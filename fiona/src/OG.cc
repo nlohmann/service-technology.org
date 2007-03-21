@@ -60,7 +60,7 @@ operatingGuidelines::~operatingGuidelines() {
 	  if (options[O_BDD] == true) {
 		delete bdd;
 	  }
-	  
+
 }
 
 //! \fn void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
@@ -206,15 +206,14 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 	analyseNode(currentNode, true);
 
 	string color = "";
-
 	if (currentNode->getColor() == RED) {
 		color = "RED";
 	} else if (currentNode->getColor() == BLUE) {
 		color = "BLUE";
 	} else {
+		assert(false);
 		color = "BLACK";
 	}
-
 	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");
 
 	

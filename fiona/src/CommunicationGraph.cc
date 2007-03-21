@@ -764,9 +764,10 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
 	            }
             }
 
-            string CNF = "";
-            
             if (parameters[P_OG]) {
+				// add annotation to node
+				string CNF = "";
+            
                 if (v->getColor() == RED) {
                     CNF += "(false)";
                 } else if (v->reachGraphStateSet.size() == 0) {
@@ -774,12 +775,11 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
                 } else {
                 	CNF += v->getCNFString();
                 }
-            }
+				CNF += "\\n";			
+				CNF += v->getCNF_formula()->asString();
 
-			CNF += "\\n";			
-			CNF += v->getCNF_formula()->asString();
-			
-			os << CNF;
+				os << CNF;
+            }
 
             os << "\", fontcolor=black, color=";
 

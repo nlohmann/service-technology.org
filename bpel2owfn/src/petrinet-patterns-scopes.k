@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/03/20 14:08:28 $
+ * \date    \$Date: 2007/03/21 11:48:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  */
 %}
 
@@ -344,6 +344,8 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
  * \fn      void kc::PScope(impl_tScope* abstract_phylum, uview current_view)
  *
  * \brief   Pattern for the <scope> activity.
+ *
+ *          \image html "scope.png" "pattern"
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view

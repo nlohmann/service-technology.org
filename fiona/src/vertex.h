@@ -40,6 +40,7 @@
 #include <set>
 
 #include "enums.h"
+#include "commGraphFormula.h"
 
 using namespace std;
 
@@ -48,6 +49,7 @@ class graphEdge;
 class successorNodeList;
 class literal;
 class CNF;
+class CNF_formula;
 
 
 struct StateCompare {
@@ -65,8 +67,11 @@ protected:
     unsigned int numberOfVertex;			//!< number of this vertex in the graph
 
 	vertexColor color; 						//!< color of vertex
-    CNF * firstClause;						//!< annotation of this node (a CNF)
 
+    CNF * firstClause;						//!< annotation of this node (a CNF)
+	CNF_formula annotation;					//!< annotation of this node (a CNF) as a formula 
+	
+	
 	successorNodeList * successorNodes;		//!< list of all the nodes succeeding this one 
 											//!< including the edge between them
 	
@@ -103,9 +108,11 @@ public:
 
 	// annotation
     CNF * getAnnotation();
+    CNF_formula getCNF_formula();
     string getCNFString();
     
     void addClause(literal *, bool);
+    void addClause(CommGraphFormulaMultiaryOr*);
     void setAnnotationEdges(graphEdge *);
    
 //	int numberOfElementsInAnnotation();

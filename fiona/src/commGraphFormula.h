@@ -40,6 +40,7 @@
 
 class CommGraphFormulaFixed;
 
+
 /**
  * Assignment of literals to truth values to determine the truth value of a
  * CommGraphFormula under the given assignment. Typical literals are edge
@@ -90,6 +91,7 @@ public:
     bool get(const std::string& literal) const;
 };
 
+
 /**
  * A formula to be used as an annotation for a state in an OG or IG. This is an
  * abstract base class for all other formula classes. Use those to construct an
@@ -130,6 +132,7 @@ public:
     virtual bool value(const CommGraphFormulaAssignment& assignment) const = 0;
 };
 
+
 /**
  * Base class for all multiary \link CommGraphFormula
  * CommGraphFormulas\endlink, such as CommGraphFormulaMultiaryAnd and
@@ -151,6 +154,14 @@ private:
      */
     subFormulas_t subFormulas;
 public:
+    CommGraphFormulaMultiary();
+    /**
+     * Constructs a multiary formula from a given subformula by adding the
+     * subformula into the set of subformulae.
+     * @param newformula The subformula to be added
+     */
+    CommGraphFormulaMultiary(CommGraphFormula* newformula);
+
     /**
      * Constructs a multiary formula from two given subformulas. This
      * constructor exists to conviently construct binary formulas from a left
@@ -166,6 +177,7 @@ public:
      * Destroys this CommGraphFormulaMultiary and all its subformulas.
      */
     virtual ~CommGraphFormulaMultiary();
+    
     virtual std::string asString() const;
 
     /**
@@ -175,6 +187,7 @@ public:
      * @returns The string representation of this multiary formula's operator.
      */
     virtual std::string getOperator() const = 0;
+    
     virtual bool value(const CommGraphFormulaAssignment& assignment) const;
 
     /**
@@ -185,11 +198,14 @@ public:
      * CommGraphFormulaMultiaryAnd and CommGraphFormulaMultiaryOr in a single
      * method here.
      */
-    virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const = 0;
+	virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const = 0;
+	
+	void addSubFormula(CommGraphFormula* subformula);
 };
 
+
 /**
- * A multiary conjunction of \link CommGraphFormula CommGraphFormulas.\end Can
+ * A multiary conjunction of \link CommGraphFormula CommGraphFormulas.\endlink Can
  * have arbitrarily many subformulas, even none.
  */
 class CommGraphFormulaMultiaryAnd : public CommGraphFormulaMultiary {
@@ -204,16 +220,20 @@ private:
     static const CommGraphFormulaFixed emptyFormulaEquivalent;
 public:
     /** See CommGraphFormulaMultiary(). */
+    CommGraphFormulaMultiaryAnd();
+    CommGraphFormulaMultiaryAnd(CommGraphFormula* subformula_);
     CommGraphFormulaMultiaryAnd(CommGraphFormula* lhs, CommGraphFormula* rhs);
 
     /** Destroys this CommGraphFormulaMultiaryAnd and all its subformulas. */
     virtual ~CommGraphFormulaMultiaryAnd() {};
     virtual std::string getOperator() const;
     virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const;
+
 };
 
+
 /**
- * A multiary disjunction of \link CommGraphFormula CommGraphFormulas.\end Can
+ * A multiary disjunction of \link CommGraphFormula CommGraphFormulas.\endlink Can
  * have arbitrarily many subformulas, even none.
  */
 class CommGraphFormulaMultiaryOr : public CommGraphFormulaMultiary {
@@ -225,6 +245,8 @@ private:
     static const CommGraphFormulaFixed emptyFormulaEquivalent;
 public:
     /** See CommGraphFormulaMultiary(). */
+    CommGraphFormulaMultiaryOr();
+    CommGraphFormulaMultiaryOr(CommGraphFormula* subformula_);
     CommGraphFormulaMultiaryOr(CommGraphFormula* lhs, CommGraphFormula* rhs);
 
     /** Destroys this CommGraphFormulaMultiaryOr and all its subformulas. */
@@ -232,6 +254,28 @@ public:
     virtual std::string getOperator() const;
     virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const;
 };
+
+
+/**
+ * A multiary conjunction of \link CommGraphFormula CommGraphFormulasMultiaryOr.\endlink
+ * Each disjunction is called "clause" and has a set of literals.
+ * This class exists for special function "addClause", etc.
+ */
+class CNF_formula : public CommGraphFormulaMultiaryAnd {
+private:
+public:
+    CNF_formula();
+    //** constructs a new CNF and adds the clause to the CNF
+    CNF_formula(CommGraphFormulaMultiaryOr* clause);
+    CNF_formula(CommGraphFormulaMultiaryOr* clause1, CommGraphFormulaMultiaryOr* clause2);
+    
+    //** destroys the CNF and all its clauses
+    virtual ~CNF_formula() {};
+    
+    //** adds a clause to the CNF
+    void addClause(CommGraphFormulaMultiaryOr* clause);
+};
+
 
 /**
  * Base class for all formulas that have a fixed value, i.e., a value that does

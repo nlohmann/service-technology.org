@@ -33,6 +33,7 @@
  */
 
 #include "commGraphFormula.h"
+#include "debug.h"
 #include <cassert>
 
 const std::string CommGraphFormulaAssignment::TAU = std::string("tau");
@@ -61,6 +62,16 @@ bool CommGraphFormula::satisfies(const CommGraphFormulaAssignment& assignment)
     return value(assignment);
 }
 
+
+CommGraphFormulaMultiary::CommGraphFormulaMultiary() {
+}
+
+
+CommGraphFormulaMultiary::CommGraphFormulaMultiary(CommGraphFormula* newformula) {
+    subFormulas.insert(newformula);
+}
+
+
 CommGraphFormulaMultiary::CommGraphFormulaMultiary(CommGraphFormula* lhs,
     CommGraphFormula* rhs)
 {
@@ -68,13 +79,15 @@ CommGraphFormulaMultiary::CommGraphFormulaMultiary(CommGraphFormula* lhs,
     subFormulas.insert(rhs);
 }
 
-CommGraphFormulaMultiary::~CommGraphFormulaMultiary()
-{
+CommGraphFormulaMultiary::~CommGraphFormulaMultiary() {
+	trace(TRACE_5, "CommGraphFormulaMultiary::~CommGraphFormulaMultiary() : start\n");
+
     for (subFormulas_t::const_iterator currentFormula = subFormulas.begin();
         currentFormula != subFormulas.end(); ++currentFormula)
     {
         delete *currentFormula;
     }
+	trace(TRACE_5, "CommGraphFormulaMultiary::~CommGraphFormulaMultiary() : end\n");
 }
 
 std::string CommGraphFormulaMultiary::asString() const
@@ -87,12 +100,13 @@ std::string CommGraphFormulaMultiary::asString() const
 
     while (++currentFormula != subFormulas.end())
     {
-        formulaString += getOperator() + " " +
+        formulaString += " " + getOperator() + " " +
             (*currentFormula)->asString();
     }
 
     return formulaString + ')';
 }
+
 
 bool CommGraphFormulaMultiary::value(
     const CommGraphFormulaAssignment& assignment) const
@@ -110,19 +124,37 @@ bool CommGraphFormulaMultiary::value(
     return getEmptyFormulaEquivalent().value(assignment);
 }
 
-CommGraphFormulaMultiaryAnd::CommGraphFormulaMultiaryAnd(
-    CommGraphFormula* lhs_, CommGraphFormula* rhs_) :
-    CommGraphFormulaMultiary(lhs_, rhs_)
-{
+
+void CommGraphFormulaMultiary::addSubFormula(CommGraphFormula* subformula) {
+	subFormulas.insert(subformula);
 }
+
+
+CommGraphFormulaMultiaryAnd::CommGraphFormulaMultiaryAnd() {
+}
+
+
+CommGraphFormulaMultiaryAnd::CommGraphFormulaMultiaryAnd(CommGraphFormula* formula) :
+   CommGraphFormulaMultiary(formula) {
+}
+
+
+CommGraphFormulaMultiaryAnd::CommGraphFormulaMultiaryAnd(CommGraphFormula* lhs_,
+    CommGraphFormula* rhs_) :
+    CommGraphFormulaMultiary(lhs_, rhs_) {
+
+}
+
 
 std::string CommGraphFormulaMultiaryAnd::getOperator() const
 {
     return "*";
 }
 
+
 const CommGraphFormulaFixed
 CommGraphFormulaMultiaryAnd::emptyFormulaEquivalent = CommGraphFormulaTrue();
+
 
 const CommGraphFormulaFixed&
 CommGraphFormulaMultiaryAnd::getEmptyFormulaEquivalent() const
@@ -130,24 +162,57 @@ CommGraphFormulaMultiaryAnd::getEmptyFormulaEquivalent() const
     return emptyFormulaEquivalent;
 }
 
+
+CommGraphFormulaMultiaryOr::CommGraphFormulaMultiaryOr() {
+}
+
+
+CommGraphFormulaMultiaryOr::CommGraphFormulaMultiaryOr(CommGraphFormula* formula) :
+   CommGraphFormulaMultiary(formula) {
+}
+
+
 CommGraphFormulaMultiaryOr::CommGraphFormulaMultiaryOr(CommGraphFormula* lhs_,
     CommGraphFormula* rhs_) : CommGraphFormulaMultiary(lhs_, rhs_)
 {
 }
+
 
 std::string CommGraphFormulaMultiaryOr::getOperator() const
 {
     return "+";
 }
 
+
 const CommGraphFormulaFixed
 CommGraphFormulaMultiaryOr::emptyFormulaEquivalent = CommGraphFormulaFalse();
+
 
 const CommGraphFormulaFixed&
 CommGraphFormulaMultiaryOr::getEmptyFormulaEquivalent() const
 {
     return emptyFormulaEquivalent;
 }
+
+
+CNF_formula::CNF_formula() {
+}
+
+
+CNF_formula::CNF_formula(CommGraphFormulaMultiaryOr* clause_) :
+    CommGraphFormulaMultiaryAnd(clause_) {
+    
+}
+
+CNF_formula::CNF_formula(CommGraphFormulaMultiaryOr* clause1_, CommGraphFormulaMultiaryOr* clause2_) :
+    CommGraphFormulaMultiaryAnd(clause1_, clause2_) {
+    
+}
+
+void CNF_formula::addClause(CommGraphFormulaMultiaryOr* clause) {
+	addSubFormula(clause);
+}
+
 
 CommGraphFormulaFixed::CommGraphFormulaFixed(bool value,
     const std::string& asString) :

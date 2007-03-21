@@ -49,6 +49,8 @@ vertex::vertex(int numberEvents) :
 			   predecessorNodes(NULL),
 			   finalAnalysisDone(false) {
 
+	annotation = CNF_formula();
+
 	eventsUsed = new int [numberEvents];
 	
 	for (int i = 0; i < numberEvents; i++) {
@@ -147,7 +149,7 @@ bool vertex::addState(State * s) {
 //! \param _isFinalState determines whether clause points to a final state or not
 //! \brief adds a new clause to the CNF of the node
 void vertex::addClause(literal * myFirstLiteral, bool _isFinalState) {
-    trace(TRACE_5, "vertex::addClause(literal * myFirstLiteral) : start\n");
+    trace(TRACE_5, "vertex::addClause(literal * myFirstLiteral, bool _isFinalState) : start\n");
 	
 	CNF * cnfElement = firstClause;
 	
@@ -158,7 +160,7 @@ void vertex::addClause(literal * myFirstLiteral, bool _isFinalState) {
 		firstClause = new CNF();
 		firstClause->firstLiteral = myFirstLiteral;
 		firstClause->isFinalState = _isFinalState;
-		trace(TRACE_5, "vertex::addClause(clause * myFirstLiteral) : end\n");
+		trace(TRACE_5, "vertex::addClause(literal * myFirstLiteral, bool _isFinalState) : end\n");
 //		cout << "number of elements in annotation of node " << numberOfVertex << " : " << numberOfElementsInAnnotation() << endl;
 		return;
 	}
@@ -172,7 +174,15 @@ void vertex::addClause(literal * myFirstLiteral, bool _isFinalState) {
 
 //	cout << "number of elements in annotation of node " << numberOfVertex << " : " << numberOfElementsInAnnotation() << endl;
 		
-    trace(TRACE_5, "vertex::addClause(clause * myFirstLiteral) : end\n");
+    trace(TRACE_5, "vertex::addClause(literal * myFirstLiteral, bool _isFinalState) : end\n");
+}
+
+
+//! \fn void vertex::addClause(CommGraphFormulaMultiaryOr* myclause)
+//! \param myclause the clause to be added to the annotation of the current node
+//! \brief adds a new clause to the CNF formula of the node
+void vertex::addClause(CommGraphFormulaMultiaryOr* myclause) {
+	annotation.addClause(myclause);
 }
 
 
@@ -301,6 +311,11 @@ string vertex::getCNFString() {
 
 CNF * vertex::getAnnotation() {
 	return firstClause;
+}
+
+
+CNF_formula vertex::getCNF_formula() {
+	return annotation;
 }
 
 

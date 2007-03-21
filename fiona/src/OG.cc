@@ -97,6 +97,9 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 
 	// get the annotation of the node (CNF)
 	computeCNF(currentNode);					// calculate CNF of this node
+	
+	cout << "returned from computeCNF: " << currentNode->getCNF_formula().asString() << endl;
+	
 
 	trace(TRACE_1, "=================================================================\n");
 
@@ -231,7 +234,9 @@ void operatingGuidelines::computeCNF(vertex* node) {
 	
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): start\n");
 	
+	// initially, the annoation is empty (and therefore equivalent to true)
 	assert(node->getAnnotation() == NULL);
+	assert(node->getCNF_formula().asString() == "true");
 	
 	StateSet::iterator iter;			// iterator over the states of the node
 	
@@ -248,22 +253,37 @@ void operatingGuidelines::computeCNF(vertex* node) {
 							
 				// this clause's first literal
 				literal * myFirstLiteral = new literal();
+				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
+				
+				cout << "\n\t a new clause was generated: " << myclause->asString() << endl;
 				
 				// get the activated output events
 				for (unsigned int i = 0; i < PN->placeOutputCnt; i++) {
 					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
-						myFirstLiteral->addLiteral(PN->outputPlacesArray[i]->name);	
+						myFirstLiteral->addLiteral(PN->outputPlacesArray[i]->name);
+
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->outputPlacesArray[i]->name);
+						myclause->addSubFormula(myliteral);
 					}
 				}
 
 				// get all the input events
 				for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
 					myFirstLiteral->addLiteral(PN->inputPlacesArray[i]->name);
+
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->inputPlacesArray[i]->name);
+					myclause->addSubFormula(myliteral);
 				}
 
 				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
+
+				cout << "\n\t building clause finished: " << myclause->asString() << endl;
+				node->addClause(myclause);
 			}
 		}
+
+		PN->setOfStatesTemp.clear();
+
 	} else {	// no state reduction
 
 		// iterate over all states of the node
@@ -272,32 +292,45 @@ void operatingGuidelines::computeCNF(vertex* node) {
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
 				// we just consider the maximal states only
 				
-				literal * myFirstLiteral = new literal();
-				
 				// get the marking of this state
 				(*iter)->decodeShowOnly(PN);
 							
+				// this clause's first literal
+				literal * myFirstLiteral = new literal();
+				
+				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
+				cout << "\n\t a new clause was generated: " << myclause->asString() << endl;
+
 				// get the activated output events
 				for (unsigned int i = 0; i < PN->placeOutputCnt; i++) {
 					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
-						myFirstLiteral->addLiteral(PN->outputPlacesArray[i]->name);	
+						myFirstLiteral->addLiteral(PN->outputPlacesArray[i]->name);
+
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->outputPlacesArray[i]->name);
+						myclause->addSubFormula(myliteral);
 					}
 				}
 
 				// get all the input events
 				for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
 					myFirstLiteral->addLiteral(PN->inputPlacesArray[i]->name);
+
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->inputPlacesArray[i]->name);
+					myclause->addSubFormula(myliteral);
 				}
 				
 				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
+
+				cout << "\n\t building clause finished: " << myclause->asString() << endl;
+
+				cout << "annotation before: " << node->getCNF_formula().asString() << endl;
+				node->addClause(myclause);
+				cout << "annotation afterwards: " << node->getCNF_formula().asString() << endl;
+				
+				// TODO: an dieser stelle prüfen, ob myclause false ist -> dann knoten rot machen
 			}
 		}
 	}
-
-	PN->setOfStatesTemp.clear();
-
-//	if (node->reachGraphStateSet.size() != 0)
-//		assert(node->annotation != NULL);
 
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): end\n");
 }

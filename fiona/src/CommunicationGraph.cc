@@ -727,8 +727,6 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
 
             os << "p" << v->getNumber() << " [label=\"# " << v->getNumber() << "\\n";
 
-            string CNF = "";
-
             StateSet::iterator iter;  // iterator over the stateList's elements
 
 			if (parameters[P_SHOW_STATES_PER_NODE]) {
@@ -761,11 +759,13 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
                         case FINALSTATE: os << "FS" << ")"; break;
                         
                         default: os << "TR" << ")"; break;
-                    }                                                
+                    }
 	                os << "\\n";
 	            }
             }
 
+            string CNF = "";
+            
             if (parameters[P_OG]) {
                 if (v->getColor() == RED) {
                     CNF += "(false)";
@@ -775,6 +775,14 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
                 	CNF += v->getCNFString();
                 }
             }
+
+			CNF += "\\n";
+			
+			cout << "alive" << endl;
+			
+			CNF += v->getCNF_formula().asString();
+			
+			cout << "still alive" << endl;
 
 			os << CNF;
 

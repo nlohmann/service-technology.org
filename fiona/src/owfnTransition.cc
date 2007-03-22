@@ -121,90 +121,94 @@ void owfnTransition::set_hashchange() {
 	hash_change %= HASHSIZE;
 }
 
-void owfnTransition::initialize(oWFN * PN) {
+void owfnTransition::initialize(oWFN * PN)
+{
+    // Create list of Pre-Places for enabling test
+    for (unsigned int i = 0; i < NrOfArriving; ++i)
+    {
+        PrePlaces.push_back(
+            AdjacentPlace(ArrivingArcs[i]->pl, ArrivingArcs[i]->Multiplicity)
+        );
+    }
 
-  unsigned int i,j,k;
-  // Create list of Pre-Places for enabling test
-  for (i = 0; i < NrOfArriving; ++i)
-  {
-      PrePlaces.push_back(
-          AdjacentPlace(ArrivingArcs[i]->pl, ArrivingArcs[i]->Multiplicity)
-      );
-  }
-  // Create list of places where transition increments marking
-  
-  k=0;
-  for(i = 0; i < NrOfLeaving;i++)
+    // Create list of places where transition increments marking
+    for (unsigned int i = 0; i < NrOfLeaving; i++)
     {
-      //Is oWFNPlace a loop place?
-      for(j=0;j<NrOfArriving;j++)
-	{
-	  if((LeavingArcs[i]->Destination) == (ArrivingArcs[j]->Source))
-	    {
-	      break;
-	    }
-	}
-      if(j<NrOfArriving)
-	{
-	  //yes, loop place
-	  if(LeavingArcs[i]->Multiplicity > ArrivingArcs[j]->Multiplicity)
-	    {
-	      // indeed, transition increments place
-	      IncrPlaces.push_back(
-	          AdjacentPlace(
-	              LeavingArcs[i]->pl,
-	              LeavingArcs[i]->Multiplicity - ArrivingArcs[j]->Multiplicity
-	          )
-	      );
-	    } 
-	}
-      else
-	{
-	  // no loop place
-	  IncrPlaces.push_back(
-	      AdjacentPlace(LeavingArcs[i]->pl, LeavingArcs[i]->Multiplicity)
-	  );
-	}
+        //Is oWFNPlace a loop place?
+        unsigned int j = 0;
+        for (j = 0; j < NrOfArriving; j++)
+        {
+            if((LeavingArcs[i]->Destination) == (ArrivingArcs[j]->Source))
+                break;
+        }
+
+        if(j < NrOfArriving)
+        {
+            //yes, loop place
+            if(LeavingArcs[i]->Multiplicity > ArrivingArcs[j]->Multiplicity)
+            {
+                // indeed, transition increments place
+                IncrPlaces.push_back(
+                    AdjacentPlace(
+                        LeavingArcs[i]->pl,
+                        LeavingArcs[i]->Multiplicity -
+                        ArrivingArcs[j]->Multiplicity
+                    )
+                );
+            }
+        }
+        else
+        {
+            // no loop place
+            IncrPlaces.push_back(
+                AdjacentPlace(LeavingArcs[i]->pl, LeavingArcs[i]->Multiplicity)
+            );
+        }
     }
-  // Create list of places where transition decrements marking
-  for(i = 0; i < NrOfArriving;i++)
+
+    // Create list of places where transition decrements marking
+    for (unsigned int i = 0; i < NrOfArriving; i++)
     {
-      //Is oWFNPlace a loop place?
-      for(j=0;j<NrOfLeaving;j++)
-	{
-	  if((ArrivingArcs[i]->Source) == (LeavingArcs[j]->Destination))
-	    {
-	      break;
-	    }
-	}
-      if(j<NrOfLeaving)
-	{
-	  //yes, loop place
-	  if(ArrivingArcs[i]->Multiplicity > LeavingArcs[j]->Multiplicity)
-	    {
-	      // indeed, transition decrements place
-	      DecrPlaces.push_back(
-	          AdjacentPlace(
-	              ArrivingArcs[i]->pl,
-	              ArrivingArcs[i]->Multiplicity - LeavingArcs[j]->Multiplicity
-	          )
-	      );
-	    } 
-	}
-      else
-	{
-	  // no loop place
-	  DecrPlaces.push_back(
-	      AdjacentPlace(ArrivingArcs[i]->pl, ArrivingArcs[i]->Multiplicity)
-	  );
-	}
+        //Is oWFNPlace a loop place?
+        unsigned int j = 0;
+        for (j = 0; j < NrOfLeaving; j++)
+        {
+            if ((ArrivingArcs[i]->Source) == (LeavingArcs[j]->Destination))
+                break;
+        }
+
+        if (j < NrOfLeaving)
+        {
+            //yes, loop place
+            if (ArrivingArcs[i]->Multiplicity > LeavingArcs[j]->Multiplicity)
+            {
+                // indeed, transition decrements place
+                DecrPlaces.push_back(
+                    AdjacentPlace(
+                        ArrivingArcs[i]->pl,
+                        ArrivingArcs[i]->Multiplicity -
+                        LeavingArcs[j]->Multiplicity
+                    )
+                );
+            }
+        }
+        else
+        {
+            // no loop place
+            DecrPlaces.push_back(
+                AdjacentPlace(
+                    ArrivingArcs[i]->pl,
+                    ArrivingArcs[i]->Multiplicity)
+            );
+        }
     }
+
     // Create list of transitions where enabledness can change
     // if this transition fires.
     for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i)
     {
         owfnPlace* incrOwfnPlace = IncrPlaces[i].getOwfnPlace();
-        for (j = 0; j < incrOwfnPlace->NrOfLeaving;j++)
+        for (unsigned int j = 0; j < incrOwfnPlace->NrOfLeaving; j++)
         {
             if (!(incrOwfnPlace->LeavingArcs)[j]->tr->isEnabled())
             {
@@ -219,7 +223,7 @@ void owfnTransition::initialize(oWFN * PN) {
     for (AdjacentPlaces_t::size_type i = 0; i != DecrPlaces.size(); ++i)
     {
         owfnPlace* decrOwfnPlace = DecrPlaces[i].getOwfnPlace();
-        for(j=0;j < decrOwfnPlace->NrOfLeaving;j++)
+        for(unsigned int j = 0; j < decrOwfnPlace->NrOfLeaving; j++)
         {
             if (!(decrOwfnPlace->LeavingArcs)[j]->tr->isEnabled())
             {
@@ -240,11 +244,11 @@ void owfnTransition::initialize(oWFN * PN) {
 	// create list of conflicting transitions
 	PN -> startOfEnabledList = (owfnTransition *) 0;
 	PN->transNrEnabled = 0;
-	for (i = 0; i != PrePlaces.size(); ++i)
+	for (unsigned int i = 0; i != PrePlaces.size(); ++i)
 	{
 		AdjacentPlace prePlace = PrePlaces[i];
 		owfnPlace* preOwfnPlace = prePlace.getOwfnPlace();
-		for(j = 0; j < preOwfnPlace->NrOfLeaving; j++)
+		for (unsigned int j = 0; j < preOwfnPlace->NrOfLeaving; j++)
 		{
 			if(preOwfnPlace->LeavingArcs[j]->tr != this)
 			{
@@ -259,7 +263,8 @@ void owfnTransition::initialize(oWFN * PN) {
 		}
 	}
 	conflicting = new owfnTransition * [PN->transNrEnabled + 1];
-	for(i=0;PN->startOfEnabledList;PN->startOfEnabledList = PN->startOfEnabledList ->NextEnabled,i++)
+	unsigned int i = 0;    
+	for(i = 0; PN->startOfEnabledList;PN->startOfEnabledList = PN->startOfEnabledList ->NextEnabled, i++)
 	{
 		PN->startOfEnabledList ->setEnabled(false);
 		conflicting[i] = PN->startOfEnabledList;

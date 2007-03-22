@@ -115,7 +115,7 @@ void owfnTransition::set_hashchange() {
 	hash_change %= HASHSIZE;
 }
 
-void owfnTransition::initialize(oWFN * PN)
+void owfnTransition::initialize()
 {
     // Create list of Pre-Places for enabling test
     for (unsigned int i = 0; i < NrOfArriving; ++i)
@@ -227,17 +227,13 @@ void owfnTransition::initialize(oWFN * PN)
         }
     }
 
-  PN->transNrQuasiEnabled = 0;
-
-  set_hashchange();
+    set_hashchange();
 #ifdef STUBBORN
     stamp = 0;
     NextStubborn = 0;
     instubborn = false;
 
     // create list of conflicting transitions
-    PN -> startOfEnabledList = (owfnTransition *) 0;
-    PN->transNrEnabled = 0;
     for (unsigned int i = 0; i != PrePlaces.size(); ++i)
     {
         AdjacentPlace prePlace = PrePlaces[i];
@@ -257,7 +253,6 @@ void owfnTransition::initialize(oWFN * PN)
 
     mustbeincluded = conflicting;
 #endif
-    PN->transNrEnabled = 0;
 }
 
 

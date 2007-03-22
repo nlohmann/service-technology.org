@@ -65,8 +65,6 @@ oWFN::oWFN() : placeCnt(0), arcCnt(0), transCnt(0), filename(NULL),
                BitVectorSize(0), startOfQuasiEnabledList(NULL),
                startOfEnabledList(NULL)
 {
-	startOfEnabledList = (owfnTransition *) 0;
-
 	unsigned int i;
   	NonEmptyHash = 0;
 //	commDepth = 0;
@@ -191,13 +189,13 @@ void oWFN::initialize() {
   	
 	// initialize transitions
   	for(i = 0; i < transCnt; i++) {
-		Transitions[i]->setEnabled(false);
-		Transitions[i]->setQuasiEnabled(false);
+		Transitions[i]->initialize();
   	}
-  	
-  	for(i = 0; i < transCnt; i++) {
-		Transitions[i]->initialize(this);
-  	}
+
+    startOfEnabledList = NULL;
+    PN->transNrEnabled = 0;
+    startOfQuasiEnabledList = NULL;
+    PN->transNrQuasiEnabled = 0;
   	
   	for(i=0; i < placeCnt; i++) {
         CurrentMarking[i] = Places[i]->initial_marking;

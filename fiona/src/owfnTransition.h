@@ -207,7 +207,7 @@ class owfnTransition: public Node
         owfnTransition *PrevQuasiEnabled;
 
         /** Set above arrays, list, enabled... */
-        void initialize(oWFN *);
+        void initialize();
 
         /**
          * replace current marking by successor marking, force enabling test

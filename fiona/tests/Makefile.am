@@ -40,14 +40,14 @@ SINGLE_CHECK_TARGETS = $(TESTS:%.sh=check-%)
 # The script belonging to the current check target is inferred from the
 # name of the target by removing the initial 'check-' and adding '.sh' to
 # the end.
-$(SINGLE_CHECK_TARGETS):
+$(SINGLE_CHECK_TARGETS): all
 	-$(TESTS_ENVIRONMENT) ./$(@:check-%=%.sh)
 
 # Global memcheck target. Runs all tests under valgrind.
-memcheck:
+memcheck: all
 	$(MAKE) $(AM_MAKEFLAGS) $(MEMCHECK_ENVIRONMENT) check
 
 # Create single memcheck target analogous to single check targets
 SINGLE_MEMCHECK_TARGETS = $(TESTS:%.sh=memcheck-%)
-$(SINGLE_MEMCHECK_TARGETS):
+$(SINGLE_MEMCHECK_TARGETS): all
 	-$(MEMCHECK_ENVIRONMENT) ./$(@:memcheck-%=%.sh)

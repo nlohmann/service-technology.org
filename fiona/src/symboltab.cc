@@ -38,7 +38,6 @@
 #include "owfnTransition.h"
 
 SymbolTab<PlSymbol>* PlaceTable;
-SymbolTab<TrSymbol>* TransitionTable;
 
 
 Symbol::Symbol(const std::string& n) : name(n)

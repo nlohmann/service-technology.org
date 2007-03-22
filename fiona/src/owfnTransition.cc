@@ -73,6 +73,12 @@ owfnTransition::owfnTransition(const std::string& name) :
 owfnTransition::~owfnTransition() {
 }
 
+void owfnTransition::addPrePlace(owfnPlace* owfnPlace,
+    unsigned int multiplicity)
+{
+    PrePlaces.push_back(AdjacentPlace(owfnPlace, multiplicity));
+}
+
 bool owfnTransition::isEnabled() const
 {
     return isEnabled_;
@@ -118,35 +124,35 @@ void owfnTransition::set_hashchange() {
 void owfnTransition::initialize()
 {
     // Create list of Pre-Places for enabling test
-    for (unsigned int i = 0; i < NrOfArriving; ++i)
+    for (unsigned int i = 0; i < getArrivingArcsCount(); ++i)
     {
         PrePlaces.push_back(
-            AdjacentPlace(ArrivingArcs[i]->pl, ArrivingArcs[i]->Multiplicity)
+            AdjacentPlace(getArrivingArc(i)->pl, getArrivingArc(i)->Multiplicity)
         );
     }
 
     // Create list of places where transition increments marking
-    for (unsigned int i = 0; i < NrOfLeaving; i++)
+    for (unsigned int i = 0; i < getLeavingArcsCount(); i++)
     {
         //Is oWFNPlace a loop place?
         unsigned int j = 0;
-        for (j = 0; j < NrOfArriving; j++)
+        for (j = 0; j < getArrivingArcsCount(); j++)
         {
-            if((LeavingArcs[i]->Destination) == (ArrivingArcs[j]->Source))
+            if((getLeavingArc(i)->Destination) == (getArrivingArc(j)->Source))
                 break;
         }
 
-        if(j < NrOfArriving)
+        if(j < getArrivingArcsCount())
         {
             //yes, loop place
-            if(LeavingArcs[i]->Multiplicity > ArrivingArcs[j]->Multiplicity)
+            if(getLeavingArc(i)->Multiplicity > getArrivingArc(j)->Multiplicity)
             {
                 // indeed, transition increments place
                 IncrPlaces.push_back(
                     AdjacentPlace(
-                        LeavingArcs[i]->pl,
-                        LeavingArcs[i]->Multiplicity -
-                        ArrivingArcs[j]->Multiplicity
+                        getLeavingArc(i)->pl,
+                        getLeavingArc(i)->Multiplicity -
+                        getArrivingArc(j)->Multiplicity
                     )
                 );
             }
@@ -155,33 +161,33 @@ void owfnTransition::initialize()
         {
             // no loop place
             IncrPlaces.push_back(
-                AdjacentPlace(LeavingArcs[i]->pl, LeavingArcs[i]->Multiplicity)
+                AdjacentPlace(getLeavingArc(i)->pl, getLeavingArc(i)->Multiplicity)
             );
         }
     }
 
     // Create list of places where transition decrements marking
-    for (unsigned int i = 0; i < NrOfArriving; i++)
+    for (unsigned int i = 0; i < getArrivingArcsCount(); i++)
     {
         //Is oWFNPlace a loop place?
         unsigned int j = 0;
-        for (j = 0; j < NrOfLeaving; j++)
+        for (j = 0; j < getLeavingArcsCount(); j++)
         {
-            if ((ArrivingArcs[i]->Source) == (LeavingArcs[j]->Destination))
+            if ((getArrivingArc(i)->Source) == (getLeavingArc(j)->Destination))
                 break;
         }
 
-        if (j < NrOfLeaving)
+        if (j < getLeavingArcsCount())
         {
             //yes, loop place
-            if (ArrivingArcs[i]->Multiplicity > LeavingArcs[j]->Multiplicity)
+            if (getArrivingArc(i)->Multiplicity > getLeavingArc(j)->Multiplicity)
             {
                 // indeed, transition decrements place
                 DecrPlaces.push_back(
                     AdjacentPlace(
-                        ArrivingArcs[i]->pl,
-                        ArrivingArcs[i]->Multiplicity -
-                        LeavingArcs[j]->Multiplicity
+                        getArrivingArc(i)->pl,
+                        getArrivingArc(i)->Multiplicity -
+                        getLeavingArc(j)->Multiplicity
                     )
                 );
             }
@@ -191,8 +197,8 @@ void owfnTransition::initialize()
             // no loop place
             DecrPlaces.push_back(
                 AdjacentPlace(
-                    ArrivingArcs[i]->pl,
-                    ArrivingArcs[i]->Multiplicity)
+                    getArrivingArc(i)->pl,
+                    getArrivingArc(i)->Multiplicity)
             );
         }
     }
@@ -202,12 +208,12 @@ void owfnTransition::initialize()
     for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i)
     {
         owfnPlace* incrOwfnPlace = IncrPlaces[i].getOwfnPlace();
-        for (unsigned int j = 0; j < incrOwfnPlace->NrOfLeaving; j++)
+        for (unsigned int j = 0; j < incrOwfnPlace->getLeavingArcsCount(); j++)
         {
-            if (!(incrOwfnPlace->LeavingArcs)[j]->tr->isEnabled())
+            if (!incrOwfnPlace->getLeavingArc(j)->tr->isEnabled())
             {
                 // not yet in list
-                ImproveEnabling.push_back((incrOwfnPlace->LeavingArcs)[j]->tr);
+                ImproveEnabling.push_back(incrOwfnPlace->getLeavingArc(j)->tr);
             }
         }
     }
@@ -217,12 +223,12 @@ void owfnTransition::initialize()
     for (AdjacentPlaces_t::size_type i = 0; i != DecrPlaces.size(); ++i)
     {
         owfnPlace* decrOwfnPlace = DecrPlaces[i].getOwfnPlace();
-        for(unsigned int j = 0; j < decrOwfnPlace->NrOfLeaving; j++)
+        for(unsigned int j = 0; j < decrOwfnPlace->getLeavingArcsCount(); j++)
         {
-            if (!(decrOwfnPlace->LeavingArcs)[j]->tr->isEnabled())
+            if (!decrOwfnPlace->getLeavingArc(j)->tr->isEnabled())
             {
                 // not yet in list
-                ImproveDisabling.push_back((decrOwfnPlace->LeavingArcs)[j]->tr);
+                ImproveDisabling.push_back(decrOwfnPlace->getLeavingArc(j)->tr);
             }
         }
     }
@@ -238,14 +244,13 @@ void owfnTransition::initialize()
     {
         AdjacentPlace prePlace = PrePlaces[i];
         owfnPlace* preOwfnPlace = prePlace.getOwfnPlace();
-        for (unsigned int j = 0; j < preOwfnPlace->NrOfLeaving; j++)
+        for (unsigned int j = 0; j < preOwfnPlace->getLeavingArcsCount(); j++)
         {
-            if (preOwfnPlace->LeavingArcs[j]->tr != this)
+            if (preOwfnPlace->getLeavingArc(j)->tr != this)
             {
-                if (!(preOwfnPlace->LeavingArcs)[j]->tr ->isEnabled())
+                if (!preOwfnPlace->getLeavingArc(j)->tr ->isEnabled())
                 {
-                    conflicting.push_back(
-                            (preOwfnPlace->LeavingArcs)[j]->tr);
+                    conflicting.push_back(preOwfnPlace->getLeavingArc(j)->tr);
                 }
             }
         }
@@ -445,7 +450,7 @@ void owfnTransition::check_enabled(oWFN * PN) {
 		}
 	}
 	
-	if(enabledNr == NrOfArriving) {		// there are as many pre-places appropriatly marked as there are incoming arcs
+	if(enabledNr == getArrivingArcsCount()) {		// there are as many pre-places appropriatly marked as there are incoming arcs
 		if (!isEnabled() || PN->startOfEnabledList == 0) {		// transition was not enabled before
 			// include transition into list of enabled transitions
 			NextEnabled = PN->startOfEnabledList;
@@ -462,7 +467,7 @@ void owfnTransition::check_enabled(oWFN * PN) {
 			PN->transNrQuasiEnabled--;
 			excludeTransitionFromQuasiEnabledList(PN);		// delete transition from list of quasi enabled transtions
 		}
-	} else if ((enabledNr + quasiEnabledNr) == NrOfArriving) {
+	} else if ((enabledNr + quasiEnabledNr) == getArrivingArcsCount()) {
 		// transition is quasi enabled
 		if (!isQuasiEnabled()) {  // transition was not quasi enabled before
 			// include transition into list of quasi enabled transitions

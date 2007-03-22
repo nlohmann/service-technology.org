@@ -62,10 +62,15 @@ class oWFN  {
 		unsigned int NrOfStates;
 		unsigned int placeCnt;				//!< number of places
 		unsigned int arcCnt;				//!< number of arcs
-		unsigned int transCnt;				//!< number of transitions
 		unsigned int CardFireList;
 		unsigned int CardQuasiFireList;
-		
+
+		/** Type of the container holding all transitions of this oWFN. */
+		typedef std::vector<owfnTransition*> Transitions_t;
+
+		/** Contains all transitions of this oWFN. */
+		Transitions_t Transitions;
+
 		owfnTransition ** firelist();
 		
 		
@@ -79,8 +84,7 @@ class oWFN  {
 		owfnTransition ** quasiFirelist();
 
 		owfnPlace ** Places;				//!< array of places
-		owfnTransition ** Transitions;		//!< array of transitions
-		
+
 		owfnPlace * * inputPlacesArray;
 		owfnPlace * * outputPlacesArray;
 
@@ -102,7 +106,18 @@ class oWFN  {
 		unsigned int placeOutputCnt;		//!< number of output places
 
 //		unsigned int getCommDepth();
-		unsigned int getTransitionCnt();
+
+		/**
+		 * Returns the number of transitions this oWFN has.
+		 */
+		Transitions_t::size_type getTransitionCount() const;
+
+		/**
+		 * Return transition with index i of this oWFN. Indices start at 0.
+		 * Get the total number of transitions by getTransitionCount().
+		 */
+		owfnTransition* getTransition(Transitions_t::size_type i) const;
+
 		unsigned int getPlaceHashValue();
 
 		unsigned int getInputPlaceCnt();
@@ -145,7 +160,15 @@ class oWFN  {
 		void initialize();						// initializes the net
 
 		void addPlace(unsigned int, owfnPlace *);
-		void addTransition(unsigned int, owfnTransition *);
+
+		/**
+		 * Adds an owfnTransition to this oWFN.
+		 * @retval true Method succeeded.
+		 * @retval false Method failed. The given transition was not added,
+		 *     because the oWFN already contains an owfnTransition with the
+		 *     same name.
+		 */
+		bool addTransition(owfnTransition* transition);
 
 //		void addStateToList(vertex *, State *, bool);
 		void addSuccStatesToList(vertex *, State *);
@@ -219,7 +242,6 @@ class oWFN  {
 		void removeisolated();
 
 		void deletePlace(owfnPlace *);
-	    void deleteTransition(owfnTransition *);
 		
 		std::string createLabel(messageMultiSet) const;
 

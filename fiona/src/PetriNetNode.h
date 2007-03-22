@@ -35,26 +35,29 @@
 #define PETRINETNODE_H_
 
 #include "mynew.h"
-//#include<streambuf.h>
-#include<iostream>
+#include <iostream>
+#include <vector>
 
 using namespace std;
 
 class Arc;
 
 class Node {
+	private:
+		typedef std::vector<Arc*> Arcs_t;
+		Arcs_t ArrivingArcs;
+		Arcs_t LeavingArcs;
 	public:
-		// unsigned int nr;
 		std::string name;
-		unsigned short int NrOfArriving;
-		unsigned short int NrOfLeaving;
-		Arc ** ArrivingArcs;
-		Arc ** LeavingArcs;
 		Node(const std::string&);
 		ostream& operator << (ostream &);
 		~Node();
-		void NewArriving(Arc&);
-		void NewLeaving(Arc&);
+		void addArrivingArc(Arc* arc);
+		Arcs_t::size_type getArrivingArcsCount() const;
+		Arc* getArrivingArc(Arcs_t::size_type i) const;
+		void addLeavingArc(Arc* arc);
+		Arcs_t::size_type getLeavingArcsCount() const;
+		Arc* getLeavingArc(Arcs_t::size_type i) const;
 };
 
 class owfnTransition;

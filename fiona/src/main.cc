@@ -265,7 +265,6 @@ int main(int argc, char ** argv) {
             // prepare getting the net
             try {
                 PlaceTable = new SymbolTab<PlSymbol>;
-                TransitionTable = new SymbolTab<TrSymbol>;
             }
             catch(bad_alloc) {
                 char mess[] = "\nnot enough space to read net\n";
@@ -299,7 +298,6 @@ int main(int argc, char ** argv) {
             petrinets.push_back(PN);
             
             delete PlaceTable;
-            delete TransitionTable;
             
             netiter++;
         } while (netfiles.begin() != netfiles.end() && netiter != netfiles.end());
@@ -325,7 +323,7 @@ int main(int argc, char ** argv) {
             // report the net
             trace(TRACE_0, "    places: " + intToString(PN->getPlaceCnt()));
             trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCnt()) + " input places, " + intToString(PN->getOutputPlaceCnt()) + " output places)\n");
-            trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCnt()) + "\n\n");
+            trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCount()) + "\n\n");
         
             if (PN->FinalCondition) {
                 trace(TRACE_0, "finalcondition used\n\n");

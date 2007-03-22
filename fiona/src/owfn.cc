@@ -58,7 +58,7 @@ int compare (const void * a, const void * b){
 
 //! \fn oWFN::oWFN()
 //! \brief constructor
-oWFN::oWFN() : placeCnt(0), arcCnt(0), transCnt(0), filename(NULL),
+oWFN::oWFN() : placeCnt(0), arcCnt(0), filename(NULL),
                tempBinDecision(NULL),
                placeInputCnt(0), placeOutputCnt(0), FinalCondition(NULL),
                currentState(0), transNrEnabled(0), transNrQuasiEnabled(0),
@@ -110,14 +110,10 @@ oWFN::~oWFN() {
 	
 	delete[] Places;
 	
-	for(unsigned int i = 0; i < transCnt; i++) {
-		if (Transitions[i]) {
-			delete Transitions[i];
-		}
-		Transitions[i] = NULL;
-	}	
-	
-	delete[] Transitions;
+	for (Transitions_t::size_type i = 0; i < getTransitionCount(); ++i) {
+		delete getTransition(i);
+	}
+
 	delete[] CurrentMarking;
 	delete[] FinalMarking;
 	delete FinalCondition;
@@ -133,12 +129,15 @@ unsigned int oWFN::getPlaceCnt() const {
 }
 
 
-//! \fn unsigned int oWFN::getTransitionCnt()
-//! \brief returns the number of transitions of the net
-unsigned int oWFN::getTransitionCnt() {
-	return transCnt;
+oWFN::Transitions_t::size_type oWFN::getTransitionCount() const
+{
+    return Transitions.size();
 }
 
+owfnTransition* oWFN::getTransition(Transitions_t::size_type i) const
+{
+    return Transitions[i];
+}
 
 //! \fn unsigned int oWFN::getInputPlaceCnt()
 //! \brief returns the number of input places of the net
@@ -180,30 +179,26 @@ void oWFN::initialize() {
 	// initialize array of pre-transitions
 	for(i=0;i<placeCnt;i++)
 	{
-		for (unsigned int j = 0; j < Places[i]->NrOfArriving; j++)
+		for (unsigned int j = 0; j < Places[i]->getArrivingArcsCount(); j++)
 		{
-			Places[i]->PreTransitions.push_back(Places[i]->ArrivingArcs[j]->tr);
+			Places[i]->PreTransitions.push_back(Places[i]->getArrivingArc(j)->tr);
 		}
 	}
 #endif
   	
 	// initialize transitions
-  	for(i = 0; i < transCnt; i++) {
-		Transitions[i]->initialize();
-  	}
+	for (Transitions_t::size_type i = 0; i < getTransitionCount(); ++i) {
+		getTransition(i)->initialize();
+	}
 
   	for(i=0; i < placeCnt; i++) {
         CurrentMarking[i] = Places[i]->initial_marking;
   	}
  
-	for(unsigned int i = 0; i < transCnt; i++) {
-		Transitions[i]->check_enabled(this);
-  	}
-  	
-//  	for(i = 0, BitVectorSize = 0; i < placeCnt; i++) {
-//        BitVectorSize += Places[i]->nrbits;
-//  	}
-  		
+	for (Transitions_t::size_type i = 0; i < getTransitionCount(); ++i) {
+		getTransition(i)->check_enabled(this);
+	}
+
 	unsigned int ki = 0;
 	unsigned int ko = 0;
 	
@@ -235,26 +230,25 @@ void oWFN::initialize() {
 
 
 
-void oWFN::initializeTransitions() {
-	unsigned int i;
-	 	
-  	for(i = 0; i < transCnt; i++) {
-		Transitions[i]->PrevEnabled = (i == 0 ? (owfnTransition *) 0 : Transitions[i-1]);
-		Transitions[i]->NextEnabled = (i == transCnt - 1 ? (owfnTransition *) 0 : Transitions[i+1]);
- 		Transitions[i]->setEnabled(true);
-		Transitions[i]->PrevQuasiEnabled = (i == 0 ? (owfnTransition *) 0 : Transitions[i-1]);
-		Transitions[i]->NextQuasiEnabled = (i == transCnt - 1 ? (owfnTransition *) 0 : Transitions[i+1]);
- 		Transitions[i]->setQuasiEnabled(true);
+void oWFN::initializeTransitions()
+{
+	for (Transitions_t::size_type i = 0; i < getTransitionCount(); ++i) {
+		getTransition(i)->PrevEnabled = (i == 0 ? (owfnTransition *) 0 : Transitions[i-1]);
+		getTransition(i)->NextEnabled = (i == getTransitionCount() - 1 ? (owfnTransition *) 0 : Transitions[i+1]);
+ 		getTransition(i)->setEnabled(true);
+		getTransition(i)->PrevQuasiEnabled = (i == 0 ? (owfnTransition *) 0 : Transitions[i-1]);
+		getTransition(i)->NextQuasiEnabled = (i == getTransitionCount() - 1 ? (owfnTransition *) 0 : Transitions[i+1]);
+ 		getTransition(i)->setQuasiEnabled(true);
   	}
-	startOfEnabledList = (getTransitionCnt() > 0) ? Transitions[0] : NULL;
+	startOfEnabledList = (getTransitionCount() > 0) ? getTransition(0) : NULL;
 
-  	transNrEnabled = transCnt;
+  	transNrEnabled = getTransitionCount();
 
-	startOfQuasiEnabledList = (getTransitionCnt() > 0) ? Transitions[0] : NULL;
-  	transNrQuasiEnabled = transCnt; 
+	startOfQuasiEnabledList = (getTransitionCount() > 0) ? getTransition(0) : NULL;
+  	transNrQuasiEnabled = getTransitionCount(); 
   	
-	for(i = 0; i < transCnt; i++) {
-		Transitions[i]->check_enabled(this);
+	for (Transitions_t::size_type i = 0; i < getTransitionCount(); ++i) {
+		getTransition(i)->check_enabled(this);
   	}
 }
 
@@ -280,7 +274,7 @@ void oWFN::removeisolated() {
 	}
 /*
 	for(i=0;i<transCnt;i++) {
-		Transitions[i]->nr = i;
+		getTransition(i)->nr = i;
 	}
 */
 	for(i=0;i<placeCnt;i++) {
@@ -1467,8 +1461,10 @@ void oWFN::addInputMessage(unsigned int message) {
 	placeHashValue += Places[message]->hash_factor;
 	placeHashValue %= HASHSIZE;
 
-	for (int k = 0; k < Places[message]->NrOfLeaving; k++) {
-		((owfnTransition *) Places[message]->LeavingArcs[k]->Destination)->check_enabled(this);
+	for (Node::Arcs_t::size_type k = 0;
+	    k < Places[message]->getLeavingArcsCount(); k++)
+	{
+		((owfnTransition *) Places[message]->getLeavingArc(k)->Destination)->check_enabled(this);
 	}
 	return;
 }
@@ -1486,8 +1482,8 @@ int oWFN::addInputMessage(messageMultiSet messages) {
 			placeHashValue %= HASHSIZE;
 
 			// TODO: check_enabled!!!!!!!! so richtig?!
-			for (int k = 0; k < Places[*iter]->NrOfLeaving; k++) {
-				((owfnTransition *) Places[*iter]->LeavingArcs[k]->Destination)->check_enabled(this);
+			for (Node::Arcs_t::size_type k = 0; k < Places[*iter]->getLeavingArcsCount(); k++) {
+				((owfnTransition *) Places[*iter]->getLeavingArc(k)->Destination)->check_enabled(this);
 			}
 		//	return 0;
 		}
@@ -1580,12 +1576,21 @@ unsigned int oWFN::getPlaceHashValue() {
 }
 
 
-void oWFN::addTransition(unsigned int i, owfnTransition * transition) {
-	transCnt++;
-	Transitions[i] = transition;
-	if(!(transCnt % REPORTFREQUENCY)) {
-		cerr << "\n" << transCnt << "transitions parsed\n";
-  	}
+bool oWFN::addTransition(owfnTransition* transition)
+{
+	for (Transitions_t::size_type i = 0; i != Transitions.size(); ++i)
+	{
+		if (getTransition(i)->name == transition->name)
+			return false;
+	}
+
+	Transitions.push_back(transition);
+	if (!(getTransitionCount() % REPORTFREQUENCY))
+	{
+		cerr << "\n" << getTransitionCount() << "transitions parsed\n";
+	}
+
+	return true;
 }
 
 
@@ -1628,8 +1633,8 @@ bool oWFN::removeOutputMessage(unsigned int message) {
 		placeHashValue %= HASHSIZE;
 		
 		// TODO: check_enabled!!!!!!!! so richtig?!
-		for (int k = 0; k < Places[message]->NrOfLeaving; k++) {
-			((owfnTransition *) Places[message]->LeavingArcs[k]->Destination)->check_enabled(this);
+		for (Node::Arcs_t::size_type k = 0; k < Places[message]->getLeavingArcsCount(); k++) {
+			((owfnTransition *) Places[message]->getLeavingArc(k)->Destination)->check_enabled(this);
 		}
 		return true;	
 	} 
@@ -1654,8 +1659,8 @@ bool oWFN::removeOutputMessage(messageMultiSet messages) {
 				placeHashValue %= HASHSIZE;
 				
 				// TODO: check_enabled!!!!!!!! so richtig?!
-				for (int k = 0; k < Places[*iter]->NrOfLeaving; k++) {
-					((owfnTransition *) Places[*iter]->LeavingArcs[k]->Destination)->check_enabled(this);
+				for (Node::Arcs_t::size_type k = 0; k < Places[*iter]->getLeavingArcsCount(); k++) {
+					((owfnTransition *) Places[*iter]->getLeavingArc(k)->Destination)->check_enabled(this);
 				}	
 			}
 		} 
@@ -1667,12 +1672,6 @@ bool oWFN::removeOutputMessage(messageMultiSet messages) {
 void oWFN::deletePlace(owfnPlace * place) {
 	delete place;
 	placeCnt--;
-}
-
-
-void oWFN::deleteTransition(owfnTransition * transition) {
-	delete transition;
-	transCnt--;
 }
 
 
@@ -1912,9 +1911,10 @@ void NewStubbStamp(oWFN * PN) {
 		StubbStamp ++;
 	}
 	else {
-		unsigned int i;
-		for(i=0;i < PN->getTransitionCnt();i++) {
-			PN->Transitions[i]-> stamp =0;
+		for (oWFN::Transitions_t::size_type i = 0;
+		     i < PN->getTransitionCount(); ++i)
+		{
+			PN->getTransition(i)-> stamp =0;
 		}
 		StubbStamp = 1;
 	}

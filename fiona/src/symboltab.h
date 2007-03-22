@@ -49,7 +49,6 @@ class owfnTransition;
 
 //---------------------------- global variables -------------------------------
 extern SymbolTab<PlSymbol>* PlaceTable;
-extern SymbolTab<TrSymbol>* TransitionTable;
 
 //----------------------------- class SymbolTab -------------------------------
 template <typename SymbolType>

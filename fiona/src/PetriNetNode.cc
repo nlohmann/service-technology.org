@@ -35,51 +35,51 @@
 #include "petriNetNode.h"
 #include "debug.h"
 
-inline void Node::NewArriving(Arc & a) {
-  Arc ** Old = ArrivingArcs;
-  NrOfArriving++;
-  ArrivingArcs = new Arc* [NrOfArriving];
-  for(int i = 0; i < NrOfArriving -1;i++)
-  {
-    ArrivingArcs[i] = Old[i];
-  }
-  ArrivingArcs[NrOfArriving -1] = & a;
-  delete [] Old;
+void Node::addArrivingArc(Arc* arc)
+{
+    ArrivingArcs.push_back(arc);
 }
 
-inline void Node::NewLeaving(Arc & a) {
-  Arc ** Old = LeavingArcs;
-  NrOfLeaving++;
-  LeavingArcs = new Arc* [NrOfLeaving];
-  for(int i = 0; i < NrOfLeaving -1;i++)
-  {
-    LeavingArcs[i] = Old[i];
-  }
-  LeavingArcs[NrOfLeaving -1] = & a;
-  delete [] Old;
+void Node::addLeavingArc(Arc* arc)
+{
+    LeavingArcs.push_back(arc);
 }
 
-Node::~Node() {
-	trace(TRACE_5, "Node::~Node() : start\n");
-
-  // Transitions and places share pointers to the same arcs because every
-  // arriving arc of a transition is a leaving arc of a place and vice versa.
-  // Therefore we only have to delete all arcs in ArrivingArcs[]. This way all
-  // arcs in LeavingArcs[] will also eventually be deleted.
-  for(int i = 0; i < NrOfArriving; i++) {
-    delete ArrivingArcs[i];
-    ArrivingArcs[i] = NULL;
-  }
-
-  delete [] ArrivingArcs;
-
-  delete [] LeavingArcs;
-
-	trace(TRACE_5, "Node::~Node() : end\n");
+Arc* Node::getArrivingArc(Arcs_t::size_type i) const
+{
+    return ArrivingArcs[i];
 }
 
-Node::Node(const std::string& n) : name(n), NrOfArriving(0), NrOfLeaving(0),
-    ArrivingArcs(NULL), LeavingArcs(NULL)
+Arc* Node::getLeavingArc(Arcs_t::size_type i) const
+{
+    return LeavingArcs[i];
+}
+
+Node::Arcs_t::size_type Node::getArrivingArcsCount() const
+{
+    return ArrivingArcs.size();
+}
+
+Node::Arcs_t::size_type Node::getLeavingArcsCount() const
+{
+    return LeavingArcs.size();
+}
+
+Node::~Node()
+{
+    trace(TRACE_5, "Node::~Node() : start\n");
+
+    // Transitions and places share pointers to the same arcs because every
+    // arriving arc of a transition is a leaving arc of a place and vice versa.
+    // Therefore we only have to delete all arcs in ArrivingArcs. This way
+    // all arcs in LeavingArcs will also eventually be deleted.
+    for (Arcs_t::size_type i = 0; i < getArrivingArcsCount(); ++i)
+        delete getArrivingArc(i);
+
+    trace(TRACE_5, "Node::~Node() : end\n");
+}
+
+Node::Node(const std::string& n) : name(n)
 {
 }
 

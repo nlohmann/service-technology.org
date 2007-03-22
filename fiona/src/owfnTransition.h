@@ -169,6 +169,15 @@ class owfnTransition: public Node
         ~owfnTransition();
 
         /**
+         * Adds a owfnPlace to the pre-set of this owfnTransition.
+         * @param owfnPlace owfnPlace to be added to this owfnTransition's
+         *     pre-set.
+         * @param multiplicity Multiplicity of the arc from the given owfnPlace
+         *     to this owfnTransition.
+         */
+        void addPrePlace(owfnPlace* owfnPlace, unsigned int multiplicity);
+
+        /**
          * Returns whether this owfnTransition is enabled or not.
          */
         bool isEnabled() const;

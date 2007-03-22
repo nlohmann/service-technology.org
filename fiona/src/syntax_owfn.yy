@@ -106,10 +106,12 @@ owfnPlace *P;
 owfnTransition *T;
 Symbol * S;
 PlSymbol * PS;
-TrSymbol * TS;
 oWFN * PN;					// the petri net
 
 placeType type = INTERNAL;		/* type of place */
+
+enum TransitionParsePosition { IN_CONSUME, IN_PRODUCE };
+TransitionParsePosition transitionParsePosition; 
 
 %}
 
@@ -205,78 +207,29 @@ net: key_place place_area key_marking
 			
 		}
 		
-		markinglist semicolon final transitionlist 
+		markinglist semicolon final transitionlist
 		{
-			// Create array of transitions 
-			PN->Transitions = new owfnTransition * [TransitionTable->getSize()];
-			unsigned int i = 0;
-			TrSymbol* trSymbol = NULL;
-			TransitionTable->initGetNextSymbol();
-			while ((trSymbol = TransitionTable->getNextSymbol()) != NULL) {
-				PN->addTransition(i++, trSymbol->getTransition());
-			}
-
-			// Create arc list of places pass 1 (count nr of arcs)
-			for(unsigned int i = 0; i < PN->getTransitionCnt(); i++) {
-				for(unsigned int j = 0; j < PN->Transitions[i]->NrOfArriving; j++) {
-					owfnPlace* pl = PN->Transitions[i]->ArrivingArcs[j]->pl;
-
-					// Ignore external places if oWFN should be matched with an
-					// OG. That is because we match the reachability graph of
-					// the inner of the oWFN with the OG.
-					if (options[O_MATCH] && pl->type != INTERNAL) {
+			// fill in arcs
+			for (unsigned int i = 0; i < PN->getTransitionCount(); i++) {
+				for (unsigned int j=0;
+				    j < PN->getTransition(i)->getLeavingArcsCount(); j++)
+				{
+					owfnPlace * pl = PN->getTransition(i)->getLeavingArc(j)->pl;
+					if (options[O_MATCH] && pl->type != INTERNAL)
+					{
 						continue;
 					}
-
-					pl->NrOfLeaving++;
+					pl->addArrivingArc(PN->getTransition(i)->getLeavingArc(j));
 				}
-				for(unsigned int j=0;j < PN->Transitions[i]->NrOfLeaving;j++) {
-					owfnPlace* pl = PN->Transitions[i]->LeavingArcs[j]->pl;
-
-					// Ignore external places if oWFN should be matched with an
-					// OG. That is because we match the reachability graph of
-					// the inner of the oWFN with the OG.
-					if (options[O_MATCH] && pl->type != INTERNAL) {
+				for (unsigned int j = 0;
+				     j < PN->getTransition(i)->getArrivingArcsCount(); j++)
+				{
+					owfnPlace * pl = PN->getTransition(i)->getArrivingArc(j)->pl;
+					if (options[O_MATCH] && pl->type != INTERNAL)
+					{
 						continue;
 					}
-
-					pl->NrOfArriving++;
-				}
-			}
-		
-			// pass 2 (allocate arc arrays)
-			for (unsigned int i = 0; i < PN->getPlaceCnt(); i++) {
-				PN->Places[i]->ArrivingArcs = new Arc * [PN->Places[i]->NrOfArriving+10];
-				PN->Places[i]->NrOfArriving = 0;
-				PN->Places[i]->LeavingArcs = new Arc * [PN->Places[i]->NrOfLeaving+10];
-				PN->Places[i]->NrOfLeaving = 0;
-			}
-		
-			// pass 3 (fill in arcs)
-			for (unsigned int i = 0; i < TransitionTable->getSize(); i++) {
-				for(unsigned int j=0; j < PN->Transitions[i]->NrOfLeaving;j++) {
-					owfnPlace * pl = PN->Transitions[i]->LeavingArcs[j]->pl;
-                    if (options[O_MATCH] && pl->type != INTERNAL) {
-                        continue;
-                    }
-					pl->ArrivingArcs[pl->NrOfArriving] = PN->Transitions[i]->LeavingArcs[j];
-					pl->NrOfArriving++;
-					
-//					if (pl->type == OUTPUT) {
-//						PN->commDepth += PN->Transitions[i]->LeavingArcs[j]->Multiplicity;
-//					}
-				}
-				for (unsigned int j = 0;j < PN->Transitions[i]->NrOfArriving; j++) {
-					owfnPlace * pl = PN->Transitions[i]->ArrivingArcs[j]->pl;
-                    if (options[O_MATCH] && pl->type != INTERNAL) {
-                        continue;
-                    }
-					pl->LeavingArcs[pl->NrOfLeaving] = PN->Transitions[i]->ArrivingArcs[j];
-					pl->NrOfLeaving ++;
-					
-//					if (pl->type == INPUT) {
-//						PN->commDepth += PN->Transitions[i]->ArrivingArcs[j]->Multiplicity;
-//					}
+					pl->addLeavingArc(PN->getTransition(i)->getArrivingArc(j));
 				}
 			}
 		}
@@ -463,21 +416,31 @@ transitionlist: transitionlist transition
 | /* empty */
 ;
 
-transition: key_transition tname key_consume arclist semicolon key_produce arclist semicolon  {
+transition: key_transition tname key_consume
+	{
+		transitionParsePosition = IN_CONSUME;
+	}
+	arclist semicolon key_produce
+	{
+		transitionParsePosition = IN_PRODUCE;
+	}
+	arclist semicolon
+	{
 	unsigned int card;
 	unsigned int i;
 	arc_list * current;
+
 	/* 1. Transition anlegen */
-	if(TransitionTable -> lookup($2)) {
+	T = new owfnTransition($2);
+	if (!PN->addTransition(T))
+	{
 		string error = "Transition name " + string($2) + " was used twice!";
 		owfn_yyerror(error.c_str());
 	}
-	T = new owfnTransition($2);	// counter++ in PN
-	TransitionTable->add(new TrSymbol(T));
 
 	/* Anzahl der Boegen */
 	card = 0;
-	for(current = $4; current; current = current->next) {
+	for(current = $5; current; current = current->next) {
 		// Ignore external places if oWFN should be matched with an
 		// OG. That is because we match the reachability graph of
 		// the inner of the oWFN with the OG.
@@ -488,9 +451,8 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 		++card;
 	}
 		
-	T->ArrivingArcs = new  Arc * [card+10];
 	/* Schleife ueber alle Boegen */
-	for(current = $4; current; current = current->next) {
+	for(current = $5; current; current = current->next) {
 		if (current->place->getPlace()->type == OUTPUT) {
 			string msg = string("Transition '") + T->name + "' reads from "
 				"output place '" + current->place->getPlace()->name +
@@ -511,18 +473,18 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 		}
 	/* gibt es Bogen schon? */
 
-		for(i = 0; i < T->NrOfArriving;i++) {
-			if(current->place->getPlace() == T->ArrivingArcs[i]->pl) {
+		for(i = 0; i < T->getArrivingArcsCount();i++) {
+			if(current->place->getPlace() == T->getArrivingArc(i)->pl) {
 				/* Bogen existiert, nur Vielfachheit addieren */
-				*(T->ArrivingArcs[i]) += current->nu;
+				*(T->getArrivingArc(i)) += current->nu;
 				break;
 			}
 		}
 
-		if(i >= T->NrOfArriving) {
-			T->ArrivingArcs[T->NrOfArriving] =
-				new Arc(T, current->place->getPlace(), true, current->nu);
-			T->NrOfArriving++;
+		if(i >= T->getArrivingArcsCount()) {
+			T->addArrivingArc(
+				new Arc(T, current->place->getPlace(), true, current->nu)
+			);
 			current->place->getPlace()->references ++;
 		}
 	}
@@ -531,13 +493,12 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 
 	/* Anzahl der Boegen */
 	card = 0;
-	for(current = $7; current; current = current->next) {
+	for(current = $9; current; current = current->next) {
 		++card;
 	}
 
-	T->LeavingArcs = new  Arc * [card+10];
 	/* Schleife ueber alle Boegen */
-	for(current = $7; current; current = current->next) {
+	for(current = $9; current; current = current->next) {
 		if (current->place->getPlace()->type == INPUT) {
 			string msg = string("Transition '") + T->name + "' writes to an "
 				"input place '" + current->place->getPlace()->name +
@@ -558,18 +519,18 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 		}
 		/* gibt es Bogen schon? */
 
-		for(i = 0; i < T->NrOfLeaving; i++) {
-			if(current->place->getPlace() == T->LeavingArcs[i]->pl) {
+		for(i = 0; i < T->getLeavingArcsCount(); i++) {
+			if(current->place->getPlace() == T->getLeavingArc(i)->pl) {
 				/* Bogen existiert, nur Vielfachheit addieren */
-				*(T->LeavingArcs[i]) += current->nu;
+				*(T->getLeavingArc(i)) += current->nu;
 				break;
 			}
 		}
 
-		if(i >= T->NrOfLeaving) {
-			T->LeavingArcs[T->NrOfLeaving] =
-				new Arc(T,current->place->getPlace(), false, current->nu);
-			T->NrOfLeaving++;
+		if(i >= T->getLeavingArcsCount()) {
+			T->addLeavingArc(
+				new Arc(T,current->place->getPlace(), false, current->nu)
+			);
 			current->place->getPlace()->references++;
 		}
 	}
@@ -577,8 +538,8 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 	free($2);
 
 	// delete arc_list because they are no longer used.
-	delete $4;
-	delete $7;
+	delete $5;
+	delete $9;
 }
 ;
 

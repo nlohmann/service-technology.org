@@ -306,7 +306,7 @@ void operatingGuidelines::computeCNF(vertex* node) {
 					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
 						myFirstLiteral->addLiteral(PN->outputPlacesArray[i]->name);
 
-						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->outputPlacesArray[i]->name);
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('?' + PN->outputPlacesArray[i]->name);
 						myclause->addSubFormula(myliteral);
 					}
 				}
@@ -315,7 +315,7 @@ void operatingGuidelines::computeCNF(vertex* node) {
 				for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
 					myFirstLiteral->addLiteral(PN->inputPlacesArray[i]->name);
 
-					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->inputPlacesArray[i]->name);
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->inputPlacesArray[i]->name);
 					myclause->addSubFormula(myliteral);
 				}
 
@@ -352,7 +352,7 @@ void operatingGuidelines::computeCNF(vertex* node) {
 					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
 						myFirstLiteral->addLiteral(PN->outputPlacesArray[i]->name);
 
-						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->outputPlacesArray[i]->name);
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('?' + PN->outputPlacesArray[i]->name);
 						myclause->addSubFormula(myliteral);
 					}
 				}
@@ -361,7 +361,7 @@ void operatingGuidelines::computeCNF(vertex* node) {
 				for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
 					myFirstLiteral->addLiteral(PN->inputPlacesArray[i]->name);
 
-					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->inputPlacesArray[i]->name);
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->inputPlacesArray[i]->name);
 					myclause->addSubFormula(myliteral);
 				}
 				

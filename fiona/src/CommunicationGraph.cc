@@ -908,6 +908,8 @@ analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis
 //        } else {
             // we analyse a non-empty node
 
+			assert(node->getColor() != RED);
+			
 			vertexColor colorBefore = node->getColor();		// remember the color of the node before the analysis
 
 			analysisResult result = node->analyseNode(finalAnalysis);
@@ -967,8 +969,6 @@ void communicationGraph::addProgress(double toAddValue) {
 //! changed significantly and depending on the debug-level set
 void communicationGraph::printProgress() {
 		
-	return;
-	
 	int progress_step_size = 5;
 	int current_progress = int(100 * global_progress);
 

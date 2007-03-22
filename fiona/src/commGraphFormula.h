@@ -130,6 +130,7 @@ public:
      *   CommGraphFormulaAssignment.
      */
     virtual bool value(const CommGraphFormulaAssignment& assignment) const = 0;
+    virtual void removeLiteral(const std::string&);
 };
 
 
@@ -201,6 +202,7 @@ public:
 	virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const = 0;
 	
 	void addSubFormula(CommGraphFormula* subformula);
+	virtual void removeLiteral(const std::string&);
 };
 
 
@@ -228,7 +230,6 @@ public:
     virtual ~CommGraphFormulaMultiaryAnd() {};
     virtual std::string getOperator() const;
     virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const;
-
 };
 
 
@@ -305,6 +306,7 @@ public:
     virtual std::string asString() const;
 };
 
+
 /**
  * The constant formula 'true'.
  */
@@ -314,6 +316,7 @@ public:
     virtual ~CommGraphFormulaTrue() {};
 };
 
+
 /**
  * The constant formula 'false'.
  */
@@ -322,6 +325,7 @@ public:
     CommGraphFormulaFalse();
     virtual ~CommGraphFormulaFalse() {};
 };
+
 
 /**
  * A literal within a CommGraphFormula.
@@ -352,6 +356,7 @@ public:
     virtual std::string asString() const;
 };
 
+
 /**
  * A special literal FINAL.
  */
@@ -369,6 +374,7 @@ public:
 //    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
 //    virtual std::string asString() const;
 };
+
 
 /**
  * A special literal TAU.

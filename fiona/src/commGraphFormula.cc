@@ -34,7 +34,10 @@
 
 #include "commGraphFormula.h"
 #include "debug.h"
+#include <stdlib.h>
 #include <cassert>
+
+using namespace std;
 
 const std::string CommGraphFormulaAssignment::FINAL = std::string("final");
 const std::string CommGraphFormulaAssignment::TAU = std::string("tau");
@@ -63,6 +66,10 @@ bool CommGraphFormula::satisfies(const CommGraphFormulaAssignment& assignment)
     const
 {
     return value(assignment);
+}
+
+
+void CommGraphFormula::removeLiteral(const std::string&) {
 }
 
 
@@ -130,6 +137,39 @@ bool CommGraphFormulaMultiary::value(
 
 void CommGraphFormulaMultiary::addSubFormula(CommGraphFormula* subformula) {
 	subFormulas.insert(subformula);
+}
+
+
+void CommGraphFormulaMultiary::removeLiteral(const std::string& name) {
+	
+	trace(TRACE_5, "CommGraphFormulaMultiary::removeLiteral(const std::string& name) : start\n");
+
+	subFormulas_t::iterator iCurrentFormula;
+	//cout << "\tanzahl von klauseln: " << subFormulas.size() << endl; int i = 1;
+	//cout << "\tremoving literal " << name << " from clause nr " << i++ << endl;	
+	
+	for (iCurrentFormula = subFormulas.begin();
+	     iCurrentFormula != subFormulas.end(); ) {
+		
+		// if the considered current formula is a literal, then remove it;
+		// call the function recursively, otherwise
+		CommGraphFormulaLiteral* currentFormula = dynamic_cast<CommGraphFormulaLiteral*> (*iCurrentFormula);
+		if (currentFormula != NULL) {
+			// the current formula is a literal
+			if (currentFormula->asString() == name) {
+				// the literal has the right name, so remove it
+				subFormulas.erase(iCurrentFormula++);
+			} else {
+				iCurrentFormula++;
+			}
+		} else {
+			// the current formula is no literal, so call removeLiteral again
+			(*iCurrentFormula)->removeLiteral(name);
+			iCurrentFormula++;
+		}
+	}
+
+	trace(TRACE_5, "CommGraphFormulaMultiary::removeLiteral(const std::string& name) : end\n");
 }
 
 

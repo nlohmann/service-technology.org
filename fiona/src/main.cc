@@ -219,14 +219,14 @@ void adjustOptionValues() {
 
 int main(int argc, char ** argv) {
 
-    set_new_handler(&myown_newhandler);
-
 //	parse_command_line(argc, argv);
 //	readog();
 //	trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
 //	NewLogger::printall();
 //	return 0;
 //	
+
+    set_new_handler(&myown_newhandler);
 
 	list<oWFN*> petrinets;
 
@@ -364,7 +364,7 @@ int main(int argc, char ** argv) {
                 trace(TRACE_0, "building the operating guideline...\n");
                 seconds = time (NULL);
         
-                //graph->printProgressFirst();
+                graph->printProgressFirst();
                 graph->calculateRootNode();	// creates the root node and calculates its reachability graph (set of states)
                 
                 if (options[O_OTF]){

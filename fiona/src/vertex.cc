@@ -190,6 +190,21 @@ void vertex::addClause(CommGraphFormulaMultiaryOr* myclause) {
 }
 
 
+void vertex::removeLiteralFromFormula(unsigned int i, edgeType type) {
+	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, edgeType type) : start\n");
+	
+	if (type == sending) {
+		//cout << "remove literal !" << PN->inputPlacesArray[i]->name << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
+		annotation->removeLiteral('!' + PN->inputPlacesArray[i]->name);
+	} else {
+		//cout << "remove literal ?" << PN->outputPlacesArray[i]->name << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
+		annotation->removeLiteral('?' + PN->outputPlacesArray[i]->name);
+	}
+	
+	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, edgeType type) : end\n");
+}
+
+
 //! \fn graphEdge * vertex::getNextSuccEdge()
 //! \return pointer to the next edge of the successor node list
 //! \brief returns a pointer to the next edge of the successor node list
@@ -321,29 +336,6 @@ CNF * vertex::getAnnotation() {
 CNF_formula* vertex::getCNF_formula() {
 	return annotation;
 }
-
-void vertex::removeLiteralFromFormula(unsigned int i, edgeType type) {
-	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, edgeType type) : start\n");
-	
-	if (type == sending) {
-		cout << "remove literal !" << PN->inputPlacesArray[i]->name << " from annotation of node number " << getNumber() << endl;
-	} else {
-		cout << "remove literal ?" << PN->outputPlacesArray[i]->name << " from annotation of node number " << getNumber() << endl;
-	}
-	
-	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, edgeType type) : end\n");
-}
-
-
-//int vertex::numberOfElementsInAnnotation() {
-//	CNF * cl = annotation;
-//	int count = 0;
-//	while (cl) {
-//		count++;
-//		cl = cl->nextElement;
-//	}
-//	return count;
-//}
 
 
 //! \fn void vertex::setColor(vertexColor c)

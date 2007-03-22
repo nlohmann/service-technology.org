@@ -37,6 +37,7 @@
 #include "mynew.h"
 #include "petriNetNode.h"
 #include "formula.h"
+#include <vector>
 
 
 class oWFN;
@@ -74,7 +75,7 @@ class owfnPlace : public Node {
 					// used for quick re-evaluation of condition
 // *** Definitions for stubborn set calculations
 #ifdef STUBBORN
-		owfnTransition ** PreTransitions;    // these transitions must be included in
+		std::vector<owfnTransition*> PreTransitions;    // these transitions must be included in
 						 // stubborn set if this place is scapegoat
 		void initialize();		 // initialize PreTransitions
 #endif

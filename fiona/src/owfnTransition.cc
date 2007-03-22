@@ -63,9 +63,6 @@ owfnTransition::owfnTransition(const std::string& name) :
     isQuasiEnabled_(false),
     quasiEnabledNr(0),
     enabledNr(0),
-#ifdef STUBBORN
-    conflicting(NULL),
-#endif
     NextEnabled(NULL),
     PrevEnabled(NULL),
     NextQuasiEnabled(NULL),
@@ -74,9 +71,6 @@ owfnTransition::owfnTransition(const std::string& name) :
 }
 
 owfnTransition::~owfnTransition() {
-#ifdef STUBBORN
-	delete [] conflicting;
-#endif
 }
 
 bool owfnTransition::isEnabled() const
@@ -234,45 +228,36 @@ void owfnTransition::initialize(oWFN * PN)
     }
 
   PN->transNrQuasiEnabled = 0;
- 
+
   set_hashchange();
 #ifdef STUBBORN
-	stamp =0;
-	NextStubborn = 0;
-	instubborn = false;
-	
-	// create list of conflicting transitions
-	PN -> startOfEnabledList = (owfnTransition *) 0;
-	PN->transNrEnabled = 0;
-	for (unsigned int i = 0; i != PrePlaces.size(); ++i)
-	{
-		AdjacentPlace prePlace = PrePlaces[i];
-		owfnPlace* preOwfnPlace = prePlace.getOwfnPlace();
-		for (unsigned int j = 0; j < preOwfnPlace->NrOfLeaving; j++)
-		{
-			if(preOwfnPlace->LeavingArcs[j]->tr != this)
-			{
-				if(!(preOwfnPlace->LeavingArcs)[j]->tr ->isEnabled())
-				{
-					(preOwfnPlace->LeavingArcs)[j]->tr->NextEnabled = PN->startOfEnabledList;
-					PN->startOfEnabledList = (preOwfnPlace->LeavingArcs)[j]->tr;
-					PN->transNrEnabled ++;
-					(preOwfnPlace->LeavingArcs)[j]->tr->setEnabled(true);
-				}
-			}
-		}
-	}
-	conflicting = new owfnTransition * [PN->transNrEnabled + 1];
-	unsigned int i = 0;    
-	for(i = 0; PN->startOfEnabledList;PN->startOfEnabledList = PN->startOfEnabledList ->NextEnabled, i++)
-	{
-		PN->startOfEnabledList ->setEnabled(false);
-		conflicting[i] = PN->startOfEnabledList;
-	}
-	conflicting[i] = (owfnTransition *) 0;
-	mustbeincluded = conflicting;
+    stamp = 0;
+    NextStubborn = 0;
+    instubborn = false;
+
+    // create list of conflicting transitions
+    PN -> startOfEnabledList = (owfnTransition *) 0;
+    PN->transNrEnabled = 0;
+    for (unsigned int i = 0; i != PrePlaces.size(); ++i)
+    {
+        AdjacentPlace prePlace = PrePlaces[i];
+        owfnPlace* preOwfnPlace = prePlace.getOwfnPlace();
+        for (unsigned int j = 0; j < preOwfnPlace->NrOfLeaving; j++)
+        {
+            if (preOwfnPlace->LeavingArcs[j]->tr != this)
+            {
+                if (!(preOwfnPlace->LeavingArcs)[j]->tr ->isEnabled())
+                {
+                    conflicting.push_back(
+                            (preOwfnPlace->LeavingArcs)[j]->tr);
+                }
+            }
+        }
+    }
+
+    mustbeincluded = conflicting;
 #endif
-  PN->transNrEnabled = 0;
+    PN->transNrEnabled = 0;
 }
 
 

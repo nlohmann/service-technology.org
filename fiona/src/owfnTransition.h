@@ -153,7 +153,7 @@ class owfnTransition: public Node
         owfnPlace *scapegoat;
 
         /** conflicting transitions, for use as mustbeincluded */
-        owfnTransition **conflicting;
+        std::vector<owfnTransition*> conflicting;
 #endif
 
     public:
@@ -245,7 +245,7 @@ class owfnTransition: public Node
         bool instubborn;
 
         /** If this is in stubborn set, so must be the ones in array */
-        owfnTransition **mustbeincluded;
+        std::vector<owfnTransition*> mustbeincluded;
 
         /** stubborn sets are calculated through scc detection */
         unsigned int dfs;

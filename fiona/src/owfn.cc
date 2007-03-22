@@ -182,13 +182,10 @@ void oWFN::initialize() {
 	// initialize array of pre-transitions
 	for(i=0;i<placeCnt;i++)
 	{
-		Places[i]->PreTransitions = new owfnTransition * [Places[i]->NrOfArriving + 1];
-		int j;
-		for(j=0;j<Places[i]->NrOfArriving;j++)
+		for (unsigned int j = 0; j < Places[i]->NrOfArriving; j++)
 		{
-			Places[i]->PreTransitions[j] = Places[i]->ArrivingArcs[j]->tr;
+			Places[i]->PreTransitions.push_back(Places[i]->ArrivingArcs[j]->tr);
 		}
-		Places[i]->PreTransitions[j] = (owfnTransition *) 0;
 	}
 #endif
   	
@@ -1783,7 +1780,6 @@ string oWFN::createLabel(messageMultiSet m) const {
 void stubbornclosure(oWFN * net)
 {
 	owfnTransition * current;
-	int i;
 
 	net->NrStubborn = 0;
 	for(current = net -> StartOfStubbornList;current; current = current -> NextStubborn)
@@ -1792,7 +1788,7 @@ void stubbornclosure(oWFN * net)
 		{
 			net -> NrStubborn ++;
 		}
-		for(i=0;current -> mustbeincluded[i];i++)
+		for (unsigned int i = 0; i != current->mustbeincluded.size(); i++)
 		{
 			if(!current -> mustbeincluded[i]->instubborn)
 			{
@@ -1833,7 +1829,7 @@ owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess) {
 	owfnTransition * t;
 	unsigned int i;
 	
-	if(!(mess->PreTransitions[0]))
+	if (mess->PreTransitions.empty())
 	{	
 		result = new owfnTransition * [1];
 		result[0] = (owfnTransition *) 0;
@@ -1841,7 +1837,7 @@ owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess) {
 		return result;
 	}
 	StartOfStubbornList = (owfnTransition *) 0;
-	for(i = 0; mess->PreTransitions[i];i++)
+	for(i = 0; i != mess->PreTransitions.size(); i++)
 	{
 		stubborninsert(this,mess->PreTransitions[i]);
 	}
@@ -1878,7 +1874,7 @@ owfnTransition ** oWFN::stubbornfirelistmessage(messageMultiSet messages) {
 	
 	// check if any of the output messages has a pre-transition associated with it
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		if (Places[*iter]->PreTransitions[0]) {
+		if (!Places[*iter]->PreTransitions.empty()) {
 			noPreTransitions = false;
 			break;
 		}
@@ -1895,7 +1891,7 @@ owfnTransition ** oWFN::stubbornfirelistmessage(messageMultiSet messages) {
 	StartOfStubbornList = (owfnTransition *) 0;
 	
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		for(i = 0; Places[*iter]->PreTransitions[i]; i++) {
+		for(i = 0; i != Places[*iter]->PreTransitions.size(); i++) {
 			stubborninsert(this, Places[*iter]->PreTransitions[i]);
 		}
 	}
@@ -1969,8 +1965,9 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
 	//	cout << "current: " << current->name << endl;
 	/*	cout << "current->mustbeincluded: " << current->mustbeincluded << endl;
 		cout << "current->mustbeincluded[0]: " << current->mustbeincluded[0] << endl;		*/
-		if(next = current->mustbeincluded[current->mbiindex])
+		if (current->mustbeincluded.size() > current->mbiindex)
 		{
+			next = current->mustbeincluded[current->mbiindex];
 			// Successor exists
 			if(next->stamp == StubbStamp)
 			{

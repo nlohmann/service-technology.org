@@ -199,60 +199,36 @@ void owfnTransition::initialize(oWFN * PN) {
 	  );
 	}
     }
-  // Create list of transitions where enabledness can change
-  // if this transition fires. For collecting these transitions, we
-  // abuse the Enabled linked list
-  PN->startOfEnabledList = (owfnTransition *) 0;
-  PN->transNrEnabled = 0;
-  for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i)
+    // Create list of transitions where enabledness can change
+    // if this transition fires.
+    for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i)
     {
-      owfnPlace* incrOwfnPlace = IncrPlaces[i].getOwfnPlace();
-      for (j = 0; j < incrOwfnPlace->NrOfLeaving;j++)
-	{
-	  if (!(incrOwfnPlace->LeavingArcs)[j]->tr->isEnabled())
-	    {
-	      // not yet in list
-	      (incrOwfnPlace->LeavingArcs)[j]->tr->NextEnabled = PN->startOfEnabledList;
-	      PN->startOfEnabledList = (incrOwfnPlace->LeavingArcs)[j]->tr;
-	      PN->transNrEnabled++;
-	      (incrOwfnPlace->LeavingArcs)[j]->tr->setEnabled(true);
-	    }
-	}
+        owfnPlace* incrOwfnPlace = IncrPlaces[i].getOwfnPlace();
+        for (j = 0; j < incrOwfnPlace->NrOfLeaving;j++)
+        {
+            if (!(incrOwfnPlace->LeavingArcs)[j]->tr->isEnabled())
+            {
+                // not yet in list
+                ImproveEnabling.push_back((incrOwfnPlace->LeavingArcs)[j]->tr);
+            }
+        }
     }
 
-  for( ; PN->startOfEnabledList; PN->startOfEnabledList = PN->startOfEnabledList -> NextEnabled)
+    // Create list of transitions where enabledness can change
+    // if this transition fires.
+    for (AdjacentPlaces_t::size_type i = 0; i != DecrPlaces.size(); ++i)
     {
-      PN->startOfEnabledList->setEnabled(false);
-      ImproveEnabling.push_back(PN->startOfEnabledList);
+        owfnPlace* decrOwfnPlace = DecrPlaces[i].getOwfnPlace();
+        for(j=0;j < decrOwfnPlace->NrOfLeaving;j++)
+        {
+            if (!(decrOwfnPlace->LeavingArcs)[j]->tr->isEnabled())
+            {
+                // not yet in list
+                ImproveDisabling.push_back((decrOwfnPlace->LeavingArcs)[j]->tr);
+            }
+        }
     }
-  // Create list of transitions where enabledness can change
-  // if this transition fires. For collecting these transitions, we
-  // abuse the Enabled linked list
-  PN->startOfEnabledList = (owfnTransition *) 0;
-  PN->transNrEnabled = 0;
-  
-  for (AdjacentPlaces_t::size_type i = 0; i != DecrPlaces.size(); ++i)
-    {
-      owfnPlace* decrOwfnPlace = DecrPlaces[i].getOwfnPlace();
-      for(j=0;j < decrOwfnPlace->NrOfLeaving;j++)
-	{
-	  if(!(decrOwfnPlace->LeavingArcs)[j]->tr->isEnabled())
-	    {
-	      // not yet in list
-	      (decrOwfnPlace->LeavingArcs)[j]->tr->NextEnabled = PN->startOfEnabledList;
-	      PN->startOfEnabledList = (decrOwfnPlace->LeavingArcs)[j]->tr;
-	      PN->transNrEnabled++;
-	      (decrOwfnPlace->LeavingArcs)[j]->tr->setEnabled(true);
-	    }
-	}
-    }
-  	
-  	for( ; PN->startOfEnabledList; PN->startOfEnabledList = PN->startOfEnabledList -> NextEnabled) {
-		PN->startOfEnabledList->setEnabled(false);
-		ImproveDisabling.push_back(PN->startOfEnabledList);
-    }
-    
-    
+
   PN->transNrQuasiEnabled = 0;
  
   set_hashchange();

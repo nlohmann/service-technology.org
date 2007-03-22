@@ -61,9 +61,9 @@ int compare (const void * a, const void * b){
 oWFN::oWFN() : placeCnt(0), arcCnt(0), transCnt(0), filename(NULL),
                tempBinDecision(NULL),
                placeInputCnt(0), placeOutputCnt(0), FinalCondition(NULL),
-               currentState(0), transNrEnabled(0), placeHashValue(0),
-               BitVectorSize(0), startOfQuasiEnabledList(NULL),
-               startOfEnabledList(NULL)
+               currentState(0), transNrEnabled(0), transNrQuasiEnabled(0),
+               placeHashValue(0), BitVectorSize(0),
+               startOfQuasiEnabledList(NULL), startOfEnabledList(NULL)
 {
 	unsigned int i;
   	NonEmptyHash = 0;
@@ -192,11 +192,6 @@ void oWFN::initialize() {
 		Transitions[i]->initialize();
   	}
 
-    startOfEnabledList = NULL;
-    PN->transNrEnabled = 0;
-    startOfQuasiEnabledList = NULL;
-    PN->transNrQuasiEnabled = 0;
-  	
   	for(i=0; i < placeCnt; i++) {
         CurrentMarking[i] = Places[i]->initial_marking;
   	}

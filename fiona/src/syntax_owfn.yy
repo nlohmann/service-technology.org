@@ -279,8 +279,6 @@ net: key_place place_area key_marking
 //					}
 				}
 			}
-			PN->startOfEnabledList = (PN->getTransitionCnt() > 0) ?
-			                          PN->Transitions[0] : NULL;
 		}
 ;
 

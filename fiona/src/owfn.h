@@ -58,15 +58,17 @@ class OGFromFile;
 class CommGraphFormulaAssignment;
 
 class oWFN  {
+	// first public typedefs, then private members, then public methods
+	public:
+		/** Type of the container holding all transitions of this oWFN. */
+		typedef std::vector<owfnTransition*> Transitions_t;
+
 	private:
 		unsigned int NrOfStates;
 		unsigned int placeCnt;				//!< number of places
 		unsigned int arcCnt;				//!< number of arcs
 		unsigned int CardFireList;
 		unsigned int CardQuasiFireList;
-
-		/** Type of the container holding all transitions of this oWFN. */
-		typedef std::vector<owfnTransition*> Transitions_t;
 
 		/** Contains all transitions of this oWFN. */
 		Transitions_t Transitions;

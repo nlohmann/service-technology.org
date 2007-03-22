@@ -43,8 +43,10 @@ using namespace std;
 class Arc;
 
 class Node {
-	private:
+	// public typedefs first, then private members, then public methods.
+	public:
 		typedef std::vector<Arc*> Arcs_t;
+	private:
 		Arcs_t ArrivingArcs;
 		Arcs_t LeavingArcs;
 	public:

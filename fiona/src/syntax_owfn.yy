@@ -103,15 +103,15 @@ class arc_list {
 
 int CurrentCapacity;
 owfnPlace *P;
-owfnTransition *T;
+owfnTransition *T; /** The transition that is currently parsed. */
 Symbol * S;
 PlSymbol * PS;
 oWFN * PN;					// the petri net
 
 placeType type = INTERNAL;		/* type of place */
 
-enum TransitionParsePosition { IN_CONSUME, IN_PRODUCE };
-TransitionParsePosition transitionParsePosition; 
+enum InTransitionParsePosition { IN_CONSUME, IN_PRODUCE };
+InTransitionParsePosition inTransitionParsePosition; 
 
 %}
 
@@ -177,11 +177,6 @@ input:  net {
 
 net: key_place place_area key_marking
 		{
-			unsigned int i = 0;
-
-			// Create array of places
-			PN->Places = new owfnPlace * [PlaceTable->getSize()];
-
 			PlSymbol* plSymbol = NULL;
 			PlaceTable->initGetNextSymbol();
 			while ((plSymbol = PlaceTable->getNextSymbol()) != NULL) {
@@ -194,7 +189,7 @@ net: key_place place_area key_marking
 					continue;
 				}
 
-				PN->addPlace(i++, plSymbol->getPlace());
+				PN->addPlace(plSymbol->getPlace());
 			}
 			
 			PN->CurrentMarking = new unsigned int [PlaceTable->getSize()];
@@ -416,13 +411,22 @@ transitionlist: transitionlist transition
 | /* empty */
 ;
 
-transition: key_transition tname key_consume
+transition: key_transition tname
 	{
-		transitionParsePosition = IN_CONSUME;
+		T = new owfnTransition($2);
+		if (!PN->addTransition(T))
+		{
+			string error = "Transition name " + string($2) + " was used twice!";
+			owfn_yyerror(error.c_str());
+		}
+	}
+	key_consume
+	{
+		inTransitionParsePosition = IN_CONSUME;
 	}
 	arclist semicolon key_produce
 	{
-		transitionParsePosition = IN_PRODUCE;
+		inTransitionParsePosition = IN_PRODUCE;
 	}
 	arclist semicolon
 	{
@@ -430,17 +434,9 @@ transition: key_transition tname key_consume
 	unsigned int i;
 	arc_list * current;
 
-	/* 1. Transition anlegen */
-	T = new owfnTransition($2);
-	if (!PN->addTransition(T))
-	{
-		string error = "Transition name " + string($2) + " was used twice!";
-		owfn_yyerror(error.c_str());
-	}
-
 	/* Anzahl der Boegen */
 	card = 0;
-	for(current = $5; current; current = current->next) {
+	for(current = $6; current; current = current->next) {
 		// Ignore external places if oWFN should be matched with an
 		// OG. That is because we match the reachability graph of
 		// the inner of the oWFN with the OG.
@@ -452,7 +448,7 @@ transition: key_transition tname key_consume
 	}
 		
 	/* Schleife ueber alle Boegen */
-	for(current = $5; current; current = current->next) {
+	for(current = $6; current; current = current->next) {
 		if (current->place->getPlace()->type == OUTPUT) {
 			string msg = string("Transition '") + T->name + "' reads from "
 				"output place '" + current->place->getPlace()->name +
@@ -493,12 +489,12 @@ transition: key_transition tname key_consume
 
 	/* Anzahl der Boegen */
 	card = 0;
-	for(current = $9; current; current = current->next) {
+	for(current = $10; current; current = current->next) {
 		++card;
 	}
 
 	/* Schleife ueber alle Boegen */
-	for(current = $9; current; current = current->next) {
+	for(current = $10; current; current = current->next) {
 		if (current->place->getPlace()->type == INPUT) {
 			string msg = string("Transition '") + T->name + "' writes to an "
 				"input place '" + current->place->getPlace()->name +
@@ -538,8 +534,8 @@ transition: key_transition tname key_consume
 	free($2);
 
 	// delete arc_list because they are no longer used.
-	delete $5;
-	delete $9;
+	delete $6;
+	delete $10;
 }
 ;
 
@@ -607,9 +603,9 @@ statepredicate: lpar statepredicate rpar {
 	set<owfnPlace*> places_in_lhs;
 	lhs->collectplaces(places_in_lhs);
 	set<owfnPlace*> all_other_places;
-	for (size_t iplace = 0; iplace != PN->getPlaceCnt(); ++iplace)
+	for (size_t iplace = 0; iplace != PN->getPlaceCount(); ++iplace)
 	{
-		owfnPlace* current_place = PN->Places[iplace];
+		owfnPlace* current_place = PN->getPlace(iplace);
 		if (places_in_lhs.find(current_place) == places_in_lhs.end())
 		{
 			all_other_places.insert(current_place);
@@ -649,9 +645,9 @@ statepredicate: lpar statepredicate rpar {
 	set<owfnPlace*> places_in_lhs;
 	lhs->collectplaces(places_in_lhs);
 	set<owfnPlace*> all_other_internal_places;
-	for (size_t iplace = 0; iplace != PN->getPlaceCnt(); ++iplace)
+	for (size_t iplace = 0; iplace != PN->getPlaceCount(); ++iplace)
 	{
-		owfnPlace* current_place = PN->Places[iplace];
+		owfnPlace* current_place = PN->getPlace(iplace);
 		if ((current_place->type == INTERNAL) &&
 		    (places_in_lhs.find(current_place) == places_in_lhs.end()))
 		{
@@ -697,9 +693,9 @@ statepredicate: lpar statepredicate rpar {
     // We cannot use PN->inputPlacesArray and PN->outputPlacesArray here
     // because they are not initialized yet. They would be initialized only
     // after PN->initialize() were called, but we cannot wait until then.
-	for (size_t iplace = 0; iplace != PN->getPlaceCnt(); ++iplace)
+	for (size_t iplace = 0; iplace != PN->getPlaceCount(); ++iplace)
 	{
-		owfnPlace* current_place = PN->Places[iplace];
+		owfnPlace* current_place = PN->getPlace(iplace);
 		if ((current_place->type != INTERNAL) &&
 		    (places_in_lhs.find(current_place) == places_in_lhs.end()))
 		{

@@ -53,7 +53,7 @@ binDecision::binDecision(int b, long int BitVectorSize) {
 	bitnr = b;
 	nextold = nextnew = (binDecision *) 0;
 	vector = new unsigned char [ (BitVectorSize - (bitnr + 2) ) / 8 + 2];
-	for(i=0;i<(BitVectorSize - (bitnr + 2) ) / 8 + 1;i++) {
+	for(i=0;i<(BitVectorSize - (bitnr + 2) ) / 8 + 2;i++) {
 		vector[i] = 0;
 	}
 }
@@ -126,10 +126,10 @@ State * binInsert(binDecision ** Bucket, oWFN * PN) {
 		*Bucket = new binDecision(-1, PN->BitVectorSize);
 		// 3. remaining places
 		vby = vbi = 0;
-		for(bin_p=0; bin_p < PN->getPlaceCnt();bin_p ++) {
-			inttobits((*Bucket)->vector + vby, vbi, PN->Places[bin_p] -> nrbits, PN->CurrentMarking[bin_p]);
-			vby += (vbi + PN->Places[bin_p] -> nrbits) / 8;
-			vbi =  (vbi + PN->Places[bin_p] -> nrbits) % 8;
+		for(bin_p=0; bin_p < PN->getPlaceCount();bin_p ++) {
+			inttobits((*Bucket)->vector + vby, vbi, PN->getPlace(bin_p) -> nrbits, PN->CurrentMarking[bin_p]);
+			vby += (vbi + PN->getPlace(bin_p) -> nrbits) / 8;
+			vbi =  (vbi + PN->getPlace(bin_p) -> nrbits) % 8;
 		}
 
 		(*Bucket)-> prev = (binDecision *) 0;
@@ -165,17 +165,17 @@ State * binInsert(binDecision ** Bucket, oWFN * PN) {
 		
 	// 2. remaining bit of current place
 	if(bin_pb) {
-		inttobits(newd->vector, vbi, PN->Places[bin_p] -> nrbits - bin_pb, PN->CurrentMarking[bin_p] % (1 << (PN->Places[bin_p] -> nrbits - bin_pb)));
-		vby += (vbi + PN->Places[bin_p] -> nrbits - bin_pb) / 8;
-		vbi =  (vbi + PN->Places[bin_p] -> nrbits - bin_pb) % 8;
+		inttobits(newd->vector, vbi, PN->getPlace(bin_p) -> nrbits - bin_pb, PN->CurrentMarking[bin_p] % (1 << (PN->getPlace(bin_p) -> nrbits - bin_pb)));
+		vby += (vbi + PN->getPlace(bin_p) -> nrbits - bin_pb) / 8;
+		vbi =  (vbi + PN->getPlace(bin_p) -> nrbits - bin_pb) % 8;
 		bin_p++;
 	}
 
 	// 3. remaining places
-	for(; bin_p < PN->getPlaceCnt();bin_p ++) {
-		inttobits(newd->vector + vby, vbi, PN->Places[bin_p] -> nrbits, PN->CurrentMarking[bin_p]);
-		vby += (vbi + PN->Places[bin_p] -> nrbits) / 8;
-		vbi =  (vbi + PN->Places[bin_p] -> nrbits) % 8;
+	for(; bin_p < PN->getPlaceCount();bin_p ++) {
+		inttobits(newd->vector + vby, vbi, PN->getPlace(bin_p) -> nrbits, PN->CurrentMarking[bin_p]);
+		vby += (vbi + PN->getPlace(bin_p) -> nrbits) / 8;
+		vbi =  (vbi + PN->getPlace(bin_p) -> nrbits) % 8;
 	}
 
 	newd->state = new State;
@@ -299,15 +299,15 @@ State * binSearch(binDecision * Bucket, oWFN * PN) {
 	while(1) {
 
 		// - fill byte starting at bit s
-		while(bin_s < 8 && bin_p < PN->getPlaceCnt()) {
-			if(8 - bin_s < PN->Places[bin_p]->nrbits - bin_pb) {
-				inttobits(&bin_byte, bin_s, 8 - bin_s, (PN->CurrentMarking[bin_p] % (1 << (PN->Places[bin_p] -> nrbits - bin_pb)))>> (PN->Places[bin_p]->nrbits + bin_s - (8 + bin_pb)));
+		while(bin_s < 8 && bin_p < PN->getPlaceCount()) {
+			if(8 - bin_s < PN->getPlace(bin_p)->nrbits - bin_pb) {
+				inttobits(&bin_byte, bin_s, 8 - bin_s, (PN->CurrentMarking[bin_p] % (1 << (PN->getPlace(bin_p) -> nrbits - bin_pb)))>> (PN->getPlace(bin_p)->nrbits + bin_s - (8 + bin_pb)));
 				bin_pb += 8 - bin_s;
 				bin_s = 8;
 				break;
 			} else {
-				inttobits(&bin_byte, bin_s, PN->Places[bin_p] -> nrbits - bin_pb, PN->CurrentMarking[bin_p] % (1 << (PN->Places[bin_p] -> nrbits - bin_pb)));
-				bin_s += PN->Places[bin_p] -> nrbits - bin_pb;
+				inttobits(&bin_byte, bin_s, PN->getPlace(bin_p) -> nrbits - bin_pb, PN->CurrentMarking[bin_p] % (1 << (PN->getPlace(bin_p) -> nrbits - bin_pb)));
+				bin_s += PN->getPlace(bin_p) -> nrbits - bin_pb;
 				bin_p++;
 				bin_pb = 0;
 			}

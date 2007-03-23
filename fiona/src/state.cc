@@ -87,8 +87,8 @@ void State::decode(oWFN * PN) {
 
 	numberOfDecodes++;
 	
-//	for (int i = 0; i < PN->getPlaceCnt(); i++) {
-//		cout << PN->Places[i]->name << " (" << PN->Places[i]->nrbits << ")" << endl;
+//	for (int i = 0; i < PN->getPlaceCount(); i++) {
+//		cout << PN->getPlace(i)->name << " (" << PN->getPlace(i)->nrbits << ")" << endl;
 //	}
 
     binDecision * currentbindec;                // the considered part of bintree
@@ -101,13 +101,13 @@ void State::decode(oWFN * PN) {
     vectorsfirstbit = my_entry -> bitnr + 1;    // bit of decision not represented in vector
 
     int currentplacenr;                         // iterates through all places of the oWFN
-    currentplacenr = PN -> getPlaceCnt() - 1;   // starting with the last one
+    currentplacenr = PN -> getPlaceCount() - 1;   // starting with the last one
 
     int pfirst;                                 // first bit of current place in bintree
-    pfirst = PN->Places[currentplacenr]->startbit;
+    pfirst = PN->getPlace(currentplacenr)->startbit;
 
     int plast;                                  // last  bit of place in bintree
-    plast = pfirst + PN->Places[currentplacenr]->nrbits - 1;
+    plast = pfirst + PN->getPlace(currentplacenr)->nrbits - 1;
 
     int currentbyte;                            // current byte in currentvector of bintree
     currentbyte = ((PN->BitVectorSize-1) - vectorsfirstbit)/8 ;
@@ -151,9 +151,9 @@ void State::decode(oWFN * PN) {
 
 //		// after decoding the new marking for a place update the final condition
 //		if (PN->FinalCondition) {
-//		    for(int j=0; j < PN->Places[currentplacenr]->cardprop; j++) {
-//				if (PN->Places[currentplacenr]->proposition != NULL) {
-//				    PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+//		    for(int j=0; j < PN->getPlace(currentplacenr)->cardprop; j++) {
+//				if (PN->getPlace(currentplacenr)->proposition != NULL) {
+//				    PN->getPlace(currentplacenr)->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
 //				}
 //		    }
 //		}
@@ -172,8 +172,8 @@ void State::decode(oWFN * PN) {
 			// take new place
 			currentplacenr--;
 
-			pfirst = PN->Places[currentplacenr]->startbit;
-			plast = pfirst + PN->Places[currentplacenr]->nrbits - 1;
+			pfirst = PN->getPlace(currentplacenr)->startbit;
+			plast = pfirst + PN->getPlace(currentplacenr)->nrbits - 1;
 
 			if(currentbyte == 0) {
 				// go to predecessing vector in bintree
@@ -184,7 +184,7 @@ void State::decode(oWFN * PN) {
 				clast = cfirst - 1;
 				cfirst = vectorsfirstbit + 8 * currentbyte;
 				
-//				cout << "\t\tnew place " << PN->Places[currentplacenr]->name << " in new byte " << currentbyte << endl;
+//				cout << "\t\tnew place " << PN->getPlace(currentplacenr)->name << " in new byte " << currentbyte << endl;
 //				cout << "\t\t\t(bindecision changed)" << endl;
 				
 				cutplace =	currentvector[currentbyte];
@@ -199,7 +199,7 @@ void State::decode(oWFN * PN) {
 				cfirst -= 8;
 				clast = cfirst + 7;
 
-//				cout << "\t\tnew place " << PN->Places[currentplacenr]->name << " in new byte " << currentbyte << endl;
+//				cout << "\t\tnew place " << PN->getPlace(currentplacenr)->name << " in new byte " << currentbyte << endl;
 //				cout << "\t\t\t(in same bindecision)" << endl;
 
 				cutplace = currentvector[currentbyte];
@@ -212,10 +212,10 @@ void State::decode(oWFN * PN) {
 		if(cfirst < pfirst) {
 			currentplacenr--;
 			
-			pfirst = PN->Places[currentplacenr]->startbit;
-			plast = pfirst + PN->Places[currentplacenr]->nrbits - 1;
+			pfirst = PN->getPlace(currentplacenr)->startbit;
+			plast = pfirst + PN->getPlace(currentplacenr)->nrbits - 1;
 
-//			cout << "\t\tnew place " << PN->Places[currentplacenr]->name << " in same byte " << currentbyte << endl;
+//			cout << "\t\tnew place " << PN->getPlace(currentplacenr)->name << " in same byte " << currentbyte << endl;
 			
 			cutplace = currentvector[currentbyte];
 			
@@ -233,7 +233,7 @@ void State::decode(oWFN * PN) {
 			clast = cfirst - 1;
 			cfirst = vectorsfirstbit + 8 * currentbyte;
 
-//			cout << "\t\tsame place " << PN->Places[currentplacenr]->name << " in new byte " << currentbyte << endl;
+//			cout << "\t\tsame place " << PN->getPlace(currentplacenr)->name << " in new byte " << currentbyte << endl;
 //			cout << "\t\t\t(bindecision changed)" << endl;
 
 			cutplace =	currentvector[currentbyte];
@@ -247,7 +247,7 @@ void State::decode(oWFN * PN) {
 			cfirst -= 8;
 			clast = cfirst + 7;
 
-//			cout << "\t\tsame place " << PN->Places[currentplacenr]->name << " in new byte " << currentbyte << endl;
+//			cout << "\t\tsame place " << PN->getPlace(currentplacenr)->name << " in new byte " << currentbyte << endl;
 //			cout << "\t\t\t(in same bindecision)" << endl;
 
 			cutplace = currentvector[currentbyte];
@@ -266,8 +266,8 @@ void State::decodeShowOnly(oWFN * PN) {
 	
 	trace(TRACE_5, "void State::decodeShowOnly(oWFN * PN) : start\n");
 		
-//	for (int i = 0; i < PN->getPlaceCnt(); i++) {
-//		cout << PN->Places[i]->name << " (" << PN->Places[i]->nrbits << ")" << endl;
+//	for (int i = 0; i < PN->getPlaceCount(); i++) {
+//		cout << PN->getPlace(i)->name << " (" << PN->getPlace(i)->nrbits << ")" << endl;
 //	}
 
 	numberOfDecodes++;
@@ -282,13 +282,13 @@ void State::decodeShowOnly(oWFN * PN) {
     vectorsfirstbit = my_entry -> bitnr + 1;    // bit of decision not represented in vector
 
     int currentplacenr;                         // iterates through all places of the oWFN
-    currentplacenr = PN -> getPlaceCnt() - 1;   // starting with the last one
+    currentplacenr = PN -> getPlaceCount() - 1;   // starting with the last one
 
     int pfirst;                                 // first bit of current place in bintree
-    pfirst = PN->Places[currentplacenr]->startbit;
+    pfirst = PN->getPlace(currentplacenr)->startbit;
 
     int plast;                                  // last  bit of place in bintree
-    plast = pfirst + PN->Places[currentplacenr]->nrbits - 1;
+    plast = pfirst + PN->getPlace(currentplacenr)->nrbits - 1;
 
     int currentbyte;                            // current byte in currentvector of bintree
     currentbyte = ((PN->BitVectorSize-1) - vectorsfirstbit)/8 ;
@@ -332,9 +332,9 @@ void State::decodeShowOnly(oWFN * PN) {
 
 //		// after decoding the new marking for a place update the final condition
 //		if (PN->FinalCondition) {
-//		    for(int j=0; j < PN->Places[currentplacenr] -> cardprop; j++) {
-//				if (PN->Places[currentplacenr]->proposition != NULL) {
-//				    PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+//		    for(int j=0; j < PN->getPlace(currentplacenr) -> cardprop; j++) {
+//				if (PN->getPlace(currentplacenr)->proposition != NULL) {
+//				    PN->getPlace(currentplacenr)->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
 //				}
 //		    }
 //		}
@@ -352,8 +352,8 @@ void State::decodeShowOnly(oWFN * PN) {
 			// take new place
 			currentplacenr--;
 
-			pfirst = PN->Places[currentplacenr]->startbit;
-			plast = pfirst + PN->Places[currentplacenr]->nrbits - 1;
+			pfirst = PN->getPlace(currentplacenr)->startbit;
+			plast = pfirst + PN->getPlace(currentplacenr)->nrbits - 1;
 
 			if(currentbyte == 0) {
 				// go to predecessing vector in bintree
@@ -364,7 +364,7 @@ void State::decodeShowOnly(oWFN * PN) {
 				clast = cfirst - 1;
 				cfirst = vectorsfirstbit + 8 * currentbyte;
 				
-//				cout << "\t\tnew place " << PN->Places[currentplacenr]->name << " in new byte " << currentbyte << endl;
+//				cout << "\t\tnew place " << PN->getPlace(currentplacenr)->name << " in new byte " << currentbyte << endl;
 //				cout << "\t\t\t(bindecision changed)" << endl;
 				
 				cutplace =	currentvector[currentbyte];
@@ -379,7 +379,7 @@ void State::decodeShowOnly(oWFN * PN) {
 				cfirst -= 8;
 				clast = cfirst + 7;
 
-//				cout << "\t\tnew place " << PN->Places[currentplacenr]->name << " in new byte " << currentbyte << endl;
+//				cout << "\t\tnew place " << PN->getPlace(currentplacenr)->name << " in new byte " << currentbyte << endl;
 //				cout << "\t\t\t(in same bindecision)" << endl;
 
 				cutplace = currentvector[currentbyte];
@@ -392,10 +392,10 @@ void State::decodeShowOnly(oWFN * PN) {
 		if(cfirst < pfirst) {
 			currentplacenr--;
 			
-			pfirst = PN->Places[currentplacenr]->startbit;
-			plast = pfirst + PN->Places[currentplacenr]->nrbits - 1;
+			pfirst = PN->getPlace(currentplacenr)->startbit;
+			plast = pfirst + PN->getPlace(currentplacenr)->nrbits - 1;
 
-//			cout << "\t\tnew place " << PN->Places[currentplacenr]->name << " in same byte " << currentbyte << endl;
+//			cout << "\t\tnew place " << PN->getPlace(currentplacenr)->name << " in same byte " << currentbyte << endl;
 			
 			cutplace = currentvector[currentbyte];
 			
@@ -413,7 +413,7 @@ void State::decodeShowOnly(oWFN * PN) {
 			clast = cfirst - 1;
 			cfirst = vectorsfirstbit + 8 * currentbyte;
 
-//			cout << "\t\tsame place " << PN->Places[currentplacenr]->name << " in new byte " << currentbyte << endl;
+//			cout << "\t\tsame place " << PN->getPlace(currentplacenr)->name << " in new byte " << currentbyte << endl;
 //			cout << "\t\t\t(bindecision changed)" << endl;
 
 			cutplace =	currentvector[currentbyte];
@@ -427,7 +427,7 @@ void State::decodeShowOnly(oWFN * PN) {
 			cfirst -= 8;
 			clast = cfirst + 7;
 
-//			cout << "\t\tsame place " << PN->Places[currentplacenr]->name << " in new byte " << currentbyte << endl;
+//			cout << "\t\tsame place " << PN->getPlace(currentplacenr)->name << " in new byte " << currentbyte << endl;
 //			cout << "\t\t\t(in same bindecision)" << endl;
 
 			cutplace = currentvector[currentbyte];

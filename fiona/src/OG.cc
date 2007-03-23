@@ -48,7 +48,7 @@
 operatingGuidelines::operatingGuidelines(oWFN * _PN) : communicationGraph(_PN) {
 	
 	 if (options[O_BDD] == true || options[O_OTF]) {
-		unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
+		unsigned int nbrLabels = PN->getInputPlaceCount() + PN->getOutputPlaceCount();
 		bdd = new BddRepresentation(nbrLabels, (Cudd_ReorderingType)bdd_reordermethod);
 	 }
 }
@@ -100,24 +100,24 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 	
 	trace(TRACE_1, "=================================================================\n");
 
-//	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCnt() + PN->getOutputPlaceCnt()));
-	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCnt()));
+//	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount() + PN->getOutputPlaceCnt()));
+	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount()));
 	
 	unsigned int i = 0;	
 
 	// iterate over all elements of outputSet of the oWFN
 	trace(TRACE_2, "\t\t\t iterating over outputSet of the oWFN\n");
-	while (i < PN->placeOutputCnt) {
+	while (i < PN->getOutputPlaceCount()) {
 
 		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
-		trace(TRACE_2, string(PN->outputPlacesArray[i]->name) + "\n");
+		trace(TRACE_2, string(PN->getOutputPlace(i)->name) + "\n");
 	    
-		if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
+		if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] < PN->getOutputPlace(i)->max_occurence) {
 				
-			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
+			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
 			currentVertex = currentNode;
 			
-			calculateSuccStatesOutput(PN->outputPlacesArray[i]->index, currentNode, v);
+			calculateSuccStatesOutput(PN->getOutputPlace(i)->index, currentNode, v);
 			
 			// was the new node computed before? 
 			vertex * found = findVertexInSet(v);
@@ -155,7 +155,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 			}
 		} else {
 			trace(TRACE_2, "\t\t\t\t\t  receiving event: ?");
-			trace(TRACE_2, string(PN->outputPlacesArray[i]->name));
+			trace(TRACE_2, string(PN->getOutputPlace(i)->name));
 			trace(TRACE_2, " suppressed (max_occurence reached)\n");
 
 			currentNode->removeLiteralFromFormula(i, receiving);
@@ -170,24 +170,24 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 
 	// iterate over all elements of inputSet of the oWFN
 	trace(TRACE_2, "\t\t\t iterating over inputSet of the oWFN\n");
-	while (i < PN->placeInputCnt) {
+	while (i < PN->getInputPlaceCount()) {
 
 		trace(TRACE_2, "\t\t\t\t    sending event: !");
-		trace(TRACE_2, string(PN->inputPlacesArray[i]->name) + "\n");
+		trace(TRACE_2, string(PN->getInputPlace(i)->name) + "\n");
 		
-		if (currentNode->eventsUsed[i] < PN->inputPlacesArray[i]->max_occurence) {
+		if (currentNode->eventsUsed[i] < PN->getInputPlace(i)->max_occurence) {
 			
-			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
+			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
 			currentVertex = currentNode;
 			
 			trace(TRACE_5, "calculating successor states\n");
 
-			calculateSuccStatesInput(PN->inputPlacesArray[i]->index, currentNode, v);
+			calculateSuccStatesInput(PN->getInputPlace(i)->index, currentNode, v);
 
 			if (v->getColor() == RED) {
 				// message bound violation occured during calculateSuccStatesInput
 				trace(TRACE_2, "\t\t\t\t\t    sending event: !");
-				trace(TRACE_2, PN->inputPlacesArray[i]->name);
+				trace(TRACE_2, PN->getInputPlace(i)->name);
 				trace(TRACE_2, " suppressed (message bound violated)\n");
 
 				numberDeletedVertices--;
@@ -233,7 +233,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 			}
 		} else {
 			trace(TRACE_2, "\t\t\t\t\t    sending event: !");
-			trace(TRACE_2, string(PN->inputPlacesArray[i]->name));
+			trace(TRACE_2, string(PN->getInputPlace(i)->name));
 			trace(TRACE_2, " suppressed (max_occurence reached)\n");
 
 			currentNode->removeLiteralFromFormula(i, sending);
@@ -302,20 +302,20 @@ void operatingGuidelines::computeCNF(vertex* node) {
 				}
 				
 				// get the activated output events
-				for (unsigned int i = 0; i < PN->placeOutputCnt; i++) {
-					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
-						myFirstLiteral->addLiteral(PN->outputPlacesArray[i]->name);
+				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+						myFirstLiteral->addLiteral(PN->getOutputPlace(i)->name);
 
-						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('?' + PN->outputPlacesArray[i]->name);
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('?' + PN->getOutputPlace(i)->name);
 						myclause->addSubFormula(myliteral);
 					}
 				}
 
 				// get all the input events
-				for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
-					myFirstLiteral->addLiteral(PN->inputPlacesArray[i]->name);
+				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
+					myFirstLiteral->addLiteral(PN->getInputPlace(i)->name);
 
-					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->inputPlacesArray[i]->name);
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->getInputPlace(i)->name);
 					myclause->addSubFormula(myliteral);
 				}
 
@@ -348,20 +348,20 @@ void operatingGuidelines::computeCNF(vertex* node) {
 				}
 				
 				// get the activated output events
-				for (unsigned int i = 0; i < PN->placeOutputCnt; i++) {
-					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
-						myFirstLiteral->addLiteral(PN->outputPlacesArray[i]->name);
+				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+						myFirstLiteral->addLiteral(PN->getOutputPlace(i)->name);
 
-						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('?' + PN->outputPlacesArray[i]->name);
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('?' + PN->getOutputPlace(i)->name);
 						myclause->addSubFormula(myliteral);
 					}
 				}
 
 				// get all the input events
-				for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
-					myFirstLiteral->addLiteral(PN->inputPlacesArray[i]->name);
+				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
+					myFirstLiteral->addLiteral(PN->getInputPlace(i)->name);
 
-					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->inputPlacesArray[i]->name);
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->getInputPlace(i)->name);
 					myclause->addSubFormula(myliteral);
 				}
 				
@@ -387,7 +387,7 @@ void operatingGuidelines::convertToBdd() {
         visitedNodes[i] = 0;
     }
    
-    //unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
+    //unsigned int nbrLabels = PN->getInputPlaceCount() + PN->getOutputPlaceCount();
     this->bdd->convertRootNode(root);
     this->bdd->generateRepresentation(tmp, visitedNodes);
     this->bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);

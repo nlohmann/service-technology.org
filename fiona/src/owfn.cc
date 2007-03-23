@@ -48,19 +48,15 @@
 using namespace std;
 
 //comparison function, in order to sort the input/output place names 
-int compare (const void * a, const void * b){
-	owfnPlace *o1 = *((owfnPlace **)(a));
-	owfnPlace *o2 = *((owfnPlace **)(b));
-	assert(o1 != NULL);
-	assert(o2 != NULL);
-	return o1->name.compare(o2->name);
+bool compare(const owfnPlace* lhs, const owfnPlace* rhs){
+	return lhs->name < rhs->name;
 }
 
 //! \fn oWFN::oWFN()
 //! \brief constructor
-oWFN::oWFN() : placeCnt(0), arcCnt(0), filename(NULL),
+oWFN::oWFN() : arcCnt(0), filename(NULL),
                tempBinDecision(NULL),
-               placeInputCnt(0), placeOutputCnt(0), FinalCondition(NULL),
+               FinalCondition(NULL),
                currentState(0), transNrEnabled(0), transNrQuasiEnabled(0),
                placeHashValue(0), BitVectorSize(0),
                startOfQuasiEnabledList(NULL), startOfEnabledList(NULL)
@@ -89,9 +85,6 @@ oWFN::oWFN() : placeCnt(0), arcCnt(0), filename(NULL),
 oWFN::~oWFN() {	
 	trace(TRACE_5, "oWFN::~oWFN() : start\n");
 
-	delete[] inputPlacesArray;
-	delete[] outputPlacesArray;
-
 	for(int i = 0; i < HASHSIZE; i++) {
 		if (binHashTable[i]) {
 			delete binHashTable[i];
@@ -101,14 +94,10 @@ oWFN::~oWFN() {
 
 	delete[] binHashTable;
 	
-	for(unsigned int i = 0; i < placeCnt; i++) {
-		if (Places[i]) {
-			delete Places[i];
-		}
-		Places[i] = NULL;
+	for (Places_t::size_type i = 0; i < getPlaceCount(); ++i)
+	{
+		delete getPlace(i);
 	}	
-	
-	delete[] Places;
 	
 	for (Transitions_t::size_type i = 0; i < getTransitionCount(); ++i) {
 		delete getTransition(i);
@@ -122,12 +111,14 @@ oWFN::~oWFN() {
 	trace(TRACE_5, "oWFN::~oWFN() : end\n");
 }
 
-//! \fn unsigned int oWFN::getPlaceCnt() const
-//! \brief returns the number of all places of the net
-unsigned int oWFN::getPlaceCnt() const {
-	return placeCnt;
+unsigned int oWFN::getPlaceCount() const {
+	return Places.size();
 }
 
+owfnPlace* oWFN::getPlace(Places_t::size_type i) const
+{
+    return Places[i];
+}
 
 oWFN::Transitions_t::size_type oWFN::getTransitionCount() const
 {
@@ -139,17 +130,25 @@ owfnTransition* oWFN::getTransition(Transitions_t::size_type i) const
     return Transitions[i];
 }
 
-//! \fn unsigned int oWFN::getInputPlaceCnt()
-//! \brief returns the number of input places of the net
-unsigned int oWFN::getInputPlaceCnt() {
-	return placeInputCnt;
+oWFN::Places_t::size_type oWFN::getInputPlaceCount() const
+{
+	return inputPlaces.size();
+}
+
+owfnPlace* oWFN::getInputPlace(Places_t::size_type i) const
+{
+    return inputPlaces[i];
 }
 
 
-//! \fn unsigned int oWFN::getOutputPlaceCnt()
-//! \brief returns the number of output places of the net
-unsigned int oWFN::getOutputPlaceCnt() {
-	return placeOutputCnt;
+oWFN::Places_t::size_type oWFN::getOutputPlaceCount() const
+{
+	return outputPlaces.size();
+}
+
+owfnPlace* oWFN::getOutputPlace(Places_t::size_type i) const
+{
+    return outputPlaces[i];
 }
 
 
@@ -160,28 +159,28 @@ void oWFN::initialize() {
 	unsigned int i;
 	
 	// initialize places hashes
-	for(i = 0; i < placeCnt; i++) {
-       Places[i]->set_hash(rand());
+	for(i = 0; i < getPlaceCount(); i++) {
+       getPlace(i)->set_hash(rand());
     }
     
     // initialize places
-  	for(i=0; i < placeCnt; i++) {
-		Places[i]->index = i;
+  	for(i=0; i < getPlaceCount(); i++) {
+		getPlace(i)->index = i;
         
-        if ((Places[i]->type == INPUT) && (CurrentMarking[i] < Places[i]->capacity)) {
-        	CurrentMarking[i] = Places[i]->capacity;
+        if ((getPlace(i)->type == INPUT) && (CurrentMarking[i] < getPlace(i)->capacity)) {
+        	CurrentMarking[i] = getPlace(i)->capacity;
         } else {
-        	CurrentMarking[i] = Places[i]->initial_marking;
+        	CurrentMarking[i] = getPlace(i)->initial_marking;
         }
   	}
 
 #ifdef STUBBORN
 	// initialize array of pre-transitions
-	for(i=0;i<placeCnt;i++)
+	for(i=0;i<getPlaceCount();i++)
 	{
-		for (unsigned int j = 0; j < Places[i]->getArrivingArcsCount(); j++)
+		for (unsigned int j = 0; j < getPlace(i)->getArrivingArcsCount(); j++)
 		{
-			Places[i]->PreTransitions.push_back(Places[i]->getArrivingArc(j)->tr);
+			getPlace(i)->PreTransitions.push_back(getPlace(i)->getArrivingArc(j)->tr);
 		}
 	}
 #endif
@@ -191,38 +190,21 @@ void oWFN::initialize() {
 		getTransition(i)->initialize();
 	}
 
-  	for(i=0; i < placeCnt; i++) {
-        CurrentMarking[i] = Places[i]->initial_marking;
+  	for(i=0; i < getPlaceCount(); i++) {
+        CurrentMarking[i] = getPlace(i)->initial_marking;
   	}
  
 	for (Transitions_t::size_type i = 0; i < getTransitionCount(); ++i) {
 		getTransition(i)->check_enabled(this);
 	}
 
-	unsigned int ki = 0;
-	unsigned int ko = 0;
-	
-	inputPlacesArray = new owfnPlace* [placeInputCnt];
-	outputPlacesArray = new owfnPlace* [placeOutputCnt];
-	
-	// get the data for those arrays from the places of the net
-	for (i = 0; i < placeCnt; i++) { // getPlaceCnt(); i++) {
-		if (Places[i]->type == INPUT) {
-			// current place is from type input
-			inputPlacesArray[ki++] = Places[i];
-		} else if (Places[i]->type == OUTPUT) {
-			// current place is from type output
-			outputPlacesArray[ko++] = Places[i];
-		}	
-	}
-	
 	// sort the inputPlacesArray and the outputPlacesArray
-	qsort (inputPlacesArray,  placeInputCnt,  sizeof(owfnPlace*), compare);
-	qsort (outputPlacesArray, placeOutputCnt, sizeof(owfnPlace*), compare);	
-	
-	for(i = 0, BitVectorSize = 0; i < placeCnt; i++) {
-        Places[i]->startbit = BitVectorSize;
-        BitVectorSize += Places[i]->nrbits;
+	sort(inputPlaces.begin(), inputPlaces.end(), compare);
+	sort(outputPlaces.begin(), outputPlaces.end(), compare);
+
+	for(i = 0, BitVectorSize = 0; i < getPlaceCount(); i++) {
+        getPlace(i)->startbit = BitVectorSize;
+        BitVectorSize += getPlace(i)->nrbits;
   	}
 	
 	trace(TRACE_5, "oWFN::initialize(): end\n");
@@ -258,16 +240,20 @@ void oWFN::removeisolated() {
 	owfnPlace * p;
 
 	i=0;
-	while(i<placeCnt) {
-		if(Places[i]->references == 0) { // owfnPlace isolated
-			p = Places[placeCnt - 1];
-			int m = CurrentMarking[placeCnt - 1];
-			Places[placeCnt - 1] = Places[i];
-			CurrentMarking[placeCnt - 1] = CurrentMarking[i];
+	while(i<getPlaceCount()) {
+		if(getPlace(i)->references == 0) { // owfnPlace isolated
+            //TODO: CurrentMarking in Vektor umwandeln, dann loeschen eines
+            //TODO: Platzes gleich mit erase(), gleichzeitiger automatischer
+            //TODO: Loeschung in CurrentMarking und Reindexierung der Plaetze
+            //TODO: implementieren.
+			p = getPlace(getPlaceCount() - 1);
+			int m = CurrentMarking[getPlaceCount() - 1];
+			Places[getPlaceCount() - 1] = getPlace(i);
+			CurrentMarking[getPlaceCount() - 1] = CurrentMarking[i];
 			Places[i] = p;
 			CurrentMarking[i] = m;
-			deletePlace(Places[placeCnt - 1]);
-			// placeCnt --;
+			delete getPlace(getPlaceCount() - 1);
+            Places.erase(Places.end() - 1);
 		} else {
 			i++;
 		}
@@ -277,9 +263,9 @@ void oWFN::removeisolated() {
 		getTransition(i)->nr = i;
 	}
 */
-	for(i=0;i<placeCnt;i++) {
-		// Places[i]->nr = i;
-		Places[i]->index = i;
+	for(i=0;i<getPlaceCount();i++) {
+		// getPlace(i)->nr = i;
+		getPlace(i)->index = i;
 	}
 }
 
@@ -391,7 +377,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, messageMultiSet mess
 		
 		// shall we save this state? meaning, are the correct output places marked?
 		for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-			if (CurrentMarking[Places[*iter]->index] == 0) {
+			if (CurrentMarking[getPlace(*iter)->index] == 0) {
 				somePlaceNotMarked = true;
 				break;
 			}
@@ -432,17 +418,17 @@ bool oWFN::checkMessageBound() {
 	// test marking of current state if message bound k reached
 	if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
 		// test input places
-		for (unsigned int i = 0; i < placeInputCnt; i++) {
-			if (CurrentMarking[inputPlacesArray[i]->index] > messages_manual) {
-				trace(TRACE_3, "\t\t\t checkMessageBound found violation for input place " + string(inputPlacesArray[i]->name) + "\n");
+		for (unsigned int i = 0; i < getInputPlaceCount(); i++) {
+			if (CurrentMarking[getInputPlace(i)->index] > messages_manual) {
+				trace(TRACE_3, "\t\t\t checkMessageBound found violation for input place " + string(getInputPlace(i)->name) + "\n");
 				trace(TRACE_5, "oWFN::checkMessageBound(): end\n");
 				return true;
 			}
 		}
 		// test output places
-		for (unsigned int i = 0; i < placeOutputCnt; i++) {
-			if (CurrentMarking[outputPlacesArray[i]->index] > messages_manual) {
-				trace(TRACE_3, "\t\t\t checkMessageBound found violation for output place " + string(outputPlacesArray[i]->name) + "\n");
+		for (unsigned int i = 0; i < getOutputPlaceCount(); i++) {
+			if (CurrentMarking[getOutputPlace(i)->index] > messages_manual) {
+				trace(TRACE_3, "\t\t\t checkMessageBound found violation for output place " + string(getOutputPlace(i)->name) + "\n");
 				trace(TRACE_5, "oWFN::checkMessageBound(): end\n");
 				return true;
 			}
@@ -493,7 +479,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, bool isCu
 	// check, whether this state is to be added to the node or not
 	// we do this right here, because of the decode function that might have been called already
 	// if the currentState is just the currentMarking, then we don't decode again ;-)
-	if (!isCurrentMarking && placeOutputCnt > 0) {
+	if (!isCurrentMarking && getOutputPlaceCount() > 0) {
 		currentState->decodeShowOnly(this);
 	}
 	
@@ -515,9 +501,9 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, bool isCu
 
 
 unsigned int * oWFN::copyCurrentMarking() {
-	unsigned int * copy = new unsigned int [placeCnt];
+	unsigned int * copy = new unsigned int [getPlaceCount()];
 
-	for (unsigned int i = 0; i < placeCnt; i++) {
+	for (unsigned int i = 0; i < getPlaceCount(); i++) {
 		copy[i] = CurrentMarking[i];
 	}	
 	return copy;
@@ -526,16 +512,16 @@ unsigned int * oWFN::copyCurrentMarking() {
 
 void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 
-	for (unsigned int i = 0; i < getPlaceCnt(); i++) {
+	for (unsigned int i = 0; i < getPlaceCount(); i++) {
 		CurrentMarking[i] = copy[i];
 	}	
 	
 //	// after decoding the new marking for a place update the final condition
 //	if (PN->FinalCondition) {
-//		for (int currentplacenr = 0; currentplacenr < getPlaceCnt(); currentplacenr++) {
-//		    for(int j=0; j < PN->Places[currentplacenr]->cardprop; j++) {
-//				if (PN->Places[currentplacenr]->proposition != NULL) {
-//				    PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+//		for (int currentplacenr = 0; currentplacenr < getPlaceCount(); currentplacenr++) {
+//		    for(int j=0; j < PN->getPlace(currentplacenr)->cardprop; j++) {
+//				if (PN->getPlace(currentplacenr)->proposition != NULL) {
+//				    PN->getPlace(currentplacenr)->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
 //				}
 //			}
 //		}
@@ -1106,11 +1092,11 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 	
 	// shall we save this state? meaning, are the correct output places all marked?
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		if (tempCurrentMarking[Places[*iter]->index] == 0) {
+		if (tempCurrentMarking[getPlace(*iter)->index] == 0) {
 			somePlaceNotMarked = true;
 			break;
 		} 
-		tempCurrentMarking[Places[*iter]->index] -= 1;
+		tempCurrentMarking[getPlace(*iter)->index] -= 1;
 	}
 
 	if (!somePlaceNotMarked) {	// if all places are appropriatly marked, we save this state
@@ -1153,11 +1139,11 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 	
 				// shall we save this state? meaning, are the correct output places marked?
 				for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-					if (CurrentMarking[Places[*iter]->index] == 0) {
+					if (CurrentMarking[getPlace(*iter)->index] == 0) {
 						somePlaceNotMarked = true;
 						break;
 					}
-					CurrentMarking[Places[*iter]->index] -= 1;
+					CurrentMarking[getPlace(*iter)->index] -= 1;
 				}
 			
 				if (!somePlaceNotMarked) {	// if all places are appropriatly marked, we save this state
@@ -1224,11 +1210,11 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 	
 				// shall we save this state? meaning, are the correct output places marked?
 				for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-					if (tempCurrentMarking[Places[*iter]->index] == 0) {
+					if (tempCurrentMarking[getPlace(*iter)->index] == 0) {
 						somePlaceNotMarked = true;
 						break;
 					}
-					tempCurrentMarking[Places[*iter]->index] -= 1;
+					tempCurrentMarking[getPlace(*iter)->index] -= 1;
 				}
 			
 				if (!somePlaceNotMarked) {	// if all places are appropriatly marked, we save this state
@@ -1458,13 +1444,13 @@ void oWFN::addInputMessage(unsigned int message) {
 
 	CurrentMarking[message]++;
 
-	placeHashValue += Places[message]->hash_factor;
+	placeHashValue += getPlace(message)->hash_factor;
 	placeHashValue %= HASHSIZE;
 
 	for (Node::Arcs_t::size_type k = 0;
-	    k < Places[message]->getLeavingArcsCount(); k++)
+	    k < getPlace(message)->getLeavingArcsCount(); k++)
 	{
-		((owfnTransition *) Places[message]->getLeavingArc(k)->Destination)->check_enabled(this);
+		((owfnTransition *) getPlace(message)->getLeavingArc(k)->Destination)->check_enabled(this);
 	}
 	return;
 }
@@ -1475,15 +1461,15 @@ void oWFN::addInputMessage(unsigned int message) {
 //! \brief adds input messages to the current marking
 int oWFN::addInputMessage(messageMultiSet messages) {
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		if (Places[*iter]->type == INPUT) {
+		if (getPlace(*iter)->type == INPUT) {
 			// found that place
 			CurrentMarking[*iter]++;
-			placeHashValue += Places[*iter]->hash_factor;
+			placeHashValue += getPlace(*iter)->hash_factor;
 			placeHashValue %= HASHSIZE;
 
 			// TODO: check_enabled!!!!!!!! so richtig?!
-			for (Node::Arcs_t::size_type k = 0; k < Places[*iter]->getLeavingArcsCount(); k++) {
-				((owfnTransition *) Places[*iter]->getLeavingArc(k)->Destination)->check_enabled(this);
+			for (Node::Arcs_t::size_type k = 0; k < getPlace(*iter)->getLeavingArcsCount(); k++) {
+				((owfnTransition *) getPlace(*iter)->getLeavingArc(k)->Destination)->check_enabled(this);
 			}
 		//	return 0;
 		}
@@ -1508,12 +1494,12 @@ void oWFN::printMarking(unsigned int * marking) const {
 string oWFN::getMarkingAsString(unsigned int * marking) const {
     bool comma = false;
     string buffer;
-    for (unsigned int i = 0; i < placeCnt; i++) {
+    for (unsigned int i = 0; i < getPlaceCount(); i++) {
         if (marking[i] > 5) {
             if (comma) {
                 buffer += ", ";
             }
-            buffer += Places[i]->name;
+            buffer += getPlace(i)->name;
             buffer += ":";
             buffer += intToString(marking[i]);
             comma = true;
@@ -1522,7 +1508,7 @@ string oWFN::getMarkingAsString(unsigned int * marking) const {
                 if (comma) {
                     buffer += ", ";
                 }
-                buffer += Places[i]->name;
+                buffer += getPlace(i)->name;
                 comma = true;
             }
         }
@@ -1537,8 +1523,8 @@ string oWFN::getCurrentMarkingAsString() const {
 
 void oWFN::print_binDec(int h) {
 
-	for (unsigned int i=0; i < placeCnt; i++) {
-		cout << Places[i] -> name << ": " << Places[i] -> nrbits;
+	for (unsigned int i=0; i < getPlaceCount(); i++) {
+		cout << getPlace(i) -> name << ": " << getPlace(i) -> nrbits;
 	}
 	cout << endl;
 	
@@ -1594,19 +1580,19 @@ bool oWFN::addTransition(owfnTransition* transition)
 }
 
 
-void oWFN::addPlace(unsigned int i, owfnPlace * place) {
-	placeCnt++;
+void oWFN::addPlace(owfnPlace *place)
+{
 	if (place->type == INPUT) {
-		PN->placeInputCnt++;
+		inputPlaces.push_back(place);
 	} else if (place->type == OUTPUT) {
-		PN->placeOutputCnt++;
+		outputPlaces.push_back(place);
 	}
-	Places[i] = place;
-	place->index = i;
+	Places.push_back(place);
+	place->index = Places.size() - 1;
 	
-	if(!(placeCnt % REPORTFREQUENCY)) {
-		cerr << "\n" << placeCnt << "places parsed\n";
-  	}
+	if(!(Places.size() % REPORTFREQUENCY)) {
+		cerr << "\n" << Places.size() << "places parsed\n";
+	}
 }
 
 void oWFN::RemoveGraph() {
@@ -1629,12 +1615,12 @@ bool oWFN::removeOutputMessage(unsigned int message) {
 
 	if (CurrentMarking[message] > 0) {
 		CurrentMarking[message]--;
-		placeHashValue -= Places[message]->hash_factor;
+		placeHashValue -= getPlace(message)->hash_factor;
 		placeHashValue %= HASHSIZE;
 		
 		// TODO: check_enabled!!!!!!!! so richtig?!
-		for (Node::Arcs_t::size_type k = 0; k < Places[message]->getLeavingArcsCount(); k++) {
-			((owfnTransition *) Places[message]->getLeavingArc(k)->Destination)->check_enabled(this);
+		for (Node::Arcs_t::size_type k = 0; k < getPlace(message)->getLeavingArcsCount(); k++) {
+			((owfnTransition *) getPlace(message)->getLeavingArc(k)->Destination)->check_enabled(this);
 		}
 		return true;	
 	} 
@@ -1650,28 +1636,22 @@ bool oWFN::removeOutputMessage(messageMultiSet messages) {
 	
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
 
-		if (Places[*iter]->type == OUTPUT) {
+		if (getPlace(*iter)->type == OUTPUT) {
 			if (CurrentMarking[*iter] > 0) {
 				found++;
 				// found that place
 				CurrentMarking[*iter]--;
-				placeHashValue -= Places[*iter]->hash_factor;
+				placeHashValue -= getPlace(*iter)->hash_factor;
 				placeHashValue %= HASHSIZE;
 				
 				// TODO: check_enabled!!!!!!!! so richtig?!
-				for (Node::Arcs_t::size_type k = 0; k < Places[*iter]->getLeavingArcsCount(); k++) {
-					((owfnTransition *) Places[*iter]->getLeavingArc(k)->Destination)->check_enabled(this);
+				for (Node::Arcs_t::size_type k = 0; k < getPlace(*iter)->getLeavingArcsCount(); k++) {
+					((owfnTransition *) getPlace(*iter)->getLeavingArc(k)->Destination)->check_enabled(this);
 				}	
 			}
 		} 
 	}
 	return messages.size() == found;	
-}
-
-
-void oWFN::deletePlace(owfnPlace * place) {
-	delete place;
-	placeCnt--;
 }
 
 
@@ -1698,8 +1678,8 @@ stateType oWFN::typeOfState() {
 //! \fn bool oWFN::isMinimal()
 //! \brief returns true, if current state is minimal
 bool oWFN::isMinimal() {
-	for (unsigned int i = 0; i < placeCnt; i++) {
-		if (Places[i]->type == OUTPUT && CurrentMarking[i] > 0) {
+	for (unsigned int i = 0; i < getPlaceCount(); i++) {
+		if (getPlace(i)->type == OUTPUT && CurrentMarking[i] > 0) {
 			return true;
 		}
 	}
@@ -1720,18 +1700,18 @@ bool oWFN::isMaximal() {
 bool oWFN::isFinal() const {
 	trace(TRACE_5, "oWFN::bool oWFN::isFinal() : start\n");
 	if(FinalCondition) {
-		for (unsigned int currentplacenr = 0; currentplacenr < getPlaceCnt(); currentplacenr++) {
-		    for (unsigned int j=0; j < PN->Places[currentplacenr]->cardprop; j++) {
-				if (PN->Places[currentplacenr]->proposition != NULL) {
-				    PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+		for (unsigned int currentplacenr = 0; currentplacenr < getPlaceCount(); currentplacenr++) {
+		    for (unsigned int j=0; j < PN->getPlace(currentplacenr)->cardprop; j++) {
+				if (PN->getPlace(currentplacenr)->proposition != NULL) {
+				    PN->getPlace(currentplacenr)->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
 				}
 			}
 		}
 		trace(TRACE_5, "oWFN::bool oWFN::isFinal() : end\n");
 		return FinalCondition -> value;
 	} else {
-		for (unsigned int i = 0; i < getPlaceCnt(); i++) {
-			if (Places[i]->type != INTERNAL && CurrentMarking[i] > 0) {
+		for (unsigned int i = 0; i < getPlaceCount(); i++) {
+			if (getPlace(i)->type != INTERNAL && CurrentMarking[i] > 0) {
 				trace(TRACE_5, "oWFN::bool oWFN::isFinal() : end\n");
 				return false;
 			}
@@ -1756,7 +1736,7 @@ string oWFN::createLabel(messageMultiSet m) const {
 		if (comma) {
 			label += ", ";
 		}
-		label += Places[*iter1]->name;
+		label += getPlace(*iter1)->name;
 		comma = true;
 	}
 
@@ -1866,7 +1846,7 @@ owfnTransition ** oWFN::stubbornfirelistmessage(messageMultiSet messages) {
 	
 	// check if any of the output messages has a pre-transition associated with it
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		if (!Places[*iter]->PreTransitions.empty()) {
+		if (!getPlace(*iter)->PreTransitions.empty()) {
 			noPreTransitions = false;
 			break;
 		}
@@ -1883,8 +1863,8 @@ owfnTransition ** oWFN::stubbornfirelistmessage(messageMultiSet messages) {
 	StartOfStubbornList = (owfnTransition *) 0;
 	
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		for(i = 0; i != Places[*iter]->PreTransitions.size(); i++) {
-			stubborninsert(this, Places[*iter]->PreTransitions[i]);
+		for(i = 0; i != getPlace(*iter)->PreTransitions.size(); i++) {
+			stubborninsert(this, getPlace(*iter)->PreTransitions[i]);
 		}
 	}
 	

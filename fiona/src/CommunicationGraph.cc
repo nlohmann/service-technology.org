@@ -145,7 +145,7 @@ void communicationGraph::calculateRootNode() {
     trace(TRACE_5, "void reachGraph::calculateRootNode(): start\n");
 
     // create new OG root node
-    root = new vertex(PN->placeInputCnt + PN->placeOutputCnt);
+    root = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());
 
     // calc the reachable states from that marking
     if (options[O_CALC_ALL_STATES]) {
@@ -212,12 +212,12 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
         unsigned int offset = 0;
         
         if (type == receiving) {
-            offset = PN->placeInputCnt;
+            offset = PN->getInputPlaceCount();
         } 
 
 		if (found == NULL) {
 			// copy the events used from the parent node
-			for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+			for (unsigned int i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
             	toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
         	}
 		}
@@ -226,16 +226,16 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             if (comma) {
               label += ", ";
             }
-           	label += string(PN->Places[*iter]->name);
+           	label += string(PN->getPlace(*iter)->name);
             comma = true;
             
             unsigned int i = 0;
             if (type == receiving) {
-	            while (i < PN->placeOutputCnt && PN->outputPlacesArray[i]->index != *iter) {
+	            while (i < PN->getOutputPlaceCount() && PN->getOutputPlace(i)->index != *iter) {
 					i++;	
 				}
             } else {
-	            while (i < PN->placeInputCnt && PN->inputPlacesArray[i]->index != *iter) {
+	            while (i < PN->getInputPlaceCount() && PN->getInputPlace(i)->index != *iter) {
 					i++;	
 				}
             }
@@ -316,9 +316,9 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
     
     string edgeLabel;
     if (type == sending) {
-        edgeLabel = PN->inputPlacesArray[label]->name;
+        edgeLabel = PN->getInputPlace(label)->name;
     } else {
-        edgeLabel = PN->outputPlacesArray[label]->name;
+        edgeLabel = PN->getOutputPlace(label)->name;
 	}
 
 	// try to find vertex in set of known vertices
@@ -337,12 +337,12 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 		currentVertex->addSuccessorNode(edgeSucc);
 		currentVertex->setAnnotationEdges(edgeSucc);
 
-        for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+        for (unsigned int i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
             toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
         }
 
         if (type == receiving) {
-            offset = PN->placeInputCnt;
+            offset = PN->getInputPlaceCount();
         }
 
         toAdd->eventsUsed[offset + label]++;
@@ -372,7 +372,7 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 		currentVertex->setAnnotationEdges(edgeSucc);
 
 		if (type == receiving) {
-			offset = PN->placeInputCnt;
+			offset = PN->getInputPlaceCount();
 		}
 
 		if (currentVertex->getColor() != RED) {
@@ -414,7 +414,7 @@ void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * o
 		// test for each marking of current node if message bound k reached
 		// then supress new sending event
 		if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
-			if (PN->CurrentMarking[PN->Places[input]->index] == messages_manual) {
+			if (PN->CurrentMarking[PN->getPlace(input)->index] == messages_manual) {
 				// adding input message to state already using full message bound
 				trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
 			    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
@@ -458,7 +458,7 @@ void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
 
 	if (TRACE_2 <= debug_level) {
 		for (messageMultiSet::iterator iter1 = input.begin(); iter1 != input.end(); iter1++) {
-			trace(TRACE_2, PN->Places[*iter1]->name);
+			trace(TRACE_2, PN->getPlace(*iter1)->name);
 			trace(TRACE_2, " ");			
 		}
 		trace(TRACE_2, "\n");
@@ -472,10 +472,10 @@ void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
 		if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
 			// iterate over the set of input messages
 			for (messageMultiSet::iterator iter = input.begin(); iter != input.end(); iter++) {
-				if (PN->CurrentMarking[PN->Places[*iter]->index] == messages_manual) {
+				if (PN->CurrentMarking[PN->getPlace(*iter)->index] == messages_manual) {
 					// adding input message to state already using full message bound
 					trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
-					trace(TRACE_3, PN->Places[*iter]->name);
+					trace(TRACE_3, PN->getPlace(*iter)->name);
 				    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
 					return;
 				}
@@ -520,7 +520,7 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
 	    		}
 		}
     } else {
-    	owfnPlace * outputPlace = PN->Places[output];
+    	owfnPlace * outputPlace = PN->getPlace(output);
 
 		StateSet stateSet;
 
@@ -560,7 +560,7 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
         
 	if (TRACE_2 <= debug_level) {
 		for (messageMultiSet::iterator iter1 = output.begin(); iter1 != output.end(); iter1++) {
-			trace(TRACE_2, PN->Places[*iter1]->name);
+			trace(TRACE_2, PN->getPlace(*iter1)->name);
 			trace(TRACE_2, " ");
 		}
 		trace(TRACE_2, "\n");
@@ -751,8 +751,8 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
                         				if (PN->transNrQuasiEnabled > 0) {
                         					kindOfDeadlock = "e";
                         				} else {
-                        					for (i = 0; i < PN->placeOutputCnt; i++) {
-                        						if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
+                        					for (i = 0; i < PN->getOutputPlaceCount(); i++) {
+                        						if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
                         							kindOfDeadlock = "e";
                         							continue;
                         						}
@@ -873,9 +873,9 @@ void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedN
 bool communicationGraph::stateActivatesOutputEvents(State * s) {
     s->decode(PN);
     
-    for (unsigned int i = 0; i < PN->getPlaceCnt(); i++) {
+    for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
 
-        if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {
+        if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {
             return true;
         }
     }
@@ -1011,12 +1011,12 @@ void communicationGraph::printProgressFirst() {
 //	int i;
 //	
 //	for (i = 0; i < PN->getInputPlaceCnt(); i++) {
-//		if (currentNode->eventsUsed[i] < PN->inputPlacesArray[i]->max_occurence) {
+//		if (currentNode->eventsUsed[i] < PN->getInputPlace(i)->max_occurence) {
 //			return false;    // at least one event can be sent
 //		}
 //	}
 //	for (i = 0; i < PN->getOutputPlaceCnt(); i++) {
-//		if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
+//		if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] < PN->getOutputPlace(i)->max_occurence) {
 //			return false;    // at least one event can be received
 //		}
 //	}

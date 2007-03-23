@@ -194,11 +194,11 @@ void vertex::removeLiteralFromFormula(unsigned int i, edgeType type) {
 	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, edgeType type) : start\n");
 	
 	if (type == sending) {
-		//cout << "remove literal !" << PN->inputPlacesArray[i]->name << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
-		annotation->removeLiteral('!' + PN->inputPlacesArray[i]->name);
+		//cout << "remove literal !" << PN->getInputPlace(i)->name << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
+		annotation->removeLiteral('!' + PN->getInputPlace(i)->name);
 	} else {
-		//cout << "remove literal ?" << PN->outputPlacesArray[i]->name << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
-		annotation->removeLiteral('?' + PN->outputPlacesArray[i]->name);
+		//cout << "remove literal ?" << PN->getOutputPlace(i)->name << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
+		annotation->removeLiteral('?' + PN->getOutputPlace(i)->name);
 	}
 	
 	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, edgeType type) : end\n");

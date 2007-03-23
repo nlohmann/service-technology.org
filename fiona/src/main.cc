@@ -116,9 +116,8 @@ void readnet() {
 #endif
 
     unsigned int ii;
-    for(ii = 0; ii < PN->getPlaceCnt();ii++) {
-        PN->CurrentMarking[ii] = PN->Places[ii]->initial_marking;
-        PN->Places[ii]->index = ii;
+    for(ii = 0; ii < PN->getPlaceCount();ii++) {
+        PN->CurrentMarking[ii] = PN->getPlace(ii)->initial_marking;
 	}
 
     PN->initialize();
@@ -197,14 +196,14 @@ void adjustOptionValues() {
 	}
 	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all:\n");
 	trace(TRACE_0, "    input events:\n" );
-	for (unsigned int e=0; e < PN->getInputPlaceCnt(); e++) {
-		trace(TRACE_0, "\t " + string(PN->inputPlacesArray[e]->name));
-		trace(TRACE_0, "\t(max. " + intToString(PN->inputPlacesArray[e]->max_occurence) + "x)\n");
+	for (unsigned int e=0; e < PN->getInputPlaceCount(); e++) {
+		trace(TRACE_0, "\t " + string(PN->getInputPlace(e)->name));
+		trace(TRACE_0, "\t(max. " + intToString(PN->getInputPlace(e)->max_occurence) + "x)\n");
 	}
 	trace(TRACE_0, "    output events:\n" );
-	for (unsigned int e=0; e < PN->getOutputPlaceCnt(); e++) {
-		trace(TRACE_0, "\t " + string(PN->outputPlacesArray[e]->name));
-		trace(TRACE_0, "\t(max. " + intToString(PN->outputPlacesArray[e]->max_occurence) + "x)\n");
+	for (unsigned int e=0; e < PN->getOutputPlaceCount(); e++) {
+		trace(TRACE_0, "\t " + string(PN->getOutputPlace(e)->name));
+		trace(TRACE_0, "\t(max. " + intToString(PN->getOutputPlace(e)->max_occurence) + "x)\n");
 	}
 	
 	trace(TRACE_0, "\n");
@@ -321,8 +320,8 @@ int main(int argc, char ** argv) {
                 trace(TRACE_0, "processing net " + string(netfile) + " ...\n");
             }	
             // report the net
-            trace(TRACE_0, "    places: " + intToString(PN->getPlaceCnt()));
-            trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCnt()) + " input places, " + intToString(PN->getOutputPlaceCnt()) + " output places)\n");
+            trace(TRACE_0, "    places: " + intToString(PN->getPlaceCount()));
+            trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCount()) + " input places, " + intToString(PN->getOutputPlaceCount()) + " output places)\n");
             trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCount()) + "\n\n");
         
             if (PN->FinalCondition) {

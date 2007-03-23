@@ -90,19 +90,19 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
 	
 	labelTable = new BddLabelTab(2*nbrLabels);
 	
-	assert(PN->placeInputCnt + PN->placeOutputCnt <= pow(double(2), double(sizeof(int)*8-1)) - 1); //PN->placeInputCnt + PN->placeOutputCnt <= 2^31 -1
-	assert(nbrLabels ==  int(PN->placeInputCnt + PN->placeOutputCnt));
+	assert(PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= pow(double(2), double(sizeof(int)*8-1)) - 1); //PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= 2^31 -1
+	assert(nbrLabels ==  int(PN->getInputPlaceCount() + PN->getOutputPlaceCount()));
 	
 /*	//for a unigue coding of the labels
 	list<char*> labelList;
-	for (unsigned int i = 0; i < PN->placeInputCnt; ++i){
-		//cout << i << "  " << PN->inputPlacesArray[i]->name << endl;
-		labelList.push_back(PN->inputPlacesArray[i]->name);
+	for (unsigned int i = 0; i < PN->getInputPlaceCount(); ++i){
+		//cout << i << "  " << PN->getInputPlace(i)->name << endl;
+		labelList.push_back(PN->getInputPlace(i)->name);
 	}
 	
-	for (unsigned int i = 0; i < PN->placeOutputCnt; ++i){
-		//cout << i << "  " << PN->outputPlacesArray[i]->name << endl;
-		labelList.push_back(PN->outputPlacesArray[i]->name);
+	for (unsigned int i = 0; i < PN->getOutputPlaceCount(); ++i){
+		//cout << i << "  " << PN->getOutputPlace(i)->name << endl;
+		labelList.push_back(PN->getOutputPlace(i)->name);
 	}
 	
 	labelList.sort(cmp());	
@@ -113,7 +113,7 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
 	//list<char*>::const_iterator list_iter = labelList.begin();
 	
 	//add labels and their bddNumber to labelTable
-	for (unsigned int i = 0; i < PN->placeInputCnt + PN->placeOutputCnt; ++i){
+	for (unsigned int i = 0; i < PN->getInputPlaceCount() + PN->getOutputPlaceCount(); ++i){
 		assert(list_iter != labelList.end());
 		cout << i << "  " << *list_iter << endl;
 		label = new BddLabel(*list_iter, i, labelTable);
@@ -125,14 +125,14 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
 	
 	//add the labels and their bddNumber to the labelTable
 	BddLabel * label;
-	for (unsigned int i = 0; i < PN->placeInputCnt; ++i){
-		//cout << i << "  " << PN->inputPlacesArray[i]->name << endl;
-		label = new BddLabel(PN->inputPlacesArray[i]->name, i, labelTable);
+	for (unsigned int i = 0; i < PN->getInputPlaceCount(); ++i){
+		//cout << i << "  " << PN->getInputPlace(i)->name << endl;
+		label = new BddLabel(PN->getInputPlace(i)->name, i, labelTable);
 	}
 	
-	for (unsigned int i = 0; i < PN->placeOutputCnt; ++i){
-		//cout << i + PN->placeInputCnt << "  " << PN->outputPlacesArray[i]->name << endl;
-		label = new BddLabel(PN->outputPlacesArray[i]->name, i + PN->placeInputCnt, labelTable);
+	for (unsigned int i = 0; i < PN->getOutputPlaceCount(); ++i){
+		//cout << i + PN->getInputPlaceCount() << "  " << PN->getOutputPlace(i)->name << endl;
+		label = new BddLabel(PN->getOutputPlace(i)->name, i + PN->getInputPlaceCount(), labelTable);
 	}
 
 /*	BddLabel * temp;
@@ -764,30 +764,30 @@ void BddRepresentation::save(char* option){
 	int size = nbrLabels + maxNodeBits;
 	char** names = new char*[size];
 
-	assert(PN->placeInputCnt + PN->placeOutputCnt <= pow(double(2), double(sizeof(int)*8-1)) - 1); //PN->placeInputCnt + PN->placeOutputCnt <= 2^31 -1
+	assert(PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= pow(double(2), double(sizeof(int)*8-1)) - 1); //PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= 2^31 -1
 	
-    for (int i = 0; i < int(PN->placeInputCnt); ++i){
-    	assert(i < nbrLabels + maxNodeBits);
-    	//cout << "i: " << i << "   name: " << PN->inputPlacesArray[i]->name << "   nbr: " << labelTable->lookup(PN->inputPlacesArray[i]->name)->nbr << endl;
-    	char* tmp = new char [PN->inputPlacesArray[i]->name.size() + 2];
+    for (unsigned int i = 0; i < PN->getInputPlaceCount(); ++i){
+    	assert((int)i < nbrLabels + maxNodeBits);
+    	//cout << "i: " << i << "   name: " << PN->getInputPlace(i)->name << "   nbr: " << labelTable->lookup(PN->getInputPlace(i)->name)->nbr << endl;
+    	char* tmp = new char [PN->getInputPlace(i)->name.size() + 2];
     	strcpy (tmp,"!");
-    	strcat (tmp, PN->inputPlacesArray[i]->name.c_str());
-    	unsigned int nbr = labelTable->lookup(PN->inputPlacesArray[i]->name)->nbr;
+    	strcat (tmp, PN->getInputPlace(i)->name.c_str());
+    	unsigned int nbr = labelTable->lookup(PN->getInputPlace(i)->name)->nbr;
         names[nbr] = tmp;
     }
     
-    for (int i = 0; i < int(PN->placeOutputCnt); ++i){
-		assert(int(i+PN->placeInputCnt) < nbrLabels + maxNodeBits);
-		//cout << "i: " << i << "   name: " << PN->outputPlacesArray[i]->name << "   nbr: " << labelTable->lookup(PN->outputPlacesArray[i]->name)->nbr << endl;
-    	char* tmp = new char [PN->outputPlacesArray[i]->name.size() + 2];
+    for (unsigned int i = 0; i < PN->getOutputPlaceCount(); ++i){
+		assert(int(i+PN->getInputPlaceCount()) < nbrLabels + maxNodeBits);
+		//cout << "i: " << i << "   name: " << PN->getOutputPlace(i)->name << "   nbr: " << labelTable->lookup(PN->getOutputPlace(i)->name)->nbr << endl;
+    	char* tmp = new char [PN->getOutputPlace(i)->name.size() + 2];
     	strcpy (tmp,"?");
-    	strcat (tmp, PN->outputPlacesArray[i]->name.c_str());
-    	unsigned int nbr = labelTable->lookup(PN->outputPlacesArray[i]->name)->nbr;
+    	strcat (tmp, PN->getOutputPlace(i)->name.c_str());
+    	unsigned int nbr = labelTable->lookup(PN->getOutputPlace(i)->name)->nbr;
         names[nbr] = tmp;
     }
     
 
-	assert((unsigned int)nbrLabels == PN->placeInputCnt+PN->placeOutputCnt);
+	assert((unsigned int)nbrLabels == PN->getInputPlaceCount()+PN->getOutputPlaceCount());
 	assert(Cudd_ReadSize(mgrAnn) == nbrLabels + maxNodeBits);
     for (int i = nbrLabels; i < size; ++i){
     	assert(i < Cudd_ReadSize(mgrAnn));

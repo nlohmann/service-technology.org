@@ -77,15 +77,15 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * cur
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
 		if (typeOfPlace == sending) {
 			unsigned int i = 0;
-			while (i < PN->placeInputCnt-1 && PN->inputPlacesArray[i] && 
-						PN->inputPlacesArray[i]->index != *iter) {
+			while (i < PN->getInputPlaceCount()-1 && PN->getInputPlace(i) && 
+						PN->getInputPlace(i)->index != *iter) {
 				i++;	
 			}
 
-			if (currentNode->eventsUsed[i] >= PN->inputPlacesArray[i]->max_occurence) {
+			if (currentNode->eventsUsed[i] >= PN->getInputPlace(i)->max_occurence) {
 				// this input event shall not be sent anymore, so quit here
 				trace(TRACE_3, "maximal occurrences of event ");
-				trace(TRACE_3, PN->inputPlacesArray[i]->name);
+				trace(TRACE_3, PN->getInputPlace(i)->name);
 				trace(TRACE_3, " reached\n");
 
 				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
@@ -93,14 +93,14 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * cur
 			}
 		} else if (typeOfPlace == receiving) {
 			unsigned int i = 0;
-			while (i < PN->placeOutputCnt-1 && PN->outputPlacesArray[i] && 
-						PN->outputPlacesArray[i]->index != *iter) {
+			while (i < PN->getOutputPlaceCount()-1 && PN->getOutputPlace(i) && 
+						PN->getOutputPlace(i)->index != *iter) {
 				i++;	
 			}
-			if (currentNode->eventsUsed[i + PN->placeInputCnt] >= PN->outputPlacesArray[i]->max_occurence) {
+			if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] >= PN->getOutputPlace(i)->max_occurence) {
 				// this output event shall not be received anymore, so quit here
 				trace(TRACE_3, "maximal occurrences of event ");
-				trace(TRACE_3, PN->outputPlacesArray[i]->name);
+				trace(TRACE_3, PN->getOutputPlace(i)->name);
 				trace(TRACE_3, " reached\n");
 				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");				
 				return false;		
@@ -153,7 +153,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	
 			trace(TRACE_2, "\t\t\t\t    sending event: !");
 			
-			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
+			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
 			currentVertex = currentNode;
 			
 			calculateSuccStatesInput(*iter, currentNode, v);
@@ -161,7 +161,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 			if (v->getColor() == RED) {
 				// message bound violation occured during calculateSuccStatesInput
 				trace(TRACE_2, "\t\t\t\t    sending event: !");
-			//	trace(TRACE_2, PN->inputPlacesArray[*iter]->name);
+			//	trace(TRACE_2, PN->getInputPlace(*iter)->name);
 				trace(TRACE_2, " at node " + intToString(currentNode->getNumber()) + " suppressed (message bound violated)\n");
 	
 				numberDeletedVertices--;
@@ -193,7 +193,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 			
 			trace(TRACE_2, "\t\t\t\t    output event: ?");
 	
-			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
+			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
 			currentVertex = currentNode;
 			
 			calculateSuccStatesOutput(*iter, currentNode, v);
@@ -251,7 +251,7 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 	setOfMessages outputSet;
 	
 	// initialize node
-	if (PN->getInputPlaceCnt() > 0) {
+	if (PN->getInputPlaceCount() > 0) {
 	//	inputSet = receivingBeforeSending(currentNode);		// per node
 	}
 	
@@ -282,7 +282,7 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 
 			trace(TRACE_2, "\t\t\t\t    input event: ?");
 
-			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);		// create new vertex of the graph
+			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());		// create new vertex of the graph
 			currentVertex = currentNode;
 			
 			calculateSuccStatesInput(*iter, currentNode, v);
@@ -303,7 +303,7 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 		
 			trace(TRACE_2, "\t\t\t\t    output event: ?");
 		
-			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
+			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
 			currentVertex = currentNode;
 						
 			calculateSuccStatesOutput(*iter, currentNode, v);
@@ -374,21 +374,21 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 					 	input.insert(*index);
 						
 						inputMessages.insert(input);
-						cl->addLiteral(PN->Places[*index]->name);
+						cl->addLiteral(PN->getPlace(*index)->name);
 						
-			//			cout << "\t" << PN->Places[*index]->name << endl;
+			//			cout << "\t" << PN->getPlace(*index)->name << endl;
 					}
 					i++;
 				}
 	
 				// get the activated output events			
-				for (unsigned int i = 0; i < PN->getPlaceCnt(); i++) {
-					if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {
+				for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
+					if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {
 						messageMultiSet output;
 						output.insert(i);
 						
 						outputMessages.insert(output);
-						cl->addLiteral(PN->Places[i]->name);	
+						cl->addLiteral(PN->getPlace(i)->name);	
 					}	
 				}
 				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
@@ -420,19 +420,19 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 						input.insert(*index);
 						
 						inputMessages.insert(input);
-						cl->addLiteral(PN->Places[*index]->name);
-				//		cout << "\t" << PN->Places[*index]->name << endl;
+						cl->addLiteral(PN->getPlace(*index)->name);
+				//		cout << "\t" << PN->getPlace(*index)->name << endl;
 					}
 					i++;
 				}
 				// get the activated output events			
-				for (unsigned int i = 0; i < PN->getPlaceCnt(); i++) {
-					if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {
+				for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
+					if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {
 						messageMultiSet output;
 						output.insert(i);
 						
 						outputMessages.insert(output);
-						cl->addLiteral(PN->Places[i]->name);	
+						cl->addLiteral(PN->getPlace(i)->name);	
 					}	
 				}
 				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
@@ -493,7 +493,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 					
 					inputMessages.insert(input);
 					
-					cl->addLiteral(PN->Places[*index]->name);
+					cl->addLiteral(PN->getPlace(*index)->name);
 				}
 				i++;
 			}			
@@ -502,16 +502,16 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 			
 			(*iter)->decode(PN);
 			
-			for (i = 0; i < PN->getPlaceCnt(); i++) {
+			for (i = 0; i < PN->getPlaceCount(); i++) {
 				
-				if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {	
+				if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {	
 					for (unsigned int z = 0; z < PN->CurrentMarking[i]; z++) {			
 						outputMessages.insert(i);
 					}
 					
 					found = true;	
 #ifdef DEBUG
-	cout << "\t\t" << PN->Places[i]->name << endl;
+	cout << "\t\t" << PN->getPlace(i)->name << endl;
 #endif
 				}	
 			}
@@ -612,7 +612,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 					
 					inputMessages.insert(input);
 					
-					cl->addLiteral(PN->Places[*index]->name);
+					cl->addLiteral(PN->getPlace(*index)->name);
 				}
 				i++;
 			}			
@@ -621,16 +621,16 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 			
 			(*iter)->decode(PN);
 			
-			for (i = 0; i < PN->getPlaceCnt(); i++) {
+			for (i = 0; i < PN->getPlaceCount(); i++) {
 				
-				if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {	
+				if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {	
 					for (unsigned int z = 0; z < PN->CurrentMarking[i]; z++) {			
 						outputMessages.insert(i);
 					}
 					
 					found = true;	
 #ifdef DEBUG
-	cout << "\t\t" << PN->Places[i]->name << endl;
+	cout << "\t\t" << PN->getPlace(i)->name << endl;
 #endif
 				}	
 			}
@@ -753,7 +753,7 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 					
 					inputMessages.insert(input);
 					
-					cl->addLiteral(PN->Places[*index]->name);
+					cl->addLiteral(PN->getPlace(*index)->name);
 				}
 				i++;
 			}
@@ -816,7 +816,7 @@ void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vert
 			
 			// CHANGE THAT!!!!!!!!!!! is just a hack, stubborn set method does not yet work for more than one output event!
 			for (messageMultiSet::iterator iter = output.begin(); iter != output.end(); iter++) {
-				outputPlace = PN->Places[*iter];
+				outputPlace = PN->getPlace(*iter);
 			}
 			
 			// if there is a state for which an output event was activated, catch that state

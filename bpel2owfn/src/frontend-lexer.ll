@@ -25,11 +25,11 @@
  * \brief BPEL lexer
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of \$Author: nielslohmann $
+ *          last changes of \$Author: gierds $
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/23 12:38:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.
@@ -279,12 +279,6 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 
  /* some things for join conditions */
 {bpwsns}?"getLinkStatus"	{ return K_GETLINKSTATUS; }
-"and"				{ return K_AND; }
-"or"				{ return K_OR; }
-"("				{ return LBRACKET; }
-")"				{ return RBRACKET; }
-"'"				{ return APOSTROPHE; }
-
 
  /* some things for transition conditions */
 "&ge;"		{ return GREATEROREQUAL; }

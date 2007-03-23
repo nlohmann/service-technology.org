@@ -139,19 +139,17 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 				// In case the successor node v was already known, an edge to the old
 				// node is drawn by function AddVertex.
 				AddVertex(found, i, receiving, false);
+
+				// Still, if that node was computed red before, the literal
+				// of the edge from currentNode to the old node must be removed in the
+				// annotation of currentNode.
 				if (found->getColor() == RED) {
 					currentNode->removeLiteralFromFormula(i, receiving);
 				}
 				delete v;
 
-				// Still, if that node was computed red before, the literal
-				// of the edge from currentNode to the old node must be removed in the
-				// annotation of currentNode.
-				
-
 //				addProgress(your_progress);
 //				printProgress();
-
 			}
 		} else {
 			trace(TRACE_2, "\t\t\t\t\t  receiving event: ?");
@@ -228,7 +226,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 
 					addProgress(your_progress);
 					printProgress();
-
 				}
 			}
 		} else {
@@ -280,54 +277,9 @@ void operatingGuidelines::computeCNF(vertex* node) {
 	
 	StateSet::iterator iter;			// iterator over the states of the node
 	
-	if (!options[O_CALC_ALL_STATES]) { // in case of the state reduced graph
+	if (options[O_CALC_ALL_STATES]) {
+	// NO state reduction
 		
-		// iterate over all states of the node
-		for (iter = PN->setOfStatesTemp.begin();
-			 iter != PN->setOfStatesTemp.end(); iter++) {
-			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
-				// we just consider the maximal states only
-				
-				// get the marking of this state
-				(*iter)->decodeShowOnly(PN);
-							
-				// this clause's first literal
-				literal * myFirstLiteral = new literal();
-				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
-				
-				// in case of a final state we add special literal "final" to the clause
-				if ((*iter)->type == FINALSTATE) {
-					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
-					myclause->addSubFormula(myliteral);
-				}
-				
-				// get the activated output events
-				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-						myFirstLiteral->addLiteral(PN->getOutputPlace(i)->name);
-
-						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('?' + PN->getOutputPlace(i)->name);
-						myclause->addSubFormula(myliteral);
-					}
-				}
-
-				// get all the input events
-				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
-					myFirstLiteral->addLiteral(PN->getInputPlace(i)->name);
-
-					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->getInputPlace(i)->name);
-					myclause->addSubFormula(myliteral);
-				}
-
-				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
-				node->addClause(myclause);
-			}
-		}
-
-		PN->setOfStatesTemp.clear();
-
-	} else {	// no state reduction
-
 		// iterate over all states of the node
 		for (iter = node->reachGraphStateSet.begin();
 			 iter != node->reachGraphStateSet.end(); iter++) {
@@ -347,6 +299,60 @@ void operatingGuidelines::computeCNF(vertex* node) {
 					myclause->addSubFormula(myliteral);
 				}
 				
+				// get all input events
+				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
+					myFirstLiteral->addLiteral(PN->getInputPlace(i)->name);
+
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->getInputPlace(i)->name);
+					myclause->addSubFormula(myliteral);
+				}
+				
+				// get all activated output events
+				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+						myFirstLiteral->addLiteral(PN->getOutputPlace(i)->name);
+
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('?' + PN->getOutputPlace(i)->name);
+						myclause->addSubFormula(myliteral);
+					}
+				}
+
+				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
+				node->addClause(myclause);
+				
+				// TODO: an dieser stelle prüfen, ob myclause false ist -> dann knoten rot machen
+			}
+		}
+	} else {
+	// WITH state reduction
+
+		// iterate over all states of the node
+		for (iter = PN->setOfStatesTemp.begin();
+			 iter != PN->setOfStatesTemp.end(); iter++) {
+			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
+				// we just consider the maximal states only
+				
+				// get the marking of this state
+				(*iter)->decodeShowOnly(PN);
+							
+				// this clause's first literal
+				literal * myFirstLiteral = new literal();
+				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
+				
+				// in case of a final state we add special literal "final" to the clause
+				if ((*iter)->type == FINALSTATE) {
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
+					myclause->addSubFormula(myliteral);
+				}
+				
+				// get all the input events
+				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
+					myFirstLiteral->addLiteral(PN->getInputPlace(i)->name);
+
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->getInputPlace(i)->name);
+					myclause->addSubFormula(myliteral);
+				}
+
 				// get the activated output events
 				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
 					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
@@ -357,20 +363,12 @@ void operatingGuidelines::computeCNF(vertex* node) {
 					}
 				}
 
-				// get all the input events
-				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
-					myFirstLiteral->addLiteral(PN->getInputPlace(i)->name);
-
-					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->getInputPlace(i)->name);
-					myclause->addSubFormula(myliteral);
-				}
-				
 				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
 				node->addClause(myclause);
-				
-				// TODO: an dieser stelle prüfen, ob myclause false ist -> dann knoten rot machen
 			}
 		}
+
+		PN->setOfStatesTemp.clear();
 	}
 
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): end\n");
@@ -393,6 +391,7 @@ void operatingGuidelines::convertToBdd() {
     this->bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
     trace(TRACE_5,"operatingGuidelines::convertToBdd(): end\n");
 }
+
 
 void operatingGuidelines::printOGFile() const {
     string ogFilename = netfile;
@@ -423,6 +422,7 @@ void operatingGuidelines::printOGFile() const {
 
     ogFile.close();
 }
+
 
 void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
     bool visitedNodes[]) const {
@@ -460,10 +460,12 @@ void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
     }
 }
 
+
 string operatingGuidelines::NodeNameForOG(const vertex* v) const {
     assert(v != NULL);
     return "#" + intToString(v->getNumber());
 }
+
 
 void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
     bool visitedNodes[]) const {
@@ -508,3 +510,4 @@ void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
         printTransitionsToOGFile(vNext, os, visitedNodes);
     }
 }
+

@@ -37,6 +37,7 @@
 #include "vertex.h"
 #include "CNF.h"
 #include "cnf_formula.h" // needed in vertex::getCNF()
+#include "options.h"
 #include <cassert>
 
 //! \fn vertex::vertex(int numberEvents)
@@ -48,6 +49,7 @@ vertex::vertex(int numberEvents) :
 			   firstClause(NULL),
 			   successorNodes(NULL),
 			   predecessorNodes(NULL),
+			   hasFinalStateInStateSet(UNKNOWN),
 			   finalAnalysisDone(false) {
 
 	annotation = new CNF_formula();
@@ -328,13 +330,76 @@ string vertex::getCNFString() {
 }
 
 
+// returns the CNF formula that is the annotation of a node as a pointer to class CNF
 CNF * vertex::getAnnotation() {
 	return firstClause;
 }
 
 
+// returns the CNF formula that is the annotation of a node as a Boolean formula
 CNF_formula* vertex::getCNF_formula() {
 	return annotation;
+}
+
+
+// return the assignment that is imposed by present or absent arcs leaving node v
+CommGraphFormulaAssignment* vertex::getAssignment(vertex* v) {
+	
+	trace(TRACE_5, "computing annotation of node " + intToString(getNumber()) + "\n");
+
+	CommGraphFormulaAssignment* myassignment = new CommGraphFormulaAssignment();
+	
+	// traverse outgoing edges and set the corresponding literals
+	// to true if the respective node is BLUE
+    this->resetIteratingSuccNodes();
+    graphEdge* edge;
+    while ((edge = v->getNextSuccEdge()) != NULL) {
+		if (edge->getNode()->getColor() == BLUE) {
+			if (edge->getType() == sending) {
+				myassignment->setToTrue('!' + edge->getLabel());
+			} else {
+				myassignment->setToTrue('?' + edge->getLabel());
+			}
+		}
+	}
+	
+	// if node is analysed the first time, fix value of hasFinalStateInStateSet
+	if (v->hasFinalStateInStateSet == UNKNOWN) {
+
+		StateSet::iterator iter;		// iterator over the states of the node
+		
+		if (options[O_CALC_ALL_STATES]) {
+		// NO state reduction
+
+			// iterate over all states of the node
+			for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
+				if ((*iter)->type == FINALSTATE) {
+					myassignment->setToTrue(CommGraphFormulaAssignment::FINAL);
+					v->hasFinalStateInStateSet = TRUE;
+					break;
+				}
+			}
+			v->hasFinalStateInStateSet = FALSE;
+		} else {
+		// WITH state reduction
+
+			cerr << "\n BIG TODO in vertex::getAssignment!!!" << endl;
+
+		}
+	}				 	
+		
+	//cout << "hasFinalStateInStateSet?: " << v->hasFinalStateInStateSet << endl;
+
+	//assert(v->hasFinalStateInStateSet != UNKNOWN);
+
+	// only if node has final state, set assignment of literal final to true
+	if (v->hasFinalStateInStateSet == TRUE) {
+		myassignment->setToTrue(CommGraphFormulaAssignment::FINAL);
+	}
+	
+	//cout << "ende" << endl;
+	return myassignment;
+
 }
 
 
@@ -407,6 +472,20 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
 
     trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : start\n");
     
+	// computing the assignment given by outgoing edges (to blue nodes)
+//    cout << "\nbefore computing assignment" << endl;
+    CommGraphFormulaAssignment* myassignment = getAssignment(this);
+//    cout << "\nafter computing assignment" << endl;
+
+
+	bool result = this->getCNF_formula()->value(*myassignment);
+	
+//	if (result) {
+//		cout << "\nKnoten " << getNumber() << " erfüllt seine annotation!!!" << endl;
+//	} else {
+//		cout << "\nKnoten " << getNumber() << " erfüllt seine annotation NICHT!" << endl;
+//	}
+
     trace(TRACE_3, "\t\t\t analysing node ");
     if (finalAnalysis) {
     	trace(TRACE_3, "(final analysis) ");

@@ -79,6 +79,8 @@ protected:
 											//!< including the edge between them
 
 public:
+    threeValueLogic hasFinalStateInStateSet;
+
 	// vertex management
 	vertex(int);
 	~vertex ();
@@ -88,7 +90,7 @@ public:
 	
     unsigned int getNumber() const;    
     void setNumber(unsigned int);
-
+    
 	// states in vertex
     bool addState(State *);
     int getNumberOfDeadlocks();
@@ -110,6 +112,8 @@ public:
     CNF * getAnnotation();
     CNF_formula* getCNF_formula();
     string getCNFString();
+    
+    CommGraphFormulaAssignment* getAssignment(vertex*);
     
     void addClause(literal *, bool);
     void addClause(CommGraphFormulaMultiaryOr*);

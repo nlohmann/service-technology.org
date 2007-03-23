@@ -1662,16 +1662,18 @@ stateType oWFN::typeOfState() {
 	if (isFinal()) {			// state is final
 		return FINALSTATE;
 	}
+
 	if (transNrEnabled == 0) {
 		trace(TRACE_5, "oWFN::typeOfState() : end\n");	
 		return DEADLOCK;		// state is an internal deadlock, no transition is enabled or quasi-enabled
-	} else if (transNrEnabled != 0) {
+	} else {
 		trace(TRACE_5, "oWFN::typeOfState() : end\n");	
 		return TRANS;		// state is transient since there are transitions which are enabled
 	}
 	
+	assert(false);
+	
 	trace(TRACE_5, "oWFN::typeOfState() : end\n");	
-	return NN;
 }
 
 

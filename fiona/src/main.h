@@ -40,6 +40,4 @@ extern unsigned int numberOfDecodes;
 extern unsigned int NonEmptyHash;
 extern unsigned int numberDeletedVertices;
 
-typedef enum {TRANS, DEADLOCK, FINALSTATE, NN} stateType;   //!< TRANS == Transient; NN == NO IDEA ;-) --> should not be the case ever
-
 #endif /*MAIN_H*/

@@ -514,10 +514,10 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
 
     if (options[O_CALC_ALL_STATES]) {
 		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
-	    		(*iter)->decode(PN);
-	    		if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
-	        			PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
-	    		}
+	    	(*iter)->decode(PN);
+	    	if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+	       			PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
+	    	}
 		}
     } else {
     	owfnPlace * outputPlace = PN->getPlace(output);
@@ -969,6 +969,8 @@ void communicationGraph::addProgress(double toAddValue) {
 //! changed significantly and depending on the debug-level set
 void communicationGraph::printProgress() {
 		
+	return;
+	
 	int progress_step_size = 5;
 	int current_progress = int(100 * global_progress);
 
@@ -990,6 +992,8 @@ void communicationGraph::printProgress() {
 //! changed significantly and depending on the debug-level set
 void communicationGraph::printProgressFirst() {
 		
+	return;
+	
 	if (debug_level == TRACE_0) {
 		trace(TRACE_0, "\t progress (in %): 0 ");
 	} else {

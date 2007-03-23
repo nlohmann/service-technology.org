@@ -26,7 +26,7 @@ Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in
 Documentation License.''
 
 (a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
-this GNU Manual, like GNU software.
+this GNU Manual, like GNU software.''
 @end quotation
 
 This manual does not explain how
@@ -42,7 +42,7 @@ the website of GNU BPEL2oWFN, @url{http://www.gnu.org/software/bpel2owfn}.
 @end ifhtml
 
 GNU BPEL2oWFN is part of the Tools4@acronym{BPEL} project funded by
-the Bundesministerium f@"ur Bildung und Forschung. See
+the German Bundesministerium f@"ur Bildung und Forschung (BMBF). See
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 @end copying
 
@@ -110,7 +110,7 @@ the Bundesministerium f@"ur Bildung und Forschung. See
 @section Introduction
 
 GNU BPEL2oWFN is a compiler translating a business processes expressed in
-@acronym{BPEL, Business Process Execution Language for Web Services}
+@acronym{BPEL, Web Service Business Process Execution Language}
 [ACD@math{^+}03] into an @acronym{oWFN, open Workflow Net} [MRS05].
 This @acronym{oWFN} can be used to:
 
@@ -245,13 +245,13 @@ bpel2owfn -i service.bpel -f owfn -o
 @end example
 
 where @file{service.bpel} is a @acronym{BPEL} process. The option
-@samp{-f owfn} cause GNU BPEL2oWFN to generate an open workflow net. This
+@samp{-f owfn} causes GNU BPEL2oWFN to generate an open workflow net. This
 net is written to a file named @file{service.owfn}, because of the option
 @samp{-o}. For more examples, see @ref{Examples}.
 
 GNU BPEL2oWFN can be called without any parameter. In this case, it acts
-as a simple parser for @acronym{BPEL}, that reads its input from the standard input
-(@code{stdin}).
+as a simple parser for @acronym{BPEL} processes that reads its input from the
+standard input (@code{stdin}).
 
 
 
@@ -272,28 +272,48 @@ Print version information and exit.
 
 @item --input=@var{filename}.bpel
 @itemx -i @var{filename}.bpel
-Read @acronym{BPEL} input from file @file{@var{filename}.bpel}.
-If this parameter is omitted, input is read from standard input (@code{stdin}).
+Read a @acronym{BPEL} process from file @file{@var{filename}.bpel}.
+If this parameter is omitted, input is read from standard input
+(@code{stdin}).
 
 @item --output[=@var{filename}]
 @itemx -o
-The generated files are written to a file called @var{filename}. If the short
+The generated output is written to a file called @var{filename}. If the short
 form is used or the @var{filename} is omitted, the input file name is taken and 
 extended by the suffix of the chosen file format(s). If this parameter is
 omitted, the output is passed to the standard output (@code{stdout}).
 
 @item --log[=@var{filename}]
 @itemx -l 
-All additional information like warnings and processing information
-are written to a file called @var{filename}. If the short form is used
-or the @var{filename} is omitted, the output file name is taken and 
-extended by the suffix @samp{.log}. If this parameter is omitted, the
-information is passed to the standard error output (@code{stderr}).
+All additional information like warnings and processing information are
+written to a file called @var{filename}. If the short form is used or the
+@var{filename} is omitted, the output file name is taken and extended by the
+suffix @samp{.log}. If this parameter is omitted, the information is passed to
+the standard error output (@code{stderr}).
 
 @item --debug=1-4 | flex | bison
 @itemx -d 1-4 | flex | bison
 This option triggers different debug levels, and can enable additional
 information from Flex and Bison about how the input is lexed and parsed.
+
+Debug level:
+@table @samp
+@itemx 1
+Nothing.
+@itemx 2
+All messages from @samp{-d1}. Additionally, information about the current
+steps is displayed.
+@itemx 3
+All messages from @samp{-d2}. Additionally, the structure of the process is
+shown, i.e. when a Petri net is generated...
+@itemx 4
+All messages from @samp{-d3}. Additionally, a message is displayed each time a
+function is entered or left.
+@itemx flex
+Displays messages flex. Can be combined with any other debug level.
+@itemx bison
+Displays messages bison. Can be combined with any other debug level.
+@end table
 @end table
 
 
@@ -308,35 +328,47 @@ When invoking GNU BPEL2oWFN several modes are possible.
 @item --mode=@var{modus}
 @itemx -m @var{modus}
 
-GNU BPEL2oWFN supports four different modes for handling 
-@acronym{BPEL}, so @samp{@var{modus}} can be one of the following options:
+GNU BPEL2oWFN supports different modes for handling input @acronym{BPEL}
+files: @samp{@var{modus}} can be one of the following:
 
 @table @samp
 @item ast
+
 Outputs the @acronym{AST, abstract syntax tree} generated while
 parsing the input file to standard output. This option is mostly
 used for debugging reasons since it shows the implicit transformations
 and the phylum names used when generating the Petri net.
 
 @item cfg
+
 For control flow analysis (a form of static analysis) a @acronym{CFG, Control
 Flow Graph} is generated. It can be printed in graphical (dot)
 representation. This option is in an early beta-stage and can only check
 for uninitialzed variables yet. For more information, see @ref{Future Work}.
 
+@item consistency
+
+Todo.
+
 @item petrinet
+
 Generates a Petri net representing the semantics of the given
 process. Other options can be added to simplify or modify that generated Petri
 net (see below).
 
 @item pretty
+
 Outputs the parsed @acronym{BPEL} file in @acronym{XML} representation. Any
 unnecessary attributes are omitted. This option is mostly used for debugging
 reasons as it shows the implicit transformations and the identifiers of the
 @acronym{BPEL} constructs.
 @end table
+
+Note that you can only use at most one mode. If no mode is given, GNU
+BPEL2oWFN acts like a @acronym{BPEL} parser.
+
 @end table
-Please note that you can only use at most one mode.
+
 
 
 
@@ -351,25 +383,48 @@ Functions} for more details.
 @itemx -p @var{par}
 
 @table @samp
-@item nofhfaults
-With this parameter, standard faults may not occure in activities directly nested
-in a fault handler.
+@item communicationonly
 
-@item nostandardfaults
-When the parameter is set, only used-defined faults using the @code{<throw>}
-activity can occur.
+Only the communicational behavior of the input @acronym{BPEL} process is
+modeled. That is, the negative control flow (in particular fault, termination,
+or compensation handlers, @code{<exit>}, @code{<throw>}, @code{<compensate>},
+@code{<compensateScope>} activities) is not translated to the Petri net
+model. When combined with @samp{reduce}, this parameter yields the most
+compact Petri net model.
 
-@item novariables
-Removes places of the generated Petri net modelling variables as well as the
-place modelling the system clock.
+@item fhfaults
 
-@item simplify
-Structurally simplify the generated Petri net.
-@end table
+Confines the @samp{standardfaults} parameter: in the negative control flow,
+that is in activities in fault or termination handlers, no further
+@acronym{BPEL} standard faults can occur.
+
+@item reduce
+
+Apply several structural reduction rules to the generated Petri net model. The
+rules preserve deadlocks, livelocks and all deadlock-free communicating
+partners. In addition, structurally dead nodes of the Petri net, for example,
+unmarked places without ingoing arcs are removed.
+
+@item standardfaults
+
+Model the occurrence of standard faults. When this parameter is ommited, only
+user-defined faults, that is, faults thrown with @code{<throw>} activities, and
+join failures can occur. With the @samp{standardfaults} parameter, also the
+occurrence of other @acronym{BPEL} standard faults is modeled. This parameter
+yields the most-detailled, and thus biggest Petri net model.
+
+@item variables
+
+Add places for the variables of the input @acronym{BPEL} process to the Petri
+net model. As the generated model abstracts from data, that is, a low-level
+Petri net is generated, the @samp{variables} parameter also does not introduce
+data aspects. Thus, this mode is experimental.
 @end table
 
 If you want to enable more than one parameter you have to add @samp{-p}/
 @samp{--parameter} to each parameter.
+
+@end table
 
 
 
@@ -386,44 +441,92 @@ following option:
 @item --format=@var{fileformat}
 @itemx -f @var{fileformat} 
 
+Creates a file in a given ouput file format. Each file format is only available in
+certain modes. If you want to use more than one output file format you have to add @samp{-f}/
+@samp{--format} to each file format. Please note that the underlying modes
+of the given file formats are the same. You cannot, for example, create @acronym{XML} and
+@acronym{LoLA} files together since @acronym{XML} requires the mode
+@samp{pretty}, whereas @acronym{LoLA} requires the mode @samp{petrinet}.
+
+@table @asis
+@item Petri net file formats (imply mode @samp{petrinet} or @samp{consistency}):
+
 @table @samp
 @item apnn
-Create a Petri net in @acronym{APNN, Abstract Petri Net Notation}. Implies the
-mode @samp{petrinet}.
+Outputs the inner of the generated open workflow net in
+@acronym{APNN, Abstract Petri Net Notation}. When the parameter @samp{-o} is
+used, a file with the suffix @samp{.apnn} is created.
 
-@item dot
-Create a dot representation of the structure generated in the current mode
-which can be any kind of Petri net (mode @samp{petrinet} or the control flow
-graph (mode @samp{cfg}).
-
-@item info
-Create an additional information file. Implies the mode @samp{petrinet}.
+@item ina
+Outputs the inner of the generated open workflow net as untimed low-level
+Petri net in @acronym{INA, Integrated Net Analyzer} format. When the parameter
+@samp{-o} is used, a file with the suffix @samp{.pnt} is created.
 
 @item lola
-Create a @acronym{LoLA} place/transition net. Implies the mode @code{petrinet}.
+Outputs the inner of the generated open workflow net as low-level Petri net in
+@acronym{LoLA, Low-Level Analyzer} file format. When the parameter @samp{-o}
+is used, a file with the suffix @samp{.lola} is created.
 
 @item owfn
-Create a low-level @acronym{oWFN} in Fiona file format. Implies the
-mode @samp{petrinet}.
+Outputs the generated open workflow net in Fiona file format. Note that the
+Fiona file format is --- together with the @acronym{PNML} file format --- the
+only Petri net output format that outputs the complete open workflow net, that
+is, also the interface is exported. When the parameter @samp{-o} is used, a
+file with the suffix @samp{.owfn} is created.
 
 @item pep
-Create a Petri net in low-level @acronym{PEP} notation. Implies the mode
-@samp{petrinet}.
+Outputs the inner of the generated open workflow net as low-level Petri net in
+low-level @acronym{PEP} notation. When the parameter @samp{-o} is used, a
+file with the suffix @samp{.llnet} is created.
 
 @item pnml
-Create a @acronym{PNML} Petri net. Implies the mode @samp{petrinet}.
+Outputs the generated open workflow net in @acronym{PNML, Petri Net Markup
+Language}. Note that the @acronym{PNML} file format is --- together with the
+Fiona file format --- the only Petri net output format that outputs the
+complete open workflow net, that is, also the interface is exported.
+Currently, the interface places are annotated using a @code{<type>} tag
+which is only supported by Yasper. When the parameter @samp{-o} is used, a
+file with the suffix @samp{.pnml} is created.
+
+@item spin
+Outputs the inner of the generated open workflow net as low-level Petri net in
+Promela (Process Meta Language) for the model checker SPIN. When the parameter
+@samp{-o} is used, a file with the suffix @samp{.spin} is created.
+@end table
+
+@item Other file formats (note the required mode):
+@table @samp
+@item dot
+When mode @samp{petrinet} is used, the generated open workflow net is printed
+in Graphviz dot representation. When mode @samp{ast} is used, the
+@acronym{AST, abstract syntax tree} is printed in Graphviz dot representation.
+When mode @samp{cfg} is used, the @acronym{CFG, control flow graph} is printed
+in Graphviz dot representation.
+
+In both cases, when the tool @code{dot} is found in the search path during
+configuration of GNU BPEL2oWFN and the parameter @samp{-o} is used,
+@code{dot} is used to generate a @acronym{PNG, Portable Network Image} file.
+In this case, two files with the suffixes @samp{.dot} and @samp{.png} are
+created. Note that when the @samp{ast} mode is used with the @samp{dot} file
+format, the @samp{-o} parameter has to be used.
+
+@item info
+When mode @samp{petrinet} is used, information about the places and
+transitions of the generated net in a
+proprietary @acronym{ASCII}-based format. For each place and transition, all
+roles, that is, inscriptions of the Petri net patterns, are listed. The
+information can be used to correlate the generated Petri net model with the
+input @acronym{BPEL} process. When the parameter @samp{-o} is used, a file
+with the suffix @samp{.info} is created.
 
 @item xml
-Create an @acronym{XML, Extensible Markup Lanuage} file. Implies the mode
-@code{pretty}.
+When the mode @samp{pretty} is used, the pretty-printed input @acronym{BPEL}
+process --- with the implicit transformation rules applied -- exported in
+@acronym{XML, Extensible Markup Lanuage}. When the parameter @samp{-o} is
+used, a file with the suffix @samp{.xml} is created.
 @end table
 @end table
-
-If you want to use more than one output file format you have to add @samp{-f}/
-@samp{--fileformat} to each file format. Please note that the underlying modes
-of the given file formats are the same, i.e. you cannot create @acronym{XML} and
-@acronym{LoLA} files together since @acronym{XML} uses the mode @samp{pretty}
-whereas @acronym{LoLA} uses the mode @samp{petrinet}.
+@end table
 
 
 

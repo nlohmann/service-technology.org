@@ -40,6 +40,7 @@
 #include "BddRepresentation.h" 
 #include "CNF.h"
 #include "owfn.h"
+#include "vertex.h"
 #include <vector>
 
 //! \fn operatingGuidelines::operatingGuidelines(oWFN * _PN)
@@ -95,15 +96,15 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 		return;
 	}
 
-	// get the annotation of the node (CNF)
-	computeCNF(currentNode);					// calculate CNF of this node
-	
+	// get the annotation of the node (CNF) as formula
+	computeCNFformula(currentNode);
+
 	trace(TRACE_1, "=================================================================\n");
 
 //	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount() + PN->getOutputPlaceCnt()));
 	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount()));
-	
-	unsigned int i = 0;	
+
+	unsigned int i = 0;
 
 	// iterate over all elements of outputSet of the oWFN
 	trace(TRACE_2, "\t\t\t iterating over outputSet of the oWFN\n");
@@ -133,7 +134,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 				}
 
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-//				analyseNode(currentNode, false);
 				actualDepth--;
 			} else {
 				// In case the successor node v was already known, an edge to the old
@@ -164,8 +164,21 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 		i++;
 	}
 
-	i = 0;
 
+	// early checking if the node's annotation cannot be made true
+    CommGraphFormulaAssignment* testAssignment = currentNode->getAssignment();
+
+	for (unsigned int j = 0; j < PN->getInputPlaceCount(); j++) {
+		//cout << PN->getInputPlace(j)->name << endl;
+		testAssignment->setToTrue('!' + PN->getInputPlace(j)->name);
+	}
+
+	if (currentNode->getCNF_formula()->value(*testAssignment) == false) {
+		cout << "node " << currentNode->getNumber() << " went red early. formula was " << currentNode->getCNF_formula()->asString() << endl;
+	}
+
+
+	i = 0;
 	// iterate over all elements of inputSet of the oWFN
 	trace(TRACE_2, "\t\t\t iterating over inputSet of the oWFN\n");
 	while (i < PN->getInputPlaceCount()) {
@@ -195,7 +208,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 				
 				delete v;
 			} else {
-				// if (v = AddVertex(v, i, sending)) {
 				// was the new node computed before? 
 				vertex * found = findVertexInSet(v);
 			
@@ -209,7 +221,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 					}
 
 					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-//					analyseNode(currentNode, false);
 					actualDepth--;
 				} else {
 					// In case the successor node was already known, an edge to the old
@@ -244,35 +255,110 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 	// finished iterating over successors
 	trace(TRACE_2, "\t\t\t no events left...\n");
 
-	analyseNode(currentNode, true);
+	analyseNode(currentNode);
 
 	string color = "";
 	if (currentNode->getColor() == RED) {
 		color = "RED";
-	} else if (currentNode->getColor() == BLUE) {
-		color = "BLUE";
 	} else {
-		assert(false);
-		color = "BLACK";
+		color = "BLUE";
 	}
-	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");
-
-	
+	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color);
+	trace(TRACE_3, " via formula " + currentNode->getCNF_formula()->asString() + "\n");	
+		
 	if (options[O_OTF]) {
 		//cout << "currentNode: " << currentNode->getNumber() << endl;	
 		bdd->addOrDeleteLeavingEdges(currentNode);
 	}
 }
 
+
+////! \fn void operatingGuidelines::computeCNF(vertex * node)
+////! \param node the node for which the annotation is calculated
+////! \brief calculates the annotation (CNF) for the node
+//void operatingGuidelines::computeCNF(vertex* node) {
+//	
+//	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): start\n");
+//	
+//	// initially, the annoation is empty (and therefore equivalent to true)
+//	assert(node->getAnnotation() == NULL);
+//	
+//	StateSet::iterator iter;			// iterator over the states of the node
+//	
+//	if (options[O_CALC_ALL_STATES]) {
+//	// NO state reduction
+//		
+//		// iterate over all states of the node
+//		for (iter = node->reachGraphStateSet.begin();
+//			 iter != node->reachGraphStateSet.end(); iter++) {
+//			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
+//				// we just consider the maximal states only
+//				
+//				// get the marking of this state
+//				(*iter)->decodeShowOnly(PN);
+//							
+//				// this clause's first literal
+//				literal * myFirstLiteral = new literal();
+//
+//				// get all input events
+//				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
+//					myFirstLiteral->addLiteral(PN->getInputPlace(i)->name);
+//				}
+//				
+//				// get all activated output events
+//				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+//					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+//						myFirstLiteral->addLiteral(PN->getOutputPlace(i)->name);
+//					}
+//				}
+//
+//				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
+//			}
+//		}
+//	} else {
+//	// WITH state reduction
+//
+//		// iterate over all states of the node
+//		for (iter = PN->setOfStatesTemp.begin();
+//			 iter != PN->setOfStatesTemp.end(); iter++) {
+//			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
+//				// we just consider the maximal states only
+//				
+//				// get the marking of this state
+//				(*iter)->decodeShowOnly(PN);
+//							
+//				// this clause's first literal
+//				literal * myFirstLiteral = new literal();
+//				
+//				// get all the input events
+//				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
+//					myFirstLiteral->addLiteral(PN->getInputPlace(i)->name);
+//				}
+//
+//				// get the activated output events
+//				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+//					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+//						myFirstLiteral->addLiteral(PN->getOutputPlace(i)->name);
+//					}
+//				}
+//
+//				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
+//			}
+//		}
+//	}
+//
+//	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): end\n");
+//}
+
+
 //! \fn void operatingGuidelines::computeCNF(vertex * node)
 //! \param node the node for which the annotation is calculated
 //! \brief calculates the annotation (CNF) for the node
-void operatingGuidelines::computeCNF(vertex* node) {
+void operatingGuidelines::computeCNFformula(vertex* node) {
 	
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): start\n");
 	
 	// initially, the annoation is empty (and therefore equivalent to true)
-	assert(node->getAnnotation() == NULL);
 	assert(node->getCNF_formula()->asString() == "true");
 	
 	StateSet::iterator iter;			// iterator over the states of the node
@@ -290,19 +376,19 @@ void operatingGuidelines::computeCNF(vertex* node) {
 				(*iter)->decodeShowOnly(PN);
 							
 				// this clause's first literal
-				literal * myFirstLiteral = new literal();
 				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
 
 				// in case of a final state we add special literal "final" to the clause
 				if ((*iter)->type == FINALSTATE) {
+
+					node->hasFinalStateInStateSet = true;
+					
 					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
 					myclause->addSubFormula(myliteral);
 				}
 				
 				// get all input events
 				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
-					myFirstLiteral->addLiteral(PN->getInputPlace(i)->name);
-
 					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->getInputPlace(i)->name);
 					myclause->addSubFormula(myliteral);
 				}
@@ -310,14 +396,11 @@ void operatingGuidelines::computeCNF(vertex* node) {
 				// get all activated output events
 				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
 					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-						myFirstLiteral->addLiteral(PN->getOutputPlace(i)->name);
-
 						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('?' + PN->getOutputPlace(i)->name);
 						myclause->addSubFormula(myliteral);
 					}
 				}
 
-				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
 				node->addClause(myclause);
 				
 				// TODO: an dieser stelle prüfen, ob myclause false ist -> dann knoten rot machen
@@ -336,19 +419,18 @@ void operatingGuidelines::computeCNF(vertex* node) {
 				(*iter)->decodeShowOnly(PN);
 							
 				// this clause's first literal
-				literal * myFirstLiteral = new literal();
 				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
 				
 				// in case of a final state we add special literal "final" to the clause
 				if ((*iter)->type == FINALSTATE) {
+					node->hasFinalStateInStateSet = true;
+
 					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
 					myclause->addSubFormula(myliteral);
 				}
 				
 				// get all the input events
 				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
-					myFirstLiteral->addLiteral(PN->getInputPlace(i)->name);
-
 					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->getInputPlace(i)->name);
 					myclause->addSubFormula(myliteral);
 				}
@@ -356,19 +438,14 @@ void operatingGuidelines::computeCNF(vertex* node) {
 				// get the activated output events
 				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
 					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-						myFirstLiteral->addLiteral(PN->getOutputPlace(i)->name);
-
 						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('?' + PN->getOutputPlace(i)->name);
 						myclause->addSubFormula(myliteral);
 					}
 				}
 
-				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
 				node->addClause(myclause);
 			}
 		}
-
-		PN->setOfStatesTemp.clear();
 	}
 
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): end\n");

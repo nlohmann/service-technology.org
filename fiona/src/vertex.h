@@ -79,7 +79,7 @@ protected:
 											//!< including the edge between them
 
 public:
-    threeValueLogic hasFinalStateInStateSet;
+    bool hasFinalStateInStateSet;
 
 	// vertex management
 	vertex(int);
@@ -113,7 +113,7 @@ public:
     CNF_formula* getCNF_formula();
     string getCNFString();
     
-    CommGraphFormulaAssignment* getAssignment(vertex*);
+    CommGraphFormulaAssignment* getAssignment();
     
     void addClause(literal *, bool);
     void addClause(CommGraphFormulaMultiaryOr*);
@@ -124,7 +124,8 @@ public:
 	// analysis   
 	bool finalAnalysisDone;
 
-    analysisResult analyseNode(bool);
+    vertexColor analyseNodeByFormula();
+    vertexColor analyseNode();
 
     vertexColor getColor();
     void setColor(vertexColor c);

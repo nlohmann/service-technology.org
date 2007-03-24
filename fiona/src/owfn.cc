@@ -448,7 +448,7 @@ void oWFN::computeAnnotationOutput(vertex * node, State * currentState) {
 	trace(TRACE_5, "oWFN::computeAnnotation(vertex * node, State * currentState, unsigned int * markingPreviousState): start\n");
 
 	// store this state in the node's temp set of state (storing all states of the node)
-	setOfStatesTemp.insert(currentState);		
+	setOfStatesTemp.insert(currentState);
 
 	// get the successor states	and compute their corresponding annotation
 	if (currentState != NULL) {

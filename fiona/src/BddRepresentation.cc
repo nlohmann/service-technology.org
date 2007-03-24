@@ -250,7 +250,6 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 
 	trace(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(vertex* v): start\n");		
 	
-	assert(v->getColor() != BLACK);
 	if (v->getColor() == BLUE){	//add annotation
 		DdNode * annotation = annotationToBddAnn(v);
 		DdNode* tmp = Cudd_bddOr(mgrAnn, annotation, bddAnn);

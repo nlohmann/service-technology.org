@@ -57,6 +57,10 @@ interactionGraph::~interactionGraph() {
 //! \fn void interactionGraph::buildGraph()
 //! \brief builds the graph starting with the root node
 void interactionGraph::buildGraph() {
+
+  	PN->setOfStatesTemp.clear();
+  	PN->visitedStates.clear();
+
     calculateRootNode(); // creates the root node and calculates its reachability graph (set of states)
 
 	if (options[O_CALC_REDUCED_IG]) {
@@ -66,86 +70,42 @@ void interactionGraph::buildGraph() {
 	}
 }
 
-//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, edgeType typeOfPlace)
-//! \param messages
-//! \param currentNode the node from which the input event is to be sent
-//! \param typeOfPlace
-//! \brief checks whether the set of input messages contains at least one input message
-//! that has been sent at its maximum
-bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, edgeType typeOfPlace) {
-	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): start\n");
-	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		if (typeOfPlace == sending) {
-			unsigned int i = 0;
-			while (i < PN->getInputPlaceCount()-1 && PN->getInputPlace(i) && 
-						PN->getInputPlace(i)->index != *iter) {
-				i++;	
-			}
-
-			if (currentNode->eventsUsed[i] >= PN->getInputPlace(i)->max_occurence) {
-				// this input event shall not be sent anymore, so quit here
-				trace(TRACE_3, "maximal occurrences of event ");
-				trace(TRACE_3, PN->getInputPlace(i)->name);
-				trace(TRACE_3, " reached\n");
-
-				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
-				return false;
-			}
-		} else if (typeOfPlace == receiving) {
-			unsigned int i = 0;
-			while (i < PN->getOutputPlaceCount()-1 && PN->getOutputPlace(i) && 
-						PN->getOutputPlace(i)->index != *iter) {
-				i++;	
-			}
-			if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] >= PN->getOutputPlace(i)->max_occurence) {
-				// this output event shall not be received anymore, so quit here
-				trace(TRACE_3, "maximal occurrences of event ");
-				trace(TRACE_3, PN->getOutputPlace(i)->name);
-				trace(TRACE_3, " reached\n");
-				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");				
-				return false;		
-			}
-		}
-	}
-	// everything is fine
-	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
-	return true;
-}
 
 //! \fn void interactionGraph::buildGraph(vertex * node)
 //! \param node current node of the graph
 //! \brief builds up the graph recursively
 void interactionGraph::buildGraph(vertex * currentNode) {
 	
-	setOfMessages inputSet;
-	setOfMessages outputSet;
+	// at this point, the states inside the current node node are already computed!
 	
-	getActivatedEventsComputeCNF(currentNode, inputSet, outputSet);
-
 	actualDepth++;
 
 	trace(TRACE_1, "\n=================================================================\n");
 	trace(TRACE_1, "\t current node: ");
 	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
+	if (debug_level >= TRACE_2) {
+		cout << "\t (" << currentNode << ")" << endl;
+	}
 
-	trace(TRACE_3, "\t number of states in node: ");
-	trace(TRACE_3, intToString(currentNode->reachGraphStateSet.size()) + "\n");
+	trace(TRACE_2, "\t number of states in node: ");
+	trace(TRACE_2, intToString(currentNode->reachGraphStateSet.size()) + "\n");
 
-//	if (terminateBuildingGraph(currentNode)) {
-//		string color;
-//		if (currentNode->getColor() == RED) {
-//			color = "RED";
-//		} else if (currentNode->getColor() == BLUE) {
-//			color = "BLUE";
-//		} else {
-//			color = "BLACK";
-//		}
-//
-//		trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");	
-//		return;
-//	}
+	if (currentNode->getColor() == RED) {
+		// this may happen due to a message bound violation in current node
+		// then, function calculateReachableStatesFull sets node color RED
+		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color RED\n");
+		trace(TRACE_1, "=================================================================\n");
+		return;
+	}
+
+	setOfMessages inputSet;
+	setOfMessages outputSet;
 	
-	trace(TRACE_5, "iterating over inputSet\n");
+	getActivatedEventsComputeCNF(currentNode, inputSet, outputSet);
+
+	trace(TRACE_1, "=================================================================\n");
+
+	trace(TRACE_2, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
 
@@ -217,7 +177,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 			}
 		} 	
 	}		
-	analyseNode(currentNode, true);
+	analyseNode(currentNode);
 	trace(TRACE_5, "node analysed\n");
 
 	actualDepth--;
@@ -225,10 +185,8 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	string color;
 	if (currentNode->getColor() == RED) {
 		color = "RED";
-	} else if (currentNode->getColor() == BLUE) {
-		color = "BLUE";
 	} else {
-		color = "BLACK";
+		color = "BLUE";
 	}
 
 	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");	
@@ -239,13 +197,20 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 //! \brief builds up the graph recursively
 void interactionGraph::buildReducedGraph(vertex * currentNode) {
 
+	if (currentNode->getColor() == RED) {
+		// this may happen due to a message bound violation in current node
+		// then, function calculateReachableStatesFull sets node color RED
+		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color RED\n");
+		trace(TRACE_1, "=================================================================\n");
+		return;
+	}
+
 	trace(TRACE_1, "\n=================================================================\n");
 	trace(TRACE_1, "\t current node: ");
 	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
 
 	trace(TRACE_3, "\t number of states in node: ");
 	trace(TRACE_3, intToString(currentNode->reachGraphStateSet.size()) + "\n");
-
 
 	setOfMessages inputSet;
 	setOfMessages outputSet;
@@ -261,19 +226,8 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 
 	actualDepth++;
 
-//	if (terminateBuildingGraph(currentNode)) {
-//		string color;
-//		if (currentNode->getColor() == RED) {
-//			color = "RED";
-//		} else if (currentNode->getColor() == BLUE) {
-//			color = "BLUE";
-//		} else {
-//			color = "BLACK";
-//		}
-//
-//		trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");	
-//		return;
-//	}
+  	PN->setOfStatesTemp.clear();
+  	PN->visitedStates.clear();
 
 	trace(TRACE_3, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
@@ -319,20 +273,66 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 	}
 			
 	actualDepth--;
-	analyseNode(currentNode, true);
+	analyseNode(currentNode);
 	trace(TRACE_5, "node analysed\n");
 	
 	string color;
 	if (currentNode->getColor() == RED) {
 		color = "RED";
-	} else if (currentNode->getColor() == BLUE) {
-		color = "BLUE";
 	} else {
-		color = "BLACK";
+		color = "BLUE";
 	}
 	
 	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");
 }
+
+
+//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, edgeType typeOfPlace)
+//! \param messages
+//! \param currentNode the node from which the input event is to be sent
+//! \param typeOfPlace
+//! \brief checks whether the set of input messages contains at least one input message
+//! that has been sent at its maximum
+bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, edgeType typeOfPlace) {
+	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): start\n");
+	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
+		if (typeOfPlace == sending) {
+			unsigned int i = 0;
+			while (i < PN->getInputPlaceCount()-1 && PN->getInputPlace(i) && 
+						PN->getInputPlace(i)->index != *iter) {
+				i++;	
+			}
+
+			if (currentNode->eventsUsed[i] >= PN->getInputPlace(i)->max_occurence) {
+				// this input event shall not be sent anymore, so quit here
+				trace(TRACE_3, "maximal occurrences of event ");
+				trace(TRACE_3, PN->getInputPlace(i)->name);
+				trace(TRACE_3, " reached\n");
+
+				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
+				return false;
+			}
+		} else if (typeOfPlace == receiving) {
+			unsigned int i = 0;
+			while (i < PN->getOutputPlaceCount()-1 && PN->getOutputPlace(i) && 
+						PN->getOutputPlace(i)->index != *iter) {
+				i++;	
+			}
+			if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] >= PN->getOutputPlace(i)->max_occurence) {
+				// this output event shall not be received anymore, so quit here
+				trace(TRACE_3, "maximal occurrences of event ");
+				trace(TRACE_3, PN->getOutputPlace(i)->name);
+				trace(TRACE_3, " reached\n");
+				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");				
+				return false;		
+			}
+		}
+	}
+	// everything is fine
+	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
+	return true;
+}
+
 
 //! \fn void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages & inputMessages, setOfMessages & outputMessages) {
 //! \param node the node for which the activated input events are calculated
@@ -770,24 +770,6 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
    	return inputMessages;   // return the list of activated input messages
 }
 
-////! \fn bool interactionGraph::terminateBuildingGraph(vertex * node) 
-////! \param node the node to be inspected
-////! \brief return true, if building up shall be terminated at the given node, false otherwise 
-//bool interactionGraph::terminateBuildingGraph(vertex * node) {
-//	
-////	if (analyseNode(node, false) == TERMINATE) {
-////		trace(TRACE_5, "node analysed\n");
-////		return true;
-////	}
-////	if (actualDepth > PN->commDepth) {			// we have reached the maximal communication depth
-////		if (node->getColor() != BLUE) {
-////			node->setColor(RED);
-////		}
-////		return true;	
-////	}
-//	//trace(TRACE_5, "node analysed\n");
-//	return false;
-//}
 
 //! \fn void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vertex * node)
 //! \param output the output messages that are taken from the marking

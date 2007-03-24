@@ -321,10 +321,7 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
         edgeLabel = PN->getOutputPlace(label)->name;
 	}
 
-	// try to find vertex in set of known vertices
-//    vertex * found = findVertexInSet(toAdd);
-
-//	if (options[O_BDD] == true || found == NULL) {
+//	if (options[O_BDD] == true || isnew) {
     if (isnew) {
         trace(TRACE_1, "\n\t new successor node computed:");
         toAdd->setNumber(numberOfNodes++);
@@ -360,7 +357,6 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 
 		trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
 
-		// return toAdd;
     } else {
 		trace(TRACE_1, "\t computed successor node already known: " + intToString(toAdd->getNumber()) + "\n");
 
@@ -379,15 +375,41 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 	        graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
 			toAdd->addPredecessorNode(edgePred);
 		}
-		
-		//delete toAdd;
-	
-//		found->eventsUsed[offset + label]++;
-		
-		trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
 
-        //return NULL;
+		trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
     }
+}
+
+
+//! \fn void communicationGraph::analyseNode(vertex* node)
+//! \param node the node to be analysed
+//! \brief analyses the node and sets its color
+void communicationGraph::analyseNode(vertex* node) {
+
+	trace(TRACE_5, "communicationGraph::analyseNode(vertex* node) : start\n");
+
+	trace(TRACE_3, "\t\t\t analysing node ");
+	trace(TRACE_3, intToString(node->getNumber()) + "...\n");
+
+	assert(node->getColor() == BLUE);
+
+	vertexColor analysedColor;
+
+	if (parameters[P_OG]) {
+		// analyse node by its formula
+		analysedColor = node->analyseNodeByFormula();
+	} else {
+		// analyse node by its CNF
+		analysedColor = node->analyseNode();
+	}
+
+	node->setColor(analysedColor);
+
+	if (node->getColor() == RED) {
+		numberOfBlueNodes--;
+	}
+
+	trace(TRACE_5, "communicationGraph::analyseNode(vertex* node) : end\n");
 }
 
 
@@ -575,6 +597,7 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
 		}
     } else {
 		StateSet stateSet;
+//		stateSet.clear();
 
 		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); 
 				iter != node->reachGraphStateSet.end(); iter++) {
@@ -717,9 +740,6 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
 
     if (v->getColor() == BLUE) {
         numberOfBlueNodes++;
-    } else if (v->getColor() == BLACK) {
-        assert(false);
-        numberOfBlackNodes++;
     }
 
     if (parameters[P_SHOW_ALL_NODES]
@@ -880,60 +900,6 @@ bool communicationGraph::stateActivatesOutputEvents(State * s) {
         }
     }
     return false;
-}
-
-
-//! \fn analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis)
-//! \param node the node to be analysed
-//! \param finalAnalysis obsolete???
-//! \brief analyses the node and sets its color, if the node gets to be red, then TERMINATE is returned
-analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis) {
-
-	trace(TRACE_5, "communicationGraph::analyseNode(vertex * node, bool finalAnalysis) : start\n");
-
-    trace(TRACE_3, "\t\t\t analysing node ");
-    trace(TRACE_3, intToString(node->getNumber()) + "...\n");
-
-//    if (node->getColor() != RED) {          // red nodes stay red forever
-//        if (node->reachGraphStateSet.size() == 0) {
-//            // we analyse an empty node; it becomes blue
-//            if (node->getColor() != BLUE) {			// not yet counted
-//                numberOfBlueNodes++;
-//            }
-//            node->setColor(BLUE);
-//            trace(TRACE_3, "\t\t\t node analysed blue (empty node)");
-//            trace(TRACE_3, "\t ...terminate\n");
-//			trace(TRACE_5, "communicationGraph::analyseNode(vertex * node, bool finalAnalysis) : end\n");
-//            return TERMINATE;
-//        } else {
-            // we analyse a non-empty node
-
-			assert(node->getColor() != RED);
-			
-			vertexColor colorBefore = node->getColor();		// remember the color of the node before the analysis
-
-			analysisResult result = node->analyseNode(finalAnalysis);
-			
-			vertexColor colorAfter = node->getColor();		// color of the node now
-
-            if (colorBefore != BLUE && colorAfter == BLUE) {
-                numberOfBlueNodes++;
-            } else if (colorBefore == BLUE && colorAfter != BLUE) {
-                numberOfBlueNodes--;
-            }
-
-            if (colorBefore != BLACK && colorAfter == BLACK) {
-                numberOfBlackNodes++;
-            } else if (colorBefore == BLACK && colorAfter != BLACK) {
-                numberOfBlackNodes--;
-            }
-
-			trace(TRACE_5, "communicationGraph::analyseNode(vertex * node, bool finalAnalysis) : end\n");
-			return result;
-//        }
-//    }
-//    trace(TRACE_5, "communicationGraph::analyseNode(vertex * node, bool finalAnalysis) : end\n");
-//    return TERMINATE;
 }
 
 

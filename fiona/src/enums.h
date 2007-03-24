@@ -36,12 +36,11 @@
 
 #include "mynew.h"
 
-//enum vertexColor {BLACK, RED, BLUE};		//!< BLACK == vertex has not been checked; RED == bad vertex; BLUE == good one
-enum vertexColor {BLACK, RED, BLUE};		//!< BLACK == vertex has not been checked; RED == bad vertex; BLUE == good one
+enum vertexColor {RED, BLUE};				//!< RED == bad vertex; BLUE == good one
 enum edgeType {sending, receiving}; 		//!< ENUM possible types of an edge
 enum analysisResult {TERMINATE, CONTINUE};  //!< needed as feedback of the "analysis" function, whether this node is an end node or not
 enum stateType {TRANS, DEADLOCK, FINALSTATE};   //!< TRANS == Transient
-enum threeValueLogic {FALSE, TRUE, UNKNOWN}; //!< used, for instance, to remember if there is a final state in a node
+//enum threeValueLogic {FALSE, TRUE, UNKNOWN}; //!< used, for instance, to remember if there is a final state in a node
 
 
 #endif /*ENUMS_H_*/

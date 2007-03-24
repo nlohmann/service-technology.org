@@ -45,24 +45,18 @@ class oWFN;
 class operatingGuidelines : public communicationGraph {
 	
 	public:
-        // Provides user defined operator new. Needed to trace all new
-        // operations on this class.
-#undef new
-        NEW_OPERATOR(operatingGuidelines)
-#define new NEW_NEW
-
 		operatingGuidelines(oWFN *);
 		~operatingGuidelines();
 	
-    	void buildGraph(vertex *, double);
-		
-    	void computeCNF(vertex *);
-    	
-//    	bool terminateBuildingGraph(vertex * );
-		void convertToBdd();
-		
 		BddRepresentation * bdd;
 
+    	void buildGraph(vertex *, double);
+		
+//    	void computeCNF(vertex *);
+    	void computeCNFformula(vertex *);
+
+		void convertToBdd();
+		
         /** Prints graph in OG output format. Should only be called if the graph
          *  is an OG. */
         void printOGFile() const;
@@ -79,6 +73,11 @@ class operatingGuidelines : public communicationGraph {
          * section. */
         void printTransitionsToOGFile(vertex * v, fstream& os,
             bool visitedNodes[]) const;
+
+// Provides user defined operator new. Needed to trace all new operations on this class.
+#undef new
+        NEW_OPERATOR(operatingGuidelines)
+#define new NEW_NEW
 };
 
 

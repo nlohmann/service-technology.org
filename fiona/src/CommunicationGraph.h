@@ -96,7 +96,6 @@ protected:
 	vertex * currentVertex;          //!< the vertex we are working on at a certain time
 
 	void addProgress(double);
-	void printProgress();
 
     unsigned int numberOfNodes;            	//!< the number of vertices of the graph
 	unsigned int numberOfEdges;           	//!< the number of edges of the graph
@@ -122,10 +121,10 @@ public:
 
 	vertexSet setOfVertices;
 
+    vertex* getRoot() const;
+    
     void calculateRootNode();
 
-    vertex * getRoot() const;
-    
     unsigned int getNumberOfNodes() const;
     unsigned int getNumberOfEdges() const;
     
@@ -133,7 +132,6 @@ public:
     unsigned int getNumberOfBlueEdges() const;
 
     unsigned int getNumberOfBlackNodes() const;
-    
     unsigned int getNumberOfStatesAllNodes() const;
 
     vertex * findVertexInSet(vertex *);
@@ -141,9 +139,10 @@ public:
     void AddVertex(vertex *, unsigned int, edgeType, bool);
     bool AddVertex(vertex *, messageMultiSet, edgeType);
 
-	// bool terminateBuildGraph(vertex *);
+    void analyseNode(vertex *);
 	
 	void printProgressFirst();
+	void printProgress();
 
     void buildGraphRandom();
 
@@ -164,7 +163,6 @@ public:
 
     bool stateActivatesOutputEvents(State *);
 
-    analysisResult analyseNode(vertex *, bool);
 };
 
 #endif /*GRAPH_H_*/

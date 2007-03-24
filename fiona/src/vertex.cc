@@ -49,7 +49,7 @@ vertex::vertex(int numberEvents) :
 			   firstClause(NULL),
 			   successorNodes(NULL),
 			   predecessorNodes(NULL),
-			   hasFinalStateInStateSet(UNKNOWN),
+			   hasFinalStateInStateSet(false),
 			   finalAnalysisDone(false) {
 
 	annotation = new CNF_formula();
@@ -343,7 +343,7 @@ CNF_formula* vertex::getCNF_formula() {
 
 
 // return the assignment that is imposed by present or absent arcs leaving node v
-CommGraphFormulaAssignment* vertex::getAssignment(vertex* v) {
+CommGraphFormulaAssignment* vertex::getAssignment() {
 	
 	trace(TRACE_5, "computing annotation of node " + intToString(getNumber()) + "\n");
 
@@ -353,7 +353,7 @@ CommGraphFormulaAssignment* vertex::getAssignment(vertex* v) {
 	// to true if the respective node is BLUE
     this->resetIteratingSuccNodes();
     graphEdge* edge;
-    while ((edge = v->getNextSuccEdge()) != NULL) {
+    while ((edge = this->getNextSuccEdge()) != NULL) {
 		if (edge->getNode()->getColor() == BLUE) {
 			if (edge->getType() == sending) {
 				myassignment->setToTrue('!' + edge->getLabel());
@@ -363,37 +363,8 @@ CommGraphFormulaAssignment* vertex::getAssignment(vertex* v) {
 		}
 	}
 	
-	// if node is analysed the first time, fix value of hasFinalStateInStateSet
-	if (v->hasFinalStateInStateSet == UNKNOWN) {
-
-		StateSet::iterator iter;		// iterator over the states of the node
-		
-		if (options[O_CALC_ALL_STATES]) {
-		// NO state reduction
-
-			// iterate over all states of the node
-			for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
-				if ((*iter)->type == FINALSTATE) {
-					myassignment->setToTrue(CommGraphFormulaAssignment::FINAL);
-					v->hasFinalStateInStateSet = TRUE;
-					break;
-				}
-			}
-			v->hasFinalStateInStateSet = FALSE;
-		} else {
-		// WITH state reduction
-
-			cerr << "\n BIG TODO in vertex::getAssignment!!!" << endl;
-
-		}
-	}				 	
-		
-	//cout << "hasFinalStateInStateSet?: " << v->hasFinalStateInStateSet << endl;
-
-	//assert(v->hasFinalStateInStateSet != UNKNOWN);
-
 	// only if node has final state, set assignment of literal final to true
-	if (v->hasFinalStateInStateSet == TRUE) {
+	if (this->hasFinalStateInStateSet == true) {
 		myassignment->setToTrue(CommGraphFormulaAssignment::FINAL);
 	}
 	
@@ -443,10 +414,9 @@ void vertex::propagateToSuccessors() {
 
     while ((element = getNextSuccEdge()) != NULL) {
     	if (element->getNode()->getColor() != RED) {
-    		element->getNode()->analyseNode(true);	// analyse the successor node again
+    		element->getNode()->analyseNode();	// analyse the successor node again
     	}
     }
-    
 }
 
 //! \fn void vertex::propagateToPredecessors() 
@@ -458,7 +428,7 @@ void vertex::propagateToPredecessors() {
 
     while ((element = getNextPredEdge()) != NULL) {
     	if (element->getNode()->getColor() != RED && element->getNode()->finalAnalysisDone) {
-    		element->getNode()->analyseNode(true);	// analyse the preceding node again
+    		element->getNode()->analyseNode();	// analyse the preceding node again
     	}
     	if (element->getNode()->getColor() == RED) {
     		predecessorNodes->removeNodeFromList(element->getNode(), true);			
@@ -466,303 +436,80 @@ void vertex::propagateToPredecessors() {
     }   
 }
 
-//! \fn analysisResult vertex::analyseNode(bool finalAnalysis)
-//! \brief analyses the node and sets its color, if the node gets to be red, then TERMINATE is returned
-analysisResult vertex::analyseNode(bool finalAnalysis) {
 
-    trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : start\n");
+//! \fn analysisResult vertex::analyseNode()
+//! \brief analyses the node and returns its color
+vertexColor vertex::analyseNode() {
+
+    trace(TRACE_5, "vertex::analyseNode() : start\n");
     
-	// computing the assignment given by outgoing edges (to blue nodes)
-//    cout << "\nbefore computing assignment" << endl;
-    CommGraphFormulaAssignment* myassignment = getAssignment(this);
-//    cout << "\nafter computing assignment" << endl;
-
-
-	bool result = this->getCNF_formula()->value(*myassignment);
-	
-//	if (result) {
-//		cout << "\nKnoten " << getNumber() << " erfüllt seine annotation!!!" << endl;
-//	} else {
-//		cout << "\nKnoten " << getNumber() << " erfüllt seine annotation NICHT!" << endl;
-//	}
-
     trace(TRACE_3, "\t\t\t analysing node ");
-    if (finalAnalysis) {
-    	trace(TRACE_3, "(final analysis) ");
-    }
-
     trace(TRACE_3, intToString(numberOfVertex) + ": ");
 
-	vertexColor beforeAnalysis = getColor();
+	assert (getColor() == BLUE);
 	
-	finalAnalysisDone = finalAnalysis;
-
-    if (beforeAnalysis != RED) {          // red nodes stay red forever
-        if (reachGraphStateSet.size() == 0) {
-            // we analyse an empty node; it becomes blue
-            setColor(BLUE);
-            trace(TRACE_3, "\t\t\t node analysed blue (empty node)");
-            trace(TRACE_3, "\t ...terminate\n");
-            trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-            return TERMINATE;
-        } else {
-            // we analyse a non-empty node
-
-            vertexColor c = BLACK;                      // the color of the current node
-            vertexColor cTmp = BLACK;                   // the color of a state of the current node
-            bool finalState = false;
-
-			CNF * cl = firstClause;						// get pointer to the first clause of the CNF
-            // iterate over all clauses of the annotation and determine color for clause
-            while (cl) {
-            	if (cl->isFinalState) {
-//            		cout << "found a final state" << endl;
-            		
-            		finalState = true;
-            		c = BLUE;
-            	} else if (eventsToBeSeen == 0 || finalAnalysis) {
-                //	finalState = false;
-                    cTmp = cl->calcClauseColor();
-                    switch (cTmp) {
-                    case RED:   // found a red clause; so node becomes red
-                        if (getColor() == BLACK) {
-                            // node was black
-                            assert(false);
-                            trace(TRACE_3, "node analysed red \t");
-                            setColor(RED);
-                        } else if (getColor() == RED) {
-                            // this should not be the case!
-                            trace(TRACE_3, "analyseNode called when node already red!!!");
-                        } else if (getColor() == BLUE) {
-                            // this should not be the case!
-                            trace(TRACE_3, "analyseNode called when node already blue!!!");
-                        }
-                        trace(TRACE_3, "\t\t ...terminate\n");
-                        setColor(RED);
-                        trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-                        if (beforeAnalysis == BLUE) {
-			            	propagateToSuccessors();	
-			            	propagateToPredecessors();	
-			            }
-                        return TERMINATE;
-                        break;
-                    case BLUE:  // found a blue state (i.e. deadlock is resolved)
-                        c = BLUE;
-                        break;
-                    case BLACK: // no definite result of state analysis
-                        
-                        assert(false);
-                        if (finalAnalysis) {
-                            setColor(RED);
-                            trace(TRACE_3, "node analysed red (final analysis)");
-                            trace(TRACE_3, "\t ...terminate\n");
-                            trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-                            if (beforeAnalysis == BLUE) {
-				            	propagateToSuccessors();	
-				            	propagateToPredecessors();	
-				            }
-                            return TERMINATE;           // <---------------------???
-                        } else {
-                        	assert(false);
-                            setColor(BLACK);
-                            trace(TRACE_3, "node still indefinite \t\t ...continue\n");
-                            trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-                            return CONTINUE;
-                        }
-                        break;
-                    }
-                } else {
-                	assert(false);
-                    // still events left to resolve deadlocks...
-                    setColor(BLACK);
-                    trace(TRACE_3, "node still indefinite \t\t ...continue\n");
-                    trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-                    return CONTINUE;
-                }
-                
-                cl = cl->nextElement; 	// get the next clause of the CNF
-            }
-
-            // all clauses considered
-            trace(TRACE_3, "all states checked, node becomes ");
-            
-            if (c == BLACK && finalState) {
-            	assert(false);
-            	c = BLUE;
-                trace(TRACE_3, "blue");
-            } else if (c == BLACK && !finalState && finalAnalysis) {
-            	assert(false);
-            	c = RED;
-                trace(TRACE_3, "red");
-            } else if (c == RED) {
-                trace(TRACE_3, "red");
-            } else if (c == BLUE) {
-                trace(TRACE_3, "blue");
-            }
-            
-            setColor(c);
-            
-            if (beforeAnalysis == BLUE && c == RED) {
-            	propagateToSuccessors();	
-            	propagateToPredecessors();	
-            }
-            
-            if (finalState) {
-                trace(TRACE_3, " ...terminate\n");
-                trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-                return TERMINATE;
-            } else {
-                trace(TRACE_3, " ...continue\n");
-                trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-                return CONTINUE;
-            }
-        }
+    if (reachGraphStateSet.size() == 0) {
+        // we analyse an empty node; it becomes blue
+        trace(TRACE_3, "\t\t\t node analysed blue (empty node)");
+        trace(TRACE_5, "vertex::analyseNode() : end\n");
+        return BLUE;
     } else {
-    	// we analyse a red node; it stays red
-		trace(TRACE_3, "\t\t\t node already red\n");
+        // we analyse a non-empty node
+		CNF * cl = firstClause;					// get pointer to the first clause of the CNF
+
+        // iterate over all clauses of the annotation
+        // if there is any RED clause, the node becomes RED as well
+        // otherwise, the node stays BLUE
+        while (cl) {
+        	if (cl->isFinalState == false) {
+				vertexColor cTmp = cl->calcClauseColor();
+
+                if (cTmp == RED) {
+					// found a red clause; so node becomes red
+
+	            	propagateToSuccessors();	
+	            	propagateToPredecessors();	
+
+			        trace(TRACE_3, "\t\t\t node analysed red (there was a red clause)");
+                    trace(TRACE_5, "vertex::analyseNode() : end\n");
+
+                    return RED;
+                    break;
+                }
+            }
+            
+            cl = cl->nextElement; 	// get the next clause of the CNF
+        }
+
+        // all clauses considered and no red clause found
+        trace(TRACE_3, "\t\t\t node analysed blue (there was no red clause)");
+		trace(TRACE_5, "vertex::analyseNode() : end\n");
+		return BLUE;
     }
-    trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-    return TERMINATE;
 }
 
 
-////! \fn analysisResult vertex::analyseNode(bool finalAnalysis)
-////! \brief analyses the node and sets its color, if the node gets to be red, then TERMINATE is returned
-//analysisResult vertex::analyseNode(bool finalAnalysis) {
-//
-//    trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : start\n");
-//    
-//    trace(TRACE_3, "\t\t\t analysing node ");
-//    if (finalAnalysis) {
-//    	trace(TRACE_3, "(final analysis) ");
-//    }
-//
-//    trace(TRACE_3, intToString(numberOfVertex) + ": ");
-//
-//	vertexColor beforeAnalysis = color;
-//	
-//	finalAnalysisDone = finalAnalysis;
-//
-//    if (color != RED) {          // red nodes stay red forever
-//        if (reachGraphStateSet.size() == 0) {
-//            // we analyse an empty node; it becomes blue
-//            color = BLUE;
-//            trace(TRACE_3, "\t\t\t node analysed blue (empty node)");
-//            trace(TRACE_3, "\t ...terminate\n");
-//            trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-//            return TERMINATE;
-//        } else {
-//            // we analyse a non-empty node
-//
-//            vertexColor c = BLACK;                      // the color of the current node
-//            vertexColor cTmp = BLACK;                   // the color of a state of the current node
-//            bool finalState = false;
-//
-//			CNF * cl = annotation;						// get pointer to the first clause of the CNF
-//            // iterate over all clauses of the annotation and determine color for clause
-//            while (cl) {
-//            	if (cl->isFinalState) {
-////            		cout << "found a final state" << endl;
-//            		
-//            		finalState = true;
-//            		c = BLUE;
-//            	} else if (eventsToBeSeen == 0 || finalAnalysis) {
-//                //	finalState = false;
-//                    cTmp = cl->calcClauseColor();
-//                    switch (cTmp) {
-//                    case RED:   // found a red clause; so node becomes red
-//                        if (color == BLACK) {
-//                            // node was black
-//                            trace(TRACE_3, "node analysed red \t");
-//                            color = RED;
-//                        } else if (color == RED) {
-//                            // this should not be the case!
-//                            trace(TRACE_3, "analyseNode called when node already red!!!");
-//                        } else if (color == BLUE) {
-//                            // this should not be the case!
-//                            trace(TRACE_3, "analyseNode called when node already blue!!!");
-//                        }
-//                        trace(TRACE_3, "\t\t ...terminate\n");
-//                        color = RED;
-//                        trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-//                        if (beforeAnalysis == BLUE) {
-//			            	propagateToSuccessors();	
-//			            	propagateToPredecessors();	
-//			            }
-//                        return TERMINATE;
-//                        break;
-//                    case BLUE:  // found a blue state (i.e. deadlock is resolved)
-//                        c = BLUE;
-//                        break;
-//                    case BLACK: // no definite result of state analysis
-//                        if (finalAnalysis) {
-//                            color = RED;
-//                            trace(TRACE_3, "node analysed red (final analysis)");
-//                            trace(TRACE_3, "\t ...terminate\n");
-//                            trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-//                            if (beforeAnalysis == BLUE) {
-//				            	propagateToSuccessors();	
-//				            	propagateToPredecessors();	
-//				            }
-//                            return TERMINATE;           // <---------------------???
-//                        } else {
-//                            color = BLACK;
-//                            trace(TRACE_3, "node still indefinite \t\t ...continue\n");
-//                            trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-//                            return CONTINUE;
-//                        }
-//                        break;
-//                    }
-//                } else {
-//                    // still events left to resolve deadlocks...
-//                    color = BLACK;
-//                    trace(TRACE_3, "node still indefinite \t\t ...continue\n");
-//                    trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-//                    return CONTINUE;
-//                }
-//                
-//                cl = cl->nextElement; 	// get the next clause of the CNF
-//            }
-//
-//            // all clauses considered
-//            trace(TRACE_3, "all states checked, node becomes ");
-//            
-//            if (c == BLACK && finalState) {
-//            	c = BLUE;
-//                trace(TRACE_3, "blue");
-//            } else if (c == BLACK && !finalState && finalAnalysis) {
-//            	c = RED;
-//                trace(TRACE_3, "red");
-//            } else if (c == RED) {
-//                trace(TRACE_3, "red");
-//            } else if (c == BLUE) {
-//                trace(TRACE_3, "blue");
-//            }
-//            
-//            color = c;
-//            
-//            if (beforeAnalysis == BLUE && c == RED) {
-//            	propagateToSuccessors();	
-//            	propagateToPredecessors();	
-//            }
-//            
-//            if (finalState) {
-//                trace(TRACE_3, " ...terminate\n");
-//                trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-//                return TERMINATE;
-//            } else {
-//                trace(TRACE_3, " ...continue\n");
-//                trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-//                return CONTINUE;
-//            }
-//        }
-//    } else {
-//    	// we analyse a red node; it stays red
-//		trace(TRACE_3, "\t\t\t node already red\n");
-//    }
-//    trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-//    return TERMINATE;
-//}
+//! \fn vertexColor vertex::analyseNodeByFormula()
+//! \result the color of the node
+//! \brief analyses the node, sets its color, and returns the new color
+vertexColor vertex::analyseNodeByFormula() {
+
+    trace(TRACE_5, "vertex::analyseNodeByFormula() : start\n");
+    
+	// computing the assignment given by outgoing edges (to blue nodes)
+    CommGraphFormulaAssignment* myassignment = this->getAssignment();
+	bool result = this->getCNF_formula()->value(*myassignment);
+
+   	trace(TRACE_5, "vertex::analyseNodeByFormula() : end\n");
+
+	if (result) {
+        trace(TRACE_3, "\t\t\t node analysed blue, formula " + this->getCNF_formula()->asString());
+		return BLUE;
+	} else {
+        trace(TRACE_3, "\t\t\t node analysed red, formula " + this->getCNF_formula()->asString());
+		return RED;
+	}
+}
 
 
 //

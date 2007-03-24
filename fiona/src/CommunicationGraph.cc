@@ -32,14 +32,13 @@
  */
 
 #include "mynew.h"
+
 #include "state.h"
-#include "vertex.h"
-#include "successorNodeList.h"
-#include "enums.h"
+#include "graphEdge.h"
 #include "options.h"
 #include "debug.h"
-#include "CNF.h"
 #include "binDecision.h"
+#include "cnf_formula.h"
 #include <cassert>
 
 double global_progress = 0;
@@ -647,6 +646,120 @@ void communicationGraph::printNodeStatistics() {
 }
 
 
+//! \fn void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedNodes[])
+//! \param v current node in the iteration process
+//! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
+//! \brief breadthsearch through the graph computing the number of blue nodes
+void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedNodes[]) {
+
+	if (v == NULL) {
+		return ;
+	}
+
+    if (v->getColor() == BLUE && 
+    		(parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
+		
+		numberOfBlueNodes++;
+		
+        v->resetIteratingSuccNodes();
+        visitedNodes[v->getNumber()] = true;
+        graphEdge * element;
+
+        while ((element = v->getNextSuccEdge()) != NULL) {
+            vertex * vNext = element->getNode();
+            if (vNext->getColor() == BLUE && 
+    			(parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
+
+    			numberOfBlueEdges++;		
+    		}
+            if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
+                computeNumberOfBlueNodesEdges(vNext, visitedNodes);
+            }
+        } // while
+    }
+}
+
+//! \fn bool communicationGraph::stateActivatesOutputEvents(State * s)
+//! \param s the state that is checked for activating output events
+//! \brief returns true, if the given state activates at least one output event
+bool communicationGraph::stateActivatesOutputEvents(State * s) {
+    s->decode(PN);
+    
+    for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
+
+        if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+//! \fn void communicationGraph::addProgress(double toAddValue)
+//! \param toAddValue the additional progress value
+//! \brief adds toAddValue to global progress value
+void communicationGraph::addProgress(double toAddValue) {
+	
+	trace(TRACE_2, "\t adding ");
+
+	// double2int in per cent = trunc(100*value)
+	trace(TRACE_2, intToString(int(100 * toAddValue)));
+	trace(TRACE_2, ",");
+	// precision 4 digits after comma = (x * 100 * 1000) mod 1000 
+	
+	int aftercomma = int(100 * 10000 * toAddValue) % 10000;
+	
+	if (aftercomma <   10) trace(TRACE_2, "0");
+	if (aftercomma <  100) trace(TRACE_2, "0");
+	if (aftercomma < 1000) trace(TRACE_2, "0");
+	
+	trace(TRACE_2, intToString(aftercomma));
+
+	trace(TRACE_2, " to progress\n");
+
+	global_progress += toAddValue;
+
+}
+
+
+//! \fn void communicationGraph::printProgress()
+//! \brief prints the current global progress value depending whether the value
+//! changed significantly and depending on the debug-level set
+void communicationGraph::printProgress() {
+		
+	return;
+	
+	int progress_step_size = 5;
+	int current_progress = int(100 * global_progress);
+
+    if (current_progress >= (show_progress + progress_step_size)) {
+    	// significant progress change
+		if (debug_level == TRACE_0) {
+			trace(TRACE_0, " " + intToString(current_progress) + " ");
+		} else {
+			trace(TRACE_0, "\t progress: " + intToString(current_progress) + " %\n");
+    	}
+		// assigning next progress value to show
+		show_progress = current_progress;
+    }
+}
+
+
+//! \fn void communicationGraph::printProgress()
+//! \brief prints the current global progress value depending whether the value
+//! changed significantly and depending on the debug-level set
+void communicationGraph::printProgressFirst() {
+		
+	return;
+	
+	if (debug_level == TRACE_0) {
+		trace(TRACE_0, "\t progress (in %): 0 ");
+	} else {
+		trace(TRACE_0, "\t progress: 0 %\n");
+   	}
+}
+
+
 //! \fn void communicationGraph::printDotFile()
 //! \brief creates a dot file of the graph
 void communicationGraph::printDotFile() {
@@ -790,20 +903,27 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
             }
 
             if (parameters[P_OG]) {
-				// add annotation to node
-				string CNF = "";
-            
-                if (v->getColor() == RED) {
-                    CNF += "(false)";
-                } else if (v->reachGraphStateSet.size() == 0) {
-                    CNF += "(true)";
-                } else {
-                	CNF += v->getCNFString();
-                }
-				CNF += "\\n";			
-				CNF += v->getCNF_formula()->asString();
+//				// add annotation to node
+				string CNFString = v->getCNF_formula()->asString();
 
-				os << CNF;
+//				/*
+//				 * The following three calls were added by Niels to simplify the string
+//				 * representation of CNF formulas in the DOT output of an OG. All
+//				 * needed code is implemented in files "cnf_formula.h" and
+//				 * "cnf_formula.cc". If the following three calls are removed,
+//				 * everything is (as ugly) as before.
+//				 */
+//
+//				// 1. create a CNF_Formula object from the CNF string representation
+//				CNF_Formula formula = CNF_Formula(CNFString);
+//			
+//				// 2. simplify the CNF formula inside the CNF_Formula object
+//				formula.simplify();
+//			
+//				// 3. create a string representation of the simplified formula
+//				CNFString = formula.to_string();	
+			
+				os << CNFString;
             }
 
             os << "\", fontcolor=black, color=";
@@ -853,143 +973,4 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
         }
     }
 }
-
-//! \fn void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedNodes[])
-//! \param v current node in the iteration process
-//! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
-//! \brief breadthsearch through the graph computing the number of blue nodes
-void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedNodes[]) {
-
-	if (v == NULL) {
-		return ;
-	}
-
-    if (v->getColor() == BLUE && 
-    		(parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
-		
-		numberOfBlueNodes++;
-		
-        v->resetIteratingSuccNodes();
-        visitedNodes[v->getNumber()] = true;
-        graphEdge * element;
-
-        while ((element = v->getNextSuccEdge()) != NULL) {
-            vertex * vNext = element->getNode();
-            if (vNext->getColor() == BLUE && 
-    			(parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
-
-    			numberOfBlueEdges++;		
-    		}
-            if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
-                computeNumberOfBlueNodesEdges(vNext, visitedNodes);
-            }
-        } // while
-    }
-}
-
-//! \fn bool communicationGraph::stateActivatesOutputEvents(State * s)
-//! \param s the state that is checked for activating output events
-//! \brief returns true, if the given state activates at least one output event
-bool communicationGraph::stateActivatesOutputEvents(State * s) {
-    s->decode(PN);
-    
-    for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
-
-        if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {
-            return true;
-        }
-    }
-    return false;
-}
-
-
-//! \fn void communicationGraph::addProgress(double toAddValue)
-//! \param toAddValue the additional progress value
-//! \brief adds toAddValue to global progress value
-void communicationGraph::addProgress(double toAddValue) {
-	
-	trace(TRACE_2, "\t adding ");
-
-	// double2int in per cent = trunc(100*value)
-	trace(TRACE_2, intToString(int(100 * toAddValue)));
-	trace(TRACE_2, ",");
-	// precision 4 digits after comma = (x * 100 * 1000) mod 1000 
-	
-	int aftercomma = int(100 * 10000 * toAddValue) % 10000;
-	
-	if (aftercomma <   10) trace(TRACE_2, "0");
-	if (aftercomma <  100) trace(TRACE_2, "0");
-	if (aftercomma < 1000) trace(TRACE_2, "0");
-	
-	trace(TRACE_2, intToString(aftercomma));
-
-	trace(TRACE_2, " to progress\n");
-
-	global_progress += toAddValue;
-
-}
-
-
-//! \fn void communicationGraph::printProgress()
-//! \brief prints the current global progress value depending whether the value
-//! changed significantly and depending on the debug-level set
-void communicationGraph::printProgress() {
-		
-	return;
-	
-	int progress_step_size = 5;
-	int current_progress = int(100 * global_progress);
-
-    if (current_progress >= (show_progress + progress_step_size)) {
-    	// significant progress change
-		if (debug_level == TRACE_0) {
-			trace(TRACE_0, " " + intToString(current_progress) + " ");
-		} else {
-			trace(TRACE_0, "\t progress: " + intToString(current_progress) + " %\n");
-    	}
-		// assigning next progress value to show
-		show_progress = current_progress;
-    }
-}
-
-
-//! \fn void communicationGraph::printProgress()
-//! \brief prints the current global progress value depending whether the value
-//! changed significantly and depending on the debug-level set
-void communicationGraph::printProgressFirst() {
-		
-	return;
-	
-	if (debug_level == TRACE_0) {
-		trace(TRACE_0, "\t progress (in %): 0 ");
-	} else {
-		trace(TRACE_0, "\t progress: 0 %\n");
-   	}
-}
-
-
-////! \fn bool communicationGraph::terminateBuildGraph(vertex * currentNode)
-////! \param currentNode the node for which termination is decided
-////! \brief decides whether a leaf node of the graph is reached;
-////! either because of reaching communication depth or because there are no events left
-//bool communicationGraph::terminateBuildGraph(vertex * /*currentNode*/) {
-//	
-//	return false;
-//
-//	// check whether there are input or output events left
-//	// (i.e. their max_occurences value is not reached)
-//	int i;
-//	
-//	for (i = 0; i < PN->getInputPlaceCnt(); i++) {
-//		if (currentNode->eventsUsed[i] < PN->getInputPlace(i)->max_occurence) {
-//			return false;    // at least one event can be sent
-//		}
-//	}
-//	for (i = 0; i < PN->getOutputPlaceCnt(); i++) {
-//		if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] < PN->getOutputPlace(i)->max_occurence) {
-//			return false;    // at least one event can be received
-//		}
-//	}
-//	return true;
-//}
 

@@ -36,11 +36,11 @@
 
 #include "mynew.h"
 #include "communicationGraph.h"
-#include "BddRepresentation.h" 
+#include "BddRepresentation.h"
 
-//#include <map>
 
 class oWFN;
+
 
 class operatingGuidelines : public communicationGraph {
 	
@@ -62,8 +62,7 @@ class operatingGuidelines : public communicationGraph {
         void printOGFile() const;
 
         /** Prints nodes of the OG into an OG file below the NODES section. */
-        void printNodesToOGFile(vertex * v, fstream& os, bool visitedNodes[])
-            const;
+        void printNodesToOGFile(vertex * v, fstream& os, bool visitedNodes[]) const;
 
         /** Generates for the given node its name to be used in operating
          * guidelines. */
@@ -71,8 +70,7 @@ class operatingGuidelines : public communicationGraph {
 
         /** Prints transitions of the OG to an OG file below the TRANSITIONS
          * section. */
-        void printTransitionsToOGFile(vertex * v, fstream& os,
-            bool visitedNodes[]) const;
+        void printTransitionsToOGFile(vertex * v, fstream& os, bool visitedNodes[]) const;
 
 // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new

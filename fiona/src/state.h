@@ -34,13 +34,12 @@
 #ifndef STATE_H
 #define STATE_H
 
-//#include "owfnTransition.h"
 #include "owfn.h"
-#include "debug.h"
-#include "main.h"
+
 
 class binDecision;
 class owfnTransition;
+
 
 // State objects are nodes in the state graph.
 class State {
@@ -63,8 +62,7 @@ public:
 	void decode(oWFN *);      		// decode state into given marking vector
 	void decodeShowOnly(oWFN *);		// decode state into given marking vector just for showing the marking!!!
 
-  // Provides user defined operator new. Needed to trace all new operations on
-  // this class.
+// Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
   NEW_OPERATOR(State)
 #define new NEW_NEW

@@ -36,18 +36,16 @@
 
 #include "mynew.h"
 #include "vertex.h"
-#include "enums.h"
-#include <string>
 #include <fstream>
-#include <iostream>
 
 #include <set>
 
 using namespace std;
 
+
+
 extern double global_progress;
 extern int show_progress;
-
 
 class oWFN;
 class State;
@@ -111,11 +109,6 @@ protected:
   
 public:
 
-// Provides user defined operator new. Needed to trace all new operations on this class.
-#undef new
-	NEW_OPERATOR(communicationGraph)
-#define new NEW_NEW
-
 	communicationGraph(oWFN *);
 	~communicationGraph();
 
@@ -159,10 +152,13 @@ public:
     void printDotFile();
 
     void computeNumberOfBlueNodesEdges(vertex *, bool[]);
-    
 
     bool stateActivatesOutputEvents(State *);
 
+// Provides user defined operator new. Needed to trace all new operations on this class.
+#undef new
+	NEW_OPERATOR(communicationGraph)
+#define new NEW_NEW
 };
 
 #endif /*GRAPH_H_*/

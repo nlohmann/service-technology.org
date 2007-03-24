@@ -31,21 +31,21 @@
  *
  */
 
-#include "mynew.h"
+#include "owfn.h"
 #include "state.h"
+#include "owfnTransition.h"
 #include "binDecision.h"
-#include "options.h"
-#include "debug.h"
-#include "CNF.h"
-#include "vertex.h"
 #include "OGFromFile.h"
+#include "debug.h"
+#include "options.h"
+#include "mynew.h"
+
 #include <stdlib.h>
 #include <cassert>
 #include <limits.h>
-#include "owfnTransition.h"
-#include "commGraphFormula.h"
 
 using namespace std;
+
 
 //comparison function, in order to sort the input/output place names 
 bool compare(const owfnPlace* lhs, const owfnPlace* rhs){

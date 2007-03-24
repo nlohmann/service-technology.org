@@ -35,14 +35,15 @@
 #define VERTEX_H_
 
 #include "mynew.h"
-#include <string>
-#include <ostream>
-#include <set>
-
 #include "enums.h"
 #include "commGraphFormula.h"
+//#include <string>
+//#include <ostream>
+//#include <set>
+
 
 using namespace std;
+
 
 class State;
 class graphEdge;

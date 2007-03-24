@@ -34,10 +34,11 @@
 
 #include "commGraphFormula.h"
 #include "debug.h"
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <cassert>
 
 using namespace std;
+
 
 const std::string CommGraphFormulaAssignment::FINAL = std::string("final");
 const std::string CommGraphFormulaAssignment::TAU = std::string("tau");

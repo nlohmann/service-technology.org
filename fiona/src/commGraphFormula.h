@@ -34,9 +34,11 @@
 #ifndef commGraphFormula_H_
 #define commGraphFormula_H_
 
+
 #include <string>
 #include <set>
 #include <map>
+
 
 class CommGraphFormulaFixed;
 

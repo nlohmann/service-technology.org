@@ -32,10 +32,8 @@
  */
 
 #include "state.h"
-#include "enums.h"
-#include "owfnTransition.h"
-#include "owfn.h"
 #include "binDecision.h"
+#include "debug.h"
 
 
 //! \fn State::State()

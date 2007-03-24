@@ -34,17 +34,17 @@
 #include "mynew.h"
 
 #include <iostream>
-#include <string>
-#include "math.h"
-
 #include "BddRepresentation.h" 
 #include "BddLabel.h"
 #include "graphEdge.h"
-#include "symboltab.h" 
 #include "owfn.h"
 
 #include "options.h" 
 #include "debug.h"
+
+#include "math.h"
+#include <string>
+
   
 //comparison function object
 struct cmp{

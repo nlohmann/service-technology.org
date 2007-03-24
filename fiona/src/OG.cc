@@ -37,11 +37,9 @@
 #include "options.h"
 #include "debug.h"
 #include "successorNodeList.h"
-#include "BddRepresentation.h" 
-#include "CNF.h"
 #include "owfn.h"
 #include "vertex.h"
-#include <vector>
+
 
 //! \fn operatingGuidelines::operatingGuidelines(oWFN * _PN)
 //! \param _PN
@@ -113,7 +111,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
 		trace(TRACE_2, string(PN->getOutputPlace(i)->name) + "\n");
 	    
-		if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] < PN->getOutputPlace(i)->max_occurence) {
+		if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] < PN->getOutputPlace(i)->max_occurence
+            || (options[O_EVENT_USE_MAX] == false)) {
 				
 			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
 			currentVertex = currentNode;
@@ -186,8 +185,9 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 		trace(TRACE_2, "\t\t\t\t    sending event: !");
 		trace(TRACE_2, string(PN->getInputPlace(i)->name) + "\n");
 		
-		if (currentNode->eventsUsed[i] < PN->getInputPlace(i)->max_occurence) {
-			
+		if (currentNode->eventsUsed[i] < PN->getInputPlace(i)->max_occurence
+            || (options[O_EVENT_USE_MAX] == false)) {
+
 			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
 			currentVertex = currentNode;
 			
@@ -514,7 +514,8 @@ void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
     os << "  " << NodeNameForOG(v);
 
     // print node annotation
-    os << " : " << v->getCNFString();
+//    os << " : " << v->getCNFString();
+    os << " : " << v->getCNF_formula()->asString();
 
     // mark current node as visited
     visitedNodes[v->getNumber()] = true;
@@ -535,12 +536,6 @@ void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
 
         printNodesToOGFile(vNext, os, visitedNodes);
     }
-}
-
-
-string operatingGuidelines::NodeNameForOG(const vertex* v) const {
-    assert(v != NULL);
-    return "#" + intToString(v->getNumber());
 }
 
 
@@ -586,5 +581,11 @@ void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
 
         printTransitionsToOGFile(vNext, os, visitedNodes);
     }
+}
+
+
+string operatingGuidelines::NodeNameForOG(const vertex* v) const {
+    assert(v != NULL);
+    return "#" + intToString(v->getNumber());
 }
 

@@ -32,14 +32,14 @@
  *
  */
 
+#include "owfn.h"
+#include "main.h"
 #include "state.h"
 #include "IG.h"
 #include "OG.h"
-#include "owfn.h"
-#include "options.h" 
-#include "main.h"
 #include "Exchangeability.h"
-#include "OGFromFile.h"
+#include "options.h" 
+#include "debug.h"
 #include <list>
 
 // #defines YY_FLEX_HAS_YYLEX_DESTROY if we can call yylex_destroy()
@@ -194,20 +194,28 @@ void adjustOptionValues() {
 	if (options[O_MESSAGES_MAX] == true) {
 		trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
 	}
-	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all:\n");
-	trace(TRACE_0, "    input events:\n" );
+	trace(TRACE_0, "considering the following events:\n");
+//	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all:\n");
+	trace(TRACE_0, "    sending events:\n" );
 	for (unsigned int e=0; e < PN->getInputPlaceCount(); e++) {
-		trace(TRACE_0, "\t " + string(PN->getInputPlace(e)->name));
-		trace(TRACE_0, "\t(max. " + intToString(PN->getInputPlace(e)->max_occurence) + "x)\n");
+		trace(TRACE_0, "\t !" + string(PN->getInputPlace(e)->name));
+		if (options[O_EVENT_USE_MAX]) {
+			trace(TRACE_0, "\t(max. " + intToString(PN->getInputPlace(e)->max_occurence) + "x)\n");
+		} else {
+			trace(TRACE_0, "\t(no limit)\n");
+		}
 	}
-	trace(TRACE_0, "    output events:\n" );
+	trace(TRACE_0, "    receiving events:\n" );
 	for (unsigned int e=0; e < PN->getOutputPlaceCount(); e++) {
-		trace(TRACE_0, "\t " + string(PN->getOutputPlace(e)->name));
-		trace(TRACE_0, "\t(max. " + intToString(PN->getOutputPlace(e)->max_occurence) + "x)\n");
+		trace(TRACE_0, "\t ?" + string(PN->getOutputPlace(e)->name));
+		if (options[O_EVENT_USE_MAX]) {
+			trace(TRACE_0, "\t(max. " + intToString(PN->getOutputPlace(e)->max_occurence) + "x)\n");
+		} else {
+			trace(TRACE_0, "\t(no limit)\n");
+		}
 	}
 	
 	trace(TRACE_0, "\n");
-	options[O_EVENT_USE_MAX] = true;
 }
 
 

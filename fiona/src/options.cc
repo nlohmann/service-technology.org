@@ -126,6 +126,8 @@ void print_help() {
   trace(" -m | --messagemaximum=<level>   set maximum number of same messages per state\n");
   trace("                                 to <level>\n");
   trace(" -e | --eventsmaximum=<level>    set event to occur at most <level> times\n");
+  trace("                                 (default is 1)\n");
+  trace("                                 (-1 means disabling -e option -- only possible if -m option is set)\n");
   trace("                                 (only relevant for OG)\n");
   trace(" -r | --reduceIG ............... use reduction rules for IG\n");
   trace(" -s | --show=<parameter> ....... different display options <parameter>:\n");
@@ -233,7 +235,7 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_MATCH] = false;
 
     options[O_MESSAGES_MAX] = false;
-    options[O_EVENT_USE_MAX] = false;
+    options[O_EVENT_USE_MAX] = true;
 
 
     // initialize parameters
@@ -318,10 +320,11 @@ void parse_command_line(int argc, char* argv[]) {
                 messages_manual = atoi(optarg);
                 break;
             case 'e':
-                options[O_EVENT_USE_MAX] = true;
-                testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary(
-                    "-e", optarg);
                 events_manual = atoi(optarg);
+                
+                if (events_manual < 0) {
+                	options[O_EVENT_USE_MAX] = false;                
+                }
                 break;
             case 's':
                 if (string(optarg) == "blue") {
@@ -424,10 +427,14 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
-    if (options[O_BDD] == true && parameters[P_OG] == false &&
-        options[O_EX] == false)
-    {
-        cerr << "computing IG -- BDD option ignored" << endl;
+    if (options[O_EVENT_USE_MAX] == false && options[O_MESSAGES_MAX] == false) {
+        cerr << "if no limit for using events is given, you must specify a message bound via option -m " << endl
+             << "\tEnter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
+    }
+
+    if (options[O_BDD] && parameters[P_OG] == false && options[O_EX] == false) {
+        cerr << "computing IG -- BDD option ignored\n" << endl;
         options[O_BDD] = false;
     }
 }

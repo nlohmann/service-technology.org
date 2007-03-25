@@ -33,7 +33,10 @@
  */
 
 #include "OGFromFile.h"
+#include "debug.h"
 #include <cassert>
+
+using namespace std;
 
 OGFromFileNode::OGFromFileNode(const std::string& name_, CommGraphFormula* annotation_) :
     name(name_),
@@ -84,20 +87,25 @@ void OGFromFileNode::addTransition(OGFromFileTransition* transition)
 bool OGFromFileNode::hasTransitionWithLabel(const std::string& transitionLabel)
     const
 {
-    return getTransitionWithLabel(transitionLabel) != NULL;
+	return getTransitionWithLabel(transitionLabel) != NULL;
 }
 
 OGFromFileTransition* OGFromFileNode::getTransitionWithLabel(
     const std::string& transitionLabel) const
 {
+
+    //cout << "\tgetTransitionWithLabel : start " << endl;
+
     for (transitions_t::const_iterator trans_iter = transitions.begin();
         trans_iter != transitions.end(); ++trans_iter)
     {
         if ((*trans_iter)->hasLabel(transitionLabel)) {
+		    //cout << "\tgetTransitionWithLabel : end1 " << endl;
             return *trans_iter;
         }
     }
 
+    //cout << "\tgetTransitionWithLabel : end2 " << endl;
     return NULL;
 }
 
@@ -133,6 +141,12 @@ std::string OGFromFileNode::getAnnotationAsString() const
     return firstClause->asString();
 }
 
+CommGraphFormula* OGFromFileNode::getAnnotation() const {
+
+    return firstClause;
+
+}
+
 void OGFromFileNode::setDepthFirstSearchParent(
     OGFromFileNode* depthFirstSearchParent_)
 {
@@ -159,6 +173,12 @@ OGFromFileNode* OGFromFileTransition::getDst() const
 {
     return dst;
 }
+
+
+const std::string OGFromFileTransition::getLabel() {
+	return label;
+}
+
 
 OGFromFile::OGFromFile() : root(NULL)
 {
@@ -233,3 +253,73 @@ bool OGFromFile::hasNoRoot() const
 {
     return getRoot() == NULL;
 }
+
+//! \fn OGFromFile* OGFromFile::enforce(OGFromFile* constraint)
+//! \brief enforces the current OG to respect the given constraint
+//! \return the OG respecting the constraint
+//! \param constraint the constraint to be enforced
+OGFromFile* OGFromFile::enforce(OGFromFile* constraint) {
+	trace(TRACE_5, "OGFromFile::enforce(OGFromFile* constraint): start\n");
+
+	OGFromFile* newOG = new OGFromFile();
+
+	// we now fill the new OG with pairs of nodes
+	// therefore, we perform a coordinated dfs through OG and constraint
+	
+	buildConstraintOG(this->getRoot(), constraint->getRoot(), newOG);	    
+
+	trace(TRACE_5, "OGFromFile::enforce(OGFromFile* constraint): end\n");
+
+	return newOG;
+}
+
+
+//! \fn OGFromFile* OGFromFile::enforce(OGFromFile* constraint)
+//! \brief enforces the current OG to respect the given constraint
+//! \return the OG respecting the constraint
+//! \param constraint the constraint to be enforced
+void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
+                                   OGFromFileNode* currentConstraintNode,
+                                   OGFromFile* newOG) {
+
+	trace(TRACE_5, "OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentConstraintNode, OGFromFile* newOG): start\n");
+
+	// building a new node that has name and annotation constructed
+	// from current nodes of OG and constraint
+	std::string newName;
+	newName = currentOGNode->getName() + currentConstraintNode->getName();
+
+	CommGraphFormulaMultiaryAnd* newFormula;
+	newFormula = new CommGraphFormulaMultiaryAnd(currentOGNode->getAnnotation(), currentConstraintNode->getAnnotation());
+
+	// add that node to the OG
+	OGFromFileNode* newNode = new OGFromFileNode(newName, newFormula);
+	newOG->addNode(newNode);
+	if (newOG->getRoot() == NULL) {
+		newOG->setRoot(newNode);
+	}
+
+	// iterate over all outgoing edges from current node of OG
+    std::string currentLabel;
+    for (OGFromFileNode::transitions_t::iterator trans_iter = currentOGNode->transitions.begin();
+         trans_iter != currentOGNode->transitions.end(); ++trans_iter) {
+
+		// remember the label of the egde
+		currentLabel = (*trans_iter)->getLabel();
+
+		// if the constraint automaton allows this edge
+		if (currentConstraintNode->hasTransitionWithLabel(currentLabel)) {
+
+			// compute both successors and recursively call buildConstraintOG again
+			OGFromFileNode* newOGNode;
+			newOGNode = currentOGNode->fireTransitionWithLabel(currentLabel);
+			
+			OGFromFileNode* newConstraintNode;
+			newConstraintNode = currentConstraintNode->fireTransitionWithLabel(currentLabel);
+
+			buildConstraintOG(newOGNode, newConstraintNode, newOG);
+		}
+	}
+	trace(TRACE_5, "OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentConstraintNode, OGFromFile* newOG): end\n");
+}
+

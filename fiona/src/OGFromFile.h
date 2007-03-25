@@ -50,7 +50,7 @@ class OGFromFileNode {
 private:
     std::string name;
     typedef std::set<OGFromFileTransition*> transitions_t;
-    transitions_t transitions;
+//    transitions_t transitions;
     typedef std::map<std::string, OGFromFileNode*> transitionLabel2parentNode_t;
     transitionLabel2parentNode_t transitionLabel2parentNode;
     void addParentNodeForTransitionLabel(const std::string& transitionLabel,
@@ -60,6 +60,7 @@ private:
     CommGraphFormula* firstClause;
     OGFromFileNode* depthFirstSearchParent;
 public:
+    transitions_t transitions;
     OGFromFileNode(const std::string& name_, CommGraphFormula* annotation_);
     ~OGFromFileNode();
     std::string getName() const;
@@ -72,7 +73,10 @@ public:
         const std::string& transitionLabel) const;
     bool assignmentSatisfiesAnnotation(
         const CommGraphFormulaAssignment& assignment) const;
+
     std::string getAnnotationAsString() const;
+	CommGraphFormula* getAnnotation() const;
+
     void setDepthFirstSearchParent(OGFromFileNode* depthFirstSearchParent);
     OGFromFileNode* getDepthFirstSearchParent() const;
 };
@@ -85,6 +89,7 @@ private:
 public:
     OGFromFileTransition(OGFromFileNode* src, OGFromFileNode* dst,
         const std::string& label);
+    const std::string getLabel();
     bool hasLabel(const std::string& label_) const;
     OGFromFileNode* getDst() const;
 };
@@ -112,6 +117,10 @@ public:
     void setRootToNodeWithName(const std::string& nodeName);
     OGFromFileNode* getNodeWithName(const std::string& nodeName) const;
     bool hasNoRoot() const;
+    
+    OGFromFile* enforce(OGFromFile*);
+    void buildConstraintOG(OGFromFileNode*, OGFromFileNode*, OGFromFile*);
+    
 };
 
 

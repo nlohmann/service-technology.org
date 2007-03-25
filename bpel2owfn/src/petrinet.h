@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/25 11:10:11 $
+ * \date    \$Date: 2007/03/25 15:40:21 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.140 $
+ * \version \$Revision: 1.141 $
  *
  * \ingroup petrinet
  */
@@ -430,10 +430,10 @@ class PetriNet
     void mergeParallelTransitions(Transition *t1, Transition *t2);
 
     /// finds place given a role
-    Place* findPlace(string role);
+    Place* findPlace(string role) const;
 
     /// finds place given an id with a role
-    Place* findPlace(unsigned int id, string role);
+    Place* findPlace(unsigned int id, string role) const;
 
     /// finds transition given a role
     Transition* findTransition(string role) const;
@@ -455,7 +455,10 @@ class PetriNet
     void addPrefix(string prefix);
 
     /// composes a second Petri net
-    void compose(PetriNet &net);
+    void compose(const PetriNet &net);
+
+    /// produces a second constraint oWFN
+    void produce(const PetriNet &net);
 
     /// moves channel places to the list of internal places
     void makeChannelsInternal();

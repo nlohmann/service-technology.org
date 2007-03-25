@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/03/25 11:10:11 $
+ * \date    \$Date: 2007/03/25 15:40:21 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.191 $
+ * \version \$Revision: 1.192 $
  *
  * \ingroup petrinet
  */
@@ -52,10 +52,13 @@
 
 #include <cassert>
 #include <iostream>
+#include <utility>
 
 #include "petrinet.h"
 #include "helpers.h"		// helper functions (setUnion, setDifference, max, toString)
 #include "pnapi.h"
+
+using std::pair;
 
 
 
@@ -264,6 +267,7 @@ Arc::~Arc()
 {
   assert(source != NULL);
   assert(target != NULL);
+
   source->postset.erase(target);
   target->preset.erase(source);
 }
@@ -1339,17 +1343,14 @@ set<Node *> PetriNet::postset(Node *n) const
  * \param   role  the demanded role
  * \return  a pointer to the place or a NULL pointer if the place was not found.
  */
-Place *PetriNet::findPlace(string role) 
+Place *PetriNet::findPlace(string role) const
 {
-  map< std::string, Node* >::iterator p = roleMap.find(role);
+  map< std::string, Node* >::const_iterator p = roleMap.find(role);
+
   if (p != roleMap.end() )
-  {
     return (static_cast<Place *>(p->second));
-  }
   else
-  {
     return NULL;
-  }
 }
 
 
@@ -1366,7 +1367,7 @@ Place *PetriNet::findPlace(string role)
  * \return  a pointer to the place or a NULL pointer if the place was not
  *          found.
  */
-Place *PetriNet::findPlace(unsigned int id, string role)
+Place *PetriNet::findPlace(unsigned int id, string role) const
 {
   return findPlace(toString(id) + role);
 }
@@ -1387,7 +1388,12 @@ Place *PetriNet::findPlace(unsigned int id, string role)
  */
 Transition *PetriNet::findTransition(string role) const
 {
-  return (static_cast<Transition *>(roleMap.find(role)->second));
+  map< std::string, Node* >::const_iterator t = roleMap.find(role);
+
+  if (t != roleMap.end() )
+    return (static_cast<Transition *>(t->second));
+  else
+    return NULL;
 }
 
 
@@ -1492,7 +1498,7 @@ void PetriNet::addPrefix(string prefix)
  *
  * \todo    Gierds: comment me!
  */
-void PetriNet::compose(PetriNet &net)
+void PetriNet::compose(const PetriNet &net)
 {
   using namespace std;
   // add all internal places
@@ -1794,4 +1800,97 @@ void PetriNet::mirror()
     else if ( (*t)->type == IN )
       (*t)->type = OUT;
   }
+}
+
+
+
+
+
+/*!
+ * \brief   produces a second constraint oWFN
+ *
+ * \param   a constraint oWFN
+ */
+void PetriNet::produce(const PetriNet &net)
+{
+  // the constraint oWFN must have an empty interface
+  assert(net.P_in.empty());
+  assert(net.P_out.empty());
+
+
+  // copy the constraint oWFN's places to the oWFN
+  for (set<Place *>::iterator p = net.P.begin(); p != net.P.end(); p++)
+  {
+    Place *p_new = newPlace((*p)->nodeName());
+
+    p_new->isFinal = (*p)->isFinal;
+    p_new->tokens = (*p)->tokens;
+  }
+
+
+  // copy the constraint oWFN's unlabeled transitions to the oWFN
+  for (set<Transition *>::iterator t = net.T.begin(); t != net.T.end(); t++)
+  {
+    if ( (*t)->labels.empty())
+    {
+      Transition *t_new = newTransition((*t)->nodeName());
+
+      // copy the arcs of the constraint oWFN
+      for (set< Arc * >::iterator arc = net.F.begin(); arc != net.F.end(); arc ++)
+      {
+	if ( ( (*arc)->source->nodeType == PLACE) && ( (*arc)->target == static_cast<Node *>(*t) ) )
+	  newArc( findPlace( (*arc)->source->nodeName() ), t_new, STANDARD, (*arc)->weight );
+	if ( ( (*arc)->target->nodeType == PLACE) && ( (*arc)->source == static_cast<Node *>(*t) ) )
+	  newArc( t_new, findPlace( (*arc)->target->nodeName() ), STANDARD, (*arc)->weight );
+      }
+
+    }
+  }
+
+
+  // transitions of the oWFN that are used as labels in the constraint oWFN
+  set<string> used_labels;
+  set<pair<Transition *, Transition *> > transition_pairs;
+
+  for (set<Transition *>::iterator t = net.T.begin(); t != net.T.end(); t++)
+  {
+    for (set<string>::iterator label = (*t)->labels.begin(); label != (*t)->labels.end(); label++)
+    {
+      Transition *t_l = findTransition(*label);
+      assert(t_l != NULL);
+
+      used_labels.insert(*label);
+      transition_pairs.insert(pair<Transition *, Transition *>(t_l, *t));
+    }
+  }
+
+
+  // create pair transitions with their arcs
+  for (set<pair<Transition *, Transition *> >::iterator tp = transition_pairs.begin(); tp != transition_pairs.end(); tp++)
+  {
+    Transition *t_new = newTransition("(" + tp->first->nodeName() + "," + tp->second->nodeName() + ")");
+
+    // copy the arcs of the constraint oWFN
+    for (set< Arc * >::iterator arc = net.F.begin(); arc != net.F.end(); arc ++)
+    {
+      if ( ( (*arc)->source->nodeType == PLACE) && ( (*arc)->target == static_cast<Node *>(tp->second) ) )
+	newArc( findPlace( (*arc)->source->nodeName() ), t_new, STANDARD, (*arc)->weight );
+      if ( ( (*arc)->target->nodeType == PLACE) && ( (*arc)->source == static_cast<Node *>(tp->second) ) )
+	newArc( t_new, findPlace( (*arc)->target->nodeName() ), STANDARD, (*arc)->weight );
+    }
+
+    // copy the arcs of the oWFN
+    for (set< Arc * >::iterator arc = F.begin(); arc != F.end(); arc ++)
+    {
+      if ( ( (*arc)->source->nodeType == PLACE) && ( (*arc)->target == static_cast<Node *>(tp->first) ) )
+	newArc( findPlace( (*arc)->source->nodeName() ), t_new, STANDARD, (*arc)->weight );
+      if ( ( (*arc)->target->nodeType == PLACE) && ( (*arc)->source == static_cast<Node *>(tp->first) ) )
+	newArc( t_new, findPlace( (*arc)->target->nodeName() ), STANDARD, (*arc)->weight );
+    }
+  }
+
+  
+  // remove transitions that are used as labels
+  for (set<string>::iterator t = used_labels.begin(); t != used_labels.end(); t++)
+    removeTransition(findTransition(*t));
 }

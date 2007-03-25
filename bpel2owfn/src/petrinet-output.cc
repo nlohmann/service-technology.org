@@ -30,13 +30,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/03/25 11:10:11 $
+ * \date    \$Date: 2007/03/25 15:40:21 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.88 $
+ * \version \$Revision: 1.89 $
  *
  * \ingroup petrinet
  */
@@ -358,7 +358,7 @@ string Transition::output_dot() const
     case(INTERNAL):	result += "["; break;
   }
 
-  if (!label.empty())
+  if (!labels.empty())
   {
     result += " label=\"{";
     for (set<string>::const_iterator it = labels.begin(); it != labels.end(); it++)

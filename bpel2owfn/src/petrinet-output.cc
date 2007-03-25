@@ -30,13 +30,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/03/25 10:19:37 $
+ * \date    \$Date: 2007/03/25 11:10:11 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.87 $
+ * \version \$Revision: 1.88 $
  *
  * \ingroup petrinet
  */
@@ -352,13 +352,25 @@ string Transition::output_dot() const
 
   switch(type)
   {
-    case(IN):	result += "[fillcolor=orange]"; break;
-    case(OUT):	result += "[fillcolor=yellow]"; break;
-    case(INOUT):result += "[fillcolor=gold]"; break;
-    default:	break;
+    case(IN):		result += "[fillcolor=orange"; break;
+    case(OUT):		result += "[fillcolor=yellow"; break;
+    case(INOUT):	result += "[fillcolor=gold"; break;
+    case(INTERNAL):	result += "["; break;
+  }
+
+  if (!label.empty())
+  {
+    result += " label=\"{";
+    for (set<string>::const_iterator it = labels.begin(); it != labels.end(); it++)
+    {
+      if (it != labels.begin())
+	result += " ";
+      result += (*it);
+    }
+    result += "}\"";
   }
   
-  result += "\n";
+  result += "]\n";
 
   result += " t" + toString(id) + "_l\t[shape=none];\n";
   result += " t" + toString(id) + "_l -> t" + toString(id) + " [headlabel=\"" + label + "\"]\n";
@@ -455,8 +467,8 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
     (*output) << "structurally reduced ";
 
   (*output) << "Petri net generated from " << globals::filename << "\"]" << endl;
-  (*output) << " node [fixedsize width=\".3\" height=\".3\" label=\"\" style=filled fillcolor=white]" << endl;
-  (*output) << " edge [fontname=\"Helvetica\" fontsize=8  color=white arrowhead=none weight=\"20.0\"]" << endl << endl;
+  (*output) << " node [fontname=\"Helvetica\" fontsize=8 fixedsize width=\".3\" height=\".3\" label=\"\" style=filled fillcolor=white]" << endl;
+  (*output) << " edge [fontname=\"Helvetica\" fontsize=8 color=white arrowhead=none weight=\"20.0\"]" << endl << endl;
 
 
   // list the places

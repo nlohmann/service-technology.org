@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/03/25 10:19:37 $
+ * \date    \$Date: 2007/03/25 11:10:11 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.190 $
+ * \version \$Revision: 1.191 $
  *
  * \ingroup petrinet
  */
@@ -155,6 +155,20 @@ Transition::Transition(unsigned int my_id, string my_role)
  */
 Transition::~Transition()
 {
+}
+
+
+
+
+
+/*!
+ * \brief   add a label to the transition (used for constraint oWFN)
+ *
+ * \param   new_label  a label to be added to the transition
+ */
+void Transition::add_label(string new_label)
+{
+  labels.insert(new_label);
 }
 
 

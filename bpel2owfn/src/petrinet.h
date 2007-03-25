@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/21 17:00:00 $
+ * \date    \$Date: 2007/03/25 11:10:11 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.139 $
+ * \version \$Revision: 1.140 $
  *
  * \ingroup petrinet
  */
@@ -261,12 +261,18 @@ class Transition: public Node
     /// the name of the type
     string nodeTypeName() const;
 
+    /// label (used for constraint oWFN)
+    set<string> labels;
+
     /// create a transition and add a first role to the history
     Transition(unsigned int id, string role);
 
   public:
     /// destructor
     virtual ~Transition();
+
+    /// add a label to the transition (used for constraint oWFN)
+    void add_label(string new_label);
 };
 
 

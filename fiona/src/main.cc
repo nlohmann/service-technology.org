@@ -40,6 +40,7 @@
 #include "Exchangeability.h"
 #include "options.h" 
 #include "debug.h"
+#include "OGFromFile.h"
 #include <list>
 
 // #defines YY_FLEX_HAS_YYLEX_DESTROY if we can call yylex_destroy()
@@ -152,6 +153,8 @@ void readog() {
     trace(TRACE_1, "--------------------------------------------------------------\n");
     trace(TRACE_1, "reading from file " + ogfile + "\n");
 
+    OGToMatch = OGFromFile();
+
     og_yyparse();
     fclose(og_yyin);
 
@@ -160,36 +163,11 @@ void readog() {
 #endif
 }
 
+
 //! \fn void adjustOptionValues()
 //! \brief adjusts values for -e and -c options
 void adjustOptionValues() {
-//	if (options[O_COMM_DEPTH] == true) {
-//		// adjusting commDepth if dominated by events
-//		if (commDepth_manual > numberOfEvents) {
-//			trace(TRACE_1, "manual commDepth is set too high ... adjusting it\n");
-//			PN->commDepth = numberOfEvents;
-//		} else {
-//			PN->commDepth = commDepth_manual;
-//		}
-//
-//		// adjusting events if dominated by commDepth
-//		if (options[O_EVENT_USE_MAX] == true) {
-//			if (PN->getCommDepth() < events_manual) {
-//			    trace(TRACE_1, "number of events to be used is set too high\n");
-//			    events_manual = PN->commDepth;
-//			}
-//		}
-//	} else {
-//		// compute commDepth if not specified by -c option
-//		trace(TRACE_1, "standard commDepth too high ... adjusting it\n");
-//		if (PN->commDepth > numberOfEvents) {
-//			PN->commDepth = numberOfEvents;
-//		}
-//	}
-	
 	// report ...
-
-//	trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
 
 	if (options[O_MESSAGES_MAX] == true) {
 		trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
@@ -219,7 +197,6 @@ void adjustOptionValues() {
 }
 
 
-
 // **********************************************************************************
 // ********                   MAIN                                           ********
 // **********************************************************************************
@@ -233,13 +210,15 @@ int main(int argc, char ** argv) {
 //	return 0;
 //	
 
-    set_new_handler(&myown_newhandler);
+	set_new_handler(&myown_newhandler);
 
 	list<oWFN*> petrinets;
 
-    // evaluate command line options
-    parse_command_line(argc, argv);
-    
+	// evaluate command line options
+	parse_command_line(argc, argv);
+
+// ---------------- exchangeability ---------------------
+
     if (options[O_EX] == true) {
         //check equality of two operating guidelines
         if (netfiles.size() == 2) {
@@ -255,223 +234,259 @@ int main(int argc, char ** argv) {
         } else {
             cerr << "Error: \t If option -x is used, exactly two oWFN must be entered\n" << endl;
         }
-    } else {
-
-        list<char*>::iterator netiter = netfiles.begin();
-
-        do {
-            numberOfDecodes = 0;
-    
-            garbagefound = 0;
-            State::card = 0;          // number of states
-    
-            numberDeletedVertices = 0;
-
-            numberOfEvents = 0;
-    
-            // prepare getting the net
-            try {
-                PlaceTable = new SymbolTab<PlSymbol>;
-            }
-            catch(bad_alloc) {
-                char mess[] = "\nnot enough space to read net\n";
-                //write(2,mess,sizeof(mess));
-                cerr << mess;
-                _exit(2);
-            }
-    
-            // get the net
-            try {
-                if (netiter != netfiles.end()) {
-                    netfile = *netiter;
-                }
-                readnet();  // Parser;
-    
-                // PN->removeisolated();
-                // TODO: better removal of places 
-                // doesn't work with, since array for input and output places
-                // depend on the order of the Places array, reordering results in
-                // a heavy crash
-    
-            } 
-            catch(bad_alloc) {
-                char mess [] = "\nnot enough space to store net\n";
-                //write(2,mess,sizeof(mess));
-                cerr << mess;
-                _exit(2);
-            }
-            
-            PN->filename = netfile;
-            petrinets.push_back(PN);
-            
-            delete PlaceTable;
-            
-            netiter++;
-        } while (netfiles.begin() != netfiles.end() && netiter != netfiles.end());
         
-        if (options[O_MATCH]) {
-            readog();
+        return 0;
+    }
+    
+// ------------------- reading OG ------------------------
+
+    if (options[O_MATCH]) {
+        readog();
+    }
+
+// ----------- enforcing a constraint automaton ----------
+
+	if (options[O_CONSTRAINT]) {
+
+		netfile = *netfiles.begin();
+		
+		// open the OG to be constrained
+		ogfile = string(netfile) + ".a.og";
+		trace(TRACE_0, "You want to constrain the OG:  " + ogfile + "\n");
+
+		OGFromFile* og = new OGFromFile();
+		readog();
+		(*og) = OGToMatch;
+		
+		// open the constraint automaton (same syntax as OG)
+		ogfile = string(constraintfile);
+		trace(TRACE_0, "   to respect the constraint:  " + ogfile + "\n\n"); 
+
+		OGFromFile* constraint = new OGFromFile();
+		readog();
+		(*constraint) = OGToMatch;
+
+		OGFromFile* constrainedOG;
+		constrainedOG = og->enforce(constraint);
+
+		return 0;
+    }
+
+// ---------------- reading all nets ---------------------
+
+    list<char*>::iterator netiter = netfiles.begin();
+
+    do {
+        numberOfDecodes = 0;
+
+        garbagefound = 0;
+        State::card = 0;          // number of states
+
+        numberDeletedVertices = 0;
+
+        numberOfEvents = 0;
+
+        // prepare getting the net
+        try {
+            PlaceTable = new SymbolTab<PlSymbol>;
+        }
+        catch(bad_alloc) {
+            char mess[] = "\nnot enough space to read net\n";
+            //write(2,mess,sizeof(mess));
+            cerr << mess;
+            _exit(2);
+		}
+
+		// get the net
+		try {
+			if (netiter != netfiles.end()) {
+				netfile = *netiter;
+			}
+            readnet();  // Parser;
+
+            // PN->removeisolated();
+            // TODO: better removal of places 
+            // doesn't work with, since array for input and output places
+            // depend on the order of the Places array, reordering results in
+            // a heavy crash
+
+        } 
+        catch(bad_alloc) {
+            char mess [] = "\nnot enough space to store net\n";
+            //write(2,mess,sizeof(mess));
+            cerr << mess;
+            _exit(2);
+        }
+        
+        PN->filename = netfile;
+        petrinets.push_back(PN);
+        
+        delete PlaceTable;
+        
+        netiter++;
+    } while (netfiles.begin() != netfiles.end() && netiter != netfiles.end());
+    
+
+// **************** start doing things :) *********************
+
+    for (list<oWFN*>::iterator net = petrinets.begin();
+         net != petrinets.end(); net++) {
+        PN = *net;
+        netfile = PN->filename; 
+
+        numberOfDecodes = 0;
+        garbagefound = 0;
+        State::card = 0;          // number of states
+        numberDeletedVertices = 0;
+
+        trace(TRACE_0, "\n--------------------------------------------------------------\n");
+        if (netfile) {
+            trace(TRACE_0, "processing net " + string(netfile) + " ...\n");
+        }	
+        // report the net
+        trace(TRACE_0, "    places: " + intToString(PN->getPlaceCount()));
+        trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCount()) + " input places, " + intToString(PN->getOutputPlaceCount()) + " output places)\n");
+        trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCount()) + "\n\n");
+    
+        if (PN->FinalCondition) {
+            trace(TRACE_0, "finalcondition used\n\n");
+		} else {
+			if (PN->FinalMarking) {
+				trace(TRACE_0, "finalmarking used\n\n");
+			} else {
+				trace(TRACE_0, "neither finalcondition nor finalmarking given\n");
+			}
+		}
+
+		// adjust events_manual and print limit of considering events
+		adjustOptionValues();
+        
+        // start computation
+        time_t seconds, seconds2;
+        
+		if (options[O_MATCH]) {
+			// ------------------------- matching --------------------------------
+
+			string reasonForFailedMatch;
+			if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
+				trace(TRACE_0, "oWFN matches with OG: YES\n");
+			} else {
+				trace(TRACE_0, "oWFN matches with OG: NO\n");
+				trace(TRACE_0, "Match failed, because: " +
+				reasonForFailedMatch + "\n");
+			}
+			return 0;
+		}
+            
+        if (parameters[P_OG]) {
+			// ---------------- operating guideline is built ---------------------
+
+            operatingGuidelines * graph = new operatingGuidelines(PN);
+            trace(TRACE_0, "building the operating guideline...\n");
+            seconds = time (NULL);
+    
+            graph->printProgressFirst();
+            graph->calculateRootNode();	// creates the root node and calculates its reachability graph (set of states)
+            
+            if (options[O_OTF]){
+                graph->bdd->convertRootNode(graph->getRoot());
+            }
+            
+            graph->buildGraph(graph->getRoot(), 1); // build operating guideline
+            
+            seconds2 = time (NULL);
+            trace(TRACE_0, "\nbuilding the operating guideline finished.\n\n");
+            cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
+    
+            trace(TRACE_0, "\nnet is controllable: ");
+            if (graph->getRoot()->getColor() == BLUE) {
+                trace(TRACE_0, "YES\n\n");
+            } else {
+                trace(TRACE_0, "NO\n\n");
+            }
+            
+            trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
+            trace(TRACE_0, "OG: number of nodes: " + intToString(graph->getNumberOfNodes()) + "\n");
+            trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
+            trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
+                
+            trace(TRACE_5, "printNodeStatistics...\n");
+            graph->printNodeStatistics();
+            trace(TRACE_5, "printDotFile...\n");
+            graph->printDotFile();
+            trace(TRACE_5, "printOGFile...\n");
+            graph->printOGFile();
+            
+            if (options[O_OTF]) {
+                //graph->bdd->printDotFile();
+                //graph->bdd->print();
+                graph->bdd->save("OTF");
+            }
+            
+            if (options[O_BDD]) {
+                trace(TRACE_0, "\nbuilding the BDDs...\n");
+                seconds = time (NULL);
+                graph->convertToBdd();      
+                seconds2 = time (NULL);
+                cout << difftime(seconds2,seconds) << " s consumed for building and reordering the BDDs" << endl;
+                 
+                //graph->bdd->printDotFile();
+                //graph->bdd->print();
+                graph->bdd->save();
+            }
+    
+            trace(TRACE_5, "computation finished -- trying to delete graph\n");
+            // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+            delete graph;
+            trace(TRACE_5, "graph deleted\n");
+
+        } else {
+			// ---------------- interaction graph is built ---------------------
+            
+            interactionGraph * graph = new interactionGraph(PN);
+    
+            if (options[O_CALC_REDUCED_IG]) {
+                trace(TRACE_0, "building the reduced interaction graph...\n");
+            } else {
+                trace(TRACE_0, "building the interaction graph...\n");
+            }
+            seconds = time (NULL);
+            graph->buildGraph();                    // build interaction graph
+            seconds2 = time (NULL);
+            if (options[O_CALC_REDUCED_IG]) {
+                trace(TRACE_0, "building the reduced interaction graph finished.\n");
+            } else {
+                trace(TRACE_0, "\nbuilding the interaction graph finished.\n");
+            }
+
+            cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
+    
+            trace(TRACE_0, "\nnet is controllable: ");
+            if (graph->getRoot()->getColor() == BLUE) {
+                trace(TRACE_0, "YES\n\n");
+            } else {
+                trace(TRACE_0, "NO\n\n");
+            }
+            trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
+            trace(TRACE_0, "IG: number of nodes: " + intToString(graph->getNumberOfNodes()) + "\n");
+            trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
+            trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
+
+            graph->printNodeStatistics();
+            graph->printDotFile();				// for IG
+
+            trace(TRACE_5, "computation finished -- trying to delete graph\n");
+//				trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+            delete graph;
+            trace(TRACE_5, "graph deleted\n");
         }
 
-        for (list<oWFN*>::iterator net = petrinets.begin();
-             net != petrinets.end(); net++) {
-            PN = *net;
-            netfile = PN->filename; 
+        delete PN;
     
-            numberOfDecodes = 0;
-            garbagefound = 0;
-            State::card = 0;          // number of states
-            numberDeletedVertices = 0;
+//		cout << "numberOfDecodes: " << numberOfDecodes << endl;
     
-            trace(TRACE_0, "\n--------------------------------------------------------------\n");
-            if (netfile) {
-                trace(TRACE_0, "processing net " + string(netfile) + " ...\n");
-            }	
-            // report the net
-            trace(TRACE_0, "    places: " + intToString(PN->getPlaceCount()));
-            trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCount()) + " input places, " + intToString(PN->getOutputPlaceCount()) + " output places)\n");
-            trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCount()) + "\n\n");
-        
-            if (PN->FinalCondition) {
-                trace(TRACE_0, "finalcondition used\n\n");
-            } else {
-                if (PN->FinalMarking) {
-                    trace(TRACE_0, "finalmarking used\n\n");
-                } else {
-                    trace(TRACE_0, "neither finalcondition nor finalmarking given\n");
-                }
-            }
+    } // end of "for all nets ..."
 
-            // adjust commDepth and events_manual
-            adjustOptionValues();
-            
-            // start computation
-            time_t seconds, seconds2;
-            
-            if (options[O_MATCH]) {
-                
-// ---------------- matching ---------------------
-
-                string reasonForFailedMatch;
-                if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
-                    trace(TRACE_0, "oWFN matches with OG: YES\n");
-                } else {
-                    trace(TRACE_0, "oWFN matches with OG: NO\n");
-                    trace(TRACE_0, "Match failed, because: " +
-                    reasonForFailedMatch + "\n");
-                }
-                
-            } else if (parameters[P_OG]) {
-
-// ---------------- operating guideline is built ---------------------
-
-                operatingGuidelines * graph = new operatingGuidelines(PN);
-                trace(TRACE_0, "building the operating guideline...\n");
-                seconds = time (NULL);
-        
-                graph->printProgressFirst();
-                graph->calculateRootNode();	// creates the root node and calculates its reachability graph (set of states)
-                
-                if (options[O_OTF]){
-                    graph->bdd->convertRootNode(graph->getRoot());
-                }
-                
-                graph->buildGraph(graph->getRoot(), 1); // build operating guideline
-                
-                seconds2 = time (NULL);
-                trace(TRACE_0, "\nbuilding the operating guideline finished.\n\n");
-                cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
-        
-                trace(TRACE_0, "\nnet is controllable: ");
-                if (graph->getRoot()->getColor() == BLUE) {
-                    trace(TRACE_0, "YES\n\n");
-                } else {
-                    trace(TRACE_0, "NO\n\n");
-                }
-                
-                trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
-                trace(TRACE_0, "OG: number of nodes: " + intToString(graph->getNumberOfNodes()) + "\n");
-                trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
-                trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
-                    
-                trace(TRACE_5, "printNodeStatistics...\n");
-                graph->printNodeStatistics();
-                trace(TRACE_5, "printDotFile...\n");
-                graph->printDotFile();
-                trace(TRACE_5, "printOGFile...\n");
-                graph->printOGFile();
-                
-                if (options[O_OTF]) {
-                    //graph->bdd->printDotFile();
-                    //graph->bdd->print();
-                    graph->bdd->save("OTF");
-                }
-                
-                if (options[O_BDD]) {
-                    trace(TRACE_0, "\nbuilding the BDDs...\n");
-                    seconds = time (NULL);
-                    graph->convertToBdd();      
-                    seconds2 = time (NULL);
-                    cout << difftime(seconds2,seconds) << " s consumed for building and reordering the BDDs" << endl;
-                     
-                    //graph->bdd->printDotFile();
-                    //graph->bdd->print();
-                    graph->bdd->save();
-                }
-        
-                trace(TRACE_5, "computation finished -- trying to delete graph\n");
-                // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
-                delete graph;
-                trace(TRACE_5, "graph deleted\n");
-            
-            } else {
-					
-// ---------------- interaction graph is built ---------------------
-                
-                interactionGraph * graph = new interactionGraph(PN);
-        
-                if (options[O_CALC_REDUCED_IG]) {
-                    trace(TRACE_0, "building the reduced interaction graph...\n");
-                } else {
-                    trace(TRACE_0, "building the interaction graph...\n");
-                }
-                seconds = time (NULL);
-                graph->buildGraph();                    // build interaction graph
-                seconds2 = time (NULL);
-                if (options[O_CALC_REDUCED_IG]) {
-                    trace(TRACE_0, "building the reduced interaction graph finished.\n");
-                } else {
-                    trace(TRACE_0, "\nbuilding the interaction graph finished.\n");
-                }
-    
-                cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
-        
-                trace(TRACE_0, "\nnet is controllable: ");
-                if (graph->getRoot()->getColor() == BLUE) {
-                    trace(TRACE_0, "YES\n\n");
-                } else {
-                    trace(TRACE_0, "NO\n\n");
-                }
-                trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
-                trace(TRACE_0, "IG: number of nodes: " + intToString(graph->getNumberOfNodes()) + "\n");
-                trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
-                trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
-    
-                graph->printNodeStatistics();
-                graph->printDotFile();				// for IG
-    
-                trace(TRACE_5, "computation finished -- trying to delete graph\n");
-//				trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
-                delete graph;
-                trace(TRACE_5, "graph deleted\n");
-            }
-    
-            delete PN;
-        
-//			cout << "numberOfDecodes: " << numberOfDecodes << endl;
-        
-        } // end of "for all nets ..."
-  }
 
 #ifdef LOG_NEW
     NewLogger::printall();

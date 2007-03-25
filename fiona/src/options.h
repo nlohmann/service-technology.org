@@ -55,7 +55,8 @@ typedef enum
 	O_BDD,
 	O_OTF, //on the fly
 	O_EX,
-	O_MATCH
+	O_MATCH,
+	O_CONSTRAINT
 } possibleOptions;
 
 typedef enum
@@ -78,6 +79,7 @@ extern std::map<possibleParameters, bool> parameters;
 
 extern char * netfile;
 extern std::string ogfile;
+extern std::string constraintfile;
 extern unsigned int messages_manual;
 extern int events_manual;
 extern int bdd_reordermethod;

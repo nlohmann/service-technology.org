@@ -1,6 +1,6 @@
 /*****************************************************************************
- * Copyright 2005, 2006 Niels Lohmann, Peter Massuthe, Daniela Weinberg,     *
- *                      Jan Bretschneider, Christian Gierds, Dennis Reinert  *
+ * Copyright 2005, 2006, 2007                 Niels Lohmann, Peter Massuthe, *
+ *                    Daniela Weinberg, Jan Bretschneider, Christian Gierds  *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
@@ -49,39 +49,24 @@ using namespace std;
 char * netfile;
 std::list<char*> netfiles; 
 std::string ogfile;
+std::string constraintfile;
 
-int commDepth_manual;
 int events_manual;
 unsigned int messages_manual;
 int bdd_reordermethod;
 
-/// Filename of input file
-std::string filename = "<STDIN>";
-
-/// Filename of input file
-std::string output_filename = "";
-
-/// pointer to input stream
-std::istream * input = &std::cin;
-/// pointer to output stream
-std::ostream * output = &std::cout;
 /// pointer to log stream
 std::ostream * log_output = &std::cout;   // &std::clog;
 
-///// Filename of log file
-//std::string log_filename = "";
-//
-//bool createOutputFile = false;
-
 // different modes controlled by command line
-
 std::map<possibleOptions,    bool> options;
 std::map<possibleParameters, bool> parameters;
 
 
 // values getopt_long() should return for long options that have no short
 // version. Start with some value that cannot be the value of a char.
-#define GETOPTLONG_MATCH  256
+#define GETOPTLONG_MATCH1  256
+#define GETOPTLONG_MATCH2  255
 
 // long options
 static struct option longopts[] =
@@ -99,7 +84,8 @@ static struct option longopts[] =
   { "BDD",             required_argument, NULL, 'b' },
   { "OnTheFly",        required_argument, NULL, 'B' },
   { "exchangeability", no_argument,       NULL, 'x' },
-  { "match",           required_argument, NULL, GETOPTLONG_MATCH },
+  { "match",           required_argument, NULL, GETOPTLONG_MATCH1 },
+  { "constraint",      required_argument, NULL, GETOPTLONG_MATCH2 },
   { NULL,              0,                 NULL, 0   }
 };
 
@@ -173,6 +159,9 @@ void print_help() {
   trace("                                 method (see option -b)\n");
   trace(" --match=<OG filename> ......... check if given oWFN (-n) matches with\n");
   trace("                                 operating guideline given in <OG filename>\n");
+  trace(" --constraint=<filename> ....... change a given OG (for the net specified with -n)\n");
+  trace("                                 that it resprects the constraint automaton given in <filename>\n");
+  trace("                                 syntax: -n net.owfn --constraint==constraintfile.og\n)");
   trace("\n");
   trace("\n");
   trace("For more information see:\n");
@@ -233,6 +222,7 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_OTF] = false;
     options[O_EX] = false;
     options[O_MATCH] = false;
+    options[O_CONSTRAINT] = false;
 
     options[O_MESSAGES_MAX] = false;
     options[O_EVENT_USE_MAX] = true;
@@ -397,12 +387,23 @@ void parse_command_line(int argc, char* argv[]) {
                 parameters[P_IG] = false;
                 parameters[P_OG] = false;
                 break;
-            case GETOPTLONG_MATCH:
+            case GETOPTLONG_MATCH1:
                 if (optarg) {
                     options[O_MATCH] = true;
                     ogfile = optarg;
                 } else {
                     cerr << "Error:\tOG file name missing" << endl
+                         << "\tEnter \"fiona --help\" for more information."
+                         << endl;
+                    exit(1);
+                }
+                break;
+            case GETOPTLONG_MATCH2:
+                if (optarg) {
+                    options[O_CONSTRAINT] = true;
+                    constraintfile = optarg;
+                } else {
+                    cerr << "Error:\tconstraint file name missing" << endl
                          << "\tEnter \"fiona --help\" for more information."
                          << endl;
                     exit(1);

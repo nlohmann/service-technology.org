@@ -1,4 +1,4 @@
-BEGIN OF INSTALL file for BPEL2oWFN Version 2.0
+BEGIN OF INSTALL file for BPEL2oWFN Version 2.0.0
 
 Setup and Installation
 **********************
@@ -15,11 +15,11 @@ simply follow these steps:
 
   1. Unpack the source tarball by entering(1)
 
-          gunzip bpel2owfn-2.0.tar.gz
-          tar xf bpel2owfn-2.0.tar
+          gunzip bpel2owfn-2.0.0.tar.gz
+          tar xf bpel2owfn-2.0.0.tar
 
   2. Enter that directory:
-          cd bpel2owfn-2.0
+          cd bpel2owfn-2.0.0
 
   3. Run the configure shell script which attempts to guess correct
      values for various system-dependent variables used during
@@ -36,7 +36,6 @@ simply follow these steps:
           checking for gawk... gawk
           checking whether make sets $(MAKE)... yes
           checking build system type... i686-pc-cygwin
-          checking for style of include used by make... GNU
           checking for g++... g++
           checking for C++ compiler default output file name... a.exe
           checking whether the C++ compiler works... yes
@@ -45,18 +44,13 @@ simply follow these steps:
           checking for suffix of object files... o
           checking whether we are using the GNU C++ compiler... yes
           checking whether g++ accepts -g... yes
+          checking for style of include used by make... GNU
           checking dependency style of g++... gcc3
-          checking for inline... inline
-          checking whether we are using the GNU C++ compiler... (cached) yes
-          checking whether g++ accepts -g... (cached) yes
-          checking dependency style of g++... (cached) gcc3
           checking for gcc... gcc
           checking whether we are using the GNU C compiler... yes
           checking whether gcc accepts -g... yes
           checking for gcc option to accept ISO C89... none needed
           checking dependency style of gcc... gcc3
-          checking whether make sets $(MAKE)... (cached) yes
-          checking for a BSD-compatible install... /usr/bin/install -c
           checking how to run the C++ preprocessor... g++ -E
           checking for grep that handles long lines and -e... /usr/bin/grep
           checking for egrep... /usr/bin/grep -E
@@ -70,40 +64,14 @@ simply follow these steps:
           checking for inttypes.h... yes
           checking for stdint.h... yes
           checking for unistd.h... yes
-          checking for size_t... yes
-          checking for ANSI C header files... (cached) yes
           checking assert.h usability... yes
           checking assert.h presence... yes
           checking for assert.h... yes
-          checking libintl.h usability... yes
-          checking libintl.h presence... yes
-          checking for libintl.h... yes
-          checking malloc.h usability... yes
-          checking malloc.h presence... yes
-          checking for malloc.h... yes
-          checking for stdlib.h... (cached) yes
-          checking for string.h... (cached) yes
-          checking for strings.h... (cached) yes
-          checking for unistd.h... (cached) yes
-          checking stddef.h usability... yes
-          checking stddef.h presence... yes
-          checking for stddef.h... yes
           checking for pow... yes
-          checking for stdlib.h... (cached) yes
-          checking for GNU libc compatible realloc... yes
-          checking for stdbool.h that conforms to C99... yes
-          checking for _Bool... no
-          checking for an ANSI C-conforming const... yes
-          checking for error_at_line... no
-          checking for stdlib.h... (cached) yes
-          checking for GNU libc compatible malloc... yes
-          checking for working alloca.h... yes
-          checking for alloca... yes
-          checking for memset... yes
           checking for bison... bison -y
           checking for flex... flex
-          checking for yywrap in -lfl... yes
           checking lex output file root... lex.yy
+          checking lex library... none needed
           checking whether yytext is a pointer... no
           checking for kc++... kc++
           checking for dot... dot
@@ -147,7 +115,7 @@ Installation
 
 After successful compilation and self tests an executable file
 `bpel2owfn' (or `bpel2owfn.exe' on systems running Microsoft Windows)
-is created in the directory `bpel2owfn-2.0/src' of the distribution.
+is created in the directory `bpel2owfn-2.0.0/src' of the distribution.
 This file has no dependencies to other files of the distribution and
 can be copied to any directory.
 
@@ -184,7 +152,7 @@ and Sun Solaris. Anyway, if the compilation fails please make sure you
 use the most recent (stable) versions of the GNU Compiler Collection.
 If this does not help please send us an electronic mail to
 <bug-bpel2owfn@gnu.org>. Include the version number of your
-distribution (version 2.0 of 30 December 2006). Also include in your
+distribution (version 2.0.0 of 22 March 2007). Also include in your
 message the output that the make process produced. We will try to
 answer your mail within a week.
 
@@ -201,7 +169,7 @@ The generated Makefiles serve different targets:
 `all'
      Compile GNU BPEL2oWFN and create an executable binary `bpel2owfn'
      (or `bpel2owfn.exe' on systems running Microsoft Windows) in the
-     directory `bpel2owfn-2.0/src'.
+     directory `bpel2owfn-2.0.0/src'.
 
 `dvi'
 `html'
@@ -209,7 +177,7 @@ The generated Makefiles serve different targets:
 `ps'
      Generate documentation files in the given format which can be DVI,
      HTML, PDF or PostScript. The documentation is generated in the
-     directory `bpel2owfn-2.0/doc' and is named `bpel2owfn.FORMAT'
+     directory `bpel2owfn-2.0.0/doc' and is named `bpel2owfn.FORMAT'
      (User's Manual).
 
 `clean'
@@ -299,16 +267,16 @@ dot is not found on your system, GNU BPEL2oWFN will only create a
 Reference System
 ================
 
-As of December 2006, we use the following system developing and
-building GNU BPEL2oWFN:
+As of March 2007, we use the following system developing and building
+GNU BPEL2oWFN:
 
    * Intel Pentium M processor, 1.60 GHz
 
    * 2 GB RAM
 
-   * Microsoft Windows XP Home Edition Service Pack 2
+   * Microsoft Windows Vista Business
 
-   * Cygwin with cygwin.dll version 1.5.23-2
+   * Cygwin with cygwin.dll version 1.5.24-2
 
    * GNU Compiler Collection 3.4.4 (cygming special, gdc 0.12, using
      dmd 0.125)
@@ -317,7 +285,7 @@ building GNU BPEL2oWFN:
 
    * GNU Bison version 2.3
 
-   * Kimwitu++ version 2.3.8
+   * Kimwitu++ version 2.3.10
 
 The version numbers are not to be understood as system requirements,
 but as a help if you fail to compile the sources.
@@ -334,4 +302,4 @@ Copyright (C) 2005, 2006, 2007 Niels Lohmann
 See `http://www.gnu.org/software/bpel2owfn' or the User's Manual for
 more information.
 
-END OF INSTALL file for BPEL2oWFN Version 2.0
+END OF INSTALL file for BPEL2oWFN Version 2.0.0

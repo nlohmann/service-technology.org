@@ -30,14 +30,14 @@
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/25 10:19:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  *
  * \todo    
  *          - commandline option to control drawing of clusters 
@@ -227,7 +227,7 @@ void cfgDot(CFGBlock * block)
 {
   (*output) << "digraph{" << endl;
   (*output) << "  graph ["
-            << " label=\"CFG generated from '" << filename <<"'\" ]; " << endl;
+            << " label=\"CFG generated from '" << globals::filename <<"'\" ]; " << endl;
   (*output) << "  node [ fontsize=10 shape=box fontname=Helvetica ]; " << endl;
   (*output) << "  edge [ fontsize=10 ]; " << endl << endl;
 
@@ -857,21 +857,21 @@ void processCFG()
 
   if (formats[F_DOT])
   {
-    if (output_filename != "")
-      output = openOutput(output_filename + ".cfg." + suffixes[F_DOT]);
+    if (globals::output_filename != "")
+      output = openOutput(globals::output_filename + ".cfg." + suffixes[F_DOT]);
     
     trace(TRACE_INFORMATION, "-> Printing CFG in dot ...\n");
     
     // output CFG;
     cfgDot(CFG);
     
-    if (output_filename != "")
+    if (globals::output_filename != "")
     {
       closeOutput(output);
       output = NULL;
 
 #ifdef HAVE_DOT
-      string systemcall = "dot -q -Tpng -o" + output_filename + ".cfg.png " + output_filename + ".cfg." + suffixes[F_DOT];
+      string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".cfg.png " + globals::output_filename + ".cfg." + suffixes[F_DOT];
       trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
       trace(TRACE_INFORMATION, systemcall + "\n\n");
       system(systemcall.c_str());

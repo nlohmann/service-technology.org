@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/25 10:19:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  */
 
 
@@ -51,6 +51,7 @@
 #include "ast-config.h"
 #include "ast-details.h"
 #include "cfg.h"
+#include "options.h"
 
 using std::set;
 using std::string;
@@ -70,6 +71,11 @@ using std::map;
     unsigned int variables;
     unsigned int links;
   };
+
+
+
+
+
 
 
 /// namespace for global variables
@@ -124,6 +130,15 @@ namespace globals {
 
 extern string invocation;
 extern string program_name;
+
+
+
+extern string filename;
+extern string output_filename;
+
+/// parameters (set by #parse_command_line)
+extern map<possibleParameters, bool> parameters;
+
 
 }
 

@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/21 16:57:56 $ by $Author: nielslohmann $.
-# Version $Revision: 1.70 $
+# File last changed $Date: 2007/03/25 10:19:37 $ by $Author: nielslohmann $.
+# Version $Revision: 1.71 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -101,7 +101,7 @@ bpel2owfn_SOURCES = $(KCSOURCES)\
 		    getopt.h getopt.c getopt1.c\
 		    ast-tools.cc ast-tools.h\
 		    ast-details.cc ast-details.h \
-		    petrinet.h petrinet.cc \
+		    pnapi.h petrinet.h petrinet.cc \
 		    petrinet-output.cc petrinet-reduction.cc
 
 # These sources have to be present before the rest is compiled.
@@ -128,3 +128,6 @@ MAINTAINERCLEANFILES = $(KCSOURCES) \
 		       $(KCDUMMY) \
 		       frontend-parser.h frontend-parser.cc frontend-lexer.cc \
 		       Doxyfile
+
+veryclean: clean
+	-rm $(KCSOURCES) $(KCDUMMY) frontend-parser.cc frontend-lexer.cc

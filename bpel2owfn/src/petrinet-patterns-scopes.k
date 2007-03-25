@@ -31,7 +31,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/03/21 11:48:09 $
+ * \date    \$Date: 2007/03/25 10:19:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  */
 %}
 
@@ -152,7 +152,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 
         // Create places for the variables and connect them with the
         // initializing transition.
-        if ( parameters[P_VARIABLES] )
+        if ( globals::parameters[P_VARIABLES] )
         {
           for ( set<string>::iterator variable = globals::ASTE_variableNames.begin(); variable != globals::ASTE_variableNames.end(); variable++ )
           {
@@ -622,7 +622,7 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 /*
 	// now comes everything we need for compensation in loops
 	assert(globals::ASTEmap[phylum->id] != NULL);
-	if (globals::ASTEmap[phylum->id]->ancestorLoops().size() != 0 && parameters[P_LOOPCOUNT])
+	if (globals::ASTEmap[phylum->id]->ancestorLoops().size() != 0 && globals::parameters[P_LOOPCOUNT])
 	{
 	  // rename existing places
 	  PN.renamePlace(prefix + "final", prefix + "final1");

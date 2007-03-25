@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/21 17:00:00 $
+ * \date    \$Date: 2007/03/25 10:19:37 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.150 $
+ * \version \$Revision: 1.151 $
  */
 
 
@@ -137,14 +137,14 @@ int main( int argc, char *argv[])
   {
     if (inputfiles.size() >= 1)
     {
-      filename = *file;
-      if (!(frontend_in = fopen(filename.c_str(), "r"))) {
-		cerr << "Could not open file for reading: " << filename.c_str() << endl;
+      globals::filename = *file;
+      if (!(frontend_in = fopen(globals::filename.c_str(), "r"))) {
+		cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
 		exit(1);
 	    }
     }
 
-    trace(TRACE_INFORMATION, "Parsing " + filename + " ...\n");
+    trace(TRACE_INFORMATION, "Parsing " + globals::filename + " ...\n");
 
     // invoke Bison parser
     int error = frontend_parse();
@@ -153,9 +153,9 @@ int main( int argc, char *argv[])
     {
       trace(TRACE_INFORMATION, "Parsing complete.\n");
 
-      if ( filename != "<STDIN>" && frontend_in != NULL)
+      if ( globals::filename != "<STDIN>" && frontend_in != NULL)
       {
-	trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
+	trace(TRACE_INFORMATION," + Closing input file: " + globals::filename + "\n");
 	fclose(frontend_in);
       }
 
@@ -190,12 +190,12 @@ int main( int argc, char *argv[])
 	trace(TRACE_INFORMATION, "-> Printing AST ...\n");
 	if (formats[F_DOT])
 	{
-	  string dot_filename = output_filename + "." + suffixes[F_DOT];
+	  string dot_filename = globals::output_filename + "." + suffixes[F_DOT];
 	  FILE *dotfile = fopen(dot_filename.c_str(), "w+");
 	  globals::AST->fprintdot(dotfile, "", "", "", true, true, true);
 	  fclose(dotfile);
 #ifdef HAVE_DOT
-  	  string systemcall = "dot -q -Tpng -o" + output_filename + ".png " + output_filename + "." + suffixes[F_DOT];
+  	  string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".png " + globals::output_filename + "." + suffixes[F_DOT];
   	  trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
   	  trace(TRACE_INFORMATION, systemcall + "\n\n");
   	  system(systemcall.c_str());
@@ -209,13 +209,13 @@ int main( int argc, char *argv[])
       {
         if (formats[F_XML])
         {
-          if (output_filename != "")
+          if (globals::output_filename != "")
           {
-            output = openOutput(output_filename + "." + suffixes[F_XML]);
+            output = openOutput(globals::output_filename + "." + suffixes[F_XML]);
           }
           trace(TRACE_INFORMATION, "-> Printing \"pretty\" XML ...\n");
           globals::AST->unparse(kc::printer, kc::xml);
-          if (output_filename != "")
+          if (globals::output_filename != "")
           {
             closeOutput(output);
 	    output = NULL;
@@ -234,7 +234,7 @@ int main( int argc, char *argv[])
 	trace(TRACE_INFORMATION, "-> Unparsing AST to Petri net ...\n");
 
 	// choose Petri net patterns
-	if (parameters[P_COMMUNICATIONONLY] == true)
+	if (globals::parameters[P_COMMUNICATIONONLY] == true)
 	  globals::AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
 	else
 	  globals::AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
@@ -253,7 +253,7 @@ int main( int argc, char *argv[])
 	  }
 
 	  // apply structural reduction rules?
-	  if (parameters[P_REDUCE])
+	  if (globals::parameters[P_REDUCE])
 	  {
 	    trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
 	    PN.reduce();
@@ -288,7 +288,7 @@ int main( int argc, char *argv[])
   if (modus == M_PETRINET || modus == M_CONSISTENCY)
   {
     // apply structural reduction rules?
-    if ( parameters[P_REDUCE] )
+    if ( globals::parameters[P_REDUCE] )
     {
       trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
       PN.reduce();
@@ -305,14 +305,14 @@ int main( int argc, char *argv[])
     // create oWFN output ?
     if (formats[F_OWFN])
     {
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
-	output = openOutput(output_filename + "." + suffixes[F_OWFN]);
+	output = openOutput(globals::output_filename + "." + suffixes[F_OWFN]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
       PN.set_format(FORMAT_OWFN);
       (*output) << PN;
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
 	closeOutput(output);
 	output = NULL;
@@ -323,9 +323,9 @@ int main( int argc, char *argv[])
     // create LoLA output ?
     if ( formats[F_LOLA] )
     {
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
-	output = openOutput(output_filename + "." + suffixes[F_LOLA]);
+	output = openOutput(globals::output_filename + "." + suffixes[F_LOLA]);
       }
       if (modus == M_CONSISTENCY)
       {
@@ -334,7 +334,7 @@ int main( int argc, char *argv[])
       trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
       PN.set_format(FORMAT_LOLA);
       (*output) << PN;
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
 	closeOutput(output);
 	output = NULL;
@@ -342,9 +342,9 @@ int main( int argc, char *argv[])
 
       if (modus == M_CONSISTENCY || modus == M_PETRINET)
       {
-	if (output_filename != "")
+	if (globals::output_filename != "")
 	{
-	  output = openOutput(output_filename + ".task");
+	  output = openOutput(globals::output_filename + ".task");
 	}
 	string comment = "{ AG EF (";
 	string formula = "FORMULA\n  ALLPATH ALWAYS EXPATH EVENTUALLY (";
@@ -361,7 +361,7 @@ int main( int argc, char *argv[])
 	formula += ")";
 	(*output) << comment << endl << endl;
 	(*output) << formula << endl << endl;
-	if (output_filename != "")
+	if (globals::output_filename != "")
 	{
 	  closeOutput(output);
 	  output = NULL;
@@ -373,14 +373,14 @@ int main( int argc, char *argv[])
     // create PNML output ?
     if ( formats[F_PNML] )
     {
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
-	output = openOutput(output_filename + "." + suffixes[F_PNML]);
+	output = openOutput(globals::output_filename + "." + suffixes[F_PNML]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for PNML ...\n");
       PN.set_format(FORMAT_PNML);
       (*output) << PN;
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
 	closeOutput(output);
 	output = NULL;
@@ -391,14 +391,14 @@ int main( int argc, char *argv[])
     // create PEP output ?
     if ( formats[F_PEP] )
     {
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
-	output = openOutput(output_filename + "." + suffixes[F_PEP]);
+	output = openOutput(globals::output_filename + "." + suffixes[F_PEP]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for PEP ...\n");
       PN.set_format(FORMAT_PEP);
       (*output) << PN;
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
 	closeOutput(output);
 	output = NULL;
@@ -409,14 +409,14 @@ int main( int argc, char *argv[])
     // create INA output ?
     if ( formats[F_INA] )
     {
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
-	output = openOutput(output_filename + "." + suffixes[F_INA]);
+	output = openOutput(globals::output_filename + "." + suffixes[F_INA]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for INA ...\n");
       PN.set_format(FORMAT_INA);
       (*output) << PN;
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
 	closeOutput(output);
 	output = NULL;
@@ -426,14 +426,14 @@ int main( int argc, char *argv[])
     // create SPIN output ?
     if ( formats[F_SPIN] )
     {
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
-	output = openOutput(output_filename + "." + suffixes[F_SPIN]);
+	output = openOutput(globals::output_filename + "." + suffixes[F_SPIN]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for SPIN ...\n");
       PN.set_format(FORMAT_SPIN);
       (*output) << PN;
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
 	closeOutput(output);
 	output = NULL;
@@ -443,14 +443,14 @@ int main( int argc, char *argv[])
     // create APNN output ?
     if ( formats[F_APNN] )
     {
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
-	output = openOutput(output_filename + "." + suffixes[F_APNN]);
+	output = openOutput(globals::output_filename + "." + suffixes[F_APNN]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for APNN ...\n");
       PN.set_format(FORMAT_APNN);
       (*output) << PN;
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
 	closeOutput(output);
 	output = NULL;
@@ -461,20 +461,20 @@ int main( int argc, char *argv[])
     // create dot output ?
     if ( formats[F_DOT] )
     {
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
-	output = openOutput(output_filename + "." + suffixes[F_DOT]);
+	output = openOutput(globals::output_filename + "." + suffixes[F_DOT]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for dot ...\n");
       PN.set_format(FORMAT_DOT);
       (*output) << PN;
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
 	closeOutput(output);
 	output = NULL;
 
 #ifdef HAVE_DOT
-	string systemcall = "dot -q -Tpng -o" + output_filename + ".png " + output_filename + "." + suffixes[F_DOT];
+	string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".png " + globals::output_filename + "." + suffixes[F_DOT];
 	trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
 	trace(TRACE_INFORMATION, systemcall + "\n\n");
 	system(systemcall.c_str());
@@ -486,14 +486,14 @@ int main( int argc, char *argv[])
     // create info file ?
     if ( formats[F_INFO] )
     {
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
-	output = openOutput(output_filename + "." + suffixes[F_INFO]);
+	output = openOutput(globals::output_filename + "." + suffixes[F_INFO]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net information ...\n");
       PN.set_format(FORMAT_INFO);
       (*output) << PN;
-      if (output_filename != "")
+      if (globals::output_filename != "")
       {
 	closeOutput(output);
 	output = NULL;

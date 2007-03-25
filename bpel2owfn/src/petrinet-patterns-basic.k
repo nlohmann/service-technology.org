@@ -46,7 +46,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/18 21:23:07 $
+ * \date    \$Date: 2007/03/25 10:19:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -56,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  */
 %}
 
@@ -75,7 +75,6 @@
 #include "helpers.h"
 #include "ast-tools.h"
 #include "ast-details.h"
-#include "options.h"
 #include "globals.h"
 #include "petrinet-patterns-shortcuts.h"
 
@@ -533,20 +532,20 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 	    Transition *t1 = PN.newTransition(newPrefix + "t1");
 	    PN.newArc(lastPlace, t1);
 	    PN.newArc(t1, p2);
-            if (parameters[P_VARIABLES])
+            if (globals::parameters[P_VARIABLES])
 	      PN.newArc(PN.findPlace("variable." + globals::ASTEmap[from->id]->variableName), t1, READ);
 
 	    Transition *t2 = PN.newTransition(newPrefix + "t2");
 	    PN.newArc(p2, t2);
 	    PN.newArc(t2, p8);
-	    if (parameters[P_VARIABLES])
+	    if (globals::parameters[P_VARIABLES])
 	    {
 	      PN.newArc(PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName), t2);
 	      PN.newArc(t2, PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName));
 	    }
 
 	    // Transitions for the negative control flow.
-	    if (parameters[P_STANDARDFAULTS])
+	    if (globals::parameters[P_STANDARDFAULTS])
 	      Transition *t3 = throwFault(p2, p4, "running", newPrefix,
                                  mkinteger(phylum->id), globals::ASTEmap[phylum->id]->controlFlow);
 	    
@@ -562,14 +561,14 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 	    Transition *t2 = PN.newTransition(newPrefix + "t2");
 	    PN.newArc(lastPlace, t2);
 	    PN.newArc(t2, p8);
-	    if (parameters[P_VARIABLES])
+	    if (globals::parameters[P_VARIABLES])
 	    {
 	      PN.newArc(PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName), t2);
 	      PN.newArc(t2, PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName));
 	    }
 
 	    // Transitions for the negative control flow.
-	    if (parameters[P_STANDARDFAULTS])
+	    if (globals::parameters[P_STANDARDFAULTS])
 	      Transition *t3 = throwFault(lastPlace, p4, "initial", newPrefix,
                                  mkinteger(phylum->id), globals::ASTEmap[phylum->id]->controlFlow);
 
@@ -661,7 +660,7 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 	PN.newArc(t2, p3);
 
 	// Transitions for the negative control flow.
-	if (parameters[P_STANDARDFAULTS])
+	if (globals::parameters[P_STANDARDFAULTS])
         {
 	  Transition *t3 = throwFault(p2, p6, "running", prefix,
                                       mkinteger(phylum->id),

@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/03/21 17:00:00 $
+ * \date    \$Date: 2007/03/25 10:19:37 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.189 $
+ * \version \$Revision: 1.190 $
  *
  * \ingroup petrinet
  */
@@ -55,18 +55,7 @@
 
 #include "petrinet.h"
 #include "helpers.h"		// helper functions (setUnion, setDifference, max, toString)
-#include "bpel2owfn.h"
-
-#ifdef USING_BPEL2OWFN
-#include "ast-details.h"	// (class ASTE)
-#include "globals.h"
-#else
-#warning "using Petri Net API outside BPEL2oWFN"
-class ASTE; 			// forward declaration of class ASTE
-#ifndef PACKAGE_STRING
-#define PACKAGE_STRING "Petri Net API"
-#endif
-#endif
+#include "pnapi.h"
 
 
 

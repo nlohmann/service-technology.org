@@ -1,4 +1,4 @@
-BEGIN OF ChangeLog file for BPEL2oWFN Version 2.0
+BEGIN OF ChangeLog file for BPEL2oWFN Version 2.0.0
 
 Change Log
 **********
@@ -125,4 +125,4 @@ Copyright (C) 2005, 2006, 2007 Niels Lohmann
 See `http://www.gnu.org/software/bpel2owfn' or the User's Manual for
 more information.
 
-END OF ChangeLog file for BPEL2oWFN Version 2.0
+END OF ChangeLog file for BPEL2oWFN Version 2.0.0

@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/25 10:19:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  *
  * \ingroup debug
  */
@@ -182,7 +182,7 @@ int frontend_error(const char *msg)
   extern int frontend_lineno;      // line number of current token
   extern char *frontend_text;      // text of the current token
 
-  cerr << filename << ":" << frontend_lineno+1 << " - " << string(msg) <<
+  cerr << globals::filename << ":" << frontend_lineno+1 << " - " << string(msg) <<
     "; last token read: `" << string(frontend_text) << "'" << endl;
 
   return 1;
@@ -207,7 +207,7 @@ int frontend_error(const char *msg)
  */
 void SAerror(unsigned int code, string information, int lineNumber)
 {
-  cerr << filename;
+  cerr << globals::filename;
   if (lineNumber != 0)
    cerr << ":" << lineNumber;
   cerr << " - [SA";
@@ -430,7 +430,7 @@ void SAerror(unsigned int code, string information, string lineNumber)
  */
 void error()
 {
-  trace("\nAn error has occured while parsing \"" + filename + "\"!\n\n");
+  trace("\nAn error has occured while parsing \"" + globals::filename + "\"!\n\n");
   trace(TRACE_WARNINGS, "-> Any output file might be in an undefinded state.\n");
 
   cleanup();
@@ -463,15 +463,15 @@ void cleanup()
 {
   trace(TRACE_INFORMATION,"Cleaning up ...\n");
 
-  if ( filename != "<STDIN>" && frontend_in != NULL)
+  if ( globals::filename != "<STDIN>" && frontend_in != NULL)
   {
-    trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
+    trace(TRACE_INFORMATION," + Closing input file: " + globals::filename + "\n");
     fclose(frontend_in);
   }
  
   if ( output != &cout && output != &clog && output != log_output && output != NULL )
   {
-    trace(TRACE_INFORMATION," + Closing output file: " + output_filename + ".X\n");
+    trace(TRACE_INFORMATION," + Closing output file: " + globals::output_filename + ".X\n");
     (*output) << flush;
     (static_cast<ofstream*>(output))->close();
     delete(output);

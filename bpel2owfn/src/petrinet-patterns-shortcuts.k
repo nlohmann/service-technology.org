@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/18 21:23:07 $
+ * \date    \$Date: 2007/03/25 10:19:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
 */
 %}
 
@@ -63,7 +63,6 @@
 #include <cmath>
 
 #include "ast-details.h"
-#include "options.h"
 #include "globals.h"
 #include "petrinet.h"
 
@@ -125,7 +124,7 @@ Transition *throwFault(Place *p1, Place *p2,
 
 
   // no fault transitions in case of "communicationonly" parameter
-  if (parameters[P_COMMUNICATIONONLY])
+  if (globals::parameters[P_COMMUNICATIONONLY])
     return NULL;
 
 
@@ -241,7 +240,7 @@ Transition *stop(Place *p, string p_name, string prefix)
   assert(p != NULL);
 
   // no stop transitions in case of "nano" parameter
-  if (parameters[P_COMMUNICATIONONLY])
+  if (globals::parameters[P_COMMUNICATIONONLY])
     return NULL;
   
   Transition *stopTransition = PN.newTransition(prefix + "stopped." + p_name);
@@ -342,7 +341,7 @@ void receivingTransition(string name, Place *prePlace, Place *postPlace,
   PN.newArc(p1, t2);
   PN.newArc(t2, p2);
 
-  if (parameters[P_VARIABLES])
+  if (globals::parameters[P_VARIABLES])
   {
     string varName = "variable." + globals::ASTEmap[id->value]->variableName;
     if ( name == "invoke_in" )
@@ -360,7 +359,7 @@ void receivingTransition(string name, Place *prePlace, Place *postPlace,
   Transition *t4 = stop(p1, name + ".buffer", prefix);
   Transition *t5 = stop(p2, name + ".received", prefix);
 
-  if (parameters[P_STANDARDFAULTS])
+  if (globals::parameters[P_STANDARDFAULTS])
   {
     Transition *t6 = throwFault(p1, faultPlace, "buffer", newPrefix, id, globals::ASTEmap[id->value]->controlFlow, preventFurtherFaults);
     Transition *t7 = throwFault(p2, faultPlace, "received", newPrefix, id, globals::ASTEmap[id->value]->controlFlow, preventFurtherFaults);
@@ -412,7 +411,7 @@ void sendingTransition(string name, Place *prePlace, Place *postPlace,
   PN.newArc(prePlace, t1);
   PN.newArc(t1, p1);
 
-  if (parameters[P_VARIABLES])
+  if (globals::parameters[P_VARIABLES])
   {
     string varName = "variable." + globals::ASTEmap[id->value]->variableName;
     if ( name == "invoke" || name == "invoke_out" )
@@ -435,7 +434,7 @@ void sendingTransition(string name, Place *prePlace, Place *postPlace,
   Transition *t4 = stop(p1, name + ".buffer", prefix);
   Transition *t5 = stop(p2, name + ".sent", prefix);
 
-  if (parameters[P_STANDARDFAULTS])
+  if (globals::parameters[P_STANDARDFAULTS])
   {
     Transition *t6 = throwFault(p1, faultPlace, "buffer", newPrefix, id, globals::ASTEmap[id->value]->controlFlow, preventFurtherFaults);
     Transition *t7 = throwFault(p2, faultPlace, "sent", newPrefix, id, globals::ASTEmap[id->value]->controlFlow, preventFurtherFaults);
@@ -480,7 +479,7 @@ void P_transitionCondition(string prefix, tSource_list source_links)
    * case 1: use XOR for the links (outgoing links are set to true mutually
    *         exclusive, i.e. "1 out of n")
    */
-  if (parameters[P_XOR] && (source_links->length() > 1))
+  if (globals::parameters[P_XOR] && (source_links->length() > 1))
   {
     // Traverse the source links.
     foreach (source; tSource_list source_links)

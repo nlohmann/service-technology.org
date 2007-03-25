@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/25 10:19:37 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  */
 
 
@@ -75,14 +75,8 @@ using std::ofstream;
  * Data structures
  *****************************************************************************/
 
-/// filename of input file
-string filename = "<STDIN>";
-
 /// list of input files
 list<string> inputfiles;
-
-/// filename of output file
-string output_filename = "";
 
 /// pointer to input stream
 istream *input = &cin;
@@ -104,9 +98,6 @@ possibleModi modus;
 
 /// options (set by #parse_command_line)
 map<possibleOptions, bool> options;
-
-/// parameters (set by #parse_command_line)
-map<possibleParameters, bool> parameters;
 
 /// output file formats (set by #parse_command_line)
 map<possibleFormats, bool> formats;
@@ -335,8 +326,8 @@ void parse_command_line(int argc, char* argv[])
       case 'i':
               {
 		options[O_INPUT] = true;
-		filename = string(optarg);
-		inputfiles.push_back(filename);
+		globals::filename = string(optarg);
+		inputfiles.push_back(globals::filename);
 		break;
 	      }
 
@@ -351,7 +342,7 @@ void parse_command_line(int argc, char* argv[])
 		options[O_OUTPUT] = true;
 
 		if (optarg != NULL)
-		  output_filename = string(optarg);
+		  globals::output_filename = string(optarg);
 
 		break;
 	      }
@@ -399,23 +390,21 @@ void parse_command_line(int argc, char* argv[])
 		parameter = string(optarg);
 
 		if ( parameter == "reduce")
-		  parameters[P_REDUCE] = true;
+		  globals::parameters[P_REDUCE] = true;
 		else if (parameter == "communicationonly")
-		  parameters[P_COMMUNICATIONONLY] = true;
+		  globals::parameters[P_COMMUNICATIONONLY] = true;
 		else if (parameter == "standardfaults")
-		  parameters[P_STANDARDFAULTS] = true;
+		  globals::parameters[P_STANDARDFAULTS] = true;
 		else if (parameter == "fhfaults")
-		  parameters[P_FHFAULTS] = true;
+		  globals::parameters[P_FHFAULTS] = true;
 		else if (parameter == "variables")
-		  parameters[P_VARIABLES] = true;
-//		else if (parameter == "tred")
-//		  parameters[P_TRED] = true;
+		  globals::parameters[P_VARIABLES] = true;
 		else if (parameter == "xor")
-		  parameters[P_XOR] = true;
+		  globals::parameters[P_XOR] = true;
 		else if (parameter == "loopcount")
-		  parameters[P_LOOPCOUNT] = true;
+		  globals::parameters[P_LOOPCOUNT] = true;
 		else if (parameter == "loopcontrol")
-		  parameters[P_LOOPCONTROL] = true;
+		  globals::parameters[P_LOOPCONTROL] = true;
 		else {
 		  trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
 		  trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");
@@ -519,12 +508,12 @@ void parse_command_line(int argc, char* argv[])
   }
 
   // set output file name if non is already chosen
-  if ((options[O_OUTPUT] || options[O_LOG]) && (output_filename == ""))
+  if ((options[O_OUTPUT] || options[O_LOG]) && (globals::output_filename == ""))
   {
     // set output file name to a standard output filename in case of no inputfiles
     if ( not(options[O_INPUT]) )
     {
-	  output_filename = "stdof"; 
+	  globals::output_filename = "stdof"; 
       trace(TRACE_ALWAYS, "Output filename set to standard: stdof\n");
     } 
     else 
@@ -533,7 +522,7 @@ void parse_command_line(int argc, char* argv[])
       unsigned int pos = file->rfind(".bpel", file->length());
       if (pos == (file->length() - 5))
       {
-        output_filename = file->substr(0, pos);
+        globals::output_filename = file->substr(0, pos);
       }
       file++;
       while(modus == M_CONSISTENCY && file != inputfiles.end())
@@ -542,7 +531,7 @@ void parse_command_line(int argc, char* argv[])
         unsigned int pos2 = file->rfind("/", file->length());
         if (pos == (file->length() - 5))
         {
-	      output_filename += "_" + file->substr(pos2 + 1, pos - pos2 - 1);
+	      globals::output_filename += "_" + file->substr(pos2 + 1, pos - pos2 - 1);
         }
         file++;
       }
@@ -554,7 +543,7 @@ void parse_command_line(int argc, char* argv[])
   {
     if (log_filename == "")
     {
-      log_filename = output_filename + ".log";
+      log_filename = globals::output_filename + ".log";
     }
     log_output = openOutput(log_filename);
   }
@@ -606,11 +595,11 @@ void parse_command_line(int argc, char* argv[])
 
   if (options[O_INPUT])
   {
-    trace(TRACE_INFORMATION, " - input is read from \"" + filename + "\"\n");
+    trace(TRACE_INFORMATION, " - input is read from \"" + globals::filename + "\"\n");
   }
   if (options[O_OUTPUT])
   {
-    trace(TRACE_INFORMATION, " - output files will be named \"" + output_filename + ".X\"\n");
+    trace(TRACE_INFORMATION, " - output files will be named \"" + globals::output_filename + ".X\"\n");
   }
   for ( unsigned int i = 0; i < (sizeof(format) / sizeof(possibleFormats)); i++)
   {

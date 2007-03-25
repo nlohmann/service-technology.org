@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/25 10:19:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.82 $
+ * \version \$Revision: 1.83 $
  */
 
 
@@ -132,12 +132,10 @@ ASTE::~ASTE()
  */
 void ASTE::checkRequiredAttributes(string required[], unsigned int length)
 {
-  extern string filename;
-
   for (unsigned int i = 0; i < length; i++)
     if (attributes[required[i]] == "")
     {
-      cerr << filename << ":" << attributes["referenceLine"];
+      cerr << globals::filename << ":" << attributes["referenceLine"];
       cerr << " - attribute `" << required[i] << "' is required for <";
       cerr << activityTypeName() << ">" << endl;
     }
@@ -576,8 +574,6 @@ void ASTE::checkAttributes()
  */
 void ASTE::checkAttributeType(string attribute, attributeType type)
 {
-  extern string filename;
-
   switch (type)
   {
     case(T_BOOLEAN):
@@ -586,7 +582,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	    attributes[attribute] == "no")
 	  return;
 
-	cerr << filename << ":" << attributes["referenceLine"];
+	cerr << globals::filename << ":" << attributes["referenceLine"];
 	cerr << " - attribute `" << attribute << "' in <";
 	cerr << activityTypeName() << "> must be of type tBoolean" << endl;
 	
@@ -600,7 +596,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	    attributes[attribute] == "no")
 	  return;
 
-	cerr << filename << ":" << attributes["referenceLine"];
+	cerr << globals::filename << ":" << attributes["referenceLine"];
 	cerr << " - attribute `" << attribute << "' in <";
 	cerr << activityTypeName() << "> must be of type tInitiate" << endl;
 	
@@ -613,7 +609,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	    attributes[attribute] == "partnerRole")
 	  return;
 
-	cerr << filename << ":" << attributes["referenceLine"];
+	cerr << globals::filename << ":" << attributes["referenceLine"];
 	cerr << " - attribute `" << attribute << "' in <";
 	cerr << activityTypeName() << "> must be of type tRoles" << endl;
 	
@@ -628,7 +624,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	    attributes[attribute] == "request-response")
 	  return;
 
-	cerr << filename << ":" << attributes["referenceLine"];
+	cerr << globals::filename << ":" << attributes["referenceLine"];
 	cerr << " - attribute `" << attribute << "' in <";
 	cerr << activityTypeName() << "> must be of type tPattern" << endl;
 	
@@ -648,7 +644,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
       {
 	if (attributes[attribute] != "" && toUInt(attributes[attribute]) == UINT_MAX)
 	{
-	  cerr << filename << ":" << attributes["referenceLine"];
+	  cerr << globals::filename << ":" << attributes["referenceLine"];
 	  cerr << " - attribute `" << attribute << "' in <";
 	  cerr << activityTypeName() << "> must be of type unsigned integer" << endl;
 	}
@@ -893,8 +889,6 @@ string ASTE::definePartnerLink()
 
 string ASTE::checkVariable(string attributename)
 {
-  extern string filename;
-
   string variableName = attributes[attributename];
   if (variableName == "")
     return variableName;
@@ -907,7 +901,7 @@ string ASTE::checkVariable(string attributename)
       return (toString(*scope) + "." + variableName);
 
   // display an error message
-  cerr << filename << ":" << attributes["referenceLine"];
+  cerr << globals::filename << ":" << attributes["referenceLine"];
   cerr << " - <variable> `" << variableName << "' referenced as `" << attributename << "' in <";
   cerr << activityTypeName() << "> was not defined before" << endl;
 
@@ -961,8 +955,6 @@ string ASTE::checkLink()
  */
 string ASTE::checkPartnerLink()
 {
-  extern string filename;
-
   string partnerLinkName = attributes["partnerLink"];
   if (partnerLinkName == "")
     return partnerLinkName;
@@ -995,7 +987,7 @@ string ASTE::checkPartnerLink()
   }
 
   // display an error message
-  cerr << filename << ":" << attributes["referenceLine"];
+  cerr << globals::filename << ":" << attributes["referenceLine"];
   cerr << " - <partnerLink> `" << partnerLinkName << "' referenced in <";
   cerr << activityTypeName() << "> was not defined before" << endl;
 
@@ -1013,8 +1005,6 @@ string ASTE::checkPartnerLink()
  */
 string ASTE::checkCorrelationSet()
 {
-  extern string filename;
-
   string correlationSetName = attributes["set"];
   if (correlationSetName == "")
     return correlationSetName;
@@ -1036,7 +1026,7 @@ string ASTE::checkCorrelationSet()
   }
 
   // display an error message
-  cerr << filename << ":" << attributes["referenceLine"];
+  cerr << globals::filename << ":" << attributes["referenceLine"];
   cerr << " - <correlationSet> `" << correlationSetName << "' referenced in <";
   cerr << globals::ASTEmap[parentActivityId]->activityTypeName() << "> was not defined before" << endl;
 

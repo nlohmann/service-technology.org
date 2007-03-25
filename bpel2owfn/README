@@ -1,15 +1,18 @@
-BEGIN OF README file for GNU BPEL2oWFN Version 2.0
+BEGIN OF README file for GNU BPEL2oWFN Version 2.0.0
 
 About this Distribution
 ***********************
 
-This file describes this distribution of GNU BPEL2oWFN, version 2.0, a
-tool translating business processes described in BPEL to open workflow
-nets (oWFN), last updated 30 December 2006.
+This file describes this distribution of GNU BPEL2oWFN, version 2.0.0,
+a tool translating business processes described in BPEL to open
+workflow nets (oWFN), last updated 22 March 2007.
 
 GNU BPEL2oWFN is licensed under the GNU General Public License.
 
-Copyright (C) 2005, 2006 Niels Lohmann and Christian Gierds.
+Copyright (C) 2006, 2007 Niels Lohmann, Christian Gierds, and Martin
+Znamirowski.
+
+Copyright (C) 2005 Niels Lohmann and Christian Gierds.
 
 GNU BPEL2oWFN is part of the Tools4BPEL project funded by the
 Bundesministerium fu"r Bildung und Forschung. See
@@ -38,7 +41,7 @@ Files
      bootstrap GNU BPEL2oWFN.
 
 `NEWS'
-     News concerning GNU BPEL2oWFN.
+     News concerning the most recent version of GNU BPEL2oWFN.
 
 `README'
      This file.
@@ -79,4 +82,4 @@ Copyright (C) 2005, 2006, 2007 Niels Lohmann
 See `http://www.gnu.org/software/bpel2owfn' or the User's Manual for
 more information.
 
-END OF README file for GNU BPEL2oWFN Version 2.0
+END OF README file for GNU BPEL2oWFN Version 2.0.0

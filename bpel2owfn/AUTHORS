@@ -1,4 +1,4 @@
-BEGIN OF AUTHORS file for BPEL2oWFN Version 2.0
+BEGIN OF AUTHORS file for BPEL2oWFN Version 2.0.0
 
 Authors and Acknowledgements
 ****************************
@@ -12,11 +12,6 @@ GNU BPEL2oWFN was written by:
    * Christian Gierds, Humboldt-Universita"t zu Berlin
 
    * Martin Znamirowski, Humboldt-Universita"t zu Berlin
-
-The Petri net patterns were created by:
-   * Christian Stahl, Humboldt-Universita"t zu Berlin (BPEL4WS 1.1)
-
-   * Niels Lohmann, Humboldt-Universita"t zu Berlin (WS-BPEL 2.0)
 
 Acknowledgements
 ================
@@ -62,6 +57,9 @@ We would like to thank:
      for integrating BPEL2oWFN to the ProM framework and valuable
      comments on BPEL's link semantics
 
+   * Ernesto Santana-Diaz
+     for writing a Java-based GUI for BPEL2oWFN
+
    * Jan Martijn van der Werf, Technische Universiteit Eindhoven
      for his discussion about the PNML-oWFN format
 
@@ -102,4 +100,4 @@ Copyright (C) 2005, 2006, 2007 Niels Lohmann
 See `http://www.gnu.org/software/bpel2owfn' or the User's Manual for
 more information.
 
-END OF AUTHORS file for BPEL2oWFN Version 2.0
+END OF AUTHORS file for BPEL2oWFN Version 2.0.0

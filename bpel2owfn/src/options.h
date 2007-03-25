@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/04 13:40:41 $
+ * \date    \$Date: 2007/03/25 10:19:37 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  */
 
 
@@ -170,9 +170,7 @@ extern ostream *openOutput(string name);
 // from options.cc
 
 extern bool createOutputFile;
-extern string filename;
 extern list<string> inputfiles;
-extern string output_filename;
 extern string log_filename;
 extern istream *input;
 extern ostream *output;

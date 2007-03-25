@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/21 16:57:56 $ by $Author: nielslohmann $.
-# Version $Revision: 1.39 $
+# File last changed $Date: 2007/03/25 10:19:37 $ by $Author: nielslohmann $.
+# Version $Revision: 1.40 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
@@ -57,10 +57,6 @@ AC_FUNC_ALLOCA
 AC_HEADER_STDC
 
 AC_CHECK_HEADERS([libintl.h malloc.h stddef.h stdlib.h string.h strings.h unistd.h])
-
-
-# Preprocessor directive to share Petri net class
-AC_DEFINE(USING_BPEL2OWFN, 1, [Petri net class belongs to BPEL2oWFN.])
 
 
 # Checks for typedefs, structures, and compiler characteristics.

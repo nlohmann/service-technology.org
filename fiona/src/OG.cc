@@ -164,8 +164,12 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 	}
 
 
+	/**
+	@todo This check, whether a node's annotation is satisfiable, should be
+	used after the new and smarter algorithm for choosing the next
+	considered event is implemented.
 	// early checking if the node's annotation cannot be made true
-    CommGraphFormulaAssignment* testAssignment = currentNode->getAssignment();
+	CommGraphFormulaAssignment* testAssignment = currentNode->getAssignment();
 
 	for (unsigned int j = 0; j < PN->getInputPlaceCount(); j++) {
 		//cout << PN->getInputPlace(j)->name << endl;
@@ -176,6 +180,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 		cout << "node " << currentNode->getNumber() << " went red early. formula was " << currentNode->getCNF_formula()->asString() << endl;
 	}
 
+	delete testAssignment;
+	*/
 
 	i = 0;
 	// iterate over all elements of inputSet of the oWFN

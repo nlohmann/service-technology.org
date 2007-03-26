@@ -47,9 +47,11 @@
 class OGFromFileTransition;
 
 class OGFromFileNode {
+// order: public typedefs, private members and methods, public methods
+public:
+    typedef std::set<OGFromFileTransition*> transitions_t;
 private:
     std::string name;
-    typedef std::set<OGFromFileTransition*> transitions_t;
 //    transitions_t transitions;
     typedef std::map<std::string, OGFromFileNode*> transitionLabel2parentNode_t;
     transitionLabel2parentNode_t transitionLabel2parentNode;

@@ -266,7 +266,24 @@ OGFromFile* OGFromFile::enforce(OGFromFile* constraint) {
 	// we now fill the new OG with pairs of nodes
 	// therefore, we perform a coordinated dfs through OG and constraint
 	
-	buildConstraintOG(this->getRoot(), constraint->getRoot(), newOG);	    
+	// building a new node that has name and annotation constructed
+	// from current nodes of OG and constraint
+	OGFromFileNode* currentOGNode = this->getRoot();
+	OGFromFileNode* currentConstraintNode = constraint->getRoot();
+
+	std::string currentName;
+	currentName = currentOGNode->getName() + currentConstraintNode->getName();
+
+	CommGraphFormulaMultiaryAnd* currentFormula;
+	currentFormula = new CommGraphFormulaMultiaryAnd(currentOGNode->getAnnotation(), currentConstraintNode->getAnnotation());
+
+	// building the new node
+	OGFromFileNode* newNode = new OGFromFileNode(currentName, currentFormula);
+//	trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
+	newOG->addNode(newNode);
+	newOG->setRoot(newNode);
+
+	buildConstraintOG(currentOGNode, currentConstraintNode, newOG);	    
 
 	trace(TRACE_5, "OGFromFile::enforce(OGFromFile* constraint): end\n");
 
@@ -284,21 +301,10 @@ void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
 
 	trace(TRACE_5, "OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentConstraintNode, OGFromFile* newOG): start\n");
 
-	// building a new node that has name and annotation constructed
-	// from current nodes of OG and constraint
-	std::string newName;
-	newName = currentOGNode->getName() + currentConstraintNode->getName();
+	// at this time, the node constructed from currentOGNode and
+	// currentConstraintNode is already inserted
 
-	CommGraphFormulaMultiaryAnd* newFormula;
-	newFormula = new CommGraphFormulaMultiaryAnd(currentOGNode->getAnnotation(), currentConstraintNode->getAnnotation());
-
-	// add that node to the OG
-	OGFromFileNode* newNode = new OGFromFileNode(newName, newFormula);
-	newOG->addNode(newNode);
-	if (newOG->getRoot() == NULL) {
-		newOG->setRoot(newNode);
-	}
-
+	assert(newOG->getRoot() != NULL);
 	// iterate over all outgoing edges from current node of OG
     std::string currentLabel;
     for (OGFromFileNode::transitions_t::iterator trans_iter = currentOGNode->transitions.begin();
@@ -310,6 +316,11 @@ void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
 		// if the constraint automaton allows this edge
 		if (currentConstraintNode->hasTransitionWithLabel(currentLabel)) {
 
+			// remember the name of the old node of the constrained OG
+			std::string currentName;
+			currentName = currentOGNode->getName() + currentConstraintNode->getName();
+			assert(newOG->hasNodeWithName(currentName));
+	
 			// compute both successors and recursively call buildConstraintOG again
 			OGFromFileNode* newOGNode;
 			newOGNode = currentOGNode->fireTransitionWithLabel(currentLabel);
@@ -317,7 +328,38 @@ void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
 			OGFromFileNode* newConstraintNode;
 			newConstraintNode = currentConstraintNode->fireTransitionWithLabel(currentLabel);
 
-			buildConstraintOG(newOGNode, newConstraintNode, newOG);
+			// build the new node of the constrained OG 
+			// that has name and annotation constructed from current nodes of OG and constraint
+			std::string newName;
+			newName = newOGNode->getName() + newConstraintNode->getName();
+		
+			CommGraphFormulaMultiaryAnd* newFormula;
+			newFormula = new CommGraphFormulaMultiaryAnd(newOGNode->getAnnotation(), newConstraintNode->getAnnotation());
+
+			OGFromFileNode* newNode = new OGFromFileNode(newName, newFormula);
+
+			// if the node is new, add that node to the OG
+			OGFromFileNode* found = newOG->getNodeWithName(newName);
+
+			if (found != NULL) {
+				// the node was known before
+
+//				trace(TRACE_0, "the node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + " was already known\n");
+
+//				trace(TRACE_0, "\tadding a transition from " + currentName + " to " + newName + " via label " + currentLabel + "\n");
+				newOG->addTransition(currentName, newName, currentLabel);
+
+				trace(TRACE_5, "OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentConstraintNode, OGFromFile* newOG): end\n");
+			} else {
+				// we computed a new node
+//				trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
+				newOG->addNode(newNode);
+
+//				trace(TRACE_0, "\tadding a transition from " + currentName + " to " + newName + " via label " + currentLabel + "\n");
+				newOG->addTransition(currentName, newName, currentLabel);
+
+				buildConstraintOG(newOGNode, newConstraintNode, newOG);
+			}
 		}
 	}
 	trace(TRACE_5, "OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentConstraintNode, OGFromFile* newOG): end\n");

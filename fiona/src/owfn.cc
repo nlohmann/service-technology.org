@@ -2101,6 +2101,7 @@ bool oWFN::matchesWithOG(const OGFromFile& og, string& reasonForFailedMatch) {
                     "' in the oWFN, but not the node '" +
                     currentOGNode->getName() + "' in the OG.";
 
+                delete[] tmpCurrentMarking;
                 return false;
             }
 

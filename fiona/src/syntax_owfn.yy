@@ -110,6 +110,18 @@ oWFN * PN;					// the petri net
 
 placeType type = INTERNAL;		/* type of place */
 
+/**
+ * See ignoredPlacesDueToMatching.
+ */
+typedef std::set<owfnPlace*> ignoredPlacesDueToMatching_t;
+
+/**
+ * Set of all places that were not added to the parsed oWFN, because matching
+ * should be performed on the oWFN. Those places must be deleted when parsing
+ * is done, because they won't be delete by the oWFN.
+ */
+ignoredPlacesDueToMatching_t ignoredPlacesDueToMatching;
+
 enum InTransitionParsePosition { IN_CONSUME, IN_PRODUCE };
 InTransitionParsePosition inTransitionParsePosition; 
 
@@ -175,7 +187,11 @@ input:  net {
 }
 ;
 
-net: key_place place_area key_marking
+net:
+		{
+			ignoredPlacesDueToMatching.clear();
+		}
+	key_place place_area key_marking
 		{
 			PlSymbol* plSymbol = NULL;
 			PlaceTable->initGetNextSymbol();
@@ -186,6 +202,7 @@ net: key_place place_area key_marking
 				if (options[O_MATCH] &&
 					plSymbol->getPlace()->type != INTERNAL)
 				{
+					ignoredPlacesDueToMatching.insert(plSymbol->getPlace());
 					continue;
 				}
 
@@ -226,6 +243,15 @@ net: key_place place_area key_marking
 					}
 					pl->addLeavingArc(PN->getTransition(i)->getArrivingArc(j));
 				}
+			}
+
+			// Delete all places that were not added while parsing this oWFN
+			// for matching.
+			for (ignoredPlacesDueToMatching_t::const_iterator iplace =
+			     ignoredPlacesDueToMatching.begin();
+			     iplace != ignoredPlacesDueToMatching.end(); ++iplace)
+			{
+				delete *iplace;
 			}
 		}
 ;

@@ -34,6 +34,7 @@
 
 #include "OGFromFile.h"
 #include "debug.h"
+#include "options.h"
 #include <cassert>
 
 using namespace std;
@@ -272,7 +273,7 @@ OGFromFile* OGFromFile::enforce(OGFromFile* constraint) {
 	OGFromFileNode* currentConstraintNode = constraint->getRoot();
 
 	std::string currentName;
-	currentName = currentOGNode->getName() + currentConstraintNode->getName();
+	currentName = currentOGNode->getName() + "x" + currentConstraintNode->getName();
 
 	CommGraphFormulaMultiaryAnd* currentFormula;
 	currentFormula = new CommGraphFormulaMultiaryAnd(currentOGNode->getAnnotation(), currentConstraintNode->getAnnotation());
@@ -318,7 +319,7 @@ void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
 
 			// remember the name of the old node of the constrained OG
 			std::string currentName;
-			currentName = currentOGNode->getName() + currentConstraintNode->getName();
+			currentName = currentOGNode->getName() + "x" + currentConstraintNode->getName();
 			assert(newOG->hasNodeWithName(currentName));
 	
 			// compute both successors and recursively call buildConstraintOG again
@@ -331,7 +332,7 @@ void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
 			// build the new node of the constrained OG 
 			// that has name and annotation constructed from current nodes of OG and constraint
 			std::string newName;
-			newName = newOGNode->getName() + newConstraintNode->getName();
+			newName = newOGNode->getName() + "x" + newConstraintNode->getName();
 		
 			CommGraphFormulaMultiaryAnd* newFormula;
 			newFormula = new CommGraphFormulaMultiaryAnd(newOGNode->getAnnotation(), newConstraintNode->getAnnotation());
@@ -364,4 +365,109 @@ void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
 	}
 	trace(TRACE_5, "OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentConstraintNode, OGFromFile* newOG): end\n");
 }
+
+
+//! \fn void OGFromFile::printDotFile()
+//! \brief creates a dot file of the graph
+void OGFromFile::printDotFile() {
+    
+	trace(TRACE_0, "creating the dot file of the graph...\n");	
+    OGFromFileNode* tmp = root;
+
+	char buffer[256];
+	sprintf(buffer, "%s.constrained.out", netfile);
+
+    fstream dotFile(buffer, ios_base::out | ios_base::trunc);
+    dotFile << "digraph g1 {\n";
+    dotFile << "graph [fontname=\"Helvetica\", label=\"";
+    dotFile << "constrained OG of ";
+    dotFile << netfile << " and " << ogfile;
+    dotFile << "\"];\n";
+    dotFile << "node [fontname=\"Helvetica\" fontsize=10];\n";
+    dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
+
+    printGraphToDot(tmp, dotFile, visitedNodes);
+    
+    dotFile << "}";
+    dotFile.close();
+    	
+    // prepare dot command line for printing
+	sprintf(buffer, "dot -Tpng %s.constrained.out -o %s.constrained.png", netfile, netfile);
+
+	// print commandline and execute system command
+	trace(TRACE_0, string(buffer) + "\n");
+    system(buffer);
+}
+
+
+//! \fn void OGFromFile::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[])
+//! \param v current node in the iteration process
+//! \param os output stream
+//! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
+//! \brief breadthsearch through the graph printing each node and edge to the output stream
+void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, OGFromFileNode_map& visitedNodes) {
+
+	assert(v != NULL);
+
+	if (visitedNodes[v] != true) {
+	
+		os << "p" << v->getName() << " [label=\"# " << v->getName() << "\\n";
+	
+		string CNFString = v->getAnnotation()->asString();
+	
+		os << CNFString;
+	
+	    os << "\", fontcolor=black, color=blue];\n";
+	
+	    visitedNodes[v] = true;
+	
+	    std::string currentLabel;
+	    
+	    for (OGFromFileNode::transitions_t::iterator trans_iter = v->transitions.begin();
+	         trans_iter != v->transitions.end(); ++trans_iter) {
+	
+			// remember the label of the egde
+			currentLabel = (*trans_iter)->getLabel();
+			OGFromFileNode* successor = v->fireTransitionWithLabel(currentLabel);
+
+			os << "p" << v->getName() << "->" << "p" << successor->getName() << " [label=\"" << currentLabel << "\", fontcolor=black, color= blue];\n";
+			printGraphToDot(successor, os, visitedNodes);
+		}
+	}
+}
+
+
+//    graphEdge * element;
+//    string label;
+
+//    while ((element = v->getNextSuccEdge()) != NULL) {
+//        vertex * vNext = element->getNode();
+//		
+//        if (parameters[P_SHOW_ALL_NODES]
+//            || (parameters[P_SHOW_NO_RED_NODES] && vNext->getColor() != RED)
+//            || (!parameters[P_SHOW_NO_RED_NODES] && vNext->getColor() == RED)
+//            || (vNext->getColor() == BLUE)) {
+//
+//            if (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0) {
+//
+//                if (vNext != NULL) {
+//                    if (element->getType() == receiving) {
+//                        label = "?";
+//                    } else {
+//                        label = "!";
+//                    }
+//                    os << "p" << v->getNumber() << "->" << "p" << vNext->getNumber() << " [label=\"" << label << element->getLabel() << "\", fontcolor=black, color=";
+//                    switch (vNext->getColor()) {
+//                        case RED: os << "red"; break;
+//                        case BLUE: os << "blue"; numberOfBlueEdges++; break;
+//                        default: os << "black"; break;
+//                    }
+//                    os << "];\n";
+//                    if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
+//                        printGraphToDot(vNext, os, visitedNodes);
+//                    }
+//                }
+//            }
+//        }
+//    } // while
 

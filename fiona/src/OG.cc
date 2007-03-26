@@ -177,6 +177,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 	}
 
 	if (currentNode->getCNF_formula()->value(*testAssignment) == false) {
+		assert(false);
 		cout << "node " << currentNode->getNumber() << " went red early. formula was " << currentNode->getCNF_formula()->asString() << endl;
 	}
 
@@ -592,6 +593,6 @@ void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
 
 string operatingGuidelines::NodeNameForOG(const vertex* v) const {
     assert(v != NULL);
-    return "#" + intToString(v->getNumber());
+    return intToString(v->getNumber());
 }
 

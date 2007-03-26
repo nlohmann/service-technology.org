@@ -268,7 +268,11 @@ int main(int argc, char ** argv) {
 
 		OGFromFile* constrainedOG;
 		constrainedOG = og->enforce(constraint);
+		
+		trace(TRACE_0, "computation finished\n"); 
+		trace(TRACE_0, "the computed OG: " + constrainedOG->getRoot()->getName() + "\n\n"); 
 
+		constrainedOG->printDotFile();
 		return 0;
     }
 

@@ -39,10 +39,13 @@
 #ifndef OGFROMFILE_H_
 #define OGFROMFILE_H_
 
+#include <fstream>
 #include <string>
 #include <set>
 #include <map>
 #include "commGraphFormula.h"
+
+using namespace std;
 
 class OGFromFileTransition;
 
@@ -100,6 +103,12 @@ class oWFN;
 
 class OGFromFile {
 private:
+
+    typedef std::map<OGFromFileNode*, bool> OGFromFileNode_map;
+
+    /** Maps literals to their truth values. */
+    OGFromFileNode_map visitedNodes;
+
     OGFromFileNode* root;
     typedef std::set<OGFromFileNode*> nodes_t;
     nodes_t nodes; // needed for proper deletion of OG.
@@ -122,6 +131,9 @@ public:
     
     OGFromFile* enforce(OGFromFile*);
     void buildConstraintOG(OGFromFileNode*, OGFromFileNode*, OGFromFile*);
+    
+	void printGraphToDot(OGFromFileNode* v, fstream& os, OGFromFileNode_map&);
+	void printDotFile();
     
 };
 

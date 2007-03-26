@@ -112,10 +112,6 @@ void readnet() {
     owfn_yyparse();
     fclose(owfn_yyin);
 
-#ifdef YY_FLEX_HAS_YYLEX_DESTROY
-    owfn_yylex_destroy(); // must NOT be called before fclose(owfn_yyin);
-#endif
-
     unsigned int ii;
     for(ii = 0; ii < PN->getPlaceCount();ii++) {
         PN->CurrentMarking[ii] = PN->getPlace(ii)->initial_marking;
@@ -331,6 +327,12 @@ int main(int argc, char ** argv) {
         netiter++;
     } while (netfiles.begin() != netfiles.end() && netiter != netfiles.end());
     
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
+    // Delete lexer buffer for parsing oWFNs.
+    // Must NOT be called before fclose(owfn_yyin);
+    owfn_yylex_destroy();
+#endif
+
 
 // **************** start doing things :) *********************
 
@@ -380,10 +382,7 @@ int main(int argc, char ** argv) {
 				trace(TRACE_0, "Match failed, because: " +
 				reasonForFailedMatch + "\n");
 			}
-			return 0;
-		}
-            
-        if (parameters[P_OG]) {
+		} else if (parameters[P_OG]) {
 			// ---------------- operating guideline is built ---------------------
 
             operatingGuidelines * graph = new operatingGuidelines(PN);

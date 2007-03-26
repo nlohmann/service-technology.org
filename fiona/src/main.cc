@@ -265,10 +265,12 @@ int main(int argc, char ** argv) {
 		OGFromFile* constrainedOG;
 		constrainedOG = og->enforce(constraint);
 		
-		trace(TRACE_0, "\n computed the constrained OG:  " + string(netfile));
-		trace(TRACE_0, ".constrained.out\n\n"); 
+		trace(TRACE_0, " computed the constrained OG:  " + string(netfile));
+		trace(TRACE_0, ".a.og.under.");
+		trace(TRACE_0, ogfile + ".out\n\n"); 
 
-		//constrainedOG->removeFalseNodes();
+		constrainedOG->removeFalseNodes();
+		//constrainedOG->computeFalseNodes();
 		constrainedOG->printDotFile();
 		return 0;
     }

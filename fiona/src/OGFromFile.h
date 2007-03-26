@@ -131,8 +131,10 @@ public:
     OGFromFileNode* getNodeWithName(const std::string& nodeName) const;
     bool hasNoRoot() const;
     
+    bool findNodeInSet(OGFromFileNode*, nodes_t*);
+    nodes_t* computeFalseNodes(nodes_t*);
     void removeFalseNodes();
-    void removeFalseNodes(nodes_t*);
+//    void removeFalseNodes(nodes_t*);
     
     OGFromFile* enforce(OGFromFile*);
     void buildConstraintOG(OGFromFileNode*, OGFromFileNode*, OGFromFile*);

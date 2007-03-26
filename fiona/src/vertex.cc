@@ -495,19 +495,20 @@ vertexColor vertex::analyseNode() {
 //! \brief analyses the node, sets its color, and returns the new color
 vertexColor vertex::analyseNodeByFormula() {
 
-    trace(TRACE_5, "vertex::analyseNodeByFormula() : start\n");
-    
-	// computing the assignment given by outgoing edges (to blue nodes)
-    CommGraphFormulaAssignment* myassignment = this->getAssignment();
-	bool result = this->getCNF_formula()->value(*myassignment);
+	trace(TRACE_5, "vertex::analyseNodeByFormula() : start\n");
 
-   	trace(TRACE_5, "vertex::analyseNodeByFormula() : end\n");
+	// computing the assignment given by outgoing edges (to blue nodes)
+	CommGraphFormulaAssignment* myassignment = this->getAssignment();
+	bool result = this->getCNF_formula()->value(*myassignment);
+	delete myassignment;
+
+	trace(TRACE_5, "vertex::analyseNodeByFormula() : end\n");
 
 	if (result) {
-        trace(TRACE_3, "\t\t\t node analysed blue, formula " + this->getCNF_formula()->asString());
+		trace(TRACE_3, "\t\t\t node analysed blue, formula " + this->getCNF_formula()->asString());
 		return BLUE;
 	} else {
-        trace(TRACE_3, "\t\t\t node analysed red, formula " + this->getCNF_formula()->asString());
+		trace(TRACE_3, "\t\t\t node analysed red, formula " + this->getCNF_formula()->asString());
 		return RED;
 	}
 }

@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/03/26 07:54:45 $
+ * \date    \$Date: 2007/03/26 14:27:19 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.194 $
+ * \version \$Revision: 1.195 $
  *
  * \ingroup petrinet
  */
@@ -796,7 +796,7 @@ void PetriNet::removeArc(Arc *f)
 
 
 /*!
- * \brief   merges two transitions
+ * \brief   merges two sequential transitions
  *
  *          Merges two transitions. Given transitions t1 and t2:
  *          -# a new transition t12 with empty history is created
@@ -815,8 +815,6 @@ void PetriNet::removeArc(Arc *f)
  * \post    Transition t12 having the incoming and outgoing arcs of t1 and t2
  *          and the union of the histories of t1 and t2.
  *
- * \todo    Znamirowski: Overwork the preset/postset calculation (What is
- *          "pre2wo1"? Why don't we need "post2wo1"?).
  */
 void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 {
@@ -863,24 +861,23 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
     t12->history.push_back(*role);
   }
 
-  // create the weighted arcs for t12
-  set<Node *> pre1 = preset(t1);
-  set<Node *> post1 = postset(t1);
-  set<Node *> pre12 = setUnion(preset(t1), preset(t2));
-  set<Node *> post2 = postset(t2);
-  set<Node *> pre2wo1 = setDifference(pre12,pre1);
-//  set<Node *> post2wo1 = pnapi::setDifference(post12,post1);
+  // merge pre- and postsets for t12
+  t12->preset=setUnion(t1->preset, t2->preset);
+  t12->postset=setUnion(t1->postset, t2->postset);
 
-  for (set<Node *>::iterator n = pre1.begin(); n != pre1.end(); n++)
+  // create the weighted arcs for t12
+  set<Node *> preset2without1 = setDifference(t12->preset,t1->preset);
+
+  for (set<Node *>::iterator n = t1->preset.begin(); n != t1->preset.end(); n++)
     newArc((*n), t12, STANDARD, arc_weight((*n),t1));
 
-  for (set<Node *>::iterator n = pre2wo1.begin(); n != pre2wo1.end(); n++)
+  for (set<Node *>::iterator n = preset2without1.begin(); n != preset2without1.end(); n++)
     newArc((*n), t12, STANDARD, arc_weight((*n),t2));
 
-  for (set<Node *>::iterator n = post1.begin(); n != post1.end(); n++) 
+  for (set<Node *>::iterator n = t1->postset.begin(); n != t1->postset.end(); n++) 
     newArc(t12, (*n), STANDARD, arc_weight(t1,(*n)));
 
-  for (set<Node *>::iterator n = post2.begin(); n != post2.end(); n++)
+  for (set<Node *>::iterator n = t2->postset.begin(); n != t2->postset.end(); n++)
   {    
     for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     {
@@ -903,12 +900,6 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
       newArc(t12, (*n), STANDARD, arc_weight(t2,(*n)));
     }
   }
-
-//  for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
-//    newArc(static_cast<Place*>(*n), t12);
-
-//  for (set<Node *>::iterator n = post12.begin(); n != post12.end(); n++)
-//    newArc(t12, static_cast<Place*>(*n));
 
   removeTransition(t1);
   removeTransition(t2);
@@ -938,9 +929,6 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
  * \post    Transition t12 having the incoming and outgoing arcs of t1 and t2
  *          and the union of the histories of t1 and t2.
  *
- * \todo    
- *          - Variable "sametarget" is not used.
- *          - Overwork the preset/postset calculation.
  */
 void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
 {
@@ -950,13 +938,7 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
   assert(t1 != NULL);
   assert(t2 != NULL);
   
-//  bool sametarget = false;
-  set<Arc *>::iterator delArc;
-  
   Node *t12 = newTransition("");
-
-//  t12->preset = setUnion(t1->preset, t2->preset);
-//  t12->postset = setUnion(t1->postset, t2->postset);  
 
   // organize the communication type of the new transition
   if (t1->type == t2->type)
@@ -990,25 +972,26 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
     t12->history.push_back(*role);
   }
 
-  // create the weighted arcs for t12
-  set<Node *> pre1 = preset(t1);
-  set<Node *> post1 = postset(t1);
-  set<Node *> pre12 = setUnion(preset(t1), preset(t2));
-  set<Node *> post12 = postset(t2);
-  set<Node *> pre2wo1 = setDifference(pre12,pre1);
-  set<Node *> post2wo1 = setDifference(post12,post1);
+  // merge pre- and postsets for t12
+  t12->preset=setUnion(t1->preset, t2->preset);
+  t12->postset=setUnion(t1->postset, t2->postset);
 
-  for (set<Node *>::iterator n = pre1.begin(); n != pre1.end(); n++)
+  // create the weighted arcs for t12
+  set<Node *> preset2without1 = setDifference(t12->preset,t1->preset);
+  set<Node *> postset2without1 = setDifference(t12->postset,t1->postset);
+
+
+  for (set<Node *>::iterator n = t1->preset.begin(); n != t1->preset.end(); n++)
     newArc((*n), t12, STANDARD, arc_weight((*n),t1));
 
-  for (set<Node *>::iterator n = pre2wo1.begin(); n != pre2wo1.end(); n++)
+  for (set<Node *>::iterator n = preset2without1.begin(); n != preset2without1.end(); n++)
     newArc((*n), t12, STANDARD, arc_weight((*n),t2));
 
-  for (set<Node *>::iterator n = post1.begin(); n != post1.end(); n++) 
+  for (set<Node *>::iterator n = t1->postset.begin(); n != t1->postset.end(); n++)
     newArc(t12, (*n), STANDARD, arc_weight(t1,(*n)));
 
-  for (set<Node *>::iterator n = post2wo1.begin(); n != post2wo1.end(); n++)
-    newArc((*n), t12, STANDARD, arc_weight((*n),t2));
+  for (set<Node *>::iterator n = postset2without1.begin(); n != postset2without1.end(); n++)
+    newArc(t12, (*n), STANDARD, arc_weight(t2,(*n)));
 
   removeTransition(t1);
   removeTransition(t2);
@@ -1038,7 +1021,6 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
  * \post    Place p12 having the incoming and outgoing arcs of p1 and p2 and
  *          the union of the histories of t1 and t2.
  *
- * \todo    Overwork the preset/postset calculation.
  */
 void PetriNet::mergePlaces(Place * & p1, Place * & p2)
 {
@@ -1074,26 +1056,26 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
     roleMap[*role] = p12;
   }
 
+  // merge pre- and postsets for p12
+  p12->preset=setUnion(p1->preset, p2->preset);
+  p12->postset=setUnion(p1->postset, p2->postset);
+
   // create the weighted arcs for p12
 
-  set<Node *> pre1 = preset(p1);
-  set<Node *> post1 = postset(p1);
-  set<Node *> pre12 = setUnion(preset(p1), preset(p2));
-  set<Node *> post12 = setUnion(postset(p1), postset(p2));
-  set<Node *> pre2wo1 = setDifference(pre12,pre1);
-  set<Node *> post2wo1 = setDifference(post12,post1);
+  set<Node *> preset2without1 = setDifference(p12->preset,p1->preset);
+  set<Node *> postset2without1 = setDifference(p12->postset,p1->postset);
 
 
-  for (set<Node *>::iterator n = pre1.begin(); n != pre1.end(); n++)
+  for (set<Node *>::iterator n = p1->preset.begin(); n != p1->preset.end(); n++)
     newArc((*n), p12, STANDARD, arc_weight((*n),p1));
 
-  for (set<Node *>::iterator n = pre2wo1.begin(); n != pre2wo1.end(); n++)
+  for (set<Node *>::iterator n = preset2without1.begin(); n != preset2without1.end(); n++)
     newArc((*n), p12, STANDARD, arc_weight((*n),p2));
 
-  for (set<Node *>::iterator n = post1.begin(); n != post1.end(); n++)
+  for (set<Node *>::iterator n = p1->postset.begin(); n != p1->postset.end(); n++)
     newArc(p12, (*n), STANDARD, arc_weight(p1,(*n)));
 
-  for (set<Node *>::iterator n = post2wo1.begin(); n != post2wo1.end(); n++)
+  for (set<Node *>::iterator n = postset2without1.begin(); n != postset2without1.end(); n++)
     newArc(p12, (*n), STANDARD, arc_weight(p2,(*n)));
 
   removePlace(p1);
@@ -1251,18 +1233,22 @@ bool PetriNet::sameweights(Node *n) const
   unsigned int w = 0;
 
   for (set<Arc*>::iterator f = F.begin(); f != F.end(); f++)
+  {
     if (((*f)->source == n) || ((*f)->target == n) )
       if (first)
       {
         first=false;
         w = (*f)->weight;
       }
-	  else
-	  {
-	    if ( (*f)->weight != w)
-        return false;
-	  }
-
+      else
+      {
+        if ( (*f)->weight != w)
+        {
+          return false;
+        }
+      }
+  }
+  
   return true;
 }
 

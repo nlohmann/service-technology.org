@@ -371,7 +371,7 @@ void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
 //! \brief creates a dot file of the graph
 void OGFromFile::printDotFile() {
     
-	trace(TRACE_0, "creating the dot file of the graph...\n");	
+	trace(TRACE_0, "creating the dot file of the OG...\n");	
     OGFromFileNode* tmp = root;
 
 	char buffer[256];
@@ -381,7 +381,7 @@ void OGFromFile::printDotFile() {
     dotFile << "digraph g1 {\n";
     dotFile << "graph [fontname=\"Helvetica\", label=\"";
     dotFile << "constrained OG of ";
-    dotFile << netfile << " and " << ogfile;
+    dotFile << netfile << "a.og and " << ogfile;
     dotFile << "\"];\n";
     dotFile << "node [fontname=\"Helvetica\" fontsize=10];\n";
     dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
@@ -395,7 +395,7 @@ void OGFromFile::printDotFile() {
 	sprintf(buffer, "dot -Tpng %s.constrained.out -o %s.constrained.png", netfile, netfile);
 
 	// print commandline and execute system command
-	trace(TRACE_0, string(buffer) + "\n");
+	trace(TRACE_0, string(buffer) + "\n\n");
     system(buffer);
 }
 
@@ -403,8 +403,8 @@ void OGFromFile::printDotFile() {
 //! \fn void OGFromFile::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[])
 //! \param v current node in the iteration process
 //! \param os output stream
-//! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
-//! \brief breadthsearch through the graph printing each node and edge to the output stream
+//! \param visitedNodes maps nodes to Bools remembering already visited nodes
+//! \brief dfs through the graph printing each node and edge to the output stream
 void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, OGFromFileNode_map& visitedNodes) {
 
 	assert(v != NULL);
@@ -435,39 +435,4 @@ void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, OGFromFileNode_
 		}
 	}
 }
-
-
-//    graphEdge * element;
-//    string label;
-
-//    while ((element = v->getNextSuccEdge()) != NULL) {
-//        vertex * vNext = element->getNode();
-//		
-//        if (parameters[P_SHOW_ALL_NODES]
-//            || (parameters[P_SHOW_NO_RED_NODES] && vNext->getColor() != RED)
-//            || (!parameters[P_SHOW_NO_RED_NODES] && vNext->getColor() == RED)
-//            || (vNext->getColor() == BLUE)) {
-//
-//            if (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0) {
-//
-//                if (vNext != NULL) {
-//                    if (element->getType() == receiving) {
-//                        label = "?";
-//                    } else {
-//                        label = "!";
-//                    }
-//                    os << "p" << v->getNumber() << "->" << "p" << vNext->getNumber() << " [label=\"" << label << element->getLabel() << "\", fontcolor=black, color=";
-//                    switch (vNext->getColor()) {
-//                        case RED: os << "red"; break;
-//                        case BLUE: os << "blue"; numberOfBlueEdges++; break;
-//                        default: os << "black"; break;
-//                    }
-//                    os << "];\n";
-//                    if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
-//                        printGraphToDot(vNext, os, visitedNodes);
-//                    }
-//                }
-//            }
-//        }
-//    } // while
 

@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/03/25 15:40:21 $
+ * \date    \$Date: 2007/03/26 07:22:50 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.192 $
+ * \version \$Revision: 1.193 $
  *
  * \ingroup petrinet
  */
@@ -1843,7 +1843,6 @@ void PetriNet::produce(const PetriNet &net)
 	if ( ( (*arc)->target->nodeType == PLACE) && ( (*arc)->source == static_cast<Node *>(*t) ) )
 	  newArc( t_new, findPlace( (*arc)->target->nodeName() ), STANDARD, (*arc)->weight );
       }
-
     }
   }
 
@@ -1868,8 +1867,10 @@ void PetriNet::produce(const PetriNet &net)
   // create pair transitions with their arcs
   for (set<pair<Transition *, Transition *> >::iterator tp = transition_pairs.begin(); tp != transition_pairs.end(); tp++)
   {
-    Transition *t_new = newTransition("(" + tp->first->nodeName() + "," + tp->second->nodeName() + ")");
-
+    // I have to comment the next line as Fiona cannot read node names with brackets
+    // Transition *t_new = newTransition("(" + tp->first->nodeName() + "," + tp->second->nodeName() + ")");
+    Transition *t_new = newTransition(tp->first->nodeName() + "_" + tp->second->nodeName());
+    
     // copy the arcs of the constraint oWFN
     for (set< Arc * >::iterator arc = net.F.begin(); arc != net.F.end(); arc ++)
     {

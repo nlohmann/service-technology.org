@@ -30,13 +30,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/03/25 15:40:21 $
+ * \date    \$Date: 2007/03/26 07:22:50 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.89 $
+ * \version \$Revision: 1.90 $
  *
  * \ingroup petrinet
  */
@@ -1143,9 +1143,9 @@ void PetriNet::output_owfn(ostream *output) const
 	(*output) << "," << endl;
 
 #ifdef USING_BPEL2OWFN
-      (*output) << " " << (*p)->nodeShortName() << ":\t" << (*p)->tokens;
+      (*output) << "  " << (*p)->nodeShortName() << ":\t" << (*p)->tokens;
 #else
-      (*output) << " " << (*p)->nodeName() << ":\t" << (*p)->tokens;
+      (*output) << "  " << (*p)->nodeName() << ":\t" << (*p)->tokens;
 #endif
 
       if ((*p)->historyContains("1.internal.initial"))
@@ -1162,7 +1162,7 @@ void PetriNet::output_owfn(ostream *output) const
   {
     if ( (*p)->isFinal )
     {
-      if (count++ != 1)
+      if (count != 1)
 	(*output) << ",";
 
 #ifdef USING_BPEL2OWFN
@@ -1171,8 +1171,10 @@ void PetriNet::output_owfn(ostream *output) const
       (*output) << "  " << (*p)->nodeName();
 #endif
 
-      if ( (*p)->isFinal )
-  	(*output) << " {final place}";
+      (*output) << " {final place}";
+
+      if (count++ != 1)
+	(*output) << endl;      
     }
   }
   (*output) << ";" << endl << endl << endl;
@@ -1203,6 +1205,7 @@ void PetriNet::output_owfn(ostream *output) const
 #else
       (*output) << (*pre)->nodeName();
 #endif
+
       if (arc_weight(*pre, *t) != 1)
 	(*output) << ":" << arc_weight(*pre, *t);
 

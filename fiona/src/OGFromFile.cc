@@ -285,6 +285,7 @@ void OGFromFile::removeFalseNodes() {
 
 	// the set representing the nodes that have to be analysed
 	nodes_t* toAnalyse = new nodes_t();
+
 	for (OGFromFile::nodes_t::iterator node_iter = nodes.begin();
 	     node_iter != nodes.end(); ++node_iter) {
 		
@@ -298,6 +299,7 @@ void OGFromFile::removeFalseNodes() {
 	
 	cout << "back..." << endl;
 }
+
 	
 //! \fn OGFromFile* OGFromFile::removeFalseNodes(nodes_t& toAnalyse)
 void OGFromFile::removeFalseNodes(nodes_t* toAnalyse) {

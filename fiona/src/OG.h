@@ -52,7 +52,7 @@ class operatingGuidelines : public communicationGraph {
 
     	void buildGraph(vertex *, double);
 		
-//    	void computeCNF(vertex *);
+    	void computeCNF(vertex *);
     	void computeCNFformula(vertex *);
 
 		void convertToBdd();

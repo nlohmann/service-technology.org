@@ -394,7 +394,8 @@ void communicationGraph::analyseNode(vertex* node) {
 
 	vertexColor analysedColor;
 
-	if (parameters[P_OG]) {
+	if (false) {
+//	if (parameters[P_OG]) {
 		// analyse node by its formula
 		analysedColor = node->analyseNodeByFormula();
 	} else {

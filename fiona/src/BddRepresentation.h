@@ -54,7 +54,7 @@ class BddLabelTab;
 
 class BddRepresentation{
 	public:
-		BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
+		BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT, unsigned int cntNodes = 1, bool calcStates = false);
 		~BddRepresentation();
 		
 		void convertRootNode(vertex* root);
@@ -65,6 +65,12 @@ class BddRepresentation{
 		void print();
 		void save(char* option = "OG");
 		void PrintMemoryInUse();
+		
+		void testSymbRepresentation(vertex* v, bool visitedNodes[]);
+		void calculateBound(vertex* v, bool visitedNodes[]);
+		unsigned int getBound();
+		void setPlaceBits();
+		//unsigned int cntNodes; //Anzahl der Knoten in der OG in expliziter Darstellung (nur für Testzwecke)
 
 		
         // Provides user defined operator new. Needed to trace all new
@@ -77,6 +83,7 @@ class BddRepresentation{
 		DdManager* mgrMp;
 		DdManager* mgrAnn;
 		DdNode* bddMp;
+		DdNode* bddRed;
 		DdNode* bddAnn;
 		int maxNodeBits;
 		int maxLabelBits;
@@ -95,6 +102,11 @@ class BddRepresentation{
 		int nbrBits(unsigned int i);
 		string myitoa(unsigned int value, int base);
 		void checkManager(DdManager* mgr, char* table);
+		
+		DdNode* statesToBddMp(vertex* v);
+		DdNode* markingToBddMp(unsigned int * marking);
+		unsigned int bound;
+		int maxPlaceBits;
 };
 
 #endif /*BDDREPRESENTATION_H_*/

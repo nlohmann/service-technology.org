@@ -271,6 +271,8 @@ int main(int argc, char ** argv) {
 		
 		trace(TRACE_0, "\n computed the constrained OG:  " + string(netfile));
 		trace(TRACE_0, ".constrained.out\n\n"); 
+
+		constrainedOG->removeFalseNodes();
 		constrainedOG->printDotFile();
 		return 0;
     }

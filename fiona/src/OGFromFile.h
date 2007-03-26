@@ -82,6 +82,8 @@ public:
     std::string getAnnotationAsString() const;
 	CommGraphFormula* getAnnotation() const;
 
+	CommGraphFormulaAssignment* OGFromFileNode::getAssignment();
+
     void setDepthFirstSearchParent(OGFromFileNode* depthFirstSearchParent);
     OGFromFileNode* getDepthFirstSearchParent() const;
 };
@@ -128,6 +130,9 @@ public:
     void setRootToNodeWithName(const std::string& nodeName);
     OGFromFileNode* getNodeWithName(const std::string& nodeName) const;
     bool hasNoRoot() const;
+    
+    void removeFalseNodes();
+    void removeFalseNodes(nodes_t*);
     
     OGFromFile* enforce(OGFromFile*);
     void buildConstraintOG(OGFromFileNode*, OGFromFileNode*, OGFromFile*);

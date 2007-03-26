@@ -104,87 +104,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 
 	unsigned int i = 0;
 
-	// iterate over all elements of outputSet of the oWFN
-	trace(TRACE_2, "\t\t\t iterating over outputSet of the oWFN\n");
-	while (i < PN->getOutputPlaceCount()) {
-
-		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
-		trace(TRACE_2, string(PN->getOutputPlace(i)->name) + "\n");
-	    
-		if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] < PN->getOutputPlace(i)->max_occurence
-            || (options[O_EVENT_USE_MAX] == false)) {
-				
-			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
-			currentVertex = currentNode;
-			
-			calculateSuccStatesOutput(PN->getOutputPlace(i)->index, currentNode, v);
-			
-			// was the new node computed before? 
-			vertex * found = findVertexInSet(v);
-			
-			if (found == NULL) {
-				// node was new, hence going down with receiving event...
-				AddVertex(v, i, receiving, true);
-				// buildGraph(v, your_progress);
-				buildGraph(v, 0);
-				
-				if (v->getColor() == RED) {
-					currentNode->removeLiteralFromFormula(i, receiving);
-				}
-
-				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-				actualDepth--;
-			} else {
-				// In case the successor node v was already known, an edge to the old
-				// node is drawn by function AddVertex.
-				AddVertex(found, i, receiving, false);
-
-				// Still, if that node was computed red before, the literal
-				// of the edge from currentNode to the old node must be removed in the
-				// annotation of currentNode.
-				if (found->getColor() == RED) {
-					currentNode->removeLiteralFromFormula(i, receiving);
-				}
-				delete v;
-
-//				addProgress(your_progress);
-//				printProgress();
-			}
-		} else {
-			trace(TRACE_2, "\t\t\t\t\t  receiving event: ?");
-			trace(TRACE_2, string(PN->getOutputPlace(i)->name));
-			trace(TRACE_2, " suppressed (max_occurence reached)\n");
-
-			currentNode->removeLiteralFromFormula(i, receiving);
-
-//			addProgress(your_progress);
-//			printProgress();
-		}
-		i++;
-	}
-
-
-	/**
-	@todo This check, whether a node's annotation is satisfiable, should be
-	used after the new and smarter algorithm for choosing the next
-	considered event is implemented.
-	// early checking if the node's annotation cannot be made true
-	CommGraphFormulaAssignment* testAssignment = currentNode->getAssignment();
-
-	for (unsigned int j = 0; j < PN->getInputPlaceCount(); j++) {
-		//cout << PN->getInputPlace(j)->name << endl;
-		testAssignment->setToTrue('!' + PN->getInputPlace(j)->name);
-	}
-
-	if (currentNode->getCNF_formula()->value(*testAssignment) == false) {
-		assert(false);
-		cout << "node " << currentNode->getNumber() << " went red early. formula was " << currentNode->getCNF_formula()->asString() << endl;
-	}
-
-	delete testAssignment;
-	*/
-
-	i = 0;
 	// iterate over all elements of inputSet of the oWFN
 	trace(TRACE_2, "\t\t\t iterating over inputSet of the oWFN\n");
 	while (i < PN->getInputPlaceCount()) {
@@ -255,6 +174,87 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 
 			addProgress(your_progress);
 			printProgress();
+		}
+		i++;
+	}
+
+
+	/**
+	@todo This check, whether a node's annotation is satisfiable, should be
+	used after the new and smarter algorithm for choosing the next
+	considered event is implemented.
+	// early checking if the node's annotation cannot be made true
+	CommGraphFormulaAssignment* testAssignment = currentNode->getAssignment();
+
+	for (unsigned int j = 0; j < PN->getInputPlaceCount(); j++) {
+		//cout << PN->getInputPlace(j)->name << endl;
+		testAssignment->setToTrue('!' + PN->getInputPlace(j)->name);
+	}
+
+	if (currentNode->getCNF_formula()->value(*testAssignment) == false) {
+		assert(false);
+		cout << "node " << currentNode->getNumber() << " went red early. formula was " << currentNode->getCNF_formula()->asString() << endl;
+	}
+
+	delete testAssignment;
+	*/
+
+	i = 0;
+	// iterate over all elements of outputSet of the oWFN
+	trace(TRACE_2, "\t\t\t iterating over outputSet of the oWFN\n");
+	while (i < PN->getOutputPlaceCount()) {
+
+		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
+		trace(TRACE_2, string(PN->getOutputPlace(i)->name) + "\n");
+	    
+		if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] < PN->getOutputPlace(i)->max_occurence
+            || (options[O_EVENT_USE_MAX] == false)) {
+				
+			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
+			currentVertex = currentNode;
+			
+			calculateSuccStatesOutput(PN->getOutputPlace(i)->index, currentNode, v);
+			
+			// was the new node computed before? 
+			vertex * found = findVertexInSet(v);
+			
+			if (found == NULL) {
+				// node was new, hence going down with receiving event...
+				AddVertex(v, i, receiving, true);
+				// buildGraph(v, your_progress);
+				buildGraph(v, 0);
+				
+				if (v->getColor() == RED) {
+					currentNode->removeLiteralFromFormula(i, receiving);
+				}
+
+				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+				actualDepth--;
+			} else {
+				// In case the successor node v was already known, an edge to the old
+				// node is drawn by function AddVertex.
+				AddVertex(found, i, receiving, false);
+
+				// Still, if that node was computed red before, the literal
+				// of the edge from currentNode to the old node must be removed in the
+				// annotation of currentNode.
+				if (found->getColor() == RED) {
+					currentNode->removeLiteralFromFormula(i, receiving);
+				}
+				delete v;
+
+//				addProgress(your_progress);
+//				printProgress();
+			}
+		} else {
+			trace(TRACE_2, "\t\t\t\t\t  receiving event: ?");
+			trace(TRACE_2, string(PN->getOutputPlace(i)->name));
+			trace(TRACE_2, " suppressed (max_occurence reached)\n");
+
+			currentNode->removeLiteralFromFormula(i, receiving);
+
+//			addProgress(your_progress);
+//			printProgress();
 		}
 		i++;
 	}

@@ -148,6 +148,30 @@ CommGraphFormula* OGFromFileNode::getAnnotation() const {
 
 }
 
+
+// return the assignment that is imposed by present or absent arcs leaving the node
+CommGraphFormulaAssignment* OGFromFileNode::getAssignment() {
+	
+	trace(TRACE_5, "computing annotation of node " + getName() + "\n");
+
+	CommGraphFormulaAssignment* myassignment = new CommGraphFormulaAssignment();
+	
+	// traverse outgoing edges and set the corresponding literals
+	// to true if the respective node is BLUE
+
+    for (OGFromFileNode::transitions_t::iterator trans_iter = transitions.begin();
+         trans_iter != transitions.end(); ++trans_iter) {
+
+		myassignment->setToTrue((*trans_iter)->getLabel());
+	}
+	
+	// we assume that literal final is always true
+	myassignment->setToTrue(CommGraphFormulaAssignment::FINAL);
+	
+	return myassignment;
+}
+
+
 void OGFromFileNode::setDepthFirstSearchParent(
     OGFromFileNode* depthFirstSearchParent_)
 {
@@ -254,6 +278,58 @@ bool OGFromFile::hasNoRoot() const
 {
     return getRoot() == NULL;
 }
+
+
+//! \fn OGFromFile* OGFromFile::removeFalseNodes()
+void OGFromFile::removeFalseNodes() {
+
+	// the set representing the nodes that have to be analysed
+	nodes_t* toAnalyse = new nodes_t();
+	for (OGFromFile::nodes_t::iterator node_iter = nodes.begin();
+	     node_iter != nodes.end(); ++node_iter) {
+		
+		cout << "adding node " << (*node_iter)->getName() << " to 'toAnalyse'" << endl;
+		toAnalyse->insert(*node_iter);
+	}
+	
+	cout << toAnalyse->size() << " nodes have to be analysed" << endl;
+	
+	removeFalseNodes(toAnalyse);
+	
+	cout << "back..." << endl;
+}
+	
+//! \fn OGFromFile* OGFromFile::removeFalseNodes(nodes_t& toAnalyse)
+void OGFromFile::removeFalseNodes(nodes_t* toAnalyse) {
+
+	trace(TRACE_5, "OGFromFile::removeFalseNodes(nodes_t& toAnalyse): start\n");
+	cout << "entering with size " << toAnalyse->size() << endl;
+
+	// take the first node and analyse it
+	for (OGFromFile::nodes_t::iterator node_iter = toAnalyse->begin();
+	     node_iter == toAnalyse->begin(); ) {
+
+		cout << "analysing node " << (*node_iter)->getName() << endl;
+	
+		CommGraphFormulaAssignment* myAssignment = (*node_iter)->getAssignment();
+		if ((*node_iter)->getAnnotation()->value(*myAssignment) == true) {
+			cout << "  node " << (*node_iter)->getName() << " fulfills its annotation" << endl;
+			
+			// since the node fulfills its annotation, remove it from the set
+			// of nodes that have to be analysed and continue with the next one
+			toAnalyse->erase(node_iter++);
+			
+			removeFalseNodes(toAnalyse);
+		} else {
+			cout << "  node " << (*node_iter)->getName() << " does NOT fulfill its annotation" << endl;
+			toAnalyse->erase(node_iter++);
+		}
+	}
+
+	cout << "backtracking" << endl;
+	trace(TRACE_5, "OGFromFile::removeFalseNodes(nodes_t& toAnalyse): end\n");
+}
+
 
 //! \fn OGFromFile* OGFromFile::enforce(OGFromFile* constraint)
 //! \brief enforces the current OG to respect the given constraint

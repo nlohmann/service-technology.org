@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/25 15:40:21 $ by $Author: nielslohmann $.
-# Version $Revision: 1.72 $
+# File last changed $Date: 2007/03/26 12:25:21 $ by $Author: nielslohmann $.
+# Version $Revision: 1.73 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -106,7 +106,7 @@ bpel2owfn_SOURCES = $(KCSOURCES)\
 
 # These sources have to be present before the rest is compiled.
 BUILT_SOURCES = $(KCDUMMY)\
-		frontend-parser.h
+		frontend-parser.cc
 
 # These files have to be distributed to compile without compiler generators.
 EXTRA_DIST = $(KCDUMMY)\

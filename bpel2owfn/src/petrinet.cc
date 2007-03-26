@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/03/26 07:22:50 $
+ * \date    \$Date: 2007/03/26 07:54:45 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.193 $
+ * \version \$Revision: 1.194 $
  *
  * \ingroup petrinet
  */
@@ -1347,7 +1347,7 @@ Place *PetriNet::findPlace(string role) const
 {
   map< std::string, Node* >::const_iterator p = roleMap.find(role);
 
-  if (p != roleMap.end() )
+  if ((p != roleMap.end()) && (p->second->nodeType == PLACE))
     return (static_cast<Place *>(p->second));
   else
     return NULL;
@@ -1390,7 +1390,7 @@ Transition *PetriNet::findTransition(string role) const
 {
   map< std::string, Node* >::const_iterator t = roleMap.find(role);
 
-  if (t != roleMap.end() )
+  if ((t != roleMap.end()) && (t->second->nodeType == TRANSITION))
     return (static_cast<Transition *>(t->second));
   else
     return NULL;
@@ -1851,15 +1851,51 @@ void PetriNet::produce(const PetriNet &net)
   set<string> used_labels;
   set<pair<Transition *, Transition *> > transition_pairs;
 
+
+  // Traverse the used labels and store pairs of constrainted and labeled
+  // transitions. If a label does not identify a transition, look for a plce
+  // with the same label instead. According to its communication type, either
+  // add the transitions in the preset or the postset to the transition pairs.
+  // For example, if "visa" is not found as transition, but there exists an
+  // input place with this name, add all transitions in the postset of this
+  // place, together with the transition labeled "visa" to the transition
+  // pairs.
   for (set<Transition *>::iterator t = net.T.begin(); t != net.T.end(); t++)
   {
     for (set<string>::iterator label = (*t)->labels.begin(); label != (*t)->labels.end(); label++)
     {
       Transition *t_l = findTransition(*label);
-      assert(t_l != NULL);
 
-      used_labels.insert(*label);
-      transition_pairs.insert(pair<Transition *, Transition *>(t_l, *t));
+      // specified transition not found -- trying places instead
+      if (t_l == NULL)
+      {
+	Place *p = findPlace(*label);
+	if (p != NULL)
+	{
+	  set<Node *> transitions_p;
+
+	  if (p->type == IN)
+	    transitions_p = p->postset;
+	  else
+	    transitions_p = p->preset;
+
+	  for (set<Node *>::iterator pre_transition = transitions_p.begin(); pre_transition != transitions_p.end(); pre_transition++)
+	  {
+	    used_labels.insert((*pre_transition)->nodeName());
+    	    transition_pairs.insert(pair<Transition *, Transition *>(static_cast<Transition *>(*pre_transition), *t));
+	  }
+	}
+	else
+	{
+	  std::cerr << "label " << *label << " neither describes a transition nor a place" << std::endl;
+	  assert(false);
+	}
+      }
+      else
+      {
+	used_labels.insert(*label);
+	transition_pairs.insert(pair<Transition *, Transition *>(t_l, *t));
+      }
     }
   }
 

@@ -159,7 +159,9 @@ void CommGraphFormulaMultiary::removeLiteral(const std::string& name) {
 			// the current formula is a literal
 			if (currentFormula->asString() == name) {
 				// the literal has the right name, so remove it
-				subFormulas.erase(iCurrentFormula++);
+				subFormulas_t::iterator iOldFormula = iCurrentFormula++;
+				delete *iOldFormula;
+				subFormulas.erase(iOldFormula);
 			} else {
 				iCurrentFormula++;
 			}

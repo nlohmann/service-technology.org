@@ -1358,6 +1358,7 @@ void oWFN::calculateReachableStatesFull(vertex * n) {
 						if (n->getColor() == RED) {
 							trace(TRACE_3, "\t\t\t message bound violated; color of node " + intToString(n->getNumber()) + " set to RED (calculateReachableStatesFull, during fire)\n");
 							trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n) : end\n");
+							delete[] tempCurrentMarking;
 							return;
 						}
 					}
@@ -1406,6 +1407,7 @@ void oWFN::calculateReachableStatesFull(vertex * n) {
 						n->setColor(RED);
 						trace(TRACE_3, "\t\t\t message bound violated; color of node " + intToString(n->getNumber()) + " set to RED (calculateReachableStatesFull, during fire)\n");
 						trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n) : end\n");
+						delete[] tempCurrentMarking;
 						return;
 					}
 

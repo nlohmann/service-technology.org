@@ -133,6 +133,7 @@ public:
      */
     virtual bool value(const CommGraphFormulaAssignment& assignment) const = 0;
     virtual void removeLiteral(const std::string&);
+    virtual CommGraphFormula* getDeepCopy() const = 0;
 };
 
 
@@ -180,7 +181,7 @@ public:
      * Destroys this CommGraphFormulaMultiary and all its subformulas.
      */
     virtual ~CommGraphFormulaMultiary();
-    
+
     virtual std::string asString() const;
 
     /**
@@ -190,7 +191,7 @@ public:
      * @returns The string representation of this multiary formula's operator.
      */
     virtual std::string getOperator() const = 0;
-    
+
     virtual bool value(const CommGraphFormulaAssignment& assignment) const;
 
     /**
@@ -205,6 +206,8 @@ public:
 	
 	void addSubFormula(CommGraphFormula* subformula);
 	virtual void removeLiteral(const std::string&);
+    void deepCopyMultiaryPrivateMembersToNewFormula(
+        CommGraphFormulaMultiary* newFormula) const;
 };
 
 
@@ -227,6 +230,8 @@ public:
     CommGraphFormulaMultiaryAnd();
     CommGraphFormulaMultiaryAnd(CommGraphFormula* subformula_);
     CommGraphFormulaMultiaryAnd(CommGraphFormula* lhs, CommGraphFormula* rhs);
+    virtual CommGraphFormulaMultiaryAnd* getDeepCopy() const;
+
 
     /** Destroys this CommGraphFormulaMultiaryAnd and all its subformulas. */
     virtual ~CommGraphFormulaMultiaryAnd() {};
@@ -251,6 +256,7 @@ public:
     CommGraphFormulaMultiaryOr();
     CommGraphFormulaMultiaryOr(CommGraphFormula* subformula_);
     CommGraphFormulaMultiaryOr(CommGraphFormula* lhs, CommGraphFormula* rhs);
+    virtual CommGraphFormulaMultiaryOr* getDeepCopy() const;
 
     /** Destroys this CommGraphFormulaMultiaryOr and all its subformulas. */
     virtual ~CommGraphFormulaMultiaryOr() {};
@@ -301,6 +307,8 @@ public:
      * @param asString String representation of this formula.
      */
     CommGraphFormulaFixed(bool value, const std::string& asString);
+
+    virtual CommGraphFormulaFixed* getDeepCopy() const;
 
     /* Destroys this CommGraphFormulaFixed. */
     virtual ~CommGraphFormulaFixed() {};
@@ -353,6 +361,7 @@ public:
      * @param literal String representation of this literal.
      */
     CommGraphFormulaLiteral(const std::string& literal);
+    virtual CommGraphFormulaLiteral* getDeepCopy() const;
     virtual ~CommGraphFormulaLiteral() {};
     virtual bool value(const CommGraphFormulaAssignment& assignment) const;
     virtual std::string asString() const;

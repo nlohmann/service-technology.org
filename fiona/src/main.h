@@ -35,9 +35,16 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include <string>
+
 extern oWFN * PN;
 extern unsigned int numberOfDecodes;
 extern unsigned int NonEmptyHash;
 extern unsigned int numberDeletedVertices;
+
+/**
+ * Equivalent for basename() on Posix systems. See 'man 3 basename'.
+ */
+extern std::string platform_basename(const std::string& path);
 
 #endif /*MAIN_H*/

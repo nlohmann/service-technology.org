@@ -62,7 +62,7 @@ private:
         OGFromFileNode* parentNode);
     OGFromFileNode* getParentNodeForTransitionLabel(
         const std::string& transitionLabel) const;
-    CommGraphFormula* firstClause;
+    CommGraphFormula* annotation;
     OGFromFileNode* depthFirstSearchParent;
 public:
     transitions_t transitions;
@@ -84,6 +84,7 @@ public:
 
 	CommGraphFormulaAssignment* getAssignment() const;
 
+    void removeTransitionsToNode(const OGFromFileNode* nodeToDelete);
     void setDepthFirstSearchParent(OGFromFileNode* depthFirstSearchParent);
     OGFromFileNode* getDepthFirstSearchParent() const;
 };
@@ -105,17 +106,15 @@ class oWFN;
 
 class OGFromFile {
 private:
-
-    typedef std::map<OGFromFileNode*, bool> OGFromFileNode_map;
-
-    /** Maps literals to their truth values. */
-    OGFromFileNode_map visitedNodes;
-
     OGFromFileNode* root;
     typedef std::set<OGFromFileNode*> nodes_t;
     nodes_t nodes; // needed for proper deletion of OG.
     typedef nodes_t::const_iterator nodes_const_iterator;
     typedef nodes_t::iterator nodes_iterator;
+
+    void removeTransitionsToNodeFromAllOtherNodes(
+        const OGFromFileNode* nodeToDelete);
+    void buildConstraintOG(OGFromFileNode*, OGFromFileNode*, OGFromFile*) const;
 public:
     OGFromFile();
     ~OGFromFile();
@@ -130,18 +129,14 @@ public:
     void setRootToNodeWithName(const std::string& nodeName);
     OGFromFileNode* getNodeWithName(const std::string& nodeName) const;
     bool hasNoRoot() const;
-    
-    bool findNodeInSet(OGFromFileNode*, nodes_t*);
-    nodes_t* computeFalseNodes(nodes_t*);
+
     void removeFalseNodes();
-//    void removeFalseNodes(nodes_t*);
-    
-    OGFromFile* enforce(OGFromFile*);
-    void buildConstraintOG(OGFromFileNode*, OGFromFileNode*, OGFromFile*);
-    
-	void printGraphToDot(OGFromFileNode* v, fstream& os, OGFromFileNode_map&);
-	void printDotFile();
-    
+
+    OGFromFile* enforce(OGFromFile*) const;
+
+    void printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFromFileNode*, bool>&) const;
+
+    void printDotFile() const;
 };
 
 

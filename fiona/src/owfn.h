@@ -279,7 +279,7 @@ class oWFN  {
 		 * @retval false Otherwise.
 		 */
 		bool matchesWithOG(
-			const OGFromFile& og,
+			const OGFromFile* og,
 			string& reasonForFailedMatch
 		);
 

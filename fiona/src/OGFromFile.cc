@@ -36,12 +36,13 @@
 #include "debug.h"
 #include "options.h"
 #include <cassert>
+#include "main.h"
 
 using namespace std;
 
 OGFromFileNode::OGFromFileNode(const std::string& name_, CommGraphFormula* annotation_) :
     name(name_),
-    firstClause(annotation_),
+    annotation(annotation_),
     depthFirstSearchParent(NULL) {
 
 }
@@ -54,7 +55,7 @@ OGFromFileNode::~OGFromFileNode()
         delete *trans_iter;
     }
 
-    delete firstClause;
+    delete annotation;
 }
 
 void OGFromFileNode::addParentNodeForTransitionLabel(
@@ -83,6 +84,19 @@ std::string OGFromFileNode::getName() const
 void OGFromFileNode::addTransition(OGFromFileTransition* transition)
 {
     transitions.insert(transition);
+}
+
+void OGFromFileNode::removeTransitionsToNode(const OGFromFileNode* nodeToDelete)
+{
+	transitions_t::iterator iTransition = transitions.begin();
+	while (iTransition != transitions.end()) {
+		if ((*iTransition)->getDst() == nodeToDelete) {
+			delete *iTransition;
+			transitions.erase(iTransition++);
+		} else {
+			++iTransition;
+		}
+	}
 }
 
 bool OGFromFileNode::hasTransitionWithLabel(const std::string& transitionLabel)
@@ -132,19 +146,19 @@ OGFromFileNode* OGFromFileNode::backfireTransitionWithLabel(
 bool OGFromFileNode::assignmentSatisfiesAnnotation(
     const CommGraphFormulaAssignment& assignment) const
 {
-    assert(firstClause != NULL);
-    return firstClause->satisfies(assignment);
+    assert(annotation != NULL);
+    return annotation->satisfies(assignment);
 }
 
 std::string OGFromFileNode::getAnnotationAsString() const
 {
-    assert(firstClause != NULL);
-    return firstClause->asString();
+    assert(annotation != NULL);
+    return annotation->asString();
 }
 
 CommGraphFormula* OGFromFileNode::getAnnotation() const {
 
-    return firstClause;
+    return annotation;
 
 }
 
@@ -280,109 +294,53 @@ bool OGFromFile::hasNoRoot() const
 }
 
 
-bool OGFromFile::findNodeInSet(OGFromFileNode* toFind, nodes_t* toLook) {
-    nodes_t::iterator iter = toLook->find(toFind);
-    if (iter != toLook->end()) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-
-//! \fn nodes_t* OGFromFile::computeFalseNodes()
-OGFromFile::nodes_t* OGFromFile::computeFalseNodes(nodes_t* redNodes) {
-
-	// the set representing the nodes that have to be analysed
-	nodes_t* nodesComputedRed = new nodes_t();
-
-//	cout << "computeFalseNodes : start" << endl;
-//	cout << "\ttotal red nodes so far: " << redNodes->size() << endl;
-//	cout << "\t  new red nodes so far: " << nodesComputedRed->size() << endl;
-
-	// iterating over all nodes of the OG
-	for (OGFromFile::nodes_t::iterator node_iter = nodes.begin();
-	     node_iter != nodes.end(); ++node_iter) {
-		
-		if (findNodeInSet(*node_iter, redNodes)) {
-//			cout << "node " << (*node_iter)->getName() << " already red" << endl;
-		} else {
-//			cout << "analysing node " << (*node_iter)->getName() << endl;
-			CommGraphFormulaAssignment* myAssignment = (*node_iter)->getAssignment();
-			
-			if ((*node_iter)->getAnnotation()->value(*myAssignment) == true) {
-//				cout << "          node is blue" << endl;
-			} else {
-//				cout << "          node is red" << endl;
-				nodesComputedRed->insert(*node_iter);
-			}
-		}
-	}
-
-//	cout << "\t  new red nodes    now: " << nodesComputedRed->size() << endl;
-//	cout << "computeFalseNodes : end" << endl;
-	return nodesComputedRed;
-}
-
-
-//! \fn OGFromFile* OGFromFile::removeFalseNodes()
 void OGFromFile::removeFalseNodes() {
 
-	nodes_t* redNodes = new nodes_t();
-	nodes_t* newRedNodes = new nodes_t();
-	
-	OGFromFileNode* myDest;
-	
-	
-	// 1) analyses each node, whether it satisfies its annotation
-	// 2) if not, the node is marked in set newRedNodes
-	// 3) afterwards, all transitions pointing to red nodes are deleted
-	// 1) - 3) is continued until a fixpoint (i.e., newRedNodes is empty) is reached
-	while (true) {
-		newRedNodes = computeFalseNodes(redNodes);
-//		cout << "number of nodes in redNodes (before) " << redNodes->size() << endl;
-		if (newRedNodes->size() == 0) {
-			break;
-		} else {
-			// adding the newly computed red nodes to the total red nodes
-			for (OGFromFile::nodes_t::iterator node_iter = newRedNodes->begin();
-			     node_iter != newRedNodes->end(); ++node_iter) {
-				redNodes->insert(*node_iter);
+	trace(TRACE_5, "OGFromFile::removeFalseNodes(): start\n");
+
+	bool nodesHaveChanged = true;
+	while (nodesHaveChanged) {
+		nodesHaveChanged = false;
+		nodes_iterator iNode = nodes.begin();
+		while (iNode != nodes.end())
+		{
+			CommGraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
+			if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
+				removeTransitionsToNodeFromAllOtherNodes(*iNode);
+                delete *iNode;
+				nodes.erase(iNode++);
+				nodesHaveChanged = true;
+			} else {
+				++iNode;
 			}
-			// iterating over all nodes and deleting transitions to
-			// nodes that became red lately
-			for (OGFromFile::nodes_t::iterator node_iter = nodes.begin();
-			     node_iter != nodes.end(); ++node_iter) {
-				for (OGFromFileNode::transitions_t::iterator trans_iter = (*node_iter)->transitions.begin();
-				     trans_iter != (*node_iter)->transitions.end(); ) {
-					// deleting transitions to a red node
-					myDest = (*trans_iter)->getDst();
-					if (findNodeInSet(myDest, newRedNodes)) {
-						(*node_iter)->transitions.erase(trans_iter++);
-					} else {
-						++trans_iter;
-					}
-				}
-			}
+
+			delete iNodeAssignment;
 		}
-//		cout << "number of nodes in redNodes (after ) " << redNodes->size() << endl << endl;
 	}
 
-	// we reached a fixpoint, so check whether there is a blue node left
-	if (nodes.size() <= redNodes->size()) {
+	if (nodes.size() == 0) {
 		setRoot(NULL);
-//		cout << "all nodes have been deleted :( " << endl;
 	}
 
-	return;
+	trace(TRACE_5, "OGFromFile::removeFalseNodes(): end\n");
 }
 
+
+void OGFromFile::removeTransitionsToNodeFromAllOtherNodes(
+    const OGFromFileNode* nodeToDelete) {
+
+	for (nodes_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
+		if (*iNode != nodeToDelete) {
+			(*iNode)->removeTransitionsToNode(nodeToDelete);
+		}
+	}
+}
 
 //! \fn OGFromFile* OGFromFile::enforce(OGFromFile* constraint)
 //! \brief enforces the current OG to respect the given constraint
 //! \return the OG respecting the constraint
 //! \param constraint the constraint to be enforced
-OGFromFile* OGFromFile::enforce(OGFromFile* constraint) {
+OGFromFile* OGFromFile::enforce(OGFromFile* constraint) const {
 	trace(TRACE_5, "OGFromFile::enforce(OGFromFile* constraint): start\n");
 
 	// this will be the new and constrained OG
@@ -397,7 +355,10 @@ OGFromFile* OGFromFile::enforce(OGFromFile* constraint) {
 	currentName = currentOGNode->getName() + "x" + currentConstraintNode->getName();
 
 	CommGraphFormulaMultiaryAnd* currentFormula;
-	currentFormula = new CommGraphFormulaMultiaryAnd(currentOGNode->getAnnotation(), currentConstraintNode->getAnnotation());
+	currentFormula = new CommGraphFormulaMultiaryAnd(
+	    currentOGNode->getAnnotation()->getDeepCopy(),
+	    currentConstraintNode->getAnnotation()->getDeepCopy()
+	);
 
 	// building the new root node of the constrained OG
 	OGFromFileNode* newNode = new OGFromFileNode(currentName, currentFormula);
@@ -421,7 +382,7 @@ OGFromFile* OGFromFile::enforce(OGFromFile* constraint) {
 //! \param newOG the resulting constrained OG
 void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
                                    OGFromFileNode* currentConstraintNode,
-                                   OGFromFile* newOG) {
+                                   OGFromFile* newOG) const {
 
 	trace(TRACE_5, "OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentConstraintNode, OGFromFile* newOG): start\n");
 
@@ -457,12 +418,6 @@ void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
 			// that has name and annotation constructed from current nodes of OG and constraint
 			std::string newName;
 			newName = newOGNode->getName() + "x" + newConstraintNode->getName();
-		
-			CommGraphFormulaMultiaryAnd* newFormula;
-			newFormula = new CommGraphFormulaMultiaryAnd(newOGNode->getAnnotation(), newConstraintNode->getAnnotation());
-
-			OGFromFileNode* newNode = new OGFromFileNode(newName, newFormula);
-
 			// if the node is new, add that node to the OG
 			OGFromFileNode* found = newOG->getNodeWithName(newName);
 
@@ -473,6 +428,16 @@ void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
 				trace(TRACE_5, "OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentConstraintNode, OGFromFile* newOG): end\n");
 			} else {
 				// we computed a new node, so we add a node and an edge
+//				trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
+
+				CommGraphFormulaMultiaryAnd* newFormula;
+				newFormula = new CommGraphFormulaMultiaryAnd(
+					newOGNode->getAnnotation()->getDeepCopy(),
+					newConstraintNode->getAnnotation()->getDeepCopy()
+				);
+
+				OGFromFileNode* newNode = new OGFromFileNode(newName, newFormula);
+
 				newOG->addNode(newNode);
 
 				// going down recursively
@@ -488,34 +453,37 @@ void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
 
 //! \fn void OGFromFile::printDotFile()
 //! \brief creates a dot file of the graph
-void OGFromFile::printDotFile() {
-    
-	trace(TRACE_0, "creating the dot file of the constrained OG...\n");	
-    OGFromFileNode* tmp = root;
+void OGFromFile::printDotFile() const {
 
-	char buffer[256];
-	sprintf(buffer, "%s.a.og.under.%s.out", netfile, ogfile.c_str());
+    trace(TRACE_0, "creating the dot file of the constrained OG...\n");	
 
-    fstream dotFile(buffer, ios_base::out | ios_base::trunc);
-    dotFile << "digraph g1 {\n";
-    dotFile << "graph [fontname=\"Helvetica\", label=\"";
-    dotFile << "constrained OG of ";
-    dotFile << netfile << "a.og and " << ogfile;
-    dotFile << "\"];\n";
-    dotFile << "node [fontname=\"Helvetica\" fontsize=10];\n";
-    dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
+    string netogfile = string(netfile) + ".a.og";
+    string outfilesPrefix = netogfile + ".under." +
+        platform_basename(constraintfile);
+    string dotFile = outfilesPrefix + ".out";
+    string pngFile = outfilesPrefix + ".png";
+    fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
+    dotFileHandle << "digraph g1 {\n";
+    dotFileHandle << "graph [fontname=\"Helvetica\", label=\"";
+    dotFileHandle << "constrained OG of ";
+    dotFileHandle << netogfile << " and " << constraintfile;
+    dotFileHandle << "\"];\n";
+    dotFileHandle << "node [fontname=\"Helvetica\" fontsize=10];\n";
+    dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
-    printGraphToDot(tmp, dotFile, visitedNodes);
-    
-    dotFile << "}";
-    dotFile.close();
-    	
+
+    std::map<OGFromFileNode*, bool> visitedNodes;
+    printGraphToDot(getRoot(), dotFileHandle, visitedNodes);
+
+    dotFileHandle << "}";
+    dotFileHandle.close();
+
     // prepare dot command line for printing
-	sprintf(buffer, "dot -Tpng %s.a.og.under.%s.out -o %s.a.og.under.%s.png", netfile, ogfile.c_str(), netfile, ogfile.c_str());
+    string cmd = "dot -Tpng " + dotFile + " -o " + pngFile;
 
-	// print commandline and execute system command
-	trace(TRACE_0, string(buffer) + "\n\n");
-    system(buffer);
+    // print commandline and execute system command
+    trace(TRACE_0, cmd + "\n\n");
+    system(cmd.c_str());
 }
 
 
@@ -524,7 +492,7 @@ void OGFromFile::printDotFile() {
 //! \param os output stream
 //! \param visitedNodes maps nodes to Bools remembering already visited nodes
 //! \brief dfs through the graph printing each node and edge to the output stream
-void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, OGFromFileNode_map& visitedNodes) {
+void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFromFileNode*, bool>& visitedNodes) const {
 
 	if (v == NULL) {
 		// print the empty OG...	

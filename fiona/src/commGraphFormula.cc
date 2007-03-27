@@ -73,8 +73,7 @@ bool CommGraphFormula::satisfies(const CommGraphFormulaAssignment& assignment)
 void CommGraphFormula::removeLiteral(const std::string&) {
 }
 
-
-CommGraphFormulaMultiary::CommGraphFormulaMultiary() {
+CommGraphFormulaMultiary::CommGraphFormulaMultiary() : CommGraphFormula() {
 }
 
 
@@ -175,6 +174,16 @@ void CommGraphFormulaMultiary::removeLiteral(const std::string& name) {
 	trace(TRACE_5, "CommGraphFormulaMultiary::removeLiteral(const std::string& name) : end\n");
 }
 
+void CommGraphFormulaMultiary::deepCopyMultiaryPrivateMembersToNewFormula(
+    CommGraphFormulaMultiary* newFormula) const
+{
+    newFormula->subFormulas.clear();
+    for (subFormulas_t::const_iterator iFormula = subFormulas.begin();
+         iFormula != subFormulas.end(); ++iFormula)
+    {
+        newFormula->subFormulas.insert((*iFormula)->getDeepCopy());
+    }
+}
 
 CommGraphFormulaMultiaryAnd::CommGraphFormulaMultiaryAnd() {
 }
@@ -189,6 +198,16 @@ CommGraphFormulaMultiaryAnd::CommGraphFormulaMultiaryAnd(CommGraphFormula* lhs_,
     CommGraphFormula* rhs_) :
     CommGraphFormulaMultiary(lhs_, rhs_) {
 
+}
+
+CommGraphFormulaMultiaryAnd* CommGraphFormulaMultiaryAnd::getDeepCopy() const
+{
+    CommGraphFormulaMultiaryAnd* newFormula =
+        new CommGraphFormulaMultiaryAnd(*this);
+
+    deepCopyMultiaryPrivateMembersToNewFormula(newFormula);
+
+    return newFormula;
 }
 
 
@@ -227,6 +246,16 @@ CommGraphFormulaMultiaryOr::CommGraphFormulaMultiaryOr(CommGraphFormula* lhs_,
 std::string CommGraphFormulaMultiaryOr::getOperator() const
 {
     return "+";
+}
+
+CommGraphFormulaMultiaryOr* CommGraphFormulaMultiaryOr::getDeepCopy() const
+{
+    CommGraphFormulaMultiaryOr* newFormula =
+        new CommGraphFormulaMultiaryOr(*this);
+
+    deepCopyMultiaryPrivateMembersToNewFormula(newFormula);
+
+    return newFormula;
 }
 
 
@@ -277,6 +306,11 @@ bool CommGraphFormulaFixed::value(const CommGraphFormulaAssignment&) const
     return _value;
 }
 
+CommGraphFormulaFixed* CommGraphFormulaFixed::getDeepCopy() const
+{
+    return new CommGraphFormulaFixed(*this);
+}
+
 CommGraphFormulaTrue::CommGraphFormulaTrue() :
     CommGraphFormulaFixed(true, "true")
 {
@@ -290,6 +324,11 @@ CommGraphFormulaFalse::CommGraphFormulaFalse() :
 CommGraphFormulaLiteral::CommGraphFormulaLiteral(const std::string& literal_) :
     literal(literal_)
 {
+}
+
+CommGraphFormulaLiteral* CommGraphFormulaLiteral::getDeepCopy() const
+{
+    return new CommGraphFormulaLiteral(*this);
 }
 
 bool CommGraphFormulaLiteral::value(

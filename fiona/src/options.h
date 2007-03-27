@@ -78,7 +78,8 @@ extern std::map<possibleOptions,    bool> options;
 extern std::map<possibleParameters, bool> parameters;
 
 extern char * netfile;
-extern std::string ogfile;
+extern std::string ogfileToMatch;
+extern std::string ogfileToParse;
 extern std::string constraintfile;
 extern unsigned int messages_manual;
 extern int events_manual;

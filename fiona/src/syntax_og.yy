@@ -57,7 +57,7 @@ extern int og_yylex();
 
 #include "OGFromFile.h"
 
-OGFromFile OGToMatch;
+OGFromFile* OGToParse;
 
 using namespace std;
 
@@ -123,11 +123,11 @@ nodes_list: nodes_list comma node
 
 node: ident colon formula
     {
-        if (OGToMatch.hasNodeWithName($1)) {
+        if (OGToParse->hasNodeWithName($1)) {
             og_yyerror_node_already_defined($1);
         }
 
-        OGToMatch.addNode($1, $3);
+        OGToParse->addNode($1, $3);
         free($1);
     }
 ;
@@ -161,11 +161,11 @@ formula: lpar formula rpar
 
 initialnode: key_initialnode ident
     {
-        if (!OGToMatch.hasNodeWithName($2)) {
+        if (!OGToParse->hasNodeWithName($2)) {
             og_yyerror_unknown_node($2);
         }
 
-        OGToMatch.setRootToNodeWithName($2);
+        OGToParse->setRootToNodeWithName($2);
         free($2);
     }
     semicolon
@@ -181,15 +181,15 @@ transitions_list: transitions_list comma transition
 
 transition: ident arrow ident colon ident
     {
-        if (!OGToMatch.hasNodeWithName($1)) {
+        if (!OGToParse->hasNodeWithName($1)) {
             og_yyerror_unknown_node($1);
         }
 
-        if (!OGToMatch.hasNodeWithName($3)) {
+        if (!OGToParse->hasNodeWithName($3)) {
             og_yyerror_unknown_node($3);
         }
 
-        OGToMatch.addTransition($1, $3, $5);
+        OGToParse->addTransition($1, $3, $5);
         free($1);
         free($3);
         free($5);

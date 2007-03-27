@@ -47,8 +47,9 @@ using namespace std;
 
 // some file names and pointers
 char * netfile;
-std::list<char*> netfiles; 
-std::string ogfile;
+std::list<char*> netfiles;
+std::string ogfileToMatch;
+std::string ogfileToParse;
 std::string constraintfile;
 
 int events_manual;
@@ -390,7 +391,7 @@ void parse_command_line(int argc, char* argv[]) {
             case GETOPTLONG_MATCH1:
                 if (optarg) {
                     options[O_MATCH] = true;
-                    ogfile = optarg;
+                    ogfileToMatch = optarg;
                 } else {
                     cerr << "Error:\tOG file name missing" << endl
                          << "\tEnter \"fiona --help\" for more information."

@@ -2027,7 +2027,7 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
 #endif
 
 
-bool oWFN::matchesWithOG(const OGFromFile& og, string& reasonForFailedMatch) {
+bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
     // A temporary copy of the CurrentMarking. Used to revert to the
     // CurrentMarking if firing of a transition leads to an already seen
     // marking.
@@ -2056,7 +2056,7 @@ bool oWFN::matchesWithOG(const OGFromFile& og, string& reasonForFailedMatch) {
     currentState->type = typeOfState();
 
     // Initialize the currentOGNode with the root node of the OG.
-    OGFromFileNode* currentOGNode = og.getRoot();
+    OGFromFileNode* currentOGNode = og->getRoot();
 
     // In this loop, we build the reachability graph of the oWFN and check
     // whether it matches with the OG.

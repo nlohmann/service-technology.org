@@ -50,6 +50,8 @@
 #include "newlogger.h"
 #endif
 
+#include <libgen.h>
+
 using namespace std;
 
 extern int owfn_yydebug;
@@ -77,7 +79,7 @@ extern int og_yylex_destroy();
 extern unsigned int State::card;
 // extern char * netfile;
 extern list<char*> netfiles;
-extern OGFromFile OGToMatch;
+extern OGFromFile* OGToParse;
 
 int garbagefound;
 unsigned int NonEmptyHash;
@@ -135,7 +137,7 @@ void readnet() {
 }
 
 
-void readog() {
+OGFromFile* readog(const std::string& ogfile) {
     og_yydebug = 0;
     og_yy_flex_debug = 0;
     assert(ogfile != "");
@@ -149,10 +151,12 @@ void readog() {
     trace(TRACE_1, "--------------------------------------------------------------\n");
     trace(TRACE_1, "reading from file " + ogfile + "\n");
 
-    OGToMatch = OGFromFile();
+    OGToParse = new OGFromFile();
+    ogfileToParse = ogfile;
 
     og_yyparse();
     fclose(og_yyin);
+    return OGToParse;
 }
 
 
@@ -232,8 +236,9 @@ int main(int argc, char ** argv) {
     
 // ------------------- reading OG ------------------------
 
+    OGFromFile* OGToMatch = NULL;
     if (options[O_MATCH]) {
-        readog();
+        OGToMatch = readog(ogfileToMatch);
     }
 
 // ----------- enforcing a constraint automaton ----------
@@ -243,30 +248,25 @@ int main(int argc, char ** argv) {
 		netfile = *netfiles.begin();
 		
 		// open the OG to be constrained
-		ogfile = string(netfile) + ".a.og";
+		string ogfile = string(netfile) + ".a.og";
 		trace(TRACE_0, "You want to constrain the OG:  " + ogfile + "\n");
 
-		OGFromFile* og = new OGFromFile();
-		readog();
-		(*og) = OGToMatch;
-		
+		OGFromFile* og = readog(ogfile);
+
 		// open the constraint automaton (same syntax as OG)
-		ogfile = string(constraintfile);
-		trace(TRACE_0, "   to respect the constraint:  " + ogfile + "\n\n"); 
+		trace(TRACE_0, "   to respect the constraint:  " + constraintfile +
+		    "\n\n"); 
 
-		OGFromFile* constraint = new OGFromFile();
-		readog();
-		(*constraint) = OGToMatch;
+		OGFromFile* constraint = readog(constraintfile);
 
-		OGFromFile* constrainedOG;
-		constrainedOG = og->enforce(constraint);
-		
-		trace(TRACE_0, " computed the constrained OG:  " + string(netfile));
-		trace(TRACE_0, ".a.og.under.");
-		trace(TRACE_0, ogfile + ".out\n\n"); 
+		OGFromFile* constrainedOG = og->enforce(constraint);
+
+		trace(TRACE_0, " computed the constrained OG:  " +
+		    string(netfile) + ".a.og.under." + platform_basename(constraintfile) +
+		    ".out\n\n");
+
 
 		constrainedOG->removeFalseNodes();
-		//constrainedOG->computeFalseNodes();
 		constrainedOG->printDotFile();
 
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
@@ -274,8 +274,12 @@ int main(int argc, char ** argv) {
 		//  Must NOT be called before fclose(og_yyin);
 		og_yylex_destroy();
 #endif
+
+		delete constrainedOG;
+		delete constraint;
+		delete og;
 		return 0;
-    }
+	}
 
 // ---------------- reading all nets ---------------------
 
@@ -495,10 +499,23 @@ int main(int argc, char ** argv) {
     
     } // end of "for all nets ..."
 
+    if (options[O_MATCH]) {
+        delete OGToMatch;
+    }
 
 #ifdef LOG_NEW
     NewLogger::printall();
 #endif
     
 	return 0;
+}
+
+
+std::string platform_basename(const std::string& path)
+{
+    char* ppath = (char*)malloc(path.size() + sizeof(char));
+    strcpy(ppath, path.c_str());
+    std::string result = string(::basename(ppath));
+    free(ppath);
+    return result;
 }

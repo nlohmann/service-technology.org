@@ -26,18 +26,18 @@
  *          This file implements the class defined in cfg.h
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/03/25 10:19:37 $
+ * \date    \$Date: 2007/03/27 13:14:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  *
  * \todo    
  *          - commandline option to control drawing of clusters 
@@ -50,6 +50,7 @@
 #include <cassert>
 #include <iostream>
 
+#include "bpel2owfn.h"
 #include "cfg.h"
 #include "options.h"
 #include "debug.h"
@@ -85,8 +86,6 @@ CFGBlock::CFGBlock()
   lastBlock  = this;
   dotted = false;
   processed = false;
-  dpe = false;
-  
 }
 
 /**
@@ -106,7 +105,6 @@ CFGBlock::CFGBlock(CFGBlockType pType, int pId = 0, string pLabel = "")
   label = pLabel;
   dotted = false;
   processed = false;
-  dpe = false;
 }
 
 /**
@@ -175,10 +173,6 @@ void CFGBlock::print_dot()
     {
       (*output) << " color=green style=filled"; //
     }
-    if (dpe)
-    {
-      (*output) << " fontcolor=blue";
-    }
     (*output) << " ]; " << endl;
     (*output) << "  // all outgoing edges" << endl;
     for(list<CFGBlock *>::iterator iter = nextBlocks.begin(); iter != nextBlocks.end(); iter++)
@@ -236,96 +230,6 @@ void cfgDot(CFGBlock * block)
   
   (*output) << "}" << endl;
 
-}
-
-/**
- * Checks if a block needs DPE.
- *
- * \param hasStartingBlock  true iff a Switch or Pick was seen.
- * \param lastTargets	    a list of all seen Targets
- * \return		    true iff DPE is needed
- *
- */
-bool CFGBlock::needsDPE(int hasStartingBlock, list<int> lastTargets)
-{
- 
-  if (processed)
-  {
-    return dpe;
-  }
-  
-  bool childrenDPE = false;
-  int newStartingBlockNumber = hasStartingBlock;
-  list<int> localTargetList;
-
-  if (!lastTargets.empty())
-  {
-    for (list<int>::iterator iter = lastTargets.begin(); iter != lastTargets.end(); iter++)
-    {
-      localTargetList.push_back(*iter);
-    }
-  }
-
-  processed = true;
-
-  if (! nextBlocks.empty())
-  {
-    switch (type)
-    {
-      case CFGSwitch :  if (label == "Switch_begin")
-			{
-			  newStartingBlockNumber++;
-			}
-			else
-			{
-			  newStartingBlockNumber--;
-			}
-			break; 
-      case CFGIf :      if (label == "If_begin")
-			{
-			  newStartingBlockNumber++;
-			}
-			else
-			{
-			  newStartingBlockNumber--;
-			}
-			break; 
-      case CFGPick :	if (label == "Pick_begin")
-			{
-			  newStartingBlockNumber++;
-			}
-			else
-			{
-			  newStartingBlockNumber--;
-			}
-			break; 
-      case CFGTarget :	localTargetList.push_back(id);
-			break;
-      default :		if (! localTargetList.empty())
-			{
-			  while ( ! localTargetList.empty() && (*(--localTargetList.end())) > id)
-			  {
-			    localTargetList.remove( *(--localTargetList.end()) );
-			  }
-			}
-			break;
-    }
-    for (list<CFGBlock *>::iterator iter = nextBlocks.begin(); iter != nextBlocks.end(); iter++)
-    {
-      bool result = (*iter)->needsDPE(newStartingBlockNumber, localTargetList);
-      childrenDPE = childrenDPE || result;
-    }
-    if (type == CFGSource)
-    {
-      childrenDPE = true;
-    }
-    
-    return dpe = (childrenDPE && ((hasStartingBlock > 0) || !localTargetList.empty()) );
-  }
-  else
-  {
-    return childrenDPE;
-  }
 }
 
 /// resets the processed flag to false
@@ -831,12 +735,6 @@ void processCFG()
   trace(TRACE_INFORMATION, "-> Unparsing AST to CFG ...\n");
   globals::AST->unparse(kc::pseudoPrinter, kc::cfg);
   
-  //trace(TRACE_DEBUG, "[CFG] checking for DPE\n");
-  // do some business with CFG
-  //list<int> kcl;
-  //CFG->needsDPE(0, kcl);
-  //CFG->resetProcessedFlag();
-
   trace(TRACE_DEBUG, "[CFG] checking for cyclic links\n");
   /// \todo (gierds) check for cyclic links, otherwise we will fail
   CFG->checkForCyclicLinks();
@@ -869,7 +767,6 @@ void processCFG()
     {
       closeOutput(output);
       output = NULL;
-
 #ifdef HAVE_DOT
       string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".cfg.png " + globals::output_filename + ".cfg." + suffixes[F_DOT];
       trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");

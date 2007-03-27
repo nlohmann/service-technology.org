@@ -30,14 +30,14 @@
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/01/17 14:45:45 $
+ * \date    \$Date: 2007/03/27 13:14:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  */
 
 #ifndef CFG_H
@@ -167,9 +167,6 @@ class CFGBlock {
     /// additional name of the channel
     string channel_name;
 
-    /// checks which blocks need DPE
-    bool needsDPE(int hasStartingBlock, list<int> lastTarget);
-
     /// resets the processed flag to false
     void resetProcessedFlag(bool withLinks = false, bool forward = true);
     
@@ -206,10 +203,6 @@ class CFGBlock {
 
     set< unsigned int > controllingPeers;
     
-    /// \todo: move to symbol table
-    bool dpe;
-    list<CFGBlock * > dpeList;
-	  
 };
 
 /// wrapper for dot printing (prints all the graph data)

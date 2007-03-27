@@ -153,10 +153,6 @@ void readog() {
 
     og_yyparse();
     fclose(og_yyin);
-
-#ifdef YY_FLEX_HAS_YYLEX_DESTROY
-    og_yylex_destroy(); // must NOT be called before fclose(og_yyin);
-#endif
 }
 
 
@@ -272,6 +268,12 @@ int main(int argc, char ** argv) {
 		constrainedOG->removeFalseNodes();
 		//constrainedOG->computeFalseNodes();
 		constrainedOG->printDotFile();
+
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
+		// Destroy buffer of OG parser.
+		//  Must NOT be called before fclose(og_yyin);
+		og_yylex_destroy();
+#endif
 		return 0;
     }
 

@@ -83,15 +83,12 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
 	}
 //for full symbolic representation (end)
 	
-	
-	
 	//init managers
-	//mgrMp = Cudd_Init(sizeMp, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 30000000);   
+	//mgrMp = Cudd_Init(sizeMp, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);   
 	//mgrAnn = Cudd_Init(sizeAnn, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
-	mgrMp = Cudd_Init(sizeMp, 0, 1000, 1000, 300000);   
-	mgrAnn = Cudd_Init(sizeAnn, 0, 1000, 1000, 300000);
-	//PrintMemoryInUse();
-	
+	mgrMp = Cudd_Init(sizeMp, 0, 1, 1, 1);   
+	mgrAnn = Cudd_Init(sizeAnn, 0, 1, 1, 1);
+		
 	//enable automatic dynamic reordering of the BDDs
 	Cudd_AutodynEnable(mgrMp, heuristic);
 	Cudd_AutodynEnable(mgrAnn, heuristic);		
@@ -894,12 +891,14 @@ void BddRepresentation::save(char* option){
 }
 
 void BddRepresentation::PrintMemoryInUse(){
-	cout << "\nNumber of live nodes in mgrMp: " << Cudd_ReadNodeCount(mgrMp)<<endl;
-	cout << "Peak number of nodes in mgrMp: " << Cudd_ReadPeakNodeCount(mgrMp)<<endl;
+	cout << endl;
+//	cout << "Number of live nodes in mgrMp: " << Cudd_ReadNodeCount(mgrMp) << endl;
+//	cout << "Peak number of nodes in mgrMp: " << Cudd_ReadPeakNodeCount(mgrMp) << endl;
+//	cout << "Number of dead nodes in mgrMp: " << Cudd_ReadDead(mgrMp) << endl;
 	cout << "Memory in use for mgrMp:  " << Cudd_ReadMemoryInUse(mgrMp)<< " bytes" << endl;	
 	cout << "Memory in use for mgrAnn: " << Cudd_ReadMemoryInUse(mgrAnn)<<" bytes" << endl;
 	cout << "Memory in use for both BDD: " << Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn)<< 
-		    "  (" << (Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn))/(1024*1024) << ") MB" << endl;
+		    "  bytes (" << (Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn))/(1024*1024) << " MB)" << endl;
 }
 
 void BddRepresentation::testSymbRepresentation(vertex* v, bool visitedNodes[]){

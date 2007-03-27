@@ -150,7 +150,7 @@ CommGraphFormula* OGFromFileNode::getAnnotation() const {
 
 
 // return the assignment that is imposed by present or absent arcs leaving the node
-CommGraphFormulaAssignment* OGFromFileNode::getAssignment() {
+CommGraphFormulaAssignment* OGFromFileNode::getAssignment() const {
 	
 	trace(TRACE_5, "computing annotation of node " + getName() + "\n");
 

@@ -82,7 +82,7 @@ public:
     std::string getAnnotationAsString() const;
 	CommGraphFormula* getAnnotation() const;
 
-	CommGraphFormulaAssignment* OGFromFileNode::getAssignment();
+	CommGraphFormulaAssignment* getAssignment() const;
 
     void setDepthFirstSearchParent(OGFromFileNode* depthFirstSearchParent);
     OGFromFileNode* getDepthFirstSearchParent() const;

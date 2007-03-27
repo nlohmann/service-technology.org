@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/03/26 14:27:19 $
+ * \date    \$Date: 2007/03/27 12:13:37 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.195 $
+ * \version \$Revision: 1.196 $
  *
  * \ingroup petrinet
  */
@@ -1482,11 +1482,16 @@ void PetriNet::addPrefix(string prefix)
 /*!
  * \brief   composes a second Petri net
  *
- * \todo    Gierds: comment me!
+ * Given a second Petri net #net, the internal structure is added and input 
+ * and output places are connected appropriatedly (if an input and an output
+ * place name of the two nets match).
+ *
+ * \param net the net that should be added (connected)
  */
 void PetriNet::compose(const PetriNet &net)
 {
   using namespace std;
+
   // add all internal places
   for (set< Place * >::iterator place = net.P.begin(); place != net.P.end(); place ++)
   {
@@ -1508,9 +1513,15 @@ void PetriNet::compose(const PetriNet &net)
     newPlace->id = getId();
     newPlace->preset.clear();
     newPlace->postset.clear();
-    P_in.insert( newPlace );
 
-    roleMap[ newPlace->nodeFullName() ] = newPlace;
+    // check if input place with same name already exists
+    if (roleMap[ newPlace->nodeFullName() ] == NULL )
+    {
+      // no, all fine
+      roleMap[ newPlace->nodeFullName() ] = newPlace;
+      P_in.insert( newPlace );
+    }
+    // else, we don't need to add the place, it already exist (arcs are connected with the existing place)
 
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
       roleMap[(newPlace->prefix + *name)] = newPlace;
@@ -1522,9 +1533,15 @@ void PetriNet::compose(const PetriNet &net)
     newPlace->id = getId();
     newPlace->preset.clear();
     newPlace->postset.clear();
-    P_out.insert( newPlace );
 
-    roleMap[ newPlace->nodeFullName() ] = newPlace;
+    // check if output place with same name already exists
+    if (roleMap[ newPlace->nodeFullName() ] == NULL )
+    {
+      // no, all fine
+      roleMap[ newPlace->nodeFullName() ] = newPlace;
+      P_out.insert( newPlace );
+    }
+    // else, we don't need to add the place, it already exist (arcs are connected with the existing place)
 
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
       roleMap[(newPlace->prefix + *name)] = newPlace;

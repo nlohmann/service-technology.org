@@ -111,7 +111,7 @@ oWFN::~oWFN() {
 	trace(TRACE_5, "oWFN::~oWFN() : end\n");
 }
 
-unsigned int oWFN::getPlaceCount() const {
+oWFN::Places_t::size_type oWFN::getPlaceCount() const {
 	return Places.size();
 }
 

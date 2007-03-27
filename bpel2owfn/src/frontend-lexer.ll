@@ -29,7 +29,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/03/27 10:42:01 $
+ * \date    \$Date: 2007/03/27 11:44:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.
@@ -169,34 +169,24 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 
 
  /* everything needed to evaluate join conditons (must be above the attributes section) */
-<ATTRIBUTE>"joinCondition"		{ return K_JOINCONDITION; }
-<ATTRIBUTE>{bpwsns}?"getLinkStatus"	{ return K_GETLINKSTATUS; }
-<ATTRIBUTE>"and"			{ return K_AND; }
-<ATTRIBUTE>"or"				{ return K_OR; }
-<ATTRIBUTE>"("				{ return LBRACKET; }
-<ATTRIBUTE>")"				{ return RBRACKET; }
-<ATTRIBUTE>"'"				{ return APOSTROPHE; }
-
+<ATTRIBUTE>"joinCondition"		                { return K_JOINCONDITION; }
+<ATTRIBUTE,JOINCONDITION>{bpwsns}?"getLinkStatus"	{ return K_GETLINKSTATUS; }
+<ATTRIBUTE,JOINCONDITION>"and"			        { return K_AND; }
+<ATTRIBUTE,JOINCONDITION>"or"				{ return K_OR; }
+<ATTRIBUTE,JOINCONDITION>"("				{ return LBRACKET; }
+<ATTRIBUTE,JOINCONDITION>")"				{ return RBRACKET; }
+<ATTRIBUTE,JOINCONDITION>"'"				{ return APOSTROPHE; }
+<ATTRIBUTE,JOINCONDITION>{name}                         { frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
+                                                          return X_NAME; }
 
  /* attributes */
-<ATTRIBUTE>{name}       { frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
-                          return X_NAME; }
 <ATTRIBUTE>{string}	{ std::string stringwoquotes = std::string(frontend_text).substr(1, strlen(frontend_text)-2);
                           frontend_lval.yt_casestring = kc::mkcasestring(stringwoquotes.c_str());
                           return X_STRING; }
 <ATTRIBUTE>"="		{ return X_EQUALS; }
 
 
- /* everything needed to parse WSBPEL join conditions */
-
-<JOINCONDITION>{bpwsns}?"getLinkStatus"	{ return K_GETLINKSTATUS; }
-<JOINCONDITION>"and"			{ return K_AND; }
-<JOINCONDITION>"or"			{ return K_OR; }
-<JOINCONDITION>"("			{ return LBRACKET; }
-<JOINCONDITION>")"			{ return RBRACKET; }
-<JOINCONDITION>"'"			{ return APOSTROPHE; }
-<JOINCONDITION>{name}	                { frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
-                                          return X_NAME; }
+ /* join conditions */
 <JOINCONDITION>"$"{name}		{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                                           return VARIABLENAME; }
 <JOINCONDITION>"<"                      { BEGIN(INITIAL); return X_OPEN; }

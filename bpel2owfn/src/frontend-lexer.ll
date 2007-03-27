@@ -29,7 +29,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/03/23 12:45:04 $
+ * \date    \$Date: 2007/03/27 10:42:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.
@@ -116,6 +116,8 @@ extern int frontend_error(const char *msg);
 /// current start condition of the lexer
 unsigned int currentView;
 
+bool parseJoinCondition = false;
+
 
 %}
 
@@ -142,7 +144,7 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 %s COMMENT
 %s XMLHEADER
 %s DOCUMENTATION
-
+%s JOINCONDITION
 
 
 %%
@@ -177,7 +179,7 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 
 
  /* attributes */
-<ATTRIBUTE>{name}	{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
+<ATTRIBUTE>{name}       { frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                           return X_NAME; }
 <ATTRIBUTE>{string}	{ std::string stringwoquotes = std::string(frontend_text).substr(1, strlen(frontend_text)-2);
                           frontend_lval.yt_casestring = kc::mkcasestring(stringwoquotes.c_str());
@@ -185,11 +187,25 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 <ATTRIBUTE>"="		{ return X_EQUALS; }
 
 
+ /* everything needed to parse WSBPEL join conditions */
+
+<JOINCONDITION>{bpwsns}?"getLinkStatus"	{ return K_GETLINKSTATUS; }
+<JOINCONDITION>"and"			{ return K_AND; }
+<JOINCONDITION>"or"			{ return K_OR; }
+<JOINCONDITION>"("			{ return LBRACKET; }
+<JOINCONDITION>")"			{ return RBRACKET; }
+<JOINCONDITION>"'"			{ return APOSTROPHE; }
+<JOINCONDITION>{name}	                { frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
+                                          return X_NAME; }
+<JOINCONDITION>"$"{name}		{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
+                                          return VARIABLENAME; }
+<JOINCONDITION>"<"                      { BEGIN(INITIAL); return X_OPEN; }
+
 
  /* XML-elements */
 "<"				{ return X_OPEN; }
 "/"				{ return X_SLASH; }
-<INITIAL,ATTRIBUTE>">"		{ BEGIN(INITIAL); return X_CLOSE; }
+<INITIAL,ATTRIBUTE>">"		{ if (!parseJoinCondition) { BEGIN(INITIAL); } else { parseJoinCondition = false; BEGIN(JOINCONDITION); }; return X_CLOSE; }
 ">"[ \t\r\n]*"<"		{ BEGIN(INITIAL); return X_NEXT; }
 
 
@@ -229,7 +245,7 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 <INITIAL>{bpwsns}?"if"			{ BEGIN(ATTRIBUTE); return K_IF; }
 <INITIAL>{bpwsns}?"import"		{ BEGIN(ATTRIBUTE); return K_IMPORT; }
 <INITIAL>{bpwsns}?"invoke"		{ BEGIN(ATTRIBUTE); return K_INVOKE; }
-<INITIAL>{bpwsns}?"joinCondition"	{ BEGIN(ATTRIBUTE); return K_JOINCONDITION; }
+<INITIAL>{bpwsns}?"joinCondition"	{ BEGIN(ATTRIBUTE); parseJoinCondition = true; return K_JOINCONDITION; }
 <INITIAL>{bpwsns}?"link"		{ BEGIN(ATTRIBUTE); return K_LINK; }
 <INITIAL>{bpwsns}?"links"		{ BEGIN(ATTRIBUTE); return K_LINKS; }
 <INITIAL>{bpwsns}?"literal"		{ BEGIN(ATTRIBUTE); return K_LITERAL; }

@@ -24,17 +24,17 @@
  * \brief   global varialbes
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/03/25 10:19:37 $
+ * \date    \$Date: 2007/03/27 12:59:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 
 
@@ -84,7 +84,7 @@ namespace globals {
   /// failures to the correct fault_in place)
   extern string currentScope;
 
-  /// \todo (gierds) comment me!
+  /// maps the name of a node in the CFG to an actual block pointer
   extern map <string, CFGBlock *> cfgMap;
 
 

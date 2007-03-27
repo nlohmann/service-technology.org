@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/25 10:19:37 $
+ * \date    \$Date: 2007/03/27 12:37:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  */
 
 
@@ -76,7 +76,7 @@ using std::ofstream;
  *****************************************************************************/
 
 /// list of input files
-list<string> inputfiles;
+set<string> inputfiles;
 
 /// pointer to input stream
 istream *input = &cin;
@@ -327,7 +327,17 @@ void parse_command_line(int argc, char* argv[])
               {
 		options[O_INPUT] = true;
 		globals::filename = string(optarg);
-		inputfiles.push_back(globals::filename);
+                if (inputfiles.find(globals::filename) == inputfiles.end())
+                {
+		  inputfiles.insert(globals::filename);
+                }
+                else
+                {
+                  trace(TRACE_ALWAYS, "WARNING: It makes no sense reading \n");
+                  trace(TRACE_ALWAYS, "             "+ globals::filename + "\n");
+                  trace(TRACE_ALWAYS, "         more than once.\n");
+                  trace(TRACE_ALWAYS, "         So file will only be read once.\n");
+                }
 		break;
 	      }
 
@@ -478,7 +488,7 @@ void parse_command_line(int argc, char* argv[])
       cleanup();
       exit(1);
     }
-    list< string >::iterator file = inputfiles.begin();
+    set< string >::iterator file = inputfiles.begin();
     FILE * fin = NULL;
     if (!(fin = fopen(file->c_str(), "r")))
     {
@@ -518,7 +528,7 @@ void parse_command_line(int argc, char* argv[])
     } 
     else 
     {
-      list< string >::iterator file = inputfiles.begin();
+      set< string >::iterator file = inputfiles.begin();
       unsigned int pos = file->rfind(".bpel", file->length());
       if (pos == (file->length() - 5))
       {

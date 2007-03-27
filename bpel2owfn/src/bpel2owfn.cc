@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/25 10:19:37 $
+ * \date    \$Date: 2007/03/27 12:37:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.151 $
+ * \version \$Revision: 1.152 $
  */
 
 
@@ -131,7 +131,7 @@ int main( int argc, char *argv[])
 
   PetriNet PN2 = PetriNet();
 
-  list< string >::iterator file = inputfiles.begin();
+  set< string >::iterator file = inputfiles.begin();
 
   do
   {

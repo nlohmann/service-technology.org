@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/25 10:19:37 $
+ * \date    \$Date: 2007/03/27 12:37:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  */
 
 
@@ -54,11 +54,13 @@
  *****************************************************************************/
 
 #include <map>
+#include <set>
 #include <list>
 #include <string>
 #include <iostream>
 
 using std::map;
+using std::set;
 using std::list;
 using std::istream;
 using std::ostream;
@@ -170,7 +172,7 @@ extern ostream *openOutput(string name);
 // from options.cc
 
 extern bool createOutputFile;
-extern list<string> inputfiles;
+extern set<string> inputfiles;
 extern string log_filename;
 extern istream *input;
 extern ostream *output;

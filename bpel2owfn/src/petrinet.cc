@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/03/27 12:13:37 $
+ * \date    \$Date: 2007/03/27 14:09:01 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.196 $
+ * \version \$Revision: 1.197 $
  *
  * \ingroup petrinet
  */
@@ -650,11 +650,17 @@ Arc *PetriNet::newArc(Node *my_source, Node *my_target, arc_type my_type, unsign
   // Tag the involved transition as communicating if it is.
   if (my_source->nodeType == PLACE)
     if (P_in.find(static_cast<Place*>(my_source)) != P_in.end())
-      (static_cast<Transition*>(my_target))->type = IN;
+      if ((static_cast<Transition*>(my_target))->type == OUT || (static_cast<Transition*>(my_target))->type == INOUT)
+        (static_cast<Transition*>(my_target))->type = INOUT;
+      else
+        (static_cast<Transition*>(my_target))->type = IN;
 
   if (my_target->nodeType == PLACE)
     if (P_out.find(static_cast<Place*>(my_target)) != P_out.end())
-      (static_cast<Transition*>(my_source))->type = OUT;
+      if ((static_cast<Transition*>(my_source))->type == IN || (static_cast<Transition*>(my_source))->type == INOUT)
+        (static_cast<Transition*>(my_source))->type = INOUT;
+      else
+        (static_cast<Transition*>(my_source))->type = OUT;
 
 
   // Finally add the arc to the Petri net.
@@ -831,21 +837,26 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 
   // organize the communication type of the new transition
   if (t1->type == t2->type)
+  {
     t12->type = t1->type;
-
-  if ((t1->type == IN && t2->type == INTERNAL) ||
+  }
+  else if ((t1->type == IN && t2->type == INTERNAL) ||
       (t1->type == INTERNAL && t2->type == IN))
+  {
     t12->type = IN;
-
-  if ((t1->type == INTERNAL && t2->type == OUT) ||
+  }
+  else if ((t1->type == INTERNAL && t2->type == OUT) ||
       (t1->type == OUT && t2->type == INTERNAL))
+  {
     t12->type = OUT;
-
-  if ((t1->type == OUT && t2->type == IN) ||
+  }
+  else if ((t1->type == OUT && t2->type == IN) ||
       (t1->type == IN && t2->type == OUT) ||
       (t1->type == INOUT || t2->type == INOUT))
+  {
     t12->type = INOUT;
-
+  }
+  else assert(false); ///< this should never happer or we have missed a case
 
   // copy t1's history to t12
   for (vector<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
@@ -944,15 +955,15 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
   if (t1->type == t2->type)
     t12->type = t1->type;
 
-  if ((t1->type == IN && t2->type == INTERNAL) ||
+  else if ((t1->type == IN && t2->type == INTERNAL) ||
       (t1->type == INTERNAL && t2->type == IN))
     t12->type = IN;
 
-  if ((t1->type == INTERNAL && t2->type == OUT) ||
+  else if ((t1->type == INTERNAL && t2->type == OUT) ||
       (t1->type == OUT && t2->type == INTERNAL))
     t12->type = OUT;
 
-  if ((t1->type == OUT && t2->type == IN) ||
+  else if ((t1->type == OUT && t2->type == IN) ||
       (t1->type == IN && t2->type == OUT) ||
       (t1->type == INOUT || t2->type == INOUT))
     t12->type = INOUT;

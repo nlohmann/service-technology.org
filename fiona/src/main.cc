@@ -198,13 +198,23 @@ void adjustOptionValues() {
 // **********************************************************************************
 
 int main(int argc, char ** argv) {
-
+	
+//	bool readExpliciteOG = false;
 //	parse_command_line(argc, argv);
-//	readog();
-//	trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
-//	NewLogger::printall();
+//	if (readExpliciteOG){
+//		readog(ogfileToMatch);
+//		trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+//		NewLogger::printall();
+//	}
+//	else{
+//		list<char*>::iterator netiter = netfiles.begin();
+//		Exchangeability* bdd = new Exchangeability(*netiter);
+//		bdd->reorder();
+//		trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+//		bdd->printMemoryInUse();
+//	}
 //	return 0;
-//	
+	
 
 	set_new_handler(&myown_newhandler);
 
@@ -431,7 +441,6 @@ int main(int argc, char ** argv) {
             
             if (options[O_OTF]) {
                 //graph->bdd->printDotFile();
-                //graph->bdd->print();
                 graph->bdd->save("OTF");
             }
             
@@ -443,7 +452,6 @@ int main(int argc, char ** argv) {
                 cout << difftime(seconds2,seconds) << " s consumed for building and reordering the BDDs" << endl;
                  
                 //graph->bdd->printDotFile();
-                //graph->bdd->print();
                 graph->bdd->save();
             }
     

@@ -42,12 +42,18 @@ DdManager* Exchangeability::mgrMp = NULL;
 DdManager* Exchangeability::mgrAnn = NULL;
 int Exchangeability::nbrBdd = 0;
  
-Exchangeability::Exchangeability(char* filename) {
+Exchangeability::Exchangeability(char* filename, Cudd_ReorderingType heuristic) {
 	trace(TRACE_5, "Exchangeability::Exchangeability(char* filename): begin\n");		   
     // Init cudd package when first Exchangeability object is created.
     if (nbrBdd == 0) {
-        mgrMp = Cudd_Init(0, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
-        mgrAnn = Cudd_Init(0, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
+        //mgrMp = Cudd_Init(0, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
+        //mgrAnn = Cudd_Init(0, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
+        mgrMp  = Cudd_Init(0, 0, 1, 1, 1);
+        mgrAnn = Cudd_Init(0, 0, 1, 1, 1);
+        
+        //enable automatic dynamic reordering of the BDDs
+		Cudd_AutodynEnable(mgrMp, heuristic);
+		Cudd_AutodynEnable(mgrAnn, heuristic);		
     }
     
     names = NULL;
@@ -300,4 +306,27 @@ bool Exchangeability::check(Exchangeability* bdd){
 		return(false);
 	}
 	trace(TRACE_5,"Exchangeability::check(Exchangeability* bdd): end\n");
+}
+
+void Exchangeability::reorder(Cudd_ReorderingType heuristic){
+
+    Cudd_ReduceHeap(mgrMp, heuristic, 0);
+	cout << "BDD_MP: number of nodes: " << Cudd_DagSize(bddMp);
+	cout << "\t" << Cudd_ReadReorderingTime(this->mgrMp) << " ms consumed for variable reordering" << endl;
+    
+    Cudd_ReduceHeap(this->mgrAnn, heuristic, 0);
+	cout << "BDD_ANN: number of nodes: "  << Cudd_DagSize(this->bddAnn);
+	cout << "\t" << Cudd_ReadReorderingTime(this->mgrAnn) << " ms consumed for variable reordering" << endl;
+}
+
+void Exchangeability::printMemoryInUse(){
+	cout << endl;
+//	cout << "Number of live nodes in mgrMp: " << Cudd_ReadNodeCount(mgrMp) << endl;
+//	cout << "Peak number of nodes in mgrMp: " << Cudd_ReadPeakNodeCount(mgrMp) << endl;
+//	cout << "Number of dead nodes in mgrMp: " << Cudd_ReadDead(mgrMp) << endl;
+//	cout << "Number of live nodes in mgrAnn: " << Cudd_ReadNodeCount(mgrAnn) << endl;
+	cout << "Memory in use for mgrMp:  " << Cudd_ReadMemoryInUse(mgrMp)<< " bytes" << endl;	
+	cout << "Memory in use for mgrAnn: " << Cudd_ReadMemoryInUse(mgrAnn)<<" bytes" << endl;
+	cout << "Memory in use for both BDD: " << Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn)<< 
+		    "  bytes (" << (Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn))/1024 << " KB; " << (Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn))/(1024*1024) << " MB)" << endl;
 }

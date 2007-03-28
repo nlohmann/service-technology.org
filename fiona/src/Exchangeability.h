@@ -54,10 +54,12 @@ using namespace std;
 
 class Exchangeability{
 	public:
-		Exchangeability(char* filename);
+		Exchangeability(char* filename, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 		~Exchangeability();
 		
 		bool check(Exchangeability* bdd);
+		void printMemoryInUse();
+		void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.

@@ -26,17 +26,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/03/26 07:22:50 $
+ * \date    \$Date: 2007/03/28 09:28:45 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.90 $
+ * \version \$Revision: 1.91 $
  *
  * \ingroup petrinet
  */
@@ -354,7 +354,17 @@ string Transition::output_dot() const
   {
     case(IN):		result += "[fillcolor=orange"; break;
     case(OUT):		result += "[fillcolor=yellow"; break;
-    case(INOUT):	result += "[fillcolor=gold"; break;
+    case(INOUT):	result += "[fillcolor=gold ";
+                        result += "label=<";
+                        // the table size depends on the node size of .3 (inch);
+                        result += " <TABLE BORDER=\"1\"";
+                        result += " CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\"";
+                        result += " HEIGHT=\"21\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\"><TR>";
+                        result += "<TD HEIGHT=\"11\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\" BGCOLOR=\"ORANGE\">";
+                        result += "</TD></TR><TR>";
+                        result += "<TD HEIGHT=\"10\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\" BGCOLOR=\"YELLOW\">";
+                        result += "</TD></TR></TABLE> >"; break;
+//    case(INOUT):	result += "[fillcolor=gold"; break;
     case(INTERNAL):	result += "["; break;
   }
 
@@ -467,6 +477,8 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
     (*output) << "structurally reduced ";
 
   (*output) << "Petri net generated from " << globals::filename << "\"]" << endl;
+  // REMEMBER The table size of the INOUT transitions depends on the size of a node!
+  //          So a width of .3 (in) results in 21 pixel table width ( 0.3 in * 72 dpi ).
   (*output) << " node [fontname=\"Helvetica\" fontsize=8 fixedsize width=\".3\" height=\".3\" label=\"\" style=filled fillcolor=white]" << endl;
   (*output) << " edge [fontname=\"Helvetica\" fontsize=8 color=white arrowhead=none weight=\"20.0\"]" << endl << endl;
 

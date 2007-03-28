@@ -100,6 +100,7 @@ public:
     const std::string getLabel();
     bool hasLabel(const std::string& label_) const;
     OGFromFileNode* getDst() const;
+    OGFromFileNode* getSrc() const;
 };
 
 class oWFN;
@@ -130,6 +131,10 @@ public:
     OGFromFileNode* getNodeWithName(const std::string& nodeName) const;
     bool hasNoRoot() const;
 
+    /**
+     * @todo Remove unreachable nodes after (or during) removal of false
+     * nodes.
+     */
     void removeFalseNodes();
 
     OGFromFile* enforce(OGFromFile*) const;

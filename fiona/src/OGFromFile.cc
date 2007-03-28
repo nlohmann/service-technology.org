@@ -91,6 +91,7 @@ void OGFromFileNode::removeTransitionsToNode(const OGFromFileNode* nodeToDelete)
 	transitions_t::iterator iTransition = transitions.begin();
 	while (iTransition != transitions.end()) {
 		if ((*iTransition)->getDst() == nodeToDelete) {
+			assert((*iTransition)->getSrc() == this);
 			delete *iTransition;
 			transitions.erase(iTransition++);
 		} else {
@@ -213,6 +214,11 @@ OGFromFileNode* OGFromFileTransition::getDst() const
     return dst;
 }
 
+OGFromFileNode* OGFromFileTransition::getSrc() const
+{
+    return src;
+}
+
 
 const std::string OGFromFileTransition::getLabel() {
 	return label;
@@ -307,7 +313,10 @@ void OGFromFile::removeFalseNodes() {
 			CommGraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
 			if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
 				removeTransitionsToNodeFromAllOtherNodes(*iNode);
-                delete *iNode;
+				if (*iNode == getRoot()) {
+					setRoot(NULL);
+				}
+				delete *iNode;
 				nodes.erase(iNode++);
 				nodesHaveChanged = true;
 			} else {
@@ -316,10 +325,6 @@ void OGFromFile::removeFalseNodes() {
 
 			delete iNodeAssignment;
 		}
-	}
-
-	if (nodes.size() == 0) {
-		setRoot(NULL);
 	}
 
 	trace(TRACE_5, "OGFromFile::removeFalseNodes(): end\n");
@@ -520,6 +525,7 @@ void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFrom
 			// remember the label of the egde
 			currentLabel = (*trans_iter)->getLabel();
 			OGFromFileNode* successor = v->fireTransitionWithLabel(currentLabel);
+			assert(successor != NULL);
 
 			os << "p" << v->getName() << "->" << "p" << successor->getName() << " [label=\"" << currentLabel << "\", fontcolor=black, color= blue];\n";
 			printGraphToDot(successor, os, visitedNodes);

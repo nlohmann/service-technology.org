@@ -31,13 +31,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/03/26 14:27:19 $
+ * \date    \$Date: 2007/03/29 13:28:32 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  *
  * \ingroup petrinet
  */
@@ -182,23 +182,23 @@ void PetriNet::reduce_dead_nodes()
     // find insufficiently marked places with empty preset
     for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
     {
-      if ((*p)->preset.empty() && (*p)->tokens == 0 && !((*p)->isFinal))
+      if ((*p)->preset.empty() && !((*p)->isFinal) && !((*p)->historyContains("1.internal.initial")))
       {
-			arcs=true;		
-			for(set<Node*>::iterator t = (*p)->postset.begin(); t != (*p)->postset.end(); t++)
-			{
-				if(arc_weight(*p,*t) <= (*p)->tokens)	
-				{
-					arcs=false;
-				}
-			}
-			if(arcs)
-			{
-				deadPlaces.push_back(*p);
-				tempPlaces.push_back(*p);
-				trace(TRACE_VERY_DEBUG, "[PN]\tPlace p" + toString((*p)->id) + " is structurally dead.\n");
-				done = false;
-			}
+	arcs=true;		
+	for(set<Node*>::iterator t = (*p)->postset.begin(); t != (*p)->postset.end(); t++)
+	{
+	  if(arc_weight(*p,*t) <= (*p)->tokens)	
+	  {
+	    arcs=false;
+	  }
+	}
+	if(arcs)
+	{
+	  deadPlaces.push_back(*p);
+	  tempPlaces.push_back(*p);
+	  trace(TRACE_VERY_DEBUG, "[PN]\tPlace p" + toString((*p)->id) + " is structurally dead.\n");
+	  done = false;
+	}
       }
     }
 

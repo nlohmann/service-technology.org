@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/27 12:37:48 $
+ * \date    \$Date: 2007/03/29 15:24:26 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.152 $
+ * \version \$Revision: 1.153 $
  */
 
 
@@ -94,28 +94,18 @@ extern FILE *frontend_in;			// from flex
 /// The Petri Net
 PetriNet PN = PetriNet();
 
+/******************************************************************************
+ * program parts
+ *****************************************************************************/
 
 
-
-
-/*!
- * \brief entry point of BPEL2oWFN
- *
- * Controls the behaviour of input and output.
- *
- * \param argc	number of command line arguments
- * \param argv	array with command line arguments
- *
- * \returns 0 if everything went well
- * \returns 1 if an error occurred
- *
- * \todo This function is definitly too long. It should be partitioned!
- */
-int main( int argc, char *argv[])
+// analyzation of the commandline
+void analyze_cl(int argc, char *argv[]) 
 {
+
+  // setting globals
   globals::program_name = string(argv[0]);
 
-  // generate the invocation string
   for (int i = 0; i < argc; i++)
   {
     globals::invocation += string(argv[i]);
@@ -129,159 +119,161 @@ int main( int argc, char *argv[])
    */
   parse_command_line(argc, argv);
 
-  PetriNet PN2 = PetriNet();
+}
 
-  set< string >::iterator file = inputfiles.begin();
 
-  do
+
+
+// opening a file
+void open_file(set< string >::iterator file) 
+{
+  if (inputfiles.size() >= 1)
   {
-    if (inputfiles.size() >= 1)
+    globals::filename = *file;
+    if (!(frontend_in = fopen(globals::filename.c_str(), "r"))) 
     {
-      globals::filename = *file;
-      if (!(frontend_in = fopen(globals::filename.c_str(), "r"))) {
-		cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
-		exit(1);
-	    }
+      cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
+      exit(1);
     }
+  }
+}
 
-    trace(TRACE_INFORMATION, "Parsing " + globals::filename + " ...\n");
 
-    // invoke Bison parser
-    int error = frontend_parse();
 
-    if (!error)
+
+// closing a file
+void close_file(set< string >::iterator file) 
+{
+  if ( globals::filename != "<STDIN>" && frontend_in != NULL)
+  {
+    trace(TRACE_INFORMATION," + Closing input file: " + globals::filename + "\n");
+    fclose(frontend_in);
+  }
+}
+
+
+
+
+// finishing AST
+void finish_AST() 
+{
+  // apply first set of rewrite rules
+  trace(TRACE_INFORMATION, "Rewriting...\n");
+  globals::AST = globals::AST->rewrite(kc::invoke);
+  globals::AST = globals::AST->rewrite(kc::implicit);
+  trace(TRACE_INFORMATION, "Rewriting complete...\n");
+
+  // postprocess and annotate the AST
+  trace(TRACE_INFORMATION, "Postprocessing...\n");
+  globals::AST->unparse(kc::printer, kc::postprocessing);
+  trace(TRACE_INFORMATION, "Postprocessing complete...\n");
+
+  // apply second set of rewrite rules
+  trace(TRACE_INFORMATION, "Rewriting 2...\n");
+  globals::AST = globals::AST->rewrite(kc::newNames);
+  trace(TRACE_INFORMATION, "Rewriting 2 complete...\n");
+
+  // print information about the process
+  show_process_information();
+
+  // an experiment      
+  //      cout << "digraph G{" << endl;
+  //      globals::ASTEmap[1]->output();
+  //      cout << "}" << endl;
+}
+
+
+
+
+// output of every single processed file
+void single_output(set< string >::iterator file, PetriNet PN2) 
+{
+  // print the AST?
+  if (modus == M_AST)
+  {
+    trace(TRACE_INFORMATION, "-> Printing AST ...\n");
+    if (formats[F_DOT])
     {
-      trace(TRACE_INFORMATION, "Parsing complete.\n");
+      string dot_filename = globals::output_filename + "." + suffixes[F_DOT];
+      FILE *dotfile = fopen(dot_filename.c_str(), "w+");
+      globals::AST->fprintdot(dotfile, "", "", "", true, true, true);
+      fclose(dotfile);
+      #ifdef HAVE_DOT
+      string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".png " + globals::output_filename + "." + suffixes[F_DOT];
+      trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
+      trace(TRACE_INFORMATION, systemcall + "\n\n");
+      system(systemcall.c_str());
+      #endif
+    }
+    else
+    globals::AST->print();
+  }
 
-      if ( globals::filename != "<STDIN>" && frontend_in != NULL)
+  if (modus == M_PRETTY)
+  {
+    if (formats[F_XML])
+    {
+      if (globals::output_filename != "")
       {
-	trace(TRACE_INFORMATION," + Closing input file: " + globals::filename + "\n");
-	fclose(frontend_in);
+        output = openOutput(globals::output_filename + "." + suffixes[F_XML]);
       }
-
-
-      // apply first set of rewrite rules
-      trace(TRACE_INFORMATION, "Rewriting...\n");
-      globals::AST = globals::AST->rewrite(kc::invoke);
-      globals::AST = globals::AST->rewrite(kc::implicit);
-      trace(TRACE_INFORMATION, "Rewriting complete...\n");
-
-      // postprocess and annotate the AST
-      trace(TRACE_INFORMATION, "Postprocessing...\n");
-      globals::AST->unparse(kc::printer, kc::postprocessing);
-      trace(TRACE_INFORMATION, "Postprocessing complete...\n");
-
-      // apply second set of rewrite rules
-      trace(TRACE_INFORMATION, "Rewriting 2...\n");
-      globals::AST = globals::AST->rewrite(kc::newNames);
-      trace(TRACE_INFORMATION, "Rewriting 2 complete...\n");
-
-      // print information about the process
-      show_process_information();
-
-// an experiment      
-//      cout << "digraph G{" << endl;
-//      globals::ASTEmap[1]->output();
-//      cout << "}" << endl;
-
-      // print the AST?
-      if (modus == M_AST)
+      trace(TRACE_INFORMATION, "-> Printing \"pretty\" XML ...\n");
+      globals::AST->unparse(kc::printer, kc::xml);
+      if (globals::output_filename != "")
       {
-	trace(TRACE_INFORMATION, "-> Printing AST ...\n");
-	if (formats[F_DOT])
-	{
-	  string dot_filename = globals::output_filename + "." + suffixes[F_DOT];
-	  FILE *dotfile = fopen(dot_filename.c_str(), "w+");
-	  globals::AST->fprintdot(dotfile, "", "", "", true, true, true);
-	  fclose(dotfile);
-#ifdef HAVE_DOT
-  	  string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".png " + globals::output_filename + "." + suffixes[F_DOT];
-  	  trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
-  	  trace(TRACE_INFORMATION, systemcall + "\n\n");
-  	  system(systemcall.c_str());
-#endif
-	}
-	else
-	  globals::AST->print();
-      }
-
-      if (modus == M_PRETTY)
-      {
-        if (formats[F_XML])
-        {
-          if (globals::output_filename != "")
-          {
-            output = openOutput(globals::output_filename + "." + suffixes[F_XML]);
-          }
-          trace(TRACE_INFORMATION, "-> Printing \"pretty\" XML ...\n");
-          globals::AST->unparse(kc::printer, kc::xml);
-          if (globals::output_filename != "")
-          {
-            closeOutput(output);
-	    output = NULL;
-          }
-        }
-      }
-
-        // generate and process the control flow graph?
-      if (modus == M_CFG)
-	processCFG();
-
-
-      // generate a Petri net?
-      if (modus == M_PETRINET || modus == M_CONSISTENCY)
-      {
-	trace(TRACE_INFORMATION, "-> Unparsing AST to Petri net ...\n");
-
-	// choose Petri net patterns
-	if (globals::parameters[P_COMMUNICATIONONLY] == true)
-	  globals::AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
-	else
-	  globals::AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
-
-        // calculate maximum occurences
-        PN.calculate_max_occurrences();
-
-        if (modus == M_CONSISTENCY)
-	{
-	  unsigned int pos = file->rfind(".bpel", file->length());
-	  unsigned int pos2 = file->rfind("/", file->length());
-	  string prefix = "";
-	  if (pos == (file->length() - 5))
-	  {
-	    prefix = file->substr(pos2 + 1, pos - pos2 - 1) + "_";
-	  }
-
-	  // apply structural reduction rules?
-	  if (globals::parameters[P_REDUCE])
-	  {
-	    trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
-	    PN.reduce();
-	  }
-
-          PN.addPrefix(prefix);
-	  PN2.compose(PN);
-	  PN = PetriNet();
-
-	  globals::AST = NULL;
-	}
+        closeOutput(output);
+        output = NULL;
       }
     }
-    else /* parse error */
+  }
+
+  // generate and process the control flow graph?
+  if (modus == M_CFG)
+  processCFG();
+
+
+  // generate a Petri net?
+  if (modus == M_PETRINET || modus == M_CONSISTENCY)
+  {
+    trace(TRACE_INFORMATION, "-> Unparsing AST to Petri net ...\n");
+    // choose Petri net patterns
+    if (globals::parameters[P_COMMUNICATIONONLY] == true)
+    globals::AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
+    else
+    globals::AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
+
+    // calculate maximum occurences
+    PN.calculate_max_occurrences();
+    if (modus == M_CONSISTENCY)
     {
-      cleanup();
-      return error;
+      unsigned int pos = file->rfind(".bpel", file->length());
+      unsigned int pos2 = file->rfind("/", file->length());
+      string prefix = "";
+      if (pos == (file->length() - 5))
+      {
+        prefix = file->substr(pos2 + 1, pos - pos2 - 1) + "_";
+      }
+      // apply structural reduction rules?
+      if (globals::parameters[P_REDUCE])
+      {
+        trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
+        PN.reduce();
+      }
+      PN.addPrefix(prefix);
+      PN2.compose(PN);
+      PN = PetriNet();
+
+      globals::AST = NULL;
+      }
     }
+}
 
 
-    file++;
-  } while (modus == M_CONSISTENCY && file != inputfiles.end());
 
 
-  /*
-   * parsing complete
-   */
-
+// Final Output of the result
+void final_output( PetriNet PN2) 
+{
   if (modus == M_CONSISTENCY)
     PN = PN2;
 
@@ -298,7 +290,7 @@ int main( int argc, char *argv[])
     // now the net will not change any more, thus the nodes are re-enumerated
     // and the maximal occurrences of the nodes are calculated.
     PN.reenumerate();
-//    PN.calculate_max_occurrences();
+//  PN.calculate_max_occurrences();
     cerr << PN.information() << endl;
 
 
@@ -500,15 +492,70 @@ int main( int argc, char *argv[])
       }
     }
   }
+}
 
+
+/******************************************************************************
+ * main() function
+ *****************************************************************************/
+
+/*!
+ * \brief entry point of BPEL2oWFN
+ *
+ * Controls the behaviour of input and output.
+ *
+ * \param argc	number of command line arguments
+ * \param argv	array with command line arguments
+ *
+ * \returns 0 if everything went well
+ * \returns 1 if an error occurred
+ *
+ * \todo This function is definitly too long. It should be partitioned!
+ */
+int main( int argc, char *argv[])
+{
+  // initilization of variables
+  PetriNet PN2 = PetriNet();
+
+  // analyzation of the commandline
+  analyze_cl(argc,argv);
+
+  // parsing all inputfiles
+  set< string >::iterator file = inputfiles.begin();
+  do
+  {
+    open_file(file);
+
+    // invoke Bison parser
+    trace(TRACE_INFORMATION, "Parsing " + globals::filename + " ...\n");
+    int error = frontend_parse();
+    
+    if (!error)
+    {
+      trace(TRACE_INFORMATION, "Parsing of " + globals::filename + " complete.\n");
+      close_file(file);
+      finish_AST();
+      // create output for this file
+      single_output(file, PN2);
+
+    }
+    else /* parse error */
+    {
+      cleanup();
+      return error;
+    }
+
+    file++;
+
+  } while (modus == M_CONSISTENCY && file != inputfiles.end());
+
+  trace(TRACE_INFORMATION, "All files have been parsed.\n");
+
+  final_output(PN2);
 
   // everything went fine
   return 0;
 }
-
-
-
-
 
 /*!
  * \defgroup frontend Front End

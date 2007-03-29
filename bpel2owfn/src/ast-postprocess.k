@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/03/29 12:55:27 $
+ * \date    \$Date: 2007/03/29 14:27:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.142 $
+ * \version \$Revision: 1.143 $
  */
 %}
 
@@ -55,6 +55,7 @@
 Process(a,b,c,d,e,g,i,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -182,6 +183,7 @@ Process(a,b,c,d,e,g,i,_id) ->
 PartnerLink(_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -211,6 +213,7 @@ Partner(a,_id) ->
 FaultHandlers(a,b,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -260,6 +263,8 @@ FaultHandlers(a,b,_id) ->
       {
         foreach(otherbranch=Catch(secondActivity,_id3); tCatch_list a)
         {
+          assert(_id2 != NULL);
+          assert(_id3 != NULL);
           if ( _id2->value < _id3->value )
           {
             enterConflictingActivities( globals::ASTEmap[ _id2->value ]->enclosedActivities, globals::ASTEmap[ _id3->value ]->enclosedActivities );
@@ -273,6 +278,8 @@ FaultHandlers(a,b,_id) ->
         {
           foreach(otherbranch=Catch(secondActivity,_id3); tCatch_list a)
           {
+            assert(_id2 != NULL);
+            assert(_id3 != NULL);
             enterConflictingActivities( globals::ASTEmap[ _id2->value ]->enclosedActivities, globals::ASTEmap[ _id3->value ]->enclosedActivities );
           }
         }
@@ -287,6 +294,7 @@ FaultHandlers(a,b,_id) ->
 Catch(a,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -316,6 +324,7 @@ Catch(a,_id) ->
 CatchAll(a,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -349,6 +358,7 @@ CatchAll(a,_id) ->
 emptyEventHandlers(_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -363,6 +373,7 @@ emptyEventHandlers(_id) ->
 EventHandlers(a,b,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -377,6 +388,7 @@ EventHandlers(a,b,_id) ->
       // distribute the event handlers's id to the enclosed activities
       foreach(branch=OnMessage(_cor,_from,_act,_id2); tOnMessage_list a)
       {
+        assert(_id2 != NULL);
         assert(globals::ASTEmap[_id2->value] != NULL);
         globals::ASTEmap[_id2->value]->parentActivityId = myid;
         globals::ASTEmap[branch->id]->parentActivityId = myid;
@@ -404,6 +416,7 @@ EventHandlers(a,b,_id) ->
 OnMessage(a,b,c,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -426,6 +439,7 @@ OnMessage(a,b,c,_id) ->
 
       foreach(correlation=Correlation(_id2); tCorrelation_list a)
       {
+        assert(_id2 != NULL);
         assert(globals::ASTEmap[_id2->value] != NULL);
         globals::ASTEmap[_id2->value]->parentActivityId = myid;
       }
@@ -446,6 +460,7 @@ OnMessage(a,b,c,_id) ->
 OnAlarm(b,a,_id) ->
   [postprocessing: 
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -482,6 +497,7 @@ OnAlarm(b,a,_id) ->
 CompensationHandler(a,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -533,6 +549,7 @@ CompensationHandler(a,_id) ->
 TerminationHandler(a,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -572,6 +589,7 @@ TerminationHandler(a,_id) ->
 Variable(_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -591,6 +609,7 @@ Variable(_id) ->
 CorrelationSet(_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -610,6 +629,7 @@ CorrelationSet(_id) ->
 Correlation(_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -637,6 +657,7 @@ Correlation(_id) ->
 ToPart(_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -649,6 +670,7 @@ ToPart(_id) ->
 FromPart(_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -666,6 +688,7 @@ FromPart(_id) ->
 Empty(a,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -690,6 +713,7 @@ Empty(a,_id) ->
 volatile_Invoke(a,b,c,d,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -717,6 +741,7 @@ volatile_Invoke(a,b,c,d,_id) ->
 
       foreach(correlation=Correlation(_id2); tCorrelation_list b)
       {
+        assert(_id2 != NULL);
         assert(globals::ASTEmap[_id2->value] != NULL);
         globals::ASTEmap[_id2->value]->parentActivityId = myid;
       }
@@ -736,6 +761,7 @@ volatile_Invoke(a,b,c,d,_id) ->
 Receive(a,b,c,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -758,6 +784,7 @@ Receive(a,b,c,_id) ->
 
       foreach(correlation=Correlation(_id2); tCorrelation_list b)
       {
+        assert(_id2 != NULL);
         assert(globals::ASTEmap[_id2->value] != NULL);
         globals::ASTEmap[_id2->value]->parentActivityId = myid;
       }
@@ -786,6 +813,7 @@ Receive(a,b,c,_id) ->
 Reply(a,b,c,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -808,6 +836,7 @@ Reply(a,b,c,_id) ->
 
       foreach(correlation=Correlation(_id2); tCorrelation_list b)
       {
+        assert(_id2 != NULL);
         assert(globals::ASTEmap[_id2->value] != NULL);
         globals::ASTEmap[_id2->value]->parentActivityId = myid;
       }
@@ -827,6 +856,7 @@ Reply(a,b,c,_id) ->
 Assign(a,b,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -850,6 +880,7 @@ Copy(a,b,c) ->
 From(_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -866,6 +897,7 @@ From(_id) ->
 To(_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -887,6 +919,7 @@ To(_id) ->
 Validate(a,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -911,6 +944,7 @@ Validate(a,_id) ->
 Wait(a,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -935,6 +969,7 @@ Wait(a,_id) ->
 Throw(a,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -959,6 +994,7 @@ Throw(a,_id) ->
 Rethrow(a,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1000,6 +1036,7 @@ Rethrow(a,_id) ->
 Compensate(a,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1048,6 +1085,7 @@ Compensate(a,_id) ->
 CompensateScope(a,b,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1107,6 +1145,7 @@ CompensateScope(a,b,_id) ->
 Exit(a,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1131,6 +1170,7 @@ Exit(a,_id) ->
 Flow(a,b,c,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1203,6 +1243,7 @@ Flow(a,b,c,_id) ->
 Link(_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1227,6 +1268,7 @@ Link(_id) ->
 If(a,b,c,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1290,6 +1332,7 @@ If(a,b,c,_id) ->
 ElseIf(a,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1309,6 +1352,7 @@ ElseIf(a,_id) ->
 Else(a,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1335,6 +1379,7 @@ While(a,b,_id) ->
   [postprocessing:
     {
       // manage identifiers
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1386,6 +1431,7 @@ While(a,b,_id) ->
 RepeatUntil(a,b,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1437,6 +1483,7 @@ RepeatUntil(a,b,_id) ->
 Sequence(a,b,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1488,6 +1535,7 @@ Sequence(a,b,_id) ->
 Pick(a,b,c,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1540,6 +1588,8 @@ Pick(a,b,c,_id) ->
 
         foreach(otherbranch=OnMessage(*,*,secondActivity,_id3); tOnMessage_list b)
         {
+          assert(_id2 != NULL);
+          assert(_id3 != NULL);
           if (_id2->value < _id3->value)
           {
             enterConflictingActivities( globals::ASTEmap[ _id2->value ]->enclosedActivities, globals::ASTEmap[ _id3->value ]->enclosedActivities );
@@ -1581,6 +1631,7 @@ Pick(a,b,c,_id) ->
 ForEach(a,b,c,d,e,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
@@ -1643,6 +1694,7 @@ ForEach(a,b,c,d,e,_id) ->
           {
             foreach (variable=Variable(_id2); tVariable_list _variables)
             {
+              assert(_id2 != NULL);
               assert(globals::ASTEmap[_id2->value] != NULL);
               if (globals::ASTEmap[_id2->value]->attributes["name"] == globals::ASTEmap[_id->value]->attributes["counterName"])
                 SAerror(76, globals::ASTEmap[_id2->value]->attributes["name"], globals::ASTEmap[_id2->value]->attributes["referenceLine"]);
@@ -1671,6 +1723,7 @@ ForEach(a,b,c,d,e,_id) ->
 Scope(a,b,c,d,e,f,g,i,j,_id) ->
   [postprocessing:
     {
+      assert(_id != NULL);
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);

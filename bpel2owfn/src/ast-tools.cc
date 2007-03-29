@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/29 14:27:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -131,6 +131,7 @@ void header(int id, bool myindent)
 */
 void header(kc::integer id, bool myindent)
 {
+  assert(id!=NULL);
   header(id->value, myindent);
 }
 
@@ -169,6 +170,7 @@ void footer(int id, bool myindent)
  */
 void footer(kc::integer id, bool myindent)
 {
+  assert(id != NULL);
   footer(id->value, myindent);
 }
 

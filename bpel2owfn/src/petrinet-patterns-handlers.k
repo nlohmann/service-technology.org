@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/29 12:55:27 $
+ * \date    \$Date: 2007/03/29 14:27:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 %}
 
@@ -53,6 +53,8 @@
 %}
 
 %{
+#include <cassert>
+
 #include "ast-config.h"
 #include "helpers.h"
 #include "ast-tools.h"
@@ -152,7 +154,7 @@ void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
   {
     CatchAll(innerActivity, _id2):
     {
-      header(_id2->value, true);
+      header(_id2, true);
 
       // Unparse the activity embedded to the <catchAll> branch
       innerActivity->unparse(pseudoPrinter, current_view);
@@ -171,7 +173,7 @@ void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
       PN.mergePlaces(prefix + "inner_stop", toString(innerActivity->id) + ".stop");
       PN.mergePlaces(prefix + "stopped", toString(innerActivity->id) + ".stopped");
 
-      footer(phylum->id, _id2->value);
+      footer(_id2, true);
     }
 
     NoCatchAll():
@@ -424,7 +426,7 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
   unsigned int event_number = 1;
   foreach(branch=OnMessage(my_corr, my_from, my_activity, my_integer); tOnMessage_list phylum->tOnMessage_list_1)
   {
-    header(my_integer->value, true);
+    header(my_integer, true);
     assert(globals::ASTEmap[branch->id] != NULL);
     string event = toString(event_number++);
 
@@ -491,14 +493,14 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
       PN.newArc(p12, t11);
     }
 
-    footer(my_integer->value, true);
+    footer(my_integer, true);
   }
 
 
   // Traverse the <onAlarm> branches.
   foreach(branch=OnAlarm(my_RepeatEvery,my_activity, my_integer); tOnAlarm_list phylum->tOnAlarm_list_1)
   {
-    header(my_integer->value, true);
+    header(my_integer, true);
     string event = toString(event_number++);
 
     // Unparse the embedded activity.
@@ -576,7 +578,7 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
       }
     }
 
-    footer(my_integer->value, true);
+    footer(my_integer, true);
   }
 
 

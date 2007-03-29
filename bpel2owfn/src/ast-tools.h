@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/03/06 11:47:59 $
+ * \date    \$Date: 2007/03/29 14:27:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  *
  * \ingroup debug
  */
@@ -59,6 +59,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <cassert>
 
 #include "petrinet.h"
 #include "ast-details.h"
@@ -135,7 +136,8 @@ void listAttributes ( unsigned int id );
  */
 inline void listAttributes ( kc::integer id )
 {
-    listAttributes ( id->value );
+  assert(id!=NULL);
+  listAttributes ( id->value );
 }
 
 

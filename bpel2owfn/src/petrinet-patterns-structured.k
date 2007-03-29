@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's structured activities
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/25 10:19:37 $
+ * \date    \$Date: 2007/03/29 14:27:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
 */
 %}
 
@@ -654,7 +654,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
   unsigned int branch_count = 1;
   foreach (ThisBranch = OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list phylum->tOnMessage_list_1)
   {
-    header(_id2->value, true);
+    header(_id2, true);
     string branch = toString(branch_count++);
 
     // Unparse the embedded activity.
@@ -675,14 +675,14 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
       PN.mergePlaces(phylum->id, ".stopped",     innerActivity->id, ".stopped");
     }
 
-    footer(_id2->value, true);
+    footer(_id2, true);
   }
 
 
   // Traverse the <onAlarm> branches.
-  foreach (onAlarmBranch=OnAlarm(innerActivity,_id2); tOnAlarm_list phylum->tOnAlarm_list_1)
+  foreach (onAlarmBranch=OnAlarm(*,innerActivity,_id2); tOnAlarm_list phylum->tOnAlarm_list_1)
   {
-    header(_id2->value, true);
+    header(_id2, true);
     string branch = toString(branch_count++);
 
     // Unparse the embedded activity.
@@ -702,7 +702,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
       PN.mergePlaces(phylum->id, ".stopped",     innerActivity->id, ".stopped");
     }
 
-    footer(_id2->value, true);
+    footer(_id2, true);
   }
   
 
@@ -716,15 +716,15 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	dpeLinks(PN.findTransition(prefix + "onMessage_" + toString(branch_count)), innerActivity2->id); // onMessage -> onMessage'
     }
 
-    foreach (OnAlarm(innerActivity2); tOnAlarm_list phylum->tOnAlarm_list_1) {
+    foreach (OnAlarm(*,innerActivity2); tOnAlarm_list phylum->tOnAlarm_list_1) {
       dpeLinks(PN.findTransition(prefix + "onMessage_" + toString(branch_count)), innerActivity2->id); // onMessage -> onAlarm
     }
     
     branch_count++;
   }
 
-  foreach (OnAlarm(innerActivity1); tOnAlarm_list phylum->tOnAlarm_list_1) {
-    foreach (otheronalarm=OnAlarm(innerActivity2); tOnAlarm_list phylum->tOnAlarm_list_1) {
+  foreach (OnAlarm(*,innerActivity1); tOnAlarm_list phylum->tOnAlarm_list_1) {
+    foreach (otheronalarm=OnAlarm(*,innerActivity2); tOnAlarm_list phylum->tOnAlarm_list_1) {
       if ((innerActivity1 != innerActivity2))
 	dpeLinks(PN.findTransition(prefix + "onAlarm_" + toString(branch_count)), innerActivity2->id); // onAlarm -> onAlarm'
     }
@@ -805,7 +805,7 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
   unsigned int currentCase = 1;
   foreach (caseBranch=ElseIf(innerActivity, _id2); tElseIf_list phylum->tElseIf_list_1)
   {
-    header(_id2->value, true);
+    header(_id2, true);
     string branch = toString(currentCase++);
 
     // Unparse the embedded activity.
@@ -821,7 +821,7 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
     PN.mergePlaces(phylum->id, ".internal.stop", innerActivity->id, ".stop");
     PN.mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
 
-    footer(_id2->value, true);
+    footer(_id2, true);
   }
 
 
@@ -834,7 +834,7 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
   {
     elseBranch=Else(innerActivity,_id2):
     {
-      header(_id2->value, true);
+      header(_id2, true);
       
       // Unparse the embedded activity.
       phylum->tElse_1->unparse(pseudoPrinter, current_view);
@@ -849,7 +849,7 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
 	PN.mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
       }
 
-      footer(_id2->value, true);
+      footer(_id2, true);
     }
 
     elseBranch=NoElse(_id2):

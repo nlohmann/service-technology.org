@@ -35,11 +35,11 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/03/21 17:00:00 $
+ * \date    \$Date: 2007/03/29 12:55:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.297 $
+ * \version \$Revision: 1.298 $
  *
  * \ingroup frontend
  *
@@ -270,6 +270,7 @@ impl_joinCondition* currentJoinCondition = standardJoinCondition();
 %type <yt_tPick> tPick
 %type <yt_tProcess> tProcess
 %type <yt_tReceive> tReceive
+%type <yt_tRepeatEvery> tRepeatEvery
 %type <yt_tRepeatUntil> tRepeatUntil
 %type <yt_tReply> tReply
 %type <yt_tRethrow> tRethrow
@@ -557,17 +558,23 @@ tOnEvent:
 ;
 
 tOnAlarm:
-  K_ONALARM arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_ONALARM 
-    { $$ = OnAlarm($4, $2); }
+  K_ONALARM arbitraryAttributes X_NEXT tRepeatEvery activity X_NEXT X_SLASH K_ONALARM 
+    { $$ = OnAlarm($4, $5, $2); }
 | K_ONALARM arbitraryAttributes X_NEXT tFor tRepeatEvery activity X_NEXT X_SLASH K_ONALARM 
-    { $$ = OnAlarm($6, $2); }
+    { $$ = OnAlarm($5, $6, $2); }
 | K_ONALARM arbitraryAttributes X_NEXT tUntil tRepeatEvery activity X_NEXT X_SLASH K_ONALARM 
-    { $$ = OnAlarm($6, $2); }
+    { $$ = OnAlarm($5, $6, $2); }
 ;
 
 tRepeatEvery:
-  /* empty */
+  /* empty */ 
+  {
+  $$ = emptyRepeatEvery(mkinteger(globals::ASTEid++));
+  }
 | K_REPEATEVERY arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_REPEATEVERY X_NEXT
+  {
+  $$ = RepeatEvery(mkinteger(globals::ASTEid++));
+  }
 ;
 
 

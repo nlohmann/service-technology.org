@@ -28,11 +28,11 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/22 10:33:46 $
+ * \date    \$Date: 2007/03/29 12:55:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  *
  * \todo    Add support for the <terminationHandler>
  */
@@ -144,8 +144,8 @@ OnMessage(a,b,c,_id) ->
   c { indown(); } "</onMessage>\n"]
 ;
 
-OnAlarm(a,_id) ->
-  [xml: { inup(); } "<onAlarm" { listAttributes( _id ); } ">\n" a { indown(); } "</onAlarm>\n"]
+OnAlarm(a,b,_id) ->
+  [xml: { inup(); } "<onAlarm" { listAttributes( _id ); } ">\n" b { indown(); } "</onAlarm>\n"]
 ;
 
 

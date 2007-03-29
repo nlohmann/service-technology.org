@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/25 10:19:37 $
+ * \date    \$Date: 2007/03/29 12:55:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.83 $
+ * \version \$Revision: 1.84 $
  */
 
 
@@ -80,7 +80,7 @@ using std::endl;
  */
 ASTE::ASTE(unsigned int myid, unsigned int mytype) :
   id(myid), type(mytype), controlFlow(POSITIVECF), 
-  plRoleDetails(NULL), isStartActivity(false),
+  plRoleDetails(NULL), isStartActivity(false), cyclic(false),
   sourceActivity(0), targetActivity(0), max_occurrences(1), max_loops(UINT_MAX), enclosedFH(0), enclosedCH(0), drawn(false)
 {
   assert(myid != 0);

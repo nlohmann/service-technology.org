@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/29 12:55:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.141 $
+ * \version \$Revision: 1.142 $
  */
 %}
 
@@ -382,7 +382,7 @@ EventHandlers(a,b,_id) ->
         globals::ASTEmap[branch->id]->parentActivityId = myid;
         globals::ASTEmap[_id2->value]->controlFlow = myself->controlFlow;
       }
-      foreach(branch=OnAlarm(innerActivity); tOnAlarm_list b)
+      foreach(branch=OnAlarm(*,innerActivity); tOnAlarm_list b)
       {
         assert(globals::ASTEmap[innerActivity->id] != NULL);
         globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
@@ -443,7 +443,7 @@ OnMessage(a,b,c,_id) ->
   ]
 ;
 
-OnAlarm(a,_id) ->
+OnAlarm(b,a,_id) ->
   [postprocessing: 
     {
       int myid = _id->value;
@@ -453,6 +453,10 @@ OnAlarm(a,_id) ->
       myself->parentScopeId = globals::PPcurrentScope;
       assert(globals::ASTEmap[myself->parentActivityId] != NULL);
       //todo: cyclic-attribute if "repeatEvery" is set
+      if(string(b->op_name())=="RepeatEvery")
+      {
+        myself->cyclic=true;
+      }
 
       assert(globals::ASTEmap[a->id] != NULL);
       globals::ASTEmap[a->id]->parentActivityId = myid;
@@ -1504,7 +1508,7 @@ Pick(a,b,c,_id) ->
         globals::ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
         globals::ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
-      foreach(branch=OnAlarm(innerActivity); tOnAlarm_list c)
+      foreach(branch=OnAlarm(*,innerActivity); tOnAlarm_list c)
       {
         assert(globals::ASTEmap[innerActivity->id] != NULL);
         globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
@@ -1542,7 +1546,7 @@ Pick(a,b,c,_id) ->
           }
         }
       }
-      foreach(branch=OnAlarm(innerActivity); tOnAlarm_list c)
+      foreach(branch=OnAlarm(*,innerActivity); tOnAlarm_list c)
       {
         assert(globals::ASTEmap[innerActivity->id] != NULL);
         myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[innerActivity->id]->enclosedSourceLinks);
@@ -1552,7 +1556,7 @@ Pick(a,b,c,_id) ->
           enterConflictingActivities( globals::ASTEmap[ innerActivity->id ]->enclosedActivities, globals::ASTEmap[ secondActivity->id ]->enclosedActivities );
         }
 
-        foreach(otherbranch=OnAlarm(secondActivity); tOnAlarm_list c)
+        foreach(otherbranch=OnAlarm(*,secondActivity); tOnAlarm_list c)
         {
           if (innerActivity->id < secondActivity->id)
           {

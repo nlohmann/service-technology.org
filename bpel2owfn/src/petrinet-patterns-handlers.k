@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for the handlers
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: znamirow $ 
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/21 12:10:51 $
+ * \date    \$Date: 2007/03/29 12:55:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 %}
 
@@ -496,14 +496,13 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
 
 
   // Traverse the <onAlarm> branches.
-  foreach(branch=OnAlarm(my_activity, my_integer); tOnAlarm_list phylum->tOnAlarm_list_1)
+  foreach(branch=OnAlarm(my_RepeatEvery,my_activity, my_integer); tOnAlarm_list phylum->tOnAlarm_list_1)
   {
     header(my_integer->value, true);
     string event = toString(event_number++);
 
     // Unparse the embedded activity.
     my_activity->unparse(pseudoPrinter, current_view);
-
 
     // Places.
     Place *p8 = PN.newPlace(prefix + "active." + event);
@@ -526,6 +525,28 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
     PN.newArc(t1, p8);
     PN.newArc(p9, t2);
 
+    // Extend net in case of RepeatEvery
+    if(string(my_RepeatEvery->op_name())=="RepeatEvery")
+    {
+      // Insertion of loop Transition
+      Transition *t5 = PN.newTransition(prefix + "loop." + event);
+      PN.newArc(p13, t5);
+      PN.newArc(t5, p8);      
+      PN.newArc(PN.findPlace(prefix + "active"), t5, READ);
+
+      // Extended Disable
+      Transition *t6 = PN.newTransition(prefix + "disable_final." + event);
+      PN.newArc(p13, t6);
+      PN.newArc(t6, p9);      
+      PN.newArc(PN.findPlace(prefix + "disabling"), t12, READ);
+
+    }
+    else
+    {
+    // Merge activity's final place with the disabled place.
+    PN.mergePlaces(p9, p13);
+    }
+
 
     // Stop places and stopping transitions.
     if (current_view != petrinetsmall_enum)
@@ -544,10 +565,16 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
       PN.newArc(t7, p11);
       PN.newArc(t8, p11);
       PN.newArc(p12, t11);
-    }
 
-    // Merge activity's final place with the disabled place.
-    PN.mergePlaces(p9, p13);
+      if(string(my_RepeatEvery->op_name())=="RepeatEvery")
+      {
+        // Extended Stop
+        Transition *t10 = PN.newTransition(prefix + "stop_disable." + event);
+        PN.newArc(p9, t10);
+        PN.newArc(p11, t10);
+        PN.newArc(t10, p12);
+      }
+    }
 
     footer(my_integer->value, true);
   }

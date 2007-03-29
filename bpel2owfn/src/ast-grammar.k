@@ -29,11 +29,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: znamirow $ 
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/29 12:55:27 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file ast-grammar.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.170 $
+ * \version \$Revision: 1.171 $
  */
 %}
 
@@ -198,7 +198,12 @@ tOnMessage:
 tOnAlarm_list: list tOnAlarm;
 
 tOnAlarm:
-  OnAlarm(activity integer)
+  OnAlarm(tRepeatEvery activity integer)
+;
+
+tRepeatEvery:
+   emptyRepeatEvery(integer)
+|  RepeatEvery(integer)
 ;
 
 

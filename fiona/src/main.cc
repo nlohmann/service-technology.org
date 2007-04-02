@@ -521,9 +521,14 @@ int main(int argc, char ** argv) {
 
 std::string platform_basename(const std::string& path)
 {
+#ifdef WIN32
+    string::size_type posOfLastBackslash = path.find_last_of('\\');
+    return path.substr(posOfLastBackslash + 1);
+#else
     char* ppath = (char*)malloc(path.size() + sizeof(char));
     strcpy(ppath, path.c_str());
     std::string result = string(::basename(ppath));
     free(ppath);
     return result;
+#endif
 }

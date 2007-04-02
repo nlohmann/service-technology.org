@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's structured activities
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/29 14:27:40 $
+ * \date    \$Date: 2007/04/02 09:42:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
 */
 %}
 
@@ -77,8 +77,10 @@ extern PetriNet PN;
 %{
 /*!
  * \fn void kc::PWhile(impl_tWhile* abstract_phylum, uview current_view)
- * \brief Pattern for the <while> activity.
- * \image html "while.png" "pattern"
+ *
+ * \brief   Pattern for the <while> activity.
+ *
+ *          \image html "while.png" "pattern"
  *
  * \ingroup patterns
  */
@@ -91,6 +93,8 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
   header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
+  assert(globals::ASTEmap[phylum->id] != NULL);
+  ASTE *myself = globals::ASTEmap[phylum->id];
 
   switch(current_view)
   {
@@ -147,14 +151,6 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	Transition *t7 = stop(p4, "final", prefix);
 	Transition *t8 = stop(p7, "p7", prefix);
 
-// ab hier wird's fuzzy, nochmal mit Niels reden
-	
-	// the subnet if loops are counted
-	if (globals::parameters[P_LOOPCOUNT])
-	{
-	}
-	
-// hier geht es wieder
 
 	// unparse the standard elements
 	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
@@ -234,8 +230,10 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 %{
 /*!
  * \fn void kc::PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
- * \brief Pattern for the <repeatUntil> activity.
- * \image html "repeatuntil.png" "pattern"
+ *
+ * \brief   Pattern for the <repeatUntil> activity.
+ * 
+ *          \image html "repeatuntil.png" "pattern"
  *
  * \ingroup patterns
  */
@@ -247,6 +245,9 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 
   header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
+
+  assert(globals::ASTEmap[phylum->id] != NULL);
+  ASTE *myself = globals::ASTEmap[phylum->id];
 
   switch (current_view)
   {

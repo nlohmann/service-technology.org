@@ -35,11 +35,11 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/03/29 12:55:27 $
+ * \date    \$Date: 2007/04/02 09:42:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.298 $
+ * \version \$Revision: 1.299 $
  *
  * \ingroup frontend
  *
@@ -209,6 +209,7 @@ impl_joinCondition* currentJoinCondition = standardJoinCondition();
 %type <yt_casestring> constant
 %type <yt_casestring> tBranches
 %type <yt_casestring> tCompletionCondition
+%type <yt_casestring> tCondition
 %type <yt_casestring> tFinalCounterValue
 %type <yt_casestring> tLiteral
 %type <yt_casestring> tStartCounterValue
@@ -955,6 +956,7 @@ tIf:
 
 tCondition:
   K_CONDITION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_CONDITION X_NEXT
+    { $$ = $4; }
 ;	  
 
 tElseIf_list:
@@ -1008,7 +1010,12 @@ tWhile:
   K_WHILE arbitraryAttributes X_NEXT standardElements activity X_NEXT X_SLASH K_WHILE
     { $$ = While($4, $5, $2); }
 | K_WHILE arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT X_SLASH K_WHILE
-    { $$ = While($4, $6, $2); }
+    {
+      $$ = While($4, $6, $2);
+      // "copy" condition to attributes      
+      assert(globals::ASTEmap[$2->value] != NULL);
+      globals::ASTEmap[$2->value]->attributes["condition"] = $5->name;
+    }
 ;
 
 
@@ -1018,7 +1025,12 @@ tWhile:
 
 tRepeatUntil:
   K_REPEATUNTIL arbitraryAttributes X_NEXT standardElements activity X_NEXT tCondition X_SLASH K_REPEATUNTIL
-    { $$ = RepeatUntil($4, $5, $2); }
+    {
+      $$ = RepeatUntil($4, $5, $2);
+      // "copy" condition to attributes      
+      assert(globals::ASTEmap[$2->value] != NULL);
+      globals::ASTEmap[$2->value]->attributes["condition"] = $7->name;
+    }
 ;
 
 

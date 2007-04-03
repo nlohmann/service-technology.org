@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/04/03 14:42:32 $
+ * \date    \$Date: 2007/04/03 16:15:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.144 $
+ * \version \$Revision: 1.145 $
  */
 %}
 
@@ -393,6 +393,8 @@ EventHandlers(a,b,_id) ->
         globals::ASTEmap[_id2->value]->parentActivityId = myid;
         globals::ASTEmap[branch->id]->parentActivityId = myid;
         globals::ASTEmap[_id2->value]->controlFlow = myself->controlFlow;
+        globals::ASTEmap[branch->id]->max_occurrences = myself->max_occurrences;
+        
       }
       foreach(branch=OnAlarm(*,innerActivity); tOnAlarm_list b)
       {
@@ -400,7 +402,7 @@ EventHandlers(a,b,_id) ->
         globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
         globals::ASTEmap[branch->id]->parentActivityId = myid;
         globals::ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
-        globals::ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
+        globals::ASTEmap[branch->id]->max_occurrences = myself->max_occurrences;
       }
     }
     a b
@@ -437,7 +439,23 @@ OnMessage(a,b,c,_id) ->
 
       assert(globals::ASTEmap[c->id] != NULL);
       globals::ASTEmap[c->id]->parentActivityId = myid;
-      globals::ASTEmap[c->id]->max_occurrences = UINT_MAX;
+
+      //Processing max occurrences
+      unsigned int max_loops = toUInt(myself->attributes["hu:maxloops"]);
+      if(globals::ASTEmap[myself->parentActivityId]->activityTypeName() == "eventHandlers")
+      {
+        if(max_loops != UINT_MAX && myself->max_occurrences != UINT_MAX)
+        {
+          globals::ASTEmap[myid]->max_occurrences = max_loops * myself-> max_occurrences;
+        } 
+        else
+        {
+          globals::ASTEmap[myid]->max_occurrences = UINT_MAX;
+        }
+      }
+
+      globals::ASTEmap[c->id]->max_occurrences = myself->max_occurrences;
+
 
       foreach(correlation=Correlation(_id2); tCorrelation_list a)
       {
@@ -474,7 +492,17 @@ OnAlarm(b,a,_id) ->
       {
         myself->cyclic=true;
         globals::ASTEmap[a->id]->max_occurrences = UINT_MAX;
+      } 
+      else
+      {
+      //Processing max occurrences
+      unsigned int max_loops = toUInt(myself->attributes["hu:maxloops"]);
+      if (max_loops != UINT_MAX && myself->max_occurrences != UINT_MAX)
+        globals::ASTEmap[a->id]->max_occurrences = myself->max_occurrences * max_loops;
+      else
+        globals::ASTEmap[a->id]->max_occurrences = myself->max_occurrences;
       }
+
 
       assert(globals::ASTEmap[a->id] != NULL);
       globals::ASTEmap[a->id]->parentActivityId = myid;
@@ -1407,6 +1435,7 @@ While(a,b,_id) ->
         globals::ASTEmap[b->id]->max_occurrences = UINT_MAX;
 
       myself->max_loops = max_loops;
+      cerr<< "BAAAAM" <<globals::ASTEmap[b->id]->max_occurrences << "\n";
     }
     a b
     {

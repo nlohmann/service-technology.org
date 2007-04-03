@@ -252,7 +252,7 @@ bpel2owfn -i service.bpel -f owfn -o
 where @file{service.bpel} is a @acronym{BPEL} process. The option
 @samp{-f owfn} causes GNU BPEL2oWFN to generate an open workflow net. This
 net is written to a file named @file{service.owfn}, because of the option
-@samp{-o}. For more examples, see @ref{Examples}.
+@samp{-o}.
 
 GNU BPEL2oWFN can be called without any parameter. In this case, it acts
 as a simple parser for @acronym{BPEL} processes that reads its input from the
@@ -349,7 +349,7 @@ and the phylum names used when generating the Petri net.
 For control flow analysis (a form of static analysis) a @acronym{CFG, Control
 Flow Graph} is generated. It can be printed in graphical (dot)
 representation. This option is in an early beta-stage and can only check
-for uninitialzed variables yet. For more information, see @ref{Future Work}.
+for uninitialzed variables yet.
 
 @item consistency
 
@@ -380,8 +380,7 @@ BPEL2oWFN acts like a @acronym{BPEL} parser.
 
 @subsection Additional parameters
 
-These options control some Petri net-related options. See @ref{Petri Net-related
-Functions} for more details.
+These options control some Petri net-related options.
 
 @table @samp
 @item --parameter=@var{par}
@@ -437,8 +436,7 @@ If you want to enable more than one parameter you have to add @samp{-p}/
 
 @subsection Output formats
 
-Especially for the Petri net mode, a variaty of output formats are supported,
-see @ref{File Formats} for more information. There are invoked by the
+Especially for the Petri net mode, a variaty of output formats are supported. There are invoked by the
 following option:
 
 @table @samp
@@ -575,15 +573,15 @@ Reads the file @file{sample.bpel} and prints the abstract syntax tree
 
 
 
-@section Exit Values
+@c @section Exit Values
 
-When GNU BPEL2oWFN is invoked and run without any error, the
-exit value is 0.
+@c When GNU BPEL2oWFN is invoked and run without any error, the
+@c exit value is 0.
 
 
-Please report the occurrence of any exception with numbers 30--50
-since it indicates a bug in GNU BPEL2oWFN we would like to fix
-immediately (see @ref{Reporting Bugs}).
+@c Please report the occurrence of any exception with numbers 30--50
+@c since it indicates a bug in GNU BPEL2oWFN we would like to fix
+@c immediately (see @ref{Reporting Bugs}).
 
 
 

@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's structured activities
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/04/02 09:42:08 $
+ * \date    \$Date: 2007/04/03 11:32:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
 */
 %}
 
@@ -95,7 +95,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 
   assert(globals::ASTEmap[phylum->id] != NULL);
   ASTE *myself = globals::ASTEmap[phylum->id];
-
+  
   switch(current_view)
   {
     case(petrinetnew_enum):
@@ -111,7 +111,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	// external control of loop condition	
 	Place *control_enter = NULL;
 	Place *control_leave = NULL;
-        if (globals::parameters[P_LOOPCONTROL])
+        if (globals::parameters[P_LOOPCONTROL] && myself->attributes["condition"] != "true")
 	{
 	  control_enter = PN.newPlace("in.enterloop." + toString(phylum->id), IN);
 	  control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
@@ -129,17 +129,21 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	  Transition *t2 = PN.newTransition(prefix + "start");
 	  PN.newArc(p2, t2);
 	  PN.newArc(t2, p3);
-          if (globals::parameters[P_LOOPCONTROL])
+          if (globals::parameters[P_LOOPCONTROL] && myself->attributes["condition"] != "true")
 	  {
             PN.newArc(control_enter, t2);
           }
 
-	  Transition *t3 = PN.newTransition(prefix + "end");
-	  PN.newArc(p2, t3);
-	  PN.newArc(t3, p4);
-          if (globals::parameters[P_LOOPCONTROL])
-	  {
-            PN.newArc(control_leave, t3);
+	  
+          if (myself->attributes["condition"] != "true")
+          {
+	    Transition *t3 = PN.newTransition(prefix + "end");
+	    PN.newArc(p2, t3);
+	    PN.newArc(t3, p4);
+            if (globals::parameters[P_LOOPCONTROL])
+	    {
+              PN.newArc(control_leave, t3);
+            }
           }
 	}
 	
@@ -178,23 +182,26 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	// external control of loop condition	
 	Place *control_enter = NULL;
 	Place *control_leave = NULL;
-        if (globals::parameters[P_LOOPCONTROL])
+        if (globals::parameters[P_LOOPCONTROL] && myself->attributes["condition"] != "true")
 	{
 	  control_enter = PN.newPlace("in.enterloop." + toString(phylum->id), IN);
 	  control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
         }
 
 
-	Transition *t1 = PN.newTransition(prefix + "leave");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p3);
-	if (globals::parameters[P_LOOPCONTROL])
-	  PN.newArc(control_leave, t1);
+	if(myself->attributes["condition"] != "true")
+	{
+	  Transition *t1 = PN.newTransition(prefix + "leave");
+	  PN.newArc(p1, t1);
+	  PN.newArc(t1, p3);
+	  if (globals::parameters[P_LOOPCONTROL])
+	    PN.newArc(control_leave, t1);
+	}
 
 	Transition *t2 = PN.newTransition(prefix + "loop");
 	PN.newArc(p1, t2);
 	PN.newArc(t2, p2);
-	if (globals::parameters[P_LOOPCONTROL])
+	if (globals::parameters[P_LOOPCONTROL] && myself->attributes["condition"] != "true")
 	  PN.newArc(control_enter, t2);
 
 
@@ -262,27 +269,34 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	Place *p6 = PN.newPlace(prefix + "stopped");
         Place *p7 = PN.newPlace(prefix + "faulted");
 
+	// external control of loop condition	
+	Place *control_enter = NULL;
+	Place *control_leave = NULL;
+        if (globals::parameters[P_LOOPCONTROL] && myself->attributes["condition"] != "true")
+	{
+	  control_enter = PN.newPlace("in.enterloop." + toString(phylum->id), IN);
+	  control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
+        }
+
 	Transition *t1 = PN.newTransition(prefix + "read_condition");
 	PN.newArc(p2, t1);
 	PN.newArc(t1, p3);
-  
-        Transition *t2 = PN.newTransition(prefix + "end");
-        PN.newArc(p3, t2);
-        PN.newArc(t2, p4);
+
+        if(myself->attributes["condition"] != "true")
+        {
+          Transition *t2 = PN.newTransition(prefix + "end");
+          PN.newArc(p3, t2);
+          PN.newArc(t2, p4);
+          if( globals::parameters[P_LOOPCONTROL])
+            PN.newArc(control_leave, t2);
+        }
+
 
         Transition *t3 = PN.newTransition(prefix + "repeat");
         PN.newArc(p3, t3);
         PN.newArc(t3, p1);
-
-	// external control of loop condition	
-        if (globals::parameters[P_LOOPCONTROL])
-	{
-	  Place *control_enter = PN.newPlace("in.enterloop." + toString(phylum->id), IN);
-	  Place *control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
-
-          PN.newArc(control_enter, t3);
-          PN.newArc(control_leave, t2);
-        }
+        if( globals::parameters[P_LOOPCONTROL])
+          PN.newArc(control_enter, t3);	
 
 	Transition *t4 = stop(p3, "running", prefix);
 	Transition *t5 = stop(p4, "final", prefix);
@@ -299,13 +313,13 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	  Transition *t2 = PN.newTransition(prefix + "end");
 	  PN.newArc(p3, t2);
 	  PN.newArc(t2, p4);
-	  if (globals::parameters[P_LOOPCONTROL])
+	  if (globals::parameters[P_LOOPCONTROL] && myself->attributes["condition"] != "true")
 	    PN.newArc(control_leave, t2);
 	
 	  Transition *t3 = PN.newTransition(prefix + "repeat");
 	  PN.newArc(p3, t3);
 	  PN.newArc(t3, p1);
-	  if (globals::parameters[P_LOOPCONTROL])
+	  if (globals::parameters[P_LOOPCONTROL] && myself->attributes["condition"] != "true")
 	    PN.newArc(control_enter, t3);
 	}
 
@@ -382,23 +396,26 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	// external control of loop condition
 	Place *control_enter = NULL;
 	Place *control_leave = NULL;
-        if (globals::parameters[P_LOOPCONTROL])
+        if (globals::parameters[P_LOOPCONTROL] && myself->attributes["condition"] != "true")
 	{
 	  control_enter = PN.newPlace("in.enterloop." + toString(phylum->id), IN);
 	  control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
         }
 
 
-	Transition *t1 = PN.newTransition(prefix + "end");
-	PN.newArc(p2, t1);
-	PN.newArc(t1, p3);
-	if (globals::parameters[P_LOOPCONTROL])
-	  PN.newArc(control_leave, t1);
+	if(myself->attributes["condition"] != "true")
+	{
+	  Transition *t1 = PN.newTransition(prefix + "end");
+	  PN.newArc(p2, t1);
+	  PN.newArc(t1, p3);
+	  if (globals::parameters[P_LOOPCONTROL])
+	    PN.newArc(control_leave, t1);
+	}
 
 	Transition *t2 = PN.newTransition(prefix + "repeat");
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p1);
-	if (globals::parameters[P_LOOPCONTROL])
+	if (globals::parameters[P_LOOPCONTROL] && myself->attributes["condition"] != "true")
 	  PN.newArc(control_enter, t2);
 
 

@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/03/29 14:27:40 $
+ * \date    \$Date: 2007/04/03 14:42:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.143 $
+ * \version \$Revision: 1.144 $
  */
 %}
 
@@ -379,8 +379,8 @@ EventHandlers(a,b,_id) ->
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
-      myself->max_occurrences = UINT_MAX; // TODO: calculate me
-
+      //BAM myself->max_occurrences = UINT_MAX; 
+      
       // triggers SA00083
       if (a->length() == 0 && b->length() == 0)
         SAerror(83, "", toInt(globals::ASTEmap[myself->parentScopeId]->attributes["referenceLine"]));
@@ -400,6 +400,7 @@ EventHandlers(a,b,_id) ->
         globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
         globals::ASTEmap[branch->id]->parentActivityId = myid;
         globals::ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
+        globals::ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
     }
     a b
@@ -436,6 +437,7 @@ OnMessage(a,b,c,_id) ->
 
       assert(globals::ASTEmap[c->id] != NULL);
       globals::ASTEmap[c->id]->parentActivityId = myid;
+      globals::ASTEmap[c->id]->max_occurrences = UINT_MAX;
 
       foreach(correlation=Correlation(_id2); tCorrelation_list a)
       {
@@ -471,6 +473,7 @@ OnAlarm(b,a,_id) ->
       if(string(b->op_name())=="RepeatEvery")
       {
         myself->cyclic=true;
+        globals::ASTEmap[a->id]->max_occurrences = UINT_MAX;
       }
 
       assert(globals::ASTEmap[a->id] != NULL);

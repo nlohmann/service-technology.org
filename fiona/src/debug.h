@@ -74,6 +74,8 @@ std::string intToString(int);
 
 bool isNonNegativeInteger(const std::string& s);
 
+std::string toUpper(const std::string& s);
+
 /// Signalling syntax errors.
 int yyerror(const char* msg);
 

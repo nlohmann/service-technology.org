@@ -128,8 +128,10 @@ public:
     vertexColor analyseNodeByFormula();
     vertexColor analyseNode();
 
-    vertexColor getColor();
+    vertexColor getColor() const;
     void setColor(vertexColor c);
+
+    bool isToShow(const vertex* rootOfGraph) const;
 
 	void removeLiteralFromFormula(unsigned int, edgeType);
 	

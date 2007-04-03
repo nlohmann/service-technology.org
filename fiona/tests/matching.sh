@@ -133,6 +133,32 @@ else
     fi
 fi
 
+############################################################################
+og="$DIR/shop_rednodes.og"
+############################################################################
+
+owfn="$DIR/client_match_1.owfn"
+cmd="$FIONA -n $owfn --match $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    if [ $? -ne 0 ]; then
+        echo ... fiona exited with nonzero return value although it should not
+        result=1
+    fi
+
+    echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+    if [ $? -ne 0 ]; then
+        echo ... oWFN matches with OG although it should not
+        result=1
+    fi
+fi
+############################################################################
+
 echo
 
 exit $result

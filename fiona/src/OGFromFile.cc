@@ -40,9 +40,11 @@
 
 using namespace std;
 
-OGFromFileNode::OGFromFileNode(const std::string& name_, CommGraphFormula* annotation_) :
-    name(name_),
-    annotation(annotation_),
+OGFromFileNode::OGFromFileNode(const std::string& name,
+    CommGraphFormula* annotation, vertexColor color) :
+    name_(name),
+    color_(color),
+    annotation_(annotation),
     depthFirstSearchParent(NULL) {
 
 }
@@ -55,7 +57,7 @@ OGFromFileNode::~OGFromFileNode()
         delete *trans_iter;
     }
 
-    delete annotation;
+    delete annotation_;
 }
 
 void OGFromFileNode::addParentNodeForTransitionLabel(
@@ -78,7 +80,22 @@ OGFromFileNode* OGFromFileNode::getParentNodeForTransitionLabel(
 
 std::string OGFromFileNode::getName() const
 {
-    return name;
+    return name_;
+}
+
+vertexColor OGFromFileNode::getColor() const
+{
+    return color_;
+}
+
+bool OGFromFileNode::isBlue() const
+{
+    return getColor() == BLUE;
+}
+
+bool OGFromFileNode::isRed() const
+{
+    return getColor() == RED;
 }
 
 void OGFromFileNode::addTransition(OGFromFileTransition* transition)
@@ -104,6 +121,16 @@ bool OGFromFileNode::hasTransitionWithLabel(const std::string& transitionLabel)
     const
 {
 	return getTransitionWithLabel(transitionLabel) != NULL;
+}
+
+bool OGFromFileNode::hasBlueTransitionWithLabel(
+    const std::string& transitionLabel) const
+{
+    OGFromFileTransition* transition = getTransitionWithLabel(transitionLabel);
+    if (transition == NULL)
+        return false;
+
+    return transition->getDst()->isBlue();
 }
 
 OGFromFileTransition* OGFromFileNode::getTransitionWithLabel(
@@ -147,19 +174,19 @@ OGFromFileNode* OGFromFileNode::backfireTransitionWithLabel(
 bool OGFromFileNode::assignmentSatisfiesAnnotation(
     const CommGraphFormulaAssignment& assignment) const
 {
-    assert(annotation != NULL);
-    return annotation->satisfies(assignment);
+    assert(annotation_ != NULL);
+    return annotation_->satisfies(assignment);
 }
 
 std::string OGFromFileNode::getAnnotationAsString() const
 {
-    assert(annotation != NULL);
-    return annotation->asString();
+    assert(annotation_ != NULL);
+    return annotation_->asString();
 }
 
 CommGraphFormula* OGFromFileNode::getAnnotation() const {
 
-    return annotation;
+    return annotation_;
 
 }
 
@@ -244,9 +271,9 @@ void OGFromFile::addNode(OGFromFileNode* node)
 }
 
 OGFromFileNode* OGFromFile::addNode(const std::string& nodeName,
-    CommGraphFormula* annotation)
+    CommGraphFormula* annotation, vertexColor color)
 {
-    OGFromFileNode* node = new OGFromFileNode(nodeName, annotation);
+    OGFromFileNode* node = new OGFromFileNode(nodeName, annotation, color);
     addNode(node);
     return node;
 }

@@ -265,13 +265,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 
 	analyseNode(currentNode);
 
-	string color = "";
-	if (currentNode->getColor() == RED) {
-		color = "RED";
-	} else {
-		color = "BLUE";
-	}
-	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color);
+	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + toUpper(currentNode->getColor().toString()));
 	trace(TRACE_3, " via formula " + currentNode->getCNF_formula()->asString() + "\n");	
 		
 	if (options[O_OTF]) {
@@ -522,8 +516,9 @@ void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
     os << "  " << NodeNameForOG(v);
 
     // print node annotation
-//    os << " : " << v->getCNFString();
     os << " : " << v->getCNF_formula()->asString();
+
+    os << " : " << v->getColor().toString();
 
     // mark current node as visited
     visitedNodes[v->getNumber()] = true;
@@ -538,8 +533,7 @@ void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
         if (visitedNodes[vNext->getNumber()])
             continue;
 
-        // only output blue nodes
-        if (vNext->getColor() != BLUE)
+        if (!vNext->isToShow(root))
             continue;
 
         printNodesToOGFile(vNext, os, visitedNodes);
@@ -567,8 +561,7 @@ void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
     while ((edge = v->getNextSuccEdge()) != NULL) {
         vertex* vNext = edge->getNode();
 
-        // only output blue nodes
-        if (vNext->getColor() != BLUE)
+        if (!vNext->isToShow(root))
             continue;
 
         // output transition (separated by comma to previous transition if

@@ -38,6 +38,7 @@
 #include <string>
 #include <cctype>
 #include <iostream>
+#include <algorithm>
 
 /// debug level
 trace_level debug_level = TRACE_0;
@@ -86,6 +87,13 @@ bool isNonNegativeInteger(const std::string& s)
     }
 
     return true;
+}
+
+std::string toUpper(const std::string& s)
+{
+    std::string result;
+    std::transform(s.begin(), s.end(), result.begin(), toupper);
+    return result;
 }
 
 /*!

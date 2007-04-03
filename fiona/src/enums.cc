@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg                     *
+ * Copyright 2007 Jan Bretschneider                                          *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
@@ -19,41 +19,45 @@
  *****************************************************************************/
 
 /*!
- * \file	enums.h
+ * \file	enums.cc
  *
- * \brief	all enums
+ * \brief	Implementation for some classes acting as enums.
  * 
- * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
+ * \author  responsible: Jan Bretschneider <bretschn@informatik.hu-berlin.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universit‰t zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universit√§t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  */
 
-#ifndef ENUMS_H_
-#define ENUMS_H_
+#include "enums.h"
+#include <cassert>
 
-#include "mynew.h"
-#include <string>
+using namespace std;
 
-enum vertexColor_enum {RED, BLUE};				//!< RED == bad vertex; BLUE == good one
-
-class vertexColor
+vertexColor::vertexColor() : color_(RED)
 {
-    private:
-        vertexColor_enum color_;
-    public:
-        vertexColor();
-        vertexColor(vertexColor_enum color);
-        std::string toString() const;
-        operator vertexColor_enum() const;
-};
+}
 
-enum edgeType {sending, receiving}; 		//!< ENUM possible types of an edge
-enum analysisResult {TERMINATE, CONTINUE};  //!< needed as feedback of the "analysis" function, whether this node is an end node or not
-enum stateType {TRANS, DEADLOCK, FINALSTATE};   //!< TRANS == Transient
-//enum threeValueLogic {FALSE, TRUE, UNKNOWN}; //!< used, for instance, to remember if there is a final state in a node
+vertexColor::vertexColor(vertexColor_enum color) : color_(color)
+{
+}
 
+std::string vertexColor::toString() const
+{
+    switch (color_)
+    {
+        case BLUE: return "blue";
+        case RED:  return "red";
+    }
 
-#endif /*ENUMS_H_*/
+    // control should never reach this line.
+    assert(true);
+    return "undefined color";
+}
+
+vertexColor::operator vertexColor_enum() const
+{
+    return color_;
+}

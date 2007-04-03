@@ -856,56 +856,51 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
         numberOfBlueNodes++;
     }
 
-    if (parameters[P_SHOW_ALL_NODES]
-        || (parameters[P_SHOW_NO_RED_NODES] && (v->getColor() != RED))
-		|| (!parameters[P_SHOW_NO_RED_NODES] && (v->getColor() == RED))
-        || (v->getColor() == BLUE)
-        || (v == root)) {
-        
-        if (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0) {
+    if (!v->isToShow(root))
+        return;
 
-            os << "p" << v->getNumber() << " [label=\"# " << v->getNumber() << "\\n";
+    os << "p" << v->getNumber() << " [label=\"# " << v->getNumber() << "\\n";
 
-            StateSet::iterator iter;  // iterator over the stateList's elements
+    StateSet::iterator iter;  // iterator over the stateList's elements
 
-			if (parameters[P_SHOW_STATES_PER_NODE]) {
-            	for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
+    if (parameters[P_SHOW_STATES_PER_NODE]) {
+        for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
 //                	(*iter)->decodeShowOnly(PN);
-                	
-                	(*iter)->decode(PN);	// need to decide if it is an external or internal deadlock
-                    os << "[" << PN->getCurrentMarkingAsString() << "]";
-                    os << " (";
-                    
-                    string kindOfDeadlock;
-                    unsigned int i;
-                    
-                    switch ((*iter)->type) {
-                        case DEADLOCK: 	
-                        				kindOfDeadlock = "i"; // letter for 'i' internal or 'e' external deadlock
-                        				if (PN->transNrQuasiEnabled > 0) {
-                        					kindOfDeadlock = "e";
-                        				} else {
-                        					for (i = 0; i < PN->getOutputPlaceCount(); i++) {
-                        						if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-                        							kindOfDeadlock = "e";
-                        							continue;
-                        						}
-                        					}
-                        				}
-                        				os << kindOfDeadlock << "DL" << ")"; 
-                        				break;
-                        				
-                        case FINALSTATE: os << "FS" << ")"; break;
-                        
-                        default: os << "TR" << ")"; break;
-                    }
-	                os << "\\n";
-	            }
+            
+            (*iter)->decode(PN);	// need to decide if it is an external or internal deadlock
+            os << "[" << PN->getCurrentMarkingAsString() << "]";
+            os << " (";
+            
+            string kindOfDeadlock;
+            unsigned int i;
+            
+            switch ((*iter)->type) {
+                case DEADLOCK: 	
+                                kindOfDeadlock = "i"; // letter for 'i' internal or 'e' external deadlock
+                                if (PN->transNrQuasiEnabled > 0) {
+                                    kindOfDeadlock = "e";
+                                } else {
+                                    for (i = 0; i < PN->getOutputPlaceCount(); i++) {
+                                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                                            kindOfDeadlock = "e";
+                                            continue;
+                                        }
+                                    }
+                                }
+                                os << kindOfDeadlock << "DL" << ")"; 
+                                break;
+                                
+                case FINALSTATE: os << "FS" << ")"; break;
+                
+                default: os << "TR" << ")"; break;
             }
+            os << "\\n";
+        }
+    }
 
-            if (parameters[P_OG]) {
+    if (parameters[P_OG]) {
 //				// add annotation to node
-				string CNFString = v->getCNF_formula()->asString();
+        string CNFString = v->getCNF_formula()->asString();
 
 //				/*
 //				 * The following three calls were added by Niels to simplify the string
@@ -923,55 +918,43 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
 //			
 //				// 3. create a string representation of the simplified formula
 //				CNFString = formula.to_string();	
-			
-				os << CNFString;
-            }
-
-            os << "\", fontcolor=black, color=";
-
-            switch(v->getColor()) {
-                case BLUE: os << "blue"; break;
-                case RED: os << "red, style=dashed"; break;
-                default: os << "black"; break;
-            }
-            os << "];\n";
-
-            v->resetIteratingSuccNodes();
-            visitedNodes[v->getNumber()] = 1;
-            graphEdge * element;
-            string label;
-
-            while ((element = v->getNextSuccEdge()) != NULL) {
-                vertex * vNext = element->getNode();
-				
-                if (parameters[P_SHOW_ALL_NODES]
-                    || (parameters[P_SHOW_NO_RED_NODES] && vNext->getColor() != RED)
-                    || (!parameters[P_SHOW_NO_RED_NODES] && vNext->getColor() == RED)
-                    || (vNext->getColor() == BLUE)) {
-
-                    if (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0) {
-
-                        if (vNext != NULL) {
-                            if (element->getType() == receiving) {
-                                label = "?";
-                            } else {
-                                label = "!";
-                            }
-                            os << "p" << v->getNumber() << "->" << "p" << vNext->getNumber() << " [label=\"" << label << element->getLabel() << "\", fontcolor=black, color=";
-                            switch (vNext->getColor()) {
-                                case RED: os << "red"; break;
-                                case BLUE: os << "blue"; numberOfBlueEdges++; break;
-                                default: os << "black"; break;
-                            }
-                            os << "];\n";
-                            if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
-                                printGraphToDot(vNext, os, visitedNodes);
-                            }
-                        }
-                    }
-                }
-            } // while
-        }
+    
+        os << CNFString;
     }
+
+    os << "\", fontcolor=black, color=" << v->getColor().toString();
+    if (v->getColor() == RED) {
+        os << ", style=dashed";
+    }
+    os << "];\n";
+
+    v->resetIteratingSuccNodes();
+    visitedNodes[v->getNumber()] = 1;
+    graphEdge * element;
+    string label;
+
+    while ((element = v->getNextSuccEdge()) != NULL) {
+        vertex * vNext = element->getNode();
+
+        if (!vNext->isToShow(root))
+            continue;
+
+        if (element->getType() == receiving) {
+            label = "?";
+        } else {
+            label = "!";
+        }
+        os << "p" << v->getNumber() << "->" << "p" << vNext->getNumber()
+           << " [label=\"" << label << element->getLabel()
+           << "\", fontcolor=black, color=" << vNext->getColor().toString();
+
+        if (vNext->getColor() == BLUE) {
+            numberOfBlueEdges++;
+        }
+        os << "];\n";
+        if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
+            printGraphToDot(vNext, os, visitedNodes);
+        }
+    } // while
 }
 

@@ -44,6 +44,7 @@
 #include <set>
 #include <map>
 #include "commGraphFormula.h"
+#include "enums.h"
 
 using namespace std;
 
@@ -54,23 +55,30 @@ class OGFromFileNode {
 public:
     typedef std::set<OGFromFileTransition*> transitions_t;
 private:
-    std::string name;
-//    transitions_t transitions;
+    std::string name_;
+    vertexColor color_;
     typedef std::map<std::string, OGFromFileNode*> transitionLabel2parentNode_t;
     transitionLabel2parentNode_t transitionLabel2parentNode;
     void addParentNodeForTransitionLabel(const std::string& transitionLabel,
         OGFromFileNode* parentNode);
     OGFromFileNode* getParentNodeForTransitionLabel(
         const std::string& transitionLabel) const;
-    CommGraphFormula* annotation;
+    CommGraphFormula* annotation_;
     OGFromFileNode* depthFirstSearchParent;
 public:
     transitions_t transitions;
-    OGFromFileNode(const std::string& name_, CommGraphFormula* annotation_);
+
+    OGFromFileNode(const std::string& name_, CommGraphFormula* annotation_,
+        vertexColor color = BLUE);
+
     ~OGFromFileNode();
     std::string getName() const;
+    vertexColor getColor() const;
+    bool isBlue() const;
+    bool isRed() const;
     void addTransition(OGFromFileTransition* transition);
     bool hasTransitionWithLabel(const std::string& transitionLabel) const;
+    bool hasBlueTransitionWithLabel(const std::string& transitionLabel) const;
     OGFromFileTransition* getTransitionWithLabel(
         const std::string& transitionLabel) const;
     OGFromFileNode* fireTransitionWithLabel(const std::string& transitionLabel);
@@ -121,7 +129,7 @@ public:
     ~OGFromFile();
     void addNode(OGFromFileNode* node);
     OGFromFileNode* addNode(const std::string& nodeName,
-        CommGraphFormula* annotation);
+        CommGraphFormula* annotation, vertexColor color = BLUE);
     void addTransition(const std::string& srcName, const std::string& dstName,
         const std::string& label);
     bool hasNodeWithName(const std::string& nodeName) const;

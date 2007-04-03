@@ -180,14 +180,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 
 	actualDepth--;
 	
-	string color;
-	if (currentNode->getColor() == RED) {
-		color = "RED";
-	} else {
-		color = "BLUE";
-	}
-
-	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");	
+	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + toUpper(currentNode->getColor().toString()) + "\n");	
 }
 
 //! \fn void interactionGraph::buildReducedGraph(vertex * currentNode)
@@ -274,14 +267,7 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 	analyseNode(currentNode);
 	trace(TRACE_5, "node analysed\n");
 	
-	string color;
-	if (currentNode->getColor() == RED) {
-		color = "RED";
-	} else {
-		color = "BLUE";
-	}
-	
-	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");
+	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + toUpper(currentNode->getColor().toString()) + "\n");
 }
 
 

@@ -56,6 +56,7 @@ extern int og_yylex();
 #include "debug.h"
 
 #include "OGFromFile.h"
+#include "enums.h"
 
 OGFromFile* OGToParse;
 
@@ -84,6 +85,7 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
 // the terminal symbols (tokens)
 
 %token key_nodes key_initialnode key_transitions
+%token key_red key_blue
 %token comma colon semicolon ident arrow
 %token key_true key_false
 %token lpar rpar
@@ -99,11 +101,13 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
 %union {
     char * str;
     CommGraphFormula* formula;
+    vertexColor_enum color;
 }
 
 /* the types of the non-terminal symbols */
 %type <str> ident
 %type <formula> formula
+%type <color> color_optional;
 
 
 %%
@@ -121,13 +125,13 @@ nodes_list: nodes_list comma node
 | /* empty */
 ;
 
-node: ident colon formula
+node: ident colon formula color_optional
     {
         if (OGToParse->hasNodeWithName($1)) {
             og_yyerror_node_already_defined($1);
         }
 
-        OGToParse->addNode($1, $3);
+        OGToParse->addNode($1, $3, $4);
         free($1);
     }
 ;
@@ -156,6 +160,20 @@ formula: lpar formula rpar
     {
         $$ = new CommGraphFormulaLiteral($1);
         free($1);
+    }
+;
+
+color_optional: colon key_blue
+    {
+        $$ = BLUE;
+    }
+| colon key_red
+    {
+        $$ = RED;
+    }
+|
+    {
+        $$ = BLUE;
     }
 ;
 

@@ -82,6 +82,9 @@ TRANSITIONS   { return key_transitions; }
 \(            { return lpar;      }
 \)            { return rpar;      }
 
+[Rr][Ee][Dd]      { return key_red;  }
+[Bb][Ll][Uu][Ee]  { return key_blue; }
+
 \:            { return colon;     }
 \;            { return semicolon; }
 ,             { return comma;     }

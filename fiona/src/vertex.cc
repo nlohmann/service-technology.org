@@ -38,6 +38,7 @@
 #include "CNF.h"
 #include "cnf_formula.h"
 #include "debug.h"
+#include "options.h"    
 #include <cassert>
 
 
@@ -384,10 +385,26 @@ void vertex::setColor(vertexColor c) {
 
 //! \fn vertexColor vertex::getColor()
 //! \brief returns the color of the vertex
-vertexColor vertex::getColor() {
+vertexColor vertex::getColor() const {
 	return color;
 }
 
+bool vertex::isToShow(const vertex* rootOfGraph) const
+{
+	if ( parameters[P_SHOW_ALL_NODES] ||
+	    (parameters[P_SHOW_NO_RED_NODES] && (getColor() != RED)) ||
+	    (!parameters[P_SHOW_NO_RED_NODES] && (getColor() == RED)) ||
+	    (getColor() == BLUE) ||
+	    (this == rootOfGraph) )
+	{
+		return (parameters[P_SHOW_EMPTY_NODE] ||
+		        reachGraphStateSet.size() != 0);
+	}
+	else
+	{
+		return false;
+	}
+}
 
 //! \fn vertexColor vertex::getNumberOfDeadlocks()
 //! \brief returns the number of deadlocks

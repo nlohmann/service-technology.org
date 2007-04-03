@@ -2058,6 +2058,12 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
     // Initialize the currentOGNode with the root node of the OG.
     OGFromFileNode* currentOGNode = og->getRoot();
 
+    if (currentOGNode->isRed())
+    {
+        reasonForFailedMatch = "The OG is empty (its root node is red).";
+        return false;
+    }
+
     // In this loop, we build the reachability graph of the oWFN and check
     // whether it matches with the OG.
     while (currentState) {
@@ -2091,14 +2097,15 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
             // OG. If not, exit this function returning false, because the oWFN
             // does not match with the OG.
             if (transition->hasNonTauLabelForMatching() &&
-                !currentOGNode->hasTransitionWithLabel(
+                !currentOGNode->hasBlueTransitionWithLabel(
                     transition->getLabelForMatching()))
             {
                 reasonForFailedMatch = "A transition labeled with '" +
                     transition->getLabelForMatching() +
                     "' leaves the marking '" +
                     getCurrentMarkingAsString() +
-                    "' in the oWFN, but not the node '" +
+                    "' in the oWFN, but no blue transition with the same label"
+                    " the node '" +
                     currentOGNode->getName() + "' in the OG.";
 
                 delete[] tmpCurrentMarking;

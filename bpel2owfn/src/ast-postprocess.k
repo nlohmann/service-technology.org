@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/04/03 16:15:49 $
+ * \date    \$Date: 2007/04/05 10:20:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.145 $
+ * \version \$Revision: 1.146 $
  */
 %}
 
@@ -391,18 +391,17 @@ EventHandlers(a,b,_id) ->
         assert(_id2 != NULL);
         assert(globals::ASTEmap[_id2->value] != NULL);
         globals::ASTEmap[_id2->value]->parentActivityId = myid;
-        globals::ASTEmap[branch->id]->parentActivityId = myid;
         globals::ASTEmap[_id2->value]->controlFlow = myself->controlFlow;
-        globals::ASTEmap[branch->id]->max_occurrences = myself->max_occurrences;
+        globals::ASTEmap[_id2->value]->max_occurrences = myself->max_occurrences;
         
       }
-      foreach(branch=OnAlarm(*,innerActivity); tOnAlarm_list b)
+      foreach(branch=OnAlarm(*,innerActivity, _id3); tOnAlarm_list b)
       {
         assert(globals::ASTEmap[innerActivity->id] != NULL);
         globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
-        globals::ASTEmap[branch->id]->parentActivityId = myid;
+        globals::ASTEmap[_id3->value]->parentActivityId = myid;
         globals::ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
-        globals::ASTEmap[branch->id]->max_occurrences = myself->max_occurrences;
+        globals::ASTEmap[_id3->value]->max_occurrences = myself->max_occurrences;
       }
     }
     a b
@@ -446,15 +445,18 @@ OnMessage(a,b,c,_id) ->
       {
         if(max_loops != UINT_MAX && myself->max_occurrences != UINT_MAX)
         {
-          globals::ASTEmap[myid]->max_occurrences = max_loops * myself-> max_occurrences;
+            myself->max_occurrences = max_loops * myself-> max_occurrences;
         } 
         else
         {
-          globals::ASTEmap[myid]->max_occurrences = UINT_MAX;
+            myself->max_occurrences = UINT_MAX;
         }
       }
 
-      globals::ASTEmap[c->id]->max_occurrences = myself->max_occurrences;
+        globals::ASTEmap[c->id]->max_occurrences = myself->max_occurrences;
+
+//      occurrences output for debugging  
+//      cerr << myself->attributes["operation"] << " hat an seinem Kind " << globals::ASTEmap[c->id]->activityTypeName() << " den Wert "  << globals::ASTEmap[c->id]->max_occurrences << " uebergeben\n";
 
 
       foreach(correlation=Correlation(_id2); tCorrelation_list a)
@@ -487,7 +489,7 @@ OnAlarm(b,a,_id) ->
 
       myself->parentScopeId = globals::PPcurrentScope;
       assert(globals::ASTEmap[myself->parentActivityId] != NULL);
-      //todo: cyclic-attribute if "repeatEvery" is set
+
       if(string(b->op_name())=="RepeatEvery")
       {
         myself->cyclic=true;
@@ -1435,7 +1437,6 @@ While(a,b,_id) ->
         globals::ASTEmap[b->id]->max_occurrences = UINT_MAX;
 
       myself->max_loops = max_loops;
-      cerr<< "BAAAAM" <<globals::ASTEmap[b->id]->max_occurrences << "\n";
     }
     a b
     {
@@ -1584,17 +1585,17 @@ Pick(a,b,c,_id) ->
       {
         assert(globals::ASTEmap[innerActivity->id] != NULL);
         globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
-        globals::ASTEmap[branch->id]->parentActivityId = myid;
+        globals::ASTEmap[_id2->value]->parentActivityId = myid;
         globals::ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
-        globals::ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
+        globals::ASTEmap[_id2->value]->max_occurrences = myself->max_occurrences;
       }
-      foreach(branch=OnAlarm(*,innerActivity); tOnAlarm_list c)
+      foreach(branch=OnAlarm(*,innerActivity,_id3); tOnAlarm_list c)
       {
         assert(globals::ASTEmap[innerActivity->id] != NULL);
         globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
-        globals::ASTEmap[branch->id]->parentActivityId = myid;
+        globals::ASTEmap[_id3->value]->parentActivityId = myid;
         globals::ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
-        globals::ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
+        globals::ASTEmap[_id3->value]->max_occurrences = myself->max_occurrences;
       }
     }
     a b c

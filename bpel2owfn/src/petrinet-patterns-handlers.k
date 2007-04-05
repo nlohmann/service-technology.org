@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/29 14:27:40 $
+ * \date    \$Date: 2007/04/05 11:51:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
 %}
 
@@ -429,10 +429,10 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
     header(my_integer, true);
     assert(globals::ASTEmap[branch->id] != NULL);
     string event = toString(event_number++);
+//    prefix = toString(my_integer->value);
 
     // Unparse the embedded activity.
     my_activity->unparse(pseudoPrinter, current_view);
-
 
     // Places.
     Place *p8 = PN.newPlace(prefix + "active." + event);
@@ -441,7 +441,7 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
     Place *p13 = PN.findPlace(my_activity->id, ".final");
 
     // Start embedded activity.
-    Transition *t4 = PN.newTransition(prefix + "onEvent." + event);
+    Transition *t4 = PN.newTransition(toString(my_integer->value) + "." + "onEvent." + event);
     PN.newArc(p8, t4);
     PN.newArc(t4, p10);
     PN.newArc(PN.findPlace("in." + globals::ASTEmap[branch->id]->channelName), t4);

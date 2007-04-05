@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/03/27 14:09:01 $
+ * \date    \$Date: 2007/04/05 11:51:40 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.197 $
+ * \version \$Revision: 1.198 $
  *
  * \ingroup petrinet
  */
@@ -59,6 +59,7 @@
 #include "pnapi.h"
 
 using std::pair;
+using std::cerr;
 
 
 
@@ -1748,6 +1749,8 @@ void PetriNet::calculate_max_occurrences()
 	else
 	  (*p)->max_occurrences += globals::ASTEmap[*activity_id]->max_occurrences;
       }
+//  Debugging Help
+//  cerr << "gehoert auch zu Aktivitaet: " << globals::ASTEmap[*activity_id]->activityTypeName() << "!\n";
     }
   }
 

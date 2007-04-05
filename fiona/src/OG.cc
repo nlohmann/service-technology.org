@@ -103,7 +103,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 //	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount() + PN->getOutputPlaceCnt()));
 	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount()));
 
-	unsigned int i = 0;
+	oWFN::Places_t::size_type i = 0;
 
 	// iterate over all elements of inputSet of the oWFN
 	trace(TRACE_2, "\t\t\t iterating over inputSet of the oWFN\n");

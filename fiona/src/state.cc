@@ -45,7 +45,6 @@ State::State() :
 				stubbornFirelist(NULL),
 				quasiFirelist(NULL),
 				current(0),
-				myMarking(NULL),
 				my_entry(NULL),
 				placeHashValue(0),
 				succ(NULL),
@@ -70,9 +69,6 @@ State::~State() {
     }
     if(succ) {
 		delete [] succ;
-    }
-    if (myMarking) {
-    	delete [] myMarking;
     }
 }
 

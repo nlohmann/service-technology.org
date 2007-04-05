@@ -53,7 +53,6 @@ public:
 	owfnTransition ** stubbornFirelist; // Transitions to be fired in the stubborn set
 	owfnTransition ** quasiFirelist;  // Transitions that are quasi enabled
 	unsigned int current;             // Nr of last already fired element of firelist
-  	unsigned int * myMarking;       // current marking at that state
 	binDecision * my_entry;           // last branch in binary decision tree that represents marking
 	unsigned int placeHashValue;      // hashValue of that state (necessary for binDecision)
 	State ** succ;                    // successor states in graph

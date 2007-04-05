@@ -383,9 +383,6 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 		// so we use the set of states that were actually stored in the node 
 		for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
 	
-	#ifdef DEBUG
-		//cout << "\t state " << PN->getMarkingAsString((*iter)->myMarking) << " activates the input events: " << endl;
-	#endif		
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	// we just consider the maximal states only
 				
 	

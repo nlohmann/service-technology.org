@@ -439,64 +439,18 @@ bool oWFN::checkMessageBound() {
 }
 
 
-//! \fn void oWFN::computeAnnotationOutput(vertex * node, State * currentState)
-//! \param node the node that is calculated
-//! \param currentState the state for which the appropriate clause is to be created if this state is DL or FS
-//! \brief computes the CNF of the current node starting with the currentState, goes recursively through
-//! all of its successor states 
-void oWFN::computeAnnotationOutput(vertex * node, State * currentState) {
-	trace(TRACE_5, "oWFN::computeAnnotation(vertex * node, State * currentState, unsigned int * markingPreviousState): start\n");
-
-	// store this state in the node's temp set of state (storing all states of the node)
-	setOfStatesTemp.insert(currentState);
-
-	// get the successor states	and compute their corresponding annotation
-	if (currentState != NULL) {
-		for(unsigned int i = 0; i < currentState->CardFireList; i++) {
-			if (currentState->succ[i]) {
-				computeAnnotationOutput(node, currentState->succ[i]);
-			}
-		}
-	}
-	trace(TRACE_5, "oWFN::computeAnnotation(vertex * node, State * currentState, unsigned int * markingPreviousState): end\n");
-}
-
-
-//! \fn void oWFN::computeAnnotationInput(vertex * node, State * currentState, bool isCurrentMarking)
-//! \param node the node that is calculated
-//! \param currentState the state for which the appropriate clause is to be created if this state is DL or FS
-//! \param isCurrentMarking flag, whether this state is the currentMarking or not
-//! \brief computes the CNF of the current node starting with the currentState, goes recursively through
-//! all of its successor states 
-void oWFN::computeAnnotationInput(vertex * node, State * currentState, bool isCurrentMarking) {
-	trace(TRACE_5, "oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned int * markingPreviousState): start\n");
+void oWFN::addRecursivelySuccStatesToSetOfTempStates(State* s) {
+	trace(TRACE_5, "oWFN::addRecursivelySuccStatesToSetOfTempStates(State* s): start\n");
 	
-	unsigned int * marking = NULL;
-
-	// store this state in the node's temp set of state (storing all states of the node)
-	setOfStatesTemp.insert(currentState);		
+	setOfStatesTemp.insert(s);
 	
-	// check, whether this state is to be added to the node or not
-	// we do this right here, because of the decode function that might have been called already
-	// if the currentState is just the currentMarking, then we don't decode again ;-)
-	if (!isCurrentMarking && getOutputPlaceCount() > 0) {
-		currentState->decodeShowOnly(this);
-	}
-	
-	// get the successor states	and compute their corresponding annotation
-	if (currentState != NULL && currentState->succ != NULL && currentState->succ[0] != NULL) {
-		marking = copyCurrentMarking();	// save the marking of the current state since it is the parent state of its successors
-		for (unsigned int i = 0; i < currentState->CardFireList; i++) {
-			if (currentState->succ[i]) {
-				computeAnnotationInput(node, currentState->succ[i], false);
-			}
-		}
-		if (marking) {
-			delete[] marking;
-			marking = NULL;
-		}
-	}
-	trace(TRACE_5, "oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned int * markingPreviousState): end\n");
+	// get the successor states	and add them, too.
+    for (unsigned int i = 0; i < s->CardFireList; i++) {
+        if (s->succ[i]) {
+            addRecursivelySuccStatesToSetOfTempStates(s->succ[i]);
+        }
+    }
+	trace(TRACE_5, "oWFN::addRecursivelySuccStatesToSetOfTempStates(State* s): end\n");
 }
 
 
@@ -549,7 +503,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n) {
 	if (CurrentState != NULL) {
 		// marking already has a state -> put it (and all its successors) into the node
 		if (n->addState(CurrentState)) {
-			computeAnnotationOutput(n, CurrentState);
+			addRecursivelySuccStatesToSetOfTempStates(CurrentState);
 		}
 		trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal): end\n");
 		return;
@@ -613,7 +567,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n) {
 	  		if(NewState != NULL) {
 		  		// Current marking already in bintree 
 				trace(TRACE_5, "Current marking already in bintree \n");
-				computeAnnotationOutput(n, NewState);
+				addRecursivelySuccStatesToSetOfTempStates(NewState);
 				
 				copyMarkingToCurrentMarking(tempCurrentMarking);
 				
@@ -657,7 +611,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n) {
 
 	      		CurrentState = NewState;
 		      	
-				computeAnnotationOutput(n, NewState);
+				addRecursivelySuccStatesToSetOfTempStates(NewState);
 				
 				if (tempCurrentMarking) {
 					delete[] tempCurrentMarking;
@@ -701,7 +655,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	if (CurrentState != NULL) {
 		// marking already has a state -> put it (and all its successors) into the node
 		if (n->addState(CurrentState)) {
-			computeAnnotationInput(n, CurrentState, true);
+			addRecursivelySuccStatesToSetOfTempStates(CurrentState);
 		}
 		trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal): end\n");
 		return;
@@ -736,7 +690,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	setOfStatesTemp.insert(CurrentState);
 	
 	n->addState(CurrentState);
-	computeAnnotationInput(n, CurrentState, true);
+	addRecursivelySuccStatesToSetOfTempStates(CurrentState);
 	  	
 	// building EG in a node
   	while(CurrentState) {
@@ -767,7 +721,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 		  		// Current marking already in bintree 
 				trace(TRACE_5, "Current marking already in bintree \n");
 				
-				computeAnnotationInput(n, NewState, true);
+				addRecursivelySuccStatesToSetOfTempStates(NewState);
 				
 				copyMarkingToCurrentMarking(tempCurrentMarking);
 				
@@ -808,7 +762,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	      		CurrentState->succ[CurrentState->current] = NewState;
 	      		CurrentState = NewState;
 		      		
-				computeAnnotationInput(n, NewState, true);
+				addRecursivelySuccStatesToSetOfTempStates(NewState);
 				
 				if (tempCurrentMarking) {
 					delete[] tempCurrentMarking;

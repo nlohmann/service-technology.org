@@ -207,8 +207,12 @@ class oWFN  {
 		
 
 		bool checkMessageBound();
-		void computeAnnotationOutput(vertex *, State *);
-		void computeAnnotationInput(vertex *, State *, bool);
+
+		/**
+		 * Adds recursively the State s and all its successor states to
+		 * setOfStatesTemp.
+		 */
+		void addRecursivelySuccStatesToSetOfTempStates(State* s);
 		
 		State * calculateNextSate();
 		

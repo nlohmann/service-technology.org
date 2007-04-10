@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for shortcuts
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/25 10:19:37 $
+ * \date    \$Date: 2007/04/10 11:22:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
 */
 %}
 
@@ -288,6 +288,118 @@ void dpeLinks(Transition *t, int id)
   LEAVE("[ASTT]");
 }
 
+
+
+
+
+%{
+/*!
+ * \brief Adds a pattern for a cyclic net with a cap of loops
+ *
+ * \param   condition   the condition for entering/leaving the loop
+ * \param   maxloops    the cap for the number of cycles
+ * \param   prefix      the prefix of the places and transitions
+ * \param   id          the id of the callin activity
+ * \param   enterPlace  the where the loop is entered (needed to connect correctly)
+ * \param   loopPlace   the place that is marked if the condition was accepted (needed to connect correctly)
+ * \param   exitPlace   the place to be marked when the loop is left (needed to connect correctly)
+ *
+ * \ingroup patterns
+ */
+%}
+void looppattern(string condition, int maxloops, string prefix, integer id,
+    Place *enterPlace, Place *loopPlace, Place *exitPlace)
+{
+  ENTER("[ASTT] looppattern");
+
+  assert( enterPlace != NULL );
+  assert( loopPlace != NULL );
+  assert( exitPlace != NULL );
+
+  std::string newPrefix = prefix + "loop.";
+
+  int counter=0;
+
+  if (condition == "false")
+  {
+    Place *Pbase = PN.newPlace(newPrefix + "count_" + toString(counter));
+
+    Transition *t1 = PN.newTransition(newPrefix + "exit_" + toString(counter));
+    PN.newArc(enterPlace, t1);
+    PN.newArc(Pbase, t1);
+    PN.newArc(t1, Pbase);
+    PN.newArc(t1, exitPlace);
+
+  } 
+  else
+  {
+    if (condition == "true")
+    {
+      Place *Pbase = PN.newPlace(newPrefix + "count_" + toString(counter));
+      
+      Place *Pcurrent = Pbase;
+      Transition *Tcurrent;
+      Transition *Tstop;
+      
+      while(counter < maxloops)
+      {
+        Tcurrent = PN.newTransition(newPrefix + "run_" + toString(counter+1));
+        PN.newArc(enterPlace, Tcurrent);
+        PN.newArc(Pcurrent, Tcurrent);
+        Pcurrent = PN.newPlace(newPrefix + "count_" + toString(counter+1));
+        if (globals::parameters[P_COMMUNICATIONONLY] == false)
+        {
+          Tstop = stop(Pcurrent, "count_" + toString(counter+1), prefix);
+          PN.newArc(Tstop, Pbase);
+        }
+        PN.newArc(Tcurrent, Pcurrent);
+        PN.newArc(Tcurrent, loopPlace);
+        counter++;
+      }
+      
+      Transition *Texit = PN.newTransition(newPrefix + "exit_" + toString(counter));
+      PN.newArc(Pcurrent, Texit);
+      PN.newArc(enterPlace, Texit);
+      PN.newArc(Texit, Pbase);
+      PN.newArc(Texit, exitPlace);      
+    }
+    else
+    {
+      Place *Pbase = PN.newPlace(newPrefix + "count_" + toString(counter));
+      Transition *Texit = PN.newTransition(newPrefix + "exit_" + toString(counter));
+      PN.newArc(Pbase, Texit);
+      PN.newArc(enterPlace, Texit);
+      PN.newArc(Texit, Pbase);
+      PN.newArc(Texit, exitPlace);      
+      
+      Place *Pcurrent;
+      Transition *Tcurrent;
+      Transition *Tstop;
+      
+      while(counter < maxloops)
+      {
+        Tcurrent = PN.newTransition(newPrefix + "run_" + toString(counter+1));
+        PN.newArc(enterPlace, Tcurrent);
+        PN.newArc(Pcurrent, Tcurrent);
+        PN.newArc(Tcurrent, loopPlace);
+        Pcurrent = PN.newPlace(newPrefix + "count_" + toString(counter+1));
+        PN.newArc(Tcurrent, Pcurrent);
+        if (globals::parameters[P_COMMUNICATIONONLY] == false)
+        {
+          Tstop = stop(Pcurrent, "count_" + toString(counter+1), prefix);
+          PN.newArc(Tstop, Pbase);
+        }
+        Tcurrent = PN.newTransition(newPrefix + "exit_" + toString(counter+1));
+        PN.newArc(Pcurrent, Tcurrent);
+        PN.newArc(enterPlace, Tcurrent);
+        PN.newArc(Tcurrent, Pbase);
+        PN.newArc(Tcurrent, exitPlace);
+        counter++;
+      }
+    }
+  }
+  LEAVE("[ASTT] looppattern");
+}
 
 
 

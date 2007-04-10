@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/04/10 11:22:44 $
+ * \date    \$Date: 2007/04/10 12:57:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
 */
 %}
 
@@ -344,6 +344,8 @@ void looppattern(string condition, int maxloops, string prefix, integer id,
       while(counter < maxloops)
       {
         Tcurrent = PN.newTransition(newPrefix + "run_" + toString(counter+1));
+        if (globals::parameters[P_LOOPCONTROL])
+	  PN.newArc(PN.findPlace("in.enterloop." + toString(id->value)), Tcurrent);
         PN.newArc(enterPlace, Tcurrent);
         PN.newArc(Pcurrent, Tcurrent);
         Pcurrent = PN.newPlace(newPrefix + "count_" + toString(counter+1));
@@ -358,6 +360,8 @@ void looppattern(string condition, int maxloops, string prefix, integer id,
       }
       
       Transition *Texit = PN.newTransition(newPrefix + "exit_" + toString(counter));
+      if (globals::parameters[P_LOOPCONTROL])
+        PN.newArc(PN.findPlace("in.exitloop." + toString(id->value)), Texit);
       PN.newArc(Pcurrent, Texit);
       PN.newArc(enterPlace, Texit);
       PN.newArc(Texit, Pbase);
@@ -367,6 +371,8 @@ void looppattern(string condition, int maxloops, string prefix, integer id,
     {
       Place *Pbase = PN.newPlace(newPrefix + "count_" + toString(counter));
       Transition *Texit = PN.newTransition(newPrefix + "exit_" + toString(counter));
+      if (globals::parameters[P_LOOPCONTROL])
+        PN.newArc(PN.findPlace("in.exitloop." + toString(id->value)), Texit);
       PN.newArc(Pbase, Texit);
       PN.newArc(enterPlace, Texit);
       PN.newArc(Texit, Pbase);
@@ -379,6 +385,8 @@ void looppattern(string condition, int maxloops, string prefix, integer id,
       while(counter < maxloops)
       {
         Tcurrent = PN.newTransition(newPrefix + "run_" + toString(counter+1));
+        if (globals::parameters[P_LOOPCONTROL])
+	  PN.newArc(PN.findPlace("in.enterloop." + toString(id->value)), Tcurrent);
         PN.newArc(enterPlace, Tcurrent);
         PN.newArc(Pcurrent, Tcurrent);
         PN.newArc(Tcurrent, loopPlace);
@@ -390,6 +398,8 @@ void looppattern(string condition, int maxloops, string prefix, integer id,
           PN.newArc(Tstop, Pbase);
         }
         Tcurrent = PN.newTransition(newPrefix + "exit_" + toString(counter+1));
+        if (globals::parameters[P_LOOPCONTROL])
+          PN.newArc(PN.findPlace("in.exitloop." + toString(id->value)), Tcurrent);
         PN.newArc(Pcurrent, Tcurrent);
         PN.newArc(enterPlace, Tcurrent);
         PN.newArc(Tcurrent, Pbase);

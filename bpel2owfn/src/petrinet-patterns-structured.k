@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/04/10 14:18:04 $
+ * \date    \$Date: 2007/04/11 10:34:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
 */
 %}
 
@@ -295,21 +295,28 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	PN.newArc(p2, t1);
 	PN.newArc(t1, p3);
 
-        if(myself->attributes["condition"] != "true")
+        if((myself->max_loops != 0) && (myself->max_loops != UINT_MAX))
         {
-          Transition *t2 = PN.newTransition(prefix + "end");
-          PN.newArc(p3, t2);
-          PN.newArc(t2, p4);
-          if( globals::parameters[P_LOOPCONTROL])
-            PN.newArc(control_leave, t2);
+          looppattern(myself->attributes["condition"], (myself->max_loops-1), prefix, phylum->id,
+                      p3, p1, p4);
         }
+        else
+        {
+          if(myself->attributes["condition"] != "true")
+          {
+            Transition *t2 = PN.newTransition(prefix + "end");
+            PN.newArc(p3, t2);
+            PN.newArc(t2, p4);
+            if( globals::parameters[P_LOOPCONTROL])
+              PN.newArc(control_leave, t2);
+          }
 
-
-        Transition *t3 = PN.newTransition(prefix + "repeat");
-        PN.newArc(p3, t3);
-        PN.newArc(t3, p1);
-        if( globals::parameters[P_LOOPCONTROL])
-          PN.newArc(control_enter, t3);	
+          Transition *t3 = PN.newTransition(prefix + "repeat");
+          PN.newArc(p3, t3);
+          PN.newArc(t3, p1);
+          if( globals::parameters[P_LOOPCONTROL])
+            PN.newArc(control_enter, t3);	
+        }
 
 	Transition *t4 = stop(p3, "running", prefix);
 	Transition *t5 = stop(p4, "final", prefix);
@@ -415,21 +422,28 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	  control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
         }
 
+        if((myself->max_loops != 0) && (myself->max_loops != UINT_MAX))
+        {
+          looppattern(myself->attributes["condition"], (myself->max_loops-1), prefix, phylum->id,
+                      p2, p1, p3);
+        }
+        else
+        {
+          if(myself->attributes["condition"] != "true")
+	  {
+	    Transition *t1 = PN.newTransition(prefix + "end");
+	    PN.newArc(p2, t1);
+	    PN.newArc(t1, p3);
+	    if (globals::parameters[P_LOOPCONTROL])
+	      PN.newArc(control_leave, t1);
+	  }
 
-	if(myself->attributes["condition"] != "true")
-	{
-	  Transition *t1 = PN.newTransition(prefix + "end");
-	  PN.newArc(p2, t1);
-	  PN.newArc(t1, p3);
-	  if (globals::parameters[P_LOOPCONTROL])
-	    PN.newArc(control_leave, t1);
+	  Transition *t2 = PN.newTransition(prefix + "repeat");
+	  PN.newArc(p2, t2);
+	  PN.newArc(t2, p1);
+	  if (globals::parameters[P_LOOPCONTROL] && myself->attributes["condition"] != "true")
+	    PN.newArc(control_enter, t2);
 	}
-
-	Transition *t2 = PN.newTransition(prefix + "repeat");
-	PN.newArc(p2, t2);
-	PN.newArc(t2, p1);
-	if (globals::parameters[P_LOOPCONTROL] && myself->attributes["condition"] != "true")
-	  PN.newArc(control_enter, t2);
 
 
 	// unparse the standard elements

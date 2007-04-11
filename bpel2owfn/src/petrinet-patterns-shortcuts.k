@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/04/10 14:18:04 $
+ * \date    \$Date: 2007/04/11 12:58:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
 */
 %}
 
@@ -254,6 +254,92 @@ Transition *stop(Place *p, string p_name, string prefix)
 
 
 
+%{
+/*!
+ * \fn      Transition *kc::stop_loop(Place *p, string p_name, string prefix)
+ *
+ * \brief   generates a subnet to stop
+ *
+ *          Generates a transition and places to stop the activity, i.e. a
+ *          transition moving a token on the "stop" place to "stopped".
+ *
+ * \param   p  the place in control flow from which the token is move to
+ *             "stop"
+ *
+ * \param   p_name  name of place p which is used to label the generated
+ *                  transition (e.g. if p1 is called "running" generated
+ *                  transition end with this name (e.g. "stop.running")
+ *
+ * \param   prefix  prefix of the pattern to label generated transition
+ *
+ * \return  a pointer to the stop transition
+ *
+ * \ingroup patterns
+ */
+%}
+Transition *stop_loop(Place *p, string p_name, string prefix)
+{
+  assert(p != NULL);
+
+  // no stop transitions in case of "nano" parameter
+  if (globals::parameters[P_COMMUNICATIONONLY])
+    return NULL;
+  
+  Transition *stopTransition = PN.newTransition(prefix + "stopped_loop." + p_name);
+  PN.newArc(PN.findPlace(prefix + "stop_loop"), stopTransition);
+  PN.newArc(stopTransition, PN.findPlace(prefix + "stopped_loop"));
+  PN.newArc(p, stopTransition);
+
+  return stopTransition;
+}
+
+
+
+
+
+%{
+/*!
+ * \fn      Transition *kc::stop_activity(Place *p, string p_name, string prefix)
+ *
+ * \brief   generates a subnet to stop
+ *
+ *          Generates a transition and places to stop the activity, i.e. a
+ *          transition moving a token on the "stop" place to "stopped".
+ *
+ * \param   p  the place in control flow from which the token is move to
+ *             "stop"
+ *
+ * \param   p_name  name of place p which is used to label the generated
+ *                  transition (e.g. if p1 is called "running" generated
+ *                  transition end with this name (e.g. "stop.running")
+ *
+ * \param   prefix  prefix of the pattern to label generated transition
+ *
+ * \return  a pointer to the stop transition
+ *
+ * \ingroup patterns
+ */
+%}
+Transition *stop_activity(Place *p, string p_name, string prefix)
+{
+  assert(p != NULL);
+
+  // no stop transitions in case of "nano" parameter
+  if (globals::parameters[P_COMMUNICATIONONLY])
+    return NULL;
+  
+  Transition *stopTransition = PN.newTransition(prefix + "stopped." + p_name);
+  PN.newArc(PN.findPlace(prefix + "stop_activity"), stopTransition);
+  PN.newArc(stopTransition, PN.findPlace(prefix + "stopped_activity"));
+  PN.newArc(p, stopTransition);
+
+  return stopTransition;
+}
+
+
+
+
+
 
 %{
 /*!
@@ -352,7 +438,7 @@ void looppattern(string condition, int maxloops, string prefix, int id,
         Pcurrent = PN.newPlace(newPrefix + "count_" + toString(counter+1));
         if (globals::parameters[P_COMMUNICATIONONLY] == false)
         {
-          Tstop = stop(Pcurrent, "count_" + toString(counter+1), prefix);
+          Tstop = stop_loop(Pcurrent, "count_" + toString(counter+1), prefix);
           PN.newArc(Tstop, Pbase);
         }
         PN.newArc(Tcurrent, Pcurrent);
@@ -396,7 +482,7 @@ void looppattern(string condition, int maxloops, string prefix, int id,
         PN.newArc(Tcurrent, Pcurrent);
         if (globals::parameters[P_COMMUNICATIONONLY] == false)
         {
-          Tstop = stop(Pcurrent, "count_" + toString(counter+1), prefix);
+          Tstop = stop_loop(Pcurrent, "count_" + toString(counter+1), prefix);
           PN.newArc(Tstop, Pbase);
         }
         Tcurrent = PN.newTransition(newPrefix + "exit_" + toString(counter+1));

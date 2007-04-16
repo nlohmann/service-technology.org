@@ -60,13 +60,7 @@ Exchangeability::Exchangeability(char* filename, Cudd_ReorderingType heuristic) 
     nbrVarAnn = 0;
 	loadBdd(filename);
 	
-	return;
-	
 	++nbrBdd;
-	Cudd_ReorderingType method = (Cudd_ReorderingType)4;
-	if (Cudd_ReorderingStatus(mgrMp, &method) == 1) {
-		cout << "automatic reordering is enabled";
-	} 
 	 
 	for (int i = 0; i < nbrVarAnn; ++i) {
         if (names[i][0] == '!' || names[i][0] == '?') {
@@ -281,6 +275,14 @@ void Exchangeability::printDotFile(char* filename, char** varNames, DdNode* bddM
 	trace(TRACE_5,"Exchangeability::printDotFile(char* filename, char** varNames, DdNode* bddMp, DdNode* bddAnn): end\n");     
 }      
 
+//! \fn void Exchangeability::print()
+//! \brief print bdd_Mp and bdd_Ann
+void Exchangeability::print(){
+	cout << "\nBDD_MP:\n";	
+	Cudd_PrintMinterm(mgrMp, bddMp);
+	cout << "\nBDD_ANN:\n"; 
+	Cudd_PrintMinterm(mgrAnn, bddAnn);
+}
 
 bool Exchangeability::check(Exchangeability* bdd){
 	trace(TRACE_5,"Exchangeability::check(Exchangeability* bdd): begin\n");
@@ -299,7 +301,6 @@ bool Exchangeability::check(Exchangeability* bdd){
 		++thislist_iter;
 		++bddlist_iter;
 	}
-	
 	if (Cudd_bddLeq(mgrMp, bddMp, bdd->bddMp) == 1  && Cudd_bddLeq(mgrAnn, bddAnn, bdd->bddAnn) == 1 ){
 		return(true);
 	}else{
@@ -330,3 +331,4 @@ void Exchangeability::printMemoryInUse(){
 	cout << "Memory in use for both BDD: " << Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn)<< 
 		    "  bytes (" << (Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn))/1024 << " KB; " << (Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn))/(1024*1024) << " MB)" << endl;
 }
+

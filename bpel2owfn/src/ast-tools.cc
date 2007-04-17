@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/03/29 14:27:40 $
+ * \date    \$Date: 2007/04/17 11:54:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.68 $
+ * \version \$Revision: 1.69 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -318,7 +318,7 @@ void enterConflictingActivities( set< unsigned int > a, set< unsigned int > b )
 }
 
 /*!
- * \brief Defines two activities as enclodes.
+ * \brief Defines two activities as enclosed (a encloses b).
  *
  * \param a	the id of the first activity
  * \param b	the id of the second activity
@@ -351,6 +351,37 @@ void enterEnclosedActivities( unsigned int a, set< unsigned int > b )
     enclosedActivities( a, *id );
   }
   LEAVE("enterEnclosedActivities");
+}
+
+/*!
+ * \brief Defines two activities as consecutive (a before b).
+ *
+ * \param a	the id of the first activity
+ * \param b	the id of the second activity
+ *
+ * \ingroup creation
+ */
+void consecutiveActivities( unsigned int a, unsigned int b )
+{
+    ENTER("consecutiveActivities");
+    activityRelationMap[pair<unsigned int, unsigned int>(a,b)] = AR_BEFORE;
+    activityRelationMap[pair<unsigned int, unsigned int>(b,a)] = AR_AFTER;
+    LEAVE("consecutiveActivities");
+}
+
+/*!
+ * \brief For two sets of activities define each pair of an a and a b activity as consecutive (a before b).
+ *
+ * \param a	the first set activity ids
+ * \param b	the second set activity ids
+ *
+ * \ingroup creation
+ */
+void enterConsecutiveActivities( unsigned int a, unsigned int b )
+{
+  ENTER("enterConsecutiveActivities");
+  consecutiveActivities( a, b );
+  LEAVE("enterConsecutiveActivities");
 }
 
 /******************************************************************************

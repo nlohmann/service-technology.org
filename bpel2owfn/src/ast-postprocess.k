@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/04/05 10:20:53 $
+ * \date    \$Date: 2007/04/17 11:54:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.146 $
+ * \version \$Revision: 1.147 $
  */
 %}
 
@@ -1545,6 +1545,19 @@ Sequence(a,b,_id) ->
       foreach(innerActivity; activity_list b)
       {
         assert(globals::ASTEmap[innerActivity->id] != NULL);
+
+        bool before = true;
+        foreach(innerActivity2; activity_list b)
+        {
+          if ( innerActivity2->id == innerActivity->id)
+          {
+            before == false;
+          }
+          else if (before == true)
+          {
+            enterConsecutiveActivities( innerActivity2->id, innerActivity->id );
+          }
+        }
 
         myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[innerActivity->id]->enclosedSourceLinks);
 

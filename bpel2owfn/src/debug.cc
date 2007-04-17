@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/03/25 10:19:37 $
+ * \date    \$Date: 2007/04/17 15:55:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  *
  * \ingroup debug
  */
@@ -57,6 +57,7 @@
 #include "options.h"
 #include "helpers.h"	// for toInt
 #include "globals.h"
+#include "colorconsole.h"
 
 using std::cerr;
 using std::clog;
@@ -137,6 +138,10 @@ void trace(string message)
  */
 void show_process_information()
 {
+  if (debug_level == TRACE_ERROR)
+    return;
+
+  cerr << endl;
   cerr << globals::process_information.basic_activities +
     globals::process_information.structured_activities +
     globals::process_information.scopes << " activities";
@@ -192,6 +197,27 @@ int frontend_error(const char *msg)
 
 
 
+void genericError(string information, string line, bool error)
+{
+  cerr << JadedHoboConsole::fg_magenta;
+  cerr << globals::filename;
+  cerr << ":" << line;
+  cerr << " - ";
+
+  if (error)
+    cerr << "[ERROR] ";
+  else
+    cerr << "[WARNING] ";
+
+  cerr << JadedHoboConsole::fg_black;
+
+  cerr << information << endl;
+}
+
+
+
+
+
 /*!
  * \brief prints static analysis error messages
  *
@@ -207,12 +233,16 @@ int frontend_error(const char *msg)
  */
 void SAerror(unsigned int code, string information, int lineNumber)
 {
+  cerr << JadedHoboConsole::fg_red;
   cerr << globals::filename;
   if (lineNumber != 0)
    cerr << ":" << lineNumber;
-  cerr << " - [SA";
+  cerr << " - ";
+
+  cerr << "[SA";
   cerr << setfill('0') << setw(5) << code;
   cerr << "] ";
+  cerr << JadedHoboConsole::fg_black;
 
   switch (code)
   {
@@ -297,7 +327,7 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	break; }
 	
     case(65):
-      { cerr << "<link> `" << information << "' was not defined before" << endl;
+      { cerr << "<link> `" << information << "' was not defined before (CRITICAL)" << endl;
 	break; }
 
     case(66):

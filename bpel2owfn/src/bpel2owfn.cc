@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/29 15:24:26 $
+ * \date    \$Date: 2007/04/17 15:55:28 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.153 $
+ * \version \$Revision: 1.154 $
  */
 
 
@@ -173,9 +173,6 @@ void finish_AST()
   globals::AST = globals::AST->rewrite(kc::newNames);
   trace(TRACE_INFORMATION, "Rewriting 2 complete...\n");
 
-  // print information about the process
-  show_process_information();
-
   // an experiment      
   //      cout << "digraph G{" << endl;
   //      globals::ASTEmap[1]->output();
@@ -231,6 +228,8 @@ void single_output(set< string >::iterator file, PetriNet PN2)
   if (modus == M_CFG)
   processCFG();
 
+  // print information about the process
+  show_process_information();
 
   // generate a Petri net?
   if (modus == M_PETRINET || modus == M_CONSISTENCY)

@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/09
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/04/17 15:55:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  *
  * \ingroup debug
  */
@@ -83,6 +83,7 @@ using std::string;
  */
 typedef enum
 {
+  TRACE_ERROR,		///< only trace error messages
   TRACE_ALWAYS,		///< trace level for errors
   TRACE_WARNINGS,       ///< trace level for warnings 
   TRACE_INFORMATION,	///< trace level some more (useful) information
@@ -114,6 +115,7 @@ void show_process_information();
 int frontend_error(const char *msg);
 void SAerror(unsigned int code, string information = "", int lineNumber = 0);
 void SAerror(unsigned int code, string information, string lineNumber);
+void genericError(string information, string line, bool error = false);
 
 /// calls #cleanup() then exits
 void error();
@@ -146,33 +148,6 @@ void cleanup();
     "() [" + string(__FILE__) + ":" + toString(__LINE__) + "]\n")
 #else
 #define ENTER(prefix)
-#endif
-
-
-
-
-/*!
- * \def EN
- * \brief prints the function name and passed arguments
- *
- * A preprocessor directive to print the name of the called function together
- * with its file position. Furthermore, a printf-string is printed that
- * allows to print and arbitrary number of arguments.
- *
- * \param ... a printf-string of arguments
- *
- * \ingroup debug
-*/
-#ifndef NDEBUG
-#define EN(...) \
-  { \
-    char buff[80]; \
-    sprintf(buff, __VA_ARGS__); \
-    trace(TRACE_VERY_DEBUG, "[" + string(__FILE__) + ":" + toString(__LINE__) + "]\t + " + string(__FUNCTION__) + \
-    "(" + string(buff) + ")\n"); \
-  }
-#else
-#define EN(...)
 #endif
 
 

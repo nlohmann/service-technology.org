@@ -1,4 +1,5 @@
 /*****************************************************************************\
+ * Copyright 2007 Christian Gierds, Niels Lohmann                            *
  * Copyright 2006 Christian Gierds                                           *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
@@ -26,18 +27,19 @@
  *          This file implements the class defined in cfg.h
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/03/27 13:14:20 $
+ * \date    \$Date: 2007/04/17 15:55:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  *
  * \todo    
  *          - commandline option to control drawing of clusters 
@@ -643,11 +645,26 @@ void CFGBlock::checkForConflictingReceive()
 	    {
 	      if(elemA->first == elemB->first && elemA->second != elemB->second && receives.find(*elemA) == receives.end())
 	      {
+		assert(globals::ASTEmap[elemA->second] != NULL);
+		assert(globals::ASTEmap[elemB->second] != NULL);
+
+		string errormessage = "<" + globals::ASTEmap[elemA->second]->activityTypeName() + "> is in conflict with " +
+		  "<" + globals::ASTEmap[elemB->second]->activityTypeName() + "> (line " +
+		  globals::ASTEmap[elemB->second]->attributes["referenceLine"] + "): " +
+		  "both activities receive from <partnerLink> `" +
+		  globals::ASTEmap[elemB->second]->attributes["partnerLink"] + "' and operation `" +
+		  globals::ASTEmap[elemB->second]->attributes["operation"] + "'";
+		genericError(errormessage, globals::ASTEmap[elemA->second]->attributes["referenceLine"]);
+
+		/*
+		assert(globals::ASTEmap[elemA->second] != NULL);
+		cerr << globals::filename << ":" << globals::ASTEmap[elemA->second]->attributes["referenceLine"] << endl;
+
 		trace("[CFG] WARNING: There are conflicting receives!\n");
 //		trace("               Please check lines " + toString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
 //		trace(                " and " + toString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
 		cerr << "               " << elemA->first << " (" << elemA->second << ") vs. " << elemB->first << " (" << elemB->second << ")" << endl;
-		trace("\n");
+		trace("\n");*/
 	      }
 	    }
 	  }
@@ -660,11 +677,16 @@ void CFGBlock::checkForConflictingReceive()
 	  {
 	    if ((*otherBlock)->type == CFGOnMessage && (*iter)->channel_name == (*otherBlock)->channel_name) 
 	    {
-	      trace("[CFG] WARNING: There are conflicting onMessage conditions!\n");
-//	      trace("               Please check lines " + toString((dynamic_cast<STElement*>(symTab.lookup((*iter)->id)))->line));
-//	      trace(                " and " + toString((dynamic_cast<STElement*>(symTab.lookup((*otherBlock)->id)))->line) + "\n");
-	      cerr << "               " << (*iter)->channel_name << " (" << (*iter)->id << ") vs. " << (*otherBlock)->channel_name << " (" << (*otherBlock)->id << ")" << endl;
-		trace("\n");
+	      assert(globals::ASTEmap[(*iter)->id] != NULL);
+	      assert(globals::ASTEmap[(*otherBlock)->id] != NULL);
+
+	      string errormessage = "<" + globals::ASTEmap[(*iter)->id]->activityTypeName() + "> is in conflict with " +
+		"<" + globals::ASTEmap[(*otherBlock)->id]->activityTypeName() + "> (line " +
+		globals::ASTEmap[(*otherBlock)->id]->attributes["referenceLine"] + "): " +
+		"both activities receive from <partnerLink> `" +
+		globals::ASTEmap[(*otherBlock)->id]->attributes["partnerLink"] + "' and operation `" +
+		globals::ASTEmap[(*otherBlock)->id]->attributes["operation"] + "'";
+	      genericError(errormessage, globals::ASTEmap[(*iter)->id]->attributes["referenceLine"]);
 	    }
 	  }
 	  receives.insert(pair<string, long>( (*iter)->channel_name, (*iter)->id));
@@ -681,11 +703,24 @@ void CFGBlock::checkForConflictingReceive()
 	{
 	  if(elemA->first == elemB->first && elemA->second != elemB->second && receives.find(*elemA) == receives.end())
 	  {
+	      assert(globals::ASTEmap[elemA->second] != NULL);
+	      assert(globals::ASTEmap[elemB->second] != NULL);
+
+	      string errormessage = "<" + globals::ASTEmap[elemA->second]->activityTypeName() + "> is in conflict with " +
+		"<" + globals::ASTEmap[elemB->second]->activityTypeName() + "> (line " +
+		globals::ASTEmap[elemB->second]->attributes["referenceLine"] + "): " +
+		"both activities receive from <partnerLink> `" +
+		globals::ASTEmap[elemB->second]->attributes["partnerLink"] + "' and operation `" +
+		globals::ASTEmap[elemB->second]->attributes["operation"] + "'";
+	      genericError(errormessage, globals::ASTEmap[elemA->second]->attributes["referenceLine"]);
+
+	      /*
 	      trace("[CFG] WARNING: There are conflicting receives!\n");
 //	      trace("               Please check lines " + toString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
 //	      trace(                " and " + toString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
 	      cerr << "               " << elemA->first << " (" << elemA->second << ") vs. " << elemB->first << " (" << elemB->second << ")" << endl;
 		trace("\n");
+		*/
 	  }
 	}
       }

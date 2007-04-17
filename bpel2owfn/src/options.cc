@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/27 12:37:48 $
+ * \date    \$Date: 2007/04/17 15:55:28 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  */
 
 
@@ -442,6 +442,8 @@ void parse_command_line(int argc, char* argv[])
 		  debug_level = TRACE_DEBUG;
 		else if (parameter == "4")
 		  debug_level = TRACE_VERY_DEBUG;
+		else if (parameter == "0")
+		  debug_level = TRACE_ERROR;
 		else {
 		  trace(TRACE_ALWAYS, "Unrecognised debug mode: \"" + parameter +"\"!\n");
 		  trace(TRACE_ALWAYS, "Use -h to get a list of valid debug modes.\n");

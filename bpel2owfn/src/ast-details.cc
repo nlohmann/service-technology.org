@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/29 12:55:27 $
+ * \date    \$Date: 2007/04/17 15:55:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.84 $
+ * \version \$Revision: 1.85 $
  */
 
 
@@ -135,9 +135,8 @@ void ASTE::checkRequiredAttributes(string required[], unsigned int length)
   for (unsigned int i = 0; i < length; i++)
     if (attributes[required[i]] == "")
     {
-      cerr << globals::filename << ":" << attributes["referenceLine"];
-      cerr << " - attribute `" << required[i] << "' is required for <";
-      cerr << activityTypeName() << ">" << endl;
+      string errormessage = "attribute `" + required[i] + "' is required for <" + activityTypeName() + ">";
+      genericError(errormessage, attributes["referenceLine"]);
     }
 }
 
@@ -582,9 +581,8 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	    attributes[attribute] == "no")
 	  return;
 
-	cerr << globals::filename << ":" << attributes["referenceLine"];
-	cerr << " - attribute `" << attribute << "' in <";
-	cerr << activityTypeName() << "> must be of type tBoolean" << endl;
+	string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tBoolean";
+	genericError(errormessage, attributes["referenceLine"], true);
 	
 	break;
       }
@@ -596,10 +594,9 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	    attributes[attribute] == "no")
 	  return;
 
-	cerr << globals::filename << ":" << attributes["referenceLine"];
-	cerr << " - attribute `" << attribute << "' in <";
-	cerr << activityTypeName() << "> must be of type tInitiate" << endl;
-	
+	string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tInitiate";
+	genericError(errormessage, attributes["referenceLine"], true);
+
 	break;
       }
 
@@ -609,9 +606,8 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	    attributes[attribute] == "partnerRole")
 	  return;
 
-	cerr << globals::filename << ":" << attributes["referenceLine"];
-	cerr << " - attribute `" << attribute << "' in <";
-	cerr << activityTypeName() << "> must be of type tRoles" << endl;
+	string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tRoles";
+	genericError(errormessage, attributes["referenceLine"], true);
 	
 	break;
       }
@@ -624,9 +620,8 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	    attributes[attribute] == "request-response")
 	  return;
 
-	cerr << globals::filename << ":" << attributes["referenceLine"];
-	cerr << " - attribute `" << attribute << "' in <";
-	cerr << activityTypeName() << "> must be of type tPattern" << endl;
+	string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tPattern";
+	genericError(errormessage, attributes["referenceLine"], true);
 	
 	break;
       }
@@ -644,9 +639,8 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
       {
 	if (attributes[attribute] != "" && toUInt(attributes[attribute]) == UINT_MAX)
 	{
-	  cerr << globals::filename << ":" << attributes["referenceLine"];
-	  cerr << " - attribute `" << attribute << "' in <";
-	  cerr << activityTypeName() << "> must be of type unsigned integer" << endl;
+  	  string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type unsigned integer";
+  	  genericError(errormessage, attributes["referenceLine"], true);
 	}
 
 	break;
@@ -901,9 +895,8 @@ string ASTE::checkVariable(string attributename)
       return (toString(*scope) + "." + variableName);
 
   // display an error message
-  cerr << globals::filename << ":" << attributes["referenceLine"];
-  cerr << " - <variable> `" << variableName << "' referenced as `" << attributename << "' in <";
-  cerr << activityTypeName() << "> was not defined before" << endl;
+  string errormessage = "<variable> `" + variableName + "' referenced as `" + attributename + "' in <" + activityTypeName() + "> was not defined before";
+  genericError(errormessage, attributes["referenceLine"]);
 
   return "";
 }
@@ -987,9 +980,8 @@ string ASTE::checkPartnerLink()
   }
 
   // display an error message
-  cerr << globals::filename << ":" << attributes["referenceLine"];
-  cerr << " - <partnerLink> `" << partnerLinkName << "' referenced in <";
-  cerr << activityTypeName() << "> was not defined before" << endl;
+  string errormessage = "<partnerLink> `" + partnerLinkName + "' referenced in <" + activityTypeName() + "> was not defined before";
+  genericError(errormessage, attributes["referenceLine"]);
 
   return "";
 }
@@ -1026,9 +1018,8 @@ string ASTE::checkCorrelationSet()
   }
 
   // display an error message
-  cerr << globals::filename << ":" << attributes["referenceLine"];
-  cerr << " - <correlationSet> `" << correlationSetName << "' referenced in <";
-  cerr << globals::ASTEmap[parentActivityId]->activityTypeName() << "> was not defined before" << endl;
+  string errormessage = "<correlationSet> `" + correlationSetName + "' referenced in <" + globals::ASTEmap[parentActivityId]->activityTypeName() + "> was not defined before";
+  genericError(errormessage, attributes["referenceLine"]);
 
   return "";
 }

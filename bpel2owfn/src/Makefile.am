@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/26 12:25:21 $ by $Author: nielslohmann $.
-# Version $Revision: 1.73 $
+# File last changed $Date: 2007/04/17 16:39:26 $ by $Author: nielslohmann $.
+# Version $Revision: 1.74 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -95,6 +95,7 @@ bpel2owfn_SOURCES = $(KCSOURCES)\
 		    bpel2owfn.cc\
 		    globals.cc globals.h\
 		    debug.cc debug.h\
+		    colorconsole.h\
 		    helpers.cc helpers.h\
 		    cfg.cc cfg.h\
 		    options.cc options.h\

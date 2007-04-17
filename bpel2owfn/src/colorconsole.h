@@ -7,20 +7,9 @@
 #if !defined( CONSOLE_MANIP_H__INCLUDED )
 #define CONSOLE_MANIP_H__INCLUDED
 
+#include "bpel2owfn.h"
 
-#ifdef UNIX
-
-namespace JadedHoboConsole
-{
-    inline std::ostream& fg_red( std::ostream& os )
-    { return os; }
-    inline std::ostream& fg_magenta( std::ostream& os )
-    { return os; }
-    inline std::ostream& fg_black( std::ostream& os )
-    { return os; }
-}
-
-#else
+#ifdef HAVE_WINDOWS_H
 
 //------------------------------------------------------------------------------
 
@@ -269,6 +258,18 @@ namespace JadedHoboConsole
         
         return os;
     }
+}
+
+#else
+
+namespace JadedHoboConsole
+{
+    inline std::ostream& fg_red( std::ostream& os )
+    { return os; }
+    inline std::ostream& fg_magenta( std::ostream& os )
+    { return os; }
+    inline std::ostream& fg_black( std::ostream& os )
+    { return os; }
 }
 
 #endif

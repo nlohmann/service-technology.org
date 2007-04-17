@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/25 10:19:37 $ by $Author: nielslohmann $.
-# Version $Revision: 1.40 $
+# File last changed $Date: 2007/04/17 16:39:26 $ by $Author: nielslohmann $.
+# Version $Revision: 1.41 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
@@ -53,24 +53,8 @@ CFLAGS=""
 
 
 # Checks for header files and functions.
-AC_FUNC_ALLOCA
-AC_HEADER_STDC
-
-AC_CHECK_HEADERS([libintl.h malloc.h stddef.h stdlib.h string.h strings.h unistd.h])
-
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-AC_C_CONST
-AC_C_INLINE
-AC_TYPE_SIZE_T
-
-
-# Checks for library functions.
-AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
-AC_CHECK_FUNCS([memset pow])
+AC_CHECK_HEADERS([windows.h])
+AC_CHECK_FUNCS([pow])
 
 
 # Check for optional programs.

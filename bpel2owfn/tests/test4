@@ -20,11 +20,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/15 19:06:42 $ by $Author: nielslohmann $.
-# Version $Revision: 1.5 $
+# File last changed $Date: 2007/04/17 16:39:26 $ by $Author: nielslohmann $.
+# Version $Revision: 1.6 $
 
 echo ""
 
 echo "test: static analysis"
 
-find $testdir/sa_tests -name '*.bpel' -exec bpel2owfn -mcfg -i {} \;
+find $testdir/sa_tests -name '*.bpel' -exec bpel2owfn -d0 -mcfg -i {} \;

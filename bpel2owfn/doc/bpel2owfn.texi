@@ -116,6 +116,9 @@ Stahl in [Sta05] proposes a Petri net semantics that consists of a collection of
 @iftex
 @image{images/toolchain,,0.7in}
 @end iftex
+@ifhtml
+@image{images/toolchain}
+@end ifhtml
 
 GNU BPEL2oWFN is a compiler translating a @acronym{BPEL} process into an @acronym{oWFN, open Workflow Net}, that is, into a Petri net model. This @acronym{oWFN} can then be used to:
 
@@ -592,7 +595,7 @@ Reads the file @file{sample.bpel} and prints the abstract syntax tree
 @node File Formats
 @chapter File Formats
 
-In this chapter, we show how a @acronym{BPEL} process can be translated to a Petri net model an then exported to several output file formats. Consider the following simple @acronym{BPEL} process @samp{example.bpel}:
+In this chapter, we show how a @acronym{BPEL} process can be translated to a Petri net model an then exported to several output file formats. Consider the following simple @acronym{BPEL} process @file{example.bpel}:
 
 @smallexample
 <process name="exampleprocess" targetNamespace="www.gnu.org/software/bpel2owfn">
@@ -700,15 +703,18 @@ bpel2owfn -i example.bpel -m petrinet -p communicationonly -f dot -o
 @end smallexample
 @end cartouche
 
-This command creates a file @samp{example.dot}, containing a Graphviz dot representation of the Petri net, and---if the @code{dot} tool was found in the search path---a @acronym{PNG, Portable Network Graphics} an image file @samp{example.png}. The latter looks like this:
+This command creates a file @file{example.dot}, containing a Graphviz dot representation of the Petri net, and---if the @code{dot} tool was found in the search path---a @acronym{PNG, Portable Network Graphics} an image file @file{example.png}. The latter looks like this:
 
 @iftex
 @image{images/example,,2.0in}
 @end iftex
+@ifhtml
+@image{images/example}
+@end ifhtml
 
-The graphic depicts the generated open workflow net. The inner of the net, that is, all nodes except the interface places, are depicted inside the dashed box, whereas the interface is depicted outside the frame. Input places and all connected transitions are colored orange. Similarly, output places and connected transitions are colored yellow. Gray places belong to the final marking, that is, the marking [@sansserif{p3}] is the final marking of the @acronym{oWFN}.
+The graphic depicts the generated open workflow net. The inner of the net, that is, all nodes except the interface places, are depicted inside the dashed box, whereas the interface is depicted outside the frame. Input places and all connected transitions are colored orange. Similarly, output places and connected transitions are colored yellow. Gray places belong to the final marking, that is, the marking [@b{p3}] is the final marking of the @acronym{oWFN}.
 
-To reach this final marking, the environment has to send a message @sansserif{in.PL.req}, followed by receiving a message @sansserif{out.PL.ack}. The name of the communication places is composed by the communication direction (``in'' or ``out''), the partner link's name (@samp{PL}) and the operations name (@samp{req} or @samp{ack}).
+To reach this final marking, the environment has to send a message @b{in.PL.req}, followed by receiving a message @b{out.PL.ack}. The name of the communication places is composed by the communication direction (``in'' or ``out''), the partner link's name (@samp{PL}) and the operations name (@samp{req} or @samp{ack}).
 
 For this very small process, it is easy to validate the generated Petri net model, that is, to compare the intended semantics by the actually modeled semantics. Especially the correlation between the nodes of the Petri net and the activities of the input @acronym{BPEL} process is not obvious for larger processes. To this end,
 
@@ -756,7 +762,7 @@ bpel2owfn -i example.bpel -m petrinet -p communicationonly -f ownf -o
 @end smallexample
 @end cartouche
 
-which creates a file @samp{example.owfn}:
+which creates a file @file{example.owfn}:
 
 @smallexample
 @{

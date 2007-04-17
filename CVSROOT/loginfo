@@ -36,3 +36,4 @@ enforce (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email-tacas %{s
 dke2007 (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email3 %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)
 adapter (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email-adapter %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)
 comparison (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email-comparison %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)
+contracts (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email-contracts %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)

@@ -61,9 +61,15 @@ namespace colorconsole
       CONSOLE_SCREEN_BUFFER_INFO  csbi;
 
     public:
+      WORD                        fg;
+      WORD                        bg;
+
       con_dev() // constructor
       {
 	hCon = GetStdHandle(STD_OUTPUT_HANDLE);
+	GetConsoleScreenBufferInfo(hCon, &csbi);
+        fg = csbi.wAttributes & fgMask;
+        bg = csbi.wAttributes & bgMask;
       }
 
       void setColor(WORD wRGBI, WORD Mask)
@@ -75,6 +81,13 @@ namespace colorconsole
       }
   } console;
 
+  ostream& fg_standard(ostream& os)
+  {
+    os.flush();
+    console.setColor(console.fg, bgMask);
+    return os;
+  }
+  
   ostream& fg_red(ostream& os)
   {
     os.flush();
@@ -138,6 +151,13 @@ namespace colorconsole
     return os;
   }
 
+  ostream& bg_standard(ostream& os)
+  {
+    os.flush();
+    console.setColor(console.bg, bgMask);
+    return os;
+  }
+  
   ostream& bg_red(ostream& os)
   {
     os.flush();

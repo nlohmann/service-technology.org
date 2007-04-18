@@ -26,17 +26,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/18 10:31:08 $
+ * \date    \$Date: 2007/04/18 11:00:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  *
  * \ingroup debug
  */
@@ -189,7 +189,7 @@ int frontend_error(const char *msg)
 
   cerr << colorconsole::fg_blue;
   cerr << globals::filename << ":" << frontend_lineno+1 << " - [PARSER] ";
-  cerr << colorconsole::fg_black;
+  cerr << colorconsole::fg_standard;
 
   cerr << string(msg) << "; last token read: `" << string(frontend_text) << "'" << endl;
 
@@ -224,7 +224,7 @@ void genericError(string information, string line, bool error)
   else
     cerr << "[WARNING] ";
 
-  cerr << colorconsole::fg_black;
+  cerr << colorconsole::fg_standard;
 
   cerr << information << endl;
 }
@@ -259,7 +259,7 @@ void SAerror(unsigned int code, string information, int lineNumber)
   cerr << setfill('0') << setw(5) << code;
   cerr << "] ";
 
-  cerr << colorconsole::fg_black;
+  cerr << colorconsole::fg_standard;
 
   switch (code)
   {

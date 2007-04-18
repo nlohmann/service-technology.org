@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/18 14:03:51 $
+ * \date    \$Date: 2007/04/18 14:55:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  *
  * \ingroup debug
  */
@@ -138,10 +138,13 @@ void trace(string message)
  */
 void show_process_information()
 {
+  extern int frontend_nerrs;
+
   if (debug_level == TRACE_ERROR)
     return;
 
   cerr << endl;
+  cerr << "------------------------------------------------------------------------------" << endl;
   cerr << globals::process_information.basic_activities +
     globals::process_information.structured_activities +
     globals::process_information.scopes << " activities";
@@ -162,6 +165,45 @@ void show_process_information()
 
   cerr << globals::process_information.links << " links, ";
   cerr << globals::process_information.variables << " variables" << endl;
+
+  cerr << endl;
+
+
+  if (frontend_nerrs == 0)
+  {
+    cerr << colorconsole::fg_green << "[SYNTAX ANALYSIS] " << colorconsole::fg_standard;
+    cerr << "No syntax errors found." << endl;
+  }
+  else
+  {
+    cerr << colorconsole::fg_red << "[SYNTAX ANALYSIS] " << colorconsole::fg_standard;
+    cerr << "Found " << frontend_nerrs << " syntax errors." << endl;
+  }
+
+
+  if (globals::static_analysis_errors == 0)
+  {
+    cerr << colorconsole::fg_green << "[STATIC ANALYSIS] " << colorconsole::fg_standard;
+    cerr << "No errors found checking 44 statics analysis requirements." << endl;
+  }
+  else
+  {
+    cerr << colorconsole::fg_red << "[STATIC ANALYSIS] " << colorconsole::fg_standard;
+    cerr << "Found " << globals::static_analysis_errors << " errors using static analysis. A WS-BPEL engine must reject this process." << endl;
+  }
+
+  if (globals::other_errors == 0)
+  {
+    cerr << colorconsole::fg_green << "[OTHER ANALYSIS]  " << colorconsole::fg_standard;
+    cerr << "No other errors found." << endl;
+  }
+  else
+  {
+    cerr << colorconsole::fg_red << "[OTHER ANALYSIS]  " << colorconsole::fg_standard;
+    cerr << "Found " << globals::other_errors << " further errors." << endl;
+  }
+
+  cerr << "------------------------------------------------------------------------------" << endl << endl;
 }
 
 
@@ -188,7 +230,7 @@ int frontend_error(const char *msg)
   extern char *frontend_text;      // text of the current token
 
   cerr << colorconsole::fg_blue;
-  cerr << globals::filename << ":" << frontend_lineno+1 << " - [PARSER] ";
+  cerr << globals::filename << ":" << frontend_lineno+1 << " - [SYNTAX] ";
   cerr << colorconsole::fg_standard;
 
   cerr << string(msg) << "; last token read: `" << string(frontend_text) << "'" << endl;
@@ -214,6 +256,8 @@ int frontend_error(const char *msg)
  */
 void genericError(string information, string line, bool error)
 {
+  globals::other_errors++;
+
   if (error)
     cerr << colorconsole::fg_red;
   else
@@ -252,6 +296,8 @@ void genericError(string information, string line, bool error)
  */
 void SAerror(unsigned int code, string information, int lineNumber)
 {
+  globals::static_analysis_errors++;
+
   cerr << colorconsole::fg_red;
 
   cerr << globals::filename;

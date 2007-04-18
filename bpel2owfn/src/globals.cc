@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/18 14:03:51 $
+ * \date    \$Date: 2007/04/18 14:55:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  */
 
 
@@ -108,4 +108,7 @@ map<possibleParameters, bool> parameters;
 
 string last_error_token = "";
 string last_error_line = "";
+
+unsigned int static_analysis_errors = 0;
+unsigned int other_errors = 0;
 }

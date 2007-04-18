@@ -29,14 +29,14 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/18 10:31:08 $
+ * \date    \$Date: 2007/04/18 14:55:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.155 $
+ * \version \$Revision: 1.156 $
  */
 
 
@@ -543,7 +543,7 @@ int main( int argc, char *argv[])
     {
       if (globals::AST == NULL)
       {
-	string errormessage = "cannot process abstract syntax tree due to parse errors";
+	string errormessage = "cannot process abstract syntax tree due to syntax errors";
 	genericError(errormessage, toString(frontend_lineno), true);
 
 	cleanup();
@@ -551,7 +551,7 @@ int main( int argc, char *argv[])
       }
       else
       {
-	string errormessage = "there were parse errors: further translation might crash or be incorrect";
+	string errormessage = "some elements were skipped due to syntax errors";
   	genericError(errormessage, toString(frontend_lineno));
 
 	finish_AST();

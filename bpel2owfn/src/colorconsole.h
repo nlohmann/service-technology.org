@@ -241,6 +241,15 @@ namespace colorconsole
   
   ostream& fg_black(ostream& os)
   { return os; }
+
+  ostream& fg_green(ostream& os)
+  { return os; }
+
+  ostream& fg_standard(ostream& os)
+  { return os; }
+
+  ostream& bg_standard(ostream& os)
+  { return os; }
 }
 
 #endif

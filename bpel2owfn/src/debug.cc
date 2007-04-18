@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/17 15:55:28 $
+ * \date    \$Date: 2007/04/18 07:43:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  *
  * \ingroup debug
  */
@@ -196,10 +196,19 @@ int frontend_error(const char *msg)
 
 
 
-
+/*!
+ * \brief prints a generic error message
+ *
+ * \param information   additional information about the error
+ * \param line          the position in the source file
+ * \param error         when set to true, prefixes the message with "[ERROR]",
+ *                      otherwise prefixes the message with "[WARNING]"
+ *                      (standard)
+ */
 void genericError(string information, string line, bool error)
 {
-  cerr << JadedHoboConsole::fg_magenta;
+  cerr << colorconsole::fg_magenta;
+
   cerr << globals::filename;
   cerr << ":" << line;
   cerr << " - ";
@@ -209,7 +218,7 @@ void genericError(string information, string line, bool error)
   else
     cerr << "[WARNING] ";
 
-  cerr << JadedHoboConsole::fg_black;
+  cerr << colorconsole::fg_black;
 
   cerr << information << endl;
 }
@@ -233,7 +242,8 @@ void genericError(string information, string line, bool error)
  */
 void SAerror(unsigned int code, string information, int lineNumber)
 {
-  cerr << JadedHoboConsole::fg_red;
+  cerr << colorconsole::fg_red;
+
   cerr << globals::filename;
   if (lineNumber != 0)
    cerr << ":" << lineNumber;
@@ -242,7 +252,8 @@ void SAerror(unsigned int code, string information, int lineNumber)
   cerr << "[SA";
   cerr << setfill('0') << setw(5) << code;
   cerr << "] ";
-  cerr << JadedHoboConsole::fg_black;
+
+  cerr << colorconsole::fg_black;
 
   switch (code)
   {

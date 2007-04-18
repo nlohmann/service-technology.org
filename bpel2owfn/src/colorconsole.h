@@ -1,279 +1,225 @@
 // from http://www.codeproject.com/cpp/AddColorConsole.asp
 
-//------------------------------------------------------------------------------
-// Console.h: interface for the Console manipulators.
-//------------------------------------------------------------------------------
+#ifndef COLORCONSOLE_H
+#define COLORCONSOLE_H
 
-#if !defined( CONSOLE_MANIP_H__INCLUDED )
-#define CONSOLE_MANIP_H__INCLUDED
-
-#include "bpel2owfn.h"
-
-#ifdef HAVE_WINDOWS_H
-
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------"includes"--
 #include <iostream>
 #include <iomanip>
+#include "bpel2owfn.h"
+
+using std::ostream;
+
+
+
+
+
+#if HAVE_WINDOWS_H == 1
+
 #include <windows.h>
 
-namespace JadedHoboConsole
+namespace colorconsole
 {
-    static const WORD bgMask( BACKGROUND_BLUE      | 
-                              BACKGROUND_GREEN     | 
-                              BACKGROUND_RED       | 
-                              BACKGROUND_INTENSITY   );
-    static const WORD fgMask( FOREGROUND_BLUE      | 
-                              FOREGROUND_GREEN     | 
-                              FOREGROUND_RED       | 
-                              FOREGROUND_INTENSITY   );
-    
-    static const WORD fgBlack    ( 0 ); 
-    static const WORD fgLoRed    ( FOREGROUND_RED   ); 
-    static const WORD fgLoGreen  ( FOREGROUND_GREEN ); 
-    static const WORD fgLoBlue   ( FOREGROUND_BLUE  ); 
-    static const WORD fgLoCyan   ( fgLoGreen   | fgLoBlue ); 
-    static const WORD fgLoMagenta( fgLoRed     | fgLoBlue ); 
-    static const WORD fgLoYellow ( fgLoRed     | fgLoGreen ); 
-    static const WORD fgLoWhite  ( fgLoRed     | fgLoGreen | fgLoBlue ); 
-    static const WORD fgGray     ( fgBlack     | FOREGROUND_INTENSITY ); 
-    static const WORD fgHiWhite  ( fgLoWhite   | FOREGROUND_INTENSITY ); 
-    static const WORD fgHiBlue   ( fgLoBlue    | FOREGROUND_INTENSITY ); 
-    static const WORD fgHiGreen  ( fgLoGreen   | FOREGROUND_INTENSITY ); 
-    static const WORD fgHiRed    ( fgLoRed     | FOREGROUND_INTENSITY ); 
-    static const WORD fgHiCyan   ( fgLoCyan    | FOREGROUND_INTENSITY ); 
-    static const WORD fgHiMagenta( fgLoMagenta | FOREGROUND_INTENSITY ); 
-    static const WORD fgHiYellow ( fgLoYellow  | FOREGROUND_INTENSITY );
-    static const WORD bgBlack    ( 0 ); 
-    static const WORD bgLoRed    ( BACKGROUND_RED   ); 
-    static const WORD bgLoGreen  ( BACKGROUND_GREEN ); 
-    static const WORD bgLoBlue   ( BACKGROUND_BLUE  ); 
-    static const WORD bgLoCyan   ( bgLoGreen   | bgLoBlue ); 
-    static const WORD bgLoMagenta( bgLoRed     | bgLoBlue ); 
-    static const WORD bgLoYellow ( bgLoRed     | bgLoGreen ); 
-    static const WORD bgLoWhite  ( bgLoRed     | bgLoGreen | bgLoBlue ); 
-    static const WORD bgGray     ( bgBlack     | BACKGROUND_INTENSITY ); 
-    static const WORD bgHiWhite  ( bgLoWhite   | BACKGROUND_INTENSITY ); 
-    static const WORD bgHiBlue   ( bgLoBlue    | BACKGROUND_INTENSITY ); 
-    static const WORD bgHiGreen  ( bgLoGreen   | BACKGROUND_INTENSITY ); 
-    static const WORD bgHiRed    ( bgLoRed     | BACKGROUND_INTENSITY ); 
-    static const WORD bgHiCyan   ( bgLoCyan    | BACKGROUND_INTENSITY ); 
-    static const WORD bgHiMagenta( bgLoMagenta | BACKGROUND_INTENSITY ); 
-    static const WORD bgHiYellow ( bgLoYellow  | BACKGROUND_INTENSITY );
-    
-    static class con_dev
-    {
-        private:
-        HANDLE                      hCon;
-        DWORD                       cCharsWritten; 
-        CONSOLE_SCREEN_BUFFER_INFO  csbi; 
-        DWORD                       dwConSize;
+  static const WORD bgMask     (BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED | BACKGROUND_INTENSITY);
+  static const WORD fgMask     (FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY);
+  static const WORD fgBlack    (0);
+  static const WORD fgLoRed    (FOREGROUND_RED);
+  static const WORD fgLoGreen  (FOREGROUND_GREEN);
+  static const WORD fgLoBlue   (FOREGROUND_BLUE );
+  static const WORD fgLoCyan   (fgLoGreen   | fgLoBlue);
+  static const WORD fgLoMagenta(fgLoRed     | fgLoBlue);
+  static const WORD fgLoYellow (fgLoRed     | fgLoGreen);
+  static const WORD fgLoWhite  (fgLoRed     | fgLoGreen | fgLoBlue);
+  static const WORD fgGray     (fgBlack     | FOREGROUND_INTENSITY);
+  static const WORD fgHiWhite  (fgLoWhite   | FOREGROUND_INTENSITY);
+  static const WORD fgHiBlue   (fgLoBlue    | FOREGROUND_INTENSITY);
+  static const WORD fgHiGreen  (fgLoGreen   | FOREGROUND_INTENSITY);
+  static const WORD fgHiRed    (fgLoRed     | FOREGROUND_INTENSITY);
+  static const WORD fgHiCyan   (fgLoCyan    | FOREGROUND_INTENSITY);
+  static const WORD fgHiMagenta(fgLoMagenta | FOREGROUND_INTENSITY);
+  static const WORD fgHiYellow (fgLoYellow  | FOREGROUND_INTENSITY);
+  static const WORD bgBlack    (0);
+  static const WORD bgLoRed    (BACKGROUND_RED  );
+  static const WORD bgLoGreen  (BACKGROUND_GREEN);
+  static const WORD bgLoBlue   (BACKGROUND_BLUE );
+  static const WORD bgLoCyan   (bgLoGreen   | bgLoBlue);
+  static const WORD bgLoMagenta(bgLoRed     | bgLoBlue);
+  static const WORD bgLoYellow (bgLoRed     | bgLoGreen);
+  static const WORD bgLoWhite  (bgLoRed     | bgLoGreen | bgLoBlue);
+  static const WORD bgGray     (bgBlack     | BACKGROUND_INTENSITY);
+  static const WORD bgHiWhite  (bgLoWhite   | BACKGROUND_INTENSITY);
+  static const WORD bgHiBlue   (bgLoBlue    | BACKGROUND_INTENSITY);
+  static const WORD bgHiGreen  (bgLoGreen   | BACKGROUND_INTENSITY);
+  static const WORD bgHiRed    (bgLoRed     | BACKGROUND_INTENSITY);
+  static const WORD bgHiCyan   (bgLoCyan    | BACKGROUND_INTENSITY);
+  static const WORD bgHiMagenta(bgLoMagenta | BACKGROUND_INTENSITY);
+  static const WORD bgHiYellow (bgLoYellow  | BACKGROUND_INTENSITY);
 
-        public:
-        con_dev() 
-        { 
-            hCon = GetStdHandle( STD_OUTPUT_HANDLE );
-        }
-        private:
-        void GetInfo()
-        {
-            GetConsoleScreenBufferInfo( hCon, &csbi );
-            dwConSize = csbi.dwSize.X * csbi.dwSize.Y; 
-        }
-        public:
-        void Clear()
-        {
-            COORD coordScreen = { 0, 0 };
-            
-            GetInfo(); 
-            FillConsoleOutputCharacter( hCon, TEXT(' '),
-                                        dwConSize, 
-                                        coordScreen,
-                                        &cCharsWritten ); 
-            GetInfo(); 
-            FillConsoleOutputAttribute( hCon,
-                                        csbi.wAttributes,
-                                        dwConSize,
-                                        coordScreen,
-                                        &cCharsWritten ); 
-            SetConsoleCursorPosition( hCon, coordScreen ); 
-        }
-        void SetColor( WORD wRGBI, WORD Mask )
-        {
-            GetInfo();
-            csbi.wAttributes &= Mask; 
-            csbi.wAttributes |= wRGBI; 
-            SetConsoleTextAttribute( hCon, csbi.wAttributes );
-        }
-    } console;
-    
-    inline std::ostream& clr( std::ostream& os )
-    {
-        os.flush();
-        console.Clear();
-        return os;
-    }
-    
-    inline std::ostream& fg_red( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( fgHiRed, bgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& fg_green( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( fgHiGreen, bgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& fg_blue( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( fgHiBlue, bgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& fg_white( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( fgHiWhite, bgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& fg_cyan( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( fgHiCyan, bgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& fg_magenta( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( fgHiMagenta, bgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& fg_yellow( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( fgHiYellow, bgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& fg_black( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( fgBlack, bgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& fg_gray( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( fgGray, bgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& bg_red( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( bgHiRed, fgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& bg_green( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( bgHiGreen, fgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& bg_blue( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( bgHiBlue, fgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& bg_white( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( bgHiWhite, fgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& bg_cyan( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( bgHiCyan, fgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& bg_magenta( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( bgHiMagenta, fgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& bg_yellow( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( bgHiYellow, fgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& bg_black( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( bgBlack, fgMask );
-        
-        return os;
-    }
-    
-    inline std::ostream& bg_gray( std::ostream& os )
-    {
-        os.flush();
-        console.SetColor( bgGray, fgMask );
-        
-        return os;
-    }
+  static class con_dev
+  {
+    private:
+      HANDLE                      hCon;
+      CONSOLE_SCREEN_BUFFER_INFO  csbi;
+
+    public:
+      con_dev() // constructor
+      {
+	hCon = GetStdHandle(STD_OUTPUT_HANDLE);
+      }
+
+      void setColor(WORD wRGBI, WORD Mask)
+      {
+	GetConsoleScreenBufferInfo(hCon, &csbi);
+	csbi.wAttributes &= Mask;
+	csbi.wAttributes |= wRGBI;
+	SetConsoleTextAttribute(hCon, csbi.wAttributes);
+      }
+  } console;
+
+  ostream& fg_red(ostream& os)
+  {
+    os.flush();
+    console.setColor(fgHiRed, bgMask);
+    return os;
+  }
+  
+  ostream& fg_green(ostream& os)
+  {
+    os.flush();
+    console.setColor(fgHiGreen, bgMask);
+    return os;
+  }
+
+  ostream& fg_blue(ostream& os)
+  {
+    os.flush();
+    console.setColor(fgHiBlue, bgMask);
+    return os;
+  }
+
+  ostream& fg_white(ostream& os)
+  {
+    os.flush();
+    console.setColor(fgHiWhite, bgMask);
+    return os;
+  }
+
+  ostream& fg_cyan(ostream& os)
+  {
+    os.flush();
+    console.setColor(fgHiCyan, bgMask);
+    return os;
+  }
+
+  ostream& fg_magenta(ostream& os)
+  {
+    os.flush();
+    console.setColor(fgHiMagenta, bgMask);
+    return os;
+  }
+
+  ostream& fg_yellow(ostream& os)
+  {
+    os.flush();
+    console.setColor(fgHiYellow, bgMask);
+    return os;
+  }
+
+  ostream& fg_black(ostream& os)
+  {
+    os.flush();
+    console.setColor(fgBlack, bgMask);
+    return os;
+  }
+
+  ostream& fg_gray(ostream& os)
+  {
+    os.flush();
+    console.setColor(fgGray, bgMask);
+    return os;
+  }
+
+  ostream& bg_red(ostream& os)
+  {
+    os.flush();
+    console.setColor(bgHiRed, fgMask);
+    return os;
+  }
+
+  ostream& bg_green(ostream& os)
+  {
+    os.flush();
+    console.setColor(bgHiGreen, fgMask);
+    return os;
+  }
+
+  ostream& bg_blue(ostream& os)
+  {
+    os.flush();
+    console.setColor(bgHiBlue, fgMask);
+    return os;
+  }
+
+  ostream& bg_white(ostream& os)
+  {
+    os.flush();
+    console.setColor(bgHiWhite, fgMask);
+    return os;
+  }
+
+  ostream& bg_cyan(ostream& os)
+  {
+    os.flush();
+    console.setColor(bgHiCyan, fgMask);
+    return os;
+  }
+
+  ostream& bg_magenta(ostream& os)
+  {
+    os.flush();
+    console.setColor(bgHiMagenta, fgMask);
+    return os;
+  }
+
+  ostream& bg_yellow(ostream& os)
+  {
+    os.flush();
+    console.setColor(bgHiYellow, fgMask);
+    return os;
+  }
+
+  ostream& bg_black(ostream& os)
+  {
+    os.flush();
+    console.setColor(bgBlack, fgMask);
+    return os;
+  }
+
+  ostream& bg_gray(ostream& os)
+  {
+    os.flush();
+    console.setColor(bgGray, fgMask);
+    return os;
+  }
 }
 
-#else
 
-namespace JadedHoboConsole
+
+
+
+#else /* non-windows systems */
+
+namespace colorconsole
 {
-    inline std::ostream& fg_red( std::ostream& os )
-    { return os; }
-    inline std::ostream& fg_magenta( std::ostream& os )
-    { return os; }
-    inline std::ostream& fg_black( std::ostream& os )
-    { return os; }
+  ostream& fg_red(ostream& os)
+  { return os; }
+  
+  ostream& fg_magenta(ostream& os)
+  { return os; }
+  
+  ostream& fg_black(ostream& os)
+  { return os; }
 }
 
 #endif
 
-//------------------------------------------------------------------------------
-#endif //!defined ( CONSOLE_MANIP_H__INCLUDED )
-
+#endif

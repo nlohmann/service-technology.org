@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/04/17 11:54:08 $
+ * \date    \$Date: 2007/04/18 12:12:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.147 $
+ * \version \$Revision: 1.148 $
  */
 %}
 
@@ -561,14 +561,16 @@ CompensationHandler(a,_id) ->
 
       // trigger SA00079
       vector<unsigned int> ancestors = myself->ancestorActivities();
-      if (ancestors.size() > 1)
+      if (myself->isUserDefined && ancestors.size() > 1)
       {
       	string ancestor = globals::ASTEmap[ancestors[1]]->activityTypeName();
     	if (ancestor == "catch" ||
   	    ancestor == "catchAll" ||
   	    ancestor == "terminationHandler" ||
   	    ancestor == "compensationHandler")
+        {
   	  SAerror(79, ancestor);
+        }
       }
     }
   ]

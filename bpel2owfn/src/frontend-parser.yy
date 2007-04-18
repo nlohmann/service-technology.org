@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/04/18 11:08:42 $
+ * \date    \$Date: 2007/04/18 12:12:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.302 $
+ * \version \$Revision: 1.303 $
  *
  * \ingroup frontend
  *
@@ -474,7 +474,9 @@ tFaultHandlers:
   /* empty */
     { $$ = volatile_standardFaultHandlers(mkinteger(0)); }
 | K_FAULTHANDLERS X_NEXT tCatch_list tCatchAll X_SLASH K_FAULTHANDLERS X_NEXT
-    { $$ = FaultHandlers($3, $4, mkinteger(0)); globals::process_information.fault_handlers++; }
+    { $$ = FaultHandlers($3, $4, mkinteger(0));
+      globals::process_information.fault_handlers++;
+      globals::ASTEmap[globals::ASTEid-1]->isUserDefined = true; }
 ;
 
 tCatch_list:
@@ -505,7 +507,9 @@ tCompensationHandler:
   /* empty */
     { $$ = volatile_standardCompensationHandler(mkinteger(0)); }
 | K_COMPENSATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
-    { $$ = CompensationHandler($3, mkinteger(0)); globals::process_information.compensation_handlers++; }
+    { $$ = CompensationHandler($3, mkinteger(0));
+      globals::process_information.compensation_handlers++;
+      globals::ASTEmap[globals::ASTEid-1]->isUserDefined = true; }
 ;
 
 
@@ -517,7 +521,9 @@ tTerminationHandler:
   /* empty */
     { $$ = volatile_standardTerminationHandler(mkinteger(0)); }
 | K_TERMINATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_TERMINATIONHANDLER X_NEXT
-    { $$ = TerminationHandler($3, mkinteger(0)); globals::process_information.termination_handlers++; }
+    { $$ = TerminationHandler($3, mkinteger(0));
+      globals::process_information.termination_handlers++;
+      globals::ASTEmap[globals::ASTEid-1]->isUserDefined = true; }
 ;
 
 

@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/04/11 12:58:43 $
+ * \date    \$Date: 2007/04/18 12:05:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
 */
 %}
 
@@ -104,13 +104,27 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	Place *p2 = PN.newPlace(prefix + "running");
 	Place *p3 = PN.newPlace(prefix + "p3");
 	Place *p4 = PN.newPlace(prefix + "final");
-	Place *p5l = PN.newPlace(prefix + "stop_loop");
-	Place *p5a = PN.newPlace(prefix + "stop_activity");
 	Place *p5 = PN.newPlace(prefix + "stop");
-	Place *p6l = PN.newPlace(prefix + "stopped_loop");
-	Place *p6a = PN.newPlace(prefix + "stopped_activity");
 	Place *p6 = PN.newPlace(prefix + "stopped");
         Place *p7 = PN.newPlace(prefix + "p7");	
+
+        if((myself->max_loops != 0) && (myself->max_loops != UINT_MAX))
+        {
+	  Place *p5l = PN.newPlace(prefix + "stop_loop");
+	  Place *p5a = PN.newPlace(prefix + "stop_activity");
+	  Place *p6l = PN.newPlace(prefix + "stopped_loop");
+	  Place *p6a = PN.newPlace(prefix + "stopped_activity");
+
+	  Transition *stop_split = PN.newTransition(prefix + "stop_split");
+	  PN.newArc(p5, stop_split);
+	  PN.newArc(stop_split, p5l);
+	  PN.newArc(stop_split, p5a);
+        
+	  Transition *stopped_merge = PN.newTransition(prefix + "stopped_merge");
+	  PN.newArc(p6l, stopped_merge);
+	  PN.newArc(p6a, stopped_merge);
+	  PN.newArc(stopped_merge, p6);
+	}
 
 	// external control of loop condition	
 	Place *control_enter = NULL;
@@ -120,16 +134,6 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	  control_enter = PN.newPlace("in.enterloop." + toString(phylum->id), IN);
 	  control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
         }
-
-	Transition *stop_split = PN.newTransition(prefix + "stop_split");
-	PN.newArc(p5, stop_split);
-	PN.newArc(stop_split, p5l);
-	PN.newArc(stop_split, p5a);
-        
-	Transition *stopped_merge = PN.newTransition(prefix + "stopped_merge");
-	PN.newArc(p6l, stopped_merge);
-	PN.newArc(p6a, stopped_merge);
-	PN.newArc(stopped_merge, p6);
 
 	Transition *t1 = PN.newTransition(prefix + "read_condition");
 	PN.newArc(p1, t1);
@@ -170,10 +174,18 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	if (globals::parameters[P_STANDARDFAULTS])
 	  Transition *t5 = throwFault(p2, p7, "running", prefix, mkinteger(phylum->id), globals::ASTEmap[phylum->id]->controlFlow);
 
-	Transition *t6 = stop_activity(p2, "running", prefix);
-	Transition *t7 = stop_activity(p4, "final", prefix);
-	Transition *t8 = stop_activity(p7, "p7", prefix);
-
+        if((myself->max_loops != 0) && (myself->max_loops != UINT_MAX))
+        {
+	  Transition *t6 = stop_activity(p2, "running", prefix);
+	  Transition *t7 = stop_activity(p4, "final", prefix);
+	  Transition *t8 = stop_activity(p7, "p7", prefix);
+	}
+	else
+	{
+	  Transition *t6 = stop(p2, "running", prefix);
+	  Transition *t7 = stop(p4, "final", prefix);
+	  Transition *t8 = stop(p7, "p7", prefix);  
+	}
 
 	// unparse the standard elements
 	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
@@ -291,13 +303,28 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	Place *p2 = PN.newPlace(prefix + "p2"); // activity end
 	Place *p3 = PN.newPlace(prefix + "running");
 	Place *p4 = PN.newPlace(prefix + "final");
-	Place *p5l = PN.newPlace(prefix + "stop_loop");
-	Place *p5a = PN.newPlace(prefix + "stop_activity");
 	Place *p5 = PN.newPlace(prefix + "stop");
-	Place *p6l = PN.newPlace(prefix + "stopped_loop");
-	Place *p6a = PN.newPlace(prefix + "stopped_activity");
 	Place *p6 = PN.newPlace(prefix + "stopped");
         Place *p7 = PN.newPlace(prefix + "faulted");
+
+
+        if((myself->max_loops != 0) && (myself->max_loops != UINT_MAX))
+        {
+	  Place *p5l = PN.newPlace(prefix + "stop_loop");
+	  Place *p5a = PN.newPlace(prefix + "stop_activity");
+	  Place *p6l = PN.newPlace(prefix + "stopped_loop");
+	  Place *p6a = PN.newPlace(prefix + "stopped_activity");
+
+	  Transition *stop_split = PN.newTransition(prefix + "stop_split");
+	  PN.newArc(p5, stop_split);
+	  PN.newArc(stop_split, p5l);
+	  PN.newArc(stop_split, p5a);
+        
+	  Transition *stopped_merge = PN.newTransition(prefix + "stopped_merge");
+	  PN.newArc(p6l, stopped_merge);
+	  PN.newArc(p6a, stopped_merge);
+	  PN.newArc(stopped_merge, p6);
+	}
 
 	// external control of loop condition	
 	Place *control_enter = NULL;
@@ -307,16 +334,6 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	  control_enter = PN.newPlace("in.enterloop." + toString(phylum->id), IN);
 	  control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
         }
-
-	Transition *stop_split = PN.newTransition(prefix + "stop_split");
-	PN.newArc(p5, stop_split);
-	PN.newArc(stop_split, p5l);
-	PN.newArc(stop_split, p5a);
-        
-	Transition *stopped_merge = PN.newTransition(prefix + "stopped_merge");
-	PN.newArc(p6l, stopped_merge);
-	PN.newArc(p6a, stopped_merge);
-	PN.newArc(stopped_merge, p6);
 
 	Transition *t1 = PN.newTransition(prefix + "read_condition");
 	PN.newArc(p2, t1);
@@ -345,9 +362,18 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
             PN.newArc(control_enter, t3);	
         }
 
-	Transition *t4 = stop_activity(p3, "running", prefix);
-	Transition *t5 = stop_activity(p4, "final", prefix);
-	Transition *t6 = stop_activity(p7, "faulted", prefix);
+        if((myself->max_loops != 0) && (myself->max_loops != UINT_MAX))
+        {
+	  Transition *t4 = stop_activity(p3, "running", prefix);
+	  Transition *t5 = stop_activity(p4, "final", prefix);
+	  Transition *t6 = stop_activity(p7, "faulted", prefix);
+	}
+	else
+	{
+	  Transition *t4 = stop(p3, "running", prefix);
+	  Transition *t5 = stop(p4, "final", prefix);
+	  Transition *t6 = stop(p7, "faulted", prefix);
+	}
 
 	if (globals::parameters[P_STANDARDFAULTS])
 	  Transition *t7 = throwFault(p3, p7, "running", prefix, mkinteger(phylum->id), globals::ASTEmap[phylum->id]->controlFlow);

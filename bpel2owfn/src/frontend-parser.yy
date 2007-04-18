@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/04/18 14:03:51 $
+ * \date    \$Date: 2007/04/18 16:18:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.305 $
+ * \version \$Revision: 1.306 $
  *
  * \ingroup frontend
  *
@@ -328,6 +328,9 @@ tProcess:
       globals::joinCondition_links.clear();
       globals::joinCondition_linkStatus.clear();
       globals::joinCondition_result.clear();
+      globals::parsing = true;
+      globals::static_analysis_errors = 0;
+      globals::other_errors = 0;
     }
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT tExtensions imports tPartnerLinks
   tPartners tMessageExchanges tVariables tCorrelationSets tFaultHandlers
@@ -342,7 +345,7 @@ activity:
     { $$ = $1; }
 | error activity2
     { $$ = $2;
-      genericError("skipped non-standard element <" + globals::last_error_token + ">", globals::last_error_line); }
+      genericError("skipped <" + globals::last_error_token + ">: either non-standard element or misplaced", globals::last_error_line); }
 ;
 
 activity2:
@@ -482,9 +485,7 @@ tFaultHandlers:
   /* empty */
     { $$ = volatile_standardFaultHandlers(mkinteger(0)); }
 | K_FAULTHANDLERS X_NEXT tCatch_list tCatchAll X_SLASH K_FAULTHANDLERS X_NEXT
-    { $$ = FaultHandlers($3, $4, mkinteger(0));
-      globals::process_information.fault_handlers++;
-      globals::ASTEmap[globals::ASTEid-1]->isUserDefined = true; }
+    { $$ = FaultHandlers($3, $4, mkinteger(0)); }
 ;
 
 tCatch_list:
@@ -515,9 +516,7 @@ tCompensationHandler:
   /* empty */
     { $$ = volatile_standardCompensationHandler(mkinteger(0)); }
 | K_COMPENSATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
-    { $$ = CompensationHandler($3, mkinteger(0));
-      globals::process_information.compensation_handlers++;
-      globals::ASTEmap[globals::ASTEid-1]->isUserDefined = true; }
+    { $$ = CompensationHandler($3, mkinteger(0)); }
 ;
 
 
@@ -529,9 +528,7 @@ tTerminationHandler:
   /* empty */
     { $$ = volatile_standardTerminationHandler(mkinteger(0)); }
 | K_TERMINATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_TERMINATIONHANDLER X_NEXT
-    { $$ = TerminationHandler($3, mkinteger(0));
-      globals::process_information.termination_handlers++;
-      globals::ASTEmap[globals::ASTEid-1]->isUserDefined = true; }
+    { $$ = TerminationHandler($3, mkinteger(0)); }
 ;
 
 
@@ -543,7 +540,7 @@ tEventHandlers:
   /* empty */
     { $$ = emptyEventHandlers(mkinteger(0)); }
 | K_EVENTHANDLERS X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_EVENTHANDLERS X_NEXT
-    { $$ = EventHandlers($3, $4, mkinteger(0)); globals::process_information.event_handlers++; }
+    { $$ = EventHandlers($3, $4, mkinteger(0)); }
 ;
 
 tOnMessage_list:
@@ -1131,22 +1128,22 @@ tLink:
 
 truetTerminationHandler:
   K_TERMINATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_TERMINATIONHANDLER X_NEXT
-    { $$ = TerminationHandler($3, mkinteger(0)); globals::process_information.termination_handlers++; }
+    { $$ = TerminationHandler($3, mkinteger(0)); }
 ;
 
 truetCompensationHandler:
   K_COMPENSATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
-    { $$ = CompensationHandler($3, mkinteger(0)); globals::process_information.compensation_handlers++; }
+    { $$ = CompensationHandler($3, mkinteger(0)); }
 ;
 
 truetFaultHandlers:
   K_FAULTHANDLERS X_NEXT tCatch_list tCatchAll X_SLASH K_FAULTHANDLERS X_NEXT
-    { $$ = FaultHandlers($3, $4, mkinteger(0)); globals::process_information.fault_handlers++; }
+    { $$ = FaultHandlers($3, $4, mkinteger(0)); }
 ;
 
 truetEventHandlers:
   K_EVENTHANDLERS X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_EVENTHANDLERS X_NEXT
-    { $$ = EventHandlers($3, $4, mkinteger(0)); globals::process_information.event_handlers++; }
+    { $$ = EventHandlers($3, $4, mkinteger(0)); }
 ;
 
 truetPartnerLinks:

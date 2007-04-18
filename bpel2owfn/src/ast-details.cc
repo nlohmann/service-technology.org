@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/04/18 12:12:24 $
+ * \date    \$Date: 2007/04/18 16:18:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.86 $
+ * \version \$Revision: 1.87 $
  */
 
 
@@ -80,26 +80,43 @@ using std::endl;
  */
 ASTE::ASTE(unsigned int myid, unsigned int mytype) :
   id(myid), type(mytype), controlFlow(POSITIVECF), 
-  plRoleDetails(NULL), isStartActivity(false), cyclic(false), isUserDefined(false),
+  plRoleDetails(NULL), isStartActivity(false), cyclic(false),
   sourceActivity(0), targetActivity(0), max_occurrences(1), max_loops(UINT_MAX), enclosedFH(0), enclosedCH(0), drawn(false)
 {
   assert(myid != 0);
 
   attributes = globals::temporaryAttributeMap[id];
 
-  switch (mytype)
+  if (globals::parsing)
   {
-    case(K_LINK):	globals::process_information.links++; break;
-    case(K_SCOPE):	globals::process_information.scopes++; break;
-    case(K_VARIABLE):	globals::process_information.variables++; break;
+    switch (mytype)
+    {
+      case(K_LINK):	globals::process_information.links++; break;
+      case(K_SCOPE):	globals::process_information.scopes++; break;
+      case(K_VARIABLE):	globals::process_information.variables++; break;
 
-    case(K_EMPTY): case(K_INVOKE): case(K_RECEIVE): case(K_REPLY): case(K_ASSIGN):
-    case(K_VALIDATE): case(K_WAIT): case(K_THROW): case(K_RETHROW):
-    case(K_EXIT): case(K_COMPENSATE): case(K_COMPENSATESCOPE):
-						   globals::process_information.basic_activities++; break;
+      case(K_EMPTY): case(K_INVOKE): case(K_RECEIVE): case(K_REPLY): case(K_ASSIGN):
+      case(K_VALIDATE): case(K_WAIT): case(K_THROW): case(K_RETHROW):
+      case(K_EXIT): case(K_COMPENSATE): case(K_COMPENSATESCOPE):
+			globals::process_information.basic_activities++; break;
 
-    case(K_WHILE): case(K_REPEATUNTIL): case(K_SEQUENCE): case(K_FLOW): case(K_PICK): case(K_IF): case(K_FOREACH):
-						   globals::process_information.structured_activities++; break;
+      case(K_WHILE): case(K_REPEATUNTIL): case(K_SEQUENCE): case(K_FLOW):
+      case(K_PICK): case(K_IF): case(K_FOREACH):
+			globals::process_information.structured_activities++; break;
+    }
+  }
+  else
+  {
+    switch (mytype)
+    {
+      case(K_SCOPE):
+      case(K_EMPTY): case(K_INVOKE): case(K_RECEIVE): case(K_REPLY): case(K_ASSIGN):
+      case(K_VALIDATE): case(K_WAIT): case(K_THROW): case(K_RETHROW):
+      case(K_EXIT): case(K_COMPENSATE): case(K_COMPENSATESCOPE):
+      case(K_WHILE): case(K_REPEATUNTIL): case(K_SEQUENCE): case(K_FLOW):
+      case(K_PICK): case(K_IF): case(K_FOREACH):
+	globals::process_information.implicit_activities++; break;
+    }
   }
 }
 

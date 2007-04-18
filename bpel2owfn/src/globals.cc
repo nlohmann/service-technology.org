@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/18 14:55:41 $
+ * \date    \$Date: 2007/04/18 16:18:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 
 
@@ -70,7 +70,7 @@ namespace globals {
 
   unsigned int PPcurrentScope = 0;
 
-  s_process_information process_information = {0,0,0,0,0,0,0,0,0};
+  s_process_information process_information = {0,0,0,0,0,0,0,0,0,0,0};
 
 /// The map of all AST elements: maps an identifier of an AST phylum to an
 /// object holding more information.
@@ -111,4 +111,6 @@ string last_error_line = "";
 
 unsigned int static_analysis_errors = 0;
 unsigned int other_errors = 0;
+
+bool parsing = true;
 }

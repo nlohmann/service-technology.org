@@ -29,11 +29,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2007/03/29 12:55:27 $
+ * \date    \$Date: 2007/04/18 16:18:31 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file ast-grammar.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.171 $
+ * \version \$Revision: 1.172 $
  */
 %}
 
@@ -560,7 +560,7 @@ expression:
 %ctor CatchAll()			{ CTOR(K_CATCHALL) }
 %ctor Compensate()			{ CTOR(K_COMPENSATE) }
 %ctor CompensateScope()			{ CTOR(K_COMPENSATESCOPE) }
-%ctor CompensationHandler()		{ CTOR(K_COMPENSATIONHANDLER) }
+%ctor CompensationHandler()		{ CTOR(K_COMPENSATIONHANDLER); if(globals::parsing) globals::process_information.compensation_handlers++; }
 %ctor Copy()				{ CTOR(K_COPY) }
 %ctor Correlation()			{ CTOR(K_CORRELATION) }
 %ctor CorrelationSet()			{ CTOR(K_CORRELATIONSET) }
@@ -568,9 +568,9 @@ expression:
 %ctor ElseIf()				{ CTOR(K_ELSEIF) }
 %ctor Empty()				{ CTOR(K_EMPTY) }
 %ctor emptyEventHandlers()		{ CTOR(K_EVENTHANDLERS) }
-%ctor EventHandlers()			{ CTOR(K_EVENTHANDLERS) }
+%ctor EventHandlers()			{ CTOR(K_EVENTHANDLERS); if(globals::parsing) globals::process_information.event_handlers++; }
 %ctor Exit()				{ CTOR(K_EXIT) }
-%ctor FaultHandlers()			{ CTOR(K_FAULTHANDLERS) }
+%ctor FaultHandlers()			{ CTOR(K_FAULTHANDLERS); if(globals::parsing) globals::process_information.fault_handlers++; }
 %ctor Flow()				{ CTOR(K_FLOW) }
 %ctor ForEach()				{ CTOR(K_FOREACH) }
 %ctor From()				{ CTOR(K_FROM) }
@@ -593,7 +593,7 @@ expression:
 %ctor Source()				{ CTOR(K_SOURCE) }
 %ctor SynchronousInvoke()		{ CTOR(K_INVOKE) }
 %ctor Target()				{ CTOR(K_TARGET) }
-%ctor TerminationHandler()		{ CTOR(K_TERMINATIONHANDLER) }
+%ctor TerminationHandler()		{ CTOR(K_TERMINATIONHANDLER); }
 %ctor Throw()				{ CTOR(K_THROW) }
 %ctor To()				{ CTOR(K_TO) }
 %ctor ToPart()				{ CTOR(K_TOPART) }
@@ -601,8 +601,8 @@ expression:
 %ctor Variable()			{ CTOR(K_VARIABLE) }
 %ctor volatile_annotatedInvoke()		{ CTOR(K_INVOKE) }
 %ctor volatile_Invoke()				{ CTOR(K_INVOKE) }
-%ctor volatile_standardCompensationHandler()	{ CTOR(K_COMPENSATIONHANDLER) }
-%ctor volatile_standardFaultHandlers()		{ CTOR(K_FAULTHANDLERS) }
-%ctor volatile_standardTerminationHandler()	{ CTOR(K_TERMINATIONHANDLER) }
+%ctor volatile_standardCompensationHandler()	{ CTOR(K_COMPENSATIONHANDLER); }
+%ctor volatile_standardFaultHandlers()		{ CTOR(K_FAULTHANDLERS); }
+%ctor volatile_standardTerminationHandler()	{ CTOR(K_TERMINATIONHANDLER); }
 %ctor Wait() 				{ CTOR(K_WAIT) }
 %ctor While()				{ CTOR(K_WHILE) }

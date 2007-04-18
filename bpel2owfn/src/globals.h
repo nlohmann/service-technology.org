@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/18 14:55:41 $
+ * \date    \$Date: 2007/04/18 16:18:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 
 
@@ -70,6 +70,8 @@ using std::map;
     unsigned int compensation_handlers;
     unsigned int variables;
     unsigned int links;
+    unsigned int implicit_activities;
+    unsigned int implicit_handlers;
   };
 
 
@@ -145,6 +147,9 @@ extern string last_error_line;
 
 extern unsigned int static_analysis_errors;
 extern unsigned int other_errors;
+
+/// true while parsing, false while postprocessing
+extern bool parsing;
 }
 
 #endif

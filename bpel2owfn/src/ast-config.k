@@ -29,7 +29,7 @@
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/04/18 16:18:31 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  *
  * \todo    Annotate the global mappings which function clear them.
  */
@@ -203,6 +203,7 @@ void printer(const char *s, uview v)
   } \
   assert(globals::ASTEmap[id] != NULL); \
   globals::ASTEmap[id]->phylum = this; \
+  globals::ASTEmap[id]->isUserDefined = globals::parsing; \
   LEAVE("[AST]"); \
 }
 

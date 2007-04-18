@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/18 14:55:41 $
+ * \date    \$Date: 2007/04/18 16:18:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  *
  * \ingroup debug
  */
@@ -152,16 +152,18 @@ void show_process_information()
     " basic, ";
   cerr << globals::process_information.structured_activities <<
     " structured, ";
-  cerr << globals::process_information.scopes << " scopes)" << endl;
+  cerr << globals::process_information.scopes << " scopes) + ";
+  cerr << globals::process_information.implicit_activities << " implicit activities" << endl;
 
   cerr << globals::process_information.fault_handlers +
     globals::process_information.termination_handlers +
     globals::process_information.compensation_handlers +
-    globals::process_information.event_handlers << " user-defined handlers (";
+    globals::process_information.event_handlers << " handlers (";
   cerr << globals::process_information.fault_handlers << " FH, ";
   cerr << globals::process_information.termination_handlers << " TH, ";
   cerr << globals::process_information.compensation_handlers << " CH, ";
-  cerr << globals::process_information.event_handlers << " EH)" << endl;
+  cerr << globals::process_information.event_handlers << " EH) + ";
+  cerr << globals::process_information.implicit_handlers << " implicit handlers" << endl;
 
   cerr << globals::process_information.links << " links, ";
   cerr << globals::process_information.variables << " variables" << endl;
@@ -237,7 +239,7 @@ int frontend_error(const char *msg)
 
   // remember the last token
   globals::last_error_token = string(frontend_text);
-  globals::last_error_line = toString(frontend_lineno+1);
+  globals::last_error_line = toString(frontend_lineno);
 
   return 1;
 }

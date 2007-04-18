@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/04/18 12:12:24 $
+ * \date    \$Date: 2007/04/18 16:18:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.148 $
+ * \version \$Revision: 1.149 $
  */
 %}
 
@@ -287,6 +287,10 @@ FaultHandlers(a,b,_id) ->
         {
         }
       }
+
+      // count this fault handlers
+      if (! myself->isUserDefined)
+        globals::process_information.implicit_handlers++;
     }
   ]
 ;
@@ -572,6 +576,10 @@ CompensationHandler(a,_id) ->
   	  SAerror(79, ancestor);
         }
       }
+
+      // count this compensation handler
+      if (! myself->isUserDefined)
+        globals::process_information.implicit_handlers++;
     }
   ]
 ;
@@ -609,6 +617,10 @@ TerminationHandler(a,_id) ->
       enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
 
       check_SA00071( myid );
+
+      // count this termination handler
+      if (! myself->isUserDefined)
+        globals::process_information.implicit_handlers++;
     }
   ]
 ;

@@ -24,17 +24,17 @@
  * \brief   global varialbes
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/03/27 12:59:16 $
+ * \date    \$Date: 2007/04/18 14:03:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  */
 
 
@@ -139,7 +139,9 @@ extern string output_filename;
 /// parameters (set by #parse_command_line)
 extern map<possibleParameters, bool> parameters;
 
-
+/// the last token that was displayed in an error message
+extern string last_error_token;
+extern string last_error_line;
 }
 
 #endif

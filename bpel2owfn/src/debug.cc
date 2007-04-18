@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/18 11:08:42 $
+ * \date    \$Date: 2007/04/18 14:03:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  *
  * \ingroup debug
  */
@@ -186,13 +186,16 @@ int frontend_error(const char *msg)
   /* defined by flex */
   extern int frontend_lineno;      // line number of current token
   extern char *frontend_text;      // text of the current token
-  extern int yyerrstatus;
 
   cerr << colorconsole::fg_blue;
   cerr << globals::filename << ":" << frontend_lineno+1 << " - [PARSER] ";
   cerr << colorconsole::fg_standard;
 
   cerr << string(msg) << "; last token read: `" << string(frontend_text) << "'" << endl;
+
+  // remember the last token
+  globals::last_error_token = string(frontend_text);
+  globals::last_error_line = toString(frontend_lineno+1);
 
   return 1;
 }

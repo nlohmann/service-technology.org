@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/04/18 13:37:08 $
+ * \date    \$Date: 2007/04/18 14:03:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.304 $
+ * \version \$Revision: 1.305 $
  *
  * \ingroup frontend
  *
@@ -206,6 +206,7 @@ impl_joinCondition* currentJoinCondition = standardJoinCondition();
  */
 %type <yt_activity_list> activity_list
 %type <yt_activity> activity
+%type <yt_activity> activity2
 %type <yt_casestring> constant
 %type <yt_casestring> tBranches
 %type <yt_casestring> tCompletionCondition
@@ -336,8 +337,15 @@ tProcess:
 
 /*---------------------------------------------------------------------------*/
 
-
 activity:
+  activity2
+    { $$ = $1; }
+| error activity2
+    { $$ = $2;
+      genericError("skipped non-standard element <" + globals::last_error_token + ">", globals::last_error_line); }
+;
+
+activity2:
   tReceive		{ $$ = activityReceive($1);	}
 | tReply		{ $$ = activityReply($1);	}
 | tInvoke		{ $$ = activityInvoke($1);	}
@@ -402,9 +410,6 @@ tPartnerLinks:
     { $$ = NiltPartnerLink_list(); }
 | K_PARTNERLINKS arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNERLINKS X_NEXT
     { $$ = $4; } 
-| error K_PARTNERLINKS { genericError("skipped unknown tag", toString(frontend_lineno-1)); }
-  arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNERLINKS X_NEXT
-    { $$ = $6; } 
 ;
 
 tPartnerLink_list:

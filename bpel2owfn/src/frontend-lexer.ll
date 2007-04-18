@@ -25,11 +25,11 @@
  * \brief BPEL lexer
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of \$Author: gierds $
+ *          last changes of \$Author: nielslohmann $
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/03/27 11:44:49 $
+ * \date    \$Date: 2007/04/18 11:08:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.
@@ -108,9 +108,7 @@
 
 #include "ast-config.h"		// all you need from Kimwitu++
 #include "frontend-parser.h" 	// list of all tokens used
-
-
-extern int frontend_error(const char *msg);
+#include "debug.h"
 
 
 /// current start condition of the lexer
@@ -307,4 +305,4 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 
 
  /* anything else */
-.				{ frontend_error("lexical error"); }
+.				{ if (debug_level >= TRACE_WARNINGS) frontend_error("lexical error"); }

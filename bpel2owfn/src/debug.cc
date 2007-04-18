@@ -26,17 +26,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/18 11:00:59 $
+ * \date    \$Date: 2007/04/18 11:08:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  *
  * \ingroup debug
  */
@@ -186,6 +186,7 @@ int frontend_error(const char *msg)
   /* defined by flex */
   extern int frontend_lineno;      // line number of current token
   extern char *frontend_text;      // text of the current token
+  extern int yyerrstatus;
 
   cerr << colorconsole::fg_blue;
   cerr << globals::filename << ":" << frontend_lineno+1 << " - [PARSER] ";

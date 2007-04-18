@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/04/18 10:31:08 $
+ * \date    \$Date: 2007/04/18 11:08:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.301 $
+ * \version \$Revision: 1.302 $
  *
  * \ingroup frontend
  *
@@ -771,7 +771,7 @@ tCopy:
 
 tFrom:
   K_FROM arbitraryAttributes X_CLOSE error X_OPEN X_SLASH K_FROM
-    { genericError("skipped <from>", toString(frontend_lineno-1));
+    { genericError("skipped <from> due to syntax error", toString(frontend_lineno-1));
       $$ = From(mkinteger(0)); }
 | K_FROM arbitraryAttributes X_NEXT X_SLASH K_FROM
     { $$ = From($2); }
@@ -957,7 +957,7 @@ tCondition:
   K_CONDITION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_CONDITION X_NEXT
     { $$ = $4; }
 | error X_NEXT
-    { genericError("skipped <condition>", toString(frontend_lineno-1));
+    { genericError("skipped <condition> due to syntax error", toString(frontend_lineno-1));
       $$ = mkcasestring(""); }
 ;	  
 

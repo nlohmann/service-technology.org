@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/04/02 09:42:08 $
+ * \date    \$Date: 2007/04/18 08:11:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.299 $
+ * \version \$Revision: 1.300 $
  *
  * \ingroup frontend
  *
@@ -309,7 +309,7 @@ impl_joinCondition* currentJoinCondition = standardJoinCondition();
 tProcess:
     {
       // initialisation (for multiple input files, i.e. `consistency' mode)
-      frontend_lineno = 0;
+      frontend_lineno = 1;
       currentJoinCondition = standardJoinCondition();
       globals::temporaryAttributeMap.clear();
       globals::ASTEmap.clear();
@@ -1256,11 +1256,14 @@ tScope:
 arbitraryAttributes:
   /* empty */
      { $$ = mkinteger(globals::ASTEid++); // generate a new id
-       globals::temporaryAttributeMap[globals::ASTEid-1]["referenceLine"] = toString(frontend_lineno-1); // remember the file position
      }
-| X_NAME X_EQUALS X_STRING arbitraryAttributes
-     { globals::temporaryAttributeMap[$4->value][$1->name] = $3->name;
-       $$ = $4; }
+| X_NAME
+     { if (globals::temporaryAttributeMap[globals::ASTEid]["referenceLine"] == "")
+         globals::temporaryAttributeMap[globals::ASTEid]["referenceLine"] = toString(frontend_lineno); // remember the file position       
+     }
+  X_EQUALS X_STRING arbitraryAttributes
+     { globals::temporaryAttributeMap[$5->value][$1->name] = $4->name;
+       $$ = $5; }
 | joinCondition arbitraryAttributes
      { $$ = $2; }
 ;

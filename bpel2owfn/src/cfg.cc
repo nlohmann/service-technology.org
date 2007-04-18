@@ -32,14 +32,14 @@
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/04/17 15:55:28 $
+ * \date    \$Date: 2007/04/18 08:44:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  *
  * \todo    
  *          - commandline option to control drawing of clusters 
@@ -652,8 +652,8 @@ void CFGBlock::checkForConflictingReceive()
 		  "<" + globals::ASTEmap[elemB->second]->activityTypeName() + "> (line " +
 		  globals::ASTEmap[elemB->second]->attributes["referenceLine"] + "): " +
 		  "both activities receive from <partnerLink> `" +
-		  globals::ASTEmap[elemB->second]->attributes["partnerLink"] + "' and operation `" +
-		  globals::ASTEmap[elemB->second]->attributes["operation"] + "'";
+		  globals::ASTEmap[elemB->second]->attributes["partnerLink"] + "' (operation `" +
+		  globals::ASTEmap[elemB->second]->attributes["operation"] + "')";
 		genericError(errormessage, globals::ASTEmap[elemA->second]->attributes["referenceLine"]);
 
 		/*
@@ -684,8 +684,8 @@ void CFGBlock::checkForConflictingReceive()
 		"<" + globals::ASTEmap[(*otherBlock)->id]->activityTypeName() + "> (line " +
 		globals::ASTEmap[(*otherBlock)->id]->attributes["referenceLine"] + "): " +
 		"both activities receive from <partnerLink> `" +
-		globals::ASTEmap[(*otherBlock)->id]->attributes["partnerLink"] + "' and operation `" +
-		globals::ASTEmap[(*otherBlock)->id]->attributes["operation"] + "'";
+		globals::ASTEmap[(*otherBlock)->id]->attributes["partnerLink"] + "' (operation `" +
+		globals::ASTEmap[(*otherBlock)->id]->attributes["operation"] + "')";
 	      genericError(errormessage, globals::ASTEmap[(*iter)->id]->attributes["referenceLine"]);
 	    }
 	  }
@@ -710,8 +710,8 @@ void CFGBlock::checkForConflictingReceive()
 		"<" + globals::ASTEmap[elemB->second]->activityTypeName() + "> (line " +
 		globals::ASTEmap[elemB->second]->attributes["referenceLine"] + "): " +
 		"both activities receive from <partnerLink> `" +
-		globals::ASTEmap[elemB->second]->attributes["partnerLink"] + "' and operation `" +
-		globals::ASTEmap[elemB->second]->attributes["operation"] + "'";
+		globals::ASTEmap[elemB->second]->attributes["partnerLink"] + "' (operation `" +
+		globals::ASTEmap[elemB->second]->attributes["operation"] + "')";
 	      genericError(errormessage, globals::ASTEmap[elemA->second]->attributes["referenceLine"]);
 
 	      /*

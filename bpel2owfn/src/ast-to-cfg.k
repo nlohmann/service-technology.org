@@ -28,11 +28,11 @@
  * associated control flow block.
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *         
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/04/18 11:56:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  */
 %}
 
@@ -227,7 +227,7 @@ EventHandlers(a,b,_id) ->
 	    connectBlocks(innerLast, lastBlock);
 	  }
 	  i = 1; 
-	  foreach(alarm=OnAlarm(innerActivity,*); tOnAlarm_list b)
+	  foreach(alarm=OnAlarm(*,innerActivity,*); tOnAlarm_list b)
 	  {
  	    CFGBlock * innerFirst = globals::cfgMap.find(toString(innerActivity->id))->second->firstBlock;
 	    CFGBlock * innerLast = globals::cfgMap.find(toString(innerActivity->id))->second->lastBlock;
@@ -817,7 +817,7 @@ Pick(a,b,c,d) ->
 	    connectBlocks(innerLast, lastBlock);
 	  } 
 	  i = 1; 
-	  foreach(alarm=OnAlarm(innerActivity); tOnAlarm_list c)
+	  foreach(alarm=OnAlarm(*,innerActivity); tOnAlarm_list c)
 	  {
  	    CFGBlock * innerFirst = globals::cfgMap.find(toString(innerActivity->id))->second->firstBlock;
 	    CFGBlock * innerLast = globals::cfgMap.find(toString(innerActivity->id))->second->lastBlock;

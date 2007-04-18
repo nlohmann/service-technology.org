@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/04/18 08:11:03 $
+ * \date    \$Date: 2007/04/18 10:31:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.300 $
+ * \version \$Revision: 1.301 $
  *
  * \ingroup frontend
  *
@@ -743,12 +743,8 @@ tReply:
 tInvoke:
   K_INVOKE arbitraryAttributes X_SLASH
     { $$ = volatile_Invoke(NoStandardElements(), NiltCorrelation_list(), NiltToPart_list(), NiltFromPart_list(), $2); }
-//| K_INVOKE arbitraryAttributes X_NEXT X_SLASH K_INVOKE
-//    { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), NiltToPart_list(), NiltFromPart_list(), $2); }
 | K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatch_list tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
     { $$ = volatile_annotatedInvoke($4, $5, $6, $7, $8, $9, $10, $2); }
-//| K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
-//    { $$ = annotatedInvoke($4, $5, NoCatch(), $6, $7, $8, $9, $2); }
 ;
 
 
@@ -774,7 +770,10 @@ tCopy:
 ; 
 
 tFrom:
-  K_FROM arbitraryAttributes X_NEXT X_SLASH K_FROM
+  K_FROM arbitraryAttributes X_CLOSE error X_OPEN X_SLASH K_FROM
+    { genericError("skipped <from>", toString(frontend_lineno-1));
+      $$ = From(mkinteger(0)); }
+| K_FROM arbitraryAttributes X_NEXT X_SLASH K_FROM
     { $$ = From($2); }
 | K_FROM arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_FROM
     { $$ = From($2); }
@@ -957,6 +956,9 @@ tIf:
 tCondition:
   K_CONDITION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_CONDITION X_NEXT
     { $$ = $4; }
+| error X_NEXT
+    { genericError("skipped <condition>", toString(frontend_lineno-1));
+      $$ = mkcasestring(""); }
 ;	  
 
 tElseIf_list:
@@ -1110,23 +1112,6 @@ tLink:
 /******************************************************************************
   SCOPE
 ******************************************************************************/
-
-/* OLD SCOPE START
-tScope:
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
-  tCorrelationSets tFaultHandlers tCompensationHandler
-  tEventHandlers activity 
-  X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, $7, $8, standardTerminationHandler(mkinteger(0)), $9, $6, $10, NiltPartnerLink_list(), $2); }
-| 
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables tPartnerLinks 
-  tMessageExchanges tCorrelationSets tEventHandlers tFaultHandlers
-  tCompensationHandler tTerminationHandler activity 
-  X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, $10, $11, $12, $9, $8, $13, $6, $2); }
-;
-
-OLD SCOPE END */
 
 /* HELPERS */
 

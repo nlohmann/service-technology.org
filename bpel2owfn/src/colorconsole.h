@@ -215,6 +215,9 @@ namespace colorconsole
   
   ostream& fg_magenta(ostream& os)
   { return os; }
+
+  ostream& fg_blue(ostream& os)
+  { return os; }
   
   ostream& fg_black(ostream& os)
   { return os; }

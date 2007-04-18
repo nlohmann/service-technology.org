@@ -29,14 +29,14 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/17 15:55:28 $
+ * \date    \$Date: 2007/04/18 10:31:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.154 $
+ * \version \$Revision: 1.155 $
  */
 
 
@@ -80,6 +80,8 @@ using std::map;
 
 extern int frontend_parse();			// from Bison
 extern int frontend_debug;			// from Bison
+extern int frontend_nerrs;			// from Bison
+extern int frontend_lineno;			// from Bison
 extern int frontend__flex_debug;		// from flex
 extern FILE *frontend_in;			// from flex
 
@@ -527,21 +529,34 @@ int main( int argc, char *argv[])
 
     // invoke Bison parser
     trace(TRACE_INFORMATION, "Parsing " + globals::filename + " ...\n");
-    int error = frontend_parse();
-    
-    if (!error)
-    {
-      trace(TRACE_INFORMATION, "Parsing of " + globals::filename + " complete.\n");
-      close_file(file);
-      finish_AST();
-      // create output for this file
-      single_output(file, PN2);
+    frontend_parse();
+    trace(TRACE_INFORMATION, "Parsing of " + globals::filename + " complete.\n");
 
+    close_file(file);
+
+    if (frontend_nerrs == 0)
+    {
+      finish_AST();
+      single_output(file, PN2);
     }
     else /* parse error */
     {
-      cleanup();
-      return error;
+      if (globals::AST == NULL)
+      {
+	string errormessage = "cannot process abstract syntax tree due to parse errors";
+	genericError(errormessage, toString(frontend_lineno), true);
+
+	cleanup();
+    	return 2;
+      }
+      else
+      {
+	string errormessage = "there were parse errors: further translation might crash or be incorrect";
+  	genericError(errormessage, toString(frontend_lineno));
+
+	finish_AST();
+	single_output(file, PN2);
+      }
     }
 
     file++;

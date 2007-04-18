@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/04/18 12:12:24 $
+ * \date    \$Date: 2007/04/18 13:37:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.303 $
+ * \version \$Revision: 1.304 $
  *
  * \ingroup frontend
  *
@@ -402,6 +402,9 @@ tPartnerLinks:
     { $$ = NiltPartnerLink_list(); }
 | K_PARTNERLINKS arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNERLINKS X_NEXT
     { $$ = $4; } 
+| error K_PARTNERLINKS { genericError("skipped unknown tag", toString(frontend_lineno-1)); }
+  arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNERLINKS X_NEXT
+    { $$ = $6; } 
 ;
 
 tPartnerLink_list:
@@ -776,10 +779,7 @@ tCopy:
 ; 
 
 tFrom:
-  K_FROM arbitraryAttributes X_CLOSE error X_OPEN X_SLASH K_FROM
-    { genericError("skipped <from> due to syntax error", toString(frontend_lineno-1));
-      $$ = From(mkinteger(0)); }
-| K_FROM arbitraryAttributes X_NEXT X_SLASH K_FROM
+  K_FROM arbitraryAttributes X_NEXT X_SLASH K_FROM
     { $$ = From($2); }
 | K_FROM arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_FROM
     { $$ = From($2); }
@@ -791,6 +791,9 @@ tFrom:
     { $$ = From($2); }
 | K_FROM arbitraryAttributes X_SLASH
     { $$ = From($2); }
+| K_FROM arbitraryAttributes error K_FROM
+    { genericError("skipped <from> due to syntax error", toString(frontend_lineno-1));
+      $$ = From($2); }
 ;
 
 tLiteral:
@@ -960,11 +963,11 @@ tIf:
 ;
 
 tCondition:
-  K_CONDITION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_CONDITION X_NEXT
-    { $$ = $4; }
-| error X_NEXT
+  K_CONDITION arbitraryAttributes error K_CONDITION X_NEXT
     { genericError("skipped <condition> due to syntax error", toString(frontend_lineno-1));
       $$ = mkcasestring(""); }
+| K_CONDITION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_CONDITION X_NEXT
+    { $$ = $4; }
 ;	  
 
 tElseIf_list:

@@ -1,0 +1,233 @@
+<process name="OrderingServiceProcess"
+    targetNamespace="http://example.com/ordering/"
+    xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/abstract"
+    xmlns:ext="http://example.com/bpel/some/extension"
+    xmlns:oif="http://example.com/ordering/interfaces/"
+    xmlns:order="http://example.com/ordering/order.xsd"
+    xmlns:plt="http://example.com/ordering/partnerLinkTypes/"
+    xmlns:props="http://example.com/ordering/properties/"
+    xmlns:tns="http://example.com/ordering/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    abstractProcessProfile="http://docs.oasisopen.
+	org/wsbpel/2.0/process/abstract/simple-template/2006/08"
+    suppressJoinFailure="yes">
+    
+    <import importType="http://schemas.xmlsoap.org/wsdl/"
+	location="orderingLT.wsdl"
+	namespace="http://example.com/ordering/partnerLinkTypes/" />
+    <import importType="http://schemas.xmlsoap.org/wsdl/"
+	location="orderingPT.wsdl"
+	namespace=" http://example.com/ordering/interfaces/" />
+    <import importType="http://schemas.xmlsoap.org/wsdl/"
+	location="orderingProperties.wsdl"
+	namespace="http://example.com/ordering/properties/" />
+    
+    <extensions>
+	<extension namespace="http://example.com/bpel/some/extension"
+	    mustUnderstand="no" />
+    </extensions>
+    
+    <partnerLinks>
+	<partnerLink name="ordering"
+	    partnerLinkType="plt:orderingServiceLT"
+	    myRole="orderingService"
+	    partnerRole="orderingServiceResponse" />
+	<partnerLink name="shipper"
+	    partnerLinkType="plt:shipperLT"
+	    myRole="shippingServiceResponse"
+	    partnerRole="shippingService" />
+	<partnerLink name="shippingRequester"
+	    partnerLinkType="##opaque"
+	    myRole="##opaque" />
+	<partnerLink name="invoiceProcessor"
+	    partnerLinkType="##opaque"
+	    myRole="##opaque"
+	    partnerRole="##opaque" />
+	<partnerLink name="orderingConfirmation"
+	    partnerLinkType="plt:completionConfirmationLT"
+	    partnerRole="orderingServiceConfirmation" />
+    </partnerLinks>
+    
+    <variables>
+	<!-- Reference to the message passed as input during
+	initiation -->
+	<variable name="order" messageType="oif:OrderMessageType" />
+	<variable name="orderAckMsg"
+	    messageType="oif:OrderAckMessageType" />
+	<variable name="orderShippedMsg"
+	    element="order:OrderAckMessage" />
+	<variable name="shippingRequestMsg"
+	    element="order:ShipRequestMessage" />
+	<variable name="shippingNoticeMsg"
+	    element="order:ShipNoticeMessage" />
+	<variable name="shipHistoryMsg"
+	    messageType="oif:ShippingHistoryMessageType" />
+	<variable name="invoiceAckMsg"
+	    messageType="oif:InvoiceAckMessageType" />
+    </variables>
+    
+    <correlationSets>
+	<correlationSet name="orderCS" properties="props:orderID" />
+    </correlationSets>
+    
+    <sequence>
+	<receive partnerLink="ordering" operation="placeOrder"
+	    variable="order" createInstance="yes">
+	    <correlations>
+		<correlation set="orderCS" initiate="yes" />
+	    </correlations>
+	</receive>
+	
+	<assign>
+	    <copy>
+		<from>
+		    $order.OrderMessagePart/order:OrderMessageHeader/
+		    order:orderID
+		</from>
+		<to>
+		    $shippingRequestMsg/order:ShipRequestMessageHeader/
+		    order:orderID
+		</to>
+	    </copy>
+	    <copy>
+		<from>$order.OrderMessagePart/order:ShippingInfo</from>
+		<to>$shippingRequestMsg/order:ShippingInfo</to>
+	    </copy>
+	</assign>
+	
+	<invoke partnerLink="shipper" operation="shippingRequest"
+	    inputVariable="shippingRequestMsg"
+	    ext:uniqueUserFriendlyName="send shipping request to
+	    shipper"/>
+	<receive partnerLink="shipper"
+	    portType="oif:shippingServiceCustomerPT"
+	    operation="shippingNotice"
+	    variable="shippingNoticeMsg"
+	    ext:uniqueUserFriendlyName="receive response from shipper">
+	    <correlations>
+		<correlation set="orderCS" />
+	    </correlations>
+	</receive>
+	
+	<assign>
+	    <copy>
+		<from>
+		    $order.OrderMessagePart/order:OrderMessageHeader/
+		    order:orderID
+		</from>
+		<to>
+		    $orderAckMsg.OrderAckMessagePart/
+		    order:OrderAckMessageHeader/order:orderID
+		</to>
+	    </copy>
+	</assign>
+
+	<if>
+	    <condition opaque="yes" />
+	    <!--
+		the first case would package the order
+		acknowledgement for a completed shipment
+	    -->
+
+	    <assign>
+		<copy>
+		    <opaqueFrom/>
+		    <to>$orderAckMsg.OrderAckMessagePart/order:Ack</to>
+		</copy>
+	    </assign>
+
+	    <else>
+		<!--
+		    the second case would package the order
+		    acknowledgement for an uncompleted shipment
+		-->
+
+    		<assign>
+		    <copy>
+			<opaqueFrom/>
+			<to>$orderAckMsg.OrderAckMessagePart/order:Ack</to>
+		    </copy>
+		</assign>
+	    </else>
+	</if>
+	
+	<invoke partnerLink="ordering"
+	    operation="getOrderAck"
+	    inputVariable="orderAckMsg" />
+
+	<receive partnerLink="shippingRequester"
+	    operation="##opaque"
+	    variable="##opaque"
+	    ext:uniqueUserFriendlyName="receive the pickup notification">
+	    <correlations>
+		<correlation set="orderCS" />
+	    </correlations>
+	</receive>
+	
+	<assign>
+	    <copy>
+		<opaqueFrom/>
+		<to>
+		    $shipHistoryMsg.ShipHistoryMessagePart/order:Event
+		</to>
+	    </copy>
+	</assign>
+	
+	<opaqueActivity>
+	    <documentation>
+		If we receive notice that the ship has completed, update
+		our ship history accordingly
+	    </documentation>
+	</opaqueActivity>
+	
+	<receive partnerLink="invoiceProcessor" operation="##opaque"
+	    variable="##opaque"
+	    ext:uniqueUserFriendlyName="receive invoice for processing">
+	    <correlations>
+		<correlation set="orderCS" />
+	    </correlations>
+	</receive>
+	
+	<assign>
+	    <copy>
+		<opaqueFrom/>
+		<to>$invoiceAckMsg.InvoiceAckMessagePart</to>
+	    </copy>
+	</assign>
+	
+	<invoke partnerLink="invoiceProcessor" operation="##opaque"
+	    inputVariable="##opaque"
+	    ext:uniqueUserFriendlyName="send response for the invoice" />
+
+	<receive partnerLink="shippingRequester" operation="##opaque"
+	    variable="##opaque"
+	    ext:uniqueUserFriendlyName="receive payment confirmation">
+	    <correlations>
+		<correlation set="orderCS" />
+	    </correlations>
+	</receive>
+	
+	<assign>
+	    <copy>
+		<opaqueFrom/>
+		<to>$orderShippedMsg/order:Ack</to>
+	    </copy>
+	    <copy>
+		<from>
+		    $order.OrderMessagePart/order:OrderMessageHeader/
+		    order:orderID
+		</from>
+		<to>
+		    $orderShippedMsg/order:OrderAckMessageHeader/
+		    order:orderID
+		</to>
+	    </copy>
+	</assign>
+
+    	<invoke partnerLink="orderingConfirmation"
+	    operation="getOrderConfirmation"
+	    inputVariable="orderShippedMsg" />
+
+    </sequence>
+</process>
+

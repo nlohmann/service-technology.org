@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/19 08:57:33 $
+ * \date    \$Date: 2007/04/19 12:07:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  *
  * \todo    Comment this file.
  */
@@ -117,4 +117,6 @@ unsigned int other_errors = 0;
 bool parsing = true;
 
 set<string> unknown_elements;
+
+bool abstract_process = false;
 }

@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/04/19 08:57:33 $
+ * \date    \$Date: 2007/04/19 12:07:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.89 $
+ * \version \$Revision: 1.90 $
  */
 
 
@@ -192,6 +192,12 @@ void ASTE::checkAttributes()
 	string names[] = {"suppressJoinFailure", "exitOnStandardFault", "abstractProcess", "enableInstanceCompensation"};
 	string values[] = {"no", "no", "no", "no"};
 	setStandardAttributes(names, values, 3);
+
+	if (attributes["abstractProcess"] == "yes" || attributes["abstractProcessProfile"] != "")
+	{
+	  globals::abstract_process = true;
+	  genericError(115, "", attributes["referenceLine"], ERRORLEVEL_NOTICE);
+	}
 
 	break;
       }

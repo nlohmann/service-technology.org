@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/19 10:55:27 $
+ * \date    \$Date: 2007/04/19 12:07:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  *
  * \ingroup debug
  */
@@ -201,6 +201,11 @@ void show_process_information()
     cerr << colorconsole::fg_green << "[STATIC ANALYSIS] " << colorconsole::fg_standard;
     cerr << "No errors found checking 44 statics analysis requirements." << endl;
   }
+  else if (globals::abstract_process)
+  {
+    cerr << colorconsole::fg_magenta << "[STATIC ANALYSIS] " << colorconsole::fg_standard;
+    cerr << "Found " << globals::static_analysis_errors << " warnings using static analysis." << endl;
+  }
   else
   {
     cerr << colorconsole::fg_red << "[STATIC ANALYSIS] " << colorconsole::fg_standard;
@@ -248,6 +253,9 @@ int frontend_error(const char *msg)
   cerr << globals::filename << ":" << frontend_lineno+1 << " - [SYNTAX]\n";
   cerr << colorconsole::fg_standard;
 
+  if (debug_level < TRACE_WARNINGS)
+    return 1;
+
   cerr << string(msg);
 
   if (debug_level >= TRACE_WARNINGS)
@@ -273,6 +281,8 @@ int frontend_error(const char *msg)
  * \param error         when set to true, prefixes the message with "[ERROR]",
  *                      otherwise prefixes the message with "[WARNING]"
  *                      (standard)
+ *
+ * \todo  Comment me
  */
 void genericError(unsigned int code, string information, string line, error_level level)
 {
@@ -304,6 +314,9 @@ void genericError(unsigned int code, string information, string line, error_leve
   cerr << setfill('0') << setw(5) << code;
   cerr << "]\n";
   cerr << colorconsole::fg_standard;
+
+  if (debug_level < TRACE_WARNINGS)
+    return;
 
   switch (code)
   {
@@ -381,6 +394,10 @@ void genericError(unsigned int code, string information, string line, error_leve
 	{ cerr << information << endl;
 	  break;
 	}
+	
+    case(115): // abstract process
+	{ cerr << "process is abstract; missing attributes might hamper translation and result in unnecessary warnings" << endl;
+	  break; }
   }
 
   cerr << endl;
@@ -407,7 +424,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 {
   globals::static_analysis_errors++;
 
-  cerr << colorconsole::fg_red;
+  if (!globals::abstract_process)
+    cerr << colorconsole::fg_red;
+  else
+    cerr << colorconsole::fg_magenta;
 
   cerr << globals::filename;
   if (lineNumber != 0)
@@ -419,6 +439,9 @@ void SAerror(unsigned int code, string information, int lineNumber)
   cerr << "]\n";
 
   cerr << colorconsole::fg_standard;
+
+  if (debug_level < TRACE_WARNINGS)
+    return;
 
   switch (code)
   {

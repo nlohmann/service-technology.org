@@ -1,9 +1,0 @@
-<process name="wait2" targetNamespace="anyURI">
-
-  <sequence>
-    <wait>
-      <for>'PT4H10M'</for>
-    </wait>
-  </sequence>
-  
-</process>

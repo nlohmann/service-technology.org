@@ -1,9 +1,0 @@
-<process name="wait1" targetNamespace="anyURI">
-
-  <sequence>
-    <wait>
-      <until>'2002-12-24T18:00+01:00'</until>
-    </wait>
-  </sequence>
-  
-</process>

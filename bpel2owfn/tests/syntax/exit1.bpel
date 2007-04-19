@@ -1,6 +1,0 @@
-<process name="exit1" targetNamespace="anyURI">
-
-  <exit>
-  </exit>
-  
-</process>

@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/04/18 16:18:31 $
+ * \date    \$Date: 2007/04/19 09:37:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.149 $
+ * \version \$Revision: 1.150 $
  */
 %}
 
@@ -304,6 +304,10 @@ Catch(a,_id) ->
       assert(myself != NULL);
 
       myself->checkAttributes();
+
+      // make fault variable visible
+      if (myself->attributes["faultVariable"] != "")
+        globals::ASTE_variableNames.insert(toString(globals::PPcurrentScope) + "." + myself->attributes["faultVariable"]);
     }
     a
     {
@@ -321,6 +325,10 @@ Catch(a,_id) ->
       globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );      
 
       check_SA00071( myid );
+
+      // make fault variable invsible
+      if (myself->attributes["faultVariable"] != "")
+        globals::ASTE_variableNames.erase(toString(globals::PPcurrentScope) + "." + myself->attributes["faultVariable"]);
     }
   ]
 ;

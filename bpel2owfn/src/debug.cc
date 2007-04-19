@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/19 08:57:33 $
+ * \date    \$Date: 2007/04/19 10:36:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  *
  * \ingroup debug
  */
@@ -325,11 +325,11 @@ void genericError(unsigned int code, string information, string line, error_leve
 	break; }
 
     case(104): // abort due syntax error
-      { cerr << "cannot proceed due to syntax errors;";
+      { cerr << "cannot proceed due to syntax errors";
 
 	if (!globals::unknown_elements.empty())
 	{
-	  cerr << " try to remove these elements:" << endl;
+	  cerr << "; try to remove these elements:" << endl;
 	  for (set<string>::iterator el = globals::unknown_elements.begin(); el != globals::unknown_elements.end(); el++)
 	  {
 	    if (*el != "scope")

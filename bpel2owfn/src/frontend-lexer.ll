@@ -1,5 +1,6 @@
 /*****************************************************************************\
- * Copyright 2005, 2006, 2007 Niels Lohmann                                  *
+ * Copyright 2007        Niels Lohmann, Christian Gierds                     *
+ * Copyright 2005, 2006  Niels Lohmann                                       *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -25,11 +26,12 @@
  * \brief BPEL lexer
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          last changes of \$Author: nielslohmann $
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/04/18 11:08:42 $
+ * \date    \$Date: 2007/04/19 06:40:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +40,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.

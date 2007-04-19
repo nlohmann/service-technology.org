@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/18 16:18:31 $
+ * \date    \$Date: 2007/04/19 06:40:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  *
  * \ingroup debug
  */
@@ -55,6 +55,7 @@
 
 #include "debug.h"
 #include "options.h"
+#include "bpel2owfn.h"
 #include "helpers.h"	// for toInt
 #include "globals.h"
 #include "colorconsole.h"
@@ -133,6 +134,19 @@ void trace(string message)
 
 
 
+void show_process_information_header()
+{
+  if (debug_level == TRACE_ERROR)
+    return;
+
+  cerr << endl;
+  cerr << "==============================================================================" << endl;
+  cerr << PACKAGE_STRING << " reading from file `" << globals::filename << "'" << endl;
+  cerr << "------------------------------------------------------------------------------" << endl;
+}
+
+
+
 /*!
  * \brief print information about the proces
  */
@@ -143,7 +157,6 @@ void show_process_information()
   if (debug_level == TRACE_ERROR)
     return;
 
-  cerr << endl;
   cerr << "------------------------------------------------------------------------------" << endl;
   cerr << globals::process_information.basic_activities +
     globals::process_information.structured_activities +
@@ -232,10 +245,10 @@ int frontend_error(const char *msg)
   extern char *frontend_text;      // text of the current token
 
   cerr << colorconsole::fg_blue;
-  cerr << globals::filename << ":" << frontend_lineno+1 << " - [SYNTAX] ";
+  cerr << globals::filename << ":" << frontend_lineno+1 << " - [SYNTAX]\n";
   cerr << colorconsole::fg_standard;
 
-  cerr << string(msg) << "; last token read: `" << string(frontend_text) << "'" << endl;
+  cerr << string(msg) << "; last token read: `" << string(frontend_text) << "'" << endl << endl;
 
   // remember the last token
   globals::last_error_token = string(frontend_text);
@@ -256,7 +269,7 @@ int frontend_error(const char *msg)
  *                      otherwise prefixes the message with "[WARNING]"
  *                      (standard)
  */
-void genericError(string information, string line, bool error)
+void genericError(unsigned int code, string information, string line, bool error)
 {
   globals::other_errors++;
 
@@ -265,18 +278,69 @@ void genericError(string information, string line, bool error)
   else
     cerr << colorconsole::fg_magenta;
 
-  cerr << globals::filename;
-  cerr << ":" << line;
-  cerr << " - ";
+  cerr << globals::filename << ":" << line << " - ";
 
   if (error)
-    cerr << "[ERROR] ";
+    cerr << "[E";
   else
-    cerr << "[WARNING] ";
+    cerr << "[W";
 
+  cerr << setfill('0') << setw(5) << code;
+  cerr << "]\n";
   cerr << colorconsole::fg_standard;
 
-  cerr << information << endl;
+  switch (code)
+  {
+    case(100): // skipped misplaced element
+      { cerr << "skipped <" << information << ">: non-standard or misplaced element" << endl;
+	break; }
+
+    case(101): // skipped error in <partners>
+      { cerr << "skipped <partners> due to syntax error" << endl;
+	break; }
+
+    case(102): // skipped error in <from>
+      { cerr << "skipped <from> due to syntax error" << endl;
+	break; }
+
+    case(103): // skipped error in <condition>
+      { cerr << "skipped <condition> due to syntax error" << endl;
+	break; }
+
+    case(104): // abort due syntax error
+      { cerr << "cannot process abstract syntax tree due to syntax errors" << endl;
+	break; }
+
+    case(105): // process despite syntax error
+      { cerr << "some elements were skipped due to syntax errors" << endl;
+	break; }
+
+    case(106): // conflicting receives
+      { cerr << information << endl;
+	break; }
+
+    case(107): // attribute missing
+      { cerr << "required attribute " << information << endl;
+	break; }
+	  
+    case(108): // attribute type error
+      { cerr << "type error: " << information << endl;
+	break; }
+
+    case(109): // undefined variable
+      { cerr << information << endl;
+	break; }
+
+    case(110): // undefined partner link
+      { cerr << information << endl;
+	break; }
+
+    case(111): // undefined correlation set
+      { cerr << information << endl;
+	break; }
+  }
+
+  cerr << endl;
 }
 
 
@@ -309,7 +373,7 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
   cerr << "[SA";
   cerr << setfill('0') << setw(5) << code;
-  cerr << "] ";
+  cerr << "]\n";
 
   cerr << colorconsole::fg_standard;
 
@@ -468,7 +532,7 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	 break; }
 
     case(83):
-       { cerr << "<eventHandlers> have no <onEvent> or <onAlarm> element" << endl;
+       { cerr << "<eventHandlers> have neither <onEvent> nor <onAlarm> element" << endl;
 	 break; }
 
     case(84):
@@ -494,6 +558,8 @@ void SAerror(unsigned int code, string information, int lineNumber)
     default:
 	 cerr << endl;
   }
+
+  cerr << endl;
 }
 
 

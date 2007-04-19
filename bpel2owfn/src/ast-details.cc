@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/04/18 16:18:31 $
+ * \date    \$Date: 2007/04/19 06:40:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.87 $
+ * \version \$Revision: 1.88 $
  */
 
 
@@ -152,8 +152,8 @@ void ASTE::checkRequiredAttributes(string required[], unsigned int length)
   for (unsigned int i = 0; i < length; i++)
     if (attributes[required[i]] == "")
     {
-      string errormessage = "attribute `" + required[i] + "' is required for <" + activityTypeName() + ">";
-      genericError(errormessage, attributes["referenceLine"]);
+      string errormessage = "`" + required[i] + "' is missing in <" + activityTypeName() + ">";
+      genericError(107, errormessage, attributes["referenceLine"]);
     }
 }
 
@@ -599,7 +599,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	  return;
 
 	string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tBoolean";
-	genericError(errormessage, attributes["referenceLine"], true);
+	genericError(108, errormessage, attributes["referenceLine"], true);
 	
 	break;
       }
@@ -612,7 +612,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	  return;
 
 	string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tInitiate";
-	genericError(errormessage, attributes["referenceLine"], true);
+	genericError(108, errormessage, attributes["referenceLine"], true);
 
 	break;
       }
@@ -624,7 +624,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	  return;
 
 	string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tRoles";
-	genericError(errormessage, attributes["referenceLine"], true);
+	genericError(108, errormessage, attributes["referenceLine"], true);
 	
 	break;
       }
@@ -638,7 +638,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	  return;
 
 	string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tPattern";
-	genericError(errormessage, attributes["referenceLine"], true);
+	genericError(108, errormessage, attributes["referenceLine"], true);
 	
 	break;
       }
@@ -657,7 +657,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	if (attributes[attribute] != "" && toUInt(attributes[attribute]) == UINT_MAX)
 	{
   	  string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type unsigned integer";
-  	  genericError(errormessage, attributes["referenceLine"], true);
+  	  genericError(108, errormessage, attributes["referenceLine"], true);
 	}
 
 	break;
@@ -912,8 +912,12 @@ string ASTE::checkVariable(string attributename)
       return (toString(*scope) + "." + variableName);
 
   // display an error message
-  string errormessage = "<variable> `" + variableName + "' referenced as `" + attributename + "' in <" + activityTypeName() + "> was not defined before";
-  genericError(errormessage, attributes["referenceLine"]);
+  string errormessage;
+  if (attributename != "variable")
+    errormessage = "variable `" + variableName + "' referenced as `" + attributename + "' in <" + activityTypeName() + "> was not defined before";
+  else
+    errormessage = "variable `" + variableName + "' referenced in <" + activityTypeName() + "> was not defined before";
+  genericError(109, errormessage, attributes["referenceLine"]);
 
   return "";
 }
@@ -997,8 +1001,8 @@ string ASTE::checkPartnerLink()
   }
 
   // display an error message
-  string errormessage = "<partnerLink> `" + partnerLinkName + "' referenced in <" + activityTypeName() + "> was not defined before";
-  genericError(errormessage, attributes["referenceLine"]);
+  string errormessage = "partner link `" + partnerLinkName + "' referenced in <" + activityTypeName() + "> was not defined before";
+  genericError(110, errormessage, attributes["referenceLine"]);
 
   return "";
 }
@@ -1035,8 +1039,8 @@ string ASTE::checkCorrelationSet()
   }
 
   // display an error message
-  string errormessage = "<correlationSet> `" + correlationSetName + "' referenced in <" + globals::ASTEmap[parentActivityId]->activityTypeName() + "> was not defined before";
-  genericError(errormessage, attributes["referenceLine"]);
+  string errormessage = "correlation set `" + correlationSetName + "' referenced in <" + globals::ASTEmap[parentActivityId]->activityTypeName() + "> was not defined before";
+  genericError(111, errormessage, attributes["referenceLine"]);
 
   return "";
 }

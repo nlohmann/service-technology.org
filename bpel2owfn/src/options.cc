@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/17 15:55:28 $
+ * \date    \$Date: 2007/04/19 06:40:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  */
 
 
@@ -149,7 +149,7 @@ void print_help()
   trace(" -o, --output[=NAME]    write output to file (NAME sets filename)\n");
   trace(" -f, --format=FORMAT    create output of the given format\n");
   trace(" -l, --log=NAME         create log file (NAME sets filename)\n");
-  trace(" -d, --debug=NUMBER     set a debug level (NUMBER=1..4 or \"flex\" or \"bison\")\n");
+  trace(" -d, --debug=NUMBER     set a debug level (NUMBER=0..4 or \"flex\" or \"bison\")\n");
   trace(" -h, --help             print this help list and exit\n");
   trace(" -v, --version          print program version and exit\n");
   trace("\n");

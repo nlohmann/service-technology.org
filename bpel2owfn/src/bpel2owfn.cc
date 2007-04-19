@@ -1,5 +1,6 @@
 /*****************************************************************************\
- * Copyright 2005, 2006, 2007 Niels Lohmann, Christian Gierds                *
+ * Copyright 2007  Niels Lohmann, Christian Gierds, Martin Znamirowski       *
+ * Copyright 2005, 2006  Niels Lohmann, Christian Gierds                     *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -25,18 +26,19 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/18 16:18:31 $
+ * \date    \$Date: 2007/04/19 06:40:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.157 $
+ * \version \$Revision: 1.158 $
  */
 
 
@@ -527,6 +529,8 @@ int main( int argc, char *argv[])
   {
     open_file(file);
 
+    show_process_information_header();
+
     // invoke Bison parser
     trace(TRACE_INFORMATION, "Parsing " + globals::filename + " ...\n");
     frontend_parse();
@@ -544,16 +548,14 @@ int main( int argc, char *argv[])
     {
       if (globals::AST == NULL)
       {
-	string errormessage = "cannot process abstract syntax tree due to syntax errors";
-	genericError(errormessage, toString(frontend_lineno), true);
+	genericError(104, "", toString(frontend_lineno), true);
 
 	cleanup();
-    	return 2;
+    	return 1;
       }
       else
       {
-	string errormessage = "some elements were skipped due to syntax errors";
-  	genericError(errormessage, toString(frontend_lineno));
+  	genericError(105, "", toString(frontend_lineno));
 
 	finish_AST();
 	single_output(file, PN2);

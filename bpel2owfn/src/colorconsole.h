@@ -1,4 +1,53 @@
-// from http://www.codeproject.com/cpp/AddColorConsole.asp
+/*****************************************************************************\
+ * Copyright 2007 Niels Lohmann, Christian Gierds                            *
+ *                                                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
+ *                                                                           *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
+ * option) any later version.                                                *
+ *                                                                           *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
+\*****************************************************************************/
+
+/*!
+ * \file    colorconsole.h
+ *
+ * \brief   colored console output
+ *
+ *          This header defines stream manipulators that allow for colored
+ *          stream output.
+ * 
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $
+ * 
+ * \since   2007-04-17
+ *
+ * \date    \$Date: 2007/04/19 06:40:48 $
+ * 
+ * \note    This code was inspired by code published by Jaded Hobo at "The
+ *          Code Project" in December 2004, available at
+ *          http://www.codeproject.com/cpp/AddColorConsole.asp.
+ *
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
+ *          for details.
+ *
+ * \version \$Revision: 1.7 $
+ *
+ * \todo    
+ *          - finish code for non-Windows operating systems
+ */
 
 #ifndef COLORCONSOLE_H
 #define COLORCONSOLE_H

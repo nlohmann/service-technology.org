@@ -32,14 +32,14 @@
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/04/18 08:44:00 $
+ * \date    \$Date: 2007/04/19 06:40:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  *
  * \todo    
  *          - commandline option to control drawing of clusters 
@@ -654,7 +654,7 @@ void CFGBlock::checkForConflictingReceive()
 		  "both activities receive from <partnerLink> `" +
 		  globals::ASTEmap[elemB->second]->attributes["partnerLink"] + "' (operation `" +
 		  globals::ASTEmap[elemB->second]->attributes["operation"] + "')";
-		genericError(errormessage, globals::ASTEmap[elemA->second]->attributes["referenceLine"]);
+		genericError(106, errormessage, globals::ASTEmap[elemA->second]->attributes["referenceLine"]);
 
 		/*
 		assert(globals::ASTEmap[elemA->second] != NULL);
@@ -686,7 +686,7 @@ void CFGBlock::checkForConflictingReceive()
 		"both activities receive from <partnerLink> `" +
 		globals::ASTEmap[(*otherBlock)->id]->attributes["partnerLink"] + "' (operation `" +
 		globals::ASTEmap[(*otherBlock)->id]->attributes["operation"] + "')";
-	      genericError(errormessage, globals::ASTEmap[(*iter)->id]->attributes["referenceLine"]);
+	      genericError(106, errormessage, globals::ASTEmap[(*iter)->id]->attributes["referenceLine"]);
 	    }
 	  }
 	  receives.insert(pair<string, long>( (*iter)->channel_name, (*iter)->id));
@@ -712,7 +712,7 @@ void CFGBlock::checkForConflictingReceive()
 		"both activities receive from <partnerLink> `" +
 		globals::ASTEmap[elemB->second]->attributes["partnerLink"] + "' (operation `" +
 		globals::ASTEmap[elemB->second]->attributes["operation"] + "')";
-	      genericError(errormessage, globals::ASTEmap[elemA->second]->attributes["referenceLine"]);
+	      genericError(106, errormessage, globals::ASTEmap[elemA->second]->attributes["referenceLine"]);
 
 	      /*
 	      trace("[CFG] WARNING: There are conflicting receives!\n");

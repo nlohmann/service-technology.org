@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/04/18 16:18:31 $
+ * \date    \$Date: 2007/04/19 06:40:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.306 $
+ * \version \$Revision: 1.307 $
  *
  * \ingroup frontend
  *
@@ -345,7 +345,7 @@ activity:
     { $$ = $1; }
 | error activity2
     { $$ = $2;
-      genericError("skipped <" + globals::last_error_token + ">: either non-standard element or misplaced", globals::last_error_line); }
+      genericError(100, globals::last_error_token, globals::last_error_line); }
 ;
 
 activity2:
@@ -439,6 +439,8 @@ tPartners:
     { $$ = NiltPartner_list(); }
 | K_PARTNERS X_NEXT tPartner_list X_SLASH K_PARTNERS X_NEXT
     { $$ = $3; }
+| K_PARTNERS error K_PARTNERS X_NEXT
+    { $$ = NiltPartner_list(); genericError(101, "", toString(frontend_lineno-1)); }
 ;
 
 tPartner_list:
@@ -794,7 +796,7 @@ tFrom:
 | K_FROM arbitraryAttributes X_SLASH
     { $$ = From($2); }
 | K_FROM arbitraryAttributes error K_FROM
-    { genericError("skipped <from> due to syntax error", toString(frontend_lineno-1));
+    { genericError(102, "", toString(frontend_lineno-1));
       $$ = From($2); }
 ;
 
@@ -966,7 +968,7 @@ tIf:
 
 tCondition:
   K_CONDITION arbitraryAttributes error K_CONDITION X_NEXT
-    { genericError("skipped <condition> due to syntax error", toString(frontend_lineno-1));
+    { genericError(103, "", toString(frontend_lineno-1));
       $$ = mkcasestring(""); }
 | K_CONDITION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_CONDITION X_NEXT
     { $$ = $4; }

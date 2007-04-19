@@ -214,17 +214,18 @@ several sets of Petri net patterns each suitable in certain
 contexts. These patterns are collected in a pattern repository.
 
 
-@anchor{Petri Net Class}
-@subsection Petri Net Class
+@anchor{Petri Net API}
+@subsection Petri Net API
 
 GNU BPEL2oWFN provides many algorithms and data structures to
 build, represent, modify and simplify Petri nets and open workflow
 nets, resp.@: They are the interface between the pattern database and
 the file output for the model checking tool. The functions are
-collected in an extensible class allowing to add more output file
+collected in an extensible @acronym{API, application programming interface}
+allowing to add more output file
 formats, structural simplification rules (optimized to preserve certain
 properties such as deadlock freedom or liveness) or abstractions
-(e.g.@: abstraction from variables, abstraction from external behavior).
+(e.g.@:, abstraction from variables, abstraction from external behavior).
 
 
 @anchor{Control Flow Graph}
@@ -232,7 +233,7 @@ properties such as deadlock freedom or liveness) or abstractions
 
 Beside the dynamic analysis of the generated Petri net model with Fiona
 or classical model checking tools, GNU BPEL2oWFN prototypically
-implements a control flow graph (@acronym{CFG}) (c.f.@: [Hei03]). This @acronym{CFG} can
+implements a control flow graph (@acronym{CFG}) (cf.@: [Hei03]). This @acronym{CFG} can
 be used to check most of the constraints of the specification statically,
 i.e.@: without actually deploying and running the BPEL process. For example,
 the @acronym{CFG} can be used to check if each variable is initialized by an
@@ -306,8 +307,11 @@ information from Flex and Bison about how the input is lexed and parsed.
 
 Debug level:
 @table @samp
+@itemx 0
+When errors are found, only display the error code and skip additional
+information.
 @itemx 1
-Nothing.
+No debug information, but display error information.
 @itemx 2
 All messages from @samp{-d1}. Additionally, information about the current
 steps is displayed.
@@ -351,12 +355,22 @@ and the phylum names used when generating the Petri net.
 
 For control flow analysis (a form of static analysis) a @acronym{CFG, Control
 Flow Graph} is generated. It can be printed in graphical (dot)
-representation. This option is in an early beta-stage and can only check
-for uninitialzed variables yet.
+representation. With the @acronym{CFG}, several design flaws of @acronym{BPEL}
+processes such as cyclic control links or read access to uninitialized
+variables can be detected statically. Furthermore, faulty constellations such
+as conflicting receiving activities can be found using the @samp{cfg} mode.
 
 @item consistency
 
-Todo.
+The @samp{consistency} mode is an extension of the @samp{petrinet} mode. In the
+consistency mode, several @acronym{BPEL} processes can be parsed, and a Petri
+net model of their composition is generated.
+
+The @samp{consistency} mode is in beta stage. It is not fully tested.
+For examples, check the @file{test5} test script in the @file{tests} directory.
+When combined with @acronym{LoLA} file output, an additional @file{.task} file
+is generated. With the help of this file @acronym{LoLA} can check for weak
+termination of the composition.
 
 @item petrinet
 
@@ -366,14 +380,14 @@ net (see below).
 
 @item pretty
 
-Outputs the parsed @acronym{BPEL} file in @acronym{XML} representation. Any
-unnecessary attributes are omitted. This option is mostly used for debugging
-reasons as it shows the implicit transformations and the identifiers of the
-@acronym{BPEL} constructs.
+Outputs the parsed @acronym{BPEL} file in @acronym{XML} representation. This
+option is mostly used for debugging reasons as it shows the implicit
+transformations and the identifiers of the @acronym{BPEL} constructs.
 @end table
 
-Note that you can only use at most one mode. If no mode is given, GNU
-BPEL2oWFN acts like a @acronym{BPEL} parser.
+At most one mode can be selected. If no mode is given, GNU BPEL2oWFN acts like
+a plain @acronym{BPEL} parser; that is, the input file is read, but no output
+is generated.
 
 @end table
 
@@ -393,11 +407,11 @@ These options control some Petri net-related options.
 @item communicationonly
 
 Only the communicational behavior of the input @acronym{BPEL} process is
-modeled. That is, the negative control flow (in particular fault, termination,
-or compensation handlers, @code{<exit>}, @code{<throw>}, @code{<compensate>},
-@code{<compensateScope>} activities) is not translated to the Petri net
-model. When combined with @samp{reduce}, this parameter yields the most
-compact Petri net model.
+modeled. That is, the negative control flow (in particular, fault, termination,
+or compensation handlers, as well as @code{<exit>}, @code{<throw>},
+@code{<compensate>}, @code{<compensateScope>} activities) is not translated to
+the Petri net model. When combined with @samp{reduce}, this parameter yields
+the most compact Petri net model.
 
 @item fhfaults
 
@@ -573,6 +587,93 @@ Reads the file @file{sample.bpel} and prints the abstract syntax tree
 @end table
 
 
+
+
+@section Warnings and Error Messages
+
+BPEL2oWFN performs several analysis steps on the input @acronym{BPEL} process.
+
+@multitable @columnfractions .1 .15 .75
+@headitem Code @tab Type @tab Description
+
+@item 1--94 @tab static analysis @tab
+A check for a static analysis goal defined in the @acronym{WS-BPEL}
+specification detected an error. Currently, 44 of the 94 described static
+analysis goals are checked. When a static analysis error is found, a
+@acronym{WS-BPEL} processor must reject the process. If the process is an
+abstract process, the static analysis errors can be considered as warnings
+as abstract processes are not meant to be executed.
+
+@item 100 @tab notice @tab
+Either a non-standard element@footnote{All elements
+that are not explicitly defined in the @acronym{WS-BPEL} specificiation (e.g.@:,
+elements from other namespaces) are considered as ``non-standard''.} was parsed
+or a @acronym{BPEL} activity was considered as
+misplaced. In the first case, a non-standard element was parsed when the
+parser expected a @acronym{BPEL} standard activity. Then, a syntax error is
+printed and the whole element is ignored. The parse error and this message
+can usually be ignored, as non-standard elements would neither we translated
+to a Petri net model nor are constrained by the @acronym{WS-BPEL}
+specification. In the second case, ... todo
+
+@item 101 @tab notice @tab
+The @code{<partners>} construct (only supported by BPEL4WS 1.1) is skipped due
+to a syntax error.
+
+@item 102 @tab notice @tab
+The @code{<to>} or @code{<from>} construct is skipped due to a syntax error.
+
+@item 103 @tab notice @tab
+The @code{<condition>} construct is skipped due to a syntax error.
+
+@item 104 @tab critical @tab
+When a syntax error occurs, BPEL2oWFN tries to recover and continue parsing the
+input file after skipping the faulty or unknown element. Sometimes, however,
+the skipping of activities yields to situations where a further analysis of the
+@acronym{BPEL} process is impossible. In this case, the syntax of the process
+has to be fixed or non-standard elements have to be removed or out-commented.
+
+@item 105 @tab notice @tab
+When a syntax error occurs, BPEL2oWFN tries to recover and continue parsing the
+input file after skipping the faulty or unknown element. If it is possible to
+continue, the analysis results might be faulty. In this case, the syntax of the
+process has to be fixed or non-standard elements have to be removed or
+out-commented.
+
+@item 106 @tab warning @tab
+conflicting receives
+
+@item 107 @tab warning @tab
+attribute missing
+
+@item 108 @tab syntax @tab
+attribute type error
+
+@item 109 @tab warning @tab
+undefined variable
+
+@item 110 @tab warning @tab
+undefined partner link
+
+@item 111 @tab warning @tab
+undefined correlation set
+
+@item 112 @tab notice @tab
+skipped <literal> due to syntax error
+
+@item 113 @tab syntax @tab
+skipped unsupported UTF-8 character
+
+@item 114 @tab warning @tab
+uninitialized variable
+
+@item 115 @tab notice @tab
+process is abstract; missing attributes might hamper translation and result in unnecessary warnings
+
+@item 116 @tab notice @tab
+replaced <opaqueActivity> with <empty> activity
+
+@end multitable
 
 
 

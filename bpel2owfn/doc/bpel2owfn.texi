@@ -641,38 +641,59 @@ process has to be fixed or non-standard elements have to be removed or
 out-commented.
 
 @item 106 @tab warning @tab
-conflicting receives
+@acronym{CFG} analysis detected two receiving activities (i.e., @code{<receive>},
+@code{<onEvent>}, @code{<onMessage>}, synchronous @code{<invoke>}) that might
+be activated concurrently and share the same partner link, port type, operation,
+and correlation set. When a message is sent to the process, these activities
+are in @i{conflict}; that is, it is not defined which activity will receive an
+inbound message. At runtime, the standard fault @samp{bpel:conflictingReceive}
+would be thrown.
 
 @item 107 @tab warning @tab
-attribute missing
+A mandatory attribute of an activity was not defined. Especially for
+communicating activities, the absence of @code{partnerLink} and
+@code{operation} might hamper the subsequent analysis and Petri net generation.
 
 @item 108 @tab syntax @tab
-attribute type error
+An attribute was set to a value that violates the attribute's given type. Only
+the types @code{tBoolean}, @code{tInitiate}, @code{tRoles}, and
+@code{tPattern} are checked.
 
 @item 109 @tab warning @tab
-undefined variable
+A variable referenced in an activity was not defined before; that is, no
+matching @code{<variable>} definition was found in a parent scope.
 
 @item 110 @tab warning @tab
-undefined partner link
+A partner link referenced in an activity was not defined before; that is, no
+matching @code{<partnerLink>} definition was found in the process.
 
 @item 111 @tab warning @tab
-undefined correlation set
+A correlation set referenced in an activity was not defined before; that is, no
+matching @code{<correlationSet>} definition was found in a parent scope.
 
 @item 112 @tab notice @tab
-skipped <literal> due to syntax error
+The @code{<literal>} construct is skipped due to a syntax error.
 
 @item 113 @tab syntax @tab
-skipped unsupported UTF-8 character
+A UTF-8 character was read in the input file. As BPEL2oWFN's scanner does not
+support Unicode, all UTF-8 characters are ignored. This message is only
+displayed when the first UTF-8 character is read.
 
 @item 114 @tab warning @tab
-uninitialized variable
+@acronym{CFG} analysis detected a read access to a variable that was not
+initialized before. At runtime, the standard fault
+@samp{bpel:uninitializedVariable} would be thrown.
 
 @item 115 @tab notice @tab
-process is abstract; missing attributes might hamper translation and result in unnecessary warnings
+The process definition defines an abstract process profile, and thus allows
+several ``opaque'' constructs. When processing and analyzing an abstract
+process, BPEL2oWFN might report error messages that where designed for
+executable processes, for example missing attributes. Static analysis errors
+detected in an abstract process are reported as warnings.
 
 @item 116 @tab notice @tab
-replaced <opaqueActivity> with <empty> activity
-
+An @code{<opaqueActivity>} of an abstract process was replaced by an
+@code{<empty>} activity.
 @end multitable
 
 

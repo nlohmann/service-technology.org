@@ -28,18 +28,18 @@
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/04/19 10:55:27 $
+ * \date    \$Date: 2007/04/19 11:46:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  *
  * \todo    
  *          - commandline option to control drawing of clusters 
@@ -107,6 +107,8 @@ CFGBlock::CFGBlock(CFGBlockType pType, int pId = 0, string pLabel = "")
   label = pLabel;
   dotted = false;
   processed = false;
+
+  globals::cfgMap[toString(pId) + "." + pLabel] = this;
 }
 
 /**
@@ -573,6 +575,7 @@ void CFGBlock::checkForConflictingReceive()
   ENTER("checkForConflictingReceive");
   if (processed)
   {
+    LEAVE("checkForConflictingReceive");
     return;
   }
 
@@ -761,6 +764,7 @@ void processCFG()
   CFG->resetProcessedFlag();
   // end test
 
+  trace(TRACE_DEBUG, "[CFG] checking for conflicting receive actions\n");
   CFG->lastBlock->checkForConflictingReceive();
   CFG->resetProcessedFlag();
 

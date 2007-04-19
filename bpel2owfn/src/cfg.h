@@ -30,14 +30,14 @@
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/03/27 13:14:20 $
+ * \date    \$Date: 2007/04/19 10:29:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  */
 
 #ifndef CFG_H
@@ -168,7 +168,7 @@ class CFGBlock {
     string channel_name;
 
     /// resets the processed flag to false
-    void resetProcessedFlag(bool withLinks = false, bool forward = true);
+    void resetProcessedFlag();
     
 
 /***************************** Program Analysis *******************************/

@@ -28,18 +28,18 @@
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/04/19 06:40:48 $
+ * \date    \$Date: 2007/04/19 10:29:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  *
  * \todo    
  *          - commandline option to control drawing of clusters 
@@ -235,37 +235,16 @@ void cfgDot(CFGBlock * block)
 }
 
 /// resets the processed flag to false
-void CFGBlock::resetProcessedFlag(bool withLinks, bool forward)
+void CFGBlock::resetProcessedFlag()
 {
-  if (! processed)
+
+  for (map< string, CFGBlock * >::iterator iter = globals::cfgMap.begin(); iter != globals::cfgMap.end(); iter++)
   {
-    return;
-  }
-  processed = false;
-  
-  if (forward && ! nextBlocks.empty())
-  {
-    for (list<CFGBlock *>::iterator iter = nextBlocks.begin(); iter != nextBlocks.end(); iter++)
+    if ( iter->second != NULL )
     {
-      (*iter)->resetProcessedFlag(withLinks, forward);
-    }
-    if (withLinks && type == CFGSource)
-    {
-      targets[dot_name()]->resetProcessedFlag(withLinks, forward);
+      iter->second->processed = false;
     }
   }
-  else if (! forward && ! prevBlocks.empty())
-  {
-    for (list<CFGBlock *>::iterator iter = prevBlocks.begin(); iter != prevBlocks.end(); iter++)
-    {
-      (*iter)->resetProcessedFlag(withLinks, forward);
-    }
-    if (withLinks && type == CFGTarget)
-    {
-      sources[dot_name()]->resetProcessedFlag(withLinks, forward);
-    }
-  }
-  
 }
 
 /**
@@ -773,11 +752,11 @@ void processCFG()
   trace(TRACE_DEBUG, "[CFG] checking for cyclic links\n");
   /// \todo (gierds) check for cyclic links, otherwise we will fail
   CFG->checkForCyclicLinks();
-  CFG->resetProcessedFlag(true);
+  CFG->resetProcessedFlag();
 
   trace(TRACE_DEBUG, "[CFG] checking for cyclic control dependency\n");
   CFG->checkForCyclicControlDependency();
-  CFG->resetProcessedFlag(true, false);
+  CFG->resetProcessedFlag();
 
   trace(TRACE_DEBUG, "[CFG] checking for uninitialized variables\n");
   // test
@@ -786,7 +765,7 @@ void processCFG()
   // end test
 
   CFG->lastBlock->checkForConflictingReceive();
-  CFG->resetProcessedFlag(true, false);
+  CFG->resetProcessedFlag();
 
   if (formats[F_DOT])
   {

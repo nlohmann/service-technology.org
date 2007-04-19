@@ -1,5 +1,5 @@
 #############################################################################
-# Copyright 2005, 2006 Niels Lohmann                                        #
+# Copyright 2005, 2006, 2007 Niels Lohmann                                  #
 #                                                                           #
 # This file is part of GNU BPEL2oWFN.                                       #
 #                                                                           #
@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/15 19:06:42 $ by $Author: nielslohmann $.
-# Version $Revision: 1.17 $
+# File last changed $Date: 2007/04/19 14:10:59 $ by $Author: nielslohmann $.
+# Version $Revision: 1.18 $
 
 TESTS = test1 test2 test3 test4 test5
 

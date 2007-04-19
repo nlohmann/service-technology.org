@@ -31,7 +31,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/04/19 06:40:48 $
+ * \date    \$Date: 2007/04/19 08:57:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.
@@ -117,10 +117,13 @@
 unsigned int currentView;
 
 bool parseJoinCondition = false;
+bool parseUnicode = false;
 
 
 %}
 
+
+UB     [\200-\277]
 
 
  /* some macros */
@@ -149,10 +152,15 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 
 %%
 
+ /* code to skip UTF-8 characters */
+[\300-\337]{UB}             { if (!parseUnicode) { parseUnicode = true; genericError(113, string(frontend_text), toString(frontend_lineno), ERRORLEVEL_SYNTAX); } }
+[\340-\357]{UB}{2}          { if (!parseUnicode) { parseUnicode = true; genericError(113, string(frontend_text), toString(frontend_lineno), ERRORLEVEL_SYNTAX); } }
+[\360-\367]{UB}{3}          { if (!parseUnicode) { parseUnicode = true; genericError(113, string(frontend_text), toString(frontend_lineno), ERRORLEVEL_SYNTAX); } }
+[\370-\373]{UB}{4}          { if (!parseUnicode) { parseUnicode = true; genericError(113, string(frontend_text), toString(frontend_lineno), ERRORLEVEL_SYNTAX); } }
+[\374-\375]{UB}{5}          { if (!parseUnicode) { parseUnicode = true; genericError(113, string(frontend_text), toString(frontend_lineno), ERRORLEVEL_SYNTAX); } }
 
 
  /* <documentation tags> */
-
 <DOCUMENTATION>{docu_end}	{ /* skip */ BEGIN(currentView); }
 <DOCUMENTATION>[^<]		{ /* skip */ }
 <INITIAL>"documentation"	{ /* skip */ currentView = YY_START; BEGIN(DOCUMENTATION); }

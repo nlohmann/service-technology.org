@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/04/19 06:40:48 $
+ * \date    \$Date: 2007/04/19 08:57:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.88 $
+ * \version \$Revision: 1.89 $
  */
 
 
@@ -599,7 +599,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	  return;
 
 	string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tBoolean";
-	genericError(108, errormessage, attributes["referenceLine"], true);
+	genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
 	
 	break;
       }
@@ -612,7 +612,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	  return;
 
 	string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tInitiate";
-	genericError(108, errormessage, attributes["referenceLine"], true);
+	genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
 
 	break;
       }
@@ -624,7 +624,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	  return;
 
 	string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tRoles";
-	genericError(108, errormessage, attributes["referenceLine"], true);
+	genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
 	
 	break;
       }
@@ -638,7 +638,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	  return;
 
 	string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tPattern";
-	genericError(108, errormessage, attributes["referenceLine"], true);
+	genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
 	
 	break;
       }
@@ -657,7 +657,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	if (attributes[attribute] != "" && toUInt(attributes[attribute]) == UINT_MAX)
 	{
   	  string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type unsigned integer";
-  	  genericError(108, errormessage, attributes["referenceLine"], true);
+  	  genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
 	}
 
 	break;

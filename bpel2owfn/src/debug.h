@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/09
  *
- * \date    \$Date: 2007/04/19 06:40:48 $
+ * \date    \$Date: 2007/04/19 08:57:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  *
  * \ingroup debug
  */
@@ -95,6 +95,23 @@ typedef enum
 
 
 
+/*!
+ * \brief error levels
+ *
+ * \ingroup debug
+ */
+typedef enum
+{
+  ERRORLEVEL_NOTICE,	///< BPEL2oWFN-relevant messages
+  ERRORLEVEL_SYNTAX,	///< syntax errors
+  ERRORLEVER_WARNING,	///< warnings
+  ERRORLEVEL_ERROR,	///< errors
+  ERRORLEVEL_CRITICAL	///< critical errors
+} error_level;
+
+
+
+
 /******************************************************************************
  * External variables
  *****************************************************************************/
@@ -116,7 +133,7 @@ void show_process_information_header();
 int frontend_error(const char *msg);
 void SAerror(unsigned int code, string information = "", int lineNumber = 0);
 void SAerror(unsigned int code, string information, string lineNumber);
-void genericError(unsigned int code, string information, string line, bool error = false);
+void genericError(unsigned int code, string information, string line, error_level level = ERRORLEVER_WARNING);
 
 /// calls #cleanup() then exits
 void error();

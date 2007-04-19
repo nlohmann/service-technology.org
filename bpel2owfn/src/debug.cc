@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/19 06:40:48 $
+ * \date    \$Date: 2007/04/19 08:57:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.68 $
+ * \version \$Revision: 1.69 $
  *
  * \ingroup debug
  */
@@ -248,7 +248,12 @@ int frontend_error(const char *msg)
   cerr << globals::filename << ":" << frontend_lineno+1 << " - [SYNTAX]\n";
   cerr << colorconsole::fg_standard;
 
-  cerr << string(msg) << "; last token read: `" << string(frontend_text) << "'" << endl << endl;
+  cerr << string(msg);
+
+  if (debug_level >= TRACE_WARNINGS)
+    cerr << "; last token read: `" << string(frontend_text) << "'" << endl << endl;
+  else
+    cerr << endl << endl;
 
   // remember the last token
   globals::last_error_token = string(frontend_text);
@@ -269,21 +274,32 @@ int frontend_error(const char *msg)
  *                      otherwise prefixes the message with "[WARNING]"
  *                      (standard)
  */
-void genericError(unsigned int code, string information, string line, bool error)
+void genericError(unsigned int code, string information, string line, error_level level)
 {
-  globals::other_errors++;
+  switch (level)
+  {
+    case(ERRORLEVEL_NOTICE):	cerr << colorconsole::fg_gray; break;
+    case(ERRORLEVEL_SYNTAX):	cerr << colorconsole::fg_blue; break;
+    case(ERRORLEVER_WARNING):	cerr << colorconsole::fg_magenta; break;
+    case(ERRORLEVEL_ERROR):	cerr << colorconsole::fg_red; globals::other_errors++; break;
+    case(ERRORLEVEL_CRITICAL):	cerr << colorconsole::fg_red; globals::other_errors++; break;
+  }
 
-  if (error)
-    cerr << colorconsole::fg_red;
-  else
-    cerr << colorconsole::fg_magenta;
+  cerr << globals::filename;
+ 
+  if (line != "")
+    cerr << ":" << line;
+ 
+  cerr  << " - ";
 
-  cerr << globals::filename << ":" << line << " - ";
-
-  if (error)
-    cerr << "[E";
-  else
-    cerr << "[W";
+  switch (level)
+  {
+    case(ERRORLEVEL_NOTICE):	cerr << "[N"; break;
+    case(ERRORLEVEL_SYNTAX):	cerr << "[S"; break;
+    case(ERRORLEVER_WARNING):	cerr << "[W"; break;
+    case(ERRORLEVEL_ERROR):	cerr << "[E"; break;
+    case(ERRORLEVEL_CRITICAL):	cerr << "[C"; break;
+  }
 
   cerr << setfill('0') << setw(5) << code;
   cerr << "]\n";
@@ -293,6 +309,7 @@ void genericError(unsigned int code, string information, string line, bool error
   {
     case(100): // skipped misplaced element
       { cerr << "skipped <" << information << ">: non-standard or misplaced element" << endl;
+	globals::unknown_elements.insert(information);
 	break; }
 
     case(101): // skipped error in <partners>
@@ -308,7 +325,20 @@ void genericError(unsigned int code, string information, string line, bool error
 	break; }
 
     case(104): // abort due syntax error
-      { cerr << "cannot process abstract syntax tree due to syntax errors" << endl;
+      { cerr << "cannot proceed due to syntax errors;";
+
+	if (!globals::unknown_elements.empty())
+	{
+	  cerr << " try to remove these elements:" << endl;
+	  for (set<string>::iterator el = globals::unknown_elements.begin(); el != globals::unknown_elements.end(); el++)
+	  {
+	    if (*el != "scope")
+	      cerr << "  <" << *el << ">" << endl;
+	  }
+	}
+	else
+	  cerr << endl;
+
 	break; }
 
     case(105): // process despite syntax error
@@ -337,6 +367,14 @@ void genericError(unsigned int code, string information, string line, bool error
 
     case(111): // undefined correlation set
       { cerr << information << endl;
+	break; }
+
+    case(112): // skipped error in literal
+      { cerr << "skipped <literal> due to syntax error" << endl;
+	break; }
+
+    case(113): // skipped UTF-8 character
+      { cerr << "skipped unsupported UTF-8 character `" << information << "'; this message is only shown once" << endl;
 	break; }
   }
 
@@ -573,7 +611,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
  */
 void SAerror(unsigned int code, string information, string lineNumber)
 {
-  SAerror(code, information, toInt(lineNumber));
+  if (lineNumber != "")
+    SAerror(code, information, toInt(lineNumber));
+  else
+    SAerror(code, information, 0);
 }
 
 

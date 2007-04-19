@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/04/19 06:40:48 $
+ * \date    \$Date: 2007/04/19 08:57:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.307 $
+ * \version \$Revision: 1.308 $
  *
  * \ingroup frontend
  *
@@ -345,7 +345,7 @@ activity:
     { $$ = $1; }
 | error activity2
     { $$ = $2;
-      genericError(100, globals::last_error_token, globals::last_error_line); }
+      genericError(100, globals::last_error_token, globals::last_error_line, ERRORLEVEL_NOTICE); }
 ;
 
 activity2:
@@ -440,7 +440,7 @@ tPartners:
 | K_PARTNERS X_NEXT tPartner_list X_SLASH K_PARTNERS X_NEXT
     { $$ = $3; }
 | K_PARTNERS error K_PARTNERS X_NEXT
-    { $$ = NiltPartner_list(); genericError(101, "", toString(frontend_lineno-1)); }
+    { $$ = NiltPartner_list(); genericError(101, "", toString(frontend_lineno-1), ERRORLEVEL_NOTICE); }
 ;
 
 tPartner_list:
@@ -796,13 +796,16 @@ tFrom:
 | K_FROM arbitraryAttributes X_SLASH
     { $$ = From($2); }
 | K_FROM arbitraryAttributes error K_FROM
-    { genericError(102, "", toString(frontend_lineno-1));
+    { genericError(102, "", toString(frontend_lineno-1), ERRORLEVEL_NOTICE);
       $$ = From($2); }
 ;
 
 tLiteral:
-  K_LITERAL X_CLOSE X_NAME X_OPEN X_SLASH K_LITERAL
+  K_LITERAL X_CLOSE constant X_OPEN X_SLASH K_LITERAL
     { $$ = $3; }
+| K_LITERAL error K_LITERAL
+    { genericError(112, "", toString(frontend_lineno-1), ERRORLEVEL_NOTICE);
+      $$ = mkcasestring(""); }
 ;
 
 tQuery:
@@ -968,7 +971,7 @@ tIf:
 
 tCondition:
   K_CONDITION arbitraryAttributes error K_CONDITION X_NEXT
-    { genericError(103, "", toString(frontend_lineno-1));
+    { genericError(103, "", toString(frontend_lineno-1), ERRORLEVEL_NOTICE);
       $$ = mkcasestring(""); }
 | K_CONDITION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_CONDITION X_NEXT
     { $$ = $4; }
@@ -1368,6 +1371,8 @@ comparison:
 constant:
   X_NAME
     { $$ = $1; }
+| X_NAME constant
+    { $$ = mkcasestring((string($1->name) + string($2->name)).c_str()); }
 | APOSTROPHE X_NAME APOSTROPHE
     { $$ = $2; }
 | NUMBER

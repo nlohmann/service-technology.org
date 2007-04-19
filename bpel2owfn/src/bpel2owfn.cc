@@ -31,14 +31,14 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/19 06:40:48 $
+ * \date    \$Date: 2007/04/19 08:57:33 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.158 $
+ * \version \$Revision: 1.159 $
  */
 
 
@@ -548,14 +548,14 @@ int main( int argc, char *argv[])
     {
       if (globals::AST == NULL)
       {
-	genericError(104, "", toString(frontend_lineno), true);
+	genericError(104, "", toString(frontend_lineno), ERRORLEVEL_CRITICAL);
 
 	cleanup();
     	return 1;
       }
       else
       {
-  	genericError(105, "", toString(frontend_lineno));
+  	genericError(105, "", toString(frontend_lineno), ERRORLEVEL_NOTICE);
 
 	finish_AST();
 	single_output(file, PN2);
@@ -573,6 +573,10 @@ int main( int argc, char *argv[])
   // everything went fine
   return 0;
 }
+
+
+
+
 
 /*!
  * \defgroup frontend Front End

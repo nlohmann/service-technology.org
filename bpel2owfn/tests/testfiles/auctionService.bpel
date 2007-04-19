@@ -43,12 +43,13 @@
 	<correlationSet name="auctionIdentification"
 	    properties="as:auctionId" />
     </correlationSets>
-    
+
     <sequence>
 	<!-- Process buyer and seller request concurrently
-	Either one can create a process instance -->
+	    Either one can create a process instance -->
+	
 	<flow>
-	    <!-- Process seller request -->
+	    <!-- Process seller request -->	    
 	    <receive name="acceptSellerInformation"
 		partnerLink="seller"
 		portType="as:sellerPT"
@@ -58,27 +59,28 @@
 		<correlations>
 		    <correlation set="auctionIdentification"
 			initiate="join" />
-		</correlations>
-	    </receive>
-	    
-	    <!-- Process buyer request -->
-	    <receive name="acceptBuyerInformation"
-		partnerLink="buyer"
-		portType="as:buyerPT"
-		operation="submit"
-		variable="buyerData"
-		createInstance="yes">
-		<correlations>
-		    <correlation set="auctionIdentification"
-			initiate="join" />
-		</correlations>
-	    </receive>
-	</flow>
+	    </correlations>
+	</receive>
 	
+	<!-- Process buyer request -->
+	<receive name="acceptBuyerInformation"
+	    partnerLink="buyer"
+	    portType="as:buyerPT"
+	    operation="submit"
+	    variable="buyerData"
+	    createInstance="yes">
+	    <correlations>
+		<correlation set="auctionIdentification"
+		    initiate="join" />
+    	    </correlations>
+	</receive>
+    
+	</flow>
+    
 	<!-- Invoke auction registration service by setting the target
-	endpoint reference and setting my own endpoint reference
-	for call back and receiving the answer Correlation of
-	request and answer is via auction Id -->
+	    endpoint reference and setting my own endpoint reference
+	    for call back and receiving the answer Correlation of
+	    request and answer is via auction Id -->
 	<assign>
 	    <copy>
 		<from>
@@ -86,7 +88,8 @@
 			<sref:service-ref>
 			    <addr:EndpointReference>
 				<addr:Address>
-				    http://example.com/auction/RegistrationService/
+				    http://example.com/auction/
+				    RegistrationService/
 				</addr:Address>
 				<addr:ServiceName>
 				    as:RegistrationService
@@ -111,13 +114,13 @@
 		<to>$auctionData.amount</to>
 	    </copy>
 	</assign>
-	
+    
 	<invoke name="registerAuctionResults"
 	    partnerLink="auctionRegistrationService"
 	    portType="as:auctionRegistrationPT"
 	    operation="process"
 	    inputVariable="auctionData" />
-	
+
 	<receive name="receiveAuctionRegistrationInformation"
 	    partnerLink="auctionRegistrationService"
 	    portType="as:auctionRegistrationAnswerPT"
@@ -127,12 +130,12 @@
 		<correlation set="auctionIdentification" />
 	    </correlations>
 	</receive>
-	
+
 	<!-- Send responses back to seller and buyer -->
 	<flow>
 	    <!-- Process seller response by setting the seller to
-	    the endpoint reference provided by the seller
-	    and invoking the response -->
+		the endpoint reference provided by the seller
+		and invoking the response -->
 	    <sequence>
 		<assign>
 		    <copy>
@@ -146,17 +149,17 @@
 			<to>$sellerAnswerData.thankYouText</to>
 		    </copy>
 		</assign>
-		
+	    
 		<invoke name="respondToSeller"
 		    partnerLink="seller"
 		    portType="as:sellerAnswerPT"
 		    operation="answer"
 		    inputVariable="sellerAnswerData" />
 	    </sequence>
-	    
+	
 	    <!-- Process buyer response by setting the buyer to
-	    the endpoint reference provided by the buyer
-	    and invoking the response -->
+		the endpoint reference provided by the buyer
+		and invoking the response -->
 	    <sequence>
 		<assign>
 		    <copy>
@@ -170,6 +173,7 @@
 			<to>$buyerAnswerData.thankYouText</to>
 		    </copy>
 		</assign>
+	    
 		<invoke name="respondToBuyer"
 		    partnerLink="buyer"
 		    portType="as:buyerAnswerPT"

@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/19 12:07:46 $
+ * \date    \$Date: 2007/04/19 13:15:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  *
  * \ingroup debug
  */
@@ -253,7 +253,7 @@ int frontend_error(const char *msg)
   cerr << globals::filename << ":" << frontend_lineno+1 << " - [SYNTAX]\n";
   cerr << colorconsole::fg_standard;
 
-  if (debug_level < TRACE_WARNINGS)
+  if (debug_level == TRACE_ERROR)
     return 1;
 
   cerr << string(msg);
@@ -315,7 +315,7 @@ void genericError(unsigned int code, string information, string line, error_leve
   cerr << "]\n";
   cerr << colorconsole::fg_standard;
 
-  if (debug_level < TRACE_WARNINGS)
+  if (debug_level == TRACE_ERROR)
     return;
 
   switch (code)
@@ -329,8 +329,8 @@ void genericError(unsigned int code, string information, string line, error_leve
       { cerr << "skipped <partners> due to syntax error" << endl;
 	break; }
 
-    case(102): // skipped error in <from>
-      { cerr << "skipped <from> due to syntax error" << endl;
+    case(102): // skipped error in <from> or <to>
+      { cerr << "skipped <" << information << "> due to syntax error" << endl;
 	break; }
 
     case(103): // skipped error in <condition>
@@ -392,11 +392,14 @@ void genericError(unsigned int code, string information, string line, error_leve
 
     case(114): // uninitialized variable
 	{ cerr << information << endl;
-	  break;
-	}
+	  break; }
 	
     case(115): // abstract process
 	{ cerr << "process is abstract; missing attributes might hamper translation and result in unnecessary warnings" << endl;
+	  break; }
+
+    case(116): // <opaqueActivity> replaced by <empty>
+	{ cerr << "replaced <opaqueActivity> with <empty> activity" << endl;
 	  break; }
   }
 
@@ -440,7 +443,7 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
   cerr << colorconsole::fg_standard;
 
-  if (debug_level < TRACE_WARNINGS)
+  if (debug_level == TRACE_ERROR)
     return;
 
   switch (code)

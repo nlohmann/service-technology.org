@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/04/19 08:57:33 $
+ * \date    \$Date: 2007/04/19 13:15:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.308 $
+ * \version \$Revision: 1.309 $
  *
  * \ingroup frontend
  *
@@ -102,11 +102,11 @@
 %token K_FINALCOUNTERVALUE K_FLOW K_FOR K_FOREACH K_FROM K_FROMPART K_FROMPARTS
 %token K_GETLINKSTATUS K_IF K_IMPORT K_INVOKE K_JOINCONDITION K_LINK K_LINKS
 %token K_LITERAL K_MESSAGEEXCHANGE K_MESSAGEEXCHANGES K_ONALARM K_ONEVENT
-%token K_ONMESSAGE K_OR K_OTHERWISE K_PARTNER K_PARTNERLINK K_PARTNERLINKS
-%token K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE K_REPEATEVERY
-%token K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE K_SOURCE K_SOURCES
-%token K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS K_TERMINATE
-%token K_TERMINATIONHANDLER K_THROW K_TO K_TOPART K_TOPARTS
+%token K_ONMESSAGE K_OPAQUEACTIVITY K_OPAQUEFROM K_OR K_OTHERWISE K_PARTNER
+%token K_PARTNERLINK K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE
+%token K_REPEATEVERY K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE
+%token K_SOURCE K_SOURCES K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS
+%token K_TERMINATE K_TERMINATIONHANDLER K_THROW K_TO K_TOPART K_TOPARTS
 %token K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT
 %token K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL RBRACKET X_CLOSE X_EQUALS
 %token X_NEXT X_OPEN X_SLASH
@@ -796,8 +796,10 @@ tFrom:
 | K_FROM arbitraryAttributes X_SLASH
     { $$ = From($2); }
 | K_FROM arbitraryAttributes error K_FROM
-    { genericError(102, "", toString(frontend_lineno-1), ERRORLEVEL_NOTICE);
+    { genericError(102, "from", toString(frontend_lineno-1), ERRORLEVEL_NOTICE);
       $$ = From($2); }
+| K_OPAQUEFROM X_SLASH
+    { $$ = From(mkinteger(0)); }
 ;
 
 tLiteral:
@@ -823,6 +825,9 @@ tTo:
     { $$ = To($2); }
 | K_TO arbitraryAttributes X_SLASH
     { $$ = To($2); }
+| K_TO arbitraryAttributes error K_TO
+    { genericError(102, "to", toString(frontend_lineno-1), ERRORLEVEL_NOTICE);
+      $$ = To($2); }
 ;
 
 
@@ -839,7 +844,9 @@ tValidate:
 
 
 /******************************************************************************
-  EMPTY
+  EMPTY / OPAQUEACTIVITY
+
+  An <opaqueActivity> is represented by an <empty> activity in the AST.
 ******************************************************************************/
 
 tEmpty:
@@ -847,6 +854,12 @@ tEmpty:
     { $$ = Empty($4, $2); }
 | K_EMPTY arbitraryAttributes X_SLASH
     { $$ = Empty(NoStandardElements(), $2); }
+| K_OPAQUEACTIVITY arbitraryAttributes X_NEXT standardElements X_SLASH K_OPAQUEACTIVITY
+    { $$ = Empty($4, $2);
+      genericError(116, "", toString(frontend_lineno-1), ERRORLEVEL_NOTICE); }
+| K_OPAQUEACTIVITY arbitraryAttributes X_SLASH
+    { $$ = Empty(NoStandardElements(), $2);
+      genericError(116, "", toString(frontend_lineno-1), ERRORLEVEL_NOTICE); }
 ;
 
 
@@ -975,7 +988,9 @@ tCondition:
       $$ = mkcasestring(""); }
 | K_CONDITION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_CONDITION X_NEXT
     { $$ = $4; }
-;	  
+| K_CONDITION arbitraryAttributes X_SLASH X_NEXT
+    { $$ = mkcasestring("opaque"); }
+;
 
 tElseIf_list:
   /* empty */
@@ -1323,6 +1338,7 @@ tSource:
 tTransitionCondition:
   /* empty */
 | K_TRANSITIONCONDITION X_CLOSE transitionCondition X_OPEN X_SLASH K_TRANSITIONCONDITION X_NEXT
+| K_TRANSITIONCONDITION arbitraryAttributes X_SLASH
 ;
 
 tJoinCondition:

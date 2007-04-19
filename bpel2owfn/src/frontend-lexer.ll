@@ -31,7 +31,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/04/19 08:57:33 $
+ * \date    \$Date: 2007/04/19 13:15:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.
@@ -123,22 +123,21 @@ bool parseUnicode = false;
 %}
 
 
-UB     [\200-\277]
-
-
  /* some macros */
+whitespace		[ \t\r\n]*
 namestart		[A-Za-z\200-\377_]
 namechar		[A-Za-z\200-\377_0-9.\-:]
 number			[0-9]+
 name			{namestart}{namechar}*
+variablename		{namestart}({namechar}|[/:]|{whitespace})*
 esc			"&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"
 quote			\"
 string			{quote}([^"]|{esc})*{quote}
 comment			([^-]|"-"[^-])*
 xmlheader		([^?]|"-"[^?])*
-whitespace		[ \t\r\n]*
 bpwsns			"bpws:"|"bpel:"
 docu_end		"</documentation>"[ \t\r\n]*"<"
+UB     			[\200-\277]
 
 
 
@@ -252,6 +251,8 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 <INITIAL>{bpwsns}?"onAlarm"		{ BEGIN(ATTRIBUTE); return K_ONALARM; }
 <INITIAL>{bpwsns}?"onEvent"		{ BEGIN(ATTRIBUTE); return K_ONEVENT; }
 <INITIAL>{bpwsns}?"onMessage"		{ BEGIN(ATTRIBUTE); return K_ONMESSAGE; }
+<INITIAL>{bpwsns}?"opaqueActivity"	{ BEGIN(ATTRIBUTE); return K_OPAQUEACTIVITY; }
+<INITIAL>{bpwsns}?"opaqueFrom"		{ return K_OPAQUEFROM; }
 <INITIAL>{bpwsns}?"otherwise"		{ return K_OTHERWISE; }
 <INITIAL>{bpwsns}?"partner"		{ BEGIN(ATTRIBUTE); return K_PARTNER; }
 <INITIAL>{bpwsns}?"partnerLink"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINK; }
@@ -293,6 +294,7 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 
  /* some things for transition conditions */
 "&ge;"		{ return GREATEROREQUAL; }
+">="		{ return GREATEROREQUAL; }
 "&gt;"		{ return GREATER; }
 "&lt;"		{ return LESS; }
 "&le;"		{ return LESSOREQUAL; }
@@ -302,10 +304,11 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 
 
  /* names and numbers */
+<INITIAL>"$"{variablename}	{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
+                                  return VARIABLENAME; }
+
 <INITIAL>{name}			{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                                   return X_NAME; }
-<INITIAL>"$"{name}		{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
-                                  return VARIABLENAME; }
 {number}	{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                   return NUMBER; }
 

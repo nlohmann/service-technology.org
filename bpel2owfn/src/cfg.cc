@@ -28,18 +28,18 @@
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/04/19 10:29:31 $
+ * \date    \$Date: 2007/04/19 10:55:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  *
  * \todo    
  *          - commandline option to control drawing of clusters 
@@ -347,12 +347,9 @@ void CFGBlock::checkForUninitializedVariables()
   {
     if (initializedVariables.find(var) == initializedVariables.end())
     {
-      trace("[CFG] WARNING: Variable \"" + globals::temporaryAttributeMap[id][attributeName] 
-//	      + "\" ("+ var +") (activity ID = " 
-//	      + toString(id->value)  
-	      + "\" in line " 
-// TODO new line number	      + toString(symTab.readAttribute(id, attributeName)->line) 
-	      + " might be undefined!\n\n");
+      assert(globals::ASTEmap[id] != NULL);
+      string errormessage = "variable `" + globals::temporaryAttributeMap[id][attributeName] + "' used as `" + attributeName + "' in <" + globals::ASTEmap[id]->activityTypeName() + "> might be uninitialized";
+      genericError(114, errormessage, globals::ASTEmap[id]->attributes["referenceLine"], ERRORLEVER_WARNING);
     }
   }
   

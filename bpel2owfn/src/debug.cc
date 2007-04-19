@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/19 10:36:53 $
+ * \date    \$Date: 2007/04/19 10:55:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  *
  * \ingroup debug
  */
@@ -376,6 +376,11 @@ void genericError(unsigned int code, string information, string line, error_leve
     case(113): // skipped UTF-8 character
       { cerr << "skipped unsupported UTF-8 character `" << information << "'; this message is only shown once" << endl;
 	break; }
+
+    case(114): // uninitialized variable
+	{ cerr << information << endl;
+	  break;
+	}
   }
 
   cerr << endl;

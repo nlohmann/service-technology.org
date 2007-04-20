@@ -1,26 +1,3 @@
-Version 1.2 (6 April 2006)
-   - input:
-        * BPEL process compliant to the specificiation BPEL4WS version
-          1.1, May 2003.
+GNU BPEL2oWFN 2.0.0 is the second major release of BPEL2oWFN.
 
-   - output:
-        * 1-safe low-level Petri net in
-           * LoLA format
-           * low-level PEP notation
-           * Abstract Petri Net Notation (APPN)
-           * Petri Net Markup Language (PNML)
-
-        * 1-safe open workflow net in Fiona format
-
-        * Dot representation of the generated Petri net
-
-        * Control Flow Graph (beta statge)
-
-   - implemented patterns:
-        * Christian Stahl. A Petri Net Semantics for BPEL.
-          Informatik-Berichte 188, Humboldt-Universita"t zu Berlin,
-          July 2005.
-
-        * Variations of the Stahl-semantics (acyclic while patterns,
-          acyclic message event handlers, optional variables,
-          livelocked systems, various fault models).
+For more information, see http://www.gnu.org/software/bpel2owfn

@@ -3,15 +3,15 @@ BEGIN OF INSTALL file for BPEL2oWFN Version 2.0.0
 Setup and Installation
 **********************
 
-The distribution environment of GNU BPEL2oWFN was created using the GNU
+The distribution environment of BPEL2oWFN was created using the GNU
 Autotools. If you are familiar with the setup and installation
 procedure of any GNU tool you may skip this section.
 
 Setup
 =====
 
-To setup the installation environment and to compile GNU BPEL2oWFN
-simply follow these steps:
+To setup the installation environment and to compile BPEL2oWFN simply
+follow these steps:
 
   1. Unpack the source tarball by entering(1)
 
@@ -85,10 +85,10 @@ simply follow these steps:
 
      In some cases the configure script complains (i.e. warns) about
      tools which could not be found in your system path. In this case
-     please check *Note Needed Programs::. GNU BPEL2oWFN can be
-     compiled without these tools.  However, you cannot make changes to
-     large parts of the programm as you will not be able to generate
-     source files without the tools.
+     please check *Note Needed Programs::. BPEL2oWFN can be compiled
+     without these tools.  However, you cannot make changes to large
+     parts of the programm as you will not be able to generate source
+     files without the tools.
 
   4. After all Makefiles are created, run
 
@@ -119,7 +119,7 @@ is created in the directory `bpel2owfn-2.0.0/src' of the distribution.
 This file has no dependencies to other files of the distribution and
 can be copied to any directory.
 
-Alternatively you can install GNU BPEL2oWFN properly by executing (3)
+Alternatively you can install BPEL2oWFN properly by executing (3)
 
      make install
 
@@ -146,19 +146,19 @@ Any warning during an in other respects successful compilation can be
 ignored -- these warnings mostly occur in generated files from Flex,
 Bison or Kimwitu++ and are outside of our scope.
 
-The compilation of GNU BPEL2oWFN was tested on several operating systems
+The compilation of BPEL2oWFN was tested on several operating systems
 such as Microsoft Windows (running Cygwin), GNU/Linux, Apple Mac OS X
 and Sun Solaris. Anyway, if the compilation fails please make sure you
 use the most recent (stable) versions of the GNU Compiler Collection.
 If this does not help please send us an electronic mail to
 <bug-bpel2owfn@gnu.org>. Include the version number of your
-distribution (version 2.0.0 of 22 March 2007). Also include in your
+distribution (version 2.0.0 of 20 April 2007). Also include in your
 message the output that the make process produced. We will try to
 answer your mail within a week.
 
-If you are not interested in compiling GNU BPEL2oWFN yourself you can
+If you are not interested in compiling BPEL2oWFN yourself you can
 alternatively download executable binaries for several operating
-systems on the website of GNU BPEL2oWFN
+systems on the website of BPEL2oWFN
 (`http://www.gnu.org/software/bpel2owfn').
 
 Makefile Targets
@@ -167,8 +167,8 @@ Makefile Targets
 The generated Makefiles serve different targets:
 
 `all'
-     Compile GNU BPEL2oWFN and create an executable binary `bpel2owfn'
-     (or `bpel2owfn.exe' on systems running Microsoft Windows) in the
+     Compile BPEL2oWFN and create an executable binary `bpel2owfn' (or
+     `bpel2owfn.exe' on systems running Microsoft Windows) in the
      directory `bpel2owfn-2.0.0/src'.
 
 `dvi'
@@ -201,8 +201,8 @@ The generated Makefiles serve different targets:
 
 (1) Cygwin users should open a `tcsh'-shell before.
 
-(2) Unless the testscript displays error messages warnings of GNU
-BPEL2oWFN can be ignored.
+(2) Unless the testscript displays error messages warnings of BPEL2oWFN
+can be ignored.
 
 (3) Usually, `make install' and `make uninstall' can only be executed
 by the root user.
@@ -213,20 +213,20 @@ Needed Programs
 Required Programs
 =================
 
-To compile GNU BPEL2oWFN you do not need any specific program other than
+To compile BPEL2oWFN you do not need any specific program other than
 the GNU Compiler Collection. If you however want to change the program
 (e.g. add new Petri net patterns) you need the following programs to
-generate source code. These programs are (as GNU BPEL2oWFN itself) free
+generate source code. These programs are (as BPEL2oWFN itself) free
 software distributed under the GNU General Public License.
 
 Flex, A fast scanner generator
-     Flex is needed to generate the lexer of GNU BPEL2oWFN. Flex was
-     written by Vern Paxon. Copyright (C) 1990 The Regents of the
-     University of California. All rights reserved. Flex is available
-     under `http://www.gnu.org/software/flex/flex.html'.
+     Flex is needed to generate the lexer of BPEL2oWFN. Flex was written
+     by Vern Paxon. Copyright (C) 1990 The Regents of the University of
+     California. All rights reserved. Flex is available under
+     `http://www.gnu.org/software/flex/flex.html'.
 
 Bison, The YACC-compatible Parser Generator
-     Bison is needed to generate the parser of GNU BPEL2oWFN. Bison was
+     Bison is needed to generate the parser of BPEL2oWFN. Bison was
      written by Robert Corbett und Richard Stallman. Copyright (C) 1992,
      1998, 1999, 2003, 2004, 2005 Free Software Foundation, Inc. Bison
      is available under `http://www.gnu.org/software/bison/bison.html'.
@@ -242,10 +242,9 @@ Kimwitu++, The Term Processor
 Optional Programs
 =================
 
-GNU BPEL2oWFN is a compiler and thus creating output files which can be
+BPEL2oWFN is a compiler and thus creating output files which can be
 read by several other programs. These programs are not needed to compile
-GNU BPEL2oWFN yet without these programs GNU BPEL2oWFN makes not much
-sense.
+BPEL2oWFN yet without these programs BPEL2oWFN makes not much sense.
 
 LoLA, a Low Level Petri net Analyzer
      LoLA is an explicit model checker implementing a broad variety of
@@ -261,14 +260,14 @@ Graphviz, the Graph Visualization Software
 
 The Graphviz tool dot can be used to create a graphical representation
 of the generated Petri net in PNG (Portable Network Graphic) format. If
-dot is not found on your system, GNU BPEL2oWFN will only create a
-.dot-file and does not try to invoke dot.
+dot is not found on your system, BPEL2oWFN will only create a .dot-file
+and does not try to invoke dot.
 
 Reference System
 ================
 
-As of March 2007, we use the following system developing and building
-GNU BPEL2oWFN:
+As of April 2007, we use the following system developing and building
+BPEL2oWFN:
 
    * Intel Pentium M processor, 1.60 GHz
 

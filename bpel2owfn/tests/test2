@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 #############################################################################
 # Copyright 2005, 2006, 2007 Niels Lohmann                                  #
@@ -20,8 +20,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/19 14:10:59 $ by $Author: nielslohmann $.
-# Version $Revision: 1.10 $
+# File last changed $Date: 2007/04/20 10:33:12 $ by $Author: nielslohmann $.
+# Version $Revision: 1.11 $
 
 echo ""
 

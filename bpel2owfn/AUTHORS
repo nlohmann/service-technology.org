@@ -6,7 +6,7 @@ Authors and Acknowledgements
 Authors
 =======
 
-GNU BPEL2oWFN was written by:
+BPEL2oWFN was written by:
    * Niels Lohmann, Humboldt-Universita"t zu Berlin
 
    * Christian Gierds, Humboldt-Universita"t zu Berlin
@@ -18,52 +18,58 @@ Acknowledgements
 
 We would like to thank:
    * Sylvain Beucler, GNU Project
-     for his help moving BPEL2oWFN to Savannah
+     for his help moving BPEL2oWFN to Savannah,
 
    * Maarten Boote, Technische Universiteit Eindhoven
-     for integrating BPEL2oWFN to LaQuSo
+     for integrating BPEL2oWFN to LaQuSo,
 
    * Jan Bretschneider, Humboldt-Universita"t zu Berlin
-     for patient C++ help
+     for patient C++ help,
 
    * Dirk Fahland, Humboldt-Universita"t zu Berlin
-     for fruitful discussions about BPEL's semantics
+     for fruitful discussions about BPEL's semantics,
 
    * Carsten Frenkler, Gedilan Technologies
-     for challenging BPEL processes
+     for challenging BPEL processes,
 
    * Mario Karrenbrock, FH Wilhelmshaven/SAP
-     for finding bugs
+     for finding bugs,
 
    * Dieter Ko"nig, IBM
-     for valuable advice concerning BPEL
+     for valuable advice concerning BPEL,
 
    * Oliver Kopp, Universita"t Stuttgart
-     for challenging BPEL processes
+     for challenging BPEL processes,
 
    * Axel Martens, IBM
-     for valuable advice concerning BPEL
+     for valuable advice concerning BPEL,
+
+   * Harald Meyer, Hasso Plattner Institute
+     for pointing out a bug in the parser,
 
    * Simon Moser, IBM
-     for valuable advice concerning BPEL
+     for valuable advice concerning BPEL,
+
+   * Chun Ouyang, Queensland University of Technology
+     for discussion about the Petri net semantics,
 
    * Michael Piefel, Humboldt-Universita"t zu Berlin
-     for help with Kimwitu++
+     for help with Kimwitu++,
 
    * Dennis Reinert, Humboldt-Universita"t zu Berlin
-     for his work on the first versions of BPEL2oWFN
+     for his work on the first versions of BPEL2oWFN,
 
    * Eric Verbeek, Technische Universiteit Eindhoven
      for integrating BPEL2oWFN to the ProM framework and valuable
-     comments on BPEL's link semantics
+     comments on BPEL's link semantics,
 
    * Ernesto Santana-Diaz
-     for writing a Java-based GUI for BPEL2oWFN
+     for writing a Java-based GUI for BPEL2oWFN,
 
    * Jan Martijn van der Werf, Technische Universiteit Eindhoven
-     for his discussion about the PNML-oWFN format
+     for his help with the PNML-oWFN format.
 
-GNU BPEL2oWFN is part of the Tools4BPEL project funded by the German
+BPEL2oWFN is part of the Tools4BPEL project funded by the German
 Bundesministerium fu"r Bildung und Forschung.
 
 Contact Person
@@ -81,6 +87,9 @@ Homepage
 
 E-mail
      <nlohmann@informatik.hu-berlin.de>
+
+Skype
+     nlohmann
 
 Phone
      (+49) (30) 2093-3070

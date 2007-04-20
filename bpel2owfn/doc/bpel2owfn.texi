@@ -33,16 +33,16 @@ This manual does not explain how to setup or install GNU BPEL2oWFN. For this
 information please read the @i{Installation Manual} which is part of the
 distribution, or can be downloaded from the website of GNU BPEL2oWFN,
 @url{http://www.gnu.org/software/bpel2owfn}.
-
+@*
 @iftex
-@image{images/tools4bpel,,0.4in}
+@center @image{images/tools4bpel,,0.4in}
 @end iftex
 @ifhtml
 @image{images/tools4bpel}
 @end ifhtml
-
+@*
 GNU BPEL2oWFN was developed during the Tools4@acronym{BPEL} project funded by
-the German Federal Ministry for Education and Research (BMBF), see
+the German Federal Ministry for Education and Research (@acronym{BMBF}), see
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 @end copying
 
@@ -57,7 +57,7 @@ the German Federal Ministry for Education and Research (BMBF), see
 @title GNU BPEL2oWFN
 @end ifnottex
 
-@subtitle Translating @acronym{BPEL} Processes into Open Workflow Nets
+@subtitle Translating BPEL Processes into Open Workflow Nets
 @subtitle GNU BPEL2oWFN Version @value{VERSION}, @value{UPDATED}
 @vskip 4pt
 @subtitle User's Manual
@@ -81,16 +81,16 @@ the German Federal Ministry for Education and Research (BMBF), see
 
 @c ----------------------------------------------------------------------------
 
-@c * Overview:: What GNU BPEL2oWFN can do.
+@c * Overview:: What BPEL2oWFN can do.
 @c * Petri Net Patterns:: Which patterns are implemented.
 @c * Petri Net-related Functions:: What is done with the Petri net.
-@c * Future Work:: What GNU BPEL2oWFN will do in the future.
+@c * Future Work:: What BPEL2oWFN will do in the future.
 @c * References:: Bibliography of cited literature.
 
 @menu
-* Invoking GNU BPEL2oWFN:: How to invoke GNU BPEL2oWFN.
+* Invoking BPEL2oWFN:: How to invoke BPEL2oWFN.
 * File Formats:: Which file formats are supported.
-* FAQ and Known Bugs:: What GNU BPEL2oWFN cannot do, and why.
+* FAQ and Known Bugs:: What BPEL2oWFN cannot do, and why.
 * GNU Free Documentation License::The license of this manual.
 @end menu
 
@@ -114,7 +114,7 @@ the German Federal Ministry for Education and Research (BMBF), see
 
 The Web Service Business Process Execution Language @acronym{WS-BPEL}, or @acronym{BPEL} for short, is the de-facto standard to describe orchestrations of Web services. @acronym{BPEL} is described in a plain-text specification, standardized by @acronym{OASIS, Organization for the Advancement of Structured Information Standards}, that is, it only has an informal semantics. However, to allow for computer-aided verification, a formal semantics is required.
 
-Stahl in [Sta05] proposes a Petri net semantics that consists of a collection of Petri net patterns, one Petri net pattern for each @acronym{BPEL} construct. To translate a @acronym{BPEL} process to a Petri net model, each activity is translated with its corresponding Petri net pattern which are then composed. This semantics was overworked and adapted to @acronym{WS-BPEL} 2.0 in [Loh07], and is implemented in GNU BPEL2oWFN.
+Stahl in [Sta05] proposes a Petri net semantics that consists of a collection of Petri net patterns, one Petri net pattern for each @acronym{BPEL} construct. To translate a @acronym{BPEL} process to a Petri net model, each activity is translated with its corresponding Petri net pattern which are then composed. This semantics was overworked and adapted to @acronym{WS-BPEL} 2.0 in [Loh07], and is implemented in BPEL2oWFN.
 
 @iftex
 @image{images/toolchain,,0.7in}
@@ -123,7 +123,7 @@ Stahl in [Sta05] proposes a Petri net semantics that consists of a collection of
 @image{images/toolchain}
 @end ifhtml
 
-GNU BPEL2oWFN is a compiler translating a @acronym{BPEL} process into an @acronym{oWFN, open Workflow Net}, that is, into a Petri net model. This @acronym{oWFN} can then be used to:
+BPEL2oWFN is a compiler translating a @acronym{BPEL} process into an @acronym{oWFN, open Workflow Net}, that is, into a Petri net model. This @acronym{oWFN} can then be used to:
 
 @itemize
 @item check @i{controllability} of this @acronym{oWFN}, that is, whether it is possible to properly interact with the web service,
@@ -132,16 +132,16 @@ GNU BPEL2oWFN is a compiler translating a @acronym{BPEL} process into an @acrony
 @item check any temporal logic formula with several model checking tools [LoLA, MCK].
 @end itemize
 
-GNU BPEL2oWFN uses static analysis to make the generated @acronym{oWFN}
+BPEL2oWFN uses static analysis to make the generated @acronym{oWFN}
 as compact as possible to analyze a chosen property. This is called
 @i{flexible model generation}.
 
-GNU BPEL2oWFN is the successor from @acronym{BPEL2PN} [SHS05], a
-Java-based compiler generating low-level Petri nets. GNU BPEL2oWFN can be
+BPEL2oWFN is the successor from @acronym{BPEL2PN} [SHS05], a
+Java-based compiler generating low-level Petri nets. BPEL2oWFN can be
 understood as a re-implementation for extensibility and performance issues. Its
 functionality is a superset of the functionality of @acronym{BPEL2PN}.
 
-GNU BPEL2oWFN was written by Niels Lohmann and Christian Gierds. It is part of
+BPEL2oWFN was written by Niels Lohmann and Christian Gierds. It is part of
 the Tools4@acronym{BPEL} project funded by the German Bundesministerium f@"ur
 Bildung und Forschung. See
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
@@ -154,7 +154,7 @@ The translation process of the @acronym{BPEL} business process is performed in
 six steps which we describe briefly in this section:
 
 @enumerate
-@item @b{Lexical and syntactical analysis}. GNU BPEL2oWFN parses the
+@item @b{Lexical and syntactical analysis}. BPEL2oWFN parses the
 input process according to the specification of @acronym{BPEL4WS} version 1.1
 [ACD@math{^+}03]. All information about the process is collected in a symbol
 table for further use.
@@ -183,13 +183,13 @@ formats.
 
 
 
-@section Concepts of GNU BPEL2oWFN
+@section Concepts of BPEL2oWFN
 
-In this section we describe the main concepts of GNU BPEL2oWFN used to
+In this section we describe the main concepts of BPEL2oWFN used to
 realize the translation. Reading this section is not necessary for using
-GNU BPEL2oWFN, yet knowing the underlying algorithms and data structures
+BPEL2oWFN, yet knowing the underlying algorithms and data structures
 not only helps to locate bugs, but also helps you to customize
-GNU BPEL2oWFN or request a feature.
+BPEL2oWFN or request a feature.
 
 @anchor{Abstract Syntax Tree}
 @subsection Abstract Syntax Tree
@@ -198,7 +198,7 @@ The @acronym{AST, abstract syntax tree} is an abstraction of the
 syntax tree generated while parsing the @acronym{BPEL} process: any
 unnecessary information (e.g.@: indention, brackets or other
 ``syntax-supporting'' elements) is omitted. It is the central data
-structure of GNU BPEL2oWFN. The nodes of the @acronym{AST} are
+structure of BPEL2oWFN. The nodes of the @acronym{AST} are
 annotated with pointers to symbol table entries during the analysis steps.
 These annotations are used to select the most compact Petri net pattern
 from the pattern database to check a given property.
@@ -212,7 +212,7 @@ model to check a given property. The patterns of the Petri net
 semantics of [Sta05] are designed to fit in any given context.
 However when the context is known some behavior modeled in the
 patterns (i.e.@: some of the nodes) can be safely removed without
-changing its semantics. GNU BPEL2oWFN is designed to hold
+changing its semantics. BPEL2oWFN is designed to hold
 several sets of Petri net patterns each suitable in certain
 contexts. These patterns are collected in a pattern repository.
 
@@ -220,7 +220,7 @@ contexts. These patterns are collected in a pattern repository.
 @anchor{Petri Net API}
 @subsection Petri Net API
 
-GNU BPEL2oWFN provides many algorithms and data structures to
+BPEL2oWFN provides many algorithms and data structures to
 build, represent, modify and simplify Petri nets and open workflow
 nets, resp.@: They are the interface between the pattern database and
 the file output for the model checking tool. The functions are
@@ -235,7 +235,7 @@ properties such as deadlock freedom or liveness) or abstractions
 @subsection Control Flow Graph
 
 Beside the dynamic analysis of the generated Petri net model with Fiona
-or classical model checking tools, GNU BPEL2oWFN prototypically
+or classical model checking tools, BPEL2oWFN prototypically
 implements a control flow graph (@acronym{CFG}) (cf.@: [Hei03]). This @acronym{CFG} can
 be used to check most of the constraints of the specification statically,
 i.e.@: without actually deploying and running the BPEL process. For example,
@@ -249,21 +249,21 @@ incoming message or an @code{<assign>} activity.
 
 @c ----------------------------------------------------------------------------
 
-@node Invoking GNU BPEL2oWFN
-@chapter Invoking GNU BPEL2oWFN
+@node Invoking BPEL2oWFN
+@chapter Invoking BPEL2oWFN
 
-The standard invocation of GNU BPEL2oWFN is:
+The standard invocation of BPEL2oWFN is:
 
 @example
 bpel2owfn -i service.bpel -f owfn -o
 @end example
 
 where @file{service.bpel} is a @acronym{BPEL} process. The option
-@samp{-f owfn} causes GNU BPEL2oWFN to generate an open workflow net. This
+@samp{-f owfn} causes BPEL2oWFN to generate an open workflow net. This
 net is written to a file named @file{service.owfn}, because of the option
 @samp{-o}.
 
-GNU BPEL2oWFN can be called without any parameter. In this case, it acts
+BPEL2oWFN can be called without any parameter. In this case, it acts
 as a simple parser for @acronym{BPEL} processes that reads its input from the
 standard input (@code{stdin}).
 
@@ -273,7 +273,7 @@ standard input (@code{stdin}).
 
 @section Options
 
-GNU BPEL2oWFN supports the following command-line options:
+BPEL2oWFN supports the following command-line options:
 
 @table @samp
 @item --help
@@ -339,13 +339,13 @@ Displays messages bison. Can be combined with any other debug level.
 
 @subsection Modes
 
-When invoking GNU BPEL2oWFN several modes are possible.
+When invoking BPEL2oWFN several modes are possible.
 
 @table @samp
 @item --mode=@var{modus}
 @itemx -m @var{modus}
 
-GNU BPEL2oWFN supports different modes for handling input @acronym{BPEL}
+BPEL2oWFN supports different modes for handling input @acronym{BPEL}
 files: @samp{@var{modus}} can be one of the following:
 
 @table @samp
@@ -390,7 +390,7 @@ option is mostly used for debugging reasons as it shows the implicit
 transformations and the identifiers of the @acronym{BPEL} constructs.
 @end table
 
-At most one mode can be selected. If no mode is given, GNU BPEL2oWFN acts like
+At most one mode can be selected. If no mode is given, BPEL2oWFN acts like
 a plain @acronym{BPEL} parser; that is, the input file is read, but no output
 is generated.
 
@@ -529,7 +529,7 @@ When mode @samp{cfg} is used, the @acronym{CFG, control flow graph} is printed
 in Graphviz dot representation.
 
 In both cases, when the tool @code{dot} is found in the search path during
-configuration of GNU BPEL2oWFN and the parameter @samp{-o} is used,
+configuration of BPEL2oWFN and the parameter @samp{-o} is used,
 @code{dot} is used to generate a @acronym{PNG, Portable Network Image} file.
 In this case, two files with the suffixes @samp{.dot} and @samp{.png} are
 created. Note that when the @samp{ast} mode is used with the @samp{dot} file
@@ -559,7 +559,7 @@ used, a file with the suffix @samp{.xml} is created.
 
 @anchor{Examples}
 @section Examples
-In this section we show some examples how GNU BPEL2oWFN can be
+In this section we show some examples how BPEL2oWFN can be
 invoked.
 
 @table @samp
@@ -622,7 +622,7 @@ to a Petri net model nor are constrained by the @acronym{WS-BPEL}
 specification. In the second case, ... todo
 
 @item 101 @tab notice @tab
-The @code{<partners>} construct (only supported by BPEL4WS 1.1) is skipped due
+The @code{<partners>} construct (only supported by @acronym{BPEL4WS} 1.1) is skipped due
 to a syntax error.
 
 @item 102 @tab notice @tab
@@ -680,9 +680,9 @@ matching @code{<correlationSet>} definition was found in a parent scope.
 The @code{<literal>} construct is skipped due to a syntax error.
 
 @item 113 @tab syntax @tab
-A UTF-8 character was read in the input file. As BPEL2oWFN's scanner does not
-support Unicode, all UTF-8 characters are ignored. This message is only
-displayed when the first UTF-8 character is read.
+A @acronym{UTF}-8 character was read in the input file. As BPEL2oWFN's scanner does not
+support Unicode, all @acronym{UTF}-8 characters are ignored. This message is only
+displayed when the first @acronym{UTF}-8 character is read.
 
 @item 114 @tab warning @tab
 @acronym{CFG} analysis detected a read access to a variable that was not
@@ -705,12 +705,12 @@ An @code{<opaqueActivity>} of an abstract process was replaced by an
 
 @c @section Exit Values
 
-@c When GNU BPEL2oWFN is invoked and run without any error, the
+@c When BPEL2oWFN is invoked and run without any error, the
 @c exit value is 0.
 
 
 @c Please report the occurrence of any exception with numbers 30--50
-@c since it indicates a bug in GNU BPEL2oWFN we would like to fix
+@c since it indicates a bug in BPEL2oWFN we would like to fix
 @c immediately (see @ref{Reporting Bugs}).
 
 
@@ -725,6 +725,7 @@ An @code{<opaqueActivity>} of an abstract process was replaced by an
 In this chapter, we show how a @acronym{BPEL} process can be translated to a Petri net model an then exported to several output file formats. Consider the following simple @acronym{BPEL} process @file{example.bpel}:
 
 @smallexample
+
 <process name="exampleprocess" targetNamespace="www.gnu.org/software/bpel2owfn">
   <partnerLinks>
     <partnerLink name="PL" partnerLinkType="PLT"
@@ -736,9 +737,10 @@ In this chapter, we show how a @acronym{BPEL} process can be translated to a Pet
     <reply partnerLink="PL" operation="ack" />
   </sequence>
 </process>
+
 @end smallexample
 
-This process just waits for a message @samp{req} on partner link @samp{PL} and replies to this message with @samp{ack} on the same partner link. To parse this @acronym{BPEL} process, GNU BPEL2oWFN has to be invoked with
+This process just waits for a message @samp{req} on partner link @samp{PL} and replies to this message with @samp{ack} on the same partner link. To parse this @acronym{BPEL} process, BPEL2oWFN has to be invoked with
 
 @cartouche
 @smallexample
@@ -746,17 +748,35 @@ bpel2owfn -i example.bpel
 @end smallexample
 @end cartouche
 
-which responds with a statistical output:
+which responds with the output:
 
 @smallexample
-6 activities (4 basic, 2 structured, 0 scopes)
-0 user-defined handlers (0 FH, 0 TH, 0 CH, 0 EH)
+
+==============================================================================
+GNU BPEL2oWFN 2.0.0 reading from file `example.bpel'
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+3 activities (2 basic, 1 structured, 0 scopes) + 3 implicit activities
+0 handlers (0 FH, 0 TH, 0 CH, 0 EH) + 1 implicit handlers
 0 links, 0 variables
+
+[SYNTAX ANALYSIS] No syntax errors found.
+[STATIC ANALYSIS] No errors found checking 44 statics analysis requirements.
+[OTHER ANALYSIS]  No other errors found.
+------------------------------------------------------------------------------
+
 @end smallexample
 
-This means, the process consists of six activities (four basic activities and two structured activities), no handlers, no links and no variables. Obviously, the given process has only one structured actvity (the @code{<sequence>}) and two structured activities (the @code{<receive>} and @code{<reply>} activity). So where are the additional activities come from?
+This means, the process consists of three activities (two basic activities and
+one structured activities), no handlers, no links and no variables. On the
+bottom the analysis results are summarized: no syntactic, static, or other
+error was found.
 
-The @acronym{BPEL} specification describes several implicit transformations of the input process, as well as standard fault, termination and compensation handlers. In the considered @acronym{BPEL} process, no fault handlers are specified. Thus, a standard fault handler is added by GNU BPEL2oWFN:
+Furthermore, three ``implicit'' activities are counted: The @acronym{WS-BPEL}
+specification describes several implicit transformations of the input process,
+as well as standard fault, termination and compensation handlers. In the
+considered @acronym{BPEL} process, no fault handlers are specified. Thus, a
+standard fault handler is added by BPEL2oWFN:
 
 @smallexample
 <faultHandlers>
@@ -769,7 +789,7 @@ The @acronym{BPEL} specification describes several implicit transformations of t
 </faultHandlers>
 @end smallexample
 
-To see how the @acronym{BPEL} process looks like after applying the transformation rules and adding the standard handlers, GNU BPEL2oWFN output the manipulated process using its pretty-printer:
+To see how the @acronym{BPEL} process looks like after applying the transformation rules and adding the standard handlers, BPEL2oWFN output the manipulated process using its pretty-printer:
 
 @cartouche
 @smallexample
@@ -780,6 +800,7 @@ bpel2owfn -i example.bpel -m pretty
 The manipulated process looks like this:
 
 @smallexample
+
 <process id="1" abstractProcess="no" exitOnStandardFault="no" name="exampleprocess"
  suppressJoinFailure="no" targetNamespace="www.gnu.org/software/bpel2owfn">
   <partnerLinks>
@@ -804,6 +825,7 @@ The manipulated process looks like this:
     </reply>
   </sequence>
 </process>
+
 @end smallexample
 
 Each activity is printed together with its attributes. Note that the standard values of several attributes (e.g., @samp{abstractProcess} or @samp{suppressJoinFailure}) are added. Furthermore, an identifier (attribute @samp{id}) was added to every activity.
@@ -816,13 +838,13 @@ bpel2owfn -i example.bpel -m petrinet -p communicationonly
 @end smallexample
 @end cartouche
 
-GNU BPEL2oWFN now also displays statistics of the generated Petri net model:
+BPEL2oWFN now also displays statistics of the generated Petri net model:
 
 @smallexample
 |P|=5, |P_in|= 1, |P_out|= 1, |T|=2, |F|=6
 @end smallexample
 
-The generated Petri net model consists of five places, including one input and one output place, two transitions and six arcs. To create a graphical representation, invoke GNU BPEL2oWFN with the following options:
+The generated Petri net model consists of five places, including one input and one output place, two transitions and six arcs. To create a graphical representation, invoke BPEL2oWFN with the following options:
 
 @cartouche
 @smallexample
@@ -830,13 +852,13 @@ bpel2owfn -i example.bpel -m petrinet -p communicationonly -f dot -o
 @end smallexample
 @end cartouche
 
-This command creates a file @file{example.dot}, containing a Graphviz dot representation of the Petri net, and---if the @code{dot} tool was found in the search path---a @acronym{PNG, Portable Network Graphics} an image file @file{example.png}. The latter looks like this:
+This command creates a file @file{example.dot}, containing a Graphviz dot representation of the Petri net, and---if the @code{dot} tool was found in the search path---a @acronym{PNG, Portable Network Graphics} an image file @file{example.png}. The latter looks like this:@*
 
 @iftex
-@image{images/example,,2.0in}
+@center @image{images/example,,2.0in}
 @end iftex
 @ifhtml
-@image{images/example}
+@center @image{images/example}
 @end ifhtml
 
 The graphic depicts the generated open workflow net. The inner of the net, that is, all nodes except the interface places, are depicted inside the dashed box, whereas the interface is depicted outside the frame. Input places and all connected transitions are colored orange. Similarly, output places and connected transitions are colored yellow. Gray places belong to the final marking, that is, the marking [@b{p3}] is the final marking of the @acronym{oWFN}.
@@ -854,6 +876,7 @@ bpel2owfn -i example.bpel -m petrinet -p communicationonly -f info
 displays an information file, consisting of all the Petri net nodes' roles.
 
 @smallexample
+
 PLACES:
 ID      TYPE            ROLES
 p1      internal        1.internal.initial
@@ -877,6 +900,7 @@ TRANSITIONS:
 ID      ROLES
 t1      8.internal.receive
 t2      9.internal.reply
+
 @end smallexample
 
 This file has to be read as follows: the place @samp{p1} has the type internal (i.e., is not connected with an interface place) and has the roles @samp{1.internal.initial}, @samp{7.initial}, @samp{7.internal.initial}, @samp{8.initial}, and @samp{8.internal.initial}. While the prefix of each role is the identifier of an activity (@samp{1} for the @code{<process>}, @samp{7} for the @code{<sequence>}, and @samp{8} for the @code{<receive>}), the suffix specifies the role inside the respective pattenr. Without going too much into details, @samp{1.internal.initial} is the role of the initial place of the pattern for the @code{<process>}, whereas, for example @samp{7.internal.final} is the final place of the @code{<sequence>}'s pattern. Similarly, roles of transitions are specified. Multiple roles of a single place arise due to the merging of distinct places during the composition of the several patterns.
@@ -892,8 +916,9 @@ bpel2owfn -i example.bpel -m petrinet -p communicationonly -f ownf -o
 which creates a file @file{example.owfn}:
 
 @smallexample
+
 @{
-  generated by: GNU BPEL2oWFN 2.0.0
+  generated by: BPEL2oWFN 2.0.0
   input file:   `example.bpel' (process `exampleprocess')
   invocation:   `bpel2owfn -i example.bpel -m petrinet -p communicationonly -f owfn'
   net size:     |P|=5, |P_in|= 1, |P_out|= 1, |T|=2, |F|=6
@@ -927,8 +952,13 @@ TRANSITION t2 @{ output @}
 
 
 @{ END OF FILE `example.owfn' @}
+
 @end smallexample
 
+
+This is finally the @acronym{oWFN} model of the @acronym{BPEL} process that
+can be analyzed by Fiona@footnote{Fiona is available at
+@url{http://www.informatik.hu-berlin.de/top/tools4bpel}.}.
 
 
 
@@ -941,7 +971,7 @@ TRANSITION t2 @{ output @}
 
 @node Petri Net Patterns
 @chapter Petri Net Patterns
-In version @value{VERSION} of GNU BPEL2oWFN the following Petri net
+In version @value{VERSION} of BPEL2oWFN the following Petri net
 patterns are implemented:
 
 
@@ -1094,7 +1124,7 @@ control flow and helps to find unwanted deadlocks occurring due
 wrong modeling. If, for example, the links of a process model are
 cyclic the generated Petri net will deadlock.
 
-In future versions of GNU BPEL2oWFN these found deadlocks
+In future versions of BPEL2oWFN these found deadlocks
 shall be mapped back into the @acronym{BPEL} code to highlight the
 ``unreasonable'' activities (i.e.@: a cycle-closing link).
 
@@ -1127,7 +1157,7 @@ are simply ignored during parsing.
 Currently implemented Petri net-specific functions:
 @section Structural Simplification
 
-GNU BPEL2oWFN implements the following structural reduction rules:
+BPEL2oWFN implements the following structural reduction rules:
 
 @c @float
 @c @center @noindent @image{images/ra1,,1.2in}@ @ @ @ @ @ @ @ @ @ @image{images/rb1,,1.2in}
@@ -1150,7 +1180,7 @@ removed.
 @end itemize
 
 These structural reduction rules are implemented in the command-line option
-@samp{--parameter=simplify}, see @ref{Invoking GNU BPEL2oWFN}). To acheive a
+@samp{--parameter=simplify}, see @ref{Invoking BPEL2oWFN}). To acheive a
 better reduction, combine the parameter with @samp{--parameter=novarialbles}.
 
 
@@ -1164,7 +1194,7 @@ communicational behavior is used in all Petri net output formats
 except @acronym{oWFN} (@samp{--format=owfn}).
 
 @item The original Petri net semantics [Sta05] consists of high-level
-Petri net patterns. However, the models generated from GNU BPEL2oWFN
+Petri net patterns. However, the models generated from BPEL2oWFN
 abstract from data. Therefore all transition guards, arc inscriptions
 and arc types were ``converted'' to low-level constructs: all
 transition guards and arc inscriptions were removed (decisions are
@@ -1207,12 +1237,12 @@ alarm event handler or a @code{<wait>} activity.
 BPEL2oWFN uses Flex and Bison to implement the parser. We decided do not use an
 off-the-shelf @acronym{XML} parser generator as we did not found a suitable
 platform-independed parser generator whose license was @i{compatible} to the
-@acronym{GNU} @acronym{GPL, General Public License}. Furthermore, we use the
+GNU @acronym{GPL, General Public License}. Furthermore, we use the
 term generator Kimwitu++ to describe and process the
 @acronym{AST, abstract syntax tree}, and the trio Flex/Bison/Kimwitu++
 integrates seamlessly. Though the grammar has to be given manually, the
 generated parser is very flexible as it allows to process @acronym{BPEL4WS} 1.1,
-@acronym{WS-BPEL} 2.0, and to some extend @acronym{BPEL4WS} 1.0 process.
+@acronym{WS-BPEL} 2.0, and to some extend @acronym{BPEL4WS} 1.0 processes.
 
 However, the parser does not support @acronym{XML} namspaces. To
 this end, @acronym{BPEL} constructs are only recognized if the are either
@@ -1238,17 +1268,17 @@ it stubbornly follows the @acronym{WS-BPEL} specification.
 @item @b{Why @acronym{LoLA} does not accept the generated files and reports parse
 errors in the first line?}
 
-This problem occurs using a pre-compiled windows version of GNU BPEL2oWFN.
+This problem occurs using a pre-compiled windows version of BPEL2oWFN.
 The generated files are in Windows format, yet @acronym{LoLA} only supports
 files in Unix format. To overcome this limitation of @acronym{LoLA}, use a
-tool like @samp{dos2unix} or change the file format in an editor like @code{vi}.
+tool like @samp{dos2unix} or change the file format in an editor like @samp{vi}.
 
 @end itemize
 
 
 @section Known Bugs
 
-Though this is the second major release version of GNU BPEL2oWFN, it might
+Though this is the second major release version of BPEL2oWFN, it might
 still contain poorly tested, unefficient code.
 
 
@@ -1275,14 +1305,14 @@ occurrence.
 @anchor{Reporting Bugs}
 @section Reporting Bugs
 
-If you find a bug in GNU BPEL2oWFN or have a question, please first check that
+If you find a bug in BPEL2oWFN or have a question, please first check that
 it is not a known bug or a frequently asked question listed in above. Otherwise, 
 please send us an email to @email{bug-bpel2owfn@@gnu.org}. Include the version
 number which you can find by running @samp{bpel2owfn --version}. Also include in
 your message the input @acronym{BPEL} process and the output that the program
 produced. We will try to answer your mail within a week.
 
-If you have other questions, comments or suggestions about GNU BPEL2oWFN,
+If you have other questions, comments or suggestions about BPEL2oWFN,
 contact us via electronic mail to @email{nlohmann@@informatik.hu-berlin.de}.
 
 
@@ -1301,6 +1331,9 @@ Unter den Linden 6@*
 
 @itemx E-mail
 @email{nlohmann@@informatik.hu-berlin.de}
+
+@itemx Skype
+nlohmann
 
 @itemx Phone
 (+49) (30) 2093-3070
@@ -1329,11 +1362,11 @@ BPEL2oWFN.
 @node Future Work
 @chapter Future Work
 
-For future releases of GNU BPEL2oWFN the following features are planned:
+For future releases of BPEL2oWFN the following features are planned:
 
 @itemize
 
-@c @item @b{Flexible model generation}. Originally, GNU BPEL2oWFN
+@c @item @b{Flexible model generation}. Originally, BPEL2oWFN
 @c was designed to support flexible model generation, i.e.@: finding the
 @c most abstract (thus smallest) model capable to check a given
 @c property. With static analysis we hope to generate the smallest
@@ -1367,12 +1400,12 @@ list the nodes of the generated net. To help the retranslation of Petri
 net-specific properties to the input process the generated files have
 to be more detailed. The integration of a symbol table is currently
 in pre-beta state and should be finished in the next version of
-GNU BPEL2oWFN.
+BPEL2oWFN.
 
 @item @b{Support for @acronym{WS-BPEL}}. The specification of
 @acronym{WS-BPEL, Web Service Business Process Execution Language}
 version 2.0 is in its final phase. As soon as the standardization is
-completed, @acronym{WS-BPEL} can be supported by GNU BPEL2oWFN
+completed, @acronym{WS-BPEL} can be supported by BPEL2oWFN
 by overworking the grammar and adding appropriate patterns to the
 pattern database.
 

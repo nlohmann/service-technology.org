@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/19 14:10:59 $ by $Author: nielslohmann $.
-# Version $Revision: 1.18 $
+# File last changed $Date: 2007/04/20 10:33:12 $ by $Author: nielslohmann $.
+# Version $Revision: 1.19 $
 
 TESTS = test1 test2 test3 test4 test5
 
@@ -37,7 +37,8 @@ CLEANFILES = $(BPEL_PROCESSES:.bpel=.info) \
 	     *.dot \
 	     *.owfn \
 	     *.png \
-	     bpel2owfn.exe.stackdump
+	     bpel2owfn.exe.stackdump \
+	     core
 	     
 EXTRA_DIST = $(TESTS) \
 	     testfiles \

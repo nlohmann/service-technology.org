@@ -1,20 +1,20 @@
-BEGIN OF README file for GNU BPEL2oWFN Version 2.0.0
+BEGIN OF README file for BPEL2oWFN Version 2.0.0
 
 About this Distribution
 ***********************
 
-This file describes this distribution of GNU BPEL2oWFN, version 2.0.0,
-a tool translating business processes described in BPEL to open
-workflow nets (oWFN), last updated 22 March 2007.
+This file describes this distribution of BPEL2oWFN, version 2.0.0, a
+tool translating business processes described in BPEL to open workflow
+nets (oWFN), last updated 20 April 2007.
 
-GNU BPEL2oWFN is licensed under the GNU General Public License.
+BPEL2oWFN is licensed under the GNU General Public License.
 
 Copyright (C) 2006, 2007 Niels Lohmann, Christian Gierds, and Martin
 Znamirowski.
 
 Copyright (C) 2005 Niels Lohmann and Christian Gierds.
 
-GNU BPEL2oWFN is part of the Tools4BPEL project funded by the
+BPEL2oWFN is part of the Tools4BPEL project funded by the
 Bundesministerium fu"r Bildung und Forschung. See
 `http://www.informatik.hu-berlin.de/top/tools4bpel' for details.
 
@@ -25,23 +25,23 @@ Files
 =====
 
 `AUTHORS'
-     A list of the authors of GNU BPEL2oWFN, acknowledgements, and a
-     contact address.
+     A list of the authors of BPEL2oWFN, acknowledgements, and a contact
+     address.
 
 `ChangeLog'
      The change log listing all changes made during the distribution
-     versions of GNU BPEL2oWFN.
+     versions of BPEL2oWFN.
 
 `COPYING'
-     The GNU General Public License (GPL) under which GNU BPEL2oWFN is
+     The GNU General Public License (GPL) under which BPEL2oWFN is
      distributed.
 
 `INSTALL'
      Setup and Installation instructions and all information needed to
-     bootstrap GNU BPEL2oWFN.
+     bootstrap BPEL2oWFN.
 
 `NEWS'
-     News concerning the most recent version of GNU BPEL2oWFN.
+     News concerning the most recent version of BPEL2oWFN.
 
 `README'
      This file.
@@ -55,18 +55,18 @@ Directories
 ===========
 
 `src'
-     The sources of GNU BPEL2oWFN. Each file contains a short
-     documentation of what it does as well as Doxygen-styled comments
-     (see `http://www.stack.nl/~dimitri/doxygen' for details).
+     The sources of BPEL2oWFN. Each file contains a short documentation
+     of what it does as well as Doxygen-styled comments (see
+     `http://www.stack.nl/~dimitri/doxygen' for details).
 
 `doc'
-     The documentation of GNU BPEL2oWFN consisting of a manual and an
+     The documentation of BPEL2oWFN consisting of a manual and an
      installation manual. The documentation is in Texinfo format and
      can be converted into many file formats using `make FORMAT' where
      `FORMAT' is a file format out of `dvi', `html', `pdf' or `ps'.
 
 `tests'
-     Several test processes to self-test GNU BPEL2oWFN. The processes
+     Several test processes to self-test BPEL2oWFN. The processes
      `loan.bpel', `purchase.bpel' and `shipping.bpel' were taken from
      the BPEL4WS 1.1 specification.
 
@@ -82,4 +82,4 @@ Copyright (C) 2005, 2006, 2007 Niels Lohmann
 See `http://www.gnu.org/software/bpel2owfn' or the User's Manual for
 more information.
 
-END OF README file for GNU BPEL2oWFN Version 2.0.0
+END OF README file for BPEL2oWFN Version 2.0.0

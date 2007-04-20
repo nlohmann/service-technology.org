@@ -58,17 +58,6 @@ private:
 
 public:
     /**
-     * Reserved literal TAU is used for edges in OGs denoting internal steps.
-     */
-    static const std::string TAU;
-
-    /**
-     * Reserved literal FINAL is used notations of nodes in OGs to denote
-     * possible final states.
-     */
-    static const std::string FINAL;
-
-    /**
      * Sets the given literal to the given truth value within this
      * CommGraphFormulaAssignment.
      * @param literal Literal whose truth value should be set.
@@ -147,16 +136,28 @@ public:
  * multiary disjunction.
  */
 class CommGraphFormulaMultiary : public CommGraphFormula {
-private:
+public:
     /**
      * Type of the container holding all subformula of this multiary formula.
      */
     typedef std::set<CommGraphFormula*> subFormulas_t;
 
     /**
+     * Type of the iterator over subformulas.
+     */
+    typedef subFormulas_t::iterator iterator;
+
+    /**
+     * Type of the const iterator over subformulas.
+     */
+    typedef subFormulas_t::const_iterator const_iterator;
+
+private:
+    /**
      * Holds all subformulas of this multiary formula.
      */
     subFormulas_t subFormulas;
+
 public:
     CommGraphFormulaMultiary();
     /**
@@ -202,12 +203,37 @@ public:
      * CommGraphFormulaMultiaryAnd and CommGraphFormulaMultiaryOr in a single
      * method here.
      */
-	virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const = 0;
-	
-	void addSubFormula(CommGraphFormula* subformula);
-	virtual void removeLiteral(const std::string&);
+    virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const = 0;
+
+    void addSubFormula(CommGraphFormula* subformula);
+    virtual void removeLiteral(const std::string&);
     void deepCopyMultiaryPrivateMembersToNewFormula(
         CommGraphFormulaMultiary* newFormula) const;
+
+    /**
+     * Returns an iterator to the first subformula.
+     */
+    iterator begin();
+
+    /**
+     * Returns an iterator to the first subformula.
+     */
+    const_iterator begin() const;
+
+    /**
+     * Returns an iterator to one past the last subformula.
+     */
+    iterator end();
+
+    /**
+     * Returns an iterator to one past the last subformula.
+     */
+    const_iterator end() const;
+
+    /**
+     * Returns true iff this formula has no subformulas.
+     */
+    bool empty() const;
 };
 
 
@@ -287,17 +313,55 @@ public:
 
 
 /**
+ * A literal within a CommGraphFormula.
+ */
+class CommGraphFormulaLiteral : public CommGraphFormula {
+private:
+    /** The string representation of this literal. */
+    std::string literal;
+public:
+    /**
+     * Reserved literal TAU is used for edges in OGs denoting internal steps.
+     */
+    static const std::string TAU;
+
+    /**
+     * Reserved literal FINAL is used notations of nodes in OGs to denote
+     * possible final states.
+     */
+    static const std::string FINAL;
+
+    /**
+     * Reserved literal TRUE is used for the value 'true'.
+     */
+    static const std::string TRUE;
+
+    /**
+     * Reserved literal FALSE is used for the value 'false'.
+     */
+    static const std::string FALSE;
+
+    /**
+     * Constructs a literal with the given string representation.
+     * @param literal String representation of this literal.
+     */
+    CommGraphFormulaLiteral(const std::string& literal);
+    virtual CommGraphFormulaLiteral* getDeepCopy() const;
+    virtual ~CommGraphFormulaLiteral() {};
+    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
+    virtual std::string asString() const;
+};
+
+
+/**
  * Base class for all formulas that have a fixed value, i.e., a value that does
  * not depend on an assignment. This class exists, because CommGraphFormulaTrue
  * and CommGraphFormulaFalse need a common base class, so we can use them to
  * implement CommGraphFormulaMultiary::value() uniformly for all multiary
  * formulas.
  */
-class CommGraphFormulaFixed : public CommGraphFormula {
+class CommGraphFormulaFixed : public CommGraphFormulaLiteral {
 private:
-    /** String representation of this CommGraphFormulaFixed. */
-    std::string _asString;
-
     /** Fixed truth value of this CommGraphFormulaFixed. */
     bool _value;
 public:
@@ -313,7 +377,6 @@ public:
     /* Destroys this CommGraphFormulaFixed. */
     virtual ~CommGraphFormulaFixed() {};
     virtual bool value(const CommGraphFormulaAssignment& assignment) const;
-    virtual std::string asString() const;
 };
 
 
@@ -338,43 +401,9 @@ public:
 
 
 /**
- * A literal within a CommGraphFormula.
- */
-class CommGraphFormulaLiteral : public CommGraphFormula {
-private:
-    /** The string representation of this literal. */
-    std::string literal;
-public:
-	/**
-     * Reserved literal TAU is used for edges in OGs denoting internal steps.
-     */
-    static const std::string TAU_L;
-
-    /**
-     * Reserved literal FINAL is used notations of nodes in OGs to denote
-     * possible final states.
-     */
-    static const std::string FINAL_L;
-
-    /**
-     * Constructs a literal with the given string representation.
-     * @param literal String representation of this literal.
-     */
-    CommGraphFormulaLiteral(const std::string& literal);
-    virtual CommGraphFormulaLiteral* getDeepCopy() const;
-    virtual ~CommGraphFormulaLiteral() {};
-    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
-    virtual std::string asString() const;
-};
-
-
-/**
  * A special literal FINAL.
  */
 class CommGraphFormulaLiteralFinal : public CommGraphFormulaLiteral {
-private:
-    /** The string representation of this literal. */
-//    std::string literal;
 public:
     /**
      * Constructs a literal with the given string representation.
@@ -382,8 +411,6 @@ public:
      */
     CommGraphFormulaLiteralFinal();
     virtual ~CommGraphFormulaLiteralFinal() {};
-//    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
-//    virtual std::string asString() const;
 };
 
 
@@ -391,9 +418,6 @@ public:
  * A special literal TAU.
  */
 class CommGraphFormulaLiteralTau : public CommGraphFormulaLiteral {
-private:
-    /** The string representation of this literal. */
-//    std::string literal;
 public:
     /**
      * Constructs a literal with the given string representation.
@@ -401,7 +425,5 @@ public:
      */
     CommGraphFormulaLiteralTau();
     virtual ~CommGraphFormulaLiteralTau() {};
-//    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
-//    virtual std::string asString() const;
 };
 #endif

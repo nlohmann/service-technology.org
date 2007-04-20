@@ -58,7 +58,7 @@ unsigned int AdjacentPlace::getMultiplicity() const
 
 owfnTransition::owfnTransition(const std::string& name) :
     Node(name),
-    labelForMatching(CommGraphFormulaAssignment::TAU),
+    labelForMatching(CommGraphFormulaLiteral::TAU),
     isEnabled_(false),
     isQuasiEnabled_(false),
     quasiEnabledNr(0),
@@ -517,5 +517,5 @@ std::string owfnTransition::getLabelForMatching() const
 
 bool owfnTransition::hasNonTauLabelForMatching() const
 {
-    return getLabelForMatching() != CommGraphFormulaAssignment::TAU;
+    return getLabelForMatching() != CommGraphFormulaLiteral::TAU;
 }

@@ -208,7 +208,7 @@ CommGraphFormulaAssignment* OGFromFileNode::getAssignment() const {
 	}
 	
 	// we assume that literal final is always true
-	myassignment->setToTrue(CommGraphFormulaAssignment::FINAL);
+	myassignment->setToTrue(CommGraphFormulaLiteral::FINAL);
 	
 	return myassignment;
 }

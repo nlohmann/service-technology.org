@@ -367,7 +367,7 @@ CommGraphFormulaAssignment* vertex::getAssignment() {
 	
 	// only if node has final state, set assignment of literal final to true
 	if (this->hasFinalStateInStateSet == true) {
-		myassignment->setToTrue(CommGraphFormulaAssignment::FINAL);
+		myassignment->setToTrue(CommGraphFormulaLiteral::FINAL);
 	}
 	
 	//cout << "ende" << endl;

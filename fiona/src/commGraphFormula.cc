@@ -40,10 +40,10 @@
 using namespace std;
 
 
-const std::string CommGraphFormulaAssignment::FINAL = std::string("final");
-const std::string CommGraphFormulaAssignment::TAU = std::string("tau");
-const std::string CommGraphFormulaLiteral::FINAL_L = std::string("final");
-const std::string CommGraphFormulaLiteral::TAU_L = std::string("tau");
+const std::string CommGraphFormulaLiteral::FINAL = std::string("final");
+const std::string CommGraphFormulaLiteral::TAU = std::string("tau");
+const std::string CommGraphFormulaLiteral::TRUE = std::string("true");
+const std::string CommGraphFormulaLiteral::FALSE = std::string("false");
 
 
 void CommGraphFormulaAssignment::set(const std::string& literal, bool value) {
@@ -185,6 +185,31 @@ void CommGraphFormulaMultiary::deepCopyMultiaryPrivateMembersToNewFormula(
     }
 }
 
+CommGraphFormulaMultiary::iterator CommGraphFormulaMultiary::begin()
+{
+    return subFormulas.begin();
+}
+
+CommGraphFormulaMultiary::const_iterator CommGraphFormulaMultiary::begin() const
+{
+    return subFormulas.begin();
+}
+
+CommGraphFormulaMultiary::iterator CommGraphFormulaMultiary::end()
+{
+    return subFormulas.end();
+}
+
+CommGraphFormulaMultiary::const_iterator CommGraphFormulaMultiary::end() const
+{
+    return subFormulas.end();
+}
+
+bool CommGraphFormulaMultiary::empty() const
+{
+    return subFormulas.empty();
+}
+
 CommGraphFormulaMultiaryAnd::CommGraphFormulaMultiaryAnd() {
 }
 
@@ -291,14 +316,9 @@ void CNF_formula::addClause(CommGraphFormulaMultiaryOr* clause) {
 
 CommGraphFormulaFixed::CommGraphFormulaFixed(bool value,
     const std::string& asString) :
-    _asString(asString),
+    CommGraphFormulaLiteral(asString),
     _value(value)
 {
-}
-
-std::string CommGraphFormulaFixed::asString() const
-{
-    return _asString;
 }
 
 bool CommGraphFormulaFixed::value(const CommGraphFormulaAssignment&) const
@@ -312,12 +332,12 @@ CommGraphFormulaFixed* CommGraphFormulaFixed::getDeepCopy() const
 }
 
 CommGraphFormulaTrue::CommGraphFormulaTrue() :
-    CommGraphFormulaFixed(true, "true")
+    CommGraphFormulaFixed(true, CommGraphFormulaLiteral::TRUE)
 {
 }
 
 CommGraphFormulaFalse::CommGraphFormulaFalse() :
-    CommGraphFormulaFixed(false, "false")
+    CommGraphFormulaFixed(false, CommGraphFormulaLiteral::FALSE)
 {
 }
 
@@ -344,13 +364,13 @@ std::string CommGraphFormulaLiteral::asString() const
 
 
 CommGraphFormulaLiteralFinal::CommGraphFormulaLiteralFinal() :
-    CommGraphFormulaLiteral(CommGraphFormulaLiteral::FINAL_L)
+    CommGraphFormulaLiteral(CommGraphFormulaLiteral::FINAL)
 {
 }
 
 
 CommGraphFormulaLiteralTau::CommGraphFormulaLiteralTau() :
-    CommGraphFormulaLiteral(CommGraphFormulaLiteral::TAU_L)
+    CommGraphFormulaLiteral(CommGraphFormulaLiteral::TAU)
 {
 }
 

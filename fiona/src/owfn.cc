@@ -2211,7 +2211,7 @@ CommGraphFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const State
     }
 
     if (isFinal()) {
-        assignment.setToTrue(CommGraphFormulaAssignment::FINAL);
+        assignment.setToTrue(CommGraphFormulaLiteral::FINAL);
     }
 
     return assignment;

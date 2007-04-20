@@ -96,7 +96,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 
 	// get the annotation of the node (CNF) as formula
 	computeCNF(currentNode);
-	computeCNFformula(currentNode);
 
 	trace(TRACE_1, "=================================================================\n");
 
@@ -189,7 +188,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 
 	for (unsigned int j = 0; j < PN->getInputPlaceCount(); j++) {
 		//cout << PN->getInputPlace(j)->name << endl;
-		testAssignment->setToTrue('!' + PN->getInputPlace(j)->name);
+		testAssignment->setToTrue(PN->getInputPlace(j)->getLabelForCommGraph());
 	}
 
 	if (currentNode->getCNF_formula()->value(*testAssignment) == false) {
@@ -275,88 +274,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 }
 
 
-//! \fn void operatingGuidelines::computeCNF(vertex * node)
-//! \param node the node for which the annotation is calculated
-//! \brief calculates the annotation (CNF) for the node
-void operatingGuidelines::computeCNF(vertex* node) {
-	
-	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): start\n");
-	
-	// initially, the annoation is empty (and therefore equivalent to true)
-	assert(node->getAnnotation() == NULL);
-	
-	StateSet::iterator iter;			// iterator over the states of the node
-	
-	if (options[O_CALC_ALL_STATES]) {
-	// NO state reduction
-		
-		// iterate over all states of the node
-		for (iter = node->reachGraphStateSet.begin();
-			 iter != node->reachGraphStateSet.end(); iter++) {
-			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
-				// we just consider the maximal states only
-				
-				// get the marking of this state
-				(*iter)->decodeShowOnly(PN);
-
-				// this clause's first literal
-				literal * myFirstLiteral = new literal();
-
-				// get all input events
-				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
-					myFirstLiteral->addLiteral(PN->getInputPlace(i)->name);
-				}
-				
-				// get all activated output events
-				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-						myFirstLiteral->addLiteral(PN->getOutputPlace(i)->name);
-					}
-				}
-
-				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
-			}
-		}
-	} else {
-	// WITH state reduction
-
-		// iterate over all states of the node
-		for (iter = PN->setOfStatesTemp.begin();
-			 iter != PN->setOfStatesTemp.end(); iter++) {
-			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
-				// we just consider the maximal states only
-				
-				// get the marking of this state
-				(*iter)->decodeShowOnly(PN);
-							
-				// this clause's first literal
-				literal * myFirstLiteral = new literal();
-				
-				// get all the input events
-				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
-					myFirstLiteral->addLiteral(PN->getInputPlace(i)->name);
-				}
-
-				// get the activated output events
-				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-						myFirstLiteral->addLiteral(PN->getOutputPlace(i)->name);
-					}
-				}
-
-				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
-			}
-		}
-	}
-
-	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): end\n");
-}
-
-
-//! \fn void operatingGuidelines::computeCNF(vertex * node)
-//! \param node the node for which the annotation is calculated
-//! \brief calculates the annotation (CNF) for the node
-void operatingGuidelines::computeCNFformula(vertex* node) {
+void operatingGuidelines::computeCNF(vertex* node) const {
 	
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): start\n");
 	
@@ -391,14 +309,14 @@ void operatingGuidelines::computeCNFformula(vertex* node) {
 				
 				// get all input events
 				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
-					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->getInputPlace(i)->name);
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
 					myclause->addSubFormula(myliteral);
 				}
 				
 				// get all activated output events
 				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
 					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('?' + PN->getOutputPlace(i)->name);
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
 						myclause->addSubFormula(myliteral);
 					}
 				}
@@ -433,14 +351,14 @@ void operatingGuidelines::computeCNFformula(vertex* node) {
 				
 				// get all the input events
 				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
-					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('!' + PN->getInputPlace(i)->name);
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
 					myclause->addSubFormula(myliteral);
 				}
 
 				// get the activated output events
 				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
 					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral('?' + PN->getOutputPlace(i)->name);
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
 						myclause->addSubFormula(myliteral);
 					}
 				}
@@ -573,8 +491,7 @@ void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
         }
 
         os << "  " << NodeNameForOG(v) << " -> " << NodeNameForOG(vNext);
-        string labelPrefix = (edge->getType() == receiving) ? "?" : "!";
-        os << " : " << labelPrefix << edge->getLabel();
+        os << " : " << edge->getLabel();
 
         // do not process nodes already visited
         if (visitedNodes[vNext->getNumber()])

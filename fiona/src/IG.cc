@@ -358,7 +358,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 					 	input.insert(*index);
 						
 						inputMessages.insert(input);
-						cl->addLiteral(PN->getPlace(*index)->name);
+						cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
 						
 			//			cout << "\t" << PN->getPlace(*index)->name << endl;
 					}
@@ -372,7 +372,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 						output.insert(i);
 						
 						outputMessages.insert(output);
-						cl->addLiteral(PN->getPlace(i)->name);	
+						cl->addLiteral(PN->getPlace(i)->getLabelForCommGraph());	
 					}	
 				}
 				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
@@ -401,7 +401,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 						input.insert(*index);
 						
 						inputMessages.insert(input);
-						cl->addLiteral(PN->getPlace(*index)->name);
+						cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
 				//		cout << "\t" << PN->getPlace(*index)->name << endl;
 					}
 					i++;
@@ -413,7 +413,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 						output.insert(i);
 						
 						outputMessages.insert(output);
-						cl->addLiteral(PN->getPlace(i)->name);	
+						cl->addLiteral(PN->getPlace(i)->getLabelForCommGraph());	
 					}	
 				}
 				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
@@ -474,7 +474,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 					
 					inputMessages.insert(input);
 					
-					cl->addLiteral(PN->getPlace(*index)->name);
+					cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
 				}
 				i++;
 			}			
@@ -593,7 +593,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 					
 					inputMessages.insert(input);
 					
-					cl->addLiteral(PN->getPlace(*index)->name);
+					cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
 				}
 				i++;
 			}			
@@ -734,7 +734,7 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 					
 					inputMessages.insert(input);
 					
-					cl->addLiteral(PN->getPlace(*index)->name);
+					cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
 				}
 				i++;
 			}

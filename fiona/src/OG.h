@@ -44,6 +44,13 @@ class oWFN;
 
 class operatingGuidelines : public communicationGraph {
 	
+	private:
+		/**
+		 * @param node the node for which the annotation is calculated
+		 * @brief calculates the annotation (CNF) for the node
+		 */
+		void computeCNF(vertex *) const;
+
 	public:
 		operatingGuidelines(oWFN *);
 		~operatingGuidelines();
@@ -52,9 +59,6 @@ class operatingGuidelines : public communicationGraph {
 
     	void buildGraph(vertex *, double);
 		
-    	void computeCNF(vertex *);
-    	void computeCNFformula(vertex *);
-
 		void convertToBdd();
 		
         /** Prints graph in OG output format. Should only be called if the graph

@@ -225,7 +225,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             if (comma) {
               label += ", ";
             }
-           	label += string(PN->getPlace(*iter)->name);
+            label += PN->getPlace(*iter)->getLabelForCommGraph();
             comma = true;
             
             unsigned int i = 0;
@@ -315,9 +315,9 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
     
     string edgeLabel;
     if (type == sending) {
-        edgeLabel = PN->getInputPlace(label)->name;
+        edgeLabel = PN->getInputPlace(label)->getLabelForCommGraph();
     } else {
-        edgeLabel = PN->getOutputPlace(label)->name;
+        edgeLabel = PN->getOutputPlace(label)->getLabelForCommGraph();
 	}
 
 //	if (options[O_BDD] == true || isnew) {
@@ -394,8 +394,7 @@ void communicationGraph::analyseNode(vertex* node) {
 
 	vertexColor analysedColor;
 
-	if (false) {
-//	if (parameters[P_OG]) {
+	if (parameters[P_OG]) {
 		// analyse node by its formula
 		analysedColor = node->analyseNodeByFormula();
 	} else {
@@ -939,13 +938,8 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
         if (!vNext->isToShow(root))
             continue;
 
-        if (element->getType() == receiving) {
-            label = "?";
-        } else {
-            label = "!";
-        }
         os << "p" << v->getNumber() << "->" << "p" << vNext->getNumber()
-           << " [label=\"" << label << element->getLabel()
+           << " [label=\"" << element->getLabel()
            << "\", fontcolor=black, color=" << vNext->getColor().toString();
 
         if (vNext->getColor() == BLUE) {

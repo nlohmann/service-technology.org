@@ -149,7 +149,7 @@ void Exchangeability::loadBdd(char* filename){
     
     int nbrVarMp = 0;     //number of variables in bddMp
     
-    delete [] permids;
+    free(permids);
     permids = NULL;
     
     //load header of bddMp

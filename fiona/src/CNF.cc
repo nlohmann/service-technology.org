@@ -171,11 +171,6 @@ string literal::getClauseString() {
             if (comma) {
                 clauseString += " + ";
             }
-            if (currentLiteral->edge->getType() == sending) {
-                clauseString += "!";
-            } else {
-                clauseString += "?";
-            }
             clauseString += currentLiteral->edge->getLabel();
             comma = true;
         }

@@ -54,6 +54,8 @@ class owfnPlace : public Node {
 	  	~owfnPlace();
 
 		placeType type;		// type of place (input, output, internal, initial, final)  
+        std::string getLabelForCommGraph() const;
+        std::string getLabelForMatching() const;
 		
 		unsigned int initial_marking;
 	  	unsigned int hash_factor;

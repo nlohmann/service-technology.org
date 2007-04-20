@@ -488,9 +488,9 @@ transition: key_transition tname
 					"receives more than one message which is not allowed.";
 				owfn_yyerror(msg.c_str());
 			}
-			string labelForMatching = string("?") +
-				current->place->getPlace()->name;
-			T->setLabelForMatching(labelForMatching);
+			T->setLabelForMatching(
+			    current->place->getPlace()->getLabelForMatching());
+
 			continue;
 		}
 	/* gibt es Bogen schon? */
@@ -534,9 +534,9 @@ transition: key_transition tname
 					"receives more than one message which is not allowed.";
 				owfn_yyerror(msg.c_str());
 			}
-			string labelForMatching = string("!") +
-				current->place->getPlace()->name;
-			T->setLabelForMatching(labelForMatching);
+			T->setLabelForMatching(
+			    current->place->getPlace()->getLabelForMatching());
+
 			continue;
 		}
 		/* gibt es Bogen schon? */

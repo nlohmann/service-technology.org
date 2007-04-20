@@ -92,10 +92,14 @@ class BddRepresentation{
 		map<unsigned int, unsigned int> nodeMap;
 		BddLabelTab * labelTable;
 		
-		DdNode* labelToBddMp(const char* label);
+		/**
+		 * Returns the BDD of a label (given as integer).
+		 */
+		DdNode* labelToBddMp(const std::string& label);
+
 		DdNode* nodesToBddMp(unsigned int node1, unsigned int node2);
 		DdNode* annotationToBddAnn(vertex * v);
-		DdNode* CNFtoBddAnn(CNF * cl);
+		DdNode* clauseToBddAnn(const CommGraphFormulaMultiaryOr* cl);
 		unsigned int getBddNumber(unsigned int node);
 		void addBddVars(unsigned int max);	
 		BitVector numberToBin(unsigned int number, int cntBits);

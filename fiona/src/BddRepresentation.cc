@@ -61,7 +61,7 @@ struct cmp{
 BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic, unsigned int cntNodes, bool calcStates){
 	trace(TRACE_5, "BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic): begin\n");
 	
-	nbrLabels = numberOfLabels;
+	nbrLabels = numberOfLabels + 1;	//Labels + final
 	maxLabelBits = nbrBits(numberOfLabels-1);
 	maxNodeBits = 1;
 	maxNodeNumber = 0;  
@@ -103,9 +103,9 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
 	
 	//nodeMap.insert(make_pair(root->getNumber(), 0));
 	
-	labelTable = new BddLabelTab(2*nbrLabels);
+	labelTable = new BddLabelTab(2*(nbrLabels+1));
 	assert(PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= pow(double(2), double(sizeof(int)*8-1)) - 1); //PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= 2^31 -1
-	assert(nbrLabels ==  int(PN->getInputPlaceCount() + PN->getOutputPlaceCount()));
+	assert(nbrLabels == 1 + int(PN->getInputPlaceCount() + PN->getOutputPlaceCount())); //final + labels
 	
 /*	//for a unigue coding of the labels
 	list<char*> labelList;
@@ -141,13 +141,16 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
 	BddLabel * label;
 	for (unsigned int i = 0; i < PN->getInputPlaceCount(); ++i){
 		//cout << i << "  " << PN->getInputPlace(i)->name << endl;
-		label = new BddLabel(PN->getInputPlace(i)->name, i, labelTable);
+		label = new BddLabel(PN->getInputPlace(i)->getLabelForCommGraph(), i, labelTable);
 	}
 	
 	for (unsigned int i = 0; i < PN->getOutputPlaceCount(); ++i){
 		//cout << i + PN->getInputPlaceCount() << "  " << PN->getOutputPlace(i)->name << endl;
-		label = new BddLabel(PN->getOutputPlace(i)->name, i + PN->getInputPlaceCount(), labelTable);
+		label = new BddLabel(PN->getOutputPlace(i)->getLabelForCommGraph(), i + PN->getInputPlaceCount(), labelTable);
 	}
+	//add the variable "final" to the labelTable
+	//cout << PN->getOutputPlaceCount() + PN->getInputPlaceCount() << "  " << "final" << endl;
+	label = new BddLabel(CommGraphFormulaLiteral::FINAL, PN->getOutputPlaceCount() + PN->getInputPlaceCount(), labelTable);
 
 /*	BddLabel * temp;
 	for(unsigned int i = 0; i < labelTable->size;i++){
@@ -223,7 +226,7 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 					//cout << "edge: " << v->getNumber() << " [" << element->getLabel() << "> " << vNext->getNumber() << endl;
 
 					//label	
-					DdNode * label = labelToBddMp(element->getLabel().c_str()); 
+					DdNode * label = labelToBddMp(element->getLabel()); 
 		
 					//nodes 
 					DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
@@ -293,7 +296,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 				//cout << "current edge: " << v->getNumber() << " [" << element->getLabel() << "> " << vNext->getNumber() << endl;
 								
 				//label
-				DdNode * label = labelToBddMp(element->getLabel().c_str()); 
+				DdNode * label = labelToBddMp(element->getLabel()); 
 				//if (label == NULL) exit(1)
 
 				//nodes		    
@@ -338,13 +341,11 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 }
 
 
-//! \fn DdNode*  BddRepresentation::labelToBddMp(const char* label)
-//! \brief returns the BDD of a label (given as integer)
-DdNode* BddRepresentation::labelToBddMp(const char* label) {
+DdNode* BddRepresentation::labelToBddMp(const std::string& label) {
 	
-	trace(TRACE_5, "BddRepresentation::labelToBddMp(char* label): start\n");
+	trace(TRACE_5, "BddRepresentation::labelToBddMp(const std::string& label): start\n");
 	 
-	BddLabel * s = labelTable->lookup(label);
+	BddLabel * s = labelTable->lookup(label.c_str());
 	unsigned int number = s->nbr;
 	BitVector assignment = numberToBin(number, maxLabelBits);
 		
@@ -366,7 +367,7 @@ DdNode* BddRepresentation::labelToBddMp(const char* label) {
 		f = tmp;
 	}
 	//cout << "label: " << label << ": "; Cudd_PrintMinterm(mgrMp,f);
-	trace(TRACE_5, "BddRepresentation::labelToBddMp(char* label): end\n");    
+	trace(TRACE_5, "BddRepresentation::labelToBddMp(const std::string& label): end\n");    
 	return (f);
 }
 
@@ -445,18 +446,21 @@ DdNode* BddRepresentation::annotationToBddAnn(vertex* v){
 	DdNode* annotation = Cudd_ReadOne(mgrAnn);		
 	Cudd_Ref(annotation);
 	
-	CNF* cl = v->getAnnotation();
+	CNF_formula* cnfFormula = v->getCNF_formula();
 		
-	while (cl) {
-		CNFTemp = CNFtoBddAnn(cl);
+	for (CNF_formula::const_iterator iClause = cnfFormula->begin();
+		 iClause != cnfFormula->end(); ++iClause)
+	{
+		CommGraphFormulaMultiaryOr* clause =
+		    dynamic_cast<CommGraphFormulaMultiaryOr*>(*iClause);
+		assert(clause != NULL);
+		CNFTemp = clauseToBddAnn(clause);
 		tmp = Cudd_bddAnd(mgrAnn, annotation, CNFTemp);
 		// if (tmp == NULL) exit(1);
 		Cudd_Ref(tmp);
 		Cudd_RecursiveDeref(mgrAnn, annotation);
 		Cudd_RecursiveDeref(mgrAnn, CNFTemp);
 		annotation = tmp;
-		
-		cl = cl->nextElement;	
 	}
 		
 	unsigned int bddNumber = getBddNumber(v->getNumber());   
@@ -499,46 +503,36 @@ DdNode* BddRepresentation::annotationToBddAnn(vertex* v){
 }
 
 
-DdNode* BddRepresentation::CNFtoBddAnn(CNF* myclause){
+DdNode* BddRepresentation::clauseToBddAnn(
+	const CommGraphFormulaMultiaryOr* myclause)
+{
 	DdNode* tmp;
-	
-	if (myclause == NULL) {		// since there is no clause we can't conclude anything
+
+	if (myclause->empty()) {
+		// since the clause is empty we can't conclude anything
 		tmp = Cudd_Not(Cudd_ReadOne(mgrAnn));
 		Cudd_Ref(tmp);
 		return tmp;  //"(false)";	
 	}
-	
-	if (myclause->isFinalState) {
-		tmp = Cudd_ReadOne(mgrAnn);
-		Cudd_Ref(tmp);
-		return tmp;  //"(true)";
-	}
 
 	DdNode* clause1 = Cudd_Not(Cudd_ReadOne(mgrAnn));
-    Cudd_Ref(clause1);
-    
-	literal* currentLiteral = myclause->firstLiteral;  // get the first literal of the clause
+	Cudd_Ref(clause1);
 
-    while (currentLiteral) {
-        if (currentLiteral->edge != NULL && 
-        	currentLiteral->edge->getNode() != NULL && 
-        	currentLiteral->edge->getNode()->getColor() != RED && 
-        	currentLiteral->edge->getNode()->reachGraphStateSet.size() > 0) {
-        			
-//            cout << "search for label " << currentLiteral->edge->getLabel() << " ...";
-            BddLabel* label = labelTable->lookup(currentLiteral->edge->getLabel().c_str());
-            //if (!l) { cout << "  Label not found\n"; exit(1);}
-//            cout << "   found: nbr = " << label->nbr << endl;
-            int i = label->nbr;
-            tmp = Cudd_bddOr(mgrAnn, clause1, Cudd_bddIthVar(mgrAnn,i));
-            Cudd_Ref(tmp);
-    		Cudd_RecursiveDeref(mgrAnn, clause1);
-    		clause1 = tmp;
-        }   	
-    	currentLiteral = currentLiteral->nextElement;	
-    }
-      
-//	cout<< "clause: \n"; Cudd_PrintMinterm(mgrAnn, clause1);
+	for (CommGraphFormulaMultiaryOr::const_iterator iLiteral =
+		 myclause->begin(); iLiteral != myclause->end(); ++iLiteral)
+	{
+		CommGraphFormulaLiteral* literal =
+		    dynamic_cast<CommGraphFormulaLiteral*>(*iLiteral);
+		assert(literal != NULL);
+		BddLabel* label = labelTable->lookup(literal->asString());
+		int i = label->nbr;
+		tmp = Cudd_bddOr(mgrAnn, clause1, Cudd_bddIthVar(mgrAnn,i));
+		Cudd_Ref(tmp);
+		Cudd_RecursiveDeref(mgrAnn, clause1);
+		clause1 = tmp;
+	}
+
+	// cout<< "clause: \n"; Cudd_PrintMinterm(mgrAnn, clause1);
 	return clause1; 
 }
 
@@ -809,26 +803,32 @@ void BddRepresentation::save(char* option){
 	
     for (unsigned int i = 0; i < PN->getInputPlaceCount(); ++i){
     	assert((int)i < nbrLabels + maxNodeBits);
-    	//cout << "i: " << i << "   name: " << PN->getInputPlace(i)->name << "   nbr: " << labelTable->lookup(PN->getInputPlace(i)->name)->nbr << endl;
-    	char* tmp = new char [PN->getInputPlace(i)->name.size() + 2];
-    	strcpy (tmp,"!");
-    	strcat (tmp, PN->getInputPlace(i)->name.c_str());
-    	unsigned int nbr = labelTable->lookup(PN->getInputPlace(i)->name)->nbr;
+    	owfnPlace* place = PN->getInputPlace(i);
+    	//cout << "i: " << i << "   name: " << place->name << "   nbr: " << labelTable->lookup(place->getLabelForCommGraph())->nbr << endl;
+    	char* tmp = new char [place->getLabelForCommGraph().size() + 1];
+    	strcpy (tmp, place->getLabelForCommGraph().c_str());
+    	unsigned int nbr = labelTable->lookup(place->getLabelForCommGraph())->nbr;
         names[nbr] = tmp;
     }
     
     for (unsigned int i = 0; i < PN->getOutputPlaceCount(); ++i){
 		assert(int(i+PN->getInputPlaceCount()) < nbrLabels + maxNodeBits);
-		//cout << "i: " << i << "   name: " << PN->getOutputPlace(i)->name << "   nbr: " << labelTable->lookup(PN->getOutputPlace(i)->name)->nbr << endl;
-    	char* tmp = new char [PN->getOutputPlace(i)->name.size() + 2];
-    	strcpy (tmp,"?");
-    	strcat (tmp, PN->getOutputPlace(i)->name.c_str());
-    	unsigned int nbr = labelTable->lookup(PN->getOutputPlace(i)->name)->nbr;
+    	owfnPlace* place = PN->getOutputPlace(i);
+		//cout << "i: " << i << "   name: " << place->name << "   nbr: " << labelTable->lookup(place->getLabelForCommGraph())->nbr << endl;
+    	char* tmp = new char [place->getLabelForCommGraph().size() + 1];
+    	strcpy (tmp, place->getLabelForCommGraph().c_str());
+    	unsigned int nbr = labelTable->lookup(place->getLabelForCommGraph())->nbr;
         names[nbr] = tmp;
     }
+
+    char* tmp = new char [CommGraphFormulaLiteral::FINAL.size() + 1];
+    strcpy (tmp, CommGraphFormulaLiteral::FINAL.c_str());
+    unsigned int nbr = labelTable->lookup(CommGraphFormulaLiteral::FINAL)->nbr;
+    names[nbr] = tmp;
+
     
 
-	assert((unsigned int)nbrLabels == PN->getInputPlaceCount()+PN->getOutputPlaceCount());
+	assert((unsigned int)nbrLabels == PN->getInputPlaceCount()+PN->getOutputPlaceCount() + 1); // + 1 for 'final' variable
 	assert(Cudd_ReadSize(mgrAnn) == nbrLabels + maxNodeBits);
     for (int i = nbrLabels; i < size; ++i){
     	assert(i < Cudd_ReadSize(mgrAnn));
@@ -929,7 +929,7 @@ void BddRepresentation::testSymbRepresentation(vertex* v, bool visitedNodes[]){
 			//cout << "edge: " << v->getNumber() << " [" << element->getLabel() << "> " << vNext->getNumber() << endl;
 			
 			//label	
-			DdNode * label = labelToBddMp(element->getLabel().c_str()); 
+			DdNode * label = labelToBddMp(element->getLabel());
 
 			//nodes 
 			DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());

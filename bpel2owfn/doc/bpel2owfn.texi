@@ -81,15 +81,16 @@ the German Federal Ministry for Education and Research (BMBF), see
 
 @c ----------------------------------------------------------------------------
 
+@c * Overview:: What GNU BPEL2oWFN can do.
+@c * Petri Net Patterns:: Which patterns are implemented.
+@c * Petri Net-related Functions:: What is done with the Petri net.
+@c * Future Work:: What GNU BPEL2oWFN will do in the future.
+@c * References:: Bibliography of cited literature.
+
 @menu
-* Overview:: What GNU BPEL2oWFN can do.
 * Invoking GNU BPEL2oWFN:: How to invoke GNU BPEL2oWFN.
 * File Formats:: Which file formats are supported.
-* Petri Net Patterns:: Which patterns are implemented.
-* Petri Net-related Functions:: What is done with the Petri net.
-* Limitations and Bugs:: What GNU BPEL2oWFN cannot do.
-* Future Work:: What GNU BPEL2oWFN will do in the future.
-* References:: Bibliography of cited literature.
+* FAQ and Known Bugs:: What GNU BPEL2oWFN cannot do, and why.
 * GNU Free Documentation License::The license of this manual.
 @end menu
 
@@ -103,6 +104,8 @@ the German Federal Ministry for Education and Research (BMBF), see
 
 
 @c ----------------------------------------------------------------------------
+
+@ignore
 
 @node Overview
 @chapter Overview
@@ -238,6 +241,8 @@ be used to check most of the constraints of the specification statically,
 i.e.@: without actually deploying and running the BPEL process. For example,
 the @acronym{CFG} can be used to check if each variable is initialized by an
 incoming message or an @code{<assign>} activity.
+
+@end ignore
 
 
 
@@ -932,6 +937,8 @@ TRANSITION t2 @{ output @}
 
 @c ----------------------------------------------------------------------------
 
+@ignore
+
 @node Petri Net Patterns
 @chapter Petri Net Patterns
 In version @value{VERSION} of GNU BPEL2oWFN the following Petri net
@@ -1183,67 +1190,84 @@ acyclic link structure):
 alarm event handler or a @code{<wait>} activity.
 @end itemize
 
+@end ignore
 
 
 @c ----------------------------------------------------------------------------
 
-@node Limitations and Bugs
-@chapter Limitations and Bugs
+@node FAQ and Known Bugs
+@chapter FAQ and Known Bugs
 
 
+@section Frequently Asked Questions
 
-@c @section Limitations
-@c 
-@c The current version of GNU BPEL2oWFN underlies several limitations:
-@c 
-@c @itemize
-@c @item The pattern database consists of only one collection of patterns
-@c (i.e.@: the semantics of [Sta05], see @cite{Petri Net Patterns}). However,
-@c the patterns are parametrized: using the command-line arguments
-@c @samp{--parameter=nostandardfaults} and/or @samp{--parameter=cyclicwhile}
-@c yield to different models using the same ``base'' semantics.
-@c @end itemize
+@itemize
+@item @b{Why does the parser reject my @acronym{BPEL} file?}
 
+BPEL2oWFN uses Flex and Bison to implement the parser. We decided do not use an
+off-the-shelf @acronym{XML} parser generator as we did not found a suitable
+platform-independed parser generator whose license was @i{compatible} to the
+@acronym{GNU} @acronym{GPL, General Public License}. Furthermore, we use the
+term generator Kimwitu++ to describe and process the
+@acronym{AST, abstract syntax tree}, and the trio Flex/Bison/Kimwitu++
+integrates seamlessly. Though the grammar has to be given manually, the
+generated parser is very flexible as it allows to process @acronym{BPEL4WS} 1.1,
+@acronym{WS-BPEL} 2.0, and to some extend @acronym{BPEL4WS} 1.0 process.
+
+However, the parser does not support @acronym{XML} namspaces. To
+this end, @acronym{BPEL} constructs are only recognized if the are either
+unprefixed or using the prefix @samp{bpws:}. Any other elements are skipped
+by the parser of BPEL2oWFN. Nevertheless, processes these elements might be
+rejected with a syntax error message (cf.@: warning message [W00104]).
+
+As a solution, try removing or commenting non-standard elements, and remove any
+namespace prefixed from @acronym{BPEL} elements.
+
+
+@item @b{I validated my process using an @acronym{XML} validator. Why does
+BPEL2oWFN still reports syntax errors?}
+
+Well, because there @i{are} such errors. Many @acronym{BPEL} editors generate
+invalid @acronym{BPEL}. Even the @acronym{WS-BPEL} specification contained
+processes with syntax errors for a long time. Furthermore, a lot of syntax errors
+cannot be covered with @acronym{XSD, XML Schema Definition} validation. Even if
+the considered process run on existing engines, BPEL2oWFN might reject it, as
+it stubbornly follows the @acronym{WS-BPEL} specification.
+
+
+@item @b{Why @acronym{LoLA} does not accept the generated files and reports parse
+errors in the first line?}
+
+This problem occurs using a pre-compiled windows version of GNU BPEL2oWFN.
+The generated files are in Windows format, yet @acronym{LoLA} only supports
+files in Unix format. To overcome this limitation of @acronym{LoLA}, use a
+tool like @samp{dos2unix} or change the file format in an editor like @code{vi}.
+
+@end itemize
 
 
 @section Known Bugs
 
-As this is the first public version of GNU BPEL2oWFN the
-translation from a @acronym{BPEL} process to an open workflow net
-might be unstable or incorrect in some few scenarios:
+Though this is the second major release version of GNU BPEL2oWFN, it might
+still contain poorly tested, unefficient code.
+
 
 @itemize
 
-@item @b{Problem:} The original semantics of [Sta05] was created to
-support executable @acronym{BPEL} processes. Therefore the
-translation of abstract @acronym{BPEL} processes (business
-protocols) might throw an exception or even crash.
+@item @b{Problem:} BPEL2oWFN crashes during the translation of an abstract
+@acronym{BPEL} process.
 
-@b{Solution:} Each communicating activity (i.e.@: @code{invoke},
-@code{receive}, @code{reply}) should be defined with (input/output)
-variables.
+@b{Diagnosis:} The implemented semantics of was mainly created to support
+executable @acronym{BPEL} processes. Therefore, the translation of abstract
+@acronym{BPEL} processes (formerly called @i{business protocols}) might be
+buggy. In particular, the allowed absence of implementation details hampers
+the analysis of the process and the generation of a formal model.
 
-@c @item @b{Problem:} The implementation of the structural reduction
-@c rules might crash when applied to @acronym{BPEL} processes that
-@c created Petri nets with a large number of nodes.
-@c 
-@c @b{Solution:} Avoid using the @samp{--parameter=simplify} mode in this case.
-
-@item @b{Problem:} The parser of GNU BPEL2oWFN is not capable
-of skipping @acronym{XML} elements originating other namespaces than
-`@code{bpws}'. Processes using these elements are rejected with a
-syntax error message.
-
-@b{Solution:} Try removing or commenting these elements.
-
-@item @b{Problem:} @acronym{LoLA} does not accept the generated files and
-reports parse errors in the first line.
-
-@b{Solution:} This problem occurs using a pre-compiled windows version
-of GNU BPEL2oWFN. The generated files are in Windows format, yet
-@acronym{LoLA} only supports files in Unix format. To overcome this
-limitation of @acronym{LoLA}, use a tool like @samp{dos2unix} or
-change the file format in an editor like vi.
+@b{Solution:} To avoid errors, at least each communicating activity should be
+defined with @code{partnerLink} and @code{operation} attribute, and
+@code{<invoke>} activities should be defined with @code{inputVariable} and/or
+@code{outputVariable} to distinguish the respective asynchronous and synchronous
+occurrence.
 @end itemize
 
 
@@ -1251,17 +1275,15 @@ change the file format in an editor like vi.
 @anchor{Reporting Bugs}
 @section Reporting Bugs
 
-If you find a bug in GNU BPEL2oWFN, please first check that it
-is not a known bug listed in `Known Bugs'. Otherwise please send us
-an electronic mail to @email{bug-bpel2owfn@@gnu.org}.
-Include the version number which you can find by running
-@samp{bpel2owfn --version}. Also include in your message the input
-@acronym{BPEL} process and the output that the program produced. We
-will try to answer your mail within a week.
+If you find a bug in GNU BPEL2oWFN or have a question, please first check that
+it is not a known bug or a frequently asked question listed in above. Otherwise, 
+please send us an email to @email{bug-bpel2owfn@@gnu.org}. Include the version
+number which you can find by running @samp{bpel2owfn --version}. Also include in
+your message the input @acronym{BPEL} process and the output that the program
+produced. We will try to answer your mail within a week.
 
-If you have other questions, comments or suggestions about
-GNU BPEL2oWFN, contact us via electronic mail to
-@email{nlohmann@@informatik.hu-berlin.de}.
+If you have other questions, comments or suggestions about GNU BPEL2oWFN,
+contact us via electronic mail to @email{nlohmann@@informatik.hu-berlin.de}.
 
 
 
@@ -1290,7 +1312,19 @@ Unter den Linden 6@*
 
 
 
+@section Help BPEL2oWFN
+BPEL2oWFN is now developed for one and a half year, and grown to a quite big
+program. Since November 2006, BPEL2oWFN is a GNU package, and the development
+is organized at Savannah (@url{https://savannah.gnu.org/projects/bpel2owfn}).
+We are always looking for developers and testers that can help us improving
+BPEL2oWFN.
+
+
+
+
 @c ----------------------------------------------------------------------------
+
+@ignore
 
 @node Future Work
 @chapter Future Work
@@ -1432,7 +1466,7 @@ Communication-Based Systems: Advances in Petri Nets}, pp. 124-144, Springer Verl
 @end table
 
 
-
+@end ignore
 
 
 @c ----------------------------------------------------------------------------

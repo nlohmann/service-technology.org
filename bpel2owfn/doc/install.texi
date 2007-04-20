@@ -8,6 +8,7 @@
 @c ----------------------------------------------------------------------------
 
 @copying
+
 @ifnotplaintext
 @b{About this document:}
 
@@ -794,35 +795,39 @@ GNU BPEL2oWFN was written by:
 We would like to thank:
 @itemize
 @item Sylvain Beucler, @i{GNU Project}@*
-for his help moving BPEL2oWFN to Savannah
+for his help moving BPEL2oWFN to Savannah,
 @item Maarten Boote, @i{Technische Universiteit Eindhoven}@*
-for integrating BPEL2oWFN to LaQuSo
+for integrating BPEL2oWFN to LaQuSo,
 @item Jan Bretschneider, @i{Humboldt-Universit@"at zu Berlin}@*
-for patient C++ help
+for patient C++ help,
 @item Dirk Fahland, @i{Humboldt-Universit@"at zu Berlin}@*
-for fruitful discussions about BPEL's semantics
+for fruitful discussions about BPEL's semantics,
 @item Carsten Frenkler, @i{Gedilan Technologies}@*
-for challenging @acronym{BPEL} processes
+for challenging @acronym{BPEL} processes,
 @item Mario Karrenbrock, @i{FH Wilhelmshaven/SAP}@*
-for finding bugs
+for finding bugs,
 @item Dieter K@"onig, @i{IBM}@*
-for valuable advice concerning @acronym{BPEL}
+for valuable advice concerning @acronym{BPEL},
 @item Oliver Kopp, @i{Universit@"at Stuttgart}@*
-for challenging @acronym{BPEL} processes
+for challenging @acronym{BPEL} processes,
 @item Axel Martens, @i{IBM}@*
-for valuable advice concerning @acronym{BPEL}
+for valuable advice concerning @acronym{BPEL},
+@item Harald Meyer, @i{Hasso Plattner Institute}@*
+for pointing out a bug in the parser,
 @item Simon Moser, @i{IBM}@*
-for valuable advice concerning @acronym{BPEL}
+for valuable advice concerning @acronym{BPEL},
+@item Chun Ouyang, @i{Queensland University of Technology}@*
+for discussion about the Petri net semantics,
 @item Michael Piefel, @i{Humboldt-Universit@"at zu Berlin}@*
-for help with Kimwitu++
+for help with Kimwitu++,
 @item Dennis Reinert, @i{Humboldt-Universit@"at zu Berlin}@*
-for his work on the first versions of BPEL2oWFN
+for his work on the first versions of BPEL2oWFN,
 @item Eric Verbeek, @i{Technische Universiteit Eindhoven}@*
-for integrating BPEL2oWFN to the ProM framework and valuable comments on BPEL's link semantics
+for integrating BPEL2oWFN to the ProM framework and valuable comments on BPEL's link semantics,
 @item Ernesto Santana-Diaz@*
-for writing a Java-based GUI for BPEL2oWFN
+for writing a Java-based GUI for BPEL2oWFN,
 @item Jan Martijn van der Werf, @i{Technische Universiteit Eindhoven}@*
-for his discussion about the PNML-oWFN format
+for his help with the PNML-oWFN format.
 @end itemize
 
 GNU BPEL2oWFN is part of the Tools4@acronym{BPEL} project funded by the

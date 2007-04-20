@@ -31,14 +31,14 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/19 08:57:33 $
+ * \date    \$Date: 2007/04/20 09:19:20 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.159 $
+ * \version \$Revision: 1.160 $
  */
 
 
@@ -152,6 +152,7 @@ void close_file(set< string >::iterator file)
   {
     trace(TRACE_INFORMATION," + Closing input file: " + globals::filename + "\n");
     fclose(frontend_in);
+    frontend_in = NULL;
   }
 }
 

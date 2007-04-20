@@ -32,7 +32,7 @@
  * 
  * \since   2007-04-17
  *
- * \date    \$Date: 2007/04/19 06:40:48 $
+ * \date    \$Date: 2007/04/20 09:19:20 $
  * 
  * \note    This code was inspired by code published by Jaded Hobo at "The
  *          Code Project" in December 2004, available at
@@ -43,7 +43,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  *
  * \todo    
  *          - finish code for non-Windows operating systems
@@ -289,6 +289,9 @@ namespace colorconsole
   { return os; }
   
   ostream& fg_black(ostream& os)
+  { return os; }
+
+  ostream& fg_gray(ostream& os)
   { return os; }
 
   ostream& fg_green(ostream& os)

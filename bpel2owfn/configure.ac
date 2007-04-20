@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/17 16:39:26 $ by $Author: nielslohmann $.
-# Version $Revision: 1.41 $
+# File last changed $Date: 2007/04/20 12:19:44 $ by $Author: nielslohmann $.
+# Version $Revision: 1.42 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
@@ -55,6 +55,8 @@ CFLAGS=""
 # Checks for header files and functions.
 AC_CHECK_HEADERS([windows.h])
 AC_CHECK_FUNCS([pow])
+
+AM_PROG_CC_C_O
 
 
 # Check for optional programs.

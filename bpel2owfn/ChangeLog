@@ -106,11 +106,56 @@ Version 1.2 (6 April 2006)
         * Structural reduction rules no longer remove the loop
           transition for deadlock search.
 
-Version 2.0 (6 December 2006)
+Version 2.0.0 (20 April 2007)
 -----------------------------
 
+   - input:
+        * executable BPEL4WS 1.1 processes
+
+        * executable WS-BPEL 2.0 processes
+
+        * abstract BPEL4WS 1.1 processes (experimental)
+
+        * abstract WS-BPEL 2.0 processes (experimental)
+
+   - output:
+        * Petri net file formats: APNN, INA (untimed, low-level), LoLA
+          (low-level), Fiona oWFN, PEP notation (low-level), PNML (with
+          extension to model interfaces), SPIN (Promela)
+
+        * other file formats: Graphviz dot, XML
+
+   - implemented patterns:
+        * overworked feature-complete Petri net semantics for BPEL4WS
+          1.1 and WS-BPEL 2.0
+
+        * overworked simplified Petri net semantics to model the
+          communicational behavior only
+
+        * several versions of each pattern controlled by command-line
+          parameters
+
+   - static analysis
+        * 44 of 94 static analysis goals of the WS-BPEL specification
+          are checked
+
+        * read access to uninitialized variables can be detected using
+          the CFG (control flow graph)
+
+        * conflicting receiving activities can be detected using the CFG
+
    - miscellaneous:
-        * overworked architecture
+        * completely overworked architecture
+
+        * all Petri net-related functions are packaged to a Petri net
+          API (application programming interface) to be published
+          independently of BPEL2oWFN soon
+
+        * statistics of the input process are displayed after implicit
+          transformation rules are applied
+
+        * messages are classified (error, warning, etc.) and numbered
+          to allow for a detailed description in the manual
 
 
 Copyright

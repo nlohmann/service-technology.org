@@ -293,12 +293,12 @@ If this parameter is omitted, input is read from standard input
 @item --output[=@var{filename}]
 @itemx -o
 The generated output is written to a file called @var{filename}. If the short
-form is used or the @var{filename} is omitted, the input file name is taken and 
+form is used or the @var{filename} is omitted, the input file name is taken and
 extended by the suffix of the chosen file format(s). If this parameter is
 omitted, the output is passed to the standard output (@code{stdout}).
 
 @item --log[=@var{filename}]
-@itemx -l 
+@itemx -l
 All additional information like warnings and processing information are
 written to a file called @var{filename}. If the short form is used or the
 @var{filename} is omitted, the output file name is taken and extended by the
@@ -316,7 +316,7 @@ Debug level:
 When errors are found, only display the error code and skip additional
 information.
 @itemx 1
-No debug information, but display error information.
+No debug information, but display warning and error messages.
 @itemx 2
 All messages from @samp{-d1}. Additionally, information about the current
 steps is displayed.
@@ -327,9 +327,9 @@ shown, i.e. when a Petri net is generated...
 All messages from @samp{-d3}. Additionally, a message is displayed each time a
 function is entered or left.
 @itemx flex
-Displays messages flex. Can be combined with any other debug level.
+Displays messages from Flex. Can be combined with any other debug level.
 @itemx bison
-Displays messages bison. Can be combined with any other debug level.
+Displays messages from Bison. Can be combined with any other debug level.
 @end table
 @end table
 
@@ -412,17 +412,15 @@ These options control some Petri net-related options.
 @item communicationonly
 
 Only the communicational behavior of the input @acronym{BPEL} process is
-modeled. That is, the negative control flow (in particular, fault, termination,
-or compensation handlers, as well as @code{<exit>}, @code{<throw>},
-@code{<compensate>}, @code{<compensateScope>} activities) is not translated to
+modeled. That is, the negative control flow (fault, termination, or compensation handlers, as well as @code{<exit>}, @code{<throw>}, @code{<compensate>}, @code{<compensateScope>} activities) is not translated to
 the Petri net model. When combined with @samp{reduce}, this parameter yields
 the most compact Petri net model.
 
 @item fhfaults
 
-Confines the @samp{standardfaults} parameter: in the negative control flow,
-that is in activities in fault or termination handlers, no further
-@acronym{BPEL} standard faults can occur.
+Confines the @samp{standardfaults} parameter: in the negative control flow
+(in activities in fault handlers), no further @acronym{BPEL} standard faults
+can occur.
 
 @item reduce
 
@@ -464,7 +462,7 @@ following option:
 @table @samp
 
 @item --format=@var{fileformat}
-@itemx -f @var{fileformat} 
+@itemx -f @var{fileformat}
 
 Creates a file in a given ouput file format. Each file format is only available in
 certain modes. If you want to use more than one output file format you have to add @samp{-f}/
@@ -510,7 +508,7 @@ Language}. Note that the @acronym{PNML} file format is --- together with the
 Fiona file format --- the only Petri net output format that outputs the
 complete open workflow net, that is, also the interface is exported.
 Currently, the interface places are annotated using a @code{<type>} tag
-which is only supported by Yasper. When the parameter @samp{-o} is used, a
+which is only supported by Yasper@footnote{Yasper is available at @url{http://www.yasper.org}.}. When the parameter @samp{-o} is used, a
 file with the suffix @samp{.pnml} is created.
 
 @item spin
@@ -528,7 +526,7 @@ in Graphviz dot representation. When mode @samp{ast} is used, the
 When mode @samp{cfg} is used, the @acronym{CFG, control flow graph} is printed
 in Graphviz dot representation.
 
-In both cases, when the tool @code{dot} is found in the search path during
+In any case, when the tool @code{dot} is found in the search path during
 configuration of BPEL2oWFN and the parameter @samp{-o} is used,
 @code{dot} is used to generate a @acronym{PNG, Portable Network Image} file.
 In this case, two files with the suffixes @samp{.dot} and @samp{.png} are
@@ -563,9 +561,9 @@ In this section we show some examples how BPEL2oWFN can be
 invoked.
 
 @table @samp
-@item bpel2owfn -i sample.bpel -flola -finfo -o -p simplify
+@item bpel2owfn -i sample.bpel -flola -finfo -o -p reduce
 
-Reads the file @file{sample.bpel}, generates a structural simplified
+Reads the file @file{sample.bpel}, generates a structural reduced
 low-level Petri net and saves it in a @acronym{LoLA} file
 @file{sample.lola}. For further information a file
 @file{sample.info} is generated.
@@ -578,17 +576,25 @@ workflow net and saves it in an @acronym{oWFN} file
 @file{sample.info} is generated. During the conversion several debug
 messages are printed to standard output.
 
-@item @var{prog} | bpel2owfn -fdot -m petrinet | dot -Tpng -osample.png
+@item @var{prog} | bpel2owfn -fdot -m petrinet | dot -Tps -osample.ps
 
 Runs the program @var{prog} and reads its output as @acronym{BPEL}
-process, generates a Petri net and outputs its Dot representation.
-This stream is read by Dot which layouts the Petri net and creates an output
-@acronym{PNG, Portable Network Graphic} file @file{sample.png}.
+process, generates a Petri net and outputs its Graphviz dot representation.
+This stream is read by @code{dot} which layouts the Petri net and creates an output
+PostScript file @file{sample.ps}.
 
 @item bpel2owfn -i sample.bpel -m ast
 
 Reads the file @file{sample.bpel} and prints the abstract syntax tree
 (@acronym{AST}) to standard output.
+
+@item bpel2owfn -m consistency -i service1.bpel -i service2.bpel -f lola -o
+
+Reads the files @file{service1.bpel} and @file{service2.bpel} and creates
+a Petri net model of their composition. The result is written to the
+@acronym{LoLA} file @file{service1_service2.lola}. Furthermore, an analysis
+file @file{service1_service2.task} is written that can be processed by
+@acronym{LoLA}.
 @end table
 
 
@@ -597,6 +603,48 @@ Reads the file @file{sample.bpel} and prints the abstract syntax tree
 @section Warnings and Error Messages
 
 BPEL2oWFN performs several analysis steps on the input @acronym{BPEL} process.
+These messages are displayed during parsing and postprocessing of the process,
+and can be classified as follows:
+
+@itemize
+@item @b{Notices} do not report errors, but just give information about the
+translation process.
+
+@item @b{Syntax error messages} report problems during the lexical or
+syntactical analysis of the process. See @ref{FAQ and Known Bugs} for
+information about handling syntax errors.
+
+@item @b{Static analysis messages} occur when a test described in the @acronym{WS-BPEL}
+specification detects an error in the process. When such an error is found, a
+@acronym{WS-BPEL} processor must reject the process. If the process is an
+abstract process, the static analysis errors can be considered as warnings
+as abstract processes are not meant to be executed.
+
+@item @b{Warnings} report potential problems in the input process. The warned
+problem should be corrected to assure executability of the input process.
+
+@item @b{Errors} report problems that are explicitly mentioned in the
+@acronym{WS-BPEL} specification. They should be corrected to avoid runtime
+errors. Furthermore, problems can arise during the generation of a Petri net
+model.
+
+@item @b{Critical errors} make a further processing of the input process
+impossible and terminate GNU BPEL2oWFN immediately.
+@end itemize
+
+An example for a message is this:
+
+@smallexample
+CubeManagement.bpel:566 - [W00114]
+variable `waitResponse' used as `variable' in <from> might be uninitialized
+@end smallexample
+
+The first line contains the filename of the input process
+@file{CubeManagement.bpel} and the line number @samp{566} of the displayed issue.
+The line number might be imprecise; that is, it might deviate up or down a
+few lines. After the line number, the error code is displayed.
+@samp{W00114} stands for a warning with code 114. Further details can be
+taken from the table below.
 
 @multitable @columnfractions .1 .15 .75
 @headitem Code @tab Type @tab Description
@@ -604,14 +652,11 @@ BPEL2oWFN performs several analysis steps on the input @acronym{BPEL} process.
 @item 1--94 @tab static analysis @tab
 A check for a static analysis goal defined in the @acronym{WS-BPEL}
 specification detected an error. Currently, 44 of the 94 described static
-analysis goals are checked. When a static analysis error is found, a
-@acronym{WS-BPEL} processor must reject the process. If the process is an
-abstract process, the static analysis errors can be considered as warnings
-as abstract processes are not meant to be executed.
+analysis goals are checked.
 
 @item 100 @tab notice @tab
 Either a non-standard element@footnote{All elements
-that are not explicitly defined in the @acronym{WS-BPEL} specificiation (e.g.@:,
+that are not explicitly defined in the @acronym{WS-BPEL} specification (e.g.@:,
 elements from other namespaces) are considered as ``non-standard''.} was parsed
 or a @acronym{BPEL} activity was considered as
 misplaced. In the first case, a non-standard element was parsed when the
@@ -619,7 +664,12 @@ parser expected a @acronym{BPEL} standard activity. Then, a syntax error is
 printed and the whole element is ignored. The parse error and this message
 can usually be ignored, as non-standard elements would neither we translated
 to a Petri net model nor are constrained by the @acronym{WS-BPEL}
-specification. In the second case, ... todo
+specification.
+
+In the second case, a syntactically correct @acronym{BPEL}
+was skipped, because it was misplaced. As an example, consider two activities
+embedded in a @code{<while>} activity without an enclosing @code{<sequence>}
+activity. In this case, the second activity triggers this message.
 
 @item 101 @tab notice @tab
 The @code{<partners>} construct (only supported by @acronym{BPEL4WS} 1.1) is skipped due
@@ -632,14 +682,14 @@ The @code{<to>} or @code{<from>} construct is skipped due to a syntax error.
 The @code{<condition>} construct is skipped due to a syntax error.
 
 @item 104 @tab critical @tab
-When a syntax error occurs, BPEL2oWFN tries to recover and continue parsing the
+When a syntax error occurs, BPEL2oWFN tries to recover and continues parsing the
 input file after skipping the faulty or unknown element. Sometimes, however,
 the skipping of activities yields to situations where a further analysis of the
 @acronym{BPEL} process is impossible. In this case, the syntax of the process
 has to be fixed or non-standard elements have to be removed or out-commented.
 
 @item 105 @tab notice @tab
-When a syntax error occurs, BPEL2oWFN tries to recover and continue parsing the
+When a syntax error occurs, BPEL2oWFN tries to recover and continues parsing the
 input file after skipping the faulty or unknown element. If it is possible to
 continue, the analysis results might be faulty. In this case, the syntax of the
 process has to be fixed or non-standard elements have to be removed or
@@ -861,11 +911,21 @@ This command creates a file @file{example.dot}, containing a Graphviz dot repres
 @center @image{images/example}
 @end ifhtml
 
-The graphic depicts the generated open workflow net. The inner of the net, that is, all nodes except the interface places, are depicted inside the dashed box, whereas the interface is depicted outside the frame. Input places and all connected transitions are colored orange. Similarly, output places and connected transitions are colored yellow. Gray places belong to the final marking, that is, the marking [@b{p3}] is the final marking of the @acronym{oWFN}.
+The graphic depicts the generated open workflow net. The inner of the net, that is, all nodes
+except the interface places, are depicted inside the dashed box, whereas the interface is depicted
+outside the frame. Input places and all connected transitions are colored orange. Similarly, output
+places and connected transitions are colored yellow. Gray places belong to the final marking, that
+is, the marking [@b{p3}] is the final marking of the @acronym{oWFN}.
 
-To reach this final marking, the environment has to send a message @b{in.PL.req}, followed by receiving a message @b{out.PL.ack}. The name of the communication places is composed by the communication direction (``in'' or ``out''), the partner link's name (@samp{PL}) and the operations name (@samp{req} or @samp{ack}).
+To reach this final marking, the environment has to send a message @b{in.PL.req}, followed by
+receiving a message @b{out.PL.ack}. The name of the communication places is composed by the
+communication direction (``in'' or ``out''), the partner link's name (@samp{PL}) and the operations
+name (@samp{req} or @samp{ack}).
 
-For this very small process, it is easy to validate the generated Petri net model, that is, to compare the intended semantics by the actually modeled semantics. Especially the correlation between the nodes of the Petri net and the activities of the input @acronym{BPEL} process is not obvious for larger processes. To this end,
+For this very small process, it is easy to validate the generated Petri net model, that is, to
+compare the intended semantics by the actually modeled semantics. Especially the correlation
+between the nodes of the Petri net and the activities of the input @acronym{BPEL} process is not
+obvious for larger processes. To this end,
 
 @cartouche
 @smallexample
@@ -903,9 +963,20 @@ t2      9.internal.reply
 
 @end smallexample
 
-This file has to be read as follows: the place @samp{p1} has the type internal (i.e., is not connected with an interface place) and has the roles @samp{1.internal.initial}, @samp{7.initial}, @samp{7.internal.initial}, @samp{8.initial}, and @samp{8.internal.initial}. While the prefix of each role is the identifier of an activity (@samp{1} for the @code{<process>}, @samp{7} for the @code{<sequence>}, and @samp{8} for the @code{<receive>}), the suffix specifies the role inside the respective pattenr. Without going too much into details, @samp{1.internal.initial} is the role of the initial place of the pattern for the @code{<process>}, whereas, for example @samp{7.internal.final} is the final place of the @code{<sequence>}'s pattern. Similarly, roles of transitions are specified. Multiple roles of a single place arise due to the merging of distinct places during the composition of the several patterns.
+This file has to be read as follows: the place @samp{p1} has the type internal (i.e., is not
+connected with an interface place) and has the roles @samp{1.internal.initial}, @samp{7.initial},
+@samp{7.internal.initial}, @samp{8.initial}, and @samp{8.internal.initial}. While the prefix of
+each role is the identifier of an activity (@samp{1} for the @code{<process>}, @samp{7} for the
+@code{<sequence>}, and @samp{8} for the @code{<receive>}), the suffix specifies the role inside the
+respective pattern. Without going too much into details, @samp{1.internal.initial} is the role of
+the initial place of the pattern for the @code{<process>}, whereas, for example
+@samp{7.internal.final} is the final place of the @code{<sequence>}'s pattern. Similarly, roles of
+transitions are specified. Multiple roles of a single place arise due to the merging of distinct
+places during the composition of the several patterns.
 
-Now that we have conviced ourselves that the generated net reflects the intended behavior of the @acronym{BPEL} process, we can export the Petri net model to an output file to process it by analysis tools. In this case, we want to create a Fiona open workflow net executing
+Now that we have convinced ourselves that the generated net reflects the intended behavior of the
+@acronym{BPEL} process, we can export the Petri net model to an output file to process it by
+analysis tools. In this case, we want to create a Fiona open workflow net executing
 
 @cartouche
 @smallexample
@@ -956,9 +1027,8 @@ TRANSITION t2 @{ output @}
 @end smallexample
 
 
-This is finally the @acronym{oWFN} model of the @acronym{BPEL} process that
-can be analyzed by Fiona@footnote{Fiona is available at
-@url{http://www.informatik.hu-berlin.de/top/tools4bpel}.}.
+This is finally the @acronym{oWFN} model of the @acronym{BPEL} process that can be analyzed by
+Fiona@footnote{Fiona is available at @url{http://www.informatik.hu-berlin.de/top/tools4bpel}.}.
 
 
 
@@ -1058,9 +1128,9 @@ generated by @acronym{BPEL2PN} [SHS05] since an unfolding of the
 reset arcs in not necessary any more.
 
 @item @b{Standard faults}. The ``throw-fault'' and ``stop'' transitions
-are generated using parametrized functions. With the command-line parameter
+are generated using parameterized functions. With the command-line parameter
 @samp{--parameter=nostandardfaults} all @acronym{BPEL} standard faults
-that can occur in the activites (i.e. all faults except user-defined faults
+that can occur in the activities (i.e. all faults except user-defined faults
 in a throw activity or join failures) are suppressed. The generated models
 have a smaller state space and allow the analysis for controllability
 which is impossible without the assumption that messages can always be
@@ -1180,7 +1250,7 @@ removed.
 @end itemize
 
 These structural reduction rules are implemented in the command-line option
-@samp{--parameter=simplify}, see @ref{Invoking BPEL2oWFN}). To acheive a
+@samp{--parameter=simplify}, see @ref{Invoking BPEL2oWFN}). To achieve a
 better reduction, combine the parameter with @samp{--parameter=novarialbles}.
 
 
@@ -1236,18 +1306,18 @@ alarm event handler or a @code{<wait>} activity.
 
 BPEL2oWFN uses Flex and Bison to implement the parser. We decided do not use an
 off-the-shelf @acronym{XML} parser generator as we did not found a suitable
-platform-independed parser generator whose license was @i{compatible} to the
+platform-independent parser generator whose license was ``compatible'' to the
 GNU @acronym{GPL, General Public License}. Furthermore, we use the
 term generator Kimwitu++ to describe and process the
 @acronym{AST, abstract syntax tree}, and the trio Flex/Bison/Kimwitu++
-integrates seamlessly. Though the grammar has to be given manually, the
+integrates seamlessly. Though the grammar has to be defined manually, the
 generated parser is very flexible as it allows to process @acronym{BPEL4WS} 1.1,
 @acronym{WS-BPEL} 2.0, and to some extend @acronym{BPEL4WS} 1.0 processes.
 
 However, the parser does not support @acronym{XML} namspaces. To
 this end, @acronym{BPEL} constructs are only recognized if the are either
 unprefixed or using the prefix @samp{bpws:}. Any other elements are skipped
-by the parser of BPEL2oWFN. Nevertheless, processes these elements might be
+by the parser of BPEL2oWFN. Nevertheless, processes that use such elements might be
 rejected with a syntax error message (cf.@: warning message [W00104]).
 
 As a solution, try removing or commenting non-standard elements, and remove any
@@ -1279,7 +1349,7 @@ tool like @samp{dos2unix} or change the file format in an editor like @samp{vi}.
 @section Known Bugs
 
 Though this is the second major release version of BPEL2oWFN, it might
-still contain poorly tested, unefficient code.
+still contain poorly tested, inefficient code.
 
 
 @itemize
@@ -1306,7 +1376,7 @@ occurrence.
 @section Reporting Bugs
 
 If you find a bug in BPEL2oWFN or have a question, please first check that
-it is not a known bug or a frequently asked question listed in above. Otherwise, 
+it is not a known bug or a frequently asked question listed in above. Otherwise,
 please send us an email to @email{bug-bpel2owfn@@gnu.org}. Include the version
 number which you can find by running @samp{bpel2owfn --version}. Also include in
 your message the input @acronym{BPEL} process and the output that the program

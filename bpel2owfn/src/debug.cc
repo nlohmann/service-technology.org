@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/19 13:15:31 $
+ * \date    \$Date: 2007/04/20 14:31:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  *
  * \ingroup debug
  */
@@ -404,6 +404,12 @@ void genericError(unsigned int code, string information, string line, error_leve
   }
 
   cerr << endl;
+
+  if (level == ERRORLEVEL_CRITICAL)
+  {
+    cleanup();
+    exit(1);
+  }
 }
 
 
@@ -442,6 +448,13 @@ void SAerror(unsigned int code, string information, int lineNumber)
   cerr << "]\n";
 
   cerr << colorconsole::fg_standard;
+
+  // [SA00065] is critical
+  if (code == 65)
+  {
+    cleanup();
+    exit(1);
+  }
 
   if (debug_level == TRACE_ERROR)
     return;
@@ -529,7 +542,7 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	break; }
 	
     case(65):
-      { cerr << "<link> `" << information << "' was not defined before (CRITICAL)" << endl;
+      { cerr << "<link> `" << information << "' was not defined before" << endl;
 	break; }
 
     case(66):

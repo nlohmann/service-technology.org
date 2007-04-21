@@ -28,15 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/19 12:07:46 $
+ * \date    \$Date: 2007/04/21 17:36:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.11 $
- *
- * \todo    Comment this file.
+ * \version \$Revision: 1.12 $
  */
 
 
@@ -74,49 +72,31 @@ namespace globals {
 
   s_process_information process_information = {0,0,0,0,0,0,0,0,0,0,0};
 
-/// The map of all AST elements: maps an identifier of an AST phylum to an
-/// object holding more information.
-map<unsigned int, ASTE*> ASTEmap;
+  map<unsigned int, ASTE*> ASTEmap;
 
-/// A temporary mapping of attributes. This mapping is filled during parsing
-/// and is copied during post-processing to the AST annotation.
-map<unsigned int, map<string, string> > temporaryAttributeMap;
+  map<unsigned int, map<string, string> > temporaryAttributeMap;
 
-/// Identifier of the next AST element. The process's id is 1.
-int ASTEid = 1;
+  int ASTEid = 1;
 
-/// The root of the abstract syntax tree.
-tProcess AST;
+  kc::tProcess AST;
 
+  string invocation="";
+  string program_name ="";
 
+  string filename = "<STDIN>";
+  string output_filename = "";
 
-/// string holding the invocation of BPEL2oWFN
-string invocation="";
+  map<possibleParameters, bool> parameters;
 
-/// string holding the called program name of BPEL2oWFN
-string program_name ="";
+  string last_error_token = "";
+  string last_error_line = "";
 
+  unsigned int static_analysis_errors = 0;
+  unsigned int other_errors = 0;
 
+  bool parsing = true;
 
+  set<string> unknown_elements;
 
-/// filename of input file
-string filename = "<STDIN>";
-
-/// filename of output file
-string output_filename = "";
-
-/// parameters (set by #parse_command_line)
-map<possibleParameters, bool> parameters;
-
-string last_error_token = "";
-string last_error_line = "";
-
-unsigned int static_analysis_errors = 0;
-unsigned int other_errors = 0;
-
-bool parsing = true;
-
-set<string> unknown_elements;
-
-bool abstract_process = false;
+  bool abstract_process = false;
 }

@@ -28,15 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/19 12:07:46 $
+ * \date    \$Date: 2007/04/21 17:36:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.11 $
- *
- * \todo    Comment this file.
+ * \version \$Revision: 1.12 $
  */
 
 
@@ -60,30 +58,36 @@ using std::string;
 using std::map;
 
 
-  /// \todo comment me!
-  struct s_process_information
-  {
-    unsigned int basic_activities;
-    unsigned int structured_activities;
-    unsigned int scopes;
-    unsigned int event_handlers;
-    unsigned int fault_handlers;
-    unsigned int termination_handlers;
-    unsigned int compensation_handlers;
-    unsigned int variables;
-    unsigned int links;
-    unsigned int implicit_activities;
-    unsigned int implicit_handlers;
-  };
+
+
+
+/*!
+ * \brief process information
+ */
+struct s_process_information
+{
+  unsigned int basic_activities;
+  unsigned int structured_activities;
+  unsigned int scopes;
+  unsigned int event_handlers;
+  unsigned int fault_handlers;
+  unsigned int termination_handlers;
+  unsigned int compensation_handlers;
+  unsigned int variables;
+  unsigned int links;
+  unsigned int implicit_activities;
+  unsigned int implicit_handlers;
+};
 
 
 
 
 
-
-
-/// namespace for global variables
-namespace globals {
+/*!
+ * \brief namespace of all global variables
+ */
+namespace globals
+{
   /// prefix of the current scope (read by the stop pattern and used to direct
   /// failures to the correct fault_in place)
   extern string currentScope;
@@ -91,73 +95,109 @@ namespace globals {
   /// maps the name of a node in the CFG to an actual block pointer
   extern map <string, CFGBlock *> cfgMap;
 
+  /// used to generate parallel <forEach> scopes
+  extern string forEach_suffix;
 
-  extern string forEach_suffix;		///< used to generate parallel <forEach> scopes
+  /// mapping of AST phylum identifiers to ASTE objects
+  extern map<unsigned int, ASTE*> ASTEmap;
+
+  /// set of input channel names
+  extern set<string> ASTE_inputChannels;
+
+  /// set of output channel names
+  extern set<string> ASTE_outputChannels;
+
+  /// set of (prefixed) correlation set names
+  extern set<string> ASTE_correlationSetNames;
+
+  /// set of (prefixed) variable names
+  extern set<string> ASTE_variableNames;
+
+  /// set of (prefixed) partner link names
+  extern set<string> ASTE_partnerLinkNames;
+
+  /// set of (prefixed) link names
+  extern set<string> ASTE_linkNames;
+
+  /// set of ASTE identifiers of the start activities
+  extern set<unsigned int> ASTE_startActivities;
+
+  /// mapping of link names to ASTE identifiers
+  extern map<string, unsigned int> ASTE_linkIdMap;
+
+  /// mapping of scope names to ASTE identifiers
+  extern map<string, unsigned int> ASTE_scopeNames;
+
+  /// mapping of partner links to ASTE identifiers
+  extern map<string, unsigned int> ASTE_partnerLinks;
 
 
-  // the global mappings (though they are not global)
-  extern set<string> ASTE_inputChannels;		///< \todo comment me
-  extern set<string> ASTE_outputChannels;	///< \todo comment me
-  extern set<string> ASTE_correlationSetNames;	///< a set holding all correlation set names (with prefix)
-  extern set<string> ASTE_variableNames;		///< a set holding all variable names (with prefix)
-  extern set<string> ASTE_partnerLinkNames;	///< a set holding all partnerLink names (with prefix)
-  extern set<string> ASTE_linkNames;		///< a set holding all link names (with prefix)
-  extern set<unsigned int> ASTE_startActivities;	///< a set of the ids of the start activities
-
-  extern map<string, unsigned int> ASTE_linkIdMap;	///< maps link names to identifiers
-  extern map<string, unsigned int> ASTE_scopeNames;	///< maps scope names to identifiers
-  extern map<string, unsigned int> ASTE_partnerLinks;    ///< maps partnerlink names to identifiers
-
-  extern map<string, unsigned int> joinCondition_links;		///< used to evaluate joinConditions: maps link names to a temporary link number
-  extern map<unsigned int, bool> joinCondition_linkStatus;	///< used to evaluate joinConditions: maps temporary link numbers to Boolean assignment
+  /*!
+   * variables used to evaluate join conditions
+   */
+  /// mapping of link names to temporary link numbers
+  extern map<string, unsigned int> joinCondition_links;
   
-  /// Used to evaluate joinConditions: maps an id of a join condition togehter
-  /// with an assignment number to a Boolean result.
+  /// mapping of temporary link numbers to Boolean value
+  extern map<unsigned int, bool> joinCondition_linkStatus;
+  
+  /// mapping of join conditions and an assignment number to a Boolean result.
   extern map<unsigned int, map<unsigned int, bool > > joinCondition_result;
 
+  /// \todo comment me
   extern map<unsigned int, unsigned int> PPhasCompensateMap;
 
-  extern unsigned int PPcurrentScope;	///< the identifier of the current scope
+  /// the identifier of the current scope
+  extern unsigned int PPcurrentScope;
 
+  /// statistics about the activities and handlers of the process
   extern s_process_information process_information;
 
-
-
-  // used during parsing
-  extern map<unsigned int, ASTE*> ASTEmap;
+  /// A temporary mapping of attributes. This mapping is filled during parsing
+  /// and is copied during post-processing to the AST annotation.
   extern map<unsigned int, map<string, string> > temporaryAttributeMap;
+
+  /// Identifier of the next AST element. The process's id is 1.
   extern int ASTEid;  
 
+  /// The root of the abstract syntax tree.
   extern kc::tProcess AST;
 
+  /// string holding the invocation of BPEL2oWFN
+  extern string invocation;
 
+  /// string holding the called program name of BPEL2oWFN
+  extern string program_name;
 
-extern string invocation;
-extern string program_name;
+  /// filename of input file
+  extern string filename;
 
+  /// filename of output file
+  extern string output_filename;
 
+  /// parameters (set by #parse_command_line)
+  extern map<possibleParameters, bool> parameters;
 
-extern string filename;
-extern string output_filename;
+  /// the last token that was displayed in an error message
+  extern string last_error_token;
 
-/// parameters (set by #parse_command_line)
-extern map<possibleParameters, bool> parameters;
+  /// the line of the last syntax error
+  extern string last_error_line;
 
-/// the last token that was displayed in an error message
-extern string last_error_token;
-extern string last_error_line;
+  /// number of detect static analysis errors
+  extern unsigned int static_analysis_errors;
 
-extern unsigned int static_analysis_errors;
-extern unsigned int other_errors;
+  /// number of other detected warnings and errors
+  extern unsigned int other_errors;
 
-/// true while parsing, false while postprocessing
-extern bool parsing;
+  /// true while parsing, false while postprocessing
+  extern bool parsing;
 
-/// all elements that cause parse errors (either misplaced or nonstandard)
-extern set<string> unknown_elements;
+  /// all elements that caused parse errors (either misplaced or nonstandard)
+  extern set<string> unknown_elements;
 
-/// true if process is abstract BPEL
-extern bool abstract_process;
+  /// true if process is abstract BPEL
+  extern bool abstract_process;
 }
 
 #endif

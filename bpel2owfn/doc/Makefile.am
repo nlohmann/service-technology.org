@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/19 10:36:53 $ by $Author: nielslohmann $.
-# Version $Revision: 1.21 $
+# File last changed $Date: 2007/04/22 16:37:06 $ by $Author: nielslohmann $.
+# Version $Revision: 1.22 $
 
 
 # the manual
@@ -53,6 +53,7 @@ CLEANFILES = install.aux \
 	     install.log \
 	     install.pg \
 	     install.tmp \
+	     install.cps \
 	     install.tp
 
 EXTRA_DIST = install.texi

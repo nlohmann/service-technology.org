@@ -28,24 +28,26 @@
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/04/19 11:46:58 $
+ * \date    \$Date: 2007/04/22 16:34:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
  *
  * \todo    
  *          - commandline option to control drawing of clusters 
  *          - do not use "temporaryAttributeMap", because it should be deleted
  *            during postprocessing
  */
+
+
 
 
 
@@ -67,6 +69,10 @@ using std::endl;
 
 
 
+/******************************************************************************
+ * GLOBAL VARIABLES
+ *****************************************************************************/
+
 /// The CFG
 CFGBlock * CFG = NULL;
 
@@ -78,9 +84,15 @@ map<string, CFGBlock*> targets;
 
 
 
-/**
+
+
+/******************************************************************************
+ * CONSTRUCTORS AND DESTRUCTORS
+ *****************************************************************************/
+
+
+/*!
  * Constructor for a CFG block.
- *
  */
 CFGBlock::CFGBlock()
 {
@@ -90,7 +102,11 @@ CFGBlock::CFGBlock()
   processed = false;
 }
 
-/**
+
+
+
+
+/*!
  * Constructor for a CFG block.
  *
  * \param pType	  the type of the block (like CFGEmpty, CFGInvoke etc.)
@@ -111,18 +127,23 @@ CFGBlock::CFGBlock(CFGBlockType pType, int pId = 0, string pLabel = "")
   globals::cfgMap[toString(pId) + "." + pLabel] = this;
 }
 
-/**
+/*!
  * Destructor
- *
  */
 CFGBlock::~CFGBlock()
 {
-
 }
 
-/**
+
+
+
+
+/******************************************************************************
+ * DOT OUTPUT FUNCTIONS
+ *****************************************************************************/
+
+/*!
  * Prints dot-style information about the block and creates arcs to its successors.
- *
  */
 void CFGBlock::print_dot()
 {
@@ -200,11 +221,14 @@ void CFGBlock::print_dot()
   }
 }
 
-/**
+
+
+
+
+/*!
  * Returns a unique name for dot
  *
  * \return the dot name
- *
  */
 string CFGBlock::dot_name()
 {
@@ -218,7 +242,11 @@ string CFGBlock::dot_name()
   }
 }
 
-/**
+
+
+
+
+/*!
  * Initializes the dot output by printing the graph information.
  */
 void cfgDot(CFGBlock * block)
@@ -236,6 +264,10 @@ void cfgDot(CFGBlock * block)
 
 }
 
+
+
+
+
 /// resets the processed flag to false
 void CFGBlock::resetProcessedFlag()
 {
@@ -249,7 +281,11 @@ void CFGBlock::resetProcessedFlag()
   }
 }
 
-/**
+
+
+
+
+/*!
  * Connects two blocks.
  *
  * \param from	the first block
@@ -261,21 +297,23 @@ void connectBlocks(CFGBlock * from, CFGBlock * to)
   to->prevBlocks.push_back(from);
 }
 
-/***************************** Program Analysis *******************************/
 
-/**
+
+
+
+/******************************************************************************
+ * CONTROL FLOW GRAPH ANALYSIS
+ *****************************************************************************/
+
+/*!
  * Checks for uninitialized variables.
  * This is a forward-must analysis of the data flow.
- *
- *
  */
 void CFGBlock::checkForUninitializedVariables()
 {
-
   if (processed)
-  {
     return;
-  }
+
   processed = true;
   
   bool allPrerequisites = true;
@@ -293,20 +331,25 @@ void CFGBlock::checkForUninitializedVariables()
       allPrerequisites = allPrerequisites && (*iter)->processed;
     }
   }
+
   if (type == CFGTarget)
   {
     allPrerequisites = allPrerequisites && sources[dot_name()]->processed;
   }
+
   if (allPrerequisites)
   {
     if (!prevBlocks.empty())
     {
       list<CFGBlock *>::iterator blockBegin = prevBlocks.begin();
+
       if (type == CFGWhile || type == CFGForEach || type == CFGRepeatUntil && label == "Repeat" )
       {
 	blockBegin++;
       }
+
       initializedVariables = (*blockBegin)->initializedVariables;
+
       for (list<CFGBlock *>::iterator iter = blockBegin; iter != prevBlocks.end(); iter++)
       {
 	if (type == CFGFlow && label == "Flow_end")
@@ -319,6 +362,7 @@ void CFGBlock::checkForUninitializedVariables()
 	}
       }
     }
+
     if (type == CFGTarget)
     {
       initializedVariables = setUnion(initializedVariables, sources[dot_name()]->initializedVariables);
@@ -339,8 +383,7 @@ void CFGBlock::checkForUninitializedVariables()
     case CFGReply     : var = globals::ASTEmap[id]->variableName; break;
     case CFGFrom      : var = globals::ASTEmap[id]->variableName; break;
     case CFGInvoke    : var = globals::ASTEmap[id]->inputVariableName; 
-			attributeName = "inputVariable";
-			break;
+			attributeName = "inputVariable"; break;
 
     default: { /* A switch needs a default branch! */ }
   }
@@ -349,6 +392,7 @@ void CFGBlock::checkForUninitializedVariables()
   {
     if (initializedVariables.find(var) == initializedVariables.end())
     {
+      // uninitialized variable found: display error message
       assert(globals::ASTEmap[id] != NULL);
       string errormessage = "variable `" + globals::temporaryAttributeMap[id][attributeName] + "' used as `" + attributeName + "' in <" + globals::ASTEmap[id]->activityTypeName() + "> might be uninitialized";
       genericError(114, errormessage, globals::ASTEmap[id]->attributes["referenceLine"], ERRORLEVER_WARNING);
@@ -387,6 +431,9 @@ void CFGBlock::checkForUninitializedVariables()
     }
   }  
 }
+
+
+
 
 
 /// checks for cyclic links
@@ -443,14 +490,18 @@ void CFGBlock::checkForCyclicLinks()
   LEAVE("checkForCyclicLinks");
 }
 
+
+
+
+
 /// checks for cycles in control dependency
 void CFGBlock::checkForCyclicControlDependency()
 {
   ENTER("checkForCyclicControlDependency");
+
   if ( processed )
-  {
     return;
-  }
+
   processed = true;
  
   bool allPrerequisites = true;
@@ -463,6 +514,7 @@ void CFGBlock::checkForCyclicControlDependency()
     {
       blockBegin++;
     }
+
     for ( list<CFGBlock *>::iterator iter = blockBegin; iter != prevBlocks.end(); iter++ )
     {
       allPrerequisites = allPrerequisites && ( *iter )->processed;
@@ -474,6 +526,7 @@ void CFGBlock::checkForCyclicControlDependency()
     allPrerequisites = allPrerequisites && sources[ dot_name() ]->processed;
   }
   */
+
   if ( allPrerequisites )
   {
     if ( type == CFGTarget )
@@ -505,11 +558,13 @@ void CFGBlock::checkForCyclicControlDependency()
 	  child = *enclosedScope;
 	}
       }
+
       if ( child != 0 )
       {
 	set< unsigned int > subscopes ( globals::ASTEmap[ child ]->peerScopes );
 	subscopes.insert( child );
 	map< unsigned int, bool > seen;
+
 	for ( set< unsigned int >::iterator scope = subscopes.begin(); scope != subscopes.end(); scope++ )
 	{
 	  if ( ! seen[ *scope ] )
@@ -555,6 +610,7 @@ void CFGBlock::checkForCyclicControlDependency()
 	(*iter)->checkForCyclicControlDependency();
       }
     }
+
     if (type == CFGSource)
     {
       targets[dot_name()]->checkForCyclicControlDependency();
@@ -566,13 +622,21 @@ void CFGBlock::checkForCyclicControlDependency()
     LEAVE("checkForCyclicControlDependency");
     return;
   }
+
   LEAVE("checkForCyclicControlDependency");
 }
 
-/// checks for conflicting receives
+
+
+
+
+/*!
+ * checks for conflicting receives
+ */
 void CFGBlock::checkForConflictingReceive()
 {
   ENTER("checkForConflictingReceive");
+
   if (processed)
   {
     LEAVE("checkForConflictingReceive");
@@ -583,8 +647,8 @@ void CFGBlock::checkForConflictingReceive()
   if (type == CFGWhile)
     (*(prevBlocks.begin()))->checkForConflictingReceive();
 
-
   bool allPrerequisites = true;
+
   // check if all entries are allready processed
   if (!nextBlocks.empty())
   {
@@ -599,10 +663,12 @@ void CFGBlock::checkForConflictingReceive()
       allPrerequisites = allPrerequisites && (*iter)->processed;
     }
   }
+
   if (type == CFGSource)
   {
     allPrerequisites = allPrerequisites && targets[dot_name()]->processed;
   }
+
   if (allPrerequisites)
   {
     if (!nextBlocks.empty())
@@ -624,6 +690,7 @@ void CFGBlock::checkForConflictingReceive()
 	    {
 	      if(elemA->first == elemB->first && elemA->second != elemB->second && receives.find(*elemA) == receives.end())
 	      {
+		// conflicting receive found: display error message
 		assert(globals::ASTEmap[elemA->second] != NULL);
 		assert(globals::ASTEmap[elemB->second] != NULL);
 
@@ -634,16 +701,6 @@ void CFGBlock::checkForConflictingReceive()
 		  globals::ASTEmap[elemB->second]->attributes["partnerLink"] + "' (operation `" +
 		  globals::ASTEmap[elemB->second]->attributes["operation"] + "')";
 		genericError(106, errormessage, globals::ASTEmap[elemA->second]->attributes["referenceLine"]);
-
-		/*
-		assert(globals::ASTEmap[elemA->second] != NULL);
-		cerr << globals::filename << ":" << globals::ASTEmap[elemA->second]->attributes["referenceLine"] << endl;
-
-		trace("[CFG] WARNING: There are conflicting receives!\n");
-//		trace("               Please check lines " + toString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
-//		trace(                " and " + toString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
-		cerr << "               " << elemA->first << " (" << elemA->second << ") vs. " << elemB->first << " (" << elemB->second << ")" << endl;
-		trace("\n");*/
 	      }
 	    }
 	  }
@@ -656,6 +713,7 @@ void CFGBlock::checkForConflictingReceive()
 	  {
 	    if ((*otherBlock)->type == CFGOnMessage && (*iter)->channel_name == (*otherBlock)->channel_name) 
 	    {
+	      // conflicting receive found: display error message
 	      assert(globals::ASTEmap[(*iter)->id] != NULL);
 	      assert(globals::ASTEmap[(*otherBlock)->id] != NULL);
 
@@ -674,6 +732,7 @@ void CFGBlock::checkForConflictingReceive()
 	receives = setUnion(receives, (*iter)->receives);
       }
     }
+
     if (type == CFGSource)
     {
       for (set< pair< string, long> >::iterator elemA = targets[dot_name()]->receives.begin(); elemA != targets[dot_name()]->receives.end(); elemA++)
@@ -682,39 +741,35 @@ void CFGBlock::checkForConflictingReceive()
 	{
 	  if(elemA->first == elemB->first && elemA->second != elemB->second && receives.find(*elemA) == receives.end())
 	  {
-	      assert(globals::ASTEmap[elemA->second] != NULL);
-	      assert(globals::ASTEmap[elemB->second] != NULL);
+	    // conflicting receive found: display error message
+	    assert(globals::ASTEmap[elemA->second] != NULL);
+	    assert(globals::ASTEmap[elemB->second] != NULL);
 
-	      string errormessage = "<" + globals::ASTEmap[elemA->second]->activityTypeName() + "> is in conflict with " +
-		"<" + globals::ASTEmap[elemB->second]->activityTypeName() + "> (line " +
-		globals::ASTEmap[elemB->second]->attributes["referenceLine"] + "): " +
-		"both activities receive from <partnerLink> `" +
-		globals::ASTEmap[elemB->second]->attributes["partnerLink"] + "' (operation `" +
-		globals::ASTEmap[elemB->second]->attributes["operation"] + "')";
-	      genericError(106, errormessage, globals::ASTEmap[elemA->second]->attributes["referenceLine"]);
-
-	      /*
-	      trace("[CFG] WARNING: There are conflicting receives!\n");
-//	      trace("               Please check lines " + toString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
-//	      trace(                " and " + toString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
-	      cerr << "               " << elemA->first << " (" << elemA->second << ") vs. " << elemB->first << " (" << elemB->second << ")" << endl;
-		trace("\n");
-		*/
+	    string errormessage = "<" + globals::ASTEmap[elemA->second]->activityTypeName() + "> is in conflict with " +
+	      "<" + globals::ASTEmap[elemB->second]->activityTypeName() + "> (line " +
+	      globals::ASTEmap[elemB->second]->attributes["referenceLine"] + "): " +
+	      "both activities receive from <partnerLink> `" +
+	      globals::ASTEmap[elemB->second]->attributes["partnerLink"] + "' (operation `" +
+	      globals::ASTEmap[elemB->second]->attributes["operation"] + "')";
+	    genericError(106, errormessage, globals::ASTEmap[elemA->second]->attributes["referenceLine"]);
 	  }
 	}
       }
       receives = setUnion(receives, targets[dot_name()]->receives);
     }
+
     if (type == CFGReceive)
     {
       receives.insert(pair<string, long>( channel_name, id));
     }
+
     if (type == CFGInvoke)
     {
       if( globals::temporaryAttributeMap[id]["outputVariable"] != "") {
 	receives.insert(pair<string, long>( channel_name, id));
       }
     }
+
     if (!prevBlocks.empty())
     {
       /// for a while, we assume, that the body is never executed, so we drop that set
@@ -723,6 +778,7 @@ void CFGBlock::checkForConflictingReceive()
         (*iter)->checkForConflictingReceive();
       }
     }
+
     if (type == CFGTarget)
     {
       sources[dot_name()]->checkForConflictingReceive();
@@ -740,6 +796,11 @@ void CFGBlock::checkForConflictingReceive()
 
 
 
+
+
+/******************************************************************************
+ * PROCESS THE CFG
+ *****************************************************************************/
 
 void processCFG()
 {
@@ -791,7 +852,6 @@ void processCFG()
 
     }
   }
-
 
   delete(CFG);
 }

@@ -2,3 +2,5 @@ bpel2owfn.info
 mdate-sh
 stamp-vti
 version.texi
+Makefile
+Makefile.in

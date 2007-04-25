@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/04/05 11:51:40 $
+ * \date    \$Date: 2007/04/25 09:13:28 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.198 $
+ * \version \$Revision: 1.199 $
  *
  * \ingroup petrinet
  */
@@ -1036,7 +1036,7 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
  */
 void PetriNet::mergePlaces(Place * & p1, Place * & p2)
 {
-  if (p1 == p2)
+  if (p1 == p2 && p1 != NULL)
     return;
 
   if (p1 == NULL || p2 == NULL)

@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/20 12:25:24 $ by $Author: nielslohmann $
-# Version $Revision: 1.55 $
+# File last changed $Date: 2007/04/26 13:50:50 $ by $Author: nielslohmann $
+# Version $Revision: 1.56 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc rpm
@@ -165,10 +165,11 @@ gnupload_alpha: *.tar.gz
 	@echo "====================================="
 	@ls *.tar.gz -1
 	@echo
-	@echo "Are you sure you want to upload these files to ftp://alpha.gnu.org/gnu/bpel2owfn?"
+	@echo "Are you sure you want to upload these files to"
+	@echo "  ftp://alpha.gnu.org/gnu/bpel2owfn/$(PACKAGE_VERSION)?"
 	@echo "If not, please press (crtl+c) now."
 	@read answer
-	gnupload --to alpha.gnu.org:bpel2owfn $^
+	gnupload --to alpha.gnu.org:bpel2owfn/$(PACKAGE_VERSION) $^
 	rm $(^:.tar.gz=.tar.gz.sig)
 
 gnupload_release: *.tar.gz
@@ -177,44 +178,12 @@ gnupload_release: *.tar.gz
 	@echo "============================================="
 	@ls *.tar.gz -1
 	@echo
-	@echo "Are you sure you want to upload these files to ftp://ftp.gnu.org/gnu/bpel2owfn?"
+	@echo "Are you sure you want to upload these files to"
+	@echo"  ftp://ftp.gnu.org/gnu/bpel2owfn/$(PACKAGE_VERSION)?"
 	@echo "If not, please press (crtl+c) now."
 	@read answer
-	gnupload --to ftp.gnu.org:bpel2owfn $^
+	gnupload --to ftp.gnu.org:bpel2owfn/$(PACKAGE_VERSION) $^
 	rm $(^:.tar.gz=.tar.gz.sig)
-
-
-###################################################
-# Targets for automatic update from alpha.gnu.org #
-###################################################
-
-update:
-	@echo "=========================="
-	@echo " UPDATE VIA ANONYMOUS FTP "
-	@echo "=========================="
-	@echo
-	@echo "Are you sure you want to check out the latest source code"
-	@echo "from ftp://alpha.gnu.org/gnu/bpel2owfn?"
-	@echo "If not, please press (crtl+c) now."
-	@read answer
-	$(MAKE) clean
-	-rm bpel2owfn-*.tar.gz
-	@echo "open alpha.gnu.org" > ftpcommands
-	@echo "anonymous" >> ftpcommands
-	@echo "cd gnu/bpel2owfn" >> ftpcommands
-	@echo "binary" >> ftpcommands
-	@echo "mget *.tar.gz" >> ftpcommands
-	@echo "y" >> ftpcommands
-	@echo "disconnect" >> ftpcommands
-	@echo "bye" >> ftpcommands
-	@echo "" >> ftpcommands
-	ftp < ftpcommands
-	mv *.tar.gz bpel2owfn-experimental.tar.gz
-	gunzip bpel2owfn-experimental.tar.gz
-	tar xf bpel2owfn-experimental.tar
-	rm bpel2owfn-experimental.tar
-	$(abs_top_srcdir)/bpel2owfn-*/configure
-	$(MAKE)
 
 
 #####################################

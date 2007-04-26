@@ -331,6 +331,28 @@ Displays messages from Flex. Can be combined with any other debug level.
 @itemx bison
 Displays messages from Bison. Can be combined with any other debug level.
 @end table
+
+
+@item --reduce=0-5
+@itemx -r 0-5
+Applies structural reduction rules.
+
+Debug level:
+@table @samp
+@itemx 0
+No rules.
+@itemx 1
+Remove structural dead nodes.
+@itemx 2
+All reduction rules from @samp{-r1}. Additionally, remove unnecessary status places.
+@itemx 3
+All reduction rules from @samp{-r2}. Additionally, remove identical nodes.
+@itemx 4
+All reduction rules from @samp{-r3}. Additionally, remove serial nodes.
+@itemx 5
+All reduction rules from @samp{-r4}. Additionally, remove self-loop nodes.
+@end table
+
 @end table
 
 
@@ -427,7 +449,8 @@ can occur.
 Apply several structural reduction rules to the generated Petri net model. The
 rules preserve deadlocks, livelocks and all deadlock-free communicating
 partners. In addition, structurally dead nodes of the Petri net, for example,
-unmarked places without ingoing arcs are removed.
+unmarked places without ingoing arcs are removed. This parameter implies
+@samp{-r5}.
 
 @item standardfaults
 

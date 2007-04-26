@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/04/26 08:08:29 $
+ * \date    \$Date: 2007/04/26 15:09:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
 */
 %}
 
@@ -811,11 +811,11 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
   foreach (OnMessage(corr_1, from_1, innerActivity1, _id1); tOnMessage_list phylum->tOnMessage_list_1) {
     foreach (OnMessage(corr_2, from_2, innerActivity2, _id2); tOnMessage_list phylum->tOnMessage_list_1) {
       if ((innerActivity1 != innerActivity2))
-	dpeLinks(PN.findTransition(prefix + "onMessage_" + toString(branch_count)), innerActivity2->id); // onMessage -> onMessage'
+	dpeLinks(PN.findTransition(prefix + "onMessage_" + toString(branch_count)), innerActivity2->id, phylum->id); // onMessage -> onMessage'
     }
 
     foreach (OnAlarm(*,innerActivity2); tOnAlarm_list phylum->tOnAlarm_list_1) {
-      dpeLinks(PN.findTransition(prefix + "onMessage_" + toString(branch_count)), innerActivity2->id); // onMessage -> onAlarm
+      dpeLinks(PN.findTransition(prefix + "onMessage_" + toString(branch_count)), innerActivity2->id, phylum->id); // onMessage -> onAlarm
     }
     
     branch_count++;
@@ -824,11 +824,11 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
   foreach (OnAlarm(*,innerActivity1); tOnAlarm_list phylum->tOnAlarm_list_1) {
     foreach (otheronalarm=OnAlarm(*,innerActivity2); tOnAlarm_list phylum->tOnAlarm_list_1) {
       if ((innerActivity1 != innerActivity2))
-	dpeLinks(PN.findTransition(prefix + "onAlarm_" + toString(branch_count)), innerActivity2->id); // onAlarm -> onAlarm'
+	dpeLinks(PN.findTransition(prefix + "onAlarm_" + toString(branch_count)), innerActivity2->id, phylum->id); // onAlarm -> onAlarm'
     }
     
     foreach (OnMessage(_corr2, _from2, innerActivity2, _id2); tOnMessage_list phylum->tOnMessage_list_1) {
-      dpeLinks(PN.findTransition(prefix + "onAlarm_" + toString(branch_count)), innerActivity2->id); // onAlarm -> onMessage
+      dpeLinks(PN.findTransition(prefix + "onAlarm_" + toString(branch_count)), innerActivity2->id, phylum->id); // onAlarm -> onMessage
     }
     
     branch_count++;
@@ -973,7 +973,7 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
     {
       if (innerActivity1 != innerActivity2)
       {
-	dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id); // case -> case'
+	dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id, phylum->id); // case -> case'
       }
     }
 
@@ -981,13 +981,13 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
     {
       elseBranch=Else(innerActivity3,_id2):
       {
-	dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), innerActivity3->id); // case -> otherwise
-	dpeLinks(PN.findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
+	dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), innerActivity3->id, phylum->id); // case -> otherwise
+	dpeLinks(PN.findTransition(prefix + "caseo"), innerActivity1->id, phylum->id); // otherwise -> case
       }
       
       default:
       {
-	dpeLinks(PN.findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
+	dpeLinks(PN.findTransition(prefix + "caseo"), innerActivity1->id, phylum->id); // otherwise -> case
       }
     }
     

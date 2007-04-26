@@ -30,13 +30,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/04/26 13:50:29 $
+ * \date    \$Date: 2007/04/26 15:09:54 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.92 $
+ * \version \$Revision: 1.93 $
  *
  * \ingroup petrinet
  */
@@ -406,6 +406,13 @@ string Transition::output_dot() const
 
   if (history.size() == 1 && history[0].find(".skip") != string::npos)
     result += "label=\"skip\" fillcolor=darkseagreen1";
+
+  if (history.size() == 1 && history[0].find(".reset_false") != string::npos)
+    result += "label=\"reset\\nlink\" fillcolor=darkseagreen1";
+
+  if (history.size() == 1 && history[0].find(".reset_true") != string::npos)
+    result += "label=\"reset\\nlink\" fillcolor=darkseagreen1";
+  
 
   // stopping
   if (history.size() == 1 && history[0].find(".stopped.") != string::npos)

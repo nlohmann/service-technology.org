@@ -31,7 +31,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/04/26 13:50:29 $
+ * \date    \$Date: 2007/04/26 15:09:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
 */
 %}
 
@@ -351,13 +351,14 @@ Transition *stop_activity(Place *p, string p_name, string prefix)
  *
  *          Creates arcs to set links on dead paths to false.
  *
- * \param   t   transition that invokes DPE
- * \param   id  the identifier of the AST node
+ * \param   t          transition that invokes DPE
+ * \param   id         the identifier of the AST node
+ * \param   parent_id  the id of the parent <pick> or <if> (default 0)
  *
  * \ingroup patterns
  */
 %}
-void dpeLinks(Transition *t, int id)
+void dpeLinks(Transition *t, int id, int parent_id = 0)
 {
   ENTER("[ASTT]");
 
@@ -373,17 +374,36 @@ void dpeLinks(Transition *t, int id)
     PN.newArc(t, PN.findPlace("!link." + linkName));
   }
 
-/*
-  for (set<unsigned int>::iterator linkID = globals::ASTEmap[id]->enclosedTargetLinks.begin();
-      linkID != globals::ASTEmap[id]->enclosedTargetLinks.end();
-      linkID++)
-  {
-    assert(globals::ASTEmap[*linkID] != NULL);
-    string linkName = globals::ASTEmap[*linkID]->linkName;
 
-    cerr << "<" << globals::ASTEmap[id]->activityTypeName() << "> has target link " << linkName << endl;
+  // links that are only consumed in one <pick> or <if> branch have
+  // to be resetted when the <flow> is finished
+  if (parent_id != 0)
+  {
+    for (set<unsigned int>::iterator linkID = globals::ASTEmap[id]->enclosedTargetLinks.begin();
+	linkID != globals::ASTEmap[id]->enclosedTargetLinks.end();
+       	linkID++)
+    {
+      assert(globals::ASTEmap[*linkID] != NULL);
+      string linkName = globals::ASTEmap[*linkID]->linkName;
+
+      Place *p1 = PN.newPlace(toString(parent_id) + ".internal.resetLink." + toString(*linkID));
+      Place *p2 = PN.newPlace(toString(parent_id) + ".internal.resetedLink." + toString(*linkID));
+
+      PN.newArc(t, p1);
+
+      Transition *t1 = PN.newTransition(toString(parent_id) + ".internal.reset_true." + linkName);
+      PN.newArc(p1, t1);
+      PN.newArc(PN.findPlace("link." + linkName), t1);
+      PN.newArc(t1, p2);
+
+      Transition *t2 = PN.newTransition(toString(parent_id) + ".internal.reset_false." + linkName);
+      PN.newArc(p1, t2);
+      PN.newArc(PN.findPlace("!link." + linkName), t2);
+      PN.newArc(t2, p2);
+
+      PN.newArc(p2, PN.findTransition(toString(globals::ASTEmap[*linkID]->parentActivityId) + ".internal.join"));
+    }
   }
-*/
 
   LEAVE("[ASTT]");
 }

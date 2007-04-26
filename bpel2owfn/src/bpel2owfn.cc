@@ -31,14 +31,14 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/20 09:19:20 $
+ * \date    \$Date: 2007/04/26 13:50:29 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.160 $
+ * \version \$Revision: 1.161 $
  */
 
 
@@ -257,12 +257,13 @@ void single_output(set< string >::iterator file, PetriNet PN2)
       {
         prefix = file->substr(pos2 + 1, pos - pos2 - 1) + "_";
       }
-      // apply structural reduction rules?
-      if (globals::parameters[P_REDUCE])
+
+      if (globals::reduction_level > 0)
       {
-        trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
-        PN.reduce();
+	trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
+	PN.reduce(globals::reduction_level);
       }
+
       PN.addPrefix(prefix);
       PN2.compose(PN);
       PN = PetriNet();
@@ -283,13 +284,11 @@ void final_output( PetriNet PN2)
 
   if (modus == M_PETRINET || modus == M_CONSISTENCY)
   {
-    // apply structural reduction rules?
-    if ( globals::parameters[P_REDUCE] )
+    if (globals::reduction_level > 0)
     {
       trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
-      PN.reduce();
+      PN.reduce(globals::reduction_level);
     }
-
 
     // now the net will not change any more, thus the nodes are re-enumerated
     // and the maximal occurrences of the nodes are calculated.
@@ -462,7 +461,9 @@ void final_output( PetriNet PN2)
 	output = openOutput(globals::output_filename + "." + suffixes[F_DOT]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for dot ...\n");
-      PN.set_format(FORMAT_DOT);
+      // if parameter "nointerface" is set, set dot format with parameter "false"
+      // not to draw an interface
+      PN.set_format(FORMAT_DOT, !globals::parameters[P_NOINTERFACE]);
       (*output) << PN;
       if (globals::output_filename != "")
       {

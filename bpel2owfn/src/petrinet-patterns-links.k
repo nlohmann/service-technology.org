@@ -40,7 +40,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/18 21:23:07 $
+ * \date    \$Date: 2007/04/26 13:50:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          petrinet-patterns-links.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 %}
 
@@ -245,14 +245,15 @@ void P_LinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)
   Place *p7 = PN.newPlace(prefix + "begin");
 
   // Join condition evalates to true: start activity.
-  Transition *t1 = PN.newTransition(prefix + "start");
-  PN.newArc(p1, t1);
-  PN.newArc(p5, t1);
-  PN.newArc(t1, p7);
+//NEW//  Transition *t1 = PN.newTransition(prefix + "start");
+//NEW//  PN.newArc(p1, t1);
+//NEW//  PN.newArc(p5, t1);
+//NEW//  PN.newArc(t1, p7);
+  PN.mergePlaces(p5, p7);
 
   // Join condition evalates to false: skip activity.
   Transition *t2 = PN.newTransition(prefix + "skip");
-  PN.newArc(p1, t2);
+//NEW//  PN.newArc(p1, t2);
   PN.newArc(p6, t2);
   PN.newArc(t2, p2);
 
@@ -263,7 +264,7 @@ void P_LinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)
   P_joinCondition(prefix, phylum->tTarget_list_1, phylum->joinCondition_1);
 
   // Embed the inner activity.
-  PN.mergePlaces(p7, newPrefix + ".initial");
+  PN.mergePlaces(prefix + "begin", newPrefix + ".initial");
   PN.mergePlaces(p2, newPrefix + ".final");
 
   // Add stop places and stopping transitions.
@@ -338,17 +339,18 @@ void P_LinkWrapper3(impl_standardElements* abstract_phylum, uview current_view)
   Place *p9 = PN.newPlace(prefix + "faulted");
 
   // Join condition evalates to true: start activity.
-  Transition *t1 = PN.newTransition(prefix + "start");
-  PN.newArc(p1, t1);
-  PN.newArc(p6, t1);
-  PN.newArc(t1, p8);
+//NEW//  Transition *t1 = PN.newTransition(prefix + "start");
+//NEW//  PN.newArc(p1, t1);
+//NEW//  PN.newArc(p6, t1);
+//NEW//  PN.newArc(t1, p8);
+  PN.mergePlaces(p6, p8);
 
   // Join condition evalates to false: skip activity and throw fault. The
   // transition is not labeled "skip", but "throwFault.joinFailure".
   Transition *t2 = throwFault(p7, p9, "joinFailure", prefix,
                               mkinteger(phylum->parentId),
                               globals::ASTEmap[phylum->parentId]->controlFlow);
-  PN.newArc(p1, t2);
+//NEW//  PN.newArc(p1, t2);
   PN.newArc(p7, t2);
   PN.newArc(t2, p9);
 
@@ -363,7 +365,7 @@ void P_LinkWrapper3(impl_standardElements* abstract_phylum, uview current_view)
   P_joinCondition(prefix, phylum->tTarget_list_1, phylum->joinCondition_1);
 
   // Embed the inner activity.
-  PN.mergePlaces(p8, newPrefix + ".initial");
+  PN.mergePlaces(prefix + "begin", newPrefix + ".initial");
   PN.mergePlaces(p2, newPrefix + ".final");
   PN.mergePlaces(p3, newPrefix + ".stop");
   PN.mergePlaces(p4, newPrefix + ".stopped");
@@ -418,14 +420,15 @@ void P_LinkWrapper4(impl_standardElements* abstract_phylum, uview current_view)
   Place *p8 = PN.newPlace(prefix + "done");
 
   // Join condition evalates to true: start activity.
-  Transition *t1 = PN.newTransition(prefix + "start");
-  PN.newArc(p1, t1);
-  PN.newArc(p5, t1);
-  PN.newArc(t1, p7);
+//NEW//  Transition *t1 = PN.newTransition(prefix + "start");
+//NEW//  PN.newArc(p1, t1);
+//NEW//  PN.newArc(p5, t1);
+//NEW//  PN.newArc(t1, p7);
+  PN.mergePlaces(p5, p7);
 
   // Join condition evalates to false: skip activity.
   Transition *t2 = PN.newTransition(prefix + "skip");
-  PN.newArc(p1, t2);
+//NEW//  PN.newArc(p1, t2);
   PN.newArc(p6, t2);
   PN.newArc(t2, p2);
 
@@ -439,7 +442,7 @@ void P_LinkWrapper4(impl_standardElements* abstract_phylum, uview current_view)
   P_joinCondition(prefix, phylum->tTarget_list_1, phylum->joinCondition_1);
 
   // Embed the inner activity.
-  PN.mergePlaces(p7, newPrefix + ".initial");
+  PN.mergePlaces(prefix + "begin", newPrefix + ".initial");
   PN.mergePlaces(p8, newPrefix + ".final"); 
 
   // Add stop places and stopping transitions.
@@ -518,17 +521,18 @@ void P_LinkWrapper5(impl_standardElements* abstract_phylum, uview current_view)
   Place *p10 = PN.newPlace(prefix + "faulted");
 
   // Join condition evalates to true: start activity.
-  Transition *t1 = PN.newTransition(prefix + "start");
-  PN.newArc(p1, t1);
-  PN.newArc(p6, t1);
-  PN.newArc(t1, p8);
+//NEW//  Transition *t1 = PN.newTransition(prefix + "start");
+//NEW//  PN.newArc(p1, t1);
+//NEW//  PN.newArc(p6, t1);
+//NEW//  PN.newArc(t1, p8);
+  PN.mergePlaces(p6, p8);
 
   // Join condition evalates to false: skip activity and throw fault. The
   // transition is not labeled "skip", but "throwFault.joinFailure".
   Transition *t2 = throwFault(p7, p10, "joinFailure", prefix,
                               mkinteger(phylum->parentId),
                               globals::ASTEmap[phylum->parentId]->controlFlow);
-  PN.newArc(p1, t2);
+//NEW//  PN.newArc(p1, t2);
   PN.newArc(p7, t2);
   PN.newArc(t2, p10);
 
@@ -547,7 +551,7 @@ void P_LinkWrapper5(impl_standardElements* abstract_phylum, uview current_view)
   P_joinCondition(prefix, phylum->tTarget_list_1, phylum->joinCondition_1);
 
   // Embed the inner activity.
-  PN.mergePlaces(p8, newPrefix + ".initial");
+  PN.mergePlaces(prefix + "begin", newPrefix + ".initial");
   PN.mergePlaces(p9, newPrefix + ".final");
   PN.mergePlaces(p3, newPrefix + ".stop");
   PN.mergePlaces(p4, newPrefix + ".stopped");

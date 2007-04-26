@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/03/29 13:28:32 $
+ * \date    \$Date: 2007/04/26 13:50:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  *
  * \ingroup petrinet
  */
@@ -772,27 +772,46 @@ void PetriNet::reduce_equal_places()
  *       - Pass a parameter to this function to choose the property of the
  *         model to be preserved.
  */
-unsigned int PetriNet::reduce()
+unsigned int PetriNet::reduce(unsigned int reduction_level)
 {
   trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " + information() + "\n");
   trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
 
   string old = information();
   bool done = false;
-  int passes = 1;
+  unsigned int passes = 1;
 
   while (!done)
   {
-    reduce_dead_nodes();
-    reduce_unused_status_places();
-    reduce_suspicious_transitions();
-    reduce_identical_places();		// RB1
-    reduce_identical_transitions();	// RB2
-    reduce_series_places();		// RA1
-    reduce_series_transitions();	// RA2
-    reduce_self_loop_places();		// RC1
-    reduce_self_loop_transitions();	// RC2
-    reduce_equal_places();		// RD1
+    if (reduction_level >= 1)
+    {
+      reduce_dead_nodes();
+    }
+
+    if (reduction_level >= 2)
+    {
+      reduce_unused_status_places();
+      reduce_suspicious_transitions();
+    }
+
+    if (reduction_level >= 3)
+    {
+      reduce_identical_places();	// RB1
+      reduce_identical_transitions();	// RB2
+    }
+
+    if (reduction_level >= 4)
+    {
+      reduce_series_places();		// RA1
+      reduce_series_transitions();	// RA2
+    }
+
+    if (reduction_level == 5)
+    {
+      reduce_self_loop_places();	// RC1
+      reduce_self_loop_transitions();	// RC2
+      reduce_equal_places();		// RD1
+    }
 
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + toString(passes++) + ": " + information() + "\n");
 

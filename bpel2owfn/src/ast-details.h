@@ -29,14 +29,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/04/18 16:18:31 $
+ * \date    \$Date: 2007/04/26 13:50:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  */
 
 
@@ -162,7 +162,9 @@ class ASTE
 
     set<unsigned int> peerScopes;	///< as defined on page 132 of the spec
     set<unsigned int> enclosedScopes;	///< as defined on page 122 of the spec
+
     set<unsigned int> enclosedSourceLinks;	///< the identifiers of all (recursively) enclosed source links
+    set<unsigned int> enclosedTargetLinks;	///< the identifiers of all (recursively) enclosed target links
 
     unsigned int enclosedFH;		///< the id of the enclosed fault handlers
     unsigned int enclosedCH;		///< the id of the enclosed compensation handler

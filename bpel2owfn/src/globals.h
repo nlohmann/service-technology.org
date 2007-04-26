@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/21 17:36:26 $
+ * \date    \$Date: 2007/04/26 13:50:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 
 
@@ -198,6 +198,9 @@ namespace globals
 
   /// true if process is abstract BPEL
   extern bool abstract_process;
+
+  /// the level of structural reduction
+  extern unsigned int reduction_level;
 }
 
 #endif

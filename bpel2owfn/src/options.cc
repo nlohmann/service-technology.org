@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/19 06:40:48 $
+ * \date    \$Date: 2007/04/26 13:50:29 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.74 $
+ * \version \$Revision: 1.75 $
  */
 
 
@@ -117,11 +117,12 @@ static struct option longopts[] =
   { "format",		required_argument, NULL, 'f' },
   { "parameter",	required_argument, NULL, 'p' },
   { "debug",		required_argument, NULL, 'd' },
+  { "reduce",		required_argument, NULL, 'r' },
   NULL
 };
 
 /// short options (needed by GNU getopt)
-const char *par_string = "hvm:li:of:p:d:";
+const char *par_string = "hvm:li:of:p:dr:";
 
 
 
@@ -150,6 +151,7 @@ void print_help()
   trace(" -f, --format=FORMAT    create output of the given format\n");
   trace(" -l, --log=NAME         create log file (NAME sets filename)\n");
   trace(" -d, --debug=NUMBER     set a debug level (NUMBER=0..4 or \"flex\" or \"bison\")\n");
+  trace(" -r, --reduce=NUMBER    apply structural reduction level (NUMBER=0..5)\n");
   trace(" -h, --help             print this help list and exit\n");
   trace(" -v, --version          print program version and exit\n");
   trace("\n");
@@ -161,12 +163,13 @@ void print_help()
   trace("    consistency         checks whether services communicate deadlock-freely\n");
   trace("\n");
   trace("  PARAMETER is one of the following (multiple parameters permitted):\n");
-  trace("    reduce              structurally simplify generated Petri net\n");
+  trace("    reduce              structurally simplify generated Petri net (-r5)\n");
   trace("    variables           model BPEL variables\n");
   trace("    standardfaults      model BPEL standard faults\n");
   trace("    fhfaults            model faults in fault handlers \n");
   trace("    communicationonly   only model the communicational behavior\n");
   trace("    xor                 use mutually exclusive transition condition\n");
+  trace("    nointerface         do not draw an interface (for dot output\n");
   trace("\n");
   trace("  FORMAT is one of the following (multiple formats permitted):\n");
   trace("    lola, owfn, dot, pep, apnn, ina, spin, info, pnml, txt, info\n");
@@ -400,7 +403,7 @@ void parse_command_line(int argc, char* argv[])
 		parameter = string(optarg);
 
 		if ( parameter == "reduce")
-		  globals::parameters[P_REDUCE] = true;
+		  globals::reduction_level = 5;
 		else if (parameter == "communicationonly")
 		  globals::parameters[P_COMMUNICATIONONLY] = true;
 		else if (parameter == "standardfaults")
@@ -415,6 +418,8 @@ void parse_command_line(int argc, char* argv[])
 		  globals::parameters[P_LOOPCOUNT] = true;
 		else if (parameter == "loopcontrol")
 		  globals::parameters[P_LOOPCONTROL] = true;
+		else if (parameter == "nointerface")
+		  globals::parameters[P_NOINTERFACE] = true;
 		else {
 		  trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
 		  trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");
@@ -447,9 +452,21 @@ void parse_command_line(int argc, char* argv[])
 		else {
 		  trace(TRACE_ALWAYS, "Unrecognised debug mode: \"" + parameter +"\"!\n");
 		  trace(TRACE_ALWAYS, "Use -h to get a list of valid debug modes.\n");
-    	  cleanup();
+		  cleanup();
 		  exit(1);
-        }
+	      }
+
+      case 'r':
+		{
+		  globals::reduction_level = toUInt(string(optarg));
+		  if (globals::reduction_level == UINT_MAX)
+		  {
+		    trace(TRACE_ALWAYS, "Unrecognised reduction mode: \"" + string(optarg) +"\"!\n");
+		    trace(TRACE_ALWAYS, "Define a number between 0 and 4.\n");
+		    cleanup();
+		    exit(1);
+		  }
+		}
 
 		break;
 	      }

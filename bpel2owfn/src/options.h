@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
+ * Copyright 2005, 2006, 2007 Niels Lohmann, Christian Gierds                *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/27 12:37:48 $
+ * \date    \$Date: 2007/04/26 13:50:29 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  */
 
 
@@ -87,7 +87,8 @@ typedef enum
    O_LOG,		///< write a log-file
    O_FORMAT,		///< choose output file format (see #possibleFormats)
    O_PARAMETER,		///< set various parameters (see #possibleParameters)
-   O_DEBUG		///< set the debug level
+   O_DEBUG,		///< set the debug level
+   O_REDUCTION		///< set level of structural reduction
 } possibleOptions;
 
 
@@ -137,14 +138,14 @@ typedef enum
  */
 typedef enum
 {
-  P_REDUCE,		///< structural reduction rules
   P_VARIABLES,		///< removes all variables from the model
   P_STANDARDFAULTS,	///< only user-defined faults can occur
   P_FHFAULTS,		///< activities inside the FH throw no faults
   P_COMMUNICATIONONLY,	///< creates the smallest possible net
   P_XOR,		///< use XOR as transition condition
   P_LOOPCOUNT,		///< use loop counters
-  P_LOOPCONTROL		///< add communication to loops
+  P_LOOPCONTROL,	///< add communication to loops
+  P_NOINTERFACE		///< do not draw an interface
 } possibleParameters;
 
 

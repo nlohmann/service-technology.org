@@ -26,17 +26,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/03/28 09:28:45 $
+ * \date    \$Date: 2007/04/26 13:50:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.91 $
+ * \version \$Revision: 1.92 $
  *
  * \ingroup petrinet
  */
@@ -176,10 +176,13 @@ string Node::nodeFullName() const
  */
 string Place::nodeShortName() const
 {
+  if (history[0].find("link") != string::npos || history[0].find("!link") != string::npos)
+    return history[0];
+
   if (type == INTERNAL)
     return ("p" + toString(id));
-  else
-    return history[0];
+  
+  return history[0];
 }
 
 
@@ -352,8 +355,8 @@ string Transition::output_dot() const
 
   switch(type)
   {
-    case(IN):		result += "[fillcolor=orange"; break;
-    case(OUT):		result += "[fillcolor=yellow"; break;
+    case(IN):		result += "[fillcolor=orange "; break;
+    case(OUT):		result += "[fillcolor=yellow "; break;
     case(INOUT):	result += "[fillcolor=gold ";
                         result += "label=<";
                         // the table size depends on the node size of .3 (inch);
@@ -364,9 +367,50 @@ string Transition::output_dot() const
                         result += "</TD></TR><TR>";
                         result += "<TD HEIGHT=\"10\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\" BGCOLOR=\"YELLOW\">";
                         result += "</TD></TR></TABLE> >"; break;
-//    case(INOUT):	result += "[fillcolor=gold"; break;
     case(INTERNAL):	result += "["; break;
   }
+
+
+  // add labels for transitions with singleton history
+
+  // internal activities
+  if (history.size() == 1 && history[0].find("internal.empty") != string::npos)
+    result += "label=\"empty\" fillcolor=gray";
+  if (history.size() == 1 && history[0].find("internal.assign") != string::npos)
+    result += "label=\"asgn\" fillcolor=gray";
+
+  // communicating activities
+  if (history.size() == 1 && history[0].find("internal.receive") != string::npos)
+    result += "label=\"rec\"";
+  if (history.size() == 1 && history[0].find("internal.reply") != string::npos)
+    result += "label=\"reply\"";
+  if (history.size() == 1 && history[0].find("internal.invoke") != string::npos)
+    result += "label=\"inv\"";
+
+  // structured activities
+  if (history.size() == 1 && history[0].find("internal.case") != string::npos)
+    result += "label=\"case\" fillcolor=azure2";
+
+  if (history.size() == 1 && history[0].find("internal.split") != string::npos)
+    result += "label=\"flow\\nsplit\" fillcolor=azure2";
+
+  if (history.size() == 1 && history[0].find("internal.join") != string::npos)
+    result += "label=\"flow\\njoin\" fillcolor=azure2";
+
+  // everything about links
+  if (history.size() == 1 && history[0].find(".setLinks") != string::npos)
+    result += "label=\"tc\" fillcolor=darkseagreen1";
+
+  if (history.size() == 1 && history[0].find(".evaluate") != string::npos)
+    result += "label=\"jc\\neval\" fillcolor=darkseagreen1";
+
+  if (history.size() == 1 && history[0].find(".skip") != string::npos)
+    result += "label=\"skip\" fillcolor=darkseagreen1";
+
+  // stopping
+  if (history.size() == 1 && history[0].find(".stopped.") != string::npos)
+    result += "label=\"stop\" fillcolor=darksalmon";
+  
 
   if (!labels.empty())
   {
@@ -473,7 +517,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   (*output) << "digraph N {" << endl;
   (*output) << " graph [fontname=\"Helvetica\" nodesep=0.3 ranksep=\"0.2 equally\" label=\"";
 
-  if (globals::parameters[P_REDUCE])
+  if (globals::reduction_level == 5)
     (*output) << "structurally reduced ";
 
   (*output) << "Petri net generated from " << globals::filename << "\"]" << endl;
@@ -516,7 +560,12 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
     else
       (*output) << " p" << (*p)->id << " p" << (*p)->id << "_l";
   }
-  (*output) << "\n  label=\"\" style=dashed" << endl;
+
+  if (draw_interface)
+    (*output) << "\n  label=\"\" style=dashed" << endl;
+  else
+    (*output) << "\n  label=\"\" style=invis" << endl;
+
   (*output) << " }" << endl;
 
 

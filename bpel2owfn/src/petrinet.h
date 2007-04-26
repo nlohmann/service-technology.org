@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/25 15:40:21 $
+ * \date    \$Date: 2007/04/26 13:50:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.141 $
+ * \version \$Revision: 1.142 $
  *
  * \ingroup petrinet
  */
@@ -446,7 +446,7 @@ class PetriNet
 
 
     /// applies structral reduction rules
-    unsigned int reduce();
+    unsigned int reduce(unsigned int reduction_level = 5);
 
     /// swaps input and output places
     void mirror();

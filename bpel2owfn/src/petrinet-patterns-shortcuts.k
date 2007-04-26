@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2007 Niels Lohmann, Christian Gierds                            *
+ * Copyright 2007 Niels Lohmann, Christian Gierds, Martin Znamirowski        *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -25,11 +25,13 @@
  * \brief   Petri net patterns for shortcuts
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/04/11 12:58:43 $
+ * \date    \$Date: 2007/04/26 13:50:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +41,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
 */
 %}
 
@@ -370,6 +372,18 @@ void dpeLinks(Transition *t, int id)
     string linkName = globals::ASTEmap[*linkID]->linkName;
     PN.newArc(t, PN.findPlace("!link." + linkName));
   }
+
+/*
+  for (set<unsigned int>::iterator linkID = globals::ASTEmap[id]->enclosedTargetLinks.begin();
+      linkID != globals::ASTEmap[id]->enclosedTargetLinks.end();
+      linkID++)
+  {
+    assert(globals::ASTEmap[*linkID] != NULL);
+    string linkName = globals::ASTEmap[*linkID]->linkName;
+
+    cerr << "<" << globals::ASTEmap[id]->activityTypeName() << "> has target link " << linkName << endl;
+  }
+*/
 
   LEAVE("[ASTT]");
 }
@@ -803,7 +817,9 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
   // Add transitions and connect them with the links.
   for (unsigned int i = 0; i < transitionNumber; i++)
   {
-    joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
+    joinTransitions[i] = PN.newTransition(prefix + "evaluate" + toString(i));
+
+    PN.newArc(PN.findPlace(prefix + "initial"), joinTransitions[i]); //NEW//
 
     for (unsigned int j = 0; j < linkCount; j++)
     {

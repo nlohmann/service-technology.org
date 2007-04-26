@@ -57,6 +57,14 @@
 % full Texinfo distribution.
 %
 % The GNU Texinfo home page is http://www.gnu.org/software/texinfo.
+% 
+%
+%
+% NOTE:
+%   This file has been edited by Niels Lohmann (nlohmann@informatik.hu-berlin.de)
+%   to re-order the sequence of image file formats to be checked. Instead of
+%   creating a PDF and convert PNGs to PDF, texinfo now firstly checks for an
+%   existing PDF file. Changes are around line 1286.
 
 
 \message{Loading texinfo [version \texinfoversion]:}
@@ -1274,15 +1282,13 @@ output) for that.)}
     % others).  Let's try in that order.
     \let\pdfimgext=\empty
     \begingroup
+    \openin 1 #1.pdf \ifeof 1
       \openin 1 #1.png \ifeof 1
         \openin 1 #1.jpg \ifeof 1
           \openin 1 #1.jpeg \ifeof 1
-            \openin 1 #1.JPG \ifeof 1
-              \openin 1 #1.pdf \ifeof 1
+            \openin 1 #1.JPG \ifeof 1              
                 \errhelp = \nopdfimagehelp
                 \errmessage{Could not find image file #1 for pdf}%
-              \else \gdef\pdfimgext{pdf}%
-              \fi
             \else \gdef\pdfimgext{JPG}%
             \fi
           \else \gdef\pdfimgext{jpeg}%
@@ -1291,6 +1297,8 @@ output) for that.)}
         \fi
       \else \gdef\pdfimgext{png}%
       \fi
+              \else \gdef\pdfimgext{pdf}%
+              \fi
       \closein 1
     \endgroup
     %

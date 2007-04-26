@@ -335,20 +335,43 @@ Displays messages from Bison. Can be combined with any other debug level.
 
 @item --reduce=0-5
 @itemx -r 0-5
-Applies structural reduction rules.
+Apply several structural reduction rules to the generated Petri net model
+(implies mode @samp{petrinet} or @samp{consistency}). The rules preserve
+deadlocks, livelocks and all deadlock-free communicating partners. The rules
+are organized in reduction levels:
 
-Debug level:
 @table @samp
 @itemx 0
-No rules.
+No rules are applied (standard).
 @itemx 1
-Remove structural dead nodes.
+Structural dead nodes are removed; that is, unmarked places with empty preset
+and transitions with a dead place in its preset are removed.
 @itemx 2
-All reduction rules from @samp{-r1}. Additionally, remove unnecessary status places.
+All reduction rules from @samp{-r1}. Additionally, unnecessary status places
+are removed. A status place is considered unnecessary if it has no outgoing
+arcs.
 @itemx 3
-All reduction rules from @samp{-r2}. Additionally, remove identical nodes.
+All reduction rules from @samp{-r2}. Additionally, identical nodes are merged.
+Two nodes are considered identical if their presets and postsets are equal:
+
+@iftex
+@center @image{images/rb1,,1.0in} @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @image{images/rb2,,1.0in}
+@end iftex
+@ifhtml
+@center @image{images/rb1} @image{images/rb2}
+@end ifhtml
+
+
 @itemx 4
-All reduction rules from @samp{-r3}. Additionally, remove serial nodes.
+All reduction rules from @samp{-r3}. Additionally, remove serial nodes:
+
+@iftex
+@center @image{images/ra1,,1.0in} @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @image{images/ra2,,1.0in}
+@end iftex
+@ifhtml
+@center @image{images/ra1} @image{images/ra2}
+@end ifhtml
+
 @itemx 5
 All reduction rules from @samp{-r4}. Additionally, remove self-loop nodes.
 @end table
@@ -444,13 +467,14 @@ Confines the @samp{standardfaults} parameter: in the negative control flow
 (in activities in fault handlers), no further @acronym{BPEL} standard faults
 can occur.
 
+@item nointerface
+
+When creating a @file{.dot} file, no interface is printed.
+
 @item reduce
 
-Apply several structural reduction rules to the generated Petri net model. The
-rules preserve deadlocks, livelocks and all deadlock-free communicating
-partners. In addition, structurally dead nodes of the Petri net, for example,
-unmarked places without ingoing arcs are removed. This parameter implies
-@samp{-r5}.
+Apply all implemented structural reduction rules. This parameter is a shortcut
+for @samp{-r5} and overrides any other defined reduction level.
 
 @item standardfaults
 

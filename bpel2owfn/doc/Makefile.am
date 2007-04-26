@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/22 16:37:06 $ by $Author: nielslohmann $.
-# Version $Revision: 1.22 $
+# File last changed $Date: 2007/04/26 16:41:14 $ by $Author: nielslohmann $.
+# Version $Revision: 1.23 $
 
 
 # the manual
@@ -27,17 +27,29 @@ info_TEXINFOS = bpel2owfn.texi
 
 bpel2owfn_TEXINFOS = fdl.texi \
 		     images/bpel2owfn.eps \
-		     images/bpel2owfn.pdf \
-		     images/bpel2owfn.png \
 		     images/example.eps \
-		     images/example.pdf \
-		     images/example.png \
 		     images/toolchain.eps \
-		     images/toolchain.pdf \
-		     images/toolchain.png \
 		     images/tools4bpel.eps \
+		     images/ra1.eps \
+		     images/ra2.eps \
+		     images/rb1.eps \
+		     images/rb2.eps \
+		     images/bpel2owfn.pdf \
+		     images/example.pdf \
+		     images/toolchain.pdf \
 		     images/tools4bpel.pdf \
-		     images/tools4bpel.png
+		     images/ra1.pdf \
+		     images/ra2.pdf \
+		     images/rb1.pdf \
+		     images/rb2.pdf
+		     images/bpel2owfn.png \
+		     images/example.png \
+		     images/toolchain.png \
+		     images/tools4bpel.png \
+		     images/ra1.png \
+		     images/ra2.png \
+		     images/rb1.png \
+		     images/rb2.png
 
 # the installation manual
 install_TEXINFOS = install.texi

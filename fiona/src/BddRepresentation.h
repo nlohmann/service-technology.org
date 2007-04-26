@@ -69,8 +69,6 @@ class BddRepresentation{
 		void testSymbRepresentation(vertex* v, bool visitedNodes[]);
 		unsigned int getBound();
 		void setMaxPlaceBits(vertex* v, bool visitedNodes[]);
-		//unsigned int cntNodes; //Anzahl der Knoten in der OG in expliziter Darstellung (nur für Testzwecke)
-
 		
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.

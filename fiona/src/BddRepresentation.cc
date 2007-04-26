@@ -204,7 +204,7 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 	
 	DdNode * annotation = annotationToBddAnn(v);
 	DdNode* tmp = Cudd_bddOr(mgrAnn, annotation, bddAnn);
-	//  if (tmp == NULL) exit(1);
+	assert(tmp != NULL);
 	Cudd_Ref(tmp);
 	Cudd_RecursiveDeref(mgrAnn, annotation);
 	Cudd_RecursiveDeref(mgrAnn, bddAnn);
@@ -232,8 +232,8 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 					DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
 					
 					//edge
-					DdNode * edge = Cudd_bddAnd(mgrMp, label, nodes); 
-					// if (edge == NULL) exit(1);
+					DdNode * edge = Cudd_bddAnd(mgrMp, label, nodes);
+					assert(edge != NULL); 
 					Cudd_Ref(edge);
 					Cudd_RecursiveDeref(mgrMp, label);
 					Cudd_RecursiveDeref(mgrMp, nodes);
@@ -244,7 +244,7 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 					Cudd_PrintMinterm(mgrMp, edge);
 					cout << "--------------------------------\n";*/
 					tmp = Cudd_bddOr(mgrMp, edge, bddMp);
-					// if (tmp == NULL) exit(1);
+					assert(tmp != NULL);
 					Cudd_Ref(tmp);
 					Cudd_RecursiveDeref(mgrMp, edge);
 					Cudd_RecursiveDeref(mgrMp, bddMp);
@@ -268,7 +268,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 	if (v->getColor() == BLUE){	//add annotation
 		DdNode * annotation = annotationToBddAnn(v);
 		DdNode* tmp = Cudd_bddOr(mgrAnn, annotation, bddAnn);
-		//  if (tmp == NULL) exit(1);
+		assert(tmp != NULL);
 		Cudd_Ref(tmp);
 		Cudd_RecursiveDeref(mgrAnn, annotation);
 		Cudd_RecursiveDeref(mgrAnn, bddAnn);
@@ -277,7 +277,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 	else {	//delete annotation
 		DdNode * annotation = annotationToBddAnn(v);
 		DdNode* tmp = Cudd_bddAnd(mgrAnn, annotation, Cudd_Not(bddAnn));
-		//  if (tmp == NULL) exit(1);
+		assert(tmp != NULL);
 		Cudd_Ref(tmp);
 		Cudd_RecursiveDeref(mgrAnn, annotation);
 		Cudd_RecursiveDeref(mgrAnn, bddAnn);
@@ -297,15 +297,13 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 								
 				//label
 				DdNode * label = labelToBddMp(element->getLabel()); 
-				//if (label == NULL) exit(1)
 
 				//nodes		    
-				DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
-				// if (nodes == NULL) exit(1)		            
+				DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());	            
 			
 				//edge
 				DdNode * edge = Cudd_bddAnd(mgrMp, label, nodes); 
-				// if (edge == NULL) exit(1);
+				assert(edge != NULL);
 				Cudd_Ref(edge);
 				Cudd_RecursiveDeref(mgrMp, label);
 				Cudd_RecursiveDeref(mgrMp, nodes);
@@ -318,7 +316,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 					/*cout << "add current edge " << endl;
 					cout << "--------------------------------\n";*/
 					DdNode* tmp = Cudd_bddOr(mgrMp, edge, bddMp);
-					// if (tmp == NULL) exit(1);
+					assert(tmp != NULL);
 					Cudd_Ref(tmp);
 					Cudd_RecursiveDeref(mgrMp, edge);
 					Cudd_RecursiveDeref(mgrMp, bddMp);
@@ -328,7 +326,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 					/*cout << "delete edge " << v->getNumber() << "->" << vNext->getNumber() << endl;
 					cout << "--------------------------------\n";*/
 					DdNode* tmp = Cudd_bddAnd(mgrMp, bddMp, Cudd_Not(edge));
-					// if (tmp == NULL) exit(1);
+					assert(tmp != NULL);
 					Cudd_Ref(tmp);
 					Cudd_RecursiveDeref(mgrMp, edge);
 					Cudd_RecursiveDeref(mgrMp, bddMp);
@@ -361,7 +359,7 @@ DdNode* BddRepresentation::labelToBddMp(const std::string& label) {
 		else{
 			tmp = Cudd_bddAnd(mgrMp, Cudd_bddIthVar(mgrMp,i), f);
 		}
-		// if (tmp == NULL) exit(1);
+		assert(tmp != NULL);
 		Cudd_Ref(tmp);
 		Cudd_RecursiveDeref(mgrMp, f);
 		f = tmp;
@@ -413,7 +411,7 @@ DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2){
 		else{
 			tmp = Cudd_bddAnd(mgrMp, Cudd_bddIthVar(mgrMp, maxLabelBits+(2*i)), f);
 		}
-		// if (tmp == NULL) exit(1);        
+		assert(tmp != NULL);  
 		Cudd_Ref(tmp);
 		Cudd_RecursiveDeref(mgrMp, f);
 		f = tmp; 
@@ -424,7 +422,7 @@ DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2){
 		else{
 			tmp = Cudd_bddAnd(mgrMp, Cudd_bddIthVar(mgrMp, maxLabelBits+1+(2*i)), f);
 		}
-		// if (tmp == NULL) exit(1);
+		assert(tmp != NULL);
 		Cudd_Ref(tmp);
 		Cudd_RecursiveDeref(mgrMp, f);
 		f = tmp;
@@ -456,7 +454,7 @@ DdNode* BddRepresentation::annotationToBddAnn(vertex* v){
 		assert(clause != NULL);
 		CNFTemp = clauseToBddAnn(clause);
 		tmp = Cudd_bddAnd(mgrAnn, annotation, CNFTemp);
-		// if (tmp == NULL) exit(1);
+		assert(tmp != NULL);
 		Cudd_Ref(tmp);
 		Cudd_RecursiveDeref(mgrAnn, annotation);
 		Cudd_RecursiveDeref(mgrAnn, CNFTemp);
@@ -485,14 +483,14 @@ DdNode* BddRepresentation::annotationToBddAnn(vertex* v){
 		else{
 			tmp = Cudd_bddAnd(mgrAnn, Cudd_bddIthVar(mgrAnn, nbrLabels+i), f);
 		}
-		// if (tmp == NULL) exit(1);        
+		assert(tmp != NULL);   
 		Cudd_Ref(tmp);
 		Cudd_RecursiveDeref(mgrAnn, f);
 		f = tmp;         
 	}
 		
 	tmp = Cudd_bddAnd(mgrAnn, annotation, f);
-	//  if (tmp == NULL) exit(1);	
+	assert(tmp != NULL);
 	Cudd_Ref(tmp);
 	Cudd_RecursiveDeref(mgrAnn, annotation);
 	Cudd_RecursiveDeref(mgrAnn, f);
@@ -527,6 +525,7 @@ DdNode* BddRepresentation::clauseToBddAnn(
 		BddLabel* label = labelTable->lookup(literal->asString());
 		int i = label->nbr;
 		tmp = Cudd_bddOr(mgrAnn, clause1, Cudd_bddIthVar(mgrAnn,i));
+		assert(tmp != NULL);
 		Cudd_Ref(tmp);
 		Cudd_RecursiveDeref(mgrAnn, clause1);
 		clause1 = tmp;
@@ -577,12 +576,14 @@ void BddRepresentation::addBddVars(unsigned int max){
 		var = Cudd_bddNewVar(mgrMp);
 //		    if (var == NULL ) exit(1);
 		tmp2 = Cudd_bddAnd(mgrMp, tmp1, Cudd_Not(var));
+		assert(tmp2 != NULL);
 		Cudd_Ref(tmp2);
 		Cudd_RecursiveDeref(mgrMp, tmp1);
 		tmp1 = tmp2;		    		
 	}
 	 
 	tmp2 = Cudd_bddAnd(mgrMp, tmp1, bddMp);
+	assert(tmp2 != NULL);
 	Cudd_Ref(tmp2);
 	Cudd_RecursiveDeref(mgrMp, tmp1); 
 	Cudd_RecursiveDeref(mgrMp, bddMp);
@@ -595,12 +596,14 @@ void BddRepresentation::addBddVars(unsigned int max){
 		var = Cudd_bddNewVar(mgrAnn);
 //		    if (var == NULL ) exit(1);
 		tmp2 = Cudd_bddAnd(mgrAnn, tmp1, Cudd_Not(var));
+		assert(tmp2 != NULL);
 		Cudd_Ref(tmp2);
 		Cudd_RecursiveDeref(mgrAnn, tmp1);
 		tmp1 = tmp2;		    		
 	}
 	 
 	tmp2 = Cudd_bddAnd(mgrAnn, tmp1, bddAnn);
+	assert(tmp2 != NULL);
 	Cudd_Ref(tmp2);
 	Cudd_RecursiveDeref(mgrAnn, tmp1); 
 	Cudd_RecursiveDeref(mgrAnn, bddAnn);
@@ -907,7 +910,7 @@ void BddRepresentation::testSymbRepresentation(vertex* v, bool visitedNodes[]){
 	//cout << "BddRepresentation::testSymbRepresentation(vertex* v, bool visitedNodes[])\n";
 	DdNode * annotation = annotationToBddAnn(v);
 	DdNode* tmp = Cudd_bddOr(mgrAnn, annotation, bddAnn);
-	//  if (tmp == NULL) exit(1);
+	assert(tmp != NULL);
 	Cudd_Ref(tmp);
 	Cudd_RecursiveDeref(mgrAnn, annotation);
 	Cudd_RecursiveDeref(mgrAnn, bddAnn);
@@ -936,7 +939,7 @@ void BddRepresentation::testSymbRepresentation(vertex* v, bool visitedNodes[]){
 			
 			//edge
 			DdNode * edge = Cudd_bddAnd(mgrMp, label, nodes); 
-			// if (edge == NULL) exit(1);
+			assert(edge != NULL);
 			Cudd_Ref(edge);
 			Cudd_RecursiveDeref(mgrMp, label);
 			Cudd_RecursiveDeref(mgrMp, nodes);
@@ -948,7 +951,7 @@ void BddRepresentation::testSymbRepresentation(vertex* v, bool visitedNodes[]){
 			cout << "--------------------------------\n";*/
 			
 			DdNode* ogNode = Cudd_bddAnd(mgrMp, edge, states);
-			// if (tmp == NULL) exit(1);
+			assert(ogNode != NULL);
 			Cudd_Ref(ogNode);
 			Cudd_RecursiveDeref(mgrMp, edge);
 			//KEIN "Cudd_RecursiveDeref(mgrMp, states)", da states noch für andere Kanten gebraucht werden
@@ -956,7 +959,7 @@ void BddRepresentation::testSymbRepresentation(vertex* v, bool visitedNodes[]){
 			
 			if(v->getColor() == BLUE && vNext->getColor() == BLUE){				
 				tmp = Cudd_bddOr(mgrMp, ogNode, bddMp);
-				// if (tmp == NULL) exit(1);
+				assert(tmp != NULL);
 				Cudd_Ref(tmp);
 				Cudd_RecursiveDeref(mgrMp, ogNode);
 				Cudd_RecursiveDeref(mgrMp, bddMp);
@@ -964,7 +967,7 @@ void BddRepresentation::testSymbRepresentation(vertex* v, bool visitedNodes[]){
 			}
 			else {
 				tmp = Cudd_bddOr(mgrMp, ogNode, bddRed);
-				// if (tmp == NULL) exit(1);
+				assert(tmp != NULL);
 				Cudd_Ref(tmp);
 				Cudd_RecursiveDeref(mgrMp, ogNode);
 				Cudd_RecursiveDeref(mgrMp, bddRed);
@@ -994,7 +997,7 @@ DdNode* BddRepresentation::statesToBddMp(vertex* v){
 		bddMarking = markingToBddMp(PN->copyCurrentMarking());
 		
 		tmp = Cudd_bddOr(mgrMp, states, bddMarking); 
-		// if (tmp == NULL) exit(1);
+		assert(tmp != NULL);
 		Cudd_Ref(tmp);
 		Cudd_RecursiveDeref(mgrMp, bddMarking);
 		Cudd_RecursiveDeref(mgrMp, states);
@@ -1024,7 +1027,7 @@ DdNode* BddRepresentation::markingToBddMp(unsigned int * marking){
 			else{
 				tmp = Cudd_bddAnd(mgrMp, Cudd_bddIthVar(mgrMp, pos + i*maxPlaceBits + j), bddMarking);
 			}
-			// if (tmp == NULL) exit(1);        
+			assert(tmp != NULL);    
 			Cudd_Ref(tmp);
 			Cudd_RecursiveDeref(mgrMp, bddMarking);
 			bddMarking = tmp; 

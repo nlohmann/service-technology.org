@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's structured activities
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/04/18 12:05:13 $
+ * \date    \$Date: 2007/04/26 08:08:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
 */
 %}
 
@@ -916,8 +916,12 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
     // Embed the inner activity.
     PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
     PN.mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
-    PN.mergePlaces(phylum->id, ".internal.stop", innerActivity->id, ".stop");
-    PN.mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
+
+    if (current_view != petrinetsmall_enum)
+    {
+      PN.mergePlaces(phylum->id, ".internal.stop", innerActivity->id, ".stop");
+      PN.mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
+    }
 
     footer(_id2, true);
   }

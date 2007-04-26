@@ -67,9 +67,8 @@ class BddRepresentation{
 		void printMemoryInUse();
 		
 		void testSymbRepresentation(vertex* v, bool visitedNodes[]);
-		void calculateBound(vertex* v, bool visitedNodes[]);
 		unsigned int getBound();
-		void setPlaceBits();
+		void setMaxPlaceBits(vertex* v, bool visitedNodes[]);
 		//unsigned int cntNodes; //Anzahl der Knoten in der OG in expliziter Darstellung (nur für Testzwecke)
 
 		
@@ -110,6 +109,7 @@ class BddRepresentation{
 		DdNode* statesToBddMp(vertex* v);
 		DdNode* markingToBddMp(unsigned int * marking);
 		unsigned int bound;
+		void calculateBound(vertex* v, bool visitedNodes[]);
 		int maxPlaceBits;
 };
 

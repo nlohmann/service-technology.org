@@ -34,7 +34,7 @@
 #include "mynew.h"
 
 #include <iostream>
-#include "BddRepresentation.h" 
+#include "BddRepresentation.h"  
 #include "BddLabel.h"
 #include "graphEdge.h"
 
@@ -1094,7 +1094,8 @@ unsigned int BddRepresentation::getBound(){
 	return bound;
 }
 
-void BddRepresentation::setPlaceBits(){
+void BddRepresentation::setMaxPlaceBits(vertex* v, bool visitedNodes[]){
+	calculateBound(v, visitedNodes);
 	maxPlaceBits = nbrBits(bound);	
 	cout <<	"maxPlaceBits: " << maxPlaceBits << endl;
 }

@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/04/26 13:50:29 $
+ * \date    \$Date: 2007/04/27 11:21:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.151 $
+ * \version \$Revision: 1.152 $
  */
 %}
 
@@ -59,6 +59,8 @@ Process(a,b,c,d,e,g,i,_id) ->
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
+
+      myself->structured=true;
 
       myself->parentScopeId = myid;
       myself->parentActivityId = myid;
@@ -220,6 +222,8 @@ FaultHandlers(a,b,_id) ->
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
+      myself->structured=true;
+
       myself->parentScopeId = globals::PPcurrentScope;
       myself->hasCatchAll = (b->op_name() == "CatchAll");
 //      myself->inProcess = (myself->parentScopeId == 1);
@@ -379,6 +383,8 @@ emptyEventHandlers(_id) ->
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
+      myself->structured=true;
+
       myself->parentScopeId = globals::PPcurrentScope;
 
       globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
@@ -393,6 +399,8 @@ EventHandlers(a,b,_id) ->
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
+
+      myself->structured=true;
 
       myself->parentScopeId = globals::PPcurrentScope;
       //BAM myself->max_occurrences = UINT_MAX; 
@@ -438,6 +446,8 @@ OnMessage(a,b,c,_id) ->
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
+
+      myself->structured=true;
 
       myself->parentScopeId = globals::PPcurrentScope;
       assert(globals::ASTEmap[myself->parentActivityId] != NULL);
@@ -504,6 +514,8 @@ OnAlarm(b,a,_id) ->
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
+      myself->structured=true;
+
       myself->parentScopeId = globals::PPcurrentScope;
       assert(globals::ASTEmap[myself->parentActivityId] != NULL);
 
@@ -552,6 +564,8 @@ CompensationHandler(a,_id) ->
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
+
+      myself->structured=true;
 
       myself->parentScopeId = globals::PPcurrentScope;
 
@@ -611,6 +625,8 @@ TerminationHandler(a,_id) ->
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
+
+      myself->structured=true;
 
       myself->parentScopeId = globals::PPcurrentScope;
 
@@ -1238,6 +1254,8 @@ Flow(a,b,c,_id) ->
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
+      myself->structured=true;
+
       a->parentId = myid;
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -1336,6 +1354,8 @@ If(a,b,c,_id) ->
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
+
+      myself->structured=true;
 
       a->parentId = myid;
 
@@ -1450,6 +1470,8 @@ While(a,b,_id) ->
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
+      myself->structured=true;
+
       a->parentId = myid;
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -1503,6 +1525,8 @@ RepeatUntil(a,b,_id) ->
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
+      myself->structured=true;
+
       a->parentId = myid;
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -1555,6 +1579,8 @@ Sequence(a,b,_id) ->
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
+
+      myself->structured=true;
 
       a->parentId = myid;
 
@@ -1622,6 +1648,8 @@ Pick(a,b,c,_id) ->
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
+
+      myself->structured=true;
 
       a->parentId = myid;
 
@@ -1721,6 +1749,8 @@ ForEach(a,b,c,d,e,_id) ->
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
+      myself->structured=true;
+
       a->parentId = myid;
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -1814,6 +1844,8 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
       a->parentId = myid;
+
+      myself->structured=true;
 
       // my parent is the current scope
       myself->parentScopeId = globals::PPcurrentScope;

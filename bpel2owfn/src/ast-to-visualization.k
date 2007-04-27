@@ -31,7 +31,7 @@
  * 
  * \since   2007-04-18
  *
- * \date    \$Date: 2007/04/27 08:41:52 $
+ * \date    \$Date: 2007/04/27 11:21:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  *
  */
 
@@ -395,7 +395,7 @@ Sequence(a,b,_id) ->
     
     bool startlist=true;
     bool laststructured = false;
-    int lastid = 0;
+    int lastid = 0;   
     foreach(innerActivity; activity_list b)
     {
       if (startlist)
@@ -582,18 +582,22 @@ Flow(a,NiltLink_list(),c,_id) ->
   }
   a c
   {
-    bool startlist=true;
+    int middle = 0;
     foreach(innerActivity; activity_list c)
     {
-      if (startlist)
+    middle+=1;
+    }
+    middle = middle/2 + (middle % 2);
+    int childcounter = 1;
+    (std::cerr) << middle << " ist der Wert \n";
+    foreach(innerActivity; activity_list c)
+    {
+      if (childcounter<middle)
       {
-        startlist=false;
         globals::ASTEmap[_id->value]->secVisConnection = globals::ASTEmap[innerActivity->id]->secVisConnection;
-      }
-      else
-      {
         globals::ASTEmap[_id->value]->visConnection = globals::ASTEmap[innerActivity->id]->visConnection;
       }
+      childcounter +=1;
     }
     (*output) << "}" << endl;    
   }
@@ -607,18 +611,23 @@ Flow(a,b,c,_id) ->
   }
   a b c
   {
-    bool startlist=true;
+    int middle = 0;
     foreach(innerActivity; activity_list c)
     {
-      if (startlist)
+    middle+=1;
+    }
+    middle = middle/2 + (middle % 2);
+    int childcounter = 1;    
+    (std::cerr) << middle << " ist der Wert \n";
+
+    foreach(innerActivity; activity_list c)
+    {
+      if (childcounter<=middle)
       {
-        startlist=false;
         globals::ASTEmap[_id->value]->secVisConnection = globals::ASTEmap[innerActivity->id]->secVisConnection;
-      }
-      else
-      {
         globals::ASTEmap[_id->value]->visConnection = globals::ASTEmap[innerActivity->id]->visConnection;
       }
+      childcounter +=1;
     }
     (*output) << "}" << endl;    
   }

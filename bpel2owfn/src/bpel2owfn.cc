@@ -27,18 +27,18 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/26 13:50:29 $
+ * \date    \$Date: 2007/04/27 08:41:52 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.161 $
+ * \version \$Revision: 1.162 $
  */
 
 
@@ -200,6 +200,34 @@ void single_output(set< string >::iterator file, PetriNet PN2)
       FILE *dotfile = fopen(dot_filename.c_str(), "w+");
       globals::AST->fprintdot(dotfile, "", "", "", true, true, true);
       fclose(dotfile);
+      #ifdef HAVE_DOT
+      string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".png " + globals::output_filename + "." + suffixes[F_DOT];
+      trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
+      trace(TRACE_INFORMATION, systemcall + "\n\n");
+      system(systemcall.c_str());
+      #endif
+    }
+    else
+    globals::AST->print();
+  }
+
+  // print the Visualization?
+  if (modus == M_VIS)
+  {
+    trace(TRACE_INFORMATION, "-> Printing the process visualization ...\n");
+    if (formats[F_DOT])
+    {
+      if (globals::output_filename != "")
+      {
+        output = openOutput(globals::output_filename + "." + suffixes[F_DOT]);
+      }
+      trace(TRACE_INFORMATION, "-> Printing it in dot format ...\n");
+      globals::AST->unparse(kc::printer, kc::visualization);
+      if (globals::output_filename != "")
+      {
+        closeOutput(output);
+        output = NULL;
+      }
       #ifdef HAVE_DOT
       string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".png " + globals::output_filename + "." + suffixes[F_DOT];
       trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");

@@ -24,17 +24,17 @@
  * \brief   global varialbes
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/26 13:50:29 $
+ * \date    \$Date: 2007/04/27 08:41:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 
 
@@ -80,8 +80,13 @@ namespace globals {
 
   kc::tProcess AST;
 
+<<<<<<< globals.cc
+/// string holding the arcs of the visualization
+string visArcs="";
+=======
   string invocation="";
   string program_name ="";
+>>>>>>> 1.12
 
   string filename = "<STDIN>";
   string output_filename = "";

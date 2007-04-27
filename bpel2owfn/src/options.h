@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/26 13:50:29 $
+ * \date    \$Date: 2007/04/27 08:41:52 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  */
 
 
@@ -104,7 +104,8 @@ typedef enum
   M_PRETTY,		///< BPEL pretty-printer
   M_PETRINET,		///< Petri net
   M_CONSISTENCY,	///< consistency (parse two input files)
-  M_CFG			///< control flow analysis
+  M_CFG,		///< control flow analysis
+  M_VIS 		///< BPEL process visualization
 } possibleModi;
 
 

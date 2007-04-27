@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/26 15:09:54 $
+ * \date    \$Date: 2007/04/27 08:41:52 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  */
 
 
@@ -257,6 +257,8 @@ void parse_command_line(int argc, char* argv[])
   validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_PNML)] = true;
 
   validFormats[pair<possibleModi,possibleFormats>(M_CFG,F_DOT)] = true;
+  
+  validFormats[pair<possibleModi,possibleFormats>(M_VIS,F_DOT)] = true;
 
   // the programme's name on the commandline
   string progname = string(argv[0]);
@@ -300,6 +302,8 @@ void parse_command_line(int argc, char* argv[])
 		    modus = M_CONSISTENCY;
 		  else if (parameter == "cfg")
 		    modus = M_CFG;
+		  else if (parameter == "visualization")
+		    modus = M_VIS;
 		  else  {
 		    trace(TRACE_ALWAYS, "Unknown mode \"" + parameter+ "\".\n");
 		    trace(TRACE_ALWAYS, "Use -h to get a list of valid modes.\n");
@@ -613,6 +617,9 @@ void parse_command_line(int argc, char* argv[])
 	    break;
     case M_CFG:
 	    trace(TRACE_INFORMATION, " - generate CFG and do some analysis\n");
+	    break;
+    case M_VIS:
+	    trace(TRACE_INFORMATION, " - generating activity diagram\n");
 	    break;
     case M_PETRINET:
 	    trace(TRACE_INFORMATION, " - generate Petri net\n");

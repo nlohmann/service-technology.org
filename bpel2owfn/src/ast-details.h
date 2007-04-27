@@ -29,14 +29,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/04/27 08:41:52 $
+ * \date    \$Date: 2007/04/27 08:58:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  */
 
 
@@ -150,11 +150,8 @@ class ASTE
     bool hasCatchAll;			///< true if <faultHandlers> have a <catchAll> branch
     bool isStartActivity;		///< true if "createInstance" attribute is set to "yes"
     bool cyclic;			///< true if OnAlarm has RepeatEvery
-<<<<<<< ast-details.h
     bool structured;			///< true if the activtity is structured
-=======
     bool isUserDefined;			///< true if construct is user-defined
->>>>>>> 1.69
 
     set<unsigned int> sourceLinks;	///< outgoing links
     set<unsigned int> targetLinks;	///< ingoing links

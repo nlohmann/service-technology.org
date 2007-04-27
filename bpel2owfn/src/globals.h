@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/27 08:41:52 $
+ * \date    \$Date: 2007/04/27 08:58:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 
 
@@ -163,9 +163,9 @@ namespace globals
   /// The root of the abstract syntax tree.
   extern kc::tProcess AST;
 
-<<<<<<< globals.h
-extern string visArcs;
-=======
+  /// String to gather arc information for visualization
+  extern string visArcs;
+
   /// string holding the invocation of BPEL2oWFN
   extern string invocation;
 
@@ -177,7 +177,6 @@ extern string visArcs;
 
   /// filename of output file
   extern string output_filename;
->>>>>>> 1.12
 
   /// parameters (set by #parse_command_line)
   extern map<possibleParameters, bool> parameters;

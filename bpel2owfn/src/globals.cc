@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/27 08:41:52 $
+ * \date    \$Date: 2007/04/27 08:58:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 
 
@@ -80,13 +80,11 @@ namespace globals {
 
   kc::tProcess AST;
 
-<<<<<<< globals.cc
 /// string holding the arcs of the visualization
-string visArcs="";
-=======
+  string visArcs="";
+
   string invocation="";
   string program_name ="";
->>>>>>> 1.12
 
   string filename = "<STDIN>";
   string output_filename = "";

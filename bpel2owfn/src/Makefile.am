@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/17 16:39:26 $ by $Author: nielslohmann $.
-# Version $Revision: 1.74 $
+# File last changed $Date: 2007/04/27 09:23:07 $ by $Author: znamirow $.
+# Version $Revision: 1.75 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -54,7 +54,8 @@ KCDUMMY = .timestamp
 # sources can be deleted before compilation (usually the unparsers).
 KCFILES_TEMP = ast-to-petrinet.k \
 	       ast-to-xml.k ast-to-cfg.k \
-	       ast-postprocess.k ast-rewrite.k
+	       ast-postprocess.k ast-rewrite.k \
+	       ast-to-visualization.k
 
 # files that create C++ that have to be linked to executable
 KCFILES_NECESSARY = petrinet-patterns-basic.k \

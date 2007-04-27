@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/04/27 08:58:43 $
+ * \date    \$Date: 2007/04/27 13:36:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.92 $
+ * \version \$Revision: 1.93 $
  */
 
 
@@ -80,7 +80,7 @@ using std::endl;
  */
 ASTE::ASTE(unsigned int myid, unsigned int mytype) :
   id(myid), type(mytype), controlFlow(POSITIVECF), visConnection("none"), secVisConnection("none"), 
-  plRoleDetails(NULL), isStartActivity(false), cyclic(false), structured(false),
+  plRoleDetails(NULL), isStartActivity(false), cyclic(false), structured(false), highlighted(false),
   sourceActivity(0), targetActivity(0), max_occurrences(1), max_loops(UINT_MAX), enclosedFH(0), enclosedCH(0), drawn(false)
 {
   assert(myid != 0);

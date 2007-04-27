@@ -29,14 +29,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/04/27 08:58:43 $
+ * \date    \$Date: 2007/04/27 13:36:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  */
 
 
@@ -151,6 +151,7 @@ class ASTE
     bool isStartActivity;		///< true if "createInstance" attribute is set to "yes"
     bool cyclic;			///< true if OnAlarm has RepeatEvery
     bool structured;			///< true if the activtity is structured
+    bool highlighted;			///< true if the activtity is to be highlighted in visualization
     bool isUserDefined;			///< true if construct is user-defined
 
     set<unsigned int> sourceLinks;	///< outgoing links

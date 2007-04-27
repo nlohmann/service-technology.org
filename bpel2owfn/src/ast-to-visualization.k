@@ -31,7 +31,7 @@
  * 
  * \since   2007-04-18
  *
- * \date    \$Date: 2007/04/27 13:13:44 $
+ * \date    \$Date: 2007/04/27 13:36:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *
  */
 
@@ -59,7 +59,7 @@ Process(a,b,c,d,e,g,i,_id) ->
   globals::visArcs = "";
   (*output) << "digraph N {" << endl;
   (*output) << " graph [fontname=\"Helvetica\" label=\"";
-  (*output) << "Activity diagramm of the BPEL-Process generated from " << globals::filename << "\"]" << endl;
+  (*output) << "Visualization of the BPEL-Process generated from " << globals::filename << "\"]" << endl;
   (*output) << "compound = true;" << endl;
   globals::ASTEmap[_id->value]->visConnection = "Process_Start";
   } 
@@ -191,7 +191,10 @@ FromPart(_id) ->
 Receive(a,b,c,_id) ->
   [visualization: 
   {
-  (*output) << "receive" << toString(_id->value) << " [shape=rectangle style=filled label=\"receive\"];" << endl;
+  (*output) << "receive" << toString(_id->value) << " [shape=rectangle style=filled label=\"receive\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
   globals::ASTEmap[_id->value]->visConnection= "receive" + toString(_id->value);
   globals::ASTEmap[_id->value]->secVisConnection= "receive" + toString(_id->value);
   }
@@ -206,7 +209,10 @@ Receive(a,b,c,_id) ->
 Reply(a,b,c,_id) ->
   [visualization: 
   {
-  (*output) << "reply" << toString(_id->value) << " [shape=rectangle style=filled label=\"reply\"];" << endl;
+  (*output) << "reply" << toString(_id->value) << " [shape=rectangle style=filled label=\"reply\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
   globals::ASTEmap[_id->value]->visConnection= "reply" + toString(_id->value);
   globals::ASTEmap[_id->value]->secVisConnection= "reply" + toString(_id->value);
   }
@@ -221,7 +227,10 @@ Reply(a,b,c,_id) ->
 SynchronousInvoke(a,b,c,d,_id) ->
   [visualization: 
   {
-  (*output) << "invoke" << toString(_id->value) << " [shape=rectangle style=filled label=\"invoke\"];" << endl;
+  (*output) << "invoke" << toString(_id->value) << " [shape=rectangle style=filled label=\"invoke\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
   globals::ASTEmap[_id->value]->visConnection= "invoke" + toString(_id->value);
   globals::ASTEmap[_id->value]->secVisConnection= "invoke" + toString(_id->value);
   }
@@ -231,7 +240,10 @@ SynchronousInvoke(a,b,c,d,_id) ->
 AsynchronousInvoke(a,b,c,d,_id) ->
   [visualization: 
   {
-  (*output) << "invoke" << toString(_id->value) << " [shape=rectangle style=filled label=\"invoke\"];" << endl;
+  (*output) << "invoke" << toString(_id->value) << " [shape=rectangle style=filled label=\"invoke\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
   globals::ASTEmap[_id->value]->visConnection= "invoke" + toString(_id->value);
   globals::ASTEmap[_id->value]->secVisConnection= "invoke" + toString(_id->value);
   }
@@ -246,7 +258,10 @@ AsynchronousInvoke(a,b,c,d,_id) ->
 Assign(a,b,_id) ->
   [visualization: 
   {
-  (*output) << "assign" << toString(_id->value) << " [shape=rectangle style=filled label=\"assign\"];" << endl;
+  (*output) << "assign" << toString(_id->value) << " [shape=rectangle style=filled label=\"assign\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
   globals::ASTEmap[_id->value]->visConnection= "assign" + toString(_id->value);
   globals::ASTEmap[_id->value]->secVisConnection= "assign" + toString(_id->value);
   }
@@ -273,7 +288,10 @@ To(b) ->
 Validate(a,_id) ->
   [visualization: 
   {
-  (*output) << "validate" << toString(_id->value) << " [shape=rectangle style=filled label=\"validate\"];" << endl;
+  (*output) << "validate" << toString(_id->value) << " [shape=rectangle style=filled label=\"validate\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
   globals::ASTEmap[_id->value]->visConnection= "validate" + toString(_id->value);
   globals::ASTEmap[_id->value]->secVisConnection= "validate" + toString(_id->value);
   }
@@ -287,7 +305,10 @@ Validate(a,_id) ->
 Empty(a,_id) ->
   [visualization: 
   {
-  (*output) << "empty" << toString(_id->value) << " [shape=rectangle style=filled label=\"empty\"];" << endl;
+  (*output) << "empty" << toString(_id->value) << " [shape=rectangle style=filled label=\"empty\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
   globals::ASTEmap[_id->value]->visConnection= "empty" + toString(_id->value);
   globals::ASTEmap[_id->value]->secVisConnection= "empty" + toString(_id->value);
   }
@@ -302,7 +323,10 @@ Empty(a,_id) ->
 Wait(a,_id) ->
   [visualization: 
   {
-  (*output) << "wait" << toString(_id->value) << " [shape=rectangle style=filled label=\"wait\"];" << endl;
+  (*output) << "wait" << toString(_id->value) << " [shape=rectangle style=filled label=\"wait\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
   globals::ASTEmap[_id->value]->visConnection= "wait" + toString(_id->value);
   globals::ASTEmap[_id->value]->secVisConnection= "wait" + toString(_id->value);
   }
@@ -317,7 +341,10 @@ Wait(a,_id) ->
 Exit(a,_id) ->
   [visualization: 
   {
-  (*output) << "exit" << toString(_id->value) << " [shape=rectangle style=filled label=\"exit\"];" << endl;
+  (*output) << "exit" << toString(_id->value) << " [shape=rectangle style=filled label=\"exit\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
   globals::ASTEmap[_id->value]->visConnection= "exit" + toString(_id->value);
   globals::ASTEmap[_id->value]->secVisConnection= "exit" + toString(_id->value);
   }
@@ -332,7 +359,10 @@ Exit(a,_id) ->
 Throw(a,_id) ->
   [visualization: 
   {
-  (*output) << "throw" << toString(_id->value) << " [shape=rectangle style=filled label=\"throw\"];" << endl;
+  (*output) << "throw" << toString(_id->value) << " [shape=rectangle style=filled label=\"throw\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
   globals::ASTEmap[_id->value]->visConnection= "throw" + toString(_id->value);
   globals::ASTEmap[_id->value]->secVisConnection= "throw" + toString(_id->value);
   }
@@ -347,7 +377,10 @@ Throw(a,_id) ->
 Rethrow(a,_id) ->
   [visualization: 
   {
-  (*output) << "rethrow" << toString(_id->value) << " [shape=rectangle style=filled label=\"rethrow\"];" << endl;
+  (*output) << "rethrow" << toString(_id->value) << " [shape=rectangle style=filled label=\"rethrow\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
   globals::ASTEmap[_id->value]->visConnection= "rethrow" + toString(_id->value);
   globals::ASTEmap[_id->value]->secVisConnection= "rethrow" + toString(_id->value);
   }
@@ -362,7 +395,10 @@ Rethrow(a,_id) ->
 Compensate(a,_id) ->
   [visualization: 
   {
-  (*output) << "compensate" << toString(_id->value) << " [shape=rectangle style=filled label=\"compensate\"];" << endl;
+  (*output) << "compensate" << toString(_id->value) << " [shape=rectangle style=filled label=\"compensate\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
   globals::ASTEmap[_id->value]->visConnection= "compensate" + toString(_id->value);
   globals::ASTEmap[_id->value]->secVisConnection= "compensate" + toString(_id->value);
   }
@@ -372,7 +408,10 @@ Compensate(a,_id) ->
 CompensateScope(a,b,_id) ->
   [visualization: 
   {
-  (*output) << "compensateScope" << toString(_id->value) << " [shape=rectangle style=filled label=\"compensateScope\"];" << endl;
+  (*output) << "compensateScope" << toString(_id->value) << " [shape=rectangle style=filled label=\"compensateScope\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
   globals::ASTEmap[_id->value]->visConnection= "compensateScope" + toString(_id->value);
   globals::ASTEmap[_id->value]->secVisConnection= "compensateScope" + toString(_id->value);
   }
@@ -606,8 +645,6 @@ Pick(a,b,c,_id) ->
     middle = middle/2 + (middle % 2);
     int childcounter = 1;
 
-    (std::cerr) << middle << " ist der Wert \n";
-
     foreach(branch=OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list b)
     {
       if (childcounter<=middle)
@@ -650,7 +687,6 @@ Flow(a,NiltLink_list(),c,_id) ->
     }
     middle = middle/2 + (middle % 2);
     int childcounter = 1;
-    (std::cerr) << middle << " ist der Wert \n";
     foreach(innerActivity; activity_list c)
     {
       if (childcounter<=middle)
@@ -679,7 +715,6 @@ Flow(a,b,c,_id) ->
     }
     middle = middle/2 + (middle % 2);
     int childcounter = 1;    
-    (std::cerr) << middle << " ist der Wert \n";
 
     foreach(innerActivity; activity_list c)
     {

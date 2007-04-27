@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/04/26 15:09:54 $
+ * \date    \$Date: 2007/04/27 11:17:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
 */
 %}
 
@@ -348,14 +348,14 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
         {
           if(myself->attributes["condition"] != "true")
           {
-            Transition *t2 = PN.newTransition(prefix + "end");
+            Transition *t2 = PN.newTransition(prefix + "leave");
             PN.newArc(p3, t2);
             PN.newArc(t2, p4);
             if( globals::parameters[P_LOOPCONTROL])
               PN.newArc(control_leave, t2);
           }
 
-          Transition *t3 = PN.newTransition(prefix + "repeat");
+          Transition *t3 = PN.newTransition(prefix + "loop");
           PN.newArc(p3, t3);
           PN.newArc(t3, p1);
           if( globals::parameters[P_LOOPCONTROL])
@@ -484,14 +484,14 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
         {
           if(myself->attributes["condition"] != "true")
 	  {
-	    Transition *t1 = PN.newTransition(prefix + "end");
+	    Transition *t1 = PN.newTransition(prefix + "leave");
 	    PN.newArc(p2, t1);
 	    PN.newArc(t1, p3);
 	    if (globals::parameters[P_LOOPCONTROL])
 	      PN.newArc(control_leave, t1);
 	  }
 
-	  Transition *t2 = PN.newTransition(prefix + "repeat");
+	  Transition *t2 = PN.newTransition(prefix + "loop");
 	  PN.newArc(p2, t2);
 	  PN.newArc(t2, p1);
 	  if (globals::parameters[P_LOOPCONTROL] && myself->attributes["condition"] != "true")

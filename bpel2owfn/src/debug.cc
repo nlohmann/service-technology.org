@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/20 14:31:55 $
+ * \date    \$Date: 2007/04/27 11:17:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.74 $
+ * \version \$Revision: 1.75 $
  *
  * \ingroup debug
  */
@@ -157,7 +157,9 @@ void show_process_information()
   if (debug_level == TRACE_ERROR)
     return;
 
-  cerr << "------------------------------------------------------------------------------" << endl;
+  if (frontend_nerrs + globals::static_analysis_errors + globals::other_errors > 0)
+    cerr << "------------------------------------------------------------------------------" << endl;
+
   cerr << globals::process_information.basic_activities +
     globals::process_information.structured_activities +
     globals::process_information.scopes << " activities";
@@ -223,7 +225,8 @@ void show_process_information()
     cerr << "Found " << globals::other_errors << " further errors." << endl;
   }
 
-  cerr << "------------------------------------------------------------------------------" << endl << endl;
+  if (modus == M_PETRINET || modus == M_CONSISTENCY)
+    cerr << "------------------------------------------------------------------------------" << endl;
 }
 
 
@@ -400,6 +403,26 @@ void genericError(unsigned int code, string information, string line, error_leve
 
     case(116): // <opaqueActivity> replaced by <empty>
 	{ cerr << "replaced <opaqueActivity> with <empty> activity" << endl;
+	  break; }
+
+    case(117): // ignoring attribute suppressJoinFailure="no"
+	{ cerr << "ignoring attribute `suppressJoinFailure' set to \"no\" in <" << information << ">; modeling \"yes\"" << endl;
+	  break; }
+
+    case(118): // ignoring user-defined transition condition (set to true instead)
+	{ cerr << "ignoring user-defined <transitionCondition> in <" << information << ">; modeling \"true\"" << endl;
+	  break; }
+
+    case(119): // ignoring user-defined transition condition (set to XOR instead)
+	{ cerr << "ignoring user-defined <transitionCondition> in <" << information << ">; modeling \"1-out-of-n\"" << endl;
+	  break; }
+
+    case(120): // ignoring <scope> handlers in mode communicationonly
+	{ cerr << "FTC handlers of <scope> activity are not modeled" << endl;
+	  break; }
+
+    case(121): // ignoring activity in mode communicationonly
+	{ cerr << "<" << information << "> activity is modeled by <empty> activity" << endl;
 	  break; }
   }
 

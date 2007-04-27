@@ -40,7 +40,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/04/26 13:50:29 $
+ * \date    \$Date: 2007/04/27 11:17:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          petrinet-patterns-links.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  */
 %}
 
@@ -78,8 +78,6 @@
 #include "globals.h"
 #include "petrinet-patterns-shortcuts.h"
 
-using std::cerr;
-using std::endl;
 using std::set;
 using std::string;
 using std::map;
@@ -323,7 +321,8 @@ void P_LinkWrapper3(impl_standardElements* abstract_phylum, uview current_view)
   // pattern which models the case where join failures are suppressed.
   if (petrinetsmall_enum == current_view)
   {
-    cerr << "ignoring attribute suppressJoinFailure=\"no\"" << endl;
+    assert(globals::ASTEmap[phylum->parentId] != NULL);
+    genericError(117, globals::ASTEmap[phylum->parentId]->activityTypeName(), globals::ASTEmap[phylum->parentId]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
     P_LinkWrapper2(abstract_phylum, current_view);
     return;
   }
@@ -504,7 +503,8 @@ void P_LinkWrapper5(impl_standardElements* abstract_phylum, uview current_view)
   // pattern which models the case where join failures are suppressed.
   if (petrinetsmall_enum == current_view)
   {
-    cerr << "ignoring attribute suppressJoinFailure=\"no\"" << endl;
+    assert(globals::ASTEmap[phylum->parentId] != NULL);
+    genericError(117, globals::ASTEmap[phylum->parentId]->activityTypeName(), globals::ASTEmap[phylum->parentId]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
     P_LinkWrapper4(abstract_phylum, current_view);
     return;
   }

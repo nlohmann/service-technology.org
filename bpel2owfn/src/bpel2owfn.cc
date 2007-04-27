@@ -27,18 +27,18 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/27 08:41:52 $
+ * \date    \$Date: 2007/04/27 11:17:17 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.162 $
+ * \version \$Revision: 1.163 $
  */
 
 
@@ -599,6 +599,9 @@ int main( int argc, char *argv[])
   trace(TRACE_INFORMATION, "All files have been parsed.\n");
 
   final_output(PN2);
+
+  if (debug_level != TRACE_ERROR)
+    cerr << "==============================================================================" << endl << endl;
 
   // everything went fine
   return 0;

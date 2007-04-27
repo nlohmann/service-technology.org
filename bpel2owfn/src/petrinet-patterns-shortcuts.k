@@ -31,7 +31,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/04/26 15:09:54 $
+ * \date    \$Date: 2007/04/27 11:17:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
 */
 %}
 
@@ -69,9 +69,6 @@
 #include "petrinet.h"
 
 extern PetriNet PN;
-
-using std::cerr;
-using std::endl;
 %}
 
 
@@ -726,10 +723,9 @@ void P_transitionCondition(string prefix, tSource_list source_links)
   if (globals::parameters[P_XOR] && (source_links->length() > 1))
   {
     // Traverse the source links.
+    unsigned int linkCounter = 1;
     foreach (source; tSource_list source_links)
     {
-      unsigned int linkCounter = 1;
-
       // Add a transition.
       Transition *t1 = PN.newTransition(prefix + "setLinks" + toString(linkCounter++));
       PN.newArc(p_done, t1);
@@ -753,8 +749,8 @@ void P_transitionCondition(string prefix, tSource_list source_links)
       string givenTransitionCondition = globals::ASTEmap[source->id]->attributes["transitionCondition"];
       if ((givenTransitionCondition != "") && (givenTransitionCondition != "true"))
       {
-        cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
-        cerr << "Using XOR instead." << endl << endl;
+      if (givenTransitionCondition != "" && givenTransitionCondition != "true")
+        genericError(119, globals::ASTEmap[globals::ASTEmap[source->id]->parentActivityId]->activityTypeName(), globals::ASTEmap[source->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
       }
     }
   }
@@ -779,10 +775,7 @@ void P_transitionCondition(string prefix, tSource_list source_links)
       // User-defined transition conditions will be ignored.
       string givenTransitionCondition = globals::ASTEmap[source->id]->attributes["transitionCondition"];
       if (givenTransitionCondition != "" && givenTransitionCondition != "true")
-      {
-        cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
-        cerr << "Using standard transition \"true\" instead." << endl << endl;
-      }
+        genericError(118, globals::ASTEmap[globals::ASTEmap[source->id]->parentActivityId]->activityTypeName(), globals::ASTEmap[source->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
     }
   }
 }

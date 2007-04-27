@@ -31,7 +31,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/03/25 10:19:37 $
+ * \date    \$Date: 2007/04/27 11:17:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  */
 %}
 
@@ -62,9 +62,6 @@
 #include "options.h"
 #include "globals.h"
 #include "petrinet-patterns-shortcuts.h"
-
-using std::cerr;
-using std::endl;
 
 extern PetriNet PN;
 %}
@@ -558,6 +555,8 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
+        genericError(120, "", globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
+
         // Places.
         Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");

@@ -30,13 +30,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/04/26 15:09:54 $
+ * \date    \$Date: 2007/04/27 11:17:17 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.93 $
+ * \version \$Revision: 1.94 $
  *
  * \ingroup petrinet
  */
@@ -381,35 +381,39 @@ string Transition::output_dot() const
 
   // communicating activities
   if (history.size() == 1 && history[0].find("internal.receive") != string::npos)
-    result += "label=\"rec\"";
+    result += "label=\"recv\"";
   if (history.size() == 1 && history[0].find("internal.reply") != string::npos)
     result += "label=\"reply\"";
   if (history.size() == 1 && history[0].find("internal.invoke") != string::npos)
-    result += "label=\"inv\"";
+    result += "label=\"invk\"";
+  if (history.size() == 1 && history[0].find("internal.onMessage_") != string::npos)
+    result += "label=\"on\\nmsg\"";
+  if (history.size() == 1 && history[0].find(".onEvent.") != string::npos)
+    result += "label=\"on\\nevent\"";
 
   // structured activities
   if (history.size() == 1 && history[0].find("internal.case") != string::npos)
     result += "label=\"case\" fillcolor=azure2";
-
+  if (history.size() == 1 && history[0].find("internal.onAlarm") != string::npos)
+    result += "label=\"on\\nalarm\" fillcolor=azure2";
   if (history.size() == 1 && history[0].find("internal.split") != string::npos)
     result += "label=\"flow\\nsplit\" fillcolor=azure2";
-
   if (history.size() == 1 && history[0].find("internal.join") != string::npos)
     result += "label=\"flow\\njoin\" fillcolor=azure2";
+  if (history.size() == 1 && history[0].find("internal.leave") != string::npos)
+    result += "label=\"leave\\nloop\" fillcolor=azure2";
+  if (history.size() == 1 && history[0].find("internal.loop") != string::npos)
+    result += "label=\"enter\\nloop\" fillcolor=azure2";
 
   // everything about links
   if (history.size() == 1 && history[0].find(".setLinks") != string::npos)
     result += "label=\"tc\" fillcolor=darkseagreen1";
-
   if (history.size() == 1 && history[0].find(".evaluate") != string::npos)
     result += "label=\"jc\\neval\" fillcolor=darkseagreen1";
-
   if (history.size() == 1 && history[0].find(".skip") != string::npos)
     result += "label=\"skip\" fillcolor=darkseagreen1";
-
   if (history.size() == 1 && history[0].find(".reset_false") != string::npos)
     result += "label=\"reset\\nlink\" fillcolor=darkseagreen1";
-
   if (history.size() == 1 && history[0].find(".reset_true") != string::npos)
     result += "label=\"reset\\nlink\" fillcolor=darkseagreen1";
   
@@ -493,6 +497,7 @@ string Place::output_dot() const
   result += "]\n";
 
   result += " p" + toString(id) + "_l\t[shape=none];\n";
+
   if (type == OUT)
     result += " p" + toString(id) + " -> p" + toString(id) + "_l [taillabel=\"" + label + "\"]\n";
   else

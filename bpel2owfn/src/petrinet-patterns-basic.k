@@ -46,7 +46,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/25 10:19:37 $
+ * \date    \$Date: 2007/04/27 11:17:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -56,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  */
 %}
 
@@ -77,9 +77,6 @@
 #include "ast-details.h"
 #include "globals.h"
 #include "petrinet-patterns-shortcuts.h"
-
-using std::cerr;
-using std::endl;
 
 extern PetriNet PN;
 %}
@@ -790,6 +787,7 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
+  assert(globals::ASTEmap[phylum->id] != NULL);
 
   switch(current_view)
   {
@@ -818,7 +816,7 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
-	cerr << "the <throw> activity cannot be modelled!" << endl;
+	genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
 
         // Model an <empty> activity instead.
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -970,7 +968,8 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
-	cerr << "the <exit> activity cannot be modelled!" << endl;
+        genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
+
 
         // Model an <empty> activity instead.
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -1086,7 +1085,7 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
-	cerr << "the <compensate> activity cannot be modelled!" << endl;
+	genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
 
         // Model an <empty> activity instead.
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -1194,7 +1193,7 @@ void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
-	cerr << "the <compensateScope> activity cannot be modelled!" << endl;
+	genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
 
         // Model an <empty> activity instead.
 	Place *p1 = PN.newPlace(prefix + "initial");

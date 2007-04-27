@@ -31,7 +31,7 @@
  * 
  * \since   2007-04-18
  *
- * \date    \$Date: 2007/04/27 12:02:06 $
+ * \date    \$Date: 2007/04/27 12:20:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  *
  */
 
@@ -589,11 +589,42 @@ ForEach(a,b,c,d,e,_id) ->
 Pick(a,b,c,_id) ->
   [visualization: 
   {
-  (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"Pick\";" << endl;  
+    (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"Pick\";" << endl;  
   }
   a b c
   {
-  (*output) << "}" << endl;    
+    int middle = 0;
+    foreach(branch=OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list b)
+    {
+    middle+=1;
+    }
+    foreach(branch=OnAlarm(*,innerActivity,_id3); tOnAlarm_list c)
+    {
+    middle+=1;
+    }
+
+    middle = middle/2 + (middle % 2);
+    int childcounter = 1;
+
+    foreach(branch=OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list b)
+    {
+      if (childcounter<middle)
+      {
+        globals::ASTEmap[_id->value]->secVisConnection = globals::ASTEmap[innerActivity->id]->secVisConnection;
+        globals::ASTEmap[_id->value]->visConnection = globals::ASTEmap[innerActivity->id]->visConnection;
+      }
+      childcounter +=1;
+    }
+    foreach(branch=OnAlarm(*,innerActivity,_id3); tOnAlarm_list c)
+    {
+      if (childcounter<middle)
+      {
+        globals::ASTEmap[_id->value]->secVisConnection = globals::ASTEmap[innerActivity->id]->secVisConnection;
+        globals::ASTEmap[_id->value]->visConnection = globals::ASTEmap[innerActivity->id]->visConnection;
+      }
+      childcounter +=1;
+    }
+    (*output) << "}" << endl;    
   }
   ]
 ;

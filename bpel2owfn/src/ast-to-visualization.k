@@ -31,7 +31,7 @@
  * 
  * \since   2007-04-18
  *
- * \date    \$Date: 2007/04/27 11:21:48 $
+ * \date    \$Date: 2007/04/27 12:02:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  *
  */
 
@@ -446,11 +446,29 @@ If(a, b, c, _id) ->
   [visualization: 
   {
   (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"If\";" << endl;  
-  (*output) << "if" << toString(_id->value) << " [shape=diamond style=filled label=""];" << endl;
+  (*output) << "if" << toString(_id->value) << " [shape=diamond style=filled label=\"\"];" << endl;
   globals::ASTEmap[_id->value]->secVisConnection = "if" + toString(_id->value);
   }
   a b c
   {
+    int middle = 0;
+
+    foreach(ElseIf(innerActivity); tElseIf_list b)
+    {
+      middle += 1;
+    }
+
+    with(c)
+    {
+      c=Else(innerActivity,_id2):
+      { 
+      middle += 1;
+      }
+    }
+
+    middle = middle/2 + (middle % 2);
+    int childcounter=1;
+
     foreach(ElseIf(innerActivity); tElseIf_list b)
     {
       globals::visArcs += "if" + toString(_id->value) + " -> " + globals::ASTEmap[innerActivity->id]->secVisConnection + "["; 
@@ -462,7 +480,12 @@ If(a, b, c, _id) ->
         globals::visArcs += " ";          
       }
       globals::visArcs += "];\n";
-      globals::ASTEmap[_id->value]->visConnection = globals::ASTEmap[innerActivity->id]->visConnection;
+      
+      if (childcounter<=middle)
+      {
+        globals::ASTEmap[_id->value]->visConnection = globals::ASTEmap[innerActivity->id]->visConnection;
+      }
+      childcounter+=1;
     } 
     with(c)
     {
@@ -477,7 +500,11 @@ If(a, b, c, _id) ->
             globals::visArcs += " ";          
           }
           globals::visArcs += "];\n";
+
+          if (childcounter<=middle)
+          {
           globals::ASTEmap[_id->value]->visConnection = globals::ASTEmap[innerActivity->id]->visConnection;
+          }
         }
         default: { /* do nothing */ 
       }
@@ -489,11 +516,12 @@ If(a, b, c, _id) ->
 ;
 
 ElseIf(a,_id) ->
-  [visualization: ]
+  [visualization: a]
+  
 ;
 
 Else(a,_id) ->
-  [visualization: ]
+  [visualization: a]
 ;
 
 

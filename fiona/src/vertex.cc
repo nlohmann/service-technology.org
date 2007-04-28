@@ -35,7 +35,7 @@
 #include "vertex.h"
 #include "state.h"
 #include "successorNodeList.h"
-#include "CNF.h"
+//#include "CNF.h"
 #include "cnf_formula.h"
 #include "debug.h"
 #include "options.h"    
@@ -48,7 +48,7 @@
 vertex::vertex(int numberEvents) :
 			   numberOfVertex(0),
 			   color(BLUE),
-			   firstClause(NULL),
+	//		   firstClause(NULL),
 			   successorNodes(NULL),
 			   predecessorNodes(NULL),
 			   hasFinalStateInStateSet(false),
@@ -83,17 +83,17 @@ vertex::~vertex() {
 		delete[] eventsUsed;
 	}
 	
-	CNF * cnfTemp1 = firstClause;
-	CNF * cnfTemp2;
+//	CNF * cnfTemp1 = firstClause;
+//	CNF * cnfTemp2;
 	
 	delete annotation;
 	
 	
-	while (cnfTemp1) {
-		cnfTemp2 = cnfTemp1->nextElement;
-		delete cnfTemp1;	
-		cnfTemp1 = cnfTemp2;
-	}
+//	while (cnfTemp1) {
+//		cnfTemp2 = cnfTemp1->nextElement;
+//		delete cnfTemp1;	
+//		cnfTemp1 = cnfTemp2;
+//	}
 	
 	numberDeletedVertices++;
 	trace(TRACE_5, "vertex::~vertex() : end\n");
@@ -150,41 +150,6 @@ bool vertex::addState(State * s) {
 	pair<StateSet::iterator, bool> result = reachGraphStateSet.insert(s);
     return result.second;       // returns whether the element got inserted (true) or not (false)
 }
-
-
-//! \fn void vertex::addClause(literal * myFirstLiteral, bool _isFinalState)
-//! \param myFirstLiteral the current clause's first literal
-//! \param _isFinalState determines whether clause points to a final state or not
-//! \brief adds a new clause to the CNF of the node
-void vertex::addClause(literal * myFirstLiteral, bool _isFinalState) {
-    trace(TRACE_5, "vertex::addClause(literal * myFirstLiteral, bool _isFinalState) : start\n");
-	
-	CNF * cnfElement = firstClause;
-	
-//	cout << "adding clause to node number " << numberOfVertex << endl;
-//	cout << "finalstate: " << _isFinalState << endl;
-	
-	if (cnfElement == NULL) {
-		firstClause = new CNF();
-		firstClause->firstLiteral = myFirstLiteral;
-		firstClause->isFinalState = _isFinalState;
-		trace(TRACE_5, "vertex::addClause(literal * myFirstLiteral, bool _isFinalState) : end\n");
-//		cout << "number of elements in annotation of node " << numberOfVertex << " : " << numberOfElementsInAnnotation() << endl;
-		return;
-	}
-
-	while (cnfElement->nextElement) {		// get the last clause of the CNF
-		cnfElement = cnfElement->nextElement;
-	}
-	cnfElement->nextElement = new CNF();
-	cnfElement->nextElement->firstLiteral = myFirstLiteral;	// create a new clause literal
-	cnfElement->nextElement->isFinalState = _isFinalState;
-
-//	cout << "number of elements in annotation of node " << numberOfVertex << " : " << numberOfElementsInAnnotation() << endl;
-		
-    trace(TRACE_5, "vertex::addClause(literal * myFirstLiteral, bool _isFinalState) : end\n");
-}
-
 
 //! \fn void vertex::addClause(CommGraphFormulaMultiaryOr* myclause)
 //! \param myclause the clause to be added to the annotation of the current node
@@ -256,85 +221,6 @@ void vertex::resetIteratingPredNodes() {
 	}
 	
 	trace(TRACE_5, "vertex::resetIteratingPredNodes() : end\n");
-}
-
-
-//! \fn void vertex::setAnnotationEdges(graphEdge * edge)
-//! \param edge the edge
-//! \brief sets the edge to all literals in the clauses
-void vertex::setAnnotationEdges(graphEdge * edge) {
-    trace(TRACE_5, "vertex::setAnnotationEdges(graphEdge * edge) : start\n");
-	
-	CNF * currentClause = firstClause;
-
-	// iterate over all clauses
-	while (currentClause) {
-		if (currentClause->firstLiteral != NULL) {
-			// let the clause set the edges to all of its literals
-			currentClause->firstLiteral->setEdges(edge);
-		}
-		currentClause = currentClause->nextElement;	
-	}
-    trace(TRACE_5, "vertex::setAnnotationEdges(graphEdge * edge) : end\n");
-}
-
-
-//! \fn string vertex::getCNFString()
-//! \brief returns the annotation as a string
-string vertex::getCNFString() {
-	string CNFString = "";
-	string CNFStringTemp = "";
-
-	bool mal = false;
-	
-	CNF * cl = firstClause;
-
-	if ((cl == NULL) && (getColor() == RED))
-		return "(false)";
-	
-	if ((cl == NULL) && (getColor() == BLUE))
-		return "(true)";
-	
-	while (cl) {
-		CNFStringTemp = "";
-		CNFStringTemp = cl->getClauseString();
-		
-		if (mal && CNFStringTemp != "()") {
-			CNFString += " * ";
-		}
-		if (CNFStringTemp != "()") {
-			CNFString += CNFStringTemp;
-		}
-		mal = true;
-		cl = cl->nextElement;
-	}
-
-
-	/*
-	 * The following three calls were added by Niels to simplify the string
-	 * representation of CNF formulas in the DOT output of an OG. All
-	 * needed code is implemented in files "cnf_formula.h" and
-	 * "cnf_formula.cc". If the following three calls are removed,
-	 * everything is (as ugly) as before.
-	 */
-
-	// 1. create a CNF_Formula object from the CNF string representation
-	CNF_Formula formula = CNF_Formula(CNFString);
-
-	// 2. simplify the CNF formula inside the CNF_Formula object
-	formula.simplify();
-
-	// 3. create a string representation of the simplified formula
-	CNFString = formula.to_string();	
-
-
-	return CNFString;
-}
-
-
-// returns the CNF formula that is the annotation of a node as a pointer to class CNF
-CNF * vertex::getAnnotation() {
-	return firstClause;
 }
 
 
@@ -428,7 +314,7 @@ void vertex::propagateToSuccessors() {
 
     while ((element = getNextSuccEdge()) != NULL) {
     	if (element->getNode()->getColor() != RED) {
-    		element->getNode()->analyseNode();	// analyse the successor node again
+    		element->getNode()->analyseNodeByFormula();	// analyse the successor node again
     	}
     }
 }
@@ -442,64 +328,12 @@ void vertex::propagateToPredecessors() {
 
     while ((element = getNextPredEdge()) != NULL) {
     	if (element->getNode()->getColor() != RED && element->getNode()->finalAnalysisDone) {
-    		element->getNode()->analyseNode();	// analyse the preceding node again
+    		element->getNode()->analyseNodeByFormula();	// analyse the preceding node again
     	}
     	if (element->getNode()->getColor() == RED) {
     		predecessorNodes->removeNodeFromList(element->getNode(), true);			
     	}
     }   
-}
-
-
-//! \fn analysisResult vertex::analyseNode()
-//! \brief analyses the node and returns its color
-vertexColor vertex::analyseNode() {
-
-    trace(TRACE_5, "vertex::analyseNode() : start\n");
-    
-    trace(TRACE_3, "\t\t\t analysing node ");
-    trace(TRACE_3, intToString(numberOfVertex) + ": ");
-
-	assert (getColor() == BLUE);
-	
-    if (reachGraphStateSet.size() == 0) {
-        // we analyse an empty node; it becomes blue
-        trace(TRACE_3, "\t\t\t node analysed blue (empty node)");
-        trace(TRACE_5, "vertex::analyseNode() : end\n");
-        return BLUE;
-    } else {
-        // we analyse a non-empty node
-		CNF * cl = firstClause;					// get pointer to the first clause of the CNF
-
-        // iterate over all clauses of the annotation
-        // if there is any RED clause, the node becomes RED as well
-        // otherwise, the node stays BLUE
-        while (cl) {
-        	if (cl->isFinalState == false) {
-				vertexColor cTmp = cl->calcClauseColor();
-
-                if (cTmp == RED) {
-					// found a red clause; so node becomes red
-
-	            	propagateToSuccessors();	
-	            	propagateToPredecessors();	
-
-			        trace(TRACE_3, "\t\t\t node analysed red (there was a red clause)");
-                    trace(TRACE_5, "vertex::analyseNode() : end\n");
-
-                    return RED;
-                    break;
-                }
-            }
-            
-            cl = cl->nextElement; 	// get the next clause of the CNF
-        }
-
-        // all clauses considered and no red clause found
-        trace(TRACE_3, "\t\t\t node analysed blue (there was no red clause)");
-		trace(TRACE_5, "vertex::analyseNode() : end\n");
-		return BLUE;
-    }
 }
 
 

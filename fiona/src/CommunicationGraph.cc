@@ -255,7 +255,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             numberOfEdges++;
 
             currentVertex->addSuccessorNode(edgeSucc);
-			currentVertex->setAnnotationEdges(edgeSucc);
+		//	currentVertex->setAnnotationEdges(edgeSucc);
 
             currentVertex = toAdd;
 
@@ -278,7 +278,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             numberOfEdges++;
 
             currentVertex->addSuccessorNode(edgeSucc);
-			currentVertex->setAnnotationEdges(edgeSucc);
+		//	currentVertex->setAnnotationEdges(edgeSucc);
 
             if (currentVertex->getColor() != RED) {
 	    	    graphEdge * edgePred = new graphEdge(currentVertex, label, type);
@@ -331,7 +331,7 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
         numberOfEdges++;
 
 		currentVertex->addSuccessorNode(edgeSucc);
-		currentVertex->setAnnotationEdges(edgeSucc);
+//		currentVertex->setAnnotationEdges(edgeSucc);
 
         for (unsigned int i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
             toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
@@ -364,7 +364,7 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 		numberOfEdges++;
 
 		currentVertex->addSuccessorNode(edgeSucc);
-		currentVertex->setAnnotationEdges(edgeSucc);
+	//	currentVertex->setAnnotationEdges(edgeSucc);
 
 		if (type == receiving) {
 			offset = PN->getInputPlaceCount();
@@ -399,7 +399,8 @@ void communicationGraph::analyseNode(vertex* node) {
 		analysedColor = node->analyseNodeByFormula();
 	} else {
 		// analyse node by its CNF
-		analysedColor = node->analyseNode();
+		analysedColor = node->analyseNodeByFormula();
+		//analysedColor = node->analyseNode();
 	}
 
 	node->setColor(analysedColor);

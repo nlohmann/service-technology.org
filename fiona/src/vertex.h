@@ -49,7 +49,7 @@ class State;
 class graphEdge;
 class successorNodeList;
 class literal;
-class CNF;
+//class CNF;
 class CNF_formula;
 
 
@@ -69,7 +69,7 @@ protected:
 
 	vertexColor color; 						//!< color of vertex
 
-    CNF * firstClause;						//!< annotation of this node (a CNF)
+  //  CNF * firstClause;						//!< annotation of this node (a CNF)
 	CNF_formula* annotation;				//!< annotation of this node (a CNF) as a formula 
 	
 	
@@ -110,15 +110,12 @@ public:
     void resetIteratingPredNodes();
 
 	// annotation
-    CNF * getAnnotation();
     CNF_formula* getCNF_formula();
     string getCNFString();
     
     CommGraphFormulaAssignment* getAssignment();
     
-    void addClause(literal *, bool);
     void addClause(CommGraphFormulaMultiaryOr*);
-    void setAnnotationEdges(graphEdge *);
    
 //	int numberOfElementsInAnnotation();
 
@@ -126,7 +123,6 @@ public:
 	bool finalAnalysisDone;
 
     vertexColor analyseNodeByFormula();
-    vertexColor analyseNode();
 
     vertexColor getColor() const;
     void setColor(vertexColor c);

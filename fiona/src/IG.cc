@@ -36,7 +36,7 @@
 #include "state.h"
 #include "options.h"
 #include "debug.h"
-#include "CNF.h"
+//#include "CNF.h"
 #include "owfnTransition.h"
 
 
@@ -337,7 +337,11 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 			// we just consider the maximal states only
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	
 				
-				literal * cl = new literal();			// create a new clause for this particular state
+				// this clause's first literal
+				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
+								
+				//literal * cl = new literal();			// create a new clause for this particular state
+			    
 			    (*iter)->decode(PN);				// get the marking for this state
 
 				if ((*iter)->quasiFirelist) {		// delete the list of quasi enabled transitions
@@ -358,7 +362,11 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 					 	input.insert(*index);
 						
 						inputMessages.insert(input);
-						cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+				
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+						myclause->addSubFormula(myliteral);
+						
+						//cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
 						
 			//			cout << "\t" << PN->getPlace(*index)->name << endl;
 					}
@@ -372,10 +380,24 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 						output.insert(i);
 						
 						outputMessages.insert(output);
-						cl->addLiteral(PN->getPlace(i)->getLabelForCommGraph());	
+						
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getPlace(i)->getLabelForCommGraph());
+						myclause->addSubFormula(myliteral);
+						
+						//cl->addLiteral(PN->getPlace(i)->getLabelForCommGraph());	
 					}	
 				}
-				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
+				
+				// in case of a final state we add special literal "final" to the clause
+				if ((*iter)->type == FINALSTATE) {
+					node->hasFinalStateInStateSet = true;
+
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
+					myclause->addSubFormula(myliteral);
+				}
+				
+				node->addClause(myclause);
+				//node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
 			}
 		}
 	} else {
@@ -385,8 +407,10 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 	
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	// we just consider the maximal states only
 				
+				// this clause's first literal
+				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
 	
-				literal * cl = new literal();			// create a new clause for this particular state
+//				literal * cl = new literal();			// create a new clause for this particular state
 				(*iter)->decode(PN);
 				
 				i = 0;
@@ -401,7 +425,11 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 						input.insert(*index);
 						
 						inputMessages.insert(input);
-						cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+						
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+						myclause->addSubFormula(myliteral);
+						
+						//cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
 				//		cout << "\t" << PN->getPlace(*index)->name << endl;
 					}
 					i++;
@@ -413,10 +441,24 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 						output.insert(i);
 						
 						outputMessages.insert(output);
-						cl->addLiteral(PN->getPlace(i)->getLabelForCommGraph());	
+						
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getPlace(i)->getLabelForCommGraph());
+						myclause->addSubFormula(myliteral);
+						
+						//cl->addLiteral(PN->getPlace(i)->getLabelForCommGraph());	
 					}	
 				}
-				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
+				
+				// in case of a final state we add special literal "final" to the clause
+				if ((*iter)->type == FINALSTATE) {
+					node->hasFinalStateInStateSet = true;
+
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
+					myclause->addSubFormula(myliteral);
+				}
+				
+				node->addClause(myclause);
+				//node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
 			}
 		}
 
@@ -458,7 +500,11 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 	cout << "\t state "<< (*iter) << " activates the output events: " << endl;
 #endif		
 			unsigned int i = 0;
-			literal * cl = new literal();			// create a new clause for this particular state
+			
+			// this clause's first literal
+			CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
+			
+			//literal * cl = new literal();			// create a new clause for this particular state
 
 			// "receiving before sending" reduction rule
 			while (!stateActivatesOutputEvents(*iter) && 
@@ -474,7 +520,10 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 					
 					inputMessages.insert(input);
 					
-					cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+					myclause->addSubFormula(myliteral);
+					
+					//cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
 				}
 				i++;
 			}			
@@ -549,22 +598,41 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 					}
 					
 					if (supset) {
-						cl->addLiteral(label);	
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(label);
+						myclause->addSubFormula(myliteral);
+						
+						//cl->addLiteral(label);	
 						listOfOutputMessageLists.insert(outputMessages);
 					}	
 				} else {
-					cl->addLiteral(label);	
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(label);
+					myclause->addSubFormula(myliteral);
+					//cl->addLiteral(label);	
 				}
     			
 				if (!subset && !supset) {
 					listOfOutputMessageLists.insert(outputMessages);
-					cl->addLiteral(PN->createLabel(outputMessages));
+					
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->createLabel(outputMessages));
+					myclause->addSubFormula(myliteral);
+					
+//					cl->addLiteral(PN->createLabel(outputMessages));
 				} 
 				
 				found = false;
 				skip = false;
 			}
-			node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
+			
+			// in case of a final state we add special literal "final" to the clause
+			if ((*iter)->type == FINALSTATE) {
+				node->hasFinalStateInStateSet = true;
+
+				CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
+				myclause->addSubFormula(myliteral);
+			}
+			
+			node->addClause(myclause);
+			//node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
 		}
 		
 	}
@@ -577,7 +645,10 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 	cout << "\t state "<< (*iter) << " activates the output events: " << endl;
 #endif		
 			unsigned int i = 0;
-			literal * cl = new literal();			// create a new clause for this particular state
+			// this clause's first literal
+			CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
+
+//			literal * cl = new literal();			// create a new clause for this particular state
 
 			// "receiving before sending" reduction rule
 			while (!stateActivatesOutputEvents(*iter) && 
@@ -593,7 +664,10 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 					
 					inputMessages.insert(input);
 					
-					cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+					myclause->addSubFormula(myliteral);
+					
+					//cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
 				}
 				i++;
 			}			
@@ -668,22 +742,41 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 					}
 					
 					if (supset) {
-						cl->addLiteral(label);	
+						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(label);
+						myclause->addSubFormula(myliteral);
+					
+						//cl->addLiteral(label);	
 						listOfOutputMessageLists.insert(outputMessages);
 					}	
 				} else {
-					cl->addLiteral(label);	
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(label);
+					myclause->addSubFormula(myliteral);
+					
+					//cl->addLiteral(label);	
 				}
     			
 				if (!subset && !supset) {
 					listOfOutputMessageLists.insert(outputMessages);
-					cl->addLiteral(PN->createLabel(outputMessages));
+					
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->createLabel(outputMessages));
+					myclause->addSubFormula(myliteral);
+					//cl->addLiteral(PN->createLabel(outputMessages));
 				} 
 				
 				found = false;
 				skip = false;
 			}
-			node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
+
+			// in case of a final state we add special literal "final" to the clause
+			if ((*iter)->type == FINALSTATE) {
+				node->hasFinalStateInStateSet = true;
+
+				CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
+				myclause->addSubFormula(myliteral);
+			}
+
+			node->addClause(myclause);
+			//node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
 		}
 		
 	}		
@@ -718,7 +811,11 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 
 		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {				// we just consider the maximal states only
 			i = 0;
-			literal * cl = new literal();
+			
+			// this clause's first literal
+			CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
+			
+//			literal * cl = new literal();
 			
 			(*iter)->decode(PN);
 			while (!stateActivatesOutputEvents(*iter) && 
@@ -734,14 +831,24 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 					
 					inputMessages.insert(input);
 					
-					cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+					myclause->addSubFormula(myliteral);					
+					
+					//cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
 				}
 				i++;
 			}
 			if ((*iter)->type == FINALSTATE) {
-				node->addClause(cl, (*iter)->type == FINALSTATE);
+				
+				CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
+				myclause->addSubFormula(myliteral);
+				
+				node->addClause(myclause);
+				
+				//node->addClause(cl, (*iter)->type == FINALSTATE);
 			} else {
-				delete cl;	
+				delete myclause;
+				//delete cl;	
 			}
 		}
 	}

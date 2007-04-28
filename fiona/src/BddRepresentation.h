@@ -40,7 +40,6 @@
 #include <list>
 
 #include "vertex.h"
-#include "CNF.h"
 
 #include "util.h"
 #include "cudd.h"

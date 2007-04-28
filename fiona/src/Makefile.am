@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-04-03 16:19:06 $ by $Author: bretschn $.
-# Version $Revision: 1.26 $
+# File last changed $Date: 2007-04-28 21:18:13 $ by $Author: weinberg $.
+# Version $Revision: 1.27 $
 
 bin_PROGRAMS = fiona
 
@@ -34,7 +34,6 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
 		lexer_owfn.ll lexer_owfn_wrap.h\
 		syntax_og.yy lexer_og.ll\
 		petriNetNode.h petriNetNode.cc\
-		CNF.cc CNF.h\
 		IG.cc owfnPlace.cc communicationGraph.h\
 		IG.h owfnPlace.h\
 		OG.cc owfnTransition.cc\

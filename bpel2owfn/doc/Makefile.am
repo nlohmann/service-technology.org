@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/26 16:41:14 $ by $Author: nielslohmann $.
-# Version $Revision: 1.23 $
+# File last changed $Date: 2007/04/28 17:51:39 $ by $Author: nielslohmann $.
+# Version $Revision: 1.24 $
 
 
 # the manual
@@ -41,7 +41,7 @@ bpel2owfn_TEXINFOS = fdl.texi \
 		     images/ra1.pdf \
 		     images/ra2.pdf \
 		     images/rb1.pdf \
-		     images/rb2.pdf
+		     images/rb2.pdf \
 		     images/bpel2owfn.png \
 		     images/example.png \
 		     images/toolchain.png \

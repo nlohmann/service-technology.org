@@ -796,6 +796,31 @@ detected in an abstract process are reported as warnings.
 @item 116 @tab notice @tab
 An @code{<opaqueActivity>} of an abstract process was replaced by an
 @code{<empty>} activity.
+
+@item 117 @tab notice @tab
+When using the parameter @samp{communicationonly}, the occurrence of join
+failures is not modeled. Thus, any activity is treated as if the
+attribute @samp{suppressJoinFailure} is set to @samp{yes}.@footnote{If the
+attribute @samp{suppressJoinFailure} is not explicitly defined for an
+activity, the value is inherited by the parent activity.}
+
+@item 118 @tab notice @tab
+A user-defined transition condition is ignored and modeled as ``@i{n}-out-of-@i{n}''
+(@samp{true}) instead.
+
+@item 119 @tab notice @tab
+A user-defined transition condition is ignored and modeled as ``1-out-of-@i{n}''
+(XOR) instead.
+
+@item 120 @tab notice @tab
+When using the parameter @samp{communicationonly}, the FTC (fault, termination,
+and compensation) handlers are not modeled.
+
+@item 121 @tab notice @tab
+When using the parameter @samp{communicationonly}, activities of the negative
+control flow (@code{<exit>}, @code{<throw>}, @code{<compensate>}, and
+@code{<compensateScope>}) are replaced by an @code{<empty>} activity.
+
 @end multitable
 
 
@@ -952,7 +977,7 @@ bpel2owfn -i example.bpel -m petrinet -p communicationonly -f dot -o
 This command creates a file @file{example.dot}, containing a Graphviz dot representation of the Petri net, and---if the @code{dot} tool was found in the search path---a @acronym{PNG, Portable Network Graphics} an image file @file{example.png}. The latter looks like this:@*
 
 @iftex
-@center @image{images/example,,2.0in}
+@center @image{images/example,,2.5in}
 @end iftex
 @ifhtml
 @center @image{images/example}

@@ -88,7 +88,9 @@ the German Federal Ministry for Education and Research (@acronym{BMBF}), see
 @c * References:: Bibliography of cited literature.
 
 @menu
+* Introducing BPEL2oWFN:: Introducing BPEL2oWFN.
 * Invoking BPEL2oWFN:: How to invoke BPEL2oWFN.
+* Warnings and Error Messages:: Warnings and Error Messages.
 * File Formats:: Which file formats are supported.
 * FAQ and Known Bugs:: What BPEL2oWFN cannot do, and why.
 * GNU Free Documentation License::The license of this manual.
@@ -243,6 +245,82 @@ the @acronym{CFG} can be used to check if each variable is initialized by an
 incoming message or an @code{<assign>} activity.
 
 @end ignore
+
+
+
+
+
+@c ----------------------------------------------------------------------------
+
+@node Introducing BPEL2oWFN
+@chapter Introducing BPEL2oWFN
+
+BPEL2oWFN translates a web service expressed in @acronym{WS-BPEL, Web Service Business Process Execution Language}
+into an oWFN (open Workflow Net). This oWFN can be used to:
+
+@itemize
+@item check for @i{controllability} or generate the @i{operating guideline} using the tool Fiona@footnote{Fiona is available at @url{http://www.informatik.hu-berlin.de/top/tools4bpel}.},
+@item check for deadlocks or any other Petri net property, or
+@item check any temporal logic formula with a variety of model checking tools.
+@end itemize
+@*
+
+@iftex
+@center @image{images/diagram,,2in}
+@end iftex
+@ifhtml
+@center @image{images/diagram}
+@end ifhtml
+
+@*
+
+BPEL2oWFN uses static analysis to make the generated Petri net model as compact
+as possible to analyze a chosen property. This is called @i{flexible model generation}.
+Furthermore, several design flaws can be detected using control and data flow analysis.
+
+BPEL2oWFN was written by Niels Lohmann, Christian Gierds and Martin Znamirowski.
+It is part of the Tools4BPEL project funded by the Bundesministerium für Bildung und
+Forschung. See @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
+
+
+@section Concepts of BPEL2oWFN
+
+@multitable @columnfractions .28 .72
+
+@item @b{Input BPEL Process} @tab
+BPEL2oWFN can read @acronym{BPEL} processes compliant to the @acronym{WS-BPEL 2.0}
+or the @acronym{BPEL4WS} 1.1 specification.
+
+@item @b{Abstract Syntax Tree} @tab
+The @acronym{AST, abstract syntax tree} is the main data structure of BPEL2oWFN.
+The @acronym{AST} is annotated with information gained by static analysis.
+
+@item @b{Control/Data Flow Graph} @tab
+From the abstract syntax tree, a control/data flow graph is built. This graph
+is used to apply static analysis algorithms to gain information
+(e.g., dead code) about the process. These algorithms Furthermore, design
+flaws such as cyclic control links or conflicting receiving activities are
+detected.
+
+@item @b{Petri Net API} @tab
+The annotated abstract syntax tree is used to generate a Petri net model of the
+@acronym{BPEL} process. All Petri net-related functions (adding, removing and
+merging of nodes; structural reduction) are provided by the Petri net
+@acronym{API, application programming interface}.
+
+@item @b{Pattern Repository} @tab
+For each @acronym{BPEL} construct, several patterns with different degrees of
+abstraction are stored in the pattern repository. Using the information gained
+by static analysis, the most abstract pattern applicable is used.
+
+@item @b{Output Petri Net} @tab
+The generated Petri net model can be exported to many file formats, such as
+@acronym{PNML}, @acronym{LoLA}, Fiona @acronym{oWFN}, @acronym{INA}, @acronym{APNN}, or @acronym{PEP}.
+
+@end multitable
+
+
+
 
 
 
@@ -647,7 +725,10 @@ file @file{service1_service2.task} is written that can be processed by
 
 
 
-@section Warnings and Error Messages
+
+@c ----------------------------------------------------------------------------
+@node Warnings and Error Messages
+@chapter Warnings and Error Messages
 
 BPEL2oWFN performs several analysis steps on the input @acronym{BPEL} process.
 These messages are displayed during parsing and postprocessing of the process,
@@ -693,13 +774,233 @@ few lines. After the line number, the error code is displayed.
 @samp{W00114} stands for a warning with code 114. Further details can be
 taken from the table below.
 
-@multitable @columnfractions .1 .15 .75
+@multitable @columnfractions .05 .18 .72
 @headitem Code @tab Type @tab Description
 
-@item 1--94 @tab static analysis @tab
-A check for a static analysis goal defined in the @acronym{WS-BPEL}
-specification detected an error. Currently, 44 of the 94 described static
-analysis goals are checked.
+@item 6 @tab static analysis @tab
+The @code{<rethrow>} activity MUST only be used within a faultHandler (i.e.
+@code{<catch>} and @code{<catchAll>} elements).@footnote{The descriptions for
+static analysis messages are taken from Appendix B of the @acronym{WS-BPEL}
+specification.}
+
+@item 7 @tab static analysis @tab
+The @code{<compensateScope>} activity MUST only be used from within a
+@code{faultHandler}, another @code{compensationHandler}, or a
+@code{terminationHandler}.
+
+@item 8 @tab static analysis @tab
+The @code{<compensate>} activity MUST only be used from within a
+@code{faultHandler}, another @code{compensationHandler}, or a
+@code{terminationHandler}.
+
+@item 15 @tab static analysis @tab
+To be instantiated, an executable business process MUST contain at least one
+@code{<receive>} or @code{<pick>} activity annotated with a
+@code{createInstance="yes"} attribute.
+
+@item 16 @tab static analysis @tab
+A @code{partnerLink} MUST specify the @code{myRole} or the @code{partnerRole},
+or both.
+
+@item 17 @tab static analysis @tab
+The @code{initializePartnerRole} attribute MUST NOT be used on a partnerLink
+that does not have a partner role.
+
+@item 18 @tab static analysis @tab
+The name of a @code{partnerLink} MUST be unique among the names of all
+partnerLinks defined within the same immediately enclosing scope.
+
+@item 23 @tab static analysis @tab
+The name of a variable MUST be unique among the names of all variables defined
+within the same immediately enclosing scope.
+
+@item 24 @tab static analysis @tab
+Variable names are @code{BPELVariableNames}, that is, NCNames (as defined in
+@acronym{XML} Schema specification) but in addition they MUST NOT contain the
+@samp{.} character.
+
+@item 25 @tab static analysis @tab
+The @code{messageType}, type or @code{element} attributes are used to specify
+the type of a variable. Exactly one of these attributes MUST be used.
+
+@item 44 @tab static analysis @tab
+The name of a @code{<correlationSet>} MUST be unique among the names of all
+@code{<correlationSet>} defined within the same immediately enclosing scope.
+
+@item 51 @tab static analysis @tab
+The @code{inputVariable} attribute MUST NOT be used on an @code{Invoke}
+activity that contains @code{<toPart>} elements.
+
+@item 52 @tab static analysis @tab
+The @code{outputVariable} attribute MUST NOT be used on an @code{Invoke}
+activity that contains @code{<toPart>} elements.
+
+@item 55 @tab static analysis @tab
+For @code{<receive>}, if @code{<fromPart>} elements are used on a
+@code{<receive>} activity then the variable attribute MUST NOT be used on the
+same activity.
+
+@item 56 @tab static analysis @tab
+A ``start activity'' is a @code{<receive>} or @code{<pick>} activity that is
+annotated with a @code{createInstance="yes"} attribute. Activities other than
+the following: start activities, @code{<scope>}, @code{<flow>} and
+@code{<sequence>} MUST NOT be performed prior to or simultaneously with start
+activities.
+
+@item 57 @tab static analysis @tab
+If a process has multiple start activities with correlation sets then all such
+activities MUST share at least one common correlationSet and all common
+correlationSets defined on all the activities MUST have the value of the
+@code{initiate} attribute be set to @code{"join"}.
+
+@item 59 @tab static analysis @tab
+For @code{<reply>}, if @code{<toPart>} elements are used on a @code{<reply>}
+activity then the @code{variable} attribute MUST NOT be used on the same
+activity.
+
+@item 62 @tab static analysis @tab
+If @code{<pick>} has a @code{createInstance} attribute with a value of
+@samp{yes}, the events in the @code{<pick>} MUST all be @code{<onMessage>}
+events.
+
+@item 63 @tab static analysis @tab
+The semantics of the @code{<onMessage>} event are identical to a
+@code{<receive>} activity regarding the optional nature of the @code{variable}
+attribute or @code{<fromPart>} elements, if @code{<fromPart>} elements on an
+activity then the variable attribute MUST NOT be used on the same activity
+(see SA00055).
+
+@item 64 @tab static analysis @tab
+For @code{<flow>}, a declared link's name MUST be unique among all
+@code{<link>} names defined within the same immediately enclosing
+@code{<flow>}.
+
+@item 65 @tab static analysis @tab
+The value of the @code{linkName} attribute of @code{<source>} or
+@code{<target>} MUST be the name of a @code{<link>} declared in an enclosing
+@code{<flow>} activity.
+
+@item 66 @tab static analysis @tab
+Every link declared within a @code{<flow>} activity MUST have exactly one
+activity within the @code{<flow>} as its source and exactly one activity within
+the @code{<flow>} as its target.
+
+@item 67 @tab static analysis @tab
+Two different links MUST NOT share the same source and target activities; that
+is, at most one link may be used to connect two activities.
+
+@item 68 @tab static analysis @tab
+An activity MAY declare itself to be the source of one or more links by
+including one or more @code{<source>} elements. Each @code{<source>}
+element MUST use a distinct link name.
+
+@item 69 @tab static analysis @tab
+An activity MAY declare itself to be the target of one or more links by
+including one or more @code{<target>} elements. Each @code{<target>} element
+associated with a given activity MUST use a link name distinct from all other
+@code{<target>} elements at that activity.
+
+@item 70 @tab static analysis @tab
+A link MUST NOT cross the boundary of a repeatable construct or the
+@code{<compensationHandler>} element. This means, a link used within a
+repeatable construct (@code{<while>}, @code{<repeatUntil>}, @code{<forEach>},
+@code{<eventHandlers>}) or a @code{<compensationHandler>} MUST be declared in
+a @code{<flow>} that is itself nested inside the repeatable construct or
+@code{<compensationHandler>}.
+
+@item 71 @tab static analysis @tab
+A link that crosses a @code{<catch>}, @code{<catchAll>} or
+@code{<terminationHandler>} element boundary MUST be outbound only, that is,
+it MUST have its source activity within the @code{<faultHandlers>} or
+@code{<terminationHandler>}, and its target activity outside of the scope
+associated with the handler.
+
+@item 72 @tab static analysis @tab
+A @code{<link>} declared in a @code{<flow>} MUST NOT create a control cycle,
+that is, the source activity must not have the target activity as a logically
+preceding activity.@footnote{This fault can only be detected in mode mode @samp{cfg}.}
+
+@item 73 @tab static analysis @tab
+The expression for a join condition MUST be constructed using only Boolean
+operators and the activity's incoming links' status values.
+
+@item 74 @tab static analysis @tab
+The expressions in @code{<startCounterValue>} and @code{<finalCounterValue>}
+MUST return a TII (meaning they contain at least one character) that can be
+validated as a @code{xsd:unsignedInt}. Static analysis MAY be used to detect
+this erroneous situation at design time when possible (for example, when the
+expression is a constant).
+
+@item 75 @tab static analysis @tab
+For the @code{<forEach>} activity, @code{<branches>} is an integer value
+expression. Static analysis MAY be used to detect if the integer value is
+larger than the number of directly enclosed activities of @code{<forEach>} at
+design time when possible (for example, when the branches expression is a
+constant).
+
+@item 76 @tab static analysis @tab
+For @code{<forEach>} the enclosed scope MUST NOT declare a variable with the
+same name as specified in the @code{counterName} attribute of
+@code{<forEach>}.
+
+@item 77 @tab static analysis @tab
+The value of the @code{target} attribute on a @code{<compensateScope>}
+activity MUST refer to the name of an immediately enclosed @code{scope} of the
+@code{scope} containing the FCT-handler with the @code{<compensateScope>}
+activity. This includes immediately enclosed scopes of an event handler
+(@code{<onEvent>} or @code{<onAlarm>}) associated with the same @code{scope}.
+
+@item 78 @tab static analysis @tab
+The @code{target} attribute of a @code{<compensateScope>} activity MUST refer
+to a @code{scope} or an @code{invoke} activity with a fault handler or
+compensation handler.
+
+@item 79 @tab static analysis @tab
+The root @code{scope} inside a FCT-handler MUST not have a compensation
+handler.
+
+@item 80 @tab static analysis @tab
+There MUST be at least one @code{<catch>} or @code{<catchAll>} element within
+a @code{<faultHandlers>} element.
+
+@item 81 @tab static analysis @tab
+For the @code{<catch>} construct; to have a defined type associated with the
+fault variable, the @code{faultVariable} attribute MUST only be used if either
+the @code{faultMessageType} or @code{faultElement} attributes, but not both,
+accompany it. The @code{faultMessageType} and @code{faultElement} attributes
+MUST NOT be used unless accompanied by @code{faultVariable} attribute.
+
+@item 82 @tab static analysis @tab
+The peer-scope dependency relation MUST NOT include cycles. In other words,
+@acronym{WS-BPEL} forbids a process in which there are peer scopes S1 and S2
+such that S1 has a peer-scope dependency on S2 and S2 has a peer-scope
+dependency on S1.@footnote{This fault can only be detected in mode mode @samp{cfg}.}
+
+@item 83 @tab static analysis @tab
+An event handler MUST contain at least one @code{<onEvent>} or
+@code{<onAlarm>} element.
+
+@item 84 @tab static analysis @tab
+The @code{partnerLink} reference of @code{<onEvent>} MUST resolve to a partner
+link declared in the process in the following order: the associated scope
+first and then the ancestor scopes.
+
+@item 88 @tab static analysis @tab
+For @code{<onEvent>}, the resolution order of the @code{correlation set}(s)
+referenced by @code{<correlation>} MUST be first the associated scope and then
+the ancestor scopes.
+
+@item 91 @tab static analysis @tab
+A scope with the @code{isolated} attribute set to @code{"yes"} is called an
+isolated scope. Isolated scopes MUST NOT contain other isolated scopes.
+
+@item 92 @tab static analysis @tab
+Within a scope, the name of all named immediately enclosed scopes MUST be
+unique.
+
+@item 93 @tab static analysis @tab
+Identical @code{<catch>} constructs MUST NOT exist within a
+@code{<faultHandlers>} element.
 
 @item 100 @tab notice @tab
 Either a non-standard element@footnote{All elements
@@ -749,7 +1050,7 @@ be activated concurrently and share the same partner link, port type, operation,
 and correlation set. When a message is sent to the process, these activities
 are in @i{conflict}; that is, it is not defined which activity will receive an
 inbound message. At runtime, the standard fault @samp{bpel:conflictingReceive}
-would be thrown.
+would be thrown.@footnote{This fault can only be detected in mode mode @samp{cfg}.}
 
 @item 107 @tab warning @tab
 A mandatory attribute of an activity was not defined. Especially for
@@ -784,7 +1085,7 @@ displayed when the first @acronym{UTF}-8 character is read.
 @item 114 @tab warning @tab
 @acronym{CFG} analysis detected a read access to a variable that was not
 initialized before. At runtime, the standard fault
-@samp{bpel:uninitializedVariable} would be thrown.
+@samp{bpel:uninitializedVariable} would be thrown.@footnote{This fault can only be detected in mode mode @samp{cfg}.}
 
 @item 115 @tab notice @tab
 The process definition defines an abstract process profile, and thus allows

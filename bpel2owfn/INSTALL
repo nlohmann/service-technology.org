@@ -1,4 +1,4 @@
-BEGIN OF INSTALL file for BPEL2oWFN Version 2.0.0
+BEGIN OF INSTALL file for BPEL2oWFN Version 2.0.1
 
 ---------- Footnotes ----------
 
@@ -20,11 +20,11 @@ follow these steps:
 
   1. Unpack the source tarball by entering(1)
 
-          gunzip bpel2owfn-2.0.0.tar.gz
-          tar xf bpel2owfn-2.0.0.tar
+          gunzip bpel2owfn-2.0.1.tar.gz
+          tar xf bpel2owfn-2.0.1.tar
 
   2. Enter that directory:
-          cd bpel2owfn-2.0.0
+          cd bpel2owfn-2.0.1
 
   3. Run the configure shell script which attempts to guess correct
      values for various system-dependent variables used during
@@ -124,7 +124,7 @@ Installation
 
 After successful compilation and self tests an executable file
 `bpel2owfn' (or `bpel2owfn.exe' on systems running Microsoft Windows)
-is created in the directory `bpel2owfn-2.0.0/src' of the distribution.
+is created in the directory `bpel2owfn-2.0.1/src' of the distribution.
 This file has no dependencies to other files of the distribution and
 can be copied to any directory.
 
@@ -161,7 +161,7 @@ and Sun Solaris. Anyway, if the compilation fails please make sure you
 use the most recent (stable) versions of the GNU Compiler Collection.
 If this does not help please send us an electronic mail to
 <bug-bpel2owfn@gnu.org>. Include the version number of your
-distribution (version 2.0.0 of 20 April 2007). Also include in your
+distribution (version 2.0.1 of 28 April 2007). Also include in your
 message the output that the make process produced. We will try to
 answer your mail within a week.
 
@@ -178,7 +178,7 @@ The generated Makefiles serve different targets:
 `all'
      Compile BPEL2oWFN and create an executable binary `bpel2owfn' (or
      `bpel2owfn.exe' on systems running Microsoft Windows) in the
-     directory `bpel2owfn-2.0.0/src'.
+     directory `bpel2owfn-2.0.1/src'.
 
 `dvi'
 `html'
@@ -186,7 +186,7 @@ The generated Makefiles serve different targets:
 `ps'
      Generate documentation files in the given format which can be DVI,
      HTML, PDF or PostScript. The documentation is generated in the
-     directory `bpel2owfn-2.0.0/doc' and is named `bpel2owfn.FORMAT'
+     directory `bpel2owfn-2.0.1/doc' and is named `bpel2owfn.FORMAT'
      (User's Manual).
 
 `clean'
@@ -329,4 +329,4 @@ Copyright (C) 2005, 2006, 2007 Niels Lohmann
 See `http://www.gnu.org/software/bpel2owfn' or the User's Manual for
 more information.
 
-END OF INSTALL file for BPEL2oWFN Version 2.0.0
+END OF INSTALL file for BPEL2oWFN Version 2.0.1

@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/28 17:51:39 $ by $Author: nielslohmann $.
-# Version $Revision: 1.24 $
+# File last changed $Date: 2007/04/29 12:04:30 $ by $Author: nielslohmann $.
+# Version $Revision: 1.25 $
 
 
 # the manual
@@ -34,6 +34,7 @@ bpel2owfn_TEXINFOS = fdl.texi \
 		     images/ra2.eps \
 		     images/rb1.eps \
 		     images/rb2.eps \
+		     images/diagram.eps \
 		     images/bpel2owfn.pdf \
 		     images/example.pdf \
 		     images/toolchain.pdf \
@@ -42,6 +43,7 @@ bpel2owfn_TEXINFOS = fdl.texi \
 		     images/ra2.pdf \
 		     images/rb1.pdf \
 		     images/rb2.pdf \
+		     images/diagram.pdf \
 		     images/bpel2owfn.png \
 		     images/example.png \
 		     images/toolchain.png \
@@ -49,7 +51,8 @@ bpel2owfn_TEXINFOS = fdl.texi \
 		     images/ra1.png \
 		     images/ra2.png \
 		     images/rb1.png \
-		     images/rb2.png
+		     images/rb2.png \
+		     images/diagram.png
 
 # the installation manual
 install_TEXINFOS = install.texi
@@ -66,9 +69,11 @@ CLEANFILES = install.aux \
 	     install.pg \
 	     install.tmp \
 	     install.cps \
-	     install.tp
+	     install.tp \
+	     *~ \
+	     -fr manual
 
-EXTRA_DIST = install.texi
+EXTRA_DIST = install.texi gendocs.sh gendocs_template
 
 
 # rules to create the distribution documentation
@@ -79,3 +84,4 @@ hu-createdistdocs: install.texi
 	sed -n '/BEGIN OF AUTHORS/,/END OF AUTHORS/w ../AUTHORS' install.txt
 	sed -n '/BEGIN OF INSTALL/,/END OF INSTALL/w ../INSTALL' install.txt
 	rm install.txt
+	./gendocs.sh bpel2owfn "$(PACKAGE_STRING)"

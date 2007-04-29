@@ -31,7 +31,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/04/29 19:09:57 $
+ * \date    \$Date: 2007/04/29 20:10:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.
@@ -315,6 +315,14 @@ UB     			[\200-\277]
  /* non-terminals for WS-BPEL Partner Link Type */
 <INITIAL>{ns}?"partnerLinkType"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINKTYPE; }
 <INITIAL>{ns}?"role"			{ BEGIN(ATTRIBUTE); return K_ROLE; }
+
+ /* non-terminals for XML Schema */
+<INITIAL>{ns}?"schema"			{ BEGIN(ATTRIBUTE); return K_SCHEMA; }
+
+ /* non-terminals for Variable Properties */
+<INITIAL>{ns}?"property"		{ BEGIN(ATTRIBUTE); return K_PROPERTY; }
+<INITIAL>{ns}?"propertyAlias"		{ BEGIN(ATTRIBUTE); return K_PROPERTYALIAS; }
+
 
 
  /* white space */

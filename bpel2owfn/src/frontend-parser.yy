@@ -40,7 +40,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/04/29 19:09:57 $
+ * \date    \$Date: 2007/04/29 20:10:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.311 $
+ * \version \$Revision: 1.312 $
  *
  * \ingroup frontend
  */
@@ -110,7 +110,7 @@
 %token X_NEXT X_OPEN X_SLASH
 %token K_TOPOLOGY K_PARTICIPANTTYPES K_PARTICIPANTTYPE K_PARTICIPANTS K_PARTICIPANT K_PARTICIPANTSET K_MESSAGELINKS K_MESSAGELINK
 %token K_TYPES K_PORTTYPE K_FAULT K_OPERATION K_DEFINITIONS K_OUTPUT K_INPUT K_MESSAGE K_PART K_BINDING K_SERVICE K_PORT
-%token K_PARTNERLINKTYPE K_ROLE
+%token K_PARTNERLINKTYPE K_ROLE K_SCHEMA K_PROPERTY K_PROPERTYALIAS
 %token <yt_casestring> NUMBER
 %token <yt_casestring> X_NAME
 %token <yt_casestring> VARIABLENAME
@@ -329,6 +329,7 @@ tProcess:
       globals::joinCondition_links.clear();
       globals::joinCondition_linkStatus.clear();
       globals::joinCondition_result.clear();
+      globals::unknown_elements.clear();
       globals::parsing = true;
       globals::static_analysis_errors = 0;
       globals::other_errors = 0;

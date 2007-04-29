@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/29 19:09:57 $
+ * \date    \$Date: 2007/04/29 20:10:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.77 $
+ * \version \$Revision: 1.78 $
  *
  * \ingroup debug
  */
@@ -431,6 +431,10 @@ void genericError(unsigned int code, string information, string line, error_leve
 
     case(123): // syntax error in WSDL file
 	{ cerr << "syntax error in WSDL file" << endl;
+	  break; }
+
+    case(124): // ignoring XML Schema
+	{ cerr << "skipped XML Schema element: <" << information << ">" << endl;
 	  break; }
   }
 

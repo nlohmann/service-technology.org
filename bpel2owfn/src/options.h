@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/29 15:08:56 $
+ * \date    \$Date: 2007/04/29 19:09:57 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  */
 
 
@@ -89,7 +89,8 @@ typedef enum
    O_PARAMETER,		///< set various parameters (see #possibleParameters)
    O_DEBUG,		///< set the debug level
    O_REDUCTION,		///< set level of structural reduction
-   O_CHOR		///< parse a choreography file (BPEL4Chor)
+   O_CHOR,		///< parse a choreography file (BPEL4Chor)
+   O_WSDL		///< parse a WSDL file
 } possibleOptions;
 
 

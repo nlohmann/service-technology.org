@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/29 15:08:56 $
+ * \date    \$Date: 2007/04/29 19:09:57 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  */
 
 
@@ -119,11 +119,12 @@ static struct option longopts[] =
   { "debug",		required_argument, NULL, 'd' },
   { "reduce",		required_argument, NULL, 'r' },
   { "choreography",	required_argument, NULL, 'c' },
+  { "wsdl",		required_argument, NULL, 'w' },
   NULL
 };
 
 /// short options (needed by GNU getopt)
-const char *par_string = "hvm:li:of:p:d:r:c:";
+const char *par_string = "hvm:li:of:p:d:r:c:w:";
 
 
 
@@ -478,8 +479,15 @@ void parse_command_line(int argc, char* argv[])
 
       case 'c':
 	      {
-		options[O_INPUT] = true;
+		options[O_CHOR] = true;
 		globals::choreography_filename = string(optarg);
+		break;
+	      }
+
+      case 'w':
+	      {
+		options[O_WSDL] = true;
+		globals::wsdl_filename = string(optarg);
 		break;
 	      }
 

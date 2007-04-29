@@ -31,14 +31,14 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/29 17:09:30 $
+ * \date    \$Date: 2007/04/29 19:09:57 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.165 $
+ * \version \$Revision: 1.166 $
  */
 
 
@@ -82,6 +82,7 @@ using std::map;
 
 extern int frontend_parse();			// from Bison
 extern int frontend_chor_parse();		// from Bison
+extern int frontend_wsdl_parse();		// from Bison
 extern int frontend_debug;			// from Bison
 extern int frontend_nerrs;			// from Bison
 extern int frontend_lineno;			// from Bison
@@ -563,7 +564,7 @@ int main( int argc, char *argv[])
 
 
   /*
-   * Choreography mode: parse a BPEL4Chor file
+   * Choreography: parse a BPEL4Chor file
    */
   if (globals::choreography_filename != "")
   {
@@ -582,6 +583,28 @@ int main( int argc, char *argv[])
       genericError(122, "", toString(frontend_lineno), ERRORLEVER_WARNING);
   }
 
+
+
+  /*
+   * parse an optional WSDL file
+   */
+  if (globals::wsdl_filename != "")
+  {
+    open_file(globals::wsdl_filename);
+
+    show_process_information_header();
+
+    // invoke Bison BPEL4Chor parser
+    trace(TRACE_INFORMATION, "Parsing " + globals::choreography_filename + " ...\n");
+    int parse_result = frontend_wsdl_parse();
+    trace(TRACE_INFORMATION, "Parsing of " + globals::choreography_filename + " complete.\n");
+
+    close_file(globals::wsdl_filename);
+
+    if (parse_result != 0)
+      genericError(123, "", toString(frontend_lineno), ERRORLEVER_WARNING);
+  }
+  
 
 
   // parsing all inputfiles

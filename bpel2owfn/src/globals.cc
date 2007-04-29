@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/29 15:08:56 $
+ * \date    \$Date: 2007/04/29 19:09:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
 
 
@@ -106,4 +106,6 @@ namespace globals {
   unsigned int reduction_level = 0;
 
   string choreography_filename = "";
+
+  string wsdl_filename = "";
 }

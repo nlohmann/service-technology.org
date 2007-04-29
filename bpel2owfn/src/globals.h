@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/29 15:08:56 $
+ * \date    \$Date: 2007/04/29 19:09:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
 
 
@@ -180,6 +180,9 @@ namespace globals
 
   /// filename of the optional BPEL4Chor choreography file
   extern string choreography_filename;  
+
+  /// filename of the optional WSDL file
+  extern string wsdl_filename;  
 
   /// parameters (set by #parse_command_line)
   extern map<possibleParameters, bool> parameters;

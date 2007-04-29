@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/29 15:08:56 $ by $Author: nielslohmann $.
-# Version $Revision: 1.76 $
+# File last changed $Date: 2007/04/29 19:09:57 $ by $Author: nielslohmann $.
+# Version $Revision: 1.77 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -94,6 +94,7 @@ bpel2owfn_SOURCES = $(KCSOURCES) \
 		    frontend-parser.yy \
 		    frontend-lexer.ll \
 		    frontend-parser-chor.yy \
+		    frontend-parser-wsdl.yy \
 		    bpel2owfn.cc \
 		    globals.cc globals.h \
 		    debug.cc debug.h \
@@ -110,7 +111,8 @@ bpel2owfn_SOURCES = $(KCSOURCES) \
 # These sources have to be present before the rest is compiled.
 BUILT_SOURCES = $(KCDUMMY) \
 		frontend-parser.cc \
-		frontend-parser-chor.cc
+		frontend-parser-chor.cc \
+		frontend-parser-wsdl.cc
 
 # These files have to be distributed to compile without compiler generators.
 EXTRA_DIST = $(KCDUMMY) \

@@ -39,6 +39,7 @@ frontend-lexer.cc
 frontend-parser.cc
 frontend-parser.h
 frontend-parser-chor.cc
+frontend-parser-wsdl.cc
 bpel2owfn.exe
 bpel2owfn.exe.stackdump
 *.bpel

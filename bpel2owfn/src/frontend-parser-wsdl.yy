@@ -20,9 +20,9 @@
 
 %{
 /*!
- * \file    frontend-parser-chor.cc
+ * \file    frontend-parser-wsdl.cc
  *
- * \brief   BPEL4Chor topology parser
+ * \brief   WSDL 1.1 parser
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
@@ -39,7 +39,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.1 $
  *
  * \ingroup frontend
  */
@@ -80,7 +80,7 @@
 %left K_AND
 
 // The start symbol of the grammar.
-%start tTopology
+%start tDefinions
 
 
 
@@ -98,8 +98,8 @@
 // arise.
 %expect 0
 
-// All "yy"-prefixes are replaced with "frontend_chor_".
-%name-prefix="frontend_chor_"
+// All "yy"-prefixes are replaced with "frontend_wsdl_".
+%name-prefix="frontend_wsdl_"
 
 
 
@@ -131,9 +131,9 @@ extern int frontend_lex();	// from flex: the lexer funtion
 extern int frontend_lineno;	// from flex: the current line number
 
 // use the functions of the BPEL parser
-#define frontend_chor_lex() frontend_lex()
-#define frontend_chor_error(a) frontend_error(a)
-#define frontend_chor_in frontend_in
+#define frontend_wsdl_lex() frontend_lex()
+#define frontend_wsdl_error(a) frontend_error(a)
+#define frontend_wsdl_in frontend_in
 %}
 
 
@@ -143,54 +143,127 @@ extern int frontend_lineno;	// from flex: the current line number
 
 
 
-tTopology:
-  X_OPEN K_TOPOLOGY arbitraryAttributes X_NEXT tParticipantTypes tParticipants tMessageLinks X_SLASH K_TOPOLOGY X_CLOSE
+tDefinions:
+  X_OPEN K_DEFINITIONS arbitraryAttributes X_NEXT
+  tImport_list tTypes tMessage_list tPortType_list tBinding_list tService_list tPartnerLinkType_list
+  X_SLASH K_DEFINITIONS X_CLOSE
 ;
 
-tParticipantTypes:
-  K_PARTICIPANTTYPES X_NEXT tParticipantType_list X_NEXT X_SLASH K_PARTICIPANTTYPES X_NEXT
+tImport_list:
+  /* empty */
+| tImport X_NEXT tImport_list;
 ;
 
-tParticipantType_list:
-  tParticipantType
-| tParticipantType_list X_NEXT tParticipantType
+tImport:
+  K_IMPORT arbitraryAttributes X_SLASH
 ;
 
-tParticipantType:
-  K_PARTICIPANTTYPE arbitraryAttributes X_SLASH
+tTypes:
+  /* empty */
+| K_TYPES X_NEXT X_SLASH K_TYPES
 ;
 
-tParticipants:
-  K_PARTICIPANTS X_NEXT tParticipant_list X_NEXT X_SLASH K_PARTICIPANTS X_NEXT
+tMessage_list:
+  /* empty */
+| tMessage X_NEXT tMessage_list
 ;
 
-tParticipant_list:
-  tParticipant
-| tParticipantSet
-| tParticipant_list X_NEXT tParticipant
-| tParticipant_list X_NEXT tParticipantSet
+tMessage:
+  K_MESSAGE arbitraryAttributes X_NEXT tPart_list X_SLASH K_MESSAGE
 ;
 
-tParticipant:
-  K_PARTICIPANT arbitraryAttributes X_NEXT X_SLASH K_PARTICIPANT
-| K_PARTICIPANT arbitraryAttributes X_SLASH
+tPart_list:
+  tPart X_NEXT
+| tPart X_NEXT tPart_list
 ;
 
-tParticipantSet:
-  K_PARTICIPANTSET arbitraryAttributes X_NEXT tParticipant_list X_NEXT X_SLASH K_PARTICIPANTSET
+tPart:
+  K_PART arbitraryAttributes X_SLASH
 ;
 
-tMessageLinks:
-  K_MESSAGELINKS X_NEXT tMessageLink_list X_NEXT X_SLASH K_MESSAGELINKS X_NEXT
+tPortType_list:
+  /* empty */
+| tPortType X_NEXT tPortType_list
 ;
 
-tMessageLink_list:
-  tMessageLink
-| tMessageLink_list X_NEXT tMessageLink
+tPortType:
+  K_PORTTYPE arbitraryAttributes X_NEXT tOperation_list X_SLASH K_PORTTYPE
 ;
 
-tMessageLink:
-  K_MESSAGELINK arbitraryAttributes X_SLASH
+tOperation_list:
+  tOperation X_NEXT
+| tOperation X_NEXT tOperation_list
+;
+
+tOperation:
+  K_OPERATION arbitraryAttributes X_NEXT tInputOutputFault_list X_SLASH K_OPERATION
+;
+
+tInputOutputFault_list:
+  tInputOutputFault X_NEXT
+| tInputOutputFault X_NEXT tInputOutputFault_list
+;
+
+tInputOutputFault:
+  tInput
+| tOutput
+| tFault
+;
+
+tInput:
+  K_INPUT arbitraryAttributes X_SLASH
+;
+
+tOutput:
+  K_OUTPUT arbitraryAttributes X_SLASH
+;
+
+tFault:
+  K_FAULT arbitraryAttributes X_SLASH
+;
+
+tBinding_list:
+  /* empty */
+| tBinding X_NEXT tBinding_list
+;
+
+tBinding:
+  K_BINDING arbitraryAttributes X_NEXT tOperation_list X_SLASH K_BINDING
+
+tService_list:
+  /* empty */
+| tService X_NEXT tService_list
+;
+
+tService:
+  K_SERVICE tPort_list X_SLASH K_SERVICE
+;
+
+tPort_list:
+  /* empty */
+| tPort X_NEXT tPort_list
+;
+
+tPort:
+  K_PORT arbitraryAttributes X_SLASH
+;
+
+tPartnerLinkType_list:
+  /* empty */
+| tPartnerLinkType X_NEXT tPartnerLinkType_list
+;
+
+tPartnerLinkType:
+  K_PARTNERLINKTYPE arbitraryAttributes X_NEXT tRoles X_SLASH K_PARTNERLINKTYPE
+;
+
+tRoles:
+  tRole X_NEXT
+| tRole X_NEXT tRole X_NEXT
+;
+
+tRole:
+  K_ROLE arbitraryAttributes X_SLASH
 ;
 
 arbitraryAttributes:

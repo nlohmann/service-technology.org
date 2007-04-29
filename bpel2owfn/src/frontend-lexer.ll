@@ -31,7 +31,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/04/29 17:13:15 $
+ * \date    \$Date: 2007/04/29 19:09:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.
@@ -127,6 +127,7 @@ bool parseUnicode = false;
 whitespace		[ \t\r\n]*
 namestart		[A-Za-z\200-\377_]
 namechar		[A-Za-z\200-\377_0-9.\-:]
+ns			{namestart}({namechar}|[/:])*":"
 number			[0-9]+
 name			{namestart}{namechar}*
 variablename		{namestart}({namechar}|[/:]|{whitespace})*
@@ -135,7 +136,6 @@ quote			\"
 string			{quote}([^"]|{esc})*{quote}
 comment			([^-]|"-"[^-])*
 xmlheader		([^?]|"-"[^?])*
-bpwsns			"bpws:"|"bpel:"
 docu_end		"</documentation>"[ \t\r\n]*"<"
 UB     			[\200-\277]
 
@@ -177,7 +177,7 @@ UB     			[\200-\277]
 
  /* everything needed to evaluate join conditons (must be above the attributes section) */
 <ATTRIBUTE>"joinCondition"		                { return K_JOINCONDITION; }
-<ATTRIBUTE,JOINCONDITION>{bpwsns}?"getLinkStatus"	{ return K_GETLINKSTATUS; }
+<ATTRIBUTE,JOINCONDITION>{ns}?"getLinkStatus"	{ return K_GETLINKSTATUS; }
 <ATTRIBUTE,JOINCONDITION>"and"			        { return K_AND; }
 <ATTRIBUTE,JOINCONDITION>"or"				{ return K_OR; }
 <ATTRIBUTE,JOINCONDITION>"("				{ return LBRACKET; }
@@ -207,96 +207,114 @@ UB     			[\200-\277]
 
 
  /* names of BPEL-elements */
-<INITIAL>{bpwsns}?"assign"		{ BEGIN(ATTRIBUTE); return K_ASSIGN; }
-<INITIAL>{bpwsns}?"branches"		{ BEGIN(ATTRIBUTE); return K_BRANCHES; }
-<INITIAL>{bpwsns}?"case"		{ BEGIN(ATTRIBUTE); return K_CASE; }
-<INITIAL>{bpwsns}?"catch"		{ BEGIN(ATTRIBUTE); return K_CATCH; }
-<INITIAL>{bpwsns}?"catchAll"		{ BEGIN(ATTRIBUTE); return K_CATCHALL; }
-<INITIAL>{bpwsns}?"compensate"		{ BEGIN(ATTRIBUTE); return K_COMPENSATE; }
-<INITIAL>{bpwsns}?"compensateScope"	{ BEGIN(ATTRIBUTE); return K_COMPENSATESCOPE; }
-<INITIAL>{bpwsns}?"compensationHandler"	{ return K_COMPENSATIONHANDLER; }
-<INITIAL>{bpwsns}?"completionCondition"	{ return K_COMPLETIONCONDITION; }
-<INITIAL>{bpwsns}?"copy"		{ return K_COPY; }
-<INITIAL>{bpwsns}?"condition"		{ BEGIN(ATTRIBUTE); return K_CONDITION; }
-<INITIAL>{bpwsns}?"correlation"		{ BEGIN(ATTRIBUTE); return K_CORRELATION; }
-<INITIAL>{bpwsns}?"correlations"	{ return K_CORRELATIONS; }
-<INITIAL>{bpwsns}?"correlationSet"	{ BEGIN(ATTRIBUTE); return K_CORRELATIONSET; }
-<INITIAL>{bpwsns}?"correlationSets"	{ return K_CORRELATIONSETS; }
-<INITIAL>{bpwsns}?"else"		{ BEGIN(ATTRIBUTE); return K_ELSE; }
-<INITIAL>{bpwsns}?"elseif"		{ BEGIN(ATTRIBUTE); return K_ELSEIF; }
-<INITIAL>{bpwsns}?"empty"		{ BEGIN(ATTRIBUTE); return K_EMPTY; }
-<INITIAL>{bpwsns}?"eventHandlers"	{ return K_EVENTHANDLERS; }
-<INITIAL>{bpwsns}?"exit"		{ BEGIN(ATTRIBUTE); return K_EXIT; }
-<INITIAL>{bpwsns}?"extension"		{ BEGIN(ATTRIBUTE); return K_EXTENSION; }
-<INITIAL>{bpwsns}?"extensionActivity"	{ BEGIN(ATTRIBUTE); return K_EXTENSIONACTIVITY; }
-<INITIAL>{bpwsns}?"extensionAssignOperation"	{ BEGIN(ATTRIBUTE); return K_EXTENSIONASSIGNOPERATION; }
-<INITIAL>{bpwsns}?"extensions"		{ BEGIN(ATTRIBUTE); return K_EXTENSIONS; }
-<INITIAL>{bpwsns}?"faultHandlers"	{ return K_FAULTHANDLERS; }
-<INITIAL>{bpwsns}?"finalCounterValue"	{ BEGIN(ATTRIBUTE); return K_FINALCOUNTERVALUE; }
-<INITIAL>{bpwsns}?"flow"		{ BEGIN(ATTRIBUTE); return K_FLOW; }
-<INITIAL>{bpwsns}?"for"			{ BEGIN(ATTRIBUTE); return K_FOR; }
-<INITIAL>{bpwsns}?"forEach"		{ BEGIN(ATTRIBUTE); return K_FOREACH; }
-<INITIAL>{bpwsns}?"from"		{ BEGIN(ATTRIBUTE); return K_FROM; }
-<INITIAL>{bpwsns}?"fromPart"		{ BEGIN(ATTRIBUTE); return K_FROMPART; }
-<INITIAL>{bpwsns}?"fromParts"		{ BEGIN(ATTRIBUTE); return K_FROMPARTS; }
-<INITIAL>{bpwsns}?"if"			{ BEGIN(ATTRIBUTE); return K_IF; }
-<INITIAL>{bpwsns}?"import"		{ BEGIN(ATTRIBUTE); return K_IMPORT; }
-<INITIAL>{bpwsns}?"invoke"		{ BEGIN(ATTRIBUTE); return K_INVOKE; }
-<INITIAL>{bpwsns}?"joinCondition"	{ BEGIN(ATTRIBUTE); parseJoinCondition = true; return K_JOINCONDITION; }
-<INITIAL>{bpwsns}?"link"		{ BEGIN(ATTRIBUTE); return K_LINK; }
-<INITIAL>{bpwsns}?"links"		{ BEGIN(ATTRIBUTE); return K_LINKS; }
-<INITIAL>{bpwsns}?"literal"		{ BEGIN(ATTRIBUTE); return K_LITERAL; }
-<INITIAL>{bpwsns}?"messageExchange"	{ BEGIN(ATTRIBUTE); return K_MESSAGEEXCHANGE; }
-<INITIAL>{bpwsns}?"messageExchanges"	{ BEGIN(ATTRIBUTE); return K_MESSAGEEXCHANGES; }
-<INITIAL>{bpwsns}?"onAlarm"		{ BEGIN(ATTRIBUTE); return K_ONALARM; }
-<INITIAL>{bpwsns}?"onEvent"		{ BEGIN(ATTRIBUTE); return K_ONEVENT; }
-<INITIAL>{bpwsns}?"onMessage"		{ BEGIN(ATTRIBUTE); return K_ONMESSAGE; }
-<INITIAL>{bpwsns}?"opaqueActivity"	{ BEGIN(ATTRIBUTE); return K_OPAQUEACTIVITY; }
-<INITIAL>{bpwsns}?"opaqueFrom"		{ return K_OPAQUEFROM; }
-<INITIAL>{bpwsns}?"otherwise"		{ return K_OTHERWISE; }
-<INITIAL>{bpwsns}?"partner"		{ BEGIN(ATTRIBUTE); return K_PARTNER; }
-<INITIAL>{bpwsns}?"partnerLink"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINK; }
-<INITIAL>{bpwsns}?"partnerLinks"	{ BEGIN(ATTRIBUTE); return K_PARTNERLINKS; }
-<INITIAL>{bpwsns}?"partners"		{ return K_PARTNERS; }
-<INITIAL>{bpwsns}?"pick"		{ BEGIN(ATTRIBUTE); return K_PICK; }
-<INITIAL>{bpwsns}?"process"		{ BEGIN(ATTRIBUTE); return K_PROCESS; }
-<INITIAL>{bpwsns}?"query"		{ BEGIN(ATTRIBUTE); return K_QUERY; }
-<INITIAL>{bpwsns}?"receive"		{ BEGIN(ATTRIBUTE); return K_RECEIVE; }
-<INITIAL>{bpwsns}?"reply"		{ BEGIN(ATTRIBUTE); return K_REPLY; }
-<INITIAL>{bpwsns}?"repeatEvery"		{ BEGIN(ATTRIBUTE); return K_REPEATEVERY; }
-<INITIAL>{bpwsns}?"repeatUntil"		{ BEGIN(ATTRIBUTE); return K_REPEATUNTIL; }
-<INITIAL>{bpwsns}?"rethrow"		{ BEGIN(ATTRIBUTE); return K_RETHROW; }
-<INITIAL>{bpwsns}?"scope"		{ BEGIN(ATTRIBUTE); return K_SCOPE; }
-<INITIAL>{bpwsns}?"sequence"		{ BEGIN(ATTRIBUTE); return K_SEQUENCE; }
-<INITIAL>{bpwsns}?"source"		{ BEGIN(ATTRIBUTE); return K_SOURCE; }
-<INITIAL>{bpwsns}?"sources"		{ BEGIN(ATTRIBUTE); return K_SOURCES; }
-<INITIAL>{bpwsns}?"startCounterValue"	{ BEGIN(ATTRIBUTE); return K_STARTCOUNTERVALUE; }
-<INITIAL>{bpwsns}?"switch"		{ BEGIN(ATTRIBUTE); return K_SWITCH; }
-<INITIAL>{bpwsns}?"target"		{ BEGIN(ATTRIBUTE); return K_TARGET; }
-<INITIAL>{bpwsns}?"targets"		{ BEGIN(ATTRIBUTE); return K_TARGETS; }
-<INITIAL>{bpwsns}?"terminate"		{ BEGIN(ATTRIBUTE); return K_TERMINATE; }
-<INITIAL>{bpwsns}?"terminationHandler"	{ BEGIN(ATTRIBUTE); return K_TERMINATIONHANDLER; }
-<INITIAL>{bpwsns}?"throw"		{ BEGIN(ATTRIBUTE); return K_THROW; }
-<INITIAL>{bpwsns}?"to"			{ BEGIN(ATTRIBUTE); return K_TO; }
-<INITIAL>{bpwsns}?"toPart"		{ BEGIN(ATTRIBUTE); return K_TOPART; }
-<INITIAL>{bpwsns}?"toParts"		{ BEGIN(ATTRIBUTE); return K_TOPARTS; }
-<INITIAL>{bpwsns}?"transitionCondition"	{ BEGIN(ATTRIBUTE); return K_TRANSITIONCONDITION; }
-<INITIAL>{bpwsns}?"until"		{ BEGIN(ATTRIBUTE); return K_UNTIL; }
-<INITIAL>{bpwsns}?"validate"		{ BEGIN(ATTRIBUTE); return K_VALIDATE; }
-<INITIAL>{bpwsns}?"variable"		{ BEGIN(ATTRIBUTE); return K_VARIABLE; }
-<INITIAL>{bpwsns}?"variables"		{ return K_VARIABLES; }
-<INITIAL>{bpwsns}?"wait"		{ BEGIN(ATTRIBUTE); return K_WAIT; }
-<INITIAL>{bpwsns}?"while"		{ BEGIN(ATTRIBUTE); return K_WHILE; }
+<INITIAL>{ns}?"assign"			{ BEGIN(ATTRIBUTE); return K_ASSIGN; }
+<INITIAL>{ns}?"branches"		{ BEGIN(ATTRIBUTE); return K_BRANCHES; }
+<INITIAL>{ns}?"case"			{ BEGIN(ATTRIBUTE); return K_CASE; }
+<INITIAL>{ns}?"catch"			{ BEGIN(ATTRIBUTE); return K_CATCH; }
+<INITIAL>{ns}?"catchAll"		{ BEGIN(ATTRIBUTE); return K_CATCHALL; }
+<INITIAL>{ns}?"compensate"		{ BEGIN(ATTRIBUTE); return K_COMPENSATE; }
+<INITIAL>{ns}?"compensateScope"		{ BEGIN(ATTRIBUTE); return K_COMPENSATESCOPE; }
+<INITIAL>{ns}?"compensationHandler"	{ return K_COMPENSATIONHANDLER; }
+<INITIAL>{ns}?"completionCondition"	{ return K_COMPLETIONCONDITION; }
+<INITIAL>{ns}?"copy"			{ return K_COPY; }
+<INITIAL>{ns}?"condition"		{ BEGIN(ATTRIBUTE); return K_CONDITION; }
+<INITIAL>{ns}?"correlation"		{ BEGIN(ATTRIBUTE); return K_CORRELATION; }
+<INITIAL>{ns}?"correlations"		{ return K_CORRELATIONS; }
+<INITIAL>{ns}?"correlationSet"		{ BEGIN(ATTRIBUTE); return K_CORRELATIONSET; }
+<INITIAL>{ns}?"correlationSets"		{ return K_CORRELATIONSETS; }
+<INITIAL>{ns}?"else"			{ BEGIN(ATTRIBUTE); return K_ELSE; }
+<INITIAL>{ns}?"elseif"			{ BEGIN(ATTRIBUTE); return K_ELSEIF; }
+<INITIAL>{ns}?"empty"			{ BEGIN(ATTRIBUTE); return K_EMPTY; }
+<INITIAL>{ns}?"eventHandlers"		{ return K_EVENTHANDLERS; }
+<INITIAL>{ns}?"exit"			{ BEGIN(ATTRIBUTE); return K_EXIT; }
+<INITIAL>{ns}?"extension"		{ BEGIN(ATTRIBUTE); return K_EXTENSION; }
+<INITIAL>{ns}?"extensionActivity"	{ BEGIN(ATTRIBUTE); return K_EXTENSIONACTIVITY; }
+<INITIAL>{ns}?"extensionAssignOperation"	{ BEGIN(ATTRIBUTE); return K_EXTENSIONASSIGNOPERATION; }
+<INITIAL>{ns}?"extensions"		{ BEGIN(ATTRIBUTE); return K_EXTENSIONS; }
+<INITIAL>{ns}?"faultHandlers"		{ return K_FAULTHANDLERS; }
+<INITIAL>{ns}?"finalCounterValue"	{ BEGIN(ATTRIBUTE); return K_FINALCOUNTERVALUE; }
+<INITIAL>{ns}?"flow"			{ BEGIN(ATTRIBUTE); return K_FLOW; }
+<INITIAL>{ns}?"for"			{ BEGIN(ATTRIBUTE); return K_FOR; }
+<INITIAL>{ns}?"forEach"			{ BEGIN(ATTRIBUTE); return K_FOREACH; }
+<INITIAL>{ns}?"from"			{ BEGIN(ATTRIBUTE); return K_FROM; }
+<INITIAL>{ns}?"fromPart"		{ BEGIN(ATTRIBUTE); return K_FROMPART; }
+<INITIAL>{ns}?"fromParts"		{ BEGIN(ATTRIBUTE); return K_FROMPARTS; }
+<INITIAL>{ns}?"if"			{ BEGIN(ATTRIBUTE); return K_IF; }
+<INITIAL>{ns}?"import"			{ BEGIN(ATTRIBUTE); return K_IMPORT; }
+<INITIAL>{ns}?"invoke"			{ BEGIN(ATTRIBUTE); return K_INVOKE; }
+<INITIAL>{ns}?"joinCondition"		{ BEGIN(ATTRIBUTE); parseJoinCondition = true; return K_JOINCONDITION; }
+<INITIAL>{ns}?"link"			{ BEGIN(ATTRIBUTE); return K_LINK; }
+<INITIAL>{ns}?"links"			{ BEGIN(ATTRIBUTE); return K_LINKS; }
+<INITIAL>{ns}?"literal"			{ BEGIN(ATTRIBUTE); return K_LITERAL; }
+<INITIAL>{ns}?"messageExchange"		{ BEGIN(ATTRIBUTE); return K_MESSAGEEXCHANGE; }
+<INITIAL>{ns}?"messageExchanges"	{ BEGIN(ATTRIBUTE); return K_MESSAGEEXCHANGES; }
+<INITIAL>{ns}?"onAlarm"			{ BEGIN(ATTRIBUTE); return K_ONALARM; }
+<INITIAL>{ns}?"onEvent"			{ BEGIN(ATTRIBUTE); return K_ONEVENT; }
+<INITIAL>{ns}?"onMessage"		{ BEGIN(ATTRIBUTE); return K_ONMESSAGE; }
+<INITIAL>{ns}?"opaqueActivity"		{ BEGIN(ATTRIBUTE); return K_OPAQUEACTIVITY; }
+<INITIAL>{ns}?"opaqueFrom"		{ return K_OPAQUEFROM; }
+<INITIAL>{ns}?"otherwise"		{ return K_OTHERWISE; }
+<INITIAL>{ns}?"partner"			{ BEGIN(ATTRIBUTE); return K_PARTNER; }
+<INITIAL>{ns}?"partnerLink"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINK; }
+<INITIAL>{ns}?"partnerLinks"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINKS; }
+<INITIAL>{ns}?"partners"		{ return K_PARTNERS; }
+<INITIAL>{ns}?"pick"			{ BEGIN(ATTRIBUTE); return K_PICK; }
+<INITIAL>{ns}?"process"			{ BEGIN(ATTRIBUTE); return K_PROCESS; }
+<INITIAL>{ns}?"query"			{ BEGIN(ATTRIBUTE); return K_QUERY; }
+<INITIAL>{ns}?"receive"			{ BEGIN(ATTRIBUTE); return K_RECEIVE; }
+<INITIAL>{ns}?"reply"			{ BEGIN(ATTRIBUTE); return K_REPLY; }
+<INITIAL>{ns}?"repeatEvery"		{ BEGIN(ATTRIBUTE); return K_REPEATEVERY; }
+<INITIAL>{ns}?"repeatUntil"		{ BEGIN(ATTRIBUTE); return K_REPEATUNTIL; }
+<INITIAL>{ns}?"rethrow"			{ BEGIN(ATTRIBUTE); return K_RETHROW; }
+<INITIAL>{ns}?"scope"			{ BEGIN(ATTRIBUTE); return K_SCOPE; }
+<INITIAL>{ns}?"sequence"		{ BEGIN(ATTRIBUTE); return K_SEQUENCE; }
+<INITIAL>{ns}?"source"			{ BEGIN(ATTRIBUTE); return K_SOURCE; }
+<INITIAL>{ns}?"sources"			{ BEGIN(ATTRIBUTE); return K_SOURCES; }
+<INITIAL>{ns}?"startCounterValue"	{ BEGIN(ATTRIBUTE); return K_STARTCOUNTERVALUE; }
+<INITIAL>{ns}?"switch"			{ BEGIN(ATTRIBUTE); return K_SWITCH; }
+<INITIAL>{ns}?"target"			{ BEGIN(ATTRIBUTE); return K_TARGET; }
+<INITIAL>{ns}?"targets"			{ BEGIN(ATTRIBUTE); return K_TARGETS; }
+<INITIAL>{ns}?"terminate"		{ BEGIN(ATTRIBUTE); return K_TERMINATE; }
+<INITIAL>{ns}?"terminationHandler"	{ BEGIN(ATTRIBUTE); return K_TERMINATIONHANDLER; }
+<INITIAL>{ns}?"throw"			{ BEGIN(ATTRIBUTE); return K_THROW; }
+<INITIAL>{ns}?"to"			{ BEGIN(ATTRIBUTE); return K_TO; }
+<INITIAL>{ns}?"toPart"			{ BEGIN(ATTRIBUTE); return K_TOPART; }
+<INITIAL>{ns}?"toParts"			{ BEGIN(ATTRIBUTE); return K_TOPARTS; }
+<INITIAL>{ns}?"transitionCondition"	{ BEGIN(ATTRIBUTE); return K_TRANSITIONCONDITION; }
+<INITIAL>{ns}?"until"			{ BEGIN(ATTRIBUTE); return K_UNTIL; }
+<INITIAL>{ns}?"validate"		{ BEGIN(ATTRIBUTE); return K_VALIDATE; }
+<INITIAL>{ns}?"variable"		{ BEGIN(ATTRIBUTE); return K_VARIABLE; }
+<INITIAL>{ns}?"variables"		{ return K_VARIABLES; }
+<INITIAL>{ns}?"wait"			{ BEGIN(ATTRIBUTE); return K_WAIT; }
+<INITIAL>{ns}?"while"			{ BEGIN(ATTRIBUTE); return K_WHILE; }
 
- /* symbols for BPEL4Chor */
-<INITIAL>"topology"			{ BEGIN(ATTRIBUTE); return K_TOPOLOGY; }
-<INITIAL>"participantTypes"		{ BEGIN(ATTRIBUTE); return K_PARTICIPANTTYPES; }
-<INITIAL>"participantType"		{ BEGIN(ATTRIBUTE); return K_PARTICIPANTTYPE; }
-<INITIAL>"participants"			{ BEGIN(ATTRIBUTE); return K_PARTICIPANTS; }
-<INITIAL>"participant"			{ BEGIN(ATTRIBUTE); return K_PARTICIPANT; }
-<INITIAL>"participantSet"		{ BEGIN(ATTRIBUTE); return K_PARTICIPANTSET; }
-<INITIAL>"messageLinks"			{ BEGIN(ATTRIBUTE); return K_MESSAGELINKS; }
-<INITIAL>"messageLink"			{ BEGIN(ATTRIBUTE); return K_MESSAGELINK; }
+ /* non-terminals for BPEL4Chor */
+<INITIAL>{ns}?"topology"		{ BEGIN(ATTRIBUTE); return K_TOPOLOGY; }
+<INITIAL>{ns}?"participantTypes"	{ BEGIN(ATTRIBUTE); return K_PARTICIPANTTYPES; }
+<INITIAL>{ns}?"participantType"		{ BEGIN(ATTRIBUTE); return K_PARTICIPANTTYPE; }
+<INITIAL>{ns}?"participants"		{ BEGIN(ATTRIBUTE); return K_PARTICIPANTS; }
+<INITIAL>{ns}?"participant"		{ BEGIN(ATTRIBUTE); return K_PARTICIPANT; }
+<INITIAL>{ns}?"participantSet"		{ BEGIN(ATTRIBUTE); return K_PARTICIPANTSET; }
+<INITIAL>{ns}?"messageLinks"		{ BEGIN(ATTRIBUTE); return K_MESSAGELINKS; }
+<INITIAL>{ns}?"messageLink"		{ BEGIN(ATTRIBUTE); return K_MESSAGELINK; }
+
+ /* non-terminals for WSDL */
+<INITIAL>{ns}?"types"			{ BEGIN(ATTRIBUTE); return K_TYPES; }
+<INITIAL>{ns}?"portType"		{ BEGIN(ATTRIBUTE); return K_PORTTYPE; }
+<INITIAL>{ns}?"fault"			{ BEGIN(ATTRIBUTE); return K_FAULT; }
+<INITIAL>{ns}?"operation"		{ BEGIN(ATTRIBUTE); return K_OPERATION; }
+<INITIAL>{ns}?"definitions"		{ BEGIN(ATTRIBUTE); return K_DEFINITIONS; }
+<INITIAL>{ns}?"input"			{ BEGIN(ATTRIBUTE); return K_INPUT; }
+<INITIAL>{ns}?"output"			{ BEGIN(ATTRIBUTE); return K_OUTPUT; }
+<INITIAL>{ns}?"message"			{ BEGIN(ATTRIBUTE); return K_MESSAGE; }
+<INITIAL>{ns}?"part"			{ BEGIN(ATTRIBUTE); return K_PART; }
+<INITIAL>{ns}?"binding"			{ BEGIN(ATTRIBUTE); return K_BINDING; }
+<INITIAL>{ns}?"service"			{ BEGIN(ATTRIBUTE); return K_SERVICE; }
+<INITIAL>{ns}?"port"			{ BEGIN(ATTRIBUTE); return K_PORT; }
+
+ /* non-terminals for WS-BPEL Partner Link Type */
+<INITIAL>{ns}?"partnerLinkType"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINKTYPE; }
+<INITIAL>{ns}?"role"			{ BEGIN(ATTRIBUTE); return K_ROLE; }
 
 
  /* white space */

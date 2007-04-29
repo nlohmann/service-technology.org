@@ -1,0 +1,148 @@
+<!--
+This example process was taken from the Web Services Business Process Execution
+Language Version 2.0 Committee Draft, 25 January, 2007, available under
+
+   * http://docs.oasis-open.org/wsbpel/2.0/
+
+Copyright (C) OASIS Open 2003, 2006. All Rights Reserved.
+
+This document and translations of it may be copied and furnished to others, and
+derivative works that comment on or otherwise explain it or assist in its
+implementation may be prepared, copied, published and distributed, in whole or
+in part, without restriction of any kind, provided that the above copyright
+notice and this paragraph are included on all such copies and derivative works.
+However, this document itself may not be modified in any way, such as by
+removing the copyright notice or references to OASIS, except as needed for the
+purpose of developing OASIS specifications, in which case the procedures for
+copyrights defined in the OASIS Intellectual Property Rights document must be
+followed, or as required to translate it into languages other than English.
+
+The limited permissions granted above are perpetual and will not be revoked by
+OASIS or its successors or assigns.
+
+This document and the information contained herein is provided on an "AS IS"
+basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT
+INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR
+A PARTICULAR PURPOSE.
+-->
+
+<wsdl:definitions
+    targetNamespace="http://example.com/auction/wsdl/auctionService/"
+    xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+    xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+    xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref"
+    xmlns:tns="http://example.com/auction/wsdl/auctionService/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <!-- Messages for communication with the seller -->
+    <wsdl:message name="sellerData">
+	<wsdl:part name="creditCardNumber" type="xsd:string" />
+	<wsdl:part name="shippingCosts" type="xsd:integer" />
+	<wsdl:part name="auctionId" type="xsd:integer" />
+	<wsdl:part name="endpointReference" type="sref:ServiceRefType" />
+    </wsdl:message>
+    
+    <wsdl:message name="sellerAnswerData">
+	<wsdl:part name="thankYouText" type="xsd:string" />
+    </wsdl:message>
+    
+    <!-- Messages for communication with the buyer -->
+    <wsdl:message name="buyerData">
+	<wsdl:part name="creditCardNumber" type="xsd:string" />
+	<wsdl:part name="phoneNumber" type="xsd:string" />
+	<wsdl:part name="ID" type="xsd:integer" />
+	<wsdl:part name="endpointReference" type="sref:ServiceRefType" />
+    </wsdl:message>
+    
+    <wsdl:message name="buyerAnswerData">
+	<wsdl:part name="thankYouText" type="xsd:string" />
+    </wsdl:message>
+    
+    <!-- Messages for communication with the auction registration service -->
+    <wsdl:message name="auctionData">
+	<wsdl:part name="auctionId" type="xsd:integer" />
+	<wsdl:part name="amount" type="xsd:integer" />
+	<wsdl:part name="auctionHouseEndpointReference"
+	    type="sref:ServiceRefType" />
+    </wsdl:message>
+    
+    <wsdl:message name="auctionAnswerData">
+	<wsdl:part name="registrationId" type="xsd:integer" />
+	<wsdl:part name="auctionId" type="xsd:integer" />
+    </wsdl:message>
+    
+    <!-- PortTypes for interacting with the seller -->
+    <wsdl:portType name="sellerPT">
+	<wsdl:operation name="submit">
+	    <wsdl:input message="tns:sellerData" />
+	</wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="sellerAnswerPT">
+	<wsdl:operation name="answer">
+	    <wsdl:input message="tns:sellerAnswerData" />
+	</wsdl:operation>
+    </wsdl:portType>
+    
+    <!-- PortTypes for interacting with the buyer -->
+    <wsdl:portType name="buyerPT">
+	<wsdl:operation name="submit">
+	    <wsdl:input message="tns:buyerData" />
+	</wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="buyerAnswerPT">
+	<wsdl:operation name="answer">
+	    <wsdl:input message="tns:buyerAnswerData" />
+	</wsdl:operation>
+    </wsdl:portType>
+    
+    <!-- PortTypes for interacting with the auction registration service -->
+    <wsdl:portType name="auctionRegistrationPT">
+	<wsdl:operation name="process">
+	    <wsdl:input message="tns:auctionData" />
+	</wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="auctionRegistrationAnswerPT">
+	<wsdl:operation name="answer">
+	    <wsdl:input message="tns:auctionAnswerData" />
+	</wsdl:operation>
+    </wsdl:portType>
+    
+    <!-- Context type used for locating business process via auction Id -->
+    <vprop:property name="auctionId" type="xsd:integer" />
+    <vprop:propertyAlias propertyName="tns:auctionId"
+	messageType="tns:sellerData" part="auctionId" />
+    <vprop:propertyAlias propertyName="tns:auctionId"
+	messageType="tns:buyerData" part="ID" />
+    <vprop:propertyAlias propertyName="tns:auctionId"
+	messageType="tns:auctionData" part="auctionId" />
+    <vprop:propertyAlias propertyName="tns:auctionId"
+	messageType="tns:auctionAnswerData" part="auctionId" />
+    
+    <!-- PartnerLinkType for seller/auctionHouse -->
+    <plnk:partnerLinkType name="sellerAuctionHouseLT">
+	<plnk:role name="auctionHouse" portType="tns:sellerPT" />
+	<plnk:role name="seller" portType="tns:sellerAnswerPT" />
+    </plnk:partnerLinkType>
+
+    <!-- PartnerLinkType for buyer/auctionHouse -->
+    <plnk:partnerLinkType name="buyerAuctionHouseLT">
+	<plnk:role name="auctionHouse" portType="tns:buyerPT" />
+	<plnk:role name="buyer" portType="tns:buyerAnswerPT" />
+    </plnk:partnerLinkType>
+    
+    <!-- Partner link type for auction house/auction registration service -->
+    <plnk:partnerLinkType
+	name="auctionHouseAuctionRegistrationServiceLT">
+	<plnk:role name="auctionRegistrationService"
+	    portType="tns:auctionRegistrationPT" />
+	<plnk:role name="auctionHouse"
+	    portType="tns:auctionRegistrationAnswerPT" />
+    </plnk:partnerLinkType>
+
+</wsdl:definitions>

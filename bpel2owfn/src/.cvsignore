@@ -38,7 +38,7 @@ petrinet-patterns-handlers.cc
 frontend-lexer.cc
 frontend-parser.cc
 frontend-parser.h
-frontend-parser-chor
+frontend-parser-chor.cc
 bpel2owfn.exe
 bpel2owfn.exe.stackdump
 *.bpel

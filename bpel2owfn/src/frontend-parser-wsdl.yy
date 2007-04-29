@@ -29,7 +29,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/04/29 20:35:37 $
+ * \date    \$Date: 2007/04/29 20:55:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  *
  * \ingroup frontend
  */
@@ -113,10 +113,8 @@
 #include "helpers.h"
 #include "debug.h"
 #include "globals.h"
-#include "ast-details.h"
 
 
-using namespace kc;
 using std::cerr;
 using std::endl;
 
@@ -138,7 +136,6 @@ extern int frontend_lineno;	// from flex: the current line number
 
 
 
-
 %%
 
 
@@ -150,6 +147,11 @@ tDefinions:
   X_SLASH K_DEFINITIONS X_CLOSE
 ;
 
+
+/******************************************************************************
+ * IMPORT
+ *****************************************************************************/
+
 tImport_list:
   /* empty */
 | tImport X_NEXT tImport_list;
@@ -158,6 +160,11 @@ tImport_list:
 tImport:
   K_IMPORT arbitraryAttributes X_SLASH
 ;
+
+
+/******************************************************************************
+ * TYPES
+ *****************************************************************************/
 
 tTypes:
   /* empty */
@@ -169,6 +176,11 @@ tSchema:
     { genericError(124, globals::last_error_token, globals::last_error_line, ERRORLEVEL_NOTICE); }
 | K_SCHEMA arbitraryAttributes X_NEXT tImport X_NEXT X_SLASH K_SCHEMA X_NEXT
 ;
+
+
+/******************************************************************************
+ * MESSAGE
+ *****************************************************************************/
 
 tMessage_list:
   /* empty */
@@ -187,6 +199,11 @@ tPart_list:
 tPart:
   K_PART arbitraryAttributes X_SLASH
 ;
+
+
+/******************************************************************************
+ * PORT TYPE
+ *****************************************************************************/
 
 tPortType_list:
   /* empty */
@@ -229,6 +246,11 @@ tFault:
   K_FAULT arbitraryAttributes X_SLASH
 ;
 
+
+/******************************************************************************
+ * BINDING
+ *****************************************************************************/
+
 tBinding_list:
   /* empty */
 | tBinding X_NEXT tBinding_list
@@ -236,6 +258,11 @@ tBinding_list:
 
 tBinding:
   K_BINDING arbitraryAttributes X_NEXT tOperation_list X_SLASH K_BINDING
+
+
+/******************************************************************************
+ * SERVICE
+ *****************************************************************************/
 
 tService_list:
   /* empty */
@@ -255,6 +282,10 @@ tPort:
   K_PORT arbitraryAttributes X_SLASH
 ;
 
+/******************************************************************************
+ * PROPERTY / PROPERTYALIAS
+ *****************************************************************************/
+
 tPropertyPropertyAlias_list:
   /* empty */
 | tPropertyPropertyAlias X_NEXT tPropertyPropertyAlias_list
@@ -266,6 +297,11 @@ tPropertyPropertyAlias:
 | K_PROPERTYALIAS arbitraryAttributes X_NEXT error X_NEXT X_SLASH K_PROPERTYALIAS
     { genericError(125, globals::last_error_token, globals::last_error_line, ERRORLEVEL_NOTICE); }
 ;
+
+
+/******************************************************************************
+ * PARTNERLINKTYPE
+ *****************************************************************************/
 
 tPartnerLinkType_list:
   /* empty */
@@ -284,6 +320,11 @@ tRoles:
 tRole:
   K_ROLE arbitraryAttributes X_SLASH
 ;
+
+
+/******************************************************************************
+ * ATTRIBUTES
+ *****************************************************************************/
 
 arbitraryAttributes:
   /* empty */

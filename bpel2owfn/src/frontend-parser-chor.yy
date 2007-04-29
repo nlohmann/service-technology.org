@@ -29,7 +29,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/04/29 20:10:09 $
+ * \date    \$Date: 2007/04/29 20:55:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  *
  * \ingroup frontend
  */
@@ -138,7 +138,6 @@ extern int frontend_lineno;	// from flex: the current line number
 
 
 
-
 %%
 
 
@@ -146,6 +145,11 @@ extern int frontend_lineno;	// from flex: the current line number
 tTopology:
   X_OPEN K_TOPOLOGY arbitraryAttributes X_NEXT tParticipantTypes tParticipants tMessageLinks X_SLASH K_TOPOLOGY X_CLOSE
 ;
+
+
+/******************************************************************************
+ * PARTICIPANT TYPES
+ *****************************************************************************/
 
 tParticipantTypes:
   K_PARTICIPANTTYPES X_NEXT tParticipantType_list X_NEXT X_SLASH K_PARTICIPANTTYPES X_NEXT
@@ -159,6 +163,11 @@ tParticipantType_list:
 tParticipantType:
   K_PARTICIPANTTYPE arbitraryAttributes X_SLASH
 ;
+
+
+/******************************************************************************
+ * PARTICIPANTS
+ *****************************************************************************/
 
 tParticipants:
   K_PARTICIPANTS X_NEXT tParticipant_list X_NEXT X_SLASH K_PARTICIPANTS X_NEXT
@@ -180,6 +189,11 @@ tParticipantSet:
   K_PARTICIPANTSET arbitraryAttributes X_NEXT tParticipant_list X_NEXT X_SLASH K_PARTICIPANTSET
 ;
 
+
+/******************************************************************************
+ * MESSAGELINKS
+ *****************************************************************************/
+
 tMessageLinks:
   K_MESSAGELINKS X_NEXT tMessageLink_list X_NEXT X_SLASH K_MESSAGELINKS X_NEXT
 ;
@@ -192,6 +206,11 @@ tMessageLink_list:
 tMessageLink:
   K_MESSAGELINK arbitraryAttributes X_SLASH
 ;
+
+
+/******************************************************************************
+ * ATTRIBUTES
+ *****************************************************************************/
 
 arbitraryAttributes:
   /* empty */

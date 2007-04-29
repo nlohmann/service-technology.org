@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/29 20:10:09 $
+ * \date    \$Date: 2007/04/29 20:35:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  *
  * \ingroup debug
  */
@@ -434,8 +434,15 @@ void genericError(unsigned int code, string information, string line, error_leve
 	  break; }
 
     case(124): // ignoring XML Schema
-	{ cerr << "skipped XML Schema element: <" << information << ">" << endl;
+	{ if (information == "/")
+	    cerr << "skipped empty XML Schema element" << endl;
+	  else
+	    cerr << "skipped XML Schema element: <" << information << ">" << endl;
 	  break; }
+
+    case(125): // ignoring variable property element
+	{ cerr << "skipped variable property element: <" << information << ">" << endl;
+	  break; }	  
   }
 
   cerr << endl;

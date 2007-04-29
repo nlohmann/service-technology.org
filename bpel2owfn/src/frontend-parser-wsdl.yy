@@ -29,7 +29,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/04/29 20:10:09 $
+ * \date    \$Date: 2007/04/29 20:35:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  *
  * \ingroup frontend
  */
@@ -263,6 +263,8 @@ tPropertyPropertyAlias_list:
 tPropertyPropertyAlias:
   K_PROPERTY arbitraryAttributes X_SLASH
 | K_PROPERTYALIAS arbitraryAttributes X_SLASH
+| K_PROPERTYALIAS arbitraryAttributes X_NEXT error X_NEXT X_SLASH K_PROPERTYALIAS
+    { genericError(125, globals::last_error_token, globals::last_error_line, ERRORLEVEL_NOTICE); }
 ;
 
 tPartnerLinkType_list:

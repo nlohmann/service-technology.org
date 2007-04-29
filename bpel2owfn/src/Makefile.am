@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/27 09:23:07 $ by $Author: znamirow $.
-# Version $Revision: 1.75 $
+# File last changed $Date: 2007/04/29 15:08:56 $ by $Author: nielslohmann $.
+# Version $Revision: 1.76 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -90,28 +90,30 @@ $(KCDUMMY): $(KCFILES_NECESSARY) $(KCFILES_TEMP)
 
 # These files are actually compiled and linked for BPEL2oWFN (except the
 # frontend files: for them C++ code is generated).
-bpel2owfn_SOURCES = $(KCSOURCES)\
-		    frontend-parser.yy\
-		    frontend-lexer.ll\
-		    bpel2owfn.cc\
-		    globals.cc globals.h\
-		    debug.cc debug.h\
-		    colorconsole.h\
-		    helpers.cc helpers.h\
-		    cfg.cc cfg.h\
-		    options.cc options.h\
-		    getopt.h getopt.c getopt1.c\
-		    ast-tools.cc ast-tools.h\
+bpel2owfn_SOURCES = $(KCSOURCES) \
+		    frontend-parser.yy \
+		    frontend-lexer.ll \
+		    frontend-parser-chor.yy \
+		    bpel2owfn.cc \
+		    globals.cc globals.h \
+		    debug.cc debug.h \
+		    colorconsole.h \
+		    helpers.cc helpers.h \
+		    cfg.cc cfg.h \
+		    options.cc options.h \
+		    getopt.h getopt.c getopt1.c \
+		    ast-tools.cc ast-tools.h \
 		    ast-details.cc ast-details.h \
 		    pnapi.h petrinet.h petrinet.cc \
 		    petrinet-output.cc petrinet-reduction.cc
 
 # These sources have to be present before the rest is compiled.
-BUILT_SOURCES = $(KCDUMMY)\
-		frontend-parser.cc
+BUILT_SOURCES = $(KCDUMMY) \
+		frontend-parser.cc \
+		frontend-parser-chor.cc
 
 # These files have to be distributed to compile without compiler generators.
-EXTRA_DIST = $(KCDUMMY)\
+EXTRA_DIST = $(KCDUMMY) \
 	     $(KCFILES_TEMP) \
 	     $(KCFILES_NECESSARY) \
 	     frontend-parser.h

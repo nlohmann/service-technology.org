@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/27 11:17:17 $
+ * \date    \$Date: 2007/04/29 15:08:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.75 $
+ * \version \$Revision: 1.76 $
  *
  * \ingroup debug
  */
@@ -423,6 +423,10 @@ void genericError(unsigned int code, string information, string line, error_leve
 
     case(121): // ignoring activity in mode communicationonly
 	{ cerr << "<" << information << "> activity is modeled by <empty> activity" << endl;
+	  break; }
+
+    case(122): // syntax error in chorography file
+	{ cerr << "syntax error in chorography file" << endl;
 	  break; }
   }
 

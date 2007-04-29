@@ -35,11 +35,12 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/04/19 13:15:32 $
+ * \date    \$Date: 2007/04/29 15:08:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,12 +50,9 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.309 $
+ * \version \$Revision: 1.310 $
  *
  * \ingroup frontend
- *
- * \todo    Check whether the out-commented code lines in the <invoke> and
-            <scope> section can be removed.
  */
 %}
 
@@ -110,6 +108,7 @@
 %token K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT
 %token K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL RBRACKET X_CLOSE X_EQUALS
 %token X_NEXT X_OPEN X_SLASH
+%token K_TOPOLOGY K_PARTICIPANTTYPES K_PARTICIPANTTYPE K_PARTICIPANTS K_PARTICIPANT K_PARTICIPANTSET K_MESSAGELINKS K_MESSAGELINK
 %token <yt_casestring> NUMBER
 %token <yt_casestring> X_NAME
 %token <yt_casestring> VARIABLENAME

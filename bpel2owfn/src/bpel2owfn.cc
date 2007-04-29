@@ -31,14 +31,14 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/27 11:17:17 $
+ * \date    \$Date: 2007/04/29 15:08:56 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.163 $
+ * \version \$Revision: 1.164 $
  */
 
 
@@ -81,11 +81,13 @@ using std::map;
  *****************************************************************************/
 
 extern int frontend_parse();			// from Bison
+extern int frontend_chor_parse();		// from Bison
 extern int frontend_debug;			// from Bison
 extern int frontend_nerrs;			// from Bison
 extern int frontend_lineno;			// from Bison
 extern int frontend__flex_debug;		// from flex
 extern FILE *frontend_in;			// from flex
+extern void frontend_restart(FILE*);		// from flex
 
 
 
@@ -129,11 +131,11 @@ void analyze_cl(int argc, char *argv[])
 
 
 // opening a file
-void open_file(set< string >::iterator file) 
+void open_file(string file) 
 {
   if (inputfiles.size() >= 1)
   {
-    globals::filename = *file;
+    globals::filename = file;
     if (!(frontend_in = fopen(globals::filename.c_str(), "r"))) 
     {
       cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
@@ -146,7 +148,7 @@ void open_file(set< string >::iterator file)
 
 
 // closing a file
-void close_file(set< string >::iterator file) 
+void close_file(string file) 
 {
   if ( globals::filename != "<STDIN>" && frontend_in != NULL)
   {
@@ -553,21 +555,48 @@ int main( int argc, char *argv[])
   // analyzation of the commandline
   analyze_cl(argc,argv);
 
+
+
+  /*
+   * Choreography mode: parse a BPEL4Chor file
+   */
+  if (globals::choreography_filename != "")
+  {
+    open_file(globals::choreography_filename);
+
+    show_process_information_header();
+
+    // invoke Bison BPEL4Chor parser
+    trace(TRACE_INFORMATION, "Parsing " + globals::choreography_filename + " ...\n");
+    int parse_result = frontend_chor_parse();
+    trace(TRACE_INFORMATION, "Parsing of " + globals::choreography_filename + " complete.\n");
+
+    close_file(globals::choreography_filename);
+
+    if (parse_result != 0)
+      genericError(122, "", toString(frontend_lineno), ERRORLEVER_WARNING);
+  }
+
+
+
   // parsing all inputfiles
   set< string >::iterator file = inputfiles.begin();
   do
   {
-    open_file(file);
+    open_file(*file);
 
     show_process_information_header();
 
-    // invoke Bison parser
+    // reset the parser
+    frontend_restart(frontend_in);
+
+    // invoke BPEL Bison parser
     trace(TRACE_INFORMATION, "Parsing " + globals::filename + " ...\n");
     frontend_parse();
     trace(TRACE_INFORMATION, "Parsing of " + globals::filename + " complete.\n");
 
     globals::parsing = false;
-    close_file(file);
+    close_file(*file);
 
     if (frontend_nerrs == 0)
     {

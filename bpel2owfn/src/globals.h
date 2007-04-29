@@ -24,17 +24,17 @@
  * \brief   global varialbes
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/27 08:58:43 $
+ * \date    \$Date: 2007/04/29 15:08:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 
 
@@ -177,6 +177,9 @@ namespace globals
 
   /// filename of output file
   extern string output_filename;
+
+  /// filename of the optional BPEL4Chor choreography file
+  extern string choreography_filename;  
 
   /// parameters (set by #parse_command_line)
   extern map<possibleParameters, bool> parameters;

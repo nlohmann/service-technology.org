@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/27 08:41:52 $
+ * \date    \$Date: 2007/04/29 15:08:56 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.77 $
+ * \version \$Revision: 1.78 $
  */
 
 
@@ -118,11 +118,12 @@ static struct option longopts[] =
   { "parameter",	required_argument, NULL, 'p' },
   { "debug",		required_argument, NULL, 'd' },
   { "reduce",		required_argument, NULL, 'r' },
+  { "choreography",	required_argument, NULL, 'c' },
   NULL
 };
 
 /// short options (needed by GNU getopt)
-const char *par_string = "hvm:li:of:p:d:r:";
+const char *par_string = "hvm:li:of:p:d:r:c:";
 
 
 
@@ -472,6 +473,13 @@ void parse_command_line(int argc, char* argv[])
 		  }
 		}
 
+		break;
+	      }
+
+      case 'c':
+	      {
+		options[O_INPUT] = true;
+		globals::choreography_filename = string(optarg);
 		break;
 	      }
 

@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/27 08:41:52 $
+ * \date    \$Date: 2007/04/29 15:08:56 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  */
 
 
@@ -88,7 +88,8 @@ typedef enum
    O_FORMAT,		///< choose output file format (see #possibleFormats)
    O_PARAMETER,		///< set various parameters (see #possibleParameters)
    O_DEBUG,		///< set the debug level
-   O_REDUCTION		///< set level of structural reduction
+   O_REDUCTION,		///< set level of structural reduction
+   O_CHOR		///< parse a choreography file (BPEL4Chor)
 } possibleOptions;
 
 

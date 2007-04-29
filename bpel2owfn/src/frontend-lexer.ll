@@ -31,7 +31,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/04/19 13:15:31 $
+ * \date    \$Date: 2007/04/29 15:08:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.
@@ -287,6 +287,16 @@ UB     			[\200-\277]
 <INITIAL>{bpwsns}?"variables"		{ return K_VARIABLES; }
 <INITIAL>{bpwsns}?"wait"		{ BEGIN(ATTRIBUTE); return K_WAIT; }
 <INITIAL>{bpwsns}?"while"		{ BEGIN(ATTRIBUTE); return K_WHILE; }
+
+<INITIAL>"topology"			{ BEGIN(ATTRIBUTE); return K_TOPOLOGY; }
+<INITIAL>"participantTypes"		{ BEGIN(ATTRIBUTE); return K_PARTICIPANTTYPES; }
+<INITIAL>"participantType"		{ BEGIN(ATTRIBUTE); return K_PARTICIPANTTYPE; }
+<INITIAL>"participants"			{ BEGIN(ATTRIBUTE); return K_PARTICIPANTS; }
+<INITIAL>"participant"			{ BEGIN(ATTRIBUTE); return K_PARTICIPANT; }
+<INITIAL>"participantSet"		{ BEGIN(ATTRIBUTE); return K_PARTICIPANTSET; }
+<INITIAL>"messageLinks"			{ BEGIN(ATTRIBUTE); return K_MESSAGELINKS; }
+<INITIAL>"messageLink"			{ BEGIN(ATTRIBUTE); return K_MESSAGELINK; }
+
 
  /* white space */
 {whitespace}			{ /* skip white space */ }

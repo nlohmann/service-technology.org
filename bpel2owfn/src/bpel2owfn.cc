@@ -31,14 +31,14 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/29 15:08:56 $
+ * \date    \$Date: 2007/04/29 17:09:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.164 $
+ * \version \$Revision: 1.165 $
  */
 
 
@@ -530,6 +530,9 @@ void final_output( PetriNet PN2)
 }
 
 
+
+
+
 /******************************************************************************
  * main() function
  *****************************************************************************/
@@ -545,7 +548,9 @@ void final_output( PetriNet PN2)
  * \returns 0 if everything went well
  * \returns 1 if an error occurred
  *
- * \todo This function is definitly too long. It should be partitioned!
+ * \todo The opening and closing of files is awkward.
+ *
+ * \bug  Piping does not always work...
  */
 int main( int argc, char *argv[])
 {
@@ -583,12 +588,16 @@ int main( int argc, char *argv[])
   set< string >::iterator file = inputfiles.begin();
   do
   {
-    open_file(*file);
+    if (file != inputfiles.end())
+    {
+      open_file(*file);
+
+      // reset the parser
+      frontend_restart(frontend_in);      
+    }
 
     show_process_information_header();
 
-    // reset the parser
-    frontend_restart(frontend_in);
 
     // invoke BPEL Bison parser
     trace(TRACE_INFORMATION, "Parsing " + globals::filename + " ...\n");
@@ -596,7 +605,9 @@ int main( int argc, char *argv[])
     trace(TRACE_INFORMATION, "Parsing of " + globals::filename + " complete.\n");
 
     globals::parsing = false;
-    close_file(*file);
+
+    if (file != inputfiles.end())
+      close_file(*file);
 
     if (frontend_nerrs == 0)
     {

@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/29 19:09:57 $
+ * \date    \$Date: 2007/04/30 15:39:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
 
 
@@ -42,6 +42,9 @@
 
 
 #include "globals.h"
+#include "extension-wsdl.h"
+#include "ast-details.h"
+
 
 namespace globals {
   string currentScope;
@@ -71,6 +74,7 @@ namespace globals {
   unsigned int PPcurrentScope = 0;
 
   s_process_information process_information = {0,0,0,0,0,0,0,0,0,0,0};
+  s_wsdl_information wsdl_information = {0,0,0,0,0,0,0,0,0};
 
   map<unsigned int, ASTE*> ASTEmap;
 
@@ -108,4 +112,6 @@ namespace globals {
   string choreography_filename = "";
 
   string wsdl_filename = "";
+
+  WSDL WSDLInfo = WSDL();
 }

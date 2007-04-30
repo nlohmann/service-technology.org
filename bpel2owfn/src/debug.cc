@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/29 20:35:37 $
+ * \date    \$Date: 2007/04/30 15:39:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.79 $
+ * \version \$Revision: 1.80 $
  *
  * \ingroup debug
  */
@@ -227,6 +227,28 @@ void show_process_information()
 
   if (modus == M_PETRINET || modus == M_CONSISTENCY)
     cerr << "------------------------------------------------------------------------------" << endl;
+}
+
+
+
+
+
+/*!
+ * \brief print information about the proces
+ */
+void show_wsdl_information()
+{
+  if (debug_level == TRACE_ERROR)
+    return;
+
+  cerr << globals::wsdl_information.imports << " imports, ";
+  cerr << globals::wsdl_information.types << " types, ";
+  cerr << globals::wsdl_information.bindings << " bindings, ";
+  cerr << globals::wsdl_information.properties << " properties" << endl;
+  cerr << globals::wsdl_information.messages << " messages, ";
+  cerr << globals::wsdl_information.portTypes << " portTypes, ";
+  cerr << globals::wsdl_information.operations << " operations, ";
+  cerr << globals::wsdl_information.partnerLinkTypes << " partnerLinkTypes" << endl;  
 }
 
 
@@ -442,7 +464,15 @@ void genericError(unsigned int code, string information, string line, error_leve
 
     case(125): // ignoring variable property element
 	{ cerr << "skipped variable property element: <" << information << ">" << endl;
-	  break; }	  
+	  break; }
+
+    case(126): // WSDL message not found
+	{ cerr << "<message> `" << information << "' referenced in <operation> not defined before" << endl;
+	  break; }
+
+    case(127): // WSDL portType not found
+	{ cerr << "<portType> `" << information << "' referenced in <role> not defined before" << endl;
+	  break; }
   }
 
   cerr << endl;

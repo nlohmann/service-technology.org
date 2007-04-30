@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/09
  *
- * \date    \$Date: 2007/04/19 08:57:33 $
+ * \date    \$Date: 2007/04/30 15:39:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  *
  * \ingroup debug
  */
@@ -129,6 +129,7 @@ extern trace_level debug_level; // defined in debug.cc
 void trace(trace_level pTraceLevel, string message);
 void trace(string message);
 void show_process_information();
+void show_wsdl_information();
 void show_process_information_header();
 int frontend_error(const char *msg);
 void SAerror(unsigned int code, string information = "", int lineNumber = 0);

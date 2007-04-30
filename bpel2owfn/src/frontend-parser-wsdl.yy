@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2007       Niels Lohmann                                        *
+ * Copyright 2007  Niels Lohmann                                             *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -29,7 +29,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/04/29 20:55:37 $
+ * \date    \$Date: 2007/04/30 15:39:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  *
  * \ingroup frontend
  */
@@ -113,6 +113,7 @@
 #include "helpers.h"
 #include "debug.h"
 #include "globals.h"
+#include "extension-wsdl.h"
 
 
 using std::cerr;
@@ -124,14 +125,25 @@ using std::endl;
  * External variables
  *****************************************************************************/
 
-extern char *frontend_text;	// from flex: the current token
 extern int frontend_lex();	// from flex: the lexer funtion
-extern int frontend_lineno;	// from flex: the current line number
 
 // use the functions of the BPEL parser
 #define frontend_wsdl_lex() frontend_lex()
 #define frontend_wsdl_error(a) frontend_error(a)
-#define frontend_wsdl_in frontend_in
+#define frontend_wsdl_in frontend_in // needed?
+
+
+
+
+/******************************************************************************
+ * Globals variables
+ *****************************************************************************/
+
+std::map<std::string, std::string> tempAttributes;
+
+WSDL_Message *temp_message = NULL;
+WSDL_PartnerLinkType *temp_partnerLinkType = NULL;
+WSDL_PortType *temp_portType = NULL;
 %}
 
 
@@ -154,11 +166,12 @@ tDefinions:
 
 tImport_list:
   /* empty */
-| tImport X_NEXT tImport_list;
+| tImport X_NEXT tImport_list
 ;
 
 tImport:
   K_IMPORT arbitraryAttributes X_SLASH
+    { globals::wsdl_information.imports++; }
 ;
 
 
@@ -169,6 +182,7 @@ tImport:
 tTypes:
   /* empty */
 | K_TYPES X_NEXT tSchema X_SLASH K_TYPES X_NEXT
+    { globals::wsdl_information.types++; }
 ;
 
 tSchema:
@@ -188,7 +202,10 @@ tMessage_list:
 ;
 
 tMessage:
-  K_MESSAGE arbitraryAttributes X_NEXT tPart_list X_SLASH K_MESSAGE
+  K_MESSAGE arbitraryAttributes
+    { temp_message = new WSDL_Message(tempAttributes["name"]); }
+  X_NEXT tPart_list X_SLASH K_MESSAGE
+    { globals::WSDLInfo.messages[temp_message->name] = temp_message; }
 ;
 
 tPart_list:
@@ -198,6 +215,7 @@ tPart_list:
 
 tPart:
   K_PART arbitraryAttributes X_SLASH
+    { temp_message->parts[tempAttributes["name"]] = tempAttributes["type"]; }
 ;
 
 
@@ -211,7 +229,10 @@ tPortType_list:
 ;
 
 tPortType:
-  K_PORTTYPE arbitraryAttributes X_NEXT tOperation_list X_SLASH K_PORTTYPE
+  K_PORTTYPE arbitraryAttributes
+    { temp_portType = new WSDL_PortType(tempAttributes["name"]); }
+  X_NEXT tOperation_list X_SLASH K_PORTTYPE
+    { globals::WSDLInfo.portTypes[temp_portType->name] = temp_portType; }
 ;
 
 tOperation_list:
@@ -220,7 +241,9 @@ tOperation_list:
 ;
 
 tOperation:
-  K_OPERATION arbitraryAttributes X_NEXT tInputOutputFault_list X_SLASH K_OPERATION
+  K_OPERATION arbitraryAttributes
+    { temp_portType->addOperation(tempAttributes["name"]); }
+  X_NEXT tInputOutputFault_list X_SLASH K_OPERATION
 ;
 
 tInputOutputFault_list:
@@ -236,14 +259,17 @@ tInputOutputFault:
 
 tInput:
   K_INPUT arbitraryAttributes X_SLASH
+    { temp_portType->addOperationDetails("input", tempAttributes["message"]); }
 ;
 
 tOutput:
   K_OUTPUT arbitraryAttributes X_SLASH
+    { temp_portType->addOperationDetails("output", tempAttributes["message"]); }
 ;
 
 tFault:
   K_FAULT arbitraryAttributes X_SLASH
+    { temp_portType->addOperationDetails("fault", tempAttributes["message"], tempAttributes["name"]); }
 ;
 
 
@@ -258,6 +284,8 @@ tBinding_list:
 
 tBinding:
   K_BINDING arbitraryAttributes X_NEXT tOperation_list X_SLASH K_BINDING
+    { globals::wsdl_information.bindings++; }
+;
 
 
 /******************************************************************************
@@ -271,6 +299,7 @@ tService_list:
 
 tService:
   K_SERVICE tPort_list X_SLASH K_SERVICE
+    { globals::wsdl_information.services++; }
 ;
 
 tPort_list:
@@ -289,6 +318,7 @@ tPort:
 tPropertyPropertyAlias_list:
   /* empty */
 | tPropertyPropertyAlias X_NEXT tPropertyPropertyAlias_list
+    { globals::wsdl_information.properties++; }
 ;
 
 tPropertyPropertyAlias:
@@ -309,7 +339,10 @@ tPartnerLinkType_list:
 ;
 
 tPartnerLinkType:
-  K_PARTNERLINKTYPE arbitraryAttributes X_NEXT tRoles X_SLASH K_PARTNERLINKTYPE
+  K_PARTNERLINKTYPE arbitraryAttributes
+    { temp_partnerLinkType = new WSDL_PartnerLinkType(tempAttributes["name"]); }
+  X_NEXT tRoles X_SLASH K_PARTNERLINKTYPE
+    { globals::WSDLInfo.partnerLinkTypes[temp_partnerLinkType->name] = temp_partnerLinkType; }
 ;
 
 tRoles:
@@ -319,6 +352,7 @@ tRoles:
 
 tRole:
   K_ROLE arbitraryAttributes X_SLASH
+    { temp_partnerLinkType->addRole(tempAttributes["name"], tempAttributes["portType"]); }
 ;
 
 
@@ -329,4 +363,5 @@ tRole:
 arbitraryAttributes:
   /* empty */
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
+    { tempAttributes[string($1->name)] = string($3->name); }
 ;

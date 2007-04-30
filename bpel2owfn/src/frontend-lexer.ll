@@ -31,7 +31,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/04/29 20:10:09 $
+ * \date    \$Date: 2007/04/30 15:39:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.
@@ -119,6 +119,8 @@ unsigned int currentView;
 bool parseJoinCondition = false;
 bool parseUnicode = false;
 
+// the inteface to the WSDL parser
+extern YYSTYPE frontend_wsdl_lval;
 
 %}
 
@@ -183,12 +185,12 @@ UB     			[\200-\277]
 <ATTRIBUTE,JOINCONDITION>"("				{ return LBRACKET; }
 <ATTRIBUTE,JOINCONDITION>")"				{ return RBRACKET; }
 <ATTRIBUTE,JOINCONDITION>"'"				{ return APOSTROPHE; }
-<ATTRIBUTE,JOINCONDITION>{name}                         { frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
+<ATTRIBUTE,JOINCONDITION>{name}                         { frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                                                           return X_NAME; }
 
  /* attributes */
 <ATTRIBUTE>{string}	{ std::string stringwoquotes = std::string(frontend_text).substr(1, strlen(frontend_text)-2);
-                          frontend_lval.yt_casestring = kc::mkcasestring(stringwoquotes.c_str());
+                          frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = kc::mkcasestring(stringwoquotes.c_str());
                           return X_STRING; }
 <ATTRIBUTE>"="		{ return X_EQUALS; }
 
@@ -344,7 +346,7 @@ UB     			[\200-\277]
 <INITIAL>"$"{variablename}	{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                                   return VARIABLENAME; }
 
-<INITIAL>{name}			{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
+<INITIAL>{name}			{ frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                                   return X_NAME; }
 {number}	{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                   return NUMBER; }

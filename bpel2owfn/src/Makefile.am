@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/29 19:09:57 $ by $Author: nielslohmann $.
-# Version $Revision: 1.77 $
+# File last changed $Date: 2007/04/30 15:39:02 $ by $Author: nielslohmann $.
+# Version $Revision: 1.78 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -105,6 +105,7 @@ bpel2owfn_SOURCES = $(KCSOURCES) \
 		    getopt.h getopt.c getopt1.c \
 		    ast-tools.cc ast-tools.h \
 		    ast-details.cc ast-details.h \
+		    extension-wsdl.cc extension-wsdl.h \
 		    pnapi.h petrinet.h petrinet.cc \
 		    petrinet-output.cc petrinet-reduction.cc
 

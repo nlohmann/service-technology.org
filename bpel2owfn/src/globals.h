@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/29 19:09:57 $
+ * \date    \$Date: 2007/04/30 15:39:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
 
 
@@ -49,14 +49,15 @@
 #include <map>
 
 #include "ast-config.h"
-#include "ast-details.h"
-#include "cfg.h"
 #include "options.h"
 
 using std::set;
 using std::string;
 using std::map;
 
+class WSDL;
+class ASTE;
+class CFGBlock;
 
 
 
@@ -77,6 +78,26 @@ struct s_process_information
   unsigned int links;
   unsigned int implicit_activities;
   unsigned int implicit_handlers;
+};
+
+
+
+
+
+/*!
+ * \brief WSDL information
+ */
+struct s_wsdl_information
+{
+  unsigned int imports;
+  unsigned int types;
+  unsigned int messages;
+  unsigned int portTypes;
+  unsigned int operations;
+  unsigned int bindings;
+  unsigned int services;
+  unsigned int properties;
+  unsigned int partnerLinkTypes;
 };
 
 
@@ -153,6 +174,9 @@ namespace globals
   /// statistics about the activities and handlers of the process
   extern s_process_information process_information;
 
+  /// statistics about the optional WSDL file
+  extern s_wsdl_information wsdl_information;
+
   /// A temporary mapping of attributes. This mapping is filled during parsing
   /// and is copied during post-processing to the AST annotation.
   extern map<unsigned int, map<string, string> > temporaryAttributeMap;
@@ -210,6 +234,9 @@ namespace globals
 
   /// the level of structural reduction
   extern unsigned int reduction_level;
+
+  /// an object holding information from the optional WSDL file
+  extern WSDL WSDLInfo;
 }
 
 #endif

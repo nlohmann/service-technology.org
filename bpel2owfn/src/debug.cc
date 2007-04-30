@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/04/30 15:39:02 $
+ * \date    \$Date: 2007/04/30 17:02:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  *
  * \ingroup debug
  */
@@ -472,6 +472,10 @@ void genericError(unsigned int code, string information, string line, error_leve
 
     case(127): // WSDL portType not found
 	{ cerr << "<portType> `" << information << "' referenced in <role> not defined before" << endl;
+	  break; }
+
+    case(128): // WSDL portType not found
+	{ cerr << information << endl;
 	  break; }
   }
 

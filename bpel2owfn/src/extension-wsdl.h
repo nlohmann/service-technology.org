@@ -26,13 +26,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/04/30 15:39:02 $
+ * \date    \$Date: 2007/04/30 17:02:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  *
  * \todo    Comment me!
  */
@@ -166,6 +166,9 @@ class WSDL
 
     /// the messages of the parsed WSDL file
     map<string, WSDL_Message*> messages;
+
+    /// check an operation
+    bool checkOperation(string operation_name);
 };
 
 #endif

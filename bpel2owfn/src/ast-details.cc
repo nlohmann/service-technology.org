@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/04/27 13:36:28 $
+ * \date    \$Date: 2007/04/30 17:02:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.93 $
+ * \version \$Revision: 1.94 $
  */
 
 
@@ -56,6 +56,7 @@
 #include "helpers.h"
 #include "frontend-parser.h"
 #include "globals.h"
+#include "extension-wsdl.h"
 
 using std::cerr;
 using std::cout;
@@ -293,7 +294,7 @@ void ASTE::checkAttributes()
 	assert(attributes["exitOnStandardFault"] != "");
 
 	/* no break here */
-      }
+      }      
 
     case(K_EMPTY):
     case(K_INVOKE):
@@ -434,6 +435,11 @@ void ASTE::checkAttributes()
         checkRequiredAttributes(required, 2);
 	checkAttributeType("inputVariable", T_BPELVARIABLENAME);
 	checkAttributeType("outputVariable", T_BPELVARIABLENAME);
+
+	if (globals::wsdl_filename != "")
+	  if (globals::WSDLInfo.checkOperation(attributes["operation"]) == false)
+	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
+
 	break;
       }
 
@@ -442,6 +448,11 @@ void ASTE::checkAttributes()
       	string required[] = {"partnerLink", "operation"};
         checkRequiredAttributes(required, 2);
 	checkAttributeType("variable", T_BPELVARIABLENAME);
+
+	if (globals::wsdl_filename != "")
+	  if (globals::WSDLInfo.checkOperation(attributes["operation"]) == false)
+	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
+	
 	break;
       }
     
@@ -493,6 +504,10 @@ void ASTE::checkAttributes()
 	if (attributes["createInstance"] == "yes")
 	  isStartActivity = true;
 
+	if (globals::wsdl_filename != "")
+	  if (globals::WSDLInfo.checkOperation(attributes["operation"]) == false)
+	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
+	
 	break;
       }
 
@@ -507,6 +522,11 @@ void ASTE::checkAttributes()
       	string required[] = {"partnerLink", "operation"};
         checkRequiredAttributes(required, 2);
 	checkAttributeType("variable", T_BPELVARIABLENAME);
+
+	if (globals::wsdl_filename != "")
+	  if (globals::WSDLInfo.checkOperation(attributes["operation"]) == false)
+	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
+
 	break;
       }
 

@@ -32,7 +32,7 @@
  * 
  * \since   2007-04-17
  *
- * \date    \$Date: 2007/04/20 09:19:20 $
+ * \date    \$Date: 2007/05/02 06:29:19 $
  * 
  * \note    This code was inspired by code published by Jaded Hobo at "The
  *          Code Project" in December 2004, available at
@@ -40,10 +40,9 @@
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
- *          for details.
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  *
  * \todo    
  *          - finish code for non-Windows operating systems

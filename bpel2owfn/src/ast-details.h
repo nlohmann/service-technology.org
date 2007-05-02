@@ -25,18 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/04/27 13:36:28 $
+ * \date    \$Date: 2007/05/02 06:29:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
- *          for details.
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  */
 
 

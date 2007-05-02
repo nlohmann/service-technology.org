@@ -24,12 +24,19 @@
  *
  * \brief   WSDL 1.1 parser
  *
+ *          WSDL is parsed as defined in
+ *          http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd
+ *
+ *          Partner Link Types are parsed according to the "Schema for OASIS
+ *          Business Process Execution Language (WS-BPEL) 2.0 - Schema for
+ *          Partner Link Type" (http://docs.oasis-open.org/wsbpel/2.0/plnktype)
+ *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/04/30 15:39:02 $
+ * \date    \$Date: 2007/05/02 08:32:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +46,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *
  * \ingroup frontend
  */
@@ -136,7 +143,7 @@ extern int frontend_lex();	// from flex: the lexer funtion
 
 
 /******************************************************************************
- * Globals variables
+ * Global variables
  *****************************************************************************/
 
 std::map<std::string, std::string> tempAttributes;
@@ -312,7 +319,7 @@ tPort:
 ;
 
 /******************************************************************************
- * PROPERTY / PROPERTYALIAS
+ * PROPERTY / PROPERTY ALIAS
  *****************************************************************************/
 
 tPropertyPropertyAlias_list:
@@ -330,7 +337,7 @@ tPropertyPropertyAlias:
 
 
 /******************************************************************************
- * PARTNERLINKTYPE
+ * PARTNER LINK TYPE
  *****************************************************************************/
 
 tPartnerLinkType_list:
@@ -353,6 +360,10 @@ tRoles:
 tRole:
   K_ROLE arbitraryAttributes X_SLASH
     { temp_partnerLinkType->addRole(tempAttributes["name"], tempAttributes["portType"]); }
+| K_ROLE arbitraryAttributes X_NEXT
+    { tempAttributes["RoleName"] = tempAttributes["name"]; }
+  K_PORTTYPE arbitraryAttributes X_SLASH X_NEXT X_SLASH K_ROLE
+    { temp_partnerLinkType->addRole(tempAttributes["RoleName"], tempAttributes["name"]); }
 ;
 
 

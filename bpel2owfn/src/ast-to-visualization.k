@@ -31,7 +31,7 @@
  * 
  * \since   2007-04-18
  *
- * \date    \$Date: 2007/05/02 10:51:28 $
+ * \date    \$Date: 2007/05/02 11:44:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  *
  */
 
@@ -56,17 +56,30 @@ Process(a,b,c,d,e,g,i,_id) ->
   [visualization: 
   
   { 
-  globals::visArcs = "";
-  (*output) << "digraph N {" << endl;
-  (*output) << " graph [fontname=\"Helvetica\" label=\"";
-  (*output) << "Visualization of the BPEL-Process generated from " << globals::filename << "\"]" << endl;
-  (*output) << "compound = true;" << endl;
-  globals::ASTEmap[_id->value]->visConnection = "Process_Start";
+    globals::visArcs = "";
+    (*output) << "digraph N {" << endl;
+    (*output) << " graph [fontname=\"Helvetica\" label=\"";
+    (*output) << "Visualization of the BPEL-Process generated from " << globals::filename << "\"]" << endl;
+    (*output) << "compound = true;" << endl;
+    globals::ASTEmap[_id->value]->visConnection = "Process_Start";
   } 
   a b c d e g i 
   {  
-  (*output) << globals::visArcs;
-  (*output) << "}" << endl;
+    unsigned int linkId;
+    unsigned int source;
+    unsigned int target;
+    for(set<string>::iterator names = globals::ASTE_linkNames.begin(); names != globals::ASTE_linkNames.end(); names++)
+    {
+       linkId = globals::ASTE_linkIdMap[(*names)];
+     
+       source = globals::ASTEmap[linkId]->sourceActivity;
+       target = globals::ASTEmap[linkId]->targetActivity;
+
+       globals::visArcs += globals::ASTEmap[source]->activityTypeName() + toString(source) + " -> " + 
+                         globals::ASTEmap[target]->activityTypeName() + toString(target) + ";\n" ; 
+    }
+    (*output) << globals::visArcs;
+    (*output) << "}" << endl;
   } ]
 ;
 

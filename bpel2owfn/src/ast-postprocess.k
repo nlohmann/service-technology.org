@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/02 10:06:50 $
+ * \date    \$Date: 2007/05/02 11:44:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.153 $
+ * \version \$Revision: 1.154 $
  */
 %}
 
@@ -174,7 +174,6 @@ Process(a,b,c,d,e,g,i,_id) ->
       globals::ASTE_correlationSetNames.clear(); // correlation sets are only tested but not used for output
       globals::ASTE_partnerLinkNames.clear();    // the same with partner links
       globals::ASTE_startActivities.clear();	// the same with start activities
-      globals::ASTE_linkIdMap.clear();		// the same with this mapping
     }
   ]
 ;

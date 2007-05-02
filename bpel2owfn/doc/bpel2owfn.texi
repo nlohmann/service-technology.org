@@ -394,7 +394,8 @@ Debug level:
 When errors are found, only display the error code and skip additional
 information.
 @itemx 1
-No debug information, but display warning and error messages.
+No debug information, but display warning and error messages. Furthermore,
+detailled information about syntax errors are displayed.
 @itemx 2
 All messages from @samp{-d1}. Additionally, information about the current
 steps is displayed.
@@ -1122,8 +1123,33 @@ When using the parameter @samp{communicationonly}, activities of the negative
 control flow (@code{<exit>}, @code{<throw>}, @code{<compensate>}, and
 @code{<compensateScope>}) are replaced by an @code{<empty>} activity.
 
-@end multitable
+@item 122 @tab notice @tab
+syntax error in chorography file
 
+@item 123 @tab notice @tab
+syntax error in WSDL file
+
+@item 124 @tab notice @tab
+ignoring XML Schema element
+
+@item 125 @tab notice @tab
+ignoring variable property element
+
+@item 126 @tab warning @tab
+WSDL message not found
+
+@item 127 @tab warning @tab
+WSDL portType not found
+
+@item 128 @tab warning @tab
+WSDL operation not found
+
+@item 129 @tab warning @tab
+WSDL partnerLinkType was found, but role was not found
+
+@item 130 @tab warning @tab
+WSDL partnerLinkType was not found
+@end multitable
 
 
 @c @section Exit Values

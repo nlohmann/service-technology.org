@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/02 06:29:19 $
+ * \date    \$Date: 2007/05/02 10:22:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.82 $
+ * \version \$Revision: 1.83 $
  *
  * \ingroup debug
  */
@@ -477,6 +477,14 @@ void genericError(unsigned int code, string information, string line, error_leve
     case(128): // WSDL operation not found
 	{ cerr << information << endl;
 	  break; }
+
+    case(129): // WSDL partnerLinkType was found, but role was not found
+	{ cerr << information << endl;
+	  break; }	  
+
+    case(130): // WSDL partnerLinkType was not found
+	{ cerr << information << endl;
+	  break; }	  
   }
 
   cerr << endl;

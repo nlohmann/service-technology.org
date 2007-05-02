@@ -26,13 +26,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/04/30 17:02:27 $
+ * \date    \$Date: 2007/05/02 10:22:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  *
  * \todo    Comment me!
  */
@@ -169,6 +169,9 @@ class WSDL
 
     /// check an operation
     bool checkOperation(string operation_name);
+
+    /// check a partnerLinkType
+    bool checkPartnerLinkType(WSDL_PartnerLinkType *partnerLinkType, string partnerRole_name);
 };
 
 #endif

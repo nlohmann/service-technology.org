@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/02 10:06:50 $
+ * \date    \$Date: 2007/05/02 10:22:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.75 $
+ * \version \$Revision: 1.76 $
  */
 
 
@@ -67,6 +67,7 @@ using std::vector;
 
 class ASTE;
 class pPartnerLink;
+class WSDL_PartnerLinkType;
 
 
 
@@ -201,6 +202,8 @@ class ASTE
 
     void output();
     bool drawn;
+
+    WSDL_PartnerLinkType* partnerLinkType; ///< a link to a partnerLinkType object holding more information; used for partnerLinks
 
     ASTE(unsigned int myid, unsigned int mytype);
     virtual ~ASTE();

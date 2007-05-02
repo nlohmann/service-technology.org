@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/02 10:06:50 $
+ * \date    \$Date: 2007/05/02 10:22:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.96 $
+ * \version \$Revision: 1.97 $
  */
 
 
@@ -81,7 +81,8 @@ using std::endl;
 ASTE::ASTE(unsigned int myid, unsigned int mytype) :
   id(myid), type(mytype), controlFlow(POSITIVECF), visConnection("none"), secVisConnection("none"), 
   plRoleDetails(NULL), isStartActivity(false), cyclic(false), highlighted(false),
-  sourceActivity(0), targetActivity(0), max_occurrences(1), max_loops(UINT_MAX), enclosedFH(0), enclosedCH(0), drawn(false)
+  sourceActivity(0), targetActivity(0), max_occurrences(1), max_loops(UINT_MAX), enclosedFH(0), enclosedCH(0), drawn(false),
+  partnerLinkType(NULL)
 {
   assert(myid != 0);
 
@@ -435,6 +436,7 @@ void ASTE::checkAttributes()
 	checkAttributeType("inputVariable", T_BPELVARIABLENAME);
 	checkAttributeType("outputVariable", T_BPELVARIABLENAME);
 
+	// check if operation was defined in WSDL file
 	if (globals::wsdl_filename != "")
 	  if (globals::WSDLInfo.checkOperation(attributes["operation"]) == false)
 	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
@@ -448,6 +450,7 @@ void ASTE::checkAttributes()
         checkRequiredAttributes(required, 2);
 	checkAttributeType("variable", T_BPELVARIABLENAME);
 
+	// check if operation was defined in WSDL file
 	if (globals::wsdl_filename != "")
 	  if (globals::WSDLInfo.checkOperation(attributes["operation"]) == false)
 	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
@@ -503,6 +506,7 @@ void ASTE::checkAttributes()
 	if (attributes["createInstance"] == "yes")
 	  isStartActivity = true;
 
+	// check if operation was defined in WSDL file
 	if (globals::wsdl_filename != "")
 	  if (globals::WSDLInfo.checkOperation(attributes["operation"]) == false)
 	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
@@ -522,6 +526,7 @@ void ASTE::checkAttributes()
         checkRequiredAttributes(required, 2);
 	checkAttributeType("variable", T_BPELVARIABLENAME);
 
+	// check if operation was defined in WSDL file
 	if (globals::wsdl_filename != "")
 	  if (globals::WSDLInfo.checkOperation(attributes["operation"]) == false)
 	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
@@ -898,6 +903,23 @@ string ASTE::definePartnerLink()
   {
     globals::ASTE_partnerLinkNames.insert(name);
     globals::ASTE_partnerLinks[ attributes["name"] ] = id;
+
+
+    // find partnerLinkType_name
+
+    // strip XML namespace prefix
+    string partnerLinkType_name = attributes["partnerLinkType"];
+    if (partnerLinkType_name.find_first_of(":") != string::npos)
+      partnerLinkType_name = partnerLinkType_name.substr(partnerLinkType_name.find_first_of(":")+1, partnerLinkType_name.length());
+    
+    partnerLinkType = globals::WSDLInfo.partnerLinkTypes[partnerLinkType_name];
+
+    if (partnerLinkType == NULL)
+      genericError(130, "partnerLinkType `" + attributes["partnerLinkType"] + "' was not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);    
+    else
+      if (!globals::WSDLInfo.checkPartnerLinkType(partnerLinkType, attributes["partnerRole"]))
+	genericError(129, "role `" + attributes["partnerRole"] + "' was not defined for partnerLinkType `" + attributes["partnerLinkType"] + "' in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
+    
   }
 
   return name;

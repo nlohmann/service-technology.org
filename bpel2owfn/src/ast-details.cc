@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/02 10:51:28 $
+ * \date    \$Date: 2007/05/02 10:58:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.98 $
+ * \version \$Revision: 1.99 $
  */
 
 
@@ -436,11 +436,6 @@ void ASTE::checkAttributes()
 	checkAttributeType("inputVariable", T_BPELVARIABLENAME);
 	checkAttributeType("outputVariable", T_BPELVARIABLENAME);
 
-	// check if operation was defined in WSDL file
-	if (globals::wsdl_filename != "")
-	  if (globals::WSDLInfo.checkOperation(attributes["operation"]) == false)
-	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
-
 	break;
       }
 
@@ -450,11 +445,6 @@ void ASTE::checkAttributes()
         checkRequiredAttributes(required, 2);
 	checkAttributeType("variable", T_BPELVARIABLENAME);
 
-	// check if operation was defined in WSDL file
-	if (globals::wsdl_filename != "")
-	  if (globals::WSDLInfo.checkOperation(attributes["operation"]) == false)
-	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
-	
 	break;
       }
     
@@ -506,11 +496,6 @@ void ASTE::checkAttributes()
 	if (attributes["createInstance"] == "yes")
 	  isStartActivity = true;
 
-	// check if operation was defined in WSDL file
-	if (globals::wsdl_filename != "")
-	  if (globals::WSDLInfo.checkOperation(attributes["operation"]) == false)
-	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
-	
 	break;
       }
 
@@ -525,11 +510,6 @@ void ASTE::checkAttributes()
       	string required[] = {"partnerLink", "operation"};
         checkRequiredAttributes(required, 2);
 	checkAttributeType("variable", T_BPELVARIABLENAME);
-
-	// check if operation was defined in WSDL file
-	if (globals::wsdl_filename != "")
-	  if (globals::WSDLInfo.checkOperation(attributes["operation"]) == false)
-	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
 
 	break;
       }
@@ -1016,6 +996,7 @@ string ASTE::checkLink()
 string ASTE::checkPartnerLink()
 {
   string partnerLinkName = attributes["partnerLink"];
+
   if (partnerLinkName == "")
     return partnerLinkName;
 
@@ -1026,14 +1007,20 @@ string ASTE::checkPartnerLink()
   {
     if (globals::ASTE_partnerLinkNames.find(toString(*scope) + "." + partnerLinkName) != globals::ASTE_partnerLinkNames.end())
     {
-      string partnerLinkType = globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerLinkType"];
-      string myRole          = globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["myRole"];
-      string partnerRole     = globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerRole"];
+      string partnerLinkType_name = globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerLinkType"];
+      string myRole_name          = globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["myRole"];
+      string partnerRole_name     = globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerRole"];
 
-      if (partnerLinkType != "" && myRole != "" && partnerRole != "")
+      if (partnerLinkType_name != "" && myRole_name != "" && partnerRole_name != "")
       {
-        plRoleDetails = new pPartnerLink(partnerLinkName, partnerLinkType, myRole, partnerRole);
+        plRoleDetails = new pPartnerLink(partnerLinkName, partnerLinkType_name, myRole_name, partnerRole_name);
       }
+
+      // check if operation was defined in WSDL file
+      if (globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->partnerLinkType != NULL && attributes["operation"] != "")
+	if (globals::WSDLInfo.checkOperation(globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->partnerLinkType, attributes["operation"]) == false)
+	  genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
+
       return (toString(*scope) + "." + partnerLinkName);
     }
   }

@@ -26,13 +26,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/02 10:22:15 $
+ * \date    \$Date: 2007/05/02 10:58:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  *
  * \todo    Comment me!
  */
@@ -168,7 +168,7 @@ class WSDL
     map<string, WSDL_Message*> messages;
 
     /// check an operation
-    bool checkOperation(string operation_name);
+    bool checkOperation(WSDL_PartnerLinkType *partnerLinkType, string operation_name);
 
     /// check a partnerLinkType
     bool checkPartnerLinkType(WSDL_PartnerLinkType *partnerLinkType, string partnerRole_name);

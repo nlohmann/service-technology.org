@@ -26,13 +26,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/02 10:22:15 $
+ * \date    \$Date: 2007/05/02 10:58:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  *
  * \todo    Comment me!
  */
@@ -186,19 +186,29 @@ void WSDL_PartnerLinkType::addRole(string role, string portType_name)
  * Functions for class WSDL
  *****************************************************************************/
 
-bool WSDL::checkOperation(string operation_name)
+bool WSDL::checkOperation(WSDL_PartnerLinkType *partnerLinkType, string operation_name)
 {
-  for (map<string, WSDL_PortType*>::iterator portType = portTypes.begin(); portType != portTypes.end(); portType++)
-  {
-    if (portType->second == NULL)
-      continue;
+  assert(partnerLinkType != NULL);
 
-    if ((portType->second->operation1 != NULL) && (portType->second->operation1->name == operation_name))
-      return true;
+  if (partnerLinkType->role1.second != NULL &&
+      partnerLinkType->role1.second->operation1 != NULL &&
+      partnerLinkType->role1.second->operation1->name == operation_name)
+    return true;
 
-    if ((portType->second->operation2 != NULL) && (portType->second->operation2->name == operation_name))
-      return true;
-  }
+  if (partnerLinkType->role1.second != NULL &&
+      partnerLinkType->role1.second->operation2 != NULL &&
+      partnerLinkType->role1.second->operation2->name == operation_name)
+    return true;
+
+  if (partnerLinkType->role2.second != NULL &&
+      partnerLinkType->role2.second->operation1 != NULL &&
+      partnerLinkType->role2.second->operation1->name == operation_name)
+    return true;
+
+  if (partnerLinkType->role2.second != NULL &&
+      partnerLinkType->role2.second->operation2 != NULL &&
+      partnerLinkType->role2.second->operation2->name == operation_name)
+    return true;
 
   return false;
 }

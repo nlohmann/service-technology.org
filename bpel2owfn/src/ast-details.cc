@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/02 10:22:15 $
+ * \date    \$Date: 2007/05/02 10:51:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.97 $
+ * \version \$Revision: 1.98 $
  */
 
 
@@ -816,7 +816,6 @@ bool ASTE::findIsolatedAncestor()
 
 
 
-
 /******************************************************************************
  * functions to define entities like variables, links, etc.
  *****************************************************************************/
@@ -1273,6 +1272,33 @@ string ASTE::activityTypeName() const
     case(K_WHILE):		return "while";
 
     default:			return "unknown"; /* should not happen */
+  }
+}
+
+
+
+
+
+/*!
+ * \brief returns true if the activity is structured
+ *
+ * \returns boolean
+ */
+bool ASTE::structured()
+{
+  switch (type)
+  {
+    case(K_FLOW):		return true;
+    case(K_FOREACH):		return true;
+    case(K_IF):			return true;
+    case(K_PICK):		return true;
+    case(K_PROCESS):		return true;
+    case(K_REPEATUNTIL):	return true;
+    case(K_SCOPE):		return true;
+    case(K_SEQUENCE):		return true;
+    case(K_WHILE):		return true;
+
+    default:			return false; /* should not happen */
   }
 }
 

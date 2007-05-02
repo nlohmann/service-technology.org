@@ -29,13 +29,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007/05/02 10:06:50 $
+ * \date    \$Date: 2007/05/02 10:51:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  */
 
 
@@ -92,9 +92,6 @@ unsigned int toUInt(string s);
 
 /// returns the maximum of two unsigned ints
 unsigned int max(unsigned int a, unsigned int b);
-
-/// returns true if the activity is structured
-bool structured(int id);
 
 
 

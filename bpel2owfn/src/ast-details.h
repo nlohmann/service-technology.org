@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/02 10:22:15 $
+ * \date    \$Date: 2007/05/02 10:51:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  */
 
 
@@ -199,6 +199,8 @@ class ASTE
     string definePartnerLink();
 
     string activityTypeName() const;
+
+    bool structured();
 
     void output();
     bool drawn;

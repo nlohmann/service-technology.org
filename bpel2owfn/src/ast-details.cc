@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/02 14:48:42 $
+ * \date    \$Date: 2007/05/02 15:22:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.100 $
+ * \version \$Revision: 1.101 $
  */
 
 
@@ -56,6 +56,7 @@
 #include "frontend-parser.h"
 #include "globals.h"
 #include "extension-wsdl.h"
+#include "extension-chor.h"
 
 using std::cerr;
 using std::cout;
@@ -431,8 +432,18 @@ void ASTE::checkAttributes()
 
     case(K_INVOKE):
       {
-      	string required[] = {"partnerLink", "operation"};
-        checkRequiredAttributes(required, 2);
+	// if BPEL4Chor file is given, all communicating activities need an id
+	if (globals::choreography_filename != "")
+	{
+	  string required[] = {"wsu:id"};
+	  checkRequiredAttributes(required, 1);
+	}
+	else
+	{
+	  string required[] = {"partnerLink", "operation"};
+	  checkRequiredAttributes(required, 2);
+	}
+
 	checkAttributeType("inputVariable", T_BPELVARIABLENAME);
 	checkAttributeType("outputVariable", T_BPELVARIABLENAME);
 
@@ -441,8 +452,18 @@ void ASTE::checkAttributes()
 
     case(K_ONMESSAGE):
       {
-      	string required[] = {"partnerLink", "operation"};
-        checkRequiredAttributes(required, 2);
+	// if BPEL4Chor file is given, all communicating activities need an id
+	if (globals::choreography_filename != "")
+	{
+	  string required[] = {"wsu:id"};
+	  checkRequiredAttributes(required, 1);
+	}
+	else
+	{
+	  string required[] = {"partnerLink", "operation"};
+	  checkRequiredAttributes(required, 2);
+	}
+
 	checkAttributeType("variable", T_BPELVARIABLENAME);
 
 	break;
@@ -488,8 +509,18 @@ void ASTE::checkAttributes()
 
     case(K_RECEIVE):
       {
-      	string required[] = {"partnerLink", "operation"};
-        checkRequiredAttributes(required, 2);
+	// if BPEL4Chor file is given, all communicating activities need an id
+	if (globals::choreography_filename != "")
+	{
+	  string required[] = {"wsu:id"};
+	  checkRequiredAttributes(required, 1);
+	}
+	else
+	{
+	  string required[] = {"partnerLink", "operation"};
+	  checkRequiredAttributes(required, 2);
+	}
+
 	checkAttributeType("createInstance", T_BOOLEAN);
 	checkAttributeType("variable", T_BPELVARIABLENAME);
 	
@@ -507,8 +538,18 @@ void ASTE::checkAttributes()
 
     case(K_REPLY):
       {
-      	string required[] = {"partnerLink", "operation"};
-        checkRequiredAttributes(required, 2);
+	// if BPEL4Chor file is given, all communicating activities need an id
+	if (globals::choreography_filename != "")
+	{
+	  string required[] = {"wsu:id"};
+	  checkRequiredAttributes(required, 1);
+	}
+	else
+	{
+	  string required[] = {"partnerLink", "operation"};
+	  checkRequiredAttributes(required, 2);
+	}
+
 	checkAttributeType("variable", T_BPELVARIABLENAME);
 
 	break;
@@ -693,10 +734,36 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
  *      for input and output channels. Thus, the Petri net unparser cannot find
  *      the channel place.
  *
+ * \todo Synchronous invoke in BPEL4Chor?
+ *
  * \return name of the channel
  */
 string ASTE::createChannel(bool synchronousCommunication)
 {
+  // in case of BPEL4Chor, we can read the channel name from the choreography
+  if (globals::choreography_filename != "")
+  {
+    string channelName;
+
+    switch (type)
+    {
+      case(K_RECEIVE):
+      case(K_ONMESSAGE):
+	  channelName = globals::ChorInfo.channelName(attributes["wsu:id"], false);
+	  globals::ASTE_inputChannels.insert(channelName);
+	  break;
+
+      case(K_INVOKE):
+      case(K_REPLY):
+	  channelName = globals::ChorInfo.channelName(attributes["wsu:id"], true);
+	  globals::ASTE_outputChannels.insert(channelName);
+	  break;
+    }
+
+    return channelName;
+  }
+
+
   string channelName = attributes["partnerLink"] + "." + attributes["operation"];
   if (channelName == ".")
   {
@@ -893,11 +960,14 @@ string ASTE::definePartnerLink()
     
     partnerLinkType = globals::WSDLInfo.partnerLinkTypes[partnerLinkType_name];
 
-    if (partnerLinkType == NULL)
-      genericError(130, "partnerLinkType `" + attributes["partnerLinkType"] + "' was not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);    
-    else
-      if (!globals::WSDLInfo.checkPartnerLinkType(partnerLinkType, attributes["partnerRole"]))
-	genericError(129, "role `" + attributes["partnerRole"] + "' was not defined for partnerLinkType `" + attributes["partnerLinkType"] + "' in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
+    if (globals::wsdl_filename != "")
+    {
+      if (partnerLinkType == NULL)
+	genericError(130, "partnerLinkType `" + attributes["partnerLinkType"] + "' was not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);    
+      else
+	if (!globals::WSDLInfo.checkPartnerLinkType(partnerLinkType, attributes["partnerRole"]))
+	  genericError(129, "role `" + attributes["partnerRole"] + "' was not defined for partnerLinkType `" + attributes["partnerLinkType"] + "' in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
+    }
     
   }
 
@@ -1070,9 +1140,10 @@ string ASTE::checkPartnerLink()
       }
 
       // check if operation was defined in WSDL file
-      if (globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->partnerLinkType != NULL && attributes["operation"] != "")
-	if (globals::WSDLInfo.checkOperation(globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->partnerLinkType, attributes["operation"]) == false)
-	  genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
+      if (globals::wsdl_filename != "")
+	if (globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->partnerLinkType != NULL && attributes["operation"] != "")
+	  if (globals::WSDLInfo.checkOperation(globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->partnerLinkType, attributes["operation"]) == false)
+	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
 
       return (toString(*scope) + "." + partnerLinkName);
     }

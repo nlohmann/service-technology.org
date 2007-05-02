@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/05/02 13:19:54 $
+ * \date    \$Date: 2007/05/02 15:22:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 
 
@@ -43,6 +43,7 @@
 
 #include "globals.h"
 #include "extension-wsdl.h"
+#include "extension-chor.h"
 #include "ast-details.h"
 
 
@@ -114,6 +115,8 @@ namespace globals {
   string wsdl_filename = "";
 
   WSDL WSDLInfo = WSDL();
+
+  Choreography ChorInfo = Choreography();
 
   map<string, string> tempAttributes;
 }

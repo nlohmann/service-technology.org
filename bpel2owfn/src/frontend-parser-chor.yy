@@ -29,7 +29,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/05/02 13:19:54 $
+ * \date    \$Date: 2007/05/02 15:22:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *
  * \ingroup frontend
  */
@@ -113,6 +113,7 @@
 #include "helpers.h"
 #include "debug.h"
 #include "globals.h"
+#include "extension-chor.h"
 
 
 using std::cerr;
@@ -140,6 +141,7 @@ extern int frontend_lex();	// from flex: the lexer funtion
 
 tTopology:
   X_OPEN K_TOPOLOGY arbitraryAttributes X_NEXT tParticipantTypes tParticipants tMessageLinks X_SLASH K_TOPOLOGY X_CLOSE
+    { std::cerr << globals::ChorInfo.messageLinks.size() << " message links" << std::endl; }
 ;
 
 
@@ -201,7 +203,9 @@ tMessageLink_list:
 
 tMessageLink:
   K_MESSAGELINK arbitraryAttributes X_SLASH
-    { std::cerr << globals::tempAttributes["sendActivity"] << " -> " << globals::tempAttributes["receiveActivity"] << std::endl; }
+    { globals::ChorInfo.addMessageLink(globals::tempAttributes["name"],
+        globals::tempAttributes["sendActivity"],
+        globals::tempAttributes["receiveActivity"]); }
 ;
 
 

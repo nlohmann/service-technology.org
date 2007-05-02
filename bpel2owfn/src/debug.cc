@@ -26,17 +26,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/02 12:56:05 $
+ * \date    \$Date: 2007/05/02 15:22:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.84 $
+ * \version \$Revision: 1.85 $
  *
  * \ingroup debug
  */
@@ -546,7 +546,7 @@ void SAerror(unsigned int code, string information, int lineNumber)
   switch (code)
   {
     case(3):
-      { cerr << "<catch> must not be applied to the standard fault \"" << information << "\" when the parent scope uses exitOnStandardFault" << endl;
+      { cerr << "<catch> must not be applied to the standard fault `" << information << "' when parent scope has attribute `exitOnStandardFault' set to `yes'" << endl;
 	break; }
 	
     case(6):

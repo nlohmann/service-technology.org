@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/05/02 13:19:54 $
+ * \date    \$Date: 2007/05/02 15:22:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 
 
@@ -58,6 +58,7 @@ using std::map;
 class WSDL;
 class ASTE;
 class CFGBlock;
+class Choreography;
 
 
 
@@ -237,6 +238,9 @@ namespace globals
 
   /// an object holding information from the optional WSDL file
   extern WSDL WSDLInfo;
+
+  /// an object holding information from the optional BPEL4Chor file
+  extern Choreography ChorInfo;
 
   /// a temporary attribute mapping for the WSDL and BPEL4Chor parser
   extern map<string, string> tempAttributes;

@@ -26,13 +26,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/02 13:19:54 $
+ * \date    \$Date: 2007/05/02 15:22:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  *
  * \todo    Comment me!
  */
@@ -45,11 +45,11 @@
 #define EXTENSION_CHOR_H
 
 
-#include <set>
+#include <map>
 #include <string>
 #include <utility>
 
-using std::set;
+using std::map;
 using std::string;
 using std::pair;
 
@@ -58,9 +58,10 @@ using std::pair;
 class Choreography
 {
   public:
-    set<pair<string, string> > activities;
+    map<string, pair<string, string> > messageLinks;
 
-    void addLink(string senderID, string receiverID);
+    void addMessageLink(string messageLink_name, string sendActivity_name, string receiveActivity_name);
+    string channelName(string activity_name, bool sending);
 };
 
 

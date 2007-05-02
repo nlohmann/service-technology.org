@@ -29,13 +29,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007/03/29 14:27:40 $
+ * \date    \$Date: 2007/05/02 10:06:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  *
  * \ingroup debug
  */
@@ -55,6 +55,8 @@
 #include "debug.h"	// (trace)
 #include "helpers.h"
 #include "options.h"
+#include "globals.h"
+#include "ast-details.h"
 
 using std::istringstream;
 using std::ostringstream;
@@ -194,4 +196,26 @@ unsigned int max(unsigned int a, unsigned int b)
     return a;
   else
     return b;
+}
+
+/*!
+ * \param id an int
+ * \return structured(id);
+ */
+bool structured(int id)
+{
+  switch(globals::ASTEmap[id]->activityTypeName())
+  {
+  case("if"):		return true;
+  case("scope"):	return true;
+  case("while"):	return true;
+  case("flow"):		return true;
+  case("pick"):		return true;
+  case("process"):	return true;
+  case("repeatUntil"):	return true;
+  case("scope"):	return true;
+  case("sequence"):	return true;
+  case("forEach"):	return true;
+  default:		return false;  
+  }
 }

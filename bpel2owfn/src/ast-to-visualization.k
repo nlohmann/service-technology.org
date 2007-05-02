@@ -31,7 +31,7 @@
  * 
  * \since   2007-04-18
  *
- * \date    \$Date: 2007/04/27 13:36:28 $
+ * \date    \$Date: 2007/05/02 10:06:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  *
  */
 
@@ -446,7 +446,7 @@ Sequence(a,b,_id) ->
       {
    
         globals::visArcs += globals::ASTEmap[_id->value]->visConnection + " -> " + globals::ASTEmap[innerActivity->id]->secVisConnection + "["; 
-        if (globals::ASTEmap[innerActivity->id]-> structured == true)
+        if (structured(innerActivity->id))
         {
           globals::visArcs += "lhead=";
           globals::visArcs += "cluster";          
@@ -461,7 +461,7 @@ Sequence(a,b,_id) ->
         }
         globals::visArcs += "];\n";
       }
-      if (globals::ASTEmap[innerActivity->id]-> structured == true)
+      if (structured(innerActivity->id))
       {
         lastid = innerActivity->id;
         laststructured = true;
@@ -511,7 +511,7 @@ If(a, b, c, _id) ->
     foreach(ElseIf(innerActivity); tElseIf_list b)
     {
       globals::visArcs += "if" + toString(_id->value) + " -> " + globals::ASTEmap[innerActivity->id]->secVisConnection + "["; 
-      if (globals::ASTEmap[innerActivity->id]-> structured == true)
+      if (structured(innerActivity->id))
       {
         globals::visArcs += "lhead=";
         globals::visArcs += "cluster";          
@@ -531,7 +531,7 @@ If(a, b, c, _id) ->
       c=Else(innerActivity,_id2):
       { 
         globals::visArcs += "if" + toString(_id->value) + " -> " + globals::ASTEmap[innerActivity->id]->secVisConnection + "["; 
-        if (globals::ASTEmap[innerActivity->id]-> structured == true)
+        if (structured(innerActivity->id))
         {
             globals::visArcs += "lhead=";
             globals::visArcs += "cluster";          

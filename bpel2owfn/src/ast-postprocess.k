@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/02 14:48:42 $
+ * \date    \$Date: 2007/05/02 14:52:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.156 $
+ * \version \$Revision: 1.157 $
  */
 %}
 
@@ -98,7 +98,7 @@ Process(a,b,c,d,e,g,i,_id) ->
           callableFH = true;
         }
       }
-      if ( globals::ASTEmap[ e->id ]->hasCatchAll )
+      if ( globals::ASTEmap[ e->id ]->hasCatchAll && ! myself->possiblyTriggeredFaults.empty() )
       {
         callableFH = true;
       }
@@ -1980,7 +1980,7 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
           callableFH = true;
         }
       }
-      if ( globals::ASTEmap[ c->id ]->hasCatchAll )
+      if ( globals::ASTEmap[ c->id ]->hasCatchAll && ! myself->possiblyTriggeredFaults.empty() )
       {
         callableFH = true;
       }

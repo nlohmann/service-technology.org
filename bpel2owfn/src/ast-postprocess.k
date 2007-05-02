@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/02 11:44:19 $
+ * \date    \$Date: 2007/05/02 12:56:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.154 $
+ * \version \$Revision: 1.155 $
  */
 %}
 
@@ -309,7 +309,34 @@ Catch(a,_id) ->
       assert(myself != NULL);
 
       myself->checkAttributes();
-
+      
+      //Check for SAerror 00003
+      if (globals::ASTEmap[globals::PPcurrentScope]->attributes["exitOnStandardFault"] == "yes")
+      {
+        if ( myself->attributes["faultName"] == "ambiguousReceive" ||
+             myself->attributes["faultName"] == "completionConditionFailure" ||
+             myself->attributes["faultName"] == "conflictingReceive" ||
+             myself->attributes["faultName"] == "conflictingRequest" ||
+             myself->attributes["faultName"] == "correlationViolation" ||
+             myself->attributes["faultName"] == "invalidBranchCondition" ||
+             myself->attributes["faultName"] == "invalidExpressionValue" ||
+             myself->attributes["faultName"] == "invalidVariables" ||
+             myself->attributes["faultName"] == "joinFailurea" ||
+             myself->attributes["faultName"] == "mismatchedAssignmentFailurei" ||
+             myself->attributes["faultName"] == "missingReply" ||
+             myself->attributes["faultName"] == "missingRequest" ||
+             myself->attributes["faultName"] == "scopeInitializationFailure" ||
+             myself->attributes["faultName"] == "selectionFailure" ||
+             myself->attributes["faultName"] == "subLanguageExecutionFaultx" ||
+             myself->attributes["faultName"] == "uninitializedPartnerRole" ||
+             myself->attributes["faultName"] == "uninitializedVariablez" ||
+             myself->attributes["faultName"] == "unsupportedReference" ||
+             myself->attributes["faultName"] == "xsltInvalidSourcel" ||
+             myself->attributes["faultName"] == "xsltStylesheetNotFound" )
+             
+             SAerror( 3, myself->attributes["faultName"], myself->attributes["referenceLine"]);
+      }
+      
       // make fault variable visible
       if (myself->attributes["faultVariable"] != "")
         globals::ASTE_variableNames.insert(toString(globals::PPcurrentScope) + "." + myself->attributes["faultVariable"]);

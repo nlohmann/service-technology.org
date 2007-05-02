@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/02 10:58:46 $
+ * \date    \$Date: 2007/05/02 14:48:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.99 $
+ * \version \$Revision: 1.100 $
  */
 
 
@@ -80,7 +80,7 @@ using std::endl;
  */
 ASTE::ASTE(unsigned int myid, unsigned int mytype) :
   id(myid), type(mytype), controlFlow(POSITIVECF), visConnection("none"), secVisConnection("none"), 
-  plRoleDetails(NULL), isStartActivity(false), cyclic(false), highlighted(false),
+  plRoleDetails(NULL), isStartActivity(false), cyclic(false), highlighted(false), isUserDefined(true), callable(true),
   sourceActivity(0), targetActivity(0), max_occurrences(1), max_loops(UINT_MAX), enclosedFH(0), enclosedCH(0), drawn(false),
   partnerLinkType(NULL)
 {
@@ -904,7 +904,60 @@ string ASTE::definePartnerLink()
   return name;
 }
 
+/*!
+ * \brief enters a possibly triggered fault to the appropriate set
+ *
+ * \todo comment me
+ */
+void ASTE::enterFault(string fault)
+{
+  if ( fault == "" )
+  {
+    return;
+  }
 
+  possiblyTriggeredFaults.insert( fault );
+  if ( id > 1 )
+  {
+    globals::ASTEmap[parentScopeId]->enterFault( fault );
+  }
+}
+
+/*!
+ * \brief enters a possibly triggered fault to the appropriate set
+ *
+ * \todo comment me
+ */
+void ASTE::enterFault(WSDL_PartnerLinkType * plt)
+{
+  if ( plt == NULL )
+  {
+    return;
+  }
+  if ( plt->role1.second != NULL )
+  {
+    if ( plt->role1.second->operation1 != NULL )
+    {
+      enterFault( plt->role1.second->operation1->faultName );
+    }
+    if ( plt->role1.second->operation2 != NULL )
+    {
+      enterFault( plt->role1.second->operation2->faultName );
+    }
+  }
+  if ( plt->role2.second != NULL )
+  {
+    if ( plt->role2.second->operation1 != NULL )
+    {
+      enterFault( plt->role2.second->operation1->faultName );
+    }
+    if ( plt->role2.second->operation2 != NULL )
+    {
+      enterFault( plt->role2.second->operation2->faultName );
+    }
+  }
+  
+}
 
 
 

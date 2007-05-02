@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/02 12:56:05 $
+ * \date    \$Date: 2007/05/02 14:48:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.155 $
+ * \version \$Revision: 1.156 $
  */
 %}
 
@@ -84,6 +84,27 @@ Process(a,b,c,d,e,g,i,_id) ->
     i // inner activity
     e g
     {
+
+      bool callableFH = false;
+      for ( set< string >::iterator fault = globals::ASTEmap[ e->id ]->catches.begin(); fault != globals::ASTEmap[ e->id ]->catches.end(); fault++)
+      {
+        string faultName = fault->substr( fault->find_first_of( "|" ) + 1 );
+        faultName = faultName.substr( 0, faultName.find_first_of( "|" ) );
+        cerr << faultName << endl;
+
+        if ( myself->possiblyTriggeredFaults.find( faultName ) != myself->possiblyTriggeredFaults.end() )
+        {
+          cerr << "callable !" << endl;
+          callableFH = true;
+        }
+      }
+      if ( globals::ASTEmap[ e->id ]->hasCatchAll )
+      {
+        callableFH = true;
+      }
+      
+      globals::ASTEmap[ e->id ]->callable = callableFH;
+
       // collect enclosed source and target links
       assert(globals::ASTEmap[i->id] != NULL);
       myself->enclosedSourceLinks = globals::ASTEmap[i->id]->enclosedSourceLinks;
@@ -480,6 +501,8 @@ OnMessage(a,b,c,_id) ->
       myself->checkAttributes();
 
       myself->checkPartnerLink();
+     
+      globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
 
       // trigger [SA00063]
       if (b->length() != 0 && myself->attributes["variable"] != "")
@@ -839,6 +862,8 @@ volatile_Invoke(a,b,c,d,_id) ->
         SAerror(52, "", myself->attributes["referenceLine"]);
 
       myself->checkPartnerLink();
+     
+      globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
 
       myself->channelName = myself->createChannel((myself->attributes["outputVariable"] != ""));
       myself->inputVariableName = myself->checkVariable("inputVariable");
@@ -883,6 +908,8 @@ Receive(a,b,c,_id) ->
         SAerror(55, "", myself->attributes["referenceLine"]);
 
       myself->checkPartnerLink();
+     
+      globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
 
       myself->channelName = myself->createChannel();
       myself->variableName = myself->checkVariable("variable");
@@ -931,6 +958,8 @@ Reply(a,b,c,_id) ->
       /* above is generic */
 
       myself->checkPartnerLink();
+     
+      globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
 
       // trigger [SA00059]
       if (c->length() != 0 && myself->attributes["variable"] != "")
@@ -1083,6 +1112,7 @@ Throw(a,_id) ->
 
       myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
+      globals::ASTEmap[ myself->parentScopeId ]->enterFault( myself->attributes[ "faultName" ] );
     }
     a
     {
@@ -1936,6 +1966,27 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
     i // inner activity
     c d e f
     {
+
+      bool callableFH = false;
+      for ( set< string >::iterator fault = globals::ASTEmap[ c->id ]->catches.begin(); fault != globals::ASTEmap[ c->id ]->catches.end(); fault++)
+      {
+        string faultName = fault->substr( fault->find_first_of( "|" ) + 1 );
+        faultName = faultName.substr( 0, faultName.find_first_of( "|" ) );
+        cerr << faultName << endl;
+
+        if ( myself->possiblyTriggeredFaults.find( faultName ) != myself->possiblyTriggeredFaults.end() )
+        {
+          cerr << "callable !" << endl;
+          callableFH = true;
+        }
+      }
+      if ( globals::ASTEmap[ c->id ]->hasCatchAll )
+      {
+        callableFH = true;
+      }
+      
+      globals::ASTEmap[ c->id ]->callable = callableFH;
+
       set< unsigned int > innerIds = globals::ASTEmap[ i->id ]->enclosedActivities;
       innerIds.insert( i->id );
       set< unsigned int > faultIds = globals::ASTEmap[ c->id ]->enclosedActivities;

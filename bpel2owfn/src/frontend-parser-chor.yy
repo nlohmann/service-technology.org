@@ -29,7 +29,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/04/29 20:55:37 $
+ * \date    \$Date: 2007/05/02 13:19:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  *
  * \ingroup frontend
  */
@@ -113,10 +113,8 @@
 #include "helpers.h"
 #include "debug.h"
 #include "globals.h"
-#include "ast-details.h"
 
 
-using namespace kc;
 using std::cerr;
 using std::endl;
 
@@ -126,9 +124,7 @@ using std::endl;
  * External variables
  *****************************************************************************/
 
-extern char *frontend_text;	// from flex: the current token
 extern int frontend_lex();	// from flex: the lexer funtion
-extern int frontend_lineno;	// from flex: the current line number
 
 // use the functions of the BPEL parser
 #define frontend_chor_lex() frontend_lex()
@@ -205,6 +201,7 @@ tMessageLink_list:
 
 tMessageLink:
   K_MESSAGELINK arbitraryAttributes X_SLASH
+    { std::cerr << globals::tempAttributes["sendActivity"] << " -> " << globals::tempAttributes["receiveActivity"] << std::endl; }
 ;
 
 
@@ -215,4 +212,5 @@ tMessageLink:
 arbitraryAttributes:
   /* empty */
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
+    { globals::tempAttributes[string($1->name)] = string($3->name); }
 ;

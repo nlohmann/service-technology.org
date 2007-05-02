@@ -36,7 +36,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/05/02 08:32:44 $
+ * \date    \$Date: 2007/05/02 13:19:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  *
  * \ingroup frontend
  */
@@ -146,8 +146,6 @@ extern int frontend_lex();	// from flex: the lexer funtion
  * Global variables
  *****************************************************************************/
 
-std::map<std::string, std::string> tempAttributes;
-
 WSDL_Message *temp_message = NULL;
 WSDL_PartnerLinkType *temp_partnerLinkType = NULL;
 WSDL_PortType *temp_portType = NULL;
@@ -164,6 +162,7 @@ tDefinions:
   tImport_list tTypes tMessage_list tPortType_list tBinding_list tService_list
   tPropertyPropertyAlias_list tPartnerLinkType_list
   X_SLASH K_DEFINITIONS X_CLOSE
+    { globals::tempAttributes.clear(); }
 ;
 
 
@@ -210,7 +209,7 @@ tMessage_list:
 
 tMessage:
   K_MESSAGE arbitraryAttributes
-    { temp_message = new WSDL_Message(tempAttributes["name"]); }
+    { temp_message = new WSDL_Message(globals::tempAttributes["name"]); }
   X_NEXT tPart_list X_SLASH K_MESSAGE
     { globals::WSDLInfo.messages[temp_message->name] = temp_message; }
 ;
@@ -222,7 +221,7 @@ tPart_list:
 
 tPart:
   K_PART arbitraryAttributes X_SLASH
-    { temp_message->parts[tempAttributes["name"]] = tempAttributes["type"]; }
+    { temp_message->parts[globals::tempAttributes["name"]] = globals::tempAttributes["type"]; }
 ;
 
 
@@ -237,7 +236,7 @@ tPortType_list:
 
 tPortType:
   K_PORTTYPE arbitraryAttributes
-    { temp_portType = new WSDL_PortType(tempAttributes["name"]); }
+    { temp_portType = new WSDL_PortType(globals::tempAttributes["name"]); }
   X_NEXT tOperation_list X_SLASH K_PORTTYPE
     { globals::WSDLInfo.portTypes[temp_portType->name] = temp_portType; }
 ;
@@ -249,7 +248,7 @@ tOperation_list:
 
 tOperation:
   K_OPERATION arbitraryAttributes
-    { temp_portType->addOperation(tempAttributes["name"]); }
+    { temp_portType->addOperation(globals::tempAttributes["name"]); }
   X_NEXT tInputOutputFault_list X_SLASH K_OPERATION
 ;
 
@@ -266,17 +265,17 @@ tInputOutputFault:
 
 tInput:
   K_INPUT arbitraryAttributes X_SLASH
-    { temp_portType->addOperationDetails("input", tempAttributes["message"]); }
+    { temp_portType->addOperationDetails("input", globals::tempAttributes["message"]); }
 ;
 
 tOutput:
   K_OUTPUT arbitraryAttributes X_SLASH
-    { temp_portType->addOperationDetails("output", tempAttributes["message"]); }
+    { temp_portType->addOperationDetails("output", globals::tempAttributes["message"]); }
 ;
 
 tFault:
   K_FAULT arbitraryAttributes X_SLASH
-    { temp_portType->addOperationDetails("fault", tempAttributes["message"], tempAttributes["name"]); }
+    { temp_portType->addOperationDetails("fault", globals::tempAttributes["message"], globals::tempAttributes["name"]); }
 ;
 
 
@@ -347,7 +346,7 @@ tPartnerLinkType_list:
 
 tPartnerLinkType:
   K_PARTNERLINKTYPE arbitraryAttributes
-    { temp_partnerLinkType = new WSDL_PartnerLinkType(tempAttributes["name"]); }
+    { temp_partnerLinkType = new WSDL_PartnerLinkType(globals::tempAttributes["name"]); }
   X_NEXT tRoles X_SLASH K_PARTNERLINKTYPE
     { globals::WSDLInfo.partnerLinkTypes[temp_partnerLinkType->name] = temp_partnerLinkType; }
 ;
@@ -359,11 +358,11 @@ tRoles:
 
 tRole:
   K_ROLE arbitraryAttributes X_SLASH
-    { temp_partnerLinkType->addRole(tempAttributes["name"], tempAttributes["portType"]); }
+    { temp_partnerLinkType->addRole(globals::tempAttributes["name"], globals::tempAttributes["portType"]); }
 | K_ROLE arbitraryAttributes X_NEXT
-    { tempAttributes["RoleName"] = tempAttributes["name"]; }
+    { globals::tempAttributes["RoleName"] = globals::tempAttributes["name"]; }
   K_PORTTYPE arbitraryAttributes X_SLASH X_NEXT X_SLASH K_ROLE
-    { temp_partnerLinkType->addRole(tempAttributes["RoleName"], tempAttributes["name"]); }
+    { temp_partnerLinkType->addRole(globals::tempAttributes["RoleName"], globals::tempAttributes["name"]); }
 ;
 
 
@@ -374,5 +373,5 @@ tRole:
 arbitraryAttributes:
   /* empty */
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
-    { tempAttributes[string($1->name)] = string($3->name); }
+    { globals::tempAttributes[string($1->name)] = string($3->name); }
 ;

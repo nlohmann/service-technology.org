@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/04/30 15:39:02 $
+ * \date    \$Date: 2007/05/02 13:19:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 
 
@@ -114,4 +114,6 @@ namespace globals {
   string wsdl_filename = "";
 
   WSDL WSDLInfo = WSDL();
+
+  map<string, string> tempAttributes;
 }

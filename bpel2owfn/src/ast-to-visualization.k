@@ -31,7 +31,7 @@
  * 
  * \since   2007-04-18
  *
- * \date    \$Date: 2007/05/02 11:44:19 $
+ * \date    \$Date: 2007/05/02 12:17:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  *
  */
 
@@ -642,6 +642,8 @@ Pick(a,b,c,_id) ->
   [visualization: 
   {
     (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"Pick\";" << endl;  
+    (*output) << "pick" << toString(_id->value) << " [shape=diamond style=filled label=\"?\"];" << endl;
+    globals::ASTEmap[_id->value]->secVisConnection = "if" + toString(_id->value);
   }
   a b c
   {
@@ -660,18 +662,36 @@ Pick(a,b,c,_id) ->
 
     foreach(branch=OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list b)
     {
+      globals::visArcs += "pick" + toString(_id->value) + " -> " + globals::ASTEmap[innerActivity->id]->secVisConnection + "["; 
+      if (globals::ASTEmap[innerActivity->id]->structured())
+      {
+        globals::visArcs += "lhead=";
+        globals::visArcs += "cluster";          
+        globals::visArcs += toString(innerActivity->id);          
+        globals::visArcs += " ";          
+      }
+      globals::visArcs += "];\n";
+      
       if (childcounter<=middle)
       {
-        globals::ASTEmap[_id->value]->secVisConnection = globals::ASTEmap[innerActivity->id]->secVisConnection;
         globals::ASTEmap[_id->value]->visConnection = globals::ASTEmap[innerActivity->id]->visConnection;
       }
       childcounter +=1;
     }
     foreach(branch=OnAlarm(*,innerActivity,_id3); tOnAlarm_list c)
     {
+      globals::visArcs += "pick" + toString(_id->value) + " -> " + globals::ASTEmap[innerActivity->id]->secVisConnection + "["; 
+      if (globals::ASTEmap[innerActivity->id]->structured())
+      {
+        globals::visArcs += "lhead=";
+        globals::visArcs += "cluster";          
+        globals::visArcs += toString(innerActivity->id);          
+        globals::visArcs += " ";          
+      }
+      globals::visArcs += "];\n";
+      
       if (childcounter<=middle)
       {
-        globals::ASTEmap[_id->value]->secVisConnection = globals::ASTEmap[innerActivity->id]->secVisConnection;
         globals::ASTEmap[_id->value]->visConnection = globals::ASTEmap[innerActivity->id]->visConnection;
       }
       childcounter +=1;

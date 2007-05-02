@@ -1,0 +1,194 @@
+<!--
+This example process was taken from the Business Process Execution Language for
+Web Services Version 1.1 Specification available under the following URLs
+
+   * http://dev2dev.bea.com/technologies/webservices/BPEL4WS.jsp
+
+   * http://www-106.ibm.com/developerworks/webservices/library/ws-bpel
+
+   * http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnbiz2k2/html/bpel1-1.asp
+
+   * http://ifr.sap.com/bpel4ws/
+
+   * http://www.siebel.com/bpel
+
+BEA, IBM, Microsoft, SAP AG and Siebel Systems (collectively, the "Authors")
+agree to grant you a royalty-free license, under reasonable, non-discriminatory
+terms and conditions, to patents that they deem necessary to implement the
+Business Process Execution Language for Web Services Specification.
+
+THE Business Process Execution Language for Web Services SPECIFICATION IS
+PROVIDED "AS IS," AND THE AUTHORS MAKE NO REPRESENTATIONS OR WARRANTIES,
+EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THE BPEL4WS SPECIFICATION ARE SUITABLE FOR ANY PURPOSE;
+NOR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY THIRD PARTY
+PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+
+THE AUTHORS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF
+THE BPEL4WS SPECIFICATION.
+-->
+
+<process name="auctionService"
+    targetNamespace="http://www.auction.com"
+    variableAccessSerializable="no"
+    xmlns:as="http://www.auction.com/wsdl/auctionService"
+    xmlns:wsa="http://schemas.xmlsoap.org/ws/2003/03/addressing"
+    xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/">
+    
+    <!-- Partners -->
+    <partnerLinks>
+	<partnerLink name="seller"
+	    partnerLinkType="as:sellerAuctionHouseLT"
+	    myRole="auctionHouse" partnerRole="seller"/>
+	<partnerLink name="buyer"
+	    partnerLinkType="as:buyerAuctionHouseLT"
+	    myRole="auctionHouse" partnerRole="buyer"/>
+	<partnerLink name="auctionRegistrationService"
+	    partnerLinkType=
+	    "as:auctionHouseAuctionRegistrationServiceLT"
+	    myRole="auctionHouse"
+	    partnerRole="auctionRegistrationService"/>
+    </partnerLinks>
+
+    <!-- Variables -->
+    <variables>
+	<variable name="sellerData" messageType="as:sellerData"/>
+	<variable name="sellerAnswerData" messageType="as:sellerAnswerData"/>
+	<variable name="buyerData" messageType="as:buyerData"/>
+	<variable name="buyerAnswerData" messageType="as:buyerAnswerData"/>
+	<variable name="auctionData"
+	    messageType="as:auctionData"/>
+	<variable name="auctionAnswerData"
+	    messageType="as:auctionAnswerData"/>
+    </variables>
+    
+    <!-- Correlation set for correlating buyer and seller request
+    as well as auction house and auction registration service
+    exchange -->
+    <correlationSets>
+	<correlationSet name="auctionIdentification"
+	    properties="as:auctionId"/>
+    </correlationSets>
+    
+    <!-- Structure of the business process -->
+    <sequence>
+
+	<!-- Process buyer and seller request concurrently
+	Either one can create a process instance -->
+	<flow>
+	    <!-- Process seller request -->
+	    <receive name="acceptSellerInformation"
+		partnerLink="seller"
+		portType="as:sellerPT"
+		operation="provide"
+		variable="sellerData"
+		createInstance="yes">
+		<correlations>
+		    <correlation set="auctionIdentification"
+			initiate="yes"/>
+		</correlations>
+	    </receive>
+	    
+	    <!-- Process buyer request -->
+	    <receive name="acceptBuyerInformation"
+		partnerLink="buyer"
+		portType="as:buyerPT"
+		operation="provide"
+		variable="buyerData"
+		createInstance="yes">
+		<correlations>
+		    <correlation set="auctionIdentification"
+			initiate="yes"/>
+		</correlations>
+	    </receive>
+	</flow>
+
+	<!-- Invoke auction registration service
+	by setting the target endpoint reference
+	and setting my own endpoint reference for call back
+	and receiving the answer
+	Correlation of request and answer is via auction Id -->
+	<assign>
+	    <copy>
+		<from>
+		    <wsa:EndpointReference>
+			<wsa:Address>xs:anyURI</wsa:Address>
+			<wsa:ServiceName>ars:RegistrationService</wsa:ServiceName>
+		    </wsa:EndpointReference>
+		</from>
+		<to partnerLink="auctionRegistrationService"/>
+	    </copy>
+	</assign>
+	<assign>
+	    <copy>
+		<from partnerLink="auctionRegistrationService"
+		    endpointReference="myRole"/>
+		<to variable="auctionData"
+		    part="auctionHouseServiceRef"/>
+    	    </copy>
+	</assign>
+	
+	<invoke name="registerAuctionResults"
+	    partnerLink="auctionRegistrationService"
+	    portType="as:auctionRegistrationPT"
+	    operation="process"
+	    inputVariable="auctionData">
+	    <correlations>
+		<correlation set="auctionIdentification"/>
+	    </correlations>
+	</invoke>
+	
+	<receive name="receiveAuctionRegistrationInformation"
+	    partnerLink="auctionRegistrationService"
+	    portType="as:auctionRegistrationAnswerPT"
+	    operation="answer"
+	    variable="auctionAnswerData">
+	    <correlations>
+		<correlation set="auctionIdentification"/>
+	    </correlations>
+	</receive>
+
+	<!-- Send responses back to seller and buyer -->
+	<flow>
+	    <!-- Process seller response by
+	    setting the seller to the endpoint reference provided by the seller
+	    and invoking the response -->
+	    <sequence>
+		<assign>
+		    <copy>
+			<from variable="sellerData"
+			    part="endpointReference"/>
+			<to partnerLink="seller"/>
+		    </copy>
+		</assign>
+		
+		<invoke name="respondToSeller"
+		    partnerLink="seller"
+		    portType="as:sellerAnswerPT"
+		    operation="answer"
+		    inputVariable="sellerAnswerData"/>
+	    </sequence>
+	    
+	    <!-- Process buyer response by
+	    setting the buyer to the endpoint reference provided by the buyer
+	    and invoking the response -->
+	    <sequence>
+		<assign>
+		    <copy>
+			<from variable="buyerData"
+			    part="endpointReference"/>
+			<to partnerLink="buyer"/>
+		    </copy>
+		</assign>
+		
+		<invoke name="respondToBuyer"
+		    partnerLink="buyer"
+		    portType="as:buyerAnswerPT"
+		    operation="answer"
+		    inputVariable="buyerAnswerData"/>
+	    </sequence>
+	</flow>
+    </sequence>
+</process>

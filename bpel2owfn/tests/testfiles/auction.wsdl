@@ -1,0 +1,165 @@
+<!--
+This example process was taken from the Business Process Execution Language for
+Web Services Version 1.1 Specification available under the following URLs
+
+   * http://dev2dev.bea.com/technologies/webservices/BPEL4WS.jsp
+
+   * http://www-106.ibm.com/developerworks/webservices/library/ws-bpel
+
+   * http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnbiz2k2/html/bpel1-1.asp
+
+   * http://ifr.sap.com/bpel4ws/
+
+   * http://www.siebel.com/bpel
+
+BEA, IBM, Microsoft, SAP AG and Siebel Systems (collectively, the "Authors")
+agree to grant you a royalty-free license, under reasonable, non-discriminatory
+terms and conditions, to patents that they deem necessary to implement the
+Business Process Execution Language for Web Services Specification.
+
+THE Business Process Execution Language for Web Services SPECIFICATION IS
+PROVIDED "AS IS," AND THE AUTHORS MAKE NO REPRESENTATIONS OR WARRANTIES,
+EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THE BPEL4WS SPECIFICATION ARE SUITABLE FOR ANY PURPOSE;
+NOR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY THIRD PARTY
+PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+
+THE AUTHORS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF
+THE BPEL4WS SPECIFICATION.
+-->
+
+<definitions
+    targetNamespace="http://www.auction.com/wsdl/auctionService"
+    xmlns:tns="http://www.auction.com/wsdl/auctionService"
+    xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/"
+    xmlns:wsa="http://schemas.xmlsoap.org/ws/2003/03/addressing"
+    xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://schemas.xmlsoap.org/wsdl/">
+    
+    <!-- Messages for communication with the seller -->
+    <message name="sellerData">
+	<part name="creditCardNumber" type="xsd:string"/>
+	<part name="shippingCosts" type="xsd:integer"/>
+	<part name="auctionId" type="xsd:integer"/>
+	<part name="endpointReference" type="wsa:EndpointReferenceType"/>
+    </message>
+    
+    <message name="sellerAnswerData">
+	<part name="thankYouText" type="xsd:string"/>
+    </message>
+
+    <!-- Messages for communication with the buyer -->
+    <message name="buyerData">
+	<part name="creditCardNumber" type="xsd:string"/>
+	<part name="phoneNumber" type="xsd:string"/>
+	<part name="ID" type="xsd:integer"/>
+	<part name="endpointReference" type="wsa:EndpointReferenceType"/>
+    </message>
+    
+    <message name="buyerAnswerData">
+	<part name="thankYouText" type="xsd:string"/>
+    </message>
+    
+    <!-- Messages for communication with the auction registration service -->
+    <message name="auctionData">
+	<part name="auctionId" type="xsd:integer"/>
+	<part name="amount" type="xsd:integer"/>
+    </message>
+    
+    <message name="auctionAnswerData">
+	<part name="registrationId" type="xsd:integer"/>
+	<part name="auctionId" type="xsd:integer"/>
+	<part name="auctionHouseEndpointReference"
+	    type="wsa:EndpointReferenceType"/>
+    </message>
+    
+    <!-- Port types for interacting with the seller -->
+    <portType name="sellerPT">
+	<operation name="submit">
+	    <input message="tns:sellerData"/>
+	</operation>
+    </portType>
+    
+    <portType name="sellerAnswerPT">
+	<operation name="answer">
+	    <input message="tns:sellerAnswerData"/>
+	</operation>
+    </portType>
+    
+    <!-- Port types for interacting with the buyer -->
+    <portType name="buyerPT">
+	<operation name="submit">
+	    <input message="tns:buyerData"/>
+	</operation>
+    </portType>
+    
+    <portType name="buyerAnswerPT">
+	<operation name="answer">
+	    <input message="tns:buyerAnswerData"/>
+	</operation>
+    </portType>
+    
+    <!-- Port types for interacting with the auction registration service -->
+    <portType name="auctionRegistrationPT">
+	<operation name="process">
+	    <input message="tns:auctionData"/>
+	</operation>
+    </portType>
+    
+    <portType name="auctionRegistrationAnswerPT">
+	<operation name="answer">
+	    <input message="tns:auctionAnswerData"/>
+	</operation>
+    </portType>
+    
+    <!-- Context type used for locating business process via auction Id -->
+    <bpws:property name="auctionId"
+	type="xsd:string"/>
+    <bpws:propertyAlias propertyName="tns:auctionId"
+	messageType="tns:sellerData"
+	part="auctionId"/>
+    <bpws:propertyAlias propertyName="tns:auctionId"
+	messageType="tns:buyerData"
+	part="ID"/>
+    <bpws:propertyAlias propertyName="tns:auctionId"
+	messageType="tns:auctionData"
+	part="auctionId"/>
+    <bpws:propertyAlias propertyName="tns:auctionId"
+	messageType="tns:auctionAnswerData"
+	part="auctionId"/>
+    
+    <!-- Partner link type for seller/auctionHouse -->
+    <plnk:partnerLinkType name="tns:sellerAuctionHouseLT">
+	<plnk:role name="auctionHouse">
+	    <plnk:portType name="tns:sellerPT"/>
+	</plnk:role>
+	<plnk:role name="seller">
+	    <plnk:portType name="tns:sellerAnswerPT"/>
+	</plnk:role>
+    </plnk:partnerLinkType>
+
+    <!-- Partner link type for buyer/auctionHouse -->
+    <plnk:partnerLinkType name="buyerAuctionHouseLT">
+	<plnk:role name="auctionHouse">
+	    <plnk:portType name="tns:buyerPT"/>
+	</plnk:role>
+	<plnk:role name="buyer">
+	    <plnk:portType name="tns:buyerAnswerPT"/>
+	</plnk:role>
+    </plnk:partnerLinkType>
+
+    <!-- Partner link type for auction house/auction
+    registration service -->
+    <plnk:partnerLinkType name="auctionHouseAuctionRegistrationServiceLT">
+	<plnk:role name="auctionRegistrationService">
+	    <plnk:portType name="tns:auctionRegistrationPT"/>
+	</plnk:role>
+	<plnk:role name="auctionHouse">
+	    <plnk:portType name="tns:auctionRegistrationAnswerPT"/>
+	</plnk:role>
+    </plnk:partnerLinkType>
+
+</definitions>

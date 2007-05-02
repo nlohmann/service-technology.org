@@ -1,0 +1,150 @@
+<!--
+This example process was taken from the Business Process Execution Language for
+Web Services Version 1.1 Specification available under the following URLs
+
+   * http://dev2dev.bea.com/technologies/webservices/BPEL4WS.jsp
+
+   * http://www-106.ibm.com/developerworks/webservices/library/ws-bpel
+
+   * http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnbiz2k2/html/bpel1-1.asp
+
+   * http://ifr.sap.com/bpel4ws/
+
+   * http://www.siebel.com/bpel
+
+BEA, IBM, Microsoft, SAP AG and Siebel Systems (collectively, the "Authors")
+agree to grant you a royalty-free license, under reasonable, non-discriminatory
+terms and conditions, to patents that they deem necessary to implement the
+Business Process Execution Language for Web Services Specification.
+
+THE Business Process Execution Language for Web Services SPECIFICATION IS
+PROVIDED "AS IS," AND THE AUTHORS MAKE NO REPRESENTATIONS OR WARRANTIES,
+EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THE BPEL4WS SPECIFICATION ARE SUITABLE FOR ANY PURPOSE;
+NOR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY THIRD PARTY
+PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+
+THE AUTHORS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF
+THE BPEL4WS SPECIFICATION.
+-->
+
+<definitions targetNamespace="http://manufacturing.org/wsdl/purchase"
+    xmlns:sns="http://manufacturing.org/xsd/purchase"
+    xmlns:pos="http://manufacturing.org/wsdl/purchase"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/">
+    
+    <import namespace="http://manufacturing.org/xsd/purchase"
+	location="http://manufacturing.org/xsd/purchase.xsd"/>
+    
+    <message name="POMessage">
+	<part name="customerInfo" type="sns:customerInfo"/>
+	<part name="purchaseOrder" type="sns:purchaseOrder"/>
+    </message>
+    
+    <message name="InvMessage">
+	<part name="IVC" type="sns:Invoice"/>
+    </message>
+    
+    <message name="orderFaultType">
+	<part name="problemInfo" type="xsd:string"/>
+    </message>
+    
+    <message name="shippingRequestMessage">
+	<part name="customerInfo" type="sns:customerInfo"/>
+    </message>
+    
+    <message name="shippingInfoMessage">
+	<part name="shippingInfo" type="sns:shippingInfo"/>
+    </message>
+    
+    <message name="scheduleMessage">
+	<part name="schedule" type="sns:scheduleInfo"/>
+    </message>
+    
+    <!-- portTypes supported by the purchase order process -->
+    <portType name="purchaseOrderPT">
+	<operation name="sendPurchaseOrder">
+	    <input message="pos:POMessage"/>
+	    <output message="pos:InvMessage"/>
+	    <fault name="cannotCompleteOrder"
+		message="pos:orderFaultType"/>
+	</operation>
+    </portType>
+    
+    <portType name="invoiceCallbackPT">
+	<operation name="sendInvoice">
+	    <input message="pos:InvMessage"/>
+	</operation>
+    </portType>
+    
+    <portType name="shippingCallbackPT">
+	<operation name="sendSchedule">
+	    <input message="pos:scheduleMessage"/>
+	</operation>
+    </portType>
+    
+    <!-- portType supported by the invoice services -->
+    <portType name="computePricePT">
+	<operation name="initiatePriceCalculation">
+	    <input message="pos:POMessage"/>
+	</operation>
+	<operation name="sendShippingPrice">
+	    <input message="pos:shippingInfoMessage"/>
+    	</operation>
+    </portType>
+    
+    <!-- portType supported by the shipping service -->
+    <portType name="shippingPT">
+	<operation name="requestShipping">
+	    <input message="pos:shippingRequestMessage"/>
+	    <output message="pos:shippingInfoMessage"/>
+	    <fault name="cannotCompleteOrder"
+		message="pos:orderFaultType"/>
+	</operation>
+    </portType>
+    
+    <!-- portType supported by the production scheduling process -->
+    <portType name="schedulingPT">
+	<operation name="requestProductionScheduling">
+	    <input message="pos:POMessage"/>
+	</operation>
+	<operation name="sendShippingSchedule">
+	    <input message="pos:scheduleMessage"/>
+	</operation>
+    </portType>
+    
+    <plnk:partnerLinkType name="purchasingLT">
+	<plnk:role name="purchaseService">
+	    <plnk:portType name="pos:purchaseOrderPT"/>
+    	</plnk:role>
+    </plnk:partnerLinkType>
+    
+    <plnk:partnerLinkType name="invoicingLT">
+	<plnk:role name="invoiceService">
+	    <plnk:portType name="pos:computePricePT"/>
+	</plnk:role>
+	<plnk:role name="invoiceRequester">
+	    <plnk:portType name="pos:invoiceCallbackPT"/>
+	</plnk:role>
+    </plnk:partnerLinkType>
+    
+    <plnk:partnerLinkType name="shippingLT">
+	<plnk:role name="shippingService">
+	    <plnk:portType name="pos:shippingPT"/>
+	</plnk:role>
+	<plnk:role name="shippingRequester">
+	    <plnk:portType name="pos:shippingCallbackPT"/>
+	</plnk:role>
+    </plnk:partnerLinkType>
+    
+    <plnk:partnerLinkType name="schedulingLT">
+	<plnk:role name="schedulingService">
+	    <plnk:portType name="pos:schedulingPT"/>
+	</plnk:role>
+    </plnk:partnerLinkType>
+
+</definitions>

@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/29 19:09:57 $
+ * \date    \$Date: 2007/05/03 06:13:17 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.79 $
+ * \version \$Revision: 1.80 $
  */
 
 
@@ -148,7 +148,7 @@ void print_help()
   trace("Options:\n");
   trace(" -m, --mode=MODE        use the given mode\n");
   trace(" -p, --parameter=PARAM  modify processing with given parameter\n");
-  trace(" -i, --input=FILE       read input from FILE\n");
+  trace(" -i, --input=FILE       read a BPEL process from FILE\n");
   trace(" -o, --output[=NAME]    write output to file (NAME sets filename)\n");
   trace(" -f, --format=FORMAT    create output of the given format\n");
   trace(" -l, --log=NAME         create log file (NAME sets filename)\n");
@@ -156,6 +156,7 @@ void print_help()
   trace(" -r, --reduce=NUMBER    apply structural reduction level (NUMBER=0..5)\n");
   trace(" -h, --help             print this help list and exit\n");
   trace(" -v, --version          print program version and exit\n");
+  trace(" -w, --wsdl=FILE        read a WSDL file from FILE\n");
   trace("\n");
   trace("  MODE is one of the following (at most one mode permitted):\n");
   trace("    petrinet            create a Petri net model\n");

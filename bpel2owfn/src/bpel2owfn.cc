@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/02 06:29:19 $
+ * \date    \$Date: 2007/05/03 06:13:17 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.168 $
+ * \version \$Revision: 1.169 $
  */
 
 
@@ -139,7 +139,7 @@ void open_file(string file)
     if (!(frontend_in = fopen(globals::filename.c_str(), "r"))) 
     {
       cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
-      exit(1);
+      exit(2);
     }
   }
 }
@@ -645,7 +645,7 @@ int main( int argc, char *argv[])
 	genericError(104, "", toString(frontend_lineno), ERRORLEVEL_CRITICAL);
 
 	cleanup();
-    	return 1;
+    	return 3;
       }
       else
       {

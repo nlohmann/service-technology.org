@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/03 06:13:17 $
+ * \date    \$Date: 2007/05/03 09:00:50 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.169 $
+ * \version \$Revision: 1.170 $
  */
 
 
@@ -97,8 +97,9 @@ extern void frontend_restart(FILE*);		// from flex
  * Global variables
  *****************************************************************************/
 
-/// The Petri Net
+/// The Petri Nets
 PetriNet PN = PetriNet();
+PetriNet PN2 = PetriNet();
 
 /******************************************************************************
  * program parts
@@ -190,7 +191,7 @@ void finish_AST()
 
 
 // output of every single processed file
-void single_output(set< string >::iterator file, PetriNet PN2) 
+void single_output(set< string >::iterator file)
 {
   // print the AST?
   if (modus == M_AST)
@@ -307,7 +308,7 @@ void single_output(set< string >::iterator file, PetriNet PN2)
 
 
 // Final Output of the result
-void final_output( PetriNet PN2) 
+void final_output()
 {
   if (modus == M_CONSISTENCY)
     PN = PN2;
@@ -636,7 +637,7 @@ int main( int argc, char *argv[])
     if (frontend_nerrs == 0)
     {
       finish_AST();
-      single_output(file, PN2);
+      single_output(file);
     }
     else /* parse error */
     {
@@ -652,7 +653,7 @@ int main( int argc, char *argv[])
   	genericError(105, "", toString(frontend_lineno), ERRORLEVEL_NOTICE);
 
 	finish_AST();
-	single_output(file, PN2);
+	single_output(file);
       }
     }
 
@@ -662,7 +663,7 @@ int main( int argc, char *argv[])
 
   trace(TRACE_INFORMATION, "All files have been parsed.\n");
 
-  final_output(PN2);
+  final_output();
 
   if (debug_level != TRACE_ERROR)
     cerr << "==============================================================================" << endl << endl;

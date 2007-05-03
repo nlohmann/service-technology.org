@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/03 06:13:17 $
+ * \date    \$Date: 2007/05/03 09:00:50 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  */
 
 
@@ -461,6 +461,8 @@ void parse_command_line(int argc, char* argv[])
 		  trace(TRACE_ALWAYS, "Use -h to get a list of valid debug modes.\n");
 		  cleanup();
 		  exit(1);
+	        }
+		break;
 	      }
 
       case 'r':
@@ -473,7 +475,6 @@ void parse_command_line(int argc, char* argv[])
 		    cleanup();
 		    exit(1);
 		  }
-		}
 
 		break;
 	      }

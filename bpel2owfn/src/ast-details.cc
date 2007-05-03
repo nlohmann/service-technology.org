@@ -29,13 +29,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/03 07:45:05 $
+ * \date    \$Date: 2007/05/03 09:17:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.102 $
+ * \version \$Revision: 1.103 $
  */
 
 
@@ -973,6 +973,10 @@ string ASTE::definePartnerLink()
 
   return name;
 }
+
+
+
+
 
 /*!
  * \brief enters a possibly triggered fault to the appropriate set

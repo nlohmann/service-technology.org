@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/04/27 11:17:17 $
+ * \date    \$Date: 2007/05/03 16:39:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
 */
 %}
 
@@ -1013,7 +1013,56 @@ void PForEach(impl_tForEach* abstract_phylum, uview current_view)
   header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
+  assert(globals::ASTEmap[phylum->id] != NULL);
+  ASTE *myself = globals::ASTEmap[phylum->id];
 
+  // the patterns for the parallel <forEach>
+  if (globals::ASTEmap[phylum->id]->attributes["parallel"] == "yes")
+  {
+    switch(current_view)
+    {
+      case(petrinetsmall_enum):
+	{
+  	  Place *p1 = PN.newPlace(prefix + "initial");
+  	  Place *p2 = PN.newPlace(prefix + "final");
+
+          Transition *t1 = PN.newTransition(prefix + "split");
+	  PN.newArc(p1, t1);
+
+	  Transition *t2 = PN.newTransition(prefix + "join");
+	  PN.newArc(t2, p2);
+
+//	  phylum->activity_1->tScope_1->unparse(pseudoPrinter, current_view);
+
+	  for (unsigned int branch = 1; branch <= myself->max_loops +1; branch++)
+	  {
+	    Place *p_start = PN.newPlace(prefix + "start_branch_" + toString(branch));
+	    Place *p_end = PN.newPlace(prefix + "end_branch_" + toString(branch));
+
+	    PN.newArc(t1, p_start);
+	    PN.newArc(p_end, t2);
+	  }
+
+  	  // unparse the standard elements
+  	  phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+          break;	  
+	}
+
+
+      case(petrinetnew_enum):
+      {
+	cerr << "no pattern" << endl;
+	break;
+      }
+      
+      default: { /* no pattern in this case */ }
+    }
+  }
+  else
+    cerr << "no pattern" << endl;
+
+/*
   // the patterns for the parallel <forEach>
   if (globals::ASTEmap[phylum->id]->attributes["parallel"] == "no")
   {
@@ -1073,14 +1122,14 @@ void PForEach(impl_tForEach* abstract_phylum, uview current_view)
 	  break;
 	}
 
-      default: { /* no pattern in this case */ }
+      default: {  }
     }
   }
   else
   {
     assert( false == "No pattern for parallel FOREACH, yet!" );
   }
-
+*/
 
   footer(phylum->id, true);
 }

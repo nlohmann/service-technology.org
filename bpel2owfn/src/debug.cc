@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/03 06:13:17 $
+ * \date    \$Date: 2007/05/03 07:45:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.86 $
+ * \version \$Revision: 1.87 $
  *
  * \ingroup debug
  */
@@ -424,7 +424,7 @@ void genericError(unsigned int code, string information, string line, error_leve
 	  break; }
 
     case(116): // <opaqueActivity> replaced by <empty>
-	{ cerr << "replaced <opaqueActivity> with <empty> activity" << endl;
+	{ cerr << "assuming <empty> semantics for <opaqueActivity>" << endl;
 	  break; }
 
     case(117): // ignoring attribute suppressJoinFailure="no"
@@ -485,6 +485,10 @@ void genericError(unsigned int code, string information, string line, error_leve
     case(130): // WSDL partnerLinkType was not found
 	{ cerr << information << endl;
 	  break; }	  
+
+    case(131): // BPEL4Chor activity name is not part of a messageLink
+	{ cerr << information << endl;
+	  break; }
   }
 
   cerr << endl;

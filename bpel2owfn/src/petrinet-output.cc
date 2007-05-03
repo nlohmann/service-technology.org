@@ -30,13 +30,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/04/27 11:17:17 $
+ * \date    \$Date: 2007/05/03 07:45:05 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.94 $
+ * \version \$Revision: 1.95 $
  *
  * \ingroup petrinet
  */
@@ -378,6 +378,8 @@ string Transition::output_dot() const
     result += "label=\"empty\" fillcolor=gray";
   if (history.size() == 1 && history[0].find("internal.assign") != string::npos)
     result += "label=\"asgn\" fillcolor=gray";
+  if (history.size() == 1 && history[0].find("internal.opaqueActivity") != string::npos)
+    result += "label=\"opque\" fillcolor=gray";
 
   // communicating activities
   if (history.size() == 1 && history[0].find("internal.receive") != string::npos)
@@ -527,7 +529,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   assert(output != NULL);
 
   (*output) << "digraph N {" << endl;
-  (*output) << " graph [fontname=\"Helvetica\" nodesep=0.3 ranksep=\"0.2 equally\" label=\"";
+  (*output) << " graph [fontname=\"Helvetica\" nodesep=0.3 ranksep=\"0.2 equally\" fontsize=10 label=\"";
 
   if (globals::reduction_level == 5)
     (*output) << "structurally reduced ";

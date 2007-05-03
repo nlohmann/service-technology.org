@@ -40,7 +40,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/04/29 20:10:09 $
+ * \date    \$Date: 2007/05/03 07:45:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.312 $
+ * \version \$Revision: 1.313 $
  *
  * \ingroup frontend
  */
@@ -263,6 +263,7 @@ impl_joinCondition* currentJoinCondition = standardJoinCondition();
 %type <yt_tOnMessage_list> tOnMessage_list
 %type <yt_tOnMessage> tOnEvent
 %type <yt_tOnMessage> tOnMessage
+%type <yt_tOpaqueActivity> tOpaqueActivity
 %type <yt_tPartner_list> tPartner_list
 %type <yt_tPartner_list> tPartners
 %type <yt_tPartner> tPartner
@@ -351,26 +352,27 @@ activity:
 ;
 
 activity2:
-  tReceive		{ $$ = activityReceive($1);	}
-| tReply		{ $$ = activityReply($1);	}
-| tInvoke		{ $$ = activityInvoke($1);	}
-| tAssign		{ $$ = activityAssign($1);	}
-| tValidate		{ $$ = activityValidate($1);	}
-| tEmpty		{ $$ = activityEmpty($1);	}
-| tWait			{ $$ = activityWait($1);	}
-| tExit			{ $$ = activityExit($1);	}
-| tThrow		{ $$ = activityThrow($1);	}
-| tRethrow		{ $$ = activityRethrow($1);	}
-| tCompensate		{ $$ = activityCompensate($1);	}
-| tCompensateScope	{ $$ = activityCompensate($1);	}
-| tSequence		{ $$ = activitySequence($1);	}
-| tIf			{ $$ = activityIf($1);		}
-| tWhile		{ $$ = activityWhile($1);	}
-| tRepeatUntil		{ $$ = activityRepeatUntil($1);	}
-| tForEach		{ $$ = activityForEach($1);	}
-| tFlow			{ $$ = activityFlow($1);	}
-| tPick			{ $$ = activityPick($1);	}
-| tScope		{ $$ = activityScope($1);	}
+  tReceive		{ $$ = activityReceive($1);		}
+| tReply		{ $$ = activityReply($1);		}
+| tInvoke		{ $$ = activityInvoke($1);		}
+| tAssign		{ $$ = activityAssign($1);		}
+| tValidate		{ $$ = activityValidate($1);		}
+| tEmpty		{ $$ = activityEmpty($1);		}
+| tOpaqueActivity	{ $$ = activityOpaqueActivity($1);	}
+| tWait			{ $$ = activityWait($1);		}
+| tExit			{ $$ = activityExit($1);		}
+| tThrow		{ $$ = activityThrow($1);		}
+| tRethrow		{ $$ = activityRethrow($1);		}
+| tCompensate		{ $$ = activityCompensate($1);		}
+| tCompensateScope	{ $$ = activityCompensate($1);		}
+| tSequence		{ $$ = activitySequence($1);		}
+| tIf			{ $$ = activityIf($1);			}
+| tWhile		{ $$ = activityWhile($1);		}
+| tRepeatUntil		{ $$ = activityRepeatUntil($1);		}
+| tForEach		{ $$ = activityForEach($1);		}
+| tFlow			{ $$ = activityFlow($1);		}
+| tPick			{ $$ = activityPick($1);		}
+| tScope		{ $$ = activityScope($1);		}
 ;
 
 activity_list:
@@ -846,9 +848,7 @@ tValidate:
 
 
 /******************************************************************************
-  EMPTY / OPAQUEACTIVITY
-
-  An <opaqueActivity> is represented by an <empty> activity in the AST.
+  EMPTY
 ******************************************************************************/
 
 tEmpty:
@@ -856,11 +856,19 @@ tEmpty:
     { $$ = Empty($4, $2); }
 | K_EMPTY arbitraryAttributes X_SLASH
     { $$ = Empty(NoStandardElements(), $2); }
-| K_OPAQUEACTIVITY arbitraryAttributes X_NEXT standardElements X_SLASH K_OPAQUEACTIVITY
-    { $$ = Empty($4, $2);
+;
+
+
+/******************************************************************************
+  OPAQUE ACTIVITY
+******************************************************************************/
+
+tOpaqueActivity:
+  K_OPAQUEACTIVITY arbitraryAttributes X_NEXT standardElements X_SLASH K_OPAQUEACTIVITY
+    { $$ = OpaqueActivity($4, $2);
       genericError(116, "", toString(frontend_lineno-1), ERRORLEVEL_NOTICE); }
 | K_OPAQUEACTIVITY arbitraryAttributes X_SLASH
-    { $$ = Empty(NoStandardElements(), $2);
+    { $$ = OpaqueActivity(NoStandardElements(), $2);
       genericError(116, "", toString(frontend_lineno-1), ERRORLEVEL_NOTICE); }
 ;
 

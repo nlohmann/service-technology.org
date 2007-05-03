@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/02 14:52:21 $
+ * \date    \$Date: 2007/05/03 07:45:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.157 $
+ * \version \$Revision: 1.158 $
  */
 %}
 
@@ -501,8 +501,9 @@ OnMessage(a,b,c,_id) ->
       myself->checkAttributes();
 
       myself->checkPartnerLink();
-     
-      globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
+
+      if (myself->attributes["partnerLink"] != "")     
+        globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
 
       // trigger [SA00063]
       if (b->length() != 0 && myself->attributes["variable"] != "")
@@ -835,6 +836,31 @@ Empty(a,_id) ->
 
 
 /******************************************************************************
+  EMPTY
+******************************************************************************/
+
+OpaqueActivity(a,_id) ->
+  [postprocessing:
+    {
+      assert(_id != NULL);
+      int myid = _id->value;
+      ASTE *myself = globals::ASTEmap[myid];
+      assert(myself != NULL);
+
+      a->parentId = myid;
+
+      myself->parentScopeId = globals::PPcurrentScope;
+      myself->checkAttributes();
+    }
+    a
+    {
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+    }
+  ]
+;
+
+
+/******************************************************************************
   INVOKE
 ******************************************************************************/
 
@@ -863,7 +889,8 @@ volatile_Invoke(a,b,c,d,_id) ->
 
       myself->checkPartnerLink();
      
-      globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
+      if (myself->attributes["partnerLink"] != "")
+        globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
 
       myself->channelName = myself->createChannel((myself->attributes["outputVariable"] != ""));
       myself->inputVariableName = myself->checkVariable("inputVariable");
@@ -908,8 +935,9 @@ Receive(a,b,c,_id) ->
         SAerror(55, "", myself->attributes["referenceLine"]);
 
       myself->checkPartnerLink();
-     
-      globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
+
+      if (myself->attributes["partnerLink"] != "")
+	globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
 
       myself->channelName = myself->createChannel();
       myself->variableName = myself->checkVariable("variable");
@@ -958,8 +986,9 @@ Reply(a,b,c,_id) ->
       /* above is generic */
 
       myself->checkPartnerLink();
-     
-      globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
+
+      if (myself->attributes["partnerLink"] != "")     
+        globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
 
       // trigger [SA00059]
       if (c->length() != 0 && myself->attributes["variable"] != "")

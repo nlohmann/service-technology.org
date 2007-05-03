@@ -33,7 +33,7 @@
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2007/04/18 16:18:31 $
+ * \date    \$Date: 2007/05/03 07:45:05 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file ast-grammar.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.172 $
+ * \version \$Revision: 1.173 $
  */
 %}
 
@@ -93,6 +93,7 @@ activity:
 | activityAssign(tAssign)
 | activityValidate(tValidate)
 | activityEmpty(tEmpty)
+| activityOpaqueActivity(tOpaqueActivity)
 | activityWait(tWait)
 | activityExit(tExit)
 | activityThrow(tThrow)
@@ -332,6 +333,15 @@ tEmpty:
 
 
 /******************************************************************************
+  OPAQUE ACTIVITY
+******************************************************************************/
+
+tOpaqueActivity:
+  OpaqueActivity(standardElements integer)
+;
+
+
+/******************************************************************************
   WAIT
 ******************************************************************************/
 
@@ -542,6 +552,7 @@ expression:
 %ctor activityForEach()			{ id = tForEach_1->id; }
 %ctor activityIf()			{ id = tIf_1->id; }
 %ctor activityInvoke()			{ id = tInvoke_1->id; }
+%ctor activityOpaqueActivity()		{ id = tOpaqueActivity_1->id; }
 %ctor activityPick()			{ id = tPick_1->id; }
 %ctor activityReceive()			{ id = tReceive_1->id; }
 %ctor activityRepeatUntil()		{ id = tRepeatUntil_1->id; }
@@ -580,6 +591,7 @@ expression:
 %ctor NoElse()				{ CTOR(K_ELSE) }
 %ctor OnAlarm()				{ CTOR(K_ONALARM) }
 %ctor OnMessage()			{ CTOR(K_ONMESSAGE) }
+%ctor OpaqueActivity()			{ CTOR(K_OPAQUEACTIVITY) }
 %ctor Partner()				{ CTOR(K_PARTNER) }
 %ctor PartnerLink()			{ CTOR(K_PARTNERLINK) }
 %ctor Pick()				{ CTOR(K_PICK) }

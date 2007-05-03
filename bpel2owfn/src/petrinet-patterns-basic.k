@@ -46,7 +46,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/04/27 11:17:17 $
+ * \date    \$Date: 2007/05/03 07:45:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -56,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  */
 %}
 
@@ -116,6 +116,60 @@ void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
 
   // A transition modelling the <empty> activity.
   Transition *t1 = PN.newTransition(prefix + "empty");
+  PN.newArc(p1, t1);
+  PN.newArc(t1, p2);
+
+  // Stop places and stopping transitions.
+  if (current_view != petrinetsmall_enum)
+  {
+    Place *p3 = PN.newPlace(prefix + "stop");
+    Place *p4 = PN.newPlace(prefix + "stopped");
+    Transition *t2 = stop(p1, "initial", prefix);
+    Transition *t3 = stop(p2, "final", prefix);
+  }
+
+  // Unparse the standard elements.
+  phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+  footer(phylum->id);
+}
+
+
+
+
+
+/******************************************************************************
+  OPAQUE ACTIVITY
+******************************************************************************/
+
+%{
+/*!
+ * \fn      void kc::POpaqueActivity(impl_tOpaqueActivity *abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <opaqueActivity> activity.
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
+ *
+ * \note    This is the same pattern as used for the <empty> activity.
+ *
+ * \ingroup patterns
+ */
+%}
+void POpaqueActivity(impl_tOpaqueActivity* abstract_phylum, uview current_view)
+{
+  impl_tOpaqueActivity_OpaqueActivity* phylum = static_cast<impl_tOpaqueActivity_OpaqueActivity*>(abstract_phylum);
+  assert(phylum != NULL);
+
+  header(phylum->id);
+  string prefix = toString(phylum->id) + ".internal.";  
+
+  // Places.
+  Place *p1 = PN.newPlace(prefix + "initial");
+  Place *p2 = PN.newPlace(prefix + "final");
+
+  // A transition modelling the <opaqueActivity> activity.
+  Transition *t1 = PN.newTransition(prefix + "opaqueActivity");
   PN.newArc(p1, t1);
   PN.newArc(t1, p2);
 

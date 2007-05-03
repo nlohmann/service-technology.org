@@ -29,13 +29,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/02 15:22:57 $
+ * \date    \$Date: 2007/05/03 07:45:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.101 $
+ * \version \$Revision: 1.102 $
  */
 
 
@@ -743,19 +743,19 @@ string ASTE::createChannel(bool synchronousCommunication)
   // in case of BPEL4Chor, we can read the channel name from the choreography
   if (globals::choreography_filename != "")
   {
-    string channelName;
+    string channelName = globals::ChorInfo.channelName(attributes["wsu:id"]);
+    if (channelName == "")
+      genericError(131, "activity id `" + attributes["wsu:id"] + "' of <" + activityTypeName() + "> does not reference a BPEL4Chor <messageLink>", attributes["referenceLine"], ERRORLEVEL_ERROR);
 
     switch (type)
     {
       case(K_RECEIVE):
       case(K_ONMESSAGE):
-	  channelName = globals::ChorInfo.channelName(attributes["wsu:id"], false);
 	  globals::ASTE_inputChannels.insert(channelName);
 	  break;
 
       case(K_INVOKE):
       case(K_REPLY):
-	  channelName = globals::ChorInfo.channelName(attributes["wsu:id"], true);
 	  globals::ASTE_outputChannels.insert(channelName);
 	  break;
     }
@@ -1347,6 +1347,7 @@ string ASTE::activityTypeName() const
     case(K_ONALARM):		return "onAlarm";
     case(K_ONEVENT):		return "onEvent";
     case(K_ONMESSAGE):		return "onMessage";
+    case(K_OPAQUEACTIVITY):	return "opaqueActivity";
     case(K_OTHERWISE):		return "otherwise";
     case(K_PARTNER):		return "partner";
     case(K_PARTNERLINK):	return "partnerLink";

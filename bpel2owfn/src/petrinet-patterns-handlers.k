@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for the handlers
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $ 
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/04/05 11:51:40 $
+ * \date    \$Date: 2007/05/03 12:50:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
 %}
 
@@ -111,6 +111,9 @@ void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
   Place *p5 =  PN.newPlace(prefix + "stopped");
   Place *p7 =  PN.newPlace(prefix + "running");
   Place *p8 =  PN.newPlace(prefix + "inner_stop");
+
+  if ( globals::ASTEmap[phylum->id]->callable )
+  {
 
   Transition *t4 = PN.newTransition(prefix + "stopped.initial");
   PN.newArc(p1, t4);
@@ -203,6 +206,7 @@ void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
     PN.mergePlaces((toString(globals::ASTEmap[phylum->id]->parentScopeId) + ".internal.final"),       (prefix + "stopped"));
   }
 
+  }
   footer(phylum->id, true);
 }
 

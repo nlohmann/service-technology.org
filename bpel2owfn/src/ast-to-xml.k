@@ -28,11 +28,11 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/29 12:55:27 $
+ * \date    \$Date: 2007/05/03 08:09:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.77 $
+ * \version \$Revision: 1.78 $
  *
  * \todo    Add support for the <terminationHandler>
  */
@@ -285,6 +285,31 @@ Empty(a,_id) ->
       {
         a = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition()): { /* nothing more to do */ }
         default: { indown(); *output << "</empty>\n"; }
+      }
+    }
+  ]
+;
+
+
+/******************************************************************************
+  OPAQUEACTIVITY
+******************************************************************************/
+
+OpaqueActivity(a,_id) ->
+  [xml: { inup(); } "<opaqueActivity id=\"" _id "\"" { listAttributes( _id ); } 
+    {  
+      with(a)
+      {
+        a = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition()): { *output << " />";  indown(); *output << endl; }
+        default: { *output << ">\n"; }
+      }
+    }
+    a
+    {  
+      with(a)
+      {
+        a = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition()): { /* nothing more to do */ }
+        default: { indown(); *output << "</opaqueActivity>\n"; }
       }
     }
   ]

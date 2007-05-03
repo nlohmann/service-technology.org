@@ -32,7 +32,7 @@
  *         
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/04/18 11:56:12 $
+ * \date    \$Date: 2007/05/03 08:09:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  */
 %}
 
@@ -342,6 +342,21 @@ Empty(a,b) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Empty\n");
 	  CFGBlock * block = new CFGBlock(CFGEmpty, $0->id, "Empty"); 
+
+	  globals::cfgMap[toString($0->id)] = block; 
+	}
+	a // standard elements
+  ];
+
+  
+/******************************************************************************
+  OPAQUEACTIVITY                                                 (WS-BPEL 2.0)
+******************************************************************************/
+
+OpaqueActivity(a,b) ->
+  [cfg: { 
+	  trace(TRACE_DEBUG, "[CFG] OpaqueActivity\n");
+	  CFGBlock * block = new CFGBlock(CFGOpaqueActivity, $0->id, "OpaqueActivity"); 
 
 	  globals::cfgMap[toString($0->id)] = block; 
 	}

@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/03 09:42:04 $
+ * \date    \$Date: 2007/05/03 10:28:42 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.143 $
+ * \version \$Revision: 1.144 $
  *
  * \ingroup petrinet
  */
@@ -309,6 +309,9 @@ class Place: public Node
     /// the maximal occurrences of this (communication) place
     unsigned int max_occurrences;
 
+    /// not empty if place was once an communication place and is now internal because of choreographie
+    string wasExternal;
+
     /// DOT-output of the place (used by PetriNet::dotOut())
     string output_dot() const;
 
@@ -330,9 +333,6 @@ class Place: public Node
 
     /// true if place is marked in the final marking
     bool isFinal;
-
-    /// not empty if place was once an communication place and is now internal because of choreographie
-    string wasExternal;
 };
 
 

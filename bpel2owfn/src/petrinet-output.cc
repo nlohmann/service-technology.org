@@ -26,17 +26,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/05/03 09:42:04 $
+ * \date    \$Date: 2007/05/03 10:28:42 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.96 $
+ * \version \$Revision: 1.97 $
  *
  * \ingroup petrinet
  */
@@ -499,6 +499,8 @@ string Place::output_dot() const
     result += "fillcolor=cyan";
   else if (historyContains("1.internal.clock"))
     result += "fillcolor=seagreen";
+  else if (wasExternal != "")
+    result += "fillcolor=lightgoldenrod1";
     
   result += "]\n";
 

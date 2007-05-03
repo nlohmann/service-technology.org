@@ -51,10 +51,10 @@ A PARTICULAR PURPOSE.
 	location="orderingProperties.wsdl"
 	namespace="http://example.com/ordering/properties/" />
     
-    <extensions>
+    <!-- <extensions>
 	<extension namespace="http://example.com/bpel/some/extension"
 	    mustUnderstand="no" />
-    </extensions>
+    </extensions> -->
     
     <partnerLinks>
 	<partnerLink name="ordering"

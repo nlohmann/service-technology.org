@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/04/25 09:13:28 $
+ * \date    \$Date: 2007/05/03 09:42:04 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.199 $
+ * \version \$Revision: 1.200 $
  *
  * \ingroup petrinet
  */
@@ -1055,6 +1055,7 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
 
   p12->tokens = max(p1->tokens, p2->tokens);
   p12->isFinal = (p1->isFinal || p2->isFinal);
+  p12->wasExternal = p1->wasExternal + p2->wasExternal;
 
   for (vector<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
   {
@@ -1612,6 +1613,7 @@ void PetriNet::compose(const PetriNet &net)
         (*oPlace)->type = INTERNAL;
         (*oPlace)->history[0] = (*oPlace)->nodeFullName();
         roleMap[(*oPlace)->nodeFullName()] = (*oPlace);
+        (*oPlace)->wasExternal = (*oPlace)->nodeFullName().substr((*oPlace)->nodeFullName().find_first_of(".") + 1);
         P.insert(*place);
         P.insert(*oPlace);
         mergePlaces((*place)->nodeFullName(), (*oPlace)->nodeFullName());

@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/03 08:22:25 $
+ * \date    \$Date: 2007/05/03 11:38:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.159 $
+ * \version \$Revision: 1.160 $
  */
 %}
 
@@ -90,6 +90,10 @@ Process(a,b,c,d,e,g,i,_id) ->
       {
         string faultName = fault->substr( fault->find_first_of( "|" ) + 1 );
         faultName = faultName.substr( 0, faultName.find_first_of( "|" ) );
+        if (faultName.find_first_of(":") < faultName.npos)
+        {
+          faultName = faultName.substr( faultName.find_first_of(":") + 1 );
+        }
 
         if ( myself->possiblyTriggeredFaults.find( faultName ) != myself->possiblyTriggeredFaults.end() )
         {
@@ -2008,6 +2012,10 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
       {
         string faultName = fault->substr( fault->find_first_of( "|" ) + 1 );
         faultName = faultName.substr( 0, faultName.find_first_of( "|" ) );
+        if (faultName.find_first_of(":") < faultName.npos)
+        {
+          faultName = faultName.substr( faultName.find_first_of(":") + 1 );
+        }
 
         if ( myself->possiblyTriggeredFaults.find( faultName ) != myself->possiblyTriggeredFaults.end() )
         {
@@ -2189,6 +2197,11 @@ Target(a) ->
       else
       {
         globals::ASTEmap[linkId]->targetActivity = myself->parentActivityId;
+      }
+
+      if ( myself->attributes["suppressJoinFailure"]  == "no" )
+      {
+        globals::ASTEmap[ myself->parentScopeId]->enterFault( "joinFailure" );
       }
     }
   ]

@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/03 09:17:34 $
+ * \date    \$Date: 2007/05/03 11:38:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.103 $
+ * \version \$Revision: 1.104 $
  */
 
 
@@ -990,6 +990,10 @@ void ASTE::enterFault(string fault)
     return;
   }
 
+  if (fault.find_first_of(":") < fault.npos)
+  {
+    fault = fault.substr( fault.find_first_of(":") + 1 );
+  }
   possiblyTriggeredFaults.insert( fault );
   if ( id > 1 )
   {

@@ -680,11 +680,34 @@ used, a file with the suffix @samp{.xml} is created.
 
 
 
+@section Exit Values
+
+@table @asis
+@item 0
+No error occurred.
+
+@item 1
+A critical error occured; that is, a fault was detected that makes further processing
+impossible.
+
+@item 2
+An input file could not be opened.
+
+@item 3
+A syntax error in the input @acronym{BPEL} occurred. The input file cannot be
+further processed.
+
+@item 4
+Any other error.
+@end table
+
+
+
 
 @anchor{Examples}
 @section Examples
-In this section we show some examples how BPEL2oWFN can be
-invoked.
+In this section we show some examples how BPEL2oWFN can be invoked. See @ref{File Formats}
+for more examples.
 
 @table @samp
 @item bpel2owfn -i sample.bpel -flola -finfo -o -p reduce
@@ -775,14 +798,19 @@ few lines. After the line number, the error code is displayed.
 @samp{W00114} stands for a warning with code 114. Further details can be
 taken from the table below.
 
-@multitable @columnfractions .05 .18 .72
+@multitable @columnfractions .05 .18 .77
 @headitem Code @tab Type @tab Description
+
+@item 3 @tab static analysis @tab
+If the value of @code{exitOnStandardFault} of a @code{<scope>} or @code{<process>}
+is set to @code{"yes"}, then a fault handler that explicitly targets the @acronym{WS-BPEL}
+standard faults MUST NOT be used in that scope.@footnote{The descriptions for
+static analysis messages are taken from Appendix B of the @acronym{WS-BPEL}
+specification.}
 
 @item 6 @tab static analysis @tab
 The @code{<rethrow>} activity MUST only be used within a faultHandler (i.e.
-@code{<catch>} and @code{<catchAll>} elements).@footnote{The descriptions for
-static analysis messages are taken from Appendix B of the @acronym{WS-BPEL}
-specification.}
+@code{<catch>} and @code{<catchAll>} elements).
 
 @item 7 @tab static analysis @tab
 The @code{<compensateScope>} activity MUST only be used from within a
@@ -1124,43 +1152,39 @@ control flow (@code{<exit>}, @code{<throw>}, @code{<compensate>}, and
 @code{<compensateScope>}) are replaced by an @code{<empty>} activity.
 
 @item 122 @tab notice @tab
-syntax error in chorography file
+A syntax error in the BPEL4Chor chorography file occurred.
 
 @item 123 @tab notice @tab
-syntax error in WSDL file
+A syntax error in the @acronym{WSDL} input file occurred.@footnote{This message 123--130
+can only occur when an optional @acronym{WSDL, Web Service Description Language}
+file is read using option @samp{-w}.}
 
 @item 124 @tab notice @tab
-ignoring XML Schema element
+An @acronym{XML} Schema element nested in a @acronym{WSDL} <types> element was ignored. This is
+usually no problem, as @acronym{WSDL} @code{<types>} are not evaluated in subsequent analysis
+or translation.
 
 @item 125 @tab notice @tab
-ignoring variable property element
+A variable property element was ignored while parsing the input @acronym{WSDL} file.
 
 @item 126 @tab warning @tab
-WSDL message not found
+A @acronym{WSDL} @code{<message>} referenced in a @acronym{WSDL} @code{<operation>} was not found.
 
 @item 127 @tab warning @tab
-WSDL portType not found
+A @acronym{WSDL} @code{<portType>} referenced in a @acronym{WSDL} @code{<role>} was not found.
 
 @item 128 @tab warning @tab
-WSDL operation not found
+A @acronym{WSDL} @code{<operation>} referenced in a @acronym{BPEL} activity was not specified in the
+input @acronym{WSDL} file.
 
 @item 129 @tab warning @tab
-WSDL partnerLinkType was found, but role was not found
+A @acronym{WSDL} @code{<role>} of a @code{partnerLinkType} referenced by a @code{<partnerLink>} was not
+defined in the specified @code{<partnerLinkType>} in the input @acronym{WSDL} file.
 
 @item 130 @tab warning @tab
-WSDL partnerLinkType was not found
+A @acronym{WSDL} @code{<partnerLinkType>} referenced by a @code{<partnerLink>} was not specified in
+the input @acronym{WSDL} file.
 @end multitable
-
-
-@c @section Exit Values
-
-@c When BPEL2oWFN is invoked and run without any error, the
-@c exit value is 0.
-
-
-@c Please report the occurrence of any exception with numbers 30--50
-@c since it indicates a bug in BPEL2oWFN we would like to fix
-@c immediately (see @ref{Reporting Bugs}).
 
 
 
@@ -1713,22 +1737,21 @@ integrates seamlessly. Though the grammar has to be defined manually, the
 generated parser is very flexible as it allows to process @acronym{BPEL4WS} 1.1,
 @acronym{WS-BPEL} 2.0, and to some extend @acronym{BPEL4WS} 1.0 processes.
 
-However, the parser does not support @acronym{XML} namspaces. To
-this end, @acronym{BPEL} constructs are only recognized if the are either
-unprefixed or using the prefix @samp{bpws:}. Any other elements are skipped
-by the parser of BPEL2oWFN. Nevertheless, processes that use such elements might be
-rejected with a syntax error message (cf.@: warning message [W00104]).
+However, the parser does not support @acronym{XML} namespaces. BPEL2oWFN will
+ignore namespace prefixes and skip all elements that are not explicitly covered
+by the @acronym{WS-BPEL} 2.0, @acronym{BPEL4WS} 1.2 or @acronym{WSDL} 1.1 specification,
+respectively. Nevertheless, skipping elements are reported as syntax error
+message (cf.@: warning message [W00104]).
 
-As a solution, try removing or commenting non-standard elements, and remove any
-namespace prefixed from @acronym{BPEL} elements.
+As a solution, try removing or commenting non-standard elements.
 
 
 @item @b{I validated my process using an @acronym{XML} validator. Why does
 BPEL2oWFN still reports syntax errors?}
 
 Well, because there @i{are} such errors. Many @acronym{BPEL} editors generate
-invalid @acronym{BPEL}. Even the @acronym{WS-BPEL} specification contained
-processes with syntax errors for a long time. Furthermore, a lot of syntax errors
+invalid @acronym{BPEL}. Even the official @acronym{WS-BPEL} 2.0 specification contains
+processes with syntax errors. Furthermore, a lot of syntax errors
 cannot be covered with @acronym{XSD, XML Schema Definition} validation. Even if
 the considered process run on existing engines, BPEL2oWFN might reject it, as
 it stubbornly follows the @acronym{WS-BPEL} specification.

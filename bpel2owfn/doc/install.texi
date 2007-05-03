@@ -221,9 +221,15 @@ converted into many file formats using @samp{make @var{format}} where
 @samp{pdf} or @samp{ps}.
 
 @item tests
-Several test processes to self-test BPEL2oWFN. The processes
-@file{loan.bpel}, @file{purchase.bpel} and @file{shipping.bpel} were taken from
-the @acronym{BPEL4WS} 1.1 specification.
+Several test processes to self-test BPEL2oWFN. The sub-directory
+@file{tesfiles} contains the example processes of the @acronym{WS-BPEL} 2.0
+and the @acronym{BPEL4WS} 1.2 specification, respectively. The sub-directory
+@file{sa_tests} contains, for each supported static analysis goal, a test
+file that triggers the respective static analysis error message. Finally,
+sub-directory @file{consistency} contains processes to check the
+@samp{consistency} mode.
+
+The tests can be triggered with @samp{make check}.
 @end table
 
 @ifplaintext
@@ -701,7 +707,7 @@ net
 parametrized:
 @itemize
 @item original semantics
-@item models without BPEL's standard faults
+@item models without @acronym{BPEL}'s standard faults
 @item acyclic models
 @end itemize
 For more information please refer to the User's Manual.
@@ -882,14 +888,16 @@ We would like to thank:
 for his help moving BPEL2oWFN to Savannah,
 @item Maarten Boote, @i{Technische Universiteit Eindhoven}@*
 for integrating BPEL2oWFN to LaQuSo,
+@item Antoon van Breda a.k.a. Jaded Hobo@*
+for the original version of the @file{colorconsole.h} header,
 @item Jan Bretschneider, @i{Humboldt-Universit@"at zu Berlin}@*
 for patient C++ help,
 @item Dirk Fahland, @i{Humboldt-Universit@"at zu Berlin}@*
-for fruitful discussions about BPEL's semantics,
+for fruitful discussions about @acronym{BPEL}'s semantics,
 @item Carsten Frenkler, @i{Gedilan Technologies}@*
 for challenging @acronym{BPEL} processes,
 @item Mario Karrenbrock, @i{FH Wilhelmshaven/SAP}@*
-for finding bugs,
+for finding bugs and testing the consistency mode,
 @item Dieter K@"onig, @i{IBM}@*
 for valuable advice concerning @acronym{BPEL},
 @item Oliver Kopp, @i{Universit@"at Stuttgart}@*
@@ -907,7 +915,7 @@ for help with Kimwitu++,
 @item Dennis Reinert, @i{Humboldt-Universit@"at zu Berlin}@*
 for his work on the first versions of BPEL2oWFN,
 @item Eric Verbeek, @i{Technische Universiteit Eindhoven}@*
-for integrating BPEL2oWFN to the ProM framework and valuable comments on BPEL's link semantics,
+for integrating BPEL2oWFN to the ProM framework and valuable comments on @acronym{BPEL}'s link semantics,
 @item Ernesto Santana-Diaz@*
 for writing a Java-based GUI for BPEL2oWFN,
 @item Jan Martijn van der Werf, @i{Technische Universiteit Eindhoven}@*

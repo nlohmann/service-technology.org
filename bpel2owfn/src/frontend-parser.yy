@@ -40,7 +40,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/05/03 07:45:05 $
+ * \date    \$Date: 2007/05/04 13:47:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.313 $
+ * \version \$Revision: 1.314 $
  *
  * \ingroup frontend
  */
@@ -586,13 +586,9 @@ tOnAlarm:
 
 tRepeatEvery:
   /* empty */ 
-  {
-  $$ = emptyRepeatEvery(mkinteger(globals::ASTEid++));
-  }
+    { $$ = emptyRepeatEvery(mkinteger(globals::ASTEid++)); }
 | K_REPEATEVERY arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_REPEATEVERY X_NEXT
-  {
-  $$ = RepeatEvery(mkinteger(globals::ASTEid++));
-  }
+    { $$ = RepeatEvery(mkinteger(globals::ASTEid++)); }
 ;
 
 

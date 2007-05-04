@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/03 11:38:31 $
+ * \date    \$Date: 2007/05/04 10:12:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.104 $
+ * \version \$Revision: 1.105 $
  */
 
 
@@ -432,13 +432,7 @@ void ASTE::checkAttributes()
 
     case(K_INVOKE):
       {
-	// if BPEL4Chor file is given, all communicating activities need an id
-	if (globals::choreography_filename != "")
-	{
-	  string required[] = {"wsu:id"};
-	  checkRequiredAttributes(required, 1);
-	}
-	else
+	if (globals::choreography_filename == "")
 	{
 	  string required[] = {"partnerLink", "operation"};
 	  checkRequiredAttributes(required, 2);
@@ -452,13 +446,7 @@ void ASTE::checkAttributes()
 
     case(K_ONMESSAGE):
       {
-	// if BPEL4Chor file is given, all communicating activities need an id
-	if (globals::choreography_filename != "")
-	{
-	  string required[] = {"wsu:id"};
-	  checkRequiredAttributes(required, 1);
-	}
-	else
+	if (globals::choreography_filename == "")
 	{
 	  string required[] = {"partnerLink", "operation"};
 	  checkRequiredAttributes(required, 2);
@@ -509,13 +497,7 @@ void ASTE::checkAttributes()
 
     case(K_RECEIVE):
       {
-	// if BPEL4Chor file is given, all communicating activities need an id
-	if (globals::choreography_filename != "")
-	{
-	  string required[] = {"wsu:id"};
-	  checkRequiredAttributes(required, 1);
-	}
-	else
+	if (globals::choreography_filename == "")
 	{
 	  string required[] = {"partnerLink", "operation"};
 	  checkRequiredAttributes(required, 2);
@@ -538,13 +520,7 @@ void ASTE::checkAttributes()
 
     case(K_REPLY):
       {
-	// if BPEL4Chor file is given, all communicating activities need an id
-	if (globals::choreography_filename != "")
-	{
-	  string required[] = {"wsu:id"};
-	  checkRequiredAttributes(required, 1);
-	}
-	else
+	if (globals::choreography_filename == "")
 	{
 	  string required[] = {"partnerLink", "operation"};
 	  checkRequiredAttributes(required, 2);
@@ -743,9 +719,20 @@ string ASTE::createChannel(bool synchronousCommunication)
   // in case of BPEL4Chor, we can read the channel name from the choreography
   if (globals::choreography_filename != "")
   {
-    string channelName = globals::ChorInfo.channelName(attributes["wsu:id"]);
+    string relevant_attribute = "";
+
+    if (attributes["wsu:id"] != "")
+      relevant_attribute = attributes["wsu:id"];
+    else
+      relevant_attribute = attributes["name"];
+
+    if (relevant_attribute == "")
+      genericError(132, activityTypeName(), attributes["referenceLine"], ERRORLEVEL_ERROR);
+
+    string channelName = globals::ChorInfo.channelName(relevant_attribute);
+
     if (channelName == "")
-      genericError(131, "activity id `" + attributes["wsu:id"] + "' of <" + activityTypeName() + "> does not reference a BPEL4Chor <messageLink>", attributes["referenceLine"], ERRORLEVEL_ERROR);
+      genericError(131, "activity id or name `" + attributes["wsu:id"] + "' of <" + activityTypeName() + "> does not reference a BPEL4Chor <messageLink>", attributes["referenceLine"], ERRORLEVEL_ERROR);
 
     switch (type)
     {

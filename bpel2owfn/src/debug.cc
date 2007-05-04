@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/03 07:45:05 $
+ * \date    \$Date: 2007/05/04 10:12:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.87 $
+ * \version \$Revision: 1.88 $
  *
  * \ingroup debug
  */
@@ -488,6 +488,10 @@ void genericError(unsigned int code, string information, string line, error_leve
 
     case(131): // BPEL4Chor activity name is not part of a messageLink
 	{ cerr << information << endl;
+	  break; }
+
+    case(132): // activity has neither a name nor a BPEL4Chor id
+	{ cerr << "activity <" + information + "> has neither a `name' nor an `id' attribute to reference a BPEL4Chor <messageLink>" << endl;
 	  break; }
   }
 

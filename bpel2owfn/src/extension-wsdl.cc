@@ -26,13 +26,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/02 10:58:46 $
+ * \date    \$Date: 2007/05/06 10:26:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  *
  * \todo    Comment me!
  */
@@ -186,7 +186,7 @@ void WSDL_PartnerLinkType::addRole(string role, string portType_name)
  * Functions for class WSDL
  *****************************************************************************/
 
-bool WSDL::checkOperation(WSDL_PartnerLinkType *partnerLinkType, string operation_name)
+bool WSDL::checkOperation(WSDL_PartnerLinkType *partnerLinkType, string operation_name) const
 {
   assert(partnerLinkType != NULL);
 
@@ -217,7 +217,7 @@ bool WSDL::checkOperation(WSDL_PartnerLinkType *partnerLinkType, string operatio
 
 
 
-bool WSDL::checkPartnerLinkType(WSDL_PartnerLinkType *partnerLinkType, string partnerRole_name)
+bool WSDL::checkPartnerLinkType(WSDL_PartnerLinkType *partnerLinkType, string partnerRole_name) const
 {
   assert(partnerLinkType != NULL);
 

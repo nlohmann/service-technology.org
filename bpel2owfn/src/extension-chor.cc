@@ -26,13 +26,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/04 10:12:05 $
+ * \date    \$Date: 2007/05/06 10:26:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *
  * \todo    Comment me!
  */
@@ -54,9 +54,9 @@ void Choreography::addMessageLink(string messageLink_name, string sendActivity_n
 
 
 
-string Choreography::channelName(string activity_name)
+string Choreography::channelName(string activity_name) const
 {
-  for (map<string, pair<string, string> >::iterator messageLink = messageLinks.begin(); messageLink != messageLinks.end(); messageLink++)
+  for (map<string, pair<string, string> >::const_iterator messageLink = messageLinks.begin(); messageLink != messageLinks.end(); messageLink++)
   {
     if (messageLink->second.first == activity_name)
       return messageLink->first;

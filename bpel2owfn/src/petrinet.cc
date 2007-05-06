@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/03 09:42:04 $
+ * \date    \$Date: 2007/05/06 10:27:01 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.200 $
+ * \version \$Revision: 1.201 $
  *
  * \ingroup petrinet
  */
@@ -565,7 +565,12 @@ PetriNet::~PetriNet()
  */
 Place *PetriNet::newPlace(string my_role, communication_type my_type)
 {
-  Place *p = new Place(getId(), my_role, my_type);
+  string my_role_with_suffix = my_role;
+
+  if (my_role != "" && !forEach_suffix.empty())
+    my_role_with_suffix += ("." + forEach_suffix[0]);
+
+  Place *p = new Place(getId(), my_role_with_suffix, my_type);
   assert(p != NULL);
 
   // Decide in which set of places the place has to be inserted.
@@ -579,8 +584,8 @@ Place *PetriNet::newPlace(string my_role, communication_type my_type)
   // Test if the place is already defined.
   if (my_role != "")
   {
-    assert(roleMap[my_role] == NULL);
-    roleMap[my_role] = p;
+    assert(roleMap[my_role_with_suffix] == NULL);
+    roleMap[my_role_with_suffix] = p;
   }
 
   return p;
@@ -603,7 +608,12 @@ Place *PetriNet::newPlace(string my_role, communication_type my_type)
  */
 Transition *PetriNet::newTransition(string my_role)
 {
-  Transition *t = new Transition(getId(), my_role);
+  string my_role_with_suffix = my_role;
+
+  if (my_role != "" && !forEach_suffix.empty())
+    my_role_with_suffix += ("." + forEach_suffix[0]);
+
+  Transition *t = new Transition(getId(), my_role_with_suffix);
   assert(t != NULL);
 
   T.insert(t);
@@ -611,8 +621,8 @@ Transition *PetriNet::newTransition(string my_role)
   // Test if the transition is already defined.
   if (my_role != "")
   {
-    assert(roleMap[my_role] == NULL);
-    roleMap[my_role] = t;
+    assert(roleMap[my_role_with_suffix] == NULL);
+    roleMap[my_role_with_suffix] = t;
   }
 
   return t;
@@ -1349,7 +1359,16 @@ Place *PetriNet::findPlace(string role) const
   if ((p != roleMap.end()) && (p->second->nodeType == PLACE))
     return (static_cast<Place *>(p->second));
   else
-    return NULL;
+  {
+    if (!forEach_suffix.empty())
+    {
+      map< std::string, Node* >::const_iterator p_with_suffix = roleMap.find(role + "." + forEach_suffix[0]);
+      if ((p_with_suffix != roleMap.end()) && (p_with_suffix->second->nodeType == PLACE))
+	return (static_cast<Place *>(p_with_suffix->second));
+    }
+  }
+
+  return NULL;
 }
 
 
@@ -1949,4 +1968,29 @@ void PetriNet::produce(const PetriNet &net)
   // remove transitions that are used as labels
   for (set<string>::iterator t = used_labels.begin(); t != used_labels.end(); t++)
     removeTransition(findTransition(*t));
+}
+
+
+
+
+
+/******************************************************************************
+ * Functions to manage <forEach> suffix
+ *****************************************************************************/
+
+
+unsigned int PetriNet::push_forEach_suffix(string suffix)
+{
+  forEach_suffix.push_front(suffix);
+  return forEach_suffix.size();
+}
+
+
+
+
+
+unsigned int PetriNet::pop_forEach_suffix()
+{
+  forEach_suffix.pop_front();
+  return forEach_suffix.size();
 }

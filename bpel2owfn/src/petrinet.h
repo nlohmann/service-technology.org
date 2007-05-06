@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/03 10:28:42 $
+ * \date    \$Date: 2007/05/06 10:27:01 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.144 $
+ * \version \$Revision: 1.145 $
  *
  * \ingroup petrinet
  */
@@ -62,9 +62,11 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <deque>
 
 using std::string;
 using std::vector;
+using std::deque;
 using std::set;
 using std::map;
 using std::ostream;
@@ -479,6 +481,10 @@ class PetriNet
     void calculate_max_occurrences();
 
 
+    unsigned int push_forEach_suffix(string suffix);
+    unsigned int pop_forEach_suffix();
+
+
     /// calculates the preset of a node
     set<Node*> preset(Node *n) const;
 
@@ -583,6 +589,10 @@ class PetriNet
 
     /// returns an id for new nodes
     unsigned int getId();
+
+
+    /// a role suffix for the forEach activity
+    deque<string> forEach_suffix;
 
 
     /// set of internal places of the Petri net

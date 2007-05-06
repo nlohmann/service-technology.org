@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/03 11:38:31 $
+ * \date    \$Date: 2007/05/06 12:38:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.160 $
+ * \version \$Revision: 1.161 $
  */
 %}
 
@@ -1865,6 +1865,7 @@ ForEach(a,b,c,d,e,_id) ->
       unsigned int startCounter = toUInt(b->name);
       unsigned int finalCounter = toUInt(c->name);
       unsigned int completion = toUInt(d->name);
+
       if (startCounter != UINT_MAX && finalCounter != UINT_MAX)
       {
         if (startCounter >= finalCounter)
@@ -1886,15 +1887,20 @@ ForEach(a,b,c,d,e,_id) ->
       }
       else
       {
-  	// calculate the maximal occurrences of the enclosed activity
-    	unsigned int max_loops = toUInt(myself->attributes["hu:maxloops"]);
-      	if (max_loops != UINT_MAX && myself->max_occurrences != UINT_MAX)
-	  globals::ASTEmap[e->id]->max_occurrences = myself->max_occurrences * max_loops;
-	else
-	  globals::ASTEmap[e->id]->max_occurrences = UINT_MAX;
+        if ((string(b->name) == "opaque") && (string(c->name) == "opaque"))
+          myself->max_loops = 3;
+        else
+        {
+	  // calculate the maximal occurrences of the enclosed activity
+	  unsigned int max_loops = toUInt(myself->attributes["hu:maxloops"]);
+	  if (max_loops != UINT_MAX && myself->max_occurrences != UINT_MAX)
+	    globals::ASTEmap[e->id]->max_occurrences = myself->max_occurrences * max_loops;
+	  else
+	    globals::ASTEmap[e->id]->max_occurrences = UINT_MAX;
 
-        myself->max_loops = max_loops;
-       }
+	  myself->max_loops = max_loops;
+        }
+      }
     }
     a e
     {

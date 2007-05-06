@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2007       Niels Lohmann
+ * Copyright 2007       Niels Lohmann                                        *
  * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
@@ -33,7 +33,7 @@
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2007/05/03 07:45:05 $
+ * \date    \$Date: 2007/05/06 10:26:15 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file ast-grammar.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.173 $
+ * \version \$Revision: 1.174 $
  */
 %}
 

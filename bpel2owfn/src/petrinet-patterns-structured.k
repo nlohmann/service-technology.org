@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/05/03 16:39:03 $
+ * \date    \$Date: 2007/05/06 10:26:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
 */
 %}
 
@@ -1016,6 +1016,7 @@ void PForEach(impl_tForEach* abstract_phylum, uview current_view)
   assert(globals::ASTEmap[phylum->id] != NULL);
   ASTE *myself = globals::ASTEmap[phylum->id];
 
+
   // the patterns for the parallel <forEach>
   if (globals::ASTEmap[phylum->id]->attributes["parallel"] == "yes")
   {
@@ -1032,15 +1033,26 @@ void PForEach(impl_tForEach* abstract_phylum, uview current_view)
 	  Transition *t2 = PN.newTransition(prefix + "join");
 	  PN.newArc(t2, p2);
 
-//	  phylum->activity_1->tScope_1->unparse(pseudoPrinter, current_view);
-
 	  for (unsigned int branch = 1; branch <= myself->max_loops +1; branch++)
 	  {
-	    Place *p_start = PN.newPlace(prefix + "start_branch_" + toString(branch));
-	    Place *p_end = PN.newPlace(prefix + "end_branch_" + toString(branch));
+            // add a suffix to the subsequent Petri net nodes
+            PN.push_forEach_suffix(toString(branch));
+
+	    Place *p_start = PN.newPlace(prefix + "start_branch");
+	    Place *p_end = PN.newPlace(prefix + "end_branch");
 
 	    PN.newArc(t1, p_start);
 	    PN.newArc(p_end, t2);
+
+            // unparse the embedded <scope> activity
+            phylum->tScope_1->unparse(pseudoPrinter, current_view);
+
+            // connect the embedded <scope> activity
+            PN.mergePlaces(prefix + "start_branch", toString(phylum->tScope_1->id) + ".initial");
+            PN.mergePlaces(prefix + "end_branch", toString(phylum->tScope_1->id) + ".final");
+
+            // remove the suffix
+            PN.pop_forEach_suffix();
 	  }
 
   	  // unparse the standard elements

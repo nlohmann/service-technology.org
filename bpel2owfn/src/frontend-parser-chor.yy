@@ -29,7 +29,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/05/04 10:12:05 $
+ * \date    \$Date: 2007/05/06 11:08:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  *
  * \ingroup frontend
  */
@@ -204,21 +204,8 @@ tMessageLink_list:
 
 tMessageLink:
   K_MESSAGELINK { globals::tempAttributes.clear(); } arbitraryAttributes X_SLASH
-    { // if a name is given, use it -- otherwise us the messageName attribute
-      if (globals::tempAttributes["name"] != "")
-      {
-        globals::ChorInfo.addMessageLink(globals::tempAttributes["name"],
-          globals::tempAttributes["sendActivity"],
-          globals::tempAttributes["receiveActivity"]);
-      }
-      else
-      {
-        globals::ChorInfo.addMessageLink(globals::tempAttributes["messageName"],
-          globals::tempAttributes["sendActivity"],
-          globals::tempAttributes["receiveActivity"]);
-      }
-      globals::tempAttributes.clear();
-    }
+    { globals::ChorInfo.addMessageLink(globals::tempAttributes);
+      globals::tempAttributes.clear(); }
 ;
 
 

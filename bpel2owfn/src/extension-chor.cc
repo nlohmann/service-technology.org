@@ -26,13 +26,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/06 10:26:32 $
+ * \date    \$Date: 2007/05/06 11:08:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  *
  * \todo    Comment me!
  */
@@ -44,10 +44,24 @@
 #include <iostream>
 #include "extension-chor.h"
 
-void Choreography::addMessageLink(string messageLink_name, string sendActivity_name, string receiveActivity_name)
+
+void Choreography::addMessageLink(map<string, string> &attribute_map)
 {
-  std::cerr << "<messageLink> `" << messageLink_name << "' between `" << sendActivity_name << "' and `" << receiveActivity_name << "'" << std::endl;
-  messageLinks[messageLink_name] = pair<string, string>(sendActivity_name, receiveActivity_name);
+  string messageLink_name = (attribute_map["name"] != "") ?
+    attribute_map["name"] :
+    attribute_map["messageName"];
+
+  string messageLink_sender = (attribute_map["sendActivity"] != "") ?
+    attribute_map["sendActivity"] :
+    attribute_map["sendActivities"];
+
+  string messageLink_receiver = (attribute_map["receiveActivity"] != "") ?
+    attribute_map["receiveActivity"] :
+    attribute_map["receiveActivities"];
+
+  std::cerr << "<messageLink> `" << messageLink_name << "' between `" << messageLink_sender << "' and `" << messageLink_receiver << "'" << std::endl;
+
+  messageLinks[messageLink_name] = pair<string, string>(messageLink_sender, messageLink_receiver);
 }
 
 

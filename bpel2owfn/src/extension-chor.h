@@ -26,13 +26,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/06 10:26:32 $
+ * \date    \$Date: 2007/05/06 11:08:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  *
  * \todo    Comment me!
  */
@@ -60,7 +60,7 @@ class Choreography
   public:
     map<string, pair<string, string> > messageLinks;
 
-    void addMessageLink(string messageLink_name, string sendActivity_name, string receiveActivity_name);
+    void addMessageLink(map<string, string> &attribute_map);
     string channelName(string activity_name) const;
 };
 

@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/06 10:27:01 $
+ * \date    \$Date: 2007/05/06 15:48:28 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.145 $
+ * \version \$Revision: 1.146 $
  *
  * \ingroup petrinet
  */
@@ -481,7 +481,10 @@ class PetriNet
     void calculate_max_occurrences();
 
 
+    /// add a suffix for a forEach activity
     unsigned int push_forEach_suffix(string suffix);
+
+    /// remove the last added suffix
     unsigned int pop_forEach_suffix();
 
 

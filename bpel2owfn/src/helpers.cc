@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007/05/02 10:51:28 $
+ * \date    \$Date: 2007/05/06 15:48:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  *
  * \ingroup debug
  */
@@ -194,4 +194,20 @@ unsigned int max(unsigned int a, unsigned int b)
     return a;
   else
     return b;
+}
+
+
+
+
+
+/*!
+ * \param s  a string that might be prefixed with an XML namespace
+ * \return   string s without XML namespace prefix
+ */
+string strip_namespace(string s)
+{
+  if (s.find_first_of(":") != string::npos)
+    return s.substr(s.find_first_of(":")+1, s.length());
+  else
+    return s;
 }

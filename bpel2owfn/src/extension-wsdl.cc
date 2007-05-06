@@ -26,13 +26,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/06 10:26:32 $
+ * \date    \$Date: 2007/05/06 15:48:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *
  * \todo    Comment me!
  */
@@ -114,10 +114,6 @@ void WSDL_PortType::addOperation(string operation_name)
 
 void WSDL_PortType::addOperationDetails(string type_name, string message_name, string fault_name)
 {
-  // strip XML namespace prefix
-  if (message_name.find_first_of(":") != string::npos)
-    message_name = message_name.substr(message_name.find_first_of(":")+1, message_name.length());
-
   WSDL_Message *message = globals::WSDLInfo.messages[message_name];
 
   if (message == NULL)
@@ -157,10 +153,6 @@ WSDL_PartnerLinkType::WSDL_PartnerLinkType(string my_name):
 
 void WSDL_PartnerLinkType::addRole(string role, string portType_name)
 {
-  // strip XML namespace prefix
-  if (portType_name.find_first_of(":") != string::npos)
-    portType_name = portType_name.substr(portType_name.find_first_of(":")+1, portType_name.length());
-
   WSDL_PortType *portType = globals::WSDLInfo.portTypes[portType_name];
 
   if (portType == NULL)

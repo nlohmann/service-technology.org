@@ -29,13 +29,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/04 10:12:05 $
+ * \date    \$Date: 2007/05/06 15:48:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.105 $
+ * \version \$Revision: 1.106 $
  */
 
 
@@ -719,32 +719,18 @@ string ASTE::createChannel(bool synchronousCommunication)
   // in case of BPEL4Chor, we can read the channel name from the choreography
   if (globals::choreography_filename != "")
   {
-    string relevant_attribute = "";
+    string relevant_attribute = (attributes["id"] != "") ?
+      attributes["id"] :
+      attributes["name"];
 
-    if (attributes["wsu:id"] != "")
-      relevant_attribute = attributes["wsu:id"];
-    else
-      relevant_attribute = attributes["name"];
-
-    if (relevant_attribute == "")
-      genericError(132, activityTypeName(), attributes["referenceLine"], ERRORLEVEL_ERROR);
-
-    string channelName = globals::ChorInfo.channelName(relevant_attribute);
-
-    if (channelName == "")
-      genericError(131, "activity id or name `" + attributes["wsu:id"] + "' of <" + activityTypeName() + "> does not reference a BPEL4Chor <messageLink>", attributes["referenceLine"], ERRORLEVEL_ERROR);
+    string channelName = globals::ChorInfo.find_channel(relevant_attribute, id);
 
     switch (type)
     {
-      case(K_RECEIVE):
-      case(K_ONMESSAGE):
-	  globals::ASTE_inputChannels.insert(channelName);
-	  break;
-
-      case(K_INVOKE):
-      case(K_REPLY):
-	  globals::ASTE_outputChannels.insert(channelName);
-	  break;
+      case(K_RECEIVE):	globals::ASTE_inputChannels.insert(channelName); break;
+      case(K_ONMESSAGE):globals::ASTE_inputChannels.insert(channelName); break;
+      case(K_INVOKE):	globals::ASTE_outputChannels.insert(channelName); break;
+      case(K_REPLY):	globals::ASTE_outputChannels.insert(channelName); break;
     }
 
     return channelName;
@@ -939,13 +925,7 @@ string ASTE::definePartnerLink()
 
 
     // find partnerLinkType_name
-
-    // strip XML namespace prefix
-    string partnerLinkType_name = attributes["partnerLinkType"];
-    if (partnerLinkType_name.find_first_of(":") != string::npos)
-      partnerLinkType_name = partnerLinkType_name.substr(partnerLinkType_name.find_first_of(":")+1, partnerLinkType_name.length());
-    
-    partnerLinkType = globals::WSDLInfo.partnerLinkTypes[partnerLinkType_name];
+    partnerLinkType = globals::WSDLInfo.partnerLinkTypes[attributes["partnerLinkType"]];
 
     if (globals::wsdl_filename != "")
     {

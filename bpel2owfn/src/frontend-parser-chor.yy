@@ -29,7 +29,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/05/06 11:08:53 $
+ * \date    \$Date: 2007/05/06 15:48:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  *
  * \ingroup frontend
  */
@@ -111,7 +111,6 @@
 
 #include "ast-config.h"
 #include "helpers.h"
-#include "debug.h"
 #include "globals.h"
 #include "extension-chor.h"
 
@@ -126,6 +125,7 @@ using std::endl;
  *****************************************************************************/
 
 extern int frontend_lex();	// from flex: the lexer funtion
+extern int frontend_lineno;
 
 // use the functions of the BPEL parser
 #define frontend_chor_lex() frontend_lex()
@@ -141,7 +141,6 @@ extern int frontend_lex();	// from flex: the lexer funtion
 
 tTopology:
   X_OPEN K_TOPOLOGY arbitraryAttributes X_NEXT tParticipantTypes tParticipants tMessageLinks X_SLASH K_TOPOLOGY X_CLOSE
-    { std::cerr << globals::ChorInfo.messageLinks.size() << " message links" << std::endl; }
 ;
 
 
@@ -160,6 +159,8 @@ tParticipantType_list:
 
 tParticipantType:
   K_PARTICIPANTTYPE arbitraryAttributes X_SLASH
+    { globals::ChorInfo.add_participantType(globals::tempAttributes["name"], globals::tempAttributes["participantBehaviorDescription"]);
+      globals::tempAttributes.clear(); }
 ;
 
 
@@ -180,7 +181,9 @@ tParticipant_list:
 
 tParticipant:
   K_PARTICIPANT arbitraryAttributes X_NEXT X_SLASH K_PARTICIPANT
+    { globals::ChorInfo.add_participant(globals::tempAttributes); }
 | K_PARTICIPANT arbitraryAttributes X_SLASH
+    { globals::ChorInfo.add_participant(globals::tempAttributes); }
 ;
 
 tParticipantSet:
@@ -204,7 +207,7 @@ tMessageLink_list:
 
 tMessageLink:
   K_MESSAGELINK { globals::tempAttributes.clear(); } arbitraryAttributes X_SLASH
-    { globals::ChorInfo.addMessageLink(globals::tempAttributes);
+    { globals::ChorInfo.add_messageLink(globals::tempAttributes);
       globals::tempAttributes.clear(); }
 ;
 
@@ -216,5 +219,5 @@ tMessageLink:
 arbitraryAttributes:
   /* empty */
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
-    { globals::tempAttributes[string($1->name)] = string($3->name); }
+    { globals::tempAttributes[strip_namespace($1->name)] = strip_namespace($3->name); }
 ;

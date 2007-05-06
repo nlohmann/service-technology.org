@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007/05/02 10:51:28 $
+ * \date    \$Date: 2007/05/06 15:48:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  */
 
 
@@ -89,6 +89,9 @@ string toString(kc::integer i);
 int toInt(string s);
 /// converts string to unsigned int
 unsigned int toUInt(string s);
+
+/// strip an XML namespace
+string strip_namespace(string s);
 
 /// returns the maximum of two unsigned ints
 unsigned int max(unsigned int a, unsigned int b);

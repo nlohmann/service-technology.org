@@ -40,7 +40,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/05/06 11:56:40 $
+ * \date    \$Date: 2007/05/06 15:48:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.316 $
+ * \version \$Revision: 1.317 $
  *
  * \ingroup frontend
  */
@@ -1301,7 +1301,7 @@ arbitraryAttributes:
          globals::temporaryAttributeMap[globals::ASTEid]["referenceLine"] = toString(frontend_lineno); // remember the file position       
      }
   X_EQUALS X_STRING arbitraryAttributes
-     { globals::temporaryAttributeMap[$5->value][$1->name] = $4->name;
+     { globals::temporaryAttributeMap[$5->value][strip_namespace($1->name)] = strip_namespace($4->name);
        $$ = $5; }
 | joinCondition arbitraryAttributes
      { $$ = $2; }

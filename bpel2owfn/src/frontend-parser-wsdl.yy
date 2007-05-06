@@ -36,7 +36,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/05/02 13:19:54 $
+ * \date    \$Date: 2007/05/06 15:48:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  *
  * \ingroup frontend
  */
@@ -373,5 +373,5 @@ tRole:
 arbitraryAttributes:
   /* empty */
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
-    { globals::tempAttributes[string($1->name)] = string($3->name); }
+    { globals::tempAttributes[strip_namespace($1->name)] = strip_namespace($3->name); }
 ;

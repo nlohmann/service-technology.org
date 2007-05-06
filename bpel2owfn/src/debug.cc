@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/06 11:33:09 $
+ * \date    \$Date: 2007/05/06 15:48:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.89 $
+ * \version \$Revision: 1.90 $
  *
  * \ingroup debug
  */
@@ -496,6 +496,14 @@ void genericError(unsigned int code, string information, string line, error_leve
 
     case(133): // <extensionActivity> replaced by <opaqueActivity>
 	{ cerr << "replacing <extensionActivity> with <opaqueActivity>" << endl;
+	  break; }
+
+    case(134): // <participantType> already definied
+	{ cerr << "BPEL4Chor <participantType> `" << information << "' already defined" << endl;
+	  break; }
+
+    case(135): // BPEL4Chor <participantType> not found for a <participant>
+	{ cerr << information << endl;
 	  break; }	  
   }
 

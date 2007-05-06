@@ -26,13 +26,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/06 11:08:53 $
+ * \date    \$Date: 2007/05/06 15:48:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *
  * \todo    Comment me!
  */
@@ -55,13 +55,25 @@ using std::pair;
 
 
 
+
+
+/*!
+ * \class   Choreography
+ *
+ * \todo    Comment me!
+ */
 class Choreography
 {
-  public:
+  private:
     map<string, pair<string, string> > messageLinks;
+    map<string, string> participantTypes;
+    
+  public:
+    void add_participantType(string participantType_name, string participantBehaviorDescription_name);
+    void add_participant(map<string, string> &attribute_map);
+    void add_messageLink(map<string, string> &attribute_map);
 
-    void addMessageLink(map<string, string> &attribute_map);
-    string channelName(string activity_name) const;
+    string find_channel(string activity_name, unsigned int ASTE_id) const;
 };
 
 

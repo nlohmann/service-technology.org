@@ -21,20 +21,20 @@
 /*!
  * \file    extension-wsdl.h
  *
+ * \brief   WSDL extension
+ *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/06 10:26:32 $
+ * \date    \$Date: 2007/05/06 17:22:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.5 $
- *
- * \todo    Comment me!
+ * \version \$Revision: 1.6 $
  */
 
 
@@ -70,7 +70,7 @@ class WSDL_Message
     map<string, string> parts;
 
     /// constructor
-    WSDL_Message(string my_name);
+    WSDL_Message(string message_name);
 };
 
 
@@ -96,7 +96,7 @@ class WSDL_Operation
     WSDL_Message *fault;
 
     /// constructor
-    WSDL_Operation(string my_name);
+    WSDL_Operation(string operation_name);
 };
 
 
@@ -119,7 +119,7 @@ class WSDL_PortType
     WSDL_Operation *last;
 
     /// constructor
-    WSDL_PortType(string my_name);
+    WSDL_PortType(string portType_name);
 
     /// add an operation to this portType
     void addOperation(string operation_name);

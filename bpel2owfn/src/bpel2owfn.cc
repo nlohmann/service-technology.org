@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/03 09:00:50 $
+ * \date    \$Date: 2007/05/06 17:22:09 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.170 $
+ * \version \$Revision: 1.171 $
  */
 
 
@@ -262,7 +262,7 @@ void single_output(set< string >::iterator file)
 
   // generate and process the control flow graph?
   if (modus == M_CFG)
-  processCFG();
+    processCFG();
 
   // print information about the process
   show_process_information();

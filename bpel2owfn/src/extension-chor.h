@@ -21,20 +21,20 @@
 /*!
  * \file    extension-chor.h
  *
+ * \brief   BPEL4Chor extension
+ *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/06 16:19:11 $
+ * \date    \$Date: 2007/05/06 17:22:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.7 $
- *
- * \todo    Comment me!
+ * \version \$Revision: 1.8 $
  */
 
 
@@ -60,7 +60,7 @@ using std::pair;
 /*!
  * \class   Choreography
  *
- * \todo    Comment me!
+ * This class organizes informations read from a BPEL4Chor topology file.
  */
 class Choreography
 {

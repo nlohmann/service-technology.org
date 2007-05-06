@@ -21,20 +21,20 @@
 /*!
  * \file    extension-wsdl.cc
  *
+ * \brief   WSDL extension
+ *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/06 15:48:28 $
+ * \date    \$Date: 2007/05/06 17:22:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.6 $
- *
- * \todo    Comment me!
+ * \version \$Revision: 1.7 $
  */
 
 
@@ -59,8 +59,11 @@ extern int frontend_lineno;
  * Functions for class WSDL_Message
  *****************************************************************************/
 
-WSDL_Message::WSDL_Message(string my_name):
-  name(my_name)
+/*!
+ * \param message_name  the name of a message
+ */
+WSDL_Message::WSDL_Message(string message_name):
+  name(message_name)
 {
   globals::wsdl_information.messages++;
 }
@@ -73,8 +76,11 @@ WSDL_Message::WSDL_Message(string my_name):
  * Functions for class WSDL_Operation
  *****************************************************************************/
 
-WSDL_Operation::WSDL_Operation(string my_name):
-  name(my_name), faultName(""), input(NULL), output(NULL), fault(NULL)
+/*!
+ * \param operation_name  the name of an operation
+ */
+WSDL_Operation::WSDL_Operation(string operation_name):
+  name(operation_name), faultName(""), input(NULL), output(NULL), fault(NULL)
 {
   globals::wsdl_information.operations++;
 }
@@ -87,8 +93,11 @@ WSDL_Operation::WSDL_Operation(string my_name):
  * Functions for class WSDL_PortType
  *****************************************************************************/
 
-WSDL_PortType::WSDL_PortType(string my_name):
-  name(my_name)
+/*!
+ * \param portType_name  the name of a portType
+ */
+WSDL_PortType::WSDL_PortType(string portType_name):
+  name(portType_name)
 {
   globals::wsdl_information.portTypes++;
 }
@@ -97,6 +106,9 @@ WSDL_PortType::WSDL_PortType(string my_name):
 
 
 
+/*!
+ * \param operation_name  the name of an operation
+ */
 void WSDL_PortType::addOperation(string operation_name)
 {
   if (last == NULL)
@@ -112,6 +124,11 @@ void WSDL_PortType::addOperation(string operation_name)
 
 
 
+/*!
+ * \param type_name     the type of the operation ("input", "output", or "fault")
+ * \param message_name  the name of the message
+ * \param fault_name    the name of a fault (optional)
+ */
 void WSDL_PortType::addOperationDetails(string type_name, string message_name, string fault_name)
 {
   WSDL_Message *message = globals::WSDLInfo.messages[message_name];
@@ -138,8 +155,11 @@ void WSDL_PortType::addOperationDetails(string type_name, string message_name, s
  * Functions for class WSDL_PartnerLinkType
  *****************************************************************************/
 
-WSDL_PartnerLinkType::WSDL_PartnerLinkType(string my_name):
-  name(my_name)
+/*!
+ * \param partnerLinkType_name  the name of the partnerLinkType
+ */
+WSDL_PartnerLinkType::WSDL_PartnerLinkType(string partnerLinkType_name):
+  name(partnerLinkType_name)
 {
   role1 = pair<string, WSDL_PortType*>("", NULL);
   role2 = pair<string, WSDL_PortType*>("", NULL);
@@ -151,7 +171,11 @@ WSDL_PartnerLinkType::WSDL_PartnerLinkType(string my_name):
 
 
 
-void WSDL_PartnerLinkType::addRole(string role, string portType_name)
+/*!
+ * \param role           the name of a role
+ * \param portType_name  the name of a portType
+ */
+void WSDL_PartnerLinkType::addRole(string role_name, string portType_name)
 {
   WSDL_PortType *portType = globals::WSDLInfo.portTypes[portType_name];
 
@@ -160,12 +184,12 @@ void WSDL_PartnerLinkType::addRole(string role, string portType_name)
 
   if (role1.first == "" && role2.second == NULL)
   {
-    role1.first = role;
+    role1.first = role_name;
     role1.second = portType;
   }
   else
   {
-    role2.first = role;
+    role2.first = role_name;
     role2.second = portType;
   }
 }
@@ -178,6 +202,14 @@ void WSDL_PartnerLinkType::addRole(string role, string portType_name)
  * Functions for class WSDL
  *****************************************************************************/
 
+/*!
+ * \param partnerLinkType  a pointer to a partnerLinkType
+ * \param operation_name   a name of an operation
+ *
+ * \return true, if operation_name identifies an operation of the given
+ *         partnerLinkType
+ * \return false, if the given operation was not found
+ */
 bool WSDL::checkOperation(WSDL_PartnerLinkType *partnerLinkType, string operation_name) const
 {
   assert(partnerLinkType != NULL);
@@ -209,6 +241,14 @@ bool WSDL::checkOperation(WSDL_PartnerLinkType *partnerLinkType, string operatio
 
 
 
+/*!
+ * \param partnerLinkType  a pointer to a partnerLinkType
+ * \param operation_name   a name of a partnerRole
+ *
+ * \return true, if partnerRole_name identifies a role of the given
+ *         partnerLinkType
+ * \return false, if the given role was not found
+ */
 bool WSDL::checkPartnerLinkType(WSDL_PartnerLinkType *partnerLinkType, string partnerRole_name) const
 {
   assert(partnerLinkType != NULL);

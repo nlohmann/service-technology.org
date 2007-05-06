@@ -29,7 +29,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/05/06 15:48:28 $
+ * \date    \$Date: 2007/05/06 16:19:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  *
  * \ingroup frontend
  */
@@ -159,7 +159,7 @@ tParticipantType_list:
 
 tParticipantType:
   K_PARTICIPANTTYPE arbitraryAttributes X_SLASH
-    { globals::ChorInfo.add_participantType(globals::tempAttributes["name"], globals::tempAttributes["participantBehaviorDescription"]);
+    { globals::ChorInfo.add_participantType(globals::tempAttributes);
       globals::tempAttributes.clear(); }
 ;
 

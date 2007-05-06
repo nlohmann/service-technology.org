@@ -26,13 +26,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/06 15:48:28 $
+ * \date    \$Date: 2007/05/06 16:19:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  *
  * \todo    Comment me!
  */
@@ -56,8 +56,14 @@ extern int frontend_lineno;
 
 
 
-void Choreography::add_participantType(string participantType_name, string participantBehaviorDescription_name)
+/*!
+ * \param  attribute_map  an attribute mapping provided by the BPEL4Chor parser
+ */
+void Choreography::add_participantType(map<string, string> &attribute_map)
 {
+  string participantType_name = attribute_map["name"];
+  string participantBehaviorDescription_name = attribute_map["participantBehaviorDescription"];
+
   // if participant type was already defined before, display a warning
   if (participantTypes[participantType_name] != "")
     genericError(134, participantType_name, toString(frontend_lineno), ERRORLEVER_WARNING);
@@ -69,6 +75,9 @@ void Choreography::add_participantType(string participantType_name, string parti
 
 
 
+/*!
+ * \param  attribute_map  an attribute mapping provided by the BPEL4Chor parser
+ */
 void Choreography::add_participant(map<string, string> &attribute_map)
 {
   string participant_name = attribute_map["name"];
@@ -77,7 +86,9 @@ void Choreography::add_participant(map<string, string> &attribute_map)
 
   // if participant type was not defined before, display an error
   if (participantTypes[participantType_name] == "")
-    genericError(135, "BPEL4Chor <participantType> `" + participantType_name + "' referenced by <participant> `" + participant_name + "' not defined before", toString(frontend_lineno), ERRORLEVER_WARNING);
+    genericError(135, "BPEL4Chor <participantType> `" + participantType_name +
+	"' referenced by <participant> `" + participant_name + "' not defined before",
+	toString(frontend_lineno), ERRORLEVER_WARNING);
 
   std::cerr << participant_name << " : " << participantType_name << " (" << forEach_name << ")" << std::endl;
 
@@ -90,6 +101,9 @@ void Choreography::add_participant(map<string, string> &attribute_map)
 
 
 
+/*!
+ * \param  attribute_map  an attribute mapping provided by the BPEL4Chor parser
+ */
 void Choreography::add_messageLink(map<string, string> &attribute_map)
 {
   string messageLink_name = (attribute_map["name"] != "") ?
@@ -104,7 +118,7 @@ void Choreography::add_messageLink(map<string, string> &attribute_map)
     attribute_map["receiveActivity"] :
     attribute_map["receiveActivities"];
 
-  std::cerr << "<messageLink> `" << messageLink_name << "' between `" << messageLink_sender << "' and `" << messageLink_receiver << "'" << std::endl;
+  // std::cerr << "<messageLink> `" << messageLink_name << "' between `" << messageLink_sender << "' and `" << messageLink_receiver << "'" << std::endl;
 
   messageLinks[messageLink_name] = pair<string, string>(messageLink_sender, messageLink_receiver);
 }
@@ -113,19 +127,31 @@ void Choreography::add_messageLink(map<string, string> &attribute_map)
 
 
 
-string Choreography::find_channel(string activity_name, unsigned int ASTE_id) const
+/*!
+ * \param  ASTE_id  the AST id of an activity
+ *
+ * \return the name of the message link that can be used to create a channel
+ *         name
+ */
+string Choreography::find_channel(unsigned int ASTE_id) const
 {
   assert(globals::ASTEmap[ASTE_id] != NULL);
+
+  string activity_name = (globals::ASTEmap[ASTE_id]->attributes["id"] != "") ?
+    globals::ASTEmap[ASTE_id]->attributes["id"] :
+    globals::ASTEmap[ASTE_id]->attributes["name"];
 
   // if no activity name is given, display an error
   if (activity_name == "")
   {
-    genericError(132, globals::ASTEmap[ASTE_id]->activityTypeName(), globals::ASTEmap[ASTE_id]->attributes["referenceLine"], ERRORLEVEL_ERROR);
+    genericError(132, globals::ASTEmap[ASTE_id]->activityTypeName(),
+	globals::ASTEmap[ASTE_id]->attributes["referenceLine"], ERRORLEVEL_ERROR);
     return "";
   }
 
   // search for the message link
-  for (map<string, pair<string, string> >::const_iterator messageLink = messageLinks.begin(); messageLink != messageLinks.end(); messageLink++)
+  for (map<string, pair<string, string> >::const_iterator messageLink = messageLinks.begin();
+      messageLink != messageLinks.end(); messageLink++)
   {
     if (messageLink->second.first == activity_name)
       return messageLink->first;
@@ -135,6 +161,8 @@ string Choreography::find_channel(string activity_name, unsigned int ASTE_id) co
   }
 
   // if no message link was found, display an error
-  genericError(131, "activity id or name `" + activity_name + "' of <" + globals::ASTEmap[ASTE_id]->activityTypeName() + "> does not reference a BPEL4Chor <messageLink>", globals::ASTEmap[ASTE_id]->attributes["referenceLine"], ERRORLEVEL_ERROR);
+  genericError(131, "activity id or name `" + activity_name + "' of <" +
+      globals::ASTEmap[ASTE_id]->activityTypeName() + "> does not reference a BPEL4Chor <messageLink>",
+      globals::ASTEmap[ASTE_id]->attributes["referenceLine"], ERRORLEVEL_ERROR);
   return "";
 }

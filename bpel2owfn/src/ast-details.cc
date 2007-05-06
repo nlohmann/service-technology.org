@@ -29,13 +29,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/06 15:48:28 $
+ * \date    \$Date: 2007/05/06 16:19:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.106 $
+ * \version \$Revision: 1.107 $
  */
 
 
@@ -719,11 +719,7 @@ string ASTE::createChannel(bool synchronousCommunication)
   // in case of BPEL4Chor, we can read the channel name from the choreography
   if (globals::choreography_filename != "")
   {
-    string relevant_attribute = (attributes["id"] != "") ?
-      attributes["id"] :
-      attributes["name"];
-
-    string channelName = globals::ChorInfo.find_channel(relevant_attribute, id);
+    string channelName = globals::ChorInfo.find_channel(id);
 
     switch (type)
     {

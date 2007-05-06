@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/04 10:12:05 $
+ * \date    \$Date: 2007/05/06 11:33:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.88 $
+ * \version \$Revision: 1.89 $
  *
  * \ingroup debug
  */
@@ -493,6 +493,10 @@ void genericError(unsigned int code, string information, string line, error_leve
     case(132): // activity has neither a name nor a BPEL4Chor id
 	{ cerr << "activity <" + information + "> has neither a `name' nor an `id' attribute to reference a BPEL4Chor <messageLink>" << endl;
 	  break; }
+
+    case(133): // <extensionActivity> replaced by <opaqueActivity>
+	{ cerr << "replacing <extensionActivity> with <opaqueActivity>" << endl;
+	  break; }	  
   }
 
   cerr << endl;

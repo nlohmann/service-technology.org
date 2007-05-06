@@ -40,7 +40,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/05/04 13:47:00 $
+ * \date    \$Date: 2007/05/06 11:33:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.314 $
+ * \version \$Revision: 1.315 $
  *
  * \ingroup frontend
  */
@@ -243,6 +243,7 @@ impl_joinCondition* currentJoinCondition = standardJoinCondition();
 %type <yt_tElseIf> tElseIf
 %type <yt_tEmpty> tEmpty
 %type <yt_tEventHandlers> tEventHandlers
+%type <yt_activity> tExtensionActivity
 %type <yt_tEventHandlers> truetEventHandlers
 %type <yt_tExit> tExit
 %type <yt_tFaultHandlers> tFaultHandlers
@@ -359,6 +360,7 @@ activity2:
 | tValidate		{ $$ = activityValidate($1);		}
 | tEmpty		{ $$ = activityEmpty($1);		}
 | tOpaqueActivity	{ $$ = activityOpaqueActivity($1);	}
+| tExtensionActivity	{ $$ = $1;				}
 | tWait			{ $$ = activityWait($1);		}
 | tExit			{ $$ = activityExit($1);		}
 | tThrow		{ $$ = activityThrow($1);		}
@@ -867,6 +869,19 @@ tOpaqueActivity:
     { $$ = OpaqueActivity(NoStandardElements(), $2);
       genericError(116, "", toString(frontend_lineno-1), ERRORLEVEL_NOTICE); }
 ;
+
+
+/******************************************************************************
+  EXTENSION ACTIVITY
+******************************************************************************/
+
+tExtensionActivity:
+  K_EXTENSIONACTIVITY arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_EXTENSIONACTIVITY
+    { $$ = $4; }
+| K_EXTENSIONACTIVITY arbitraryAttributes X_NEXT error X_NEXT X_SLASH K_EXTENSIONACTIVITY
+    { $$ = $$ = activityOpaqueActivity(OpaqueActivity(NoStandardElements(), $2));
+      genericError(133, "", toString(frontend_lineno-1), ERRORLEVEL_NOTICE); }
+;		  
 
 
 /******************************************************************************

@@ -1,0 +1,10 @@
+<process name="SA00003" targetNamespace="anyURI" exitOnStandardFault="yes">
+   
+   <faultHandlers>
+      <catch faultName="missingReply">
+        <empty/> 
+      </catch>
+   </faultHandlers>
+   
+   <empty/> 
+</process>

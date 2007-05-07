@@ -1,0 +1,115 @@
+<process name="SA00032" targetNamespace="anyURI">
+
+  <partnerLinks>
+    <partnerLink name="shipping"
+                 partnerLinkType="lns:shippingLT"
+                 myRole="shippingRequester"
+                 partnerRole="shippingService" />
+  </partnerLinks>
+
+  <variables>
+    <variable name="shippingInfo"
+              messageType="lns:shippingInfoMessage" />
+  </variables>
+  <sequence>  
+    
+    <receive operation="anyOperation" partnerLink="shipping" createInstance="yes"/>    
+    
+    <!-- All correct uses of from and to -->
+    
+    <sequence>  
+      <assign>
+         <copy>
+            <from/>
+            <to/>
+         </copy>
+      </assign>               
+      <assign>
+         <copy>
+            <from variable ="shippingInfo">
+            </from>
+            <to variable ="shippingInfo">
+            </to>
+         </copy>
+      </assign>               
+      <assign>
+         <copy>
+            <from variable ="shippingInfo" part="42">
+            </from>
+            <to variable ="shippingInfo" part="42">
+            </to>
+         </copy>
+      </assign>               
+      <assign>
+         <copy>
+            <from variable ="shippingInfo" part="42">
+              <query>AnotherName</query>
+            </from>
+            <to variable ="shippingInfo" part="42">
+              <query>AnotherName</query>
+            </to>
+         </copy>
+      </assign>               
+      <assign>
+         <copy>
+            <from variable ="shippingInfo">
+              <query>AnotherName</query>
+            </from>
+            <to variable ="shippingInfo">
+              <query>AnotherName</query>
+            </to>
+         </copy>
+      </assign>               
+      <assign>
+         <copy>
+            <from partnerLink="shipping"
+                  endpointReference="myRole|partnerRole"/>
+            <to partnerLink="shipping"/>
+         </copy>
+      </assign>               
+      <assign>
+         <copy>
+            <from variable="shippingInfo"
+                  property="QName"/>
+            <to variable="shippingInfo"
+                property="QName"/>
+         </copy>
+      </assign>               
+      <assign>
+         <copy>
+            <from>anotherExpression</from>
+            <to>anotherExpression</to>
+         </copy>
+      </assign>               
+      <assign>
+         <copy>
+            <from expressionLanguage = "AnotherLanguage">anotherExpression</from>
+            <to expressionLanguage = "AnotherLanguage">anotherExpression</to>
+         </copy>
+      </assign>               
+      <assign>
+         <copy>
+            <from>
+              <literal>AnotherLiteral</literal>
+            </from>
+            <to/>
+         </copy>
+      </assign>               
+    </sequence>  
+    
+    <!-- An incorrect use-->
+    
+    <assign>
+       <copy>
+          <from variable ="shippingInfo" part="42" expressionLanguage = "NotAllowed">
+            <query>AnotherName</query>
+          </from>
+          <to variable ="shippingInfo" part="42">
+            <query>AnotherName</query>
+          </to>
+       </copy>
+    </assign>               
+
+  </sequence>  
+
+</process>

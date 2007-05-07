@@ -25,11 +25,11 @@
  * \brief   Configuration of the AST
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2007/04/27 08:50:45 $
+ * \date    \$Date: 2007/05/07 16:00:49 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  *
  * \todo    Annotate the global mappings which function clear them.
  */
@@ -110,6 +110,7 @@ extern string forEach_suffix;
 #include "ast-details.h"
 #include "ast-tools.h"
 #include "globals.h"
+#include "extension-chor.h"
 
 using std::map;
 using std::string;

@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/07 10:58:05 $
+ * \date    \$Date: 2007/05/07 16:00:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.162 $
+ * \version \$Revision: 1.163 $
  */
 %}
 
@@ -56,7 +56,7 @@ Process(a,b,c,d,e,g,i,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -211,7 +211,7 @@ PartnerLink(_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -241,7 +241,7 @@ FaultHandlers(a,b,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -328,7 +328,7 @@ Catch(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -394,7 +394,7 @@ CatchAll(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
       globals::ASTEmap[a->id]->parentActivityId = myid;
@@ -429,7 +429,7 @@ emptyEventHandlers(_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -446,7 +446,7 @@ EventHandlers(a,b,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -493,7 +493,7 @@ OnMessage(a,b,c,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -565,7 +565,7 @@ OnAlarm(b,a,_id) ->
   [postprocessing: 
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -616,7 +616,7 @@ CompensationHandler(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -677,7 +677,7 @@ TerminationHandler(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -724,7 +724,7 @@ Variable(_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -744,7 +744,7 @@ CorrelationSet(_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -764,7 +764,7 @@ Correlation(_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -792,7 +792,7 @@ ToPart(_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -805,7 +805,7 @@ FromPart(_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
             
@@ -823,7 +823,7 @@ Empty(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -848,7 +848,7 @@ OpaqueActivity(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -873,7 +873,7 @@ volatile_Invoke(a,b,c,d,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -926,7 +926,7 @@ Receive(a,b,c,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -983,7 +983,7 @@ Reply(a,b,c,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1031,7 +1031,7 @@ Assign(a,b,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1055,7 +1055,7 @@ From(_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1122,7 +1122,7 @@ To(_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1172,7 +1172,7 @@ Validate(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1197,7 +1197,7 @@ Wait(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1222,7 +1222,7 @@ Throw(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1248,7 +1248,7 @@ Rethrow(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1290,7 +1290,7 @@ Compensate(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1339,7 +1339,7 @@ CompensateScope(a,b,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1399,7 +1399,7 @@ Exit(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1424,7 +1424,7 @@ Flow(a,b,c,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1500,7 +1500,7 @@ Link(_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1525,7 +1525,7 @@ If(a,b,c,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1593,7 +1593,7 @@ ElseIf(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1613,7 +1613,7 @@ Else(a,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1640,7 +1640,7 @@ While(a,b,_id) ->
     {
       // manage identifiers
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1695,7 +1695,7 @@ RepeatUntil(a,b,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1750,7 +1750,7 @@ Sequence(a,b,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1819,7 +1819,7 @@ Pick(a,b,c,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
@@ -1919,11 +1919,9 @@ ForEach(a,b,c,d,e,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
-      assert(myself != NULL);
-
-      
+      assert(myself != NULL);    
 
       a->parentId = myid;
 
@@ -1965,8 +1963,13 @@ ForEach(a,b,c,d,e,_id) ->
       }
       else
       {
-        if ((string(b->name) == "opaque") && (string(c->name) == "opaque"))
+        // the forEach is annotated by an id that references a BPEL4Chor participantSet
+        if ((globals::choreography_filename != "") && (string(b->name) == "opaque") && (string(c->name) == "opaque"))
+        {
+          cerr << globals::ChorInfo.find_forEach(myid) << endl;
+
           myself->max_loops = 3;
+        }
         else
         {
 	  // calculate the maximal occurrences of the enclosed activity
@@ -2020,7 +2023,7 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
-      int myid = _id->value;
+      unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
       a->parentId = myid;

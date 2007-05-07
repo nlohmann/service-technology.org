@@ -26,17 +26,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/07 10:58:05 $
+ * \date    \$Date: 2007/05/07 16:00:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.91 $
+ * \version \$Revision: 1.92 $
  *
  * \ingroup debug
  */
@@ -201,7 +201,7 @@ void show_process_information()
   if (globals::static_analysis_errors == 0)
   {
     cerr << colorconsole::fg_green << "[STATIC ANALYSIS] " << colorconsole::fg_standard;
-    cerr << "No errors found checking 44 statics analysis requirements." << endl;
+    cerr << "No errors found checking 46 statics analysis requirements." << endl;
   }
   else if (globals::abstract_process)
   {
@@ -504,7 +504,11 @@ void genericError(unsigned int code, string information, string line, error_leve
 
     case(135): // BPEL4Chor <participantType> not found for a <participant>
 	{ cerr << information << endl;
-	  break; }	  
+	  break; }
+
+    case(136): // BPEL4Chor forEach id not found
+	{ cerr << "<forEach> id or name `" << information << "' does not reference a BPEL4Chor <participant> or <participantSet>" << endl;
+	  break; }
   }
 
   cerr << endl;

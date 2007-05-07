@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/06 17:22:09 $
+ * \date    \$Date: 2007/05/07 16:00:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 
 
@@ -90,7 +90,8 @@ void Choreography::add_participant(map<string, string> &attribute_map)
 	"' referenced by <participant> `" + participant_name + "' not defined before",
 	toString(frontend_lineno), ERRORLEVER_WARNING);
 
-  std::cerr << participant_name << " : " << participantType_name << " (" << forEach_name << ")" << std::endl;
+  if (forEach_name != "")
+    forEach_participants[forEach_name] = participant_name;
 
   // reset name and forEach attribute -- the type attribute is not touched
   attribute_map["name"] = "";
@@ -165,4 +166,38 @@ string Choreography::find_channel(unsigned int ASTE_id) const
       globals::ASTEmap[ASTE_id]->activityTypeName() + "> does not reference a BPEL4Chor <messageLink>",
       globals::ASTEmap[ASTE_id]->attributes["referenceLine"], ERRORLEVEL_ERROR);
   return "";
+}
+
+
+
+
+
+/*!
+ * \param  ASTE_id  the AST id of an activity
+ *
+ * \todo   make me const
+ */
+string Choreography::find_forEach(unsigned int ASTE_id)
+{
+  assert(globals::ASTEmap[ASTE_id] != NULL);
+
+  string forEach_name = (globals::ASTEmap[ASTE_id]->attributes["id"] != "") ?
+    globals::ASTEmap[ASTE_id]->attributes["id"] :
+    globals::ASTEmap[ASTE_id]->attributes["name"];
+
+  if (forEach_participants[forEach_name] == "")
+    genericError(136, forEach_name, globals::ASTEmap[ASTE_id]->attributes["referenceLine"], ERRORLEVER_WARNING);
+
+  return forEach_participants[forEach_name];
+}
+
+
+
+
+
+void Choreography::print_information() const
+{
+  std::cerr << messageLinks.size() << " message links, " <<
+    participantTypes.size() << " participant types, " <<
+    forEach_participants.size() << " forEach participants" << std::endl;
 }

@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/06 17:22:09 $
+ * \date    \$Date: 2007/05/07 16:00:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  */
 
 
@@ -70,6 +70,9 @@ class Choreography
 
     /// the participantTypes
     map<string, string> participantTypes;
+
+    /// a mapping from a forEach's name to the running variable
+    map<string, string> forEach_participants;
     
   public:
     /// add a <participantType>
@@ -83,6 +86,12 @@ class Choreography
 
     /// find a channel name given an activity id or name
     string find_channel(unsigned int ASTE_id) const;
+
+    /// find a forEach name given an activity id or name
+    string find_forEach(unsigned int ASTE_id);
+
+    /// prints information about the BPEL4Chor topology
+    void print_information() const;
 };
 
 

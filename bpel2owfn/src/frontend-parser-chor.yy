@@ -29,7 +29,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/05/06 16:19:11 $
+ * \date    \$Date: 2007/05/07 16:00:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  *
  * \ingroup frontend
  */
@@ -141,6 +141,7 @@ extern int frontend_lineno;
 
 tTopology:
   X_OPEN K_TOPOLOGY arbitraryAttributes X_NEXT tParticipantTypes tParticipants tMessageLinks X_SLASH K_TOPOLOGY X_CLOSE
+    { globals::ChorInfo.print_information(); }
 ;
 
 

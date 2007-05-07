@@ -24,17 +24,17 @@
  * \brief   WSDL extension
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/06 17:22:09 $
+ * \date    \$Date: 2007/05/07 13:54:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 
 
@@ -47,6 +47,7 @@
 #include "globals.h"
 #include "debug.h"
 #include "helpers.h"
+#include "ast-details.h"
 
 
 extern int frontend_lineno;
@@ -259,4 +260,43 @@ bool WSDL::checkPartnerLinkType(WSDL_PartnerLinkType *partnerLinkType, string pa
     return true;
 
   return false;
+}
+
+
+
+
+/*!
+ * \param partnerLink  a name of a partnerLink
+ * \param role         a name of a role
+ * \param portType     a name of a portType
+ *
+ * \return true, if the combination is validated in WDSL
+ * \return false, if it is not
+ */
+bool WSDL::checkPortType(string partnerLink, string role, string portType) const
+{
+  string partnerLinkTypeName;
+  WSDL_PartnerLinkType *partnerLinkType;
+  unsigned int partnerLinkId;
+  
+  partnerLinkId = globals::ASTE_partnerLinks[partnerLink];
+  if (partnerLinkId==0)
+    return false;
+  
+  partnerLinkTypeName = globals::ASTEmap[partnerLinkId]->attributes["partnerLinkType"];
+  if (partnerLinkTypeName=="")
+    return false;
+  
+  partnerLinkType = globals::WSDLInfo.partnerLinkTypes[partnerLinkTypeName];
+  if (partnerLinkType==NULL)
+    return false;
+    
+  if (!(partnerLinkType->role1.first == role || partnerLinkType->role2.first == role))
+    return false;
+
+  if (!( partnerLinkType->role1.second != globals::WSDLInfo.portTypes[role] ||
+         partnerLinkType->role2.second != globals::WSDLInfo.portTypes[role] ))
+    return false;
+
+  return true;
 }

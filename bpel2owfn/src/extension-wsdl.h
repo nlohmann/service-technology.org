@@ -24,17 +24,17 @@
  * \brief   WSDL extension
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/06 17:22:09 $
+ * \date    \$Date: 2007/05/07 13:54:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  */
 
 
@@ -172,6 +172,10 @@ class WSDL
 
     /// check a partnerLinkType
     bool checkPartnerLinkType(WSDL_PartnerLinkType *partnerLinkType, string partnerRole_name) const;
+
+    /// check a combination of partnerLink, role and portType
+    bool checkPortType(string partnerLink, string role, string portType) const;
+
 };
 
 #endif

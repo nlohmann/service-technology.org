@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/29 12:07:12 $ by $Author: nielslohmann $
-# Version $Revision: 1.57 $
+# File last changed $Date: 2007/05/07 08:14:33 $ by $Author: nielslohmann $
+# Version $Revision: 1.58 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc rpm
@@ -56,6 +56,8 @@ hu-prepare: maintainer-clean
 	-rm -f configure
 	-rm -f depcomp
 	-rm -f compile
+	-rm -f config.guess
+	-rm -f config.sub
 	-rm -f install-sh
 	-rm -f Makefile.in
 	-rm -f missing

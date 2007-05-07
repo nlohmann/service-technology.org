@@ -143,10 +143,10 @@ InTransitionParsePosition inTransitionParsePosition;
 %token comma colon semicolon ident number negative_number
 %token lpar rpar
 
-%nonassoc op_eq op_ne op_gt op_lt op_ge op_le
-%left op_not
-%left op_and
 %left op_or
+%left op_and
+%left op_not
+%nonassoc op_eq op_ne op_gt op_lt op_ge op_le
 
 
 // the start symbol of the grammar

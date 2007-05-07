@@ -90,8 +90,8 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
 %token key_true key_false
 %token lpar rpar
 
-%left op_and
 %left op_or
+%left op_and
 
 
 // Bison generates a list of all used tokens in file "syntax_og.h" (for flex)

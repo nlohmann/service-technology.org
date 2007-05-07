@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/06 12:38:30 $
+ * \date    \$Date: 2007/05/07 10:58:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.161 $
+ * \version \$Revision: 1.162 $
  */
 %}
 
@@ -808,7 +808,7 @@ FromPart(_id) ->
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
-
+            
       myself->checkAttributes();
      }
   ]
@@ -1059,6 +1059,56 @@ From(_id) ->
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
+      if (myself->attributes["has_literal"] == "")
+      {
+        if(myself->attributes["has_expression"] == "")
+        {
+          if (myself->attributes["variable"] == "")
+          {
+            if (myself->attributes["endpointReference"] == "")
+            {
+              if (! (myself->attributes["property"] == "" && myself->attributes["partnerLink"] == ""
+                  && myself->attributes["expressionLanguage"] == "" && myself->attributes["has_query"] == ""
+                  && myself->attributes["part"] == ""))
+                SAerror(32, "from", myself->attributes["referenceLine"]);
+            }
+            else
+            {
+              if (! (myself->attributes["property"] == "" && myself->attributes["partnerLink"] != ""
+                  && myself->attributes["expressionLanguage"] == "" && myself->attributes["has_query"] == ""
+                  && myself->attributes["part"] == ""))
+                SAerror(32, "from", myself->attributes["referenceLine"]);
+            }
+          }
+          else
+          {
+            if (! (myself->attributes["endpointReference"] == "" && myself->attributes["property"] != "" 
+                && myself->attributes["partnerLink"] == "" && myself->attributes["expressionLanguage"] == ""
+                && myself->attributes["has_query"] == "" && myself->attributes["part"] == "")
+                &&
+                ! (myself->attributes["endpointReference"] == "" && myself->attributes["property"] == "" 
+                && myself->attributes["partnerLink"] == "" && myself->attributes["expressionLanguage"] == "")
+                )
+              SAerror(32, "from", myself->attributes["referenceLine"]);           
+          }
+        }
+        else
+        {
+          if (! (myself->attributes["has_query"] == "" && myself->attributes["variable"] == "" 
+              && myself->attributes["endpointReference"] == "" && myself->attributes["property"] == "" 
+              && myself->attributes["partnerLink"] == ""&& myself->attributes["part"] == ""))
+            SAerror(32, "from", myself->attributes["referenceLine"]);
+        }
+      }
+      else
+      {
+        if (! (myself->attributes["has_query"] == "" && myself->attributes["has_expression"] == ""
+            && myself->attributes["variable"] == "" && myself->attributes["endpointReference"] == ""
+            && myself->attributes["property"] == "" && myself->attributes["partnerLink"] == ""
+            && myself->attributes["expressionLanguage"] == "" && myself->attributes["part"] == ""))
+          SAerror(32, "from", myself->attributes["referenceLine"]);
+      }
+
       myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
@@ -1075,6 +1125,34 @@ To(_id) ->
       int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
+
+      if(myself->attributes["has_expression"] == "")
+      {
+        if (myself->attributes["variable"] == "")
+        {
+          if (! (myself->attributes["property"] == "" && myself->attributes["expressionLanguage"] == "" 
+              && myself->attributes["has_query"] == "" && myself->attributes["part"] == ""))
+            SAerror(32, "to", myself->attributes["referenceLine"]);
+        }
+        else
+        {
+          if (! (myself->attributes["property"] != "" && myself->attributes["part"] == ""
+              && myself->attributes["partnerLink"] == "" && myself->attributes["expressionLanguage"] == ""
+              && myself->attributes["has_query"] == "")
+              &&
+              ! (myself->attributes["expressionLanguage"] == "" && myself->attributes["property"] == "" 
+              && myself->attributes["partnerLink"] == "")
+              )
+            SAerror(32, "to", myself->attributes["referenceLine"]);           
+        }
+      }
+      else
+      {
+        if (! (myself->attributes["has_query"] == "" && myself->attributes["variable"] == "" 
+            && myself->attributes["part"] == "" && myself->attributes["property"] == "" 
+            && myself->attributes["partnerLink"] == ""))
+          SAerror(32, "to", myself->attributes["referenceLine"]);
+      }
 
       myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();

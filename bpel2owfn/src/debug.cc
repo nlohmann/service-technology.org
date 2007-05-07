@@ -26,17 +26,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/06 15:48:28 $
+ * \date    \$Date: 2007/05/07 10:58:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.90 $
+ * \version \$Revision: 1.91 $
  *
  * \ingroup debug
  */
@@ -609,6 +609,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
       { cerr << "<variable> `" << information << "' must either use `messageType', `type' or `element' attribute" << endl;
 	break; }
 	
+    case(32):
+      { cerr << "<" << information << "> has an invalid combination of attributes and/or elements" << endl;
+	break; }
+
     case(44):
       { cerr << "<correlationSet> `" << information << "' already defined in this scope/process" << endl;
 	break; }

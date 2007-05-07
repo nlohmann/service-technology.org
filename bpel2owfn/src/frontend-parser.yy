@@ -36,11 +36,11 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/05/06 15:48:28 $
+ * \date    \$Date: 2007/05/07 10:58:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.317 $
+ * \version \$Revision: 1.318 $
  *
  * \ingroup frontend
  */
@@ -788,13 +788,13 @@ tFrom:
   K_FROM arbitraryAttributes X_NEXT X_SLASH K_FROM
     { $$ = From($2); }
 | K_FROM arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_FROM
-    { $$ = From($2); }
+    { globals::temporaryAttributeMap[$2->value]["has_expression"] = "true"; $$ = From($2); }
 | K_FROM arbitraryAttributes X_CLOSE VARIABLENAME X_OPEN X_SLASH K_FROM
-    { $$ = From($2); }
+    { globals::temporaryAttributeMap[$2->value]["has_expression"] = "true"; $$ = From($2); }
 | K_FROM arbitraryAttributes X_NEXT tLiteral X_NEXT X_SLASH K_FROM
-    { $$ = From($2); }
+    { globals::temporaryAttributeMap[$2->value]["has_literal"] = "true"; $$ =  From($2); }
 | K_FROM arbitraryAttributes X_NEXT tQuery X_NEXT X_SLASH K_FROM
-    { $$ = From($2); }
+    { globals::temporaryAttributeMap[$2->value]["has_query"] = "true"; $$ = From($2); }
 | K_FROM arbitraryAttributes X_SLASH
     { $$ = From($2); }
 | K_FROM arbitraryAttributes error K_FROM
@@ -820,11 +820,11 @@ tTo:
   K_TO arbitraryAttributes X_NEXT X_SLASH K_TO
     { $$ = To($2); }
 | K_TO arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_TO
-    { $$ = To($2); }
+    { globals::temporaryAttributeMap[$2->value]["has_expression"] = "true"; $$ = To($2); }
 | K_TO arbitraryAttributes X_CLOSE VARIABLENAME X_OPEN X_SLASH K_TO
-    { $$ = To($2); }
+    { globals::temporaryAttributeMap[$2->value]["has_expression"] = "true"; $$ = To($2); }
 | K_TO arbitraryAttributes X_NEXT tQuery X_NEXT X_SLASH K_TO
-    { $$ = To($2); }
+    { globals::temporaryAttributeMap[$2->value]["has_query"] = "true"; $$ = To($2); }
 | K_TO arbitraryAttributes X_SLASH
     { $$ = To($2); }
 | K_TO arbitraryAttributes error K_TO

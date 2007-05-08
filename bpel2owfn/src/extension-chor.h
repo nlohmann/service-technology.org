@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/08 14:18:56 $
+ * \date    \$Date: 2007/05/08 16:11:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 
 
@@ -46,34 +46,45 @@
 
 
 #include <map>
+#include <set>
 #include <string>
 #include <utility>
 
 using std::map;
 using std::string;
 using std::pair;
+using std::set;
 
 
 
 
 
-class BPEL4Chor_forEach
+class BPEL4Chor_participantSet
 {
   friend class BPEL4Chor;
-  friend class BPEL4Chor_MessageLink;
+  friend class BPEL4Chor_messageLink;
 
   private:
-    /// name of the forEach (attribute "forEach")
+    /// name of the participantSet
     string name;
+
+    /// name of the forEach
+    string forEach_name;
+
+    /// name of the participantType
+    string participantType_name;
 
     /// maximal number of iterations (attribute "count")
     unsigned int count;
 
-    /// iterator partcipant name
-    string iterator_participant_name;
+    /// a set of iterator participant names
+    set<string> iterator_participant_names;
+
+    /// a set of unique participant names
+    set<string> unique_participant_names;
 
     /// constructor
-    BPEL4Chor_forEach(map<string, string> &attribute_map);
+    BPEL4Chor_participantSet(map<string, string> &attribute_map);
 };
 
 
@@ -81,11 +92,11 @@ class BPEL4Chor_forEach
 
 
 /*!
- * \class BPEL4Chor_MessageLink
+ * \class BPEL4Chor_messageLink
  *
  * A BPEL4Chor messageLink.
  */
-class BPEL4Chor_MessageLink
+class BPEL4Chor_messageLink
 {
   friend class BPEL4Chor;
 
@@ -112,10 +123,10 @@ class BPEL4Chor_MessageLink
     string messageName;
 
     /// a pointer to a forEach if an iterator participant is involved
-    BPEL4Chor_forEach *forEach;
+    BPEL4Chor_participantSet *participantSet;
 
     /// constructor
-    BPEL4Chor_MessageLink(map<string, string> &attribute_map);
+    BPEL4Chor_messageLink(map<string, string> &attribute_map);
 };
 
 
@@ -129,18 +140,21 @@ class BPEL4Chor_MessageLink
  */
 class BPEL4Chor
 {
-  friend class BPEL4Chor_forEach;
-  friend class BPEL4Chor_MessageLink;
+  friend class BPEL4Chor_participantSet;
+  friend class BPEL4Chor_messageLink;
 
   private:
+    /// the currently parsed participantSet
+    BPEL4Chor_participantSet *current_participantSet;
+
     /// the messageLinks, indexed by their name
-    map<string, BPEL4Chor_MessageLink*> messageLinks;
+    map<string, BPEL4Chor_messageLink*> messageLinks;
 
     /// the participantTypes, indexed by their name
     map<string, string> participantTypes;
 
-    /// the forEachs, indexed by their name
-    map<string, BPEL4Chor_forEach*> forEachs;
+    /// the participantSets, indexed by their name
+    map<string, BPEL4Chor_participantSet*> participantSets;
 
   public:
     /// add a <participantType>
@@ -149,6 +163,12 @@ class BPEL4Chor
     /// add a <participant>
     void add_participant(map<string, string> &attribute_map);
 
+    /// start processing a <participantSet>
+    void start_participantSet(map<string, string> &attribute_map);
+
+    /// end processing a <participantSet>
+    void end_participantSet();
+
     /// add a <messageLink>
     void add_messageLink(map<string, string> &attribute_map);
 
@@ -156,13 +176,16 @@ class BPEL4Chor
     string channel_name(unsigned int ASTE_id) const;
 
     /// find a forEach name given an activity id or name
-    unsigned int forEach_count(unsigned int ASTE_id);
+    unsigned int forEach_count(unsigned int ASTE_id) const;
 
     /// returns the number of times a channel is used
-    unsigned int channel_count(unsigned int ASTE_id, bool sending);
+    unsigned int channel_count(unsigned int ASTE_id, bool sending) const;
 
     /// prints information about the BPEL4Chor topology
     void print_information() const;
+
+    /// constructor
+    BPEL4Chor();
 };
 
 

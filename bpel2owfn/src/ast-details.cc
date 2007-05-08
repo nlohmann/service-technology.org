@@ -29,13 +29,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/08 14:18:56 $
+ * \date    \$Date: 2007/05/08 16:11:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.108 $
+ * \version \$Revision: 1.109 $
  */
 
 
@@ -762,14 +762,13 @@ string ASTE::createChannel(bool synchronousCommunication)
       case(K_RECEIVE):
       case(K_ONMESSAGE):
 	{
-	  // depending on the channel count, create input channel(s)
+	  // depending on the channel count, create one or more input channel(s)
 	  unsigned int count = globals::BPEL4ChorInfo.channel_count(id, false);
 	  if (count != 0 && count != UINT_MAX)
 	  {
 	    channel_instances = 1;
 	    for (unsigned int i = 1; i <= count; i++)
 	      globals::ASTE_inputChannels[channelName] = count;
-//	      globals::ASTE_inputChannels.insert(channelName + ".instance_" + toString(count));
 	  }
 	  else
 	    globals::ASTE_inputChannels[channelName] = 1;
@@ -781,14 +780,13 @@ string ASTE::createChannel(bool synchronousCommunication)
       case(K_INVOKE):
       case(K_REPLY):
 	{
-	  // depending on the channel count, create output channel(s)
+	  // depending on the channel count, create one or more output channel(s)
 	  unsigned int count = globals::BPEL4ChorInfo.channel_count(id, true);
 	  if (count != 0 && count != UINT_MAX)
 	  {
 	    channel_instances = 1;
 	    for (unsigned int i = 1; i <= count; i++)
 	      globals::ASTE_outputChannels[channelName] = count;
-//	      globals::ASTE_outputChannels.insert(channelName + ".instance_" + toString(count));
 	  }
 	  else
 	    globals::ASTE_outputChannels[channelName] = 1;

@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/08 14:18:56 $
+ * \date    \$Date: 2007/05/08 16:11:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 
 
@@ -56,12 +56,21 @@ extern int frontend_lineno;
 
 
 
-BPEL4Chor_forEach::BPEL4Chor_forEach(map<string, string> &attribute_map)
+BPEL4Chor_participantSet::BPEL4Chor_participantSet(map<string, string> &attribute_map)
 {
-  name = attribute_map["forEach"];
+  // read attributes
+  name = attribute_map["name"];
+  forEach_name = attribute_map["forEach"];
+  participantType_name = attribute_map["type"];
   count = toUInt(attribute_map["count"]);
-  iterator_participant_name = attribute_map["name"];
 
+  // if participantType is not found, display an error
+  if (participantType_name == "")
+    genericError(135, "BPEL4Chor <participantType> `" + participantType_name +
+	"' referenced by <participantSet> `" + name + "' not defined before",
+	toString(frontend_lineno), ERRORLEVER_WARNING);
+
+  // warn if no count is given
   if (count == UINT_MAX)
     std::cerr << "no count given" << std::endl;
 }
@@ -70,7 +79,7 @@ BPEL4Chor_forEach::BPEL4Chor_forEach(map<string, string> &attribute_map)
 
 
 
-BPEL4Chor_MessageLink::BPEL4Chor_MessageLink(map<string, string> &attribute_map)
+BPEL4Chor_messageLink::BPEL4Chor_messageLink(map<string, string> &attribute_map)
 {
   name = attribute_map["name"];
   sender = attribute_map["sender"];
@@ -89,13 +98,13 @@ BPEL4Chor_MessageLink::BPEL4Chor_MessageLink(map<string, string> &attribute_map)
     attribute_map["receiveActivity"] :
     attribute_map["receiveActivities"];
 
-  forEach = NULL;
-  for (map<string, BPEL4Chor_forEach*>::const_iterator forEach_it = globals::BPEL4ChorInfo.forEachs.begin();
-      forEach_it != globals::BPEL4ChorInfo.forEachs.end(); forEach_it++)
+  participantSet = NULL;
+  for (map<string, BPEL4Chor_participantSet*>::const_iterator participantSet_it = globals::BPEL4ChorInfo.participantSets.begin();
+      participantSet_it != globals::BPEL4ChorInfo.participantSets.end(); participantSet_it++)
   {
-    if (forEach_it->second->iterator_participant_name == receiver ||
-	forEach_it->second->iterator_participant_name == sender)
-      forEach = forEach_it->second;
+    if (participantSet_it->second->iterator_participant_names.find(receiver) != participantSet_it->second->iterator_participant_names.end() ||
+	participantSet_it->second->iterator_participant_names.find(sender) != participantSet_it->second->iterator_participant_names.end())
+      participantSet = participantSet_it->second;
   }
 }
 
@@ -127,21 +136,17 @@ void BPEL4Chor::add_participantType(map<string, string> &attribute_map)
  */
 void BPEL4Chor::add_participant(map<string, string> &attribute_map)
 {
-  string participant_name = attribute_map["name"];
-  string participantType_name = attribute_map["type"];
-  string forEach_name = attribute_map["forEach"];
+  // add the participant to the current participantSet if present
+  if (current_participantSet != NULL)
+  {
+    if (attribute_map["forEach"] != "")
+      current_participantSet->iterator_participant_names.insert(attribute_map["name"]);
+    else
+      current_participantSet->unique_participant_names.insert(attribute_map["name"]);
+  }
 
-  // if participant type was not defined before, display an error
-  if (participantTypes[participantType_name] == "")
-    genericError(135, "BPEL4Chor <participantType> `" + participantType_name +
-	"' referenced by <participant> `" + participant_name + "' not defined before",
-	toString(frontend_lineno), ERRORLEVER_WARNING);
-
-  // store the forEach
-  if (forEach_name != "")
-    forEachs[forEach_name] = new BPEL4Chor_forEach(attribute_map);
-
-  // reset name, count, and forEach attribute -- the type attribute is not touched
+  // reset attributes
+  attribute_map["type"] = "";
   attribute_map["name"] = "";
   attribute_map["forEach"] = "";
   attribute_map["count"] = "";
@@ -154,9 +159,31 @@ void BPEL4Chor::add_participant(map<string, string> &attribute_map)
 /*!
  * \param  attribute_map  an attribute mapping provided by the BPEL4Chor parser
  */
+void BPEL4Chor::start_participantSet(map<string, string> &attribute_map)
+{
+  current_participantSet = new BPEL4Chor_participantSet(attribute_map);
+  participantSets[attribute_map["name"]] = current_participantSet;
+}
+
+
+
+
+
+void BPEL4Chor::end_participantSet()
+{
+  current_participantSet = NULL;
+}
+
+
+
+
+
+/*!
+ * \param  attribute_map  an attribute mapping provided by the BPEL4Chor parser
+ */
 void BPEL4Chor::add_messageLink(map<string, string> &attribute_map)
 {
-  BPEL4Chor_MessageLink *temp = new BPEL4Chor_MessageLink(attribute_map);
+  BPEL4Chor_messageLink *temp = new BPEL4Chor_messageLink(attribute_map);
   messageLinks[temp->id] = temp;
 }
 
@@ -187,7 +214,7 @@ string BPEL4Chor::channel_name(unsigned int ASTE_id) const
   }
 
   // search for the message link
-  for (map<string, BPEL4Chor_MessageLink*>::const_iterator messageLink = messageLinks.begin();
+  for (map<string, BPEL4Chor_messageLink*>::const_iterator messageLink = messageLinks.begin();
       messageLink != messageLinks.end(); messageLink++)
   {
     if (messageLink->second->sendActivity == activity_name)
@@ -211,33 +238,52 @@ string BPEL4Chor::channel_name(unsigned int ASTE_id) const
 /*!
  * \param  ASTE_id  the AST id of an activity
  *
- * \todo   make me const
+ * \return maximal iterations
  */
-unsigned int BPEL4Chor::forEach_count(unsigned int ASTE_id)
+unsigned int BPEL4Chor::forEach_count(unsigned int ASTE_id) const
 {
   assert(globals::ASTEmap[ASTE_id] != NULL);
 
+  // find the forEach's name
   string forEach_name = (globals::ASTEmap[ASTE_id]->attributes["id"] != "") ?
     globals::ASTEmap[ASTE_id]->attributes["id"] :
     globals::ASTEmap[ASTE_id]->attributes["name"];
 
-  if (forEachs[forEach_name] == NULL)
+  // find the participantSet using the given forEach
+  BPEL4Chor_participantSet *participantSet = NULL;
+  for (map<string, BPEL4Chor_participantSet*>::const_iterator participantSet_it = participantSets.begin();
+      participantSet_it != participantSets.end(); participantSet_it++)
   {
-    return UINT_MAX;
-    genericError(136, forEach_name, globals::ASTEmap[ASTE_id]->attributes["referenceLine"], ERRORLEVER_WARNING);
+    assert(participantSet_it->second != NULL);
+
+    if (participantSet_it->second->forEach_name == forEach_name)
+    {
+      participantSet = participantSet_it->second;
+      break;
+    }      
   }
-  else
-    return forEachs[forEach_name]->count;
+
+  // if the participantSet is not found, display a warning
+  if (participantSet == NULL)
+  {
+    genericError(136, forEach_name, globals::ASTEmap[ASTE_id]->attributes["referenceLine"], ERRORLEVER_WARNING);
+    return UINT_MAX;
+  }
+
+  return participantSet->count;
 }
 
 
 
 
 
-unsigned int BPEL4Chor::channel_count(unsigned int ASTE_id, bool sending)
+unsigned int BPEL4Chor::channel_count(unsigned int ASTE_id, bool sending) const
 {
-  BPEL4Chor_MessageLink* messageLink = messageLinks[channel_name(ASTE_id)];
-  
+  string temp_channel_name = channel_name(ASTE_id);
+  BPEL4Chor_messageLink* messageLink = (messageLinks.find(temp_channel_name) != messageLinks.end()) ?
+    messageLinks.find(temp_channel_name)->second :
+    NULL;
+
   // if messageLink was not found, display an error
   if (messageLink == NULL)
   {
@@ -245,16 +291,16 @@ unsigned int BPEL4Chor::channel_count(unsigned int ASTE_id, bool sending)
     return 0;
   }
 
-  if (messageLink->forEach == NULL)
+  if (messageLink->participantSet == NULL)
     return 0;
 
   // activity is sending messages to a receiver nested in a forEach
-  if (sending && (messageLink->forEach->iterator_participant_name == messageLink->receiver))
-    return messageLink->forEach->count;
+  if (sending && (messageLink->participantSet->iterator_participant_names.find(messageLink->receiver) != messageLink->participantSet->iterator_participant_names.end()))
+    return messageLink->participantSet->count;
 
   // activity is receiving messages from a sender nested in a forEach
-  if (!sending && (messageLink->forEach->iterator_participant_name == messageLink->sender))
-    return messageLink->forEach->count;
+  if (!sending && (messageLink->participantSet->iterator_participant_names.find(messageLink->sender) != messageLink->participantSet->iterator_participant_names.end()))
+    return messageLink->participantSet->count;
 
   return 0;
 }
@@ -267,5 +313,14 @@ void BPEL4Chor::print_information() const
 {
   std::cerr << messageLinks.size() << " message links, " <<
     participantTypes.size() << " participant types, " <<
-    forEachs.size() << " forEach participants" << std::endl;
+    participantSets.size() << " participantSets" << std::endl;
+}
+
+
+
+
+
+BPEL4Chor::BPEL4Chor() :
+  current_participantSet(NULL)
+{
 }

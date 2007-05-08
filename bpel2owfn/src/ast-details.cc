@@ -29,13 +29,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/06 16:19:11 $
+ * \date    \$Date: 2007/05/08 14:18:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.107 $
+ * \version \$Revision: 1.108 $
  */
 
 
@@ -76,14 +76,12 @@ using std::endl;
  * \param myid an id of an AST node
  * \param mytype value of the type of the node using the token values defined
  *               by flex and bison
- *
- * \todo "real" initialization
  */
 ASTE::ASTE(unsigned int myid, unsigned int mytype) :
   id(myid), type(mytype), controlFlow(POSITIVECF), visConnection("none"), secVisConnection("none"), 
   plRoleDetails(NULL), isStartActivity(false), cyclic(false), highlighted(false), isUserDefined(true), callable(true),
-  sourceActivity(0), targetActivity(0), max_occurrences(1), max_loops(UINT_MAX), enclosedFH(0), enclosedCH(0), drawn(false),
-  partnerLinkType(NULL)
+  sourceActivity(0), targetActivity(0), max_occurrences(1), max_loops(UINT_MAX), enclosedFH(0), enclosedCH(0), channel_instances(0),
+  drawn(false), partnerLinkType(NULL)
 {
   assert(myid != 0);
 
@@ -91,36 +89,73 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype) :
 
   if (globals::parsing)
   {
+    // we are parsing: these activities are explicit
     switch (mytype)
     {
       case(K_LINK):	globals::process_information.links++; break;
       case(K_SCOPE):	globals::process_information.scopes++; break;
       case(K_VARIABLE):	globals::process_information.variables++; break;
 
-      case(K_EMPTY): case(K_INVOKE): case(K_RECEIVE): case(K_REPLY): case(K_ASSIGN):
-      case(K_VALIDATE): case(K_WAIT): case(K_THROW): case(K_RETHROW):
-      case(K_EXIT): case(K_COMPENSATE): case(K_COMPENSATESCOPE):
+      // basic activity
+      case(K_EMPTY):
+      case(K_INVOKE):
+      case(K_RECEIVE):
+      case(K_REPLY):
+      case(K_ASSIGN):
+      case(K_VALIDATE):
+      case(K_WAIT):
+      case(K_THROW):
+      case(K_RETHROW):
+      case(K_EXIT):
+      case(K_COMPENSATE):
+      case(K_COMPENSATESCOPE):
+      case(K_OPAQUEACTIVITY):
 			globals::process_information.basic_activities++; break;
 
-      case(K_WHILE): case(K_REPEATUNTIL): case(K_SEQUENCE): case(K_FLOW):
-      case(K_PICK): case(K_IF): case(K_FOREACH):
+      // structured activities
+      case(K_WHILE):
+      case(K_REPEATUNTIL):
+      case(K_SEQUENCE):
+      case(K_FLOW):
+      case(K_PICK):
+      case(K_IF):
+      case(K_FOREACH):
 			globals::process_information.structured_activities++; break;
     }
   }
   else
   {
+    // we are not parsing any more: these activities are implicit
     switch (mytype)
     {
       case(K_SCOPE):
-      case(K_EMPTY): case(K_INVOKE): case(K_RECEIVE): case(K_REPLY): case(K_ASSIGN):
-      case(K_VALIDATE): case(K_WAIT): case(K_THROW): case(K_RETHROW):
-      case(K_EXIT): case(K_COMPENSATE): case(K_COMPENSATESCOPE):
-      case(K_WHILE): case(K_REPEATUNTIL): case(K_SEQUENCE): case(K_FLOW):
-      case(K_PICK): case(K_IF): case(K_FOREACH):
-	globals::process_information.implicit_activities++; break;
+      case(K_EMPTY):
+      case(K_INVOKE):
+      case(K_RECEIVE):
+      case(K_REPLY):
+      case(K_ASSIGN):
+      case(K_VALIDATE):
+      case(K_WAIT):
+      case(K_THROW):
+      case(K_RETHROW):
+      case(K_EXIT):
+      case(K_COMPENSATE):
+      case(K_COMPENSATESCOPE):
+      case(K_OPAQUEACTIVITY):
+      case(K_WHILE):
+      case(K_REPEATUNTIL):
+      case(K_SEQUENCE):
+      case(K_FLOW):
+      case(K_PICK):
+      case(K_IF):
+      case(K_FOREACH):
+	                globals::process_information.implicit_activities++; break;
     }
   }
 }
+
+
+
 
 
 /*!
@@ -719,14 +754,47 @@ string ASTE::createChannel(bool synchronousCommunication)
   // in case of BPEL4Chor, we can read the channel name from the choreography
   if (globals::choreography_filename != "")
   {
-    string channelName = globals::ChorInfo.find_channel(id);
+    string channelName = globals::BPEL4ChorInfo.channel_name(id);
 
     switch (type)
     {
-      case(K_RECEIVE):	globals::ASTE_inputChannels.insert(channelName); break;
-      case(K_ONMESSAGE):globals::ASTE_inputChannels.insert(channelName); break;
-      case(K_INVOKE):	globals::ASTE_outputChannels.insert(channelName); break;
-      case(K_REPLY):	globals::ASTE_outputChannels.insert(channelName); break;
+      // receiving activity
+      case(K_RECEIVE):
+      case(K_ONMESSAGE):
+	{
+	  // depending on the channel count, create input channel(s)
+	  unsigned int count = globals::BPEL4ChorInfo.channel_count(id, false);
+	  if (count != 0 && count != UINT_MAX)
+	  {
+	    channel_instances = 1;
+	    for (unsigned int i = 1; i <= count; i++)
+	      globals::ASTE_inputChannels[channelName] = count;
+//	      globals::ASTE_inputChannels.insert(channelName + ".instance_" + toString(count));
+	  }
+	  else
+	    globals::ASTE_inputChannels[channelName] = 1;
+
+	  break;
+	}
+
+      // sending activity
+      case(K_INVOKE):
+      case(K_REPLY):
+	{
+	  // depending on the channel count, create output channel(s)
+	  unsigned int count = globals::BPEL4ChorInfo.channel_count(id, true);
+	  if (count != 0 && count != UINT_MAX)
+	  {
+	    channel_instances = 1;
+	    for (unsigned int i = 1; i <= count; i++)
+	      globals::ASTE_outputChannels[channelName] = count;
+//	      globals::ASTE_outputChannels.insert(channelName + ".instance_" + toString(count));
+	  }
+	  else
+	    globals::ASTE_outputChannels[channelName] = 1;
+
+	  break;
+	}
     }
 
     return channelName;
@@ -749,7 +817,8 @@ string ASTE::createChannel(bool synchronousCommunication)
         {
           channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
         }
-	globals::ASTE_inputChannels.insert(channelName);
+//	globals::ASTE_inputChannels.insert(channelName);
+	globals::ASTE_inputChannels[channelName] = 1;
 	break;
       }
 
@@ -760,7 +829,8 @@ string ASTE::createChannel(bool synchronousCommunication)
         {
           channelName = plRoleDetails->myRole + "." + plRoleDetails->partnerRole + "." + attributes["operation"];
         }
-	globals::ASTE_outputChannels.insert(channelName);
+//	globals::ASTE_outputChannels.insert(channelName);
+	globals::ASTE_outputChannels[channelName] = 1;
 
 	if (synchronousCommunication)
         {
@@ -770,7 +840,8 @@ string ASTE::createChannel(bool synchronousCommunication)
             channelName2 = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
           }
           this->channelName2 = channelName2;
-	  globals::ASTE_inputChannels.insert(channelName2);
+	  globals::ASTE_inputChannels[channelName2] = 1;
+//	  globals::ASTE_inputChannels.insert(channelName2);
         }
 
 	break;

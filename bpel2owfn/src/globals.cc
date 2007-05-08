@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/05/02 15:22:57 $
+ * \date    \$Date: 2007/05/08 14:18:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 
 
@@ -54,8 +54,8 @@ namespace globals {
 
   string forEach_suffix = "";
 
-  set<string> ASTE_inputChannels;
-  set<string> ASTE_outputChannels;
+  map<string, unsigned int> ASTE_inputChannels;
+  map<string, unsigned int> ASTE_outputChannels;
   set<string> ASTE_correlationSetNames;
   set<string> ASTE_variableNames;
   set<string> ASTE_partnerLinkNames;
@@ -116,7 +116,7 @@ namespace globals {
 
   WSDL WSDLInfo = WSDL();
 
-  Choreography ChorInfo = Choreography();
+  BPEL4Chor BPEL4ChorInfo = BPEL4Chor();
 
   map<string, string> tempAttributes;
 }

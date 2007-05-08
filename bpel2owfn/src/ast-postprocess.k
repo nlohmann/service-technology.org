@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/07 16:00:49 $
+ * \date    \$Date: 2007/05/08 14:18:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.163 $
+ * \version \$Revision: 1.164 $
  */
 %}
 
@@ -1966,9 +1966,8 @@ ForEach(a,b,c,d,e,_id) ->
         // the forEach is annotated by an id that references a BPEL4Chor participantSet
         if ((globals::choreography_filename != "") && (string(b->name) == "opaque") && (string(c->name) == "opaque"))
         {
-          cerr << globals::ChorInfo.find_forEach(myid) << endl;
-
-          myself->max_loops = 3;
+          // get the number of maximal instances from the BPEL4Chor file
+          myself->max_loops = globals::BPEL4ChorInfo.forEach_count(myid);
         }
         else
         {

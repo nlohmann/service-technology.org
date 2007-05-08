@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/05/02 15:22:57 $
+ * \date    \$Date: 2007/05/08 14:18:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 
 
@@ -58,7 +58,7 @@ using std::map;
 class WSDL;
 class ASTE;
 class CFGBlock;
-class Choreography;
+class BPEL4Chor;
 
 
 
@@ -124,10 +124,10 @@ namespace globals
   extern map<unsigned int, ASTE*> ASTEmap;
 
   /// set of input channel names
-  extern set<string> ASTE_inputChannels;
+  extern map<string, unsigned int> ASTE_inputChannels;
 
   /// set of output channel names
-  extern set<string> ASTE_outputChannels;
+  extern map<string, unsigned int> ASTE_outputChannels;
 
   /// set of (prefixed) correlation set names
   extern set<string> ASTE_correlationSetNames;
@@ -240,7 +240,7 @@ namespace globals
   extern WSDL WSDLInfo;
 
   /// an object holding information from the optional BPEL4Chor file
-  extern Choreography ChorInfo;
+  extern BPEL4Chor BPEL4ChorInfo;
 
   /// a temporary attribute mapping for the WSDL and BPEL4Chor parser
   extern map<string, string> tempAttributes;

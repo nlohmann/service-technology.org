@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/07 16:00:49 $
+ * \date    \$Date: 2007/05/08 14:18:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  */
 
 
@@ -57,23 +57,91 @@ using std::pair;
 
 
 
+class BPEL4Chor_forEach
+{
+  friend class BPEL4Chor;
+  friend class BPEL4Chor_MessageLink;
+
+  private:
+    /// name of the forEach (attribute "forEach")
+    string name;
+
+    /// maximal number of iterations (attribute "count")
+    unsigned int count;
+
+    /// iterator partcipant name
+    string iterator_participant_name;
+
+    /// constructor
+    BPEL4Chor_forEach(map<string, string> &attribute_map);
+};
+
+
+
+
+
 /*!
- * \class   Choreography
+ * \class BPEL4Chor_MessageLink
+ *
+ * A BPEL4Chor messageLink.
+ */
+class BPEL4Chor_MessageLink
+{
+  friend class BPEL4Chor;
+
+  private:
+    /// the identifier of the messageLink (either attribute "id" or "name")
+    string id;
+
+    /// attribute "name"
+    string name;
+
+    /// attribute "sender" or "senders"
+    string sender;
+
+    /// attribute "sendActivity" or "sendActivties"
+    string sendActivity;
+
+    /// attribute "receiver" or "receivers"
+    string receiver;
+
+    /// attribute "receiveActivity" or "receiveActivities"
+    string receiveActivity;
+
+    /// attribute "messageName"
+    string messageName;
+
+    /// a pointer to a forEach if an iterator participant is involved
+    BPEL4Chor_forEach *forEach;
+
+    /// constructor
+    BPEL4Chor_MessageLink(map<string, string> &attribute_map);
+};
+
+
+
+
+
+/*!
+ * \class   BPEL4Chor
  *
  * This class organizes informations read from a BPEL4Chor topology file.
  */
-class Choreography
+class BPEL4Chor
 {
-  private:
-    /// the messageLinks
-    map<string, pair<string, string> > messageLinks;
+  friend class BPEL4Chor_forEach;
+  friend class BPEL4Chor_MessageLink;
 
-    /// the participantTypes
+  private:
+    /// the messageLinks, indexed by their name
+    map<string, BPEL4Chor_MessageLink*> messageLinks;
+
+    /// the participantTypes, indexed by their name
     map<string, string> participantTypes;
 
-    /// a mapping from a forEach's name to the running variable
-    map<string, string> forEach_participants;
-    
+    /// the forEachs, indexed by their name
+    map<string, BPEL4Chor_forEach*> forEachs;
+
   public:
     /// add a <participantType>
     void add_participantType(map<string, string> &attribute_map);
@@ -85,10 +153,13 @@ class Choreography
     void add_messageLink(map<string, string> &attribute_map);
 
     /// find a channel name given an activity id or name
-    string find_channel(unsigned int ASTE_id) const;
+    string channel_name(unsigned int ASTE_id) const;
 
     /// find a forEach name given an activity id or name
-    string find_forEach(unsigned int ASTE_id);
+    unsigned int forEach_count(unsigned int ASTE_id);
+
+    /// returns the number of times a channel is used
+    unsigned int channel_count(unsigned int ASTE_id, bool sending);
 
     /// prints information about the BPEL4Chor topology
     void print_information() const;

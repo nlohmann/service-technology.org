@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/07 16:00:49 $
+ * \date    \$Date: 2007/05/08 14:18:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 
 
@@ -56,10 +56,57 @@ extern int frontend_lineno;
 
 
 
+BPEL4Chor_forEach::BPEL4Chor_forEach(map<string, string> &attribute_map)
+{
+  name = attribute_map["forEach"];
+  count = toUInt(attribute_map["count"]);
+  iterator_participant_name = attribute_map["name"];
+
+  if (count == UINT_MAX)
+    std::cerr << "no count given" << std::endl;
+}
+
+
+
+
+
+BPEL4Chor_MessageLink::BPEL4Chor_MessageLink(map<string, string> &attribute_map)
+{
+  name = attribute_map["name"];
+  sender = attribute_map["sender"];
+  receiver = attribute_map["receiver"];
+  messageName = attribute_map["messageName"];
+
+  id = (attribute_map["name"] != "") ?
+    attribute_map["name"] :
+    attribute_map["messageName"];
+
+  sendActivity = (attribute_map["sendActivity"] != "") ?
+    attribute_map["sendActivity"] :
+    attribute_map["sendActivities"];
+
+  receiveActivity = (attribute_map["receiveActivity"] != "") ?
+    attribute_map["receiveActivity"] :
+    attribute_map["receiveActivities"];
+
+  forEach = NULL;
+  for (map<string, BPEL4Chor_forEach*>::const_iterator forEach_it = globals::BPEL4ChorInfo.forEachs.begin();
+      forEach_it != globals::BPEL4ChorInfo.forEachs.end(); forEach_it++)
+  {
+    if (forEach_it->second->iterator_participant_name == receiver ||
+	forEach_it->second->iterator_participant_name == sender)
+      forEach = forEach_it->second;
+  }
+}
+
+
+
+
+
 /*!
  * \param  attribute_map  an attribute mapping provided by the BPEL4Chor parser
  */
-void Choreography::add_participantType(map<string, string> &attribute_map)
+void BPEL4Chor::add_participantType(map<string, string> &attribute_map)
 {
   string participantType_name = attribute_map["name"];
   string participantBehaviorDescription_name = attribute_map["participantBehaviorDescription"];
@@ -78,7 +125,7 @@ void Choreography::add_participantType(map<string, string> &attribute_map)
 /*!
  * \param  attribute_map  an attribute mapping provided by the BPEL4Chor parser
  */
-void Choreography::add_participant(map<string, string> &attribute_map)
+void BPEL4Chor::add_participant(map<string, string> &attribute_map)
 {
   string participant_name = attribute_map["name"];
   string participantType_name = attribute_map["type"];
@@ -90,12 +137,14 @@ void Choreography::add_participant(map<string, string> &attribute_map)
 	"' referenced by <participant> `" + participant_name + "' not defined before",
 	toString(frontend_lineno), ERRORLEVER_WARNING);
 
+  // store the forEach
   if (forEach_name != "")
-    forEach_participants[forEach_name] = participant_name;
+    forEachs[forEach_name] = new BPEL4Chor_forEach(attribute_map);
 
-  // reset name and forEach attribute -- the type attribute is not touched
+  // reset name, count, and forEach attribute -- the type attribute is not touched
   attribute_map["name"] = "";
   attribute_map["forEach"] = "";
+  attribute_map["count"] = "";
 }
 
 
@@ -105,23 +154,10 @@ void Choreography::add_participant(map<string, string> &attribute_map)
 /*!
  * \param  attribute_map  an attribute mapping provided by the BPEL4Chor parser
  */
-void Choreography::add_messageLink(map<string, string> &attribute_map)
+void BPEL4Chor::add_messageLink(map<string, string> &attribute_map)
 {
-  string messageLink_name = (attribute_map["name"] != "") ?
-    attribute_map["name"] :
-    attribute_map["messageName"];
-
-  string messageLink_sender = (attribute_map["sendActivity"] != "") ?
-    attribute_map["sendActivity"] :
-    attribute_map["sendActivities"];
-
-  string messageLink_receiver = (attribute_map["receiveActivity"] != "") ?
-    attribute_map["receiveActivity"] :
-    attribute_map["receiveActivities"];
-
-  // std::cerr << "<messageLink> `" << messageLink_name << "' between `" << messageLink_sender << "' and `" << messageLink_receiver << "'" << std::endl;
-
-  messageLinks[messageLink_name] = pair<string, string>(messageLink_sender, messageLink_receiver);
+  BPEL4Chor_MessageLink *temp = new BPEL4Chor_MessageLink(attribute_map);
+  messageLinks[temp->id] = temp;
 }
 
 
@@ -134,7 +170,7 @@ void Choreography::add_messageLink(map<string, string> &attribute_map)
  * \return the name of the message link that can be used to create a channel
  *         name
  */
-string Choreography::find_channel(unsigned int ASTE_id) const
+string BPEL4Chor::channel_name(unsigned int ASTE_id) const
 {
   assert(globals::ASTEmap[ASTE_id] != NULL);
 
@@ -151,13 +187,13 @@ string Choreography::find_channel(unsigned int ASTE_id) const
   }
 
   // search for the message link
-  for (map<string, pair<string, string> >::const_iterator messageLink = messageLinks.begin();
+  for (map<string, BPEL4Chor_MessageLink*>::const_iterator messageLink = messageLinks.begin();
       messageLink != messageLinks.end(); messageLink++)
   {
-    if (messageLink->second.first == activity_name)
+    if (messageLink->second->sendActivity == activity_name)
       return messageLink->first;
 
-    if (messageLink->second.second == activity_name)
+    if (messageLink->second->receiveActivity == activity_name)
       return messageLink->first;
   }
 
@@ -177,7 +213,7 @@ string Choreography::find_channel(unsigned int ASTE_id) const
  *
  * \todo   make me const
  */
-string Choreography::find_forEach(unsigned int ASTE_id)
+unsigned int BPEL4Chor::forEach_count(unsigned int ASTE_id)
 {
   assert(globals::ASTEmap[ASTE_id] != NULL);
 
@@ -185,19 +221,51 @@ string Choreography::find_forEach(unsigned int ASTE_id)
     globals::ASTEmap[ASTE_id]->attributes["id"] :
     globals::ASTEmap[ASTE_id]->attributes["name"];
 
-  if (forEach_participants[forEach_name] == "")
+  if (forEachs[forEach_name] == NULL)
+  {
+    return UINT_MAX;
     genericError(136, forEach_name, globals::ASTEmap[ASTE_id]->attributes["referenceLine"], ERRORLEVER_WARNING);
-
-  return forEach_participants[forEach_name];
+  }
+  else
+    return forEachs[forEach_name]->count;
 }
 
 
 
 
 
-void Choreography::print_information() const
+unsigned int BPEL4Chor::channel_count(unsigned int ASTE_id, bool sending)
+{
+  BPEL4Chor_MessageLink* messageLink = messageLinks[channel_name(ASTE_id)];
+  
+  // if messageLink was not found, display an error
+  if (messageLink == NULL)
+  {
+    std::cerr << "messageLink not found" << std::endl;
+    return 0;
+  }
+
+  if (messageLink->forEach == NULL)
+    return 0;
+
+  // activity is sending messages to a receiver nested in a forEach
+  if (sending && (messageLink->forEach->iterator_participant_name == messageLink->receiver))
+    return messageLink->forEach->count;
+
+  // activity is receiving messages from a sender nested in a forEach
+  if (!sending && (messageLink->forEach->iterator_participant_name == messageLink->sender))
+    return messageLink->forEach->count;
+
+  return 0;
+}
+
+
+
+
+
+void BPEL4Chor::print_information() const
 {
   std::cerr << messageLinks.size() << " message links, " <<
     participantTypes.size() << " participant types, " <<
-    forEach_participants.size() << " forEach participants" << std::endl;
+    forEachs.size() << " forEach participants" << std::endl;
 }

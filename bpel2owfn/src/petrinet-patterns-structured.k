@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/05/06 10:26:15 $
+ * \date    \$Date: 2007/05/08 14:18:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
 */
 %}
 
@@ -758,10 +758,15 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
     // Unparse the embedded activity.
     innerActivity->unparse(pseudoPrinter, current_view);
 
+    // Set the name of the interface place.
+    string interface_place_name = (globals::ASTEmap[ThisBranch->id]->channel_instances != 0) ?
+      "in." + globals::ASTEmap[ThisBranch->id]->channelName + ".instance_" + toString(globals::ASTEmap[ThisBranch->id]->channel_instances++) :
+      "in." + globals::ASTEmap[ThisBranch->id]->channelName;
+
     // Message-receiving transition.
     Transition *t1 = PN.newTransition(prefix + "onMessage_" + branch);
     PN.newArc(PN.findPlace(prefix + "initial"), t1);
-    PN.newArc(PN.findPlace("in." + globals::ASTEmap[ThisBranch->id]->channelName), t1);
+    PN.newArc(PN.findPlace("in." + interface_place_name), t1);
     PN.newArc(t1, PN.findPlace(toString(innerActivity->id) + ".initial"));
 
     // Embed the inner activity.
@@ -1033,7 +1038,7 @@ void PForEach(impl_tForEach* abstract_phylum, uview current_view)
 	  Transition *t2 = PN.newTransition(prefix + "join");
 	  PN.newArc(t2, p2);
 
-	  for (unsigned int branch = 1; branch <= myself->max_loops +1; branch++)
+	  for (unsigned int branch = 1; branch <= myself->max_loops; branch++)
 	  {
             // add a suffix to the subsequent Petri net nodes
             PN.push_forEach_suffix(toString(branch));

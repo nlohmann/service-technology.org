@@ -29,7 +29,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/05/07 16:00:49 $
+ * \date    \$Date: 2007/05/08 14:18:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  *
  * \ingroup frontend
  */
@@ -141,7 +141,7 @@ extern int frontend_lineno;
 
 tTopology:
   X_OPEN K_TOPOLOGY arbitraryAttributes X_NEXT tParticipantTypes tParticipants tMessageLinks X_SLASH K_TOPOLOGY X_CLOSE
-    { globals::ChorInfo.print_information(); }
+    { globals::BPEL4ChorInfo.print_information(); }
 ;
 
 
@@ -160,7 +160,7 @@ tParticipantType_list:
 
 tParticipantType:
   K_PARTICIPANTTYPE arbitraryAttributes X_SLASH
-    { globals::ChorInfo.add_participantType(globals::tempAttributes);
+    { globals::BPEL4ChorInfo.add_participantType(globals::tempAttributes);
       globals::tempAttributes.clear(); }
 ;
 
@@ -182,9 +182,9 @@ tParticipant_list:
 
 tParticipant:
   K_PARTICIPANT arbitraryAttributes X_NEXT X_SLASH K_PARTICIPANT
-    { globals::ChorInfo.add_participant(globals::tempAttributes); }
+    { globals::BPEL4ChorInfo.add_participant(globals::tempAttributes); }
 | K_PARTICIPANT arbitraryAttributes X_SLASH
-    { globals::ChorInfo.add_participant(globals::tempAttributes); }
+    { globals::BPEL4ChorInfo.add_participant(globals::tempAttributes); }
 ;
 
 tParticipantSet:
@@ -208,7 +208,7 @@ tMessageLink_list:
 
 tMessageLink:
   K_MESSAGELINK { globals::tempAttributes.clear(); } arbitraryAttributes X_SLASH
-    { globals::ChorInfo.add_messageLink(globals::tempAttributes);
+    { globals::BPEL4ChorInfo.add_messageLink(globals::tempAttributes);
       globals::tempAttributes.clear(); }
 ;
 

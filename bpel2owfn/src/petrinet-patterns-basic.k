@@ -46,7 +46,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/05/03 07:45:05 $
+ * \date    \$Date: 2007/05/08 14:18:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -56,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  */
 %}
 
@@ -253,11 +253,16 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
 
+        // Set the name of the interface place.
+	string interface_place_name = (globals::ASTEmap[phylum->id]->channel_instances != 0) ?
+	  "out." + globals::ASTEmap[phylum->id]->channelName + ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++) :
+	  "out." + globals::ASTEmap[phylum->id]->channelName;
+
         // A transition sending a message.
 	Transition *t1 = PN.newTransition(prefix + "invoke");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
-	PN.newArc(t1, PN.findPlace("out." + globals::ASTEmap[phylum->id]->channelName));
+	PN.newArc(t1, PN.findPlace(interface_place_name));
 	
 	break;
       }
@@ -307,15 +312,25 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	Place *p5 = PN.newPlace(prefix + "stopped");
         Place *p6 = PN.newPlace(prefix + "faulted");
 
+        // Set the name of the interface place (no incrementation here!).
+	string interface_place_name = (globals::ASTEmap[phylum->id]->channel_instances != 0) ?
+	  "out." + globals::ASTEmap[phylum->id]->channelName + ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances) :
+	  "out." + globals::ASTEmap[phylum->id]->channelName;
+
+        // Set the name of the interface place.
+	string interface_place_name2 = (globals::ASTEmap[phylum->id]->channel_instances != 0) ?
+	  "in." + globals::ASTEmap[phylum->id]->channelName2 + ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++) :
+	  "in." + globals::ASTEmap[phylum->id]->channelName2;
+	
         // A subnet sending a message (replacement of t1).
         sendingTransition("invoke_out",  p1, p2,
-                          PN.findPlace("out." + globals::ASTEmap[phylum->id]->channelName),
+                          PN.findPlace(interface_place_name),
                           p6, prefix, mkinteger(phylum->id),
                           globals::ASTEmap[phylum->id]->controlFlow);
 
         // A subnet receiving a message (replacement of t2).
         receivingTransition("invoke_in", p2, p3,
-                            PN.findPlace("in." + globals::ASTEmap[phylum->id]->channelName2),
+                            PN.findPlace(interface_place_name2),
                             p6, prefix, mkinteger(phylum->id),
                             globals::ASTEmap[phylum->id]->controlFlow);
 	
@@ -421,9 +436,14 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
 
+        // Set the name of the interface place.
+	string interface_place_name = (globals::ASTEmap[phylum->id]->channel_instances != 0) ?
+	  "in." + globals::ASTEmap[phylum->id]->channelName + ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++) :
+	  "in." + globals::ASTEmap[phylum->id]->channelName;
+
         // A transition receiving a message.
 	Transition *t1 = PN.newTransition(prefix + "receive");
-	PN.newArc(PN.findPlace("in." + globals::ASTEmap[phylum->id]->channelName), t1);
+	PN.newArc(PN.findPlace(interface_place_name), t1);
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
 
@@ -499,9 +519,14 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
 
+        // Set the name of the interface place.
+	string interface_place_name = (globals::ASTEmap[phylum->id]->channel_instances != 0) ?
+	  "out." + globals::ASTEmap[phylum->id]->channelName + ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++) :
+	  "out." + globals::ASTEmap[phylum->id]->channelName;
+
         // A transition sending a message.
 	Transition *t1 = PN.newTransition(prefix + "reply");
-	PN.newArc(t1, PN.findPlace("out." + globals::ASTEmap[phylum->id]->channelName));
+	PN.newArc(t1, PN.findPlace(interface_place_name));
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
 

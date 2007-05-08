@@ -31,7 +31,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/04/27 11:17:17 $
+ * \date    \$Date: 2007/05/08 14:18:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  */
 %}
 
@@ -94,13 +94,31 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
+
   // Create the interface places. The used lists are filled during parsing
   // mapping each combination of partnerLink, portType and operation to one
   // input (resp. output) place.
-  for (set<string>::iterator in = globals::ASTE_inputChannels.begin(); in != globals::ASTE_inputChannels.end(); in++)
-       PN.newPlace("in." + *in, IN);
-  for (set<string>::iterator out = globals::ASTE_outputChannels.begin(); out != globals::ASTE_outputChannels.end(); out++)
-       PN.newPlace("out." + *out, OUT);
+  // If an interface is associated with many instances, several copies of
+  // it are created.
+  for (map<string, unsigned int>::const_iterator in = globals::ASTE_inputChannels.begin();
+      in != globals::ASTE_inputChannels.end(); in++)
+  {
+    if (in->second == 1)
+      PN.newPlace("in." + in->first, IN);
+    else
+      for (unsigned int i = 1; i <= in->second; i++)
+	PN.newPlace("in." + in->first + ".instance_" + toString(i), IN);
+  }
+
+  for (map<string, unsigned int>::const_iterator out = globals::ASTE_outputChannels.begin();
+      out != globals::ASTE_outputChannels.end(); out++)
+  {
+    if (out->second == 1)
+      PN.newPlace("out." + out->first, OUT);
+    else
+      for (unsigned int i = 1; i <= out->second; i++)
+	PN.newPlace("out." + out->first + ".instance_" + toString(i), OUT);
+  }
 
 
   // Create the places for the links. The used list is filled during parsing

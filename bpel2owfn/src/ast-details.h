@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/02 14:48:42 $
+ * \date    \$Date: 2007/05/08 14:18:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  */
 
 
@@ -179,6 +179,8 @@ class ASTE
     set<string> catches;		///< the <catch> branches of <faultHandlers> to detect duplicates
 
     set<unsigned int> enclosedActivities;       ///< set of all the enclosed activities
+
+    unsigned int channel_instances;
 
     string createChannel(bool synchronousCommunication = false);
 

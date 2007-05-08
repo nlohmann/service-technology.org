@@ -31,7 +31,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/04/27 11:17:17 $
+ * \date    \$Date: 2007/05/08 14:18:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
 */
 %}
 
@@ -529,6 +529,7 @@ void looppattern(string condition, int maxloops, string prefix, int id,
   }
   LEAVE("[ASTT] looppattern");
 }
+
 
 
 

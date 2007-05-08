@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/08 16:11:41 $
+ * \date    \$Date: 2007/05/08 17:03:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 
 
@@ -179,7 +179,7 @@ class BPEL4Chor
     unsigned int forEach_count(unsigned int ASTE_id) const;
 
     /// returns the number of times a channel is used
-    unsigned int channel_count(unsigned int ASTE_id, bool sending) const;
+    pair<unsigned int, bool> channel_count(unsigned int ASTE_id, bool sending) const;
 
     /// prints information about the BPEL4Chor topology
     void print_information() const;

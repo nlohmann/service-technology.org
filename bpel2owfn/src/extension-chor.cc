@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/08 16:11:41 $
+ * \date    \$Date: 2007/05/08 17:03:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 
 
@@ -81,6 +81,7 @@ BPEL4Chor_participantSet::BPEL4Chor_participantSet(map<string, string> &attribut
 
 BPEL4Chor_messageLink::BPEL4Chor_messageLink(map<string, string> &attribute_map)
 {
+  // read the attributes
   name = attribute_map["name"];
   sender = attribute_map["sender"];
   receiver = attribute_map["receiver"];
@@ -98,12 +99,15 @@ BPEL4Chor_messageLink::BPEL4Chor_messageLink(map<string, string> &attribute_map)
     attribute_map["receiveActivity"] :
     attribute_map["receiveActivities"];
 
+  // if a sender or receiver is part of a participantSet, save a pointer to it
   participantSet = NULL;
   for (map<string, BPEL4Chor_participantSet*>::const_iterator participantSet_it = globals::BPEL4ChorInfo.participantSets.begin();
       participantSet_it != globals::BPEL4ChorInfo.participantSets.end(); participantSet_it++)
   {
     if (participantSet_it->second->iterator_participant_names.find(receiver) != participantSet_it->second->iterator_participant_names.end() ||
-	participantSet_it->second->iterator_participant_names.find(sender) != participantSet_it->second->iterator_participant_names.end())
+	participantSet_it->second->iterator_participant_names.find(sender) != participantSet_it->second->iterator_participant_names.end() ||
+	participantSet_it->second->unique_participant_names.find(receiver) != participantSet_it->second->unique_participant_names.end() ||
+	participantSet_it->second->unique_participant_names.find(sender) != participantSet_it->second->unique_participant_names.end())
       participantSet = participantSet_it->second;
   }
 }
@@ -277,8 +281,9 @@ unsigned int BPEL4Chor::forEach_count(unsigned int ASTE_id) const
 
 
 
-unsigned int BPEL4Chor::channel_count(unsigned int ASTE_id, bool sending) const
+pair<unsigned int, bool> BPEL4Chor::channel_count(unsigned int ASTE_id, bool sending) const
 {
+  // find the messageLink
   string temp_channel_name = channel_name(ASTE_id);
   BPEL4Chor_messageLink* messageLink = (messageLinks.find(temp_channel_name) != messageLinks.end()) ?
     messageLinks.find(temp_channel_name)->second :
@@ -288,21 +293,36 @@ unsigned int BPEL4Chor::channel_count(unsigned int ASTE_id, bool sending) const
   if (messageLink == NULL)
   {
     std::cerr << "messageLink not found" << std::endl;
-    return 0;
+    return pair<unsigned int, bool>(0, false);
   }
 
+  assert(messageLink != NULL);
+
   if (messageLink->participantSet == NULL)
-    return 0;
+    return pair<unsigned int, bool>(0, false);
+
+  assert(messageLink->participantSet != NULL);
+
+  std::cerr << "looking for " << messageLink->receiver << " or " << messageLink->sender << std::endl;
 
   // activity is sending messages to a receiver nested in a forEach
   if (sending && (messageLink->participantSet->iterator_participant_names.find(messageLink->receiver) != messageLink->participantSet->iterator_participant_names.end()))
-    return messageLink->participantSet->count;
+    return pair<unsigned int, bool>(messageLink->participantSet->count, false);
 
   // activity is receiving messages from a sender nested in a forEach
   if (!sending && (messageLink->participantSet->iterator_participant_names.find(messageLink->sender) != messageLink->participantSet->iterator_participant_names.end()))
-    return messageLink->participantSet->count;
+    return pair<unsigned int, bool>(messageLink->participantSet->count, false);
 
-  return 0;
+
+  // activity is sending messages to a unique receiver nested in a forEach
+  if (sending && (messageLink->participantSet->unique_participant_names.find(messageLink->receiver) != messageLink->participantSet->unique_participant_names.end()))
+    return pair<unsigned int, bool>(messageLink->participantSet->count, true);
+
+  // activity is receiving messages from a unique sender nested in a forEach
+  if (!sending && (messageLink->participantSet->unique_participant_names.find(messageLink->sender) != messageLink->participantSet->unique_participant_names.end()))
+    return pair<unsigned int, bool>(messageLink->participantSet->count, true);
+
+  return pair<unsigned int, bool>(0, false);
 }
 
 

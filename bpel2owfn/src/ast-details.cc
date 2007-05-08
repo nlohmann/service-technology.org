@@ -29,13 +29,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/08 16:11:41 $
+ * \date    \$Date: 2007/05/08 17:03:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.109 $
+ * \version \$Revision: 1.110 $
  */
 
 
@@ -81,7 +81,7 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype) :
   id(myid), type(mytype), controlFlow(POSITIVECF), visConnection("none"), secVisConnection("none"), 
   plRoleDetails(NULL), isStartActivity(false), cyclic(false), highlighted(false), isUserDefined(true), callable(true),
   sourceActivity(0), targetActivity(0), max_occurrences(1), max_loops(UINT_MAX), enclosedFH(0), enclosedCH(0), channel_instances(0),
-  drawn(false), partnerLinkType(NULL)
+  channel_unique_instances(0), drawn(false), partnerLinkType(NULL)
 {
   assert(myid != 0);
 
@@ -763,12 +763,15 @@ string ASTE::createChannel(bool synchronousCommunication)
       case(K_ONMESSAGE):
 	{
 	  // depending on the channel count, create one or more input channel(s)
-	  unsigned int count = globals::BPEL4ChorInfo.channel_count(id, false);
-	  if (count != 0 && count != UINT_MAX)
+	  pair<unsigned int, bool> result = globals::BPEL4ChorInfo.channel_count(id, false);
+	  if (result.first != 0 && result.first != UINT_MAX)
 	  {
-	    channel_instances = 1;
-	    for (unsigned int i = 1; i <= count; i++)
-	      globals::ASTE_inputChannels[channelName] = count;
+	    globals::ASTE_inputChannels[channelName] = result.first;
+
+	    if (result.second)
+	      channel_unique_instances = result.first; // a unique instance
+	    else
+	      channel_instances = 1; // an iterator
 	  }
 	  else
 	    globals::ASTE_inputChannels[channelName] = 1;
@@ -781,12 +784,15 @@ string ASTE::createChannel(bool synchronousCommunication)
       case(K_REPLY):
 	{
 	  // depending on the channel count, create one or more output channel(s)
-	  unsigned int count = globals::BPEL4ChorInfo.channel_count(id, true);
-	  if (count != 0 && count != UINT_MAX)
+	  pair<unsigned int, bool> result = globals::BPEL4ChorInfo.channel_count(id, true);
+	  if (result.first != 0 && result.first != UINT_MAX)
 	  {
-	    channel_instances = 1;
-	    for (unsigned int i = 1; i <= count; i++)
-	      globals::ASTE_outputChannels[channelName] = count;
+	    globals::ASTE_outputChannels[channelName] = result.first;
+
+	    if (result.second)
+	      channel_unique_instances = result.first; // a unique instance
+	    else
+	      channel_instances = 1; // an iterator
 	  }
 	  else
 	    globals::ASTE_outputChannels[channelName] = 1;

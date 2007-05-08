@@ -46,7 +46,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/05/08 14:18:56 $
+ * \date    \$Date: 2007/05/08 17:03:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -56,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  */
 %}
 
@@ -258,11 +258,24 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	  "out." + globals::ASTEmap[phylum->id]->channelName + ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++) :
 	  "out." + globals::ASTEmap[phylum->id]->channelName;
 
+        // send a message to one unique instance
+        if (globals::ASTEmap[phylum->id]->channel_unique_instances != 0)
+        {
+          for (unsigned int i = 1; i <= globals::ASTEmap[phylum->id]->channel_unique_instances; i++)
+          {
+	    Transition *t1 = PN.newTransition(prefix + "invoke" + toString(i));
+	    PN.newArc(p1, t1);
+	    PN.newArc(t1, p2);
+	    PN.newArc(t1, PN.findPlace(interface_place_name + ".instance_" + toString(i)));
+          }
+          break;
+        }
+  	
         // A transition sending a message.
-	Transition *t1 = PN.newTransition(prefix + "invoke");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-	PN.newArc(t1, PN.findPlace(interface_place_name));
+  	Transition *t1 = PN.newTransition(prefix + "invoke");
+  	PN.newArc(p1, t1);
+  	PN.newArc(t1, p2);
+  	PN.newArc(t1, PN.findPlace(interface_place_name));
 	
 	break;
       }
@@ -440,6 +453,19 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 	string interface_place_name = (globals::ASTEmap[phylum->id]->channel_instances != 0) ?
 	  "in." + globals::ASTEmap[phylum->id]->channelName + ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++) :
 	  "in." + globals::ASTEmap[phylum->id]->channelName;
+
+        // receive a message from one unique instance
+        if (globals::ASTEmap[phylum->id]->channel_unique_instances != 0)
+        {
+          for (unsigned int i = 1; i <= globals::ASTEmap[phylum->id]->channel_unique_instances; i++)
+          {
+    	    Transition *t1 = PN.newTransition(prefix + "receive" + toString(i));
+    	    PN.newArc(PN.findPlace(interface_place_name + ".instance_" + toString(i)), t1);
+    	    PN.newArc(p1, t1);
+    	    PN.newArc(t1, p2);
+          }
+          break;
+        }
 
         // A transition receiving a message.
 	Transition *t1 = PN.newTransition(prefix + "receive");

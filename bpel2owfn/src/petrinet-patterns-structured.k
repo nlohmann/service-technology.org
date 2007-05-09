@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/05/08 14:18:56 $
+ * \date    \$Date: 2007/05/09 13:07:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
 */
 %}
 
@@ -766,7 +766,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
     // Message-receiving transition.
     Transition *t1 = PN.newTransition(prefix + "onMessage_" + branch);
     PN.newArc(PN.findPlace(prefix + "initial"), t1);
-    PN.newArc(PN.findPlace("in." + interface_place_name), t1);
+    PN.newArc(PN.findPlace(interface_place_name), t1);
     PN.newArc(t1, PN.findPlace(toString(innerActivity->id) + ".initial"));
 
     // Embed the inner activity.

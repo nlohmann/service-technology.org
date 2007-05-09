@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/03 09:00:50 $
+ * \date    \$Date: 2007/05/09 16:28:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.81 $
+ * \version \$Revision: 1.82 $
  */
 
 
@@ -471,7 +471,7 @@ void parse_command_line(int argc, char* argv[])
 		  if (globals::reduction_level == UINT_MAX)
 		  {
 		    trace(TRACE_ALWAYS, "Unrecognised reduction mode: \"" + string(optarg) +"\"!\n");
-		    trace(TRACE_ALWAYS, "Define a number between 0 and 4.\n");
+		    trace(TRACE_ALWAYS, "Define a number between 0 and 6.\n");
 		    cleanup();
 		    exit(1);
 		  }

@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/06 10:27:01 $
+ * \date    \$Date: 2007/05/09 15:39:41 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.201 $
+ * \version \$Revision: 1.202 $
  *
  * \ingroup petrinet
  */
@@ -1538,6 +1538,7 @@ void PetriNet::compose(const PetriNet &net)
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
       roleMap[(newPlace->prefix + *name)] = newPlace;
   }
+
   // add all input places
   for (set< Place * >::iterator place = net.P_in.begin(); place != net.P_in.end(); place ++)
   {
@@ -1558,6 +1559,7 @@ void PetriNet::compose(const PetriNet &net)
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
       roleMap[(newPlace->prefix + *name)] = newPlace;
   }
+
   // add all output places
   for (set< Place * >::iterator place = net.P_out.begin(); place != net.P_out.end(); place ++)
   {
@@ -1578,6 +1580,7 @@ void PetriNet::compose(const PetriNet &net)
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
       roleMap[(newPlace->prefix + *name)] = newPlace;
   }
+
   // add all transitions
   for (set< Transition * >::iterator transition = net.T.begin(); transition != net.T.end(); transition ++)
   {
@@ -1592,6 +1595,7 @@ void PetriNet::compose(const PetriNet &net)
     for(vector< string >::iterator name = (*transition)->history.begin(); name != (*transition)->history.end(); name++)
       roleMap[ newTransition->prefix + *name ] = newTransition;
   }
+
   // create arcs according to the given "net"
   for (set< Arc * >::iterator arc = net.F.begin(); arc != net.F.end(); arc ++)
   {
@@ -1607,6 +1611,8 @@ void PetriNet::compose(const PetriNet &net)
 
   set< Place * > eraseP_in;
   set< Place * > additionalP_out;
+
+
 
   // merge appropriate input and output places (same name, different prefixes)
   for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
@@ -1641,6 +1647,7 @@ void PetriNet::compose(const PetriNet &net)
       }
     }
   }
+
   // erase input places, that were merged
   for (set< Place * >::iterator place = eraseP_in.begin(); place != eraseP_in.end(); place ++)
   {

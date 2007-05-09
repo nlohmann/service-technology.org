@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/05/09 13:07:17 $
+ * \date    \$Date: 2007/05/09 15:39:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
 */
 %}
 
@@ -762,6 +762,8 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
     string interface_place_name = (globals::ASTEmap[ThisBranch->id]->channel_instances != 0) ?
       "in." + globals::ASTEmap[ThisBranch->id]->channelName + ".instance_" + toString(globals::ASTEmap[ThisBranch->id]->channel_instances++) :
       "in." + globals::ASTEmap[ThisBranch->id]->channelName;
+    if (globals::instances_of_current_process > 1)
+      interface_place_name = "in." + globals::ASTEmap[ThisBranch->id]->channelName + ".instance_" + toString(globals::current_instance_of_the_process);
 
     // Message-receiving transition.
     Transition *t1 = PN.newTransition(prefix + "onMessage_" + branch);

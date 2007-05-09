@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/08 17:03:55 $
+ * \date    \$Date: 2007/05/09 14:40:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 
 
@@ -121,14 +121,24 @@ BPEL4Chor_messageLink::BPEL4Chor_messageLink(map<string, string> &attribute_map)
  */
 void BPEL4Chor::add_participantType(map<string, string> &attribute_map)
 {
+  // read attributes
   string participantType_name = attribute_map["name"];
   string participantBehaviorDescription_name = attribute_map["participantBehaviorDescription"];
+  string xmlns_URL = attribute_map[participantBehaviorDescription_name];
 
   // if participant type was already defined before, display a warning
-  if (participantTypes[participantType_name] != "")
+  if (participantTypes[participantType_name].first != "")
     genericError(134, participantType_name, toString(frontend_lineno), ERRORLEVER_WARNING);
 
-  participantTypes[participantType_name] = participantBehaviorDescription_name;
+  if (xmlns_URL == "")
+    genericError(137, "no `" + participantBehaviorDescription_name + ":xmlns' definition found for <participantType> `" + participantType_name + "'", toString(frontend_lineno), ERRORLEVER_WARNING);
+
+  participantTypes[participantType_name] = pair<string, string>(participantBehaviorDescription_name, xmlns_URL);
+
+  // reset attributes
+  attribute_map["name"] = "";
+  attribute_map["participantBehaviorDescription"] = "";
+  attribute_map[participantBehaviorDescription_name] = "";
 }
 
 
@@ -303,8 +313,6 @@ pair<unsigned int, bool> BPEL4Chor::channel_count(unsigned int ASTE_id, bool sen
 
   assert(messageLink->participantSet != NULL);
 
-  std::cerr << "looking for " << messageLink->receiver << " or " << messageLink->sender << std::endl;
-
   // activity is sending messages to a receiver nested in a forEach
   if (sending && (messageLink->participantSet->iterator_participant_names.find(messageLink->receiver) != messageLink->participantSet->iterator_participant_names.end()))
     return pair<unsigned int, bool>(messageLink->participantSet->count, false);
@@ -343,4 +351,37 @@ void BPEL4Chor::print_information() const
 BPEL4Chor::BPEL4Chor() :
   current_participantSet(NULL)
 {
+}
+
+
+
+
+
+unsigned int BPEL4Chor::instances(string xmlns) const
+{
+  // traverse the participant types to find the xmlns URL
+  for(map<string, pair<string, string> >::const_iterator participantType = participantTypes.begin();
+      participantType != participantTypes.end(); participantType++)
+  {
+    // is the xmlns URL found?
+    if (participantType->second.second == xmlns)
+    {
+      // traverse the participant sets to find a set with this participant type and xmlns URL
+      for(map<string, BPEL4Chor_participantSet*>::const_iterator participantSet = participantSets.begin();
+	  participantSet != participantSets.end(); participantSet++)
+      {
+	// is this participant set of the right participant type
+	if (participantSet->second->participantType_name == participantType->first)
+	{
+	  // return the number of instances
+	  return participantSet->second->count;
+	}
+      }
+
+      // xmlns URL found, but no matching participant set: 1 instance is needed
+      return 1;
+    }
+  }
+
+  return 0;
 }

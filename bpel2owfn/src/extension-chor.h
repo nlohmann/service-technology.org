@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/08 17:03:55 $
+ * \date    \$Date: 2007/05/09 14:40:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 
 
@@ -150,8 +150,8 @@ class BPEL4Chor
     /// the messageLinks, indexed by their name
     map<string, BPEL4Chor_messageLink*> messageLinks;
 
-    /// the participantTypes, indexed by their name
-    map<string, string> participantTypes;
+    /// the participantTypes with XMLNS, indexed by their name
+    map<string, pair<string, string> > participantTypes;
 
     /// the participantSets, indexed by their name
     map<string, BPEL4Chor_participantSet*> participantSets;
@@ -174,6 +174,9 @@ class BPEL4Chor
 
     /// find a channel name given an activity id or name
     string channel_name(unsigned int ASTE_id) const;
+
+    /// find the number of instances to be created, given an xmlns URL
+    unsigned int instances(string xmlns) const;
 
     /// find a forEach name given an activity id or name
     unsigned int forEach_count(unsigned int ASTE_id) const;

@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/07 16:00:49 $
+ * \date    \$Date: 2007/05/09 14:40:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.92 $
+ * \version \$Revision: 1.93 $
  *
  * \ingroup debug
  */
@@ -508,6 +508,10 @@ void genericError(unsigned int code, string information, string line, error_leve
 
     case(136): // BPEL4Chor forEach id not found
 	{ cerr << "<forEach> id or name `" << information << "' does not reference a BPEL4Chor <participant> or <participantSet>" << endl;
+	  break; }
+
+    case(137): // BPEL4Chor XMLNS not found (either in BPEL4Chor file or in process)
+	{ cerr << information << endl;
 	  break; }
   }
 

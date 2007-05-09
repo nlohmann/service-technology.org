@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/05/08 14:18:56 $
+ * \date    \$Date: 2007/05/09 14:40:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 
 
@@ -244,6 +244,9 @@ namespace globals
 
   /// a temporary attribute mapping for the WSDL and BPEL4Chor parser
   extern map<string, string> tempAttributes;
+
+  /// the number of instances to be created of current process (used in BPEL4Chor)
+  extern unsigned int instances_of_current_process;
 }
 
 #endif

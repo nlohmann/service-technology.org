@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/08 17:03:55 $
+ * \date    \$Date: 2007/05/10 09:22:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  */
 
 
@@ -206,6 +206,7 @@ class ASTE
 
     void enterFault(string fault);
     void enterFault(WSDL_PartnerLinkType *);
+    void removeFault(string fault);
 
     string activityTypeName() const;
 

@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/09 14:40:33 $
+ * \date    \$Date: 2007/05/10 09:22:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.111 $
+ * \version \$Revision: 1.112 $
  */
 
 
@@ -1082,6 +1082,29 @@ void ASTE::enterFault(WSDL_PartnerLinkType * plt)
     }
   }
   
+}
+
+/*!
+ * \brief removes a possibly triggered fault from the appropriate set because it was caught
+ *
+ * \todo comment me
+ */
+void ASTE::removeFault(string fault)
+{
+  if ( fault == "" )
+  {
+    return;
+  }
+
+  if (fault.find_first_of(":") < fault.npos)
+  {
+    fault = fault.substr( fault.find_first_of(":") + 1 );
+  }
+  possiblyTriggeredFaults.erase( fault );
+  if ( id > 1 )
+  {
+    globals::ASTEmap[parentScopeId]->removeFault( fault );
+  }
 }
 
 

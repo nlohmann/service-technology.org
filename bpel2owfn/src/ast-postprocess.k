@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/08 14:18:56 $
+ * \date    \$Date: 2007/05/10 09:22:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.164 $
+ * \version \$Revision: 1.165 $
  */
 %}
 
@@ -509,6 +509,10 @@ OnMessage(a,b,c,_id) ->
       {
         globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
       }
+      if ( globals::parameters[P_STANDARDFAULTS] )
+      {
+        globals::ASTEmap[ myself->parentScopeId]->enterFault( ";" );
+      }
 
       // trigger [SA00063]
       if (b->length() != 0 && myself->attributes["variable"] != "")
@@ -898,6 +902,10 @@ volatile_Invoke(a,b,c,d,_id) ->
       {
         globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
       }
+      if ( globals::parameters[P_STANDARDFAULTS] )
+      {
+        globals::ASTEmap[ myself->parentScopeId]->enterFault( ";" );
+      }
 
       myself->channelName = myself->createChannel((myself->attributes["outputVariable"] != ""));
       myself->inputVariableName = myself->checkVariable("inputVariable");
@@ -946,6 +954,10 @@ Receive(a,b,c,_id) ->
       if ( globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] != 0 )
       {
         globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
+      }
+      if ( globals::parameters[P_STANDARDFAULTS] )
+      {
+        globals::ASTEmap[ myself->parentScopeId]->enterFault( ";" );
       }
 
       myself->channelName = myself->createChannel();
@@ -999,6 +1011,10 @@ Reply(a,b,c,_id) ->
       if ( globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] != 0 )
       {
         globals::ASTEmap[ myself->parentScopeId]->enterFault( globals::ASTEmap[ globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] ]->partnerLinkType );
+      }
+      if ( globals::parameters[P_STANDARDFAULTS] )
+      {
+        globals::ASTEmap[ myself->parentScopeId]->enterFault( ";" );
       }
 
       // trigger [SA00059]
@@ -2105,8 +2121,9 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
 
         if ( myself->possiblyTriggeredFaults.find( faultName ) != myself->possiblyTriggeredFaults.end() )
         {
-          cerr << "callable !" << endl;
           callableFH = true;
+          // might remove to much ... faults occuring in handlers are caught in higher scopes, especially if a <rethrow> occurs ...
+          // myself->removeFault( faultName );
         }
       }
       if ( globals::ASTEmap[ c->id ]->hasCatchAll && ! myself->possiblyTriggeredFaults.empty() )

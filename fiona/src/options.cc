@@ -48,6 +48,8 @@ using namespace std;
 // some file names and pointers
 char * netfile;
 std::list<char*> netfiles;
+//char * ogfile;
+std::list<char*> ogfiles;
 std::string ogfileToMatch;
 std::string ogfileToParse;
 std::string constraintfile;
@@ -87,11 +89,12 @@ static struct option longopts[] =
   { "exchangeability", no_argument,       NULL, 'x' },
   { "match",           required_argument, NULL, GETOPTLONG_MATCH1 },
   { "constraint",      required_argument, NULL, GETOPTLONG_MATCH2 },
+  { "og",              required_argument, NULL, 'o' },
   { NULL,              0,                 NULL, 0   }
 };
 
 
-const char * par_string = "hvd:n:t:s:arm:e:b:B:x";
+const char * par_string = "hvd:n:St:s:arm:e:b:B:xo:";
 
 // --------------------- functions for command line evaluation ------------------------
 // Prints an overview of all commandline arguments.
@@ -224,6 +227,8 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_EX] = false;
     options[O_MATCH] = false;
     options[O_CONSTRAINT] = false;
+	options[O_SIMULATES] = false;
+	options[O_OG_NAME] = false;
 
     options[O_MESSAGES_MAX] = false;
     options[O_EVENT_USE_MAX] = true;
@@ -287,6 +292,21 @@ void parse_command_line(int argc, char* argv[]) {
                     exit(1);
                 }
                 break;
+			case 'o':
+				if (optarg) {
+					options[O_OG_NAME] = true;
+					ogfiles.push_back(optarg);
+				}
+				else {
+					cerr << "Error:\tog name missing" << endl
+					     << "\tEnter \"fiona --help\" for more information."
+					     << endl;
+					exit(1);
+				}
+				break;
+			case 'S':
+				options[O_SIMULATES] = true;
+				break;
             case 't':
                 if (string(optarg) == "OG") {
                     options[O_GRAPH_TYPE] = true;
@@ -423,8 +443,8 @@ void parse_command_line(int argc, char* argv[]) {
         }
     }
 
-    if (options[O_OWFN_NAME] == false) {
-        cerr << "Error:\tmissing parameter -n" << endl
+    if ( (options[O_OWFN_NAME] == false) && (options[O_OG_NAME] == false) ) {
+        cerr << "Error:\tmissing parameter -n or -o. At least one must be given." << endl
              << "\tEnter \"fiona --help\" for more information." << endl;
         exit(1);
     }

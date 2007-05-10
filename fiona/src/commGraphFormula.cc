@@ -34,6 +34,7 @@
 
 #include "commGraphFormula.h"
 #include "debug.h"
+#include "enums.h"
 //#include <stdlib.h>
 #include <cassert>
 
@@ -72,6 +73,129 @@ bool CommGraphFormula::satisfies(const CommGraphFormulaAssignment& assignment)
 
 void CommGraphFormula::removeLiteral(const std::string&) {
 }
+
+
+threeValueLogic CommGraphFormula::equals() {
+    bool result = false;
+
+    if(dynamic_cast<CommGraphFormulaLiteral*>(this)) {
+        if(this->asString() == "true") return TRUE;
+        else if(this->asString() == "false") return FALSE;
+        else return UNKNOWN; 
+    }
+
+    if(dynamic_cast<CommGraphFormulaMultiaryOr*>(this)) {
+        result = false;
+        for(CommGraphFormulaMultiaryOr::iterator i = dynamic_cast<CommGraphFormulaMultiaryOr*>(this)->begin();
+            i != dynamic_cast<CommGraphFormulaMultiaryOr*>(this)->end(); i++) {
+            if(dynamic_cast<CommGraphFormula*>(*i)->equals() == TRUE) return TRUE;
+            else if(dynamic_cast<CommGraphFormula*>(*i)->equals() == FALSE) result |= false;
+            else result = true;
+        }
+        return result ? UNKNOWN : FALSE; 
+    }
+
+    if(dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)) {
+        result = true;
+        for(CommGraphFormulaMultiaryAnd::iterator i = dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)->begin();
+            i != dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)->end(); i++) {
+            if(dynamic_cast<CommGraphFormula*>(*i)->equals() == TRUE) result &= true;
+            else if(dynamic_cast<CommGraphFormula*>(*i)->equals() == FALSE) return FALSE;
+            else result = false;
+        }
+        return result ? TRUE : UNKNOWN;
+    }
+
+    return UNKNOWN;
+} 
+
+
+CNF_formula *CommGraphFormula::getCNF() {
+    CNF_formula *cnf = new CNF_formula;
+    trace(TRACE_5, "commGraphFormula::getCNF(): " + asString() + " is a\n");
+
+    // CNF(literal) = literal 
+    if(dynamic_cast<CommGraphFormulaLiteral*>(this)) {
+        CommGraphFormulaMultiaryOr *clause = new CommGraphFormulaMultiaryOr;
+        trace(TRACE_5, "literal.\n");
+
+        clause->addSubFormula(this);
+        cnf->addClause(clause);
+        return cnf; 
+    }
+
+    // CNF(cnf) = cnf 
+    if(dynamic_cast<CNF_formula*>(this)) {
+        trace(TRACE_5, "CNF.\n");
+        return dynamic_cast<CNF_formula*>(this);
+    }
+
+    // CNF(phi AND psi) = CNF(phi) AND CNF(psi) 
+    if(dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)) {
+        trace(TRACE_5, "MultiaryAnd. Going in deeper.\n");
+        for(CommGraphFormulaMultiaryAnd::iterator i = dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)->begin(); 
+            i != dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)->end(); i++) {
+            CNF_formula *temp = dynamic_cast<CommGraphFormula*>(*i)->getCNF();
+            for(CNF_formula::iterator j = temp->begin(); j != temp->end(); j++) {
+                cnf->addClause(dynamic_cast<CommGraphFormulaMultiaryOr*>(*j));
+            } 
+        }
+        return cnf;
+    }
+
+    // CNF(phi OR psi) = ...  things becoming ugly 
+    if(dynamic_cast<CommGraphFormulaMultiaryOr*>(this)) {
+        trace(TRACE_5, "MultiaryOr. Going Underground.\n");
+        CommGraphFormulaMultiaryOr *temp = dynamic_cast<CommGraphFormulaMultiaryOr*>(this);
+        CommGraphFormulaMultiaryAnd *clause;
+        //CNF_formula *conj = new CNF_formula;    
+        bool final = true;
+
+        // first of all, merge all top-level OR's 
+        temp = temp->merge();
+
+        // all SubFormulas shoud now be either Literal or MultiaryAnd
+
+        // iterate over the MultiaryOr
+        for(CommGraphFormulaMultiaryOr::iterator i = temp->begin(); i != temp->end(); ++i) {
+            // CNF((phi1 AND phi2) OR psi) = CNF(phi1 OR psi) AND CNF(phi2 OR psi) 
+            if(dynamic_cast<CommGraphFormulaMultiaryAnd*>(*i)) {
+                clause = dynamic_cast<CommGraphFormulaMultiaryAnd*>(*i); 
+                final = false;
+
+                for(CommGraphFormulaMultiaryAnd::iterator j = clause->begin(); j != clause->end(); ++j) {
+                    CommGraphFormulaMultiaryOr *disj = new CommGraphFormulaMultiaryOr;
+                    disj->addSubFormula(dynamic_cast<CommGraphFormula*>(*j)); 
+
+                    for(CommGraphFormulaMultiaryOr::iterator k = temp->begin(); k != temp->end(); ++k) {
+                        if(k != i) {
+                            disj->addSubFormula(dynamic_cast<CommGraphFormula*>(*k));
+                        }
+                    }
+
+                    CNF_formula *temp_cnf = disj->getCNF();
+                    trace(TRACE_5, "Adding Disjunction " + temp_cnf->asString() + "\n");
+                    for(CommGraphFormulaMultiaryAnd::iterator l = temp_cnf->begin(); l != temp_cnf->end(); ++l) {
+                        cnf->addClause(dynamic_cast<CommGraphFormulaMultiaryOr*>(*l)); 
+                    }
+                }
+            }
+        }
+        if(final) {
+            trace(TRACE_5, "finished.\n");
+            cnf->addClause(temp);
+        }
+        else {
+            trace(TRACE_5, "not finished.\n"); 
+        }
+        trace(TRACE_5, "Returning: " + cnf->asString() + "\n");
+        return cnf;
+    }
+
+    trace(TRACE_5, "You do not see this.\n");
+    return NULL; // should not happen! probably new derivate of CommGraphFormula
+}
+
 
 CommGraphFormulaMultiary::CommGraphFormulaMultiary() : CommGraphFormula() {
 }
@@ -225,6 +349,32 @@ CommGraphFormulaMultiaryAnd::CommGraphFormulaMultiaryAnd(CommGraphFormula* lhs_,
 
 }
 
+
+CommGraphFormulaMultiaryAnd* CommGraphFormulaMultiaryAnd::merge() {
+    bool final = true;
+    CommGraphFormulaMultiaryAnd *result = new CommGraphFormulaMultiaryAnd;
+
+    trace(TRACE_5, "commGraphFormulaMultiaryAnd::merge: " + asString() + " merged to ");
+    for(CommGraphFormulaMultiaryAnd::iterator i = begin(); i != end(); i++) {
+        if(dynamic_cast<CommGraphFormulaMultiaryAnd*>(*i)) {
+            final = false;
+            CommGraphFormulaMultiaryAnd *temp = dynamic_cast<CommGraphFormulaMultiaryAnd*>(*i);
+            for(CommGraphFormulaMultiaryAnd::iterator j = temp->begin();
+                j != temp->end(); j++) {
+            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*j));
+            }
+        }
+        else {
+            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*i));
+        }
+    }
+    trace(TRACE_5, result->asString() + "\n");
+
+    if(final) return result;
+    else return result->merge();
+}
+
+
 CommGraphFormulaMultiaryAnd* CommGraphFormulaMultiaryAnd::getDeepCopy() const
 {
     CommGraphFormulaMultiaryAnd* newFormula =
@@ -284,6 +434,54 @@ CommGraphFormulaMultiaryOr* CommGraphFormulaMultiaryOr::getDeepCopy() const
 }
 
 
+CommGraphFormulaMultiaryOr* CommGraphFormulaMultiaryOr::merge() {
+    bool final = true;
+    CommGraphFormulaMultiaryOr *result = new CommGraphFormulaMultiaryOr;
+
+    trace(TRACE_5, "commGraphFormulaMultiaryOr::merge: " + asString() + " merged to ");
+    for(CommGraphFormulaMultiaryOr::iterator i = begin(); i != end(); i++) {
+        if(dynamic_cast<CommGraphFormulaMultiaryOr*>(*i)) {
+            final = false;
+            CommGraphFormulaMultiaryOr *temp = dynamic_cast<CommGraphFormulaMultiaryOr*>(*i); 
+            for(CommGraphFormulaMultiaryOr::iterator j = temp->begin();
+                j != temp->end(); j++) {
+            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*j)); 
+            }
+        }
+        else {
+            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*i));
+        }
+    }
+    trace(TRACE_5, result->asString() + "\n");
+    
+    if(final) return result; 
+    else return result->merge(); 
+}
+
+
+// shall only be used for clauses within cnf!
+bool CommGraphFormulaMultiaryOr::implies(CommGraphFormulaMultiaryOr *op) {
+    bool result;
+
+    trace(TRACE_5, this->asString() + " -> " + op->asString() + " ? ... "); 
+
+    for(CommGraphFormulaMultiaryOr::iterator i = this->begin(); i != this->end(); i++) {
+        result = false;
+        for(CommGraphFormulaMultiaryOr::iterator j = op->begin(); j != op->end(); j++) {
+	    result |= (dynamic_cast<CommGraphFormulaLiteral*>(*i)->asString() 
+                == dynamic_cast<CommGraphFormulaLiteral*>(*j)->asString()); 
+        }
+        if(!result) {
+            trace(TRACE_5, "false.\n"); 
+            return false;
+        }
+    }
+
+    trace(TRACE_5, "true.\n");
+    return true;
+}
+
+
 const CommGraphFormulaFixed
 CommGraphFormulaMultiaryOr::emptyFormulaEquivalent = CommGraphFormulaFalse();
 
@@ -309,8 +507,47 @@ CNF_formula::CNF_formula(CommGraphFormulaMultiaryOr* clause1_, CommGraphFormulaM
     
 }
 
+
 void CNF_formula::addClause(CommGraphFormulaMultiaryOr* clause) {
 	addSubFormula(clause);
+}
+
+//! \fn bool CNF_formula::implies(CNF_formula *op) 
+//! \param op the rhs of the implication 
+//! \brief checks whether the current CNF formula implies the given one via op
+//!        Note: all literals have to occur non-negated! 
+bool CNF_formula::implies(CNF_formula *op) {
+    bool result;
+
+    if(op == NULL) return false;
+	
+    trace(TRACE_5, "bool CNF_formula::implies(CNF_formula *op)\n");
+    trace(TRACE_5, asString() + " => " + op->asString() + "?\n");
+
+    if(this->equals() == FALSE) return true;
+    if(op->equals() == TRUE) return true;
+
+    for(CNF_formula::iterator i = op->begin(); i != op->end(); i++) {
+       	// iterate over rhs operand
+        if((dynamic_cast<CommGraphFormula*>(*i)->asString() != "final") && 
+           (dynamic_cast<CommGraphFormula*>(*i)->asString() != "true") && 
+           (dynamic_cast<CommGraphFormula*>(*i)->asString() != "false")) {
+            result = false;
+
+            for(CNF_formula::iterator j = begin(); j != end(); j++) {
+                // iterate over lhs operand
+                result |= (dynamic_cast<CommGraphFormulaMultiaryOr*>(*j)->implies(
+                    dynamic_cast<CommGraphFormulaMultiaryOr*>(*i))); 
+            }
+            if(!result) {
+            trace(TRACE_5, "Implication failed.\n");
+            return false;
+            }
+        }
+    }
+ 
+    trace(TRACE_5, "Implication succesfull.\n");
+    return true;
 }
 
 

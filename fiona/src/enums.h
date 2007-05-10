@@ -53,7 +53,7 @@ class vertexColor
 enum edgeType {sending, receiving}; 		//!< ENUM possible types of an edge
 enum analysisResult {TERMINATE, CONTINUE};  //!< needed as feedback of the "analysis" function, whether this node is an end node or not
 enum stateType {TRANS, DEADLOCK, FINALSTATE};   //!< TRANS == Transient
-//enum threeValueLogic {FALSE, TRUE, UNKNOWN}; //!< used, for instance, to remember if there is a final state in a node
+enum threeValueLogic {FALSE, TRUE, UNKNOWN}; //!< used, for instance, to remember if there is a final state in a node
 
 
 #endif /*ENUMS_H_*/

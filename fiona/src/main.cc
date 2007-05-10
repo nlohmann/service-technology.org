@@ -79,6 +79,7 @@ extern int og_yylex_destroy();
 extern unsigned int State::card;
 // extern char * netfile;
 extern list<char*> netfiles;
+extern list<char*> ogfiles;
 extern OGFromFile* OGToParse;
 
 int garbagefound;
@@ -219,6 +220,7 @@ int main(int argc, char ** argv) {
 	set_new_handler(&myown_newhandler);
 
 	list<oWFN*> petrinets;
+	list<OGFromFile*> OGsFromFiles;
 
 	// evaluate command line options
 	parse_command_line(argc, argv);
@@ -292,65 +294,90 @@ int main(int argc, char ** argv) {
 	}
 
 // ---------------- reading all nets ---------------------
-
-    list<char*>::iterator netiter = netfiles.begin();
-
-    do {
-        numberOfDecodes = 0;
-
-        garbagefound = 0;
-        State::card = 0;          // number of states
-
-        numberDeletedVertices = 0;
-
-        numberOfEvents = 0;
-
-        // prepare getting the net
-        try {
-            PlaceTable = new SymbolTab<PlSymbol>;
-        }
-        catch(bad_alloc) {
-            char mess[] = "\nnot enough space to read net\n";
-            //write(2,mess,sizeof(mess));
-            cerr << mess;
-            _exit(2);
-		}
-
-		// get the net
-		try {
-			if (netiter != netfiles.end()) {
-				netfile = *netiter;
+	if (options[O_OWFN_NAME] ) {
+		list<char*>::iterator netiter = netfiles.begin();
+		
+		do {
+			numberOfDecodes = 0;
+			
+			garbagefound = 0;
+			State::card = 0;          // number of states
+			
+			numberDeletedVertices = 0;
+			
+			numberOfEvents = 0;
+			
+			// prepare getting the net
+			try {
+				PlaceTable = new SymbolTab<PlSymbol>;
 			}
-            readnet();  // Parser;
-
-            // PN->removeisolated();
-            // TODO: better removal of places 
-            // doesn't work with, since array for input and output places
-            // depend on the order of the Places array, reordering results in
-            // a heavy crash
-
-        } 
-        catch(bad_alloc) {
-            char mess [] = "\nnot enough space to store net\n";
-            //write(2,mess,sizeof(mess));
-            cerr << mess;
-            _exit(2);
-        }
-        
-        PN->filename = netfile;
-        petrinets.push_back(PN);
-        
-        delete PlaceTable;
-        
-        netiter++;
-    } while (netfiles.begin() != netfiles.end() && netiter != netfiles.end());
+			catch(bad_alloc) {
+				char mess[] = "\nnot enough space to read net\n";
+				//write(2,mess,sizeof(mess));
+				cerr << mess;
+				_exit(2);
+			}
+			
+			// get the net
+			try {
+				if (netiter != netfiles.end()) {
+					netfile = *netiter;
+				}
+				readnet();  // Parser;
+				
+				// PN->removeisolated();
+				// TODO: better removal of places 
+				// doesn't work with, since array for input and output places
+				// depend on the order of the Places array, reordering results in
+				// a heavy crash
+				
+			} 
+			catch(bad_alloc) {
+				char mess [] = "\nnot enough space to store net\n";
+				//write(2,mess,sizeof(mess));
+				cerr << mess;
+				_exit(2);
+			}
+			
+			PN->filename = netfile;
+			petrinets.push_back(PN);
+			
+			delete PlaceTable;
+			
+			netiter++;
+		} while (netfiles.begin() != netfiles.end() && netiter != netfiles.end());
+	}
     
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
     // Delete lexer buffer for parsing oWFNs.
     // Must NOT be called before fclose(owfn_yyin);
     owfn_yylex_destroy();
 #endif
-
+	
+// ------------- reading all OG-files -----------------------
+	if ( options[O_OG_NAME] ) {
+		list<char*>::iterator ogIter = ogfiles.begin();
+		do {
+			OGsFromFiles.push_back(readog((*ogIter)));
+			ogIter++;
+		}while (ogfiles.begin() != ogfiles.end() && ogIter != ogfiles.end());
+	}
+	
+// ------------- simulation on OGFromFile --------------------
+	
+	if ( options[O_SIMULATES] ) {
+		if ( OGsFromFiles.size() == 2 ) {
+			list<OGFromFile*>::iterator OGFFIter = OGsFromFiles.begin();
+			OGFromFile *simulator = *OGFFIter;
+			OGFromFile *simulant = *(++OGFFIter);
+			if ( simulator->simulates(simulant) )
+				trace(TRACE_0, "\nThe first OG simulates the second one.\n" );
+			else
+				trace(TRACE_0, "\nThe first OG doesn't simulate the second one.\n");
+		}
+		else
+			cerr << "Error: \t If option -S is used, exactly two OG files must be entered\n" << endl;
+	}
 
 // **************** start doing things :) *********************
 

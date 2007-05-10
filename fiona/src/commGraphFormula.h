@@ -35,12 +35,14 @@
 #define commGraphFormula_H_
 
 
+#include "enums.h"
 #include <string>
 #include <set>
 #include <map>
 
 
 class CommGraphFormulaFixed;
+class CNF_formula;
 
 
 /**
@@ -123,6 +125,8 @@ public:
     virtual bool value(const CommGraphFormulaAssignment& assignment) const = 0;
     virtual void removeLiteral(const std::string&);
     virtual CommGraphFormula* getDeepCopy() const = 0;
+    threeValueLogic equals();
+    CNF_formula *getCNF();
 };
 
 
@@ -256,6 +260,7 @@ public:
     CommGraphFormulaMultiaryAnd();
     CommGraphFormulaMultiaryAnd(CommGraphFormula* subformula_);
     CommGraphFormulaMultiaryAnd(CommGraphFormula* lhs, CommGraphFormula* rhs);
+    CommGraphFormulaMultiaryAnd* merge();
     virtual CommGraphFormulaMultiaryAnd* getDeepCopy() const;
 
 
@@ -282,6 +287,8 @@ public:
     CommGraphFormulaMultiaryOr();
     CommGraphFormulaMultiaryOr(CommGraphFormula* subformula_);
     CommGraphFormulaMultiaryOr(CommGraphFormula* lhs, CommGraphFormula* rhs);
+    CommGraphFormulaMultiaryOr* merge(); 
+    bool implies(CommGraphFormulaMultiaryOr *);
     virtual CommGraphFormulaMultiaryOr* getDeepCopy() const;
 
     /** Destroys this CommGraphFormulaMultiaryOr and all its subformulas. */
@@ -309,6 +316,8 @@ public:
     
     //** adds a clause to the CNF
     void addClause(CommGraphFormulaMultiaryOr* clause);
+
+    bool implies(CNF_formula *);
 };
 
 

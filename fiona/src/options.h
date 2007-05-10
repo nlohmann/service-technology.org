@@ -56,7 +56,9 @@ typedef enum
 	O_OTF, //on the fly
 	O_EX,
 	O_MATCH,
-	O_CONSTRAINT
+	O_CONSTRAINT,
+	O_SIMULATES,
+	O_OG_NAME
 } possibleOptions;
 
 typedef enum
@@ -78,6 +80,7 @@ extern std::map<possibleOptions,    bool> options;
 extern std::map<possibleParameters, bool> parameters;
 
 extern char * netfile;
+extern char * ogfile;
 extern std::string ogfileToMatch;
 extern std::string ogfileToParse;
 extern std::string constraintfile;

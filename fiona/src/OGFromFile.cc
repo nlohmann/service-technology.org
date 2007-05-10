@@ -368,6 +368,98 @@ void OGFromFile::removeTransitionsToNodeFromAllOtherNodes(
 	}
 }
 
+//! \fn bool OGFromFile::simulates(OGFromFile *simulant)
+//! \brief checks, whether this OGFromFile simulates the given simulant
+//! \return true on positive check, otherwise: false
+//! \param simulant the simulant that should be simulated
+bool OGFromFile::simulates ( OGFromFile *simulant ) {
+	trace(TRACE_5, "OGFromFile::simulates(OGFromFile *simulant): start\n" );
+	//Simulation is impossible without a simulant.
+	if ( simulant == NULL )
+		return false;
+	
+	//We need to remember the nodes we already visited.
+	set<OGFromFileNode*> *myVisitedNodes, *simVisitedNodes;
+	myVisitedNodes = new set<OGFromFileNode*>;
+	simVisitedNodes = new set<OGFromFileNode*>;
+	
+	//Get things moving...
+	bool result = false;
+	if ( simulatesRecursive(root, myVisitedNodes, simulant->getRoot(), simVisitedNodes) )
+		result = true;
+	
+	trace(TRACE_5, "OGFromFile::simulates(OGFromFile *simulant): end\n" );
+	return result;
+}
+
+//! \fn bool OGFromFile::simulatesRecursive(OGFromFileNode *myNode, OGFromFileNode *simNode)
+//! \brief checks, whether the part of an OGFromFile below myNode simulates
+//         the part of an OGFromFile below simNode
+//! \return true on positive check, otherwise: false
+//! \param myNode a node in this OGFromFile
+//! \param simNode a node in the simulant
+bool OGFromFile::simulatesRecursive ( OGFromFileNode *myNode, 
+									  set<OGFromFileNode*> *myVisitedNodes, 
+									  OGFromFileNode *simNode,
+									  set<OGFromFileNode*> *simVisitedNodes) {
+	//If the simulant has no further nodes then myNode simulates simNode.
+	if ( simNode == NULL )
+		return true;
+	//If simNode has a subgraph but myNode does not 
+	//then myNode cannot simulate simNode.
+	if ( myNode == NULL ) 
+		return false;
+	//The above two checks shouldn't matter anyway because there should be no
+	//edges pointing to NULL, or should they? Let's just keep those checks
+	//there for now.
+	
+	//If we already visited this node in the simulant, then we're done.
+	if ( simVisitedNodes->find(simNode) != simVisitedNodes->end() )
+		return true;
+	else
+		simVisitedNodes->insert(simNode);
+	//If we have visited this node in the simulator, but not in the simulant,
+	//then we screwed up badly (I think). Simulation isn't possible, for sure.
+	if ( myVisitedNodes->find(myNode) != myVisitedNodes->end() )
+		return false;
+	
+	trace(TRACE_5, "OGFromFile::simulateRecursive: checking annotations\n");
+	if ( simNode->getAnnotation()->getCNF()->implies(myNode->getAnnotation()->getCNF()) )
+		trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations ok\n" );
+	else {
+		trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations incompatible\n");
+		return false;
+	}
+	
+	//Now, we have to check whether the two graphs are compatible.
+	OGFromFileNode::transitions_t::iterator myTransIter, simTransIter;
+	trace ( TRACE_5, "Iterating over the transitions of the simulant's node.\n" );
+	for ( simTransIter = simNode->transitions.begin();
+		  simTransIter!= simNode->transitions.end();
+		  simTransIter++ ) {
+		trace(TRACE_5, "Trying to find the transition in the simulator.\n" );
+		myTransIter = myNode->transitions.begin();
+		while ( ( myTransIter != myNode->transitions.end() ) &&
+				( (*myTransIter)->getLabel().compare((*simTransIter)->getLabel()) ) ) {
+			myTransIter++;
+		}
+		
+		if ( myTransIter == myNode->transitions.end() )
+			return false;
+		else {
+			trace(TRACE_5, "These two nodes seem compatible.\n" );
+			if (!simulatesRecursive ( (*myTransIter)->getDst(), 
+									  myVisitedNodes,
+									  (*simTransIter)->getDst(),
+									  simVisitedNodes))
+				return false;
+		}
+	}
+	
+	//All checks were successful.
+	return true;
+}
+
 //! \fn OGFromFile* OGFromFile::enforce(OGFromFile* constraint)
 //! \brief enforces the current OG to respect the given constraint
 //! \return the OG respecting the constraint

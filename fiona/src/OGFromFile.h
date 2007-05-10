@@ -124,6 +124,10 @@ private:
     void removeTransitionsToNodeFromAllOtherNodes(
         const OGFromFileNode* nodeToDelete);
     void buildConstraintOG(OGFromFileNode*, OGFromFileNode*, OGFromFile*) const;
+	bool simulatesRecursive ( OGFromFileNode *myNode, 
+							  set<OGFromFileNode*> *myVisitedNodes, 
+							  OGFromFileNode *simNode,
+							  set<OGFromFileNode*> *simVisitedNodes);
 public:
     OGFromFile();
     ~OGFromFile();
@@ -150,6 +154,8 @@ public:
     void printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFromFileNode*, bool>&) const;
 
     void printDotFile() const;
+	
+	bool simulates ( OGFromFile *simulant );
 };
 
 

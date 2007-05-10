@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/05/09 16:28:01 $
+ * \date    \$Date: 2007/05/10 13:11:02 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.75 $
+ * \version \$Revision: 1.76 $
  *
  * \ingroup petrinet
  */
@@ -643,6 +643,73 @@ void PetriNet::reduce_equal_places()
   set<pair<string, string> > delPairs;
   bool safe = true;
 
+  set<Place*> candidates = P;
+  // since we need two places for this rule, we need sufficent candidates
+  while ( candidates.size() > 1 )
+  {
+    Place * p1 = *(candidates.begin());
+    // erase candidate from set, so it cannot compared with itself and set gets smaller
+    candidates.erase(p1);
+  
+    if ((p1)->postset.size() !=1) //precondition 2
+      continue;
+
+    if (arc_weight(p1,*(p1)->postset.begin())!=1) //precondition 3
+      continue;
+	 
+    Node* t1 = *(p1)->postset.begin();
+
+    for (set<Place*>::iterator p2 = candidates.begin(); p2 != candidates.end(); p2++)
+    {
+      if ((*p2)->type != INTERNAL) //precondition 0
+		 continue;
+
+      if(p1 == *p2) // precondition 1
+		  continue;
+
+      if ((*p2)->postset.size() !=1) //precondition 2
+        continue;
+
+      if (arc_weight(*p2,*(*p2)->postset.begin()) !=1) //precondition 3
+        continue;
+
+      Node* t2 = *(*p2)->postset.begin();
+
+      if (t1 == t2) //precondition 4
+        continue;
+      set<Node*> postSetT1 = postset (t1);
+      set<Node*> postSetT2 = postset (t2);
+
+      if (postSetT1 != postSetT2) //precondition 5
+	continue;
+
+      set<Node*> preSetT1 = (t1)->preset;
+      set<Node*> preSetT2 = (t2)->preset;
+
+      preSetT1.erase(p1);
+      preSetT2.erase(*p2);
+
+      if (preSetT1 != preSetT2) //precondition 5
+        continue;
+
+      string id1 = *((p1)->history.begin());
+      string id2 = *((*p2)->history.begin());
+	    
+      for (set<pair<string, string> >::iterator labels = placePairs.begin();
+      labels != placePairs.end(); labels++)
+      {
+        if ( (labels->first==id1) || (labels->second==id1) || (labels->first==id2) || (labels->second==id2))
+          safe = false;
+      }
+	    
+      if (placePairs.find(pair<string, string>(id2, id1)) == placePairs.end() && safe)
+      {
+        placePairs.insert(pair<string, string>(id1, id2));
+      }
+    }
+  }
+  
+  /*
   // Testing all preconditions
   for (set<Place*>::iterator p1 = P.begin(); p1 != P.end(); p1++)
   {
@@ -704,6 +771,7 @@ void PetriNet::reduce_equal_places()
       }
     }
   }
+    */
 
 
   for (set<pair<string, string> >::iterator labels = placePairs.begin();
@@ -829,3 +897,4 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
 
   return passes;
 }
+

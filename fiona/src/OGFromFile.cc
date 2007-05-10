@@ -502,10 +502,11 @@ OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
 
 OGFromFile* OGFromFile::product(const ogs_t& ogs)
 {
-    assert(ogs.size() != 0);
+    assert(ogs.size() > 1);
 
     ogs_t::const_iterator iOG = ogs.begin();
-    OGFromFile* productOG = *iOG;
+    OGFromFile* firstOG = *iOG++;
+    OGFromFile* productOG = firstOG->product(*iOG);
     for (++iOG; iOG != ogs.end(); ++iOG)
     {
         OGFromFile* oldProductOG = productOG;

@@ -172,7 +172,7 @@ public:
     /**
      * Returns the product OG of all given OGs. The caller has to delete the
      * returned OGFromFile.
-     * \param ogs Given OGs. Must contain at least one OG.
+     * \param ogs Given OGs. Must contain at least two OG.
      */
     static OGFromFile* product(const ogs_t& ogs);
 

@@ -31,7 +31,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/05/09 15:39:41 $
+ * \date    \$Date: 2007/05/10 12:07:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  */
 %}
 
@@ -103,35 +103,23 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   for (map<string, unsigned int>::const_iterator in = globals::ASTE_inputChannels.begin();
       in != globals::ASTE_inputChannels.end(); in++)
   {
-    // case 1: several instances of this process are needed: create channels for the current instance
-    if (globals::instances_of_current_process > 1)
-      PN.newPlace("in." + in->first + ".instance_" + toString(globals::current_instance_of_the_process), IN);
-    else
-    {
-      // case 2: only one instance of each channel is needed
-      if (in->second == 1)
-	PN.newPlace("in." + in->first, IN);
-      else // case 3: several instances of each channel are needed
-    	for (unsigned int i = 1; i <= in->second; i++)
-  	  PN.newPlace("in." + in->first + ".instance_" + toString(i), IN);
-    }
+    // case 1: only one instance of each channel is needed
+    if (in->second == 1)
+      PN.newPlace("in." + in->first, IN);
+    else // case 2: several instances of each channel are needed
+      for (unsigned int i = 1; i <= in->second; i++)
+      	PN.newPlace("in." + in->first + ".instance_" + toString(i), IN);
   }
 
   for (map<string, unsigned int>::const_iterator out = globals::ASTE_outputChannels.begin();
       out != globals::ASTE_outputChannels.end(); out++)
   {
-    // case 1: several instances of this process are needed: create channels for the current instance
-    if (globals::instances_of_current_process > 1)
-      PN.newPlace("out." + out->first + ".instance_" + toString(globals::current_instance_of_the_process), OUT);
-    else
-    {
-      // case 2: only one instance of each channel is needed
-      if (out->second == 1)
-	PN.newPlace("out." + out->first, OUT);
-      else // case 3: several instances of each channel are needed
-    	for (unsigned int i = 1; i <= out->second; i++)
-  	  PN.newPlace("out." + out->first + ".instance_" + toString(i), OUT);
-    }
+    // case 1: only one instance of each channel is needed
+    if (out->second == 1)
+      PN.newPlace("out." + out->first, OUT);
+    else // case 2: several instances of each channel are needed
+      for (unsigned int i = 1; i <= out->second; i++)
+      	PN.newPlace("out." + out->first + ".instance_" + toString(i), OUT);
   }
 
 

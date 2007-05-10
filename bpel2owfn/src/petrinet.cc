@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/10 11:48:27 $
+ * \date    \$Date: 2007/05/10 12:07:17 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.203 $
+ * \version \$Revision: 1.204 $
  *
  * \ingroup petrinet
  */
@@ -1455,6 +1455,25 @@ unsigned int PetriNet::getId()
 {
   return nextId++;
 }
+
+
+
+
+
+/*!
+ * \brief   adds a suffix to the name of all interface places of the net
+ *
+ * \param   suffix to add to the interface places
+ */
+void PetriNet::add_interface_suffix(string suffix)
+{
+  for (set<Place *>::const_iterator place = P_in.begin(); place != P_in.end(); place ++)
+    (*place)->history[0] += suffix;
+
+  for (set<Place *>::const_iterator place = P_out.begin(); place != P_out.end(); place ++)
+    (*place)->history[0] += suffix;
+}
+
 
 
 

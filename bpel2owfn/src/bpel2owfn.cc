@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/09 15:39:41 $
+ * \date    \$Date: 2007/05/10 12:07:17 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.172 $
+ * \version \$Revision: 1.173 $
  */
 
 
@@ -297,31 +297,33 @@ void single_output(set< string >::iterator file)
     }
     else
     {
-      for(globals::current_instance_of_the_process = 1;
-  	  globals::current_instance_of_the_process <= globals::instances_of_current_process;
-  	  globals::current_instance_of_the_process++)
+      // choose Petri net patterns
+      if (globals::parameters[P_COMMUNICATIONONLY] == true)
+	globals::AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
+      else
+	globals::AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
+
+      // calculate maximum occurences
+      PN.calculate_max_occurrences();
+
+      if (globals::reduction_level > 0)
       {
-	std::cerr << globals::current_instance_of_the_process << ". pass in unparsing" << std::endl;
-
-	// choose Petri net patterns
-	if (globals::parameters[P_COMMUNICATIONONLY] == true)
-	  globals::AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
-	else
-	  globals::AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
-
-	// calculate maximum occurences
-	PN.calculate_max_occurrences();
-
-	if (globals::reduction_level > 0)
-	{
-	  trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
-	  PN.reduce(globals::reduction_level);
-	}
-
-	PN.addPrefix(globals::ASTEmap[1]->attributes["name"] + "_" + toString(globals::current_instance_of_the_process) + ".");
-	PN2.compose(PN);
-    	PN = PetriNet();
+	trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
+	PN.reduce(globals::reduction_level);
       }
+
+      for(unsigned int instance = 1; instance <= globals::instances_of_current_process; instance++)
+      {
+	std::cerr << "instance " << instance << "/" << globals::instances_of_current_process << " " << PN2.information() << std::endl;
+	
+	PetriNet PN3 = PN;
+
+	PN3.addPrefix(globals::ASTEmap[1]->attributes["name"] + "_" + toString(instance) + ".");
+	PN3.add_interface_suffix(".instance_" + toString(instance));
+	PN2.compose(PN3);
+      }
+      
+      PN = PetriNet();
     }
 
     globals::AST = NULL;

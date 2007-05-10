@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/10 12:07:17 $
+ * \date    \$Date: 2007/05/10 12:37:57 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.173 $
+ * \version \$Revision: 1.174 $
  */
 
 
@@ -270,67 +270,51 @@ void single_output(set< string >::iterator file)
 
 
 
-  // generate a Petri net (with BPEL4Chor)?
-  if ((globals::choreography_filename != "") &&
-    (modus == M_PETRINET || modus == M_CONSISTENCY))
+  if (modus == M_PETRINET || modus == M_CONSISTENCY) //)
   {
+    // choose Petri net patterns
+    if (globals::parameters[P_COMMUNICATIONONLY] == true)
+      globals::AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
+    else
+      globals::AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
+
+    // calculate maximum occurences
+    PN.calculate_max_occurrences();
+
+    // structurally reducte the Petri net
+    if (globals::reduction_level > 0)
+    {
+      trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
+      PN.reduce(globals::reduction_level);
+    }
+
+    // case 1: only one instance of this process is needed
     if (globals::instances_of_current_process == 1)
     {
-      // choose Petri net patterns
-      if (globals::parameters[P_COMMUNICATIONONLY] == true)
-      	globals::AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
-      else
-	globals::AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
-
-      // calculate maximum occurences
-      PN.calculate_max_occurrences();
-
-      if (globals::reduction_level > 0)
-      {
-	trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
-	PN.reduce(globals::reduction_level);
-      }
-
+      // add a prefix and compose PN to PN2
       PN.addPrefix(globals::ASTEmap[1]->attributes["name"] + ".");
       PN2.compose(PN);
-      PN = PetriNet();
     }
-    else
+    else // case 2: two or more instances of this process are needed
     {
-      // choose Petri net patterns
-      if (globals::parameters[P_COMMUNICATIONONLY] == true)
-	globals::AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
-      else
-	globals::AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
-
-      // calculate maximum occurences
-      PN.calculate_max_occurrences();
-
-      if (globals::reduction_level > 0)
-      {
-	trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
-	PN.reduce(globals::reduction_level);
-      }
-
       for(unsigned int instance = 1; instance <= globals::instances_of_current_process; instance++)
       {
 	std::cerr << "instance " << instance << "/" << globals::instances_of_current_process << " " << PN2.information() << std::endl;
 	
 	PetriNet PN3 = PN;
-
 	PN3.addPrefix(globals::ASTEmap[1]->attributes["name"] + "_" + toString(instance) + ".");
 	PN3.add_interface_suffix(".instance_" + toString(instance));
 	PN2.compose(PN3);
-      }
-      
-      PN = PetriNet();
+      }      
     }
-
+    
+    // reset data structures
+    PN = PetriNet();
     globals::AST = NULL;
   }
 
 
-
+/*
 
   // generate a Petri net (w/o BPEL4Chor)?
   if ((globals::choreography_filename == "") &&
@@ -367,7 +351,7 @@ void single_output(set< string >::iterator file)
 
       globals::AST = NULL;
       }
-    }
+    }*/
 }
 
 

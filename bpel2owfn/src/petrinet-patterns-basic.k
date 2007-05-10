@@ -46,7 +46,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/05/10 12:07:17 $
+ * \date    \$Date: 2007/05/10 12:37:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -56,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  */
 %}
 
@@ -257,8 +257,6 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	string interface_place_name = (globals::ASTEmap[phylum->id]->channel_instances != 0) ?
 	  "out." + globals::ASTEmap[phylum->id]->channelName + ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++) :
 	  "out." + globals::ASTEmap[phylum->id]->channelName;
-//        if (globals::instances_of_current_process > 1)
-//          interface_place_name = "out." + globals::ASTEmap[phylum->id]->channelName + ".instance_" + toString(globals::current_instance_of_the_process);
 
         // send a message to one unique instance
         if (globals::ASTEmap[phylum->id]->channel_unique_instances != 0)
@@ -337,13 +335,6 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	  "in." + globals::ASTEmap[phylum->id]->channelName2 + ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++) :
 	  "in." + globals::ASTEmap[phylum->id]->channelName2;
 	
-//        if (globals::instances_of_current_process > 1)
-//        {
-//          interface_place_name = "out." + globals::ASTEmap[phylum->id]->channelName + ".instance_" + toString(globals::current_instance_of_the_process);
-//          interface_place_name = "in." + globals::ASTEmap[phylum->id]->channelName2 + ".instance_" + toString(globals::current_instance_of_the_process);
-//        }
-
-
         // A subnet sending a message (replacement of t1).
         sendingTransition("invoke_out",  p1, p2,
                           PN.findPlace(interface_place_name),
@@ -462,8 +453,6 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 	string interface_place_name = (globals::ASTEmap[phylum->id]->channel_instances != 0) ?
 	  "in." + globals::ASTEmap[phylum->id]->channelName + ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++) :
 	  "in." + globals::ASTEmap[phylum->id]->channelName;
-//        if (globals::instances_of_current_process > 1)
-//          interface_place_name = "in." + globals::ASTEmap[phylum->id]->channelName + ".instance_" + toString(globals::current_instance_of_the_process);
 
 
         // receive a message from one unique instance
@@ -561,8 +550,6 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 	string interface_place_name = (globals::ASTEmap[phylum->id]->channel_instances != 0) ?
 	  "out." + globals::ASTEmap[phylum->id]->channelName + ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++) :
 	  "out." + globals::ASTEmap[phylum->id]->channelName;
-//        if (globals::instances_of_current_process > 1)
-//          interface_place_name = "out." + globals::ASTEmap[phylum->id]->channelName + ".instance_" + toString(globals::current_instance_of_the_process);
 
         // A transition sending a message.
 	Transition *t1 = PN.newTransition(prefix + "reply");

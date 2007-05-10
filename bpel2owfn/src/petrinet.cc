@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/10 12:07:17 $
+ * \date    \$Date: 2007/05/10 12:23:16 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.204 $
+ * \version \$Revision: 1.205 $
  *
  * \ingroup petrinet
  */
@@ -1633,6 +1633,7 @@ void PetriNet::compose(const PetriNet &net)
   // merge appropriate input and output places (same name, different prefixes)
   for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
   {
+    /*
     set< Place * >::iterator oPlace = P_out.begin();
     bool finished = false;
     while ( ! finished && oPlace != P_out.end())
@@ -1643,23 +1644,27 @@ void PetriNet::compose(const PetriNet &net)
       else
 	finished = true;
     }
+    */
 
-   if (finished)
+    Place * oPlace = findPlace("out." + (*place)->nodeFullName().erase(0,3));
+
+    // if (finished)
+    if ( oPlace != NULL )
     {
-      if ( (*place)->prefix != (*oPlace)->prefix )
+      if ( (*place)->prefix != (oPlace)->prefix )
       {
         (*place)->type = INTERNAL;
         (*place)->history[0] = (*place)->nodeFullName();
         roleMap[(*place)->nodeFullName()] = (*place);
-        (*oPlace)->type = INTERNAL;
-        (*oPlace)->history[0] = (*oPlace)->nodeFullName();
-        roleMap[(*oPlace)->nodeFullName()] = (*oPlace);
-        (*oPlace)->wasExternal = (*oPlace)->nodeFullName().substr((*oPlace)->nodeFullName().find_first_of(".") + 1);
+        (oPlace)->type = INTERNAL;
+        (oPlace)->history[0] = (oPlace)->nodeFullName();
+        roleMap[(oPlace)->nodeFullName()] = (oPlace);
+        (oPlace)->wasExternal = (oPlace)->nodeFullName().substr((oPlace)->nodeFullName().find_first_of(".") + 1);
         P.insert(*place);
-        P.insert(*oPlace);
-        mergePlaces((*place)->nodeFullName(), (*oPlace)->nodeFullName());
+        P.insert(oPlace);
+        mergePlaces((*place)->nodeFullName(), (oPlace)->nodeFullName());
         eraseP_in.insert(*place);
-        P_out.erase(*oPlace);
+        P_out.erase(oPlace);
       }
     }
   }

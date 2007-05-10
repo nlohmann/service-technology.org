@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/09 15:39:41 $
+ * \date    \$Date: 2007/05/10 11:48:27 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.202 $
+ * \version \$Revision: 1.203 $
  *
  * \ingroup petrinet
  */
@@ -1473,8 +1473,7 @@ void PetriNet::addPrefix(string prefix)
 
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
     {
-      if (*place == NULL)
-	roleMap[(prefix + *name)] = *place;
+      roleMap[(prefix + *name)] = *place;
     }
   }
   for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
@@ -1483,8 +1482,7 @@ void PetriNet::addPrefix(string prefix)
 
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
     {
-      if (*place == NULL)
-	roleMap[(prefix + *name)] = *place;
+      roleMap[(prefix + *name)] = *place;
     }
   }
   for (set< Place * >::iterator place = P_out.begin(); place != P_out.end(); place ++)
@@ -1493,8 +1491,7 @@ void PetriNet::addPrefix(string prefix)
 
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
     {
-      if (*place == NULL)
-	roleMap[(prefix + *name)] = *place;
+      roleMap[(prefix + *name)] = *place;
     }
   }
 

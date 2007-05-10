@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright 2005, 2006, 2007 Jan Bretschneider, Peter Massuthe              *
+ * Copyright 2005, 2006, 2007 Jan Bretschneider, Peter Massuthe, Leonard Kern*
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *

@@ -1,6 +1,7 @@
 /*****************************************************************************
  * Copyright 2005, 2006 Niels Lohmann, Peter Massuthe, Daniela Weinberg,     *
- *                      Jan Bretschneider, Christian Gierds, Dennis Reinert  *
+ *                      Jan Bretschneider, Christian Gierds, Dennis Reinert, *
+ *                      Leonard Kern                                         *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *

@@ -1,6 +1,7 @@
 /*****************************************************************************
  * Copyright 2005, 2006, 2007                 Niels Lohmann, Peter Massuthe, *
- *                    Daniela Weinberg, Jan Bretschneider, Christian Gierds  *
+ *                                      Daniela Weinberg, Jan Bretschneider, *
+ *                                           Christian Gierds, Leonard Kern  *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
@@ -92,12 +93,11 @@ static struct option longopts[] =
   { "match",           required_argument, NULL, GETOPTLONG_MATCH },
   { "constraint",      required_argument, NULL, GETOPTLONG_CONSTRAINT },
   { "productog",       no_argument,       NULL, GETOPTLONG_PRODUCTOG },
-  { "simulates",       no_argument,       NULL, 'S' },
   { NULL,              0,                 NULL, 0   }
 };
 
 
-const char * par_string = "hvd:n:St:s:arm:e:b:B:xo:";
+const char * par_string = "hvd:n:t:s:arm:e:b:B:xo:";
 
 // --------------------- functions for command line evaluation ------------------------
 // Prints an overview of all commandline arguments.
@@ -118,6 +118,8 @@ void print_help() {
   trace(" -t | --graphtype=<type> ....... select the graph <type> to be calculated:\n");
   trace("                                   OG - operating guideline\n");
   trace("                                   IG - interaction graph (default)\n");
+  trace("                                   simulation - check whether the first\n");
+  trace("                                                OG simulates the second one\n");
   trace(" -m | --messagemaximum=<level>   set maximum number of same messages per state\n");
   trace("                                 to <level>\n");
   trace(" -e | --eventsmaximum=<level>    set event to occur at most <level> times\n");
@@ -168,8 +170,6 @@ void print_help() {
   trace("                                 method (see option -b)\n");
   trace(" --match=<OG filename> ......... check if given oWFN (-n) matches with\n");
   trace("                                 operating guideline given in <OG filename>\n");
-  trace(" -S | --simulates............... check if the first given OG simulates the\n");
-  trace("                                 second\n");
   trace(" --constraint=<filename> ....... change a given OG (for the net specified with -n)\n");
   trace("                                 that it resprects the constraint automaton given in <filename>\n");
   trace("                                 syntax: -n net.owfn --constraint==constraintfile.og\n");
@@ -302,9 +302,6 @@ void parse_command_line(int argc, char* argv[]) {
                     exit(1);
                 }
                 break;
-            case 'S':
-                options[O_SIMULATES] = true;
-                break;
             case 't':
                 if (string(optarg) == "OG") {
                     options[O_GRAPH_TYPE] = true;
@@ -314,6 +311,8 @@ void parse_command_line(int argc, char* argv[]) {
                     options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = false;
                     parameters[P_IG] = true;
+				} else if (string(optarg) == "simulation") {
+					options[O_SIMULATES] = true;
                 } else {
                     cerr << "Warning:\twrong graph type" << endl
                          << "\tIG computed" << endl;

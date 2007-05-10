@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg                     *
+ * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Robert Danitz      *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *

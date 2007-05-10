@@ -79,7 +79,6 @@ extern int og_yylex_destroy();
 extern unsigned int State::card;
 // extern char * netfile;
 extern list<char*> netfiles;
-extern list<char*> ogfiles;
 extern OGFromFile* OGToParse;
 
 int garbagefound;
@@ -220,7 +219,6 @@ int main(int argc, char ** argv) {
 	set_new_handler(&myown_newhandler);
 
 	list<oWFN*> petrinets;
-	list<OGFromFile*> OGsFromFiles;
 
 	// evaluate command line options
 	parse_command_line(argc, argv);
@@ -258,7 +256,7 @@ int main(int argc, char ** argv) {
 	if (options[O_CONSTRAINT]) {
 
 		netfile = *netfiles.begin();
-		
+	
 		// open the OG to be constrained
 		string ogfile = string(netfile) + ".a.og";
 		trace(TRACE_0, "You want to constrain the OG:  " + ogfile + "\n");
@@ -355,14 +353,46 @@ int main(int argc, char ** argv) {
 #endif
 	
 // ------------- reading all OG-files -----------------------
-	if ( options[O_OG_NAME] ) {
-		list<char*>::iterator ogIter = ogfiles.begin();
-		do {
-			OGsFromFiles.push_back(readog((*ogIter)));
-			ogIter++;
-		}while (ogfiles.begin() != ogfiles.end() && ogIter != ogfiles.end());
-	}
+    OGFromFile::ogs_t OGsFromFiles;
+	for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+         iOgFile != ogfiles.end(); ++iOgFile)
+    {
+        OGsFromFiles.push_back(readog(*iOgFile));
+    }
 	
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
+		// Destroy buffer of OG parser.
+		//  Must NOT be called before fclose(og_yyin);
+		og_yylex_destroy();
+#endif
+
+// -------------- calculating the product og -------------
+    if (options[O_PRODUCTOG])
+    {
+        if (OGsFromFiles.size() < 2)
+        {
+			cerr << "Error: \t Give at least two OGs to build their product!\n" << endl;
+            exit(1);
+        }
+        OGFromFile* productOG = OGFromFile::product(OGsFromFiles);
+
+        if (!options[O_OUTFILEPREFIX])
+        {
+            outfilePrefix = OGFromFile::getProductOGFilePrefix(ogfiles);
+        }
+
+        productOG->printDotFile(outfilePrefix);
+        delete productOG;
+
+        for (OGFromFile::ogs_t::const_iterator iOg = OGsFromFiles.begin();
+             iOg != OGsFromFiles.end(); ++iOg)
+        {
+            delete *iOg;
+        }
+
+        return 0;
+    }
+
 // ------------- simulation on OGFromFile --------------------
 	
 	if ( options[O_SIMULATES] ) {

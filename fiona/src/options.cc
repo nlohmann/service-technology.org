@@ -48,11 +48,11 @@ using namespace std;
 // some file names and pointers
 char * netfile;
 std::list<char*> netfiles;
-//char * ogfile;
-std::list<char*> ogfiles;
+OGFromFile::ogfiles_t ogfiles;
 std::string ogfileToMatch;
 std::string ogfileToParse;
 std::string constraintfile;
+std::string outfilePrefix;
 
 int events_manual;
 unsigned int messages_manual;
@@ -67,9 +67,11 @@ std::map<possibleParameters, bool> parameters;
 
 
 // values getopt_long() should return for long options that have no short
-// version. Start with some value that cannot be the value of a char.
-#define GETOPTLONG_MATCH1  256
-#define GETOPTLONG_MATCH2  255
+// version. Start with some value that cannot be the value of a char,
+// i.e. 256!!
+#define GETOPTLONG_MATCH       256
+#define GETOPTLONG_CONSTRAINT  257
+#define GETOPTLONG_PRODUCTOG   258
 
 // long options
 static struct option longopts[] =
@@ -87,9 +89,10 @@ static struct option longopts[] =
   { "BDD",             required_argument, NULL, 'b' },
   { "OnTheFly",        required_argument, NULL, 'B' },
   { "exchangeability", no_argument,       NULL, 'x' },
-  { "match",           required_argument, NULL, GETOPTLONG_MATCH1 },
-  { "constraint",      required_argument, NULL, GETOPTLONG_MATCH2 },
-  { "og",              required_argument, NULL, 'o' },
+  { "match",           required_argument, NULL, GETOPTLONG_MATCH },
+  { "constraint",      required_argument, NULL, GETOPTLONG_CONSTRAINT },
+  { "productog",       no_argument,       NULL, GETOPTLONG_PRODUCTOG },
+  { "simulates",       no_argument,       NULL, 'S' },
   { NULL,              0,                 NULL, 0   }
 };
 
@@ -99,6 +102,8 @@ const char * par_string = "hvd:n:St:s:arm:e:b:B:xo:";
 // --------------------- functions for command line evaluation ------------------------
 // Prints an overview of all commandline arguments.
 void print_help() {
+  trace("Usage: fiona [OPTION]... [FILE]...\n");
+  trace("\n");
   trace("Options: (if an option is skipped, the default settings are denoted)\n");
   trace("\n");
   trace(" -h | --help ................... print this information and exit\n");
@@ -163,9 +168,13 @@ void print_help() {
   trace("                                 method (see option -b)\n");
   trace(" --match=<OG filename> ......... check if given oWFN (-n) matches with\n");
   trace("                                 operating guideline given in <OG filename>\n");
+  trace(" -S | --simulates............... check if the first given OG simulates the\n");
+  trace("                                 second\n");
   trace(" --constraint=<filename> ....... change a given OG (for the net specified with -n)\n");
   trace("                                 that it resprects the constraint automaton given in <filename>\n");
-  trace("                                 syntax: -n net.owfn --constraint==constraintfile.og\n)");
+  trace("                                 syntax: -n net.owfn --constraint==constraintfile.og\n");
+  trace(" --productog ................... calculate the product OG of all given OGs\n");
+  trace(" -o <filename prefix> .......... prefix of the output files\n");
   trace("\n");
   trace("\n");
   trace("For more information see:\n");
@@ -227,8 +236,9 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_EX] = false;
     options[O_MATCH] = false;
     options[O_CONSTRAINT] = false;
-	options[O_SIMULATES] = false;
-	options[O_OG_NAME] = false;
+    options[O_PRODUCTOG] = false;
+    options[O_SIMULATES] = false;
+    options[O_OUTFILEPREFIX] = false;
 
     options[O_MESSAGES_MAX] = false;
     options[O_EVENT_USE_MAX] = true;
@@ -292,21 +302,9 @@ void parse_command_line(int argc, char* argv[]) {
                     exit(1);
                 }
                 break;
-			case 'o':
-				if (optarg) {
-					options[O_OG_NAME] = true;
-					ogfiles.push_back(optarg);
-				}
-				else {
-					cerr << "Error:\tog name missing" << endl
-					     << "\tEnter \"fiona --help\" for more information."
-					     << endl;
-					exit(1);
-				}
-				break;
-			case 'S':
-				options[O_SIMULATES] = true;
-				break;
+            case 'S':
+                options[O_SIMULATES] = true;
+                break;
             case 't':
                 if (string(optarg) == "OG") {
                     options[O_GRAPH_TYPE] = true;
@@ -408,7 +406,7 @@ void parse_command_line(int argc, char* argv[]) {
                 parameters[P_IG] = false;
                 parameters[P_OG] = false;
                 break;
-            case GETOPTLONG_MATCH1:
+            case GETOPTLONG_MATCH:
                 if (optarg) {
                     options[O_MATCH] = true;
                     ogfileToMatch = optarg;
@@ -419,12 +417,26 @@ void parse_command_line(int argc, char* argv[]) {
                     exit(1);
                 }
                 break;
-            case GETOPTLONG_MATCH2:
+            case GETOPTLONG_CONSTRAINT:
                 if (optarg) {
                     options[O_CONSTRAINT] = true;
                     constraintfile = optarg;
                 } else {
                     cerr << "Error:\tconstraint file name missing" << endl
+                         << "\tEnter \"fiona --help\" for more information."
+                         << endl;
+                    exit(1);
+                }
+                break;
+            case GETOPTLONG_PRODUCTOG:
+                options[O_PRODUCTOG] = true;
+                break;
+            case 'o':
+                if (optarg) {
+                    options[O_OUTFILEPREFIX] = true;
+                    outfilePrefix = optarg;
+                } else {
+                    cerr << "Error:\toutput filename prefix missing" << endl
                          << "\tEnter \"fiona --help\" for more information."
                          << endl;
                     exit(1);
@@ -443,8 +455,12 @@ void parse_command_line(int argc, char* argv[]) {
         }
     }
 
-    if ( (options[O_OWFN_NAME] == false) && (options[O_OG_NAME] == false) ) {
-        cerr << "Error:\tmissing parameter -n or -o. At least one must be given." << endl
+    for ( ; optind < argc; ++optind) {
+        ogfiles.push_back(argv[optind]);
+    }
+
+    if (ogfiles.size() == 0 && options[O_OWFN_NAME] == false) {
+        cerr << "Error:\tmissing parameter -n" << endl
              << "\tEnter \"fiona --help\" for more information." << endl;
         exit(1);
     }

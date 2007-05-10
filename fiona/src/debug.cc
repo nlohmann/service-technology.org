@@ -92,7 +92,7 @@ bool isNonNegativeInteger(const std::string& s)
 std::string toUpper(const std::string& s)
 {
     std::string result;
-    std::transform(s.begin(), s.end(), result.begin(), toupper);
+    std::transform(s.begin(), s.end(), result.begin(), (int(*)(int))toupper);
     return result;
 }
 

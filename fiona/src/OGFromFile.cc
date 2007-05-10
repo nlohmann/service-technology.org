@@ -460,60 +460,72 @@ bool OGFromFile::simulatesRecursive ( OGFromFileNode *myNode,
 	return true;
 }
 
-//! \fn OGFromFile* OGFromFile::enforce(OGFromFile* constraint)
-//! \brief enforces the current OG to respect the given constraint
-//! \return the OG respecting the constraint
-//! \param constraint the constraint to be enforced
-OGFromFile* OGFromFile::enforce(OGFromFile* constraint) const {
-	trace(TRACE_5, "OGFromFile::enforce(OGFromFile* constraint): start\n");
+OGFromFile* OGFromFile::enforce(const OGFromFile* rhs) {
+    return product(rhs);
+}
 
-	// this will be the new and constrained OG
-	OGFromFile* newOG = new OGFromFile();
+OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
+	trace(TRACE_5, "OGFromFile::product(const OGFromFile* rhs): start\n");
+
+	// this will be the product OG
+	OGFromFile* productOG = new OGFromFile();
 
 	// first we build a new root node that has name and annotation constructed
-	// from the root nodes of OG and constraint
+	// from the root nodes of OG and the rhs OG.
 	OGFromFileNode* currentOGNode = this->getRoot();
-	OGFromFileNode* currentConstraintNode = constraint->getRoot();
+	OGFromFileNode* currentRhsNode = rhs->getRoot();
 
 	std::string currentName;
-	currentName = currentOGNode->getName() + "x" + currentConstraintNode->getName();
+	currentName = currentOGNode->getName() + "x" + currentRhsNode->getName();
 
 	CommGraphFormulaMultiaryAnd* currentFormula;
 	currentFormula = new CommGraphFormulaMultiaryAnd(
 	    currentOGNode->getAnnotation()->getDeepCopy(),
-	    currentConstraintNode->getAnnotation()->getDeepCopy()
+	    currentRhsNode->getAnnotation()->getDeepCopy()
 	);
 
-	// building the new root node of the constrained OG
-	OGFromFileNode* newNode = new OGFromFileNode(currentName, currentFormula);
-	newOG->addNode(newNode);
-	newOG->setRoot(newNode);
+	// building the new root node of the product OG
+	OGFromFileNode* productNode = new OGFromFileNode(currentName,
+	    currentFormula);
+	productOG->addNode(productNode);
+	productOG->setRoot(productNode);
 
-	// builds the successor nodes of the root nodes of OG and constraint
-	// therefore, we perform a coordinated dfs through OG and constraint
-	buildConstraintOG(currentOGNode, currentConstraintNode, newOG);	    
+	// builds the successor nodes of the root nodes of OG and rhs OG
+	// therefore, we perform a coordinated dfs through OG and the rhs OG
+	buildProductOG(currentOGNode, currentRhsNode, productOG);	    
 
-	trace(TRACE_5, "OGFromFile::enforce(OGFromFile* constraint): end\n");
+	trace(TRACE_5, "OGFromFile::product(const OGFromFile* rhs): end\n");
 
-	return newOG;
+	return productOG;
 }
 
 
-//! \fn OGFromFile* OGFromFile::enforce(OGFromFileNode* currentOGNode, OGFromFileNode* currentConstraintNode, OGFromFile* newOG)
-//! \brief recursive coordinated dfs through OG and constraint
-//! \param currentOGNode the current node of the OG
-//! \param currentConstraintNode the current node of the constraint
-//! \param newOG the resulting constrained OG
-void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
-                                   OGFromFileNode* currentConstraintNode,
-                                   OGFromFile* newOG) const {
+OGFromFile* OGFromFile::product(const ogs_t& ogs)
+{
+    assert(ogs.size() != 0);
 
-	trace(TRACE_5, "OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentConstraintNode, OGFromFile* newOG): start\n");
+    ogs_t::const_iterator iOG = ogs.begin();
+    OGFromFile* productOG = *iOG;
+    for (++iOG; iOG != ogs.end(); ++iOG)
+    {
+        OGFromFile* oldProductOG = productOG;
+        productOG = productOG->product(*iOG);
+        delete oldProductOG;
+    }
+
+    return productOG;
+}
+
+void OGFromFile::buildProductOG(OGFromFileNode* currentOGNode,
+                                OGFromFileNode* currentRhsNode,
+                                OGFromFile* productOG) {
+
+	trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): start\n");
 
 	// at this time, the node constructed from currentOGNode and
-	// currentConstraintNode is already inserted
+	// currentRhsNode is already inserted
 
-	assert(newOG->getRoot() != NULL);
+	assert(productOG->getRoot() != NULL);
 
 	// iterate over all outgoing edges from current node of OG
     std::string currentLabel;
@@ -523,78 +535,98 @@ void OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode,
 		// remember the label of the egde
 		currentLabel = (*trans_iter)->getLabel();
 
-		// if the constraint automaton allows this edge
-		if (currentConstraintNode->hasTransitionWithLabel(currentLabel)) {
+		// if the rhs automaton allows this edge
+		if (currentRhsNode->hasTransitionWithLabel(currentLabel)) {
 
-			// remember the name of the old node of the constrained OG
+			// remember the name of the old node of the product OG
 			std::string currentName;
-			currentName = currentOGNode->getName() + "x" + currentConstraintNode->getName();
-			assert(newOG->hasNodeWithName(currentName));
+			currentName = currentOGNode->getName() + "x" + currentRhsNode->getName();
+			assert(productOG->hasNodeWithName(currentName));
 	
-			// compute both successors and recursively call buildConstraintOG again
+			// compute both successors and recursively call buildProductOG again
 			OGFromFileNode* newOGNode;
 			newOGNode = currentOGNode->fireTransitionWithLabel(currentLabel);
 			
-			OGFromFileNode* newConstraintNode;
-			newConstraintNode = currentConstraintNode->fireTransitionWithLabel(currentLabel);
+			OGFromFileNode* newRhsNode;
+			newRhsNode = currentRhsNode->fireTransitionWithLabel(currentLabel);
 
-			// build the new node of the constrained OG 
-			// that has name and annotation constructed from current nodes of OG and constraint
-			std::string newName;
-			newName = newOGNode->getName() + "x" + newConstraintNode->getName();
+			// build the new node of the product OG 
+			// that has name and annotation constructed from current nodes of OG and rhs OG
+			std::string newProductName;
+			newProductName = newOGNode->getName() + "x" + newRhsNode->getName();
 			// if the node is new, add that node to the OG
-			OGFromFileNode* found = newOG->getNodeWithName(newName);
+			OGFromFileNode* found = productOG->getNodeWithName(newProductName);
 
 			if (found != NULL) {
 				// the node was known before, so we just have to add a new edge
-				newOG->addTransition(currentName, newName, currentLabel);
+				productOG->addTransition(currentName, newProductName, currentLabel);
 
-				trace(TRACE_5, "OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentConstraintNode, OGFromFile* newOG): end\n");
+				trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): end\n");
 			} else {
 				// we computed a new node, so we add a node and an edge
 //				trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
 
-				CommGraphFormulaMultiaryAnd* newFormula;
-				newFormula = new CommGraphFormulaMultiaryAnd(
+				CommGraphFormulaMultiaryAnd* newProductFormula;
+				newProductFormula = new CommGraphFormulaMultiaryAnd(
 					newOGNode->getAnnotation()->getDeepCopy(),
-					newConstraintNode->getAnnotation()->getDeepCopy()
+					newRhsNode->getAnnotation()->getDeepCopy()
 				);
 
-				OGFromFileNode* newNode = new OGFromFileNode(newName, newFormula);
+				OGFromFileNode* newProductNode = new OGFromFileNode(newProductName, newProductFormula);
 
-				newOG->addNode(newNode);
+				productOG->addNode(newProductNode);
 
 				// going down recursively
-				newOG->addTransition(currentName, newName, currentLabel);
+				productOG->addTransition(currentName, newProductName, currentLabel);
 
-				buildConstraintOG(newOGNode, newConstraintNode, newOG);
+				buildProductOG(newOGNode, newRhsNode, productOG);
 			}
 		}
 	}
-	trace(TRACE_5, "OGFromFile::buildConstraintOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentConstraintNode, OGFromFile* newOG): end\n");
+	trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): end\n");
 }
 
+std::string OGFromFile::getProductOGFilePrefix(const ogfiles_t& ogfiles)
+{
+    assert(ogfiles.size() != 0);
 
-//! \fn void OGFromFile::printDotFile()
-//! \brief creates a dot file of the graph
-void OGFromFile::printDotFile() const {
+    ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+    string productFilePrefix = stripOGFileSuffix(*iOgFile);
 
-    trace(TRACE_0, "creating the dot file of the constrained OG...\n");	
+    for (++iOgFile; iOgFile != ogfiles.end(); ++iOgFile)
+    {
+        productFilePrefix += "_X_" +
+            stripOGFileSuffix(platform_basename(*iOgFile));
+    }
 
-    string netogfile = string(netfile) + ".a.og";
-    string outfilesPrefix = netogfile + ".under." +
-        platform_basename(constraintfile);
-    string dotFile = outfilesPrefix + ".out";
-    string pngFile = outfilesPrefix + ".png";
+    return productFilePrefix + ".og";
+}
+
+std::string OGFromFile::stripOGFileSuffix(const std::string& filename)
+{
+    static const string ogFileSuffix = ".og";
+    if (filename.substr(filename.size() - ogFileSuffix.size()) == ogFileSuffix)
+    {
+        return filename.substr(0, filename.size() - ogFileSuffix.size());
+    }
+
+    return filename;
+}
+
+void OGFromFile::printDotFile(const std::string& filenamePrefix,
+    const std::string& dotGraphTitle) const
+{
+    trace(TRACE_0, "creating the dot file of the OG...\n");
+
+    string dotFile = filenamePrefix + ".out";
+    string pngFile = filenamePrefix + ".png";
     fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
     dotFileHandle << "digraph g1 {\n";
     dotFileHandle << "graph [fontname=\"Helvetica\", label=\"";
-    dotFileHandle << "constrained OG of ";
-    dotFileHandle << netogfile << " and " << constraintfile;
+    dotFileHandle << dotGraphTitle;
     dotFileHandle << "\"];\n";
     dotFileHandle << "node [fontname=\"Helvetica\" fontsize=10];\n";
     dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
-
 
     std::map<OGFromFileNode*, bool> visitedNodes;
     printGraphToDot(getRoot(), dotFileHandle, visitedNodes);
@@ -608,6 +640,22 @@ void OGFromFile::printDotFile() const {
     // print commandline and execute system command
     trace(TRACE_0, cmd + "\n\n");
     system(cmd.c_str());
+}
+
+void OGFromFile::printDotFile(const std::string& filenamePrefix) const
+{
+    printDotFile(filenamePrefix, filenamePrefix);
+}
+
+//! \fn void OGFromFile::printDotFile()
+//! \brief creates a dot file of the graph
+void OGFromFile::printDotFile() const {
+
+    string netogfile = string(netfile) + ".a.og";
+    string outfilesPrefix = netogfile + ".under." +
+        platform_basename(constraintfile);
+    printDotFile(outfilesPrefix, "constrained OG of " + netogfile + " and " +
+        constraintfile);
 }
 
 

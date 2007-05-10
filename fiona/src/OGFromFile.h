@@ -43,6 +43,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include <list>
 #include "commGraphFormula.h"
 #include "enums.h"
 
@@ -123,7 +124,16 @@ private:
 
     void removeTransitionsToNodeFromAllOtherNodes(
         const OGFromFileNode* nodeToDelete);
-    void buildConstraintOG(OGFromFileNode*, OGFromFileNode*, OGFromFile*) const;
+
+    /**
+     * Recursive coordinated dfs through OG and rhs OG.
+     * \param currentOGNode the current node of the OG
+     * \param currentRhsNode the current node of the rhs OG
+     * \param productOG the resulting product OG
+     */
+    void buildProductOG(OGFromFileNode* currentOGNode,
+        OGFromFileNode* currentRhsNode, OGFromFile* productOG);
+
 	bool simulatesRecursive ( OGFromFileNode *myNode, 
 							  set<OGFromFileNode*> *myVisitedNodes, 
 							  OGFromFileNode *simNode,
@@ -149,13 +159,55 @@ public:
      */
     void removeFalseNodes();
 
-    OGFromFile* enforce(OGFromFile*) const;
+    /**
+     * Type of container passed to OGFromFile::product().
+     */
+    typedef std::list<OGFromFile*> ogs_t;
+
+    /**
+     * Type of container passed to OGFromFile::getProductOGFilePrefix().
+     */
+    typedef std::list<std::string> ogfiles_t;
+
+    /**
+     * Returns the product OG of all given OGs. The caller has to delete the
+     * returned OGFromFile.
+     * \param ogs Given OGs. Must contain at least one OG.
+     */
+    static OGFromFile* product(const ogs_t& ogs);
+
+    /**
+     * Returns the product OG of this OG and the passed one. The caller has to
+     * delete the returned OGFromFile.
+     */
+    OGFromFile* product(const OGFromFile* rhs);
+
+    /**
+     * Produces from the given OG file names the default prefix of the
+     * product OG output file.
+     */
+    static std::string getProductOGFilePrefix(const ogfiles_t& ogfiles);
+
+    /**
+     * Enforces the current OG to respect the given constraint.
+     * \return the OG respecting the constraint
+     * \param constraint the constraint to be enforced
+     */
+    OGFromFile* enforce(const OGFromFile*);
+
+    /**
+     * Strips the OG file suffix from filename and returns the result.
+     */
+    static std::string stripOGFileSuffix(const std::string& filename);
 
     void printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFromFileNode*, bool>&) const;
 
     void printDotFile() const;
-	
-	bool simulates ( OGFromFile *simulant );
+    void printDotFile(const std::string& filenamePrefix) const;
+    void printDotFile(const std::string& filenamePrefix,
+        const std::string& dotGraphTitle) const;
+
+    bool simulates ( OGFromFile *simulant );
 };
 
 

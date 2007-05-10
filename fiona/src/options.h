@@ -37,8 +37,10 @@
 
 #include "mynew.h"
 #include <map>
+#include <list>
 #include <cstdio>
 #include "getopt.h"
+#include "OGFromFile.h"
 
 typedef enum
 {
@@ -57,8 +59,9 @@ typedef enum
 	O_EX,
 	O_MATCH,
 	O_CONSTRAINT,
+	O_PRODUCTOG,
 	O_SIMULATES,
-	O_OG_NAME
+    O_OUTFILEPREFIX
 } possibleOptions;
 
 typedef enum
@@ -80,9 +83,14 @@ extern std::map<possibleOptions,    bool> options;
 extern std::map<possibleParameters, bool> parameters;
 
 extern char * netfile;
-extern char * ogfile;
+
+extern OGFromFile::ogfiles_t ogfiles;
+
 extern std::string ogfileToMatch;
 extern std::string ogfileToParse;
+
+extern std::string outfilePrefix;
+
 extern std::string constraintfile;
 extern unsigned int messages_manual;
 extern int events_manual;

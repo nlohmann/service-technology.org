@@ -1,0 +1,152 @@
+<!--
+This example process was taken from the Web Services Business Process Execution
+Language Version 2.0 Committee Draft, 25 January, 2007, available under
+
+   * http://docs.oasis-open.org/wsbpel/2.0/
+
+Copyright (C) OASIS Open 2003, 2006. All Rights Reserved.
+
+This document and translations of it may be copied and furnished to others, and
+derivative works that comment on or otherwise explain it or assist in its
+implementation may be prepared, copied, published and distributed, in whole or
+in part, without restriction of any kind, provided that the above copyright
+notice and this paragraph are included on all such copies and derivative works.
+However, this document itself may not be modified in any way, such as by
+removing the copyright notice or references to OASIS, except as needed for the
+purpose of developing OASIS specifications, in which case the procedures for
+copyrights defined in the OASIS Intellectual Property Rights document must be
+followed, or as required to translate it into languages other than English.
+
+The limited permissions granted above are perpetual and will not be revoked by
+OASIS or its successors or assigns.
+
+This document and the information contained herein is provided on an "AS IS"
+basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT
+INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR
+A PARTICULAR PURPOSE.
+-->
+
+<wsdl:definitions
+    targetNamespace="http://manufacturing.org/wsdl/purchase"
+    xmlns:sns="http://manufacturing.org/xsd/purchase"
+    xmlns:pos="http://manufacturing.org/wsdl/purchase"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <wsdl:types>
+	<xsd:schema>
+	    <xsd:import namespace="http://manufacturing.org/xsd/purchase"
+		schemaLocation="http://manufacturing.org/xsd/purchase.xsd" />
+	</xsd:schema>
+    </wsdl:types>
+    
+    <wsdl:message name="POMessage">
+	<wsdl:part name="customerInfo" type="sns:customerInfoType" />
+	<wsdl:part name="purchaseOrder" type="sns:purchaseOrderType" />
+    </wsdl:message>
+    
+    <wsdl:message name="InvMessage">
+	<wsdl:part name="IVC" type="sns:InvoiceType" />
+    </wsdl:message>
+
+    <wsdl:message name="orderFaultType">
+	<wsdl:part name="problemInfo" element="sns:OrderFault " />
+    </wsdl:message>
+    
+    <wsdl:message name="shippingRequestMessage">
+	<wsdl:part name="customerInfo" element="sns:customerInfo" />
+    </wsdl:message>
+
+    <wsdl:message name="shippingInfoMessage">
+	<wsdl:part name="shippingInfo" element="sns:shippingInfo" />
+    </wsdl:message>
+    
+    <wsdl:message name="scheduleMessage">
+	<wsdl:part name="schedule" element="sns:scheduleInfo" />
+    </wsdl:message>
+
+    <!-- portTypes supported by the purchase order process -->
+    <wsdl:portType name="purchaseOrderPT">
+	<wsdl:operation name="sendPurchaseOrder">
+	    <wsdl:input message="pos:POMessage" />
+	    <wsdl:output message="pos:InvMessage" />
+	    <wsdl:fault name="cannotCompleteOrder"
+		message="pos:orderFaultType" />
+	</wsdl:operation>
+	<wsdl:operation name="sendPurchaseOrder">
+	    <wsdl:input message="pos:POMessage" />
+	    <wsdl:output message="pos:InvMessage" />
+	    <wsdl:fault name="cannotCompleteOrder"
+		message="pos:orderFaultType" />
+	</wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="invoiceCallbackPT">
+	<wsdl:operation name="sendInvoice">
+	    <wsdl:input message="pos:InvMessage" />
+	</wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="shippingCallbackPT">
+	<wsdl:operation name="sendSchedule">
+	    <wsdl:input message="pos:scheduleMessage" />
+    	</wsdl:operation>
+    </wsdl:portType>
+    
+    <!-- portType supported by the invoice services -->
+    <wsdl:portType name="computePricePT">
+	<wsdl:operation name="initiatePriceCalculation">
+	    <wsdl:input message="pos:POMessage" />
+	</wsdl:operation>
+	<wsdl:operation name="sendShippingPrice">
+	    <wsdl:input message="pos:shippingInfoMessage" />
+	</wsdl:operation>
+    </wsdl:portType>
+    
+    <!-- portType supported by the shipping service -->
+    <wsdl:portType name="shippingPT">
+	<wsdl:operation name="requestShipping">
+	    <wsdl:input message="pos:shippingRequestMessage" />
+	    <wsdl:output message="pos:shippingInfoMessage" />
+	    <wsdl:fault name="cannotCompleteOrder"
+		message="pos:orderFaultType" />
+	</wsdl:operation>
+    </wsdl:portType>
+
+    <!-- portType supported by the production scheduling process -->
+    <wsdl:portType name="schedulingPT">
+	<wsdl:operation name="requestProductionScheduling">
+	    <wsdl:input message="pos:POMessage" />
+	</wsdl:operation>
+	<wsdl:operation name="sendShippingSchedule">
+	    <wsdl:input message="pos:scheduleMessage" />
+	</wsdl:operation>
+    </wsdl:portType>
+    
+    <plnk:partnerLinkType name="purchasingLT">
+	<plnk:role name="purchaseService"
+	    portType="pos:purchaseOrderPT" />
+    </plnk:partnerLinkType>
+
+    <plnk:partnerLinkType name="invoicingLT">
+	<plnk:role name="invoiceService"
+	    portType="pos:computePricePT" />
+	<plnk:role name="invoiceRequester"
+	    portType="pos:invoiceCallbackPT" />
+    </plnk:partnerLinkType>
+    
+    <plnk:partnerLinkType name="shippingLT">
+	<plnk:role name="shippingService"
+	    portType="pos:shippingPT" />
+	<plnk:role name="shippingRequester"
+	    portType="pos:shippingCallbackPT" />
+    </plnk:partnerLinkType>
+    
+    <plnk:partnerLinkType name="schedulingLT">
+	<plnk:role name="schedulingService"
+	    portType="pos:schedulingPT" />
+    </plnk:partnerLinkType>
+
+</wsdl:definitions>

@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/11 13:46:59 $
+ * \date    \$Date: 2007/05/11 14:04:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.97 $
+ * \version \$Revision: 1.98 $
  *
  * \ingroup debug
  */
@@ -635,6 +635,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(36):
       { cerr << "in a <from> element endpointReference is only allowed to be `partnerRole` if partnerRole is definied for the used partnerLink '"<< information << "'"<< endl;
+	break; }
+
+    case(37):
+      { cerr << "partnerLink `" << information << "' referenced in a <to> element must have a partnerRole defined"<< endl;
 	break; }
 
     case(44):

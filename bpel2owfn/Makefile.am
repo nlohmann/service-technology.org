@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/05/07 08:14:33 $ by $Author: nielslohmann $
-# Version $Revision: 1.58 $
+# File last changed $Date: 2007/05/11 17:16:02 $ by $Author: nielslohmann $
+# Version $Revision: 1.59 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc rpm
@@ -181,7 +181,7 @@ gnupload_release: *.tar.gz
 	@ls *.tar.gz -1
 	@echo
 	@echo "Are you sure you want to upload these files to"
-	@echo"  ftp://ftp.gnu.org/gnu/bpel2owfn/$(PACKAGE_VERSION)?"
+	@echo "  ftp://ftp.gnu.org/gnu/bpel2owfn/$(PACKAGE_VERSION)?"
 	@echo "If not, please press (crtl+c) now."
 	@read answer
 	gnupload --to ftp.gnu.org:bpel2owfn/$(PACKAGE_VERSION) $^

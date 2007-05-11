@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/11 13:46:59 $
+ * \date    \$Date: 2007/05/11 14:04:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.170 $
+ * \version \$Revision: 1.171 $
  */
 %}
 
@@ -1240,6 +1240,11 @@ To(_id) ->
             && myself->attributes["partnerLink"] == ""))
           SAerror(32, "to", myself->attributes["referenceLine"]);
       }
+
+      // trigger [SA00037]
+      if (myself->attributes["partnerLink"] != "")
+        if(globals::ASTEmap[globals::ASTE_partnerLinks[myself->attributes["partnerLink"]]]->attributes["partnerRole"] == "")
+          SAerror(37, myself->attributes["partnerLink"], myself->attributes["referenceLine"]);
 
       myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();

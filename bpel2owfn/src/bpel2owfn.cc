@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/10 12:37:57 $
+ * \date    \$Date: 2007/05/11 10:36:33 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.174 $
+ * \version \$Revision: 1.175 $
  */
 
 
@@ -288,29 +288,32 @@ void single_output(set< string >::iterator file)
       PN.reduce(globals::reduction_level);
     }
 
-    // case 1: only one instance of this process is needed
-    if (globals::instances_of_current_process == 1)
+    if (modus == M_CONSISTENCY)
     {
-      // add a prefix and compose PN to PN2
-      PN.addPrefix(globals::ASTEmap[1]->attributes["name"] + ".");
-      PN2.compose(PN);
-    }
-    else // case 2: two or more instances of this process are needed
-    {
-      for(unsigned int instance = 1; instance <= globals::instances_of_current_process; instance++)
+      // case 1: only one instance of this process is needed
+      if (globals::instances_of_current_process == 1)
       {
-	std::cerr << "instance " << instance << "/" << globals::instances_of_current_process << " " << PN2.information() << std::endl;
+	// add a prefix and compose PN to PN2
+	PN.addPrefix(globals::ASTEmap[1]->attributes["name"] + ".");
+	PN2.compose(PN);
+      }
+      else // case 2: two or more instances of this process are needed
+      {
+	for(unsigned int instance = 1; instance <= globals::instances_of_current_process; instance++)
+	{
+	  std::cerr << "instance " << instance << "/" << globals::instances_of_current_process << " " << PN2.information() << std::endl;
 	
-	PetriNet PN3 = PN;
-	PN3.addPrefix(globals::ASTEmap[1]->attributes["name"] + "_" + toString(instance) + ".");
-	PN3.add_interface_suffix(".instance_" + toString(instance));
-	PN2.compose(PN3);
-      }      
-    }
+	  PetriNet PN3 = PN;
+	  PN3.addPrefix(globals::ASTEmap[1]->attributes["name"] + "_" + toString(instance) + ".");
+	  PN3.add_interface_suffix(".instance_" + toString(instance));
+	  PN2.compose(PN3);
+	}      
+      }
     
-    // reset data structures
-    PN = PetriNet();
-    globals::AST = NULL;
+      // reset data structures
+      PN = PetriNet();
+      globals::AST = NULL;
+    }
   }
 
 

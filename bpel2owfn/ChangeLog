@@ -157,6 +157,32 @@ Version 2.0.0 (20 April 2007)
         * messages are classified (error, warning, etc.) and numbered
           to allow for a detailed description in the manual
 
+Version 2.0.1 (11 May 2007)
+---------------------------
+
+        - fixed bugs:
+             * `<if>'/`<switch>' pattern did not work with parameter
+               `communicationonly'
+
+             * `<flow>' activities in repeated constructs (`<while>',
+               `<repeatUntil>', ...) could result in unbounded nets
+
+             * parameter `xor' could crash
+
+        - miscellaneous:
+             * new parameter `nointerface' allows to create dot output
+               of the generated Petri net model without drawing the
+               interface
+
+             * transitions of the Petri net model are labeled and
+               colored according to their role (only for dot mode)
+
+             * Petri net reduction rules can be chosen using the
+               `reduce' option
+
+             * improved performance of composition of nets in the
+               `consistency' mode
+
 
 Copyright
 =========

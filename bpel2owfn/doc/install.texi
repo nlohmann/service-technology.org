@@ -830,6 +830,27 @@ a detailed description in the manual
 @end itemize
 
 
+
+@unnumberedsubsec Version 2.0.1 (11 May 2007)
+
+@itemize --
+@item fixed bugs:
+@itemize
+@item @code{<if>}/@code{<switch>} pattern did not work with parameter @samp{communicationonly}
+@item @code{<flow>} activities in repeated constructs (@code{<while>}, @code{<repeatUntil>}, ...) could result in unbounded nets
+@item parameter @samp{xor} could crash
+@end itemize
+@item miscellaneous:
+@itemize
+@item new parameter @samp{nointerface} allows to create dot output of the generated Petri net model without drawing the interface
+@item transitions of the Petri net model are labeled and colored according to their role (only for dot mode)
+@item Petri net reduction rules can be chosen using the @samp{reduce} option
+@item improved performance of composition of nets in the @samp{consistency} mode
+@end itemize
+@end itemize
+
+
+
 @end itemize
 
 

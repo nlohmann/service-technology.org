@@ -161,7 +161,7 @@ and Sun Solaris. Anyway, if the compilation fails please make sure you
 use the most recent (stable) versions of the GNU Compiler Collection.
 If this does not help please send us an electronic mail to
 <bug-bpel2owfn@gnu.org>. Include the version number of your
-distribution (version 2.0.1 of 28 April 2007). Also include in your
+distribution (version 2.0.1 of 11 May 2007). Also include in your
 message the output that the make process produced. We will try to
 answer your mail within a week.
 
@@ -294,7 +294,7 @@ However, we tested BPEL2oWFN on these platforms:
 Reference System
 ================
 
-As of April 2007, we use the following system developing and building
+As of May 2007, we use the following system developing and building
 BPEL2oWFN:
 
    * Intel Pentium M processor, 1.60 GHz

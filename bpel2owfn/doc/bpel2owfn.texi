@@ -803,16 +803,27 @@ Further details can be taken from the table below.
 @multitable @columnfractions .05 .18 .77
 @headitem Code @tab Type @tab Description
 
+@item 2 @tab static analysis @tab
+A @acronym{WS-BPEL} processor MUST reject any @acronym{WSDL} portType definition that includes
+overloaded operation names.@footnote{The descriptions for
+static analysis messages are taken from Appendix B of the @acronym{WS-BPEL}
+specification.}
+
 @item 3 @tab static analysis @tab
 If the value of @code{exitOnStandardFault} of a @code{<scope>} or @code{<process>}
 is set to @code{"yes"}, then a fault handler that explicitly targets the @acronym{WS-BPEL}
-standard faults MUST NOT be used in that scope.@footnote{The descriptions for
-static analysis messages are taken from Appendix B of the @acronym{WS-BPEL}
-specification.}
+standard faults MUST NOT be used in that scope.
 
 @item 6 @tab static analysis @tab
 The @code{<rethrow>} activity MUST only be used within a faultHandler (i.e.
 @code{<catch>} and @code{<catchAll>} elements).
+
+@item 5 @tab static analysis @tab
+If the @code{portType} attribute is included for readability, in a @code{<receive>},
+@code{<reply>}, @code{<invoke>}, @code{<onEvent>} or @code{<onMessage>}
+element, the value of the @code{portType} attribute MUST match the @code{portType}
+value implied by the combination of the specified @code{partnerLink} and the role
+implicitly specified by the activity.
 
 @item 7 @tab static analysis @tab
 The @code{<compensateScope>} activity MUST only be used from within a
@@ -853,6 +864,25 @@ Variable names are @code{BPELVariableNames}, that is, NCNames (as defined in
 @item 25 @tab static analysis @tab
 The @code{messageType}, type or @code{element} attributes are used to specify
 the type of a variable. Exactly one of these attributes MUST be used.
+
+@item 32 @tab static analysis @tab
+For @code{<assign>}, the @code{<from>} and @code{<to>} element MUST be one
+of the specified variants.@footnote{The specification describes all allowed
+combinations of elements and attributes in from- and to-specifications.}
+
+@item 35 @tab static analysis @tab
+In the from-spec of the partnerLink variant of @code{<assign>} the value
+@code{"myRole"} for attribute @code{endpointReference} is only permitted when the
+partnerLink specifies the attribute @code{myRole}.
+
+@item 36 @tab static analysis @tab
+In the from-spec of the partnerLink variant of @code{<assign>} the value
+@code{"partnerRole"} for attribute @code{endpointReference} is only permitted
+when the partnerLink specifies the attribute @code{partnerRole}.
+
+@item 37 @tab static analysis @tab
+In the to-spec of the partnerLink variant of @code{<assign>} only partnerLinks
+are permitted which specify the attribute @code{partnerRole}.
 
 @item 44 @tab static analysis @tab
 The name of a @code{<correlationSet>} MUST be unique among the names of all
@@ -1153,13 +1183,10 @@ control flow (@code{<exit>}, @code{<throw>}, @code{<compensate>}, and
 @code{<compensateScope>}) are replaced by an @code{<empty>} activity.
 
 @item 122 @tab notice @tab
-A syntax error in the BPEL4Chor chorography file occurred.@footnote{Messages 122, 131--133 can only
-occur when an optional BPEL4Chor file is read using option @samp{-c}.}
+A syntax error in the @acronym{BPEL4Chor} chorography file occurred.
 
 @item 123 @tab notice @tab
-A syntax error in the @acronym{WSDL} input file occurred.@footnote{Messages 123--130
-can only occur when an optional @acronym{WSDL, Web Service Description Language}
-file is read using option @samp{-w}.}
+A syntax error in the @acronym{WSDL} input file occurred.
 
 @item 124 @tab notice @tab
 An @acronym{XML} Schema element nested in a @acronym{WSDL} <types> element was ignored. This is
@@ -1188,13 +1215,30 @@ A @acronym{WSDL} @code{<partnerLinkType>} referenced by a @code{<partnerLink>} w
 the input @acronym{WSDL} file.
 
 @item 131 @tab error @tab
-An activity has neither a @code{name} or @code{id} attribute and thus can not be linked with a BPEL4Chor @code{<messageLink>}.
+An activity has neither a @code{name} or @code{id} attribute and thus can not be linked with a @acronym{BPEL4Chor} @code{<messageLink>}.
 
 @item 132 @tab error @tab
-An activity has neither could not be linked with a BPEL4Chor @code{<messageLink>} using the activity's @code{name} or @code{id} attribute.
+An activity has neither could not be linked with a @acronym{BPEL4Chor} @code{<messageLink>} using the activity's @code{name} or @code{id} attribute.
 
 @item 133 @tab notice @tab
 An @code{<extensionActivity>} is replaced by an @code{<opaqueActivity>} (cf. notice 116).
+
+@item 134 @tab warning @tab
+A @acronym{BPEL4Chor} @code{<participantType>} was defined twice.
+
+@item 135 @tab warning @tab
+The @code{<participantType>} referenced by a @acronym{BPEL4Chor} @code{<participant>} was not found.
+
+@item 136 @tab error @tab
+The value of a @code{<forEach>}'s attribute @code{id} or @code{name} does not reference a @acronym{BPEL4Chor}
+@code{<participant>} or @code{<participantSet>}. Thus, the @code{<forEach>} activity is not grounded to the
+@acronym{BPEL4Chor} topology.
+
+@item 137 @tab error @tab
+In a @acronym{BPEL4Chor} topology, no @acronym{XML} namespace was defined for a @code{<participant>}. In a
+@acronym{WS-BPEL} file, the attribute @code{targetNamespace} could not to be grounded to a
+BPEL4Chor @code{<participant>}.
+
 
 @end multitable
 

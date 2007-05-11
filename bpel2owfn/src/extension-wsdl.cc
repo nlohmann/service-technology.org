@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/11 11:13:30 $
+ * \date    \$Date: 2007/05/11 13:17:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 
 
@@ -112,7 +112,15 @@ WSDL_PortType::WSDL_PortType(string portType_name):
  */
 void WSDL_PortType::addOperation(string operation_name)
 {
-  Operations[operation_name] = last = new WSDL_Operation(operation_name);
+  if(Operations[operation_name]==NULL)
+  {
+    Operations[operation_name] = last = new WSDL_Operation(operation_name);
+  }
+  else
+  {
+    SAerror(2, operation_name, 0);
+    Operations[operation_name] = last = new WSDL_Operation(operation_name);    
+  }
 }
 
 

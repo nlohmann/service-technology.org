@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/11 10:28:57 $
+ * \date    \$Date: 2007/05/11 11:13:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  */
 
 
@@ -187,6 +187,43 @@ void WSDL_PartnerLinkType::addRole(string role_name, string portType_name)
   {
     role2.first = role_name;
     role2.second = portType;
+  }
+}
+
+
+
+
+/*!
+ * \param plink          Pointer to the partnerLink in the ASTEmap
+ */
+ 
+void WSDL_PartnerLinkType::correctOrder(ASTE* plink)
+{
+  if (plink->attributes["myRole"]!="")
+  {
+    if (this->role1.first == plink->attributes["myRole"])
+    {
+      this->myRole.first = this->role1.first;
+      this->myRole.second = this->role1.second;
+    }
+    if (this->role2.first == plink->attributes["myRole"])
+    {
+      this->myRole.first = this->role2.first;
+      this->myRole.second = this->role2.second;
+    }
+  }
+  if (plink->attributes["partnerRole"] != "")
+  {
+    if (this->role1.first == plink->attributes["partnerRole"])
+    {
+      this->partnerRole.first = this->role1.first;
+      this->partnerRole.second = this->role1.second;
+    }
+    if (this->role2.first == plink->attributes["partnerRole"])
+    {
+      this->partnerRole.first = this->role2.first;
+      this->partnerRole.second = this->role2.second;
+    }
   }
 }
 

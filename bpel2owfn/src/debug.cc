@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/11 10:28:57 $
+ * \date    \$Date: 2007/05/11 11:13:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.94 $
+ * \version \$Revision: 1.95 $
  *
  * \ingroup debug
  */
@@ -578,7 +578,7 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	break; }
 	
     case(5):
-      { cerr << "PortType \"" << information << "\" does not match the portType specified by the combination of PartnerLink and Role in the WSDL description" << endl;
+      { cerr << information << " does not match the portType specified by the combination of PartnerLink and Role in the WSDL description" << endl;
 	break; }
 
     case(6):

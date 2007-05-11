@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/11 10:28:57 $
+ * \date    \$Date: 2007/05/11 11:13:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  */
 
 
@@ -51,6 +51,7 @@
 #include <map>
 #include <string>
 #include <utility>
+#include <ast-details.h>
 
 using std::map;
 using std::string;
@@ -151,8 +152,10 @@ class WSDL_PartnerLinkType
     WSDL_PartnerLinkType(string my_name);
 
     /// add a role to this partnerLinkType
-     void addRole(string role, string portType_name);
+    void addRole(string role, string portType_name);
     
+    /// corrects the order of roles when called by the bpel postprocess
+    void correctOrder(ASTE *plink);
 };
 
 

@@ -41,7 +41,9 @@
 DdManager* Exchangeability::mgrMp = NULL;
 DdManager* Exchangeability::mgrAnn = NULL;
 int Exchangeability::nbrBdd = 0;
- 
+
+//! \fn Exchangeability::Exchangeability(char* filename, Cudd_ReorderingType heuristic)
+//! \brief constructor  
 Exchangeability::Exchangeability(char* filename, Cudd_ReorderingType heuristic) {
 	trace(TRACE_5, "Exchangeability::Exchangeability(char* filename): begin\n");		   
     // Init cudd package when first Exchangeability object is created.
@@ -69,7 +71,6 @@ Exchangeability::Exchangeability(char* filename, Cudd_ReorderingType heuristic) 
     }
     
 /* list<char*>::iterator list_iter;
-	cout << "Liste ausgeben ";
    	for( list_iter = labelList.begin(); list_iter != labelList.end(); ++list_iter) {
      	cout << *list_iter;
    	}
@@ -78,6 +79,8 @@ Exchangeability::Exchangeability(char* filename, Cudd_ReorderingType heuristic) 
 	trace(TRACE_5, "Exchangeability::Exchangeability(char* filename): end\n");
 }
 
+//! \fn Exchangeability::~Exchangeability()
+//! \brief destructor
 Exchangeability::~Exchangeability(){
 	trace(TRACE_5, "Exchangeability::~Exchangeability(): begin\n");		   
     
@@ -105,6 +108,8 @@ Exchangeability::~Exchangeability(){
 	trace(TRACE_5, "Exchangeability::~Exchangeability(): end\n");
 }
 
+//! \fn void Exchangeability::loadBdd(char* filename)
+//! \brief loads the BDD representation of the opereating guideline stored in filname
 void Exchangeability::loadBdd(char* filename){
     trace(TRACE_5, "Exchangeability::loadBdds(char* filename): begin\n");		   
     cout << "loading BDD-representation of the operating guideline of " << filename << endl;
@@ -166,7 +171,7 @@ void Exchangeability::loadBdd(char* filename){
     trace(TRACE_5, "Exchangeability::loadBdds(char* filename): end\n");		   
 }
 
-
+//! \fn void Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids)
 void Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids){
 	trace(TRACE_5,"Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids): begin\n");
     Dddmp_DecompType ddType; //possible Values: DDDMP_BDD,DDDMP_ADD,DDDMP_CNF,DDDMP_NONE
@@ -201,7 +206,8 @@ void Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** perm
     trace(TRACE_5,"Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids): end\n");
 }
 
-// optimale Reihenfolge der Variablen im Manager wieder bilden  
+//! \fn void Exchangeability::loadOptimalOrder(DdManager* mgr, int size, int* permids)
+//! \brief loads a good variable order to the BDD manager  
 void Exchangeability::loadOptimalOrder(DdManager* mgr, int size, int* permids){ 
     int length; 
     if (size < Cudd_ReadSize(mgr)){
@@ -223,6 +229,7 @@ void Exchangeability::loadOptimalOrder(DdManager* mgr, int size, int* permids){
     int res = Cudd_ShuffleHeap(mgr,idOrder);
     assert(res == 1);	
 } 
+
 
 DdNode* Exchangeability::loadDiagram(FILE* fp, DdManager* mgr){
 	trace(TRACE_5,"Exchangeability::loadDiagram(FILE* fp, DdManager* mgr, int size, int* permids): begin\n");
@@ -284,6 +291,8 @@ void Exchangeability::print(){
 	Cudd_PrintMinterm(mgrAnn, bddAnn);
 }
 
+//! \fn bool Exchangeability::check(Exchangeability* bdd)
+//! \brief checks the equality of two BDD representations
 bool Exchangeability::check(Exchangeability* bdd){
 	trace(TRACE_5,"Exchangeability::check(Exchangeability* bdd): begin\n");
 	
@@ -309,6 +318,8 @@ bool Exchangeability::check(Exchangeability* bdd){
 	trace(TRACE_5,"Exchangeability::check(Exchangeability* bdd): end\n");
 }
 
+//! \fn void Exchangeability::reorder(Cudd_ReorderingType heuristic)
+//! \brief reorders the variables of the BDDs according to a given heuristic
 void Exchangeability::reorder(Cudd_ReorderingType heuristic){
 
     Cudd_ReduceHeap(mgrMp, heuristic, 0);
@@ -320,6 +331,8 @@ void Exchangeability::reorder(Cudd_ReorderingType heuristic){
 	cout << "\t" << Cudd_ReadReorderingTime(this->mgrAnn) << " ms consumed for variable reordering" << endl;
 }
 
+//! \fn void Exchangeability::printMemoryInUse()
+//! \brief returns the memory in use by the BDD manager measured in bytes
 void Exchangeability::printMemoryInUse(){
 	cout << endl;
 //	cout << "Number of live nodes in mgrMp: " << Cudd_ReadNodeCount(mgrMp) << endl;

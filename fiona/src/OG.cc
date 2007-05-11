@@ -371,24 +371,54 @@ void operatingGuidelines::computeCNF(vertex* node) const {
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): end\n");
 }
 
-
+//! \fn void operatingGuidelines::convertToBdd()
+//! \brief converts an OG into its BDD representation
 void operatingGuidelines::convertToBdd() {
 	trace(TRACE_5, "operatingGuidelines::convertToBdd(): start\n");
 	
-	vertex * tmp = root;
     bool visitedNodes[numberOfNodes];
 
     for (unsigned int i = 0; i < numberOfNodes; i++) {
         visitedNodes[i] = 0;
     }
-   
-    //unsigned int nbrLabels = PN->getInputPlaceCount() + PN->getOutputPlaceCount();
-    this->bdd->convertRootNode(root);
-    this->bdd->generateRepresentation(tmp, visitedNodes);
-    this->bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
+
+    bdd->convertRootNode(root);
+    bdd->generateRepresentation(root, visitedNodes);
+    bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
+    bdd->printMemoryInUse();
+
     trace(TRACE_5,"operatingGuidelines::convertToBdd(): end\n");
 }
 
+//! \fn void operatingGuidelines::convertToBddFull()
+//! \brief converts an OG into its BDD representation including the red nodes and the markings of the nodes
+void operatingGuidelines::convertToBddFull() {
+	trace(TRACE_5, "operatingGuidelines::convertToBddFull(): start\n");
+	
+    bool visitedNodes[numberOfNodes];
+
+    for (unsigned int i = 0; i < numberOfNodes; i++) {
+        visitedNodes[i] = 0;
+    }
+
+	trace(TRACE_0, "\nHIT A KEY TO CONTINUE (convertToBddFull)\n");
+	//getchar();
+	unsigned int nbrLabels = PN->getInputPlaceCount() + PN->getOutputPlaceCount();
+	BddRepresentation * testbdd = new BddRepresentation(nbrLabels, (Cudd_ReorderingType)bdd_reordermethod, numberOfNodes, true);
+	testbdd->convertRootNode(root);
+	testbdd->setMaxPlaceBits(root,visitedNodes);
+	for (unsigned int i = 0; i < numberOfNodes; i++) {
+		visitedNodes[i] = 0;
+	}
+	cout << endl;
+	
+	testbdd->testSymbRepresentation(root, visitedNodes);
+	testbdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
+	testbdd->printMemoryInUse();
+	testbdd->printDotFile();
+	delete testbdd;
+    trace(TRACE_5,"operatingGuidelines::convertToBdd(): end\n");
+}
 
 void operatingGuidelines::printOGFile() const {
     string ogFilename = netfile;

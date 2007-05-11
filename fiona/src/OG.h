@@ -60,6 +60,7 @@ class operatingGuidelines : public communicationGraph {
     	void buildGraph(vertex *, double);
 		
 		void convertToBdd();
+		void convertToBddFull();
 		
         /** Prints graph in OG output format. Should only be called if the graph
          *  is an OG. */

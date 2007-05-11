@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/07 13:54:58 $
+ * \date    \$Date: 2007/05/11 10:28:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  */
 
 
@@ -112,13 +112,7 @@ WSDL_PortType::WSDL_PortType(string portType_name):
  */
 void WSDL_PortType::addOperation(string operation_name)
 {
-  if (last == NULL)
-    operation1 = last = new WSDL_Operation(operation_name);
-  else
-  {
-    operation1 = last;
-    operation2 = last = new WSDL_Operation(operation_name);
-  }
+  Operations[operation_name] = last = new WSDL_Operation(operation_name);
 }
 
 
@@ -162,8 +156,8 @@ void WSDL_PortType::addOperationDetails(string type_name, string message_name, s
 WSDL_PartnerLinkType::WSDL_PartnerLinkType(string partnerLinkType_name):
   name(partnerLinkType_name)
 {
-  role1 = pair<string, WSDL_PortType*>("", NULL);
-  role2 = pair<string, WSDL_PortType*>("", NULL);
+  myRole = pair<string, WSDL_PortType*>("", NULL);
+  partnerRole = pair<string, WSDL_PortType*>("", NULL);
 
   globals::wsdl_information.partnerLinkTypes++;
 }
@@ -176,6 +170,7 @@ WSDL_PartnerLinkType::WSDL_PartnerLinkType(string partnerLinkType_name):
  * \param role           the name of a role
  * \param portType_name  the name of a portType
  */
+ 
 void WSDL_PartnerLinkType::addRole(string role_name, string portType_name)
 {
   WSDL_PortType *portType = globals::WSDLInfo.portTypes[portType_name];
@@ -197,8 +192,6 @@ void WSDL_PartnerLinkType::addRole(string role_name, string portType_name)
 
 
 
-
-
 /******************************************************************************
  * Functions for class WSDL
  *****************************************************************************/
@@ -206,6 +199,7 @@ void WSDL_PartnerLinkType::addRole(string role_name, string portType_name)
 /*!
  * \param partnerLinkType  a pointer to a partnerLinkType
  * \param operation_name   a name of an operation
+ * \param receiving        a boolean which is true if the operation is included in a receiving activity
  *
  * \return true, if operation_name identifies an operation of the given
  *         partnerLinkType
@@ -215,24 +209,12 @@ bool WSDL::checkOperation(WSDL_PartnerLinkType *partnerLinkType, string operatio
 {
   assert(partnerLinkType != NULL);
 
-  if (partnerLinkType->role1.second != NULL &&
-      partnerLinkType->role1.second->operation1 != NULL &&
-      partnerLinkType->role1.second->operation1->name == operation_name)
+  if (partnerLinkType->myRole.second != NULL &&
+      partnerLinkType->myRole.second->Operations[operation_name] != NULL)
     return true;
 
-  if (partnerLinkType->role1.second != NULL &&
-      partnerLinkType->role1.second->operation2 != NULL &&
-      partnerLinkType->role1.second->operation2->name == operation_name)
-    return true;
-
-  if (partnerLinkType->role2.second != NULL &&
-      partnerLinkType->role2.second->operation1 != NULL &&
-      partnerLinkType->role2.second->operation1->name == operation_name)
-    return true;
-
-  if (partnerLinkType->role2.second != NULL &&
-      partnerLinkType->role2.second->operation2 != NULL &&
-      partnerLinkType->role2.second->operation2->name == operation_name)
+  if (partnerLinkType->partnerRole.second != NULL &&
+      partnerLinkType->partnerRole.second->Operations[operation_name] != NULL)
     return true;
 
   return false;
@@ -254,9 +236,9 @@ bool WSDL::checkPartnerLinkType(WSDL_PartnerLinkType *partnerLinkType, string pa
 {
   assert(partnerLinkType != NULL);
 
-  if (partnerLinkType->role1.first == partnerRole_name)
+  if (partnerLinkType->myRole.first == partnerRole_name)
     return true;
-  else if (partnerLinkType->role2.first == partnerRole_name)
+  else if (partnerLinkType->partnerRole.first == partnerRole_name)
     return true;
 
   return false;
@@ -282,7 +264,7 @@ bool WSDL::checkPortType(string partnerLink, string role, string portType) const
   partnerLinkId = globals::ASTE_partnerLinks[partnerLink];
   if (partnerLinkId==0)
     return false;
-  
+
   partnerLinkTypeName = globals::ASTEmap[partnerLinkId]->attributes["partnerLinkType"];
   if (partnerLinkTypeName=="")
     return false;
@@ -290,13 +272,18 @@ bool WSDL::checkPortType(string partnerLink, string role, string portType) const
   partnerLinkType = globals::WSDLInfo.partnerLinkTypes[partnerLinkTypeName];
   if (partnerLinkType==NULL)
     return false;
-    
-  if (!(partnerLinkType->role1.first == role || partnerLinkType->role2.first == role))
-    return false;
 
-  if (!( partnerLinkType->role1.second != globals::WSDLInfo.portTypes[role] ||
-         partnerLinkType->role2.second != globals::WSDLInfo.portTypes[role] ))
-    return false;
+  if (partnerLinkType->myRole.first == role)
+  {  
+    if ( partnerLinkType->myRole.second == globals::WSDLInfo.portTypes[portType] && globals::WSDLInfo.portTypes[portType] != NULL)
+      return true;
+  }
 
-  return true;
+  if (partnerLinkType->partnerRole.first == role)
+  {  
+    if ( partnerLinkType->partnerRole.second == globals::WSDLInfo.portTypes[portType] && globals::WSDLInfo.portTypes[portType] != NULL)
+      return true;
+  }
+  
+  return false;
 }

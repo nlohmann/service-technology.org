@@ -26,17 +26,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/09 14:40:33 $
+ * \date    \$Date: 2007/05/11 10:28:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.93 $
+ * \version \$Revision: 1.94 $
  *
  * \ingroup debug
  */
@@ -577,6 +577,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
       { cerr << "<catch> must not be applied to the standard fault `" << information << "' when parent scope has attribute `exitOnStandardFault' set to `yes'" << endl;
 	break; }
 	
+    case(5):
+      { cerr << "PortType \"" << information << "\" does not match the portType specified by the combination of PartnerLink and Role in the WSDL description" << endl;
+	break; }
+
     case(6):
       { cerr << "<rethrow> activity must only be used within <catch> or <catchAll>" << endl;
 	break; }

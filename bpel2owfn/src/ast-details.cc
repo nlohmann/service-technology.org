@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/10 09:22:14 $
+ * \date    \$Date: 2007/05/11 10:28:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.112 $
+ * \version \$Revision: 1.113 $
  */
 
 
@@ -1061,25 +1061,15 @@ void ASTE::enterFault(WSDL_PartnerLinkType * plt)
   }
   if ( plt->role1.second != NULL )
   {
-    if ( plt->role1.second->operation1 != NULL )
-    {
-      enterFault( plt->role1.second->operation1->faultName );
-    }
-    if ( plt->role1.second->operation2 != NULL )
-    {
-      enterFault( plt->role1.second->operation2->faultName );
-    }
+    for (map<string, WSDL_Operation*>::iterator it = plt->role1.second->Operations.begin(); it != plt->role1.second->Operations.begin(); it++)
+      if ( it->second != NULL )
+        enterFault( it->second->faultName );
   }
   if ( plt->role2.second != NULL )
   {
-    if ( plt->role2.second->operation1 != NULL )
-    {
-      enterFault( plt->role2.second->operation1->faultName );
-    }
-    if ( plt->role2.second->operation2 != NULL )
-    {
-      enterFault( plt->role2.second->operation2->faultName );
-    }
+    for (map<string, WSDL_Operation*>::iterator it2 = plt->role2.second->Operations.begin(); it2 != plt->role2.second->Operations.begin(); it2++)
+      if ( it2->second != NULL )
+        enterFault( it2->second->faultName );
   }
   
 }

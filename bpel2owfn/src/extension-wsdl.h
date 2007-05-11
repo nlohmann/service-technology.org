@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/07 13:54:58 $
+ * \date    \$Date: 2007/05/11 10:28:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 
 
@@ -110,10 +110,7 @@ class WSDL_PortType
     string name;
 
     /// first operation
-    WSDL_Operation *operation1;
-
-    /// second operation (optional)
-    WSDL_Operation *operation2;
+    map<string, WSDL_Operation*> Operations;
 
     /// pointer to the last (i.e., current) operation
     WSDL_Operation *last;
@@ -138,17 +135,24 @@ class WSDL_PartnerLinkType
     /// name of the partnerLinkType
     string name;
 
-    /// first role
+    /// myRole (used for receiving communication)
+    pair<string, WSDL_PortType*> myRole;
+
+    /// partnerRole (used for invoking communication)
+    pair<string, WSDL_PortType*> partnerRole;
+
+    /// first temporary placeholder for a role
     pair<string, WSDL_PortType*> role1;
 
-    /// second role (optional)
+    /// second temporary placeholder for a role
     pair<string, WSDL_PortType*> role2;
 
     /// constructor
     WSDL_PartnerLinkType(string my_name);
 
     /// add a role to this partnerLinkType
-    void addRole(string role, string portType_name);
+     void addRole(string role, string portType_name);
+    
 };
 
 

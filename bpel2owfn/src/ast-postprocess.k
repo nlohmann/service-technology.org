@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/10 09:22:14 $
+ * \date    \$Date: 2007/05/11 10:28:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.165 $
+ * \version \$Revision: 1.166 $
  */
 %}
 
@@ -217,8 +217,41 @@ PartnerLink(_id) ->
 
       myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
+      
+
+      if(globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]] != NULL)
+      {
+        if (myself->attributes["myRole"]!="")
+        {
+          if (globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->role1.first == myself->attributes["myRole"])
+          {
+            globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->myRole.first = globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->role1.first;
+            globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->myRole.second = globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->role1.second;
+          }
+          if (globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->role2.first == myself->attributes["myRole"])
+          {
+            globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->myRole.first = globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->role2.first;
+            globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->myRole.second = globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->role2.second;
+          }
+        }
+        if (myself->attributes["partnerRole"] != "")
+        {
+          if (globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->role1.first == myself->attributes["partnerRole"])
+          {
+            globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->partnerRole.first = globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->role1.first;
+            globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->partnerRole.second = globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->role1.second;
+          }
+          if (globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->role2.first == myself->attributes["partnerRole"])
+          {
+            globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->partnerRole.first = globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->role2.first;
+            globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->partnerRole.second = globals::WSDLInfo.partnerLinkTypes[myself->attributes["partnerLinkType"]]->role2.second;
+          }
+        }
+      }
 
       myself->definePartnerLink();
+      
+       
     }
   ]
 ;
@@ -517,6 +550,15 @@ OnMessage(a,b,c,_id) ->
       // trigger [SA00063]
       if (b->length() != 0 && myself->attributes["variable"] != "")
         SAerror(63, "", myself->attributes["referenceLine"]);
+
+      // trigger [SA00005]
+      if (globals::wsdl_filename != "")
+      {
+        if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
+                                                globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["myRole"],
+                                                myself->attributes["portType"]) ) )
+          SAerror(5, myself->attributes["portType"] ,myself->attributes["referenceLine"]);
+      }
 
       myself->channelName = myself->createChannel();
       myself->variableName = myself->checkVariable("variable");
@@ -896,6 +938,16 @@ volatile_Invoke(a,b,c,d,_id) ->
       if (d->length() != 0 && myself->attributes["outputVariable"] != "")
         SAerror(52, "", myself->attributes["referenceLine"]);
 
+      // trigger [SA00005]
+      // trigger [SA00005]
+      if (globals::wsdl_filename != "")
+      {
+        if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
+                                                globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["partnerRole"],
+                                                myself->attributes["portType"]) ) )
+          SAerror(5, myself->attributes["portType"] ,myself->attributes["referenceLine"]);
+      }
+
       myself->checkPartnerLink();
      
       if ( globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] != 0 )
@@ -948,6 +1000,15 @@ Receive(a,b,c,_id) ->
       // trigger [SA00055]
       if (c->length() != 0 && myself->attributes["variable"] != "")
         SAerror(55, "", myself->attributes["referenceLine"]);
+
+      // trigger [SA00005]
+      if (globals::wsdl_filename != "")
+      {
+        if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
+                                                globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["myRole"],
+                                                myself->attributes["portType"]) ) )
+          SAerror(5, myself->attributes["portType"] ,myself->attributes["referenceLine"]);
+      }
 
       myself->checkPartnerLink();
 
@@ -1005,6 +1066,15 @@ Reply(a,b,c,_id) ->
       myself->checkAttributes();
 
       /* above is generic */
+
+      // trigger [SA00005]
+      if (globals::wsdl_filename != "")
+      {
+        if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
+                                                globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["myRole"],
+                                                myself->attributes["portType"]) ) )
+          SAerror(5, myself->attributes["portType"] ,myself->attributes["referenceLine"]);
+      }
 
       myself->checkPartnerLink();
 

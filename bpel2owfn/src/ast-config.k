@@ -25,11 +25,11 @@
  * \brief   Configuration of the AST
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2007/05/07 16:00:49 $
+ * \date    \$Date: 2007/05/11 10:42:02 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  *
  * \todo    Annotate the global mappings which function clear them.
  */
@@ -104,6 +104,7 @@ extern string forEach_suffix;
 #include "petrinet-patterns-scopes.h"
 #include "petrinet-patterns-handlers.h"
 #include "petrinet-patterns-links.h"
+#include "extension-wsdl.h"
 #include "options.h"
 #include "cfg.h"
 #include "helpers.h"

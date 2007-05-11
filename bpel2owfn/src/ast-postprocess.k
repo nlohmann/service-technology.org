@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/11 12:32:30 $
+ * \date    \$Date: 2007/05/11 12:53:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.168 $
+ * \version \$Revision: 1.169 $
  */
 %}
 
@@ -264,6 +264,7 @@ FaultHandlers(a,b,_id) ->
         assert(globals::ASTEmap[innerActivity->id] != NULL);
         globals::ASTEmap[innerActivity->id]->parentActivityId = myid; // this is not intended: the activity should be child of the catch
         globals::ASTEmap[branch->id]->parentActivityId = myid;
+        globals::ASTEmap[branch->id]->parentScopeId = myself->parentScopeId;
         globals::ASTEmap[innerActivity->id]->controlFlow = FHCF;
         globals::ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }

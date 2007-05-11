@@ -29,13 +29,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/11 12:53:11 $
+ * \date    \$Date: 2007/05/11 12:53:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.114 $
+ * \version \$Revision: 1.115 $
  */
 
 
@@ -417,7 +417,6 @@ void ASTE::checkAttributes()
 	  + "|" + attributes["faultMessageType"];
 
 	// trigger [SA00093]
-	cerr << "catchString ist: " << catchString << "\n";
 	assert(globals::ASTEmap[parentActivityId] != NULL);
 	if (globals::ASTEmap[parentActivityId]->catches.find(catchString) != globals::ASTEmap[parentActivityId]->catches.end())
 	  SAerror(93, "", attributes["referenceLine"]);

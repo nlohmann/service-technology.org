@@ -48,8 +48,7 @@ THE BPEL4WS SPECIFICATION.
                myRole="shippingRequester"
                partnerRole="shippingService"/>
       <partnerLink name="scheduling" 
-               partnerLinkType="lns:schedulingLT"
-               partnerRole="schedulingService"/>
+               partnerLinkType="lns:schedulingLT" />
    </partnerLinks>
 
    <variables>

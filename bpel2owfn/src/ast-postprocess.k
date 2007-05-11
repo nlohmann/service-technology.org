@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/11 12:53:11 $
+ * \date    \$Date: 2007/05/11 13:46:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.169 $
+ * \version \$Revision: 1.170 $
  */
 %}
 
@@ -1135,6 +1135,7 @@ From(_id) ->
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
+      // trigger [SA00032]
       if (myself->attributes["has_literal"] == "")
       {
         if(myself->attributes["has_expression"] == "")
@@ -1184,6 +1185,16 @@ From(_id) ->
             && myself->attributes["expressionLanguage"] == "" && myself->attributes["part"] == ""))
           SAerror(32, "from", myself->attributes["referenceLine"]);
       }
+
+      // trigger [SA00035]
+      if (myself->attributes["endpointReference"] == "myRole")
+        if(globals::ASTEmap[globals::ASTE_partnerLinks[myself->attributes["partnerLink"]]]->attributes["myRole"] == "")
+          SAerror(35, myself->attributes["partnerLink"], myself->attributes["referenceLine"]);
+          
+      // trigger [SA00036]
+      if (myself->attributes["endpointReference"] == "partnerRole")
+        if(globals::ASTEmap[globals::ASTE_partnerLinks[myself->attributes["partnerLink"]]]->attributes["partnerRole"] == "")
+          SAerror(36, myself->attributes["partnerLink"], myself->attributes["referenceLine"]);
 
       myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();

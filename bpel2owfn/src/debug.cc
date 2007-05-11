@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/11 13:17:03 $
+ * \date    \$Date: 2007/05/11 13:46:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.96 $
+ * \version \$Revision: 1.97 $
  *
  * \ingroup debug
  */
@@ -627,6 +627,14 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	
     case(32):
       { cerr << "<" << information << "> has an invalid combination of attributes and/or elements" << endl;
+	break; }
+
+    case(35):
+      { cerr << "in a <from> element endpointReference is only allowed to be `myRole` if myRole is definied for the used partnerLink '"<< information << "'"<< endl;
+	break; }
+
+    case(36):
+      { cerr << "in a <from> element endpointReference is only allowed to be `partnerRole` if partnerRole is definied for the used partnerLink '"<< information << "'"<< endl;
 	break; }
 
     case(44):

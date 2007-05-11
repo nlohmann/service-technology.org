@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/11 14:04:07 $
+ * \date    \$Date: 2007/05/11 14:59:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.171 $
+ * \version \$Revision: 1.172 $
  */
 %}
 
@@ -531,7 +531,7 @@ OnMessage(a,b,c,_id) ->
         if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
                                                 globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["myRole"],
                                                 myself->attributes["portType"]) ) )
-          SAerror(5, ("portType \"" + myself->attributes["portType"] +"\" referenced in <onMessage>"),myself->attributes["referenceLine"]);
+          SAerror(5, ("portType `" + myself->attributes["portType"] +"' referenced in <onMessage>"),myself->attributes["referenceLine"]);
       }
 
       myself->channelName = myself->createChannel();
@@ -935,7 +935,7 @@ volatile_Invoke(a,b,c,d,_id) ->
         if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
                                                 globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["partnerRole"],
                                                 myself->attributes["portType"]) ) )
-          SAerror(5, ("portType \"" + myself->attributes["portType"] +"\" referenced in <invoke>"),myself->attributes["referenceLine"]);
+          SAerror(5, ("portType `" + myself->attributes["portType"] +"' referenced in <invoke>"),myself->attributes["referenceLine"]);
       }
 
       myself->checkPartnerLink();
@@ -997,7 +997,7 @@ Receive(a,b,c,_id) ->
         if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
                                                 globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["myRole"],
                                                 myself->attributes["portType"]) ) )
-          SAerror(5, ("portType \"" + myself->attributes["portType"] +"\" referenced in <receive>"),myself->attributes["referenceLine"]);
+          SAerror(5, ("portType `" + myself->attributes["portType"] +"' referenced in <receive>"), myself->attributes["referenceLine"]);
       }
 
       myself->checkPartnerLink();
@@ -1063,7 +1063,7 @@ Reply(a,b,c,_id) ->
         if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
                                                 globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["myRole"],
                                                 myself->attributes["portType"]) ) )
-          SAerror(5, ("portType \"" + myself->attributes["portType"] +"\" referenced in <reply>"),myself->attributes["referenceLine"]);
+          SAerror(5, ("portType `" + myself->attributes["portType"] +"' referenced in <reply>"), myself->attributes["referenceLine"]);
       }
 
       myself->checkPartnerLink();

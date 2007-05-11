@@ -26,17 +26,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/11 14:04:53 $
+ * \date    \$Date: 2007/05/11 14:59:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.98 $
+ * \version \$Revision: 1.99 $
  *
  * \ingroup debug
  */
@@ -201,7 +201,7 @@ void show_process_information()
   if (globals::static_analysis_errors == 0)
   {
     cerr << colorconsole::fg_green << "[STATIC ANALYSIS] " << colorconsole::fg_standard;
-    cerr << "No errors found checking 46 statics analysis requirements." << endl;
+    cerr << "No errors found checking 51 statics analysis requirements." << endl;
   }
   else if (globals::abstract_process)
   {
@@ -582,7 +582,7 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	break; }
 	
     case(5):
-      { cerr << information << " does not match the portType specified by the combination of PartnerLink and Role in the WSDL description" << endl;
+      { cerr << information << " does not match the portType specified by the combination of partnerLink and role in the WSDL description" << endl;
 	break; }
 
     case(6):
@@ -630,15 +630,15 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	break; }
 
     case(35):
-      { cerr << "in a <from> element endpointReference is only allowed to be `myRole` if myRole is definied for the used partnerLink '"<< information << "'"<< endl;
+      { cerr << "attribute `endpointReference' in <from> element is only allowed to be `myRole' if a `myRole' attribute is definied for the used <partnerLink> `" << information << "'" << endl;
 	break; }
 
     case(36):
-      { cerr << "in a <from> element endpointReference is only allowed to be `partnerRole` if partnerRole is definied for the used partnerLink '"<< information << "'"<< endl;
+      { cerr << "attribute `endpointReference' in <from> element is only allowed to be `partnerRole' if a `partnerRole' attribute is definied for the used <partnerLink> `"<< information << "'"<< endl;
 	break; }
 
     case(37):
-      { cerr << "partnerLink `" << information << "' referenced in a <to> element must have a partnerRole defined"<< endl;
+      { cerr << "<partnerLink> `" << information << "' referenced in a <to> element must define the attribute `partnerRole'" << endl;
 	break; }
 
     case(44):

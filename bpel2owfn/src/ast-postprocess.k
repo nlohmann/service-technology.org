@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/11 11:13:30 $
+ * \date    \$Date: 2007/05/11 12:32:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.167 $
+ * \version \$Revision: 1.168 $
  */
 %}
 
@@ -666,17 +666,33 @@ CompensationHandler(a,_id) ->
 
       check_SA00070( myid );
 
+      /* Debugging hilfe
+      if (myself->isUserDefined)
+        cerr<<"Ist userdefined\n";
+
+      if (!myself->isUserDefined)
+        cerr<<"ist nicht userdefined\n";
+      */
+
       // trigger SA00079
       vector<unsigned int> ancestors = myself->ancestorActivities();
       if (myself->isUserDefined && ancestors.size() > 1)
       {
-      	string ancestor = globals::ASTEmap[ancestors[1]]->activityTypeName();
-    	if (ancestor == "catch" ||
-  	    ancestor == "catchAll" ||
-  	    ancestor == "terminationHandler" ||
-  	    ancestor == "compensationHandler")
-        {
-  	  SAerror(79, ancestor);
+      	cerr<<"neuer comphandler\n";
+      	int i=1;
+       	while(i < ancestors.size())
+      	{
+      	  string ancestor = globals::ASTEmap[ancestors[i]]->activityTypeName();
+          cerr<<"Ancestor:" << ancestor << "\n";
+    	  if (ancestor == "catch" ||
+  	      ancestor == "catchAll" ||
+  	      ancestor == "terminationHandler" ||
+  	      ancestor == "compensationHandler")
+          {
+  	    SAerror(79, ancestor);
+  	    break;
+          }
+          i++;
         }
       }
 

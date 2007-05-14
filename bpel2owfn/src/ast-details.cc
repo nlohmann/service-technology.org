@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/14 09:02:55 $
+ * \date    \$Date: 2007/05/14 10:23:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.116 $
+ * \version \$Revision: 1.117 $
  */
 
 
@@ -946,7 +946,10 @@ string ASTE::defineVariable()
     SAerror(23, attributes["name"], attributes["referenceLine"]);
   else
     globals::ASTE_variableNames.insert(name);
-
+  
+  if(attributes["messageType"]!="")
+    globals::ASTE_variableMap[name] = attributes["messageType"];
+  
   return name;
 }
 

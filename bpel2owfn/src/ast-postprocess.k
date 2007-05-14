@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/14 09:02:56 $
+ * \date    \$Date: 2007/05/14 10:23:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.173 $
+ * \version \$Revision: 1.174 $
  */
 %}
 
@@ -370,7 +370,11 @@ Catch(a,_id) ->
       
       // make fault variable visible
       if (myself->attributes["faultVariable"] != "")
+      {
         globals::ASTE_variableNames.insert(toString(globals::PPcurrentScope) + "." + myself->attributes["faultVariable"]);
+        if (myself->attributes["faultMessageType"] != "")
+          globals::ASTE_variableMap[(toString(globals::PPcurrentScope) + "." + myself->attributes["faultVariable"])] = myself->attributes["faultMessageType"];
+      }
     }
     a
     {
@@ -389,10 +393,6 @@ Catch(a,_id) ->
       globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );      
 
       check_SA00071( myid );
-
-      // make fault variable invsible
-      if (myself->attributes["faultVariable"] != "")
-        globals::ASTE_variableNames.erase(toString(globals::PPcurrentScope) + "." + myself->attributes["faultVariable"]);
     }
   ]
 ;

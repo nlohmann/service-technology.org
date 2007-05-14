@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/10 12:23:16 $
+ * \date    \$Date: 2007/05/14 13:15:55 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.205 $
+ * \version \$Revision: 1.206 $
  *
  * \ingroup petrinet
  */
@@ -1088,6 +1088,8 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
   set<Node *> preset2without1 = setDifference(p12->preset,p1->preset);
   set<Node *> postset2without1 = setDifference(p12->postset,p1->postset);
 
+  if ((p1->preset.size() + p1->postset.size()) > 1000)
+    std::cerr << (p1->preset.size() + p1->postset.size()) << " arcs to add..." << std::endl;
 
   for (set<Node *>::iterator n = p1->preset.begin(); n != p1->preset.end(); n++)
     newArc((*n), p12, STANDARD, arc_weight((*n),p1));

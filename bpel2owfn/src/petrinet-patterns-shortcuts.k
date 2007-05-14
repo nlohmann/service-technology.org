@@ -31,7 +31,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/05/08 14:18:56 $
+ * \date    \$Date: 2007/05/14 13:15:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
 */
 %}
 
@@ -806,6 +806,9 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
   map<unsigned int, Place*> falseLinks;
   unsigned int transitionNumber = (unsigned int)pow(2.0, target_links->length());
 
+  // report progress for huge join conditions
+  bool report = (transitionNumber > 1000);
+
   Place *p_jc_false = PN.findPlace(prefix + "jc_false");
   Place *p_jc_true = PN.findPlace(prefix + "jc_true");
 
@@ -831,6 +834,9 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
   // Add transitions and connect them with the links.
   for (unsigned int i = 0; i < transitionNumber; i++)
   {
+      if (report && (i % 1000 == 0) && (i > 0))
+    	trace(TRACE_WARNINGS, "[JC]\t" + toString(i) + " transitions created\n");
+
     joinTransitions[i] = PN.newTransition(prefix + "evaluate" + toString(i));
 
     PN.newArc(PN.findPlace(prefix + "initial"), joinTransitions[i]); //NEW//
@@ -854,6 +860,9 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
     // Traverse the different cases.
     for (unsigned int i = 0; i < transitionNumber; i++)
     {
+      if (report && (i % 1000 == 0) && (i > 0))
+    	trace(TRACE_WARNINGS, "[JC]\t" + toString(i) + " arcs created\n");
+
       // Only one transition makes the join fail. All others set the join
       // transition to true.
       if (i == transitionNumber-1)
@@ -873,6 +882,9 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
     // Traverse the different cases.
     for (unsigned int i = 0; i < transitionNumber; i++)
     {
+      if (report && (i % 1000 == 0) && (i > 0))
+    	trace(TRACE_WARNINGS, "[JC]\t" + toString(i) + " arcs created\n");
+
       // Connect transitions according to the stored result.
       if (globals::joinCondition_result[jc->parentId][i])
 	PN.newArc(joinTransitions[i], p_jc_true);

@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/05/10 12:07:17 $
+ * \date    \$Date: 2007/05/14 09:02:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 
 
@@ -43,6 +43,14 @@
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
+
+
+
+
+
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
 
 #include <set>
 #include <string>
@@ -59,6 +67,7 @@ class WSDL;
 class ASTE;
 class CFGBlock;
 class BPEL4Chor;
+
 
 
 

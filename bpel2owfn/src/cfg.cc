@@ -32,13 +32,13 @@
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/05/02 06:29:19 $
+ * \date    \$Date: 2007/05/14 09:02:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  *
  * \todo    
  *          - commandline option to control drawing of clusters 
@@ -49,6 +49,10 @@
 
 
 
+
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
 
 #include <cassert>
 #include <iostream>
@@ -88,7 +92,6 @@ map<string, CFGBlock*> targets;
 /******************************************************************************
  * CONSTRUCTORS AND DESTRUCTORS
  *****************************************************************************/
-
 
 /*!
  * Constructor for a CFG block.

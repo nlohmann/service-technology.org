@@ -20,7 +20,7 @@
 
 %{
 /*!
- * \file    ast-rewrite.cc
+ * \file    ast-system-rk.cc
  *
  * \brief   AST rewrite rules (implementation)
  *
@@ -44,14 +44,33 @@
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2007/05/02 06:29:19 $
+ * \date    \$Date: 2007/05/14 09:02:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.30 $
+ * \note    This file was created using Kimwitu++ reading file ast-rewrite.k.
+ *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
+ *
+ * \version \$Revision: 1.31 $
  */
+%}
+
+
+
+
+
+// the rewrite views (see definitions below)
+%rview implicit;
+%rview invoke;
+%rview newNames;
+
+
+// these lines are copied to file "ast-system-rk.cc"
+%{ KC_REWRITE
+#include "ast-details.h"
+#include "globals.h"
 %}
 
 

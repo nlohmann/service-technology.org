@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/11 12:53:46 $
+ * \date    \$Date: 2007/05/14 09:02:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.115 $
+ * \version \$Revision: 1.116 $
  */
 
 
@@ -319,8 +319,6 @@ void ASTE::checkAttributes()
 
 	break;
       }      
-
-    default: { /* do nothing */ }
   }
 
 
@@ -379,7 +377,6 @@ void ASTE::checkAttributes()
 	
 	break;
       }
-    default: { /* do nothing */ }
   }
 
 
@@ -645,8 +642,6 @@ void ASTE::checkAttributes()
 	checkAttributeType("hu:maxloops", T_UINT);
 	break;
       }
-
-    default: { /* do nothing */ }
   }
 }
 
@@ -660,7 +655,7 @@ void ASTE::checkAttributes()
  * Checks whether the value of an attribute matches a given attribute type as
  * defined in the BPEL specification.
  */
-void ASTE::checkAttributeType(string attribute, attributeType type)
+void ASTE::checkAttributeType(string attribute, ENUM_attribute_type type)
 {
   switch (type)
   {
@@ -734,8 +729,6 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 
 	break;
       }
-
-    default: return;
   }
 }
 
@@ -831,7 +824,6 @@ string ASTE::createChannel(bool synchronousCommunication)
         {
           channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
         }
-//	globals::ASTE_inputChannels.insert(channelName);
 	globals::ASTE_inputChannels[channelName] = 1;
 	break;
       }
@@ -843,7 +835,6 @@ string ASTE::createChannel(bool synchronousCommunication)
         {
           channelName = plRoleDetails->myRole + "." + plRoleDetails->partnerRole + "." + attributes["operation"];
         }
-//	globals::ASTE_outputChannels.insert(channelName);
 	globals::ASTE_outputChannels[channelName] = 1;
 
 	if (synchronousCommunication)
@@ -855,7 +846,6 @@ string ASTE::createChannel(bool synchronousCommunication)
           }
           this->channelName2 = channelName2;
 	  globals::ASTE_inputChannels[channelName2] = 1;
-//	  globals::ASTE_inputChannels.insert(channelName2);
         }
 
 	break;
@@ -913,6 +903,7 @@ bool ASTE::findIsolatedAncestor()
   else
     return globals::ASTEmap[parentScopeId]->findIsolatedAncestor();
 }
+
 
 
 
@@ -1049,6 +1040,10 @@ void ASTE::enterFault(string fault)
   }
 }
 
+
+
+
+
 /*!
  * \brief enters a possibly triggered fault to the appropriate set
  *
@@ -1075,6 +1070,10 @@ void ASTE::enterFault(WSDL_PartnerLinkType * plt)
   
 }
 
+
+
+
+
 /*!
  * \brief removes a possibly triggered fault from the appropriate set because it was caught
  *
@@ -1097,6 +1096,8 @@ void ASTE::removeFault(string fault)
     globals::ASTEmap[parentScopeId]->removeFault( fault );
   }
 }
+
+
 
 
 
@@ -1461,32 +1462,36 @@ string ASTE::activityTypeName() const
 
 
 /*!
- * \brief returns true if the activity is structured
- *
- * \returns boolean
+ * \return  true iff the activity is structured
  */
 bool ASTE::structured()
 {
   switch (type)
   {
-    case(K_FLOW):		return true;
-    case(K_FOREACH):		return true;
-    case(K_IF):			return true;
-    case(K_PICK):		return true;
-    case(K_PROCESS):		return true;
-    case(K_REPEATUNTIL):	return true;
-    case(K_SCOPE):		return true;
-    case(K_SEQUENCE):		return true;
-    case(K_WHILE):		return true;
-
-    default:			return false; /* should not happen */
+    case(K_FLOW):
+    case(K_FOREACH):
+    case(K_IF):
+    case(K_PICK):
+    case(K_PROCESS):
+    case(K_REPEATUNTIL):
+    case(K_SCOPE):
+    case(K_SEQUENCE):
+    case(K_WHILE):
+      return true;
   }
+
+  return false;
 }
 
 
 
 
 
+/*!
+ * \brief   experimental dot output of the ASTE
+ *
+ * \todo    comment me
+ */
 void ASTE::output()
 {
   if (drawn)
@@ -1544,7 +1549,6 @@ void ASTE::output()
 /*****************************************************************************
  * Class pPartnerLink                                                        *
  *****************************************************************************/
-
 
 /*!
  *  \brief constructor

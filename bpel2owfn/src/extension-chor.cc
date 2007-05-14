@@ -28,18 +28,22 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/09 14:40:33 $
+ * \date    \$Date: 2007/05/14 09:02:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 
 
 
 
+
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
 
 #include <iostream>
 
@@ -55,6 +59,10 @@ extern int frontend_lineno;
 
 
 
+
+/******************************************************************************
+ * Member functions
+ *****************************************************************************/
 
 BPEL4Chor_participantSet::BPEL4Chor_participantSet(map<string, string> &attribute_map)
 {

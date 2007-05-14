@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/11 14:59:47 $
+ * \date    \$Date: 2007/05/14 09:02:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.99 $
+ * \version \$Revision: 1.100 $
  *
  * \ingroup debug
  */
@@ -144,6 +144,8 @@ void show_process_information_header()
   cerr << PACKAGE_STRING << " reading from file `" << globals::filename << "'" << endl;
   cerr << "------------------------------------------------------------------------------" << endl;
 }
+
+
 
 
 
@@ -294,6 +296,7 @@ int frontend_error(const char *msg)
 
   return 1;
 }
+
 
 
 
@@ -800,6 +803,7 @@ void SAerror(unsigned int code, string information, string lineNumber)
   else
     SAerror(code, information, 0);
 }
+
 
 
 

@@ -32,7 +32,7 @@
  * 
  * \since   2007-04-17
  *
- * \date    \$Date: 2007/05/02 06:29:19 $
+ * \date    \$Date: 2007/05/14 09:02:56 $
  * 
  * \note    This code was inspired by code published by Jaded Hobo at "The
  *          Code Project" in December 2004, available at
@@ -42,14 +42,26 @@
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  *
  * \todo    
  *          - finish code for non-Windows operating systems
  */
 
+
+
+
+
 #ifndef COLORCONSOLE_H
 #define COLORCONSOLE_H
+
+
+
+
+
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
 
 #include <iostream>
 #include <iomanip>
@@ -60,6 +72,10 @@ using std::ostream;
 
 
 
+
+/******************************************************************************
+ * Color console for Windows operating system
+ *****************************************************************************/
 
 #if HAVE_WINDOWS_H == 1
 
@@ -274,6 +290,10 @@ namespace colorconsole
 
 
 
+/******************************************************************************
+ * Uncolored standard console for non-Windows operating systems
+ *****************************************************************************/
+
 #else /* non-windows systems */
 
 namespace colorconsole
@@ -304,5 +324,9 @@ namespace colorconsole
 }
 
 #endif
+
+
+
+
 
 #endif

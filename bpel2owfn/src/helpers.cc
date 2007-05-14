@@ -29,13 +29,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007/05/09 14:40:33 $
+ * \date    \$Date: 2007/05/14 09:02:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  *
  * \ingroup debug
  */
@@ -85,6 +85,7 @@ string toString(kc::integer i)
   return toString(i->value);
 }
 #endif
+
 
 
 

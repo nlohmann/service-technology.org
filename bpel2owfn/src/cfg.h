@@ -26,21 +26,33 @@
  * This file provides the necessary classes for building a Control Flow Graph
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/05/03 08:09:54 $
+ * \date    \$Date: 2007/05/14 09:02:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  */
+
+
+
+
 
 #ifndef CFG_H
 #define CFG_H
+
+
+
+
+
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
 
 #include <string>
 #include <list>

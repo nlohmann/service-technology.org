@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/04/17 11:54:08 $
+ * \date    \$Date: 2007/05/14 09:02:56 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -43,6 +43,11 @@
 
 
 
+
+
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
 
 #include <cmath>
 #include <cassert>
@@ -54,10 +59,9 @@
 #include "ast-tools.h"
 #include "globals.h"
 #include "debug.h"
+#include "petrinet.h"
 
 using std::pair;
-using std::cerr;
-using std::endl;
 
 
 
@@ -605,4 +609,16 @@ void next_index(vector<unsigned int> &current_index, const vector<unsigned int> 
     else
       current_index[i] = 1;
   }
+}
+
+
+
+
+/*!
+ * \todo Move me to the right place.
+ */
+void listAttributes ( kc::integer id )
+{
+  assert(id!=NULL);
+  listAttributes ( id->value );
 }

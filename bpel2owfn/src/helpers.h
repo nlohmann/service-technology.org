@@ -29,13 +29,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007/05/06 15:48:28 $
+ * \date    \$Date: 2007/05/14 09:02:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  */
 
 
@@ -77,6 +77,7 @@ using std::less;
 
 /// converts int to string
 string toString(int i);
+
 ///converts a vector to a C++ string
 string toString(const vector<unsigned int> &v);
 
@@ -87,6 +88,7 @@ string toString(kc::integer i);
 
 /// converts string to int
 int toInt(string s);
+
 /// converts string to unsigned int
 unsigned int toUInt(string s);
 

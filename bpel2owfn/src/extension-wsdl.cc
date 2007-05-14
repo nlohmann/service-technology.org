@@ -24,22 +24,27 @@
  * \brief   WSDL extension
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/11 13:17:03 $
+ * \date    \$Date: 2007/05/14 09:02:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 
 
 
 
+
+
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
 
 #include <iostream>
 
@@ -57,7 +62,7 @@ extern int frontend_lineno;
 
 
 /******************************************************************************
- * Functions for class WSDL_Message
+ * Member functions for class WSDL_Message
  *****************************************************************************/
 
 /*!
@@ -74,7 +79,7 @@ WSDL_Message::WSDL_Message(string message_name):
 
 
 /******************************************************************************
- * Functions for class WSDL_Operation
+ * Member functions for class WSDL_Operation
  *****************************************************************************/
 
 /*!
@@ -91,7 +96,7 @@ WSDL_Operation::WSDL_Operation(string operation_name):
 
 
 /******************************************************************************
- * Functions for class WSDL_PortType
+ * Member functions for class WSDL_PortType
  *****************************************************************************/
 
 /*!
@@ -155,7 +160,7 @@ void WSDL_PortType::addOperationDetails(string type_name, string message_name, s
 
 
 /******************************************************************************
- * Functions for class WSDL_PartnerLinkType
+ * Member functions for class WSDL_PartnerLinkType
  *****************************************************************************/
 
 /*!
@@ -237,8 +242,10 @@ void WSDL_PartnerLinkType::correctOrder(ASTE* plink)
 
 
 
+
+
 /******************************************************************************
- * Functions for class WSDL
+ * Member functions for class WSDL
  *****************************************************************************/
 
 /*!

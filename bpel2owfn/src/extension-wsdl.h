@@ -24,17 +24,17 @@
  * \brief   WSDL extension
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/11 11:13:30 $
+ * \date    \$Date: 2007/05/14 09:02:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  */
 
 
@@ -51,12 +51,12 @@
 #include <map>
 #include <string>
 #include <utility>
-#include <ast-details.h>
 
 using std::map;
 using std::string;
 using std::pair;
 
+class ASTE; // forward declaration
 
 
 

@@ -25,11 +25,11 @@
  * \brief   Configuration of the AST
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2007/05/11 10:42:02 $
+ * \date    \$Date: 2007/05/14 09:02:55 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  *
  * \todo    Annotate the global mappings which function clear them.
  */
@@ -98,13 +98,12 @@ extern string forEach_suffix;
 #include <climits>
 #include <string>
 
-#include "petrinet.h"
 #include "petrinet-patterns-basic.h"
 #include "petrinet-patterns-structured.h"
 #include "petrinet-patterns-scopes.h"
 #include "petrinet-patterns-handlers.h"
 #include "petrinet-patterns-links.h"
-#include "extension-wsdl.h"
+#include "extension-wsdl.h"			// for class WSDL
 #include "options.h"
 #include "cfg.h"
 #include "helpers.h"
@@ -113,9 +112,6 @@ extern string forEach_suffix;
 #include "globals.h"
 #include "extension-chor.h"
 
-using std::map;
-using std::string;
-using std::set;
 using std::endl;
 using std::cerr;
 
@@ -149,31 +145,6 @@ void printer(const char *s, uview v)
 
 
 /******************************************************************************
-  REWRITING FEATURES
-******************************************************************************/
-
-// the rewrite views
-
-%rview implicit;
-%rview invoke;
-%rview newNames;
-
-
-// the header file
-
-%{ KC_REWRITE
-#include <map>
-
-#include "ast-details.h"
-#include "options.h"
-#include "globals.h"
-%}
-
-
-
-
-
-/******************************************************************************
   PHYLUM DECLARATIONS
 ******************************************************************************/
 
@@ -185,10 +156,29 @@ void printer(const char *s, uview v)
 #include <iostream>
 #include <map>
 
-#include "debug.h"
-#include "helpers.h"
+#include "debug.h"	// for (SAerror, trace)
+#include "helpers.h"	// for (toString)
 
-// a preprocessor directive for the quite generic constructors
+/*!
+ * \brief  a preprocessor directive for the quite generic constructors
+ *
+ *         This preprocessor defines a constructor for ASTE objects. It is
+ *         invoked by the constructors of the AST phyla. The latter constructor
+ *         can be invoked explictly by the BPEL parser (defined in in
+ *         frontend-parser.yy), or implicitly during rewriting.
+ *
+ *         Each AST phylum has an integer value defined which is interpreted as
+ *         the identifier of this phylum. If this value is non-zero, it is
+ *         directly passed to the ASTE constructor and used in mapping
+ *         globals::ASTEmap to reference to the newly created object. If,
+ *         however, the identifier has the value 0, the value of the global
+ *         variable globals::ASTEid is used as identifier. The latter case is
+ *         used if an AST phylum is added by an unparser an thus cannot be
+ *         linked to any information of the parser such as an attribute map.
+ *
+ * \param  token  The token name (e.g. "K_PROCESS" for the <process>) which is
+ *                passed to the ASTE constructor.
+ */
 #define CTOR(token) { \
   ENTER("[AST]"); \
   assert(integer_1 != NULL); \
@@ -209,6 +199,9 @@ void printer(const char *s, uview v)
   globals::ASTEmap[id]->isUserDefined = globals::parsing; \
   LEAVE("[AST]"); \
 }
+
+
+
 
 
 // use to get ANSI C

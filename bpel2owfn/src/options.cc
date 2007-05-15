@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/09 16:28:01 $
+ * \date    \$Date: 2007/05/15 17:00:33 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.82 $
+ * \version \$Revision: 1.83 $
  */
 
 
@@ -343,10 +343,10 @@ void parse_command_line(int argc, char* argv[])
                 }
                 else
                 {
-                  trace(TRACE_ALWAYS, "WARNING: It makes no sense reading \n");
-                  trace(TRACE_ALWAYS, "             "+ globals::filename + "\n");
-                  trace(TRACE_ALWAYS, "         more than once.\n");
-                  trace(TRACE_ALWAYS, "         So file will only be read once.\n");
+                  trace(TRACE_WARNINGS, "WARNING: It makes no sense reading \n");
+                  trace(TRACE_WARNINGS, "             "+ globals::filename + "\n");
+                  trace(TRACE_WARNINGS, "         more than once.\n");
+                  trace(TRACE_WARNINGS, "         So file will only be read once.\n");
                 }
 		break;
 	      }
@@ -504,7 +504,24 @@ void parse_command_line(int argc, char* argv[])
       }
   }
 
-  // print help and exit
+  for ( ; optind < argc; ++optind) 
+  {
+    options[O_INPUT] = true;
+    globals::filename = string(argv[optind]);
+    if (inputfiles.find(globals::filename) == inputfiles.end())
+    {
+      inputfiles.insert(globals::filename);
+    }
+    else
+    {
+      trace(TRACE_WARNINGS, "WARNING: It makes no sense reading \n");
+      trace(TRACE_WARNINGS, "             "+ globals::filename + "\n");
+      trace(TRACE_WARNINGS, "         more than once.\n");
+      trace(TRACE_WARNINGS, "         So file will only be read once.\n");
+    }
+  }
+
+ // print help and exit
   if (options[O_HELP])
   {
     print_help();

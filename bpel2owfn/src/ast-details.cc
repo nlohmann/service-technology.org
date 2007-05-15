@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/14 10:23:17 $
+ * \date    \$Date: 2007/05/15 14:28:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.117 $
+ * \version \$Revision: 1.118 $
  */
 
 
@@ -808,12 +808,29 @@ string ASTE::createChannel(bool synchronousCommunication)
   }
 
 
+  // Find the name of the channel: it is usually a combination of partnerLink
+  // and operation. If no partnerLink and operation are given, the channel name
+  // is derived from an optional "id" or "name" attribute which is usually
+  // defined for BPEL4Chor processes.
   string channelName = attributes["partnerLink"] + "." + attributes["operation"];
+
+  // check if a channel name could be derived from partnerLink and operation
   if (channelName == ".")
   {
-//    cerr << "no operation or partnerLink given" << endl;
-    return "";
+    // check if an "id" or "name" attribute is found
+    if (attributes["id"] != "" || attributes["name"] != "")
+    {
+      // set the channel name and warn
+      channelName = (attributes["id"] != "") ? attributes["id"] : attributes["name"];
+      genericError(138, channelName, attributes["referenceLine"], ERRORLEVEL_NOTICE);
+    }
+    else
+    {
+      // no "operation", "partnerLink", "id", or "name" attribute is found
+      return "";
+    }
   }
+
 
   switch (type)
   {

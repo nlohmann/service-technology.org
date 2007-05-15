@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/14 09:02:56 $
+ * \date    \$Date: 2007/05/15 14:28:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.100 $
+ * \version \$Revision: 1.101 $
  *
  * \ingroup debug
  */
@@ -515,6 +515,10 @@ void genericError(unsigned int code, string information, string line, error_leve
 
     case(137): // BPEL4Chor XMLNS not found (either in BPEL4Chor file or in process)
 	{ cerr << information << endl;
+	  break; }
+
+    case(138): // no "partnerLink" or "operation" attribute found -- using BPEL4Chor attributes instead
+        { cerr << "using identifier `" << information << "' as a channel name; use BPEL4Chor topology for exact channel names" << endl;
 	  break; }
   }
 

@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/11 10:36:33 $
+ * \date    \$Date: 2007/05/15 14:28:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.175 $
+ * \version \$Revision: 1.176 $
  */
 
 
@@ -203,12 +203,12 @@ void single_output(set< string >::iterator file)
       FILE *dotfile = fopen(dot_filename.c_str(), "w+");
       globals::AST->fprintdot(dotfile, "", "", "", true, true, true);
       fclose(dotfile);
-      #ifdef HAVE_DOT
+#ifdef HAVE_DOT
       string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".png " + globals::output_filename + "." + suffixes[F_DOT];
       trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
       trace(TRACE_INFORMATION, systemcall + "\n\n");
       system(systemcall.c_str());
-      #endif
+#endif
     }
     else
     globals::AST->print();
@@ -290,8 +290,9 @@ void single_output(set< string >::iterator file)
 
     if (modus == M_CONSISTENCY)
     {
-      // case 1: only one instance of this process is needed
-      if (globals::instances_of_current_process == 1)
+      std::cerr << globals::instances_of_current_process << std::endl;
+      // case 1: no or only one instance of this process is needed
+      if (globals::instances_of_current_process == 1 || globals::instances_of_current_process == 0)
       {
 	// add a prefix and compose PN to PN2
 	PN.addPrefix(globals::ASTEmap[1]->attributes["name"] + ".");

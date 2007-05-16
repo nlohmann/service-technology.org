@@ -333,12 +333,12 @@ The generated Petri net model can be exported to many file formats, such as
 The standard invocation of BPEL2oWFN is:
 
 @example
-bpel2owfn -i service.bpel -f owfn -o
+bpel2owfn -i service.bpel -m petrinet -f owfn -o
 @end example
 
 where @file{service.bpel} is a @acronym{BPEL} process. The option
-@samp{-f owfn} causes BPEL2oWFN to generate an open workflow net. This
-net is written to a file named @file{service.owfn}, because of the option
+@samp{-f owfn} causes BPEL2oWFN to generate an open workflow net (option
+@samp{-m petrinet}). This net is written to a file named @file{service.owfn}, because of the option
 @samp{-o}.
 
 BPEL2oWFN can be called without any parameter. In this case, it acts
@@ -710,14 +710,14 @@ In this section we show some examples how BPEL2oWFN can be invoked. See @ref{Fil
 for more examples.
 
 @table @samp
-@item bpel2owfn -i sample.bpel -flola -finfo -o -p reduce
+@item bpel2owfn -i sample.bpel -m petrinet -f lola -f info -o -p reduce
 
 Reads the file @file{sample.bpel}, generates a structural reduced
 low-level Petri net and saves it in a @acronym{LoLA} file
 @file{sample.lola}. For further information a file
 @file{sample.info} is generated.
 
-@item bpel2owfn -i sample.bpel -fowfn -d3 -o
+@item bpel2owfn -i sample.bpel  -mpetrinet -fowfn -d3 -o
 
 Reads the file @file{sample.bpel}, generates a low-level open
 workflow net and saves it in an @acronym{oWFN} file

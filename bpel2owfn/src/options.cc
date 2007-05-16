@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/15 17:00:33 $
+ * \date    \$Date: 2007/05/16 13:13:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.83 $
+ * \version \$Revision: 1.84 $
  */
 
 
@@ -172,7 +172,7 @@ void print_help()
   trace("    fhfaults            model faults in fault handlers \n");
   trace("    communicationonly   only model the communicational behavior\n");
   trace("    xor                 use mutually exclusive transition condition\n");
-  trace("    nointerface         do not draw an interface (for dot output\n");
+  trace("    nointerface         do not draw an interface (for dot output)\n");
   trace("\n");
   trace("  FORMAT is one of the following (multiple formats permitted):\n");
   trace("    lola, owfn, dot, pep, apnn, ina, spin, info, pnml, txt, info\n");

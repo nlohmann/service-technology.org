@@ -26,17 +26,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/15 14:28:48 $
+ * \date    \$Date: 2007/05/16 11:52:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.101 $
+ * \version \$Revision: 1.102 $
  *
  * \ingroup debug
  */
@@ -652,6 +652,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
       { cerr << "<correlationSet> `" << information << "' already defined in this scope/process" << endl;
 	break; }
 
+    case(48):
+      { cerr << "<" << information << "> is using a variable of a wrong messageType" << endl;
+	break; }
+
     case(51):
       { cerr << "<invoke> must not be used with an inputVariable AND <toPart> elements" << endl;
 	break; }
@@ -670,6 +674,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(57):
       { cerr << "all start activities must share a correlation set with `initiate' set to \"join\"" << endl;
+	break; }
+
+    case(58):
+      { cerr << "<" << information << "> is using a variable of a wrong messageType" << endl;
 	break; }
 
     case(59):
@@ -767,6 +775,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
     case(84):
        { cerr << "partnerLink reference `" << information << "' of <onEvent> cannot be resolved" << endl;
 	 break; }
+
+    case(87):
+      { cerr << "<" << information << "> is using a variable of a wrong messageType" << endl;
+	break; }
 
     case(88):
        { cerr << "<correlation> reference `" << information << "' of <onEvent> cannot be resolved" << endl;

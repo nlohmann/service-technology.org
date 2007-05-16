@@ -24,17 +24,17 @@
  * \brief   WSDL extension
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/14 09:02:56 $
+ * \date    \$Date: 2007/05/16 11:52:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 
 
@@ -338,4 +338,236 @@ bool WSDL::checkPortType(string partnerLink, string role, string portType) const
   }
   
   return false;
+}
+
+
+
+
+
+
+/*!
+ * \param activity     pointer to the activity to be tested
+ *
+ * \return true, if the variable is correct
+ * \return false, if it is not
+ */
+void WSDL::checkVariable(ASTE *activity) const
+{
+   assert(activity!=NULL);
+   
+   string inputName = "";
+   string outputName = "";
+   string inputType = "";
+   string outputType = "";
+   int SAID = 0;
+   WSDL_PartnerLinkType *plink;
+   
+   string operation = activity->attributes["operation"];
+
+   plink = globals::WSDLInfo.partnerLinkTypes[globals::ASTEmap[globals::ASTE_partnerLinks[activity->attributes["partnerLink"]]]->attributes["partnerLinkType"]];
+
+   if (activity->activityTypeName() == "invoke")
+   {
+     SAID = 48;
+     if(activity->attributes["inputVariable"] != "")
+       inputName = activity->attributes["inputVariable"];
+     if(activity->attributes["outputVariable"] != "")
+       outputName = activity->attributes["outputVariable"];
+   }
+
+   if (activity->activityTypeName() == "receive" || activity->activityTypeName() == "reply")
+   {
+     SAID = 58;
+     if(activity->attributes["variable"] != "")
+       inputName = activity->attributes["variable"];
+   }
+
+   if (activity->activityTypeName() == "onMessage" || activity->activityTypeName() == "onEvent" )
+   {
+     SAID = 87;
+     if(activity->attributes["variable"] != "")
+       inputName = activity->attributes["variable"];
+     
+     if(activity->attributes["messageType"] != "")
+       globals::ASTE_variableMap[toString(globals::PPcurrentScope) + "." + inputName] = activity->attributes["messageType"];
+
+     if(activity->attributes["element"] != "")
+       globals::ASTE_variableMap[toString(globals::PPcurrentScope) + "." + inputName] = activity->attributes["element"];
+   }
+   
+   if (inputName != "" && activity->activityTypeName() != "invoke")
+   {
+     inputType = globals::ASTE_variableMap[toString(globals::PPcurrentScope) + "." + inputName];
+     if (plink != NULL)
+     {
+       if (plink->myRole.second != NULL)
+       {
+         if (plink->myRole.second->Operations[operation] != NULL)
+         {
+           if (plink->myRole.second->Operations[operation]->input != NULL)
+           {
+             if (plink->myRole.second->Operations[operation]->input->name == inputType ||
+                 globals::WSDLInfo.messages[plink->myRole.second->Operations[operation]->input->name]->element.second == inputType)
+             {
+             }
+             else
+             {
+               if (plink->myRole.second->Operations[operation]->fault != NULL)
+               {
+                 if(plink->myRole.second->Operations[operation]->fault->name == inputType)
+                 {
+                 }
+                 else
+                 {
+                   if (activity->activityTypeName() == "reply" && plink->myRole.second->Operations[operation]->output != NULL)
+                   {
+                     if(plink->myRole.second->Operations[operation]->output->name == inputType ||
+                        globals::WSDLInfo.messages[plink->myRole.second->Operations[operation]->output->name]->element.second == inputType)
+                     {
+                     }
+                     else
+                     {
+                       SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);             
+                     }
+                   }
+                   else
+                   {
+                     SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);             
+                   }
+                 }                 
+               }
+               else
+               {
+               SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+               }
+             }
+           }
+           else
+           {
+             SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+           }
+         }
+         else
+         {
+           SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+         }    
+       }
+       else
+       {
+         SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+       }
+     }
+     else
+     {
+       SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+     }
+   }      
+   
+   if (inputName != "" && activity->activityTypeName() == "invoke")
+   {
+     inputType = globals::ASTE_variableMap[toString(globals::PPcurrentScope) + "." + inputName];
+     if (plink != NULL)
+     {
+       if (plink->partnerRole.second != NULL)
+       {
+         if (plink->partnerRole.second->Operations[operation] != NULL)
+         {
+           if (plink->partnerRole.second->Operations[operation]->input != NULL)
+           {
+             if (plink->partnerRole.second->Operations[operation]->input->name == inputType ||
+                 globals::WSDLInfo.messages[plink->partnerRole.second->Operations[operation]->input->name]->element.second == inputType)
+             {
+             }
+             else
+             {
+               if (plink->partnerRole.second->Operations[operation]->fault != NULL)
+               {
+                 if(plink->partnerRole.second->Operations[operation]->fault->name == inputType)
+                 {
+                 }
+                 else
+                 {
+                   SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);             
+                 }                 
+               }
+               else
+               {
+               SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+               }
+             }
+           }
+           else
+           {
+             SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+           }
+         }
+         else
+         {
+           SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+         }    
+       }
+       else
+       {
+         SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+       }
+     }
+     else
+     {
+       SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+     }
+   }      
+
+   if (outputName != "")
+   {
+     outputType = globals::ASTE_variableMap[toString(globals::PPcurrentScope) + "." + outputName];
+     if (plink != NULL)
+     {
+       if (plink->partnerRole.second != NULL)
+       {
+         if (plink->partnerRole.second->Operations[operation] != NULL)
+         {
+           if (plink->partnerRole.second->Operations[operation]->output != NULL)
+           {
+             if (plink->partnerRole.second->Operations[operation]->output->name == outputType ||
+                 globals::WSDLInfo.messages[plink->partnerRole.second->Operations[operation]->output->name]->element.second == outputType)
+             {
+             }
+             else
+             {
+               if (plink->partnerRole.second->Operations[operation]->fault != NULL)
+               {
+                 if(plink->partnerRole.second->Operations[operation]->fault->name == outputType)
+                 {
+                 }
+                 else
+                 {
+                   SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);             
+                 }                 
+               }
+               else
+               {
+               SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+               }
+             }
+           }
+           else
+           {
+             SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+           }
+         }
+         else
+         {
+           SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+         }    
+       }
+       else
+       {
+         SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+       }
+     }
+     else
+     {
+       SAerror(SAID, activity->activityTypeName(), activity->attributes["referenceLine"]);
+     }
+   }      
 }

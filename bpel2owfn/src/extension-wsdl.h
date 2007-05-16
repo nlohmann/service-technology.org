@@ -24,17 +24,17 @@
  * \brief   WSDL extension
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/14 09:02:56 $
+ * \date    \$Date: 2007/05/16 11:52:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 
 
@@ -66,6 +66,9 @@ class WSDL_Message
   public:
     /// name of the message
     string name;
+
+    /// name of a single part with the element attribute
+    pair<string, string> element;
 
     /// parts of the message
     map<string, string> parts;
@@ -110,7 +113,7 @@ class WSDL_PortType
     /// name of the portType
     string name;
 
-    /// first operation
+    /// map of all operations
     map<string, WSDL_Operation*> Operations;
 
     /// pointer to the last (i.e., current) operation
@@ -183,6 +186,8 @@ class WSDL
     /// check a combination of partnerLink, role and portType
     bool checkPortType(string partnerLink, string role, string portType) const;
 
+    /// check if a given variable has the correct message type/element
+    void checkVariable(ASTE *activity) const;
 };
 
 #endif

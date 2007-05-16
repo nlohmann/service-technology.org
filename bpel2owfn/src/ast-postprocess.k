@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/14 10:23:17 $
+ * \date    \$Date: 2007/05/16 11:52:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.174 $
+ * \version \$Revision: 1.175 $
  */
 %}
 
@@ -528,14 +528,18 @@ OnMessage(a,b,c,_id) ->
       // trigger [SA00005]
       if (globals::wsdl_filename != "")
       {
-        if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
-                                                globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["myRole"],
-                                                myself->attributes["portType"]) ) )
-          SAerror(5, ("portType `" + myself->attributes["portType"] +"' referenced in <onMessage>"),myself->attributes["referenceLine"]);
+        if (myself->attributes["portType"] != "")
+          if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
+                                                  globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["myRole"],
+                                                  myself->attributes["portType"]) ) )
+            SAerror(5, ("portType `" + myself->attributes["portType"] +"' referenced in <onMessage>"),myself->attributes["referenceLine"]);
+        // trigger [SA00058]
+        globals::WSDLInfo.checkVariable(myself);
       }
 
       myself->channelName = myself->createChannel();
-      myself->variableName = myself->checkVariable("variable");
+      // checkVariable does not work correctly for onEvent since onEvent-variable does not have to be defined previously
+      //myself->variableName = myself->checkVariable("variable");
 
       assert(globals::ASTEmap[c->id] != NULL);
       globals::ASTEmap[c->id]->parentActivityId = myid;
@@ -679,7 +683,6 @@ CompensationHandler(a,_id) ->
       vector<unsigned int> ancestors = myself->ancestorActivities();
       if (myself->isUserDefined && ancestors.size() > 1)
       {
-      	cerr<<"neuer comphandler\n";
       	unsigned int i = 1;
        	while(i < ancestors.size())
       	{
@@ -928,14 +931,16 @@ volatile_Invoke(a,b,c,d,_id) ->
       if (d->length() != 0 && myself->attributes["outputVariable"] != "")
         SAerror(52, "", myself->attributes["referenceLine"]);
 
-      // trigger [SA00005]
-      // trigger [SA00005]
       if (globals::wsdl_filename != "")
       {
-        if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
-                                                globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["partnerRole"],
-                                                myself->attributes["portType"]) ) )
-          SAerror(5, ("portType `" + myself->attributes["portType"] +"' referenced in <invoke>"),myself->attributes["referenceLine"]);
+        // trigger [SA00005]
+        if (myself->attributes["portType"] != "")
+          if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
+                                                  globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["partnerRole"],
+                                                  myself->attributes["portType"]) ) )
+            SAerror(5, ("portType `" + myself->attributes["portType"] +"' referenced in <invoke>"),myself->attributes["referenceLine"]);
+        // trigger [SA00058]
+        globals::WSDLInfo.checkVariable(myself);
       }
 
       myself->checkPartnerLink();
@@ -991,13 +996,17 @@ Receive(a,b,c,_id) ->
       if (c->length() != 0 && myself->attributes["variable"] != "")
         SAerror(55, "", myself->attributes["referenceLine"]);
 
-      // trigger [SA00005]
+      // trigger WSDL dependent SAs
       if (globals::wsdl_filename != "")
       {
-        if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
-                                                globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["myRole"],
-                                                myself->attributes["portType"]) ) )
-          SAerror(5, ("portType `" + myself->attributes["portType"] +"' referenced in <receive>"), myself->attributes["referenceLine"]);
+        // trigger [SA00005]
+        if (myself->attributes["portType"] != "")
+          if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
+                                                  globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["myRole"],
+                                                  myself->attributes["portType"]) ) )
+            SAerror(5, ("portType `" + myself->attributes["portType"] +"' referenced in <receive>"), myself->attributes["referenceLine"]);
+        // trigger [SA00058]
+        globals::WSDLInfo.checkVariable(myself);
       }
 
       myself->checkPartnerLink();
@@ -1060,10 +1069,13 @@ Reply(a,b,c,_id) ->
       // trigger [SA00005]
       if (globals::wsdl_filename != "")
       {
-        if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
-                                                globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["myRole"],
-                                                myself->attributes["portType"]) ) )
-          SAerror(5, ("portType `" + myself->attributes["portType"] +"' referenced in <reply>"), myself->attributes["referenceLine"]);
+        if (myself->attributes["portType"] != "")
+          if (!( globals::WSDLInfo.checkPortType( myself->attributes["partnerLink"],
+                                                  globals::ASTEmap[globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ]]->attributes["myRole"],
+                                                  myself->attributes["portType"]) ) )
+            SAerror(5, ("portType `" + myself->attributes["portType"] +"' referenced in <reply>"), myself->attributes["referenceLine"]);
+        // trigger [SA00058]
+        globals::WSDLInfo.checkVariable(myself);
       }
 
       myself->checkPartnerLink();

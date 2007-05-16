@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/15 14:28:48 $
+ * \date    \$Date: 2007/05/16 08:36:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.176 $
+ * \version \$Revision: 1.177 $
  */
 
 
@@ -290,7 +290,6 @@ void single_output(set< string >::iterator file)
 
     if (modus == M_CONSISTENCY)
     {
-      std::cerr << globals::instances_of_current_process << std::endl;
       // case 1: no or only one instance of this process is needed
       if (globals::instances_of_current_process == 1 || globals::instances_of_current_process == 0)
       {

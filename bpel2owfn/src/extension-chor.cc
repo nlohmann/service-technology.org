@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/05/14 09:02:56 $
+ * \date    \$Date: 2007/05/16 08:36:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
 
 
@@ -132,21 +132,19 @@ void BPEL4Chor::add_participantType(map<string, string> &attribute_map)
   // read attributes
   string participantType_name = attribute_map["name"];
   string participantBehaviorDescription_name = attribute_map["participantBehaviorDescription"];
-  string xmlns_URL = attribute_map[participantBehaviorDescription_name];
 
   // if participant type was already defined before, display a warning
-  if (participantTypes[participantType_name].first != "")
+  if (participantTypes[participantType_name] != "")
     genericError(134, participantType_name, toString(frontend_lineno), ERRORLEVER_WARNING);
 
-  if (xmlns_URL == "")
-    genericError(137, "no `" + participantBehaviorDescription_name + ":xmlns' definition found for <participantType> `" + participantType_name + "'", toString(frontend_lineno), ERRORLEVER_WARNING);
+  if (participantBehaviorDescription_name == "")
+    genericError(137, "<participantType> `" + participantType_name + "' has no `participantBehaviorDescription' specified", toString(frontend_lineno), ERRORLEVER_WARNING);
 
-  participantTypes[participantType_name] = pair<string, string>(participantBehaviorDescription_name, xmlns_URL);
+  participantTypes[participantType_name] = participantBehaviorDescription_name;
 
   // reset attributes
   attribute_map["name"] = "";
   attribute_map["participantBehaviorDescription"] = "";
-  attribute_map[participantBehaviorDescription_name] = "";
 }
 
 
@@ -365,14 +363,14 @@ BPEL4Chor::BPEL4Chor() :
 
 
 
-unsigned int BPEL4Chor::instances(string xmlns) const
+unsigned int BPEL4Chor::instances(string process_name) const
 {
   // traverse the participant types to find the xmlns URL
-  for(map<string, pair<string, string> >::const_iterator participantType = participantTypes.begin();
+  for(map<string, string>::const_iterator participantType = participantTypes.begin();
       participantType != participantTypes.end(); participantType++)
   {
     // is the xmlns URL found?
-    if (participantType->second.second == xmlns)
+    if (participantType->second == process_name)
     {
       // traverse the participant sets to find a set with this participant type and xmlns URL
       for(map<string, BPEL4Chor_participantSet*>::const_iterator participantSet = participantSets.begin();

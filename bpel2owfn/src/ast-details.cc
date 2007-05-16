@@ -29,13 +29,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/15 14:28:47 $
+ * \date    \$Date: 2007/05/16 08:36:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.118 $
+ * \version \$Revision: 1.119 $
  */
 
 
@@ -233,9 +233,9 @@ void ASTE::checkAttributes()
 	// read the optional BPEL4Chor file to find the number of instances of this process
     	if (globals::choreography_filename != "")
 	{
-	  globals::instances_of_current_process = globals::BPEL4ChorInfo.instances(attributes["targetNamespace"]);
+	  globals::instances_of_current_process = globals::BPEL4ChorInfo.instances(attributes["name"]);
 	  if (globals::instances_of_current_process == 0)
-	    genericError(137, "targetNamespace `" + attributes["targetNamespace"] + "' not found in BPEL4Chor topology file", attributes["referenceLine"], ERRORLEVEL_ERROR);
+	    genericError(137, "process `" + attributes["name"] + "' not found in BPEL4Chor topology file", attributes["referenceLine"], ERRORLEVEL_ERROR);
 	}
 
 	// if the process is abstract, print a notice

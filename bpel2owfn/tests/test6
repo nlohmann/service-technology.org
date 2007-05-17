@@ -1,5 +1,7 @@
+#! /bin/bash
+
 #############################################################################
-# Copyright 2005, 2006, 2007 Niels Lohmann                                  #
+# Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      #
 #                                                                           #
 # This file is part of GNU BPEL2oWFN.                                       #
 #                                                                           #
@@ -19,23 +21,19 @@
 #############################################################################
 
 # File last changed $Date: 2007/05/17 11:43:00 $ by $Author: nielslohmann $.
-# Version $Revision: 1.20 $
+# Version $Revision: 1.1 $
 
-TESTS = test1 test2 test3 test4 test5 test6
+echo ""
 
-TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=.:../src:$$PATH
+echo "test: BPEL4Chor"
+bpel2owfn --input=$testdir/bpel4chor/chor_paper_traveler.bpel --input=$testdir/bpel4chor/chor_paper_airline.bpel --input=$testdir/bpel4chor/chor_paper_traveler.bpel --choreography=$testdir/bpel4chor/chor_paper_topology.xml --mode=consistency --parameter=communicationonly --output=choreography --format=owfn &> /dev/null
+result1=$?
 
-CLEANFILES = *.lola \
-             *.task \
-	     *.xml \
-	     *.dot \
-	     *.owfn \
-	     *.png \
-	     bpel2owfn.exe.stackdump \
-	     core
-	     
-EXTRA_DIST = $(TESTS) \
-	     testfiles \
-	     sa_tests \
-	     consistency \
-	     bpel4chor
+if test \( $result1 -eq 0 \) -a \( -f choreography.owfn \)
+then
+  result=0
+else
+  result=1
+fi
+
+exit $result

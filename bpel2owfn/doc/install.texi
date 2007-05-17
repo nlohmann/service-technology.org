@@ -616,6 +616,7 @@ compile on nearly any platform that supports the GNU Compiler Collection.
 
 However, we tested BPEL2oWFN on these platforms:
 @itemize @bullet
+@item Microsoft Windows 2000 (x86)
 @item Microsoft Windows XP (x86)
 @item Microsoft Vista Business (x86)
 @item Apple Mac OS X Tiger (PowerPC and x86)

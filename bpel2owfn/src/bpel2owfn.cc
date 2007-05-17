@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/16 08:36:23 $
+ * \date    \$Date: 2007/05/17 11:41:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.177 $
+ * \version \$Revision: 1.178 $
  */
 
 
@@ -270,7 +270,7 @@ void single_output(set< string >::iterator file)
 
 
 
-  if (modus == M_PETRINET || modus == M_CONSISTENCY) //)
+  if (modus == M_PETRINET || modus == M_CONSISTENCY)
   {
     // choose Petri net patterns
     if (globals::parameters[P_COMMUNICATIONONLY] == true)

@@ -31,7 +31,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/05/10 12:07:17 $
+ * \date    \$Date: 2007/05/17 11:41:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  */
 %}
 
@@ -105,10 +105,16 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   {
     // case 1: only one instance of each channel is needed
     if (in->second == 1)
+    {
+      trace(TRACE_DEBUG, "[PNU]\tcreating channel `in." + in->first + "'\n");
       PN.newPlace("in." + in->first, IN);
+    }
     else // case 2: several instances of each channel are needed
       for (unsigned int i = 1; i <= in->second; i++)
+      {
+        trace(TRACE_DEBUG, "[PNU]\tcreating channel `in." + in->first + ".instance_" + toString(i) + "'\n");
       	PN.newPlace("in." + in->first + ".instance_" + toString(i), IN);
+      }
   }
 
   for (map<string, unsigned int>::const_iterator out = globals::ASTE_outputChannels.begin();
@@ -116,10 +122,16 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   {
     // case 1: only one instance of each channel is needed
     if (out->second == 1)
+    {
+      trace(TRACE_DEBUG, "[PNU]\tcreating channel `out." + out->first + "'\n");
       PN.newPlace("out." + out->first, OUT);
+    }
     else // case 2: several instances of each channel are needed
       for (unsigned int i = 1; i <= out->second; i++)
+      {
+        trace(TRACE_DEBUG, "[PNU]\tcreating channel `out." + out->first + ".instance_" + toString(i) + "'\n");
       	PN.newPlace("out." + out->first + ".instance_" + toString(i), OUT);
+      }
   }
 
 

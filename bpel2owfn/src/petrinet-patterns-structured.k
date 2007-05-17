@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/05/10 12:37:57 $
+ * \date    \$Date: 2007/05/17 11:41:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
 */
 %}
 
@@ -759,9 +759,10 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
     innerActivity->unparse(pseudoPrinter, current_view);
 
     // Set the name of the interface place.
-    string interface_place_name = (globals::ASTEmap[ThisBranch->id]->channel_instances != 0) ?
-      "in." + globals::ASTEmap[ThisBranch->id]->channelName + ".instance_" + toString(globals::ASTEmap[ThisBranch->id]->channel_instances++) :
-      "in." + globals::ASTEmap[ThisBranch->id]->channelName;
+    string interface_place_name = "in." + globals::ASTEmap[ThisBranch->id]->channelName;
+    if ((globals::ASTE_inputChannels[globals::ASTEmap[ThisBranch->id]->channelName] > 1) &&
+       (globals::ASTEmap[ThisBranch->id]->channel_unique_instances == 0))
+      interface_place_name += ".instance_" + toString(globals::ASTEmap[ThisBranch->id]->channel_instances++);
 
     // Message-receiving transition.
     Transition *t1 = PN.newTransition(prefix + "onMessage_" + branch);

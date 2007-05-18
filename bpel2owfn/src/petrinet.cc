@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/18 09:31:16 $
+ * \date    \$Date: 2007/05/18 16:06:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.208 $
+ * \version \$Revision: 1.209 $
  *
  * \ingroup petrinet
  */
@@ -146,6 +146,8 @@ Transition::Transition(unsigned int my_id, string my_role)
   nodeType = TRANSITION;
   type = INTERNAL;
 
+  max_occurrences = 0;
+
   if (my_role != "")
     history.push_back(my_role);
 }
@@ -191,12 +193,13 @@ void Transition::add_label(string new_label)
  */
 Place::Place(unsigned int my_id, string my_role, communication_type my_type) :
   tokens(0),
-  max_occurrences(0),
   isFinal(false)
 {
   id = my_id;
   type = my_type;
   nodeType = PLACE;
+
+  max_occurrences = 0;
 
   if (my_role != "")
     history.push_back(my_role);
@@ -922,6 +925,12 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
       newArc(t12, (*n), STANDARD, arc_weight(t2,(*n)));
     }
   }
+
+  
+  // set max_occurrences
+  t12->max_occurrences = (t1->max_occurrences > t2->max_occurrences) ?
+    t1->max_occurrences :
+    t2->max_occurrences;
 
   removeTransition(t1);
   removeTransition(t2);
@@ -1775,6 +1784,20 @@ void PetriNet::reenumerate()
 void PetriNet::calculate_max_occurrences()
 {
 #ifdef USING_BPEL2OWFN
+
+  // set the max_occurrences for the transitions (should make more sense...)
+  for (set<Transition *>::iterator transition = T.begin();
+      transition != T.end();
+      transition++)
+  {
+    unsigned int activity_identifier = toUInt((*transition)->history[0].substr(0, (*transition)->history[0].find_first_of(".")));
+
+    assert(globals::ASTEmap[activity_identifier] != NULL);
+    (*transition)->max_occurrences = globals::ASTEmap[activity_identifier]->max_occurrences;
+  }
+
+
+
   // process the input places
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
   {

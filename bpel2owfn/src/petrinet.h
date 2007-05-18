@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/10 12:07:17 $
+ * \date    \$Date: 2007/05/18 16:06:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.147 $
+ * \version \$Revision: 1.148 $
  *
  * \ingroup petrinet
  */
@@ -212,6 +212,9 @@ class Node
     /// the postset of this node
     set<Node*> postset;
 
+    /// the maximal occurrences of this (communication) place or transition
+    unsigned int max_occurrences;
+
 
     /// true if first role contains role
     bool firstMemberAs(string role) const;
@@ -307,9 +310,6 @@ class Place: public Node
   private:
     /// initial marking of the place
     unsigned int tokens;
-
-    /// the maximal occurrences of this (communication) place
-    unsigned int max_occurrences;
 
     /// not empty if place was once an communication place and is now internal because of choreographie
     string wasExternal;
@@ -591,6 +591,9 @@ class PetriNet
 
     /// elimination of identical places
     void reduce_equal_places();
+
+    /// remove unneeded initially marked places in choreographies
+    void reduce_remove_initially_marked_places_in_choreographies();
 
 
     /// returns an id for new nodes

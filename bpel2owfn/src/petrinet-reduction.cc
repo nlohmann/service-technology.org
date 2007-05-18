@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/05/10 13:11:02 $
+ * \date    \$Date: 2007/05/18 16:06:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  *
  * \ingroup petrinet
  */
@@ -815,6 +815,66 @@ void PetriNet::reduce_equal_places()
 
 
 
+
+/*!
+ * \brief remove unneeded initially marked places in choreographies
+ *
+ * \todo comment me!
+ */
+void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
+{
+  trace(TRACE_DEBUG, "[PN]\tApplying rule \"Elimination of unnecessary initial places\"...\n");
+
+  set<Place*> redundant_places;
+
+  // traverse the places
+  for (set<Place *>::const_iterator place = P.begin();
+      place != P.end();
+      place++)
+  {
+    // find initial places with empty preset and singleton postset
+    if ( (*place)->tokens == 1  &&
+	(*place)->preset.empty() &&
+	(*place)->postset.size() == 1 )
+    {
+      Transition *post_transition = static_cast<Transition *> (*((*place)->postset.begin()));
+
+      // if the transition in the postset is executed exactly once...
+      if ( post_transition->max_occurrences == 1 )
+      {
+	for (set<Node *>::const_iterator pre_place = post_transition->preset.begin();
+	    pre_place != post_transition->preset.end();
+	    pre_place++)
+	{
+	  // ... and has a former communication place in its preset
+	  if (static_cast<Place *>(*pre_place)->wasExternal != "")
+	  {
+	    // the marked place is not necessary
+	    redundant_places.insert(*place);
+	    break;
+	  }
+	}
+      }
+    }
+  }
+
+
+  // remove the redundant places
+  for (set<Place*>::const_iterator place = redundant_places.begin();
+      place != redundant_places.end();
+      place++)
+  {
+    removePlace(*place);
+  }
+
+  if (!redundant_places.empty())
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(redundant_places.size()) + " places.\n");
+}
+
+
+
+
+
 /*!
  * Removes unnecessary nodes of the generated Petri net:
  *  - structural dead nodes
@@ -878,6 +938,7 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
     {
       reduce_self_loop_places();	// RC1
       reduce_self_loop_transitions();	// RC2
+//      reduce_remove_initially_marked_places_in_choreographies();
     }
 
     if (reduction_level == 6)
@@ -891,6 +952,7 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
     done = (old == information());
     old = information();
   }
+
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
   trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " + information() + "\n");

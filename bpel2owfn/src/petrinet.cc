@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/18 09:26:24 $
+ * \date    \$Date: 2007/05/18 09:31:16 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.207 $
+ * \version \$Revision: 1.208 $
  *
  * \ingroup petrinet
  */
@@ -1656,9 +1656,9 @@ void PetriNet::compose(const PetriNet &net)
       if ( (*place)->prefix != (oPlace)->prefix )
       {
         (*place)->type = INTERNAL;
-        if ( (*place)->max_occurrences < (*oPlace)->max_occurrences )
+        if ( (*place)->max_occurrences < (oPlace)->max_occurrences )
         {
-          (*place)->max_occurrences = (*oPlace)->max_occurrences;
+          (*place)->max_occurrences = (oPlace)->max_occurrences;
         }
         (*place)->history[0] = (*place)->nodeFullName();
         roleMap[(*place)->nodeFullName()] = (*place);

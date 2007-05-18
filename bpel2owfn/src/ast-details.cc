@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/16 11:52:39 $
+ * \date    \$Date: 2007/05/18 09:44:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.120 $
+ * \version \$Revision: 1.121 $
  */
 
 
@@ -78,10 +78,15 @@ using std::endl;
  *               by flex and bison
  */
 ASTE::ASTE(unsigned int myid, unsigned int mytype) :
-  id(myid), type(mytype), controlFlow(POSITIVECF), visConnection("none"), secVisConnection("none"), 
-  plRoleDetails(NULL), isStartActivity(false), cyclic(false), highlighted(false), isUserDefined(true), callable(true),
-  sourceActivity(0), targetActivity(0), max_occurrences(1), max_loops(UINT_MAX), enclosedFH(0), enclosedCH(0), channel_instances(0),
-  channel_unique_instances(0), drawn(false), partnerLinkType(NULL)
+  id(myid), type(mytype), 
+  sourceActivity(0), targetActivity(0), 
+  visConnection("none"), secVisConnection("none"), drawn(false), highlighted(false), 
+  enclosedFH(0), enclosedCH(0), callable(true), isUserDefined(true), controlFlow(POSITIVECF), 
+  plRoleDetails(NULL), 
+  isStartActivity(false), cyclic(false), 
+  max_occurrences(1), max_loops(UINT_MAX), 
+  channel_instances(0), channel_unique_instances(0), 
+  partnerLinkType(NULL) 
 {
   assert(myid != 0);
 

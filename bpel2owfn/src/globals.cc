@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/05/14 10:23:17 $
+ * \date    \$Date: 2007/05/21 13:18:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  */
 
 
@@ -111,6 +111,8 @@ namespace globals {
   unsigned int other_errors = 0;
 
   bool parsing = true;
+
+  bool hideStandardHandlers = false;
 
   set<string> unknown_elements;
 

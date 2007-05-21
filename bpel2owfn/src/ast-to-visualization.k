@@ -31,7 +31,7 @@
  * 
  * \since   2007-04-18
  *
- * \date    \$Date: 2007/05/02 12:17:56 $
+ * \date    \$Date: 2007/05/21 13:18:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  *
  */
 
@@ -63,8 +63,16 @@ Process(a,b,c,d,e,g,i,_id) ->
     (*output) << "compound = true;" << endl;
     globals::ASTEmap[_id->value]->visConnection = "Process_Start";
   } 
-  a b c d e g i 
+  a b c d e g 
+  {
+    (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"Process activity\";" << endl;  
+  }
+  i 
   {  
+    globals::ASTEmap[_id->value]->visConnection = globals::ASTEmap[i->id]->visConnection;
+    globals::ASTEmap[_id->value]->secVisConnection = globals::ASTEmap[i->id]->secVisConnection;
+    (*output) << "}" << endl;    
+
     unsigned int linkId;
     unsigned int source;
     unsigned int target;
@@ -107,15 +115,44 @@ Partner(a,_id) ->
 ******************************************************************************/
 
 FaultHandlers(a,b,_id) ->
-  [visualization: ]
+  [visualization: 
+  { if (! (globals::ASTEmap[_id->value]->isUserDefined) && globals::hideStandardHandlers) }
+    ${ /* no Variables */ $}
+  { else }
+    ${
+       {
+         (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"FaultHandlers\";" << endl;  
+       }
+       a b
+       {
+         (*output) << "}" << endl;    
+       }    
+    $}
+  ]
 ;
 
 Catch(a,_id) ->
-  [visualization: a]
+  [visualization: 
+  {
+  (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"Catch\";" << endl;  
+  }
+  a
+  {
+  (*output) << "}" << endl;    
+  }
+  ]
 ;
 
 CatchAll(a,_id) ->
-  [visualization: a]
+  [visualization:
+  {
+    (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"CatchAll\";" << endl;  
+  }
+  a
+  {
+    (*output) << "}" << endl;    
+  }
+  ]
 ;
 
 
@@ -128,15 +165,39 @@ emptyEventHandlers(_id) ->
 ;
 
 EventHandlers(a,b,_id) ->
-  [visualization: ]
+  [visualization: 
+  {
+    (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"EventHandlers\";" << endl;  
+  }
+  a b 
+  {
+    (*output) << "}" << endl;    
+  }
+  ]
 ;
 
 OnMessage(a,b,c,_id) ->
-  [visualization: a b c]
+  [visualization:
+  {
+  (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"OnMessage\";" << endl;  
+  }
+  a b c
+  {
+  (*output) << "}" << endl;    
+  }
+  ]
 ;
 
 OnAlarm(a,b,_id) ->
-  [visualization: b]
+  [visualization: 
+  {
+  (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"OnAlarm\";" << endl;  
+  }
+  b
+  {
+  (*output) << "}" << endl;    
+  }
+  ]
 ;
 
 
@@ -145,7 +206,20 @@ OnAlarm(a,b,_id) ->
 ******************************************************************************/
  
 CompensationHandler(a,_id) ->
-  [visualization: ]
+  [visualization: 
+  { if (! (globals::ASTEmap[_id->value]->isUserDefined) && globals::hideStandardHandlers) }
+    ${ /* no Variables */ $}
+  { else }
+    ${
+       {
+         (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"CompensationHandler\";" << endl;  
+       }
+       a
+       {
+         (*output) << "}" << endl;    
+       }
+    $}
+  ]
 ;
 
 
@@ -154,7 +228,20 @@ CompensationHandler(a,_id) ->
 ******************************************************************************/
  
 TerminationHandler(a,_id) ->
-  [visualization: ]
+  [visualization: 
+  { if (! (globals::ASTEmap[_id->value]->isUserDefined) && globals::hideStandardHandlers) }
+    ${ /* no Variables */ $}
+  { else }
+    ${
+       {
+         (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"TerminationHandler\";" << endl;  
+       }
+       a
+       {
+         (*output) << "}" << endl;    
+       }
+    $}
+  ]
 ;
 
 
@@ -408,13 +495,14 @@ Rethrow(a,_id) ->
 Compensate(a,_id) ->
   [visualization: 
   {
-  (*output) << "compensate" << toString(_id->value) << " [shape=rectangle style=filled label=\"compensate\"";
-  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << "compensate" << toString(_id->value) << " [shape=rectangle style=filled label=\"compensate\"";
+    if(globals::ASTEmap[_id->value]->highlighted)
     (*output) << " fillcolor=red";
-  (*output) << "];" << endl;
-  globals::ASTEmap[_id->value]->visConnection= "compensate" + toString(_id->value);
-  globals::ASTEmap[_id->value]->secVisConnection= "compensate" + toString(_id->value);
+    (*output) << "];" << endl;
+    globals::ASTEmap[_id->value]->visConnection= "compensate" + toString(_id->value);
+    globals::ASTEmap[_id->value]->secVisConnection= "compensate" + toString(_id->value);
   }
+
   ]
 ;
 
@@ -775,13 +863,19 @@ Link(_id) ->
 Scope(a,b,c,d,e,f,g,i,j,_id) ->
   [visualization: 
   {
-  (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"Scope\";" << endl;  
+    (*output) << "subgraph cluster" << toString(_id->value+1000) << " { label = \"Scope\";" << endl;  
   }
-  i
+  a b c d e f g
   {
-  globals::ASTEmap[_id->value]->visConnection = globals::ASTEmap[i->id]->visConnection;
-  globals::ASTEmap[_id->value]->secVisConnection = globals::ASTEmap[i->id]->secVisConnection;
-  (*output) << "}" << endl;    
+    (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"Scope Activity\";" << endl;  
+  }
+  i 
+  {  
+    (*output) << "}" << endl;    
+
+    globals::ASTEmap[_id->value]->visConnection = globals::ASTEmap[i->id]->visConnection;
+    globals::ASTEmap[_id->value]->secVisConnection = globals::ASTEmap[i->id]->secVisConnection;
+    (*output) << "}" << endl;    
   }
   ]
 ;

@@ -29,7 +29,7 @@
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2007/05/21 12:58:45 $
+ * \date    \$Date: 2007/05/21 13:04:58 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  *
  * \todo    Annotate the global mappings which function clear them.
  */
@@ -182,9 +182,9 @@ void printer(const char *s, uview v)
 #define CTOR(token) { \
   ENTER("[AST]"); \
   assert(integer_1 != NULL); \
+  bool id_was_zero = (integer_1->value == 0); \
   if (integer_1->value == 0) \
   { \
-    globals::ASTEmap[id]->isUserDefined = globals::parsing; \
     id = globals::ASTEid; \
     integer_1 = mkinteger(globals::ASTEid++); \
   } \
@@ -197,10 +197,10 @@ void printer(const char *s, uview v)
   } \
   assert(globals::ASTEmap[id] != NULL); \
   globals::ASTEmap[id]->phylum = this; \
+  if (id_was_zero) \
+    globals::ASTEmap[id]->isUserDefined = globals::parsing; \
   LEAVE("[AST]"); \
 }
-
-//  globals::ASTEmap[id]->isUserDefined = globals::parsing; \
 
 
 

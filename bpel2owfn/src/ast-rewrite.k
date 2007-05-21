@@ -44,7 +44,7 @@
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2007/05/14 09:02:56 $
+ * \date    \$Date: 2007/05/21 12:58:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -53,7 +53,7 @@
  * \note    This file was created using Kimwitu++ reading file ast-rewrite.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  */
 %}
 
@@ -196,7 +196,7 @@ volatile_standardTerminationHandler(_id)
         mkinteger(0)
       )
     ),
-    _id
+    mkinteger(0) // was: _id
   )
 >;
 
@@ -234,7 +234,7 @@ volatile_standardFaultHandlers(_id) ->
       ),
       mkinteger(0)
     ),
-    _id
+    mkinteger(0) // was: _id
   )
 >;
 
@@ -251,7 +251,7 @@ volatile_standardCompensationHandler(_id) ->
         mkinteger(0)
       )
     ),
-    _id
+    mkinteger(0) // was: _id
   )
 >;      
 

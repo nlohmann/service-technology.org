@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/18 16:06:29 $
+ * \date    \$Date: 2007/05/21 10:30:25 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.209 $
+ * \version \$Revision: 1.210 $
  *
  * \ingroup petrinet
  */
@@ -844,9 +844,11 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   assert(t1 != NULL);
   assert(t2 != NULL);
   
+  // variable needed for correct arc weights
   bool sametarget = false;
+  // container for arcs to be deleted
   set<Arc *>::iterator delArc;
-  
+  // the merged transition
   Node *t12 = newTransition("");
 
   // organize the communication type of the new transition
@@ -891,19 +893,27 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   t12->postset=setUnion(t1->postset, t2->postset);
 
   // create the weighted arcs for t12
+  
+  // this is the preset of t12 without the preset of t1. It is needed not generate double arcs if
+  // the preset of t1 and t2 were not distinct.
   set<Node *> preset2without1 = setDifference(t12->preset,t1->preset);
 
+  // create new arcs from the t1 preset to t12
   for (set<Node *>::iterator n = t1->preset.begin(); n != t1->preset.end(); n++)
     newArc((*n), t12, STANDARD, arc_weight((*n),t1));
 
+  // create new arcs from the preset of t2 to t12 without those, that have been already covered by the preset of t1
   for (set<Node *>::iterator n = preset2without1.begin(); n != preset2without1.end(); n++)
     newArc((*n), t12, STANDARD, arc_weight((*n),t2));
 
+  // create new arcs from t12 to postset of t1
   for (set<Node *>::iterator n = t1->postset.begin(); n != t1->postset.end(); n++) 
     newArc(t12, (*n), STANDARD, arc_weight(t1,(*n)));
 
+  // create new arcs from t12 to postset of t2 and adjust arcweights if a node of postset of t2 is also in postset of t1
   for (set<Node *>::iterator n = t2->postset.begin(); n != t2->postset.end(); n++)
   {    
+    // Find an arc already created in because of the postset of t1
     for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     {
       if (((*f)->source == t12) && ((*f)->target == (*n)))
@@ -913,6 +923,7 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
       }
     }
         
+    // if such an arc was found, save its weight, delete it and add its weight to the arc from t12 to postset of t2
     if (sametarget)
     {
       int weightsave = arc_weight(t12,(*n));
@@ -920,6 +931,7 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
       newArc(t12, (*n), STANDARD, (arc_weight(t2,(*n)) + weightsave));
       sametarget = false;
     }
+    // if no such arc was found, simply add an arc from t12 to postset of t2
     else
     {
       newArc(t12, (*n), STANDARD, arc_weight(t2,(*n)));

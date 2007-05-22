@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/05/18 16:06:29 $
+ * \date    \$Date: 2007/05/22 08:20:39 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.77 $
+ * \version \$Revision: 1.78 $
  *
  * \ingroup petrinet
  */
@@ -304,8 +304,8 @@ void PetriNet::reduce_identical_places()
 	    (sameweights(*p2)) && // precondition 4
 	    (arc_weight((*preTransition), (*p1)) == arc_weight((*p2), (*((*p1)->postset.begin())))) ) // precondition 4
 	{
-	  string id1 = *((*p1)->history.begin());
-	  string id2 = *((*p2)->history.begin());
+	  string id1 = ((*p1)->nodeFullName());
+	  string id2 = ((*p2)->nodeFullName());
 	  placePairs.insert(pair<string, string>(id1, id2));
 	}
     }
@@ -364,8 +364,8 @@ void PetriNet::reduce_identical_transitions()
 	    (sameweights(*t2)) && // precondition 4
 	    (arc_weight((*((*t1)->preset.begin())),(*t1)) == arc_weight((*t2), (*((*t1)->postset.begin()))))) // precondition 4
 	{
-	  string id1 = *((*t1)->history.begin());
-	  string id2 = *((*t2)->history.begin());
+	  string id1 = ((*t1)->nodeFullName());
+	  string id2 = ((*t2)->nodeFullName());
 	  transitionPairs.insert(pair<string, string>(id1, id2));
 	}
     }
@@ -427,10 +427,10 @@ void PetriNet::reduce_series_places()
 	(postPlace->type == INTERNAL) &&
 	(arc_weight(prePlace, *t) == 1 && arc_weight(*t, postPlace) == 1)) // precondition 5
    {
-      string id1 = *((*((*t)->preset.begin()))->history.begin());
-      string id2 = *((*((*t)->postset.begin()))->history.begin());
+      string id1 = ((*((*t)->preset.begin()))->nodeFullName());
+      string id2 = ((*((*t)->postset.begin()))->nodeFullName());
       placePairs.insert(pair<string, string>(id1, id2));
-      uselessTransitions.insert(*((*t)->history.begin()));
+      uselessTransitions.insert(((*t)->nodeFullName()));
     }
   }
 
@@ -491,10 +491,10 @@ void PetriNet::reduce_series_transitions()
       if (((t2)->preset.size() == 1) && // precondition 2
           (arc_weight(t1, *p) == arc_weight(*p, t2))) // precondition 5
       {
-	string id1 = *(t1->history.begin());
-	string id2 = *(t2->history.begin());
+	string id1 = (t1->nodeFullName());
+	string id2 = (t2->nodeFullName());
 	transitionPairs.insert(pair<string, string>(id1, id2));
-	uselessPlaces.insert(*((*p)->history.begin()));
+	uselessPlaces.insert(((*p)->nodeFullName()));
       }
     }
   }
@@ -692,8 +692,8 @@ void PetriNet::reduce_equal_places()
       if (preSetT1 != preSetT2) //precondition 5
         continue;
 
-      string id1 = *((p1)->history.begin());
-      string id2 = *((*p2)->history.begin());
+      string id1 = ((p1)->nodeFullName());
+      string id2 = ((*p2)->nodeFullName());
 	    
       for (set<pair<string, string> >::iterator labels = placePairs.begin();
       labels != placePairs.end(); labels++)
@@ -755,8 +755,8 @@ void PetriNet::reduce_equal_places()
       if (preSetT1 != preSetT2) //precondition 5
         continue;
 
-      string id1 = *((*p1)->history.begin());
-      string id2 = *((*p2)->history.begin());
+      string id1 = ((*p1)->nodeFullName());
+      string id2 = ((*p2)->nodeFullName());
 	    
       for (set<pair<string, string> >::iterator labels = placePairs.begin();
       labels != placePairs.end(); labels++)
@@ -781,7 +781,7 @@ void PetriNet::reduce_equal_places()
     Place* p1 = findPlace(labels->first);
     Place* p2 = findPlace(labels->second);
 
-    string trans_id = *((*(p2->postset.begin()))->history.begin());
+    string trans_id = ((*(p2->postset.begin()))->nodeFullName());
 
     unsigned int arcadd = 0;
 
@@ -938,7 +938,7 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
     {
       reduce_self_loop_places();	// RC1
       reduce_self_loop_transitions();	// RC2
-//      reduce_remove_initially_marked_places_in_choreographies();
+      reduce_remove_initially_marked_places_in_choreographies();
     }
 
     if (reduction_level == 6)

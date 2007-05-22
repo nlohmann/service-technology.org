@@ -52,7 +52,6 @@ std::list<char*> netfiles;
 OGFromFile::ogfiles_t ogfiles;
 std::string ogfileToMatch;
 std::string ogfileToParse;
-std::string constraintfile;
 std::string outfilePrefix;
 
 int events_manual;
@@ -71,8 +70,7 @@ std::map<possibleParameters, bool> parameters;
 // version. Start with some value that cannot be the value of a char,
 // i.e. 256!!
 #define GETOPTLONG_MATCH       256
-#define GETOPTLONG_CONSTRAINT  257
-#define GETOPTLONG_PRODUCTOG   258
+#define GETOPTLONG_PRODUCTOG   257
 
 // long options
 static struct option longopts[] =
@@ -91,7 +89,6 @@ static struct option longopts[] =
   { "OnTheFly",        required_argument, NULL, 'B' },
   { "exchangeability", no_argument,       NULL, 'x' },
   { "match",           required_argument, NULL, GETOPTLONG_MATCH },
-  { "constraint",      required_argument, NULL, GETOPTLONG_CONSTRAINT },
   { "productog",       no_argument,       NULL, GETOPTLONG_PRODUCTOG },
   { NULL,              0,                 NULL, 0   }
 };
@@ -118,8 +115,10 @@ void print_help() {
   trace(" -t | --graphtype=<type> ....... select the graph <type> to be calculated:\n");
   trace("                                   OG - operating guideline\n");
   trace("                                   IG - interaction graph (default)\n");
-  trace("                                   simulation - check whether the first\n");
-  trace("                                                OG simulates the second one\n");
+  trace("                                   simulation - check whether the first OG\n");
+  trace("                                                simulates the second one\n");
+  trace("                                   productog  - calculate the product OG of all\n");
+  trace("                                                given OGs\n");
   trace(" -m | --messagemaximum=<level>   set maximum number of same messages per state\n");
   trace("                                 to <level>\n");
   trace(" -e | --eventsmaximum=<level>    set event to occur at most <level> times\n");
@@ -170,10 +169,6 @@ void print_help() {
   trace("                                 method (see option -b)\n");
   trace(" --match=<OG filename> ......... check if given oWFN (-n) matches with\n");
   trace("                                 operating guideline given in <OG filename>\n");
-  trace(" --constraint=<filename> ....... change a given OG (for the net specified with -n)\n");
-  trace("                                 that it resprects the constraint automaton given in <filename>\n");
-  trace("                                 syntax: -n net.owfn --constraint==constraintfile.og\n");
-  trace(" --productog ................... calculate the product OG of all given OGs\n");
   trace(" -o <filename prefix> .......... prefix of the output files\n");
   trace("\n");
   trace("\n");
@@ -235,7 +230,6 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_OTF] = false;
     options[O_EX] = false;
     options[O_MATCH] = false;
-    options[O_CONSTRAINT] = false;
     options[O_PRODUCTOG] = false;
     options[O_SIMULATES] = false;
     options[O_OUTFILEPREFIX] = false;
@@ -313,6 +307,8 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_IG] = true;
 				} else if (string(optarg) == "simulation") {
 					options[O_SIMULATES] = true;
+				} else if (string(optarg) == "productog") {
+					options[O_PRODUCTOG] = true;
                 } else {
                     cerr << "Warning:\twrong graph type" << endl
                          << "\tIG computed" << endl;
@@ -415,20 +411,6 @@ void parse_command_line(int argc, char* argv[]) {
                          << endl;
                     exit(1);
                 }
-                break;
-            case GETOPTLONG_CONSTRAINT:
-                if (optarg) {
-                    options[O_CONSTRAINT] = true;
-                    constraintfile = optarg;
-                } else {
-                    cerr << "Error:\tconstraint file name missing" << endl
-                         << "\tEnter \"fiona --help\" for more information."
-                         << endl;
-                    exit(1);
-                }
-                break;
-            case GETOPTLONG_PRODUCTOG:
-                options[O_PRODUCTOG] = true;
                 break;
             case 'o':
                 if (optarg) {

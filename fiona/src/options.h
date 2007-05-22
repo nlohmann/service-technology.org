@@ -59,7 +59,6 @@ typedef enum
 	O_OTF, //on the fly
 	O_EX,
 	O_MATCH,
-	O_CONSTRAINT,
 	O_PRODUCTOG,
 	O_SIMULATES,
     O_OUTFILEPREFIX
@@ -92,7 +91,6 @@ extern std::string ogfileToParse;
 
 extern std::string outfilePrefix;
 
-extern std::string constraintfile;
 extern unsigned int messages_manual;
 extern int events_manual;
 extern int bdd_reordermethod;

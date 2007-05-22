@@ -251,46 +251,6 @@ int main(int argc, char ** argv) {
         OGToMatch = readog(ogfileToMatch);
     }
 
-// ----------- enforcing a constraint automaton ----------
-
-	if (options[O_CONSTRAINT]) {
-
-		netfile = *netfiles.begin();
-	
-		// open the OG to be constrained
-		string ogfile = string(netfile) + ".a.og";
-		trace(TRACE_0, "You want to constrain the OG:  " + ogfile + "\n");
-
-		OGFromFile* og = readog(ogfile);
-
-		// open the constraint automaton (same syntax as OG)
-		trace(TRACE_0, "   to respect the constraint:  " + constraintfile +
-		    "\n\n"); 
-
-		OGFromFile* constraint = readog(constraintfile);
-
-		OGFromFile* constrainedOG = og->enforce(constraint);
-
-		trace(TRACE_0, " computed the constrained OG:  " +
-		    string(netfile) + ".a.og.under." + platform_basename(constraintfile) +
-		    ".out\n\n");
-
-
-		constrainedOG->removeFalseNodes();
-		constrainedOG->printDotFile();
-
-#ifdef YY_FLEX_HAS_YYLEX_DESTROY
-		// Destroy buffer of OG parser.
-		//  Must NOT be called before fclose(og_yyin);
-		og_yylex_destroy();
-#endif
-
-		delete constrainedOG;
-		delete constraint;
-		delete og;
-		return 0;
-	}
-
 // ---------------- reading all nets ---------------------
 	if (options[O_OWFN_NAME] ) {
 		list<char*>::iterator netiter = netfiles.begin();
@@ -371,15 +331,29 @@ int main(int argc, char ** argv) {
     {
         if (OGsFromFiles.size() < 2)
         {
-			cerr << "Error: \t Give at least two OGs to build their product!\n" << endl;
+            cerr << "Error: \t Give at least two OGs to build their product!\n" << endl;
             exit(1);
         }
+
+        trace("Building product of the following OGs:\n");
+        for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+             iOgFile != ogfiles.end(); ++iOgFile)
+        {
+            trace(*iOgFile); trace("\n");
+        }
+        trace("\n");
+
         OGFromFile* productOG = OGFromFile::product(OGsFromFiles);
 
         if (!options[O_OUTFILEPREFIX])
         {
             outfilePrefix = OGFromFile::getProductOGFilePrefix(ogfiles);
         }
+
+        trace("Saving product OG to:\n");
+        trace(OGFromFile::addOGFileSuffix(outfilePrefix)); trace("\n");
+        productOG->printOGFile(outfilePrefix);
+        trace("\n");
 
         productOG->printDotFile(outfilePrefix);
         delete productOG;

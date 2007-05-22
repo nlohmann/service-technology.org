@@ -460,9 +460,6 @@ bool OGFromFile::simulatesRecursive ( OGFromFileNode *myNode,
 	return true;
 }
 
-OGFromFile* OGFromFile::enforce(const OGFromFile* rhs) {
-    return product(rhs);
-}
 
 OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
 	trace(TRACE_5, "OGFromFile::product(const OGFromFile* rhs): start\n");
@@ -600,7 +597,7 @@ std::string OGFromFile::getProductOGFilePrefix(const ogfiles_t& ogfiles)
             stripOGFileSuffix(platform_basename(*iOgFile));
     }
 
-    return productFilePrefix + ".og";
+    return productFilePrefix;
 }
 
 std::string OGFromFile::stripOGFileSuffix(const std::string& filename)
@@ -648,17 +645,6 @@ void OGFromFile::printDotFile(const std::string& filenamePrefix) const
     printDotFile(filenamePrefix, filenamePrefix);
 }
 
-//! \fn void OGFromFile::printDotFile()
-//! \brief creates a dot file of the graph
-void OGFromFile::printDotFile() const {
-
-    string netogfile = string(netfile) + ".a.og";
-    string outfilesPrefix = netogfile + ".under." +
-        platform_basename(constraintfile);
-    printDotFile(outfilesPrefix, "constrained OG of " + netogfile + " and " +
-        constraintfile);
-}
-
 
 //! \fn void OGFromFile::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[])
 //! \param v current node in the iteration process
@@ -701,3 +687,63 @@ void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFrom
 	}
 }
 
+void OGFromFile::printOGFile(const std::string& filenamePrefix) const
+{
+    fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(),
+        ios_base::out | ios_base::trunc);
+
+    ogFile << "NODES" << endl;
+    bool printedFirstNode = false;
+    for (nodes_t::const_iterator iNode = nodes.begin(); iNode != nodes.end();
+        ++iNode)
+    {
+        if (printedFirstNode)
+        {
+            ogFile << ',' << endl;
+        }
+
+        OGFromFileNode* node = *iNode;
+        ogFile << "  " << node->getName() << " : " 
+               << node->getAnnotationAsString() << " : "
+               << node->getColor().toString();
+
+        printedFirstNode = true;
+    }
+    ogFile << ';' << endl << endl;
+
+    ogFile << "INITIALNODE" << endl;
+    ogFile << "  " << getRoot()->getName() << ';' << endl << endl;
+
+    ogFile << "TRANSITIONS" << endl;
+    bool printedFirstTransition = false;
+    for (nodes_t::const_iterator iNode = nodes.begin(); iNode != nodes.end();
+        ++iNode)
+    {
+        OGFromFileNode* node = *iNode;
+        for (OGFromFileNode::transitions_t::const_iterator iTransition =
+            node->transitions.begin(); iTransition != node->transitions.end();
+            ++iTransition)
+        {
+            if (printedFirstTransition)
+            {
+                ogFile << ',' << endl;
+            }
+
+            OGFromFileTransition* transition = *iTransition;
+            ogFile << "  " << transition->getSrc()->getName() << " -> "
+                   << transition->getDst()->getName() << " : "
+                   << transition->getLabel();
+
+            printedFirstTransition = true;
+        }
+    }
+    ogFile << ';' << endl;
+
+    ogFile.close();
+}
+
+
+std::string OGFromFile::addOGFileSuffix(const std::string& filePrefix)
+{
+    return filePrefix + ".og";
+}

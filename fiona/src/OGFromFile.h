@@ -189,23 +189,27 @@ public:
     static std::string getProductOGFilePrefix(const ogfiles_t& ogfiles);
 
     /**
-     * Enforces the current OG to respect the given constraint.
-     * \return the OG respecting the constraint
-     * \param constraint the constraint to be enforced
-     */
-    OGFromFile* enforce(const OGFromFile*);
-
-    /**
      * Strips the OG file suffix from filename and returns the result.
      */
     static std::string stripOGFileSuffix(const std::string& filename);
 
     void printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFromFileNode*, bool>&) const;
 
-    void printDotFile() const;
     void printDotFile(const std::string& filenamePrefix) const;
     void printDotFile(const std::string& filenamePrefix,
         const std::string& dotGraphTitle) const;
+
+    /**
+     * Prints this OG in OG file format to a file with the given prefix. The
+     * suffix is added automatically by this method.
+     */
+    void printOGFile(const std::string& filenamePrefix) const;
+
+    /**
+     * Adds the suffix for OG files to the given file name prefix and returns
+     * the result. The suffix includes the . (dot).
+     */
+    static std::string addOGFileSuffix(const std::string& filePrefix);
 
     bool simulates ( OGFromFile *simulant );
 };

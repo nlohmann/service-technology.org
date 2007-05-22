@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/21 10:30:25 $
+ * \date    \$Date: 2007/05/22 13:14:55 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.210 $
+ * \version \$Revision: 1.211 $
  *
  * \ingroup petrinet
  */
@@ -879,6 +879,13 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   {
     roleMap[*role] = t12;
     t12->history.push_back(*role);
+    if (t1->prefix != "" || t2->prefix != "")
+    {
+      roleMap[t1->prefix + *role] = t12;
+      t12->history.push_back(t1->prefix + *role);
+      roleMap[t2->prefix + *role] = t12;
+      t12->history.push_back(t2->prefix + *role);
+    }
   }
 
   // copy t2's history to t12
@@ -886,6 +893,13 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   {
     roleMap[*role] = t12;
     t12->history.push_back(*role);
+    if (t1->prefix != "" || t2->prefix != "")
+    {
+      roleMap[t1->prefix + *role] = t12;
+      t12->history.push_back(t1->prefix + *role);
+      roleMap[t2->prefix + *role] = t12;
+      t12->history.push_back(t2->prefix + *role);
+    }
   }
 
   // merge pre- and postsets for t12
@@ -1006,6 +1020,13 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
   {
     roleMap[*role] = t12;
     t12->history.push_back(*role);
+    if (t1->prefix != "" || t2->prefix != "")
+    {
+      roleMap[t1->prefix + *role] = t12;
+      t12->history.push_back(t1->prefix + *role);
+      roleMap[t2->prefix + *role] = t12;
+      t12->history.push_back(t2->prefix + *role);
+    }
   }
 
   // copy t2's history to t12
@@ -1013,6 +1034,13 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
   {
     roleMap[*role] = t12;
     t12->history.push_back(*role);
+    if (t1->prefix != "" || t2->prefix != "")
+    {
+      roleMap[t1->prefix + *role] = t12;
+      t12->history.push_back(t1->prefix + *role);
+      roleMap[t2->prefix + *role] = t12;
+      t12->history.push_back(t2->prefix + *role);
+    }
   }
 
   // merge pre- and postsets for t12
@@ -1092,12 +1120,26 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
   {
     p12->history.push_back(*role);
     roleMap[*role] = p12;
+    if (p1->prefix != "" || p2->prefix != "")
+    {
+      roleMap[p1->prefix + *role] = p12;
+      p12->history.push_back(p1->prefix + *role);
+      roleMap[p2->prefix + *role] = p12;
+      p12->history.push_back(p2->prefix + *role);
+    }
   }
 
   for (vector<string>::iterator role = p2->history.begin(); role != p2->history.end(); role++)
   {
     p12->history.push_back(*role);
     roleMap[*role] = p12;
+    if (p1->prefix != "" || p2->prefix != "")
+    {
+      roleMap[p1->prefix + *role] = p12;
+      p12->history.push_back(p1->prefix + *role);
+      roleMap[p2->prefix + *role] = p12;
+      p12->history.push_back(p2->prefix + *role);
+    }
   }
 
   // merge pre- and postsets for p12

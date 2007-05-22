@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/18 16:06:29 $
+ * \date    \$Date: 2007/05/22 15:10:03 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.148 $
+ * \version \$Revision: 1.149 $
  *
  * \ingroup petrinet
  */
@@ -69,6 +69,7 @@ using std::vector;
 using std::deque;
 using std::set;
 using std::map;
+using std::pair;
 using std::ostream;
 
 
@@ -631,6 +632,9 @@ class PetriNet
 
     /// mapping of roles to nodes of the Petri net
     map<string, Node *> roleMap;
+
+    /// mapping of arcs to their appropriate weight
+    map< pair< Node*, Node* >, int > weight;
 };
 
 

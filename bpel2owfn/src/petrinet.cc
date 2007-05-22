@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/22 13:14:55 $
+ * \date    \$Date: 2007/05/22 15:10:03 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.211 $
+ * \version \$Revision: 1.212 $
  *
  * \ingroup petrinet
  */
@@ -682,6 +682,7 @@ Arc *PetriNet::newArc(Node *my_source, Node *my_target, arc_type my_type, unsign
   assert(f != NULL);
   F.insert(f);
 
+  weight[ pair<Node*, Node*>(my_source, my_target) ] = my_weight;
 
   // Add a second arc to close a loop if the arc is a read arc.
   if (my_type == READ)
@@ -689,6 +690,7 @@ Arc *PetriNet::newArc(Node *my_source, Node *my_target, arc_type my_type, unsign
     Arc *f2 = new Arc(my_target, my_source, my_weight);
     assert(f2 != NULL);
     F.insert(f2);
+    weight[ pair<Node*, Node*>(my_target, my_source) ] = my_weight;
   }
 
   return f;
@@ -804,7 +806,10 @@ void PetriNet::removeArc(Arc *f)
   if (f == NULL)
     return;
 
+  weight[ pair<Node*, Node*>(f->source, f->target) ] = 0;
+
   F.erase(f);
+
   delete f;
 }
 
@@ -1289,12 +1294,22 @@ void PetriNet::renamePlace(string old_name, string new_name)
  */
 unsigned int PetriNet::arc_weight(Node *my_source, Node *my_target) const
 {
+
+  map< pair<Node*, Node*>, int >::const_iterator iter = weight.find(pair<Node*, Node*>(my_source, my_target));
+
+  assert( iter != weight.end() ) ;
+  assert( iter->second > 0 );
+
+  return iter->second;
+
+  /*
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if (((*f)->source == my_source) && ((*f)->target == my_target))
       return (*f)->weight;
 
   assert(false);
   return 1;
+  */
 }
 
 

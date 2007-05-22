@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/22 15:10:03 $
+ * \date    \$Date: 2007/05/22 21:15:00 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.212 $
+ * \version \$Revision: 1.213 $
  *
  * \ingroup petrinet
  */
@@ -886,10 +886,8 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
     t12->history.push_back(*role);
     if (t1->prefix != "" || t2->prefix != "")
     {
-      roleMap[t1->prefix + *role] = t12;
+      // roleMap[t1->prefix + *role] = t12;
       t12->history.push_back(t1->prefix + *role);
-      roleMap[t2->prefix + *role] = t12;
-      t12->history.push_back(t2->prefix + *role);
     }
   }
 
@@ -900,12 +898,12 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
     t12->history.push_back(*role);
     if (t1->prefix != "" || t2->prefix != "")
     {
-      roleMap[t1->prefix + *role] = t12;
-      t12->history.push_back(t1->prefix + *role);
-      roleMap[t2->prefix + *role] = t12;
+      // roleMap[t2->prefix + *role] = t12;
       t12->history.push_back(t2->prefix + *role);
     }
   }
+  roleMap[t1->nodeFullName()] = t12;
+  roleMap[t2->nodeFullName()] = t12;
 
   // merge pre- and postsets for t12
   t12->preset=setUnion(t1->preset, t2->preset);

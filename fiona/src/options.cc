@@ -79,7 +79,7 @@ static struct option longopts[] =
   { "version",         no_argument,       NULL, 'v' },
   { "debug",           required_argument, NULL, 'd' },
   { "net",             required_argument, NULL, 'n' },
-  { "graphtype",       required_argument, NULL, 't' },
+  { "type",       required_argument, NULL, 't' },
   { "show",            required_argument, NULL, 's' },
   { "calcallstates",   no_argument,       NULL, 'a' },
   { "reduceIG",        no_argument,       NULL, 'r' },
@@ -112,9 +112,9 @@ void print_help() {
   trace("                                   4 - yet to be defined ;)\n");
   trace("                                   5 - show detailed information on everything\n");
   trace(" -n | --net=<filename> ......... read input owfn from <filename>\n");
-  trace(" -t | --graphtype=<type> ....... select the graph <type> to be calculated:\n");
-  trace("                                   OG - operating guideline\n");
-  trace("                                   IG - interaction graph (default)\n");
+  trace(" -t | --type=<type> ............ select the modus operandi of fiona, called <type>:\n");
+  trace("                                   OG - compute operating guideline\n");
+  trace("                                   IG - compute interaction graph (default)\n");
   trace("                                   simulation - check whether the first OG\n");
   trace("                                                simulates the second one\n");
   trace("                                   productog  - calculate the product OG of all\n");

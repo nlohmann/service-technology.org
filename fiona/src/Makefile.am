@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-04-28 21:18:13 $ by $Author: weinberg $.
-# Version $Revision: 1.27 $
+# File last changed $Date: 2007-05-23 13:19:18 $ by $Author: bretschn $.
+# Version $Revision: 1.28 $
 
 bin_PROGRAMS = fiona
 
@@ -66,7 +66,7 @@ EXTRA_DIST = lexer_owfn.h syntax_owfn.h syntax_og.h
 MAINTAINERCLEANFILES = $(YYSOURCES) 
 
 # set the include path found by configure
-INCLUDES = -I$(srcdir)/../cudd/include $(all_includes)
+INCLUDES = -I$(builddir)/../cudd/include $(all_includes)
 
 # Set 64bit compile and link flags if 64bit was configured
 if ENABLE_64BIT
@@ -86,10 +86,10 @@ fiona_CFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(OPTIMIZATION_LEVEL) $(WARNINGS)
 # the library search path.
 fiona_LDFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(all_libraries) 
 
-fiona_LDADD = $(srcdir)/../cudd/obj/libobj.a \
-	$(srcdir)/../cudd/dddmp/libdddmp.a $(srcdir)/../cudd/cudd/libcudd.a \
-	$(srcdir)/../cudd/mtr/libmtr.a $(srcdir)/../cudd/st/libst.a \
-	$(srcdir)/../cudd/util/libutil.a $(srcdir)/../cudd/epd/libepd.a
+fiona_LDADD = $(builddir)/../cudd/obj/libobj.a \
+	$(builddir)/../cudd/dddmp/libdddmp.a $(builddir)/../cudd/cudd/libcudd.a \
+	$(builddir)/../cudd/mtr/libmtr.a $(builddir)/../cudd/st/libst.a \
+	$(builddir)/../cudd/util/libutil.a $(builddir)/../cudd/epd/libepd.a
 
 lexer_owfn.h: lexer_owfn.cc
 	$(EGREP) '^#define.*FLEX.*VERSION' $^ > $@

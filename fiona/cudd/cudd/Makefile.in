@@ -1,7 +1,14 @@
-# $Id: Makefile,v 1.1 2006-06-29 09:20:59 massuthe Exp $
+# $Id: Makefile.in,v 1.1 2007-05-23 13:15:13 bretschn Exp $
 #
 #    Cudd - DD package
 #---------------------------
+
+#-------------- Autoconf configuration section of this Makefile ------------
+VPATH = @srcdir@
+srcdir = @srcdir@
+builddir = @builddir@
+#------------------- End of Autoconf configuration section -----------------
+
 .SUFFIXES: .o .c .u
 
 CC	= gcc
@@ -25,7 +32,7 @@ LINTSWITCH = -o
 
 WHERE	= ..
 
-INCLUDE = $(WHERE)/include
+INCLUDE = -I$(WHERE)/include -I$(srcdir)/../../src
 
 LIBS	= ./libcudd.a $(WHERE)/mtr/libmtr.a \
 	$(WHERE)/st/libst.a $(WHERE)/util/libutil.a $(WHERE)/epd/libepd.a
@@ -76,7 +83,7 @@ lib$(P).a: $(POBJ)
 	$(RANLIB) $@
 
 .c.o: $(PSRC) $(PHDR)
-	$(CC) -c  $< -I$(INCLUDE) $(CFLAGS) $(DDDEBUG) 
+	$(CC) -c  $< $(INCLUDE) $(CFLAGS) $(DDDEBUG) 
 
 optimize_dec: lib$(P).b
 
@@ -85,7 +92,7 @@ lib$(P).b: $(PUBJ)
 	$(RANLIB) $@
 
 .c.u: $(PSRC) $(PHDR)
-	cc -j $< -I$(INCLUDE) $(XCFLAGS)
+	cc -j $< $(INCLUDE) $(XCFLAGS)
 
 # if the header files change, recompile
 $(POBJ): $(PHDR)
@@ -103,10 +110,10 @@ $(TARGETu): $(SRC) $(UBJ) $(HDR) $(LIBS:.a=.b)
 lint: llib-l$(P).ln
 
 llib-l$(P).ln: $(PSRC) $(PHDR)
-	lint $(LINTFLAGS) $(LINTSWITCH)$(P) -I$(INCLUDE) $(PSRC)
+	lint $(LINTFLAGS) $(LINTSWITCH)$(P) $(INCLUDE) $(PSRC)
 
 lintpgm: lint
-	lint $(LINTFLAGS) -I$(INCLUDE) $(SRC) $(LINTLIBS)
+	lint $(LINTFLAGS) $(INCLUDE) $(SRC) $(LINTLIBS)
 
 tags: $(PSRC) $(PHDR)
 	ctags $(PSRC) $(PHDR)

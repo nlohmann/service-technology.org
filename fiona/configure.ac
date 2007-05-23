@@ -4,7 +4,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 1.5, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.19 $)
+AC_REVISION($Revision: 1.20 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -56,10 +56,41 @@ AM_CONDITIONAL(ENABLE_64BIT, test "$enable_64bit" = "yes")
 # no optimization flag here as it takes too much time
 CXXFLAGS=-g
 
+
+case `uname -s` in
+  Linux)
+    CUDD_XFLAGS="-march=`uname -m` -malign-double -DHAVE_IEEE_754 -DBSD"
+    ;;
+  SunOS)
+    CUDD_XFLAGS="-mcpu=ultrasparc  -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN"
+    ;;
+  CYGWIN*)
+    CUDD_XFLAGS="-march=`uname -m` -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864"
+    ;;
+  Darwin)
+    CUDD_XFLAGS="-m`uname -p` -DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3 -qstrict"
+    ;;
+  *) ;;
+esac
+
+AC_SUBST(CUDD_XFLAGS)
+
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  tests/Makefile
-		 doc/Makefile])
+                 doc/Makefile
+                 cudd/Makefile
+                 cudd/setup.sh
+                 cudd/shutdown.sh
+                 cudd/cudd/Makefile
+                 cudd/dddmp/Makefile
+                 cudd/epd/Makefile
+                 cudd/mnemosyne/Makefile
+                 cudd/mtr/Makefile
+                 cudd/nanotrav/Makefile
+                 cudd/obj/Makefile
+                 cudd/st/Makefile
+                 cudd/util/Makefile])
 AC_OUTPUT
 
 # Print summary of compile settings
@@ -68,28 +99,6 @@ echo "--------- compile settings ---------"
 echo "compile for 64bit...: $enable_64bit"
 echo "------------------------------------"
 echo
-
-AC_MSG_NOTICE([Creating Makefile include in order to build cudd package])
-# create Makefile include for cudd package
-echo "# created by configure script"  > $srcdir/cudd/Makefile.inc
-echo                      >> $srcdir/cudd/Makefile.inc
-echo "CPP = $CXX"             >> $srcdir/cudd/Makefile.inc
-echo              >> $srcdir/cudd/Makefile.inc
-echo "# IMPORTANT NOTICE: C sources also need to be compiled as C++, because the code" >> $srcdir/cudd/Makefile.inc
-echo "# for logging malloc, realloc, free, new and delete (newlogger.cc) is" >> $srcdir/cudd/Makefile.inc
-echo "# written in C++, and C cannot call C++. Only C++ can do that." >> $srcdir/cudd/Makefile.inc
-echo "CC  = $CXX"             >> $srcdir/cudd/Makefile.inc
-echo                                  >> $srcdir/cudd/Makefile.inc
-echo "RANLIB = $RANLIB"           >> $srcdir/cudd/Makefile.inc
-echo                                  >> $srcdir/cudd/Makefile.inc
-case `uname -s` in
-  Linux)    echo "XCFLAGS = -march=`uname -m` -malign-double -DHAVE_IEEE_754 -DBSD" >> $srcdir/cudd/Makefile.inc ;;
-  SunOS)    echo "XCFLAGS = -mcpu=ultrasparc  -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN" >> $srcdir/cudd/Makefile.inc;;
-  CYGWIN*)  echo "XCFLAGS = -march=`uname -m` -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864" >> $srcdir/cudd/Makefile.inc;;
-#  Darwin)   echo "XCFLAGS = -m`uname -p` -DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3 -qstrict" >> $srcdir/cudd/Makefile.inc ;;
-  *) ;;
-esac
-echo                                  >> $srcdir/cudd/Makefile.inc
 
 echo
 echo "Run \"make\" to build fiona (cudd package is built automatically)."

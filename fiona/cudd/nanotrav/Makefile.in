@@ -1,7 +1,14 @@
-# $Id: Makefile,v 1.1 2006-06-29 09:23:07 massuthe Exp $
+# $Id: Makefile.in,v 1.1 2007-05-23 13:17:29 bretschn Exp $
 #
 # nanotrav: simple FSM traversal program
 #---------------------------------------------------------------------------
+
+#-------------- Autoconf configuration section of this Makefile ------------
+VPATH = @srcdir@
+srcdir = @srcdir@
+builddir = @builddir@
+#------------------- End of Autoconf configuration section -----------------
+
 .SUFFIXES: .o .c .u
 
 CC	= gcc
@@ -17,7 +24,7 @@ TARGETu = nanotrav-u
 
 WHERE	= ..
 
-INCLUDE = $(WHERE)/include
+INCLUDE = -I$(WHERE)/include -I$(srcdir)/../../src
 
 LIBS	= $(WHERE)/dddmp/libdddmp.a $(WHERE)/cudd/libcudd.a \
 	$(WHERE)/mtr/libmtr.a $(WHERE)/st/libst.a $(WHERE)/util/libutil.a \
@@ -64,7 +71,7 @@ $(TARGET): $(SRC) $(OBJ) $(HDR) $(LIBS) $(MNEMLIB)
 	$(PURE) $(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(LIBS) $(MNEMLIB) -lm
 
 .c.o: $(HDR)
-	$(CC) -c $< -I$(INCLUDE) $(CFLAGS) $(DDDEBUG)
+	$(CC) -c $< $(INCLUDE) $(CFLAGS) $(DDDEBUG)
 
 # if the header files change, recompile
 $(OBJ): $(HDR)
@@ -77,10 +84,10 @@ $(TARGETu): $(SRC) $(UBJ) $(HDR) $(LIBS:.a=.b)
 	cc -O3 $(XCFLAGS) $(LDFLAGS) $(UBJ) -o $@ $(BLIBS) -lm
 
 .c.u: $(SRC) $(HDR)
-	cc -j -I$(INCLUDE) $(XCFLAGS) $<
+	cc -j $(INCLUDE) $(XCFLAGS) $<
 
 lint: $(SRC) $(HDR) $(LINTLIBS)
-	lint $(LINTFLAGS) -I$(INCLUDE) $(SRC) $(LINTLIBS)
+	lint $(LINTFLAGS) $(INCLUDE) $(SRC) $(LINTLIBS)
 
 tags: $(SRC) $(HDR)
 	ctags $(SRC) $(HDR)

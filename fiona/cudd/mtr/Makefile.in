@@ -1,8 +1,14 @@
-# $Id: Makefile,v 1.1 2006-06-29 09:22:46 massuthe Exp $
+# $Id: Makefile.in,v 1.1 2007-05-23 13:17:01 bretschn Exp $
 #
 #    mtr - multiway-branching tree package
 #---------------------------
 .SUFFIXES: .o .c .u
+
+#-------------- Autoconf configuration section of this Makefile ------------
+VPATH = @srcdir@
+srcdir = @srcdir@
+builddir = @builddir@
+#------------------- End of Autoconf configuration section -----------------
 
 CC	= cc
 RANLIB	= ranlib
@@ -25,7 +31,7 @@ LDFLAGS	=
 
 WHERE	= ..
 
-INCLUDE = $(WHERE)/include
+INCLUDE = -I$(WHERE)/include -I$(srcdir)/../../src
 
 P	= mtr
 PSRC    = mtrBasic.c mtrGroup.c
@@ -54,7 +60,7 @@ lib$(P).a: $(POBJ)
 	$(RANLIB) $@
 
 .c.o: $(PSRC) $(PHDR)
-	$(CC) -c  $< -I$(INCLUDE) $(CFLAGS) $(MTRDEBUG) 
+	$(CC) -c  $< $(INCLUDE) $(CFLAGS) $(MTRDEBUG) 
 
 optimize_dec: lib$(P).b
 
@@ -63,7 +69,7 @@ lib$(P).b: $(PUBJ)
 	$(RANLIB) $@
 
 .c.u: $(PSRC) $(PHDR)
-	cc -j $<  -I$(INCLUDE) $(XCFLAGS)
+	cc -j $<  $(INCLUDE) $(XCFLAGS)
 
 # if the header files change, recompile
 $(POBJ): $(PHDR)
@@ -74,7 +80,7 @@ $(UBJ): $(PHDR)
 lint: llib-l$(P).ln
 
 llib-l$(P).ln: $(PSRC) $(PHDR)
-	lint $(LINTFLAGS) $(LINTSWITCH)$(P) -I$(INCLUDE) $(PSRC)
+	lint $(LINTFLAGS) $(LINTSWITCH)$(P) $(INCLUDE) $(PSRC)
 
 tags: $(PSRC) $(PHDR)
 	ctags $(PSRC) $(PHDR)

@@ -23,13 +23,13 @@ TESTS = syntax.sh sequences.sh bddtest.sh extrema.sh \
 		messages.sh cyclic.sh matching.sh samples.sh
 
 
-TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=".:../src:$$PATH"
+TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=".:../src:$(srcdir):$$PATH"
 
 MEMCHECK_ENVIRONMENT = $(TESTS_ENVIRONMENT) memcheck=yes
 
 EXTRA_DIST = $(TESTS) cyclic/*.owfn extrema/*.owfn messages/*.owfn \
 			 samples/*.owfn sequence_suite/*.owfn matching/*.owfn \
-			 matching/*.og syntax/*.owfn
+			 matching/*.og syntax/*.owfn memcheck_helper.sh
 
 # Generate check targets from $(TESTS). That is done by removing '.sh' from
 # every word in $(TESTS) and precede them by 'check-'. So one of many check

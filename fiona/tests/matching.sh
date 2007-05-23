@@ -42,7 +42,7 @@ og="$DIR/shop.og"
 ############################################################################
 
 owfn="$DIR/client_match_1.owfn"
-cmd="$FIONA -n $owfn --match $og"
+cmd="$FIONA -n $owfn -t match $og"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.match.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -65,7 +65,7 @@ fi
 ############################################################################
 
 owfn="$DIR/client_nomatch_1.owfn"
-cmd="$FIONA -n $owfn --match $og"
+cmd="$FIONA -n $owfn -t match $og"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.match.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -88,7 +88,7 @@ fi
 ############################################################################
 
 owfn="$DIR/client_nomatch_2.owfn"
-cmd="$FIONA -n $owfn --match $og"
+cmd="$FIONA -n $owfn -t match $og"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.match.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -111,7 +111,7 @@ fi
 ############################################################################
 
 owfn="$DIR/client_nosupport_1.owfn"
-cmd="$FIONA -n $owfn --match $og"
+cmd="$FIONA -n $owfn -t match $og"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.match.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -138,7 +138,7 @@ og="$DIR/shop_rednodes.og"
 ############################################################################
 
 owfn="$DIR/client_match_1.owfn"
-cmd="$FIONA -n $owfn --match $og"
+cmd="$FIONA -n $owfn -t match $og"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.match.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"

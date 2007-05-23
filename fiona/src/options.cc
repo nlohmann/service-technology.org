@@ -65,13 +65,6 @@ std::ostream * log_output = &std::cout;   // &std::clog;
 std::map<possibleOptions,    bool> options;
 std::map<possibleParameters, bool> parameters;
 
-
-// values getopt_long() should return for long options that have no short
-// version. Start with some value that cannot be the value of a char,
-// i.e. 256!!
-#define GETOPTLONG_MATCH       256
-#define GETOPTLONG_PRODUCTOG   257
-
 // long options
 static struct option longopts[] =
 {
@@ -88,8 +81,7 @@ static struct option longopts[] =
   { "BDD",             required_argument, NULL, 'b' },
   { "OnTheFly",        required_argument, NULL, 'B' },
   { "exchangeability", no_argument,       NULL, 'x' },
-  { "match",           required_argument, NULL, GETOPTLONG_MATCH },
-  { "productog",       no_argument,       NULL, GETOPTLONG_PRODUCTOG },
+  { "output",          required_argument, NULL, 'o' },
   { NULL,              0,                 NULL, 0   }
 };
 
@@ -112,9 +104,13 @@ void print_help() {
   trace("                                   4 - yet to be defined ;)\n");
   trace("                                   5 - show detailed information on everything\n");
   trace(" -n | --net=<filename> ......... read input owfn from <filename>\n");
-  trace(" -t | --type=<type> ............ select the modus operandi of fiona, called <type>:\n");
+  trace(" -t | --type=<type> ............ select the modus operandi of fiona, called\n");
+  trace("                                 <type>:\n");
   trace("                                   OG - compute operating guideline\n");
   trace("                                   IG - compute interaction graph (default)\n");
+  trace("                                   match - check if given oWFN (-n) matches\n");
+  trace("                                           with the operating guideline given\n");
+  trace("                                           in [FILE]\n");
   trace("                                   simulation - check whether the first OG\n");
   trace("                                                simulates the second one\n");
   trace("                                   productog  - calculate the product OG of all\n");
@@ -123,7 +119,8 @@ void print_help() {
   trace("                                 to <level>\n");
   trace(" -e | --eventsmaximum=<level>    set event to occur at most <level> times\n");
   trace("                                 (default is 1)\n");
-  trace("                                 (-1 means disabling -e option -- only possible if -m option is set)\n");
+  trace("                                 (-1 means disabling -e option -- only possible\n");
+  trace("                                 if -m option is set)\n");
   trace("                                 (only relevant for OG)\n");
   trace(" -r | --reduceIG ............... use reduction rules for IG\n");
   trace(" -s | --show=<parameter> ....... different display options <parameter>:\n");
@@ -163,13 +160,11 @@ void print_help() {
   trace("                                   19 - CUDD_REORDER_LINEAR_CONVERGE\n");
   trace("                                   20 - CUDD_REORDER_LAZY_SIFT\n");
   trace("                                   21 - CUDD_REORDER_EXACT\n");
-  trace(" -B | --OnTheFly=<reordering> ...enable BDD construction on the fly\n");
+  trace(" -B | --OnTheFly=<reordering> .. enable BDD construction on the fly\n");
   trace("                                 (only relevant for OG)\n");
   trace("                                 argument <reordering> specifies reodering\n");
   trace("                                 method (see option -b)\n");
-  trace(" --match=<OG filename> ......... check if given oWFN (-n) matches with\n");
-  trace("                                 operating guideline given in <OG filename>\n");
-  trace(" -o <filename prefix> .......... prefix of the output files\n");
+  trace(" -o | --output=<filename prefix> prefix of the output files\n");
   trace("\n");
   trace("\n");
   trace("For more information see:\n");
@@ -305,6 +300,8 @@ void parse_command_line(int argc, char* argv[]) {
                     options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = false;
                     parameters[P_IG] = true;
+                } else if (string(optarg) == "match") {
+                    options[O_MATCH] = true;
 				} else if (string(optarg) == "simulation") {
 					options[O_SIMULATES] = true;
 				} else if (string(optarg) == "productog") {
@@ -400,17 +397,6 @@ void parse_command_line(int argc, char* argv[]) {
                 options[O_GRAPH_TYPE] = false;
                 parameters[P_IG] = false;
                 parameters[P_OG] = false;
-                break;
-            case GETOPTLONG_MATCH:
-                if (optarg) {
-                    options[O_MATCH] = true;
-                    ogfileToMatch = optarg;
-                } else {
-                    cerr << "Error:\tOG file name missing" << endl
-                         << "\tEnter \"fiona --help\" for more information."
-                         << endl;
-                    exit(1);
-                }
                 break;
             case 'o':
                 if (optarg) {

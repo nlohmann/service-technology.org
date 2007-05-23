@@ -248,6 +248,26 @@ int main(int argc, char ** argv) {
 
     OGFromFile* OGToMatch = NULL;
     if (options[O_MATCH]) {
+        if (ogfiles.size() == 0)
+        {
+            cerr << "Error:\tNo OG file given. You need to pass the OG, "
+                    "that should be matched" << endl
+                 << "\tagainst, on the command line."
+                 << endl
+                 << "\tEnter \"fiona --help\" for more information." << endl;
+            exit(1);
+        }
+
+        if (ogfiles.size() > 1)
+        {
+            cerr << "Error:\tToo many OG files given. You need to pass "
+                    "exactly one OG on the" << endl
+                 << "\tcommand line." << endl
+                 << "\tEnter \"fiona --help\" for more information." << endl;
+            exit(1);
+        }
+
+        ogfileToMatch = *(ogfiles.begin());
         OGToMatch = readog(ogfileToMatch);
     }
 

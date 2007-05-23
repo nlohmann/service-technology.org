@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/23 12:21:19 $
+ * \date    \$Date: 2007/05/23 13:35:22 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.214 $
+ * \version \$Revision: 1.215 $
  *
  * \ingroup petrinet
  */
@@ -60,6 +60,7 @@
 
 using std::pair;
 using std::cerr;
+using std::endl;
 
 
 
@@ -882,15 +883,17 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   }
   else assert(false); ///< this should never happer or we have missed a case
 
+  t12->prefix = t1->prefix;
+
   // copy t1's history to t12
   for (list<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
   {
     roleMap[*role] = t12;
     t12->history.push_back(*role);
-    if (t1->prefix != "" || t2->prefix != "")
+//    if (t1->prefix != "")
     {
-      roleMap[t1->prefix + *role] = t12;
-      t12->history.push_back(t1->prefix + *role);
+//      roleMap[t1->prefix + *role] = t12;
+//      t12->history.push_back(t1->prefix + *role);
     }
   }
 
@@ -899,16 +902,15 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   {
     roleMap[*role] = t12;
     t12->history.push_back(*role);
-    if (t1->prefix != "" || t2->prefix != "")
+//    if (t1->prefix != "" || t2->prefix != "")
     {
-      roleMap[t2->prefix + *role] = t12;
-      t12->history.push_back(t2->prefix + *role);
+//      roleMap[t2->prefix + *role] = t12;
+//      t12->history.push_back(t2->prefix + *role);
     }
   }
 
-  // merge pre- and postsets for t12
-  t12->preset=setUnion(t1->preset, t2->preset);
-  t12->postset=setUnion(t1->postset, t2->postset);
+  roleMap[t1->nodeFullName()] = t12;
+  roleMap[t2->nodeFullName()] = t12;
 
   // create the weighted arcs for t12
   
@@ -945,9 +947,7 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
     if (sametarget)
     {
       int weightsave = arc_weight(t12,(*n));
-      cerr << ".";
       removeArc(*delArc);
-      cerr << "." << std::endl;
       newArc(t12, (*n), STANDARD, (arc_weight(t2,(*n)) + weightsave));
       sametarget = false;
     }

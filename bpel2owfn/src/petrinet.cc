@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/23 13:35:22 $
+ * \date    \$Date: 2007/05/23 13:45:39 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.215 $
+ * \version \$Revision: 1.216 $
  *
  * \ingroup petrinet
  */
@@ -911,6 +911,10 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 
   roleMap[t1->nodeFullName()] = t12;
   roleMap[t2->nodeFullName()] = t12;
+
+  // merge pre- and postsets for t12
+  t12->preset=setUnion(t1->preset, t2->preset);
+  t12->postset=setUnion(t1->postset, t2->postset);
 
   // create the weighted arcs for t12
   

@@ -26,17 +26,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/05/03 10:28:42 $
+ * \date    \$Date: 2007/05/23 12:21:19 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.97 $
+ * \version \$Revision: 1.98 $
  *
  * \ingroup petrinet
  */
@@ -134,7 +134,7 @@ string Node::nodeShortName() const
  */
 string Node::nodeName() const
 {
-  string result = history[0];
+  string result = *history.begin();
 
   if ( type == INTERNAL || nodeType == TRANSITION )
   {
@@ -156,7 +156,7 @@ string Node::nodeName() const
  */
 string Node::nodeFullName() const
 {
-  string result = history[0];
+  string result = *history.begin();
 
   if ( type == INTERNAL || nodeType == TRANSITION )
     result = prefix + result;
@@ -176,13 +176,13 @@ string Node::nodeFullName() const
  */
 string Place::nodeShortName() const
 {
-  if (history[0].find("link") != string::npos || history[0].find("!link") != string::npos)
-    return history[0];
+  if (history.begin()->find("link") != string::npos || history.begin()->find("!link") != string::npos)
+    return *history.begin();
 
   if (type == INTERNAL)
     return ("p" + toString(id));
   
-  return history[0];
+  return *history.begin();
 }
 
 
@@ -243,7 +243,7 @@ void PetriNet::output_info(ostream *output) const
   {
     (*output) << (*p)->nodeShortName() << "\tinternal";
 
-    for (vector<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
+    for (list<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
       if (role == (*p)->history.begin())
 	(*output) << "\t" + (*p)->prefix + *role + "\n";
       else
@@ -255,7 +255,7 @@ void PetriNet::output_info(ostream *output) const
   {
     (*output) << (*p)->nodeShortName() << "\tinput   ";
 
-    for (vector<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
+    for (list<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
       if (role == (*p)->history.begin())
 	(*output) << "\t" + (*p)->prefix + *role + "\n";
       else
@@ -267,7 +267,7 @@ void PetriNet::output_info(ostream *output) const
   {
     (*output) << (*p)->nodeShortName() << "\toutput  ";
 
-    for (vector<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
+    for (list<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
       if (role == (*p)->history.begin())
 	(*output) << "\t" + (*p)->prefix + *role + "\n";
       else
@@ -282,7 +282,7 @@ void PetriNet::output_info(ostream *output) const
   {
     (*output) << (*t)->nodeShortName() + "\t";
 
-    for (vector<string>::iterator role = (*t)->history.begin(); role != (*t)->history.end(); role++)
+    for (list<string>::iterator role = (*t)->history.begin(); role != (*t)->history.end(); role++)
       if (role == (*t)->history.begin())
 	(*output) << (*t)->prefix + *role + "\n";
       else
@@ -374,54 +374,54 @@ string Transition::output_dot() const
   // add labels for transitions with singleton history
 
   // internal activities
-  if (history.size() == 1 && history[0].find("internal.empty") != string::npos)
+  if (history.size() == 1 && history.begin()->find("internal.empty") != string::npos)
     result += "label=\"empty\" fillcolor=gray";
-  if (history.size() == 1 && history[0].find("internal.assign") != string::npos)
+  if (history.size() == 1 && history.begin()->find("internal.assign") != string::npos)
     result += "label=\"asgn\" fillcolor=gray";
-  if (history.size() == 1 && history[0].find("internal.opaqueActivity") != string::npos)
+  if (history.size() == 1 && history.begin()->find("internal.opaqueActivity") != string::npos)
     result += "label=\"opque\" fillcolor=gray";
 
   // communicating activities
-  if (history.size() == 1 && history[0].find("internal.receive") != string::npos)
+  if (history.size() == 1 && history.begin()->find("internal.receive") != string::npos)
     result += "label=\"recv\"";
-  if (history.size() == 1 && history[0].find("internal.reply") != string::npos)
+  if (history.size() == 1 && history.begin()->find("internal.reply") != string::npos)
     result += "label=\"reply\"";
-  if (history.size() == 1 && history[0].find("internal.invoke") != string::npos)
+  if (history.size() == 1 && history.begin()->find("internal.invoke") != string::npos)
     result += "label=\"invk\"";
-  if (history.size() == 1 && history[0].find("internal.onMessage_") != string::npos)
+  if (history.size() == 1 && history.begin()->find("internal.onMessage_") != string::npos)
     result += "label=\"on\\nmsg\"";
-  if (history.size() == 1 && history[0].find(".onEvent.") != string::npos)
+  if (history.size() == 1 && history.begin()->find(".onEvent.") != string::npos)
     result += "label=\"on\\nevent\"";
 
   // structured activities
-  if (history.size() == 1 && history[0].find("internal.case") != string::npos)
+  if (history.size() == 1 && history.begin()->find("internal.case") != string::npos)
     result += "label=\"case\" fillcolor=azure2";
-  if (history.size() == 1 && history[0].find("internal.onAlarm") != string::npos)
+  if (history.size() == 1 && history.begin()->find("internal.onAlarm") != string::npos)
     result += "label=\"on\\nalarm\" fillcolor=azure2";
-  if (history.size() == 1 && history[0].find("internal.split") != string::npos)
+  if (history.size() == 1 && history.begin()->find("internal.split") != string::npos)
     result += "label=\"flow\\nsplit\" fillcolor=azure2";
-  if (history.size() == 1 && history[0].find("internal.join") != string::npos)
+  if (history.size() == 1 && history.begin()->find("internal.join") != string::npos)
     result += "label=\"flow\\njoin\" fillcolor=azure2";
-  if (history.size() == 1 && history[0].find("internal.leave") != string::npos)
+  if (history.size() == 1 && history.begin()->find("internal.leave") != string::npos)
     result += "label=\"leave\\nloop\" fillcolor=azure2";
-  if (history.size() == 1 && history[0].find("internal.loop") != string::npos)
+  if (history.size() == 1 && history.begin()->find("internal.loop") != string::npos)
     result += "label=\"enter\\nloop\" fillcolor=azure2";
 
   // everything about links
-  if (history.size() == 1 && history[0].find(".setLinks") != string::npos)
+  if (history.size() == 1 && history.begin()->find(".setLinks") != string::npos)
     result += "label=\"tc\" fillcolor=darkseagreen1";
-  if (history.size() == 1 && history[0].find(".evaluate") != string::npos)
+  if (history.size() == 1 && history.begin()->find(".evaluate") != string::npos)
     result += "label=\"jc\\neval\" fillcolor=darkseagreen1";
-  if (history.size() == 1 && history[0].find(".skip") != string::npos)
+  if (history.size() == 1 && history.begin()->find(".skip") != string::npos)
     result += "label=\"skip\" fillcolor=darkseagreen1";
-  if (history.size() == 1 && history[0].find(".reset_false") != string::npos)
+  if (history.size() == 1 && history.begin()->find(".reset_false") != string::npos)
     result += "label=\"reset\\nlink\" fillcolor=darkseagreen1";
-  if (history.size() == 1 && history[0].find(".reset_true") != string::npos)
+  if (history.size() == 1 && history.begin()->find(".reset_true") != string::npos)
     result += "label=\"reset\\nlink\" fillcolor=darkseagreen1";
   
 
   // stopping
-  if (history.size() == 1 && history[0].find(".stopped.") != string::npos)
+  if (history.size() == 1 && history.begin()->find(".stopped.") != string::npos)
     result += "label=\"stop\" fillcolor=darksalmon";
   
 
@@ -644,7 +644,7 @@ void PetriNet::output_pnml(ostream *output) const
     (*output) << "    <place id=\"" << (*p)->nodeName() << "\">" << endl;
 #endif
     (*output) << "      <name>" << endl;
-    (*output) << "        <text>" << (*p)->history[0] << "</text>" << endl;
+    (*output) << "        <text>" << *(*p)->history.begin() << "</text>" << endl;
     (*output) << "      </name>" << endl;
     (*output) << "      <type>" << endl;
     (*output) << "        <text>input</text>" << endl;
@@ -662,7 +662,7 @@ void PetriNet::output_pnml(ostream *output) const
     (*output) << "    <place id=\"" << (*p)->nodeName() << "\">" << endl;
 #endif
     (*output) << "      <name>" << endl;
-    (*output) << "        <text>" << (*p)->history[0] << "</text>" << endl;
+    (*output) << "        <text>" << *(*p)->history.begin() << "</text>" << endl;
     (*output) << "      </name>" << endl;
     (*output) << "      <type>" << endl;
     (*output) << "        <text>output</text>" << endl;
@@ -680,7 +680,7 @@ void PetriNet::output_pnml(ostream *output) const
     (*output) << "    <place id=\"" << (*p)->nodeName() << "\">" << endl;
 #endif
     (*output) << "      <name>" << endl;
-    (*output) << "        <text>" << (*p)->history[0] << "</text>" << endl;
+    (*output) << "        <text>" << *(*p)->history.begin() << "</text>" << endl;
     (*output) << "      </name>" << endl;
     if ((*p)->tokens > 0)
     {
@@ -702,7 +702,7 @@ void PetriNet::output_pnml(ostream *output) const
     (*output) << "    <transition id=\"" << (*t)->nodeName() << "\">" << endl;
 #endif
     (*output) << "      <name>" << endl;
-    (*output) << "        <text>" << (*t)->history[0] << "</text>" << endl;
+    (*output) << "        <text>" << *(*t)->history.begin() << "</text>" << endl;
     (*output) << "      </name>" << endl;
     (*output) << "    </transition>" << endl << endl;
   }

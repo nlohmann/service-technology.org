@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/22 15:10:03 $
+ * \date    \$Date: 2007/05/23 12:21:19 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.149 $
+ * \version \$Revision: 1.150 $
  *
  * \ingroup petrinet
  */
@@ -62,6 +62,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <list>
 #include <deque>
 
 using std::string;
@@ -69,6 +70,7 @@ using std::vector;
 using std::deque;
 using std::set;
 using std::map;
+using std::list;
 using std::pair;
 using std::ostream;
 
@@ -196,7 +198,7 @@ class Node
 
   protected:
     /// the set of roles (i.e. the history) of the node
-    vector<string> history;
+    list<string> history;
 
     /// the id of the node
     unsigned int id;

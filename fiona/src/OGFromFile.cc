@@ -495,6 +495,7 @@ OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
 	// therefore, we perform a coordinated dfs through OG and the rhs OG
 	buildProductOG(currentOGNode, currentRhsNode, productOG);	    
 
+	productOG->removeFalseNodes();
 	trace(TRACE_5, "OGFromFile::product(const OGFromFile* rhs): end\n");
 
 	return productOG;

@@ -127,6 +127,11 @@ public:
     virtual void removeLiteral(const std::string&);
     virtual CommGraphFormula* getDeepCopy() const = 0;
     threeValueLogic equals();
+
+    /**
+     * Returns this formula in conjunctive normal form. The caller is
+     * responsible for deleting the newly created and returned formula.
+     */
     CNF_formula *getCNF();
 };
 
@@ -261,7 +266,14 @@ public:
     CommGraphFormulaMultiaryAnd();
     CommGraphFormulaMultiaryAnd(CommGraphFormula* subformula_);
     CommGraphFormulaMultiaryAnd(CommGraphFormula* lhs, CommGraphFormula* rhs);
+
+    /**
+     * Returns the merged equivalent to this formula. Merging gets rid of
+     * unnecessary nesting of subformulas. (a*(b*c)) becomes (a*b*c). The
+     * caller is responsible for deleting the returned newly created formula.
+     */
     CommGraphFormulaMultiaryAnd* merge();
+
     virtual CommGraphFormulaMultiaryAnd* getDeepCopy() const;
 
 
@@ -288,7 +300,14 @@ public:
     CommGraphFormulaMultiaryOr();
     CommGraphFormulaMultiaryOr(CommGraphFormula* subformula_);
     CommGraphFormulaMultiaryOr(CommGraphFormula* lhs, CommGraphFormula* rhs);
-    CommGraphFormulaMultiaryOr* merge(); 
+
+    /**
+     * Returns the merged equivalent to this formula. Merging gets rid of
+     * unnecessary nesting of subformulas. (a+(b+c)) becomes (a+b+c). The
+     * caller is responsible for deleting the returned newly created formula.
+     */
+    CommGraphFormulaMultiaryOr* merge();
+
     bool implies(CommGraphFormulaMultiaryOr *);
     virtual CommGraphFormulaMultiaryOr* getDeepCopy() const;
 
@@ -314,7 +333,9 @@ public:
     
     //** destroys the CNF and all its clauses
     virtual ~CNF_formula() {};
-    
+
+    virtual CNF_formula* getDeepCopy() const;
+
     //** adds a clause to the CNF
     void addClause(CommGraphFormulaMultiaryOr* clause);
 

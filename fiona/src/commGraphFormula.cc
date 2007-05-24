@@ -120,7 +120,7 @@ CNF_formula *CommGraphFormula::getCNF() {
         CommGraphFormulaMultiaryOr *clause = new CommGraphFormulaMultiaryOr;
         trace(TRACE_5, "literal.\n");
 
-        clause->addSubFormula(this);
+        clause->addSubFormula(this->getDeepCopy());
         cnf->addClause(clause);
         return cnf; 
     }
@@ -128,7 +128,7 @@ CNF_formula *CommGraphFormula::getCNF() {
     // CNF(cnf) = cnf 
     if(dynamic_cast<CNF_formula*>(this)) {
         trace(TRACE_5, "CNF.\n");
-        return dynamic_cast<CNF_formula*>(this);
+        return dynamic_cast<CNF_formula*>(this)->getDeepCopy();
     }
 
     // CNF(phi AND psi) = CNF(phi) AND CNF(psi) 
@@ -138,8 +138,9 @@ CNF_formula *CommGraphFormula::getCNF() {
             i != dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)->end(); i++) {
             CNF_formula *temp = dynamic_cast<CommGraphFormula*>(*i)->getCNF();
             for(CNF_formula::iterator j = temp->begin(); j != temp->end(); j++) {
-                cnf->addClause(dynamic_cast<CommGraphFormulaMultiaryOr*>(*j));
-            } 
+                cnf->addClause(dynamic_cast<CommGraphFormulaMultiaryOr*>(*j)->getDeepCopy());
+            }
+            delete temp;
         }
         return cnf;
     }
@@ -166,30 +167,32 @@ CNF_formula *CommGraphFormula::getCNF() {
 
                 for(CommGraphFormulaMultiaryAnd::iterator j = clause->begin(); j != clause->end(); ++j) {
                     CommGraphFormulaMultiaryOr *disj = new CommGraphFormulaMultiaryOr;
-                    disj->addSubFormula(dynamic_cast<CommGraphFormula*>(*j)); 
+                    disj->addSubFormula(dynamic_cast<CommGraphFormula*>(*j)->getDeepCopy()); 
 
                     for(CommGraphFormulaMultiaryOr::iterator k = temp->begin(); k != temp->end(); ++k) {
                         if(k != i) {
-                            disj->addSubFormula(dynamic_cast<CommGraphFormula*>(*k));
+                            disj->addSubFormula(dynamic_cast<CommGraphFormula*>(*k)->getDeepCopy());
                         }
                     }
 
                     CNF_formula *temp_cnf = disj->getCNF();
                     trace(TRACE_5, "Adding Disjunction " + temp_cnf->asString() + "\n");
                     for(CommGraphFormulaMultiaryAnd::iterator l = temp_cnf->begin(); l != temp_cnf->end(); ++l) {
-                        cnf->addClause(dynamic_cast<CommGraphFormulaMultiaryOr*>(*l)); 
+                        cnf->addClause(dynamic_cast<CommGraphFormulaMultiaryOr*>(*l)->getDeepCopy()); 
                     }
+                    delete temp_cnf;
                 }
             }
         }
         if(final) {
             trace(TRACE_5, "finished.\n");
-            cnf->addClause(temp);
+            cnf->addClause(temp->getDeepCopy());
         }
         else {
             trace(TRACE_5, "not finished.\n"); 
         }
         trace(TRACE_5, "Returning: " + cnf->asString() + "\n");
+        delete temp;
         return cnf;
     }
 
@@ -362,17 +365,23 @@ CommGraphFormulaMultiaryAnd* CommGraphFormulaMultiaryAnd::merge() {
             CommGraphFormulaMultiaryAnd *temp = dynamic_cast<CommGraphFormulaMultiaryAnd*>(*i);
             for(CommGraphFormulaMultiaryAnd::iterator j = temp->begin();
                 j != temp->end(); j++) {
-            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*j));
+            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*j)->getDeepCopy());
             }
         }
         else {
-            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*i));
+            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*i)->getDeepCopy());
         }
     }
     trace(TRACE_5, result->asString() + "\n");
 
-    if(final) return result;
-    else return result->merge();
+    if (final) {
+        return result;
+    }
+
+    CommGraphFormulaMultiaryAnd* oldResult = result;
+    result = result->merge();
+    delete oldResult;
+    return result;
 }
 
 
@@ -446,17 +455,23 @@ CommGraphFormulaMultiaryOr* CommGraphFormulaMultiaryOr::merge() {
             CommGraphFormulaMultiaryOr *temp = dynamic_cast<CommGraphFormulaMultiaryOr*>(*i); 
             for(CommGraphFormulaMultiaryOr::iterator j = temp->begin();
                 j != temp->end(); j++) {
-            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*j)); 
+            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*j)->getDeepCopy()); 
             }
         }
         else {
-            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*i));
+            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*i)->getDeepCopy());
         }
     }
     trace(TRACE_5, result->asString() + "\n");
-    
-    if(final) return result; 
-    else return result->merge(); 
+
+    if (final) {
+        return result;
+    }
+
+    CommGraphFormulaMultiaryOr* oldResult = result;
+    result = result->merge();
+    delete oldResult;
+    return result;
 }
 
 
@@ -506,6 +521,14 @@ CNF_formula::CNF_formula(CommGraphFormulaMultiaryOr* clause_) :
 CNF_formula::CNF_formula(CommGraphFormulaMultiaryOr* clause1_, CommGraphFormulaMultiaryOr* clause2_) :
     CommGraphFormulaMultiaryAnd(clause1_, clause2_) {
     
+}
+
+CNF_formula* CNF_formula::getDeepCopy() const
+{
+    CommGraphFormulaMultiaryAnd* newFormula =
+        CommGraphFormulaMultiaryAnd::getDeepCopy();
+
+    return static_cast<CNF_formula*>(newFormula);
 }
 
 

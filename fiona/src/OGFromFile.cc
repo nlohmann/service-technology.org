@@ -424,12 +424,19 @@ bool OGFromFile::simulatesRecursive ( OGFromFileNode *myNode,
 		return false;
 	
 	trace(TRACE_5, "OGFromFile::simulateRecursive: checking annotations\n");
-	if ( simNode->getAnnotation()->getCNF()->implies(myNode->getAnnotation()->getCNF()) )
+
+	CNF_formula* simNodeAnnotationInCNF = simNode->getAnnotation()->getCNF();
+	CNF_formula* myNodeAnnotationInCNF = myNode->getAnnotation()->getCNF();
+	if (simNodeAnnotationInCNF->implies(myNodeAnnotationInCNF)) {
 		trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations ok\n" );
-	else {
+	} else {
 		trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations incompatible\n");
+		delete simNodeAnnotationInCNF;
+		delete myNodeAnnotationInCNF;
 		return false;
 	}
+	delete simNodeAnnotationInCNF;
+	delete myNodeAnnotationInCNF;
 	
 	//Now, we have to check whether the two graphs are compatible.
 	OGFromFileNode::transitions_t::iterator myTransIter, simTransIter;
@@ -475,11 +482,8 @@ OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
 	std::string currentName;
 	currentName = currentOGNode->getName() + "x" + currentRhsNode->getName();
 
-	CommGraphFormulaMultiaryAnd* currentFormula;
-	currentFormula = new CommGraphFormulaMultiaryAnd(
-	    currentOGNode->getAnnotation()->getDeepCopy(),
-	    currentRhsNode->getAnnotation()->getDeepCopy()
-	);
+	CNF_formula* currentFormula = createProductAnnotation(currentOGNode,
+	    currentRhsNode);
 
 	// building the new root node of the product OG
 	OGFromFileNode* productNode = new OGFromFileNode(currentName,
@@ -564,11 +568,8 @@ void OGFromFile::buildProductOG(OGFromFileNode* currentOGNode,
 				// we computed a new node, so we add a node and an edge
 //				trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
 
-				CommGraphFormulaMultiaryAnd* newProductFormula;
-				newProductFormula = new CommGraphFormulaMultiaryAnd(
-					newOGNode->getAnnotation()->getDeepCopy(),
-					newRhsNode->getAnnotation()->getDeepCopy()
-				);
+				CNF_formula* newProductFormula = createProductAnnotation(
+				    newOGNode, newRhsNode);
 
 				OGFromFileNode* newProductNode = new OGFromFileNode(newProductName, newProductFormula);
 
@@ -582,6 +583,18 @@ void OGFromFile::buildProductOG(OGFromFileNode* currentOGNode,
 		}
 	}
 	trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): end\n");
+}
+
+CNF_formula* OGFromFile::createProductAnnotation(const OGFromFileNode* lhs,
+    const OGFromFileNode* rhs) const
+{
+    CommGraphFormulaMultiaryAnd* conjunction = new CommGraphFormulaMultiaryAnd(
+        lhs->getAnnotation()->getDeepCopy(),
+        rhs->getAnnotation()->getDeepCopy());
+
+    CNF_formula* cnf = conjunction->getCNF();
+    delete conjunction;
+    return cnf;
 }
 
 std::string OGFromFile::getProductOGFilePrefix(const ogfiles_t& ogfiles)

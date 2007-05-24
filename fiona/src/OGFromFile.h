@@ -183,6 +183,13 @@ public:
     OGFromFile* product(const OGFromFile* rhs);
 
     /**
+     * Creates and returns the annotation for the product node of the given two
+     * nodes. The caller is responsible for deleting the returned formula.
+     */
+    CNF_formula* createProductAnnotation(const OGFromFileNode* lhs,
+        const OGFromFileNode* rhs) const;
+
+    /**
      * Produces from the given OG file names the default prefix of the
      * product OG output file.
      */

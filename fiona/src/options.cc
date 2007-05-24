@@ -292,28 +292,30 @@ void parse_command_line(int argc, char* argv[]) {
                 }
                 break;
             case 't':
-                if (string(optarg) == "OG") {
+            {
+                string lc_optarg = toLower(optarg);
+                if (lc_optarg == "og") {
                     options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = true;
                     parameters[P_IG] = false;
-                } else if (string(optarg) == "IG") {
+                } else if (lc_optarg == "ig") {
                     options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = false;
                     parameters[P_IG] = true;
-                } else if (string(optarg) == "match") {
+                } else if (lc_optarg == "match") {
                     options[O_MATCH] = true;
-				} else if (string(optarg) == "simulation") {
+				} else if (lc_optarg == "simulation") {
 					options[O_SIMULATES] = true;
-				} else if (string(optarg) == "productog") {
+				} else if (lc_optarg == "productog") {
 					options[O_PRODUCTOG] = true;
                 } else {
-                    cerr << "Warning:\twrong graph type" << endl
-                         << "\tIG computed" << endl;
-                    options[O_GRAPH_TYPE] = true;
-                    parameters[P_OG] = false;
-                    parameters[P_IG] = true;
+                    cerr << "Error:\twrong graph type" << endl
+                         << "\tEnter \"fiona --help\" for more information."
+                         << endl;
+                    exit(1);
                 }
                 break;
+            }
             case 'm':
                 options[O_MESSAGES_MAX] = true;
                 testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary(

@@ -216,6 +216,7 @@ public:
     virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const = 0;
 
     void addSubFormula(CommGraphFormula* subformula);
+    void removeSubFormula(iterator subformula);
     virtual void removeLiteral(const std::string&);
     void deepCopyMultiaryPrivateMembersToNewFormula(
         CommGraphFormulaMultiary* newFormula) const;
@@ -330,7 +331,7 @@ public:
     //** constructs a new CNF and adds the clause to the CNF
     CNF_formula(CommGraphFormulaMultiaryOr* clause);
     CNF_formula(CommGraphFormulaMultiaryOr* clause1, CommGraphFormulaMultiaryOr* clause2);
-    
+
     //** destroys the CNF and all its clauses
     virtual ~CNF_formula() {};
 
@@ -340,6 +341,11 @@ public:
     void addClause(CommGraphFormulaMultiaryOr* clause);
 
     bool implies(CNF_formula *);
+
+    /**
+     * Simplifies the formula by removing redundant clauses.
+     */
+    void simplify();
 };
 
 

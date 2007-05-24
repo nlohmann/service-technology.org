@@ -268,6 +268,11 @@ void CommGraphFormulaMultiary::addSubFormula(CommGraphFormula* subformula) {
 }
 
 
+void CommGraphFormulaMultiary::removeSubFormula(iterator subformula) {
+    subFormulas.erase(subformula);
+}
+
+
 void CommGraphFormulaMultiary::removeLiteral(const std::string& name) {
 	
 	trace(TRACE_5, "CommGraphFormulaMultiary::removeLiteral(const std::string& name) : start\n");
@@ -481,6 +486,12 @@ bool CommGraphFormulaMultiaryOr::implies(CommGraphFormulaMultiaryOr *op) {
 
     trace(TRACE_5, this->asString() + " -> " + op->asString() + " ? ... "); 
 
+    // CNF_formula::simplify() depends on this if clause to remove superfluous
+    // true-clauses.
+    if (op->equals() == TRUE) {
+        return true;
+    }
+
     for(CommGraphFormulaMultiaryOr::iterator i = this->begin(); i != this->end(); i++) {
         result = false;
         for(CommGraphFormulaMultiaryOr::iterator j = op->begin(); j != op->end(); j++) {
@@ -572,6 +583,34 @@ bool CNF_formula::implies(CNF_formula *op) {
  
     trace(TRACE_5, "Implication succesfull.\n");
     return true;
+}
+
+void CNF_formula::simplify()
+{
+    for (CNF_formula::const_iterator iLhs = begin(); iLhs != end(); ++iLhs) {
+        CommGraphFormulaMultiaryOr* lhs =
+            dynamic_cast<CommGraphFormulaMultiaryOr*>(*iLhs);
+        assert(lhs != NULL);
+        CNF_formula::const_iterator iRhs = begin();
+        while (iRhs != end())
+        {
+            if (iLhs == iRhs) {
+                ++iRhs;
+                continue;
+            }
+
+            CommGraphFormulaMultiaryOr* rhs =
+                dynamic_cast<CommGraphFormulaMultiaryOr*>(*iRhs);
+            assert(rhs != NULL);
+            if (lhs->implies(rhs)) {
+                CNF_formula::const_iterator iOldRhs = iRhs++;
+                delete *iOldRhs;
+                removeSubFormula(iOldRhs);
+            } else {
+                ++iRhs;
+            }
+        }
+    }
 }
 
 

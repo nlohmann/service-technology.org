@@ -594,6 +594,7 @@ CNF_formula* OGFromFile::createProductAnnotation(const OGFromFileNode* lhs,
 
     CNF_formula* cnf = conjunction->getCNF();
     delete conjunction;
+    cnf->simplify();
     return cnf;
 }
 

@@ -227,8 +227,8 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_SIMULATES] = false;
     options[O_OUTFILEPREFIX] = false;
 
-    options[O_MESSAGES_MAX] = false;
-    options[O_EVENT_USE_MAX] = true;
+    options[O_MESSAGES_MAX] = true;
+    options[O_EVENT_USE_MAX] = false;
 
     // initialize parameters
     parameters[P_IG] = true;
@@ -242,7 +242,7 @@ void parse_command_line(int argc, char* argv[]) {
     bdd_reordermethod = 0;
 
     messages_manual = 1;
-    events_manual = 1;
+    events_manual = -1;
 
     // evaluate options and set parameters
     trace(TRACE_0, "\n");

@@ -54,8 +54,7 @@ else
     result5=$?
 
     if [ $result5 -ne 0 ] ; then
-        echo     ... FAILED
-        echo
+        echo ... failed to build BDD
     fi
 
     if test \( $result5 -eq 0 \) -a \
@@ -86,18 +85,14 @@ else
     resultNodesMP=$?
     echo $OUTPUT | grep "BDD_ANN: number of nodes: $nodes_ann" > /dev/null
     resultNodesANN=$?
-    
+
     if [ $resultNodesMP -ne 0 ] ; then
-        echo     ... FAILED
-        echo Number of nodes of BDD_MP is incorrect.
-        echo
+        echo ... failed to build BDD_MP correct
         result=1
     fi
 
     if [ $resultNodesANN -ne 0 ] ; then
-        echo     ... FAILED
-        echo Number of nodes of BDD_ANN is incorrect.
-        echo
+        echo ... failed to build BDD_ANN correctly
         result=1
     fi
 
@@ -110,7 +105,7 @@ owfn_reference="$testdir/bdd_ref/sequence3_reference.owfn"
 cmd="$FIONA -n $owfn -a -b 4 -t OG"
 $cmd 2>/dev/null 1>/dev/null
 
-cmd="$FIONA -n $owfn -n $owfn_reference -x"
+cmd="$FIONA -n $owfn -n $owfn_reference -t equivalence"
 
 
 if [ "$memcheck" = "yes" ]; then
@@ -122,11 +117,9 @@ else
     OUTPUT=`$cmd 2>&1`
     echo $OUTPUT | grep "The two operating guidelines are equal: YES" > /dev/null
     resultEqual=$?
-    
+
     if [ $resultEqual -ne 0 ] ; then
-        echo     ... FAILED
-        echo The two operating guidelines are not equal although they should be.
-        echo
+        echo "... failed (the two operating guidelines are not equal although they should be)"
         result=1
     fi
 fi
@@ -151,18 +144,14 @@ else
     resultNodesMP=$?
     echo $OUTPUT | grep "BDD_ANN: number of nodes: $nodes_ann" > /dev/null
     resultNodesANN=$?
-    
+
     if [ $resultNodesMP -ne 0 ] ; then
-        echo     ... FAILED
-        echo Number of nodes of BDD_MP is incorrect.
-        echo
+        echo ... failed to build BDD_MP correctly
         result=1
     fi
 
     if [ $resultNodesANN -ne 0 ] ; then
-        echo     ... FAILED
-        echo Number of nodes of BDD_ANN is incorrect.
-        echo
+        echo ... failed to build BDD_ANN correctly
         result=1
     fi
 
@@ -175,7 +164,7 @@ owfn_reference="$testdir/bdd_ref/phcontrol4.unf_reference.owfn"
 cmd="$FIONA -n $owfn -a -b 4 -t OG"
 $cmd 2>/dev/null 1>/dev/null
 
-cmd="$FIONA -n $owfn -n $owfn_reference -x"
+cmd="$FIONA -n $owfn -n $owfn_reference -t equivalence"
 
 
 if [ "$memcheck" = "yes" ]; then
@@ -187,11 +176,9 @@ else
     OUTPUT=`$cmd 2>&1`
     echo $OUTPUT | grep "The two operating guidelines are equal: YES" > /dev/null
     resultEqual=$?
-    
+
     if [ $resultEqual -ne 0 ] ; then
-        echo     ... FAILED
-        echo The two operating guidelines are not equal although they should be.
-        echo
+        echo "... failed (the two operating guidelines are not equal although they should be)"
         result=1
     fi
 fi

@@ -136,6 +136,9 @@ void Exchangeability::loadBdd(char* filename){
     	
     	if (fpMp == NULL || fpAnn == NULL){
     		cerr << "cannot open cudd-files of " << filename << "\n";
+    		cerr << "\nTo check equivalence of two nets, the BDD representations of"
+    		     << "\nthe corresponding OGs must have been computed before.\n"
+                 << "\nEnter \"fiona --help\" for more information" << endl;
             exit(4);
     	}
 	}

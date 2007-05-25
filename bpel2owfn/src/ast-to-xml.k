@@ -28,11 +28,11 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/05/03 08:09:54 $
+ * \date    \$Date: 2007/05/25 10:59:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  *
  * \todo    Add support for the <terminationHandler>
  */
@@ -54,7 +54,7 @@
   PROCESS
 ******************************************************************************/
 
-Process(a,b,c,d,e,g,i,_id) ->
+Process(a,b,messageExchange,c,d,e,g,i,_id) ->
   [xml: { inup(); } "<process id=\"" _id "\"" { listAttributes( _id ); } ">\n" 
   
   { if (a->length() == 0) }
@@ -454,7 +454,7 @@ Link(_id) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,i,j,_id) ->
+Scope(a,b,messageExchange,c,d,e,f,g,i,j,_id) ->
   [xml: { inup(); } "<scope id=\"" _id "\"" { listAttributes( _id ); } ">\n" 
   
   a

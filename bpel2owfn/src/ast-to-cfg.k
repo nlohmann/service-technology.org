@@ -28,11 +28,11 @@
  * associated control flow block.
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  *         
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/05/03 08:09:54 $
+ * \date    \$Date: 2007/05/25 10:59:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  */
 %}
 
@@ -54,7 +54,7 @@
   PROCESS
 ******************************************************************************/
 
-Process(a,b,c,d,e,g,i,j) ->
+Process(a,b,messageExchange,c,d,e,g,i,j) ->
   [cfg: {
           // reset data structures
 	  globals::cfgMap = map<std::string, CFGBlock *>();
@@ -852,7 +852,7 @@ Pick(a,b,c,d) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,i,j,_id) ->
+Scope(a,b,messageExchange,c,d,e,f,g,i,j,_id) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Scope\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGScope, $0->id, "Scope_begin"); 

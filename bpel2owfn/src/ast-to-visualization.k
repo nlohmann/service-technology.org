@@ -31,7 +31,7 @@
  * 
  * \since   2007-04-18
  *
- * \date    \$Date: 2007/05/21 13:18:20 $
+ * \date    \$Date: 2007/05/25 10:59:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  *
  */
 
@@ -52,7 +52,7 @@
   PROCESS
 ******************************************************************************/
 
-Process(a,b,c,d,e,g,i,_id) ->
+Process(a,b,messageExchange,c,d,e,g,i,_id) ->
   [visualization: 
   
   { 
@@ -860,7 +860,7 @@ Link(_id) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,i,j,_id) ->
+Scope(a,b,messageExchange,c,d,e,f,g,i,j,_id) ->
   [visualization: 
   {
     (*output) << "subgraph cluster" << toString(_id->value+1000) << " { label = \"Scope\";" << endl;  

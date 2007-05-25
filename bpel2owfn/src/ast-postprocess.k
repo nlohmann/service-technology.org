@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/16 11:52:39 $
+ * \date    \$Date: 2007/05/25 10:59:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.175 $
+ * \version \$Revision: 1.176 $
  */
 %}
 
@@ -52,7 +52,7 @@
   PROCESS
 ******************************************************************************/
 
-Process(a,b,c,d,e,g,i,_id) ->
+Process(a,b,messageExchange,c,d,e,g,i,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);
@@ -80,7 +80,7 @@ Process(a,b,c,d,e,g,i,_id) ->
 
       myself->enclosedFH = e->id;
     }
-    a b c d
+    a b messageExchange c d
     i // inner activity
     e g
     {
@@ -770,6 +770,26 @@ Variable(_id) ->
       myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
       myself->defineVariable();
+    }
+  ]
+;
+
+
+/******************************************************************************
+  MESSAGE EXCHANGES
+******************************************************************************/
+
+MessageExchange(_id) ->
+  [postprocessing:
+    {
+      assert(_id != NULL);
+      unsigned int myid = _id->value;
+      ASTE *myself = globals::ASTEmap[myid];
+      assert(myself != NULL);
+
+      myself->parentScopeId = globals::PPcurrentScope;
+      myself->checkAttributes();
+      myself->defineMessageExchange();
     }
   ]
 ;
@@ -2091,7 +2111,7 @@ ForEach(a,b,c,d,e,_id) ->
       // trigger [SA00076]
       with (e)
       {
-        e=Scope(*,_variables,*,*,*,*,*,*,*,*):
+        e=Scope(*,_variables,messageExchange,*,*,*,*,*,*,*,*):
           {
             foreach (variable=Variable(_id2); tVariable_list _variables)
             {
@@ -2122,7 +2142,7 @@ ForEach(a,b,c,d,e,_id) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,i,j,_id) ->
+Scope(a,b,messageExchange,c,d,e,f,g,i,j,_id) ->
   [postprocessing:
     {
       assert(_id != NULL);

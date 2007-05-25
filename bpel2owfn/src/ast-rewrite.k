@@ -40,11 +40,11 @@
  *           - Invoke
  *   
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2007/05/21 12:58:45 $
+ * \date    \$Date: 2007/05/25 10:59:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -53,7 +53,7 @@
  * \note    This file was created using Kimwitu++ reading file ast-rewrite.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 %}
 
@@ -139,6 +139,7 @@ activityInvoke(
     Scope(
       my_standardElements,
       NiltVariable_list(),
+      NiltMessageExchange_list(),
       FaultHandlers(
         my_tCatchList,
         my_tCatchAll,
@@ -264,6 +265,7 @@ activityScope(
   Scope(
     my_standardElements,
     my_variables,
+    my_messageExchanges,
     FaultHandlers(
       NiltCatch_list(),
       NoCatchAll(),
@@ -284,6 +286,7 @@ activityScope(
     Scope(
       my_standardElements,
       my_variables,
+      my_messageExchanges,
       volatile_standardFaultHandlers(
         my_fh_integer
       ),

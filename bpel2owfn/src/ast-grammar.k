@@ -29,11 +29,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: znamirow $ 
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2007/05/06 10:26:15 $
+ * \date    \$Date: 2007/05/25 10:59:37 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file ast-grammar.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.174 $
+ * \version \$Revision: 1.175 $
  */
 %}
 
@@ -74,6 +74,7 @@ tProcess:
   Process(
       tPartnerLink_list
       tPartner_list
+      tMessageExchange_list
       tVariable_list
       tCorrelationSet_list
       tFaultHandlers
@@ -216,6 +217,16 @@ tVariable_list: list tVariable;
 
 tVariable:
   Variable(integer)
+;
+
+/******************************************************************************
+  MESSAGE EXCHANGES
+******************************************************************************/
+
+tMessageExchange_list: list tMessageExchange;
+
+tMessageExchange:
+  MessageExchange(integer)
 ;
 
 
@@ -475,6 +486,7 @@ tScope:
   Scope(
       standardElements
       tVariable_list
+      tMessageExchange_list
       tFaultHandlers
       tCompensationHandler
       tTerminationHandler
@@ -588,6 +600,7 @@ expression:
 %ctor FromPart()			{ CTOR(K_FROMPART) }
 %ctor If() 				{ CTOR(K_IF) }
 %ctor Link()				{ CTOR(K_LINK) }
+%ctor MessageExchange()			{ CTOR(K_MESSAGEEXCHANGE) }
 %ctor NoElse()				{ CTOR(K_ELSE) }
 %ctor OnAlarm()				{ CTOR(K_ONALARM) }
 %ctor OnMessage()			{ CTOR(K_ONMESSAGE) }

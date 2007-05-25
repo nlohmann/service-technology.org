@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/18 09:44:43 $
+ * \date    \$Date: 2007/05/25 10:59:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.121 $
+ * \version \$Revision: 1.122 $
  */
 
 
@@ -977,6 +977,18 @@ string ASTE::defineVariable()
 }
 
 
+/*!
+ * \brief defines a messageExchange
+ */
+string ASTE::defineMessageExchange()
+{
+  string name = toString(parentScopeId) + "." + attributes["name"];
+
+  if (!(globals::ASTE_messageExchangeNames.find(name) != globals::ASTE_messageExchangeNames.end()))
+    globals::ASTE_messageExchangeNames.insert(name);
+
+  return name;
+}
 
 
 

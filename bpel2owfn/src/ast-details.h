@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/14 09:02:55 $
+ * \date    \$Date: 2007/05/25 10:59:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.82 $
+ * \version \$Revision: 1.83 $
  */
 
 
@@ -260,6 +260,7 @@ class ASTE
 
     string defineCorrelationSet();
     string defineVariable();
+    string defineMessageExchange();
     string defineLink();
     string definePartnerLink();
 

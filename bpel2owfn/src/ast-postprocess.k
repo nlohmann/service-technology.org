@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/25 10:59:37 $
+ * \date    \$Date: 2007/05/27 12:18:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.176 $
+ * \version \$Revision: 1.177 $
  */
 %}
 
@@ -2171,7 +2171,11 @@ Scope(a,b,messageExchange,c,d,e,f,g,i,j,_id) ->
 	globals::ASTEmap[myid]->peerScopes.insert(*peerScope);
       }
 
-      globals::ASTEmap[myself->parentScopeId]->enclosedScopes.insert(myid);
+      // register this scope to be enclosed in the parent scope only if this
+      // scope is embedded to positive control flow (only then in can be
+      // compensated)
+      if (myself->controlFlow == POSITIVECF)
+	globals::ASTEmap[myself->parentScopeId]->enclosedScopes.insert(myid);
 
       myself->hasEH = (string(f->op_name()) == "EventHandlers");
 

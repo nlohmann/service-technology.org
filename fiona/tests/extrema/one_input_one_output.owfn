@@ -3,6 +3,7 @@
 PLACE
 
 INTERNAL
+  initial,
   final
  ;
 
@@ -15,6 +16,7 @@ OUTPUT
  ;
 
 INITIALMARKING
+  initial
  ;
 
 FINALMARKING
@@ -23,6 +25,7 @@ FINALMARKING
 
 TRANSITION t1
 CONSUME
+  initial,
   p0
  ;
 PRODUCE

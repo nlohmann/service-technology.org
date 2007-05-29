@@ -47,7 +47,7 @@ result=0
 
 mycoffeebluenodes_soll=7
 mycoffeeblueedges_soll=9
-mycoffeestoredstates_soll=24
+mycoffeestoredstates_soll=32
 
 owfn="$DIR/myCoffee.owfn"
 cmd="$FIONA -n $owfn -a -t OG"
@@ -318,7 +318,7 @@ fi
 
 shop3bluenodes_soll=12
 shop3blueedges_soll=15
-shop3storedstates_soll=1878
+shop3storedstates_soll=5494
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 cmd="$FIONA -n $owfn -a -t OG"
@@ -356,7 +356,7 @@ fi
 
 shop3bluenodes_soll=12
 shop3blueedges_soll=15
-shop3storedstates_soll=236
+shop3storedstates_soll=978
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 cmd="$FIONA -n $owfn -t OG"
@@ -546,7 +546,7 @@ fi
 
 shop6bluenodes_soll=7
 shop6blueedges_soll=7
-shop6storedstates_soll=4712
+shop6storedstates_soll=14980
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 cmd="$FIONA -n $owfn -a -t OG"
@@ -614,7 +614,7 @@ fi
 
 shop6bluenodes_soll=6
 shop6blueedges_soll=5
-shop6storedstates_soll=3863
+shop6storedstates_soll=2491
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 cmd="$FIONA -n $owfn -a -t IG"

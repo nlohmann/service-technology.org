@@ -34,9 +34,11 @@ FIONA=fiona
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
 rm -f $DIR/*.out
-rm -f $DIR/*.png
+rm -f $DIR/*.OG.png
+rm -f $DIR/*.IG.png
 rm -f $DIR/*.og
 rm -f $DIR/*.log
+rm -f $DIR/*.dot
 
 result=0
 
@@ -47,7 +49,7 @@ zyklusRblueedges_soll=6
 zyklusRstoredstates_soll=0
 
 owfn="$DIR/zyklusR.owfn"
-cmd="$FIONA -a -t OG -n $owfn -e5"
+cmd="$FIONA -a -t OG -n $owfn -e5 -m5"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.a.e5.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"

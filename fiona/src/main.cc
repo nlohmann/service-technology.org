@@ -165,9 +165,6 @@ OGFromFile* readog(const std::string& ogfile) {
 void adjustOptionValues() {
 	// report ...
 
-	if (options[O_MESSAGES_MAX] == true) {
-		trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
-	}
 	trace(TRACE_0, "considering the following events:\n");
 //	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all:\n");
 	trace(TRACE_0, "    sending events:\n" );
@@ -187,6 +184,9 @@ void adjustOptionValues() {
 		} else {
 			trace(TRACE_0, "\t(no limit)\n");
 		}
+	}
+	if (options[O_MESSAGES_MAX]) {
+		trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
 	}
 	
 	trace(TRACE_0, "\n");
@@ -272,7 +272,7 @@ int main(int argc, char ** argv) {
     }
 
 // ---------------- reading all nets ---------------------
-	if (options[O_OWFN_NAME] ) {
+	if (options[O_OWFN_NAME]) {
 		list<char*>::iterator netiter = netfiles.begin();
 		
 		do {
@@ -347,26 +347,22 @@ int main(int argc, char ** argv) {
 #endif
 
 // -------------- calculating the product og -------------
-    if (options[O_PRODUCTOG])
-    {
-        if (OGsFromFiles.size() < 2)
-        {
+    if (options[O_PRODUCTOG]) {
+        if (OGsFromFiles.size() < 2) {
             cerr << "Error: \t Give at least two OGs to build their product!\n" << endl;
             exit(1);
         }
 
         trace("Building product of the following OGs:\n");
         for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
-             iOgFile != ogfiles.end(); ++iOgFile)
-        {
+             iOgFile != ogfiles.end(); ++iOgFile) {
             trace(*iOgFile); trace("\n");
         }
         trace("\n");
 
         OGFromFile* productOG = OGFromFile::product(OGsFromFiles);
 
-        if (!options[O_OUTFILEPREFIX])
-        {
+        if (!options[O_OUTFILEPREFIX]) {
             outfilePrefix = OGFromFile::getProductOGFilePrefix(ogfiles);
         }
 
@@ -379,8 +375,7 @@ int main(int argc, char ** argv) {
         delete productOG;
 
         for (OGFromFile::ogs_t::const_iterator iOg = OGsFromFiles.begin();
-             iOg != OGsFromFiles.end(); ++iOg)
-        {
+             iOg != OGsFromFiles.end(); ++iOg) {
             delete *iOg;
         }
 
@@ -389,15 +384,16 @@ int main(int argc, char ** argv) {
 
 // ------------- simulation on OGFromFile --------------------
 	
-	if ( options[O_SIMULATES] ) {
-		if ( OGsFromFiles.size() == 2 ) {
+	if (options[O_SIMULATES]) {
+		if (OGsFromFiles.size() == 2) {
 			list<OGFromFile*>::iterator OGFFIter = OGsFromFiles.begin();
 			OGFromFile *simulator = *OGFFIter;
 			OGFromFile *simulant = *(++OGFFIter);
-			if ( simulator->simulates(simulant) )
-				trace(TRACE_0, "\nThe first OG simulates the second one.\n" );
-			else
-				trace(TRACE_0, "\nThe first OG doesn't simulate the second one.\n");
+			if (simulator->simulates(simulant)) {
+                trace(TRACE_0, "\nThe first OG simulates the second one.\n" );
+            } else {
+                trace(TRACE_0, "\nThe first OG does not simulate the second one.\n");
+            }
 		}
 		else
 			cerr << "Error: \t If option -S is used, exactly two OG files must be entered\n" << endl;

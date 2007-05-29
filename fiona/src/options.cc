@@ -325,11 +325,12 @@ void parse_command_line(int argc, char* argv[]) {
                 messages_manual = atoi(optarg);
                 break;
             case 'e':
+                options[O_EVENT_USE_MAX] = true;
                 events_manual = atoi(optarg);
-                
                 if (events_manual < 0) {
-                	options[O_EVENT_USE_MAX] = false;                
+                	options[O_EVENT_USE_MAX] = false;
                 }
+
                 break;
             case 's':
                 if (string(optarg) == "blue") {

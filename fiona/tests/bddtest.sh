@@ -69,7 +69,7 @@ fi
 ############################################################################
 
 nodes_mp=28
-nodes_ann=16
+nodes_ann=8
 
 owfn="$DIR/sequence3.owfn"
 cmd="$FIONA -n $owfn -a -b 4 -t OG"
@@ -128,7 +128,7 @@ fi
 ############################################################################
 
 nodes_mp=1562
-nodes_ann=361
+nodes_ann=360
 
 owfn="$testdir/philosophers/phcontrol4.unf.owfn"
 cmd="$FIONA -n $owfn -a -b 4 -t OG"

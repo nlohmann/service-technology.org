@@ -53,8 +53,6 @@ using namespace std;
 communicationGraph::communicationGraph(oWFN * _PN) :
     root(NULL),
     currentVertex(NULL),
-//    global_progress(0),
-//    show_progress(0),
     numberOfNodes(0),
     numberOfEdges(0),
     numberOfBlueNodes(0),
@@ -70,15 +68,14 @@ communicationGraph::communicationGraph(oWFN * _PN) :
 //! \fn communicationGraph::~communicationGraph()
 //! \brief destructor
 communicationGraph::~communicationGraph() {
-	trace(TRACE_5, "communicationGraph::~communicationGraph() : start\n");
-	vertexSet::iterator iter;
-	
-	for (iter = setOfVertices.begin(); iter != setOfVertices.end(); iter++) {
-		delete *iter;
-	}
-	
-//	delete root; 		// not necessary for OG   ...and for IG?????
-	trace(TRACE_5, "communicationGraph::~communicationGraph() : end\n");
+    trace(TRACE_5, "communicationGraph::~communicationGraph() : start\n");
+    vertexSet::iterator iter;
+
+    for (iter = setOfVertices.begin(); iter != setOfVertices.end(); iter++) {
+        delete *iter;
+    }
+
+    trace(TRACE_5, "communicationGraph::~communicationGraph() : end\n");
 }
 
 
@@ -106,7 +103,7 @@ unsigned int communicationGraph::getNumberOfEdges() const {
 }
 
 
-//! \fn unsigned int communicationGraph::getNumberOfBlueNodes() 
+//! \fn unsigned int communicationGraph::getNumberOfBlueNodes()
 //! \return number of blue nodes
 //! \brief returns the number of blue nodes of the graph
 unsigned int communicationGraph::getNumberOfBlueNodes() {
@@ -156,11 +153,11 @@ void communicationGraph::calculateRootNode() {
     currentVertex = root;
 
     numberOfStatesAllNodes += root->reachGraphStateSet.size();
-    
-	numberOfNodes++;
-	numberOfBlueNodes++;
-	
-	setOfVertices.insert(root);
+
+    numberOfNodes++;
+    numberOfBlueNodes++;
+
+    setOfVertices.insert(root);
 
     trace(TRACE_5, "void reachGraph::calculateRootNode(): end\n");
 }
@@ -209,40 +206,40 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
         string label;
         bool comma = false;
         unsigned int offset = 0;
-        
+
         if (type == receiving) {
             offset = PN->getInputPlaceCount();
-        } 
+        }
 
-		if (found == NULL) {
-			// copy the events used from the parent node
-			for (unsigned int i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
-            	toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
-        	}
-		}
-			
+        if (found == NULL) {
+            // copy the events used from the parent node
+            for (unsigned int i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
+                toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
+            }
+        }
+
         for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
             if (comma) {
               label += ", ";
             }
             label += PN->getPlace(*iter)->getLabelForCommGraph();
             comma = true;
-            
+
             unsigned int i = 0;
             if (type == receiving) {
-	            while (i < PN->getOutputPlaceCount() && PN->getOutputPlace(i)->index != *iter) {
-					i++;	
-				}
+                while (i < PN->getOutputPlaceCount() && PN->getOutputPlace(i)->index != *iter) {
+                    i++;
+                }
             } else {
-	            while (i < PN->getInputPlaceCount() && PN->getInputPlace(i)->index != *iter) {
-					i++;	
-				}
+                while (i < PN->getInputPlaceCount() && PN->getInputPlace(i)->index != *iter) {
+                    i++;
+                }
             }
-			if (found == 0) {
-	            toAdd->eventsUsed[offset + i]++;
-			} else {
-				found->eventsUsed[offset + i]++;
-			}
+            if (found == 0) {
+                toAdd->eventsUsed[offset + i]++;
+            } else {
+                found->eventsUsed[offset + i]++;
+            }
         }
 
         if (found == NULL) {
@@ -255,15 +252,15 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             numberOfEdges++;
 
             currentVertex->addSuccessorNode(edgeSucc);
-		//	currentVertex->setAnnotationEdges(edgeSucc);
+            // currentVertex->setAnnotationEdges(edgeSucc);
 
             currentVertex = toAdd;
 
-			if (currentVertex->getColor() != RED) {
-		        graphEdge * edgePred = new graphEdge(currentVertex, label, type);
-				toAdd->addPredecessorNode(edgePred);
-			}
-			
+            if (currentVertex->getColor() != RED) {
+                graphEdge * edgePred = new graphEdge(currentVertex, label, type);
+                toAdd->addPredecessorNode(edgePred);
+            }
+
             setOfVertices.insert(toAdd);
 
             numberOfStatesAllNodes += toAdd->reachGraphStateSet.size();
@@ -278,13 +275,13 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             numberOfEdges++;
 
             currentVertex->addSuccessorNode(edgeSucc);
-		//	currentVertex->setAnnotationEdges(edgeSucc);
+            // currentVertex->setAnnotationEdges(edgeSucc);
 
             if (currentVertex->getColor() != RED) {
-	    	    graphEdge * edgePred = new graphEdge(currentVertex, label, type);
-				found->addPredecessorNode(edgePred);            
+                graphEdge * edgePred = new graphEdge(currentVertex, label, type);
+                found->addPredecessorNode(edgePred);
             }
-            
+
             delete toAdd;
 
             trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
@@ -292,7 +289,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             return false;
         }
     }
-    
+
     return false;
 }
 
@@ -301,37 +298,37 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 //vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type, bool isnew) {
 void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type, bool isnew) {
 
-	trace(TRACE_5, "reachGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type): start\n");
-	// If the last argument is true, then the node toAdd represents a fresh node
-	// that has to be added.
-	
-	// If the last argument is false, then the node toAdd represents the node that
-	// was computed before and only the edge to that node has to be added (and not the node itself).
-	
-	int offset = 0;
+    trace(TRACE_5, "reachGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type): start\n");
+    // If the last argument is true, then the node toAdd represents a fresh node
+    // that has to be added.
+
+    // If the last argument is false, then the node toAdd represents the node that
+    // was computed before and only the edge to that node has to be added (and not the node itself).
+
+    int offset = 0;
 
     assert(numberOfNodes > 0);
     assert(setOfVertices.size() > 0);
-    
+
     string edgeLabel;
     if (type == sending) {
         edgeLabel = PN->getInputPlace(label)->getLabelForCommGraph();
     } else {
         edgeLabel = PN->getOutputPlace(label)->getLabelForCommGraph();
-	}
+    }
 
-//	if (options[O_BDD] == true || isnew) {
+    // if (options[O_BDD] == true || isnew) {
     if (isnew) {
         trace(TRACE_1, "\n\t new successor node computed:");
         toAdd->setNumber(numberOfNodes++);
-        numberOfBlueNodes++;			// all nodes initially blue
+        numberOfBlueNodes++; // all nodes initially blue
 
-		// draw a new edge to the new node
+        // draw a new edge to the new node
         graphEdge * edgeSucc = new graphEdge(toAdd, edgeLabel, type);
         numberOfEdges++;
 
-		currentVertex->addSuccessorNode(edgeSucc);
-//		currentVertex->setAnnotationEdges(edgeSucc);
+        currentVertex->addSuccessorNode(edgeSucc);
+        // currentVertex->setAnnotationEdges(edgeSucc);
 
         for (unsigned int i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
             toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
@@ -342,40 +339,40 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
         }
 
         toAdd->eventsUsed[offset + label]++;
-        
+
         if (currentVertex->getColor() != RED) {
-	        graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
-			toAdd->addPredecessorNode(edgePred);
+            graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
+            toAdd->addPredecessorNode(edgePred);
         }
-        
+
         currentVertex = toAdd;
 
         setOfVertices.insert(toAdd);
 
-       	numberOfStatesAllNodes += toAdd->reachGraphStateSet.size();
+        numberOfStatesAllNodes += toAdd->reachGraphStateSet.size();
 
-		trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
+        trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
 
     } else {
-		trace(TRACE_1, "\t computed successor node already known: " + intToString(toAdd->getNumber()) + "\n");
+        trace(TRACE_1, "\t computed successor node already known: " + intToString(toAdd->getNumber()) + "\n");
 
-		// draw a new edge to the old node
-		graphEdge * edgeSucc = new graphEdge(toAdd, edgeLabel, type);
-		numberOfEdges++;
+        // draw a new edge to the old node
+        graphEdge * edgeSucc = new graphEdge(toAdd, edgeLabel, type);
+        numberOfEdges++;
 
-		currentVertex->addSuccessorNode(edgeSucc);
-	//	currentVertex->setAnnotationEdges(edgeSucc);
+        currentVertex->addSuccessorNode(edgeSucc);
+        // currentVertex->setAnnotationEdges(edgeSucc);
 
-		if (type == receiving) {
-			offset = PN->getInputPlaceCount();
-		}
+        if (type == receiving) {
+            offset = PN->getInputPlaceCount();
+        }
 
-		if (currentVertex->getColor() != RED) {
-	        graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
-			toAdd->addPredecessorNode(edgePred);
-		}
+        if (currentVertex->getColor() != RED) {
+            graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
+            toAdd->addPredecessorNode(edgePred);
+        }
 
-		trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
+        trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
     }
 }
 
@@ -385,31 +382,31 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 //! \brief analyses the node and sets its color
 void communicationGraph::analyseNode(vertex* node) {
 
-	trace(TRACE_5, "communicationGraph::analyseNode(vertex* node) : start\n");
+    trace(TRACE_5, "communicationGraph::analyseNode(vertex* node) : start\n");
 
-	trace(TRACE_3, "\t\t\t analysing node ");
-	trace(TRACE_3, intToString(node->getNumber()) + "...\n");
+    trace(TRACE_3, "\t\t\t analysing node ");
+    trace(TRACE_3, intToString(node->getNumber()) + "...\n");
 
-	assert(node->getColor() == BLUE);
+    assert(node->getColor() == BLUE);
 
-	vertexColor analysedColor;
+    vertexColor analysedColor;
 
-	if (parameters[P_OG]) {
-		// analyse node by its formula
-		analysedColor = node->analyseNodeByFormula();
-	} else {
-		// analyse node by its CNF
-		analysedColor = node->analyseNodeByFormula();
-		//analysedColor = node->analyseNode();
-	}
+    if (parameters[P_OG]) {
+        // analyse node by its formula
+        analysedColor = node->analyseNodeByFormula();
+    } else {
+        // analyse node by its CNF
+        analysedColor = node->analyseNodeByFormula();
+        //analysedColor = node->analyseNode();
+    }
 
-	node->setColor(analysedColor);
+    node->setColor(analysedColor);
 
-	if (node->getColor() == RED) {
-		numberOfBlueNodes--;
-	}
+    if (node->getColor() == RED) {
+        numberOfBlueNodes--;
+    }
 
-	trace(TRACE_5, "communicationGraph::analyseNode(vertex* node) : end\n");
+    trace(TRACE_5, "communicationGraph::analyseNode(vertex* node) : end\n");
 }
 
 
@@ -424,43 +421,43 @@ void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * o
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : start\n");
 
     StateSet::iterator iter;              // iterator over the state set's elements
-  	PN->setOfStatesTemp.clear();
-  	PN->visitedStates.clear();
+    PN->setOfStatesTemp.clear();
+    PN->visitedStates.clear();
 
     for (iter = oldNode->reachGraphStateSet.begin();
          iter != oldNode->reachGraphStateSet.end(); iter++) {
 
-		// get the marking of this state
-		(*iter)->decode(PN);
-		
-		// test for each marking of current node if message bound k reached
-		// then supress new sending event
-		if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
-			if (PN->CurrentMarking[PN->getPlace(input)->index] == messages_manual) {
-				// adding input message to state already using full message bound
-				trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
-			    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
-				newNode->setColor(RED);
-				return;
-			}
-		}
+        // get the marking of this state
+        (*iter)->decode(PN);
+
+        // test for each marking of current node if message bound k reached
+        // then supress new sending event
+        if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
+            if (PN->CurrentMarking[PN->getPlace(input)->index] == messages_manual) {
+                // adding input message to state already using full message bound
+                trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
+                trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
+                newNode->setColor(RED);
+                return;
+            }
+        }
 
         // asserted: adding input message does not violate message bound
-        PN->addInputMessage(input);			// add the input message to the current marking
+        PN->addInputMessage(input); // add the input message to the current marking
 
         if (options[O_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
         } else {
             PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
         }
-        
+
         if (newNode->getColor() == RED) {
-        	// a message bound violation occured during computation of reachability graph
-		    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
-        	return;
+            // a message bound violation occured during computation of reachability graph
+            trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
+            return;
         }
-	}
-    
+    }
+
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
     return;
 }
@@ -475,35 +472,35 @@ void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * o
 void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) : start\n");
 
-  	PN->setOfStatesTemp.clear();
-  	PN->visitedStates.clear();
+    PN->setOfStatesTemp.clear();
+    PN->visitedStates.clear();
 
-	if (TRACE_2 <= debug_level) {
-		for (messageMultiSet::iterator iter1 = input.begin(); iter1 != input.end(); iter1++) {
-			trace(TRACE_2, PN->getPlace(*iter1)->name);
-			trace(TRACE_2, " ");			
-		}
-		trace(TRACE_2, "\n");
-	}
+    if (TRACE_2 <= debug_level) {
+        for (messageMultiSet::iterator iter1 = input.begin(); iter1 != input.end(); iter1++) {
+            trace(TRACE_2, PN->getPlace(*iter1)->name);
+            trace(TRACE_2, " ");
+        }
+        trace(TRACE_2, "\n");
+    }
 
     for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
         (*iter)->decode(PN);
-        
-		// test for each marking of current node if message bound k reached
-		// then supress new sending event
-		if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
-			// iterate over the set of input messages
-			for (messageMultiSet::iterator iter = input.begin(); iter != input.end(); iter++) {
-				if (PN->CurrentMarking[PN->getPlace(*iter)->index] == messages_manual) {
-					// adding input message to state already using full message bound
-					trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
-					trace(TRACE_3, PN->getPlace(*iter)->name);
-				    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
-					return;
-				}
-			}
-		}        
-        
+
+        // test for each marking of current node if message bound k reached
+        // then supress new sending event
+        if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
+            // iterate over the set of input messages
+            for (messageMultiSet::iterator iter = input.begin(); iter != input.end(); iter++) {
+                if (PN->CurrentMarking[PN->getPlace(*iter)->index] == messages_manual) {
+                    // adding input message to state already using full message bound
+                    trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
+                    trace(TRACE_3, PN->getPlace(*iter)->name);
+                    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
+                    return;
+                }
+            }
+        }
+
         PN->addInputMessage(input);                 // add the input message to the current marking
         if (options[O_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
@@ -511,14 +508,14 @@ void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
             PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
         }
         if (newNode->getColor() == RED) {
-        	// a message bound violation occured during computation of reachability graph
-		    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
-        	return;
-        }        
+            // a message bound violation occured during computation of reachability graph
+            trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
+            return;
+        }
     }
-    
+
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) : end\n");
-	return;
+    return;
 }
 
 //! \fn void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode)
@@ -530,40 +527,40 @@ void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
 void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode) : start\n");
 
-	StateSet::iterator iter;                      // iterator over the stateList's elements
-  	PN->setOfStatesTemp.clear();
-  	PN->visitedStates.clear();
+    StateSet::iterator iter;                      // iterator over the stateList's elements
+    PN->setOfStatesTemp.clear();
+    PN->visitedStates.clear();
 
     if (options[O_CALC_ALL_STATES]) {
-		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
-	    	(*iter)->decode(PN);
-	    	if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
-	       			PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
-	    	}
-		}
+        for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
+            (*iter)->decode(PN);
+            if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+                PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
+            }
+        }
     } else {
-    	owfnPlace * outputPlace = PN->getPlace(output);
+        owfnPlace * outputPlace = PN->getPlace(output);
 
-		StateSet stateSet;
+        StateSet stateSet;
 
-		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); 
-				iter != node->reachGraphStateSet.end(); iter++) {
-        		
-			(*iter)->decode(PN);
-			// calculate temporary state set with the help of stubborn set method
-			PN->calculateReachableStates(stateSet, outputPlace, newNode);	
-		}
+        for (StateSet::iterator iter = node->reachGraphStateSet.begin();
+                iter != node->reachGraphStateSet.end(); iter++) {
 
-		for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {		
-			(*iter2)->decode(PN); // get the marking of the state
-			
-			if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
-				PN->calculateReachableStatesOutputEvent(newNode);   // calc the reachable states from that marking
-			}
-		}
-	//	binDeleteAll(PN->tempBinDecision);
-		delete PN->tempBinDecision;
-		PN->tempBinDecision = NULL;
+            (*iter)->decode(PN);
+            // calculate temporary state set with the help of stubborn set method
+            PN->calculateReachableStates(stateSet, outputPlace, newNode);
+        }
+
+        for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {
+            (*iter2)->decode(PN); // get the marking of the state
+
+            if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+                PN->calculateReachableStatesOutputEvent(newNode);   // calc the reachable states from that marking
+            }
+        }
+
+        delete PN->tempBinDecision;
+        PN->tempBinDecision = NULL;
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode) : end\n");
 }
@@ -577,46 +574,60 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
 void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : start\n");
 
-  	PN->setOfStatesTemp.clear();
-  	PN->visitedStates.clear();
-        
-	if (TRACE_2 <= debug_level) {
-		for (messageMultiSet::iterator iter1 = output.begin(); iter1 != output.end(); iter1++) {
-			trace(TRACE_2, PN->getPlace(*iter1)->name);
-			trace(TRACE_2, " ");
-		}
-		trace(TRACE_2, "\n");
-	}      
-        
+    PN->setOfStatesTemp.clear();
+    PN->visitedStates.clear();
+
+    if (TRACE_2 <= debug_level) {
+        for (messageMultiSet::iterator iter1 = output.begin(); iter1 != output.end(); iter1++) {
+            trace(TRACE_2, PN->getPlace(*iter1)->name);
+            trace(TRACE_2, " ");
+        }
+        trace(TRACE_2, "\n");
+    }
+
     if (options[O_CALC_ALL_STATES]) {
-		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
-    		(*iter)->decode(PN);
-    		if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
-        		PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
-    		}
-		}
+        for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
+            (*iter)->decode(PN);
+            if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+                PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
+            }
+        }
     } else {
-		StateSet stateSet;
-//		stateSet.clear();
+        StateSet stateSet;
+        // stateSet.clear();
 
-		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); 
-				iter != node->reachGraphStateSet.end(); iter++) {
-        		
-			(*iter)->decode(PN);
-			// calculate temporary state set with the help of stubborn set method
-			PN->calculateReachableStates(stateSet, output, newNode);	
-		}
+        for (StateSet::iterator iter = node->reachGraphStateSet.begin();
+            iter != node->reachGraphStateSet.end(); iter++) {
 
-		for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {		
-			(*iter2)->decode(PN); // get the marking of the state
-			
-			if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
-				PN->calculateReachableStatesOutputEvent(newNode);   // calc the reachable states from that marking
-			}
-		}
-	//	binDeleteAll(PN->tempBinDecision);
-		delete PN->tempBinDecision;
-		PN->tempBinDecision = NULL;
+            (*iter)->decode(PN);
+            // calculate temporary state set with the help of stubborn set method
+            // TODO: Fix this memory leak.
+            // The following method sets tempBinDecision to NULL before
+            // filling tempBinDecision anew without deleting the old one.
+            // Consequently, some binDecisions become unreachable and
+            // cannot be deleted at the end of this method. This produces a
+            // memory leak. Not setting tempBinDecision to NULL in the
+            // following method call obviously fixes this memory leak. But this
+            // would cause unintended behaviour, wouldn't it? I figure that
+            // each State in stateSet needs a separate tempBinDecision. Then,
+            // each of those tempBinDecision must be kept alive until the
+            // following for loop is completed because otherwise the just
+            // calculated States would deleted by the binDecision destructor
+            // causing a segmentation fault while trying to call decode() on
+            // one those deleted states in the following for loop.
+            PN->calculateReachableStates(stateSet, output, newNode);
+        }
+
+        for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {
+            (*iter2)->decode(PN); // get the marking of the state
+
+            if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+                PN->calculateReachableStatesOutputEvent(newNode);   // calc the reachable states from that marking
+            }
+        }
+        // binDeleteAll(PN->tempBinDecision);
+        delete PN->tempBinDecision;
+        PN->tempBinDecision = NULL;
     }
 
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : end\n");
@@ -631,13 +642,13 @@ void communicationGraph::printNodeStatistics() {
     for (unsigned int i = 0; i < numberOfNodes; i++) {
         visitedNodes[i] = false;
     }
-    
+
     numberOfBlueNodes = 0;
     numberOfBlueEdges = 0;
-    
+
     // calculate the number of blue nodes and edges first
-    computeNumberOfBlueNodesEdges(tmp, visitedNodes);	
-	
+    computeNumberOfBlueNodesEdges(tmp, visitedNodes);
+
     trace(TRACE_0, "\n    number of blue nodes: " + intToString(getNumberOfBlueNodes()) + "\n");
     if (getNumberOfBlackNodes() > 0) {
         trace(TRACE_0, "\n    number of black nodes: " + intToString(getNumberOfBlackNodes()) + "\n");
@@ -653,26 +664,26 @@ void communicationGraph::printNodeStatistics() {
 //! \brief breadthsearch through the graph computing the number of blue nodes
 void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedNodes[]) {
 
-	if (v == NULL) {
-		return ;
-	}
+    if (v == NULL) {
+        return ;
+    }
 
-    if (v->getColor() == BLUE && 
-    		(parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
-		
-		numberOfBlueNodes++;
-		
+    if (v->getColor() == BLUE &&
+        (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
+
+        numberOfBlueNodes++;
+
         v->resetIteratingSuccNodes();
         visitedNodes[v->getNumber()] = true;
         graphEdge * element;
 
         while ((element = v->getNextSuccEdge()) != NULL) {
             vertex * vNext = element->getNode();
-            if (vNext->getColor() == BLUE && 
-    			(parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
+            if (vNext->getColor() == BLUE &&
+                (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
 
-    			numberOfBlueEdges++;		
-    		}
+                numberOfBlueEdges++;
+            }
             if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
                 computeNumberOfBlueNodesEdges(vNext, visitedNodes);
             }
@@ -685,7 +696,7 @@ void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedN
 //! \brief returns true, if the given state activates at least one output event
 bool communicationGraph::stateActivatesOutputEvents(State * s) {
     s->decode(PN);
-    
+
     for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
 
         if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {
@@ -700,25 +711,25 @@ bool communicationGraph::stateActivatesOutputEvents(State * s) {
 //! \param toAddValue the additional progress value
 //! \brief adds toAddValue to global progress value
 void communicationGraph::addProgress(double toAddValue) {
-	
-	trace(TRACE_2, "\t adding ");
 
-	// double2int in per cent = trunc(100*value)
-	trace(TRACE_2, intToString(int(100 * toAddValue)));
-	trace(TRACE_2, ",");
-	// precision 4 digits after comma = (x * 100 * 1000) mod 1000 
-	
-	int aftercomma = int(100 * 10000 * toAddValue) % 10000;
-	
-	if (aftercomma <   10) trace(TRACE_2, "0");
-	if (aftercomma <  100) trace(TRACE_2, "0");
-	if (aftercomma < 1000) trace(TRACE_2, "0");
-	
-	trace(TRACE_2, intToString(aftercomma));
+    trace(TRACE_2, "\t adding ");
 
-	trace(TRACE_2, " to progress\n");
+    // double2int in per cent = trunc(100*value)
+    trace(TRACE_2, intToString(int(100 * toAddValue)));
+    trace(TRACE_2, ",");
+    // precision 4 digits after comma = (x * 100 * 1000) mod 1000
 
-	global_progress += toAddValue;
+    int aftercomma = int(100 * 10000 * toAddValue) % 10000;
+
+    if (aftercomma <   10) trace(TRACE_2, "0");
+    if (aftercomma <  100) trace(TRACE_2, "0");
+    if (aftercomma < 1000) trace(TRACE_2, "0");
+
+    trace(TRACE_2, intToString(aftercomma));
+
+    trace(TRACE_2, " to progress\n");
+
+    global_progress += toAddValue;
 
 }
 
@@ -727,21 +738,21 @@ void communicationGraph::addProgress(double toAddValue) {
 //! \brief prints the current global progress value depending whether the value
 //! changed significantly and depending on the debug-level set
 void communicationGraph::printProgress() {
-		
-	return;
-	
-	int progress_step_size = 5;
-	int current_progress = int(100 * global_progress);
+
+    return;
+
+    int progress_step_size = 5;
+    int current_progress = int(100 * global_progress);
 
     if (current_progress >= (show_progress + progress_step_size)) {
-    	// significant progress change
-		if (debug_level == TRACE_0) {
-			trace(TRACE_0, " " + intToString(current_progress) + " ");
-		} else {
-			trace(TRACE_0, "\t progress: " + intToString(current_progress) + " %\n");
-    	}
-		// assigning next progress value to show
-		show_progress = current_progress;
+        // significant progress change
+        if (debug_level == TRACE_0) {
+            trace(TRACE_0, " " + intToString(current_progress) + " ");
+        } else {
+            trace(TRACE_0, "\t progress: " + intToString(current_progress) + " %\n");
+        }
+        // assigning next progress value to show
+        show_progress = current_progress;
     }
 }
 
@@ -750,27 +761,27 @@ void communicationGraph::printProgress() {
 //! \brief prints the current global progress value depending whether the value
 //! changed significantly and depending on the debug-level set
 void communicationGraph::printProgressFirst() {
-		
-	return;
-	
-	if (debug_level == TRACE_0) {
-		trace(TRACE_0, "\t progress (in %): 0 ");
-	} else {
-		trace(TRACE_0, "\t progress: 0 %\n");
-   	}
+
+    return;
+
+    if (debug_level == TRACE_0) {
+        trace(TRACE_0, "\t progress (in %): 0 ");
+    } else {
+        trace(TRACE_0, "\t progress: 0 %\n");
+       }
 }
 
 
 //! \fn void communicationGraph::printDotFile()
 //! \brief creates a dot file of the graph
 void communicationGraph::printDotFile() {
-    
+
     // unsigned int maxWritingSize = 1000;
     unsigned int maxPrintingSize = 500;
-    
+
     if (true) { // numberOfBlueNodes <= maxWritingSize) {
-        
-		trace(TRACE_0, "creating the dot file of the graph...\n");	
+
+        trace(TRACE_0, "creating the dot file of the graph...\n");
         vertex * tmp = root;
 
         bool visitedNodes[numberOfNodes];
@@ -802,14 +813,14 @@ void communicationGraph::printDotFile() {
         dotFile << "node [fontname=\"Helvetica\" fontsize=10];\n";
         dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
-		numberOfBlueNodes = 0;
-		numberOfBlackNodes = 0;
+        numberOfBlueNodes = 0;
+        numberOfBlackNodes = 0;
 
         printGraphToDot(tmp, dotFile, visitedNodes);
-        
+
         dotFile << "}";
         dotFile.close();
-        	
+
         // prepare dot command line for printing
         if (parameters[P_OG]) {
             if (options[O_CALC_ALL_STATES]) {
@@ -825,17 +836,17 @@ void communicationGraph::printDotFile() {
             }
         }
 
-		// print commandline and execute system command
-        if ((options[O_SHOW_NODES] && numberOfNodes <= maxPrintingSize) || 
-        		(!options[O_SHOW_NODES] && numberOfBlueNodes <= maxPrintingSize)) {
-        	// print only, if number of nodes is lower than required 
-        	// if option is set to show all nodes, then we compare the number of all nodes
-        	// otherwise, we compare the number of blue nodes only
-			trace(TRACE_0, string(buffer) + "\n");
+        // print commandline and execute system command
+        if ((options[O_SHOW_NODES] && numberOfNodes <= maxPrintingSize) ||
+                (!options[O_SHOW_NODES] && numberOfBlueNodes <= maxPrintingSize)) {
+            // print only, if number of nodes is lower than required
+            // if option is set to show all nodes, then we compare the number of all nodes
+            // otherwise, we compare the number of blue nodes only
+            trace(TRACE_0, string(buffer) + "\n");
             system(buffer);
         } else {
-        	trace(TRACE_0, "graph is too big to create the graphics;\n");
-			trace(TRACE_0, string(buffer) + "\n");
+            trace(TRACE_0, "graph is too big to create the graphics;\n");
+            trace(TRACE_0, string(buffer) + "\n");
         }
     } else {
         trace(TRACE_0, "graph is too big to create dot file\n");
@@ -850,7 +861,7 @@ void communicationGraph::printDotFile() {
 //! \brief breadthsearch through the graph printing each node and edge to the output stream
 void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
 
-	assert(v != NULL);
+    assert(v != NULL);
 
     if (v->getColor() == BLUE) {
         numberOfBlueNodes++;
@@ -865,17 +876,17 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
 
     if (parameters[P_SHOW_STATES_PER_NODE]) {
         for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
-//                	(*iter)->decodeShowOnly(PN);
-            
-            (*iter)->decode(PN);	// need to decide if it is an external or internal deadlock
+//                    (*iter)->decodeShowOnly(PN);
+
+            (*iter)->decode(PN);    // need to decide if it is an external or internal deadlock
             os << "[" << PN->getCurrentMarkingAsString() << "]";
             os << " (";
-            
+
             string kindOfDeadlock;
             unsigned int i;
-            
+
             switch ((*iter)->type) {
-                case DEADLOCK: 	
+                case DEADLOCK:
                                 kindOfDeadlock = "i"; // letter for 'i' internal or 'e' external deadlock
                                 if (PN->transNrQuasiEnabled > 0) {
                                     kindOfDeadlock = "e";
@@ -887,11 +898,11 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
                                         }
                                     }
                                 }
-                                os << kindOfDeadlock << "DL" << ")"; 
+                                os << kindOfDeadlock << "DL" << ")";
                                 break;
-                                
+
                 case FINALSTATE: os << "FS" << ")"; break;
-                
+
                 default: os << "TR" << ")"; break;
             }
             os << "\\n";
@@ -899,26 +910,24 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
     }
 
     if (parameters[P_OG]) {
-//				// add annotation to node
+        // add annotation to node
         string CNFString = v->getCNF_formula()->asString();
 
-//				/*
-//				 * The following three calls were added by Niels to simplify the string
-//				 * representation of CNF formulas in the DOT output of an OG. All
-//				 * needed code is implemented in files "cnf_formula.h" and
-//				 * "cnf_formula.cc". If the following three calls are removed,
-//				 * everything is (as ugly) as before.
-//				 */
-//
-//				// 1. create a CNF_Formula object from the CNF string representation
-//				CNF_Formula formula = CNF_Formula(CNFString);
-//			
-//				// 2. simplify the CNF formula inside the CNF_Formula object
-//				formula.simplify();
-//			
-//				// 3. create a string representation of the simplified formula
-//				CNFString = formula.to_string();	
-    
+        // The following three calls were added by Niels to simplify the string
+        // representation of CNF formulas in the DOT output of an OG. All
+        // needed code is implemented in files "cnf_formula.h" and
+        // "cnf_formula.cc". If the following three calls are removed,
+        // everything is (as ugly) as before.
+        //
+        // 1. create a CNF_Formula object from the CNF string representation
+        //    CNF_Formula formula = CNF_Formula(CNFString);
+        //
+        // 2. simplify the CNF formula inside the CNF_Formula object
+        //    formula.simplify();
+        //
+        // 3. create a string representation of the simplified formula
+        //    CNFString = formula.to_string();
+
         os << CNFString;
     }
 

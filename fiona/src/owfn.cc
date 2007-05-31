@@ -996,7 +996,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 	State * CurrentState;
   	State * NewState;
 
-	tempBinDecision = (binDecision *) 0;
+	tempBinDecision = NULL;
 
 	CurrentState = binSearch(this);
 	
@@ -1011,7 +1011,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 		CurrentState = binInsert(&tempBinDecision, this);  // save current state to the local binDecision 
 		
 		CurrentState->current = 0;
-		CurrentState->parent = (State *) 0;
+		CurrentState->parent = NULL;
 
 		// marking already has a state -> put it (and all its successors) into the node
 //		addSuccessorStatesToSetStubborn(CurrentState, stateSet);
@@ -1019,7 +1019,9 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 		//return;
 	} else {
 		CurrentState = binSearch(tempBinDecision, this);
-		CurrentState = binInsert(&tempBinDecision, this);  // save current state to the local binDecision 
+
+        // save current state to the local binDecision 
+        CurrentState = binInsert(&tempBinDecision, this);
 	}
 	
 	CurrentState->stubbornFirelist = stubbornfirelistmessage(messages);
@@ -1207,8 +1209,6 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 		delete[] tempCurrentMarking;
 		tempCurrentMarking = NULL;
 	}
-	
-	//binDeleteAll(*tempBinDecision);
 	
 	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
 	return;

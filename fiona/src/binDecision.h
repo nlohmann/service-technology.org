@@ -28,7 +28,6 @@
  * \note    This file is part of the tool Fiona and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
- *
  */
 
 #ifndef BINDECISION_H
@@ -36,38 +35,50 @@
 
 using namespace std;
 
-//class forward declartion 
 class oWFN;
 class State;
 
-// binDecision records form a binary decision tree
-
+/**
+ * binDecision records form a binary decision tree
+ */
 class binDecision {
 public:
-	int bitnr;
-	binDecision *  nextold;
-	binDecision *  nextnew;
-	unsigned char * vector; 	// actual bit vector
-    binDecision * prev; 		// backlink to previous decision
-    State * state;   			// link to state record for this state
-	binDecision(int, long int);
-	~binDecision();
+    int bitnr;
+    binDecision*  nextold;
+    binDecision*  nextnew;
 
-    // Provides user defined operator new. Needed to trace all new operations
-    // on this class.
+    /** actual bit vector */
+    unsigned char* vector;
+
+    /** backlink to previous decision */
+    binDecision* prev;
+
+    /** link to state record for this state */
+    State* state;
+
+    binDecision(int b, long int bitVectorSize);
+    ~binDecision();
+
 #undef new
+    /**
+     * Provides user defined operator new. Needed to trace all new operations
+     * on this class.
+     */
     NEW_OPERATOR(binDecision)
 #define new NEW_NEW
 };
 
-void binDelete(binDecision ** Bucket, long int BitVectorSize);
-void binDeleteAll(binDecision * d);
-void binDeleteAll(oWFN * PN, int h);
-State * binInsert(oWFN * PN);
-State * binInsert(binDecision ** Bucket, oWFN * PN);
-State * binSearch(oWFN * PN);
-State * binSearch(binDecision * Bucket, oWFN * PN);
-void inttobits(unsigned char * bytepos, int bitpos, int nrbits, unsigned int value);
+void binDelete(binDecision** Bucket, long int BitVectorSize);
+void binDeleteAll(binDecision* d);
+void binDeleteAll(oWFN* PN, int h);
+State* binInsert(oWFN* PN);
+State* binInsert(binDecision** Bucket, oWFN* PN);
+State* binSearch(oWFN* PN);
+State* binSearch(binDecision* Bucket, oWFN* PN);
+
+void inttobits(unsigned char* bytepos, int bitpos, int nrbits,
+    unsigned int value);
+
 int logzwo(int m);
 
 #endif //BINDECISION_H

@@ -362,6 +362,10 @@ int main(int argc, char ** argv) {
 
         OGFromFile* productOG = OGFromFile::product(OGsFromFiles);
 
+        if (productOG->hasNoRoot()) {
+            trace("The product OG is empty.\n\n");
+        }
+
         if (!options[O_OUTFILEPREFIX]) {
             outfilePrefix = OGFromFile::getProductOGFilePrefix(ogfiles);
         }

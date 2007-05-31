@@ -472,7 +472,7 @@ OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
 	trace(TRACE_5, "OGFromFile::product(const OGFromFile* rhs): start\n");
 
 	// this will be the product OG
-	OGFromFile* productOG = new OGFromFile();
+	OGFromFile* productOG = new OGFromFile;
 
 	// first we build a new root node that has name and annotation constructed
 	// from the root nodes of OG and the rhs OG.
@@ -707,6 +707,18 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const
     fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(),
         ios_base::out | ios_base::trunc);
 
+    if (hasNoRoot()) {
+        // print file for empty OG
+        ogFile << "NODES" << endl << "  0 : " << vertexColor(RED).toString()
+               << " : "
+               << CommGraphFormulaLiteral::FALSE << ';' << endl << endl
+               << "INITIALNODE" << endl << "  0;" << endl << endl
+               << "TRANSITIONS" << endl << "  ;" << endl;
+
+        ogFile.close();
+        return;
+    }
+
     ogFile << "NODES" << endl;
     bool printedFirstNode = false;
     for (nodes_t::const_iterator iNode = nodes.begin(); iNode != nodes.end();
@@ -727,6 +739,7 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const
     ogFile << ';' << endl << endl;
 
     ogFile << "INITIALNODE" << endl;
+    assert(getRoot() != NULL);
     ogFile << "  " << getRoot()->getName() << ';' << endl << endl;
 
     ogFile << "TRANSITIONS" << endl;

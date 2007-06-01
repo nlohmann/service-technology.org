@@ -58,6 +58,8 @@ int events_manual;
 unsigned int messages_manual;
 int bdd_reordermethod;
 
+const int GETOPT_REDUCENODES = 256;
+
 /// pointer to log stream
 std::ostream * log_output = &std::cout;   // &std::clog;
 
@@ -74,7 +76,8 @@ static struct option longopts[] =
   { "net",             required_argument, NULL, 'n' },
   { "type",            required_argument, NULL, 't' },
   { "show",            required_argument, NULL, 's' },
-  { "calcallstates",   no_argument,       NULL, 'a' },
+//  { "reduce-nodes",    no_argument,       NULL, GETOPT_REDUCENODES },
+  { "reduce-nodes",    no_argument,       NULL, 'R' },
   { "reduceIG",        no_argument,       NULL, 'r' },
   { "messagemaximum",  required_argument, NULL, 'm' },
   { "eventsmaximum",   required_argument, NULL, 'e' },
@@ -85,7 +88,7 @@ static struct option longopts[] =
 };
 
 
-const char * par_string = "hvd:n:t:s:arm:e:b:B:o:";
+const char * par_string = "hvd:n:t:s:Rrm:e:b:B:o:";
 
 // --------------------- functions for command line evaluation ------------------------
 // Prints an overview of all commandline arguments.
@@ -124,6 +127,9 @@ void print_help() {
   trace("                                   possible if -m option is set)\n");
   trace("                                   (only relevant for OG)\n");
   trace(" -r | --reduceIG ................. use reduction rules for IG\n");
+  trace(" -R | --reduce-nodes ............. use node reduction (IG or OG) wich\n");
+  trace("                                   stores less states per node of IG/OG\n");
+  trace("                                   and reduces memory, but increases time\n");
   trace(" -s | --show=<parameter> ......... different display options <parameter>:\n");
   trace("                                     allnodes  - show nodes of all colors\n");
   trace("                                     blue      - show blue nodes only (default)\n");
@@ -215,8 +221,8 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_DEBUG] = false;
     options[O_GRAPH_TYPE] = false;
     options[O_SHOW_NODES] = false;
-    options[O_CALC_ALL_STATES] = false; // standard: man muss -a angeben, um voll
-//    options[O_CALC_ALL_STATES] = true; // so lange Reduktion im Teststadium
+//    options[O_CALC_ALL_STATES] = false; // standard: man muss -a angeben, um voll
+    options[O_CALC_ALL_STATES] = true; // so lange Reduktion im Teststadium
     options[O_CALC_REDUCED_IG] = false;
     options[O_OWFN_NAME] = false;
     options[O_BDD] = false;
@@ -362,8 +368,9 @@ void parse_command_line(int argc, char* argv[]) {
                     exit(1);
                 }
                 break;
-            case 'a':
-                options[O_CALC_ALL_STATES] = true;
+//            case GETOPT_REDUCENODES:
+            case 'R':
+                options[O_CALC_ALL_STATES] = false;
                 break;
             case 'r':
                 options[O_CALC_REDUCED_IG] = true;

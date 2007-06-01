@@ -422,8 +422,8 @@ void operatingGuidelines::convertToBddFull() {
 
 void operatingGuidelines::printOGFile() const {
     string ogFilename = netfile;
-    if (options[O_CALC_ALL_STATES]) {
-        ogFilename += ".a";
+    if (!options[O_CALC_ALL_STATES]) {
+        ogFilename += ".R";
     }
     ogFilename += ".og";
     fstream ogFile(ogFilename.c_str(), ios_base::out | ios_base::trunc);

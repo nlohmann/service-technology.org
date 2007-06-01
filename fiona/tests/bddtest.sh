@@ -42,10 +42,10 @@ rm -f $DIR/*.log
 ############################################################################
 
 owfn="$DIR/sequence5.owfn"
-cmd="$FIONA -n $owfn -a -b 4 -t OG"
+cmd="$FIONA -n $owfn -b 4 -t OG"
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.a.b4.IG.memcheck.log"
+    memchecklog="$owfn.b4.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
     result=$?
 else
@@ -58,7 +58,7 @@ else
     fi
 
     if test \( $result5 -eq 0 \) -a \
-        \( -f $DIR/sequence5.owfn.a.OG.png -a -f $DIR/sequence5.owfn.a.OG.out \)
+        \( -f $DIR/sequence5.owfn.OG.png -a -f $DIR/sequence5.owfn.OG.out \)
     then
       result=0
     else
@@ -72,10 +72,10 @@ nodes_mp=28
 nodes_ann=8
 
 owfn="$DIR/sequence3.owfn"
-cmd="$FIONA -n $owfn -a -b 4 -t OG"
+cmd="$FIONA -n $owfn -b 4 -t OG"
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.a.b4.IG.memcheck.log"
+    memchecklog="$owfn.b4.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
     result=$?
 else
@@ -102,7 +102,7 @@ fi
 
 owfn="$DIR/sequence3.owfn"
 owfn_reference="$testdir/bdd_ref/sequence3_reference.owfn"
-cmd="$FIONA -n $owfn -a -b 4 -t OG"
+cmd="$FIONA -n $owfn -b 4 -t OG"
 $cmd 2>/dev/null 1>/dev/null
 
 cmd="$FIONA -n $owfn -n $owfn_reference -t equivalence"
@@ -131,10 +131,10 @@ nodes_mp=1562
 nodes_ann=360
 
 owfn="$testdir/philosophers/phcontrol4.unf.owfn"
-cmd="$FIONA -n $owfn -a -b 4 -t OG"
+cmd="$FIONA -n $owfn -b 4 -t OG"
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.a.b4.IG.memcheck.log"
+    memchecklog="$owfn.b4.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
     result=$?
 else
@@ -161,7 +161,7 @@ fi
 
 owfn="$testdir/philosophers/phcontrol4.unf.owfn"
 owfn_reference="$testdir/bdd_ref/phcontrol4.unf_reference.owfn"
-cmd="$FIONA -n $owfn -a -b 4 -t OG"
+cmd="$FIONA -n $owfn -b 4 -t OG"
 $cmd 2>/dev/null 1>/dev/null
 
 cmd="$FIONA -n $owfn -n $owfn_reference -t equivalence"

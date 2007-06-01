@@ -31,19 +31,19 @@ echo
 echo ---------------------------------------------------------------------
 echo running: $FIONA -a -t OG -n $DIR/smtp3.owfn
 echo
-$FIONA -a -t OG -n $DIR/smtp3.owfn
+$FIONA -t OG -n $DIR/smtp3.owfn
 
 echo
 echo ---------------------------------------------------------------------
 echo running: $FIONA -a -t OG -n $DIR/smtp4.owfn
 echo
-$FIONA -a -t OG -n $DIR/smtp4.owfn
+$FIONA -t OG -n $DIR/smtp4.owfn
 
 echo
 echo ---------------------------------------------------------------------
 echo running: $FIONA -a -t OG -n $DIR/smtp5.owfn
 echo
-$FIONA -a -t OG -n $DIR/smtp5.owfn
+$FIONA -t OG -n $DIR/smtp5.owfn
 
 
 

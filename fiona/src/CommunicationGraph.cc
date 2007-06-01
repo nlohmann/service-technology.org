@@ -792,15 +792,15 @@ void communicationGraph::printDotFile() {
         char buffer[256];
         if (parameters[P_OG]) {
             if (options[O_CALC_ALL_STATES]) {
-                sprintf(buffer, "%s.a.OG.out", netfile);
-            } else {
                 sprintf(buffer, "%s.OG.out", netfile);
+            } else {
+                sprintf(buffer, "%s.R.OG.out", netfile);
             }
         } else {
             if (options[O_CALC_ALL_STATES]) {
-                sprintf(buffer, "%s.a.IG.out", netfile);
-            } else {
                 sprintf(buffer, "%s.IG.out", netfile);
+            } else {
+                sprintf(buffer, "%s.R.IG.out", netfile);
             }
         }
 
@@ -824,15 +824,15 @@ void communicationGraph::printDotFile() {
         // prepare dot command line for printing
         if (parameters[P_OG]) {
             if (options[O_CALC_ALL_STATES]) {
-                sprintf(buffer, "dot -Tpng %s.a.OG.out -o %s.a.OG.png", netfile, netfile);
-            } else {
                 sprintf(buffer, "dot -Tpng %s.OG.out -o %s.OG.png", netfile, netfile);
+            } else {
+                sprintf(buffer, "dot -Tpng %s.R.OG.out -o %s.R.OG.png", netfile, netfile);
             }
         } else {
             if (options[O_CALC_ALL_STATES]) {
-                sprintf(buffer, "dot -Tpng %s.a.IG.out -o %s.a.IG.png", netfile, netfile);
-            } else {
                 sprintf(buffer, "dot -Tpng %s.IG.out -o %s.IG.png", netfile, netfile);
+            } else {
+                sprintf(buffer, "dot -Tpng %s.R.IG.out -o %s.R.IG.png", netfile, netfile);
             }
         }
 

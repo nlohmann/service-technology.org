@@ -118,8 +118,8 @@ void Exchangeability::loadBdd(char* filename){
 	char bufferMp[256]; 
 	char bufferAnn[256];
 
-	sprintf(bufferMp, "%s.a.OG.BDD_MP.cudd", filename);
-    sprintf(bufferAnn, "%s.a.OG.BDD_ANN.cudd", filename); 
+	sprintf(bufferMp, "%s.OG.BDD_MP.cudd", filename);
+    sprintf(bufferAnn, "%s.OG.BDD_ANN.cudd", filename); 
     
     FILE* fpMp;
     fpMp = fopen(bufferMp, "r");
@@ -128,8 +128,8 @@ void Exchangeability::loadBdd(char* filename){
     fpAnn = fopen(bufferAnn, "r");
     
     if (fpMp == NULL || fpAnn == NULL){
-    	sprintf(bufferMp, "%s.OG.BDD_MP.cudd", filename);
-    	sprintf(bufferAnn, "%s.OG.BDD_ANN.cudd", filename); 
+    	sprintf(bufferMp, "%s.R.OG.BDD_MP.cudd", filename);
+    	sprintf(bufferAnn, "%s.R.OG.BDD_ANN.cudd", filename); 
     	
     	fpMp = fopen(bufferMp, "r");
     	fpAnn = fopen(bufferAnn, "r");

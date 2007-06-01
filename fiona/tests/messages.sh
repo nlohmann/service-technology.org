@@ -43,9 +43,9 @@ result=0
 ############################################################################
 
 owfn="$DIR/messageboundtest1.owfn"
-cmd="$FIONA -n $owfn -a -t OG -e10 -m4"
+cmd="$FIONA -n $owfn -t OG -e10 -m4"
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.a.e10.m4.OG.memcheck.log"
+    memchecklog="$owfn.e10.m4.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
     result=$?
 else
@@ -69,9 +69,9 @@ mb15bluenodes_soll=36
 mb15blueedges_soll=60
 
 owfn="$DIR/messageboundtest1.owfn"
-cmd="$FIONA -n $owfn -a -t OG -e10 -m5"
+cmd="$FIONA -n $owfn -t OG -e10 -m5"
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.a.e10.m5.OG.memcheck.log"
+    memchecklog="$owfn.e10.m5.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
     result=$?
 else
@@ -101,9 +101,9 @@ mb16bluenodes_soll=46
 mb16blueedges_soll=78
 
 owfn="$DIR/messageboundtest1.owfn"
-cmd="$FIONA -n $owfn -a -t OG -e10 -m6"
+cmd="$FIONA -n $owfn -t OG -e10 -m6"
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.a.e10.m6.OG.memcheck.log"
+    memchecklog="$owfn.e10.m6.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
     result=$?
 else
@@ -133,9 +133,9 @@ mb21bluenodes_soll=3
 mb21blueedges_soll=2
 
 owfn="$DIR/messageboundtest2.owfn"
-cmd="$FIONA -n $owfn -a -t OG -e10 -m1"
+cmd="$FIONA -n $owfn -t OG -e10 -m1"
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.a.e10.m1.OG.memcheck.log"
+    memchecklog="$owfn.e10.m1.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
     result=$?
 else
@@ -165,9 +165,9 @@ mb22bluenodes_soll=5
 mb22blueedges_soll=5
 
 owfn="$DIR/messageboundtest2.owfn"
-cmd="$FIONA -n $owfn -a -t OG -e10 -m2"
+cmd="$FIONA -n $owfn -t OG -e10 -m2"
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.a.e10.m2.OG.memcheck.log"
+    memchecklog="$owfn.e10.m2.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
     result=$?
 else

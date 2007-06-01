@@ -78,10 +78,10 @@ result=0
 
 for ((i=0; i<${#owfns[*]}; ++i)) do
     owfn="${owfns[$i]}"
-    cmd="$FIONA -n $owfn -a -t OG"
+    cmd="$FIONA -n $owfn -t OG"
 
     if [ "$memcheck" = "yes" ]; then
-        memchecklog="$owfn.a.OG.memcheck.log"
+        memchecklog="$owfn.OG.memcheck.log"
         do_memcheck "$cmd" "$memchecklog"
         result=$?
     else

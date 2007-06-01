@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/16 13:13:03 $
+ * \date    \$Date: 2007/06/01 08:52:10 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.84 $
+ * \version \$Revision: 1.85 $
  */
 
 
@@ -427,6 +427,8 @@ void parse_command_line(int argc, char* argv[])
 		  globals::parameters[P_LOOPCONTROL] = true;
 		else if (parameter == "nointerface")
 		  globals::parameters[P_NOINTERFACE] = true;
+		else if (parameter == "deadlocktest")
+		  globals::parameters[P_DEADLOCKTEST] = true;
 		else {
 		  trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
 		  trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");

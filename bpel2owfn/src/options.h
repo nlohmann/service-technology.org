@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/04/29 19:09:57 $
+ * \date    \$Date: 2007/06/01 08:52:10 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  */
 
 
@@ -148,7 +148,8 @@ typedef enum
   P_XOR,		///< use XOR as transition condition
   P_LOOPCOUNT,		///< use loop counters
   P_LOOPCONTROL,	///< add communication to loops
-  P_NOINTERFACE		///< do not draw an interface
+  P_NOINTERFACE,		///< do not draw an interface
+  P_DEADLOCKTEST		///< removes the deadlock from the final place
 } possibleParameters;
 
 

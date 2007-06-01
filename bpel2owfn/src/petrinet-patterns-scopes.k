@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/05/17 11:41:30 $
+ * \date    \$Date: 2007/06/01 08:52:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  */
 %}
 
@@ -289,6 +289,14 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	  PN.mergePlaces((prefix + "inner_stop"),    (toString(phylum->activity_1->id) + ".stop"));
 	  PN.mergePlaces((prefix + "inner_stopped"), (toString(phylum->activity_1->id) + ".stopped"));
         }
+
+    // Removes the deadlock from the final place in case of a deadlocktest
+    if (globals::parameters[P_DEADLOCKTEST])
+    {
+    Transition *t11 = PN.newTransition(prefix + "antideadlock");
+	  PN.newArc(t11, p2);
+	  PN.newArc(p2, t11);
+	  }
 
 
 	// Unparse the fault handlers (the handlers embed themselves to the

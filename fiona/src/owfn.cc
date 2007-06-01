@@ -2155,25 +2155,30 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
             // state. Because in a OGFromFileFormulaAssignment every
             // unmentioned literal is considered false, we only set those
             // literals that should be considered true.
-            CommGraphFormulaAssignment assignment =
-                makeAssignmentForOGMatchingForState(currentState);
+            //
+            // If the currentState has a leaving tau transition, we can skip
+            // checking the annotation because it is satisfied for sure.
+            if (!currentState->hasLeavingTauTransitionForMatching()) {
+                CommGraphFormulaAssignment assignment =
+                    makeAssignmentForOGMatchingForState(currentState);
 
-            if (!currentOGNode->assignmentSatisfiesAnnotation(assignment)) {
-                // Clean up the temporary copy of the former CurrentMarking
-                // just to be sure.
-                if (tmpCurrentMarking != NULL) {
-                    delete[] tmpCurrentMarking;
-                    tmpCurrentMarking = NULL;
+                if (!currentOGNode->assignmentSatisfiesAnnotation(assignment)) {
+                    // Clean up the temporary copy of the former CurrentMarking
+                    // just to be sure.
+                    if (tmpCurrentMarking != NULL) {
+                        delete[] tmpCurrentMarking;
+                        tmpCurrentMarking = NULL;
+                    }
+
+                    reasonForFailedMatch = "The marking '" +
+                        getCurrentMarkingAsString() +
+                        "' of the oWFN does not satisfy the annotation '" +
+                        currentOGNode->getAnnotationAsString() +
+                        "' of the corresponding node '" +
+                        currentOGNode->getName() + "' in the OG.";
+
+                    return false;
                 }
-
-                reasonForFailedMatch = "The marking '" +
-                    getCurrentMarkingAsString() +
-                    "' of the oWFN does not satisfy the annotation '" +
-                    currentOGNode->getAnnotationAsString() +
-                    "' of the corresponding node '" +
-                    currentOGNode->getName() + "' in the OG.";
-
-                return false;
             }
 
             currentState = currentState->parent;

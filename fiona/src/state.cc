@@ -34,6 +34,7 @@
 #include "state.h"
 #include "binDecision.h"
 #include "debug.h"
+#include "owfnTransition.h"
 
 
 //! \fn State::State()
@@ -432,4 +433,14 @@ void State::decodeShowOnly(oWFN * PN) {
 	cerr << "if this happens please contact the authors" << endl;	
 	cerr << "\tvoid State::decode(oWFN * PN) in graph.cc" << endl;
 	
+}
+
+bool State::hasLeavingTauTransitionForMatching() const {
+    for (size_t itrans = 0; itrans != CardFireList; ++itrans) {
+        if (!firelist[itrans]->hasNonTauLabelForMatching()) {
+            return true;
+        }
+    }
+
+    return false;
 }

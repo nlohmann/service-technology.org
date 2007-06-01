@@ -155,6 +155,10 @@ OGFromFileTransition* OGFromFileNode::getTransitionWithLabel(
 OGFromFileNode* OGFromFileNode::fireTransitionWithLabel(
     const std::string& transitionLabel)
 {
+    if (transitionLabel == CommGraphFormulaLiteral::TAU) {
+        return this;
+    }
+
     OGFromFileTransition* transition = getTransitionWithLabel(transitionLabel);
     if (transition == NULL) {
         return NULL;

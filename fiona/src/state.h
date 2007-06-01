@@ -44,26 +44,64 @@ class owfnTransition;
 // State objects are nodes in the state graph.
 class State {
 public:
-	State();
-	~State();
-	static unsigned int card;         // number of states
-	unsigned int CardFireList;        // number of transitions to be fired
-	unsigned int CardStubbornFireList;        // number of transitions to be fired
-	owfnTransition ** firelist;       // Transitions to be fired
-	owfnTransition ** stubbornFirelist; // Transitions to be fired in the stubborn set
-	owfnTransition ** quasiFirelist;  // Transitions that are quasi enabled
-	unsigned int current;             // Nr of last already fired element of firelist
-	binDecision * my_entry;           // last branch in binary decision tree that represents marking
-	unsigned int placeHashValue;      // hashValue of that state (necessary for binDecision)
-	State ** succ;                    // successor states in graph
-	State * parent;                   // state responsible for first generation
-	stateType type;                   // type of state (Deadlock, Final, Transient)
-	void decode(oWFN *);      		// decode state into given marking vector
-	void decodeShowOnly(oWFN *);		// decode state into given marking vector just for showing the marking!!!
+    State();
+    ~State();
 
-// Provides user defined operator new. Needed to trace all new operations on this class.
+    /** number of states */
+    static unsigned int card;
+
+    /** number of transitions to be fired */
+    unsigned int CardFireList;
+
+    /** number of transitions to be fired */
+    unsigned int CardStubbornFireList;
+
+    /** Transitions to be fired */
+    owfnTransition ** firelist;
+
+    /** Transitions to be fired in the stubborn set */
+    owfnTransition ** stubbornFirelist;
+
+    /** Transitions that are quasi enabled */
+    owfnTransition ** quasiFirelist;
+
+    /** Nr of last already fired element of firelist */
+    unsigned int current;
+
+    /** last branch in binary decision tree that represents marking */
+    binDecision * my_entry;
+
+    /** hashValue of that state (necessary for binDecision) */
+    unsigned int placeHashValue;
+
+    /** successor states in graph */
+    State ** succ;
+
+    /** state responsible for first generation */
+    State * parent;
+
+    /** type of state (Deadlock, Final, Transient) */
+    stateType type;
+
+    /** decode state into given marking vector */
+    void decode(oWFN *);
+
+    /**
+     * decode state into given marking vector just for showing the marking!!!
+     */
+    void decodeShowOnly(oWFN *);
+
+    /**
+     * Returns true iff this state has an enabled tau labeled transition.
+     */
+    bool hasLeavingTauTransitionForMatching() const;
+
 #undef new
-  NEW_OPERATOR(State)
+    /**
+     * Provides user defined operator new. Needed to trace all new operations
+     * on this class.
+     */
+    NEW_OPERATOR(State)
 #define new NEW_NEW
 };
 

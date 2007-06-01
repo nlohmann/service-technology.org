@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/05/25 10:59:38 $
+ * \date    \$Date: 2007/06/01 08:29:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  */
 
 
@@ -68,6 +68,7 @@ namespace globals {
   set<string> ASTE_messageExchangeNames;
   set<string> ASTE_partnerLinkNames;
   set<string> ASTE_linkNames;
+  set<unsigned int> ASTE_IMAs;
   set<unsigned int> ASTE_startActivities;
 
   map<string, string> ASTE_variableMap;

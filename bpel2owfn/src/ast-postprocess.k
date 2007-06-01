@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/06/01 07:50:12 $
+ * \date    \$Date: 2007/06/01 08:29:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.178 $
+ * \version \$Revision: 1.179 $
  */
 %}
 
@@ -513,6 +513,8 @@ OnMessage(a,b,c,_id) ->
       myself->checkPartnerLink();
 
       myself->checkMessageExchange();
+
+      globals::ASTE_IMAs.insert(myid);
 
       if ( globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] != 0 )
       {
@@ -1012,7 +1014,8 @@ Receive(a,b,c,_id) ->
       myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
       myself->checkMessageExchange();
-
+      globals::ASTE_IMAs.insert(myid);
+      
       /* above is generic */
 
       // trigger [SA00055]

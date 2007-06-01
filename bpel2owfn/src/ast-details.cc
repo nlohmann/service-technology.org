@@ -29,13 +29,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/06/01 07:50:11 $
+ * \date    \$Date: 2007/06/01 08:29:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.123 $
+ * \version \$Revision: 1.124 $
  */
 
 
@@ -1194,6 +1194,31 @@ string ASTE::checkVariable(string attributename)
 
 string ASTE::checkMessageExchange()
 {
+  // SA00060
+  if (this->type==K_REPLY)
+  {
+    bool valid = false;
+    for (set<unsigned int>:: iterator ima = globals::ASTE_IMAs.begin(); ima != globals::ASTE_IMAs.end(); ima++)
+    {
+      if (globals::ASTEmap[(*ima)]->attributes["operation"]== attributes["operation"] &&
+          globals::ASTEmap[(*ima)]->attributes["partnerLink"]== attributes["partnerLink"] &&
+            ((globals::ASTEmap[(*ima)]->attributes["messageExchange"] == "" && attributes["messageExchange"] == "") ||
+             (globals::ASTEmap[(*ima)]->attributes["messageExchange"] == attributes["messageExchange"] && 
+              globals::ASTEmap[(*ima)]->attributes["messageExchange"] != "" && attributes["messageExchange"] != "")))
+      {
+        // If two legal messageexchanges are found, it is no more valid
+        if (valid)
+        {
+          valid = false;
+          break;
+        }
+        valid = true;
+      }            
+    }
+    if (!valid)
+      SAerror(60,"", attributes["referenceLine"]);    
+  }
+
   if ( attributes["messageExchange"] == "")
     return "";
   

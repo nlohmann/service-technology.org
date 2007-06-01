@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/06/01 07:50:12 $
+ * \date    \$Date: 2007/06/01 08:29:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.103 $
+ * \version \$Revision: 1.104 $
  *
  * \ingroup debug
  */
@@ -682,6 +682,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(59):
       { cerr << "<reply> must not be used with a variable AND <toPart> elements" << endl;
+	break; }
+
+    case(60):
+      { cerr << "ould not find an explicit corresponding incoming message activity for the <reply>" << endl;
 	break; }
 
     case(61):

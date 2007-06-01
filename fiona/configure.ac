@@ -4,7 +4,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 1.5, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.21 $)
+AC_REVISION($Revision: 1.22 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -68,7 +68,7 @@ case `uname -s` in
     CUDD_XFLAGS="-march=`uname -m` -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864"
     ;;
   Darwin)
-    CUDD_XFLAGS="-m`uname -p` -DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3 -qstrict"
+    CUDD_XFLAGS="-DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3"
     ;;
   *) ;;
 esac

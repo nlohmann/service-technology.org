@@ -127,7 +127,7 @@ void print_help() {
   trace("                                   possible if -m option is set)\n");
   trace("                                   (only relevant for OG)\n");
   trace(" -r | --reduceIG ................. use reduction rules for IG\n");
-  trace(" -R | --reduce-nodes ............. use node reduction (IG or OG) wich\n");
+  trace(" -R | --reduce-nodes ............. use node reduction (IG or OG) which\n");
   trace("                                   stores less states per node of IG/OG\n");
   trace("                                   and reduces memory, but increases time\n");
   trace(" -s | --show=<parameter> ......... different display options <parameter>:\n");

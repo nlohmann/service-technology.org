@@ -1,0 +1,42 @@
+<process name="SA00061"
+    targetNamespace="http://testnamespace">
+    
+    <documentation xml:lang="EN">
+	A simple example of a WS-BPEL process for handling a purchase
+	order.
+    </documentation>
+
+    <partnerLinks>
+	<partnerLink name="purchasing"
+	    partnerLinkType="lns:purchasingLT" myRole="purchaseService" />
+	<partnerLink name="invoicing" partnerLinkType="lns:invoicingLT"
+	    myRole="invoiceRequester" partnerRole="invoiceService" />
+	<partnerLink name="shipping" partnerLinkType="lns:shippingLT"
+	    myRole="shippingRequester" partnerRole="shippingService" />
+	<partnerLink name="scheduling"
+	    partnerLinkType="lns:schedulingLT"
+	    partnerRole="schedulingService" />
+    </partnerLinks>
+
+    <messageExchanges>
+	<messageExchange name="testexchange"/>
+    </messageExchanges>
+
+    <variables>
+	<variable name="PO"/>
+    </variables>
+    
+      <scope>
+    <sequence>
+	<receive partnerLink="purchasing" operation="sendPurchaseOrder" 
+  variable="PO" createInstance="yes" messageExchange="testexchange">
+    	    <documentation>Receive Purchase Order</documentation>
+	</receive>    
+
+  <receive partnerLink="purchasing" operation="sendPurchaseOrder" 
+  variable="PO" messageExchange="wrongexchange">
+    	    <documentation>Receive Purchase Order</documentation>
+	</receive>    
+    </sequence>
+      </scope>
+</process>

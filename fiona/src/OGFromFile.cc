@@ -372,14 +372,14 @@ void OGFromFile::removeTransitionsToNodeFromAllOtherNodes(
 	}
 }
 
-//! \fn bool OGFromFile::simulates(OGFromFile *simulant)
+//! \fn bool OGFromFile::simulates(OGFromFile *smallerOG)
 //! \brief checks, whether this OGFromFile simulates the given simulant
 //! \return true on positive check, otherwise: false
-//! \param simulant the simulant that should be simulated
-bool OGFromFile::simulates ( OGFromFile *simulant ) {
-	trace(TRACE_5, "OGFromFile::simulates(OGFromFile *simulant): start\n" );
+//! \param smallerOG the simulant that should be simulated
+bool OGFromFile::simulates ( OGFromFile *smallerOG ) {
+	trace(TRACE_5, "OGFromFile::simulates(OGFromFile *smallerOG): start\n" );
 	//Simulation is impossible without a simulant.
-	if ( simulant == NULL )
+	if ( smallerOG == NULL )
 		return false;
 	
 	//We need to remember the nodes we already visited.
@@ -389,10 +389,10 @@ bool OGFromFile::simulates ( OGFromFile *simulant ) {
 	
 	//Get things moving...
 	bool result = false;
-	if ( simulatesRecursive(root, myVisitedNodes, simulant->getRoot(), simVisitedNodes) )
+	if ( simulatesRecursive(root, myVisitedNodes, smallerOG->getRoot(), simVisitedNodes) )
 		result = true;
 	
-	trace(TRACE_5, "OGFromFile::simulates(OGFromFile *simulant): end\n" );
+	trace(TRACE_5, "OGFromFile::simulates(OGFromFile *smallerOG): end\n" );
 	return result;
 }
 
@@ -401,7 +401,9 @@ bool OGFromFile::simulates ( OGFromFile *simulant ) {
 //         the part of an OGFromFile below simNode
 //! \return true on positive check, otherwise: false
 //! \param myNode a node in this OGFromFile
+//! \param myVisitedNodes a set containing the visited nodes in this OGFromFile
 //! \param simNode a node in the simulant
+//! \param simVisitedNodes same as myVisitedNodes in the simulant
 bool OGFromFile::simulatesRecursive ( OGFromFileNode *myNode, 
 									  set<OGFromFileNode*> *myVisitedNodes, 
 									  OGFromFileNode *simNode,
@@ -444,7 +446,7 @@ bool OGFromFile::simulatesRecursive ( OGFromFileNode *myNode,
 	
 	//Now, we have to check whether the two graphs are compatible.
 	OGFromFileNode::transitions_t::iterator myTransIter, simTransIter;
-	trace ( TRACE_5, "Iterating over the transitions of the simulant's node.\n" );
+	trace ( TRACE_5, "Iterating over the transitions of the smallerOG's node.\n" );
 	for ( simTransIter = simNode->transitions.begin();
 		  simTransIter!= simNode->transitions.end();
 		  simTransIter++ ) {

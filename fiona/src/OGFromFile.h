@@ -218,7 +218,7 @@ public:
      */
     static std::string addOGFileSuffix(const std::string& filePrefix);
 
-    bool simulates ( OGFromFile *simulant );
+    bool simulates ( OGFromFile *smallerOG );
 };
 
 

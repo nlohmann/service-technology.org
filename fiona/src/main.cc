@@ -385,8 +385,8 @@ int main(int argc, char ** argv) {
 
         return 0;
     }
-
-// ------------- simulation on OGFromFile --------------------
+	
+	// ------------- simulation on OGFromFile --------------------
 	
 	if (options[O_SIMULATES]) {
 		if (OGsFromFiles.size() == 2) {
@@ -394,9 +394,31 @@ int main(int argc, char ** argv) {
 			OGFromFile *simulator = *OGFFIter;
 			OGFromFile *simulant = *(++OGFFIter);
 			if (simulator->simulates(simulant)) {
-                trace(TRACE_0, "\nThe first OG simulates the second one.\n" );
+                trace(TRACE_0, "\nThe first OG has all the strategies of the second one, possibly more.\n" );
             } else {
-                trace(TRACE_0, "\nThe first OG does not simulate the second one.\n");
+                trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
+            }
+		}
+		else
+			cerr << "Error: \t If option -t simulation is used, exactly two OG files must be entered\n" << endl;
+	}
+	
+	// ------------- equivalence on OGFromFile --------------------
+	
+	if (options[O_EQUALS]) {
+		if (OGsFromFiles.size() == 2) {
+			list<OGFromFile*>::iterator OGFFIter = OGsFromFiles.begin();
+			OGFromFile *simulator = *OGFFIter;
+			OGFromFile *simulant = *(++OGFFIter);
+			if (simulator->simulates(simulant)) {
+                if (simulant->simulates(simulator)) {
+					trace(TRACE_0, "\nThe two OGs are equivalent, that is, they have the same strategies.\n");
+				}
+				else {
+					trace(TRACE_0, "\nThe first OG has a strategy which the second one hasn't.\n");
+				}
+            } else {
+                trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
             }
 		}
 		else

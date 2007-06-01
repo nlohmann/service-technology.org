@@ -115,6 +115,8 @@ void print_help() {
   trace("                                             in [FILE]\n");
   trace("                                     simulation  - check whether the first OG\n");
   trace("                                                   simulates the second one\n");
+  trace("                                     equality - check whether two OGs (given as\n");
+  trace("                                                OG-files) have the same strategies\n");
   trace("                                     equivalence - check whether two OGs (given\n");
   trace("                                                   as BDDs) are equivalent\n");
   trace("                                     productog   - calculate the product OG of\n");
@@ -231,6 +233,7 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_MATCH] = false;
     options[O_PRODUCTOG] = false;
     options[O_SIMULATES] = false;
+	options[O_EQUALS] = false;
     options[O_OUTFILEPREFIX] = false;
 
     options[O_MESSAGES_MAX] = true;
@@ -309,6 +312,8 @@ void parse_command_line(int argc, char* argv[]) {
                     options[O_MATCH] = true;
 				} else if (lc_optarg == "simulation") {
 					options[O_SIMULATES] = true;
+				} else if (lc_optarg == "equality") {
+					options[O_EQUALS] = true;
 				} else if (lc_optarg == "equivalence") {
 	                options[O_EX] = true;
 	                options[O_GRAPH_TYPE] = false;

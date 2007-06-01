@@ -61,6 +61,7 @@ typedef enum
 	O_MATCH,
 	O_PRODUCTOG,
 	O_SIMULATES,
+	O_EQUALS,
     O_OUTFILEPREFIX
 } possibleOptions;
 

@@ -18,7 +18,7 @@
  * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
 \*****************************************************************************/
-
+ 
 %{
 /*!
  * \file    ast-postprocess.cc
@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/05/27 12:18:00 $
+ * \date    \$Date: 2007/06/01 07:50:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.177 $
+ * \version \$Revision: 1.178 $
  */
 %}
 
@@ -511,6 +511,8 @@ OnMessage(a,b,c,_id) ->
       myself->checkAttributes();
 
       myself->checkPartnerLink();
+
+      myself->checkMessageExchange();
 
       if ( globals::ASTE_partnerLinks[ myself->attributes["partnerLink"] ] != 0 )
       {
@@ -1009,6 +1011,7 @@ Receive(a,b,c,_id) ->
 
       myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
+      myself->checkMessageExchange();
 
       /* above is generic */
 
@@ -1083,6 +1086,7 @@ Reply(a,b,c,_id) ->
 
       myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
+      myself->checkMessageExchange();
 
       /* above is generic */
 
@@ -2216,7 +2220,7 @@ Scope(a,b,messageExchange,c,d,e,f,g,i,j,_id) ->
           globals::ASTEmap[myself->parentScopeId]->findIsolatedAncestor())
         SAerror(91, "", myself->attributes["referenceLine"]);
     }
-    a b j g
+    a b messageExchange j g
     i // inner activity
     c d e f
     {

@@ -18,7 +18,7 @@
  * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
 \*****************************************************************************/
-
+ 
 /*!
  * \file    debug.cc
  *
@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/05/16 11:52:39 $
+ * \date    \$Date: 2007/06/01 07:50:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.102 $
+ * \version \$Revision: 1.103 $
  *
  * \ingroup debug
  */
@@ -682,6 +682,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(59):
       { cerr << "<reply> must not be used with a variable AND <toPart> elements" << endl;
+	break; }
+
+    case(61):
+      { cerr << "messageExchange \"" << information << "\" is not defined in any enclosing scope" << endl;
 	break; }
 
     case(62):

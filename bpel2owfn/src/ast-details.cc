@@ -17,7 +17,7 @@
  * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
 \*****************************************************************************/
-
+ 
 /*!
  * \file    ast-details.cc
  *
@@ -29,13 +29,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/05/25 10:59:37 $
+ * \date    \$Date: 2007/06/01 07:50:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.122 $
+ * \version \$Revision: 1.123 $
  */
 
 
@@ -1180,6 +1180,35 @@ string ASTE::checkVariable(string attributename)
 }
 
 
+/*!
+ * \brief checks a messageExchange and returns its name
+ *
+ * Checks whether a given messageExchange was defined in an ancestor scope and returns
+ * the name of the messageExchange preceeded by the first scope that defined the
+ * messageExchange, e.g. "1.purchase".
+ *
+ * \param name name of the messageExchange
+ *  
+ * \return name of the variable
+ */
+
+string ASTE::checkMessageExchange()
+{
+  if ( attributes["messageExchange"] == "")
+    return "";
+  
+  vector<unsigned int> ancestorScopes = this->ancestorScopes();
+
+  // traverse the ancestor scopes
+  for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
+    if (globals::ASTE_messageExchangeNames.find(toString(*scope) + "." + attributes["messageExchange"]) != globals::ASTE_messageExchangeNames.end())
+      return (toString(*scope) + "." + attributes["messageExchange"]);
+
+  // SA00061
+  SAerror(61, attributes["messageExchange"], attributes["referenceLine"]);
+
+  return "";
+}
 
 
 

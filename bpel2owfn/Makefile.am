@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/05/11 17:16:02 $ by $Author: nielslohmann $
-# Version $Revision: 1.59 $
+# File last changed $Date: 2007/06/02 18:46:28 $ by $Author: nielslohmann $
+# Version $Revision: 1.60 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc rpm
@@ -73,9 +73,9 @@ hu-prepare: maintainer-clean
 	-rm -f -r src/.deps
 	-rm -f tests/Makefile.in
 	-rm -f rpm/Makefile.in	
-	find -type d -exec chmod 755 {} \;
-	find -type f -exec chmod 644 {} \;
-	-find -type f -exec dos2unix {} \;
+	find . -type d -exec chmod 755 {} \;
+	find . -type f -exec chmod 644 {} \;
+	-find . -type f -exec dos2unix {} \;
 	chmod 755 $(SHELLSCRIPTS) doc/gendocs.sh
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"

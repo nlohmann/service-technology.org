@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/06/02 18:46:28 $ by $Author: nielslohmann $
-# Version $Revision: 1.60 $
+# File last changed $Date: 2007/06/03 11:50:30 $ by $Author: nielslohmann $
+# Version $Revision: 1.61 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc rpm
@@ -45,7 +45,8 @@ SHELLSCRIPTS = tests/test1 \
 	       tests/test2 \
 	       tests/test3 \
 	       tests/test4 \
-	       tests/test5
+	       tests/test5 \
+	       tests/test6
 
 # Delete all files that can be created by other files, repair file
 # permissions and set filetype to UNIX.

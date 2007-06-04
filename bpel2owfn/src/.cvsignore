@@ -54,3 +54,5 @@ bpel2owfn.exe.stackdump
 *.og
 *.wsdl
 *.xml
+.DS_Store
+bpel2owfn

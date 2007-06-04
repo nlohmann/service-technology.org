@@ -20,22 +20,22 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/04/20 10:33:12 $ by $Author: nielslohmann $.
-# Version $Revision: 1.9 $
+# File last changed $Date: 2007/06/04 13:06:11 $ by $Author: nielslohmann $.
+# Version $Revision: 1.10 $
 
 echo ""
 
-echo "test: consistency mode"
+echo "test: choreography mode"
 echo "customer 1"
-bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer1.bpel --mode=consistency --format=lola --parameter=communicationonly --parameter=reduce --output=coffee_customer1 &> /dev/null
+bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer1.bpel --mode=choreography --format=lola --parameter=communicationonly --parameter=reduce --output=coffee_customer1 &> /dev/null
 result1=$?
 
 echo "customer 2"
-bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer2.bpel --mode=consistency --format=lola --parameter=communicationonly --parameter=reduce --output=coffee_customer2 &> /dev/null
+bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer2.bpel --mode=choreography --format=lola --parameter=communicationonly --parameter=reduce --output=coffee_customer2 &> /dev/null
 result2=$?
 
 echo "customer 3"
-bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer3.bpel --mode=consistency --format=lola --parameter=communicationonly --parameter=reduce --output=coffee_customer3 &> /dev/null
+bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer3.bpel --mode=choreography --format=lola --parameter=communicationonly --parameter=reduce --output=coffee_customer3 &> /dev/null
 result3=$?
 
 if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 \) \

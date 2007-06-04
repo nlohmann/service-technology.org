@@ -20,13 +20,13 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/05/17 11:43:00 $ by $Author: nielslohmann $.
-# Version $Revision: 1.1 $
+# File last changed $Date: 2007/06/04 13:06:11 $ by $Author: nielslohmann $.
+# Version $Revision: 1.2 $
 
 echo ""
 
 echo "test: BPEL4Chor"
-bpel2owfn --input=$testdir/bpel4chor/chor_paper_traveler.bpel --input=$testdir/bpel4chor/chor_paper_airline.bpel --input=$testdir/bpel4chor/chor_paper_traveler.bpel --choreography=$testdir/bpel4chor/chor_paper_topology.xml --mode=consistency --parameter=communicationonly --output=choreography --format=owfn &> /dev/null
+bpel2owfn --input=$testdir/bpel4chor/chor_paper_traveler.bpel --input=$testdir/bpel4chor/chor_paper_airline.bpel --input=$testdir/bpel4chor/chor_paper_traveler.bpel --choreography=$testdir/bpel4chor/chor_paper_topology.xml --mode=choreography --parameter=communicationonly --output=choreography --format=owfn &> /dev/null
 result1=$?
 
 if test \( $result1 -eq 0 \) -a \( -f choreography.owfn \)

@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/06/01 08:52:10 $
+ * \date    \$Date: 2007/06/04 08:02:02 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.85 $
+ * \version \$Revision: 1.86 $
  */
 
 
@@ -163,7 +163,7 @@ void print_help()
   trace("    ast                 print the abstract syntax tree\n");
   trace("    pretty              pretty-print the input BPEL process\n");
   trace("    cfg                 build a control flow graph\n");
-  trace("    consistency         checks whether services communicate deadlock-freely\n");
+  trace("    choreography        composes several processes to a choreography\n");
   trace("\n");
   trace("  PARAMETER is one of the following (multiple parameters permitted):\n");
   trace("    reduce              structurally simplify generated Petri net (-r5)\n");
@@ -249,15 +249,15 @@ void parse_command_line(int argc, char* argv[])
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_INFO)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_PNML)] = true;
 
-  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_LOLA)] = true;
-  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_OWFN)] = true;
-  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_DOT )] = true;
-  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_INA )] = true;
-  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_SPIN)] = true;
-  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_PEP )] = true;
-  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_APNN)] = true;
-  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_INFO)] = true;
-  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_PNML)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_LOLA)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_OWFN)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_DOT )] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_INA )] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_SPIN)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_PEP )] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_APNN)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_INFO)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_PNML)] = true;
 
   validFormats[pair<possibleModi,possibleFormats>(M_CFG,F_DOT)] = true;
   
@@ -301,11 +301,11 @@ void parse_command_line(int argc, char* argv[])
 		  }
 		  else if (parameter == "petrinet" || parameter == "pn")
 		    modus = M_PETRINET;
-		  else if (parameter == "consistency")
-		    modus = M_CONSISTENCY;
+		  else if (parameter == "choreography" || parameter == "chor")
+		    modus = M_CHOREOGRAPHY;
 		  else if (parameter == "cfg")
 		    modus = M_CFG;
-		  else if (parameter == "visualization")
+		  else if (parameter == "visualization" || parameter == "vis")
 		    modus = M_VIS;
 		  else  {
 		    trace(TRACE_ALWAYS, "Unknown mode \"" + parameter+ "\".\n");
@@ -411,7 +411,7 @@ void parse_command_line(int argc, char* argv[])
 
 		if ( parameter == "reduce")
 		  globals::reduction_level = 5;
-		else if (parameter == "communicationonly")
+		else if (parameter == "communicationonly" | parameter == "small")
 		  globals::parameters[P_COMMUNICATIONONLY] = true;
 		else if (parameter == "standardfaults")
 		  globals::parameters[P_STANDARDFAULTS] = true;
@@ -542,7 +542,7 @@ void parse_command_line(int argc, char* argv[])
   // if input file is given, bind it to frontend_in
   if (options[O_INPUT])
   {
-    if (modus != M_CONSISTENCY && inputfiles.size() > 1)
+    if (modus != M_CHOREOGRAPHY && inputfiles.size() > 1)
     {
 	  trace(TRACE_ALWAYS, "Multiple input options are given, please choose only one!\n");
       cleanup();
@@ -557,7 +557,7 @@ void parse_command_line(int argc, char* argv[])
     }
     fclose(fin);
     file++;
-    while(modus == M_CONSISTENCY && file != inputfiles.end())
+    while(modus == M_CHOREOGRAPHY && file != inputfiles.end())
     {
       if (!(fin = fopen(file->c_str(), "r")))
       {
@@ -595,7 +595,7 @@ void parse_command_line(int argc, char* argv[])
         globals::output_filename = file->substr(0, pos);
       }
       file++;
-      while(modus == M_CONSISTENCY && file != inputfiles.end())
+      while(modus == M_CHOREOGRAPHY && file != inputfiles.end())
       {
         unsigned int pos = file->rfind(".bpel", file->length());
         unsigned int pos2 = file->rfind("/", file->length());
@@ -661,8 +661,8 @@ void parse_command_line(int argc, char* argv[])
     case M_PETRINET:
 	    trace(TRACE_INFORMATION, " - generate Petri net\n");
 	    break;
-    case M_CONSISTENCY:
-	    trace(TRACE_INFORMATION, " - consistency mode\n");
+    case M_CHOREOGRAPHY:
+	    trace(TRACE_INFORMATION, " - choreography mode\n");
 	    break;
   }
 

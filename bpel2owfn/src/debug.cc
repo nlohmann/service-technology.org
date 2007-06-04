@@ -26,17 +26,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/06/01 08:29:53 $
+ * \date    \$Date: 2007/06/04 08:02:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.104 $
+ * \version \$Revision: 1.105 $
  *
  * \ingroup debug
  */
@@ -227,7 +227,7 @@ void show_process_information()
     cerr << "Found " << globals::other_errors << " further errors." << endl;
   }
 
-  if (modus == M_PETRINET || modus == M_CONSISTENCY)
+  if (modus == M_PETRINET || modus == M_CHOREOGRAPHY)
     cerr << "------------------------------------------------------------------------------" << endl;
 }
 

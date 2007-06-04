@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/05/17 11:41:30 $
+ * \date    \$Date: 2007/06/04 08:02:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.178 $
+ * \version \$Revision: 1.179 $
  */
 
 
@@ -270,7 +270,7 @@ void single_output(set< string >::iterator file)
 
 
 
-  if (modus == M_PETRINET || modus == M_CONSISTENCY)
+  if (modus == M_PETRINET || modus == M_CHOREOGRAPHY)
   {
     // choose Petri net patterns
     if (globals::parameters[P_COMMUNICATIONONLY] == true)
@@ -288,7 +288,7 @@ void single_output(set< string >::iterator file)
       PN.reduce(globals::reduction_level);
     }
 
-    if (modus == M_CONSISTENCY)
+    if (modus == M_CHOREOGRAPHY)
     {
       // case 1: no or only one instance of this process is needed
       if (globals::instances_of_current_process == 1 || globals::instances_of_current_process == 0)
@@ -321,7 +321,7 @@ void single_output(set< string >::iterator file)
 
   // generate a Petri net (w/o BPEL4Chor)?
   if ((globals::choreography_filename == "") &&
-    (modus == M_PETRINET || modus == M_CONSISTENCY))
+    (modus == M_PETRINET || modus == M_CHOREOGRAPHY))
   {
     trace(TRACE_INFORMATION, "-> Unparsing AST to Petri net ...\n");
     // choose Petri net patterns
@@ -332,7 +332,7 @@ void single_output(set< string >::iterator file)
 
     // calculate maximum occurences
     PN.calculate_max_occurrences();
-    if (modus == M_CONSISTENCY)
+    if (modus == M_CHOREOGRAPHY)
     {
       unsigned int pos = file->rfind(".bpel", file->length());
       unsigned int pos2 = file->rfind("/", file->length());
@@ -363,10 +363,10 @@ void single_output(set< string >::iterator file)
 // Final Output of the result
 void final_output()
 {
-  if (modus == M_CONSISTENCY)
+  if (modus == M_CHOREOGRAPHY)
     PN = PN2;
 
-  if (modus == M_PETRINET || modus == M_CONSISTENCY)
+  if (modus == M_PETRINET || modus == M_CHOREOGRAPHY)
   {
     if (globals::reduction_level > 0)
     {
@@ -406,7 +406,7 @@ void final_output()
       {
 	output = openOutput(globals::output_filename + "." + suffixes[F_LOLA]);
       }
-      if (modus == M_CONSISTENCY)
+      if (modus == M_CHOREOGRAPHY)
       {
 	PN.makeChannelsInternal();
       }
@@ -419,7 +419,7 @@ void final_output()
 	output = NULL;
       }
 
-      if (modus == M_CONSISTENCY || modus == M_PETRINET)
+      if (modus == M_CHOREOGRAPHY || modus == M_PETRINET)
       {
 	if (globals::output_filename != "")
 	{
@@ -712,7 +712,7 @@ int main( int argc, char *argv[])
 
     file++;
 
-  } while (modus == M_CONSISTENCY && file != inputfiles.end());
+  } while (modus == M_CHOREOGRAPHY && file != inputfiles.end());
 
   trace(TRACE_INFORMATION, "All files have been parsed.\n");
 

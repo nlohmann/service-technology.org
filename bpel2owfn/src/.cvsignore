@@ -53,3 +53,4 @@ bpel2owfn.exe.stackdump
 *.exe
 *.og
 *.wsdl
+*.xml

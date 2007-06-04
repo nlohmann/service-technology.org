@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/06/04 08:02:01 $
+ * \date    \$Date: 2007/06/04 11:31:24 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.179 $
+ * \version \$Revision: 1.180 $
  */
 
 
@@ -293,23 +293,23 @@ void single_output(set< string >::iterator file)
       // case 1: no or only one instance of this process is needed
       if (globals::instances_of_current_process == 1 || globals::instances_of_current_process == 0)
       {
-	// add a prefix and compose PN to PN2
-	PN.addPrefix(globals::ASTEmap[1]->attributes["name"] + ".");
-	PN2.compose(PN);
+        // add a prefix and compose PN to PN2
+        PN.addPrefix(globals::ASTEmap[1]->attributes["name"] + ".");
+        PN2.compose(PN);
       }
       else // case 2: two or more instances of this process are needed
       {
-	for(unsigned int instance = 1; instance <= globals::instances_of_current_process; instance++)
-	{
-	  std::cerr << "instance " << instance << "/" << globals::instances_of_current_process << " " << PN2.information() << std::endl;
-	
-	  PetriNet PN3 = PN;
-	  PN3.addPrefix(globals::ASTEmap[1]->attributes["name"] + "_" + toString(instance) + ".");
-	  PN3.add_interface_suffix(".instance_" + toString(instance));
-	  PN2.compose(PN3);
-	}      
+        for(unsigned int instance = 1; instance <= globals::instances_of_current_process; instance++)
+        {
+          std::cerr << "instance " << instance << "/" << globals::instances_of_current_process << " " << PN2.information() << std::endl;
+          
+          PetriNet PN3 = PN;
+          PN3.addPrefix(globals::ASTEmap[1]->attributes["name"] + "_" + toString(instance) + ".");
+          PN3.add_interface_suffix(".instance_" + toString(instance));
+          PN2.compose(PN3);
+        }      
       }
-    
+      
       // reset data structures
       PN = PetriNet();
       globals::AST = NULL;
@@ -373,28 +373,28 @@ void final_output()
       trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
       PN.reduce(globals::reduction_level);
     }
-
+    
     // now the net will not change any more, thus the nodes are re-enumerated
     // and the maximal occurrences of the nodes are calculated.
     PN.reenumerate();
-//  PN.calculate_max_occurrences();
+    //  PN.calculate_max_occurrences();
     cerr << PN.information() << endl;
-
-
+    
+    
     // create oWFN output ?
     if (formats[F_OWFN])
     {
       if (globals::output_filename != "")
       {
-	output = openOutput(globals::output_filename + "." + suffixes[F_OWFN]);
+        output = openOutput(globals::output_filename + "." + suffixes[F_OWFN]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
       PN.set_format(FORMAT_OWFN);
       (*output) << PN;
       if (globals::output_filename != "")
       {
-	closeOutput(output);
-	output = NULL;
+        closeOutput(output);
+        output = NULL;
       }
     }
 
@@ -404,47 +404,47 @@ void final_output()
     {
       if (globals::output_filename != "")
       {
-	output = openOutput(globals::output_filename + "." + suffixes[F_LOLA]);
+        output = openOutput(globals::output_filename + "." + suffixes[F_LOLA]);
       }
       if (modus == M_CHOREOGRAPHY)
       {
-	PN.makeChannelsInternal();
+        PN.makeChannelsInternal();
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
       PN.set_format(FORMAT_LOLA);
       (*output) << PN;
       if (globals::output_filename != "")
       {
-	closeOutput(output);
-	output = NULL;
+        closeOutput(output);
+        output = NULL;
       }
-
+      
       if (modus == M_CHOREOGRAPHY || modus == M_PETRINET)
       {
-	if (globals::output_filename != "")
-	{
-	  output = openOutput(globals::output_filename + ".task");
-	}
-	string comment = "{ AG EF (";
-	string formula = "FORMULA\n  ALLPATH ALWAYS EXPATH EVENTUALLY (";
-	string andStr = "";
-
+        if (globals::output_filename != "")
+        {
+          output = openOutput(globals::output_filename + ".task");
+        }
+        string comment = "{ AG EF (";
+        string formula = "FORMULA\n  ALLPATH ALWAYS EXPATH EVENTUALLY (";
+        string andStr = "";
+        
         set< Place * > finalPlaces = PN.getFinalPlaces();
-	for (set< Place * >::iterator place = finalPlaces.begin(); place != finalPlaces.end(); place++)
-	{
-	  comment += andStr + (*place)->nodeFullName();
-	  formula += andStr + (*place)->nodeShortName() + " > 0";
+        for (set< Place * >::iterator place = finalPlaces.begin(); place != finalPlaces.end(); place++)
+        {
+          comment += andStr + (*place)->nodeFullName();
+          formula += andStr + (*place)->nodeShortName() + " > 0";
        	  andStr = " AND ";
-	}
-	comment += ") }";
-	formula += ")";
-	(*output) << comment << endl << endl;
-	(*output) << formula << endl << endl;
-	if (globals::output_filename != "")
-	{
-	  closeOutput(output);
-	  output = NULL;
-	}
+        }
+        comment += ") }";
+        formula += ")";
+        (*output) << comment << endl << endl;
+        (*output) << formula << endl << endl;
+        if (globals::output_filename != "")
+        {
+          closeOutput(output);
+          output = NULL;
+        }
       }
     }
 
@@ -454,15 +454,15 @@ void final_output()
     {
       if (globals::output_filename != "")
       {
-	output = openOutput(globals::output_filename + "." + suffixes[F_PNML]);
+        output = openOutput(globals::output_filename + "." + suffixes[F_PNML]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for PNML ...\n");
       PN.set_format(FORMAT_PNML);
       (*output) << PN;
       if (globals::output_filename != "")
       {
-	closeOutput(output);
-	output = NULL;
+        closeOutput(output);
+        output = NULL;
       }
     }
 
@@ -472,15 +472,15 @@ void final_output()
     {
       if (globals::output_filename != "")
       {
-	output = openOutput(globals::output_filename + "." + suffixes[F_PEP]);
+        output = openOutput(globals::output_filename + "." + suffixes[F_PEP]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for PEP ...\n");
       PN.set_format(FORMAT_PEP);
       (*output) << PN;
       if (globals::output_filename != "")
       {
-	closeOutput(output);
-	output = NULL;
+        closeOutput(output);
+        output = NULL;
       }
     }
 
@@ -490,32 +490,32 @@ void final_output()
     {
       if (globals::output_filename != "")
       {
-	output = openOutput(globals::output_filename + "." + suffixes[F_INA]);
+        output = openOutput(globals::output_filename + "." + suffixes[F_INA]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for INA ...\n");
       PN.set_format(FORMAT_INA);
       (*output) << PN;
       if (globals::output_filename != "")
       {
-	closeOutput(output);
-	output = NULL;
+        closeOutput(output);
+        output = NULL;
       }
     }
-
+    
     // create SPIN output ?
     if ( formats[F_SPIN] )
     {
       if (globals::output_filename != "")
       {
-	output = openOutput(globals::output_filename + "." + suffixes[F_SPIN]);
+        output = openOutput(globals::output_filename + "." + suffixes[F_SPIN]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for SPIN ...\n");
       PN.set_format(FORMAT_SPIN);
       (*output) << PN;
       if (globals::output_filename != "")
       {
-	closeOutput(output);
-	output = NULL;
+        closeOutput(output);
+        output = NULL;
       }
     }
 
@@ -524,25 +524,25 @@ void final_output()
     {
       if (globals::output_filename != "")
       {
-	output = openOutput(globals::output_filename + "." + suffixes[F_APNN]);
+        output = openOutput(globals::output_filename + "." + suffixes[F_APNN]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for APNN ...\n");
       PN.set_format(FORMAT_APNN);
       (*output) << PN;
       if (globals::output_filename != "")
       {
-	closeOutput(output);
-	output = NULL;
+        closeOutput(output);
+        output = NULL;
       }
     }
-
-
+    
+    
     // create dot output ?
     if ( formats[F_DOT] )
     {
       if (globals::output_filename != "")
       {
-	output = openOutput(globals::output_filename + "." + suffixes[F_DOT]);
+        output = openOutput(globals::output_filename + "." + suffixes[F_DOT]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for dot ...\n");
       // if parameter "nointerface" is set, set dot format with parameter "false"
@@ -551,8 +551,8 @@ void final_output()
       (*output) << PN;
       if (globals::output_filename != "")
       {
-	closeOutput(output);
-	output = NULL;
+        closeOutput(output);
+        output = NULL;
 
 #ifdef HAVE_DOT
 	string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".png " + globals::output_filename + "." + suffixes[F_DOT];
@@ -569,15 +569,15 @@ void final_output()
     {
       if (globals::output_filename != "")
       {
-	output = openOutput(globals::output_filename + "." + suffixes[F_INFO]);
+        output = openOutput(globals::output_filename + "." + suffixes[F_INFO]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net information ...\n");
       PN.set_format(FORMAT_INFO);
       (*output) << PN;
       if (globals::output_filename != "")
       {
-	closeOutput(output);
-	output = NULL;
+        closeOutput(output);
+        output = NULL;
       }
     }
   }
@@ -681,12 +681,12 @@ int main( int argc, char *argv[])
     trace(TRACE_INFORMATION, "Parsing " + globals::filename + " ...\n");
     frontend_parse();
     trace(TRACE_INFORMATION, "Parsing of " + globals::filename + " complete.\n");
-
+    
     globals::parsing = false;
-
+    
     if (file != inputfiles.end())
       close_file(*file);
-
+    
     if (frontend_nerrs == 0)
     {
       finish_AST();
@@ -696,17 +696,17 @@ int main( int argc, char *argv[])
     {
       if (globals::AST == NULL)
       {
-	genericError(104, "", toString(frontend_lineno), ERRORLEVEL_CRITICAL);
-
-	cleanup();
-    	return 3;
+        genericError(104, "", toString(frontend_lineno), ERRORLEVEL_CRITICAL);
+        
+        cleanup();
+        return 3;
       }
       else
       {
-  	genericError(105, "", toString(frontend_lineno), ERRORLEVEL_NOTICE);
-
-	finish_AST();
-	single_output(file);
+        genericError(105, "", toString(frontend_lineno), ERRORLEVEL_NOTICE);
+        
+        finish_AST();
+        single_output(file);
       }
     }
 

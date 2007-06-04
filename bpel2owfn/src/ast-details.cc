@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/06/04 12:44:51 $
+ * \date    \$Date: 2007/06/04 13:08:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.125 $
+ * \version \$Revision: 1.126 $
  */
 
 
@@ -78,14 +78,26 @@ using std::endl;
  *               by flex and bison
  */
 ASTE::ASTE(unsigned int myid, unsigned int mytype) :
-  id(myid), type(mytype), 
-  sourceActivity(0), targetActivity(0), 
-  visConnection("none"), secVisConnection("none"), drawn(false), highlighted(false), 
-  enclosedFH(0), enclosedCH(0), callable(true), isUserDefined(true), controlFlow(POSITIVECF), 
+  id(myid),
+  type(mytype), 
+  sourceActivity(0),
+  targetActivity(0), 
+  visConnection("none"),
+  secVisConnection("none"),
+  drawn(false),
+  highlighted(false), 
+  enclosedFH(0),
+  enclosedCH(0),
+  callable(true),
+  isUserDefined(true),
+  controlFlow(POSITIVECF), 
   plRoleDetails(NULL), 
-  isStartActivity(false), cyclic(false), 
-  max_occurrences(1), max_loops(UINT_MAX), 
-  channel_instances(0), channel_unique_instances(0), 
+  isStartActivity(false),
+  cyclic(false), 
+  max_occurrences(1),
+  max_loops(UINT_MAX), 
+  channel_instances(0),
+  channel_unique_instances(0), 
   partnerLinkType(NULL) 
 {
   assert(myid != 0);
@@ -115,8 +127,8 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype) :
       case(K_COMPENSATE):
       case(K_COMPENSATESCOPE):
       case(K_OPAQUEACTIVITY):
-			globals::process_information.basic_activities++; break;
-
+        globals::process_information.basic_activities++; break;
+        
       // structured activities
       case(K_WHILE):
       case(K_REPEATUNTIL):
@@ -125,7 +137,7 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype) :
       case(K_PICK):
       case(K_IF):
       case(K_FOREACH):
-			globals::process_information.structured_activities++; break;
+			  globals::process_information.structured_activities++; break;
     }
   }
   else
@@ -154,7 +166,7 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype) :
       case(K_PICK):
       case(K_IF):
       case(K_FOREACH):
-	                globals::process_information.implicit_activities++; break;
+        globals::process_information.implicit_activities++; break;
     }
   }
 }
@@ -769,48 +781,60 @@ string ASTE::createChannel(bool synchronousCommunication)
       // receiving activity
       case(K_RECEIVE):
       case(K_ONMESSAGE):
-	{
-	  // depending on the channel count, create one or more input channel(s)
-	  pair<unsigned int, bool> result = globals::BPEL4ChorInfo.channel_count(id, false);
-	  if (result.first != 0 && result.first != UINT_MAX)
-	  {
-	    globals::ASTE_inputChannels[channelName] = result.first;
+      {
+        // depending on the channel count, create one or more input channel(s)
+        pair<unsigned int, bool> result = globals::BPEL4ChorInfo.channel_count(id, false);
+        if (result.first != 0 && result.first != UINT_MAX)
+        {
+          globals::ASTE_inputChannels[channelName] = result.first;
 
-	    if (result.second)
-	      channel_unique_instances = result.first; // a unique instance
-	    else
-	      channel_instances = 1; // an iterator
-	  }
-	  else
-	    globals::ASTE_inputChannels[channelName] = 1;
+          if (result.second)
+          {
+            std::cerr << "channel `" << channelName << "' is used as unique channel" << std::endl;
+            channel_unique_instances = result.first; // a unique instance
+          }
+          else
+          {
+            std::cerr << "channel `" << channelName << "' is used as instanced channel" << std::endl;
+            channel_instances = 1; // an iterator
+          }
+        }
+        else
+          globals::ASTE_inputChannels[channelName] = 1;
 
-	  break;
-	}
+        break;
+      }
 
       // sending activity
       case(K_INVOKE):
       case(K_REPLY):
-	{
-	  // depending on the channel count, create one or more output channel(s)
-	  pair<unsigned int, bool> result = globals::BPEL4ChorInfo.channel_count(id, true);
-	  if (result.first != 0 && result.first != UINT_MAX)
-	  {
-	    globals::ASTE_outputChannels[channelName] = result.first;
+      {
+        // depending on the channel count, create one or more output channel(s)
+        pair<unsigned int, bool> result = globals::BPEL4ChorInfo.channel_count(id, true);
+        if (result.first != 0 && result.first != UINT_MAX)
+        {
+          globals::ASTE_outputChannels[channelName] = result.first;
 
-	    if (result.second)
-	      channel_unique_instances = result.first; // a unique instance
-	    else
-	      channel_instances = 1; // an iterator
-	  }
-	  else
-	    globals::ASTE_outputChannels[channelName] = 1;
+          if (result.second)
+          {
+            std::cerr << "channel `" << channelName << "' is used as unique channel" << std::endl;
+            channel_unique_instances = result.first; // a unique instance
+          }
+          else
+          {
+            std::cerr << "channel `" << channelName << "' is used as instanced channel" << std::endl;
+            channel_instances = 1; // an iterator
+          }
+        }
+        else
+          globals::ASTE_outputChannels[channelName] = 1;
 
-	  break;
-	}
-    }
+        break;
+      }
+        }
 
-    return channelName;
-  }
+        return channelName;
+      }
 
 
   // Find the name of the channel: it is usually a combination of partnerLink

@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/06/04 11:31:24 $
+ * \date    \$Date: 2007/06/04 13:08:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 
 
@@ -297,6 +297,11 @@ unsigned int BPEL4Chor::forEach_count(unsigned int ASTE_id) const
 
 
 
+/*!
+ * \return pair consisting of the number of instances of the channel and a boolean that
+ *         is true iff a unique sender/receiver nested in a forEach is part of the
+ *         message link.
+ */
 pair<unsigned int, bool> BPEL4Chor::channel_count(unsigned int ASTE_id, bool sending) const
 {
   // find the messageLink
@@ -326,7 +331,6 @@ pair<unsigned int, bool> BPEL4Chor::channel_count(unsigned int ASTE_id, bool sen
   // activity is receiving messages from a sender nested in a forEach
   if (!sending && (messageLink->participantSet->iterator_participant_names.find(messageLink->sender) != messageLink->participantSet->iterator_participant_names.end()))
     return pair<unsigned int, bool>(messageLink->participantSet->count, false);
-  
   
   // activity is sending messages to a unique receiver nested in a forEach
   if (sending && (messageLink->participantSet->unique_participant_names.find(messageLink->receiver) != messageLink->participantSet->unique_participant_names.end()))

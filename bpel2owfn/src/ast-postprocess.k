@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/06/04 12:44:51 $
+ * \date    \$Date: 2007/06/04 13:46:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.180 $
+ * \version \$Revision: 1.181 $
  */
 %}
 
@@ -691,7 +691,6 @@ CompensationHandler(a,_id) ->
        	while(i < ancestors.size())
       	{
       	  string ancestor = globals::ASTEmap[ancestors[i]]->activityTypeName();
-          cerr<<"Ancestor:" << ancestor << "\n";
     	  if (ancestor == "catch" ||
   	      ancestor == "catchAll" ||
   	      ancestor == "terminationHandler" ||

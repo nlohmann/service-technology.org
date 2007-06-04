@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/06/01 08:29:52 $
+ * \date    \$Date: 2007/06/04 12:44:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.179 $
+ * \version \$Revision: 1.180 $
  */
 %}
 
@@ -94,10 +94,9 @@ Process(a,b,messageExchange,c,d,e,g,i,_id) ->
         {
           faultName = faultName.substr( faultName.find_first_of(":") + 1 );
         }
-
         if ( myself->possiblyTriggeredFaults.find( faultName ) != myself->possiblyTriggeredFaults.end() )
         {
-          cerr << "callable !" << endl;
+          // cerr << "callable !" << endl;
           callableFH = true;
         }
       }
@@ -254,7 +253,8 @@ FaultHandlers(a,b,_id) ->
       
 
       myself->parentScopeId = globals::PPcurrentScope;
-      myself->hasCatchAll = (b->op_name() == "CatchAll");
+      myself->hasCatchAll = (string(b->op_name()) == "CatchAll");
+      
 //      myself->inProcess = (myself->parentScopeId == 1);
 
       // distribute the fault handlers's id to the enclosed catch/catchAll branches

@@ -29,13 +29,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/06/01 08:29:52 $
+ * \date    \$Date: 2007/06/04 12:44:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.124 $
+ * \version \$Revision: 1.125 $
  */
 
 
@@ -1093,15 +1093,15 @@ void ASTE::enterFault(WSDL_PartnerLinkType * plt)
   {
     return;
   }
-  if ( plt->role1.second != NULL )
+  if ( plt->myRole.second != NULL )
   {
-    for (map<string, WSDL_Operation*>::iterator it = plt->role1.second->Operations.begin(); it != plt->role1.second->Operations.begin(); it++)
+    for (map<string, WSDL_Operation*>::iterator it = plt->myRole.second->Operations.begin(); it != plt->myRole.second->Operations.end(); it++)
       if ( it->second != NULL )
         enterFault( it->second->faultName );
   }
-  if ( plt->role2.second != NULL )
+  if ( plt->partnerRole.second != NULL )
   {
-    for (map<string, WSDL_Operation*>::iterator it2 = plt->role2.second->Operations.begin(); it2 != plt->role2.second->Operations.begin(); it2++)
+    for (map<string, WSDL_Operation*>::iterator it2 = plt->partnerRole.second->Operations.begin(); it2 != plt->partnerRole.second->Operations.end(); it2++)
       if ( it2->second != NULL )
         enterFault( it2->second->faultName );
   }

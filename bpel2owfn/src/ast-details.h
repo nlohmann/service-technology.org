@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/06/01 07:50:11 $
+ * \date    \$Date: 2007/06/05 11:51:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.84 $
+ * \version \$Revision: 1.85 $
  */
 
 
@@ -68,6 +68,7 @@ using std::vector;
 class ASTE;
 class pPartnerLink;
 class WSDL_PartnerLinkType;
+class BPEL4Chor_messageLink;
 
 
 
@@ -232,11 +233,11 @@ class ASTE
   
     set<string> sharedCorrelationSets;	///< the identifiers of the joined correlation sets in case activity is a start activity
 
-    unsigned int channel_instances;
-    unsigned int channel_unique_instances;
+    unsigned int channel_instances; ///< an iterator for BPEL4Chor
 
     WSDL_PartnerLinkType* partnerLinkType; ///< a link to a partnerLinkType object holding more information; used for partnerLinks
-
+    BPEL4Chor_messageLink* messageLink; ///< a BPEL4Chor message link (if present)
+    
 
     /**************************************************************************
      * Class methods

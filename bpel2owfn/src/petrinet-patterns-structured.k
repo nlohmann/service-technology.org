@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/05/17 11:41:30 $
+ * \date    \$Date: 2007/06/05 11:51:22 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
 */
 %}
 
@@ -59,6 +59,7 @@
 #include "ast-details.h"
 #include "globals.h"
 #include "petrinet-patterns-shortcuts.h"
+#include "extension-chor.h"
 
 using std::cerr;
 using std::endl;
@@ -758,17 +759,40 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
     // Unparse the embedded activity.
     innerActivity->unparse(pseudoPrinter, current_view);
 
+
     // Set the name of the interface place.
     string interface_place_name = "in." + globals::ASTEmap[ThisBranch->id]->channelName;
-    if ((globals::ASTE_inputChannels[globals::ASTEmap[ThisBranch->id]->channelName] > 1) &&
-       (globals::ASTEmap[ThisBranch->id]->channel_unique_instances == 0))
-      interface_place_name += ".instance_" + toString(globals::ASTEmap[ThisBranch->id]->channel_instances++);
 
-    // Message-receiving transition.
-    Transition *t1 = PN.newTransition(prefix + "onMessage_" + branch);
-    PN.newArc(PN.findPlace(prefix + "initial"), t1);
-    PN.newArc(PN.findPlace(interface_place_name), t1);
-    PN.newArc(t1, PN.findPlace(toString(innerActivity->id) + ".initial"));
+    // Add an instance suffix when necessary.            
+    if (globals::instances_of_current_process == 0 &&
+        globals::ASTEmap[ThisBranch->id]->messageLink != NULL &&
+        (globals::ASTEmap[ThisBranch->id]->messageLink->receiver_is_iterator ||
+         globals::ASTEmap[ThisBranch->id]->messageLink->sender_is_iterator ||
+         globals::ASTEmap[ThisBranch->id]->messageLink->receiver_is_unique))
+    {
+      interface_place_name += ".instance_" + toString(globals::ASTEmap[ThisBranch->id]->channel_instances++);
+    }
+
+    // Receive message from all unique senders.
+    if (globals::ASTEmap[ThisBranch->id]->messageLink != NULL &&
+        globals::ASTEmap[ThisBranch->id]->messageLink->sender_is_unique)
+    {
+      for (unsigned int i = 1; i <= globals::ASTEmap[ThisBranch->id]->messageLink->participantSet->count; i++)
+      {
+        Transition *t1 = PN.newTransition(prefix + "onMessage_" + branch + "_" + toString(i));
+        PN.newArc(PN.findPlace(prefix + "initial"), t1);
+        PN.newArc(PN.findPlace(interface_place_name + ".instance_" + toString(i)), t1);
+        PN.newArc(t1, PN.findPlace(toString(innerActivity->id) + ".initial"));
+      }
+    }
+    else
+    {
+      // Create a "normal" message receiving transition.
+      Transition *t1 = PN.newTransition(prefix + "onMessage_" + branch);
+      PN.newArc(PN.findPlace(prefix + "initial"), t1);
+      PN.newArc(PN.findPlace(interface_place_name), t1);
+      PN.newArc(t1, PN.findPlace(toString(innerActivity->id) + ".initial"));
+    }
 
     // Embed the inner activity.
     PN.mergePlaces(phylum->id, ".final", innerActivity->id, ".final");
@@ -809,6 +833,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
     footer(_id2, true);
   }
   
+  return; // THIS IS A HACK!!!!!
 
   // Create the arcs for the Dead Path elimination: each chosen activity (i.e.
   // firing of the respective t1/t3-transition) has set the links of all other
@@ -817,7 +842,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
   foreach (OnMessage(corr_1, from_1, innerActivity1, _id1); tOnMessage_list phylum->tOnMessage_list_1) {
     foreach (OnMessage(corr_2, from_2, innerActivity2, _id2); tOnMessage_list phylum->tOnMessage_list_1) {
       if ((innerActivity1 != innerActivity2))
-	dpeLinks(PN.findTransition(prefix + "onMessage_" + toString(branch_count)), innerActivity2->id, phylum->id); // onMessage -> onMessage'
+        dpeLinks(PN.findTransition(prefix + "onMessage_" + toString(branch_count)), innerActivity2->id, phylum->id); // onMessage -> onMessage'
     }
 
     foreach (OnAlarm(*,innerActivity2); tOnAlarm_list phylum->tOnAlarm_list_1) {
@@ -830,7 +855,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
   foreach (OnAlarm(*,innerActivity1); tOnAlarm_list phylum->tOnAlarm_list_1) {
     foreach (otheronalarm=OnAlarm(*,innerActivity2); tOnAlarm_list phylum->tOnAlarm_list_1) {
       if ((innerActivity1 != innerActivity2))
-	dpeLinks(PN.findTransition(prefix + "onAlarm_" + toString(branch_count)), innerActivity2->id, phylum->id); // onAlarm -> onAlarm'
+        dpeLinks(PN.findTransition(prefix + "onAlarm_" + toString(branch_count)), innerActivity2->id, phylum->id); // onAlarm -> onAlarm'
     }
     
     foreach (OnMessage(_corr2, _from2, innerActivity2, _id2); tOnMessage_list phylum->tOnMessage_list_1) {

@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/06/04 13:08:07 $
+ * \date    \$Date: 2007/06/05 11:51:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 
 
@@ -87,7 +87,11 @@ BPEL4Chor_participantSet::BPEL4Chor_participantSet(map<string, string> &attribut
 
 
 
-BPEL4Chor_messageLink::BPEL4Chor_messageLink(map<string, string> &attribute_map)
+BPEL4Chor_messageLink::BPEL4Chor_messageLink(map<string, string> &attribute_map):
+  sender_is_unique(false),
+  sender_is_iterator(false),
+  receiver_is_unique(false),
+  receiver_is_iterator(false)
 {
   // read the attributes
   name = attribute_map["name"];
@@ -118,6 +122,34 @@ BPEL4Chor_messageLink::BPEL4Chor_messageLink(map<string, string> &attribute_map)
         participantSet_it->second->unique_participant_names.find(sender) != participantSet_it->second->unique_participant_names.end())
       participantSet = participantSet_it->second;
   }
+  
+  if (participantSet != NULL)
+  {
+    if (participantSet->unique_participant_names.find(sender) != participantSet->unique_participant_names.end())
+      sender_is_unique = true;
+    if (participantSet->unique_participant_names.find(receiver) != participantSet->unique_participant_names.end())
+      receiver_is_unique = true;
+    if (participantSet->iterator_participant_names.find(sender) != participantSet->iterator_participant_names.end())
+      sender_is_iterator = true;
+    if (participantSet->iterator_participant_names.find(receiver) != participantSet->iterator_participant_names.end())
+      receiver_is_iterator = true;
+  }
+
+  std::cerr << "messageLink `" << name << "': `" << sender << "'";
+  
+  if (sender_is_unique)
+    std::cerr << " (U)";
+  if (sender_is_iterator)
+    std::cerr << " (I)";
+  
+  std::cerr << " --> `" << receiver << "'";
+
+  if (receiver_is_unique)
+    std::cerr << " (U)";
+  if (receiver_is_iterator)
+    std::cerr << " (I)";
+  
+  std::cerr << "" << std::endl;
 }
 
 
@@ -214,10 +246,9 @@ void BPEL4Chor::add_messageLink(map<string, string> &attribute_map)
 /*!
  * \param  ASTE_id  the AST id of an activity
  *
- * \return the name of the message link that can be used to create a channel
- *         name
+ * \return a message link
  */
-string BPEL4Chor::channel_name(unsigned int ASTE_id) const
+BPEL4Chor_messageLink *BPEL4Chor::get_messageLink(unsigned int ASTE_id) const
 {
   assert(globals::ASTEmap[ASTE_id] != NULL);
   
@@ -230,7 +261,7 @@ string BPEL4Chor::channel_name(unsigned int ASTE_id) const
   {
     genericError(132, globals::ASTEmap[ASTE_id]->activityTypeName(),
                  globals::ASTEmap[ASTE_id]->attributes["referenceLine"], ERRORLEVEL_ERROR);
-    return "";
+    return NULL;
   }
   
   // search for the message link
@@ -238,17 +269,17 @@ string BPEL4Chor::channel_name(unsigned int ASTE_id) const
        messageLink != messageLinks.end(); messageLink++)
   {
     if (messageLink->second->sendActivity == activity_name)
-      return messageLink->first;
+      return messageLink->second;
     
     if (messageLink->second->receiveActivity == activity_name)
-      return messageLink->first;
+      return messageLink->second;
   }
   
   // if no message link was found, display an error
   genericError(131, "activity id or name `" + activity_name + "' of <" +
                globals::ASTEmap[ASTE_id]->activityTypeName() + "> does not reference a BPEL4Chor <messageLink>",
                globals::ASTEmap[ASTE_id]->attributes["referenceLine"], ERRORLEVEL_ERROR);
-  return "";
+  return NULL;
 }
 
 
@@ -297,56 +328,6 @@ unsigned int BPEL4Chor::forEach_count(unsigned int ASTE_id) const
 
 
 
-/*!
- * \return pair consisting of the number of instances of the channel and a boolean that
- *         is true iff a unique sender/receiver nested in a forEach is part of the
- *         message link.
- */
-pair<unsigned int, bool> BPEL4Chor::channel_count(unsigned int ASTE_id, bool sending) const
-{
-  // find the messageLink
-  string temp_channel_name = channel_name(ASTE_id);
-  BPEL4Chor_messageLink* messageLink = (messageLinks.find(temp_channel_name) != messageLinks.end()) ?
-    messageLinks.find(temp_channel_name)->second :
-    NULL;
-  
-  // if messageLink was not found, display an error
-  if (messageLink == NULL)
-  {
-    std::cerr << "messageLink not found" << std::endl;
-    return pair<unsigned int, bool>(0, false);
-  }
-  
-  assert(messageLink != NULL);
-  
-  if (messageLink->participantSet == NULL)
-    return pair<unsigned int, bool>(0, false);
-  
-  assert(messageLink->participantSet != NULL);
-  
-  // activity is sending messages to a receiver nested in a forEach
-  if (sending && (messageLink->participantSet->iterator_participant_names.find(messageLink->receiver) != messageLink->participantSet->iterator_participant_names.end()))
-    return pair<unsigned int, bool>(messageLink->participantSet->count, false);
-  
-  // activity is receiving messages from a sender nested in a forEach
-  if (!sending && (messageLink->participantSet->iterator_participant_names.find(messageLink->sender) != messageLink->participantSet->iterator_participant_names.end()))
-    return pair<unsigned int, bool>(messageLink->participantSet->count, false);
-  
-  // activity is sending messages to a unique receiver nested in a forEach
-  if (sending && (messageLink->participantSet->unique_participant_names.find(messageLink->receiver) != messageLink->participantSet->unique_participant_names.end()))
-    return pair<unsigned int, bool>(messageLink->participantSet->count, true);
-  
-  // activity is receiving messages from a unique sender nested in a forEach
-  if (!sending && (messageLink->participantSet->unique_participant_names.find(messageLink->sender) != messageLink->participantSet->unique_participant_names.end()))
-    return pair<unsigned int, bool>(messageLink->participantSet->count, true);
-  
-  return pair<unsigned int, bool>(0, false);
-}
-
-
-
-
-
 void BPEL4Chor::print_information() const
 {
   std::cerr << messageLinks.size() << " message links, " <<
@@ -389,9 +370,9 @@ unsigned int BPEL4Chor::instances(string process_name) const
       }
       
       // xmlns URL found, but no matching participant set: 1 instance is needed
-      return 1;
+      return 0; // was: 1;
     }
   }
   
-  return 0;
+  return -1;
 }

@@ -46,7 +46,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/05/17 11:41:30 $
+ * \date    \$Date: 2007/06/05 11:51:22 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -56,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  */
 %}
 
@@ -77,6 +77,7 @@
 #include "ast-details.h"
 #include "globals.h"
 #include "petrinet-patterns-shortcuts.h"
+#include "extension-chor.h"
 
 extern PetriNet PN;
 %}
@@ -222,64 +223,76 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
 
+  ASTE *myself = globals::ASTEmap[phylum->id];
+  assert(myself != NULL);
+
   switch(current_view)
   {
     case(petrinetnew_enum):
-      {
-        // Places.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-	Place *p3 = PN.newPlace(prefix + "stop");
-	Place *p4 = PN.newPlace(prefix + "stopped");
-        Place *p5 = PN.newPlace(prefix + "faulted");
+    {
+      // Places.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+      Place *p3 = PN.newPlace(prefix + "stop");
+      Place *p4 = PN.newPlace(prefix + "stopped");
+      Place *p5 = PN.newPlace(prefix + "faulted");
 
-        // A subnet sending a message (replacement of t1).
-        sendingTransition("invoke", p1, p2,
-                          PN.findPlace("out." + globals::ASTEmap[phylum->id]->channelName),
-                          p5, prefix, mkinteger(phylum->id),
-                          globals::ASTEmap[phylum->id]->controlFlow);
+      // A subnet sending a message (replacement of t1).
+      sendingTransition("invoke", p1, p2,
+                        PN.findPlace("out." + myself->channelName),
+                        p5, prefix, mkinteger(phylum->id),
+                        myself->controlFlow);
 
-        // Stopping transitions.
-	Transition *t2 = stop(p1, "initial", prefix);
-	Transition *t3 = stop(p2, "final", prefix);
-        Transition *t4 = stop(p5, "faulted", prefix);
+      // Stopping transitions.
+      Transition *t2 = stop(p1, "initial", prefix);
+      Transition *t3 = stop(p2, "final", prefix);
+      Transition *t4 = stop(p5, "faulted", prefix);
 
-	break;
-      }
+      break;
+    }
 
     case(petrinetsmall_enum):
+    {
+      // Places.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+
+      // Set the name of the interface place.
+      string interface_place_name = "out." + myself->channelName;
+
+      // Add an instance suffix when necessary.            
+      if (globals::instances_of_current_process == 0 &&
+          myself->messageLink != NULL &&
+          (myself->messageLink->receiver_is_iterator ||
+           myself->messageLink->sender_is_iterator ||
+           myself->messageLink->sender_is_unique))
       {
-        // Places.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-
-        // Set the name of the interface place.
-	string interface_place_name = "out." + globals::ASTEmap[phylum->id]->channelName;
-	if ((globals::ASTE_outputChannels[globals::ASTEmap[phylum->id]->channelName] > 1) &&
-	   (globals::ASTEmap[phylum->id]->channel_unique_instances == 0))
-	  interface_place_name += ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++);
-
-        // send a message to one unique instance
-        if (globals::ASTEmap[phylum->id]->channel_unique_instances > 1)
-        {
-          for (unsigned int i = 1; i <= globals::ASTEmap[phylum->id]->channel_unique_instances; i++)
-          {
-	    Transition *t1 = PN.newTransition(prefix + "invoke" + toString(i));
-	    PN.newArc(p1, t1);
-	    PN.newArc(t1, p2);
-	    PN.newArc(t1, PN.findPlace(interface_place_name + ".instance_" + toString(i)));
-          }
-          break;
-        }
-
-        // A transition sending a message.
-  	Transition *t1 = PN.newTransition(prefix + "invoke");
-  	PN.newArc(p1, t1);
-  	PN.newArc(t1, p2);
-  	PN.newArc(t1, PN.findPlace(interface_place_name));
-
-	break;
+        interface_place_name += ".instance_" + toString(myself->channel_instances++);
       }
+
+      // Receive message from all unique senders.
+      if (myself->messageLink != NULL &&
+          myself->messageLink->receiver_is_unique)
+      {
+        for (unsigned int i = 1; i <= myself->messageLink->participantSet->count; i++)
+        {
+          Transition *t1 = PN.newTransition(prefix + "invoke" + toString(i));
+          PN.newArc(t1, PN.findPlace(interface_place_name + ".instance_" + toString(i)));
+          PN.newArc(p1, t1);
+          PN.newArc(t1, p2);          
+        }
+      }
+      else
+      {
+        // Create a "normal" message sending transition.
+        Transition *t1 = PN.newTransition(prefix + "invoke");
+        PN.newArc(t1, PN.findPlace(interface_place_name));
+        PN.newArc(p1, t1);
+        PN.newArc(t1, p2);
+      }
+
+      break;
+    }
 
     default: { /* no pattern in this case */ }      
   }
@@ -314,72 +327,69 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
 
+  ASTE *myself = globals::ASTEmap[phylum->id];
+  assert(myself != NULL);
+
   switch(current_view)
   {
     case(petrinetnew_enum):
-      {
-        // Places.
-	Place *p1 = PN.newPlace(prefix + "initial");
-        Place *p2 = PN.newPlace(prefix + "running");
-	Place *p3 = PN.newPlace(prefix + "final");
-	Place *p4 = PN.newPlace(prefix + "stop");
-	Place *p5 = PN.newPlace(prefix + "stopped");
-        Place *p6 = PN.newPlace(prefix + "faulted");
+    {
+      // Places.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "running");
+      Place *p3 = PN.newPlace(prefix + "final");
+      Place *p4 = PN.newPlace(prefix + "stop");
+      Place *p5 = PN.newPlace(prefix + "stopped");
+      Place *p6 = PN.newPlace(prefix + "faulted");
 
-        // Set the name of the interface place.
-	string interface_place_name = "out." + globals::ASTEmap[phylum->id]->channelName;
-	if ((globals::ASTE_outputChannels[globals::ASTEmap[phylum->id]->channelName] > 1) &&
-	   (globals::ASTEmap[phylum->id]->channel_unique_instances == 0))
-	  interface_place_name += ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++);
+      // Set the name of the (output) interface place.
+      string interface_place_name = "out." + myself->channelName;
 
-        // Set the name of the interface place.
-	string interface_place_name2 = "in." + globals::ASTEmap[phylum->id]->channelName2;
-	if ((globals::ASTE_inputChannels[globals::ASTEmap[phylum->id]->channelName] > 1) &&
-	   (globals::ASTEmap[phylum->id]->channel_unique_instances == 0))
-	  interface_place_name2 += ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++);
+      // Set the name of the (input) interface place.
+      string interface_place_name2 = "in." + myself->channelName2;
 
-        // A subnet sending a message (replacement of t1).
-        sendingTransition("invoke_out",  p1, p2,
-                          PN.findPlace(interface_place_name),
+      // A subnet sending a message (replacement of t1).
+      sendingTransition("invoke_out",  p1, p2,
+                        PN.findPlace(interface_place_name),
+                        p6, prefix, mkinteger(phylum->id),
+                        myself->controlFlow);
+
+      // A subnet receiving a message (replacement of t2).
+      receivingTransition("invoke_in", p2, p3,
+                          PN.findPlace(interface_place_name2),
                           p6, prefix, mkinteger(phylum->id),
-                          globals::ASTEmap[phylum->id]->controlFlow);
+                          myself->controlFlow);
 
-        // A subnet receiving a message (replacement of t2).
-        receivingTransition("invoke_in", p2, p3,
-                            PN.findPlace(interface_place_name2),
-                            p6, prefix, mkinteger(phylum->id),
-                            globals::ASTEmap[phylum->id]->controlFlow);
-	
-        // Stopping transitions.
-	Transition *t3 = stop(p1, "initial", prefix);
-	Transition *t4 = stop(p2, "running", prefix);
-	Transition *t5 = stop(p3, "final", prefix);
-        Transition *t6 = stop(p6, "faulted", prefix);
-	
-	break;
-      }
+      // Stopping transitions.
+      Transition *t3 = stop(p1, "initial", prefix);
+      Transition *t4 = stop(p2, "running", prefix);
+      Transition *t5 = stop(p3, "final", prefix);
+      Transition *t6 = stop(p6, "faulted", prefix);
+
+      break;
+    }
 
     case(petrinetsmall_enum):
-      {
-        // Places.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "running");
-	Place *p3 = PN.newPlace(prefix + "final");
+    {
+      // Places.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "running");
+      Place *p3 = PN.newPlace(prefix + "final");
 
-        // A transition for the outgoing message.
-	Transition *t1 = PN.newTransition(prefix + "invokeO");
-	PN.newArc(t1, PN.findPlace("out." + globals::ASTEmap[phylum->id]->channelName));
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
+      // A transition for the outgoing message.
+      Transition *t1 = PN.newTransition(prefix + "invokeO");
+      PN.newArc(t1, PN.findPlace("out." + myself->channelName));
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
 
-        // A transition for the incoming message.
-	Transition *t2 = PN.newTransition(prefix + "invokeI");
-	PN.newArc(PN.findPlace("in." + globals::ASTEmap[phylum->id]->channelName2), t2);
-	PN.newArc(p2, t2);
-	PN.newArc(t2, p3);
+      // A transition for the incoming message.
+      Transition *t2 = PN.newTransition(prefix + "invokeI");
+      PN.newArc(PN.findPlace("in." + myself->channelName2), t2);
+      PN.newArc(p2, t2);
+      PN.newArc(t2, p3);
 
-	break;
-      }
+      break;
+    }
 
     default: { /* no pattern in this case */ }
   }
@@ -419,67 +429,78 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
   assert(phylum != NULL);
 
   header(phylum->id);
-  string prefix = toString(phylum->id) + ".internal.";  
-
+  string prefix = toString(phylum->id) + ".internal.";
+  
+  ASTE *myself = globals::ASTEmap[phylum->id];
+  assert(myself != NULL);
+  
   switch(current_view)
   {
-     case(petrinetnew_enum):
-      {
-        // Places.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-	Place *p3 = PN.newPlace(prefix + "stop");
-	Place *p4 = PN.newPlace(prefix + "stopped");
-        Place *p5 = PN.newPlace(prefix + "faulted");
+    case(petrinetnew_enum):
+    {
+      // Places.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+      Place *p3 = PN.newPlace(prefix + "stop");
+      Place *p4 = PN.newPlace(prefix + "stopped");
+      Place *p5 = PN.newPlace(prefix + "faulted");
 
-        // A subnet receiving a message (replacement of t1).
-        receivingTransition("receive", p1, p2,
-                            PN.findPlace("in." + globals::ASTEmap[phylum->id]->channelName),
-                            p5, prefix, mkinteger(phylum->id),
-                            globals::ASTEmap[phylum->id]->controlFlow);
+      // A subnet receiving a message (replacement of t1).
+      receivingTransition("receive", p1, p2,
+                          PN.findPlace("in." + myself->channelName),
+                          p5, prefix, mkinteger(phylum->id),
+                          myself->controlFlow);
 
-        // Stopping transitions.
-	Transition *t2 = stop(p1, "initial", prefix);
-	Transition *t3 = stop(p2, "final", prefix);
-        Transition *t4 = stop(p5, "faulted", prefix);
-
-	break;
-      }
+      // Stopping transitions.
+      Transition *t2 = stop(p1, "initial", prefix);
+      Transition *t3 = stop(p2, "final", prefix);
+      Transition *t4 = stop(p5, "faulted", prefix);
+      
+      break;
+    }
 
     case(petrinetsmall_enum):
+    {
+      // Places.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+
+      // Set the name of the interface place.
+      string interface_place_name = "in." + myself->channelName;
+
+      // Add an instance suffix when necessary.            
+      if (globals::instances_of_current_process == 0 &&
+           myself->messageLink != NULL &&
+          (myself->messageLink->receiver_is_iterator ||
+           myself->messageLink->sender_is_iterator ||
+           myself->messageLink->receiver_is_unique))
       {
-        // Places.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-
-        // Set the name of the interface place.
-	string interface_place_name = "in." + globals::ASTEmap[phylum->id]->channelName;
-	if ((globals::ASTE_inputChannels[globals::ASTEmap[phylum->id]->channelName] > 1) &&
-	   (globals::ASTEmap[phylum->id]->channel_unique_instances == 0))
-	  interface_place_name += ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++);
-
-
-	// receive a message from one unique instance
-        if (globals::ASTEmap[phylum->id]->channel_unique_instances > 1)
-        {
-          for (unsigned int i = 1; i <= globals::ASTEmap[phylum->id]->channel_unique_instances; i++)
-          {
-    	    Transition *t1 = PN.newTransition(prefix + "receive" + toString(i));
-    	    PN.newArc(PN.findPlace(interface_place_name + ".instance_" + toString(i)), t1);
-    	    PN.newArc(p1, t1);
-    	    PN.newArc(t1, p2);
-          }
-          break;
-        }
-
-        // A transition receiving a message.
-	Transition *t1 = PN.newTransition(prefix + "receive");
-	PN.newArc(PN.findPlace(interface_place_name), t1);
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	break;
+        interface_place_name += ".instance_" + toString(myself->channel_instances++);
       }
+      
+      // Receive message from all unique senders.
+      if (myself->messageLink != NULL &&
+          myself->messageLink->sender_is_unique)
+      {
+        for (unsigned int i = 1; i <= myself->messageLink->participantSet->count; i++)
+        {
+          Transition *t1 = PN.newTransition(prefix + "receive" + toString(i));
+          PN.newArc(PN.findPlace(interface_place_name + ".instance_" + toString(i)), t1);
+          PN.newArc(p1, t1);
+          PN.newArc(t1, p2);          
+        }
+      }
+      else
+      {
+        // Create a "normal" message receiving transition.
+        Transition *t1 = PN.newTransition(prefix + "receive");
+        PN.newArc(PN.findPlace(interface_place_name), t1);
+        PN.newArc(p1, t1);
+        PN.newArc(t1, p2);
+      }
+
+      break;
+    }
 
     default: { /* no pattern in this case */ }      
   }
@@ -519,51 +540,68 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";  
 
+  ASTE *myself = globals::ASTEmap[phylum->id];
+  assert(myself != NULL);
+
   switch(current_view)
   {
     case(petrinetnew_enum):
-      {
-        // Places.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-	Place *p3 = PN.newPlace(prefix + "stop");
-	Place *p4 = PN.newPlace(prefix + "stopped");
-        Place *p5 = PN.newPlace(prefix + "faulted");
+    {
+      // Places.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+      Place *p3 = PN.newPlace(prefix + "stop");
+      Place *p4 = PN.newPlace(prefix + "stopped");
+      Place *p5 = PN.newPlace(prefix + "faulted");
 
-        // A subnet sending a message (replacement of t1).
-        sendingTransition("reply", p1, p2,
-                          PN.findPlace("out." + globals::ASTEmap[phylum->id]->channelName),
-                          p5, prefix, mkinteger(phylum->id),
-                          globals::ASTEmap[phylum->id]->controlFlow);
+      // A subnet sending a message (replacement of t1).
+      sendingTransition("reply", p1, p2,
+                        PN.findPlace("out." + myself->channelName),
+                        p5, prefix, mkinteger(phylum->id),
+                        myself->controlFlow);
 
-        // Stopping transitions.
-        Transition *t2 = stop(p1, "initial", prefix);
-	Transition *t3 = stop(p2, "final", prefix);
-        Transition *t4 = stop(p5, "faulted", prefix);
+      // Stopping transitions.
+      Transition *t2 = stop(p1, "initial", prefix);
+      Transition *t3 = stop(p2, "final", prefix);
+      Transition *t4 = stop(p5, "faulted", prefix);
 
-	break;
-      }
+      break;
+    }
 
     case(petrinetsmall_enum):
+    {
+      // Places.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+
+      // Set the name of the interface place.
+      string interface_place_name = "out." + myself->channelName;
+      if (myself->messageLink != NULL &&
+          myself->messageLink->receiver_is_iterator)
+        interface_place_name += ".instance_" + toString(myself->channel_instances++);
+
+      // send a message from one unique instance
+      if (myself->messageLink != NULL &&
+          myself->messageLink->receiver_is_unique)
       {
-        // Places.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-
-        // Set the name of the interface place.
-	string interface_place_name = "out." + globals::ASTEmap[phylum->id]->channelName;
-	if ((globals::ASTE_outputChannels[globals::ASTEmap[phylum->id]->channelName] > 1) &&
-	   (globals::ASTEmap[phylum->id]->channel_unique_instances == 0))
-	  interface_place_name += ".instance_" + toString(globals::ASTEmap[phylum->id]->channel_instances++);
-
-        // A transition sending a message.
-	Transition *t1 = PN.newTransition(prefix + "reply");
-	PN.newArc(t1, PN.findPlace(interface_place_name));
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	break;
+        for (unsigned int i = 1; i <= myself->messageLink->participantSet->count; i++)
+        {
+          Transition *t1 = PN.newTransition(prefix + "reply" + toString(i));
+          PN.newArc(t1, PN.findPlace(interface_place_name + ".instance_" + toString(i)));
+          PN.newArc(p1, t1);
+          PN.newArc(t1, p2);
+        }
+        break;
       }
+
+      // A transition sending a message.
+      Transition *t1 = PN.newTransition(prefix + "reply");
+      PN.newArc(t1, PN.findPlace(interface_place_name));
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
+
+      break;
+    }
 
     default: { /* no pattern in this case */ }      
   }

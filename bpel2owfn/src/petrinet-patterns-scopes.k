@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/06/01 08:52:10 $
+ * \date    \$Date: 2007/06/05 11:51:22 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  */
 %}
 
@@ -94,7 +94,6 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
-
   // Create the interface places. The used lists are filled during parsing
   // mapping each combination of partnerLink, portType and operation to one
   // input (resp. output) place.
@@ -104,24 +103,26 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
       in != globals::ASTE_inputChannels.end(); in++)
   {
     // case 1: only one instance of each channel is needed
-    if (in->second == 1)
+    if (in->second == 1 || globals::instances_of_current_process != 0)
     {
       trace(TRACE_DEBUG, "[PNU]\tcreating channel `in." + in->first + "'\n");
       PN.newPlace("in." + in->first, IN);
     }
     else // case 2: several instances of each channel are needed
+    {
       for (unsigned int i = 1; i <= in->second; i++)
       {
         trace(TRACE_DEBUG, "[PNU]\tcreating channel `in." + in->first + ".instance_" + toString(i) + "'\n");
       	PN.newPlace("in." + in->first + ".instance_" + toString(i), IN);
       }
+    }
   }
 
   for (map<string, unsigned int>::const_iterator out = globals::ASTE_outputChannels.begin();
       out != globals::ASTE_outputChannels.end(); out++)
   {
     // case 1: only one instance of each channel is needed
-    if (out->second == 1)
+    if (out->second == 1 || globals::instances_of_current_process != 0)
     {
       trace(TRACE_DEBUG, "[PNU]\tcreating channel `out." + out->first + "'\n");
       PN.newPlace("out." + out->first, OUT);

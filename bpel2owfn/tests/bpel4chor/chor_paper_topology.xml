@@ -23,7 +23,7 @@
   <participants>
     <participant name="traveler" type="Traveler" selects="agency" />
     <participant name="agency" type="Agency" selects="airlines" />
-    <participantSet name="airlines" type="Airline" forEach="agency:fe_RequestPrice" count="1">
+    <participantSet name="airlines" type="Airline" forEach="agency:fe_RequestPrice" count="2">
       <participant name="currentAirline" forEach="agency:fe_RequestPrice" />
       <participant name="selectedAirline" />
     </participantSet>

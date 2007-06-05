@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/06/04 11:31:24 $
+ * \date    \$Date: 2007/06/05 14:45:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.180 $
+ * \version \$Revision: 1.181 $
  */
 
 
@@ -373,6 +373,12 @@ void final_output()
       trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
       PN.reduce(globals::reduction_level);
     }
+    
+    
+    // Removes the deadlock from the final place in case of a deadlocktest
+    if (globals::parameters[P_DEADLOCKTEST])
+      PN.loop_final_state();
+    
     
     // now the net will not change any more, thus the nodes are re-enumerated
     // and the maximal occurrences of the nodes are calculated.

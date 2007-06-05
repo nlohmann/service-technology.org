@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/05/23 13:45:39 $
+ * \date    \$Date: 2007/06/05 14:45:03 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.216 $
+ * \version \$Revision: 1.217 $
  *
  * \ingroup petrinet
  */
@@ -1864,75 +1864,75 @@ void PetriNet::reenumerate()
 void PetriNet::calculate_max_occurrences()
 {
 #ifdef USING_BPEL2OWFN
-
+  
   // set the max_occurrences for the transitions (should make more sense...)
   for (set<Transition *>::iterator transition = T.begin();
-      transition != T.end();
-      transition++)
+       transition != T.end();
+       transition++)
   {
     unsigned int activity_identifier = toUInt((*(*transition)->history.begin()).substr(0, (*(*transition)->history.begin()).find_first_of(".")));
-
+    
     assert(globals::ASTEmap[activity_identifier] != NULL);
     (*transition)->max_occurrences = globals::ASTEmap[activity_identifier]->max_occurrences;
   }
-
-
-
+  
+  
+  
   // process the input places
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
   {
     set<unsigned int> receiving_activities;
-
+    
     for (set<Node *>::iterator t = (*p)->postset.begin(); t != (*p)->postset.end(); t++)
       for (unsigned int i = 0; i < (*t)->history.size(); i++)
       {
-	// unsigned int transition_activity_id = toUInt((*t)->history[i].substr(0, (*t)->history[i].find_first_of(".")));
+        // unsigned int transition_activity_id = toUInt((*t)->history[i].substr(0, (*t)->history[i].find_first_of(".")));
         string act_id = (*t)->nodeFullName().substr(0, (*t)->nodeFullName().find_first_of("."));
-
+        
         act_id = act_id.substr( act_id.find_last_of( "_" ) + 1 );
-	unsigned int transition_activity_id = toUInt( act_id );
-	assert(globals::ASTEmap[transition_activity_id] != NULL);
-	receiving_activities.insert(transition_activity_id);
+        unsigned int transition_activity_id = toUInt( act_id );
+        assert(globals::ASTEmap[transition_activity_id] != NULL);
+        receiving_activities.insert(transition_activity_id);
       }
-
-    for (set<unsigned int>::iterator activity_id = receiving_activities.begin(); activity_id != receiving_activities.end(); activity_id++)
-    {
-      if (globals::ASTEmap[*activity_id]->max_occurrences == UINT_MAX)
-	(*p)->max_occurrences = UINT_MAX;
-      else if ((*p)->max_occurrences != UINT_MAX)
-      {
-	if (globals::ASTEmap[*activity_id]->activityTypeName() == "repeatUntil" ||
-	    globals::ASTEmap[*activity_id]->activityTypeName() == "while")
-	  (*p)->max_occurrences += globals::ASTEmap[*activity_id]->max_loops;
-	else
-	  (*p)->max_occurrences += globals::ASTEmap[*activity_id]->max_occurrences;
-      }
-//  Debugging Help
-//  cerr << "gehoert auch zu Aktivitaet: " << globals::ASTEmap[*activity_id]->activityTypeName() << "!\n";
-    }
+        
+        for (set<unsigned int>::iterator activity_id = receiving_activities.begin(); activity_id != receiving_activities.end(); activity_id++)
+        {
+          if (globals::ASTEmap[*activity_id]->max_occurrences == UINT_MAX)
+            (*p)->max_occurrences = UINT_MAX;
+          else if ((*p)->max_occurrences != UINT_MAX)
+          {
+            if (globals::ASTEmap[*activity_id]->activityTypeName() == "repeatUntil" ||
+                globals::ASTEmap[*activity_id]->activityTypeName() == "while")
+              (*p)->max_occurrences += globals::ASTEmap[*activity_id]->max_loops;
+            else
+              (*p)->max_occurrences += globals::ASTEmap[*activity_id]->max_occurrences;
+          }
+          //  Debugging Help
+          //  cerr << "gehoert auch zu Aktivitaet: " << globals::ASTEmap[*activity_id]->activityTypeName() << "!\n";
+        }
   }
-
-  // process the output places
-  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
-  {
-    set<unsigned int> sending_activities;
-
-    for (set<Node *>::iterator t = (*p)->preset.begin(); t != (*p)->preset.end(); t++)
-      for (list<string>::iterator iter = (*t)->history.begin(); iter != (*t)->history.end(); iter++)
-      {
-	unsigned int transition_activity_id = toUInt(iter->substr(0, iter->find_first_of(".")));
-	assert(globals::ASTEmap[transition_activity_id] != NULL);
-	sending_activities.insert(transition_activity_id);
-      }
-
-    for (set<unsigned int>::iterator activity_id = sending_activities.begin(); activity_id != sending_activities.end(); activity_id++)
+    
+    // process the output places
+    for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
     {
-      if (globals::ASTEmap[*activity_id]->max_occurrences == UINT_MAX)
-	(*p)->max_occurrences = UINT_MAX;
-      else if ((*p)->max_occurrences != UINT_MAX)
-	(*p)->max_occurrences += globals::ASTEmap[*activity_id]->max_occurrences;
+      set<unsigned int> sending_activities;
+      
+      for (set<Node *>::iterator t = (*p)->preset.begin(); t != (*p)->preset.end(); t++)
+        for (list<string>::iterator iter = (*t)->history.begin(); iter != (*t)->history.end(); iter++)
+        {
+          unsigned int transition_activity_id = toUInt(iter->substr(0, iter->find_first_of(".")));
+          assert(globals::ASTEmap[transition_activity_id] != NULL);
+          sending_activities.insert(transition_activity_id);
+        }
+          
+          for (set<unsigned int>::iterator activity_id = sending_activities.begin(); activity_id != sending_activities.end(); activity_id++)
+          {
+            if (globals::ASTEmap[*activity_id]->max_occurrences == UINT_MAX)
+              (*p)->max_occurrences = UINT_MAX;
+            else if ((*p)->max_occurrences != UINT_MAX)
+              (*p)->max_occurrences += globals::ASTEmap[*activity_id]->max_occurrences;
+          }
     }
-  }
 #endif
 }
 
@@ -2009,14 +2009,14 @@ void PetriNet::produce(const PetriNet &net)
     if ( (*t)->labels.empty())
     {
       Transition *t_new = newTransition((*t)->nodeName());
-
+      
       // copy the arcs of the constraint oWFN
       for (set< Arc * >::iterator arc = net.F.begin(); arc != net.F.end(); arc ++)
       {
-	if ( ( (*arc)->source->nodeType == PLACE) && ( (*arc)->target == static_cast<Node *>(*t) ) )
-	  newArc( findPlace( (*arc)->source->nodeName() ), t_new, STANDARD, (*arc)->weight );
-	if ( ( (*arc)->target->nodeType == PLACE) && ( (*arc)->source == static_cast<Node *>(*t) ) )
-	  newArc( t_new, findPlace( (*arc)->target->nodeName() ), STANDARD, (*arc)->weight );
+        if ( ( (*arc)->source->nodeType == PLACE) && ( (*arc)->target == static_cast<Node *>(*t) ) )
+          newArc( findPlace( (*arc)->source->nodeName() ), t_new, STANDARD, (*arc)->weight );
+        if ( ( (*arc)->target->nodeType == PLACE) && ( (*arc)->source == static_cast<Node *>(*t) ) )
+          newArc( t_new, findPlace( (*arc)->target->nodeName() ), STANDARD, (*arc)->weight );
       }
     }
   }
@@ -2040,36 +2040,36 @@ void PetriNet::produce(const PetriNet &net)
     for (set<string>::iterator label = (*t)->labels.begin(); label != (*t)->labels.end(); label++)
     {
       Transition *t_l = findTransition(*label);
-
+      
       // specified transition not found -- trying places instead
       if (t_l == NULL)
       {
-	Place *p = findPlace(*label);
-	if (p != NULL)
-	{
-	  set<Node *> transitions_p;
-
-	  if (p->type == IN)
-	    transitions_p = p->postset;
-	  else
-	    transitions_p = p->preset;
-
-	  for (set<Node *>::iterator pre_transition = transitions_p.begin(); pre_transition != transitions_p.end(); pre_transition++)
-	  {
-	    used_labels.insert((*pre_transition)->nodeName());
-    	    transition_pairs.insert(pair<Transition *, Transition *>(static_cast<Transition *>(*pre_transition), *t));
-	  }
-	}
-	else
-	{
-	  std::cerr << "label " << *label << " neither describes a transition nor a place" << std::endl;
-	  assert(false);
-	}
+        Place *p = findPlace(*label);
+        if (p != NULL)
+        {
+          set<Node *> transitions_p;
+          
+          if (p->type == IN)
+            transitions_p = p->postset;
+          else
+            transitions_p = p->preset;
+          
+          for (set<Node *>::iterator pre_transition = transitions_p.begin(); pre_transition != transitions_p.end(); pre_transition++)
+          {
+            used_labels.insert((*pre_transition)->nodeName());
+            transition_pairs.insert(pair<Transition *, Transition *>(static_cast<Transition *>(*pre_transition), *t));
+          }
+        }
+        else
+        {
+          std::cerr << "label " << *label << " neither describes a transition nor a place" << std::endl;
+          assert(false);
+        }
       }
       else
       {
-	used_labels.insert(*label);
-	transition_pairs.insert(pair<Transition *, Transition *>(t_l, *t));
+        used_labels.insert(*label);
+        transition_pairs.insert(pair<Transition *, Transition *>(t_l, *t));
       }
     }
   }
@@ -2086,18 +2086,18 @@ void PetriNet::produce(const PetriNet &net)
     for (set< Arc * >::iterator arc = net.F.begin(); arc != net.F.end(); arc ++)
     {
       if ( ( (*arc)->source->nodeType == PLACE) && ( (*arc)->target == static_cast<Node *>(tp->second) ) )
-	newArc( findPlace( (*arc)->source->nodeName() ), t_new, STANDARD, (*arc)->weight );
+        newArc( findPlace( (*arc)->source->nodeName() ), t_new, STANDARD, (*arc)->weight );
       if ( ( (*arc)->target->nodeType == PLACE) && ( (*arc)->source == static_cast<Node *>(tp->second) ) )
-	newArc( t_new, findPlace( (*arc)->target->nodeName() ), STANDARD, (*arc)->weight );
+        newArc( t_new, findPlace( (*arc)->target->nodeName() ), STANDARD, (*arc)->weight );
     }
-
+    
     // copy the arcs of the oWFN
     for (set< Arc * >::iterator arc = F.begin(); arc != F.end(); arc ++)
     {
       if ( ( (*arc)->source->nodeType == PLACE) && ( (*arc)->target == static_cast<Node *>(tp->first) ) )
-	newArc( findPlace( (*arc)->source->nodeName() ), t_new, STANDARD, (*arc)->weight );
+        newArc( findPlace( (*arc)->source->nodeName() ), t_new, STANDARD, (*arc)->weight );
       if ( ( (*arc)->target->nodeType == PLACE) && ( (*arc)->source == static_cast<Node *>(tp->first) ) )
-	newArc( t_new, findPlace( (*arc)->target->nodeName() ), STANDARD, (*arc)->weight );
+        newArc( t_new, findPlace( (*arc)->target->nodeName() ), STANDARD, (*arc)->weight );
     }
   }
 
@@ -2105,6 +2105,24 @@ void PetriNet::produce(const PetriNet &net)
   // remove transitions that are used as labels
   for (set<string>::iterator t = used_labels.begin(); t != used_labels.end(); t++)
     removeTransition(findTransition(*t));
+}
+
+
+
+
+
+/*!
+ * \brief  adds a transition that has read arcs to all final places
+ */
+void PetriNet::loop_final_state()
+{
+  Transition *t = newTransition("antideadlock"); 
+  
+  for (set<Place *>::iterator place = P.begin(); place != P.end(); place++)
+  {
+    if ( (*place)->isFinal )
+      newArc(t, *place, READ);
+  }
 }
 
 

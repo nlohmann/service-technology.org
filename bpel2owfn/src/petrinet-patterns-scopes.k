@@ -31,7 +31,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/06/05 11:51:22 $
+ * \date    \$Date: 2007/06/05 14:45:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  */
 %}
 
@@ -291,15 +291,6 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	  PN.mergePlaces((prefix + "inner_stopped"), (toString(phylum->activity_1->id) + ".stopped"));
         }
 
-    // Removes the deadlock from the final place in case of a deadlocktest
-    if (globals::parameters[P_DEADLOCKTEST])
-    {
-    Transition *t11 = PN.newTransition(prefix + "antideadlock");
-	  PN.newArc(t11, p2);
-	  PN.newArc(p2, t11);
-	  }
-
-
 	// Unparse the fault handlers (the handlers embed themselves to the
 	// process).
 	phylum->tFaultHandlers_1->unparse(pseudoPrinter, current_view);
@@ -309,55 +300,55 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 
 
     case(petrinetsmall_enum):
+    {
+      // Places.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+
+      // Indicate the process's initial and final marking.
+      p1->mark();
+      p2->isFinal = true;
+
+      // Unparse the embedded activity.
+      phylum->activity_1->unparse(pseudoPrinter, current_view);
+
+      // No event handlers: embed activity.
+      if (globals::ASTEmap[phylum->id]->hasEH == false)
       {
-        // Places.
-        Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-
-        // Indicate the process's initial and final marking.
-	p1->mark();
-        p2->isFinal = true;
-       
-        // Unparse the embedded activity.
-	phylum->activity_1->unparse(pseudoPrinter, current_view);
-
-        // No event handlers: embed activity.
-        if (globals::ASTEmap[phylum->id]->hasEH == false)
-        {
-  	  PN.mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".initial");
-  	  PN.mergePlaces(phylum->id, ".internal.final", phylum->activity_1->id, ".final");
-        }
-
-        // Event handlers present.
-        if (globals::ASTEmap[phylum->id]->hasEH == true)
-        {
-	  Place *p3 = PN.newPlace(prefix + "activity_begin");
-	  Place *p4 = PN.newPlace(prefix + "activity_done");
-	  Place *p5 = PN.newPlace(prefix + "disabling_eh");
-	  Place *p6 = PN.newPlace(prefix + "active_eh");
-
-          Transition *t1 = PN.newTransition(prefix + "disable_eh");
-          PN.newArc(p4, t1);
-          PN.newArc(t1, p5);
-          PN.newArc(p6, t1);
-
-  	  // Unparse the event handlers.
-  	  phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
-
-  	  // Embed the inner activity.
-  	  PN.mergePlaces(phylum->id, ".internal.activity_begin", phylum->activity_1->id, ".initial");
-  	  PN.mergePlaces(phylum->id, ".internal.activity_done", phylum->activity_1->id, ".final");
-
-          // Embed the event handlers.
-          PN.mergePlaces(phylum->id, ".internal.initial",        phylum->tEventHandlers_1->id, ".initial");
-          PN.mergePlaces(phylum->id, ".internal.final",          phylum->tEventHandlers_1->id, ".disabled");
-          PN.mergePlaces(phylum->id, ".internal.disabling_eh",   phylum->tEventHandlers_1->id, ".disabling");
-          PN.mergePlaces(phylum->id, ".internal.active_eh",      phylum->tEventHandlers_1->id, ".active");
-          PN.mergePlaces(phylum->id, ".internal.activity_begin", phylum->tEventHandlers_1->id, ".start");
-        }
-  
-	break;
+        PN.mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".initial");
+        PN.mergePlaces(phylum->id, ".internal.final", phylum->activity_1->id, ".final");
       }
+
+      // Event handlers present.
+      if (globals::ASTEmap[phylum->id]->hasEH == true)
+      {
+        Place *p3 = PN.newPlace(prefix + "activity_begin");
+        Place *p4 = PN.newPlace(prefix + "activity_done");
+        Place *p5 = PN.newPlace(prefix + "disabling_eh");
+        Place *p6 = PN.newPlace(prefix + "active_eh");
+
+        Transition *t1 = PN.newTransition(prefix + "disable_eh");
+        PN.newArc(p4, t1);
+        PN.newArc(t1, p5);
+        PN.newArc(p6, t1);
+
+        // Unparse the event handlers.
+        phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
+
+        // Embed the inner activity.
+        PN.mergePlaces(phylum->id, ".internal.activity_begin", phylum->activity_1->id, ".initial");
+        PN.mergePlaces(phylum->id, ".internal.activity_done", phylum->activity_1->id, ".final");
+
+        // Embed the event handlers.
+        PN.mergePlaces(phylum->id, ".internal.initial",        phylum->tEventHandlers_1->id, ".initial");
+        PN.mergePlaces(phylum->id, ".internal.final",          phylum->tEventHandlers_1->id, ".disabled");
+        PN.mergePlaces(phylum->id, ".internal.disabling_eh",   phylum->tEventHandlers_1->id, ".disabling");
+        PN.mergePlaces(phylum->id, ".internal.active_eh",      phylum->tEventHandlers_1->id, ".active");
+        PN.mergePlaces(phylum->id, ".internal.activity_begin", phylum->tEventHandlers_1->id, ".start");
+      }
+
+      break;
+    }
 
     default: { /* no pattern in this case */ }
   }

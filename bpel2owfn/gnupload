@@ -24,8 +24,8 @@ scriptversion=2006-11-12.11
 
 set -e
 
-#GPG='/usr/bin/gpg --batch --no-tty'
-GPG='/cygdrive/c/Programme/Tools/GnuPG/gpg.exe --batch --no-tty'
+GPG='/usr/local/bin/gpg --batch --no-tty'
+#GPG='/cygdrive/c/Programme/Tools/GnuPG/gpg.exe --batch --no-tty'
 to=
 
 usage="Usage: $0 [OPTIONS]... FILES...

@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/06/03 11:50:30 $ by $Author: nielslohmann $
-# Version $Revision: 1.61 $
+# File last changed $Date: 2007/06/05 15:17:31 $ by $Author: nielslohmann $
+# Version $Revision: 1.62 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc rpm
@@ -77,7 +77,7 @@ hu-prepare: maintainer-clean
 	find . -type d -exec chmod 755 {} \;
 	find . -type f -exec chmod 644 {} \;
 	-find . -type f -exec dos2unix {} \;
-	chmod 755 $(SHELLSCRIPTS) doc/gendocs.sh
+	chmod 755 $(SHELLSCRIPTS) doc/gendocs.sh gnupload
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
 	@echo "  aclocal"
@@ -166,26 +166,26 @@ gnupload_alpha: *.tar.gz
 	@echo "====================================="
 	@echo " FILE DISTRIBUTION TO GNU FTP SERVER "
 	@echo "====================================="
-	@ls *.tar.gz -1
+	@ls *.tar.gz
 	@echo
 	@echo "Are you sure you want to upload these files to"
 	@echo "  ftp://alpha.gnu.org/gnu/bpel2owfn/$(PACKAGE_VERSION)?"
 	@echo "If not, please press (crtl+c) now."
 	@read answer
-	gnupload --to alpha.gnu.org:bpel2owfn/$(PACKAGE_VERSION) $^
+	./gnupload --to alpha.gnu.org:bpel2owfn/$(PACKAGE_VERSION) $^
 	rm $(^:.tar.gz=.tar.gz.sig)
 
 gnupload_release: *.tar.gz
 	@echo "============================================="
 	@echo " RELEASE FILE DISTRIBUTION TO GNU FTP SERVER "
 	@echo "============================================="
-	@ls *.tar.gz -1
+	@ls *.tar.gz
 	@echo
 	@echo "Are you sure you want to upload these files to"
 	@echo "  ftp://ftp.gnu.org/gnu/bpel2owfn/$(PACKAGE_VERSION)?"
 	@echo "If not, please press (crtl+c) now."
 	@read answer
-	gnupload --to ftp.gnu.org:bpel2owfn/$(PACKAGE_VERSION) $^
+	./gnupload --to ftp.gnu.org:bpel2owfn/$(PACKAGE_VERSION) $^
 	rm $(^:.tar.gz=.tar.gz.sig)
 
 

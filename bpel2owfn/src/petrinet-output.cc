@@ -26,17 +26,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/05/23 12:21:19 $
+ * \date    \$Date: 2007/06/05 09:04:03 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.98 $
+ * \version \$Revision: 1.99 $
  *
  * \ingroup petrinet
  */
@@ -469,6 +469,21 @@ string Place::output_dot() const
     label = wasExternal;
   else
     label = nodeShortName();
+  
+  if (type == IN || type == OUT)
+  {
+    // strip "in." or "out."
+    label = label.substr(label.find_first_of(".")+1, label.length());
+    
+    // if channel is instantiated, strip the ".instance_" part and replace 
+    if (label.find(".instance_") != string::npos)
+    {
+      string label_prefix = label.substr(0, label.find(".instance_"));
+      string label_suffix = label.substr(label.find(".instance_")+10, label.length());
+      label = label_prefix + " (" + label_suffix + ")";
+    }
+  }
+  
 #else
   string label = nodeName();
 #endif

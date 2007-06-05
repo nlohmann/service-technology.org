@@ -58,7 +58,7 @@ int events_manual;
 unsigned int messages_manual;
 int bdd_reordermethod;
 
-const int GETOPT_REDUCENODES = 256;
+// const int GETOPT_BLA = 256;
 
 /// pointer to log stream
 std::ostream * log_output = &std::cout;   // &std::clog;
@@ -70,13 +70,13 @@ std::map<possibleParameters, bool> parameters;
 // long options
 static struct option longopts[] =
 {
+//  { "bla",           no_argument,       NULL, GETOPT_BLA },
   { "help",            no_argument,       NULL, 'h' },
   { "version",         no_argument,       NULL, 'v' },
   { "debug",           required_argument, NULL, 'd' },
   { "net",             required_argument, NULL, 'n' },
   { "type",            required_argument, NULL, 't' },
   { "show",            required_argument, NULL, 's' },
-//  { "reduce-nodes",    no_argument,       NULL, GETOPT_REDUCENODES },
   { "reduce-nodes",    no_argument,       NULL, 'R' },
   { "reduceIG",        no_argument,       NULL, 'r' },
   { "messagemaximum",  required_argument, NULL, 'm' },
@@ -87,8 +87,8 @@ static struct option longopts[] =
   { NULL,              0,                 NULL, 0   }
 };
 
-
 const char * par_string = "hvd:n:t:s:Rrm:e:b:B:o:";
+
 
 // --------------------- functions for command line evaluation ------------------------
 // Prints an overview of all commandline arguments.
@@ -106,28 +106,30 @@ void print_help() {
   trace("                                     4 - yet to be defined ;)\n");
   trace("                                     5 - show detailed information on everything\n");
   trace(" -n | --net=<filename> ........... read input owfn from <filename>\n");
-  trace(" -t | --type=<type> .............. select the modus operandi of fiona, called\n");
-  trace("                                   <type>:\n");
+  trace(" -t | --type=<type> .............. select the modus operandi of fiona <type>:\n");
   trace("                                     OG - compute operating guideline\n");
   trace("                                     IG - compute interaction graph (default)\n");
   trace("                                     match - check if given oWFN (-n) matches\n");
   trace("                                             with the operating guideline given\n");
   trace("                                             in [FILE]\n");
   trace("                                     simulation  - check whether the first OG\n");
-  trace("                                                   simulates the second one\n");
-  trace("                                     equality - check whether two OGs (given as\n");
-  trace("                                                OG-files) have the same strategies\n");
+  trace("                                                   characterizes more strategies\n");
+  trace("                                                   than the second one\n");
+  trace("                                     equality    - check whether two OGs\n");
+  trace("                                                   characterize the same\n");
+  trace("                                                   strategies\n");
   trace("                                     equivalence - check whether two OGs (given\n");
   trace("                                                   as BDDs) are equivalent\n");
   trace("                                     productog   - calculate the product OG of\n");
   trace("                                                   all given OGs\n");
   trace(" -m | --messagemaximum=<level> ... set maximum number of same messages per\n");
   trace("                                   state to <level>\n");
-  trace(" -e | --eventsmaximum=<level> .... set event to occur at most <level> times\n");
   trace("                                   (default is 1)\n");
-  trace("                                   (-1 means disabling -e option, but is only\n");
-  trace("                                   possible if -m option is set)\n");
-  trace("                                   (only relevant for OG)\n");
+//  trace(" -e | --eventsmaximum=<level> .... set event to occur at most <level> times\n");
+//  trace("                                   (default is 1)\n");
+//  trace("                                   (-1 means disabling -e option, but is only\n");
+//  trace("                                   possible if -m option is set)\n");
+//  trace("                                   (only relevant for OG)\n");
   trace(" -r | --reduceIG ................. use reduction rules for IG\n");
   trace(" -R | --reduce-nodes ............. use node reduction (IG or OG) which\n");
   trace("                                   stores less states per node of IG/OG\n");

@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/06/05 11:51:22 $
+ * \date    \$Date: 2007/06/05 11:55:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
 */
 %}
 
@@ -721,6 +721,7 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
  * \ingroup patterns
  * 
  * \todo    Use "receivingTransition" function in <onMessage> branches.
+ * \todo    Enable DPE for Choreography mode.
  */
 %}
 void PPick(impl_tPick* abstract_phylum, uview current_view)
@@ -832,8 +833,14 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 
     footer(_id2, true);
   }
-  
-  return; // THIS IS A HACK!!!!!
+
+
+  // This is a hack to avoid error messages. In choreography mode, it is
+  // possible that the onMessage-transitions have "_instance"-suffixes. Such
+  // transitions are not found in the code below, yielding error messages.  
+  if (modus == M_CHOREOGRAPHY)
+    return;
+
 
   // Create the arcs for the Dead Path elimination: each chosen activity (i.e.
   // firing of the respective t1/t3-transition) has set the links of all other

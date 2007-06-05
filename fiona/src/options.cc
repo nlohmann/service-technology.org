@@ -142,6 +142,7 @@ void print_help() {
   trace("                                     empty     - show empty node\n");
   trace("                                     allstates - show all calculated states per\n");
   trace("                                                 node\n");
+  trace("                                     deadlocks - show all but transient states\n");
   trace(" -b | --BDD=<reordering> ......... enable BDD construction\n");
   trace("                                   (only relevant for OG)\n");
   trace("                                   argument <reordering> specifies reodering\n");
@@ -249,6 +250,7 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_SHOW_NO_RED_NODES] = true;
     parameters[P_SHOW_EMPTY_NODE] = false;
     parameters[P_SHOW_STATES_PER_NODE] = false;
+    parameters[P_SHOW_DEADLOCKS_PER_NODE] = false;
 
     bdd_reordermethod = 0;
 
@@ -368,6 +370,9 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if (string(optarg) == "allstates") {
                     options[O_SHOW_NODES] = true;
                     parameters[P_SHOW_STATES_PER_NODE] = true;
+                } else if (string(optarg) == "deadlocks") {
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
                 } else {
                     cerr << "Error:\twrong show option" << endl
                          << "\tEnter \"fiona --help\" for more information."

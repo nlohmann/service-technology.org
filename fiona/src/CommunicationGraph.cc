@@ -874,38 +874,44 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
 
     StateSet::iterator iter;  // iterator over the stateList's elements
 
-    if (parameters[P_SHOW_STATES_PER_NODE]) {
+    if (parameters[P_SHOW_STATES_PER_NODE] || parameters[P_SHOW_DEADLOCKS_PER_NODE]) {
+
         for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
-//                    (*iter)->decodeShowOnly(PN);
 
             (*iter)->decode(PN);    // need to decide if it is an external or internal deadlock
-            os << "[" << PN->getCurrentMarkingAsString() << "]";
-            os << " (";
 
-            string kindOfDeadlock;
+            string kindOfDeadlock = "i"; // letter for 'i' internal or 'e' external deadlock
             unsigned int i;
 
             switch ((*iter)->type) {
                 case DEADLOCK:
-                                kindOfDeadlock = "i"; // letter for 'i' internal or 'e' external deadlock
-                                if (PN->transNrQuasiEnabled > 0) {
-                                    kindOfDeadlock = "e";
-                                } else {
-                                    for (i = 0; i < PN->getOutputPlaceCount(); i++) {
-                                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-                                            kindOfDeadlock = "e";
-                                            continue;
-                                        }
-                                    }
-                                }
-                                os << kindOfDeadlock << "DL" << ")";
-                                break;
+                    os << "[" << PN->getCurrentMarkingAsString() << "]";
+                    os << " (";
 
-                case FINALSTATE: os << "FS" << ")"; break;
-
-                default: os << "TR" << ")"; break;
+                    if (PN->transNrQuasiEnabled > 0) {
+                        kindOfDeadlock = "e";
+                    } else {
+                        for (i = 0; i < PN->getOutputPlaceCount(); i++) {
+                            if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                                kindOfDeadlock = "e";
+                                continue;
+                            }
+                        }
+                    }
+                    os << kindOfDeadlock << "DL" << ")" << "\\n";
+                    break;
+                case FINALSTATE:
+                    os << "[" << PN->getCurrentMarkingAsString() << "]";
+                    os << " (";
+                    os << "FS" << ")" << "\\n";
+                    break;
+                default:
+                    if (parameters[P_SHOW_STATES_PER_NODE]) {
+                        os << "[" << PN->getCurrentMarkingAsString() << "]";
+                        os << " (" << "TR" << ")" << "\\n";
+                    }
+                    break;
             }
-            os << "\\n";
         }
     }
 

@@ -67,13 +67,14 @@ typedef enum
 
 typedef enum
 {
-	P_IG,			//!< compute IG  
-	P_OG,			//!< compute OG
-	P_SHOW_ALL_NODES,
-	P_SHOW_BLUE_NODES_ONLY,
-	P_SHOW_NO_RED_NODES,
-	P_SHOW_EMPTY_NODE,
-	P_SHOW_STATES_PER_NODE
+    P_IG,                         //!< compute IG  
+    P_OG,                         //!< compute OG
+    P_SHOW_ALL_NODES,             //!< show red and blue nodes
+    P_SHOW_BLUE_NODES_ONLY,       //!< show blue nodes only (empty node not shown though) 
+    P_SHOW_NO_RED_NODES,          //!< show all blue nodes (including empty node)
+    P_SHOW_EMPTY_NODE,            //!< same as above
+    P_SHOW_STATES_PER_NODE,       //!< show all states in a node (aka "knowledge")
+    P_SHOW_DEADLOCKS_PER_NODE     //!< show deadlock states only
 } possibleParameters;
 
 

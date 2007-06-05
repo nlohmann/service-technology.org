@@ -29,13 +29,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/06/05 11:51:21 $
+ * \date    \$Date: 2007/06/05 15:03:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.127 $
+ * \version \$Revision: 1.128 $
  */
 
 
@@ -101,9 +101,9 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype) :
   messageLink(NULL)
 {
   assert(myid != 0);
-
+  
   attributes = globals::temporaryAttributeMap[id];
-
+  
   if (globals::parsing)
   {
     // we are parsing: these activities are explicit
@@ -112,8 +112,8 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype) :
       case(K_LINK):	globals::process_information.links++; break;
       case(K_SCOPE):	globals::process_information.scopes++; break;
       case(K_VARIABLE):	globals::process_information.variables++; break;
-
-      // basic activity
+        
+        // basic activity
       case(K_EMPTY):
       case(K_INVOKE):
       case(K_RECEIVE):
@@ -129,7 +129,7 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype) :
       case(K_OPAQUEACTIVITY):
         globals::process_information.basic_activities++; break;
         
-      // structured activities
+        // structured activities
       case(K_WHILE):
       case(K_REPEATUNTIL):
       case(K_SEQUENCE):
@@ -137,7 +137,7 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype) :
       case(K_PICK):
       case(K_IF):
       case(K_FOREACH):
-			  globals::process_information.structured_activities++; break;
+        globals::process_information.structured_activities++; break;
     }
   }
   else
@@ -778,7 +778,7 @@ string ASTE::createChannel(bool synchronousCommunication)
     assert(messageLink != NULL);
     
     channelName = messageLink->name;
-      
+    
     switch (type)
     {
       // receiving activity
@@ -787,25 +787,25 @@ string ASTE::createChannel(bool synchronousCommunication)
       {
         // depending on the channel count, create one or more input channel(s)
         unsigned int result = (messageLink->participantSet != NULL) ?
-          messageLink->participantSet->count :
-          0;
+        messageLink->participantSet->count :
+        0;
         
         if (result != 0 && result != UINT_MAX)
           globals::ASTE_inputChannels[channelName] = result;
         else
           globals::ASTE_inputChannels[channelName] = 1;
-       
+        
         break;
       }
         
-      // sending activity
+        // sending activity
       case(K_INVOKE):
       case(K_REPLY):
       {
         // depending on the channel count, create one or more output channel(s)
         unsigned int result = (messageLink->participantSet != NULL) ?
-          messageLink->participantSet->count :
-          0;
+        messageLink->participantSet->count :
+        0;
         
         if (result != 0 && result != UINT_MAX)
           globals::ASTE_outputChannels[channelName] = result;
@@ -1214,9 +1214,9 @@ string ASTE::checkMessageExchange()
     {
       if (globals::ASTEmap[(*ima)]->attributes["operation"]== attributes["operation"] &&
           globals::ASTEmap[(*ima)]->attributes["partnerLink"]== attributes["partnerLink"] &&
-            ((globals::ASTEmap[(*ima)]->attributes["messageExchange"] == "" && attributes["messageExchange"] == "") ||
-             (globals::ASTEmap[(*ima)]->attributes["messageExchange"] == attributes["messageExchange"] && 
-              globals::ASTEmap[(*ima)]->attributes["messageExchange"] != "" && attributes["messageExchange"] != "")))
+          ((globals::ASTEmap[(*ima)]->attributes["messageExchange"] == "" && attributes["messageExchange"] == "") ||
+           (globals::ASTEmap[(*ima)]->attributes["messageExchange"] == attributes["messageExchange"] && 
+            globals::ASTEmap[(*ima)]->attributes["messageExchange"] != "" && attributes["messageExchange"] != "")))
       {
         // If two legal messageexchanges are found, it is no more valid
         if (valid)
@@ -1230,20 +1230,20 @@ string ASTE::checkMessageExchange()
     if (!valid)
       SAerror(60,"", attributes["referenceLine"]);    
   }
-
+  
   if ( attributes["messageExchange"] == "")
     return "";
   
   vector<unsigned int> ancestorScopes = this->ancestorScopes();
-
+  
   // traverse the ancestor scopes
   for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
     if (globals::ASTE_messageExchangeNames.find(toString(*scope) + "." + attributes["messageExchange"]) != globals::ASTE_messageExchangeNames.end())
       return (toString(*scope) + "." + attributes["messageExchange"]);
-
+  
   // SA00061
   SAerror(61, attributes["messageExchange"], attributes["referenceLine"]);
-
+  
   return "";
 }
 
@@ -1293,12 +1293,12 @@ string ASTE::checkLink()
 string ASTE::checkPartnerLink()
 {
   string partnerLinkName = attributes["partnerLink"];
-
+  
   if (partnerLinkName == "")
     return partnerLinkName;
-
+  
   vector<unsigned int> ancestorScopes = this->ancestorScopes();
-
+  
   // traverse the ancestor scopes
   for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
   {
@@ -1307,22 +1307,22 @@ string ASTE::checkPartnerLink()
       string partnerLinkType_name = globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerLinkType"];
       string myRole_name          = globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["myRole"];
       string partnerRole_name     = globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerRole"];
-
+      
       if (partnerLinkType_name != "" && myRole_name != "" && partnerRole_name != "")
       {
         plRoleDetails = new pPartnerLink(partnerLinkName, partnerLinkType_name, myRole_name, partnerRole_name);
       }
-
+      
       // check if operation was defined in WSDL file
       if (globals::wsdl_filename != "")
-	if (globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->partnerLinkType != NULL && attributes["operation"] != "")
-	  if (globals::WSDLInfo.checkOperation(globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->partnerLinkType, attributes["operation"]) == false)
-	    genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
-
+        if (globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->partnerLinkType != NULL && attributes["operation"] != "")
+          if (globals::WSDLInfo.checkOperation(globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->partnerLinkType, attributes["operation"]) == false)
+            genericError(128, "operation `" + attributes["operation"] + "' referenced in <" + activityTypeName() + "> not defined in WSDL file", attributes["referenceLine"], ERRORLEVER_WARNING);
+      
       return (toString(*scope) + "." + partnerLinkName);
     }
   }
-
+  
   // trigger [SA00084]
   assert(globals::ASTEmap[parentActivityId] != NULL);
   if (globals::ASTEmap[parentActivityId]->activityTypeName() == "eventHandlers")
@@ -1330,11 +1330,11 @@ string ASTE::checkPartnerLink()
     SAerror(84, partnerLinkName, attributes["referenceLine"]);
     return partnerLinkName;
   }
-
+  
   // display an error message
   string errormessage = "partner link `" + partnerLinkName + "' referenced in <" + activityTypeName() + "> was not defined before";
   genericError(110, errormessage, attributes["referenceLine"]);
-
+  
   return "";
 }
 
@@ -1442,14 +1442,14 @@ vector<unsigned int> ASTE::ancestorScopes() const
 vector<unsigned int> ASTE::ancestorLoops() const
 {
   vector<unsigned int> result;
-
+  
   if (id != 1)
   {
     assert(globals::ASTEmap[parentActivityId] != NULL);
-
+    
     if (globals::ASTEmap[parentActivityId]->activityTypeName() == "while" ||
-	globals::ASTEmap[parentActivityId]->activityTypeName() == "repeatUntil" ||
-	globals::ASTEmap[parentActivityId]->activityTypeName() == "forEach")
+        globals::ASTEmap[parentActivityId]->activityTypeName() == "repeatUntil" ||
+        globals::ASTEmap[parentActivityId]->activityTypeName() == "forEach")
     {
       result.push_back(parentActivityId);
     }
@@ -1600,35 +1600,35 @@ void ASTE::output()
 {
   if (drawn)
     return;
-
+  
   drawn = true;
-
+  
   // arcs to parents
   if (activityTypeName() != "link")
   {
     cout << id << " [label=\"" << id << " " << activityTypeName() << "\"]" << endl;
-
+    
     if (id != 1)
       cout << parentActivityId << " -> " << id << endl;
   }
-
+  
   // arcs for links
   if (activityTypeName() == "link")
     cout << sourceActivity << " -> " << targetActivity << "[label = \"" << id << " link\" color=blue]" << endl;
-
-
+  
+  
   // arcs for compensation
   if (activityTypeName() == "compensateScope")
   {
     cout << id << " -> " << globals::ASTEmap[globals::ASTE_scopeNames[attributes["target"]]]->enclosedCH << "[color=green]" << endl;
   }
-
+  
   if (activityTypeName() == "compensate")
   {
     for (set<unsigned int>::iterator it = globals::ASTEmap[parentScopeId]->enclosedScopes.begin(); it != globals::ASTEmap[parentScopeId]->enclosedScopes.end(); it++)
       cout << id << " -> " << globals::ASTEmap[*it]->enclosedCH << "[color=green]" << endl;
   }
-
+  
   
   // arcs for faults
   if (activityTypeName() == "throw")
@@ -1639,8 +1639,8 @@ void ASTE::output()
   {
     cout << id << " -> " << globals::ASTEmap[globals::ASTEmap[globals::ASTEmap[parentScopeId]->id]->parentScopeId]->enclosedFH << "[color=red]" << endl;
   }
-
-
+  
+  
   // process children
   for (set<unsigned int>::iterator it = enclosedActivities.begin(); it != enclosedActivities.end(); it++)
     globals::ASTEmap[*it]->output();

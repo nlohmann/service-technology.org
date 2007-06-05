@@ -46,7 +46,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/06/05 11:51:22 $
+ * \date    \$Date: 2007/06/05 15:04:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -56,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  */
 %}
 
@@ -217,15 +217,15 @@ void POpaqueActivity(impl_tOpaqueActivity* abstract_phylum, uview current_view)
 void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 {
   impl_tInvoke_AsynchronousInvoke* phylum =
-    static_cast<impl_tInvoke_AsynchronousInvoke*>(abstract_phylum);
+  static_cast<impl_tInvoke_AsynchronousInvoke*>(abstract_phylum);
   assert(phylum != NULL);
-
+  
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
-
+  
   ASTE *myself = globals::ASTEmap[phylum->id];
   assert(myself != NULL);
-
+  
   switch(current_view)
   {
     case(petrinetnew_enum):
@@ -236,30 +236,30 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
       Place *p3 = PN.newPlace(prefix + "stop");
       Place *p4 = PN.newPlace(prefix + "stopped");
       Place *p5 = PN.newPlace(prefix + "faulted");
-
+      
       // A subnet sending a message (replacement of t1).
       sendingTransition("invoke", p1, p2,
                         PN.findPlace("out." + myself->channelName),
                         p5, prefix, mkinteger(phylum->id),
                         myself->controlFlow);
-
+      
       // Stopping transitions.
       Transition *t2 = stop(p1, "initial", prefix);
       Transition *t3 = stop(p2, "final", prefix);
       Transition *t4 = stop(p5, "faulted", prefix);
-
+      
       break;
     }
-
+      
     case(petrinetsmall_enum):
     {
       // Places.
       Place *p1 = PN.newPlace(prefix + "initial");
       Place *p2 = PN.newPlace(prefix + "final");
-
+      
       // Set the name of the interface place.
       string interface_place_name = "out." + myself->channelName;
-
+      
       // Add an instance suffix when necessary.            
       if (globals::instances_of_current_process == 0 &&
           myself->messageLink != NULL &&
@@ -269,7 +269,7 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
       {
         interface_place_name += ".instance_" + toString(myself->channel_instances++);
       }
-
+      
       // Receive message from all unique senders.
       if (myself->messageLink != NULL &&
           myself->messageLink->receiver_is_unique)
@@ -290,16 +290,16 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
         PN.newArc(p1, t1);
         PN.newArc(t1, p2);
       }
-
+      
       break;
     }
-
+      
     default: { /* no pattern in this case */ }      
   }
-
+  
   // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
+  
   footer(phylum->id);
 }
 
@@ -536,13 +536,13 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 {
   impl_tReply_Reply* phylum = static_cast<impl_tReply_Reply*>(abstract_phylum);
   assert(phylum != NULL);
-
+  
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";  
-
+  
   ASTE *myself = globals::ASTEmap[phylum->id];
   assert(myself != NULL);
-
+  
   switch(current_view)
   {
     case(petrinetnew_enum):
@@ -553,33 +553,33 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
       Place *p3 = PN.newPlace(prefix + "stop");
       Place *p4 = PN.newPlace(prefix + "stopped");
       Place *p5 = PN.newPlace(prefix + "faulted");
-
+      
       // A subnet sending a message (replacement of t1).
       sendingTransition("reply", p1, p2,
                         PN.findPlace("out." + myself->channelName),
                         p5, prefix, mkinteger(phylum->id),
                         myself->controlFlow);
-
+      
       // Stopping transitions.
       Transition *t2 = stop(p1, "initial", prefix);
       Transition *t3 = stop(p2, "final", prefix);
       Transition *t4 = stop(p5, "faulted", prefix);
-
+      
       break;
     }
-
+      
     case(petrinetsmall_enum):
     {
       // Places.
       Place *p1 = PN.newPlace(prefix + "initial");
       Place *p2 = PN.newPlace(prefix + "final");
-
+      
       // Set the name of the interface place.
       string interface_place_name = "out." + myself->channelName;
       if (myself->messageLink != NULL &&
           myself->messageLink->receiver_is_iterator)
         interface_place_name += ".instance_" + toString(myself->channel_instances++);
-
+      
       // send a message from one unique instance
       if (myself->messageLink != NULL &&
           myself->messageLink->receiver_is_unique)
@@ -593,22 +593,22 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
         }
         break;
       }
-
+      
       // A transition sending a message.
       Transition *t1 = PN.newTransition(prefix + "reply");
       PN.newArc(t1, PN.findPlace(interface_place_name));
       PN.newArc(p1, t1);
       PN.newArc(t1, p2);
-
+      
       break;
     }
-
+      
     default: { /* no pattern in this case */ }      
   }
-
+  
   // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
+  
   footer(phylum->id);
 }
 
@@ -639,116 +639,116 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 {
   impl_tAssign_Assign* phylum =
-    static_cast<impl_tAssign_Assign*>(abstract_phylum);
+  static_cast<impl_tAssign_Assign*>(abstract_phylum);
   assert(phylum != NULL);
-
+  
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
-
-
+  
+  
   switch (current_view)
   {
     case(petrinetnew_enum):
-      {
-        // Places.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p3 = PN.newPlace(prefix + "final");
-	Place *p5 = PN.newPlace(prefix + "stop");
-	Place *p6 = PN.newPlace(prefix + "stopped");
-	
-	Transition *t4 = stop(p1, "initial", prefix);
-	Transition *t7 = stop(p3, "final", prefix);
-
-	// unparse the standard elements
-	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
-	int copyCount = 1;
-	Place *lastPlace = PN.findPlace(prefix + "initial");
-
-	foreach (copyBlock=Copy(from,to); tCopy_list phylum->tCopy_list_1)
-	{
-	  string newPrefix = prefix + "copy." + toString(copyCount) + ".";
-
-	  if (globals::ASTEmap[from->id]->variableName != "")
-	  {
-	    Place *p2 = PN.newPlace(newPrefix + "running");
-	    Place *p4 = PN.newPlace(newPrefix + "p4");
-	    Place *p8 = PN.newPlace(newPrefix + "final");
+    {
+      // Places.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p3 = PN.newPlace(prefix + "final");
+      Place *p5 = PN.newPlace(prefix + "stop");
+      Place *p6 = PN.newPlace(prefix + "stopped");
       
-	    Transition *t1 = PN.newTransition(newPrefix + "t1");
-	    PN.newArc(lastPlace, t1);
-	    PN.newArc(t1, p2);
-            if (globals::parameters[P_VARIABLES])
-	      PN.newArc(PN.findPlace("variable." + globals::ASTEmap[from->id]->variableName), t1, READ);
-
-	    Transition *t2 = PN.newTransition(newPrefix + "t2");
-	    PN.newArc(p2, t2);
-	    PN.newArc(t2, p8);
-	    if (globals::parameters[P_VARIABLES])
-	    {
-	      PN.newArc(PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName), t2);
-	      PN.newArc(t2, PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName));
-	    }
-
-	    // Transitions for the negative control flow.
-	    if (globals::parameters[P_STANDARDFAULTS])
-	      Transition *t3 = throwFault(p2, p4, "running", newPrefix,
-                                 mkinteger(phylum->id), globals::ASTEmap[phylum->id]->controlFlow);
-	    
-	    Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
-	    
-	    lastPlace = p8;
-	  }
-	  else
-	  {
-	    Place *p4 = PN.newPlace(newPrefix + "p4");
-	    Place *p8 = PN.newPlace(newPrefix + "final");
-	    
-	    Transition *t2 = PN.newTransition(newPrefix + "t2");
-	    PN.newArc(lastPlace, t2);
-	    PN.newArc(t2, p8);
-	    if (globals::parameters[P_VARIABLES])
-	    {
-	      PN.newArc(PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName), t2);
-	      PN.newArc(t2, PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName));
-	    }
-
-	    // Transitions for the negative control flow.
-	    if (globals::parameters[P_STANDARDFAULTS])
-	      Transition *t3 = throwFault(lastPlace, p4, "initial", newPrefix,
-                                 mkinteger(phylum->id), globals::ASTEmap[phylum->id]->controlFlow);
-
-	    Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
-
-	    lastPlace = p8;
-	  }
-
-	  copyCount++;
-	}
-
-	PN.mergePlaces(prefix + "final", lastPlace);
-	break;
+      Transition *t4 = stop(p1, "initial", prefix);
+      Transition *t7 = stop(p3, "final", prefix);
+      
+      // unparse the standard elements
+      phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+      
+      int copyCount = 1;
+      Place *lastPlace = PN.findPlace(prefix + "initial");
+      
+      foreach (copyBlock=Copy(from,to); tCopy_list phylum->tCopy_list_1)
+      {
+        string newPrefix = prefix + "copy." + toString(copyCount) + ".";
+        
+        if (globals::ASTEmap[from->id]->variableName != "")
+        {
+          Place *p2 = PN.newPlace(newPrefix + "running");
+          Place *p4 = PN.newPlace(newPrefix + "p4");
+          Place *p8 = PN.newPlace(newPrefix + "final");
+          
+          Transition *t1 = PN.newTransition(newPrefix + "t1");
+          PN.newArc(lastPlace, t1);
+          PN.newArc(t1, p2);
+          if (globals::parameters[P_VARIABLES])
+            PN.newArc(PN.findPlace("variable." + globals::ASTEmap[from->id]->variableName), t1, READ);
+          
+          Transition *t2 = PN.newTransition(newPrefix + "t2");
+          PN.newArc(p2, t2);
+          PN.newArc(t2, p8);
+          if (globals::parameters[P_VARIABLES])
+          {
+            PN.newArc(PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName), t2);
+            PN.newArc(t2, PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName));
+          }
+          
+          // Transitions for the negative control flow.
+          if (globals::parameters[P_STANDARDFAULTS])
+            Transition *t3 = throwFault(p2, p4, "running", newPrefix,
+                                        mkinteger(phylum->id), globals::ASTEmap[phylum->id]->controlFlow);
+          
+          Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
+          
+          lastPlace = p8;
+        }
+        else
+        {
+          Place *p4 = PN.newPlace(newPrefix + "p4");
+          Place *p8 = PN.newPlace(newPrefix + "final");
+          
+          Transition *t2 = PN.newTransition(newPrefix + "t2");
+          PN.newArc(lastPlace, t2);
+          PN.newArc(t2, p8);
+          if (globals::parameters[P_VARIABLES])
+          {
+            PN.newArc(PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName), t2);
+            PN.newArc(t2, PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName));
+          }
+          
+          // Transitions for the negative control flow.
+          if (globals::parameters[P_STANDARDFAULTS])
+            Transition *t3 = throwFault(lastPlace, p4, "initial", newPrefix,
+                                        mkinteger(phylum->id), globals::ASTEmap[phylum->id]->controlFlow);
+          
+          Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
+          
+          lastPlace = p8;
+        }
+        
+        copyCount++;
       }
-
+      
+      PN.mergePlaces(prefix + "final", lastPlace);
+      break;
+    }
+      
     case (petrinetsmall_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-
-	Transition *t1 = PN.newTransition(prefix + "assign");
-
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	// unparse the standard elements
-	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+    {
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
       
-	break;
-      }
-
+      Transition *t1 = PN.newTransition(prefix + "assign");
+      
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
+      
+      // unparse the standard elements
+      phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+      
+      break;
+    }
+      
     default: { /* no pattern in this case */ }
   }
-   
+  
   footer(phylum->id);
 }
 
@@ -779,68 +779,68 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 {
   impl_tValidate_Validate* phylum =
-    static_cast<impl_tValidate_Validate*>(abstract_phylum);
+  static_cast<impl_tValidate_Validate*>(abstract_phylum);
   assert(phylum != NULL);
-
+  
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
-
+  
   switch (current_view)
   {
     case(petrinetnew_enum):
+    {
+      // Places
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "running");
+      Place *p3 = PN.newPlace(prefix + "final");
+      Place *p4 = PN.newPlace(prefix + "stop");
+      Place *p5 = PN.newPlace(prefix + "stopped");
+      Place *p6 = PN.newPlace(prefix + "faulted");
+      
+      Transition *t1 = PN.newTransition(prefix + "read_variable");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
+      
+      Transition *t2 = PN.newTransition(prefix + "continue");
+      PN.newArc(p2, t2);
+      PN.newArc(t2, p3);
+      
+      // Transitions for the negative control flow.
+      if (globals::parameters[P_STANDARDFAULTS])
       {
-        // Places
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "running");
-	Place *p3 = PN.newPlace(prefix + "final");
-	Place *p4 = PN.newPlace(prefix + "stop");
-	Place *p5 = PN.newPlace(prefix + "stopped");
-        Place *p6 = PN.newPlace(prefix + "faulted");
-
-	Transition *t1 = PN.newTransition(prefix + "read_variable");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	Transition *t2 = PN.newTransition(prefix + "continue");
-	PN.newArc(p2, t2);
-	PN.newArc(t2, p3);
-
-	// Transitions for the negative control flow.
-	if (globals::parameters[P_STANDARDFAULTS])
-        {
-	  Transition *t3 = throwFault(p2, p6, "running", prefix,
-                                      mkinteger(phylum->id),
-                                      globals::ASTEmap[phylum->id]->controlFlow);
-        }
-
-        // Stopping transitions.
-	Transition *t4 = stop(p1, "initial", prefix);
-	Transition *t5 = stop(p2, "running", prefix);
-	Transition *t6 = stop(p3, "final", prefix);
-
-	break;
+        Transition *t3 = throwFault(p2, p6, "running", prefix,
+                                    mkinteger(phylum->id),
+                                    globals::ASTEmap[phylum->id]->controlFlow);
       }
-
+      
+      // Stopping transitions.
+      Transition *t4 = stop(p1, "initial", prefix);
+      Transition *t5 = stop(p2, "running", prefix);
+      Transition *t6 = stop(p3, "final", prefix);
+      
+      break;
+    }
+      
     case(petrinetsmall_enum):
-      {
-        // Places.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-
-        // Bogus validation.
-	Transition *t1 = PN.newTransition(prefix + "validate");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	break;
-      }
-    
+    {
+      // Places.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+      
+      // Bogus validation.
+      Transition *t1 = PN.newTransition(prefix + "validate");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
+      
+      break;
+    }
+      
     default: { /* no pattern in this case */ }
   }
-
+  
   // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
+  
   footer(phylum->id);
 }
 
@@ -933,56 +933,56 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 {
   impl_tThrow_Throw* phylum = static_cast<impl_tThrow_Throw*>(abstract_phylum);
   assert(phylum != NULL);
-
+  
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
   assert(globals::ASTEmap[phylum->id] != NULL);
-
+  
   switch(current_view)
   {
     case(petrinetnew_enum):
-      {
-        // Places. Place "final" is not connected, as the <throw> activity
-        // stops the positive control flow. The "fault" place is not modeled as
-        // faults are organized by the "throwFault" function.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "faulted");
-	Place *p4 = PN.newPlace(prefix + "stop");
-	Place *p5 = PN.newPlace(prefix + "stopped");
-        Place *p6 = PN.newPlace(prefix + "final");
-
-        // Throw a fault.
-        Transition *t1 = throwFault(p1, p2, "throw", prefix,
-                                    mkinteger(phylum->id),
-                                    globals::ASTEmap[phylum->id]->controlFlow);
-
-        // Stopping transitions.
-	Transition *t2 = stop(p1, "initial", prefix);
-	Transition *t3 = stop(p2, "faulted", prefix);
-
-	break;
-      }
-
+    {
+      // Places. Place "final" is not connected, as the <throw> activity
+      // stops the positive control flow. The "fault" place is not modeled as
+      // faults are organized by the "throwFault" function.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "faulted");
+      Place *p4 = PN.newPlace(prefix + "stop");
+      Place *p5 = PN.newPlace(prefix + "stopped");
+      Place *p6 = PN.newPlace(prefix + "final");
+      
+      // Throw a fault.
+      Transition *t1 = throwFault(p1, p2, "throw", prefix,
+                                  mkinteger(phylum->id),
+                                  globals::ASTEmap[phylum->id]->controlFlow);
+      
+      // Stopping transitions.
+      Transition *t2 = stop(p1, "initial", prefix);
+      Transition *t3 = stop(p2, "faulted", prefix);
+      
+      break;
+    }
+      
     case(petrinetsmall_enum):
-      {
-	genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
-
-        // Model an <empty> activity instead.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-	Transition *t1 = PN.newTransition(prefix + "empty");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	break;
-      }
-
+    {
+      genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
+      
+      // Model an <empty> activity instead.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+      Transition *t1 = PN.newTransition(prefix + "empty");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
+      
+      break;
+    }
+      
     default: { /* no pattern in this case */ }
   }
-
+  
   // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
+  
   footer(phylum->id);      
 }
 
@@ -1019,34 +1019,34 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
 {
   impl_tRethrow_Rethrow* phylum =
-    static_cast<impl_tRethrow_Rethrow*>(abstract_phylum);
+  static_cast<impl_tRethrow_Rethrow*>(abstract_phylum);
   assert(phylum != NULL);
-
+  
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
-
+  
   // Places.
   Place *p1 = PN.newPlace(prefix + "initial");
   Place *p2 = PN.newPlace(prefix + "faulted");
   Place *p4 = PN.newPlace(prefix + "stop");
   Place *p5 = PN.newPlace(prefix + "stopped");
   Place *p6 = PN.newPlace(prefix + "final");
-
+  
   // Transitions for the negative control flow.
   Transition *t1 = throwFault(p1, p2, "rethrow", prefix,
-                                    mkinteger(phylum->id),
-                                    globals::ASTEmap[phylum->id]->controlFlow);
-
+                              mkinteger(phylum->id),
+                              globals::ASTEmap[phylum->id]->controlFlow);
+  
   PN.newArc(PN.findPlace(toString(globals::ASTEmap[phylum->id]->parentScopeId) +
-            ".faultHandlers.fault"), t1, READ);
-
+                         ".faultHandlers.fault"), t1, READ);
+  
   // Stopping transitions.
   Transition *t2 = stop(p1, "initial", prefix);
   Transition *t3 = stop(p2, "faulted", prefix);
-
+  
   // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
+  
   footer(phylum->id);
 }
 
@@ -1084,58 +1084,58 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
 {
   impl_tExit_Exit* phylum = static_cast<impl_tExit_Exit*>(abstract_phylum);
   assert(phylum != NULL);
-
+  
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
-
+  
   switch(current_view)
   {
     case(petrinetnew_enum):
-      {
-        // Places. Place "final" is not connected, as the <exit> activity
-        // stops the control flow of the <process>.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "done");
-	Place *p3 = PN.newPlace(prefix + "stop");
-	Place *p4 = PN.newPlace(prefix + "stopped");
-        Place *p5 = PN.newPlace(prefix + "final");
-
-        // Signal the <process> termination.
-        Transition *t1 = PN.newTransition(prefix + "exit");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-	PN.newArc(PN.findPlace("1.internal.!Exiting"), t1);
-	PN.newArc(t1, PN.findPlace("1.internal.Exiting"));
-	PN.newArc(t1, PN.findPlace("1.internal.inner_stop"));
-
-	// Stopping transitions.
-	Transition *t2 = stop(p1, "initial", prefix);
-	Transition *t3 = stop(p2, "done", prefix);
-
-	break;
-      }
-
+    {
+      // Places. Place "final" is not connected, as the <exit> activity
+      // stops the control flow of the <process>.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "done");
+      Place *p3 = PN.newPlace(prefix + "stop");
+      Place *p4 = PN.newPlace(prefix + "stopped");
+      Place *p5 = PN.newPlace(prefix + "final");
+      
+      // Signal the <process> termination.
+      Transition *t1 = PN.newTransition(prefix + "exit");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
+      PN.newArc(PN.findPlace("1.internal.!Exiting"), t1);
+      PN.newArc(t1, PN.findPlace("1.internal.Exiting"));
+      PN.newArc(t1, PN.findPlace("1.internal.inner_stop"));
+      
+      // Stopping transitions.
+      Transition *t2 = stop(p1, "initial", prefix);
+      Transition *t3 = stop(p2, "done", prefix);
+      
+      break;
+    }
+      
     case(petrinetsmall_enum):
-      {
-        genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
-
-
-        // Model an <empty> activity instead.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-	Transition *t1 = PN.newTransition(prefix + "empty");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	break;
-      }
-
+    {
+      genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
+      
+      
+      // Model an <empty> activity instead.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+      Transition *t1 = PN.newTransition(prefix + "empty");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
+      
+      break;
+    }
+      
     default: { /* no pattern in this case */ }
   }
-
+  
   // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
+  
   footer(phylum->id);
 }
 
@@ -1169,89 +1169,89 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
 void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
 {
   impl_tCompensate_Compensate* phylum =
-    static_cast<impl_tCompensate_Compensate*>(abstract_phylum);
+  static_cast<impl_tCompensate_Compensate*>(abstract_phylum);
   assert(phylum != NULL);
-
+  
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
-
+  
   switch(current_view)
   {
     case(petrinetnew_enum):
+    {
+      // Places.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+      Place *p3 = PN.newPlace(prefix + "stop");
+      Place *p4 = PN.newPlace(prefix + "stopped");
+      Place *p5 = PN.newPlace(prefix + "compensating");
+      
+      // Concurrently call all compensation handlers of the child scopes.
+      Transition *t1 = PN.newTransition(prefix + "call_ch");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p5);
+      
+      // Finish activity after called compensation handlers have finished.
+      Transition *t2 = PN.newTransition(prefix + "finish");
+      PN.newArc(p5, t2);
+      PN.newArc(t2, p2);
+      
+      Transition *t3 = NULL;
+      Transition *t4 = NULL;
+      
+      unsigned int parentId = globals::ASTEmap[ phylum->id ]->parentScopeId;
+      if ( !globals::ASTEmap[ parentId ]->enclosedScopes.empty() )
       {
-        // Places.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-        Place *p3 = PN.newPlace(prefix + "stop");
-        Place *p4 = PN.newPlace(prefix + "stopped");
-        Place *p5 = PN.newPlace(prefix + "compensating");
-
-        // Concurrently call all compensation handlers of the child scopes.
-	Transition *t1 = PN.newTransition(prefix + "call_ch");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p5);
-
-        // Finish activity after called compensation handlers have finished.
-	Transition *t2 = PN.newTransition(prefix + "finish");
-	PN.newArc(p5, t2);
-	PN.newArc(t2, p2);
-
-        Transition *t3 = NULL;
-        Transition *t4 = NULL;
-
-        unsigned int parentId = globals::ASTEmap[ phylum->id ]->parentScopeId;
-        if ( !globals::ASTEmap[ parentId ]->enclosedScopes.empty() )
-        {
-          // Forward stop request to compensation handler.
-          t3 = PN.newTransition(prefix + "stop_ch");
-          PN.newArc(p3, t3);
-          PN.newArc(p5, t3, READ);
-
-          // Set state to "stopped" after compensation handler has stopped.
-          t4 = PN.newTransition(prefix + "ch_stopped");
-          PN.newArc(p5, t4);
-          PN.newArc(t4, p4);
-        }
-
-        // Stopping transitions.
-        Transition *t5 = stop(p1, "initial", prefix);
-        Transition *t6 = stop(p2, "final",   prefix);
-
-        // Connect with places of child scopes.
-        for( set< unsigned int >::iterator scope = globals::ASTEmap[ parentId ]->enclosedScopes.begin();
-                                           scope != globals::ASTEmap[ parentId ]->enclosedScopes.end();
-                                           scope++ )
-        {
-          string newPrefix = toString(*scope) + ".internal.";
-          PN.newArc(t1, PN.findPlace(newPrefix + "compensate"));
-          PN.newArc(t3, PN.findPlace(newPrefix + "ch_stop"));
-          PN.newArc(PN.findPlace(newPrefix + "ch_stopped"),  t4);
-          PN.newArc(PN.findPlace(newPrefix + "compensated"), t2);
-        }
-
-        break;
+        // Forward stop request to compensation handler.
+        t3 = PN.newTransition(prefix + "stop_ch");
+        PN.newArc(p3, t3);
+        PN.newArc(p5, t3, READ);
+        
+        // Set state to "stopped" after compensation handler has stopped.
+        t4 = PN.newTransition(prefix + "ch_stopped");
+        PN.newArc(p5, t4);
+        PN.newArc(t4, p4);
       }
-
+      
+      // Stopping transitions.
+      Transition *t5 = stop(p1, "initial", prefix);
+      Transition *t6 = stop(p2, "final",   prefix);
+      
+      // Connect with places of child scopes.
+      for( set< unsigned int >::iterator scope = globals::ASTEmap[ parentId ]->enclosedScopes.begin();
+           scope != globals::ASTEmap[ parentId ]->enclosedScopes.end();
+           scope++ )
+      {
+        string newPrefix = toString(*scope) + ".internal.";
+        PN.newArc(t1, PN.findPlace(newPrefix + "compensate"));
+        PN.newArc(t3, PN.findPlace(newPrefix + "ch_stop"));
+        PN.newArc(PN.findPlace(newPrefix + "ch_stopped"),  t4);
+        PN.newArc(PN.findPlace(newPrefix + "compensated"), t2);
+      }
+      
+      break;
+    }
+      
     case(petrinetsmall_enum):
-      {
-	genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
-
-        // Model an <empty> activity instead.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-	Transition *t1 = PN.newTransition(prefix + "empty");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	break;
-      }
-
+    {
+      genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
+      
+      // Model an <empty> activity instead.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+      Transition *t1 = PN.newTransition(prefix + "empty");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
+      
+      break;
+    }
+      
     default: { /* no pattern in this case */ }
   }
-
+  
   // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
+  
   footer(phylum->id);
 }
 
@@ -1288,77 +1288,77 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
 void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
 {
   impl_tCompensate_CompensateScope* phylum =
-    static_cast<impl_tCompensate_CompensateScope*>(abstract_phylum);
+  static_cast<impl_tCompensate_CompensateScope*>(abstract_phylum);
   assert(phylum != NULL);
-
+  
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
-
+  
   switch(current_view)
   {
     case(petrinetnew_enum):
-      {
-        // Find the prefix of the target scope.
-        string newPrefix =
-          toString(globals::ASTE_scopeNames[globals::ASTEmap[phylum->id]->attributes["target"]]) + ".internal.";
-
-        // Places.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-        Place *p3 = PN.newPlace(prefix + "stop");
-        Place *p4 = PN.newPlace(prefix + "stopped");
-        Place *p5 = PN.newPlace(prefix + "compensating");
-	
-        // Call the compensation handler of the target scope.
-	Transition *t1 = PN.newTransition(prefix + "call_ch");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p5);
-        PN.newArc(t1, PN.findPlace(newPrefix + "compensate"));
-
-        // Finish activity after called compensation handler has finished.
-	Transition *t2 = PN.newTransition(prefix + "finish");
-	PN.newArc(p5, t2);
-	PN.newArc(t2, p2);
-        PN.newArc(PN.findPlace(newPrefix + "compensated"), t2);
-
-        // Forward stop request to compensation handler.
-        Transition *t3 = PN.newTransition(prefix + "stop_ch");
-        PN.newArc(p3, t3);
-        PN.newArc(p5, t3, READ);
-        PN.newArc(t3, PN.findPlace(newPrefix + "ch_stop"));
-
-        // Set state to "stopped" after compensation handler has stopped.
-        Transition *t4 = PN.newTransition(prefix + "ch_stopped");
-        PN.newArc(p5, t4);
-        PN.newArc(t4, p4);
-        PN.newArc(PN.findPlace(newPrefix + "ch_stopped"),  t4);
-
-        // Stopping transitions.        
-        Transition *t5 = stop(p1, "initial", prefix);
-        Transition *t6 = stop(p2, "final",   prefix);
-
-        break;
-      }
-
+    {
+      // Find the prefix of the target scope.
+      string newPrefix =
+      toString(globals::ASTE_scopeNames[globals::ASTEmap[phylum->id]->attributes["target"]]) + ".internal.";
+      
+      // Places.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+      Place *p3 = PN.newPlace(prefix + "stop");
+      Place *p4 = PN.newPlace(prefix + "stopped");
+      Place *p5 = PN.newPlace(prefix + "compensating");
+      
+      // Call the compensation handler of the target scope.
+      Transition *t1 = PN.newTransition(prefix + "call_ch");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p5);
+      PN.newArc(t1, PN.findPlace(newPrefix + "compensate"));
+      
+      // Finish activity after called compensation handler has finished.
+      Transition *t2 = PN.newTransition(prefix + "finish");
+      PN.newArc(p5, t2);
+      PN.newArc(t2, p2);
+      PN.newArc(PN.findPlace(newPrefix + "compensated"), t2);
+      
+      // Forward stop request to compensation handler.
+      Transition *t3 = PN.newTransition(prefix + "stop_ch");
+      PN.newArc(p3, t3);
+      PN.newArc(p5, t3, READ);
+      PN.newArc(t3, PN.findPlace(newPrefix + "ch_stop"));
+      
+      // Set state to "stopped" after compensation handler has stopped.
+      Transition *t4 = PN.newTransition(prefix + "ch_stopped");
+      PN.newArc(p5, t4);
+      PN.newArc(t4, p4);
+      PN.newArc(PN.findPlace(newPrefix + "ch_stopped"),  t4);
+      
+      // Stopping transitions.        
+      Transition *t5 = stop(p1, "initial", prefix);
+      Transition *t6 = stop(p2, "final",   prefix);
+      
+      break;
+    }
+      
     case(petrinetsmall_enum):
-      {
-	genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
-
-        // Model an <empty> activity instead.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-	Transition *t1 = PN.newTransition(prefix + "empty");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	break;
-      }
-
+    {
+      genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
+      
+      // Model an <empty> activity instead.
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+      Transition *t1 = PN.newTransition(prefix + "empty");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
+      
+      break;
+    }
+      
     default: { /* no pattern in this case */ }
   }
-
+  
   // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
+  
   footer(phylum->id);
 }

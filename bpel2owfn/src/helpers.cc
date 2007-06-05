@@ -29,13 +29,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007/05/14 09:02:56 $
+ * \date    \$Date: 2007/06/05 15:04:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.81 $
+ * \version \$Revision: 1.82 $
  *
  * \ingroup debug
  */
@@ -210,8 +210,8 @@ unsigned int max(unsigned int a, unsigned int b)
 string strip_namespace(string s)
 {
   if (s.find_first_of(":") != string::npos &&
-     (s.substr(0, s.find_first_of(":")) != "http"))
-      return s.substr(s.find_first_of(":")+1, s.length());
+      (s.substr(0, s.find_first_of(":")) != "http"))
+    return s.substr(s.find_first_of(":")+1, s.length());
   else
     return s;
 }

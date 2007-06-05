@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/05/14 09:02:56 $
+ * \date    \$Date: 2007/06/05 15:04:00 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -401,15 +401,15 @@ void enterConsecutiveActivities( unsigned int a, unsigned int b )
 void check_SA00070( unsigned int id )
 {
   ENTER("check_SA00070");
-
+  
   // go through all enclosed activities and look if there have sources or targets
   for ( set< unsigned int >::iterator activities = globals::ASTEmap[ id ]->enclosedActivities.begin();
-          activities != globals::ASTEmap[ id ]->enclosedActivities.end();
-          activities++ )
+        activities != globals::ASTEmap[ id ]->enclosedActivities.end();
+        activities++ )
   {
     // whether it's source or target doesn't matter - the link must be defined inside the element that is checked
     set< unsigned int > links = setUnion( globals::ASTEmap[ *activities ]->sourceLinks, globals::ASTEmap[ *activities ]->targetLinks );
-
+    
     // so check every source and target
     for ( set< unsigned int>::iterator link = links.begin(); link != links.end(); link++ )
     {
@@ -566,7 +566,7 @@ void listAttributes ( unsigned int id )
              attribute->first == "surpressJoinFailure" ||
              attribute->first == "validate")
             && attribute->second == "no" )
-      )
+         )
     {
       result += " " + attribute->first + "=\""+ attribute->second +"\"";
     }

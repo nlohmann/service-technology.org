@@ -31,7 +31,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/06/05 15:04:00 $
+ * \date    \$Date: 2007/06/06 08:43:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  */
 %}
 
@@ -173,6 +173,18 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
         // Indicate the process's initial and final marking.
         p1->mark();
         p2->isFinal = true;
+        
+        // Read process's parameter "reinstantiate" and add transition
+        // accordingly.
+        if (globals::ASTEmap[phylum->id]->attributes["reinstantiate"] == "yes")
+        {
+          p1->isFinal = true;
+          p2->isFinal = false;
+          
+          Transition *loop = PN.newTransition(prefix + "reinstantiate");
+          PN.newArc(p2, loop);
+          PN.newArc(loop, p1);
+        }
         
         Transition *t1 = PN.newTransition(prefix + "initialize");
         PN.newArc(p1, t1);
@@ -308,6 +320,18 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
         // Indicate the process's initial and final marking.
         p1->mark();
         p2->isFinal = true;
+        
+        // Read process's parameter "reinstantiate" and add transition
+        // accordingly.
+        if (globals::ASTEmap[phylum->id]->attributes["reinstantiate"] == "yes")
+        {
+          p1->isFinal = true;
+          p2->isFinal = false;
+          
+          Transition *loop = PN.newTransition(prefix + "reinstantiate");
+          PN.newArc(p2, loop);
+          PN.newArc(loop, p1);
+        }
         
         // Unparse the embedded activity.
         phylum->activity_1->unparse(pseudoPrinter, current_view);

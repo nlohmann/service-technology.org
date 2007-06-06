@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/06/06 08:55:38 $
+ * \date    \$Date: 2007/06/06 13:35:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.182 $
+ * \version \$Revision: 1.183 $
  */
 %}
 
@@ -1447,6 +1447,9 @@ Compensate(a,_id) ->
       }
       if (!correctUse)
         SAerror(8, "", myself->attributes["referenceLine"]);
+
+      // the parent scope has to deal with a compensate
+      globals::ASTEmap[myself->parentActivityId]->hasCompensate = true;
     }
     a
     {
@@ -1503,6 +1506,12 @@ CompensateScope(a,b,_id) ->
         SAerror(78, myself->attributes["target"], myself->attributes["referenceLine"]);
       else if (globals::ASTEmap[myself->parentScopeId]->enclosedScopes.find(globals::ASTE_scopeNames[myself->attributes["target"]]) == globals::ASTEmap[myself->parentScopeId]->enclosedScopes.end())
         SAerror(77, myself->attributes["target"], myself->attributes["referenceLine"]);
+
+      globals::ASTEmap[ 
+        globals::ASTEmap[ 
+          *(globals::ASTEmap[myself->parentScopeId]->enclosedScopes.find(globals::ASTE_scopeNames[myself->attributes["target"]])) 
+        ]->enclosedCH 
+      ]->callable = true;
     }
     a
     {

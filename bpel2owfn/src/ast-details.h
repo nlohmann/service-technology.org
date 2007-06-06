@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/06/05 11:51:21 $
+ * \date    \$Date: 2007/06/06 13:35:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.85 $
+ * \version \$Revision: 1.86 $
  */
 
 
@@ -215,6 +215,7 @@ class ASTE
     unsigned int enclosedFH;		///< the id of the enclosed fault handlers
     unsigned int enclosedCH;		///< the id of the enclosed compensation handler
     bool callable;                      ///< true if a handler actually can be called
+    bool hasCompensate;                 ///< true if a scope has an compensate
     bool hasEH;				///< true if <process> or <scope> have <eventHandlers>
     bool hasCatchAll;			///< true if <faultHandlers> have a <catchAll> branch
     bool isUserDefined;			///< true if construct is user-defined

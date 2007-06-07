@@ -36,6 +36,7 @@
 #include <string>
 #include "vertex.h"
 #include "enums.h"
+#include <cassert>
 
 GraphEdge::GraphEdge(vertex* dstNodeP, const string& labelP) :
     dstNode(dstNodeP),

@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/06/05 11:51:22 $
+ * \date    \$Date: 2007/06/07 08:22:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 
 
@@ -184,7 +184,7 @@ class BPEL4Chor
     BPEL4Chor_messageLink *get_messageLink(unsigned int ASTE_id) const;
     
     /// find the number of instances to be created, given a process name
-    unsigned int instances(string process_name) const;
+    int instances(string process_name) const;
 
     /// find a forEach name given an activity id or name
     unsigned int forEach_count(unsigned int ASTE_id) const;

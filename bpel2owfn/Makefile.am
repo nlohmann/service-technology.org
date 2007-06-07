@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/06/05 15:17:31 $ by $Author: nielslohmann $
-# Version $Revision: 1.62 $
+# File last changed $Date: 2007/06/07 08:22:39 $ by $Author: nielslohmann $
+# Version $Revision: 1.63 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc rpm
@@ -142,6 +142,7 @@ binarydist: pdf binarydistreadme
 bindist_universal:
 	@echo "you have to configure with:"
 	@echo "  ./configure --disable-dependency-tracking"
+	@read answer
 	$(MAKE) binarydist OS=mac-universal CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
 	  CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
 	  LDFLAGS="-arch i386 -arch ppc"

@@ -28,13 +28,13 @@
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/06/05 11:51:21 $
+ * \date    \$Date: 2007/06/07 08:22:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 
 
@@ -348,7 +348,7 @@ BPEL4Chor::BPEL4Chor() :
 
 
 
-unsigned int BPEL4Chor::instances(string process_name) const
+int BPEL4Chor::instances(string process_name) const
 {
   // traverse the participant types to find the xmlns URL
   for(map<string, string>::const_iterator participantType = participantTypes.begin();

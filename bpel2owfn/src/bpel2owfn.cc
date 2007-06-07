@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/06/05 14:45:03 $
+ * \date    \$Date: 2007/06/07 08:22:39 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.181 $
+ * \version \$Revision: 1.182 $
  */
 
 
@@ -299,7 +299,7 @@ void single_output(set< string >::iterator file)
       }
       else // case 2: two or more instances of this process are needed
       {
-        for(unsigned int instance = 1; instance <= globals::instances_of_current_process; instance++)
+        for(int instance = 1; instance <= globals::instances_of_current_process; instance++)
         {
           std::cerr << "instance " << instance << "/" << globals::instances_of_current_process << " " << PN2.information() << std::endl;
           

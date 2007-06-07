@@ -24,17 +24,17 @@
  * \brief   global varialbes
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/06/06 08:55:38 $
+ * \date    \$Date: 2007/06/07 08:22:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  */
 
 
@@ -264,7 +264,7 @@ namespace globals
   extern map<string, string> tempAttributes;
 
   /// the number of instances to be created of current process (used in BPEL4Chor)
-  extern unsigned int instances_of_current_process;
+  extern int instances_of_current_process;
 }
 
 #endif

@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/06/07 08:22:39 $
+ * \date    \$Date: 2007/06/07 09:17:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 
 
@@ -265,6 +265,9 @@ namespace globals
 
   /// the number of instances to be created of current process (used in BPEL4Chor)
   extern int instances_of_current_process;
+  
+  /// a mapping holding the number of branches for every <if> activity (indexed by the <if>'s id)
+  extern map<unsigned int, unsigned int> if_branches;
 }
 
 #endif

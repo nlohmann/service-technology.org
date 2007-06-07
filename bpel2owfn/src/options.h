@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/06/04 08:02:02 $
+ * \date    \$Date: 2007/06/07 09:17:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
  */
 
 
@@ -148,8 +148,9 @@ typedef enum
   P_XOR,		///< use XOR as transition condition
   P_LOOPCOUNT,		///< use loop counters
   P_LOOPCONTROL,	///< add communication to loops
-  P_NOINTERFACE,		///< do not draw an interface
-  P_DEADLOCKTEST		///< removes the deadlock from the final place
+  P_NOINTERFACE,	///< do not draw an interface
+  P_DEADLOCKTEST,	///< removes the deadlock from the final place
+  P_DATA		///< creates multiple nets (Diplomarbeit Thomas Heidinger)   
 } possibleParameters;
 
 

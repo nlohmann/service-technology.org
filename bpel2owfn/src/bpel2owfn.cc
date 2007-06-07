@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/06/07 08:22:39 $
+ * \date    \$Date: 2007/06/07 09:17:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.182 $
+ * \version \$Revision: 1.183 $
  */
 
 
@@ -64,6 +64,7 @@
 #include "ast-config.h"
 #include "ast-details.h"
 #include "globals.h"
+#include "extension-data.h"
 
 using std::cerr;
 using std::cout;
@@ -366,6 +367,15 @@ void final_output()
   if (modus == M_CHOREOGRAPHY)
     PN = PN2;
 
+  
+  // jump into Thomas Heidinger's part
+  if (globals::parameters[P_DATA])
+  {
+    data_extension_main();
+    return;
+  }
+  
+  
   if (modus == M_PETRINET || modus == M_CHOREOGRAPHY)
   {
     if (globals::reduction_level > 0)

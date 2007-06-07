@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/06/06 13:35:17 $
+ * \date    \$Date: 2007/06/07 09:17:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.183 $
+ * \version \$Revision: 1.184 $
  */
 %}
 
@@ -1660,13 +1660,17 @@ If(a,b,c,_id) ->
       assert(myself != NULL);
 
       
-
       a->parentId = myid;
 
       myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
+      
+      
+      // count the <if>'s branches for Thomas Heidinger's Diplomarbeit
+      globals::if_branches[myid] = 1;
+      
 
       // distribute the switch's id to the enclosed activities
       // also distribute the control flow
@@ -1676,13 +1680,15 @@ If(a,b,c,_id) ->
         globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
         globals::ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
         globals::ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
+	
+	globals::if_branches[myid]++;
       }
 
       // process Else-branch
       with(c)
       {
         c=Else(d,_id2):
-        { 
+        {
           assert(globals::ASTEmap[d->id] != NULL);
           globals::ASTEmap[d->id]->parentActivityId = myid;
           globals::ASTEmap[d->id]->controlFlow = myself->controlFlow;

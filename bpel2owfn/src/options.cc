@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/06/04 08:02:02 $
+ * \date    \$Date: 2007/06/07 09:17:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.86 $
+ * \version \$Revision: 1.87 $
  */
 
 
@@ -228,17 +228,17 @@ void parse_command_line(int argc, char* argv[])
   suffixes[F_PNML] = "pnml"  ;
   suffixes[F_TXT]  = "txt"   ;
   suffixes[F_XML]  = "xml"   ;
-
+  
   // this array helps us to automatically check the valid formats
   possibleFormats format[] = { F_LOLA, F_OWFN, F_DOT, F_INA, F_SPIN, F_PEP, F_APNN, F_INFO, F_PNML, F_TXT, F_XML };
-
+  
   // this map indicates, whether a certain format is valid for a mode
   map< pair<possibleModi,possibleFormats>, bool > validFormats;
-
+  
   validFormats[pair<possibleModi,possibleFormats>(M_AST,F_DOT)] = true;
-
+  
   validFormats[pair<possibleModi,possibleFormats>(M_PRETTY,F_XML)] = true;
-
+  
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_LOLA)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_OWFN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_DOT )] = true;
@@ -248,7 +248,7 @@ void parse_command_line(int argc, char* argv[])
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_APNN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_INFO)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_PNML)] = true;
-
+  
   validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_LOLA)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_OWFN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_DOT )] = true;
@@ -258,20 +258,20 @@ void parse_command_line(int argc, char* argv[])
   validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_APNN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_INFO)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_PNML)] = true;
-
+  
   validFormats[pair<possibleModi,possibleFormats>(M_CFG,F_DOT)] = true;
   
   validFormats[pair<possibleModi,possibleFormats>(M_VIS,F_DOT)] = true;
-
+  
   // the programme's name on the commandline
   string progname = string(argv[0]);
-
-
+  
+  
   // turn off debug modi of flex and bison by default
   frontend_debug = 0;
   frontend__flex_debug = 0;
-
-
+  
+  
   // use GNU getopt to parse the command-line arguments
   int optc = 0;
   while ((optc = getopt_long (argc, argv, par_string, longopts, static_cast<int *>(0)))
@@ -283,229 +283,231 @@ void parse_command_line(int argc, char* argv[])
     switch (optc)
     {
       case 'h': options[O_HELP] = true; break;
-
+        
       case 'v': options[O_VERSION] = true; break;
-
+        
       case 'm':
-		{
-		  old_modus = modus;
-		  parameter = string(optarg);
-
-		  if (parameter == "ast")
-		    modus = M_AST;
-		  else if (parameter == "pretty")
-		  {
-		    modus = M_PRETTY;
-		    formats[F_XML] = true;
-		    options[O_FORMAT] = true;
-		  }
-		  else if (parameter == "petrinet" || parameter == "pn")
-		    modus = M_PETRINET;
-		  else if (parameter == "choreography" || parameter == "chor")
-		    modus = M_CHOREOGRAPHY;
-		  else if (parameter == "cfg")
-		    modus = M_CFG;
-		  else if (parameter == "visualization" || parameter == "vis")
-		    modus = M_VIS;
-		  else  {
-		    trace(TRACE_ALWAYS, "Unknown mode \"" + parameter+ "\".\n");
-		    trace(TRACE_ALWAYS, "Use -h to get a list of valid modes.\n");
-		    cleanup();
-		    exit(1);
-		  }
-
-		  if (options[O_MODE] && modus != old_modus) {
-		    trace(TRACE_ALWAYS, "Multiple modes are given, please choose only one!\n");
-		    cleanup();
-		    exit(1);
-		  }
-
-		  options[O_MODE] = true;
-
-		  break;
-		}
-
-      case 'l':
-		{
-		  options[O_LOG] = true;
-		  if (optarg != NULL)
-		    log_filename = string(optarg);
-		  break;
-		}
-
-      case 'i':
-              {
-		options[O_INPUT] = true;
-		globals::filename = string(optarg);
-                if (inputfiles.find(globals::filename) == inputfiles.end())
-                {
-		  inputfiles.insert(globals::filename);
-                }
-                else
-                {
-                  trace(TRACE_WARNINGS, "WARNING: It makes no sense reading \n");
-                  trace(TRACE_WARNINGS, "             "+ globals::filename + "\n");
-                  trace(TRACE_WARNINGS, "         more than once.\n");
-                  trace(TRACE_WARNINGS, "         So file will only be read once.\n");
-                }
-		break;
-	      }
-
-      case 'o':
-	      {
-		if (options[O_OUTPUT]) {
-		  trace(TRACE_ALWAYS, "Multiple output options are given, please choose only one!\n");
-          cleanup();
-		  exit(1);
-		}
-
-		options[O_OUTPUT] = true;
-
-		if (optarg != NULL)
-		  globals::output_filename = string(optarg);
-
-		break;
-	      }
-
-      case 'f':
-	      {
-		options[O_FORMAT] = true;
-		parameter = string(optarg);
-
-		if (parameter == suffixes[F_LOLA])
-		  formats[F_LOLA] = true;
-		else if (parameter == suffixes[F_OWFN])
-		  formats[F_OWFN] = true;
-		else if (parameter == suffixes[F_DOT])
-		  formats[F_DOT] = true;
-		else if (parameter == "pep")
-		  formats[F_PEP] = true;
-		else if (parameter == suffixes[F_APNN])
-		  formats[F_APNN] = true;
-		else if (parameter == suffixes[F_INFO])
-		  formats[F_INFO] = true;
-		else if (parameter == "ina")
-		  formats[F_INA] = true;
-		else if (parameter == "spin")
-		  formats[F_SPIN] = true;
-		else if (parameter == suffixes[F_PNML])
-		  formats[F_PNML] = true;
-		else if (parameter == suffixes[F_TXT])
-		  formats[F_TXT] = true;
-		else if (parameter == suffixes[F_XML])
-		  formats[F_XML] = true;
-		else {
-		  trace(TRACE_ALWAYS, "Unknown format \"" + parameter +"\".\n");
-		  trace(TRACE_ALWAYS, "Use -h to get a list of valid formats.\n");
-    	  cleanup();
-		  exit(1);
+      {
+        old_modus = modus;
+        parameter = string(optarg);
+        
+        if (parameter == "ast")
+          modus = M_AST;
+        else if (parameter == "pretty")
+        {
+          modus = M_PRETTY;
+          formats[F_XML] = true;
+          options[O_FORMAT] = true;
         }
-
-		break;
-	      }
-
-      case 'p':
-	      {
-		options[O_PARAMETER] = true;
-		parameter = string(optarg);
-
-		if ( parameter == "reduce")
-		  globals::reduction_level = 5;
-		else if (parameter == "communicationonly" | parameter == "small")
-		  globals::parameters[P_COMMUNICATIONONLY] = true;
-		else if (parameter == "standardfaults")
-		  globals::parameters[P_STANDARDFAULTS] = true;
-		else if (parameter == "fhfaults")
-		  globals::parameters[P_FHFAULTS] = true;
-		else if (parameter == "variables")
-		  globals::parameters[P_VARIABLES] = true;
-		else if (parameter == "xor")
-		  globals::parameters[P_XOR] = true;
-		else if (parameter == "loopcount")
-		  globals::parameters[P_LOOPCOUNT] = true;
-		else if (parameter == "loopcontrol")
-		  globals::parameters[P_LOOPCONTROL] = true;
-		else if (parameter == "nointerface")
-		  globals::parameters[P_NOINTERFACE] = true;
-		else if (parameter == "deadlocktest")
-		  globals::parameters[P_DEADLOCKTEST] = true;
-		else {
-		  trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
-		  trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");
-    	  cleanup();
-		  exit(1);
-		}
-
-		break;
-	      }
-
-      case 'd':
-	      {
-		options[O_DEBUG] = true;
-		parameter = string(optarg);
-
-		if (parameter == "flex")
-		  frontend__flex_debug = 1;
-		else if (parameter == "bison")
-		  frontend_debug = 1;
-		else if (parameter == "1")
-		  debug_level = TRACE_WARNINGS;
-		else if (parameter == "2")
-		  debug_level = TRACE_INFORMATION;
-		else if (parameter == "3")
-		  debug_level = TRACE_DEBUG;
-		else if (parameter == "4")
-		  debug_level = TRACE_VERY_DEBUG;
-		else if (parameter == "0")
-		  debug_level = TRACE_ERROR;
-		else {
-		  trace(TRACE_ALWAYS, "Unrecognised debug mode: \"" + parameter +"\"!\n");
-		  trace(TRACE_ALWAYS, "Use -h to get a list of valid debug modes.\n");
-		  cleanup();
-		  exit(1);
-	        }
-		break;
-	      }
-
-      case 'r':
-		{
-		  globals::reduction_level = toUInt(string(optarg));
-		  if (globals::reduction_level == UINT_MAX)
-		  {
-		    trace(TRACE_ALWAYS, "Unrecognised reduction mode: \"" + string(optarg) +"\"!\n");
-		    trace(TRACE_ALWAYS, "Define a number between 0 and 6.\n");
-		    cleanup();
-		    exit(1);
-		  }
-
-		break;
-	      }
-
-      case 'c':
-	      {
-		options[O_CHOR] = true;
-		globals::choreography_filename = string(optarg);
-		break;
-	      }
-
-      case 'w':
-	      {
-		options[O_WSDL] = true;
-		globals::wsdl_filename = string(optarg);
-		break;
-	      }
-
-      default:
-	      {
-		trace("Unknown option!\n");
-        trace(TRACE_ALWAYS, "Use -h to get a list of valid options.\n");
-    	cleanup();
-		exit(1);
-		break;
-	      }
+        else if (parameter == "petrinet" || parameter == "pn")
+          modus = M_PETRINET;
+        else if (parameter == "choreography" || parameter == "chor")
+          modus = M_CHOREOGRAPHY;
+        else if (parameter == "cfg")
+          modus = M_CFG;
+        else if (parameter == "visualization" || parameter == "vis")
+          modus = M_VIS;
+        else  {
+          trace(TRACE_ALWAYS, "Unknown mode \"" + parameter+ "\".\n");
+          trace(TRACE_ALWAYS, "Use -h to get a list of valid modes.\n");
+          cleanup();
+          exit(1);
+        }
+        
+        if (options[O_MODE] && modus != old_modus) {
+          trace(TRACE_ALWAYS, "Multiple modes are given, please choose only one!\n");
+          cleanup();
+          exit(1);
+        }
+        
+        options[O_MODE] = true;
+        
+        break;
       }
+        
+      case 'l':
+      {
+        options[O_LOG] = true;
+        if (optarg != NULL)
+          log_filename = string(optarg);
+        break;
+      }
+        
+      case 'i':
+      {
+        options[O_INPUT] = true;
+        globals::filename = string(optarg);
+        if (inputfiles.find(globals::filename) == inputfiles.end())
+        {
+          inputfiles.insert(globals::filename);
+        }
+        else
+        {
+          trace(TRACE_WARNINGS, "WARNING: It makes no sense reading \n");
+          trace(TRACE_WARNINGS, "             "+ globals::filename + "\n");
+          trace(TRACE_WARNINGS, "         more than once.\n");
+          trace(TRACE_WARNINGS, "         So file will only be read once.\n");
+        }
+        break;
+      }
+        
+      case 'o':
+      {
+        if (options[O_OUTPUT]) {
+          trace(TRACE_ALWAYS, "Multiple output options are given, please choose only one!\n");
+          cleanup();
+          exit(1);
+        }
+        
+        options[O_OUTPUT] = true;
+        
+        if (optarg != NULL)
+          globals::output_filename = string(optarg);
+        
+        break;
+      }
+        
+      case 'f':
+      {
+        options[O_FORMAT] = true;
+        parameter = string(optarg);
+        
+        if (parameter == suffixes[F_LOLA])
+          formats[F_LOLA] = true;
+        else if (parameter == suffixes[F_OWFN])
+          formats[F_OWFN] = true;
+        else if (parameter == suffixes[F_DOT])
+          formats[F_DOT] = true;
+        else if (parameter == "pep")
+          formats[F_PEP] = true;
+        else if (parameter == suffixes[F_APNN])
+          formats[F_APNN] = true;
+        else if (parameter == suffixes[F_INFO])
+          formats[F_INFO] = true;
+        else if (parameter == "ina")
+          formats[F_INA] = true;
+        else if (parameter == "spin")
+          formats[F_SPIN] = true;
+        else if (parameter == suffixes[F_PNML])
+          formats[F_PNML] = true;
+        else if (parameter == suffixes[F_TXT])
+          formats[F_TXT] = true;
+        else if (parameter == suffixes[F_XML])
+          formats[F_XML] = true;
+        else {
+          trace(TRACE_ALWAYS, "Unknown format \"" + parameter +"\".\n");
+          trace(TRACE_ALWAYS, "Use -h to get a list of valid formats.\n");
+          cleanup();
+          exit(1);
+        }
+        
+        break;
+      }
+        
+      case 'p':
+      {
+        options[O_PARAMETER] = true;
+        parameter = string(optarg);
+        
+        if ( parameter == "reduce")
+          globals::reduction_level = 5;
+        else if (parameter == "communicationonly" | parameter == "small")
+          globals::parameters[P_COMMUNICATIONONLY] = true;
+        else if (parameter == "standardfaults")
+          globals::parameters[P_STANDARDFAULTS] = true;
+        else if (parameter == "fhfaults")
+          globals::parameters[P_FHFAULTS] = true;
+        else if (parameter == "variables")
+          globals::parameters[P_VARIABLES] = true;
+        else if (parameter == "xor")
+          globals::parameters[P_XOR] = true;
+        else if (parameter == "loopcount")
+          globals::parameters[P_LOOPCOUNT] = true;
+        else if (parameter == "loopcontrol")
+          globals::parameters[P_LOOPCONTROL] = true;
+        else if (parameter == "nointerface")
+          globals::parameters[P_NOINTERFACE] = true;
+        else if (parameter == "deadlocktest")
+          globals::parameters[P_DEADLOCKTEST] = true;
+        else if (parameter == "data")
+          globals::parameters[P_DATA] = true;
+        else {
+          trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
+          trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");
+          cleanup();
+          exit(1);
+        }
+        
+        break;
+      }
+        
+      case 'd':
+      {
+        options[O_DEBUG] = true;
+        parameter = string(optarg);
+        
+        if (parameter == "flex")
+          frontend__flex_debug = 1;
+        else if (parameter == "bison")
+          frontend_debug = 1;
+        else if (parameter == "1")
+          debug_level = TRACE_WARNINGS;
+        else if (parameter == "2")
+          debug_level = TRACE_INFORMATION;
+        else if (parameter == "3")
+          debug_level = TRACE_DEBUG;
+        else if (parameter == "4")
+          debug_level = TRACE_VERY_DEBUG;
+        else if (parameter == "0")
+          debug_level = TRACE_ERROR;
+        else {
+          trace(TRACE_ALWAYS, "Unrecognised debug mode: \"" + parameter +"\"!\n");
+          trace(TRACE_ALWAYS, "Use -h to get a list of valid debug modes.\n");
+          cleanup();
+          exit(1);
+        }
+        break;
+      }
+        
+      case 'r':
+      {
+        globals::reduction_level = toUInt(string(optarg));
+        if (globals::reduction_level == UINT_MAX)
+        {
+          trace(TRACE_ALWAYS, "Unrecognised reduction mode: \"" + string(optarg) +"\"!\n");
+          trace(TRACE_ALWAYS, "Define a number between 0 and 6.\n");
+          cleanup();
+          exit(1);
+        }
+        
+        break;
+      }
+        
+      case 'c':
+      {
+        options[O_CHOR] = true;
+        globals::choreography_filename = string(optarg);
+        break;
+      }
+        
+      case 'w':
+      {
+        options[O_WSDL] = true;
+        globals::wsdl_filename = string(optarg);
+        break;
+      }
+        
+      default:
+      {
+        trace("Unknown option!\n");
+        trace(TRACE_ALWAYS, "Use -h to get a list of valid options.\n");
+        cleanup();
+        exit(1);
+        break;
+      }
+    }
   }
-
+  
   for ( ; optind < argc; ++optind) 
   {
     options[O_INPUT] = true;
@@ -522,29 +524,29 @@ void parse_command_line(int argc, char* argv[])
       trace(TRACE_WARNINGS, "         So file will only be read once.\n");
     }
   }
-
- // print help and exit
+  
+  // print help and exit
   if (options[O_HELP])
   {
     print_help();
     exit(0);
   }
-
-
+  
+  
   // print version and exit
   if (options[O_VERSION])
   {
     print_version();
     exit(0);
   }
-
-
+  
+  
   // if input file is given, bind it to frontend_in
   if (options[O_INPUT])
   {
     if (modus != M_CHOREOGRAPHY && inputfiles.size() > 1)
     {
-	  trace(TRACE_ALWAYS, "Multiple input options are given, please choose only one!\n");
+      trace(TRACE_ALWAYS, "Multiple input options are given, please choose only one!\n");
       cleanup();
       exit(1);
     }
@@ -553,7 +555,7 @@ void parse_command_line(int argc, char* argv[])
     if (!(fin = fopen(file->c_str(), "r")))
     {
 	    trace(TRACE_ALWAYS, "File '" + *file + "' not found.\n");
-        exit(1);
+      exit(1);
     }
     fclose(fin);
     file++;
@@ -561,7 +563,7 @@ void parse_command_line(int argc, char* argv[])
     {
       if (!(fin = fopen(file->c_str(), "r")))
       {
-	    trace(TRACE_ALWAYS, "File '" + *file + "' not found.\n");
+        trace(TRACE_ALWAYS, "File '" + *file + "' not found.\n");
         exit(1);
       }
       else
@@ -571,19 +573,19 @@ void parse_command_line(int argc, char* argv[])
       file++;
     }
   }
-
+  
   if ( options[O_OUTPUT] )
   {
     createOutputFile = true;
   }
-
+  
   // set output file name if non is already chosen
   if ((options[O_OUTPUT] || options[O_LOG]) && (globals::output_filename == ""))
   {
     // set output file name to a standard output filename in case of no inputfiles
     if ( not(options[O_INPUT]) )
     {
-	  globals::output_filename = "stdof"; 
+      globals::output_filename = "stdof"; 
       trace(TRACE_ALWAYS, "Output filename set to standard: stdof\n");
     } 
     else 
@@ -601,14 +603,14 @@ void parse_command_line(int argc, char* argv[])
         unsigned int pos2 = file->rfind("/", file->length());
         if (pos == (file->length() - 5))
         {
-	      globals::output_filename += "_" + file->substr(pos2 + 1, pos - pos2 - 1);
+          globals::output_filename += "_" + file->substr(pos2 + 1, pos - pos2 - 1);
         }
         file++;
       }
-    
+      
     }
   }
-
+  
   if (options[O_LOG])
   {
     if (log_filename == "")
@@ -617,12 +619,12 @@ void parse_command_line(int argc, char* argv[])
     }
     log_output = openOutput(log_filename);
   }
-
+  
   // check for valid formats
   if ( options[O_MODE] )
   {
     int counter = 0;
-
+    
     for ( unsigned int i = 0; i < (sizeof(format) / sizeof(possibleFormats)); i++)
     {
       if ( validFormats[pair<possibleModi, possibleFormats>(modus,format[i])] && formats[format[i]] )
@@ -641,13 +643,13 @@ void parse_command_line(int argc, char* argv[])
       trace(TRACE_WARNINGS, "         Therefore all ouput will be mixed on STDOUT.\n");
     }
   }
-
+  
   /// \todo: TODO (gierds) complete information for modus operandi
   trace(TRACE_INFORMATION, "Modus operandi:\n");
   switch ( modus )
   {
     case M_AST:
-            trace(TRACE_INFORMATION, " - generate AST\n");
+      trace(TRACE_INFORMATION, " - generate AST\n");
 	    break;
     case M_PRETTY:
 	    trace(TRACE_INFORMATION, " - generate XML\n");
@@ -665,7 +667,7 @@ void parse_command_line(int argc, char* argv[])
 	    trace(TRACE_INFORMATION, " - choreography mode\n");
 	    break;
   }
-
+  
   if (options[O_INPUT])
   {
     trace(TRACE_INFORMATION, " - input is read from \"" + globals::filename + "\"\n");
@@ -681,10 +683,10 @@ void parse_command_line(int argc, char* argv[])
       trace(TRACE_INFORMATION, "   + output will be written in " + suffixes[format[i]] + " style\n");
     }
   }
-
+  
   if (options[O_LOG])
     trace(TRACE_INFORMATION, " - Logging additional information to \"" + log_filename + "\"\n");
-
+  
 }
 
 

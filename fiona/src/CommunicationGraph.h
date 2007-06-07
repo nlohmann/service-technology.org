@@ -95,14 +95,6 @@ protected:
 
 	void addProgress(double);
 
-    unsigned int numberOfNodes;          //!< the number of vertices of the graph
-	unsigned int numberOfEdges;          //!< the number of edges of the graph
-
-	unsigned int numberOfBlueNodes;      //!< number of blue nodes in the graph
-	unsigned int numberOfBlueEdges;      //!< number of blue edges in the graph
-
-	unsigned int numberOfStatesAllNodes;
-
 	unsigned int actualDepth;            //!< actual depth in graph
   
 public:
@@ -117,12 +109,6 @@ public:
     void calculateRootNode();
 
     unsigned int getNumberOfNodes() const;
-    unsigned int getNumberOfEdges() const;
-    
-    unsigned int getNumberOfBlueNodes();
-    unsigned int getNumberOfBlueEdges() const;
-
-    unsigned int getNumberOfStatesAllNodes() const;
 
     vertex * findVertexInSet(vertex *);
 
@@ -144,10 +130,11 @@ public:
     void calculateSuccStatesInput(messageMultiSet, vertex *, vertex *);
     void calculateSuccStatesOutput(messageMultiSet, vertex *, vertex *);
 
-	void printNodeStatistics();
     void printGraphToDot(vertex * v, fstream& os, bool[]);
     void printDotFile();
 
+    void printNodeStatistics();
+    void computeNumberOfNodesEdges(vertex *, bool[]);
     void computeNumberOfBlueNodesEdges(vertex *, bool[]);
 
     bool stateActivatesOutputEvents(State *);

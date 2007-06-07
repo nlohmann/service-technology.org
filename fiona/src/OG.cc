@@ -376,9 +376,9 @@ void operatingGuidelines::computeCNF(vertex* node) const {
 void operatingGuidelines::convertToBdd() {
 	trace(TRACE_5, "operatingGuidelines::convertToBdd(): start\n");
 	
-    bool visitedNodes[numberOfNodes];
+    bool visitedNodes[getNumberOfNodes()];
 
-    for (unsigned int i = 0; i < numberOfNodes; i++) {
+    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
         visitedNodes[i] = 0;
     }
 
@@ -395,19 +395,19 @@ void operatingGuidelines::convertToBdd() {
 void operatingGuidelines::convertToBddFull() {
 	trace(TRACE_5, "operatingGuidelines::convertToBddFull(): start\n");
 	
-    bool visitedNodes[numberOfNodes];
+    bool visitedNodes[getNumberOfNodes()];
 
-    for (unsigned int i = 0; i < numberOfNodes; i++) {
+    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
         visitedNodes[i] = 0;
     }
 
 	trace(TRACE_0, "\nHIT A KEY TO CONTINUE (convertToBddFull)\n");
 	//getchar();
 	unsigned int nbrLabels = PN->getInputPlaceCount() + PN->getOutputPlaceCount();
-	BddRepresentation * testbdd = new BddRepresentation(nbrLabels, (Cudd_ReorderingType)bdd_reordermethod, numberOfNodes, true);
+	BddRepresentation * testbdd = new BddRepresentation(nbrLabels, (Cudd_ReorderingType)bdd_reordermethod, getNumberOfNodes(), true);
 	testbdd->convertRootNode(root);
 	testbdd->setMaxPlaceBits(root,visitedNodes);
-	for (unsigned int i = 0; i < numberOfNodes; i++) {
+	for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
 		visitedNodes[i] = 0;
 	}
 	cout << endl;
@@ -428,8 +428,8 @@ void operatingGuidelines::printOGFile() const {
     ogFilename += ".og";
     fstream ogFile(ogFilename.c_str(), ios_base::out | ios_base::trunc);
 
-    bool visitedNodes[numberOfNodes];
-    for (unsigned int i = 0; i < numberOfNodes; ++i) {
+    bool visitedNodes[getNumberOfNodes()];
+    for (unsigned int i = 0; i < getNumberOfNodes(); ++i) {
         visitedNodes[i] = false;
     }
 
@@ -440,7 +440,7 @@ void operatingGuidelines::printOGFile() const {
     ogFile << "INITIALNODE" << endl;
     ogFile << "  " << NodeNameForOG(root) << ';' << endl << endl;
 
-    for (unsigned int i = 0; i < numberOfNodes; ++i) {
+    for (unsigned int i = 0; i < getNumberOfNodes(); ++i) {
         visitedNodes[i] = false;
     }
     ogFile << "TRANSITIONS" << endl;

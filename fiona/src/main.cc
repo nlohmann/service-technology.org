@@ -437,9 +437,9 @@ int main(int argc, char ** argv) {
         State::card = 0;          // number of states
         numberDeletedVertices = 0;
 
-        trace(TRACE_0, "\n--------------------------------------------------------------\n");
+        trace(TRACE_0, "--------------------------------------------------------------\n");
         if (netfile) {
-            trace(TRACE_0, "processing net " + string(netfile) + " ...\n");
+            trace(TRACE_0, "processing net " + string(netfile) + "\n");
         }	
         // report the net
         trace(TRACE_0, "    places: " + intToString(PN->getPlaceCount()));
@@ -499,17 +499,14 @@ int main(int argc, char ** argv) {
             } else {
                 trace(TRACE_0, "NO\n\n");
             }
-            
-            trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
-            trace(TRACE_0, "OG: number of nodes: " + intToString(graph->getNumberOfNodes()) + "\n");
-            trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
-            trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
-                
-            trace(TRACE_5, "printNodeStatistics...\n");
+
+            trace(TRACE_0, "OG statistics:\n");
             graph->printNodeStatistics();
-            trace(TRACE_5, "printDotFile...\n");
+            trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
+            trace(TRACE_0, "    number of states calculated: " + intToString(State::card) + "\n");
+            trace(TRACE_0, "\n");
+
             graph->printDotFile();
-            trace(TRACE_5, "printOGFile...\n");
             graph->printOGFile();
             
             if (options[O_OTF]) {
@@ -532,6 +529,8 @@ int main(int argc, char ** argv) {
             // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
             delete graph;
             trace(TRACE_5, "graph deleted\n");
+            trace(TRACE_0, "--------------------------------------------------------------\n");
+            trace(TRACE_0, "\n");
 
         } else {
 			// ---------------- interaction graph is built ---------------------
@@ -560,18 +559,21 @@ int main(int argc, char ** argv) {
             } else {
                 trace(TRACE_0, "NO\n\n");
             }
-            trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
-            trace(TRACE_0, "IG: number of nodes: " + intToString(graph->getNumberOfNodes()) + "\n");
-            trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
-            trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
 
+            trace(TRACE_0, "IG statistics:\n");
             graph->printNodeStatistics();
-            graph->printDotFile();				// for IG
+            trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
+            trace(TRACE_0, "    number of states calculated: " + intToString(State::card) + "\n");
+            trace(TRACE_0, "\n");
+
+            graph->printDotFile();
 
             trace(TRACE_5, "computation finished -- trying to delete graph\n");
 //				trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
             delete graph;
             trace(TRACE_5, "graph deleted\n");
+            trace(TRACE_0, "--------------------------------------------------------------\n");
+            trace(TRACE_0, "\n");
         }
 
         delete PN;

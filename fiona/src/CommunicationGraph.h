@@ -88,22 +88,22 @@ typedef std::set<messageMultiSet, compareMessageMultiSets> setOfMessages;
 /* communication graph */
 class communicationGraph {
 protected:
-	oWFN * PN;                   	//!< pointer to the underlying petri net
+	oWFN* PN;                            //!< pointer to the underlying petri net
 
-	vertex * root;                   //!< the root node of the graph
-	vertex * currentVertex;          //!< the vertex we are working on at a certain time
+	vertex* root;                        //!< the root node of the graph
+	vertex* currentVertex;               //!< the vertex we are working on at a certain time
 
 	void addProgress(double);
 
-    unsigned int numberOfNodes;            	//!< the number of vertices of the graph
-	unsigned int numberOfEdges;           	//!< the number of edges of the graph
+    unsigned int numberOfNodes;          //!< the number of vertices of the graph
+	unsigned int numberOfEdges;          //!< the number of edges of the graph
 
-	unsigned int numberOfBlueNodes;			//!< number of blue nodes in the graph
-	unsigned int numberOfBlueEdges;			//!< number of blue edges in the graph
+	unsigned int numberOfBlueNodes;      //!< number of blue nodes in the graph
+	unsigned int numberOfBlueEdges;      //!< number of blue edges in the graph
 
 	unsigned int numberOfStatesAllNodes;
 
-	unsigned int actualDepth; 				//!< actual depth in graph
+	unsigned int actualDepth;            //!< actual depth in graph
   
 public:
 

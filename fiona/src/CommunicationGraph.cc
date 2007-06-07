@@ -344,10 +344,6 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
         currentVertex->addSuccessorNode(edgeSucc);
         // currentVertex->setAnnotationEdges(edgeSucc);
 
-        if (type == receiving) {
-            offset = PN->getInputPlaceCount();
-        }
-
         if (currentVertex->getColor() != RED) {
             graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
             toAdd->addPredecessorNode(edgePred);

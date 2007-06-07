@@ -68,7 +68,7 @@ operatingGuidelines::~operatingGuidelines() {
 //! \brief builds up the graph recursively
 void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus) {
 		
-	// at this point, the states inside the current node node are already computed!
+	// at this point, the states inside the current node (currentNode) are already computed!
 	
 	actualDepth++;
 

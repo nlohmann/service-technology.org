@@ -30,7 +30,7 @@
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
- 
+
 #ifndef SUCCESSORNODELIST_H
 #define SUCCESSORNODELIST_H
 

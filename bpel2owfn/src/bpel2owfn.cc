@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/06/07 09:17:43 $
+ * \date    \$Date: 2007/06/07 10:53:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.183 $
+ * \version \$Revision: 1.184 $
  */
 
 
@@ -291,14 +291,14 @@ void single_output(set< string >::iterator file)
 
     if (modus == M_CHOREOGRAPHY)
     {
-      // case 1: no or only one instance of this process is needed
-      if (globals::instances_of_current_process == 1 || globals::instances_of_current_process == 0)
+      // case 1: no instance of this process is needed
+      if (globals::instances_of_current_process == 0)
       {
         // add a prefix and compose PN to PN2
         PN.addPrefix(globals::ASTEmap[1]->attributes["name"] + ".");
         PN2.compose(PN);
       }
-      else // case 2: two or more instances of this process are needed
+      else // case 2: one or more instances of this process are needed
       {
         for(int instance = 1; instance <= globals::instances_of_current_process; instance++)
         {

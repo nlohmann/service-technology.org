@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/06/06 13:35:17 $
+ * \date    \$Date: 2007/06/07 10:53:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.129 $
+ * \version \$Revision: 1.130 $
  */
 
 
@@ -787,14 +787,9 @@ string ASTE::createChannel(bool synchronousCommunication)
       case(K_ONMESSAGE):
       {
         // depending on the channel count, create one or more input channel(s)
-        unsigned int result = (messageLink->participantSet != NULL) ?
+        globals::ASTE_inputChannels[channelName] = (messageLink->participantSet != NULL) ?
         messageLink->participantSet->count :
         0;
-        
-        if (result != 0 && result != UINT_MAX)
-          globals::ASTE_inputChannels[channelName] = result;
-        else
-          globals::ASTE_inputChannels[channelName] = 1;
         
         break;
       }
@@ -804,14 +799,9 @@ string ASTE::createChannel(bool synchronousCommunication)
       case(K_REPLY):
       {
         // depending on the channel count, create one or more output channel(s)
-        unsigned int result = (messageLink->participantSet != NULL) ?
+        globals::ASTE_outputChannels[channelName] = (messageLink->participantSet != NULL) ?
         messageLink->participantSet->count :
         0;
-        
-        if (result != 0 && result != UINT_MAX)
-          globals::ASTE_outputChannels[channelName] = result;
-        else
-          globals::ASTE_outputChannels[channelName] = 1;
         
         break;
       }
@@ -854,7 +844,9 @@ string ASTE::createChannel(bool synchronousCommunication)
       {
         channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
       }
-      globals::ASTE_inputChannels[channelName] = 1;
+      
+      // no instances needed
+      globals::ASTE_inputChannels[channelName] = 0;
       break;
     }
       
@@ -865,7 +857,9 @@ string ASTE::createChannel(bool synchronousCommunication)
       {
         channelName = plRoleDetails->myRole + "." + plRoleDetails->partnerRole + "." + attributes["operation"];
       }
-      globals::ASTE_outputChannels[channelName] = 1;
+      
+      // no instances needed
+      globals::ASTE_outputChannels[channelName] = 0;
       
       if (synchronousCommunication)
       {
@@ -875,7 +869,9 @@ string ASTE::createChannel(bool synchronousCommunication)
           channelName2 = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
         }
         this->channelName2 = channelName2;
-        globals::ASTE_inputChannels[channelName2] = 1;
+	
+	// no instances needed
+        globals::ASTE_inputChannels[channelName2] = 0;
       }
       
       break;

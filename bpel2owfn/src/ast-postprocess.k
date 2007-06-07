@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/06/07 09:17:43 $
+ * \date    \$Date: 2007/06/07 10:53:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.184 $
+ * \version \$Revision: 1.185 $
  */
 %}
 
@@ -1365,6 +1365,11 @@ Throw(a,_id) ->
     a
     {
       globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+
+      // warn for non-existing Petri net patterns
+      if ( (modus == M_PETRINET || modus == M_CHOREOGRAPHY)
+         && globals::parameters[P_COMMUNICATIONONLY] )
+	genericError(121, myself->activityTypeName(), myself->attributes["referenceLine"], ERRORLEVEL_NOTICE);
     }
   ]
 ;
@@ -1454,6 +1459,11 @@ Compensate(a,_id) ->
     a
     {
       globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+
+      // warn for non-existing Petri net patterns
+      if ( (modus == M_PETRINET || modus == M_CHOREOGRAPHY)
+         && globals::parameters[P_COMMUNICATIONONLY] )
+	genericError(121, myself->activityTypeName(), myself->attributes["referenceLine"], ERRORLEVEL_NOTICE);
     }
   ]
 ;
@@ -1516,6 +1526,11 @@ CompensateScope(a,b,_id) ->
     a
     {
       globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+
+      // warn for non-existing Petri net patterns
+      if ( (modus == M_PETRINET || modus == M_CHOREOGRAPHY)
+         && globals::parameters[P_COMMUNICATIONONLY] )
+	genericError(121, myself->activityTypeName(), myself->attributes["referenceLine"], ERRORLEVEL_NOTICE);
     }
   ]
 ;
@@ -1541,6 +1556,11 @@ Exit(a,_id) ->
     a
     {
       globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+
+      // warn for non-existing Petri net patterns
+      if ( (modus == M_PETRINET || modus == M_CHOREOGRAPHY)
+         && globals::parameters[P_COMMUNICATIONONLY] )
+	genericError(121, myself->activityTypeName(), myself->attributes["referenceLine"], ERRORLEVEL_NOTICE);
     }
   ]
 ;
@@ -2291,6 +2311,12 @@ Scope(a,b,messageExchange,c,d,e,f,g,i,j,_id) ->
       globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
       enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
+      
+      
+      // warn for non-existing Petri net patterns
+      if ( (modus == M_PETRINET || modus == M_CHOREOGRAPHY)
+         && globals::parameters[P_COMMUNICATIONONLY] )
+	genericError(120, "", myself->attributes["referenceLine"], ERRORLEVEL_NOTICE);
     }
   ]
 ;

@@ -31,7 +31,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/06/06 08:43:35 $
+ * \date    \$Date: 2007/06/07 10:53:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  */
 %}
 
@@ -102,8 +102,10 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   for (map<string, unsigned int>::const_iterator in = globals::ASTE_inputChannels.begin();
        in != globals::ASTE_inputChannels.end(); in++)
   {
+    std::cerr << in->second << std::endl;
+    
     // case 1: only one instance of each channel is needed
-    if (in->second == 1 || globals::instances_of_current_process != 0)
+    if (in->second == 0 || globals::instances_of_current_process != 0)
     {
       trace(TRACE_DEBUG, "[PNU]\tcreating channel `in." + in->first + "'\n");
       PN.newPlace("in." + in->first, IN);
@@ -122,7 +124,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
        out != globals::ASTE_outputChannels.end(); out++)
   {
     // case 1: only one instance of each channel is needed
-    if (out->second == 1 || globals::instances_of_current_process != 0)
+    if (out->second == 0 || globals::instances_of_current_process != 0)
     {
       trace(TRACE_DEBUG, "[PNU]\tcreating channel `out." + out->first + "'\n");
       PN.newPlace("out." + out->first, OUT);
@@ -611,8 +613,6 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
       
     case(petrinetsmall_enum):
     {
-      genericError(120, "", globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
-      
       // Places.
       Place *p1 = PN.newPlace(prefix + "initial");
       Place *p2 = PN.newPlace(prefix + "final");

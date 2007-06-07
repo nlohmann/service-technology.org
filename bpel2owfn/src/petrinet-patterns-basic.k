@@ -46,7 +46,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/06/05 15:04:00 $
+ * \date    \$Date: 2007/06/07 10:53:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -56,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  */
 %}
 
@@ -965,8 +965,6 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
       
     case(petrinetsmall_enum):
     {
-      genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
-      
       // Model an <empty> activity instead.
       Place *p1 = PN.newPlace(prefix + "initial");
       Place *p2 = PN.newPlace(prefix + "final");
@@ -1117,9 +1115,6 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
       
     case(petrinetsmall_enum):
     {
-      genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
-      
-      
       // Model an <empty> activity instead.
       Place *p1 = PN.newPlace(prefix + "initial");
       Place *p2 = PN.newPlace(prefix + "final");
@@ -1234,8 +1229,6 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
       
     case(petrinetsmall_enum):
     {
-      genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
-      
       // Model an <empty> activity instead.
       Place *p1 = PN.newPlace(prefix + "initial");
       Place *p2 = PN.newPlace(prefix + "final");
@@ -1342,8 +1335,6 @@ void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
       
     case(petrinetsmall_enum):
     {
-      genericError(121, globals::ASTEmap[phylum->id]->activityTypeName(), globals::ASTEmap[phylum->id]->attributes["referenceLine"], ERRORLEVEL_NOTICE);
-      
       // Model an <empty> activity instead.
       Place *p1 = PN.newPlace(prefix + "initial");
       Place *p2 = PN.newPlace(prefix + "final");

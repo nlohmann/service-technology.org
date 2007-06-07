@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/06/05 14:45:04 $
+ * \date    \$Date: 2007/06/07 12:28:59 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.151 $
+ * \version \$Revision: 1.152 $
  *
  * \ingroup petrinet
  */
@@ -452,6 +452,8 @@ class PetriNet
     /// rename a node (i.e., rename one role in its history)
     void renamePlace(string old_name, string new_name);
 
+    /// removes a transition from the net
+    void removeTransition(Transition *t);    
 
     /// applies structral reduction rules
     unsigned int reduce(unsigned int reduction_level = 5);
@@ -523,9 +525,6 @@ class PetriNet
   private:
     /// removes a place from the net
     void removePlace(Place *p);
-
-    /// removes a transition from the net
-    void removeTransition(Transition *t);
 
     /// removes an arc from the net
     void removeArc(Arc *f);

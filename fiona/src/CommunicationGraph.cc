@@ -47,7 +47,6 @@ int show_progress = 0;
 using namespace std;
 
 
-//! \fn communicationGraph::communicationGraph(oWFN * _PN)
 //! \param _PN
 //! \brief constructor
 communicationGraph::communicationGraph(oWFN * _PN) :
@@ -57,7 +56,7 @@ communicationGraph::communicationGraph(oWFN * _PN) :
     numberOfEdges(0),
     numberOfBlueNodes(0),
     numberOfBlueEdges(0),
-    numberOfBlackNodes(0),
+//    numberOfBlackNodes(0),
     numberOfStatesAllNodes(0),
     actualDepth(0) {
 
@@ -65,7 +64,6 @@ communicationGraph::communicationGraph(oWFN * _PN) :
 }
 
 
-//! \fn communicationGraph::~communicationGraph()
 //! \brief destructor
 communicationGraph::~communicationGraph() {
     trace(TRACE_5, "communicationGraph::~communicationGraph() : start\n");
@@ -79,7 +77,6 @@ communicationGraph::~communicationGraph() {
 }
 
 
-//! \fn vertex * communicationGraph::getRoot() const
 //! \return pointer to root
 //! \brief returns a pointer to the root node of the graph
 vertex * communicationGraph::getRoot() const {
@@ -87,7 +84,6 @@ vertex * communicationGraph::getRoot() const {
 }
 
 
-//! \fn unsigned int communicationGraph::getNumberOfNodes() const
 //! \return number of nodes
 //! \brief returns the number of nodes of the graph (IG or OG)
 unsigned int communicationGraph::getNumberOfNodes() const {
@@ -95,7 +91,6 @@ unsigned int communicationGraph::getNumberOfNodes() const {
 }
 
 
-//! \fn unsigned int communicationGraph::getNumberOfEdges() const
 //! \return number of edges
 //! \brief returns the number of edges of the graph
 unsigned int communicationGraph::getNumberOfEdges() const {
@@ -103,7 +98,6 @@ unsigned int communicationGraph::getNumberOfEdges() const {
 }
 
 
-//! \fn unsigned int communicationGraph::getNumberOfBlueNodes()
 //! \return number of blue nodes
 //! \brief returns the number of blue nodes of the graph
 unsigned int communicationGraph::getNumberOfBlueNodes() {
@@ -111,7 +105,6 @@ unsigned int communicationGraph::getNumberOfBlueNodes() {
 }
 
 
-//! \fn unsigned int communicationGraph::getNumberOfBlueEdges() const
 //! \return number of blue edges
 //! \brief returns the number of blue edges of the graph
 unsigned int communicationGraph::getNumberOfBlueEdges() const {
@@ -119,25 +112,16 @@ unsigned int communicationGraph::getNumberOfBlueEdges() const {
 }
 
 
-//! \fn unsigned int communicationGraph::getNumberOfBlackNodes() const
-//! \return number of black nodes
-//! \brief returns the number of black nodes of the graph
-unsigned int communicationGraph::getNumberOfBlackNodes() const {
-    return numberOfBlackNodes;
-}
-
-
-//! \fn unsigned int communicationGraph::getNumberOfStatesAllNodes() const
 //! \return number of states stored in all nodes
 unsigned int communicationGraph::getNumberOfStatesAllNodes() const {
     return numberOfStatesAllNodes;
 }
 
 
-//! \fn void communicationGraph::calculateRootNode()
 //! \brief calculates the root node of the graph
 // for OG only
 void communicationGraph::calculateRootNode() {
+    
     trace(TRACE_5, "void reachGraph::calculateRootNode(): start\n");
 
     // create new OG root node
@@ -163,7 +147,6 @@ void communicationGraph::calculateRootNode() {
 }
 
 
-//! \fn vertex * communicationGraph::findVertexInSet(vertex * toAdd)
 //! \param toAdd the vertex we are looking for in the graph
 //! \brief this function uses the find method from the template set
 vertex * communicationGraph::findVertexInSet(vertex * toAdd) {
@@ -176,7 +159,6 @@ vertex * communicationGraph::findVertexInSet(vertex * toAdd) {
 }
 
 
-//! \fn bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type)
 //! \param toAdd a reference to the vertex that is to be added to the graph
 //! \param messages the label of the edge between the current vertex and the one to be added
 //! \param type the type of the edge (sending, receiving)
@@ -295,7 +277,6 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 
 
 // for OG
-//vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type, bool isnew) {
 void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type, bool isnew) {
 
     trace(TRACE_5, "reachGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type): start\n");
@@ -377,7 +358,6 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 }
 
 
-//! \fn void communicationGraph::analyseNode(vertex* node)
 //! \param node the node to be analysed
 //! \brief analyses the node and sets its color
 void communicationGraph::analyseNode(vertex* node) {
@@ -410,7 +390,6 @@ void communicationGraph::analyseNode(vertex* node) {
 }
 
 
-//! \fn void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * oldNode, vertex * newNode)
 //! \param input the sending event currently performed
 //! \param oldNode the old node carrying the states
 //! \param newNode the new node wich is computed
@@ -463,7 +442,6 @@ void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * o
 }
 
 
-//! \fn void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode)
 //! \param input (multi) set of input messages
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
@@ -518,7 +496,7 @@ void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
     return;
 }
 
-//! \fn void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode)
+
 //! \param output the output messages that are taken from the marking
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
@@ -565,7 +543,7 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode) : end\n");
 }
 
-//! \fn void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode)
+
 //! \param output the output messages that are taken from the marking
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
@@ -633,7 +611,7 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : end\n");
 }
 
-//! \fn void communicationGraph::printNodeStatistics()
+
 //! \brief computes number of blue nodes and edges and prints them
 void communicationGraph::printNodeStatistics() {
     vertex * tmp = root;
@@ -650,15 +628,11 @@ void communicationGraph::printNodeStatistics() {
     computeNumberOfBlueNodesEdges(tmp, visitedNodes);
 
     trace(TRACE_0, "\n    number of blue nodes: " + intToString(getNumberOfBlueNodes()) + "\n");
-    if (getNumberOfBlackNodes() > 0) {
-        trace(TRACE_0, "\n    number of black nodes: " + intToString(getNumberOfBlackNodes()) + "\n");
-    }
     trace(TRACE_0, "    number of blue edges: " + intToString(getNumberOfBlueEdges()) + "\n");
     trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStatesAllNodes()) + "\n\n");
 }
 
 
-//! \fn void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedNodes[])
 //! \param v current node in the iteration process
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
 //! \brief breadthsearch through the graph computing the number of blue nodes
@@ -691,7 +665,7 @@ void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedN
     }
 }
 
-//! \fn bool communicationGraph::stateActivatesOutputEvents(State * s)
+
 //! \param s the state that is checked for activating output events
 //! \brief returns true, if the given state activates at least one output event
 bool communicationGraph::stateActivatesOutputEvents(State * s) {
@@ -707,7 +681,6 @@ bool communicationGraph::stateActivatesOutputEvents(State * s) {
 }
 
 
-//! \fn void communicationGraph::addProgress(double toAddValue)
 //! \param toAddValue the additional progress value
 //! \brief adds toAddValue to global progress value
 void communicationGraph::addProgress(double toAddValue) {
@@ -734,7 +707,6 @@ void communicationGraph::addProgress(double toAddValue) {
 }
 
 
-//! \fn void communicationGraph::printProgress()
 //! \brief prints the current global progress value depending whether the value
 //! changed significantly and depending on the debug-level set
 void communicationGraph::printProgress() {
@@ -757,7 +729,6 @@ void communicationGraph::printProgress() {
 }
 
 
-//! \fn void communicationGraph::printProgress()
 //! \brief prints the current global progress value depending whether the value
 //! changed significantly and depending on the debug-level set
 void communicationGraph::printProgressFirst() {
@@ -772,7 +743,6 @@ void communicationGraph::printProgressFirst() {
 }
 
 
-//! \fn void communicationGraph::printDotFile()
 //! \brief creates a dot file of the graph
 void communicationGraph::printDotFile() {
 
@@ -814,7 +784,6 @@ void communicationGraph::printDotFile() {
         dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
         numberOfBlueNodes = 0;
-        numberOfBlackNodes = 0;
 
         printGraphToDot(tmp, dotFile, visitedNodes);
 
@@ -854,7 +823,6 @@ void communicationGraph::printDotFile() {
 }
 
 
-//! \fn void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[])
 //! \param v current node in the iteration process
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far

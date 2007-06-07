@@ -101,8 +101,6 @@ protected:
 	unsigned int numberOfBlueNodes;			//!< number of blue nodes in the graph
 	unsigned int numberOfBlueEdges;			//!< number of blue edges in the graph
 
-	unsigned int numberOfBlackNodes;		//!< number of black nodes in the graph
-
 	unsigned int numberOfStatesAllNodes;
 
 	unsigned int actualDepth; 				//!< actual depth in graph
@@ -124,7 +122,6 @@ public:
     unsigned int getNumberOfBlueNodes();
     unsigned int getNumberOfBlueEdges() const;
 
-    unsigned int getNumberOfBlackNodes() const;
     unsigned int getNumberOfStatesAllNodes() const;
 
     vertex * findVertexInSet(vertex *);

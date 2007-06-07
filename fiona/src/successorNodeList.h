@@ -42,7 +42,7 @@
 
 using namespace std;
 
-class vertex;
+class GraphNode;
 
 class successorNodeList {
 
@@ -61,8 +61,6 @@ public:
     
     void resetIterating();
     GraphEdge * getNextElement();
-    
-	void removeNodeFromList(vertex *, bool);
     
 // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new

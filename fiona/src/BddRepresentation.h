@@ -39,7 +39,7 @@
 #include <map>
 #include <list>
 
-#include "vertex.h"
+#include "GraphNode.h"
 
 #include "util.h"
 #include "cudd.h"
@@ -56,18 +56,18 @@ class BddRepresentation{
 		BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT, unsigned int cntNodes = 1, bool calcStates = false);
 		~BddRepresentation();
 		
-		void convertRootNode(vertex* root);
-		void generateRepresentation(vertex* v, bool visitedNodes[]);
-		void addOrDeleteLeavingEdges(vertex* v);
+		void convertRootNode(GraphNode* root);
+		void generateRepresentation(GraphNode* v, bool visitedNodes[]);
+		void addOrDeleteLeavingEdges(GraphNode* v);
 		void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 		void printDotFile(char** names = NULL, char* option = "OG");
 		void print();
 		void save(char* option = "OG");
 		void printMemoryInUse();
 		
-		void testSymbRepresentation(vertex* v, bool visitedNodes[]);
+		void testSymbRepresentation(GraphNode* v, bool visitedNodes[]);
 		unsigned int getBound();
-		void setMaxPlaceBits(vertex* v, bool visitedNodes[]);
+		void setMaxPlaceBits(GraphNode* v, bool visitedNodes[]);
 		
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.
@@ -94,7 +94,7 @@ class BddRepresentation{
 		DdNode* labelToBddMp(const std::string& label);
 
 		DdNode* nodesToBddMp(unsigned int node1, unsigned int node2);
-		DdNode* annotationToBddAnn(vertex * v);
+		DdNode* annotationToBddAnn(GraphNode * v);
 		DdNode* clauseToBddAnn(const CommGraphFormulaMultiaryOr* cl);
 		unsigned int getBddNumber(unsigned int node);
 		void addBddVars(unsigned int max);	
@@ -103,10 +103,10 @@ class BddRepresentation{
 		string myitoa(unsigned int value, int base);
 		void checkManager(DdManager* mgr, char* table);
 		
-		DdNode* statesToBddMp(vertex* v);
+		DdNode* statesToBddMp(GraphNode* v);
 		DdNode* markingToBddMp(unsigned int * marking);
 		unsigned int bound;
-		void calculateBound(vertex* v, bool visitedNodes[]);
+		void calculateBound(GraphNode* v, bool visitedNodes[]);
 		int maxPlaceBits;
 };
 

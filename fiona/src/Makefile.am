@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-05-23 13:19:18 $ by $Author: bretschn $.
-# Version $Revision: 1.28 $
+# File last changed $Date: 2007-06-07 14:42:13 $ by $Author: bretschn $.
+# Version $Revision: 1.29 $
 
 bin_PROGRAMS = fiona
 
@@ -46,8 +46,8 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
 		dimensions.h main.cc symboltab.cc\
 		enums.h enums.cc main.h symboltab.h\
 		options.cc userconfig.h\
-		options.h vertex.cc \
-		formula.cc owfn.cc vertex.h \
+		options.h GraphNode.cc \
+		formula.cc owfn.cc GraphNode.h \
 		formula.h owfn.h communicationGraph.cc\
 		getopt.c getopt1.c getopt.h \
 		BddRepresentation.h BddRepresentation.cc \

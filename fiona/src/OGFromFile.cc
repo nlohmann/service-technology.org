@@ -41,7 +41,7 @@
 using namespace std;
 
 OGFromFileNode::OGFromFileNode(const std::string& name,
-    CommGraphFormula* annotation, vertexColor color) :
+    CommGraphFormula* annotation, GraphNodeColor color) :
     name_(name),
     color_(color),
     annotation_(annotation),
@@ -83,7 +83,7 @@ std::string OGFromFileNode::getName() const
     return name_;
 }
 
-vertexColor OGFromFileNode::getColor() const
+GraphNodeColor OGFromFileNode::getColor() const
 {
     return color_;
 }
@@ -275,7 +275,7 @@ void OGFromFile::addNode(OGFromFileNode* node)
 }
 
 OGFromFileNode* OGFromFile::addNode(const std::string& nodeName,
-    CommGraphFormula* annotation, vertexColor color)
+    CommGraphFormula* annotation, GraphNodeColor color)
 {
     OGFromFileNode* node = new OGFromFileNode(nodeName, annotation, color);
     addNode(node);
@@ -667,7 +667,7 @@ void OGFromFile::printDotFile(const std::string& filenamePrefix) const
 }
 
 
-//! \fn void OGFromFile::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[])
+//! \fn void OGFromFile::printGraphToDot(GraphNode * v, fstream& os, bool visitedNodes[])
 //! \param v current node in the iteration process
 //! \param os output stream
 //! \param visitedNodes maps nodes to Bools remembering already visited nodes
@@ -715,7 +715,7 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const
 
     if (hasNoRoot()) {
         // print file for empty OG
-        ogFile << "NODES" << endl << "  0 : " << vertexColor(RED).toString()
+        ogFile << "NODES" << endl << "  0 : " << GraphNodeColor(RED).toString()
                << " : "
                << CommGraphFormulaLiteral::FALSE << ';' << endl << endl
                << "INITIALNODE" << endl << "  0;" << endl << endl

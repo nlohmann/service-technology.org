@@ -41,7 +41,7 @@
 #include <string>
 #include "formula.h"
 #include "main.h"
-#include "vertex.h"
+#include "GraphNode.h"
 
 #include "communicationGraph.h"
 
@@ -195,15 +195,15 @@ class oWFN  {
 		 */
 		bool addTransition(owfnTransition* transition);
 
-//		void addStateToList(vertex *, State *, bool);
-		void addSuccStatesToList(vertex *, State *);
+//		void addStateToList(GraphNode *, State *, bool);
+		void addSuccStatesToList(GraphNode *, State *);
 		
-		void addSuccStatesToListStubborn(StateSet &, owfnPlace * , State *, vertex *);
-		void addSuccStatesToListStubborn(StateSet &, messageMultiSet, State *, vertex *);
+		void addSuccStatesToListStubborn(StateSet &, owfnPlace * , State *, GraphNode *);
+		void addSuccStatesToListStubborn(StateSet &, messageMultiSet, State *, GraphNode *);
 		
-		void addSuccStatesToListOrig(vertex *, State *);
+		void addSuccStatesToListOrig(GraphNode *, State *);
 		
-//		void addStateToList(vertex *, State *);
+//		void addStateToList(GraphNode *, State *);
 		
 
 		bool checkMessageBound();
@@ -218,12 +218,12 @@ class oWFN  {
 		
 		unsigned int * copyCurrentMarking();
 		void copyMarkingToCurrentMarking(unsigned int * copy);
-		void calculateReachableStatesOutputEvent(vertex *);
-		void calculateReachableStatesInputEvent(vertex *, bool);
-		void calculateReachableStates(StateSet&, owfnPlace *, vertex *);
-		void calculateReachableStates(StateSet&, messageMultiSet, vertex *); 
+		void calculateReachableStatesOutputEvent(GraphNode *);
+		void calculateReachableStatesInputEvent(GraphNode *, bool);
+		void calculateReachableStates(StateSet&, owfnPlace *, GraphNode *);
+		void calculateReachableStates(StateSet&, messageMultiSet, GraphNode *); 
 		
-		void calculateReachableStatesFull(vertex *);
+		void calculateReachableStatesFull(GraphNode *);
 		
 		void addInputMessage(unsigned int);
 		int addInputMessage(messageMultiSet);			// adds input message to the current marking

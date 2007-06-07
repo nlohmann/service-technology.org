@@ -34,11 +34,14 @@
 #include "mynew.h"
 #include "graphEdge.h"
 #include <string>
-#include "vertex.h"
+#include <stdexcept>
+#include "GraphNode.h"
 #include "enums.h"
 #include <cassert>
 
-GraphEdge::GraphEdge(vertex* dstNodeP, const string& labelP) :
+using namespace std;
+
+GraphEdge::GraphEdge(GraphNode* dstNodeP, const string& labelP) :
     dstNode(dstNodeP),
     label(labelP),
     nextElement(NULL) {
@@ -52,11 +55,11 @@ GraphEdge* GraphEdge::getNextElement() const {
     return nextElement;
 }
 
-void GraphEdge::setDstNode(vertex* newDstNode) {
+void GraphEdge::setDstNode(GraphNode* newDstNode) {
     dstNode = newDstNode;
 }
 
-vertex * GraphEdge::getDstNode() const {
+GraphNode * GraphEdge::getDstNode() const {
     return dstNode;
 }
 
@@ -69,7 +72,11 @@ GraphEdgeType GraphEdge::getType() const {
     switch (label[0]) {
         case '?': return RECEIVING;
         case '!': return SENDING;
-        default : assert(false); // This should never happen.
+        default :
+            // This should never happen.
+            assert(false);
+            throw new invalid_argument("Cannot determine type of this "
+                "GraphEdge with label '" + label + "'.");
     }
 }
 

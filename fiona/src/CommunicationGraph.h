@@ -35,7 +35,7 @@
 #define GRAPH_H_
 
 #include "mynew.h"
-#include "vertex.h"
+#include "GraphNode.h"
 #include <fstream>
 
 #include <set>
@@ -51,7 +51,7 @@ class oWFN;
 class State;
 
 struct compareVertices {
-  bool operator() (vertex const * left, vertex const * right) {
+  bool operator() (GraphNode const * left, GraphNode const * right) {
     return (*left < *right);
   }
 }; // compareVertices
@@ -80,7 +80,7 @@ struct compareMessageMultiSets {
   }
 }; // compareMessageMultiSets
 
-typedef std::set<vertex*, compareVertices> vertexSet;
+typedef std::set<GraphNode*, compareVertices> GraphNodeSet;
 
 typedef std::set<messageMultiSet, compareMessageMultiSets> setOfMessages;
 
@@ -90,8 +90,8 @@ class communicationGraph {
 protected:
 	oWFN* PN;                            //!< pointer to the underlying petri net
 
-	vertex* root;                        //!< the root node of the graph
-	vertex* currentVertex;               //!< the vertex we are working on at a certain time
+	GraphNode* root;                        //!< the root node of the graph
+	GraphNode* currentGraphNode;               //!< the GraphNode we are working on at a certain time
 
 	void addProgress(double);
 
@@ -102,20 +102,20 @@ public:
 	communicationGraph(oWFN *);
 	~communicationGraph();
 
-	vertexSet setOfVertices;
+	GraphNodeSet setOfVertices;
 
-    vertex* getRoot() const;
+    GraphNode* getRoot() const;
     
     void calculateRootNode();
 
     unsigned int getNumberOfNodes() const;
 
-    vertex * findVertexInSet(vertex *);
+    GraphNode * findGraphNodeInSet(GraphNode *);
 
-    void AddVertex(vertex *, unsigned int, GraphEdgeType, bool);
-    bool AddVertex(vertex *, messageMultiSet, GraphEdgeType);
+    void AddGraphNode(GraphNode *, unsigned int, GraphEdgeType, bool);
+    bool AddGraphNode(GraphNode *, messageMultiSet, GraphEdgeType);
 
-    void analyseNode(vertex *);
+    void analyseNode(GraphNode *);
 	
 	void printProgressFirst();
 	void printProgress();
@@ -123,19 +123,19 @@ public:
     void buildGraphRandom();
 
     // for OG
-    void calculateSuccStatesInput(unsigned int, vertex *, vertex *);
-    void calculateSuccStatesOutput(unsigned int, vertex *, vertex *);
+    void calculateSuccStatesInput(unsigned int, GraphNode *, GraphNode *);
+    void calculateSuccStatesOutput(unsigned int, GraphNode *, GraphNode *);
 
     // for IG
-    void calculateSuccStatesInput(messageMultiSet, vertex *, vertex *);
-    void calculateSuccStatesOutput(messageMultiSet, vertex *, vertex *);
+    void calculateSuccStatesInput(messageMultiSet, GraphNode *, GraphNode *);
+    void calculateSuccStatesOutput(messageMultiSet, GraphNode *, GraphNode *);
 
-    void printGraphToDot(vertex * v, fstream& os, bool[]);
+    void printGraphToDot(GraphNode * v, fstream& os, bool[]);
     void printDotFile();
 
     void printNodeStatistics();
-    void computeNumberOfNodesEdges(vertex *, bool[]);
-    void computeNumberOfBlueNodesEdges(vertex *, bool[]);
+    void computeNumberOfNodesEdges(GraphNode *, bool[]);
+    void computeNumberOfBlueNodesEdges(GraphNode *, bool[]);
 
     bool stateActivatesOutputEvents(State *);
 

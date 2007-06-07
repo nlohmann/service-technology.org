@@ -49,7 +49,7 @@ class operatingGuidelines : public communicationGraph {
 		 * @param node the node for which the annotation is calculated
 		 * @brief calculates the annotation (CNF) for the node
 		 */
-		void computeCNF(vertex *) const;
+		void computeCNF(GraphNode *) const;
 
 	public:
 		operatingGuidelines(oWFN *);
@@ -57,7 +57,7 @@ class operatingGuidelines : public communicationGraph {
 	
 		BddRepresentation * bdd;
 
-    	void buildGraph(vertex *, double);
+    	void buildGraph(GraphNode *, double);
 		
 		void convertToBdd();
 		void convertToBddFull();
@@ -67,15 +67,15 @@ class operatingGuidelines : public communicationGraph {
         void printOGFile() const;
 
         /** Prints nodes of the OG into an OG file below the NODES section. */
-        void printNodesToOGFile(vertex * v, fstream& os, bool visitedNodes[]) const;
+        void printNodesToOGFile(GraphNode * v, fstream& os, bool visitedNodes[]) const;
 
         /** Generates for the given node its name to be used in operating
          * guidelines. */
-        std::string NodeNameForOG(const vertex* v) const;
+        std::string NodeNameForOG(const GraphNode* v) const;
 
         /** Prints transitions of the OG to an OG file below the TRANSITIONS
          * section. */
-        void printTransitionsToOGFile(vertex * v, fstream& os, bool visitedNodes[]) const;
+        void printTransitionsToOGFile(GraphNode * v, fstream& os, bool visitedNodes[]) const;
 
 // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new

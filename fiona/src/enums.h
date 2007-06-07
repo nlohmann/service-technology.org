@@ -37,17 +37,17 @@
 #include "mynew.h"
 #include <string>
 
-enum vertexColor_enum {RED, BLUE};				//!< RED == bad vertex; BLUE == good one
+enum GraphNodeColor_enum {RED, BLUE};				//!< RED == bad GraphNode; BLUE == good one
 
-class vertexColor
+class GraphNodeColor
 {
     private:
-        vertexColor_enum color_;
+        GraphNodeColor_enum color_;
     public:
-        vertexColor();
-        vertexColor(vertexColor_enum color);
+        GraphNodeColor();
+        GraphNodeColor(GraphNodeColor_enum color);
         std::string toString() const;
-        operator vertexColor_enum() const;
+        operator GraphNodeColor_enum() const;
 };
 
 /**

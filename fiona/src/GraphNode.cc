@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*!
- * \file    vertex.cc
+ * \file    GraphNode.cc
  *
  * \brief   functions for handling of nodes of IG / OG
  *
@@ -32,23 +32,21 @@
  */
 
 #include "mynew.h"
-#include "vertex.h"
+#include "GraphNode.h"
 #include "state.h"
 #include "successorNodeList.h"
-//#include "CNF.h"
 #include "cnf_formula.h"
 #include "debug.h"
 #include "options.h"    
 #include <cassert>
 
 
-//! \fn vertex::vertex(int numberEvents)
+//! \fn GraphNode::GraphNode(int numberEvents)
 //! \param numberEvents the number of events that have to be processed from this node
 //! \brief constructor
-vertex::vertex(int numberEvents) :
-			   numberOfVertex(0),
+GraphNode::GraphNode(int numberEvents) :
+			   number(0),
 			   color(BLUE),
-	//		   firstClause(NULL),
 			   successorNodes(NULL),
 			   predecessorNodes(NULL),
 			   hasFinalStateInStateSet(false),
@@ -66,10 +64,10 @@ vertex::vertex(int numberEvents) :
 }
 
 
-//! \fn vertex::~vertex()
+//! \fn GraphNode::~GraphNode()
 //! \brief destructor
-vertex::~vertex() {
-	trace(TRACE_5, "vertex::~vertex() : start\n");
+GraphNode::~GraphNode() {
+	trace(TRACE_5, "GraphNode::~GraphNode() : start\n");
 
 	if (successorNodes != NULL) {
 		delete successorNodes;
@@ -96,31 +94,31 @@ vertex::~vertex() {
 //	}
 	
 	numberDeletedVertices++;
-	trace(TRACE_5, "vertex::~vertex() : end\n");
+	trace(TRACE_5, "GraphNode::~GraphNode() : end\n");
 }
 
 
-//! \fn unsigned int vertex::getNumber() const
+//! \fn unsigned int GraphNode::getNumber() const
 //! \return number of this node
 //! \brief returns the number of this node
-unsigned int vertex::getNumber() const {
-    return numberOfVertex;
+unsigned int GraphNode::getNumber() const {
+    return number;
 }
 
 
-//! \fn void vertex::setNumber(unsigned int _number)
+//! \fn void GraphNode::setNumber(unsigned int _number)
 //! \param _number number of this node in the graph
 //! \brief sets the number of this node
-void vertex::setNumber(unsigned int _number) {
-	numberOfVertex = _number;
+void GraphNode::setNumber(unsigned int _number) {
+	number = _number;
 }
 
 
-//! \fn void vertex::addSuccessorNode(GraphEdge * edge) 
+//! \fn void GraphNode::addSuccessorNode(GraphEdge * edge) 
 //! \param edge pointer to the edge which is to point to the successor node
 //! \brief adds the node v to the list of successor nodes of this node using the edge
 //! given by the parameters
-void vertex::addSuccessorNode(GraphEdge * edge) {
+void GraphNode::addSuccessorNode(GraphEdge * edge) {
 	if (successorNodes == NULL) {
 		successorNodes = new successorNodeList();
 	}
@@ -130,11 +128,11 @@ void vertex::addSuccessorNode(GraphEdge * edge) {
 }
 
 
-//! \fn void vertex::addPredecessorNode(GraphEdge * edge) 
+//! \fn void GraphNode::addPredecessorNode(GraphEdge * edge) 
 //! \param edge pointer to the edge which is to point to the predecessor node
 //! \brief adds the node v to the list of preceding nodes of this node using the edge
 //! given by the parameters
-void vertex::addPredecessorNode(GraphEdge * edge) {
+void GraphNode::addPredecessorNode(GraphEdge * edge) {
 	if (predecessorNodes == NULL) {
 		predecessorNodes = new successorNodeList();
 	}
@@ -143,24 +141,24 @@ void vertex::addPredecessorNode(GraphEdge * edge) {
 }
 
 
-//! \fn void vertex::addState(State * s) 
+//! \fn void GraphNode::addState(State * s) 
 //! \param s pointer to the state that is to be added to this node
 //! \brief adds the state s to the list of states
-bool vertex::addState(State * s) {
+bool GraphNode::addState(State * s) {
 	pair<StateSet::iterator, bool> result = reachGraphStateSet.insert(s);
     return result.second;       // returns whether the element got inserted (true) or not (false)
 }
 
-//! \fn void vertex::addClause(CommGraphFormulaMultiaryOr* myclause)
+//! \fn void GraphNode::addClause(CommGraphFormulaMultiaryOr* myclause)
 //! \param myclause the clause to be added to the annotation of the current node
 //! \brief adds a new clause to the CNF formula of the node
-void vertex::addClause(CommGraphFormulaMultiaryOr* myclause) {
+void GraphNode::addClause(CommGraphFormulaMultiaryOr* myclause) {
 	annotation->addClause(myclause);
 }
 
 
-void vertex::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) {
-	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) : start\n");
+void GraphNode::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) {
+	trace(TRACE_5, "GraphNode::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) : start\n");
 	
 	if (type == SENDING) {
 		//cout << "remove literal " << PN->getInputPlace(i)->getLabelForCommGraph() << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
@@ -170,14 +168,14 @@ void vertex::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) {
 		annotation->removeLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
 	}
 	
-	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) : end\n");
+	trace(TRACE_5, "GraphNode::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) : end\n");
 }
 
 
-//! \fn GraphEdge * vertex::getNextSuccEdge()
+//! \fn GraphEdge * GraphNode::getNextSuccEdge()
 //! \return pointer to the next edge of the successor node list
 //! \brief returns a pointer to the next edge of the successor node list
-GraphEdge * vertex::getNextSuccEdge() {
+GraphEdge * GraphNode::getNextSuccEdge() {
 	if (successorNodes != NULL) {
 		return successorNodes->getNextElement();
 	} else {
@@ -186,10 +184,10 @@ GraphEdge * vertex::getNextSuccEdge() {
 }
 
 
-//! \fn GraphEdge * vertex::getNextPredEdge()
+//! \fn GraphEdge * GraphNode::getNextPredEdge()
 //! \return pointer to the next edge of the successor node list
 //! \brief returns a pointer to the next edge of the successor node list
-GraphEdge * vertex::getNextPredEdge() {
+GraphEdge * GraphNode::getNextPredEdge() {
 	if (predecessorNodes != NULL) {
 		return predecessorNodes->getNextElement();
 	} else {
@@ -198,40 +196,40 @@ GraphEdge * vertex::getNextPredEdge() {
 }
 
 
-//! \fn void vertex::resetIteratingSuccNodes()
+//! \fn void GraphNode::resetIteratingSuccNodes()
 //! \brief resets the iteration process of the successor node list
-void vertex::resetIteratingSuccNodes() {
-	trace(TRACE_5, "vertex::resetIteratingSuccNodes() : start\n");
+void GraphNode::resetIteratingSuccNodes() {
+	trace(TRACE_5, "GraphNode::resetIteratingSuccNodes() : start\n");
 	
 	if (successorNodes != NULL) {
 		successorNodes->resetIterating();
 	}
 	
-	trace(TRACE_5, "vertex::resetIteratingSuccNodes() : end\n");
+	trace(TRACE_5, "GraphNode::resetIteratingSuccNodes() : end\n");
 }
 
 
-//! \fn void vertex::resetIteratingPredNodes()
+//! \fn void GraphNode::resetIteratingPredNodes()
 //! \brief resets the iteration process of the successor node list
-void vertex::resetIteratingPredNodes() {
-	trace(TRACE_5, "vertex::resetIteratingPredNodes() : start\n");
+void GraphNode::resetIteratingPredNodes() {
+	trace(TRACE_5, "GraphNode::resetIteratingPredNodes() : start\n");
 	
 	if (predecessorNodes != NULL) {
 		predecessorNodes->resetIterating();
 	}
 	
-	trace(TRACE_5, "vertex::resetIteratingPredNodes() : end\n");
+	trace(TRACE_5, "GraphNode::resetIteratingPredNodes() : end\n");
 }
 
 
 // returns the CNF formula that is the annotation of a node as a Boolean formula
-CNF_formula* vertex::getCNF_formula() {
+CNF_formula* GraphNode::getCNF_formula() {
 	return annotation;
 }
 
 
 // return the assignment that is imposed by present or absent arcs leaving node v
-CommGraphFormulaAssignment* vertex::getAssignment() {
+CommGraphFormulaAssignment* GraphNode::getAssignment() {
 	
 	trace(TRACE_5, "computing annotation of node " + intToString(getNumber()) + "\n");
 
@@ -258,20 +256,20 @@ CommGraphFormulaAssignment* vertex::getAssignment() {
 }
 
 
-//! \fn void vertex::setColor(vertexColor c)
-//! \param c color of vertex
-//! \brief sets the color of the vertex to the given color
-void vertex::setColor(vertexColor c) {
+//! \fn void GraphNode::setColor(GraphNodeColor c)
+//! \param c color of GraphNode
+//! \brief sets the color of the GraphNode to the given color
+void GraphNode::setColor(GraphNodeColor c) {
 	color = c;
 }
 
-//! \fn vertexColor vertex::getColor()
-//! \brief returns the color of the vertex
-vertexColor vertex::getColor() const {
+//! \fn GraphNodeColor GraphNode::getColor()
+//! \brief returns the color of the GraphNode
+GraphNodeColor GraphNode::getColor() const {
 	return color;
 }
 
-bool vertex::isToShow(const vertex* rootOfGraph) const
+bool GraphNode::isToShow(const GraphNode* rootOfGraph) const
 {
 	if ( parameters[P_SHOW_ALL_NODES] ||
 	    (parameters[P_SHOW_NO_RED_NODES] && (getColor() != RED)) ||
@@ -288,9 +286,9 @@ bool vertex::isToShow(const vertex* rootOfGraph) const
 	}
 }
 
-//! \fn vertexColor vertex::getNumberOfDeadlocks()
+//! \fn GraphNodeColor GraphNode::getNumberOfDeadlocks()
 //! \brief returns the number of deadlocks
-int vertex::getNumberOfDeadlocks() {
+int GraphNode::getNumberOfDeadlocks() {
 	StateSet::iterator iter;
 
 	int count = 0;
@@ -305,51 +303,19 @@ int vertex::getNumberOfDeadlocks() {
 	return count;
 }
 
-//! \fn void vertex::propagateToSuccessors() 
-//! \brief in case the current node got the color in the finalanalysis, this decision is propagated to its
-//! successor nodes
-void vertex::propagateToSuccessors() {
-	resetIteratingSuccNodes();
-	GraphEdge * element;
-
-    while ((element = getNextSuccEdge()) != NULL) {
-    	if (element->getDstNode()->getColor() != RED) {
-    		element->getDstNode()->analyseNodeByFormula();	// analyse the successor node again
-    	}
-    }
-}
-
-//! \fn void vertex::propagateToPredecessors() 
-//! \brief in case the current node got the color in the finalanalysis, this decision is propagated to its
-//! predecessor nodes
-void vertex::propagateToPredecessors() {
-	resetIteratingPredNodes();
-	GraphEdge * element;
-
-    while ((element = getNextPredEdge()) != NULL) {
-    	if (element->getDstNode()->getColor() != RED && element->getDstNode()->finalAnalysisDone) {
-    		element->getDstNode()->analyseNodeByFormula();	// analyse the preceding node again
-    	}
-    	if (element->getDstNode()->getColor() == RED) {
-    		predecessorNodes->removeNodeFromList(element->getDstNode(), true);			
-    	}
-    }   
-}
-
-
-//! \fn vertexColor vertex::analyseNodeByFormula()
+//! \fn GraphNodeColor GraphNode::analyseNodeByFormula()
 //! \result the color of the node
 //! \brief analyses the node, sets its color, and returns the new color
-vertexColor vertex::analyseNodeByFormula() {
+GraphNodeColor GraphNode::analyseNodeByFormula() {
 
-	trace(TRACE_5, "vertex::analyseNodeByFormula() : start\n");
+	trace(TRACE_5, "GraphNode::analyseNodeByFormula() : start\n");
 
 	// computing the assignment given by outgoing edges (to blue nodes)
 	CommGraphFormulaAssignment* myassignment = this->getAssignment();
 	bool result = this->getCNF_formula()->value(*myassignment);
 	delete myassignment;
 
-	trace(TRACE_5, "vertex::analyseNodeByFormula() : end\n");
+	trace(TRACE_5, "GraphNode::analyseNodeByFormula() : end\n");
 
 	if (result) {
 		trace(TRACE_3, "\t\t\t node analysed blue, formula " + this->getCNF_formula()->asString());
@@ -363,29 +329,29 @@ vertexColor vertex::analyseNodeByFormula() {
 
 //
 //
-////! \fn bool operator == (vertex const& left, vertex const& right)
-////! \param left left hand vertex
-////! \param right right hand vertex
+////! \fn bool operator == (GraphNode const& left, GraphNode const& right)
+////! \param left left hand GraphNode
+////! \param right right hand GraphNode
 ////! \brief implements the operator == by comparing the states of the two vertices
-//bool operator == (vertex const& left, vertex const& right) {
+//bool operator == (GraphNode const& left, GraphNode const& right) {
 //    return (*(left.states) == *(right.states));	
 //}
 
 
-//! \fn bool operator < (vertex const& left, vertex const& right)
-//! \param left left hand vertex
-//! \param right right hand vertex
+//! \fn bool operator < (GraphNode const& left, GraphNode const& right)
+//! \param left left hand GraphNode
+//! \param right right hand GraphNode
 //! \brief implements the operator < by comparing the states of the two vertices
-bool operator < (vertex const& left, vertex const& right) {
+bool operator < (GraphNode const& left, GraphNode const& right) {
     return (left.reachGraphStateSet < right.reachGraphStateSet);	
 }
 
 
-////! \fn ostream& operator << (ostream& os, const vertex& v)
+////! \fn ostream& operator << (ostream& os, const GraphNode& v)
 ////! \param os output stream
-////! \param v vertex
-////! \brief implements the operator << by printing the states of the vertex v to the output stream
-//ostream& operator << (ostream& os, const vertex& v) {			
+////! \param v GraphNode
+////! \brief implements the operator << by printing the states of the GraphNode v to the output stream
+//ostream& operator << (ostream& os, const GraphNode& v) {			
 //	os << *(v.states);
 //	return os;
 //}

@@ -50,19 +50,19 @@ class interactionGraph : public communicationGraph {
 		interactionGraph(oWFN *);
 		~interactionGraph();
 	
-		bool checkMaximalEvents(messageMultiSet, vertex *, GraphEdgeType);	
+		bool checkMaximalEvents(messageMultiSet, GraphNode *, GraphEdgeType);	
 	
 	    void buildGraph();
-    	void buildGraph(vertex * );
-    	void buildReducedGraph(vertex * );
+    	void buildGraph(GraphNode * );
+    	void buildReducedGraph(GraphNode * );
     
-    	void getActivatedEventsComputeCNF(vertex *, setOfMessages &, setOfMessages &);
+    	void getActivatedEventsComputeCNF(GraphNode *, setOfMessages &, setOfMessages &);
     
-		setOfMessages combineReceivingEvents(vertex *, setOfMessages &);
-		setOfMessages receivingBeforeSending(vertex *);
+		setOfMessages combineReceivingEvents(GraphNode *, setOfMessages &);
+		setOfMessages receivingBeforeSending(GraphNode *);
 
-    	void calculateSuccStatesOutputSet(messageMultiSet, vertex *);
-    	void calculateSuccStatesInputReduced(messageMultiSet, vertex *);
+    	void calculateSuccStatesOutputSet(messageMultiSet, GraphNode *);
+    	void calculateSuccStatesInputReduced(messageMultiSet, GraphNode *);
         
 };
 

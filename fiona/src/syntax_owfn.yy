@@ -132,21 +132,21 @@ InTransitionParsePosition inTransitionParsePosition;
 
 // the terminal symbols (tokens)
 
-%token key_safe key_place key_internal key_input key_output
-%token key_marking key_finalmarking key_finalcondition
-%token key_transition key_consume key_produce
-%token key_all_other_places_empty
-%token key_all_other_internal_places_empty
-%token key_all_other_external_places_empty
-%token key_max_unique_events key_on_loop key_max_occurrences
-%token key_true key_false lcontrol rcontrol
-%token comma colon semicolon ident number negative_number
-%token lpar rpar
+%token KEY_SAFE KEY_PLACE KEY_INTERNAL KEY_INPUT KEY_OUTPUT
+%token KEY_MARKING KEY_FINALMARKING KEY_FINALCONDITION
+%token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE
+%token KEY_ALL_OTHER_PLACES_EMPTY
+%token KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
+%token KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
+%token KEY_MAX_UNIQUE_EVENTS KEY_ON_LOOP KEY_MAX_OCCURRENCES
+%token KEY_TRUE KEY_FALSE LCONTROL RCONTROL
+%token COMMA COLON SEMICOLON IDENT NUMBER NEGATIVE_NUMBER
+%token LPAR RPAR
 
-%left op_or
-%left op_and
-%left op_not
-%nonassoc op_eq op_ne op_gt op_lt op_ge op_le
+%left OP_OR
+%left OP_AND
+%left OP_NOT
+%nonassoc OP_EQ OP_NE OP_GT OP_LT OP_GE OP_LE
 
 
 // the start symbol of the grammar
@@ -169,9 +169,9 @@ InTransitionParsePosition inTransitionParsePosition;
 
 
 /* the types of the non-terminal symbols */
-%type <str> ident
-%type <str> number
-%type <str> negative_number
+%type <str> IDENT
+%type <str> NUMBER
+%type <str> NEGATIVE_NUMBER
 %type <str> tname
 %type <str> nodeident
 %type <al> arclist
@@ -191,7 +191,7 @@ net:
 		{
 			ignoredPlacesDueToMatching.clear();
 		}
-	key_place place_area key_marking
+	KEY_PLACE place_area KEY_MARKING
 		{
 			PlSymbol* plSymbol = NULL;
 			PlaceTable->initGetNextSymbol();
@@ -219,7 +219,7 @@ net:
 			
 		}
 		
-		markinglist semicolon final transitionlist
+		markinglist SEMICOLON final transitionlist
 		{
 			// fill in arcs
 			for (unsigned int i = 0; i < PN->getTransitionCount(); i++) {
@@ -256,8 +256,8 @@ net:
 		}
 ;
 
-final: key_finalmarking finalmarkinglist semicolon
-| key_finalcondition statepredicate semicolon {
+final: KEY_FINALMARKING finalmarkinglist SEMICOLON
+| KEY_FINALCONDITION statepredicate SEMICOLON {
 	PN->FinalCondition = $2;
 
 	// merge() and posate() can only be called on FinalCondition after the PN
@@ -270,33 +270,33 @@ place_area: place_area_internal place_area_input  place_area_output
 	  | place_area_lola
 ;
 
-place_area_input: key_input {type = INPUT; } placelists semicolon
+place_area_input: KEY_INPUT {type = INPUT; } placelists SEMICOLON
 		| /* empty */
 ;
 
-place_area_output: key_output {type = OUTPUT; } placelists semicolon
+place_area_output: KEY_OUTPUT {type = OUTPUT; } placelists SEMICOLON
 		 | /* empty */
 ;
 
-place_area_internal: key_internal {type = INTERNAL; } placelists semicolon
+place_area_internal: KEY_INTERNAL {type = INTERNAL; } placelists SEMICOLON
 		   | /* empty */
 ;
 
-place_area_lola: {type = INTERNAL; } placelists semicolon;
+place_area_lola: {type = INTERNAL; } placelists SEMICOLON;
 
 placelists: capacity placelist 
-| placelists semicolon capacity placelist
+| placelists SEMICOLON capacity placelist
 ;
 
 capacity: { CurrentCapacity = CAPACITY;}
-| key_safe    colon  {CurrentCapacity = 1;}
-| key_safe number  colon { 
+| KEY_SAFE    COLON  {CurrentCapacity = 1;}
+| KEY_SAFE NUMBER  COLON { 
 				sscanf($2, "%u", &CurrentCapacity);
 				free($2);
 			}
 ;
 
-placelist:  placelist comma place 
+placelist:  placelist COMMA place 
 |  place
 |  /* empty */ 
 ;
@@ -321,27 +321,27 @@ place: nodeident {
     controlcommands
 ;
 
-nodeident: ident { $$ = $1;}
-| number  {$$ = $1; }
+nodeident: IDENT { $$ = $1;}
+| NUMBER  {$$ = $1; }
 ;
 
 controlcommands:
   /* emtpy */
-| lcontrol commands rcontrol
+| LCONTROL commands RCONTROL
 ;
 
 commands:
   /* empty */
-| key_max_unique_events op_eq number commands
+| KEY_MAX_UNIQUE_EVENTS OP_EQ NUMBER commands
     {
     }
-| key_on_loop op_eq key_true commands
+| KEY_ON_LOOP OP_EQ KEY_TRUE commands
     {
     }
-| key_on_loop op_eq key_false commands
+| KEY_ON_LOOP OP_EQ KEY_FALSE commands
     {
     }
-| key_max_occurrences op_eq number commands
+| KEY_MAX_OCCURRENCES OP_EQ NUMBER commands
     {
         sscanf($3, "%u", &(PS->getPlace()->max_occurence));
         free($3);
@@ -352,7 +352,7 @@ commands:
         }
         numberOfEvents += PS->getPlace()->max_occurence - events_manual;
     }
-| key_max_occurrences op_eq negative_number commands
+| KEY_MAX_OCCURRENCES OP_EQ NEGATIVE_NUMBER commands
     {
         sscanf($3, "%d", &(PS->getPlace()->max_occurence));
         free($3);
@@ -368,11 +368,11 @@ commands:
 markinglist:
   /* empty */ 
 | marking
-| markinglist comma marking
+| markinglist COMMA marking
 ;
 
 marking: 
-  nodeident colon number 
+  nodeident COLON NUMBER 
       {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
@@ -401,11 +401,11 @@ marking:
 
 finalmarkinglist: 
 | finalmarking
-| finalmarkinglist comma finalmarking
+| finalmarkinglist COMMA finalmarking
 ;
 
 finalmarking: 
-  nodeident colon number 
+  nodeident COLON NUMBER 
       {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
@@ -437,7 +437,7 @@ transitionlist: transitionlist transition
 | /* empty */
 ;
 
-transition: key_transition tname
+transition: KEY_TRANSITION tname
 	{
 		T = new owfnTransition($2);
 		if (!PN->addTransition(T))
@@ -446,15 +446,15 @@ transition: key_transition tname
 			owfn_yyerror(error.c_str());
 		}
 	}
-	key_consume
+	KEY_CONSUME
 	{
 		inTransitionParsePosition = IN_CONSUME;
 	}
-	arclist semicolon key_produce
+	arclist SEMICOLON KEY_PRODUCE
 	{
 		inTransitionParsePosition = IN_PRODUCE;
 	}
-	arclist semicolon
+	arclist SEMICOLON
 	{
 	unsigned int card;
 	unsigned int i;
@@ -566,21 +566,21 @@ transition: key_transition tname
 ;
 
 
-tname:   ident 
-| number 
+tname:   IDENT 
+| NUMBER 
 ;
 
 
 arclist: { $$ = (arc_list *) 0;}
 | arc {$$ = $1;}
-| arc comma arclist {
+| arc COMMA arclist {
 			$1-> next = $3;
 			$$ = $1;
 		}
 ;
 
 arc: 
-  nodeident colon number 
+  nodeident COLON NUMBER 
       {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable -> lookup($1);
@@ -613,17 +613,17 @@ arc:
       }
 ;
 
-statepredicate: lpar statepredicate rpar {
+statepredicate: LPAR statepredicate RPAR {
 	$$ = $2;
 }
-| statepredicate op_and statepredicate {
+| statepredicate OP_AND statepredicate {
 	$$ = new binarybooleanformula(conj,$1,$3);
 }
-| statepredicate op_and key_all_other_places_empty {
+| statepredicate OP_AND KEY_ALL_OTHER_PLACES_EMPTY {
 	//
 	// Warning: code duplication! Keep the rules for
-	// key_all_other_places_empty, key_all_other_internal_places_empty and
-	// key_all_other_external_places_empty in sync!
+	// KEY_ALL_OTHER_PLACES_EMPTY, KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY and
+	// KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY in sync!
 	//
 	formula* lhs = $1;
 	set<owfnPlace*> places_in_lhs;
@@ -661,11 +661,11 @@ statepredicate: lpar statepredicate rpar {
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
 }
-| statepredicate op_and key_all_other_internal_places_empty {
+| statepredicate OP_AND KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY {
 	//
 	// Warning: code duplication! Keep the rules for
-	// key_all_other_places_empty, key_all_other_internal_places_empty and
-	// key_all_other_external_places_empty in sync!
+	// KEY_ALL_OTHER_PLACES_EMPTY, KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY and
+	// KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY in sync!
 	//
 	formula* lhs = $1;
 	set<owfnPlace*> places_in_lhs;
@@ -705,11 +705,11 @@ statepredicate: lpar statepredicate rpar {
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
 }
-| statepredicate op_and key_all_other_external_places_empty {
+| statepredicate OP_AND KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY {
 	//
 	// Warning: code duplication! Keep the rules for
-	// key_all_other_places_empty, key_all_other_internal_places_empty and
-	// key_all_other_external_places_empty in sync!
+	// KEY_ALL_OTHER_PLACES_EMPTY, KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY and
+	// KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY in sync!
 	//
 	formula* lhs = $1;
 	set<owfnPlace*> places_in_lhs;
@@ -753,13 +753,13 @@ statepredicate: lpar statepredicate rpar {
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
 }
-| statepredicate op_or statepredicate {
+| statepredicate OP_OR statepredicate {
 	$$ = new binarybooleanformula(disj,$1,$3);
 }
-| op_not statepredicate {
+| OP_NOT statepredicate {
 	$$ = new unarybooleanformula(neg,$2);
 }
-| nodeident op_eq number {
+| nodeident OP_EQ NUMBER {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
@@ -771,7 +771,7 @@ statepredicate: lpar statepredicate rpar {
 	free($1);
 	free($3);
 }
-| nodeident op_ne number {
+| nodeident OP_NE NUMBER {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
@@ -783,7 +783,7 @@ statepredicate: lpar statepredicate rpar {
 	free($1);
 	free($3);
 }
-| nodeident op_lt number {
+| nodeident OP_LT NUMBER {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
@@ -795,7 +795,7 @@ statepredicate: lpar statepredicate rpar {
 	free($1);
 	free($3);
 }
-| nodeident op_gt number {
+| nodeident OP_GT NUMBER {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
@@ -807,7 +807,7 @@ statepredicate: lpar statepredicate rpar {
 	free($1);
 	free($3);
 }
-| nodeident op_ge number {
+| nodeident OP_GE NUMBER {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
@@ -819,7 +819,7 @@ statepredicate: lpar statepredicate rpar {
 	free($1);
 	free($3);
 }
-| nodeident op_le number {
+| nodeident OP_LE NUMBER {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {

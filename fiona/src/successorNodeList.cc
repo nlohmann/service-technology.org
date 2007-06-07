@@ -34,7 +34,7 @@
 #include "mynew.h"
 #include "successorNodeList.h"
 #include "graphEdge.h"
-#include "vertex.h"
+#include "GraphNode.h"
 #include "enums.h"
 #include <string>
 #include <iostream>
@@ -125,40 +125,4 @@ GraphEdge * successorNodeList::getNextElement() {
 		duringIteration = true;
 		return NULL;
 	}
-}
-
-
-//! \fn void successorNodeList::removeNodeFromList(vertex * node, bool iterating)
-//! \param node a pointer to the node that shall be remove from the list
-//! \param iterating flag to show whether we are iterating through the list right now
-//! \brief remove the given node from the list
-void successorNodeList::removeNodeFromList(vertex * node, bool iterating) {
-	if (firstElement == NULL) {
-		return;	
-	}
-
-	GraphEdge * prevEdge = firstElement;
-	GraphEdge * tmpEdge = firstElement;
-	
-	while (tmpEdge) {
-		// test if this edge is the one to be removed
-		if (tmpEdge->getDstNode() == node) {
-			if (tmpEdge == firstElement) {
-				firstElement = tmpEdge->getNextElement();
-				nextElement = NULL;
-			} else {
-				nextElement = prevEdge;
-				prevEdge->setNextElement(tmpEdge->getNextElement());	
-				if (iterating) {
-					nextElement = prevEdge;	// in case we are iterating through the list, we have to
-											// visit the previous element once again
-				}				
-			}
-			delete tmpEdge;							// remove element from list, the node itself is not deleted
-			return;
-		}
-		// not the one, so go on
-		prevEdge = tmpEdge;
-		tmpEdge = tmpEdge->getNextElement();	
-	}		
 }

@@ -57,7 +57,7 @@ public:
     typedef std::set<OGFromFileTransition*> transitions_t;
 private:
     std::string name_;
-    vertexColor color_;
+    GraphNodeColor color_;
     typedef std::map<std::string, OGFromFileNode*> transitionLabel2parentNode_t;
     transitionLabel2parentNode_t transitionLabel2parentNode;
     void addParentNodeForTransitionLabel(const std::string& transitionLabel,
@@ -70,11 +70,11 @@ public:
     transitions_t transitions;
 
     OGFromFileNode(const std::string& name_, CommGraphFormula* annotation_,
-        vertexColor color = BLUE);
+        GraphNodeColor color = BLUE);
 
     ~OGFromFileNode();
     std::string getName() const;
-    vertexColor getColor() const;
+    GraphNodeColor getColor() const;
     bool isBlue() const;
     bool isRed() const;
     void addTransition(OGFromFileTransition* transition);
@@ -143,7 +143,7 @@ public:
     ~OGFromFile();
     void addNode(OGFromFileNode* node);
     OGFromFileNode* addNode(const std::string& nodeName,
-        CommGraphFormula* annotation, vertexColor color = BLUE);
+        CommGraphFormula* annotation, GraphNodeColor color = BLUE);
     void addTransition(const std::string& srcName, const std::string& dstName,
         const std::string& label);
     bool hasNodeWithName(const std::string& nodeName) const;

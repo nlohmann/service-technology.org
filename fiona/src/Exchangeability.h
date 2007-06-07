@@ -40,7 +40,7 @@
 //#include <vector>
 //#include <map>
 
-//#include "vertex.h"
+//#include "GraphNode.h"
 //#include "CNF.h"
 
 #include "util.h"

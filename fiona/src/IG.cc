@@ -69,10 +69,10 @@ void interactionGraph::buildGraph() {
 }
 
 
-//! \fn void interactionGraph::buildGraph(vertex * node)
+//! \fn void interactionGraph::buildGraph(GraphNode * node)
 //! \param node current node of the graph
 //! \brief builds up the graph recursively
-void interactionGraph::buildGraph(vertex * currentNode) {
+void interactionGraph::buildGraph(GraphNode * currentNode) {
 	
 	// at this point, the states inside the current node node are already computed!
 	
@@ -112,8 +112,8 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	
 			trace(TRACE_2, "\t\t\t\t    sending event: !");
 			
-			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
-			currentVertex = currentNode;
+			GraphNode * v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
+			currentGraphNode = currentNode;
 			
 			calculateSuccStatesInput(*iter, currentNode, v);
 			
@@ -126,7 +126,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 				numberDeletedVertices--;
 				delete v;
 			} else {
-				if (AddVertex (v, *iter, SENDING)) {
+				if (AddGraphNode (v, *iter, SENDING)) {
 
 #ifdef LOOP
 	cout << "calc next node? [y,n]" << endl;
@@ -153,12 +153,12 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 			
 			trace(TRACE_2, "\t\t\t\t    output event: ?");
 	
-			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
-			currentVertex = currentNode;
+			GraphNode * v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
+			currentGraphNode = currentNode;
 			
 			calculateSuccStatesOutput(*iter, currentNode, v);
 			
-			if (AddVertex (v, *iter, RECEIVING)) {
+			if (AddGraphNode (v, *iter, RECEIVING)) {
 		
 #ifdef LOOP
 		cout << "calc next node? [y,n]" << endl;
@@ -185,10 +185,10 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + toUpper(currentNode->getColor().toString()) + "\n");	
 }
 
-//! \fn void interactionGraph::buildReducedGraph(vertex * currentNode)
+//! \fn void interactionGraph::buildReducedGraph(GraphNode * currentNode)
 //! \param currentNode current node of the graph
 //! \brief builds up the graph recursively
-void interactionGraph::buildReducedGraph(vertex * currentNode) {
+void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 
 	if (currentNode->getColor() == RED) {
 		// this may happen due to a message bound violation in current node
@@ -230,12 +230,12 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 
 			trace(TRACE_2, "\t\t\t\t    input event: ?");
 
-			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());		// create new vertex of the graph
-			currentVertex = currentNode;
+			GraphNode * v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());		// create new GraphNode of the graph
+			currentGraphNode = currentNode;
 			
 			calculateSuccStatesInput(*iter, currentNode, v);
 			
-			if (AddVertex (v, *iter, SENDING)) {
+			if (AddGraphNode (v, *iter, SENDING)) {
 				buildReducedGraph(v);
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 				//analyseNode(currentNode, false);
@@ -252,13 +252,13 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 		
 			trace(TRACE_2, "\t\t\t\t    output event: ?");
 		
-			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
-			currentVertex = currentNode;
+			GraphNode * v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
+			currentGraphNode = currentNode;
 						
 			calculateSuccStatesOutput(*iter, currentNode, v);
 	
 			
-			if (AddVertex (v, *iter, RECEIVING)) {
+			if (AddGraphNode (v, *iter, RECEIVING)) {
 				buildReducedGraph(v);
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 				//analyseNode(currentNode, false);
@@ -275,14 +275,14 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 }
 
 
-//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, GraphEdgeType typeOfPlace)
+//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, GraphEdgeType typeOfPlace)
 //! \param messages
 //! \param currentNode the node from which the input event is to be sent
 //! \param typeOfPlace
 //! \brief checks whether the set of input messages contains at least one input message
 //! that has been sent at its maximum
-bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, GraphEdgeType typeOfPlace) {
-	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): start\n");
+bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, GraphEdgeType typeOfPlace) {
+	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): start\n");
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
 		if (typeOfPlace == SENDING) {
 			unsigned int i = 0;
@@ -297,7 +297,7 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * cur
 				trace(TRACE_3, PN->getInputPlace(i)->name);
 				trace(TRACE_3, " reached\n");
 
-				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
+				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): end\n");
 				return false;
 			}
 		} else if (typeOfPlace == RECEIVING) {
@@ -311,24 +311,24 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * cur
 				trace(TRACE_3, "maximal occurrences of event ");
 				trace(TRACE_3, PN->getOutputPlace(i)->name);
 				trace(TRACE_3, " reached\n");
-				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");				
+				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): end\n");				
 				return false;		
 			}
 		}
 	}
 	// everything is fine
-	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
+	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): end\n");
 	return true;
 }
 
 
-//! \fn void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages & inputMessages, setOfMessages & outputMessages) {
+//! \fn void interactionGraph::getActivatedEventsComputeCNF(GraphNode * node, setOfMessages & inputMessages, setOfMessages & outputMessages) {
 //! \param node the node for which the activated input events are calculated
 //! \param inputMessages the set of input messages (sending events) that are activated in the current node 
 //! \param outputMessages the set of output messages (receiving events) that are activated in the current node 
 //! \brief creates a list of all activated sending and receiving events (input messages and output messages) of the current node
-void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages & inputMessages, setOfMessages & outputMessages) {
-	trace(TRACE_5, "interactionGraph::getActivatedEventsComputeCNF(vertex * node): start\n");
+void interactionGraph::getActivatedEventsComputeCNF(GraphNode * node, setOfMessages & inputMessages, setOfMessages & outputMessages) {
+	trace(TRACE_5, "interactionGraph::getActivatedEventsComputeCNF(GraphNode * node): start\n");
 
 	int i;
 	StateSet::iterator iter;
@@ -467,7 +467,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 		}
 
 	}			
-	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(vertex * node): end\n");
+	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(GraphNode * node): end\n");
 	
 }
 
@@ -475,13 +475,13 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 // reduction rules
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-//! \fn setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessages & inputMessages)
+//! \fn setOfMessages interactionGraph::combineReceivingEvents(GraphNode * node, setOfMessages & inputMessages)
 //! \param node the node for which the activated output events are calculated
 //! \param inputMessages
 //! \brief creates a list of all output messages of the current node
-setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessages & inputMessages) {
+setOfMessages interactionGraph::combineReceivingEvents(GraphNode * node, setOfMessages & inputMessages) {
 	
-	trace(TRACE_5, "interactionGraph::combineReceivingEvents(vertex * node): start\n");
+	trace(TRACE_5, "interactionGraph::combineReceivingEvents(GraphNode * node): start\n");
 
 	std::vector<StateSet::iterator> statesVector; 	// remember those states that activate an output event
 	
@@ -786,7 +786,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 	}		
 	}
 
-	trace(TRACE_5, "interactionGraph::combineReceivingEvents(vertex * node): end\n");
+	trace(TRACE_5, "interactionGraph::combineReceivingEvents(GraphNode * node): end\n");
 
     /* check the set of output-messages for containing subsets */
     /* e.g. the set contains [a, b] and [a, b, c] */
@@ -796,13 +796,13 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 }
 
 
-//! \fn setOfMessageSet interactionGraph::receivingBeforeSending(vertex * node)
+//! \fn setOfMessageSet interactionGraph::receivingBeforeSending(GraphNode * node)
 //! \param node the node for which the activated input events are calculated
 //! \brief creates a list of all activated input events (messages) of the current node with respect to the
 //! receiving before sending rule
-setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
+setOfMessages interactionGraph::receivingBeforeSending(GraphNode * node) {
 
-	trace(TRACE_5, "interactionGraph::receivingBeforeSending(vertex * node): start\n");
+	trace(TRACE_5, "interactionGraph::receivingBeforeSending(GraphNode * node): start\n");
 
 	int i;
 
@@ -858,23 +858,23 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 	}
 
 	trace(TRACE_5, "number of input events: " + intToString(inputMessages.size()) + "\n" );
-	trace(TRACE_5, "interactionGraph::receivingBeforeSending(vertex * node): end\n");
+	trace(TRACE_5, "interactionGraph::receivingBeforeSending(GraphNode * node): end\n");
    	return inputMessages;   // return the list of activated input messages
 }
 
 
-//! \fn void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vertex * node)
+//! \fn void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, GraphNode * node)
 //! \param output the output messages that are taken from the marking
 //! \param node
 //! \brief calculates the set of successor states in case of an output message
-void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vertex * node) {
+void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, GraphNode * node) {
     
 	/* iterate over all states of the current node 
 	 * and get rid of the output messages in the marking of the state
 	 * */
 	
 #ifdef DEBUG
-	cout << "interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vertex * node): start" << endl;
+	cout << "interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, GraphNode * node): start" << endl;
 	cout << "checking node: " << *node << endl;
 #endif
 	StateSet::iterator iter;	
@@ -903,14 +903,14 @@ void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vert
 	}
 }
 
-//! \fn void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, vertex * node)
+//! \fn void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, GraphNode * node)
 //! \param input set of input messages
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an input message
-void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, vertex * node) {
+void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, GraphNode * node) {
 	
 #ifdef DEBUG
-	cout << "interactionGraph::calculateSuccStatesInputReduced(char * input, vertex * node): start" << endl;
+	cout << "interactionGraph::calculateSuccStatesInputReduced(char * input, GraphNode * node): start" << endl;
 #endif
 
 	StateSet::iterator iter;		

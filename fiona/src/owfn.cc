@@ -299,11 +299,11 @@ owfnTransition ** oWFN::quasiFirelist() {
 }
 
 
-//! \fn void oWFN::addSuccStatesToList(vertex * n, State * currentState)
+//! \fn void oWFN::addSuccStatesToList(GraphNode * n, State * currentState)
 //! \param n the node to add the states to
 //! \param currentState the currently added state
 //! \brief decodes state, checks for message bound violation and adds successors recursively
-void oWFN::addSuccStatesToList(vertex * n, State * currentState) {
+void oWFN::addSuccStatesToList(GraphNode * n, State * currentState) {
 	
 	if (currentState != NULL) {
 		assert(!n->addState(currentState));		// currentState was added to node before
@@ -328,13 +328,13 @@ void oWFN::addSuccStatesToList(vertex * n, State * currentState) {
 }
 
 
-//! \fn void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, owfnPlace * outputPlace, State * currentState, vertex * n)
+//! \fn void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, owfnPlace * outputPlace, State * currentState, GraphNode * n)
 //! \param stateSet 
 //! \param outputPlace
 //! \param currentState
 //! \param n
 //! \brief decodes state, checks for message bound violation and adds successors recursively
-void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, owfnPlace * outputPlace, State * currentState, vertex * n) {
+void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, owfnPlace * outputPlace, State * currentState, GraphNode * n) {
 	
 	if (currentState != NULL) {
 		currentState->decodeShowOnly(this);		// decodes currently considered state
@@ -362,13 +362,13 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, owfnPlace * outputPl
 	}
 }
 
-//! \fn void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, messageMultiSet messages, State * currentState, vertex * n)
+//! \fn void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, messageMultiSet messages, State * currentState, GraphNode * n)
 //! \param stateSet
 //! \param messages  
 //! \param currentState
 //! \param n
 //! \brief decodes state, checks for message bound violation and adds successors recursively
-void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, messageMultiSet messages, State * currentState, vertex * n) {
+void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, messageMultiSet messages, State * currentState, GraphNode * n) {
 	
 	if (currentState != NULL) {
 		currentState->decodeShowOnly(this);		// decodes currently considered state
@@ -386,7 +386,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, messageMultiSet mess
 		if (!somePlaceNotMarked) {	// if all places are appropriatly marked, we save this state
 			stateSet.insert(currentState);
 			
-			trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
+			trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : end\n");
 			// nothing else to be done here
 			return ;
 			
@@ -485,12 +485,12 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 }
 
 
-//! \fn void oWFN::calculateReachableStatesOutputEvent(vertex * n) 
+//! \fn void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) 
 //! \param n the node to be calculated in case of an output event
-//! \brief calculates the reduced set of states of the new vertex in case of an output event
-void oWFN::calculateReachableStatesOutputEvent(vertex * n) {
+//! \brief calculates the reduced set of states of the new GraphNode in case of an output event
+void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
 	// calculates the EG starting at the current marking
-	trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal): start\n");
+	trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(GraphNode * n, bool minimal): start\n");
 
 	State * CurrentState;
   	State * NewState;
@@ -505,7 +505,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n) {
 		if (n->addState(CurrentState)) {
 			addRecursivelySuccStatesToSetOfTempStates(CurrentState);
 		}
-		trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal): end\n");
+		trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(GraphNode * n, bool minimal): end\n");
 		return;
 	}
 	
@@ -633,16 +633,16 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n) {
 	if (tempCurrentMarking) {
 		delete[] tempCurrentMarking;	
 	}
-	trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal): end\n");
+	trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(GraphNode * n, bool minimal): end\n");
 }
 
-//! \fn void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) 
+//! \fn void oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal) 
 //! \param n the node to be calculated in case of an input event
-//! \param minimal the current state is minimal in the vertex
-//! \brief calculates the reduced set of states of the new vertex in case of an input event
-void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
+//! \param minimal the current state is minimal in the GraphNode
+//! \brief calculates the reduced set of states of the new GraphNode in case of an input event
+void oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal) {
 	// calculates the EG starting at the current marking
-	trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal): start\n");
+	trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal): start\n");
 
 	State * CurrentState;
   	State * NewState;
@@ -657,7 +657,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 		if (n->addState(CurrentState)) {
 			addRecursivelySuccStatesToSetOfTempStates(CurrentState);
 		}
-		trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal): end\n");
+		trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal): end\n");
 		return;
 	}
 	
@@ -784,19 +784,19 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	if (tempCurrentMarking) {
 		delete[] tempCurrentMarking;	
 	}
-	trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal): end\n");
+	trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal): end\n");
 }
 
-//! \fn void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n)
+//! \fn void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n)
 //! \param stateSet set of states
-//! \param outputPlace the output place of the net that is associated with the receiving event for which the new vertex is calculated
-//! \param n new vertex 
-//! \brief calculates the set of states reachable from the current marking and stores them in the new vertex
+//! \param outputPlace the output place of the net that is associated with the receiving event for which the new GraphNode is calculated
+//! \param n new GraphNode 
+//! \brief calculates the set of states reachable from the current marking and stores them in the new GraphNode
 //! this function is for the full IG and the OG since a single output place is considered
-void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) {
+void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) {
 
 	// calculates the EG starting at the current marking
-	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : start\n");
+	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : start\n");
 
 	// test current marking if message bound k reached
 	if (checkMessageBound()) {
@@ -852,7 +852,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	if (CurrentMarking[outputPlace->index] > 0) {
 		stateSet.insert(CurrentState);
 		
-		trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
+		trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : end\n");
 		// nothing else to be done here
 		return ;
 	}
@@ -926,7 +926,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 				if (checkMessageBound()) {
 					n->setColor(RED);
 					trace(TRACE_3, "\t\t\t message bound violated; color of node " + intToString(n->getNumber()) + " set to RED (calculateReachableStates, during fire)\n");
-					trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
+					trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : end\n");
 					return;
 				}
 
@@ -970,21 +970,21 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	
 	//binDeleteAll(*tempBinDecision);
 	
-	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
+	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : end\n");
 	return;
 	
 }
 
-//! \fn void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n)
+//! \fn void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n)
 //! \param stateSet set of states
-//! \param outputPlace the output place of the net that is associated with the receiving event for which the new vertex is calculated
-//! \param n new vertex 
-//! \brief calculates the set of states reachable from the current marking and stores them in the new vertex
+//! \param outputPlace the output place of the net that is associated with the receiving event for which the new GraphNode is calculated
+//! \param n new GraphNode 
+//! \brief calculates the set of states reachable from the current marking and stores them in the new GraphNode
 //! this function is for the IG only since a multiset of output places is considered
-void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages, vertex * n) {
+void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages, GraphNode * n) {
 
 	// calculates the EG starting at the current marking
-	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages, vertex * n) : start\n");
+	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages, GraphNode * n) : start\n");
 
 	// test current marking if message bound k reached
 	if (checkMessageBound()) {
@@ -1058,7 +1058,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 	if (!somePlaceNotMarked) {	// if all places are appropriatly marked, we save this state
 		stateSet.insert(CurrentState);
 		
-		trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
+		trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : end\n");
 		// nothing else to be done here
 		if (tempCurrentMarking) {
 			delete[] tempCurrentMarking;
@@ -1148,7 +1148,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 				if (checkMessageBound()) {
 					n->setColor(RED);
 					trace(TRACE_3, "\t\t\t message bound violated; color of node " + intToString(n->getNumber()) + " set to RED (calculateReachableStates, during fire)\n");
-					trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
+					trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : end\n");
 					if (tempCurrentMarking != NULL) {
 						delete[] tempCurrentMarking;
 						tempCurrentMarking = NULL;
@@ -1210,19 +1210,19 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 		tempCurrentMarking = NULL;
 	}
 	
-	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
+	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : end\n");
 	return;
 }
 
-//! \fn void oWFN::calculateReachableStatesFull(vertex * n)
+//! \fn void oWFN::calculateReachableStatesFull(GraphNode * n)
 //! \param n the node for which the reachability graph is computed
 //! \brief NO REDUCTION! calculate all reachable states from the current marking
-//! and store them in the node n (== vertex of communicationGraph);
+//! and store them in the node n (== GraphNode of communicationGraph);
 //! it will color the node n RED if a given message bound is violated
-void oWFN::calculateReachableStatesFull(vertex * n) {
+void oWFN::calculateReachableStatesFull(GraphNode * n) {
 
 	// calculates the EG starting at the current marking
-	trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n) : start\n");
+	trace(TRACE_5, "oWFN::calculateReachableStatesFull(GraphNode * n) : start\n");
 
 	// test current marking if message bound k reached
 	if (checkMessageBound()) {
@@ -1248,7 +1248,7 @@ void oWFN::calculateReachableStatesFull(vertex * n) {
 			// successors need only be added if state was not yet in current node
 			addSuccStatesToList(n, CurrentState);	// decodes and checks for message bound
 		}
-		trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n) : end (root marking of EG already in bintree; states copied only)\n");
+		trace(TRACE_5, "oWFN::calculateReachableStatesFull(GraphNode * n) : end (root marking of EG already in bintree; states copied only)\n");
 		return;
 	} else {
 	
@@ -1311,7 +1311,7 @@ void oWFN::calculateReachableStatesFull(vertex * n) {
 						addSuccStatesToList(n, NewState);
 						if (n->getColor() == RED) {
 							trace(TRACE_3, "\t\t\t message bound violated; color of node " + intToString(n->getNumber()) + " set to RED (calculateReachableStatesFull, during fire)\n");
-							trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n) : end\n");
+							trace(TRACE_5, "oWFN::calculateReachableStatesFull(GraphNode * n) : end\n");
 							delete[] tempCurrentMarking;
 							return;
 						}
@@ -1360,7 +1360,7 @@ void oWFN::calculateReachableStatesFull(vertex * n) {
 					if (checkMessageBound()) {
 						n->setColor(RED);
 						trace(TRACE_3, "\t\t\t message bound violated; color of node " + intToString(n->getNumber()) + " set to RED (calculateReachableStatesFull, during fire)\n");
-						trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n) : end\n");
+						trace(TRACE_5, "oWFN::calculateReachableStatesFull(GraphNode * n) : end\n");
 						delete[] tempCurrentMarking;
 						return;
 					}
@@ -1387,7 +1387,7 @@ void oWFN::calculateReachableStatesFull(vertex * n) {
 		if (tempCurrentMarking) {
 			delete[] tempCurrentMarking;	
 		}
-		trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n) : end\n");
+		trace(TRACE_5, "oWFN::calculateReachableStatesFull(GraphNode * n) : end\n");
 		return;
 	}
 }

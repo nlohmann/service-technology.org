@@ -153,21 +153,21 @@ BddRepresentation::~BddRepresentation(){
 	trace(TRACE_5, "BddRepresentation::~BddRepresentation(): end\n"); 
 }
 
-void BddRepresentation::convertRootNode(vertex* root){
-	trace(TRACE_5, "void BddRepresentation::convertRootNode(vertex* root): begin\n");
+void BddRepresentation::convertRootNode(GraphNode* root){
+	trace(TRACE_5, "void BddRepresentation::convertRootNode(GraphNode* root): begin\n");
 	
 	pair<map<unsigned int, unsigned int>::iterator,bool> success;
 	success = nodeMap.insert(make_pair(root->getNumber(), 0));
 	assert(success.second == true);
 	
-	trace(TRACE_5, "void BddRepresentation::convertRootNode(vertex* root): end\n"); 
+	trace(TRACE_5, "void BddRepresentation::convertRootNode(GraphNode* root): end\n"); 
 }
 
-//! \fn void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[])
+//! \fn void BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[])
 //! \brief generate BDD representation
-void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
+void BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]){
 	
-	trace(TRACE_5, "BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]): start\n");
+	trace(TRACE_5, "BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]): start\n");
 
 	//annotation
 	DdNode * annotation = annotationToBddAnn(v);
@@ -186,7 +186,7 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 			GraphEdge* element;
 			
 			while((element = v->getNextSuccEdge()) != NULL){;
-				vertex* vNext = element->getDstNode();
+				GraphNode* vNext = element->getDstNode();
 				
 				if (vNext->getColor() == BLUE && 
 				    vNext->reachGraphStateSet.size() != 0 &&
@@ -224,15 +224,15 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 			}//end while
 		}
 	}
-	trace(TRACE_5, "BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]): end\n");	
+	trace(TRACE_5, "BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]): end\n");	
 }
 
 
-//! \fn void BddRepresentation::addOrDeleteLeavingEdges(vertex* v)
+//! \fn void BddRepresentation::addOrDeleteLeavingEdges(GraphNode* v)
 //! \brief add blue edges to the BDD and delete red edges from the BDD (for the on the fly construction)
-void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
+void BddRepresentation::addOrDeleteLeavingEdges(GraphNode* v){
 
-	trace(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(vertex* v): start\n");		
+	trace(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(GraphNode* v): start\n");		
 	
 	if (v->getColor() == BLUE){	//add annotation
 		DdNode * annotation = annotationToBddAnn(v);
@@ -259,7 +259,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 		GraphEdge* element;
 		
 		while((element = v->getNextSuccEdge()) != NULL){
-			vertex* vNext = element->getDstNode();
+			GraphNode* vNext = element->getDstNode();
 			if (vNext != NULL){
 												
 				//label
@@ -302,7 +302,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 			} 
 		}//end while 
 	}
-	trace(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(vertex* v): end\n");
+	trace(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(GraphNode* v): end\n");
 }
 
 
@@ -399,8 +399,8 @@ DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2){
 }
 
 
-DdNode* BddRepresentation::annotationToBddAnn(vertex* v){
-	trace(TRACE_5, "DdNode* BddRepresentation::annotationToBddAnn(vertex * v): start\n");
+DdNode* BddRepresentation::annotationToBddAnn(GraphNode* v){
+	trace(TRACE_5, "DdNode* BddRepresentation::annotationToBddAnn(GraphNode * v): start\n");
 	
 //	cout << "----------------------------------\n";
 //	cout << "node " << v->getNumber() << " ("<< getBddNumber(v->getNumber()) << ") : " << v->getCNF_formula()->asString()<< endl;
@@ -463,7 +463,7 @@ DdNode* BddRepresentation::annotationToBddAnn(vertex* v){
 	Cudd_RecursiveDeref(mgrAnn, f);
 	annotation = tmp;
 		
-	trace(TRACE_5, "DdNode* BddRepresentation::annotationToBddAnn(vertex * v): end\n");		 
+	trace(TRACE_5, "DdNode* BddRepresentation::annotationToBddAnn(GraphNode * v): end\n");		 
 	return annotation;	
 }
 
@@ -861,9 +861,9 @@ void BddRepresentation::printMemoryInUse(){
 		    "  bytes (" << (Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn))/1024 << " KB; " << (Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn))/(1024*1024) << " MB)" << endl;
 }
 
-void BddRepresentation::testSymbRepresentation(vertex* v, bool visitedNodes[]){
+void BddRepresentation::testSymbRepresentation(GraphNode* v, bool visitedNodes[]){
 	
-	trace(TRACE_5, "BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]): start\n");
+	trace(TRACE_5, "BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]): start\n");
 	
 	//annotation
 	DdNode * annotation = annotationToBddAnn(v);
@@ -887,7 +887,7 @@ void BddRepresentation::testSymbRepresentation(vertex* v, bool visitedNodes[]){
 	GraphEdge* element;
 	
 	while((element = v->getNextSuccEdge()) != NULL){
-		vertex* vNext = element->getDstNode();
+		GraphNode* vNext = element->getDstNode();
 		
 		if (vNext != NULL) {
 		    
@@ -940,11 +940,11 @@ void BddRepresentation::testSymbRepresentation(vertex* v, bool visitedNodes[]){
 	}//end while
 		
 	Cudd_RecursiveDeref(mgrMp, states);
-	trace(TRACE_5, "BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]): end\n");	
+	trace(TRACE_5, "BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]): end\n");	
 }
 
 
-DdNode* BddRepresentation::statesToBddMp(vertex* v){
+DdNode* BddRepresentation::statesToBddMp(GraphNode* v){
 	StateSet::iterator iter;  // iterator over the stateList's elements
     DdNode* states = Cudd_Not(Cudd_ReadOne(mgrMp));
     Cudd_Ref(states);
@@ -994,7 +994,7 @@ DdNode* BddRepresentation::markingToBddMp(unsigned int * marking){
     return (bddMarking);
 }
 
-void BddRepresentation::calculateBound(vertex* v, bool visitedNodes[]){
+void BddRepresentation::calculateBound(GraphNode* v, bool visitedNodes[]){
 	if (v->reachGraphStateSet.size() != 0) {
             StateSet::iterator iter;  // iterator over the stateList's elements
 
@@ -1012,7 +1012,7 @@ void BddRepresentation::calculateBound(vertex* v, bool visitedNodes[]){
             GraphEdge * element;
 
             while ((element = v->getNextSuccEdge()) != NULL) {
-                vertex * vNext = element->getDstNode();
+                GraphNode * vNext = element->getDstNode();
 				
                 if (vNext->reachGraphStateSet.size() != 0 && 
                     vNext != NULL && 
@@ -1029,7 +1029,7 @@ unsigned int BddRepresentation::getBound(){
 	return bound;
 }
 
-void BddRepresentation::setMaxPlaceBits(vertex* v, bool visitedNodes[]){
+void BddRepresentation::setMaxPlaceBits(GraphNode* v, bool visitedNodes[]){
 	calculateBound(v, visitedNodes);
 	maxPlaceBits = nbrBits(bound);	
 	cout <<	"maxPlaceBits: " << maxPlaceBits << endl;

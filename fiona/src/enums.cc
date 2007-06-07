@@ -36,15 +36,15 @@
 
 using namespace std;
 
-vertexColor::vertexColor() : color_(RED)
+GraphNodeColor::GraphNodeColor() : color_(RED)
 {
 }
 
-vertexColor::vertexColor(vertexColor_enum color) : color_(color)
+GraphNodeColor::GraphNodeColor(GraphNodeColor_enum color) : color_(color)
 {
 }
 
-std::string vertexColor::toString() const
+std::string GraphNodeColor::toString() const
 {
     switch (color_)
     {
@@ -57,7 +57,7 @@ std::string vertexColor::toString() const
     return "undefined color";
 }
 
-vertexColor::operator vertexColor_enum() const
+GraphNodeColor::operator GraphNodeColor_enum() const
 {
     return color_;
 }

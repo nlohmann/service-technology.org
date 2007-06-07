@@ -38,7 +38,7 @@
 #include "debug.h"
 #include "successorNodeList.h"
 #include "owfn.h"
-#include "vertex.h"
+#include "GraphNode.h"
 
 
 //! \fn operatingGuidelines::operatingGuidelines(oWFN * _PN)
@@ -62,11 +62,11 @@ operatingGuidelines::~operatingGuidelines() {
 
 }
 
-//! \fn void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
+//! \fn void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_plus)
 //! \param currentNode current node of the graph
 //! \param progress_plus the additional progress when the subgraph starting at this node is finished 
 //! \brief builds up the graph recursively
-void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus) {
+void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_plus) {
 		
 	// at this point, the states inside the current node (currentNode) are already computed!
 	
@@ -114,8 +114,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 		if (currentNode->eventsUsed[i] < PN->getInputPlace(i)->max_occurence
             || (options[O_EVENT_USE_MAX] == false)) {
 
-			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
-			currentVertex = currentNode;
+			GraphNode * v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
+			currentGraphNode = currentNode;
 			
 			trace(TRACE_5, "calculating successor states\n");
 
@@ -135,11 +135,11 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 				delete v;
 			} else {
 				// was the new node computed before? 
-				vertex * found = findVertexInSet(v);
+				GraphNode * found = findGraphNodeInSet(v);
 			
 				if (found == NULL) {
 					// node was new, hence going down with sending event...
-					AddVertex(v, i, SENDING, true);
+					AddGraphNode(v, i, SENDING, true);
 					buildGraph(v, your_progress);
 	
 					if (v->getColor() == RED) {
@@ -150,8 +150,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 					actualDepth--;
 				} else {
 					// In case the successor node was already known, an edge to the old
-					// node is drawn by function AddVertex.
-					AddVertex(found, i, SENDING, false);
+					// node is drawn by function AddGraphNode.
+					AddGraphNode(found, i, SENDING, false);
 
 					// Still, if that node was computed red before, the literal
 					// of the edge from currentNode to the old node must be removed
@@ -210,17 +210,17 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 		if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] < PN->getOutputPlace(i)->max_occurence
             || (options[O_EVENT_USE_MAX] == false)) {
 				
-			vertex * v = new vertex(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new vertex of the graph
-			currentVertex = currentNode;
+			GraphNode * v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
+			currentGraphNode = currentNode;
 			
 			calculateSuccStatesOutput(PN->getOutputPlace(i)->index, currentNode, v);
 			
 			// was the new node computed before? 
-			vertex * found = findVertexInSet(v);
+			GraphNode * found = findGraphNodeInSet(v);
 			
 			if (found == NULL) {
 				// node was new, hence going down with receiving event...
-				AddVertex(v, i, RECEIVING, true);
+				AddGraphNode(v, i, RECEIVING, true);
 				// buildGraph(v, your_progress);
 				buildGraph(v, 0);
 				
@@ -232,8 +232,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 				actualDepth--;
 			} else {
 				// In case the successor node v was already known, an edge to the old
-				// node is drawn by function AddVertex.
-				AddVertex(found, i, RECEIVING, false);
+				// node is drawn by function AddGraphNode.
+				AddGraphNode(found, i, RECEIVING, false);
 
 				// Still, if that node was computed red before, the literal
 				// of the edge from currentNode to the old node must be removed in the
@@ -274,9 +274,9 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 }
 
 
-void operatingGuidelines::computeCNF(vertex* node) const {
+void operatingGuidelines::computeCNF(GraphNode* node) const {
 	
-	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): start\n");
+	trace(TRACE_5, "operatingGuidelines::computeCNF(GraphNode * node): start\n");
 	
 	// initially, the annoation is empty (and therefore equivalent to true)
 	assert(node->getCNF_formula()->asString() == "true");
@@ -368,7 +368,7 @@ void operatingGuidelines::computeCNF(vertex* node) const {
 		}
 	}
 
-	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): end\n");
+	trace(TRACE_5, "operatingGuidelines::computeCNF(GraphNode * node): end\n");
 }
 
 //! \fn void operatingGuidelines::convertToBdd()
@@ -451,7 +451,7 @@ void operatingGuidelines::printOGFile() const {
 }
 
 
-void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
+void operatingGuidelines::printNodesToOGFile(GraphNode * v, fstream& os,
     bool visitedNodes[]) const {
 
     if (v == NULL)
@@ -475,7 +475,7 @@ void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
     GraphEdge* edge;
     v->resetIteratingSuccNodes();
     while ((edge = v->getNextSuccEdge()) != NULL) {
-        vertex* vNext = edge->getDstNode();
+        GraphNode* vNext = edge->getDstNode();
 
         // do not process nodes already visited
         if (visitedNodes[vNext->getNumber()])
@@ -489,7 +489,7 @@ void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
 }
 
 
-void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
+void operatingGuidelines::printTransitionsToOGFile(GraphNode * v, fstream& os,
     bool visitedNodes[]) const {
 
     if (v == NULL)
@@ -507,7 +507,7 @@ void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
     GraphEdge* edge;
     v->resetIteratingSuccNodes();
     while ((edge = v->getNextSuccEdge()) != NULL) {
-        vertex* vNext = edge->getDstNode();
+        GraphNode* vNext = edge->getDstNode();
 
         if (!vNext->isToShow(root))
             continue;
@@ -532,7 +532,7 @@ void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
 }
 
 
-string operatingGuidelines::NodeNameForOG(const vertex* v) const {
+string operatingGuidelines::NodeNameForOG(const GraphNode* v) const {
     assert(v != NULL);
     return intToString(v->getNumber());
 }

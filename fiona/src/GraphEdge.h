@@ -38,12 +38,12 @@
 #include "enums.h"
 #include <string>
 
-class vertex;
+class GraphNode;
 
 class GraphEdge {
 private:
     /** Pointer to the node this arc is pointing to. */
-    vertex* dstNode;
+    GraphNode* dstNode;
 
     /** Label of the edge. */
     std::string label;
@@ -57,7 +57,7 @@ public:
      * @param dstNode Pointer to the node this edge is pointing to.
      * @param label label of this edge.
      */
-    GraphEdge(vertex* dstNode, const std::string& label);
+    GraphEdge(GraphNode* dstNode, const std::string& label);
 
     /**
      * Sets the nextElement of this edge to newNextElement.
@@ -82,12 +82,12 @@ public:
     /**
      * Returns the node this edge points to.
      */
-    vertex* getDstNode() const;
+    GraphNode* getDstNode() const;
 
     /**
      * Sets the node this edge points to to newDstNode.
      */
-    void setDstNode(vertex* newDstNode);
+    void setDstNode(GraphNode* newDstNode);
 
 #undef new
     /**

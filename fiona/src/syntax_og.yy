@@ -101,7 +101,7 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
 %union {
     char * str;
     CommGraphFormula* formula;
-    vertexColor_enum color;
+    GraphNodeColor_enum color;
 }
 
 /* the types of the non-terminal symbols */

@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*!
- * \file    vertex.h
+ * \file    GraphNode.h
  *
  * \brief   functions for handling of nodes of IG / OG
  *
@@ -31,60 +31,58 @@
  *
  */
 
-#ifndef VERTEX_H_
-#define VERTEX_H_
+#ifndef GraphNode_H_
+#define GraphNode_H_
 
 #include "mynew.h"
 #include "enums.h"
 #include "commGraphFormula.h"
-//#include <string>
-//#include <ostream>
-//#include <set>
-
-
-using namespace std;
-
 
 class State;
 class GraphEdge;
 class successorNodeList;
 class literal;
-//class CNF;
 class CNF_formula;
 
-
-struct StateCompare {
-  bool operator() ( State const * left, State const * right) {
-	    return (left < right);
-  }
-}; // StateCompare
-
-typedef std::set<State*, StateCompare> StateSet;
+typedef std::set<State*> StateSet;
 
 
-class vertex {
+class GraphNode {
+private:
+    /**
+     * Number of this GraphNode in the graph.
+     */
+    unsigned int number;
 
-protected:
-    unsigned int numberOfVertex;			//!< number of this vertex in the graph
+    /**
+     * Color of this GraphNode.
+     */
+    GraphNodeColor color;
 
-	vertexColor color; 						//!< color of vertex
 
-  //  CNF * firstClause;						//!< annotation of this node (a CNF)
-	CNF_formula* annotation;				//!< annotation of this node (a CNF) as a formula 
-	
-	
-	successorNodeList * successorNodes;		//!< list of all the nodes succeeding this one 
-											//!< including the edge between them
-	
-	successorNodeList * predecessorNodes;	//!< list of all blue nodes preceding this one 
-											//!< including the edge between them
+    /**
+     * Annotation of this node (a CNF) as a formula.
+     */
+    CNF_formula* annotation;
+
+    /**
+     * List of all the nodes succeeding this one including the edge between
+     * them
+     */
+    successorNodeList * successorNodes;
+
+    /**
+     * List of all blue nodes preceding this one including the edge between
+     * them.
+     */
+    successorNodeList * predecessorNodes;
 
 public:
     bool hasFinalStateInStateSet;
 
-	// vertex management
-	vertex(int);
-	~vertex ();
+	// GraphNode management
+	GraphNode(int);
+	~GraphNode ();
 
 	int * eventsUsed;
 	int eventsToBeSeen;
@@ -92,7 +90,7 @@ public:
     unsigned int getNumber() const;    
     void setNumber(unsigned int);
     
-	// states in vertex
+	// states in GraphNode
     bool addState(State *);
     int getNumberOfDeadlocks();
     
@@ -111,7 +109,7 @@ public:
 
 	// annotation
     CNF_formula* getCNF_formula();
-    string getCNFString();
+    std::string getCNFString();
     
     CommGraphFormulaAssignment* getAssignment();
     
@@ -122,27 +120,27 @@ public:
 	// analysis   
 	bool finalAnalysisDone;
 
-    vertexColor analyseNodeByFormula();
+    GraphNodeColor analyseNodeByFormula();
 
-    vertexColor getColor() const;
-    void setColor(vertexColor c);
+    GraphNodeColor getColor() const;
+    void setColor(GraphNodeColor c);
 
-    bool isToShow(const vertex* rootOfGraph) const;
+    bool isToShow(const GraphNode* rootOfGraph) const;
 
 	void removeLiteralFromFormula(unsigned int, GraphEdgeType);
 	
     void propagateToSuccessors();
     void propagateToPredecessors();
 
-//	friend bool operator == (vertex const&, vertex const& );		// could be changed and replaced by hash-value
-	friend bool operator < (vertex const&, vertex const& );
-//	friend ostream& operator << (std::ostream& os, const vertex& v);
+//	friend bool operator == (GraphNode const&, GraphNode const& );		// could be changed and replaced by hash-value
+	friend bool operator < (GraphNode const&, GraphNode const& );
+//	friend ostream& operator << (std::ostream& os, const GraphNode& v);
 
 // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
-    NEW_OPERATOR(vertex)
+    NEW_OPERATOR(GraphNode)
 #define new NEW_NEW
     
 };
 
-#endif /*VERTEX_H_*/
+#endif /*GraphNode_H_*/

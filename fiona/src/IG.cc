@@ -108,7 +108,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
 
 		if ((options[O_EVENT_USE_MAX] == false) ||
-             checkMaximalEvents(*iter, currentNode, sending)) {
+             checkMaximalEvents(*iter, currentNode, SENDING)) {
 	
 			trace(TRACE_2, "\t\t\t\t    sending event: !");
 			
@@ -126,7 +126,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 				numberDeletedVertices--;
 				delete v;
 			} else {
-				if (AddVertex (v, *iter, sending)) {
+				if (AddVertex (v, *iter, SENDING)) {
 
 #ifdef LOOP
 	cout << "calc next node? [y,n]" << endl;
@@ -149,7 +149,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	trace(TRACE_3, "iterating over outputSet\n");
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
         if ((options[O_EVENT_USE_MAX] == false) ||
-		     checkMaximalEvents(*iter, currentNode, receiving)) {
+		     checkMaximalEvents(*iter, currentNode, RECEIVING)) {
 			
 			trace(TRACE_2, "\t\t\t\t    output event: ?");
 	
@@ -158,7 +158,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 			
 			calculateSuccStatesOutput(*iter, currentNode, v);
 			
-			if (AddVertex (v, *iter, receiving)) {
+			if (AddVertex (v, *iter, RECEIVING)) {
 		
 #ifdef LOOP
 		cout << "calc next node? [y,n]" << endl;
@@ -226,7 +226,7 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 	// iterate over all elements of inputSet
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
         if ((options[O_EVENT_USE_MAX] == false) ||
-             checkMaximalEvents(*iter, currentNode, sending)) {
+             checkMaximalEvents(*iter, currentNode, SENDING)) {
 
 			trace(TRACE_2, "\t\t\t\t    input event: ?");
 
@@ -235,7 +235,7 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 			
 			calculateSuccStatesInput(*iter, currentNode, v);
 			
-			if (AddVertex (v, *iter, sending)) {
+			if (AddVertex (v, *iter, SENDING)) {
 				buildReducedGraph(v);
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 				//analyseNode(currentNode, false);
@@ -248,7 +248,7 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 	trace(TRACE_3, "iterating over outputSet\n");
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
         if ((options[O_EVENT_USE_MAX] == false) ||
-             checkMaximalEvents(*iter, currentNode, receiving)) {
+             checkMaximalEvents(*iter, currentNode, RECEIVING)) {
 		
 			trace(TRACE_2, "\t\t\t\t    output event: ?");
 		
@@ -258,7 +258,7 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 			calculateSuccStatesOutput(*iter, currentNode, v);
 	
 			
-			if (AddVertex (v, *iter, receiving)) {
+			if (AddVertex (v, *iter, RECEIVING)) {
 				buildReducedGraph(v);
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 				//analyseNode(currentNode, false);
@@ -275,16 +275,16 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 }
 
 
-//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, edgeType typeOfPlace)
+//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, GraphEdgeType typeOfPlace)
 //! \param messages
 //! \param currentNode the node from which the input event is to be sent
 //! \param typeOfPlace
 //! \brief checks whether the set of input messages contains at least one input message
 //! that has been sent at its maximum
-bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, edgeType typeOfPlace) {
+bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, GraphEdgeType typeOfPlace) {
 	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): start\n");
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		if (typeOfPlace == sending) {
+		if (typeOfPlace == SENDING) {
 			unsigned int i = 0;
 			while (i < PN->getInputPlaceCount()-1 && PN->getInputPlace(i) && 
 						PN->getInputPlace(i)->index != *iter) {
@@ -300,7 +300,7 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * cur
 				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
 				return false;
 			}
-		} else if (typeOfPlace == receiving) {
+		} else if (typeOfPlace == RECEIVING) {
 			unsigned int i = 0;
 			while (i < PN->getOutputPlaceCount()-1 && PN->getOutputPlace(i) && 
 						PN->getOutputPlace(i)->index != *iter) {

@@ -50,7 +50,7 @@ class interactionGraph : public communicationGraph {
 		interactionGraph(oWFN *);
 		~interactionGraph();
 	
-		bool checkMaximalEvents(messageMultiSet, vertex *, edgeType);	
+		bool checkMaximalEvents(messageMultiSet, vertex *, GraphEdgeType);	
 	
 	    void buildGraph();
     	void buildGraph(vertex * );

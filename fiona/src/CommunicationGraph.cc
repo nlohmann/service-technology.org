@@ -161,7 +161,7 @@ vertex * communicationGraph::findVertexInSet(vertex * toAdd) {
 
 //! \param toAdd a reference to the vertex that is to be added to the graph
 //! \param messages the label of the edge between the current vertex and the one to be added
-//! \param type the type of the edge (sending, receiving)
+//! \param type the type of the edge (SENDING, RECEIVING)
 //! \brief adding a new vertex/ edge to the graph
 //!
 //! if the graph already contains nodes, we first search the graph for a node that matches the new node
@@ -173,8 +173,8 @@ vertex * communicationGraph::findVertexInSet(vertex * toAdd) {
 //! and the node we have just found, the found one gets the current node as a predecessor node
 
 // for IG
-bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) {
-    trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : start\n");
+bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, GraphEdgeType type) {
+    trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, GraphEdgeType type) : start\n");
 
     if (numberOfNodes == 0) {                // graph contains no nodes at all
         root = toAdd;                           // the given node becomes the root node
@@ -189,7 +189,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
         bool comma = false;
         unsigned int offset = 0;
 
-        if (type == receiving) {
+        if (type == RECEIVING) {
             offset = PN->getInputPlaceCount();
         }
 
@@ -208,7 +208,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             comma = true;
 
             unsigned int i = 0;
-            if (type == receiving) {
+            if (type == RECEIVING) {
                 while (i < PN->getOutputPlaceCount() && PN->getOutputPlace(i)->index != *iter) {
                     i++;
                 }
@@ -230,7 +230,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 
             toAdd->setNumber(numberOfNodes++);
 
-            graphEdge * edgeSucc = new graphEdge(toAdd, label, type);
+            GraphEdge * edgeSucc = new GraphEdge(toAdd, label);
             numberOfEdges++;
 
             currentVertex->addSuccessorNode(edgeSucc);
@@ -239,7 +239,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             currentVertex = toAdd;
 
             if (currentVertex->getColor() != RED) {
-                graphEdge * edgePred = new graphEdge(currentVertex, label, type);
+                GraphEdge * edgePred = new GraphEdge(currentVertex, label);
                 toAdd->addPredecessorNode(edgePred);
             }
 
@@ -247,26 +247,26 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 
             numberOfStatesAllNodes += toAdd->reachGraphStateSet.size();
 
-            trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
+            trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
 
             return true;
         } else {
             trace(TRACE_1, "\t successor node already known: " + intToString(found->getNumber()) + "\n");
 
-            graphEdge * edgeSucc = new graphEdge(found, label, type);
+            GraphEdge * edgeSucc = new GraphEdge(found, label);
             numberOfEdges++;
 
             currentVertex->addSuccessorNode(edgeSucc);
             // currentVertex->setAnnotationEdges(edgeSucc);
 
             if (currentVertex->getColor() != RED) {
-                graphEdge * edgePred = new graphEdge(currentVertex, label, type);
+                GraphEdge * edgePred = new GraphEdge(currentVertex, label);
                 found->addPredecessorNode(edgePred);
             }
 
             delete toAdd;
 
-            trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
+            trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
 
             return false;
         }
@@ -277,9 +277,9 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 
 
 // for OG
-void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type, bool isnew) {
+void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, GraphEdgeType type, bool isnew) {
 
-    trace(TRACE_5, "reachGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type): start\n");
+    trace(TRACE_5, "reachGraph::AddVertex(vertex * toAdd, unsigned int label, GraphEdgeType type): start\n");
     // If the last argument is true, then the node toAdd represents a fresh node
     // that has to be added.
 
@@ -292,7 +292,7 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
     assert(setOfVertices.size() > 0);
 
     string edgeLabel;
-    if (type == sending) {
+    if (type == SENDING) {
         edgeLabel = PN->getInputPlace(label)->getLabelForCommGraph();
     } else {
         edgeLabel = PN->getOutputPlace(label)->getLabelForCommGraph();
@@ -305,7 +305,7 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
         numberOfBlueNodes++; // all nodes initially blue
 
         // draw a new edge to the new node
-        graphEdge * edgeSucc = new graphEdge(toAdd, edgeLabel, type);
+        GraphEdge * edgeSucc = new GraphEdge(toAdd, edgeLabel);
         numberOfEdges++;
 
         currentVertex->addSuccessorNode(edgeSucc);
@@ -315,14 +315,14 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
             toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
         }
 
-        if (type == receiving) {
+        if (type == RECEIVING) {
             offset = PN->getInputPlaceCount();
         }
 
         toAdd->eventsUsed[offset + label]++;
 
         if (currentVertex->getColor() != RED) {
-            graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
+            GraphEdge * edgePred = new GraphEdge(currentVertex, edgeLabel);
             toAdd->addPredecessorNode(edgePred);
         }
 
@@ -332,24 +332,24 @@ void communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 
         numberOfStatesAllNodes += toAdd->reachGraphStateSet.size();
 
-        trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
+        trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, GraphEdgeType type): end\n");
 
     } else {
         trace(TRACE_1, "\t computed successor node already known: " + intToString(toAdd->getNumber()) + "\n");
 
         // draw a new edge to the old node
-        graphEdge * edgeSucc = new graphEdge(toAdd, edgeLabel, type);
+        GraphEdge * edgeSucc = new GraphEdge(toAdd, edgeLabel);
         numberOfEdges++;
 
         currentVertex->addSuccessorNode(edgeSucc);
         // currentVertex->setAnnotationEdges(edgeSucc);
 
         if (currentVertex->getColor() != RED) {
-            graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
+            GraphEdge * edgePred = new GraphEdge(currentVertex, edgeLabel);
             toAdd->addPredecessorNode(edgePred);
         }
 
-        trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
+        trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, GraphEdgeType type): end\n");
     }
 }
 
@@ -645,10 +645,10 @@ void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedN
 
         v->resetIteratingSuccNodes();
         visitedNodes[v->getNumber()] = true;
-        graphEdge * element;
+        GraphEdge * element;
 
         while ((element = v->getNextSuccEdge()) != NULL) {
-            vertex * vNext = element->getNode();
+            vertex * vNext = element->getDstNode();
             if (vNext->getColor() == BLUE &&
                 (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
 
@@ -909,11 +909,11 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
 
     v->resetIteratingSuccNodes();
     visitedNodes[v->getNumber()] = 1;
-    graphEdge * element;
+    GraphEdge * element;
     string label;
 
     while ((element = v->getNextSuccEdge()) != NULL) {
-        vertex * vNext = element->getNode();
+        vertex * vNext = element->getDstNode();
 
         if (!vNext->isToShow(root))
             continue;

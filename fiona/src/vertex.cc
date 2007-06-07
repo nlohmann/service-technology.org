@@ -116,11 +116,11 @@ void vertex::setNumber(unsigned int _number) {
 }
 
 
-//! \fn void vertex::addSuccessorNode(graphEdge * edge) 
+//! \fn void vertex::addSuccessorNode(GraphEdge * edge) 
 //! \param edge pointer to the edge which is to point to the successor node
 //! \brief adds the node v to the list of successor nodes of this node using the edge
 //! given by the parameters
-void vertex::addSuccessorNode(graphEdge * edge) {
+void vertex::addSuccessorNode(GraphEdge * edge) {
 	if (successorNodes == NULL) {
 		successorNodes = new successorNodeList();
 	}
@@ -130,11 +130,11 @@ void vertex::addSuccessorNode(graphEdge * edge) {
 }
 
 
-//! \fn void vertex::addPredecessorNode(graphEdge * edge) 
+//! \fn void vertex::addPredecessorNode(GraphEdge * edge) 
 //! \param edge pointer to the edge which is to point to the predecessor node
 //! \brief adds the node v to the list of preceding nodes of this node using the edge
 //! given by the parameters
-void vertex::addPredecessorNode(graphEdge * edge) {
+void vertex::addPredecessorNode(GraphEdge * edge) {
 	if (predecessorNodes == NULL) {
 		predecessorNodes = new successorNodeList();
 	}
@@ -159,10 +159,10 @@ void vertex::addClause(CommGraphFormulaMultiaryOr* myclause) {
 }
 
 
-void vertex::removeLiteralFromFormula(unsigned int i, edgeType type) {
-	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, edgeType type) : start\n");
+void vertex::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) {
+	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) : start\n");
 	
-	if (type == sending) {
+	if (type == SENDING) {
 		//cout << "remove literal " << PN->getInputPlace(i)->getLabelForCommGraph() << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
 		annotation->removeLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
 	} else {
@@ -170,14 +170,14 @@ void vertex::removeLiteralFromFormula(unsigned int i, edgeType type) {
 		annotation->removeLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
 	}
 	
-	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, edgeType type) : end\n");
+	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) : end\n");
 }
 
 
-//! \fn graphEdge * vertex::getNextSuccEdge()
+//! \fn GraphEdge * vertex::getNextSuccEdge()
 //! \return pointer to the next edge of the successor node list
 //! \brief returns a pointer to the next edge of the successor node list
-graphEdge * vertex::getNextSuccEdge() {
+GraphEdge * vertex::getNextSuccEdge() {
 	if (successorNodes != NULL) {
 		return successorNodes->getNextElement();
 	} else {
@@ -186,10 +186,10 @@ graphEdge * vertex::getNextSuccEdge() {
 }
 
 
-//! \fn graphEdge * vertex::getNextPredEdge()
+//! \fn GraphEdge * vertex::getNextPredEdge()
 //! \return pointer to the next edge of the successor node list
 //! \brief returns a pointer to the next edge of the successor node list
-graphEdge * vertex::getNextPredEdge() {
+GraphEdge * vertex::getNextPredEdge() {
 	if (predecessorNodes != NULL) {
 		return predecessorNodes->getNextElement();
 	} else {
@@ -240,9 +240,9 @@ CommGraphFormulaAssignment* vertex::getAssignment() {
 	// traverse outgoing edges and set the corresponding literals
 	// to true if the respective node is BLUE
     this->resetIteratingSuccNodes();
-    graphEdge* edge;
+    GraphEdge* edge;
     while ((edge = this->getNextSuccEdge()) != NULL) {
-		if (edge->getNode()->getColor() == BLUE) {
+		if (edge->getDstNode()->getColor() == BLUE) {
             myassignment->setToTrue(edge->getLabel());
 		}
 	}
@@ -310,11 +310,11 @@ int vertex::getNumberOfDeadlocks() {
 //! successor nodes
 void vertex::propagateToSuccessors() {
 	resetIteratingSuccNodes();
-	graphEdge * element;
+	GraphEdge * element;
 
     while ((element = getNextSuccEdge()) != NULL) {
-    	if (element->getNode()->getColor() != RED) {
-    		element->getNode()->analyseNodeByFormula();	// analyse the successor node again
+    	if (element->getDstNode()->getColor() != RED) {
+    		element->getDstNode()->analyseNodeByFormula();	// analyse the successor node again
     	}
     }
 }
@@ -324,14 +324,14 @@ void vertex::propagateToSuccessors() {
 //! predecessor nodes
 void vertex::propagateToPredecessors() {
 	resetIteratingPredNodes();
-	graphEdge * element;
+	GraphEdge * element;
 
     while ((element = getNextPredEdge()) != NULL) {
-    	if (element->getNode()->getColor() != RED && element->getNode()->finalAnalysisDone) {
-    		element->getNode()->analyseNodeByFormula();	// analyse the preceding node again
+    	if (element->getDstNode()->getColor() != RED && element->getDstNode()->finalAnalysisDone) {
+    		element->getDstNode()->analyseNodeByFormula();	// analyse the preceding node again
     	}
-    	if (element->getNode()->getColor() == RED) {
-    		predecessorNodes->removeNodeFromList(element->getNode(), true);			
+    	if (element->getDstNode()->getColor() == RED) {
+    		predecessorNodes->removeNodeFromList(element->getDstNode(), true);			
     	}
     }   
 }

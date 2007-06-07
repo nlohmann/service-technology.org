@@ -56,10 +56,10 @@ successorNodeList::~successorNodeList() {
 	deleteList(firstElement);
 }
 
-//! \fn void successorNodeList::deleteList(graphEdge * element)
+//! \fn void successorNodeList::deleteList(GraphEdge * element)
 //! \param element pointer to the next element
 //! \brief deletes the whole list recursively
-void successorNodeList::deleteList(graphEdge * element) {
+void successorNodeList::deleteList(GraphEdge * element) {
 	if (element == NULL) {
 		return;
 	} else {
@@ -69,17 +69,17 @@ void successorNodeList::deleteList(graphEdge * element) {
 	delete element;
 }
 
-//! \fn void successorNodeList::addNextNode(graphEdge * newEdge)
+//! \fn void successorNodeList::addNextNode(GraphEdge * newEdge)
 //! \param newEdge the edge which is to be added to the list
 //! \brief adding an additional node to the end of the list
-void successorNodeList::addNextNode(graphEdge * newEdge) {
+void successorNodeList::addNextNode(GraphEdge * newEdge) {
 
 	if (firstElement == NULL) {
 		firstElement = newEdge;
 		return;
 	}
 
-	graphEdge * tmpEdge = firstElement;
+	GraphEdge * tmpEdge = firstElement;
 
 	while (tmpEdge) {
 		if (tmpEdge->getNextElement() != NULL) {
@@ -101,10 +101,10 @@ void successorNodeList::resetIterating() {
 }
 
 
-//! \fn graphEdge * successorNodeList::getNextElement()
-//! \return a pointer to the next graphEdge in case of iterating through the list, NULL if the end of the list has been reached
-//! \brief returns a pointer to the next graphEdge in case of iterating through the list, NULL if the end of the list has been reached
-graphEdge * successorNodeList::getNextElement() {
+//! \fn GraphEdge * successorNodeList::getNextElement()
+//! \return a pointer to the next GraphEdge in case of iterating through the list, NULL if the end of the list has been reached
+//! \brief returns a pointer to the next GraphEdge in case of iterating through the list, NULL if the end of the list has been reached
+GraphEdge * successorNodeList::getNextElement() {
 	if (duringIteration) {
 		// we have to return the next element
 		if (nextElement == NULL) {
@@ -137,12 +137,12 @@ void successorNodeList::removeNodeFromList(vertex * node, bool iterating) {
 		return;	
 	}
 
-	graphEdge * prevEdge = firstElement;
-	graphEdge * tmpEdge = firstElement;
+	GraphEdge * prevEdge = firstElement;
+	GraphEdge * tmpEdge = firstElement;
 	
 	while (tmpEdge) {
 		// test if this edge is the one to be removed
-		if (tmpEdge->getNode() == node) {
+		if (tmpEdge->getDstNode() == node) {
 			if (tmpEdge == firstElement) {
 				firstElement = tmpEdge->getNextElement();
 				nextElement = NULL;

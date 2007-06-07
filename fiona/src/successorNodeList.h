@@ -47,8 +47,8 @@ class vertex;
 class successorNodeList {
 
 private:    
-    graphEdge * firstElement;	//!< pointer to the first element of the list
-    graphEdge * nextElement;	//!< pointer to the next element in the list while iterating through the list
+    GraphEdge * firstElement;	//!< pointer to the first element of the list
+    GraphEdge * nextElement;	//!< pointer to the next element in the list while iterating through the list
 public:    
     bool duringIteration;			/*!< we have reached the end of the iterating process, or not */
     
@@ -56,11 +56,11 @@ public:
     successorNodeList();    
     ~successorNodeList(); 
     
-    void deleteList(graphEdge *);   
-    void addNextNode(graphEdge *);
+    void deleteList(GraphEdge *);   
+    void addNextNode(GraphEdge *);
     
     void resetIterating();
-    graphEdge * getNextElement();
+    GraphEdge * getNextElement();
     
 	void removeNodeFromList(vertex *, bool);
     

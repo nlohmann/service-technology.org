@@ -183,10 +183,10 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 	if (v->getColor() == BLUE) {	
 		if (v->reachGraphStateSet.size() != 0){
 			visitedNodes[v->getNumber()] = 1;
-			graphEdge* element;
+			GraphEdge* element;
 			
 			while((element = v->getNextSuccEdge()) != NULL){;
-				vertex* vNext = element->getNode();
+				vertex* vNext = element->getDstNode();
 				
 				if (vNext->getColor() == BLUE && 
 				    vNext->reachGraphStateSet.size() != 0 &&
@@ -256,10 +256,10 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 	
 	if (v->reachGraphStateSet.size() != 0){
 		
-		graphEdge* element;
+		GraphEdge* element;
 		
 		while((element = v->getNextSuccEdge()) != NULL){
-			vertex* vNext = element->getNode();
+			vertex* vNext = element->getDstNode();
 			if (vNext != NULL){
 												
 				//label
@@ -884,10 +884,10 @@ void BddRepresentation::testSymbRepresentation(vertex* v, bool visitedNodes[]){
 	
 	v->resetIteratingSuccNodes();	
 	visitedNodes[v->getNumber()] = 1;
-	graphEdge* element;
+	GraphEdge* element;
 	
 	while((element = v->getNextSuccEdge()) != NULL){
-		vertex* vNext = element->getNode();
+		vertex* vNext = element->getDstNode();
 		
 		if (vNext != NULL) {
 		    
@@ -1009,10 +1009,10 @@ void BddRepresentation::calculateBound(vertex* v, bool visitedNodes[]){
             }
             v->resetIteratingSuccNodes();
             visitedNodes[v->getNumber()] = 1;
-            graphEdge * element;
+            GraphEdge * element;
 
             while ((element = v->getNextSuccEdge()) != NULL) {
-                vertex * vNext = element->getNode();
+                vertex * vNext = element->getDstNode();
 				
                 if (vNext->reachGraphStateSet.size() != 0 && 
                     vNext != NULL && 

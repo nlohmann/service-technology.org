@@ -36,35 +36,67 @@
 
 #include "mynew.h"
 #include "enums.h"
-#include <stddef.h>
 #include <string>
-
-using namespace std;
 
 class vertex;
 
-class graphEdge {
-
+class GraphEdge {
 private:
-    vertex * node;				//!< pointer to the node this arc is pointing to
-    std::string label;			//!< label of the arc (usually the name of the event)
-    edgeType type;  			//!< type of the arc (sending, receiving)
-    graphEdge * nextElement;	//!< pointer to the next element in list
+    /** Pointer to the node this arc is pointing to. */
+    vertex* dstNode;
+
+    /** Label of the edge. */
+    std::string label;
+
+    /** pointer to the next element in list */
+    GraphEdge* nextElement;
 
 public:
-	graphEdge(vertex *, const string&, edgeType);
-	~graphEdge();
-	void setNextElement(graphEdge *);
-	graphEdge * getNextElement();
-	string getLabel() const;
-	edgeType getType();
-	vertex * getNode();
-	void setNode(vertex *);
+    /**
+     * Constructs a GraphEdge.
+     * @param dstNode Pointer to the node this edge is pointing to.
+     * @param label label of this edge.
+     */
+    GraphEdge(vertex* dstNode, const std::string& label);
 
-// Provides user defined operator new. Needed to trace all new operations on this class.
+    /**
+     * Sets the nextElement of this edge to newNextElement.
+     */
+    void setNextElement(GraphEdge* newNextElement);
+
+    /**
+     * Returns the next element in the GraphEdge list.
+     */
+    GraphEdge* getNextElement() const;
+
+    /**
+     * Returns the label of this edge.
+     */
+    std::string getLabel() const;
+
+    /**
+     * Returns the type if this edge. (RECEIVING or SENDING)
+     */
+    GraphEdgeType getType() const;
+
+    /**
+     * Returns the node this edge points to.
+     */
+    vertex* getDstNode() const;
+
+    /**
+     * Sets the node this edge points to to newDstNode.
+     */
+    void setDstNode(vertex* newDstNode);
+
 #undef new
-    NEW_OPERATOR(graphEdge)
+    /**
+     * Provides user defined operator new. Needed to trace all new operations
+     * on this class.
+     */
+    NEW_OPERATOR(GraphEdge)
 #define new NEW_NEW
 };
+
 #endif //GRAPHEDGE_H
 

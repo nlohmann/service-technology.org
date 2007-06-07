@@ -126,8 +126,8 @@ public:
 
     vertex * findVertexInSet(vertex *);
 
-    void AddVertex(vertex *, unsigned int, edgeType, bool);
-    bool AddVertex(vertex *, messageMultiSet, edgeType);
+    void AddVertex(vertex *, unsigned int, GraphEdgeType, bool);
+    bool AddVertex(vertex *, messageMultiSet, GraphEdgeType);
 
     void analyseNode(vertex *);
 	

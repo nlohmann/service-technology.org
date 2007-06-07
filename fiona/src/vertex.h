@@ -46,7 +46,7 @@ using namespace std;
 
 
 class State;
-class graphEdge;
+class GraphEdge;
 class successorNodeList;
 class literal;
 //class CNF;
@@ -100,11 +100,11 @@ public:
 //    StateSet setOfStatesTemp;	// this set contains all states
 
 	// traversing successors/predecessors
-    void addSuccessorNode(graphEdge *);
-    void addPredecessorNode(graphEdge *);
+    void addSuccessorNode(GraphEdge *);
+    void addPredecessorNode(GraphEdge *);
 
-    graphEdge * getNextSuccEdge();
-    graphEdge * getNextPredEdge();
+    GraphEdge * getNextSuccEdge();
+    GraphEdge * getNextPredEdge();
 
     void resetIteratingSuccNodes();
     void resetIteratingPredNodes();
@@ -129,7 +129,7 @@ public:
 
     bool isToShow(const vertex* rootOfGraph) const;
 
-	void removeLiteralFromFormula(unsigned int, edgeType);
+	void removeLiteralFromFormula(unsigned int, GraphEdgeType);
 	
     void propagateToSuccessors();
     void propagateToPredecessors();

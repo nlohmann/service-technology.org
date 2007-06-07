@@ -139,11 +139,11 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 			
 				if (found == NULL) {
 					// node was new, hence going down with sending event...
-					AddVertex(v, i, sending, true);
+					AddVertex(v, i, SENDING, true);
 					buildGraph(v, your_progress);
 	
 					if (v->getColor() == RED) {
-						currentNode->removeLiteralFromFormula(i, sending);
+						currentNode->removeLiteralFromFormula(i, SENDING);
 					}
 
 					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
@@ -151,13 +151,13 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 				} else {
 					// In case the successor node was already known, an edge to the old
 					// node is drawn by function AddVertex.
-					AddVertex(found, i, sending, false);
+					AddVertex(found, i, SENDING, false);
 
 					// Still, if that node was computed red before, the literal
 					// of the edge from currentNode to the old node must be removed
 					// in the annotation of currentNode.
 					if (found->getColor() == RED) {
-						currentNode->removeLiteralFromFormula(i, sending);
+						currentNode->removeLiteralFromFormula(i, SENDING);
 					}
 					delete v;
 
@@ -170,7 +170,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 			trace(TRACE_2, string(PN->getInputPlace(i)->name));
 			trace(TRACE_2, " suppressed (max_occurence reached)\n");
 
-			currentNode->removeLiteralFromFormula(i, sending);
+			currentNode->removeLiteralFromFormula(i, SENDING);
 
 			addProgress(your_progress);
 			printProgress();
@@ -220,12 +220,12 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 			
 			if (found == NULL) {
 				// node was new, hence going down with receiving event...
-				AddVertex(v, i, receiving, true);
+				AddVertex(v, i, RECEIVING, true);
 				// buildGraph(v, your_progress);
 				buildGraph(v, 0);
 				
 				if (v->getColor() == RED) {
-					currentNode->removeLiteralFromFormula(i, receiving);
+					currentNode->removeLiteralFromFormula(i, RECEIVING);
 				}
 
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
@@ -233,13 +233,13 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 			} else {
 				// In case the successor node v was already known, an edge to the old
 				// node is drawn by function AddVertex.
-				AddVertex(found, i, receiving, false);
+				AddVertex(found, i, RECEIVING, false);
 
 				// Still, if that node was computed red before, the literal
 				// of the edge from currentNode to the old node must be removed in the
 				// annotation of currentNode.
 				if (found->getColor() == RED) {
-					currentNode->removeLiteralFromFormula(i, receiving);
+					currentNode->removeLiteralFromFormula(i, RECEIVING);
 				}
 				delete v;
 
@@ -251,7 +251,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 			trace(TRACE_2, string(PN->getOutputPlace(i)->name));
 			trace(TRACE_2, " suppressed (max_occurence reached)\n");
 
-			currentNode->removeLiteralFromFormula(i, receiving);
+			currentNode->removeLiteralFromFormula(i, RECEIVING);
 
 //			addProgress(your_progress);
 //			printProgress();
@@ -472,10 +472,10 @@ void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
     visitedNodes[v->getNumber()] = true;
 
     // recursively process successor nodes that have not been visited yet
-    graphEdge* edge;
+    GraphEdge* edge;
     v->resetIteratingSuccNodes();
     while ((edge = v->getNextSuccEdge()) != NULL) {
-        vertex* vNext = edge->getNode();
+        vertex* vNext = edge->getDstNode();
 
         // do not process nodes already visited
         if (visitedNodes[vNext->getNumber()])
@@ -504,10 +504,10 @@ void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
     visitedNodes[v->getNumber()] = true;
 
     // recursively process successor nodes that have not been visited yet
-    graphEdge* edge;
+    GraphEdge* edge;
     v->resetIteratingSuccNodes();
     while ((edge = v->getNextSuccEdge()) != NULL) {
-        vertex* vNext = edge->getNode();
+        vertex* vNext = edge->getDstNode();
 
         if (!vNext->isToShow(root))
             continue;

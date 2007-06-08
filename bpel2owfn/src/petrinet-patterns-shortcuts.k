@@ -27,11 +27,11 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/05/14 13:15:55 $
+ * \date    \$Date: 2007/06/08 12:27:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
 */
 %}
 
@@ -383,22 +383,39 @@ void dpeLinks(Transition *t, int id, int parent_id = 0)
       assert(globals::ASTEmap[*linkID] != NULL);
       string linkName = globals::ASTEmap[*linkID]->linkName;
 
-      Place *p1 = PN.newPlace(toString(parent_id) + ".internal.resetLink." + toString(*linkID));
-      Place *p2 = PN.newPlace(toString(parent_id) + ".internal.resetedLink." + toString(*linkID));
+      Place *p1 = PN.findPlace(toString(parent_id) + ".internal.resetLink." + toString(*linkID));
+      Place *p2 = PN.findPlace(toString(parent_id) + ".internal.resetedLink." + toString(*linkID));
+
+      if ( p1 == NULL )
+      {
+        p1 = PN.newPlace(toString(parent_id) + ".internal.resetLink." + toString(*linkID));
+      }
+      if ( p2 == NULL )
+      {
+        p2 = PN.newPlace(toString(parent_id) + ".internal.resetedLink." + toString(*linkID));
+        PN.newArc(p2, PN.findTransition(toString(globals::ASTEmap[*linkID]->parentActivityId) + ".internal.join"));
+      }
 
       PN.newArc(t, p1);
 
-      Transition *t1 = PN.newTransition(toString(parent_id) + ".internal.reset_true." + linkName);
-      PN.newArc(p1, t1);
-      PN.newArc(PN.findPlace("link." + linkName), t1);
-      PN.newArc(t1, p2);
+      Transition *t1 = PN.findTransition(toString(parent_id) + ".internal.reset_true." + linkName);
+      if ( t1 == NULL )
+      {
+        t1 = PN.newTransition(toString(parent_id) + ".internal.reset_true." + linkName);
+        PN.newArc(p1, t1);
+        PN.newArc(PN.findPlace("link." + linkName), t1);
+        PN.newArc(t1, p2);
+      }
 
-      Transition *t2 = PN.newTransition(toString(parent_id) + ".internal.reset_false." + linkName);
-      PN.newArc(p1, t2);
-      PN.newArc(PN.findPlace("!link." + linkName), t2);
-      PN.newArc(t2, p2);
+      Transition *t2 = PN.findTransition(toString(parent_id) + ".internal.reset_false." + linkName);
+      if ( t2 == NULL )
+      {
+        t2 = PN.newTransition(toString(parent_id) + ".internal.reset_false." + linkName);
+        PN.newArc(p1, t2);
+        PN.newArc(PN.findPlace("!link." + linkName), t2);
+        PN.newArc(t2, p2);
+      }
 
-      PN.newArc(p2, PN.findTransition(toString(globals::ASTEmap[*linkID]->parentActivityId) + ".internal.join"));
     }
   }
 

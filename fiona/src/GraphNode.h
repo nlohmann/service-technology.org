@@ -99,13 +99,10 @@ public:
 
 	// traversing successors/predecessors
     void addSuccessorNode(GraphEdge *);
-    void addPredecessorNode(GraphEdge *);
 
     GraphEdge * getNextSuccEdge();
-    GraphEdge * getNextPredEdge();
 
     void resetIteratingSuccNodes();
-    void resetIteratingPredNodes();
 
 	// annotation
     CNF_formula* getCNF_formula();

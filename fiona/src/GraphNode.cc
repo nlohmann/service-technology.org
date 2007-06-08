@@ -128,19 +128,6 @@ void GraphNode::addSuccessorNode(GraphEdge * edge) {
 }
 
 
-//! \fn void GraphNode::addPredecessorNode(GraphEdge * edge) 
-//! \param edge pointer to the edge which is to point to the predecessor node
-//! \brief adds the node v to the list of preceding nodes of this node using the edge
-//! given by the parameters
-void GraphNode::addPredecessorNode(GraphEdge * edge) {
-	if (predecessorNodes == NULL) {
-		predecessorNodes = new successorNodeList();
-	}
-	predecessorNodes->addNextNode(edge);
-	return;
-}
-
-
 //! \fn void GraphNode::addState(State * s) 
 //! \param s pointer to the state that is to be added to this node
 //! \brief adds the state s to the list of states
@@ -184,18 +171,6 @@ GraphEdge * GraphNode::getNextSuccEdge() {
 }
 
 
-//! \fn GraphEdge * GraphNode::getNextPredEdge()
-//! \return pointer to the next edge of the successor node list
-//! \brief returns a pointer to the next edge of the successor node list
-GraphEdge * GraphNode::getNextPredEdge() {
-	if (predecessorNodes != NULL) {
-		return predecessorNodes->getNextElement();
-	} else {
-		return NULL;
-	}
-}
-
-
 //! \fn void GraphNode::resetIteratingSuccNodes()
 //! \brief resets the iteration process of the successor node list
 void GraphNode::resetIteratingSuccNodes() {
@@ -206,19 +181,6 @@ void GraphNode::resetIteratingSuccNodes() {
 	}
 	
 	trace(TRACE_5, "GraphNode::resetIteratingSuccNodes() : end\n");
-}
-
-
-//! \fn void GraphNode::resetIteratingPredNodes()
-//! \brief resets the iteration process of the successor node list
-void GraphNode::resetIteratingPredNodes() {
-	trace(TRACE_5, "GraphNode::resetIteratingPredNodes() : start\n");
-	
-	if (predecessorNodes != NULL) {
-		predecessorNodes->resetIterating();
-	}
-	
-	trace(TRACE_5, "GraphNode::resetIteratingPredNodes() : end\n");
 }
 
 

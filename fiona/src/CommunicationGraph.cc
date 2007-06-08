@@ -206,11 +206,6 @@ bool communicationGraph::AddGraphNode (GraphNode * toAdd, messageMultiSet messag
 
             currentGraphNode = toAdd;
 
-            if (currentGraphNode->getColor() != RED) {
-                GraphEdge * edgePred = new GraphEdge(currentGraphNode, label);
-                toAdd->addPredecessorNode(edgePred);
-            }
-
             setOfVertices.insert(toAdd);
             trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
 
@@ -222,11 +217,6 @@ bool communicationGraph::AddGraphNode (GraphNode * toAdd, messageMultiSet messag
 
             currentGraphNode->addSuccessorNode(edgeSucc);
             // currentGraphNode->setAnnotationEdges(edgeSucc);
-
-            if (currentGraphNode->getColor() != RED) {
-                GraphEdge * edgePred = new GraphEdge(currentGraphNode, label);
-                found->addPredecessorNode(edgePred);
-            }
 
             delete toAdd;
 
@@ -283,11 +273,6 @@ void communicationGraph::AddGraphNode(GraphNode * toAdd, unsigned int label, Gra
 
         toAdd->eventsUsed[offset + label]++;
 
-        if (currentGraphNode->getColor() != RED) {
-            GraphEdge * edgePred = new GraphEdge(currentGraphNode, edgeLabel);
-            toAdd->addPredecessorNode(edgePred);
-        }
-
         currentGraphNode = toAdd;
 
         setOfVertices.insert(toAdd);
@@ -302,11 +287,6 @@ void communicationGraph::AddGraphNode(GraphNode * toAdd, unsigned int label, Gra
 
         currentGraphNode->addSuccessorNode(edgeSucc);
         // currentGraphNode->setAnnotationEdges(edgeSucc);
-
-        if (currentGraphNode->getColor() != RED) {
-            GraphEdge * edgePred = new GraphEdge(currentGraphNode, edgeLabel);
-            toAdd->addPredecessorNode(edgePred);
-        }
 
         trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * toAdd, unsigned int label, GraphEdgeType type): end\n");
     }

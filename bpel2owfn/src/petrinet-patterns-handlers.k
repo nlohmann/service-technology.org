@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/05/03 12:50:07 $
+ * \date    \$Date: 2007/06/08 12:31:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 %}
 
@@ -330,6 +330,9 @@ void PCompensationHandler(impl_tCompensationHandler* abstract_phylum, uview curr
 
   header(phylum->id, true);
 
+  if ( globals::ASTEmap[phylum->id]->callable )
+  {
+
   // Unparse inner activity.
   phylum->activity_1->unparse(pseudoPrinter, current_view);
 
@@ -341,6 +344,7 @@ void PCompensationHandler(impl_tCompensationHandler* abstract_phylum, uview curr
   PN.mergePlaces((toString(globals::ASTEmap[phylum->id]->parentScopeId) + ".internal.ch_stop"),    (toString(phylum->activity_1->id) + ".stop"));
   PN.mergePlaces((toString(globals::ASTEmap[phylum->id]->parentScopeId) + ".internal.ch_stopped"), (toString(phylum->activity_1->id) + ".stopped"));
 
+  }
 
 // OLD CODE FOR LOOPCOUNT
 //	    if (globals::ASTEmap[phylum->id]->ancestorLoops().size() != 0 && parameters[P_LOOPCOUNT])

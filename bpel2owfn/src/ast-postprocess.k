@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/06/07 10:53:43 $
+ * \date    \$Date: 2007/06/08 10:39:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.185 $
+ * \version \$Revision: 1.186 $
  */
 %}
 
@@ -1455,6 +1455,12 @@ Compensate(a,_id) ->
 
       // the parent scope has to deal with a compensate
       globals::ASTEmap[myself->parentActivityId]->hasCompensate = true;
+      for (set< unsigned int >::iterator scope =  globals::ASTEmap[myself->parentActivityId]->enclosedScopes.begin();
+                                         scope != globals::ASTEmap[myself->parentActivityId]->enclosedScopes.begin(); 
+                                         scope++)
+      {
+        globals::ASTEmap[ globals::ASTEmap[ *scope ]->enclosedCH ]->callable = true;
+      }
     }
     a
     {

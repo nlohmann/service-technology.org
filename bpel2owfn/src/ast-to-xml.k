@@ -28,11 +28,11 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/05/25 10:59:37 $
+ * \date    \$Date: 2007/06/08 10:39:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.79 $
+ * \version \$Revision: 1.80 $
  *
  * \todo    Add support for the <terminationHandler>
  */
@@ -104,7 +104,7 @@ Partner(a,_id) ->
 ******************************************************************************/
 
 FaultHandlers(a,b,_id) ->
-  [xml: { inup(); } "<faultHandlers id=\"" _id "\">\n" a b { indown(); } "</faultHandlers>\n"]
+  [xml: { inup(); } "<faultHandlers id=\"" _id "\" callable=\"" { *output << globals::ASTEmap[ _id->value ]->callable; } "\">\n" a b { indown(); } "</faultHandlers>\n"]
 ;
 
 Catch(a,_id) ->
@@ -154,7 +154,7 @@ OnAlarm(a,b,_id) ->
 ******************************************************************************/
  
 CompensationHandler(a,_id) ->
-  [xml: { inup(); } "<compensationHandler id=\"" _id "\">\n" a { indown(); } "</compensationHandler>\n"]
+  [xml: { inup(); } "<compensationHandler id=\"" _id "\" callable=\"" { *output << globals::ASTEmap[ _id->value ]->callable; } "\">\n" a { indown(); } "</compensationHandler>\n"]
 ;
 
 

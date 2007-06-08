@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/06/07 10:53:43 $
+ * \date    \$Date: 2007/06/08 10:39:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.130 $
+ * \version \$Revision: 1.131 $
  */
 
 
@@ -88,7 +88,7 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype) :
   highlighted(false), 
   enclosedFH(0),
   enclosedCH(0),
-  callable(true),
+  callable(false),
   hasCompensate(false),
   isUserDefined(true),
   controlFlow(POSITIVECF), 

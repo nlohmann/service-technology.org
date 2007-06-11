@@ -27,11 +27,11 @@
  * This file defines and implements unparse rules to unparse BPEL to XML.
  * 
  * \author  Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2007-04-18
  *
- * \date    \$Date: 2007/05/25 10:59:37 $
+ * \date    \$Date: 2007/06/11 12:25:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  *
  */
 
@@ -122,6 +122,12 @@ FaultHandlers(a,b,_id) ->
     ${
        {
          (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"FaultHandlers\";" << endl;  
+          if ( !globals::ASTEmap[_id->value]->callable )
+          {
+            (*output) << "\tcolor = grey70;" << endl;
+            (*output) << "\tfillcolor = grey80;" << endl;
+            (*output) << "\tfontcolor = grey60;" << endl;
+          }
        }
        a b
        {
@@ -213,6 +219,12 @@ CompensationHandler(a,_id) ->
     ${
        {
          (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"CompensationHandler\";" << endl;  
+          if ( !globals::ASTEmap[_id->value]->callable )
+          {
+            (*output) << "\tcolor = grey70;" << endl;
+            (*output) << "\tfillcolor = grey80;" << endl;
+            (*output) << "\tfontcolor = grey60;" << endl;
+          }
        }
        a
        {
@@ -235,6 +247,12 @@ TerminationHandler(a,_id) ->
     ${
        {
          (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"TerminationHandler\";" << endl;  
+          if ( !globals::ASTEmap[_id->value]->callable )
+          {
+            (*output) << "\tcolor = grey70;" << endl;
+            (*output) << "\tfillcolor = grey80;" << endl;
+            (*output) << "\tfontcolor = grey60;" << endl;
+          }
        }
        a
        {

@@ -554,8 +554,10 @@ void communicationGraph::printNodeStatistics() {
 
     trace(TRACE_0, "    number of nodes: " + intToString(myNumberOfNodes) + "\n");
     trace(TRACE_0, "    number of edges: " + intToString(myNumberOfEdges) + "\n");
+    trace(TRACE_0, "    number of deleted nodes: " + intToString(numberDeletedVertices) + "\n");
     trace(TRACE_0, "    number of blue nodes: " + intToString(myNumberOfBlueNodes) + "\n");
     trace(TRACE_0, "    number of blue edges: " + intToString(myNumberOfBlueEdges) + "\n");
+    trace(TRACE_0, "    number of states calculated: " + intToString(State::card) + "\n");
     trace(TRACE_0, "    number of states stored in nodes: " + intToString(myNumberOfStoredStates) + "\n");
 }
 
@@ -674,7 +676,7 @@ void communicationGraph::addProgress(double toAddValue) {
 //! changed significantly and depending on the debug-level set
 void communicationGraph::printProgress() {
 
-    return;
+//    return;
 
     int progress_step_size = 5;
     int current_progress = int(100 * global_progress);

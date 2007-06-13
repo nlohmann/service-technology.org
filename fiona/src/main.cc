@@ -76,7 +76,7 @@ extern int og_yyparse();
 extern int og_yylex_destroy();
 #endif
 
-extern unsigned int State::card;
+unsigned int State::card = 0;
 // extern char * netfile;
 extern list<char*> netfiles;
 extern OGFromFile* OGToParse;
@@ -500,14 +500,13 @@ int main(int argc, char ** argv) {
                 trace(TRACE_0, "NO\n\n");
             }
 
+            // STATISTICS
             trace(TRACE_0, "OG statistics:\n");
             graph->printNodeStatistics();
-            trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
-            trace(TRACE_0, "    number of states calculated: " + intToString(State::card) + "\n");
             trace(TRACE_0, "\n");
 
-            graph->printDotFile();
-            graph->printOGFile();
+            graph->printDotFile();      // .out
+            graph->printOGFile();       // .og
             
             if (options[O_OTF]) {
                 //graph->bdd->printDotFile();
@@ -560,13 +559,12 @@ int main(int argc, char ** argv) {
                 trace(TRACE_0, "NO\n\n");
             }
 
+            // STATISTICS
             trace(TRACE_0, "IG statistics:\n");
             graph->printNodeStatistics();
-            trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
-            trace(TRACE_0, "    number of states calculated: " + intToString(State::card) + "\n");
             trace(TRACE_0, "\n");
 
-            graph->printDotFile();
+            graph->printDotFile();      // .out
 
             trace(TRACE_5, "computation finished -- trying to delete graph\n");
 //				trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();

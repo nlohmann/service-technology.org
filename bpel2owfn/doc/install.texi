@@ -226,8 +226,8 @@ Several test processes to self-test BPEL2oWFN. The sub-directory
 and the @acronym{BPEL4WS} 1.2 specification, respectively. The sub-directory
 @file{sa_tests} contains, for each supported static analysis goal, a test
 file that triggers the respective static analysis error message. Finally,
-sub-directory @file{consistency} contains processes to check the
-@samp{consistency} mode.
+sub-directoris @file{consistency} and @file{bpel4chor} contain processes to check the
+@samp{choreography} mode.
 
 The tests can be triggered with @samp{make check}.
 @end table

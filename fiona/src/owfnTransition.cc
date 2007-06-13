@@ -282,7 +282,7 @@ void owfnTransition::fire(oWFN * PN) {
 		if (PN->CurrentMarking[decrOwfnPlace->index] < decrPlace.getMultiplicity()) {
 			PN->printCurrentMarking();
       		cerr << "marking of place " << decrOwfnPlace->name << " is: " << PN->CurrentMarking[decrOwfnPlace->index] << " but transition " << this->name << " consumes: " << decrPlace.getMultiplicity() << endl;
-			cerr << "number of states calculated so far: " << State::card << endl;
+			cerr << "number of states calculated so far: " << State::state_count << endl;
 			_exit(4);
 		} else {
 			PN->CurrentMarking[decrOwfnPlace->index] -= decrPlace.getMultiplicity();

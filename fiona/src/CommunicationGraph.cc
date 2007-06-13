@@ -231,65 +231,41 @@ bool communicationGraph::AddGraphNode (GraphNode * toAdd, messageMultiSet messag
 
 
 // for OG
-void communicationGraph::AddGraphNode(GraphNode * toAdd, unsigned int label, GraphEdgeType type, bool isnew) {
+void communicationGraph::AddGraphNode(GraphNode * toAdd, unsigned int label, GraphEdgeType type) {
 
     trace(TRACE_5, "reachGraph::AddGraphNode(GraphNode * toAdd, unsigned int label, GraphEdgeType type): start\n");
-    // If the last argument is true, then the node toAdd represents a fresh node
-    // that has to be added.
-
-    // If the last argument is false, then the node toAdd represents the node that
-    // was computed before and only the edge to that node has to be added (and not the node itself).
-
-    int offset = 0;
 
     assert(getNumberOfNodes() > 0);
     assert(setOfVertices.size() > 0);
 
+    // preparing the new edge
+    int offset = 0;
     string edgeLabel;
     if (type == SENDING) {
         edgeLabel = PN->getInputPlace(label)->getLabelForCommGraph();
     } else {
         edgeLabel = PN->getOutputPlace(label)->getLabelForCommGraph();
+        offset = PN->getInputPlaceCount();
     }
 
-    // if (options[O_BDD] == true || isnew) {
-    if (isnew) {
-        trace(TRACE_1, "\n\t new successor node computed:");
-        toAdd->setNumber(getNumberOfNodes());
-
-        // draw a new edge to the new node
-        GraphEdge * edgeSucc = new GraphEdge(toAdd, edgeLabel);
-
-        currentGraphNode->addSuccessorNode(edgeSucc);
-        // currentGraphNode->setAnnotationEdges(edgeSucc);
-
-        for (unsigned int i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
-            toAdd->eventsUsed[i] = currentGraphNode->eventsUsed[i];
-        }
-
-        if (type == RECEIVING) {
-            offset = PN->getInputPlaceCount();
-        }
-
-        toAdd->eventsUsed[offset + label]++;
-
-        currentGraphNode = toAdd;
-
-        setOfVertices.insert(toAdd);
-
-        trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * toAdd, unsigned int label, GraphEdgeType type): end\n");
-
-    } else {
-        trace(TRACE_1, "\t computed successor node already known: " + intToString(toAdd->getNumber()) + "\n");
-
-        // draw a new edge to the old node
-        GraphEdge * edgeSucc = new GraphEdge(toAdd, edgeLabel);
-
-        currentGraphNode->addSuccessorNode(edgeSucc);
-        // currentGraphNode->setAnnotationEdges(edgeSucc);
-
-        trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * toAdd, unsigned int label, GraphEdgeType type): end\n");
+    // preparing the new node
+    toAdd->setNumber(getNumberOfNodes());
+    for (unsigned int i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
+        toAdd->eventsUsed[i] = currentGraphNode->eventsUsed[i];
     }
+    toAdd->eventsUsed[offset + label]++;
+    setOfVertices.insert(toAdd);
+
+    // add a new edge to the new node
+    GraphEdge* newEdge = new GraphEdge(toAdd, edgeLabel);
+
+    // add the new node to successorNodeList
+    currentGraphNode->addSuccessorNode(newEdge);
+
+    // exiting
+    currentGraphNode = toAdd;
+
+    trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * toAdd, unsigned int label, GraphEdgeType type): end\n");
 }
 
 
@@ -557,7 +533,7 @@ void communicationGraph::printNodeStatistics() {
     trace(TRACE_0, "    number of deleted nodes: " + intToString(numberDeletedVertices) + "\n");
     trace(TRACE_0, "    number of blue nodes: " + intToString(myNumberOfBlueNodes) + "\n");
     trace(TRACE_0, "    number of blue edges: " + intToString(myNumberOfBlueEdges) + "\n");
-    trace(TRACE_0, "    number of states calculated: " + intToString(State::card) + "\n");
+    trace(TRACE_0, "    number of states calculated: " + intToString(State::state_count) + "\n");
     trace(TRACE_0, "    number of states stored in nodes: " + intToString(myNumberOfStoredStates) + "\n");
 }
 
@@ -676,7 +652,7 @@ void communicationGraph::addProgress(double toAddValue) {
 //! changed significantly and depending on the debug-level set
 void communicationGraph::printProgress() {
 
-//    return;
+    return;
 
     int progress_step_size = 5;
     int current_progress = int(100 * global_progress);

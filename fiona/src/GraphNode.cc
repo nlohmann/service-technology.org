@@ -145,17 +145,17 @@ void GraphNode::addClause(CommGraphFormulaMultiaryOr* myclause) {
 
 
 void GraphNode::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) {
-	trace(TRACE_5, "GraphNode::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) : start\n");
-	
-	if (type == SENDING) {
-		//cout << "remove literal " << PN->getInputPlace(i)->getLabelForCommGraph() << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
-		annotation->removeLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
-	} else {
-		//cout << "remove literal " << PN->getOutputPlace(i)->getLabelForCommGraph() << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
-		annotation->removeLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
-	}
-	
-	trace(TRACE_5, "GraphNode::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) : end\n");
+    trace(TRACE_5, "GraphNode::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) : start\n");
+
+    if (type == SENDING) {
+        //cout << "remove literal " << PN->getInputPlace(i)->getLabelForCommGraph() << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
+        annotation->removeLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
+    } else {
+        //cout << "remove literal " << PN->getOutputPlace(i)->getLabelForCommGraph() << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
+        annotation->removeLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
+    }
+
+    trace(TRACE_5, "GraphNode::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) : end\n");
 }
 
 

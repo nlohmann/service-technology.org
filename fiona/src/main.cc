@@ -76,7 +76,7 @@ extern int og_yyparse();
 extern int og_yylex_destroy();
 #endif
 
-unsigned int State::card = 0;
+extern unsigned int State::state_count;
 // extern char * netfile;
 extern list<char*> netfiles;
 extern OGFromFile* OGToParse;
@@ -279,7 +279,7 @@ int main(int argc, char ** argv) {
 			numberOfDecodes = 0;
 			
 			garbagefound = 0;
-			State::card = 0;          // number of states
+			State::state_count = 0;          // number of states
 			
 			numberDeletedVertices = 0;
 			
@@ -434,7 +434,7 @@ int main(int argc, char ** argv) {
 
         numberOfDecodes = 0;
         garbagefound = 0;
-        State::card = 0;          // number of states
+        State::state_count = 0;          // number of states
         numberDeletedVertices = 0;
 
         trace(TRACE_0, "--------------------------------------------------------------\n");
@@ -477,6 +477,9 @@ int main(int argc, char ** argv) {
 			// ---------------- operating guideline is built ---------------------
 
             operatingGuidelines * graph = new operatingGuidelines(PN);
+            
+            cout << "states: " << State::state_count << endl;
+            
             trace(TRACE_0, "building the operating guideline...\n");
             seconds = time (NULL);
     
@@ -493,6 +496,8 @@ int main(int argc, char ** argv) {
             trace(TRACE_0, "\nbuilding the operating guideline finished.\n\n");
             cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
     
+            cout << "states: " << State::state_count << endl;
+
             trace(TRACE_0, "\nnet is controllable: ");
             if (graph->getRoot()->getColor() == BLUE) {
                 trace(TRACE_0, "YES\n\n");

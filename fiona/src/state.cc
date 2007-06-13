@@ -52,7 +52,7 @@ State::State() :
 				parent(NULL),
 				type(TRANS)
                 {
-	card++;
+	state_count++;
 }
 
 //! \fn State::~State()

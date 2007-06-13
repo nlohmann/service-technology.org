@@ -105,7 +105,8 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 
 	trace(TRACE_2, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
-	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
+	for (setOfMessages::iterator iter = inputSet.begin();
+         iter != inputSet.end(); iter++) {
 
 		if ((options[O_EVENT_USE_MAX] == false) ||
              checkMaximalEvents(*iter, currentNode, SENDING)) {

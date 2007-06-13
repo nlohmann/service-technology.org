@@ -52,6 +52,7 @@ operatingGuidelines::operatingGuidelines(oWFN * _PN) : communicationGraph(_PN) {
 	 }
 }
 
+
 //! \fn operatingGuidelines::~operatingGuidelines() 
 //! \brief destructor
 operatingGuidelines::~operatingGuidelines() {
@@ -62,15 +63,18 @@ operatingGuidelines::~operatingGuidelines() {
 
 }
 
+
 //! \fn void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_plus)
 //! \param currentNode current node of the graph
 //! \param progress_plus the additional progress when the subgraph starting at this node is finished 
 //! \brief builds up the graph recursively
 void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_plus) {
-		
-	// at this point, the states inside the current node (currentNode) are already computed!
-	
-	actualDepth++;
+
+    // currentNode is the root of the current subgraph
+    // currentGraphNode is the parent of currentNode
+    // at this point, the states inside currentNode are already computed!
+
+    actualDepth++;
 
 	trace(TRACE_1, "\n=================================================================\n");
 	trace(TRACE_1, "\t current node: ");
@@ -110,13 +114,12 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 
 		trace(TRACE_2, "\t\t\t\t    sending event: !");
 		trace(TRACE_2, string(PN->getInputPlace(i)->name) + "\n");
-		
+
 		if (currentNode->eventsUsed[i] < PN->getInputPlace(i)->max_occurence
             || (options[O_EVENT_USE_MAX] == false)) {
 
-			GraphNode * v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
-			currentGraphNode = currentNode;
-			
+			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
+
 			trace(TRACE_5, "calculating successor states\n");
 
 			calculateSuccStatesInput(PN->getInputPlace(i)->index, currentNode, v);
@@ -129,34 +132,39 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 
                 currentNode->removeLiteralFromFormula(i, SENDING);
 
-				numberDeletedVertices--;
-
 				addProgress(your_progress);
 				printProgress();
-				
+
+                numberDeletedVertices--;      // elsewise deletion of v is counted twice
 				delete v;
 			} else {
-				// was the new node computed before? 
-				GraphNode* found = findGraphNodeInSet(v);
-			
+				// was the new node v computed before? 
+                GraphNode* found = findGraphNodeInSet(v);
+                
                 if (found == NULL) {
-                    // node is new -> calling AddGraphNode with true
+                    // node v is new
+                    currentGraphNode = currentNode; // remember me as the parent
+
+                    // calling AddGraphNode with true
                     // meaning that the node as well as the edge to it is added 
-                    AddGraphNode(v, i, SENDING, true);
+                    AddGraphNode(v, i, SENDING);
 
                     // going down with sending event...
                     buildGraph(v, your_progress);
 
+                    trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
                     if (v->getColor() == RED) {
                         currentNode->removeLiteralFromFormula(i, SENDING);
                     }
-
-					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-					actualDepth--;
+                    actualDepth--;
 				} else {
-                    // node was computed before -> calling AddGraphNode with false
-                    // meaning the AddGraphNode only adds the new edge to the old node
-					AddGraphNode(found, i, SENDING, false);
+                    // node was computed before, so only add a new edge to the old node
+                    trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
+            
+                    // draw a new SENDING edge to the old node
+                    string edgeLabel = PN->getInputPlace(i)->getLabelForCommGraph();
+                    GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
+                    currentNode->addSuccessorNode(newEdge);
 
 					// Still, if that node was computed red before, the literal
 					// of the edge from currentNode to the old node must be removed
@@ -182,7 +190,6 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
         }
         i++;
     }
-
 
 	/**
 	@todo This check, whether a node's annotation is satisfiable, should be
@@ -211,37 +218,41 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 
 		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
 		trace(TRACE_2, string(PN->getOutputPlace(i)->name) + "\n");
-	    
+
 		if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] < PN->getOutputPlace(i)->max_occurence
             || (options[O_EVENT_USE_MAX] == false)) {
-				
-			GraphNode * v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
-			currentGraphNode = currentNode;
-			
+
+			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
 			calculateSuccStatesOutput(PN->getOutputPlace(i)->index, currentNode, v);
-			
+
 			// was the new node computed before? 
-			GraphNode * found = findGraphNodeInSet(v);
+			GraphNode* found = findGraphNodeInSet(v);
 			
 			if (found == NULL) {
-                // node is new -> calling AddGraphNode with true
+                // node v is new
+                currentGraphNode = currentNode; // remember me as the parent
+
+                // calling AddGraphNode with true
                 // meaning that the node as well as the edge to it is added 
-				AddGraphNode(v, i, RECEIVING, true);
+                AddGraphNode(v, i, RECEIVING);
 
                 // going down with receiving event...
 				// buildGraph(v, your_progress);
 				buildGraph(v, 0);
 				
+                trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 				if (v->getColor() == RED) {
 					currentNode->removeLiteralFromFormula(i, RECEIVING);
 				}
-
-				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 				actualDepth--;
 			} else {
-                // node was computed before -> calling AddGraphNode with false
-                // meaning the AddGraphNode only adds the new edge to the old node
-                AddGraphNode(found, i, RECEIVING, false);
+                // node was computed before, so only add a new edge to the old node
+                trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
+
+                // draw a new RECEIVING edge to the old node
+                string edgeLabel = PN->getOutputPlace(i)->getLabelForCommGraph();
+                GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
+                currentNode->addSuccessorNode(newEdge);
 
 				// Still, if that node was computed red before, the literal
 				// of the edge from currentNode to the old node must be removed in the
@@ -273,8 +284,8 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
     analyseNode(currentNode);
 
 	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + toUpper(currentNode->getColor().toString()));
-	trace(TRACE_3, " via formula " + currentNode->getCNF_formula()->asString() + "\n");	
-		
+	trace(TRACE_3, " via formula " + currentNode->getCNF_formula()->asString() + "\n");
+
 	if (options[O_OTF]) {
 		//cout << "currentNode: " << currentNode->getNumber() << endl;	
 		bdd->addOrDeleteLeavingEdges(currentNode);
@@ -314,13 +325,13 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
 					myclause->addSubFormula(myliteral);
 				}
-				
+
 				// get all input events
 				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
 					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
 					myclause->addSubFormula(myliteral);
 				}
-				
+
 				// get all activated output events
 				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
 					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
@@ -330,7 +341,7 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 				}
 
 				node->addClause(myclause);
-				
+
 				// TODO: an dieser stelle prüfen, ob myclause false ist -> dann knoten rot machen
 			}
 		}
@@ -342,13 +353,13 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 			 iter != PN->setOfStatesTemp.end(); iter++) {
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
 				// we just consider the maximal states only
-				
+
 				// get the marking of this state
 				(*iter)->decodeShowOnly(PN);
-							
+
 				// this clause's first literal
 				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
-				
+
 				// in case of a final state we add special literal "final" to the clause
 				if ((*iter)->type == FINALSTATE) {
 					node->hasFinalStateInStateSet = true;
@@ -356,7 +367,7 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
 					myclause->addSubFormula(myliteral);
 				}
-				
+
 				// get all the input events
 				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
 					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
@@ -379,6 +390,7 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 	trace(TRACE_5, "operatingGuidelines::computeCNF(GraphNode * node): end\n");
 }
 
+
 //! \fn void operatingGuidelines::convertToBdd()
 //! \brief converts an OG into its BDD representation
 void operatingGuidelines::convertToBdd() {
@@ -397,6 +409,7 @@ void operatingGuidelines::convertToBdd() {
 
     trace(TRACE_5,"operatingGuidelines::convertToBdd(): end\n");
 }
+
 
 //! \fn void operatingGuidelines::convertToBddFull()
 //! \brief converts an OG into its BDD representation including the red nodes and the markings of the nodes
@@ -427,6 +440,7 @@ void operatingGuidelines::convertToBddFull() {
 	delete testbdd;
     trace(TRACE_5,"operatingGuidelines::convertToBdd(): end\n");
 }
+
 
 void operatingGuidelines::printOGFile() const {
     string ogFilename = netfile;

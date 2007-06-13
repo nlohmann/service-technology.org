@@ -90,8 +90,8 @@ class communicationGraph {
 protected:
 	oWFN* PN;                            //!< pointer to the underlying petri net
 
-	GraphNode* root;                        //!< the root node of the graph
-	GraphNode* currentGraphNode;               //!< the GraphNode we are working on at a certain time
+	GraphNode* root;                     //!< the root node of the graph
+	GraphNode* currentGraphNode;         //!< the GraphNode we are working on at a certain time
 
 	void addProgress(double);
 
@@ -112,8 +112,8 @@ public:
 
     GraphNode * findGraphNodeInSet(GraphNode *);
 
-    void AddGraphNode(GraphNode *, unsigned int, GraphEdgeType, bool);
-    bool AddGraphNode(GraphNode *, messageMultiSet, GraphEdgeType);
+    void AddGraphNode(GraphNode *, unsigned int, GraphEdgeType);        // for OG
+    bool AddGraphNode(GraphNode *, messageMultiSet, GraphEdgeType);     // for IG
 
     void analyseNode(GraphNode *);
 	

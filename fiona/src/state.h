@@ -48,7 +48,7 @@ public:
     ~State();
 
     /** number of states */
-    static unsigned int card;
+    static unsigned int state_count;
 
     /** number of transitions to be fired */
     unsigned int CardFireList;

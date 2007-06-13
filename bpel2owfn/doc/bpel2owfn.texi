@@ -366,7 +366,16 @@ Print version information and exit.
 @itemx -i @var{filename}.bpel
 Read a @acronym{BPEL} process from file @file{@var{filename}.bpel}.
 If this parameter is omitted, input is read from standard input
-(@code{stdin}).
+(@code{stdin}). When combined with the @samp{choreography} mode,
+wildcards such as @file{process*.bpel} are also allowed.
+
+@item --wsdl=@var{filename}.wsdl
+@itemx -w @var{filename}.wsdl
+Read a @acronym{WSDL} file to support the translation.
+
+@item --topology=@var{filename}.xml
+@itemx -t @var{filename}.xml
+Read a @acronym{BPEL4Chor} participant topology file to support the translation of @acronym{BPEL4Chor} choreographies. Can only be used with the @samp{choreography} mode.
 
 @item --output[=@var{filename}]
 @itemx -o
@@ -415,7 +424,7 @@ Displays messages from Bison. Can be combined with any other debug level.
 @item --reduce=0-5
 @itemx -r 0-5
 Apply several structural reduction rules to the generated Petri net model
-(implies mode @samp{petrinet} or @samp{consistency}). The rules preserve
+(implies mode @samp{petrinet} or @samp{choreography}). The rules preserve
 deadlocks, livelocks and all deadlock-free communicating partners. The rules
 are organized in reduction levels:
 
@@ -489,17 +498,20 @@ processes such as cyclic control links or read access to uninitialized
 variables can be detected statically. Furthermore, faulty constellations such
 as conflicting receiving activities can be found using the @samp{cfg} mode.
 
-@item consistency
+@item choreography
 
-The @samp{consistency} mode is an extension of the @samp{petrinet} mode. In the
-consistency mode, several @acronym{BPEL} processes can be parsed, and a Petri
+The @samp{choreography} mode@footnote{This mode was formally called @samp{consinstency}.} is an extension of the @samp{petrinet} mode. In the
+choreography mode, several @acronym{BPEL} processes can be parsed, and a Petri
 net model of their composition is generated.
 
-The @samp{consistency} mode is in beta stage. It is not fully tested.
-For examples, check the @file{test5} test script in the @file{tests} directory.
+For examples, check @file{test/bpel4chor} directory.
 When combined with @acronym{LoLA} file output, an additional @file{.task} file
 is generated. With the help of this file @acronym{LoLA} can check for weak
 termination of the composition.
+
+Note that the choreography mode is only tested with the @samp{small} mode.
+To support the translation of a @acronym{BPEL4Chor} choreography, a participant topology
+can be additionally parsed using the @samp{topology} parameter.
 
 @item petrinet
 
@@ -533,9 +545,9 @@ These options control some Petri net-related options.
 @itemx -p @var{par}
 
 @table @samp
-@item communicationonly
+@item small
 
-Only the communicational behavior of the input @acronym{BPEL} process is
+With the @samp{small} parameter@footnote{This mode was formally called @samp{communicationonly}.}, only the communicational behavior of the input @acronym{BPEL} process is
 modeled. That is, the negative control flow (fault, termination, or compensation handlers, as well as @code{<exit>}, @code{<throw>}, @code{<compensate>}, @code{<compensateScope>} activities) is not translated to
 the Petri net model. When combined with @samp{reduce}, this parameter yields
 the most compact Petri net model.
@@ -598,7 +610,7 @@ of the given file formats are the same. You cannot, for example, create @acronym
 @samp{pretty}, whereas @acronym{LoLA} requires the mode @samp{petrinet}.
 
 @table @asis
-@item Petri net file formats (imply mode @samp{petrinet} or @samp{consistency}):
+@item Petri net file formats (imply mode @samp{petrinet} or @samp{choreography}):
 
 @table @samp
 @item apnn
@@ -737,7 +749,7 @@ PostScript file @file{sample.ps}.
 Reads the file @file{sample.bpel} and prints the abstract syntax tree
 (@acronym{AST}) to standard output.
 
-@item bpel2owfn -m consistency -i service1.bpel -i service2.bpel -f lola -o
+@item bpel2owfn -m choreography -i service1.bpel -i service2.bpel -f lola -o
 
 Reads the files @file{service1.bpel} and @file{service2.bpel} and creates
 a Petri net model of their composition. The result is written to the
@@ -1159,7 +1171,7 @@ detected in an abstract process are reported as warnings.
 An @code{<opaqueActivity>} of an abstract process is modeled by an @code{<empty>} activity.
 
 @item 117 @tab notice @tab
-When using the parameter @samp{communicationonly}, the occurrence of join
+When using the parameter @samp{small}, the occurrence of join
 failures is not modeled. Thus, any activity is treated as if the
 attribute @samp{suppressJoinFailure} is set to @samp{yes}.@footnote{If the
 attribute @samp{suppressJoinFailure} is not explicitly defined for an
@@ -1174,11 +1186,11 @@ A user-defined transition condition is ignored and modeled as ``1-out-of-@i{n}''
 (XOR) instead.
 
 @item 120 @tab notice @tab
-When using the parameter @samp{communicationonly}, the FTC (fault, termination,
+When using the parameter @samp{small}, the FTC (fault, termination,
 and compensation) handlers are not modeled.
 
 @item 121 @tab notice @tab
-When using the parameter @samp{communicationonly}, activities of the negative
+When using the parameter @samp{small}, activities of the negative
 control flow (@code{<exit>}, @code{<throw>}, @code{<compensate>}, and
 @code{<compensateScope>}) are replaced by an @code{<empty>} activity.
 
@@ -1359,11 +1371,11 @@ The manipulated process looks like this:
 
 Each activity is printed together with its attributes. Note that the standard values of several attributes (e.g., @samp{abstractProcess} or @samp{suppressJoinFailure}) are added. Furthermore, an identifier (attribute @samp{id}) was added to every activity.
 
-We now want to create a compact Petri net model of the @acronym{BPEL} process, using the @samp{petrinet} mode and the @samp{communicationonly} parameter:
+We now want to create a compact Petri net model of the @acronym{BPEL} process, using the @samp{petrinet} mode and the @samp{small} parameter:
 
 @cartouche
 @smallexample
-bpel2owfn -i example.bpel -m petrinet -p communicationonly
+bpel2owfn -i example.bpel -m petrinet -p small
 @end smallexample
 @end cartouche
 
@@ -1377,7 +1389,7 @@ The generated Petri net model consists of five places, including one input and o
 
 @cartouche
 @smallexample
-bpel2owfn -i example.bpel -m petrinet -p communicationonly -f dot -o
+bpel2owfn -i example.bpel -m petrinet -p small -f dot -o
 @end smallexample
 @end cartouche
 
@@ -1408,7 +1420,7 @@ obvious for larger processes. To this end,
 
 @cartouche
 @smallexample
-bpel2owfn -i example.bpel -m petrinet -p communicationonly -f info
+bpel2owfn -i example.bpel -m petrinet -p small -f info
 @end smallexample
 @end cartouche
 
@@ -1459,7 +1471,7 @@ analysis tools. In this case, we want to create a Fiona open workflow net execut
 
 @cartouche
 @smallexample
-bpel2owfn -i example.bpel -m petrinet -p communicationonly -f ownf -o
+bpel2owfn -i example.bpel -m petrinet -p small -f owfn -o
 @end smallexample
 @end cartouche
 
@@ -1470,7 +1482,7 @@ which creates a file @file{example.owfn}:
 @{
   generated by: BPEL2oWFN 2.0.1
   input file:   `example.bpel' (process `exampleprocess')
-  invocation:   `bpel2owfn -i example.bpel -m petrinet -p communicationonly -f owfn'
+  invocation:   `bpel2owfn -i example.bpel -m petrinet -p small -f owfn'
   net size:     |P|=5, |P_in|= 1, |P_out|= 1, |T|=2, |F|=6
 @}
 

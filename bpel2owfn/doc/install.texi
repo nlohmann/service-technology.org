@@ -633,14 +633,13 @@ As of @value{UPDATED-MONTH}, we use the following system developing and
 building BPEL2oWFN:
 
 @itemize
-@item Intel Pentium M processor, 1.60 GHz
+@item Apple MacBook
 @item 2 GB RAM
-@item Microsoft Windows Vista Business
-@item Cygwin with cygwin.dll version 1.5.24-2
-@item GNU Compiler Collection 3.4.4 (cygming special, gdc 0.12, using dmd 0.125)
-@item Flex version 2.5.4
+@item Mac OS X 10.4.9 (Tiger)
+@item GNU Compiler Collection 4.0.1 (Apple Computer, Inc. build 5367)
+@item Flex version 2.5.33
 @item GNU Bison version 2.3
-@item Kimwitu++ version 2.3.10
+@item Kimwitu++ version 2.3.11
 @end itemize
 
 The version numbers are not to be understood as system requirements, but as a
@@ -847,6 +846,23 @@ a detailed description in the manual
 @item transitions of the Petri net model are labeled and colored according to their role (only for dot mode)
 @item Petri net reduction rules can be chosen using the @samp{reduce} option
 @item improved performance of composition of nets in the @samp{consistency} mode
+@end itemize
+@end itemize
+
+
+
+@unnumberedsubsec Version 2.0.2 (15 June 2007)
+
+@itemize --
+@item new features:
+@itemize
+@item @acronym{BPEL4Chor} choreographies can be translated (further information to come)
+@item @acronym{WSDL} files can be parsed to support the translation of a BPEL process
+@item abstract @acronym{BPEL} processes (both @acronym{BPEL4WS} 1.1 and @acronym{WS-BPEL} 2.0) are now parsed
+@end itemize
+@item miscellaneous:
+@itemize
+@item when parsing multiple @acronym{BPEL} processes, wildcard like @file{*.bpel} can be used
 @end itemize
 @end itemize
 

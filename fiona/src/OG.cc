@@ -127,6 +127,8 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 				trace(TRACE_2, PN->getInputPlace(i)->name);
 				trace(TRACE_2, " suppressed (message bound violated)\n");
 
+                currentNode->removeLiteralFromFormula(i, SENDING);
+
 				numberDeletedVertices--;
 
 				addProgress(your_progress);
@@ -135,22 +137,25 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 				delete v;
 			} else {
 				// was the new node computed before? 
-				GraphNode * found = findGraphNodeInSet(v);
+				GraphNode* found = findGraphNodeInSet(v);
 			
-				if (found == NULL) {
-					// node was new, hence going down with sending event...
-					AddGraphNode(v, i, SENDING, true);
-					buildGraph(v, your_progress);
-	
-					if (v->getColor() == RED) {
-						currentNode->removeLiteralFromFormula(i, SENDING);
-					}
+                if (found == NULL) {
+                    // node is new -> calling AddGraphNode with true
+                    // meaning that the node as well as the edge to it is added 
+                    AddGraphNode(v, i, SENDING, true);
+
+                    // going down with sending event...
+                    buildGraph(v, your_progress);
+
+                    if (v->getColor() == RED) {
+                        currentNode->removeLiteralFromFormula(i, SENDING);
+                    }
 
 					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 					actualDepth--;
 				} else {
-					// In case the successor node was already known, an edge to the old
-					// node is drawn by function AddGraphNode.
+                    // node was computed before -> calling AddGraphNode with false
+                    // meaning the AddGraphNode only adds the new edge to the old node
 					AddGraphNode(found, i, SENDING, false);
 
 					// Still, if that node was computed red before, the literal
@@ -161,22 +166,22 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 					}
 					delete v;
 
-					addProgress(your_progress);
-					printProgress();
-				}
-			}
-		} else {
-			trace(TRACE_2, "\t\t\t\t\t    sending event: !");
-			trace(TRACE_2, string(PN->getInputPlace(i)->name));
-			trace(TRACE_2, " suppressed (max_occurence reached)\n");
+                    addProgress(your_progress);
+                    printProgress();
+                }
+            }
+        } else {
+            trace(TRACE_2, "\t\t\t\t\t    sending event: !");
+            trace(TRACE_2, string(PN->getInputPlace(i)->name));
+            trace(TRACE_2, " suppressed (max_occurence reached)\n");
 
-			currentNode->removeLiteralFromFormula(i, SENDING);
+            currentNode->removeLiteralFromFormula(i, SENDING);
 
-			addProgress(your_progress);
-			printProgress();
-		}
-		i++;
-	}
+            addProgress(your_progress);
+            printProgress();
+        }
+        i++;
+    }
 
 
 	/**
@@ -200,8 +205,8 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 	*/
 
 	i = 0;
-	// iterate over all elements of outputSet of the oWFN
-	trace(TRACE_2, "\t\t\t iterating over outputSet of the oWFN\n");
+	// iterate over all output places of the oWFN (receiving events in OG)
+	trace(TRACE_2, "\t\t\t iterating over output places of the oWFN\n");
 	while (i < PN->getOutputPlaceCount()) {
 
 		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
@@ -219,8 +224,11 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 			GraphNode * found = findGraphNodeInSet(v);
 			
 			if (found == NULL) {
-				// node was new, hence going down with receiving event...
+                // node is new -> calling AddGraphNode with true
+                // meaning that the node as well as the edge to it is added 
 				AddGraphNode(v, i, RECEIVING, true);
+
+                // going down with receiving event...
 				// buildGraph(v, your_progress);
 				buildGraph(v, 0);
 				
@@ -231,9 +239,9 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 				actualDepth--;
 			} else {
-				// In case the successor node v was already known, an edge to the old
-				// node is drawn by function AddGraphNode.
-				AddGraphNode(found, i, RECEIVING, false);
+                // node was computed before -> calling AddGraphNode with false
+                // meaning the AddGraphNode only adds the new edge to the old node
+                AddGraphNode(found, i, RECEIVING, false);
 
 				// Still, if that node was computed red before, the literal
 				// of the edge from currentNode to the old node must be removed in the
@@ -257,12 +265,12 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 //			printProgress();
 		}
 		i++;
-	}
+    }
 
-	// finished iterating over successors
-	trace(TRACE_2, "\t\t\t no events left...\n");
+    // finished iterating over successors
+    trace(TRACE_2, "\t\t\t no events left...\n");
 
-	analyseNode(currentNode);
+    analyseNode(currentNode);
 
 	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + toUpper(currentNode->getColor().toString()));
 	trace(TRACE_3, " via formula " + currentNode->getCNF_formula()->asString() + "\n");	

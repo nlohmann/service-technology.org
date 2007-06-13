@@ -1,4 +1,4 @@
-BEGIN OF ChangeLog file for BPEL2oWFN Version 2.0.1
+BEGIN OF ChangeLog file for BPEL2oWFN Version 2.0.2
 
 Change Log
 **********
@@ -183,6 +183,23 @@ Version 2.0.1 (11 May 2007)
              * improved performance of composition of nets in the
                `consistency' mode
 
+Version 2.0.2 (15 June 2007)
+----------------------------
+
+        - new features:
+             * BPEL4Chor choreographies can be translated (further
+               information to come)
+
+             * WSDL files can be parsed to support the translation of a
+               BPEL process
+
+             * abstract BPEL processes (both BPEL4WS 1.1 and WS-BPEL
+               2.0) are now parsed
+
+        - miscellaneous:
+             * when parsing multiple BPEL processes, wildcard like
+               `*.bpel' can be used
+
 
 Copyright
 =========
@@ -196,4 +213,4 @@ Copyright (C) 2005, 2006, 2007 Niels Lohmann
 See `http://www.gnu.org/software/bpel2owfn' or the User's Manual for
 more information.
 
-END OF ChangeLog file for BPEL2oWFN Version 2.0.1
+END OF ChangeLog file for BPEL2oWFN Version 2.0.2

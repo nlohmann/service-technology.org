@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/06/07 09:17:43 $
+ * \date    \$Date: 2007/06/13 20:01:04 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.87 $
+ * \version \$Revision: 1.88 $
  */
 
 
@@ -118,13 +118,13 @@ static struct option longopts[] =
   { "parameter",	required_argument, NULL, 'p' },
   { "debug",		required_argument, NULL, 'd' },
   { "reduce",		required_argument, NULL, 'r' },
-  { "choreography",	required_argument, NULL, 'c' },
+  { "topology",		required_argument, NULL, 't' },
   { "wsdl",		required_argument, NULL, 'w' },
   NULL
 };
 
 /// short options (needed by GNU getopt)
-const char *par_string = "hvm:li:of:p:d:r:c:w:";
+const char *par_string = "hvm:li:of:p:d:r:t:w:";
 
 
 
@@ -156,6 +156,7 @@ void print_help()
   trace(" -r, --reduce=NUMBER    apply structural reduction level (NUMBER=0..5)\n");
   trace(" -h, --help             print this help list and exit\n");
   trace(" -v, --version          print program version and exit\n");
+  trace(" -t, --topology=FILE    read a BPEL4Chor participant topology file from FILE\n");
   trace(" -w, --wsdl=FILE        read a WSDL file from FILE\n");
   trace("\n");
   trace("  MODE is one of the following (at most one mode permitted):\n");
@@ -411,7 +412,7 @@ void parse_command_line(int argc, char* argv[])
         
         if ( parameter == "reduce")
           globals::reduction_level = 5;
-        else if (parameter == "communicationonly" | parameter == "small")
+        else if (parameter == "communicationonly" | parameter == "small") // communicationonly is deprecated!
           globals::parameters[P_COMMUNICATIONONLY] = true;
         else if (parameter == "standardfaults")
           globals::parameters[P_STANDARDFAULTS] = true;
@@ -483,9 +484,9 @@ void parse_command_line(int argc, char* argv[])
         break;
       }
         
-      case 'c':
+      case 't':
       {
-        options[O_CHOR] = true;
+        options[O_TOPOLOGY] = true;
         globals::choreography_filename = string(optarg);
         break;
       }

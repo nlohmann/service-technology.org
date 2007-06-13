@@ -27,11 +27,11 @@
  * This file defines and implements unparse rules to unparse BPEL to XML.
  * 
  * \author  Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2007-04-18
  *
- * \date    \$Date: 2007/06/11 12:25:29 $
+ * \date    \$Date: 2007/06/13 08:14:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  *
  */
 
@@ -83,8 +83,21 @@ Process(a,b,messageExchange,c,d,e,g,i,_id) ->
        source = globals::ASTEmap[linkId]->sourceActivity;
        target = globals::ASTEmap[linkId]->targetActivity;
 
-       globals::visArcs += globals::ASTEmap[source]->activityTypeName() + toString(source) + " -> " + 
-                         globals::ASTEmap[target]->activityTypeName() + toString(target) + ";\n" ; 
+       globals::visArcs += globals::ASTEmap[source]->visConnection + " -> " + globals::ASTEmap[target]->secVisConnection + "["; 
+       if (globals::ASTEmap[target]->structured())
+       {
+         globals::visArcs += "lhead=";
+         globals::visArcs += "cluster";          
+         globals::visArcs += toString(target);          
+         globals::visArcs += " ";          
+       } 
+       if (globals::ASTEmap[source]->structured())
+       {
+         globals::visArcs += "ltail=";
+         globals::visArcs += "cluster";          
+          globals::visArcs += toString(source);          
+       }
+       globals::visArcs += "];\n";
     }
     (*output) << globals::visArcs;
     (*output) << "}" << endl;

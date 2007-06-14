@@ -35,7 +35,7 @@
 #include "binDecision.h"
 #include "debug.h"
 #include "owfnTransition.h"
- 
+
 
 //! \fn State::State()
 //! \brief constructor
@@ -259,7 +259,7 @@ void State::decode(oWFN * PN) {
 //! \brief decodes State in bintree and returns the corresponding marking
 void State::decodeShowOnly(oWFN * PN) {
 	
-	trace(TRACE_5, "void State::decodeShowOnly(oWFN * PN) : start\n");
+    trace(TRACE_5, "void State::decodeShowOnly(oWFN * PN) : start\n");
 		
 //	for (int i = 0; i < PN->getPlaceCount(); i++) {
 //		cout << PN->getPlace(i)->name << " (" << PN->getPlace(i)->nrbits << ")" << endl;

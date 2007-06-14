@@ -41,17 +41,18 @@
 #include "cnf_formula.h"
 #include <cassert>
 
+using namespace std;
+
+
 double global_progress = 0;
 int show_progress = 0;
 
-using namespace std;
 
 //! \param _PN
 //! \brief constructor
 communicationGraph::communicationGraph(oWFN * _PN) :
     root(NULL),
-    currentGraphNode(NULL),
-    actualDepth(0) {
+    currentGraphNode(NULL) {
 
     PN = _PN;
 }
@@ -112,6 +113,7 @@ void communicationGraph::calculateRootNode() {
 //! \param toAdd the GraphNode we are looking for in the graph
 //! \brief this function uses the find method from the template set
 GraphNode * communicationGraph::findGraphNodeInSet(GraphNode * toAdd) {
+
     GraphNodeSet::iterator iter = setOfVertices.find(toAdd);
     if (iter != setOfVertices.end()) {
         return *iter;
@@ -529,6 +531,7 @@ void communicationGraph::printNodeStatistics() {
     trace(TRACE_0, "    number of states stored in nodes: " + intToString(nStoredStates) + "\n");
 }
 
+
 void communicationGraph::computeNumberOfNodesEdges(
     unsigned int& nNodes,
     unsigned int& nStoredStates,
@@ -547,6 +550,7 @@ void communicationGraph::computeNumberOfNodesEdges(
     computeNumberOfNodesEdgesHelper(root, visitedNodes, nNodes, nStoredStates,
         nEdges);
 }
+
 
 //! \param v current node in the iteration process
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
@@ -584,6 +588,7 @@ void communicationGraph::computeNumberOfNodesEdgesHelper(
     }
 }
 
+
 void communicationGraph::computeNumberOfBlueNodesEdges(
     unsigned int& nBlueNodes,
     unsigned int& nBlueEdges) const {
@@ -600,6 +605,7 @@ void communicationGraph::computeNumberOfBlueNodesEdges(
     computeNumberOfBlueNodesEdgesHelper(root, visitedNodes, nBlueNodes,
         nBlueEdges);
 }
+
 
 //! \param v current node in the iteration process
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
@@ -630,7 +636,7 @@ void communicationGraph::computeNumberOfBlueNodesEdgesHelper(
             assert(vNext != NULL);
 
             if (vNext->getColor() == BLUE &&
-              (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
+                (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
 
                 nBlueEdges++;
             }
@@ -639,7 +645,7 @@ void communicationGraph::computeNumberOfBlueNodesEdgesHelper(
                 computeNumberOfBlueNodesEdgesHelper(vNext, visitedNodes,
                     nBlueNodes, nBlueEdges);
             }
-        }
+        } // while
     }
 }
 

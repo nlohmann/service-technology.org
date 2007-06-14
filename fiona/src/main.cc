@@ -169,7 +169,7 @@ void adjustOptionValues() {
 //	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all:\n");
 	trace(TRACE_0, "    sending events:\n" );
 	for (unsigned int e=0; e < PN->getInputPlaceCount(); e++) {
-		trace(TRACE_0, "\t !" + string(PN->getInputPlace(e)->name));
+		trace(TRACE_0, "\t!" + string(PN->getInputPlace(e)->name));
 		if (options[O_EVENT_USE_MAX]) {
 			trace(TRACE_0, "\t(max. " + intToString(PN->getInputPlace(e)->max_occurence) + "x)\n");
 		} else {
@@ -178,7 +178,7 @@ void adjustOptionValues() {
 	}
 	trace(TRACE_0, "    receiving events:\n" );
 	for (unsigned int e=0; e < PN->getOutputPlaceCount(); e++) {
-		trace(TRACE_0, "\t ?" + string(PN->getOutputPlace(e)->name));
+		trace(TRACE_0, "\t?" + string(PN->getOutputPlace(e)->name));
 		if (options[O_EVENT_USE_MAX]) {
 			trace(TRACE_0, "\t(max. " + intToString(PN->getOutputPlace(e)->max_occurence) + "x)\n");
 		} else {
@@ -478,8 +478,6 @@ int main(int argc, char ** argv) {
 
             operatingGuidelines * graph = new operatingGuidelines(PN);
             
-            cout << "states: " << State::state_count << endl;
-            
             trace(TRACE_0, "building the operating guideline...\n");
             seconds = time (NULL);
     
@@ -493,11 +491,9 @@ int main(int argc, char ** argv) {
             graph->buildGraph(graph->getRoot(), 1); // build operating guideline
             
             seconds2 = time (NULL);
-            trace(TRACE_0, "\nbuilding the operating guideline finished.\n\n");
-            cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
+            trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
+            cout << "    " << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
     
-            cout << "states: " << State::state_count << endl;
-
             trace(TRACE_0, "\nnet is controllable: ");
             if (graph->getRoot()->getColor() == BLUE) {
                 trace(TRACE_0, "YES\n\n");

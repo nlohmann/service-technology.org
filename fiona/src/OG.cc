@@ -74,11 +74,9 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
     // currentGraphNode is the parent of currentNode
     // at this point, the states inside currentNode are already computed!
 
-    actualDepth++;
-
 	trace(TRACE_1, "\n=================================================================\n");
 	trace(TRACE_1, "\t current node: ");
-	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
+	trace(TRACE_1, intToString(currentNode->getNumber()) + "\n");
 	if (debug_level >= TRACE_2) {
 		cout << "\t (" << currentNode << ")" << endl;
 	}
@@ -156,7 +154,6 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
                     if (v->getColor() == RED) {
                         currentNode->removeLiteralFromFormula(i, SENDING);
                     }
-                    actualDepth--;
 				} else {
                     // node was computed before, so only add a new edge to the old node
                     trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
@@ -244,7 +241,6 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 				if (v->getColor() == RED) {
 					currentNode->removeLiteralFromFormula(i, RECEIVING);
 				}
-				actualDepth--;
 			} else {
                 // node was computed before, so only add a new edge to the old node
                 trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
@@ -295,7 +291,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 
 void operatingGuidelines::computeCNF(GraphNode* node) const {
 	
-	trace(TRACE_5, "operatingGuidelines::computeCNF(GraphNode * node): start\n");
+    trace(TRACE_5, "operatingGuidelines::computeCNF(GraphNode * node): start\n");
 	
 	// initially, the annoation is empty (and therefore equivalent to true)
 	assert(node->getCNF_formula()->asString() == "true");

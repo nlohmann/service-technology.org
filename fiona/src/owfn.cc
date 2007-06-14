@@ -492,7 +492,7 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
 	// calculates the EG starting at the current marking
 	trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(GraphNode * n, bool minimal): start\n");
 
-	State * CurrentState;
+    State * CurrentState;
   	State * NewState;
   	
 	CurrentState = binSearch(this);
@@ -644,7 +644,7 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal) {
 	// calculates the EG starting at the current marking
 	trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal): start\n");
 
-	State * CurrentState;
+    State * CurrentState;
   	State * NewState;
   	
 	CurrentState = binSearch(this);
@@ -793,9 +793,10 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal) {
 //! \param n new GraphNode 
 //! \brief calculates the set of states reachable from the current marking and stores them in the new GraphNode
 //! this function is for the full IG and the OG since a single output place is considered
+//  for OG or full IG
 void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) {
 
-	// calculates the EG starting at the current marking
+    // calculates the EG starting at the current marking
 	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : start\n");
 
 	// test current marking if message bound k reached
@@ -981,6 +982,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 //! \param n new GraphNode 
 //! \brief calculates the set of states reachable from the current marking and stores them in the new GraphNode
 //! this function is for the IG only since a multiset of output places is considered
+//  for IG
 void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages, GraphNode * n) {
 
 	// calculates the EG starting at the current marking
@@ -1221,7 +1223,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 //! it will color the node n RED if a given message bound is violated
 void oWFN::calculateReachableStatesFull(GraphNode * n) {
 
-	// calculates the EG starting at the current marking
+    // calculates the EG starting at the current marking
 	trace(TRACE_5, "oWFN::calculateReachableStatesFull(GraphNode * n) : start\n");
 
 	// test current marking if message bound k reached

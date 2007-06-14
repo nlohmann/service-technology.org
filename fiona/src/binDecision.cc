@@ -35,6 +35,7 @@
 #include "debug.h"
 #include "state.h"
 #include "binDecision.h"
+
  
 unsigned int bin_p; // (=place); index in CurrentMarking
 int bin_pb; // next bit of place to be processed;
@@ -45,13 +46,15 @@ int bin_s; // nr of bits pending in byte from previous iteration
 int bin_d; // difference position
 int bin_dir; // did we go "old" or "new" in last decision?
 int bin_b; // bit nr at start of byte
-binDecision * fromdec, * todec;
-binDecision * vectordec;
+binDecision* fromdec = NULL;
+binDecision* todec = NULL;
+binDecision* vectordec = NULL;
 
 binDecision::binDecision(int b, long int BitVectorSize) :
     bitnr(b),
     nextold(NULL),
     nextnew(NULL) {
+
     vector = new unsigned char [(BitVectorSize - (bitnr + 2)) / 8 + 2];
     for (int i = 0; i < (BitVectorSize - (bitnr + 2)) / 8 + 2; ++i) {
         vector[i] = 0;
@@ -107,7 +110,7 @@ int logzwo(int m) {
 }
 
 
-State* binInsert(oWFN* PN) {
+State* binInsert(oWFN* PN) {    
     trace(TRACE_5, "binInsert(oWFN* PN)\n");
     return binInsert(PN->binHashTable + (PN->getPlaceHashValue()), PN);
 }

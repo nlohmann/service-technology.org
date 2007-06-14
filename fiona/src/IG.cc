@@ -76,11 +76,9 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 	
 	// at this point, the states inside the current node node are already computed!
 	
-	actualDepth++;
-
 	trace(TRACE_1, "\n=================================================================\n");
 	trace(TRACE_1, "\t current node: ");
-	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
+	trace(TRACE_1, intToString(currentNode->getNumber()) + "\n");
 	if (debug_level >= TRACE_2) {
 		cout << "\t (" << currentNode << ")" << endl;
 	}
@@ -181,8 +179,6 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 	analyseNode(currentNode);
 	trace(TRACE_5, "node analysed\n");
 
-	actualDepth--;
-	
 	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + toUpper(currentNode->getColor().toString()) + "\n");	
 }
 
@@ -201,7 +197,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 
 	trace(TRACE_1, "\n=================================================================\n");
 	trace(TRACE_1, "\t current node: ");
-	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
+	trace(TRACE_1, intToString(currentNode->getNumber()) + "\n");
 
 	trace(TRACE_3, "\t number of states in node: ");
 	trace(TRACE_3, intToString(currentNode->reachGraphStateSet.size()) + "\n");
@@ -217,8 +213,6 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 //	if (PN->getOutputPlaceCnt() > 0) {
 		outputSet = combineReceivingEvents(currentNode, inputSet);
 //	}
-
-	actualDepth++;
 
   	PN->setOfStatesTemp.clear();
   	PN->visitedStates.clear();
@@ -267,8 +261,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 			}	
 		}	
 	}
-			
-	actualDepth--;
+
 	analyseNode(currentNode);
 	trace(TRACE_5, "node analysed\n");
 	

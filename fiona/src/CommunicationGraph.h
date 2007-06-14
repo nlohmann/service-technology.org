@@ -42,19 +42,20 @@
 
 using namespace std;
 
+class oWFN;
+class State;
 
 
 extern double global_progress;
 extern int show_progress;
-
-class oWFN;
-class State;
 
 struct compareVertices {
   bool operator() (GraphNode const * left, GraphNode const * right) {
     return (*left < *right);
   }
 }; // compareVertices
+
+typedef std::set<GraphNode*, compareVertices> GraphNodeSet;
 
 typedef std::multiset<unsigned int> messageMultiSet;
 
@@ -79,8 +80,6 @@ struct compareMessageMultiSets {
     return false;
   }
 }; // compareMessageMultiSets
-
-typedef std::set<GraphNode*, compareVertices> GraphNodeSet;
 
 typedef std::set<messageMultiSet, compareMessageMultiSets> setOfMessages;
 
@@ -118,7 +117,7 @@ protected:
 
 	void addProgress(double);
 
-	unsigned int actualDepth;            //!< actual depth in graph
+//	unsigned int actualDepth;            //!< actual depth in graph
 
 public:
 

@@ -4,3 +4,4 @@ stamp-vti
 version.texi
 Makefile
 Makefile.in
+.DS_Store

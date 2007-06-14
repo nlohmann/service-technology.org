@@ -12,3 +12,4 @@ aclocal.m4
 config.status
 *.tar.gz
 ylwrap
+.DS_Store

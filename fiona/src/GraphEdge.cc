@@ -41,7 +41,7 @@
 
 using namespace std;
 
-GraphEdge::GraphEdge(GraphNode* dstNodeP, const string& labelP) :
+GraphEdge::GraphEdge(GraphNode* dstNodeP, const std::string& labelP) :
     dstNode(dstNodeP),
     label(labelP),
     nextElement(NULL) {

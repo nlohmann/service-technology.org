@@ -46,9 +46,6 @@
 extern oWFN * PN;
 
 
-//! \fn BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic)
-//! \param numberOfLabels
-//! \param heuristic
 //! \brief constructor
 BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic, unsigned int cntNodes, bool calcStates){
 	trace(TRACE_5, "BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic): begin\n");
@@ -132,7 +129,7 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
 	trace(TRACE_5, "BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic): end\n");
 }
 
-//! \fn BddRepresentation::~BddRepresentation()()
+
 //! \brief destructor 
 BddRepresentation::~BddRepresentation(){
 	trace(TRACE_5, "BddRepresentation::~BddRepresentation(): begin\n");
@@ -163,7 +160,7 @@ void BddRepresentation::convertRootNode(GraphNode* root){
 	trace(TRACE_5, "void BddRepresentation::convertRootNode(GraphNode* root): end\n"); 
 }
 
-//! \fn void BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[])
+
 //! \brief generate BDD representation
 void BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]){
 	
@@ -228,7 +225,6 @@ void BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]
 }
 
 
-//! \fn void BddRepresentation::addOrDeleteLeavingEdges(GraphNode* v)
 //! \brief add blue edges to the BDD and delete red edges from the BDD (for the on the fly construction)
 void BddRepresentation::addOrDeleteLeavingEdges(GraphNode* v){
 
@@ -337,7 +333,6 @@ DdNode* BddRepresentation::labelToBddMp(const std::string& label) {
 }
 
 
-//! \fn DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2)
 //! \brief returns the BDD of the nodes (given as integer) of an edge
 DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2){
 	
@@ -503,7 +498,6 @@ DdNode* BddRepresentation::clauseToBddAnn(
 }
 
 
-//! \fn int BddRepresentation::getBddNumber(unsigned int node)
 //! \param node
 unsigned int BddRepresentation::getBddNumber(unsigned int node){
 	
@@ -580,7 +574,6 @@ void BddRepresentation::addBddVars(unsigned int max){
 }	
 
 
-//! \fn BitVector BddRepresentation::numberToBin(unsigned int number, int count)
 //! \brief returns the binary representation of a number
 BitVector BddRepresentation::numberToBin(unsigned int number, int cntBits){	
 	trace(TRACE_5, "BddRepresentation::numberToBin(unsigned int number, int cntBits): start\n");
@@ -604,7 +597,7 @@ BitVector BddRepresentation::numberToBin(unsigned int number, int cntBits){
 	return (assignment);
 	}
 
-//! \fn int BddRepresentation::nbrBits(unsigned int i)
+
 //! \brief returns the number of bits to represent a number i
 int BddRepresentation::nbrBits(unsigned int i){
 	switch (i){
@@ -626,7 +619,6 @@ int BddRepresentation::nbrBits(unsigned int i){
 }
 
 
-//! \fn void BddRepresentation::checkManager(DdManager* mgr, char* table)
 //! \param mgr
 //! \param table
 void BddRepresentation::checkManager(DdManager* mgr, char* table){
@@ -639,7 +631,7 @@ void BddRepresentation::checkManager(DdManager* mgr, char* table){
     Cudd_DebugCheck(mgr);
 }
 
-//! \fn void BddRepresentation::reorder(Cudd_ReorderingType heuristic)
+
 //! \param heuristic
 void BddRepresentation::reorder(Cudd_ReorderingType heuristic){
 /*
@@ -669,7 +661,6 @@ void BddRepresentation::reorder(Cudd_ReorderingType heuristic){
 }
 
 
-//! \fn void BddRepresentation::printDotFile(char** varNames, char* option)
 //! \brief creates dot files of the BDDs
 //    mit dot -Tps fileName -o neu.ps kann das BDD graphisch dargestellt werden
 void BddRepresentation::printDotFile(char** varNames, char* option){
@@ -743,7 +734,7 @@ void BddRepresentation::printDotFile(char** varNames, char* option){
     }      
 }	
 
-//! \fn void BddRepresentation::print()
+
 //! \brief print bdd_Mp and bdd_Ann
 void BddRepresentation::print(){
 	cout << "\nBDD_MP:\n";	
@@ -753,7 +744,6 @@ void BddRepresentation::print(){
 }
 
 
-//! \fn void BddRepresentation::save(char* option)
 //! \brief save bddMp and bddAnn in file
 void BddRepresentation::save(char* option){
 	int size = nbrLabels + maxNodeBits;
@@ -850,6 +840,7 @@ void BddRepresentation::save(char* option){
      names = 0;
 }
 
+
 void BddRepresentation::printMemoryInUse(){
 	cout << endl;
 //	cout << "Number of live nodes in mgrMp: " << Cudd_ReadNodeCount(mgrMp) << endl;
@@ -860,6 +851,7 @@ void BddRepresentation::printMemoryInUse(){
 	cout << "Memory in use for both BDD: " << Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn)<< 
 		    "  bytes (" << (Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn))/1024 << " KB; " << (Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn))/(1024*1024) << " MB)" << endl;
 }
+
 
 void BddRepresentation::testSymbRepresentation(GraphNode* v, bool visitedNodes[]){
 	
@@ -965,6 +957,7 @@ DdNode* BddRepresentation::statesToBddMp(GraphNode* v){
     return (states);
 } 
 
+
 DdNode* BddRepresentation::markingToBddMp(unsigned int * marking){
     DdNode* bddMarking = Cudd_ReadOne(mgrMp);
     Cudd_Ref(bddMarking);
@@ -993,6 +986,7 @@ DdNode* BddRepresentation::markingToBddMp(unsigned int * marking){
     }
     return (bddMarking);
 }
+
 
 void BddRepresentation::calculateBound(GraphNode* v, bool visitedNodes[]){
 	if (v->reachGraphStateSet.size() != 0) {
@@ -1025,9 +1019,11 @@ void BddRepresentation::calculateBound(GraphNode* v, bool visitedNodes[]){
 	}
 }
 
+
 unsigned int BddRepresentation::getBound(){
 	return bound;
 }
+
 
 void BddRepresentation::setMaxPlaceBits(GraphNode* v, bool visitedNodes[]){
 	calculateBound(v, visitedNodes);

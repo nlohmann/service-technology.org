@@ -372,7 +372,7 @@ void OGFromFile::removeTransitionsToNodeFromAllOtherNodes(
 	}
 }
 
-//! \fn bool OGFromFile::simulates(OGFromFile *smallerOG)
+
 //! \brief checks, whether this OGFromFile simulates the given simulant
 //! \return true on positive check, otherwise: false
 //! \param smallerOG the simulant that should be simulated
@@ -396,7 +396,7 @@ bool OGFromFile::simulates ( OGFromFile *smallerOG ) {
 	return result;
 }
 
-//! \fn bool OGFromFile::simulatesRecursive(OGFromFileNode *myNode, OGFromFileNode *simNode)
+
 //! \brief checks, whether the part of an OGFromFile below myNode simulates
 //         the part of an OGFromFile below simNode
 //! \return true on positive check, otherwise: false
@@ -667,7 +667,6 @@ void OGFromFile::printDotFile(const std::string& filenamePrefix) const
 }
 
 
-//! \fn void OGFromFile::printGraphToDot(GraphNode * v, fstream& os, bool visitedNodes[])
 //! \param v current node in the iteration process
 //! \param os output stream
 //! \param visitedNodes maps nodes to Bools remembering already visited nodes
@@ -708,8 +707,8 @@ void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFrom
 	}
 }
 
-void OGFromFile::printOGFile(const std::string& filenamePrefix) const
-{
+
+void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
     fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(),
         ios_base::out | ios_base::trunc);
 

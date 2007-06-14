@@ -54,10 +54,10 @@ private:
 public:
     /**
      * Constructs a GraphEdge.
-     * @param dstNode Pointer to the node this edge is pointing to.
-     * @param label label of this edge.
+     * @param dstNodeP Pointer to the node this edge is pointing to.
+     * @param labelP label of this edge.
      */
-    GraphEdge(GraphNode* dstNode, const std::string& label);
+    GraphEdge(GraphNode* dstNodeP, const std::string& labelP);
 
     /**
      * Sets the nextElement of this edge to newNextElement.

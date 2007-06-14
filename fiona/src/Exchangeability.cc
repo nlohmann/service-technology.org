@@ -174,7 +174,7 @@ void Exchangeability::loadBdd(char* filename){
     trace(TRACE_5, "Exchangeability::loadBdds(char* filename): end\n");		   
 }
 
-//! \fn void Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids)
+
 void Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids){
 	trace(TRACE_5,"Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids): begin\n");
     Dddmp_DecompType ddType; //possible Values: DDDMP_BDD,DDDMP_ADD,DDDMP_CNF,DDDMP_NONE

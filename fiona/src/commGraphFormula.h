@@ -444,7 +444,6 @@ class CommGraphFormulaLiteralFinal : public CommGraphFormulaLiteral {
 public:
     /**
      * Constructs a literal with the given string representation.
-     * @param literal String representation of this literal.
      */
     CommGraphFormulaLiteralFinal();
     virtual ~CommGraphFormulaLiteralFinal() {};
@@ -458,7 +457,6 @@ class CommGraphFormulaLiteralTau : public CommGraphFormulaLiteral {
 public:
     /**
      * Constructs a literal with the given string representation.
-     * @param literal String representation of this literal.
      */
     CommGraphFormulaLiteralTau();
     virtual ~CommGraphFormulaLiteralTau() {};

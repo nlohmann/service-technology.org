@@ -41,7 +41,6 @@
 #include <cassert>
 
 
-//! \fn GraphNode::GraphNode(int numberEvents)
 //! \param numberEvents the number of events that have to be processed from this node
 //! \brief constructor
 GraphNode::GraphNode(int numberEvents) :
@@ -64,7 +63,6 @@ GraphNode::GraphNode(int numberEvents) :
 }
 
 
-//! \fn GraphNode::~GraphNode()
 //! \brief destructor
 GraphNode::~GraphNode() {
 	trace(TRACE_5, "GraphNode::~GraphNode() : start\n");
@@ -83,22 +81,21 @@ GraphNode::~GraphNode() {
 	
 //	CNF * cnfTemp1 = firstClause;
 //	CNF * cnfTemp2;
-	
+
 	delete annotation;
-	
-	
+
+
 //	while (cnfTemp1) {
 //		cnfTemp2 = cnfTemp1->nextElement;
 //		delete cnfTemp1;	
 //		cnfTemp1 = cnfTemp2;
 //	}
-	
+
 	numberDeletedVertices++;
 	trace(TRACE_5, "GraphNode::~GraphNode() : end\n");
 }
 
 
-//! \fn unsigned int GraphNode::getNumber() const
 //! \return number of this node
 //! \brief returns the number of this node
 unsigned int GraphNode::getNumber() const {
@@ -106,7 +103,6 @@ unsigned int GraphNode::getNumber() const {
 }
 
 
-//! \fn void GraphNode::setNumber(unsigned int _number)
 //! \param _number number of this node in the graph
 //! \brief sets the number of this node
 void GraphNode::setNumber(unsigned int _number) {
@@ -114,7 +110,6 @@ void GraphNode::setNumber(unsigned int _number) {
 }
 
 
-//! \fn void GraphNode::addSuccessorNode(GraphEdge * edge) 
 //! \param edge pointer to the edge which is to point to the successor node
 //! \brief adds the node v to the list of successor nodes of this node using the edge
 //! given by the parameters
@@ -128,7 +123,6 @@ void GraphNode::addSuccessorNode(GraphEdge * edge) {
 }
 
 
-//! \fn void GraphNode::addState(State * s) 
 //! \param s pointer to the state that is to be added to this node
 //! \brief adds the state s to the list of states
 bool GraphNode::addState(State * s) {
@@ -136,7 +130,7 @@ bool GraphNode::addState(State * s) {
     return result.second;       // returns whether the element got inserted (true) or not (false)
 }
 
-//! \fn void GraphNode::addClause(CommGraphFormulaMultiaryOr* myclause)
+
 //! \param myclause the clause to be added to the annotation of the current node
 //! \brief adds a new clause to the CNF formula of the node
 void GraphNode::addClause(CommGraphFormulaMultiaryOr* myclause) {
@@ -159,7 +153,6 @@ void GraphNode::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) {
 }
 
 
-//! \fn GraphEdge * GraphNode::getNextSuccEdge()
 //! \return pointer to the next edge of the successor node list
 //! \brief returns a pointer to the next edge of the successor node list
 GraphEdge * GraphNode::getNextSuccEdge() {
@@ -171,7 +164,6 @@ GraphEdge * GraphNode::getNextSuccEdge() {
 }
 
 
-//! \fn void GraphNode::resetIteratingSuccNodes()
 //! \brief resets the iteration process of the successor node list
 void GraphNode::resetIteratingSuccNodes() {
 	trace(TRACE_5, "GraphNode::resetIteratingSuccNodes() : start\n");
@@ -218,18 +210,18 @@ CommGraphFormulaAssignment* GraphNode::getAssignment() {
 }
 
 
-//! \fn void GraphNode::setColor(GraphNodeColor c)
 //! \param c color of GraphNode
 //! \brief sets the color of the GraphNode to the given color
 void GraphNode::setColor(GraphNodeColor c) {
 	color = c;
 }
 
-//! \fn GraphNodeColor GraphNode::getColor()
+
 //! \brief returns the color of the GraphNode
 GraphNodeColor GraphNode::getColor() const {
 	return color;
 }
+
 
 bool GraphNode::isToShow(const GraphNode* rootOfGraph) const
 {
@@ -248,7 +240,7 @@ bool GraphNode::isToShow(const GraphNode* rootOfGraph) const
 	}
 }
 
-//! \fn GraphNodeColor GraphNode::getNumberOfDeadlocks()
+
 //! \brief returns the number of deadlocks
 int GraphNode::getNumberOfDeadlocks() {
 	StateSet::iterator iter;
@@ -265,7 +257,7 @@ int GraphNode::getNumberOfDeadlocks() {
 	return count;
 }
 
-//! \fn GraphNodeColor GraphNode::analyseNodeByFormula()
+
 //! \result the color of the node
 //! \brief analyses the node, sets its color, and returns the new color
 GraphNodeColor GraphNode::analyseNodeByFormula() {
@@ -291,7 +283,6 @@ GraphNodeColor GraphNode::analyseNodeByFormula() {
 
 //
 //
-////! \fn bool operator == (GraphNode const& left, GraphNode const& right)
 ////! \param left left hand GraphNode
 ////! \param right right hand GraphNode
 ////! \brief implements the operator == by comparing the states of the two vertices
@@ -300,7 +291,6 @@ GraphNodeColor GraphNode::analyseNodeByFormula() {
 //}
 
 
-//! \fn bool operator < (GraphNode const& left, GraphNode const& right)
 //! \param left left hand GraphNode
 //! \param right right hand GraphNode
 //! \brief implements the operator < by comparing the states of the two vertices
@@ -309,7 +299,6 @@ bool operator < (GraphNode const& left, GraphNode const& right) {
 }
 
 
-////! \fn ostream& operator << (ostream& os, const GraphNode& v)
 ////! \param os output stream
 ////! \param v GraphNode
 ////! \brief implements the operator << by printing the states of the GraphNode v to the output stream

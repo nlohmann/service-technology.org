@@ -49,7 +49,7 @@ class operatingGuidelines : public communicationGraph {
 		 * @param node the node for which the annotation is calculated
 		 * @brief calculates the annotation (CNF) for the node
 		 */
-		void computeCNF(GraphNode *) const;
+		void computeCNF(GraphNode* node) const;
 
 	public:
 		operatingGuidelines(oWFN *);

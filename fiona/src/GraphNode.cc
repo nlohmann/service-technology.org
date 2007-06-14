@@ -47,8 +47,7 @@ GraphNode::GraphNode(int numberEvents) :
 			   number(0),
 			   color(BLUE),
 			   successorNodes(NULL),
-			   hasFinalStateInStateSet(false),
-			   finalAnalysisDone(false) {
+			   hasFinalStateInStateSet(false) {
 
 	annotation = new CNF_formula();
 
@@ -226,23 +225,6 @@ bool GraphNode::isToShow(const GraphNode* rootOfGraph) const
 }
 
 
-//! \brief returns the number of deadlocks
-int GraphNode::getNumberOfDeadlocks() {
-	StateSet::iterator iter;
-
-	int count = 0;
-	
-	// iterate over all states of the current node 
-	for (iter = reachGraphStateSet.begin(); iter != reachGraphStateSet.end(); iter++) {
-		
-		if ((*iter)->type == DEADLOCK) {	// state is a DEADLOCK, so count it
-			count++;
-		}
-	}
-	return count;
-}
-
-
 //! \result the color of the node
 //! \brief analyses the node, sets its color, and returns the new color
 GraphNodeColor GraphNode::analyseNodeByFormula() {
@@ -265,29 +247,9 @@ GraphNodeColor GraphNode::analyseNodeByFormula() {
 	}
 }
 
-
-//
-//
-////! \param left left hand GraphNode
-////! \param right right hand GraphNode
-////! \brief implements the operator == by comparing the states of the two vertices
-//bool operator == (GraphNode const& left, GraphNode const& right) {
-//    return (*(left.states) == *(right.states));	
-//}
-
-
 //! \param left left hand GraphNode
 //! \param right right hand GraphNode
 //! \brief implements the operator < by comparing the states of the two vertices
 bool operator < (GraphNode const& left, GraphNode const& right) {
     return (left.reachGraphStateSet < right.reachGraphStateSet);	
 }
-
-
-////! \param os output stream
-////! \param v GraphNode
-////! \brief implements the operator << by printing the states of the GraphNode v to the output stream
-//ostream& operator << (ostream& os, const GraphNode& v) {			
-//	os << *(v.states);
-//	return os;
-//}

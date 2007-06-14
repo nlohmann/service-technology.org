@@ -63,13 +63,11 @@ oWFN::oWFN() : arcCnt(0), filename(NULL),
 {
 	unsigned int i;
   	NonEmptyHash = 0;
-//	commDepth = 0;
 
   	try {
   		binHashTable = new binDecision * [HASHSIZE];
 	} catch(bad_alloc) {
 		char mess[] = "\nhash table too large!\n";
-		//write(2,mess,sizeof(mess));
 		cerr << mess;
 		_exit(2);
 	}
@@ -469,19 +467,6 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 	for (unsigned int i = 0; i < getPlaceCount(); i++) {
 		CurrentMarking[i] = copy[i];
 	}	
-	
-//	// after decoding the new marking for a place update the final condition
-//	if (PN->FinalCondition) {
-//		for (int currentplacenr = 0; currentplacenr < getPlaceCount(); currentplacenr++) {
-//		    for(int j=0; j < PN->getPlace(currentplacenr)->cardprop; j++) {
-//				if (PN->getPlace(currentplacenr)->proposition != NULL) {
-//				    PN->getPlace(currentplacenr)->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
-//				}
-//			}
-//		}
-//	}
-
-	//initializeTransitions();
 }
 
 
@@ -1286,10 +1271,6 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 		// building EG in a node
 	  	while(CurrentState) {
 	 
-//			if ((n->reachGraphStateSet.size() % 1000) == 0) {
-//				trace(TRACE_2, "\t current state count: " + intToString(n->reachGraphStateSet.size()) + "\n");
-//			}
-//		  	
 			// no more transition to fire from current state?
 			if (CurrentState->current < CurrentState->CardFireList) {
 				// there is a next state that needs to be explored
@@ -1417,7 +1398,7 @@ void oWFN::addInputMessage(unsigned int message) {
 //! \fn int oWFN::addInputMessage(messageMultiSet messages)
 //! \param messages multiset of messages to be added to the currentmarking
 //! \brief adds input messages to the current marking
-int oWFN::addInputMessage(messageMultiSet messages) {
+void oWFN::addInputMessage(messageMultiSet messages) {
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
 		if (getPlace(*iter)->type == INPUT) {
 			// found that place
@@ -1429,10 +1410,8 @@ int oWFN::addInputMessage(messageMultiSet messages) {
 			for (Node::Arcs_t::size_type k = 0; k < getPlace(*iter)->getLeavingArcsCount(); k++) {
 				((owfnTransition *) getPlace(*iter)->getLeavingArc(k)->Destination)->check_enabled(this);
 			}
-		//	return 0;
 		}
 	}
-	return 1;		// place not found
 }
 
 void oWFN::printCurrentMarking() const {

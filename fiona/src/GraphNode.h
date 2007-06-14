@@ -68,47 +68,41 @@ private:
      * List of all the nodes succeeding this one including the edge between
      * them
      */
-    successorNodeList * successorNodes;
+    successorNodeList* successorNodes;
 
 public:
     bool hasFinalStateInStateSet;
 
-	// GraphNode management
-	GraphNode(int);
-	~GraphNode ();
+    GraphNode(int);
+    ~GraphNode();
 
-	int * eventsUsed;
-	int eventsToBeSeen;
-	
-    unsigned int getNumber() const;    
+    int * eventsUsed;
+    int eventsToBeSeen;
+
+    unsigned int getNumber() const;
     void setNumber(unsigned int);
-    
-	// states in GraphNode
-    bool addState(State *);
-    int getNumberOfDeadlocks();
-    
-    StateSet reachGraphStateSet;		// this set contains only a reduced number of states in case the state reduced graph is to be build
-//    StateSet setOfStatesTemp;	// this set contains all states
 
-	// traversing successors/predecessors
+    // states in GraphNode
+    bool addState(State *);
+
+    // this set contains only a reduced number of states in case the state
+    // reduced graph is to be build.
+    StateSet reachGraphStateSet;
+
+    // traversing successors/predecessors
     void addSuccessorNode(GraphEdge *);
 
     GraphEdge * getNextSuccEdge();
 
     void resetIteratingSuccNodes();
 
-	// annotation
+    // annotation
     CNF_formula* getCNF_formula();
     std::string getCNFString();
-    
-    CommGraphFormulaAssignment* getAssignment();
-    
-    void addClause(CommGraphFormulaMultiaryOr*);
-   
-//	int numberOfElementsInAnnotation();
 
-	// analysis   
-	bool finalAnalysisDone;
+    CommGraphFormulaAssignment* getAssignment();
+
+    void addClause(CommGraphFormulaMultiaryOr*);
 
     GraphNodeColor analyseNodeByFormula();
 
@@ -117,17 +111,17 @@ public:
 
     bool isToShow(const GraphNode* rootOfGraph) const;
 
-	void removeLiteralFromFormula(unsigned int, GraphEdgeType);
-	
-//	friend bool operator == (GraphNode const&, GraphNode const& );		// could be changed and replaced by hash-value
-	friend bool operator < (GraphNode const&, GraphNode const& );
-//	friend ostream& operator << (std::ostream& os, const GraphNode& v);
+    void removeLiteralFromFormula(unsigned int, GraphEdgeType);
 
-// Provides user defined operator new. Needed to trace all new operations on this class.
+    friend bool operator < (GraphNode const&, GraphNode const& );
+
 #undef new
+    /**
+     * Provides user defined operator new. Needed to trace all new operations
+     * on this class.
+     */
     NEW_OPERATOR(GraphNode)
 #define new NEW_NEW
-    
 };
 
 #endif /*GraphNode_H_*/

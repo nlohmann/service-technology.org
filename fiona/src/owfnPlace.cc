@@ -93,10 +93,6 @@ void owfnPlace::operator += (unsigned int i)
   initial_marking += i;
   net->placeHashValue += i*hash_factor;
   net->placeHashValue %= HASHSIZE;
-/*  
-  hash_value += i*hash_factor;
-  hash_value %= HASHSIZE;
-*/
 }
 
 void owfnPlace::operator -= (unsigned int i)
@@ -105,10 +101,6 @@ void owfnPlace::operator -= (unsigned int i)
 
   net->placeHashValue -= i*hash_factor;
   net->placeHashValue %= HASHSIZE;
-/*
-  hash_value -= i*hash_factor;
-  hash_value %= HASHSIZE;
-  */
 }
 
 bool owfnPlace::operator >= (unsigned int i)
@@ -123,25 +115,4 @@ void owfnPlace::set_hash(unsigned int i)
   hash_factor = i;
   net->placeHashValue += hash_factor * initial_marking;
   net->placeHashValue %= HASHSIZE;
-/*	
-  hash_value -= hash_factor * initial_marking;
-  hash_factor = i;
-  hash_value += hash_factor * initial_marking;
-  hash_value %= HASHSIZE;
-  */
 }
-
-//void owfnPlace::set_marking(unsigned int i)
-//{
-//  net->placeHashValue -= hash_factor * initial_marking;
-//  initial_marking = i;
-// net->placeHashValue += hash_factor * initial_marking;
-//  net->placeHashValue %= HASHSIZE;
-//  
-///*
-//  hash_value -= hash_factor * initial_marking;
-//  initial_marking = i;
-// hash_value += hash_factor * initial_marking;
-//  hash_value %= HASHSIZE;
-//*/
-//}  

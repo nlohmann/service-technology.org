@@ -226,7 +226,7 @@ class oWFN  {
 		void calculateReachableStatesFull(GraphNode *);
 		
 		void addInputMessage(unsigned int);
-		int addInputMessage(messageMultiSet);			// adds input message to the current marking
+		void addInputMessage(messageMultiSet);			// adds input message to the current marking
 
 		bool removeOutputMessage(unsigned int);
 		bool removeOutputMessage(messageMultiSet);

@@ -272,59 +272,36 @@ int main(int argc, char ** argv) {
     }
 
 // ---------------- reading all nets ---------------------
-	if (options[O_OWFN_NAME]) {
-		list<char*>::iterator netiter = netfiles.begin();
-		
-		do {
-			numberOfDecodes = 0;
-			
-			garbagefound = 0;
-			State::state_count = 0;          // number of states
-			
-			numberDeletedVertices = 0;
-			
-			numberOfEvents = 0;
-			
-			// prepare getting the net
-			try {
-				PlaceTable = new SymbolTab<PlSymbol>;
-			}
-			catch(bad_alloc) {
-				char mess[] = "\nnot enough space to read net\n";
-				//write(2,mess,sizeof(mess));
-				cerr << mess;
-				_exit(2);
-			}
-			
-			// get the net
-			try {
-				if (netiter != netfiles.end()) {
-					netfile = *netiter;
-				}
-				readnet();  // Parser;
-				
-				// PN->removeisolated();
-				// TODO: better removal of places 
-				// doesn't work with, since array for input and output places
-				// depend on the order of the Places array, reordering results in
-				// a heavy crash
-				
-			} 
-			catch(bad_alloc) {
-				char mess [] = "\nnot enough space to store net\n";
-				//write(2,mess,sizeof(mess));
-				cerr << mess;
-				_exit(2);
-			}
-			
-			PN->filename = netfile;
-			petrinets.push_back(PN);
-			
-			delete PlaceTable;
-			
-			netiter++;
-		} while (netfiles.begin() != netfiles.end() && netiter != netfiles.end());
-	}
+    for (list<char*>::iterator netiter = netfiles.begin();
+        netiter != netfiles.end(); ++netiter) {
+
+        numberOfDecodes = 0;
+        
+        garbagefound = 0;
+        State::state_count = 0;          // number of states
+        
+        numberDeletedVertices = 0;
+        
+        numberOfEvents = 0;
+        
+        // prepare getting the net
+        PlaceTable = new SymbolTab<PlSymbol>;
+        
+        // get the net
+        netfile = *netiter;
+        readnet();  // Parser;
+            
+        // PN->removeisolated();
+        // TODO: better removal of places 
+        // doesn't work with, since array for input and output places
+        // depend on the order of the Places array, reordering results in
+        // a heavy crash
+            
+        PN->filename = netfile;
+        petrinets.push_back(PN);
+        
+        delete PlaceTable;
+    }
     
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
     // Delete lexer buffer for parsing oWFNs.

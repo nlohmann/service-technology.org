@@ -48,7 +48,6 @@ typedef enum
    	O_HELP,
 	O_VERSION,
 	O_DEBUG,
-	O_OWFN_NAME,
 	O_GRAPH_TYPE,	//!< OG or IG
 	O_MESSAGES_MAX,
 	O_EVENT_USE_MAX,
@@ -98,6 +97,7 @@ extern int events_manual;
 extern int bdd_reordermethod;
 
 
+
 /// pointer to input stream
 //extern std::istream * input;
 /// pointer to output stream
@@ -106,6 +106,13 @@ extern int bdd_reordermethod;
 extern std::ostream * log_output;
 
 void parse_command_line(int argc, char* argv[]);
+
+enum FileType { FILETYPE_OWFN, FILETYPE_OG, FILETYPE_UNKNOWN };
+extern FileType getFileType(const std::string& fileName);
+
+extern bool contains(
+    const std::string& hostString,
+    const std::string& subString);
 
 #endif
 

@@ -29,21 +29,21 @@ FIONA=fiona
 
 echo
 echo ---------------------------------------------------------------------
-echo running: $FIONA -a -t OG -n $DIR/smtp3.owfn
+echo running: $FIONA -a -t OG $DIR/smtp3.owfn
 echo
-$FIONA -t OG -n $DIR/smtp3.owfn
+$FIONA -t OG $DIR/smtp3.owfn
 
 echo
 echo ---------------------------------------------------------------------
-echo running: $FIONA -a -t OG -n $DIR/smtp4.owfn
+echo running: $FIONA -a -t OG $DIR/smtp4.owfn
 echo
-$FIONA -t OG -n $DIR/smtp4.owfn
+$FIONA -t OG $DIR/smtp4.owfn
 
 echo
 echo ---------------------------------------------------------------------
-echo running: $FIONA -a -t OG -n $DIR/smtp5.owfn
+echo running: $FIONA -a -t OG $DIR/smtp5.owfn
 echo
-$FIONA -t OG -n $DIR/smtp5.owfn
+$FIONA -t OG $DIR/smtp5.owfn
 
 
 

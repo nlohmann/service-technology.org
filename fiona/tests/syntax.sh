@@ -43,7 +43,7 @@ result=0
 ############################################################################
 
 owfn="$DIR/max_occurrence.owfn"
-cmd="$FIONA -n $owfn -t OG"
+cmd="$FIONA $owfn -t OG"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"

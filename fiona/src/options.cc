@@ -39,6 +39,7 @@
 #include <map>
 #include <list>
 #include <stdlib.h>
+#include <fstream>
 
 #include "options.h"
 #include "debug.h"
@@ -74,7 +75,6 @@ static struct option longopts[] =
   { "help",            no_argument,       NULL, 'h' },
   { "version",         no_argument,       NULL, 'v' },
   { "debug",           required_argument, NULL, 'd' },
-  { "net",             required_argument, NULL, 'n' },
   { "type",            required_argument, NULL, 't' },
   { "show",            required_argument, NULL, 's' },
   { "reduce-nodes",    no_argument,       NULL, 'R' },
@@ -87,7 +87,7 @@ static struct option longopts[] =
   { NULL,              0,                 NULL, 0   }
 };
 
-const char * par_string = "hvd:n:t:s:Rrm:e:b:B:o:";
+const char * par_string = "hvd:t:s:Rrm:e:b:B:o:";
 
 
 // --------------------- functions for command line evaluation ------------------------
@@ -105,11 +105,10 @@ void print_help() {
   trace("                                     3 - show information on events and states\n");
   trace("                                     4 - yet to be defined ;)\n");
   trace("                                     5 - show detailed information on everything\n");
-  trace(" -n | --net=<filename> ........... read input owfn from <filename>\n");
   trace(" -t | --type=<type> .............. select the modus operandi of fiona <type>:\n");
   trace("                                     OG - compute operating guideline\n");
   trace("                                     IG - compute interaction graph (default)\n");
-  trace("                                     match - check if given oWFN (-n) matches\n");
+  trace("                                     match - check if given oWFN matches\n");
   trace("                                             with the operating guideline given\n");
   trace("                                             in [FILE]\n");
   trace("                                     simulation  - check whether the first OG\n");
@@ -229,7 +228,6 @@ void parse_command_line(int argc, char* argv[]) {
 //    options[O_CALC_ALL_STATES] = false; // standard: man muss -a angeben, um voll
     options[O_CALC_ALL_STATES] = true; // so lange Reduktion im Teststadium
     options[O_CALC_REDUCED_IG] = false;
-    options[O_OWFN_NAME] = false;
     options[O_BDD] = false;
     options[O_OTF] = false;
     options[O_EX] = false;
@@ -284,18 +282,6 @@ void parse_command_line(int argc, char* argv[]) {
                     debug_level = TRACE_5;
                 } else {
                     cerr << "Error:\twrong debug mode" << endl
-                         << "\tEnter \"fiona --help\" for more information."
-                         << endl;
-                    exit(1);
-                }
-                break;
-            case 'n':
-                if (optarg) {
-                    options[O_OWFN_NAME] = true;
-                    // netfile = optarg;
-                    netfiles.push_back(optarg);
-                } else {
-                    cerr << "Error:\tnet name missing" << endl
                          << "\tEnter \"fiona --help\" for more information."
                          << endl;
                     exit(1);
@@ -441,19 +427,31 @@ void parse_command_line(int argc, char* argv[]) {
     }
 
     for ( ; optind < argc; ++optind) {
-        ogfiles.push_back(argv[optind]);
+        switch (getFileType(argv[optind])) {
+            case FILETYPE_OWFN:
+                netfiles.push_back(argv[optind]);
+                break;
+            case FILETYPE_OG:
+                ogfiles.push_back(argv[optind]);
+                break;
+            case FILETYPE_UNKNOWN:
+                cerr << "Error:\tCannot determine file type of '"
+                     << argv[optind] << "'" << endl
+                     << "\tEnter \"fiona --help\" for more information.\n"
+                     << endl;
+        }
     }
 
-    if (options[O_EX] == true && options[O_OWFN_NAME] == false) {
-        cerr << "To check equivalence of two OGs, please specify the"
-        	 << "corresponding oWFNs using the -n option."
+    if (options[O_EX] == true && netfiles.size() == 0) {
+        cerr << "To check equivalence of two OGs, please give the"
+        	 << "corresponding oWFNs on the command line."
         	 << "The OGs as BDDs must have been computed before."
              << "\tEnter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
 
-    if (ogfiles.size() == 0 && options[O_OWFN_NAME] == false) {
-        cerr << "Error:\tmissing parameter -n" << endl
+    if (ogfiles.size() == 0 && netfiles.size() == 0) {
+        cerr << "Error:\tNo oWFNs or OGs given." << endl
              << "\tEnter \"fiona --help\" for more information." << endl;
         exit(1);
     }
@@ -470,4 +468,52 @@ void parse_command_line(int argc, char* argv[]) {
     }
 }
 
+FileType getFileType(const std::string& fileName) {
+    unsigned int owfnHits = 0;
+    unsigned int ogHits   = 0;
+
+    ifstream fileStream(fileName.c_str());
+    if (!fileStream) {
+        cerr << "Error:\tCould not open '" << fileName << "' for reading."
+             << endl;
+        exit(1);
+    }
+
+    string line;
+    while (getline(fileStream, line)) {
+        if (contains(line, "PLACE")) ++owfnHits;
+        if (contains(line, "INTERNAL")) ++owfnHits;
+        if (contains(line, "INPUT")) ++owfnHits;
+        if (contains(line, "OUTPUT")) ++owfnHits;
+        if (contains(line, "INITIALMARKING")) ++owfnHits;
+        if (contains(line, "FINALMARKING")) ++owfnHits;
+        if (contains(line, "FINALCONDITION")) ++owfnHits;
+        if (contains(line, "CONSUME")) ++owfnHits;
+        if (contains(line, "PRODUCE")) ++owfnHits;
+        if (contains(line, "ALL_OTHER_PLACES_EMPTY")) ++owfnHits;
+        if (contains(line, "ALL_OTHER_INTERNAL_PLACES_EMPTY")) ++owfnHits;
+        if (contains(line, "ALL_OTHER_EXTERNAL_PLACES_EMPTY")) ++owfnHits;
+        if (contains(line, "MAX_UNIQUE_EVENTS")) ++owfnHits;
+        if (contains(line, "ON_LOOP")) ++owfnHits;
+        if (contains(line, "MAX_OCCURRENCES")) ++owfnHits;
+
+        if (contains(line, "NODES")) ++ogHits;
+        if (contains(line, "INITIALNODE")) ++ogHits;
+        if (contains(line, "TRANSITIONS")) ++ogHits;
+    }
+
+    if (owfnHits > ogHits) {
+        return FILETYPE_OWFN;
+    }
+
+    if (owfnHits < ogHits) {
+        return FILETYPE_OG;
+    }
+
+    return FILETYPE_UNKNOWN;
+}
+
+bool contains(const std::string& hostString, const std::string& subString) {
+    return hostString.find(subString, 0) != std::string::npos;
+}
 

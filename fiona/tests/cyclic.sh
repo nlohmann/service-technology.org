@@ -49,7 +49,7 @@ zyklusRblueedges_soll=6
 zyklusRstoredstates_soll=0
 
 owfn="$DIR/zyklusR.owfn"
-cmd="$FIONA -t OG -n $owfn -e5 -m5"
+cmd="$FIONA -t OG $owfn -e5 -m5"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e5.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -78,7 +78,7 @@ fi
 #############################################################################
 
 owfn="$DIR/zyklusP.owfn"
-cmd="$FIONA -t OG -n $owfn -e10 -m5"
+cmd="$FIONA -t OG $owfn -e10 -m5"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e10.m5.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -105,7 +105,7 @@ zyklusPcommitblueedges_soll=5
 zyklusPcommitstoredstates_soll=11
 
 owfn="$DIR/zyklusPmitCommit.owfn"
-cmd="$FIONA -t OG -n $owfn -e2 -m1"
+cmd="$FIONA -t OG $owfn -e2 -m1"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e2.m1.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"

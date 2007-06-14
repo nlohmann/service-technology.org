@@ -48,7 +48,7 @@ do
     #echo running sequence$i
 
     owfn="$DIR/sequence${i}.owfn"
-    cmd="$FIONA -n $owfn -t IG"
+    cmd="$FIONA $owfn -t IG"
 
     if [ "$memcheck" = "yes" ]; then
         memchecklog="$owfn.IG.memcheck.log"
@@ -79,7 +79,7 @@ do
 
     # Don't run this test because -R is buggy.
     #
-    #cmd="$FIONA -n $owfn -t IG -R"
+    #cmd="$FIONA $owfn -t IG -R"
     #
     #if [ "$memcheck" = "yes" ]; then
     #    memchecklog="$owfn.R.IG.memcheck.log"
@@ -109,7 +109,7 @@ do
     #fi
 
 
-    cmd="$FIONA -n $owfn -t OG"
+    cmd="$FIONA $owfn -t OG"
 
     if [ "$memcheck" = "yes" ]; then
         memchecklog="$owfn.OG.memcheck.log"
@@ -138,7 +138,7 @@ do
     fi
 
 
-    #cmd="$FIONA -n $owfn -t OG -R"
+    #cmd="$FIONA $owfn -t OG -R"
     #
     #if [ "$memcheck" = "yes" ]; then
     #    memchecklog="$owfn.R.OG.memcheck.log"

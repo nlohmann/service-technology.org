@@ -29,50 +29,50 @@ FIONA=fiona
 
 echo
 echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG -n $DIR/phcontrol3.unf.owfn -e1 -m1
+echo running: $FIONA -t OG $DIR/phcontrol3.unf.owfn -e1 -m1
 echo
-$FIONA -a -t OG -n $DIR/phcontrol3.unf.owfn -e1 -m1
+$FIONA -a -t OG $DIR/phcontrol3.unf.owfn -e1 -m1
 
 echo
 echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG -n $DIR/phcontrol4.unf.owfn -e1 -m1
+echo running: $FIONA -t OG $DIR/phcontrol4.unf.owfn -e1 -m1
 echo
-$FIONA -a -t OG -n $DIR/phcontrol4.unf.owfn -e1 -m1
+$FIONA -a -t OG $DIR/phcontrol4.unf.owfn -e1 -m1
 
 echo
 echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG -n $DIR/phcontrol5.unf.owfn -e1 -m1
+echo running: $FIONA -t OG $DIR/phcontrol5.unf.owfn -e1 -m1
 echo
-$FIONA -a -t OG -n $DIR/phcontrol5.unf.owfn -e1 -m1
+$FIONA -a -t OG $DIR/phcontrol5.unf.owfn -e1 -m1
 
 echo
 echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG -n $DIR/phcontrol6.unf.owfn -e1 -m1
+echo running: $FIONA -t OG $DIR/phcontrol6.unf.owfn -e1 -m1
 echo
-$FIONA -a -t OG -n $DIR/phcontrol6.unf.owfn -e1 -m1
+$FIONA -a -t OG $DIR/phcontrol6.unf.owfn -e1 -m1
 
 echo
 echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG -n $DIR/phcontrol7.unf.owfn -e1 -m1
+echo running: $FIONA -t OG $DIR/phcontrol7.unf.owfn -e1 -m1
 echo
-$FIONA -a -t OG -n $DIR/phcontrol7.unf.owfn -e1 -m1
+$FIONA -a -t OG $DIR/phcontrol7.unf.owfn -e1 -m1
 
 echo
 echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG -n $DIR/phcontrol8.unf.owfn -e1 -m1
+echo running: $FIONA -t OG $DIR/phcontrol8.unf.owfn -e1 -m1
 echo
-$FIONA -a -t OG -n $DIR/phcontrol8.unf.owfn -e1 -m1
+$FIONA -a -t OG $DIR/phcontrol8.unf.owfn -e1 -m1
 
 echo
 echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG -n $DIR/phcontrol9.unf.owfn -e1 -m1
+echo running: $FIONA -t OG $DIR/phcontrol9.unf.owfn -e1 -m1
 echo
-$FIONA -a -t OG -n $DIR/phcontrol9.unf.owfn -e1 -m1
+$FIONA -a -t OG $DIR/phcontrol9.unf.owfn -e1 -m1
 
 echo
 echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG -n $DIR/phcontrol10.unf.owfn -e1 -m1
+echo running: $FIONA -t OG $DIR/phcontrol10.unf.owfn -e1 -m1
 echo
-$FIONA -a -t OG -n $DIR/phcontrol10.unf.owfn -e1 -m1
+$FIONA -a -t OG $DIR/phcontrol10.unf.owfn -e1 -m1
 
 exit $result

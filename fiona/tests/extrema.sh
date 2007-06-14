@@ -78,7 +78,7 @@ result=0
 
 for ((i=0; i<${#owfns[*]}; ++i)) do
     owfn="${owfns[$i]}"
-    cmd="$FIONA -n $owfn -t OG"
+    cmd="$FIONA $owfn -t OG"
 
     if [ "$memcheck" = "yes" ]; then
         memchecklog="$owfn.OG.memcheck.log"

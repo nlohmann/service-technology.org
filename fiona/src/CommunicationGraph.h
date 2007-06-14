@@ -87,6 +87,29 @@ typedef std::set<messageMultiSet, compareMessageMultiSets> setOfMessages;
 
 /* communication graph */
 class communicationGraph {
+private:
+    void computeNumberOfNodesEdges(
+        unsigned int& nNodes,
+        unsigned int& nStoredStates,
+        unsigned int& nEdges) const;
+
+    void computeNumberOfNodesEdgesHelper(
+        GraphNode*    v,
+        bool          visitedNodes[],
+        unsigned int& nNodes,
+        unsigned int& nStoredStates,
+        unsigned int& nEdges) const;
+
+    void computeNumberOfBlueNodesEdges(
+        unsigned int& nBlueNodes,
+        unsigned int& nBlueEdges) const;
+
+    void computeNumberOfBlueNodesEdgesHelper(
+        GraphNode* v,
+        bool       visitedNodes[],
+        unsigned int& nBlueNodes,
+        unsigned int& nBlueEdges) const;
+
 protected:
 	oWFN* PN;                            //!< pointer to the underlying petri net
 
@@ -96,7 +119,7 @@ protected:
 	void addProgress(double);
 
 	unsigned int actualDepth;            //!< actual depth in graph
-  
+
 public:
 
 	communicationGraph(oWFN *);
@@ -134,9 +157,6 @@ public:
     void printDotFile();
 
     void printNodeStatistics();
-    void computeNumberOfNodesEdges(GraphNode *, bool[]);
-    void computeNumberOfBlueNodesEdges(GraphNode *, bool[]);
-
     bool stateActivatesOutputEvents(State *);
 
 // Provides user defined operator new. Needed to trace all new operations on this class.

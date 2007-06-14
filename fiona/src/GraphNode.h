@@ -59,7 +59,6 @@ private:
      */
     GraphNodeColor color;
 
-
     /**
      * Annotation of this node (a CNF) as a formula.
      */
@@ -70,12 +69,6 @@ private:
      * them
      */
     successorNodeList * successorNodes;
-
-    /**
-     * List of all blue nodes preceding this one including the edge between
-     * them.
-     */
-    successorNodeList * predecessorNodes;
 
 public:
     bool hasFinalStateInStateSet;
@@ -126,9 +119,6 @@ public:
 
 	void removeLiteralFromFormula(unsigned int, GraphEdgeType);
 	
-    void propagateToSuccessors();
-    void propagateToPredecessors();
-
 //	friend bool operator == (GraphNode const&, GraphNode const& );		// could be changed and replaced by hash-value
 	friend bool operator < (GraphNode const&, GraphNode const& );
 //	friend ostream& operator << (std::ostream& os, const GraphNode& v);

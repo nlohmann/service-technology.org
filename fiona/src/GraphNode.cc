@@ -47,7 +47,6 @@ GraphNode::GraphNode(int numberEvents) :
 			   number(0),
 			   color(BLUE),
 			   successorNodes(NULL),
-			   predecessorNodes(NULL),
 			   hasFinalStateInStateSet(false),
 			   finalAnalysisDone(false) {
 
@@ -71,25 +70,11 @@ GraphNode::~GraphNode() {
 		delete successorNodes;
 	}
 	
-	if (predecessorNodes != NULL) {
-		delete predecessorNodes;
-	}
-	
 	if (eventsUsed != NULL) {
 		delete[] eventsUsed;
 	}
 	
-//	CNF * cnfTemp1 = firstClause;
-//	CNF * cnfTemp2;
-
 	delete annotation;
-
-
-//	while (cnfTemp1) {
-//		cnfTemp2 = cnfTemp1->nextElement;
-//		delete cnfTemp1;	
-//		cnfTemp1 = cnfTemp2;
-//	}
 
 	numberDeletedVertices++;
 	trace(TRACE_5, "GraphNode::~GraphNode() : end\n");

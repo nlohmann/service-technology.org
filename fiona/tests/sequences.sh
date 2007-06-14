@@ -59,7 +59,7 @@ do
         OUTPUT=`$cmd 2>&1`
         echo $OUTPUT | grep "net is controllable: YES" > /dev/null
         resultIG=$?
-        echo $OUTPUT | grep "number of states calculated: $(((i+1)*(i+2)/2))" > /dev/null
+        echo $OUTPUT | grep "number of states stored in nodes: $(((i+1)*(i+2)/2))" > /dev/null
         resultIGNOSC=$?
         echo $OUTPUT | grep "number of nodes: $((i+1))" > /dev/null
         resultIGNON=$?
@@ -90,7 +90,7 @@ do
     #    OUTPUT=`$cmd 2>&1`
     #    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     #    resultIG=$?
-    #    echo $OUTPUT | grep "number of states calculated: $(((i+1)*(i+2)/2))" > /dev/null
+    #    echo $OUTPUT | grep "number of states stored in nodes: $(((i+1)*(i+2)/2))" > /dev/null
     #    resultIGNOSC=$?
     #    echo $OUTPUT | grep "number of nodes: $((i+1))" > /dev/null
     #    resultIGNON=$?
@@ -120,7 +120,7 @@ do
         OUTPUT=`$cmd  2>&1`
         echo $OUTPUT | grep "net is controllable: YES" > /dev/null
         resultOG=$?
-        echo $OUTPUT | grep "number of states calculated: $(((2**(i+1))-1))" > /dev/null
+        echo $OUTPUT | grep "number of states stored in nodes: $(((2**(i+1))-1))" > /dev/null
         resultOGNOSC=$?
         echo $OUTPUT | grep "number of nodes: $((2**i))" > /dev/null
         resultOGNON=$?
@@ -149,7 +149,7 @@ do
     #    OUTPUT=`$cmd 2>&1`
     #    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     #    resultOG=$?
-    #    echo $OUTPUT | grep "number of states calculated: $(((2**(i+1))-1))" > /dev/null
+    #    echo $OUTPUT | grep "number of states stored in nodes: $(((2**(i+1))-1))" > /dev/null
     #    resultOGNOSC=$?
     #    echo $OUTPUT | grep "number of nodes: $((2**i))" > /dev/null
     #    resultOGNON=$?

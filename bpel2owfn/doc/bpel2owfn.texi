@@ -274,6 +274,8 @@ into an oWFN (open Workflow Net). This oWFN can be used to:
 
 @*
 
+Furthermore, BPEL2oWFN can translate a @acronym{BPEL4Chor} choreography to a Petri net model. This model can be used to analyze properties of a complete choreography or to synthesize a fitting service for an incomplete choreography.
+
 BPEL2oWFN uses static analysis to make the generated Petri net model as compact
 as possible to analyze a chosen property. This is called @i{flexible model generation}.
 Furthermore, several design flaws can be detected using control and data flow analysis.
@@ -366,8 +368,7 @@ Print version information and exit.
 @itemx -i @var{filename}.bpel
 Read a @acronym{BPEL} process from file @file{@var{filename}.bpel}.
 If this parameter is omitted, input is read from standard input
-(@code{stdin}). When combined with the @samp{choreography} mode,
-wildcards such as @file{process*.bpel} are also allowed.
+(@code{stdin}). Wildcards such as @file{process*.bpel} are also allowed.
 
 @item --wsdl=@var{filename}.wsdl
 @itemx -w @var{filename}.wsdl
@@ -757,6 +758,8 @@ a Petri net model of their composition. The result is written to the
 file @file{service1_service2.task} is written that can be processed by
 @acronym{LoLA}.
 @end table
+
+Further examples for invocations of BPEL2oWFN can be found in the @file{tests} directory of the source distribution.
 
 
 
@@ -1251,6 +1254,9 @@ In a @acronym{BPEL4Chor} topology, no @acronym{XML} namespace was defined for a 
 @acronym{WS-BPEL} file, the attribute @code{targetNamespace} could not to be grounded to a
 BPEL4Chor @code{<participant>}.
 
+@item 138 @tab notice @tab
+In a @acronym{BPEL4Chor} topology, a partner link specified for an activity was not found. Instead,
+the name of the specified id is used as a partner link.
 
 @end multitable
 

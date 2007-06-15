@@ -161,7 +161,7 @@ and Sun Solaris. Anyway, if the compilation fails please make sure you
 use the most recent (stable) versions of the GNU Compiler Collection.
 If this does not help please send us an electronic mail to
 <bug-bpel2owfn@gnu.org>. Include the version number of your
-distribution (version 2.0.2 of 13 June 2007). Also include in your
+distribution (version 2.0.2 of 15 June 2007). Also include in your
 message the output that the make process produced. We will try to
 answer your mail within a week.
 

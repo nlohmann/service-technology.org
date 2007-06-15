@@ -5,7 +5,7 @@ About this Distribution
 
 This file describes this distribution of BPEL2oWFN, version 2.0.2, a
 tool translating business processes described in BPEL to open workflow
-nets (oWFN), last updated 13 June 2007.
+nets (oWFN), last updated 15 June 2007.
 
 BPEL2oWFN is licensed under the GNU General Public License.
 
@@ -76,8 +76,8 @@ Directories
      the BPEL4WS 1.2 specification, respectively. The sub-directory
      `sa_tests' contains, for each supported static analysis goal, a
      test file that triggers the respective static analysis error
-     message. Finally, sub-directory `consistency' contains processes
-     to check the `consistency' mode.
+     message. Finally, sub-directoris `consistency' and `bpel4chor'
+     contain processes to check the `choreography' mode.
 
      The tests can be triggered with `make check'.
 

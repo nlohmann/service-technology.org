@@ -387,7 +387,7 @@ ignored.} @code{make check} should announce
 
 @smallexample
 ==================
-All 5 tests passed
+All 6 tests passed
 ==================
 @end smallexample
 

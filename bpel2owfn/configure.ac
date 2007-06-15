@@ -19,12 +19,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/05/11 17:16:02 $ by $Author: nielslohmann $.
-# Version $Revision: 1.44 $
+# File last changed $Date: 2007/06/15 15:51:38 $ by $Author: nielslohmann $.
+# Version $Revision: 1.45 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([GNU BPEL2oWFN],[2.0.2],[bpel2owfn-bug@gnu.org],[bpel2owfn])
+AC_INIT([GNU BPEL2oWFN],[2.0.3],[bpel2owfn-bug@gnu.org],[bpel2owfn])
 AM_INIT_AUTOMAKE
 
 

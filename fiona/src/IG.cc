@@ -108,71 +108,64 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 
 		if ((options[O_EVENT_USE_MAX] == false) ||
              checkMaximalEvents(*iter, currentNode, SENDING)) {
-	
+
 			trace(TRACE_2, "\t\t\t\t    sending event: !");
-			
-			GraphNode * v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
-			currentGraphNode = currentNode;
-			
+
+			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
 			calculateSuccStatesInput(*iter, currentNode, v);
-			
+
 			if (v->getColor() == RED) {
 				// message bound violation occured during calculateSuccStatesInput
-				trace(TRACE_2, "\t\t\t\t    sending event: !");
-			//	trace(TRACE_2, PN->getInputPlace(*iter)->name);
-				trace(TRACE_2, " at node " + intToString(currentNode->getNumber()) + " suppressed (message bound violated)\n");
-	
+                trace(TRACE_2, "\t\t\t\t    sending event: !");
+//                trace(TRACE_2, PN->getPlace(*iter)->name);
+                trace(TRACE_2, " at node " + intToString(currentNode->getNumber()) + " suppressed (message bound violated)\n");
+
 				numberDeletedVertices--;
 				delete v;
 			} else {
-				if (AddGraphNode (v, *iter, SENDING)) {
+				if (AddGraphNode (currentNode, v, *iter, SENDING)) {
 
 #ifdef LOOP
 	cout << "calc next node? [y,n]" << endl;
 	char a = getchar();
 	if (a == 'y') {
 #endif
-			
+
 					buildGraph(v);
 					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-					//analyseNode(currentNode, false);
-					//trace(TRACE_5, "node analysed\n");
 #ifdef LOOP
 	}
 #endif	
 				}
 			}
 		}
-	}
-	
-	trace(TRACE_3, "iterating over outputSet\n");
-	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
+    }
+
+    trace(TRACE_3, "iterating over outputSet\n");
+    for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
         if ((options[O_EVENT_USE_MAX] == false) ||
-		     checkMaximalEvents(*iter, currentNode, RECEIVING)) {
-			
-			trace(TRACE_2, "\t\t\t\t    output event: ?");
-	
-			GraphNode * v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
-			currentGraphNode = currentNode;
-			
-			calculateSuccStatesOutput(*iter, currentNode, v);
-			
-			if (AddGraphNode (v, *iter, RECEIVING)) {
+             checkMaximalEvents(*iter, currentNode, RECEIVING)) {
+
+            trace(TRACE_2, "\t\t\t\t    output event: ?");
+
+            GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
+            calculateSuccStatesOutput(*iter, currentNode, v);
+
+			if (AddGraphNode (currentNode, v, *iter, RECEIVING)) {
 		
 #ifdef LOOP
-		cout << "calc next node? [y,n]" << endl;
-		char a = getchar();
-		if (a == 'y') {
+    		cout << "calc next node? [y,n]" << endl;
+            char a = getchar();
+            if (a == 'y') {
 #endif
-				buildGraph(v);
-				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-				//analyseNode(currentNode, false);
-				//trace(TRACE_5, "node analysed\n");
-		
+
+            buildGraph(v);
+            trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+
 #ifdef LOOP
-		}
+            }
 #endif
-		
+
 			}
 		} 	
 	}		
@@ -226,15 +219,12 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 			trace(TRACE_2, "\t\t\t\t    input event: ?");
 
 			GraphNode * v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());		// create new GraphNode of the graph
-			currentGraphNode = currentNode;
 			
 			calculateSuccStatesInput(*iter, currentNode, v);
 			
-			if (AddGraphNode (v, *iter, SENDING)) {
+			if (AddGraphNode (currentNode, v, *iter, SENDING)) {
 				buildReducedGraph(v);
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-				//analyseNode(currentNode, false);
-				//trace(TRACE_5, "node analysed\n");
 			}
 		}
 	}
@@ -244,16 +234,13 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
         if ((options[O_EVENT_USE_MAX] == false) ||
              checkMaximalEvents(*iter, currentNode, RECEIVING)) {
-		
+
 			trace(TRACE_2, "\t\t\t\t    output event: ?");
-		
-			GraphNode * v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
-			currentGraphNode = currentNode;
-						
+
+			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
 			calculateSuccStatesOutput(*iter, currentNode, v);
-	
-			
-			if (AddGraphNode (v, *iter, RECEIVING)) {
+
+			if (AddGraphNode (currentNode, v, *iter, RECEIVING)) {
 				buildReducedGraph(v);
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 				//analyseNode(currentNode, false);

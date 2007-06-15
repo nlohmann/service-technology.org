@@ -113,11 +113,8 @@ protected:
 	oWFN* PN;                            //!< pointer to the underlying petri net
 
 	GraphNode* root;                     //!< the root node of the graph
-	GraphNode* currentGraphNode;         //!< the GraphNode we are working on at a certain time
 
 	void addProgress(double);
-
-//	unsigned int actualDepth;            //!< actual depth in graph
 
 public:
 
@@ -134,8 +131,8 @@ public:
 
     GraphNode * findGraphNodeInSet(GraphNode *);
 
-    void AddGraphNode(GraphNode *, unsigned int, GraphEdgeType);        // for OG
-    bool AddGraphNode(GraphNode *, messageMultiSet, GraphEdgeType);     // for IG
+    void AddGraphNode(GraphNode *, GraphNode *, unsigned int, GraphEdgeType);        // for OG
+    bool AddGraphNode(GraphNode *, GraphNode *, messageMultiSet, GraphEdgeType);     // for IG
 
     void analyseNode(GraphNode *);
 	

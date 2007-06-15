@@ -51,8 +51,7 @@ int show_progress = 0;
 //! \param _PN
 //! \brief constructor
 communicationGraph::communicationGraph(oWFN * _PN) :
-    root(NULL),
-    currentGraphNode(NULL) {
+    root(NULL) {
 
     PN = _PN;
 }
@@ -102,8 +101,6 @@ void communicationGraph::calculateRootNode() {
         PN->calculateReachableStatesInputEvent(root, true);
     }
 
-    currentGraphNode = root;
-
     setOfVertices.insert(root);
 
     trace(TRACE_5, "void reachGraph::calculateRootNode(): end\n");
@@ -137,13 +134,11 @@ GraphNode * communicationGraph::findGraphNodeInSet(GraphNode * toAdd) {
 //! and the node we have just found, the found one gets the current node as a predecessor node
 
 // for IG
-bool communicationGraph::AddGraphNode (GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) {
-    trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : start\n");
+bool communicationGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) {
+    trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : start\n");
 
     if (getNumberOfNodes() == 0) {                // graph contains no nodes at all
         root = toAdd;                           // the given node becomes the root node
-        currentGraphNode = root;
-
         setOfVertices.insert(toAdd);
     } else {
         GraphNode * found = findGraphNodeInSet(toAdd); //findGraphNode(toAdd);
@@ -159,7 +154,7 @@ bool communicationGraph::AddGraphNode (GraphNode * toAdd, messageMultiSet messag
         if (found == NULL) {
             // copy the events used from the parent node
             for (unsigned int i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
-                toAdd->eventsUsed[i] = currentGraphNode->eventsUsed[i];
+                toAdd->eventsUsed[i] = sourceNode->eventsUsed[i];
             }
         }
 
@@ -188,34 +183,23 @@ bool communicationGraph::AddGraphNode (GraphNode * toAdd, messageMultiSet messag
         }
 
         if (found == NULL) {
-
             trace(TRACE_1, "\n\t new successor node computed:");
 
             toAdd->setNumber(getNumberOfNodes());
-
-            GraphEdge * edgeSucc = new GraphEdge(toAdd, label);
-
-            currentGraphNode->addSuccessorNode(edgeSucc);
-            // currentGraphNode->setAnnotationEdges(edgeSucc);
-
-            currentGraphNode = toAdd;
-
+            GraphEdge* edgeSucc = new GraphEdge(toAdd, label);
+            sourceNode->addSuccessorNode(edgeSucc);
             setOfVertices.insert(toAdd);
-            trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
 
+            trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
             return true;
         } else {
             trace(TRACE_1, "\t successor node already known: " + intToString(found->getNumber()) + "\n");
 
             GraphEdge * edgeSucc = new GraphEdge(found, label);
-
-            currentGraphNode->addSuccessorNode(edgeSucc);
-            // currentGraphNode->setAnnotationEdges(edgeSucc);
-
+            sourceNode->addSuccessorNode(edgeSucc);
             delete toAdd;
 
-            trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
-
+            trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
             return false;
         }
     }
@@ -225,9 +209,9 @@ bool communicationGraph::AddGraphNode (GraphNode * toAdd, messageMultiSet messag
 
 
 // for OG
-void communicationGraph::AddGraphNode(GraphNode * toAdd, unsigned int label, GraphEdgeType type) {
+void communicationGraph::AddGraphNode(GraphNode* sourceNode, GraphNode * toAdd, unsigned int label, GraphEdgeType type) {
 
-    trace(TRACE_5, "reachGraph::AddGraphNode(GraphNode * toAdd, unsigned int label, GraphEdgeType type): start\n");
+    trace(TRACE_5, "reachGraph::AddGraphNode(GraphNode* sourceNode, GraphNode * toAdd, unsigned int label, GraphEdgeType type): start\n");
 
     assert(getNumberOfNodes() > 0);
     assert(setOfVertices.size() > 0);
@@ -245,7 +229,7 @@ void communicationGraph::AddGraphNode(GraphNode * toAdd, unsigned int label, Gra
     // preparing the new node
     toAdd->setNumber(getNumberOfNodes());
     for (unsigned int i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
-        toAdd->eventsUsed[i] = currentGraphNode->eventsUsed[i];
+        toAdd->eventsUsed[i] = sourceNode->eventsUsed[i];
     }
     toAdd->eventsUsed[offset + label]++;
     setOfVertices.insert(toAdd);
@@ -254,12 +238,9 @@ void communicationGraph::AddGraphNode(GraphNode * toAdd, unsigned int label, Gra
     GraphEdge* newEdge = new GraphEdge(toAdd, edgeLabel);
 
     // add the new node to successorNodeList
-    currentGraphNode->addSuccessorNode(newEdge);
+    sourceNode->addSuccessorNode(newEdge);
 
-    // exiting
-    currentGraphNode = toAdd;
-
-    trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * toAdd, unsigned int label, GraphEdgeType type): end\n");
+    trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode* sourceNode, GraphNode * toAdd, unsigned int label, GraphEdgeType type): end\n");
 }
 
 
@@ -695,7 +676,7 @@ void communicationGraph::addProgress(double toAddValue) {
 //! changed significantly and depending on the debug-level set
 void communicationGraph::printProgress() {
 
-    return;
+//    return;
 
     int progress_step_size = 5;
     int current_progress = int(100 * global_progress);

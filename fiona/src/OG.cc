@@ -70,8 +70,7 @@ operatingGuidelines::~operatingGuidelines() {
 //! \brief builds up the graph recursively
 void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_plus) {
 
-    // currentNode is the root of the current subgraph
-    // currentGraphNode is the parent of currentNode
+    // currentNode is the root of the currently considered subgraph
     // at this point, the states inside currentNode are already computed!
 
 	trace(TRACE_1, "\n=================================================================\n");
@@ -140,12 +139,8 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
                 GraphNode* found = findGraphNodeInSet(v);
                 
                 if (found == NULL) {
-                    // node v is new
-                    currentGraphNode = currentNode; // remember me as the parent
-
-                    // calling AddGraphNode with true
-                    // meaning that the node as well as the edge to it is added 
-                    AddGraphNode(v, i, SENDING);
+                    // node v is new, so the node as well as the edge to it is added 
+                    AddGraphNode(currentNode, v, i, SENDING);
 
                     // going down with sending event...
                     buildGraph(v, your_progress);
@@ -157,7 +152,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 				} else {
                     // node was computed before, so only add a new edge to the old node
                     trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
-            
+
                     // draw a new SENDING edge to the old node
                     string edgeLabel = PN->getInputPlace(i)->getLabelForCommGraph();
                     GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
@@ -226,12 +221,8 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 			GraphNode* found = findGraphNodeInSet(v);
 			
 			if (found == NULL) {
-                // node v is new
-                currentGraphNode = currentNode; // remember me as the parent
-
-                // calling AddGraphNode with true
-                // meaning that the node as well as the edge to it is added 
-                AddGraphNode(v, i, RECEIVING);
+                // node v is new, so the node as well as the edge to it is added
+                AddGraphNode(currentNode, v, i, RECEIVING);
 
                 // going down with receiving event...
 				// buildGraph(v, your_progress);

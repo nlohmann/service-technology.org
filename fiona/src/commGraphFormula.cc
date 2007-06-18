@@ -56,6 +56,10 @@ void CommGraphFormulaAssignment::setToTrue(const std::string& literal) {
     set(literal, true);
 }
 
+void CommGraphFormulaAssignment::setToFalse(const std::string& literal) {
+    set(literal, false);
+}
+
 bool CommGraphFormulaAssignment::get(const std::string& literal) const {
     literal2bool_t::const_iterator literal2bool_iter = literal2bool.find(literal);
 

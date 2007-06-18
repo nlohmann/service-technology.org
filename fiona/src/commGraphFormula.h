@@ -75,6 +75,12 @@ public:
     void setToTrue(const std::string& literal);
 
     /**
+     * Sets the given literal to false within this CommGraphFormulaAssignment.
+     * @param literal Literal which should be set to false.
+     */
+    void setToFalse(const std::string& literal);
+
+    /**
      * Gets the truth value of the given literal within this
      * CommGraphFormulaAssignment. If no truth value was previously set for
      * this literal by set() or setToTrue(), then the truth value of the given

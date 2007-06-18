@@ -47,7 +47,8 @@ GraphNode::GraphNode(int numberEvents) :
 			   number(0),
 			   color(BLUE),
 			   successorNodes(NULL),
-			   hasFinalStateInStateSet(false) {
+			   hasFinalStateInStateSet(false),
+               testAssignment(NULL) {
 
 	annotation = new CNF_formula();
 
@@ -169,7 +170,7 @@ CNF_formula* GraphNode::getCNF_formula() {
 // return the assignment that is imposed by present or absent arcs leaving node v
 CommGraphFormulaAssignment* GraphNode::getAssignment() {
 	
-	trace(TRACE_5, "computing annotation of node " + intToString(getNumber()) + "\n");
+	trace(TRACE_5, "computing assignment of node " + intToString(getNumber()) + "\n");
 
 	CommGraphFormulaAssignment* myassignment = new CommGraphFormulaAssignment();
 	

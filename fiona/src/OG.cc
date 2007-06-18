@@ -183,25 +183,19 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
         i++;
     }
 
-	/**
-	@todo This check, whether a node's annotation is satisfiable, should be
-	used after the new and smarter algorithm for choosing the next
-	considered event is implemented.
-	// early checking if the node's annotation cannot be made true
-	CommGraphFormulaAssignment* testAssignment = currentNode->getAssignment();
+    // early checking if the node's annotation cannot be made true
+    currentNode->testAssignment = currentNode->getAssignment();
+    unsigned int j = 0;
+    for (j = 0; j < PN->getOutputPlaceCount(); j++) {
+        currentNode->testAssignment->setToTrue(PN->getOutputPlace(j)->getLabelForCommGraph());
+    }
 
-	for (unsigned int j = 0; j < PN->getInputPlaceCount(); j++) {
-		//cout << PN->getInputPlace(j)->name << endl;
-		testAssignment->setToTrue(PN->getInputPlace(j)->getLabelForCommGraph());
+    // check whether annotation is still satisfiable
+    // @todo: should later be changed to test for existence of empty clause
+	if (currentNode->getCNF_formula()->value(*(currentNode->testAssignment)) == false) {
+		currentNode->setColor(RED);
+        return;
 	}
-
-	if (currentNode->getCNF_formula()->value(*testAssignment) == false) {
-		assert(false);
-		cout << "node " << currentNode->getNumber() << " went red early. formula was " << currentNode->getCNF_formula()->asString() << endl;
-	}
-
-	delete testAssignment;
-	*/
 
 	i = 0;
 	// iterate over all output places of the oWFN (receiving events in OG)
@@ -231,6 +225,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
                 trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 				if (v->getColor() == RED) {
 					currentNode->removeLiteralFromFormula(i, RECEIVING);
+                    currentNode->testAssignment->setToFalse(PN->getOutputPlace(i)->getLabelForCommGraph());
 				}
 			} else {
                 // node was computed before, so only add a new edge to the old node
@@ -246,6 +241,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 				// annotation of currentNode.
 				if (found->getColor() == RED) {
 					currentNode->removeLiteralFromFormula(i, RECEIVING);
+                    currentNode->testAssignment->setToFalse(PN->getOutputPlace(i)->getLabelForCommGraph());
 				}
 				delete v;
 
@@ -258,10 +254,19 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 			trace(TRACE_2, " suppressed (max_occurence reached)\n");
 
 			currentNode->removeLiteralFromFormula(i, RECEIVING);
+            currentNode->testAssignment->setToFalse(PN->getOutputPlace(i)->getLabelForCommGraph());
 
 //			addProgress(your_progress);
 //			printProgress();
 		}
+
+        // check whether annotation is still satisfiable
+        // @todo: should later be changed to test for existence of empty clause
+        if (currentNode->getCNF_formula()->value(*(currentNode->testAssignment)) == false) {
+            currentNode->setColor(RED);
+            return;
+        }
+
 		i++;
     }
 

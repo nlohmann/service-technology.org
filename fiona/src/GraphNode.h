@@ -100,6 +100,9 @@ public:
     CNF_formula* getCNF_formula();
     std::string getCNFString();
 
+    // temporary test assignment that sets yet to be visited successors to true
+    // and therefore allows for early discovery of a formula that cannot get true 
+    CommGraphFormulaAssignment* testAssignment;
     CommGraphFormulaAssignment* getAssignment();
 
     void addClause(CommGraphFormulaMultiaryOr*);

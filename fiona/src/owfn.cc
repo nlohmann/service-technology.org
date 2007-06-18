@@ -317,6 +317,7 @@ void oWFN::addSuccStatesToList(GraphNode * n, State * currentState) {
 		
 		// add successors
 		for(unsigned int i = 0; i < currentState->CardFireList; i++) {
+			assert(currentState->succ[i] != NULL);
 			if (n->addState(currentState->succ[i])) {	// add current successor
 				// its successors need only be added if state was not yet in current node
 				addSuccStatesToList(n, currentState->succ[i]);
@@ -522,6 +523,7 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
 	CurrentState->placeHashValue = placeHashValue;
 	CurrentState->type = typeOfState();
 	
+	assert(CurrentState != NULL);
 	n->addState(CurrentState);
 	setOfStatesTemp.insert(CurrentState);
 	  	
@@ -674,6 +676,7 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal) {
 	
 	setOfStatesTemp.insert(CurrentState);
 	
+	assert(CurrentState != NULL);
 	n->addState(CurrentState);
 	addRecursivelySuccStatesToSetOfTempStates(CurrentState);
 	  	
@@ -1266,6 +1269,7 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 		
 		CurrentState->placeHashValue = placeHashValue;
 		CurrentState->type = typeOfState();
+		assert(CurrentState != NULL);
 		n->addState(CurrentState);
 		
 		// building EG in a node
@@ -1348,6 +1352,7 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 						return;
 					}
 
+					assert(NewState != NULL);
 					n->addState(NewState);
 					
 					if (tempCurrentMarking) {

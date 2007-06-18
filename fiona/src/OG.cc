@@ -40,6 +40,9 @@
 #include "owfn.h"
 #include "GraphNode.h"
 
+// #define TRUE 1 in cudd package can interfere with CommGraphLiteral::TRUE.
+// So, we undefine TRUE.
+#undef TRUE
 
 //! \fn operatingGuidelines::operatingGuidelines(oWFN * _PN)
 //! \param _PN
@@ -290,7 +293,7 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
     trace(TRACE_5, "operatingGuidelines::computeCNF(GraphNode * node): start\n");
 	
 	// initially, the annoation is empty (and therefore equivalent to true)
-	assert(node->getCNF_formula()->asString() == "true");
+	assert(node->getCNF_formula()->asString() == CommGraphFormulaLiteral::TRUE);
 	
 	StateSet::iterator iter;			// iterator over the states of the node
 	
@@ -334,7 +337,7 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 
 				node->addClause(myclause);
 
-				// TODO: an dieser stelle prüfen, ob myclause false ist -> dann knoten rot machen
+				// TODO: an dieser stelle prüfen, ob myclause false ist -> dann knoten rot machen. Korrektur: das sollte der Aufrufer von computeCNF machen!
 			}
 		}
 	} else {

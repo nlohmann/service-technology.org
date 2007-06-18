@@ -111,7 +111,8 @@ void GraphNode::addSuccessorNode(GraphEdge * edge) {
 //! \param s pointer to the state that is to be added to this node
 //! \brief adds the state s to the list of states
 bool GraphNode::addState(State * s) {
-	pair<StateSet::iterator, bool> result = reachGraphStateSet.insert(s);
+    assert(s != NULL);
+    pair<StateSet::iterator, bool> result = reachGraphStateSet.insert(s);
     return result.second;       // returns whether the element got inserted (true) or not (false)
 }
 

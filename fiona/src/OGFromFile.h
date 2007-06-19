@@ -64,12 +64,12 @@ private:
         OGFromFileNode* parentNode);
     OGFromFileNode* getParentNodeForTransitionLabel(
         const std::string& transitionLabel) const;
-    CommGraphFormula* annotation_;
+    GraphFormula* annotation_;
     OGFromFileNode* depthFirstSearchParent;
 public:
     transitions_t transitions;
 
-    OGFromFileNode(const std::string& name_, CommGraphFormula* annotation_,
+    OGFromFileNode(const std::string& name_, GraphFormula* annotation_,
         GraphNodeColor color = BLUE);
 
     ~OGFromFileNode();
@@ -86,12 +86,12 @@ public:
     OGFromFileNode* backfireTransitionWithLabel(
         const std::string& transitionLabel) const;
     bool assignmentSatisfiesAnnotation(
-        const CommGraphFormulaAssignment& assignment) const;
+        const GraphFormulaAssignment& assignment) const;
 
     std::string getAnnotationAsString() const;
-	CommGraphFormula* getAnnotation() const;
+	GraphFormula* getAnnotation() const;
 
-	CommGraphFormulaAssignment* getAssignment() const;
+	GraphFormulaAssignment* getAssignment() const;
 
     void removeTransitionsToNode(const OGFromFileNode* nodeToDelete);
     void setDepthFirstSearchParent(OGFromFileNode* depthFirstSearchParent);
@@ -143,7 +143,7 @@ public:
     ~OGFromFile();
     void addNode(OGFromFileNode* node);
     OGFromFileNode* addNode(const std::string& nodeName,
-        CommGraphFormula* annotation, GraphNodeColor color = BLUE);
+        GraphFormula* annotation, GraphNodeColor color = BLUE);
     void addTransition(const std::string& srcName, const std::string& dstName,
         const std::string& label);
     bool hasNodeWithName(const std::string& nodeName) const;
@@ -186,7 +186,7 @@ public:
      * Creates and returns the annotation for the product node of the given two
      * nodes. The caller is responsible for deleting the returned formula.
      */
-    CNF_formula* createProductAnnotation(const OGFromFileNode* lhs,
+    GraphFormulaCNF* createProductAnnotation(const OGFromFileNode* lhs,
         const OGFromFileNode* rhs) const;
 
     /**

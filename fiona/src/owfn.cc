@@ -52,7 +52,7 @@ bool compare(const owfnPlace* lhs, const owfnPlace* rhs){
 	return lhs->name < rhs->name;
 }
 
-//! \fn oWFN::oWFN()
+
 //! \brief constructor
 oWFN::oWFN() : arcCnt(0),
                CurrentCardFireList(0), CurrentCardQuasiFireList(0),
@@ -79,7 +79,6 @@ oWFN::oWFN() : arcCnt(0),
 }
 
 
-//! \fn oWFN::~oWFN()
 //! \brief destructor
 oWFN::~oWFN() {	
 	trace(TRACE_5, "oWFN::~oWFN() : start\n");
@@ -89,12 +88,11 @@ oWFN::~oWFN() {
 			delete binHashTable[i];
 		}
 		binHashTable[i] = (binDecision *) 0;
-	}	
+	}
 
 	delete[] binHashTable;
-	
-	for (Places_t::size_type i = 0; i < getPlaceCount(); ++i)
-	{
+
+	for (Places_t::size_type i = 0; i < getPlaceCount(); ++i) {
 		delete getPlace(i);
 	}	
 	
@@ -114,18 +112,15 @@ oWFN::Places_t::size_type oWFN::getPlaceCount() const {
 	return Places.size();
 }
 
-owfnPlace* oWFN::getPlace(Places_t::size_type i) const
-{
+owfnPlace* oWFN::getPlace(Places_t::size_type i) const {
     return Places[i];
 }
 
-oWFN::Transitions_t::size_type oWFN::getTransitionCount() const
-{
+oWFN::Transitions_t::size_type oWFN::getTransitionCount() const {
     return Transitions.size();
 }
 
-owfnTransition* oWFN::getTransition(Transitions_t::size_type i) const
-{
+owfnTransition* oWFN::getTransition(Transitions_t::size_type i) const {
     return Transitions[i];
 }
 
@@ -2144,7 +2139,7 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
             // If the currentState has a leaving tau transition, we can skip
             // checking the annotation because it is satisfied for sure.
             if (!currentState->hasLeavingTauTransitionForMatching()) {
-                CommGraphFormulaAssignment assignment =
+                GraphFormulaAssignment assignment =
                     makeAssignmentForOGMatchingForState(currentState);
 
                 if (!currentOGNode->assignmentSatisfiesAnnotation(assignment)) {
@@ -2190,8 +2185,8 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
 }
 
 
-CommGraphFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const State* currentState) const {
-    CommGraphFormulaAssignment assignment;
+GraphFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const State* currentState) const {
+    GraphFormulaAssignment assignment;
 
     for (unsigned int itransition = 0;
          itransition != currentState->CardFireList; ++itransition)
@@ -2201,7 +2196,7 @@ CommGraphFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const State
     }
 
     if (isFinal()) {
-        assignment.setToTrue(CommGraphFormulaLiteral::FINAL);
+        assignment.setToTrue(GraphFormulaLiteral::FINAL);
     }
 
     return assignment;

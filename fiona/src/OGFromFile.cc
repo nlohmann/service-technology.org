@@ -41,7 +41,7 @@
 using namespace std;
 
 OGFromFileNode::OGFromFileNode(const std::string& name,
-    CommGraphFormula* annotation, GraphNodeColor color) :
+    GraphFormula* annotation, GraphNodeColor color) :
     name_(name),
     color_(color),
     annotation_(annotation),
@@ -155,7 +155,7 @@ OGFromFileTransition* OGFromFileNode::getTransitionWithLabel(
 OGFromFileNode* OGFromFileNode::fireTransitionWithLabel(
     const std::string& transitionLabel)
 {
-    if (transitionLabel == CommGraphFormulaLiteral::TAU) {
+    if (transitionLabel == GraphFormulaLiteral::TAU) {
         return this;
     }
 
@@ -176,7 +176,7 @@ OGFromFileNode* OGFromFileNode::backfireTransitionWithLabel(
 }
 
 bool OGFromFileNode::assignmentSatisfiesAnnotation(
-    const CommGraphFormulaAssignment& assignment) const
+    const GraphFormulaAssignment& assignment) const
 {
     assert(annotation_ != NULL);
     return annotation_->satisfies(assignment);
@@ -188,7 +188,7 @@ std::string OGFromFileNode::getAnnotationAsString() const
     return annotation_->asString();
 }
 
-CommGraphFormula* OGFromFileNode::getAnnotation() const {
+GraphFormula* OGFromFileNode::getAnnotation() const {
 
     return annotation_;
 
@@ -196,11 +196,11 @@ CommGraphFormula* OGFromFileNode::getAnnotation() const {
 
 
 // return the assignment that is imposed by present or absent arcs leaving the node
-CommGraphFormulaAssignment* OGFromFileNode::getAssignment() const {
+GraphFormulaAssignment* OGFromFileNode::getAssignment() const {
 	
 	trace(TRACE_5, "computing annotation of node " + getName() + "\n");
 
-	CommGraphFormulaAssignment* myassignment = new CommGraphFormulaAssignment();
+	GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
 	
 	// traverse outgoing edges and set the corresponding literals
 	// to true if the respective node is BLUE
@@ -212,7 +212,7 @@ CommGraphFormulaAssignment* OGFromFileNode::getAssignment() const {
 	}
 	
 	// we assume that literal final is always true
-	myassignment->setToTrue(CommGraphFormulaLiteral::FINAL);
+	myassignment->setToTrue(GraphFormulaLiteral::FINAL);
 	
 	return myassignment;
 }
@@ -275,7 +275,7 @@ void OGFromFile::addNode(OGFromFileNode* node)
 }
 
 OGFromFileNode* OGFromFile::addNode(const std::string& nodeName,
-    CommGraphFormula* annotation, GraphNodeColor color)
+    GraphFormula* annotation, GraphNodeColor color)
 {
     OGFromFileNode* node = new OGFromFileNode(nodeName, annotation, color);
     addNode(node);
@@ -341,7 +341,7 @@ void OGFromFile::removeFalseNodes() {
 		nodes_iterator iNode = nodes.begin();
 		while (iNode != nodes.end())
 		{
-			CommGraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
+			GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
 			if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
 				removeTransitionsToNodeFromAllOtherNodes(*iNode);
 				if (*iNode == getRoot()) {
@@ -431,8 +431,8 @@ bool OGFromFile::simulatesRecursive ( OGFromFileNode *myNode,
 	
 	trace(TRACE_5, "OGFromFile::simulateRecursive: checking annotations\n");
 
-	CNF_formula* simNodeAnnotationInCNF = simNode->getAnnotation()->getCNF();
-	CNF_formula* myNodeAnnotationInCNF = myNode->getAnnotation()->getCNF();
+	GraphFormulaCNF* simNodeAnnotationInCNF = simNode->getAnnotation()->getCNF();
+	GraphFormulaCNF* myNodeAnnotationInCNF = myNode->getAnnotation()->getCNF();
 	if (simNodeAnnotationInCNF->implies(myNodeAnnotationInCNF)) {
 		trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations ok\n" );
 	} else {
@@ -488,7 +488,7 @@ OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
 	std::string currentName;
 	currentName = currentOGNode->getName() + "x" + currentRhsNode->getName();
 
-	CNF_formula* currentFormula = createProductAnnotation(currentOGNode,
+	GraphFormulaCNF* currentFormula = createProductAnnotation(currentOGNode,
 	    currentRhsNode);
 
 	// building the new root node of the product OG
@@ -575,7 +575,7 @@ void OGFromFile::buildProductOG(OGFromFileNode* currentOGNode,
 				// we computed a new node, so we add a node and an edge
 //				trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
 
-				CNF_formula* newProductFormula = createProductAnnotation(
+				GraphFormulaCNF* newProductFormula = createProductAnnotation(
 				    newOGNode, newRhsNode);
 
 				OGFromFileNode* newProductNode = new OGFromFileNode(newProductName, newProductFormula);
@@ -592,14 +592,14 @@ void OGFromFile::buildProductOG(OGFromFileNode* currentOGNode,
 	trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): end\n");
 }
 
-CNF_formula* OGFromFile::createProductAnnotation(const OGFromFileNode* lhs,
+GraphFormulaCNF* OGFromFile::createProductAnnotation(const OGFromFileNode* lhs,
     const OGFromFileNode* rhs) const
 {
-    CommGraphFormulaMultiaryAnd* conjunction = new CommGraphFormulaMultiaryAnd(
+    GraphFormulaMultiaryAnd* conjunction = new GraphFormulaMultiaryAnd(
         lhs->getAnnotation()->getDeepCopy(),
         rhs->getAnnotation()->getDeepCopy());
 
-    CNF_formula* cnf = conjunction->getCNF();
+    GraphFormulaCNF* cnf = conjunction->getCNF();
     delete conjunction;
     cnf->simplify();
     return cnf;
@@ -716,7 +716,7 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
         // print file for empty OG
         ogFile << "NODES" << endl << "  0 : " << GraphNodeColor(RED).toString()
                << " : "
-               << CommGraphFormulaLiteral::FALSE << ';' << endl << endl
+               << GraphFormulaLiteral::FALSE << ';' << endl << endl
                << "INITIALNODE" << endl << "  0;" << endl << endl
                << "TRANSITIONS" << endl << "  ;" << endl;
 

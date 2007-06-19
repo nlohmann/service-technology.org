@@ -20,9 +20,9 @@
  *****************************************************************************/
 
 /*!
- * \file    commGraphFormula.cc
+ * \file    GraphFormula.cc
  *
- * \brief   Implementation of class commGraphFormula. See commGraphFormula.h
+ * \brief   Implementation of class GraphFormula. See GraphFormula.h
  *          for further information.
  *
  * \author  responsible: Jan Bretschneider <bretschn@informatik.hu-berlin.de>
@@ -42,25 +42,25 @@
 using namespace std;
 
 
-const std::string CommGraphFormulaLiteral::FINAL = std::string("final");
-const std::string CommGraphFormulaLiteral::TAU = std::string("tau");
-const std::string CommGraphFormulaLiteral::TRUE = std::string("true");
-const std::string CommGraphFormulaLiteral::FALSE = std::string("false");
+const std::string GraphFormulaLiteral::FINAL = std::string("final");
+const std::string GraphFormulaLiteral::TAU = std::string("tau");
+const std::string GraphFormulaLiteral::TRUE = std::string("true");
+const std::string GraphFormulaLiteral::FALSE = std::string("false");
 
 
-void CommGraphFormulaAssignment::set(const std::string& literal, bool value) {
+void GraphFormulaAssignment::set(const std::string& literal, bool value) {
     literal2bool[literal] = value;
 }
 
-void CommGraphFormulaAssignment::setToTrue(const std::string& literal) {
+void GraphFormulaAssignment::setToTrue(const std::string& literal) {
     set(literal, true);
 }
 
-void CommGraphFormulaAssignment::setToFalse(const std::string& literal) {
+void GraphFormulaAssignment::setToFalse(const std::string& literal) {
     set(literal, false);
 }
 
-bool CommGraphFormulaAssignment::get(const std::string& literal) const {
+bool GraphFormulaAssignment::get(const std::string& literal) const {
     literal2bool_t::const_iterator literal2bool_iter = literal2bool.find(literal);
 
     if (literal2bool_iter == literal2bool.end())
@@ -69,41 +69,41 @@ bool CommGraphFormulaAssignment::get(const std::string& literal) const {
     return literal2bool_iter->second;
 }
 
-bool CommGraphFormula::satisfies(const CommGraphFormulaAssignment& assignment)
+bool GraphFormula::satisfies(const GraphFormulaAssignment& assignment)
     const
 {
     return value(assignment);
 }
 
 
-void CommGraphFormula::removeLiteral(const std::string&) {
+void GraphFormula::removeLiteral(const std::string&) {
 }
 
 
-threeValueLogic CommGraphFormula::equals() {
+threeValueLogic GraphFormula::equals() {
 
-    if (dynamic_cast<CommGraphFormulaLiteral*>(this)) {
-        if (asString() == CommGraphFormulaLiteral::TRUE) {
+    if (dynamic_cast<GraphFormulaLiteral*>(this)) {
+        if (asString() == GraphFormulaLiteral::TRUE) {
             return TRUE;
-        } else if (asString() == CommGraphFormulaLiteral::FALSE) {
+        } else if (asString() == GraphFormulaLiteral::FALSE) {
             return FALSE;
         } else {
             return UNKNOWN;
         }
     }
 
-    // assert: this is no CommGraphFormulaLiteral.
+    // assert: this is no GraphFormulaLiteral.
 
-    if (dynamic_cast<CommGraphFormulaMultiaryOr*>(this)) {
+    if (dynamic_cast<GraphFormulaMultiaryOr*>(this)) {
         bool unknownFound = false;
-        for (CommGraphFormulaMultiaryOr::iterator i =
-             dynamic_cast<CommGraphFormulaMultiaryOr*>(this)->begin();
-             i != dynamic_cast<CommGraphFormulaMultiaryOr*>(this)->end(); i++) {
-            if (dynamic_cast<CommGraphFormula*>(*i)->equals() == TRUE) {
+        for (GraphFormulaMultiaryOr::iterator i =
+             dynamic_cast<GraphFormulaMultiaryOr*>(this)->begin();
+             i != dynamic_cast<GraphFormulaMultiaryOr*>(this)->end(); i++) {
+            if (dynamic_cast<GraphFormula*>(*i)->equals() == TRUE) {
                 return TRUE;
             }
 
-            if (dynamic_cast<CommGraphFormula*>(*i)->equals() == UNKNOWN) {
+            if (dynamic_cast<GraphFormula*>(*i)->equals() == UNKNOWN) {
                 unknownFound = true;
             }
         }
@@ -111,17 +111,17 @@ threeValueLogic CommGraphFormula::equals() {
         return unknownFound ? UNKNOWN : FALSE;
     }
 
-    if (dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)) {
+    if (dynamic_cast<GraphFormulaMultiaryAnd*>(this)) {
         bool noUnknownFound = true;
-        for (CommGraphFormulaMultiaryAnd::iterator i =
-             dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)->begin();
-             i != dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)->end();
+        for (GraphFormulaMultiaryAnd::iterator i =
+             dynamic_cast<GraphFormulaMultiaryAnd*>(this)->begin();
+             i != dynamic_cast<GraphFormulaMultiaryAnd*>(this)->end();
              i++) {
-            if (dynamic_cast<CommGraphFormula*>(*i)->equals() == FALSE) {
+            if (dynamic_cast<GraphFormula*>(*i)->equals() == FALSE) {
                 return FALSE;
             }
 
-            if (dynamic_cast<CommGraphFormula*>(*i)->equals() == UNKNOWN) {
+            if (dynamic_cast<GraphFormula*>(*i)->equals() == UNKNOWN) {
                 noUnknownFound = false;
             }
         }
@@ -133,13 +133,13 @@ threeValueLogic CommGraphFormula::equals() {
 }
 
 
-CNF_formula *CommGraphFormula::getCNF() {
-    CNF_formula *cnf = new CNF_formula;
-    trace(TRACE_5, "commGraphFormula::getCNF(): " + asString() + " is a\n");
+GraphFormulaCNF* GraphFormula::getCNF() {
+    GraphFormulaCNF* cnf = new GraphFormulaCNF;
+    trace(TRACE_5, "GraphFormula::getCNF(): " + asString() + " is a\n");
 
     // CNF(literal) = literal 
-    if(dynamic_cast<CommGraphFormulaLiteral*>(this)) {
-        CommGraphFormulaMultiaryOr *clause = new CommGraphFormulaMultiaryOr;
+    if (dynamic_cast<GraphFormulaLiteral*>(this)) {
+        GraphFormulaMultiaryOr* clause = new GraphFormulaMultiaryOr;
         trace(TRACE_5, "literal.\n");
 
         clause->addSubFormula(this->getDeepCopy());
@@ -148,19 +148,19 @@ CNF_formula *CommGraphFormula::getCNF() {
     }
 
     // CNF(cnf) = cnf 
-    if(dynamic_cast<CNF_formula*>(this)) {
+    if (dynamic_cast<GraphFormulaCNF*>(this)) {
         trace(TRACE_5, "CNF.\n");
-        return dynamic_cast<CNF_formula*>(this)->getDeepCopy();
+        return dynamic_cast<GraphFormulaCNF*>(this)->getDeepCopy();
     }
 
     // CNF(phi AND psi) = CNF(phi) AND CNF(psi) 
-    if(dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)) {
+    if (dynamic_cast<GraphFormulaMultiaryAnd*>(this)) {
         trace(TRACE_5, "MultiaryAnd. Going in deeper.\n");
-        for(CommGraphFormulaMultiaryAnd::iterator i = dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)->begin(); 
-            i != dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)->end(); i++) {
-            CNF_formula *temp = dynamic_cast<CommGraphFormula*>(*i)->getCNF();
-            for(CNF_formula::iterator j = temp->begin(); j != temp->end(); j++) {
-                cnf->addClause(dynamic_cast<CommGraphFormulaMultiaryOr*>(*j)->getDeepCopy());
+        for(GraphFormulaMultiaryAnd::iterator i = dynamic_cast<GraphFormulaMultiaryAnd*>(this)->begin(); 
+            i != dynamic_cast<GraphFormulaMultiaryAnd*>(this)->end(); i++) {
+            GraphFormulaCNF *temp = dynamic_cast<GraphFormula*>(*i)->getCNF();
+            for(GraphFormulaCNF::iterator j = temp->begin(); j != temp->end(); j++) {
+                cnf->addClause(dynamic_cast<GraphFormulaMultiaryOr*>(*j)->getDeepCopy());
             }
             delete temp;
         }
@@ -168,11 +168,11 @@ CNF_formula *CommGraphFormula::getCNF() {
     }
 
     // CNF(phi OR psi) = ...  things becoming ugly 
-    if(dynamic_cast<CommGraphFormulaMultiaryOr*>(this)) {
+    if (dynamic_cast<GraphFormulaMultiaryOr*>(this)) {
         trace(TRACE_5, "MultiaryOr. Going Underground.\n");
-        CommGraphFormulaMultiaryOr *temp = dynamic_cast<CommGraphFormulaMultiaryOr*>(this);
-        CommGraphFormulaMultiaryAnd *clause;
-        //CNF_formula *conj = new CNF_formula;    
+        GraphFormulaMultiaryOr *temp = dynamic_cast<GraphFormulaMultiaryOr*>(this);
+        GraphFormulaMultiaryAnd *clause;
+        //GraphFormulaCNF *conj = new GraphFormulaCNF;    
         bool final = true;
 
         // first of all, merge all top-level OR's 
@@ -181,36 +181,35 @@ CNF_formula *CommGraphFormula::getCNF() {
         // all SubFormulas shoud now be either Literal or MultiaryAnd
 
         // iterate over the MultiaryOr
-        for(CommGraphFormulaMultiaryOr::iterator i = temp->begin(); i != temp->end(); ++i) {
+        for (GraphFormulaMultiaryOr::iterator i = temp->begin(); i != temp->end(); ++i) {
             // CNF((phi1 AND phi2) OR psi) = CNF(phi1 OR psi) AND CNF(phi2 OR psi) 
-            if(dynamic_cast<CommGraphFormulaMultiaryAnd*>(*i)) {
-                clause = dynamic_cast<CommGraphFormulaMultiaryAnd*>(*i); 
+            if (dynamic_cast<GraphFormulaMultiaryAnd*>(*i)) {
+                clause = dynamic_cast<GraphFormulaMultiaryAnd*>(*i); 
                 final = false;
 
-                for(CommGraphFormulaMultiaryAnd::iterator j = clause->begin(); j != clause->end(); ++j) {
-                    CommGraphFormulaMultiaryOr *disj = new CommGraphFormulaMultiaryOr;
-                    disj->addSubFormula(dynamic_cast<CommGraphFormula*>(*j)->getDeepCopy()); 
+                for (GraphFormulaMultiaryAnd::iterator j = clause->begin(); j != clause->end(); ++j) {
+                    GraphFormulaMultiaryOr *disj = new GraphFormulaMultiaryOr;
+                    disj->addSubFormula(dynamic_cast<GraphFormula*>(*j)->getDeepCopy()); 
 
-                    for(CommGraphFormulaMultiaryOr::iterator k = temp->begin(); k != temp->end(); ++k) {
+                    for (GraphFormulaMultiaryOr::iterator k = temp->begin(); k != temp->end(); ++k) {
                         if(k != i) {
-                            disj->addSubFormula(dynamic_cast<CommGraphFormula*>(*k)->getDeepCopy());
+                            disj->addSubFormula(dynamic_cast<GraphFormula*>(*k)->getDeepCopy());
                         }
                     }
 
-                    CNF_formula *temp_cnf = disj->getCNF();
+                    GraphFormulaCNF *temp_cnf = disj->getCNF();
                     trace(TRACE_5, "Adding Disjunction " + temp_cnf->asString() + "\n");
-                    for(CommGraphFormulaMultiaryAnd::iterator l = temp_cnf->begin(); l != temp_cnf->end(); ++l) {
-                        cnf->addClause(dynamic_cast<CommGraphFormulaMultiaryOr*>(*l)->getDeepCopy()); 
+                    for (GraphFormulaMultiaryAnd::iterator l = temp_cnf->begin(); l != temp_cnf->end(); ++l) {
+                        cnf->addClause(dynamic_cast<GraphFormulaMultiaryOr*>(*l)->getDeepCopy()); 
                     }
                     delete temp_cnf;
                 }
             }
         }
-        if(final) {
+        if (final) {
             trace(TRACE_5, "finished.\n");
             cnf->addClause(temp->getDeepCopy());
-        }
-        else {
+        } else {
             trace(TRACE_5, "not finished.\n"); 
         }
         trace(TRACE_5, "Returning: " + cnf->asString() + "\n");
@@ -219,38 +218,38 @@ CNF_formula *CommGraphFormula::getCNF() {
     }
 
     trace(TRACE_5, "You do not see this.\n");
-    return NULL; // should not happen! probably new derivate of CommGraphFormula
+    return NULL; // should not happen! probably new derivate of GraphFormula
 }
 
 
-CommGraphFormulaMultiary::CommGraphFormulaMultiary() : CommGraphFormula() {
+GraphFormulaMultiary::GraphFormulaMultiary() : GraphFormula() {
 }
 
 
-CommGraphFormulaMultiary::CommGraphFormulaMultiary(CommGraphFormula* newformula) {
+GraphFormulaMultiary::GraphFormulaMultiary(GraphFormula* newformula) {
     subFormulas.insert(newformula);
 }
 
 
-CommGraphFormulaMultiary::CommGraphFormulaMultiary(CommGraphFormula* lhs,
-    CommGraphFormula* rhs)
+GraphFormulaMultiary::GraphFormulaMultiary(GraphFormula* lhs,
+    GraphFormula* rhs)
 {
     subFormulas.insert(lhs);
     subFormulas.insert(rhs);
 }
 
-CommGraphFormulaMultiary::~CommGraphFormulaMultiary() {
-	trace(TRACE_5, "CommGraphFormulaMultiary::~CommGraphFormulaMultiary() : start\n");
+GraphFormulaMultiary::~GraphFormulaMultiary() {
+	trace(TRACE_5, "GraphFormulaMultiary::~GraphFormulaMultiary() : start\n");
 
     for (subFormulas_t::const_iterator currentFormula = subFormulas.begin();
         currentFormula != subFormulas.end(); ++currentFormula)
     {
         delete *currentFormula;
     }
-	trace(TRACE_5, "CommGraphFormulaMultiary::~CommGraphFormulaMultiary() : end\n");
+	trace(TRACE_5, "GraphFormulaMultiary::~GraphFormulaMultiary() : end\n");
 }
 
-std::string CommGraphFormulaMultiary::asString() const
+std::string GraphFormulaMultiary::asString() const
 {
     if (subFormulas.empty())
         return getEmptyFormulaEquivalent().asString();
@@ -268,8 +267,8 @@ std::string CommGraphFormulaMultiary::asString() const
 }
 
 
-bool CommGraphFormulaMultiary::value(
-    const CommGraphFormulaAssignment& assignment) const
+bool GraphFormulaMultiary::value(
+    const GraphFormulaAssignment& assignment) const
 {
     for (subFormulas_t::const_iterator currentFormula = subFormulas.begin();
         currentFormula != subFormulas.end(); ++currentFormula)
@@ -285,19 +284,19 @@ bool CommGraphFormulaMultiary::value(
 }
 
 
-void CommGraphFormulaMultiary::addSubFormula(CommGraphFormula* subformula) {
+void GraphFormulaMultiary::addSubFormula(GraphFormula* subformula) {
 	subFormulas.insert(subformula);
 }
 
 
-void CommGraphFormulaMultiary::removeSubFormula(iterator subformula) {
+void GraphFormulaMultiary::removeSubFormula(iterator subformula) {
     subFormulas.erase(subformula);
 }
 
 
-void CommGraphFormulaMultiary::removeLiteral(const std::string& name) {
+void GraphFormulaMultiary::removeLiteral(const std::string& name) {
 	
-	trace(TRACE_5, "CommGraphFormulaMultiary::removeLiteral(const std::string& name) : start\n");
+	trace(TRACE_5, "GraphFormulaMultiary::removeLiteral(const std::string& name) : start\n");
 
 	subFormulas_t::iterator iCurrentFormula;
 	//cout << "\tanzahl von klauseln: " << subFormulas.size() << endl; int i = 1;
@@ -308,7 +307,7 @@ void CommGraphFormulaMultiary::removeLiteral(const std::string& name) {
 		
 		// if the considered current formula is a literal, then remove it;
 		// call the function recursively, otherwise
-		CommGraphFormulaLiteral* currentFormula = dynamic_cast<CommGraphFormulaLiteral*> (*iCurrentFormula);
+		GraphFormulaLiteral* currentFormula = dynamic_cast<GraphFormulaLiteral*> (*iCurrentFormula);
 		if (currentFormula != NULL) {
 			// the current formula is a literal
 			if (currentFormula->asString() == name) {
@@ -326,11 +325,11 @@ void CommGraphFormulaMultiary::removeLiteral(const std::string& name) {
 		}
 	}
 
-	trace(TRACE_5, "CommGraphFormulaMultiary::removeLiteral(const std::string& name) : end\n");
+	trace(TRACE_5, "GraphFormulaMultiary::removeLiteral(const std::string& name) : end\n");
 }
 
-void CommGraphFormulaMultiary::deepCopyMultiaryPrivateMembersToNewFormula(
-    CommGraphFormulaMultiary* newFormula) const
+void GraphFormulaMultiary::deepCopyMultiaryPrivateMembersToNewFormula(
+    GraphFormulaMultiary* newFormula) const
 {
     newFormula->subFormulas.clear();
     for (subFormulas_t::const_iterator iFormula = subFormulas.begin();
@@ -340,63 +339,63 @@ void CommGraphFormulaMultiary::deepCopyMultiaryPrivateMembersToNewFormula(
     }
 }
 
-CommGraphFormulaMultiary::iterator CommGraphFormulaMultiary::begin()
+GraphFormulaMultiary::iterator GraphFormulaMultiary::begin()
 {
     return subFormulas.begin();
 }
 
-CommGraphFormulaMultiary::const_iterator CommGraphFormulaMultiary::begin() const
+GraphFormulaMultiary::const_iterator GraphFormulaMultiary::begin() const
 {
     return subFormulas.begin();
 }
 
-CommGraphFormulaMultiary::iterator CommGraphFormulaMultiary::end()
+GraphFormulaMultiary::iterator GraphFormulaMultiary::end()
 {
     return subFormulas.end();
 }
 
-CommGraphFormulaMultiary::const_iterator CommGraphFormulaMultiary::end() const
+GraphFormulaMultiary::const_iterator GraphFormulaMultiary::end() const
 {
     return subFormulas.end();
 }
 
-bool CommGraphFormulaMultiary::empty() const
+bool GraphFormulaMultiary::empty() const
 {
     return subFormulas.empty();
 }
 
-CommGraphFormulaMultiaryAnd::CommGraphFormulaMultiaryAnd() {
+GraphFormulaMultiaryAnd::GraphFormulaMultiaryAnd() {
 }
 
 
-CommGraphFormulaMultiaryAnd::CommGraphFormulaMultiaryAnd(CommGraphFormula* formula) :
-   CommGraphFormulaMultiary(formula) {
+GraphFormulaMultiaryAnd::GraphFormulaMultiaryAnd(GraphFormula* formula) :
+   GraphFormulaMultiary(formula) {
 }
 
 
-CommGraphFormulaMultiaryAnd::CommGraphFormulaMultiaryAnd(CommGraphFormula* lhs_,
-    CommGraphFormula* rhs_) :
-    CommGraphFormulaMultiary(lhs_, rhs_) {
+GraphFormulaMultiaryAnd::GraphFormulaMultiaryAnd(GraphFormula* lhs_,
+    GraphFormula* rhs_) :
+    GraphFormulaMultiary(lhs_, rhs_) {
 
 }
 
 
-CommGraphFormulaMultiaryAnd* CommGraphFormulaMultiaryAnd::merge() {
+GraphFormulaMultiaryAnd* GraphFormulaMultiaryAnd::merge() {
     bool final = true;
-    CommGraphFormulaMultiaryAnd *result = new CommGraphFormulaMultiaryAnd;
+    GraphFormulaMultiaryAnd *result = new GraphFormulaMultiaryAnd;
 
-    trace(TRACE_5, "commGraphFormulaMultiaryAnd::merge: " + asString() + " merged to ");
-    for(CommGraphFormulaMultiaryAnd::iterator i = begin(); i != end(); i++) {
-        if(dynamic_cast<CommGraphFormulaMultiaryAnd*>(*i)) {
+    trace(TRACE_5, "GraphFormulaMultiaryAnd::merge: " + asString() + " merged to ");
+    for(GraphFormulaMultiaryAnd::iterator i = begin(); i != end(); i++) {
+        if(dynamic_cast<GraphFormulaMultiaryAnd*>(*i)) {
             final = false;
-            CommGraphFormulaMultiaryAnd *temp = dynamic_cast<CommGraphFormulaMultiaryAnd*>(*i);
-            for(CommGraphFormulaMultiaryAnd::iterator j = temp->begin();
+            GraphFormulaMultiaryAnd *temp = dynamic_cast<GraphFormulaMultiaryAnd*>(*i);
+            for(GraphFormulaMultiaryAnd::iterator j = temp->begin();
                 j != temp->end(); j++) {
-            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*j)->getDeepCopy());
+            result->addSubFormula(dynamic_cast<GraphFormula*>(*j)->getDeepCopy());
             }
         }
         else {
-            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*i)->getDeepCopy());
+            result->addSubFormula(dynamic_cast<GraphFormula*>(*i)->getDeepCopy());
         }
     }
     trace(TRACE_5, result->asString() + "\n");
@@ -405,17 +404,17 @@ CommGraphFormulaMultiaryAnd* CommGraphFormulaMultiaryAnd::merge() {
         return result;
     }
 
-    CommGraphFormulaMultiaryAnd* oldResult = result;
+    GraphFormulaMultiaryAnd* oldResult = result;
     result = result->merge();
     delete oldResult;
     return result;
 }
 
 
-CommGraphFormulaMultiaryAnd* CommGraphFormulaMultiaryAnd::getDeepCopy() const
+GraphFormulaMultiaryAnd* GraphFormulaMultiaryAnd::getDeepCopy() const
 {
-    CommGraphFormulaMultiaryAnd* newFormula =
-        new CommGraphFormulaMultiaryAnd(*this);
+    GraphFormulaMultiaryAnd* newFormula =
+        new GraphFormulaMultiaryAnd(*this);
 
     deepCopyMultiaryPrivateMembersToNewFormula(newFormula);
 
@@ -423,47 +422,47 @@ CommGraphFormulaMultiaryAnd* CommGraphFormulaMultiaryAnd::getDeepCopy() const
 }
 
 
-std::string CommGraphFormulaMultiaryAnd::getOperator() const
+std::string GraphFormulaMultiaryAnd::getOperator() const
 {
     return "*";
 }
 
 
-const CommGraphFormulaFixed
-CommGraphFormulaMultiaryAnd::emptyFormulaEquivalent = CommGraphFormulaTrue();
+const GraphFormulaFixed
+GraphFormulaMultiaryAnd::emptyFormulaEquivalent = GraphFormulaTrue();
 
 
-const CommGraphFormulaFixed&
-CommGraphFormulaMultiaryAnd::getEmptyFormulaEquivalent() const
+const GraphFormulaFixed&
+GraphFormulaMultiaryAnd::getEmptyFormulaEquivalent() const
 {
     return emptyFormulaEquivalent;
 }
 
 
-CommGraphFormulaMultiaryOr::CommGraphFormulaMultiaryOr() {
+GraphFormulaMultiaryOr::GraphFormulaMultiaryOr() {
 }
 
 
-CommGraphFormulaMultiaryOr::CommGraphFormulaMultiaryOr(CommGraphFormula* formula) :
-   CommGraphFormulaMultiary(formula) {
+GraphFormulaMultiaryOr::GraphFormulaMultiaryOr(GraphFormula* formula) :
+   GraphFormulaMultiary(formula) {
 }
 
 
-CommGraphFormulaMultiaryOr::CommGraphFormulaMultiaryOr(CommGraphFormula* lhs_,
-    CommGraphFormula* rhs_) : CommGraphFormulaMultiary(lhs_, rhs_)
+GraphFormulaMultiaryOr::GraphFormulaMultiaryOr(GraphFormula* lhs_,
+    GraphFormula* rhs_) : GraphFormulaMultiary(lhs_, rhs_)
 {
 }
 
 
-std::string CommGraphFormulaMultiaryOr::getOperator() const
+std::string GraphFormulaMultiaryOr::getOperator() const
 {
     return "+";
 }
 
-CommGraphFormulaMultiaryOr* CommGraphFormulaMultiaryOr::getDeepCopy() const
+GraphFormulaMultiaryOr* GraphFormulaMultiaryOr::getDeepCopy() const
 {
-    CommGraphFormulaMultiaryOr* newFormula =
-        new CommGraphFormulaMultiaryOr(*this);
+    GraphFormulaMultiaryOr* newFormula =
+        new GraphFormulaMultiaryOr(*this);
 
     deepCopyMultiaryPrivateMembersToNewFormula(newFormula);
 
@@ -471,22 +470,22 @@ CommGraphFormulaMultiaryOr* CommGraphFormulaMultiaryOr::getDeepCopy() const
 }
 
 
-CommGraphFormulaMultiaryOr* CommGraphFormulaMultiaryOr::merge() {
+GraphFormulaMultiaryOr* GraphFormulaMultiaryOr::merge() {
     bool final = true;
-    CommGraphFormulaMultiaryOr *result = new CommGraphFormulaMultiaryOr;
+    GraphFormulaMultiaryOr *result = new GraphFormulaMultiaryOr;
 
-    trace(TRACE_5, "commGraphFormulaMultiaryOr::merge: " + asString() + " merged to ");
-    for(CommGraphFormulaMultiaryOr::iterator i = begin(); i != end(); i++) {
-        if(dynamic_cast<CommGraphFormulaMultiaryOr*>(*i)) {
+    trace(TRACE_5, "GraphFormulaMultiaryOr::merge: " + asString() + " merged to ");
+    for(GraphFormulaMultiaryOr::iterator i = begin(); i != end(); i++) {
+        if(dynamic_cast<GraphFormulaMultiaryOr*>(*i)) {
             final = false;
-            CommGraphFormulaMultiaryOr *temp = dynamic_cast<CommGraphFormulaMultiaryOr*>(*i); 
-            for(CommGraphFormulaMultiaryOr::iterator j = temp->begin();
+            GraphFormulaMultiaryOr *temp = dynamic_cast<GraphFormulaMultiaryOr*>(*i); 
+            for(GraphFormulaMultiaryOr::iterator j = temp->begin();
                 j != temp->end(); j++) {
-            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*j)->getDeepCopy()); 
+            result->addSubFormula(dynamic_cast<GraphFormula*>(*j)->getDeepCopy()); 
             }
         }
         else {
-            result->addSubFormula(dynamic_cast<CommGraphFormula*>(*i)->getDeepCopy());
+            result->addSubFormula(dynamic_cast<GraphFormula*>(*i)->getDeepCopy());
         }
     }
     trace(TRACE_5, result->asString() + "\n");
@@ -495,7 +494,7 @@ CommGraphFormulaMultiaryOr* CommGraphFormulaMultiaryOr::merge() {
         return result;
     }
 
-    CommGraphFormulaMultiaryOr* oldResult = result;
+    GraphFormulaMultiaryOr* oldResult = result;
     result = result->merge();
     delete oldResult;
     return result;
@@ -503,22 +502,22 @@ CommGraphFormulaMultiaryOr* CommGraphFormulaMultiaryOr::merge() {
 
 
 // shall only be used for clauses within cnf!
-bool CommGraphFormulaMultiaryOr::implies(CommGraphFormulaMultiaryOr *op) {
+bool GraphFormulaMultiaryOr::implies(GraphFormulaMultiaryOr *op) {
     bool result;
 
     trace(TRACE_5, this->asString() + " -> " + op->asString() + " ? ... "); 
 
-    // CNF_formula::simplify() depends on this if clause to remove superfluous
+    // GraphFormulaCNF::simplify() depends on this if clause to remove superfluous
     // true-clauses.
     if (op->equals() == TRUE) {
         return true;
     }
 
-    for(CommGraphFormulaMultiaryOr::iterator i = this->begin(); i != this->end(); i++) {
+    for(GraphFormulaMultiaryOr::iterator i = this->begin(); i != this->end(); i++) {
         result = false;
-        for(CommGraphFormulaMultiaryOr::iterator j = op->begin(); j != op->end(); j++) {
-	    result |= (dynamic_cast<CommGraphFormulaLiteral*>(*i)->asString() 
-                == dynamic_cast<CommGraphFormulaLiteral*>(*j)->asString()); 
+        for(GraphFormulaMultiaryOr::iterator j = op->begin(); j != op->end(); j++) {
+	    result |= (dynamic_cast<GraphFormulaLiteral*>(*i)->asString() 
+                == dynamic_cast<GraphFormulaLiteral*>(*j)->asString()); 
         }
         if(!result) {
             trace(TRACE_5, "false.\n"); 
@@ -531,70 +530,70 @@ bool CommGraphFormulaMultiaryOr::implies(CommGraphFormulaMultiaryOr *op) {
 }
 
 
-const CommGraphFormulaFixed
-CommGraphFormulaMultiaryOr::emptyFormulaEquivalent = CommGraphFormulaFalse();
+const GraphFormulaFixed
+GraphFormulaMultiaryOr::emptyFormulaEquivalent = GraphFormulaFalse();
 
 
-const CommGraphFormulaFixed&
-CommGraphFormulaMultiaryOr::getEmptyFormulaEquivalent() const
+const GraphFormulaFixed&
+GraphFormulaMultiaryOr::getEmptyFormulaEquivalent() const
 {
     return emptyFormulaEquivalent;
 }
 
 
-CNF_formula::CNF_formula() {
+GraphFormulaCNF::GraphFormulaCNF() {
 }
 
 
-CNF_formula::CNF_formula(CommGraphFormulaMultiaryOr* clause_) :
-    CommGraphFormulaMultiaryAnd(clause_) {
+GraphFormulaCNF::GraphFormulaCNF(GraphFormulaMultiaryOr* clause_) :
+    GraphFormulaMultiaryAnd(clause_) {
     
 }
 
-CNF_formula::CNF_formula(CommGraphFormulaMultiaryOr* clause1_, CommGraphFormulaMultiaryOr* clause2_) :
-    CommGraphFormulaMultiaryAnd(clause1_, clause2_) {
+GraphFormulaCNF::GraphFormulaCNF(GraphFormulaMultiaryOr* clause1_, GraphFormulaMultiaryOr* clause2_) :
+    GraphFormulaMultiaryAnd(clause1_, clause2_) {
     
 }
 
-CNF_formula* CNF_formula::getDeepCopy() const
+GraphFormulaCNF* GraphFormulaCNF::getDeepCopy() const
 {
-    CommGraphFormulaMultiaryAnd* newFormula =
-        CommGraphFormulaMultiaryAnd::getDeepCopy();
+    GraphFormulaMultiaryAnd* newFormula =
+        GraphFormulaMultiaryAnd::getDeepCopy();
 
-    return static_cast<CNF_formula*>(newFormula);
+    return static_cast<GraphFormulaCNF*>(newFormula);
 }
 
 
-void CNF_formula::addClause(CommGraphFormulaMultiaryOr* clause) {
+void GraphFormulaCNF::addClause(GraphFormulaMultiaryOr* clause) {
 	addSubFormula(clause);
 }
 
-//! \fn bool CNF_formula::implies(CNF_formula *op) 
+//! \fn bool GraphFormulaCNF::implies(GraphFormulaCNF *op) 
 //! \param op the rhs of the implication 
 //! \brief checks whether the current CNF formula implies the given one via op
 //!        Note: all literals have to occur non-negated! 
-bool CNF_formula::implies(CNF_formula *op) {
+bool GraphFormulaCNF::implies(GraphFormulaCNF *op) {
     bool result;
 
     if(op == NULL) return false;
 	
-    trace(TRACE_5, "bool CNF_formula::implies(CNF_formula *op)\n");
+    trace(TRACE_5, "bool GraphFormulaCNF::implies(GraphFormulaCNF *op)\n");
     trace(TRACE_5, asString() + " => " + op->asString() + "?\n");
 
     if(this->equals() == FALSE) return true;
     if(op->equals() == TRUE) return true;
 
-    for(CNF_formula::iterator i = op->begin(); i != op->end(); i++) {
+    for(GraphFormulaCNF::iterator i = op->begin(); i != op->end(); i++) {
        	// iterate over rhs operand
-        if((dynamic_cast<CommGraphFormula*>(*i)->asString() != "final") && 
-           (dynamic_cast<CommGraphFormula*>(*i)->asString() != "true") && 
-           (dynamic_cast<CommGraphFormula*>(*i)->asString() != "false")) {
+        if((dynamic_cast<GraphFormula*>(*i)->asString() != "final") && 
+           (dynamic_cast<GraphFormula*>(*i)->asString() != "true") && 
+           (dynamic_cast<GraphFormula*>(*i)->asString() != "false")) {
             result = false;
 
-            for(CNF_formula::iterator j = begin(); j != end(); j++) {
+            for(GraphFormulaCNF::iterator j = begin(); j != end(); j++) {
                 // iterate over lhs operand
-                result |= (dynamic_cast<CommGraphFormulaMultiaryOr*>(*j)->implies(
-                    dynamic_cast<CommGraphFormulaMultiaryOr*>(*i))); 
+                result |= (dynamic_cast<GraphFormulaMultiaryOr*>(*j)->implies(
+                    dynamic_cast<GraphFormulaMultiaryOr*>(*i))); 
             }
             if(!result) {
             trace(TRACE_5, "Implication failed.\n");
@@ -607,13 +606,13 @@ bool CNF_formula::implies(CNF_formula *op) {
     return true;
 }
 
-void CNF_formula::simplify()
+void GraphFormulaCNF::simplify()
 {
-    for (CNF_formula::const_iterator iLhs = begin(); iLhs != end(); ++iLhs) {
-        CommGraphFormulaMultiaryOr* lhs =
-            dynamic_cast<CommGraphFormulaMultiaryOr*>(*iLhs);
+    for (GraphFormulaCNF::const_iterator iLhs = begin(); iLhs != end(); ++iLhs) {
+        GraphFormulaMultiaryOr* lhs =
+            dynamic_cast<GraphFormulaMultiaryOr*>(*iLhs);
         assert(lhs != NULL);
-        CNF_formula::const_iterator iRhs = begin();
+        GraphFormulaCNF::const_iterator iRhs = begin();
         while (iRhs != end())
         {
             if (iLhs == iRhs) {
@@ -621,11 +620,11 @@ void CNF_formula::simplify()
                 continue;
             }
 
-            CommGraphFormulaMultiaryOr* rhs =
-                dynamic_cast<CommGraphFormulaMultiaryOr*>(*iRhs);
+            GraphFormulaMultiaryOr* rhs =
+                dynamic_cast<GraphFormulaMultiaryOr*>(*iRhs);
             assert(rhs != NULL);
             if (lhs->implies(rhs)) {
-                CNF_formula::const_iterator iOldRhs = iRhs++;
+                GraphFormulaCNF::const_iterator iOldRhs = iRhs++;
                 delete *iOldRhs;
                 removeSubFormula(iOldRhs);
             } else {
@@ -636,63 +635,63 @@ void CNF_formula::simplify()
 }
 
 
-CommGraphFormulaFixed::CommGraphFormulaFixed(bool value,
+GraphFormulaFixed::GraphFormulaFixed(bool value,
     const std::string& asString) :
-    CommGraphFormulaLiteral(asString),
+    GraphFormulaLiteral(asString),
     _value(value)
 {
 }
 
-bool CommGraphFormulaFixed::value(const CommGraphFormulaAssignment&) const
+bool GraphFormulaFixed::value(const GraphFormulaAssignment&) const
 {
     return _value;
 }
 
-CommGraphFormulaFixed* CommGraphFormulaFixed::getDeepCopy() const
+GraphFormulaFixed* GraphFormulaFixed::getDeepCopy() const
 {
-    return new CommGraphFormulaFixed(*this);
+    return new GraphFormulaFixed(*this);
 }
 
-CommGraphFormulaTrue::CommGraphFormulaTrue() :
-    CommGraphFormulaFixed(true, CommGraphFormulaLiteral::TRUE)
-{
-}
-
-CommGraphFormulaFalse::CommGraphFormulaFalse() :
-    CommGraphFormulaFixed(false, CommGraphFormulaLiteral::FALSE)
+GraphFormulaTrue::GraphFormulaTrue() :
+    GraphFormulaFixed(true, GraphFormulaLiteral::TRUE)
 {
 }
 
-CommGraphFormulaLiteral::CommGraphFormulaLiteral(const std::string& literal_) :
+GraphFormulaFalse::GraphFormulaFalse() :
+    GraphFormulaFixed(false, GraphFormulaLiteral::FALSE)
+{
+}
+
+GraphFormulaLiteral::GraphFormulaLiteral(const std::string& literal_) :
     literal(literal_)
 {
 }
 
-CommGraphFormulaLiteral* CommGraphFormulaLiteral::getDeepCopy() const
+GraphFormulaLiteral* GraphFormulaLiteral::getDeepCopy() const
 {
-    return new CommGraphFormulaLiteral(*this);
+    return new GraphFormulaLiteral(*this);
 }
 
-bool CommGraphFormulaLiteral::value(
-    const CommGraphFormulaAssignment& assignment) const
+bool GraphFormulaLiteral::value(
+    const GraphFormulaAssignment& assignment) const
 {
     return assignment.get(literal);
 }
 
-std::string CommGraphFormulaLiteral::asString() const
+std::string GraphFormulaLiteral::asString() const
 {
     return literal;
 }
 
 
-CommGraphFormulaLiteralFinal::CommGraphFormulaLiteralFinal() :
-    CommGraphFormulaLiteral(CommGraphFormulaLiteral::FINAL)
+GraphFormulaLiteralFinal::GraphFormulaLiteralFinal() :
+    GraphFormulaLiteral(GraphFormulaLiteral::FINAL)
 {
 }
 
 
-CommGraphFormulaLiteralTau::CommGraphFormulaLiteralTau() :
-    CommGraphFormulaLiteral(CommGraphFormulaLiteral::TAU)
+GraphFormulaLiteralTau::GraphFormulaLiteralTau() :
+    GraphFormulaLiteral(GraphFormulaLiteral::TAU)
 {
 }
 

@@ -42,7 +42,7 @@ class State;
 class GraphEdge;
 class successorNodeList;
 class literal;
-class CNF_formula;
+class GraphFormulaCNF;
 
 typedef std::set<State*> StateSet;
 
@@ -62,7 +62,7 @@ private:
     /**
      * Annotation of this node (a CNF) as a formula.
      */
-    CNF_formula* annotation;
+    GraphFormulaCNF* annotation;
 
     /**
      * List of all the nodes succeeding this one including the edge between
@@ -97,15 +97,15 @@ public:
     void resetIteratingSuccNodes();
 
     // annotation
-    CNF_formula* getCNF_formula();
+    GraphFormulaCNF* getCNFformula();
     std::string getCNFString();
 
     // temporary test assignment that sets yet to be visited successors to true
     // and therefore allows for early discovery of a formula that cannot get true 
-    CommGraphFormulaAssignment* testAssignment;
-    CommGraphFormulaAssignment* getAssignment();
+    GraphFormulaAssignment* testAssignment;
+    GraphFormulaAssignment* getAssignment();
 
-    void addClause(CommGraphFormulaMultiaryOr*);
+    void addClause(GraphFormulaMultiaryOr*);
 
     GraphNodeColor analyseNodeByFormula();
 

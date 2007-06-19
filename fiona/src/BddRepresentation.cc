@@ -114,7 +114,7 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
 	
 	//add the variable "final" to the labelTable
 	//cout << PN->getOutputPlaceCount() + PN->getInputPlaceCount() << "  " << "final" << endl;
-	label = new BddLabel(CommGraphFormulaLiteral::FINAL, PN->getOutputPlaceCount() + PN->getInputPlaceCount(), labelTable);
+	label = new BddLabel(GraphFormulaLiteral::FINAL, PN->getOutputPlaceCount() + PN->getInputPlaceCount(), labelTable);
 
 /*	BddLabel * temp;
 	for(unsigned int i = 0; i < labelTable->size;i++){
@@ -398,7 +398,7 @@ DdNode* BddRepresentation::annotationToBddAnn(GraphNode* v){
 	trace(TRACE_5, "DdNode* BddRepresentation::annotationToBddAnn(GraphNode * v): start\n");
 	
 //	cout << "----------------------------------\n";
-//	cout << "node " << v->getNumber() << " ("<< getBddNumber(v->getNumber()) << ") : " << v->getCNF_formula()->asString()<< endl;
+//	cout << "node " << v->getNumber() << " ("<< getBddNumber(v->getNumber()) << ") : " << v->getCNFformula()->asString()<< endl;
 	
 	DdNode* tmp;
 	DdNode* CNFTemp;
@@ -406,13 +406,13 @@ DdNode* BddRepresentation::annotationToBddAnn(GraphNode* v){
 	DdNode* annotation = Cudd_ReadOne(mgrAnn);		
 	Cudd_Ref(annotation);
 	
-	CNF_formula* cnfFormula = v->getCNF_formula();
+	GraphFormulaCNF* cnfFormula = v->getCNFformula();
 		
-	for (CNF_formula::const_iterator iClause = cnfFormula->begin();
+	for (GraphFormulaCNF::const_iterator iClause = cnfFormula->begin();
 		 iClause != cnfFormula->end(); ++iClause)
 	{
-		CommGraphFormulaMultiaryOr* clause =
-		    dynamic_cast<CommGraphFormulaMultiaryOr*>(*iClause);
+		GraphFormulaMultiaryOr* clause =
+		    dynamic_cast<GraphFormulaMultiaryOr*>(*iClause);
 		assert(clause != NULL);
 		CNFTemp = clauseToBddAnn(clause);
 		tmp = Cudd_bddAnd(mgrAnn, annotation, CNFTemp);
@@ -464,7 +464,7 @@ DdNode* BddRepresentation::annotationToBddAnn(GraphNode* v){
 
 
 DdNode* BddRepresentation::clauseToBddAnn(
-	const CommGraphFormulaMultiaryOr* myclause)
+	const GraphFormulaMultiaryOr* myclause)
 {
 	DdNode* tmp;
 
@@ -478,11 +478,11 @@ DdNode* BddRepresentation::clauseToBddAnn(
 	DdNode* clause1 = Cudd_Not(Cudd_ReadOne(mgrAnn));
 	Cudd_Ref(clause1);
 
-	for (CommGraphFormulaMultiaryOr::const_iterator iLiteral =
+	for (GraphFormulaMultiaryOr::const_iterator iLiteral =
 		 myclause->begin(); iLiteral != myclause->end(); ++iLiteral)
 	{
-		CommGraphFormulaLiteral* literal =
-		    dynamic_cast<CommGraphFormulaLiteral*>(*iLiteral);
+		GraphFormulaLiteral* literal =
+		    dynamic_cast<GraphFormulaLiteral*>(*iLiteral);
 		assert(literal != NULL);
 		BddLabel* label = labelTable->lookup(literal->asString());
 		int i = label->nbr;
@@ -771,9 +771,9 @@ void BddRepresentation::save(char* option){
         names[nbr] = tmp;
     }
 
-    char* tmp = new char [CommGraphFormulaLiteral::FINAL.size() + 1];
-    strcpy (tmp, CommGraphFormulaLiteral::FINAL.c_str());
-    unsigned int nbr = labelTable->lookup(CommGraphFormulaLiteral::FINAL)->nbr;
+    char* tmp = new char [GraphFormulaLiteral::FINAL.size() + 1];
+    strcpy (tmp, GraphFormulaLiteral::FINAL.c_str());
+    unsigned int nbr = labelTable->lookup(GraphFormulaLiteral::FINAL)->nbr;
     names[nbr] = tmp;
 
     

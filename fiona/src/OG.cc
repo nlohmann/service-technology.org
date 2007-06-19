@@ -44,7 +44,7 @@
 // So, we undefine TRUE.
 #undef TRUE
 
-//! \fn operatingGuidelines::operatingGuidelines(oWFN * _PN)
+
 //! \param _PN
 //! \brief constructor
 operatingGuidelines::operatingGuidelines(oWFN * _PN) : communicationGraph(_PN) {
@@ -56,7 +56,6 @@ operatingGuidelines::operatingGuidelines(oWFN * _PN) : communicationGraph(_PN) {
 }
 
 
-//! \fn operatingGuidelines::~operatingGuidelines() 
 //! \brief destructor
 operatingGuidelines::~operatingGuidelines() {
 
@@ -67,7 +66,6 @@ operatingGuidelines::~operatingGuidelines() {
 }
 
 
-//! \fn void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_plus)
 //! \param currentNode current node of the graph
 //! \param progress_plus the additional progress when the subgraph starting at this node is finished 
 //! \brief builds up the graph recursively
@@ -188,10 +186,10 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
     }
 
     // early checking if the node's annotation cannot be made true
-    if (currentNode->getCNF_formula()->equals() == FALSE) {
+    if (currentNode->getCNFformula()->equals() == FALSE) {
         trace(TRACE_3, "\t\t\t any further event suppressed (annotation of node ");
         trace(TRACE_3, intToString(currentNode->getNumber()) + " is unsatisfiable)\n");
-        trace(TRACE_5, "\t\t\t formula was " + currentNode->getCNF_formula()->asString());
+        trace(TRACE_5, "\t\t\t formula was " + currentNode->getCNFformula()->asString());
         trace(TRACE_3, "\n");
         currentNode->setColor(RED);
         return;
@@ -260,11 +258,11 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 		}
 
         // check whether annotation is still satisfiable
-        if (currentNode->getCNF_formula()->equals() == FALSE) {
+        if (currentNode->getCNFformula()->equals() == FALSE) {
             currentNode->setColor(RED);
             trace(TRACE_3, "\t\t\t any further event suppressed (annotation of node ");
             trace(TRACE_3, intToString(currentNode->getNumber()) + " is unsatisfiable)\n");
-            trace(TRACE_5, "\t\t\t formula was " + currentNode->getCNF_formula()->asString());
+            trace(TRACE_5, "\t\t\t formula was " + currentNode->getCNFformula()->asString());
             trace(TRACE_3, "\n");
             return;
         }
@@ -278,7 +276,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
     analyseNode(currentNode);
 
 	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + toUpper(currentNode->getColor().toString()));
-	trace(TRACE_3, " via formula " + currentNode->getCNF_formula()->asString() + "\n");
+	trace(TRACE_3, " via formula " + currentNode->getCNFformula()->asString() + "\n");
 
 	if (options[O_OTF]) {
 		//cout << "currentNode: " << currentNode->getNumber() << endl;	
@@ -292,7 +290,7 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
     trace(TRACE_5, "operatingGuidelines::computeCNF(GraphNode * node): start\n");
 	
 	// initially, the annoation is empty (and therefore equivalent to true)
-	assert(node->getCNF_formula()->asString() == CommGraphFormulaLiteral::TRUE);
+	assert(node->getCNFformula()->asString() == GraphFormulaLiteral::TRUE);
 	
 	StateSet::iterator iter;			// iterator over the states of the node
 
@@ -310,27 +308,27 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 				(*iter)->decodeShowOnly(PN);
 
 				// this clause's first literal
-				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
+				GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
 
 				// in case of a final state we add special literal "final" to the clause
 				if ((*iter)->type == FINALSTATE) {
 
 					node->hasFinalStateInStateSet = true;
 
-					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
+					GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
 					myclause->addSubFormula(myliteral);
 				}
 
 				// get all input events
 				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
-					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
+					GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
 					myclause->addSubFormula(myliteral);
 				}
 
 				// get all activated output events
 				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
 					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
+						GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
 						myclause->addSubFormula(myliteral);
 					}
 				}
@@ -353,26 +351,26 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 				(*iter)->decodeShowOnly(PN);
 
 				// this clause's first literal
-				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
+				GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
 
 				// in case of a final state we add special literal "final" to the clause
 				if ((*iter)->type == FINALSTATE) {
 					node->hasFinalStateInStateSet = true;
 
-					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
+					GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
 					myclause->addSubFormula(myliteral);
 				}
 
 				// get all the input events
 				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
-					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
+					GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
 					myclause->addSubFormula(myliteral);
 				}
 
 				// get the activated output events
 				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
 					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-						CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
+						GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
 						myclause->addSubFormula(myliteral);
 					}
 				}
@@ -386,7 +384,6 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 }
 
 
-//! \fn void operatingGuidelines::convertToBdd()
 //! \brief converts an OG into its BDD representation
 void operatingGuidelines::convertToBdd() {
 	trace(TRACE_5, "operatingGuidelines::convertToBdd(): start\n");
@@ -406,7 +403,6 @@ void operatingGuidelines::convertToBdd() {
 }
 
 
-//! \fn void operatingGuidelines::convertToBddFull()
 //! \brief converts an OG into its BDD representation including the red nodes and the markings of the nodes
 void operatingGuidelines::convertToBddFull() {
 	trace(TRACE_5, "operatingGuidelines::convertToBddFull(): start\n");
@@ -481,7 +477,7 @@ void operatingGuidelines::printNodesToOGFile(GraphNode * v, fstream& os,
     os << "  " << NodeNameForOG(v);
 
     // print node annotation
-    os << " : " << v->getCNF_formula()->asString();
+    os << " : " << v->getCNFformula()->asString();
 
     os << " : " << v->getColor().toString();
 

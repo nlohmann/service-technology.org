@@ -20,7 +20,7 @@
  *****************************************************************************/
 
 /*!
- * \file    commGraphFormula.h
+ * \file    GraphFormula.h
  *
  * \brief   Provides formulas to be used as annotations of nodes in IGs or OGs.
  *
@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef commGraphFormula_H_
-#define commGraphFormula_H_
+#ifndef GraphFormula_H_
+#define GraphFormula_H_
 
 
 #include "enums.h"
@@ -42,16 +42,16 @@
 #include <map>
 
 
-class CommGraphFormulaFixed;
-class CNF_formula;
+class GraphFormulaFixed;
+class GraphFormulaCNF;
 
 
 /**
  * Assignment of literals to truth values to determine the truth value of a
- * CommGraphFormula under the given assignment. Typical literals are edge
+ * GraphFormula under the given assignment. Typical literals are edge
  * labels of IGs and OGs.
  */
-class CommGraphFormulaAssignment {
+class GraphFormulaAssignment {
 private:
     /** Type of the container that maps literals to their truth values. */
     typedef std::map<std::string, bool> literal2bool_t;
@@ -62,27 +62,27 @@ private:
 public:
     /**
      * Sets the given literal to the given truth value within this
-     * CommGraphFormulaAssignment.
+     * GraphFormulaAssignment.
      * @param literal Literal whose truth value should be set.
      * @param value Truth value the given literal should be set to.
      */
     void set(const std::string& literal, bool value);
 
     /**
-     * Sets the given literal to true within this CommGraphFormulaAssignment.
+     * Sets the given literal to true within this GraphFormulaAssignment.
      * @param literal Literal which should be set to true.
      */
     void setToTrue(const std::string& literal);
 
     /**
-     * Sets the given literal to false within this CommGraphFormulaAssignment.
+     * Sets the given literal to false within this GraphFormulaAssignment.
      * @param literal Literal which should be set to false.
      */
     void setToFalse(const std::string& literal);
 
     /**
      * Gets the truth value of the given literal within this
-     * CommGraphFormulaAssignment. If no truth value was previously set for
+     * GraphFormulaAssignment. If no truth value was previously set for
      * this literal by set() or setToTrue(), then the truth value of the given
      * literal is implicetly false.
      * @param literal Literal whose truth value should be determined.
@@ -97,66 +97,66 @@ public:
  * abstract base class for all other formula classes. Use those to construct an
  * actual formula.
  */
-class CommGraphFormula {
+class GraphFormula {
 public:
     /**
-     * Destroys the given CommGraphFormula and all its subformulas.
+     * Destroys the given GraphFormula and all its subformulas.
      */
-    virtual ~CommGraphFormula() {};
+    virtual ~GraphFormula() {};
 
     /**
-     * Determines whether this CommGraphFormula satisfies the given
-     * CommGraphFormulaAssignment. Equivalent to value().
+     * Determines whether this GraphFormula satisfies the given
+     * GraphFormulaAssignment. Equivalent to value().
      */
-    virtual bool satisfies(const CommGraphFormulaAssignment& assignment) const;
+    virtual bool satisfies(const GraphFormulaAssignment& assignment) const;
 
     /**
-     * Formats and returns this CommGraphFormula as a string. This string is
+     * Formats and returns this GraphFormula as a string. This string is
      * suitable for showing the user and for the OG output format. The string
      * representation for the AND and OR operators are determined by
-     * CommGraphFormulaMultiaryAnd::getOperator() and
-     * CommGraphFormulaMultiaryOr::getOperator().
-     * @returns The string representation for this CommGraphFormula.
+     * GraphFormulaMultiaryAnd::getOperator() and
+     * GraphFormulaMultiaryOr::getOperator().
+     * @returns The string representation for this GraphFormula.
      */
     virtual std::string asString() const = 0;
 
     /**
-     * Returns the truth value of this CommGraphFormula under the given
-     * CommGraphFormulaAssignment.
-     * @param assignment The CommGraphFormulaAssignment under which the truth
-     *   value of this CommGraphFormula should be computed. The value of
+     * Returns the truth value of this GraphFormula under the given
+     * GraphFormulaAssignment.
+     * @param assignment The GraphFormulaAssignment under which the truth
+     *   value of this GraphFormula should be computed. The value of
      *   literals not set in assignment are considered false.
-     * @returns The truth value of this CommGraphFormula under the given
-     *   CommGraphFormulaAssignment.
+     * @returns The truth value of this GraphFormula under the given
+     *   GraphFormulaAssignment.
      */
-    virtual bool value(const CommGraphFormulaAssignment& assignment) const = 0;
+    virtual bool value(const GraphFormulaAssignment& assignment) const = 0;
     virtual void removeLiteral(const std::string&);
-    virtual CommGraphFormula* getDeepCopy() const = 0;
+    virtual GraphFormula* getDeepCopy() const = 0;
     threeValueLogic equals();
 
     /**
      * Returns this formula in conjunctive normal form. The caller is
      * responsible for deleting the newly created and returned formula.
      */
-    CNF_formula *getCNF();
+    GraphFormulaCNF *getCNF();
 };
 
 
 /**
- * Base class for all multiary \link CommGraphFormula
- * CommGraphFormulas\endlink, such as CommGraphFormulaMultiaryAnd and
- * CommGraphFormulaMultiaryOr. This class exists because the classes
- * CommGraphFormulaMultiaryAnd and CommGraphFormulaMultiaryOr share
+ * Base class for all multiary \link GraphFormula
+ * CommGraphFormulas\endlink, such as GraphFormulaMultiaryAnd and
+ * GraphFormulaMultiaryOr. This class exists because the classes
+ * GraphFormulaMultiaryAnd and GraphFormulaMultiaryOr share
  * functionality which should be implemented only once, e.g., the truth of a
  * multiary conjunction is computed analogously to the truth value of a
  * multiary disjunction.
  */
-class CommGraphFormulaMultiary : public CommGraphFormula {
+class GraphFormulaMultiary : public GraphFormula {
 public:
     /**
      * Type of the container holding all subformula of this multiary formula.
      */
-    typedef std::set<CommGraphFormula*> subFormulas_t;
+    typedef std::set<GraphFormula*> subFormulas_t;
 
     /**
      * Type of the iterator over subformulas.
@@ -175,13 +175,13 @@ private:
     subFormulas_t subFormulas;
 
 public:
-    CommGraphFormulaMultiary();
+    GraphFormulaMultiary();
     /**
      * Constructs a multiary formula from a given subformula by adding the
      * subformula into the set of subformulae.
      * @param newformula The subformula to be added
      */
-    CommGraphFormulaMultiary(CommGraphFormula* newformula);
+    GraphFormulaMultiary(GraphFormula* newformula);
 
     /**
      * Constructs a multiary formula from two given subformulas. This
@@ -192,12 +192,12 @@ public:
      * @param rhs Reft hand side subformula of the to be constructed binary
      *   formula.
      */
-    CommGraphFormulaMultiary(CommGraphFormula* lhs, CommGraphFormula* rhs);
+    GraphFormulaMultiary(GraphFormula* lhs, GraphFormula* rhs);
 
     /**
-     * Destroys this CommGraphFormulaMultiary and all its subformulas.
+     * Destroys this GraphFormulaMultiary and all its subformulas.
      */
-    virtual ~CommGraphFormulaMultiary();
+    virtual ~GraphFormulaMultiary();
 
     virtual std::string asString() const;
 
@@ -209,23 +209,23 @@ public:
      */
     virtual std::string getOperator() const = 0;
 
-    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
+    virtual bool value(const GraphFormulaAssignment& assignment) const;
 
     /**
      * Returns a formula that is equivalent to this multiary formula if it is
      * empty. For instance, an empty disjunction is equivalent to false, an
      * empty conjunction is equivalent to true.
      * @remarks Using this equivalent formula we can implement value() for
-     * CommGraphFormulaMultiaryAnd and CommGraphFormulaMultiaryOr in a single
+     * GraphFormulaMultiaryAnd and GraphFormulaMultiaryOr in a single
      * method here.
      */
-    virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const = 0;
+    virtual const GraphFormulaFixed& getEmptyFormulaEquivalent() const = 0;
 
-    void addSubFormula(CommGraphFormula* subformula);
+    void addSubFormula(GraphFormula* subformula);
     void removeSubFormula(iterator subformula);
     virtual void removeLiteral(const std::string&);
     void deepCopyMultiaryPrivateMembersToNewFormula(
-        CommGraphFormulaMultiary* newFormula) const;
+        GraphFormulaMultiary* newFormula) const;
 
     /**
      * Returns an iterator to the first subformula.
@@ -255,98 +255,98 @@ public:
 
 
 /**
- * A multiary conjunction of \link CommGraphFormula CommGraphFormulas.\endlink Can
+ * A multiary conjunction of \link GraphFormula CommGraphFormulas.\endlink Can
  * have arbitrarily many subformulas, even none.
  */
-class CommGraphFormulaMultiaryAnd : public CommGraphFormulaMultiary {
+class GraphFormulaMultiaryAnd : public GraphFormulaMultiary {
 private:
     /**
-     * Holds a CommGraphFormula that is equivalent to this
-     * CommGraphFormulaMultiaryAnd if it is empty. This is CommGraphFormulaTrue
+     * Holds a GraphFormula that is equivalent to this
+     * GraphFormulaMultiaryAnd if it is empty. This is GraphFormulaTrue
      * because an empty conjunction evaluates to true. Used to implement
-     * value() for all \link CommGraphFormulaMultiary multiary functions
-     * \endlink in a single method (CommGraphFormulaMultiary::value()).
+     * value() for all \link GraphFormulaMultiary multiary functions
+     * \endlink in a single method (GraphFormulaMultiary::value()).
      */
-    static const CommGraphFormulaFixed emptyFormulaEquivalent;
+    static const GraphFormulaFixed emptyFormulaEquivalent;
 public:
-    /** See CommGraphFormulaMultiary(). */
-    CommGraphFormulaMultiaryAnd();
-    CommGraphFormulaMultiaryAnd(CommGraphFormula* subformula_);
-    CommGraphFormulaMultiaryAnd(CommGraphFormula* lhs, CommGraphFormula* rhs);
+    /** See GraphFormulaMultiary(). */
+    GraphFormulaMultiaryAnd();
+    GraphFormulaMultiaryAnd(GraphFormula* subformula_);
+    GraphFormulaMultiaryAnd(GraphFormula* lhs, GraphFormula* rhs);
 
     /**
      * Returns the merged equivalent to this formula. Merging gets rid of
      * unnecessary nesting of subformulas. (a*(b*c)) becomes (a*b*c). The
      * caller is responsible for deleting the returned newly created formula.
      */
-    CommGraphFormulaMultiaryAnd* merge();
+    GraphFormulaMultiaryAnd* merge();
 
-    virtual CommGraphFormulaMultiaryAnd* getDeepCopy() const;
+    virtual GraphFormulaMultiaryAnd* getDeepCopy() const;
 
 
-    /** Destroys this CommGraphFormulaMultiaryAnd and all its subformulas. */
-    virtual ~CommGraphFormulaMultiaryAnd() {};
+    /** Destroys this GraphFormulaMultiaryAnd and all its subformulas. */
+    virtual ~GraphFormulaMultiaryAnd() {};
     virtual std::string getOperator() const;
-    virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const;
+    virtual const GraphFormulaFixed& getEmptyFormulaEquivalent() const;
 };
 
 
 /**
- * A multiary disjunction of \link CommGraphFormula CommGraphFormulas.\endlink Can
+ * A multiary disjunction of \link GraphFormula CommGraphFormulas.\endlink Can
  * have arbitrarily many subformulas, even none.
  */
-class CommGraphFormulaMultiaryOr : public CommGraphFormulaMultiary {
+class GraphFormulaMultiaryOr : public GraphFormulaMultiary {
 private:
     /**
-     * Analog to CommGraphFormulaMultiaryOr::emptyFormulaEquivalent. Except: an
+     * Analog to GraphFormulaMultiaryOr::emptyFormulaEquivalent. Except: an
      * empty multiary disjunction evaluates to false.
      */
-    static const CommGraphFormulaFixed emptyFormulaEquivalent;
+    static const GraphFormulaFixed emptyFormulaEquivalent;
 public:
-    /** See CommGraphFormulaMultiary(). */
-    CommGraphFormulaMultiaryOr();
-    CommGraphFormulaMultiaryOr(CommGraphFormula* subformula_);
-    CommGraphFormulaMultiaryOr(CommGraphFormula* lhs, CommGraphFormula* rhs);
+    /** See GraphFormulaMultiary(). */
+    GraphFormulaMultiaryOr();
+    GraphFormulaMultiaryOr(GraphFormula* subformula_);
+    GraphFormulaMultiaryOr(GraphFormula* lhs, GraphFormula* rhs);
 
     /**
      * Returns the merged equivalent to this formula. Merging gets rid of
      * unnecessary nesting of subformulas. (a+(b+c)) becomes (a+b+c). The
      * caller is responsible for deleting the returned newly created formula.
      */
-    CommGraphFormulaMultiaryOr* merge();
+    GraphFormulaMultiaryOr* merge();
 
-    bool implies(CommGraphFormulaMultiaryOr *);
-    virtual CommGraphFormulaMultiaryOr* getDeepCopy() const;
+    bool implies(GraphFormulaMultiaryOr *);
+    virtual GraphFormulaMultiaryOr* getDeepCopy() const;
 
-    /** Destroys this CommGraphFormulaMultiaryOr and all its subformulas. */
-    virtual ~CommGraphFormulaMultiaryOr() {};
+    /** Destroys this GraphFormulaMultiaryOr and all its subformulas. */
+    virtual ~GraphFormulaMultiaryOr() {};
     virtual std::string getOperator() const;
-    virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const;
+    virtual const GraphFormulaFixed& getEmptyFormulaEquivalent() const;
 };
 
 
 /**
- * A multiary conjunction of \link CommGraphFormula CommGraphFormulasMultiaryOr.\endlink
+ * A multiary conjunction of \link GraphFormula CommGraphFormulasMultiaryOr.\endlink
  * Each disjunction is called "clause" and has a set of literals.
  * This class exists for special function "addClause", etc.
  */
-class CNF_formula : public CommGraphFormulaMultiaryAnd {
+class GraphFormulaCNF : public GraphFormulaMultiaryAnd {
 private:
 public:
-    CNF_formula();
+    GraphFormulaCNF();
     //** constructs a new CNF and adds the clause to the CNF
-    CNF_formula(CommGraphFormulaMultiaryOr* clause);
-    CNF_formula(CommGraphFormulaMultiaryOr* clause1, CommGraphFormulaMultiaryOr* clause2);
+    GraphFormulaCNF(GraphFormulaMultiaryOr* clause);
+    GraphFormulaCNF(GraphFormulaMultiaryOr* clause1, GraphFormulaMultiaryOr* clause2);
 
     //** destroys the CNF and all its clauses
-    virtual ~CNF_formula() {};
+    virtual ~GraphFormulaCNF() {};
 
-    virtual CNF_formula* getDeepCopy() const;
+    virtual GraphFormulaCNF* getDeepCopy() const;
 
     //** adds a clause to the CNF
-    void addClause(CommGraphFormulaMultiaryOr* clause);
+    void addClause(GraphFormulaMultiaryOr* clause);
 
-    bool implies(CNF_formula *);
+    bool implies(GraphFormulaCNF *);
 
     /**
      * Simplifies the formula by removing redundant clauses.
@@ -356,9 +356,9 @@ public:
 
 
 /**
- * A literal within a CommGraphFormula.
+ * A literal within a GraphFormula.
  */
-class CommGraphFormulaLiteral : public CommGraphFormula {
+class GraphFormulaLiteral : public GraphFormula {
 private:
     /** The string representation of this literal. */
     std::string literal;
@@ -388,24 +388,24 @@ public:
      * Constructs a literal with the given string representation.
      * @param literal String representation of this literal.
      */
-    CommGraphFormulaLiteral(const std::string& literal);
-    virtual CommGraphFormulaLiteral* getDeepCopy() const;
-    virtual ~CommGraphFormulaLiteral() {};
-    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
+    GraphFormulaLiteral(const std::string& literal);
+    virtual GraphFormulaLiteral* getDeepCopy() const;
+    virtual ~GraphFormulaLiteral() {};
+    virtual bool value(const GraphFormulaAssignment& assignment) const;
     virtual std::string asString() const;
 };
 
 
 /**
  * Base class for all formulas that have a fixed value, i.e., a value that does
- * not depend on an assignment. This class exists, because CommGraphFormulaTrue
- * and CommGraphFormulaFalse need a common base class, so we can use them to
- * implement CommGraphFormulaMultiary::value() uniformly for all multiary
+ * not depend on an assignment. This class exists, because GraphFormulaTrue
+ * and GraphFormulaFalse need a common base class, so we can use them to
+ * implement GraphFormulaMultiary::value() uniformly for all multiary
  * formulas.
  */
-class CommGraphFormulaFixed : public CommGraphFormulaLiteral {
+class GraphFormulaFixed : public GraphFormulaLiteral {
 private:
-    /** Fixed truth value of this CommGraphFormulaFixed. */
+    /** Fixed truth value of this GraphFormulaFixed. */
     bool _value;
 public:
     /**
@@ -413,58 +413,58 @@ public:
      * @param value Fixed truth value of this formula.
      * @param asString String representation of this formula.
      */
-    CommGraphFormulaFixed(bool value, const std::string& asString);
+    GraphFormulaFixed(bool value, const std::string& asString);
 
-    virtual CommGraphFormulaFixed* getDeepCopy() const;
+    virtual GraphFormulaFixed* getDeepCopy() const;
 
-    /* Destroys this CommGraphFormulaFixed. */
-    virtual ~CommGraphFormulaFixed() {};
-    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
+    /* Destroys this GraphFormulaFixed. */
+    virtual ~GraphFormulaFixed() {};
+    virtual bool value(const GraphFormulaAssignment& assignment) const;
 };
 
 
 /**
  * The constant formula 'true'.
  */
-class CommGraphFormulaTrue : public CommGraphFormulaFixed {
+class GraphFormulaTrue : public GraphFormulaFixed {
 public:
-    CommGraphFormulaTrue();
-    virtual ~CommGraphFormulaTrue() {};
+    GraphFormulaTrue();
+    virtual ~GraphFormulaTrue() {};
 };
 
 
 /**
  * The constant formula 'false'.
  */
-class CommGraphFormulaFalse : public CommGraphFormulaFixed {
+class GraphFormulaFalse : public GraphFormulaFixed {
 public:
-    CommGraphFormulaFalse();
-    virtual ~CommGraphFormulaFalse() {};
+    GraphFormulaFalse();
+    virtual ~GraphFormulaFalse() {};
 };
 
 
 /**
  * A special literal FINAL.
  */
-class CommGraphFormulaLiteralFinal : public CommGraphFormulaLiteral {
+class GraphFormulaLiteralFinal : public GraphFormulaLiteral {
 public:
     /**
      * Constructs a literal with the given string representation.
      */
-    CommGraphFormulaLiteralFinal();
-    virtual ~CommGraphFormulaLiteralFinal() {};
+    GraphFormulaLiteralFinal();
+    virtual ~GraphFormulaLiteralFinal() {};
 };
 
 
 /**
  * A special literal TAU.
  */
-class CommGraphFormulaLiteralTau : public CommGraphFormulaLiteral {
+class GraphFormulaLiteralTau : public GraphFormulaLiteral {
 public:
     /**
      * Constructs a literal with the given string representation.
      */
-    CommGraphFormulaLiteralTau();
-    virtual ~CommGraphFormulaLiteralTau() {};
+    GraphFormulaLiteralTau();
+    virtual ~GraphFormulaLiteralTau() {};
 };
 #endif

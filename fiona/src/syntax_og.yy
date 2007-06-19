@@ -100,7 +100,7 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
 
 %union {
     char * str;
-    CommGraphFormula* formula;
+    GraphFormula* formula;
     GraphNodeColor_enum color;
 }
 
@@ -142,23 +142,23 @@ formula: lpar formula rpar
     }
 | formula op_and formula
     {
-        $$ = new CommGraphFormulaMultiaryAnd($1, $3);
+        $$ = new GraphFormulaMultiaryAnd($1, $3);
     }
 | formula op_or formula
     {
-        $$ = new CommGraphFormulaMultiaryOr($1, $3);
+        $$ = new GraphFormulaMultiaryOr($1, $3);
     }
 | key_true
     {
-        $$ = new CommGraphFormulaTrue;
+        $$ = new GraphFormulaTrue;
     }
 | key_false
     {
-        $$ = new CommGraphFormulaFalse;
+        $$ = new GraphFormulaFalse;
     }
 | ident
     {
-        $$ = new CommGraphFormulaLiteral($1);
+        $$ = new GraphFormulaLiteral($1);
         free($1);
     }
 ;

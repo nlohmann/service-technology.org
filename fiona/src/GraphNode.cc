@@ -49,7 +49,7 @@ GraphNode::GraphNode(int numberEvents) :
 			   hasFinalStateInStateSet(false),
                testAssignment(NULL) {
 
-	annotation = new CNF_formula();
+	annotation = new GraphFormulaCNF();
 
 	eventsUsed = new int [numberEvents];
 
@@ -118,7 +118,7 @@ bool GraphNode::addState(State * s) {
 
 //! \param myclause the clause to be added to the annotation of the current node
 //! \brief adds a new clause to the CNF formula of the node
-void GraphNode::addClause(CommGraphFormulaMultiaryOr* myclause) {
+void GraphNode::addClause(GraphFormulaMultiaryOr* myclause) {
 	annotation->addClause(myclause);
 }
 
@@ -162,17 +162,17 @@ void GraphNode::resetIteratingSuccNodes() {
 
 
 // returns the CNF formula that is the annotation of a node as a Boolean formula
-CNF_formula* GraphNode::getCNF_formula() {
+GraphFormulaCNF* GraphNode::getCNFformula() {
 	return annotation;
 }
 
 
 // return the assignment that is imposed by present or absent arcs leaving node v
-CommGraphFormulaAssignment* GraphNode::getAssignment() {
+GraphFormulaAssignment* GraphNode::getAssignment() {
 
 	trace(TRACE_5, "computing assignment of node " + intToString(getNumber()) + "\n");
 
-	CommGraphFormulaAssignment* myassignment = new CommGraphFormulaAssignment();
+	GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
 
 	// traverse outgoing edges and set the corresponding literals
 	// to true if the respective node is BLUE
@@ -186,7 +186,7 @@ CommGraphFormulaAssignment* GraphNode::getAssignment() {
 
 	// only if node has final state, set assignment of literal final to true
 	if (this->hasFinalStateInStateSet == true) {
-		myassignment->setToTrue(CommGraphFormulaLiteral::FINAL);
+		myassignment->setToTrue(GraphFormulaLiteral::FINAL);
 	}
 
 	//cout << "ende" << endl;
@@ -230,17 +230,17 @@ GraphNodeColor GraphNode::analyseNodeByFormula() {
 	trace(TRACE_5, "GraphNode::analyseNodeByFormula() : start\n");
 
 	// computing the assignment given by outgoing edges (to blue nodes)
-	CommGraphFormulaAssignment* myassignment = this->getAssignment();
-	bool result = this->getCNF_formula()->value(*myassignment);
+	GraphFormulaAssignment* myassignment = this->getAssignment();
+	bool result = this->getCNFformula()->value(*myassignment);
 	delete myassignment;
 
 	trace(TRACE_5, "GraphNode::analyseNodeByFormula() : end\n");
 
 	if (result) {
-		trace(TRACE_3, "\t\t\t node analysed blue, formula " + this->getCNF_formula()->asString() + "\n");
+		trace(TRACE_3, "\t\t\t node analysed blue, formula " + this->getCNFformula()->asString() + "\n");
 		return BLUE;
 	} else {
-		trace(TRACE_3, "\t\t\t node analysed red, formula " + this->getCNF_formula()->asString() + "\n");
+		trace(TRACE_3, "\t\t\t node analysed red, formula " + this->getCNFformula()->asString() + "\n");
 		return RED;
 	}
 }

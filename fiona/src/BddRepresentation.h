@@ -95,7 +95,7 @@ class BddRepresentation{
 
 		DdNode* nodesToBddMp(unsigned int node1, unsigned int node2);
 		DdNode* annotationToBddAnn(GraphNode * v);
-		DdNode* clauseToBddAnn(const CommGraphFormulaMultiaryOr* cl);
+		DdNode* clauseToBddAnn(const GraphFormulaMultiaryOr* cl);
 		unsigned int getBddNumber(unsigned int node);
 		void addBddVars(unsigned int max);	
 		BitVector numberToBin(unsigned int number, int cntBits);

@@ -125,7 +125,7 @@ threeValueLogic CommGraphFormula::equals() {
                 noUnknownFound = false;
             }
         }
-        return result ? TRUE : UNKNOWN;
+        return noUnknownFound ? TRUE : UNKNOWN;
     }
 
     return UNKNOWN;

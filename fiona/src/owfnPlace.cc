@@ -37,6 +37,7 @@
 #include "dimensions.h"
 #include "owfnPlace.h"
 #include "debug.h"
+#include <cassert>
 
 //! \fn owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net)
 //! \param name

@@ -35,6 +35,7 @@
 #include "binDecision.h"
 #include "debug.h"
 #include "owfnTransition.h"
+#include <cassert>
 
 
 //! \fn State::State()

@@ -124,29 +124,23 @@ owfnTransition* oWFN::getTransition(Transitions_t::size_type i) const {
     return Transitions[i];
 }
 
-oWFN::Places_t::size_type oWFN::getInputPlaceCount() const
-{
+oWFN::Places_t::size_type oWFN::getInputPlaceCount() const {
 	return inputPlaces.size();
 }
 
-owfnPlace* oWFN::getInputPlace(Places_t::size_type i) const
-{
+owfnPlace* oWFN::getInputPlace(Places_t::size_type i) const {
     return inputPlaces[i];
 }
 
-
-oWFN::Places_t::size_type oWFN::getOutputPlaceCount() const
-{
+oWFN::Places_t::size_type oWFN::getOutputPlaceCount() const {
 	return outputPlaces.size();
 }
 
-owfnPlace* oWFN::getOutputPlace(Places_t::size_type i) const
-{
+owfnPlace* oWFN::getOutputPlace(Places_t::size_type i) const {
     return outputPlaces[i];
 }
 
 
-//! \fn oWFN::initialize()
 //! \brief initializes the owfn; is called right after the parsing of the net file is done
 void oWFN::initialize() {
 	trace(TRACE_5, "oWFN::initialize(): start\n");
@@ -206,8 +200,7 @@ void oWFN::initialize() {
 
 
 
-void oWFN::initializeTransitions()
-{
+void oWFN::initializeTransitions() {
 	for (Transitions_t::size_type i = 0; i < getTransitionCount(); ++i) {
 		getTransition(i)->PrevEnabled = (i == 0 ? (owfnTransition *) 0 : Transitions[i-1]);
 		getTransition(i)->NextEnabled = (i == getTransitionCount() - 1 ? (owfnTransition *) 0 : Transitions[i+1]);
@@ -227,6 +220,7 @@ void oWFN::initializeTransitions()
 		getTransition(i)->check_enabled(this);
   	}
 }
+
 
 void oWFN::removeisolated() {
 	unsigned int i;
@@ -293,7 +287,6 @@ owfnTransition ** oWFN::quasiFirelist() {
 }
 
 
-//! \fn void oWFN::addSuccStatesToList(GraphNode * n, State * currentState)
 //! \param n the node to add the states to
 //! \param currentState the currently added state
 //! \brief decodes state, checks for message bound violation and adds successors recursively
@@ -326,7 +319,6 @@ void oWFN::addSuccStatesToList(GraphNode * n, State * currentState) {
 }
 
 
-//! \fn void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, owfnPlace * outputPlace, State * currentState, GraphNode * n)
 //! \param stateSet 
 //! \param outputPlace
 //! \param currentState
@@ -361,7 +353,6 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, owfnPlace * outputPl
 }
 
 
-//! \fn void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, messageMultiSet messages, State * currentState, GraphNode * n)
 //! \param stateSet
 //! \param messages  
 //! \param currentState
@@ -410,7 +401,6 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, messageMultiSet mess
 }
 
 
-//! \fn bool oWFN::checkMessageBound()
 //! \return returns true iff current marking VIOLATES message bound
 //! \brief checks if message bound is violated by the current marking (for interface places only)
 bool oWFN::checkMessageBound() {
@@ -475,7 +465,6 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 }
 
 
-//! \fn void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) 
 //! \param n the node to be calculated in case of an output event
 //! \brief calculates the reduced set of states of the new GraphNode in case of an output event
 void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
@@ -625,11 +614,11 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
 	trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(GraphNode * n, bool minimal): end\n");
 }
 
-//! \fn void oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal) 
+
 //! \param n the node to be calculated in case of an input event
-//! \param minimal the current state is minimal in the GraphNode
 //! \brief calculates the reduced set of states of the new GraphNode in case of an input event
-void oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal) {
+// for IG with node reduction
+void oWFN::calculateReachableStatesInputEvent(GraphNode * n) {
 	// calculates the EG starting at the current marking
 	trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal): start\n");
 
@@ -704,7 +693,7 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal) {
 	  		trace(TRACE_5, "fire transition\n");
 
 			CurrentState->firelist[CurrentState->current]->fire(this);
-			minimal = isMinimal();
+//			minimal = isMinimal();
 			NewState = binSearch(this);
 			
 	  		if(NewState != NULL) {
@@ -777,7 +766,7 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal) {
 	trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal): end\n");
 }
 
-//! \fn void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n)
+
 //! \param stateSet set of states
 //! \param outputPlace the output place of the net that is associated with the receiving event for which the new GraphNode is calculated
 //! \param n new GraphNode 
@@ -966,7 +955,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	
 }
 
-//! \fn void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n)
+
 //! \param stateSet set of states
 //! \param outputPlace the output place of the net that is associated with the receiving event for which the new GraphNode is calculated
 //! \param n new GraphNode 
@@ -1206,7 +1195,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 	return;
 }
 
-//! \fn void oWFN::calculateReachableStatesFull(GraphNode * n)
+
 //! \param n the node for which the reachability graph is computed
 //! \brief NO REDUCTION! calculate all reachable states from the current marking
 //! and store them in the node n (== GraphNode of communicationGraph);
@@ -1383,7 +1372,6 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 }
 
 
-//! \fn int oWFN::addInputMessage(unsigned int message)
 //! \param message message to be added to the currentmarking
 //! \brief adds input message to the current marking
 void oWFN::addInputMessage(unsigned int message) {
@@ -1402,7 +1390,6 @@ void oWFN::addInputMessage(unsigned int message) {
 }
 
 
-//! \fn int oWFN::addInputMessage(messageMultiSet messages)
 //! \param messages multiset of messages to be added to the currentmarking
 //! \brief adds input messages to the current marking
 void oWFN::addInputMessage(messageMultiSet messages) {
@@ -1551,10 +1538,10 @@ void oWFN::RemoveGraph() {
 }
 
 
-//! \fn bool oWFN::removeOutputMessage(unsigned int message)
 //! \param message name of message to be deleted from currentmarking
-//! \brief removes an output message from the current marking, if an output place was found the marking on that
-//! place is decreased by one and the function returns 1
+//! \brief removes an output message from the current marking,
+//! if an output place was found, the marking on that place is
+//! decreased by one and the function returns true
 bool oWFN::removeOutputMessage(unsigned int message) {
 
 	if (CurrentMarking[message] > 0) {
@@ -1569,13 +1556,13 @@ bool oWFN::removeOutputMessage(unsigned int message) {
 		return true;	
 	}
 	return false;
-}	
+}
 
 
-//! \fn bool oWFN::removeOutputMessage(messageMultiSet messages)
 //! \param messages multiset of messages to be deleted from currentmarking
-//! \brief removes output messages from the current marking, if an output place was found the marking on that
-//! place is decreased by one and the function returns 1
+//! \brief removes output messages from the current marking,
+//! if an output place was found, the marking on that place is
+//! decreased by one and the function returns 1
 bool oWFN::removeOutputMessage(messageMultiSet messages) {
 	unsigned int found = 0;
 	
@@ -1600,7 +1587,6 @@ bool oWFN::removeOutputMessage(messageMultiSet messages) {
 }
 
 
-//! \fn stateType oWFN::typeOfState()
 //! \brief returns type of state: {TRANS, DEADLOCK, FINALSTATE, NN}
 stateType oWFN::typeOfState() {
 	trace(TRACE_5, "oWFN::typeOfState() : start\n");
@@ -1619,30 +1605,27 @@ stateType oWFN::typeOfState() {
 }
 
 
-//! \fn bool oWFN::isMinimal()
-//! \brief returns true, if current state is minimal
-bool oWFN::isMinimal() {
-    
-    assert(false);
-	for (unsigned int i = 0; i < getPlaceCount(); i++) {
-		if (getPlace(i)->type == OUTPUT && CurrentMarking[i] > 0) {
-			return true;
-		}
-	}
-	return false;
-}
+////! \brief returns true, if current state is minimal
+//bool oWFN::isMinimal() {
+//    
+//    assert(false);
+//	for (unsigned int i = 0; i < getPlaceCount(); i++) {
+//		if (getPlace(i)->type == OUTPUT && CurrentMarking[i] > 0) {
+//			return true;
+//		}
+//	}
+//	return false;
+//}
+//
+//
+////! \brief returns true, if current state is maximal
+//bool oWFN::isMaximal() {
+//    
+//    assert(false);
+//	return transNrEnabled == 0;			
+//}
 
 
-//! \fn bool oWFN::isMaximal()
-//! \brief returns true, if current state is maximal
-bool oWFN::isMaximal() {
-    
-    assert(false);
-	return transNrEnabled == 0;			
-}
-
-
-//! \fn bool oWFN::isFinal() const
 //! \brief checks if the current marking satisfies final condition or final marking, resp.
 //! if a final condition is given, a possible final marking is ignored
 bool oWFN::isFinal() const {
@@ -1690,275 +1673,6 @@ string oWFN::createLabel(messageMultiSet m) const {
 
 	return label;
 }
-
-
-// ****************** Implementation of Stubborn Set Calculation *******************
-
-#ifdef STUBBORN
-
-
-void stubbornclosure(oWFN * net)
-{
-	owfnTransition * current;
-
-	net->NrStubborn = 0;
-	for(current = net -> StartOfStubbornList;current; current = current -> NextStubborn)
-	{
-		if (current->isEnabled())
-		{
-			net -> NrStubborn ++;
-		}
-		for (unsigned int i = 0; i != current->mustbeincluded.size(); i++)
-		{
-			if(!current -> mustbeincluded[i]->instubborn)
-			{
-				current -> mustbeincluded[i]->instubborn = true;
-				current -> mustbeincluded[i]->NextStubborn  = (owfnTransition *) 0;
-				net -> EndOfStubbornList -> NextStubborn = current -> mustbeincluded[i];
-				net -> EndOfStubbornList = current -> mustbeincluded[i];
-			}
-		}
-	}
-}
-	
-
-void stubborninsert(oWFN * net, owfnTransition* t)
-{
-	if(t -> instubborn) return;
-	t -> instubborn = true;
-	t -> NextStubborn = (owfnTransition *) 0;
-	if(net -> StartOfStubbornList)
-	{
-		net -> EndOfStubbornList -> NextStubborn = t;
-		net -> EndOfStubbornList = t;
-	}
-	else
-	{
-		net -> StartOfStubbornList = net -> EndOfStubbornList = t;
-	}
-}
-		
-//! \fn owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess)
-//! \param mess output message that is to be received
-//! \brief returns transitions to be fired for reduced state space for message successors		
-owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess) {
-	
-	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): begin\n");
-	
-	owfnTransition ** result;
-	owfnTransition * t;
-	unsigned int i;
-	
-	if (mess->PreTransitions.empty())
-	{	
-		result = new owfnTransition * [1];
-		result[0] = (owfnTransition *) 0;
-		trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): end\n");
-		return result;
-	}
-	StartOfStubbornList = (owfnTransition *) 0;
-	for(i = 0; i != mess->PreTransitions.size(); i++)
-	{
-		stubborninsert(this,mess->PreTransitions[i]);
-	}
-	stubbornclosure(this);
-	result = new owfnTransition * [NrStubborn + 1];
-	for(t=StartOfStubbornList, i=0;t; t = t -> NextStubborn)
-	{
-		t -> instubborn = false;
-		if (t->isEnabled())
-		{
-			result[i++] = t;
-		}
-	}
-	result[i] = (owfnTransition *)0;
-	CurrentCardFireList = NrStubborn;
-	StartOfStubbornList = (owfnTransition *) 0;
-	
-	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): end\n");
-	return result;
-}
-
-//! \fn owfnTransition ** oWFN::stubbornfirelistmessage(messageMultiSet messages)
-//! \param messages multiset of output messages that are to be received
-//! \brief returns transitions to be fired for reduced state space for messages successors
-owfnTransition ** oWFN::stubbornfirelistmessage(messageMultiSet messages) {
-	
-	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): begin\n");
-	
-	owfnTransition ** result;
-	owfnTransition * t;
-	unsigned int i;
-	
-	bool noPreTransitions = true;
-	
-	// check if any of the output messages has a pre-transition associated with it
-	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		if (!getPlace(*iter)->PreTransitions.empty()) {
-			noPreTransitions = false;
-			break;
-		}
-	}
-	
-	// none of the transitions that correspond to the output messages has a pre-transition
-	if (noPreTransitions) {
-		result = new owfnTransition * [1];
-		result[0] = (owfnTransition *) 0;
-		trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): end\n");
-		return result;
-	}
-	
-	StartOfStubbornList = (owfnTransition *) 0;
-	
-	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		for(i = 0; i != getPlace(*iter)->PreTransitions.size(); i++) {
-			stubborninsert(this, getPlace(*iter)->PreTransitions[i]);
-		}
-	}
-	
-	stubbornclosure(this);
-	result = new owfnTransition * [NrStubborn + 1];
-	for(t=StartOfStubbornList, i=0;t; t = t -> NextStubborn) {
-		t -> instubborn = false;
-		if (t->isEnabled()) {
-			result[i++] = t;
-		}
-	}
-	result[i] = (owfnTransition *)0;
-	CurrentCardFireList = NrStubborn;
-	StartOfStubbornList = (owfnTransition *) 0;
-	
-	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): end\n");
-	return result;
-}	
-	
-unsigned int StubbStamp = 0;
-
-void NewStubbStamp(oWFN * PN) {
-	if(StubbStamp < UINT_MAX) {
-		StubbStamp ++;
-	}
-	else {
-		for (oWFN::Transitions_t::size_type i = 0;
-		     i < PN->getTransitionCount(); ++i)
-		{
-			PN->getTransition(i)-> stamp =0;
-		}
-		StubbStamp = 1;
-	}
-}
-
-#define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
-owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
-	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): start\n"); 
-	
-	owfnTransition ** result;
-	unsigned int maxdfs;
-	owfnTransition * current, * next;
-
-	// computes stubborn set without goal orientation.
-	// The TSCC based optimisation is included
-
-	// 1. start with enabled transition
-	if(TarjanStack = startOfEnabledList) {
-		maxdfs = 0;
-		NewStubbStamp(this);
-		TarjanStack -> nextontarjanstack = TarjanStack;
-		TarjanStack -> stamp  = StubbStamp;
-		TarjanStack -> dfs = TarjanStack -> min = maxdfs++;
-		TarjanStack -> mbiindex = 0;
-		current = TarjanStack;
-		CallStack = current;
-		current -> nextoncallstack = (owfnTransition *) 0;
-	} else {
-		result = new owfnTransition * [1];
-		result[0] = (owfnTransition *) 0;
-		CurrentCardFireList = 0;
-
-		trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
-		return result;
-	}
-	
-    while(current) {
-	//	cout << "current: " << current->name << endl;
-	/*	cout << "current->mustbeincluded: " << current->mustbeincluded << endl;
-		cout << "current->mustbeincluded[0]: " << current->mustbeincluded[0] << endl;		*/
-		if (current->mustbeincluded.size() > current->mbiindex) {
-			next = current->mustbeincluded[current->mbiindex];
-			// Successor exists
-			if(next->stamp == StubbStamp) {
-				// already visited
-				if(next -> nextontarjanstack) {
-					// next still on stack
-					current -> min = MINIMUM(current -> min, next -> dfs);
-				}
-				current -> mbiindex++;
-			} else {
-				// not yet visited
-				next -> nextontarjanstack = TarjanStack;
-				TarjanStack = next;
-				next -> min = next -> dfs = maxdfs++;
-				next -> stamp = StubbStamp;
-				next -> mbiindex = 0;
-				next -> nextoncallstack = current;
-				CallStack = next;
-				current = next;
-			}
-		}
-		else
-		{
-			// no more successors -> scc detection and backtracking
-			if(current -> dfs == current -> min)
-			{
-				// remove all states behind current from Tarjanstack;
-				// if enabled -> final sequence
-				while(1)
-				{
-					if (TarjanStack->isEnabled())
-					{
-						// final sequence
-						unsigned int cardstubborn;
-						owfnTransition * t;
-
-						cardstubborn = 0;
-						for(t = TarjanStack;;t = t -> nextontarjanstack)
-						{
-							if (t->isEnabled()) cardstubborn ++;
-							if(t == current) break;
-						}
-						result = new owfnTransition * [cardstubborn + 1];
-						cardstubborn = 0;
-						for(t = TarjanStack;;t = t -> nextontarjanstack)
-						{
-							if (t->isEnabled())
-							{
-								result[cardstubborn++] = t;
-							}
-							if(t == current)
-							{
-								result[cardstubborn] = (owfnTransition *) 0;
-								CurrentCardFireList = cardstubborn;
-								trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
-								return(result);
-							}
-						}
-					} else {
-						if(TarjanStack == current) break;
-						TarjanStack = TarjanStack -> nextontarjanstack;
-					}
-				}
-			}
-		//	cout << "current -> nextoncallstack: " << current -> nextoncallstack << endl;
-			// backtracking to previous state
-			next = current -> nextoncallstack;
-			next -> min = MINIMUM(current -> min, next -> min);
-			next -> mbiindex++;
-			current = next;
-		}
-	}
-	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
-}
-#endif
 
 
 bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
@@ -2201,3 +1915,272 @@ GraphFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const State* cu
 
     return assignment;
 }
+
+
+// ****************** Implementation of Stubborn Set Calculation *******************
+
+#ifdef STUBBORN
+
+
+void stubbornclosure(oWFN * net)
+{
+	owfnTransition * current;
+
+	net->NrStubborn = 0;
+	for(current = net -> StartOfStubbornList;current; current = current -> NextStubborn)
+	{
+		if (current->isEnabled())
+		{
+			net -> NrStubborn ++;
+		}
+		for (unsigned int i = 0; i != current->mustbeincluded.size(); i++)
+		{
+			if(!current -> mustbeincluded[i]->instubborn)
+			{
+				current -> mustbeincluded[i]->instubborn = true;
+				current -> mustbeincluded[i]->NextStubborn  = (owfnTransition *) 0;
+				net -> EndOfStubbornList -> NextStubborn = current -> mustbeincluded[i];
+				net -> EndOfStubbornList = current -> mustbeincluded[i];
+			}
+		}
+	}
+}
+	
+
+void stubborninsert(oWFN * net, owfnTransition* t)
+{
+	if(t -> instubborn) return;
+	t -> instubborn = true;
+	t -> NextStubborn = (owfnTransition *) 0;
+	if(net -> StartOfStubbornList)
+	{
+		net -> EndOfStubbornList -> NextStubborn = t;
+		net -> EndOfStubbornList = t;
+	}
+	else
+	{
+		net -> StartOfStubbornList = net -> EndOfStubbornList = t;
+	}
+}
+		
+
+//! \param mess output message that is to be received
+//! \brief returns transitions to be fired for reduced state space for message successors		
+owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess) {
+	
+	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): begin\n");
+	
+	owfnTransition ** result;
+	owfnTransition * t;
+	unsigned int i;
+	
+	if (mess->PreTransitions.empty())
+	{	
+		result = new owfnTransition * [1];
+		result[0] = (owfnTransition *) 0;
+		trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): end\n");
+		return result;
+	}
+	StartOfStubbornList = (owfnTransition *) 0;
+	for(i = 0; i != mess->PreTransitions.size(); i++)
+	{
+		stubborninsert(this,mess->PreTransitions[i]);
+	}
+	stubbornclosure(this);
+	result = new owfnTransition * [NrStubborn + 1];
+	for(t=StartOfStubbornList, i=0;t; t = t -> NextStubborn)
+	{
+		t -> instubborn = false;
+		if (t->isEnabled())
+		{
+			result[i++] = t;
+		}
+	}
+	result[i] = (owfnTransition *)0;
+	CurrentCardFireList = NrStubborn;
+	StartOfStubbornList = (owfnTransition *) 0;
+	
+	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): end\n");
+	return result;
+}
+
+
+//! \param messages multiset of output messages that are to be received
+//! \brief returns transitions to be fired for reduced state space for messages successors
+owfnTransition ** oWFN::stubbornfirelistmessage(messageMultiSet messages) {
+	
+	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): begin\n");
+	
+	owfnTransition ** result;
+	owfnTransition * t;
+	unsigned int i;
+	
+	bool noPreTransitions = true;
+	
+	// check if any of the output messages has a pre-transition associated with it
+	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
+		if (!getPlace(*iter)->PreTransitions.empty()) {
+			noPreTransitions = false;
+			break;
+		}
+	}
+	
+	// none of the transitions that correspond to the output messages has a pre-transition
+	if (noPreTransitions) {
+		result = new owfnTransition * [1];
+		result[0] = (owfnTransition *) 0;
+		trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): end\n");
+		return result;
+	}
+	
+	StartOfStubbornList = (owfnTransition *) 0;
+	
+	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
+		for(i = 0; i != getPlace(*iter)->PreTransitions.size(); i++) {
+			stubborninsert(this, getPlace(*iter)->PreTransitions[i]);
+		}
+	}
+	
+	stubbornclosure(this);
+	result = new owfnTransition * [NrStubborn + 1];
+	for(t=StartOfStubbornList, i=0;t; t = t -> NextStubborn) {
+		t -> instubborn = false;
+		if (t->isEnabled()) {
+			result[i++] = t;
+		}
+	}
+	result[i] = (owfnTransition *)0;
+	CurrentCardFireList = NrStubborn;
+	StartOfStubbornList = (owfnTransition *) 0;
+	
+	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): end\n");
+	return result;
+}	
+	
+unsigned int StubbStamp = 0;
+
+void NewStubbStamp(oWFN * PN) {
+	if(StubbStamp < UINT_MAX) {
+		StubbStamp ++;
+	}
+	else {
+		for (oWFN::Transitions_t::size_type i = 0;
+		     i < PN->getTransitionCount(); ++i)
+		{
+			PN->getTransition(i)-> stamp =0;
+		}
+		StubbStamp = 1;
+	}
+}
+
+#define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
+owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
+	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): start\n"); 
+	
+	owfnTransition ** result;
+	unsigned int maxdfs;
+	owfnTransition * current, * next;
+
+	// computes stubborn set without goal orientation.
+	// The TSCC based optimisation is included
+
+	// 1. start with enabled transition
+	if(TarjanStack = startOfEnabledList) {
+		maxdfs = 0;
+		NewStubbStamp(this);
+		TarjanStack -> nextontarjanstack = TarjanStack;
+		TarjanStack -> stamp  = StubbStamp;
+		TarjanStack -> dfs = TarjanStack -> min = maxdfs++;
+		TarjanStack -> mbiindex = 0;
+		current = TarjanStack;
+		CallStack = current;
+		current -> nextoncallstack = (owfnTransition *) 0;
+	} else {
+		result = new owfnTransition * [1];
+		result[0] = (owfnTransition *) 0;
+		CurrentCardFireList = 0;
+
+		trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
+		return result;
+	}
+	
+    while(current) {
+	//	cout << "current: " << current->name << endl;
+	/*	cout << "current->mustbeincluded: " << current->mustbeincluded << endl;
+		cout << "current->mustbeincluded[0]: " << current->mustbeincluded[0] << endl;		*/
+		if (current->mustbeincluded.size() > current->mbiindex) {
+			next = current->mustbeincluded[current->mbiindex];
+			// Successor exists
+			if(next->stamp == StubbStamp) {
+				// already visited
+				if(next -> nextontarjanstack) {
+					// next still on stack
+					current -> min = MINIMUM(current -> min, next -> dfs);
+				}
+				current -> mbiindex++;
+			} else {
+				// not yet visited
+				next -> nextontarjanstack = TarjanStack;
+				TarjanStack = next;
+				next -> min = next -> dfs = maxdfs++;
+				next -> stamp = StubbStamp;
+				next -> mbiindex = 0;
+				next -> nextoncallstack = current;
+				CallStack = next;
+				current = next;
+			}
+		}
+		else
+		{
+			// no more successors -> scc detection and backtracking
+			if(current -> dfs == current -> min)
+			{
+				// remove all states behind current from Tarjanstack;
+				// if enabled -> final sequence
+				while(1)
+				{
+					if (TarjanStack->isEnabled())
+					{
+						// final sequence
+						unsigned int cardstubborn;
+						owfnTransition * t;
+
+						cardstubborn = 0;
+						for(t = TarjanStack;;t = t -> nextontarjanstack)
+						{
+							if (t->isEnabled()) cardstubborn ++;
+							if(t == current) break;
+						}
+						result = new owfnTransition * [cardstubborn + 1];
+						cardstubborn = 0;
+						for(t = TarjanStack;;t = t -> nextontarjanstack)
+						{
+							if (t->isEnabled())
+							{
+								result[cardstubborn++] = t;
+							}
+							if(t == current)
+							{
+								result[cardstubborn] = (owfnTransition *) 0;
+								CurrentCardFireList = cardstubborn;
+								trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
+								return(result);
+							}
+						}
+					} else {
+						if(TarjanStack == current) break;
+						TarjanStack = TarjanStack -> nextontarjanstack;
+					}
+				}
+			}
+		//	cout << "current -> nextoncallstack: " << current -> nextoncallstack << endl;
+			// backtracking to previous state
+			next = current -> nextoncallstack;
+			next -> min = MINIMUM(current -> min, next -> min);
+			next -> mbiindex++;
+			current = next;
+		}
+	}
+	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
+}
+#endif

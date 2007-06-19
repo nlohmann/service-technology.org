@@ -911,7 +911,7 @@ void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, Gr
 			if (options[O_CALC_ALL_STATES]) {
 				PN->calculateReachableStatesFull(node);	// calc the reachable states from that marking
 			} else {
-				PN->calculateReachableStatesInputEvent(node, false);	// calc the reachable states from that marking
+				PN->calculateReachableStatesInputEvent(node);	// calc the reachable states from that marking
 			}
 		}
 	}

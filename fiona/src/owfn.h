@@ -179,8 +179,6 @@ class oWFN  {
 
 		void initialize();						// initializes the net
 
-		void addPlace(owfnPlace*);
-
 		/**
 		 * Adds an owfnTransition to this oWFN.
 		 * @retval true Method succeeded.
@@ -190,16 +188,13 @@ class oWFN  {
 		 */
 		bool addTransition(owfnTransition* transition);
 
-//		void addStateToList(GraphNode *, State *, bool);
+        void addPlace(owfnPlace*);
+
 		void addSuccStatesToList(GraphNode *, State *);
-		
 		void addSuccStatesToListStubborn(StateSet &, owfnPlace * , State *, GraphNode *);
 		void addSuccStatesToListStubborn(StateSet &, messageMultiSet, State *, GraphNode *);
-		
-		void addSuccStatesToListOrig(GraphNode *, State *);
-		
-//		void addStateToList(GraphNode *, State *);
-		
+
+//		void addSuccStatesToListOrig(GraphNode *, State *);		
 
 		bool checkMessageBound();
 
@@ -214,21 +209,22 @@ class oWFN  {
 		unsigned int * copyCurrentMarking();
 		void copyMarkingToCurrentMarking(unsigned int * copy);
 		void calculateReachableStatesOutputEvent(GraphNode *);
-		void calculateReachableStatesInputEvent(GraphNode *, bool);
+		void calculateReachableStatesInputEvent(GraphNode *);
 		void calculateReachableStates(StateSet&, owfnPlace *, GraphNode *);
 		void calculateReachableStates(StateSet&, messageMultiSet, GraphNode *); 
-		
+
 		void calculateReachableStatesFull(GraphNode *);
-		
+
 		void addInputMessage(unsigned int);
 		void addInputMessage(messageMultiSet);			// adds input message to the current marking
 
 		bool removeOutputMessage(unsigned int);
 		bool removeOutputMessage(messageMultiSet);
-		
+
 		stateType typeOfState();			// returns the type of state (transient, maximal, minimal)
-		bool isMaximal();					// returns true if the state is maximal
-		bool isMinimal();					// returns true if the state is minimal
+//		bool isMaximal();					// returns true if the state is maximal
+//		bool isMinimal();					// returns true if the state is minimal
+
 		/**
 		 * Returns the label of the given marking, that means the label
 		 * consists of the names of the places of the net that have tokens

@@ -99,7 +99,7 @@ void communicationGraph::calculateRootNode() {
     if (options[O_CALC_ALL_STATES]) {
         PN->calculateReachableStatesFull(root);
     } else {
-        PN->calculateReachableStatesInputEvent(root, true);
+        PN->calculateReachableStatesInputEvent(root);
     }
 
     root->setNumber(0);
@@ -303,7 +303,7 @@ void communicationGraph::calculateSuccStatesInput(unsigned int input, GraphNode 
         } else {
             PN->setOfStatesTemp.clear();
             PN->visitedStates.clear();
-            PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
+            PN->calculateReachableStatesInputEvent(newNode);       // calc the reachable states from that marking
         }
 
         if (newNode->getColor() == RED) {
@@ -364,7 +364,7 @@ void communicationGraph::calculateSuccStatesInput(messageMultiSet input, GraphNo
         if (options[O_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
         } else {
-            PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
+            PN->calculateReachableStatesInputEvent(newNode);       // calc the reachable states from that marking
         }
         if (newNode->getColor() == RED) {
             // a message bound violation occured during computation of reachability graph

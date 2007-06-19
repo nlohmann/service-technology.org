@@ -54,27 +54,28 @@ bool compare(const owfnPlace* lhs, const owfnPlace* rhs){
 
 //! \fn oWFN::oWFN()
 //! \brief constructor
-oWFN::oWFN() : arcCnt(0), filename(NULL),
+oWFN::oWFN() : arcCnt(0),
+               CurrentCardFireList(0), CurrentCardQuasiFireList(0),
+               filename(NULL),
                tempBinDecision(NULL),
                FinalCondition(NULL),
                currentState(0), transNrEnabled(0), transNrQuasiEnabled(0),
                placeHashValue(0), BitVectorSize(0),
-               startOfQuasiEnabledList(NULL), startOfEnabledList(NULL)
-{
-	unsigned int i;
-  	NonEmptyHash = 0;
+               startOfQuasiEnabledList(NULL), startOfEnabledList(NULL) {
 
-  	try {
-  		binHashTable = new binDecision * [HASHSIZE];
-	} catch(bad_alloc) {
-		char mess[] = "\nhash table too large!\n";
-		cerr << mess;
-		_exit(2);
-	}
-  	
-  	for(i = 0; i < HASHSIZE; i++) {
-          binHashTable[i] = (binDecision *) 0;
-    } 
+    unsigned int i;
+    NonEmptyHash = 0;
+
+    try {
+        binHashTable = new binDecision * [HASHSIZE];
+    } catch(bad_alloc) {
+        cerr << "\nhash table too large!\n";
+        _exit(2);
+    }
+
+    for(i = 0; i < HASHSIZE; i++) {
+        binHashTable[i] = (binDecision *) 0;
+    }
 }
 
 
@@ -277,7 +278,7 @@ owfnTransition ** oWFN::firelist() {
 		tl[i++] = t;
 	}
 	tl[i] = (owfnTransition *) 0;
-	CardFireList = i;
+	CurrentCardFireList = i;
 	return tl;
 }
 
@@ -291,7 +292,7 @@ owfnTransition ** oWFN::quasiFirelist() {
 		tl[i++] = t;
 	}
 	tl[i] = (owfnTransition *) 0;
-	CardQuasiFireList = i;
+	CurrentCardQuasiFireList = i;
 
 	return tl;
 }
@@ -303,25 +304,28 @@ owfnTransition ** oWFN::quasiFirelist() {
 //! \brief decodes state, checks for message bound violation and adds successors recursively
 void oWFN::addSuccStatesToList(GraphNode * n, State * currentState) {
 	
-	if (currentState != NULL) {
+	assert(n != NULL);
+    
+    if (currentState != NULL) {
 		assert(!n->addState(currentState));		// currentState was added to node before
 
 		currentState->decodeShowOnly(this);		// decodes currently considered state
-	
+
 		// test decoded current marking if message bound k reached
 		if (checkMessageBound()) {
 			n->setColor(RED);
 			trace(TRACE_3, "\t\t\t message bound violation detected in node " + intToString(n->getNumber()) + " (addSuccStatesToList)\n");
-			return;
+            return;
 		}
-		
+
 		// add successors
-		for(unsigned int i = 0; i < currentState->CardFireList; i++) {
-			assert(currentState->succ[i] != NULL);
-			if (n->addState(currentState->succ[i])) {	// add current successor
-				// its successors need only be added if state was not yet in current node
-				addSuccStatesToList(n, currentState->succ[i]);
-			}
+		for (unsigned int i = 0; i < currentState->CardFireList; i++) {
+			if (currentState->succ[i] != NULL) {
+    			if (n->addState(currentState->succ[i])) {	// add current successor
+    				// its successors need only be added if state was not yet in current node
+    				addSuccStatesToList(n, currentState->succ[i]);
+    			}
+            }
 		}
 	}
 }
@@ -360,6 +364,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, owfnPlace * outputPl
 		}
 	}
 }
+
 
 //! \fn void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, messageMultiSet messages, State * currentState, GraphNode * n)
 //! \param stateSet
@@ -409,6 +414,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, messageMultiSet mess
 	}
 }
 
+
 //! \fn bool oWFN::checkMessageBound()
 //! \return returns true iff current marking VIOLATES message bound
 //! \brief checks if message bound is violated by the current marking (for interface places only)
@@ -416,8 +422,11 @@ bool oWFN::checkMessageBound() {
 	trace(TRACE_5, "oWFN::checkMessageBound(): start\n");
 	// test marking of current state if message bound k reached
 	if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
-		// test input places
-		for (unsigned int i = 0; i < getInputPlaceCount(); i++) {
+
+		Places_t::size_type i;
+
+        // test input places
+        for (i = 0; i < getInputPlaceCount(); i++) {
 			if (CurrentMarking[getInputPlace(i)->index] > messages_manual) {
 				trace(TRACE_3, "\t\t\t checkMessageBound found violation for input place " + string(getInputPlace(i)->name) + "\n");
 				trace(TRACE_5, "oWFN::checkMessageBound(): end\n");
@@ -425,7 +434,7 @@ bool oWFN::checkMessageBound() {
 			}
 		}
 		// test output places
-		for (unsigned int i = 0; i < getOutputPlaceCount(); i++) {
+		for (i = 0; i < getOutputPlaceCount(); i++) {
 			if (CurrentMarking[getOutputPlace(i)->index] > messages_manual) {
 				trace(TRACE_3, "\t\t\t checkMessageBound found violation for output place " + string(getOutputPlace(i)->name) + "\n");
 				trace(TRACE_5, "oWFN::checkMessageBound(): end\n");
@@ -502,7 +511,7 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
 	}
 	
 	CurrentState->firelist = stubbornfirelistdeadlocks();
-	CurrentState->CardFireList = CardFireList;
+	CurrentState->CardFireList = CurrentCardFireList;
 	if (parameters[P_IG]) {
 	    if (CurrentState->quasiFirelist) {
 		delete [] CurrentState->quasiFirelist;
@@ -514,9 +523,8 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
 	CurrentState->current = 0;
 	CurrentState->parent = (State *) 0;
 	assert(CurrentState->succ == NULL);
-	CurrentState->succ = new State * [CardFireList+1];
-	for (size_t istate = 0; istate != CardFireList+1; ++istate)
-	{
+	CurrentState->succ = new State * [CurrentCardFireList+1];
+	for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate) {
 		CurrentState->succ[istate] = NULL;
 	}
 
@@ -572,7 +580,7 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
 				trace(TRACE_5, "Current marking new\n");
       			NewState = binInsert(this);
       			NewState->firelist = stubbornfirelistdeadlocks();
-	      		NewState->CardFireList = CardFireList;
+	      		NewState->CardFireList = CurrentCardFireList;
 	      		if (parameters[P_IG]) {
 				    if (NewState->quasiFirelist) {
 						delete [] NewState->quasiFirelist;
@@ -584,16 +592,15 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
 	      		NewState->parent = CurrentState;
 
 				assert(NewState->succ == NULL);
-				NewState->succ =  new State * [CardFireList+1];
-				for (size_t istate = 0; istate != CardFireList+1; ++istate)
-				{
+				NewState->succ =  new State * [CurrentCardFireList+1];
+				for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate) {
 					NewState->succ[istate] = NULL;
 				}
 
 	      		NewState->placeHashValue = placeHashValue;
 	      		NewState->type = typeOfState();
 	      		
-				assert(CurrentState->succ[CurrentState -> current] == NULL);
+				assert(CurrentState->succ[CurrentState->current] == NULL);
 	      		CurrentState->succ[CurrentState->current] = NewState;
 
 	      		CurrentState = NewState;
@@ -654,21 +661,21 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal) {
 		CurrentState = binInsert(this);
 	}
 	
-	CurrentState->firelist = stubbornfirelistdeadlocks();
-	CurrentState->CardFireList = CardFireList;
-	if (parameters[P_IG]) {
-	    if (CurrentState->quasiFirelist) {
-		delete [] CurrentState->quasiFirelist;
-		CurrentState->quasiFirelist = NULL;
-	    }
-  	    CurrentState->quasiFirelist = quasiFirelist();
-	}
+    CurrentState->firelist = stubbornfirelistdeadlocks();
+    CurrentState->CardFireList = CurrentCardFireList;
+    if (parameters[P_IG]) {
+        if (CurrentState->quasiFirelist) {
+            delete [] CurrentState->quasiFirelist;
+            CurrentState->quasiFirelist = NULL;
+        }
+        CurrentState->quasiFirelist = quasiFirelist();
+    }
 
 	CurrentState->current = 0;
 	CurrentState->parent = (State *) 0;
 	assert(CurrentState->succ == NULL);
-	CurrentState->succ = new State * [CardFireList + 1];
-	for (unsigned int i = 0; i < CardFireList + 1; i++) {
+	CurrentState->succ = new State * [CurrentCardFireList + 1];
+	for (unsigned int i = 0; i < CurrentCardFireList + 1; i++) {
 		CurrentState->succ[i] = NULL;
 	}
 	CurrentState->placeHashValue = placeHashValue;
@@ -728,7 +735,7 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal) {
 
       			NewState = binInsert(this);
       			NewState->firelist = stubbornfirelistdeadlocks();
-	      		NewState->CardFireList = CardFireList;
+	      		NewState->CardFireList = CurrentCardFireList;
 	      		if (parameters[P_IG]) {
 			    if (NewState->quasiFirelist) {
 				delete [] NewState->quasiFirelist;
@@ -739,13 +746,13 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode * n, bool minimal) {
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
 				assert(NewState->succ == NULL);
-	      		NewState->succ =  new State * [CardFireList + 1];
-				for (unsigned int i = 0; i < CardFireList + 1; i++) {
+	      		NewState->succ =  new State * [CurrentCardFireList + 1];
+				for (unsigned int i = 0; i < CurrentCardFireList + 1; i++) {
 					NewState->succ[i] = NULL;	
 				}
 	      		NewState->placeHashValue = placeHashValue;
 	      		NewState->type = typeOfState();
-	      		
+
 				assert(CurrentState->succ[CurrentState->current] == NULL);
 	      		CurrentState->succ[CurrentState->current] = NewState;
 	      		CurrentState = NewState;
@@ -825,11 +832,11 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	}
 	
 	CurrentState->stubbornFirelist = stubbornfirelistmessage(outputPlace);
-	CurrentState->CardStubbornFireList = CardFireList;
+	CurrentState->CardStubbornFireList = CurrentCardFireList;
 
 	if (CurrentState->succ == NULL) {
-		CurrentState->succ = new State * [CardFireList+1];
-		for (size_t istate = 0; istate != CardFireList+1; ++istate) {
+		CurrentState->succ = new State * [CurrentCardFireList+1];
+		for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate) {
 			CurrentState->succ[istate] = NULL;
 		}
 	}
@@ -893,13 +900,13 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 				trace(TRACE_5, "Current marking new\n");
       			NewState = binInsert(&tempBinDecision, this);
       			NewState->stubbornFirelist = stubbornfirelistmessage(outputPlace);
-	      		NewState->CardStubbornFireList = CardFireList;
+	      		NewState->CardStubbornFireList = CurrentCardFireList;
 	      		
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
 				if (NewState->succ == NULL) {
-			      		NewState->succ =  new State * [CardFireList+1];
-					for (size_t istate = 0; istate != CardFireList+1; ++istate)
+			      		NewState->succ =  new State * [CurrentCardFireList+1];
+					for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate)
 					{
 						NewState->succ[istate] = NULL;
 					}
@@ -930,10 +937,10 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 					trace(TRACE_5, "close state and return to previous state\n");
 	  				CurrentState = CurrentState->parent;
 
-	  				if(CurrentState) {			// there is a father to further examine
-	      					CurrentState->decode(this);
-	      					CurrentState->current++;
-	    				}
+                    if (CurrentState) {			// there is a father to further examine
+                        CurrentState->decode(this);
+	      				CurrentState->current++;
+                    }
 				}
 				
 				if (tempCurrentMarking) {
@@ -947,18 +954,18 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 			trace(TRACE_5, "close state and return to previous state\n");
 	  		CurrentState = CurrentState->parent;
 
-	  		if(CurrentState) {			// there is a father to further examine
+	  		if (CurrentState) {			// there is a father to further examine
 	      		CurrentState->decode(this);
 	      		CurrentState->current++;
 	    	}
 		}
 	}
 	if (tempCurrentMarking) {
-		delete[] tempCurrentMarking;	
+		delete[] tempCurrentMarking;
 	}
-	
+
 	//binDeleteAll(*tempBinDecision);
-	
+
 	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : end\n");
 	return;
 	
@@ -1015,11 +1022,11 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 	}
 	
 	CurrentState->stubbornFirelist = stubbornfirelistmessage(messages);
-	CurrentState->CardStubbornFireList = CardFireList;
+	CurrentState->CardStubbornFireList = CurrentCardFireList;
 
 	if (CurrentState->succ == NULL) {
-		CurrentState->succ = new State * [CardFireList+1];
-		for (size_t istate = 0; istate != CardFireList+1; ++istate) {
+		CurrentState->succ = new State * [CurrentCardFireList+1];
+		for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate) {
 			CurrentState->succ[istate] = NULL;
 		}
 	}
@@ -1116,13 +1123,13 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 				trace(TRACE_5, "Current marking new\n");
       			NewState = binInsert(&tempBinDecision, this);
       			NewState->stubbornFirelist = stubbornfirelistmessage(messages);
-	      		NewState->CardStubbornFireList = CardFireList;
+	      		NewState->CardStubbornFireList = CurrentCardFireList;
 	      		
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
 				if (NewState->succ == NULL) {
-			      	NewState->succ =  new State * [CardFireList+1];
-					for (size_t istate = 0; istate != CardFireList+1; ++istate)
+			      	NewState->succ =  new State * [CurrentCardFireList+1];
+					for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate)
 					{
 						NewState->succ[istate] = NULL;
 					}
@@ -1172,7 +1179,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 					trace(TRACE_5, "close state and return to previous state\n");
 	  				CurrentState = CurrentState->parent;
 
-	  				if(CurrentState) {			// there is a father to further examine
+	  				if (CurrentState) {			// there is a father to further examine
       					CurrentState->decode(this);
       					CurrentState->current++;
     				}
@@ -1189,7 +1196,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 			trace(TRACE_5, "close state and return to previous state\n");
 	  		CurrentState = CurrentState->parent;
 
-	  		if(CurrentState) {			// there is a father to further examine
+	  		if (CurrentState) {			// there is a father to further examine
 	      		CurrentState->decode(this);
 	      		CurrentState->current++;
 	    	}
@@ -1199,7 +1206,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 		delete[] tempCurrentMarking;
 		tempCurrentMarking = NULL;
 	}
-	
+
 	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : end\n");
 	return;
 }
@@ -1220,15 +1227,13 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 		trace(TRACE_3, "\t\t\t message bound violated; color of node " + intToString(n->getNumber()) + " set to RED (calculateReachableStatesFull, oben)\n");
 		return;
 	}
-	
+
 	State * CurrentState;
-  	State * NewState;
-  	
 	CurrentState = binSearch(this);
-	
+
 	unsigned int * tempCurrentMarking = NULL;
 	unsigned int tempPlaceHashValue;
-	
+
 //	if (options[O_BDD] == false && CurrentState != NULL) {
 
 	if (CurrentState != NULL) {
@@ -1241,13 +1246,13 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 		trace(TRACE_5, "oWFN::calculateReachableStatesFull(GraphNode * n) : end (root marking of EG already in bintree; states copied only)\n");
 		return;
 	} else {
-	
+
 		// the other case:
 		// we have a marking which has not yet a state object assigned to it
 		CurrentState = binInsert(this);
-	
+
 		CurrentState->firelist = firelist();
-		CurrentState->CardFireList = CardFireList;
+		CurrentState->CardFireList = CurrentCardFireList;
 	
 		if (parameters[P_IG]) {
 		    if (CurrentState->quasiFirelist) {
@@ -1261,8 +1266,8 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 		CurrentState->parent = (State *) 0;
 		assert(CurrentState->succ == NULL);
 	
-		CurrentState->succ = new State * [CardFireList+1];
-		for (size_t istate = 0; istate != CardFireList+1; ++istate)
+		CurrentState->succ = new State * [CurrentCardFireList+1];
+		for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate)
 		{
 			CurrentState->succ[istate] = NULL;
 		}
@@ -1272,25 +1277,27 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 		assert(CurrentState != NULL);
 		n->addState(CurrentState);
 		
+        State * NewState;    
+    
 		// building EG in a node
 	  	while(CurrentState) {
-	 
+
 			// no more transition to fire from current state?
 			if (CurrentState->current < CurrentState->CardFireList) {
 				// there is a next state that needs to be explored
-	
+
 				if (tempCurrentMarking) {
 					delete[] tempCurrentMarking;
 					tempCurrentMarking = NULL;
 				}
-				
+
 				tempCurrentMarking = copyCurrentMarking();
 				tempPlaceHashValue = placeHashValue;
-				  		
+
 				// fire and reach next state
 				CurrentState->firelist[CurrentState->current]->fire(this);
 				NewState = binSearch(this);
-				
+
 		  		if(NewState != NULL) {
 			  		// Current marking already in bintree 
 					trace(TRACE_5, "Current marking already in bintree \n");
@@ -1303,13 +1310,13 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 							return;
 						}
 					}
-					
+
 					copyMarkingToCurrentMarking(tempCurrentMarking);
-					
+
 					CurrentState->firelist[CurrentState->current]->backfire(this);
-					
+
 					placeHashValue = tempPlaceHashValue;
-					
+
 					delete[] tempCurrentMarking;
 					tempCurrentMarking = NULL;
 										
@@ -1320,7 +1327,7 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 					trace(TRACE_5, "Current marking new\n");
 	      			NewState = binInsert(this);
 	      			NewState->firelist = firelist();
-		      		NewState->CardFireList = CardFireList;
+		      		NewState->CardFireList = CurrentCardFireList;
 		      		if (parameters[P_IG]) {
 					    if (NewState->quasiFirelist) {
 							delete [] NewState->quasiFirelist;
@@ -1331,8 +1338,8 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 		      		NewState->current = 0;
 		      		NewState->parent = CurrentState;
 					assert(NewState->succ == NULL);
-		      		NewState->succ =  new State * [CardFireList+1];
-					for (size_t istate = 0; istate != CardFireList+1; ++istate)
+		      		NewState->succ =  new State * [CurrentCardFireList+1];
+					for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate)
 					{
 						NewState->succ[istate] = NULL;
 					}
@@ -1366,7 +1373,7 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 				trace(TRACE_5, "close state and return to previous state\n");
 		  		CurrentState = CurrentState->parent;
 	
-		  		if(CurrentState) {			// there is a father to further examine
+		  		if (CurrentState) {			// there is a father to further examine
 		      		CurrentState->decode(this);
 		      		CurrentState->current++;
 		    	}
@@ -1419,9 +1426,11 @@ void oWFN::addInputMessage(messageMultiSet messages) {
 	}
 }
 
+
 void oWFN::printCurrentMarking() const {
     printMarking(CurrentMarking);
 }
+
 
 void oWFN::printMarking(unsigned int * marking) const {
     cout << "---------------------------------------------------------------"
@@ -1457,6 +1466,7 @@ string oWFN::getMarkingAsString(unsigned int * marking) const {
     }
     return buffer;
 }
+
 
 string oWFN::getCurrentMarkingAsString() const {
     return getMarkingAsString(CurrentMarking);
@@ -1504,17 +1514,14 @@ unsigned int oWFN::getPlaceHashValue() {
 }
 
 
-bool oWFN::addTransition(owfnTransition* transition)
-{
-	for (Transitions_t::size_type i = 0; i != Transitions.size(); ++i)
-	{
+bool oWFN::addTransition(owfnTransition* transition) {
+	for (Transitions_t::size_type i = 0; i != Transitions.size(); ++i) {
 		if (getTransition(i)->name == transition->name)
 			return false;
 	}
 
 	Transitions.push_back(transition);
-	if (!(getTransitionCount() % REPORTFREQUENCY))
-	{
+	if (!(getTransitionCount() % REPORTFREQUENCY)) {
 		cerr << "\n" << getTransitionCount() << "transitions parsed\n";
 	}
 
@@ -1522,8 +1529,7 @@ bool oWFN::addTransition(owfnTransition* transition)
 }
 
 
-void oWFN::addPlace(owfnPlace *place)
-{
+void oWFN::addPlace(owfnPlace *place) {
 	if (place->type == INPUT) {
 		inputPlaces.push_back(place);
 	} else if (place->type == OUTPUT) {
@@ -1536,6 +1542,7 @@ void oWFN::addPlace(owfnPlace *place)
 		cerr << "\n" << Places.size() << "places parsed\n";
 	}
 }
+
 
 void oWFN::RemoveGraph() {
 	int i;
@@ -1565,9 +1572,10 @@ bool oWFN::removeOutputMessage(unsigned int message) {
 			((owfnTransition *) getPlace(message)->getLeavingArc(k)->Destination)->check_enabled(this);
 		}
 		return true;	
-	} 
+	}
 	return false;
 }	
+
 
 //! \fn bool oWFN::removeOutputMessage(messageMultiSet messages)
 //! \param messages multiset of messages to be deleted from currentmarking
@@ -1591,7 +1599,7 @@ bool oWFN::removeOutputMessage(messageMultiSet messages) {
 					((owfnTransition *) getPlace(*iter)->getLeavingArc(k)->Destination)->check_enabled(this);
 				}	
 			}
-		} 
+		}
 	}
 	return messages.size() == found;	
 }
@@ -1608,20 +1616,19 @@ stateType oWFN::typeOfState() {
 	if (transNrEnabled == 0) {
 		trace(TRACE_5, "oWFN::typeOfState() : end\n");	
 		return DEADLOCK;		// state is an internal deadlock, no transition is enabled or quasi-enabled
-	} else {
-		trace(TRACE_5, "oWFN::typeOfState() : end\n");	
-		return TRANS;		// state is transient since there are transitions which are enabled
 	}
-	
-	assert(false);
-	
+
+    // otherwise, state must be transient
 	trace(TRACE_5, "oWFN::typeOfState() : end\n");	
+	return TRANS;
 }
 
 
 //! \fn bool oWFN::isMinimal()
 //! \brief returns true, if current state is minimal
 bool oWFN::isMinimal() {
+    
+    assert(false);
 	for (unsigned int i = 0; i < getPlaceCount(); i++) {
 		if (getPlace(i)->type == OUTPUT && CurrentMarking[i] > 0) {
 			return true;
@@ -1634,6 +1641,8 @@ bool oWFN::isMinimal() {
 //! \fn bool oWFN::isMaximal()
 //! \brief returns true, if current state is maximal
 bool oWFN::isMaximal() {
+    
+    assert(false);
 	return transNrEnabled == 0;			
 }
 
@@ -1768,7 +1777,7 @@ owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess) {
 		}
 	}
 	result[i] = (owfnTransition *)0;
-	CardFireList = NrStubborn;
+	CurrentCardFireList = NrStubborn;
 	StartOfStubbornList = (owfnTransition *) 0;
 	
 	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): end\n");
@@ -1821,7 +1830,7 @@ owfnTransition ** oWFN::stubbornfirelistmessage(messageMultiSet messages) {
 		}
 	}
 	result[i] = (owfnTransition *)0;
-	CardFireList = NrStubborn;
+	CurrentCardFireList = NrStubborn;
 	StartOfStubbornList = (owfnTransition *) 0;
 	
 	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): end\n");
@@ -1856,8 +1865,7 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
 	// The TSCC based optimisation is included
 
 	// 1. start with enabled transition
-	if(TarjanStack = startOfEnabledList)
-	{
+	if(TarjanStack = startOfEnabledList) {
 		maxdfs = 0;
 		NewStubbStamp(this);
 		TarjanStack -> nextontarjanstack = TarjanStack;
@@ -1867,37 +1875,30 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
 		current = TarjanStack;
 		CallStack = current;
 		current -> nextoncallstack = (owfnTransition *) 0;
-	}
-	else
-	{
+	} else {
 		result = new owfnTransition * [1];
 		result[0] = (owfnTransition *) 0;
-		CardFireList = 0;
+		CurrentCardFireList = 0;
 
 		trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
 		return result;
 	}
-	while(current)
-	{
+	
+    while(current) {
 	//	cout << "current: " << current->name << endl;
 	/*	cout << "current->mustbeincluded: " << current->mustbeincluded << endl;
 		cout << "current->mustbeincluded[0]: " << current->mustbeincluded[0] << endl;		*/
-		if (current->mustbeincluded.size() > current->mbiindex)
-		{
+		if (current->mustbeincluded.size() > current->mbiindex) {
 			next = current->mustbeincluded[current->mbiindex];
 			// Successor exists
-			if(next->stamp == StubbStamp)
-			{
+			if(next->stamp == StubbStamp) {
 				// already visited
-				if(next -> nextontarjanstack)
-				{
+				if(next -> nextontarjanstack) {
 					// next still on stack
 					current -> min = MINIMUM(current -> min, next -> dfs);
 				}
 				current -> mbiindex++;
-			}
-			else
-			{
+			} else {
 				// not yet visited
 				next -> nextontarjanstack = TarjanStack;
 				TarjanStack = next;
@@ -1941,14 +1942,12 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
 							if(t == current)
 							{
 								result[cardstubborn] = (owfnTransition *) 0;
-								CardFireList = cardstubborn;
+								CurrentCardFireList = cardstubborn;
 								trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
 								return(result);
 							}
 						}
-					}
-					else
-					{
+					} else {
 						if(TarjanStack == current) break;
 						TarjanStack = TarjanStack -> nextontarjanstack;
 					}
@@ -1985,11 +1984,11 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
     // Initialize the currentState with the initial marking.
     State* currentState = binInsert(this);
     currentState->firelist = firelist();
-    currentState->CardFireList = CardFireList;
+    currentState->CardFireList = CurrentCardFireList;
     currentState->current = 0;
     currentState->parent = NULL;
-    currentState->succ = new State*[CardFireList + 1];
-    for (size_t istate = 0; istate != CardFireList + 1; ++istate) {
+    currentState->succ = new State*[CurrentCardFireList + 1];
+    for (size_t istate = 0; istate != CurrentCardFireList + 1; ++istate) {
         currentState->succ[istate] = NULL;
     }
     currentState->placeHashValue = placeHashValue;
@@ -2098,11 +2097,11 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
                 // So we have to initialize this newly seen state.
                 newState = binInsert(this);
                 newState->firelist = firelist();
-                newState->CardFireList = CardFireList;
+                newState->CardFireList = CurrentCardFireList;
                 newState->current = 0;
                 newState->parent = currentState;
-                newState->succ = new State*[CardFireList + 1];
-                for (size_t istate = 0; istate != CardFireList + 1; ++istate) {
+                newState->succ = new State*[CurrentCardFireList + 1];
+                for (size_t istate = 0; istate != CurrentCardFireList + 1; ++istate) {
                     newState->succ[istate] = NULL;
                 }
                 newState->placeHashValue = placeHashValue;

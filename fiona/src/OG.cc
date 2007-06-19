@@ -48,7 +48,7 @@
 //! \param _PN
 //! \brief constructor
 operatingGuidelines::operatingGuidelines(oWFN * _PN) : communicationGraph(_PN) {
-	
+
 	 if (options[O_BDD] == true || options[O_OTF]) {
 		unsigned int nbrLabels = PN->getInputPlaceCount() + PN->getOutputPlaceCount();
 		bdd = new BddRepresentation(nbrLabels, (Cudd_ReorderingType)bdd_reordermethod);
@@ -98,7 +98,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 		return;
 	}
 
-	// get the annotation of the node (CNF) as formula
+	// get the annotation of the node as CNF formula
 	computeCNF(currentNode);
 
 	trace(TRACE_1, "=================================================================\n");
@@ -121,7 +121,6 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
 
 			trace(TRACE_5, "calculating successor states\n");
-
 			calculateSuccStatesInput(PN->getInputPlace(i)->index, currentNode, v);
 
 			if (v->getColor() == RED) {
@@ -140,7 +139,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 			} else {
 				// was the new node v computed before? 
                 GraphNode* found = findGraphNodeInSet(v);
-                
+
                 if (found == NULL) {
                     // node v is new, so the node as well as the edge to it is added 
                     AddGraphNode(currentNode, v, i, SENDING);
@@ -188,8 +187,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 
     // early checking if the node's annotation cannot be made true
     currentNode->testAssignment = currentNode->getAssignment();
-    unsigned int j = 0;
-    for (j = 0; j < PN->getOutputPlaceCount(); j++) {
+    for (unsigned int j = 0; j < PN->getOutputPlaceCount(); j++) {
         currentNode->testAssignment->setToTrue(PN->getOutputPlace(j)->getLabelForCommGraph());
     }
 
@@ -216,7 +214,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 
 			// was the new node computed before? 
 			GraphNode* found = findGraphNodeInSet(v);
-			
+
 			if (found == NULL) {
                 // node v is new, so the node as well as the edge to it is added
                 AddGraphNode(currentNode, v, i, RECEIVING);
@@ -231,7 +229,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
                     currentNode->testAssignment->setToFalse(PN->getOutputPlace(i)->getLabelForCommGraph());
 				}
 			} else {
-                // node was computed before, so only add a new edge to the old node
+                // node v was computed before, so only add a new edge to the old node
                 trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
 
                 // draw a new RECEIVING edge to the old node
@@ -244,7 +242,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 				// annotation of currentNode.
 				if (found->getColor() == RED) {
 					currentNode->removeLiteralFromFormula(i, RECEIVING);
-                    currentNode->testAssignment->setToFalse(PN->getOutputPlace(i)->getLabelForCommGraph());
+                    currentNode->testAssignment->setToFalse((PN->getOutputPlace(i))->getLabelForCommGraph());
 				}
 				delete v;
 
@@ -296,19 +294,20 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 	assert(node->getCNF_formula()->asString() == CommGraphFormulaLiteral::TRUE);
 	
 	StateSet::iterator iter;			// iterator over the states of the node
-	
+
 	if (options[O_CALC_ALL_STATES]) {
 	// NO state reduction
-		
+
 		// iterate over all states of the node
 		for (iter = node->reachGraphStateSet.begin();
 			 iter != node->reachGraphStateSet.end(); iter++) {
+
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
 				// we just consider the maximal states only
-				
+
 				// get the marking of this state
 				(*iter)->decodeShowOnly(PN);
-							
+
 				// this clause's first literal
 				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
 
@@ -316,7 +315,7 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 				if ((*iter)->type == FINALSTATE) {
 
 					node->hasFinalStateInStateSet = true;
-					
+
 					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
 					myclause->addSubFormula(myliteral);
 				}

@@ -44,7 +44,7 @@
 //! \param numberEvents the number of events that have to be processed from this node
 //! \brief constructor
 GraphNode::GraphNode(int numberEvents) :
-			   number(0),
+			   number(12345678),
 			   color(BLUE),
 			   successorNodes(NULL),
 			   hasFinalStateInStateSet(false),
@@ -53,7 +53,7 @@ GraphNode::GraphNode(int numberEvents) :
 	annotation = new CNF_formula();
 
 	eventsUsed = new int [numberEvents];
-	
+
 	for (int i = 0; i < numberEvents; i++) {
 		eventsUsed[i] = 0;
 	}
@@ -124,8 +124,8 @@ void GraphNode::addClause(CommGraphFormulaMultiaryOr* myclause) {
 }
 
 
-void GraphNode::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) {
-    trace(TRACE_5, "GraphNode::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) : start\n");
+void GraphNode::removeLiteralFromFormula(oWFN::Places_t::size_type i, GraphEdgeType type) {
+    trace(TRACE_5, "GraphNode::removeLiteralFromFormula(oWFN::Places_t::size_type i, GraphEdgeType type) : start\n");
 
     if (type == SENDING) {
         //cout << "remove literal " << PN->getInputPlace(i)->getLabelForCommGraph() << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
@@ -135,7 +135,7 @@ void GraphNode::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) {
         annotation->removeLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
     }
 
-    trace(TRACE_5, "GraphNode::removeLiteralFromFormula(unsigned int i, GraphEdgeType type) : end\n");
+    trace(TRACE_5, "GraphNode::removeLiteralFromFormula(oWFN::Places_t::size_type i, GraphEdgeType type) : end\n");
 }
 
 
@@ -170,11 +170,11 @@ CNF_formula* GraphNode::getCNF_formula() {
 
 // return the assignment that is imposed by present or absent arcs leaving node v
 CommGraphFormulaAssignment* GraphNode::getAssignment() {
-	
+
 	trace(TRACE_5, "computing assignment of node " + intToString(getNumber()) + "\n");
 
 	CommGraphFormulaAssignment* myassignment = new CommGraphFormulaAssignment();
-	
+
 	// traverse outgoing edges and set the corresponding literals
 	// to true if the respective node is BLUE
     this->resetIteratingSuccNodes();
@@ -184,12 +184,12 @@ CommGraphFormulaAssignment* GraphNode::getAssignment() {
             myassignment->setToTrue(edge->getLabel());
 		}
 	}
-	
+
 	// only if node has final state, set assignment of literal final to true
 	if (this->hasFinalStateInStateSet == true) {
 		myassignment->setToTrue(CommGraphFormulaLiteral::FINAL);
 	}
-	
+
 	//cout << "ende" << endl;
 	return myassignment;
 
@@ -209,21 +209,18 @@ GraphNodeColor GraphNode::getColor() const {
 }
 
 
-bool GraphNode::isToShow(const GraphNode* rootOfGraph) const
-{
-	if ( parameters[P_SHOW_ALL_NODES] ||
-	    (parameters[P_SHOW_NO_RED_NODES] && (getColor() != RED)) ||
-	    (!parameters[P_SHOW_NO_RED_NODES] && (getColor() == RED)) ||
-	    (getColor() == BLUE) ||
-	    (this == rootOfGraph) )
-	{
-		return (parameters[P_SHOW_EMPTY_NODE] ||
-		        reachGraphStateSet.size() != 0);
-	}
-	else
-	{
-		return false;
-	}
+bool GraphNode::isToShow(const GraphNode* rootOfGraph) const {
+
+    if (parameters[P_SHOW_ALL_NODES] ||
+         (parameters[P_SHOW_NO_RED_NODES] && (getColor() != RED)) ||
+         (!parameters[P_SHOW_NO_RED_NODES] && (getColor() == RED)) ||
+         (getColor() == BLUE) ||
+         (this == rootOfGraph)) {
+
+        return (parameters[P_SHOW_EMPTY_NODE] || reachGraphStateSet.size() != 0);
+    } else {
+        return false;
+    }
 }
 
 
@@ -241,13 +238,14 @@ GraphNodeColor GraphNode::analyseNodeByFormula() {
 	trace(TRACE_5, "GraphNode::analyseNodeByFormula() : end\n");
 
 	if (result) {
-		trace(TRACE_3, "\t\t\t node analysed blue, formula " + this->getCNF_formula()->asString());
+		trace(TRACE_3, "\t\t\t node analysed blue, formula " + this->getCNF_formula()->asString() + "\n");
 		return BLUE;
 	} else {
-		trace(TRACE_3, "\t\t\t node analysed red, formula " + this->getCNF_formula()->asString());
+		trace(TRACE_3, "\t\t\t node analysed red, formula " + this->getCNF_formula()->asString() + "\n");
 		return RED;
 	}
 }
+
 
 //! \param left left hand GraphNode
 //! \param right right hand GraphNode

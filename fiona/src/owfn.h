@@ -69,8 +69,8 @@ class oWFN  {
 	private:
 		unsigned int NrOfStates;
 		unsigned int arcCnt;				//!< number of arcs
-		unsigned int CardFireList;
-		unsigned int CardQuasiFireList;
+		unsigned int CurrentCardFireList;
+		unsigned int CurrentCardQuasiFireList;
 
 		/** array of places */
 		Places_t Places;

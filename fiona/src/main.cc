@@ -165,26 +165,29 @@ OGFromFile* readog(const std::string& ogfile) {
 void adjustOptionValues() {
 	// report ...
 
-	trace(TRACE_0, "considering the following events:\n");
-//	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all:\n");
-	trace(TRACE_0, "    sending events:\n" );
-	for (unsigned int e=0; e < PN->getInputPlaceCount(); e++) {
-		trace(TRACE_0, "\t!" + string(PN->getInputPlace(e)->name));
-		if (options[O_EVENT_USE_MAX]) {
-			trace(TRACE_0, "\t(max. " + intToString(PN->getInputPlace(e)->max_occurence) + "x)\n");
-		} else {
-			trace(TRACE_0, "\t(no limit)\n");
-		}
-	}
-	trace(TRACE_0, "    receiving events:\n" );
-	for (unsigned int e=0; e < PN->getOutputPlaceCount(); e++) {
-		trace(TRACE_0, "\t?" + string(PN->getOutputPlace(e)->name));
-		if (options[O_EVENT_USE_MAX]) {
-			trace(TRACE_0, "\t(max. " + intToString(PN->getOutputPlace(e)->max_occurence) + "x)\n");
-		} else {
-			trace(TRACE_0, "\t(no limit)\n");
-		}
-	}
+//	trace(TRACE_0, "considering the following events:\n");
+////	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all:\n");
+//	trace(TRACE_0, "    sending events:\n" );
+//	for (unsigned int e=0; e < PN->getInputPlaceCount(); e++) {
+//		trace(TRACE_0, "\t!" + string(PN->getInputPlace(e)->name));
+//		if (options[O_EVENT_USE_MAX]) {
+//			trace(TRACE_0, "\t(max. " + intToString(PN->getInputPlace(e)->max_occurence) + "x)\n");
+//		} else {
+//			trace(TRACE_0, "\t(no limit)\n");
+//		}
+//	}
+//	trace(TRACE_0, "    receiving events:\n" );
+//	for (unsigned int e=0; e < PN->getOutputPlaceCount(); e++) {
+//		trace(TRACE_0, "\t?" + string(PN->getOutputPlace(e)->name));
+//		if (options[O_EVENT_USE_MAX]) {
+//			trace(TRACE_0, "\t(max. " + intToString(PN->getOutputPlace(e)->max_occurence) + "x)\n");
+//		} else {
+//			trace(TRACE_0, "\t(no limit)\n");
+//		}
+//	}
+    if (options[O_EVENT_USE_MAX]) {
+        trace(TRACE_0, "each event considered max: " + intToString(messages_manual) +"\n");
+    }
 	if (options[O_MESSAGES_MAX]) {
 		trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
 	}
@@ -457,14 +460,14 @@ int main(int argc, char ** argv) {
             
             trace(TRACE_0, "building the operating guideline...\n");
             seconds = time (NULL);
-    
+
             graph->printProgressFirst();
             graph->calculateRootNode();	// creates the root node and calculates its reachability graph (set of states)
-            
+
             if (options[O_OTF]){
                 graph->bdd->convertRootNode(graph->getRoot());
             }
-            
+
             graph->buildGraph(graph->getRoot(), 1); // build operating guideline
             
             seconds2 = time (NULL);

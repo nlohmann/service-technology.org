@@ -64,28 +64,40 @@ owfnPlace::~owfnPlace() {
 	trace(TRACE_5, "owfnPlace::~owfnPlace() : end\n");
 }
 
-std::string owfnPlace::getLabelForCommGraph() const
-{
+
+std::string owfnPlace::getLabelForCommGraph() const {
+
     string label;
-    switch (type)
-    {
-        case INPUT: label  += '!'; break;
-        case OUTPUT: label += '?'; break;
-        default: break;
+    switch (type) {
+        case INPUT:
+            label  = '!';
+            break;
+        case OUTPUT:
+            label = '?';
+            break;
+        default:
+            assert(false);
+            break;
     }
-    return label + name;
+    return (label + name);
 }
 
-std::string owfnPlace::getLabelForMatching() const
-{
+
+std::string owfnPlace::getLabelForMatching() const {
+
     string label;
-    switch (type)
-    {
-        case INPUT: label  += '?'; break;
-        case OUTPUT: label += '!'; break;
-        default: break;
+    switch (type) {
+        case INPUT:
+            label  = '?';
+            break;
+        case OUTPUT:
+            label = '!';
+            break;
+        default:
+            assert(false);
+            break;
     }
-    return label + name;
+    return (label + name);
 }
 
 void owfnPlace::operator += (unsigned int i)

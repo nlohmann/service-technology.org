@@ -50,8 +50,7 @@ State::State() :
 				placeHashValue(0),
 				succ(NULL),
 				parent(NULL),
-				type(TRANS)
-                {
+				type(TRANS) {
 	state_count++;
 }
 
@@ -199,7 +198,7 @@ void State::decode(oWFN * PN) {
 
 				cutplace = currentvector[currentbyte];
 			}
-			
+
 			continue;
 		}
 		
@@ -252,6 +251,7 @@ void State::decode(oWFN * PN) {
 	cerr << "this line is not reachable" << endl;
 	cerr << "if this happens please contact the authors" << endl;	
 	cerr << "\tvoid State::decode(oWFN * PN) in graph.cc" << endl;
+    assert(false);
 }
 
 //! \fn void State::decodeShowOnly(oWFN * PN)
@@ -340,7 +340,7 @@ void State::decodeShowOnly(oWFN * PN) {
 			if(currentplacenr == 0) {
 				// all places decoded - finishing
 				trace(TRACE_5, "void State::decodeShowOnly(oWFN * PN) : end\n");
-				
+
 				return;
 			}
 			
@@ -432,7 +432,7 @@ void State::decodeShowOnly(oWFN * PN) {
 	cerr << "this line is not reachable" << endl;
 	cerr << "if this happens please contact the authors" << endl;	
 	cerr << "\tvoid State::decode(oWFN * PN) in graph.cc" << endl;
-	
+    assert(false);	
 }
 
 bool State::hasLeavingTauTransitionForMatching() const {

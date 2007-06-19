@@ -88,8 +88,10 @@ unsigned int communicationGraph::getNumberOfNodes() const {
 //! \brief calculates the root node of the graph
 // for OG only
 void communicationGraph::calculateRootNode() {
-    
+
     trace(TRACE_5, "void reachGraph::calculateRootNode(): start\n");
+
+    assert(setOfVertices.size() == 0);
 
     // create new OG root node
     root = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());
@@ -101,6 +103,7 @@ void communicationGraph::calculateRootNode() {
         PN->calculateReachableStatesInputEvent(root, true);
     }
 
+    root->setNumber(0);
     setOfVertices.insert(root);
 
     trace(TRACE_5, "void reachGraph::calculateRootNode(): end\n");
@@ -209,7 +212,7 @@ bool communicationGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd
 
 
 // for OG
-void communicationGraph::AddGraphNode(GraphNode* sourceNode, GraphNode * toAdd, unsigned int label, GraphEdgeType type) {
+void communicationGraph::AddGraphNode(GraphNode* sourceNode, GraphNode* toAdd, unsigned int label, GraphEdgeType type) {
 
     trace(TRACE_5, "reachGraph::AddGraphNode(GraphNode* sourceNode, GraphNode * toAdd, unsigned int label, GraphEdgeType type): start\n");
 
@@ -256,8 +259,7 @@ void communicationGraph::analyseNode(GraphNode* node) {
     assert(node->getColor() == BLUE);
 
     // analyse node by its formula
-    GraphNodeColor analysedColor;
-    analysedColor = node->analyseNodeByFormula();
+    GraphNodeColor analysedColor = node->analyseNodeByFormula();
     node->setColor(analysedColor);
 
     trace(TRACE_5, "communicationGraph::analyseNode(GraphNode* node) : end\n");
@@ -274,12 +276,11 @@ void communicationGraph::calculateSuccStatesInput(unsigned int input, GraphNode 
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode * node) : start\n");
 
     StateSet::iterator iter;              // iterator over the state set's elements
-    PN->setOfStatesTemp.clear();
-    PN->visitedStates.clear();
 
     for (iter = oldNode->reachGraphStateSet.begin();
          iter != oldNode->reachGraphStateSet.end(); iter++) {
 
+        assert(*iter != NULL);
         // get the marking of this state
         (*iter)->decode(PN);
 
@@ -301,16 +302,20 @@ void communicationGraph::calculateSuccStatesInput(unsigned int input, GraphNode 
         if (options[O_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
         } else {
+            PN->setOfStatesTemp.clear();
+            PN->visitedStates.clear();
             PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
         }
 
         if (newNode->getColor() == RED) {
             // a message bound violation occured during computation of reachability graph
+            trace(TRACE_3, "\t\t\t\t\t found message bound violation during calculating EG in node\n");
             trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode * node) : end\n");
             return;
         }
     }
 
+    trace(TRACE_3, "\t\t\t\t\t input event added without message bound violation\n");
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode * node) : end\n");
     return;
 }
@@ -335,7 +340,10 @@ void communicationGraph::calculateSuccStatesInput(messageMultiSet input, GraphNo
         trace(TRACE_2, "\n");
     }
 
-    for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
+    for (StateSet::iterator iter = node->reachGraphStateSet.begin();
+         iter != node->reachGraphStateSet.end();
+         iter++) {
+
         (*iter)->decode(PN);
 
         // test for each marking of current node if message bound k reached
@@ -380,8 +388,6 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, GraphNod
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, GraphNode * node, GraphNode * newNode) : start\n");
 
     StateSet::iterator iter;                      // iterator over the stateList's elements
-    PN->setOfStatesTemp.clear();
-    PN->visitedStates.clear();
 
     if (options[O_CALC_ALL_STATES]) {
         for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
@@ -391,6 +397,8 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, GraphNod
             }
         }
     } else {
+        PN->setOfStatesTemp.clear();
+        PN->visitedStates.clear();
         owfnPlace * outputPlace = PN->getPlace(output);
 
         StateSet stateSet;
@@ -426,9 +434,6 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, GraphNod
 void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, GraphNode * node, GraphNode * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, GraphNode * node, GraphNode * newNode) : start\n");
 
-    PN->setOfStatesTemp.clear();
-    PN->visitedStates.clear();
-
     if (TRACE_2 <= debug_level) {
         for (messageMultiSet::iterator iter1 = output.begin(); iter1 != output.end(); iter1++) {
             trace(TRACE_2, PN->getPlace(*iter1)->name);
@@ -445,6 +450,9 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, Graph
             }
         }
     } else {
+        PN->setOfStatesTemp.clear();
+        PN->visitedStates.clear();
+
         StateSet stateSet;
         // stateSet.clear();
 
@@ -686,7 +694,7 @@ void communicationGraph::printProgress() {
         if (debug_level == TRACE_0) {
             trace(TRACE_0, " " + intToString(current_progress) + " ");
         } else {
-            trace(TRACE_0, "\t progress: " + intToString(current_progress) + " %\n");
+            trace(TRACE_0, "    progress: " + intToString(current_progress) + " %\n");
         }
         // assigning next progress value to show
         show_progress = current_progress;
@@ -698,13 +706,14 @@ void communicationGraph::printProgress() {
 //! changed significantly and depending on the debug-level set
 void communicationGraph::printProgressFirst() {
 
-    return;
+    trace(TRACE_0, "    ");
+//    return;
 
     if (debug_level == TRACE_0) {
-        trace(TRACE_0, "\t progress (in %): 0 ");
+        trace(TRACE_0, "progress (in %): 0 ");
     } else {
-        trace(TRACE_0, "\t progress: 0 %\n");
-       }
+        trace(TRACE_0, "progress: 0 %\n");
+    }
 }
 
 

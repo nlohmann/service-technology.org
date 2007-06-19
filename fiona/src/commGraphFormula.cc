@@ -81,38 +81,55 @@ void CommGraphFormula::removeLiteral(const std::string&) {
 
 
 threeValueLogic CommGraphFormula::equals() {
-    bool result = false;
 
-    if(dynamic_cast<CommGraphFormulaLiteral*>(this)) {
-        if(this->asString() == "true") return TRUE;
-        else if(this->asString() == "false") return FALSE;
-        else return UNKNOWN; 
-    }
-
-    if(dynamic_cast<CommGraphFormulaMultiaryOr*>(this)) {
-        result = false;
-        for(CommGraphFormulaMultiaryOr::iterator i = dynamic_cast<CommGraphFormulaMultiaryOr*>(this)->begin();
-            i != dynamic_cast<CommGraphFormulaMultiaryOr*>(this)->end(); i++) {
-            if(dynamic_cast<CommGraphFormula*>(*i)->equals() == TRUE) return TRUE;
-            else if(dynamic_cast<CommGraphFormula*>(*i)->equals() == FALSE) result |= false;
-            else result = true;
+    if (dynamic_cast<CommGraphFormulaLiteral*>(this)) {
+        if (asString() == CommGraphFormulaLiteral::TRUE) {
+            return TRUE;
+        } else if (asString() == CommGraphFormulaLiteral::FALSE) {
+            return FALSE;
+        } else {
+            return UNKNOWN;
         }
-        return result ? UNKNOWN : FALSE; 
     }
 
-    if(dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)) {
-        result = true;
-        for(CommGraphFormulaMultiaryAnd::iterator i = dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)->begin();
-            i != dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)->end(); i++) {
-            if(dynamic_cast<CommGraphFormula*>(*i)->equals() == TRUE) result &= true;
-            else if(dynamic_cast<CommGraphFormula*>(*i)->equals() == FALSE) return FALSE;
-            else result = false;
+    // assert: this is no CommGraphFormulaLiteral.
+
+    if (dynamic_cast<CommGraphFormulaMultiaryOr*>(this)) {
+        bool unknownFound = false;
+        for (CommGraphFormulaMultiaryOr::iterator i =
+             dynamic_cast<CommGraphFormulaMultiaryOr*>(this)->begin();
+             i != dynamic_cast<CommGraphFormulaMultiaryOr*>(this)->end(); i++) {
+            if (dynamic_cast<CommGraphFormula*>(*i)->equals() == TRUE) {
+                return TRUE;
+            }
+
+            if (dynamic_cast<CommGraphFormula*>(*i)->equals() == UNKNOWN) {
+                unknownFound = true;
+            }
+        }
+
+        return unknownFound ? UNKNOWN : FALSE;
+    }
+
+    if (dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)) {
+        bool noUnknownFound = true;
+        for (CommGraphFormulaMultiaryAnd::iterator i =
+             dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)->begin();
+             i != dynamic_cast<CommGraphFormulaMultiaryAnd*>(this)->end();
+             i++) {
+            if (dynamic_cast<CommGraphFormula*>(*i)->equals() == FALSE) {
+                return FALSE;
+            }
+
+            if (dynamic_cast<CommGraphFormula*>(*i)->equals() == UNKNOWN) {
+                noUnknownFound = false;
+            }
         }
         return result ? TRUE : UNKNOWN;
     }
 
     return UNKNOWN;
-} 
+}
 
 
 CNF_formula *CommGraphFormula::getCNF() {

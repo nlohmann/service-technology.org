@@ -153,7 +153,9 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
                     }
 				} else {
                     // node was computed before, so only add a new edge to the old node
-                    trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
+                    trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()));
+                    trace(TRACE_1, " (color " + toUpper(found->getColor().toString()) + ")");
+                    trace(TRACE_1, "\n");
 
                     // draw a new SENDING edge to the old node
                     string edgeLabel = PN->getInputPlace(i)->getLabelForCommGraph();
@@ -186,17 +188,14 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
     }
 
     // early checking if the node's annotation cannot be made true
-    currentNode->testAssignment = currentNode->getAssignment();
-    for (unsigned int j = 0; j < PN->getOutputPlaceCount(); j++) {
-        currentNode->testAssignment->setToTrue(PN->getOutputPlace(j)->getLabelForCommGraph());
-    }
-
-    // check whether annotation is still satisfiable
-    // @todo: should later be changed to test for existence of empty clause
-	if (currentNode->getCNF_formula()->value(*(currentNode->testAssignment)) == false) {
-		currentNode->setColor(RED);
+    if (currentNode->getCNF_formula()->equals() == FALSE) {
+        trace(TRACE_3, "\t\t\t any further event suppressed (annotation of node ");
+        trace(TRACE_3, intToString(currentNode->getNumber()) + " is unsatisfiable)\n");
+        trace(TRACE_5, "\t\t\t formula was " + currentNode->getCNF_formula()->asString());
+        trace(TRACE_3, "\n");
+        currentNode->setColor(RED);
         return;
-	}
+    }
 
 	i = 0;
 	// iterate over all output places of the oWFN (receiving events in OG)
@@ -226,11 +225,12 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
                 trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 				if (v->getColor() == RED) {
 					currentNode->removeLiteralFromFormula(i, RECEIVING);
-                    currentNode->testAssignment->setToFalse(PN->getOutputPlace(i)->getLabelForCommGraph());
 				}
 			} else {
                 // node v was computed before, so only add a new edge to the old node
-                trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
+                trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()));
+                trace(TRACE_1, " (color " + toUpper(found->getColor().toString()) + ")");
+                trace(TRACE_1, "\n");
 
                 // draw a new RECEIVING edge to the old node
                 string edgeLabel = PN->getOutputPlace(i)->getLabelForCommGraph();
@@ -242,7 +242,6 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 				// annotation of currentNode.
 				if (found->getColor() == RED) {
 					currentNode->removeLiteralFromFormula(i, RECEIVING);
-                    currentNode->testAssignment->setToFalse((PN->getOutputPlace(i))->getLabelForCommGraph());
 				}
 				delete v;
 
@@ -255,16 +254,18 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 			trace(TRACE_2, " suppressed (max_occurence reached)\n");
 
 			currentNode->removeLiteralFromFormula(i, RECEIVING);
-            currentNode->testAssignment->setToFalse(PN->getOutputPlace(i)->getLabelForCommGraph());
 
 //			addProgress(your_progress);
 //			printProgress();
 		}
 
         // check whether annotation is still satisfiable
-        // @todo: should later be changed to test for existence of empty clause
-        if (currentNode->getCNF_formula()->value(*(currentNode->testAssignment)) == false) {
+        if (currentNode->getCNF_formula()->equals() == FALSE) {
             currentNode->setColor(RED);
+            trace(TRACE_3, "\t\t\t any further event suppressed (annotation of node ");
+            trace(TRACE_3, intToString(currentNode->getNumber()) + " is unsatisfiable)\n");
+            trace(TRACE_5, "\t\t\t formula was " + currentNode->getCNF_formula()->asString());
+            trace(TRACE_3, "\n");
             return;
         }
 

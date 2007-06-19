@@ -38,7 +38,6 @@
 #include "options.h"
 #include "debug.h"
 #include "binDecision.h"
-#include "cnf_formula.h"
 #include <cassert>
 
 using namespace std;
@@ -854,24 +853,7 @@ void communicationGraph::printGraphToDot(GraphNode * v, fstream& os, bool visite
 
     if (parameters[P_OG]) {
         // add annotation to node
-        string CNFString = v->getCNF_formula()->asString();
-
-        // The following three calls were added by Niels to simplify the string
-        // representation of CNF formulas in the DOT output of an OG. All
-        // needed code is implemented in files "cnf_formula.h" and
-        // "cnf_formula.cc". If the following three calls are removed,
-        // everything is (as ugly) as before.
-        //
-        // 1. create a CNF_Formula object from the CNF string representation
-        //    CNF_Formula formula = CNF_Formula(CNFString);
-        //
-        // 2. simplify the CNF formula inside the CNF_Formula object
-        //    formula.simplify();
-        //
-        // 3. create a string representation of the simplified formula
-        //    CNFString = formula.to_string();
-
-        os << CNFString;
+        os << v->getCNF_formula()->asString();
     }
 
     os << "\", fontcolor=black, color=" << v->getColor().toString();

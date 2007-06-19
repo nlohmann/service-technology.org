@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-06-07 14:42:13 $ by $Author: bretschn $.
-# Version $Revision: 1.29 $
+# File last changed $Date: 2007-06-19 15:42:49 $ by $Author: bretschn $.
+# Version $Revision: 1.30 $
 
 bin_PROGRAMS = fiona
 
@@ -55,8 +55,7 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
 		state.h state.cc \
 		newlogger.h newlogger.cc mynew.h \
 		Exchangeability.h Exchangeability.cc \
-		OGFromFile.h OGFromFile.cc commGraphFormula.h commGraphFormula.cc \
-		cnf_formula.h cnf_formula.cc
+		OGFromFile.h OGFromFile.cc commGraphFormula.h commGraphFormula.cc
 
 BUILT_SOURCES = lexer_owfn.h
 

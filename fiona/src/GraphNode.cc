@@ -35,7 +35,6 @@
 #include "GraphNode.h"
 #include "state.h"
 #include "successorNodeList.h"
-#include "cnf_formula.h"
 #include "debug.h"
 #include "options.h"    
 #include <cassert>

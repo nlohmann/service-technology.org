@@ -853,6 +853,7 @@ void communicationGraph::printGraphToDot(GraphNode * v, fstream& os, bool visite
 
     if (parameters[P_OG]) {
         // add annotation to node
+        v->getCNF_formula()->simplify();
         os << v->getCNF_formula()->asString();
     }
 

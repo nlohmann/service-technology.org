@@ -33,6 +33,7 @@
 
 #include "mynew.h"
 #include "GraphNode.h"
+#include "GraphFormula.h"
 #include "state.h"
 #include "successorNodeList.h"
 #include "debug.h"

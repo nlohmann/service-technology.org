@@ -36,12 +36,15 @@
 
 #include "mynew.h"
 #include "enums.h"
-#include "commGraphFormula.h"
+#include <set>
 
 class State;
 class GraphEdge;
 class successorNodeList;
 class literal;
+class GraphFormula;
+class GraphFormulaAssignment;
+class GraphFormulaMultiaryOr;
 class GraphFormulaCNF;
 
 typedef std::set<State*> StateSet;

@@ -39,6 +39,7 @@
 #include "successorNodeList.h"
 #include "owfn.h"
 #include "GraphNode.h"
+#include "GraphFormula.h"
 
 // #define TRUE 1 in cudd package can interfere with CommGraphLiteral::TRUE.
 // So, we undefine TRUE.

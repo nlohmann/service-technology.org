@@ -37,6 +37,12 @@
 #include "options.h"
 #include <cassert>
 #include "main.h"
+#include "GraphFormula.h"
+
+// TRUE and FALSE #defined in cudd package may interfere with
+// GraphFormulaLiteral::TRUE and ...::FALSE.
+#undef TRUE
+#undef FALSE
 
 using namespace std;
 

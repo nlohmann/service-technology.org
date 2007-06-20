@@ -33,14 +33,17 @@
  *
  */
 
-#include "commGraphFormula.h"
+#include "GraphFormula.h"
 #include "debug.h"
 #include "enums.h"
-//#include <stdlib.h>
 #include <cassert>
 
 using namespace std;
 
+// TRUE and FALSE #defined in cudd package may interfere with
+// GraphFormulaLiteral::TRUE and ...::FALSE.
+#undef TRUE
+#undef FALSE
 
 const std::string GraphFormulaLiteral::FINAL = std::string("final");
 const std::string GraphFormulaLiteral::TAU = std::string("tau");

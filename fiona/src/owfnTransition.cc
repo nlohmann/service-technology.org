@@ -39,6 +39,7 @@
 #include "state.h"
 #include "options.h"
 #include "OGFromFile.h"
+#include "GraphFormula.h"
 
 AdjacentPlace::AdjacentPlace(owfnPlace* place, unsigned int multiplicity) :
     place_(place),

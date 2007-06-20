@@ -39,6 +39,7 @@
 #include "debug.h"
 #include "options.h"
 #include "mynew.h"
+#include "GraphFormula.h"
 
 #include <stdlib.h>
 #include <cassert>

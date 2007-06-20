@@ -56,6 +56,7 @@ extern int og_yylex();
 #include "debug.h"
 
 #include "OGFromFile.h"
+#include "GraphFormula.h"
 #include "enums.h"
 
 OGFromFile* OGToParse;

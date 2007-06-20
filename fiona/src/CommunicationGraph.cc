@@ -35,6 +35,7 @@
 
 #include "state.h"
 #include "graphEdge.h"
+#include "GraphFormula.h"
 #include "options.h"
 #include "debug.h"
 #include "binDecision.h"

@@ -36,7 +36,7 @@
 #include "state.h"
 #include "options.h"
 #include "debug.h"
-//#include "CNF.h"
+#include "GraphFormula.h"
 #include "owfnTransition.h"
 
 

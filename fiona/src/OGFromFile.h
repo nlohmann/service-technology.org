@@ -44,12 +44,14 @@
 #include <set>
 #include <map>
 #include <list>
-#include "commGraphFormula.h"
 #include "enums.h"
 
 using namespace std;
 
+class GraphFormula;
+class GraphFormulaAssignment;
 class OGFromFileTransition;
+class GraphFormulaCNF;
 
 class OGFromFileNode {
 // order: public typedefs, private members and methods, public methods

@@ -377,12 +377,16 @@ public:
     /**
      * Reserved literal TRUE is used for the value 'true'.
      */
+#undef TRUE /* TRUE may interfere with macro in cudd package. */
     static const std::string TRUE;
+#define TRUE 1
 
     /**
      * Reserved literal FALSE is used for the value 'false'.
      */
+#undef FALSE /* FALSE may interfere with macro in cudd package. */
     static const std::string FALSE;
+#define FALSE 0
 
     /**
      * Constructs a literal with the given string representation.

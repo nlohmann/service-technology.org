@@ -508,8 +508,8 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
 	CurrentState->current = 0;
 	CurrentState->parent = (State *) 0;
 	assert(CurrentState->succ == NULL);
-	CurrentState->succ = new State * [CurrentCardFireList+1];
-	for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate) {
+	CurrentState->succ = new State * [CurrentCardFireList];
+	for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
 		CurrentState->succ[istate] = NULL;
 	}
 
@@ -577,8 +577,8 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
 	      		NewState->parent = CurrentState;
 
 				assert(NewState->succ == NULL);
-				NewState->succ =  new State * [CurrentCardFireList+1];
-				for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate) {
+				NewState->succ =  new State * [CurrentCardFireList];
+				for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
 					NewState->succ[istate] = NULL;
 				}
 
@@ -659,8 +659,8 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode * n) {
 	CurrentState->current = 0;
 	CurrentState->parent = (State *) 0;
 	assert(CurrentState->succ == NULL);
-	CurrentState->succ = new State * [CurrentCardFireList + 1];
-	for (unsigned int i = 0; i < CurrentCardFireList + 1; i++) {
+	CurrentState->succ = new State * [CurrentCardFireList];
+	for (unsigned int i = 0; i < CurrentCardFireList; i++) {
 		CurrentState->succ[i] = NULL;
 	}
 	CurrentState->placeHashValue = placeHashValue;
@@ -731,8 +731,8 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode * n) {
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
 				assert(NewState->succ == NULL);
-	      		NewState->succ =  new State * [CurrentCardFireList + 1];
-				for (unsigned int i = 0; i < CurrentCardFireList + 1; i++) {
+	      		NewState->succ =  new State * [CurrentCardFireList];
+				for (unsigned int i = 0; i < CurrentCardFireList; i++) {
 					NewState->succ[i] = NULL;	
 				}
 	      		NewState->placeHashValue = placeHashValue;
@@ -820,8 +820,8 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	CurrentState->CardStubbornFireList = CurrentCardFireList;
 
 	if (CurrentState->succ == NULL) {
-		CurrentState->succ = new State * [CurrentCardFireList+1];
-		for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate) {
+		CurrentState->succ = new State * [CurrentCardFireList];
+		for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
 			CurrentState->succ[istate] = NULL;
 		}
 	}
@@ -890,8 +890,8 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
 				if (NewState->succ == NULL) {
-			      		NewState->succ =  new State * [CurrentCardFireList+1];
-					for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate)
+			      		NewState->succ =  new State * [CurrentCardFireList];
+					for (size_t istate = 0; istate != CurrentCardFireList; ++istate)
 					{
 						NewState->succ[istate] = NULL;
 					}
@@ -1010,8 +1010,8 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 	CurrentState->CardStubbornFireList = CurrentCardFireList;
 
 	if (CurrentState->succ == NULL) {
-		CurrentState->succ = new State * [CurrentCardFireList+1];
-		for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate) {
+		CurrentState->succ = new State * [CurrentCardFireList];
+		for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
 			CurrentState->succ[istate] = NULL;
 		}
 	}
@@ -1113,8 +1113,8 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
 				if (NewState->succ == NULL) {
-			      	NewState->succ =  new State * [CurrentCardFireList+1];
-					for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate)
+			      	NewState->succ =  new State * [CurrentCardFireList];
+					for (size_t istate = 0; istate != CurrentCardFireList; ++istate)
 					{
 						NewState->succ[istate] = NULL;
 					}
@@ -1251,8 +1251,8 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 		CurrentState->parent = (State *) 0;
 		assert(CurrentState->succ == NULL);
 	
-		CurrentState->succ = new State * [CurrentCardFireList+1];
-		for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate)
+		CurrentState->succ = new State * [CurrentCardFireList];
+		for (size_t istate = 0; istate != CurrentCardFireList; ++istate)
 		{
 			CurrentState->succ[istate] = NULL;
 		}
@@ -1323,8 +1323,8 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 		      		NewState->current = 0;
 		      		NewState->parent = CurrentState;
 					assert(NewState->succ == NULL);
-		      		NewState->succ =  new State * [CurrentCardFireList+1];
-					for (size_t istate = 0; istate != CurrentCardFireList+1; ++istate)
+		      		NewState->succ =  new State * [CurrentCardFireList];
+					for (size_t istate = 0; istate != CurrentCardFireList; ++istate)
 					{
 						NewState->succ[istate] = NULL;
 					}
@@ -1697,8 +1697,8 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
     currentState->CardFireList = CurrentCardFireList;
     currentState->current = 0;
     currentState->parent = NULL;
-    currentState->succ = new State*[CurrentCardFireList + 1];
-    for (size_t istate = 0; istate != CurrentCardFireList + 1; ++istate) {
+    currentState->succ = new State*[CurrentCardFireList];
+    for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
         currentState->succ[istate] = NULL;
     }
     currentState->placeHashValue = placeHashValue;
@@ -1810,8 +1810,8 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
                 newState->CardFireList = CurrentCardFireList;
                 newState->current = 0;
                 newState->parent = currentState;
-                newState->succ = new State*[CurrentCardFireList + 1];
-                for (size_t istate = 0; istate != CurrentCardFireList + 1; ++istate) {
+                newState->succ = new State*[CurrentCardFireList];
+                for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
                     newState->succ[istate] = NULL;
                 }
                 newState->placeHashValue = placeHashValue;

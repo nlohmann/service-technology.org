@@ -211,39 +211,55 @@ bool communicationGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd
 }
 
 
+//! \brief adds the node toAdd to the set of all nodes
+//! and copies the eventsUsed array from the sourceNode
 // for OG
-void communicationGraph::AddGraphNode(GraphNode* sourceNode, GraphNode* toAdd, unsigned int label, GraphEdgeType type) {
+void communicationGraph::AddGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
 
     trace(TRACE_5, "reachGraph::AddGraphNode(GraphNode* sourceNode, GraphNode * toAdd, unsigned int label, GraphEdgeType type): start\n");
 
     assert(getNumberOfNodes() > 0);
     assert(setOfVertices.size() > 0);
 
+    // preparing the new node
+    toAdd->setNumber(getNumberOfNodes());
+    for (oWFN::Places_t::size_type i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
+        toAdd->eventsUsed[i] = sourceNode->eventsUsed[i];
+    }
+    setOfVertices.insert(toAdd);
+
+    trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode* sourceNode, GraphNode * toAdd, unsigned int label, GraphEdgeType type): end\n");
+}
+
+
+//! adds an SENDING or RECEIVING edge from sourceNode to destNode
+//! and adds destNode to the successor list of sourceNode
+//! and increases eventsUsed of destNode by one  
+// for OG
+void communicationGraph::AddGraphEdge(GraphNode* sourceNode, GraphNode* destNode, oWFN::Places_t::size_type label, GraphEdgeType type) {
+
+    trace(TRACE_5, "reachGraph::AddGraphEdge(GraphNode* sourceNode, GraphNode* destNode, unsigned int label, GraphEdgeType type): start\n");
+
+    assert(sourceNode != NULL);
+    assert(destNode != NULL);
+
     // preparing the new edge
-    int offset = 0;
     string edgeLabel;
     if (type == SENDING) {
         edgeLabel = PN->getInputPlace(label)->getLabelForCommGraph();
+        destNode->eventsUsed[label]++;
     } else {
         edgeLabel = PN->getOutputPlace(label)->getLabelForCommGraph();
-        offset = PN->getInputPlaceCount();
+        destNode->eventsUsed[PN->getInputPlaceCount() + label]++;
     }
-
-    // preparing the new node
-    toAdd->setNumber(getNumberOfNodes());
-    for (unsigned int i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
-        toAdd->eventsUsed[i] = sourceNode->eventsUsed[i];
-    }
-    toAdd->eventsUsed[offset + label]++;
-    setOfVertices.insert(toAdd);
 
     // add a new edge to the new node
-    GraphEdge* newEdge = new GraphEdge(toAdd, edgeLabel);
+    GraphEdge* newEdge = new GraphEdge(destNode, edgeLabel);
 
     // add the new node to successorNodeList
     sourceNode->addSuccessorNode(newEdge);
 
-    trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode* sourceNode, GraphNode * toAdd, unsigned int label, GraphEdgeType type): end\n");
+    trace(TRACE_5, "reachGraph::AddGraphEdge(GraphNode* sourceNode, GraphNode* destNode, unsigned int label, GraphEdgeType type): end\n");
 }
 
 

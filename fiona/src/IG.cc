@@ -338,19 +338,19 @@ void interactionGraph::getActivatedEventsComputeCNF(GraphNode * node, setOfMessa
 				i = 0;
 				// get the activated input events
 			//	cout << "state " << PN->getCurrentMarkingAsString() << " activates the input events: " << (*iter)->quasiFirelist << ", " << (*iter)->quasiFirelist[i] << endl;
-				while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
-					for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
-								index != (*iter)->quasiFirelist[i]->messageSet.end();
-								index++) {
-	
-						messageMultiSet input;				// multiset holding one input message
-					 	input.insert(*index);
-						
-						inputMessages.insert(input);
-				
-						GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
-						myclause->addSubFormula(myliteral);
-						
+                while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
+                    for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
+                         index != (*iter)->quasiFirelist[i]->messageSet.end();
+                         index++) {
+
+                        messageMultiSet input;				// multiset holding one input message
+                        input.insert(*index);
+
+                        inputMessages.insert(input);
+
+                        GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+                        myclause->addSubFormula(myliteral);
+
 						//cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
 						
 			//			cout << "\t" << PN->getPlace(*index)->name << endl;

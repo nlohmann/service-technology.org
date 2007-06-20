@@ -141,7 +141,8 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 
                 if (found == NULL) {
                     // node v is new, so the node as well as the edge to it is added 
-                    AddGraphNode(currentNode, v, i, SENDING);
+                    AddGraphNode(currentNode, v);
+                    AddGraphEdge(currentNode, v, i, SENDING);
 
                     // going down with sending event...
                     buildGraph(v, your_progress);
@@ -215,7 +216,8 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 
 			if (found == NULL) {
                 // node v is new, so the node as well as the edge to it is added
-                AddGraphNode(currentNode, v, i, RECEIVING);
+                AddGraphNode(currentNode, v);
+                AddGraphEdge(currentNode, v, i, RECEIVING);
 
                 // going down with receiving event...
 				// buildGraph(v, your_progress);

@@ -131,8 +131,10 @@ public:
 
     GraphNode * findGraphNodeInSet(GraphNode *);
 
-    void AddGraphNode(GraphNode *, GraphNode *, unsigned int, GraphEdgeType);        // for OG
+    void AddGraphNode(GraphNode *, GraphNode *);        // for OG
     bool AddGraphNode(GraphNode *, GraphNode *, messageMultiSet, GraphEdgeType);     // for IG
+
+    void AddGraphEdge(GraphNode*, GraphNode*, unsigned int, GraphEdgeType);        // for OG
 
     void analyseNode(GraphNode *);
 	

@@ -308,15 +308,15 @@ void oWFN::addSuccStatesToList(GraphNode * n, State * currentState) {
 		}
 
 		// add successors
-		for (unsigned int i = 0; i < currentState->CardFireList; i++) {
-			if (currentState->succ[i] != NULL) {
-    			if (n->addState(currentState->succ[i])) {	// add current successor
-    				// its successors need only be added if state was not yet in current node
-    				addSuccStatesToList(n, currentState->succ[i]);
-    			}
+        for (unsigned int i = 0; i < currentState->CardFireList; i++) {
+            if (currentState->succ[i] != NULL) {
+                if (n->addState(currentState->succ[i])) {	// add current successor
+                    // its successors need only be added if state was not yet in current node
+                    addSuccStatesToList(n, currentState->succ[i]);
+                }
             }
-		}
-	}
+        }
+    }
 }
 
 

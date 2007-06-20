@@ -75,7 +75,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
     // currentNode is the root of the currently considered subgraph
     // at this point, the states inside currentNode are already computed!
 
-	trace(TRACE_1, "\n=================================================================\n");
+    trace(TRACE_1, "\n=================================================================\n");
 	trace(TRACE_1, "\t current node: ");
 	trace(TRACE_1, intToString(currentNode->getNumber()) + "\n");
 	if (debug_level >= TRACE_2) {
@@ -83,7 +83,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 	}
 
 	trace(TRACE_2, "\t number of states in node: ");
-	trace(TRACE_2, intToString(currentNode->reachGraphStateSet.size()) + "\n");
+    trace(TRACE_2, intToString(currentNode->reachGraphStateSet.size()) + "\n");
 
 	if (currentNode->getColor() == RED) {
 		// this may happen due to a message bound violation in current node
@@ -99,6 +99,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 
 	// get the annotation of the node as CNF formula
 	computeCNF(currentNode);
+    trace(TRACE_1, "\t first computation of formula yields: " + currentNode->getCNFformula()->asString() + "\n");
 
 	trace(TRACE_1, "=================================================================\n");
 
@@ -140,6 +141,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
                 GraphNode* found = findGraphNodeInSet(v);
 
                 if (found == NULL) {
+                trace(TRACE_1, "\t computed successor node new\n");
                     // node v is new, so the node as well as the edge to it is added 
                     AddGraphNode(currentNode, v);
                     AddGraphEdge(currentNode, v, i, SENDING);
@@ -215,6 +217,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 			GraphNode* found = findGraphNodeInSet(v);
 
 			if (found == NULL) {
+                trace(TRACE_1, "\t computed successor node new\n");
                 // node v is new, so the node as well as the edge to it is added
                 AddGraphNode(currentNode, v);
                 AddGraphEdge(currentNode, v, i, RECEIVING);

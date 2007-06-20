@@ -77,11 +77,11 @@ State::~State() {
 //! \param PN the corresponding open workflow net
 //! \brief decodes State in bintree and writes the corresponding marking into currentMarking
 void State::decode(oWFN * PN) {
-	
+
 	trace(TRACE_5, "void State::decode(int * v, oWFN * PN):start\n");
 
 	numberOfDecodes++;
-	
+
 //	for (int i = 0; i < PN->getPlaceCount(); i++) {
 //		cout << PN->getPlace(i)->name << " (" << PN->getPlace(i)->nrbits << ")" << endl;
 //	}

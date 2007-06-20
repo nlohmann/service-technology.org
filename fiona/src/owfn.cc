@@ -314,6 +314,17 @@ void oWFN::addSuccStatesToList(GraphNode * n, State * currentState) {
                     // its successors need only be added if state was not yet in current node
                     addSuccStatesToList(n, currentState->succ[i]);
                 }
+            } else {
+                //TODO: this is a guess!! we should not rely on this
+                // can only happen if currentState would have a successor
+                // which violates message bound;
+                // but instead currentState has NULL successor -- don't know why ;)
+
+                // if the above is true, then current node n must be
+                // considered to violate message bound, too
+                n->setColor(RED);
+                trace(TRACE_3, "\t\t\t message bound violation detected in node " + intToString(n->getNumber()) + " (addSuccStatesToList with NULL successor)\n");
+                return;
             }
         }
     }

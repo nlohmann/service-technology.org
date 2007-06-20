@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/06/07 10:53:43 $
+ * \date    \$Date: 2007/06/20 09:24:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  */
 %}
 
@@ -102,7 +102,6 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   for (map<string, unsigned int>::const_iterator in = globals::ASTE_inputChannels.begin();
        in != globals::ASTE_inputChannels.end(); in++)
   {
-    std::cerr << in->second << std::endl;
     
     // case 1: only one instance of each channel is needed
     if (in->second == 0 || globals::instances_of_current_process != 0)
@@ -167,10 +166,14 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
         Place *p12 = PN.newPlace(prefix + "eha_final");
         Place *p13 = PN.newPlace(prefix + "fh_fault");
         Place *p14 = PN.newPlace(prefix + "ch_fault_in");
+        Place *p21 = PN.newPlace(prefix + "take_ch_fault");
+        Place *p22 = PN.newPlace(prefix + "deny_ch_fault");
+        Place *p23 = PN.newPlace(prefix + "accepted_ch_fault");
         
         // Process is initially in states "!Active" and "!Exiting".
         p6->mark();
         p8->mark();
+        p21->mark();
         
         // Indicate the process's initial and final marking.
         p1->mark();
@@ -250,14 +253,23 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
         Transition *t9 = PN.newTransition(prefix + "forced_exit");
         PN.newArc(t9, p4);
         PN.newArc(p6, t9, READ);
-        PN.newArc(p14, t9);
+        PN.newArc(p23, t9);
         
         Transition *t10 = PN.newTransition(prefix + "handle_ch_fault");
         PN.newArc(t10, p3);
         PN.newArc(p5, t10, READ);
-        PN.newArc(p14, t10);
+        PN.newArc(p23, t10);
         
+        Transition *t13 = PN.newTransition(prefix + "pass_ch_fault");
+        PN.newArc(t13, p23);
+        PN.newArc(t13, p22);
+        PN.newArc(p21, t13);
+        PN.newArc(p14, t13);
         
+        Transition *t14 = PN.newTransition(prefix + "block_ch_fault");
+        PN.newArc(p22, t14, READ);
+        PN.newArc(p14, t14);
+
         // Create subpattern for the event handlers and the inner activity.
         if (globals::ASTEmap[phylum->id]->hasEH)
         {
@@ -449,11 +461,15 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
       Place *p22 = PN.newPlace(prefix + "ThrownCHFault");
       Place *p23 = PN.newPlace(prefix + "ch_stop");
       Place *p24 = PN.newPlace(prefix + "ch_stopped");
+      Place *p31 = PN.newPlace(prefix + "take_ch_fault");
+      Place *p32 = PN.newPlace(prefix + "deny_ch_fault");
+      Place *p33 = PN.newPlace(prefix + "accepted_ch_fault");
       
       // Scope is initially in states "!Active", "!Successful" and "!ThrownCHFault".
       p10->mark();
       p12->mark();
       p21->mark();
+      p31->mark();
       
       // Initialize scope: start inner activity, set state to "Active".
       Transition *t1 = PN.newTransition(prefix + "initialize");
@@ -517,10 +533,8 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
       // fault to be thrown up).
       Transition *t9 = PN.newTransition(prefix + "rethrow_ch_fault");
       PN.newArc(p10, t9, READ);
-      PN.newArc(p19, t9);
+      PN.newArc(p33, t9);
       PN.newArc(t9, p20);
-      PN.newArc(p21, t9);
-      PN.newArc(t9, p22);
       
       // Handle compensation handler's fault (in case this scope's fault
       // handlers are installed and it is the first compensation handler's
@@ -528,16 +542,18 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
       Transition *t10 = PN.newTransition(prefix + "handle_ch_fault");
       PN.newArc(t10, p3);
       PN.newArc(p9, t10, READ);
-      PN.newArc(p19, t10);
-      PN.newArc(p21, t10);
-      PN.newArc(t10, p22);
+      PN.newArc(p33, t10);
       
-      // Ignore compensation handler's fault (in case it is not the first one
-      // thrown to this scope).
-      Transition *t11 = PN.newTransition(prefix + "ignore_ch_fault");
+      Transition *t11 = PN.newTransition(prefix + "pass_ch_fault");
+      PN.newArc(t11, p33);
+      PN.newArc(t11, p32);
+      PN.newArc(p31, t11);
       PN.newArc(p19, t11);
-      PN.newArc(p22, t11, READ);
       
+      Transition *t16 = PN.newTransition(prefix + "block_ch_fault");
+      PN.newArc(p32, t16, READ);
+      PN.newArc(p19, t16);
+
       // Stopping transitions.
       Transition *t12 = stop(p1, "initial", prefix);
       Transition *t13 = stop(p2, "final", prefix);

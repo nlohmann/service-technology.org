@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for the handlers
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: znamirow $ 
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/06/08 12:31:51 $
+ * \date    \$Date: 2007/06/20 09:24:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 %}
 
@@ -105,30 +105,50 @@ void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
 
   // Places.
   Place *p1 =  PN.newPlace(prefix + "initial");
-  Place *p2 =  PN.newPlace(prefix + "final");
-  Place *p3 =  PN.newPlace(prefix + "fault");
+  Place *p2 =  PN.newPlace(prefix + "fault");
+  Place *p3 =  PN.newPlace(prefix + "final");
   Place *p4 =  PN.newPlace(prefix + "stop");
   Place *p5 =  PN.newPlace(prefix + "stopped");
-  Place *p7 =  PN.newPlace(prefix + "running");
-  Place *p8 =  PN.newPlace(prefix + "inner_stop");
+  Place *p6 =  PN.newPlace(prefix + "fault_up");
+  Place *p7 =  PN.newPlace(prefix + "branch");
+  Place *p8 =  PN.newPlace(prefix + "inner_stopped");
+  Place *p9 =  PN.newPlace(prefix + "inner_finalized");
 
-  if ( globals::ASTEmap[phylum->id]->callable )
+  if ( true ) // globals::ASTEmap[phylum->id]->callable ) //callable needs fixing
   {
 
-  Transition *t4 = PN.newTransition(prefix + "stopped.initial");
-  PN.newArc(p1, t4);
-  PN.newArc(p3, t4);
-  PN.newArc(p4, t4);
-  PN.newArc(t4, p5);
+  Transition *t1 = PN.newTransition(prefix + "std_evaluate");
+  PN.newArc(p1, t1);
+  PN.newArc(p2, t1, READ);
+  PN.newArc((PN.findPlace(globals::ASTEmap[phylum->id]->parentScopeId, ".internal.take_ch_fault")), t1, READ);
+  PN.newArc(t1, p7);
+  
+  Transition *t2 = PN.newTransition(prefix + "ch_evaluate");
+  PN.newArc(p1, t2);
+  PN.newArc(p2, t2, READ);
+  PN.newArc((PN.findPlace(globals::ASTEmap[phylum->id]->parentScopeId, ".internal.deny_ch_fault")), t2);
+  PN.newArc(t2, (PN.findPlace(globals::ASTEmap[phylum->id]->parentScopeId, ".internal.take_ch_fault")));
+  PN.newArc(t2, p7);
 
-  Transition *t5 = PN.newTransition(prefix + "stop_fh");
-  PN.newArc(p4, t5);
-  PN.newArc(p7, t5);
-  PN.newArc(p3, t5);
-  PN.newArc(t5, p8);
+  Transition *t5 = PN.newTransition(prefix + "stopped_fh");
+  PN.newArc(p8, t5);
+  PN.newArc(p2, t5);
+  PN.newArc(t5, p5);
 
-  Transition *t9 = stop(p2, "final", prefix);
+  Transition *t6 = PN.newTransition(prefix + "finish_fh");
+  PN.newArc(p9, t6);
+  PN.newArc(p2, t6);
+  PN.newArc(t6, p3);
 
+  Transition *t7 = PN.newTransition(prefix + "stop_initial");
+  PN.newArc(p1, t7);
+  PN.newArc(p4, t7);
+  PN.newArc(t7, p8);
+
+  Transition *t8 = PN.newTransition(prefix + "stop_branching");
+  PN.newArc(p7, t8);
+  PN.newArc(p4, t8);
+  PN.newArc(t8, p8);
 
   // Traverse the <catch> branches.  
   unsigned int catchBranches = 1;
@@ -137,19 +157,14 @@ void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
     // unparse the activity embedded to the catch branch
     innerActivity->unparse(pseudoPrinter, current_view);
 
-    Transition *t1 = PN.newTransition(prefix + "catch" + toString(catchBranches));
-    PN.newArc(p1, t1);
-    PN.newArc(p3, t1, READ);
-    PN.newArc(t1, p7);
-    PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
+    Transition *t3 = PN.newTransition(prefix + "catch" + toString(catchBranches));
+    PN.newArc(p7, t3);
+    PN.newArc(p2, t3, READ);
+    PN.newArc(t3, PN.findPlace(innerActivity->id, ".initial"));
 
-    Transition *t6 = PN.newTransition(prefix + "finish" + toString(catchBranches++));
-    PN.newArc(p7, t6);
-    PN.newArc(t6, p2);
-    PN.newArc(PN.findPlace(innerActivity->id, ".final"), t6);
-
-    PN.mergePlaces(prefix + "inner_stop", toString(innerActivity->id) + ".stop");
-    PN.mergePlaces(prefix + "stopped", toString(innerActivity->id) + ".stopped");
+    PN.mergePlaces(prefix + "inner_finalized", toString(innerActivity->id) + ".final");
+    PN.mergePlaces(prefix + "stop", toString(innerActivity->id) + ".stop");
+    PN.mergePlaces(prefix + "inner_stopped", toString(innerActivity->id) + ".stopped");
   }
 
 
@@ -160,30 +175,24 @@ void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
       header(_id2, true);
 
       // Unparse the activity embedded to the <catchAll> branch
-      innerActivity->unparse(pseudoPrinter, current_view);
+    innerActivity->unparse(pseudoPrinter, current_view);
 
-      Transition *t2 = PN.newTransition(prefix + "catchAll");
-      PN.newArc(p1, t2);
-      PN.newArc(p3, t2, READ);
-      PN.newArc(t2, p7);
-      PN.newArc(t2, PN.findPlace(innerActivity->id, ".initial"));
+    Transition *t4 = PN.newTransition(prefix + "catchAll");
+    PN.newArc(p7, t4);
+    PN.newArc(p2, t4, READ);
+    PN.newArc(t4, PN.findPlace(innerActivity->id, ".initial"));
 
-      Transition *t7 = PN.newTransition(prefix + "finishCatchAll");
-      PN.newArc(p7, t7);
-      PN.newArc(t7, p2);
-      PN.newArc(PN.findPlace(innerActivity->id, ".final"), t7);
-
-      PN.mergePlaces(prefix + "inner_stop", toString(innerActivity->id) + ".stop");
-      PN.mergePlaces(prefix + "stopped", toString(innerActivity->id) + ".stopped");
+    PN.mergePlaces(prefix + "inner_finalized", toString(innerActivity->id) + ".final");
+    PN.mergePlaces(prefix + "stop", toString(innerActivity->id) + ".stop");
+    PN.mergePlaces(prefix + "inner_stopped", toString(innerActivity->id) + ".stopped");
 
       footer(_id2, true);
     }
 
     NoCatchAll():
     {
-      Place *p6 = PN.newPlace(prefix + "faulted");
-      Transition *t1 = throwFault(p1, p6, "initial", prefix, mkinteger(phylum->id), 4);
-      Transition *t2 = stop(p6, "faulted", prefix);
+      Transition *t3 = throwFault(p1, p6, "initial", prefix, mkinteger(phylum->id), 4);
+      Transition *t4 = stop(p6, "fault_up", prefix);
     }
 
     default: { /* this should never happen */ }
@@ -330,7 +339,7 @@ void PCompensationHandler(impl_tCompensationHandler* abstract_phylum, uview curr
 
   header(phylum->id, true);
 
-  if ( globals::ASTEmap[phylum->id]->callable )
+  if ( true) // globals::ASTEmap[phylum->id]->callable ) // Callable needs fixing
   {
 
   // Unparse inner activity.

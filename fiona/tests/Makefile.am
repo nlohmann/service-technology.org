@@ -35,7 +35,9 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              sequence_suite/*.owfn \
              matching/*.owfn matching/*.og \
              syntax/*.owfn \
-             bdd_ref/*.owfn bdd_ref/*.cudd
+             bdd_ref/*.owfn bdd_ref/*.cudd \
+             philosophers/*.owfn philosophers/*.owfn.dot \
+             philosophers/*.owfn.png
 
 
 # Generate check targets from $(TESTS). That is done by removing '.sh' from

@@ -42,6 +42,11 @@
 #include <map>
 
 
+//! used, for instance, for evaluating node annotation where not all successors
+//! are known yet
+enum threeValueLogic {FALSE, TRUE, UNKNOWN};
+
+
 class GraphFormulaFixed;
 class GraphFormulaCNF;
 

@@ -37,16 +37,5 @@
 #include "mynew.h"
 #include <string>
 
-enum GraphNodeColor_enum {RED, BLUE};				//!< RED == bad GraphNode; BLUE == good one
-
-/**
- * Possible types of a GraphEdge.
- */
-enum GraphEdgeType {SENDING, RECEIVING};
-
-//enum analysisResult {TERMINATE, CONTINUE};  //!< needed as feedback of the "analysis" function, whether this node is an end node or not
-enum stateType {TRANS, DEADLOCK, FINALSTATE};   //!< TRANS == Transient
-enum threeValueLogic {FALSE, TRUE, UNKNOWN}; //!< used, for instance, to remember if there is a final state in a node
-
 
 #endif /*ENUMS_H_*/

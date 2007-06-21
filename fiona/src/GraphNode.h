@@ -36,6 +36,7 @@
 
 #include "mynew.h"
 #include "enums.h"
+#include "graphEdge.h"
 #include <set>
 
 class State;
@@ -49,6 +50,9 @@ class GraphFormulaCNF;
 
 typedef std::set<State*> StateSet;
 
+
+//! RED == bad GraphNode; BLUE == good one
+enum GraphNodeColor_enum {RED, BLUE};
 
 class GraphNodeColor {
     private:

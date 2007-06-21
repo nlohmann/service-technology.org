@@ -52,12 +52,12 @@ using namespace std;
 //typedef vector<bool> BitVector;
 
 
-class Exchangeability{
-	public:
-		Exchangeability(char* filename, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
-		~Exchangeability();
-		
-		bool check(Exchangeability* bdd);
+class Exchangeability {
+    public:
+        Exchangeability(char* filename, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
+        ~Exchangeability();
+
+        bool check(Exchangeability* bdd);
 		void print();
 		void printMemoryInUse();
 		void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);

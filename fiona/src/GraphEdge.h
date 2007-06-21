@@ -38,6 +38,9 @@
 #include "enums.h"
 #include <string>
 
+//! Possible types of a GraphEdge.
+enum GraphEdgeType {SENDING, RECEIVING};
+
 class GraphNode;
 
 class GraphEdge {

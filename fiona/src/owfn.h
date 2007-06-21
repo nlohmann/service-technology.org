@@ -42,7 +42,7 @@
 #include "formula.h"
 #include "main.h"
 #include "GraphNode.h"
-
+#include "state.h"
 #include "communicationGraph.h"
 
 using namespace std;

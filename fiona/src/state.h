@@ -37,9 +37,14 @@
 #include "owfn.h"
 
 
+//! Possible types of states:
+//! FINALSTATE == state fulfills finalmarking or finalcondition
+//! DEADLOCK == no transition is enabled (may be internal or external DL)
+//! TRANS == there is at least one enabled transition
+enum stateType {TRANS, DEADLOCK, FINALSTATE};
+
 class binDecision;
 class owfnTransition;
-
 
 // State objects are nodes in the state graph.
 class State {

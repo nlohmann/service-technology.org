@@ -124,20 +124,20 @@ public:
 	GraphNodeSet setOfVertices;
 
     GraphNode* getRoot() const;
-    
+
     void calculateRootNode();
 
     unsigned int getNumberOfNodes() const;
 
     GraphNode * findGraphNodeInSet(GraphNode *);
 
-    void AddGraphNode(GraphNode *, GraphNode *);        // for OG
-    bool AddGraphNode(GraphNode *, GraphNode *, messageMultiSet, GraphEdgeType);     // for IG
+    void addGraphNode(GraphNode *, GraphNode *);        // for OG
+    bool addGraphNode(GraphNode *, GraphNode *, messageMultiSet, GraphEdgeType);     // for IG
 
-    void AddGraphEdge(GraphNode*, GraphNode*, unsigned int, GraphEdgeType);        // for OG
+    void addGraphEdge(GraphNode*, GraphNode*, unsigned int, GraphEdgeType);        // for OG
 
     void analyseNode(GraphNode *);
-	
+
 	void printProgressFirst();
 	void printProgress();
 

@@ -123,7 +123,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 				numberDeletedVertices--;
 				delete v;
 			} else {
-				if (AddGraphNode (currentNode, v, *iter, SENDING)) {
+				if (addGraphNode (currentNode, v, *iter, SENDING)) {
 
 #ifdef LOOP
 	cout << "calc next node? [y,n]" << endl;
@@ -151,7 +151,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
             GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
             calculateSuccStatesOutput(*iter, currentNode, v);
 
-			if (AddGraphNode (currentNode, v, *iter, RECEIVING)) {
+			if (addGraphNode (currentNode, v, *iter, RECEIVING)) {
 		
 #ifdef LOOP
     		cout << "calc next node? [y,n]" << endl;
@@ -222,7 +222,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 			
 			calculateSuccStatesInput(*iter, currentNode, v);
 			
-			if (AddGraphNode (currentNode, v, *iter, SENDING)) {
+			if (addGraphNode (currentNode, v, *iter, SENDING)) {
 				buildReducedGraph(v);
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 			}
@@ -240,7 +240,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
 			calculateSuccStatesOutput(*iter, currentNode, v);
 
-			if (AddGraphNode (currentNode, v, *iter, RECEIVING)) {
+			if (addGraphNode (currentNode, v, *iter, RECEIVING)) {
 				buildReducedGraph(v);
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 				//analyseNode(currentNode, false);

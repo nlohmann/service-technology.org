@@ -143,8 +143,8 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
                 if (found == NULL) {
                 trace(TRACE_1, "\t computed successor node new\n");
                     // node v is new, so the node as well as the edge to it is added 
-                    AddGraphNode(currentNode, v);
-                    AddGraphEdge(currentNode, v, i, SENDING);
+                    addGraphNode(currentNode, v);
+                    addGraphEdge(currentNode, v, i, SENDING);
 
                     // going down with sending event...
                     buildGraph(v, your_progress);
@@ -219,8 +219,8 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 			if (found == NULL) {
                 trace(TRACE_1, "\t computed successor node new\n");
                 // node v is new, so the node as well as the edge to it is added
-                AddGraphNode(currentNode, v);
-                AddGraphEdge(currentNode, v, i, RECEIVING);
+                addGraphNode(currentNode, v);
+                addGraphEdge(currentNode, v, i, RECEIVING);
 
                 // going down with receiving event...
 				// buildGraph(v, your_progress);

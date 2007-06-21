@@ -137,7 +137,7 @@ GraphNode * communicationGraph::findGraphNodeInSet(GraphNode * toAdd) {
 //! and the node we have just found, the found one gets the current node as a predecessor node
 
 // for IG
-bool communicationGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) {
+bool communicationGraph::addGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) {
     trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : start\n");
 
     if (getNumberOfNodes() == 0) {                // graph contains no nodes at all
@@ -214,7 +214,7 @@ bool communicationGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd
 //! \brief adds the node toAdd to the set of all nodes
 //! and copies the eventsUsed array from the sourceNode
 // for OG
-void communicationGraph::AddGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
+void communicationGraph::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
 
     trace(TRACE_5, "reachGraph::AddGraphNode(GraphNode* sourceNode, GraphNode * toAdd, unsigned int label, GraphEdgeType type): start\n");
 
@@ -236,7 +236,7 @@ void communicationGraph::AddGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
 //! and adds destNode to the successor list of sourceNode
 //! and increases eventsUsed of destNode by one  
 // for OG
-void communicationGraph::AddGraphEdge(GraphNode* sourceNode, GraphNode* destNode, oWFN::Places_t::size_type label, GraphEdgeType type) {
+void communicationGraph::addGraphEdge(GraphNode* sourceNode, GraphNode* destNode, oWFN::Places_t::size_type label, GraphEdgeType type) {
 
     trace(TRACE_5, "reachGraph::AddGraphEdge(GraphNode* sourceNode, GraphNode* destNode, unsigned int label, GraphEdgeType type): start\n");
 

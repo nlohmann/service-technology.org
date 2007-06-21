@@ -308,7 +308,7 @@ void oWFN::addSuccStatesToList(GraphNode * n, State * currentState) {
 		}
 
 		// add successors
-        for (unsigned int i = 0; i < currentState->CardFireList; i++) {
+        for (unsigned int i = 0; i < currentState->cardFireList; i++) {
             if (currentState->succ[i] != NULL) {
                 if (n->addState(currentState->succ[i])) {	// add current successor
                     // its successors need only be added if state was not yet in current node
@@ -354,7 +354,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, owfnPlace * outputPl
 		}
 		
 		// add successors
-		for(unsigned int i = 0; i < currentState->CardStubbornFireList; i++) {
+		for(unsigned int i = 0; i < currentState->cardStubbornFireList; i++) {
 			// test if successor state has not yet been added to the state set
 			if (stateSet.find(currentState->succ[i]) == stateSet.end()) {
 				// its successors need only be added if state was not yet in current node
@@ -402,7 +402,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, messageMultiSet mess
 		}
 		
 		// add successors
-		for(unsigned int i = 0; i < currentState->CardStubbornFireList; i++) {
+		for(unsigned int i = 0; i < currentState->cardStubbornFireList; i++) {
 			// test if successor state has not yet been added to the state set
 			if (stateSet.find(currentState->succ[i]) == stateSet.end()) {
 				// its successors need only be added if state was not yet in current state set
@@ -450,7 +450,7 @@ void oWFN::addRecursivelySuccStatesToSetOfTempStates(State* s) {
 	setOfStatesTemp.insert(s);
 	
 	// get the successor states	and add them, too.
-    for (unsigned int i = 0; i < s->CardFireList; i++) {
+    for (unsigned int i = 0; i < s->cardFireList; i++) {
         if (s->succ[i]) {
             addRecursivelySuccStatesToSetOfTempStates(s->succ[i]);
         }
@@ -507,7 +507,7 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
 	}
 	
 	CurrentState->firelist = stubbornfirelistdeadlocks();
-	CurrentState->CardFireList = CurrentCardFireList;
+	CurrentState->cardFireList = CurrentCardFireList;
 	if (parameters[P_IG]) {
 	    if (CurrentState->quasiFirelist) {
 		delete [] CurrentState->quasiFirelist;
@@ -539,7 +539,7 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
 		}
 	  	
 		// no more transition to fire from current state?
-		if (CurrentState->current < CurrentState->CardFireList) {
+		if (CurrentState->current < CurrentState->cardFireList) {
 			// there is a next state that needs to be explored
 
 			if (tempCurrentMarking) {
@@ -576,7 +576,7 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNode * n) {
 				trace(TRACE_5, "Current marking new\n");
       			NewState = binInsert(this);
       			NewState->firelist = stubbornfirelistdeadlocks();
-	      		NewState->CardFireList = CurrentCardFireList;
+	      		NewState->cardFireList = CurrentCardFireList;
 	      		if (parameters[P_IG]) {
 				    if (NewState->quasiFirelist) {
 						delete [] NewState->quasiFirelist;
@@ -658,7 +658,7 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode * n) {
 	}
 	
     CurrentState->firelist = stubbornfirelistdeadlocks();
-    CurrentState->CardFireList = CurrentCardFireList;
+    CurrentState->cardFireList = CurrentCardFireList;
     if (parameters[P_IG]) {
         if (CurrentState->quasiFirelist) {
             delete [] CurrentState->quasiFirelist;
@@ -691,7 +691,7 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode * n) {
 		}
 	  	
 		// no more transition to fire from current state?
-		if (CurrentState->current < CurrentState->CardFireList) {
+		if (CurrentState->current < CurrentState->cardFireList) {
 			// there is a next state that needs to be explored
 
 			if (tempCurrentMarking) {
@@ -731,7 +731,7 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode * n) {
 
       			NewState = binInsert(this);
       			NewState->firelist = stubbornfirelistdeadlocks();
-	      		NewState->CardFireList = CurrentCardFireList;
+	      		NewState->cardFireList = CurrentCardFireList;
 	      		if (parameters[P_IG]) {
 			    if (NewState->quasiFirelist) {
 				delete [] NewState->quasiFirelist;
@@ -828,7 +828,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	}
 	
 	CurrentState->stubbornFirelist = stubbornfirelistmessage(outputPlace);
-	CurrentState->CardStubbornFireList = CurrentCardFireList;
+	CurrentState->cardStubbornFireList = CurrentCardFireList;
 
 	if (CurrentState->succ == NULL) {
 		CurrentState->succ = new State * [CurrentCardFireList];
@@ -853,7 +853,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	while(CurrentState) {
 	 
 		// no more transition to fire from current state?
-		if (CurrentState->current < CurrentState->CardStubbornFireList) {
+		if (CurrentState->current < CurrentState->cardStubbornFireList) {
 			// there is a next state that needs to be explored
 	
 			if (tempCurrentMarking) {
@@ -896,7 +896,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 				trace(TRACE_5, "Current marking new\n");
       			NewState = binInsert(&tempBinDecision, this);
       			NewState->stubbornFirelist = stubbornfirelistmessage(outputPlace);
-	      		NewState->CardStubbornFireList = CurrentCardFireList;
+	      		NewState->cardStubbornFireList = CurrentCardFireList;
 	      		
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
@@ -1018,7 +1018,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 	}
 	
 	CurrentState->stubbornFirelist = stubbornfirelistmessage(messages);
-	CurrentState->CardStubbornFireList = CurrentCardFireList;
+	CurrentState->cardStubbornFireList = CurrentCardFireList;
 
 	if (CurrentState->succ == NULL) {
 		CurrentState->succ = new State * [CurrentCardFireList];
@@ -1064,7 +1064,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 	while(CurrentState) {
 	 
 		// no more transition to fire from current state?
-		if (CurrentState->current < CurrentState->CardStubbornFireList) {
+		if (CurrentState->current < CurrentState->cardStubbornFireList) {
 			// there is a next state that needs to be explored
 	
 			if (tempCurrentMarking) {
@@ -1119,7 +1119,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 				trace(TRACE_5, "Current marking new\n");
       			NewState = binInsert(&tempBinDecision, this);
       			NewState->stubbornFirelist = stubbornfirelistmessage(messages);
-	      		NewState->CardStubbornFireList = CurrentCardFireList;
+	      		NewState->cardStubbornFireList = CurrentCardFireList;
 	      		
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
@@ -1248,7 +1248,7 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 		CurrentState = binInsert(this);
 
 		CurrentState->firelist = firelist();
-		CurrentState->CardFireList = CurrentCardFireList;
+		CurrentState->cardFireList = CurrentCardFireList;
 	
 		if (parameters[P_IG]) {
 		    if (CurrentState->quasiFirelist) {
@@ -1279,7 +1279,7 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 	  	while(CurrentState) {
 
 			// no more transition to fire from current state?
-			if (CurrentState->current < CurrentState->CardFireList) {
+			if (CurrentState->current < CurrentState->cardFireList) {
 				// there is a next state that needs to be explored
 
 				if (tempCurrentMarking) {
@@ -1323,7 +1323,7 @@ void oWFN::calculateReachableStatesFull(GraphNode * n) {
 					trace(TRACE_5, "Current marking new\n");
 	      			NewState = binInsert(this);
 	      			NewState->firelist = firelist();
-		      		NewState->CardFireList = CurrentCardFireList;
+		      		NewState->cardFireList = CurrentCardFireList;
 		      		if (parameters[P_IG]) {
 					    if (NewState->quasiFirelist) {
 							delete [] NewState->quasiFirelist;
@@ -1705,7 +1705,7 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
     // Initialize the currentState with the initial marking.
     State* currentState = binInsert(this);
     currentState->firelist = firelist();
-    currentState->CardFireList = CurrentCardFireList;
+    currentState->cardFireList = CurrentCardFireList;
     currentState->current = 0;
     currentState->parent = NULL;
     currentState->succ = new State*[CurrentCardFireList];
@@ -1735,7 +1735,7 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
         // building the reachability graph). currentState->current holds the
         // index of the last fired transition in the array of to be fired
         // transitions currentState->firelist[].
-        if (currentState->current < currentState->CardFireList) {
+        if (currentState->current < currentState->cardFireList) {
             // There is a not yet fired transition in currentState.
 
             // Retrieve the transition leaving the current state that should be
@@ -1818,7 +1818,7 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
                 // So we have to initialize this newly seen state.
                 newState = binInsert(this);
                 newState->firelist = firelist();
-                newState->CardFireList = CurrentCardFireList;
+                newState->cardFireList = CurrentCardFireList;
                 newState->current = 0;
                 newState->parent = currentState;
                 newState->succ = new State*[CurrentCardFireList];
@@ -1915,7 +1915,7 @@ GraphFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const State* cu
     GraphFormulaAssignment assignment;
 
     for (unsigned int itransition = 0;
-         itransition != currentState->CardFireList; ++itransition)
+         itransition != currentState->cardFireList; ++itransition)
     {
         owfnTransition* transition = currentState->firelist[itransition];
         assignment.setToTrue(transition->getLabelForMatching());

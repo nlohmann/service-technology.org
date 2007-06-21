@@ -42,7 +42,7 @@
 //! \brief constructor
 // inline rausgenommen!
 State::State() :
-				CardFireList(0),
+				cardFireList(0),
 				firelist(NULL),
 				stubbornFirelist(NULL),
 				quasiFirelist(NULL),
@@ -437,7 +437,7 @@ void State::decodeShowOnly(oWFN * PN) {
 }
 
 bool State::hasLeavingTauTransitionForMatching() const {
-    for (size_t itrans = 0; itrans != CardFireList; ++itrans) {
+    for (size_t itrans = 0; itrans != cardFireList; ++itrans) {
         if (!firelist[itrans]->hasNonTauLabelForMatching()) {
             return true;
         }

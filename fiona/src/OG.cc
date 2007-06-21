@@ -319,11 +319,18 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 				// in case of a final state we add special literal "final" to the clause
 				if ((*iter)->type == FINALSTATE) {
 
-					node->hasFinalStateInStateSet = true;
+                    node->hasFinalStateInStateSet = true;
 
-					GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
-					myclause->addSubFormula(myliteral);
-				}
+					if ((PN->FinalCondition) && (*iter)->cardFireList > 0) {
+                        cerr << "\n\n\t WARNING: found a finalstate which activates a transition -- you shouldn't do this!\n" << endl;
+                        // transient final states are ignored in annotation, just like
+                        // all other transient states
+                        continue;
+                    } else {
+    					GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
+    					myclause->addSubFormula(myliteral);
+                    }
+                }
 
 				// get all input events
 				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
@@ -363,8 +370,15 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 				if ((*iter)->type == FINALSTATE) {
 					node->hasFinalStateInStateSet = true;
 
-					GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
-					myclause->addSubFormula(myliteral);
+                    if ((PN->FinalCondition) && (*iter)->cardFireList > 0) {
+                        cerr << "\n\n\t WARNING: found a finalstate which activates a transition -- you shouldn't do this!\n" << endl;
+                        // transient final states are ignored in annotation, just like
+                        // all other transient states
+                        continue;
+                    } else {
+                        GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
+                        myclause->addSubFormula(myliteral);
+                    }
 				}
 
 				// get all the input events

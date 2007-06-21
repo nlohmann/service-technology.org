@@ -35,7 +35,7 @@
 #define STATE_H
 
 //! Possible types of states:
-//! FINALSTATE == state fulfills finalmarking or finalcondition
+//! FINALSTATE == state fulfills finalmarking or finalcondition (may be transient, too)
 //! DEADLOCK == no transition is enabled (may be internal or external DL)
 //! TRANS == there is at least one enabled transition
 enum stateType {TRANS, DEADLOCK, FINALSTATE};
@@ -56,10 +56,10 @@ public:
     static unsigned int state_count;
 
     /** number of transitions to be fired */
-    unsigned int CardFireList;
+    unsigned int cardFireList;
 
     /** number of transitions to be fired */
-    unsigned int CardStubbornFireList;
+    unsigned int cardStubbornFireList;
 
     /** Transitions to be fired */
     owfnTransition ** firelist;

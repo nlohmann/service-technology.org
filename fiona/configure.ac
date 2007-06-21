@@ -3,8 +3,8 @@
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT(Fiona, 1.5, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.22 $)
+AC_INIT(Fiona, 2.0, weinberg@informatik.hu-berlin.de, fiona)
+AC_REVISION($Revision: 1.23 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)

@@ -27,9 +27,16 @@ TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=".:../src:$(srcdir):$$PATH"
 
 MEMCHECK_ENVIRONMENT = $(TESTS_ENVIRONMENT) memcheck=yes
 
-EXTRA_DIST = $(TESTS) cyclic/*.owfn extrema/*.owfn messages/*.owfn \
-			 samples/*.owfn sequence_suite/*.owfn matching/*.owfn \
-			 matching/*.og syntax/*.owfn memcheck_helper.sh
+EXTRA_DIST = $(TESTS) memcheck_helper.sh \
+             cyclic/*.owfn \
+             extrema/*.owfn \
+             messages/*.owfn \
+             samples/*.owfn \
+             sequence_suite/*.owfn \
+             matching/*.owfn matching/*.og \
+             syntax/*.owfn \
+             bdd_ref/*.owfn bdd_ref/*.cudd
+
 
 # Generate check targets from $(TESTS). That is done by removing '.sh' from
 # every word in $(TESTS) and precede them by 'check-'. So one of many check

@@ -19,12 +19,10 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-05-23 13:14:18 $ by $Author: bretschn $.
-# Version $Revision: 1.13 $
+# File last changed $Date: 2007-06-21 08:53:36 $ by $Author: bretschn $.
+# Version $Revision: 1.14 $
 
-SUBDIRS = cudd src tests
-
-EXTRA_DIST = doc
+SUBDIRS = cudd src tests doc
 
 .PHONY: binarydistreadme
 

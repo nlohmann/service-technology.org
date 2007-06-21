@@ -40,8 +40,7 @@
 #include <fstream>
 #include <exception>
 
-typedef enum
-{
+typedef enum {
   TRACE_0,			//!< no messages
   TRACE_1,			//!< keep track of nodes
   TRACE_2,       	//!< edges

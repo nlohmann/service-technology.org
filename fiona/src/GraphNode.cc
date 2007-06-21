@@ -41,6 +41,37 @@
 #include <cassert>
 
 
+using namespace std;
+
+
+GraphNodeColor::GraphNodeColor() :
+    color_(RED) {
+
+}
+
+GraphNodeColor::GraphNodeColor(GraphNodeColor_enum color) :
+    color_(color) {
+
+}
+
+std::string GraphNodeColor::toString() const {
+    switch (color_) {
+        case BLUE:
+            return "blue";
+        case RED:
+            return "red";
+    }
+
+    // control should never reach this line.
+    assert(false);
+    return "undefined color";
+}
+
+GraphNodeColor::operator GraphNodeColor_enum() const {
+    return color_;
+}
+
+
 //! \param numberEvents the number of events that have to be processed from this node
 //! \brief constructor
 GraphNode::GraphNode(int numberEvents) :

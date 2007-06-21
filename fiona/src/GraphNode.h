@@ -50,6 +50,18 @@ class GraphFormulaCNF;
 typedef std::set<State*> StateSet;
 
 
+class GraphNodeColor {
+    private:
+        GraphNodeColor_enum color_;
+
+    public:
+        GraphNodeColor();
+        GraphNodeColor(GraphNodeColor_enum color);
+        std::string toString() const;
+        operator GraphNodeColor_enum() const;
+};
+
+
 class GraphNode {
 private:
     /**

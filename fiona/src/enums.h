@@ -39,23 +39,12 @@
 
 enum GraphNodeColor_enum {RED, BLUE};				//!< RED == bad GraphNode; BLUE == good one
 
-class GraphNodeColor
-{
-    private:
-        GraphNodeColor_enum color_;
-    public:
-        GraphNodeColor();
-        GraphNodeColor(GraphNodeColor_enum color);
-        std::string toString() const;
-        operator GraphNodeColor_enum() const;
-};
-
 /**
  * Possible types of a GraphEdge.
  */
 enum GraphEdgeType {SENDING, RECEIVING};
 
-enum analysisResult {TERMINATE, CONTINUE};  //!< needed as feedback of the "analysis" function, whether this node is an end node or not
+//enum analysisResult {TERMINATE, CONTINUE};  //!< needed as feedback of the "analysis" function, whether this node is an end node or not
 enum stateType {TRANS, DEADLOCK, FINALSTATE};   //!< TRANS == Transient
 enum threeValueLogic {FALSE, TRUE, UNKNOWN}; //!< used, for instance, to remember if there is a final state in a node
 

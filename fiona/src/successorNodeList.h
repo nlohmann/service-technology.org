@@ -36,7 +36,6 @@
 
 #include "mynew.h"
 #include "graphEdge.h"
-#include "enums.h"
 #include <stddef.h>
 #include <string>
 

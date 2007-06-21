@@ -35,7 +35,6 @@
 #define GraphNode_H_
 
 #include "mynew.h"
-#include "enums.h"
 #include "graphEdge.h"
 #include <set>
 
@@ -83,10 +82,8 @@ private:
      */
     GraphFormulaCNF* annotation;
 
-    /**
-     * List of all the nodes succeeding this one including the edge between
-     * them
-     */
+    //! List of all the nodes succeeding this one including the edge between
+    //! them
     successorNodeList* successorNodes;
 
 public:

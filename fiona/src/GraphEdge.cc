@@ -36,7 +36,6 @@
 #include <string>
 #include <stdexcept>
 #include "GraphNode.h"
-#include "enums.h"
 #include <cassert>
 
 using namespace std;

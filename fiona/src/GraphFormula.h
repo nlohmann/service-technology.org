@@ -36,16 +36,23 @@
 #define GraphFormula_H_
 
 
-#include "enums.h"
 #include <string>
 #include <set>
 #include <map>
 
 
+
+// TRUE and FALSE #defined in cudd package may interfere with
+// GraphFormulaLiteral::TRUE and ...::FALSE.
+#undef TRUE
+#undef FALSE
+
 //! used, for instance, for evaluating node annotation where not all successors
 //! are known yet
 enum threeValueLogic {FALSE, TRUE, UNKNOWN};
 
+#define TRUE 1
+#define FALSE 0
 
 class GraphFormulaFixed;
 class GraphFormulaCNF;

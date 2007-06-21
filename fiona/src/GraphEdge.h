@@ -35,7 +35,6 @@
 #define GRAPHEDGE_H
 
 #include "mynew.h"
-#include "enums.h"
 #include <string>
 
 //! Possible types of a GraphEdge.

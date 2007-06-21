@@ -35,7 +35,6 @@
 
 #include "GraphFormula.h"
 #include "debug.h"
-#include "enums.h"
 #include <cassert>
 
 using namespace std;

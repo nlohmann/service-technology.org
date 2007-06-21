@@ -35,7 +35,6 @@
 #include "successorNodeList.h"
 #include "graphEdge.h"
 #include "GraphNode.h"
-#include "enums.h"
 #include <string>
 #include <iostream>
 

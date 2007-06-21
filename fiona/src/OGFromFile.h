@@ -44,7 +44,6 @@
 #include <set>
 #include <map>
 #include <list>
-//#include "enums.h"
 #include "GraphNode.h"
 
 using namespace std;

@@ -57,7 +57,7 @@ class Arc;
 class OGFromFile;
 class GraphFormulaAssignment;
 
-class oWFN  {
+class oWFN {
 	// first public typedefs, then private members, then public methods
 	public:
 		/** Type of the container holding all transitions of this oWFN. */

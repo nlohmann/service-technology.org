@@ -4,7 +4,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 2.0, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.23 $)
+AC_REVISION($Revision: 1.24 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -59,13 +59,13 @@ CXXFLAGS=-g
 
 case `uname -s` in
   Linux)
-    CUDD_XFLAGS="-march=`uname -m` -malign-double -DHAVE_IEEE_754 -DBSD"
+    CUDD_XFLAGS="-malign-double -DHAVE_IEEE_754 -DBSD"
     ;;
   SunOS)
-    CUDD_XFLAGS="-mcpu=ultrasparc  -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN"
+    CUDD_XFLAGS="-DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN"
     ;;
   CYGWIN*)
-    CUDD_XFLAGS="-march=`uname -m` -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864"
+    CUDD_XFLAGS="-malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864"
     ;;
   Darwin)
     CUDD_XFLAGS="-DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3"

@@ -88,24 +88,24 @@ unsigned int numberDeletedVertices;
 
 unsigned int numberOfEvents;
 
-void myown_newhandler()
-{
+void myown_newhandler() {
     cerr << "new failed, memory exhausted" << endl;
     exit(2);
 }
 
+
+//! \brief reads an oWFN from netfile
 void readnet() {
     owfn_yydebug = 0;
     owfn_yy_flex_debug = 0;
 	// diagnosefilename = (char *) 0;
-    if(netfile) {
+    if (netfile) {
         owfn_yyin = fopen(netfile,"r");
         if(!owfn_yyin) {
             cerr << "cannot open netfile: " << netfile << "\n\n";
             exit(4);
         }
-		trace(TRACE_1, "--------------------------------------------------------------\n");
-		trace(TRACE_1, "reading from file " + string(netfile) + "\n");
+		trace(TRACE_5, "reading from file " + string(netfile) + "\n");
 		//  diagnosefilename = netfile;
     }
 
@@ -137,6 +137,43 @@ void readnet() {
 }
 
 
+//! \brief reads all oWFNs from a list
+void readAllNets(list<oWFN*>& listOfPetrinets) {
+    // ---------------- reading all nets ---------------------
+    for (list<char*>::iterator netiter = netfiles.begin();
+        netiter != netfiles.end(); ++netiter) {
+
+        numberOfDecodes = 0;
+
+        garbagefound = 0;
+        State::state_count = 0;          // number of states
+
+        numberDeletedVertices = 0;
+
+        numberOfEvents = 0;
+
+        // prepare getting the net
+        PlaceTable = new SymbolTab<PlSymbol>;
+
+        // get the net
+        netfile = *netiter;
+        readnet();  // Parser;
+
+        // PN->removeisolated();
+        // TODO: better removal of places 
+        // doesn't work with, since array for input and output places
+        // depend on the order of the Places array, reordering results in
+        // a heavy crash
+
+        PN->filename = netfile;
+        listOfPetrinets.push_back(PN);
+
+        delete PlaceTable;
+    }
+}
+
+
+//! \brief reads an OG from ogfile
 OGFromFile* readog(const std::string& ogfile) {
     og_yydebug = 0;
     og_yy_flex_debug = 0;
@@ -148,7 +185,7 @@ OGFromFile* readog(const std::string& ogfile) {
         exit(4);
     }
 
-    trace(TRACE_1, "--------------------------------------------------------------\n");
+    trace(TRACE_1, "=================================================================\n");
     trace(TRACE_1, "reading from file " + ogfile + "\n");
 
     OGToParse = new OGFromFile();
@@ -160,39 +197,49 @@ OGFromFile* readog(const std::string& ogfile) {
 }
 
 
-//! \fn void adjustOptionValues()
-//! \brief adjusts values for -e and -c options
-void adjustOptionValues() {
-	// report ...
+//! \brief reads all OGs from a list
+void readAllOGs(OGFromFile::ogs_t& theOGs) {
+    for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+         iOgFile != ogfiles.end(); ++iOgFile) {
 
-//	trace(TRACE_0, "considering the following events:\n");
-////	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all:\n");
-//	trace(TRACE_0, "    sending events:\n" );
-//	for (unsigned int e=0; e < PN->getInputPlaceCount(); e++) {
-//		trace(TRACE_0, "\t!" + string(PN->getInputPlace(e)->name));
-//		if (options[O_EVENT_USE_MAX]) {
-//			trace(TRACE_0, "\t(max. " + intToString(PN->getInputPlace(e)->max_occurence) + "x)\n");
-//		} else {
-//			trace(TRACE_0, "\t(no limit)\n");
-//		}
-//	}
-//	trace(TRACE_0, "    receiving events:\n" );
-//	for (unsigned int e=0; e < PN->getOutputPlaceCount(); e++) {
-//		trace(TRACE_0, "\t?" + string(PN->getOutputPlace(e)->name));
-//		if (options[O_EVENT_USE_MAX]) {
-//			trace(TRACE_0, "\t(max. " + intToString(PN->getOutputPlace(e)->max_occurence) + "x)\n");
-//		} else {
-//			trace(TRACE_0, "\t(no limit)\n");
-//		}
-//	}
-    if (options[O_EVENT_USE_MAX]) {
-        trace(TRACE_0, "each event considered max: " + intToString(messages_manual) +"\n");
+        theOGs.push_back(readog(*iOgFile));
     }
-	if (options[O_MESSAGES_MAX]) {
-		trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
-	}
-	
-	trace(TRACE_0, "\n");
+}
+
+
+//! \brief reports values for -e and -m option
+void reportOptionValues() {
+
+	// report ...
+    if (debug_level == TRACE_0) {
+        if (options[O_EVENT_USE_MAX]) {
+            trace(TRACE_0, "each event considered max: " + intToString(messages_manual) +"\n");
+        }
+        if (options[O_MESSAGES_MAX]) {
+            trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
+        }
+        trace(TRACE_0, "\n");
+    } else {
+        trace(TRACE_0, "considering the following events:\n");
+        trace(TRACE_0, "    sending events:\n" );
+        for (unsigned int e = 0; e < PN->getInputPlaceCount(); e++) {
+            trace(TRACE_0, "\t!" + string(PN->getInputPlace(e)->name));
+            if (options[O_EVENT_USE_MAX]) {
+                trace(TRACE_0, "\t(max. " + intToString(PN->getInputPlace(e)->max_occurence) + "x)\n");
+            } else {
+                trace(TRACE_0, "\t(no limit)\n");
+            }
+        }
+        trace(TRACE_0, "    receiving events:\n" );
+        for (unsigned int e = 0; e < PN->getOutputPlaceCount(); e++) {
+            trace(TRACE_0, "\t?" + string(PN->getOutputPlace(e)->name));
+            if (options[O_EVENT_USE_MAX]) {
+                trace(TRACE_0, "\t(max. " + intToString(PN->getOutputPlace(e)->max_occurence) + "x)\n");
+            } else {
+                trace(TRACE_0, "\t(no limit)\n");
+            }
+        }
+    }
 }
 
 
@@ -221,13 +268,11 @@ int main(int argc, char ** argv) {
 
 	set_new_handler(&myown_newhandler);
 
-	list<oWFN*> petrinets;
 
 	// evaluate command line options
 	parse_command_line(argc, argv);
 
-// ---------------- exchangeability ---------------------
-
+    // ---------------- exchangeability ---------------------
     if (options[O_EX] == true) {
         //check equality of two operating guidelines
         if (netfiles.size() == 2) {
@@ -243,16 +288,14 @@ int main(int argc, char ** argv) {
         } else {
             cerr << "Error: \t If option -x is used, exactly two oWFN must be entered\n" << endl;
         }
-        
+
         return 0;
     }
-    
-// ------------------- reading OG ------------------------
 
+    // ------------------- matching oWFN with OG ------------------------
     OGFromFile* OGToMatch = NULL;
     if (options[O_MATCH]) {
-        if (ogfiles.size() == 0)
-        {
+        if (ogfiles.size() == 0) {
             cerr << "Error:\tNo OG file given. You need to pass the OG, "
                     "that should be matched" << endl
                  << "\tagainst, on the command line."
@@ -261,8 +304,7 @@ int main(int argc, char ** argv) {
             exit(1);
         }
 
-        if (ogfiles.size() > 1)
-        {
+        if (ogfiles.size() > 1) {
             cerr << "Error:\tToo many OG files given. You need to pass "
                     "exactly one OG on the" << endl
                  << "\tcommand line." << endl
@@ -274,37 +316,9 @@ int main(int argc, char ** argv) {
         OGToMatch = readog(ogfileToMatch);
     }
 
-// ---------------- reading all nets ---------------------
-    for (list<char*>::iterator netiter = netfiles.begin();
-        netiter != netfiles.end(); ++netiter) {
-
-        numberOfDecodes = 0;
-        
-        garbagefound = 0;
-        State::state_count = 0;          // number of states
-        
-        numberDeletedVertices = 0;
-        
-        numberOfEvents = 0;
-        
-        // prepare getting the net
-        PlaceTable = new SymbolTab<PlSymbol>;
-        
-        // get the net
-        netfile = *netiter;
-        readnet();  // Parser;
-            
-        // PN->removeisolated();
-        // TODO: better removal of places 
-        // doesn't work with, since array for input and output places
-        // depend on the order of the Places array, reordering results in
-        // a heavy crash
-            
-        PN->filename = netfile;
-        petrinets.push_back(PN);
-        
-        delete PlaceTable;
-    }
+    // ---------------- reading all nets ---------------------
+    list<oWFN*> petrinets;
+    readAllNets(petrinets);
     
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
     // Delete lexer buffer for parsing oWFNs.
@@ -312,13 +326,9 @@ int main(int argc, char ** argv) {
     owfn_yylex_destroy();
 #endif
 	
-// ------------- reading all OG-files -----------------------
+    // ------------- reading all OG-files -----------------------
     OGFromFile::ogs_t OGsFromFiles;
-	for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
-         iOgFile != ogfiles.end(); ++iOgFile)
-    {
-        OGsFromFiles.push_back(readog(*iOgFile));
-    }
+    readAllOGs(OGsFromFiles);
 	
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
 		// Destroy buffer of OG parser.
@@ -326,7 +336,7 @@ int main(int argc, char ** argv) {
 		og_yylex_destroy();
 #endif
 
-// -------------- calculating the product og -------------
+    // -------------- calculating the product og -------------
     if (options[O_PRODUCTOG]) {
         if (OGsFromFiles.size() < 2) {
             cerr << "Error: \t Give at least two OGs to build their product!\n" << endl;
@@ -379,10 +389,11 @@ int main(int argc, char ** argv) {
                 trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
             }
 		}
-		else
+		else {
 			cerr << "Error: \t If option -t simulation is used, exactly two OG files must be entered\n" << endl;
+        }
 	}
-	
+
 	// ------------- equivalence on OGFromFile --------------------
 	
 	if (options[O_EQUALS]) {
@@ -401,23 +412,29 @@ int main(int argc, char ** argv) {
                 trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
             }
 		}
-		else
+		else {
 			cerr << "Error: \t If option -S is used, exactly two OG files must be entered\n" << endl;
+        }
 	}
 
-// **************** start doing things :) *********************
+// **********************************************************************************
+// *******                    start doing things                             ********
+// **********************************************************************************
 
     for (list<oWFN*>::iterator net = petrinets.begin();
          net != petrinets.end(); net++) {
+
         PN = *net;
         netfile = PN->filename; 
 
         numberOfDecodes = 0;
         garbagefound = 0;
+        global_progress = 0;
+        show_progress = 0;
         State::state_count = 0;          // number of states
         numberDeletedVertices = 0;
 
-        trace(TRACE_0, "--------------------------------------------------------------\n");
+        trace(TRACE_0, "=================================================================\n");
         if (netfile) {
             trace(TRACE_0, "processing net " + string(netfile) + "\n");
         }	
@@ -437,14 +454,14 @@ int main(int argc, char ** argv) {
 		}
 
 		// adjust events_manual and print limit of considering events
-		adjustOptionValues();
+		reportOptionValues();
         
         // start computation
         time_t seconds, seconds2;
         
 		if (options[O_MATCH]) {
-			// ------------------------- matching --------------------------------
 
+			// ------------------------- matching --------------------------------
 			string reasonForFailedMatch;
 			if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
 				trace(TRACE_0, "oWFN matches with OG: YES\n");
@@ -454,8 +471,8 @@ int main(int argc, char ** argv) {
 				reasonForFailedMatch + "\n");
 			}
 		} else if (parameters[P_OG]) {
-			// ---------------- operating guideline is built ---------------------
 
+			// ---------------- operating guideline is built ---------------------
             operatingGuidelines * graph = new operatingGuidelines(PN);
             
             trace(TRACE_0, "building the operating guideline...\n");
@@ -481,19 +498,20 @@ int main(int argc, char ** argv) {
                 trace(TRACE_0, "NO\n\n");
             }
 
-            // STATISTICS
+            // print statistics
             trace(TRACE_0, "OG statistics:\n");
             graph->printNodeStatistics();
             trace(TRACE_0, "\n");
 
+            // generate output files
             graph->printDotFile();      // .out
             graph->printOGFile();       // .og
-            
+
             if (options[O_OTF]) {
                 //graph->bdd->printDotFile();
                 graph->bdd->save("OTF");
             }
-            
+
             if (options[O_BDD]) {
                 trace(TRACE_0, "\nbuilding the BDDs...\n");
                 seconds = time (NULL);
@@ -509,12 +527,12 @@ int main(int argc, char ** argv) {
             // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
             delete graph;
             trace(TRACE_5, "graph deleted\n");
-            trace(TRACE_0, "--------------------------------------------------------------\n");
+            trace(TRACE_0, "=================================================================\n");
             trace(TRACE_0, "\n");
 
         } else {
+
 			// ---------------- interaction graph is built ---------------------
-            
             interactionGraph * graph = new interactionGraph(PN);
     
             if (options[O_CALC_REDUCED_IG]) {
@@ -540,25 +558,27 @@ int main(int argc, char ** argv) {
                 trace(TRACE_0, "NO\n\n");
             }
 
-            // STATISTICS
+            // print statistics
             trace(TRACE_0, "IG statistics:\n");
             graph->printNodeStatistics();
             trace(TRACE_0, "\n");
 
+            // generate output files
             graph->printDotFile();      // .out
 
             trace(TRACE_5, "computation finished -- trying to delete graph\n");
-//				trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+//			trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
             delete graph;
             trace(TRACE_5, "graph deleted\n");
-            trace(TRACE_0, "--------------------------------------------------------------\n");
+            trace(TRACE_0, "=================================================================\n");
             trace(TRACE_0, "\n");
         }
 
         delete PN;
-    
+        trace(TRACE_5, "net deleted\n");
+
 //		cout << "numberOfDecodes: " << numberOfDecodes << endl;
-    
+
     } // end of "for all nets ..."
 
     if (options[O_MATCH]) {
@@ -568,13 +588,12 @@ int main(int argc, char ** argv) {
 #ifdef LOG_NEW
     NewLogger::printall();
 #endif
-    
+
 	return 0;
 }
 
 
-std::string platform_basename(const std::string& path)
-{
+std::string platform_basename(const std::string& path) {
 #ifdef WIN32
     string::size_type posOfLastBackslash = path.find_last_of('\\');
     return path.substr(posOfLastBackslash + 1);

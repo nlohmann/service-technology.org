@@ -75,7 +75,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
     // currentNode is the root of the currently considered subgraph
     // at this point, the states inside currentNode are already computed!
 
-    trace(TRACE_1, "\n=================================================================\n");
+    trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 	trace(TRACE_1, "\t current node: ");
 	trace(TRACE_1, intToString(currentNode->getNumber()) + "\n");
 	if (debug_level >= TRACE_2) {
@@ -89,7 +89,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 		// this may happen due to a message bound violation in current node
 		// then, function calculateReachableStatesFull sets node color RED
 		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color RED\n");
-		trace(TRACE_1, "=================================================================\n");
+        trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 
 		addProgress(progress_plus);
 		printProgress();
@@ -101,7 +101,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 	computeCNF(currentNode);
     trace(TRACE_1, "\t first computation of formula yields: " + currentNode->getCNFformula()->asString() + "\n");
 
-	trace(TRACE_1, "=================================================================\n");
+    trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 
 //	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount() + PN->getOutputPlaceCnt()));
 	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount()));

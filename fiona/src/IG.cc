@@ -76,7 +76,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 	
 	// at this point, the states inside the current node node are already computed!
 	
-	trace(TRACE_1, "\n=================================================================\n");
+    trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 	trace(TRACE_1, "\t current node: ");
 	trace(TRACE_1, intToString(currentNode->getNumber()) + "\n");
 	if (debug_level >= TRACE_2) {
@@ -90,7 +90,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 		// this may happen due to a message bound violation in current node
 		// then, function calculateReachableStatesFull sets node color RED
 		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color RED\n");
-		trace(TRACE_1, "=================================================================\n");
+        trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 		return;
 	}
 
@@ -99,7 +99,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 	
 	getActivatedEventsComputeCNF(currentNode, inputSet, outputSet);
 
-	trace(TRACE_1, "=================================================================\n");
+    trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 
 	trace(TRACE_2, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
@@ -184,11 +184,11 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 		// this may happen due to a message bound violation in current node
 		// then, function calculateReachableStatesFull sets node color RED
 		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color RED\n");
-		trace(TRACE_1, "=================================================================\n");
+        trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 		return;
 	}
 
-	trace(TRACE_1, "\n=================================================================\n");
+    trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 	trace(TRACE_1, "\t current node: ");
 	trace(TRACE_1, intToString(currentNode->getNumber()) + "\n");
 

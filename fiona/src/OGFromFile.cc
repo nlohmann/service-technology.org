@@ -382,7 +382,7 @@ void OGFromFile::removeTransitionsToNodeFromAllOtherNodes(
 //! \brief checks, whether this OGFromFile simulates the given simulant
 //! \return true on positive check, otherwise: false
 //! \param smallerOG the simulant that should be simulated
-bool OGFromFile::simulates ( OGFromFile *smallerOG ) {
+bool OGFromFile::simulates(OGFromFile *smallerOG) {
 	trace(TRACE_5, "OGFromFile::simulates(OGFromFile *smallerOG): start\n" );
 	//Simulation is impossible without a simulant.
 	if ( smallerOG == NULL )
@@ -395,7 +395,7 @@ bool OGFromFile::simulates ( OGFromFile *smallerOG ) {
 	
 	//Get things moving...
 	bool result = false;
-	if ( simulatesRecursive(root, myVisitedNodes, smallerOG->getRoot(), simVisitedNodes) )
+	if (simulatesRecursive(root, myVisitedNodes, smallerOG->getRoot(), simVisitedNodes))
 		result = true;
 	
 	trace(TRACE_5, "OGFromFile::simulates(OGFromFile *smallerOG): end\n" );

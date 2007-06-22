@@ -210,21 +210,37 @@ void readAllOGs(OGFromFile::ogs_t& theOGs) {
 //! \brief reports values for -e and -m option
 void reportOptionValues() {
 
-	// report ...
-    if (debug_level == TRACE_0) {
+    trace(TRACE_0, "-e option found: ");
+    if (options[O_EVENT_USE_MAX]) {
+        trace(TRACE_0, "yes\n");
+    } else {
+        trace(TRACE_0, "no\n");
+    }
+
+    // if options[O_EVENT_USE_MAX] (with non-negative value) is set, then
+    // values for max_occurence are totally ignored (overwritten)
+    // otherwise, take values of max_occurence
+    if (options[O_EVENT_USE_MAX]) {
+        assert(events_manual >= 0);
+        for (unsigned int e = 0; e < PN->getInputPlaceCount(); e++) {
+            PN->getInputPlace(e)->max_occurence = events_manual;
+        }
+        for (unsigned int e = 0; e < PN->getOutputPlaceCount(); e++) {
+            PN->getOutputPlace(e)->max_occurence = events_manual;
+        }
+    }
+
+	// report events
+    if (false) {//debug_level == TRACE_0) {
         if (options[O_EVENT_USE_MAX]) {
-            trace(TRACE_0, "each event considered max: " + intToString(messages_manual) +"\n");
+            trace(TRACE_0, "each event considered max: " + intToString(events_manual) +"\n");
         }
-        if (options[O_MESSAGES_MAX]) {
-            trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
-        }
-        trace(TRACE_0, "\n");
     } else {
         trace(TRACE_0, "considering the following events:\n");
         trace(TRACE_0, "    sending events:\n" );
         for (unsigned int e = 0; e < PN->getInputPlaceCount(); e++) {
             trace(TRACE_0, "\t!" + string(PN->getInputPlace(e)->name));
-            if (options[O_EVENT_USE_MAX]) {
+            if (PN->getInputPlace(e)->max_occurence >= 0) {
                 trace(TRACE_0, "\t(max. " + intToString(PN->getInputPlace(e)->max_occurence) + "x)\n");
             } else {
                 trace(TRACE_0, "\t(no limit)\n");
@@ -233,13 +249,19 @@ void reportOptionValues() {
         trace(TRACE_0, "    receiving events:\n" );
         for (unsigned int e = 0; e < PN->getOutputPlaceCount(); e++) {
             trace(TRACE_0, "\t?" + string(PN->getOutputPlace(e)->name));
-            if (options[O_EVENT_USE_MAX]) {
+            if (PN->getOutputPlace(e)->max_occurence >= 0) {
                 trace(TRACE_0, "\t(max. " + intToString(PN->getOutputPlace(e)->max_occurence) + "x)\n");
             } else {
                 trace(TRACE_0, "\t(no limit)\n");
             }
         }
     }
+
+    // report message bound
+    if (options[O_MESSAGES_MAX]) {
+        trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
+    }
+    trace(TRACE_0, "\n");
 }
 
 
@@ -271,6 +293,7 @@ int main(int argc, char ** argv) {
 
 	// evaluate command line options
 	parse_command_line(argc, argv);
+
 
     // ---------------- exchangeability ---------------------
     if (options[O_EX] == true) {
@@ -319,17 +342,17 @@ int main(int argc, char ** argv) {
     // ---------------- reading all nets ---------------------
     list<oWFN*> petrinets;
     readAllNets(petrinets);
-    
+
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
     // Delete lexer buffer for parsing oWFNs.
     // Must NOT be called before fclose(owfn_yyin);
     owfn_yylex_destroy();
 #endif
-	
+
     // ------------- reading all OG-files -----------------------
     OGFromFile::ogs_t OGsFromFiles;
     readAllOGs(OGsFromFiles);
-	
+
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
 		// Destroy buffer of OG parser.
 		//  Must NOT be called before fclose(og_yyin);

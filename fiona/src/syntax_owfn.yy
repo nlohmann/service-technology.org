@@ -312,6 +312,7 @@ place: nodeident {
 	PlaceTable->add(PS);
 	P->capacity = CurrentCapacity;
 	P->nrbits = CurrentCapacity > 0 ? logzwo(CurrentCapacity) : 32;
+	// set max_occurence to default value
 	P->max_occurence = events_manual;
 	free($1);
 	if (type == INPUT || type == OUTPUT) {
@@ -343,25 +344,27 @@ commands:
     }
 | KEY_MAX_OCCURRENCES OP_EQ NUMBER commands
     {
+        // set max_occurence to value that was given in oWFN file
         sscanf($3, "%u", &(PS->getPlace()->max_occurence));
         free($3);
-        if (options[O_EVENT_USE_MAX] &&
-            PS->getPlace()->max_occurence > events_manual)
-        {
-            PS->getPlace()->max_occurence = events_manual;
-        }
-        numberOfEvents += PS->getPlace()->max_occurence - events_manual;
+//    	options[O_EVENT_USE_MAX] = true;
+//        if (options[O_EVENT_USE_MAX] &&
+//            PS->getPlace()->max_occurence > events_manual)
+//        {
+//            PS->getPlace()->max_occurence = events_manual;
+//        }
+//        numberOfEvents += PS->getPlace()->max_occurence - events_manual;
     }
 | KEY_MAX_OCCURRENCES OP_EQ NEGATIVE_NUMBER commands
     {
         sscanf($3, "%d", &(PS->getPlace()->max_occurence));
         free($3);
-        if (options[O_EVENT_USE_MAX] &&
-            PS->getPlace()->max_occurence > events_manual)
-        {
-            PS->getPlace()->max_occurence = events_manual;
-        }
-        numberOfEvents += PS->getPlace()->max_occurence - events_manual;
+//        if (options[O_EVENT_USE_MAX] &&
+//            PS->getPlace()->max_occurence > events_manual)
+//        {
+//            PS->getPlace()->max_occurence = events_manual;
+//        }
+//        numberOfEvents += PS->getPlace()->max_occurence - events_manual;
     }
 ;
 

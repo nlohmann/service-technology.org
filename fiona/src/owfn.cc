@@ -56,13 +56,18 @@ bool compare(const owfnPlace* lhs, const owfnPlace* rhs){
 
 //! \brief constructor
 oWFN::oWFN() : arcCnt(0),
-               CurrentCardFireList(0), CurrentCardQuasiFireList(0),
+               CurrentCardFireList(0),
+               CurrentCardQuasiFireList(0),
                filename(NULL),
                tempBinDecision(NULL),
                FinalCondition(NULL),
-               currentState(0), transNrEnabled(0), transNrQuasiEnabled(0),
-               placeHashValue(0), BitVectorSize(0),
-               startOfQuasiEnabledList(NULL), startOfEnabledList(NULL) {
+               currentState(0),
+               transNrEnabled(0),
+               transNrQuasiEnabled(0),
+               placeHashValue(0),
+               BitVectorSize(0),
+               startOfQuasiEnabledList(NULL),
+               startOfEnabledList(NULL) {
 
     unsigned int i;
     NonEmptyHash = 0;

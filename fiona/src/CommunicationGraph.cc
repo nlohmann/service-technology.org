@@ -737,7 +737,7 @@ void communicationGraph::printProgressFirst() {
 void communicationGraph::printDotFile() {
 
     // unsigned int maxWritingSize = 1000;
-    unsigned int maxPrintingSize = 1000;
+    unsigned int maxPrintingSize = 10000;
 
     if (true) {
 //    if (getNumberOfNodes() <= maxWritingSize) {

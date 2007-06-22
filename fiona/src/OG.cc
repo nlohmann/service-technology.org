@@ -115,8 +115,9 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 		trace(TRACE_2, "\t\t\t\t    sending event: !");
 		trace(TRACE_2, string(PN->getInputPlace(i)->name) + "\n");
 
-		if (currentNode->eventsUsed[i] < PN->getInputPlace(i)->max_occurence
-            || (options[O_EVENT_USE_MAX] == false)) {
+		if (PN->getInputPlace(i)->max_occurence < 0 ||
+            PN->getInputPlace(i)->max_occurence > currentNode->eventsUsed[i]) {
+            // we have to consider this event
 
 			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
 
@@ -177,7 +178,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
                 }
             }
         } else {
-            trace(TRACE_2, "\t\t\t\t\t    sending event: !");
+            trace(TRACE_2, "\t\t\t\t\t    !");
             trace(TRACE_2, string(PN->getInputPlace(i)->name));
             trace(TRACE_2, " suppressed (max_occurence reached)\n");
 
@@ -207,8 +208,10 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
 		trace(TRACE_2, string(PN->getOutputPlace(i)->name) + "\n");
 
-		if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] < PN->getOutputPlace(i)->max_occurence
-            || (options[O_EVENT_USE_MAX] == false)) {
+        if (PN->getOutputPlace(i)->max_occurence < 0 ||
+            PN->getOutputPlace(i)->max_occurence > currentNode->eventsUsed[i + PN->getInputPlaceCount()]) {
+//		if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] < PN->getOutputPlace(i)->max_occurence
+//            || (options[O_EVENT_USE_MAX] == false)) {
 
 			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
 			calculateSuccStatesOutput(PN->getOutputPlace(i)->index, currentNode, v);
@@ -253,7 +256,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 //				printProgress();
 			}
 		} else {
-			trace(TRACE_2, "\t\t\t\t\t  receiving event: ?");
+			trace(TRACE_2, "\t\t\t\t\t  ?");
 			trace(TRACE_2, string(PN->getOutputPlace(i)->name));
 			trace(TRACE_2, " suppressed (max_occurence reached)\n");
 

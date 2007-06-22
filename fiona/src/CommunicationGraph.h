@@ -35,7 +35,7 @@
 #define GRAPH_H_
 
 #include "mynew.h"
-#include "GraphNode.h"
+#include "graphEdge.h"
 #include <fstream>
 
 #include <set>
@@ -44,16 +44,15 @@ using namespace std;
 
 class oWFN;
 class State;
+class GraphNode;
 
 
 extern double global_progress;
 extern int show_progress;
 
 struct compareVertices {
-  bool operator() (GraphNode const * left, GraphNode const * right) {
-    return (*left < *right);
-  }
-}; // compareVertices
+  bool operator() (GraphNode const * left, GraphNode const * right);
+};
 
 typedef std::set<GraphNode*, compareVertices> GraphNodeSet;
 

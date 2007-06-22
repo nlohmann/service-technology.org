@@ -36,6 +36,7 @@
 
 #include "mynew.h"
 #include "graphEdge.h"
+#include "owfn.h"
 #include <set>
 
 class State;
@@ -130,7 +131,7 @@ public:
 
     bool isToShow(const GraphNode* rootOfGraph) const;
 
-    void removeLiteralFromFormula(unsigned int, GraphEdgeType);
+    void removeLiteralFromFormula(oWFN::Places_t::size_type, GraphEdgeType);
 
     friend bool operator < (GraphNode const&, GraphNode const& );
 

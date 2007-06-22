@@ -43,6 +43,10 @@
 
 using namespace std;
 
+bool compareVertices::operator()(GraphNode const* left,
+    GraphNode const* right) {
+    return (*left < *right);
+}
 
 double global_progress = 0;
 int show_progress = 0;

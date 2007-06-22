@@ -19,8 +19,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-06-21 08:53:36 $ by $Author: bretschn $.
-# Version $Revision: 1.14 $
+# File last changed $Date: 2007-06-22 12:32:12 $ by $Author: bretschn $.
+# Version $Revision: 1.15 $
 
 SUBDIRS = cudd src tests doc
 
@@ -96,6 +96,15 @@ bindist: clean binarydistreadme all create_bindist_archive
 # target to create a binary distribution for systems having no cygwin1.dll.
 win32bindist: clean binarydistreadme win32
 	$(MAKE) create_bindist_archive BINARYDISTDIR="$(distdir)-win32"
+
+bindist_universal:
+	@echo "You have to configure with:"
+	@echo "  ./configure --disable-dependency-tracking"
+	@echo "Press return to continue."
+	@read answer
+	$(MAKE) bindist OS=mac-universal CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+	CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+	LDFLAGS="-arch i386 -arch ppc"
 
 # Helper target for bindist and win32bindist. Creates the actual zip file to be
 # distributed.

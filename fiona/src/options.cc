@@ -197,7 +197,7 @@ void printErrorInvalidNumberForOptionAndExit(const std::string& option,
             "non-negative number." << endl
          << "\tInstead you gave '" << givenArgument
          << "' as the argument for " << option << '.' << endl
-         << "\tEnter \"fiona --help\" for more information."
+         << "\tEnter \"fiona --help\" for more information.\n"
          << endl;
 
     exit(1);
@@ -259,8 +259,8 @@ void parse_command_line(int argc, char* argv[]) {
     trace(TRACE_0, "\n");
     int optc = 0;
     while ((optc = getopt_long (argc, argv, par_string, longopts, (int *) 0))
-           != EOF)
-    {
+           != EOF) {
+
         switch (optc) {
             case 'h': print_help();      exit(0);
             case 'v': print_version();   exit(0);
@@ -282,13 +282,12 @@ void parse_command_line(int argc, char* argv[]) {
                     debug_level = TRACE_5;
                 } else {
                     cerr << "Error:\twrong debug mode" << endl
-                         << "\tEnter \"fiona --help\" for more information."
+                         << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
                     exit(1);
                 }
                 break;
-            case 't':
-            {
+            case 't': {
                 string lc_optarg = toLower(optarg);
                 if (lc_optarg == "og") {
                     options[O_GRAPH_TYPE] = true;
@@ -312,8 +311,8 @@ void parse_command_line(int argc, char* argv[]) {
 				} else if (lc_optarg == "productog") {
 					options[O_PRODUCTOG] = true;
                 } else {
-                    cerr << "Error:\twrong graph type" << endl
-                         << "\tEnter \"fiona --help\" for more information."
+                    cerr << "Error:\twrong modus operandi (option -t)" << endl
+                         << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
                     exit(1);
                 }
@@ -331,7 +330,6 @@ void parse_command_line(int argc, char* argv[]) {
                 if (events_manual < 0) {
                 	options[O_EVENT_USE_MAX] = false;
                 }
-
                 break;
             case 's':
                 if (string(optarg) == "blue") {
@@ -361,7 +359,7 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
                 } else {
                     cerr << "Error:\twrong show option" << endl
-                         << "\tEnter \"fiona --help\" for more information."
+                         << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
                     exit(1);
                 }
@@ -382,7 +380,7 @@ void parse_command_line(int argc, char* argv[]) {
                     bdd_reordermethod = i;
                 } else {
                     cerr << "Error:\twrong BDD reorder method" << endl
-                         << "\tEnter \"fiona --help\" for more information."
+                         << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
                     exit(1);
                 }
@@ -397,7 +395,7 @@ void parse_command_line(int argc, char* argv[]) {
                     bdd_reordermethod = i;
                 } else {
                     cerr << "Error:\twrong BDD reorder method" << endl
-                         << "\tEnter \"fiona --help\" for more information."
+                         << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
                     exit(1);
                 }
@@ -408,19 +406,19 @@ void parse_command_line(int argc, char* argv[]) {
                     outfilePrefix = optarg;
                 } else {
                     cerr << "Error:\toutput filename prefix missing" << endl
-                         << "\tEnter \"fiona --help\" for more information."
+                         << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
                     exit(1);
                 }
                 break;
             case '?':
                 cerr << "Error:\toption error" << endl
-                     << "\tEnter \"fiona --help\" for more information."
+                     << "\tEnter \"fiona --help\" for more information.\n"
                      << endl;
                 exit(1);
             default:
                 cerr << "Warning:\tUnknown option ignored" << endl
-                     << "\tEnter \"fiona --help\" for more information"
+                     << "\tEnter \"fiona --help\" for more information.\n"
                      << endl;
                 break;
         }
@@ -452,7 +450,7 @@ void parse_command_line(int argc, char* argv[]) {
 
     if (ogfiles.size() == 0 && netfiles.size() == 0) {
         cerr << "Error:\tNo oWFNs or OGs given." << endl
-             << "\tEnter \"fiona --help\" for more information." << endl;
+             << "\tEnter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
 
@@ -474,7 +472,7 @@ FileType getFileType(const std::string& fileName) {
 
     ifstream fileStream(fileName.c_str());
     if (!fileStream) {
-        cerr << "Error:\tCould not open '" << fileName << "' for reading."
+        cerr << "Error:\tCould not open '" << fileName << "' for reading.\n"
              << endl;
         exit(1);
     }

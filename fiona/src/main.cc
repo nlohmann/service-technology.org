@@ -292,7 +292,7 @@ int main(int argc, char ** argv) {
         return 0;
     }
 
-    // ------------------- matching oWFN with OG ------------------------
+    // ---------------- matching oWFN with OG ------------------------
     OGFromFile* OGToMatch = NULL;
     if (options[O_MATCH]) {
         if (ogfiles.size() == 0) {
@@ -336,86 +336,6 @@ int main(int argc, char ** argv) {
 		og_yylex_destroy();
 #endif
 
-    // -------------- calculating the product og -------------
-    if (options[O_PRODUCTOG]) {
-        if (OGsFromFiles.size() < 2) {
-            cerr << "Error: \t Give at least two OGs to build their product!\n" << endl;
-            exit(1);
-        }
-
-        trace("Building product of the following OGs:\n");
-        for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
-             iOgFile != ogfiles.end(); ++iOgFile) {
-            trace(*iOgFile); trace("\n");
-        }
-        trace("\n");
-
-        OGFromFile* productOG = OGFromFile::product(OGsFromFiles);
-
-        if (productOG->hasNoRoot()) {
-            trace("The product OG is empty.\n\n");
-        }
-
-        if (!options[O_OUTFILEPREFIX]) {
-            outfilePrefix = OGFromFile::getProductOGFilePrefix(ogfiles);
-        }
-
-        trace("Saving product OG to:\n");
-        trace(OGFromFile::addOGFileSuffix(outfilePrefix)); trace("\n");
-        productOG->printOGFile(outfilePrefix);
-        trace("\n");
-
-        productOG->printDotFile(outfilePrefix);
-        delete productOG;
-
-        for (OGFromFile::ogs_t::const_iterator iOg = OGsFromFiles.begin();
-             iOg != OGsFromFiles.end(); ++iOg) {
-            delete *iOg;
-        }
-
-        return 0;
-    }
-	
-	// ------------- simulation on OGFromFile --------------------
-	
-	if (options[O_SIMULATES]) {
-		if (OGsFromFiles.size() == 2) {
-			list<OGFromFile*>::iterator OGFFIter = OGsFromFiles.begin();
-			OGFromFile *simulator = *OGFFIter;
-			OGFromFile *simulant = *(++OGFFIter);
-			if (simulator->simulates(simulant)) {
-                trace(TRACE_0, "\nThe first OG has all the strategies of the second one, possibly more.\n" );
-            } else {
-                trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
-            }
-		}
-		else {
-			cerr << "Error: \t If option -t simulation is used, exactly two OG files must be entered\n" << endl;
-        }
-	}
-
-	// ------------- equivalence on OGFromFile --------------------
-	
-	if (options[O_EQUALS]) {
-		if (OGsFromFiles.size() == 2) {
-			list<OGFromFile*>::iterator OGFFIter = OGsFromFiles.begin();
-			OGFromFile *simulator = *OGFFIter;
-			OGFromFile *simulant = *(++OGFFIter);
-			if (simulator->simulates(simulant)) {
-                if (simulant->simulates(simulator)) {
-					trace(TRACE_0, "\nThe two OGs are equivalent, that is, they have the same strategies.\n");
-				}
-				else {
-					trace(TRACE_0, "\nThe first OG has a strategy which the second one hasn't.\n");
-				}
-            } else {
-                trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
-            }
-		}
-		else {
-			cerr << "Error: \t If option -S is used, exactly two OG files must be entered\n" << endl;
-        }
-	}
 
 // **********************************************************************************
 // *******                    start doing things                             ********
@@ -470,6 +390,9 @@ int main(int argc, char ** argv) {
 				trace(TRACE_0, "Match failed, because: " +
 				reasonForFailedMatch + "\n");
 			}
+
+            delete OGToMatch;
+
 		} else if (parameters[P_OG]) {
 
 			// ---------------- operating guideline is built ---------------------
@@ -581,8 +504,82 @@ int main(int argc, char ** argv) {
 
     } // end of "for all nets ..."
 
-    if (options[O_MATCH]) {
-        delete OGToMatch;
+    // -------------- calculating the product og -------------
+    if (options[O_PRODUCTOG]) {
+        if (OGsFromFiles.size() < 2) {
+            cerr << "Error: \t Give at least two OGs to build their product!\n" << endl;
+            exit(1);
+        }
+
+        trace("Building product of the following OGs:\n");
+        for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+             iOgFile != ogfiles.end(); ++iOgFile) {
+            trace(*iOgFile); trace("\n");
+        }
+        trace("\n");
+
+        OGFromFile* productOG = OGFromFile::product(OGsFromFiles);
+
+        if (productOG->hasNoRoot()) {
+            trace("The product OG is empty.\n\n");
+        }
+
+        if (!options[O_OUTFILEPREFIX]) {
+            outfilePrefix = OGFromFile::getProductOGFilePrefix(ogfiles);
+        }
+
+        trace("Saving product OG to:\n");
+        trace(OGFromFile::addOGFileSuffix(outfilePrefix)); trace("\n");
+        productOG->printOGFile(outfilePrefix);
+        trace("\n");
+
+        productOG->printDotFile(outfilePrefix);
+        delete productOG;
+
+        for (OGFromFile::ogs_t::const_iterator iOg = OGsFromFiles.begin();
+             iOg != OGsFromFiles.end(); ++iOg) {
+            delete *iOg;
+        }
+
+        return 0;
+    }
+    
+    // ------------- simulation on OGFromFile --------------------
+    
+    if (options[O_SIMULATES]) {
+        if (OGsFromFiles.size() == 2) {
+            list<OGFromFile*>::iterator OGFFIter = OGsFromFiles.begin();
+            OGFromFile *simulator = *OGFFIter;
+            OGFromFile *simulant = *(++OGFFIter);
+            if (simulator->simulates(simulant)) {
+                trace(TRACE_0, "\nThe first OG has all the strategies of the second one, possibly more.\n" );
+            } else {
+                trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
+            }
+        } else {
+            cerr << "Error: \t If option -t simulation is used, exactly two OG files must be entered\n" << endl;
+        }
+    }
+
+    // ------------- equivalence on OGFromFile --------------------
+    
+    if (options[O_EQUALS]) {
+        if (OGsFromFiles.size() == 2) {
+            list<OGFromFile*>::iterator OGFFIter = OGsFromFiles.begin();
+            OGFromFile *simulator = *OGFFIter;
+            OGFromFile *simulant = *(++OGFFIter);
+            if (simulator->simulates(simulant)) {
+                if (simulant->simulates(simulator)) {
+                    trace(TRACE_0, "\nThe two OGs are equivalent, that is, they have the same strategies.\n");
+                } else {
+                    trace(TRACE_0, "\nThe first OG has a strategy which the second one hasn't.\n");
+                }
+            } else {
+                trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
+            }
+        } else {
+            cerr << "Error: \t If option -S is used, exactly two OG files must be entered\n" << endl;
+        }
     }
 
 #ifdef LOG_NEW

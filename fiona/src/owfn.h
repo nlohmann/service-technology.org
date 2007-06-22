@@ -42,7 +42,7 @@
 #include "formula.h"
 #include "main.h"
 #include "state.h"
-#include "communicationGraph.h"
+#include "containers.h"
 
 using namespace std;
 
@@ -55,8 +55,6 @@ class TrSymbol;
 class Arc;
 class OGFromFile;
 class GraphFormulaAssignment;
-
-typedef std::set<State*> StateSet;
 
 class oWFN {
 	// first public typedefs, then private members, then public methods

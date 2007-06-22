@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-06-21 08:04:35 $ by $Author: bretschn $.
-# Version $Revision: 1.32 $
+# File last changed $Date: 2007-06-22 10:33:29 $ by $Author: bretschn $.
+# Version $Revision: 1.33 $
 
 bin_PROGRAMS = fiona
 
@@ -27,35 +27,36 @@ bin_PROGRAMS = fiona
 AM_YFLAGS = --yacc --defines #--no-lines
 
 YYSOURCES = lexer_owfn.cc lexer_owfn.h syntax_owfn.cc syntax_owfn.h \
-			lexer_og.cc lexer_og.h syntax_og.cc syntax_og.h
+            lexer_og.cc lexer_og.h syntax_og.cc syntax_og.h
 
 # the list of sources
 fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
-		lexer_owfn.ll lexer_owfn_wrap.h\
-		syntax_og.yy lexer_og.ll\
-		petriNetNode.h petriNetNode.cc\
-		IG.cc owfnPlace.cc communicationGraph.h\
-		IG.h owfnPlace.h\
-		OG.cc owfnTransition.cc\
-		OG.h owfnTransition.h\
-		debug.cc\
-    	binDecision.h binDecision.cc \
-    	searchTrace.h \
-		debug.h graphEdge.cc successorNodeList.cc\
-		graphEdge.h successorNodeList.h\
-		dimensions.h main.cc symboltab.cc\
-		main.h symboltab.h\
-		options.cc userconfig.h\
-		options.h GraphNode.cc \
-		formula.cc owfn.cc GraphNode.h \
-		formula.h owfn.h communicationGraph.cc\
-		getopt.c getopt1.c getopt.h \
-		BddRepresentation.h BddRepresentation.cc \
-		BddLabel.h BddLabel.cc \
-		state.h state.cc \
-		newlogger.h newlogger.cc mynew.h \
-		Exchangeability.h Exchangeability.cc \
-		OGFromFile.h OGFromFile.cc GraphFormula.h GraphFormula.cc
+        lexer_owfn.ll lexer_owfn_wrap.h\
+        syntax_og.yy lexer_og.ll\
+        petriNetNode.h petriNetNode.cc\
+        IG.cc owfnPlace.cc communicationGraph.h\
+        IG.h owfnPlace.h\
+        OG.cc owfnTransition.cc\
+        OG.h owfnTransition.h\
+        debug.cc\
+        binDecision.h binDecision.cc \
+        searchTrace.h \
+        debug.h graphEdge.cc successorNodeList.cc\
+        graphEdge.h successorNodeList.h\
+        dimensions.h main.cc symboltab.cc\
+        main.h symboltab.h\
+        options.cc userconfig.h\
+        options.h GraphNode.cc \
+        formula.cc owfn.cc GraphNode.h \
+        formula.h owfn.h communicationGraph.cc\
+        getopt.c getopt1.c getopt.h \
+        BddRepresentation.h BddRepresentation.cc \
+        BddLabel.h BddLabel.cc \
+        state.h state.cc \
+        newlogger.h newlogger.cc mynew.h \
+        Exchangeability.h Exchangeability.cc \
+        OGFromFile.h OGFromFile.cc GraphFormula.h GraphFormula.cc \
+        containers.h containers.cc
 
 BUILT_SOURCES = lexer_owfn.h
 

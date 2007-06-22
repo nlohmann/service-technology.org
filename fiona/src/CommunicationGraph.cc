@@ -39,14 +39,10 @@
 #include "options.h"
 #include "debug.h"
 #include "binDecision.h"
+#include "communicationGraph.h"
 #include <cassert>
 
 using namespace std;
-
-bool compareVertices::operator()(GraphNode const* left,
-    GraphNode const* right) {
-    return (*left < *right);
-}
 
 double global_progress = 0;
 int show_progress = 0;

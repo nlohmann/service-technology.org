@@ -36,6 +36,7 @@
 
 #include "mynew.h"
 #include "graphEdge.h"
+#include "owfn.h"
 #include <fstream>
 
 #include <set>
@@ -49,39 +50,6 @@ class GraphNode;
 
 extern double global_progress;
 extern int show_progress;
-
-struct compareVertices {
-  bool operator() (GraphNode const * left, GraphNode const * right);
-};
-
-typedef std::set<GraphNode*, compareVertices> GraphNodeSet;
-
-typedef std::multiset<unsigned int> messageMultiSet;
-
-struct compareMessageMultiSets {
-  bool operator() (messageMultiSet const left, messageMultiSet const right) {
-    if (left.size() < right.size()) {
-        return true;
-    }
-    if (left.size() > right.size()) {
-        return false;
-    }
-    for (std::multiset<unsigned int>::iterator s1 = left.begin(); s1 != left.end(); s1++) {
-        for (std::multiset<unsigned int>::iterator s2 = right.begin(); s2 != right.end(); s2++) {
-            if (*s1 < *s2) {
-                return true;
-            }
-            if (*s1 > *s2) {
-                return false;
-            }
-        }
-    }
-    return false;
-  }
-}; // compareMessageMultiSets
-
-typedef std::set<messageMultiSet, compareMessageMultiSets> setOfMessages;
-
 
 /* communication graph */
 class communicationGraph {
@@ -133,7 +101,7 @@ public:
     void addGraphNode(GraphNode *, GraphNode *);        // for OG
     bool addGraphNode(GraphNode *, GraphNode *, messageMultiSet, GraphEdgeType);     // for IG
 
-    void addGraphEdge(GraphNode*, GraphNode*, unsigned int, GraphEdgeType);        // for OG
+    void addGraphEdge(GraphNode*, GraphNode*, oWFN::Places_t::size_type, GraphEdgeType);        // for OG
 
     void analyseNode(GraphNode *);
 

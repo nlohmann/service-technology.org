@@ -1,0 +1,66 @@
+{test8 op2}
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1, 
+  p2,
+  p3,
+  p4,
+  p5;
+INPUT
+  a,
+  c,
+  d;
+OUTPUT
+  b;
+
+INITIALMARKING
+  p0:   1;
+
+FINALMARKING
+  p5:   1;
+
+TRANSITION t1    
+CONSUME
+  p0:   1,
+  a:   1;
+PRODUCE
+  p1:   1;
+
+TRANSITION t2
+CONSUME 
+  p1:   1;
+PRODUCE 
+  p2:   1,
+  b:   1;
+
+TRANSITION t3
+CONSUME 
+  p2:   1,
+  c:   1;
+PRODUCE 
+  p3:   1;
+
+TRANSITION t4
+CONSUME  
+  p2:   1,
+  d:   1;
+PRODUCE
+  p3:   1;
+
+TRANSITION t5
+CONSUME  
+  p0:   1,
+  c:   1;
+PRODUCE
+  p4:   1;
+
+TRANSITION t6
+CONSUME  
+  p4:   1,
+  p3:   1;
+PRODUCE
+  p5:   1;
+
+{ END OF FILE }

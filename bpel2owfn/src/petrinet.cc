@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/06/05 15:04:00 $
+ * \date    \$Date: 2007/06/25 10:42:39 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.218 $
+ * \version \$Revision: 1.219 $
  *
  * \ingroup petrinet
  */
@@ -364,6 +364,8 @@ PetriNet::PetriNet(const PetriNet & net)
   {
     Place * newPlace = new Place( **place );
     newPlace->id = getId();
+    newPlace->preset.clear();
+    newPlace->postset.clear();
     P.insert( newPlace );
 
     roleMap[ newPlace->nodeFullName() ] = newPlace;
@@ -376,6 +378,8 @@ PetriNet::PetriNet(const PetriNet & net)
   {
     Place * newPlace = new Place( **place );
     newPlace->id = getId();
+    newPlace->preset.clear();
+    newPlace->postset.clear();
     P_in.insert( newPlace );
 
     roleMap[ newPlace->nodeFullName() ] = newPlace;
@@ -388,6 +392,8 @@ PetriNet::PetriNet(const PetriNet & net)
   {
     Place * newPlace = new Place( **place );
     newPlace->id = getId();
+    newPlace->preset.clear();
+    newPlace->postset.clear();
     P_out.insert( newPlace );
 
     roleMap[ newPlace->nodeFullName() ] = newPlace;
@@ -400,6 +406,8 @@ PetriNet::PetriNet(const PetriNet & net)
   {
     Transition * newTransition = new Transition( **transition );
     newTransition->id = getId();
+    newTransition->preset.clear();
+    newTransition->postset.clear();
     T.insert( newTransition );
 
     roleMap[ newTransition->nodeFullName() ] = newTransition;

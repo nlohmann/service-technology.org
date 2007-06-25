@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/06/25 11:12:20 $
+ * \date    \$Date: 2007/06/25 14:26:28 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.220 $
+ * \version \$Revision: 1.221 $
  *
  * \ingroup petrinet
  */
@@ -464,7 +464,7 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
   roleMap.clear();
 
 
-  nextId = net.id;
+  nextId = net.nextId;
   format = FORMAT_OWFN;
 
   // add all internal places

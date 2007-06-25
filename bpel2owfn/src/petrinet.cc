@@ -31,13 +31,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/06/25 10:42:39 $
+ * \date    \$Date: 2007/06/25 11:12:20 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.219 $
+ * \version \$Revision: 1.220 $
  *
  * \ingroup petrinet
  */
@@ -356,14 +356,14 @@ PetriNet::PetriNet(const PetriNet & net)
   roleMap.clear();
 
 
-  nextId = 1;
+  nextId = net.nextId;
   format = FORMAT_OWFN;
 
   // add all internal places
   for (set< Place * >::iterator place = net.P.begin(); place != net.P.end(); place ++)
   {
     Place * newPlace = new Place( **place );
-    newPlace->id = getId();
+    newPlace->id = (*place)->id;
     newPlace->preset.clear();
     newPlace->postset.clear();
     P.insert( newPlace );
@@ -377,7 +377,7 @@ PetriNet::PetriNet(const PetriNet & net)
   for (set< Place * >::iterator place = net.P_in.begin(); place != net.P_in.end(); place ++)
   {
     Place * newPlace = new Place( **place );
-    newPlace->id = getId();
+    newPlace->id = (*place)->id;
     newPlace->preset.clear();
     newPlace->postset.clear();
     P_in.insert( newPlace );
@@ -391,7 +391,7 @@ PetriNet::PetriNet(const PetriNet & net)
   for (set< Place * >::iterator place = net.P_out.begin(); place != net.P_out.end(); place ++)
   {
     Place * newPlace = new Place( **place );
-    newPlace->id = getId();
+    newPlace->id = (*place)->id;
     newPlace->preset.clear();
     newPlace->postset.clear();
     P_out.insert( newPlace );
@@ -405,7 +405,7 @@ PetriNet::PetriNet(const PetriNet & net)
   for (set< Transition * >::iterator transition = net.T.begin(); transition != net.T.end(); transition ++)
   {
     Transition * newTransition = new Transition( **transition );
-    newTransition->id = getId();
+    newTransition->id = (*transition)->id;
     newTransition->preset.clear();
     newTransition->postset.clear();
     T.insert( newTransition );
@@ -464,14 +464,14 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
   roleMap.clear();
 
 
-  nextId = 1;
+  nextId = net.id;
   format = FORMAT_OWFN;
 
   // add all internal places
   for (set< Place * >::iterator place = net.P.begin(); place != net.P.end(); place ++)
   {
     Place * newPlace = new Place( **place );
-    newPlace->id = getId();
+    newPlace->id = (*place)->id;
     newPlace->preset.clear();
     newPlace->postset.clear();
     P.insert( newPlace );
@@ -485,7 +485,7 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
   for (set< Place * >::iterator place = net.P_in.begin(); place != net.P_in.end(); place ++)
   {
     Place * newPlace = new Place( **place );
-    newPlace->id = getId();
+    newPlace->id = (*place)->id;
     newPlace->preset.clear();
     newPlace->postset.clear();
     P_in.insert( newPlace );
@@ -499,7 +499,7 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
   for (set< Place * >::iterator place = net.P_out.begin(); place != net.P_out.end(); place ++)
   {
     Place * newPlace = new Place( **place );
-    newPlace->id = getId();
+    newPlace->id = (*place)->id;
     newPlace->preset.clear();
     newPlace->postset.clear();
     P_out.insert( newPlace );
@@ -513,7 +513,7 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
   for (set< Transition * >::iterator transition = net.T.begin(); transition != net.T.end(); transition ++)
   {
     Transition * newTransition = new Transition( **transition );
-    newTransition->id = getId();
+    newTransition->id = (*transition)->id;
     newTransition->preset.clear();
     newTransition->postset.clear();
     T.insert( newTransition );

@@ -32,11 +32,11 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/06/28 07:38:17 $
+ * \date    \$Date: 2007/06/28 10:25:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
 */
 %}
 
@@ -177,9 +177,26 @@ Transition *throwFault(Place *p1, Place *p2,
 	  PN.newArc(t1, p2);
 
 	  if (globals::ASTEmap[id->value]->parentScopeId == 1)
+	  {
 	    PN.newArc(t1, PN.findPlace(toString(parentId) + ".internal.exit"));
+	    PN.newArc(PN.findPlace(toString(parentId) + ".internal.!Exiting"), t1, READ);
+
+	    Transition *t2;
+	    if (negativeControlFlow == 4)
+	      t2 = PN.newTransition(prefix + "final_rethrow");
+	    else
+	      t2 = PN.newTransition(prefix + "final_rethrowFault." + p1name);
+
+  	  PN.newArc(p1, t2);
+  	  PN.newArc(t2, p2);
+
+	    PN.newArc(t2, PN.findPlace(toString(parentId) + ".internal.inner_stop"));
+	    PN.newArc(PN.findPlace(toString(parentId) + ".internal.Exiting"), t2, READ);
+	  }
 	  else
+	  {
 	    PN.newArc(t1, PN.findPlace(toString(parentId) + ".internal.fault_in"));
+	  }
 
 	  return t1;
 	}

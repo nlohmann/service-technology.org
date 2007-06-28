@@ -25,8 +25,9 @@ Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in
 (a) below.  A copy of the license is included in the section entitled ``GNU Free
 Documentation License.''
 
-(a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
-this GNU Manual, like GNU software.''
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual. Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''
 @end quotation
 
 This manual does not explain how to setup or install GNU BPEL2oWFN. For this

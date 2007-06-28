@@ -27,8 +27,9 @@ Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in
 (a) below.  A copy of the license is included in the section entitled ``GNU Free
 Documentation License.''
 
-(a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
-this GNU Manual, like GNU software.''
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual. Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''
 @end quotation
 
 Once GNU BPEL2oWFN is installed please read the @i{User's Manual} which is part of the distribution or can be downloaded from the website
@@ -865,6 +866,19 @@ a detailed description in the manual
 @item when parsing multiple @acronym{BPEL} processes, wildcard like @file{*.bpel} can be used
 @end itemize
 @end itemize
+
+
+
+@unnumberedsubsec Version 2.0.3 (29 June 2007)
+
+@itemize --
+@item miscellaneous:
+@itemize
+@item adpoted the GNU GPL Version 3
+@item minor changes and bug fixes
+@end itemize
+@end itemize
+
 
 
 

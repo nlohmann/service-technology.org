@@ -1,22 +1,26 @@
 /*****************************************************************************\
- * Copyright 2007        Niels Lohmann, Christian Gierds                     *
- * Copyright 2005, 2006  Niels Lohmann                                       *
- *                                                                           *
- * This file is part of GNU BPEL2oWFN.                                       *
- *                                                                           *
- * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
- * under the terms of the GNU General Public License as published by the     *
- * Free Software Foundation; either version 2 of the License, or (at your    *
- * option) any later version.                                                *
- *                                                                           *
- * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
- * WITHOUT ANY WARRANTY; without even the implied warranty of                *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
- * Public License for more details.                                          *
- *                                                                           *
- * You should have received a copy of the GNU General Public License along   *
- * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
+  GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
+
+  Copyright (C) 2006, 2007  Niels Lohmann,
+                            Christian Gierds, and
+                            Martin Znamirowski
+  Copyright (C) 2005        Niels Lohmann and
+			    Christian Gierds
+
+  GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3 of the License, or (at your option) any
+  later version.
+
+  GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  details.
+
+  You should have received a copy of the GNU General Public License along with
+  GNU BPEL2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
+  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
+  Floor, Boston, MA 02110-1301  USA.
 \*****************************************************************************/
 
 %{
@@ -31,7 +35,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/05/02 13:19:54 $
+ * \date    \$Date: 2007/06/28 07:38:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +44,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.

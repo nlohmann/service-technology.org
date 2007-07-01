@@ -23,12 +23,12 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/06/28 07:38:13 $ by $Author: nielslohmann $.
-# Version $Revision: 1.46 $
+# File last changed $Date: 2007/07/01 13:26:59 $ by $Author: nielslohmann $.
+# Version $Revision: 1.47 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([GNU BPEL2oWFN],[2.0.3],[bpel2owfn-bug@gnu.org],[bpel2owfn])
+AC_INIT([GNU BPEL2oWFN],[2.0.4],[bpel2owfn-bug@gnu.org],[bpel2owfn])
 AM_INIT_AUTOMAKE
 
 

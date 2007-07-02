@@ -31,17 +31,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/06/28 07:38:15 $
+ * \date    \$Date: 2007/07/02 09:02:35 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.185 $
+ * \version \$Revision: 1.186 $
  */
 
 
@@ -667,10 +667,10 @@ int main( int argc, char *argv[])
 
     show_process_information_header();
 
-    // invoke Bison BPEL4Chor parser
-    trace(TRACE_INFORMATION, "Parsing " + globals::choreography_filename + " ...\n");
+    // invoke Bison BPEL4WSDL parser
+    trace(TRACE_INFORMATION, "Parsing " + globals::wsdl_filename + " ...\n");
     int parse_result = frontend_wsdl_parse();
-    trace(TRACE_INFORMATION, "Parsing of " + globals::choreography_filename + " complete.\n");
+    trace(TRACE_INFORMATION, "Parsing of " + globals::wsdl_filename + " complete.\n");
 
     close_file(globals::wsdl_filename);
 

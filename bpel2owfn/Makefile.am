@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/06/28 07:38:13 $ by $Author: nielslohmann $
-# Version $Revision: 1.64 $
+# File last changed $Date: 2007/07/03 16:38:24 $ by $Author: nielslohmann $
+# Version $Revision: 1.65 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc rpm
@@ -112,18 +112,19 @@ binarydistreadme:
 	@echo -e GNU BPEL2oWFN \(http://www.gnu.org/software/bpel2owfn\). >> BINARYREADME
 	@echo >> BINARYREADME
 	@echo -e GNU BPEL2oWFN is free software\; you can redistribute it and/or modify it >> BINARYREADME
-	@echo -e under the terms of the GNU General Public License as published by the >> BINARYREADME
-	@echo -e Free Software Foundation\; either version 2 of the License, or \(at your >> BINARYREADME
-	@echo -e option\) any later version. >> BINARYREADME
+	@echo -e under the terms of the GNU General Public License as published by the Free >> BINARYREADME
+	@echo -e Software Foundation\; either version 3 of the License, or \(at your option\) any >> BINARYREADME
+	@echo -e later version. >> BINARYREADME
 	@echo >> BINARYREADME
-	@echo -e GNU BPEL2oWFN is distributed in the hope that it will be useful, but >> BINARYREADME
-	@echo -e WITHOUT ANY WARRANTY\; without even the implied warranty of >> BINARYREADME
-	@echo -e MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU >> BINARYREADME
-	@echo -e General Public License for more details. >> BINARYREADME
+	@echo -e GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT >> BINARYREADME
+	@echo -e ANY WARRANTY\; without even the implied warranty of MERCHANTABILITY or FITNESS >> BINARYREADME
+	@echo -e FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more >> BINARYREADME
+	@echo -e details. >> BINARYREADME
 	@echo >> BINARYREADME
-	@echo -e You should have received a copy of the GNU General Public License along >> BINARYREADME
-	@echo -e with GNU BPEL2oWFN\; if not, write to the Free Software Foundation, Inc., 51 >> BINARYREADME
-	@echo -e Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. >> BINARYREADME
+	@echo -e You should have received a copy of the GNU General Public License along with >> BINARYREADME
+	@echo -e GNU BPEL2oWFN\; if not, see http://www.gnu.org/licenses or write to the Free >> BINARYREADME
+	@echo -e Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, >> BINARYREADME
+	@echo -e MA 02110-1301  USA. >> BINARYREADME
 
 # name of the directory/archive for a binary distribution
 BINARYDISTDIR = $(distdir)-$(OS)

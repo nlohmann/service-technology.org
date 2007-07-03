@@ -620,7 +620,7 @@ However, we tested BPEL2oWFN on these platforms:
 @item Microsoft Windows 2000 (x86)
 @item Microsoft Windows XP (x86)
 @item Microsoft Vista Business (x86)
-@item Apple Mac OS X Tiger (PowerPC and x86)
+@item Apple Mac OS X Tiger (Universal: PowerPC and x86)
 @item Sun Solaris 8 (@acronym{SPARC})
 @item Sun Solaris 9 (@acronym{SPARC})
 @item GNU/Linux (x86)
@@ -636,7 +636,7 @@ building BPEL2oWFN:
 @itemize
 @item Apple MacBook
 @item 2 GB RAM
-@item Mac OS X 10.4.9 (Tiger)
+@item Mac OS X 10.4.10 (Tiger)
 @item GNU Compiler Collection 4.0.1 (Apple Computer, Inc. build 5367)
 @item Flex version 2.5.33
 @item GNU Bison version 2.3

@@ -313,7 +313,10 @@ bool Exchangeability::check(Exchangeability* bdd){
 		++thislist_iter;
 		++bddlist_iter;
 	}
-	if (Cudd_bddLeq(mgrMp, bddMp, bdd->bddMp) == 1  && Cudd_bddLeq(mgrAnn, bddAnn, bdd->bddAnn) == 1 ){
+	if (Cudd_bddLeq(mgrMp, bddMp, bdd->bddMp) == 1  && 
+	    Cudd_bddLeq(mgrMp, bdd->bddMp, bddMp) == 1  &&
+	    Cudd_bddLeq(mgrAnn, bddAnn, bdd->bddAnn) == 1 &&
+	    Cudd_bddLeq(mgrAnn, bdd->bddAnn, bddAnn) == 1 ){
 		return(true);
 	}else{
 		return(false);

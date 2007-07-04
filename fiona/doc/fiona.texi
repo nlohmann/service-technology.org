@@ -20,7 +20,9 @@ downloaded from the website of @acronym{Fiona}
 (@url{http://www.informatik.hu-berlin.de/top/tools4bpel/fiona}).
 Last update @value{UPDATED}.
 
-@vskip 20pt
+
+@sp 2
+
 
 Copyright @copyright{} 2007 Daniela Weinberg
 
@@ -53,18 +55,22 @@ funded by the Bundesministerium f@"ur Bildung und Forschung. See
 
 @title @acronym{Fiona}
 
-@subtitle Functional Interaction Analysis for open Workflow Nets
+@subtitle Functional Interaction Analysis for Open Workflow Nets
 @subtitle @acronym{Fiona} Version @value{VERSION}, @value{UPDATED}
-@vskip 4pt
+
+@sp 1
+
 @subtitle User's Manual
 
 @author Daniela Weinberg
 
 @page
 
+@c @vskip 0pt plus 1filll
 
-@vskip 0pt plus 1filll
 @insertcopying
+
+
 @end titlepage
 
 @c ----------------------------------------------------------------------------

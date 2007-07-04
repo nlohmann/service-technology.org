@@ -118,8 +118,8 @@ public:
     void calculateSuccStatesInput(messageMultiSet, GraphNode *, GraphNode *);
     void calculateSuccStatesOutput(messageMultiSet, GraphNode *, GraphNode *);
 
-    void printGraphToDot(GraphNode * v, fstream& os, bool[]);
-    void printDotFile();
+    void printGraphToDot();
+    void printGraphToDotRecursively(GraphNode * v, fstream& os, bool[]);
 
     void printNodeStatistics();
     bool stateActivatesOutputEvents(State *);

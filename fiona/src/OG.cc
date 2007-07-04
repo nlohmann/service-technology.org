@@ -99,7 +99,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 
 	// get the annotation of the node as CNF formula
 	computeCNF(currentNode);
-    trace(TRACE_1, "\t first computation of formula yields: " + currentNode->getCNFformula()->asString() + "\n");
+    trace(TRACE_3, "\t first computation of formula yields: " + currentNode->getCNFformula()->asString() + "\n");
 
     trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 
@@ -164,6 +164,13 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
                     string edgeLabel = PN->getInputPlace(i)->getLabelForCommGraph();
                     GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
                     currentNode->addSuccessorNode(newEdge);
+
+                    // If that node was computed BLUE before, check again
+                    // its color, since its successors may have been set
+                    // RED meanwhile
+                    if (found->getColor() == BLUE) {
+                        analyseNode(found);
+                    }
 
 					// Still, if that node was computed red before, the literal
 					// of the edge from currentNode to the old node must be removed
@@ -243,6 +250,13 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
                 string edgeLabel = PN->getOutputPlace(i)->getLabelForCommGraph();
                 GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
                 currentNode->addSuccessorNode(newEdge);
+
+                // If that node was computed BLUE before, check again
+                // its color, since its successors may have been set
+                // RED meanwhile
+                if (found->getColor() == BLUE) {
+                    analyseNode(found);
+                }
 
 				// Still, if that node was computed red before, the literal
 				// of the edge from currentNode to the old node must be removed in the
@@ -456,7 +470,7 @@ void operatingGuidelines::convertToBddFull() {
 }
 
 
-void operatingGuidelines::printOGFile() const {
+void operatingGuidelines::printOGtoFile() const {
     string ogFilename = netfile;
     if (!options[O_CALC_ALL_STATES]) {
         ogFilename += ".R";

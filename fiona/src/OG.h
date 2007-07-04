@@ -64,7 +64,7 @@ class operatingGuidelines : public communicationGraph {
 		
         /** Prints graph in OG output format. Should only be called if the graph
          *  is an OG. */
-        void printOGFile() const;
+        void printOGtoFile() const;
 
         /** Prints nodes of the OG into an OG file below the NODES section. */
         void printNodesToOGFile(GraphNode * v, fstream& os, bool visitedNodes[]) const;

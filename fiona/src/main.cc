@@ -210,11 +210,11 @@ void readAllOGs(OGFromFile::ogs_t& theOGs) {
 //! \brief reports values for -e and -m option
 void reportOptionValues() {
 
-    trace(TRACE_0, "-e option found: ");
+    trace(TRACE_5, "-e option found: ");
     if (options[O_EVENT_USE_MAX]) {
-        trace(TRACE_0, "yes\n");
+        trace(TRACE_5, "yes\n");
     } else {
-        trace(TRACE_0, "no\n");
+        trace(TRACE_5, "no\n");
     }
 
     // if options[O_EVENT_USE_MAX] (with non-negative value) is set, then
@@ -231,7 +231,7 @@ void reportOptionValues() {
     }
 
 	// report events
-    if (false) {//debug_level == TRACE_0) {
+    if (debug_level == TRACE_0) {
         if (options[O_EVENT_USE_MAX]) {
             trace(TRACE_0, "each event considered max: " + intToString(events_manual) +"\n");
         }
@@ -450,11 +450,11 @@ int main(int argc, char ** argv) {
             trace(TRACE_0, "\n");
 
             // generate output files
-            graph->printDotFile();      // .out
-            graph->printOGFile();       // .og
+            graph->printGraphToDot();      // .out
+            graph->printOGtoFile();       // .og
 
             if (options[O_OTF]) {
-                //graph->bdd->printDotFile();
+                //graph->bdd->printGraphToDot();
                 graph->bdd->save("OTF");
             }
 
@@ -465,7 +465,7 @@ int main(int argc, char ** argv) {
                 seconds2 = time (NULL);
                 cout << difftime(seconds2,seconds) << " s consumed for building and reordering the BDDs" << endl;
                  
-                //graph->bdd->printDotFile();
+                //graph->bdd->printGraphToDot();
                 graph->bdd->save();
             }
     
@@ -510,7 +510,7 @@ int main(int argc, char ** argv) {
             trace(TRACE_0, "\n");
 
             // generate output files
-            graph->printDotFile();      // .out
+            graph->printGraphToDot();      // .out
 
             trace(TRACE_5, "computation finished -- trying to delete graph\n");
 //			trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
@@ -556,7 +556,7 @@ int main(int argc, char ** argv) {
         productOG->printOGFile(outfilePrefix);
         trace("\n");
 
-        productOG->printDotFile(outfilePrefix);
+        productOG->printOGFile(outfilePrefix);
         delete productOG;
 
         for (OGFromFile::ogs_t::const_iterator iOg = OGsFromFiles.begin();

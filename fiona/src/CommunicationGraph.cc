@@ -734,10 +734,10 @@ void communicationGraph::printProgressFirst() {
 
 
 //! \brief creates a dot file of the graph
-void communicationGraph::printDotFile() {
+void communicationGraph::printGraphToDot() {
 
     // unsigned int maxWritingSize = 1000;
-    unsigned int maxPrintingSize = 10000;
+    unsigned int maxPrintingSize = 2000;
 
     if (true) {
 //    if (getNumberOfNodes() <= maxWritingSize) {
@@ -764,7 +764,15 @@ void communicationGraph::printDotFile() {
         dotFile << "digraph g1 {\n";
         dotFile << "graph [fontname=\"Helvetica\", label=\"";
         parameters[P_OG] ? dotFile << "OG of " : dotFile << "IG of ";
-        dotFile << netfile;
+        dotFile << netfile;        
+        dotFile << " (parameters:";
+        if (options[O_MESSAGES_MAX]) {
+            dotFile << " -m" << intToString(messages_manual);
+        }
+        if (options[O_EVENT_USE_MAX]) {
+            dotFile << " -e" << intToString(events_manual);
+        }
+        dotFile << ")";
         dotFile << "\"];\n";
         dotFile << "node [fontname=\"Helvetica\" fontsize=10];\n";
         dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
@@ -774,7 +782,7 @@ void communicationGraph::printDotFile() {
             visitedNodes[i] = 0;
         }
 
-        printGraphToDot(tmp, dotFile, visitedNodes);
+        printGraphToDotRecursively(tmp, dotFile, visitedNodes);
 
         dotFile << "}";
         dotFile.close();
@@ -802,13 +810,24 @@ void communicationGraph::printDotFile() {
             trace(TRACE_0, string(buffer) + "\n");
             system(buffer);
         } else {
-            trace(TRACE_0, "graph is too big to create the graphics :( \n");
-            trace(TRACE_0, intToString(getNumberOfNodes()) + " > " + intToString(maxPrintingSize) + "\n");
+            trace(TRACE_0, "graph is too big to create the graphics :( ");
+            trace(TRACE_0, "(greater " + intToString(maxPrintingSize) + ")\n");
+//            trace(TRACE_0, intToString(getNumberOfNodes()) + " > " + intToString(maxPrintingSize) + "\n");
             trace(TRACE_0, string(buffer) + "\n");
         }
     } else {
         trace(TRACE_0, "graph is too big to create dot file\n");
     }
+    
+#ifdef WINDOWSBLABLA
+    if (parameters[P_OG]) {
+        char buffer[256];
+        cout << "initiating command to show the graphics..." << endl;
+        sprintf(buffer, "cmd /c \"start %s.OG.png\"", netfile);
+        trace(TRACE_0, string(buffer) + "\n");
+        system(buffer);
+    }
+#endif
 }
 
 
@@ -816,7 +835,7 @@ void communicationGraph::printDotFile() {
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
 //! \brief breadthsearch through the graph printing each node and edge to the output stream
-void communicationGraph::printGraphToDot(GraphNode * v, fstream& os, bool visitedNodes[]) {
+void communicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, bool visitedNodes[]) {
 
     assert(v != NULL);
 
@@ -897,7 +916,7 @@ void communicationGraph::printGraphToDot(GraphNode * v, fstream& os, bool visite
 
         os << "];\n";
         if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
-            printGraphToDot(vNext, os, visitedNodes);
+            printGraphToDotRecursively(vNext, os, visitedNodes);
         }
     } // while
 }

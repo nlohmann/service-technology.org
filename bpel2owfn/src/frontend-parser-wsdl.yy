@@ -41,7 +41,7 @@
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/06/28 07:38:16 $
+ * \date    \$Date: 2007/07/06 20:05:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -51,7 +51,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  *
  * \ingroup frontend
  */
@@ -217,6 +217,8 @@ tMessage:
     { temp_message = new WSDL_Message(globals::tempAttributes["name"]); }
   X_NEXT tPart_list X_SLASH K_MESSAGE
     { globals::WSDLInfo.messages[temp_message->name] = temp_message; }
+| K_MESSAGE arbitraryAttributes X_SLASH
+    { temp_message = new WSDL_Message(globals::tempAttributes["name"]); }
 ;
 
 tPart_list:
@@ -259,6 +261,8 @@ tOperation:
   K_OPERATION arbitraryAttributes
     { temp_portType->addOperation(globals::tempAttributes["name"]); }
   X_NEXT tInputOutputFault_list X_SLASH K_OPERATION
+| K_OPERATION arbitraryAttributes X_SLASH
+    { temp_portType->addOperation(globals::tempAttributes["name"]); }
 ;
 
 tInputOutputFault_list:

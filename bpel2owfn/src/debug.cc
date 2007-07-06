@@ -34,13 +34,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/06/28 07:38:15 $
+ * \date    \$Date: 2007/07/06 20:05:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.106 $
+ * \version \$Revision: 1.107 $
  *
  * \ingroup debug
  */
@@ -207,7 +207,7 @@ void show_process_information()
   if (globals::static_analysis_errors == 0)
   {
     cerr << colorconsole::fg_green << "[STATIC ANALYSIS] " << colorconsole::fg_standard;
-    cerr << "No errors found checking 51 statics analysis requirements." << endl;
+    cerr << "No errors found checking 56 statics analysis requirements." << endl;
   }
   else if (globals::abstract_process)
   {
@@ -689,7 +689,7 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	break; }
 
     case(60):
-      { cerr << "ould not find an explicit corresponding incoming message activity for the <reply>" << endl;
+      { cerr << "could not find an explicit corresponding incoming message activity for the <reply>" << endl;
 	break; }
 
     case(61):

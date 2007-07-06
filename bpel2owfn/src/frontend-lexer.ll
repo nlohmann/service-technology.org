@@ -35,7 +35,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/06/28 07:38:16 $
+ * \date    \$Date: 2007/07/06 20:05:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.
@@ -177,7 +177,7 @@ UB     			[\200-\277]
 <COMMENT>{comment}		{ /* skip */ }
 <COMMENT>"-->"[ \t\r\n]*"<"	{ BEGIN(currentView); }
 
-"?xml"				{ currentView = YY_START; BEGIN(XMLHEADER); }
+"?"				{ currentView = YY_START; BEGIN(XMLHEADER); }
 <XMLHEADER>{xmlheader}		{ /* skip */ }
 <XMLHEADER>"?>"[ \t\r\n]*"<"	{ BEGIN(currentView); }
 

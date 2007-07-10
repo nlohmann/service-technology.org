@@ -46,6 +46,7 @@
 
 using namespace std;
 
+
 OGFromFileNode::OGFromFileNode(const std::string& name,
     GraphFormula* annotation, GraphNodeColor color) :
     name_(name),
@@ -55,26 +56,26 @@ OGFromFileNode::OGFromFileNode(const std::string& name,
 
 }
 
-OGFromFileNode::~OGFromFileNode()
-{
+
+OGFromFileNode::~OGFromFileNode() {
     for (transitions_t::const_iterator trans_iter = transitions.begin();
-         trans_iter != transitions.end(); ++trans_iter)
-    {
+         trans_iter != transitions.end(); ++trans_iter) {
         delete *trans_iter;
     }
 
     delete annotation_;
 }
 
+
 void OGFromFileNode::addParentNodeForTransitionLabel(
-    const std::string& transitionLabel, OGFromFileNode* parentNode)
-{
+    const std::string& transitionLabel, OGFromFileNode* parentNode) {
     transitionLabel2parentNode[transitionLabel] = parentNode;
 }
 
+
 OGFromFileNode* OGFromFileNode::getParentNodeForTransitionLabel(
-    const std::string& transitionLabel) const
-{
+    const std::string& transitionLabel) const {
+
     transitionLabel2parentNode_t::const_iterator trans2parent_iter =
         transitionLabel2parentNode.find(transitionLabel);
 
@@ -84,33 +85,33 @@ OGFromFileNode* OGFromFileNode::getParentNodeForTransitionLabel(
     return trans2parent_iter->second;
 }
 
-std::string OGFromFileNode::getName() const
-{
+
+std::string OGFromFileNode::getName() const {
     return name_;
 }
 
-GraphNodeColor OGFromFileNode::getColor() const
-{
+
+GraphNodeColor OGFromFileNode::getColor() const {
     return color_;
 }
 
-bool OGFromFileNode::isBlue() const
-{
+
+bool OGFromFileNode::isBlue() const {
     return getColor() == BLUE;
 }
 
-bool OGFromFileNode::isRed() const
-{
+
+bool OGFromFileNode::isRed() const {
     return getColor() == RED;
 }
 
-void OGFromFileNode::addTransition(OGFromFileTransition* transition)
-{
+
+void OGFromFileNode::addTransition(OGFromFileTransition* transition) {
     transitions.insert(transition);
 }
 
-void OGFromFileNode::removeTransitionsToNode(const OGFromFileNode* nodeToDelete)
-{
+
+void OGFromFileNode::removeTransitionsToNode(const OGFromFileNode* nodeToDelete) {
 	transitions_t::iterator iTransition = transitions.begin();
 	while (iTransition != transitions.end()) {
 		if ((*iTransition)->getDst() == nodeToDelete) {
@@ -123,15 +124,17 @@ void OGFromFileNode::removeTransitionsToNode(const OGFromFileNode* nodeToDelete)
 	}
 }
 
+
 bool OGFromFileNode::hasTransitionWithLabel(const std::string& transitionLabel)
-    const
-{
+    const {
+
 	return getTransitionWithLabel(transitionLabel) != NULL;
 }
 
+
 bool OGFromFileNode::hasBlueTransitionWithLabel(
-    const std::string& transitionLabel) const
-{
+    const std::string& transitionLabel) const {
+
     OGFromFileTransition* transition = getTransitionWithLabel(transitionLabel);
     if (transition == NULL)
         return false;
@@ -139,28 +142,28 @@ bool OGFromFileNode::hasBlueTransitionWithLabel(
     return transition->getDst()->isBlue();
 }
 
+
 OGFromFileTransition* OGFromFileNode::getTransitionWithLabel(
-    const std::string& transitionLabel) const
-{
+    const std::string& transitionLabel) const {
 
     //cout << "\tgetTransitionWithLabel : start " << endl;
 
     for (transitions_t::const_iterator trans_iter = transitions.begin();
-        trans_iter != transitions.end(); ++trans_iter)
-    {
+        trans_iter != transitions.end(); ++trans_iter) {
+
         if ((*trans_iter)->hasLabel(transitionLabel)) {
 		    //cout << "\tgetTransitionWithLabel : end1 " << endl;
             return *trans_iter;
         }
     }
-
     //cout << "\tgetTransitionWithLabel : end2 " << endl;
     return NULL;
 }
 
+
 OGFromFileNode* OGFromFileNode::fireTransitionWithLabel(
-    const std::string& transitionLabel)
-{
+    const std::string& transitionLabel) {
+
     if (transitionLabel == GraphFormulaLiteral::TAU) {
         return this;
     }
@@ -175,29 +178,30 @@ OGFromFileNode* OGFromFileNode::fireTransitionWithLabel(
     return dst;
 }
 
+
 OGFromFileNode* OGFromFileNode::backfireTransitionWithLabel(
-    const std::string& transitionLabel) const
-{
+    const std::string& transitionLabel) const {
+
     return getParentNodeForTransitionLabel(transitionLabel);
 }
 
+
 bool OGFromFileNode::assignmentSatisfiesAnnotation(
-    const GraphFormulaAssignment& assignment) const
-{
+    const GraphFormulaAssignment& assignment) const {
+
     assert(annotation_ != NULL);
     return annotation_->satisfies(assignment);
 }
 
-std::string OGFromFileNode::getAnnotationAsString() const
-{
+
+std::string OGFromFileNode::getAnnotationAsString() const {
     assert(annotation_ != NULL);
     return annotation_->asString();
 }
 
+
 GraphFormula* OGFromFileNode::getAnnotation() const {
-
     return annotation_;
-
 }
 
 
@@ -225,34 +229,35 @@ GraphFormulaAssignment* OGFromFileNode::getAssignment() const {
 
 
 void OGFromFileNode::setDepthFirstSearchParent(
-    OGFromFileNode* depthFirstSearchParent_)
-{
+    OGFromFileNode* depthFirstSearchParent_) {
+
     depthFirstSearchParent = depthFirstSearchParent_;
 }
 
-OGFromFileNode* OGFromFileNode::getDepthFirstSearchParent() const
-{
+
+OGFromFileNode* OGFromFileNode::getDepthFirstSearchParent() const {
     return depthFirstSearchParent;
 }
 
+
 OGFromFileTransition::OGFromFileTransition(OGFromFileNode* src_,
     OGFromFileNode* dst_, const std::string& label_) :
-    src(src_), dst(dst_), label(label_)
-{
+    src(src_), dst(dst_), label(label_) {
+
 }
 
-bool OGFromFileTransition::hasLabel(const std::string& label_) const
-{
+
+bool OGFromFileTransition::hasLabel(const std::string& label_) const {
     return label == label_;
 }
 
-OGFromFileNode* OGFromFileTransition::getDst() const
-{
+
+OGFromFileNode* OGFromFileTransition::getDst() const {
     return dst;
 }
 
-OGFromFileNode* OGFromFileTransition::getSrc() const
-{
+
+OGFromFileNode* OGFromFileTransition::getSrc() const {
     return src;
 }
 
@@ -262,35 +267,35 @@ const std::string OGFromFileTransition::getLabel() {
 }
 
 
-OGFromFile::OGFromFile() : root(NULL)
-{
+OGFromFile::OGFromFile() : root(NULL) {
 }
 
-OGFromFile::~OGFromFile()
-{
+
+OGFromFile::~OGFromFile() {
     for (nodes_iterator node_iter = nodes.begin(); node_iter != nodes.end();
-         ++node_iter)
-    {
+         ++node_iter) {
         delete *node_iter;
     }
 }
 
-void OGFromFile::addNode(OGFromFileNode* node)
-{
+
+void OGFromFile::addNode(OGFromFileNode* node) {
     nodes.insert(node);
 }
 
+
 OGFromFileNode* OGFromFile::addNode(const std::string& nodeName,
-    GraphFormula* annotation, GraphNodeColor color)
-{
+    GraphFormula* annotation, GraphNodeColor color) {
+
     OGFromFileNode* node = new OGFromFileNode(nodeName, annotation, color);
     addNode(node);
     return node;
 }
 
+
 void OGFromFile::addTransition(const std::string& srcName,
-    const std::string& dstName, const std::string& label)
-{
+    const std::string& dstName, const std::string& label) {
+
     OGFromFileNode* src = getNodeWithName(srcName);
     OGFromFileNode* dst = getNodeWithName(dstName);
     assert(src != NULL);
@@ -299,40 +304,41 @@ void OGFromFile::addTransition(const std::string& srcName,
     src->addTransition(transition);
 }
 
-bool OGFromFile::hasNodeWithName(const std::string& nodeName) const
-{
+
+bool OGFromFile::hasNodeWithName(const std::string& nodeName) const {
     return getNodeWithName(nodeName) != NULL;
 }
 
-OGFromFileNode* OGFromFile::getNodeWithName(const std::string& nodeName) const
-{
+
+OGFromFileNode* OGFromFile::getNodeWithName(const std::string& nodeName) const {
+
     for (nodes_const_iterator node_iter = nodes.begin();
-         node_iter != nodes.end(); ++node_iter)
-    {
-        if ((*node_iter)->getName() == nodeName)
+         node_iter != nodes.end(); ++node_iter) {
+
+        if ((*node_iter)->getName() == nodeName) {
             return *node_iter;
+        }
     }
 
     return NULL;
 }
 
-OGFromFileNode* OGFromFile::getRoot() const
-{
+
+OGFromFileNode* OGFromFile::getRoot() const {
     return root;
 }
 
-void OGFromFile::setRoot(OGFromFileNode* newRoot)
-{
+void OGFromFile::setRoot(OGFromFileNode* newRoot) {
     root = newRoot;
 }
 
-void OGFromFile::setRootToNodeWithName(const std::string& nodeName)
-{
+
+void OGFromFile::setRootToNodeWithName(const std::string& nodeName) {
     setRoot(getNodeWithName(nodeName));
 }
 
-bool OGFromFile::hasNoRoot() const
-{
+
+bool OGFromFile::hasNoRoot() const {
     return getRoot() == NULL;
 }
 
@@ -342,11 +348,12 @@ void OGFromFile::removeFalseNodes() {
 	trace(TRACE_5, "OGFromFile::removeFalseNodes(): start\n");
 
 	bool nodesHaveChanged = true;
+
 	while (nodesHaveChanged) {
 		nodesHaveChanged = false;
 		nodes_iterator iNode = nodes.begin();
-		while (iNode != nodes.end())
-		{
+
+		while (iNode != nodes.end()) {
 			GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
 			if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
 				removeTransitionsToNodeFromAllOtherNodes(*iNode);
@@ -410,10 +417,10 @@ bool OGFromFile::simulates(OGFromFile *smallerOG) {
 //! \param myVisitedNodes a set containing the visited nodes in this OGFromFile
 //! \param simNode a node in the simulant
 //! \param simVisitedNodes same as myVisitedNodes in the simulant
-bool OGFromFile::simulatesRecursive ( OGFromFileNode *myNode, 
-									  set<OGFromFileNode*> *myVisitedNodes, 
-									  OGFromFileNode *simNode,
-									  set<OGFromFileNode*> *simVisitedNodes) {
+bool OGFromFile::simulatesRecursive (OGFromFileNode *myNode, 
+									 set<OGFromFileNode*> *myVisitedNodes, 
+									 OGFromFileNode *simNode,
+									 set<OGFromFileNode*> *simVisitedNodes) {
 	//If the simulant has no further nodes then myNode simulates simNode.
 	if ( simNode == NULL )
 		return true;
@@ -514,15 +521,14 @@ OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
 }
 
 
-OGFromFile* OGFromFile::product(const ogs_t& ogs)
-{
+OGFromFile* OGFromFile::product(const ogs_t& ogs) {
     assert(ogs.size() > 1);
 
     ogs_t::const_iterator iOG = ogs.begin();
     OGFromFile* firstOG = *iOG++;
     OGFromFile* productOG = firstOG->product(*iOG);
-    for (++iOG; iOG != ogs.end(); ++iOG)
-    {
+
+    for (++iOG; iOG != ogs.end(); ++iOG) {
         OGFromFile* oldProductOG = productOG;
         productOG = productOG->product(*iOG);
         delete oldProductOG;
@@ -530,6 +536,7 @@ OGFromFile* OGFromFile::product(const ogs_t& ogs)
 
     return productOG;
 }
+
 
 void OGFromFile::buildProductOG(OGFromFileNode* currentOGNode,
                                 OGFromFileNode* currentRhsNode,
@@ -598,9 +605,10 @@ void OGFromFile::buildProductOG(OGFromFileNode* currentOGNode,
 	trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): end\n");
 }
 
+
 GraphFormulaCNF* OGFromFile::createProductAnnotation(const OGFromFileNode* lhs,
-    const OGFromFileNode* rhs) const
-{
+    const OGFromFileNode* rhs) const {
+
     GraphFormulaMultiaryAnd* conjunction = new GraphFormulaMultiaryAnd(
         lhs->getAnnotation()->getDeepCopy(),
         rhs->getAnnotation()->getDeepCopy());
@@ -611,36 +619,35 @@ GraphFormulaCNF* OGFromFile::createProductAnnotation(const OGFromFileNode* lhs,
     return cnf;
 }
 
-std::string OGFromFile::getProductOGFilePrefix(const ogfiles_t& ogfiles)
-{
+
+std::string OGFromFile::getProductOGFilePrefix(const ogfiles_t& ogfiles) {
     assert(ogfiles.size() != 0);
 
     ogfiles_t::const_iterator iOgFile = ogfiles.begin();
     string productFilePrefix = stripOGFileSuffix(*iOgFile);
 
-    for (++iOgFile; iOgFile != ogfiles.end(); ++iOgFile)
-    {
-        productFilePrefix += "_X_" +
-            stripOGFileSuffix(platform_basename(*iOgFile));
+    for (++iOgFile; iOgFile != ogfiles.end(); ++iOgFile) {
+        productFilePrefix += "_X_" + stripOGFileSuffix(platform_basename(*iOgFile));
     }
 
     return productFilePrefix;
 }
 
-std::string OGFromFile::stripOGFileSuffix(const std::string& filename)
-{
+
+std::string OGFromFile::stripOGFileSuffix(const std::string& filename) {
+
     static const string ogFileSuffix = ".og";
-    if (filename.substr(filename.size() - ogFileSuffix.size()) == ogFileSuffix)
-    {
+    if (filename.substr(filename.size() - ogFileSuffix.size()) == ogFileSuffix) {
         return filename.substr(0, filename.size() - ogFileSuffix.size());
     }
 
     return filename;
 }
 
+
 void OGFromFile::printDotFile(const std::string& filenamePrefix,
-    const std::string& dotGraphTitle) const
-{
+    const std::string& dotGraphTitle) const {
+
     trace(TRACE_0, "creating the dot file of the OG...\n");
 
     string dotFile = filenamePrefix + ".out";
@@ -667,8 +674,8 @@ void OGFromFile::printDotFile(const std::string& filenamePrefix,
     system(cmd.c_str());
 }
 
-void OGFromFile::printDotFile(const std::string& filenamePrefix) const
-{
+
+void OGFromFile::printDotFile(const std::string& filenamePrefix) const {
     printDotFile(filenamePrefix, filenamePrefix);
 }
 
@@ -714,6 +721,7 @@ void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFrom
 }
 
 
+//! \brief prints all nodes and transitions of an OG to file .og
 void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
     fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(),
         ios_base::out | ios_base::trunc);
@@ -755,16 +763,15 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
 
     ogFile << "TRANSITIONS" << endl;
     bool printedFirstTransition = false;
-    for (nodes_t::const_iterator iNode = nodes.begin(); iNode != nodes.end();
-        ++iNode)
-    {
+    for (nodes_t::const_iterator iNode = nodes.begin();
+         iNode != nodes.end(); ++iNode) {
+
         OGFromFileNode* node = *iNode;
-        for (OGFromFileNode::transitions_t::const_iterator iTransition =
-            node->transitions.begin(); iTransition != node->transitions.end();
-            ++iTransition)
-        {
-            if (printedFirstTransition)
-            {
+        for (OGFromFileNode::transitions_t::const_iterator
+             iTransition = node->transitions.begin();
+             iTransition != node->transitions.end(); ++iTransition) {
+
+            if (printedFirstTransition) {
                 ogFile << ',' << endl;
             }
 
@@ -782,7 +789,6 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
 }
 
 
-std::string OGFromFile::addOGFileSuffix(const std::string& filePrefix)
-{
+std::string OGFromFile::addOGFileSuffix(const std::string& filePrefix) {
     return filePrefix + ".og";
 }

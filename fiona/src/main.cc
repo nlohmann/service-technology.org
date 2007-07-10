@@ -309,7 +309,7 @@ int main(int argc, char ** argv) {
                 trace(TRACE_0, "NO\n");
             }
         } else {
-            cerr << "Error: \t If option -x is used, exactly two oWFN must be entered\n" << endl;
+            cerr << "Error: \t If option -x is used, exactly two oWFNs must be entered\n" << endl;
         }
 
         return 0;
@@ -557,6 +557,7 @@ int main(int argc, char ** argv) {
         trace("\n");
 
         productOG->printOGFile(outfilePrefix);
+        productOG->printDotFile(outfilePrefix);
         delete productOG;
 
         for (OGFromFile::ogs_t::const_iterator iOg = OGsFromFiles.begin();

@@ -45,23 +45,24 @@
 
 typedef enum
 {
-   	O_HELP,
-	O_VERSION,
-	O_DEBUG,
-	O_GRAPH_TYPE,	//!< OG or IG
-	O_MESSAGES_MAX,
-	O_EVENT_USE_MAX,
-	O_CALC_REDUCED_IG,
-	O_SHOW_NODES,	//!<
-	O_CALC_ALL_STATES,
-	O_BDD,
-	O_OTF, //on the fly
-	O_EX,
-	O_MATCH,
-	O_PRODUCTOG,
-	O_SIMULATES,
-	O_EQUALS,
-    O_OUTFILEPREFIX
+    O_HELP,
+    O_VERSION,
+    O_DEBUG,
+    O_GRAPH_TYPE,	//!< OG or IG
+    O_MESSAGES_MAX,
+    O_EVENT_USE_MAX,
+    O_CALC_REDUCED_IG,
+    O_SHOW_NODES,	//!<
+    O_CALC_ALL_STATES,
+    O_BDD,
+    O_OTF, //on the fly
+    O_EX,
+    O_MATCH,
+    O_PRODUCTOG,
+    O_SIMULATES,
+    O_EQUALS,
+    O_OUTFILEPREFIX,
+    O_SYNTHESIZE_PARTNER_OWFN       //!< compute an oWFN from the IG/OG
 } possibleOptions;
 
 typedef enum

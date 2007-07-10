@@ -297,23 +297,33 @@ void parse_command_line(int argc, char* argv[]) {
                     options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = false;
                     parameters[P_IG] = true;
+                } else if (lc_optarg == "smallpartner") {
+                    options[O_GRAPH_TYPE] = true;
+                    parameters[P_OG] = false;
+                    parameters[P_IG] = true;
+		    options[O_SYNTHESIZE_PARTNER_OWFN] = true;
+                } else if (lc_optarg == "mostpermissivepartner") {
+                    options[O_GRAPH_TYPE] = true;
+                    parameters[P_OG] = true;
+                    parameters[P_IG] = false;
+		    options[O_SYNTHESIZE_PARTNER_OWFN] = true;
                 } else if (lc_optarg == "match") {
                     options[O_MATCH] = true;
-				} else if (lc_optarg == "simulation") {
-					options[O_SIMULATES] = true;
-				} else if (lc_optarg == "equality") {
-					options[O_EQUALS] = true;
-				} else if (lc_optarg == "equivalence") {
-	                options[O_EX] = true;
-	                options[O_GRAPH_TYPE] = false;
-	                parameters[P_IG] = false;
-	                parameters[P_OG] = false;
-				} else if (lc_optarg == "productog") {
-					options[O_PRODUCTOG] = true;
+		} else if (lc_optarg == "simulation") {
+		    options[O_SIMULATES] = true;
+		} else if (lc_optarg == "equality") {
+		    options[O_EQUALS] = true;
+		} else if (lc_optarg == "equivalence") {
+		    options[O_EX] = true;
+		    options[O_GRAPH_TYPE] = false;
+		    parameters[P_IG] = false;
+		    parameters[P_OG] = false;
+		} else if (lc_optarg == "productog") {
+		    options[O_PRODUCTOG] = true;
                 } else {
                     cerr << "Error:\twrong modus operandi (option -t)" << endl
-                         << "\tEnter \"fiona --help\" for more information.\n"
-                         << endl;
+		    << "\tEnter \"fiona --help\" for more information.\n"
+		    << endl;
                     exit(1);
                 }
                 break;

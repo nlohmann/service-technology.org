@@ -121,6 +121,10 @@ public:
     void printGraphToDot();
     void printGraphToDotRecursively(GraphNode * v, fstream& os, bool[]);
 
+    // functions to create an STG representation of the IG or OG
+    void printGraphToSTG();
+    void printGraphToSTGRecursively(GraphNode * v, fstream& os, bool[]);
+    
     void printNodeStatistics();
     bool stateActivatesOutputEvents(State *);
 

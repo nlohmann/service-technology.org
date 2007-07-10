@@ -40,6 +40,7 @@
 #include "debug.h"
 #include "binDecision.h"
 #include "communicationGraph.h"
+#include "fiona.h"
 #include <cassert>
 
 using namespace std;
@@ -919,5 +920,170 @@ void communicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
             printGraphToDotRecursively(vNext, os, visitedNodes);
         }
     } // while
+}
+
+
+
+
+
+//! \brief creates a STG file of the graph
+void communicationGraph::printGraphToSTG() {
+    trace(TRACE_0, "creating the STG file of the graph...\n");
+    GraphNode *tmp = root;
+    
+    // set file name
+    char buffer[256];
+    if (parameters[P_OG]) {
+	if (options[O_CALC_ALL_STATES]) {
+	    sprintf(buffer, "%s.OG.stg", netfile);
+	} else {
+	    sprintf(buffer, "%s.R.OG.stg", netfile);
+	}
+    } else {
+	if (options[O_CALC_ALL_STATES]) {
+	    sprintf(buffer, "%s.IG.stg", netfile);
+	} else {
+	    sprintf(buffer, "%s.R.IG.stg", netfile);
+	}
+    }
+    
+    // create file
+    fstream dotFile(buffer, ios_base::out | ios_base::trunc);
+    
+    // print header
+    dotFile << ".model Labeled_Transition_System" << endl;
+    
+    dotFile << ".dummy";
+    assert(PN != NULL);
+    for (unsigned int i = 0; i < PN->getPlaceCount(); i++)
+    {
+	if (PN->getPlace(i)->type == INPUT || PN->getPlace(i)->type == OUTPUT)
+	    dotFile << " " << PN->getPlace(i)->name;
+    }
+    dotFile << endl;
+    
+    dotFile << ".state graph" << endl;
+
+    // mark all nodes as unvisited
+    bool visitedNodes[getNumberOfNodes()];
+    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
+	visitedNodes[i] = false;
+    }
+    
+    // traverse the nodes recursively
+    printGraphToSTGRecursively(tmp, dotFile, visitedNodes);
+    
+    // the initial marking
+    dotFile << ".marking {p" << tmp->getNumber() << "}" << endl;
+    
+    // end and close file
+    dotFile << ".end" << endl;
+    dotFile.close();
+    
+    // prepare Petrify command line for printing
+    if (parameters[P_OG]) {
+	sprintf(buffer, "petrify4.2 %s.OG.stg -dead -ip -o %s.OG.stg.pn", netfile, netfile);
+    } else {
+	sprintf(buffer, "petrify4.2 %s.IG.stg -dead -ip -o %s.IG.stg.pn", netfile, netfile);
+    }
+    
+    // print commandline and execute system command
+    trace(TRACE_0, string(buffer) + "\n");
+    
+    if (HAVE_PETRIFY == 1)
+      system(buffer);
+}
+
+
+
+
+
+//! \param v current node in the iteration process
+//! \param os output stream
+//! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
+//! \brief breadthsearch through the graph printing each node and edge to the output stream
+void communicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, bool visitedNodes[]) {
+    assert(v != NULL);
+    
+    if (!v->isToShow(root))
+        return;
+    
+    /*
+    os << "p" << v->getNumber() << " [label=\"# " << v->getNumber() << "\\n";
+    
+    StateSet::iterator iter;  // iterator over the stateList's elements
+    
+    if (parameters[P_SHOW_STATES_PER_NODE] || parameters[P_SHOW_DEADLOCKS_PER_NODE]) {
+	
+        for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
+	    
+            (*iter)->decode(PN);    // need to decide if it is an external or internal deadlock
+	    
+            string kindOfDeadlock = "i"; // letter for 'i' internal or 'e' external deadlock
+            unsigned int i;
+	    
+            switch ((*iter)->type) {
+                case DEADLOCK:
+                    os << "[" << PN->getCurrentMarkingAsString() << "]";
+                    os << " (";
+		    
+                    if (PN->transNrQuasiEnabled > 0) {
+                        kindOfDeadlock = "e";
+                    } else {
+                        for (i = 0; i < PN->getOutputPlaceCount(); i++) {
+                            if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                                kindOfDeadlock = "e";
+                                continue;
+                            }
+                        }
+                    }
+			os << kindOfDeadlock << "DL" << ")" << "\\n";
+                    break;
+                case FINALSTATE:
+                    os << "[" << PN->getCurrentMarkingAsString() << "]";
+                    os << " (";
+                    os << "FS" << ")" << "\\n";
+                    break;
+                default:
+                    if (parameters[P_SHOW_STATES_PER_NODE]) {
+                        os << "[" << PN->getCurrentMarkingAsString() << "]";
+                        os << " (" << "TR" << ")" << "\\n";
+                    }
+                    break;
+            }
+        }
+    }
+    
+    if (parameters[P_OG]) {
+        // add annotation to node
+        v->getCNFformula()->simplify();
+        os << v->getCNFformula()->asString();
+    }
+    
+    os << "\", fontcolor=black, color=" << v->getColor().toString();
+    if (v->getColor() == RED) {
+        os << ", style=dashed";
+    }
+    os << "];\n";
+     */
+    
+    v->resetIteratingSuccNodes();
+    visitedNodes[v->getNumber()] = true;
+    GraphEdge *element;
+    
+    // arcs
+    while ((element = v->getNextSuccEdge()) != NULL) {
+        GraphNode * vNext = element->getDstNode();
+	
+        if (!vNext->isToShow(root))
+            continue;
+	
+	string this_edges_label = element->getLabel().substr(1, element->getLabel().size());
+        os << "p" << v->getNumber() << " " << this_edges_label << " p" << vNext->getNumber() << endl;
+
+	if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
+            printGraphToSTGRecursively(vNext, os, visitedNodes);
+        }
+    }
 }
 

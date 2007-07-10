@@ -453,6 +453,10 @@ int main(int argc, char ** argv) {
             graph->printGraphToDot();      // .out
             graph->printOGtoFile();       // .og
 
+	    if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
+		graph->printGraphToSTG();	    
+	    }	    
+	    
             if (options[O_OTF]) {
                 //graph->bdd->printGraphToDot();
                 graph->bdd->save("OTF");
@@ -512,6 +516,10 @@ int main(int argc, char ** argv) {
             // generate output files
             graph->printGraphToDot();      // .out
 
+	    if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
+		graph->printGraphToSTG();	    
+	    }
+	    
             trace(TRACE_5, "computation finished -- trying to delete graph\n");
 //			trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
             delete graph;
@@ -558,6 +566,7 @@ int main(int argc, char ** argv) {
 
         productOG->printOGFile(outfilePrefix);
         productOG->printDotFile(outfilePrefix);
+	
         delete productOG;
 
         for (OGFromFile::ogs_t::const_iterator iOg = OGsFromFiles.begin();

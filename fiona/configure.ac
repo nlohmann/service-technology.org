@@ -4,7 +4,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 2.0, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.24 $)
+AC_REVISION($Revision: 1.25 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -36,6 +36,14 @@ AC_CHECK_LIB([m], [main])
 AC_PROG_LEX
 if test "$LEX" != "flex"; then
  AC_MSG_ERROR([flex was not found.])
+fi
+
+AC_CHECK_PROG(PETRIFY, petrify4.1, petrify4.1, not found)
+if test "$PETRIFY" = "not found"; then
+ AC_MSG_WARN([Petrify 4.1 was not found.])
+ AC_DEFINE(HAVE_PETRIFY, 0, [Petrify 4.1 can not be used on this system.])
+else
+ AC_DEFINE(HAVE_PETRIFY, 1, [Petrify 4.1 can be used on this system.])
 fi
 
 AC_CHECK_PROG(YACC, bison, bison, not found)

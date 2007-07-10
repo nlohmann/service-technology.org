@@ -28,17 +28,17 @@
  *
  * \author  Thomas Heidinger <heidinge@informatik.hu-berlin.de>,
  *          Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2007-06-07
  *
- * \date    \$Date: 2007/06/28 07:38:16 $
+ * \date    \$Date: 2007/07/10 09:40:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 
 
@@ -129,7 +129,7 @@ void data_extension_main()
       output = NULL;
       
 #ifdef HAVE_DOT
-      string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".png " + globals::output_filename + "." + suffixes[F_DOT];
+      string systemcall = "dot -q -Tpng -o\"" + globals::output_filename + ".png\" \"" + globals::output_filename + "." + suffixes[F_DOT] + "\"";
       trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
       trace(TRACE_INFORMATION, systemcall + "\n\n");
       system(systemcall.c_str());

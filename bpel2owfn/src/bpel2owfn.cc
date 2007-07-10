@@ -31,17 +31,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/02 09:02:35 $
+ * \date    \$Date: 2007/07/10 09:40:17 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.186 $
+ * \version \$Revision: 1.187 $
  */
 
 
@@ -209,7 +209,7 @@ void single_output(set< string >::iterator file)
       globals::AST->fprintdot(dotfile, "", "", "", true, true, true);
       fclose(dotfile);
 #ifdef HAVE_DOT
-      string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".png " + globals::output_filename + "." + suffixes[F_DOT];
+      string systemcall = "dot -q -Tpng -o\"" + globals::output_filename + ".png\" \"" + globals::output_filename + "." + suffixes[F_DOT] + "\"";
       trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
       trace(TRACE_INFORMATION, systemcall + "\n\n");
       system(systemcall.c_str());
@@ -237,7 +237,7 @@ void single_output(set< string >::iterator file)
         output = NULL;
       }
       #ifdef HAVE_DOT
-      string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".png " + globals::output_filename + "." + suffixes[F_DOT];
+      string systemcall = "dot -q -Tpng -o\"" + globals::output_filename + ".png\" \"" + globals::output_filename + "." + suffixes[F_DOT] + "\"";
       trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
       trace(TRACE_INFORMATION, systemcall + "\n\n");
       system(systemcall.c_str());
@@ -575,7 +575,7 @@ void final_output()
         output = NULL;
 
 #ifdef HAVE_DOT
-	string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".png " + globals::output_filename + "." + suffixes[F_DOT];
+        string systemcall = "dot -q -Tpng -o\"" + globals::output_filename + ".png\" \"" + globals::output_filename + "." + suffixes[F_DOT] + "\"";
 	trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
 	trace(TRACE_INFORMATION, systemcall + "\n\n");
 	system(systemcall.c_str());

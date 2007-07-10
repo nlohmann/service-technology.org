@@ -32,17 +32,17 @@
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/06/28 07:38:15 $
+ * \date    \$Date: 2007/07/10 09:40:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  *
  * \todo    
  *          - commandline option to control drawing of clusters 
@@ -850,7 +850,7 @@ void processCFG()
       closeOutput(output);
       output = NULL;
 #ifdef HAVE_DOT
-      string systemcall = "dot -q -Tpng -o" + globals::output_filename + ".cfg.png " + globals::output_filename + ".cfg." + suffixes[F_DOT];
+      string systemcall = "dot -q -Tpng -o\"" + globals::output_filename + ".cfg.png\" \"" + globals::output_filename + ".cfg." + suffixes[F_DOT] + "\"";
       trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
       trace(TRACE_INFORMATION, systemcall + "\n\n");
       system(systemcall.c_str());
@@ -861,3 +861,4 @@ void processCFG()
 
   delete(CFG);
 }
+

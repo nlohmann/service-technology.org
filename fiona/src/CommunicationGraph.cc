@@ -982,9 +982,9 @@ void communicationGraph::printGraphToSTG() {
     
     // prepare Petrify command line for printing
     if (parameters[P_OG]) {
-	sprintf(buffer, "petrify4.2 %s.OG.stg -dead -ip -o %s.OG.stg.pn", netfile, netfile);
+	sprintf(buffer, "petrify4.1 %s.OG.stg -dead -ip -o %s.OG.stg.pn", netfile, netfile);
     } else {
-	sprintf(buffer, "petrify4.2 %s.IG.stg -dead -ip -o %s.IG.stg.pn", netfile, netfile);
+	sprintf(buffer, "petrify4.1 %s.IG.stg -dead -ip -o %s.IG.stg.pn", netfile, netfile);
     }
     
     // print commandline and execute system command

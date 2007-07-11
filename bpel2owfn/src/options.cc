@@ -31,17 +31,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/06/28 07:38:16 $
+ * \date    \$Date: 2007/07/11 09:24:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.89 $
+ * \version \$Revision: 1.90 $
  */
 
 
@@ -602,6 +602,10 @@ void parse_command_line(int argc, char* argv[])
       if (pos == (file->length() - 5))
       {
         globals::output_filename = file->substr(0, pos);
+      }
+      else
+      {
+        globals::output_filename = *file;
       }
       file++;
       while(modus == M_CHOREOGRAPHY && file != inputfiles.end())

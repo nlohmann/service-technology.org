@@ -990,10 +990,11 @@ void communicationGraph::printGraphToSTG() {
     // print commandline and execute system command
     trace(TRACE_0, string(buffer) + "\n");
     
-    if (HAVE_PETRIFY == 1)
+    if (HAVE_PETRIFY == 1) {
         system(buffer.c_str());
-    else
+    } else {
         trace(TRACE_0, "cannot execute command as Petrify was not found in path\n");
+    }
 }
 
 

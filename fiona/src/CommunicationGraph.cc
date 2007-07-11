@@ -934,17 +934,17 @@ void communicationGraph::printGraphToSTG() {
     // set file name
     char buffer[256];
     if (parameters[P_OG]) {
-	if (options[O_CALC_ALL_STATES]) {
-	    sprintf(buffer, "%s.OG.stg", netfile);
-	} else {
-	    sprintf(buffer, "%s.R.OG.stg", netfile);
-	}
+        if (options[O_CALC_ALL_STATES]) {
+            sprintf(buffer, "%s.OG.stg", netfile);
+        } else {
+            sprintf(buffer, "%s.R.OG.stg", netfile);
+        }
     } else {
-	if (options[O_CALC_ALL_STATES]) {
-	    sprintf(buffer, "%s.IG.stg", netfile);
-	} else {
-	    sprintf(buffer, "%s.R.IG.stg", netfile);
-	}
+        if (options[O_CALC_ALL_STATES]) {
+            sprintf(buffer, "%s.IG.stg", netfile);
+        } else {
+            sprintf(buffer, "%s.R.IG.stg", netfile);
+        }
     }
     
     // create file
@@ -957,17 +957,17 @@ void communicationGraph::printGraphToSTG() {
     assert(PN != NULL);
     for (unsigned int i = 0; i < PN->getPlaceCount(); i++)
     {
-	if (PN->getPlace(i)->type == INPUT || PN->getPlace(i)->type == OUTPUT)
-	    dotFile << " " << PN->getPlace(i)->name;
+        if (PN->getPlace(i)->type == INPUT || PN->getPlace(i)->type == OUTPUT)
+            dotFile << " " << PN->getPlace(i)->name;
     }
     dotFile << endl;
     
     dotFile << ".state graph" << endl;
-
+    
     // mark all nodes as unvisited
     bool visitedNodes[getNumberOfNodes()];
     for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-	visitedNodes[i] = false;
+        visitedNodes[i] = false;
     }
     
     // traverse the nodes recursively
@@ -982,16 +982,16 @@ void communicationGraph::printGraphToSTG() {
     
     // prepare Petrify command line for printing
     if (parameters[P_OG]) {
-	sprintf(buffer, "petrify4.1 %s.OG.stg -dead -ip -o %s.OG.stg.pn", netfile, netfile);
+        sprintf(buffer, "petrify4.1 %s.OG.stg -dead -ip -o %s.OG.stg.pn", netfile, netfile);
     } else {
-	sprintf(buffer, "petrify4.1 %s.IG.stg -dead -ip -o %s.IG.stg.pn", netfile, netfile);
+        sprintf(buffer, "petrify4.1 %s.IG.stg -dead -ip -o %s.IG.stg.pn", netfile, netfile);
     }
     
     // print commandline and execute system command
     trace(TRACE_0, string(buffer) + "\n");
     
     if (HAVE_PETRIFY == 1)
-      system(buffer);
+        system(buffer);
 }
 
 
@@ -1078,10 +1078,10 @@ void communicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, 
         if (!vNext->isToShow(root))
             continue;
 	
-	string this_edges_label = element->getLabel().substr(1, element->getLabel().size());
+        string this_edges_label = element->getLabel().substr(1, element->getLabel().size());
         os << "p" << v->getNumber() << " " << this_edges_label << " p" << vNext->getNumber() << endl;
 
-	if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
+        if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
             printGraphToSTGRecursively(vNext, os, visitedNodes);
         }
     }

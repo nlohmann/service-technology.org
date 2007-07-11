@@ -29,17 +29,17 @@
  * \brief   WSDL extension
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/06/28 07:38:16 $
+ * \date    \$Date: 2007/07/11 11:35:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 
 
@@ -378,14 +378,26 @@ void WSDL::checkVariable(ASTE *activity) const
      if(activity->attributes["inputVariable"] != "")
        inputName = activity->attributes["inputVariable"];
      if(activity->attributes["outputVariable"] != "")
+       {
        outputName = activity->attributes["outputVariable"];
+       error = false;
+       }
+     if((activity->attributes["inputVariable"] == "") &&  (activity->attributes["outputVariable"] == ""))
+       error = false;
    }
 
    if (activity->activityTypeName() == "receive" || activity->activityTypeName() == "reply")
    {
      SAID = 58;
      if(activity->attributes["variable"] != "")
+     {
        inputName = activity->attributes["variable"];
+     }
+     else
+     {
+       error = false;
+     }
+    
    }
 
    if (activity->activityTypeName() == "onMessage" || activity->activityTypeName() == "onEvent" )
@@ -399,6 +411,8 @@ void WSDL::checkVariable(ASTE *activity) const
 
      if(activity->attributes["element"] != "")
        globals::ASTE_variableMap[toString(globals::PPcurrentScope) + "." + inputName] = activity->attributes["element"];
+     if ((activity->attributes["element"] == "") && (activity->attributes["messageType"] == "") && (activity->attributes["variable"] != ""))
+       error = false;
    }
    
    if (inputName != "" && activity->activityTypeName() != "invoke")
@@ -407,7 +421,8 @@ void WSDL::checkVariable(ASTE *activity) const
      if (plink != NULL &&
          plink->myRole.second != NULL &&
          plink->myRole.second->Operations[operation] != NULL &&
-         plink->myRole.second->Operations[operation]->input != NULL)
+         (plink->myRole.second->Operations[operation]->input != NULL ||
+          plink->myRole.second->Operations[operation]->output != NULL))
      {
        if (plink->myRole.second->Operations[operation]->input->name == inputType ||
                  globals::WSDLInfo.messages[plink->myRole.second->Operations[operation]->input->name]->element.second == inputType)

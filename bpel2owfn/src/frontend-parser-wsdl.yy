@@ -37,11 +37,11 @@
  *          Partner Link Type" (http://docs.oasis-open.org/wsbpel/2.0/plnktype)
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/07/06 20:05:29 $
+ * \date    \$Date: 2007/07/11 11:35:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -51,7 +51,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  *
  * \ingroup frontend
  */
@@ -218,7 +218,10 @@ tMessage:
   X_NEXT tPart_list X_SLASH K_MESSAGE
     { globals::WSDLInfo.messages[temp_message->name] = temp_message; }
 | K_MESSAGE arbitraryAttributes X_SLASH
-    { temp_message = new WSDL_Message(globals::tempAttributes["name"]); }
+    { 
+      temp_message = new WSDL_Message(globals::tempAttributes["name"]); 
+      globals::WSDLInfo.messages[temp_message->name] = temp_message;
+    }
 ;
 
 tPart_list:

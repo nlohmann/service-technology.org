@@ -38,7 +38,7 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              syntax/*.owfn \
              bdd_ref/*.owfn bdd_ref/*.cudd \
              philosophers/*.owfn \
-             # sim_og/*.owfn \
+             sim_og/*.owfn \
              philosophers/*.owfn.png
 
 

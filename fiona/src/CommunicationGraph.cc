@@ -932,27 +932,28 @@ void communicationGraph::printGraphToSTG() {
     GraphNode *tmp = root;
     
     // set file name
-    char buffer[256];
+    string buffer = string(netfile);
     if (parameters[P_OG]) {
         if (options[O_CALC_ALL_STATES]) {
-            sprintf(buffer, "%s.OG.stg", netfile);
+            buffer += ".OG.stg";
         } else {
-            sprintf(buffer, "%s.R.OG.stg", netfile);
+            buffer += ".R.OG.stg";
         }
     } else {
         if (options[O_CALC_ALL_STATES]) {
-            sprintf(buffer, "%s.IG.stg", netfile);
+            buffer += ".IG.stg";
         } else {
-            sprintf(buffer, "%s.R.IG.stg", netfile);
+            buffer += ".R.IG.stg";
         }
     }
     
     // create file
-    fstream dotFile(buffer, ios_base::out | ios_base::trunc);
+    fstream dotFile(buffer.c_str(), ios_base::out | ios_base::trunc);
     
     // print header
     dotFile << ".model Labeled_Transition_System" << endl;
     
+    // list transitions (use place names)
     dotFile << ".dummy";
     assert(PN != NULL);
     for (unsigned int i = 0; i < PN->getPlaceCount(); i++)
@@ -960,8 +961,7 @@ void communicationGraph::printGraphToSTG() {
         if (PN->getPlace(i)->type == INPUT || PN->getPlace(i)->type == OUTPUT)
             dotFile << " " << PN->getPlace(i)->name;
     }
-    dotFile << endl;
-    
+    dotFile << endl;    
     dotFile << ".state graph" << endl;
     
     // mark all nodes as unvisited
@@ -982,16 +982,18 @@ void communicationGraph::printGraphToSTG() {
     
     // prepare Petrify command line for printing
     if (parameters[P_OG]) {
-        sprintf(buffer, "petrify4.1 %s.OG.stg -dead -ip -o %s.OG.stg.pn", netfile, netfile);
+        buffer = "petrify4.1 " + string(netfile) + ".OG.stg -dead -ip -o " + string(netfile) + ".OG.pn";
     } else {
-        sprintf(buffer, "petrify4.1 %s.IG.stg -dead -ip -o %s.IG.stg.pn", netfile, netfile);
+        buffer = "petrify4.1 " + string(netfile) + ".IG.stg -dead -ip -o " + string(netfile) + ".IG.pn";
     }
     
     // print commandline and execute system command
     trace(TRACE_0, string(buffer) + "\n");
     
     if (HAVE_PETRIFY == 1)
-        system(buffer);
+        system(buffer.c_str());
+    else
+        trace(TRACE_0, "cannot execute command as Petrify was not found in path\n");
 }
 
 
@@ -1007,65 +1009,6 @@ void communicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, 
     
     if (!v->isToShow(root))
         return;
-    
-    /*
-    os << "p" << v->getNumber() << " [label=\"# " << v->getNumber() << "\\n";
-    
-    StateSet::iterator iter;  // iterator over the stateList's elements
-    
-    if (parameters[P_SHOW_STATES_PER_NODE] || parameters[P_SHOW_DEADLOCKS_PER_NODE]) {
-	
-        for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
-	    
-            (*iter)->decode(PN);    // need to decide if it is an external or internal deadlock
-	    
-            string kindOfDeadlock = "i"; // letter for 'i' internal or 'e' external deadlock
-            unsigned int i;
-	    
-            switch ((*iter)->type) {
-                case DEADLOCK:
-                    os << "[" << PN->getCurrentMarkingAsString() << "]";
-                    os << " (";
-		    
-                    if (PN->transNrQuasiEnabled > 0) {
-                        kindOfDeadlock = "e";
-                    } else {
-                        for (i = 0; i < PN->getOutputPlaceCount(); i++) {
-                            if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-                                kindOfDeadlock = "e";
-                                continue;
-                            }
-                        }
-                    }
-			os << kindOfDeadlock << "DL" << ")" << "\\n";
-                    break;
-                case FINALSTATE:
-                    os << "[" << PN->getCurrentMarkingAsString() << "]";
-                    os << " (";
-                    os << "FS" << ")" << "\\n";
-                    break;
-                default:
-                    if (parameters[P_SHOW_STATES_PER_NODE]) {
-                        os << "[" << PN->getCurrentMarkingAsString() << "]";
-                        os << " (" << "TR" << ")" << "\\n";
-                    }
-                    break;
-            }
-        }
-    }
-    
-    if (parameters[P_OG]) {
-        // add annotation to node
-        v->getCNFformula()->simplify();
-        os << v->getCNFformula()->asString();
-    }
-    
-    os << "\", fontcolor=black, color=" << v->getColor().toString();
-    if (v->getColor() == RED) {
-        os << ", style=dashed";
-    }
-    os << "];\n";
-     */
     
     v->resetIteratingSuccNodes();
     visitedNodes[v->getNumber()] = true;

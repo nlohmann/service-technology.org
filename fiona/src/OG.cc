@@ -113,7 +113,23 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 	while (i < PN->getInputPlaceCount()) {
 
 		trace(TRACE_2, "\t\t\t\t    sending event: !");
-		trace(TRACE_2, string(PN->getInputPlace(i)->name) + "\n");
+		trace(TRACE_2, string(PN->getInputPlace(i)->name));
+
+//        if (currentNode->getColor() == RED) {
+//            // this may happen if current node is target of (one of) its child(s)
+//            // which causes early analyse
+//            trace(TRACE_3, " suppressed (node " + intToString(currentNode->getNumber()) + " already RED)\n");
+//
+//            currentNode->removeLiteralFromFormula(i, SENDING);
+//
+//            addProgress(your_progress);
+//            printProgress();
+//
+//            i++;
+//            continue;
+//        } else {
+//            trace(TRACE_2, "\n");
+//        }
 
 		if (PN->getInputPlace(i)->max_occurence < 0 ||
             PN->getInputPlace(i)->max_occurence > currentNode->eventsUsed[i]) {
@@ -165,12 +181,12 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
                     GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
                     currentNode->addSuccessorNode(newEdge);
 
-                    // If that node was computed BLUE before, check again
-                    // its color, since its successors may have been set
-                    // RED meanwhile
-                    if (found->getColor() == BLUE) {
-                        analyseNode(found);
-                    }
+//                    // If that node was computed BLUE before, check again
+//                    // its color, since its successors may have been set
+//                    // RED meanwhile
+//                    if (found->getColor() == BLUE) {
+//                        analyseNode(found);
+//                    }
 
 					// Still, if that node was computed red before, the literal
 					// of the edge from currentNode to the old node must be removed
@@ -204,6 +220,9 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
         trace(TRACE_5, "\t\t\t formula was " + currentNode->getCNFformula()->asString());
         trace(TRACE_3, "\n");
         currentNode->setColor(RED);
+
+        // an dieser stelle alle ?-literale loeschen???
+
         return;
     }
 
@@ -213,7 +232,23 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 	while (i < PN->getOutputPlaceCount()) {
 
 		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
-		trace(TRACE_2, string(PN->getOutputPlace(i)->name) + "\n");
+		trace(TRACE_2, string(PN->getOutputPlace(i)->name));
+
+//        if (currentNode->getColor() == RED) {
+//            // this may happen if current node is target of (one of) its child(s)
+//            // which causes early analyse
+//            trace(TRACE_3, " suppressed (node " + intToString(currentNode->getNumber()) + " already RED)\n");
+//
+//            currentNode->removeLiteralFromFormula(i, RECEIVING);
+//
+//            addProgress(your_progress);
+//            printProgress();
+//
+//            i++;
+//            continue;
+//        } else {
+//            trace(TRACE_2, "\n");
+//        }
 
         if (PN->getOutputPlace(i)->max_occurence < 0 ||
             PN->getOutputPlace(i)->max_occurence > currentNode->eventsUsed[i + PN->getInputPlaceCount()]) {
@@ -251,12 +286,12 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
                 GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
                 currentNode->addSuccessorNode(newEdge);
 
-                // If that node was computed BLUE before, check again
-                // its color, since its successors may have been set
-                // RED meanwhile
-                if (found->getColor() == BLUE) {
-                    analyseNode(found);
-                }
+//                // If that node was computed BLUE before, check again
+//                // its color, since its successors may have been set
+//                // RED meanwhile
+//                if (found->getColor() == BLUE) {
+//                    analyseNode(found);
+//                }
 
 				// Still, if that node was computed red before, the literal
 				// of the edge from currentNode to the old node must be removed in the
@@ -296,7 +331,9 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
     // finished iterating over successors
     trace(TRACE_2, "\t\t\t no events left...\n");
 
-    analyseNode(currentNode);
+    if (currentNode->getColor() != RED) {
+        analyseNode(currentNode);
+    }
 
 	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + toUpper(currentNode->getColor().toString()));
 	trace(TRACE_3, " via formula " + currentNode->getCNFformula()->asString() + "\n");

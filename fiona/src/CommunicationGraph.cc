@@ -791,15 +791,15 @@ void communicationGraph::printGraphToDot() {
         // prepare dot command line for printing
         if (parameters[P_OG]) {
             if (options[O_CALC_ALL_STATES]) {
-                sprintf(buffer, "dot -Tpng %s.OG.out -o %s.OG.png", netfile, netfile);
+                sprintf(buffer, "dot -Tpng \"%s.OG.out\" -o \"%s.OG.png\"", netfile, netfile);
             } else {
-                sprintf(buffer, "dot -Tpng %s.R.OG.out -o %s.R.OG.png", netfile, netfile);
+                sprintf(buffer, "dot -Tpng \"%s.R.OG.out\" -o \"%s.R.OG.png\"", netfile, netfile);
             }
         } else {
             if (options[O_CALC_ALL_STATES]) {
-                sprintf(buffer, "dot -Tpng %s.IG.out -o %s.IG.png", netfile, netfile);
+                sprintf(buffer, "dot -Tpng \"%s.IG.out\" -o \"%s.IG.png\"", netfile, netfile);
             } else {
-                sprintf(buffer, "dot -Tpng %s.R.IG.out -o %s.R.IG.png", netfile, netfile);
+                sprintf(buffer, "dot -Tpng \"%s.R.IG.out\" -o \"%s.R.IG.png\"", netfile, netfile);
             }
         }
 
@@ -933,6 +933,7 @@ void communicationGraph::printGraphToSTG() {
     
     // set file name
     string buffer = string(netfile);
+
     if (parameters[P_OG]) {
         if (options[O_CALC_ALL_STATES]) {
             buffer += ".OG.stg";
@@ -956,9 +957,8 @@ void communicationGraph::printGraphToSTG() {
     // list transitions (use place names)
     dotFile << ".dummy";
     assert(PN != NULL);
-    for (unsigned int i = 0; i < PN->getPlaceCount(); i++)
-    {
-        if (PN->getPlace(i)->type == INPUT || PN->getPlace(i)->type == OUTPUT)
+    for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
+    	if (PN->getPlace(i)->type == INPUT || PN->getPlace(i)->type == OUTPUT)
             dotFile << " " << PN->getPlace(i)->name;
     }
     dotFile << endl;    
@@ -972,24 +972,24 @@ void communicationGraph::printGraphToSTG() {
     
     // traverse the nodes recursively
     printGraphToSTGRecursively(tmp, dotFile, visitedNodes);
-    
+
     // the initial marking
     dotFile << ".marking {p" << tmp->getNumber() << "}" << endl;
-    
+
     // end and close file
     dotFile << ".end" << endl;
     dotFile.close();
-    
+
     // prepare Petrify command line for printing
     if (parameters[P_OG]) {
         buffer = "petrify4.1 " + string(netfile) + ".OG.stg -dead -ip -o " + string(netfile) + ".OG.pn";
     } else {
         buffer = "petrify4.1 " + string(netfile) + ".IG.stg -dead -ip -o " + string(netfile) + ".IG.pn";
     }
-    
+
     // print commandline and execute system command
-    trace(TRACE_0, string(buffer) + "\n");
-    
+    trace(TRACE_0, buffer + "\n");
+
     if (HAVE_PETRIFY == 1) {
         system(buffer.c_str());
     } else {

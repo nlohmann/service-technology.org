@@ -42,7 +42,7 @@
 class oWFN;
 
 
-class operatingGuidelines : public communicationGraph {
+class OG : public communicationGraph {
 	
 	private:
 		/**
@@ -51,14 +51,39 @@ class operatingGuidelines : public communicationGraph {
 		 */
 		void computeCNF(GraphNode* node) const;
 
+        /**
+         * Builds the OG of the associated PN recursively starting at
+         * currentNode.
+         * @param currentNode Current node of the graph from which the build
+         *     algorithm starts.
+         * @param progress_plus The additional progress when the subgraph
+         *     starting at this node is finished.
+         * @pre The states of currentNode have been calculated, currentNode's
+         *   number has been set (e.g. by calling currentNode->setNumber), and
+         *   setOfVertices contains currentNode. That means, buildGraph can be
+         *   called with root, if calculateRootNode() has been called.
+         */
+    	void buildGraph(GraphNode* currentNode, double);
+
+        /**
+         * Turns all blue nodes that should be red into red ones and
+         * simplifies their annotations by removing unneeded literals.
+         * @pre OG has been built by buildGraph().
+         */
+        void correctNodeColorsAndShortenAnnotations();
+
 	public:
-		operatingGuidelines(oWFN *);
-		~operatingGuidelines();
+		OG(oWFN *);
+		~OG();
 	
 		BddRepresentation * bdd;
 
-    	void buildGraph(GraphNode *, double);
-		
+        /**
+         * Computes the OG of the associated PN.
+         * @pre calculateRootNode() has been called.
+         */
+        void compute();
+
 		void convertToBdd();
 		void convertToBddFull();
 		
@@ -79,7 +104,7 @@ class operatingGuidelines : public communicationGraph {
 
 // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
-        NEW_OPERATOR(operatingGuidelines)
+        NEW_OPERATOR(OG)
 #define new NEW_NEW
 };
 

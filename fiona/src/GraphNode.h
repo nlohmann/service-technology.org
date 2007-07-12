@@ -114,8 +114,7 @@ public:
     void resetIteratingSuccNodes();
 
     // annotation
-    GraphFormulaCNF* getCNFformula();
-    std::string getCNFString();
+    GraphFormulaCNF* getAnnotation() const;
 
     // temporary test assignment that sets yet to be visited successors to true
     // and therefore allows for early discovery of a formula that cannot get true 
@@ -132,6 +131,12 @@ public:
     bool isToShow(const GraphNode* rootOfGraph) const;
 
     void removeLiteralFromFormula(oWFN::Places_t::size_type, GraphEdgeType);
+
+    /**
+     * Removes unneeded literals from the node's annotation. Labels of edges to
+     * red nodes are unneeded.
+     */
+    void removeUnneededLiteralsFromAnnotation();
 
     friend bool operator < (GraphNode const&, GraphNode const& );
 

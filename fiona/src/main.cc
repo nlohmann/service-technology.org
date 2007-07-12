@@ -419,7 +419,7 @@ int main(int argc, char ** argv) {
 		} else if (parameters[P_OG]) {
 
 			// ---------------- operating guideline is built ---------------------
-            operatingGuidelines * graph = new operatingGuidelines(PN);
+            OG * graph = new OG(PN);
             
             trace(TRACE_0, "building the operating guideline...\n");
             seconds = time (NULL);
@@ -431,7 +431,7 @@ int main(int argc, char ** argv) {
                 graph->bdd->convertRootNode(graph->getRoot());
             }
 
-            graph->buildGraph(graph->getRoot(), 1); // build operating guideline
+            graph->compute(); // build operating guideline
             
             seconds2 = time (NULL);
             trace(TRACE_0, "\nbuilding the operating guideline finished.\n");

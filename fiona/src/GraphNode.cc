@@ -169,6 +169,15 @@ void GraphNode::removeLiteralFromFormula(oWFN::Places_t::size_type i, GraphEdgeT
     trace(TRACE_5, "GraphNode::removeLiteralFromFormula(oWFN::Places_t::size_type i, GraphEdgeType type) : end\n");
 }
 
+void GraphNode::removeUnneededLiteralsFromAnnotation() {
+    GraphEdge* edge;
+    resetIteratingSuccNodes();
+    while ((edge = getNextSuccEdge()) != NULL) {
+		if (edge->getDstNode()->getColor() == RED) {
+            annotation->removeLiteral(edge->getLabel());
+		}
+	}
+}
 
 //! \return pointer to the next edge of the successor node list
 //! \brief returns a pointer to the next edge of the successor node list
@@ -194,10 +203,9 @@ void GraphNode::resetIteratingSuccNodes() {
 
 
 // returns the CNF formula that is the annotation of a node as a Boolean formula
-GraphFormulaCNF* GraphNode::getCNFformula() {
+GraphFormulaCNF* GraphNode::getAnnotation() const {
 	return annotation;
 }
-
 
 // return the assignment that is imposed by present or absent arcs leaving node v
 GraphFormulaAssignment* GraphNode::getAssignment() {
@@ -263,16 +271,16 @@ GraphNodeColor GraphNode::analyseNodeByFormula() {
 
 	// computing the assignment given by outgoing edges (to blue nodes)
 	GraphFormulaAssignment* myassignment = this->getAssignment();
-	bool result = this->getCNFformula()->value(*myassignment);
+	bool result = this->getAnnotation()->value(*myassignment);
 	delete myassignment;
 
 	trace(TRACE_5, "GraphNode::analyseNodeByFormula() : end\n");
 
 	if (result) {
-		trace(TRACE_3, "\t\t\t node analysed blue, formula " + this->getCNFformula()->asString() + "\n");
+		trace(TRACE_3, "\t\t\t node analysed blue, formula " + this->getAnnotation()->asString() + "\n");
 		return BLUE;
 	} else {
-		trace(TRACE_3, "\t\t\t node analysed red, formula " + this->getCNFformula()->asString() + "\n");
+		trace(TRACE_3, "\t\t\t node analysed red, formula " + this->getAnnotation()->asString() + "\n");
 		return RED;
 	}
 }

@@ -890,8 +890,8 @@ void communicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
 
     if (parameters[P_OG]) {
         // add annotation to node
-        v->getCNFformula()->simplify();
-        os << v->getCNFformula()->asString();
+        v->getAnnotation()->simplify();
+        os << v->getAnnotation()->asString();
     }
 
     os << "\", fontcolor=black, color=" << v->getColor().toString();

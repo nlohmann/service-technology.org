@@ -399,7 +399,7 @@ DdNode* BddRepresentation::annotationToBddAnn(GraphNode* v){
 	trace(TRACE_5, "DdNode* BddRepresentation::annotationToBddAnn(GraphNode * v): start\n");
 	
 //	cout << "----------------------------------\n";
-//	cout << "node " << v->getNumber() << " ("<< getBddNumber(v->getNumber()) << ") : " << v->getCNFformula()->asString()<< endl;
+//	cout << "node " << v->getNumber() << " ("<< getBddNumber(v->getNumber()) << ") : " << v->getAnnotation()->asString()<< endl;
 	
 	DdNode* tmp;
 	DdNode* CNFTemp;
@@ -407,7 +407,7 @@ DdNode* BddRepresentation::annotationToBddAnn(GraphNode* v){
 	DdNode* annotation = Cudd_ReadOne(mgrAnn);		
 	Cudd_Ref(annotation);
 	
-	GraphFormulaCNF* cnfFormula = v->getCNFformula();
+	GraphFormulaCNF* cnfFormula = v->getAnnotation();
 		
 	for (GraphFormulaCNF::const_iterator iClause = cnfFormula->begin();
 		 iClause != cnfFormula->end(); ++iClause)

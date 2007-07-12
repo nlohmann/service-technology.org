@@ -48,7 +48,7 @@
 
 //! \param _PN
 //! \brief constructor
-operatingGuidelines::operatingGuidelines(oWFN * _PN) : communicationGraph(_PN) {
+OG::OG(oWFN * _PN) : communicationGraph(_PN) {
 
 	 if (options[O_BDD] == true || options[O_OTF]) {
 		unsigned int nbrLabels = PN->getInputPlaceCount() + PN->getOutputPlaceCount();
@@ -58,7 +58,7 @@ operatingGuidelines::operatingGuidelines(oWFN * _PN) : communicationGraph(_PN) {
 
 
 //! \brief destructor
-operatingGuidelines::~operatingGuidelines() {
+OG::~OG() {
 
 	  if (options[O_BDD] == true) {
 		delete bdd;
@@ -66,11 +66,13 @@ operatingGuidelines::~operatingGuidelines() {
 
 }
 
+void OG::compute() {
+    assert(getRoot() != NULL);
+    buildGraph(getRoot(), 1);
+    correctNodeColorsAndShortenAnnotations();
+}
 
-//! \param currentNode current node of the graph
-//! \param progress_plus the additional progress when the subgraph starting at this node is finished 
-//! \brief builds up the graph recursively
-void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_plus) {
+void OG::buildGraph(GraphNode * currentNode, double progress_plus) {
 
     // currentNode is the root of the currently considered subgraph
     // at this point, the states inside currentNode are already computed!
@@ -99,7 +101,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 
 	// get the annotation of the node as CNF formula
 	computeCNF(currentNode);
-    trace(TRACE_3, "\t first computation of formula yields: " + currentNode->getCNFformula()->asString() + "\n");
+    trace(TRACE_3, "\t first computation of formula yields: " + currentNode->getAnnotation()->asString() + "\n");
 
     trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 
@@ -214,10 +216,10 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
     }
 
     // early checking if the node's annotation cannot be made true
-    if (currentNode->getCNFformula()->equals() == FALSE) {
+    if (currentNode->getAnnotation()->equals() == FALSE) {
         trace(TRACE_3, "\t\t\t any further event suppressed (annotation of node ");
         trace(TRACE_3, intToString(currentNode->getNumber()) + " is unsatisfiable)\n");
-        trace(TRACE_5, "\t\t\t formula was " + currentNode->getCNFformula()->asString());
+        trace(TRACE_5, "\t\t\t formula was " + currentNode->getAnnotation()->asString());
         trace(TRACE_3, "\n");
         currentNode->setColor(RED);
 
@@ -316,11 +318,11 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 		}
 
         // check whether annotation is still satisfiable
-        if (currentNode->getCNFformula()->equals() == FALSE) {
+        if (currentNode->getAnnotation()->equals() == FALSE) {
             currentNode->setColor(RED);
             trace(TRACE_3, "\t\t\t any further event suppressed (annotation of node ");
             trace(TRACE_3, intToString(currentNode->getNumber()) + " is unsatisfiable)\n");
-            trace(TRACE_5, "\t\t\t formula was " + currentNode->getCNFformula()->asString());
+            trace(TRACE_5, "\t\t\t formula was " + currentNode->getAnnotation()->asString());
             trace(TRACE_3, "\n");
             return;
         }
@@ -336,7 +338,7 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
     }
 
 	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + toUpper(currentNode->getColor().toString()));
-	trace(TRACE_3, " via formula " + currentNode->getCNFformula()->asString() + "\n");
+	trace(TRACE_3, " via formula " + currentNode->getAnnotation()->asString() + "\n");
 
 	if (options[O_OTF]) {
 		//cout << "currentNode: " << currentNode->getNumber() << endl;	
@@ -344,13 +346,51 @@ void operatingGuidelines::buildGraph(GraphNode * currentNode, double progress_pl
 	}
 }
 
+void OG::correctNodeColorsAndShortenAnnotations() {
+    // This is a fixpoint operation. Do the following until nothing changes:
+    //   1. Turn one blue node that should be red into a red one.
 
-void operatingGuidelines::computeCNF(GraphNode* node) const {
+    bool graphChangedInLoop = true;
+    bool graphChanged = false;
+    while (graphChangedInLoop) {
+        graphChangedInLoop = false;
+
+        for (GraphNodeSet::iterator iNode = setOfVertices.begin();
+             iNode != setOfVertices.end(); ++iNode) {
+
+            GraphNode* node = *iNode;
+            if (node->getColor() == RED) {
+                continue;
+            }
+
+            analyseNode(node);
+            if (node->getColor() == RED) {
+                graphChangedInLoop = true;
+                graphChanged = true;
+            }
+        }
+    }
+
+    // Shorten all annotations by removing unneeded literals if any node turned
+    // red during the previous color correction process.
+    if (!graphChanged) {
+        return;
+    }
+
+    for (GraphNodeSet::iterator iNode = setOfVertices.begin();
+         iNode != setOfVertices.end(); ++iNode) {
+
+        GraphNode* node = *iNode;
+        node->removeUnneededLiteralsFromAnnotation();
+    }
+}
+
+void OG::computeCNF(GraphNode* node) const {
 	
-    trace(TRACE_5, "operatingGuidelines::computeCNF(GraphNode * node): start\n");
+    trace(TRACE_5, "OG::computeCNF(GraphNode * node): start\n");
 	
 	// initially, the annoation is empty (and therefore equivalent to true)
-	assert(node->getCNFformula()->asString() == GraphFormulaLiteral::TRUE);
+	assert(node->getAnnotation()->asString() == GraphFormulaLiteral::TRUE);
 	
 	StateSet::iterator iter;			// iterator over the states of the node
 
@@ -454,13 +494,13 @@ void operatingGuidelines::computeCNF(GraphNode* node) const {
 		}
 	}
 
-	trace(TRACE_5, "operatingGuidelines::computeCNF(GraphNode * node): end\n");
+	trace(TRACE_5, "OG::computeCNF(GraphNode * node): end\n");
 }
 
 
 //! \brief converts an OG into its BDD representation
-void operatingGuidelines::convertToBdd() {
-	trace(TRACE_5, "operatingGuidelines::convertToBdd(): start\n");
+void OG::convertToBdd() {
+	trace(TRACE_5, "OG::convertToBdd(): start\n");
 	
     bool visitedNodes[getNumberOfNodes()];
 
@@ -473,13 +513,13 @@ void operatingGuidelines::convertToBdd() {
     bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
     bdd->printMemoryInUse();
 
-    trace(TRACE_5,"operatingGuidelines::convertToBdd(): end\n");
+    trace(TRACE_5,"OG::convertToBdd(): end\n");
 }
 
 
 //! \brief converts an OG into its BDD representation including the red nodes and the markings of the nodes
-void operatingGuidelines::convertToBddFull() {
-	trace(TRACE_5, "operatingGuidelines::convertToBddFull(): start\n");
+void OG::convertToBddFull() {
+	trace(TRACE_5, "OG::convertToBddFull(): start\n");
 	
     bool visitedNodes[getNumberOfNodes()];
 
@@ -503,11 +543,11 @@ void operatingGuidelines::convertToBddFull() {
 	testbdd->printMemoryInUse();
 	testbdd->printDotFile();
 	delete testbdd;
-    trace(TRACE_5,"operatingGuidelines::convertToBdd(): end\n");
+    trace(TRACE_5,"OG::convertToBdd(): end\n");
 }
 
 
-void operatingGuidelines::printOGtoFile() const {
+void OG::printOGtoFile() const {
     string ogFilename = netfile;
     if (!options[O_CALC_ALL_STATES]) {
         ogFilename += ".R";
@@ -538,7 +578,7 @@ void operatingGuidelines::printOGtoFile() const {
 }
 
 
-void operatingGuidelines::printNodesToOGFile(GraphNode * v, fstream& os,
+void OG::printNodesToOGFile(GraphNode * v, fstream& os,
     bool visitedNodes[]) const {
 
     if (v == NULL)
@@ -551,7 +591,7 @@ void operatingGuidelines::printNodesToOGFile(GraphNode * v, fstream& os,
     os << "  " << NodeNameForOG(v);
 
     // print node annotation
-    os << " : " << v->getCNFformula()->asString();
+    os << " : " << v->getAnnotation()->asString();
 
     os << " : " << v->getColor().toString();
 
@@ -576,7 +616,7 @@ void operatingGuidelines::printNodesToOGFile(GraphNode * v, fstream& os,
 }
 
 
-void operatingGuidelines::printTransitionsToOGFile(GraphNode * v, fstream& os,
+void OG::printTransitionsToOGFile(GraphNode * v, fstream& os,
     bool visitedNodes[]) const {
 
     if (v == NULL)
@@ -619,7 +659,7 @@ void operatingGuidelines::printTransitionsToOGFile(GraphNode * v, fstream& os,
 }
 
 
-string operatingGuidelines::NodeNameForOG(const GraphNode* v) const {
+string OG::NodeNameForOG(const GraphNode* v) const {
     assert(v != NULL);
     return intToString(v->getNumber());
 }

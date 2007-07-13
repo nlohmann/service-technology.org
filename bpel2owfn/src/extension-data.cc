@@ -28,17 +28,17 @@
  *
  * \author  Thomas Heidinger <heidinge@informatik.hu-berlin.de>,
  *          Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: theidin $
  * 
  * \since   2007-06-07
  *
- * \date    \$Date: 2007/07/10 09:40:18 $
+ * \date    \$Date: 2007/07/13 09:58:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  */
 
 
@@ -63,7 +63,113 @@ using std::cerr;
 using std::endl;
 
 extern PetriNet PN;
+int netnr = 0;  //net number for unique output filename
 
+/*
+Creates nets from input net.
+All if activities in the output nets contain just one case branch.
+*/
+void split_net(PetriNet & P)
+{
+   extern int netnr;
+   bool valid = false;
+   std::map<unsigned int, unsigned int>::iterator it;
+   for (it = globals::if_branches.begin();
+       it != globals::if_branches.end();
+       it++)
+   {
+      int count = 0;
+      for (unsigned int i = 1; i < (*it).second; i++)
+      {
+         if (P.findTransition( toString((*it).first) + ".internal.case" + toString(i) ))
+         {
+            count++;
+         }
+      }
+      if (P.findTransition( toString((*it).first) + ".internal.caseo" ))
+      {
+         count++;
+      }
+      if (count <= 1)
+      {
+         valid = true;
+      }
+      else
+      {
+         valid = false;
+	 break;
+      }
+  }
+  if (valid) 
+  //all if activities consist of just one case branch, so print net
+  {
+     P.reduce(1);
+     cerr << P.information() << endl;
+     netnr++;
+     // create oWFN output ?
+     if (formats[F_OWFN])
+     {
+       if (globals::output_filename != "")
+       {
+         output = openOutput(globals::output_filename + toString(netnr) + "." + suffixes[F_OWFN]);
+       }
+       trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
+       P.set_format(FORMAT_OWFN);
+       (*output) << P;
+       if (globals::output_filename != "")
+       {
+         closeOutput(output);
+         output = NULL;
+       }
+     }
+  
+     // create dot output ?
+     if ( formats[F_DOT] )
+     {
+       if (globals::output_filename != "")
+       {
+         output = openOutput(globals::output_filename + toString(netnr) + "." + suffixes[F_DOT]);
+       }
+       trace(TRACE_INFORMATION, "-> Printing Petri net for dot ...\n");
+       // if parameter "nointerface" is set, set dot format with parameter "false"
+       // not to draw an interface
+       P.set_format(FORMAT_DOT, !globals::parameters[P_NOINTERFACE]);
+       (*output) << P;
+       if (globals::output_filename != "")
+       {
+         closeOutput(output);
+         output = NULL;
+      
+#ifdef HAVE_DOT
+         string systemcall = "dot -q -Tpng -o" + globals::output_filename + toString(netnr) + ".png " + globals::output_filename + toString(netnr) + "." + suffixes[F_DOT];
+         trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
+         trace(TRACE_INFORMATION, systemcall + "\n\n");
+         system(systemcall.c_str());
+#endif
+       }
+     }  
+  }
+  else
+  //in P (*it).first contains several branches
+  //for each branch create PNnew which contains just this branch
+  {
+     for (unsigned int i = 1; i <= (*it).second; i++)
+     {
+        PetriNet PNnew;
+	PNnew = P;
+        for (unsigned int j = 1; j <= (*it).second; j++)
+	{
+           if (i != j && j == (*it).second)
+	       PNnew.removeTransition( PNnew.findTransition( toString((*it).first) + ".internal.caseo" ));
+	   else 
+              if (i != j)
+	         PNnew.removeTransition( PNnew.findTransition( toString((*it).first) + ".internal.case" + toString(j) ));	
+        }
+        PNnew.reduce(1);
+	split_net(PNnew);
+     }
+  }  
+}
 
 
 
@@ -81,10 +187,6 @@ void data_extension_main()
   
   //  PN.calculate_max_occurrences();
   cerr << PN.information() << endl;
-  
-  
-  PN.removeTransition( PN.findTransition( "5.internal.case2" ) );
-  PN.removeTransition( PN.findTransition( "5.internal.caseo" ) );
   
   
   PN.reduce(1);
@@ -137,6 +239,7 @@ void data_extension_main()
     }
   }  
   
+
   for (std::map<unsigned int, unsigned int>::iterator it = globals::if_branches.begin();
        it != globals::if_branches.end();
        it++)
@@ -144,5 +247,9 @@ void data_extension_main()
     std::cerr << "there is an <if> with id " << (*it).first << " and with " << (*it).second << " branches" << std::endl;
   }
   
-  std::cerr << globals::if_branches[5] << std::endl;
+  PetriNet PN1;
+  PN1 = PN;  //using assignment operator since copy constructor is erroneous
+  split_net(PN1);
+
 }
+

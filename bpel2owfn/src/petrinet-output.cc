@@ -30,17 +30,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/06/28 07:38:17 $
+ * \date    \$Date: 2007/07/13 12:50:47 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.101 $
+ * \version \$Revision: 1.102 $
  *
  * \ingroup petrinet
  */
@@ -67,7 +67,7 @@ using std::setw;
 using std::right;
 using std::left;
 
-
+using namespace PNapi;
 
 
 
@@ -80,7 +80,7 @@ using std::left;
  *
  *          dummy-implementation of virtual function
  */
-string Node::nodeTypeName() const
+string PNapi::Node::nodeTypeName() const
 {
   return "";
 }
@@ -122,7 +122,7 @@ string Transition::nodeTypeName() const
  *
  *          dummy-implementation of virtual function
  */
-string Node::nodeShortName() const
+string PNapi::Node::nodeShortName() const
 {
   return "";
 }
@@ -136,7 +136,7 @@ string Node::nodeShortName() const
  *
  * \return  the (nice) name of the node for DOT output
  */
-string Node::nodeName() const
+string PNapi::Node::nodeName() const
 {
   string result = *history.begin();
 
@@ -158,7 +158,7 @@ string Node::nodeName() const
  *
  * \return  the name of the node for DOT output
  */
-string Node::nodeFullName() const
+string PNapi::Node::nodeFullName() const
 {
   string result = *history.begin();
 
@@ -1349,7 +1349,7 @@ void PetriNet::output_owfn(ostream *output) const
  * \param   os  an output stream to which the net is streamed
  * \param   obj a PetriNet object
  */
-ostream& operator<< (ostream& os, const PetriNet &obj)
+ostream& PNapi::operator<< (ostream& os, const PNapi::PetriNet &obj)
 {
   switch (obj.format)
   {

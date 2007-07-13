@@ -36,7 +36,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/06/28 10:25:24 $
+ * \date    \$Date: 2007/07/13 12:50:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
 */
 %}
 
@@ -63,6 +63,7 @@
 
 %{ HEADER
 #include "petrinet.h"
+using namespace PNapi;
 %}
 
 %{

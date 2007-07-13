@@ -30,17 +30,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/06/28 07:38:15 $
+ * \date    \$Date: 2007/07/13 12:50:47 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -67,7 +67,7 @@
 #include "petrinet.h"
 
 using std::pair;
-
+using namespace PNapi;
 
 
 
@@ -195,7 +195,7 @@ void footer(kc::integer id, bool myindent)
  */
 void process_loop_bounds(const vector<unsigned int> &loop_bounds, const vector<unsigned int> &loop_identifiers, string prefix, unsigned int my_max)
 {
-  extern PetriNet PN;	// introduced in main.c
+  extern PNapi::PetriNet PN;	// introduced in main.c
 
   vector<unsigned int> current_index(loop_bounds.size(), 1);
   unsigned int number = 1;

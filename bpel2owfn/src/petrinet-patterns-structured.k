@@ -30,11 +30,11 @@
  * \brief   Petri net patterns for BPEL's structured activities
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/06/28 07:38:17 $
+ * \date    \$Date: 2007/07/13 12:50:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
 */
 %}
 
@@ -69,7 +69,7 @@
 using std::cerr;
 using std::endl;
 
-extern PetriNet PN;
+extern PNapi::PetriNet PN;
 %}
 
 

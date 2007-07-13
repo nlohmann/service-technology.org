@@ -28,17 +28,17 @@
  *
  * \author  Thomas Heidinger <heidinge@informatik.hu-berlin.de>,
  *          Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: theidin $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2007-06-07
  *
- * \date    \$Date: 2007/07/13 09:58:35 $
+ * \date    \$Date: 2007/07/13 12:50:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  */
 
 
@@ -61,6 +61,7 @@
 
 using std::cerr;
 using std::endl;
+using namespace PNapi;
 
 extern PetriNet PN;
 int netnr = 0;  //net number for unique output filename

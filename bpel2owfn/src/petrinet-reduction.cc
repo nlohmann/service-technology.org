@@ -31,17 +31,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/06/28 07:38:17 $
+ * \date    \$Date: 2007/07/13 12:50:48 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  *
  * \ingroup petrinet
  */
@@ -68,6 +68,7 @@ using std::list;
 using std::pair;
 using std::cerr;
 using std::endl;
+using namespace PNapi;
 
 
 

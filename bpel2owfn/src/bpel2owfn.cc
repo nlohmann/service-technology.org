@@ -31,17 +31,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/10 09:40:17 $
+ * \date    \$Date: 2007/07/13 12:50:47 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.187 $
+ * \version \$Revision: 1.188 $
  */
 
 
@@ -75,7 +75,7 @@ using std::cout;
 using std::endl;
 using std::string;
 using std::map;
-
+using namespace PNapi;
 
 
 

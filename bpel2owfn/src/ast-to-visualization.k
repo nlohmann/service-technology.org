@@ -32,11 +32,11 @@
  * This file defines and implements unparse rules to unparse BPEL to XML.
  * 
  * \author  Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2007-04-18
  *
- * \date    \$Date: 2007/06/28 07:38:15 $
+ * \date    \$Date: 2007/07/13 12:50:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -45,7 +45,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  *
  */
 
@@ -317,6 +317,23 @@ ToPart(_id) ->
 
 FromPart(_id) ->
   [visualization: ]
+;
+
+/******************************************************************************
+  OPAQUEACTIVITY
+******************************************************************************/
+
+OpaqueActivity(a,_id) ->
+  [visualization: 
+  {
+  (*output) << "opaqueActivity" << toString(_id->value) << " [shape=rectangle style=filled label=\"opaqueActivity\"";
+  if(globals::ASTEmap[_id->value]->highlighted)
+    (*output) << " fillcolor=red";
+  (*output) << "];" << endl;
+  globals::ASTEmap[_id->value]->visConnection= "opaqueActivity" + toString(_id->value);
+  globals::ASTEmap[_id->value]->secVisConnection= "opaqueActivity" + toString(_id->value);
+  }
+  ]
 ;
 
 

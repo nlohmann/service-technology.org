@@ -99,11 +99,6 @@ Arc::Arc(owfnTransition * t, owfnPlace * p, bool totrans, unsigned int mult)
 //	cnt++;
 }
 
-inline Node * Arc::Get(bool dest)
-{
-  return dest? Destination : Source;
-}
-
 void Arc::operator += (unsigned int incr)
 {
   Multiplicity += incr;

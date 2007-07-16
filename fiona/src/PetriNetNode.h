@@ -76,7 +76,6 @@ class Arc
 	  	owfnPlace * pl;
 	  	owfnTransition * tr;
 	  	unsigned int Multiplicity;
-	  	Node * Get(bool);
 	  	void operator += (unsigned int);
 
         // Provides user defined operator new. Needed to trace all new

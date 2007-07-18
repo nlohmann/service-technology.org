@@ -29,17 +29,17 @@
  * \brief   debugging tools
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2005/11/09
  *
- * \date    \$Date: 2007/06/28 07:38:16 $
+ * \date    \$Date: 2007/07/18 10:37:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  *
  * \ingroup debug
  */
@@ -137,6 +137,7 @@ void show_process_information();
 void show_wsdl_information();
 void show_process_information_header();
 int frontend_error(const char *msg);
+int owfn_yyerror(const char *msg);
 void SAerror(unsigned int code, string information = "", int lineNumber = 0);
 void SAerror(unsigned int code, string information, string lineNumber);
 void genericError(unsigned int code, string information, string line, error_level level = ERRORLEVER_WARNING);

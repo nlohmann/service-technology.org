@@ -29,17 +29,17 @@
  * \brief   global varialbes
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/06/28 07:38:16 $
+ * \date    \$Date: 2007/07/18 10:37:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  */
 
 
@@ -229,6 +229,9 @@ namespace globals
   /// filename of the optional WSDL file
   extern string wsdl_filename;  
 
+  /// filename of the OWFN file
+  extern string net_filename;  
+
   /// parameters (set by #parse_command_line)
   extern map<possibleParameters, bool> parameters;
 
@@ -273,6 +276,12 @@ namespace globals
   
   /// a mapping holding the number of branches for every <if> activity (indexed by the <if>'s id)
   extern map<unsigned int, unsigned int> if_branches;
+  
+  /// a mapping for the commands that are attached to nodes in owfn files
+  extern map<string,string> owfn_commands;
+
+  /// the statepredicate of an owfn file
+  extern string owfn_statepredicate;
 }
 
 #endif

@@ -30,17 +30,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/06/28 07:38:16 $
+ * \date    \$Date: 2007/07/18 10:37:53 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  */
 
 
@@ -95,7 +95,8 @@ typedef enum
    O_DEBUG,		///< set the debug level
    O_REDUCTION,		///< set level of structural reduction
    O_TOPOLOGY,		///< parse a choreography file (BPEL4Chor)
-   O_WSDL		///< parse a WSDL file
+   O_WSDL,		///< parse a WSDL file
+   O_NET  	///< parse an OWFN file
 } possibleOptions;
 
 
@@ -196,6 +197,7 @@ extern map<possibleFormats,  string> suffixes;
 
 extern int frontend_debug;
 extern int frontend__flex_debug;
+extern int owfn_yydebug;
 extern FILE *frontend_in;
 
 

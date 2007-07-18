@@ -31,17 +31,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/11 09:24:11 $
+ * \date    \$Date: 2007/07/18 10:37:53 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.90 $
+ * \version \$Revision: 1.91 $
  */
 
 
@@ -126,11 +126,12 @@ static struct option longopts[] =
   { "reduce",		required_argument, NULL, 'r' },
   { "topology",		required_argument, NULL, 't' },
   { "wsdl",		required_argument, NULL, 'w' },
+  { "net",		required_argument, NULL, 'n' },
   NULL
 };
 
 /// short options (needed by GNU getopt)
-const char *par_string = "hvm:li:of:p:d:r:t:w:";
+const char *par_string = "hvm:li:of:p:d:r:t:w:n:";
 
 
 
@@ -164,6 +165,7 @@ void print_help()
   trace(" -v, --version          print program version and exit\n");
   trace(" -t, --topology=FILE    read a BPEL4Chor participant topology file from FILE\n");
   trace(" -w, --wsdl=FILE        read a WSDL file from FILE\n");
+  trace(" -n, --net=FILE         read an OWFN file from FILE\n");
   trace("\n");
   trace("  MODE is one of the following (at most one mode permitted):\n");
   trace("    petrinet            create a Petri net model\n");
@@ -277,6 +279,8 @@ void parse_command_line(int argc, char* argv[])
   // turn off debug modi of flex and bison by default
   frontend_debug = 0;
   frontend__flex_debug = 0;
+
+  owfn_yydebug = 0;
   
   
   // use GNU getopt to parse the command-line arguments
@@ -456,7 +460,10 @@ void parse_command_line(int argc, char* argv[])
         if (parameter == "flex")
           frontend__flex_debug = 1;
         else if (parameter == "bison")
+        {
           frontend_debug = 1;
+          owfn_yydebug = 0;
+        }
         else if (parameter == "1")
           debug_level = TRACE_WARNINGS;
         else if (parameter == "2")
@@ -501,6 +508,13 @@ void parse_command_line(int argc, char* argv[])
       {
         options[O_WSDL] = true;
         globals::wsdl_filename = string(optarg);
+        break;
+      }
+
+      case 'n':
+      {
+        options[O_NET] = true;
+        globals::net_filename = string(optarg);
         break;
       }
         
@@ -594,6 +608,11 @@ void parse_command_line(int argc, char* argv[])
     {
       globals::output_filename = "stdof"; 
       trace(TRACE_ALWAYS, "Output filename set to standard: stdof\n");
+      if (options[O_NET])
+      {
+        unsigned int pos = globals::net_filename.length() - 5;
+        globals::output_filename = globals::net_filename.substr(0, pos);
+      }
     } 
     else 
     {

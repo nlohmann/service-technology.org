@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/06/28 07:38:14 $ by $Author: nielslohmann $.
-# Version $Revision: 1.81 $
+# File last changed $Date: 2007/07/18 10:37:52 $ by $Author: znamirow $.
+# Version $Revision: 1.82 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -98,6 +98,8 @@ $(KCDUMMY): $(KCFILES_NECESSARY) $(KCFILES_TEMP)
 bpel2owfn_SOURCES = $(KCSOURCES) \
 		    frontend-parser.yy \
 		    frontend-lexer.ll \
+		    syntax_owfn.yy \
+		    lexer_owfn.ll \
 		    frontend-parser-chor.yy \
 		    frontend-parser-wsdl.yy \
 		    bpel2owfn.cc \

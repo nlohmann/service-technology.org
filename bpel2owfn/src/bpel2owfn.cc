@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/13 12:50:47 $
+ * \date    \$Date: 2007/07/18 10:37:52 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.188 $
+ * \version \$Revision: 1.189 $
  */
 
 
@@ -88,11 +88,19 @@ extern int frontend_parse();			// from Bison
 extern int frontend_chor_parse();		// from Bison
 extern int frontend_wsdl_parse();		// from Bison
 extern int frontend_debug;			// from Bison
+extern int owfn_yydebug;			// from Bison
 extern int frontend_nerrs;			// from Bison
 extern int frontend_lineno;			// from Bison
 extern int frontend__flex_debug;		// from flex
 extern FILE *frontend_in;			// from flex
 extern void frontend_restart(FILE*);		// from flex
+
+extern int owfn_yydebug;
+extern int owfn_yy_flex_debug;
+
+extern FILE *owfn_yyin;
+extern int owfn_yyerror();
+extern int owfn_yyparse();
 
 
 
@@ -406,7 +414,14 @@ void final_output()
     {
       if (globals::output_filename != "")
       {
-        output = openOutput(globals::output_filename + "." + suffixes[F_OWFN]);
+        if (options[O_NET])
+        {
+          output = openOutput(globals::output_filename + "Gen." + suffixes[F_OWFN]);
+        }
+        else
+        {
+          output = openOutput(globals::output_filename + "." + suffixes[F_OWFN]);
+        }
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
       PN.set_format(FORMAT_OWFN);
@@ -628,8 +643,10 @@ void final_output()
  */
 int main( int argc, char *argv[])
 {
+
   // initilization of variables
   PetriNet PN2 = PetriNet();
+
 
   // analyzation of the commandline
   analyze_cl(argc,argv);
@@ -679,61 +696,84 @@ int main( int argc, char *argv[])
 
     show_wsdl_information();
   }
-  
 
-
-  // parsing all inputfiles
-  set< string >::iterator file = inputfiles.begin();
-  do
+  /*
+   * parse an OWFN file
+   */
+  if (globals::net_filename != "")
   {
-    if (file != inputfiles.end())
-    {
-      open_file(*file);
 
-      // reset the parser
-      frontend_restart(frontend_in);      
+    globals::filename = globals::net_filename;
+    if (!(owfn_yyin = fopen(globals::filename.c_str(), "r"))) 
+    {
+      cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
+      exit(2);
     }
 
-    show_process_information_header();
+    // invoke Bison BPEL4WSDL parser
+    trace(TRACE_INFORMATION, "Parsing " + globals::net_filename + " ...\n");
+    int parse_result = owfn_yyparse();
+    trace(TRACE_INFORMATION, "Parsing of " + globals::net_filename + " complete.\n");
 
-
-    // invoke BPEL Bison parser
-    trace(TRACE_INFORMATION, "Parsing " + globals::filename + " ...\n");
-    frontend_parse();
-    trace(TRACE_INFORMATION, "Parsing of " + globals::filename + " complete.\n");
-    
-    globals::parsing = false;
-    
-    if (file != inputfiles.end())
-      close_file(*file);
-    
-    if (frontend_nerrs == 0)
+    // closing a file
+    trace(TRACE_INFORMATION," + Closing owfn file: " + globals::filename + "\n");
+    fclose(owfn_yyin);
+    frontend_in = NULL;
+  }
+  else
+  {
+    // parsing all inputfiles
+    set< string >::iterator file = inputfiles.begin();
+    do
     {
-      finish_AST();
-      single_output(file);
-    }
-    else /* parse error */
-    {
-      if (globals::AST == NULL)
+      if (file != inputfiles.end())
       {
-        genericError(104, "", toString(frontend_lineno), ERRORLEVEL_CRITICAL);
-        
-        cleanup();
-        return 3;
+        open_file(*file);
+  
+        // reset the parser
+        frontend_restart(frontend_in);      
       }
-      else
+  
+      show_process_information_header();
+  
+  
+      // invoke BPEL Bison parser
+      trace(TRACE_INFORMATION, "Parsing " + globals::filename + " ...\n");
+      frontend_parse();
+      trace(TRACE_INFORMATION, "Parsing of " + globals::filename + " complete.\n");
+      
+      globals::parsing = false;
+      
+      if (file != inputfiles.end())
+        close_file(*file);
+      
+      if (frontend_nerrs == 0)
       {
-        genericError(105, "", toString(frontend_lineno), ERRORLEVEL_NOTICE);
-        
         finish_AST();
         single_output(file);
       }
-    }
-
-    file++;
-
-  } while (modus == M_CHOREOGRAPHY && file != inputfiles.end());
-
+      else /* parse error */
+      {
+        if (globals::AST == NULL)
+        {
+          genericError(104, "", toString(frontend_lineno), ERRORLEVEL_CRITICAL);
+          
+          cleanup();
+          return 3;
+        }
+        else
+        {
+          genericError(105, "", toString(frontend_lineno), ERRORLEVEL_NOTICE);
+          
+          finish_AST();
+          single_output(file);
+        }
+      }
+  
+      file++;
+  
+    } while (modus == M_CHOREOGRAPHY && file != inputfiles.end());
+  }
   trace(TRACE_INFORMATION, "All files have been parsed.\n");
 
   final_output();

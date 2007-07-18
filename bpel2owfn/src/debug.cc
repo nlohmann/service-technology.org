@@ -30,17 +30,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/07/06 20:05:29 $
+ * \date    \$Date: 2007/07/18 10:37:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.107 $
+ * \version \$Revision: 1.108 $
  *
  * \ingroup debug
  */
@@ -274,6 +274,8 @@ void show_wsdl_information()
  *
  * \ingroup debug
  */
+int owfn_yyerror(const char *msg)
+{ return 1;}
 int frontend_error(const char *msg)
 {
   /* defined by flex */

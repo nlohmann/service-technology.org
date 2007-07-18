@@ -1,22 +1,26 @@
 /*****************************************************************************\
- * Copyright 2007        Niels Lohmann, Christian Gierds, Martin Znamirowski *
- * Copyright 2005, 2006  Niels Lohmann, Christian Gierds                     *
- *                                                                           *
- * This file is part of GNU BPEL2oWFN.                                       *
- *                                                                           *
- * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
- * under the terms of the GNU General Public License as published by the     *
- * Free Software Foundation; either version 2 of the License, or (at your    *
- * option) any later version.                                                *
- *                                                                           *
- * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
- * WITHOUT ANY WARRANTY; without even the implied warranty of                *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
- * Public License for more details.                                          *
- *                                                                           *
- * You should have received a copy of the GNU General Public License along   *
- * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
+  GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
+
+  Copyright (C) 2006, 2007  Niels Lohmann,
+                            Christian Gierds, and
+                            Martin Znamirowski
+  Copyright (C) 2005        Niels Lohmann and
+			    Christian Gierds
+
+  GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3 of the License, or (at your option) any
+  later version.
+
+  GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  details.
+
+  You should have received a copy of the GNU General Public License along with
+  GNU BPEL2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
+  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
+  Floor, Boston, MA 02110-1301  USA.
 \*****************************************************************************/
 
 /*!
@@ -31,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007-07-11 10:31:55 $
+ * \date    \$Date: 2007-07-18 08:16:54 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  *
  * \ingroup petrinet
  */
@@ -62,13 +66,17 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <list>
+#include <deque>
 
 using std::string;
 using std::vector;
+using std::deque;
 using std::set;
 using std::map;
+using std::list;
+using std::pair;
 using std::ostream;
-
 
 
 
@@ -156,7 +164,8 @@ typedef enum
 } output_format;
 
 
-
+namespace PNapi
+{
 
 
 /******************************************************************************
@@ -193,7 +202,7 @@ class Node
 
   protected:
     /// the set of roles (i.e. the history) of the node
-    vector<string> history;
+    list<string> history;
 
     /// the id of the node
     unsigned int id;
@@ -209,6 +218,9 @@ class Node
 
     /// the postset of this node
     set<Node*> postset;
+
+    /// the maximal occurrences of this (communication) place or transition
+    unsigned int max_occurrences;
 
 
     /// true if first role contains role
@@ -306,8 +318,8 @@ class Place: public Node
     /// initial marking of the place
     unsigned int tokens;
 
-    /// the maximal occurrences of this (communication) place
-    unsigned int max_occurrences;
+    /// not empty if place was once an communication place and is now internal because of choreographie
+    string wasExternal;
 
     /// DOT-output of the place (used by PetriNet::dotOut())
     string output_dot() const;
@@ -444,15 +456,20 @@ class PetriNet
     /// rename a node (i.e., rename one role in its history)
     void renamePlace(string old_name, string new_name);
 
+    /// removes a transition from the net
+    void removeTransition(Transition *t);    
 
     /// applies structral reduction rules
-    unsigned int reduce();
+    unsigned int reduce(unsigned int reduction_level = 5);
 
     /// swaps input and output places
     void mirror();
 
     /// adds a prefix to the name of all nodes of the net
     void addPrefix(string prefix);
+
+    /// adds a suffix to the name of all interface places of the net
+    void add_interface_suffix(string suffix);
 
     /// composes a second Petri net
     void compose(const PetriNet &net);
@@ -466,6 +483,9 @@ class PetriNet
     /// re-enumerates the nodes
     void reenumerate();
 
+    /// add a loop to the final states to check deadlock freedom with LoLA
+    void loop_final_state();
+    
     /// statistical output
     string information() const;
 
@@ -474,6 +494,13 @@ class PetriNet
 
     /// calculate the maximal occurrences of communication
     void calculate_max_occurrences();
+
+
+    /// add a suffix for a forEach activity
+    unsigned int push_forEach_suffix(string suffix);
+
+    /// remove the last added suffix
+    unsigned int pop_forEach_suffix();
 
 
     /// calculates the preset of a node
@@ -502,9 +529,6 @@ class PetriNet
   private:
     /// removes a place from the net
     void removePlace(Place *p);
-
-    /// removes a transition from the net
-    void removeTransition(Transition *t);
 
     /// removes an arc from the net
     void removeArc(Arc *f);
@@ -577,9 +601,16 @@ class PetriNet
     /// elimination of identical places
     void reduce_equal_places();
 
+    /// remove unneeded initially marked places in choreographies
+    void reduce_remove_initially_marked_places_in_choreographies();
+
 
     /// returns an id for new nodes
     unsigned int getId();
+
+
+    /// a role suffix for the forEach activity
+    deque<string> forEach_suffix;
 
 
     /// set of internal places of the Petri net
@@ -609,10 +640,14 @@ class PetriNet
 
     /// mapping of roles to nodes of the Petri net
     map<string, Node *> roleMap;
+
+    /// mapping of arcs to their appropriate weight
+    map< pair< Node*, Node* >, int > weight;
 };
 
 
 
+}
 
 
 #endif

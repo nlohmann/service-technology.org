@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-07-11 10:51:39 $ by $Author: nlohmann $.
-# Version $Revision: 1.35 $
+# File last changed $Date: 2007-07-18 08:16:15 $ by $Author: nlohmann $.
+# Version $Revision: 1.36 $
 
 bin_PROGRAMS = fiona
 
@@ -97,13 +97,12 @@ lexer_owfn.h: lexer_owfn.cc
 
 
 # the Petri net API
-#lib_LIBRARIES = lib_pnapi.a
-#
-#lib_pnapi_a_SOURCES = pnapi/pnapi.cc pnapi/pnapi.h\
-#		      pnapi/debug.cc pnapi/debug.h \
-#		      pnapi/helpers.cc pnapi/helpers.h \
-#		      pnapi/options.h \
-#		      pnapi/petrinet-output.cc \
-#		      pnapi/petrinet-reduction.cc \
-#		      pnapi/petrinet.cc \
-#		      pnapi/petrinet.h
+lib_LIBRARIES = lib_pnapi.a
+
+lib_pnapi_a_SOURCES = pnapi/pnapi.h\
+		      pnapi/helpers.cc pnapi/helpers.h \
+		      pnapi/options.h \
+		      pnapi/petrinet-output.cc \
+		      pnapi/petrinet-reduction.cc \
+		      pnapi/petrinet.cc \
+		      pnapi/petrinet.h

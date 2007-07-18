@@ -1,21 +1,26 @@
 /*****************************************************************************\
- * Copyright 2005, 2006, 2007 Niels Lohmann, Christian Gierds                *
- *                                                                           *
- * This file is part of GNU BPEL2oWFN.                                       *
- *                                                                           *
- * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
- * under the terms of the GNU General Public License as published by the     *
- * Free Software Foundation; either version 2 of the License, or (at your    *
- * option) any later version.                                                *
- *                                                                           *
- * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
- * WITHOUT ANY WARRANTY; without even the implied warranty of                *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
- * Public License for more details.                                          *
- *                                                                           *
- * You should have received a copy of the GNU General Public License along   *
- * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
+  GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
+
+  Copyright (C) 2006, 2007  Niels Lohmann,
+                            Christian Gierds, and
+                            Martin Znamirowski
+  Copyright (C) 2005        Niels Lohmann and
+			    Christian Gierds
+
+  GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3 of the License, or (at your option) any
+  later version.
+
+  GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  details.
+
+  You should have received a copy of the GNU General Public License along with
+  GNU BPEL2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
+  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
+  Floor, Boston, MA 02110-1301  USA.
 \*****************************************************************************/
 
 /*!
@@ -29,15 +34,14 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007-07-11 10:31:54 $
+ * \date    \$Date: 2007-07-18 08:16:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  *
- * \ingroup conversion
  * \ingroup debug
  */
 
@@ -49,12 +53,16 @@
  * Headers
  *****************************************************************************/
 
+#include <iostream>
 #include <fstream>	// (std::ofstream)
 #include <sstream>	// (std::ostringstream, std::istringstream)
+#include <cassert>
+#include <string>
+#include <vector>
 
-#include "debug.h"	// (trace)
+//#include "debug.h"	// (trace)
 #include "helpers.h"
-#include "options.h"
+//#include "options.h"
 
 using std::istringstream;
 using std::ostringstream;
@@ -63,6 +71,8 @@ using std::cerr;
 using std::clog;
 using std::flush;
 using std::ofstream;
+using std::string;
+using std::vector;
 
 
 
@@ -74,15 +84,14 @@ using std::ofstream;
 
 #ifdef USING_BPEL2OWFN
 /*!
- * Converts a Kimwitu++ kc::integer to a C++ string.
+ * Converts a Kimwitu++ kc::integer to a C++ string object.
  *
  * \param i Kimwitu++ integer
- * \return  C++ string representing i
- *
- * \ingroup conversion
+ * \return  C++ string object representing i
  */
 string toString(kc::integer i)
 {
+  assert(i!=NULL);
   return toString(i->value);
 }
 #endif
@@ -90,15 +99,12 @@ string toString(kc::integer i)
 
 
 
+
 /*!
- * Converts a C++ int to a C++ string.
+ * Converts a C++ int to a C++ string object.
  *
  * \param i standard C int
- * \return  C++ string representing i
- *
- * \pre \f$i < 10^{20} \f$
- *
- * \ingroup conversion
+ * \return  C++ string object representing i
  */
 string toString(int i)
 {
@@ -118,9 +124,7 @@ string toString(int i)
  * integers are seperated by a period.
  *
  * \param v  an STL vector of unsigned ints
- * \return   C++ string representation of v
- *
- * \ingroup conversion
+ * \return   C++ string object representation of v
  */
 string toString(const vector<unsigned int> &v)
 {
@@ -142,12 +146,10 @@ string toString(const vector<unsigned int> &v)
 
 
 /*!
- * Converts a C++ string to a C++ int.
+ * Converts a C++ string object to a C++ int.
  *
- * \param s C++ string
+ * \param s C++ string object
  * \return int representing s or INT_MAX if the conversion failed
- *
- * \ingroup conversion
  */
 int toInt(string s)
 {
@@ -168,13 +170,11 @@ int toInt(string s)
 
 
 /*!
- * Converts a C++ string to a C++ unsigned int.
+ * Converts a C++ string object to a C++ unsigned int.
  *
- * \param s C++ string
+ * \param s C++ string object
  * \return unsigned int representing s or UINT_MAX if the conversion failed
  *         (e.g. a negative value was passed)
- *
- * \ingroup conversion
  */
 unsigned int toUInt(string s)
 {
@@ -205,4 +205,23 @@ unsigned int max(unsigned int a, unsigned int b)
     return a;
   else
     return b;
+}
+
+
+
+
+
+/*!
+ * \param s  a string that might be prefixed with an XML namespace
+ * \return   string s without XML namespace prefix
+ *
+ * \note  The prefix "http:" is not removed.
+ */
+string strip_namespace(string s)
+{
+  if (s.find_first_of(":") != string::npos &&
+      (s.substr(0, s.find_first_of(":")) != "http"))
+    return s.substr(s.find_first_of(":")+1, s.length());
+  else
+    return s;
 }

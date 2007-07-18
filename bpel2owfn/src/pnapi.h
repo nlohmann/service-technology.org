@@ -15,7 +15,7 @@
 //class ASTE; 			// forward declaration of class ASTE
 //#ifndef PACKAGE_STRING
 //#define PACKAGE_STRING "Petri Net API"
-
+//#endif
 
 
 #endif

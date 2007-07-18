@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007-07-18 08:16:54 $
+ * \date    \$Date: 2007-07-18 10:01:28 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  *
  * \ingroup petrinet
  */
@@ -81,10 +81,15 @@ using std::ostream;
 
 
 
-/******************************************************************************
- * Data structures
- *****************************************************************************/
 
+namespace PNapi
+{
+
+    
+/******************************************************************************
+ * Data structure
+ *****************************************************************************/
+    
 /*!
  * \brief   place and transition types
  *
@@ -126,7 +131,7 @@ typedef enum
 
 
 /*!
- * \brief   node types
+* \brief   node types
  *
  *          Enumeration of the possible types of a node, i.e. whether it is a
  *          place or a transition.
@@ -144,7 +149,7 @@ typedef enum
 
 
 /*!
- * \brief   file formats
+* \brief   file formats
  *
  *          Enumeration of the possible output file formats.
  *
@@ -163,10 +168,9 @@ typedef enum
   FORMAT_PNML		///< Petri Net Markup Language (PNML)
 } output_format;
 
-
-namespace PNapi
-{
-
+    
+    
+    
 
 /******************************************************************************
  * Classes

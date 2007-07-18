@@ -41,6 +41,7 @@
 #include "binDecision.h"
 #include "communicationGraph.h"
 #include "fiona.h"
+#include "pnapi/petrinet.h"
 #include <cassert>
 
 using namespace std;

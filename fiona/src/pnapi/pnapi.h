@@ -43,21 +43,20 @@ class ASTE; 			// forward declaration of class ASTE
 #include <string>
 
 namespace globals {
-    std::string filename; //="";
-    std::string output_filename; //="";
-    std::string invocation; // = "PN API";
-    unsigned int reduction_level;
-//  map<possibleParameters, bool> parameters;
+  extern std::string filename;
+  extern std::string output_filename;
+  extern std::string invocation;
+  extern unsigned int reduction_level;
 }
 
 typedef enum
 {
-    TRACE_ERROR,		///< only trace error messages
-    TRACE_ALWAYS,		///< trace level for errors
-    TRACE_WARNINGS,       ///< trace level for warnings 
-    TRACE_INFORMATION,	///< trace level some more (useful) information
-    TRACE_DEBUG,          ///< trace level for detailed debug information
-    TRACE_VERY_DEBUG	///< trace level for everything
+  TRACE_ERROR,		///< only trace error messages
+  TRACE_ALWAYS,		///< trace level for errors
+  TRACE_WARNINGS,       ///< trace level for warnings 
+  TRACE_INFORMATION,	///< trace level some more (useful) information
+  TRACE_DEBUG,          ///< trace level for detailed debug information
+  TRACE_VERY_DEBUG	///< trace level for everything
 } trace_level;
 
 void trace(unsigned int a, std::string b);

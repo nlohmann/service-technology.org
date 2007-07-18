@@ -28,5 +28,5 @@ namespace globals {
   string filename="";
   string output_filename="";
   string invocation = "PN API";
-  map<possibleParameters, bool> parameters;
+  unsigned int reduction_level;
 }

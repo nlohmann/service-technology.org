@@ -26,6 +26,8 @@ extern set<string> places;
 extern set<string> initialMarked;
 extern map<string, set<string> > arcs;
 
+extern int stg_yylineno;
+
 set<string> tempNodeSet;
 bool in_marking_list = false;
 bool in_arc_list = false;
@@ -33,7 +35,8 @@ bool in_arc_list = false;
 
 int stg_yyerror(const char* msg)
 {
-  cerr << msg << ": token last read: `" << stg_yytext << "'" << endl;
+  cerr << msg << endl;
+  cerr << "error in line " << stg_yylineno << ": token last read: `" << stg_yytext << "'" << endl;
   exit(1);
 }
 

@@ -41,15 +41,16 @@
 #include "binDecision.h"
 #include "communicationGraph.h"
 #include "fiona.h"
-#include "pnapi/petrinet.h"
 #include <cassert>
 
 using namespace std;
-using PNapi::PetriNet;
 
 double global_progress = 0;
 int show_progress = 0;
 
+// for the STG->oWFN translation
+extern void STG2oWFN_main();
+extern FILE *stg_yyin;
 
 //! \param _PN
 //! \brief constructor
@@ -930,7 +931,7 @@ void communicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
 
 //! \brief creates a STG file of the graph
 void communicationGraph::printGraphToSTG() {
-    trace(TRACE_0, "creating the STG file of the graph...\n");
+    trace(TRACE_0, "\ncreating the STG file of the graph...\n");
     GraphNode *tmp = root;
     
     // set file name
@@ -997,9 +998,18 @@ void communicationGraph::printGraphToSTG() {
     } else {
         trace(TRACE_0, "cannot execute command as Petrify was not found in path\n");
     }
+
+    // the filename of the generated Petri net
+    string generated_stg_file = string(netfile);
+    if (parameters[P_OG]) {
+        generated_stg_file += ".OG.pn";
+    } else {
+        generated_stg_file += ".IG.pn";
+    }
     
-    PetriNet *TheNet = new PetriNet();
-    std::cerr << TheNet->information() << std::endl;
+    std::cerr << "parsing file file `" << generated_stg_file << "'..." << std::endl;
+    stg_yyin = fopen(generated_stg_file.c_str(), "r");
+    STG2oWFN_main();
 }
 
 

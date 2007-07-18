@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-07-18 08:16:15 $ by $Author: nlohmann $.
-# Version $Revision: 1.36 $
+# File last changed $Date: 2007-07-18 10:44:24 $ by $Author: nlohmann $.
+# Version $Revision: 1.37 $
 
 bin_PROGRAMS = fiona
 
@@ -33,6 +33,7 @@ YYSOURCES = lexer_owfn.cc lexer_owfn.h syntax_owfn.cc syntax_owfn.h \
 fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         lexer_owfn.ll lexer_owfn_wrap.h\
         syntax_og.yy lexer_og.ll\
+	syntax_stg.yy lexer_stg.ll \
         petriNetNode.h petriNetNode.cc\
         IG.cc owfnPlace.cc communicationGraph.h\
         IG.h owfnPlace.h\
@@ -56,7 +57,8 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         newlogger.h newlogger.cc mynew.h \
         Exchangeability.h Exchangeability.cc \
         OGFromFile.h OGFromFile.cc GraphFormula.h GraphFormula.cc \
-        containers.h containers.cc
+        containers.h containers.cc\
+	stg2owfn.cc
 
 BUILT_SOURCES = lexer_owfn.h
 
@@ -89,8 +91,8 @@ fiona_LDFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(all_libraries)
 fiona_LDADD = $(builddir)/../cudd/obj/libobj.a \
 	$(builddir)/../cudd/dddmp/libdddmp.a $(builddir)/../cudd/cudd/libcudd.a \
 	$(builddir)/../cudd/mtr/libmtr.a $(builddir)/../cudd/st/libst.a \
-	$(builddir)/../cudd/util/libutil.a $(builddir)/../cudd/epd/libepd.a #\
-        #lib_pnapi.a
+	$(builddir)/../cudd/util/libutil.a $(builddir)/../cudd/epd/libepd.a \
+        lib_pnapi.a
 
 lexer_owfn.h: lexer_owfn.cc
 	$(EGREP) '^#define.*FLEX.*VERSION' $^ > $@
@@ -99,7 +101,7 @@ lexer_owfn.h: lexer_owfn.cc
 # the Petri net API
 lib_LIBRARIES = lib_pnapi.a
 
-lib_pnapi_a_SOURCES = pnapi/pnapi.h\
+lib_pnapi_a_SOURCES = pnapi/pnapi.cc pnapi/pnapi.h\
 		      pnapi/helpers.cc pnapi/helpers.h \
 		      pnapi/options.h \
 		      pnapi/petrinet-output.cc \

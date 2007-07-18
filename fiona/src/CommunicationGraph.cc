@@ -45,6 +45,7 @@
 #include <cassert>
 
 using namespace std;
+using PNapi::PetriNet;
 
 double global_progress = 0;
 int show_progress = 0;
@@ -996,6 +997,9 @@ void communicationGraph::printGraphToSTG() {
     } else {
         trace(TRACE_0, "cannot execute command as Petrify was not found in path\n");
     }
+    
+    PetriNet *TheNet = new PetriNet();
+    std::cerr << TheNet->information() << std::endl;
 }
 
 

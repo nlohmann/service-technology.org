@@ -985,9 +985,9 @@ void communicationGraph::printGraphToSTG() {
 
     // prepare Petrify command line for printing
     if (parameters[P_OG]) {
-        buffer = "petrify4.1 " + string(netfile) + ".OG.stg -dead -ip -o " + string(netfile) + ".OG.pn";
+        buffer = string(HAVE_PETRIFY) + " " + string(netfile) + ".OG.stg -dead -d1 -ip -o " + string(netfile) + ".OG.pn";
     } else {
-        buffer = "petrify4.1 " + string(netfile) + ".IG.stg -dead -ip -o " + string(netfile) + ".IG.pn";
+        buffer = string(HAVE_PETRIFY) + " " + string(netfile) + ".IG.stg -dead -d1 -ip -o " + string(netfile) + ".IG.pn";
     }
 
     // print commandline and execute system command
@@ -997,6 +997,7 @@ void communicationGraph::printGraphToSTG() {
         system(buffer.c_str());
     } else {
         trace(TRACE_0, "cannot execute command as Petrify was not found in path\n");
+        return;
     }
 
     // the filename of the generated Petri net

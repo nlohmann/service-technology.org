@@ -961,8 +961,11 @@ void communicationGraph::printGraphToSTG() {
     dotFile << ".dummy";
     assert(PN != NULL);
     for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
-    	if (PN->getPlace(i)->type == INPUT || PN->getPlace(i)->type == OUTPUT)
-            dotFile << " " << PN->getPlace(i)->name;
+    	if (PN->getPlace(i)->type == INPUT) {
+            dotFile << " out." << PN->getPlace(i)->name;
+        } else if (PN->getPlace(i)->type == OUTPUT) {
+            dotFile << " in." << PN->getPlace(i)->name;
+        }
     }
     dotFile << endl;    
     dotFile << ".state graph" << endl;
@@ -1033,13 +1036,22 @@ void communicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, 
     
     // arcs
     while ((element = v->getNextSuccEdge()) != NULL) {
-        GraphNode * vNext = element->getDstNode();
+        GraphNode *vNext = element->getDstNode();
 	
         if (!vNext->isToShow(root))
             continue;
 	
         string this_edges_label = element->getLabel().substr(1, element->getLabel().size());
-        os << "p" << v->getNumber() << " " << this_edges_label << " p" << vNext->getNumber() << endl;
+        os << "p" << v->getNumber() << " ";
+        
+        if (element->getLabel().substr(0,1) == "!") {
+            os << "out.";
+        } else if (element->getLabel().substr(0,1) == "?") {
+            os << "in.";
+        }
+        
+        os << this_edges_label;
+        os << " p" << vNext->getNumber() << endl;
 
         if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
             printGraphToSTGRecursively(vNext, os, visitedNodes);

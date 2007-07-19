@@ -66,12 +66,12 @@ extern int stg_yylex();
 %%
 
 stg:
-  K_MODEL IDENTIFIER NEWLINE NEWLINE
-  K_DUMMY transition_list NEWLINE NEWLINE
-  K_GRAPH NEWLINE NEWLINE { in_arc_list = true; }
+  K_MODEL IDENTIFIER newline
+  K_DUMMY transition_list newline
+  K_GRAPH newline { in_arc_list = true; }
   tp_list pt_list
-  K_MARKING { in_marking_list = true; } OPENBRACE place_list CLOSEBRACE NEWLINE NEWLINE
-  K_END NEWLINE NEWLINE
+  K_MARKING { in_marking_list = true; } OPENBRACE place_list CLOSEBRACE newline
+  K_END newline
 ;
 
 transition_list:
@@ -95,11 +95,16 @@ place_list:
 ;
 
 tp_list:
-  TRANSITIONNAME place_list NEWLINE NEWLINE { arcs[string($1)] = tempNodeSet; tempNodeSet.clear(); } tp_list
+  TRANSITIONNAME place_list newline { arcs[string($1)] = tempNodeSet; tempNodeSet.clear(); } tp_list
 | /* empty */
 ;
 
 pt_list:
-  PLACENAME transition_list NEWLINE NEWLINE { arcs[string($1)] = tempNodeSet; tempNodeSet.clear(); } pt_list
+  PLACENAME transition_list newline { arcs[string($1)] = tempNodeSet; tempNodeSet.clear(); } pt_list
 | /* empty */
+;
+
+newline:
+  NEWLINE
+| NEWLINE NEWLINE
 ;

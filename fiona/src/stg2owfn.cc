@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <map>
 #include <set>
 #include <string>
@@ -10,10 +11,12 @@ using std::set;
 using std::string;
 using std::cerr;
 using std::endl;
+using std::ofstream;
 using namespace PNapi;
 
 extern int stg_yyparse();
 extern FILE *stg_yyin;
+extern char *netfile; 
 
 set<string> transitions;
 set<string> places;
@@ -93,7 +96,7 @@ void STG2oWFN_init()
 void STG2oWFN_main()
 {
     stg_yyparse();
-    cerr << "parsing complete" << endl;
+    cerr << "parsing complete. generated oWFN: ";
     
 //    cerr << transitions.size() << " transitions" << endl;
 //    cerr << places.size() << " places" << endl;
@@ -103,5 +106,11 @@ void STG2oWFN_main()
     std::cerr << STGPN.information() << endl;
     
     STGPN.set_format(FORMAT_OWFN);
-//    std::cout << STGPN;
+    
+    std::cerr << "writing partner oWFN to file `" << string(netfile).substr(0, string(netfile).length()-5) << "-partner.owfn'" << std::endl;
+    
+    string filename = string(netfile).substr(0, string(netfile).length()-5) + "-partner.owfn";
+    ofstream *file = new ofstream(filename.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
+    
+    (*file) << STGPN;
 }

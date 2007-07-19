@@ -18,3 +18,7 @@ lexer_og.cc
 syntax_og.cc
 syntax_og.h
 doc
+.DS_Store
+lexer_stg.cc
+syntax_stg.cc
+syntax_stg.h

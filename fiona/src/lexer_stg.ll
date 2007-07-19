@@ -16,8 +16,6 @@
 using std::string;
 
 extern int stg_yyerror(const char*);
-
-static void setlval();
 %}
 
 
@@ -33,8 +31,8 @@ transitionname2		"in."{name}
 %%
  /* RULES */
 
-"#"            { BEGIN(COMMENT); }
-<COMMENT>[\n\r]   { BEGIN(INITIAL); }
+"#"             { BEGIN(COMMENT); }
+<COMMENT>[\n\r] { BEGIN(INITIAL); }
 <COMMENT>[^\n]* {                 }
 
 
@@ -49,14 +47,20 @@ transitionname2		"in."{name}
 
 {placename}		{ stg_yylval.str = strdup(stg_yytext);
                           return PLACENAME; }
+
 {transitionname1}	{ stg_yylval.str = strdup(stg_yytext);
                           return TRANSITIONNAME; }
+
 {transitionname2}	{ stg_yylval.str = strdup(stg_yytext);
                           return TRANSITIONNAME; }
+
 "finalize"		{ stg_yylval.str = strdup(stg_yytext);
                           return TRANSITIONNAME; }
+
 {name}			{ return IDENTIFIER; }
 
 [\n\r]        { return NEWLINE; }
+
 [ \t]         { break; }
+
 .             { stg_yyerror("lexical error"); }

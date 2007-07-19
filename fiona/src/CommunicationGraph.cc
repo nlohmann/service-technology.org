@@ -988,9 +988,9 @@ void communicationGraph::printGraphToSTG() {
 
     // prepare Petrify command line for printing
     if (parameters[P_OG]) {
-        buffer = string(HAVE_PETRIFY) + " " + string(netfile) + ".OG.stg -dead -d1 -ip -o " + string(netfile) + ".OG.pn";
+        buffer = string(HAVE_PETRIFY) + " " + string(netfile) + ".OG.stg -dead -ip -o " + string(netfile) + ".OG.pn";
     } else {
-        buffer = string(HAVE_PETRIFY) + " " + string(netfile) + ".IG.stg -dead -d1 -ip -o " + string(netfile) + ".IG.pn";
+        buffer = string(HAVE_PETRIFY) + " " + string(netfile) + ".IG.stg -dead -ip -o " + string(netfile) + ".IG.pn";
     }
 
     // print commandline and execute system command

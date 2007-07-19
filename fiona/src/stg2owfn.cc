@@ -6,6 +6,8 @@
 
 #include "pnapi/pnapi.h"
 
+
+
 using std::map;
 using std::set;
 using std::string;
@@ -14,27 +16,36 @@ using std::endl;
 using std::ofstream;
 using namespace PNapi;
 
-extern int stg_yyparse();
-extern FILE *stg_yyin;
-extern char *netfile; 
 
+
+// globals used in STG parser
 set<string> transitions;
 set<string> places;
 set<string> initialMarked;
 map<string, set<string> > arcs;
-PetriNet STGPN;
 
 
-void STG2oWFN_init()
+
+
+
+PetriNet STG2oWFN_init()
 {
-    STGPN = PetriNet();
+    extern int stg_yyparse();
+    extern FILE *stg_yyin;
+    
+    // call STG parser
+    stg_yyparse();
+    fclose(stg_yyin);    
+    
+    // create a Petri Net object
+    PetriNet STGPN = PetriNet();
     
     // create places
     for (set<string>::iterator p = places.begin(); p != places.end(); p++)
         STGPN.newPlace(*p);
     
-    Place *finalPlace = STGPN.newPlace("final");
-    finalPlace->isFinal = true;
+    //Place *finalPlace = STGPN.newPlace("final");
+    //finalPlace->isFinal = true;
     
     // initially mark places
     for (set<string>::iterator p = initialMarked.begin(); p != initialMarked.end(); p++)
@@ -46,8 +57,7 @@ void STG2oWFN_init()
         string transitionName = *t;
         string placeName = transitionName.substr(0, transitionName.find_first_of("/"));
         
-        if (transitionName.substr(0, transitionName.find_first_of(".")) == "in")
-        {
+        if (transitionName.substr(0, transitionName.find_first_of(".")) == "in") {
             Place *inPlace = STGPN.findPlace(placeName);
             if (inPlace == NULL)
                 inPlace = STGPN.newPlace(placeName, IN);
@@ -60,8 +70,7 @@ void STG2oWFN_init()
             
             STGPN.newArc(inPlace, inTransition);
         }
-        else if (transitionName.substr(0, transitionName.find_first_of(".")) == "out")
-        {
+        else if (transitionName.substr(0, transitionName.find_first_of(".")) == "out") {
             Place *outPlace = STGPN.findPlace(placeName);
             if (outPlace == NULL)
                 outPlace = STGPN.newPlace(placeName, OUT);
@@ -74,13 +83,13 @@ void STG2oWFN_init()
             
             STGPN.newArc(outTransition, outPlace);
         }
-        else
+/*        else
             if (transitionName == "finalize")
             {
                 Transition *finalTransition = STGPN.newTransition("t" + transitionName);
                 STGPN.newArc(finalTransition, finalPlace);
             }
-        
+*/        
         // arcs t->p
         for (set<string>::iterator p = arcs[*t].begin(); p != arcs[*t].end(); p++)
             STGPN.newArc(STGPN.findTransition(transitionName), STGPN.findPlace(*p));
@@ -90,27 +99,25 @@ void STG2oWFN_init()
     for (set<string>::iterator p = places.begin(); p != places.end(); p++)
         for (set<string>::iterator t = arcs[*p].begin(); t != arcs[*p].end(); t++)
             STGPN.newArc(STGPN.findPlace(*p), STGPN.findTransition("t" + *t));
+    
+    return STGPN;
 }
+
+
+
 
 
 void STG2oWFN_main()
 {
-    stg_yyparse();
-    cerr << "parsing complete. generated oWFN: ";
+    extern char *netfile; 
     
-//    cerr << transitions.size() << " transitions" << endl;
-//    cerr << places.size() << " places" << endl;
-    
-    STG2oWFN_init();
-    
+    PetriNet STGPN = STG2oWFN_init();
     std::cerr << STGPN.information() << endl;
-    
-    STGPN.set_format(FORMAT_OWFN);
-    
-    std::cerr << "writing partner oWFN to file `" << string(netfile).substr(0, string(netfile).length()-5) << "-partner.owfn'" << std::endl;
-    
+
     string filename = string(netfile).substr(0, string(netfile).length()-5) + "-partner.owfn";
+    cerr << "writing partner oWFN to file `" << filename << "'" << endl;    
     ofstream *file = new ofstream(filename.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
-    
+
+    STGPN.set_format(FORMAT_OWFN);
     (*file) << STGPN;
 }

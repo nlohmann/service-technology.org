@@ -3,7 +3,7 @@
 #include <set>
 #include <string>
 
-#include "PNapi/PNapi.h"
+#include "pnapi/pnapi.h"
 
 using std::map;
 using std::set;

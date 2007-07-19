@@ -31,11 +31,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/06/28 07:38:15 $
+ * \date    \$Date: 2007/07/19 09:56:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.187 $
+ * \version \$Revision: 1.188 $
  */
 %}
 
@@ -126,14 +126,49 @@ Process(a,b,messageExchange,c,d,e,g,i,_id) ->
       set< unsigned int > faultIds = globals::ASTEmap[ e->id ]->enclosedActivities;
       faultIds.insert( e->id );
 
-      enterConflictingActivities( innerIds, faultIds );
+//      enterConflictingActivities( innerIds, faultIds );
 //      enterConflictingActivities( faultIds, compIds );
 
 
       // trigger [SA00015]
       if (globals::ASTE_startActivities.empty())
+      {
         SAerror(15, "", myself->attributes["referenceLine"]);
-
+      }
+      else
+      {
+        for ( set< unsigned int >::iterator it = globals::ASTE_startActivities.begin(); it != globals::ASTE_startActivities.end(); it++ )
+        {
+          for ( int i = 2; i < globals::ASTEid; i++ )
+          {
+            if (globals::ASTEmap[i] != NULL)
+            {
+              activityRelationType type = activityRelation( i, *it );
+              if ( (type == AR_BEFORE || type == AR_CONCURRENT) &&
+                  (
+                  globals::ASTEmap[i]->activityTypeName() == "pick" ||
+                  globals::ASTEmap[i]->activityTypeName() == "reply" ||
+                  globals::ASTEmap[i]->activityTypeName() == "invoke" ||      
+                  globals::ASTEmap[i]->activityTypeName() == "empty" ||     
+                  globals::ASTEmap[i]->activityTypeName() == "receive" ||      
+                  globals::ASTEmap[i]->activityTypeName() == "wait" ||      
+                  globals::ASTEmap[i]->activityTypeName() == "assign" ||      
+                  globals::ASTEmap[i]->activityTypeName() == "throw" ||      
+                  globals::ASTEmap[i]->activityTypeName() == "exit" ||      
+                  globals::ASTEmap[i]->activityTypeName() == "rethrow" ||      
+                  globals::ASTEmap[i]->activityTypeName() == "if" ||      
+                  globals::ASTEmap[i]->activityTypeName() == "while" ||      
+                  globals::ASTEmap[i]->activityTypeName() == "foreach" ||      
+                  globals::ASTEmap[i]->activityTypeName() == "repeatUntil"
+                  ) &&      
+                  globals::ASTEmap[i]->isStartActivity == false )
+              {
+                SAerror( 56, globals::ASTEmap[i]->activityTypeName(), globals::ASTEmap[i]->attributes["referenceLine"] );
+              }
+            }
+          }
+        }
+      }
 
       // trigger [SA00066]
       // should be actually calculated at a <flow> activity, but "linksOK" is

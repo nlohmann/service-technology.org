@@ -4,7 +4,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 2.0, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.26 $)
+AC_REVISION($Revision: 1.27 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -47,12 +47,12 @@ else
 fi
 
 # search for Petrify
-AC_CHECK_PROG(PETRIFY, petrify4.1, petrify4.1, not found)
+AC_CHECK_PROGS(PETRIFY, [petrify4.0 petrify4.1 petrify4.2 petrify], not found)
 if test "$PETRIFY" = "not found"; then
- AC_MSG_WARN([Petrify 4.1 was not found.])
- AC_DEFINE(HAVE_PETRIFY, 0, [Petrify 4.1 can not be used on this system.])
+ AC_MSG_WARN([Petrify was not found.])
+ AC_DEFINE(HAVE_PETRIFY, 0, [Petrify can not be used on this system.])
 else
- AC_DEFINE(HAVE_PETRIFY, 1, [Petrify 4.1 can be used on this system.])
+ AC_DEFINE_UNQUOTED(HAVE_PETRIFY, "${PETRIFY}", [Petrify can be used on this system.])
 fi
 
 AC_CHECK_PROG(YACC, bison, bison, not found)

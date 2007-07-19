@@ -68,9 +68,9 @@ std::ostream * log_output = &std::cout;   // &std::clog;
 std::map<possibleOptions,    bool> options;
 std::map<possibleParameters, bool> parameters;
 
+
 // long options
-static struct option longopts[] =
-{
+static struct option longopts[] = {
 //  { "bla",           no_argument,       NULL, GETOPT_BLA },
   { "help",            no_argument,       NULL, 'h' },
   { "version",         no_argument,       NULL, 'v' },
@@ -180,6 +180,7 @@ void print_help() {
   trace("\n");
 }
 
+
 // Prints some version information
 void print_version() {
   trace(std::string(PACKAGE_STRING) + " -- ");
@@ -190,9 +191,9 @@ void print_version() {
   trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 }
 
+
 void printErrorInvalidNumberForOptionAndExit(const std::string& option,
-    const std::string& givenArgument)
-{
+    const std::string& givenArgument) {
     cerr << "Error:\tArgument for option " << option << " has to be a "
             "non-negative number." << endl
          << "\tInstead you gave '" << givenArgument
@@ -203,13 +204,14 @@ void printErrorInvalidNumberForOptionAndExit(const std::string& option,
     exit(1);
 }
 
+
 void testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary(
-    const std::string& option, const std::string& givenArgument)
-{
+    const std::string& option, const std::string& givenArgument) {
     if (!isNonNegativeInteger(givenArgument)) {
         printErrorInvalidNumberForOptionAndExit(option, optarg);
     }
 }
+
 
 // get parameters from options
 void parse_command_line(int argc, char* argv[]) {
@@ -301,29 +303,35 @@ void parse_command_line(int argc, char* argv[]) {
                     options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = false;
                     parameters[P_IG] = true;
-		    options[O_SYNTHESIZE_PARTNER_OWFN] = true;
+                    options[O_SYNTHESIZE_PARTNER_OWFN] = true;
                 } else if (lc_optarg == "mostpermissivepartner") {
                     options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = true;
                     parameters[P_IG] = false;
-		    options[O_SYNTHESIZE_PARTNER_OWFN] = true;
+                    options[O_SYNTHESIZE_PARTNER_OWFN] = true;
                 } else if (lc_optarg == "match") {
                     options[O_MATCH] = true;
-		} else if (lc_optarg == "simulation") {
-		    options[O_SIMULATES] = true;
-		} else if (lc_optarg == "equality") {
-		    options[O_EQUALS] = true;
-		} else if (lc_optarg == "equivalence") {
-		    options[O_EX] = true;
-		    options[O_GRAPH_TYPE] = false;
-		    parameters[P_IG] = false;
-		    parameters[P_OG] = false;
-		} else if (lc_optarg == "productog") {
-		    options[O_PRODUCTOG] = true;
+                    parameters[P_IG] = false;
+                } else if (lc_optarg == "simulation") {
+                    options[O_SIMULATES] = true;
+                    parameters[P_IG] = false;
+                } else if (lc_optarg == "equality") {
+                    // using simulation in both directions
+                    options[O_EQUALS] = true;
+                    parameters[P_IG] = false;
+                } else if (lc_optarg == "equivalence") {
+                    // using BDDs
+                    options[O_EX] = true;
+                    options[O_GRAPH_TYPE] = false;
+                    parameters[P_IG] = false;
+                    parameters[P_OG] = false;
+                } else if (lc_optarg == "productog") {
+                    parameters[P_IG] = false;
+                    options[O_PRODUCTOG] = true;
                 } else {
                     cerr << "Error:\twrong modus operandi (option -t)" << endl
-		    << "\tEnter \"fiona --help\" for more information.\n"
-		    << endl;
+                         << "\tEnter \"fiona --help\" for more information.\n"
+                         << endl;
                     exit(1);
                 }
                 break;

@@ -453,10 +453,10 @@ int main(int argc, char ** argv) {
             graph->printGraphToDot();      // .out
             graph->printOGtoFile();       // .og
 
-	    if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
-		graph->printGraphToSTG();	    
-	    }	    
-	    
+            if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
+                graph->printGraphToSTG();	    
+            }
+
             if (options[O_OTF]) {
                 //graph->bdd->printGraphToDot();
                 graph->bdd->save("OTF");
@@ -480,7 +480,7 @@ int main(int argc, char ** argv) {
             trace(TRACE_0, "=================================================================\n");
             trace(TRACE_0, "\n");
 
-        } else {
+        } else if (parameters[P_IG]) {
 
 			// ---------------- interaction graph is built ---------------------
             interactionGraph * graph = new interactionGraph(PN);
@@ -516,10 +516,10 @@ int main(int argc, char ** argv) {
             // generate output files
             graph->printGraphToDot();      // .out
 
-	    if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
-		graph->printGraphToSTG();	    
-	    }
-	    
+            if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
+                graph->printGraphToSTG();	    
+            }
+
             trace(TRACE_5, "computation finished -- trying to delete graph\n");
 //			trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
             delete graph;
@@ -611,7 +611,7 @@ int main(int argc, char ** argv) {
                 trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
             }
         } else {
-            cerr << "Error: \t If option -S is used, exactly two OG files must be entered\n" << endl;
+            cerr << "Error: \t If option -t equals is used, exactly two OG files must be entered\n" << endl;
         }
     }
 

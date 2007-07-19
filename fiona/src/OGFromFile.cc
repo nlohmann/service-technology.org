@@ -667,7 +667,7 @@ void OGFromFile::printDotFile(const std::string& filenamePrefix,
     dotFileHandle.close();
 
     // prepare dot command line for printing
-    string cmd = "dot -Tpng " + dotFile + " -o " + pngFile;
+    string cmd = "dot -Tpng \"" + dotFile + "\" -o \"" + pngFile + "\"";
 
     // print commandline and execute system command
     trace(TRACE_0, cmd + "\n\n");

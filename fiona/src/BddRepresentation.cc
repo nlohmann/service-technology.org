@@ -691,11 +691,11 @@ void BddRepresentation::printDotFile(char** varNames, char* option){
 	    if ((Cudd_DagSize(bddMp) < 900) && (Cudd_DagSize(bddAnn) < 900)) {
             trace(TRACE_0, "\ncreating the dot file of BDD_MP and BDD_ANN...\n");
             if (options[O_CALC_ALL_STATES]) {
-                sprintf(bufferMp, "dot -Tpng %s.OG.BDD_MP.out -o %s.OG.BDD_MP.png", netfile, netfile);
-                sprintf(bufferAnn, "dot -Tpng %s.OG.BDD_ANN.out -o %s.OG.BDD_ANN.png", netfile, netfile);
+                sprintf(bufferMp, "dot -Tpng \"%s.OG.BDD_MP.out\" -o \"%s.OG.BDD_MP.png\"", netfile, netfile);
+                sprintf(bufferAnn, "dot -Tpng \"%s.OG.BDD_ANN.out\" -o \"%s.OG.BDD_ANN.png\"", netfile, netfile);
             } else {
-                sprintf(bufferMp, "dot -Tpng %s.R.OG.BDD_MP.out -o %s.R.OG.BDD_MP.png", netfile, netfile);
-                sprintf(bufferAnn, "dot -Tpng %s.R.OG.BDD_ANN.out -o %s.R.OG.BDD_ANN.png", netfile, netfile);
+                sprintf(bufferMp, "dot -Tpng \"%s.R.OG.BDD_MP.out\" -o \"%s.R.OG.BDD_MP.png\"", netfile, netfile);
+                sprintf(bufferAnn, "dot -Tpng \"%s.R.OG.BDD_ANN.out\" -o \"%s.R.OG.BDD_ANN.png\"", netfile, netfile);
             }
          
             trace(TRACE_0, bufferMp); trace(TRACE_0, "\n");

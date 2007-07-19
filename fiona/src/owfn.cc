@@ -1663,8 +1663,7 @@ bool oWFN::isFinal() const {
 				trace(TRACE_5, "oWFN::bool oWFN::isFinal() : end\n");
 				return false;
 			}
-//			if (FinalMarking[i] != 0 && marking[i] != FinalMarking[i]) {
-			if (FinalMarking[i] != 0 && CurrentMarking[i] < FinalMarking[i]) {
+			if (CurrentMarking[i] != FinalMarking[i]) {
 				trace(TRACE_5, "oWFN::bool oWFN::isFinal() : end\n");
 				return false;	
 			}

@@ -30,17 +30,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/07/18 10:37:53 $
+ * \date    \$Date: 2007/07/19 12:39:04 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.103 $
+ * \version \$Revision: 1.104 $
  *
  * \ingroup petrinet
  */
@@ -1280,22 +1280,22 @@ void PetriNet::output_owfn(ostream *output) const
   
   if (globals::owfn_statepredicate == "")
   {
-    (*output) << "FINALMARKING" << endl;
+    (*output) << "FINALCONDITION" << endl;
     count = 1;
     for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     {
       if ( (*p)->isFinal )
       {
         if (count != 1)
-          (*output) << ",";
+          (*output) << " AND";
         
   #ifdef USING_BPEL2OWFN
-        (*output) << "  " << (*p)->nodeShortName();
+        (*output) << "  (" << (*p)->nodeShortName() << "=1)";
   #else
-        (*output) << "  " << (*p)->nodeName();
+        (*output) << "  (" << (*p)->nodeName() << "=1)";
   #endif
         
-        (*output) << " {final place}";
+        // (*output) << " {final place}";
         
         if (count++ != 1)
           (*output) << endl;      

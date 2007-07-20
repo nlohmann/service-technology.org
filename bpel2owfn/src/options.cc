@@ -31,17 +31,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/18 10:37:53 $
+ * \date    \$Date: 2007/07/20 08:14:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.91 $
+ * \version \$Revision: 1.92 $
  */
 
 
@@ -514,6 +514,10 @@ void parse_command_line(int argc, char* argv[])
       case 'n':
       {
         options[O_NET] = true;
+        
+        // set the mode to Petri net
+        modus = M_PETRINET;
+        
         globals::net_filename = string(optarg);
         break;
       }

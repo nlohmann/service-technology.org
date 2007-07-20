@@ -278,6 +278,7 @@ transition: KEY_TRANSITION tname
 	{
 	  t = PN.newTransition(nodename);
 	}
+        annotation
 	KEY_CONSUME
 	{
 	  readmode = 4;
@@ -296,6 +297,15 @@ tname:   IDENT {nodename = strip_namespace($1->name);}
 | NUMBER {nodename = strip_namespace($1->name);}
 ;
 
+annotation:
+  /* empty */
+| LCONTROL annotation_list RCONTROL
+;
+
+annotation_list:
+  IDENT { t->add_label(string($1->name)); }
+| IDENT { t->add_label(string($1->name)); } COMMA annotation_list
+;
 
 arclist: 
 | arc 

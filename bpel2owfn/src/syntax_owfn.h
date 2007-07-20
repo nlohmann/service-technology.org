@@ -128,7 +128,7 @@ typedef union YYSTYPE
 {
     kc::casestring yt_casestring;
 }
-/* Line 1489 of yacc.c.  */
+/* Line 1529 of yacc.c.  */
 #line 133 "syntax_owfn.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

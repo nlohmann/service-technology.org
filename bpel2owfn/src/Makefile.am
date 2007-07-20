@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/07/18 10:37:52 $ by $Author: znamirow $.
-# Version $Revision: 1.82 $
+# File last changed $Date: 2007/07/20 09:29:32 $ by $Author: nielslohmann $.
+# Version $Revision: 1.83 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -116,7 +116,8 @@ bpel2owfn_SOURCES = $(KCSOURCES) \
 		    extension-chor.cc extension-chor.h \
 		    extension-data.cc extension-data.h \
 		    pnapi.h petrinet.h petrinet.cc \
-		    petrinet-output.cc petrinet-reduction.cc
+		    petrinet-output.cc petrinet-reduction.cc \
+		    syntax_owfn.h
 
 # These sources have to be present before the rest is compiled.
 BUILT_SOURCES = $(KCDUMMY) \
@@ -128,7 +129,7 @@ BUILT_SOURCES = $(KCDUMMY) \
 EXTRA_DIST = $(KCDUMMY) \
 	     $(KCFILES_TEMP) \
 	     $(KCFILES_NECESSARY) \
-	     frontend-parser.h
+	     frontend-parser.h 
 
 
 

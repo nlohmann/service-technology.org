@@ -263,7 +263,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 //! \brief checks whether the set of input messages contains at least one input message
 //! that has been sent at its maximum
 bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, GraphEdgeType typeOfPlace) {
-	trace(TRACE_3, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): start\n");
+	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): start\n");
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
 		if (typeOfPlace == SENDING) {
 			unsigned int i = 0;
@@ -299,7 +299,7 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * 
 		}
 	}
 	// everything is fine
-	trace(TRACE_3, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): end\n");
+	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): end\n");
 	return true;
 }
 

@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/07/23 08:10:37 $ by $Author: znamirow $.
-# Version $Revision: 1.84 $
+# File last changed $Date: 2007/07/23 08:20:26 $ by $Author: znamirow $.
+# Version $Revision: 1.85 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -123,13 +123,15 @@ bpel2owfn_SOURCES = $(KCSOURCES) \
 BUILT_SOURCES = $(KCDUMMY) \
 		frontend-parser.cc \
 		frontend-parser-chor.cc \
-		frontend-parser-wsdl.cc
+		frontend-parser-wsdl.cc \
+		frontend-parser-owfn.cc 
 
 # These files have to be distributed to compile without compiler generators.
 EXTRA_DIST = $(KCDUMMY) \
 	     $(KCFILES_TEMP) \
 	     $(KCFILES_NECESSARY) \
-	     frontend-parser.h 
+	     frontend-parser.h frontend-owfn-parser.h 
+	     
 
 
 

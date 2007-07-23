@@ -29,17 +29,17 @@
  * \brief   BPEL4Chor extension
  *  
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2007/04/30
  *
- * \date    \$Date: 2007/06/28 07:38:16 $
+ * \date    \$Date: 2007/07/23 08:20:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 
 

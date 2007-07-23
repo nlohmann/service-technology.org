@@ -39,7 +39,7 @@
  *          
  * \date
  *          - created 2006/09/10
- *          - last changed: \$Date: 2007/07/23 12:43:09 $
+ *          - last changed: \$Date: 2007/07/23 14:01:51 $
  * 
  * \note    This file is part of the tool PNML2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  * \note    This file was created using Flex reading file lexic_pnml.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  *
  * \todo
  */
@@ -131,7 +131,7 @@ xmlheader		([^?]|"-"[^?])*
 <ATTRIBUTE>"="		{ return X_EQUALS;}
 
  /* text */
-<TEXT>">"{text}"<"	{ BEGIN(INITIAL);
+<TEXT>">"{text}?"<"	{ BEGIN(INITIAL);
 					  setlval();
 					  return X_TEXT;
 					}

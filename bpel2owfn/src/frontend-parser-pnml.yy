@@ -36,7 +36,7 @@
  *          
  * \date 
  *          - created: 2006/09/10
- *          - last changed: \$Date: 2007/07/23 12:43:09 $
+ *          - last changed: \$Date: 2007/07/23 14:01:51 $
  * 
  * \note    This file is part of the tool PNML2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -45,7 +45,7 @@
  * \note    This file was created using GNU Bison reading file pnml-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  * 
  */
 %}
@@ -181,13 +181,11 @@ netSubElement:
 ******************************************************************************/
 
 tTransition:
-| P_TRANSITION attributes
-	X_NEXT transitionSubElement_List X_SLASH P_TRANSITION
+  P_TRANSITION attributes	X_NEXT transitionSubElement_List X_SLASH P_TRANSITION
     {
     	PN.newTransition(id);
     }
-| P_TRANSITION attributes
-    X_SLASH
+| P_TRANSITION attributes X_SLASH
     {
     	PN.newTransition(id);
     }
@@ -262,6 +260,9 @@ referenceplaceSubElement:
 
 tPlace:
   P_PLACE attributes
+    {
+      type = INTERNAL;
+    }
   X_NEXT placeSubElement_List X_SLASH P_PLACE
     {
    	  p = PN.newPlace(id,type);
@@ -324,15 +325,15 @@ tInitialmarking:
 tType:
   P_TYPE X_NEXT tText X_NEXT X_SLASH P_TYPE
     {
-      if((strip_namespace($3->name)) == "input")
+      if((strip_namespace($3->name)) == ">input<")
       {
         type = IN;
       } 
-      else if ((strip_namespace($3->name)) == "output")
+      else if ((strip_namespace($3->name)) == ">output<")
       {
         type = OUT;
       }
-      else if ((strip_namespace($3->name)) == "inout")
+      else if ((strip_namespace($3->name)) == ">inout<")
       {
         type = INOUT;
       }
@@ -352,7 +353,6 @@ tText:
     {
     	$$ = $2;
     }
-| P_TEXT X_SLASH P_TEXT
 ;
 
 /******************************************************************************
@@ -418,6 +418,7 @@ arcSubElement:
 | tDescription  
 | tInscription	
 | tType				
+;
 
 /*---------------------------------------------------------------------------*/
 
@@ -513,15 +514,15 @@ attributes:
   { 	
       if((strip_namespace($1->name)) == "id")
       {
-        id = (strip_namespace($3->name));
+        id = (strip_namespace($3->name)).substr(1,(strip_namespace($3->name)).length()-2);
       } 
       else if ((strip_namespace($1->name)) == "source")
       {
-        source = (strip_namespace($3->name));
+        source = (strip_namespace($3->name)).substr(1,(strip_namespace($3->name)).length()-2);
       }
       else if ((strip_namespace($1->name)) == "target")
       {
-        target = (strip_namespace($3->name));
+        target = (strip_namespace($3->name)).substr(1,(strip_namespace($3->name)).length()-2);
       }
       else
       {
@@ -538,7 +539,7 @@ tExtension:
 ;
 
 tToolSpecific:
-  P_TOOLSPECIFIC attributes X_NEXT toolSpecificSubElement_List { trace(TRACE_VERY_DEBUG, "???"); } X_SLASH P_TOOLSPECIFIC
+  P_TOOLSPECIFIC attributes X_NEXT toolSpecificSubElement_List X_SLASH P_TOOLSPECIFIC
 | P_TOOLSPECIFIC attributes X_SLASH
 ;
 
@@ -548,6 +549,11 @@ toolSpecificSubElement_List:
   X_NAME attributesIgnore X_NEXT toolSpecificSubElement_List X_SLASH X_NAME X_NEXT toolSpecificSubElement_List
 | X_NAME attributesIgnore X_SLASH X_NEXT toolSpecificSubElement_List
 |	/* empty */
+| X_NAME attributesIgnore X_NEXT P_TEXT X_TEXT X_SLASH P_TEXT X_NEXT X_SLASH X_NAME X_NEXT toolSpecificSubElement_List
+  { 
+    if (PN.findPlace((strip_namespace($5->name)).substr(1,(strip_namespace($5->name)).length()-3)) != NULL)
+      PN.findPlace((strip_namespace($5->name)).substr(1,(strip_namespace($5->name)).length()-3))->isFinal = true;
+  }
 ;
 
 attributesIgnore:

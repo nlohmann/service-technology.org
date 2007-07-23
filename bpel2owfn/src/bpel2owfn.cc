@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/23 12:43:08 $
+ * \date    \$Date: 2007/07/23 14:01:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.191 $
+ * \version \$Revision: 1.192 $
  */
 
 
@@ -422,6 +422,7 @@ void final_output()
         if (options[O_NET] && globals::net_mode == OWFN)
         {
           output = openOutput(globals::output_filename + "Gen." + suffixes[F_OWFN]);
+          trace(TRACE_ALWAYS, "Output filename for owfn2owfn is [OLDNAME]Gen.owfn \n");
         }
         else
         {
@@ -497,6 +498,7 @@ void final_output()
         if (options[O_NET] && globals::net_mode == PNML)
         {
           output = openOutput(globals::output_filename + "Gen." + suffixes[F_PNML]);
+          trace(TRACE_ALWAYS, "Output filename for pnml2pnml is [OLDNAME]Gen.pnml \n");
         }
         else
         {

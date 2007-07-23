@@ -329,15 +329,15 @@ arc:
     }
 ;
 
-statepredicate: 
-  LPAR 
+statepredicate:
+| LPAR 
   {
-    globals::owfn_statepredicate = "(";  
+    globals::owfn_statepredicate += "(";  
   }
   statepredicate 
   RPAR 
   {
-    globals::owfn_statepredicate = ")";  
+    globals::owfn_statepredicate += ")";  
   }
 
 | statepredicate OP_AND  

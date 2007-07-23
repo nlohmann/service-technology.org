@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/23 12:43:09 $
+ * \date    \$Date: 2007/07/23 14:01:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.94 $
+ * \version \$Revision: 1.95 $
  */
 
 
@@ -460,11 +460,16 @@ void parse_command_line(int argc, char* argv[])
         parameter = string(optarg);
         
         if (parameter == "flex")
+        {
           frontend__flex_debug = 1;
+          frontend_owfn__flex_debug = 1;
+          frontend_pnml__flex_debug = 1;
+        }
         else if (parameter == "bison")
         {
           frontend_debug = 1;
-          frontend_owfn_debug = 0;
+          frontend_owfn_debug = 1;
+          frontend_pnml_debug = 1;
         }
         else if (parameter == "1")
           debug_level = TRACE_WARNINGS;
@@ -632,7 +637,6 @@ void parse_command_line(int argc, char* argv[])
       {
         unsigned int pos = globals::net_filename.length() - 5;
         globals::output_filename = globals::net_filename.substr(0, pos);
-        trace(TRACE_ALWAYS, "Output filename for owfn2owfn set to standard: [OLDNAME]Gen.owfn\n");
       }
       else
       {

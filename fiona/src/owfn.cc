@@ -1659,10 +1659,6 @@ bool oWFN::isFinal() const {
 		return FinalCondition -> value;
 	} else {
 		for (unsigned int i = 0; i < getPlaceCount(); i++) {
-			if (getPlace(i)->type != INTERNAL && CurrentMarking[i] > 0) {
-				trace(TRACE_5, "oWFN::bool oWFN::isFinal() : end\n");
-				return false;
-			}
 			if (CurrentMarking[i] != FinalMarking[i]) {
 				trace(TRACE_5, "oWFN::bool oWFN::isFinal() : end\n");
 				return false;	

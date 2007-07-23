@@ -57,7 +57,7 @@ owfns=(
 )
 
 expectations_controllable=(
-    YES
+    NO
     NO
     YES
     NO

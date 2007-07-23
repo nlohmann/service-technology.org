@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/23 08:10:38 $
+ * \date    \$Date: 2007/07/23 12:43:09 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.93 $
+ * \version \$Revision: 1.94 $
  */
 
 
@@ -165,7 +165,7 @@ void print_help()
   trace(" -v, --version          print program version and exit\n");
   trace(" -t, --topology=FILE    read a BPEL4Chor participant topology file from FILE\n");
   trace(" -w, --wsdl=FILE        read a WSDL file from FILE\n");
-  trace(" -n, --net=FILE         read an OWFN file from FILE\n");
+  trace(" -n, --net=FILE         read an OWFN or PNML file from FILE\n");
   trace("\n");
   trace("  MODE is one of the following (at most one mode permitted):\n");
   trace("    petrinet            create a Petri net model\n");
@@ -281,6 +281,8 @@ void parse_command_line(int argc, char* argv[])
   frontend__flex_debug = 0;
   frontend_owfn_debug = 0;
   frontend_owfn__flex_debug = 0;
+  frontend_pnml_debug = 0;
+  frontend_pnml__flex_debug = 0;
   
   
   // use GNU getopt to parse the command-line arguments
@@ -517,8 +519,24 @@ void parse_command_line(int argc, char* argv[])
         
         // set the mode to Petri net
         modus = M_PETRINET;
-        
-        globals::net_filename = string(optarg);
+        string suffix;
+        suffix = string(optarg).substr(string(optarg).length()-4);
+        if (suffix == "owfn")
+        {
+          globals::net_filename = string(optarg);
+          globals::net_mode = OWFN;
+        }
+        else if (suffix == "pnml")
+        {
+          globals::net_filename = string(optarg);
+          globals::net_mode = PNML;
+        }
+        else
+        {
+        globals::net_mode = NONE;
+        trace(string(optarg) + " does not have a valid filetype!\n");
+        trace(TRACE_ALWAYS, "Use -h to get a list of valid filetypes.\n");
+        }
         break;
       }
         

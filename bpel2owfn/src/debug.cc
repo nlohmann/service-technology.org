@@ -34,13 +34,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/07/23 08:10:37 $
+ * \date    \$Date: 2007/07/23 12:43:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.109 $
+ * \version \$Revision: 1.110 $
  *
  * \ingroup debug
  */
@@ -297,6 +297,33 @@ int frontend_owfn_error(const char *msg)
   // remember the last token
   globals::last_error_token = string(frontend_owfn_text);
   globals::last_error_line = toString(frontend_owfn_lineno);
+
+  return 1;
+}
+
+int frontend_pnml_error(const char *msg)
+{ 
+  /* defined by flex */
+  extern int frontend_pnml_lineno;      // line number of current token
+  extern char *frontend_pnml_text;      // text of the current token
+
+  cerr << colorconsole::fg_blue;
+  cerr << globals::filename << ":" << frontend_pnml_lineno+1 << " - [SYNTAX]\n";
+  cerr << colorconsole::fg_standard;
+
+  if (debug_level == TRACE_ERROR)
+    return 1;
+
+  cerr << string(msg);
+
+  if (debug_level >= TRACE_WARNINGS)
+    cerr << "; last token read: `" << string(frontend_pnml_text) << "'" << endl << endl;
+  else
+    cerr << endl << endl;
+
+  // remember the last token
+  globals::last_error_token = string(frontend_pnml_text);
+  globals::last_error_line = toString(frontend_pnml_lineno);
 
   return 1;
 }

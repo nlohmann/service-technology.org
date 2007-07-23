@@ -33,13 +33,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/07/18 10:37:53 $
+ * \date    \$Date: 2007/07/23 12:43:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  */
 
 
@@ -147,5 +147,6 @@ namespace globals {
   map<string, string> owfn_commands;
   
   string owfn_statepredicate;
-
+  
+  net_modes net_mode;
 }

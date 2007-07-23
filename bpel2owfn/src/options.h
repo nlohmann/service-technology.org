@@ -34,13 +34,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/23 08:10:38 $
+ * \date    \$Date: 2007/07/23 12:43:09 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  */
 
 
@@ -96,7 +96,7 @@ typedef enum
    O_REDUCTION,		///< set level of structural reduction
    O_TOPOLOGY,		///< parse a choreography file (BPEL4Chor)
    O_WSDL,		///< parse a WSDL file
-   O_NET  	///< parse an OWFN file
+   O_NET  	///< parse an OWFN or PNML file
 } possibleOptions;
 
 
@@ -199,6 +199,8 @@ extern int frontend_debug;
 extern int frontend__flex_debug;
 extern int frontend_owfn_debug;
 extern int frontend_owfn__flex_debug;
+extern int frontend_pnml_debug;
+extern int frontend_pnml__flex_debug;
 extern FILE *frontend_in;
 
 

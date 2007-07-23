@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/07/23 08:20:26 $ by $Author: znamirow $.
-# Version $Revision: 1.85 $
+# File last changed $Date: 2007/07/23 12:43:08 $ by $Author: znamirow $.
+# Version $Revision: 1.86 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -98,8 +98,10 @@ $(KCDUMMY): $(KCFILES_NECESSARY) $(KCFILES_TEMP)
 bpel2owfn_SOURCES = $(KCSOURCES) \
 		    frontend-parser.yy \
 		    frontend-parser-owfn.yy \
+		    frontend-parser-pnml.yy \
 		    frontend-lexer.ll \
 		    frontend-lexer-owfn.ll \
+		    frontend-lexer-pnml.ll \
 		    frontend-parser-chor.yy \
 		    frontend-parser-wsdl.yy \
 		    bpel2owfn.cc \
@@ -116,21 +118,21 @@ bpel2owfn_SOURCES = $(KCSOURCES) \
 		    extension-chor.cc extension-chor.h \
 		    extension-data.cc extension-data.h \
 		    pnapi.h petrinet.h petrinet.cc \
-		    petrinet-output.cc petrinet-reduction.cc \
-		    syntax_owfn.h
+		    petrinet-output.cc petrinet-reduction.cc 
 
 # These sources have to be present before the rest is compiled.
 BUILT_SOURCES = $(KCDUMMY) \
 		frontend-parser.cc \
 		frontend-parser-chor.cc \
 		frontend-parser-wsdl.cc \
-		frontend-parser-owfn.cc 
+		frontend-parser-owfn.cc \
+		frontend-parser-pnml.cc
 
 # These files have to be distributed to compile without compiler generators.
 EXTRA_DIST = $(KCDUMMY) \
 	     $(KCFILES_TEMP) \
 	     $(KCFILES_NECESSARY) \
-	     frontend-parser.h frontend-owfn-parser.h 
+	     frontend-parser.h frontend-parser-owfn.h frontend-parser-pnml.h 
 	     
 
 

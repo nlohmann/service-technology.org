@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/23 08:10:37 $
+ * \date    \$Date: 2007/07/23 12:43:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.190 $
+ * \version \$Revision: 1.191 $
  */
 
 
@@ -88,19 +88,25 @@ extern int frontend_parse();			// from Bison
 extern int frontend_chor_parse();		// from Bison
 extern int frontend_wsdl_parse();		// from Bison
 extern int frontend_debug;			// from Bison
-extern int frontend_owfn_debug;			// from Bison
 extern int frontend_nerrs;			// from Bison
 extern int frontend_lineno;			// from Bison
 extern int frontend__flex_debug;		// from flex
 extern FILE *frontend_in;			// from flex
 extern void frontend_restart(FILE*);		// from flex
 
+extern int frontend_owfn_debug;			// from Bison
 extern int frontend_owfn_flex_debug;
 
 extern FILE *frontend_owfn_in;
 extern int frontend_owfn_error();
 extern int frontend_owfn_parse();
 
+extern int frontend_pnml_debug;			// from Bison
+extern int frontend_pnml_flex_debug;
+
+extern FILE *frontend_pnml_in;
+extern int frontend_pnml_error();
+extern int frontend_pnml_parse();
 
 
 
@@ -413,7 +419,7 @@ void final_output()
     {
       if (globals::output_filename != "")
       {
-        if (options[O_NET])
+        if (options[O_NET] && globals::net_mode == OWFN)
         {
           output = openOutput(globals::output_filename + "Gen." + suffixes[F_OWFN]);
         }
@@ -488,7 +494,14 @@ void final_output()
     {
       if (globals::output_filename != "")
       {
-        output = openOutput(globals::output_filename + "." + suffixes[F_PNML]);
+        if (options[O_NET] && globals::net_mode == PNML)
+        {
+          output = openOutput(globals::output_filename + "Gen." + suffixes[F_PNML]);
+        }
+        else
+        {
+          output = openOutput(globals::output_filename + "." + suffixes[F_PNML]);
+        }
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for PNML ...\n");
       PN.set_format(FORMAT_PNML);
@@ -703,23 +716,52 @@ int main( int argc, char *argv[])
   {
 
     globals::filename = globals::net_filename;
-    if (!(frontend_owfn_in = fopen(globals::filename.c_str(), "r"))) 
+    
+    if (globals::net_mode == OWFN)
     {
-      cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
-      exit(2);
+      if (!(frontend_owfn_in = fopen(globals::filename.c_str(), "r"))) 
+      {
+        cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
+        exit(2);
+      }
+  
+      show_process_information_header();
+  
+      // invoke Bison BPEL4WSDL parser
+      trace(TRACE_INFORMATION, "Parsing " + globals::net_filename + " ...\n");
+      int parse_result = frontend_owfn_parse();
+      trace(TRACE_INFORMATION, "Parsing of " + globals::net_filename + " complete.\n");
+  
+      // closing a file
+      trace(TRACE_INFORMATION," + Closing owfn file: " + globals::filename + "\n");
+      fclose(frontend_owfn_in);
+      frontend_in = NULL;
     }
-
-    show_process_information_header();
-
-    // invoke Bison BPEL4WSDL parser
-    trace(TRACE_INFORMATION, "Parsing " + globals::net_filename + " ...\n");
-    int parse_result = frontend_owfn_parse();
-    trace(TRACE_INFORMATION, "Parsing of " + globals::net_filename + " complete.\n");
-
-    // closing a file
-    trace(TRACE_INFORMATION," + Closing owfn file: " + globals::filename + "\n");
-    fclose(frontend_owfn_in);
-    frontend_in = NULL;
+    else if (globals::net_mode == PNML)
+    {
+      if (!(frontend_pnml_in = fopen(globals::filename.c_str(), "r"))) 
+      {
+        cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
+        exit(2);
+      }
+  
+      show_process_information_header();
+  
+      // invoke Bison BPEL4WSDL parser
+      trace(TRACE_INFORMATION, "Parsing " + globals::net_filename + " ...\n");
+      int parse_result = frontend_pnml_parse();
+      trace(TRACE_INFORMATION, "Parsing of " + globals::net_filename + " complete.\n");
+  
+      // closing a file
+      trace(TRACE_INFORMATION," + Closing pnml file: " + globals::filename + "\n");
+      fclose(frontend_pnml_in);
+      frontend_in = NULL;
+    }
+    else
+    {
+      trace(TRACE_INFORMATION, "No parsable files.");
+      globals::output_filename = "";
+    }
   }
   else
   {

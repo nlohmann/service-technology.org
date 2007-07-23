@@ -33,13 +33,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/07/18 10:37:53 $
+ * \date    \$Date: 2007/07/23 12:43:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  */
 
 
@@ -115,6 +115,16 @@ struct s_wsdl_information
   unsigned int partnerLinkTypes;
 };
 
+
+/*!
+ * \brief net reading modes
+ */
+typedef enum
+{
+  OWFN,		  ///< OWFN file
+  PNML,			///< PNML file
+  NONE      ///< Not a valid format
+} net_modes;
 
 
 
@@ -282,6 +292,10 @@ namespace globals
 
   /// the statepredicate of an owfn file
   extern string owfn_statepredicate;
+  
+  /// the mode of reading a petrinet file
+  extern net_modes net_mode;
+  
 }
 
 #endif

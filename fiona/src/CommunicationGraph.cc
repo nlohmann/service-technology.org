@@ -770,6 +770,9 @@ void communicationGraph::printGraphToDot() {
         parameters[P_OG] ? dotFile << "OG of " : dotFile << "IG of ";
         dotFile << netfile;        
         dotFile << " (parameters:";
+        if (parameters[P_IG] && options[O_CALC_REDUCED_IG]) {
+            dotFile << " -r";
+        }
         if (options[O_MESSAGES_MAX]) {
             dotFile << " -m" << intToString(messages_manual);
         }

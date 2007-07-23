@@ -375,7 +375,8 @@ void communicationGraph::calculateSuccStatesInput(messageMultiSet input, GraphNo
                     // adding input message to state already using full message bound
                     trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
                     trace(TRACE_3, PN->getPlace(*iter)->name);
-                    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode * node) : end\n");
+                    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, GraphNode * node) : end\n");
+                    newNode->setColor(RED);
                     return;
                 }
             }
@@ -389,7 +390,7 @@ void communicationGraph::calculateSuccStatesInput(messageMultiSet input, GraphNo
         }
         if (newNode->getColor() == RED) {
             // a message bound violation occured during computation of reachability graph
-            trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode * node) : end\n");
+            trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, GraphNode * node) : end\n");
             return;
         }
     }

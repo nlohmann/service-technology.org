@@ -106,7 +106,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 	for (setOfMessages::iterator iter = inputSet.begin();
          iter != inputSet.end(); iter++) {
 
-		if ((options[O_MESSAGES_MAX] == false) ||
+		if (((options[O_MESSAGES_MAX] == false) && (options[O_EVENT_USE_MAX] == false)) ||
              checkMaximalEvents(*iter, currentNode, SENDING)) {
 
 			trace(TRACE_2, "\t\t\t\t    sending event: !");
@@ -143,7 +143,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 
     trace(TRACE_3, "iterating over outputSet\n");
     for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
-        if ((options[O_MESSAGES_MAX] == false) ||
+        if ((options[O_EVENT_USE_MAX] == false) ||
              checkMaximalEvents(*iter, currentNode, RECEIVING)) {
 
             trace(TRACE_2, "\t\t\t\t    output event: ?");
@@ -151,7 +151,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
             GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
             calculateSuccStatesOutput(*iter, currentNode, v);
 
-			if (addGraphNode (currentNode, v, *iter, RECEIVING)) {
+			if (currentNode->getColor() != RED && addGraphNode (currentNode, v, *iter, RECEIVING)) {
 		
 #ifdef LOOP
     		cout << "calc next node? [y,n]" << endl;
@@ -213,7 +213,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 	trace(TRACE_3, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
-        if ((options[O_MESSAGES_MAX] == false) ||
+        if (((options[O_MESSAGES_MAX] == false) && (options[O_EVENT_USE_MAX] == false)) ||
              checkMaximalEvents(*iter, currentNode, SENDING)) {
 
 			trace(TRACE_2, "\t\t\t\t    input event: ?");
@@ -222,7 +222,16 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 			
 			calculateSuccStatesInput(*iter, currentNode, v);
 			
-			if (addGraphNode (currentNode, v, *iter, SENDING)) {
+			if (v->getColor() == RED) {
+				// message bound violation occured during calculateSuccStatesInput
+                trace(TRACE_2, "\t\t\t\t    sending event: !");
+//                trace(TRACE_2, PN->getPlace(*iter)->name);
+                trace(TRACE_2, " at node " + intToString(currentNode->getNumber()) + " suppressed (message bound violated)\n");
+
+				numberDeletedVertices--;
+				delete v;
+				
+			} else if (addGraphNode (currentNode, v, *iter, SENDING)) {
 				buildReducedGraph(v);
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 			}
@@ -232,7 +241,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 
 	trace(TRACE_3, "iterating over outputSet\n");
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
-        if ((options[O_MESSAGES_MAX] == false) ||
+        if ((options[O_EVENT_USE_MAX] == false) ||
              checkMaximalEvents(*iter, currentNode, RECEIVING)) {
 
 			trace(TRACE_2, "\t\t\t\t    output event: ?");
@@ -240,7 +249,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
 			calculateSuccStatesOutput(*iter, currentNode, v);
 
-			if (addGraphNode (currentNode, v, *iter, RECEIVING)) {
+			if (currentNode->getColor() != RED && addGraphNode (currentNode, v, *iter, RECEIVING)) {
 				buildReducedGraph(v);
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 				//analyseNode(currentNode, false);
@@ -264,6 +273,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 //! that has been sent at its maximum
 bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, GraphEdgeType typeOfPlace) {
 	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): start\n");
+	
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
 		if (typeOfPlace == SENDING) {
 			unsigned int i = 0;
@@ -272,15 +282,30 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * 
 				i++;	
 			}
 
-			if (currentNode->eventsUsed[i] >= messages_manual) {
-				// this input event shall not be sent anymore, so quit here
-				trace(TRACE_3, "maximal occurrences of event ");
-				trace(TRACE_3, PN->getInputPlace(i)->name);
-				trace(TRACE_3, " reached\n");
-
-				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): end\n");
-				return false;
+			if (options[O_EVENT_USE_MAX] == true) {      // k-message-bounded set
+				if (currentNode->eventsUsed[i] >= events_manual) {
+					// this input event shall not be sent anymore, so quit here
+					trace(TRACE_3, "maximal occurrences of event ");
+					trace(TRACE_3, PN->getInputPlace(i)->name);
+					trace(TRACE_3, " reached\n");
+	
+					trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): end\n");
+					return false;
+				}
 			}
+			
+//	        if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
+//	            if (PN->CurrentMarking[PN->getInputPlace(i)->index] >= messages_manual) {
+//	                // adding input message to state already using full message bound
+//	                trace(TRACE_3, "\t\t\t\t\t adding input event ");
+//	                trace(TRACE_3, PN->getInputPlace(i)->name);
+//	                trace(TRACE_3, intToString(PN->CurrentMarking[PN->getInputPlace(i)->index]));
+//	                trace(TRACE_3, " would cause message bound violation\n");
+//	                trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): end\n");
+//	                return false;
+//	            }
+//	        }
+			
 		} else if (typeOfPlace == RECEIVING) {
 			unsigned int i = 0;
 			while (i < PN->getOutputPlaceCount()-1 && PN->getOutputPlace(i) && 
@@ -288,13 +313,15 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * 
 				i++;	
 			}
 			
-			if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] >= messages_manual) {
-				// this output event shall not be received anymore, so quit here
-				trace(TRACE_3, "maximal occurrences of event ");
-				trace(TRACE_3, PN->getOutputPlace(i)->name);
-				trace(TRACE_3, " reached\n");
-				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): end\n");				
-				return false;		
+			if (options[O_EVENT_USE_MAX] == true) {      // k-message-bounded set
+				if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] >= messages_manual) {
+					// this output event shall not be received anymore, so quit here
+					trace(TRACE_3, "maximal occurrences of event ");
+					trace(TRACE_3, PN->getOutputPlace(i)->name);
+					trace(TRACE_3, " reached\n");
+					trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): end\n");				
+					return false;		
+				}
 			}
 		}
 	}

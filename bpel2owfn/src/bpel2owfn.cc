@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/18 10:37:52 $
+ * \date    \$Date: 2007/07/23 08:10:37 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.189 $
+ * \version \$Revision: 1.190 $
  */
 
 
@@ -88,19 +88,18 @@ extern int frontend_parse();			// from Bison
 extern int frontend_chor_parse();		// from Bison
 extern int frontend_wsdl_parse();		// from Bison
 extern int frontend_debug;			// from Bison
-extern int owfn_yydebug;			// from Bison
+extern int frontend_owfn_debug;			// from Bison
 extern int frontend_nerrs;			// from Bison
 extern int frontend_lineno;			// from Bison
 extern int frontend__flex_debug;		// from flex
 extern FILE *frontend_in;			// from flex
 extern void frontend_restart(FILE*);		// from flex
 
-extern int owfn_yydebug;
-extern int owfn_yy_flex_debug;
+extern int frontend_owfn_flex_debug;
 
-extern FILE *owfn_yyin;
-extern int owfn_yyerror();
-extern int owfn_yyparse();
+extern FILE *frontend_owfn_in;
+extern int frontend_owfn_error();
+extern int frontend_owfn_parse();
 
 
 
@@ -704,20 +703,22 @@ int main( int argc, char *argv[])
   {
 
     globals::filename = globals::net_filename;
-    if (!(owfn_yyin = fopen(globals::filename.c_str(), "r"))) 
+    if (!(frontend_owfn_in = fopen(globals::filename.c_str(), "r"))) 
     {
       cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
       exit(2);
     }
 
+    show_process_information_header();
+
     // invoke Bison BPEL4WSDL parser
     trace(TRACE_INFORMATION, "Parsing " + globals::net_filename + " ...\n");
-    int parse_result = owfn_yyparse();
+    int parse_result = frontend_owfn_parse();
     trace(TRACE_INFORMATION, "Parsing of " + globals::net_filename + " complete.\n");
 
     // closing a file
     trace(TRACE_INFORMATION," + Closing owfn file: " + globals::filename + "\n");
-    fclose(owfn_yyin);
+    fclose(frontend_owfn_in);
     frontend_in = NULL;
   }
   else

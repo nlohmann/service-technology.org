@@ -34,13 +34,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/18 10:37:53 $
+ * \date    \$Date: 2007/07/23 08:10:38 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  */
 
 
@@ -197,7 +197,8 @@ extern map<possibleFormats,  string> suffixes;
 
 extern int frontend_debug;
 extern int frontend__flex_debug;
-extern int owfn_yydebug;
+extern int frontend_owfn_debug;
+extern int frontend_owfn__flex_debug;
 extern FILE *frontend_in;
 
 

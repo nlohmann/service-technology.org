@@ -36,10 +36,13 @@ petrinet-patterns-shortcuts.cc
 petrinet-patterns-handlers.h
 petrinet-patterns-handlers.cc
 frontend-lexer.cc
+frontend-lexer-owfn.cc
 frontend-parser.cc
 frontend-parser.h
+frontend-parser-owfn.h
 frontend-parser-chor.cc
 frontend-parser-wsdl.cc
+frontend-parser-owfn.cc
 bpel2owfn.exe
 bpel2owfn.exe.stackdump
 *.bpel

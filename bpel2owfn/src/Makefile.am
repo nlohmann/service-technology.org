@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/07/20 09:29:32 $ by $Author: nielslohmann $.
-# Version $Revision: 1.83 $
+# File last changed $Date: 2007/07/23 08:10:37 $ by $Author: znamirow $.
+# Version $Revision: 1.84 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -97,9 +97,9 @@ $(KCDUMMY): $(KCFILES_NECESSARY) $(KCFILES_TEMP)
 # frontend files: for them C++ code is generated).
 bpel2owfn_SOURCES = $(KCSOURCES) \
 		    frontend-parser.yy \
+		    frontend-parser-owfn.yy \
 		    frontend-lexer.ll \
-		    syntax_owfn.yy \
-		    lexer_owfn.ll \
+		    frontend-lexer-owfn.ll \
 		    frontend-parser-chor.yy \
 		    frontend-parser-wsdl.yy \
 		    bpel2owfn.cc \

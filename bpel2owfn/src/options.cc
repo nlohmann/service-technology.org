@@ -31,17 +31,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/20 08:14:07 $
+ * \date    \$Date: 2007/07/23 08:10:38 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.92 $
+ * \version \$Revision: 1.93 $
  */
 
 
@@ -279,8 +279,8 @@ void parse_command_line(int argc, char* argv[])
   // turn off debug modi of flex and bison by default
   frontend_debug = 0;
   frontend__flex_debug = 0;
-
-  owfn_yydebug = 0;
+  frontend_owfn_debug = 0;
+  frontend_owfn__flex_debug = 0;
   
   
   // use GNU getopt to parse the command-line arguments
@@ -462,7 +462,7 @@ void parse_command_line(int argc, char* argv[])
         else if (parameter == "bison")
         {
           frontend_debug = 1;
-          owfn_yydebug = 0;
+          frontend_owfn_debug = 0;
         }
         else if (parameter == "1")
           debug_level = TRACE_WARNINGS;
@@ -610,12 +610,16 @@ void parse_command_line(int argc, char* argv[])
     // set output file name to a standard output filename in case of no inputfiles
     if ( not(options[O_INPUT]) )
     {
-      globals::output_filename = "stdof"; 
-      trace(TRACE_ALWAYS, "Output filename set to standard: stdof\n");
       if (options[O_NET])
       {
         unsigned int pos = globals::net_filename.length() - 5;
         globals::output_filename = globals::net_filename.substr(0, pos);
+        trace(TRACE_ALWAYS, "Output filename for owfn2owfn set to standard: [OLDNAME]Gen.owfn\n");
+      }
+      else
+      {
+        globals::output_filename = "stdof"; 
+        trace(TRACE_ALWAYS, "Output filename set to standard: stdof\n");
       }
     } 
     else 

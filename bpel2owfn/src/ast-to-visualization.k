@@ -36,7 +36,7 @@
  * 
  * \since   2007-04-18
  *
- * \date    \$Date: 2007/07/13 12:50:47 $
+ * \date    \$Date: 2007/07/25 08:31:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -45,7 +45,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  *
  */
 
@@ -784,7 +784,7 @@ Pick(a,b,c,_id) ->
   {
     (*output) << "subgraph cluster" << toString(_id->value) << " { label = \"Pick\";" << endl;  
     (*output) << "pick" << toString(_id->value) << " [shape=diamond style=filled label=\"?\"];" << endl;
-    globals::ASTEmap[_id->value]->secVisConnection = "if" + toString(_id->value);
+    globals::ASTEmap[_id->value]->secVisConnection = "pick" + toString(_id->value);
   }
   a b c
   {

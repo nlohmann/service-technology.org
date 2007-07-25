@@ -30,11 +30,11 @@
  * \brief   BPEL4Chor topology parser
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2007/04/29
  *
- * \date    \$Date: 2007/06/28 07:38:16 $
+ * \date    \$Date: 2007/07/25 09:28:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          frontend-parser-chor.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  *
  * \ingroup frontend
  */
@@ -75,10 +75,15 @@
 %token K_TOPOLOGY K_PARTICIPANTTYPES K_PARTICIPANTTYPE K_PARTICIPANTS K_PARTICIPANT K_PARTICIPANTSET K_MESSAGELINKS K_MESSAGELINK
 %token K_TYPES K_PORTTYPE K_FAULT K_OPERATION K_DEFINITIONS K_OUTPUT K_INPUT K_MESSAGE K_PART K_BINDING K_SERVICE K_PORT
 %token K_PARTNERLINKTYPE K_ROLE K_SCHEMA K_PROPERTY K_PROPERTYALIAS
+%token P_NET P_PLACE P_GRAPHICS P_NAME P_DESCRIPTION P_TRANSITION P_PAGE
+%token P_POSITION P_TEXT P_INITIALMARKING P_DIMENSION P_PNML
+%token P_ARC P_INSCRIPTION P_OFFSET P_REFERENCEPLACE P_TYPE P_TRANSFORMATION
+%token P_TOOLSPECIFIC
 %token <yt_casestring> NUMBER
 %token <yt_casestring> X_NAME
 %token <yt_casestring> VARIABLENAME
 %token <yt_casestring> X_STRING
+%token <yt_casestring> X_TEXT
 
 // OR and AND are left-associative.
 %left K_OR

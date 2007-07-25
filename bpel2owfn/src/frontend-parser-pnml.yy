@@ -36,7 +36,7 @@
  *          
  * \date 
  *          - created: 2006/09/10
- *          - last changed: \$Date: 2007/07/23 14:01:51 $
+ *          - last changed: \$Date: 2007/07/25 09:28:07 $
  * 
  * \note    This file is part of the tool PNML2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -45,7 +45,7 @@
  * \note    This file was created using GNU Bison reading file pnml-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  * 
  */
 %}
@@ -89,11 +89,23 @@ extern PetriNet PN;
  *****************************************************************************/
 
 // from flex
-extern int frontend_pnml_lex();
-extern int frontend_pnml_lineno;
-extern char* frontend_pnml_text;
+//extern int frontend_pnml_lex();
+//extern int frontend_pnml_lineno;
+//extern char* frontend_pnml_text;
 
-extern int frontend_pnml_error(const char *);
+//extern int frontend_pnml_error(const char *);
+
+/******************************************************************************
+ * External variables
+ *****************************************************************************/
+
+extern int frontend_lex();	// from flex: the lexer funtion
+
+// use the functions of the BPEL parser
+#define frontend_pnml_lex() frontend_lex()
+#define frontend_pnml_error(a) frontend_error(a)
+#define frontend_pnml_in frontend_in // needed?
+
 
 string id = "";
 communication_type type = INTERNAL;
@@ -109,24 +121,42 @@ Place* p = NULL;
 %name-prefix="frontend_pnml_"
 // Bison generates a list of all used tokens in file "syntax_pnml.h" (for flex)
 %token_table
-%defines
 %yacc
 
-
-/* data type definition for return value of flex or bison action */
-%union {
-    kc::casestring yt_casestring;
-}
-
 /* the terminal symbols (tokens) */
-%token X_OPEN X_SLASH X_CLOSE X_NEXT X_EQUALS QUOTE
+%token APOSTROPHE EQUAL GREATER GREATEROREQUAL K_AND K_ASSIGN K_BRANCHES K_CASE
+%token K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATESCOPE K_COMPENSATIONHANDLER
+%token K_COMPLETIONCONDITION K_CONDITION K_COPY K_CORRELATION K_CORRELATIONS
+%token K_CORRELATIONSET K_CORRELATIONSETS K_ELSE K_ELSEIF K_EMPTY
+%token K_EVENTHANDLERS K_EXIT K_EXTENSION K_EXTENSIONACTIVITY
+%token K_EXTENSIONASSIGNOPERATION K_EXTENSIONS K_FAULTHANDLERS
+%token K_FINALCOUNTERVALUE K_FLOW K_FOR K_FOREACH K_FROM K_FROMPART K_FROMPARTS
+%token K_GETLINKSTATUS K_IF K_IMPORT K_INVOKE K_JOINCONDITION K_LINK K_LINKS
+%token K_LITERAL K_MESSAGEEXCHANGE K_MESSAGEEXCHANGES K_ONALARM K_ONEVENT
+%token K_ONMESSAGE K_OPAQUEACTIVITY K_OPAQUEFROM K_OR K_OTHERWISE K_PARTNER
+%token K_PARTNERLINK K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE
+%token K_REPEATEVERY K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE
+%token K_SOURCE K_SOURCES K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS
+%token K_TERMINATE K_TERMINATIONHANDLER K_THROW K_TO K_TOPART K_TOPARTS
+%token K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT
+%token K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL RBRACKET X_CLOSE X_EQUALS
+%token X_NEXT X_OPEN X_SLASH
+%token K_TOPOLOGY K_PARTICIPANTTYPES K_PARTICIPANTTYPE K_PARTICIPANTS K_PARTICIPANT K_PARTICIPANTSET K_MESSAGELINKS K_MESSAGELINK
+%token K_TYPES K_PORTTYPE K_FAULT K_OPERATION K_DEFINITIONS K_OUTPUT K_INPUT K_MESSAGE K_PART K_BINDING K_SERVICE K_PORT
+%token K_PARTNERLINKTYPE K_ROLE K_SCHEMA K_PROPERTY K_PROPERTYALIAS
 %token P_NET P_PLACE P_GRAPHICS P_NAME P_DESCRIPTION P_TRANSITION P_PAGE
 %token P_POSITION P_TEXT P_INITIALMARKING P_DIMENSION P_PNML
 %token P_ARC P_INSCRIPTION P_OFFSET P_REFERENCEPLACE P_TYPE P_TRANSFORMATION
 %token P_TOOLSPECIFIC
+%token <yt_casestring> NUMBER
 %token <yt_casestring> X_NAME
+%token <yt_casestring> VARIABLENAME
 %token <yt_casestring> X_STRING
 %token <yt_casestring> X_TEXT
+
+// OR and AND are left-associative.
+%left K_OR
+%left K_AND
 
 %type <yt_casestring> tText
 
@@ -514,15 +544,15 @@ attributes:
   { 	
       if((strip_namespace($1->name)) == "id")
       {
-        id = (strip_namespace($3->name)).substr(1,(strip_namespace($3->name)).length()-2);
+        id = (strip_namespace($3->name));
       } 
       else if ((strip_namespace($1->name)) == "source")
       {
-        source = (strip_namespace($3->name)).substr(1,(strip_namespace($3->name)).length()-2);
+        source = (strip_namespace($3->name));
       }
       else if ((strip_namespace($1->name)) == "target")
       {
-        target = (strip_namespace($3->name)).substr(1,(strip_namespace($3->name)).length()-2);
+        target = (strip_namespace($3->name));
       }
       else
       {
@@ -558,6 +588,6 @@ toolSpecificSubElement_List:
 
 attributesIgnore:
   /* empty */
-| X_NAME X_EQUALS X_STRING attributesIgnore
+| X_NAME EQUAL X_STRING attributesIgnore
 ;
 

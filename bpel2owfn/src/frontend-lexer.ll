@@ -31,11 +31,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of \$Author: nielslohmann $
+ *          last changes of \$Author: znamirow $
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/07/06 20:05:29 $
+ * \date    \$Date: 2007/07/25 09:28:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.68 $
+ * \version \$Revision: 1.69 $
  *
  * \todo    
  *          - Add rules to ignored everything non-BPEL.
@@ -126,6 +126,7 @@ bool parseUnicode = false;
 // the inteface to the WSDL and BPEL4Chor parser
 extern YYSTYPE frontend_wsdl_lval;
 extern YYSTYPE frontend_chor_lval;
+extern YYSTYPE frontend_pnml_lval;
 
 %}
 
@@ -135,6 +136,7 @@ whitespace		[ \t\r\n]*
 namestart		[A-Za-z\200-\377_]
 namechar		[A-Za-z\200-\377_0-9.\-:]
 ns			{namestart}({namechar}|[/:])*":"
+text            [\040-\176]*
 number			[0-9]+
 name			{namestart}{namechar}*
 variablename		{namestart}({namechar}|[/:]|{whitespace})*
@@ -154,6 +156,7 @@ UB     			[\200-\277]
 %s XMLHEADER
 %s DOCUMENTATION
 %s JOINCONDITION
+%s TEXT
 
 
 %%
@@ -181,6 +184,12 @@ UB     			[\200-\277]
 <XMLHEADER>{xmlheader}		{ /* skip */ }
 <XMLHEADER>"?>"[ \t\r\n]*"<"	{ BEGIN(currentView); }
 
+ /* text */
+<TEXT>">"{text}?"<"	{ BEGIN(INITIAL);
+					  frontend_pnml_lval.yt_casestring = kc::mkcasestring(frontend_text);
+					  return X_TEXT;
+					}
+
 
  /* everything needed to evaluate join conditons (must be above the attributes section) */
 <ATTRIBUTE>"joinCondition"		                { return K_JOINCONDITION; }
@@ -190,12 +199,12 @@ UB     			[\200-\277]
 <ATTRIBUTE,JOINCONDITION>"("				{ return LBRACKET; }
 <ATTRIBUTE,JOINCONDITION>")"				{ return RBRACKET; }
 <ATTRIBUTE,JOINCONDITION>"'"				{ return APOSTROPHE; }
-<ATTRIBUTE,JOINCONDITION>{name}                         { frontend_chor_lval.yt_casestring = frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
+<ATTRIBUTE,JOINCONDITION>{name}                         { frontend_chor_lval.yt_casestring = frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = frontend_pnml_lval.yt_casestring = kc::mkcasestring(frontend_text);
                                                           return X_NAME; }
 
  /* attributes */
 <ATTRIBUTE>{string}	{ std::string stringwoquotes = std::string(frontend_text).substr(1, strlen(frontend_text)-2);
-                          frontend_chor_lval.yt_casestring = frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = kc::mkcasestring(stringwoquotes.c_str());
+                          frontend_chor_lval.yt_casestring = frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = frontend_pnml_lval.yt_casestring = kc::mkcasestring(stringwoquotes.c_str());
                           return X_STRING; }
 <ATTRIBUTE>"="		{ return X_EQUALS; }
 
@@ -319,6 +328,27 @@ UB     			[\200-\277]
 <INITIAL>{ns}?"service"			{ BEGIN(ATTRIBUTE); return K_SERVICE; }
 <INITIAL>{ns}?"port"			{ BEGIN(ATTRIBUTE); return K_PORT; }
 
+ /* non-terminals for PNML */
+<INITIAL>{ns}?"pnml"				{ BEGIN(ATTRIBUTE); return P_PNML; }
+<INITIAL>{ns}?"net"				{ BEGIN(ATTRIBUTE); return P_NET; }
+<INITIAL>{ns}?"place"				{ BEGIN(ATTRIBUTE); return P_PLACE; }
+<INITIAL>{ns}?"graphics"			{ BEGIN(ATTRIBUTE); return P_GRAPHICS; }
+<INITIAL>{ns}?"name"				{ BEGIN(ATTRIBUTE); return P_NAME; }
+<INITIAL>{ns}?"description"		{ BEGIN(ATTRIBUTE); return P_DESCRIPTION; }
+<INITIAL>{ns}?"transition"		{ BEGIN(ATTRIBUTE); return P_TRANSITION; }
+<INITIAL>{ns}?"position"			{ BEGIN(ATTRIBUTE); return P_POSITION; }
+<INITIAL>{ns}?"text"				{ BEGIN(TEXT); return P_TEXT; }
+<INITIAL>{ns}?"initialMarking"	{ BEGIN(ATTRIBUTE); return P_INITIALMARKING; }
+<INITIAL>{ns}?"dimension"			{ BEGIN(ATTRIBUTE); return P_DIMENSION; }
+<INITIAL>{ns}?"arc"				{ BEGIN(ATTRIBUTE); return P_ARC; }
+<INITIAL>{ns}?"inscription"		{ BEGIN(ATTRIBUTE); return P_INSCRIPTION; }
+<INITIAL>{ns}?"offset"			{ BEGIN(ATTRIBUTE); return P_OFFSET; }
+<INITIAL>{ns}?"referencePlace"	{ BEGIN(ATTRIBUTE); return P_REFERENCEPLACE; }
+<INITIAL>{ns}?"transformation"	{ BEGIN(ATTRIBUTE); return P_TRANSFORMATION; }
+<INITIAL>{ns}?"page"				{ BEGIN(ATTRIBUTE); return P_PAGE;}
+<INITIAL>{ns}?"type"				{ BEGIN(ATTRIBUTE); return P_TYPE;}
+<INITIAL>{ns}?"toolspecific"		{ BEGIN(ATTRIBUTE); return P_TOOLSPECIFIC; }
+
  /* non-terminals for WS-BPEL Partner Link Type */
 <INITIAL>{ns}?"partnerLinkType"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINKTYPE; }
 <INITIAL>{ns}?"role"			{ BEGIN(ATTRIBUTE); return K_ROLE; }
@@ -351,10 +381,12 @@ UB     			[\200-\277]
 <INITIAL>"$"{variablename}	{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                                   return VARIABLENAME; }
 
-<INITIAL>{name}			{ frontend_chor_lval.yt_casestring = frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
+<INITIAL>{name}			{ frontend_chor_lval.yt_casestring = frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = frontend_pnml_lval.yt_casestring = kc::mkcasestring(frontend_text);
                                   return X_NAME; }
 {number}	{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                   return NUMBER; }
+ /* string needed for toolspecific element in pnml */
+{string} 	{  frontend_pnml_lval.yt_casestring = kc::mkcasestring(frontend_text); return X_STRING; }
 
 
  /* end of input file */

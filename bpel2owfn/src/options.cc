@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/23 14:01:51 $
+ * \date    \$Date: 2007/07/25 09:28:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.95 $
+ * \version \$Revision: 1.96 $
  */
 
 
@@ -282,7 +282,6 @@ void parse_command_line(int argc, char* argv[])
   frontend_owfn_debug = 0;
   frontend_owfn__flex_debug = 0;
   frontend_pnml_debug = 0;
-  frontend_pnml__flex_debug = 0;
   
   
   // use GNU getopt to parse the command-line arguments
@@ -463,7 +462,6 @@ void parse_command_line(int argc, char* argv[])
         {
           frontend__flex_debug = 1;
           frontend_owfn__flex_debug = 1;
-          frontend_pnml__flex_debug = 1;
         }
         else if (parameter == "bison")
         {

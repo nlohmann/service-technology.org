@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/23 14:01:51 $
+ * \date    \$Date: 2007/07/25 09:28:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.192 $
+ * \version \$Revision: 1.193 $
  */
 
 
@@ -102,10 +102,7 @@ extern int frontend_owfn_error();
 extern int frontend_owfn_parse();
 
 extern int frontend_pnml_debug;			// from Bison
-extern int frontend_pnml_flex_debug;
 
-extern FILE *frontend_pnml_in;
-extern int frontend_pnml_error();
 extern int frontend_pnml_parse();
 
 
@@ -737,11 +734,11 @@ int main( int argc, char *argv[])
       // closing a file
       trace(TRACE_INFORMATION," + Closing owfn file: " + globals::filename + "\n");
       fclose(frontend_owfn_in);
-      frontend_in = NULL;
+      frontend_owfn_in = NULL;
     }
     else if (globals::net_mode == PNML)
     {
-      if (!(frontend_pnml_in = fopen(globals::filename.c_str(), "r"))) 
+      if (!(frontend_in = fopen(globals::filename.c_str(), "r"))) 
       {
         cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
         exit(2);
@@ -756,7 +753,7 @@ int main( int argc, char *argv[])
   
       // closing a file
       trace(TRACE_INFORMATION," + Closing pnml file: " + globals::filename + "\n");
-      fclose(frontend_pnml_in);
+      fclose(frontend_in);
       frontend_in = NULL;
     }
     else

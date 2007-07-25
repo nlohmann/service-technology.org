@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/07/23 12:43:08 $ by $Author: znamirow $.
-# Version $Revision: 1.86 $
+# File last changed $Date: 2007/07/25 09:28:06 $ by $Author: znamirow $.
+# Version $Revision: 1.87 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -101,7 +101,6 @@ bpel2owfn_SOURCES = $(KCSOURCES) \
 		    frontend-parser-pnml.yy \
 		    frontend-lexer.ll \
 		    frontend-lexer-owfn.ll \
-		    frontend-lexer-pnml.ll \
 		    frontend-parser-chor.yy \
 		    frontend-parser-wsdl.yy \
 		    bpel2owfn.cc \
@@ -132,7 +131,7 @@ BUILT_SOURCES = $(KCDUMMY) \
 EXTRA_DIST = $(KCDUMMY) \
 	     $(KCFILES_TEMP) \
 	     $(KCFILES_NECESSARY) \
-	     frontend-parser.h frontend-parser-owfn.h frontend-parser-pnml.h 
+	     frontend-parser.h frontend-parser-owfn.h
 	     
 
 

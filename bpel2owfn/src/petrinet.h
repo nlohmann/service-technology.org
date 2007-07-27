@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/18 09:59:40 $
+ * \date    \$Date: 2007/07/27 14:24:20 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.155 $
+ * \version \$Revision: 1.156 $
  *
  * \ingroup petrinet
  */
@@ -415,7 +415,7 @@ class PetriNet
 {
   public:
     /// adds a place with a given role and type
-    Place* newPlace(string my_role, communication_type my_type = INTERNAL);
+    Place* newPlace(string my_role, communication_type my_type = INTERNAL, string my_port = "");
 
     /// adds a transition with a given role
     Transition *newTransition(string my_role);
@@ -632,6 +632,10 @@ class PetriNet
     /// set of arcs of the Petri net
     set<Arc *> F;
 
+    
+    /// the ports of the oWFN as mapping from a name to the interface places
+    map<string, set<Place *> > ports;
+    
 
     /// id that will be assigned to the next node
     unsigned int nextId;

@@ -31,17 +31,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/07/13 12:50:48 $
+ * \date    \$Date: 2007/07/27 14:24:20 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.223 $
+ * \version \$Revision: 1.224 $
  *
  * \ingroup petrinet
  */
@@ -359,6 +359,7 @@ PetriNet::PetriNet(const PetriNet & net)
   T.clear();
   F.clear();
   roleMap.clear();
+  ports.clear();
 
 
   nextId = net.nextId;
@@ -467,6 +468,7 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
   T.clear();
   F.clear();
   roleMap.clear();
+  ports.clear();
 
 
   nextId = net.nextId;
@@ -579,11 +581,12 @@ PetriNet::~PetriNet()
  *
  * \param   my_role  the initial role of the place
  * \param   my_type  the type of the place (as defined in #communication_type)
+ * \param   my_port  the port to which this place belongs
  * \return  pointer of the created place
  *
  * \pre     No place with the given role is defined.
  */
-Place *PetriNet::newPlace(string my_role, communication_type my_type)
+Place *PetriNet::newPlace(string my_role, communication_type my_type, string my_port)
 {
   string my_role_with_suffix = my_role;
 
@@ -606,6 +609,12 @@ Place *PetriNet::newPlace(string my_role, communication_type my_type)
   {
     assert(roleMap[my_role_with_suffix] == NULL);
     roleMap[my_role_with_suffix] = p;
+  }
+  
+  if (my_port != "")
+  {
+    assert(my_type != INTERNAL);
+    ports[my_port].insert(p);
   }
 
   return p;

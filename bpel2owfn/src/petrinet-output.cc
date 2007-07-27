@@ -30,17 +30,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/07/23 14:01:51 $
+ * \date    \$Date: 2007/07/27 14:24:19 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.105 $
+ * \version \$Revision: 1.106 $
  *
  * \ingroup petrinet
  */
@@ -1250,11 +1250,39 @@ void PetriNet::output_owfn(ostream *output) const
     if (count < P_out.size())
       (*output) << "," << endl;
   }
-  (*output) << ";" << endl << endl << endl;
+  (*output) << ";" << endl << endl;
+  
+  
+  
+  // ports
+  if (!ports.empty())
+  {
+    (*output) << endl << "PORTS" << endl;
+    
+    for (map<string, set<Place*> >::const_iterator port = ports.begin();
+         port != ports.end(); port++)
+    {
+      (*output) << "  PORT " << port->first << ":" << endl;
+      
+      for (set<Place *>::const_iterator place = port->second.begin();
+           place != port->second.end(); place++)
+      {
+        if (place != port->second.begin())
+          (*output) << "," << endl;
+        
+        (*output) << "    " << (*place)->nodeShortName();
+      }
+      
+      (*output) << ";" << endl;
+    }
+    
+    (*output) << endl;
+  }
+  
   
   
   // initial marking
-  (*output) << "INITIALMARKING" << endl;
+  (*output) << endl << "INITIALMARKING" << endl;
   count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
@@ -1290,9 +1318,9 @@ void PetriNet::output_owfn(ostream *output) const
           (*output) << " AND";
         
   #ifdef USING_BPEL2OWFN
-        (*output) << "  (" << (*p)->nodeShortName() << "=1)";
+        (*output) << "  (" << (*p)->nodeShortName() << " = 1)";
   #else
-        (*output) << "  (" << (*p)->nodeName() << "=1)";
+        (*output) << "  (" << (*p)->nodeName() << " = 1)";
   #endif
         
         // (*output) << " {final place}";

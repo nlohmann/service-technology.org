@@ -172,7 +172,6 @@ void readAllNets(list<oWFN*>& listOfPetrinets) {
     }
 }
 
-
 //! \brief reads an OG from ogfile
 OGFromFile* readog(const std::string& ogfile) {
     og_yydebug = 0;
@@ -264,6 +263,210 @@ void reportOptionValues() {
     trace(TRACE_0, "\n");
 }
 
+// **********************************************************************************
+// *******                    mode dependent functions                       ********
+// **********************************************************************************
+
+
+// check the exchangeability of two nets
+void check_exchangeability() {
+    list<char*>::iterator netiter = netfiles.begin();
+    Exchangeability* og1 = new Exchangeability(*netiter);
+    Exchangeability* og2 = new Exchangeability(*(++netiter));
+    trace(TRACE_0, "The two operating guidelines are equal: ");
+    if (og1->check(og2) == true) {
+        trace(TRACE_0, "YES\n");
+    } else {
+        trace(TRACE_0, "NO\n");
+    }
+}
+
+// match a net against an og
+void match_net(OGFromFile* OGToMatch, oWFN* PN) {
+      string reasonForFailedMatch;
+			if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
+				trace(TRACE_0, "oWFN matches with OG: YES\n");
+			} else {
+				trace(TRACE_0, "oWFN matches with OG: NO\n");
+				trace(TRACE_0, "Match failed, because: " +
+				reasonForFailedMatch + "\n");
+			}
+      delete OGToMatch;
+}
+
+// create an OG from a net
+void build_og(oWFN* PN, time_t seconds, time_t seconds2) {
+            OG * graph = new OG(PN);
+            
+            trace(TRACE_0, "building the operating guideline...\n");
+            seconds = time (NULL);
+
+            graph->printProgressFirst();
+            graph->calculateRootNode();	// creates the root node and calculates its reachability graph (set of states)
+
+            if (options[O_OTF]){
+                graph->bdd->convertRootNode(graph->getRoot());
+            }
+
+            graph->compute(); // build operating guideline
+            
+            seconds2 = time (NULL);
+            trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
+            cout << "    " << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
+    
+            trace(TRACE_0, "\nnet is controllable: ");
+            if (graph->getRoot()->getColor() == BLUE) {
+                trace(TRACE_0, "YES\n\n");
+            } else {
+                trace(TRACE_0, "NO\n\n");
+            }
+
+            // print statistics
+            trace(TRACE_0, "OG statistics:\n");
+            graph->printNodeStatistics();
+            trace(TRACE_0, "\n");
+
+            // generate output files
+            graph->printGraphToDot();      // .out
+            graph->printOGtoFile();       // .og
+
+            if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
+                graph->printGraphToSTG();	    
+            }
+
+            if (options[O_OTF]) {
+                //graph->bdd->printGraphToDot();
+                graph->bdd->save("OTF");
+            }
+
+            if (options[O_BDD]) {
+                trace(TRACE_0, "\nbuilding the BDDs...\n");
+                seconds = time (NULL);
+                graph->convertToBdd();      
+                seconds2 = time (NULL);
+                cout << difftime(seconds2,seconds) << " s consumed for building and reordering the BDDs" << endl;
+                 
+                //graph->bdd->printGraphToDot();
+                graph->bdd->save();
+            }
+    
+            trace(TRACE_5, "computation finished -- trying to delete graph\n");
+            // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+            delete graph;
+            trace(TRACE_5, "graph deleted\n");
+            trace(TRACE_0, "=================================================================\n");
+            trace(TRACE_0, "\n");
+}
+
+// build an IG for a given petrinet
+void build_ig(oWFN* PN, time_t seconds, time_t seconds2) {
+            interactionGraph * graph = new interactionGraph(PN);
+    
+            if (options[O_CALC_REDUCED_IG]) {
+                trace(TRACE_0, "building the reduced interaction graph...\n");
+            } else {
+                trace(TRACE_0, "building the interaction graph...\n");
+            }
+            seconds = time (NULL);
+            graph->buildGraph();                    // build interaction graph
+            seconds2 = time (NULL);
+            if (options[O_CALC_REDUCED_IG]) {
+                trace(TRACE_0, "building the reduced interaction graph finished.\n");
+            } else {
+                trace(TRACE_0, "\nbuilding the interaction graph finished.\n");
+            }
+
+            cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
+    
+            trace(TRACE_0, "\nnet is controllable: ");
+            if (graph->getRoot()->getColor() == BLUE) {
+                trace(TRACE_0, "YES\n\n");
+            } else {
+                trace(TRACE_0, "NO\n\n");
+            }
+
+            // print statistics
+            trace(TRACE_0, "IG statistics:\n");
+            graph->printNodeStatistics();
+            trace(TRACE_0, "\n");
+
+            // generate output files
+            graph->printGraphToDot();      // .out
+
+            if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
+                graph->printGraphToSTG();	    
+            }
+
+            trace(TRACE_5, "computation finished -- trying to delete graph\n");
+//			trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+            delete graph;
+            trace(TRACE_5, "graph deleted\n");
+            trace(TRACE_0, "=================================================================\n");
+            trace(TRACE_0, "\n");
+}
+
+// create the product of all given OGs
+void product_ogs(OGFromFile::ogs_t OGsFromFiles) {
+    trace("Building product of the following OGs:\n");
+    for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+         iOgFile != ogfiles.end(); ++iOgFile) {
+        trace(*iOgFile); trace("\n");
+    }
+    trace("\n");
+    
+    OGFromFile* productOG = OGFromFile::product(OGsFromFiles);
+    
+    if (productOG->hasNoRoot()) {
+        trace("The product OG is empty.\n\n");
+    }
+    
+    if (!options[O_OUTFILEPREFIX]) {
+        outfilePrefix = OGFromFile::getProductOGFilePrefix(ogfiles);
+    }
+    
+    trace("Saving product OG to:\n");
+    trace(OGFromFile::addOGFileSuffix(outfilePrefix)); trace("\n");
+    productOG->printOGFile(outfilePrefix);
+    trace("\n");
+    
+    productOG->printOGFile(outfilePrefix);
+    productOG->printDotFile(outfilePrefix);
+    
+    delete productOG;
+    
+    for (OGFromFile::ogs_t::const_iterator iOg = OGsFromFiles.begin();
+         iOg != OGsFromFiles.end(); ++iOg) {
+        delete *iOg;
+    }
+}
+
+// simulate two given OGs
+void simulate_ogs(OGFromFile::ogs_t OGsFromFiles) {
+    list<OGFromFile*>::iterator OGFFIter = OGsFromFiles.begin();
+    OGFromFile *simulator = *OGFFIter;
+    OGFromFile *simulant = *(++OGFFIter);
+    if (simulator->simulates(simulant)) {
+        trace(TRACE_0, "\nThe first OG has all the strategies of the second one, possibly more.\n" );
+    } else {
+        trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
+    }
+}
+
+// check if two given ogs are equal
+void equals_ogs(OGFromFile::ogs_t OGsFromFiles) {
+    list<OGFromFile*>::iterator OGFFIter = OGsFromFiles.begin();
+    OGFromFile *simulator = *OGFFIter;
+    OGFromFile *simulant = *(++OGFFIter);
+    if (simulator->simulates(simulant)) {
+        if (simulant->simulates(simulator)) {
+            trace(TRACE_0, "\nThe two OGs are equivalent, that is, they have the same strategies.\n");
+        } else {
+            trace(TRACE_0, "\nThe first OG has a strategy which the second one hasn't.\n");
+        }
+    } else {
+        trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
+    }
+}
 
 // **********************************************************************************
 // ********                   MAIN                                           ********
@@ -299,15 +502,7 @@ int main(int argc, char ** argv) {
     if (options[O_EX] == true) {
         //check equality of two operating guidelines
         if (netfiles.size() == 2) {
-            list<char*>::iterator netiter = netfiles.begin();
-            Exchangeability* og1 = new Exchangeability(*netiter);
-            Exchangeability* og2 = new Exchangeability(*(++netiter));
-            trace(TRACE_0, "The two operating guidelines are equal: ");
-            if (og1->check(og2) == true) {
-                trace(TRACE_0, "YES\n");
-            } else {
-                trace(TRACE_0, "NO\n");
-            }
+            check_exchangeability();
         } else {
             cerr << "Error: \t If option -x is used, exactly two oWFNs must be entered\n" << endl;
         }
@@ -334,7 +529,6 @@ int main(int argc, char ** argv) {
                  << "\tEnter \"fiona --help\" for more information." << endl;
             exit(1);
         }
-
         ogfileToMatch = *(ogfiles.begin());
         OGToMatch = readog(ogfileToMatch);
     }
@@ -399,134 +593,25 @@ int main(int argc, char ** argv) {
 		// adjust events_manual and print limit of considering events
 		reportOptionValues();
         
-        // start computation
-        time_t seconds, seconds2;
+    // start computation
+    time_t seconds = time (NULL), seconds2 = time (NULL);
         
 		if (options[O_MATCH]) {
 
-			// ------------------------- matching --------------------------------
-			string reasonForFailedMatch;
-			if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
-				trace(TRACE_0, "oWFN matches with OG: YES\n");
-			} else {
-				trace(TRACE_0, "oWFN matches with OG: NO\n");
-				trace(TRACE_0, "Match failed, because: " +
-				reasonForFailedMatch + "\n");
-			}
-
-            delete OGToMatch;
+      // ------------------------- matching --------------------------------
+			match_net(OGToMatch, PN);    
 
 		} else if (parameters[P_OG]) {
 
 			// ---------------- operating guideline is built ---------------------
-            OG * graph = new OG(PN);
-            
-            trace(TRACE_0, "building the operating guideline...\n");
-            seconds = time (NULL);
+      build_og(PN, seconds, seconds2);
 
-            graph->printProgressFirst();
-            graph->calculateRootNode();	// creates the root node and calculates its reachability graph (set of states)
-
-            if (options[O_OTF]){
-                graph->bdd->convertRootNode(graph->getRoot());
-            }
-
-            graph->compute(); // build operating guideline
-            
-            seconds2 = time (NULL);
-            trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
-            cout << "    " << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
-    
-            trace(TRACE_0, "\nnet is controllable: ");
-            if (graph->getRoot()->getColor() == BLUE) {
-                trace(TRACE_0, "YES\n\n");
-            } else {
-                trace(TRACE_0, "NO\n\n");
-            }
-
-            // print statistics
-            trace(TRACE_0, "OG statistics:\n");
-            graph->printNodeStatistics();
-            trace(TRACE_0, "\n");
-
-            // generate output files
-            graph->printGraphToDot();      // .out
-            graph->printOGtoFile();       // .og
-
-            if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
-                graph->printGraphToSTG();	    
-            }
-
-            if (options[O_OTF]) {
-                //graph->bdd->printGraphToDot();
-                graph->bdd->save("OTF");
-            }
-
-            if (options[O_BDD]) {
-                trace(TRACE_0, "\nbuilding the BDDs...\n");
-                seconds = time (NULL);
-                graph->convertToBdd();      
-                seconds2 = time (NULL);
-                cout << difftime(seconds2,seconds) << " s consumed for building and reordering the BDDs" << endl;
-                 
-                //graph->bdd->printGraphToDot();
-                graph->bdd->save();
-            }
-    
-            trace(TRACE_5, "computation finished -- trying to delete graph\n");
-            // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
-            delete graph;
-            trace(TRACE_5, "graph deleted\n");
-            trace(TRACE_0, "=================================================================\n");
-            trace(TRACE_0, "\n");
-
-        } else if (parameters[P_IG]) {
+    } else if (parameters[P_IG]) {
 
 			// ---------------- interaction graph is built ---------------------
-            interactionGraph * graph = new interactionGraph(PN);
-    
-            if (options[O_CALC_REDUCED_IG]) {
-                trace(TRACE_0, "building the reduced interaction graph...\n");
-            } else {
-                trace(TRACE_0, "building the interaction graph...\n");
-            }
-            seconds = time (NULL);
-            graph->buildGraph();                    // build interaction graph
-            seconds2 = time (NULL);
-            if (options[O_CALC_REDUCED_IG]) {
-                trace(TRACE_0, "building the reduced interaction graph finished.\n");
-            } else {
-                trace(TRACE_0, "\nbuilding the interaction graph finished.\n");
-            }
+      build_ig(PN, seconds, seconds2);
 
-            cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
-    
-            trace(TRACE_0, "\nnet is controllable: ");
-            if (graph->getRoot()->getColor() == BLUE) {
-                trace(TRACE_0, "YES\n\n");
-            } else {
-                trace(TRACE_0, "NO\n\n");
-            }
-
-            // print statistics
-            trace(TRACE_0, "IG statistics:\n");
-            graph->printNodeStatistics();
-            trace(TRACE_0, "\n");
-
-            // generate output files
-            graph->printGraphToDot();      // .out
-
-            if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
-                graph->printGraphToSTG();	    
-            }
-
-            trace(TRACE_5, "computation finished -- trying to delete graph\n");
-//			trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
-            delete graph;
-            trace(TRACE_5, "graph deleted\n");
-            trace(TRACE_0, "=================================================================\n");
-            trace(TRACE_0, "\n");
-        }
+    }
 
         delete PN;
         trace(TRACE_5, "net deleted\n");
@@ -535,44 +620,14 @@ int main(int argc, char ** argv) {
 
     } // end of "for all nets ..."
 
-    // -------------- calculating the product og -------------
     if (options[O_PRODUCTOG]) {
         if (OGsFromFiles.size() < 2) {
             cerr << "Error: \t Give at least two OGs to build their product!\n" << endl;
             exit(1);
         }
 
-        trace("Building product of the following OGs:\n");
-        for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
-             iOgFile != ogfiles.end(); ++iOgFile) {
-            trace(*iOgFile); trace("\n");
-        }
-        trace("\n");
-
-        OGFromFile* productOG = OGFromFile::product(OGsFromFiles);
-
-        if (productOG->hasNoRoot()) {
-            trace("The product OG is empty.\n\n");
-        }
-
-        if (!options[O_OUTFILEPREFIX]) {
-            outfilePrefix = OGFromFile::getProductOGFilePrefix(ogfiles);
-        }
-
-        trace("Saving product OG to:\n");
-        trace(OGFromFile::addOGFileSuffix(outfilePrefix)); trace("\n");
-        productOG->printOGFile(outfilePrefix);
-        trace("\n");
-
-        productOG->printOGFile(outfilePrefix);
-        productOG->printDotFile(outfilePrefix);
-	
-        delete productOG;
-
-        for (OGFromFile::ogs_t::const_iterator iOg = OGsFromFiles.begin();
-             iOg != OGsFromFiles.end(); ++iOg) {
-            delete *iOg;
-        }
+    // -------------- calculating the product og -------------
+        product_ogs(OGsFromFiles);
 
         return 0;
     }
@@ -581,14 +636,7 @@ int main(int argc, char ** argv) {
     
     if (options[O_SIMULATES]) {
         if (OGsFromFiles.size() == 2) {
-            list<OGFromFile*>::iterator OGFFIter = OGsFromFiles.begin();
-            OGFromFile *simulator = *OGFFIter;
-            OGFromFile *simulant = *(++OGFFIter);
-            if (simulator->simulates(simulant)) {
-                trace(TRACE_0, "\nThe first OG has all the strategies of the second one, possibly more.\n" );
-            } else {
-                trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
-            }
+            simulate_ogs(OGsFromFiles);
         } else {
             cerr << "Error: \t If option -t simulation is used, exactly two OG files must be entered\n" << endl;
         }
@@ -598,18 +646,7 @@ int main(int argc, char ** argv) {
     
     if (options[O_EQUALS]) {
         if (OGsFromFiles.size() == 2) {
-            list<OGFromFile*>::iterator OGFFIter = OGsFromFiles.begin();
-            OGFromFile *simulator = *OGFFIter;
-            OGFromFile *simulant = *(++OGFFIter);
-            if (simulator->simulates(simulant)) {
-                if (simulant->simulates(simulator)) {
-                    trace(TRACE_0, "\nThe two OGs are equivalent, that is, they have the same strategies.\n");
-                } else {
-                    trace(TRACE_0, "\nThe first OG has a strategy which the second one hasn't.\n");
-                }
-            } else {
-                trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
-            }
+            equals_ogs(OGsFromFiles);
         } else {
             cerr << "Error: \t If option -t equals is used, exactly two OG files must be entered\n" << endl;
         }
@@ -635,3 +672,5 @@ std::string platform_basename(const std::string& path) {
     return result;
 #endif
 }
+
+

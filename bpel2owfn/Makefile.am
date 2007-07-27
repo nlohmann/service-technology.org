@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/07/03 16:38:24 $ by $Author: nielslohmann $
-# Version $Revision: 1.65 $
+# File last changed $Date: 2007/07/27 13:21:30 $ by $Author: nielslohmann $
+# Version $Revision: 1.66 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc rpm
@@ -35,7 +35,10 @@ SUBDIRS = src tests doc rpm
 # do not publish CVS files
 dist-hook:
 	rm -rf `find $(distdir) -name CVS`
+	make clean --directory=gui
+	rm -fr gui/BPEL2oWFN.app
 
+EXTRA_DIST = gui
 
 ####################################
 # Targets to clean generated files #

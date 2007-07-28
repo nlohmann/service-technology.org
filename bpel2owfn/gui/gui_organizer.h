@@ -4,7 +4,6 @@
 #include <QObject>
 #include <string>
 
-using std::string;
 
 
 class GUI_Organizer : public QObject
@@ -21,8 +20,9 @@ class GUI_Organizer : public QObject
     bool fileFormat_pnml;
     bool fileFormat_dot;
     
-    string output_filename;
-    string command_line;
+    std::string output_filename;
+    std::string input_filename;
+    std::string command_line;
     
     int patterns;
     bool patterns_variables;
@@ -43,11 +43,14 @@ class GUI_Organizer : public QObject
     void set_patternNofhfaults(bool value);
     void set_patternStandardfaults(bool value);
     void set_patternVariables(bool value);
+    void set_inputFileName(QString value);
+    void translateButton_pressed();
   
   signals:
-    void reductionLevel_changed(QString text);
-    void commandLine_changed(QString text);
-    void no_variables_possible(bool value);
+    void reductionLevel_changed(QString);
+    void commandLine_changed(QString);
+    void no_variables_possible(bool);
+    void show_errormessage(QString);
 };
 
 #endif

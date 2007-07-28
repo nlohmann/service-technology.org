@@ -36,6 +36,9 @@ int main(int argc, char *argv[])
   QObject::connect(test.fileFormatPnml_checkBox, SIGNAL(toggled(bool)), &organizer, SLOT(set_fileFormatPnml(bool)));  
   QObject::connect(test.fileFormatDot_checkBox, SIGNAL(toggled(bool)), &organizer, SLOT(set_fileFormatDot(bool)));  
   QObject::connect(test.fileFormat_lineEdit, SIGNAL(textChanged(QString)), &organizer, SLOT(set_outputFileName(QString)));
+
+  // the input file
+  QObject::connect(test.inputFile_lineEdit, SIGNAL(textChanged(QString)), &organizer, SLOT(set_inputFileName(QString)));
   
   // the patterns
   QObject::connect(test.patternSmall_radioButton, SIGNAL(toggled(bool)), &organizer, SLOT(set_patternSmall(bool)));
@@ -44,12 +47,19 @@ int main(int argc, char *argv[])
   QObject::connect(test.patternVariables_checkBox, SIGNAL(toggled(bool)), &organizer, SLOT(set_patternVariables(bool)));  
   QObject::connect(&organizer, SIGNAL(no_variables_possible(bool)), test.patternVariables_checkBox, SLOT(setEnabled(bool)));
   
+  // the translate button
+  QObject::connect(test.translate_pushButton, SIGNAL(pressed()), &organizer, SLOT(translateButton_pressed()));
+  
+  // error messages
+  QObject::connect(&organizer, SIGNAL(show_errormessage(QString)), test.StandardErrorMessage, SLOT(showMessage(QString)));
   
   // initialize the command line
   organizer.set_commandLine();
-  
+    
   // show the main window widget
   widget.show();
+  
+
   
   return app.exec();
 }

@@ -1,6 +1,13 @@
 <ui version="4.0" >
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow" >
+ <widget class="QErrorMessage" name="StandardErrorMessage" >
+   <property name="modal">
+     <bool>true</bool>
+   </property>
+ </widget>
+ <widget class="QDialog" name="StandardDialog" >
+ </widget>
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -41,8 +48,8 @@
        <widget class="QGroupBox" name="reduction_groupBox" >
         <property name="geometry" >
          <rect>
-          <x>10</x>
-          <y>170</y>
+          <x>260</x>
+          <y>0</y>
           <width>231</width>
           <height>81</height>
          </rect>
@@ -140,7 +147,7 @@
         <property name="geometry" >
          <rect>
           <x>10</x>
-          <y>0</y>
+          <y>90</y>
           <width>231</width>
           <height>161</height>
          </rect>
@@ -235,9 +242,9 @@
         <property name="geometry" >
          <rect>
           <x>260</x>
-          <y>0</y>
+          <y>90</y>
           <width>231</width>
-          <height>251</height>
+          <height>161</height>
          </rect>
         </property>
         <property name="title" >
@@ -296,7 +303,7 @@
          </layout>
         </widget>
        </widget>
-       <widget class="QPushButton" name="pushButton" >
+       <widget class="QPushButton" name="translate_pushButton" >
         <property name="geometry" >
          <rect>
           <x>390</x>
@@ -311,6 +318,55 @@
         <property name="default" >
          <bool>true</bool>
         </property>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_2" >
+        <property name="geometry" >
+         <rect>
+          <x>10</x>
+          <y>0</y>
+          <width>231</width>
+          <height>81</height>
+         </rect>
+        </property>
+        <property name="title" >
+         <string>Input file</string>
+        </property>
+        <widget class="QLineEdit" name="inputFile_lineEdit" >
+         <property name="geometry" >
+          <rect>
+           <x>80</x>
+           <y>30</y>
+           <width>141</width>
+           <height>22</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label" >
+         <property name="geometry" >
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>64</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="text" >
+          <string>File name:</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="pushButton_2" >
+         <property name="geometry" >
+          <rect>
+           <x>80</x>
+           <y>50</y>
+           <width>86</width>
+           <height>32</height>
+          </rect>
+         </property>
+         <property name="text" >
+          <string>Browse</string>
+         </property>
+        </widget>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_2" >
@@ -358,15 +414,22 @@
   </action>
  </widget>
  <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>inputFile_lineEdit</tabstop>
+  <tabstop>pushButton_2</tabstop>
   <tabstop>fileFormatFiona_checkBox</tabstop>
   <tabstop>fileFormatLola_checkBox</tabstop>
   <tabstop>fileFormatPnml_checkBox</tabstop>
   <tabstop>fileFormatDot_checkBox</tabstop>
   <tabstop>fileFormat_lineEdit</tabstop>
   <tabstop>reduction_horizontalSlider</tabstop>
+  <tabstop>patternSmall_radioButton</tabstop>
+  <tabstop>patternNofhfaults_radioButton</tabstop>
+  <tabstop>patternStandardfaults_radioButton</tabstop>
+  <tabstop>patternVariables_checkBox</tabstop>
   <tabstop>commandLine_lineEdit</tabstop>
   <tabstop>commandLine_checkBox</tabstop>
-  <tabstop>tabWidget</tabstop>
+  <tabstop>translate_pushButton</tabstop>
  </tabstops>
  <includes/>
  <resources/>

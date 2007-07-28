@@ -1,6 +1,9 @@
 #include "gui_organizer.h"
 #include "../src/helpers.h" // for toString(int)
 
+#include <QProcess>
+#include <QErrorMessage>
+
 
 /******************************************************************************
  * CONSTRUCTOR
@@ -14,6 +17,7 @@ GUI_Organizer::GUI_Organizer() :
   fileFormat_pnml(false),
   fileFormat_dot(false),
   output_filename(""),
+  input_filename(""),
   command_line(""),
   patterns(1),
   patterns_variables(false)
@@ -27,6 +31,16 @@ GUI_Organizer::GUI_Organizer() :
 /******************************************************************************
 * SLOTS
 ******************************************************************************/
+
+void GUI_Organizer::translateButton_pressed()
+{
+//  QProcess run;
+//  run.start(QString(command_line.c_str()));
+//  QByteArray result = run.readAllStandardError();
+  
+  emit show_errormessage("Well...<br>This feature is not yet implemented...");
+}
+
 
 void GUI_Organizer::set_patternVariables(bool value)
 {
@@ -67,6 +81,14 @@ void GUI_Organizer::set_patternStandardfaults(bool value)
 void GUI_Organizer::set_outputFileName(QString value)
 {
   output_filename = value.toStdString();
+  
+  set_commandLine();
+}
+
+
+void GUI_Organizer::set_inputFileName(QString value)
+{
+  input_filename = value.toStdString();
   
   set_commandLine();
 }
@@ -140,6 +162,14 @@ void GUI_Organizer::set_reductionLevel(int value)
 void GUI_Organizer::set_commandLine()
 {
   string temp = "bpel2owfn";
+  
+  
+  // the input file
+  if (use_long_options)
+    temp += " --input=" + input_filename;
+  else
+    temp += " -i" + input_filename;
+  
   
   // the mode
   if (use_long_options)

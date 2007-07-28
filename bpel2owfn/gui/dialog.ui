@@ -40,7 +40,7 @@
         <string>Single BPEL process</string>
        </attribute>
        <attribute name="icon" >
-        <iconset>icons/bpel.png</iconset>
+        <iconset>:/icons/bpel.png</iconset>
        </attribute>
        <attribute name="toolTip" >
         <string>Translation of a single BPEL process into a Petri net model.</string>
@@ -374,7 +374,7 @@
         <string>BPEL4Chor choreography</string>
        </attribute>
        <attribute name="icon" >
-        <iconset>icons/bpel4chor.png</iconset>
+        <iconset>:/icons/bpel4chor.png</iconset>
        </attribute>
        <attribute name="toolTip" >
         <string>Translation of a BPEL4Chor choreography (participant descriptions and participant topology) into a Petri net model.</string>

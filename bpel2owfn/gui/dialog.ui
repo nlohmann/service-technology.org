@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>680</width>
-    <height>556</height>
+    <width>530</width>
+    <height>488</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -38,46 +38,11 @@
        <attribute name="toolTip" >
         <string>Translation of a single BPEL process into a Petri net model.</string>
        </attribute>
-       <widget class="QPushButton" name="pushButton" >
-        <property name="geometry" >
-         <rect>
-          <x>220</x>
-          <y>200</y>
-          <width>113</width>
-          <height>32</height>
-         </rect>
-        </property>
-        <property name="text" >
-         <string>PushButton</string>
-        </property>
-        <property name="autoDefault" >
-         <bool>false</bool>
-        </property>
-        <property name="default" >
-         <bool>false</bool>
-        </property>
-        <property name="flat" >
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton_2" >
-        <property name="geometry" >
-         <rect>
-          <x>400</x>
-          <y>160</y>
-          <width>113</width>
-          <height>32</height>
-         </rect>
-        </property>
-        <property name="text" >
-         <string>PushButton</string>
-        </property>
-       </widget>
        <widget class="QGroupBox" name="reduction_groupBox" >
         <property name="geometry" >
          <rect>
           <x>10</x>
-          <y>260</y>
+          <y>170</y>
           <width>231</width>
           <height>81</height>
          </rect>
@@ -91,7 +56,7 @@
            <x>10</x>
            <y>30</y>
            <width>211</width>
-           <height>27</height>
+           <height>22</height>
           </rect>
          </property>
          <property name="maximum" >
@@ -125,8 +90,8 @@
         <property name="geometry" >
          <rect>
           <x>10</x>
-          <y>361</y>
-          <width>631</width>
+          <y>260</y>
+          <width>481</width>
           <height>91</height>
          </rect>
         </property>
@@ -138,14 +103,22 @@
           <rect>
            <x>10</x>
            <y>30</y>
-           <width>611</width>
+           <width>461</width>
            <height>22</height>
           </rect>
          </property>
+         <property name="font" >
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text" >
-          <string>bpel2owfn</string>
+          <string/>
          </property>
          <property name="frame" >
+          <bool>true</bool>
+         </property>
+         <property name="readOnly" >
           <bool>true</bool>
          </property>
         </widget>
@@ -154,7 +127,7 @@
           <rect>
            <x>10</x>
            <y>60</y>
-           <width>241</width>
+           <width>227</width>
            <height>21</height>
           </rect>
          </property>
@@ -163,41 +136,181 @@
          </property>
         </widget>
        </widget>
-       <widget class="QWidget" name="" >
+       <widget class="QGroupBox" name="fileFormat_groupBox" >
         <property name="geometry" >
          <rect>
-          <x>190</x>
-          <y>100</y>
-          <width>100</width>
-          <height>61</height>
+          <x>10</x>
+          <y>0</y>
+          <width>231</width>
+          <height>161</height>
          </rect>
         </property>
-        <layout class="QVBoxLayout" >
-         <item>
-          <widget class="QRadioButton" name="radioButton" >
-           <property name="text" >
-            <string>RadioButton</string>
-           </property>
-           <property name="checked" >
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="radioButton_2" >
-           <property name="text" >
-            <string>RadioButton</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="radioButton_3" >
-           <property name="text" >
-            <string>RadioButton</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <property name="title" >
+         <string>Output file</string>
+        </property>
+        <widget class="QLabel" name="fileFormat_label1" >
+         <property name="geometry" >
+          <rect>
+           <x>20</x>
+           <y>30</y>
+           <width>51</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text" >
+          <string>Format:</string>
+         </property>
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="fileFormat_label2" >
+         <property name="geometry" >
+          <rect>
+           <x>10</x>
+           <y>130</y>
+           <width>64</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="text" >
+          <string>File name:</string>
+         </property>
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="fileFormat_lineEdit" >
+         <property name="geometry" >
+          <rect>
+           <x>80</x>
+           <y>130</y>
+           <width>141</width>
+           <height>22</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QWidget" name="" >
+         <property name="geometry" >
+          <rect>
+           <x>80</x>
+           <y>30</y>
+           <width>104</width>
+           <height>87</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" >
+          <item>
+           <widget class="QCheckBox" name="fileFormatFiona_checkBox" >
+            <property name="text" >
+             <string>Fiona oWFN</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="fileFormatLola_checkBox" >
+            <property name="text" >
+             <string>LoLA</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="fileFormatPnml_checkBox" >
+            <property name="text" >
+             <string>PNML</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="fileFormatDot_checkBox" >
+            <property name="text" >
+             <string>Graphviz dot</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox" >
+        <property name="geometry" >
+         <rect>
+          <x>260</x>
+          <y>0</y>
+          <width>231</width>
+          <height>251</height>
+         </rect>
+        </property>
+        <property name="title" >
+         <string>Petri net patterns</string>
+        </property>
+        <widget class="QCheckBox" name="patternVariables_checkBox" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+         <property name="geometry" >
+          <rect>
+           <x>10</x>
+           <y>100</y>
+           <width>123</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text" >
+          <string>model variables</string>
+         </property>
+        </widget>
+        <widget class="QWidget" name="" >
+         <property name="geometry" >
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>213</width>
+           <height>61</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" >
+          <item>
+           <widget class="QRadioButton" name="patternSmall_radioButton" >
+            <property name="text" >
+             <string>don't model faults at all</string>
+            </property>
+            <property name="checked" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="patternNofhfaults_radioButton" >
+            <property name="text" >
+             <string>don't model faults in handlers</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="patternStandardfaults_radioButton" >
+            <property name="text" >
+             <string>model all faults</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QPushButton" name="pushButton" >
+        <property name="geometry" >
+         <rect>
+          <x>390</x>
+          <y>370</y>
+          <width>100</width>
+          <height>32</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Translate</string>
+        </property>
+        <property name="default" >
+         <bool>true</bool>
+        </property>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_2" >
@@ -220,25 +333,39 @@
     </item>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusbar" />
   <widget class="QMenuBar" name="menubar" >
    <property name="geometry" >
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>680</width>
+     <width>530</width>
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu_Help" >
+    <property name="title" >
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="action_About_BPEL2oWFN" />
+   </widget>
+   <addaction name="menu_Help" />
   </widget>
-  <widget class="QStatusBar" name="statusbar" />
+  <action name="action_About_BPEL2oWFN" >
+   <property name="text" >
+    <string>&amp;About BPEL2oWFN</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
+  <tabstop>fileFormatFiona_checkBox</tabstop>
+  <tabstop>fileFormatLola_checkBox</tabstop>
+  <tabstop>fileFormatPnml_checkBox</tabstop>
+  <tabstop>fileFormatDot_checkBox</tabstop>
+  <tabstop>fileFormat_lineEdit</tabstop>
   <tabstop>reduction_horizontalSlider</tabstop>
-  <tabstop>radioButton</tabstop>
-  <tabstop>radioButton_2</tabstop>
-  <tabstop>radioButton_3</tabstop>
-  <tabstop>pushButton_2</tabstop>
-  <tabstop>pushButton</tabstop>
+  <tabstop>commandLine_lineEdit</tabstop>
+  <tabstop>commandLine_checkBox</tabstop>
   <tabstop>tabWidget</tabstop>
  </tabstops>
  <includes/>

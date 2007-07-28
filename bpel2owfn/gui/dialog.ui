@@ -76,8 +76,8 @@
        <widget class="QGroupBox" name="reduction_groupBox" >
         <property name="geometry" >
          <rect>
-          <x>30</x>
-          <y>300</y>
+          <x>10</x>
+          <y>260</y>
           <width>231</width>
           <height>81</height>
          </rect>
@@ -121,18 +121,47 @@
          </property>
         </widget>
        </widget>
-       <widget class="QLineEdit" name="systemcall_lineEdit" >
+       <widget class="QGroupBox" name="commandLine_groupBox" >
         <property name="geometry" >
          <rect>
-          <x>30</x>
-          <y>420</y>
-          <width>591</width>
-          <height>22</height>
+          <x>10</x>
+          <y>361</y>
+          <width>631</width>
+          <height>91</height>
          </rect>
         </property>
-        <property name="text" >
-         <string>bpel2owfn</string>
+        <property name="title" >
+         <string>Command line</string>
         </property>
+        <widget class="QLineEdit" name="commandLine_lineEdit" >
+         <property name="geometry" >
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>611</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="text" >
+          <string>bpel2owfn</string>
+         </property>
+         <property name="frame" >
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="commandLine_checkBox" >
+         <property name="geometry" >
+          <rect>
+           <x>10</x>
+           <y>60</y>
+           <width>241</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text" >
+          <string>use long command-line options</string>
+         </property>
+        </widget>
        </widget>
        <widget class="QWidget" name="" >
         <property name="geometry" >

@@ -1,6 +1,18 @@
 #include "gui_organizer.h"
 #include "../src/helpers.h"
 
+GUI_Organizer::GUI_Organizer()
+{
+  use_long_options = false;
+}
+
+void GUI_Organizer::set_longOptions(bool value)
+{
+  use_long_options = value;
+  
+  set_commandLine();
+}
+
 void GUI_Organizer::set_reductionLevel(int value)
 {
   if (value != reduction_level)
@@ -27,7 +39,12 @@ void GUI_Organizer::set_commandLine()
   string temp = "bpel2owfn";
   
   if (reduction_level > 0)
-    temp += " -r" + toString(reduction_level);
+  {
+    if (use_long_options)
+      temp += " --reduce=" + toString(reduction_level);
+    else
+      temp += " -r" + toString(reduction_level);
+  }
   
   emit commandLine_changed(temp.c_str());
 }

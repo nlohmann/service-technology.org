@@ -1,13 +1,15 @@
-TEMPLATE = app
-TARGET = BPEL2oWFN 
+TEMPLATE     = app
+TARGET       = BPEL2oWFN 
 
-# QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.4u.sdk
-CONFIG += i386 #ppc
+CONFIG       += i386 #static #ppc
 
-RESOURCES = BPEL2oWFN.qrc
+FORMS        += dialog.ui
 
-RC_FILE = icons/bpel2owfn.icns
+TRANSLATIONS += translation_de.ts
 
-HEADERS += gui_organizer.h ../src/helpers.h
-FORMS += dialog.ui
-SOURCES += bpel2owfn-gui.cc gui_organizer.cc ../src/helpers.cc
+#RC_FILE      += icons/bpel2owfn.icns
+ICON         += icons/bpel2owfn.icns
+RESOURCES    += BPEL2oWFN.qrc
+
+HEADERS      += gui_organizer.h ../src/helpers.h
+SOURCES      += bpel2owfn-gui.cc gui_organizer.cc ../src/helpers.cc

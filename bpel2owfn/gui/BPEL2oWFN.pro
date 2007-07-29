@@ -5,7 +5,7 @@ TEMPLATE     = app
 TARGET       = BPEL2oWFN 
 
 # configuration details
-CONFIG       += i386 #static #ppc
+CONFIG       += static release
 
 # the UI from the QT Designer
 FORMS        += dialog.ui

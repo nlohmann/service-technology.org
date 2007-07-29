@@ -16,7 +16,7 @@ mv BPEL2oWFN.app release
 
 echo ">>> creating installation package"
 echo ">>> please enter your root password when prompted"
-sudo /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -build -proj BPEL2oWFN.pmproj -p BPEL2oWFN.pkg
+sudo /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -build -proj BPEL2oWFN.pmproj -p BPEL2oWFN-@PACKAGE_VERSION@.pkg
 
 echo ">>> tidying directory"
 rm -fr release

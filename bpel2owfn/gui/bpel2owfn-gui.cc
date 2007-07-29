@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
   
   // the organizer object
   GUI_Organizer organizer;
+  organizer.fileDialog = test.StandardFileDialog;
   
   
   // the slider for the structural reduction
@@ -49,6 +50,10 @@ int main(int argc, char *argv[])
   
   // the translate button
   QObject::connect(test.translate_pushButton, SIGNAL(pressed()), &organizer, SLOT(translateButton_pressed()));
+
+  // the browse button
+  QObject::connect(test.inputFile_pushButton, SIGNAL(pressed()), &organizer, SLOT(browseButton_pressed()));
+  QObject::connect(&organizer, SIGNAL(inputFileName_changed(QString)), test.inputFile_lineEdit, SLOT(setText(QString)));
   
   // error messages
   QObject::connect(&organizer, SIGNAL(show_errormessage(QString)), test.StandardErrorMessage, SLOT(showMessage(QString)));

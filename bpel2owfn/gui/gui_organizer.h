@@ -2,7 +2,7 @@
 #define GUI_ORGANIZER_H
 
 #include <QObject>
-
+#include <QFileDialog>
 
 
 class GUI_Organizer : public QObject
@@ -28,6 +28,8 @@ class GUI_Organizer : public QObject
   
   public:
     GUI_Organizer();
+    
+    QFileDialog *fileDialog;
   
   public slots:
     void set_commandLine();
@@ -44,12 +46,14 @@ class GUI_Organizer : public QObject
     void set_patternVariables(bool value);
     void set_inputFileName(QString value);
     void translateButton_pressed();
+    void browseButton_pressed();
   
   signals:
     void reductionLevel_changed(QString);
     void commandLine_changed(QString);
     void no_variables_possible(bool);
     void show_errormessage(QString);
+    void inputFileName_changed(QString);
 };
 
 #endif

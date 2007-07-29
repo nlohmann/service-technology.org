@@ -6,7 +6,7 @@
      <bool>true</bool>
    </property>
  </widget>
- <widget class="QDialog" name="StandardDialog" >
+ <widget class="QFileDialog" name="StandardFileDialog" >
  </widget>
   <property name="geometry" >
    <rect>
@@ -354,7 +354,7 @@
           <string>File name:</string>
          </property>
         </widget>
-        <widget class="QPushButton" name="pushButton_2" >
+        <widget class="QPushButton" name="inputFile_pushButton" >
          <property name="geometry" >
           <rect>
            <x>80</x>

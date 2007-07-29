@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <QErrorMessage>
+#include <QFileDialog>
 
 #include "gui_organizer.h"
 
@@ -30,6 +31,16 @@ GUI_Organizer::GUI_Organizer() :
 /******************************************************************************
 * SLOTS
 ******************************************************************************/
+
+void GUI_Organizer::browseButton_pressed()
+{
+
+  QString fileName = fileDialog->getOpenFileName(fileDialog, "Choose BPEL process",
+                                                  "~",
+                                                  "BPEL processes (*.bpel)");
+
+  emit inputFileName_changed(fileName);
+}
 
 void GUI_Organizer::translateButton_pressed()
 {
@@ -168,38 +179,36 @@ void GUI_Organizer::set_commandLine()
   if (use_long_options)
     temp += " --input=" + input_filename;
   else
-    temp += " -i" + input_filename;
+    temp += " -i " + input_filename;
   
   
   // the mode
   if (use_long_options)
     temp += " --modus=petrinet";
   else
-    temp += " -mpetrinet";
+    temp += " -m petrinet";
 
   
   // the pattern parameters
-  if (patterns > 1)
+  if (use_long_options)
+    temp += " --parameter=";
+  else
+    temp += " -p ";
+  
+  switch (patterns)
+  {
+    case(1): temp += "small"; break;
+    case(2): temp += "nofhfaults"; break;
+    case(3): temp += "standardfaults"; break;
+  }
+  
+  if (patterns_variables)
   {
     if (use_long_options)
-      temp += " --parameter=";
+      temp += " --parameter=variables";
     else
-      temp += " -p";
-    
-    switch (patterns)
-    {
-      case(2): temp += "nofhfaults"; break;
-      case(3): temp += "standardfaults"; break;
-    }
-    
-    if (patterns_variables)
-    {
-      if (use_long_options)
-        temp += " --parameter=variables";
-      else
-        temp += " -pvariables";
-    }    
-  }
+      temp += " -p variables";
+  }    
   
   // the file formats
   if (fileFormat_fiona)
@@ -207,7 +216,7 @@ void GUI_Organizer::set_commandLine()
     if (use_long_options)
       temp += " --format=owfn";
     else
-      temp += " -fowfn";
+      temp += " -f owfn";
   }
   
   if (fileFormat_lola)
@@ -215,7 +224,7 @@ void GUI_Organizer::set_commandLine()
     if (use_long_options)
       temp += " --format=lola";
     else
-      temp += " -flola";
+      temp += " -f lola";
   }
   
   if (fileFormat_pnml)
@@ -223,7 +232,7 @@ void GUI_Organizer::set_commandLine()
     if (use_long_options)
       temp += " --format=pnml";
     else
-      temp += " -fpnml";
+      temp += " -f pnml";
   }
   
   if (fileFormat_dot)
@@ -231,7 +240,7 @@ void GUI_Organizer::set_commandLine()
     if (use_long_options)
       temp += " --format=dot";
     else
-      temp += " -fdot";
+      temp += " -f dot";
   }
   
   

@@ -2,7 +2,6 @@
 #define GUI_ORGANIZER_H
 
 #include <QObject>
-#include <string>
 
 
 
@@ -20,9 +19,9 @@ class GUI_Organizer : public QObject
     bool fileFormat_pnml;
     bool fileFormat_dot;
     
-    std::string output_filename;
-    std::string input_filename;
-    std::string command_line;
+    QString output_filename;
+    QString input_filename;
+    QString command_line;
     
     int patterns;
     bool patterns_variables;

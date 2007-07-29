@@ -3,6 +3,7 @@ export PATH=~/Downloads/qt-static/bin:$PATH
 which qmake
 qmake -config release
 make
+cp ../src/bpel2owfn BPEL2oWFN.app/Contents/Resources
 mkdir release
 mv BPEL2oWFN.app release
 make distclean

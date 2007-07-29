@@ -1,8 +1,7 @@
-#include "gui_organizer.h"
-#include "../src/helpers.h" // for toString(int)
-
-#include <QProcess>
+#include <cstdlib>
 #include <QErrorMessage>
+
+#include "gui_organizer.h"
 
 
 /******************************************************************************
@@ -34,14 +33,12 @@ GUI_Organizer::GUI_Organizer() :
 
 void GUI_Organizer::translateButton_pressed()
 {
-  QProcess run;
+  // I am assuming the bpel2owfn executable is inside the application bundle
+  QString temp = "BPEL2oWFN.app/Contents/Resources/" + command_line;
   
-  string temp = "../src/" + command_line;
+  std::system(temp.toStdString().c_str());
   
-  run.start(QString(temp.c_str()));
-  QByteArray result = run.readAllStandardError();
-  
-  emit show_errormessage(QString(toString(run.exitCode()).c_str()));
+  emit show_errormessage("Executed " + command_line);
 }
 
 
@@ -83,7 +80,7 @@ void GUI_Organizer::set_patternStandardfaults(bool value)
 
 void GUI_Organizer::set_outputFileName(QString value)
 {
-  output_filename = value.toStdString();
+  output_filename = value;
   
   set_commandLine();
 }
@@ -91,7 +88,7 @@ void GUI_Organizer::set_outputFileName(QString value)
 
 void GUI_Organizer::set_inputFileName(QString value)
 {
-  input_filename = value.toStdString();
+  input_filename = value;
   
   set_commandLine();
 }
@@ -164,7 +161,7 @@ void GUI_Organizer::set_reductionLevel(int value)
 
 void GUI_Organizer::set_commandLine()
 {
-  string temp = "bpel2owfn";
+  QString temp = "bpel2owfn";
   
   
   // the input file
@@ -226,7 +223,7 @@ void GUI_Organizer::set_commandLine()
     if (use_long_options)
       temp += " --format=pnml";
     else
-      temp += " -fowfn";
+      temp += " -fpnml";
   }
   
   if (fileFormat_dot)
@@ -234,7 +231,7 @@ void GUI_Organizer::set_commandLine()
     if (use_long_options)
       temp += " --format=dot";
     else
-      temp += " -fowfn";
+      temp += " -fdot";
   }
   
   
@@ -242,9 +239,9 @@ void GUI_Organizer::set_commandLine()
   if (reduction_level > 0)
   {
     if (use_long_options)
-      temp += " --reduce=" + toString(reduction_level);
+      temp += " --reduce=" + QString::number(reduction_level);
     else
-      temp += " -r" + toString(reduction_level);
+      temp += " -r" + QString::number(reduction_level);
   }
   
   
@@ -256,5 +253,5 @@ void GUI_Organizer::set_commandLine()
   
   command_line = temp;
   
-  emit commandLine_changed(temp.c_str());
+  emit commandLine_changed(temp);
 }

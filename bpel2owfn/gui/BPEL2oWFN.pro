@@ -20,5 +20,5 @@ RC_FILE      += resource/bpel2owfn.icns
 RESOURCES    += BPEL2oWFN.qrc
 
 # the C++ source files
-HEADERS      += gui_organizer.h ../src/helpers.h
-SOURCES      += bpel2owfn-gui.cc gui_organizer.cc ../src/helpers.cc
+HEADERS      += gui_organizer.h
+SOURCES      += bpel2owfn-gui.cc gui_organizer.cc

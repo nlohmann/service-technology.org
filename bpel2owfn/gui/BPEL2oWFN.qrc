@@ -1,6 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <file>icons/bpel.png</file>
-    <file>icons/bpel4chor.png</file>
+    <file>resource/bpel.png</file>
+    <file>resource/bpel4chor.png</file>
 </qresource>
 </RCC>

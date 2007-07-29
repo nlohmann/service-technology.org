@@ -1,0 +1,107 @@
+===============================================================================
+                A GRAPHICAL USER INTERFACE FOR GNU BPEL2oWFN
+===============================================================================
+
+
+
+SHORT INFORMATION
+-----------------
+
+To create the GUI as a Mac OS X application called `BPEL2oWFN.app':
+
+    qmake
+    make
+    cp ../src/bpel2owfn BPEL2oWFN.app/Contents/Resources
+
+
+To create a Mac OS X installation package called `BPEL2oWFN.pkg':
+
+    ./static_release.sh
+
+
+
+DETAILED INFORMATION
+--------------------
+
+To bootstrap, type `qmake'. Then, you can use `make' to generate C++ code from
+the designed UI and to translate it. Note that the generated application
+(BPEL2oWFN.app for Mac OS X) DOES NOT WORK LIKE THIS. To make it work, execute
+the following line
+
+          `cp ../src/bpel2owfn BPEL2oWFN.app/Contents/Resources'
+
+to copy the built executable of BPEL2oWFN into the generated application. This
+executable is called by the GUI. To make life easier, execute the script
+`static_release.sh' after tidying up with `make distclean'. This will create
+an installation package `BPEL2oWFN.pkg' which contains a correct application.
+
+
+
+FILES
+-----
+
+dialog.ui         The graphical user interface itself, described as XML file
+                  created by the Qt Designer. The dialogs does not contain any
+                  connections -- they are defined elsewhere. Note that the
+                  dialog has some "hidden" widgets in the beginning of the file
+                  (i.e., widgets that were not defined in the Qt Designer).
+
+bpel2owfn-gui.cc  The main C++ file for the graphical user interface. Includes
+                  the generated code of Qt, creates an GUI organizer object,
+                  and defines all the connections of the GUI elements.
+
+gui_organizer.*   An organizer object that implements the connections of the
+                  GUI. This object defines the whole behavior of the GUI without
+                  referencing the GUI objects itself. Thus, the behavior is
+                  totally independent of the layout and the operating system.
+
+BPEL2oWFN.pro     A project file for qmake. It is read by qmake to create the
+                  Makefile for the GUI. It is currently only tested with
+                  Mac OS X.
+                  
+BPEL2oWFN.qrc     This file lists all resources that have to be copied into the
+                  created application such as icons or graphics. Qt creates a
+                  C++ file which then describes these files.
+                  
+translation-de.ts A translation of the GUI elements to German. Incomplete and
+                  not yet used.
+
+BPEL2oWFN.pmproj  A project for the Apple PackageMaker. It creates a .pkg file
+                  from the generated application (BPEL2oWFN.app) and uses some
+                  files in the `resource' directory. Please use the shell script
+                  `static_release.h' to automate the package building. THE
+                  APPLICATION WILL NOT WORK WHEN ONLY BUILT WITH `make'!
+
+static_release.sh A shell script to automatically build an Apple installation
+                  package. The script creates a stand-alone application which
+                  is statically linked against Qt. The static version is
+                  assumed to be in the directory `~/Downloads/qt-static/bin'.
+                  The PakckageMaker has to be run as super user, so the script
+                  will prompt for the passwort after creating the application.
+                  Furthermore, the built executable of BPEL2oWFN is assumed to
+                  be in the directory `../src'. This executable is copied into
+                  the application (BPEL2oWFN.app). Note that the script will
+                  try to tidy the directory with `make distclean' which will
+                  fail if the directory was tidied before. So don't worry about
+                  a failure at the beginning.
+
+resource/bpel.png
+resource/bpel4chor.png  Graphics for the GUI. They are linked into the
+                        application with the help of the file `BPEL2oWFN.qrc'.
+
+resource/bpel2owfn.icns The file icon of the generated application (the Mac
+                        version). The icon is mentioned in file `BPEL2oWFN.pro'.
+
+resource/background.jpg This background is used by the Apple PackageMaker for
+                        the installation package.
+                        
+resource/gpl.rtf        The GNU GPL v2 which is displayed in the installation
+                        package.
+                        
+resource/about.rtfd     The welcome message for the installation package.
+
+
+
+  Niels Lohmann
+  nlohmann@informatik.hu-berlin.de
+  29 July 2007

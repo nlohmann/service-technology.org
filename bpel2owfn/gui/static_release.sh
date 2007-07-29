@@ -1,11 +1,23 @@
 #!/bin/bash
+echo ">>> tidying directory"
+make -s distclean
 export PATH=~/Downloads/qt-static/bin:$PATH
-which qmake
+
+echo ">>> calling qmake"
 qmake -config release
-make
+
+echo ">>> calling make"
+make -s
+
+echo ">>> copying BPEL2oWFN executable"
 cp ../src/bpel2owfn BPEL2oWFN.app/Contents/Resources
 mkdir release
 mv BPEL2oWFN.app release
-make distclean
+
+echo ">>> creating installation package"
+echo ">>> please enter your root password when prompted"
 sudo /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -build -proj BPEL2oWFN.pmproj -p BPEL2oWFN.pkg
+
+echo ">>> tidying directory"
 rm -fr release
+make -s distclean

@@ -416,7 +416,7 @@
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>inputFile_lineEdit</tabstop>
-  <tabstop>pushButton_2</tabstop>
+  <tabstop>inputFile_pushButton</tabstop>
   <tabstop>fileFormatFiona_checkBox</tabstop>
   <tabstop>fileFormatLola_checkBox</tabstop>
   <tabstop>fileFormatPnml_checkBox</tabstop>

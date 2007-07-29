@@ -6,7 +6,7 @@ CONFIG += i386 #ppc
 
 RESOURCES = BPEL2oWFN.qrc
 
-ICONS = icons/bpel2owfn.icns
+RC_FILE = icons/bpel2owfn.icns
 
 HEADERS += gui_organizer.h ../src/helpers.h
 FORMS += dialog.ui

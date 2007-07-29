@@ -34,11 +34,14 @@ GUI_Organizer::GUI_Organizer() :
 
 void GUI_Organizer::translateButton_pressed()
 {
-//  QProcess run;
-//  run.start(QString(command_line.c_str()));
-//  QByteArray result = run.readAllStandardError();
+  QProcess run;
   
-  emit show_errormessage("Well...<br>This feature is not yet implemented...");
+  string temp = "../src/" + command_line;
+  
+  run.start(QString(temp.c_str()));
+  QByteArray result = run.readAllStandardError();
+  
+  emit show_errormessage(QString(toString(run.exitCode()).c_str()));
 }
 
 

@@ -29,17 +29,17 @@
  * \brief   global varialbes
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/07/23 12:43:09 $
+ * \date    \$Date: 2007/07/30 19:56:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  */
 
 
@@ -69,6 +69,7 @@ namespace globals {
 
   map<string, unsigned int> ASTE_inputChannels;
   map<string, unsigned int> ASTE_outputChannels;
+  map<string, string> ASTE_channel_to_port;
   set<string> ASTE_correlationSetNames;
   set<string> ASTE_variableNames;
   set<string> ASTE_messageExchangeNames;

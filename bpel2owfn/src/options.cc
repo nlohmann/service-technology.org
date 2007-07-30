@@ -31,17 +31,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/25 09:28:07 $
+ * \date    \$Date: 2007/07/30 19:56:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.96 $
+ * \version \$Revision: 1.97 $
  */
 
 
@@ -443,6 +443,8 @@ void parse_command_line(int argc, char* argv[])
           globals::parameters[P_DEADLOCKTEST] = true;
         else if (parameter == "data")
           globals::parameters[P_DATA] = true;
+        else if (parameter == "ports")
+          globals::parameters[P_PORTS] = true;
         else {
           trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
           trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");

@@ -34,13 +34,13 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/06/28 07:38:14 $
+ * \date    \$Date: 2007/07/30 19:56:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.132 $
+ * \version \$Revision: 1.133 $
  */
 
 
@@ -838,6 +838,11 @@ string ASTE::createChannel(bool synchronousCommunication)
       return "";
     }
   }
+  
+  
+  // map the channel to the name of the partner link to obtain ports
+  if (attributes["partnerLink"] != "")
+    globals::ASTE_channel_to_port[channelName] = attributes["partnerLink"];
   
   
   switch (type)

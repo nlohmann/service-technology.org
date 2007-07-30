@@ -31,11 +31,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/07/13 12:50:47 $
+ * \date    \$Date: 2007/07/30 19:56:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  */
 %}
 
@@ -111,14 +111,14 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
     if (in->second == 0 || globals::instances_of_current_process != 0)
     {
       trace(TRACE_DEBUG, "[PNU]\tcreating channel `in." + in->first + "'\n");
-      PN.newPlace("in." + in->first, IN);
+      PN.newPlace("in." + in->first, IN, globals::ASTE_channel_to_port[in->first]);
     }
     else // case 2: several instances of each channel are needed
     {
       for (unsigned int i = 1; i <= in->second; i++)
       {
         trace(TRACE_DEBUG, "[PNU]\tcreating channel `in." + in->first + ".instance_" + toString(i) + "'\n");
-      	PN.newPlace("in." + in->first + ".instance_" + toString(i), IN);
+      	PN.newPlace("in." + in->first + ".instance_" + toString(i), IN, globals::ASTE_channel_to_port[in->first]);
       }
     }
   }
@@ -130,13 +130,13 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
     if (out->second == 0 || globals::instances_of_current_process != 0)
     {
       trace(TRACE_DEBUG, "[PNU]\tcreating channel `out." + out->first + "'\n");
-      PN.newPlace("out." + out->first, OUT);
+      PN.newPlace("out." + out->first, OUT, globals::ASTE_channel_to_port[out->first]);
     }
     else // case 2: several instances of each channel are needed
       for (unsigned int i = 1; i <= out->second; i++)
       {
         trace(TRACE_DEBUG, "[PNU]\tcreating channel `out." + out->first + ".instance_" + toString(i) + "'\n");
-      	PN.newPlace("out." + out->first + ".instance_" + toString(i), OUT);
+      	PN.newPlace("out." + out->first + ".instance_" + toString(i), OUT,  globals::ASTE_channel_to_port[out->first]);
       }
   }
     

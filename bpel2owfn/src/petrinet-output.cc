@@ -34,13 +34,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/07/27 14:24:19 $
+ * \date    \$Date: 2007/07/30 19:56:41 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.106 $
+ * \version \$Revision: 1.107 $
  *
  * \ingroup petrinet
  */
@@ -479,6 +479,12 @@ string Place::output_dot() const
     // strip "in." or "out."
     label = label.substr(label.find_first_of(".")+1, label.length());
     
+    // when drawing ports, strip the port (i.e. the partnerLink) name
+    if (globals::parameters[P_PORTS])
+    {
+      label = label.substr(label.find_first_of(".")+1, label.length());      
+    }
+    
     // if channel is instantiated, strip the ".instance_" part and replace 
     if (label.find(".instance_") != string::npos)
     {
@@ -554,7 +560,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   assert(output != NULL);
   
   (*output) << "digraph N {" << endl;
-  (*output) << " graph [fontname=\"Helvetica\" nodesep=0.3 ranksep=\"0.2 equally\" fontsize=10 label=\"";
+  (*output) << " graph [fontname=\"Helvetica\" nodesep=0.3 ranksep=\"0.2 equally\" fontsize=10 remincross=true label=\"";
   
   if (globals::reduction_level == 5)
     (*output) << "structurally reduced ";
@@ -578,6 +584,37 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
       (*output) << (*p)->output_dot();
     for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
       (*output) << (*p)->output_dot();
+    
+    if (globals::parameters[P_PORTS])
+    {
+      // draw the ports
+      for (map<string, set<Place *> >::const_iterator port = ports.begin();
+           port != ports.end(); port++)
+      {
+        (*output) << " // cluster for port " << port->first << endl; 
+        (*output) << " subgraph cluster_" << port->first << "\n {\n ";
+        
+        for (set<Place*>::const_iterator place = port->second.begin();
+             place != port->second.end(); place++)
+        {
+          (*output) << "  p" + toString((*place)->id) << ";" << endl;
+//          (*output) << "  p" + toString((*place)->id) << "_l;" << endl;
+
+          for (set<Place*>::const_iterator place2 = port->second.begin();
+               place2 != port->second.end(); place2++)
+          {
+            if ( (*place) != (*place2) )
+              (*output) << "  p" + toString((*place)->id) + " -> p" + toString((*place2)->id) + ";" << endl;  
+          }
+
+        }
+        
+        (*output) << "  label=\"" << port->first << "\";" << endl;
+        (*output) << "  style=rounded; labelloc=t;" << endl;
+        //(*output) << "  rankdir=TB;" << endl;
+        (*output) << " }" << endl;
+      }
+    }
   }
   
   // list the transitions
@@ -1255,30 +1292,32 @@ void PetriNet::output_owfn(ostream *output) const
   
   
   // ports
-  if (!ports.empty())
+  if (globals::parameters[P_PORTS])
   {
-    (*output) << endl << "PORTS" << endl;
-    
-    for (map<string, set<Place*> >::const_iterator port = ports.begin();
-         port != ports.end(); port++)
+    if (!ports.empty())
     {
-      (*output) << "  PORT " << port->first << ":" << endl;
+      (*output) << endl << "PORTS" << endl;
       
-      for (set<Place *>::const_iterator place = port->second.begin();
-           place != port->second.end(); place++)
+      for (map<string, set<Place*> >::const_iterator port = ports.begin();
+           port != ports.end(); port++)
       {
-        if (place != port->second.begin())
-          (*output) << "," << endl;
+        (*output) << "  PORT " << port->first << ":" << endl;
         
-        (*output) << "    " << (*place)->nodeShortName();
+        for (set<Place *>::const_iterator place = port->second.begin();
+             place != port->second.end(); place++)
+        {
+          if (place != port->second.begin())
+            (*output) << "," << endl;
+          
+          (*output) << "    " << (*place)->nodeShortName();
+        }
+        
+        (*output) << ";" << endl;
       }
       
-      (*output) << ";" << endl;
+      (*output) << endl;
     }
-    
-    (*output) << endl;
   }
-  
   
   
   // initial marking

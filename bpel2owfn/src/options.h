@@ -30,17 +30,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/25 09:28:07 $
+ * \date    \$Date: 2007/07/30 19:56:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  */
 
 
@@ -96,7 +96,7 @@ typedef enum
    O_REDUCTION,		///< set level of structural reduction
    O_TOPOLOGY,		///< parse a choreography file (BPEL4Chor)
    O_WSDL,		///< parse a WSDL file
-   O_NET  	///< parse an OWFN or PNML file
+   O_NET		///< parse an oWFN or PNML file
 } possibleOptions;
 
 
@@ -156,7 +156,8 @@ typedef enum
   P_LOOPCONTROL,	///< add communication to loops
   P_NOINTERFACE,	///< do not draw an interface
   P_DEADLOCKTEST,	///< removes the deadlock from the final place
-  P_DATA		///< creates multiple nets (Diplomarbeit Thomas Heidinger)   
+  P_DATA,		///< creates multiple nets (Diplomarbeit Thomas Heidinger)
+  P_PORTS		///< outputs ports (affects oWFN and dot output)
 } possibleParameters;
 
 

@@ -71,6 +71,7 @@ void OG::buildGraph() {
     assert(getRoot() != NULL);
     buildGraph(getRoot(), 1);
     correctNodeColorsAndShortenAnnotations();
+    computeGraphStatistics();
 }
 
 

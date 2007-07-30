@@ -81,11 +81,28 @@ GraphNode * communicationGraph::getRoot() const {
 }
 
 
-//! \return number of nodes
-//! \brief returns the number of nodes of the graph (IG or OG)
 unsigned int communicationGraph::getNumberOfNodes() const {
     return setOfVertices.size();
-//    return numberOfNodes;
+}
+
+
+unsigned int communicationGraph::getNumberOfStoredStates() const {
+    return nStoredStates;
+}
+
+
+unsigned int communicationGraph::getNumberOfEdges() const {
+    return nEdges;
+}
+
+
+unsigned int communicationGraph::getNumberOfBlueNodes() const {
+    return nBlueNodes;
+}
+
+
+unsigned int communicationGraph::getNumberOfBlueEdges() const {
+    return nBlueEdges;
 }
 
 
@@ -272,11 +289,12 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, Graph
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, GraphNode * node, GraphNode * newNode) : end\n");
 }
 
+void communicationGraph::computeGraphStatistics() {
+    computeNumberOfStatesAndEdges();
+    computeNumberOfBlueNodesEdges();
+}
 
-void communicationGraph::computeNumberOfNodesEdges(
-    unsigned int& nNodes,
-    unsigned int& nStoredStates,
-    unsigned int& nEdges) const {
+void communicationGraph::computeNumberOfStatesAndEdges() {
 
     bool visitedNodes[getNumberOfNodes()];
 
@@ -284,24 +302,16 @@ void communicationGraph::computeNumberOfNodesEdges(
         visitedNodes[i] = false;
     }
 
-    nNodes        = 0;
     nStoredStates = 0;
     nEdges        = 0;
 
-    computeNumberOfNodesEdgesHelper(root, visitedNodes, nNodes, nStoredStates,
-        nEdges);
+    computeNumberOfStatesAndEdgesHelper(root, visitedNodes);
 }
 
 
-//! \param v current node in the iteration process
-//! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
-//! \brief dfs through the graph computing the number of all (blue and red) nodes
-void communicationGraph::computeNumberOfNodesEdgesHelper(
+void communicationGraph::computeNumberOfStatesAndEdgesHelper(
     GraphNode*    v,
-    bool          visitedNodes[],
-    unsigned int& nNodes,
-    unsigned int& nStoredStates,
-    unsigned int& nEdges) const {
+    bool          visitedNodes[]) {
 
     assert(v != NULL);
 
@@ -310,7 +320,6 @@ void communicationGraph::computeNumberOfNodesEdgesHelper(
     visitedNodes[v->getNumber()] = true;
 
     nStoredStates += v->reachGraphStateSet.size();
-    nNodes++;
 
     // iterating over all successors
     GraphEdge* leavingEdge;
@@ -323,16 +332,13 @@ void communicationGraph::computeNumberOfNodesEdgesHelper(
         nEdges++;
 
         if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
-            computeNumberOfNodesEdgesHelper(vNext, visitedNodes, nNodes,
-                nStoredStates, nEdges);
+            computeNumberOfStatesAndEdgesHelper(vNext, visitedNodes);
         }
     }
 }
 
 
-void communicationGraph::computeNumberOfBlueNodesEdges(
-    unsigned int& nBlueNodes,
-    unsigned int& nBlueEdges) const {
+void communicationGraph::computeNumberOfBlueNodesEdges() {
 
     bool visitedNodes[getNumberOfNodes()];
 
@@ -343,18 +349,13 @@ void communicationGraph::computeNumberOfBlueNodesEdges(
     nBlueNodes = 0;
     nBlueEdges = 0;
 
-    computeNumberOfBlueNodesEdgesHelper(root, visitedNodes, nBlueNodes, nBlueEdges);
+    computeNumberOfBlueNodesEdgesHelper(root, visitedNodes);
 }
 
 
-//! \param v current node in the iteration process
-//! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
-//! \brief dfs through the graph computing the number of blue nodes
 void communicationGraph::computeNumberOfBlueNodesEdgesHelper(
     GraphNode* v,
-    bool       visitedNodes[],
-    unsigned int& nBlueNodes,
-    unsigned int& nBlueEdges) const {
+    bool       visitedNodes[]) {
 
     assert(v != NULL);
 
@@ -382,8 +383,7 @@ void communicationGraph::computeNumberOfBlueNodesEdgesHelper(
             }
 
             if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
-                computeNumberOfBlueNodesEdgesHelper(vNext, visitedNodes,
-                    nBlueNodes, nBlueEdges);
+                computeNumberOfBlueNodesEdgesHelper(vNext, visitedNodes);
             }
         } // while
     }
@@ -468,30 +468,14 @@ void communicationGraph::printProgressFirst() {
 }
 
 
-//! \brief computes number of blue nodes and edges and prints them
-void communicationGraph::printNodeStatistics() {
-
-    unsigned int nNodes;
-    unsigned int nStoredStates;
-    unsigned int nEdges;
-
-    // calculate the number of all (blue and red) nodes and edges
-    computeNumberOfNodesEdges(nNodes, nStoredStates, nEdges);
-
-    unsigned int nBlueNodes;
-    unsigned int nBlueEdges;
-
-    // calculate the number of blue nodes and edges, that are reachable from
-    // the root
-    computeNumberOfBlueNodesEdges(nBlueNodes, nBlueEdges);
-
-    trace(TRACE_0, "    number of nodes: " + intToString(nNodes) + "\n");
-    trace(TRACE_0, "    number of edges: " + intToString(nEdges) + "\n");
+void communicationGraph::printGraphStatistics() {
+    trace(TRACE_0, "    number of nodes: " + intToString(getNumberOfNodes()) + "\n");
+    trace(TRACE_0, "    number of edges: " + intToString(getNumberOfEdges()) + "\n");
     trace(TRACE_0, "    number of deleted nodes: " + intToString(numberDeletedVertices) + "\n");
-    trace(TRACE_0, "    number of blue nodes: " + intToString(nBlueNodes) + "\n");
-    trace(TRACE_0, "    number of blue edges: " + intToString(nBlueEdges) + "\n");
+    trace(TRACE_0, "    number of blue nodes: " + intToString(getNumberOfBlueNodes()) + "\n");
+    trace(TRACE_0, "    number of blue edges: " + intToString(getNumberOfBlueEdges()) + "\n");
     trace(TRACE_0, "    number of states calculated: " + intToString(State::state_count) + "\n");
-    trace(TRACE_0, "    number of states stored in nodes: " + intToString(nStoredStates) + "\n");
+    trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStoredStates()) + "\n");
 }
 
 

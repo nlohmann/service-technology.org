@@ -54,27 +54,66 @@ extern int show_progress;
 /* communication graph */
 class communicationGraph {
 private:
-    void computeNumberOfNodesEdges(
-        unsigned int& nNodes,
-        unsigned int& nStoredStates,
-        unsigned int& nEdges) const;
 
-    void computeNumberOfNodesEdgesHelper(
+    /**
+     * Computes the total number of all states stored in all nodes and the
+     * number of all edges in this graph.
+     */
+    void computeNumberOfStatesAndEdges();
+
+    /**
+     * Helps computeNumberOfStatesAndEdges to computes the total number of all
+     * states stored in all nodes and the number of all edges in this graph.
+     * This is done recursively (dfs).
+     * @param v Current node in the iteration process.
+     * @param visitedNodes[] Array of bool storing the nodes that we have
+     *     already looked at.
+     */
+    void computeNumberOfStatesAndEdgesHelper(
         GraphNode*    v,
-        bool          visitedNodes[],
-        unsigned int& nNodes,
-        unsigned int& nStoredStates,
-        unsigned int& nEdges) const;
+        bool          visitedNodes[]);
 
-    void computeNumberOfBlueNodesEdges(
-        unsigned int& nBlueNodes,
-        unsigned int& nBlueEdges) const;
+    /**
+     * Computes the number of all blue to be shown nodes and edges in this
+     * graph.
+     */
+    void computeNumberOfBlueNodesEdges();
 
+    /**
+     * Helps computeNumberOfStatesAndEdges() to computes the number of all blue
+     * to be shown nodes and edges in this graph.
+     * This is done recursively (dfs).
+     * @param v Current node in the iteration process.
+     * @param visitedNodes[] Array of bool storing the nodes that we have
+     *     already looked at.
+     */
     void computeNumberOfBlueNodesEdgesHelper(
         GraphNode* v,
-        bool       visitedNodes[],
-        unsigned int& nBlueNodes,
-        unsigned int& nBlueEdges) const;
+        bool       visitedNodes[]);
+
+    /**
+     * The total number of all states stored in all nodes in this graph.
+     * Is computed by computeNumberOfStatesAndEdges().
+     */
+    unsigned int nStoredStates;
+
+    /**
+     * The number of all edges in this graph.
+     * Is computed by computeNumberOfStatesAndEdges().
+     */
+    unsigned int nEdges;
+
+    /**
+     * The number of blue to be shown nodes in this graph.
+     * Is computed by computeNumberOfBlueNodesEdges().
+     */
+    unsigned int nBlueNodes;
+
+    /**
+     * The number of blue to be shown edges in this graph.
+     * Is computed by computeNumberOfBlueNodesEdges().
+     */
+    unsigned int nBlueEdges;
 
 protected:
 	oWFN* PN;                            //!< pointer to the underlying petri net
@@ -94,7 +133,34 @@ public:
 
     void calculateRootNode();
 
+    /**
+     * Returns the number of nodes in this graph.
+     */
     unsigned int getNumberOfNodes() const;
+
+    /**
+     * Returns the total number of all states stored in all nodes in this
+     * graph. May only be called after computeGraphStatistics().
+     */
+    unsigned int getNumberOfStoredStates() const;
+
+    /**
+     * Returns the number of all edges in this graph. May only be called after
+     * computeGraphStatistics().
+     */
+    unsigned int getNumberOfEdges() const;
+
+    /**
+     * Returns the number of all blue to be shown nodes in this graph. May only
+     * be called after computeGraphStatistics().
+     */
+    unsigned int getNumberOfBlueNodes() const;
+
+    /**
+     * Returns the number of all blue to be shown edges in this graph. May only
+     * be called after computeGraphStatistics().
+     */
+    unsigned int getNumberOfBlueEdges() const;
 
     GraphNode * findGraphNodeInSet(GraphNode *);
 
@@ -115,8 +181,19 @@ public:
     // functions to create an STG representation of the IG or OG
     void printGraphToSTG();
     void printGraphToSTGRecursively(GraphNode * v, fstream& os, bool[]);
-    
-    void printNodeStatistics();
+
+    /**
+     * Computes statistics about this graph. They can be printed by
+     * printGraphStatistics().
+     */
+    void computeGraphStatistics();
+
+    /**
+     * Prints statistics about this graph. May only be called after
+     * computeGraphStatistics().
+     */
+    void printGraphStatistics();
+
     bool stateActivatesOutputEvents(State *);
 
 // Provides user defined operator new. Needed to trace all new operations on this class.

@@ -56,16 +56,18 @@ interactionGraph::~interactionGraph() {
 //! \brief builds the graph starting with the root node
 void interactionGraph::buildGraph() {
 
-  	PN->setOfStatesTemp.clear();
-  	PN->visitedStates.clear();
+    PN->setOfStatesTemp.clear();
+    PN->visitedStates.clear();
 
     calculateRootNode(); // creates the root node and calculates its reachability graph (set of states)
 
-	if (options[O_CALC_REDUCED_IG]) {
-		buildReducedGraph(root);
-	} else {
-		buildGraph(root);
-	}
+    if (options[O_CALC_REDUCED_IG]) {
+        buildReducedGraph(root);
+    } else {
+        buildGraph(root);
+    }
+
+    computeGraphStatistics();
 }
 
 

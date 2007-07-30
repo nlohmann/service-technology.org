@@ -332,7 +332,7 @@ void computeOG(oWFN* PN) {
 
     // print statistics
     trace(TRACE_0, "OG statistics:\n");
-    graph->printNodeStatistics();
+    graph->printGraphStatistics();
     trace(TRACE_0, "\n");
 
     // generate output files
@@ -405,7 +405,7 @@ void computeIG(oWFN* PN) {
 
     // print statistics
     trace(TRACE_0, "IG statistics:\n");
-    graph->printNodeStatistics();
+    graph->printGraphStatistics();
     trace(TRACE_0, "\n");
 
     // generate output files

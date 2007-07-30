@@ -34,13 +34,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/07/30 19:56:41 $
+ * \date    \$Date: 2007/07/30 20:33:43 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.107 $
+ * \version \$Revision: 1.108 $
  *
  * \ingroup petrinet
  */
@@ -443,8 +443,8 @@ string Transition::output_dot() const
   
   result += "]\n";
   
-  result += " t" + toString(id) + "_l\t[shape=none];\n";
-  result += " t" + toString(id) + "_l -> t" + toString(id) + " [headlabel=\"" + label + "\"]\n";
+  result += " t" + toString(id) + "_l\t[style=invis];\n";
+  result += " t" + toString(id) + "_l -> t" + toString(id) + " [headlabel=\"" + label + "\" style=invis]\n";
   
   return result;
 }
@@ -529,12 +529,12 @@ string Place::output_dot() const
   
   result += "]\n";
   
-  result += " p" + toString(id) + "_l\t[shape=none];\n";
+  result += " p" + toString(id) + "_l\t[style=invis];\n";
   
   if (type == OUT)
-    result += " p" + toString(id) + " -> p" + toString(id) + "_l [taillabel=\"" + label + "\"]\n";
+    result += " p" + toString(id) + " -> p" + toString(id) + "_l [taillabel=\"" + label + "\" style=invis]\n";
   else
-    result += " p" + toString(id) + "_l -> p" + toString(id) + " [headlabel=\"" + label + "\"]\n";
+    result += " p" + toString(id) + "_l -> p" + toString(id) + " [headlabel=\"" + label + "\" style=invis]\n";
   
   return result;
 }
@@ -560,7 +560,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   assert(output != NULL);
   
   (*output) << "digraph N {" << endl;
-  (*output) << " graph [fontname=\"Helvetica\" nodesep=0.3 ranksep=\"0.2 equally\" fontsize=10 remincross=true label=\"";
+  (*output) << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\" fontsize=10 remincross=true label=\"";
   
   if (globals::reduction_level == 5)
     (*output) << "structurally reduced ";
@@ -598,19 +598,19 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
              place != port->second.end(); place++)
         {
           (*output) << "  p" + toString((*place)->id) << ";" << endl;
-//          (*output) << "  p" + toString((*place)->id) << "_l;" << endl;
+          (*output) << "  p" + toString((*place)->id) << "_l;" << endl;
 
+          // make the port more compact
           for (set<Place*>::const_iterator place2 = port->second.begin();
                place2 != port->second.end(); place2++)
           {
             if ( (*place) != (*place2) )
-              (*output) << "  p" + toString((*place)->id) + " -> p" + toString((*place2)->id) + ";" << endl;  
+              (*output) << "  p" + toString((*place)->id) + " -> p" + toString((*place2)->id) + " [style=invis];" << endl;  
           }
-
         }
         
         (*output) << "  label=\"" << port->first << "\";" << endl;
-        (*output) << "  style=rounded; labelloc=t;" << endl;
+        (*output) << "  style=\"filled,rounded\"; bgcolor=grey95  labelloc=t;" << endl;
         //(*output) << "  rankdir=TB;" << endl;
         (*output) << " }" << endl;
       }
@@ -638,7 +638,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   }
   
   if (draw_interface)
-    (*output) << "\n  label=\"\" style=dashed" << endl;
+    (*output) << "\n  label=\"\" style=\"dashed\"" << endl;
   else
     (*output) << "\n  label=\"\" style=invis" << endl;
   

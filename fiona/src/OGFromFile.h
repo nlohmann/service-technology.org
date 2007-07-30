@@ -221,6 +221,11 @@ public:
     static std::string addOGFileSuffix(const std::string& filePrefix);
 
     bool simulates ( OGFromFile *smallerOG );
+    
+    /**
+     * Tests, if this OG is acyclic
+     */
+    bool acyclic();
 };
 
 

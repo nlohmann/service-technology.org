@@ -489,6 +489,19 @@ void checkEquality(OGFromFile::ogs_t OGsFromFiles) {
     }
 }
 
+// computes the number of Services that are determined by every single OG
+void countServices(OGFromFile::ogs_t OGsFromFiles) {
+    for (list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
+         OGFromFileIter != OGsFromFiles.end(); OGFromFileIter++) {
+
+        if ((*OGFromFileIter)->acyclic()) {
+            trace(TRACE_5, "The given OG is acyclic\n");
+        } else {
+            trace(TRACE_5, "The given OG is is not ayclic\n");
+        }
+    }
+}
+
 
 // **********************************************************************************
 // ********                   MAIN                                           ********
@@ -550,7 +563,7 @@ int main(int argc, char ** argv) {
 // **********************************************************************************
 // start OG file dependant operations
 
-    if (options[O_MATCH] || options[O_PRODUCTOG] || options[O_SIMULATES] || options[O_EQUALS]) {
+    if (options[O_MATCH] || options[O_PRODUCTOG] || options[O_SIMULATES] || options[O_EQUALS] || options[O_COUNT_SERVICES]) {
 
         // reading all OG-files
         OGFromFile::ogs_t OGsFromFiles;
@@ -583,6 +596,12 @@ int main(int argc, char ** argv) {
         if (options[O_EQUALS]) {
             // equivalence on OGFromFile
             checkEquality(OGsFromFiles);
+            return 0;
+        }
+
+        if (options[O_COUNT_SERVICES]) {
+            // equivalence on OGFromFile
+            countServices(OGsFromFiles);
             return 0;
         }
     }

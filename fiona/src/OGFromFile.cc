@@ -36,6 +36,7 @@
 #include "debug.h"
 #include "options.h"
 #include <cassert>
+#include <queue>
 #include "main.h"
 #include "GraphFormula.h"
 
@@ -483,6 +484,37 @@ bool OGFromFile::simulatesRecursive (OGFromFileNode *myNode,
 	}
 	
 	//All checks were successful.
+	return true;
+}
+
+//! \brief checks, whether this OGFromFile is acyclic
+//! \return true on positive check, otherwise: false
+bool OGFromFile::acyclic() {
+    trace(TRACE_5, "Test if the given OG is acyclic: start\n" );
+
+    map<OGFromFileNode*, bool> visitedNodes; 
+    queue<OGFromFileNode*> testNodes;
+    testNodes.push(root);
+    OGFromFileNode* testNode;
+
+    while(!testNodes.empty()) {
+        
+        testNode = testNodes.front();
+        testNodes.pop();
+        
+        if ( visitedNodes[testNode] == true ) {
+            return false;
+        } else {
+            visitedNodes[testNode] = true;
+            for (OGFromFileNode::transitions_t::const_iterator trans_iter = testNode->transitions.begin();
+                 trans_iter != testNode->transitions.end(); ++trans_iter) {
+                if (testNode != (*trans_iter)->getDst() && (*trans_iter)->getDst()->getColor() == BLUE) {
+                    testNodes.push((*trans_iter)->getDst());
+                }
+            }
+        }
+    }
+    
 	return true;
 }
 

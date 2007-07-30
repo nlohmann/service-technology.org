@@ -23,11 +23,11 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/07/30 13:20:21 $ by $Author: nielslohmann $
-# Version $Revision: 1.69 $
+# File last changed $Date: 2007/07/30 13:34:01 $ by $Author: nielslohmann $
+# Version $Revision: 1.70 $
 
 # Where else are Makefiles?
-SUBDIRS = src tests doc
+SUBDIRS = src tests doc maintainer/rpm
 
 # Which targets have no dependencies (i.e. always succeed)?
 .PHONY: binarydistreadme update
@@ -37,7 +37,7 @@ dist-hook:
 	rm -rf `find $(distdir) -name CVS`
 	-make -C gui distclean
 
-EXTRA_DIST = gui maintainer
+EXTRA_DIST = gui maintainer/fink
 
 ####################################
 # Targets to clean generated files #

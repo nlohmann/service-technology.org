@@ -670,13 +670,24 @@ void BddRepresentation::printDotFile(char** varNames, char* option){
 		char bufferMp[256]; 
 		char bufferAnn[256];
 
-		if (options[O_CALC_ALL_STATES]) {
-	                sprintf(bufferMp, "%s.%s.BDD_MP.out", netfile, option);
-	                sprintf(bufferAnn, "%s.%s.BDD_ANN.out", netfile, option); 
-	            } else {
-	                sprintf(bufferMp, "%s.R.%s.BDD_MP.out", netfile, option);
-	                sprintf(bufferAnn, "%s.R.%s.BDD_ANN.out", netfile, option);
-	            }
+  if (options[O_OUTFILEPREFIX]) {
+      const char * prefix = outfilePrefix.c_str();
+  		if (options[O_CALC_ALL_STATES]) {
+  	                sprintf(bufferMp, "%s.%s.BDD_MP.out", prefix, option);
+  	                sprintf(bufferAnn, "%s.%s.BDD_ANN.out", prefix, option); 
+      } else {
+          sprintf(bufferMp, "%s.R.%s.BDD_MP.out", prefix, option);
+          sprintf(bufferAnn, "%s.R.%s.BDD_ANN.out", prefix, option);
+      }
+  } else {
+  		if (options[O_CALC_ALL_STATES]) {
+  	                sprintf(bufferMp, "%s.%s.BDD_MP.out", netfile, option);
+  	                sprintf(bufferAnn, "%s.%s.BDD_ANN.out", netfile, option); 
+      } else {
+          sprintf(bufferMp, "%s.R.%s.BDD_MP.out", netfile, option);
+          sprintf(bufferAnn, "%s.R.%s.BDD_ANN.out", netfile, option);
+      }
+  }
             
             FILE* fpMp;
 	    fpMp = fopen(bufferMp, "w");
@@ -690,12 +701,23 @@ void BddRepresentation::printDotFile(char** varNames, char* option){
 	    
 	    if ((Cudd_DagSize(bddMp) < 900) && (Cudd_DagSize(bddAnn) < 900)) {
             trace(TRACE_0, "\ncreating the dot file of BDD_MP and BDD_ANN...\n");
-            if (options[O_CALC_ALL_STATES]) {
-                sprintf(bufferMp, "dot -Tpng \"%s.OG.BDD_MP.out\" -o \"%s.OG.BDD_MP.png\"", netfile, netfile);
-                sprintf(bufferAnn, "dot -Tpng \"%s.OG.BDD_ANN.out\" -o \"%s.OG.BDD_ANN.png\"", netfile, netfile);
+            if (options[O_OUTFILEPREFIX]) {
+                const char * prefix = outfilePrefix.c_str();
+                if (options[O_CALC_ALL_STATES]) {
+                    sprintf(bufferMp, "dot -Tpng \"%s.OG.BDD_MP.out\" -o \"%s.OG.BDD_MP.png\"", prefix, prefix);
+                    sprintf(bufferAnn, "dot -Tpng \"%s.OG.BDD_ANN.out\" -o \"%s.OG.BDD_ANN.png\"", prefix, prefix);
+                } else {
+                    sprintf(bufferMp, "dot -Tpng \"%s.R.OG.BDD_MP.out\" -o \"%s.R.OG.BDD_MP.png\"", prefix, prefix);
+                    sprintf(bufferAnn, "dot -Tpng \"%s.R.OG.BDD_ANN.out\" -o \"%s.R.OG.BDD_ANN.png\"", prefix, prefix);
+                }
             } else {
-                sprintf(bufferMp, "dot -Tpng \"%s.R.OG.BDD_MP.out\" -o \"%s.R.OG.BDD_MP.png\"", netfile, netfile);
-                sprintf(bufferAnn, "dot -Tpng \"%s.R.OG.BDD_ANN.out\" -o \"%s.R.OG.BDD_ANN.png\"", netfile, netfile);
+                if (options[O_CALC_ALL_STATES]) {
+                    sprintf(bufferMp, "dot -Tpng \"%s.OG.BDD_MP.out\" -o \"%s.OG.BDD_MP.png\"", netfile, netfile);
+                    sprintf(bufferAnn, "dot -Tpng \"%s.OG.BDD_ANN.out\" -o \"%s.OG.BDD_ANN.png\"", netfile, netfile);
+                } else {
+                    sprintf(bufferMp, "dot -Tpng \"%s.R.OG.BDD_MP.out\" -o \"%s.R.OG.BDD_MP.png\"", netfile, netfile);
+                    sprintf(bufferAnn, "dot -Tpng \"%s.R.OG.BDD_ANN.out\" -o \"%s.R.OG.BDD_ANN.png\"", netfile, netfile);
+                }
             }
          
             trace(TRACE_0, bufferMp); trace(TRACE_0, "\n");
@@ -705,11 +727,20 @@ void BddRepresentation::printDotFile(char** varNames, char* option){
             
             if (bddRed != Cudd_Not(Cudd_ReadOne(mgrMp))){
 	        	char bufferMpRed[256];
-	        	if (options[O_CALC_ALL_STATES]) {
-		            sprintf(bufferMpRed, "%s.%s.BDD_MPRED.out", netfile, option);
-		        } else {
-		         	sprintf(bufferMpRed, "%s.R.%s.BDD_MPRED.out", netfile, option);
-		        } 
+            if (options[O_OUTFILEPREFIX]) {
+                const char * prefix = outfilePrefix.c_str();
+    	        	if (options[O_CALC_ALL_STATES]) {
+    		            sprintf(bufferMpRed, "%s.%s.BDD_MPRED.out", prefix, option);
+    		        } else {
+    		         	sprintf(bufferMpRed, "%s.R.%s.BDD_MPRED.out", prefix, option);
+    		        }
+            } else {
+    	        	if (options[O_CALC_ALL_STATES]) {
+    		            sprintf(bufferMpRed, "%s.%s.BDD_MPRED.out", netfile, option);
+    		        } else {
+    		         	sprintf(bufferMpRed, "%s.R.%s.BDD_MPRED.out", netfile, option);
+    		        }
+            } 
 	        	
 	        	DdNode* bdd[2];
 	        	bdd[0] = bddMp;
@@ -718,11 +749,22 @@ void BddRepresentation::printDotFile(char** varNames, char* option){
 			    fpMpRed = fopen(bufferMpRed, "w");
 			    Cudd_DumpDot(mgrMp, 2, bdd, varNames, NULL, fpMpRed);
 			    fclose(fpMpRed);
-			    if (options[O_CALC_ALL_STATES]) {
-	                sprintf(bufferMpRed, "dot -Tpng %s.OG.BDD_MPRED.out -o %s.OG.BDD_MPRED.png", netfile, netfile);
-	        	} else {
-	                sprintf(bufferMpRed, "dot -Tpng %s.R.OG.BDD_MPRED.out -o %s.R.OG.BDD_MPRED.png", netfile, netfile);
-	        	}
+
+          if (options[O_OUTFILEPREFIX]) {
+              const char * prefix = outfilePrefix.c_str();
+    			    if (options[O_CALC_ALL_STATES]) {
+    	                sprintf(bufferMpRed, "dot -Tpng %s.OG.BDD_MPRED.out -o %s.OG.BDD_MPRED.png", prefix, prefix);
+  	        	} else {
+    	                sprintf(bufferMpRed, "dot -Tpng %s.R.OG.BDD_MPRED.out -o %s.R.OG.BDD_MPRED.png", prefix, prefix);
+  	        	}
+  	      } else {
+    			    if (options[O_CALC_ALL_STATES]) {
+    	                sprintf(bufferMpRed, "dot -Tpng %s.OG.BDD_MPRED.out -o %s.OG.BDD_MPRED.png", netfile, netfile);
+  	        	} else {
+    	                sprintf(bufferMpRed, "dot -Tpng %s.R.OG.BDD_MPRED.out -o %s.R.OG.BDD_MPRED.png", netfile, netfile);
+  	        	}
+          }
+
 			    trace(TRACE_0, bufferMpRed); trace(TRACE_0, "\n");
 	        	system(bufferMpRed);
         	}
@@ -797,13 +839,24 @@ void BddRepresentation::save(char* option){
 	char bufferMp[256]; 
 	char bufferAnn[256];
 	
-	if (options[O_CALC_ALL_STATES]) {
-                sprintf(bufferMp, "%s.%s.BDD_MP.cudd", netfile, option);
-                sprintf(bufferAnn, "%s.%s.BDD_ANN.cudd", netfile, option); 
-    } else {
-        sprintf(bufferMp, "%s.R.%s.BDD_MP.cudd", netfile, option);
-        sprintf(bufferAnn, "%s.R.%s.BDD_ANN.cudd", netfile, option);
-    }
+  if (options[O_OUTFILEPREFIX]) {
+      const char * prefix = outfilePrefix.c_str();
+      if (options[O_CALC_ALL_STATES]) {
+                    sprintf(bufferMp, "%s.%s.BDD_MP.cudd", prefix, option);
+                    sprintf(bufferAnn, "%s.%s.BDD_ANN.cudd", prefix, option); 
+      } else {
+          sprintf(bufferMp, "%s.R.%s.BDD_MP.cudd", prefix, option);
+          sprintf(bufferAnn, "%s.R.%s.BDD_ANN.cudd", prefix, option);
+      }
+  } else {
+      if (options[O_CALC_ALL_STATES]) {
+                    sprintf(bufferMp, "%s.%s.BDD_MP.cudd", netfile, option);
+                    sprintf(bufferAnn, "%s.%s.BDD_ANN.cudd", netfile, option); 
+      } else {
+          sprintf(bufferMp, "%s.R.%s.BDD_MP.cudd", netfile, option);
+          sprintf(bufferAnn, "%s.R.%s.BDD_ANN.cudd", netfile, option);
+      }
+  }
     
    	cout << "\nsaving the BDDs... \n";
     FILE* fpMp = fopen(bufferMp, "w");

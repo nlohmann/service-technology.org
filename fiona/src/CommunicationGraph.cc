@@ -509,20 +509,36 @@ void communicationGraph::printGraphToDot() {
         GraphNode * tmp = root;
 
         char buffer[256];
-        if (parameters[P_OG]) {
-            if (options[O_CALC_ALL_STATES]) {
-                sprintf(buffer, "%s.OG.out", netfile);
+        if (options[O_OUTFILEPREFIX]) {
+            const char * prefix = outfilePrefix.c_str();
+            if (parameters[P_OG]) {
+                if (options[O_CALC_ALL_STATES]) {
+                    sprintf(buffer, "%s.OG.out", prefix);
+                } else {
+                    sprintf(buffer, "%s.R.OG.out", prefix);
+                }
             } else {
-                sprintf(buffer, "%s.R.OG.out", netfile);
-            }
+                if (options[O_CALC_ALL_STATES]) {
+                    sprintf(buffer, "%s.IG.out", prefix);
+                } else {
+                    sprintf(buffer, "%s.R.IG.out", prefix);
+                }
+            }        
         } else {
-            if (options[O_CALC_ALL_STATES]) {
-                sprintf(buffer, "%s.IG.out", netfile);
+            if (parameters[P_OG]) {
+                if (options[O_CALC_ALL_STATES]) {
+                    sprintf(buffer, "%s.OG.out", netfile);
+                } else {
+                    sprintf(buffer, "%s.R.OG.out", netfile);
+                }
             } else {
-                sprintf(buffer, "%s.R.IG.out", netfile);
+                if (options[O_CALC_ALL_STATES]) {
+                    sprintf(buffer, "%s.IG.out", netfile);
+                } else {
+                    sprintf(buffer, "%s.R.IG.out", netfile);
+                }
             }
         }
-
         fstream dotFile(buffer, ios_base::out | ios_base::trunc);
         dotFile << "digraph g1 {\n";
         dotFile << "graph [fontname=\"Helvetica\", label=\"";
@@ -554,18 +570,35 @@ void communicationGraph::printGraphToDot() {
         dotFile.close();
 
         // prepare dot command line for printing
-        if (parameters[P_OG]) {
-            if (options[O_CALC_ALL_STATES]) {
-                sprintf(buffer, "dot -Tpng \"%s.OG.out\" -o \"%s.OG.png\"", netfile, netfile);
+        if (options[O_OUTFILEPREFIX]) {
+            const char * prefix = outfilePrefix.c_str();
+            if (parameters[P_OG]) {
+                if (options[O_CALC_ALL_STATES]) {
+                    sprintf(buffer, "dot -Tpng \"%s.OG.out\" -o \"%s.OG.png\"", prefix, prefix);
+                } else {
+                    sprintf(buffer, "dot -Tpng \"%s.R.OG.out\" -o \"%s.R.OG.png\"", prefix, prefix);
+                }
             } else {
-                sprintf(buffer, "dot -Tpng \"%s.R.OG.out\" -o \"%s.R.OG.png\"", netfile, netfile);
+                if (options[O_CALC_ALL_STATES]) {
+                    sprintf(buffer, "dot -Tpng \"%s.IG.out\" -o \"%s.IG.png\"", prefix, prefix);
+                } else {
+                    sprintf(buffer, "dot -Tpng \"%s.R.IG.out\" -o \"%s.R.IG.png\"", prefix, prefix);
+                }
             }
         } else {
-            if (options[O_CALC_ALL_STATES]) {
-                sprintf(buffer, "dot -Tpng \"%s.IG.out\" -o \"%s.IG.png\"", netfile, netfile);
+            if (parameters[P_OG]) {
+                if (options[O_CALC_ALL_STATES]) {
+                    sprintf(buffer, "dot -Tpng \"%s.OG.out\" -o \"%s.OG.png\"", netfile, netfile);
+                } else {
+                    sprintf(buffer, "dot -Tpng \"%s.R.OG.out\" -o \"%s.R.OG.png\"", netfile, netfile);
+                }
             } else {
-                sprintf(buffer, "dot -Tpng \"%s.R.IG.out\" -o \"%s.R.IG.png\"", netfile, netfile);
-            }
+                if (options[O_CALC_ALL_STATES]) {
+                    sprintf(buffer, "dot -Tpng \"%s.IG.out\" -o \"%s.IG.png\"", netfile, netfile);
+                } else {
+                    sprintf(buffer, "dot -Tpng \"%s.R.IG.out\" -o \"%s.R.IG.png\"", netfile, netfile);
+                }
+            }        
         }
 
         // print commandline and execute system command
@@ -695,9 +728,14 @@ void communicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
 void communicationGraph::printGraphToSTG() {
     trace(TRACE_0, "\ncreating the STG file of the graph...\n");
     GraphNode *tmp = root;
-    
+    string buffer;
+
     // set file name
-    string buffer = string(netfile);
+    if (options[O_OUTFILEPREFIX]) {
+        buffer = outfilePrefix;    
+    } else {
+        buffer = string(netfile);
+    }
 
     if (parameters[P_OG]) {
         if (options[O_CALC_ALL_STATES]) {

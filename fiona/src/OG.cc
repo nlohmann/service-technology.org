@@ -690,6 +690,12 @@ void OG::convertToBddFull() {
 
 void OG::printOGtoFile() const {
     string ogFilename = netfile;
+    if (options[O_OUTFILEPREFIX]) {
+        ogFilename = outfilePrefix;
+    } else {
+        ogFilename = netfile;
+    }
+
     if (!options[O_CALC_ALL_STATES]) {
         ogFilename += ".R";
     }

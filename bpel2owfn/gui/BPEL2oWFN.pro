@@ -13,8 +13,9 @@ FORMS        += dialog.ui
 # translation files (not used yet)
 TRANSLATIONS += translation_de.ts
 
-# the icon used for the application ("ICON" does not work!)
+# the icon used for the application
 mac:ICON     += resource/bpel2owfn.icns
+win:RC_FILE  += resource/bpel2owfn.rc
 
 # a file containing information about used resources (icons, graphics)
 RESOURCES    += BPEL2oWFN.qrc

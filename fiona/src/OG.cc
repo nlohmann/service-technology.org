@@ -66,11 +66,13 @@ OG::~OG() {
 
 }
 
-void OG::compute() {
+
+void OG::buildGraph() {
     assert(getRoot() != NULL);
     buildGraph(getRoot(), 1);
     correctNodeColorsAndShortenAnnotations();
 }
+
 
 void OG::buildGraph(GraphNode * currentNode, double progress_plus) {
 
@@ -116,22 +118,6 @@ void OG::buildGraph(GraphNode * currentNode, double progress_plus) {
 
 		trace(TRACE_2, "\t\t\t\t    sending event: !");
 		trace(TRACE_2, string(PN->getInputPlace(i)->name));
-
-//        if (currentNode->getColor() == RED) {
-//            // this may happen if current node is target of (one of) its child(s)
-//            // which causes early analyse
-//            trace(TRACE_3, " suppressed (node " + intToString(currentNode->getNumber()) + " already RED)\n");
-//
-//            currentNode->removeLiteralFromFormula(i, SENDING);
-//
-//            addProgress(your_progress);
-//            printProgress();
-//
-//            i++;
-//            continue;
-//        } else {
-//            trace(TRACE_2, "\n");
-//        }
 
 		if (PN->getInputPlace(i)->max_occurence < 0 ||
             PN->getInputPlace(i)->max_occurence > currentNode->eventsUsed[i]) {

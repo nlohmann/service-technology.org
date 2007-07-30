@@ -82,7 +82,7 @@ class OG : public communicationGraph {
          * Computes the OG of the associated PN.
          * @pre calculateRootNode() has been called.
          */
-        void compute();
+        void buildGraph();
 
 		void convertToBdd();
 		void convertToBddFull();

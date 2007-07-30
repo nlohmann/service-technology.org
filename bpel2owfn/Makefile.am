@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/07/30 13:34:01 $ by $Author: nielslohmann $
-# Version $Revision: 1.70 $
+# File last changed $Date: 2007/07/30 14:52:26 $ by $Author: nielslohmann $
+# Version $Revision: 1.71 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc maintainer/rpm
@@ -57,14 +57,11 @@ SHELLSCRIPTS = tests/test1 \
 # Delete all files that can be created by other files, repair file
 # permissions and set filetype to UNIX.
 hu-prepare: maintainer-clean
-	-rm -f COPYING
 	-rm -f aclocal.m4
 	-rm -f configure
 	-rm -f configure
 	-rm -f depcomp
 	-rm -f compile
-	-rm -f config.guess
-	-rm -f config.sub
 	-rm -f install-sh
 	-rm -f Makefile.in
 	-rm -f missing
@@ -82,7 +79,6 @@ hu-prepare: maintainer-clean
 	-rm -f rpm/Makefile.in	
 	find . -type d -exec chmod 755 {} \;
 	find . -type f -exec chmod 644 {} \;
-	-find . -type f -exec dos2unix {} \;
 	chmod 755 $(SHELLSCRIPTS) doc/gendocs.sh gnupload
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"

@@ -273,33 +273,6 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, Graph
 }
 
 
-//! \brief computes number of blue nodes and edges and prints them
-void communicationGraph::printNodeStatistics() {
-
-    unsigned int nNodes;
-    unsigned int nStoredStates;
-    unsigned int nEdges;
-
-    // calculate the number of all (blue and red) nodes and edges
-    computeNumberOfNodesEdges(nNodes, nStoredStates, nEdges);
-
-    unsigned int nBlueNodes;
-    unsigned int nBlueEdges;
-
-    // calculate the number of blue nodes and edges, that are reachable from
-    // the root
-    computeNumberOfBlueNodesEdges(nBlueNodes, nBlueEdges);
-
-    trace(TRACE_0, "    number of nodes: " + intToString(nNodes) + "\n");
-    trace(TRACE_0, "    number of edges: " + intToString(nEdges) + "\n");
-    trace(TRACE_0, "    number of deleted nodes: " + intToString(numberDeletedVertices) + "\n");
-    trace(TRACE_0, "    number of blue nodes: " + intToString(nBlueNodes) + "\n");
-    trace(TRACE_0, "    number of blue edges: " + intToString(nBlueEdges) + "\n");
-    trace(TRACE_0, "    number of states calculated: " + intToString(State::state_count) + "\n");
-    trace(TRACE_0, "    number of states stored in nodes: " + intToString(nStoredStates) + "\n");
-}
-
-
 void communicationGraph::computeNumberOfNodesEdges(
     unsigned int& nNodes,
     unsigned int& nStoredStates,
@@ -370,8 +343,7 @@ void communicationGraph::computeNumberOfBlueNodesEdges(
     nBlueNodes = 0;
     nBlueEdges = 0;
 
-    computeNumberOfBlueNodesEdgesHelper(root, visitedNodes, nBlueNodes,
-        nBlueEdges);
+    computeNumberOfBlueNodesEdgesHelper(root, visitedNodes, nBlueNodes, nBlueEdges);
 }
 
 
@@ -496,6 +468,33 @@ void communicationGraph::printProgressFirst() {
 }
 
 
+//! \brief computes number of blue nodes and edges and prints them
+void communicationGraph::printNodeStatistics() {
+
+    unsigned int nNodes;
+    unsigned int nStoredStates;
+    unsigned int nEdges;
+
+    // calculate the number of all (blue and red) nodes and edges
+    computeNumberOfNodesEdges(nNodes, nStoredStates, nEdges);
+
+    unsigned int nBlueNodes;
+    unsigned int nBlueEdges;
+
+    // calculate the number of blue nodes and edges, that are reachable from
+    // the root
+    computeNumberOfBlueNodesEdges(nBlueNodes, nBlueEdges);
+
+    trace(TRACE_0, "    number of nodes: " + intToString(nNodes) + "\n");
+    trace(TRACE_0, "    number of edges: " + intToString(nEdges) + "\n");
+    trace(TRACE_0, "    number of deleted nodes: " + intToString(numberDeletedVertices) + "\n");
+    trace(TRACE_0, "    number of blue nodes: " + intToString(nBlueNodes) + "\n");
+    trace(TRACE_0, "    number of blue edges: " + intToString(nBlueEdges) + "\n");
+    trace(TRACE_0, "    number of states calculated: " + intToString(State::state_count) + "\n");
+    trace(TRACE_0, "    number of states stored in nodes: " + intToString(nStoredStates) + "\n");
+}
+
+
 //! \brief creates a dot file of the graph
 void communicationGraph::printGraphToDot() {
 
@@ -503,6 +502,7 @@ void communicationGraph::printGraphToDot() {
     unsigned int maxPrintingSize = 2000;
 
     if (true) {
+        cout << 
 //    if (getNumberOfNodes() <= maxWritingSize) {
 
         trace(TRACE_0, "creating the dot file of the graph...\n");

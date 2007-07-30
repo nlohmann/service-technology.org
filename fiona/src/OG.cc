@@ -85,14 +85,15 @@ void OG::buildGraph(GraphNode * currentNode, double progress_plus) {
 	if (debug_level >= TRACE_2) {
 		cout << "\t (" << currentNode << ")" << endl;
 	}
-
 	trace(TRACE_2, "\t number of states in node: ");
     trace(TRACE_2, intToString(currentNode->reachGraphStateSet.size()) + "\n");
+
 
 	if (currentNode->getColor() == RED) {
 		// this may happen due to a message bound violation in current node
 		// then, function calculateReachableStatesFull sets node color RED
-		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color RED\n");
+		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()));
+        trace(TRACE_3, " has color RED (message bound violated)\n");
         trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 
 		addProgress(progress_plus);
@@ -103,14 +104,15 @@ void OG::buildGraph(GraphNode * currentNode, double progress_plus) {
 
 	// get the annotation of the node as CNF formula
 	computeCNF(currentNode);
-    trace(TRACE_3, "\t first computation of formula yields: " + currentNode->getAnnotation()->asString() + "\n");
-
+    trace(TRACE_3, "\t first computation of formula yields: ");
+    trace(TRACE_3, currentNode->getAnnotation()->asString() + "\n");
     trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 
 //	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount() + PN->getOutputPlaceCnt()));
 	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount()));
 
 	oWFN::Places_t::size_type i = 0;
+
 
 	// iterate over all elements of inputSet of the oWFN
 	trace(TRACE_2, "\t\t\t iterating over inputSet of the oWFN\n");
@@ -169,13 +171,6 @@ void OG::buildGraph(GraphNode * currentNode, double progress_plus) {
                     GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
                     currentNode->addSuccessorNode(newEdge);
 
-//                    // If that node was computed BLUE before, check again
-//                    // its color, since its successors may have been set
-//                    // RED meanwhile
-//                    if (found->getColor() == BLUE) {
-//                        analyseNode(found);
-//                    }
-
 					// Still, if that node was computed red before, the literal
 					// of the edge from currentNode to the old node must be removed
 					// in the annotation of currentNode.
@@ -222,26 +217,8 @@ void OG::buildGraph(GraphNode * currentNode, double progress_plus) {
 		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
 		trace(TRACE_2, string(PN->getOutputPlace(i)->name));
 
-//        if (currentNode->getColor() == RED) {
-//            // this may happen if current node is target of (one of) its child(s)
-//            // which causes early analyse
-//            trace(TRACE_3, " suppressed (node " + intToString(currentNode->getNumber()) + " already RED)\n");
-//
-//            currentNode->removeLiteralFromFormula(i, RECEIVING);
-//
-//            addProgress(your_progress);
-//            printProgress();
-//
-//            i++;
-//            continue;
-//        } else {
-//            trace(TRACE_2, "\n");
-//        }
-
         if (PN->getOutputPlace(i)->max_occurence < 0 ||
             PN->getOutputPlace(i)->max_occurence > currentNode->eventsUsed[i + PN->getInputPlaceCount()]) {
-//		if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] < PN->getOutputPlace(i)->max_occurence
-//            || (options[O_EVENT_USE_MAX] == false)) {
 
 			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
 			calculateSuccStatesOutput(PN->getOutputPlace(i)->index, currentNode, v);
@@ -273,13 +250,6 @@ void OG::buildGraph(GraphNode * currentNode, double progress_plus) {
                 string edgeLabel = PN->getOutputPlace(i)->getLabelForCommGraph();
                 GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
                 currentNode->addSuccessorNode(newEdge);
-
-//                // If that node was computed BLUE before, check again
-//                // its color, since its successors may have been set
-//                // RED meanwhile
-//                if (found->getColor() == BLUE) {
-//                    analyseNode(found);
-//                }
 
 				// Still, if that node was computed red before, the literal
 				// of the edge from currentNode to the old node must be removed in the

@@ -254,13 +254,13 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 				//analyseNode(currentNode, false);
 				//trace(TRACE_5, "node analysed\n");
-			}	
-		}	
+			}
+		}
 	}
 
 	analyseNode(currentNode);
 	trace(TRACE_5, "node analysed\n");
-	
+
 	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + toUpper(currentNode->getColor().toString()) + "\n");
 }
 
@@ -277,8 +277,6 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 //!
 //! if we actually found a node matching the new one, we just create an edge between the current node
 //! and the node we have just found, the found one gets the current node as a predecessor node
-
-// for IG
 bool interactionGraph::addGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) {
     trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : start\n");
 

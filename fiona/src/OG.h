@@ -65,6 +65,12 @@ class OG : public communicationGraph {
          */
     	void buildGraph(GraphNode* currentNode, double);
 
+        void calculateSuccStatesInput(unsigned int, GraphNode *, GraphNode *);
+        void calculateSuccStatesOutput(unsigned int, GraphNode *, GraphNode *);
+
+        void addGraphNode(GraphNode *, GraphNode *);        // for OG
+        void addGraphEdge(GraphNode*, GraphNode*, oWFN::Places_t::size_type, GraphEdgeType);        // for OG
+
         /**
          * Turns all blue nodes that should be red into red ones and
          * simplifies their annotations by removing unneeded literals.

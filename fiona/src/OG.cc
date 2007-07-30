@@ -332,6 +332,161 @@ void OG::buildGraph(GraphNode * currentNode, double progress_plus) {
 	}
 }
 
+
+//! \brief adds the node toAdd to the set of all nodes
+//! and copies the eventsUsed array from the sourceNode
+// for OG
+void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
+
+    trace(TRACE_5, "reachGraph::AddGraphNode(GraphNode* sourceNode, GraphNode * toAdd, unsigned int label, GraphEdgeType type): start\n");
+
+    assert(getNumberOfNodes() > 0);
+    assert(setOfVertices.size() > 0);
+
+    // preparing the new node
+    toAdd->setNumber(getNumberOfNodes());
+    for (oWFN::Places_t::size_type i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
+        toAdd->eventsUsed[i] = sourceNode->eventsUsed[i];
+    }
+    setOfVertices.insert(toAdd);
+
+    trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode* sourceNode, GraphNode * toAdd, unsigned int label, GraphEdgeType type): end\n");
+}
+
+
+//! adds an SENDING or RECEIVING edge from sourceNode to destNode
+//! and adds destNode to the successor list of sourceNode
+//! and increases eventsUsed of destNode by one  
+// for OG
+void OG::addGraphEdge(GraphNode* sourceNode, GraphNode* destNode, oWFN::Places_t::size_type label, GraphEdgeType type) {
+
+    trace(TRACE_5, "reachGraph::AddGraphEdge(GraphNode* sourceNode, GraphNode* destNode, unsigned int label, GraphEdgeType type): start\n");
+
+    assert(sourceNode != NULL);
+    assert(destNode != NULL);
+
+    // preparing the new edge
+    string edgeLabel;
+    if (type == SENDING) {
+        edgeLabel = PN->getInputPlace(label)->getLabelForCommGraph();
+        destNode->eventsUsed[label]++;
+    } else {
+        edgeLabel = PN->getOutputPlace(label)->getLabelForCommGraph();
+        destNode->eventsUsed[PN->getInputPlaceCount() + label]++;
+    }
+
+    // add a new edge to the new node
+    GraphEdge* newEdge = new GraphEdge(destNode, edgeLabel);
+
+    // add the new node to successorNodeList
+    sourceNode->addSuccessorNode(newEdge);
+
+    trace(TRACE_5, "reachGraph::AddGraphEdge(GraphNode* sourceNode, GraphNode* destNode, unsigned int label, GraphEdgeType type): end\n");
+}
+
+
+//! \param input the sending event currently performed
+//! \param oldNode the old node carrying the states
+//! \param newNode the new node wich is computed
+//! \brief for each state of the old node:
+//! add input message and build reachability graph and add all states to new node
+// for OG only
+void OG::calculateSuccStatesInput(unsigned int input, GraphNode * oldNode, GraphNode * newNode) {
+    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode * node) : start\n");
+
+    StateSet::iterator iter;              // iterator over the state set's elements
+
+    for (iter = oldNode->reachGraphStateSet.begin();
+         iter != oldNode->reachGraphStateSet.end(); iter++) {
+
+        assert(*iter != NULL);
+        // get the marking of this state
+        (*iter)->decode(PN);
+
+        // test for each marking of current node if message bound k reached
+        // then supress new sending event
+        if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
+            if (PN->CurrentMarking[PN->getPlace(input)->index] == messages_manual) {
+                // adding input message to state already using full message bound
+                trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
+                trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode * node) : end\n");
+                newNode->setColor(RED);
+                return;
+            }
+        }
+
+        // asserted: adding input message does not violate message bound
+        PN->addInputMessage(input); // add the input message to the current marking
+
+        if (options[O_CALC_ALL_STATES]) {
+            PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
+        } else {
+            PN->setOfStatesTemp.clear();
+            PN->visitedStates.clear();
+            PN->calculateReachableStatesInputEvent(newNode);       // calc the reachable states from that marking
+        }
+
+        if (newNode->getColor() == RED) {
+            // a message bound violation occured during computation of reachability graph
+            trace(TRACE_3, "\t\t\t\t\t found message bound violation during calculating EG in node\n");
+            trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode * node) : end\n");
+            return;
+        }
+    }
+
+    trace(TRACE_3, "\t\t\t\t\t input event added without message bound violation\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode * node) : end\n");
+    return;
+}
+
+
+//! \param output the output messages that are taken from the marking
+//! \param node the node for which the successor states are to be calculated
+//! \param newNode the new node where the new states go into
+//! \brief calculates the set of successor states in case of an output message
+// for OG
+void OG::calculateSuccStatesOutput(unsigned int output, GraphNode * node, GraphNode * newNode) {
+    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, GraphNode * node, GraphNode * newNode) : start\n");
+
+    StateSet::iterator iter;                      // iterator over the stateList's elements
+
+    if (options[O_CALC_ALL_STATES]) {
+        for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
+            (*iter)->decode(PN);
+            if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+                PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
+            }
+        }
+    } else {
+//        PN->setOfStatesTemp.clear();
+//        PN->visitedStates.clear();
+        owfnPlace * outputPlace = PN->getPlace(output);
+
+        StateSet stateSet;
+
+        for (StateSet::iterator iter = node->reachGraphStateSet.begin();
+                iter != node->reachGraphStateSet.end(); iter++) {
+
+            (*iter)->decode(PN);
+            // calculate temporary state set with the help of stubborn set method
+            PN->calculateReachableStates(stateSet, outputPlace, newNode);
+        }
+
+        for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {
+            (*iter2)->decode(PN); // get the marking of the state
+
+            if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+                PN->calculateReachableStatesOutputEvent(newNode);   // calc the reachable states from that marking
+            }
+        }
+
+//        delete PN->tempBinDecision;
+//        PN->tempBinDecision = NULL;
+    }
+    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, GraphNode * node, GraphNode * newNode) : end\n");
+}
+
+
 void OG::correctNodeColorsAndShortenAnnotations() {
     // This is a fixpoint operation. Do the following until nothing changes:
     //   1. Turn one blue node that should be red into a red one.

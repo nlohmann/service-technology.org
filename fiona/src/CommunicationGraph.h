@@ -98,21 +98,12 @@ public:
 
     GraphNode * findGraphNodeInSet(GraphNode *);
 
-    void addGraphNode(GraphNode *, GraphNode *);        // for OG
-    bool addGraphNode(GraphNode *, GraphNode *, messageMultiSet, GraphEdgeType);     // for IG
-
-    void addGraphEdge(GraphNode*, GraphNode*, oWFN::Places_t::size_type, GraphEdgeType);        // for OG
-
     void analyseNode(GraphNode *);
 
 	void printProgressFirst();
 	void printProgress();
 
     void buildGraphRandom();
-
-    // for OG
-    void calculateSuccStatesInput(unsigned int, GraphNode *, GraphNode *);
-    void calculateSuccStatesOutput(unsigned int, GraphNode *, GraphNode *);
 
     // for IG
     void calculateSuccStatesInput(messageMultiSet, GraphNode *, GraphNode *);

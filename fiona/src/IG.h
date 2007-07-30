@@ -40,6 +40,11 @@
 class oWFN;
 
 class interactionGraph : public communicationGraph {
+
+    private:
+
+        bool addGraphNode(GraphNode *, GraphNode *, messageMultiSet, GraphEdgeType);     // for IG
+
 	public:
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.

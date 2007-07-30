@@ -265,6 +265,94 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 }
 
 
+//! \param toAdd a reference to the GraphNode that is to be added to the graph
+//! \param messages the label of the edge between the current GraphNode and the one to be added
+//! \param type the type of the edge (SENDING, RECEIVING)
+//! \brief adding a new GraphNode/ edge to the graph
+//!
+//! if the graph already contains nodes, we first search the graph for a node that matches the new node
+//! if we did not find a node, we add the new node to the graph (here we add the new node to the
+//! successor node list of the current graph and add the current node to the list of predecessor nodes
+//! of the new node; after that the current GraphNode becomes to be the new node)
+//!
+//! if we actually found a node matching the new one, we just create an edge between the current node
+//! and the node we have just found, the found one gets the current node as a predecessor node
+
+// for IG
+bool interactionGraph::addGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) {
+    trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : start\n");
+
+    if (getNumberOfNodes() == 0) {                // graph contains no nodes at all
+        root = toAdd;                           // the given node becomes the root node
+        setOfVertices.insert(toAdd);
+    } else {
+        GraphNode * found = findGraphNodeInSet(toAdd); //findGraphNode(toAdd);
+
+        string label;
+        bool comma = false;
+        unsigned int offset = 0;
+
+        if (type == RECEIVING) {
+            offset = PN->getInputPlaceCount();
+        }
+
+        if (found == NULL) {
+            // copy the events used from the parent node
+            for (unsigned int i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
+                toAdd->eventsUsed[i] = sourceNode->eventsUsed[i];
+            }
+        }
+
+        for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
+            if (comma) {
+              label += ", ";
+            }
+            label += PN->getPlace(*iter)->getLabelForCommGraph();
+            comma = true;
+
+            unsigned int i = 0;
+            if (type == RECEIVING) {
+                while (i < PN->getOutputPlaceCount() && PN->getOutputPlace(i)->index != *iter) {
+                    i++;
+                }
+            } else {
+                while (i < PN->getInputPlaceCount() && PN->getInputPlace(i)->index != *iter) {
+                    i++;
+                }
+            }
+            if (found == 0) {
+                toAdd->eventsUsed[offset + i]++;
+            } else {
+                found->eventsUsed[offset + i]++;
+            }
+        }
+
+        if (found == NULL) {
+            trace(TRACE_1, "\n\t new successor node computed:");
+
+            toAdd->setNumber(getNumberOfNodes());
+            GraphEdge* edgeSucc = new GraphEdge(toAdd, label);
+            sourceNode->addSuccessorNode(edgeSucc);
+            setOfVertices.insert(toAdd);
+
+            trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
+            return true;
+        } else {
+            trace(TRACE_1, "\t successor node already known: " + intToString(found->getNumber()) + "\n");
+
+            GraphEdge * edgeSucc = new GraphEdge(found, label);
+            sourceNode->addSuccessorNode(edgeSucc);
+            delete toAdd;
+
+            trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
+            return false;
+        }
+    }
+
+    return false;
+}
+
+
 //! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, GraphEdgeType typeOfPlace)
 //! \param messages
 //! \param currentNode the node from which the input event is to be sent

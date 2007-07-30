@@ -482,11 +482,10 @@ void communicationGraph::printGraphStatistics() {
 //! \brief creates a dot file of the graph
 void communicationGraph::printGraphToDot() {
 
-    // unsigned int maxWritingSize = 1000;
-    unsigned int maxPrintingSize = 2000;
+    unsigned int maxWritingSize = 5000;        // number relevant for .out file
+    unsigned int maxPrintingSize = 500;        // number relevant to generate png
 
-    if (true) {
-//    if (getNumberOfNodes() <= maxWritingSize) {
+    if (getNumberOfNodes() <= maxWritingSize) {
 
         trace(TRACE_0, "creating the dot file of the graph...\n");
         GraphNode * tmp = root;
@@ -585,31 +584,31 @@ void communicationGraph::printGraphToDot() {
         }
 
         // print commandline and execute system command
-        if (options[O_SHOW_NODES] || getNumberOfNodes() <= maxPrintingSize) {
+        if ((options[O_SHOW_NODES] && getNumberOfNodes() <= maxPrintingSize) ||
+           (!options[O_SHOW_NODES] && getNumberOfBlueNodes() <= maxPrintingSize)) {
             // print only, if number of nodes is lower than required
             // if option is set to show all nodes, then we compare the number of all nodes
             // otherwise, we compare the number of blue nodes only
             trace(TRACE_0, string(buffer) + "\n");
             system(buffer);
+
+//            // on windows machines, the png file can be shown per system call
+//            if (parameters[P_OG]) {
+//                char buffer[256];
+//                cout << "initiating command to show the graphics..." << endl;
+//                sprintf(buffer, "cmd /c \"start %s.OG.png\"", netfile);
+//                trace(TRACE_0, string(buffer) + "\n");
+//                system(buffer);
+//            }
+
         } else {
             trace(TRACE_0, "graph is too big to create the graphics :( ");
             trace(TRACE_0, "(greater " + intToString(maxPrintingSize) + ")\n");
-//            trace(TRACE_0, intToString(getNumberOfNodes()) + " > " + intToString(maxPrintingSize) + "\n");
             trace(TRACE_0, string(buffer) + "\n");
         }
     } else {
         trace(TRACE_0, "graph is too big to create dot file\n");
     }
-    
-#ifdef WINDOWSBLABLA
-    if (parameters[P_OG]) {
-        char buffer[256];
-        cout << "initiating command to show the graphics..." << endl;
-        sprintf(buffer, "cmd /c \"start %s.OG.png\"", netfile);
-        trace(TRACE_0, string(buffer) + "\n");
-        system(buffer);
-    }
-#endif
 }
 
 

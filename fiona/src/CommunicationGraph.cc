@@ -502,7 +502,6 @@ void communicationGraph::printGraphToDot() {
     unsigned int maxPrintingSize = 2000;
 
     if (true) {
-        cout << 
 //    if (getNumberOfNodes() <= maxWritingSize) {
 
         trace(TRACE_0, "creating the dot file of the graph...\n");

@@ -1,0 +1,56 @@
+#%define prefix %{_prefix}
+%define prefix /usr
+
+%define ver @VERSION@
+%define rel 1
+%define c_p --enable-all-sets
+%define m_p CFLAGS="-O2"
+
+%define _sourcedir /tmp
+
+Summary:   GNU BPEL2oWFN
+Name:      bpel2owfn
+Version:   %{ver}
+Release:   %{rel}
+License:   GPL
+Group:     Applications/Engineering
+Source:    %{name}-%{version}.tar.gz
+URL:       http://www.gnu.org/software/bpel2owfn/
+BuildRoot: %{_tmppath}/%{name}-%{version}-root
+Packager:  Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+Autoreq:   1
+
+#Requires:  perl >= 5.002
+#Provides:  bpel2owfn
+
+Docdir:    %{prefix}/share/doc
+
+%description
+BPEL2oWFN does something useful.
+
+%prep
+%setup
+
+%build
+./configure --prefix=%{prefix} --mandir='${prefix}'/share/man %{c_p}
+make %{m_p}
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make prefix=$RPM_BUILD_ROOT%{prefix} ROOT_PREFIX=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-, root, root)
+
+%doc AUTHORS COPYING INSTALL NEWS README
+
+%{prefix}/bin/*
+%{prefix}/info/*
+
+%define date%(env LC_ALL=C date +"%a %b %d %Y")
+%changelog
+* %{date} Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+  - Auto building %{PACKAGE_VERSION}

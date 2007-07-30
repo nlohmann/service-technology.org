@@ -1,0 +1,13 @@
+Package: bpel2owfn
+Version: @PACKAGE_VERSION@
+Revision: 1
+Source: mirror:gnu:%n/%v/%n-%v.tar.gz
+Maintainer: Niels Lohmann <@PACKAGE_BUGREPORT@>
+HomePage: http://www.gnu.org/software/bpel2owfn
+License: GPL
+Description: Translates BPEL into oWFN
+DocFiles: README COPYING NEWS AUTHORS
+ConfigureParams: --infodir='%i/share/info'
+InfoDocs: bpel2owfn.info
+
+Source-MD5: 8c36bbdc079e92bea5d6754aa686b104

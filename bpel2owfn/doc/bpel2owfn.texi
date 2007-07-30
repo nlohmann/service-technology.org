@@ -47,6 +47,12 @@ the German Federal Ministry for Education and Research (@acronym{BMBF}), see
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 @end copying
 
+@dircategory Tools4BPEL
+@direntry
+* bpel2owfn: (bpel2owfn).       @acronym{GNU} BPEL2oWFN.
+@end direntry
+
+
 @c ----------------------------------------------------------------------------
 
 @titlepage

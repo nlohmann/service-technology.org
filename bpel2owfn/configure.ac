@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/07/29 19:43:42 $ by $Author: nielslohmann $.
-# Version $Revision: 1.48 $
+# File last changed $Date: 2007/07/30 13:18:52 $ by $Author: nielslohmann $.
+# Version $Revision: 1.49 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
@@ -88,8 +88,10 @@ AC_CONFIG_FILES([Makefile \
 	  src/Doxyfile \
 	  tests/Makefile \
 	  gui/static_release.sh \
-	  rpm/Makefile \
-	  rpm/bpel2owfn.spec
+	  maintainer/fink/bpel2owfn.info \
+	  maintainer/fink/create_fink_package.sh \
+	  maintainer/rpm/Makefile \
+	  maintainer/rpm/bpel2owfn.spec
 	  ])
 
 

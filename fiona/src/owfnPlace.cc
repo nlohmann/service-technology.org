@@ -50,6 +50,7 @@ owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) :
 {
   references = initial_marking = hash_factor = 0;
   net = _net;
+  port = "";
 }
 
 //! \fn owfnPlace::~owfnPlace()
@@ -128,4 +129,12 @@ void owfnPlace::set_hash(unsigned int i)
   hash_factor = i;
   net->placeHashValue += hash_factor * initial_marking;
   net->placeHashValue %= HASHSIZE;
+}
+
+
+/*!
+ * \brief set the port of the oWFN place
+ */
+void owfnPlace::set_port(std::string my_port) {
+    port = my_port;
 }

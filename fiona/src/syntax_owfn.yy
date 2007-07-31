@@ -1,23 +1,23 @@
-/* *****************************************************************************\
-   * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Karsten Wolf,      *
-   *                      Jan Bretschneider, Christian Gierds                  *
-   *                                                                           *
-   * This file is part of Fiona.                                               *
-   *                                                                           *
-   * Fiona is free software; you can redistribute it and/or modify it          *
-   * under the terms of the GNU General Public License as published by the     *
-   * Free Software Foundation; either version 2 of the License, or (at your    *
-   * option) any later version.                                                *
-   *                                                                           *
-   * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
-   * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
-   * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
-   * more details.                                                             *
-   *                                                                           *
-   * You should have received a copy of the GNU General Public License along   *
-   * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
-   * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-   *****************************************************************************/
+/*****************************************************************************\
+ * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Karsten Wolf,      *
+ *                      Jan Bretschneider, Christian Gierds                  *
+ *                                                                           *
+ * This file is part of Fiona.                                               *
+ *                                                                           *
+ * Fiona is free software; you can redistribute it and/or modify it          *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
+ * option) any later version.                                                *
+ *                                                                           *
+ * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                             *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ *****************************************************************************/
 
 /*!
  * \file    syntax_owfn.yy
@@ -107,6 +107,7 @@ owfnTransition *T; /** The transition that is currently parsed. */
 Symbol * S;
 PlSymbol * PS;
 oWFN * PN;					// the petri net
+string current_port; ///< the currently parsed port
 
 placeType type = INTERNAL;		/* type of place */
 
@@ -385,7 +386,9 @@ port_list:
 ;
 
 port_definition:
-  KEY_PORT nodeident COLON port_participant_list SEMICOLON
+  KEY_PORT nodeident
+    { current_port = std::string($2); }
+  COLON port_participant_list SEMICOLON
 ;
 
 port_participant_list:
@@ -395,6 +398,16 @@ port_participant_list:
 
 port_participant:
   nodeident
+    {
+        PS = static_cast<PlSymbol *>( PlaceTable->lookup($1) );
+	
+        if (PS == NULL) {
+            string error = "Place " + string($1) + " does not exist!";
+            owfn_yyerror(error.c_str());
+        } else {
+            PN->add_place_to_port(PS->getPlace(), current_port);
+        }
+    }
 ;
 
 

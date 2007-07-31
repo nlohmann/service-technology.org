@@ -35,7 +35,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/07/19 09:56:56 $
+ * \date    \$Date: 2007/07/31 08:46:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.188 $
+ * \version \$Revision: 1.189 $
  */
 %}
 
@@ -1650,6 +1650,12 @@ Flow(a,b,c,_id) ->
     }
     a b c
     {
+      foreach(link; tLink_list b)
+      {
+        assert(globals::ASTEmap[link->id] != NULL);
+        enterConsecutiveActivities( globals::ASTEmap[ link->id ]->sourceActivity, globals::ASTEmap[ link->id ]->targetActivity );
+      }
+
       // id of an enclosed start activity (for [SA00056])
       unsigned int startActivityId = 0;
 

@@ -30,17 +30,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/07/13 12:50:47 $
+ * \date    \$Date: 2007/07/31 08:46:22 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -263,6 +263,8 @@ void process_loop_bounds(const vector<unsigned int> &loop_bounds, const vector<u
 
 namespace {
     map< pair< unsigned int, unsigned int >, activityRelationType > activityRelationMap;
+    map< unsigned int, set< unsigned int > > beforeActivities;
+    map< unsigned int, set< unsigned int > > afterActivities;
 }
 
 
@@ -373,8 +375,19 @@ void enterEnclosedActivities( unsigned int a, set< unsigned int > b )
 void consecutiveActivities( unsigned int a, unsigned int b )
 {
     ENTER("consecutiveActivities");
-    activityRelationMap[pair<unsigned int, unsigned int>(a,b)] = AR_BEFORE;
-    activityRelationMap[pair<unsigned int, unsigned int>(b,a)] = AR_AFTER;
+    beforeActivities[b].insert(a);
+    afterActivities[a].insert(b);
+    for (set< unsigned int >::iterator first = beforeActivities[b].begin(); first != beforeActivities[b].end(); first++)
+    {
+        for (set< unsigned int >::iterator second = afterActivities[a].begin(); second != afterActivities[a].end(); second++)
+        {
+            activityRelationMap[pair<unsigned int, unsigned int>(*first,*second)] = AR_BEFORE;
+            activityRelationMap[pair<unsigned int, unsigned int>(*second,*first)] = AR_AFTER;
+            beforeActivities[*second].insert(*first);
+            afterActivities[*first].insert(*second);
+        } 
+    }
+    
     LEAVE("consecutiveActivities");
 }
 

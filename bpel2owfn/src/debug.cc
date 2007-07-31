@@ -30,17 +30,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/07/25 09:28:07 $
+ * \date    \$Date: 2007/07/31 08:46:22 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.111 $
+ * \version \$Revision: 1.112 $
  *
  * \ingroup debug
  */
@@ -700,7 +700,7 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	break; }
 
     case(56):
-      { cerr << information << " start activity must not be preceeded by another activity" << endl;
+      { cerr << "<" << information << ">: start activity must not be preceeded by another activity" << endl;
 	break; }
 
     case(57):

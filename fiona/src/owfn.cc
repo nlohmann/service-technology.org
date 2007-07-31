@@ -2209,3 +2209,8 @@ void oWFN::add_place_to_port(owfnPlace *place, std::string port) {
     ports[port].push_back(place);
     place->set_port(port);
 }
+
+
+unsigned int oWFN::getPortCount() const {
+    return ports.size();
+}

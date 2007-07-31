@@ -135,7 +135,7 @@ InTransitionParsePosition inTransitionParsePosition;
 
 %token KEY_SAFE KEY_PLACE KEY_INTERNAL KEY_INPUT KEY_OUTPUT
 %token KEY_MARKING KEY_FINALMARKING KEY_FINALCONDITION
-%token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE KEY_PORT KEY_PORTS
+%token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE KEY_PORTS
 %token KEY_ALL_OTHER_PLACES_EMPTY
 %token KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
 %token KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
@@ -386,8 +386,8 @@ port_list:
 ;
 
 port_definition:
-  KEY_PORT nodeident
-    { current_port = std::string($2); }
+  nodeident
+    { current_port = std::string($1); }
   COLON port_participant_list SEMICOLON
 ;
 

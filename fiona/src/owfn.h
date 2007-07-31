@@ -299,10 +299,11 @@ class oWFN {
                                                                    ) const;
         
 
-        /*!
-         * \brief adds a place to a port
-         */
+        /// adds a place to a port
         void add_place_to_port(owfnPlace *place, std::string port);
+        
+        /// counts the ports
+        unsigned int getPortCount() const;
         
         
         

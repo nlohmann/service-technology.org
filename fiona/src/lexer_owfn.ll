@@ -89,7 +89,6 @@ FINALMARKING                    { return KEY_FINALMARKING; }
 FINALCONDITION                  { return KEY_FINALCONDITION; }
 CONSUME                         { return KEY_CONSUME; }
 PRODUCE                         { return KEY_PRODUCE; }
-PORT                            { return KEY_PORT; }
 PORTS                           { return KEY_PORTS; }
 
  /* keywords for final conditions */

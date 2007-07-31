@@ -644,7 +644,8 @@ int main(int argc, char ** argv) {
             // report the net
             trace(TRACE_0, "    places: " + intToString(PN->getPlaceCount()));
             trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCount()) + " input places, " + intToString(PN->getOutputPlaceCount()) + " output places)\n");
-            trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCount()) + "\n\n");
+            trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCount()) + "\n");
+            trace(TRACE_0, "    ports: " + intToString(PN->getPortCount()) + "\n\n");
 
             if (PN->FinalCondition) {
                 trace(TRACE_0, "finalcondition used\n\n");

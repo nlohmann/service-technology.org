@@ -74,6 +74,7 @@ extern PetriNet PN;
 set<string> in;
 set<string> out;
 string nodename;
+string current_port;
 int readmode=0;
 PNapi::Transition *t = NULL; 
 
@@ -95,13 +96,14 @@ PNapi::Transition *t = NULL;
 }
 
 %type <yt_casestring> IDENT
+%type <yt_casestring> nodeident
 %type <yt_casestring> NUMBER
 %type <yt_casestring> NEGATIVE_NUMBER
 
 
 // the terminal symbols (tokens)
 
-%token KEY_SAFE KEY_PLACE KEY_INTERNAL KEY_INPUT KEY_OUTPUT
+%token KEY_SAFE KEY_PLACE KEY_INTERNAL KEY_INPUT KEY_OUTPUT KEY_PORTS
 %token KEY_MARKING KEY_FINALMARKING KEY_FINALCONDITION
 %token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE
 %token KEY_ALL_OTHER_PLACES_EMPTY
@@ -119,7 +121,7 @@ PNapi::Transition *t = NULL;
 
 
 // the start symbol of the grammar
-// %start tProcess
+%start net
 
 
 
@@ -127,21 +129,9 @@ PNapi::Transition *t = NULL;
 
 /* Grammar rules */
 
-input:  net { 
-}
-;
-
 net:
-		{
-		}
-	KEY_PLACE place_area KEY_MARKING
-		{
-		}
-		
+    KEY_PLACE place_area port_area KEY_MARKING
     markinglist SEMICOLON final transitionlist
-		{
-			// fill in arcs
-		}
 ;
 
 final: KEY_FINALMARKING finalmarkinglist SEMICOLON
@@ -268,6 +258,41 @@ finalmarking:
        (PN.findPlace(nodename))->isFinal = true;
       }
 ;
+
+
+
+
+
+/*************
+ * the ports *
+ *************/
+
+port_area:
+  /* empty */
+| KEY_PORTS port_list
+;
+
+port_list:
+  port_definition
+| port_list port_definition
+;
+
+port_definition:
+  nodeident
+    { current_port = std::string($1->name); }
+  COLON port_participant_list SEMICOLON
+;
+
+port_participant_list:
+  nodeident
+    { PN.setPlacePort(PN.findPlace(string($1->name)), current_port); }
+| port_participant_list COMMA nodeident
+    { PN.setPlacePort(PN.findPlace(string($3->name)), current_port); }
+;
+
+
+
+
 
 
 transitionlist: transitionlist transition

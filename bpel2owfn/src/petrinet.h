@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/27 14:24:20 $
+ * \date    \$Date: 2007/07/31 13:39:34 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.156 $
+ * \version \$Revision: 1.157 $
  *
  * \ingroup petrinet
  */
@@ -423,7 +423,7 @@ class PetriNet
     /// adds an arc given source and target node, and arc type
     Arc *newArc(Node *my_source, Node *my_target, arc_type my_type = STANDARD, unsigned int my_weight = 1);
 
-
+    
     /// merges two places
     void mergePlaces(Place * & p1, Place * & p2);
 
@@ -498,6 +498,10 @@ class PetriNet
 
     /// calculate the maximal occurrences of communication
     void calculate_max_occurrences();
+    
+    /// sets the port of a place
+    void setPlacePort(Place *place, string port);
+    
 
 
     /// add a suffix for a forEach activity

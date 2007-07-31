@@ -35,13 +35,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/07/31 07:38:10 $
+ * \date    \$Date: 2007/07/31 13:39:34 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.225 $
+ * \version \$Revision: 1.226 $
  *
  * \ingroup petrinet
  */
@@ -2146,6 +2146,17 @@ void PetriNet::loop_final_state()
   }
 }
 
+
+
+
+void PetriNet::setPlacePort(Place *place, string port)
+{
+  assert (place != NULL);
+  assert (place->type != INTERNAL);
+  assert (port != "");
+
+  ports[port].insert(place);
+}
 
 
 

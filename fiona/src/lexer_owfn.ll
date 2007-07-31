@@ -32,7 +32,7 @@
  *
  */
 
-/* DEFINITIONS */
+
 
 /* flex options */
 %option outfile="lex.yy.c"
@@ -42,86 +42,97 @@
 %option nodefault
 %option debug
 
+/* a start condition to skip comments */
 %s COMMENT
 
+
+
 %{
-// c-code (wird übernommen)
-
-// We don't need yyunput().
-#define YY_NO_UNPUT
-
-#include "syntax_owfn_wrap.h"			// list of all tokens used
-#include <string>
-
-using namespace std;
+#define YY_NO_UNPUT                // We don't need yyunput().
+#include "syntax_owfn_wrap.h"      // list of all tokens used
 
 extern int owfn_yyerror(const char *msg);
 static void setlval();
-
 %}
 
 
-%%
- /* RULES */
-
-"{$"		{ return LCONTROL; }
-"$}"		{ return RCONTROL; }
-
-"{"            { BEGIN(COMMENT); }
-<COMMENT>"}"   { BEGIN(INITIAL); }
-<COMMENT>[^}]* {}
-
-MAX_UNIQUE_EVENTS		{ return KEY_MAX_UNIQUE_EVENTS; }
-ON_LOOP				{ return KEY_ON_LOOP; }
-MAX_OCCURRENCES			{ return KEY_MAX_OCCURRENCES; }
-TRUE				{ return KEY_TRUE; }
-FALSE				{ return KEY_FALSE; }
-
-SAFE             						{ return KEY_SAFE;}
-PLACE            						{ return KEY_PLACE; }
-INTERNAL		 						{ return KEY_INTERNAL; }
-INPUT			 						{ return KEY_INPUT; }
-OUTPUT			 						{ return KEY_OUTPUT; }
-TRANSITION       						{ return KEY_TRANSITION; }
-INITIALMARKING          				{ return KEY_MARKING; }
-FINALMARKING          					{ return KEY_FINALMARKING; }
-FINALCONDITION     						{ return KEY_FINALCONDITION; }
-CONSUME          						{ return KEY_CONSUME; }
-PRODUCE          						{ return KEY_PRODUCE; }
-ALL_OTHER_PLACES_EMPTY           { return KEY_ALL_OTHER_PLACES_EMPTY; }
-ALL_OTHER_INTERNAL_PLACES_EMPTY  { return KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY; }
-ALL_OTHER_EXTERNAL_PLACES_EMPTY  { return KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY; }
-AND		 								{ return OP_AND;}
-OR		 								{ return OP_OR;}
-NOT		 								{ return OP_NOT;}
-\>		 								{ return OP_GT;}
-\<		 								{ return OP_LT;}
-\>=		 								{ return OP_GE;}
-\<=		 								{ return OP_LE;}
-=		 								{ return OP_EQ;}
-\<\>									{ return OP_NE;}
-\#		 								{ return OP_NE;}
-\:              						{ return COLON; }
-\;              						{ return SEMICOLON; }
-,               						{ return COMMA; }
-\(		 								{ return LPAR;}
-\)		 								{ return RPAR;}
-[0-9][0-9]*     						{ setlval(); return NUMBER; }
-"-"[0-9][0-9]*     						{ setlval(); return NEGATIVE_NUMBER; }
-[^,;:()\t \n\r\{\}=][^,;:()\t \n\r\{\}=]*		{ setlval(); return IDENT; }
-[\n\r]            						{ break; }
-[ \t]           						{ break; }
-.										{ owfn_yyerror("lexical error"); }
-
 
 %%
-// USER CODE
 
-// pass token string as attribute to bison
+
+
+ /* control comments */ 
+"{$"                            { return LCONTROL; }
+"$}"                            { return RCONTROL; }
+
+ /* comments */
+"{"                             { BEGIN(COMMENT); }
+<COMMENT>"}"                    { BEGIN(INITIAL); }
+<COMMENT>[^}]*                  { /* skip */ }
+
+ /* control keywords */
+MAX_UNIQUE_EVENTS               { return KEY_MAX_UNIQUE_EVENTS; }
+ON_LOOP                         { return KEY_ON_LOOP; }
+MAX_OCCURRENCES                 { return KEY_MAX_OCCURRENCES; }
+TRUE                            { return KEY_TRUE; }
+FALSE                           { return KEY_FALSE; }
+
+ /* keywords */
+SAFE                            { return KEY_SAFE; }
+PLACE                           { return KEY_PLACE; }
+INTERNAL                        { return KEY_INTERNAL; }
+INPUT                           { return KEY_INPUT; }
+OUTPUT                          { return KEY_OUTPUT; }
+TRANSITION                      { return KEY_TRANSITION; }
+INITIALMARKING                  { return KEY_MARKING; }
+FINALMARKING                    { return KEY_FINALMARKING; }
+FINALCONDITION                  { return KEY_FINALCONDITION; }
+CONSUME                         { return KEY_CONSUME; }
+PRODUCE                         { return KEY_PRODUCE; }
+PORT                            { return KEY_PORT; }
+PORTS                           { return KEY_PORTS; }
+
+ /* keywords for final conditions */
+ALL_OTHER_PLACES_EMPTY          { return KEY_ALL_OTHER_PLACES_EMPTY; }
+ALL_OTHER_INTERNAL_PLACES_EMPTY { return KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY; }
+ALL_OTHER_EXTERNAL_PLACES_EMPTY { return KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY; }
+AND                             { return OP_AND; }
+OR                              { return OP_OR; }
+NOT                             { return OP_NOT; }
+\>                              { return OP_GT; }
+\<                              { return OP_LT; }
+\>=                             { return OP_GE; }
+\<=                             { return OP_LE; }
+=                               { return OP_EQ; }
+\<\>                            { return OP_NE; }
+\#                              { return OP_NE; }
+\(                              { return LPAR; }
+\)                              { return RPAR; }
+
+ /* other characters */
+\:                              { return COLON; }
+\;                              { return SEMICOLON; }
+,                               { return COMMA; }
+
+ /* identifiers */
+[0-9][0-9]*                               { setlval(); return NUMBER; }
+"-"[0-9][0-9]*                            { setlval(); return NEGATIVE_NUMBER; }
+[^,;:()\t \n\r\{\}=][^,;:()\t \n\r\{\}=]* { setlval(); return IDENT; }
+
+ /* whitespace */
+[\n\r]                          { /* skip */ }
+[ \t]                           { /* skip */ }
+
+ /* anything else */
+.                               { owfn_yyerror("lexical error"); }
+
+
+
+%%
+
+
+
+/// pass token string as attribute to bison
 static void setlval() {
-  owfn_yylval.str = strdup(owfn_yytext);
+    owfn_yylval.str = strdup(owfn_yytext);
 }
-
-
-
-

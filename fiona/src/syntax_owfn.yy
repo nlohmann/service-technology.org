@@ -134,7 +134,7 @@ InTransitionParsePosition inTransitionParsePosition;
 
 %token KEY_SAFE KEY_PLACE KEY_INTERNAL KEY_INPUT KEY_OUTPUT
 %token KEY_MARKING KEY_FINALMARKING KEY_FINALCONDITION
-%token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE
+%token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE KEY_PORT KEY_PORTS
 %token KEY_ALL_OTHER_PLACES_EMPTY
 %token KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
 %token KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
@@ -191,7 +191,7 @@ net:
 		{
 			ignoredPlacesDueToMatching.clear();
 		}
-	KEY_PLACE place_area KEY_MARKING
+	KEY_PLACE place_area port_area KEY_MARKING
 		{
 			PlSymbol* plSymbol = NULL;
 			PlaceTable->initGetNextSymbol();
@@ -367,6 +367,37 @@ commands:
 //        numberOfEvents += PS->getPlace()->max_occurence - events_manual;
     }
 ;
+
+
+
+/*************
+ * the ports *
+ *************/
+
+port_area:
+  /* empty */
+| KEY_PORTS port_list
+;
+
+port_list:
+  port_definition
+| port_list port_definition
+;
+
+port_definition:
+  KEY_PORT nodeident COLON port_participant_list SEMICOLON
+;
+
+port_participant_list:
+  port_participant
+| port_participant_list COMMA port_participant
+;
+
+port_participant:
+  nodeident
+;
+
+
 
 markinglist:
   /* empty */ 

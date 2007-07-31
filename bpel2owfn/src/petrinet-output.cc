@@ -34,13 +34,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/07/31 07:38:10 $
+ * \date    \$Date: 2007/07/31 13:15:07 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.109 $
+ * \version \$Revision: 1.110 $
  *
  * \ingroup petrinet
  */
@@ -1306,7 +1306,7 @@ void PetriNet::output_owfn(ostream *output) const
       for (map<string, set<Place*> >::const_iterator port = ports.begin();
            port != ports.end(); port++)
       {
-        (*output) << "  PORT " << port->first << ":" << endl;
+        (*output) << "  " << port->first << ":" << endl;
         
         for (set<Place *>::const_iterator place = port->second.begin();
              place != port->second.end(); place++)

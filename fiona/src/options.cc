@@ -121,9 +121,10 @@ void print_help() {
   trace("                                                   as BDDs) are equivalent\n");
   trace("                                     productog   - calculate the product OG of\n");
   trace("                                                   all given OGs\n");
-  trace("                                     countservices - compute the number of\n");
-  trace("                                                   services determined by\n");  
-  trace("                                                   every singe given OG\n");  
+  trace("                                     isacyclic   - check a given OG for cycles\n");
+  trace("                                     count       - count the number of services\n");
+  trace("                                                   that are characterized by a\n");  
+  trace("                                                   given OG\n");  
   trace(" -m | --messagemaximum=<level> ... set maximum number of same messages per\n");
   trace("                                   state to <level>\n");
   trace("                                   (default is 1)\n");
@@ -242,6 +243,7 @@ void parse_command_line(int argc, char* argv[]) {
 	options[O_EQUALS] = false;
     options[O_OUTFILEPREFIX] = false;
     options[O_COUNT_SERVICES] = false;
+    options[O_CHECK_ACYCLIC] = false;
 
     options[O_MESSAGES_MAX] = true;
     options[O_EVENT_USE_MAX] = false;
@@ -332,9 +334,12 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if (lc_optarg == "productog") {
                     parameters[P_IG] = false;
                     options[O_PRODUCTOG] = true;
-                } else if (lc_optarg == "countservices") {
-                    options[O_COUNT_SERVICES] = true;
+                } else if (lc_optarg == "count") {
                     parameters[P_IG] = false;
+                    options[O_COUNT_SERVICES] = true;
+                } else if (lc_optarg == "isacyclic") {
+                    parameters[P_IG] = false;
+                    options[O_CHECK_ACYCLIC] = true;
                 } else {
                     cerr << "Error:\twrong modus operandi (option -t)" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"

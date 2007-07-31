@@ -133,45 +133,13 @@ void readnet() {
         PN->FinalCondition = PN->FinalCondition->posate();
         PN->FinalCondition->setstatic();
     }
+
+    // PN->removeisolated();
+    // TODO: better removal of places 
+    // doesn't work with, since array for input and output places
+    // depend on the order of the Places array, reordering results in
+    // a heavy crash
 }
-
-
-/* temporarily removed due to lack of usage
-//! \brief reads all oWFNs from a list
-void readAllNets(list<oWFN*>& listOfPetrinets) {
-    // ---------------- reading all nets ---------------------
-    for (list<char*>::iterator netiter = netfiles.begin();
-        netiter != netfiles.end(); ++netiter) {
-
-        numberOfDecodes = 0;
-
-        garbagefound = 0;
-        State::state_count = 0;          // number of states
-
-        numberDeletedVertices = 0;
-
-        numberOfEvents = 0;
-
-        // prepare getting the net
-        PlaceTable = new SymbolTab<PlSymbol>;
-
-        // get the net
-        netfile = *netiter;
-        readnet();  // Parser;
-
-        // PN->removeisolated();
-        // TODO: better removal of places 
-        // doesn't work with, since array for input and output places
-        // depend on the order of the Places array, reordering results in
-        // a heavy crash
-
-        PN->filename = netfile;
-        listOfPetrinets.push_back(PN);
-
-        delete PlaceTable;
-    }
-}
-*/
 
 
 //! \brief reads an OG from ogfile
@@ -462,9 +430,11 @@ void computeProductOG(OGFromFile::ogs_t OGsFromFiles) {
 
 // check for simulation relation of two given OGs
 void checkSimulation(OGFromFile::ogs_t OGsFromFiles) {
+
     list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
     OGFromFile *simulator = *OGFromFileIter;
     OGFromFile *simulant = *(++OGFromFileIter);
+
     if (simulator->simulates(simulant)) {
         trace(TRACE_0, "\nThe first OG has all the strategies of the second one, possibly more.\n" );
     } else {
@@ -475,9 +445,11 @@ void checkSimulation(OGFromFile::ogs_t OGsFromFiles) {
 
 // check if two given ogs are equal
 void checkEquality(OGFromFile::ogs_t OGsFromFiles) {
+
     list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
     OGFromFile *simulator = *OGFromFileIter;
     OGFromFile *simulant = *(++OGFromFileIter);
+
     if (simulator->simulates(simulant)) {
         if (simulant->simulates(simulator)) {
             trace(TRACE_0, "\nThe two OGs are equivalent, that is, they have the same strategies.\n");
@@ -489,15 +461,32 @@ void checkEquality(OGFromFile::ogs_t OGsFromFiles) {
     }
 }
 
+
 // computes the number of Services that are determined by every single OG
 void countServices(OGFromFile::ogs_t OGsFromFiles) {
+
     for (list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
          OGFromFileIter != OGsFromFiles.end(); OGFromFileIter++) {
 
         if ((*OGFromFileIter)->acyclic()) {
-            trace(TRACE_5, "The given OG is acyclic\n");
+            trace("The given OG is acyclic\n\n");
         } else {
-            trace(TRACE_5, "The given OG is is not ayclic\n");
+            trace("The given OG is is NOT ayclic\n\n");
+        }
+    }
+}
+
+
+// checks whether an OG is acyclic
+void checkAcyclicity(OGFromFile::ogs_t OGsFromFiles) {
+
+    for (list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
+         OGFromFileIter != OGsFromFiles.end(); OGFromFileIter++) {
+
+        if ((*OGFromFileIter)->acyclic()) {
+            trace("The given OG is acyclic\n\n");
+        } else {
+            trace("The given OG is is NOT ayclic\n\n");
         }
     }
 }
@@ -563,7 +552,8 @@ int main(int argc, char ** argv) {
 // **********************************************************************************
 // start OG file dependant operations
 
-    if (options[O_MATCH] || options[O_PRODUCTOG] || options[O_SIMULATES] || options[O_EQUALS] || options[O_COUNT_SERVICES]) {
+    if (options[O_MATCH] || options[O_PRODUCTOG] || options[O_SIMULATES] ||
+        options[O_EQUALS] || options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC]) {
 
         // reading all OG-files
         OGFromFile::ogs_t OGsFromFiles;
@@ -600,8 +590,16 @@ int main(int argc, char ** argv) {
         }
 
         if (options[O_COUNT_SERVICES]) {
-            // equivalence on OGFromFile
+            // counts the number of deterministic strategies
+            // that are characterized by a given OG
             countServices(OGsFromFiles);
+            return 0;
+        }
+
+        if (options[O_CHECK_ACYCLIC]) {
+            // counts the number of deterministic strategies
+            // that are characterized by a given OG
+            checkAcyclicity(OGsFromFiles);
             return 0;
         }
     }
@@ -623,29 +621,21 @@ int main(int argc, char ** argv) {
             netiter != netfiles.end(); ++netiter) {
        
             numberOfEvents = 0;
-            
-            // prepare getting the net
-            PlaceTable = new SymbolTab<PlSymbol>;
-    
-            // get the net
-            netfile = *netiter;
-            readnet();  // Parser;
-    
-            // PN->removeisolated();
-            // TODO: better removal of places 
-            // doesn't work with, since array for input and output places
-            // depend on the order of the Places array, reordering results in
-            // a heavy crash
-
-            PN->filename = netfile;
-            delete PlaceTable;   
-
             numberOfDecodes = 0;
             garbagefound = 0;
             global_progress = 0;
             show_progress = 0;
             State::state_count = 0;          // number of states
             numberDeletedVertices = 0;
+
+            // prepare getting the net
+            PlaceTable = new SymbolTab<PlSymbol>;
+
+            // get the net
+            netfile = *netiter;
+            readnet();
+            PN->filename = netfile;
+            delete PlaceTable;   
 
             trace(TRACE_0, "=================================================================\n");
             if (netfile) {
@@ -687,8 +677,8 @@ int main(int argc, char ** argv) {
             delete PN;
             trace(TRACE_5, "net deleted\n");
 
-    //		cout << "numberOfDecodes: " << numberOfDecodes << endl;   
-        } // end of "processing every single net ..."
+            // cout << "numberOfDecodes: " << numberOfDecodes << endl;   
+        }
 
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
         // Delete lexer buffer for parsing oWFNs.

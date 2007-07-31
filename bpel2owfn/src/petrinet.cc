@@ -35,13 +35,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/07/27 14:24:20 $
+ * \date    \$Date: 2007/07/31 07:38:10 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.224 $
+ * \version \$Revision: 1.225 $
  *
  * \ingroup petrinet
  */
@@ -589,13 +589,13 @@ PetriNet::~PetriNet()
 Place *PetriNet::newPlace(string my_role, communication_type my_type, string my_port)
 {
   string my_role_with_suffix = my_role;
-
+  
   if (my_role != "" && !forEach_suffix.empty())
     my_role_with_suffix += ("." + forEach_suffix[0]);
-
+  
   Place *p = new Place(getId(), my_role_with_suffix, my_type);
   assert(p != NULL);
-
+  
   // Decide in which set of places the place has to be inserted.
   switch(my_type)
   {
@@ -603,7 +603,7 @@ Place *PetriNet::newPlace(string my_role, communication_type my_type, string my_
     case (OUT):	{ P_out.insert(p); break; }
     default:	{ P.insert(p);     break; }
   }
-
+  
   // Test if the place is already defined.
   if (my_role != "")
   {
@@ -611,12 +611,11 @@ Place *PetriNet::newPlace(string my_role, communication_type my_type, string my_
     roleMap[my_role_with_suffix] = p;
   }
   
-  if (my_port != "")
+  if (my_type != INTERNAL && my_port != "")
   {
-    assert(my_type != INTERNAL);
     ports[my_port].insert(p);
   }
-
+  
   return p;
 }
 

@@ -34,13 +34,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/07/30 20:33:43 $
+ * \date    \$Date: 2007/07/31 07:38:10 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.108 $
+ * \version \$Revision: 1.109 $
  *
  * \ingroup petrinet
  */
@@ -585,6 +585,38 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
     for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
       (*output) << (*p)->output_dot();
     
+    
+    
+    // list the transitions
+    (*output) << "\n // transitions" << endl;
+    (*output) << " node [shape=box]" << endl;
+    for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+      (*output) << (*t)->output_dot();
+    
+    
+    // the inner of the net
+    (*output) << "\n // cluster the inner of the net" << endl;
+    (*output) << " subgraph cluster1\n {\n ";
+    for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+      (*output) << " t" << (*t)->id << " t" << (*t)->id << "_l";
+    (*output) << "\n ";
+    for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    {
+      if ((*p)->tokens > 0)
+        (*output) << " p" << (*p)->id;
+      else
+        (*output) << " p" << (*p)->id << " p" << (*p)->id << "_l";
+    }
+    
+    if (draw_interface)
+      (*output) << "\n  label=\"\" style=\"dashed\"" << endl;
+    else
+      (*output) << "\n  label=\"\" style=invis" << endl;
+    
+    (*output) << " }" << endl;
+    
+    
+    
     if (globals::parameters[P_PORTS])
     {
       // draw the ports
@@ -592,14 +624,17 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
            port != ports.end(); port++)
       {
         (*output) << " // cluster for port " << port->first << endl; 
-        (*output) << " subgraph cluster_" << port->first << "\n {\n ";
+        (*output) << " subgraph cluster_" << port->first << "\n {\n";
+        (*output) << "  label=\"" << port->first << "\";" << endl;
+        (*output) << "  style=\"filled,rounded\"; bgcolor=grey95  labelloc=t;" << endl;
+        //(*output) << "  rankdir=TB;" << endl;
         
         for (set<Place*>::const_iterator place = port->second.begin();
              place != port->second.end(); place++)
         {
           (*output) << "  p" + toString((*place)->id) << ";" << endl;
           (*output) << "  p" + toString((*place)->id) << "_l;" << endl;
-
+          
           // make the port more compact
           for (set<Place*>::const_iterator place2 = port->second.begin();
                place2 != port->second.end(); place2++)
@@ -609,40 +644,10 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
           }
         }
         
-        (*output) << "  label=\"" << port->first << "\";" << endl;
-        (*output) << "  style=\"filled,rounded\"; bgcolor=grey95  labelloc=t;" << endl;
-        //(*output) << "  rankdir=TB;" << endl;
-        (*output) << " }" << endl;
+        (*output) << " }" << endl << endl;
       }
     }
   }
-  
-  // list the transitions
-  (*output) << "\n // transitions" << endl;
-  (*output) << " node [shape=box]" << endl;
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-    (*output) << (*t)->output_dot();
-  
-  
-  (*output) << "\n // cluster the inner of the net" << endl;
-  (*output) << " subgraph cluster1\n {\n ";
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-    (*output) << " t" << (*t)->id << " t" << (*t)->id << "_l";
-  (*output) << "\n ";
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-  {
-    if ((*p)->tokens > 0)
-      (*output) << " p" << (*p)->id;
-    else
-      (*output) << " p" << (*p)->id << " p" << (*p)->id << "_l";
-  }
-  
-  if (draw_interface)
-    (*output) << "\n  label=\"\" style=\"dashed\"" << endl;
-  else
-    (*output) << "\n  label=\"\" style=invis" << endl;
-  
-  (*output) << " }" << endl;
   
   
   // list the arcs
@@ -651,7 +656,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     (*output) << (*f)->output_dot(draw_interface);
   
-  (*output) << "}" << endl;
+  (*output) << endl << "}" << endl;
 }
 
 

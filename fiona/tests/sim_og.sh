@@ -33,23 +33,23 @@ FIONA=fiona
 #loeschen aller erzeugten Dateien im letzten Durchlauf
 rm -f $DIR/*.out
 rm -f $DIR/*.png
-rm -f $DIR/*.og
-rm -f $DIR/*.log
+#rm -f $DIR/*.og
+#rm -f $DIR/*.log
 
 ############################################################################
 
 result=0
 
-for i in 1 2 3 4 5 6 8; 
+for i in 1 2 3 4 5 6 8;
 do
     #echo running test$i
 
     owfn1="$DIR/test${i}1.owfn"
     owfn2="$DIR/test${i}2.owfn"
 
-    OUTPUT=`$FIONA $owfn1 -t OG` 
-    OUTPUT=`$FIONA $owfn2 -t OG` 
-    
+    #OUTPUT=`$FIONA $owfn1 -t OG`
+    #OUTPUT=`$FIONA $owfn2 -t OG`
+
     cmd="$FIONA ${owfn1}.og ${owfn2}.og -t simulation"
 
     echo running $cmd
@@ -59,7 +59,7 @@ do
     if [ $resultSIM -ne 0 ]
     then
         let "result*=1"
-        echo ... Simulation failed, although it should not. 
+        echo ... Simulation failed, although it should not.
     fi
 
 done
@@ -71,8 +71,8 @@ do
     owfn1="$DIR/test${i}1.owfn"
     owfn2="$DIR/test${i}2.owfn"
 
-    OUTPUT=`$FIONA $owfn1 -t OG`
-    OUTPUT=`$FIONA $owfn2 -t OG`
+    #OUTPUT=`$FIONA $owfn1 -t OG`
+    #OUTPUT=`$FIONA $owfn2 -t OG`
 
     cmd="$FIONA ${owfn1}.og ${owfn2}.og -t simulation"
 
@@ -88,6 +88,6 @@ do
 
 done
 
-echo 
+echo
 
 exit $result

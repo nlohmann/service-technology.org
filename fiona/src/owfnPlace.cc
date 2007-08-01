@@ -45,25 +45,32 @@
 //! \param _net
 //! \brief constructor
 owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) :
-    Node(name), type(_type), index(0), capacity(0), nrbits(0),
-    max_occurence(1), cardprop(0), proposition(NULL)
-{
-  references = initial_marking = hash_factor = 0;
-  net = _net;
-  port = "";
+    Node(name),
+    type(_type),
+    index(0),
+    capacity(0),
+    nrbits(0),
+    max_occurence(1),
+    cardprop(0),
+    proposition(NULL) {
+
+    references = initial_marking = hash_factor = 0;
+    net = _net;
+    port = "";
 }
+
 
 //! \fn owfnPlace::~owfnPlace()
 //! \brief constructor
 owfnPlace::~owfnPlace() {
-	trace(TRACE_5, "owfnPlace::~owfnPlace() : start\n");
-	
+    trace(TRACE_5, "owfnPlace::~owfnPlace() : start\n");
+
     // delete the array with all propositions (atomicformulas) which mention
     // this place. The propositions themselves are deleted by the class oWFN
     // that recursively deletes its FinalCondition.
     delete[] proposition;
 
-	trace(TRACE_5, "owfnPlace::~owfnPlace() : end\n");
+    trace(TRACE_5, "owfnPlace::~owfnPlace() : end\n");
 }
 
 
@@ -102,39 +109,36 @@ std::string owfnPlace::getLabelForMatching() const {
     return (label + name);
 }
 
-void owfnPlace::operator += (unsigned int i)
-{
-  initial_marking += i;
-  net->placeHashValue += i*hash_factor;
-  net->placeHashValue %= HASHSIZE;
-}
 
-void owfnPlace::operator -= (unsigned int i)
-{
-  initial_marking -= i;
-
-  net->placeHashValue -= i*hash_factor;
-  net->placeHashValue %= HASHSIZE;
-}
-
-bool owfnPlace::operator >= (unsigned int i)
-{
-  return((initial_marking >= i) ? 1 : 0);
-}
-
-void owfnPlace::set_hash(unsigned int i)
-{
-	
-  net->placeHashValue -= hash_factor * initial_marking;
-  hash_factor = i;
-  net->placeHashValue += hash_factor * initial_marking;
-  net->placeHashValue %= HASHSIZE;
+void owfnPlace::operator += (unsigned int i) {
+    initial_marking += i;
+    net->placeHashValue += i*hash_factor;
+    net->placeHashValue %= HASHSIZE;
 }
 
 
-/*!
- * \brief set the port of the oWFN place
- */
+void owfnPlace::operator -= (unsigned int i) {
+    initial_marking -= i;
+
+    net->placeHashValue -= i*hash_factor;
+    net->placeHashValue %= HASHSIZE;
+}
+
+
+bool owfnPlace::operator >= (unsigned int i) {
+    return((initial_marking >= i) ? 1 : 0);
+}
+
+
+void owfnPlace::set_hash(unsigned int i) {
+    net->placeHashValue -= hash_factor * initial_marking;
+    hash_factor = i;
+    net->placeHashValue += hash_factor * initial_marking;
+    net->placeHashValue %= HASHSIZE;
+}
+
+
+//! \brief set the port of the oWFN place
 void owfnPlace::set_port(std::string my_port) {
     port = my_port;
 }

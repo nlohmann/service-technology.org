@@ -490,42 +490,25 @@ void communicationGraph::printGraphToDot() {
         trace(TRACE_0, "creating the dot file of the graph...\n");
         GraphNode * tmp = root;
 
-        char buffer[256];
-        if (options[O_OUTFILEPREFIX]) {
-            const char * prefix = outfilePrefix.c_str();
-            if (parameters[P_OG]) {
-                if (options[O_CALC_ALL_STATES]) {
-                    sprintf(buffer, "%s.OG.out", prefix);
-                } else {
-                    sprintf(buffer, "%s.R.OG.out", prefix);
-                }
-            } else {
-                if (options[O_CALC_ALL_STATES]) {
-                    sprintf(buffer, "%s.IG.out", prefix);
-                } else {
-                    sprintf(buffer, "%s.R.IG.out", prefix);
-                }
-            }        
-        } else {
-            if (parameters[P_OG]) {
-                if (options[O_CALC_ALL_STATES]) {
-                    sprintf(buffer, "%s.OG.out", netfile);
-                } else {
-                    sprintf(buffer, "%s.R.OG.out", netfile);
-                }
-            } else {
-                if (options[O_CALC_ALL_STATES]) {
-                    sprintf(buffer, "%s.IG.out", netfile);
-                } else {
-                    sprintf(buffer, "%s.R.IG.out", netfile);
-                }
-            }
+        string outfilePrefixWithOptions =
+            options[O_OUTFILEPREFIX] ? outfilePrefix : netfile;
+
+        if (!options[O_CALC_ALL_STATES]) {
+            outfilePrefixWithOptions += ".R";
         }
-        fstream dotFile(buffer, ios_base::out | ios_base::trunc);
+
+        if (parameters[P_OG]) {
+            outfilePrefixWithOptions += ".OG";
+        } else {
+            outfilePrefixWithOptions += ".IG";
+        }
+
+        string dotFileName = outfilePrefixWithOptions + ".out";
+        fstream dotFile(dotFileName.c_str(), ios_base::out | ios_base::trunc);
         dotFile << "digraph g1 {\n";
         dotFile << "graph [fontname=\"Helvetica\", label=\"";
         parameters[P_OG] ? dotFile << "OG of " : dotFile << "IG of ";
-        dotFile << netfile;        
+        dotFile << netfile;
         dotFile << " (parameters:";
         if (parameters[P_IG] && options[O_CALC_REDUCED_IG]) {
             dotFile << " -r";
@@ -552,36 +535,9 @@ void communicationGraph::printGraphToDot() {
         dotFile.close();
 
         // prepare dot command line for printing
-        if (options[O_OUTFILEPREFIX]) {
-            const char * prefix = outfilePrefix.c_str();
-            if (parameters[P_OG]) {
-                if (options[O_CALC_ALL_STATES]) {
-                    sprintf(buffer, "dot -Tpng \"%s.OG.out\" -o \"%s.OG.png\"", prefix, prefix);
-                } else {
-                    sprintf(buffer, "dot -Tpng \"%s.R.OG.out\" -o \"%s.R.OG.png\"", prefix, prefix);
-                }
-            } else {
-                if (options[O_CALC_ALL_STATES]) {
-                    sprintf(buffer, "dot -Tpng \"%s.IG.out\" -o \"%s.IG.png\"", prefix, prefix);
-                } else {
-                    sprintf(buffer, "dot -Tpng \"%s.R.IG.out\" -o \"%s.R.IG.png\"", prefix, prefix);
-                }
-            }
-        } else {
-            if (parameters[P_OG]) {
-                if (options[O_CALC_ALL_STATES]) {
-                    sprintf(buffer, "dot -Tpng \"%s.OG.out\" -o \"%s.OG.png\"", netfile, netfile);
-                } else {
-                    sprintf(buffer, "dot -Tpng \"%s.R.OG.out\" -o \"%s.R.OG.png\"", netfile, netfile);
-                }
-            } else {
-                if (options[O_CALC_ALL_STATES]) {
-                    sprintf(buffer, "dot -Tpng \"%s.IG.out\" -o \"%s.IG.png\"", netfile, netfile);
-                } else {
-                    sprintf(buffer, "dot -Tpng \"%s.R.IG.out\" -o \"%s.R.IG.png\"", netfile, netfile);
-                }
-            }        
-        }
+        string imgFileName = outfilePrefixWithOptions + ".png";
+        string dotCmd = "dot -Tpng \"" + dotFileName + "\" -o \"" +
+            imgFileName + "\"";
 
         // print commandline and execute system command
         if ((options[O_SHOW_NODES] && getNumberOfNodes() <= maxPrintingSize) ||
@@ -589,8 +545,8 @@ void communicationGraph::printGraphToDot() {
             // print only, if number of nodes is lower than required
             // if option is set to show all nodes, then we compare the number of all nodes
             // otherwise, we compare the number of blue nodes only
-            trace(TRACE_0, string(buffer) + "\n");
-            system(buffer);
+            trace(TRACE_0, dotCmd + "\n");
+            system(dotCmd.c_str());
 
 //            // on windows machines, the png file can be shown per system call
 //            if (parameters[P_OG]) {
@@ -604,7 +560,7 @@ void communicationGraph::printGraphToDot() {
         } else {
             trace(TRACE_0, "graph is too big to create the graphics :( ");
             trace(TRACE_0, "(greater " + intToString(maxPrintingSize) + ")\n");
-            trace(TRACE_0, string(buffer) + "\n");
+            trace(TRACE_0, dotCmd + "\n");
         }
     } else {
         trace(TRACE_0, "graph is too big to create dot file\n");

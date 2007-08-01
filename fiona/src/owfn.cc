@@ -2090,25 +2090,25 @@ void NewStubbStamp(oWFN * PN) {
 #define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
 owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
     trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): start\n"); 
-    
+
     owfnTransition ** result;
     unsigned int maxdfs;
     owfnTransition * current, * next;
-    
+
     // computes stubborn set without goal orientation.
     // The TSCC based optimisation is included
-    
+
     // 1. start with enabled transition
-    if(TarjanStack = startOfEnabledList) {
+    if (TarjanStack = startOfEnabledList) {
         maxdfs = 0;
         NewStubbStamp(this);
-        TarjanStack -> nextontarjanstack = TarjanStack;
-        TarjanStack -> stamp  = StubbStamp;
-        TarjanStack -> dfs = TarjanStack -> min = maxdfs++;
-        TarjanStack -> mbiindex = 0;
+        TarjanStack->nextontarjanstack = TarjanStack;
+        TarjanStack->stamp  = StubbStamp;
+        TarjanStack->dfs = TarjanStack->min = maxdfs++;
+        TarjanStack->mbiindex = 0;
         current = TarjanStack;
         CallStack = current;
-        current -> nextoncallstack = (owfnTransition *) 0;
+        current->nextoncallstack = (owfnTransition *) 0;
     } else {
         result = new owfnTransition * [1];
         result[0] = (owfnTransition *) 0;
@@ -2117,17 +2117,17 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
         trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
         return result;
     }
-    
-    while(current) {
-	//	cout << "current: " << current->name << endl;
-	/*	cout << "current->mustbeincluded: " << current->mustbeincluded << endl;
-        cout << "current->mustbeincluded[0]: " << current->mustbeincluded[0] << endl;		*/
+
+    while (current) {
+    //  cout << "current: " << current->name << endl;
+    //  cout << "current->mustbeincluded: " << current->mustbeincluded << endl;
+    //  cout << "current->mustbeincluded[0]: " << current->mustbeincluded[0] << endl;
         if (current->mustbeincluded.size() > current->mbiindex) {
             next = current->mustbeincluded[current->mbiindex];
             // Successor exists
-            if(next->stamp == StubbStamp) {
+            if (next->stamp == StubbStamp) {
                 // already visited
-                if(next -> nextontarjanstack) {
+                if (next -> nextontarjanstack) {
                     // next still on stack
                     current -> min = MINIMUM(current -> min, next -> dfs);
                 }
@@ -2143,46 +2143,39 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
                 CallStack = next;
                 current = next;
             }
-        }
-        else
-        {
+        } else {
             // no more successors -> scc detection and backtracking
-            if(current -> dfs == current -> min)
-            {
+            if (current->dfs == current->min) {
                 // remove all states behind current from Tarjanstack;
                 // if enabled -> final sequence
-                while(1)
-                {
-                    if (TarjanStack->isEnabled())
-                    {
+                while (true) {
+                    if (TarjanStack->isEnabled()) {
                         // final sequence
                         unsigned int cardstubborn;
                         owfnTransition * t;
                         
                         cardstubborn = 0;
-                        for(t = TarjanStack;;t = t -> nextontarjanstack)
-                        {
+                        for (t = TarjanStack; ; t = t->nextontarjanstack) {
                             if (t->isEnabled()) cardstubborn ++;
                             if(t == current) break;
                         }
                         result = new owfnTransition * [cardstubborn + 1];
                         cardstubborn = 0;
-                        for(t = TarjanStack;;t = t -> nextontarjanstack)
-                        {
-                            if (t->isEnabled())
-                            {
+                        for (t = TarjanStack; ; t = t->nextontarjanstack) {
+                            if (t->isEnabled()) {
                                 result[cardstubborn++] = t;
                             }
-                            if(t == current)
-                            {
+                            if (t == current) {
                                 result[cardstubborn] = (owfnTransition *) 0;
                                 CurrentCardFireList = cardstubborn;
                                 trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
-                                return(result);
+                                return (result);
                             }
                         }
                     } else {
-                        if(TarjanStack == current) break;
+                        if (TarjanStack == current) {
+                            break;
+                        }
                         TarjanStack = TarjanStack -> nextontarjanstack;
                     }
                 }
@@ -2195,7 +2188,11 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
             current = next;
         }
     }
-    trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
+
+    cerr << "You reached an unreachable line in function "
+         << "owfnTransition ** oWFN::stubbornfirelistdeadlocks())" << endl;
+    assert(false);
+    exit(1);
 }
 #endif
 

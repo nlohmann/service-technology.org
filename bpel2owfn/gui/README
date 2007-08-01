@@ -84,6 +84,8 @@ static_release.sh A shell script to automatically build an Apple installation
                   try to tidy the directory with `make distclean' which will
                   fail if the directory was tidied before. So don't worry about
                   a failure at the beginning.
+                  More about static linking of Qt can be found under
+                  http://doc.trolltech.com/4.3/deployment-x11.html
 
 resource/bpel.png
 resource/bpel4chor.png  Graphics for the GUI. They are linked into the

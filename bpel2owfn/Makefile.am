@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/07/30 14:52:26 $ by $Author: nielslohmann $
-# Version $Revision: 1.71 $
+# File last changed $Date: 2007/08/01 13:53:35 $ by $Author: nielslohmann $
+# Version $Revision: 1.72 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc maintainer/rpm
@@ -32,12 +32,19 @@ SUBDIRS = src tests doc maintainer/rpm
 # Which targets have no dependencies (i.e. always succeed)?
 .PHONY: binarydistreadme update
 
+
+##################################
+# Targets to manage distribution #
+##################################
+
 # do not publish CVS files
 dist-hook:
 	rm -rf `find $(distdir) -name CVS`
 	-make -C gui distclean
 
 EXTRA_DIST = gui maintainer/fink
+
+
 
 ####################################
 # Targets to clean generated files #
@@ -58,10 +65,9 @@ SHELLSCRIPTS = tests/test1 \
 # permissions and set filetype to UNIX.
 hu-prepare: maintainer-clean
 	-rm -f aclocal.m4
-	-rm -f configure
+	-rm -f compile
 	-rm -f configure
 	-rm -f depcomp
-	-rm -f compile
 	-rm -f install-sh
 	-rm -f Makefile.in
 	-rm -f missing
@@ -76,7 +82,7 @@ hu-prepare: maintainer-clean
 	-rm -f src/bpel2owfn.h.in
 	-rm -f -r src/.deps
 	-rm -f tests/Makefile.in
-	-rm -f rpm/Makefile.in	
+	-rm -f mainainer/rpm/Makefile.in
 	find . -type d -exec chmod 755 {} \;
 	find . -type f -exec chmod 644 {} \;
 	chmod 755 $(SHELLSCRIPTS) doc/gendocs.sh gnupload
@@ -90,6 +96,7 @@ hu-prepare: maintainer-clean
 	@echo "or"
 	@echo "  autoreconf -i"
 	@echo
+
 
 
 ####################################

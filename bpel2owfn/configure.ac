@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/07/30 13:18:52 $ by $Author: nielslohmann $.
-# Version $Revision: 1.49 $
+# File last changed $Date: 2007/08/01 13:53:35 $ by $Author: nielslohmann $.
+# Version $Revision: 1.50 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
@@ -57,10 +57,10 @@ CFLAGS=""
 
 
 # Checks for header files and functions.
-AC_CHECK_HEADERS([windows.h])
-AC_CHECK_FUNCS([pow])
+#AC_CHECK_HEADERS([windows.h])
+#AC_CHECK_FUNCS([pow])
 
-AM_PROG_CC_C_O
+#AM_PROG_CC_C_O
 
 
 # Check for optional programs.
@@ -94,5 +94,9 @@ AC_CONFIG_FILES([Makefile \
 	  maintainer/rpm/bpel2owfn.spec
 	  ])
 
-
 AC_OUTPUT
+
+chmod 775 gui/static_release.sh
+chmod 775 maintainer/fink/create_fink_package.sh
+
+#AC_OUTPUT

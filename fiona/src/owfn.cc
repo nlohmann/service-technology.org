@@ -1445,7 +1445,7 @@ void oWFN::printMarking(unsigned int * marking) const {
 
 string oWFN::getMarkingAsString(unsigned int * marking) const {
     bool comma = false;
-    string buffer;
+    string buffer = "";
     for (unsigned int i = 0; i < getPlaceCount(); i++) {
         if (marking[i] > 5) {
             if (comma) {

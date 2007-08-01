@@ -52,9 +52,9 @@ trace_level debug_level = TRACE_0;
  *
  */
 void trace(trace_level pTraceLevel, std::string message) {
-  if (pTraceLevel <= debug_level) {
-    (*log_output) << message << std::flush;
-  }
+    if (pTraceLevel <= debug_level) {
+        (*log_output) << message << std::flush;
+    }
 }
 
 /**
@@ -64,7 +64,7 @@ void trace(trace_level pTraceLevel, std::string message) {
  *
  */
 void trace(std::string message ) {
-  trace(TRACE_0, message);
+    trace(TRACE_0, message);
 }
 
 /*!
@@ -72,52 +72,50 @@ void trace(std::string message ) {
  * \return  C++ string representing i
  */
 std::string intToString(int i) {
-  char buffer[20];
-  sprintf(buffer, "%d", i);
-  
-  return std::string(buffer);
+    char buffer[20];
+    sprintf(buffer, "%d", i);
+
+    return std::string(buffer);
 }
 
-bool isNonNegativeInteger(const std::string& s)
-{
+
+bool isNonNegativeInteger(const std::string& s) {
     for (std::string::size_type i = 0; i != s.size(); ++i) {
         if (!std::isdigit(s[i])) {
             return false;
         }
     }
-
     return true;
 }
 
-std::string toUpper(const std::string& s)
-{
+
+std::string toUpper(const std::string& s) {
     std::string result;
 
     // The next line does not work for some reason. So we transform by hand.
     // std::transform(s.begin(), s.end(), result.begin(), (int(*)(int))toupper);
 
-    for (string::size_type i = 0; i != s.size(); ++i)
-    {
+    for (string::size_type i = 0; i != s.size(); ++i) {
         result += toupper(s[i]);
     }
 
     return result;
 }
 
-std::string toLower(const std::string& s)
-{
+
+std::string toLower(const std::string& s) {
     std::string result;
 
     // The next line does not work for some reason. So we transform by hand.
     // std::transform(s.begin(), s.end(), result.begin(), (int(*)(int))tolower);
 
-    for (string::size_type i = 0; i != s.size(); ++i)
-    {
+    for (string::size_type i = 0; i != s.size(); ++i) {
         result += tolower(s[i]);
     }
 
     return result;
 }
+
 
 /*!
  * This function is invoked by the parser and the lexer during the syntax
@@ -132,67 +130,66 @@ std::string toLower(const std::string& s)
  * 
  * \return 1, since an error occured
  */
-int yyerror(const char* msg, int yylineno, const char* yytext, const char* file)
-{
-  trace("Error while parsing!\n\n");
-  trace(msg);
-  trace("\n");
-	
-  // display passed error message
-  trace("Error in '" + std::string(file) + "' in line ");
-  trace(intToString(yylineno));
-  trace(":\n");
-  trace("  token/text last read was '");
-  trace(yytext);
-  trace("'\n\n");
-  
-  // if (filename != "<STDIN>")
-  {
-    trace("-------------------------------------------------------------------------------\n");
-    
-    // number of lines to print before and after errorneous line
-    int environment = 4;
+int yyerror(const char* msg, int yylineno, const char* yytext, const char* file) {
+    trace("Error while parsing!\n\n");
+    trace(msg);
+    trace("\n");
 
-    unsigned int firstShowedLine = ((yylineno-environment)>0)?(yylineno-environment):1;
+    // display passed error message
+    trace("Error in '" + std::string(file) + "' in line ");
+    trace(intToString(yylineno));
+    trace(":\n");
+    trace("  token/text last read was '");
+    trace(yytext);
+    trace("'\n\n");
   
-    std::ifstream inputFile(file);
-    std::string errorLine;
-    for (unsigned int i=0; i<firstShowedLine; i++)
+    // if (filename != "<STDIN>")
     {
-      getline(inputFile, errorLine);
-    }
-    // print the erroneous line (plus/minus three more)
-    for (unsigned int i=firstShowedLine; i<=firstShowedLine+(2*environment); i++)
-    {
-      trace(intToString(i) + ": " + errorLine + "\n");
-      getline(inputFile, errorLine);
-      if (inputFile.eof())
-	break;
-    }
-    inputFile.close();
-    
-    trace("-------------------------------------------------------------------------------\n");
-  }
+        trace("-------------------------------------------------------------------------------\n");
 
-  exit(1);
-  return 1;
+        // number of lines to print before and after errorneous line
+        int environment = 4;
+
+        unsigned int firstShowedLine = ((yylineno-environment)>0)?(yylineno-environment):1;
+
+        std::ifstream inputFile(file);
+        std::string errorLine;
+        for (unsigned int i=0; i<firstShowedLine; i++) {
+            getline(inputFile, errorLine);
+        }
+
+        // print the erroneous line (plus/minus three more)
+        for (unsigned int i=firstShowedLine; i<=firstShowedLine+(2*environment); i++) {
+            trace(intToString(i) + ": " + errorLine + "\n");
+            getline(inputFile, errorLine);
+            if (inputFile.eof()) {
+                break;
+            }
+        }
+        inputFile.close();
+
+        trace("-------------------------------------------------------------------------------\n");
+    }
+
+    exit(1);
+    return 1;
 }
 
-int owfn_yyerror(const char* msg)
-{
-  /* defined by flex */
-  extern int owfn_yylineno;      ///< line number of current token
-  extern char *owfn_yytext;      ///< text of the current token
-  extern char * netfile;
 
-  return yyerror(msg, owfn_yylineno, owfn_yytext, netfile);
+int owfn_yyerror(const char* msg) {
+    /* defined by flex */
+    extern int owfn_yylineno;      ///< line number of current token
+    extern char *owfn_yytext;      ///< text of the current token
+    extern char * netfile;
+
+    return yyerror(msg, owfn_yylineno, owfn_yytext, netfile);
 }
 
-int og_yyerror(const char* msg)
-{
-  /* defined by flex */
-  extern int og_yylineno;      ///< line number of current token
-  extern char *og_yytext;      ///< text of the current token
 
-  return yyerror(msg, og_yylineno, og_yytext, ogfileToParse.c_str());
+int og_yyerror(const char* msg) {
+    /* defined by flex */
+    extern int og_yylineno;      ///< line number of current token
+    extern char *og_yytext;      ///< text of the current token
+
+    return yyerror(msg, og_yylineno, og_yytext, ogfileToParse.c_str());
 }

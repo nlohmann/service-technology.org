@@ -489,7 +489,7 @@ bool OGFromFile::simulatesRecursive (OGFromFileNode *myNode,
 
 //! \brief checks, whether this OGFromFile is acyclic
 //! \return true on positive check, otherwise: false
-bool OGFromFile::acyclic() {
+bool OGFromFile::isAcyclic() {
     trace(TRACE_5, "Test if the given OG is acyclic: start\n" );
 
     // Define a set vor every Node, that will contain all transitive parent nodes 

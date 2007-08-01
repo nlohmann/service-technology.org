@@ -476,7 +476,7 @@ void countServices(OGFromFile::ogs_t OGsFromFiles) {
     for (list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
          OGFromFileIter != OGsFromFiles.end(); OGFromFileIter++) {
 
-        if ((*OGFromFileIter)->acyclic()) {
+        if ((*OGFromFileIter)->isAcyclic()) {
             trace("The given OG is acyclic\n\n");
         } else {
             trace("The given OG is is NOT ayclic\n\n");
@@ -491,7 +491,7 @@ void checkAcyclicity(OGFromFile::ogs_t OGsFromFiles) {
     for (list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
          OGFromFileIter != OGsFromFiles.end(); OGFromFileIter++) {
 
-        if ((*OGFromFileIter)->acyclic()) {
+        if ((*OGFromFileIter)->isAcyclic()) {
             trace("The given OG is acyclic\n\n");
         } else {
             trace("The given OG is is NOT ayclic\n\n");

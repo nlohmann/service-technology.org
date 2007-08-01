@@ -222,10 +222,8 @@ public:
 
     bool simulates ( OGFromFile *smallerOG );
     
-    /**
-     * Tests, if this OG is acyclic
-     */
-    bool acyclic();
+    //! Tests, if this OG is acyclic
+    bool isAcyclic();
 };
 
 

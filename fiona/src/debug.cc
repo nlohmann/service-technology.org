@@ -40,6 +40,9 @@
 #include <iostream>
 #include <algorithm>
 
+std::string ogfileToParse;
+std::string owfnfileToParse;
+
 /// debug level
 trace_level debug_level = TRACE_0;
 
@@ -63,7 +66,7 @@ void trace(trace_level pTraceLevel, std::string message) {
  * \param message the output
  *
  */
-void trace(std::string message ) {
+void trace(std::string message) {
     trace(TRACE_0, message);
 }
 
@@ -180,9 +183,9 @@ int owfn_yyerror(const char* msg) {
     /* defined by flex */
     extern int owfn_yylineno;      ///< line number of current token
     extern char *owfn_yytext;      ///< text of the current token
-    extern char * netfile;
+//    extern char * netfile;
 
-    return yyerror(msg, owfn_yylineno, owfn_yytext, netfile);
+    return yyerror(msg, owfn_yylineno, owfn_yytext, owfnfileToParse.c_str());
 }
 
 

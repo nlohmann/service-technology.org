@@ -81,6 +81,12 @@ extern unsigned int State::state_count;
 extern list<char*> netfiles;
 extern OGFromFile* OGToParse;
 
+
+// the currently considered owfn from the owfn list given by the command line
+// used only in main.cc
+std::string currentowfnfile;
+
+
 int garbagefound;
 unsigned int NonEmptyHash;
 unsigned int numberOfDecodes;
@@ -94,29 +100,31 @@ void myown_newhandler() {
 }
 
 
-//! \brief reads an oWFN from netfile
-void readnet() {
+//! \brief reads an oWFN from owfnfile
+void readnet(const std::string& owfnfile) {
     owfn_yydebug = 0;
     owfn_yy_flex_debug = 0;
+    assert(owfnfile != "");
 	// diagnosefilename = (char *) 0;
-    if (netfile) {
-        owfn_yyin = fopen(netfile,"r");
-        if(!owfn_yyin) {
-            cerr << "cannot open netfile: " << netfile << "\n\n";
-            exit(4);
-        }
-		trace(TRACE_5, "reading from file " + string(netfile) + "\n");
-		//  diagnosefilename = netfile;
+
+    trace(TRACE_5, "reading from file " + owfnfile + "\n");
+    owfn_yyin = fopen(owfnfile.c_str(), "r");
+    if (!owfn_yyin) {
+        cerr << "cannot open owfn file " << owfnfile << "' for reading'\n" << endl;
+        exit(4);
     }
+	//  diagnosefilename = owfnfile;
 
     PN = new oWFN();
+    PN->filename = owfnfile;
 
+    owfnfileToParse = owfnfile;
     owfn_yyparse();
     fclose(owfn_yyin);
 
-    for(unsigned int i = 0; i < PN->getPlaceCount(); i++) {
+    for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
         PN->CurrentMarking[i] = PN->getPlace(i)->initial_marking;
-	}
+    }
 
     PN->initialize();
 
@@ -148,20 +156,19 @@ OGFromFile* readog(const std::string& ogfile) {
     og_yy_flex_debug = 0;
     assert(ogfile != "");
 
+    trace(TRACE_5, "reading from file " + ogfile + "\n");
     og_yyin = fopen(ogfile.c_str(), "r");
     if (!og_yyin) {
-        cerr << "cannot open OG file '" << ogfile << "' for reading'" << endl;
+        cerr << "cannot open OG file '" << ogfile << "' for reading'\n" << endl;
         exit(4);
     }
 
-    trace(TRACE_1, "=================================================================\n");
-    trace(TRACE_1, "reading from file " + ogfile + "\n");
-
     OGToParse = new OGFromFile();
-    ogfileToParse = ogfile;
 
+    ogfileToParse = ogfile;
     og_yyparse();
     fclose(og_yyin);
+
     return OGToParse;
 }
 
@@ -269,7 +276,7 @@ void matchNet(OGFromFile* OGToMatch, oWFN* PN) {
 
 // create an OG of an oWFN
 void computeOG(oWFN* PN) {
-    
+
     time_t seconds, seconds2;
 
     OG * graph = new OG(PN);
@@ -278,11 +285,6 @@ void computeOG(oWFN* PN) {
     seconds = time (NULL);
 
     graph->printProgressFirst();
-    graph->calculateRootNode();	// creates the root node and calculates its reachability graph (set of states)
-
-    if (options[O_OTF]){
-        graph->bdd->convertRootNode(graph->getRoot());
-    }
 
     graph->buildGraph(); // build operating guideline
 
@@ -566,7 +568,7 @@ int main(int argc, char ** argv) {
         // reading all OG-files
         OGFromFile::ogs_t OGsFromFiles;
         readAllOGs(OGsFromFiles);
-    
+
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
     		// Destroy buffer of OG parser.
     		// Must NOT be called before fclose(og_yyin);
@@ -627,7 +629,7 @@ int main(int argc, char ** argv) {
         // ---------------- processing every single net -------------------
         for (list<char*>::iterator netiter = netfiles.begin();
             netiter != netfiles.end(); ++netiter) {
-       
+
             numberOfEvents = 0;
             numberOfDecodes = 0;
             garbagefound = 0;
@@ -636,19 +638,18 @@ int main(int argc, char ** argv) {
             State::state_count = 0;          // number of states
             numberDeletedVertices = 0;
 
+            currentowfnfile = string(*netiter);
+            assert(currentowfnfile != "");
+
             // prepare getting the net
             PlaceTable = new SymbolTab<PlSymbol>;
-
             // get the net
-            netfile = *netiter;
-            readnet();
-            PN->filename = netfile;
-            delete PlaceTable;   
+            readnet(currentowfnfile);
+            delete PlaceTable;
 
             trace(TRACE_0, "=================================================================\n");
-            if (netfile) {
-                trace(TRACE_0, "processing net " + string(netfile) + "\n");
-            }
+            trace(TRACE_0, "processing net " + currentowfnfile + "\n");
+
             // report the net
             trace(TRACE_0, "    places: " + intToString(PN->getPlaceCount()));
             trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCount()) + " input places, " + intToString(PN->getOutputPlaceCount()) + " output places)\n");

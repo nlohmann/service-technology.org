@@ -491,7 +491,7 @@ void communicationGraph::printGraphToDot() {
         GraphNode* rootNode = root;
 
         string outfilePrefixWithOptions =
-            options[O_OUTFILEPREFIX] ? outfilePrefix : netfile;
+            options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
 
         if (!options[O_CALC_ALL_STATES]) {
             outfilePrefixWithOptions += ".R";
@@ -508,7 +508,7 @@ void communicationGraph::printGraphToDot() {
         dotFile << "digraph g1 {\n";
         dotFile << "graph [fontname=\"Helvetica\", label=\"";
         parameters[P_OG] ? dotFile << "OG of " : dotFile << "IG of ";
-        dotFile << netfile;
+        dotFile << PN->filename;
         dotFile << " (parameters:";
         if (parameters[P_IG] && options[O_CALC_REDUCED_IG]) {
             dotFile << " -r";
@@ -663,14 +663,14 @@ void communicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
 //! \brief creates a STG file of the graph
 void communicationGraph::printGraphToSTG() {
     trace(TRACE_0, "\ncreating the STG file of the graph...\n");
-    GraphNode *tmp = root;
+    GraphNode* rootNode = root;
     string buffer;
 
     // set file name
     if (options[O_OUTFILEPREFIX]) {
         buffer = outfilePrefix;    
     } else {
-        buffer = string(netfile);
+        buffer = PN->filename;
     }
 
     if (parameters[P_OG]) {
@@ -686,13 +686,13 @@ void communicationGraph::printGraphToSTG() {
             buffer += ".R.IG.stg";
         }
     }
-    
+
     // create file
     fstream dotFile(buffer.c_str(), ios_base::out | ios_base::trunc);
-    
+
     // print header
     dotFile << ".model Labeled_Transition_System" << endl;
-    
+
     // list transitions (use place names)
     dotFile << ".dummy";
     assert(PN != NULL);
@@ -705,18 +705,18 @@ void communicationGraph::printGraphToSTG() {
     }
     dotFile << endl;    
     dotFile << ".state graph" << endl;
-    
+
     // mark all nodes as unvisited
     bool visitedNodes[getNumberOfNodes()];
     for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
         visitedNodes[i] = false;
     }
-    
+
     // traverse the nodes recursively
-    printGraphToSTGRecursively(tmp, dotFile, visitedNodes);
+    printGraphToSTGRecursively(rootNode, dotFile, visitedNodes);
 
     // the initial marking
-    dotFile << ".marking {p" << tmp->getNumber() << "}" << endl;
+    dotFile << ".marking {p" << rootNode->getNumber() << "}" << endl;
 
     // end and close file
     dotFile << ".end" << endl;
@@ -724,9 +724,9 @@ void communicationGraph::printGraphToSTG() {
 
     // prepare Petrify command line for printing
     if (parameters[P_OG]) {
-        buffer = string(HAVE_PETRIFY) + " " + string(netfile) + ".OG.stg -dead -ip -o " + string(netfile) + ".OG.pn";
+        buffer = string(HAVE_PETRIFY) + " " + PN->filename + ".OG.stg -dead -ip -o " + PN->filename + ".OG.pn";
     } else {
-        buffer = string(HAVE_PETRIFY) + " " + string(netfile) + ".IG.stg -dead -ip -o " + string(netfile) + ".IG.pn";
+        buffer = string(HAVE_PETRIFY) + " " + PN->filename + ".IG.stg -dead -ip -o " + PN->filename + ".IG.pn";
     }
 
     // print commandline and execute system command
@@ -740,20 +740,17 @@ void communicationGraph::printGraphToSTG() {
     }
 
     // the filename of the generated Petri net
-    string generated_stg_file = string(netfile);
+    string generated_stg_file = PN->filename;
     if (parameters[P_OG]) {
         generated_stg_file += ".OG.pn";
     } else {
         generated_stg_file += ".IG.pn";
     }
-    
+
     std::cerr << "parsing file file `" << generated_stg_file << "'..." << std::endl;
     stg_yyin = fopen(generated_stg_file.c_str(), "r");
     STG2oWFN_main();
 }
-
-
-
 
 
 //! \param v current node in the iteration process

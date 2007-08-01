@@ -40,6 +40,9 @@
 #include <fstream>
 #include <exception>
 
+extern std::string ogfileToParse;
+extern std::string owfnfileToParse;
+
 typedef enum {
   TRACE_0,			//!< no messages
   TRACE_1,			//!< keep track of nodes

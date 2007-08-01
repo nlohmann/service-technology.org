@@ -65,103 +65,95 @@ class oWFN {
         
         /** Type of the containers holding all places of this oWFN. */
         typedef std::vector<owfnPlace*> Places_t;
-    
+
     private:
         unsigned int NrOfStates;
         unsigned int arcCnt;				//!< number of arcs
         unsigned int CurrentCardFireList;
         unsigned int CurrentCardQuasiFireList;
-        
-        /** array of places */
+
+        //! array of places
         Places_t Places;
-        
+
         Places_t inputPlaces;
         Places_t outputPlaces;
-        
-        /// the ports
+
+        //! the ports
         std::map<std::string, Places_t> ports;
-        
-        /** Contains all transitions of this oWFN. */
+
+        //! Contains all transitions of this oWFN.
         Transitions_t Transitions;
-        
+
         owfnTransition ** firelist();
-        
+
     public:
         oWFN();
         ~oWFN();
         void RemoveGraph();
-        
-        char * filename;
-        
+
+        string filename;
+//        char * filename;
+
         owfnTransition ** quasiFirelist();
-        
+
         binDecision * tempBinDecision;   // we want to store some the states calculated temporarily in a new binDecision structure
-        
+
         setOfMessages inputMessages;		//!< activated input messages of current node
         setOfMessages outputMessages;		//!< activated output messages of current node
-        
+
         StateSet setOfStatesTemp;			//!< this set contains all states of the newly calculated node
         StateSet visitedStates;				//!< in case of state reduction, remember those state that we have visited so far by calculating the new node
-        
+
         void initializeTransitions();		//!< calls the check_enabled function for all transitions
-        
-        /** returns the number of all places of the net */
+
+        //! returns the number of all places of the net
         Places_t::size_type getPlaceCount() const;
-        
-        /**
-         * Get owfnPlace from index i. Indices start at 0. Get the total number
-         * of owfnPlaces from getPlaceCount().
-         */
+
+        //! Get owfnPlace from index i. Indices start at 0. Get the total number
+        //! of owfnPlaces from getPlaceCount().
+
         owfnPlace* getPlace(Places_t::size_type i) const;
-        
-        /**
-            * Returns the number of transitions this oWFN has.
-         */
+
+        //! Returns the number of transitions this oWFN has.
         Transitions_t::size_type getTransitionCount() const;
-        
-        /**
-         * Return transition with index i of this oWFN. Indices start at 0.
-         * Get the total number of transitions by getTransitionCount().
-         */
+
+        //! Return transition with index i of this oWFN. Indices start at 0.
+        //! Get the total number of transitions by getTransitionCount().
         owfnTransition* getTransition(Transitions_t::size_type i) const;
-        
+
         unsigned int getPlaceHashValue();
-        
-        /** returns the number of input places of the net. */
+
+        //! returns the number of input places of the net.
         Places_t::size_type getInputPlaceCount() const;
-        
-        /**
-         * Get an input owfnPlace from index i. Indices start at 0. Get the
-         * total number of input owfnPlaces from getInputPlaceCount().
-         */
+
+        //! Get an input owfnPlace from index i. Indices start at 0. Get the
+        //! total number of input owfnPlaces from getInputPlaceCount().
         owfnPlace* getInputPlace(Places_t::size_type i) const;
-        
-        /** returns the number of output places of the net. */
+
+        //! returns the number of output places of the net.
         Places_t::size_type getOutputPlaceCount() const;
-        
-        /**
-         * Get an output owfnPlace from index i. Indices start at 0. Get the
-         * total number of output owfnPlaces from getOutputPlaceCount().
-         */
+
+        //! Get an output owfnPlace from index i. Indices start at 0. Get the
+        //! total number of output owfnPlaces from getOutputPlaceCount().
         owfnPlace* getOutputPlace(Places_t::size_type i) const;
-        
+
         unsigned int getCardFireList();
-        
+
         binDecision ** binHashTable;
-        
+
         unsigned int * CurrentMarking;
         unsigned int * FinalMarking;
         formula * FinalCondition;
         State * currentState;
-        
+
         unsigned int transNrEnabled;			//!< number of really enabled transitions
         unsigned int transNrQuasiEnabled;		//!< number of quasi enabled transitions
         unsigned int placeHashValue;	
         long int BitVectorSize;
-        
+
         owfnTransition * startOfQuasiEnabledList;	//!< start of list of quasi enabled transitions
         owfnTransition * startOfEnabledList;		//!< start of list of real enabled transitions
-        
+
         // **** Definitions for Stubborn set calculations
 #ifdef STUBBORN
         owfnTransition * StartOfStubbornList;		// anchor to linked list of ...
@@ -169,18 +161,18 @@ class oWFN {
         unsigned int NrStubborn;			// # of activated (!) elements in stubborn set
         owfnTransition * TarjanStack;                       // Stubborn Set Calculation involves ...
         owfnTransition * CallStack;                         // ... SCC investigation on a graph of tr.
-        
+
         owfnTransition ** stubbornfirelistdeadlocks();  	// returns transitions to be fired for
-                                                            // reduced state space that preserves deadlocks
+
         owfnTransition ** stubbornfirelistmessage(owfnPlace *);
         owfnTransition ** stubbornfirelistmessage(messageMultiSet);
         // returns transitions to be fired for
         // reduced state space for message (or messages)
         // successors
 #endif
-        
+
         void initialize();						// initializes the net
-        
+
         /**
          * Adds an owfnTransition to this oWFN.
          * @retval true Method succeeded.

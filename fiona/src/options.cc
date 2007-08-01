@@ -48,11 +48,10 @@
 using namespace std;
 
 // some file names and pointers
-char * netfile;
 std::list<char*> netfiles;
 OGFromFile::ogfiles_t ogfiles;
+
 std::string ogfileToMatch;
-std::string ogfileToParse;
 std::string outfilePrefix;
 
 int events_manual;

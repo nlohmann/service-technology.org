@@ -58,7 +58,6 @@ bool compare(const owfnPlace* lhs, const owfnPlace* rhs){
 oWFN::oWFN() : arcCnt(0),
                CurrentCardFireList(0),
                CurrentCardQuasiFireList(0),
-               filename(NULL),
                tempBinDecision(NULL),
                FinalCondition(NULL),
                currentState(0),
@@ -69,6 +68,7 @@ oWFN::oWFN() : arcCnt(0),
                startOfQuasiEnabledList(NULL),
                startOfEnabledList(NULL) {
     
+    filename = "";
     unsigned int i;
     NonEmptyHash = 0;
     

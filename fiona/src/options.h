@@ -87,13 +87,9 @@ typedef enum
 extern std::map<possibleOptions,    bool> options;
 extern std::map<possibleParameters, bool> parameters;
 
-extern char * netfile;
-
 extern OGFromFile::ogfiles_t ogfiles;
 
 extern std::string ogfileToMatch;
-extern std::string ogfileToParse;
-
 extern std::string outfilePrefix;
 
 extern unsigned int messages_manual;

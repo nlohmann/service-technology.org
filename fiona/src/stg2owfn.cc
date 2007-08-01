@@ -4,6 +4,8 @@
 #include <set>
 #include <string>
 
+//#include "owfn.h"
+#include "communicationGraph.h"
 #include "pnapi/pnapi.h"
 
 
@@ -39,11 +41,11 @@ PetriNet STG2oWFN_init()
     
     // create a Petri Net object
     PetriNet STGPN = PetriNet();
-    
+
     // create places
     for (set<string>::iterator p = places.begin(); p != places.end(); p++)
         STGPN.newPlace(*p);
-    
+
     //Place *finalPlace = STGPN.newPlace("final");
     //finalPlace->isFinal = true;
     
@@ -107,14 +109,16 @@ PetriNet STG2oWFN_init()
 
 
 
-void STG2oWFN_main()
-{
-    extern char *netfile; 
-    
+void STG2oWFN_main() {
+
+//    extern char *netfile; 
+    string netfile = PN->filename;
+
     PetriNet STGPN = STG2oWFN_init();
     std::cerr << STGPN.information() << endl;
 
-    string filename = string(netfile).substr(0, string(netfile).length()-5) + "-partner.owfn";
+//    string filename = string(netfile).substr(0, string(netfile).length()-5) + "-partner.owfn";
+    string filename = netfile.substr(0, string(netfile).length()-5) + "-partner.owfn";
     cerr << "writing partner oWFN to file `" << filename << "'" << endl;    
     ofstream *file = new ofstream(filename.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
 

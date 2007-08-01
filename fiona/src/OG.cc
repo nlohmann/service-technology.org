@@ -68,14 +68,23 @@ OG::~OG() {
 
 
 void OG::buildGraph() {
-    assert(getRoot() != NULL);
+
+    // creates the root node and calculates its reachability graph (set of states)
+    calculateRootNode(); 
+
+    if (options[O_OTF]){
+        bdd->convertRootNode(getRoot());
+    }
+
+    // start building up the rest of the graph
+    // second parameter means: if finished, 100% of the graph is constructed 
     buildGraph(getRoot(), 1);
     correctNodeColorsAndShortenAnnotations();
     computeGraphStatistics();
 }
 
 
-void OG::buildGraph(GraphNode * currentNode, double progress_plus) {
+void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
     // currentNode is the root of the currently considered subgraph
     // at this point, the states inside currentNode are already computed!
@@ -660,11 +669,12 @@ void OG::convertToBddFull() {
 
 
 void OG::printOGtoFile() const {
-    string ogFilename = netfile;
+
+    string ogFilename = "";
     if (options[O_OUTFILEPREFIX]) {
         ogFilename = outfilePrefix;
     } else {
-        ogFilename = netfile;
+        ogFilename = string(PN->filename);
     }
 
     if (!options[O_CALC_ALL_STATES]) {

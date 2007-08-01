@@ -62,6 +62,7 @@ typedef enum
     O_SIMULATES,
     O_EQUALS,
     O_OUTFILEPREFIX,
+    O_NOOUTPUTFILES,  // produce no output files
     O_SYNTHESIZE_PARTNER_OWFN,       //!< compute an oWFN from the IG/OG
     O_COUNT_SERVICES,
     O_CHECK_ACYCLIC

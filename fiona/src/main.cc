@@ -304,16 +304,18 @@ void computeOG(oWFN* PN) {
     trace(TRACE_0, "\n");
 
     // generate output files
-    graph->printGraphToDot();      // .out
-    graph->printOGtoFile();        // .og
+    if (!options[O_NOOUTPUTFILES]) {
+        graph->printGraphToDot();      // .out
+        graph->printOGtoFile();        // .og
 
-    if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
-        graph->printGraphToSTG();	    
-    }
+        if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
+            graph->printGraphToSTG();	    
+        }
 
-    if (options[O_OTF]) {
-        //graph->bdd->printGraphToDot();
-        graph->bdd->save("OTF");
+        if (options[O_OTF]) {
+            //graph->bdd->printGraphToDot();
+            graph->bdd->save("OTF");
+        }
     }
 
     if (options[O_BDD]) {
@@ -322,9 +324,11 @@ void computeOG(oWFN* PN) {
         graph->convertToBdd();      
         seconds2 = time (NULL);
         cout << difftime(seconds2,seconds) << " s consumed for building and reordering the BDDs" << endl;
-         
+
         //graph->bdd->printGraphToDot();
-        graph->bdd->save();
+        if (!options[O_NOOUTPUTFILES]) {
+            graph->bdd->save();
+        }
     }
 
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
@@ -376,11 +380,13 @@ void computeIG(oWFN* PN) {
     graph->printGraphStatistics();
     trace(TRACE_0, "\n");
 
-    // generate output files
-    graph->printGraphToDot();      // .out
+    if (!options[O_NOOUTPUTFILES]) {
+        // generate output files
+        graph->printGraphToDot();      // .out
 
-    if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
-        graph->printGraphToSTG();	    
+        if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
+            graph->printGraphToSTG();	    
+        }
     }
 
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
@@ -411,13 +417,15 @@ void computeProductOG(OGFromFile::ogs_t OGsFromFiles) {
         outfilePrefix = OGFromFile::getProductOGFilePrefix(ogfiles);
     }
 
-    trace("Saving product OG to:\n");
-    trace(OGFromFile::addOGFileSuffix(outfilePrefix)); trace("\n");
-    productOG->printOGFile(outfilePrefix);
-    trace("\n");
+    if (!options[O_NOOUTPUTFILES]) {
+        trace("Saving product OG to:\n");
+        trace(OGFromFile::addOGFileSuffix(outfilePrefix)); trace("\n");
+        productOG->printOGFile(outfilePrefix);
+        trace("\n");
 
-    productOG->printOGFile(outfilePrefix);
-    productOG->printDotFile(outfilePrefix);
+        productOG->printOGFile(outfilePrefix);
+        productOG->printDotFile(outfilePrefix);
+    }
 
     delete productOG;
 

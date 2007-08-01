@@ -84,10 +84,11 @@ static struct option longopts[] = {
   { "BDD",             required_argument, NULL, 'b' },
   { "OnTheFly",        required_argument, NULL, 'B' },
   { "output",          required_argument, NULL, 'o' },
+  { "no-output",       no_argument,       NULL, 'Q' },
   { NULL,              0,                 NULL, 0   }
 };
 
-const char * par_string = "hvd:t:s:Rrm:e:b:B:o:";
+const char * par_string = "hvd:t:s:Rrm:e:b:B:o:Q";
 
 
 // --------------------- functions for command line evaluation ------------------------
@@ -177,6 +178,7 @@ void print_help() {
   trace("                                   argument <reordering> specifies reodering\n");
   trace("                                   method (see option -b)\n");
   trace(" -o | --output=<filename prefix> . prefix of the output files\n");
+  trace(" -Q | --no-output ................ runs quiet, i.e., produces no output files\n");
   trace("\n");
   trace("\n");
   trace("For more information see:\n");
@@ -242,6 +244,7 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_SIMULATES] = false;
 	options[O_EQUALS] = false;
     options[O_OUTFILEPREFIX] = false;
+    options[O_NOOUTPUTFILES] = false;
     options[O_COUNT_SERVICES] = false;
     options[O_CHECK_ACYCLIC] = false;
 
@@ -440,6 +443,9 @@ void parse_command_line(int argc, char* argv[]) {
                          << endl;
                     exit(1);
                 }
+                break;
+            case 'Q':
+                options[O_NOOUTPUTFILES] = true;
                 break;
             case '?':
                 cerr << "Error:\toption error" << endl

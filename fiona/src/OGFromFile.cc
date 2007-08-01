@@ -492,29 +492,41 @@ bool OGFromFile::simulatesRecursive (OGFromFileNode *myNode,
 bool OGFromFile::acyclic() {
     trace(TRACE_5, "Test if the given OG is acyclic: start\n" );
 
-    map<OGFromFileNode*, bool> visitedNodes; 
+    // Define a set vor every Node, that will contain all transitive parent nodes 
+    map<OGFromFileNode*, set<OGFromFileNode*> > parentNodes; 
+    
+    // Define a queue for all nodes that still need to be tested and initialize it
     queue<OGFromFileNode*> testNodes;
     testNodes.push(root);
     OGFromFileNode* testNode;
 
+    // While there are still nodes in the queue
     while(!testNodes.empty()) {
         
         testNode = testNodes.front();
         testNodes.pop();
         
-        if ( visitedNodes[testNode] == true ) {
-            return false;
-        } else {
-            visitedNodes[testNode] = true;
-            for (OGFromFileNode::transitions_t::const_iterator trans_iter = testNode->transitions.begin();
-                 trans_iter != testNode->transitions.end(); ++trans_iter) {
-                if (testNode != (*trans_iter)->getDst() && (*trans_iter)->getDst()->getColor() == BLUE) {
+        // A node counts as a parent node to it self for the purpose of cycles
+        parentNodes[testNode].insert(testNode);
+        
+        // Iterate all transitions of that node
+        for (OGFromFileNode::transitions_t::const_iterator trans_iter = testNode->transitions.begin();
+            trans_iter != testNode->transitions.end(); ++trans_iter) {
+            
+            // If the Node is the source of that transition and if the Destination is a valid node
+            if (testNode == (*trans_iter)->getSrc() && (*trans_iter)->getDst()->getColor() == BLUE) {
+                
+                // Return false if an outgoing transition points at a transitive parent node,
+                // else add the destination to the queue and update its transitive parent nodes
+                if ( parentNodes[testNode].find((*trans_iter)->getDst()) != parentNodes[testNode].end()) {
+                    return false;
+                } else {
                     testNodes.push((*trans_iter)->getDst());
+                    parentNodes[(*trans_iter)->getDst()].insert(parentNodes[testNode].begin(),parentNodes[testNode].end());
                 }
             }
         }
     }
-    
 	return true;
 }
 

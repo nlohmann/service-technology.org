@@ -23,56 +23,19 @@
 
 result=1
 
-testdir=.
 DIR=$testdir/philosophers
 FIONA=fiona
 
-echo
-echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG $DIR/phcontrol3.unf.owfn -e1 -m1
-echo
-$FIONA -a -t OG $DIR/phcontrol3.unf.owfn -e1 -m1
+for i in 3 4 5 6 7 8 9 10; do
+    cmd="$FIONA -a -t OG $DIR/phcontrol$i.unf.owfn -e1 -m1"
+    if [ "$quiet" != "no" ]; then
+        cmd="$cmd -Q"
+    fi
 
-echo
-echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG $DIR/phcontrol4.unf.owfn -e1 -m1
-echo
-$FIONA -a -t OG $DIR/phcontrol4.unf.owfn -e1 -m1
-
-echo
-echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG $DIR/phcontrol5.unf.owfn -e1 -m1
-echo
-$FIONA -a -t OG $DIR/phcontrol5.unf.owfn -e1 -m1
-
-echo
-echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG $DIR/phcontrol6.unf.owfn -e1 -m1
-echo
-$FIONA -a -t OG $DIR/phcontrol6.unf.owfn -e1 -m1
-
-echo
-echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG $DIR/phcontrol7.unf.owfn -e1 -m1
-echo
-$FIONA -a -t OG $DIR/phcontrol7.unf.owfn -e1 -m1
-
-echo
-echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG $DIR/phcontrol8.unf.owfn -e1 -m1
-echo
-$FIONA -a -t OG $DIR/phcontrol8.unf.owfn -e1 -m1
-
-echo
-echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG $DIR/phcontrol9.unf.owfn -e1 -m1
-echo
-$FIONA -a -t OG $DIR/phcontrol9.unf.owfn -e1 -m1
-
-echo
-echo ---------------------------------------------------------------------
-echo running: $FIONA -t OG $DIR/phcontrol10.unf.owfn -e1 -m1
-echo
-$FIONA -a -t OG $DIR/phcontrol10.unf.owfn -e1 -m1
+    echo
+    echo ---------------------------------------------------------------------
+    echo running: $cmd
+    echo
+done
 
 exit $result

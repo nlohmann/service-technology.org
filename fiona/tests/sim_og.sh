@@ -26,7 +26,6 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-testdir=.
 DIR=$testdir/sim_og
 FIONA=fiona
 
@@ -58,7 +57,7 @@ do
     resultSIM=$?
     if [ $resultSIM -ne 0 ]
     then
-        let "result*=1"
+        let "result += 1"
         echo ... Simulation failed, although it should not.
     fi
 
@@ -82,7 +81,7 @@ do
     resultSIM=$?
     if [ $resultSIM -ne 0 ]
     then
-        let "result*=1"
+        let "result += 1"
         echo ... Simulation succeded, although it should not.
     fi
 

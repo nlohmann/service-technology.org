@@ -28,7 +28,7 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-testdir=. DIR=$testdir/extrema FIONA=fiona
+DIR=$testdir/extrema FIONA=fiona
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
 rm -f $DIR/*.out
@@ -79,6 +79,10 @@ result=0
 for ((i=0; i<${#owfns[*]}; ++i)) do
     owfn="${owfns[$i]}"
     cmd="$FIONA $owfn -t OG"
+
+    if [ "$quiet" != "no" ]; then
+        cmd="$cmd -Q"
+    fi
 
     if [ "$memcheck" = "yes" ]; then
         memchecklog="$owfn.OG.memcheck.log"

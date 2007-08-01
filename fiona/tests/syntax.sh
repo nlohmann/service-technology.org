@@ -28,7 +28,6 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-testdir=.
 DIR=$testdir/syntax
 FIONA=fiona
 
@@ -44,6 +43,10 @@ result=0
 
 owfn="$DIR/max_occurrence.owfn"
 cmd="$FIONA $owfn -t OG"
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"

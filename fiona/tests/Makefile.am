@@ -24,9 +24,11 @@ TESTS = syntax.sh extrema.sh messages.sh cyclic.sh \
 		sequences.sh samples.sh bddtest.sh
 
 
-TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=".:../src:$(srcdir):$$PATH"
+TESTS_ENVIRONMENT = testdir=$(srcdir) MKDIR_P="$(MKDIR_P)" \
+    builddir=$(builddir) PATH=".:../src:$(srcdir):$$PATH"
 
 MEMCHECK_ENVIRONMENT = $(TESTS_ENVIRONMENT) memcheck=yes
+CHECKLOUD_ENVIRONMENT = $(TESTS_ENVIRONMENT) quiet=no
 
 EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              cyclic/*.owfn \
@@ -38,14 +40,22 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              syntax/*.owfn \
              bdd_ref/*.owfn bdd_ref/*.cudd \
              philosophers/*.owfn \
-             sim_og/*.owfn \
+             sim_og/*.owfn sim_og/*.og \
              philosophers/*.owfn.png
+
+# Global check-loud target. Runs all tests. Output files are generated.
+check-loud:
+	(cd .. && $(MAKE) $(AM_MAKEFLAGS) all)
+	$(MAKE) $(AM_MAKEFLAGS) $(CHECKLOUD_ENVIRONMENT) check
 
 
 # Generate check targets from $(TESTS). That is done by removing '.sh' from
 # every word in $(TESTS) and precede them by 'check-'. So one of many check
 # targets would be check-samples if samples.sh was in $(TESTS).
 SINGLE_CHECK_TARGETS = $(TESTS:%.sh=check-%)
+
+# The same for loud (unquiet, output files generating)
+SINGLE_CHECKLOUD_TARGETS = $(TESTS:%.sh=check-%-loud)
 
 # All single check targets. For example check-samples.
 # The script belonging to the current check target is inferred from the
@@ -54,6 +64,10 @@ SINGLE_CHECK_TARGETS = $(TESTS:%.sh=check-%)
 $(SINGLE_CHECK_TARGETS):
 	(cd .. && $(MAKE) $(AM_MAKEFLAGS) all)
 	-$(TESTS_ENVIRONMENT) ./$(@:check-%=%.sh)
+
+$(SINGLE_CHECKLOUD_TARGETS):
+	(cd .. && $(MAKE) $(AM_MAKEFLAGS) all)
+	-$(CHECKLOUD_ENVIRONMENT) ./$(@:check-%-loud=%.sh)
 
 # Global memcheck target. Runs all tests under valgrind.
 memcheck:

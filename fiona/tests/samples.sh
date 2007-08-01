@@ -28,7 +28,6 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-testdir=.
 DIR=$testdir/samples
 FIONA=fiona
 
@@ -51,6 +50,11 @@ mycoffeestoredstates_soll=32
 
 owfn="$DIR/myCoffee.owfn"
 cmd="$FIONA $owfn -t OG"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -90,6 +94,11 @@ mycoffeestoredstates_soll=12
 
 owfn="$DIR/myCoffee.owfn"
 cmd="$FIONA $owfn -t IG"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -128,6 +137,11 @@ mycoffeestoredstates_soll=12
 
 owfn="$DIR/myCoffee.owfn"
 cmd="$FIONA $owfn -r -t IG"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.r.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -169,6 +183,11 @@ fi
 #
 #owfn="$DIR/myCoffee.owfn"
 #cmd="$FIONA $owfn -r -R -t IG"
+#
+#if [ "$quiet" != "no" ]; then
+#    cmd="$cmd -Q"
+#fi
+#
 #if [ "$memcheck" = "yes" ]; then
 #    memchecklog="$owfn.rR.IG.memcheck.log"
 #    do_memcheck "$cmd" "$memchecklog"
@@ -213,6 +232,11 @@ fi
 #
 #owfn="$DIR/myCoffee.owfn"
 #cmd="$FIONA $owfn -R -t IG"
+#
+#if [ "$quiet" != "no" ]; then
+#    cmd="$cmd -Q"
+#fi
+#
 #if [ "$memcheck" = "yes" ]; then
 #    memchecklog="$owfn.R.IG.memcheck.log"
 #    do_memcheck "$cmd" "$memchecklog"
@@ -252,6 +276,11 @@ keescoffee1storedstates_soll=100
 
 owfn="$DIR/keesCoffee_condition.owfn"
 cmd="$FIONA $owfn -t OG -e 1"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e1.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -288,6 +317,11 @@ keescoffee2storedstates_soll=212
 
 owfn="$DIR/keesCoffee_condition.owfn"
 cmd="$FIONA $owfn -t OG -e 3 -m 1"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e2.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -326,6 +360,11 @@ shop3storedstates_soll=4530
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 cmd="$FIONA $owfn -t OG"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -366,6 +405,11 @@ fi
 #
 #owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 #cmd="$FIONA $owfn -R -t OG"
+#
+#if [ "$quiet" != "no" ]; then
+#    cmd="$cmd -Q"
+#fi
+#
 #if [ "$memcheck" = "yes" ]; then
 #    memchecklog="$owfn.R.OG.memcheck.log"
 #    do_memcheck "$cmd" "$memchecklog"
@@ -404,6 +448,11 @@ shop3storedstates_soll=728
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 cmd="$FIONA $owfn -t IG"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -444,6 +493,11 @@ fi
 #
 #owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 #cmd="$FIONA $owfn -R -t IG"
+#
+#if [ "$quiet" != "no" ]; then
+#    cmd="$cmd -Q"
+#fi
+#
 #if [ "$memcheck" = "yes" ]; then
 #    memchecklog="$owfn.R.IG.memcheck.log"
 #    do_memcheck "$cmd" "$memchecklog"
@@ -482,6 +536,11 @@ shop3storedstates_soll=351 #329
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 cmd="$FIONA $owfn -t IG -r"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.r.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -522,6 +581,11 @@ fi
 #
 #owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 #cmd="$FIONA $owfn -t IG -r -R"
+#
+#if [ "$quiet" != "no" ]; then
+#    cmd="$cmd -Q"
+#fi
+#
 #if [ "$memcheck" = "yes" ]; then
 #    memchecklog="$owfn.rR.IG.memcheck.log"
 #    do_memcheck "$cmd" "$memchecklog"
@@ -560,6 +624,11 @@ shop6storedstates_soll=6932
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 cmd="$FIONA $owfn -t OG"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -596,8 +665,15 @@ fi
 #shop6blueedges_soll=7
 #shop6storedstates_soll=761
 
-#echo running $FIONA $DIR/06-03-23_BPM06_shop_sect_6.owfn -a -t OG
-#OUTPUT=`$FIONA $DIR/06-03-23_BPM06_shop_sect_6.owfn -a -t OG  2>&1`
+#owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
+#cmd="$FIONA $owfn -a -t OG"
+
+#if [ "$quiet" != "no" ]; then
+#    cmd="$cmd -Q"
+#fi
+
+#echo running $cmd
+#OUTPUT=`$cmd 2>&1`
 
 #echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 #shop6control=$?
@@ -628,6 +704,11 @@ shop6storedstates_soll=2491
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 cmd="$FIONA $owfn -t IG"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -668,6 +749,11 @@ fi
 #
 #owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 #cmd="$FIONA $owfn -R -t IG"
+#
+#if [ "$quiet" != "no" ]; then
+#    cmd="$cmd -Q"
+#fi
+#
 #if [ "$memcheck" = "yes" ]; then
 #    memchecklog="$owfn.R.IG.memcheck.log"
 #    do_memcheck "$cmd" "$memchecklog"
@@ -708,6 +794,11 @@ fi
 #
 #owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 #cmd="$FIONA $owfn -t IG -r -R"
+#
+#if [ "$quiet" != "no" ]; then
+#    cmd="$cmd -Q"
+#fi
+#
 #if [ "$memcheck" = "yes" ]; then
 #    memchecklog="$owfn.rR.IG.memcheck.log"
 #    do_memcheck "$cmd" "$memchecklog"
@@ -748,6 +839,11 @@ fi
 #
 #owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 #cmd="$FIONA $owfn -t IG -r -R"
+#
+#if [ "$quiet" != "no" ]; then
+#    cmd="$cmd -Q"
+#fi
+#
 #if [ "$memcheck" = "yes" ]; then
 #    memchecklog="$owfn.rR.IG.memcheck.log"
 #    do_memcheck "$cmd" "$memchecklog"

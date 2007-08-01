@@ -28,7 +28,6 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-testdir=.
 DIR=$testdir/matching
 FIONA=fiona
 

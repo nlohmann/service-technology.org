@@ -28,8 +28,8 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-testdir=.
-DIR=$testdir/sequence_suite
+SUBDIR=sequence_suite
+DIR=$testdir/$SUBDIR
 FIONA=fiona
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
@@ -43,6 +43,9 @@ rm -f $DIR/*.log
 
 owfn="$DIR/sequence5.owfn"
 cmd="$FIONA $owfn -b 4 -t OG"
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.b4.IG.memcheck.log"
@@ -55,14 +58,7 @@ else
 
     if [ $result5 -ne 0 ] ; then
         echo ... failed to build BDD
-    fi
-
-    if test \( $result5 -eq 0 \) -a \
-        \( -f $DIR/sequence5.owfn.OG.png -a -f $DIR/sequence5.owfn.OG.out \)
-    then
-      result=0
-    else
-      result=1
+        result=1
     fi
 fi
 
@@ -73,6 +69,9 @@ nodes_ann=16
 
 owfn="$DIR/sequence3.owfn"
 cmd="$FIONA $owfn -b 4 -t OG"
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.b4.IG.memcheck.log"
@@ -102,6 +101,18 @@ fi
 
 owfn="$DIR/sequence3.owfn"
 owfn_reference="$testdir/bdd_ref/sequence3_reference.owfn"
+
+# for make distcheck: make copy of $owfn and work on it
+if [ ! -e $builddir/$SUBDIR ]; then
+    $MKDIR_P $builddir/$SUBDIR
+fi
+
+if [ "$srcdir" != "$builddir" ]; then
+    cp $owfn $builddir/$SUBDIR
+fi
+
+owfn="$builddir/$SUBDIR/sequence3.owfn"
+
 cmd="$FIONA $owfn -b 4 -t OG"
 $cmd 2>/dev/null 1>/dev/null
 
@@ -132,6 +143,9 @@ nodes_ann=361
 
 owfn="$testdir/philosophers/phcontrol4.unf.owfn"
 cmd="$FIONA $owfn -b 4 -t OG"
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.b4.IG.memcheck.log"
@@ -154,13 +168,24 @@ else
         echo ... failed to build BDD_ANN correctly
         result=1
     fi
-
 fi
 
 ############################################################################
 
 owfn="$testdir/philosophers/phcontrol4.unf.owfn"
 owfn_reference="$testdir/bdd_ref/phcontrol4.unf_reference.owfn"
+
+# for make distcheck: make copy of $owfn and work on it
+SUBDIR=philosophers
+if [ ! -e $builddir/$SUBDIR ]; then
+    $MKDIR_P $builddir/$SUBDIR
+fi
+
+if [ "$srcdir" != "$builddir" ]; then
+    cp $owfn $builddir/$SUBDIR
+fi
+
+owfn="$builddir/$SUBDIR/phcontrol4.unf.owfn"
 cmd="$FIONA $owfn -b 4 -t OG"
 $cmd 2>/dev/null 1>/dev/null
 

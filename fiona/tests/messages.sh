@@ -28,7 +28,6 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-testdir=.
 DIR=$testdir/messages
 FIONA=fiona
 
@@ -44,6 +43,11 @@ result=0
 
 owfn="$DIR/messageboundtest1.owfn"
 cmd="$FIONA $owfn -t OG -e10 -m4"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e10.m4.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -70,6 +74,11 @@ mb15blueedges_soll=60
 
 owfn="$DIR/messageboundtest1.owfn"
 cmd="$FIONA $owfn -t OG -e10 -m5"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e10.m5.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -102,6 +111,11 @@ mb16blueedges_soll=78
 
 owfn="$DIR/messageboundtest1.owfn"
 cmd="$FIONA $owfn -t OG -e10 -m6"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e10.m6.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -134,6 +148,11 @@ mb21blueedges_soll=2
 
 owfn="$DIR/messageboundtest2.owfn"
 cmd="$FIONA $owfn -t OG -e10 -m1"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e10.m1.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -166,6 +185,11 @@ mb22blueedges_soll=5
 
 owfn="$DIR/messageboundtest2.owfn"
 cmd="$FIONA $owfn -t OG -e10 -m2"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e10.m2.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"

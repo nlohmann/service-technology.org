@@ -28,7 +28,6 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-testdir=.
 DIR=$testdir/cyclic
 FIONA=fiona
 
@@ -50,6 +49,11 @@ zyklusRstoredstates_soll=0
 
 owfn="$DIR/zyklusR.owfn"
 cmd="$FIONA -t OG $owfn -e5 -m5"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e5.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -79,6 +83,11 @@ fi
 
 owfn="$DIR/zyklusP.owfn"
 cmd="$FIONA -t OG $owfn -e10 -m5"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e10.m5.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
@@ -106,6 +115,11 @@ zyklusPcommitstoredstates_soll=11
 
 owfn="$DIR/zyklusPmitCommit.owfn"
 cmd="$FIONA -t OG $owfn -e2 -m1"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e2.m1.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"

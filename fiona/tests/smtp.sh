@@ -23,28 +23,21 @@
 
 result=1
 
-testdir=.
 DIR=$testdir/philosophers
 FIONA=fiona
 
-echo
-echo ---------------------------------------------------------------------
-echo running: $FIONA -a -t OG $DIR/smtp3.owfn
-echo
-$FIONA -t OG $DIR/smtp3.owfn
+for i in 3 4 5; do
+    cmd="$FIONA -a -t OG $DIR/smtp$i.owfn"
 
-echo
-echo ---------------------------------------------------------------------
-echo running: $FIONA -a -t OG $DIR/smtp4.owfn
-echo
-$FIONA -t OG $DIR/smtp4.owfn
+    if [ "$quiet" != "no" ]; then
+        cmd="$cmd -Q"
+    fi
 
-echo
-echo ---------------------------------------------------------------------
-echo running: $FIONA -a -t OG $DIR/smtp5.owfn
-echo
-$FIONA -t OG $DIR/smtp5.owfn
-
-
+    echo
+    echo ---------------------------------------------------------------------
+    echo running: $cmd
+    echo
+    $cmd
+done
 
 exit $result

@@ -28,7 +28,6 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-testdir=.
 DIR=$testdir/sequence_suite
 FIONA=fiona
 
@@ -49,6 +48,10 @@ do
 
     owfn="$DIR/sequence${i}.owfn"
     cmd="$FIONA $owfn -t IG"
+
+    if [ "$quiet" != "no" ]; then
+        cmd="$cmd -Q"
+    fi
 
     if [ "$memcheck" = "yes" ]; then
         memchecklog="$owfn.IG.memcheck.log"
@@ -81,6 +84,10 @@ do
     #
     #cmd="$FIONA $owfn -t IG -R"
     #
+    #if [ "$quiet" != "no" ]; then
+    #    cmd="$cmd -Q"
+    #fi
+    #
     #if [ "$memcheck" = "yes" ]; then
     #    memchecklog="$owfn.R.IG.memcheck.log"
     #    do_memcheck "$cmd" "$memchecklog"
@@ -111,6 +118,10 @@ do
 
     cmd="$FIONA $owfn -t OG"
 
+    if [ "$quiet" != "no" ]; then
+        cmd="$cmd -Q"
+    fi
+
     if [ "$memcheck" = "yes" ]; then
         memchecklog="$owfn.OG.memcheck.log"
         do_memcheck "$cmd" "$memchecklog"
@@ -139,6 +150,10 @@ do
 
 
     #cmd="$FIONA $owfn -t OG -R"
+    #
+    #if [ "$quiet" != "no" ]; then
+    #    cmd="$cmd -Q"
+    #fi
     #
     #if [ "$memcheck" = "yes" ]; then
     #    memchecklog="$owfn.R.OG.memcheck.log"

@@ -55,25 +55,6 @@
 
 using namespace std;
 
-// Converts given integer into a string.
-//
-// This function exists additionally to intToString() in debug.cc to ease
-// linking of the libraries in the cudd package which require newlogger.cc.
-// Using intToString() from debug.cc would pull in too much dependencies.
-std::string toString(int x)
-{
-    //C++-like: (fehlerhaft: fuehrt zu trailing space)
-    //std::stringstream os;
-    //os << x << std::ends;
-    //std::string s(os.str());
-    //return s;
-
-    // C-like:
-    char s[40];
-    sprintf(s, "%d", x);
-    return string(s);
-}
-
 LogInfo::LogInfo() :
     allocCallCount(0), deallocCallCount(0), allocated_mem(0),
     peak_allocated_mem(0)
@@ -433,7 +414,7 @@ void* mynew(size_t size, const std::string &file, int line,
 {
     std::string filepos(file);
     filepos += ':';
-    filepos += toString(line);
+    filepos += intToString(line);
     void* ptr = mynew_without_log(size);
     NewLogger::logAllocation(type, filepos, size, ptr); 
     return ptr;
@@ -460,7 +441,7 @@ void* mycalloc(size_t n, size_t s, const std::string &file, int line)
 {
     std::string filepos(file);
     filepos += ':';
-    filepos += toString(line);
+    filepos += intToString(line);
     void* ptr = calloc(n, s);
     NewLogger::logAllocation("", filepos, n*s, ptr); 
     return ptr;

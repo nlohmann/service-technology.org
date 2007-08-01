@@ -44,9 +44,6 @@
 #include <map>
 //#include <strstream>
 
-// Converts int to string.
-std::string toString(int x);
-
 // prototypes for global operators new
 void* operator new   (size_t size, const std::string &file, int line);
 void* operator new[] (size_t size, const std::string &file, int line);

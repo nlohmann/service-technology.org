@@ -1007,7 +1007,7 @@ void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, Grap
 void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, GraphNode * node) {
 	
 #ifdef DEBUG
-	cout << "interactionGraph::calculateSuccStatesInputReduced(char * input, GraphNode * node): start" << endl;
+	cout << "interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, GraphNode * node) : start" << endl;
 #endif
 
 	StateSet::iterator iter;		

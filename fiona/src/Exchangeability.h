@@ -54,7 +54,7 @@ using namespace std;
 
 class Exchangeability {
     public:
-        Exchangeability(char* filename, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
+        Exchangeability(string filename, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
         ~Exchangeability();
 
         bool check(Exchangeability* bdd);
@@ -79,7 +79,7 @@ class Exchangeability {
 		int nbrVarAnn; //size of array names
 		list<char*> labelList;
 		
-		void loadBdd(char* filename);
+		void loadBdd(string filename);
 		void loadHeader(FILE* fp, char*** names, int* nVars, int** permids);
 		void loadOptimalOrder(DdManager* mgr, int size, int* permids);
 		DdNode* loadDiagram(FILE* fp, DdManager* mgr);

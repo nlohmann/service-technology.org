@@ -48,7 +48,7 @@
 using namespace std;
 
 // some file names and pointers
-std::list<char*> netfiles;
+std::list<string> netfiles;
 OGFromFile::ogfiles_t ogfiles;
 
 std::string ogfileToMatch;

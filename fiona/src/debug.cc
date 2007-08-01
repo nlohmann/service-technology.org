@@ -183,7 +183,6 @@ int owfn_yyerror(const char* msg) {
     /* defined by flex */
     extern int owfn_yylineno;      ///< line number of current token
     extern char *owfn_yytext;      ///< text of the current token
-//    extern char * netfile;
 
     return yyerror(msg, owfn_yylineno, owfn_yytext, owfnfileToParse.c_str());
 }

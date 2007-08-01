@@ -77,8 +77,7 @@ extern int og_yylex_destroy();
 #endif
 
 extern unsigned int State::state_count;
-// extern char * netfile;
-extern list<char*> netfiles;
+extern list<std::string> netfiles;
 extern OGFromFile* OGToParse;
 
 
@@ -248,7 +247,7 @@ void reportOptionValues() {
 
 // check the exchangeability of two nets (using BDDs)
 void checkExchangeability() {
-    list<char*>::iterator netiter = netfiles.begin();
+    list<std::string>::iterator netiter = netfiles.begin();
     Exchangeability* og1 = new Exchangeability(*netiter);
     Exchangeability* og2 = new Exchangeability(*(++netiter));
     trace(TRACE_0, "The two operating guidelines are equal: ");
@@ -516,7 +515,7 @@ int main(int argc, char ** argv) {
 //		NewLogger::printall();
 //	}
 //	else{
-//		list<char*>::iterator netiter = netfiles.begin();
+//		list<std::string>::iterator netiter = netfiles.begin();
 //		Exchangeability* bdd = new Exchangeability(*netiter);
 //		bdd->reorder();
 //		trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
@@ -627,7 +626,7 @@ int main(int argc, char ** argv) {
         }
 
         // ---------------- processing every single net -------------------
-        for (list<char*>::iterator netiter = netfiles.begin();
+        for (list<std::string>::iterator netiter = netfiles.begin();
             netiter != netfiles.end(); ++netiter) {
 
             numberOfEvents = 0;
@@ -638,7 +637,7 @@ int main(int argc, char ** argv) {
             State::state_count = 0;          // number of states
             numberDeletedVertices = 0;
 
-            currentowfnfile = string(*netiter);
+            currentowfnfile = *netiter;
             assert(currentowfnfile != "");
 
             // prepare getting the net

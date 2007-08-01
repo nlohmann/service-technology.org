@@ -60,10 +60,10 @@ class GraphFormulaAssignment;
 class oWFN {
     // first public typedefs, then private members, then public methods
     public:
-        /** Type of the container holding all transitions of this oWFN. */
+        //! Type of the container holding all transitions of this oWFN.
         typedef std::vector<owfnTransition*> Transitions_t;
         
-        /** Type of the containers holding all places of this oWFN. */
+        //! Type of the containers holding all places of this oWFN.
         typedef std::vector<owfnPlace*> Places_t;
 
     private:
@@ -92,7 +92,6 @@ class oWFN {
         void RemoveGraph();
 
         string filename;
-//        char * filename;
 
         owfnTransition ** quasiFirelist();
 

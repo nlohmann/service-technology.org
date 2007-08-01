@@ -44,7 +44,7 @@ int Exchangeability::nbrBdd = 0;
 
 //! \fn Exchangeability::Exchangeability(char* filename, Cudd_ReorderingType heuristic)
 //! \brief constructor  
-Exchangeability::Exchangeability(char* filename, Cudd_ReorderingType heuristic) {
+Exchangeability::Exchangeability(string filename, Cudd_ReorderingType heuristic) {
 	trace(TRACE_5, "Exchangeability::Exchangeability(char* filename): begin\n");		   
     // Init cudd package when first Exchangeability object is created.
     if (nbrBdd == 0) {
@@ -110,30 +110,30 @@ Exchangeability::~Exchangeability(){
 
 //! \fn void Exchangeability::loadBdd(char* filename)
 //! \brief loads the BDD representation of the opereating guideline stored in filname
-void Exchangeability::loadBdd(char* filename){
-    trace(TRACE_5, "Exchangeability::loadBdds(char* filename): begin\n");		   
+void Exchangeability::loadBdd(std::string filename){
+    trace(TRACE_5, "Exchangeability::loadBdds(string filename): begin\n");		   
     cout << "loading BDD-representation of the operating guideline of " << filename << endl;
-    
-	//open cudd-files
-	char bufferMp[256]; 
-	char bufferAnn[256];
 
-	sprintf(bufferMp, "%s.OG.BDD_MP.cudd", filename);
-    sprintf(bufferAnn, "%s.OG.BDD_ANN.cudd", filename); 
-    
+	//open cudd-files
+	std::string bufferMp;  
+	std::string bufferAnn;
+
+    bufferMp = filename + ".OG.BDD_MP.cudd";
+    bufferAnn = filename + ".OG.BDD_ANN.cudd";
+
     FILE* fpMp;
-    fpMp = fopen(bufferMp, "r");
-    
+    fpMp = fopen(bufferMp.c_str(), "r");
+
     FILE* fpAnn;
-    fpAnn = fopen(bufferAnn, "r");
-    
+    fpAnn = fopen(bufferAnn.c_str(), "r");
+
     if (fpMp == NULL || fpAnn == NULL){
-    	sprintf(bufferMp, "%s.R.OG.BDD_MP.cudd", filename);
-    	sprintf(bufferAnn, "%s.R.OG.BDD_ANN.cudd", filename); 
-    	
-    	fpMp = fopen(bufferMp, "r");
-    	fpAnn = fopen(bufferAnn, "r");
-    	
+        bufferMp = filename + ".R.OG.BDD_MP.cudd";
+        bufferAnn = filename + ".R.OG.BDD_ANN.cudd";
+
+    	fpMp = fopen(bufferMp.c_str(), "r");
+    	fpAnn = fopen(bufferAnn.c_str(), "r");
+
     	if (fpMp == NULL || fpAnn == NULL){
     		cerr << "cannot open cudd-files of " << filename << "\n";
     		cerr << "\nTo check equivalence of two nets, the BDD representations of"
@@ -142,24 +142,24 @@ void Exchangeability::loadBdd(char* filename){
             exit(4);
     	}
 	}
-	
-	//load header of bddAnn
+
+    // load header of bddAnn
     int* permids = NULL;    //optimal variable ordering      
     loadHeader(fpAnn, &names, &nbrVarAnn, &permids);
     fseek(fpAnn, 0, SEEK_SET); //File-Pointer auf Anfang der Datei setzen, damit später BDD geladen werden kann;      
-    
+
     //load bddAnn
     if (nbrBdd == 0) {
     	loadOptimalOrder(mgrAnn, nbrVarAnn, permids);
     }
     bddAnn = loadDiagram(fpAnn, mgrAnn);
     fclose(fpAnn);
-    
+
     int nbrVarMp = 0;     //number of variables in bddMp
-    
+
     free(permids);
     permids = NULL;
-    
+
     //load header of bddMp
     loadHeader(fpMp, NULL, &nbrVarMp, &permids);
     fseek(fpMp, 0, SEEK_SET); //File-Pointer auf Anfang der Datei setzen, damit Bdd geladen werden kann;
@@ -170,8 +170,8 @@ void Exchangeability::loadBdd(char* filename){
     }
     bddMp = loadDiagram(fpMp, mgrMp);
     fclose(fpMp);
-    
-    trace(TRACE_5, "Exchangeability::loadBdds(char* filename): end\n");		   
+
+    trace(TRACE_5, "Exchangeability::loadBdds(string filename): end\n");		   
 }
 
 
@@ -257,7 +257,7 @@ void Exchangeability::printDotFile(char* filename, char** varNames, DdNode* bddM
 	trace(TRACE_5,"Exchangeability::printDotFile(char* filename, char** varNames, DdNode* bddMp, DdNode* bddAnn): begin\n");
 	if ((Cudd_DagSize(bddMp) < 200000) && (Cudd_DagSize(bddAnn) < 200000) ) {
 	
-		char bufferMp[256]; 
+		char bufferMp[256];
 		char bufferAnn[256];
 
         sprintf(bufferMp, "%s.Exchangeability.BDD_MP.out", filename);

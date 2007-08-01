@@ -1,0 +1,8 @@
+NODES
+  0 : ((final)) : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+;

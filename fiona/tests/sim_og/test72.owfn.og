@@ -1,0 +1,9 @@
+NODES
+  0 : ((!a)) : blue,
+  1 : ((final)) : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 1 : !a;

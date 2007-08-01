@@ -50,6 +50,7 @@
 %{
 #define YY_NO_UNPUT                // We don't need yyunput().
 #include "syntax_owfn_wrap.h"      // list of all tokens used
+#include <cstring>
 
 extern int owfn_yyerror(const char *msg);
 static void setlval();

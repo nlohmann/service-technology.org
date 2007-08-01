@@ -488,7 +488,7 @@ void communicationGraph::printGraphToDot() {
     if (getNumberOfNodes() <= maxWritingSize) {
 
         trace(TRACE_0, "creating the dot file of the graph...\n");
-        GraphNode * tmp = root;
+        GraphNode* rootNode = root;
 
         string outfilePrefixWithOptions =
             options[O_OUTFILEPREFIX] ? outfilePrefix : netfile;
@@ -529,7 +529,7 @@ void communicationGraph::printGraphToDot() {
             visitedNodes[i] = 0;
         }
 
-        printGraphToDotRecursively(tmp, dotFile, visitedNodes);
+        printGraphToDotRecursively(rootNode, dotFile, visitedNodes);
 
         dotFile << "}";
         dotFile.close();
@@ -550,11 +550,9 @@ void communicationGraph::printGraphToDot() {
 
 //            // on windows machines, the png file can be shown per system call
 //            if (parameters[P_OG]) {
-//                char buffer[256];
-//                cout << "initiating command to show the graphics..." << endl;
-//                sprintf(buffer, "cmd /c \"start %s.OG.png\"", netfile);
-//                trace(TRACE_0, string(buffer) + "\n");
-//                system(buffer);
+//                trace(TRACE_0, "initiating command to show the graphics...\n");
+//                string showCmd = "cmd /c \"start " + imgFileName + "\"";
+//                system(showCmd.c_str());
 //            }
 
         } else {

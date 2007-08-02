@@ -103,11 +103,11 @@ owfn="$DIR/sequence3.owfn"
 owfn_reference="$testdir/bdd_ref/sequence3_reference.owfn"
 
 # for make distcheck: make copy of $owfn and work on it
-if [ ! -e $builddir/$SUBDIR ]; then
-    $MKDIR_P $builddir/$SUBDIR
-fi
+if [ "$testdir" != "$builddir" ]; then
+    if [ ! -e $builddir/$SUBDIR ]; then
+        $MKDIR_P $builddir/$SUBDIR
+    fi
 
-if [ "$srcdir" != "$builddir" ]; then
     cp $owfn $builddir/$SUBDIR
 fi
 
@@ -133,6 +133,10 @@ else
         echo "... failed (the two operating guidelines are not equal although they should be)"
         result=1
     fi
+fi
+
+if [ "$testdir" != "$builddir" ]; then
+    rm -rf $builddir/$SUBDIR
 fi
 
 ############################################################################
@@ -177,11 +181,11 @@ owfn_reference="$testdir/bdd_ref/phcontrol4.unf_reference.owfn"
 
 # for make distcheck: make copy of $owfn and work on it
 SUBDIR=philosophers
-if [ ! -e $builddir/$SUBDIR ]; then
-    $MKDIR_P $builddir/$SUBDIR
-fi
+if [ "$testdir" != "$builddir" ]; then
+    if [ ! -e $builddir/$SUBDIR ]; then
+        $MKDIR_P $builddir/$SUBDIR
+    fi
 
-if [ "$srcdir" != "$builddir" ]; then
     cp $owfn $builddir/$SUBDIR
 fi
 
@@ -206,6 +210,10 @@ else
         echo "... failed (the two operating guidelines are not equal although they should be)"
         result=1
     fi
+fi
+
+if [ "$testdir" != "$builddir" ]; then
+    rm -rf $builddir/$SUBDIR
 fi
 
 ############################################################################

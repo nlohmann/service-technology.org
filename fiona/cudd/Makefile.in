@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.1 2007-05-23 13:14:45 bretschn Exp $
+# $Id: Makefile.in,v 1.2 2007-08-02 15:37:50 bretschn Exp $
 #
 # Makefile for the CUDD distribution kit 
 #---------------------------------------------------------------------------
@@ -243,8 +243,6 @@ DIRS	= $(BDIRS) nanotrav
 
 all: objlib
 
-install: all
-
 build:
 	sh $(builddir)/setup.sh
 	@for dir in $(DIRS); do \
@@ -351,8 +349,23 @@ distclean:
 	sh $(srcdir)/shutdown.sh
 
 # Targets required by 'make distcheck'.
-check:
 dvi:
+check:
+install:
+installcheck:
+uninstall:
+distuninstallcheck:
+
+distcleancheck_listfiles = find . -type f -print
+distcleancheck: distclean
+	@if test '$(srcdir)' = . ; then \
+	  echo "ERROR: distcleancheck can only run from a VPATH build" ; \
+	  exit 1 ; \
+	fi
+	@test `$(distcleancheck_listfiles) | wc -l` -eq 0 \
+	  || { echo "ERROR: files left in build directory after distclean:" ; \
+	       $(distcleancheck_listfiles) ; \
+	       exit 1; } >&2
 
 # Calling find only once while ORing the conditions would be nicer, but
 # somehow find on radon gets it wrong *shrug*

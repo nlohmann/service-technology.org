@@ -17,7 +17,7 @@ Group:     Applications/Engineering
 Source:    %{name}-%{version}.tar.gz
 URL:       http://www.gnu.org/software/bpel2owfn/
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
-Packager:  Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+Packager:  Niels Lohmann <@PACKAGE_BUGREPORT@>
 Autoreq:   1
 
 #Requires:  perl >= 5.002
@@ -52,5 +52,5 @@ rm -rf $RPM_BUILD_ROOT
 
 %define date%(env LC_ALL=C date +"%a %b %d %Y")
 %changelog
-* %{date} Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+* %{date} Niels Lohmann <@PACKAGE_BUGREPORT@>
   - Auto building %{PACKAGE_VERSION}

@@ -797,7 +797,7 @@ void communicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, 
 
 
 
-void communicationGraph::annotateGraphDistributedly() {
+bool communicationGraph::annotateGraphDistributedly() {
     GraphNode* rootNode = root;
 
     // mark all nodes as unvisited
@@ -807,20 +807,22 @@ void communicationGraph::annotateGraphDistributedly() {
     }
     
     // traverse the nodes recursively
-    annotateGraphDistributedlyRecursively(rootNode, visitedNodes);
+    return annotateGraphDistributedlyRecursively(rootNode, visitedNodes);
 }
 
-void communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, bool visitedNodes[]) {
+bool communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, bool visitedNodes[]) {
     assert(v != NULL);
     GraphEdge *element;
-        
+    set<string> disabled, enabled;
+    
+    if (!v->isToShow(root))
+        return false;
+    
+    
+    // save for each state the outgoing labels;
     static map<GraphNode*, set<string> > outgoing_labels;
 
-    if (!v->isToShow(root))
-        return;
-
-
-    // store outgoing arcs
+    // store outgoing lables
     v->resetIteratingSuccNodes();
     while ((element = v->getNextSuccEdge()) != NULL) {
         if (element->getDstNode() != NULL &&
@@ -829,8 +831,6 @@ void communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, boo
         }
     }
     
-    
-
     // standard procedurce
     visitedNodes[v->getNumber()] = true;
     
@@ -842,48 +842,94 @@ void communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, boo
             continue;
  
         if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
-            annotateGraphDistributedlyRecursively(vNext, visitedNodes);
+            bool done = annotateGraphDistributedlyRecursively(vNext, visitedNodes);
+            
+            if (done)
+                return done;
+
+            
+            ///////////////////////////////////////////
+            // 1. organized events that enable others
+            ///////////////////////////////////////////
+            enabled = setDifference(setDifference( outgoing_labels[vNext],
+                                                   PN->getPort(PN->getPortForLabel(element->getLabel()))),
+                                    outgoing_labels[v] );
+            
+            if (!enabled.empty()) {
+                //                cerr << "  in state " << v->getNumber() << ": " << element->getLabel() <<
+                //                " enables " << enabled.size() <<
+                //                " elements" << endl;
+                
+                for (set<string>::const_iterator label = enabled.begin();
+                     label != enabled.end(); label++) {
+                    if ( removeLabeledSuccessor(v, *label) ) {
+                        return true;
+                    } else {
+                        continue;
+                    }
+                }
+            }
+            
+            
+            ///////////////////////////////////////////
+            // 2. organize events that disable others
+            ///////////////////////////////////////////
+            disabled = setDifference(setDifference( outgoing_labels[v],
+                                                    PN->getPort(PN->getPortForLabel(element->getLabel()))),
+                                     outgoing_labels[vNext] );
                         
-            set<string> disabled = setDifference(setDifference( outgoing_labels[v],
-                                                                PN->getPort(PN->getPortForLabel(element->getLabel()))),
-                                                 outgoing_labels[vNext] );
-            
-            set<string> enabled = setDifference(setDifference( outgoing_labels[vNext],
-                                                               PN->getPort(PN->getPortForLabel(element->getLabel()))),
-                                                outgoing_labels[v] );
-            
             if (!disabled.empty()) {
                 cerr << "  in state " << v->getNumber() << ": " << element->getLabel() <<
                     " disables " << disabled.size() <<
                     " elements" << endl;
-            }
-
-            if (!enabled.empty()) {
-                cerr << "  in state " << v->getNumber() << ": " << element->getLabel() <<
-                " enables " << enabled.size() <<
-                " elements" << endl;
-                
-                for (set<string>::const_iterator label = enabled.begin();
-                     label != enabled.end(); label++) {
-                    removeLabeledSuccessor(vNext, *label);
+               
+                /*
+                for (set<string>::const_iterator label = disabled.begin();
+                     label != disabled.end(); label++) {
+                    if ( removeLabeledSuccessor(v, *label) ) {
+                        return true;
+                    } else {
+                        continue;
+                    }
                 }
+                
+                cerr << disabled.size() << endl;
+                */
             }
         }
     }
+    
+    
+    if (v == root) {
+        if (disabled.empty()) {
+            cerr << "no nondeterminism left" << endl;
+        } else {
+            cerr << "nondeterminism left" << endl;
+        }
+    }
+    
+    return false;
 }
 
 
-void communicationGraph::removeLabeledSuccessor(GraphNode *v, std::string label) {
+bool communicationGraph::removeLabeledSuccessor(GraphNode *v, std::string label) {
     GraphEdge *element;
     v->resetIteratingSuccNodes();
     
     while ((element = v->getNextSuccEdge()) != NULL) {
         if (element->getLabel() == label) {
             GraphNode *vNext = element->getDstNode();
-            if (vNext->getAnnotation()->asString() != "true") {
+            if (vNext->getAnnotation()->asString() != "true" && vNext->getColor() != RED) {
                 cerr << "  deleted state " << vNext->getNumber() << endl;
                 vNext->setColor(RED);
+                return true;
+            } else {
+                return false;
             }
         }
     }
+    
+    // node not found
+    assert(false);
+    return false;
 }

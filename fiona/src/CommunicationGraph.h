@@ -183,9 +183,9 @@ public:
     void printGraphToSTGRecursively(GraphNode *v, fstream& os, bool[]);
     
     // functions to annotate the OG for distributed controllability
-    void annotateGraphDistributedly();    
-    void annotateGraphDistributedlyRecursively(GraphNode *v, bool[]);
-    void removeLabeledSuccessor(GraphNode *v, std::string label);
+    bool annotateGraphDistributedly();    
+    bool annotateGraphDistributedlyRecursively(GraphNode *v, bool[]);
+    bool removeLabeledSuccessor(GraphNode *v, std::string label);
     
 
     /**

@@ -309,9 +309,14 @@ void computeOG(oWFN* PN) {
         // distributed controllability?
         if (options[O_DISTRIBUTED]) {
             trace(TRACE_0, "\nannotating OG for distributed controllability\n");
-            graph->annotateGraphDistributedly();
-	    graph->correctNodeColorsAndShortenAnnotations();
- 
+            
+            bool graphChanged = true;
+            while (graphChanged) {
+                graphChanged = graph->annotateGraphDistributedly();
+                graph->correctNodeColorsAndShortenAnnotations();
+                cerr << endl;
+            }
+                
 //            parameters[P_SHOW_EMPTY_NODE] = false;
             
             trace(TRACE_0, "\nnet is distributedly controllable: ");

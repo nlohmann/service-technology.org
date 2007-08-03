@@ -19,9 +19,6 @@
   <property name="windowTitle" >
    <string>BPEL2oWFN</string>
   </property>
-  <property name="unifiedTitleAndToolBarOnMac" >
-   <bool>false</bool>
-  </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QHBoxLayout" >
     <item>

@@ -317,6 +317,13 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_OG] = true;
                     parameters[P_IG] = false;
                     options[O_SYNTHESIZE_PARTNER_OWFN] = true;
+                } else if (lc_optarg == "distributed") {
+                    options[O_GRAPH_TYPE] = true;
+                    parameters[P_OG] = true;
+                    parameters[P_IG] = false;
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = true;
+                    options[O_DISTRIBUTED] = true;
                 } else if (lc_optarg == "match") {
                     options[O_MATCH] = true;
                     parameters[P_IG] = false;

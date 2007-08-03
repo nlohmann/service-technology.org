@@ -306,6 +306,22 @@ void computeOG(oWFN* PN) {
 
     // generate output files
     if (!options[O_NOOUTPUTFILES]) {
+        // distributed controllability?
+        if (options[O_DISTRIBUTED]) {
+            trace(TRACE_0, "\nannotating OG for distributed controllability\n");
+            graph->annotateGraphDistributedly();
+	    graph->correctNodeColorsAndShortenAnnotations();
+ 
+//            parameters[P_SHOW_EMPTY_NODE] = false;
+            
+            trace(TRACE_0, "\nnet is distributedly controllable: ");
+            if (graph->getRoot()->getColor() == BLUE) {
+                trace(TRACE_0, "MAYBE\n\n");
+            } else {
+                trace(TRACE_0, "NO\n\n");
+            }
+        }
+              
         graph->printGraphToDot();      // .out
         graph->printOGtoFile();        // .og
 

@@ -2211,3 +2211,47 @@ void oWFN::add_place_to_port(owfnPlace *place, std::string port) {
 unsigned int oWFN::getPortCount() const {
     return ports.size();
 }
+
+
+
+
+
+/*!
+ * \note  This function is implemented just for the functionality and not for
+ *        any performance issues. As long as I don't know which functions I
+ *        need, I will program with such stubs.
+ */
+std::string oWFN::getPortForLabel(std::string label) const {
+    for(map<std::string, Places_t>::const_iterator port = ports.begin();
+        port != ports.end(); port++) {
+        for (unsigned int i = 0; i < port->second.size(); i++) {
+            if (port->second[i]->name == label.substr(1, label.length())) {
+                return port->first;
+            }
+        }
+    }
+    
+    // no port found
+    return "";
+}
+
+
+
+
+
+/*!
+ * \note  This function is implemented just for the functionality and not for
+ *        any performance issues. As long as I don't know which functions I
+ *        need, I will program with such stubs.
+ */
+std::set<std::string> oWFN::getPort(std::string name) const {
+    Places_t places = ports.find(name)->second;
+    set<string> temp;
+    
+    // collect the labels of the places of the given port
+    for (Places_t::const_iterator place = places.begin(); place != places.end(); place++) {
+        temp.insert( (*place)->getLabelForCommGraph() );
+    }
+    
+    return temp;
+}

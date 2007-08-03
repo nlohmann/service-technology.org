@@ -63,7 +63,8 @@ typedef enum
     O_EQUALS,
     O_OUTFILEPREFIX,
     O_NOOUTPUTFILES,  // produce no output files
-    O_SYNTHESIZE_PARTNER_OWFN,       //!< compute an oWFN from the IG/OG
+    O_SYNTHESIZE_PARTNER_OWFN,    //!< compute an oWFN from the IG/OG
+    O_DISTRIBUTED,                //!< check for distributed controllability
     O_COUNT_SERVICES,
     O_CHECK_ACYCLIC
 } possibleOptions;

@@ -41,6 +41,7 @@
 #include "binDecision.h"
 #include "communicationGraph.h"
 #include "fiona.h"
+#include "set_helpers.h"
 #include <cassert>
 
 using namespace std;
@@ -792,3 +793,97 @@ void communicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, 
     }
 }
 
+
+
+
+
+void communicationGraph::annotateGraphDistributedly() {
+    GraphNode* rootNode = root;
+
+    // mark all nodes as unvisited
+    bool visitedNodes[getNumberOfNodes()];
+    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
+        visitedNodes[i] = false;
+    }
+    
+    // traverse the nodes recursively
+    annotateGraphDistributedlyRecursively(rootNode, visitedNodes);
+}
+
+void communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, bool visitedNodes[]) {
+    assert(v != NULL);
+    GraphEdge *element;
+        
+    static map<GraphNode*, set<string> > outgoing_labels;
+
+    if (!v->isToShow(root))
+        return;
+
+
+    // store outgoing arcs
+    v->resetIteratingSuccNodes();
+    while ((element = v->getNextSuccEdge()) != NULL) {
+        if (element->getDstNode() != NULL &&
+            element->getDstNode()->isToShow(root) ) {
+            outgoing_labels[v].insert(element->getLabel());
+        }
+    }
+    
+    
+
+    // standard procedurce
+    visitedNodes[v->getNumber()] = true;
+    
+    v->resetIteratingSuccNodes();
+    while ((element = v->getNextSuccEdge()) != NULL) {
+        GraphNode *vNext = element->getDstNode();
+ 	
+        if (!vNext->isToShow(root))
+            continue;
+ 
+        if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
+            annotateGraphDistributedlyRecursively(vNext, visitedNodes);
+                        
+            set<string> disabled = setDifference(setDifference( outgoing_labels[v],
+                                                                PN->getPort(PN->getPortForLabel(element->getLabel()))),
+                                                 outgoing_labels[vNext] );
+            
+            set<string> enabled = setDifference(setDifference( outgoing_labels[vNext],
+                                                               PN->getPort(PN->getPortForLabel(element->getLabel()))),
+                                                outgoing_labels[v] );
+            
+            if (!disabled.empty()) {
+                cerr << "  in state " << v->getNumber() << ": " << element->getLabel() <<
+                    " disables " << disabled.size() <<
+                    " elements" << endl;
+            }
+
+            if (!enabled.empty()) {
+                cerr << "  in state " << v->getNumber() << ": " << element->getLabel() <<
+                " enables " << enabled.size() <<
+                " elements" << endl;
+                
+                for (set<string>::const_iterator label = enabled.begin();
+                     label != enabled.end(); label++) {
+                    removeLabeledSuccessor(vNext, *label);
+                }
+            }
+        }
+    }
+}
+
+
+void communicationGraph::removeLabeledSuccessor(GraphNode *v, std::string label) {
+    GraphEdge *element;
+    v->resetIteratingSuccNodes();
+    
+    while ((element = v->getNextSuccEdge()) != NULL) {
+        if (element->getLabel() == label) {
+            GraphNode *vNext = element->getDstNode();
+            if (vNext->getAnnotation()->asString() != "true") {
+                cerr << "  deleted state " << vNext->getNumber() << endl;
+                vNext->setColor(RED);
+            }
+        }
+    }
+}

@@ -180,7 +180,13 @@ public:
 
     // functions to create an STG representation of the IG or OG
     void printGraphToSTG();
-    void printGraphToSTGRecursively(GraphNode * v, fstream& os, bool[]);
+    void printGraphToSTGRecursively(GraphNode *v, fstream& os, bool[]);
+    
+    // functions to annotate the OG for distributed controllability
+    void annotateGraphDistributedly();    
+    void annotateGraphDistributedlyRecursively(GraphNode *v, bool[]);
+    void removeLabeledSuccessor(GraphNode *v, std::string label);
+    
 
     /**
      * Computes statistics about this graph. They can be printed by

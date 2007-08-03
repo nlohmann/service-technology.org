@@ -296,7 +296,12 @@ class oWFN {
         /// counts the ports
         unsigned int getPortCount() const;
         
+        /// returns the port of the interface place identified by a label
+        std::string getPortForLabel(std::string label) const;
         
+        /// returns the port identified by its name
+        std::set<std::string> getPort(std::string name) const;
+                
         
         // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new

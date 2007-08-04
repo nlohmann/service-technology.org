@@ -185,7 +185,7 @@ public:
     // functions to annotate the OG for distributed controllability
     bool annotateGraphDistributedly();    
     bool annotateGraphDistributedlyRecursively(GraphNode *v, bool[]);
-    bool removeLabeledSuccessor(GraphNode *v, std::string label);
+    void removeLabeledSuccessor(GraphNode *v, std::string label);
     
 
     /**

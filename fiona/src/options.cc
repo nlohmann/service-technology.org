@@ -322,7 +322,7 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_OG] = true;
                     parameters[P_IG] = false;
                     options[O_SHOW_NODES] = true;
-                    parameters[P_SHOW_EMPTY_NODE] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = true; // essential for theory!
                     options[O_DISTRIBUTED] = true;
                 } else if (lc_optarg == "match") {
                     options[O_MATCH] = true;

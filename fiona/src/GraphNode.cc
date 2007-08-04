@@ -292,3 +292,11 @@ GraphNodeColor GraphNode::analyseNodeByFormula() {
 bool operator < (GraphNode const& left, GraphNode const& right) {
     return (left.reachGraphStateSet < right.reachGraphStateSet);	
 }
+
+
+
+
+void GraphNode::removeEdge(GraphEdge *e) {
+    assert (e != NULL);
+    successorNodes->removeElement(e);
+}

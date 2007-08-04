@@ -58,6 +58,9 @@ public:
     void deleteList(GraphEdge *);   
     void addNextNode(GraphEdge *);
     
+    /// removes and element from the list
+    void removeElement(GraphEdge *e);
+    
     void resetIterating();
     GraphEdge * getNextElement();
     

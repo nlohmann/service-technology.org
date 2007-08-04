@@ -125,3 +125,33 @@ GraphEdge * successorNodeList::getNextElement() {
 		return NULL;
 	}
 }
+
+
+
+
+
+void successorNodeList::removeElement(GraphEdge *e) {
+    assert (e != NULL);
+    
+    //cerr << "deleting edge " << e->getLabel() << endl;
+    
+    if (e == firstElement) {
+        //cerr << "it's the first element" << endl;
+        firstElement = firstElement->getNextElement();
+
+        delete e;
+    } else {
+        //cerr << "it's not the first element" << endl;
+        
+        GraphEdge *iterator = firstElement;
+        GraphEdge *pre_iterator = firstElement;
+        
+        while (iterator != e) {
+            pre_iterator = iterator;
+            iterator = iterator->getNextElement();
+        }
+        
+        pre_iterator->setNextElement(iterator->getNextElement());
+        delete iterator;
+    }
+}

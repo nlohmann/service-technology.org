@@ -314,16 +314,17 @@ void computeOG(oWFN* PN) {
             while (graphChanged) {
                 graphChanged = graph->annotateGraphDistributedly();
                 graph->correctNodeColorsAndShortenAnnotations();
-                cerr << endl;
+//                cerr << endl;
             }
                 
-//            parameters[P_SHOW_EMPTY_NODE] = false;
+            parameters[P_SHOW_EMPTY_NODE] = false;
             
             trace(TRACE_0, "\nnet is distributedly controllable: ");
             if (graph->getRoot()->getColor() == BLUE) {
                 trace(TRACE_0, "MAYBE\n\n");
             } else {
                 trace(TRACE_0, "NO\n\n");
+                parameters[P_SHOW_ALL_NODES] = true;
             }
         }
               

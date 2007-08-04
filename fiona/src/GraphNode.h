@@ -137,6 +137,9 @@ public:
      * red nodes are unneeded.
      */
     void removeUnneededLiteralsFromAnnotation();
+    
+    /// remove an edge originating from this node
+    void removeEdge(GraphEdge *e);
 
     friend bool operator < (GraphNode const&, GraphNode const& );
 

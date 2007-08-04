@@ -816,8 +816,7 @@ bool communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, boo
     set<string> disabled, enabled;
     
     if (!v->isToShow(root))
-        return false;
-    
+        return false;    
     
     // save for each state the outgoing labels;
     static map<GraphNode*, set<string> > outgoing_labels;
@@ -856,17 +855,23 @@ bool communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, boo
                                     outgoing_labels[v] );
             
             if (!enabled.empty()) {
-                //                cerr << "  in state " << v->getNumber() << ": " << element->getLabel() <<
-                //                " enables " << enabled.size() <<
-                //                " elements" << endl;
-                
+                cerr << "  in state " << v->getNumber() << ": " << element->getLabel() <<
+                    " enables " << enabled.size() <<
+                    " elements: ";
+
+                // list what's enabled
                 for (set<string>::const_iterator label = enabled.begin();
                      label != enabled.end(); label++) {
-                    if ( removeLabeledSuccessor(v, *label) ) {
-                        return true;
-                    } else {
-                        continue;
-                    }
+                    cerr << *label << " ";
+                }
+                cerr << endl;
+                
+                // delete enabled states
+                for (set<string>::const_iterator label = enabled.begin();
+                     label != enabled.end(); label++) {
+                    removeLabeledSuccessor(vNext, *label);
+                    outgoing_labels.clear(); // reset the label list
+                    return true;
                 }
             }
             
@@ -912,24 +917,19 @@ bool communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, boo
 }
 
 
-bool communicationGraph::removeLabeledSuccessor(GraphNode *v, std::string label) {
+void communicationGraph::removeLabeledSuccessor(GraphNode *v, std::string label) {
     GraphEdge *element;
     v->resetIteratingSuccNodes();
     
     while ((element = v->getNextSuccEdge()) != NULL) {
         if (element->getLabel() == label) {
-            GraphNode *vNext = element->getDstNode();
-            if (vNext->getAnnotation()->asString() != "true" && vNext->getColor() != RED) {
-                cerr << "  deleted state " << vNext->getNumber() << endl;
-                vNext->setColor(RED);
-                return true;
-            } else {
-                return false;
-            }
+            // GraphNode *vNext = element->getDstNode();
+            //cerr << "    deleting edge " << element->getLabel() << " connecting state " << v->getNumber() << " and " << vNext->getNumber() << endl;
+            v->removeEdge(element);
+            return;
         }
     }
     
     // node not found
     assert(false);
-    return false;
 }

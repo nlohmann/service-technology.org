@@ -63,6 +63,9 @@ class interactionGraph : public communicationGraph {
     
     	void getActivatedEventsComputeCNF(GraphNode *, setOfMessages &, setOfMessages &);
     
+    	void calculateSuccStatesInput(messageMultiSet, GraphNode *, GraphNode *);
+    	void calculateSuccStatesOutput(messageMultiSet, GraphNode *, GraphNode *);
+    
 		setOfMessages combineReceivingEvents(GraphNode *, setOfMessages &);
 		setOfMessages receivingBeforeSending(GraphNode *);
 

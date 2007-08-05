@@ -362,6 +362,10 @@ bool interactionGraph::addGraphNode (GraphNode * sourceNode, GraphNode * toAdd, 
 bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, GraphEdgeType typeOfPlace) {
 	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): start\n");
 	
+	map<unsigned int, unsigned int> numberOfInputMessages;
+	map<unsigned int, unsigned int> numberOfOutputMessages;
+
+	// count the messages, since there may be more than one message of a kind assigned to an edge	
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
 		if (typeOfPlace == SENDING) {
 			unsigned int i = 0;
@@ -369,30 +373,8 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * 
 						PN->getInputPlace(i)->index != *iter) {
 				i++;	
 			}
-
-			if (options[O_EVENT_USE_MAX] == true) {      // k-message-bounded set
-				if (currentNode->eventsUsed[i] >= events_manual) {
-					// this input event shall not be sent anymore, so quit here
-					trace(TRACE_3, "maximal occurrences of event ");
-					trace(TRACE_3, PN->getInputPlace(i)->name);
-					trace(TRACE_3, " reached\n");
-	
-					trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): end\n");
-					return false;
-				}
-			}
-			
-//	        if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
-//	            if (PN->CurrentMarking[PN->getInputPlace(i)->index] >= messages_manual) {
-//	                // adding input message to state already using full message bound
-//	                trace(TRACE_3, "\t\t\t\t\t adding input event ");
-//	                trace(TRACE_3, PN->getInputPlace(i)->name);
-//	                trace(TRACE_3, intToString(PN->CurrentMarking[PN->getInputPlace(i)->index]));
-//	                trace(TRACE_3, " would cause message bound violation\n");
-//	                trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, GraphNode * currentNode, bool typeOfPlace): end\n");
-//	                return false;
-//	            }
-//	        }
+			// count the occurance of this message
+			numberOfInputMessages[i]++;
 			
 		} else if (typeOfPlace == RECEIVING) {
 			unsigned int i = 0;
@@ -400,12 +382,39 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * 
 						PN->getOutputPlace(i)->index != *iter) {
 				i++;	
 			}
-			
+			// count the occurance of this message
+			numberOfOutputMessages[i]++;
+		}
+	}
+
+	map<unsigned int, unsigned int>::const_iterator iter;
+
+	// now we check each message stored in the map, if its occurance violates our boundaries or not    
+	if (typeOfPlace == SENDING) {
+    	for (iter = numberOfInputMessages.begin(); iter != numberOfInputMessages.end(); ++iter) {
 			if (options[O_EVENT_USE_MAX] == true) {      // k-message-bounded set
-				if (currentNode->eventsUsed[i + PN->getInputPlaceCount()] >= messages_manual) {
+				if (currentNode->eventsUsed[iter->first] + iter->second > 
+							PN->getInputPlace(iter->first)->max_occurence) {
+								
+					// this input event shall not be sent anymore, so quit here
+					trace(TRACE_3, "maximal occurrences of event ");
+					trace(TRACE_3, PN->getInputPlace(iter->first)->name);
+					trace(TRACE_3, " reached\n");
+	
+					trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): end\n");
+					return false;
+				}
+			}
+    	}		
+	} else if (typeOfPlace == RECEIVING) {
+		for (iter = numberOfOutputMessages.begin(); iter != numberOfOutputMessages.end(); ++iter) {			
+			if (options[O_EVENT_USE_MAX] == true) {      // k-message-bounded set
+				if (currentNode->eventsUsed[iter->first + PN->getInputPlaceCount()] + 
+						iter->second > 
+							PN->getOutputPlace(iter->first)->max_occurence) {
 					// this output event shall not be received anymore, so quit here
 					trace(TRACE_3, "maximal occurrences of event ");
-					trace(TRACE_3, PN->getOutputPlace(i)->name);
+					trace(TRACE_3, PN->getOutputPlace(iter->first)->name);
 					trace(TRACE_3, " reached\n");
 					trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): end\n");				
 					return false;		
@@ -413,6 +422,7 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * 
 			}
 		}
 	}
+
 	// everything is fine
 	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): end\n");
 	return true;
@@ -567,6 +577,131 @@ void interactionGraph::getActivatedEventsComputeCNF(GraphNode * node, setOfMessa
 	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(GraphNode * node): end\n");
 	
 }
+
+//! \param input (multi) set of input messages
+//! \param node the node for which the successor states are to be calculated
+//! \param newNode the new node where the new states go into
+//! \brief calculates the set of successor states in case of an input message
+void interactionGraph::calculateSuccStatesInput(messageMultiSet input, GraphNode * node, GraphNode * newNode) {
+    trace(TRACE_5, "interactionGraph::calculateSuccStatesInput(messageMultiSet input, GraphNode * node, GraphNode * newNode) : start\n");
+
+    PN->setOfStatesTemp.clear();
+    PN->visitedStates.clear();
+
+    if (TRACE_2 <= debug_level) {
+        for (messageMultiSet::iterator iter1 = input.begin(); iter1 != input.end(); iter1++) {
+            trace(TRACE_2, PN->getPlace(*iter1)->name);
+            trace(TRACE_2, " ");
+        }
+        trace(TRACE_2, "\n");
+    }
+
+    for (StateSet::iterator iter = node->reachGraphStateSet.begin();
+         iter != node->reachGraphStateSet.end();
+         iter++) {
+
+        (*iter)->decode(PN);
+
+        // test for each marking of current node if message bound k reached
+        // then supress new sending event
+        if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
+            // iterate over the set of input messages
+            for (messageMultiSet::iterator iter = input.begin(); iter != input.end(); iter++) {
+                if (PN->CurrentMarking[PN->getPlace(*iter)->index] == messages_manual) {
+                    // adding input message to state already using full message bound
+                    trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
+                    trace(TRACE_3, PN->getPlace(*iter)->name);
+                    trace(TRACE_5, "interactionGraph::calculateSuccStatesInput(messageMultiSet input, GraphNode * node) : end\n");
+                    newNode->setColor(RED);
+                    return;
+                }
+            }
+        }
+
+        PN->addInputMessage(input);                 // add the input message to the current marking
+        if (options[O_CALC_ALL_STATES]) {
+            PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
+        } else {
+            PN->calculateReachableStatesInputEvent(newNode);       // calc the reachable states from that marking
+        }
+        if (newNode->getColor() == RED) {
+            // a message bound violation occured during computation of reachability graph
+            trace(TRACE_5, "interactionGraph::calculateSuccStatesInput(messageMultiSet input, GraphNode * node) : end\n");
+            return;
+        }
+    }
+
+    trace(TRACE_5, "IG::calculateSuccStatesInput(messageMultiSet input, GraphNode * node, GraphNode * newNode) : end\n");
+    return;
+}
+
+
+//! \param output the output messages that are taken from the marking
+//! \param node the node for which the successor states are to be calculated
+//! \param newNode the new node where the new states go into
+//! \brief calculates the set of successor states in case of an output message
+void interactionGraph::calculateSuccStatesOutput(messageMultiSet output, GraphNode * node, GraphNode * newNode) {
+    trace(TRACE_5, "interactionGraph::calculateSuccStatesOutput(messageMultiSet output, GraphNode * node, GraphNode * newNode) : start\n");
+
+    if (TRACE_2 <= debug_level) {
+        for (messageMultiSet::iterator iter1 = output.begin(); iter1 != output.end(); iter1++) {
+            trace(TRACE_2, PN->getPlace(*iter1)->name);
+            trace(TRACE_2, " ");
+        }
+        trace(TRACE_2, "\n");
+    }
+
+    if (options[O_CALC_ALL_STATES]) {
+        for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
+            (*iter)->decode(PN);
+            if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+                PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
+            }
+        }
+    } else {
+        PN->setOfStatesTemp.clear();
+        PN->visitedStates.clear();
+
+        StateSet stateSet;
+        // stateSet.clear();
+
+        for (StateSet::iterator iter = node->reachGraphStateSet.begin();
+            iter != node->reachGraphStateSet.end(); iter++) {
+
+            (*iter)->decode(PN);
+            // calculate temporary state set with the help of stubborn set method
+            // TODO: Fix this memory leak.
+            // The following method sets tempBinDecision to NULL before
+            // filling tempBinDecision anew without deleting the old one.
+            // Consequently, some binDecisions become unreachable and
+            // cannot be deleted at the end of this method. This produces a
+            // memory leak. Not setting tempBinDecision to NULL in the
+            // following method call obviously fixes this memory leak. But this
+            // would cause unintended behaviour, wouldn't it? I figure that
+            // each State in stateSet needs a separate tempBinDecision. Then,
+            // each of those tempBinDecision must be kept alive until the
+            // following for loop is completed because otherwise the just
+            // calculated States would deleted by the binDecision destructor
+            // causing a segmentation fault while trying to call decode() on
+            // one those deleted states in the following for loop.
+            PN->calculateReachableStates(stateSet, output, newNode);
+        }
+
+        for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {
+            (*iter2)->decode(PN); // get the marking of the state
+
+            if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+                PN->calculateReachableStatesOutputEvent(newNode);   // calc the reachable states from that marking
+            }
+        }
+        // binDeleteAll(PN->tempBinDecision);
+        delete PN->tempBinDecision;
+        PN->tempBinDecision = NULL;
+    }
+
+    trace(TRACE_5, "interactionGraph::calculateSuccStatesOutput(messageMultiSet output, GraphNode * node, GraphNode * newNode) : end\n");
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // reduction rules

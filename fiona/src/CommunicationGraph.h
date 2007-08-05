@@ -171,10 +171,6 @@ public:
 
     void buildGraphRandom();
 
-    // for IG
-    void calculateSuccStatesInput(messageMultiSet, GraphNode *, GraphNode *);
-    void calculateSuccStatesOutput(messageMultiSet, GraphNode *, GraphNode *);
-
     void printGraphToDot();
     void printGraphToDotRecursively(GraphNode * v, fstream& os, bool[]);
 

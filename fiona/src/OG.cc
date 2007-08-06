@@ -40,6 +40,7 @@
 #include "owfn.h"
 #include "GraphNode.h"
 #include "GraphFormula.h"
+#include "binDecision.h"
 
 // #define TRUE 1 in cudd package can interfere with CommGraphLiteral::TRUE.
 // So, we undefine TRUE.
@@ -438,8 +439,8 @@ void OG::calculateSuccStatesOutput(unsigned int output, GraphNode * node, GraphN
             }
         }
     } else {
-//        PN->setOfStatesTemp.clear();
-//        PN->visitedStates.clear();
+        PN->setOfStatesTemp.clear();
+        PN->visitedStates.clear();
         owfnPlace * outputPlace = PN->getPlace(output);
 
         StateSet stateSet;
@@ -460,8 +461,8 @@ void OG::calculateSuccStatesOutput(unsigned int output, GraphNode * node, GraphN
             }
         }
 
-//        delete PN->tempBinDecision;
-//        PN->tempBinDecision = NULL;
+        delete PN->tempBinDecision;
+        PN->tempBinDecision = NULL;
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, GraphNode * node, GraphNode * newNode) : end\n");
 }

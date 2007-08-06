@@ -361,72 +361,72 @@ bool interactionGraph::addGraphNode (GraphNode * sourceNode, GraphNode * toAdd, 
 //! \brief checks whether the set of input messages contains at least one input message
 //! that has been sent at its maximum
 bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, GraphEdgeType typeOfPlace) {
-	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): start\n");
-	
-	map<unsigned int, unsigned int> numberOfInputMessages;
-	map<unsigned int, unsigned int> numberOfOutputMessages;
+    trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): start\n");
 
-	// count the messages, since there may be more than one message of a kind assigned to an edge	
-	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		if (typeOfPlace == SENDING) {
-			unsigned int i = 0;
-			while (i < PN->getInputPlaceCount()-1 && PN->getInputPlace(i) && 
-						PN->getInputPlace(i)->index != *iter) {
-				i++;	
-			}
-			// count the occurance of this message
-			numberOfInputMessages[i]++;
-			
-		} else if (typeOfPlace == RECEIVING) {
-			unsigned int i = 0;
-			while (i < PN->getOutputPlaceCount()-1 && PN->getOutputPlace(i) && 
-						PN->getOutputPlace(i)->index != *iter) {
-				i++;	
-			}
-			// count the occurance of this message
-			numberOfOutputMessages[i]++;
-		}
-	}
+    map<unsigned int, int> numberOfInputMessages;
+    map<unsigned int, int> numberOfOutputMessages;
 
-	map<unsigned int, unsigned int>::const_iterator iter;
+    // count the messages, since there may be more than one message of a kind assigned to an edge	
+    for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
+        if (typeOfPlace == SENDING) {
+            unsigned int i = 0;
+            while (i < PN->getInputPlaceCount()-1 && PN->getInputPlace(i)
+                   && PN->getInputPlace(i)->index != *iter) {
+                i++;
+            }
+            // count the occurance of this message
+            numberOfInputMessages[i]++;
 
-	// now we check each message stored in the map, if its occurance violates our boundaries or not    
-	if (typeOfPlace == SENDING) {
+        } else if (typeOfPlace == RECEIVING) {
+            unsigned int i = 0;
+            while (i < PN->getOutputPlaceCount()-1 && PN->getOutputPlace(i)
+                   && PN->getOutputPlace(i)->index != *iter) {
+                i++;
+            }
+            // count the occurance of this message
+            numberOfOutputMessages[i]++;
+        }
+    }
+
+    map<unsigned int, int>::const_iterator iter;
+
+    // now we check each message stored in the map, if its occurance violates our boundaries or not    
+    if (typeOfPlace == SENDING) {
     	for (iter = numberOfInputMessages.begin(); iter != numberOfInputMessages.end(); ++iter) {
-			if (options[O_EVENT_USE_MAX] == true) {      // k-message-bounded set
-				if (currentNode->eventsUsed[iter->first] + iter->second > 
-							PN->getInputPlace(iter->first)->max_occurence) {
-								
-					// this input event shall not be sent anymore, so quit here
-					trace(TRACE_3, "maximal occurrences of event ");
-					trace(TRACE_3, PN->getInputPlace(iter->first)->name);
-					trace(TRACE_3, " reached\n");
-	
-					trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): end\n");
-					return false;
-				}
-			}
-    	}		
-	} else if (typeOfPlace == RECEIVING) {
-		for (iter = numberOfOutputMessages.begin(); iter != numberOfOutputMessages.end(); ++iter) {			
-			if (options[O_EVENT_USE_MAX] == true) {      // k-message-bounded set
-				if (currentNode->eventsUsed[iter->first + PN->getInputPlaceCount()] + 
-						iter->second > 
-							PN->getOutputPlace(iter->first)->max_occurence) {
-					// this output event shall not be received anymore, so quit here
-					trace(TRACE_3, "maximal occurrences of event ");
-					trace(TRACE_3, PN->getOutputPlace(iter->first)->name);
-					trace(TRACE_3, " reached\n");
-					trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): end\n");				
-					return false;		
-				}
-			}
-		}
-	}
+            if (options[O_EVENT_USE_MAX] == true) {      // max use of events set
+                if (currentNode->eventsUsed[iter->first] + iter->second >
+                    PN->getInputPlace(iter->first)->max_occurence) {
 
-	// everything is fine
-	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): end\n");
-	return true;
+                    // this input event shall not be sent anymore, so quit here
+                    trace(TRACE_3, "maximal occurrences of event ");
+                    trace(TRACE_3, PN->getInputPlace(iter->first)->name);
+                    trace(TRACE_3, " reached\n");
+
+                    trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): end\n");
+                    return false;
+                }
+            }
+        }
+    } else if (typeOfPlace == RECEIVING) {
+        for (iter = numberOfOutputMessages.begin(); iter != numberOfOutputMessages.end(); ++iter) {			
+            if (options[O_EVENT_USE_MAX] == true) {      // max use of events set
+                if (currentNode->eventsUsed[iter->first + PN->getInputPlaceCount()] + 
+                    iter->second > PN->getOutputPlace(iter->first)->max_occurence) {
+
+                    // this output event shall not be received anymore, so quit here
+                    trace(TRACE_3, "maximal occurrences of event ");
+                    trace(TRACE_3, PN->getOutputPlace(iter->first)->name);
+                    trace(TRACE_3, " reached\n");
+                    trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): end\n");				
+                    return false;
+                }
+            }
+        }
+    }
+
+    // everything is fine
+    trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): end\n");
+    return true;
 }
 
 

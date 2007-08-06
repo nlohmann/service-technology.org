@@ -38,6 +38,7 @@
 #include "debug.h"
 #include "GraphFormula.h"
 #include "owfnTransition.h"
+#include "binDecision.h"
 
 
 //! \fn interactionGraph::interactionGraph(oWFN * _PN) 

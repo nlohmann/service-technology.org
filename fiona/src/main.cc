@@ -332,7 +332,7 @@ void computeOG(oWFN* PN) {
         graph->printOGtoFile();        // .og
 
         if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
-            graph->printGraphToSTG();	    
+            graph->printGraphToSTG();
         }
 
         if (options[O_OTF]) {
@@ -550,34 +550,6 @@ int main(int argc, char ** argv) {
 
     // evaluate command line options
     parse_command_line(argc, argv);
-
-
-// **********************************************************************************
-// check if the numbers of inputfiles corresponds to the chosen mode
-    if (options[O_EX] == true && netfiles.size() != 2) {
-        cerr << "Error: \t If option -x is used, exactly two oWFNs must be entered\n" << endl;
-        exit(1);
-    }
-
-    if (options[O_MATCH] && ogfiles.size() != 1) {
-        cerr << "Exactly one operating guideline must be given for matching!\n" << endl;
-        exit(1);
-    }
-
-    if (options[O_PRODUCTOG] && ogfiles.size() < 2) {
-        cerr << "Error: \t Give at least two OGs to build their product!\n" << endl;
-        exit(1);
-    }
-
-    if (options[O_SIMULATES] && ogfiles.size() != 2) {
-        cerr << "Error: \t If option -t simulation is used, exactly two OG files must be entered\n" << endl;
-        exit(1);
-    }
-
-    if (options[O_EQUALS] && ogfiles.size() != 2) {
-        cerr << "Error: \t If option -t equals is used, exactly two OG files must be entered\n" << endl;
-        exit(1);
-    }
 
 
 // **********************************************************************************

@@ -466,6 +466,7 @@ void parse_command_line(int argc, char* argv[]) {
         }
     }
 
+    // reading all oWFNs and OGs
     for ( ; optind < argc; ++optind) {
         switch (getFileType(argv[optind])) {
             case FILETYPE_OWFN:
@@ -475,38 +476,64 @@ void parse_command_line(int argc, char* argv[]) {
                 ogfiles.push_back(argv[optind]);
                 break;
             case FILETYPE_UNKNOWN:
-                cerr << "Error:\tCannot determine file type of '"
+                cerr << "Error:\t Cannot determine file type of '"
                      << argv[optind] << "'" << endl
                      << "\tEnter \"fiona --help\" for more information.\n"
                      << endl;
         }
     }
 
-    if (options[O_EX] == true && netfiles.size() == 0) {
-        cerr << "To check equivalence of two OGs, please give the"
-        	 << "corresponding oWFNs on the command line."
-        	 << "The OGs as BDDs must have been computed before."
-             << "\tEnter \"fiona --help\" for more information.\n" << endl;
+
+    // check if the numbers of inputfiles corresponds to the chosen mode
+    if (ogfiles.size() == 0 && netfiles.size() == 0) {
+        cerr << "Error: \t No oWFNs or OGs are given." << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
 
-    if (ogfiles.size() == 0 && netfiles.size() == 0) {
-        cerr << "Error:\tNo oWFNs or OGs given." << endl
-             << "\tEnter \"fiona --help\" for more information.\n" << endl;
+    if (options[O_EX] == true && netfiles.size() != 2) {
+        cerr << "Error: \t If option '-t equivalence' is used, exactly two oWFNs must be entered\n" << endl;
+        cerr << "       \t and their BDDs must have been computed before." << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
+    }
+
+    if (options[O_MATCH] && ogfiles.size() != 1) {
+        cerr << "Error: \t Exactly one operating guideline must be given for matching!\n" << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
+    }
+
+    if (options[O_PRODUCTOG] && ogfiles.size() < 2) {
+        cerr << "Error: \t Give at least two OGs to build their product!\n" << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
+    }
+
+    if (options[O_SIMULATES] && ogfiles.size() != 2) {
+        cerr << "Error: \t If option -t simulation is used, exactly two OG files must be entered\n" << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
+    }
+
+    if (options[O_EQUALS] && ogfiles.size() != 2) {
+        cerr << "Error: \t If option -t equals is used, exactly two OG files must be entered\n" << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
 
     if (options[O_EVENT_USE_MAX] == false && options[O_MESSAGES_MAX] == false) {
-        cerr << "if no limit for using events is given, you must specify a message bound via option -m " << endl
-             << "\tEnter \"fiona --help\" for more information.\n" << endl;
+        cerr << "Error: \t if no limit for using events is given, you must specify a message bound via option -m " << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
 
     if (options[O_BDD] && parameters[P_OG] == false && options[O_EX] == false) {
-        cerr << "computing IG -- BDD option ignored\n" << endl;
+        cerr << "Warning: \t computing IG -- BDD option ignored\n" << endl;
         options[O_BDD] = false;
     }
 }
+
 
 FileType getFileType(const std::string& fileName) {
     unsigned int owfnHits = 0;

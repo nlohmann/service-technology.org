@@ -127,9 +127,6 @@ GraphEdge * successorNodeList::getNextElement() {
 }
 
 
-
-
-
 void successorNodeList::removeElement(GraphEdge *e) {
     assert (e != NULL);
     

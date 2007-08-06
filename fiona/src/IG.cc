@@ -81,7 +81,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 	
     trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 	trace(TRACE_1, "\t current node: ");
-	trace(TRACE_1, intToString(currentNode->getNumber()) + "\n");
+	trace(TRACE_1, currentNode->getName() + "\n");
 	if (debug_level >= TRACE_2) {
 		cout << "\t (" << currentNode << ")" << endl;
 	}
@@ -92,7 +92,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 	if (currentNode->getColor() == RED) {
 		// this may happen due to a message bound violation in current node
 		// then, function calculateReachableStatesFull sets node color RED
-		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color RED\n");
+		trace(TRACE_3, "\t\t\t node " + currentNode->getName() + " has color RED\n");
         trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 		return;
 	}
@@ -121,7 +121,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 				// message bound violation occured during calculateSuccStatesInput
                 trace(TRACE_2, "\t\t\t\t    sending event: !");
 //                trace(TRACE_2, PN->getPlace(*iter)->name);
-                trace(TRACE_2, " at node " + intToString(currentNode->getNumber()) + " suppressed (message bound violated)\n");
+                trace(TRACE_2, " at node " + currentNode->getName() + " suppressed (message bound violated)\n");
 
 				numberDeletedVertices--;
 				delete v;
@@ -135,7 +135,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 #endif
 
 					buildGraph(v);
-					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+					trace(TRACE_1, "\t\t backtracking to node " + currentNode->getName() + "\n");
 #ifdef LOOP
 	}
 #endif	
@@ -163,7 +163,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 #endif
 
             buildGraph(v);
-            trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+            trace(TRACE_1, "\t\t backtracking to node " + currentNode->getName() + "\n");
 
 #ifdef LOOP
             }
@@ -175,7 +175,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 	analyseNode(currentNode);
 	trace(TRACE_5, "node analysed\n");
 
-	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + toUpper(currentNode->getColor().toString()) + "\n");	
+	trace(TRACE_1, "\t\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()) + "\n");	
 }
 
 //! \fn void interactionGraph::buildReducedGraph(GraphNode * currentNode)
@@ -186,14 +186,14 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 	if (currentNode->getColor() == RED) {
 		// this may happen due to a message bound violation in current node
 		// then, function calculateReachableStatesFull sets node color RED
-		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color RED\n");
+		trace(TRACE_3, "\t\t\t node " + currentNode->getName() + " has color RED\n");
         trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 		return;
 	}
 
     trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 	trace(TRACE_1, "\t current node: ");
-	trace(TRACE_1, intToString(currentNode->getNumber()) + "\n");
+	trace(TRACE_1, currentNode->getName() + "\n");
 
 	trace(TRACE_3, "\t number of states in node: ");
 	trace(TRACE_3, intToString(currentNode->reachGraphStateSet.size()) + "\n");
@@ -229,14 +229,14 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 				// message bound violation occured during calculateSuccStatesInput
                 trace(TRACE_2, "\t\t\t\t    sending event: !");
 //                trace(TRACE_2, PN->getPlace(*iter)->name);
-                trace(TRACE_2, " at node " + intToString(currentNode->getNumber()) + " suppressed (message bound violated)\n");
+                trace(TRACE_2, " at node " + currentNode->getName() + " suppressed (message bound violated)\n");
 
 				numberDeletedVertices--;
 				delete v;
 				
 			} else if (addGraphNode (currentNode, v, *iter, SENDING)) {
 				buildReducedGraph(v);
-				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+				trace(TRACE_1, "\t\t backtracking to node " + currentNode->getName() + "\n");
 			}
 		}
 	}
@@ -254,7 +254,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 
 			if (currentNode->getColor() != RED && addGraphNode (currentNode, v, *iter, RECEIVING)) {
 				buildReducedGraph(v);
-				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+				trace(TRACE_1, "\t\t backtracking to node " + currentNode->getName() + "\n");
 				//analyseNode(currentNode, false);
 				//trace(TRACE_5, "node analysed\n");
 			}
@@ -264,7 +264,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 	analyseNode(currentNode);
 	trace(TRACE_5, "node analysed\n");
 
-	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + toUpper(currentNode->getColor().toString()) + "\n");
+	trace(TRACE_1, "\t\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()) + "\n");
 }
 
 
@@ -332,6 +332,8 @@ bool interactionGraph::addGraphNode (GraphNode * sourceNode, GraphNode * toAdd, 
             trace(TRACE_1, "\n\t new successor node computed:");
 
             toAdd->setNumber(getNumberOfNodes());
+            toAdd->setName(intToString(getNumberOfNodes()));
+
             GraphEdge* edgeSucc = new GraphEdge(toAdd, label);
             sourceNode->addSuccessorNode(edgeSucc);
             setOfVertices.insert(toAdd);
@@ -339,7 +341,7 @@ bool interactionGraph::addGraphNode (GraphNode * sourceNode, GraphNode * toAdd, 
             trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
             return true;
         } else {
-            trace(TRACE_1, "\t successor node already known: " + intToString(found->getNumber()) + "\n");
+            trace(TRACE_1, "\t successor node already known: " + found->getName() + "\n");
 
             GraphEdge * edgeSucc = new GraphEdge(found, label);
             sourceNode->addSuccessorNode(edgeSucc);

@@ -34,6 +34,7 @@
 #include "mynew.h"
 
 #include <iostream>
+#include <sstream>
 #include "BddRepresentation.h"  
 #include "BddLabel.h"
 #include "graphEdge.h"
@@ -60,13 +61,16 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
 	int sizeAnn = nbrLabels + maxNodeBits;
 	
 //for full symbolic representation (begin)
-	if(calcStates == true){
+	if (calcStates == true){
 		bound = 0;
 		int max = cntNodes;
 		cout << "Number of Nodes in OG: " << max << endl;
-		for (int i = 1; i<=max; ++i){
-			nodeMap.insert(make_pair(i, i));
-		}  
+
+        std::stringstream sstr();
+
+		for (int i = 1; i <= max; ++i) {
+            nodeMap.insert(make_pair(i, i));
+		}
 		maxNodeNumber = max;
 		maxNodeBits = nbrBits(max);
 		sizeMp = 2 * maxNodeBits + maxLabelBits + PN->getPlaceCount();
@@ -154,7 +158,7 @@ BddRepresentation::~BddRepresentation(){
 void BddRepresentation::convertRootNode(GraphNode* root){
 	trace(TRACE_5, "void BddRepresentation::convertRootNode(GraphNode* root): begin\n");
 	
-	pair<map<unsigned int, unsigned int>::iterator,bool> success;
+	pair<map<unsigned int, unsigned int>::iterator, bool> success;
 	success = nodeMap.insert(make_pair(root->getNumber(), 0));
 	assert(success.second == true);
 	
@@ -163,7 +167,7 @@ void BddRepresentation::convertRootNode(GraphNode* root){
 
 
 //! \brief generate BDD representation
-void BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]){
+void BddRepresentation::generateRepresentation(GraphNode* v, std::map<GraphNode*, bool>& visitedNodes){
 	
 	trace(TRACE_5, "BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]): start\n");
 
@@ -180,7 +184,7 @@ void BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]
 	v->resetIteratingSuccNodes();
 	if (v->getColor() == BLUE) {	
 		if (v->reachGraphStateSet.size() != 0){
-			visitedNodes[v->getNumber()] = 1;
+			visitedNodes[v] = true;
 			GraphEdge* element;
 			
 			while((element = v->getNextSuccEdge()) != NULL){;
@@ -189,13 +193,13 @@ void BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]
 				if (vNext->getColor() == BLUE && 
 				    vNext->reachGraphStateSet.size() != 0 &&
 				    vNext != NULL ) {
-				    
+
 					//label	
 					DdNode * label = labelToBddMp(element->getLabel()); 
-		
+
 					//nodes 
-					DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
-					
+                    DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
+
 					//edge
 					DdNode * edge = Cudd_bddAnd(mgrMp, label, nodes);
 					assert(edge != NULL); 
@@ -215,7 +219,7 @@ void BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]
 					Cudd_RecursiveDeref(mgrMp, edge);
 					Cudd_RecursiveDeref(mgrMp, bddMp);
 					bddMp = tmp;	
-					if ((vNext != v) && !visitedNodes[vNext->getNumber()]){
+					if ((vNext != v) && !visitedNodes[vNext]){
 						generateRepresentation(vNext, visitedNodes); 
 					}   
 				}
@@ -263,7 +267,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(GraphNode* v){
 				DdNode * label = labelToBddMp(element->getLabel()); 
 
 				//nodes		    
-				DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());	            
+                DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
 			
 				//edge
 				DdNode * edge = Cudd_bddAnd(mgrMp, label, nodes); 
@@ -335,23 +339,22 @@ DdNode* BddRepresentation::labelToBddMp(const std::string& label) {
 
 
 //! \brief returns the BDD of the nodes (given as integer) of an edge
-DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2){
-	
+DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2) {
+
 	trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2): start\n");
-	
-	unsigned int bddNumber1 = getBddNumber(node1);   
+
+	unsigned int bddNumber1 = getBddNumber(node1);
 	unsigned int bddNumber2 = getBddNumber(node2);
-    
-	unsigned int max;	
-	if (bddNumber1 > bddNumber2){
+
+	unsigned int max;
+	if (bddNumber1 > bddNumber2) {
 		max = bddNumber1;
-	}
-	else {
+	} else {
 		max = bddNumber2;
 	}
-		
+
 	//cout << "max: " << max  << "  maxNodeNumber-old-: " << maxNodeNumber << endl;
-    
+
 	if (max > maxNodeNumber){
 		addBddVars(max);
 	}
@@ -509,15 +512,14 @@ unsigned int BddRepresentation::getBddNumber(unsigned int node){
 	
 	unsigned int bddNumber;
 	if (map_iter == nodeMap.end()){ //if node not found add node with a new bddNumber
-	pair<map<unsigned int, unsigned int>::iterator, bool> success;
-	bddNumber = nodeMap.size();
-	success = nodeMap.insert(make_pair(node, bddNumber));
-	//if (!(success.second)){exit(1);}
+    	pair<map<unsigned int, unsigned int>::iterator, bool> success;
+    	bddNumber = nodeMap.size();
+    	success = nodeMap.insert(make_pair(node, bddNumber));
+    	//if (!(success.second)){exit(1);}
+	} else {
+        bddNumber = map_iter -> second;
 	}
-	else {
-        	bddNumber = map_iter -> second;
-	}
-	
+
 	trace(TRACE_5, "BddRepresentation::getBddNumber(unsigned int node): end\n");
 	return(bddNumber);
 }
@@ -908,7 +910,7 @@ void BddRepresentation::printMemoryInUse(){
 }
 
 
-void BddRepresentation::testSymbRepresentation(GraphNode* v, bool visitedNodes[]){
+void BddRepresentation::testSymbRepresentation(GraphNode* v, std::map<GraphNode*, bool>& visitedNodes){
 	
 	trace(TRACE_5, "BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]): start\n");
 	
@@ -930,7 +932,7 @@ void BddRepresentation::testSymbRepresentation(GraphNode* v, bool visitedNodes[]
 	//Cudd_PrintMinterm(mgrMp, states); cout << endl;
 	
 	v->resetIteratingSuccNodes();	
-	visitedNodes[v->getNumber()] = 1;
+	visitedNodes[v] = 1;
 	GraphEdge* element;
 	
 	while((element = v->getNextSuccEdge()) != NULL){
@@ -942,8 +944,8 @@ void BddRepresentation::testSymbRepresentation(GraphNode* v, bool visitedNodes[]
 			DdNode * label = labelToBddMp(element->getLabel());
 
 			//nodes 
-			DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
-			
+            DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
+
 			//edge
 			DdNode * edge = Cudd_bddAnd(mgrMp, label, nodes); 
 			assert(edge != NULL);
@@ -980,7 +982,7 @@ void BddRepresentation::testSymbRepresentation(GraphNode* v, bool visitedNodes[]
 				Cudd_RecursiveDeref(mgrMp, bddRed);
 				bddRed = tmp;	
 			}
-			if ((vNext != v) && !visitedNodes[vNext->getNumber()]){
+			if ((vNext != v) && !visitedNodes[vNext]){
 					testSymbRepresentation(vNext, visitedNodes); 
 			}   
 		}
@@ -1043,7 +1045,7 @@ DdNode* BddRepresentation::markingToBddMp(unsigned int * marking){
 }
 
 
-void BddRepresentation::calculateBound(GraphNode* v, bool visitedNodes[]){
+void BddRepresentation::calculateBound(GraphNode* v, std::map<GraphNode*, bool>& visitedNodes){
 	if (v->reachGraphStateSet.size() != 0) {
             StateSet::iterator iter;  // iterator over the stateList's elements
 
@@ -1057,17 +1059,16 @@ void BddRepresentation::calculateBound(GraphNode* v, bool visitedNodes[]){
        			}
             }
             v->resetIteratingSuccNodes();
-            visitedNodes[v->getNumber()] = 1;
+            visitedNodes[v] = true;
             GraphEdge * element;
 
             while ((element = v->getNextSuccEdge()) != NULL) {
                 GraphNode * vNext = element->getDstNode();
 				
-                if (vNext->reachGraphStateSet.size() != 0 && 
-                    vNext != NULL && 
-                    vNext != v &&
-                    !visitedNodes[vNext->getNumber()]) {
-                            calculateBound(vNext, visitedNodes);
+                if (vNext->reachGraphStateSet.size() != 0 && vNext != NULL && 
+                    vNext != v && !visitedNodes[vNext]) {
+
+                    calculateBound(vNext, visitedNodes);
                 }
             } // while 
 		}
@@ -1080,7 +1081,7 @@ unsigned int BddRepresentation::getBound(){
 }
 
 
-void BddRepresentation::setMaxPlaceBits(GraphNode* v, bool visitedNodes[]){
+void BddRepresentation::setMaxPlaceBits(GraphNode* v, std::map<GraphNode*, bool>& visitedNodes){
 	calculateBound(v, visitedNodes);
 	maxPlaceBits = nbrBits(bound);	
 	cout <<	"maxPlaceBits: " << maxPlaceBits << endl;

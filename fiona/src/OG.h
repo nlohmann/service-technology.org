@@ -101,15 +101,16 @@ public:
         void printOGtoFile() const;
         
         /** Prints nodes of the OG into an OG file below the NODES section. */
-        void printNodesToOGFile(GraphNode * v, fstream& os, bool visitedNodes[]) const;
-        
+//        void printNodesToOGFile(GraphNode * v, fstream& os, bool visitedNodes[]) const;
+        void printNodesToOGFile(GraphNode * v, fstream& os, std::map<GraphNode*, bool>& visitedNodes) const;
+
         /** Generates for the given node its name to be used in operating
           * guidelines. */
         std::string NodeNameForOG(const GraphNode* v) const;
         
         /** Prints transitions of the OG to an OG file below the TRANSITIONS
           * section. */
-        void printTransitionsToOGFile(GraphNode * v, fstream& os, bool visitedNodes[]) const;
+        void printTransitionsToOGFile(GraphNode * v, fstream& os, std::map<GraphNode*, bool>& visitedNodes) const;
         
         // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new

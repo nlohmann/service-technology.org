@@ -67,6 +67,7 @@ std::string GraphNodeColor::toString() const {
     return "undefined color";
 }
 
+
 GraphNodeColor::operator GraphNodeColor_enum() const {
     return color_;
 }
@@ -76,6 +77,7 @@ GraphNodeColor::operator GraphNodeColor_enum() const {
 //! \brief constructor
 GraphNode::GraphNode(int numberEvents) :
 			   number(12345678),
+               name("12345678"),
 			   color(BLUE),
 			   successorNodes(NULL),
 			   hasFinalStateInStateSet(false),
@@ -119,10 +121,24 @@ unsigned int GraphNode::getNumber() const {
 }
 
 
+//! \return name of this node
+//! \brief returns the name of this node
+std::string GraphNode::getName() const {
+    return name;
+}
+
+
 //! \param _number number of this node in the graph
 //! \brief sets the number of this node
 void GraphNode::setNumber(unsigned int _number) {
 	number = _number;
+}
+
+
+//! \param _name new name of this node in the graph
+//! \brief sets the name of this node
+void GraphNode::setName(std::string newName) {
+    name = newName;
 }
 
 
@@ -159,10 +175,10 @@ void GraphNode::removeLiteralFromFormula(oWFN::Places_t::size_type i, GraphEdgeT
     trace(TRACE_5, "GraphNode::removeLiteralFromFormula(oWFN::Places_t::size_type i, GraphEdgeType type) : start\n");
 
     if (type == SENDING) {
-        //cout << "remove literal " << PN->getInputPlace(i)->getLabelForCommGraph() << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
+        //cout << "remove literal " << PN->getInputPlace(i)->getLabelForCommGraph() << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
         annotation->removeLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
     } else {
-        //cout << "remove literal " << PN->getOutputPlace(i)->getLabelForCommGraph() << " from annotation " << annotation->asString() << " of node number " << getNumber() << endl;
+        //cout << "remove literal " << PN->getOutputPlace(i)->getLabelForCommGraph() << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
         annotation->removeLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
     }
 
@@ -210,7 +226,7 @@ GraphFormulaCNF* GraphNode::getAnnotation() const {
 // return the assignment that is imposed by present or absent arcs leaving node v
 GraphFormulaAssignment* GraphNode::getAssignment() {
 
-	trace(TRACE_5, "computing assignment of node " + intToString(getNumber()) + "\n");
+	trace(TRACE_5, "computing assignment of node " + getName() + "\n");
 
 	GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
 

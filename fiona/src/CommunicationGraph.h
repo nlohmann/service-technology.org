@@ -70,8 +70,8 @@ private:
      *     already looked at.
      */
     void computeNumberOfStatesAndEdgesHelper(
-        GraphNode*    v,
-        bool          visitedNodes[]);
+        GraphNode* v,
+        std::map<GraphNode*, bool>& visitedNodes);
 
     /**
      * Computes the number of all blue to be shown nodes and edges in this
@@ -89,7 +89,7 @@ private:
      */
     void computeNumberOfBlueNodesEdgesHelper(
         GraphNode* v,
-        bool       visitedNodes[]);
+        std::map<GraphNode*, bool>& visitedNodes);
 
     /**
      * The total number of all states stored in all nodes in this graph.
@@ -172,15 +172,15 @@ public:
     void buildGraphRandom();
 
     void printGraphToDot();
-    void printGraphToDotRecursively(GraphNode * v, fstream& os, bool[]);
+    void printGraphToDotRecursively(GraphNode * v, fstream& os, std::map<GraphNode*, bool>&);
 
     // functions to create an STG representation of the IG or OG
     void printGraphToSTG();
-    void printGraphToSTGRecursively(GraphNode *v, fstream& os, bool[]);
+    void printGraphToSTGRecursively(GraphNode *v, fstream& os, std::map<GraphNode*, bool>&);
     
     // functions to annotate the OG for distributed controllability
     bool annotateGraphDistributedly();    
-    bool annotateGraphDistributedlyRecursively(GraphNode *v, bool[]);
+    bool annotateGraphDistributedlyRecursively(GraphNode *v, std::map<GraphNode*, bool>&);
     void removeLabeledSuccessor(GraphNode *v, std::string label);
     
 

@@ -57,7 +57,7 @@ class BddRepresentation{
 		~BddRepresentation();
 		
 		void convertRootNode(GraphNode* root);
-		void generateRepresentation(GraphNode* v, bool visitedNodes[]);
+		void generateRepresentation(GraphNode* v, std::map<GraphNode*, bool>&);
 		void addOrDeleteLeavingEdges(GraphNode* v);
 		void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 		void printDotFile(char** names = NULL, char* option = "OG");
@@ -65,9 +65,9 @@ class BddRepresentation{
 		void save(char* option = "OG");
 		void printMemoryInUse();
 		
-		void testSymbRepresentation(GraphNode* v, bool visitedNodes[]);
+		void testSymbRepresentation(GraphNode* v, std::map<GraphNode*, bool>&);
 		unsigned int getBound();
-		void setMaxPlaceBits(GraphNode* v, bool visitedNodes[]);
+		void setMaxPlaceBits(GraphNode* v, std::map<GraphNode*, bool>&);
 		
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.
@@ -106,7 +106,7 @@ class BddRepresentation{
 		DdNode* statesToBddMp(GraphNode* v);
 		DdNode* markingToBddMp(unsigned int * marking);
 		unsigned int bound;
-		void calculateBound(GraphNode* v, bool visitedNodes[]);
+		void calculateBound(GraphNode* v, std::map<GraphNode*, bool>&);
 		int maxPlaceBits;
 };
 

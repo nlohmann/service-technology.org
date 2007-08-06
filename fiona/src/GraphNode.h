@@ -68,10 +68,12 @@ class GraphNodeColor {
 
 class GraphNode {
 private:
-    /**
-     * Number of this GraphNode in the graph.
-     */
+
+    //! Number of this GraphNode in the graph.
     unsigned int number;
+
+    //! Name of this GraphNode in the graph.
+    std::string name;
 
     /**
      * Color of this GraphNode.
@@ -98,6 +100,9 @@ public:
 
     unsigned int getNumber() const;
     void setNumber(unsigned int);
+
+    std::string getName() const;
+    void setName(std::string);
 
     // states in GraphNode
     bool addState(State *);

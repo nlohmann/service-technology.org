@@ -151,7 +151,7 @@ void communicationGraph::analyseNode(GraphNode* node) {
     trace(TRACE_5, "communicationGraph::analyseNode(GraphNode* node) : start\n");
 
     trace(TRACE_3, "\t\t\t analysing node ");
-    trace(TRACE_3, intToString(node->getNumber()) + "...\n");
+    trace(TRACE_3, node->getNumber() + "...\n");
 
     assert(node->getColor() == BLUE);
 
@@ -171,12 +171,12 @@ void communicationGraph::computeGraphStatistics() {
 
 void communicationGraph::computeNumberOfStatesAndEdges() {
 
-    bool visitedNodes[getNumberOfNodes()];
+    std::map<GraphNode*, bool> visitedNodes;
 
-    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-        visitedNodes[i] = false;
-    }
-
+//    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
+//        visitedNodes[i] = false;
+//    }
+//
     nStoredStates = 0;
     nEdges        = 0;
 
@@ -186,13 +186,13 @@ void communicationGraph::computeNumberOfStatesAndEdges() {
 
 void communicationGraph::computeNumberOfStatesAndEdgesHelper(
     GraphNode*    v,
-    bool          visitedNodes[]) {
+    std::map<GraphNode*, bool>& visitedNodes) {
 
     assert(v != NULL);
 
     // counting the current node
     v->resetIteratingSuccNodes();
-    visitedNodes[v->getNumber()] = true;
+    visitedNodes[v] = true;
 
     nStoredStates += v->reachGraphStateSet.size();
 
@@ -206,7 +206,7 @@ void communicationGraph::computeNumberOfStatesAndEdgesHelper(
 
         nEdges++;
 
-        if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
+        if ((vNext != v) && !visitedNodes[vNext]) {
             computeNumberOfStatesAndEdgesHelper(vNext, visitedNodes);
         }
     }
@@ -215,11 +215,11 @@ void communicationGraph::computeNumberOfStatesAndEdgesHelper(
 
 void communicationGraph::computeNumberOfBlueNodesEdges() {
 
-    bool visitedNodes[getNumberOfNodes()];
+    std::map<GraphNode*, bool> visitedNodes;
 
-    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-        visitedNodes[i] = false;
-    }
+//    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
+//        visitedNodes[i] = false;
+//    }
 
     nBlueNodes = 0;
     nBlueEdges = 0;
@@ -230,12 +230,12 @@ void communicationGraph::computeNumberOfBlueNodesEdges() {
 
 void communicationGraph::computeNumberOfBlueNodesEdgesHelper(
     GraphNode* v,
-    bool       visitedNodes[]) {
+    std::map<GraphNode*, bool>& visitedNodes) {
 
     assert(v != NULL);
 
     // counting the current node
-    visitedNodes[v->getNumber()] = true;
+    visitedNodes[v] = true;
 
     if (v->getColor() == BLUE &&
         (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
@@ -257,7 +257,7 @@ void communicationGraph::computeNumberOfBlueNodesEdgesHelper(
                 nBlueEdges++;
             }
 
-            if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
+            if ((vNext != v) && !visitedNodes[vNext]) {
                 computeNumberOfBlueNodesEdgesHelper(vNext, visitedNodes);
             }
         } // while
@@ -399,10 +399,10 @@ void communicationGraph::printGraphToDot() {
         dotFile << "node [fontname=\"Helvetica\" fontsize=10];\n";
         dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
-        bool visitedNodes[getNumberOfNodes()];
-        for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-            visitedNodes[i] = 0;
-        }
+        std::map<GraphNode*, bool> visitedNodes;
+//        for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
+//            visitedNodes[i] = 0;
+//        }
 
         printGraphToDotRecursively(rootNode, dotFile, visitedNodes);
 
@@ -445,7 +445,7 @@ void communicationGraph::printGraphToDot() {
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
 //! \brief breadthsearch through the graph printing each node and edge to the output stream
-void communicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, bool visitedNodes[]) {
+void communicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, std::map<GraphNode*, bool>& visitedNodes) {
 
     assert(v != NULL);
 
@@ -510,7 +510,7 @@ void communicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
     os << "];\n";
 
     v->resetIteratingSuccNodes();
-    visitedNodes[v->getNumber()] = 1;
+    visitedNodes[v] = true;
     GraphEdge * element;
     string label;
 
@@ -525,7 +525,7 @@ void communicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
            << "\", fontcolor=black, color=" << vNext->getColor().toString();
 
         os << "];\n";
-        if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
+        if ((vNext != v) && !visitedNodes[vNext]) {
             printGraphToDotRecursively(vNext, os, visitedNodes);
         }
     } // while
@@ -582,10 +582,11 @@ void communicationGraph::printGraphToSTG() {
     dotFile << ".state graph" << endl;
 
     // mark all nodes as unvisited
-    bool visitedNodes[getNumberOfNodes()];
-    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-        visitedNodes[i] = false;
-    }
+    std::map<GraphNode*, bool> visitedNodes;
+//    bool visitedNodes[getNumberOfNodes()];
+//    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
+//        visitedNodes[i] = false;
+//    }
 
     // traverse the nodes recursively
     printGraphToSTGRecursively(rootNode, dotFile, visitedNodes);
@@ -632,14 +633,14 @@ void communicationGraph::printGraphToSTG() {
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
 //! \brief breadthsearch through the graph printing each node and edge to the output stream
-void communicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, bool visitedNodes[]) {
+void communicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, std::map<GraphNode*, bool>& visitedNodes) {
     assert(v != NULL);
     
     if (!v->isToShow(root))
         return;
     
     v->resetIteratingSuccNodes();
-    visitedNodes[v->getNumber()] = true;
+    visitedNodes[v] = true;
     GraphEdge *element;
     
     // arcs
@@ -661,34 +662,33 @@ void communicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, 
         os << this_edges_label;
         os << " p" << vNext->getNumber() << endl;
 
-        if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
+        if ((vNext != v) && !visitedNodes[vNext]) {
             printGraphToSTGRecursively(vNext, os, visitedNodes);
         }
     }
 }
 
 
-
-
-
 bool communicationGraph::annotateGraphDistributedly() {
     GraphNode* rootNode = root;
 
     // mark all nodes as unvisited
-    bool visitedNodes[getNumberOfNodes()];
-    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-        visitedNodes[i] = false;
-    }
+    std::map<GraphNode*, bool> visitedNodes;
+//    bool visitedNodes[getNumberOfNodes()];
+//    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
+//        visitedNodes[i] = false;
+//    }
     
     // traverse the nodes recursively
     return annotateGraphDistributedlyRecursively(rootNode, visitedNodes);
 }
 
-bool communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, bool visitedNodes[]) {
+
+bool communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes) {
     assert(v != NULL);
     GraphEdge *element;
     set<string> disabled, enabled;
-    
+
     if (!v->isToShow(root))
         return false;    
     
@@ -705,7 +705,7 @@ bool communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, boo
     }
     
     // standard procedurce
-    visitedNodes[v->getNumber()] = true;
+    visitedNodes[v] = true;
     
     v->resetIteratingSuccNodes();
     while ((element = v->getNextSuccEdge()) != NULL) {
@@ -714,7 +714,7 @@ bool communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, boo
         if (!vNext->isToShow(root))
             continue;
  
-        if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
+        if ((vNext != v) && !visitedNodes[vNext]) {
             bool done = annotateGraphDistributedlyRecursively(vNext, visitedNodes);
             
             if (done)

@@ -21,6 +21,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
+source defaults.sh
+
 result=1
 
 DIR=$testdir/philosophers

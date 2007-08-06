@@ -24,6 +24,8 @@ TESTS = syntax.sh extrema.sh messages.sh cyclic.sh \
 		sequences.sh samples.sh bddtest.sh
 
 
+# Notice: If you add environment variables here, you have to provide defaults
+# defaults.sh, too.
 TESTS_ENVIRONMENT = testdir=$(srcdir) MKDIR_P="$(MKDIR_P)" \
     builddir=$(builddir) PATH=".:../src:$(srcdir):$$PATH"
 

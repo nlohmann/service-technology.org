@@ -21,6 +21,7 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
+source defaults.sh
 source memcheck_helper.sh
 
 echo

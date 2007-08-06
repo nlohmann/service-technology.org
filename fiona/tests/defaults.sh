@@ -1,8 +1,5 @@
-#!/bin/bash
-
 ############################################################################
-# Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
-#                      Jan Bretschneider and Christian Gierds              #
+# Copyright 2007 Jan Bretschneider                                         #
 #                                                                          #
 # This file is part of Fiona.                                              #
 #                                                                          #
@@ -21,48 +18,17 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-source defaults.sh
-source memcheck_helper.sh
+# Allows test scrips to be directly called from the command line. Set all unset
+# environment variables that are normally set by the Makefile.
 
-echo
-echo ---------------------------------------------------------------------
-echo running $0
-echo
-
-DIR=$testdir/syntax
-FIONA=fiona
-
-#loeschen aller erzeugten Dateien im letzten Durchlauf
-rm -f $DIR/*.out
-rm -f $DIR/*.png
-rm -f $DIR/*.og
-rm -f $DIR/*.log
-
-result=0
-
-############################################################################
-
-owfn="$DIR/max_occurrence.owfn"
-cmd="$FIONA $owfn -t OG"
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
+if [ "$testdir" == "" ]; then
+    testdir=.
 fi
 
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.OG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$?
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo ... fiona exited with nonzero return value although it should not
-        result=1
-    fi
+if [ "$builddir" == "" ]; then
+    builddir=.
 fi
 
-############################################################################
-
-echo
-
-exit $result
+if [ "$MKDIR_P" == "" ]; then
+    MKDIR_P="mkdir -p"
+fi

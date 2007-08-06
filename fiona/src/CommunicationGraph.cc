@@ -38,7 +38,6 @@
 #include "GraphFormula.h"
 #include "options.h"
 #include "debug.h"
-#include "binDecision.h"
 #include "communicationGraph.h"
 #include "fiona.h"
 #include "set_helpers.h"

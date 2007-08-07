@@ -59,28 +59,28 @@ bool EventHandlerPlugin::isContainer() const
 
 QString EventHandlerPlugin::domXml() const
 {
-  return "<widget class=\"EventHandler\" name=\"horst\">\n"
+  return "<widget class=\"EventHandler\" name=\"eventhandler\">\n"
   " <property name=\"geometry\">\n"
   "  <rect>\n"
   "   <x>0</x>\n"
   "   <y>0</y>\n"
-  "   <width>200</width>\n"
-  "   <height>200</height>\n"
+  "   <width>32</width>\n"
+  "   <height>32</height>\n"
   "  </rect>\n"
   " </property>\n"
   " <property name=\"toolTip\" >\n"
-  "  <string>The current time</string>\n"
+  "  <string>the GUI eventhandler</string>\n"
   " </property>\n"
   " <property name=\"whatsThis\" >\n"
-  "  <string>The horst widget displays "
-  "the current time.</string>\n"
+  "  <string>The eventhandler organizes the "
+  "behavior of the gui.</string>\n"
   " </property>\n"
   "</widget>\n";
 }
 
 QString EventHandlerPlugin::includeFile() const
 {
-  return "horst.h";
+  return "eventhandler/eventhandler.h";
 }
 
 

@@ -20,8 +20,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006-12-27 17:53:47 $ by $Author: bretschn $.
-# Version $Revision: 1.1 $
+# File last changed $Date: 2007-08-07 19:23:24 $ by $Author: nlohmann $.
+# Version $Revision: 1.2 $
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -105,7 +105,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = .
+INPUT                  = . pnapi
 FILE_PATTERNS          = *.c \
                          *.cc \
                          *.cxx \

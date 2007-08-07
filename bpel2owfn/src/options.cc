@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/30 19:56:41 $
+ * \date    \$Date: 2007/08/07 12:01:37 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.97 $
+ * \version \$Revision: 1.98 $
  */
 
 
@@ -227,6 +227,7 @@ void parse_command_line(int argc, char* argv[])
 {
   // suffixes stores the file suffixes for the various supported file types
   suffixes[F_LOLA] = "lola"  ;
+  suffixes[F_IOLOLA] = "iolola"  ;
   suffixes[F_OWFN] = "owfn"  ;
   suffixes[F_DOT]  = "dot"   ;
   suffixes[F_INA]  = "pnt";
@@ -239,7 +240,7 @@ void parse_command_line(int argc, char* argv[])
   suffixes[F_XML]  = "xml"   ;
   
   // this array helps us to automatically check the valid formats
-  possibleFormats format[] = { F_LOLA, F_OWFN, F_DOT, F_INA, F_SPIN, F_PEP, F_APNN, F_INFO, F_PNML, F_TXT, F_XML };
+  possibleFormats format[] = { F_LOLA, F_OWFN, F_DOT, F_INA, F_SPIN, F_PEP, F_APNN, F_INFO, F_PNML, F_TXT, F_XML, F_IOLOLA };
   
   // this map indicates, whether a certain format is valid for a mode
   map< pair<possibleModi,possibleFormats>, bool > validFormats;
@@ -257,7 +258,8 @@ void parse_command_line(int argc, char* argv[])
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_APNN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_INFO)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_PNML)] = true;
-  
+
+  validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_IOLOLA)] = true;  
   validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_LOLA)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_OWFN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CHOREOGRAPHY,F_DOT )] = true;
@@ -398,6 +400,8 @@ void parse_command_line(int argc, char* argv[])
           formats[F_INFO] = true;
         else if (parameter == "ina")
           formats[F_INA] = true;
+        else if (parameter == "iolola")
+          formats[F_IOLOLA] = true;
         else if (parameter == "spin")
           formats[F_SPIN] = true;
         else if (parameter == suffixes[F_PNML])

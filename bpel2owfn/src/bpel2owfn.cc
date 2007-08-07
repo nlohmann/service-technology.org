@@ -31,17 +31,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/25 09:28:07 $
+ * \date    \$Date: 2007/08/07 12:01:37 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.193 $
+ * \version \$Revision: 1.194 $
  */
 
 
@@ -435,8 +435,8 @@ void final_output()
         output = NULL;
       }
     }
-
-
+    
+    
     // create LoLA output ?
     if ( formats[F_LOLA] )
     {
@@ -485,8 +485,8 @@ void final_output()
         }
       }
     }
-
-
+    
+    
     // create PNML output ?
     if ( formats[F_PNML] )
     {
@@ -511,8 +511,26 @@ void final_output()
         output = NULL;
       }
     }
+    
 
-
+    // create I/O-annotated LoLA output ?
+    if ( formats[F_IOLOLA] )
+    {
+      if (globals::output_filename != "")
+      {
+        output = openOutput(globals::output_filename + "." + suffixes[F_IOLOLA]);
+      }
+      trace(TRACE_INFORMATION, "-> Printing Petri net for I/O-annotated LoLA ...\n");
+      PN.set_format(FORMAT_IOLOLA);
+      (*output) << PN;
+      if (globals::output_filename != "")
+      {
+        closeOutput(output);
+        output = NULL;
+      }
+    }
+    
+    
     // create PEP output ?
     if ( formats[F_PEP] )
     {
@@ -529,8 +547,8 @@ void final_output()
         output = NULL;
       }
     }
-
-
+    
+    
     // create INA output ?
     if ( formats[F_INA] )
     {
@@ -564,7 +582,7 @@ void final_output()
         output = NULL;
       }
     }
-
+    
     // create APNN output ?
     if ( formats[F_APNN] )
     {
@@ -599,7 +617,7 @@ void final_output()
       {
         closeOutput(output);
         output = NULL;
-
+        
 #ifdef HAVE_DOT
         string systemcall = "dot -q -Tpng -o\"" + globals::output_filename + ".png\" \"" + globals::output_filename + "." + suffixes[F_DOT] + "\"";
 	trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
@@ -608,8 +626,8 @@ void final_output()
 #endif
       }
     }
-
-
+    
+    
     // create info file ?
     if ( formats[F_INFO] )
     {

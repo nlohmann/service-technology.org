@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/31 13:39:34 $
+ * \date    \$Date: 2007/08/07 12:01:38 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.157 $
+ * \version \$Revision: 1.158 $
  *
  * \ingroup petrinet
  */
@@ -165,7 +165,8 @@ typedef enum
   FORMAT_LOLA,		///< LoLA
   FORMAT_OWFN,		///< Fiona open workflow net (oWFN)
   FORMAT_PEP,		///< Low-Level PEP Notation
-  FORMAT_PNML		///< Petri Net Markup Language (PNML)
+  FORMAT_PNML,		///< Petri Net Markup Language (PNML)
+  FORMAT_IOLOLA		///< LoLA with I/O annotation
 } output_format;
 
     

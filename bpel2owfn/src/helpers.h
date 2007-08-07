@@ -34,13 +34,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007/06/28 07:38:16 $
+ * \date    \$Date: 2007/08/07 12:01:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  */
 
 
@@ -109,10 +109,6 @@ unsigned int max(unsigned int a, unsigned int b);
 /******************************************************************************
  * Set functions (since we're using templates, we cannot move this to a header)
  *****************************************************************************/
-
-// to avoid compile errors
-class Node;
-
 
 /*!
  * \brief returns the union of two sets

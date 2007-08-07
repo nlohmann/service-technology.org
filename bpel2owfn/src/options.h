@@ -34,13 +34,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/07/30 19:56:41 $
+ * \date    \$Date: 2007/08/07 12:01:37 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  */
 
 
@@ -135,7 +135,8 @@ typedef enum
   F_INFO,		///< BPEL2oWFN information file
   F_PNML,		///< Petri Net Markup Language
   F_TXT,		///< ASCII output (for the abstract syntax tree)
-  F_XML			///< XML output (for pretty-printed BPEL)
+  F_XML,		///< XML output (for pretty-printed BPEL)
+  F_IOLOLA		///< LoLA Petri net with I/O annotation
 } possibleFormats;
 
 

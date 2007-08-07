@@ -34,13 +34,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/07/31 13:15:07 $
+ * \date    \$Date: 2007/08/07 12:01:37 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.110 $
+ * \version \$Revision: 1.111 $
  *
  * \ingroup petrinet
  */
@@ -1102,23 +1102,78 @@ void PetriNet::output_lola(ostream *output) const
   
   (*output) << "{ Petri net created by " << PACKAGE_STRING << " reading " << globals::filename << " }" << endl << endl;
   
-  
-  // places (only internal)
-  (*output) << "PLACE" << endl;
-  unsigned int count = 1;
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); count++, p++)
-  {
-    (*output) << "  " << (*p)->nodeShortName();
     
-    if (count < P.size())
-      (*output) << "," << endl;
+  // output places according to the used LoLA format
+  if (format == FORMAT_IOLOLA)
+  {
+    /*****************************
+     * I/O-ANNOTATED LOLA FORMAT *
+     *****************************/    
+
+    set<Place *> internal_places;
+    set<Place *> internal_interface_places;
+    
+    // separate internal places from former interface places
+    for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    {
+      if ( (*p)->wasExternal == "")
+        internal_places.insert( *p );
+      else
+        internal_interface_places.insert( *p );
+    }
+
+    (*output) << "PLACE" << endl;
+
+    // places (only internal)
+    (*output) << "  INTERNAL" << endl;
+    unsigned int count = 1;
+    for (set<Place *>::iterator p = internal_places.begin(); p != internal_places.end(); count++, p++)
+    {
+      (*output) << "    " << (*p)->nodeShortName();
+      
+      if (count < internal_places.size())
+        (*output) << "," << endl;
+    }
+    (*output) << endl << ";" << endl << endl << endl;
+
+    // places (only internal)
+    (*output) << "  INTERNAL_INTERFACE" << endl;
+    count = 1;
+    for (set<Place *>::iterator p = internal_interface_places.begin(); p != internal_interface_places.end(); count++, p++)
+    {
+      (*output) << "    " << (*p)->nodeShortName();
+      
+      if (count < internal_interface_places.size())
+        (*output) << "," << endl;
+    }
+    (*output) << endl << ";" << endl << endl << endl;    
   }
-  (*output) << endl << ";" << endl << endl << endl;
+  else
+  {
+    /************************
+     * STANDARD LOLA FORMAT *
+     ************************/
+    
+    // places (only internal)
+    (*output) << "PLACE" << endl;
+    unsigned int count = 1;
+    for (set<Place *>::iterator p = P.begin(); p != P.end(); count++, p++)
+    {
+      (*output) << "  " << (*p)->nodeShortName();
+      
+      if (count < P.size())
+        (*output) << "," << endl;
+    }
+    (*output) << endl << ";" << endl << endl << endl;
+  }
+  
+  
+  // from here on, both standard LoLA and I/O-annotated LoLA formats are equal
   
   
   // initial marking
   (*output) << "MARKING" << endl;
-  count = 1;
+  unsigned int count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
     if ((*p)->tokens > 0)
@@ -1460,6 +1515,7 @@ ostream& PNapi::operator<< (ostream& os, const PNapi::PetriNet &obj)
     case(FORMAT_SPIN):	obj.output_spin(&os); break;
     case(FORMAT_INFO):	obj.output_info(&os); break;
     case(FORMAT_LOLA):	obj.output_lola(&os); break;
+    case(FORMAT_IOLOLA):obj.output_lola(&os); break;
     case(FORMAT_OWFN):	obj.output_owfn(&os); break;
     case(FORMAT_PEP):	obj.output_pep(&os); break;
     case(FORMAT_PNML):	obj.output_pnml(&os); break;

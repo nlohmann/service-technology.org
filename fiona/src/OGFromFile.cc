@@ -530,6 +530,112 @@ bool OGFromFile::isAcyclic() {
 	return true;
 }
 
+//! \brief computes the number of services determined by this OG
+//! \return number of Services
+unsigned int OGFromFile::numberOfServices() {
+    // needed because "root" is private
+    return numberOfServicesRecursively(root);
+}
+
+//! \brief computes the number of possible services for a node and its children
+//! \return number of Services
+unsigned int OGFromFile::numberOfServicesRecursively(OGFromFileNode* start) {
+    
+    // define needed variables
+    unsigned int number = 0;
+    set<string> labels;
+    map<string, unsigned int> labelCount;
+    GraphFormulaAssignment possibleAssignment;
+
+    // get and save the labels of all outgoing transitions of this node in the labels set
+    for (OGFromFileNode::transitions_t::const_iterator trans_iter = start->transitions.begin();
+         trans_iter != start->transitions.end(); ++trans_iter) {
+        if (start == (*trans_iter)->getSrc() && (*trans_iter)->getDst()->getColor() == BLUE) {
+            labels.insert((*trans_iter)->getLabel());
+        }
+    }
+
+    // Process the number of assignments for the true assignments of this node
+    processAssignmentsRecursively(labels, labelCount, possibleAssignment, start);
+    
+    // reaching this node is one more service already
+    number = 1;
+
+    // The number of services is increased for every outgoing transitions, that leads to a blue
+    // Node, by the number of true assignments, that include the transitions label to be true, multiplied
+    // recursively with the destination's node number of possible services 
+    for (OGFromFileNode::transitions_t::const_iterator trans_iter = start->transitions.begin();
+         trans_iter != start->transitions.end(); ++trans_iter) {
+        if (start == (*trans_iter)->getSrc() && (*trans_iter)->getDst()->getColor() == BLUE) {
+            number += labelCount[(*trans_iter)->getLabel()] * numberOfServicesRecursively((*trans_iter)->getDst());
+        }
+    }
+
+    // return the number of services below this node
+    return number;
+}
+
+//! \brief computes the number of true assignments for the given formula of an OG node and additionally
+//!        saves how often every label participated in a true assignment. The function works by recursively
+//!        computing and checking the powerset of all labels of the node
+//! \return number of Services
+unsigned int OGFromFile::processAssignmentsRecursively(set<string> labels, map<string, unsigned int>& labelCount, GraphFormulaAssignment possibleAssignment, OGFromFileNode* testNode) {
+
+    // If there is no outgoing transition, return immediatly
+    if(labels.empty()) {
+        return 0;
+    }
+    
+    // define variables
+    unsigned int returnValue = 0;
+    unsigned int tempValue = 0;
+    string label;
+    label = (*labels.begin());
+    labels.erase(labels.begin());
+  
+    // if this was the last lable ...
+    if (labels.empty())
+    {
+        // set it to False
+        possibleAssignment.setToFalse(label);
+        if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)){
+            // Increase the Number of true Assigments by one if the assignment is true
+            returnValue += 1;
+        }
+
+        // set it to True
+        possibleAssignment.setToTrue(label);
+        if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)){
+            // increase the Number of true Assigments by one if the assignment is true
+            returnValue += 1;
+            // and increasy the count of this specific label by one, since it was true too
+            labelCount[label] += 1;
+        }
+    // If this is a lable inbetween or at the start
+    } else {
+        // set it to False
+        possibleAssignment.setToFalse(label);
+        // count the number of all true assignments which are true following this label being set to false
+        tempValue = processAssignmentsRecursively(labels, labelCount, possibleAssignment, testNode);    
+        // increase the number of true assignments accordingly
+        returnValue += tempValue;
+
+        // set it to True
+        possibleAssignment.setToTrue(label);
+        // count the number of all true assignments which are true following this label being set to true
+        tempValue = processAssignmentsRecursively(labels, labelCount, possibleAssignment, testNode);    
+        // increase the number of true assignments accordingly
+        returnValue += tempValue;        
+        // and also increase the count of true assignemnts with this node being set to true 
+        labelCount[label] += tempValue;
+    }
+    
+    // reinsert the label aftwewards
+    labels.insert(labels.begin(),label);
+    
+    // return the number of true assignments
+    return returnValue;
+}
 
 OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
 	trace(TRACE_5, "OGFromFile::product(const OGFromFile* rhs): start\n");

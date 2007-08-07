@@ -222,6 +222,14 @@ public:
 
     bool simulates ( OGFromFile *smallerOG );
     
+
+    /**
+     * computes the number of Services determined by this OG
+     */
+    unsigned int numberOfServices();
+    unsigned int numberOfServicesRecursively(OGFromFileNode* start);
+    unsigned int processAssignmentsRecursively(set<string> labels, map<string, unsigned int>& LabelCount, GraphFormulaAssignment possibleAssignment, OGFromFileNode* testNode);
+
     //! Tests, if this OG is acyclic
     bool isAcyclic();
 };

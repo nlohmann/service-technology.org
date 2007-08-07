@@ -558,8 +558,12 @@ unsigned int OGFromFile::numberOfServicesRecursively(OGFromFileNode* start) {
     // Process the number of assignments for the true assignments of this node
     processAssignmentsRecursively(labels, labelCount, possibleAssignment, start);
     
-    // reaching this node is one more service already
-    number = 1;
+    // reaching this node is one more service if this node has no outgoing transitions
+    if (start->transitions.begin() == start->transitions.end()){
+        number = 1;
+    } else {
+        number = 0;
+    }
 
     // The number of services is increased for every outgoing transitions, that leads to a blue
     // Node, by the number of true assignments, that include the transitions label to be true, multiplied

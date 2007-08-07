@@ -107,7 +107,7 @@ unsigned int communicationGraph::getNumberOfBlueEdges() const {
 
 
 //! \brief calculates the root node of the graph
-// for OG only
+// for IG and OG
 void communicationGraph::calculateRootNode() {
 
     trace(TRACE_5, "void reachGraph::calculateRootNode(): start\n");
@@ -125,6 +125,7 @@ void communicationGraph::calculateRootNode() {
     }
 
     root->setNumber(0);
+    root->setName(intToString(0));
     setOfVertices.insert(root);
 
     trace(TRACE_5, "void reachGraph::calculateRootNode(): end\n");
@@ -284,25 +285,24 @@ bool communicationGraph::stateActivatesOutputEvents(State * s) {
 //! \brief adds toAddValue to global progress value
 void communicationGraph::addProgress(double toAddValue) {
 
-    trace(TRACE_2, "\t adding ");
+    trace(TRACE_4, "\t adding ");
 
     // double2int in per cent = trunc(100*value)
-    trace(TRACE_2, intToString(int(100 * toAddValue)));
-    trace(TRACE_2, ",");
+    trace(TRACE_4, intToString(int(100 * toAddValue)));
+    trace(TRACE_4, ",");
     // precision 4 digits after comma = (x * 100 * 1000) mod 1000
 
     int aftercomma = int(100 * 10000 * toAddValue) % 10000;
 
-    if (aftercomma <   10) trace(TRACE_2, "0");
-    if (aftercomma <  100) trace(TRACE_2, "0");
-    if (aftercomma < 1000) trace(TRACE_2, "0");
+    if (aftercomma <   10) trace(TRACE_4, "0");
+    if (aftercomma <  100) trace(TRACE_4, "0");
+    if (aftercomma < 1000) trace(TRACE_4, "0");
 
-    trace(TRACE_2, intToString(aftercomma));
+    trace(TRACE_4, intToString(aftercomma));
 
-    trace(TRACE_2, " to progress\n");
+    trace(TRACE_4, " to progress\n");
 
     global_progress += toAddValue;
-
 }
 
 

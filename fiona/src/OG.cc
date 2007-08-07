@@ -81,6 +81,7 @@ void OG::buildGraph() {
     // second parameter means: if finished, 100% of the graph is constructed 
     buildGraph(getRoot(), 1);
     correctNodeColorsAndShortenAnnotations();
+
     computeGraphStatistics();
 }
 
@@ -98,7 +99,6 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 	}
 	trace(TRACE_2, "\t number of states in node: ");
     trace(TRACE_2, intToString(currentNode->reachGraphStateSet.size()) + "\n");
-
 
 	if (currentNode->getColor() == RED) {
 		// this may happen due to a message bound violation in current node
@@ -126,11 +126,11 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
 
 	// iterate over all elements of inputSet of the oWFN
-	trace(TRACE_2, "\t\t\t iterating over inputSet of the oWFN\n");
+	trace(TRACE_2, "\t\t  iterating over inputSet of the oWFN\n");
 	while (i < PN->getInputPlaceCount()) {
 
-		trace(TRACE_2, "\t\t\t\t    sending event: !");
-		trace(TRACE_2, string(PN->getInputPlace(i)->name));
+		trace(TRACE_2, "\t\t\t    sending event: !");
+		trace(TRACE_2, string(PN->getInputPlace(i)->name) + "\n");
 
 		if (PN->getInputPlace(i)->max_occurence < 0 ||
             PN->getInputPlace(i)->max_occurence > currentNode->eventsUsed[i]) {
@@ -138,28 +138,26 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
 			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
 
-			trace(TRACE_5, "calculating successor states\n");
-			calculateSuccStatesInput(PN->getInputPlace(i)->index, currentNode, v);
+            trace(TRACE_5, "\t\t\t\t    calculating successor states\n");
+            calculateSuccStatesInput(PN->getInputPlace(i)->index, currentNode, v);
 
-			if (v->getColor() == RED) {
-				// message bound violation occured during calculateSuccStatesInput
-				trace(TRACE_2, "\t\t\t\t\t    sending event: !");
-				trace(TRACE_2, PN->getInputPlace(i)->name);
-				trace(TRACE_2, " suppressed (message bound violated)\n");
+            if (v->getColor() == RED) {
+                // message bound violation occured during calculateSuccStatesInput
+                trace(TRACE_2, "\t\t\t            event suppressed (message bound violated)\n");
 
                 currentNode->removeLiteralFromFormula(i, SENDING);
 
-				addProgress(your_progress);
-				printProgress();
+                addProgress(your_progress);
+                printProgress();
 
                 numberDeletedVertices--;      // elsewise deletion of v is counted twice
-				delete v;
+                delete v;
 			} else {
 				// was the new node v computed before? 
                 GraphNode* found = findGraphNodeInSet(v);
 
                 if (found == NULL) {
-                trace(TRACE_1, "\t computed successor node new\n");
+                    trace(TRACE_1, "\t computed successor node new\n");
                     // node v is new, so the node as well as the edge to it is added 
                     addGraphNode(currentNode, v);
                     addGraphEdge(currentNode, v, i, SENDING);
@@ -167,7 +165,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                     // going down with sending event...
                     buildGraph(v, your_progress);
 
-                    trace(TRACE_1, "\t\t backtracking to node " + currentNode->getName() + "\n");
+                    trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
                     if (v->getColor() == RED) {
                         currentNode->removeLiteralFromFormula(i, SENDING);
                     }
@@ -195,9 +193,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                 }
             }
         } else {
-            trace(TRACE_2, "\t\t\t\t\t    !");
-            trace(TRACE_2, string(PN->getInputPlace(i)->name));
-            trace(TRACE_2, " suppressed (max_occurence reached)\n");
+            trace(TRACE_2, "\t\t\t            event suppressed (max_occurence reached)\n");
 
             currentNode->removeLiteralFromFormula(i, SENDING);
 
@@ -209,9 +205,9 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
     // early checking if the node's annotation cannot be made true
     if (currentNode->getAnnotation()->equals() == FALSE) {
-        trace(TRACE_3, "\t\t\t any further event suppressed (annotation of node ");
+        trace(TRACE_3, "\t\t any further event suppressed (annotation of node ");
         trace(TRACE_3, currentNode->getName() + " is unsatisfiable)\n");
-        trace(TRACE_5, "\t\t\t formula was " + currentNode->getAnnotation()->asString());
+        trace(TRACE_5, "\t\t formula was " + currentNode->getAnnotation()->asString());
         trace(TRACE_3, "\n");
         currentNode->setColor(RED);
 
@@ -222,11 +218,11 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
 	i = 0;
 	// iterate over all output places of the oWFN (receiving events in OG)
-	trace(TRACE_2, "\t\t\t iterating over output places of the oWFN\n");
+	trace(TRACE_2, "\t\t  iterating over output places of the oWFN\n");
 	while (i < PN->getOutputPlaceCount()) {
 
-		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
-		trace(TRACE_2, string(PN->getOutputPlace(i)->name));
+		trace(TRACE_2, "\t\t\t  receiving event: ?");
+		trace(TRACE_2, string(PN->getOutputPlace(i)->name) + "\n");
 
         if (PN->getOutputPlace(i)->max_occurence < 0 ||
             PN->getOutputPlace(i)->max_occurence > currentNode->eventsUsed[i + PN->getInputPlaceCount()]) {
@@ -247,7 +243,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 				// buildGraph(v, your_progress);
 				buildGraph(v, 0);
 				
-                trace(TRACE_1, "\t\t backtracking to node " + currentNode->getName() + "\n");
+                trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
 				if (v->getColor() == RED) {
 					currentNode->removeLiteralFromFormula(i, RECEIVING);
 				}
@@ -274,9 +270,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 //				printProgress();
 			}
 		} else {
-			trace(TRACE_2, "\t\t\t\t\t  ?");
-			trace(TRACE_2, string(PN->getOutputPlace(i)->name));
-			trace(TRACE_2, " suppressed (max_occurence reached)\n");
+            trace(TRACE_2, "\t\t\t            event suppressed (max_occurence reached)\n");
 
 			currentNode->removeLiteralFromFormula(i, RECEIVING);
 
@@ -287,9 +281,9 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
         // check whether annotation is still satisfiable
         if (currentNode->getAnnotation()->equals() == FALSE) {
             currentNode->setColor(RED);
-            trace(TRACE_3, "\t\t\t any further event suppressed (annotation of node ");
+            trace(TRACE_3, "\t\t any further event suppressed (annotation of node ");
             trace(TRACE_3, currentNode->getName() + " is unsatisfiable)\n");
-            trace(TRACE_5, "\t\t\t formula was " + currentNode->getAnnotation()->asString());
+            trace(TRACE_5, "\t\t formula was " + currentNode->getAnnotation()->asString());
             trace(TRACE_3, "\n");
             return;
         }
@@ -298,13 +292,13 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
     }
 
     // finished iterating over successors
-    trace(TRACE_2, "\t\t\t no events left...\n");
+    trace(TRACE_2, "\t\t  no events left...\n");
 
     if (currentNode->getColor() != RED) {
         analyseNode(currentNode);
     }
 
-	trace(TRACE_3, "\t\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()));
+	trace(TRACE_3, "\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()));
 	trace(TRACE_3, " via formula " + currentNode->getAnnotation()->asString() + "\n");
 
 	if (options[O_OTF]) {
@@ -411,13 +405,13 @@ void OG::calculateSuccStatesInput(unsigned int input, GraphNode * oldNode, Graph
 
         if (newNode->getColor() == RED) {
             // a message bound violation occured during computation of reachability graph
-            trace(TRACE_3, "\t\t\t\t\t found message bound violation during calculating EG in node\n");
+            trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
             trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode * node) : end\n");
             return;
         }
     }
 
-    trace(TRACE_3, "\t\t\t\t\t input event added without message bound violation\n");
+    trace(TRACE_3, "\t\t\t\t input event added without message bound violation\n");
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode * node) : end\n");
     return;
 }
@@ -510,113 +504,112 @@ void OG::correctNodeColorsAndShortenAnnotations() {
 }
 
 void OG::computeCNF(GraphNode* node) const {
-	
+
     trace(TRACE_5, "OG::computeCNF(GraphNode * node): start\n");
-	
-	// initially, the annoation is empty (and therefore equivalent to true)
-	assert(node->getAnnotation()->asString() == GraphFormulaLiteral::TRUE);
-	
-	StateSet::iterator iter;			// iterator over the states of the node
 
-	if (options[O_CALC_ALL_STATES]) {
-	// NO state reduction
+    // initially, the annoation is empty (and therefore equivalent to true)
+    assert(node->getAnnotation()->asString() == GraphFormulaLiteral::TRUE);
 
-		// iterate over all states of the node
-		for (iter = node->reachGraphStateSet.begin();
-			 iter != node->reachGraphStateSet.end(); iter++) {
+    StateSet::iterator iter;			// iterator over the states of the node
 
-			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
-				// we just consider the maximal states only
+    if (options[O_CALC_ALL_STATES]) {
+    // NO state reduction
 
-				// get the marking of this state
-				(*iter)->decodeShowOnly(PN);
+        // iterate over all states of the node
+        for (iter = node->reachGraphStateSet.begin();
+             iter != node->reachGraphStateSet.end(); iter++) {
 
-				// this clause's first literal
-				GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
+            if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
+                // we just consider the maximal states only
 
-				// in case of a final state we add special literal "final" to the clause
-				if ((*iter)->type == FINALSTATE) {
+                // get the marking of this state
+                (*iter)->decodeShowOnly(PN);
 
-                    node->hasFinalStateInStateSet = true;
+                // this clause's first literal
+                GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
 
-					if ((PN->FinalCondition) && (*iter)->cardFireList > 0) {
-                        cerr << "\n\t WARNING: found a finalstate which activates a transition -- you shouldn't do this!" << endl;
+                // in case of a final state we add special literal "final" to the clause
+                if ((*iter)->type == FINALSTATE) {
+
+                    if ((PN->FinalCondition) && (*iter)->cardFireList > 0) {
+                        cerr << "\n\t WARNING: found a finalstate which activates a transition";
+                        cerr << "\n\t          you shouldn't do this!" << endl;
                         // transient final states are ignored in annotation, just like
                         // all other transient states
                         continue;
                     } else {
+                        node->hasFinalStateInStateSet = true;
     					GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
     					myclause->addSubFormula(myliteral);
                     }
                 }
 
-				// get all input events
-				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
-					GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
-					myclause->addSubFormula(myliteral);
-				}
+                // get all input events
+                for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
+                    GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
+                    myclause->addSubFormula(myliteral);
+                }
 
-				// get all activated output events
-				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-						GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
-						myclause->addSubFormula(myliteral);
-					}
-				}
+                // get all activated output events
+                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                    if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                        GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
+                        myclause->addSubFormula(myliteral);
+                    }
+                }
 
-				node->addClause(myclause);
+                node->addClause(myclause);
+            }
+        }
+    } else {
+    // WITH state reduction
 
-				// TODO: an dieser stelle prüfen, ob myclause false ist -> dann knoten rot machen. Korrektur: das sollte der Aufrufer von computeCNF machen!
-			}
-		}
-	} else {
-	// WITH state reduction
+    	// iterate over all states of the node
+    	for (iter = PN->setOfStatesTemp.begin();
+    		 iter != PN->setOfStatesTemp.end(); iter++) {
+    		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
+    			// we just consider the maximal states only
 
-		// iterate over all states of the node
-		for (iter = PN->setOfStatesTemp.begin();
-			 iter != PN->setOfStatesTemp.end(); iter++) {
-			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
-				// we just consider the maximal states only
+    			// get the marking of this state
+    			(*iter)->decodeShowOnly(PN);
 
-				// get the marking of this state
-				(*iter)->decodeShowOnly(PN);
+    			// this clause's first literal
+    			GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
 
-				// this clause's first literal
-				GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
-
-				// in case of a final state we add special literal "final" to the clause
-				if ((*iter)->type == FINALSTATE) {
-					node->hasFinalStateInStateSet = true;
+    			// in case of a final state we add special literal "final" to the clause
+    			if ((*iter)->type == FINALSTATE) {
 
                     if ((PN->FinalCondition) && (*iter)->cardFireList > 0) {
-                        cerr << "\n\t WARNING: found a finalstate which activates a transition -- you shouldn't do this!" << endl;
+                        cerr << "\n\t WARNING: found a finalstate which activates a transition";
+                        cerr << "\n\t          you shouldn't do this!" << endl;
                         // transient final states are ignored in annotation, just like
                         // all other transient states
                         continue;
                     } else {
+                        node->hasFinalStateInStateSet = true;
                         GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
                         myclause->addSubFormula(myliteral);
                     }
-				}
+                }
 
-				// get all the input events
-				for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
-					GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
-					myclause->addSubFormula(myliteral);
-				}
+                // get all the input events
+                for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
+                    GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
+                    myclause->addSubFormula(myliteral);
+                }
 
-				// get the activated output events
-				for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-					if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-						GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
-						myclause->addSubFormula(myliteral);
-					}
-				}
+                // get the activated output events
+                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                    if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                        GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
+                        myclause->addSubFormula(myliteral);
+                    }
+                }
 
-				node->addClause(myclause);
-			}
-		}
-	}
+                node->addClause(myclause);
+            }
+        }
+    }
 
 	trace(TRACE_5, "OG::computeCNF(GraphNode * node): end\n");
 }

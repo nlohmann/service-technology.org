@@ -63,9 +63,9 @@ void interactionGraph::buildGraph() {
     calculateRootNode(); // creates the root node and calculates its reachability graph (set of states)
 
     if (options[O_CALC_REDUCED_IG]) {
-        buildReducedGraph(root);
+        buildReducedGraph(getRoot());
     } else {
-        buildGraph(root);
+        buildGraph(getRoot());
     }
 
     computeGraphStatistics();
@@ -135,7 +135,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 #endif
 
 					buildGraph(v);
-					trace(TRACE_1, "\t\t backtracking to node " + currentNode->getName() + "\n");
+					trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
 #ifdef LOOP
 	}
 #endif	
@@ -163,7 +163,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 #endif
 
             buildGraph(v);
-            trace(TRACE_1, "\t\t backtracking to node " + currentNode->getName() + "\n");
+            trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
 
 #ifdef LOOP
             }
@@ -236,7 +236,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 				
 			} else if (addGraphNode (currentNode, v, *iter, SENDING)) {
 				buildReducedGraph(v);
-				trace(TRACE_1, "\t\t backtracking to node " + currentNode->getName() + "\n");
+				trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
 			}
 		}
 	}
@@ -254,7 +254,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 
 			if (currentNode->getColor() != RED && addGraphNode (currentNode, v, *iter, RECEIVING)) {
 				buildReducedGraph(v);
-				trace(TRACE_1, "\t\t backtracking to node " + currentNode->getName() + "\n");
+				trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
 				//analyseNode(currentNode, false);
 				//trace(TRACE_5, "node analysed\n");
 			}

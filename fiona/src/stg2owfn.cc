@@ -122,4 +122,6 @@ void STG2oWFN_main() {
 
     STGPN.set_format(FORMAT_OWFN);
     (*file) << STGPN;
+
+    file->close();
 }

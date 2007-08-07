@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-07-18 12:20:20 $ by $Author: nlohmann $.
-# Version $Revision: 1.38 $
+# File last changed $Date: 2007-08-07 09:43:47 $ by $Author: massuthe $.
+# Version $Revision: 1.39 $
 
 bin_PROGRAMS = fiona
 
@@ -34,22 +34,22 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         lexer_owfn.ll lexer_owfn_wrap.h\
         syntax_og.yy lexer_og.ll\
 	syntax_stg.yy lexer_stg.ll \
-        petriNetNode.h petriNetNode.cc\
-        IG.cc owfnPlace.cc communicationGraph.h\
+        PetriNetNode.h PetriNetNode.cc\
+        IG.cc owfnPlace.cc CommunicationGraph.h\
         IG.h owfnPlace.h\
         OG.cc owfnTransition.cc\
         OG.h owfnTransition.h\
         debug.cc\
         binDecision.h binDecision.cc \
         searchTrace.h \
-        debug.h graphEdge.cc successorNodeList.cc\
-        graphEdge.h successorNodeList.h\
+        debug.h GraphEdge.cc successorNodeList.cc\
+        GraphEdge.h successorNodeList.h\
         dimensions.h main.cc symboltab.cc\
         main.h symboltab.h\
         options.cc userconfig.h\
         options.h GraphNode.cc \
         formula.cc owfn.cc GraphNode.h \
-        formula.h owfn.h communicationGraph.cc\
+        formula.h owfn.h CommunicationGraph.cc\
         getopt.c getopt1.c getopt.h \
         BddRepresentation.h BddRepresentation.cc \
         BddLabel.h BddLabel.cc \

@@ -35,7 +35,7 @@
 #define GraphNode_H_
 
 #include "mynew.h"
-#include "graphEdge.h"
+#include "GraphEdge.h"
 #include "owfn.h"
 #include <set>
 

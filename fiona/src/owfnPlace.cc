@@ -32,7 +32,7 @@
  */
 
 #include "mynew.h"
-#include "petriNetNode.h"
+#include "PetriNetNode.h"
 #include "owfn.h"
 #include "dimensions.h"
 #include "owfnPlace.h"

@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*!
- * \file    communicationGraph.cc
+ * \file    CommunicationGraph.cc
  *
  * \brief   common functions for IG / OG
  *
@@ -34,11 +34,11 @@
 #include "mynew.h"
 
 #include "state.h"
-#include "graphEdge.h"
+#include "GraphEdge.h"
 #include "GraphFormula.h"
 #include "options.h"
 #include "debug.h"
-#include "communicationGraph.h"
+#include "CommunicationGraph.h"
 #include "fiona.h"
 #include "set_helpers.h"
 #include <cassert>
@@ -54,7 +54,7 @@ extern FILE *stg_yyin;
 
 //! \param _PN
 //! \brief constructor
-communicationGraph::communicationGraph(oWFN * _PN) :
+CommunicationGraph::CommunicationGraph(oWFN * _PN) :
     root(NULL) {
 
     PN = _PN;
@@ -62,55 +62,55 @@ communicationGraph::communicationGraph(oWFN * _PN) :
 
 
 //! \brief destructor
-communicationGraph::~communicationGraph() {
-    trace(TRACE_5, "communicationGraph::~communicationGraph() : start\n");
+CommunicationGraph::~CommunicationGraph() {
+    trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : start\n");
     GraphNodeSet::iterator iter;
 
     for (iter = setOfVertices.begin(); iter != setOfVertices.end(); iter++) {
         delete *iter;
     }
 
-    trace(TRACE_5, "communicationGraph::~communicationGraph() : end\n");
+    trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : end\n");
 }
 
 
 //! \return pointer to root
 //! \brief returns a pointer to the root node of the graph
-GraphNode * communicationGraph::getRoot() const {
+GraphNode * CommunicationGraph::getRoot() const {
     return root;
 }
 
 
-unsigned int communicationGraph::getNumberOfNodes() const {
+unsigned int CommunicationGraph::getNumberOfNodes() const {
     return setOfVertices.size();
 }
 
 
-unsigned int communicationGraph::getNumberOfStoredStates() const {
+unsigned int CommunicationGraph::getNumberOfStoredStates() const {
     return nStoredStates;
 }
 
 
-unsigned int communicationGraph::getNumberOfEdges() const {
+unsigned int CommunicationGraph::getNumberOfEdges() const {
     return nEdges;
 }
 
 
-unsigned int communicationGraph::getNumberOfBlueNodes() const {
+unsigned int CommunicationGraph::getNumberOfBlueNodes() const {
     return nBlueNodes;
 }
 
 
-unsigned int communicationGraph::getNumberOfBlueEdges() const {
+unsigned int CommunicationGraph::getNumberOfBlueEdges() const {
     return nBlueEdges;
 }
 
 
 //! \brief calculates the root node of the graph
 // for IG and OG
-void communicationGraph::calculateRootNode() {
+void CommunicationGraph::calculateRootNode() {
 
-    trace(TRACE_5, "void reachGraph::calculateRootNode(): start\n");
+    trace(TRACE_5, "void CommunicationGraph::calculateRootNode(): start\n");
 
     assert(setOfVertices.size() == 0);
 
@@ -128,13 +128,13 @@ void communicationGraph::calculateRootNode() {
     root->setName(intToString(0));
     setOfVertices.insert(root);
 
-    trace(TRACE_5, "void reachGraph::calculateRootNode(): end\n");
+    trace(TRACE_5, "void CommunicationGraph::calculateRootNode(): end\n");
 }
 
 
 //! \param toAdd the GraphNode we are looking for in the graph
 //! \brief this function uses the find method from the template set
-GraphNode * communicationGraph::findGraphNodeInSet(GraphNode * toAdd) {
+GraphNode * CommunicationGraph::findGraphNodeInSet(GraphNode * toAdd) {
 
     GraphNodeSet::iterator iter = setOfVertices.find(toAdd);
     if (iter != setOfVertices.end()) {
@@ -147,9 +147,9 @@ GraphNode * communicationGraph::findGraphNodeInSet(GraphNode * toAdd) {
 
 //! \param node the node to be analysed
 //! \brief analyses the node and sets its color
-void communicationGraph::analyseNode(GraphNode* node) {
+void CommunicationGraph::analyseNode(GraphNode* node) {
 
-    trace(TRACE_5, "communicationGraph::analyseNode(GraphNode* node) : start\n");
+    trace(TRACE_5, "CommunicationGraph::analyseNode(GraphNode* node) : start\n");
 
     trace(TRACE_3, "\t\t\t analysing node ");
     trace(TRACE_3, node->getNumber() + "...\n");
@@ -160,17 +160,17 @@ void communicationGraph::analyseNode(GraphNode* node) {
     GraphNodeColor analysedColor = node->analyseNodeByFormula();
     node->setColor(analysedColor);
 
-    trace(TRACE_5, "communicationGraph::analyseNode(GraphNode* node) : end\n");
+    trace(TRACE_5, "CommunicationGraph::analyseNode(GraphNode* node) : end\n");
 }
 
 
 
-void communicationGraph::computeGraphStatistics() {
+void CommunicationGraph::computeGraphStatistics() {
     computeNumberOfStatesAndEdges();
     computeNumberOfBlueNodesEdges();
 }
 
-void communicationGraph::computeNumberOfStatesAndEdges() {
+void CommunicationGraph::computeNumberOfStatesAndEdges() {
 
     std::map<GraphNode*, bool> visitedNodes;
 
@@ -185,7 +185,7 @@ void communicationGraph::computeNumberOfStatesAndEdges() {
 }
 
 
-void communicationGraph::computeNumberOfStatesAndEdgesHelper(
+void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(
     GraphNode*    v,
     std::map<GraphNode*, bool>& visitedNodes) {
 
@@ -214,7 +214,7 @@ void communicationGraph::computeNumberOfStatesAndEdgesHelper(
 }
 
 
-void communicationGraph::computeNumberOfBlueNodesEdges() {
+void CommunicationGraph::computeNumberOfBlueNodesEdges() {
 
     std::map<GraphNode*, bool> visitedNodes;
 
@@ -229,7 +229,7 @@ void communicationGraph::computeNumberOfBlueNodesEdges() {
 }
 
 
-void communicationGraph::computeNumberOfBlueNodesEdgesHelper(
+void CommunicationGraph::computeNumberOfBlueNodesEdgesHelper(
     GraphNode* v,
     std::map<GraphNode*, bool>& visitedNodes) {
 
@@ -268,7 +268,7 @@ void communicationGraph::computeNumberOfBlueNodesEdgesHelper(
 
 //! \param s the state that is checked for activating output events
 //! \brief returns true, if the given state activates at least one output event
-bool communicationGraph::stateActivatesOutputEvents(State * s) {
+bool CommunicationGraph::stateActivatesOutputEvents(State * s) {
     s->decode(PN);
 
     for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
@@ -283,7 +283,7 @@ bool communicationGraph::stateActivatesOutputEvents(State * s) {
 
 //! \param toAddValue the additional progress value
 //! \brief adds toAddValue to global progress value
-void communicationGraph::addProgress(double toAddValue) {
+void CommunicationGraph::addProgress(double toAddValue) {
 
     trace(TRACE_4, "\t adding ");
 
@@ -308,7 +308,7 @@ void communicationGraph::addProgress(double toAddValue) {
 
 //! \brief prints the current global progress value depending whether the value
 //! changed significantly and depending on the debug-level set
-void communicationGraph::printProgress() {
+void CommunicationGraph::printProgress() {
 
 //    return;
 
@@ -330,7 +330,7 @@ void communicationGraph::printProgress() {
 
 //! \brief prints the current global progress value depending whether the value
 //! changed significantly and depending on the debug-level set
-void communicationGraph::printProgressFirst() {
+void CommunicationGraph::printProgressFirst() {
 
     trace(TRACE_0, "    ");
 //    return;
@@ -343,7 +343,7 @@ void communicationGraph::printProgressFirst() {
 }
 
 
-void communicationGraph::printGraphStatistics() {
+void CommunicationGraph::printGraphStatistics() {
     trace(TRACE_0, "    number of nodes: " + intToString(getNumberOfNodes()) + "\n");
     trace(TRACE_0, "    number of edges: " + intToString(getNumberOfEdges()) + "\n");
     trace(TRACE_0, "    number of deleted nodes: " + intToString(numberDeletedVertices) + "\n");
@@ -355,7 +355,7 @@ void communicationGraph::printGraphStatistics() {
 
 
 //! \brief creates a dot file of the graph
-void communicationGraph::printGraphToDot() {
+void CommunicationGraph::printGraphToDot() {
 
     unsigned int maxWritingSize = 5000;        // number relevant for .out file
     unsigned int maxPrintingSize = 500;        // number relevant to generate png
@@ -445,7 +445,7 @@ void communicationGraph::printGraphToDot() {
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
 //! \brief breadthsearch through the graph printing each node and edge to the output stream
-void communicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, std::map<GraphNode*, bool>& visitedNodes) {
+void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, std::map<GraphNode*, bool>& visitedNodes) {
 
     assert(v != NULL);
 
@@ -536,7 +536,7 @@ void communicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
 
 
 //! \brief creates a STG file of the graph
-void communicationGraph::printGraphToSTG() {
+void CommunicationGraph::printGraphToSTG() {
     trace(TRACE_0, "\ncreating the STG file of the graph...\n");
     GraphNode* rootNode = root;
     string buffer;
@@ -633,7 +633,7 @@ void communicationGraph::printGraphToSTG() {
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
 //! \brief breadthsearch through the graph printing each node and edge to the output stream
-void communicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, std::map<GraphNode*, bool>& visitedNodes) {
+void CommunicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, std::map<GraphNode*, bool>& visitedNodes) {
     assert(v != NULL);
     
     if (!v->isToShow(root))
@@ -669,7 +669,7 @@ void communicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, 
 }
 
 
-bool communicationGraph::annotateGraphDistributedly() {
+bool CommunicationGraph::annotateGraphDistributedly() {
     GraphNode* rootNode = root;
 
     // mark all nodes as unvisited
@@ -684,7 +684,7 @@ bool communicationGraph::annotateGraphDistributedly() {
 }
 
 
-bool communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes) {
+bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes) {
     assert(v != NULL);
     GraphEdge *element;
     set<string> disabled, enabled;
@@ -791,7 +791,7 @@ bool communicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, std
 }
 
 
-void communicationGraph::removeLabeledSuccessor(GraphNode *v, std::string label) {
+void CommunicationGraph::removeLabeledSuccessor(GraphNode *v, std::string label) {
     GraphEdge *element;
     v->resetIteratingSuccNodes();
     

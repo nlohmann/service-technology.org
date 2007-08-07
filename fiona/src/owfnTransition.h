@@ -35,7 +35,7 @@
 #define OWFNTRANSITION_H_
 
 #include "mynew.h"
-#include "petriNetNode.h"
+#include "PetriNetNode.h"
 #include <set>
 #include <vector>
 

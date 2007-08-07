@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*!
- * \file    graphEdge.cc
+ * \file    GraphEdge.cc
  *
  * \brief   functions for traversing IG / OG
  *
@@ -31,12 +31,12 @@
  *
  */
 
-#include "mynew.h"
-#include "graphEdge.h"
 #include <string>
 #include <stdexcept>
-#include "GraphNode.h"
 #include <cassert>
+#include "mynew.h"
+#include "GraphEdge.h"
+#include "GraphNode.h"
 
 using namespace std;
 

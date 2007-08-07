@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*!
- * \file    petriNetNode.h
+ * \file    PetriNetNode.h
  *
  * \brief   functions for Petri net elements
  *

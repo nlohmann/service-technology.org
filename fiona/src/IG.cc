@@ -44,7 +44,7 @@
 //! \fn interactionGraph::interactionGraph(oWFN * _PN) 
 //! \param _PN
 //! \brief constructor
-interactionGraph::interactionGraph(oWFN * _PN) : communicationGraph(_PN) {
+interactionGraph::interactionGraph(oWFN * _PN) : CommunicationGraph(_PN) {
 }
 
 //! \fn interactionGraph::~interactionGraph() 

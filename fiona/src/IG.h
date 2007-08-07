@@ -35,11 +35,11 @@
 #define IG_H_
 
 #include "mynew.h"
-#include "communicationGraph.h"
+#include "CommunicationGraph.h"
 
 class oWFN;
 
-class interactionGraph : public communicationGraph {
+class interactionGraph : public CommunicationGraph {
 
     private:
 

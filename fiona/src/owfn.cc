@@ -1217,7 +1217,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 
 //! \param n the node for which the reachability graph is computed
 //! \brief NO REDUCTION! calculate all reachable states from the current marking
-//! and store them in the node n (== GraphNode of communicationGraph);
+//! and store them in the node n (== GraphNode of CommunicationGraph);
 //! it will color the node n RED if a given message bound is violated
 void oWFN::calculateReachableStatesFull(GraphNode * n) {
     

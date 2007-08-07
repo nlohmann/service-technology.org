@@ -49,7 +49,7 @@
 
 //! \param _PN
 //! \brief constructor
-OG::OG(oWFN * _PN) : communicationGraph(_PN) {
+OG::OG(oWFN * _PN) : CommunicationGraph(_PN) {
 
 	 if (options[O_BDD] == true || options[O_OTF]) {
 		unsigned int nbrLabels = PN->getInputPlaceCount() + PN->getOutputPlaceCount();

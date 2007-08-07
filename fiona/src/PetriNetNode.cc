@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*!
- * \file    petriNetNode.cc
+ * \file    PetriNetNode.cc
  *
  * \brief   functions for Petri net elements
  *
@@ -32,7 +32,7 @@
  */
  
 #include "mynew.h"
-#include "petriNetNode.h"
+#include "PetriNetNode.h"
 #include "debug.h"
 
 void Node::addArrivingArc(Arc* arc)

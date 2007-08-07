@@ -35,14 +35,14 @@
 #define OG_H_
 
 #include "mynew.h"
-#include "communicationGraph.h"
+#include "CommunicationGraph.h"
 #include "BddRepresentation.h"
 
 
 class oWFN;
 
 
-class OG : public communicationGraph {
+class OG : public CommunicationGraph {
     
     private:
         /**

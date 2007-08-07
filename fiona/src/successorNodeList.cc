@@ -33,7 +33,7 @@
  
 #include "mynew.h"
 #include "successorNodeList.h"
-#include "graphEdge.h"
+#include "GraphEdge.h"
 #include "GraphNode.h"
 #include <string>
 #include <iostream>

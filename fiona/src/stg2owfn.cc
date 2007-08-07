@@ -5,7 +5,7 @@
 #include <string>
 
 //#include "owfn.h"
-#include "communicationGraph.h"
+#include "CommunicationGraph.h"
 #include "pnapi/pnapi.h"
 
 

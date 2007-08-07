@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*!
- * \file    graphEdge.h
+ * \file    GraphEdge.h
  *
  * \brief   functions for traversing IG / OG
  *

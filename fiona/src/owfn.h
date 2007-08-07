@@ -222,7 +222,7 @@ class oWFN {
          * Returns the label of the given marking, that means the label
          * consists of the names of the places of the net that have tokens
          * (is a multiset => occurance of name == number of tokens used in
-         * dotFile creation (communicationGraph::printGraphToDot).
+         * dotFile creation (CommunicationGraph::printGraphToDot).
          *
          * @param marking The marking to be printed out.
          */

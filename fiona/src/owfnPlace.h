@@ -35,7 +35,7 @@
 #define OWFNPLACE_H_
 
 #include "mynew.h"
-#include "petriNetNode.h"
+#include "PetriNetNode.h"
 #include "formula.h"
 #include <vector>
 #include <string>

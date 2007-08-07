@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*!
- * \file    communicationGraph.h
+ * \file    CommunicationGraph.h
  *
  * \brief   common functions for IG / OG
  *
@@ -35,7 +35,7 @@
 #define GRAPH_H_
 
 #include "mynew.h"
-#include "graphEdge.h"
+#include "GraphEdge.h"
 #include "owfn.h"
 #include <fstream>
 
@@ -52,7 +52,7 @@ extern double global_progress;
 extern int show_progress;
 
 /* communication graph */
-class communicationGraph {
+class CommunicationGraph {
 private:
 
     /**
@@ -124,8 +124,8 @@ protected:
 
 public:
 
-	communicationGraph(oWFN *);
-	~communicationGraph();
+	CommunicationGraph(oWFN *);
+	~CommunicationGraph();
 
 	GraphNodeSet setOfVertices;
 
@@ -200,7 +200,7 @@ public:
 
 // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
-	NEW_OPERATOR(communicationGraph)
+	NEW_OPERATOR(CommunicationGraph)
 #define new NEW_NEW
 };
 

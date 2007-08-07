@@ -35,7 +35,7 @@
 #define SUCCESSORNODELIST_H
 
 #include "mynew.h"
-#include "graphEdge.h"
+#include "GraphEdge.h"
 #include <stddef.h>
 #include <string>
 

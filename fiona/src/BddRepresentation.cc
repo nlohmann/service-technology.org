@@ -37,7 +37,7 @@
 #include <sstream>
 #include "BddRepresentation.h"  
 #include "BddLabel.h"
-#include "graphEdge.h"
+#include "GraphEdge.h"
 #include "GraphFormula.h"
 
 #include "options.h" 

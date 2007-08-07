@@ -66,6 +66,10 @@ extern int stg_yylex();
 %%
 
 stg:
+    {
+      transitions.clear(); places.clear(); initialMarked.clear(); arcs.clear();
+      tempNodeSet.clear(); in_marking_list = false; in_arc_list = false;
+    }
   K_MODEL IDENTIFIER newline
   K_DUMMY transition_list newline
   K_GRAPH newline { in_arc_list = true; }

@@ -44,6 +44,7 @@
 #include "main.h"
 #include "state.h"
 #include "containers.h"
+#include "pnapi/pnapi.h"
 
 using namespace std;
 
@@ -301,7 +302,9 @@ class oWFN {
         
         /// returns the port identified by its name
         std::set<std::string> getPort(std::string name) const;
-                
+
+        /// returns a pointer to this petrinet in the PNapi net format
+        PNapi::PetriNet* returnPNapiNet();                
         
         // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new

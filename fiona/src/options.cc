@@ -125,6 +125,8 @@ void print_help() {
   trace("                                     count       - count the number of services\n");
   trace("                                                   that are characterized by a\n");  
   trace("                                                   given OG\n");  
+  trace("                                     png         - generate png files from all\n");
+  trace("                                                   given of oWFNs\n");  
   trace(" -m | --messagemaximum=<level> ... set maximum number of same messages per\n");
   trace("                                   state to <level>\n");
   trace("                                   (default is 1)\n");
@@ -349,6 +351,10 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if (lc_optarg == "isacyclic") {
                     parameters[P_IG] = false;
                     options[O_CHECK_ACYCLIC] = true;
+                } else if (lc_optarg == "png") {
+                    parameters[P_IG] = false;
+                    parameters[P_OG] = false;
+                    options[O_PNG] = true;
                 } else {
                     cerr << "Error:\twrong modus operandi (option -t)" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
@@ -494,6 +500,12 @@ void parse_command_line(int argc, char* argv[]) {
     if (options[O_EX] == true && netfiles.size() != 2) {
         cerr << "Error: \t If option '-t equivalence' is used, exactly two oWFNs must be entered\n" << endl;
         cerr << "       \t and their BDDs must have been computed before." << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
+    }
+
+    if (options[O_PNG] == true && netfiles.size() == 0) {
+        cerr << "Error: \t No oWFNs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }

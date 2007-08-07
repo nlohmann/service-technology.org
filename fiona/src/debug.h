@@ -50,22 +50,22 @@ typedef enum {
   TRACE_3,			//!< number of states: global, local
   TRACE_4,          //!< to be defined
   TRACE_5			//!< all
-} trace_level;
+} trace_level_fiona;
 
-extern trace_level debug_level;
+extern trace_level_fiona debug_level;
 
 /**
- * Provides output to stderr using different #trace_level 
+ * Provides output to stderr using different #trace_level_fiona 
  * (in order to regulate amount of output)
  *
- * \param pTraceLevel	the #trace_level
+ * \param pTraceLevel	the #trace_level_fiona
  * \param message	the output
  *
  */
-void trace(trace_level pTraceLevel, std::string message);
+void trace(trace_level_fiona pTraceLevel, std::string message);
 
 /**
- * Works like #trace(trace_level,std::string) with trace_level = TRACE_ALWAYS
+ * Works like #trace(trace_level,std::string) with trace_level_fiona = TRACE_ALWAYS
  *
  * \param message the output
  *

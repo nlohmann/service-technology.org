@@ -42,6 +42,10 @@
 #include "debug.h"
 #include "OGFromFile.h"
 #include <list>
+#include <iostream>
+#include <fstream>
+#include "pnapi/pnapi.h"
+
 
 // #defines YY_FLEX_HAS_YYLEX_DESTROY if we can call yylex_destroy()
 #include "lexer_owfn_wrap.h"
@@ -420,6 +424,51 @@ void computeIG(oWFN* PN) {
     trace(TRACE_0, "\n");
 }
 
+// create an PNG of the given oWFN
+void makePNG(oWFN* PN) {
+
+    trace(TRACE_1, "internal translation of the net into PNapi format...\n");
+
+    // translate the net into PNapi format
+    PNapi::PetriNet* PNapiNet = PN->returnPNapiNet();
+
+    trace(TRACE_1, "internal translation of the net into PNapi format finished.\n");
+
+    // set strings needed in PNapi output
+    globals::output_filename = PN->filename;
+    globals::filename = PN->filename;
+    string name = PN->filename + ".dot";
+    
+    // Open a filestream needed for PNapi output
+    ofstream *file = new ofstream(name.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
+
+    // Only proceed if the file was opened successfully
+    if (!file->is_open()) {
+        trace(TRACE_0, "File \"" + name + "\" could not be opened for writing access!\n");
+    } else {
+        // set the net to dot output
+        PNapiNet->set_format(PNapi::FORMAT_DOT, true);
+        
+        // Write the dot output into the file
+        (*file) << (*PNapiNet);
+
+        trace(TRACE_0, "created the dot file\n");
+
+        // close the file and delete the pointer
+        (*file) << flush;
+        (static_cast<ofstream*>(file))->close();
+        delete(file);
+        file = NULL;
+
+        // Make a systemcall to dot in order to create the png
+        string systemcall = "dot -q -Tpng -o\"" + globals::output_filename + ".png\" \"" + globals::output_filename + ".dot\"";
+    	trace(TRACE_3, "Invoking dot with the following options:\n");
+    	trace(TRACE_3, systemcall + "\n\n");
+    	system(systemcall.c_str());  
+        trace(TRACE_0, "png generated\n");
+    }
+}
+
 
 // create the productOG of all given OGs
 void computeProductOG(OGFromFile::ogs_t OGsFromFiles) {
@@ -611,7 +660,7 @@ int main(int argc, char ** argv) {
 // **********************************************************************************
 // start petrinet-file dependant operations
 
-    if (options[O_EX] || options[O_MATCH] || parameters[P_OG] || parameters[P_IG]) {
+    if (options[O_EX] || options[O_MATCH] || parameters[P_OG] || parameters[P_IG] || options[O_PNG]) {
 
         if (options[O_EX] == true) {
             // checking exchangeability using BDDs
@@ -675,6 +724,11 @@ int main(int argc, char ** argv) {
             if (parameters[P_IG]) {
                 // computing IG of the current oWFN
                 computeIG(PN);
+            }
+
+            if (options[O_PNG]) {
+                // create a png file from the given net
+                makePNG(PN);    
             }
 
             delete PN;

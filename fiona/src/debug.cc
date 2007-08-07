@@ -44,7 +44,7 @@ std::string ogfileToParse;
 std::string owfnfileToParse;
 
 /// debug level
-trace_level debug_level = TRACE_0;
+trace_level_fiona debug_level = TRACE_0;
 
 /**
  * Provides output to stderr using different #trace_level 
@@ -54,7 +54,7 @@ trace_level debug_level = TRACE_0;
  * \param message	the output
  *
  */
-void trace(trace_level pTraceLevel, std::string message) {
+void trace(trace_level_fiona pTraceLevel, std::string message) {
     if (pTraceLevel <= debug_level) {
         (*log_output) << message << std::flush;
     }

@@ -2212,6 +2212,61 @@ unsigned int oWFN::getPortCount() const {
     return ports.size();
 }
 
+//! \brief returns this net as an PNapi net
+PNapi::PetriNet* oWFN::returnPNapiNet() {
+
+    PNapi::PetriNet* PN = new PNapi::PetriNet();
+
+    // translate all input places
+    for (Places_t::const_iterator place = inputPlaces.begin(); place != inputPlaces.end(); place++) {
+        PNapi::Place* p = PN->newPlace((*place)->name, PNapi::IN);
+        // Warning: tokens of a place in PNapi is private. The number of tokens is not translated correctly!
+        if ((*place)->initial_marking >= 1) {
+            p->mark();
+        }
+    }
+
+    // translate all output places
+    for (Places_t::const_iterator place = outputPlaces.begin(); place != outputPlaces.end(); place++) {
+        PNapi::Place* p = PN->newPlace((*place)->name, PNapi::OUT);
+        // Warning: tokens of a place in PNapi is private. The number of tokens is not translated correctly!
+        if ((*place)->initial_marking >= 1) {
+            p->mark();
+        }
+    }
+
+    // translate all places which are not input or output places
+    for (Places_t::const_iterator place = Places.begin(); place != Places.end(); place++) {
+        if (PN->findPlace((*place)->name) == NULL) {
+            PNapi::Place* p = PN->newPlace((*place)->name);
+            // Warning: tokens of a place in PNapi is private. The number of tokens is not translated correctly!
+            if ((*place)->initial_marking >= 1) {
+                p->mark();
+            }
+        }
+    }
+
+    // translate all transitions and generate all arcs
+    for (Transitions_t::const_iterator transition = Transitions.begin(); transition != Transitions.end(); transition++) {
+        PNapi::Transition* t = PN->newTransition((*transition)->name);
+        Arc::Arc* arc;
+        
+        // translate all leaving arcs
+        for (Node::Arcs_t::size_type i = 0; i < (*transition)->Node::getLeavingArcsCount(); ++i) {
+            arc = (*transition)->Node::getLeavingArc(i);
+            PN->newArc(t,PN->findPlace(arc->Destination->name), PNapi::STANDARD, arc->Multiplicity);
+        }
+
+        // translate all arriving arcs
+        for (Node::Arcs_t::size_type i = 0; i < (*transition)->Node::getArrivingArcsCount(); ++i) {
+            arc = (*transition)->Node::getArrivingArc(i);
+            PN->newArc(PN->findPlace(arc->Source->name), t, PNapi::STANDARD, arc->Multiplicity);
+        }
+
+    }
+
+    return PN;
+}                
 
 
 

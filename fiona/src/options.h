@@ -66,7 +66,8 @@ typedef enum
     O_SYNTHESIZE_PARTNER_OWFN,    //!< compute an oWFN from the IG/OG
     O_DISTRIBUTED,                //!< check for distributed controllability
     O_COUNT_SERVICES,
-    O_CHECK_ACYCLIC
+    O_CHECK_ACYCLIC,
+    O_PNG
 } possibleOptions;
 
 typedef enum

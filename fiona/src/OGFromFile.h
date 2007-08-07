@@ -66,7 +66,7 @@ private:
         OGFromFileNode* parentNode);
     OGFromFileNode* getParentNodeForTransitionLabel(
         const std::string& transitionLabel) const;
-    GraphFormula* annotation_;
+    GraphFormulaCNF* annotation_;
     OGFromFileNode* depthFirstSearchParent;
 public:
     transitions_t transitions;
@@ -91,7 +91,7 @@ public:
         const GraphFormulaAssignment& assignment) const;
 
     std::string getAnnotationAsString() const;
-	GraphFormula* getAnnotation() const;
+	GraphFormulaCNF* getAnnotation() const;
 
 	GraphFormulaAssignment* getAssignment() const;
 

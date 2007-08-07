@@ -52,7 +52,7 @@ OGFromFileNode::OGFromFileNode(const std::string& name,
     GraphFormula* annotation, GraphNodeColor color) :
     name_(name),
     color_(color),
-    annotation_(annotation),
+    annotation_(annotation->getCNF()),
     depthFirstSearchParent(NULL) {
 
 }
@@ -201,7 +201,7 @@ std::string OGFromFileNode::getAnnotationAsString() const {
 }
 
 
-GraphFormula* OGFromFileNode::getAnnotation() const {
+GraphFormulaCNF* OGFromFileNode::getAnnotation() const {
     return annotation_;
 }
 

@@ -50,13 +50,12 @@ class owfnPlace : public Node {
     private :
         oWFN * net;		// pointer to underlying petri net (needed for hash value)
         std::string port;       ///< the port of this place
-        
-        
+
     public:
         owfnPlace(char *, placeType, oWFN *);
         ~owfnPlace();
-        
-        placeType type;		// type of place (input, output, internal, initial, final)  
+
+        placeType type;		// type of place (input, output, internal)
         std::string getLabelForCommGraph() const;
         std::string getLabelForMatching() const;
         

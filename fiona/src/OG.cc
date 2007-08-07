@@ -508,7 +508,8 @@ void OG::computeCNF(GraphNode* node) const {
     trace(TRACE_5, "OG::computeCNF(GraphNode * node): start\n");
 
     // initially, the annoation is empty (and therefore equivalent to true)
-    assert(node->getAnnotation()->asString() == GraphFormulaLiteral::TRUE);
+    assert(node->getAnnotation()->equals() == TRUE);
+    // assert(node->getAnnotation()->asString() == GraphFormulaLiteral::TRUE);
 
     StateSet::iterator iter;			// iterator over the states of the node
 
@@ -567,6 +568,7 @@ void OG::computeCNF(GraphNode* node) const {
     	// iterate over all states of the node
     	for (iter = PN->setOfStatesTemp.begin();
     		 iter != PN->setOfStatesTemp.end(); iter++) {
+
     		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
     			// we just consider the maximal states only
 

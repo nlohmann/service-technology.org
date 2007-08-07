@@ -1699,12 +1699,11 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
     // Initialize the currentOGNode with the root node of the OG.
     OGFromFileNode* currentOGNode = og->getRoot();
     
-    if (currentOGNode->isRed())
-    {
+    if (currentOGNode->isRed()) {
         reasonForFailedMatch = "The OG is empty (its root node is red).";
         return false;
     }
-    
+
     // In this loop, we build the reachability graph of the oWFN and check
     // whether it matches with the OG.
     while (currentState) {
@@ -1722,7 +1721,7 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
             // Retrieve the transition leaving the current state that should be
             // fired next.
             owfnTransition* transition =
-            currentState->firelist[currentState->current];
+                currentState->firelist[currentState->current];
             
             // Save the current marking, so we can easily revert to it if
             // firing the transition that we will try in this if-branch leads
@@ -1738,8 +1737,7 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
             // OG. If not, exit this function returning false, because the oWFN
             // does not match with the OG.
             if (transition->hasNonTauLabelForMatching() &&
-                !currentOGNode->hasBlueTransitionWithLabel(
-                                                           transition->getLabelForMatching()))
+                !currentOGNode->hasBlueTransitionWithLabel(transition->getLabelForMatching()))
             {
                 reasonForFailedMatch = "A transition labeled with '" +
                 transition->getLabelForMatching() +
@@ -1761,12 +1759,14 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
             // revert to it if the state we reached to firing the current
             // transition lead us to an already seen state.
             OGFromFileNode* oldOGNode = currentOGNode;
-            
-            // Fire the transition in the OG that belongs to the transition we
-            // just fired in the oWFN.
-            currentOGNode = currentOGNode->fireTransitionWithLabel(
-                                                                   transition->getLabelForMatching());
-            
+
+            // if net makes a silent step, the OG node stays unchanged
+            if (transition->hasNonTauLabelForMatching()) {
+                // Fire the transition in the OG that belongs to the transition we
+                // just fired in the oWFN.
+                currentOGNode = currentOGNode->fireTransitionWithLabel(transition->getLabelForMatching());
+            }
+
             // Determine whether we have already seen the state we just
             // reached.
             State* newState = binSearch(this);
@@ -1791,9 +1791,12 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
                 // transition.
                 currentState->current++;
                 
-                // OGFromFileNode::backfire...() works as expected.
-                currentOGNode = currentOGNode->backfireTransitionWithLabel(
-                                                                           transition->getLabelForMatching());
+                // if net makes a silent (back) step, the OG node stays unchanged
+                if (transition->hasNonTauLabelForMatching()) {
+                    // get the parent node for TransitionLabel
+                    currentOGNode = currentOGNode->
+                        getParentNodeForTransitionLabel(transition->getLabelForMatching());
+                }
             } else {
                 // The state we reached by firing the above transition is new.
                 // So we have to initialize this newly seen state.

@@ -54,20 +54,21 @@ class OGFromFileTransition;
 class GraphFormulaCNF;
 
 class OGFromFileNode {
-// order: public typedefs, private members and methods, public methods
+
 public:
     typedef std::set<OGFromFileTransition*> transitions_t;
+    typedef std::map<std::string, OGFromFileNode*> transitionLabel2parentNode_t;
+
 private:
     std::string name_;
     GraphNodeColor color_;
-    typedef std::map<std::string, OGFromFileNode*> transitionLabel2parentNode_t;
     transitionLabel2parentNode_t transitionLabel2parentNode;
-    void addParentNodeForTransitionLabel(const std::string& transitionLabel,
-        OGFromFileNode* parentNode);
-    OGFromFileNode* getParentNodeForTransitionLabel(
-        const std::string& transitionLabel) const;
     GraphFormulaCNF* annotation_;
     OGFromFileNode* depthFirstSearchParent;
+
+    void addParentNodeForTransitionLabel(const std::string& transitionLabel,
+        OGFromFileNode* parentNode);
+
 public:
     transitions_t transitions;
 
@@ -82,11 +83,15 @@ public:
     void addTransition(OGFromFileTransition* transition);
     bool hasTransitionWithLabel(const std::string& transitionLabel) const;
     bool hasBlueTransitionWithLabel(const std::string& transitionLabel) const;
+
     OGFromFileTransition* getTransitionWithLabel(
         const std::string& transitionLabel) const;
     OGFromFileNode* fireTransitionWithLabel(const std::string& transitionLabel);
-    OGFromFileNode* backfireTransitionWithLabel(
+//    OGFromFileNode* backfireTransitionWithLabel(
+//        const std::string& transitionLabel) const;
+    OGFromFileNode* getParentNodeForTransitionLabel(
         const std::string& transitionLabel) const;
+
     bool assignmentSatisfiesAnnotation(
         const GraphFormulaAssignment& assignment) const;
 

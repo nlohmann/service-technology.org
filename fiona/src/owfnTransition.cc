@@ -506,17 +506,17 @@ void owfnTransition::check_enabled(oWFN * PN) {
 //   	trace(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : end\n");
 }
 
-void owfnTransition::setLabelForMatching(const std::string& label)
-{
+
+void owfnTransition::setLabelForMatching(const std::string& label) {
     labelForMatching = label;
 }
 
-std::string owfnTransition::getLabelForMatching() const
-{
+
+std::string owfnTransition::getLabelForMatching() const {
     return labelForMatching;
 }
 
-bool owfnTransition::hasNonTauLabelForMatching() const
-{
+
+bool owfnTransition::hasNonTauLabelForMatching() const {
     return getLabelForMatching() != GraphFormulaLiteral::TAU;
 }

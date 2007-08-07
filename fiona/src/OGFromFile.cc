@@ -32,11 +32,11 @@
  *
  */
 
+#include <cassert>
+#include <queue>
 #include "OGFromFile.h"
 #include "debug.h"
 #include "options.h"
-#include <cassert>
-#include <queue>
 #include "main.h"
 #include "GraphFormula.h"
 
@@ -48,11 +48,11 @@
 using namespace std;
 
 
-OGFromFileNode::OGFromFileNode(const std::string& name,
-    GraphFormula* annotation, GraphNodeColor color) :
-    name_(name),
-    color_(color),
-    annotation_(annotation->getCNF()),
+OGFromFileNode::OGFromFileNode(const std::string& _name, GraphFormula* _annotation,
+                               GraphNodeColor _color) :
+    name_(_name),
+    color_(_color),
+    annotation_(_annotation->getCNF()),
     depthFirstSearchParent(NULL) {
 
 }
@@ -70,6 +70,7 @@ OGFromFileNode::~OGFromFileNode() {
 
 void OGFromFileNode::addParentNodeForTransitionLabel(
     const std::string& transitionLabel, OGFromFileNode* parentNode) {
+
     transitionLabel2parentNode[transitionLabel] = parentNode;
 }
 
@@ -166,6 +167,7 @@ OGFromFileNode* OGFromFileNode::fireTransitionWithLabel(
     const std::string& transitionLabel) {
 
     if (transitionLabel == GraphFormulaLiteral::TAU) {
+        assert(false);
         return this;
     }
 
@@ -177,13 +179,6 @@ OGFromFileNode* OGFromFileNode::fireTransitionWithLabel(
     OGFromFileNode* dst = transition->getDst();
     dst->addParentNodeForTransitionLabel(transitionLabel, this);
     return dst;
-}
-
-
-OGFromFileNode* OGFromFileNode::backfireTransitionWithLabel(
-    const std::string& transitionLabel) const {
-
-    return getParentNodeForTransitionLabel(transitionLabel);
 }
 
 

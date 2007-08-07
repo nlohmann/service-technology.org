@@ -63,7 +63,7 @@ class OG : public CommunicationGraph {
          *      setOfVertices contains currentNode. That means, buildGraph can be
          *      called with root, if calculateRootNode() has been called.
          */
-        void buildGraph(GraphNode* currentNode, double);
+        void buildGraph(GraphNode* currentNode, double progress_plus);
         
         void calculateSuccStatesInput(unsigned int, GraphNode *, GraphNode *);
         void calculateSuccStatesOutput(unsigned int, GraphNode *, GraphNode *);

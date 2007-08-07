@@ -46,11 +46,12 @@ std::string owfnfileToParse;
 /// debug level
 trace_level_fiona debug_level = TRACE_0;
 
+
 /**
- * Provides output to stderr using different #trace_level 
+ * Provides output to stderr using different #trace_level_fiona
  * (in order to regulate amount of output)
  *
- * \param pTraceLevel	the #trace_level
+ * \param pTraceLevel	the used trace level
  * \param message	the output
  *
  */
@@ -60,8 +61,9 @@ void trace(trace_level_fiona pTraceLevel, std::string message) {
     }
 }
 
+
 /**
- * Works like #trace(trace_level,std::string) with trace_level = TRACE_ALWAYS
+ * Works like #trace(trace_level_fiona, std::string) with trace_level = TRACE_ALWAYS
  *
  * \param message the output
  *
@@ -69,6 +71,7 @@ void trace(trace_level_fiona pTraceLevel, std::string message) {
 void trace(std::string message) {
     trace(TRACE_0, message);
 }
+
 
 /*!
  * \param i standard C int

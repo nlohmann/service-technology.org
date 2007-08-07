@@ -39,7 +39,7 @@
 #include "debug.h"
 #include <cassert>
 
-//! \fn owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net)
+
 //! \param name
 //! \param _type
 //! \param _net
@@ -60,7 +60,6 @@ owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) :
 }
 
 
-//! \fn owfnPlace::~owfnPlace()
 //! \brief constructor
 owfnPlace::~owfnPlace() {
     trace(TRACE_5, "owfnPlace::~owfnPlace() : start\n");

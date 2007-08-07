@@ -976,7 +976,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 
 
 //! \param stateSet set of states
-//! \param outputPlace the output place of the net that is associated with the receiving event for which the new GraphNode is calculated
+//! \param messages the event(s) for which the new GraphNode's EG is calculated
 //! \param n new GraphNode 
 //! \brief calculates the set of states reachable from the current marking and stores them in the new GraphNode
 //! this function is for the IG only since a multiset of output places is considered
@@ -1624,31 +1624,10 @@ stateType oWFN::typeOfState() {
 }
 
 
-////! \brief returns true, if current state is minimal
-//bool oWFN::isMinimal() {
-//    
-//    assert(false);
-//	for (unsigned int i = 0; i < getPlaceCount(); i++) {
-//		if (getPlace(i)->type == OUTPUT && CurrentMarking[i] > 0) {
-//			return true;
-//		}
-//	}
-//	return false;
-//}
-//
-//
-////! \brief returns true, if current state is maximal
-//bool oWFN::isMaximal() {
-//    
-//    assert(false);
-//	return transNrEnabled == 0;			
-//}
-
-
 //! \brief checks if the current marking satisfies final condition or final marking, resp.
 //! if a final condition is given, a possible final marking is ignored
 bool oWFN::isFinal() const {
-    trace(TRACE_5, "oWFN::bool oWFN::isFinal() : start\n");
+    trace(TRACE_5, "bool oWFN::isFinal() : start\n");
     if(FinalCondition) {
         for (unsigned int currentplacenr = 0; currentplacenr < getPlaceCount(); currentplacenr++) {
             for (unsigned int j=0; j < PN->getPlace(currentplacenr)->cardprop; j++) {
@@ -1657,19 +1636,19 @@ bool oWFN::isFinal() const {
                 }
             }
         }
-        trace(TRACE_5, "oWFN::bool oWFN::isFinal() : end\n");
+        trace(TRACE_5, "bool oWFN::isFinal() : end\n");
         return FinalCondition -> value;
     } else {
         for (unsigned int i = 0; i < getPlaceCount(); i++) {
             if (CurrentMarking[i] != FinalMarking[i]) {
-                trace(TRACE_5, "oWFN::bool oWFN::isFinal() : end\n");
+                trace(TRACE_5, "bool oWFN::isFinal() : end\n");
                 return false;	
             }
         }
-        trace(TRACE_5, "oWFN::bool oWFN::isFinal() : end\n");
+        trace(TRACE_5, "bool oWFN::isFinal() : end\n");
         return true;
     }
-    trace(TRACE_5, "oWFN::bool oWFN::isFinal() : end\n");
+    trace(TRACE_5, "bool oWFN::isFinal() : end\n");
 }
 
 
@@ -2211,6 +2190,7 @@ void oWFN::add_place_to_port(owfnPlace *place, std::string port) {
 unsigned int oWFN::getPortCount() const {
     return ports.size();
 }
+
 
 //! \brief returns this net as an PNapi net
 PNapi::PetriNet* oWFN::returnPNapiNet() {

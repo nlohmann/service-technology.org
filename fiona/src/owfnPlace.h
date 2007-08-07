@@ -85,7 +85,7 @@ class owfnPlace : public Node {
         void initialize();		 // initialize PreTransitions
         
         /// set the port of the place
-        void set_port(string port);
+        void set_port(std::string port);
 #endif
     
         // Provides user defined operator new. Needed to trace all new

@@ -35,7 +35,7 @@
 #define EXCHANGEABILITY_H_
 
 
-#include "mynew.h" 
+#include "mynew.h"
 #include <list>
 //#include <vector>
 //#include <map>
@@ -44,7 +44,7 @@
 //#include "CNF.h"
 
 #include "util.h"
-#include "cudd.h" 
+#include "cudd.h"
 #include "cuddInt.h"
 #include "dddmp.h"
 
@@ -79,7 +79,7 @@ class Exchangeability {
 		int nbrVarAnn; //size of array names
 		list<char*> labelList;
 		
-		void loadBdd(string filename);
+		void loadBdd(std::string filename);
 		void loadHeader(FILE* fp, char*** names, int* nVars, int** permids);
 		void loadOptimalOrder(DdManager* mgr, int size, int* permids);
 		DdNode* loadDiagram(FILE* fp, DdManager* mgr);

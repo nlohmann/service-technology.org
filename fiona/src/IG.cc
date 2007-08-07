@@ -268,6 +268,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 }
 
 
+//! \param sourceNode a reference to the father of toAdd (needed for implicitly adding the edge, too)
 //! \param toAdd a reference to the GraphNode that is to be added to the graph
 //! \param messages the label of the edge between the current GraphNode and the one to be added
 //! \param type the type of the edge (SENDING, RECEIVING)

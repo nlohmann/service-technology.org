@@ -135,7 +135,7 @@ void GraphNode::setNumber(unsigned int _number) {
 }
 
 
-//! \param _name new name of this node in the graph
+//! \param newName new name of this node in the graph
 //! \brief sets the name of this node
 void GraphNode::setName(std::string newName) {
     name = newName;

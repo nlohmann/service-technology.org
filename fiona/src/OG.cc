@@ -36,7 +36,6 @@
 #include "state.h"
 #include "options.h"
 #include "debug.h"
-#include "successorNodeList.h"
 #include "owfn.h"
 #include "GraphNode.h"
 #include "GraphFormula.h"
@@ -71,14 +70,14 @@ OG::~OG() {
 void OG::buildGraph() {
 
     // creates the root node and calculates its reachability graph (set of states)
-    calculateRootNode(); 
+    calculateRootNode();
 
     if (options[O_OTF]){
         bdd->convertRootNode(getRoot());
     }
 
     // start building up the rest of the graph
-    // second parameter means: if finished, 100% of the graph is constructed 
+    // second parameter means: if finished, 100% of the graph is constructed
     buildGraph(getRoot(), 1);
     correctNodeColorsAndShortenAnnotations();
 
@@ -92,51 +91,51 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
     // at this point, the states inside currentNode are already computed!
 
     trace(TRACE_1, "\n-----------------------------------------------------------------\n");
-	trace(TRACE_1, "\t current node: ");
-	trace(TRACE_1, currentNode->getName() + "\n");
-	if (debug_level >= TRACE_2) {
-		cout << "\t (" << currentNode << ")" << endl;
-	}
-	trace(TRACE_2, "\t number of states in node: ");
+    trace(TRACE_1, "\t current node: ");
+    trace(TRACE_1, currentNode->getName() + "\n");
+    if (debug_level >= TRACE_2) {
+        cout << "\t (" << currentNode << ")" << endl;
+    }
+    trace(TRACE_2, "\t number of states in node: ");
     trace(TRACE_2, intToString(currentNode->reachGraphStateSet.size()) + "\n");
 
-	if (currentNode->getColor() == RED) {
-		// this may happen due to a message bound violation in current node
-		// then, function calculateReachableStatesFull sets node color RED
-		trace(TRACE_3, "\t\t\t node " + currentNode->getName());
+    if (currentNode->getColor() == RED) {
+        // this may happen due to a message bound violation in current node
+        // then, function calculateReachableStatesFull sets node color RED
+        trace(TRACE_3, "\t\t\t node " + currentNode->getName());
         trace(TRACE_3, " has color RED (message bound violated)\n");
         trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 
-		addProgress(progress_plus);
-		printProgress();
+        addProgress(progress_plus);
+        printProgress();
 
-		return;
-	}
+        return;
+    }
 
-	// get the annotation of the node as CNF formula
-	computeCNF(currentNode);
+    // get the annotation of the node as CNF formula
+    computeCNF(currentNode);
     trace(TRACE_3, "\t first computation of formula yields: ");
     trace(TRACE_3, currentNode->getAnnotation()->asString() + "\n");
     trace(TRACE_1, "\n-----------------------------------------------------------------\n");
 
-//	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount() + PN->getOutputPlaceCnt()));
-	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount()));
+//    double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount() + PN->getOutputPlaceCnt()));
+    double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount()));
 
-	oWFN::Places_t::size_type i = 0;
+    oWFN::Places_t::size_type i = 0;
 
 
-	// iterate over all elements of inputSet of the oWFN
-	trace(TRACE_2, "\t\t  iterating over inputSet of the oWFN\n");
-	while (i < PN->getInputPlaceCount()) {
+    // iterate over all elements of inputSet of the oWFN
+    trace(TRACE_2, "\t\t  iterating over inputSet of the oWFN\n");
+    while (i < PN->getInputPlaceCount()) {
 
-		trace(TRACE_2, "\t\t\t    sending event: !");
-		trace(TRACE_2, string(PN->getInputPlace(i)->name) + "\n");
+        trace(TRACE_2, "\t\t\t    sending event: !");
+        trace(TRACE_2, string(PN->getInputPlace(i)->name) + "\n");
 
-		if (PN->getInputPlace(i)->max_occurence < 0 ||
+        if (PN->getInputPlace(i)->max_occurence < 0 ||
             PN->getInputPlace(i)->max_occurence > currentNode->eventsUsed[i]) {
             // we have to consider this event
 
-			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
+            GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());    // create new GraphNode of the graph
 
             trace(TRACE_5, "\t\t\t\t    calculating successor states\n");
             calculateSuccStatesInput(PN->getInputPlace(i)->index, currentNode, v);
@@ -152,13 +151,13 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
                 numberDeletedVertices--;      // elsewise deletion of v is counted twice
                 delete v;
-			} else {
-				// was the new node v computed before? 
+            } else {
+                // was the new node v computed before?
                 GraphNode* found = findGraphNodeInSet(v);
 
                 if (found == NULL) {
                     trace(TRACE_1, "\t computed successor node new\n");
-                    // node v is new, so the node as well as the edge to it is added 
+                    // node v is new, so the node as well as the edge to it is added
                     addGraphNode(currentNode, v);
                     addGraphEdge(currentNode, v, i, SENDING);
 
@@ -169,7 +168,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                     if (v->getColor() == RED) {
                         currentNode->removeLiteralFromFormula(i, SENDING);
                     }
-				} else {
+                } else {
                     // node was computed before, so only add a new edge to the old node
                     trace(TRACE_1, "\t computed successor node already known: " + found->getName());
                     trace(TRACE_1, " (color " + toUpper(found->getColor().toString()) + ")");
@@ -178,15 +177,15 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                     // draw a new SENDING edge to the old node
                     string edgeLabel = PN->getInputPlace(i)->getLabelForCommGraph();
                     GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
-                    currentNode->addSuccessorNode(newEdge);
+                    currentNode->addLeavingEdge(newEdge);
 
-					// Still, if that node was computed red before, the literal
-					// of the edge from currentNode to the old node must be removed
-					// in the annotation of currentNode.
-					if (found->getColor() == RED) {
-						currentNode->removeLiteralFromFormula(i, SENDING);
-					}
-					delete v;
+                    // Still, if that node was computed red before, the literal
+                    // of the edge from currentNode to the old node must be removed
+                    // in the annotation of currentNode.
+                    if (found->getColor() == RED) {
+                        currentNode->removeLiteralFromFormula(i, SENDING);
+                    }
+                    delete v;
 
                     addProgress(your_progress);
                     printProgress();
@@ -216,38 +215,38 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
         return;
     }
 
-	i = 0;
-	// iterate over all output places of the oWFN (receiving events in OG)
-	trace(TRACE_2, "\t\t  iterating over output places of the oWFN\n");
-	while (i < PN->getOutputPlaceCount()) {
+    i = 0;
+    // iterate over all output places of the oWFN (receiving events in OG)
+    trace(TRACE_2, "\t\t  iterating over output places of the oWFN\n");
+    while (i < PN->getOutputPlaceCount()) {
 
-		trace(TRACE_2, "\t\t\t  receiving event: ?");
-		trace(TRACE_2, string(PN->getOutputPlace(i)->name) + "\n");
+        trace(TRACE_2, "\t\t\t  receiving event: ?");
+        trace(TRACE_2, string(PN->getOutputPlace(i)->name) + "\n");
 
         if (PN->getOutputPlace(i)->max_occurence < 0 ||
             PN->getOutputPlace(i)->max_occurence > currentNode->eventsUsed[i + PN->getInputPlaceCount()]) {
 
-			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
-			calculateSuccStatesOutput(PN->getOutputPlace(i)->index, currentNode, v);
+            GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());    // create new GraphNode of the graph
+            calculateSuccStatesOutput(PN->getOutputPlace(i)->index, currentNode, v);
 
-			// was the new node computed before? 
-			GraphNode* found = findGraphNodeInSet(v);
+            // was the new node computed before?
+            GraphNode* found = findGraphNodeInSet(v);
 
-			if (found == NULL) {
+            if (found == NULL) {
                 trace(TRACE_1, "\t computed successor node new\n");
                 // node v is new, so the node as well as the edge to it is added
                 addGraphNode(currentNode, v);
                 addGraphEdge(currentNode, v, i, RECEIVING);
 
                 // going down with receiving event...
-				// buildGraph(v, your_progress);
-				buildGraph(v, 0);
-				
+                // buildGraph(v, your_progress);
+                buildGraph(v, 0);
+
                 trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
-				if (v->getColor() == RED) {
-					currentNode->removeLiteralFromFormula(i, RECEIVING);
-				}
-			} else {
+                if (v->getColor() == RED) {
+                    currentNode->removeLiteralFromFormula(i, RECEIVING);
+                }
+            } else {
                 // node v was computed before, so only add a new edge to the old node
                 trace(TRACE_1, "\t computed successor node already known: " + found->getName());
                 trace(TRACE_1, " (color " + toUpper(found->getColor().toString()) + ")");
@@ -256,27 +255,27 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                 // draw a new RECEIVING edge to the old node
                 string edgeLabel = PN->getOutputPlace(i)->getLabelForCommGraph();
                 GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
-                currentNode->addSuccessorNode(newEdge);
+                currentNode->addLeavingEdge(newEdge);
 
-				// Still, if that node was computed red before, the literal
-				// of the edge from currentNode to the old node must be removed in the
-				// annotation of currentNode.
-				if (found->getColor() == RED) {
-					currentNode->removeLiteralFromFormula(i, RECEIVING);
-				}
-				delete v;
+                // Still, if that node was computed red before, the literal
+                // of the edge from currentNode to the old node must be removed in the
+                // annotation of currentNode.
+                if (found->getColor() == RED) {
+                    currentNode->removeLiteralFromFormula(i, RECEIVING);
+                }
+                delete v;
 
-//				addProgress(your_progress);
-//				printProgress();
-			}
-		} else {
+                // addProgress(your_progress);
+                // printProgress();
+            }
+        } else {
             trace(TRACE_2, "\t\t\t            event suppressed (max_occurence reached)\n");
 
-			currentNode->removeLiteralFromFormula(i, RECEIVING);
+            currentNode->removeLiteralFromFormula(i, RECEIVING);
 
-//			addProgress(your_progress);
-//			printProgress();
-		}
+            // addProgress(your_progress);
+            // printProgress();
+        }
 
         // check whether annotation is still satisfiable
         if (currentNode->getAnnotation()->equals() == FALSE) {
@@ -288,7 +287,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
             return;
         }
 
-		i++;
+        i++;
     }
 
     // finished iterating over successors
@@ -298,13 +297,13 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
         analyseNode(currentNode);
     }
 
-	trace(TRACE_3, "\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()));
-	trace(TRACE_3, " via formula " + currentNode->getAnnotation()->asString() + "\n");
+    trace(TRACE_3, "\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()));
+    trace(TRACE_3, " via formula " + currentNode->getAnnotation()->asString() + "\n");
 
-	if (options[O_OTF]) {
-		//cout << "currentNode: " << currentNode->getName() << endl;	
-		bdd->addOrDeleteLeavingEdges(currentNode);
-	}
+    if (options[O_OTF]) {
+        //cout << "currentNode: " << currentNode->getName() << endl;
+        bdd->addOrDeleteLeavingEdges(currentNode);
+    }
 }
 
 
@@ -333,7 +332,7 @@ void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
 
 //! adds an SENDING or RECEIVING edge from sourceNode to destNode
 //! and adds destNode to the successor list of sourceNode
-//! and increases eventsUsed of destNode by one  
+//! and increases eventsUsed of destNode by one
 // for OG
 void OG::addGraphEdge(GraphNode* sourceNode, GraphNode* destNode, oWFN::Places_t::size_type label, GraphEdgeType type) {
 
@@ -355,8 +354,8 @@ void OG::addGraphEdge(GraphNode* sourceNode, GraphNode* destNode, oWFN::Places_t
     // add a new edge to the new node
     GraphEdge* newEdge = new GraphEdge(destNode, edgeLabel);
 
-    // add the new node to successorNodeList
-    sourceNode->addSuccessorNode(newEdge);
+    // add the edge to the leaving edges list
+    sourceNode->addLeavingEdge(newEdge);
 
     trace(TRACE_5, "reachGraph::AddGraphEdge(GraphNode* sourceNode, GraphNode* destNode, unsigned int label, GraphEdgeType type): end\n");
 }
@@ -620,7 +619,7 @@ void OG::computeCNF(GraphNode* node) const {
 //! \brief converts an OG into its BDD representation
 void OG::convertToBdd() {
 	trace(TRACE_5, "OG::convertToBdd(): start\n");
-	
+
     std::map<GraphNode*, bool> visitedNodes;
 //    bool visitedNodes[getNumberOfNodes()];
 //
@@ -640,7 +639,7 @@ void OG::convertToBdd() {
 //! \brief converts an OG into its BDD representation including the red nodes and the markings of the nodes
 void OG::convertToBddFull() {
 	trace(TRACE_5, "OG::convertToBddFull(): start\n");
-	
+
     std::map<GraphNode*, bool> visitedNodes;
 //    bool visitedNodes[getNumberOfNodes()];
 //
@@ -660,7 +659,7 @@ void OG::convertToBddFull() {
 //		visitedNodes[i] = false;
 //	}
 	cout << endl;
-	
+
 	testbdd->testSymbRepresentation(root, visitedNodes);
 	testbdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
 	testbdd->printMemoryInUse();
@@ -734,10 +733,9 @@ void OG::printNodesToOGFile(GraphNode * v, fstream& os,
     visitedNodes[v] = true;
 
     // recursively process successor nodes that have not been visited yet
-    GraphEdge* edge;
-    v->resetIteratingSuccNodes();
-    while ((edge = v->getNextSuccEdge()) != NULL) {
-        GraphNode* vNext = edge->getDstNode();
+    GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
+    while (edgeIter->hasNext()) {
+        GraphNode* vNext = edgeIter->getNext()->getDstNode();
 
         // do not process nodes already visited
         if (visitedNodes[vNext])
@@ -748,6 +746,7 @@ void OG::printNodesToOGFile(GraphNode * v, fstream& os,
 
         printNodesToOGFile(vNext, os, visitedNodes);
     }
+    delete edgeIter;
 }
 
 
@@ -766,9 +765,9 @@ void OG::printTransitionsToOGFile(GraphNode * v, fstream& os,
     visitedNodes[v] = true;
 
     // recursively process successor nodes that have not been visited yet
-    GraphEdge* edge;
-    v->resetIteratingSuccNodes();
-    while ((edge = v->getNextSuccEdge()) != NULL) {
+    GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge* edge = edgeIter->getNext();
         GraphNode* vNext = edge->getDstNode();
 
         if (!vNext->isToShow(root))
@@ -791,6 +790,7 @@ void OG::printTransitionsToOGFile(GraphNode * v, fstream& os,
 
         printTransitionsToOGFile(vNext, os, visitedNodes);
     }
+    delete edgeIter;
 }
 
 

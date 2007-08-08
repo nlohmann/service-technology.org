@@ -42,17 +42,9 @@ using namespace std;
 
 GraphEdge::GraphEdge(GraphNode* dstNodeP, const std::string& labelP) :
     dstNode(dstNodeP),
-    label(labelP),
-    nextElement(NULL) {
+    label(labelP) {
 }
 
-void GraphEdge::setNextElement(GraphEdge* newNextElement) {
-    nextElement = newNextElement;
-}
-
-GraphEdge* GraphEdge::getNextElement() const {
-    return nextElement;
-}
 
 void GraphEdge::setDstNode(GraphNode* newDstNode) {
     dstNode = newDstNode;

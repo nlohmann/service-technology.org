@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-08-07 19:01:24 $ by $Author: nlohmann $.
-# Version $Revision: 1.40 $
+# File last changed $Date: 2007-08-08 10:51:28 $ by $Author: bretschn $.
+# Version $Revision: 1.41 $
 
 bin_PROGRAMS = fiona
 
@@ -33,7 +33,7 @@ YYSOURCES = lexer_owfn.cc lexer_owfn.h syntax_owfn.cc syntax_owfn.h \
 fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         lexer_owfn.ll lexer_owfn_wrap.h\
         syntax_og.yy lexer_og.ll\
-	syntax_stg.yy lexer_stg.ll \
+        syntax_stg.yy lexer_stg.ll \
         PetriNetNode.h PetriNetNode.cc\
         IG.cc owfnPlace.cc CommunicationGraph.h\
         IG.h owfnPlace.h\
@@ -42,8 +42,8 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         debug.cc\
         binDecision.h binDecision.cc \
         searchTrace.h \
-        debug.h GraphEdge.cc successorNodeList.cc\
-        GraphEdge.h successorNodeList.h\
+        debug.h \
+        GraphEdge.h GraphEdge.cc \
         dimensions.h main.cc symboltab.cc\
         main.h symboltab.h\
         options.cc userconfig.h\
@@ -58,7 +58,7 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         Exchangeability.h Exchangeability.cc \
         OGFromFile.h OGFromFile.cc GraphFormula.h GraphFormula.cc \
         containers.h containers.cc\
-	stg2owfn.cc set_helpers.h
+        stg2owfn.cc set_helpers.h SList.h
 
 BUILT_SOURCES = lexer_owfn.h
 

@@ -50,9 +50,6 @@ private:
     /** Label of the edge. */
     std::string label;
 
-    /** pointer to the next element in list */
-    GraphEdge* nextElement;
-
 public:
     /**
      * Constructs a GraphEdge.
@@ -61,15 +58,6 @@ public:
      */
     GraphEdge(GraphNode* dstNodeP, const std::string& labelP);
 
-    /**
-     * Sets the nextElement of this edge to newNextElement.
-     */
-    void setNextElement(GraphEdge* newNextElement);
-
-    /**
-     * Returns the next element in the GraphEdge list.
-     */
-    GraphEdge* getNextElement() const;
 
     /**
      * Returns the label of this edge.

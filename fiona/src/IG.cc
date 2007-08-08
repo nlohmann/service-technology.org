@@ -336,7 +336,7 @@ bool interactionGraph::addGraphNode (GraphNode * sourceNode, GraphNode * toAdd, 
             toAdd->setName(intToString(getNumberOfNodes()));
 
             GraphEdge* edgeSucc = new GraphEdge(toAdd, label);
-            sourceNode->addSuccessorNode(edgeSucc);
+            sourceNode->addLeavingEdge(edgeSucc);
             setOfVertices.insert(toAdd);
 
             trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
@@ -345,7 +345,7 @@ bool interactionGraph::addGraphNode (GraphNode * sourceNode, GraphNode * toAdd, 
             trace(TRACE_1, "\t successor node already known: " + found->getName() + "\n");
 
             GraphEdge * edgeSucc = new GraphEdge(found, label);
-            sourceNode->addSuccessorNode(edgeSucc);
+            sourceNode->addLeavingEdge(edgeSucc);
             delete toAdd;
 
             trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");

@@ -19,10 +19,13 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-TESTS = syntax.sh extrema.sh messages.sh cyclic.sh \
-		matching.sh sim_og.sh \
-		sequences.sh samples.sh bddtest.sh
+TESTS = slist.sh syntax.sh extrema.sh messages.sh cyclic.sh \
+        matching.sh sim_og.sh \
+        sequences.sh samples.sh bddtest.sh
 
+check_PROGRAMS = slistcheck
+
+slistcheck_SOURCES = slistcheck.cc
 
 # Notice: If you add environment variables here, you have to provide defaults
 # defaults.sh, too.

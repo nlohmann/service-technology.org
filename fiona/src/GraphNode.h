@@ -38,10 +38,10 @@
 #include "GraphEdge.h"
 #include "owfn.h"
 #include <set>
+#include "SList.h"
 
 class State;
 class GraphEdge;
-class successorNodeList;
 class literal;
 class GraphFormula;
 class GraphFormulaAssignment;
@@ -67,6 +67,12 @@ class GraphNodeColor {
 
 
 class GraphNode {
+public:
+    /**
+     * Type of the container that holds all leaving edges of this GraphNode.
+     */
+    typedef SList<GraphEdge*> LeavingEdges;
+
 private:
 
     //! Number of this GraphNode in the graph.
@@ -85,9 +91,10 @@ private:
      */
     GraphFormulaCNF* annotation;
 
-    //! List of all the nodes succeeding this one including the edge between
-    //! them
-    successorNodeList* successorNodes;
+    /**
+     * Contains all leaving edges.
+     */
+    LeavingEdges leavingEdges;
 
 public:
     bool hasFinalStateInStateSet;
@@ -111,12 +118,17 @@ public:
     // reduced graph is to be build.
     StateSet reachGraphStateSet;
 
-    // traversing successors/predecessors
-    void addSuccessorNode(GraphEdge *);
+    /**
+     * Adds a leaving edge to this node.
+     */
+    void addLeavingEdge(GraphEdge* edge);
 
-    GraphEdge * getNextSuccEdge();
-
-    void resetIteratingSuccNodes();
+    /**
+     * Returns an iterator that can be used to traverse all leaving edges of
+     * this GraphNode. Consult SList<T>::getIterator() for instructions how to
+     * use this iterator.
+     */
+    LeavingEdges::Iterator getLeavingEdgesIterator();
 
     // annotation
     GraphFormulaCNF* getAnnotation() const;
@@ -142,9 +154,6 @@ public:
      * red nodes are unneeded.
      */
     void removeUnneededLiteralsFromAnnotation();
-    
-    /// remove an edge originating from this node
-    void removeEdge(GraphEdge *e);
 
     friend bool operator < (GraphNode const&, GraphNode const& );
 

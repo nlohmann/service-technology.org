@@ -35,7 +35,6 @@
 #include "GraphNode.h"
 #include "GraphFormula.h"
 #include "state.h"
-#include "successorNodeList.h"
 #include "debug.h"
 #include "options.h"    
 #include <cassert>
@@ -76,41 +75,43 @@ GraphNodeColor::operator GraphNodeColor_enum() const {
 //! \param numberEvents the number of events that have to be processed from this node
 //! \brief constructor
 GraphNode::GraphNode(int numberEvents) :
-			   number(12345678),
+               number(12345678),
                name("12345678"),
-			   color(BLUE),
-			   successorNodes(NULL),
-			   hasFinalStateInStateSet(false),
+               color(BLUE),
+               hasFinalStateInStateSet(false),
                testAssignment(NULL) {
 
-	annotation = new GraphFormulaCNF();
+    annotation = new GraphFormulaCNF();
 
-	eventsUsed = new int [numberEvents];
+    eventsUsed = new int [numberEvents];
 
-	for (int i = 0; i < numberEvents; i++) {
-		eventsUsed[i] = 0;
-	}
+    for (int i = 0; i < numberEvents; i++) {
+        eventsUsed[i] = 0;
+    }
 
-	eventsToBeSeen = numberEvents;
+    eventsToBeSeen = numberEvents;
 }
 
 
 //! \brief destructor
 GraphNode::~GraphNode() {
-	trace(TRACE_5, "GraphNode::~GraphNode() : start\n");
+    trace(TRACE_5, "GraphNode::~GraphNode() : start\n");
 
-	if (successorNodes != NULL) {
-		delete successorNodes;
-	}
-	
-	if (eventsUsed != NULL) {
-		delete[] eventsUsed;
-	}
-	
-	delete annotation;
+    LeavingEdges::Iterator iEdge = getLeavingEdgesIterator();
+    while (iEdge->hasNext()) {
+        GraphEdge* edge = iEdge->getNext();
+        delete edge;
+    }
+    delete iEdge;
 
-	numberDeletedVertices++;
-	trace(TRACE_5, "GraphNode::~GraphNode() : end\n");
+    if (eventsUsed != NULL) {
+        delete[] eventsUsed;
+    }
+
+    delete annotation;
+
+    numberDeletedVertices++;
+    trace(TRACE_5, "GraphNode::~GraphNode() : end\n");
 }
 
 
@@ -142,16 +143,9 @@ void GraphNode::setName(std::string newName) {
 }
 
 
-//! \param edge pointer to the edge which is to point to the successor node
-//! \brief adds the node v to the list of successor nodes of this node using the edge
-//! given by the parameters
-void GraphNode::addSuccessorNode(GraphEdge * edge) {
-	if (successorNodes == NULL) {
-		successorNodes = new successorNodeList();
-	}
-	eventsToBeSeen--;
-	successorNodes->addNextNode(edge);
-	return;
+void GraphNode::addLeavingEdge(GraphEdge* edge) {
+    eventsToBeSeen--;
+    leavingEdges.add(edge);
 }
 
 
@@ -186,37 +180,19 @@ void GraphNode::removeLiteralFromFormula(oWFN::Places_t::size_type i, GraphEdgeT
 }
 
 void GraphNode::removeUnneededLiteralsFromAnnotation() {
-    GraphEdge* edge;
-    resetIteratingSuccNodes();
-    while ((edge = getNextSuccEdge()) != NULL) {
-		if (edge->getDstNode()->getColor() == RED) {
+    GraphNode::LeavingEdges::Iterator edgeIter = getLeavingEdgesIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge* edge = edgeIter->getNext();
+        if (edge->getDstNode()->getColor() == RED) {
             annotation->removeLiteral(edge->getLabel());
-		}
-	}
+        }
+    }
+    delete edgeIter;
 }
 
-//! \return pointer to the next edge of the successor node list
-//! \brief returns a pointer to the next edge of the successor node list
-GraphEdge * GraphNode::getNextSuccEdge() {
-	if (successorNodes != NULL) {
-		return successorNodes->getNextElement();
-	} else {
-		return NULL;
-	}
+GraphNode::LeavingEdges::Iterator GraphNode::getLeavingEdgesIterator() {
+    return leavingEdges.getIterator();
 }
-
-
-//! \brief resets the iteration process of the successor node list
-void GraphNode::resetIteratingSuccNodes() {
-	trace(TRACE_5, "GraphNode::resetIteratingSuccNodes() : start\n");
-	
-	if (successorNodes != NULL) {
-		successorNodes->resetIterating();
-	}
-	
-	trace(TRACE_5, "GraphNode::resetIteratingSuccNodes() : end\n");
-}
-
 
 // returns the CNF formula that is the annotation of a node as a Boolean formula
 GraphFormulaCNF* GraphNode::getAnnotation() const {
@@ -226,27 +202,28 @@ GraphFormulaCNF* GraphNode::getAnnotation() const {
 // return the assignment that is imposed by present or absent arcs leaving node v
 GraphFormulaAssignment* GraphNode::getAssignment() {
 
-	trace(TRACE_5, "computing assignment of node " + getName() + "\n");
+    trace(TRACE_5, "computing assignment of node " + getName() + "\n");
 
-	GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
+    GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
 
-	// traverse outgoing edges and set the corresponding literals
-	// to true if the respective node is BLUE
-    this->resetIteratingSuccNodes();
-    GraphEdge* edge;
-    while ((edge = this->getNextSuccEdge()) != NULL) {
-		if (edge->getDstNode()->getColor() == BLUE) {
+    // traverse outgoing edges and set the corresponding literals
+    // to true if the respective node is BLUE
+    LeavingEdges::Iterator edgeIter = getLeavingEdgesIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge* edge = edgeIter->getNext();
+        if (edge->getDstNode()->getColor() == BLUE) {
             myassignment->setToTrue(edge->getLabel());
-		}
-	}
+        }
+    }
+    delete edgeIter;
 
-	// only if node has final state, set assignment of literal final to true
-	if (this->hasFinalStateInStateSet == true) {
-		myassignment->setToTrue(GraphFormulaLiteral::FINAL);
-	}
+    // only if node has final state, set assignment of literal final to true
+    if (this->hasFinalStateInStateSet == true) {
+        myassignment->setToTrue(GraphFormulaLiteral::FINAL);
+    }
 
-	//cout << "ende" << endl;
-	return myassignment;
+    //cout << "ende" << endl;
+    return myassignment;
 
 }
 
@@ -299,12 +276,6 @@ GraphNodeColor GraphNode::analyseNodeByFormula() {
 		trace(TRACE_3, "\t\t\t node analysed red, formula " + this->getAnnotation()->asString() + "\n");
 		return RED;
 	}
-}
-
-
-void GraphNode::removeEdge(GraphEdge *e) {
-    assert (e != NULL);
-    successorNodes->removeElement(e);
 }
 
 

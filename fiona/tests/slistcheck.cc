@@ -34,7 +34,7 @@
  
 #include <iostream>
 #include <vector>
-#include "SList.h"
+#include "SinglyLinkedList.h"
 
 using namespace std;
 

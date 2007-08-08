@@ -38,7 +38,7 @@
 #include "GraphEdge.h"
 #include "owfn.h"
 #include <set>
-#include "SList.h"
+#include "SinglyLinkedList.h"
 
 class State;
 class GraphEdge;

@@ -18,9 +18,13 @@
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
  *****************************************************************************/
 
+/*
+ * NOTE: This file should not be called SList.h because the GNU C++ Compiler
+ * comes with a file of the same name.
+ */
 
 /*!
- * \file    SList.h
+ * \file    SinglyLinkedList.h
  *
  * \brief   A singly linked list.
  *
@@ -32,8 +36,8 @@
  *
  */
  
-#ifndef SLIST_H
-#define SLIST_H
+#ifndef SINGLYLINKEDLIST_H
+#define SINGLYLINKEDLIST_H
 
 #include <cstdlib> // NULL
 

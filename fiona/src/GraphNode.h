@@ -103,7 +103,6 @@ public:
     ~GraphNode();
 
     int * eventsUsed;
-    int eventsToBeSeen;
 
     unsigned int getNumber() const;
     void setNumber(unsigned int);

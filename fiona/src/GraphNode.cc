@@ -88,8 +88,6 @@ GraphNode::GraphNode(int numberEvents) :
     for (int i = 0; i < numberEvents; i++) {
         eventsUsed[i] = 0;
     }
-
-    eventsToBeSeen = numberEvents;
 }
 
 
@@ -144,7 +142,6 @@ void GraphNode::setName(std::string newName) {
 
 
 void GraphNode::addLeavingEdge(GraphEdge* edge) {
-    eventsToBeSeen--;
     leavingEdges.add(edge);
 }
 

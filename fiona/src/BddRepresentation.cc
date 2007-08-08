@@ -189,7 +189,7 @@ void BddRepresentation::generateRepresentation(GraphNode* v, std::map<GraphNode*
                 v->getLeavingEdgesIterator();
 
             while (edgeIter->hasNext()) {
-                GraphEdge* element = edgeIter->getNext();
+                GraphEdge<>* element = edgeIter->getNext();
                 GraphNode* vNext = element->getDstNode();
 
                 if (vNext->getColor() == BLUE &&
@@ -263,7 +263,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(GraphNode* v){
             v->getLeavingEdgesIterator();
 
         while (edgeIter->hasNext()) {
-            GraphEdge* element = edgeIter->getNext();
+            GraphEdge<>* element = edgeIter->getNext();
             GraphNode* vNext = element->getDstNode();
             if (vNext != NULL){
 
@@ -940,7 +940,7 @@ void BddRepresentation::testSymbRepresentation(GraphNode* v, std::map<GraphNode*
 
     GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge* element = edgeIter->getNext();
+        GraphEdge<>* element = edgeIter->getNext();
         GraphNode* vNext = element->getDstNode();
 
         if (vNext != NULL) {
@@ -1070,7 +1070,7 @@ void BddRepresentation::calculateBound(GraphNode* v, std::map<GraphNode*, bool>&
                 v->getLeavingEdgesIterator();
 
             while (edgeIter->hasNext()) {
-                GraphEdge* element = edgeIter->getNext();
+                GraphEdge<>* element = edgeIter->getNext();
                 GraphNode * vNext = element->getDstNode();
 
                 if (vNext->reachGraphStateSet.size() != 0 && vNext != NULL &&

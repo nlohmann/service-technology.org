@@ -41,7 +41,6 @@
 #include "SinglyLinkedList.h"
 
 class State;
-class GraphEdge;
 class literal;
 class GraphFormula;
 class GraphFormulaAssignment;
@@ -71,7 +70,7 @@ public:
     /**
      * Type of the container that holds all leaving edges of this GraphNode.
      */
-    typedef SList<GraphEdge*> LeavingEdges;
+    typedef SList<GraphEdge<>*> LeavingEdges;
 
 private:
 
@@ -120,7 +119,7 @@ public:
     /**
      * Adds a leaving edge to this node.
      */
-    void addLeavingEdge(GraphEdge* edge);
+    void addLeavingEdge(GraphEdge<>* edge);
 
     /**
      * Returns an iterator that can be used to traverse all leaving edges of

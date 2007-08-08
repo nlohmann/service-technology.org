@@ -200,7 +200,7 @@ void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(
     GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
 
     while (edgeIter->hasNext()) {
-        GraphEdge* leavingEdge = edgeIter->getNext();
+        GraphEdge<>* leavingEdge = edgeIter->getNext();
 
         GraphNode* vNext = leavingEdge->getDstNode();
         assert(vNext != NULL);
@@ -249,7 +249,7 @@ void CommunicationGraph::computeNumberOfBlueNodesEdgesHelper(
             v->getLeavingEdgesIterator();
 
         while (edgeIter->hasNext()) {
-            GraphEdge* leavingEdge = edgeIter->getNext();
+            GraphEdge<>* leavingEdge = edgeIter->getNext();
 
             GraphNode* vNext = leavingEdge->getDstNode();
             assert(vNext != NULL);
@@ -518,7 +518,7 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
         v->getLeavingEdgesIterator();
 
     while (edgeIter->hasNext()) {
-        GraphEdge * element = edgeIter->getNext();
+        GraphEdge<> * element = edgeIter->getNext();
         GraphNode * vNext = element->getDstNode();
 
         if (!vNext->isToShow(root))
@@ -648,7 +648,7 @@ void CommunicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, 
     // arcs
     GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge *element = edgeIter->getNext();
+        GraphEdge<> *element = edgeIter->getNext();
         GraphNode *vNext = element->getDstNode();
 	
         if (!vNext->isToShow(root))
@@ -702,7 +702,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, std
     // store outgoing lables
     GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge *element = edgeIter->getNext();
+        GraphEdge<> *element = edgeIter->getNext();
         if (element->getDstNode() != NULL &&
             element->getDstNode()->isToShow(root) ) {
             outgoing_labels[v].insert(element->getLabel());
@@ -714,7 +714,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, std
     
     edgeIter = v->getLeavingEdgesIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge *element = edgeIter->getNext();
+        GraphEdge<> *element = edgeIter->getNext();
         GraphNode *vNext = element->getDstNode();
  	
         if (!vNext->isToShow(root))
@@ -803,7 +803,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, std
 void CommunicationGraph::removeLabeledSuccessor(GraphNode *v, std::string label) {
     GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge* element = edgeIter->getNext();
+        GraphEdge<>* element = edgeIter->getNext();
 
         if (element->getLabel() == label) {
             // GraphNode *vNext = element->getDstNode();

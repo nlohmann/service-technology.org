@@ -48,15 +48,17 @@
 
 using namespace std;
 
+template<typename T>
+class GraphEdge;
+
 class GraphFormula;
 class GraphFormulaAssignment;
-class OGFromFileTransition;
 class GraphFormulaCNF;
 
 class OGFromFileNode {
 
 public:
-    typedef std::set<OGFromFileTransition*> transitions_t;
+    typedef std::set<GraphEdge<OGFromFileNode>*> transitions_t;
     typedef std::map<std::string, OGFromFileNode*> transitionLabel2parentNode_t;
 
 private:
@@ -79,11 +81,11 @@ public:
     GraphNodeColor getColor() const;
     bool isBlue() const;
     bool isRed() const;
-    void addTransition(OGFromFileTransition* transition);
+    void addTransition(GraphEdge<OGFromFileNode>* transition);
     bool hasTransitionWithLabel(const std::string& transitionLabel) const;
     bool hasBlueTransitionWithLabel(const std::string& transitionLabel) const;
 
-    OGFromFileTransition* getTransitionWithLabel(
+    GraphEdge<OGFromFileNode>* getTransitionWithLabel(
         const std::string& transitionLabel) const;
     OGFromFileNode* fireTransitionWithLabel(const std::string& transitionLabel);
 //    OGFromFileNode* backfireTransitionWithLabel(
@@ -100,20 +102,6 @@ public:
 	GraphFormulaAssignment* getAssignment() const;
 
     void removeTransitionsToNode(const OGFromFileNode* nodeToDelete);
-};
-
-class OGFromFileTransition {
-private:
-    OGFromFileNode* src;
-    OGFromFileNode* dst;
-    std::string label;
-public:
-    OGFromFileTransition(OGFromFileNode* src, OGFromFileNode* dst,
-        const std::string& label);
-    const std::string getLabel();
-    bool hasLabel(const std::string& label_) const;
-    OGFromFileNode* getDst() const;
-    OGFromFileNode* getSrc() const;
 };
 
 class oWFN;

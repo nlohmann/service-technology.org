@@ -40,25 +40,8 @@
 
 using namespace std;
 
-GraphEdge::GraphEdge(GraphNode* dstNodeP, const std::string& labelP) :
-    dstNode(dstNodeP),
-    label(labelP) {
-}
-
-
-void GraphEdge::setDstNode(GraphNode* newDstNode) {
-    dstNode = newDstNode;
-}
-
-GraphNode * GraphEdge::getDstNode() const {
-    return dstNode;
-}
-
-string GraphEdge::getLabel() const {
-    return label;
-}
-
-GraphEdgeType GraphEdge::getType() const {
+template<typename GraphNodeType>
+GraphEdgeType GraphEdge<GraphNodeType>::getType() const {
     assert(label.size() != 0);
     switch (label[0]) {
         case '?': return RECEIVING;

@@ -97,7 +97,7 @@ GraphNode::~GraphNode() {
 
     LeavingEdges::Iterator iEdge = getLeavingEdgesIterator();
     while (iEdge->hasNext()) {
-        GraphEdge* edge = iEdge->getNext();
+        GraphEdge<>* edge = iEdge->getNext();
         delete edge;
     }
     delete iEdge;
@@ -141,7 +141,7 @@ void GraphNode::setName(std::string newName) {
 }
 
 
-void GraphNode::addLeavingEdge(GraphEdge* edge) {
+void GraphNode::addLeavingEdge(GraphEdge<>* edge) {
     leavingEdges.add(edge);
 }
 
@@ -179,7 +179,7 @@ void GraphNode::removeLiteralFromFormula(oWFN::Places_t::size_type i, GraphEdgeT
 void GraphNode::removeUnneededLiteralsFromAnnotation() {
     GraphNode::LeavingEdges::Iterator edgeIter = getLeavingEdgesIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge* edge = edgeIter->getNext();
+        GraphEdge<>* edge = edgeIter->getNext();
         if (edge->getDstNode()->getColor() == RED) {
             annotation->removeLiteral(edge->getLabel());
         }
@@ -207,7 +207,7 @@ GraphFormulaAssignment* GraphNode::getAssignment() {
     // to true if the respective node is BLUE
     LeavingEdges::Iterator edgeIter = getLeavingEdgesIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge* edge = edgeIter->getNext();
+        GraphEdge<>* edge = edgeIter->getNext();
         if (edge->getDstNode()->getColor() == BLUE) {
             myassignment->setToTrue(edge->getLabel());
         }

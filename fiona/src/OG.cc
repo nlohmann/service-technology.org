@@ -176,7 +176,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
                     // draw a new SENDING edge to the old node
                     string edgeLabel = PN->getInputPlace(i)->getLabelForCommGraph();
-                    GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
+                    GraphEdge<>* newEdge = new GraphEdge<>(found, edgeLabel);
                     currentNode->addLeavingEdge(newEdge);
 
                     // Still, if that node was computed red before, the literal
@@ -254,7 +254,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
                 // draw a new RECEIVING edge to the old node
                 string edgeLabel = PN->getOutputPlace(i)->getLabelForCommGraph();
-                GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
+                GraphEdge<>* newEdge = new GraphEdge<>(found, edgeLabel);
                 currentNode->addLeavingEdge(newEdge);
 
                 // Still, if that node was computed red before, the literal
@@ -352,7 +352,7 @@ void OG::addGraphEdge(GraphNode* sourceNode, GraphNode* destNode, oWFN::Places_t
     }
 
     // add a new edge to the new node
-    GraphEdge* newEdge = new GraphEdge(destNode, edgeLabel);
+    GraphEdge<>* newEdge = new GraphEdge<>(destNode, edgeLabel);
 
     // add the edge to the leaving edges list
     sourceNode->addLeavingEdge(newEdge);
@@ -767,7 +767,7 @@ void OG::printTransitionsToOGFile(GraphNode * v, fstream& os,
     // recursively process successor nodes that have not been visited yet
     GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge* edge = edgeIter->getNext();
+        GraphEdge<>* edge = edgeIter->getNext();
         GraphNode* vNext = edge->getDstNode();
 
         if (!vNext->isToShow(root))

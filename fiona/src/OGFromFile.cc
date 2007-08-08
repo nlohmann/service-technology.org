@@ -107,7 +107,7 @@ bool OGFromFileNode::isRed() const {
 }
 
 
-void OGFromFileNode::addTransition(OGFromFileTransition* transition) {
+void OGFromFileNode::addTransition(GraphEdge<OGFromFileNode>* transition) {
     transitions.insert(transition);
 }
 
@@ -115,8 +115,7 @@ void OGFromFileNode::addTransition(OGFromFileTransition* transition) {
 void OGFromFileNode::removeTransitionsToNode(const OGFromFileNode* nodeToDelete) {
 	transitions_t::iterator iTransition = transitions.begin();
 	while (iTransition != transitions.end()) {
-		if ((*iTransition)->getDst() == nodeToDelete) {
-			assert((*iTransition)->getSrc() == this);
+		if ((*iTransition)->getDstNode() == nodeToDelete) {
 			delete *iTransition;
 			transitions.erase(iTransition++);
 		} else {
@@ -136,15 +135,15 @@ bool OGFromFileNode::hasTransitionWithLabel(const std::string& transitionLabel)
 bool OGFromFileNode::hasBlueTransitionWithLabel(
     const std::string& transitionLabel) const {
 
-    OGFromFileTransition* transition = getTransitionWithLabel(transitionLabel);
+    GraphEdge<OGFromFileNode>* transition = getTransitionWithLabel(transitionLabel);
     if (transition == NULL)
         return false;
 
-    return transition->getDst()->isBlue();
+    return transition->getDstNode()->isBlue();
 }
 
 
-OGFromFileTransition* OGFromFileNode::getTransitionWithLabel(
+GraphEdge<OGFromFileNode>* OGFromFileNode::getTransitionWithLabel(
     const std::string& transitionLabel) const {
 
     //cout << "\tgetTransitionWithLabel : start " << endl;
@@ -152,7 +151,7 @@ OGFromFileTransition* OGFromFileNode::getTransitionWithLabel(
     for (transitions_t::const_iterator trans_iter = transitions.begin();
         trans_iter != transitions.end(); ++trans_iter) {
 
-        if ((*trans_iter)->hasLabel(transitionLabel)) {
+        if ((*trans_iter)->getLabel() == transitionLabel) {
 		    //cout << "\tgetTransitionWithLabel : end1 " << endl;
             return *trans_iter;
         }
@@ -167,14 +166,14 @@ OGFromFileNode* OGFromFileNode::fireTransitionWithLabel(
 
     assert(transitionLabel != GraphFormulaLiteral::TAU);
 
-    OGFromFileTransition* transition = getTransitionWithLabel(transitionLabel);
+    GraphEdge<OGFromFileNode>* transition = getTransitionWithLabel(transitionLabel);
     if (transition == NULL) {
         return NULL;
     }
 
-    OGFromFileNode* dst = transition->getDst();
-    dst->addParentNodeForTransitionLabel(transitionLabel, this);
-    return dst;
+    OGFromFileNode* dstNode = transition->getDstNode();
+    dstNode->addParentNodeForTransitionLabel(transitionLabel, this);
+    return dstNode;
 }
 
 
@@ -219,32 +218,6 @@ GraphFormulaAssignment* OGFromFileNode::getAssignment() const {
 	return myassignment;
 }
 
-OGFromFileTransition::OGFromFileTransition(OGFromFileNode* src_,
-    OGFromFileNode* dst_, const std::string& label_) :
-    src(src_), dst(dst_), label(label_) {
-
-}
-
-
-bool OGFromFileTransition::hasLabel(const std::string& label_) const {
-    return label == label_;
-}
-
-
-OGFromFileNode* OGFromFileTransition::getDst() const {
-    return dst;
-}
-
-
-OGFromFileNode* OGFromFileTransition::getSrc() const {
-    return src;
-}
-
-
-const std::string OGFromFileTransition::getLabel() {
-	return label;
-}
-
 
 OGFromFile::OGFromFile() : root(NULL) {
 }
@@ -273,13 +246,13 @@ OGFromFileNode* OGFromFile::addNode(const std::string& nodeName,
 
 
 void OGFromFile::addTransition(const std::string& srcName,
-    const std::string& dstName, const std::string& label) {
+    const std::string& dstNodeName, const std::string& label) {
 
     OGFromFileNode* src = getNodeWithName(srcName);
-    OGFromFileNode* dst = getNodeWithName(dstName);
+    OGFromFileNode* dstNode = getNodeWithName(dstNodeName);
     assert(src != NULL);
-    assert(dst != NULL);
-    OGFromFileTransition* transition = new OGFromFileTransition(src,dst,label);
+    assert(dstNode != NULL);
+    GraphEdge<OGFromFileNode>* transition = new GraphEdge<OGFromFileNode>(dstNode,label);
     src->addTransition(transition);
 }
 
@@ -453,9 +426,9 @@ bool OGFromFile::simulatesRecursive (OGFromFileNode *myNode,
 			return false;
 		else {
 			trace(TRACE_5, "These two nodes seem compatible.\n" );
-			if (!simulatesRecursive ( (*myTransIter)->getDst(), 
+			if (!simulatesRecursive ( (*myTransIter)->getDstNode(), 
 									  myVisitedNodes,
-									  (*simTransIter)->getDst(),
+									  (*simTransIter)->getDstNode(),
 									  simVisitedNodes))
 				return false;
 		}
@@ -492,15 +465,15 @@ bool OGFromFile::isAcyclic() {
             trans_iter != testNode->transitions.end(); ++trans_iter) {
             
             // If the Node is the source of that transition and if the Destination is a valid node
-            if (testNode == (*trans_iter)->getSrc() && (*trans_iter)->getDst()->getColor() == BLUE) {
+            if ((*trans_iter)->getDstNode()->getColor() == BLUE) {
                 
                 // Return false if an outgoing transition points at a transitive parent node,
                 // else add the destination to the queue and update its transitive parent nodes
-                if ( parentNodes[testNode].find((*trans_iter)->getDst()) != parentNodes[testNode].end()) {
+                if ( parentNodes[testNode].find((*trans_iter)->getDstNode()) != parentNodes[testNode].end()) {
                     return false;
                 } else {
-                    testNodes.push((*trans_iter)->getDst());
-                    parentNodes[(*trans_iter)->getDst()].insert(parentNodes[testNode].begin(),parentNodes[testNode].end());
+                    testNodes.push((*trans_iter)->getDstNode());
+                    parentNodes[(*trans_iter)->getDstNode()].insert(parentNodes[testNode].begin(),parentNodes[testNode].end());
                 }
             }
         }
@@ -528,7 +501,7 @@ unsigned int OGFromFile::numberOfServicesRecursively(OGFromFileNode* start) {
     // get and save the labels of all outgoing transitions of this node in the labels set
     for (OGFromFileNode::transitions_t::const_iterator trans_iter = start->transitions.begin();
          trans_iter != start->transitions.end(); ++trans_iter) {
-        if (start == (*trans_iter)->getSrc() && (*trans_iter)->getDst()->getColor() == BLUE) {
+        if ((*trans_iter)->getDstNode()->getColor() == BLUE) {
             labels.insert((*trans_iter)->getLabel());
         }
     }
@@ -548,8 +521,8 @@ unsigned int OGFromFile::numberOfServicesRecursively(OGFromFileNode* start) {
     // recursively with the destination's node number of possible services 
     for (OGFromFileNode::transitions_t::const_iterator trans_iter = start->transitions.begin();
          trans_iter != start->transitions.end(); ++trans_iter) {
-        if (start == (*trans_iter)->getSrc() && (*trans_iter)->getDst()->getColor() == BLUE) {
-            number += labelCount[(*trans_iter)->getLabel()] * numberOfServicesRecursively((*trans_iter)->getDst());
+        if ((*trans_iter)->getDstNode()->getColor() == BLUE) {
+            number += labelCount[(*trans_iter)->getLabel()] * numberOfServicesRecursively((*trans_iter)->getDstNode());
         }
     }
 
@@ -907,9 +880,9 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
                 ogFile << ',' << endl;
             }
 
-            OGFromFileTransition* transition = *iTransition;
-            ogFile << "  " << transition->getSrc()->getName() << " -> "
-                   << transition->getDst()->getName() << " : "
+            GraphEdge<OGFromFileNode>* transition = *iTransition;
+            ogFile << "  " << node->getName() << " -> "
+                   << transition->getDstNode()->getName() << " : "
                    << transition->getLabel();
 
             printedFirstTransition = true;

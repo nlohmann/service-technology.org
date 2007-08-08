@@ -37,15 +37,22 @@
 #include "mynew.h"
 #include <string>
 
+class GraphNode;
+
 //! Possible types of a GraphEdge.
 enum GraphEdgeType {SENDING, RECEIVING};
 
-class GraphNode;
-
+/**
+ * @todo TODO: Turn this template class into a normal class with GraphNodeType =
+ * GraphNode when GraphNode and OGFromFileNode are merged.
+ */
+template<typename GraphNodeType = GraphNode>
 class GraphEdge {
 private:
-    /** Pointer to the node this arc is pointing to. */
-    GraphNode* dstNode;
+    /**
+     * Points to the destination node of this edge.
+     */
+    GraphNodeType* dstNode;
 
     /** Label of the edge. */
     std::string label;
@@ -53,11 +60,10 @@ private:
 public:
     /**
      * Constructs a GraphEdge.
-     * @param dstNodeP Pointer to the node this edge is pointing to.
+     * @param dstNodeP Points to the destination of this edge.
      * @param labelP label of this edge.
      */
-    GraphEdge(GraphNode* dstNodeP, const std::string& labelP);
-
+    GraphEdge(GraphNodeType* dstNodeP, const std::string& labelP);
 
     /**
      * Returns the label of this edge.
@@ -72,12 +78,7 @@ public:
     /**
      * Returns the node this edge points to.
      */
-    GraphNode* getDstNode() const;
-
-    /**
-     * Sets the node this edge points to to newDstNode.
-     */
-    void setDstNode(GraphNode* newDstNode);
+    GraphNodeType* getDstNode() const;
 
 #undef new
     /**
@@ -87,6 +88,27 @@ public:
     NEW_OPERATOR(GraphEdge)
 #define new NEW_NEW
 };
+
+
+template<typename GraphNodeType>
+GraphEdge<GraphNodeType>::GraphEdge(GraphNodeType* dstNodeP,
+    const std::string& labelP) :
+    dstNode(dstNodeP),
+    label(labelP) {
+}
+
+
+template<typename GraphNodeType>
+GraphNodeType* GraphEdge<GraphNodeType>::getDstNode() const {
+    return dstNode;
+}
+
+
+template<typename GraphNodeType>
+std::string GraphEdge<GraphNodeType>::getLabel() const {
+    return label;
+}
+
 
 #endif //GRAPHEDGE_H
 

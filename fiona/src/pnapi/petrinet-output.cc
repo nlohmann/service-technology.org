@@ -30,17 +30,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007-08-07 13:52:03 $
+ * \date    \$Date: 2007-08-08 06:57:32 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  *
  * \ingroup petrinet
  */
@@ -59,7 +59,7 @@
 #include "helpers.h"		// helper functions (toString)
 #include "options.h"		// (parameters)
 #include "pnapi.h"
-#include "../fiona.h"
+#include "fiona.h"
 
 
 

@@ -1668,6 +1668,8 @@ string oWFN::createLabel(messageMultiSet m) const {
 }
 
 
+// TODO: make this function recursively.
+// then, OGFromFileNode::depthFirstSearchParent is no longer needed
 bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
     // A temporary copy of the CurrentMarking. Used to revert to the
     // CurrentMarking if firing of a transition leads to an already seen
@@ -1760,11 +1762,14 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
             // transition lead us to an already seen state.
             OGFromFileNode* oldOGNode = currentOGNode;
 
-            // if net makes a silent step, the OG node stays unchanged
+            // if net makes a visible step, the OG node does so, too
             if (transition->hasNonTauLabelForMatching()) {
                 // Fire the transition in the OG that belongs to the transition we
                 // just fired in the oWFN.
                 currentOGNode = currentOGNode->fireTransitionWithLabel(transition->getLabelForMatching());
+            } else {
+                // if net makes a silent step, the OG node stays unchanged
+                // so do nothing.
             }
 
             // Determine whether we have already seen the state we just
@@ -1786,16 +1791,17 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
                 delete[] tmpCurrentMarking;
                 tmpCurrentMarking = NULL;
                 currentState->succ[currentState->current] = newState;
-                
+
                 // Increment current to the index of the next to be fired
                 // transition.
                 currentState->current++;
-                
-                // if net makes a silent (back) step, the OG node stays unchanged
+
                 if (transition->hasNonTauLabelForMatching()) {
-                    // get the parent node for TransitionLabel
-                    currentOGNode = currentOGNode->
-                        getParentNodeForTransitionLabel(transition->getLabelForMatching());
+                    // go back to the previously considered node
+                    currentOGNode = oldOGNode;
+                } else {
+                    // if net makes a silent (back) step, the OG node stays unchanged
+                    // so do nothing.
                 }
             } else {
                 // The state we reached by firing the above transition is new.
@@ -1850,8 +1856,8 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
             // checking the annotation because it is satisfied for sure.
             if (!currentState->hasLeavingTauTransitionForMatching()) {
                 GraphFormulaAssignment assignment =
-                makeAssignmentForOGMatchingForState(currentState);
-                
+                    makeAssignmentForOGMatchingForState(currentState);
+
                 if (!currentOGNode->assignmentSatisfiesAnnotation(assignment)) {
                     // Clean up the temporary copy of the former CurrentMarking
                     // just to be sure.
@@ -1859,18 +1865,18 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
                         delete[] tmpCurrentMarking;
                         tmpCurrentMarking = NULL;
                     }
-                    
+
                     reasonForFailedMatch = "The marking '" +
                     getCurrentMarkingAsString() +
                     "' of the oWFN does not satisfy the annotation '" +
                     currentOGNode->getAnnotationAsString() +
                     "' of the corresponding node '" +
                     currentOGNode->getName() + "' in the OG.";
-                    
+
                     return false;
                 }
             }
-            
+
             currentState = currentState->parent;
             if (currentState != NULL) {
                 // Decode currentState into CurrentMarking such that

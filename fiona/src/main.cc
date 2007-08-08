@@ -30,6 +30,8 @@
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
+
+
 #include "owfn.h"
 #include "main.h"
 #include "state.h"
@@ -72,15 +74,18 @@ extern unsigned int State::state_count;
 extern list<std::string> netfiles;
 extern OGFromFile* OGToParse;
 
-// the currently considered owfn from the owfn list given by the command line
+// the currently considered owfn from the owfn list given by the command line;
 // used only in main.cc
 std::string currentowfnfile;
+
 
 int garbagefound;
 unsigned int NonEmptyHash;
 unsigned int numberOfDecodes;
 unsigned int numberDeletedVertices;
 unsigned int numberOfEvents;
+
+
 void myown_newhandler() {
     cerr << "new failed, memory exhausted" << endl;
     exit(2);
@@ -130,6 +135,8 @@ void readnet(const std::string& owfnfile) {
     // depend on the order of the Places array, reordering results in
     // a heavy crash
 }
+
+
 //! \brief reads an OG from ogfile
 OGFromFile* readog(const std::string& ogfile) {
     og_yydebug = 0;
@@ -149,6 +156,8 @@ OGFromFile* readog(const std::string& ogfile) {
 
     return OGToParse;
 }
+
+
 //! \brief reads all OGs from a list
 void readAllOGs(OGFromFile::ogs_t& theOGs) {
     for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
@@ -156,6 +165,8 @@ void readAllOGs(OGFromFile::ogs_t& theOGs) {
         theOGs.push_back(readog(*iOgFile));
     }
 }
+
+
 //! \brief reports values for -e and -m option
 void reportOptionValues() {
     trace(TRACE_5, "-e option found: ");
@@ -164,6 +175,7 @@ void reportOptionValues() {
     } else {
         trace(TRACE_5, "no\n");
     }
+
     // if options[O_EVENT_USE_MAX] (with non-negative value) is set, then
     // values for max_occurence are totally ignored (overwritten)
     // otherwise, take values of max_occurence
@@ -176,6 +188,7 @@ void reportOptionValues() {
             PN->getOutputPlace(e)->max_occurence = events_manual;
         }
     }
+
 	// report events
     if (debug_level == TRACE_0) {
         if (options[O_EVENT_USE_MAX]) {
@@ -202,12 +215,15 @@ void reportOptionValues() {
             }
         }
     }
+
     // report message bound
     if (options[O_MESSAGES_MAX]) {
         trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
     }
     trace(TRACE_0, "\n");
 }
+
+
 // **********************************************************************************
 // *******                    mode dependent functions                       ********
 // **********************************************************************************
@@ -223,6 +239,8 @@ void checkExchangeability() {
         trace(TRACE_0, "NO\n");
     }
 }
+
+
 // match a net against an og
 void matchNet(OGFromFile* OGToMatch, oWFN* PN) {
     string reasonForFailedMatch;
@@ -235,28 +253,39 @@ void matchNet(OGFromFile* OGToMatch, oWFN* PN) {
     }
     delete OGToMatch;
 }
+
+
 // create an OG of an oWFN
 void computeOG(oWFN* PN) {
 
     time_t seconds, seconds2;
     OG * graph = new OG(PN);
+
     trace(TRACE_0, "building the operating guideline...\n");
     seconds = time (NULL);
+
     graph->printProgressFirst();
+
     graph->buildGraph(); // build operating guideline
+
     seconds2 = time (NULL);
+
     trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
+
     cout << "    " << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
+
     trace(TRACE_0, "\nnet is controllable: ");
     if (graph->getRoot()->getColor() == BLUE) {
         trace(TRACE_0, "YES\n\n");
     } else {
         trace(TRACE_0, "NO\n\n");
     }
+
     // print statistics
     trace(TRACE_0, "OG statistics:\n");
     graph->printGraphStatistics();
     trace(TRACE_0, "\n");
+
     // generate output files
     if (!options[O_NOOUTPUTFILES]) {
         // distributed controllability?
@@ -269,7 +298,7 @@ void computeOG(oWFN* PN) {
                 graph->correctNodeColorsAndShortenAnnotations();
 //                cerr << endl;
             }
-                
+
             parameters[P_SHOW_EMPTY_NODE] = false;
             
             trace(TRACE_0, "\nnet is distributedly controllable: ");
@@ -293,6 +322,7 @@ void computeOG(oWFN* PN) {
             graph->bdd->save("OTF");
         }
     }
+
     if (options[O_BDD]) {
         trace(TRACE_0, "\nbuilding the BDDs...\n");
         seconds = time (NULL);
@@ -305,37 +335,51 @@ void computeOG(oWFN* PN) {
             graph->bdd->save();
         }
     }
+
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
+
     delete graph;
     trace(TRACE_5, "graph deleted\n");
+
     // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
     trace(TRACE_0, "=================================================================\n");
     trace(TRACE_0, "\n");
 }
+
+
 // create an IG of an oWFN
 void computeIG(oWFN* PN) {
+
     time_t seconds, seconds2;
     interactionGraph * graph = new interactionGraph(PN);
+
     if (options[O_CALC_REDUCED_IG]) {
         trace(TRACE_0, "building the reduced interaction graph...\n");
     } else {
         trace(TRACE_0, "building the interaction graph...\n");
     }
+
     seconds = time (NULL);
+
     graph->buildGraph();                    // build interaction graph
+
     seconds2 = time (NULL);
+
     if (options[O_CALC_REDUCED_IG]) {
         trace(TRACE_0, "building the reduced interaction graph finished.\n");
     } else {
         trace(TRACE_0, "\nbuilding the interaction graph finished.\n");
     }
+
     cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
+
     trace(TRACE_0, "\nnet is controllable: ");
     if (graph->getRoot()->getColor() == BLUE) {
         trace(TRACE_0, "YES\n\n");
     } else {
         trace(TRACE_0, "NO\n\n");
     }
+
     // print statistics
     trace(TRACE_0, "IG statistics:\n");
     graph->printGraphStatistics();
@@ -349,13 +393,16 @@ void computeIG(oWFN* PN) {
             graph->printGraphToSTG();	    
         }
     }
+
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
 //			trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+
     delete graph;
     trace(TRACE_5, "graph deleted\n");
     trace(TRACE_0, "=================================================================\n");
     trace(TRACE_0, "\n");
 }
+
 
 // create an PNG of the given oWFN
 void makePNG(oWFN* PN) {
@@ -395,12 +442,13 @@ void makePNG(oWFN* PN) {
 
         // Make a systemcall to dot in order to create the png
         string systemcall = "dot -q -Tpng -o\"" + globals::output_filename + ".png\" \"" + globals::output_filename + ".dot\"";
-    	trace(TRACE_3, "Invoking dot with the following options:\n");
-    	trace(TRACE_3, systemcall + "\n\n");
+    	trace(TRACE_0, "Invoking dot with the following options:\n");
+    	trace(TRACE_0, systemcall + "\n\n");
     	system(systemcall.c_str());  
         trace(TRACE_0, "png generated\n");
     }
 }
+
 
 // create the productOG of all given OGs
 void computeProductOG(OGFromFile::ogs_t OGsFromFiles) {
@@ -434,6 +482,8 @@ void computeProductOG(OGFromFile::ogs_t OGsFromFiles) {
         delete *iOg;
     }
 }
+
+
 // check for simulation relation of two given OGs
 void checkSimulation(OGFromFile::ogs_t OGsFromFiles) {
     list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
@@ -445,6 +495,8 @@ void checkSimulation(OGFromFile::ogs_t OGsFromFiles) {
         trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
     }
 }
+
+
 // check if two given ogs are equal
 void checkEquality(OGFromFile::ogs_t OGsFromFiles) {
     list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
@@ -497,6 +549,8 @@ void countServices(OGFromFile::ogs_t OGsFromFiles) {
         }
     }
 }
+
+
 // checks whether an OG is acyclic
 void checkAcyclicity(OGFromFile::ogs_t OGsFromFiles) {
     for (list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
@@ -508,6 +562,8 @@ void checkAcyclicity(OGFromFile::ogs_t OGsFromFiles) {
         }
     }
 }
+
+
 // **********************************************************************************
 // ********                   MAIN                                           ********
 // **********************************************************************************
@@ -528,14 +584,20 @@ int main(int argc, char ** argv) {
 //		bdd->printMemoryInUse();
 //	}
 //	return 0;
+
     OGFromFile* OGToMatch = NULL;
     set_new_handler(&myown_newhandler);
+
     // evaluate command line options
     parse_command_line(argc, argv);
+
+
 // **********************************************************************************
 // start OG file dependant operations
+
     if (options[O_MATCH] || options[O_PRODUCTOG] || options[O_SIMULATES] ||
         options[O_EQUALS] || options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC]) {
+
         // reading all OG-files
         OGFromFile::ogs_t OGsFromFiles;
         readAllOGs(OGsFromFiles);
@@ -550,27 +612,32 @@ int main(int argc, char ** argv) {
             ogfileToMatch = *(ogfiles.begin());
             OGToMatch = readog(ogfileToMatch);
         }
+
         if (options[O_PRODUCTOG]) {
             // calculating the product OG
             computeProductOG(OGsFromFiles);    
             return 0;
         }
+
         if (options[O_SIMULATES]) {
             // simulation on OGFromFile
             checkSimulation(OGsFromFiles);
             return 0;
         }
+
         if (options[O_EQUALS]) {
             // equivalence on OGFromFile
             checkEquality(OGsFromFiles);
             return 0;
         }
+
         if (options[O_COUNT_SERVICES]) {
             // counts the number of deterministic strategies
             // that are characterized by a given OG
             countServices(OGsFromFiles);
             return 0;
         }
+
         if (options[O_CHECK_ACYCLIC]) {
             // counts the number of deterministic strategies
             // that are characterized by a given OG
@@ -578,15 +645,20 @@ int main(int argc, char ** argv) {
             return 0;
         }
     }
+
+
 // **********************************************************************************
 // start petrinet-file dependant operations
-    if (options[O_EX] || options[O_MATCH] || parameters[P_OG] || parameters[P_IG] || options[O_PNG]) {
+
+    if (options[O_EX] || options[O_MATCH] || parameters[P_OG] || parameters[P_IG] ||
+        options[O_PNG]) {
 
         if (options[O_EX] == true) {
             // checking exchangeability using BDDs
             checkExchangeability();
             return 0;
         }
+
         // ---------------- processing every single net -------------------
         for (list<std::string>::iterator netiter = netfiles.begin();
             netiter != netfiles.end(); ++netiter) {
@@ -624,6 +696,7 @@ int main(int argc, char ** argv) {
             } else {
                 trace(TRACE_0, "neither finalcondition nor finalmarking given\n");
             }
+
             // adjust events_manual and print limit of considering events
             reportOptionValues();
             // start computation
@@ -632,14 +705,17 @@ int main(int argc, char ** argv) {
                 // matching current oWFN against the OG 
                 matchNet(OGToMatch, PN);    
             }
+
             if (parameters[P_OG]) {
                 // computing OG of the current oWFN
                 computeOG(PN);
             }
+
             if (parameters[P_IG]) {
                 // computing IG of the current oWFN
                 computeIG(PN);
             }
+
             if (options[O_PNG]) {
                 // create a png file from the given net
                 makePNG(PN);    
@@ -649,17 +725,22 @@ int main(int argc, char ** argv) {
             trace(TRACE_5, "net deleted\n");
             // cout << "numberOfDecodes: " << numberOfDecodes << endl;   
         }
+
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
         // Delete lexer buffer for parsing oWFNs.
         // Must NOT be called before fclose(owfn_yyin);
         owfn_yylex_destroy();
 #endif
+
     } // end of petrinet dependant operations
+
 #ifdef LOG_NEW
     NewLogger::printall();
 #endif
 	return 0;
 }
+
+
 std::string platform_basename(const std::string& path) {
 #ifdef WIN32
     string::size_type posOfLastBackslash = path.find_last_of('\\');

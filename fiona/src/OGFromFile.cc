@@ -166,10 +166,7 @@ OGFromFileTransition* OGFromFileNode::getTransitionWithLabel(
 OGFromFileNode* OGFromFileNode::fireTransitionWithLabel(
     const std::string& transitionLabel) {
 
-    if (transitionLabel == GraphFormulaLiteral::TAU) {
-        assert(false);
-        return this;
-    }
+    assert(transitionLabel != GraphFormulaLiteral::TAU);
 
     OGFromFileTransition* transition = getTransitionWithLabel(transitionLabel);
     if (transition == NULL) {

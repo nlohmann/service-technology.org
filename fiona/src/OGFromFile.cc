@@ -52,8 +52,7 @@ OGFromFileNode::OGFromFileNode(const std::string& _name, GraphFormula* _annotati
                                GraphNodeColor _color) :
     name_(_name),
     color_(_color),
-    annotation_(_annotation->getCNF()),
-    depthFirstSearchParent(NULL) {
+    annotation_(_annotation->getCNF()) {
 
 }
 
@@ -219,19 +218,6 @@ GraphFormulaAssignment* OGFromFileNode::getAssignment() const {
 	
 	return myassignment;
 }
-
-
-void OGFromFileNode::setDepthFirstSearchParent(
-    OGFromFileNode* depthFirstSearchParent_) {
-
-    depthFirstSearchParent = depthFirstSearchParent_;
-}
-
-
-OGFromFileNode* OGFromFileNode::getDepthFirstSearchParent() const {
-    return depthFirstSearchParent;
-}
-
 
 OGFromFileTransition::OGFromFileTransition(OGFromFileNode* src_,
     OGFromFileNode* dst_, const std::string& label_) :

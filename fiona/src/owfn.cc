@@ -1667,16 +1667,7 @@ string oWFN::createLabel(messageMultiSet m) const {
     return label;
 }
 
-
-// TODO: make this function recursively.
-// then, OGFromFileNode::depthFirstSearchParent is no longer needed
 bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
-    // A temporary copy of the CurrentMarking. Used to revert to the
-    // CurrentMarking if firing of a transition leads to an already seen
-    // marking.
-    unsigned int* tmpCurrentMarking = NULL;
-    unsigned int tmpPlaceHashValue;
-    
     // Check whether the initial marking violates the message bound and exit
     // with an error message if it does.
     if (checkMessageBound()) {
@@ -1705,188 +1696,212 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
         reasonForFailedMatch = "The OG is empty (its root node is red).";
         return false;
     }
+    
+    // We return true if (and only if) the recusive method succeeded.
+    return matchesWithOGRecursive(currentOGNode,
+                                  currentState,
+                                  reasonForFailedMatch);
+}
 
-    // In this loop, we build the reachability graph of the oWFN and check
-    // whether it matches with the OG.
-    while (currentState) {
-        // currentState is non-NULL. So we continue the depth first search from
-        // currentState.
+bool oWFN::matchesWithOGRecursive(OGFromFileNode* currentOGNode,
+                                  State* currentState,
+                                  string& reasonForFailedMatch) {
+    
+    // A temporary copy of the CurrentMarking. Used to revert to the
+    // CurrentMarking if firing of a transition leads to an already seen
+    // marking.
+    unsigned int* tmpCurrentMarking = NULL;
+    unsigned int tmpPlaceHashValue;
+    
+    // If currentState becomes NULL we don't need to look any further.
+    if (currentState == NULL) {
+        reasonForFailedMatch = "";
+        return true;
+    }
+    
+    // Check whether there are still enabled transitions to be fired in
+    // currentState (transitions that have not been processed yet while
+    // building the reachability graph). currentState->current holds the
+    // index of the last fired transition in the array of to be fired
+    // transitions currentState->firelist[].
+    while (currentState->current < currentState->cardFireList) {
+        // There is a not yet fired transition in currentState.
         
-        // Check whether there are still enabled transitions to be fired in
-        // currentState (transitions that have not been processed yet while
-        // building the reachability graph). currentState->current holds the
-        // index of the last fired transition in the array of to be fired
-        // transitions currentState->firelist[].
-        if (currentState->current < currentState->cardFireList) {
-            // There is a not yet fired transition in currentState.
-            
-            // Retrieve the transition leaving the current state that should be
-            // fired next.
-            owfnTransition* transition =
-                currentState->firelist[currentState->current];
-            
-            // Save the current marking, so we can easily revert to it if
-            // firing the transition that we will try in this if-branch leads
-            // us to a state we have already seen.
-            if (tmpCurrentMarking != NULL) {
-                delete[] tmpCurrentMarking;
-                tmpCurrentMarking = NULL;
-            }
-            tmpCurrentMarking = copyCurrentMarking();
-            tmpPlaceHashValue = placeHashValue;
-            
-            // Check whether the transition to be fired is also present in the
-            // OG. If not, exit this function returning false, because the oWFN
-            // does not match with the OG.
-            if (transition->hasNonTauLabelForMatching() &&
-                !currentOGNode->hasBlueTransitionWithLabel(transition->getLabelForMatching()))
-            {
-                reasonForFailedMatch = "A transition labeled with '" +
+        // Retrieve the transition leaving the current state that should be
+        // fired next.
+        owfnTransition* transition =
+            currentState->firelist[currentState->current];
+        
+        // Save the current marking, so we can easily revert to it if
+        // firing the transition that we will try in this if-branch leads
+        // us to a state we have already seen.
+        if (tmpCurrentMarking != NULL) {
+            delete[] tmpCurrentMarking;
+            tmpCurrentMarking = NULL;
+        }
+        tmpCurrentMarking = copyCurrentMarking();
+        tmpPlaceHashValue = placeHashValue;
+        
+        // Check whether the transition to be fired is also present in the
+        // OG. If not, exit this function returning false, because the oWFN
+        // does not match with the OG.
+        if (transition->hasNonTauLabelForMatching() &&
+            !currentOGNode->hasBlueTransitionWithLabel(transition->getLabelForMatching()))
+        {
+            reasonForFailedMatch = 
+                "A transition labeled with '" +
                 transition->getLabelForMatching() +
                 "' leaves the marking '" +
                 getCurrentMarkingAsString() +
                 "' in the oWFN, but no blue transition with the same label"
                 " the node '" +
                 currentOGNode->getName() + "' in the OG.";
-                
+            
+            delete[] tmpCurrentMarking;
+            return false;
+        }
+        
+        // Fire the to be tried transition. The thereby reached marking is
+        // saved to CurrentMarking.
+        transition->fire(this);
+        
+        // Save the currentOGNode to a temporary copy, so we can easily
+        // revert to it if the state we reached to firing the current
+        // transition lead us to an already seen state.
+        OGFromFileNode* oldOGNode = currentOGNode;
+        
+        // if net makes a visible step, the OG node does so, too
+        if (transition->hasNonTauLabelForMatching()) {
+            // Fire the transition in the OG that belongs to the transition we
+            // just fired in the oWFN.
+            currentOGNode = currentOGNode->fireTransitionWithLabel(transition->getLabelForMatching());
+        } else {
+            // if net makes a silent step, the OG node stays unchanged
+            // so do nothing.
+        }
+        
+        // Determine whether we have already seen the state we just
+        // reached.
+        State* newState = binSearch(this);
+        if (newState != NULL) {
+            // We have already seen the state we just reaching by firing
+            // the transition above. So we have to revert to the state that
+            // the transition left from.
+            copyMarkingToCurrentMarking(tmpCurrentMarking);
+            
+            // owfnTransition::backfire() does not actually backfire.
+            // It merely rechecks enabledness of all transitions in
+            // question with respect to CurrentMarking. Therefore you have
+            // to restore the CurrentMarking first and then call
+            // backfire() to undo the effect of a transition.
+            transition->backfire(this);
+            placeHashValue = tmpPlaceHashValue;
+            delete[] tmpCurrentMarking;
+            tmpCurrentMarking = NULL;
+            currentState->succ[currentState->current] = newState;
+            
+            // Increment current to the index of the next to be fired
+            // transition.
+            currentState->current++;
+            
+            if (transition->hasNonTauLabelForMatching()) {
+                // go back to the previously considered node
+                currentOGNode = oldOGNode;
+            } else {
+                // if net makes a silent (back) step, the OG node stays unchanged
+                // so do nothing.
+            }
+        } else {
+            // The state we reached by firing the above transition is new.
+            // So we have to initialize this newly seen state.
+            newState = binInsert(this);
+            newState->firelist = firelist();
+            newState->cardFireList = CurrentCardFireList;
+            newState->current = 0;
+            newState->parent = currentState;
+            newState->succ = new State*[CurrentCardFireList];
+            for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
+                newState->succ[istate] = NULL;
+            }
+            newState->placeHashValue = placeHashValue;
+            newState->type = typeOfState();
+            currentState->succ[currentState->current] = newState;
+            
+            // Clean up the temporary copy of the former CurrentMarking
+            // because we do not longer need to be able to revert to it as
+            // we have a found a _new_ not yet seen state.
+            if (tmpCurrentMarking != NULL) {
                 delete[] tmpCurrentMarking;
+                tmpCurrentMarking = NULL;
+            }
+            
+            // Check whether the initial marking violates the message bound
+            // and exit with an error message if it does.
+            if (checkMessageBound()) {
+                reasonForFailedMatch = "Current marking: '" +
+                getCurrentMarkingAsString() +
+                "' violated message bound.";
                 return false;
             }
             
-            // Fire the to be tried transition. The thereby reached marking is
-            // saved to CurrentMarking.
-            transition->fire(this);
-            
-            // Save the currentOGNode to a temporary copy, so we can easily
-            // revert to it if the state we reached to firing the current
-            // transition lead us to an already seen state.
-            OGFromFileNode* oldOGNode = currentOGNode;
-
-            // if net makes a visible step, the OG node does so, too
-            if (transition->hasNonTauLabelForMatching()) {
-                // Fire the transition in the OG that belongs to the transition we
-                // just fired in the oWFN.
-                currentOGNode = currentOGNode->fireTransitionWithLabel(transition->getLabelForMatching());
-            } else {
-                // if net makes a silent step, the OG node stays unchanged
-                // so do nothing.
+            // Continue the matching recursively using newState and
+            // currentOGNode.
+            // Upon success, don't forget to continue to work with oldOGNode.
+            if (!matchesWithOGRecursive(currentOGNode,newState,reasonForFailedMatch)) {
+                return false;
             }
-
-            // Determine whether we have already seen the state we just
-            // reached.
-            State* newState = binSearch(this);
-            if (newState != NULL) {
-                // We have already seen the state we just reaching by firing
-                // the transition above. So we have to revert to the state that
-                // the transition left.
-                copyMarkingToCurrentMarking(tmpCurrentMarking);
-                
-                // owfnTransition::backfire() does not actually backfire.
-                // It merely rechecks enabledness of all transitions in
-                // question with respect to CurrentMarking. Therefore you have
-                // to restore the CurrentMarking first and then call
-                // backfire() to undo the effect of a transition.
-                transition->backfire(this);
-                placeHashValue = tmpPlaceHashValue;
-                delete[] tmpCurrentMarking;
-                tmpCurrentMarking = NULL;
-                currentState->succ[currentState->current] = newState;
-
-                // Increment current to the index of the next to be fired
-                // transition.
-                currentState->current++;
-
-                if (transition->hasNonTauLabelForMatching()) {
-                    // go back to the previously considered node
-                    currentOGNode = oldOGNode;
-                } else {
-                    // if net makes a silent (back) step, the OG node stays unchanged
-                    // so do nothing.
-                }
-            } else {
-                // The state we reached by firing the above transition is new.
-                // So we have to initialize this newly seen state.
-                newState = binInsert(this);
-                newState->firelist = firelist();
-                newState->cardFireList = CurrentCardFireList;
-                newState->current = 0;
-                newState->parent = currentState;
-                newState->succ = new State*[CurrentCardFireList];
-                for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
-                    newState->succ[istate] = NULL;
-                }
-                newState->placeHashValue = placeHashValue;
-                newState->type = typeOfState();
-                currentState->succ[currentState->current] = newState;
-                currentState = newState;
-                
-                currentOGNode->setDepthFirstSearchParent(oldOGNode);
-                
-                // Clean up the temporary copy of the former CurrentMarking
-                // because we do not longer need to be able to revert to it as
-                // we have a found a _new_ not yet seen state.
-                if (tmpCurrentMarking != NULL) {
-                    delete[] tmpCurrentMarking;
-                    tmpCurrentMarking = NULL;
-                }
-                
-                // Check whether the initial marking violates the message bound
-                // and exit with an error message if it does.
-                if (checkMessageBound()) {
-                    reasonForFailedMatch = "Current marking: '" +
-                    getCurrentMarkingAsString() +
-                    "' violated message bound.";
-                    return false;
-                }
-            }
-        } else {
-            // There are no transitions left to fire. So we are about to
-            // backtrack to the parent of the currentState. But before we
-            // do this, we have to check whether the currentState satisfies
-            // the annotation of the corresponding OG node. So we construct
-            // an assignment for this node such that all propositions
-            // corresponding to currently enabled transitions are set to
-            // true and all others to false; furthermore the literal
-            // 'final' is set to true iff the currentState is a final
-            // state. Because in a OGFromFileFormulaAssignment every
-            // unmentioned literal is considered false, we only set those
-            // literals that should be considered true.
-            //
-            // If the currentState has a leaving tau transition, we can skip
-            // checking the annotation because it is satisfied for sure.
-            if (!currentState->hasLeavingTauTransitionForMatching()) {
-                GraphFormulaAssignment assignment =
-                    makeAssignmentForOGMatchingForState(currentState);
-
-                if (!currentOGNode->assignmentSatisfiesAnnotation(assignment)) {
-                    // Clean up the temporary copy of the former CurrentMarking
-                    // just to be sure.
-                    if (tmpCurrentMarking != NULL) {
-                        delete[] tmpCurrentMarking;
-                        tmpCurrentMarking = NULL;
-                    }
-
-                    reasonForFailedMatch = "The marking '" +
-                    getCurrentMarkingAsString() +
-                    "' of the oWFN does not satisfy the annotation '" +
-                    currentOGNode->getAnnotationAsString() +
-                    "' of the corresponding node '" +
-                    currentOGNode->getName() + "' in the OG.";
-
-                    return false;
-                }
-            }
-
-            currentState = currentState->parent;
-            if (currentState != NULL) {
-                // Decode currentState into CurrentMarking such that
-                // currentState and CurrentMarking again denote the same
-                // state of the oWFN.
-                currentState->decode(this);
-                currentState->current++;
-                currentOGNode = currentOGNode->getDepthFirstSearchParent();
+            else {
+                currentOGNode = oldOGNode;
             }
         }
+    }
+    
+    // There are no transitions left to fire. So we are about to
+    // backtrack to the parent of the currentState. But before we
+    // do this, we have to check whether the currentState satisfies
+    // the annotation of the corresponding OG node. So we construct
+    // an assignment for this node such that all propositions
+    // corresponding to currently enabled transitions are set to
+    // true and all others to false; furthermore the literal
+    // 'final' is set to true iff the currentState is a final
+    // state. Because in a OGFromFileFormulaAssignment every
+    // unmentioned literal is considered false, we only set those
+    // literals that should be considered true.
+    //
+    // If the currentState has a leaving tau transition, we can skip
+    // checking the annotation because it is satisfied for sure.
+    if (!currentState->hasLeavingTauTransitionForMatching()) {
+        GraphFormulaAssignment assignment =
+            makeAssignmentForOGMatchingForState(currentState);
+        
+        if (!currentOGNode->assignmentSatisfiesAnnotation(assignment)) {
+            // Clean up the temporary copy of the former CurrentMarking
+            // just to be sure.
+            if (tmpCurrentMarking != NULL) {
+                delete[] tmpCurrentMarking;
+                tmpCurrentMarking = NULL;
+            }
+            
+            reasonForFailedMatch = "The marking '" +
+                getCurrentMarkingAsString() +
+                "' of the oWFN does not satisfy the annotation '" +
+                currentOGNode->getAnnotationAsString() +
+                "' of the corresponding node '" +
+                currentOGNode->getName() + "' in the OG.";
+            
+            return false;
+        }
+    }
+    
+    // Although we won't use currentState after tracking back (it will
+    // be lost anyway), we set it to its parent here for convenience.
+    currentState = currentState->parent;
+    if (currentState != NULL) {
+        // Decode currentState into CurrentMarking such that
+        // currentState and CurrentMarking again denote the same
+        // state of the oWFN.
+        currentState->decode(this);
+        currentState->current++;
     }
     
     // Clean up before we return from the function.
@@ -1899,7 +1914,6 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
     reasonForFailedMatch = "";
     return true;
 }
-
 
 GraphFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const State* currentState) const {
     GraphFormulaAssignment assignment;

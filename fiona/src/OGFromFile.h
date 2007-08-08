@@ -64,7 +64,6 @@ private:
     GraphNodeColor color_;
     transitionLabel2parentNode_t transitionLabel2parentNode;
     GraphFormulaCNF* annotation_;
-    OGFromFileNode* depthFirstSearchParent;
 
     void addParentNodeForTransitionLabel(const std::string& transitionLabel,
         OGFromFileNode* parentNode);
@@ -101,8 +100,6 @@ public:
 	GraphFormulaAssignment* getAssignment() const;
 
     void removeTransitionsToNode(const OGFromFileNode* nodeToDelete);
-    void setDepthFirstSearchParent(OGFromFileNode* depthFirstSearchParent);
-    OGFromFileNode* getDepthFirstSearchParent() const;
 };
 
 class OGFromFileTransition {

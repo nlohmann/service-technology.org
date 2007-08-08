@@ -56,6 +56,7 @@ class PlSymbol;
 class TrSymbol;
 class Arc;
 class OGFromFile;
+class OGFromFileNode;
 class GraphFormulaAssignment;
 
 class oWFN {
@@ -86,6 +87,23 @@ class oWFN {
         Transitions_t Transitions;
 
         owfnTransition ** firelist();
+        
+        /**
+         * helper for matchesWithOG
+         *
+         * @param currentOGNode current node in the OG, so we know where we are
+         * @param currentState current oWFN state
+         * @param reasonForFailedMatch In case of a failed match, holds a text
+         *     describing why the matching failed.
+         *
+         * @retval true If this oWFN matches with given OG.
+         * @retval false Otherwise.
+         */
+        bool matchesWithOGRecursive(
+                                    OGFromFileNode* currentOGNode,
+                                    State* currentState,
+                                    string& reasonForFailedMatch
+                                    );
 
     public:
         oWFN();

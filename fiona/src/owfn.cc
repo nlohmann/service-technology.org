@@ -2211,7 +2211,7 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
         PNapi::Place* p = PN->newPlace((*place)->name, PNapi::IN);
         // Warning: tokens of a place in PNapi is private. The number of tokens is not translated correctly!
         if ((*place)->initial_marking >= 1) {
-            p->mark();
+            p->mark((*place)->initial_marking);
         }
     }
 
@@ -2220,7 +2220,7 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
         PNapi::Place* p = PN->newPlace((*place)->name, PNapi::OUT);
         // Warning: tokens of a place in PNapi is private. The number of tokens is not translated correctly!
         if ((*place)->initial_marking >= 1) {
-            p->mark();
+            p->mark((*place)->initial_marking);
         }
     }
 
@@ -2230,7 +2230,7 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
             PNapi::Place* p = PN->newPlace((*place)->name);
             // Warning: tokens of a place in PNapi is private. The number of tokens is not translated correctly!
             if ((*place)->initial_marking >= 1) {
-                p->mark();
+                p->mark((*place)->initial_marking);
             }
         }
     }

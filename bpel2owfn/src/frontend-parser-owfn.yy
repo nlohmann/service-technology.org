@@ -235,7 +235,7 @@ markinglist:
 marking: 
   nodeident COLON NUMBER 
       {
-       (PN.findPlace(nodename))->mark(); // BAM
+       (PN.findPlace(nodename))->mark(toUInt(strip_namespace($3->name)));
       } 
 | nodeident
       {

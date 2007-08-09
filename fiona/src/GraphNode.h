@@ -51,8 +51,8 @@ typedef std::set<State*> StateSet;
 
 
 /****************
-* enumerations *
-****************/
+ * enumerations *
+ ****************/
 
 enum GraphNodeColor_enum {
     RED,            ///< bad GraphNode
@@ -69,8 +69,8 @@ enum GraphNodeDiagnosisColor_enum {
 
 
 /************************
-* class GraphNodeColor *
-************************/
+ * class GraphNodeColor *
+ ************************/
 
 class GraphNodeColor {
     private:
@@ -89,8 +89,8 @@ class GraphNodeColor {
 };
 
 /*********************************
-* class GraphNodeDiagnosisColor *
-*********************************/
+ * class GraphNodeDiagnosisColor *
+ *********************************/
 
 class GraphNodeDiagnosisColor {
     private:
@@ -110,8 +110,8 @@ class GraphNodeDiagnosisColor {
 
 
 /*******************
-* class GraphNode *
-*******************/
+ * class GraphNode *
+ *******************/
 
 class GraphNode {
 

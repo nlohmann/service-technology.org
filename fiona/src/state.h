@@ -88,11 +88,15 @@ public:
     /** type of state (Deadlock, Final, Transient) */
     stateType type;
 
-    /** decode state into given marking vector */
+    /**
+     * Same as decodeShowOnly(), but initializes all transition of the given 'PN'.
+     */
     void decode(oWFN *);
 
     /**
-     * decode state into given marking vector just for showing the marking!!!
+     * Decodes State in bintree and writes the corresponding marking into
+     * the CurrentMarking of the given 'PN'.
+     * @param PN The corresponding open workflow net.
      */
     void decodeShowOnly(oWFN *);
 

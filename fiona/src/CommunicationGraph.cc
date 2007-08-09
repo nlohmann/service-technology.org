@@ -956,7 +956,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     ///////////////////////////////////////////////////////////////////////
     if (final_state_seen && external_deadlock_seen) {
         v->setDiagnosisColor(DIAG_ORANGE);
-        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (early)" << endl;
+        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (ED/FS mix)" << endl;
         return DIAG_ORANGE;
     }
     
@@ -966,7 +966,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     /////////////////////////////////////////////////
     if (blue_child && !red_child && !orange_child) {
         v->setDiagnosisColor(DIAG_BLUE);
-        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
+        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (only blue children)" << endl;
         return DIAG_BLUE;
     }
     
@@ -976,17 +976,17 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     ///////////////////////////////////////////////
     if (red_child && !orange_child && !blue_child) {
         v->setDiagnosisColor(DIAG_RED);
-        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
+        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (only red children)" << endl;
         return DIAG_RED;
     }
 
 
     //////////////////////////////////////////////////////
-    // CASE 6: NODE HAS RED AND BLUE CHILDREN => ORANGE //
+    // CASE 6: NODE HAS NOT ONLY RED CHILDREN => ORANGE //
     //////////////////////////////////////////////////////
-    if (red_child && blue_child) {
+    if (red_child && (blue_child || orange_child)) {
         v->setDiagnosisColor(DIAG_ORANGE);
-        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
+        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (blue and red children)" << endl;
         return DIAG_ORANGE;
     }
 

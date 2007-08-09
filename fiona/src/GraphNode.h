@@ -38,6 +38,7 @@
 #include "GraphEdge.h"
 #include "owfn.h"
 #include <set>
+#include <cassert>
 #include "SinglyLinkedList.h"
 #include "GraphFormula.h"
 
@@ -200,6 +201,11 @@ public:
 //----------
 
     /**
+     * Destroys this GraphNodeCommon.
+     */
+    ~GraphNodeCommon();
+
+    /**
      * Adds a leaving edge to this node.
      */
     void addLeavingEdge(GraphEdge<GraphNodeType>* edge);
@@ -313,6 +319,7 @@ GraphNodeCommon<GraphNodeType>::
         color(_color) {
 
     annotation = _annotation->getCNF();
+    delete _annotation; // because getCNF() returns a newly create formula
 }
 
 
@@ -392,6 +399,17 @@ std::string GraphNodeCommon<GraphNodeType>::getAnnotationAsString() const {
 
 
 // ------------
+
+
+template<typename GraphNodeType>
+GraphNodeCommon<GraphNodeType>::~GraphNodeCommon<GraphNodeType>() {
+    typename LeavingEdges::ConstIterator iEdge = getLeavingEdgesConstIterator();
+    while (iEdge->hasNext()) {
+        GraphEdge<GraphNodeType>* edge = iEdge->getNext();
+        delete edge;
+    }
+    delete iEdge;
+}
 
 
 template<typename GraphNodeType>

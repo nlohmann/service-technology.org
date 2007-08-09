@@ -122,13 +122,6 @@ GraphNode::GraphNode(int numberEvents) :
 GraphNode::~GraphNode() {
     trace(TRACE_5, "GraphNode::~GraphNode() : start\n");
 
-    LeavingEdges::ConstIterator iEdge = getLeavingEdgesConstIterator();
-    while (iEdge->hasNext()) {
-        GraphEdge<>* edge = iEdge->getNext();
-        delete edge;
-    }
-    delete iEdge;
-
     if (eventsUsed != NULL) {
         delete[] eventsUsed;
     }

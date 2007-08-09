@@ -99,7 +99,7 @@ class GraphNodeDiagnosisColor {
 
     public:
         /// constructor
-        GraphNodeDiagnosisColor(GraphNodeDiagnosisColor_enum color = RED);
+        GraphNodeDiagnosisColor(GraphNodeDiagnosisColor_enum color = DIAG_RED);
 
         /// return node diagnosis color as string
         std::string toString() const;

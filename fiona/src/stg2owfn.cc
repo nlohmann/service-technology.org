@@ -124,4 +124,18 @@ void STG2oWFN_main() {
     (*file) << STGPN;
 
     file->close();
+
+    // also generate the png file
+    filename = netfile.substr(0, string(netfile).length()-5) + "-partner.dot";
+    file = new ofstream(filename.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
+
+    STGPN.set_format(FORMAT_DOT);
+    (*file) << STGPN;
+
+    file->close();
+
+    // Make a systemcall to dot in order to create the png
+    string systemcall = "dot -q -Tpng -o\"" + netfile.substr(0, string(netfile).length()-5) + "-partner.png\" " + filename;
+	system(systemcall.c_str());  
+
 }

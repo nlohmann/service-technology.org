@@ -260,6 +260,7 @@ void computeOG(oWFN* PN) {
 
     time_t seconds, seconds2;
     OG * graph = new OG(PN);
+    bool controlable = false;
 
     trace(TRACE_0, "building the operating guideline...\n");
     seconds = time (NULL);
@@ -277,6 +278,7 @@ void computeOG(oWFN* PN) {
     trace(TRACE_0, "\nnet is controllable: ");
     if (graph->getRoot()->getColor() == BLUE) {
         trace(TRACE_0, "YES\n\n");
+        controlable = true;
     } else {
         trace(TRACE_0, "NO\n\n");
     }
@@ -313,9 +315,15 @@ void computeOG(oWFN* PN) {
         graph->printGraphToDot();      // .out
         graph->printOGtoFile();        // .og
 
+
         if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
-            graph->printGraphToSTG();
+            if ( controlable ) {
+                graph->printGraphToSTG();
+            } else {
+                trace(TRACE_0, "\nCannot synthesize a partner for a net, that is not controlable\n\n");
+            }
         }
+
 
         if (options[O_OTF]) {
             //graph->bdd->printGraphToDot();
@@ -352,6 +360,7 @@ void computeIG(oWFN* PN) {
 
     time_t seconds, seconds2;
     interactionGraph * graph = new interactionGraph(PN);
+    bool controlable = false;
 
     if (options[O_CALC_REDUCED_IG]) {
         trace(TRACE_0, "building the reduced interaction graph...\n");
@@ -376,6 +385,7 @@ void computeIG(oWFN* PN) {
     trace(TRACE_0, "\nnet is controllable: ");
     if (graph->getRoot()->getColor() == BLUE) {
         trace(TRACE_0, "YES\n\n");
+        controlable = true;
     } else {
         trace(TRACE_0, "NO\n\n");
     }
@@ -394,7 +404,11 @@ void computeIG(oWFN* PN) {
         graph->printGraphToDot();      // .out
 
         if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
-            graph->printGraphToSTG();	    
+            if ( controlable ) {
+                graph->printGraphToSTG();
+            } else {
+                trace(TRACE_0, "\nCannot synthesize a partner for a net, that is not controlable\n\n");
+            }
         }
     }
 

@@ -847,18 +847,27 @@ void CommunicationGraph::diagnose() {
 
 GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes) {
     assert(v != NULL);
-        
-    if (!v->isToShow(root))
+
+    /* DO I NEED THIS?
+    if (!v->isToShow(root)) {
+        cerr << "skipping node " << v->getNumber() << endl;
         return GraphNodeDiagnosisColor(DIAG_UNSET);
+    }
+    */
     
     // if color is known already, return it!
     if (v->getDiagnosisColor() != DIAG_UNSET) {
         assert( visitedNodes[v] );
         return v->getDiagnosisColor();
-    }    
+    }
     
     visitedNodes[v] = true;
     
+
+    bool external_deadlock_seen = false;
+    bool final_state_seen = false;
+    
+    // iterate the states to check if there are internal deadlocks or final states
     for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
          state != v->reachGraphStateSet.end(); state++) {
         (*state)->decode(PN);
@@ -878,30 +887,49 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
                         }
                     }
                 }
-                
+
+                ///////////////////////////////////////////////
+                // CASE 1: NODE HAS INTERNAL DEADLOCK => RED //
+                ///////////////////////////////////////////////
                 if (internal_deadlock) {
                     v->setDiagnosisColor(DIAG_RED);
-                    cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
-                    return DIAG_RED;
+                    cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (early)" << endl;
+                    return DIAG_RED;        
                 }
                 
+                
+                external_deadlock_seen = external_deadlock_seen || !internal_deadlock;
                 break;
             }
                 
             case FINALSTATE: {
-                v->setDiagnosisColor(DIAG_BLUE);
-                cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
-                return DIAG_BLUE;
+                final_state_seen = true;
+                break;
             }
+                
+            default: break;
         }
     }
     
+    
+    //////////////////////////////////////////////////////////
+    // CASE 2: NODE HAS FINAL STATE AND NO DEADLOCK => BLUE //
+    //////////////////////////////////////////////////////////
+    if (final_state_seen && !external_deadlock_seen) {
+        v->setDiagnosisColor(DIAG_BLUE);
+        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (early)" << endl;
+        return DIAG_BLUE;
+    }
+        
+    
+    // node color cannot be quickly derived, so the children have to be considered
     set<GraphNodeDiagnosisColor_enum> childrenDiagnosisColors;
     
     //cerr << "  node " << v->getNumber() << ": no quick answer" << endl;
     
     GraphNode::LeavingEdges::ConstIterator edgeIter =
         v->getLeavingEdgesConstIterator();
+
 
     while (edgeIter->hasNext()) {
         GraphEdge<> *element = edgeIter->getNext();
@@ -916,33 +944,56 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     }
     delete edgeIter;
     
-    //cerr << "  node " << v->getNumber() << " has " << childrenDiagnosisColors.size() << " different children colors" << endl;
     
     bool red_child = (childrenDiagnosisColors.find(DIAG_RED) != childrenDiagnosisColors.end());
     bool blue_child = (childrenDiagnosisColors.find(DIAG_BLUE) != childrenDiagnosisColors.end());;
+    bool orange_child = (childrenDiagnosisColors.find(DIAG_ORANGE) != childrenDiagnosisColors.end());;
     
-    // only blue children: node is blue, too
-    if (blue_child && !red_child) {
+    
+    
+    ///////////////////////////////////////////////////////////////////////
+    // CASE 3: NODE HAS A FINAL STATE AND AN EXTERNAL DEADLOCK => ORANGE //
+    ///////////////////////////////////////////////////////////////////////
+    if (final_state_seen && external_deadlock_seen) {
+        v->setDiagnosisColor(DIAG_ORANGE);
+        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (early)" << endl;
+        return DIAG_ORANGE;
+    }
+    
+    
+    /////////////////////////////////////////////////
+    // CASE 4: NODE HAS ONLY BLUE CHILDREN => BLUE //
+    /////////////////////////////////////////////////
+    if (blue_child && !red_child && !orange_child) {
         v->setDiagnosisColor(DIAG_BLUE);
         cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
         return DIAG_BLUE;
     }
     
-    // only red children: node is red, too
-    if (red_child && !blue_child) {
+    
+    ///////////////////////////////////////////////
+    // CASE 5: NODE HAS ONLY RED CHILDREN => RED //
+    ///////////////////////////////////////////////
+    if (red_child && !orange_child && !blue_child) {
         v->setDiagnosisColor(DIAG_RED);
         cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
         return DIAG_RED;
     }
 
-    // both blue and red children: node is orange
+
+    //////////////////////////////////////////////////////
+    // CASE 6: NODE HAS RED AND BLUE CHILDREN => ORANGE //
+    //////////////////////////////////////////////////////
     if (red_child && blue_child) {
         v->setDiagnosisColor(DIAG_ORANGE);
         cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
         return DIAG_ORANGE;
     }
 
-    // nodes that are neither red, blue nor orange are green
+
+    ////////////////////////////
+    // ANYTHING ELSE => GREEN //
+    ////////////////////////////
     v->setDiagnosisColor(DIAG_GREEN);
     cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
     return DIAG_GREEN;

@@ -67,26 +67,6 @@ OGFromFileNode::~OGFromFileNode() {
 }
 
 
-void OGFromFileNode::addParentNodeForTransitionLabel(
-    const std::string& transitionLabel, OGFromFileNode* parentNode) {
-
-    transitionLabel2parentNode[transitionLabel] = parentNode;
-}
-
-
-OGFromFileNode* OGFromFileNode::getParentNodeForTransitionLabel(
-    const std::string& transitionLabel) const {
-
-    transitionLabel2parentNode_t::const_iterator trans2parent_iter =
-        transitionLabel2parentNode.find(transitionLabel);
-
-    if (trans2parent_iter == transitionLabel2parentNode.end())
-        return NULL;
-
-    return trans2parent_iter->second;
-}
-
-
 std::string OGFromFileNode::getName() const {
     return name_;
 }
@@ -146,17 +126,13 @@ bool OGFromFileNode::hasBlueTransitionWithLabel(
 GraphEdge<OGFromFileNode>* OGFromFileNode::getTransitionWithLabel(
     const std::string& transitionLabel) const {
 
-    //cout << "\tgetTransitionWithLabel : start " << endl;
-
     for (transitions_t::const_iterator trans_iter = transitions.begin();
         trans_iter != transitions.end(); ++trans_iter) {
 
         if ((*trans_iter)->getLabel() == transitionLabel) {
-		    //cout << "\tgetTransitionWithLabel : end1 " << endl;
             return *trans_iter;
         }
     }
-    //cout << "\tgetTransitionWithLabel : end2 " << endl;
     return NULL;
 }
 
@@ -171,9 +147,7 @@ OGFromFileNode* OGFromFileNode::fireTransitionWithLabel(
         return NULL;
     }
 
-    OGFromFileNode* dstNode = transition->getDstNode();
-    dstNode->addParentNodeForTransitionLabel(transitionLabel, this);
-    return dstNode;
+    return transition->getDstNode();
 }
 
 

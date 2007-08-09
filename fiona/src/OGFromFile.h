@@ -59,16 +59,12 @@ class OGFromFileNode {
 
 public:
     typedef std::set<GraphEdge<OGFromFileNode>*> transitions_t;
-    typedef std::map<std::string, OGFromFileNode*> transitionLabel2parentNode_t;
 
 private:
     std::string name_;
     GraphNodeColor color_;
-    transitionLabel2parentNode_t transitionLabel2parentNode;
     GraphFormulaCNF* annotation_;
 
-    void addParentNodeForTransitionLabel(const std::string& transitionLabel,
-        OGFromFileNode* parentNode);
 
 public:
     transitions_t transitions;
@@ -88,10 +84,6 @@ public:
     GraphEdge<OGFromFileNode>* getTransitionWithLabel(
         const std::string& transitionLabel) const;
     OGFromFileNode* fireTransitionWithLabel(const std::string& transitionLabel);
-//    OGFromFileNode* backfireTransitionWithLabel(
-//        const std::string& transitionLabel) const;
-    OGFromFileNode* getParentNodeForTransitionLabel(
-        const std::string& transitionLabel) const;
 
     bool assignmentSatisfiesAnnotation(
         const GraphFormulaAssignment& assignment) const;

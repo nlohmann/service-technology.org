@@ -50,35 +50,15 @@ using namespace std;
 
 OGFromFileNode::OGFromFileNode(const std::string& _name, GraphFormula* _annotation,
                                GraphNodeColor _color) :
-    name(_name),
-    color(_color),
-    annotation(_annotation->getCNF()) {
+
+    // initialize father
+    GraphNodeCommon<OGFromFileNode>(_name,  _annotation, _color) {
 
 }
 
 
 OGFromFileNode::~OGFromFileNode() {
     delete annotation;
-}
-
-
-std::string OGFromFileNode::getName() const {
-    return name;
-}
-
-
-GraphNodeColor OGFromFileNode::getColor() const {
-    return color;
-}
-
-
-bool OGFromFileNode::isBlue() const {
-    return getColor() == BLUE;
-}
-
-
-bool OGFromFileNode::isRed() const {
-    return getColor() == RED;
 }
 
 
@@ -149,17 +129,6 @@ bool OGFromFileNode::assignmentSatisfiesAnnotation(
 
     assert(annotation != NULL);
     return annotation->satisfies(assignment);
-}
-
-
-std::string OGFromFileNode::getAnnotationAsString() const {
-    assert(annotation != NULL);
-    return annotation->asString();
-}
-
-
-GraphFormulaCNF* OGFromFileNode::getAnnotation() const {
-    return annotation;
 }
 
 

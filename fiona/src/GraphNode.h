@@ -39,13 +39,14 @@
 #include "owfn.h"
 #include <set>
 #include "SinglyLinkedList.h"
+#include "GraphFormula.h"
 
 class State;
 class literal;
-class GraphFormula;
-class GraphFormulaAssignment;
-class GraphFormulaMultiaryOr;
-class GraphFormulaCNF;
+//class GraphFormula;
+//class GraphFormulaAssignment;
+//class GraphFormulaMultiaryOr;
+//class GraphFormulaCNF;
 
 typedef std::set<State*> StateSet;
 
@@ -140,12 +141,63 @@ public:
 
 protected:
 
-    /**
-     * Contains all leaving edges.
-     */
+    //! Number of this GraphNode in the graph.
+    unsigned int number;
+
+    //! Name of this GraphNode in the graph.
+    std::string name;
+
+    //! Color of this GraphNode.
+    GraphNodeColor color;
+
+    //! Annotation of this node (a CNF) as a formula.
+    GraphFormulaCNF* annotation;
+
+    //! Contains all leaving edges.
     LeavingEdges leavingEdges;
 
 public:
+
+    //! constructor
+    GraphNodeCommon();
+
+    //! constructor
+    //! \param _name
+    //! \param _annotation
+    //! \param _color
+    GraphNodeCommon(const std::string& _name, GraphFormula* _annotation, GraphNodeColor _color);
+
+    /// get the node number
+    unsigned int getNumber() const;
+
+    /// set the node number
+    void setNumber(unsigned int);
+
+    /// get the node name
+    std::string getName() const;
+
+    /// set the node name
+    void setName(std::string);
+
+    /// get the node color
+    GraphNodeColor getColor() const;
+
+    /// set the node color
+    void setColor(GraphNodeColor c);
+
+    /// is the node color blue?
+    bool isBlue() const;
+
+    /// is the node color red?
+    bool isRed() const;
+
+    //! get the annotation
+    GraphFormulaCNF* getAnnotation() const;
+
+    //! get the annotation as a string
+    std::string getAnnotationAsString() const;
+
+//----------
 
     /**
      * Adds a leaving edge to this node.
@@ -184,45 +236,23 @@ public:
 class GraphNode : public GraphNodeCommon<> {
 private:
 
-    //! Number of this GraphNode in the graph.
-    unsigned int number;
-
-    //! Name of this GraphNode in the graph.
-    std::string name;
-
-    //! Color of this GraphNode.
-    GraphNodeColor color;
-
     //! Diagnosis color of this GraphNode.
     GraphNodeDiagnosisColor diagnosis_color;    
-
-    //! Annotation of this node (a CNF) as a formula.
-    GraphFormulaCNF* annotation;
 
 public:
 
     bool hasFinalStateInStateSet;
-
-    GraphNode(int);
-    ~GraphNode();
-
     int * eventsUsed;
-
-    unsigned int getNumber() const;
-    void setNumber(unsigned int);
-
-    std::string getName() const;
-    void setName(std::string);
-
-    // states in GraphNode
-    bool addState(State *);
 
     // this set contains only a reduced number of states in case the state
     // reduced graph is to be build.
     StateSet reachGraphStateSet;
 
-    //! annotation
-    GraphFormulaCNF* getAnnotation() const;
+    GraphNode(int);
+    ~GraphNode();
+
+    // states in GraphNode
+    bool addState(State *);
 
     //! temporary test assignment that sets yet to be visited successors to true
     //! and therefore allows for early discovery of a formula that cannot get true 
@@ -233,14 +263,8 @@ public:
 
     GraphNodeColor analyseNodeByFormula();
 
-    /// get the node color
-    GraphNodeColor getColor() const;
-
     /// get the node diagnosis color
     GraphNodeDiagnosisColor getDiagnosisColor() const;    
-
-    /// set the node color
-    void setColor(GraphNodeColor c);
 
     /// set the diagnosis color
     void setDiagnosisColor(GraphNodeDiagnosisColor c);
@@ -261,6 +285,113 @@ public:
     NEW_OPERATOR(GraphNode)
 #define new NEW_NEW
 };
+
+
+/*************************
+ * class GraphNodeCommon *
+ *************************/
+
+
+//! \brief constructor
+template<typename GraphNodeType>
+GraphNodeCommon<GraphNodeType>::GraphNodeCommon() :
+        number(12345678),
+        name("12345678"),
+        color(BLUE) {
+    
+    annotation = new GraphFormulaCNF();
+
+}
+
+
+//! \brief constructor
+template<typename GraphNodeType>
+GraphNodeCommon<GraphNodeType>::
+    GraphNodeCommon(const std::string& _name, GraphFormula* _annotation, GraphNodeColor _color) :
+        number(12345678),
+        name(_name),
+        color(_color) {
+
+    annotation = _annotation->getCNF();
+}
+
+
+//! returns the number of this node
+//! \return number of this node
+template<typename GraphNodeType>
+unsigned int GraphNodeCommon<GraphNodeType>::getNumber() const {
+    return number;
+}
+
+
+//! sets the number of this node
+//! \param newNumber number of this node in the graph
+template<typename GraphNodeType>
+void GraphNodeCommon<GraphNodeType>::setNumber(unsigned int newNumber) {
+    number = newNumber;
+}
+
+
+//! returns the name of this node
+//! \return name of this node
+template<typename GraphNodeType>
+std::string GraphNodeCommon<GraphNodeType>::getName() const {
+    return name;
+}
+
+
+//! sets the name of this node
+//! \param newName new name of this node in the graph
+template<typename GraphNodeType>
+void GraphNodeCommon<GraphNodeType>::setName(std::string newName) {
+    name = newName;
+}
+
+
+//! returns the color of the GraphNode
+//! \return color of this node
+template<typename GraphNodeType>
+GraphNodeColor GraphNodeCommon<GraphNodeType>::getColor() const {
+    return color;
+}
+
+
+//! sets the color of the GraphNode to the given color
+//! \param c color of GraphNode
+template<typename GraphNodeType>
+void GraphNodeCommon<GraphNodeType>::setColor(GraphNodeColor c) {
+    color = c;
+}
+
+
+template<typename GraphNodeType>
+bool GraphNodeCommon<GraphNodeType>::isBlue() const {
+    return getColor() == BLUE;
+}
+
+
+template<typename GraphNodeType>
+bool GraphNodeCommon<GraphNodeType>::isRed() const {
+    return getColor() == RED;
+}
+
+
+// returns the CNF formula that is the annotation of a node as a Boolean formula
+template<typename GraphNodeType>
+GraphFormulaCNF* GraphNodeCommon<GraphNodeType>::getAnnotation() const {
+    return annotation;
+}
+
+
+template<typename GraphNodeType>
+std::string GraphNodeCommon<GraphNodeType>::getAnnotationAsString() const {
+    assert(annotation != NULL);
+    return annotation->asString();
+}
+
+
+
+// ------------
 
 
 template<typename GraphNodeType>

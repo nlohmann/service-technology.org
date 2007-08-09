@@ -56,20 +56,13 @@ class GraphFormulaAssignment;
 class GraphFormulaCNF;
 
 class OGFromFileNode : public GraphNodeCommon<OGFromFileNode> {
-private:
-    std::string name;
-    GraphNodeColor color;
-    GraphFormulaCNF* annotation;
 
 public:
     OGFromFileNode(const std::string& name_, GraphFormula* annotation_,
         GraphNodeColor color = BLUE);
 
     ~OGFromFileNode();
-    std::string getName() const;
-    GraphNodeColor getColor() const;
-    bool isBlue() const;
-    bool isRed() const;
+
     bool hasTransitionWithLabel(const std::string& transitionLabel) const;
     bool hasBlueTransitionWithLabel(const std::string& transitionLabel) const;
 
@@ -79,9 +72,6 @@ public:
 
     bool assignmentSatisfiesAnnotation(
         const GraphFormulaAssignment& assignment) const;
-
-    std::string getAnnotationAsString() const;
-	GraphFormulaCNF* getAnnotation() const;
 
 	GraphFormulaAssignment* getAssignment() const;
 

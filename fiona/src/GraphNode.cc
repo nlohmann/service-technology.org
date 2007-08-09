@@ -103,14 +103,12 @@ GraphNodeDiagnosisColor::operator GraphNodeDiagnosisColor_enum() const {
 //! \param numberEvents the number of events that have to be processed from this node
 //! \brief constructor
 GraphNode::GraphNode(int numberEvents) :
-    number(12345678),
-    name("12345678"),
-    color(BLUE),
+
+    GraphNodeCommon<>(),                // initialize father
+
     diagnosis_color(DIAG_UNSET),
     hasFinalStateInStateSet(false),
     testAssignment(NULL) {
-
-    annotation = new GraphFormulaCNF();
 
     eventsUsed = new int [numberEvents];
 
@@ -139,34 +137,6 @@ GraphNode::~GraphNode() {
 
     numberDeletedVertices++;
     trace(TRACE_5, "GraphNode::~GraphNode() : end\n");
-}
-
-
-//! \return number of this node
-//! \brief returns the number of this node
-unsigned int GraphNode::getNumber() const {
-    return number;
-}
-
-
-//! \return name of this node
-//! \brief returns the name of this node
-std::string GraphNode::getName() const {
-    return name;
-}
-
-
-//! \param _number number of this node in the graph
-//! \brief sets the number of this node
-void GraphNode::setNumber(unsigned int _number) {
-    number = _number;
-}
-
-
-//! \param newName new name of this node in the graph
-//! \brief sets the name of this node
-void GraphNode::setName(std::string newName) {
-    name = newName;
 }
 
 
@@ -214,11 +184,6 @@ void GraphNode::removeUnneededLiteralsFromAnnotation() {
 }
 
 
-// returns the CNF formula that is the annotation of a node as a Boolean formula
-GraphFormulaCNF* GraphNode::getAnnotation() const {
-    return annotation;
-}
-
 // return the assignment that is imposed by present or absent arcs leaving node v
 GraphFormulaAssignment* GraphNode::getAssignment() {
     
@@ -250,21 +215,10 @@ GraphFormulaAssignment* GraphNode::getAssignment() {
 
 //! \param c color of GraphNode
 //! \brief sets the color of the GraphNode to the given color
-void GraphNode::setColor(GraphNodeColor c) {
-    color = c;
-}
-
-//! \param c color of GraphNode
-//! \brief sets the color of the GraphNode to the given color
 void GraphNode::setDiagnosisColor(GraphNodeDiagnosisColor c) {
     diagnosis_color = c;
 }
 
-
-//! \brief returns the color of the GraphNode
-GraphNodeColor GraphNode::getColor() const {
-    return color;
-}
 
 //! \brief returns the diagnosis color of the GraphNode
 GraphNodeDiagnosisColor GraphNode::getDiagnosisColor() const {

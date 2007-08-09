@@ -157,7 +157,6 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
 
 # Global check-loud target. Runs all tests. Output files are generated.
 check-loud:
-	(cd .. && $(MAKE) $(AM_MAKEFLAGS) all)
 	$(MAKE) $(AM_MAKEFLAGS) $(CHECKLOUD_ENVIRONMENT) check
 
 
@@ -174,20 +173,16 @@ SINGLE_CHECKLOUD_TARGETS = $(TESTS:%.sh=check-%-loud)
 # name of the target by removing the initial 'check-' and adding '.sh' to
 # the end.
 $(SINGLE_CHECK_TARGETS):
-	(cd .. && $(MAKE) $(AM_MAKEFLAGS) all)
 	-$(TESTS_ENVIRONMENT) ./$(@:check-%=%.sh)
 
 $(SINGLE_CHECKLOUD_TARGETS):
-	(cd .. && $(MAKE) $(AM_MAKEFLAGS) all)
 	-$(CHECKLOUD_ENVIRONMENT) ./$(@:check-%-loud=%.sh)
 
 # Global memcheck target. Runs all tests under valgrind.
 memcheck:
-	(cd .. && $(MAKE) $(AM_MAKEFLAGS) all)
 	$(MAKE) $(AM_MAKEFLAGS) $(MEMCHECK_ENVIRONMENT) check
 
 # Create single memcheck target analogous to single check targets
 SINGLE_MEMCHECK_TARGETS = $(TESTS:%.sh=memcheck-%)
 $(SINGLE_MEMCHECK_TARGETS):
-	(cd .. && $(MAKE) $(AM_MAKEFLAGS) all)
 	-$(MEMCHECK_ENVIRONMENT) ./$(@:memcheck-%=%.sh)

@@ -67,7 +67,8 @@ typedef enum
     O_DISTRIBUTED,                //!< check for distributed controllability
     O_COUNT_SERVICES,
     O_CHECK_ACYCLIC,
-    O_PNG
+    O_PNG,
+    O_DIAGNOSIS                   //!< diagnosis information
 } possibleOptions;
 
 typedef enum

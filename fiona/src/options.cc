@@ -355,6 +355,16 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
                     options[O_PNG] = true;
+                } else if (lc_optarg == "diagnosis") {
+                    options[O_GRAPH_TYPE] = true;
+                    parameters[P_OG] = false;
+                    parameters[P_IG] = true; 
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
+                    parameters[P_SHOW_ALL_NODES] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = true;
+                    parameters[P_SHOW_NO_RED_NODES] = false;
+                    parameters[P_SHOW_BLUE_NODES_ONLY] = false;
                 } else {
                     cerr << "Error:\twrong modus operandi (option -t)" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"

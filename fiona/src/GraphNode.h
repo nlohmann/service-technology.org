@@ -50,20 +50,68 @@ class GraphFormulaCNF;
 typedef std::set<State*> StateSet;
 
 
-//! RED == bad GraphNode; BLUE == good one
-enum GraphNodeColor_enum {RED, BLUE};
+/****************
+* enumerations *
+****************/
+
+enum GraphNodeColor_enum {
+    RED,            ///< bad GraphNode
+    BLUE            ///< good GraphNode
+};
+
+enum GraphNodeDiagnosisColor_enum {
+    DIAG_UNSET,     ///< color of this node is not yet set
+    DIAG_RED,       ///< bad node: you will reach a deadlock
+    DIAG_BLUE,      ///< good node: you will reach a final state
+    DIAG_GREEN,     ///< innocent node: you did not make anything wrong yet
+    DIAG_ORANGE     ///< dangerous node: be careful!
+};
+
+
+/************************
+* class GraphNodeColor *
+************************/
 
 class GraphNodeColor {
     private:
+        /// color to build IG or OG
         GraphNodeColor_enum color_;
-
+        
     public:
-        GraphNodeColor();
-        GraphNodeColor(GraphNodeColor_enum color);
+        /// constructor
+        GraphNodeColor(GraphNodeColor_enum color = RED);
+        
+        /// return node color as string
         std::string toString() const;
+        
+        /// typecast operator
         operator GraphNodeColor_enum() const;
 };
 
+/*********************************
+* class GraphNodeDiagnosisColor *
+*********************************/
+
+class GraphNodeDiagnosisColor {
+    private:
+        /// color for diagnosis
+        GraphNodeDiagnosisColor_enum diagnosis_color_;
+        
+    public:
+        /// constructor
+        GraphNodeDiagnosisColor(GraphNodeDiagnosisColor_enum color = RED);
+        
+        /// return node diagnosis color as string
+        std::string toString() const;
+        
+        /// typecast operator
+        operator GraphNodeDiagnosisColor_enum() const;
+};
+
+
+/*******************
+* class GraphNode *
+*******************/
 
 class GraphNode {
 
@@ -82,6 +130,9 @@ private:
 
     //! Color of this GraphNode.
     GraphNodeColor color;
+    
+    //! Diagnosis color of this GraphNode.
+    GraphNodeDiagnosisColor diagnosis_color;    
 
     //! Annotation of this node (a CNF) as a formula.
     GraphFormulaCNF* annotation;
@@ -131,9 +182,18 @@ public:
 
     GraphNodeColor analyseNodeByFormula();
 
+    /// get the node color
     GraphNodeColor getColor() const;
+    
+    /// get the node diagnosis color
+    GraphNodeDiagnosisColor getDiagnosisColor() const;    
+    
+    /// set the node color
     void setColor(GraphNodeColor c);
-
+    
+    /// set the diagnosis color
+    void setDiagnosisColor(GraphNodeDiagnosisColor c);
+    
     bool isToShow(const GraphNode* rootOfGraph) const;
 
     void removeLiteralFromFormula(oWFN::Places_t::size_type, GraphEdgeType);

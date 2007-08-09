@@ -264,7 +264,11 @@ final: KEY_FINALMARKING finalmarkinglist SEMICOLON
 	// merge() and posate() can only be called on FinalCondition after the PN
 	// and the FinalCondition (in this order) have been initialized with the
 	// initial marking. This is done after parsing is complete.
-}
+  }
+| KEY_FINALCONDITION SEMICOLON 
+    {
+      PN->FinalCondition = NULL;
+    }
 ;
 
 place_area: place_area_internal place_area_input  place_area_output

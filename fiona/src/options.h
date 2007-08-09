@@ -92,7 +92,6 @@ extern std::map<possibleParameters, bool> parameters;
 
 extern OGFromFile::ogfiles_t ogfiles;
 
-extern std::string ogfileToMatch;
 extern std::string outfilePrefix;
 
 extern unsigned int messages_manual;

@@ -631,8 +631,7 @@ int main(int argc, char ** argv) {
 #endif
         if (options[O_MATCH]) {
             // matching against an OG
-            ogfileToMatch = *(ogfiles.begin());
-            OGToMatch = readog(ogfileToMatch);
+            OGToMatch = *(OGsFromFiles.begin());
         }
 
         if (options[O_PRODUCTOG]) {

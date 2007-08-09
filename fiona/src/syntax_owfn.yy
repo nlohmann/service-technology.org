@@ -452,7 +452,11 @@ marking:
 
 finalmarkinglist: 
 | finalmarking
-| finalmarkinglist COMMA finalmarking
+| finalmarkinglist COMMA 
+    {
+    PN->finalMarkingString = PN->finalMarkingString + ", ";
+    }
+    finalmarking
 ;
 
 finalmarking: 
@@ -466,6 +470,7 @@ finalmarking:
 	}
 	sscanf($3,"%u",&i);
 	PN->FinalMarking[PS->getPlace()->index] = i;
+    PN->finalMarkingString = PN->finalMarkingString + string($1) + ": " + string($3);
 	free($1);
 	free($3);
       }
@@ -479,6 +484,7 @@ finalmarking:
 	}
 	sscanf("1","%u",&i);
 	PN->FinalMarking[PS->getPlace()->index] = i;
+    PN->finalMarkingString = PN->finalMarkingString + string($1) + ": 1";
 	free($1);
       }
 ;

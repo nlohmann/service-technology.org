@@ -423,7 +423,7 @@ void makePNG(oWFN* PN) {
     if (PN->finalConditionString != "") {
         globals::filename = PN->filename + " | Final Condition: " + PN->finalConditionString;
     } else {
-        globals::filename = PN->filename;
+        globals::filename = PN->filename + " | Final Marking: " + PN->finalMarkingString;
     }
     string name = PN->filename + ".dot";
 

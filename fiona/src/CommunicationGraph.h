@@ -183,6 +183,9 @@ public:
     bool annotateGraphDistributedlyRecursively(GraphNode *v, std::map<GraphNode*, bool>&);
     void removeLabeledSuccessor(GraphNode *v, std::string label);
     
+    // functions for diagnosis
+    void diagnose();
+    
 
     /**
      * Computes statistics about this graph. They can be printed by

@@ -818,3 +818,9 @@ void CommunicationGraph::removeLabeledSuccessor(GraphNode *v, std::string label)
     // node not found
     assert(false);
 }
+
+
+void CommunicationGraph::diagnose() {
+    cerr << endl << "Diagnosis:" << endl;
+    cerr << "  Lass mich Arzt, ich bin durch!" << endl << endl;
+}

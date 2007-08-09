@@ -357,6 +357,7 @@ void parse_command_line(int argc, char* argv[]) {
                     options[O_PNG] = true;
                 } else if (lc_optarg == "diagnosis") {
                     options[O_GRAPH_TYPE] = true;
+                    options[O_DIAGNOSIS] = true;
                     parameters[P_OG] = false;
                     parameters[P_IG] = true; 
                     options[O_SHOW_NODES] = true;

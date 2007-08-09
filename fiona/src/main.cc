@@ -393,6 +393,10 @@ void computeIG(oWFN* PN) {
             graph->printGraphToSTG();	    
         }
     }
+    
+//    if (options[O_DIAGNOSIS]) {
+        graph->diagnose();
+  //  }    
 
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
 //			trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();

@@ -900,7 +900,9 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     
     //cerr << "  node " << v->getNumber() << ": no quick answer" << endl;
     
-    GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
+    GraphNode::LeavingEdges::ConstIterator edgeIter =
+        v->getLeavingEdgesConstIterator();
+
     while (edgeIter->hasNext()) {
         GraphEdge<> *element = edgeIter->getNext();
         GraphNode *vNext = element->getDstNode();

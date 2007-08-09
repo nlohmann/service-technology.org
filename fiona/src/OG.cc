@@ -733,7 +733,9 @@ void OG::printNodesToOGFile(GraphNode * v, fstream& os,
     visitedNodes[v] = true;
 
     // recursively process successor nodes that have not been visited yet
-    GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
+    GraphNode::LeavingEdges::ConstIterator edgeIter =
+        v->getLeavingEdgesConstIterator();
+
     while (edgeIter->hasNext()) {
         GraphNode* vNext = edgeIter->getNext()->getDstNode();
 
@@ -765,7 +767,9 @@ void OG::printTransitionsToOGFile(GraphNode * v, fstream& os,
     visitedNodes[v] = true;
 
     // recursively process successor nodes that have not been visited yet
-    GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
+    GraphNode::LeavingEdges::ConstIterator edgeIter =
+        v->getLeavingEdgesConstIterator();
+
     while (edgeIter->hasNext()) {
         GraphEdge<>* edge = edgeIter->getNext();
         GraphNode* vNext = edge->getDstNode();

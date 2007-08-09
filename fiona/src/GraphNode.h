@@ -277,7 +277,7 @@ public:
 
     bool isToShow(const GraphNode* rootOfGraph) const;
 
-    void removeLiteralFromFormula(oWFN::Places_t::size_type, GraphEdgeType);
+    void removeLiteralFromAnnotation(const std::string& literal);
 
     //! Removes unneeded literals from the node's annotation. Labels of edges to
     //! red nodes are unneeded.

@@ -149,18 +149,13 @@ void GraphNode::addClause(GraphFormulaMultiaryOr* myclause) {
 }
 
 
-void GraphNode::removeLiteralFromFormula(oWFN::Places_t::size_type i, GraphEdgeType type) {
-    trace(TRACE_5, "GraphNode::removeLiteralFromFormula(oWFN::Places_t::size_type i, GraphEdgeType type) : start\n");
+void GraphNode::removeLiteralFromAnnotation(const string& literal) {
+    trace(TRACE_5, "GraphNode::removeLiteralFromAnnotation(const string& literal) : start\n");
     
-    if (type == SENDING) {
-        //cout << "remove literal " << PN->getInputPlace(i)->getLabelForCommGraph() << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
-        annotation->removeLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
-    } else {
-        //cout << "remove literal " << PN->getOutputPlace(i)->getLabelForCommGraph() << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
-        annotation->removeLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
-    }
+    //cout << "remove literal " << literal << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
+    annotation->removeLiteral(literal);
     
-    trace(TRACE_5, "GraphNode::removeLiteralFromFormula(oWFN::Places_t::size_type i, GraphEdgeType type) : end\n");
+    trace(TRACE_5, "GraphNode::removeLiteralFromAnnotation(const string& literal) : end\n");
 }
 
 void GraphNode::removeUnneededLiteralsFromAnnotation() {

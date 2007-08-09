@@ -144,7 +144,8 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                 // message bound violation occured during calculateSuccStatesInput
                 trace(TRACE_2, "\t\t\t            event suppressed (message bound violated)\n");
 
-                currentNode->removeLiteralFromFormula(i, SENDING);
+                currentNode->removeLiteralFromAnnotation(
+                    PN->getInputPlace(i)->getLabelForCommGraph());
 
                 addProgress(your_progress);
                 printProgress();
@@ -166,7 +167,8 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
                     trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
                     if (v->getColor() == RED) {
-                        currentNode->removeLiteralFromFormula(i, SENDING);
+                        currentNode->removeLiteralFromAnnotation(
+                            PN->getInputPlace(i)->getLabelForCommGraph());
                     }
                 } else {
                     // node was computed before, so only add a new edge to the old node
@@ -183,7 +185,8 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                     // of the edge from currentNode to the old node must be removed
                     // in the annotation of currentNode.
                     if (found->getColor() == RED) {
-                        currentNode->removeLiteralFromFormula(i, SENDING);
+                        currentNode->removeLiteralFromAnnotation(
+                            PN->getInputPlace(i)->getLabelForCommGraph());
                     }
                     delete v;
 
@@ -194,7 +197,8 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
         } else {
             trace(TRACE_2, "\t\t\t            event suppressed (max_occurence reached)\n");
 
-            currentNode->removeLiteralFromFormula(i, SENDING);
+            currentNode->removeLiteralFromAnnotation(
+                PN->getInputPlace(i)->getLabelForCommGraph());
 
             addProgress(your_progress);
             printProgress();
@@ -244,7 +248,8 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
                 trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
                 if (v->getColor() == RED) {
-                    currentNode->removeLiteralFromFormula(i, RECEIVING);
+                    currentNode->removeLiteralFromAnnotation(
+                        PN->getOutputPlace(i)->getLabelForCommGraph());
                 }
             } else {
                 // node v was computed before, so only add a new edge to the old node
@@ -261,7 +266,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                 // of the edge from currentNode to the old node must be removed in the
                 // annotation of currentNode.
                 if (found->getColor() == RED) {
-                    currentNode->removeLiteralFromFormula(i, RECEIVING);
+                    currentNode->removeLiteralFromAnnotation(edgeLabel);
                 }
                 delete v;
 
@@ -271,7 +276,8 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
         } else {
             trace(TRACE_2, "\t\t\t            event suppressed (max_occurence reached)\n");
 
-            currentNode->removeLiteralFromFormula(i, RECEIVING);
+            currentNode->removeLiteralFromAnnotation(
+                PN->getOutputPlace(i)->getLabelForCommGraph());
 
             // addProgress(your_progress);
             // printProgress();

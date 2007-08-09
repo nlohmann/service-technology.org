@@ -27,6 +27,8 @@ check_PROGRAMS = slistcheck
 
 slistcheck_SOURCES = slistcheck.cc
 
+slistcheck_CXXFLAGS = -I$(top_srcdir)/src
+
 # Notice: If you add environment variables here, you have to provide defaults
 # defaults.sh, too.
 TESTS_ENVIRONMENT = testdir=$(srcdir) MKDIR_P="$(MKDIR_P)" \

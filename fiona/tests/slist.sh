@@ -36,7 +36,7 @@ result=0
 
 ############################################################################
 
-cmd=$testdir/slistcheck
+cmd=$builddir/slistcheck
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$cmd.memcheck.log"

@@ -376,11 +376,17 @@ void CommunicationGraph::printGraphToDot() {
             outfilePrefixWithOptions += ".R";
         }
 
-        if (parameters[P_OG]) {
-            outfilePrefixWithOptions += ".OG";
+
+        if (options[O_DIAGNOSIS]) {
+            outfilePrefixWithOptions += ".diag";
         } else {
-            outfilePrefixWithOptions += ".IG";
+            if (parameters[P_OG]) {
+                outfilePrefixWithOptions += ".OG";
+            } else {
+                outfilePrefixWithOptions += ".IG";
+            }
         }
+        
 
         string dotFileName = outfilePrefixWithOptions + ".out";
         fstream dotFile(dotFileName.c_str(), ios_base::out | ios_base::trunc);

@@ -109,11 +109,11 @@ GraphNode::GraphNode(int numberEvents) :
     diagnosis_color(DIAG_UNSET),
     hasFinalStateInStateSet(false),
     testAssignment(NULL) {
-    
+
     annotation = new GraphFormulaCNF();
-    
+
     eventsUsed = new int [numberEvents];
-    
+
     for (int i = 0; i < numberEvents; i++) {
         eventsUsed[i] = 0;
     }
@@ -123,20 +123,20 @@ GraphNode::GraphNode(int numberEvents) :
 //! \brief destructor
 GraphNode::~GraphNode() {
     trace(TRACE_5, "GraphNode::~GraphNode() : start\n");
-    
-    LeavingEdges::Iterator iEdge = getLeavingEdgesIterator();
+
+    LeavingEdges::ConstIterator iEdge = getLeavingEdgesConstIterator();
     while (iEdge->hasNext()) {
         GraphEdge<>* edge = iEdge->getNext();
         delete edge;
     }
     delete iEdge;
-    
+
     if (eventsUsed != NULL) {
         delete[] eventsUsed;
     }
-    
+
     delete annotation;
-    
+
     numberDeletedVertices++;
     trace(TRACE_5, "GraphNode::~GraphNode() : end\n");
 }
@@ -167,11 +167,6 @@ void GraphNode::setNumber(unsigned int _number) {
 //! \brief sets the name of this node
 void GraphNode::setName(std::string newName) {
     name = newName;
-}
-
-
-void GraphNode::addLeavingEdge(GraphEdge<>* edge) {
-    leavingEdges.add(edge);
 }
 
 
@@ -206,7 +201,9 @@ void GraphNode::removeLiteralFromFormula(oWFN::Places_t::size_type i, GraphEdgeT
 }
 
 void GraphNode::removeUnneededLiteralsFromAnnotation() {
-    GraphNode::LeavingEdges::Iterator edgeIter = getLeavingEdgesIterator();
+    GraphNode::LeavingEdges::ConstIterator edgeIter =
+        getLeavingEdgesConstIterator();
+
     while (edgeIter->hasNext()) {
         GraphEdge<>* edge = edgeIter->getNext();
         if (edge->getDstNode()->getColor() == RED) {
@@ -216,9 +213,6 @@ void GraphNode::removeUnneededLiteralsFromAnnotation() {
     delete edgeIter;
 }
 
-GraphNode::LeavingEdges::Iterator GraphNode::getLeavingEdgesIterator() {
-    return leavingEdges.getIterator();
-}
 
 // returns the CNF formula that is the annotation of a node as a Boolean formula
 GraphFormulaCNF* GraphNode::getAnnotation() const {
@@ -234,7 +228,7 @@ GraphFormulaAssignment* GraphNode::getAssignment() {
     
     // traverse outgoing edges and set the corresponding literals
     // to true if the respective node is BLUE
-    LeavingEdges::Iterator edgeIter = getLeavingEdgesIterator();
+    LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         GraphEdge<>* edge = edgeIter->getNext();
         if (edge->getDstNode()->getColor() == BLUE) {

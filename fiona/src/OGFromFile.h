@@ -55,22 +55,13 @@ class GraphFormula;
 class GraphFormulaAssignment;
 class GraphFormulaCNF;
 
-class OGFromFileNode {
-
-public:
-
-    typedef std::set<GraphEdge<OGFromFileNode>*> transitions_t;
-
+class OGFromFileNode : public GraphNodeCommon<OGFromFileNode> {
 private:
-
     std::string name;
     GraphNodeColor color;
     GraphFormulaCNF* annotation;
 
 public:
-
-    transitions_t transitions;
-
     OGFromFileNode(const std::string& name_, GraphFormula* annotation_,
         GraphNodeColor color = BLUE);
 
@@ -79,7 +70,6 @@ public:
     GraphNodeColor getColor() const;
     bool isBlue() const;
     bool isRed() const;
-    void addTransition(GraphEdge<OGFromFileNode>* transition);
     bool hasTransitionWithLabel(const std::string& transitionLabel) const;
     bool hasBlueTransitionWithLabel(const std::string& transitionLabel) const;
 

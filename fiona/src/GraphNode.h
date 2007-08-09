@@ -76,14 +76,14 @@ class GraphNodeColor {
     private:
         /// color to build IG or OG
         GraphNodeColor_enum color_;
-        
+
     public:
         /// constructor
         GraphNodeColor(GraphNodeColor_enum color = RED);
-        
+
         /// return node color as string
         std::string toString() const;
-        
+
         /// typecast operator
         operator GraphNodeColor_enum() const;
 };
@@ -96,16 +96,84 @@ class GraphNodeDiagnosisColor {
     private:
         /// color for diagnosis
         GraphNodeDiagnosisColor_enum diagnosis_color_;
-        
+
     public:
         /// constructor
         GraphNodeDiagnosisColor(GraphNodeDiagnosisColor_enum color = RED);
-        
+
         /// return node diagnosis color as string
         std::string toString() const;
-        
+
         /// typecast operator
         operator GraphNodeDiagnosisColor_enum() const;
+};
+
+
+/**
+ * Common base class for GraphNode and OGFromFileNode. This class shall
+ * alleviate merging those two classes. Merging both classes should be done as
+ * follows:
+ *  1. Merge all functionality of GraphNode and OGFromFileNode by moving
+ *     members and methods to GraphNodeCommon. Merged members that were private
+ *     in GraphNode and OGFromFileNode should be declared protected in
+ *     GraphNodeCommon. Public members stay public.
+ *  2. Eventually GraphNode and OGFromFileNode are empty. Then OGFromFileNode
+ *     should be deleted, all protected members of GraphNodeCommon should be
+ *     declared private, GraphNodeCommon should be turned from a template class
+ *     into a normal class and be renamed to GraphNode.
+ *  3. GraphEdge should be turned from a template class to a normal class with
+ *     GraphNodeType = GraphNode.
+ *
+ * NOTE: This class needs to be a template class until GraphNode and
+ * OGFromFileNode are empty, because they have GraphEdges of their
+ * corresponding type. The template type is called GraphNodeType. It can be
+ * GraphNode (the default) or OGFromFileNode.
+ */
+template<typename GraphNodeType = GraphNode>
+class GraphNodeCommon {
+public:
+
+    /**
+     * Type of the container that holds all leaving edges of this GraphNode.
+     */
+    typedef SList<GraphEdge<GraphNodeType>*> LeavingEdges;
+
+protected:
+
+    /**
+     * Contains all leaving edges.
+     */
+    LeavingEdges leavingEdges;
+
+public:
+
+    /**
+     * Adds a leaving edge to this node.
+     */
+    void addLeavingEdge(GraphEdge<GraphNodeType>* edge);
+
+    /**
+     * Returns an iterator that can be used to traverse all leaving edges of
+     * this GraphNode from begin to end. This iterator can also be used to
+     * modify the list of leaving edges, e.g., to remove an edge.
+     * Consult SList<T>::getIterator() for instructions how to use this
+     * iterator.
+     */
+    typename LeavingEdges::Iterator getLeavingEdgesIterator();
+
+    /**
+     * Returns a const iterator that can be used to traverse all leaving edges
+     * of this GraphNode. You can not modify the list of leaving edges with
+     * this const iterator. Consult SList<T>::getConstIterator() for
+     * instructions how to use this iterator.
+     */
+    typename LeavingEdges::ConstIterator getLeavingEdgesConstIterator() const;
+
+    /**
+     * Returns the number of leaving edges.
+     */
+    unsigned int getLeavingEdgesCount() const;
+
 };
 
 
@@ -113,13 +181,7 @@ class GraphNodeDiagnosisColor {
  * class GraphNode *
  *******************/
 
-class GraphNode {
-
-public:
-
-    //! Type of the container that holds all leaving edges of this GraphNode.
-    typedef SList<GraphEdge<>*> LeavingEdges;
-
+class GraphNode : public GraphNodeCommon<> {
 private:
 
     //! Number of this GraphNode in the graph.
@@ -130,15 +192,12 @@ private:
 
     //! Color of this GraphNode.
     GraphNodeColor color;
-    
+
     //! Diagnosis color of this GraphNode.
     GraphNodeDiagnosisColor diagnosis_color;    
 
     //! Annotation of this node (a CNF) as a formula.
     GraphFormulaCNF* annotation;
-
-    //! Contains all leaving edges.
-    LeavingEdges leavingEdges;
 
 public:
 
@@ -162,14 +221,6 @@ public:
     // reduced graph is to be build.
     StateSet reachGraphStateSet;
 
-    //! Adds a leaving edge to this node.
-    void addLeavingEdge(GraphEdge<>* edge);
-
-    //! Returns an iterator that can be used to traverse all leaving edges of
-    //! this GraphNode. Consult SList<T>::getIterator() for instructions how to
-    //! use this iterator.
-    LeavingEdges::Iterator getLeavingEdgesIterator();
-
     //! annotation
     GraphFormulaCNF* getAnnotation() const;
 
@@ -184,16 +235,16 @@ public:
 
     /// get the node color
     GraphNodeColor getColor() const;
-    
+
     /// get the node diagnosis color
     GraphNodeDiagnosisColor getDiagnosisColor() const;    
-    
+
     /// set the node color
     void setColor(GraphNodeColor c);
-    
+
     /// set the diagnosis color
     void setDiagnosisColor(GraphNodeDiagnosisColor c);
-    
+
     bool isToShow(const GraphNode* rootOfGraph) const;
 
     void removeLiteralFromFormula(oWFN::Places_t::size_type, GraphEdgeType);
@@ -210,5 +261,33 @@ public:
     NEW_OPERATOR(GraphNode)
 #define new NEW_NEW
 };
+
+
+template<typename GraphNodeType>
+void GraphNodeCommon<GraphNodeType>::addLeavingEdge(
+    GraphEdge<GraphNodeType>* edge) {
+
+    leavingEdges.add(edge);
+}
+
+
+template<typename GraphNodeType>
+typename GraphNodeCommon<GraphNodeType>::LeavingEdges::Iterator
+GraphNodeCommon<GraphNodeType>::getLeavingEdgesIterator() {
+    return leavingEdges.getIterator();
+}
+
+
+template<typename GraphNodeType>
+typename GraphNodeCommon<GraphNodeType>::LeavingEdges::ConstIterator
+GraphNodeCommon<GraphNodeType>::getLeavingEdgesConstIterator() const {
+    return leavingEdges.getConstIterator();
+}
+
+
+template<typename GraphNodeType>
+unsigned int GraphNodeCommon<GraphNodeType>::getLeavingEdgesCount() const {
+    return leavingEdges.size();
+}
 
 #endif /*GraphNode_H_*/

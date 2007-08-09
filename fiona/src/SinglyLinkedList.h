@@ -74,12 +74,12 @@ public:
     /**
      * Returns the 'element' (data) of this SListItem.
      */
-    T getElement() { return element_; }
+    T getElement() const { return element_; }
 
     /**
      * Returns the next SListItem after this SListItem in a SList.
      */
-    SListItem* getNext() { return next_; }
+    SListItem* getNext() const { return next_; }
 
     /**
      * Sets the next SListItem after this SListItem in a SList.
@@ -89,7 +89,8 @@ public:
 
 
 /**
- * A SListIterator is used to traverse a SList.
+ * A SListIterator is used to traverse a SList. This iterator allows
+ * modification of the underlying SList, e.g., removing an element.
  */
 template<typename T>
 class SListIterator {
@@ -209,6 +210,45 @@ public:
 };
 
 /**
+ * A SListConstIterator is used to traverse a SList. This iterator allows no
+ * modification of the underlying SList.
+ */
+template<typename T>
+class SListConstIterator {
+private:
+    /**
+     * Points to the SListItem that will be returned at the next call to
+     * getNext().
+     */
+    SListItem<T>* next_;
+
+public:
+
+    /**
+     * Constructs a SListConstIterator that points to 'first'.
+     */
+    SListConstIterator(SListItem<T>* first) :
+        next_(first) {
+    }
+
+    /**
+     * Returns true iff there is a next element in the corresponding SList. If
+     * there is, it can be obtained by a call to getNext().
+     */
+    bool hasNext() const { return next_ != NULL; }
+
+    /**
+     * Returns the next element in the corresponding SList. May only be called
+     * once after a call to hasNext() returned true.
+     */
+    T getNext() {
+        T elementAtNext = next_->getElement();
+        next_ = next_->getNext();
+        return elementAtNext;
+    }
+};
+
+/**
  * A singly linked list.
  */
 template<typename T>
@@ -243,6 +283,11 @@ public:
      * The iterator type needed to traverse a SList.
      */
     typedef SListIterator<T>* Iterator;
+
+    /**
+     * The const iterator type needed to traverse a SList.
+     */
+    typedef SListConstIterator<T>* ConstIterator;
 
     /**
      * Constructs an empty SList.
@@ -309,8 +354,10 @@ public:
 
     /**
      * Returns an iterator for this SList. This iterator can be used to
-     * traverse this SList from start to end. You have to 'delete' the iterator
-     * after usage. A typical loop to traverse an SList looks as follows:
+     * traverse this SList from begin to end. You can use this iterator to
+     * modify the SList, e.g., remove an element. You have to 'delete' the
+     * iterator after usage. A typical loop to traverse an SList looks as
+     * follows:
      *
      * <pre>
      * SList<int> list;
@@ -324,6 +371,26 @@ public:
      */
     Iterator getIterator() {
         return new SListIterator<T>(this);
+    }
+
+    /**
+     * Returns a const iterator for this SList. This iterator can be used to
+     * traverse this SList from start to end. This iterator allows no
+     * modification of the underlying SList. You have to 'delete' the iterator
+     * after usage. A typical loop to traverse an SList looks as follows:
+     *
+     * <pre>
+     * SList<int> list;
+     * SList<int>::ConstIterator iter = list.getConstIterator();
+     * while (iter->hasNext) {
+     *     int element = iter->getNext();
+     * }
+     * delete iter;
+     * </pre>
+     *
+     */
+    ConstIterator getConstIterator() const {
+        return new SListConstIterator<T>(first_);
     }
 
     /**

@@ -58,11 +58,6 @@ OGFromFileNode::OGFromFileNode(const std::string& _name, GraphFormula* _annotati
 
 
 OGFromFileNode::~OGFromFileNode() {
-    for (transitions_t::const_iterator trans_iter = transitions.begin();
-         trans_iter != transitions.end(); ++trans_iter) {
-        delete *trans_iter;
-    }
-
     delete annotation;
 }
 
@@ -87,21 +82,16 @@ bool OGFromFileNode::isRed() const {
 }
 
 
-void OGFromFileNode::addTransition(GraphEdge<OGFromFileNode>* transition) {
-    transitions.insert(transition);
-}
-
-
 void OGFromFileNode::removeTransitionsToNode(const OGFromFileNode* nodeToDelete) {
-	transitions_t::iterator iTransition = transitions.begin();
-	while (iTransition != transitions.end()) {
-		if ((*iTransition)->getDstNode() == nodeToDelete) {
-			delete *iTransition;
-			transitions.erase(iTransition++);
-		} else {
-			++iTransition;
-		}
-	}
+    LeavingEdges::Iterator iEdge = getLeavingEdgesIterator();
+    while (iEdge->hasNext()) {
+        GraphEdge<OGFromFileNode>* edge = iEdge->getNext();
+        if (edge->getDstNode() == nodeToDelete) {
+            delete edge;
+            iEdge->remove();
+        }
+    }
+    delete iEdge;
 }
 
 
@@ -126,13 +116,16 @@ bool OGFromFileNode::hasBlueTransitionWithLabel(
 GraphEdge<OGFromFileNode>* OGFromFileNode::getTransitionWithLabel(
     const std::string& transitionLabel) const {
 
-    for (transitions_t::const_iterator trans_iter = transitions.begin();
-        trans_iter != transitions.end(); ++trans_iter) {
+    LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
 
-        if ((*trans_iter)->getLabel() == transitionLabel) {
-            return *trans_iter;
+        if (edge->getLabel() == transitionLabel) {
+            delete edgeIter;
+            return edge;
         }
     }
+    delete edgeIter;
     return NULL;
 }
 
@@ -172,24 +165,25 @@ GraphFormulaCNF* OGFromFileNode::getAnnotation() const {
 
 // return the assignment that is imposed by present or absent arcs leaving the node
 GraphFormulaAssignment* OGFromFileNode::getAssignment() const {
-	
-	trace(TRACE_5, "computing annotation of node " + getName() + "\n");
 
-	GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
-	
-	// traverse outgoing edges and set the corresponding literals
-	// to true if the respective node is BLUE
+    trace(TRACE_5, "computing annotation of node " + getName() + "\n");
 
-    for (OGFromFileNode::transitions_t::iterator trans_iter = transitions.begin();
-         trans_iter != transitions.end(); ++trans_iter) {
+    GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
 
-		myassignment->setToTrue((*trans_iter)->getLabel());
-	}
-	
-	// we assume that literal final is always true
-	myassignment->setToTrue(GraphFormulaLiteral::FINAL);
-	
-	return myassignment;
+    // traverse outgoing edges and set the corresponding literals
+    // to true if the respective node is BLUE
+
+    LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
+        myassignment->setToTrue(edge->getLabel());
+    }
+    delete edgeIter;
+
+    // we assume that literal final is always true
+    myassignment->setToTrue(GraphFormulaLiteral::FINAL);
+
+    return myassignment;
 }
 
 
@@ -227,7 +221,7 @@ void OGFromFile::addTransition(const std::string& srcName,
     assert(src != NULL);
     assert(dstNode != NULL);
     GraphEdge<OGFromFileNode>* transition = new GraphEdge<OGFromFileNode>(dstNode,label);
-    src->addTransition(transition);
+    src->addLeavingEdge(transition);
 }
 
 
@@ -345,77 +339,79 @@ bool OGFromFile::simulates(OGFromFile *smallerOG) {
 //! \param simNode a node in the simulant
 //! \param simVisitedNodes same as myVisitedNodes in the simulant
 bool OGFromFile::simulatesRecursive(OGFromFileNode *myNode, 
-									set<OGFromFileNode*> *myVisitedNodes, 
-									OGFromFileNode *simNode,
-									set<OGFromFileNode*> *simVisitedNodes) {
-	//If the simulant has no further nodes then myNode simulates simNode.
-	if (simNode == NULL) {
-		return true;
+                                    set<OGFromFileNode*> *myVisitedNodes, 
+                                    OGFromFileNode *simNode,
+                                    set<OGFromFileNode*> *simVisitedNodes) {
+    //If the simulant has no further nodes then myNode simulates simNode.
+    if (simNode == NULL) {
+        return true;
     }
-	//If simNode has a subgraph but myNode does not 
-	//then myNode cannot simulate simNode.
-	if (myNode == NULL) { 
-		return false;
+    //If simNode has a subgraph but myNode does not
+    //then myNode cannot simulate simNode.
+    if (myNode == NULL) {
+        return false;
     }
-	//The above two checks shouldn't matter anyway because there should be no
-	//edges pointing to NULL, or should they? Let's just keep those checks
-	//there for now.
-	
-	//If we already visited this node in the simulant, then we're done.
-	if (simVisitedNodes->find(simNode) != simVisitedNodes->end()) {
-		return true;
-    } else {
-		simVisitedNodes->insert(simNode);
-    }
-	//If we have visited this node in the simulator, but not in the simulant,
-	//then we screwed up badly (I think). Simulation isn't possible, for sure.
-	if (myVisitedNodes->find(myNode) != myVisitedNodes->end()) {
-		return false;
-    }
-	
-	trace(TRACE_5, "OGFromFile::simulateRecursive: checking annotations\n");
+    //The above two checks shouldn't matter anyway because there should be no
+    //edges pointing to NULL, or should they? Let's just keep those checks
+    //there for now.
 
-	GraphFormulaCNF* simNodeAnnotationInCNF = simNode->getAnnotation()->getCNF();
-	GraphFormulaCNF* myNodeAnnotationInCNF = myNode->getAnnotation()->getCNF();
-	if (simNodeAnnotationInCNF->implies(myNodeAnnotationInCNF)) {
-		trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations ok\n" );
-	} else {
-		trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations incompatible\n");
-		delete simNodeAnnotationInCNF;
-		delete myNodeAnnotationInCNF;
-		return false;
-	}
-	delete simNodeAnnotationInCNF;
-	delete myNodeAnnotationInCNF;
-	
-	//Now, we have to check whether the two graphs are compatible.
-	OGFromFileNode::transitions_t::iterator myTransIter, simTransIter;
-	trace(TRACE_5, "Iterating over the transitions of the smallerOG's node.\n");
-	for (simTransIter = simNode->transitions.begin();
-		 simTransIter!= simNode->transitions.end();
-		 simTransIter++) {
-		trace(TRACE_5, "Trying to find the transition in the simulator.\n" );
-		myTransIter = myNode->transitions.begin();
-		while ( ( myTransIter != myNode->transitions.end() ) &&
-				( (*myTransIter)->getLabel().compare((*simTransIter)->getLabel()) ) ) {
-			myTransIter++;
-		}
-		
-		if (myTransIter == myNode->transitions.end()) {
-			return false;
+    //If we already visited this node in the simulant, then we're done.
+    if (simVisitedNodes->find(simNode) != simVisitedNodes->end()) {
+        return true;
+    } else {
+        simVisitedNodes->insert(simNode);
+    }
+    //If we have visited this node in the simulator, but not in the simulant,
+    //then we screwed up badly (I think). Simulation isn't possible, for sure.
+    if (myVisitedNodes->find(myNode) != myVisitedNodes->end()) {
+        return false;
+    }
+
+    trace(TRACE_5, "OGFromFile::simulateRecursive: checking annotations\n");
+
+    GraphFormulaCNF* simNodeAnnotationInCNF = simNode->getAnnotation()->getCNF();
+    GraphFormulaCNF* myNodeAnnotationInCNF = myNode->getAnnotation()->getCNF();
+    if (simNodeAnnotationInCNF->implies(myNodeAnnotationInCNF)) {
+        trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations ok\n" );
+    } else {
+        trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations incompatible\n");
+        delete simNodeAnnotationInCNF;
+        delete myNodeAnnotationInCNF;
+        return false;
+    }
+    delete simNodeAnnotationInCNF;
+    delete myNodeAnnotationInCNF;
+
+    //Now, we have to check whether the two graphs are compatible.
+    trace( TRACE_5, "Iterating over the transitions of the smallerOG's node.\n");
+    OGFromFileNode::LeavingEdges::ConstIterator simEdgeIter =
+        simNode->getLeavingEdgesConstIterator();
+
+    while (simEdgeIter->hasNext()) {
+        GraphEdge<OGFromFileNode>* simEdge = simEdgeIter->getNext();
+        trace(TRACE_5, "Trying to find the transition in the simulator.\n");
+
+        GraphEdge<OGFromFileNode>* myEdge =
+            myNode->getTransitionWithLabel(simEdge->getLabel());
+
+        if (myEdge == NULL) {
+            delete simEdgeIter;
+            return false;
         } else {
-			trace(TRACE_5, "These two nodes seem compatible.\n" );
-			if (!simulatesRecursive((*myTransIter)->getDstNode(), 
-									myVisitedNodes,
-									(*simTransIter)->getDstNode(),
-									simVisitedNodes)) {
-				return false;
+            trace(TRACE_5, "These two nodes seem compatible.\n");
+            if (!simulatesRecursive (myEdge->getDstNode(),
+                                     myVisitedNodes,
+                                     simEdge->getDstNode(),
+                                     simVisitedNodes)) {
+                delete simEdgeIter;
+                return false;
             }
-		}
-	}
-	
-	//All checks were successful.
-	return true;
+        }
+    }
+    delete simEdgeIter;
+
+    //All checks were successful.
+    return true;
 }
 
 
@@ -424,9 +420,9 @@ bool OGFromFile::simulatesRecursive(OGFromFileNode *myNode,
 bool OGFromFile::isAcyclic() {
     trace(TRACE_5, "Test if the given OG is acyclic: start\n" );
 
-    // Define a set vor every Node, that will contain all transitive parent nodes 
+    // Define a set vor every Node, that will contain all transitive parent nodes
     map<OGFromFileNode*, set<OGFromFileNode*> > parentNodes; 
-    
+
     // Define a queue for all nodes that still need to be tested and initialize it
     queue<OGFromFileNode*> testNodes;
     testNodes.push(root);
@@ -434,32 +430,36 @@ bool OGFromFile::isAcyclic() {
 
     // While there are still nodes in the queue
     while(!testNodes.empty()) {
-        
+
         testNode = testNodes.front();
         testNodes.pop();
-        
+
         // A node counts as a parent node to it self for the purpose of cycles
         parentNodes[testNode].insert(testNode);
-        
+
         // Iterate all transitions of that node
-        for (OGFromFileNode::transitions_t::const_iterator trans_iter = testNode->transitions.begin();
-            trans_iter != testNode->transitions.end(); ++trans_iter) {
-            
+        OGFromFileNode::LeavingEdges::ConstIterator edgeIter =
+            testNode->getLeavingEdgesConstIterator();
+
+        while (edgeIter->hasNext()) {
+            GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
             // If the Node is the source of that transition and if the Destination is a valid node
-            if ((*trans_iter)->getDstNode()->getColor() == BLUE) {
-                
+            if (edge->getDstNode()->getColor() == BLUE) {
+
                 // Return false if an outgoing transition points at a transitive parent node,
                 // else add the destination to the queue and update its transitive parent nodes
-                if ( parentNodes[testNode].find((*trans_iter)->getDstNode()) != parentNodes[testNode].end()) {
+                if ( parentNodes[testNode].find(edge->getDstNode()) != parentNodes[testNode].end()) {
+                    delete edgeIter;
                     return false;
                 } else {
-                    testNodes.push((*trans_iter)->getDstNode());
-                    parentNodes[(*trans_iter)->getDstNode()].insert(parentNodes[testNode].begin(),parentNodes[testNode].end());
+                    testNodes.push(edge->getDstNode());
+                    parentNodes[edge->getDstNode()].insert(parentNodes[testNode].begin(),parentNodes[testNode].end());
                 }
             }
         }
+        delete edgeIter;
     }
-	return true;
+    return true;
 }
 
 
@@ -474,7 +474,7 @@ unsigned int OGFromFile::numberOfServices() {
 //! \brief computes the number of possible services for a node and its children
 //! \return number of Services
 unsigned int OGFromFile::numberOfServicesRecursively(OGFromFileNode* start) {
-    
+
     // define needed variables
     unsigned int number = 0;
     set<string> labels;
@@ -482,18 +482,22 @@ unsigned int OGFromFile::numberOfServicesRecursively(OGFromFileNode* start) {
     GraphFormulaAssignment possibleAssignment;
 
     // get and save the labels of all outgoing transitions of this node in the labels set
-    for (OGFromFileNode::transitions_t::const_iterator trans_iter = start->transitions.begin();
-         trans_iter != start->transitions.end(); ++trans_iter) {
-        if ((*trans_iter)->getDstNode()->getColor() == BLUE) {
-            labels.insert((*trans_iter)->getLabel());
+    OGFromFileNode::LeavingEdges::ConstIterator edgeIter =
+        start->getLeavingEdgesConstIterator();
+
+    while (edgeIter->hasNext()) {
+        GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
+        if (edge->getDstNode()->getColor() == BLUE) {
+            labels.insert(edge->getLabel());
         }
     }
+    delete edgeIter;
 
     // Process the number of assignments for the true assignments of this node
     processAssignmentsRecursively(labels, labelCount, possibleAssignment, start);
     
     // reaching this node is one more service if this node has no outgoing transitions
-    if (start->transitions.begin() == start->transitions.end()){
+    if (start->getLeavingEdgesCount() == 0) {
         number = 1;
     } else {
         number = 0;
@@ -501,13 +505,15 @@ unsigned int OGFromFile::numberOfServicesRecursively(OGFromFileNode* start) {
 
     // The number of services is increased for every outgoing transitions, that leads to a blue
     // Node, by the number of true assignments, that include the transitions label to be true, multiplied
-    // recursively with the destination's node number of possible services 
-    for (OGFromFileNode::transitions_t::const_iterator trans_iter = start->transitions.begin();
-         trans_iter != start->transitions.end(); ++trans_iter) {
-        if ((*trans_iter)->getDstNode()->getColor() == BLUE) {
-            number += labelCount[(*trans_iter)->getLabel()] * numberOfServicesRecursively((*trans_iter)->getDstNode());
+    // recursively with the destination's node number of possible services
+    edgeIter = start->getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
+        if (edge->getDstNode()->getColor() == BLUE) {
+            number += labelCount[edge->getLabel()] * numberOfServicesRecursively(edge->getDstNode());
         }
     }
+    delete edgeIter;
 
     // return the number of services below this node
     return number;
@@ -632,67 +638,71 @@ void OGFromFile::buildProductOG(OGFromFileNode* currentOGNode,
                                 OGFromFileNode* currentRhsNode,
                                 OGFromFile* productOG) {
 
-	trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): start\n");
+    trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): start\n");
 
-	// at this time, the node constructed from currentOGNode and
-	// currentRhsNode is already inserted
+    // at this time, the node constructed from currentOGNode and
+    // currentRhsNode is already inserted
 
-	assert(productOG->getRoot() != NULL);
+    assert(productOG->getRoot() != NULL);
 
-	// iterate over all outgoing edges from current node of OG
+    // iterate over all outgoing edges from current node of OG
     std::string currentLabel;
-    for (OGFromFileNode::transitions_t::iterator trans_iter = currentOGNode->transitions.begin();
-         trans_iter != currentOGNode->transitions.end(); ++trans_iter) {
+    OGFromFileNode::LeavingEdges::ConstIterator edgeIter =
+        currentOGNode->getLeavingEdgesConstIterator();
 
-		// remember the label of the egde
-		currentLabel = (*trans_iter)->getLabel();
+    while (edgeIter->hasNext()) {
+        GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
 
-		// if the rhs automaton allows this edge
-		if (currentRhsNode->hasTransitionWithLabel(currentLabel)) {
+        // remember the label of the egde
+        currentLabel = edge->getLabel();
 
-			// remember the name of the old node of the product OG
-			std::string currentName;
-			currentName = currentOGNode->getName() + "x" + currentRhsNode->getName();
-			assert(productOG->hasNodeWithName(currentName));
-	
-			// compute both successors and recursively call buildProductOG again
-			OGFromFileNode* newOGNode;
-			newOGNode = currentOGNode->fireTransitionWithLabel(currentLabel);
-			
-			OGFromFileNode* newRhsNode;
-			newRhsNode = currentRhsNode->fireTransitionWithLabel(currentLabel);
+        // if the rhs automaton allows this edge
+        if (currentRhsNode->hasTransitionWithLabel(currentLabel)) {
 
-			// build the new node of the product OG 
-			// that has name and annotation constructed from current nodes of OG and rhs OG
-			std::string newProductName;
-			newProductName = newOGNode->getName() + "x" + newRhsNode->getName();
-			// if the node is new, add that node to the OG
-			OGFromFileNode* found = productOG->getNodeWithName(newProductName);
+            // remember the name of the old node of the product OG
+            std::string currentName;
+            currentName = currentOGNode->getName() + "x" + currentRhsNode->getName();
+            assert(productOG->hasNodeWithName(currentName));
 
-			if (found != NULL) {
-				// the node was known before, so we just have to add a new edge
-				productOG->addTransition(currentName, newProductName, currentLabel);
+            // compute both successors and recursively call buildProductOG again
+            OGFromFileNode* newOGNode;
+            newOGNode = currentOGNode->fireTransitionWithLabel(currentLabel);
 
-				trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): end\n");
-			} else {
-				// we computed a new node, so we add a node and an edge
-//				trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
+            OGFromFileNode* newRhsNode;
+            newRhsNode = currentRhsNode->fireTransitionWithLabel(currentLabel);
 
-				GraphFormulaCNF* newProductFormula = createProductAnnotation(
-				    newOGNode, newRhsNode);
+            // build the new node of the product OG 
+            // that has name and annotation constructed from current nodes of OG and rhs OG
+            std::string newProductName;
+            newProductName = newOGNode->getName() + "x" + newRhsNode->getName();
+            // if the node is new, add that node to the OG
+            OGFromFileNode* found = productOG->getNodeWithName(newProductName);
 
-				OGFromFileNode* newProductNode = new OGFromFileNode(newProductName, newProductFormula);
+            if (found != NULL) {
+                // the node was known before, so we just have to add a new edge
+                productOG->addTransition(currentName, newProductName, currentLabel);
 
-				productOG->addNode(newProductNode);
+                trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): end\n");
+            } else {
+                // we computed a new node, so we add a node and an edge
+                // trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
 
-				// going down recursively
-				productOG->addTransition(currentName, newProductName, currentLabel);
+                GraphFormulaCNF* newProductFormula = createProductAnnotation(
+                    newOGNode, newRhsNode);
 
-				buildProductOG(newOGNode, newRhsNode, productOG);
-			}
-		}
-	}
-	trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): end\n");
+                OGFromFileNode* newProductNode = new OGFromFileNode(newProductName, newProductFormula);
+
+                productOG->addNode(newProductNode);
+
+                // going down recursively
+                productOG->addTransition(currentName, newProductName, currentLabel);
+
+                buildProductOG(newOGNode, newRhsNode, productOG);
+            }
+        }
+    }
+    delete edgeIter;
+    trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): end\n");
 }
 
 
@@ -776,38 +786,36 @@ void OGFromFile::printDotFile(const std::string& filenamePrefix) const {
 //! \brief dfs through the graph printing each node and edge to the output stream
 void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFromFileNode*, bool>& visitedNodes) const {
 
-	if (v == NULL) {
-		// print the empty OG...	
-		os << "p0" << " [label=\"#0\", fontcolor=black, color=red, style=dashed];\n";
-		return;		
-	}
+    if (v == NULL) {
+        // print the empty OG...
+        os << "p0" << " [label=\"#0\", fontcolor=black, color=red, style=dashed];\n";
+        return;
+    }
 
-	if (visitedNodes[v] != true) {
-	
-		os << "p" << v->getName() << " [label=\"# " << v->getName() << "\\n";
-	
-		string CNFString = v->getAnnotation()->asString();
-	
-		os << CNFString;
-	
-	    os << "\", fontcolor=black, color=blue];\n";
-	
-	    visitedNodes[v] = true;
-	
-	    std::string currentLabel;
-	    
-	    for (OGFromFileNode::transitions_t::iterator trans_iter = v->transitions.begin();
-	         trans_iter != v->transitions.end(); ++trans_iter) {
-	
-			// remember the label of the egde
-			currentLabel = (*trans_iter)->getLabel();
-			OGFromFileNode* successor = v->fireTransitionWithLabel(currentLabel);
-			assert(successor != NULL);
+    if (visitedNodes[v] != true) {
+        os << "p" << v->getName() << " [label=\"# " << v->getName() << "\\n";
+        os << v->getAnnotation()->asString();
+        os << "\", fontcolor=black, color=blue];\n";
+        visitedNodes[v] = true;
 
-			os << "p" << v->getName() << "->" << "p" << successor->getName() << " [label=\"" << currentLabel << "\", fontcolor=black, color= blue];\n";
-			printGraphToDot(successor, os, visitedNodes);
-		}
-	}
+        std::string currentLabel;
+
+        OGFromFileNode::LeavingEdges::ConstIterator edgeIter =
+            v->getLeavingEdgesConstIterator();
+
+        while (edgeIter->getNext()) {
+            GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
+
+            // remember the label of the egde
+            currentLabel = edge->getLabel();
+            OGFromFileNode* successor = v->fireTransitionWithLabel(currentLabel);
+            assert(successor != NULL);
+
+            os << "p" << v->getName() << "->" << "p" << successor->getName() << " [label=\"" << currentLabel << "\", fontcolor=black, color= blue];\n";
+            printGraphToDot(successor, os, visitedNodes);
+        }
+        delete edgeIter;
+    }
 }
 
 
@@ -857,21 +865,22 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
          iNode != nodes.end(); ++iNode) {
 
         OGFromFileNode* node = *iNode;
-        for (OGFromFileNode::transitions_t::const_iterator
-             iTransition = node->transitions.begin();
-             iTransition != node->transitions.end(); ++iTransition) {
+        OGFromFileNode::LeavingEdges::ConstIterator iEdge =
+            node->getLeavingEdgesConstIterator();
 
+        while (iEdge->hasNext()) {
             if (printedFirstTransition) {
                 ogFile << ',' << endl;
             }
 
-            GraphEdge<OGFromFileNode>* transition = *iTransition;
+            GraphEdge<OGFromFileNode>* edge = iEdge->getNext();
             ogFile << "  " << node->getName() << " -> "
-                   << transition->getDstNode()->getName() << " : "
-                   << transition->getLabel();
+                   << edge->getDstNode()->getName() << " : "
+                   << edge->getLabel();
 
             printedFirstTransition = true;
         }
+        delete iEdge;
     }
     ogFile << ';' << endl;
 

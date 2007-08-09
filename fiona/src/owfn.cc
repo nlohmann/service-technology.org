@@ -2227,6 +2227,10 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
         if ((*place)->initial_marking >= 1) {
             p->mark((*place)->initial_marking);
         }
+
+        if (FinalMarking[(*place)->index] >= 1) {
+            p->isFinal = true;
+        }
     }
 
     // translate all output places
@@ -2235,6 +2239,10 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
         // Warning: tokens of a place in PNapi is private. The number of tokens is not translated correctly!
         if ((*place)->initial_marking >= 1) {
             p->mark((*place)->initial_marking);
+        }
+
+        if (FinalMarking[(*place)->index] >= 1) {
+            p->isFinal = true;
         }
     }
 
@@ -2245,6 +2253,10 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
             // Warning: tokens of a place in PNapi is private. The number of tokens is not translated correctly!
             if ((*place)->initial_marking >= 1) {
                 p->mark((*place)->initial_marking);
+            }
+
+            if (FinalMarking[(*place)->index] >= 1) {
+                p->isFinal = true;
             }
         }
     }

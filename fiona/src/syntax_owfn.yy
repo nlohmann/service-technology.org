@@ -660,11 +660,22 @@ arc:
       }
 ;
 
-statepredicate: LPAR statepredicate RPAR {
-	$$ = $2;
+statepredicate: LPAR 
+    {
+    PN->finalConditionString += "(";  
+    }
+    statepredicate RPAR 
+    {
+	$$ = $3;
+    PN->finalConditionString += ")";
 }
-| statepredicate OP_AND statepredicate {
-	$$ = new binarybooleanformula(conj,$1,$3);
+| statepredicate OP_AND 
+    {
+    PN->finalConditionString = PN->finalConditionString + " AND ";    
+    }
+    statepredicate 
+    {
+	$$ = new binarybooleanformula(conj,$1,$4);
 }
 | statepredicate OP_AND KEY_ALL_OTHER_PLACES_EMPTY {
 	//
@@ -707,6 +718,7 @@ statepredicate: LPAR statepredicate RPAR {
 		
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
+    PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_PLACES_EMPTY";  
 }
 | statepredicate OP_AND KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY {
 	//
@@ -751,6 +763,7 @@ statepredicate: LPAR statepredicate RPAR {
 		
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
+    PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_INTERNAL_PLACES_EMPTY";  
 }
 | statepredicate OP_AND KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY {
 	//
@@ -799,12 +812,23 @@ statepredicate: LPAR statepredicate RPAR {
 		
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
+    PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_EXTERNAL_PLACES_EMPTY";  
 }
-| statepredicate OP_OR statepredicate {
-	$$ = new binarybooleanformula(disj,$1,$3);
+| statepredicate OP_OR 
+    {
+        PN->finalConditionString = PN->finalConditionString + " OR ";  
+    }
+    statepredicate 
+    {
+        $$ = new binarybooleanformula(disj,$1,$4);
 }
-| OP_NOT statepredicate {
-	$$ = new unarybooleanformula(neg,$2);
+| OP_NOT
+    {
+        PN->finalConditionString = PN->finalConditionString + "NOT ";      
+    } 
+    statepredicate 
+    {
+	   $$ = new unarybooleanformula(neg,$3);
 }
 | nodeident OP_EQ NUMBER {
 	unsigned int i;
@@ -815,6 +839,7 @@ statepredicate: LPAR statepredicate RPAR {
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(eq, PS->getPlace(), i);
+    PN->finalConditionString = PN->finalConditionString + string($1) + " = " + string($3);  
 	free($1);
 	free($3);
 }
@@ -827,6 +852,7 @@ statepredicate: LPAR statepredicate RPAR {
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(neq, PS->getPlace(), i);
+    PN->finalConditionString = PN->finalConditionString + string($1) + " != " + string($3);  
 	free($1);
 	free($3);
 }
@@ -839,6 +865,7 @@ statepredicate: LPAR statepredicate RPAR {
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(lt, PS->getPlace(), i);
+    PN->finalConditionString = PN->finalConditionString + string($1) + " < " + string($3);  
 	free($1);
 	free($3);
 }
@@ -851,6 +878,7 @@ statepredicate: LPAR statepredicate RPAR {
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(gt, PS->getPlace(), i);
+    PN->finalConditionString = PN->finalConditionString + string($1) + " > " + string($3);  
 	free($1);
 	free($3);
 }
@@ -863,6 +891,7 @@ statepredicate: LPAR statepredicate RPAR {
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(geq, PS->getPlace(), i);
+    PN->finalConditionString = PN->finalConditionString + string($1) + " >= " + string($3);  
 	free($1);
 	free($3);
 }
@@ -875,6 +904,7 @@ statepredicate: LPAR statepredicate RPAR {
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(leq, PS->getPlace(), i);
+    PN->finalConditionString = PN->finalConditionString + string($1) + " <= " + string($3);  
 	free($1);
 	free($3);
 }

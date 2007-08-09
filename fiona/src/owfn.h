@@ -162,6 +162,7 @@ class oWFN {
         unsigned int * CurrentMarking;
         unsigned int * FinalMarking;
         formula * FinalCondition;
+        std::string finalConditionString;
         State * currentState;
 
         unsigned int transNrEnabled;			//!< number of really enabled transitions

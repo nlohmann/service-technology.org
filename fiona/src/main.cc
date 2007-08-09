@@ -420,9 +420,13 @@ void makePNG(oWFN* PN) {
 
     // set strings needed in PNapi output
     globals::output_filename = PN->filename;
-    globals::filename = PN->filename;
+    if (PN->finalConditionString != "") {
+        globals::filename = PN->filename + " | Final Condition: " + PN->finalConditionString;
+    } else {
+        globals::filename = PN->filename;
+    }
     string name = PN->filename + ".dot";
-    
+
     // Open a filestream needed for PNapi output
     ofstream *file = new ofstream(name.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
 
@@ -432,7 +436,7 @@ void makePNG(oWFN* PN) {
     } else {
         // set the net to dot output
         PNapiNet->set_format(PNapi::FORMAT_DOT, true);
-        
+
         // Write the dot output into the file
         (*file) << (*PNapiNet);
 

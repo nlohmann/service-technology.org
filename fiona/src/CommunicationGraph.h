@@ -36,6 +36,7 @@
 
 #include "mynew.h"
 #include "GraphEdge.h"
+#include "GraphNode.h" // for GraphNodeDiagnosisColor_enum
 #include "owfn.h"
 #include <fstream>
 
@@ -185,6 +186,7 @@ public:
     
     // functions for diagnosis
     void diagnose();
+    GraphNodeDiagnosisColor_enum diagnose_recursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes);
     
 
     /**

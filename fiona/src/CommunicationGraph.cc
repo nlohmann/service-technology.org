@@ -506,10 +506,16 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
         os << v->getAnnotation()->asString();
     }
 
-    os << "\", fontcolor=black, color=" << v->getColor().toString();
-    if (v->getColor() == RED) {
-        os << ", style=dashed";
+    if (options[O_DIAGNOSIS]) {
+        os << "\", fontcolor=black, color=" << v->getDiagnosisColor().toString();
+    } else {
+        os << "\", fontcolor=black, color=" << v->getColor().toString();
+
+        if (v->getColor() == RED) {
+            os << ", style=dashed";
+        }
     }
+        
     os << "];\n";
 
     visitedNodes[v] = true;
@@ -525,8 +531,13 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
             continue;
 
         os << "p" << v->getNumber() << "->" << "p" << vNext->getNumber()
-           << " [label=\"" << element->getLabel()
-           << "\", fontcolor=black, color=" << vNext->getColor().toString();
+            << " [label=\"" << element->getLabel();
+        
+        if (options[O_DIAGNOSIS]) {
+            os << "\", fontcolor=black, color=" << vNext->getDiagnosisColor().toString();
+        } else {
+            os << "\", fontcolor=black, color=" << vNext->getColor().toString();
+        }
 
         os << "];\n";
         if ((vNext != v) && !visitedNodes[vNext]) {
@@ -679,10 +690,6 @@ bool CommunicationGraph::annotateGraphDistributedly() {
 
     // mark all nodes as unvisited
     std::map<GraphNode*, bool> visitedNodes;
-//    bool visitedNodes[getNumberOfNodes()];
-//    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-//        visitedNodes[i] = false;
-//    }
     
     // traverse the nodes recursively
     return annotateGraphDistributedlyRecursively(rootNode, visitedNodes);
@@ -823,4 +830,112 @@ void CommunicationGraph::removeLabeledSuccessor(GraphNode *v, std::string label)
 void CommunicationGraph::diagnose() {
     cerr << endl << "Diagnosis:" << endl;
     cerr << "  Lass mich Arzt, ich bin durch!" << endl << endl;
+    
+    GraphNode* rootNode = root;
+    
+    // mark all nodes as unvisited
+    std::map<GraphNode*, bool> visitedNodes;
+
+    diagnose_recursively(rootNode, visitedNodes);
+}
+
+GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes) {
+    assert(v != NULL);
+        
+    if (!v->isToShow(root))
+        return GraphNodeDiagnosisColor(DIAG_UNSET);
+    
+    // if color is known already, return it!
+    if (v->getDiagnosisColor() != DIAG_UNSET) {
+        assert( visitedNodes[v] );
+        return v->getDiagnosisColor();
+    }    
+    
+    visitedNodes[v] = true;
+    
+    for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
+         state != v->reachGraphStateSet.end(); state++) {
+        (*state)->decode(PN);
+        
+        switch ((*state)->type) {
+            case DEADLOCK: {
+                // check if state is internal deadlock
+                bool internal_deadlock = true;
+                
+                if (PN->transNrQuasiEnabled > 0) {
+                    internal_deadlock = false;
+                } else {
+                    for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                            internal_deadlock = false;
+                            continue;
+                        }
+                    }
+                }
+                
+                if (internal_deadlock) {
+                    v->setDiagnosisColor(DIAG_RED);
+                    cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
+                    return DIAG_RED;
+                }
+                
+                break;
+            }
+                
+            case FINALSTATE: {
+                v->setDiagnosisColor(DIAG_BLUE);
+                cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
+                return DIAG_BLUE;
+            }
+        }
+    }
+    
+    set<GraphNodeDiagnosisColor_enum> childrenDiagnosisColors;
+    
+    //cerr << "  node " << v->getNumber() << ": no quick answer" << endl;
+    
+    GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<> *element = edgeIter->getNext();
+        GraphNode *vNext = element->getDstNode();
+	
+        if (!vNext->isToShow(root))
+            continue;
+        
+        if (vNext != v) {
+            childrenDiagnosisColors.insert( diagnose_recursively(vNext, visitedNodes) );
+        }
+    }
+    delete edgeIter;
+    
+    //cerr << "  node " << v->getNumber() << " has " << childrenDiagnosisColors.size() << " different children colors" << endl;
+    
+    bool red_child = (childrenDiagnosisColors.find(DIAG_RED) != childrenDiagnosisColors.end());
+    bool blue_child = (childrenDiagnosisColors.find(DIAG_BLUE) != childrenDiagnosisColors.end());;
+    
+    // only blue children: node is blue, too
+    if (blue_child && !red_child) {
+        v->setDiagnosisColor(DIAG_BLUE);
+        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
+        return DIAG_BLUE;
+    }
+    
+    // only red children: node is red, too
+    if (red_child && !blue_child) {
+        v->setDiagnosisColor(DIAG_RED);
+        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
+        return DIAG_RED;
+    }
+
+    // both blue and red children: node is orange
+    if (red_child && blue_child) {
+        v->setDiagnosisColor(DIAG_ORANGE);
+        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
+        return DIAG_ORANGE;
+    }
+
+    // nodes that are neither red, blue nor orange are green
+    v->setDiagnosisColor(DIAG_GREEN);
+    cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
+    return DIAG_GREEN;
 }

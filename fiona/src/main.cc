@@ -386,15 +386,15 @@ void computeIG(oWFN* PN) {
     trace(TRACE_0, "\n");
 
     if (!options[O_NOOUTPUTFILES]) {
+        if (options[O_DIAGNOSIS]) {
+            graph->diagnose();
+        }        
+        
         // generate output files
         graph->printGraphToDot();      // .out
 
         if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
             graph->printGraphToSTG();	    
-        }
-        
-        if (options[O_DIAGNOSIS]) {
-            graph->diagnose();
         }
     }
 

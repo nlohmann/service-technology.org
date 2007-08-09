@@ -386,7 +386,13 @@ void CommunicationGraph::printGraphToDot() {
         fstream dotFile(dotFileName.c_str(), ios_base::out | ios_base::trunc);
         dotFile << "digraph g1 {\n";
         dotFile << "graph [fontname=\"Helvetica\", label=\"";
-        parameters[P_OG] ? dotFile << "OG of " : dotFile << "IG of ";
+        
+        if (options[O_DIAGNOSIS]) {
+            dotFile << "diagnosis of ";
+        } else {
+            parameters[P_OG] ? dotFile << "OG of " : dotFile << "IG of ";
+        }
+        
         dotFile << PN->filename;
         dotFile << " (parameters:";
         if (parameters[P_IG] && options[O_CALC_REDUCED_IG]) {

@@ -40,38 +40,36 @@
 class oWFN;
 
 class interactionGraph : public CommunicationGraph {
-
+    
     private:
-
         bool addGraphNode(GraphNode *, GraphNode *, messageMultiSet, GraphEdgeType);     // for IG
-
-	public:
+        
+    public:
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.
 #undef new
         NEW_OPERATOR(interactionGraph)
 #define new NEW_NEW
-
-		interactionGraph(oWFN *);
-		~interactionGraph();
-	
-		bool checkMaximalEvents(messageMultiSet, GraphNode *, GraphEdgeType);	
-	
-	    void buildGraph();
-    	void buildGraph(GraphNode * );
-    	void buildReducedGraph(GraphNode * );
-    
-    	void getActivatedEventsComputeCNF(GraphNode *, setOfMessages &, setOfMessages &);
-    
-    	void calculateSuccStatesInput(messageMultiSet, GraphNode *, GraphNode *);
-    	void calculateSuccStatesOutput(messageMultiSet, GraphNode *, GraphNode *);
-    
-		setOfMessages combineReceivingEvents(GraphNode *, setOfMessages &);
-		setOfMessages receivingBeforeSending(GraphNode *);
-
-    	void calculateSuccStatesOutputSet(messageMultiSet, GraphNode *);
-    	void calculateSuccStatesInputReduced(messageMultiSet, GraphNode *);
         
+        interactionGraph(oWFN *);
+        ~interactionGraph();
+        
+        bool checkMaximalEvents(messageMultiSet, GraphNode *, GraphEdgeType);	
+        
+        void buildGraph();
+        void buildGraph(GraphNode * );
+        void buildReducedGraph(GraphNode * );
+        
+        void getActivatedEventsComputeCNF(GraphNode *, setOfMessages &, setOfMessages &);
+        
+        void calculateSuccStatesInput(messageMultiSet, GraphNode *, GraphNode *);
+        void calculateSuccStatesOutput(messageMultiSet, GraphNode *, GraphNode *);
+        
+        setOfMessages combineReceivingEvents(GraphNode *, setOfMessages &);
+        setOfMessages receivingBeforeSending(GraphNode *);
+        
+        void calculateSuccStatesOutputSet(messageMultiSet, GraphNode *);
+        void calculateSuccStatesInputReduced(messageMultiSet, GraphNode *);    
 };
 
 #endif /*IG_H_*/

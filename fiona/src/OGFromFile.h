@@ -58,15 +58,17 @@ class GraphFormulaCNF;
 class OGFromFileNode {
 
 public:
+
     typedef std::set<GraphEdge<OGFromFileNode>*> transitions_t;
 
 private:
-    std::string name_;
-    GraphNodeColor color_;
-    GraphFormulaCNF* annotation_;
 
+    std::string name;
+    GraphNodeColor color;
+    GraphFormulaCNF* annotation;
 
 public:
+
     transitions_t transitions;
 
     OGFromFileNode(const std::string& name_, GraphFormula* annotation_,

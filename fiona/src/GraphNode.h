@@ -66,10 +66,10 @@ class GraphNodeColor {
 
 
 class GraphNode {
+
 public:
-    /**
-     * Type of the container that holds all leaving edges of this GraphNode.
-     */
+
+    //! Type of the container that holds all leaving edges of this GraphNode.
     typedef SList<GraphEdge<>*> LeavingEdges;
 
 private:
@@ -80,22 +80,17 @@ private:
     //! Name of this GraphNode in the graph.
     std::string name;
 
-    /**
-     * Color of this GraphNode.
-     */
+    //! Color of this GraphNode.
     GraphNodeColor color;
 
-    /**
-     * Annotation of this node (a CNF) as a formula.
-     */
+    //! Annotation of this node (a CNF) as a formula.
     GraphFormulaCNF* annotation;
 
-    /**
-     * Contains all leaving edges.
-     */
+    //! Contains all leaving edges.
     LeavingEdges leavingEdges;
 
 public:
+
     bool hasFinalStateInStateSet;
 
     GraphNode(int);
@@ -116,23 +111,19 @@ public:
     // reduced graph is to be build.
     StateSet reachGraphStateSet;
 
-    /**
-     * Adds a leaving edge to this node.
-     */
+    //! Adds a leaving edge to this node.
     void addLeavingEdge(GraphEdge<>* edge);
 
-    /**
-     * Returns an iterator that can be used to traverse all leaving edges of
-     * this GraphNode. Consult SList<T>::getIterator() for instructions how to
-     * use this iterator.
-     */
+    //! Returns an iterator that can be used to traverse all leaving edges of
+    //! this GraphNode. Consult SList<T>::getIterator() for instructions how to
+    //! use this iterator.
     LeavingEdges::Iterator getLeavingEdgesIterator();
 
-    // annotation
+    //! annotation
     GraphFormulaCNF* getAnnotation() const;
 
-    // temporary test assignment that sets yet to be visited successors to true
-    // and therefore allows for early discovery of a formula that cannot get true 
+    //! temporary test assignment that sets yet to be visited successors to true
+    //! and therefore allows for early discovery of a formula that cannot get true 
     GraphFormulaAssignment* testAssignment;
     GraphFormulaAssignment* getAssignment();
 
@@ -147,19 +138,15 @@ public:
 
     void removeLiteralFromFormula(oWFN::Places_t::size_type, GraphEdgeType);
 
-    /**
-     * Removes unneeded literals from the node's annotation. Labels of edges to
-     * red nodes are unneeded.
-     */
+    //! Removes unneeded literals from the node's annotation. Labels of edges to
+    //! red nodes are unneeded.
     void removeUnneededLiteralsFromAnnotation();
 
     friend bool operator < (GraphNode const&, GraphNode const& );
 
 #undef new
-    /**
-     * Provides user defined operator new. Needed to trace all new operations
-     * on this class.
-     */
+    //! Provides user defined operator new. Needed to trace all new operations
+    //! on this class.
     NEW_OPERATOR(GraphNode)
 #define new NEW_NEW
 };

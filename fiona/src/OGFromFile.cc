@@ -50,9 +50,9 @@ using namespace std;
 
 OGFromFileNode::OGFromFileNode(const std::string& _name, GraphFormula* _annotation,
                                GraphNodeColor _color) :
-    name_(_name),
-    color_(_color),
-    annotation_(_annotation->getCNF()) {
+    name(_name),
+    color(_color),
+    annotation(_annotation->getCNF()) {
 
 }
 
@@ -63,17 +63,17 @@ OGFromFileNode::~OGFromFileNode() {
         delete *trans_iter;
     }
 
-    delete annotation_;
+    delete annotation;
 }
 
 
 std::string OGFromFileNode::getName() const {
-    return name_;
+    return name;
 }
 
 
 GraphNodeColor OGFromFileNode::getColor() const {
-    return color_;
+    return color;
 }
 
 
@@ -154,19 +154,19 @@ OGFromFileNode* OGFromFileNode::fireTransitionWithLabel(
 bool OGFromFileNode::assignmentSatisfiesAnnotation(
     const GraphFormulaAssignment& assignment) const {
 
-    assert(annotation_ != NULL);
-    return annotation_->satisfies(assignment);
+    assert(annotation != NULL);
+    return annotation->satisfies(assignment);
 }
 
 
 std::string OGFromFileNode::getAnnotationAsString() const {
-    assert(annotation_ != NULL);
-    return annotation_->asString();
+    assert(annotation != NULL);
+    return annotation->asString();
 }
 
 
 GraphFormulaCNF* OGFromFileNode::getAnnotation() const {
-    return annotation_;
+    return annotation;
 }
 
 
@@ -253,6 +253,7 @@ OGFromFileNode* OGFromFile::getNodeWithName(const std::string& nodeName) const {
 OGFromFileNode* OGFromFile::getRoot() const {
     return root;
 }
+
 
 void OGFromFile::setRoot(OGFromFileNode* newRoot) {
     root = newRoot;
@@ -343,30 +344,34 @@ bool OGFromFile::simulates(OGFromFile *smallerOG) {
 //! \param myVisitedNodes a set containing the visited nodes in this OGFromFile
 //! \param simNode a node in the simulant
 //! \param simVisitedNodes same as myVisitedNodes in the simulant
-bool OGFromFile::simulatesRecursive (OGFromFileNode *myNode, 
-									 set<OGFromFileNode*> *myVisitedNodes, 
-									 OGFromFileNode *simNode,
-									 set<OGFromFileNode*> *simVisitedNodes) {
+bool OGFromFile::simulatesRecursive(OGFromFileNode *myNode, 
+									set<OGFromFileNode*> *myVisitedNodes, 
+									OGFromFileNode *simNode,
+									set<OGFromFileNode*> *simVisitedNodes) {
 	//If the simulant has no further nodes then myNode simulates simNode.
-	if ( simNode == NULL )
+	if (simNode == NULL) {
 		return true;
+    }
 	//If simNode has a subgraph but myNode does not 
 	//then myNode cannot simulate simNode.
-	if ( myNode == NULL ) 
+	if (myNode == NULL) { 
 		return false;
+    }
 	//The above two checks shouldn't matter anyway because there should be no
 	//edges pointing to NULL, or should they? Let's just keep those checks
 	//there for now.
 	
 	//If we already visited this node in the simulant, then we're done.
-	if ( simVisitedNodes->find(simNode) != simVisitedNodes->end() )
+	if (simVisitedNodes->find(simNode) != simVisitedNodes->end()) {
 		return true;
-	else
+    } else {
 		simVisitedNodes->insert(simNode);
+    }
 	//If we have visited this node in the simulator, but not in the simulant,
 	//then we screwed up badly (I think). Simulation isn't possible, for sure.
-	if ( myVisitedNodes->find(myNode) != myVisitedNodes->end() )
+	if (myVisitedNodes->find(myNode) != myVisitedNodes->end()) {
 		return false;
+    }
 	
 	trace(TRACE_5, "OGFromFile::simulateRecursive: checking annotations\n");
 
@@ -385,10 +390,10 @@ bool OGFromFile::simulatesRecursive (OGFromFileNode *myNode,
 	
 	//Now, we have to check whether the two graphs are compatible.
 	OGFromFileNode::transitions_t::iterator myTransIter, simTransIter;
-	trace ( TRACE_5, "Iterating over the transitions of the smallerOG's node.\n" );
-	for ( simTransIter = simNode->transitions.begin();
-		  simTransIter!= simNode->transitions.end();
-		  simTransIter++ ) {
+	trace(TRACE_5, "Iterating over the transitions of the smallerOG's node.\n");
+	for (simTransIter = simNode->transitions.begin();
+		 simTransIter!= simNode->transitions.end();
+		 simTransIter++) {
 		trace(TRACE_5, "Trying to find the transition in the simulator.\n" );
 		myTransIter = myNode->transitions.begin();
 		while ( ( myTransIter != myNode->transitions.end() ) &&
@@ -396,21 +401,23 @@ bool OGFromFile::simulatesRecursive (OGFromFileNode *myNode,
 			myTransIter++;
 		}
 		
-		if ( myTransIter == myNode->transitions.end() )
+		if (myTransIter == myNode->transitions.end()) {
 			return false;
-		else {
+        } else {
 			trace(TRACE_5, "These two nodes seem compatible.\n" );
-			if (!simulatesRecursive ( (*myTransIter)->getDstNode(), 
-									  myVisitedNodes,
-									  (*simTransIter)->getDstNode(),
-									  simVisitedNodes))
+			if (!simulatesRecursive((*myTransIter)->getDstNode(), 
+									myVisitedNodes,
+									(*simTransIter)->getDstNode(),
+									simVisitedNodes)) {
 				return false;
+            }
 		}
 	}
 	
 	//All checks were successful.
 	return true;
 }
+
 
 //! \brief checks, whether this OGFromFile is acyclic
 //! \return true on positive check, otherwise: false
@@ -455,12 +462,14 @@ bool OGFromFile::isAcyclic() {
 	return true;
 }
 
+
 //! \brief computes the number of services determined by this OG
 //! \return number of Services
 unsigned int OGFromFile::numberOfServices() {
     // needed because "root" is private
     return numberOfServicesRecursively(root);
 }
+
 
 //! \brief computes the number of possible services for a node and its children
 //! \return number of Services
@@ -503,6 +512,7 @@ unsigned int OGFromFile::numberOfServicesRecursively(OGFromFileNode* start) {
     // return the number of services below this node
     return number;
 }
+
 
 //! \brief computes the number of true assignments for the given formula of an OG node and additionally
 //!        saves how often every label participated in a true assignment. The function works by recursively
@@ -565,6 +575,7 @@ unsigned int OGFromFile::processAssignmentsRecursively(set<string> labels, map<s
     // return the number of true assignments
     return returnValue;
 }
+
 
 OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
 	trace(TRACE_5, "OGFromFile::product(const OGFromFile* rhs): start\n");
@@ -819,11 +830,11 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
 
     ogFile << "NODES" << endl;
     bool printedFirstNode = false;
-    for (nodes_t::const_iterator iNode = nodes.begin(); iNode != nodes.end();
-        ++iNode)
-    {
-        if (printedFirstNode)
-        {
+    for (nodes_t::const_iterator iNode = nodes.begin();
+         iNode != nodes.end();
+         ++iNode) {
+
+        if (printedFirstNode) {
             ogFile << ',' << endl;
         }
 

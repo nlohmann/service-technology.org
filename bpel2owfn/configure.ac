@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/08/01 13:53:35 $ by $Author: nielslohmann $.
-# Version $Revision: 1.50 $
+# File last changed $Date: 2007/08/10 08:32:21 $ by $Author: gierds $.
+# Version $Revision: 1.51 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
@@ -57,7 +57,7 @@ CFLAGS=""
 
 
 # Checks for header files and functions.
-#AC_CHECK_HEADERS([windows.h])
+AC_CHECK_HEADERS([windows.h])
 #AC_CHECK_FUNCS([pow])
 
 #AM_PROG_CC_C_O

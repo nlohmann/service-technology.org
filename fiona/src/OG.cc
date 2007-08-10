@@ -542,6 +542,7 @@ void OG::computeCNF(GraphNode* node) const {
                         cerr << "\n\t          you shouldn't do this!" << endl;
                         // transient final states are ignored in annotation, just like
                         // all other transient states
+                        delete myclause;
                         continue;
                     } else {
                         node->hasFinalStateInStateSet = true;

@@ -35,7 +35,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/07/31 08:46:21 $
+ * \date    \$Date: 2007/08/10 11:09:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.189 $
+ * \version \$Revision: 1.190 $
  */
 %}
 
@@ -126,8 +126,8 @@ Process(a,b,messageExchange,c,d,e,g,i,_id) ->
       set< unsigned int > faultIds = globals::ASTEmap[ e->id ]->enclosedActivities;
       faultIds.insert( e->id );
 
-//      enterConflictingActivities( innerIds, faultIds );
-//      enterConflictingActivities( faultIds, compIds );
+      enterConflictingActivities( innerIds, faultIds );
+      // enterConflictingActivities( faultIds, compIds );
 
 
       // trigger [SA00015]
@@ -139,31 +139,33 @@ Process(a,b,messageExchange,c,d,e,g,i,_id) ->
       {
         for ( set< unsigned int >::iterator it = globals::ASTE_startActivities.begin(); it != globals::ASTE_startActivities.end(); it++ )
         {
-          for ( int i = 2; i < globals::ASTEid; i++ )
+          //for ( int j = 2; j < globals::ASTEid; j++ )
+          for ( set< unsigned int >::iterator it2 = globals::ASTEmap[ i->id ]->enclosedActivities.begin(); it2 != globals::ASTEmap[ i->id ]->enclosedActivities.end(); it2++)
           {
-            if (globals::ASTEmap[i] != NULL)
+            int j = *it2;
+            if (globals::ASTEmap[j] != NULL)
             {
-              activityRelationType type = activityRelation( i, *it );
+              activityRelationType type = activityRelation( j, *it );
               if ( (type == AR_BEFORE || type == AR_CONCURRENT) &&
                   (
-                  globals::ASTEmap[i]->activityTypeName() == "pick" ||
-                  globals::ASTEmap[i]->activityTypeName() == "reply" ||
-                  globals::ASTEmap[i]->activityTypeName() == "invoke" ||      
-                  globals::ASTEmap[i]->activityTypeName() == "empty" ||     
-                  globals::ASTEmap[i]->activityTypeName() == "receive" ||      
-                  globals::ASTEmap[i]->activityTypeName() == "wait" ||      
-                  globals::ASTEmap[i]->activityTypeName() == "assign" ||      
-                  globals::ASTEmap[i]->activityTypeName() == "throw" ||      
-                  globals::ASTEmap[i]->activityTypeName() == "exit" ||      
-                  globals::ASTEmap[i]->activityTypeName() == "rethrow" ||      
-                  globals::ASTEmap[i]->activityTypeName() == "if" ||      
-                  globals::ASTEmap[i]->activityTypeName() == "while" ||      
-                  globals::ASTEmap[i]->activityTypeName() == "foreach" ||      
-                  globals::ASTEmap[i]->activityTypeName() == "repeatUntil"
+                  globals::ASTEmap[j]->activityTypeName() == "pick" ||
+                  globals::ASTEmap[j]->activityTypeName() == "reply" ||
+                  globals::ASTEmap[j]->activityTypeName() == "invoke" ||      
+                  globals::ASTEmap[j]->activityTypeName() == "empty" ||     
+                  globals::ASTEmap[j]->activityTypeName() == "receive" ||      
+                  globals::ASTEmap[j]->activityTypeName() == "wait" ||      
+                  globals::ASTEmap[j]->activityTypeName() == "assign" ||      
+                  globals::ASTEmap[j]->activityTypeName() == "throw" ||      
+                  globals::ASTEmap[j]->activityTypeName() == "exit" ||      
+                  globals::ASTEmap[j]->activityTypeName() == "rethrow" ||      
+                  globals::ASTEmap[j]->activityTypeName() == "if" ||      
+                  globals::ASTEmap[j]->activityTypeName() == "while" ||      
+                  globals::ASTEmap[j]->activityTypeName() == "foreach" ||      
+                  globals::ASTEmap[j]->activityTypeName() == "repeatUntil"
                   ) &&      
-                  globals::ASTEmap[i]->isStartActivity == false )
+                  globals::ASTEmap[j]->isStartActivity == false )
               {
-                SAerror( 56, globals::ASTEmap[i]->activityTypeName(), globals::ASTEmap[i]->attributes["referenceLine"] );
+                SAerror( 56, globals::ASTEmap[j]->activityTypeName(), globals::ASTEmap[j]->attributes["referenceLine"] );
               }
             }
           }
@@ -1101,8 +1103,8 @@ Receive(a,b,c,_id) ->
         globals::ASTE_startActivities.insert(myid);
 
         // trigger [SA00056]
-        if (!globals::ASTEmap[myself->parentActivityId]->checkAncestors() || !myself->targetLinks.empty())
-          SAerror(56, "<receive>", myself->attributes["referenceLine"]);
+        // if (!globals::ASTEmap[myself->parentActivityId]->checkAncestors() || !myself->targetLinks.empty())
+        //   SAerror(56, "<receive>", myself->attributes["referenceLine"]);
       }
 
       globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
@@ -1650,6 +1652,10 @@ Flow(a,b,c,_id) ->
     }
     a b c
     {
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
+
       foreach(link; tLink_list b)
       {
         assert(globals::ASTEmap[link->id] != NULL);
@@ -1690,9 +1696,6 @@ Flow(a,b,c,_id) ->
       /* here we can check whether each link was used as source and target */
 
 
-      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1981,6 +1984,10 @@ Sequence(a,b,_id) ->
     }
     a b
     {
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
+
       // collect enclosed source links and check whether the sequence contains
       // a start activity (for [SA00056])
       int activityCount = 1;
@@ -1993,7 +2000,7 @@ Sequence(a,b,_id) ->
         {
           if ( innerActivity2->id == innerActivity->id)
           {
-            before == false;
+            before = false;
           }
           else if (before == true)
           {
@@ -2006,13 +2013,10 @@ Sequence(a,b,_id) ->
         myself->enclosedTargetLinks = setUnion(myself->enclosedTargetLinks, globals::ASTEmap[innerActivity->id]->enclosedTargetLinks);
 
         // trigger [SA00056]
-        if (globals::ASTEmap[innerActivity->id]->isStartActivity && activityCount++ > 1)
-          SAerror(56, "<" + globals::ASTEmap[innerActivity->id]->activityTypeName() + ">", globals::ASTEmap[innerActivity->id]->attributes["referenceLine"]);
+        // if (globals::ASTEmap[innerActivity->id]->isStartActivity && activityCount++ > 1)
+        //   SAerror(56, "<" + globals::ASTEmap[innerActivity->id]->activityTypeName() + ">", globals::ASTEmap[innerActivity->id]->attributes["referenceLine"]);
       }
 
-      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -2068,8 +2072,8 @@ Pick(a,b,c,_id) ->
           SAerror(62, "", myself->attributes["referenceLine"]);
 
         // trigger [SA00056]
-        if (!globals::ASTEmap[myself->parentActivityId]->checkAncestors() || !myself->targetLinks.empty())
-          SAerror(56, "<pick>", myself->attributes["referenceLine"]);
+        // if (!globals::ASTEmap[myself->parentActivityId]->checkAncestors() || !myself->targetLinks.empty())
+        //   SAerror(56, "<pick>", myself->attributes["referenceLine"]);
       }
 
       // collect enclosed source and target links

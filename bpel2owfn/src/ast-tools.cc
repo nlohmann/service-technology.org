@@ -34,13 +34,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/07/31 08:46:22 $
+ * \date    \$Date: 2007/08/10 11:09:04 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.74 $
+ * \version \$Revision: 1.75 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -385,6 +385,30 @@ void consecutiveActivities( unsigned int a, unsigned int b )
             activityRelationMap[pair<unsigned int, unsigned int>(*second,*first)] = AR_AFTER;
             beforeActivities[*second].insert(*first);
             afterActivities[*first].insert(*second);
+            for (set< unsigned int >::iterator innerFirst = globals::ASTEmap[ *first ]->enclosedActivities.begin(); innerFirst != globals::ASTEmap[ *first ]->enclosedActivities.end(); innerFirst++)
+            {
+                for (set< unsigned int >::iterator innerSecond = globals::ASTEmap[ *second ]->enclosedActivities.begin(); innerSecond != globals::ASTEmap[ *second ]->enclosedActivities.end(); innerSecond++)
+                {
+                    activityRelationMap[pair<unsigned int, unsigned int>(*innerFirst,*innerSecond)] = AR_BEFORE;
+                    activityRelationMap[pair<unsigned int, unsigned int>(*innerSecond,*innerFirst)] = AR_AFTER;
+                    beforeActivities[*innerSecond].insert(*innerFirst);
+                    afterActivities[*innerFirst].insert(*innerSecond);
+                }            
+            }
+            for (set< unsigned int >::iterator innerFirst = globals::ASTEmap[ *first ]->enclosedActivities.begin(); innerFirst != globals::ASTEmap[ *first ]->enclosedActivities.end(); innerFirst++)
+            {
+                    activityRelationMap[pair<unsigned int, unsigned int>(*innerFirst,*second)] = AR_BEFORE;
+                    activityRelationMap[pair<unsigned int, unsigned int>(*second,*innerFirst)] = AR_AFTER;
+                    beforeActivities[*second].insert(*innerFirst);
+                    afterActivities[*innerFirst].insert(*second);
+            }
+                for (set< unsigned int >::iterator innerSecond = globals::ASTEmap[ *second ]->enclosedActivities.begin(); innerSecond != globals::ASTEmap[ *second ]->enclosedActivities.end(); innerSecond++)
+                {
+                    activityRelationMap[pair<unsigned int, unsigned int>(*first,*innerSecond)] = AR_BEFORE;
+                    activityRelationMap[pair<unsigned int, unsigned int>(*innerSecond,*first)] = AR_AFTER;
+                    beforeActivities[*innerSecond].insert(*first);
+                    afterActivities[*first].insert(*innerSecond);
+                }            
         } 
     }
     

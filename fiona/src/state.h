@@ -91,14 +91,14 @@ public:
     /**
      * Same as decodeShowOnly(), but initializes all transition of the given 'PN'.
      */
-    void decode(oWFN *);
+    void decode(oWFN* PN);
 
     /**
      * Decodes State in bintree and writes the corresponding marking into
      * the CurrentMarking of the given 'PN'.
      * @param PN The corresponding open workflow net.
      */
-    void decodeShowOnly(oWFN *);
+    void decodeShowOnly(oWFN* PN);
 
     /**
      * Returns true iff this state has an enabled tau labeled transition.

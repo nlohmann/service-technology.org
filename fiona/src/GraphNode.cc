@@ -36,7 +36,7 @@
 #include "GraphFormula.h"
 #include "state.h"
 #include "debug.h"
-#include "options.h"    
+#include "options.h"
 #include <cassert>
 
 
@@ -100,19 +100,18 @@ GraphNodeDiagnosisColor::operator GraphNodeDiagnosisColor_enum() const {
  * class GraphNode *
  *******************/
 
-//! \param numberEvents the number of events that have to be processed from this node
+
 //! \brief constructor
-GraphNode::GraphNode(int numberEvents) :
+GraphNode::GraphNode() :
 
     GraphNodeCommon<>(),                // initialize father
 
     diagnosis_color(DIAG_UNSET),
-    hasFinalStateInStateSet(false),
-    testAssignment(NULL) {
+    hasFinalStateInStateSet(false) {
 
-    eventsUsed = new int [numberEvents];
+    eventsUsed = new int [PN->getInputPlaceCount() + PN->getOutputPlaceCount()];
 
-    for (int i = 0; i < numberEvents; i++) {
+    for (unsigned int i = 0; i < PN->getInputPlaceCount() + PN->getOutputPlaceCount(); i++) {
         eventsUsed[i] = 0;
     }
 }
@@ -149,7 +148,7 @@ void GraphNode::addClause(GraphFormulaMultiaryOr* myclause) {
 }
 
 
-void GraphNode::removeLiteralFromAnnotation(const string& literal) {
+void GraphNode::removeLiteralFromAnnotation(const std::string& literal) {
     trace(TRACE_5, "GraphNode::removeLiteralFromAnnotation(const string& literal) : start\n");
     
     //cout << "remove literal " << literal << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
@@ -157,6 +156,7 @@ void GraphNode::removeLiteralFromAnnotation(const string& literal) {
     
     trace(TRACE_5, "GraphNode::removeLiteralFromAnnotation(const string& literal) : end\n");
 }
+
 
 void GraphNode::removeUnneededLiteralsFromAnnotation() {
     GraphNode::LeavingEdges::ConstIterator edgeIter =
@@ -169,35 +169,6 @@ void GraphNode::removeUnneededLiteralsFromAnnotation() {
         }
     }
     delete edgeIter;
-}
-
-
-// return the assignment that is imposed by present or absent arcs leaving node v
-GraphFormulaAssignment* GraphNode::getAssignment() {
-    
-    trace(TRACE_5, "computing assignment of node " + getName() + "\n");
-    
-    GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
-    
-    // traverse outgoing edges and set the corresponding literals
-    // to true if the respective node is BLUE
-    LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
-    while (edgeIter->hasNext()) {
-        GraphEdge<>* edge = edgeIter->getNext();
-        if (edge->getDstNode()->getColor() == BLUE) {
-            myassignment->setToTrue(edge->getLabel());
-        }
-    }
-    delete edgeIter;
-    
-    // only if node has final state, set assignment of literal final to true
-    if (this->hasFinalStateInStateSet == true) {
-        myassignment->setToTrue(GraphFormulaLiteral::FINAL);
-    }
-    
-    //cout << "ende" << endl;
-    return myassignment;
-    
 }
 
 
@@ -229,26 +200,48 @@ bool GraphNode::isToShow(const GraphNode* rootOfGraph) const {
 }
 
 
-//! \result the color of the node
-//! \brief analyses the node, sets its color, and returns the new color
-GraphNodeColor GraphNode::analyseNodeByFormula() {
-    
+//! \brief analyses the node and sets its color
+void GraphNode::analyseNode() {
+
     trace(TRACE_5, "GraphNode::analyseNodeByFormula() : start\n");
-    
+
+    trace(TRACE_3, "\t\t\t analysing node ");
+    trace(TRACE_3, this->getNumber() + "...\n");
+
+    assert(this->getColor() == BLUE);
+
     // computing the assignment given by outgoing edges (to blue nodes)
-    GraphFormulaAssignment* myassignment = this->getAssignment();
+    GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
+
+    // traverse outgoing edges and set the corresponding literals
+    // to true if the respective node is BLUE
+    LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<>* edge = edgeIter->getNext();
+        if (edge->getDstNode()->getColor() == BLUE) {
+            myassignment->setToTrue(edge->getLabel());
+        }
+    }
+    delete edgeIter;
+
+    // only if node has final state, set assignment of literal final to true
+    if (this->hasFinalStateInStateSet == true) {
+        myassignment->setToTrue(GraphFormulaLiteral::FINAL);
+    }
+
+    // evaluating the computed assignment
     bool result = this->getAnnotation()->value(*myassignment);
     delete myassignment;
-    
-    trace(TRACE_5, "GraphNode::analyseNodeByFormula() : end\n");
-    
+
     if (result) {
         trace(TRACE_3, "\t\t\t node analysed blue, formula " + this->getAnnotation()->asString() + "\n");
-        return BLUE;
+        this->setColor(BLUE);
     } else {
         trace(TRACE_3, "\t\t\t node analysed red, formula " + this->getAnnotation()->asString() + "\n");
-        return RED;
+        this->setColor(RED);
     }
+
+    trace(TRACE_5, "GraphNode::analyseNodeByFormula() : end\n");
 }
 
 

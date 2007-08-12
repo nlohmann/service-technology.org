@@ -114,7 +114,8 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 
 			trace(TRACE_2, "\t\t\t\t    sending event: !");
 
-			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
+			// create new GraphNode of the graph
+            GraphNode* v = new GraphNode();
 			calculateSuccStatesInput(*iter, currentNode, v);
 
 			if (v->getColor() == RED) {
@@ -151,7 +152,8 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 
             trace(TRACE_2, "\t\t\t\t    output event: ?");
 
-            GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
+            // create new GraphNode of the graph
+            GraphNode* v = new GraphNode();
             calculateSuccStatesOutput(*iter, currentNode, v);
 
 			if (currentNode->getColor() != RED && addGraphNode (currentNode, v, *iter, RECEIVING)) {
@@ -172,7 +174,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 			}
 		} 	
 	}		
-	analyseNode(currentNode);
+	currentNode->analyseNode();
 	trace(TRACE_5, "node analysed\n");
 
 	trace(TRACE_1, "\t\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()) + "\n");	
@@ -221,7 +223,8 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 
 			trace(TRACE_2, "\t\t\t\t    input event: ?");
 
-			GraphNode * v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());		// create new GraphNode of the graph
+			// create new GraphNode of the graph
+            GraphNode * v = new GraphNode();
 			
 			calculateSuccStatesInput(*iter, currentNode, v);
 			
@@ -249,7 +252,8 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 
 			trace(TRACE_2, "\t\t\t\t    output event: ?");
 
-			GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());	// create new GraphNode of the graph
+			// create new GraphNode of the graph
+            GraphNode* v = new GraphNode();
 			calculateSuccStatesOutput(*iter, currentNode, v);
 
 			if (currentNode->getColor() != RED && addGraphNode (currentNode, v, *iter, RECEIVING)) {
@@ -261,7 +265,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 		}
 	}
 
-	analyseNode(currentNode);
+	currentNode->analyseNode();
 	trace(TRACE_5, "node analysed\n");
 
 	trace(TRACE_1, "\t\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()) + "\n");

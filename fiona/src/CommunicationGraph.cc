@@ -31,8 +31,8 @@
  *
  */
 
-#include "mynew.h"
 
+#include "mynew.h"
 #include "state.h"
 #include "GraphEdge.h"
 #include "GraphFormula.h"
@@ -45,12 +45,14 @@
 
 using namespace std;
 
+
 double global_progress = 0;
 int show_progress = 0;
 
 // for the STG->oWFN translation
 extern void STG2oWFN_main();
 extern FILE *stg_yyin;
+
 
 //! \param _PN
 //! \brief constructor
@@ -76,7 +78,7 @@ CommunicationGraph::~CommunicationGraph() {
 
 //! \return pointer to root
 //! \brief returns a pointer to the root node of the graph
-GraphNode * CommunicationGraph::getRoot() const {
+GraphNode* CommunicationGraph::getRoot() const {
     return root;
 }
 
@@ -115,7 +117,7 @@ void CommunicationGraph::calculateRootNode() {
     assert(setOfVertices.size() == 0);
 
     // create new OG root node
-    root = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());
+    root = new GraphNode();
 
     // calc the reachable states from that marking
     if (options[O_CALC_ALL_STATES]) {
@@ -143,26 +145,6 @@ GraphNode * CommunicationGraph::findGraphNodeInSet(GraphNode * toAdd) {
         return NULL;
     }
 }
-
-
-//! \param node the node to be analysed
-//! \brief analyses the node and sets its color
-void CommunicationGraph::analyseNode(GraphNode* node) {
-
-    trace(TRACE_5, "CommunicationGraph::analyseNode(GraphNode* node) : start\n");
-
-    trace(TRACE_3, "\t\t\t analysing node ");
-    trace(TRACE_3, node->getNumber() + "...\n");
-
-    assert(node->getColor() == BLUE);
-
-    // analyse node by its formula
-    GraphNodeColor analysedColor = node->analyseNodeByFormula();
-    node->setColor(analysedColor);
-
-    trace(TRACE_5, "CommunicationGraph::analyseNode(GraphNode* node) : end\n");
-}
-
 
 
 void CommunicationGraph::computeGraphStatistics() {

@@ -254,20 +254,16 @@ public:
     // reduced graph is to be build.
     StateSet reachGraphStateSet;
 
-    GraphNode(int);
+    GraphNode();
     ~GraphNode();
 
-    // states in GraphNode
+    /// adds a state to the states of a GraphNode
     bool addState(State *);
-
-    //! temporary test assignment that sets yet to be visited successors to true
-    //! and therefore allows for early discovery of a formula that cannot get true 
-    GraphFormulaAssignment* testAssignment;
-    GraphFormulaAssignment* getAssignment();
 
     void addClause(GraphFormulaMultiaryOr*);
 
-    GraphNodeColor analyseNodeByFormula();
+    /// analyses the node and sets its color
+    void analyseNode();
 
     /// get the node diagnosis color
     GraphNodeDiagnosisColor getDiagnosisColor() const;    
@@ -279,15 +275,15 @@ public:
 
     void removeLiteralFromAnnotation(const std::string& literal);
 
-    //! Removes unneeded literals from the node's annotation. Labels of edges to
-    //! red nodes are unneeded.
+    /// Removes unneeded literals from the node's annotation. Labels of edges to
+    /// red nodes are unneeded.
     void removeUnneededLiteralsFromAnnotation();
 
     friend bool operator < (GraphNode const&, GraphNode const& );
 
 #undef new
-    //! Provides user defined operator new. Needed to trace all new operations
-    //! on this class.
+    /// Provides user defined operator new. Needed to trace all new operations
+    /// on this class.
     NEW_OPERATOR(GraphNode)
 #define new NEW_NEW
 };
@@ -395,10 +391,6 @@ std::string GraphNodeCommon<GraphNodeType>::getAnnotationAsString() const {
     assert(annotation != NULL);
     return annotation->asString();
 }
-
-
-
-// ------------
 
 
 template<typename GraphNodeType>

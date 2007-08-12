@@ -135,7 +135,8 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
             PN->getInputPlace(i)->max_occurence > currentNode->eventsUsed[i]) {
             // we have to consider this event
 
-            GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());    // create new GraphNode of the graph
+            // create new GraphNode of the graph
+            GraphNode* v = new GraphNode();
 
             trace(TRACE_5, "\t\t\t\t    calculating successor states\n");
             calculateSuccStatesInput(PN->getInputPlace(i)->index, currentNode, v);
@@ -230,7 +231,8 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
         if (PN->getOutputPlace(i)->max_occurence < 0 ||
             PN->getOutputPlace(i)->max_occurence > currentNode->eventsUsed[i + PN->getInputPlaceCount()]) {
 
-            GraphNode* v = new GraphNode(PN->getInputPlaceCount() + PN->getOutputPlaceCount());    // create new GraphNode of the graph
+            // create new GraphNode of the graph
+            GraphNode* v = new GraphNode();
             calculateSuccStatesOutput(PN->getOutputPlace(i)->index, currentNode, v);
 
             // was the new node computed before?
@@ -300,7 +302,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
     trace(TRACE_2, "\t\t  no events left...\n");
 
     if (currentNode->getColor() != RED) {
-        analyseNode(currentNode);
+        currentNode->analyseNode();
     }
 
     trace(TRACE_3, "\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()));
@@ -315,7 +317,6 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
 //! \brief adds the node toAdd to the set of all nodes
 //! and copies the eventsUsed array from the sourceNode
-// for OG
 void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
 
     trace(TRACE_5, "reachGraph::AddGraphNode(GraphNode* sourceNode, GraphNode * toAdd, unsigned int label, GraphEdgeType type): start\n");
@@ -339,7 +340,6 @@ void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
 //! adds an SENDING or RECEIVING edge from sourceNode to destNode
 //! and adds destNode to the successor list of sourceNode
 //! and increases eventsUsed of destNode by one
-// for OG
 void OG::addGraphEdge(GraphNode* sourceNode, GraphNode* destNode, oWFN::Places_t::size_type label, GraphEdgeType type) {
 
     trace(TRACE_5, "reachGraph::AddGraphEdge(GraphNode* sourceNode, GraphNode* destNode, unsigned int label, GraphEdgeType type): start\n");
@@ -372,7 +372,6 @@ void OG::addGraphEdge(GraphNode* sourceNode, GraphNode* destNode, oWFN::Places_t
 //! \param newNode the new node wich is computed
 //! \brief for each state of the old node:
 //! add input message and build reachability graph and add all states to new node
-// for OG only
 void OG::calculateSuccStatesInput(unsigned int input, GraphNode * oldNode, GraphNode * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode * node) : start\n");
 
@@ -426,7 +425,6 @@ void OG::calculateSuccStatesInput(unsigned int input, GraphNode * oldNode, Graph
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
 //! \brief calculates the set of successor states in case of an output message
-// for OG
 void OG::calculateSuccStatesOutput(unsigned int output, GraphNode * node, GraphNode * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, GraphNode * node, GraphNode * newNode) : start\n");
 
@@ -486,7 +484,7 @@ void OG::correctNodeColorsAndShortenAnnotations() {
                 continue;
             }
 
-            analyseNode(node);
+            node->analyseNode();
             if (node->getColor() == RED) {
                 graphChangedInLoop = true;
                 graphChanged = true;
@@ -507,6 +505,7 @@ void OG::correctNodeColorsAndShortenAnnotations() {
         node->removeUnneededLiteralsFromAnnotation();
     }
 }
+
 
 void OG::computeCNF(GraphNode* node) const {
 
@@ -592,6 +591,7 @@ void OG::computeCNF(GraphNode* node) const {
                         cerr << "\n\t          you shouldn't do this!" << endl;
                         // transient final states are ignored in annotation, just like
                         // all other transient states
+                        delete myclause;
                         continue;
                     } else {
                         node->hasFinalStateInStateSet = true;
@@ -628,11 +628,6 @@ void OG::convertToBdd() {
 	trace(TRACE_5, "OG::convertToBdd(): start\n");
 
     std::map<GraphNode*, bool> visitedNodes;
-//    bool visitedNodes[getNumberOfNodes()];
-//
-//    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-//        visitedNodes[i] = 0;
-//    }
 
     bdd->convertRootNode(root);
     bdd->generateRepresentation(root, visitedNodes);
@@ -648,11 +643,6 @@ void OG::convertToBddFull() {
 	trace(TRACE_5, "OG::convertToBddFull(): start\n");
 
     std::map<GraphNode*, bool> visitedNodes;
-//    bool visitedNodes[getNumberOfNodes()];
-//
-//    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-//        visitedNodes[i] = 0;
-//    }
 
 	trace(TRACE_0, "\nHIT A KEY TO CONTINUE (convertToBddFull)\n");
 	//getchar();
@@ -662,10 +652,7 @@ void OG::convertToBddFull() {
 	testbdd->setMaxPlaceBits(root,visitedNodes);
 
     visitedNodes.clear();
-//	for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-//		visitedNodes[i] = false;
-//	}
-	cout << endl;
+    trace(TRACE_0, "\n");
 
 	testbdd->testSymbRepresentation(root, visitedNodes);
 	testbdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
@@ -693,10 +680,6 @@ void OG::printOGtoFile() const {
 
     std::map<GraphNode*, bool> visitedNodes;
 
-//    for (unsigned int i = 0; i < getNumberOfNodes(); ++i) {
-//        visitedNodes[i] = false;
-//    }
-
     ogFile << "NODES" << endl;
     printNodesToOGFile(root, ogFile, visitedNodes);
     ogFile << ';' << endl << endl;
@@ -705,9 +688,7 @@ void OG::printOGtoFile() const {
     ogFile << "  " << NodeNameForOG(root) << ';' << endl << endl;
 
     visitedNodes.clear();
-//    for (unsigned int i = 0; i < getNumberOfNodes(); ++i) {
-//        visitedNodes[i] = false;
-//    }
+
     ogFile << "TRANSITIONS" << endl;
     printTransitionsToOGFile(root, ogFile, visitedNodes);
     ogFile << ';' << endl;
@@ -715,9 +696,6 @@ void OG::printOGtoFile() const {
     ogFile.close();
 }
 
-
-//void OG::printNodesToOGFile(GraphNode * v, fstream& os,
-//    bool visitedNodes[]) const {
 
 void OG::printNodesToOGFile(GraphNode * v, fstream& os,
     std::map<GraphNode*, bool>& visitedNodes) const {
@@ -808,8 +786,5 @@ void OG::printTransitionsToOGFile(GraphNode * v, fstream& os,
 string OG::NodeNameForOG(const GraphNode* v) const {
 
     return v->getName();
-
-    // assert(v != NULL);
-    // return intToString(v->getName());
 }
 

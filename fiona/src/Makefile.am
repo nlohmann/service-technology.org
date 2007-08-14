@@ -18,8 +18,10 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-08-08 12:38:25 $ by $Author: bretschn $.
-# Version $Revision: 1.42 $
+# File last changed $Date: 2007-08-14 13:05:46 $ by $Author: bretschn $.
+# Version $Revision: 1.43 $
+
+include $(top_srcdir)/Makefile.covcommon
 
 bin_PROGRAMS = fiona
 
@@ -97,6 +99,11 @@ fiona_LDADD = $(builddir)/../cudd/obj/libobj.a \
 lexer_owfn.h: lexer_owfn.cc
 	$(EGREP) '^#define.*FLEX.*VERSION' $^ > $@
 
+allcov: $(BUILT_SOURCES) fiona.h
+	$(MAKE) $(AM_MAKEFLAGS) CXX="$(CXXCOV)" all
+	$(MAKE) $(AM_MAKEFLAGS) cleandeps
+
+clean-local: cleandeps
 
 # the Petri net API
 lib_LIBRARIES = lib_pnapi.a

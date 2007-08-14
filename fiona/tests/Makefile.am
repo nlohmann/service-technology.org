@@ -19,6 +19,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
+include $(top_srcdir)/Makefile.covcommon
+
 TESTS = slist.sh syntax.sh extrema.sh messages.sh cyclic.sh \
         matching.sh sim_og.sh \
         sequences.sh samples.sh bddtest.sh
@@ -188,3 +190,25 @@ memcheck:
 SINGLE_MEMCHECK_TARGETS = $(TESTS:%.sh=memcheck-%)
 $(SINGLE_MEMCHECK_TARGETS):
 	-$(MEMCHECK_ENVIRONMENT) ./$(@:memcheck-%=%.sh)
+
+COV_RUNFILES=cov-run-*.covexp
+COV_DBFILE=cov-db
+COV_ALLFILES=$(COV_RUNFILES) $(COV_DBFILE)
+
+# Coverage check
+covcheck: covrunclean
+	$(MAKE) $(AM_MAKEFLAGS) CXX="$(CXXCOV)" $(check_PROGRAMS)
+	$(MAKE) $(AM_MAKEFLAGS) cleandeps
+	-$(MAKE) $(AM_MAKEFLAGS) check
+	covmerge.exe $(COV_RUNFILES) > $(COV_DBFILE)
+	gen_html $(COV_DBFILE)
+	$(MAKE) $(AM_MAKEFLAGS) covrunclean
+
+covrunclean:
+	-test -z "$(COV_ALLFILES)" || rm -f $(COV_ALLFILES)
+
+clean-local: covrunclean cleandeps
+
+distclean-local:
+	test -d coverage_html/ && rm -rf coverage_html/
+

@@ -19,8 +19,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-06-22 12:32:12 $ by $Author: bretschn $.
-# Version $Revision: 1.15 $
+# File last changed $Date: 2007-08-14 13:05:07 $ by $Author: bretschn $.
+# Version $Revision: 1.16 $
 
 SUBDIRS = cudd src tests doc
 
@@ -136,3 +136,12 @@ memcheck: all
 # Do single memchecks in tests directory.
 memcheck-%: all
 	(cd tests && $(MAKE) $(AM_MAKEFLAGS) $@)
+
+# Do code coverage check for test suite.
+allcov:
+	(cd cudd  && $(MAKE) $(AM_MAKEFLAGS) all)
+	(cd src   && $(MAKE) $(AM_MAKEFLAGS) allcov)
+
+# Do code coverage check for test suite.
+covcheck: allcov
+	(cd tests && $(MAKE) $(AM_MAKEFLAGS) covcheck)

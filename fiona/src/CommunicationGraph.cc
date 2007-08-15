@@ -500,7 +500,8 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
         v->getAnnotation()->simplify();
         os << v->getAnnotation()->asString();
     }
-
+    
+    // the diagnosis mode uses different colors
     if (options[O_DIAGNOSIS]) {
         os << "\", fontcolor=black, color=" << v->getDiagnosisColor().toString();
     } else {
@@ -528,11 +529,43 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
         os << "p" << v->getNumber() << "->" << "p" << vNext->getNumber()
             << " [label=\"" << element->getLabel();
         
+        // the diagnosis mode uses different colors
         if (options[O_DIAGNOSIS]) {
             os << "\", fontcolor=black, color=" << vNext->getDiagnosisColor().toString();
         } else {
             os << "\", fontcolor=black, color=" << vNext->getColor().toString();
         }
+        
+        // in diagnosis mode, draw "unenforcable" arcs dashed
+        if (options[O_DIAGNOSIS] && (element->getLabel().substr(0,1) == "?" )) {
+            string edge_label = element->getLabel().substr(1,element->getLabel().length());
+            bool edge_enforcable = true;
+            
+            // iterate the states and look for deadlocks where the considered
+            // message is not present: then, the receiving of this message can
+            // not be enforced
+            for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
+                 state != v->reachGraphStateSet.end(); state++) {
+                (*state)->decode(PN);
+                
+                if ((*state)->type == DEADLOCK) {
+                    for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                        if (PN->getOutputPlace(i)->name == edge_label) {
+                            if (PN->CurrentMarking[PN->getOutputPlace(i)->index] == 0) {
+                                edge_enforcable = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+            }
+            
+            if (!edge_enforcable) {
+                os << ", style=dashed";
+            }
+        }
+        
 
         os << "];\n";
         if ((vNext != v) && !visitedNodes[vNext]) {
@@ -939,6 +972,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     delete edgeIter;
     
     
+    // collect information about the child nodes
     bool red_child = (childrenDiagnosisColors.find(DIAG_RED) != childrenDiagnosisColors.end());
     bool blue_child = (childrenDiagnosisColors.find(DIAG_BLUE) != childrenDiagnosisColors.end());;
     bool orange_child = (childrenDiagnosisColors.find(DIAG_ORANGE) != childrenDiagnosisColors.end());;

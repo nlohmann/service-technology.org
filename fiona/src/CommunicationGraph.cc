@@ -978,24 +978,23 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     bool orange_child = (childrenDiagnosisColors.find(DIAG_ORANGE) != childrenDiagnosisColors.end());;
     
     
-    
-    ///////////////////////////////////////////////////////////////////////
-    // CASE 3: NODE HAS A FINAL STATE AND AN EXTERNAL DEADLOCK => ORANGE //
-    ///////////////////////////////////////////////////////////////////////
-    if (final_state_seen && external_deadlock_seen) {
-        v->setDiagnosisColor(DIAG_ORANGE);
-        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (ED/FS mix)" << endl;
-        return DIAG_ORANGE;
-    }
-    
-    
     /////////////////////////////////////////////////
-    // CASE 4: NODE HAS ONLY BLUE CHILDREN => BLUE //
+    // CASE 3: NODE HAS ONLY BLUE CHILDREN => BLUE //
     /////////////////////////////////////////////////
     if (blue_child && !red_child && !orange_child) {
         v->setDiagnosisColor(DIAG_BLUE);
         cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (only blue children)" << endl;
         return DIAG_BLUE;
+    }
+    
+    
+    ///////////////////////////////////////////////////////////////////////
+    // CASE 4: NODE HAS A FINAL STATE AND AN EXTERNAL DEADLOCK => ORANGE //
+    ///////////////////////////////////////////////////////////////////////
+    if (final_state_seen && external_deadlock_seen) {
+        v->setDiagnosisColor(DIAG_ORANGE);
+        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (ED/FS mix)" << endl;
+        return DIAG_ORANGE;
     }
     
     

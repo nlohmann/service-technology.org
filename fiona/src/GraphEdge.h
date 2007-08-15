@@ -36,6 +36,8 @@
 
 #include "mynew.h"
 #include <string>
+#include <stdexcept>
+#include <cassert>
 
 class GraphNode;
 
@@ -107,6 +109,21 @@ GraphNodeType* GraphEdge<GraphNodeType>::getDstNode() const {
 template<typename GraphNodeType>
 std::string GraphEdge<GraphNodeType>::getLabel() const {
     return label;
+}
+
+
+template<typename GraphNodeType>
+GraphEdgeType GraphEdge<GraphNodeType>::getType() const {
+    assert(label.size() != 0);
+    switch (label[0]) {
+        case '?': return RECEIVING;
+        case '!': return SENDING;
+        default :
+            // This should never happen.
+            assert(false);
+            throw new std::invalid_argument("Cannot determine type of this "
+                "GraphEdge with label '" + label + "'.");
+    }
 }
 
 

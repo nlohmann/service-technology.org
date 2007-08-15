@@ -537,7 +537,7 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
         }
         
         // in diagnosis mode, draw "unenforcable" arcs dashed
-        if (options[O_DIAGNOSIS] && (element->getLabel().substr(0,1) == "?" )) {
+        if (options[O_DIAGNOSIS] && (element->getType() == RECEIVING)) {
             string edge_label = element->getLabel().substr(1,element->getLabel().length());
             bool edge_enforcable = true;
             

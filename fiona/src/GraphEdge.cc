@@ -40,17 +40,3 @@
 
 using namespace std;
 
-template<typename GraphNodeType>
-GraphEdgeType GraphEdge<GraphNodeType>::getType() const {
-    assert(label.size() != 0);
-    switch (label[0]) {
-        case '?': return RECEIVING;
-        case '!': return SENDING;
-        default :
-            // This should never happen.
-            assert(false);
-            throw new invalid_argument("Cannot determine type of this "
-                "GraphEdge with label '" + label + "'.");
-    }
-}
-

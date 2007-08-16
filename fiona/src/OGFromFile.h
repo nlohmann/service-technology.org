@@ -183,16 +183,15 @@ public:
     static std::string addOGFileSuffix(const std::string& filePrefix);
 
     bool simulates ( OGFromFile *smallerOG );
-    
 
     /**
      * computes the number of Services determined by this OG
      */
     unsigned int numberOfServices();
-    unsigned int OGFromFile::numberOfServicesRecursively(set<OGFromFileNode*> activeNodes, map<OGFromFileNode*, unsigned int>& followers,
-                                                         map<OGFromFileNode*, list <set<OGFromFileNode*> > >& validFollowerCombinations,
-                                                         map<set<OGFromFileNode*>, unsigned int>& eliminateRedundantCounting); 
-    unsigned int processAssignmentsRecursively(set<string> labels, GraphFormulaAssignment possibleAssignment, 
+    unsigned int numberOfServicesRecursively(set<OGFromFileNode*> activeNodes, map<OGFromFileNode*, unsigned int>& followers,
+                                             map<OGFromFileNode*, list <set<OGFromFileNode*> > >& validFollowerCombinations,
+                                             map<set<OGFromFileNode*>, unsigned int>& eliminateRedundantCounting);
+    unsigned int processAssignmentsRecursively(set<string> labels, GraphFormulaAssignment possibleAssignment,
                                                OGFromFileNode* testNode,list<GraphFormulaAssignment>& assignmentList);
 
     //! Tests, if this OG is acyclic

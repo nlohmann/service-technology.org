@@ -83,7 +83,7 @@ std::string GraphNodeDiagnosisColor::toString() const {
         case DIAG_RED:      return "red";
         case DIAG_BLUE:     return "blue";
         case DIAG_GREEN:    return "green";
-        case DIAG_ORANGE:   return "orange";
+        case DIAG_ORANGE:   return "darkorange";
             
         default:
             assert(false);

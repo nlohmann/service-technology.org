@@ -537,35 +537,9 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
         }
         
         // in diagnosis mode, draw "unenforcable" arcs dashed
-        if (options[O_DIAGNOSIS] && (element->getType() == RECEIVING)) {
-            string edge_label = element->getLabel().substr(1,element->getLabel().length());
-            bool edge_enforcable = true;
-            
-            // iterate the states and look for deadlocks where the considered
-            // message is not present: then, the receiving of this message can
-            // not be enforced
-            for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
-                 state != v->reachGraphStateSet.end(); state++) {
-                (*state)->decode(PN);
-                
-                if ((*state)->type == DEADLOCK) {
-                    for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-                        if (PN->getOutputPlace(i)->name == edge_label) {
-                            if (PN->CurrentMarking[PN->getOutputPlace(i)->index] == 0) {
-                                edge_enforcable = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-                
-            }
-            
-            if (!edge_enforcable) {
-                os << ", style=dashed";
-            }
-        }
-        
+        if (options[O_DIAGNOSIS] && !edge_enforcable(v, element)) {
+            os << ", style=dashed";
+        } 
 
         os << "];\n";
         if ((vNext != v) && !visitedNodes[vNext]) {
@@ -986,12 +960,12 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
         cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (only blue children)" << endl;
         return DIAG_BLUE;
     }
-    
+
     
     ///////////////////////////////////////////////////////////////////////
     // CASE 4: NODE HAS A FINAL STATE AND AN EXTERNAL DEADLOCK => ORANGE //
     ///////////////////////////////////////////////////////////////////////
-    if (final_state_seen && external_deadlock_seen) {
+    if (final_state_seen && external_deadlock_seen && red_child) {
         v->setDiagnosisColor(DIAG_ORANGE);
         cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (ED/FS mix)" << endl;
         return DIAG_ORANGE;
@@ -1007,7 +981,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
         return DIAG_RED;
     }
 
-
+/*
     //////////////////////////////////////////////////////
     // CASE 6: NODE HAS NOT ONLY RED CHILDREN => ORANGE //
     //////////////////////////////////////////////////////
@@ -1016,12 +990,55 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
         cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (blue and red children)" << endl;
         return DIAG_ORANGE;
     }
-
-
+*/
+    
+/*
     ////////////////////////////
     // ANYTHING ELSE => GREEN //
     ////////////////////////////
     v->setDiagnosisColor(DIAG_GREEN);
     cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
     return DIAG_GREEN;
+*/
+    return DIAG_UNSET;
+}
+
+
+
+/*!
+ * \param  v  a node
+ * \param  e  an edge, leaving from node v
+ * \return true, iff the edge e is labeled with a sending event, or a
+ *         receiving event that is present in every external deadlock state of
+ *         node v
+ */
+bool CommunicationGraph::edge_enforcable(GraphNode *v, GraphEdge<> *e) {
+    if (e->getType() == SENDING) {
+        return true;
+    } else {
+        string edge_label = e->getLabel().substr(1,e->getLabel().length());
+        bool edge_enforcable = true;
+        
+        // iterate the states and look for deadlocks where the considered
+        // message is not present: then, the receiving of this message can
+        // not be enforced
+        for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
+             state != v->reachGraphStateSet.end(); state++) {
+            (*state)->decode(PN);
+            
+            if ((*state)->type == DEADLOCK) {
+                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                    if (PN->getOutputPlace(i)->name == edge_label) {
+                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] == 0) {
+                            edge_enforcable = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+        }
+        
+        return edge_enforcable;
+    }
 }

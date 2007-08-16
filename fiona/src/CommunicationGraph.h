@@ -187,6 +187,8 @@ public:
     // functions for diagnosis
     void diagnose();
     GraphNodeDiagnosisColor_enum diagnose_recursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes);
+    bool edge_enforcable(GraphNode *v, GraphEdge<> *e);
+    bool successor_avoidable(GraphNode *v, GraphNode *succ);
     
 
     /**

@@ -189,8 +189,11 @@ public:
      * computes the number of Services determined by this OG
      */
     unsigned int numberOfServices();
-    unsigned int numberOfServicesRecursively(OGFromFileNode* start);
-    unsigned int processAssignmentsRecursively(set<string> labels, map<string, unsigned int>& LabelCount, GraphFormulaAssignment possibleAssignment, OGFromFileNode* testNode);
+    unsigned int OGFromFile::numberOfServicesRecursively(set<OGFromFileNode*> activeNodes, map<OGFromFileNode*, unsigned int>& followers,
+                                                         map<OGFromFileNode*, list <set<OGFromFileNode*> > >& validFollowerCombinations,
+                                                         map<set<OGFromFileNode*>, unsigned int>& eliminateRedundantCounting); 
+    unsigned int processAssignmentsRecursively(set<string> labels, GraphFormulaAssignment possibleAssignment, 
+                                               OGFromFileNode* testNode,list<GraphFormulaAssignment>& assignmentList);
 
     //! Tests, if this OG is acyclic
     bool isAcyclic();

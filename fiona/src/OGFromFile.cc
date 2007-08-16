@@ -430,66 +430,241 @@ bool OGFromFile::isAcyclic() {
 //! \brief computes the number of services determined by this OG
 //! \return number of Services
 unsigned int OGFromFile::numberOfServices() {
-    // needed because "root" is private
-    return numberOfServicesRecursively(root);
+
+    // define variables that will be used in the recursive function
+    map<OGFromFileNode*, list < set<OGFromFileNode*> > > validFollowerCombinations;
+    set<OGFromFileNode*> activeNodes;
+    map<OGFromFileNode*, unsigned int> followers;
+    map<set<OGFromFileNode*>, unsigned int> eliminateRedundantCounting;
+    
+    // define variables that will be used in the preprocessing before starting the recursion
+    set<string> labels;
+    list<GraphFormulaAssignment> assignmentList;
+    GraphFormulaAssignment possibleAssignment;
+    map<string, GraphEdge<OGFromFileNode>*> edges;
+
+    // Preprocess all nodes of the OG in order to fill the variables needed in the recursion
+    for (nodes_t::const_iterator iNode = nodes.begin(); 
+         iNode != nodes.end(); 
+         ++iNode) {
+    
+        // reset the temporary variables for every node
+        labels.clear();
+        assignmentList.clear();
+        edges.clear();
+        possibleAssignment = GraphFormulaAssignment();
+        
+        
+        // get the labels of all outgoing edges, that reach a blue destination
+        // save those labels in a set and fill a mapping that allows finding the
+        // outgoing edges for a label. (does not work with non-determinism yet)
+        OGFromFileNode::LeavingEdges::ConstIterator edgeIter =
+            (*iNode)->getLeavingEdgesConstIterator();
+        while (edgeIter->hasNext()) {
+            GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
+            if (edge->getDstNode()->getColor() == BLUE) {
+                labels.insert(edge->getLabel());
+                edges[edge->getLabel()] = edge;
+            }
+        }
+        
+        // get rid of the iterator
+        delete edgeIter;
+
+
+        // return the number of true assignments for this node's formula and simultaniously 
+        // fill the given list with those true assignments
+        followers[(*iNode)] = processAssignmentsRecursively(labels, possibleAssignment, (*iNode), assignmentList);
+
+        // create a temporary variable for a set of nodes
+        set<OGFromFileNode*> followerNodes;
+        
+        // for every true assignment in the list a set of nodes will be created. These are the nodes which are
+        // reached by outgoing edges of which the labels were true in the assignment. This set is then saved in
+        // a map for the currently proceeded node.
+        for (list<GraphFormulaAssignment>::iterator assignment = assignmentList.begin();
+             assignment != assignmentList.end(); 
+             assignment++) {
+
+            followerNodes = set<OGFromFileNode*>();
+            for (set<string>::iterator label = labels.begin(); 
+                 label != labels.end(); 
+                 label++) {
+                 
+                if (assignment->get((*label))) {    
+                    followerNodes.insert(edges[(*label)]->getDstNode());    
+                }
+            }
+            validFollowerCombinations[(*iNode)].push_back(followerNodes);
+        }
+    }
+
+    // initialize the first instance for the recursive function
+    activeNodes.insert(root);
+    
+    // process Instances recursively
+    return numberOfServicesRecursively(activeNodes, followers, validFollowerCombinations, eliminateRedundantCounting);
 }
 
 
-//! \brief computes the number of possible services for a node and its children
+//! \brief computes the number of possible services for a finished instance or proceed the active nodes
 //! \return number of Services
-unsigned int OGFromFile::numberOfServicesRecursively(OGFromFileNode* start) {
+unsigned int OGFromFile::numberOfServicesRecursively(set<OGFromFileNode*> activeNodes, map<OGFromFileNode*, unsigned int>& followers,
+                                                         map<OGFromFileNode*,list<set<OGFromFileNode*> > >& validFollowerCombinations,
+                                                         map<set<OGFromFileNode*>, unsigned int>& eliminateRedundantCounting)
+{
+
+    // if an Instance with the same active Nodes has already been computed, use the saved value
+    if (eliminateRedundantCounting[activeNodes] != 0)
+    {
+        return eliminateRedundantCounting[activeNodes];
+    } 
 
     // define needed variables
     unsigned int number = 0;
-    set<string> labels;
-    map<string, unsigned int> labelCount;
-    GraphFormulaAssignment possibleAssignment;
+    list< set<OGFromFileNode*> > oldList;
+    list< set<OGFromFileNode*> > newList;
+    set<OGFromFileNode*> tempSet;
+    bool first = true;
+    bool usingNew = true;
+    bool finalInstance = true;
 
-    // get and save the labels of all outgoing transitions of this node in the labels set
-    OGFromFileNode::LeavingEdges::ConstIterator edgeIter =
-        start->getLeavingEdgesConstIterator();
+    // process all active nodes of this instance
+    for (set<OGFromFileNode*>::iterator activeNode = activeNodes.begin(); 
+         activeNode != activeNodes.end(); 
+         activeNode++) {
 
-    while (edgeIter->hasNext()) {
-        GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
-        if (edge->getDstNode()->getColor() == BLUE) {
-            labels.insert(edge->getLabel());
+        // if the active node has no valid outgoing edges, do nothing. If that happens
+        // with all active nodes, the finalInstance variable will stay true
+        if ( followers[(*activeNode)] != 0) {
+
+            finalInstance = false;
+
+            // if this is the first iteration for this node, fill the newList with all combinations
+            // of followers of the currently proceeded active Node and continues the loop
+            if (first) {
+
+                first = false;
+                for (list<set<OGFromFileNode*> >::iterator combination = validFollowerCombinations[(*activeNode)].begin();
+                     combination != validFollowerCombinations[(*activeNode)].end(); 
+                     combination++) {
+ 
+                    newList.push_back((*combination));
+                }
+                usingNew = false;
+                continue;
+            }
+            
+            // the next two blocks work similarly. Either one takes the current list of followerSets 
+            // as it was left by the last node, produces a new set for every combination of its own following
+            // sets and the already existing ones and saves it in the other list. This is executed for every node
+            // resulting in a list of all followingSet-tuples of all the active nodes
+            if (usingNew) {
+
+                newList.clear();
+                for (list<set<OGFromFileNode*> >::iterator oldListSet = oldList.begin();
+                     oldListSet != oldList.end(); 
+                     oldListSet++) {
+
+                    for (list<set<OGFromFileNode*> >::iterator combination = validFollowerCombinations[(*activeNode)].begin();
+                         combination != validFollowerCombinations[(*activeNode)].end(); 
+                         combination++) {
+
+                        tempSet = set<OGFromFileNode*>();
+                        
+                        for (set<OGFromFileNode*>::iterator insertionNode = (*combination).begin();
+                             insertionNode != (*combination).end(); 
+                             insertionNode++) {
+
+                            tempSet.insert((*insertionNode));
+                        }
+                        
+                        for (set<OGFromFileNode*>::iterator insertionNode = (*oldListSet).begin();
+                             insertionNode != (*oldListSet).end(); 
+                             insertionNode++) {
+
+                            tempSet.insert((*insertionNode));
+                        }                        
+
+                        newList.push_back(tempSet);
+                    }                    
+                }
+                usingNew = false;        
+            } else {
+
+                oldList.clear();
+                for (list<set<OGFromFileNode*> >::iterator newListSet = newList.begin();
+                     newListSet != newList.end();
+                     newListSet++) {
+
+                    for (list<set<OGFromFileNode*> >::iterator combination = validFollowerCombinations[(*activeNode)].begin();
+                         combination != validFollowerCombinations[(*activeNode)].end(); 
+                         combination++) {
+
+                        tempSet = set<OGFromFileNode*>();
+                        
+                        for (set<OGFromFileNode*>::iterator insertionNode = (*combination).begin();
+                             insertionNode != (*combination).end(); 
+                             insertionNode++) {
+
+                            tempSet.insert((*insertionNode));
+                        }
+
+                        for (set<OGFromFileNode*>::iterator insertionNode = (*newListSet).begin();
+                             insertionNode != (*newListSet).end(); 
+                             insertionNode++) {
+
+                            tempSet.insert((*insertionNode));
+                        }                        
+                        oldList.push_back(tempSet);
+                    }                    
+                }
+                usingNew = true;                    
+            }
         }
     }
-    delete edgeIter;
-
-    // Process the number of assignments for the true assignments of this node
-    processAssignmentsRecursively(labels, labelCount, possibleAssignment, start);
     
-    // reaching this node is one more service if this node has no outgoing transitions
-    if (start->getLeavingEdgesCount() == 0) {
-        number = 1;
-    } else {
-        number = 0;
+    // if none of the active nodes had followers this is a finished service of the OG and thus returns 1
+    if (finalInstance)
+    {
+        eliminateRedundantCounting[activeNodes] = 1;
+        return 1;
     }
-
-    // The number of services is increased for every outgoing transitions, that leads to a blue
-    // Node, by the number of true assignments, that include the transitions label to be true, multiplied
-    // recursively with the destination's node number of possible services
-    edgeIter = start->getLeavingEdgesConstIterator();
-    while (edgeIter->hasNext()) {
-        GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
-        if (edge->getDstNode()->getColor() == BLUE) {
-            number += labelCount[edge->getLabel()] * numberOfServicesRecursively(edge->getDstNode());
-        }
+    
+    // if there were sets of following nodes, create a new instance of active nodes for every tuple of
+    // following sets and add the results to this instance's number of services
+    if(usingNew)
+    {
+        for (list<set<OGFromFileNode*> >::iterator oldListSet = oldList.begin();
+             oldListSet != oldList.end(); oldListSet++)
+        {
+            number += numberOfServicesRecursively((*oldListSet), followers, validFollowerCombinations, eliminateRedundantCounting); 
+        }        
     }
-    delete edgeIter;
-
-    // return the number of services below this node
+    else
+    {
+        for (list<set<OGFromFileNode*> >::iterator newListSet = newList.begin();
+             newListSet != newList.end(); newListSet++)
+        {
+            number += numberOfServicesRecursively((*newListSet), followers, validFollowerCombinations, eliminateRedundantCounting); 
+        }        
+    }
+    
+    // as soon as the counting for this set of active nodes is finished, save the number to prevent redundancy
+    eliminateRedundantCounting[activeNodes] = number;
+    
+    // return the number of services for this instance
     return number;
 }
 
 
 //! \brief computes the number of true assignments for the given formula of an OG node and additionally
-//!        saves how often every label participated in a true assignment. The function works by recursively
+//!        saves them in an assignmentList for every node. The function works by recursively
 //!        computing and checking the powerset of all labels of the node
-//! \return number of Services
-unsigned int OGFromFile::processAssignmentsRecursively(set<string> labels, map<string, unsigned int>& labelCount, GraphFormulaAssignment possibleAssignment, OGFromFileNode* testNode) {
-
+//! \return number of true Assignments 
+unsigned int OGFromFile::processAssignmentsRecursively(set<string> labels, GraphFormulaAssignment possibleAssignment, 
+                                                       OGFromFileNode* testNode, list<GraphFormulaAssignment>& assignmentList) 
+{
     // If there is no outgoing transition, return immediatly
     if(labels.empty()) {
         return 0;
@@ -501,47 +676,45 @@ unsigned int OGFromFile::processAssignmentsRecursively(set<string> labels, map<s
     string label;
     label = (*labels.begin());
     labels.erase(labels.begin());
-  
+
     // if this was the last lable ...
-    if (labels.empty())
-    {
+    if (labels.empty()) {
+
         // set it to False
         possibleAssignment.setToFalse(label);
-        if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)){
-            // Increase the Number of true Assigments by one if the assignment is true
+        if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)) {
+            // Increase the Number of true Assigments by one and save the assignment if the assignment is true
             returnValue += 1;
+            assignmentList.push_back(possibleAssignment);
         }
 
         // set it to True
         possibleAssignment.setToTrue(label);
-        if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)){
-            // increase the Number of true Assigments by one if the assignment is true
+        if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)) {
+            // increase the Number of true Assigments by one and save the assignment if the assignment is true
             returnValue += 1;
-            // and increasy the count of this specific label by one, since it was true too
-            labelCount[label] += 1;
+            assignmentList.push_back(possibleAssignment);
         }
-    // If this is a lable inbetween or at the start
+    // If this is a label inbetween or at the start
     } else {
         // set it to False
         possibleAssignment.setToFalse(label);
         // count the number of all true assignments which are true following this label being set to false
-        tempValue = processAssignmentsRecursively(labels, labelCount, possibleAssignment, testNode);    
+        tempValue = processAssignmentsRecursively(labels, possibleAssignment, testNode, assignmentList);    
         // increase the number of true assignments accordingly
         returnValue += tempValue;
 
         // set it to True
         possibleAssignment.setToTrue(label);
         // count the number of all true assignments which are true following this label being set to true
-        tempValue = processAssignmentsRecursively(labels, labelCount, possibleAssignment, testNode);    
+        tempValue = processAssignmentsRecursively(labels, possibleAssignment, testNode, assignmentList);    
         // increase the number of true assignments accordingly
         returnValue += tempValue;        
-        // and also increase the count of true assignemnts with this node being set to true 
-        labelCount[label] += tempValue;
     }
     
     // reinsert the label aftwewards
     labels.insert(labels.begin(),label);
-    
+
     // return the number of true assignments
     return returnValue;
 }

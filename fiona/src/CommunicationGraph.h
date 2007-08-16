@@ -188,11 +188,11 @@ public:
     void diagnose();
     GraphNodeDiagnosisColor_enum diagnose_recursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes);
     
-    ///! returns true iff edge e is possible in every state of node v
+    /// returns true iff edge e is possible in every state of node v
     bool edge_enforcable(GraphNode *v, GraphEdge<> *e);
     
-    ///! returns true iff node succ can be avoided in every state of node v
-    bool successor_avoidable(GraphNode *v, GraphNode *succ);
+    /// returns true iff a red successor of v can be avoided
+    bool red_successors_avoidable(GraphNode *v);
     
 
     /**

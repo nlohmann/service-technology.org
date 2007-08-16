@@ -926,12 +926,11 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     // node color cannot be quickly derived, so the children have to be considered
     set<GraphNodeDiagnosisColor_enum> childrenDiagnosisColors;
     
-    //cerr << "  node " << v->getNumber() << ": no quick answer" << endl;
     
     GraphNode::LeavingEdges::ConstIterator edgeIter =
         v->getLeavingEdgesConstIterator();
 
-
+    // look at all successor nodes
     while (edgeIter->hasNext()) {
         GraphEdge<> *element = edgeIter->getNext();
         GraphNode *vNext = element->getDstNode();
@@ -965,12 +964,12 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     ///////////////////////////////////////////////////////////////////////
     // CASE 4: NODE HAS A FINAL STATE AND AN EXTERNAL DEADLOCK => ORANGE //
     ///////////////////////////////////////////////////////////////////////
-    if (final_state_seen && external_deadlock_seen && red_child) {
+    if (final_state_seen && red_child) {
         v->setDiagnosisColor(DIAG_ORANGE);
-        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (ED/FS mix)" << endl;
+        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (FS/red successor mix)" << endl;
         return DIAG_ORANGE;
     }
-    
+     
     
     ///////////////////////////////////////////////
     // CASE 5: NODE HAS ONLY RED CHILDREN => RED //
@@ -981,16 +980,16 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
         return DIAG_RED;
     }
 
-/*
+    
     //////////////////////////////////////////////////////
     // CASE 6: NODE HAS NOT ONLY RED CHILDREN => ORANGE //
     //////////////////////////////////////////////////////
-    if (red_child && (blue_child || orange_child)) {
+    if (red_child && !red_successors_avoidable(v)) {
         v->setDiagnosisColor(DIAG_ORANGE);
         cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (blue and red children)" << endl;
         return DIAG_ORANGE;
     }
-*/
+    
     
 /*
     ////////////////////////////
@@ -1045,7 +1044,6 @@ bool CommunicationGraph::edge_enforcable(GraphNode *v, GraphEdge<> *e) {
                     }
                 }
             }
-            
         }
         
         return edge_enforcable;
@@ -1053,15 +1051,85 @@ bool CommunicationGraph::edge_enforcable(GraphNode *v, GraphEdge<> *e) {
 }
 
 
+
 /*!
- * \brief  returns true iff node succ can be avoided in every state of node v
+ * \brief  returns true iff a red successor of v can be avoided
  *
- * \param  v     a node
- * \param  succ  a successor node of v
+ * \param  v  node under consideration
+ *
+ * \return true iff there is either a sending edge to a non-red successor or,
+ *         for each external deadlock, there exists a receiving edge to a
+ *         non-red successor
  */
-bool CommunicationGraph::successor_avoidable(GraphNode *v, GraphNode *succ) {
+bool CommunicationGraph::red_successors_avoidable(GraphNode *v) {
     assert (v != NULL);
-    assert (succ != NULL);
+        
+    // collect all edges to non-red successor nodes
+    set<GraphEdge<>*> edges_to_nonred_successors;
+    GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<> *element = edgeIter->getNext();
+        GraphNode *vNext = element->getDstNode();	
+        
+        if (!vNext->isToShow(root))
+            continue;
+        
+        if (vNext != v && (vNext->getDiagnosisColor() != DIAG_RED)) {
+            edges_to_nonred_successors.insert(element);
+        }
+    }
+    delete edgeIter;
+
+    
+    // if there are no non-red successors, the red successors can not be avoided
+    if ( edges_to_nonred_successors.empty() ) {
+        return false;
+    }
+    
+    
+    // if there is a sending edge to a non-red sucessor, take this edge
+    for (set<GraphEdge<>*>::iterator edge = edges_to_nonred_successors.begin();
+         edge != edges_to_nonred_successors.end(); edge++) {
+        if ( (*edge)->getType() == SENDING ) {
+            return true;
+        }
+    }
+    
+  
+    // last chance: look if each external deadlock "enables" a receiving edge
+    // to a non-red successor
+    for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
+         state != v->reachGraphStateSet.end(); state++) {
+        (*state)->decode(PN);
+
+        bool found_enabled_state = false;
+        
+        if ((*state)->type == DEADLOCK) {
+            for (set<GraphEdge<>*>::iterator edge = edges_to_nonred_successors.begin();
+                 edge != edges_to_nonred_successors.end(); edge++) {
+                if ( (*edge)->getType() == SENDING ) {
+                    continue;
+                }
+                
+                string edge_label = (*edge)->getLabel().substr(1, (*edge)->getLabel().length());
+                
+                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                    if (PN->getOutputPlace(i)->name == edge_label) {
+                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                            found_enabled_state = true;
+                            break;
+                        }
+                    }
+                }
+                
+            }
+            
+            // looked at all edges
+            if (!found_enabled_state) {
+                return false;
+            }
+        }
+    }
     
     return true;
 }

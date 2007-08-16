@@ -1,0 +1,13 @@
+NODES
+  0x0 : ((!a)) : blue,
+  1x1 : ((true)) : blue,
+  2x2 : ((final + ?u + ?y) * (!b + ?y + ?u)) : blue,
+  3x1 : ((final)) : blue;
+
+INITIALNODE
+  0x0;
+
+TRANSITIONS
+  0x0 -> 1x1 : ?x,
+  0x0 -> 2x2 : !a,
+  2x2 -> 3x1 : ?y;

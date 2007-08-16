@@ -229,15 +229,15 @@ GraphFormulaMultiary::GraphFormulaMultiary() : GraphFormula() {
 
 
 GraphFormulaMultiary::GraphFormulaMultiary(GraphFormula* newformula) {
-    subFormulas.insert(newformula);
+    subFormulas.push_back(newformula);
 }
 
 
 GraphFormulaMultiary::GraphFormulaMultiary(GraphFormula* lhs,
     GraphFormula* rhs)
 {
-    subFormulas.insert(lhs);
-    subFormulas.insert(rhs);
+    subFormulas.push_back(lhs);
+    subFormulas.push_back(rhs);
 }
 
 GraphFormulaMultiary::~GraphFormulaMultiary() {
@@ -287,7 +287,7 @@ bool GraphFormulaMultiary::value(
 
 
 void GraphFormulaMultiary::addSubFormula(GraphFormula* subformula) {
-	subFormulas.insert(subformula);
+	subFormulas.push_back(subformula);
 }
 
 
@@ -337,7 +337,7 @@ void GraphFormulaMultiary::deepCopyMultiaryPrivateMembersToNewFormula(
     for (subFormulas_t::const_iterator iFormula = subFormulas.begin();
          iFormula != subFormulas.end(); ++iFormula)
     {
-        newFormula->subFormulas.insert((*iFormula)->getDeepCopy());
+        newFormula->subFormulas.push_back((*iFormula)->getDeepCopy());
     }
 }
 
@@ -614,7 +614,7 @@ void GraphFormulaCNF::simplify()
         GraphFormulaMultiaryOr* lhs =
             dynamic_cast<GraphFormulaMultiaryOr*>(*iLhs);
         assert(lhs != NULL);
-        GraphFormulaCNF::const_iterator iRhs = begin();
+        GraphFormulaCNF::iterator iRhs = begin();
         while (iRhs != end())
         {
             if (iLhs == iRhs) {
@@ -626,7 +626,7 @@ void GraphFormulaCNF::simplify()
                 dynamic_cast<GraphFormulaMultiaryOr*>(*iRhs);
             assert(rhs != NULL);
             if (lhs->implies(rhs)) {
-                GraphFormulaCNF::const_iterator iOldRhs = iRhs++;
+                GraphFormulaCNF::iterator iOldRhs = iRhs++;
                 delete *iOldRhs;
                 removeSubFormula(iOldRhs);
             } else {

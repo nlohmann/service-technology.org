@@ -37,7 +37,7 @@
 
 
 #include <string>
-#include <set>
+#include <list>
 #include <map>
 
 
@@ -168,7 +168,7 @@ public:
     /**
      * Type of the container holding all subformula of this multiary formula.
      */
-    typedef std::set<GraphFormula*> subFormulas_t;
+    typedef std::list<GraphFormula*> subFormulas_t;
 
     /**
      * Type of the iterator over subformulas.

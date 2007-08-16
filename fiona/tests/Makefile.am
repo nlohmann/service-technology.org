@@ -22,7 +22,7 @@
 include $(top_srcdir)/Makefile.covcommon
 
 TESTS = slist.sh syntax.sh extrema.sh messages.sh cyclic.sh \
-        matching.sh sim_og.sh \
+        matching.sh sim_og.sh productog.sh \
         sequences.sh samples.sh bddtest.sh
 
 check_PROGRAMS = slistcheck

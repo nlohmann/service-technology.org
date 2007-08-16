@@ -54,6 +54,7 @@
 #endif
 #include <libgen.h>
 using namespace std;
+extern int owfn_yylineno;
 extern int owfn_yydebug;
 extern int owfn_yy_flex_debug;
 extern FILE *owfn_yyin;
@@ -62,6 +63,7 @@ extern int owfn_yyparse();
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
 extern int owfn_yylex_destroy();
 #endif
+extern int og_yylineno;
 extern int og_yydebug;
 extern int og_yy_flex_debug;
 extern FILE *og_yyin;
@@ -94,6 +96,7 @@ void myown_newhandler() {
 
 //! \brief reads an oWFN from owfnfile
 void readnet(const std::string& owfnfile) {
+    owfn_yylineno = 1;
     owfn_yydebug = 0;
     owfn_yy_flex_debug = 0;
     assert(owfnfile != "");
@@ -139,6 +142,7 @@ void readnet(const std::string& owfnfile) {
 
 //! \brief reads an OG from ogfile
 OGFromFile* readog(const std::string& ogfile) {
+    og_yylineno = 1;
     og_yydebug = 0;
     og_yy_flex_debug = 0;
     assert(ogfile != "");

@@ -125,8 +125,6 @@ GraphNode::~GraphNode() {
         delete[] eventsUsed;
     }
 
-    delete annotation;
-
     numberDeletedVertices++;
     trace(TRACE_5, "GraphNode::~GraphNode() : end\n");
 }

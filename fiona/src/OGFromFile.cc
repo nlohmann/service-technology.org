@@ -57,11 +57,6 @@ OGFromFileNode::OGFromFileNode(const std::string& _name, GraphFormula* _annotati
 }
 
 
-OGFromFileNode::~OGFromFileNode() {
-    delete annotation;
-}
-
-
 void OGFromFileNode::removeTransitionsToNode(const OGFromFileNode* nodeToDelete) {
     LeavingEdges::Iterator iEdge = getLeavingEdgesIterator();
     while (iEdge->hasNext()) {
@@ -553,36 +548,41 @@ unsigned int OGFromFile::processAssignmentsRecursively(set<string> labels, map<s
 
 
 OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
-	trace(TRACE_5, "OGFromFile::product(const OGFromFile* rhs): start\n");
+    trace(TRACE_5, "OGFromFile::product(const OGFromFile* rhs): start\n");
 
-	// this will be the product OG
-	OGFromFile* productOG = new OGFromFile;
+    // this will be the product OG
+    OGFromFile* productOG = new OGFromFile;
 
-	// first we build a new root node that has name and annotation constructed
-	// from the root nodes of OG and the rhs OG.
-	OGFromFileNode* currentOGNode = this->getRoot();
-	OGFromFileNode* currentRhsNode = rhs->getRoot();
+    // If one of both OGs is empty, their product is empty, too.
+    if (hasNoRoot() || rhs->hasNoRoot()) {
+        return productOG;
+    }
 
-	std::string currentName;
-	currentName = currentOGNode->getName() + "x" + currentRhsNode->getName();
+    // first we build a new root node that has name and annotation constructed
+    // from the root nodes of OG and the rhs OG.
+    OGFromFileNode* currentOGNode = this->getRoot();
+    OGFromFileNode* currentRhsNode = rhs->getRoot();
 
-	GraphFormulaCNF* currentFormula = createProductAnnotation(currentOGNode,
-	    currentRhsNode);
+    std::string currentName;
+    currentName = currentOGNode->getName() + "x" + currentRhsNode->getName();
 
-	// building the new root node of the product OG
-	OGFromFileNode* productNode = new OGFromFileNode(currentName,
-	    currentFormula);
-	productOG->addNode(productNode);
-	productOG->setRoot(productNode);
+    GraphFormulaCNF* currentFormula = createProductAnnotation(currentOGNode,
+        currentRhsNode);
 
-	// builds the successor nodes of the root nodes of OG and rhs OG
-	// therefore, we perform a coordinated dfs through OG and the rhs OG
-	buildProductOG(currentOGNode, currentRhsNode, productOG);	    
+    // building the new root node of the product OG
+    OGFromFileNode* productNode = new OGFromFileNode(currentName,
+        currentFormula);
+    productOG->addNode(productNode);
+    productOG->setRoot(productNode);
 
-	productOG->removeFalseNodes();
-	trace(TRACE_5, "OGFromFile::product(const OGFromFile* rhs): end\n");
+    // builds the successor nodes of the root nodes of OG and rhs OG
+    // therefore, we perform a coordinated dfs through OG and the rhs OG
+    buildProductOG(currentOGNode, currentRhsNode, productOG);
 
-	return productOG;
+    productOG->removeFalseNodes();
+    trace(TRACE_5, "OGFromFile::product(const OGFromFile* rhs): end\n");
+
+    return productOG;
 }
 
 
@@ -795,9 +795,9 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
 
     if (hasNoRoot()) {
         // print file for empty OG
-        ogFile << "NODES" << endl << "  0 : " << GraphNodeColor(RED).toString()
+        ogFile << "NODES" << endl << "  0 : " << GraphFormulaLiteral::FALSE
                << " : "
-               << GraphFormulaLiteral::FALSE << ';' << endl << endl
+               << GraphNodeColor(RED).toString() << ';' << endl << endl
                << "INITIALNODE" << endl << "  0;" << endl << endl
                << "TRANSITIONS" << endl << "  ;" << endl;
 

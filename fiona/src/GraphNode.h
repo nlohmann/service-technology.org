@@ -401,6 +401,8 @@ GraphNodeCommon<GraphNodeType>::~GraphNodeCommon<GraphNodeType>() {
         delete edge;
     }
     delete iEdge;
+
+    delete annotation;
 }
 
 

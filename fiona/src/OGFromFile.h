@@ -61,8 +61,6 @@ public:
     OGFromFileNode(const std::string& name_, GraphFormula* annotation_,
         GraphNodeColor color = BLUE);
 
-    ~OGFromFileNode();
-
     bool hasTransitionWithLabel(const std::string& transitionLabel) const;
     bool hasBlueTransitionWithLabel(const std::string& transitionLabel) const;
 

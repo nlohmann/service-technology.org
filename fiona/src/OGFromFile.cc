@@ -772,7 +772,7 @@ void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFrom
         OGFromFileNode::LeavingEdges::ConstIterator edgeIter =
             v->getLeavingEdgesConstIterator();
 
-        while (edgeIter->getNext()) {
+        while (edgeIter->hasNext()) {
             GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
 
             // remember the label of the egde

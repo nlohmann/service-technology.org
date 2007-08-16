@@ -1006,13 +1006,22 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
 
 
 /*!
+ * \brief  returns true iff edge e is possible in every state of node v
+ *
  * \param  v  a node
  * \param  e  an edge, leaving from node v
+ *
  * \return true, iff the edge e is labeled with a sending event, or a
  *         receiving event that is present in every external deadlock state of
  *         node v
+ *
+ * \note   For performance issues, it is not checked whether edge e is really
+ *         leaving node v.
  */
 bool CommunicationGraph::edge_enforcable(GraphNode *v, GraphEdge<> *e) {
+    assert (v != NULL);
+    assert (e != NULL);
+    
     if (e->getType() == SENDING) {
         return true;
     } else {
@@ -1041,4 +1050,18 @@ bool CommunicationGraph::edge_enforcable(GraphNode *v, GraphEdge<> *e) {
         
         return edge_enforcable;
     }
+}
+
+
+/*!
+ * \brief  returns true iff node succ can be avoided in every state of node v
+ *
+ * \param  v     a node
+ * \param  succ  a successor node of v
+ */
+bool CommunicationGraph::successor_avoidable(GraphNode *v, GraphNode *succ) {
+    assert (v != NULL);
+    assert (succ != NULL);
+    
+    return true;
 }

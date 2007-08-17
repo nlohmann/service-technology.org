@@ -115,6 +115,14 @@ private:
      * Is computed by computeNumberOfBlueNodesEdges().
      */
     unsigned int nBlueEdges;
+    
+    
+    /// returns true iff edge e is possible in every state of node v
+    bool edge_enforcable(GraphNode *v, GraphEdge<> *e) const;
+    
+    /// returns true iff a colored successor of v can be avoided
+    bool colored_successors_avoidable(GraphNode *v, GraphNodeDiagnosisColor_enum color) const;
+    
 
 protected:
 	oWFN* PN;                            //!< pointer to the underlying petri net
@@ -187,13 +195,7 @@ public:
     // functions for diagnosis
     void diagnose();
     GraphNodeDiagnosisColor_enum diagnose_recursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes);
-    
-    /// returns true iff edge e is possible in every state of node v
-    bool edge_enforcable(GraphNode *v, GraphEdge<> *e);
-    
-    /// returns true iff a colored successor of v can be avoided
-    bool colored_successors_avoidable(GraphNode *v, GraphNodeDiagnosisColor_enum color);
-    
+        
 
     /**
      * Computes statistics about this graph. They can be printed by

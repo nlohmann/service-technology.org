@@ -836,9 +836,14 @@ void CommunicationGraph::removeLabeledSuccessor(GraphNode *v, std::string label)
 
 
 void CommunicationGraph::diagnose() {
-    cerr << endl << "Diagnosis:" << endl;
+    cerr << "Diagnosis:" << endl;
+    if (root->getColor() == BLUE) {
+        cerr << "    you are an idiot: net is already controllable" << endl;
+    }
+    
     std::map<GraphNode*, bool> visitedNodes;
     diagnose_recursively(root, visitedNodes);
+    cerr << endl;
 }
 
 
@@ -904,9 +909,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     // CASE 1: NODE HAS INTERNAL DEADLOCK => RED //
     ///////////////////////////////////////////////
     if (internal_deadlock_seen) {
-        v->setDiagnosisColor(DIAG_RED);
-        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (early)" << endl;
-        return DIAG_RED;        
+        return v->setDiagnosisColor(DIAG_RED);
     }
         
     
@@ -914,9 +917,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     // CASE 2: NODE HAS FINAL STATE AND NO DEADLOCK => BLUE //
     //////////////////////////////////////////////////////////
     if (final_state_seen && !external_deadlock_seen) {
-        v->setDiagnosisColor(DIAG_BLUE);
-        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (early)" << endl;
-        return DIAG_BLUE;
+        return v->setDiagnosisColor(DIAG_BLUE);
     }
         
     
@@ -941,15 +942,14 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     bool red_child = (childrenDiagnosisColors.find(DIAG_RED) != childrenDiagnosisColors.end());
     bool blue_child = (childrenDiagnosisColors.find(DIAG_BLUE) != childrenDiagnosisColors.end());;
     bool violet_child = (childrenDiagnosisColors.find(DIAG_VIOLET) != childrenDiagnosisColors.end());;
+    bool green_child = (childrenDiagnosisColors.find(DIAG_GREEN) != childrenDiagnosisColors.end());;
     
     
     /////////////////////////////////////////////////
     // CASE 3: NODE HAS ONLY BLUE CHILDREN => BLUE //
     /////////////////////////////////////////////////
     if (blue_child && !red_child && !violet_child) {
-        v->setDiagnosisColor(DIAG_BLUE);
-        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (only blue children)" << endl;
-        return DIAG_BLUE;
+        return v->setDiagnosisColor(DIAG_BLUE);
     }
 
     
@@ -957,9 +957,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     // CASE 4: NODE HAS A FINAL STATE AND A RED CHILD => VIOLET //
     //////////////////////////////////////////////////////////////
     if (final_state_seen && red_child) {
-        v->setDiagnosisColor(DIAG_VIOLET);
-        cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (FS/red successor mix)" << endl;
-        return DIAG_VIOLET;
+        return v->setDiagnosisColor(DIAG_VIOLET);
     }
     
     
@@ -971,30 +969,43 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     if (red_child) {
         if (!violet_child && !blue_child) {
             // only red children
-            v->setDiagnosisColor(DIAG_RED);
-            cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (only red children)" << endl;
-            return DIAG_RED;
+            return v->setDiagnosisColor(DIAG_RED);
         }
         if (!colored_successors_avoidable(v, DIAG_RED)) {
             // red child cannot be avoided
-            v->setDiagnosisColor(DIAG_VIOLET);
-            cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (unavoidable red child)" << endl;
-            return DIAG_VIOLET;
+            return v->setDiagnosisColor(DIAG_VIOLET);
         } else {
             // red child can be abvoided
-            v->setDiagnosisColor(DIAG_ORANGE);
-            cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << " (blue and red children)" << endl;
-            return DIAG_ORANGE;        
+            if (!colored_successors_avoidable(v, DIAG_VIOLET)) {
+                cerr << "node " << v->getNumber() << " is an example for an orange node that cannot avoid violet children" << endl;
+            }
+            
+            return v->setDiagnosisColor(DIAG_ORANGE);
         }
+    }
+    
+    
+    // display a warning
+    if (!green_child && !colored_successors_avoidable(v, DIAG_VIOLET)) {
+        cerr << "    Node " << v->getNumber() << " is a potential troublemaker, as violet children cannot be avoided." << endl;
+        cerr << "    Conflicting states:";
+
+        for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
+             state != v->reachGraphStateSet.end(); state++) {
+            (*state)->decode(PN);
+            
+            if ((*state)->type == DEADLOCK) {
+                cerr << "  [" << PN->getCurrentMarkingAsString() << "]";
+            }
+        }
+        cerr << endl;
     }
     
     
     ////////////////////////////
     // ANYTHING ELSE => GREEN //
     ////////////////////////////
-    v->setDiagnosisColor(DIAG_GREEN);
-    cerr << "  node " << v->getNumber() << " is " << v->getDiagnosisColor().toString() << endl;
-    return DIAG_GREEN;
+    return v->setDiagnosisColor(DIAG_GREEN);
 }
 
 
@@ -1012,7 +1023,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
  * \note   For performance issues, it is not checked whether edge e is really
  *         leaving node v.
  */
-bool CommunicationGraph::edge_enforcable(GraphNode *v, GraphEdge<> *e) {
+bool CommunicationGraph::edge_enforcable(GraphNode *v, GraphEdge<> *e) const {
     assert (v != NULL);
     assert (e != NULL);
     
@@ -1056,7 +1067,7 @@ bool CommunicationGraph::edge_enforcable(GraphNode *v, GraphEdge<> *e) {
  *         for each external deadlock, there exists a receiving edge to a
  *         non-colored successor
  */
-bool CommunicationGraph::colored_successors_avoidable(GraphNode *v, GraphNodeDiagnosisColor_enum color) {
+bool CommunicationGraph::colored_successors_avoidable(GraphNode *v, GraphNodeDiagnosisColor_enum color) const {
     assert (v != NULL);
         
     // collect all edges to non-colored successor nodes
@@ -1082,7 +1093,7 @@ bool CommunicationGraph::colored_successors_avoidable(GraphNode *v, GraphNodeDia
     delete edgeIter;
 
     
-    // if there are no non-red successors, the red successors can not be avoided
+    // if there are no non-colored successors, the red successors can not be avoided
     if ( edges_to_noncolored_successors.empty() ) {
         return false;
     }

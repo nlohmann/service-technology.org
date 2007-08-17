@@ -191,8 +191,8 @@ public:
     /// returns true iff edge e is possible in every state of node v
     bool edge_enforcable(GraphNode *v, GraphEdge<> *e);
     
-    /// returns true iff a red successor of v can be avoided
-    bool red_successors_avoidable(GraphNode *v);
+    /// returns true iff a colored successor of v can be avoided
+    bool colored_successors_avoidable(GraphNode *v, GraphNodeDiagnosisColor_enum color);
     
 
     /**

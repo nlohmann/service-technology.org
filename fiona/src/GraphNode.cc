@@ -84,7 +84,8 @@ std::string GraphNodeDiagnosisColor::toString() const {
         case DIAG_BLUE:     return "blue";
         case DIAG_GREEN:    return "green";
         case DIAG_ORANGE:   return "darkorange";
-            
+        case DIAG_VIOLET:   return "violetred";
+
         default:
             assert(false);
             return "undefined color";
@@ -172,8 +173,9 @@ void GraphNode::removeUnneededLiteralsFromAnnotation() {
 
 //! \param c color of GraphNode
 //! \brief sets the color of the GraphNode to the given color
-void GraphNode::setDiagnosisColor(GraphNodeDiagnosisColor c) {
+GraphNodeDiagnosisColor GraphNode::setDiagnosisColor(GraphNodeDiagnosisColor c) {
     diagnosis_color = c;
+    return c;
 }
 
 

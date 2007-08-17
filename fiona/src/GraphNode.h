@@ -66,7 +66,8 @@ enum GraphNodeDiagnosisColor_enum {
     DIAG_RED,       ///< bad node: you will reach a deadlock
     DIAG_BLUE,      ///< good node: you will reach a final state
     DIAG_GREEN,     ///< innocent node: you did not make anything wrong yet
-    DIAG_ORANGE     ///< dangerous node: be careful!
+    DIAG_ORANGE,    ///< dangerous node: be careful!
+    DIAG_VIOLET
 };
 
 
@@ -269,7 +270,7 @@ public:
     GraphNodeDiagnosisColor getDiagnosisColor() const;    
 
     /// set the diagnosis color
-    void setDiagnosisColor(GraphNodeDiagnosisColor c);
+    GraphNodeDiagnosisColor setDiagnosisColor(GraphNodeDiagnosisColor c);
 
     bool isToShow(const GraphNode* rootOfGraph) const;
 

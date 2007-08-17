@@ -38,3 +38,5 @@ adapter (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email-adapter %
 comparison (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email-comparison %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)
 contracts (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email-contracts %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)
 traforules (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email-contracts %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)
+BPEL-compliance (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email-contracts %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)
+Contracts-ComputerJournal (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email-contracts %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)

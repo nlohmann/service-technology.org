@@ -838,7 +838,7 @@ void CommunicationGraph::removeLabeledSuccessor(GraphNode *v, std::string label)
 void CommunicationGraph::diagnose() {
     cerr << "Diagnosis:" << endl;
     if (root->getColor() == BLUE) {
-        cerr << "    you are an idiot: net is already controllable" << endl;
+        cerr << "Please note: the net is controllable." << endl;
     }
     
     std::map<GraphNode*, bool> visitedNodes;
@@ -987,17 +987,31 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     
     // display a warning
     if (!green_child && !colored_successors_avoidable(v, DIAG_VIOLET)) {
-        cerr << "    Node " << v->getNumber() << " is a potential troublemaker, as violet children cannot be avoided." << endl;
-        cerr << "    Conflicting states:";
+        cerr << "Problem in node " << v->getNumber() << ":" << endl;
+        cerr << "  Undistinguishable deadlocking states  ";
 
         for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
              state != v->reachGraphStateSet.end(); state++) {
             (*state)->decode(PN);
             
             if ((*state)->type == DEADLOCK) {
-                cerr << "  [" << PN->getCurrentMarkingAsString() << "]";
+                cerr << "[" << PN->getCurrentMarkingAsString() << "]  ";
             }
         }
+        cerr << endl << "  require different treatments  ";
+        GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+        while (edgeIter->hasNext()) {
+            GraphEdge<> *element = edgeIter->getNext();
+            GraphNode *vNext = element->getDstNode();
+            
+            if (!vNext->isToShow(root))
+                continue;
+            
+            if (element->getType() == SENDING) {
+                cerr << element->getLabel() << "  ";
+            }
+        }
+        delete edgeIter;
         cerr << endl;
     }
     

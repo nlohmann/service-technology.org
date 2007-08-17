@@ -948,7 +948,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     /////////////////////////////////////////////////
     // CASE 3: NODE HAS ONLY BLUE CHILDREN => BLUE //
     /////////////////////////////////////////////////
-    if (blue_child && !red_child && !violet_child) {
+    if (blue_child && !red_child && !violet_child) { //!green_child ?
         return v->setDiagnosisColor(DIAG_BLUE);
     }
 

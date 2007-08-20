@@ -43,6 +43,7 @@
 #include "OGFromFile.h"
 #include <list>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include "pnapi/pnapi.h"
 
@@ -443,36 +444,58 @@ void makePNG(oWFN* PN) {
     } else {
         globals::filename = PN->filename + " | Final Marking: " + PN->finalMarkingString;
     }
-    string name = PN->filename + ".dot";
 
-    // Open a filestream needed for PNapi output
-    ofstream *file = new ofstream(name.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
+    // create temporary stream as target for the dot output of the PNapiNet
+    ostringstream *dot = new ostringstream(ostringstream::out);
 
-    // Only proceed if the file was opened successfully
-    if (!file->is_open()) {
-        trace(TRACE_0, "File \"" + name + "\" could not be opened for writing access!\n");
-    } else {
-        // set the net to dot output
-        PNapiNet->set_format(PNapi::FORMAT_DOT, true);
+    // set the output format to dot
+    PNapiNet->set_format(PNapi::FORMAT_DOT, true);
 
-        // Write the dot output into the file
-        (*file) << (*PNapiNet);
+    // create the dot
+    (*dot) << (*PNapiNet);
+    
+    // generate a string from the stream to be modified for piping
+    string dotString = dot->str();
 
-        trace(TRACE_0, "created the dot file\n");
-
-        // close the file and delete the pointer
-        (*file) << flush;
-        (static_cast<ofstream*>(file))->close();
-        delete(file);
-        file = NULL;
-
-        // Make a systemcall to dot in order to create the png
-        string systemcall = "dot -q -Tpng -o\"" + globals::output_filename + ".png\" \"" + globals::output_filename + ".dot\"";
-    	trace(TRACE_0, "Invoking dot with the following options:\n");
-    	trace(TRACE_0, systemcall + "\n\n");
-    	system(systemcall.c_str());  
-        trace(TRACE_0, "png generated\n");
+    delete(dot);
+    
+    unsigned int position;
+    unsigned int deletePosition;
+    
+    // delete all comments in the dot output of the PNapiNet, since the endlines will 
+    // be deleted for echo piping and "//" comments won't work anymore
+    while ((position = dotString.find_first_of("/")) != string::npos)
+    {
+        if (dotString.at(position+1)=='/') {
+            deletePosition = dotString.find_first_of("\n", (position + 2));
+            dotString.erase(position,(deletePosition - position));        
+        }
     }
+
+    // delete all endlines and escape all quotes for the echo string
+    for (unsigned int i = 0; i != dotString.size(); i++) {
+        char testchar;
+        testchar = dotString[i];
+
+        if (testchar == '\n') {
+            dotString.erase(i,1);
+            dotString.insert(i, " ");            
+        }
+
+        if (testchar == '"') {
+            dotString.insert(i, "\\");
+            i++;
+        }
+    }
+    
+    // finish the string for the system call
+    dotString = "echo \"" + dotString + "\" | dot -q -Tpng -o \"" + globals::output_filename + ".png\"";
+    
+    // create the output
+    system(dotString.c_str());
+    trace(TRACE_0, (globals::output_filename + ".png generated\n\n"));
+
+    
 }
 
 

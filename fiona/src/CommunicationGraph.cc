@@ -980,7 +980,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
             // red child cannot be avoided
             return v->setDiagnosisColor(DIAG_VIOLET);
         } else {
-            // red child can be abvoided
+            // red child can be avoided
             if (!colored_successors_avoidable(v, DIAG_VIOLET)) {
                 cerr << "node " << v->getNumber() << " is an example for an orange node that cannot avoid violet children" << endl;
             }
@@ -988,8 +988,9 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
             return v->setDiagnosisColor(DIAG_ORANGE);
         }
     }
+
     
-    
+    /*
     // display a warning
     if (!green_child && !colored_successors_avoidable(v, DIAG_VIOLET)) {
         cerr << "Problem in node " << v->getNumber() << ":" << endl;
@@ -1019,8 +1020,8 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
         delete edgeIter;
         cerr << endl;
     }
-    
-    
+    */
+        
     ////////////////////////////
     // ANYTHING ELSE => GREEN //
     ////////////////////////////

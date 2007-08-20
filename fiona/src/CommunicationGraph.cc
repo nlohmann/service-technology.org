@@ -856,6 +856,11 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
         return v->getDiagnosisColor();
     }
     
+    // this is new...
+    if (visitedNodes[v]) {
+        return DIAG_UNSET;
+    }
+    
     visitedNodes[v] = true;
     
 
@@ -940,15 +945,15 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     
     // collect information about the child nodes
     bool red_child = (childrenDiagnosisColors.find(DIAG_RED) != childrenDiagnosisColors.end());
-    bool blue_child = (childrenDiagnosisColors.find(DIAG_BLUE) != childrenDiagnosisColors.end());;
-    bool violet_child = (childrenDiagnosisColors.find(DIAG_VIOLET) != childrenDiagnosisColors.end());;
-    bool green_child = (childrenDiagnosisColors.find(DIAG_GREEN) != childrenDiagnosisColors.end());;
+    bool blue_child = (childrenDiagnosisColors.find(DIAG_BLUE) != childrenDiagnosisColors.end());
+    bool violet_child = (childrenDiagnosisColors.find(DIAG_VIOLET) != childrenDiagnosisColors.end());
+    bool green_child = (childrenDiagnosisColors.find(DIAG_GREEN) != childrenDiagnosisColors.end());
     
     
     /////////////////////////////////////////////////
     // CASE 3: NODE HAS ONLY BLUE CHILDREN => BLUE //
     /////////////////////////////////////////////////
-    if (blue_child && !red_child && !violet_child) { //!green_child ?
+    if (blue_child && !red_child && !violet_child && !green_child) {
         return v->setDiagnosisColor(DIAG_BLUE);
     }
 
@@ -967,7 +972,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     // CASE 7: AVOIDABLE RED CHILD => ORANGE             //
     ///////////////////////////////////////////////////////
     if (red_child) {
-        if (!violet_child && !blue_child) {
+        if (!violet_child && !blue_child && !green_child) {
             // only red children
             return v->setDiagnosisColor(DIAG_RED);
         }

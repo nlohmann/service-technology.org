@@ -31,7 +31,6 @@
  *
  */
 
-
 #include "owfn.h"
 #include "main.h"
 #include "state.h"
@@ -90,7 +89,7 @@ unsigned int numberOfEvents;
 
 
 void myown_newhandler() {
-    cerr << "new failed, memory exhausted" << endl;
+    cerr << "new failed, memory exhausted"<< endl;
     exit(2);
 }
 
@@ -101,7 +100,7 @@ void readnet(const std::string& owfnfile) {
     owfn_yydebug = 0;
     owfn_yy_flex_debug = 0;
     assert(owfnfile != "");
-	// diagnosefilename = (char *) 0;
+    // diagnosefilename = (char *) 0;
 
     trace(TRACE_5, "reading from file " + owfnfile + "\n");
     owfn_yyin = fopen(owfnfile.c_str(), "r");
@@ -109,7 +108,7 @@ void readnet(const std::string& owfnfile) {
         cerr << "cannot open owfn file " << owfnfile << "' for reading'\n" << endl;
         exit(4);
     }
-	//  diagnosefilename = owfnfile;
+    // diagnosefilename = owfnfile;
 
     PN = new oWFN();
     PN->filename = owfnfile;
@@ -165,8 +164,10 @@ OGFromFile* readog(const std::string& ogfile) {
 
 //! \brief reads all OGs from a list
 void readAllOGs(OGFromFile::ogs_t& theOGs) {
+
     for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
          iOgFile != ogfiles.end(); ++iOgFile) {
+
         theOGs.push_back(readog(*iOgFile));
     }
 }
@@ -194,14 +195,15 @@ void reportOptionValues() {
         }
     }
 
-	// report events
+    // report events
     if (debug_level == TRACE_0) {
         if (options[O_EVENT_USE_MAX]) {
-            trace(TRACE_0, "each event considered max: " + intToString(events_manual) +"\n");
+            trace(TRACE_0, "each event considered max: "
+                    + intToString(events_manual) +"\n");
         }
     } else {
         trace(TRACE_0, "considering the following events:\n");
-        trace(TRACE_0, "    sending events:\n" );
+        trace(TRACE_0, "    sending events:\n");
         for (unsigned int e = 0; e < PN->getInputPlaceCount(); e++) {
             trace(TRACE_0, "\t!" + string(PN->getInputPlace(e)->name));
             if (PN->getInputPlace(e)->max_occurence >= 0) {
@@ -210,7 +212,7 @@ void reportOptionValues() {
                 trace(TRACE_0, "\t(no limit)\n");
             }
         }
-        trace(TRACE_0, "    receiving events:\n" );
+        trace(TRACE_0, "    receiving events:\n");
         for (unsigned int e = 0; e < PN->getOutputPlaceCount(); e++) {
             trace(TRACE_0, "\t?" + string(PN->getOutputPlace(e)->name));
             if (PN->getOutputPlace(e)->max_occurence >= 0) {
@@ -223,7 +225,8 @@ void reportOptionValues() {
 
     // report message bound
     if (options[O_MESSAGES_MAX]) {
-        trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
+        trace(TRACE_0, "interface message bound set to: "
+                + intToString(messages_manual) +"\n");
     }
     trace(TRACE_0, "\n");
 }
@@ -250,11 +253,10 @@ void checkExchangeability() {
 void matchNet(OGFromFile* OGToMatch, oWFN* PN) {
     string reasonForFailedMatch;
     if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
-    	trace(TRACE_0, "oWFN matches with OG: YES\n");
+        trace(TRACE_0, "oWFN matches with OG: YES\n");
     } else {
-    	trace(TRACE_0, "oWFN matches with OG: NO\n");
-    	trace(TRACE_0, "Match failed, because: " +
-    	reasonForFailedMatch + "\n");
+        trace(TRACE_0, "oWFN matches with OG: NO\n");
+        trace(TRACE_0, "Match failed, because: " +reasonForFailedMatch + "\n");
     }
     delete OGToMatch;
 }
@@ -278,7 +280,7 @@ void computeOG(oWFN* PN) {
 
     trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
 
-    cout << "    " << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
+    cout << "    " << difftime(seconds2, seconds) << " s consumed for building graph" << endl;
 
     trace(TRACE_0, "\nnet is controllable: ");
     if (graph->getRoot()->getColor() == BLUE) {
@@ -298,16 +300,16 @@ void computeOG(oWFN* PN) {
         // distributed controllability?
         if (options[O_DISTRIBUTED]) {
             trace(TRACE_0, "\nannotating OG for distributed controllability\n");
-            
+
             bool graphChanged = true;
             while (graphChanged) {
                 graphChanged = graph->annotateGraphDistributedly();
                 graph->correctNodeColorsAndShortenAnnotations();
-//                cerr << endl;
+                // cerr << endl;
             }
 
             parameters[P_SHOW_EMPTY_NODE] = false;
-            
+
             trace(TRACE_0, "\nnet is distributedly controllable: ");
             if (graph->getRoot()->getColor() == BLUE) {
                 trace(TRACE_0, "MAYBE\n\n");
@@ -316,9 +318,9 @@ void computeOG(oWFN* PN) {
                 parameters[P_SHOW_ALL_NODES] = true;
             }
         }
-              
-        graph->printGraphToDot();      // .out
-        graph->printOGtoFile();        // .og
+
+        graph->printGraphToDot(); // .out
+        graph->printOGtoFile(); // .og
 
 
         if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
@@ -329,7 +331,6 @@ void computeOG(oWFN* PN) {
             }
         }
 
-
         if (options[O_OTF]) {
             //graph->bdd->printGraphToDot();
             graph->bdd->save("OTF");
@@ -339,9 +340,9 @@ void computeOG(oWFN* PN) {
     if (options[O_BDD]) {
         trace(TRACE_0, "\nbuilding the BDDs...\n");
         seconds = time (NULL);
-        graph->convertToBdd();      
+        graph->convertToBdd();
         seconds2 = time (NULL);
-        cout << difftime(seconds2,seconds) << " s consumed for building and reordering the BDDs" << endl;
+        cout << difftime(seconds2, seconds) << " s consumed for building and reordering the BDDs" << endl;
 
         //graph->bdd->printGraphToDot();
         if (!options[O_NOOUTPUTFILES]) {
@@ -375,7 +376,7 @@ void computeIG(oWFN* PN) {
 
     seconds = time (NULL);
 
-    graph->buildGraph();                    // build interaction graph
+    graph->buildGraph(); // build interaction graph
 
     seconds2 = time (NULL);
 
@@ -385,7 +386,7 @@ void computeIG(oWFN* PN) {
         trace(TRACE_0, "\nbuilding the interaction graph finished.\n");
     }
 
-    cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
+    cout << difftime(seconds2, seconds) << " s consumed for building graph" << endl;
 
     trace(TRACE_0, "\nnet is controllable: ");
     if (graph->getRoot()->getColor() == BLUE) {
@@ -403,13 +404,13 @@ void computeIG(oWFN* PN) {
     if (!options[O_NOOUTPUTFILES]) {
         if (options[O_DIAGNOSIS]) {
             graph->diagnose();
-        }        
-        
+        }
+
         // generate output files
-        graph->printGraphToDot();      // .out
+        graph->printGraphToDot(); // .out
 
         if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
-            if ( controllable ) {
+            if (controllable ) {
                 graph->printGraphToSTG();
             } else {
                 trace(TRACE_0, "\nCannot synthesize a partner for a net, that is not controllable\n\n");
@@ -418,7 +419,7 @@ void computeIG(oWFN* PN) {
     }
 
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
-//			trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+    // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
 
     delete graph;
     trace(TRACE_5, "graph deleted\n");
@@ -440,9 +441,11 @@ void makePNG(oWFN* PN) {
     // set strings needed in PNapi output
     globals::output_filename = PN->filename;
     if (PN->finalConditionString != "") {
-        globals::filename = PN->filename + " | Final Condition: " + PN->finalConditionString;
+        globals::filename = PN->filename + " | Final Condition: "
+                + PN->finalConditionString;
     } else {
-        globals::filename = PN->filename + " | Final Marking: " + PN->finalMarkingString;
+        globals::filename = PN->filename + " | Final Marking: "
+                + PN->finalMarkingString;
     }
 
     // create temporary stream as target for the dot output of the PNapiNet
@@ -453,22 +456,21 @@ void makePNG(oWFN* PN) {
 
     // create the dot
     (*dot) << (*PNapiNet);
-    
+
     // generate a string from the stream to be modified for piping
     string dotString = dot->str();
 
     delete(dot);
-    
+
     unsigned int position;
     unsigned int deletePosition;
-    
+
     // delete all comments in the dot output of the PNapiNet, since the endlines will 
     // be deleted for echo piping and "//" comments won't work anymore
-    while ((position = dotString.find_first_of("/")) != string::npos)
-    {
+    while ((position = dotString.find_first_of("/")) != string::npos) {
         if (dotString.at(position+1)=='/') {
             deletePosition = dotString.find_first_of("\n", (position + 2));
-            dotString.erase(position,(deletePosition - position));        
+            dotString.erase(position, (deletePosition - position));
         }
     }
 
@@ -478,8 +480,8 @@ void makePNG(oWFN* PN) {
         testchar = dotString[i];
 
         if (testchar == '\n') {
-            dotString.erase(i,1);
-            dotString.insert(i, " ");            
+            dotString.erase(i, 1);
+            dotString.insert(i, " ");
         }
 
         if (testchar == '"') {
@@ -487,26 +489,28 @@ void makePNG(oWFN* PN) {
             i++;
         }
     }
-    
+
     // finish the string for the system call
-    dotString = "echo \"" + dotString + "\" | dot -q -Tpng -o \"" + globals::output_filename + ".png\"";
-    
+    dotString = "echo \"" + dotString + "\" | dot -q -Tpng -o \""
+            + globals::output_filename + ".png\"";
+
     // create the output
     system(dotString.c_str());
     trace(TRACE_0, (globals::output_filename + ".png generated\n\n"));
-
-    
 }
 
 
 // create the productOG of all given OGs
 void computeProductOG(OGFromFile::ogs_t OGsFromFiles) {
     trace("Building product of the following OGs:\n");
+
     for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
          iOgFile != ogfiles.end(); ++iOgFile) {
-        trace(*iOgFile); trace("\n");
+
+        trace(*iOgFile + "\n");
     }
     trace("\n");
+
     OGFromFile* productOG = OGFromFile::product(OGsFromFiles);
     if (productOG->hasNoRoot()) {
         trace("The product OG is empty.\n\n");
@@ -517,7 +521,8 @@ void computeProductOG(OGFromFile::ogs_t OGsFromFiles) {
 
     if (!options[O_NOOUTPUTFILES]) {
         trace("Saving product OG to:\n");
-        trace(OGFromFile::addOGFileSuffix(outfilePrefix)); trace("\n");
+        trace(OGFromFile::addOGFileSuffix(outfilePrefix));
+        trace("\n");
         productOG->printOGFile(outfilePrefix);
         trace("\n");
 
@@ -526,8 +531,8 @@ void computeProductOG(OGFromFile::ogs_t OGsFromFiles) {
     }
 
     delete productOG;
-    for (OGFromFile::ogs_t::const_iterator iOg = OGsFromFiles.begin();
-         iOg != OGsFromFiles.end(); ++iOg) {
+    for (OGFromFile::ogs_t::const_iterator iOg = OGsFromFiles.begin(); iOg
+            != OGsFromFiles.end(); ++iOg) {
         delete *iOg;
     }
 }
@@ -539,7 +544,7 @@ void checkSimulation(OGFromFile::ogs_t OGsFromFiles) {
     OGFromFile *simulator = *OGFromFileIter;
     OGFromFile *simulant = *(++OGFromFileIter);
     if (simulator->simulates(simulant)) {
-        trace(TRACE_0, "\nThe first OG has all the strategies of the second one, possibly more.\n" );
+        trace(TRACE_0, "\nThe first OG has all the strategies of the second one, possibly more.\n");
     } else {
         trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
     }
@@ -573,17 +578,17 @@ void countServices(OGFromFile::ogs_t OGsFromFiles) {
             trace("Computing: ");
             trace(*iOgFile);
             trace("\n");
-            trace(TRACE_1,"The given OG is acyclic\n");
-            
+            trace(TRACE_1, "The given OG is acyclic\n");
+
             time_t seconds, seconds2;
-            
-            seconds = time (NULL); 
+
+            seconds = time (NULL);
             // Compute and show the number of Services
             trace("Computed number of Services: " + intToString((*OGFromFileIter)->numberOfServices()) + "\n");
             seconds2 = time (NULL);
-            
-            cout << difftime(seconds2,seconds) << " s consumed for computation" << endl << endl;
-            
+
+            cout << difftime(seconds2, seconds) << " s consumed for computation" << endl << endl;
+
             // increment filename counter
             iOgFile++;
         } else {
@@ -592,7 +597,7 @@ void countServices(OGFromFile::ogs_t OGsFromFiles) {
             trace("\n");
             trace("The given OG is is NOT ayclic\n");
             trace("Cannot compute number of Services\n\n");
-            
+
             // increment filename counter
             iOgFile++;
         }
@@ -602,8 +607,8 @@ void countServices(OGFromFile::ogs_t OGsFromFiles) {
 
 // checks whether an OG is acyclic
 void checkAcyclicity(OGFromFile::ogs_t OGsFromFiles) {
-    for (list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
-         OGFromFileIter != OGsFromFiles.end(); OGFromFileIter++) {
+    for (list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin(); OGFromFileIter
+            != OGsFromFiles.end(); OGFromFileIter++) {
         if ((*OGFromFileIter)->isAcyclic()) {
             trace("The given OG is acyclic\n\n");
         } else {
@@ -617,7 +622,7 @@ void checkAcyclicity(OGFromFile::ogs_t OGsFromFiles) {
 // ********                   MAIN                                           ********
 // **********************************************************************************
 int main(int argc, char ** argv) {
-	
+
 //	bool readExpliciteOG = false;
 //	parse_command_line(argc, argv);
 //	if (readExpliciteOG){
@@ -640,21 +645,21 @@ int main(int argc, char ** argv) {
     // evaluate command line options
     parse_command_line(argc, argv);
 
+    // **********************************************************************************
+    // start OG file dependant operations
 
-// **********************************************************************************
-// start OG file dependant operations
-
-    if (options[O_MATCH] || options[O_PRODUCTOG] || options[O_SIMULATES] ||
-        options[O_EQUALS] || options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC]) {
+    if (options[O_MATCH] || options[O_PRODUCTOG]|| options[O_SIMULATES]
+            ||options[O_EQUALS]|| options[O_COUNT_SERVICES]
+            || options[O_CHECK_ACYCLIC]) {
 
         // reading all OG-files
         OGFromFile::ogs_t OGsFromFiles;
         readAllOGs(OGsFromFiles);
 
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
-    		// Destroy buffer of OG parser.
-    		// Must NOT be called before fclose(og_yyin);
-    		og_yylex_destroy();
+        // Destroy buffer of OG parser.
+        // Must NOT be called before fclose(og_yyin);
+        og_yylex_destroy();
 #endif
         if (options[O_MATCH]) {
             // matching against an OG
@@ -663,7 +668,7 @@ int main(int argc, char ** argv) {
 
         if (options[O_PRODUCTOG]) {
             // calculating the product OG
-            computeProductOG(OGsFromFiles);    
+            computeProductOG(OGsFromFiles);
             return 0;
         }
 
@@ -694,9 +699,8 @@ int main(int argc, char ** argv) {
         }
     }
 
-
-// **********************************************************************************
-// start petrinet-file dependant operations
+    // **********************************************************************************
+    // start petrinet-file dependant operations
 
     if (options[O_EX] || options[O_MATCH] || parameters[P_OG] || parameters[P_IG] ||
         options[O_PNG]) {
@@ -709,14 +713,14 @@ int main(int argc, char ** argv) {
 
         // ---------------- processing every single net -------------------
         for (list<std::string>::iterator netiter = netfiles.begin();
-            netiter != netfiles.end(); ++netiter) {
+             netiter != netfiles.end(); ++netiter) {
 
             numberOfEvents = 0;
             numberOfDecodes = 0;
             garbagefound = 0;
             global_progress = 0;
             show_progress = 0;
-            State::state_count = 0;          // number of states
+            State::state_count = 0; // number of states
             numberDeletedVertices = 0;
 
             currentowfnfile = *netiter;
@@ -724,8 +728,8 @@ int main(int argc, char ** argv) {
 
             // prepare getting the net
             PlaceTable = new SymbolTab<PlSymbol>;
-            // get the net
 
+            // get the net
             readnet(currentowfnfile);
             delete PlaceTable;
 
@@ -734,9 +738,14 @@ int main(int argc, char ** argv) {
 
             // report the net
             trace(TRACE_0, "    places: " + intToString(PN->getPlaceCount()));
-            trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCount()) + " input places, " + intToString(PN->getOutputPlaceCount()) + " output places)\n");
-            trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCount()) + "\n");
-            trace(TRACE_0, "    ports: " + intToString(PN->getPortCount()) + "\n\n");
+            trace(TRACE_0, " (including "
+                           + intToString(PN->getInputPlaceCount()) + " input places, "
+                           + intToString(PN->getOutputPlaceCount())
+                           + " output places)\n");
+            trace(TRACE_0, "    transitions: "
+                           + intToString(PN->getTransitionCount()) + "\n");
+            trace(TRACE_0, "    ports: " + intToString(PN->getPortCount())
+                           + "\n\n");
             if (PN->FinalCondition) {
                 trace(TRACE_0, "finalcondition used\n\n");
             } else if (PN->FinalMarking) {
@@ -748,10 +757,10 @@ int main(int argc, char ** argv) {
             // adjust events_manual and print limit of considering events
             reportOptionValues();
             // start computation
-                
+
             if (options[O_MATCH]) {
                 // matching current oWFN against the OG 
-                matchNet(OGToMatch, PN);    
+                matchNet(OGToMatch, PN);
             }
 
             if (parameters[P_OG]) {
@@ -766,7 +775,7 @@ int main(int argc, char ** argv) {
 
             if (options[O_PNG]) {
                 // create a png file from the given net
-                makePNG(PN);    
+                makePNG(PN);
             }
 
             delete PN;
@@ -785,7 +794,7 @@ int main(int argc, char ** argv) {
 #ifdef LOG_NEW
     NewLogger::printall();
 #endif
-	return 0;
+    return 0;
 }
 
 

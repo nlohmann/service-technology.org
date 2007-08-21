@@ -43,40 +43,41 @@ using namespace std;
 class Arc;
 
 class Node {
-	// public typedefs first, then private members, then public methods.
-	public:
-		typedef std::vector<Arc*> Arcs_t;
-	private:
-		Arcs_t ArrivingArcs;
-		Arcs_t LeavingArcs;
-	public:
-		std::string name;
-		Node(const std::string&);
-		ostream& operator << (ostream &);
-		~Node();
-		void addArrivingArc(Arc* arc);
-		Arcs_t::size_type getArrivingArcsCount() const;
-		Arc* getArrivingArc(Arcs_t::size_type i) const;
-		void addLeavingArc(Arc* arc);
-		Arcs_t::size_type getLeavingArcsCount() const;
-		Arc* getLeavingArc(Arcs_t::size_type i) const;
+    // public typedefs first, then private members, then public methods.
+    public:
+        typedef std::vector<Arc*> Arcs_t;
+    private:
+        Arcs_t ArrivingArcs;
+        Arcs_t LeavingArcs;
+    public:
+        std::string name;
+        Node(const std::string&);
+        ostream& operator <<(ostream &);
+        ~Node();
+        void addArrivingArc(Arc* arc);
+        Arcs_t::size_type getArrivingArcsCount() const;
+        Arc* getArrivingArc(Arcs_t::size_type i) const;
+        void addLeavingArc(Arc* arc);
+        Arcs_t::size_type getLeavingArcsCount() const;
+        Arc* getLeavingArc(Arcs_t::size_type i) const;
 };
+
 
 class owfnTransition;
 class owfnPlace;
 
-class Arc
-{
-	public:
-		Arc(owfnTransition *, owfnPlace *, bool ,unsigned int);
-		
-	//	static unsigned int cnt;
-		Node * Source;
-	  	Node * Destination;
-	  	owfnPlace * pl;
-	  	owfnTransition * tr;
-	  	unsigned int Multiplicity;
-	  	void operator += (unsigned int);
+
+class Arc {
+    public:
+        Arc(owfnTransition *, owfnPlace *, bool, unsigned int);
+
+        //	static unsigned int cnt;
+        Node * Source;
+        Node * Destination;
+        owfnPlace * pl;
+        owfnTransition * tr;
+        unsigned int Multiplicity;
+        void operator +=(unsigned int);
 
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.

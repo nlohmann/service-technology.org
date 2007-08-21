@@ -54,166 +54,168 @@ extern int show_progress;
 
 /* communication graph */
 class CommunicationGraph {
-private:
+    private:
 
-    /**
-     * Computes the total number of all states stored in all nodes and the
-     * number of all edges in this graph.
-     */
-    void computeNumberOfStatesAndEdges();
+        /**
+         * Computes the total number of all states stored in all nodes and the
+         * number of all edges in this graph.
+         */
+        void computeNumberOfStatesAndEdges();
 
-    /**
-     * Helps computeNumberOfStatesAndEdges to computes the total number of all
-     * states stored in all nodes and the number of all edges in this graph.
-     * This is done recursively (dfs).
-     * @param v Current node in the iteration process.
-     * @param visitedNodes[] Array of bool storing the nodes that we have
-     *     already looked at.
-     */
-    void computeNumberOfStatesAndEdgesHelper(
-        GraphNode* v,
-        std::map<GraphNode*, bool>& visitedNodes);
+        /**
+         * Helps computeNumberOfStatesAndEdges to computes the total number of all
+         * states stored in all nodes and the number of all edges in this graph.
+         * This is done recursively (dfs).
+         * @param v Current node in the iteration process.
+         * @param visitedNodes[] Array of bool storing the nodes that we have
+         *     already looked at.
+         */
+        void computeNumberOfStatesAndEdgesHelper(GraphNode* v,
+                                                 std::map<GraphNode*, bool>& visitedNodes);
 
-    /**
-     * Computes the number of all blue to be shown nodes and edges in this
-     * graph.
-     */
-    void computeNumberOfBlueNodesEdges();
+        /**
+         * Computes the number of all blue to be shown nodes and edges in this
+         * graph.
+         */
+        void computeNumberOfBlueNodesEdges();
 
-    /**
-     * Helps computeNumberOfStatesAndEdges() to computes the number of all blue
-     * to be shown nodes and edges in this graph.
-     * This is done recursively (dfs).
-     * @param v Current node in the iteration process.
-     * @param visitedNodes[] Array of bool storing the nodes that we have
-     *     already looked at.
-     */
-    void computeNumberOfBlueNodesEdgesHelper(
-        GraphNode* v,
-        std::map<GraphNode*, bool>& visitedNodes);
+        /**
+         * Helps computeNumberOfStatesAndEdges() to computes the number of all blue
+         * to be shown nodes and edges in this graph.
+         * This is done recursively (dfs).
+         * @param v Current node in the iteration process.
+         * @param visitedNodes[] Array of bool storing the nodes that we have
+         *     already looked at.
+         */
+        void computeNumberOfBlueNodesEdgesHelper(GraphNode* v,
+                                                 std::map<GraphNode*, bool>& visitedNodes);
 
-    /**
-     * The total number of all states stored in all nodes in this graph.
-     * Is computed by computeNumberOfStatesAndEdges().
-     */
-    unsigned int nStoredStates;
+        /**
+         * The total number of all states stored in all nodes in this graph.
+         * Is computed by computeNumberOfStatesAndEdges().
+         */
+        unsigned int nStoredStates;
 
-    /**
-     * The number of all edges in this graph.
-     * Is computed by computeNumberOfStatesAndEdges().
-     */
-    unsigned int nEdges;
+        /**
+         * The number of all edges in this graph.
+         * Is computed by computeNumberOfStatesAndEdges().
+         */
+        unsigned int nEdges;
 
-    /**
-     * The number of blue to be shown nodes in this graph.
-     * Is computed by computeNumberOfBlueNodesEdges().
-     */
-    unsigned int nBlueNodes;
+        /**
+         * The number of blue to be shown nodes in this graph.
+         * Is computed by computeNumberOfBlueNodesEdges().
+         */
+        unsigned int nBlueNodes;
 
-    /**
-     * The number of blue to be shown edges in this graph.
-     * Is computed by computeNumberOfBlueNodesEdges().
-     */
-    unsigned int nBlueEdges;
-    
-    
-    /// returns true iff edge e is possible in every state of node v
-    bool edge_enforcable(GraphNode *v, GraphEdge<> *e) const;
-    
-    /// returns true iff a colored successor of v can be avoided
-    bool colored_successors_avoidable(GraphNode *v, GraphNodeDiagnosisColor_enum color) const;
-    
+        /**
+         * The number of blue to be shown edges in this graph.
+         * Is computed by computeNumberOfBlueNodesEdges().
+         */
+        unsigned int nBlueEdges;
 
-protected:
-	oWFN* PN;                            //!< pointer to the underlying petri net
+        /// returns true iff edge e is possible in every state of node v
+        bool edge_enforcable(GraphNode *v, GraphEdge<> *e) const;
 
-	GraphNode* root;                     //!< the root node of the graph
+        /// returns true iff a colored successor of v can be avoided
+        bool colored_successors_avoidable(GraphNode *v,
+                                          GraphNodeDiagnosisColor_enum color) const;
 
-	void addProgress(double);
+    protected:
+        oWFN* PN; //!< pointer to the underlying petri net
 
-public:
+        GraphNode* root; //!< the root node of the graph
 
-	CommunicationGraph(oWFN *);
-	~CommunicationGraph();
+        void addProgress(double);
 
-	GraphNodeSet setOfVertices;
+    public:
 
-    GraphNode* getRoot() const;
+        CommunicationGraph(oWFN *);
+        ~CommunicationGraph();
 
-    void calculateRootNode();
+        GraphNodeSet setOfVertices;
 
-    /**
-     * Returns the number of nodes in this graph.
-     */
-    unsigned int getNumberOfNodes() const;
+        GraphNode* getRoot() const;
 
-    /**
-     * Returns the total number of all states stored in all nodes in this
-     * graph. May only be called after computeGraphStatistics().
-     */
-    unsigned int getNumberOfStoredStates() const;
+        void calculateRootNode();
 
-    /**
-     * Returns the number of all edges in this graph. May only be called after
-     * computeGraphStatistics().
-     */
-    unsigned int getNumberOfEdges() const;
+        /**
+         * Returns the number of nodes in this graph.
+         */
+        unsigned int getNumberOfNodes() const;
 
-    /**
-     * Returns the number of all blue to be shown nodes in this graph. May only
-     * be called after computeGraphStatistics().
-     */
-    unsigned int getNumberOfBlueNodes() const;
+        /**
+         * Returns the total number of all states stored in all nodes in this
+         * graph. May only be called after computeGraphStatistics().
+         */
+        unsigned int getNumberOfStoredStates() const;
 
-    /**
-     * Returns the number of all blue to be shown edges in this graph. May only
-     * be called after computeGraphStatistics().
-     */
-    unsigned int getNumberOfBlueEdges() const;
+        /**
+         * Returns the number of all edges in this graph. May only be called after
+         * computeGraphStatistics().
+         */
+        unsigned int getNumberOfEdges() const;
 
-    GraphNode * findGraphNodeInSet(GraphNode *);
+        /**
+         * Returns the number of all blue to be shown nodes in this graph. May only
+         * be called after computeGraphStatistics().
+         */
+        unsigned int getNumberOfBlueNodes() const;
 
-    void analyseNode(GraphNode *);
+        /**
+         * Returns the number of all blue to be shown edges in this graph. May only
+         * be called after computeGraphStatistics().
+         */
+        unsigned int getNumberOfBlueEdges() const;
 
-	void printProgressFirst();
-	void printProgress();
+        GraphNode * findGraphNodeInSet(GraphNode *);
 
-    void buildGraphRandom();
+        void analyseNode(GraphNode *);
 
-    void printGraphToDot();
-    void printGraphToDotRecursively(GraphNode * v, fstream& os, std::map<GraphNode*, bool>&);
+        void printProgressFirst();
+        void printProgress();
 
-    // functions to create an STG representation of the IG or OG
-    void printGraphToSTG();
-    void printGraphToSTGRecursively(GraphNode *v, fstream& os, std::map<GraphNode*, bool>&);
-    
-    // functions to annotate the OG for distributed controllability
-    bool annotateGraphDistributedly();    
-    bool annotateGraphDistributedlyRecursively(GraphNode *v, std::map<GraphNode*, bool>&);
-    void removeLabeledSuccessor(GraphNode *v, std::string label);
-    
-    // functions for diagnosis
-    void diagnose();
-    GraphNodeDiagnosisColor_enum diagnose_recursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes);
-        
+        void buildGraphRandom();
 
-    /**
-     * Computes statistics about this graph. They can be printed by
-     * printGraphStatistics().
-     */
-    void computeGraphStatistics();
+        void printGraphToDot();
+        void printGraphToDotRecursively(GraphNode * v,
+                                        fstream& os,
+                                        std::map<GraphNode*, bool>&);
 
-    /**
-     * Prints statistics about this graph. May only be called after
-     * computeGraphStatistics().
-     */
-    void printGraphStatistics();
+        // functions to create an STG representation of the IG or OG
+        void printGraphToSTG();
+        void printGraphToSTGRecursively(GraphNode *v,
+                                        fstream& os,
+                                        std::map<GraphNode*, bool>&);
 
-    bool stateActivatesOutputEvents(State *);
+        // functions to annotate the OG for distributed controllability
+        bool annotateGraphDistributedly();
+        bool annotateGraphDistributedlyRecursively(GraphNode *v,
+                                                   std::map<GraphNode*, bool>&);
+        void removeLabeledSuccessor(GraphNode *v, std::string label);
 
-// Provides user defined operator new. Needed to trace all new operations on this class.
+        // functions for diagnosis
+        void diagnose();
+        GraphNodeDiagnosisColor_enum diagnose_recursively(GraphNode *v,
+                                                          std::map<GraphNode*, bool>& visitedNodes);
+
+        /**
+         * Computes statistics about this graph. They can be printed by
+         * printGraphStatistics().
+         */
+        void computeGraphStatistics();
+
+        /**
+         * Prints statistics about this graph. May only be called after
+         * computeGraphStatistics().
+         */
+        void printGraphStatistics();
+
+        bool stateActivatesOutputEvents(State *);
+
+        // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
-	NEW_OPERATOR(CommunicationGraph)
+        NEW_OPERATOR(CommunicationGraph)
 #define new NEW_NEW
 };
 

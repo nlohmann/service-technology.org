@@ -33,7 +33,7 @@
 
 #ifndef BDDREPRESENTATION_H_
 #define BDDREPRESENTATION_H_
- 
+
 #include "mynew.h" 
 #include <vector>
 #include <map>
@@ -51,63 +51,67 @@ typedef vector<bool> BitVector;
 
 class BddLabelTab;
 
-class BddRepresentation{
-	public:
-		BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT, unsigned int cntNodes = 1, bool calcStates = false);
-		~BddRepresentation();
-		
-		void convertRootNode(GraphNode* root);
-		void generateRepresentation(GraphNode* v, std::map<GraphNode*, bool>&);
-		void addOrDeleteLeavingEdges(GraphNode* v);
-		void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
-		void printDotFile(char** names = NULL, char* option = "OG");
-		void print();
-		void save(char* option = "OG");
-		void printMemoryInUse();
-		
-		void testSymbRepresentation(GraphNode* v, std::map<GraphNode*, bool>&);
-		unsigned int getBound();
-		void setMaxPlaceBits(GraphNode* v, std::map<GraphNode*, bool>&);
-		
+
+class BddRepresentation {
+    public:
+        BddRepresentation(unsigned int numberOfLabels,
+                          Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT,
+                          unsigned int cntNodes = 1,
+                          bool calcStates = false);
+        ~BddRepresentation();
+
+        void convertRootNode(GraphNode* root);
+        void generateRepresentation(GraphNode* v, std::map<GraphNode*, bool>&);
+        void addOrDeleteLeavingEdges(GraphNode* v);
+        void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
+        void printDotFile(char** names = NULL, char* option = "OG");
+        void print();
+        void save(char* option = "OG");
+        void printMemoryInUse();
+
+        void testSymbRepresentation(GraphNode* v, std::map<GraphNode*, bool>&);
+        unsigned int getBound();
+        void setMaxPlaceBits(GraphNode* v, std::map<GraphNode*, bool>&);
+
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.
 #undef new
         NEW_OPERATOR(BddRepresentation)
 #define new NEW_NEW
 
-	private:	  
-		DdManager* mgrMp;
-		DdManager* mgrAnn;
-		DdNode* bddMp;
-		DdNode* bddRed;
-		DdNode* bddAnn;
-		int maxNodeBits;
-		int maxLabelBits;
-		unsigned int maxNodeNumber;
-		int nbrLabels;
-		map<unsigned int, unsigned int> nodeMap;
-		BddLabelTab * labelTable;
-		
-		/**
-		 * Returns the BDD of a label (given as integer).
-		 */
-		DdNode* labelToBddMp(const std::string& label);
+        private:
+        DdManager* mgrMp;
+        DdManager* mgrAnn;
+        DdNode* bddMp;
+        DdNode* bddRed;
+        DdNode* bddAnn;
+        int maxNodeBits;
+        int maxLabelBits;
+        unsigned int maxNodeNumber;
+        int nbrLabels;
+        map<unsigned int, unsigned int> nodeMap;
+        BddLabelTab * labelTable;
 
-		DdNode* nodesToBddMp(unsigned int node1, unsigned int node2);
-		DdNode* annotationToBddAnn(GraphNode * v);
-		DdNode* clauseToBddAnn(const GraphFormulaMultiaryOr* cl);
-		unsigned int getBddNumber(unsigned int node);
-		void addBddVars(unsigned int max);	
-		BitVector numberToBin(unsigned int number, int cntBits);
-		int nbrBits(unsigned int i);
-		string myitoa(unsigned int value, int base);
-		void checkManager(DdManager* mgr, char* table);
-		
-		DdNode* statesToBddMp(GraphNode* v);
-		DdNode* markingToBddMp(unsigned int * marking);
-		unsigned int bound;
-		void calculateBound(GraphNode* v, std::map<GraphNode*, bool>&);
-		int maxPlaceBits;
+        /**
+         * Returns the BDD of a label (given as integer).
+         */
+        DdNode* labelToBddMp(const std::string& label);
+
+        DdNode* nodesToBddMp(unsigned int node1, unsigned int node2);
+        DdNode* annotationToBddAnn(GraphNode * v);
+        DdNode* clauseToBddAnn(const GraphFormulaMultiaryOr* cl);
+        unsigned int getBddNumber(unsigned int node);
+        void addBddVars(unsigned int max);
+        BitVector numberToBin(unsigned int number, int cntBits);
+        int nbrBits(unsigned int i);
+        string myitoa(unsigned int value, int base);
+        void checkManager(DdManager* mgr, char* table);
+
+        DdNode* statesToBddMp(GraphNode* v);
+        DdNode* markingToBddMp(unsigned int * marking);
+        unsigned int bound;
+        void calculateBound(GraphNode* v, std::map<GraphNode*, bool>&);
+        int maxPlaceBits;
 };
 
 #endif /*BDDREPRESENTATION_H_*/

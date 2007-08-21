@@ -152,24 +152,19 @@ void CommunicationGraph::computeGraphStatistics() {
     computeNumberOfBlueNodesEdges();
 }
 
+
 void CommunicationGraph::computeNumberOfStatesAndEdges() {
 
     std::map<GraphNode*, bool> visitedNodes;
-
-//    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-//        visitedNodes[i] = false;
-//    }
-//
     nStoredStates = 0;
-    nEdges        = 0;
+    nEdges = 0;
 
     computeNumberOfStatesAndEdgesHelper(root, visitedNodes);
 }
 
 
-void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(
-    GraphNode*    v,
-    std::map<GraphNode*, bool>& visitedNodes) {
+void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(GraphNode* v,
+                                                             std::map<GraphNode*, bool>& visitedNodes) {
 
     assert(v != NULL);
 
@@ -179,8 +174,7 @@ void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(
     nStoredStates += v->reachGraphStateSet.size();
 
     // iterating over all successors
-    GraphNode::LeavingEdges::ConstIterator edgeIter =
-        v->getLeavingEdgesConstIterator();
+    GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
         GraphEdge<>* leavingEdge = edgeIter->getNext();
@@ -201,11 +195,6 @@ void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(
 void CommunicationGraph::computeNumberOfBlueNodesEdges() {
 
     std::map<GraphNode*, bool> visitedNodes;
-
-//    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-//        visitedNodes[i] = false;
-//    }
-
     nBlueNodes = 0;
     nBlueEdges = 0;
 
@@ -213,9 +202,8 @@ void CommunicationGraph::computeNumberOfBlueNodesEdges() {
 }
 
 
-void CommunicationGraph::computeNumberOfBlueNodesEdgesHelper(
-    GraphNode* v,
-    std::map<GraphNode*, bool>& visitedNodes) {
+void CommunicationGraph::computeNumberOfBlueNodesEdgesHelper(GraphNode* v,
+                                                             std::map<GraphNode*, bool>& visitedNodes) {
 
     assert(v != NULL);
 
@@ -228,8 +216,7 @@ void CommunicationGraph::computeNumberOfBlueNodesEdgesHelper(
         nBlueNodes++;
 
         // iterating over all successors
-        GraphNode::LeavingEdges::ConstIterator edgeIter =
-            v->getLeavingEdgesConstIterator();
+        GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
             GraphEdge<>* leavingEdge = edgeIter->getNext();
@@ -258,7 +245,6 @@ bool CommunicationGraph::stateActivatesOutputEvents(State * s) {
     s->decode(PN);
 
     for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
-
         if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {
             return true;
         }
@@ -280,9 +266,12 @@ void CommunicationGraph::addProgress(double toAddValue) {
 
     int aftercomma = int(100 * 10000 * toAddValue) % 10000;
 
-    if (aftercomma <   10) trace(TRACE_4, "0");
-    if (aftercomma <  100) trace(TRACE_4, "0");
-    if (aftercomma < 1000) trace(TRACE_4, "0");
+    if (aftercomma < 10)
+        trace(TRACE_4, "0");
+    if (aftercomma < 100)
+        trace(TRACE_4, "0");
+    if (aftercomma < 1000)
+        trace(TRACE_4, "0");
 
     trace(TRACE_4, intToString(aftercomma));
 
@@ -343,21 +332,19 @@ void CommunicationGraph::printGraphStatistics() {
 //! \brief creates a dot file of the graph
 void CommunicationGraph::printGraphToDot() {
 
-    unsigned int maxWritingSize = 5000;        // number relevant for .out file
-    unsigned int maxPrintingSize = 500;        // number relevant to generate png
+    unsigned int maxWritingSize = 5000; // number relevant for .out file
+    unsigned int maxPrintingSize = 500; // number relevant to generate png
 
     if (getNumberOfNodes() <= maxWritingSize) {
 
         trace(TRACE_0, "creating the dot file of the graph...\n");
         GraphNode* rootNode = root;
 
-        string outfilePrefixWithOptions =
-            options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
+        string outfilePrefixWithOptions = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
 
         if (!options[O_CALC_ALL_STATES]) {
             outfilePrefixWithOptions += ".R";
         }
-
 
         if (options[O_DIAGNOSIS]) {
             outfilePrefixWithOptions += ".diag";
@@ -368,19 +355,18 @@ void CommunicationGraph::printGraphToDot() {
                 outfilePrefixWithOptions += ".IG";
             }
         }
-        
 
         string dotFileName = outfilePrefixWithOptions + ".out";
         fstream dotFile(dotFileName.c_str(), ios_base::out | ios_base::trunc);
         dotFile << "digraph g1 {\n";
         dotFile << "graph [fontname=\"Helvetica\", label=\"";
-        
+
         if (options[O_DIAGNOSIS]) {
             dotFile << "diagnosis of ";
         } else {
             parameters[P_OG] ? dotFile << "OG of " : dotFile << "IG of ";
         }
-        
+
         dotFile << PN->filename;
         dotFile << " (parameters:";
         if (parameters[P_IG] && options[O_CALC_REDUCED_IG]) {
@@ -398,24 +384,20 @@ void CommunicationGraph::printGraphToDot() {
         dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
         std::map<GraphNode*, bool> visitedNodes;
-//        for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-//            visitedNodes[i] = 0;
-//        }
 
         printGraphToDotRecursively(rootNode, dotFile, visitedNodes);
 
-        
         dotFile << "}";
         dotFile.close();
 
         // prepare dot command line for printing
         string imgFileName = outfilePrefixWithOptions + ".png";
-        string dotCmd = "dot -Tpng \"" + dotFileName + "\" -o \"" +
-            imgFileName + "\"";
+        string dotCmd = "dot -Tpng \"" + dotFileName + "\" -o \"" + imgFileName + "\"";
 
         // print commandline and execute system command
         if ((options[O_SHOW_NODES] && getNumberOfNodes() <= maxPrintingSize) ||
-           (!options[O_SHOW_NODES] && getNumberOfBlueNodes() <= maxPrintingSize)) {
+            (!options[O_SHOW_NODES] && getNumberOfBlueNodes() <= maxPrintingSize)) {
+
             // print only, if number of nodes is lower than required
             // if option is set to show all nodes, then we compare the number of all nodes
             // otherwise, we compare the number of blue nodes only
@@ -444,7 +426,9 @@ void CommunicationGraph::printGraphToDot() {
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
 //! \brief breadthsearch through the graph printing each node and edge to the output stream
-void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, std::map<GraphNode*, bool>& visitedNodes) {
+void CommunicationGraph::printGraphToDotRecursively(GraphNode * v,
+                                                    fstream& os,
+                                                    std::map<GraphNode*, bool>& visitedNodes) {
 
     assert(v != NULL);
 
@@ -453,13 +437,13 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
 
     os << "p" << v->getNumber() << " [label=\"# " << v->getNumber() << "\\n";
 
-    StateSet::iterator iter;  // iterator over the stateList's elements
+    StateSet::iterator iter; // iterator over the stateList's elements
 
     if (parameters[P_SHOW_STATES_PER_NODE] || parameters[P_SHOW_DEADLOCKS_PER_NODE]) {
 
         for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
 
-            (*iter)->decode(PN);    // need to decide if it is an external or internal deadlock
+            (*iter)->decode(PN); // need to decide if it is an external or internal deadlock
 
             string kindOfDeadlock = "i"; // letter for 'i' internal or 'e' external deadlock
             unsigned int i;
@@ -501,7 +485,7 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
         v->getAnnotation()->simplify();
         os << v->getAnnotation()->asString();
     }
-    
+
     // the diagnosis mode uses different colors
     if (options[O_DIAGNOSIS]) {
         os << "\", fontcolor=black, color=" << v->getDiagnosisColor().toString();
@@ -512,13 +496,12 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
             os << ", style=dashed";
         }
     }
-        
+
     os << "];\n";
 
     visitedNodes[v] = true;
 
-    GraphNode::LeavingEdges::ConstIterator edgeIter =
-        v->getLeavingEdgesConstIterator();
+    GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
         GraphEdge<> * element = edgeIter->getNext();
@@ -527,20 +510,21 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
         if (!vNext->isToShow(root))
             continue;
 
-        os << "p" << v->getNumber() << "->" << "p" << vNext->getNumber()
-            << " [label=\"" << element->getLabel();
-        
+        os << "p" << v->getNumber() << "->"
+           << "p" << vNext->getNumber()
+           << " [label=\"" << element->getLabel();
+
         // the diagnosis mode uses different colors
         if (options[O_DIAGNOSIS]) {
             os << "\", fontcolor=black, color=" << vNext->getDiagnosisColor().toString();
         } else {
             os << "\", fontcolor=black, color=" << vNext->getColor().toString();
         }
-        
+
         // in diagnosis mode, draw "unenforcable" arcs dashed
         if (options[O_DIAGNOSIS] && !edge_enforcable(v, element)) {
             os << ", style=dashed";
-        } 
+        }
 
         os << "];\n";
         if ((vNext != v) && !visitedNodes[vNext]) {
@@ -548,9 +532,6 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v, fstream& os, 
         }
     } // while
 }
-
-
-
 
 
 //! \brief creates a STG file of the graph
@@ -561,7 +542,7 @@ void CommunicationGraph::printGraphToSTG() {
 
     // set file name
     if (options[O_OUTFILEPREFIX]) {
-        buffer = outfilePrefix;    
+        buffer = outfilePrefix;
     } else {
         buffer = PN->filename;
     }
@@ -590,21 +571,17 @@ void CommunicationGraph::printGraphToSTG() {
     dotFile << ".dummy";
     assert(PN != NULL);
     for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
-    	if (PN->getPlace(i)->type == INPUT) {
+        if (PN->getPlace(i)->type == INPUT) {
             dotFile << " out." << PN->getPlace(i)->name;
         } else if (PN->getPlace(i)->type == OUTPUT) {
             dotFile << " in." << PN->getPlace(i)->name;
         }
     }
-    dotFile << endl;    
+    dotFile << endl;
     dotFile << ".state graph" << endl;
 
     // mark all nodes as unvisited
     std::map<GraphNode*, bool> visitedNodes;
-//    bool visitedNodes[getNumberOfNodes()];
-//    for (unsigned int i = 0; i < getNumberOfNodes(); i++) {
-//        visitedNodes[i] = false;
-//    }
 
     // traverse the nodes recursively
     printGraphToSTGRecursively(rootNode, dotFile, visitedNodes);
@@ -613,14 +590,16 @@ void CommunicationGraph::printGraphToSTG() {
     dotFile << ".marking {p" << rootNode->getNumber() << "}" << endl;
 
     // end and close file
-    dotFile << ".end" << endl;
+    dotFile << ".end"<< endl;
     dotFile.close();
 
     // prepare Petrify command line for printing
     if (parameters[P_OG]) {
-        buffer = string(HAVE_PETRIFY) + " " + PN->filename + ".OG.stg -dead -ip -o " + PN->filename + ".OG.pn";
+        buffer = string(HAVE_PETRIFY) + " " + PN->filename
+                 + ".OG.stg -dead -ip -o " + PN->filename + ".OG.pn";
     } else {
-        buffer = string(HAVE_PETRIFY) + " " + PN->filename + ".IG.stg -dead -ip -o " + PN->filename + ".IG.pn";
+        buffer = string(HAVE_PETRIFY) + " " + PN->filename
+                 + ".IG.stg -dead -ip -o " + PN->filename + ".IG.pn";
     }
 
     // print commandline and execute system command
@@ -651,34 +630,35 @@ void CommunicationGraph::printGraphToSTG() {
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
 //! \brief breadthsearch through the graph printing each node and edge to the output stream
-void CommunicationGraph::printGraphToSTGRecursively(GraphNode * v, fstream& os, std::map<GraphNode*, bool>& visitedNodes) {
+void CommunicationGraph::printGraphToSTGRecursively(GraphNode * v,
+                                                    fstream& os,
+                                                    std::map<GraphNode*, bool>& visitedNodes) {
     assert(v != NULL);
-    
+
     if (!v->isToShow(root))
         return;
-    
+
     visitedNodes[v] = true;
-    
+
     // arcs
-    GraphNode::LeavingEdges::ConstIterator edgeIter =
-        v->getLeavingEdgesConstIterator();
+    GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
-        GraphEdge<> *element = edgeIter->getNext();
-        GraphNode *vNext = element->getDstNode();
-	
+        GraphEdge<>* element = edgeIter->getNext();
+        GraphNode* vNext = element->getDstNode();
+
         if (!vNext->isToShow(root))
             continue;
-	
+
         string this_edges_label = element->getLabel().substr(1, element->getLabel().size());
         os << "p" << v->getNumber() << " ";
-        
-        if (element->getLabel().substr(0,1) == "!") {
+
+        if (element->getLabel().substr(0, 1) == "!") {
             os << "out.";
-        } else if (element->getLabel().substr(0,1) == "?") {
+        } else if (element->getLabel().substr(0, 1) == "?") {
             os << "in.";
         }
-        
+
         os << this_edges_label;
         os << " p" << vNext->getNumber() << endl;
 
@@ -695,65 +675,64 @@ bool CommunicationGraph::annotateGraphDistributedly() {
 
     // mark all nodes as unvisited
     std::map<GraphNode*, bool> visitedNodes;
-    
+
     // traverse the nodes recursively
     return annotateGraphDistributedlyRecursively(rootNode, visitedNodes);
 }
 
 
-bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes) {
+bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v,
+                                                               std::map<GraphNode*, bool>& visitedNodes) {
     assert(v != NULL);
     set<string> disabled, enabled;
 
     if (!v->isToShow(root))
-        return false;    
-    
+        return false;
+
     // save for each state the outgoing labels;
     static map<GraphNode*, set<string> > outgoing_labels;
 
     // store outgoing lables
-    GraphNode::LeavingEdges::ConstIterator edgeIter =
-        v->getLeavingEdgesConstIterator();
+    GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
-        GraphEdge<> *element = edgeIter->getNext();
-        if (element->getDstNode() != NULL &&
-            element->getDstNode()->isToShow(root) ) {
+        GraphEdge<>* element = edgeIter->getNext();
+        if (element->getDstNode() != NULL &&element->getDstNode()->isToShow(root) ) {
             outgoing_labels[v].insert(element->getLabel());
         }
     }
-    
+
     // standard procedurce
     visitedNodes[v] = true;
-    
+
     edgeIter = v->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         GraphEdge<> *element = edgeIter->getNext();
         GraphNode *vNext = element->getDstNode();
- 	
+
         if (!vNext->isToShow(root))
             continue;
- 
+
         if ((vNext != v) && !visitedNodes[vNext]) {
             bool done = annotateGraphDistributedlyRecursively(vNext, visitedNodes);
-            
+
             if (done) {
                 delete edgeIter;
                 return done;
             }
 
-            
             ///////////////////////////////////////////
             // 1. organized events that enable others
             ///////////////////////////////////////////
-            enabled = setDifference(setDifference( outgoing_labels[vNext],
-                                                   PN->getPort(PN->getPortForLabel(element->getLabel()))),
-                                    outgoing_labels[v] );
-            
+            enabled
+                    = setDifference(setDifference(outgoing_labels[vNext],
+                                                  PN->getPort(PN->getPortForLabel(element->getLabel()))),
+                                    outgoing_labels[v]);
+
             if (!enabled.empty()) {
-                cerr << "  in state " << v->getNumber() << ": " << element->getLabel() <<
-                    " enables " << enabled.size() <<
-                    " elements: ";
+                cerr << "  in state " << v->getNumber() << ": "
+                     << element->getLabel() << " enables " << enabled.size()
+                     << " elements: ";
 
                 // list what's enabled
                 for (set<string>::const_iterator label = enabled.begin();
@@ -761,7 +740,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, std
                     cerr << *label << " ";
                 }
                 cerr << endl;
-                
+
                 // delete enabled states
                 for (set<string>::const_iterator label = enabled.begin();
                      label != enabled.end(); label++) {
@@ -770,38 +749,36 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, std
                     return true;
                 }
             }
-            
-            
+
             ///////////////////////////////////////////
             // 2. organize events that disable others
             ///////////////////////////////////////////
-            disabled = setDifference(setDifference( outgoing_labels[v],
-                                                    PN->getPort(PN->getPortForLabel(element->getLabel()))),
-                                     outgoing_labels[vNext] );
-                        
+            disabled = setDifference(setDifference(outgoing_labels[v],
+                                                   PN->getPort(PN->getPortForLabel(element->getLabel()))),
+                                     outgoing_labels[vNext]);
+
             if (!disabled.empty()) {
-                cerr << "  in state " << v->getNumber() << ": " << element->getLabel() <<
-                    " disables " << disabled.size() <<
-                    " elements" << endl;
-               
+                cerr << "  in state " << v->getNumber() << ": "
+                     << element->getLabel() << " disables " << disabled.size()
+                     << " elements" << endl;
+
                 /*
-                for (set<string>::const_iterator label = disabled.begin();
-                     label != disabled.end(); label++) {
-                    if ( removeLabeledSuccessor(v, *label) ) {
+                 for (set<string>::const_iterator label = disabled.begin();
+                      label != disabled.end(); label++) {
+                    if (removeLabeledSuccessor(v, *label) ) {
                         return true;
                     } else {
                         continue;
                     }
                 }
-                
+
                 cerr << disabled.size() << endl;
-                */
+                 */
             }
         }
     }
     delete edgeIter;
-    
-    
+
     if (v == root) {
         if (disabled.empty()) {
             cerr << "no nondeterminism left" << endl;
@@ -809,7 +786,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v, std
             cerr << "nondeterminism left" << endl;
         }
     }
-    
+
     return false;
 }
 
@@ -840,44 +817,44 @@ void CommunicationGraph::diagnose() {
     if (root->getColor() == BLUE) {
         cerr << "Please note: the net is controllable." << endl;
     }
-    
+
     std::map<GraphNode*, bool> visitedNodes;
     diagnose_recursively(root, visitedNodes);
     cerr << endl;
 }
 
 
-GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes) {
+GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode *v,
+                                                                      std::map<GraphNode*, bool>& visitedNodes) {
     assert(v != NULL);
-    
+
     // if color is known already, return it
     if (v->getDiagnosisColor() != DIAG_UNSET) {
-        assert( visitedNodes[v] );
+        assert(visitedNodes[v]);
         return v->getDiagnosisColor();
     }
-    
+
     // this is new...
     if (visitedNodes[v]) {
         return DIAG_UNSET;
     }
-    
+
     visitedNodes[v] = true;
-    
 
     bool internal_deadlock_seen = false;
     bool external_deadlock_seen = false;
     bool final_state_seen = false;
-    
+
     // iterate the states to check if there are internal deadlocks or final states
     for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
          state != v->reachGraphStateSet.end(); state++) {
         (*state)->decode(PN);
-        
+
         switch ((*state)->type) {
             case DEADLOCK: {
                 // check if state is internal deadlock
                 bool internal_deadlock = true;
-                
+
                 if (PN->transNrQuasiEnabled > 0) {
                     internal_deadlock = false;
                 } else {
@@ -894,38 +871,35 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
                 } else {
                     external_deadlock_seen = true;
                 }
-                
+
                 break;
             }
-                
+
             case FINALSTATE: {
                 final_state_seen = true;
                 break;
             }
-                
+
             case TRANS: {
                 break;
             }
         }
     }
 
-    
     ///////////////////////////////////////////////
     // CASE 1: NODE HAS INTERNAL DEADLOCK => RED //
     ///////////////////////////////////////////////
     if (internal_deadlock_seen) {
         return v->setDiagnosisColor(DIAG_RED);
     }
-        
-    
+
     //////////////////////////////////////////////////////////
     // CASE 2: NODE HAS FINAL STATE AND NO DEADLOCK => BLUE //
     //////////////////////////////////////////////////////////
     if (final_state_seen && !external_deadlock_seen) {
         return v->setDiagnosisColor(DIAG_BLUE);
     }
-        
-    
+
     // node color cannot be quickly derived, so the children have to be considered
     set<GraphNodeDiagnosisColor_enum> childrenDiagnosisColors;
 
@@ -933,23 +907,26 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     while (edgeIter->hasNext()) {
         GraphEdge<> *element = edgeIter->getNext();
         GraphNode *vNext = element->getDstNode();
-	
+
         if (!vNext->isToShow(root))
             continue;
-        
+
         if (vNext != v) {
-            childrenDiagnosisColors.insert( diagnose_recursively(vNext, visitedNodes) );
+            childrenDiagnosisColors.insert(diagnose_recursively(vNext, visitedNodes));
         }
     }
     delete edgeIter;
-    
+
     // collect information about the child nodes
-    bool red_child = (childrenDiagnosisColors.find(DIAG_RED) != childrenDiagnosisColors.end());
-    bool blue_child = (childrenDiagnosisColors.find(DIAG_BLUE) != childrenDiagnosisColors.end());
-    bool violet_child = (childrenDiagnosisColors.find(DIAG_VIOLET) != childrenDiagnosisColors.end());
-    bool green_child = (childrenDiagnosisColors.find(DIAG_GREEN) != childrenDiagnosisColors.end());
-    
-    
+    bool red_child = (childrenDiagnosisColors.find(DIAG_RED)
+            != childrenDiagnosisColors.end());
+    bool blue_child = (childrenDiagnosisColors.find(DIAG_BLUE)
+            != childrenDiagnosisColors.end());
+    bool violet_child = (childrenDiagnosisColors.find(DIAG_VIOLET)
+            != childrenDiagnosisColors.end());
+    bool green_child = (childrenDiagnosisColors.find(DIAG_GREEN)
+            != childrenDiagnosisColors.end());
+
     /////////////////////////////////////////////////
     // CASE 3: NODE HAS ONLY BLUE CHILDREN => BLUE //
     /////////////////////////////////////////////////
@@ -957,15 +934,13 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
         return v->setDiagnosisColor(DIAG_BLUE);
     }
 
-    
     //////////////////////////////////////////////////////////////
     // CASE 4: NODE HAS A FINAL STATE AND A RED CHILD => VIOLET //
     //////////////////////////////////////////////////////////////
     if (final_state_seen && red_child) {
         return v->setDiagnosisColor(DIAG_VIOLET);
     }
-    
-    
+
     ///////////////////////////////////////////////////////
     // CASE 5: NODE HAS ONLY RED CHILDREN => RED         //
     // CASE 6: RED SUCCESSOR CANNOT BE AVOIDED => VIOLET //
@@ -982,13 +957,14 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
         } else {
             // red child can be avoided
             if (!colored_successors_avoidable(v, DIAG_VIOLET)) {
-                cerr << "node " << v->getNumber() << " is an example for an orange node that cannot avoid violet children" << endl;
+                cerr << "node " << v->getNumber()
+                     << " is an example for an orange node that cannot avoid violet children"
+                     << endl;
             }
-            
+
             return v->setDiagnosisColor(DIAG_ORANGE);
         }
     }
-
     
     /*
     // display a warning
@@ -999,20 +975,21 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
         for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
              state != v->reachGraphStateSet.end(); state++) {
             (*state)->decode(PN);
-            
+
             if ((*state)->type == DEADLOCK) {
                 cerr << "[" << PN->getCurrentMarkingAsString() << "]  ";
             }
         }
         cerr << endl << "  require different treatments  ";
-        GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+        GraphNode::LeavingEdges::ConstIterator
+                edgeIter = v->getLeavingEdgesConstIterator();
         while (edgeIter->hasNext()) {
             GraphEdge<> *element = edgeIter->getNext();
             GraphNode *vNext = element->getDstNode();
-            
+
             if (!vNext->isToShow(root))
                 continue;
-            
+
             if (element->getType() == SENDING) {
                 cerr << element->getLabel() << "  ";
             }
@@ -1029,7 +1006,6 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
 }
 
 
-
 /*!
  * \brief  returns true iff edge e is possible in every state of node v
  *
@@ -1044,22 +1020,23 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
  *         leaving node v.
  */
 bool CommunicationGraph::edge_enforcable(GraphNode *v, GraphEdge<> *e) const {
+
     assert (v != NULL);
     assert (e != NULL);
-    
+
     if (e->getType() == SENDING) {
         return true;
     } else {
-        string edge_label = e->getLabel().substr(1,e->getLabel().length());
+        string edge_label = e->getLabel().substr(1, e->getLabel().length());
         bool edge_enforcable = true;
-        
+
         // iterate the states and look for deadlocks where the considered
         // message is not present: then, the receiving of this message can
         // not be enforced
         for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
              state != v->reachGraphStateSet.end(); state++) {
             (*state)->decode(PN);
-            
+
             if ((*state)->type == DEADLOCK) {
                 for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
                     if (PN->getOutputPlace(i)->name == edge_label) {
@@ -1071,11 +1048,10 @@ bool CommunicationGraph::edge_enforcable(GraphNode *v, GraphEdge<> *e) const {
                 }
             }
         }
-        
+
         return edge_enforcable;
     }
 }
-
 
 
 /*!
@@ -1087,23 +1063,25 @@ bool CommunicationGraph::edge_enforcable(GraphNode *v, GraphEdge<> *e) const {
  *         for each external deadlock, there exists a receiving edge to a
  *         non-colored successor
  */
-bool CommunicationGraph::colored_successors_avoidable(GraphNode *v, GraphNodeDiagnosisColor_enum color) const {
+bool CommunicationGraph::colored_successors_avoidable(GraphNode *v,
+                                                      GraphNodeDiagnosisColor_enum color) const {
     assert (v != NULL);
-        
+
     // collect all edges to non-colored successor nodes
     set<GraphEdge<>*> edges_to_noncolored_successors;
-    GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+    GraphNode::LeavingEdges::ConstIterator
+            edgeIter = v->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         GraphEdge<> *element = edgeIter->getNext();
-        GraphNode *vNext = element->getDstNode();	
-        
+        GraphNode *vNext = element->getDstNode();
+
         if (!vNext->isToShow(root))
             continue;
-        
+
         if (vNext != v && (vNext->getDiagnosisColor() != color)) {
             // if there is a sending edge to a non-red sucessor, take this edge;
             // otherwise: store this edge for future considerations
-            if ( element->getType() == SENDING ) {
+            if (element->getType() == SENDING ) {
                 return true;
             } else {
                 edges_to_noncolored_successors.insert(element);
@@ -1112,12 +1090,10 @@ bool CommunicationGraph::colored_successors_avoidable(GraphNode *v, GraphNodeDia
     }
     delete edgeIter;
 
-    
     // if there are no non-colored successors, the red successors can not be avoided
-    if ( edges_to_noncolored_successors.empty() ) {
+    if (edges_to_noncolored_successors.empty() ) {
         return false;
     }
-    
 
     // last chance: look if each external deadlock "enables" a receiving edge
     // to a non-red successor
@@ -1126,16 +1102,16 @@ bool CommunicationGraph::colored_successors_avoidable(GraphNode *v, GraphNodeDia
         (*state)->decode(PN);
 
         bool found_enabled_state = false;
-        
+
         if ((*state)->type == DEADLOCK) {
             for (set<GraphEdge<>*>::iterator edge = edges_to_noncolored_successors.begin();
                  edge != edges_to_noncolored_successors.end(); edge++) {
-                if ( (*edge)->getType() == SENDING ) {
+                if ((*edge)->getType() == SENDING ) {
                     continue;
                 }
-                
+
                 string edge_label = (*edge)->getLabel().substr(1, (*edge)->getLabel().length());
-                
+
                 for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
                     if (PN->getOutputPlace(i)->name == edge_label) {
                         if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
@@ -1143,16 +1119,16 @@ bool CommunicationGraph::colored_successors_avoidable(GraphNode *v, GraphNodeDia
                             break;
                         }
                     }
-                }                
+                }
             }
-            
+
             // looked at all edges but did not finde an enabling state
             if (!found_enabled_state) {
                 return false;
             }
         }
     }
-    
+
     // looked at all edges but did not abort earlier
     return true;
 }

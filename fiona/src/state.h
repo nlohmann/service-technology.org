@@ -48,70 +48,70 @@ class owfnTransition;
 
 // State objects are nodes in the state graph.
 class State {
-public:
-    State();
-    ~State();
+    public:
+        State();
+        ~State();
 
-    /** number of states */
-    static unsigned int state_count;
+        /** number of states */
+        static unsigned int state_count;
 
-    /** number of transitions to be fired */
-    unsigned int cardFireList;
+        /** number of transitions to be fired */
+        unsigned int cardFireList;
 
-    /** number of transitions to be fired */
-    unsigned int cardStubbornFireList;
+        /** number of transitions to be fired */
+        unsigned int cardStubbornFireList;
 
-    /** Transitions to be fired */
-    owfnTransition ** firelist;
+        /** Transitions to be fired */
+        owfnTransition ** firelist;
 
-    /** Transitions to be fired in the stubborn set */
-    owfnTransition ** stubbornFirelist;
+        /** Transitions to be fired in the stubborn set */
+        owfnTransition ** stubbornFirelist;
 
-    /** Transitions that are quasi enabled */
-    owfnTransition ** quasiFirelist;
+        /** Transitions that are quasi enabled */
+        owfnTransition ** quasiFirelist;
 
-    /** Nr of last already fired element of firelist */
-    unsigned int current;
+        /** Nr of last already fired element of firelist */
+        unsigned int current;
 
-    /** last branch in binary decision tree that represents marking */
-    binDecision * my_entry;
+        /** last branch in binary decision tree that represents marking */
+        binDecision * my_entry;
 
-    /** hashValue of that state (necessary for binDecision) */
-    unsigned int placeHashValue;
+        /** hashValue of that state (necessary for binDecision) */
+        unsigned int placeHashValue;
 
-    /** successor states in graph */
-    State ** succ;
+        /** successor states in graph */
+        State ** succ;
 
-    /** state responsible for first generation */
-    State * parent;
+        /** state responsible for first generation */
+        State * parent;
 
-    /** type of state (Deadlock, Final, Transient) */
-    stateType type;
+        /** type of state (Deadlock, Final, Transient) */
+        stateType type;
 
-    /**
-     * Same as decodeShowOnly(), but initializes all transition of the given 'PN'.
-     */
-    void decode(oWFN* PN);
+        /**
+         * Same as decodeShowOnly(), but initializes all transition of the given 'PN'.
+         */
+        void decode(oWFN* PN);
 
-    /**
-     * Decodes State in bintree and writes the corresponding marking into
-     * the CurrentMarking of the given 'PN'.
-     * @param PN The corresponding open workflow net.
-     */
-    void decodeShowOnly(oWFN* PN);
+        /**
+         * Decodes State in bintree and writes the corresponding marking into
+         * the CurrentMarking of the given 'PN'.
+         * @param PN The corresponding open workflow net.
+         */
+        void decodeShowOnly(oWFN* PN);
 
-    /**
-     * Returns true iff this state has an enabled tau labeled transition.
-     */
-    bool hasLeavingTauTransitionForMatching() const;
+        /**
+         * Returns true iff this state has an enabled tau labeled transition.
+         */
+        bool hasLeavingTauTransitionForMatching() const;
 
 #undef new
-    /**
-     * Provides user defined operator new. Needed to trace all new operations
-     * on this class.
-     */
-    NEW_OPERATOR(State)
+        /**
+         * Provides user defined operator new. Needed to trace all new operations
+         * on this class.
+         */
+        NEW_OPERATOR(State)
 #define new NEW_NEW
-};
+    };
 
 #endif

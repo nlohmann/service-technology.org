@@ -30,43 +30,43 @@
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
- 
+
 #include "mynew.h"
 #include "PetriNetNode.h"
 #include "debug.h"
 
-void Node::addArrivingArc(Arc* arc)
-{
+
+void Node::addArrivingArc(Arc* arc) {
     ArrivingArcs.push_back(arc);
 }
 
-void Node::addLeavingArc(Arc* arc)
-{
+
+void Node::addLeavingArc(Arc* arc) {
     LeavingArcs.push_back(arc);
 }
 
-Arc* Node::getArrivingArc(Arcs_t::size_type i) const
-{
+
+Arc* Node::getArrivingArc(Arcs_t::size_type i) const {
     return ArrivingArcs[i];
 }
 
-Arc* Node::getLeavingArc(Arcs_t::size_type i) const
-{
+
+Arc* Node::getLeavingArc(Arcs_t::size_type i) const {
     return LeavingArcs[i];
 }
 
-Node::Arcs_t::size_type Node::getArrivingArcsCount() const
-{
+
+Node::Arcs_t::size_type Node::getArrivingArcsCount() const {
     return ArrivingArcs.size();
 }
 
-Node::Arcs_t::size_type Node::getLeavingArcsCount() const
-{
+
+Node::Arcs_t::size_type Node::getLeavingArcsCount() const {
     return LeavingArcs.size();
 }
 
-Node::~Node()
-{
+
+Node::~Node() {
     trace(TRACE_5, "Node::~Node() : start\n");
 
     // Transitions and places share pointers to the same arcs because every
@@ -79,27 +79,28 @@ Node::~Node()
     trace(TRACE_5, "Node::~Node() : end\n");
 }
 
-Node::Node(const std::string& n) : name(n)
-{
+
+Node::Node(const std::string& n) :
+    name(n) {
 }
 
-inline ostream& operator << (ostream & str,Node n)
-{
-  str << n.name;
-  return str;
+
+inline ostream& operator <<(ostream & str, Node n) {
+    str << n.name;
+    return str;
 }
 
-Arc::Arc(owfnTransition * t, owfnPlace * p, bool totrans, unsigned int mult)
-{
-  tr = t;
-  pl = p;
-  Source = totrans ? (Node *) p : (Node *) t;
-  Destination = totrans ? (Node *) t : (Node *) p;
-  Multiplicity = mult;
-//	cnt++;
+
+Arc::Arc(owfnTransition * t, owfnPlace * p, bool totrans, unsigned int mult) {
+    tr = t;
+    pl = p;
+    Source = totrans ? (Node *) p : (Node *) t;
+    Destination = totrans ? (Node *) t : (Node *) p;
+    Multiplicity = mult;
+    //	cnt++;
 }
 
-void Arc::operator += (unsigned int incr)
-{
-  Multiplicity += incr;
+
+void Arc::operator += (unsigned int incr) {
+    Multiplicity += incr;
 }

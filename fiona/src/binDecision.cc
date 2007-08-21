@@ -36,27 +36,26 @@
 #include "state.h"
 #include "binDecision.h"
 
- 
-unsigned int bin_p; // (=place); index in CurrentMarking
-int bin_pb; // next bit of place to be processed;
+
+unsigned int bin_p;     // (=place); index in CurrentMarking
+int bin_pb;             // next bit of place to be processed;
 unsigned char bin_byte; // byte to be matched against tree vector; constructed from CurrentMarking
-int bin_t; // index in tree vector
-unsigned char * bin_v; // current tree vector
-int bin_s; // nr of bits pending in byte from previous iteration
-int bin_d; // difference position
-int bin_dir; // did we go "old" or "new" in last decision?
-int bin_b; // bit nr at start of byte
+int bin_t;              // index in tree vector
+unsigned char * bin_v;  // current tree vector
+int bin_s;              // nr of bits pending in byte from previous iteration
+int bin_d;              // difference position
+int bin_dir;            // did we go "old" or "new" in last decision?
+int bin_b;              // bit nr at start of byte
 binDecision* fromdec = NULL;
 binDecision* todec = NULL;
 binDecision* vectordec = NULL;
 
+
 binDecision::binDecision(int b, long int BitVectorSize) :
-    bitnr(b),
-    nextold(NULL),
-    nextnew(NULL) {
+    bitnr(b), nextold(NULL), nextnew(NULL) {
 
     vector = new unsigned char [(BitVectorSize - (bitnr + 2)) / 8 + 2];
-    for (int i = 0; i < (BitVectorSize - (bitnr + 2)) / 8 + 2; ++i) {
+    for (int i = 0; i < (BitVectorSize - (bitnr + 2))/8 +2; ++i) {
         vector[i] = 0;
     }
 }
@@ -70,11 +69,13 @@ binDecision::~binDecision() {
 }
 
 
-void inttobits(unsigned char* bytepos, int bitpos, int nrbits,
-    unsigned int value) {
+void inttobits(unsigned char* bytepos,
+               int bitpos,
+               int nrbits,
+               unsigned int value) {
     // store value as a bit sequence of a char array starting at byte bytepos,
     // bit bitpos and consisting of nrbits bits
-    if(nrbits <= 8 - bitpos) {
+    if (nrbits <= 8 - bitpos) {
         // value fits completely into first byte
         *bytepos |= value << (8 - (bitpos + nrbits));
         return;
@@ -84,14 +85,14 @@ void inttobits(unsigned char* bytepos, int bitpos, int nrbits,
     nrbits -= 8 - bitpos;
     value = value % (1 << nrbits);
     bytepos++;
-    while(nrbits > 8) {
+    while (nrbits > 8) {
         nrbits -= 8;
         *bytepos = value >> nrbits;
         bytepos++;
-        value = value % (1 << nrbits) ;
+        value = value % (1 << nrbits);
     }
 
-    if(nrbits) {
+    if (nrbits) {
         *bytepos = value << 8 - nrbits;
     }
 
@@ -101,7 +102,7 @@ void inttobits(unsigned char* bytepos, int bitpos, int nrbits,
 
 int logzwo(int m) {
     int k = 0;
-    while(m) {
+    while (m) {
         k++;
         m = m >> 1;
     }
@@ -110,7 +111,7 @@ int logzwo(int m) {
 }
 
 
-State* binInsert(oWFN* PN) {    
+State* binInsert(oWFN* PN) {
     trace(TRACE_5, "binInsert(oWFN* PN)\n");
     return binInsert(PN->binHashTable + (PN->getPlaceHashValue()), PN);
 }
@@ -135,9 +136,9 @@ State* binInsert(binDecision** Bucket, oWFN* PN) {
         vby = vbi = 0;
         for (bin_p = 0; bin_p < PN->getPlaceCount(); bin_p++) {
             inttobits((*Bucket)->vector + vby, vbi,
-                PN->getPlace(bin_p)->nrbits, PN->CurrentMarking[bin_p]);
+                      PN->getPlace(bin_p)->nrbits, PN->CurrentMarking[bin_p]);
             vby += (vbi + PN->getPlace(bin_p) -> nrbits) / 8;
-            vbi =  (vbi + PN->getPlace(bin_p) -> nrbits) % 8;
+            vbi = (vbi + PN->getPlace(bin_p) -> nrbits) % 8;
         }
 
         (*Bucket)-> prev = NULL;
@@ -151,7 +152,7 @@ State* binInsert(binDecision** Bucket, oWFN* PN) {
 
     newd = new binDecision(bin_b + bin_d, PN->BitVectorSize);
 
-    if(bin_dir) {
+    if (bin_dir) {
         newd->nextold = fromdec->nextnew;
         fromdec->nextnew = newd;
     } else {
@@ -163,7 +164,7 @@ State* binInsert(binDecision** Bucket, oWFN* PN) {
 
     // fill vector
     // 1. remaining   bin_byte
-    if(bin_d < 7) {
+    if (bin_d < 7) {
         newd->vector[0] = bin_byte << (bin_d + 1);
         vby = 0;
         vbi = 7 - bin_d;
@@ -173,21 +174,20 @@ State* binInsert(binDecision** Bucket, oWFN* PN) {
     }
 
     // 2. remaining bit of current place
-    if(bin_pb) {
+    if (bin_pb) {
         inttobits(newd->vector, vbi, PN->getPlace(bin_p)->nrbits - bin_pb,
-            PN->CurrentMarking[bin_p] %
-                (1 << (PN->getPlace(bin_p)->nrbits - bin_pb)));
-        vby += (vbi + PN->getPlace(bin_p)->nrbits - bin_pb) / 8;
-        vbi =  (vbi + PN->getPlace(bin_p)->nrbits - bin_pb) % 8;
+                  PN->CurrentMarking[bin_p] % (1 << (PN->getPlace(bin_p)->nrbits - bin_pb)));
+        vby += (vbi + PN->getPlace(bin_p)->nrbits- bin_pb) / 8;
+        vbi = (vbi + PN->getPlace(bin_p)->nrbits- bin_pb) % 8;
         bin_p++;
     }
 
     // 3. remaining places
-    for( ; bin_p < PN->getPlaceCount(); bin_p++) {
+    for (; bin_p < PN->getPlaceCount(); bin_p++) {
         inttobits(newd->vector + vby, vbi, PN->getPlace(bin_p)->nrbits,
-            PN->CurrentMarking[bin_p]);
+                  PN->CurrentMarking[bin_p]);
         vby += (vbi + PN->getPlace(bin_p) -> nrbits) / 8;
-        vbi =  (vbi + PN->getPlace(bin_p) -> nrbits) % 8;
+        vbi = (vbi + PN->getPlace(bin_p) -> nrbits) % 8;
     }
 
     newd->state = new State;
@@ -218,9 +218,10 @@ void binDelete(binDecision** Bucket, long int BitVectorSize) {
         unsigned char *v, *o;
         v = (*Bucket)->vector;
 
-        for (oldlist = &((*Bucket)->nextold); (*oldlist)->nextold;
-             oldlist = &((*oldlist)->nextold))
+        for (oldlist = &((*Bucket)->nextold);
+             (*oldlist)->nextold; oldlist = &((*oldlist)->nextold)) {
             ;
+        }
 
         vbyte = (*oldlist)->bitnr / 8;
         upper = (*oldlist)->bitnr % 8;
@@ -245,24 +246,23 @@ void binDelete(binDecision** Bucket, long int BitVectorSize) {
 
             do {
                 /* 1. upper part of o --> lower part of v */
-                v[vbyte] = (v[vbyte] & vuppermask) |
-                    ((o[obyte] & ouppermask) >> upper);
+                v[vbyte] = (v[vbyte] & vuppermask) |((o[obyte] & ouppermask)
+                        >> upper);
                 vbyte++;
                 if (8 * vbyte >= BitVectorSize) {
                     break;
                 }
 
                 /* 2. lower part of o --> upper part of v */
-                v[vbyte] = (v[vbyte]  & vlowermask) |
-                    ((o[obyte++] & olowermask) << lower);
+                v[vbyte] = (v[vbyte] & vlowermask) |((o[obyte++] & olowermask)
+                        << lower);
 
                 if ((*oldlist)->bitnr + 8 * obyte >= BitVectorSize) {
                     break;
                 }
-            } while(1);
+            } while (true);
         } else {
-            for (obyte = 0; (*oldlist)->bitnr + 8 * obyte < BitVectorSize;
-                obyte++) {
+            for (obyte = 0; (*oldlist)->bitnr + 8 * obyte < BitVectorSize; obyte++) {
                 v[vbyte++] = o[obyte];
             }
         }
@@ -306,6 +306,7 @@ State* binSearch(oWFN* PN) {
     return binSearch(PN->binHashTable[PN->getPlaceHashValue()], PN);
 }
 
+
 State* binSearch(binDecision* Bucket, oWFN* PN) {
     // cout << "search for marking "
     //      << PN->getMarkingAsString(PN->CurrentMarking) << endl;
@@ -318,33 +319,29 @@ State* binSearch(binDecision* Bucket, oWFN* PN) {
         return NULL;
     }
 
-    bin_p     = 0;                // current place
-    bin_pb    = 0;                // current bit in current place
-    bin_s     = 0;                //
-    bin_t     = 0;                //
-    bin_b     = 0;                //
-    bin_byte  = 0;                // working byte to compare
-    bin_v     = fromdec->vector;  // vector to compare
-    todec     = fromdec->nextold; // next decision in bintree
-    vectordec = fromdec;          // bindecision of v
+    bin_p = 0;                  // current place
+    bin_pb = 0;                 // current bit in current place
+    bin_s = 0;                  //
+    bin_t = 0;                  //
+    bin_b = 0;                  //
+    bin_byte = 0;               // working byte to compare
+    bin_v = fromdec->vector;    // vector to compare
+    todec = fromdec->nextold;   // next decision in bintree
+    vectordec = fromdec;        // bindecision of v
 
     while (true) {
         // - fill byte starting at bit s
-        while (bin_s < 8 && bin_p < PN->getPlaceCount()) {
+        while (bin_s < 8&& bin_p < PN->getPlaceCount()) {
             if (8 - bin_s < PN->getPlace(bin_p)->nrbits - bin_pb) {
                 inttobits(&bin_byte, bin_s, 8 - bin_s,
-                    (PN->CurrentMarking[bin_p] %
-                        (1 << (PN->getPlace(bin_p)->nrbits - bin_pb))) >>
-                    (PN->getPlace(bin_p)->nrbits + bin_s - (8 + bin_pb)));
+                          (PN->CurrentMarking[bin_p] % (1 << (PN->getPlace(bin_p)->nrbits - bin_pb))) >> (PN->getPlace(bin_p)->nrbits + bin_s - (8 + bin_pb)));
 
                 bin_pb += 8 - bin_s;
                 bin_s = 8;
                 break;
             } else {
-                inttobits(&bin_byte, bin_s,
-                    PN->getPlace(bin_p)->nrbits - bin_pb,
-                    PN->CurrentMarking[bin_p] %
-                        (1 << (PN->getPlace(bin_p)->nrbits - bin_pb)));
+                inttobits(&bin_byte, bin_s, PN->getPlace(bin_p)->nrbits - bin_pb, PN->CurrentMarking[bin_p] %(1
+                        << (PN->getPlace(bin_p)->nrbits - bin_pb)));
 
                 bin_s += PN->getPlace(bin_p)->nrbits - bin_pb;
                 bin_p++;

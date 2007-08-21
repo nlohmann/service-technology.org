@@ -148,7 +148,7 @@ int yyerror(const char* msg, int yylineno, const char* yytext, const char* file)
     trace("  token/text last read was '");
     trace(yytext);
     trace("'\n\n");
-  
+
     // if (filename != "<STDIN>")
     {
         trace("-------------------------------------------------------------------------------\n");
@@ -156,7 +156,8 @@ int yyerror(const char* msg, int yylineno, const char* yytext, const char* file)
         // number of lines to print before and after errorneous line
         int environment = 4;
 
-        unsigned int firstShowedLine = ((yylineno-environment)>0)?(yylineno-environment):1;
+        unsigned int firstShowedLine =
+            ((yylineno-environment)>0) ? (yylineno-environment) : 1;
 
         std::ifstream inputFile(file);
         std::string errorLine;
@@ -184,8 +185,8 @@ int yyerror(const char* msg, int yylineno, const char* yytext, const char* file)
 
 int owfn_yyerror(const char* msg) {
     /* defined by flex */
-    extern int owfn_yylineno;      ///< line number of current token
-    extern char *owfn_yytext;      ///< text of the current token
+    extern int owfn_yylineno; ///< line number of current token
+    extern char *owfn_yytext; ///< text of the current token
 
     return yyerror(msg, owfn_yylineno, owfn_yytext, owfnfileToParse.c_str());
 }
@@ -193,8 +194,8 @@ int owfn_yyerror(const char* msg) {
 
 int og_yyerror(const char* msg) {
     /* defined by flex */
-    extern int og_yylineno;      ///< line number of current token
-    extern char *og_yytext;      ///< text of the current token
+    extern int og_yylineno; ///< line number of current token
+    extern char *og_yytext; ///< text of the current token
 
     return yyerror(msg, og_yylineno, og_yytext, ogfileToParse.c_str());
 }

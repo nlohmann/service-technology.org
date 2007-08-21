@@ -38,19 +38,17 @@
 #include "CommunicationGraph.h"
 #include "BddRepresentation.h"
 
-
 class oWFN;
 
 
 class OG : public CommunicationGraph {
-    
     private:
         /**
          * @param node the node for which the annotation is calculated
          * @brief calculates the annotation (CNF) for the node
          */
         void computeCNF(GraphNode* node) const;
-        
+
         /**
          * Builds the OG of the associated PN recursively starting at
          * currentNode.
@@ -64,19 +62,22 @@ class OG : public CommunicationGraph {
          *      called with root, if calculateRootNode() has been called.
          */
         void buildGraph(GraphNode* currentNode, double progress_plus);
-        
+
         void calculateSuccStatesInput(unsigned int, GraphNode *, GraphNode *);
         void calculateSuccStatesOutput(unsigned int, GraphNode *, GraphNode *);
-        
-        void addGraphNode(GraphNode *, GraphNode *);        // for OG
-        void addGraphEdge(GraphNode*, GraphNode*, oWFN::Places_t::size_type, GraphEdgeType);        // for OG
-            
-public:
+
+        void addGraphNode(GraphNode *, GraphNode *); // for OG
+        void addGraphEdge(GraphNode*,
+                          GraphNode*,
+                          oWFN::Places_t::size_type,
+                          GraphEdgeType); // for OG
+
+    public:
         OG(oWFN *);
         ~OG();
-        
+
         BddRepresentation * bdd;
-        
+
         /**
          * Turns all blue nodes that should be red into red ones and
          * simplifies their annotations by removing unneeded literals.
@@ -85,38 +86,41 @@ public:
          * @note Niels made this public since he needs it for distributed controllability.
          */
         void correctNodeColorsAndShortenAnnotations();
-        
-        
+
         /**
          * Computes the OG of the associated PN.
          * @pre calculateRootNode() has been called.
          */
         void buildGraph();
-        
+
         void convertToBdd();
         void convertToBddFull();
-        
+
         /** Prints graph in OG output format. Should only be called if the graph
-          *  is an OG. */
+         *  is an OG. */
         void printOGtoFile() const;
-        
+
         /** Prints nodes of the OG into an OG file below the NODES section. */
-//        void printNodesToOGFile(GraphNode * v, fstream& os, bool visitedNodes[]) const;
-        void printNodesToOGFile(GraphNode * v, fstream& os, std::map<GraphNode*, bool>& visitedNodes) const;
+        //        void printNodesToOGFile(GraphNode * v, fstream& os, bool visitedNodes[]) const;
+        void printNodesToOGFile(GraphNode * v,
+                                fstream& os,
+                                std::map<GraphNode*, bool>& visitedNodes) const;
 
         /** Generates for the given node its name to be used in operating
-          * guidelines. */
+         * guidelines. */
         std::string NodeNameForOG(const GraphNode* v) const;
-        
+
         /** Prints transitions of the OG to an OG file below the TRANSITIONS
-          * section. */
-        void printTransitionsToOGFile(GraphNode * v, fstream& os, std::map<GraphNode*, bool>& visitedNodes) const;
-        
+         * section. */
+        void
+                printTransitionsToOGFile(GraphNode * v,
+                                         fstream& os,
+                                         std::map<GraphNode*, bool>& visitedNodes) const;
+
         // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
-    NEW_OPERATOR(OG)
+        NEW_OPERATOR(OG)
 #define new NEW_NEW
 };
-
 
 #endif /*OG_H_*/

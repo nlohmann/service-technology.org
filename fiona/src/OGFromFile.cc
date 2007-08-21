@@ -48,11 +48,12 @@
 using namespace std;
 
 
-OGFromFileNode::OGFromFileNode(const std::string& _name, GraphFormula* _annotation,
+OGFromFileNode::OGFromFileNode(const std::string& _name,
+                               GraphFormula* _annotation,
                                GraphNodeColor _color) :
 
     // initialize father
-    GraphNodeCommon<OGFromFileNode>(_name,  _annotation, _color) {
+            GraphNodeCommon<OGFromFileNode>(_name, _annotation, _color) {
 
 }
 
@@ -70,17 +71,16 @@ void OGFromFileNode::removeTransitionsToNode(const OGFromFileNode* nodeToDelete)
 }
 
 
-bool OGFromFileNode::hasTransitionWithLabel(const std::string& transitionLabel)
-    const {
+bool OGFromFileNode::hasTransitionWithLabel(const std::string& transitionLabel) const {
 
-	return getTransitionWithLabel(transitionLabel) != NULL;
+    return getTransitionWithLabel(transitionLabel) != NULL;
 }
 
 
-bool OGFromFileNode::hasBlueTransitionWithLabel(
-    const std::string& transitionLabel) const {
+bool OGFromFileNode::hasBlueTransitionWithLabel(const std::string& transitionLabel) const {
 
-    GraphEdge<OGFromFileNode>* transition = getTransitionWithLabel(transitionLabel);
+    GraphEdge<OGFromFileNode>
+            * transition = getTransitionWithLabel(transitionLabel);
     if (transition == NULL)
         return false;
 
@@ -88,8 +88,7 @@ bool OGFromFileNode::hasBlueTransitionWithLabel(
 }
 
 
-GraphEdge<OGFromFileNode>* OGFromFileNode::getTransitionWithLabel(
-    const std::string& transitionLabel) const {
+GraphEdge<OGFromFileNode>* OGFromFileNode::getTransitionWithLabel(const std::string& transitionLabel) const {
 
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
@@ -100,17 +99,18 @@ GraphEdge<OGFromFileNode>* OGFromFileNode::getTransitionWithLabel(
             return edge;
         }
     }
+
     delete edgeIter;
     return NULL;
 }
 
 
-OGFromFileNode* OGFromFileNode::fireTransitionWithLabel(
-    const std::string& transitionLabel) {
+OGFromFileNode* OGFromFileNode::fireTransitionWithLabel(const std::string& transitionLabel) {
 
     assert(transitionLabel != GraphFormulaLiteral::TAU);
 
-    GraphEdge<OGFromFileNode>* transition = getTransitionWithLabel(transitionLabel);
+    GraphEdge<OGFromFileNode>
+            * transition = getTransitionWithLabel(transitionLabel);
     if (transition == NULL) {
         return NULL;
     }
@@ -119,8 +119,7 @@ OGFromFileNode* OGFromFileNode::fireTransitionWithLabel(
 }
 
 
-bool OGFromFileNode::assignmentSatisfiesAnnotation(
-    const GraphFormulaAssignment& assignment) const {
+bool OGFromFileNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const {
 
     assert(annotation != NULL);
     return annotation->satisfies(assignment);
@@ -151,13 +150,14 @@ GraphFormulaAssignment* OGFromFileNode::getAssignment() const {
 }
 
 
-OGFromFile::OGFromFile() : root(NULL) {
+OGFromFile::OGFromFile() :
+    root(NULL) {
 }
 
 
 OGFromFile::~OGFromFile() {
-    for (nodes_iterator node_iter = nodes.begin(); node_iter != nodes.end();
-         ++node_iter) {
+    for (nodes_iterator node_iter = nodes.begin(); node_iter != nodes.end(); ++node_iter) {
+
         delete *node_iter;
     }
 }
@@ -169,7 +169,8 @@ void OGFromFile::addNode(OGFromFileNode* node) {
 
 
 OGFromFileNode* OGFromFile::addNode(const std::string& nodeName,
-    GraphFormula* annotation, GraphNodeColor color) {
+                                    GraphFormula* annotation,
+                                    GraphNodeColor color) {
 
     OGFromFileNode* node = new OGFromFileNode(nodeName, annotation, color);
     addNode(node);
@@ -178,7 +179,8 @@ OGFromFileNode* OGFromFile::addNode(const std::string& nodeName,
 
 
 void OGFromFile::addTransition(const std::string& srcName,
-    const std::string& dstNodeName, const std::string& label) {
+                               const std::string& dstNodeName,
+                               const std::string& label) {
 
     OGFromFileNode* src = getNodeWithName(srcName);
     OGFromFileNode* dstNode = getNodeWithName(dstNodeName);
@@ -196,8 +198,8 @@ bool OGFromFile::hasNodeWithName(const std::string& nodeName) const {
 
 OGFromFileNode* OGFromFile::getNodeWithName(const std::string& nodeName) const {
 
-    for (nodes_const_iterator node_iter = nodes.begin();
-         node_iter != nodes.end(); ++node_iter) {
+    for (nodes_const_iterator node_iter = nodes.begin(); node_iter
+            != nodes.end(); ++node_iter) {
 
         if ((*node_iter)->getName() == nodeName) {
             return *node_iter;
@@ -230,44 +232,43 @@ bool OGFromFile::hasNoRoot() const {
 
 void OGFromFile::removeFalseNodes() {
 
-	trace(TRACE_5, "OGFromFile::removeFalseNodes(): start\n");
+    trace(TRACE_5, "OGFromFile::removeFalseNodes(): start\n");
 
-	bool nodesHaveChanged = true;
+    bool nodesHaveChanged = true;
 
-	while (nodesHaveChanged) {
-		nodesHaveChanged = false;
-		nodes_iterator iNode = nodes.begin();
+    while (nodesHaveChanged) {
+        nodesHaveChanged = false;
+        nodes_iterator iNode = nodes.begin();
 
-		while (iNode != nodes.end()) {
-			GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
-			if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
-				removeTransitionsToNodeFromAllOtherNodes(*iNode);
-				if (*iNode == getRoot()) {
-					setRoot(NULL);
-				}
-				delete *iNode;
-				nodes.erase(iNode++);
-				nodesHaveChanged = true;
-			} else {
-				++iNode;
-			}
+        while (iNode != nodes.end()) {
+            GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
+            if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
+                removeTransitionsToNodeFromAllOtherNodes(*iNode);
+                if (*iNode == getRoot()) {
+                    setRoot(NULL);
+                }
+                delete *iNode;
+                nodes.erase(iNode++);
+                nodesHaveChanged = true;
+            } else {
+                ++iNode;
+            }
 
-			delete iNodeAssignment;
-		}
-	}
+            delete iNodeAssignment;
+        }
+    }
 
-	trace(TRACE_5, "OGFromFile::removeFalseNodes(): end\n");
+    trace(TRACE_5, "OGFromFile::removeFalseNodes(): end\n");
 }
 
 
-void OGFromFile::removeTransitionsToNodeFromAllOtherNodes(
-    const OGFromFileNode* nodeToDelete) {
+void OGFromFile::removeTransitionsToNodeFromAllOtherNodes(const OGFromFileNode* nodeToDelete) {
 
-	for (nodes_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
-		if (*iNode != nodeToDelete) {
-			(*iNode)->removeTransitionsToNode(nodeToDelete);
-		}
-	}
+    for (nodes_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
+        if (*iNode != nodeToDelete) {
+            (*iNode)->removeTransitionsToNode(nodeToDelete);
+        }
+    }
 }
 
 
@@ -275,23 +276,24 @@ void OGFromFile::removeTransitionsToNodeFromAllOtherNodes(
 //! \return true on positive check, otherwise: false
 //! \param smallerOG the simulant that should be simulated
 bool OGFromFile::simulates(OGFromFile *smallerOG) {
-	trace(TRACE_5, "OGFromFile::simulates(OGFromFile *smallerOG): start\n" );
-	//Simulation is impossible without a simulant.
-	if ( smallerOG == NULL )
-		return false;
-	
-	//We need to remember the nodes we already visited.
-	set<OGFromFileNode*> *myVisitedNodes, *simVisitedNodes;
-	myVisitedNodes = new set<OGFromFileNode*>;
-	simVisitedNodes = new set<OGFromFileNode*>;
-	
-	//Get things moving...
-	bool result = false;
-	if (simulatesRecursive(root, myVisitedNodes, smallerOG->getRoot(), simVisitedNodes))
-		result = true;
-	
-	trace(TRACE_5, "OGFromFile::simulates(OGFromFile *smallerOG): end\n" );
-	return result;
+    trace(TRACE_5, "OGFromFile::simulates(OGFromFile *smallerOG): start\n");
+    //Simulation is impossible without a simulant.
+    if (smallerOG == NULL )
+        return false;
+
+    //We need to remember the nodes we already visited.
+    set<OGFromFileNode*> *myVisitedNodes, *simVisitedNodes;
+    myVisitedNodes = new set<OGFromFileNode*>;
+    simVisitedNodes = new set<OGFromFileNode*>;
+
+    //Get things moving...
+    bool result = false;
+    if (simulatesRecursive(root, myVisitedNodes, smallerOG->getRoot(),
+                           simVisitedNodes))
+        result = true;
+
+    trace(TRACE_5, "OGFromFile::simulates(OGFromFile *smallerOG): end\n");
+    return result;
 }
 
 
@@ -302,8 +304,8 @@ bool OGFromFile::simulates(OGFromFile *smallerOG) {
 //! \param myVisitedNodes a set containing the visited nodes in this OGFromFile
 //! \param simNode a node in the simulant
 //! \param simVisitedNodes same as myVisitedNodes in the simulant
-bool OGFromFile::simulatesRecursive(OGFromFileNode *myNode, 
-                                    set<OGFromFileNode*> *myVisitedNodes, 
+bool OGFromFile::simulatesRecursive(OGFromFileNode *myNode,
+                                    set<OGFromFileNode*> *myVisitedNodes,
                                     OGFromFileNode *simNode,
                                     set<OGFromFileNode*> *simVisitedNodes) {
     //If the simulant has no further nodes then myNode simulates simNode.
@@ -336,9 +338,10 @@ bool OGFromFile::simulatesRecursive(OGFromFileNode *myNode,
     GraphFormulaCNF* simNodeAnnotationInCNF = simNode->getAnnotation()->getCNF();
     GraphFormulaCNF* myNodeAnnotationInCNF = myNode->getAnnotation()->getCNF();
     if (simNodeAnnotationInCNF->implies(myNodeAnnotationInCNF)) {
-        trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations ok\n" );
+        trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations ok\n");
     } else {
-        trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations incompatible\n");
+        trace(TRACE_5,
+              "OGFromFile::simulatesRecursive: annotations incompatible\n");
         delete simNodeAnnotationInCNF;
         delete myNodeAnnotationInCNF;
         return false;
@@ -347,26 +350,24 @@ bool OGFromFile::simulatesRecursive(OGFromFileNode *myNode,
     delete myNodeAnnotationInCNF;
 
     //Now, we have to check whether the two graphs are compatible.
-    trace( TRACE_5, "Iterating over the transitions of the smallerOG's node.\n");
-    OGFromFileNode::LeavingEdges::ConstIterator simEdgeIter =
-        simNode->getLeavingEdgesConstIterator();
+    trace(TRACE_5, "Iterating over the transitions of the smallerOG's node.\n");
+    OGFromFileNode::LeavingEdges::ConstIterator
+            simEdgeIter =simNode->getLeavingEdgesConstIterator();
 
     while (simEdgeIter->hasNext()) {
         GraphEdge<OGFromFileNode>* simEdge = simEdgeIter->getNext();
         trace(TRACE_5, "Trying to find the transition in the simulator.\n");
 
-        GraphEdge<OGFromFileNode>* myEdge =
-            myNode->getTransitionWithLabel(simEdge->getLabel());
+        GraphEdge<OGFromFileNode>
+                * myEdge =myNode->getTransitionWithLabel(simEdge->getLabel());
 
         if (myEdge == NULL) {
             delete simEdgeIter;
             return false;
         } else {
             trace(TRACE_5, "These two nodes seem compatible.\n");
-            if (!simulatesRecursive (myEdge->getDstNode(),
-                                     myVisitedNodes,
-                                     simEdge->getDstNode(),
-                                     simVisitedNodes)) {
+            if (!simulatesRecursive (myEdge->getDstNode(), myVisitedNodes,
+                                     simEdge->getDstNode(), simVisitedNodes)) {
                 delete simEdgeIter;
                 return false;
             }
@@ -382,10 +383,10 @@ bool OGFromFile::simulatesRecursive(OGFromFileNode *myNode,
 //! \brief checks, whether this OGFromFile is acyclic
 //! \return true on positive check, otherwise: false
 bool OGFromFile::isAcyclic() {
-    trace(TRACE_5, "Test if the given OG is acyclic: start\n" );
+    trace(TRACE_5, "Test if the given OG is acyclic: start\n");
 
     // Define a set vor every Node, that will contain all transitive parent nodes
-    map<OGFromFileNode*, set<OGFromFileNode*> > parentNodes; 
+    map<OGFromFileNode*, set<OGFromFileNode*> > parentNodes;
 
     // Define a queue for all nodes that still need to be tested and initialize it
     queue<OGFromFileNode*> testNodes;
@@ -393,7 +394,7 @@ bool OGFromFile::isAcyclic() {
     OGFromFileNode* testNode;
 
     // While there are still nodes in the queue
-    while(!testNodes.empty()) {
+    while (!testNodes.empty()) {
 
         testNode = testNodes.front();
         testNodes.pop();
@@ -402,8 +403,8 @@ bool OGFromFile::isAcyclic() {
         parentNodes[testNode].insert(testNode);
 
         // Iterate all transitions of that node
-        OGFromFileNode::LeavingEdges::ConstIterator edgeIter =
-            testNode->getLeavingEdgesConstIterator();
+        OGFromFileNode::LeavingEdges::ConstIterator
+                edgeIter =testNode->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
             GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
@@ -412,12 +413,14 @@ bool OGFromFile::isAcyclic() {
 
                 // Return false if an outgoing transition points at a transitive parent node,
                 // else add the destination to the queue and update its transitive parent nodes
-                if ( parentNodes[testNode].find(edge->getDstNode()) != parentNodes[testNode].end()) {
+                if (parentNodes[testNode].find(edge->getDstNode())
+                        != parentNodes[testNode].end()) {
                     delete edgeIter;
                     return false;
                 } else {
                     testNodes.push(edge->getDstNode());
-                    parentNodes[edge->getDstNode()].insert(parentNodes[testNode].begin(),parentNodes[testNode].end());
+                    parentNodes[edge->getDstNode()].insert(parentNodes[testNode].begin(),
+                                      parentNodes[testNode].end());
                 }
             }
         }
@@ -432,11 +435,12 @@ bool OGFromFile::isAcyclic() {
 unsigned int OGFromFile::numberOfServices() {
 
     // define variables that will be used in the recursive function
-    map<OGFromFileNode*, list < set<OGFromFileNode*> > > validFollowerCombinations;
+    map<OGFromFileNode*, list < set<OGFromFileNode*> > >
+            validFollowerCombinations;
     set<OGFromFileNode*> activeNodes;
     map<OGFromFileNode*, unsigned int> followers;
     map<set<OGFromFileNode*>, unsigned int> eliminateRedundantCounting;
-    
+
     // define variables that will be used in the preprocessing before starting the recursion
     set<string> labels;
     list<GraphFormulaAssignment> assignmentList;
@@ -444,22 +448,18 @@ unsigned int OGFromFile::numberOfServices() {
     map<string, GraphEdge<OGFromFileNode>*> edges;
 
     // Preprocess all nodes of the OG in order to fill the variables needed in the recursion
-    for (nodes_t::const_iterator iNode = nodes.begin(); 
-         iNode != nodes.end(); 
-         ++iNode) {
-    
+    for (nodes_t::const_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
+
         // reset the temporary variables for every node
         labels.clear();
         assignmentList.clear();
         edges.clear();
         possibleAssignment = GraphFormulaAssignment();
-        
-        
+
         // get the labels of all outgoing edges, that reach a blue destination
         // save those labels in a set and fill a mapping that allows finding the
         // outgoing edges for a label. (does not work with non-determinism yet)
-        OGFromFileNode::LeavingEdges::ConstIterator edgeIter =
-            (*iNode)->getLeavingEdgesConstIterator();
+        OGFromFileNode::LeavingEdges::ConstIterator edgeIter =(*iNode)->getLeavingEdgesConstIterator();
         while (edgeIter->hasNext()) {
             GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
             if (edge->getDstNode()->getColor() == BLUE) {
@@ -467,32 +467,33 @@ unsigned int OGFromFile::numberOfServices() {
                 edges[edge->getLabel()] = edge;
             }
         }
-        
+
         // get rid of the iterator
         delete edgeIter;
 
-
         // return the number of true assignments for this node's formula and simultaniously 
         // fill the given list with those true assignments
-        followers[(*iNode)] = processAssignmentsRecursively(labels, possibleAssignment, (*iNode), assignmentList);
+        followers[(*iNode)] = processAssignmentsRecursively(labels,
+                                                         possibleAssignment,
+                                                         (*iNode),
+                                                         assignmentList);
 
         // create a temporary variable for a set of nodes
         set<OGFromFileNode*> followerNodes;
-        
+
         // for every true assignment in the list a set of nodes will be created. These are the nodes which are
         // reached by outgoing edges of which the labels were true in the assignment. This set is then saved in
         // a map for the currently proceeded node.
-        for (list<GraphFormulaAssignment>::iterator assignment = assignmentList.begin();
-             assignment != assignmentList.end(); 
-             assignment++) {
+        for (list<GraphFormulaAssignment>::iterator
+                assignment = assignmentList.begin(); assignment
+                != assignmentList.end(); assignment++) {
 
             followerNodes = set<OGFromFileNode*>();
-            for (set<string>::iterator label = labels.begin(); 
-                 label != labels.end(); 
-                 label++) {
-                 
-                if (assignment->get((*label))) {    
-                    followerNodes.insert(edges[(*label)]->getDstNode());    
+            for (set<string>::iterator label = labels.begin(); label
+                    != labels.end(); label++) {
+
+                if (assignment->get((*label))) {
+                    followerNodes.insert(edges[(*label)]->getDstNode());
                 }
             }
             validFollowerCombinations[(*iNode)].push_back(followerNodes);
@@ -501,24 +502,25 @@ unsigned int OGFromFile::numberOfServices() {
 
     // initialize the first instance for the recursive function
     activeNodes.insert(root);
-    
+
     // process Instances recursively
-    return numberOfServicesRecursively(activeNodes, followers, validFollowerCombinations, eliminateRedundantCounting);
+    return numberOfServicesRecursively(activeNodes, followers,
+                                       validFollowerCombinations,
+                                       eliminateRedundantCounting);
 }
 
 
 //! \brief computes the number of possible services for a finished instance or proceed the active nodes
 //! \return number of Services
-unsigned int OGFromFile::numberOfServicesRecursively(set<OGFromFileNode*> activeNodes, map<OGFromFileNode*, unsigned int>& followers,
-                                                         map<OGFromFileNode*,list<set<OGFromFileNode*> > >& validFollowerCombinations,
-                                                         map<set<OGFromFileNode*>, unsigned int>& eliminateRedundantCounting)
-{
+unsigned int OGFromFile::numberOfServicesRecursively(set<OGFromFileNode*> activeNodes,
+                                                     map<OGFromFileNode*, unsigned int>& followers,
+                                                     map<OGFromFileNode*,list<set<OGFromFileNode*> > >& validFollowerCombinations,
+                                                     map<set<OGFromFileNode*>, unsigned int>& eliminateRedundantCounting) {
 
     // if an Instance with the same active Nodes has already been computed, use the saved value
-    if (eliminateRedundantCounting[activeNodes] != 0)
-    {
+    if (eliminateRedundantCounting[activeNodes] != 0) {
         return eliminateRedundantCounting[activeNodes];
-    } 
+    }
 
     // define needed variables
     unsigned int number = 0;
@@ -530,13 +532,12 @@ unsigned int OGFromFile::numberOfServicesRecursively(set<OGFromFileNode*> active
     bool finalInstance = true;
 
     // process all active nodes of this instance
-    for (set<OGFromFileNode*>::iterator activeNode = activeNodes.begin(); 
-         activeNode != activeNodes.end(); 
-         activeNode++) {
+    for (set<OGFromFileNode*>::iterator activeNode = activeNodes.begin(); activeNode
+            != activeNodes.end(); activeNode++) {
 
         // if the active node has no valid outgoing edges, do nothing. If that happens
         // with all active nodes, the finalInstance variable will stay true
-        if ( followers[(*activeNode)] != 0) {
+        if (followers[(*activeNode)] != 0) {
 
             finalInstance = false;
 
@@ -545,16 +546,16 @@ unsigned int OGFromFile::numberOfServicesRecursively(set<OGFromFileNode*> active
             if (first) {
 
                 first = false;
-                for (list<set<OGFromFileNode*> >::iterator combination = validFollowerCombinations[(*activeNode)].begin();
-                     combination != validFollowerCombinations[(*activeNode)].end(); 
-                     combination++) {
- 
+                for (list<set<OGFromFileNode*> >::iterator
+                        combination = validFollowerCombinations[(*activeNode)].begin(); combination
+                        != validFollowerCombinations[(*activeNode)].end(); combination++) {
+
                     newList.push_back((*combination));
                 }
                 usingNew = false;
                 continue;
             }
-            
+
             // the next two blocks work similarly. Either one takes the current list of followerSets 
             // as it was left by the last node, produces a new set for every combination of its own following
             // sets and the already existing ones and saves it in the other list. This is executed for every node
@@ -562,97 +563,87 @@ unsigned int OGFromFile::numberOfServicesRecursively(set<OGFromFileNode*> active
             if (usingNew) {
 
                 newList.clear();
-                for (list<set<OGFromFileNode*> >::iterator oldListSet = oldList.begin();
-                     oldListSet != oldList.end(); 
-                     oldListSet++) {
+                for (list<set<OGFromFileNode*> >::iterator
+                        oldListSet = oldList.begin(); oldListSet
+                        != oldList.end(); oldListSet++) {
 
-                    for (list<set<OGFromFileNode*> >::iterator combination = validFollowerCombinations[(*activeNode)].begin();
-                         combination != validFollowerCombinations[(*activeNode)].end(); 
-                         combination++) {
+                    for (list<set<OGFromFileNode*> >::iterator
+                            combination = validFollowerCombinations[(*activeNode)].begin(); combination
+                            != validFollowerCombinations[(*activeNode)].end(); combination++) {
 
                         tempSet = set<OGFromFileNode*>();
-                        
-                        for (set<OGFromFileNode*>::iterator insertionNode = (*combination).begin();
-                             insertionNode != (*combination).end(); 
-                             insertionNode++) {
+
+                        for (set<OGFromFileNode*>::iterator insertionNode = (*combination).begin(); insertionNode != (*combination).end(); insertionNode++) {
 
                             tempSet.insert((*insertionNode));
                         }
-                        
-                        for (set<OGFromFileNode*>::iterator insertionNode = (*oldListSet).begin();
-                             insertionNode != (*oldListSet).end(); 
-                             insertionNode++) {
+
+                        for (set<OGFromFileNode*>::iterator insertionNode = (*oldListSet).begin(); insertionNode != (*oldListSet).end(); insertionNode++) {
 
                             tempSet.insert((*insertionNode));
-                        }                        
+                        }
 
                         newList.push_back(tempSet);
-                    }                    
+                    }
                 }
-                usingNew = false;        
+                usingNew = false;
             } else {
 
                 oldList.clear();
-                for (list<set<OGFromFileNode*> >::iterator newListSet = newList.begin();
-                     newListSet != newList.end();
-                     newListSet++) {
+                for (list<set<OGFromFileNode*> >::iterator
+                        newListSet = newList.begin(); newListSet
+                        != newList.end(); newListSet++) {
 
-                    for (list<set<OGFromFileNode*> >::iterator combination = validFollowerCombinations[(*activeNode)].begin();
-                         combination != validFollowerCombinations[(*activeNode)].end(); 
-                         combination++) {
+                    for (list<set<OGFromFileNode*> >::iterator
+                            combination = validFollowerCombinations[(*activeNode)].begin(); combination
+                            != validFollowerCombinations[(*activeNode)].end(); combination++) {
 
                         tempSet = set<OGFromFileNode*>();
-                        
-                        for (set<OGFromFileNode*>::iterator insertionNode = (*combination).begin();
-                             insertionNode != (*combination).end(); 
-                             insertionNode++) {
+
+                        for (set<OGFromFileNode*>::iterator insertionNode = (*combination).begin(); insertionNode != (*combination).end(); insertionNode++) {
 
                             tempSet.insert((*insertionNode));
                         }
 
-                        for (set<OGFromFileNode*>::iterator insertionNode = (*newListSet).begin();
-                             insertionNode != (*newListSet).end(); 
-                             insertionNode++) {
+                        for (set<OGFromFileNode*>::iterator insertionNode = (*newListSet).begin(); insertionNode != (*newListSet).end(); insertionNode++) {
 
                             tempSet.insert((*insertionNode));
-                        }                        
+                        }
                         oldList.push_back(tempSet);
-                    }                    
+                    }
                 }
-                usingNew = true;                    
+                usingNew = true;
             }
         }
     }
-    
+
     // if none of the active nodes had followers this is a finished service of the OG and thus returns 1
-    if (finalInstance)
-    {
+    if (finalInstance) {
         eliminateRedundantCounting[activeNodes] = 1;
         return 1;
     }
-    
+
     // if there were sets of following nodes, create a new instance of active nodes for every tuple of
     // following sets and add the results to this instance's number of services
-    if(usingNew)
-    {
-        for (list<set<OGFromFileNode*> >::iterator oldListSet = oldList.begin();
-             oldListSet != oldList.end(); oldListSet++)
-        {
-            number += numberOfServicesRecursively((*oldListSet), followers, validFollowerCombinations, eliminateRedundantCounting); 
-        }        
+    if (usingNew) {
+        for (list<set<OGFromFileNode*> >::iterator oldListSet = oldList.begin(); oldListSet
+                != oldList.end(); oldListSet++) {
+            number += numberOfServicesRecursively((*oldListSet), followers,
+                                                  validFollowerCombinations,
+                                                  eliminateRedundantCounting);
+        }
+    } else {
+        for (list<set<OGFromFileNode*> >::iterator newListSet = newList.begin(); newListSet
+                != newList.end(); newListSet++) {
+            number += numberOfServicesRecursively((*newListSet), followers,
+                                                  validFollowerCombinations,
+                                                  eliminateRedundantCounting);
+        }
     }
-    else
-    {
-        for (list<set<OGFromFileNode*> >::iterator newListSet = newList.begin();
-             newListSet != newList.end(); newListSet++)
-        {
-            number += numberOfServicesRecursively((*newListSet), followers, validFollowerCombinations, eliminateRedundantCounting); 
-        }        
-    }
-    
+
     // as soon as the counting for this set of active nodes is finished, save the number to prevent redundancy
     eliminateRedundantCounting[activeNodes] = number;
-    
+
     // return the number of services for this instance
     return number;
 }
@@ -662,14 +653,15 @@ unsigned int OGFromFile::numberOfServicesRecursively(set<OGFromFileNode*> active
 //!        saves them in an assignmentList for every node. The function works by recursively
 //!        computing and checking the powerset of all labels of the node
 //! \return number of true Assignments 
-unsigned int OGFromFile::processAssignmentsRecursively(set<string> labels, GraphFormulaAssignment possibleAssignment, 
-                                                       OGFromFileNode* testNode, list<GraphFormulaAssignment>& assignmentList) 
-{
+unsigned int OGFromFile::processAssignmentsRecursively(set<string> labels,
+                                                       GraphFormulaAssignment possibleAssignment,
+                                                       OGFromFileNode* testNode,
+                                                       list<GraphFormulaAssignment>& assignmentList) {
     // If there is no outgoing transition, return immediatly
-    if(labels.empty()) {
+    if (labels.empty()) {
         return 0;
     }
-    
+
     // define variables
     unsigned int returnValue = 0;
     unsigned int tempValue = 0;
@@ -695,25 +687,27 @@ unsigned int OGFromFile::processAssignmentsRecursively(set<string> labels, Graph
             returnValue += 1;
             assignmentList.push_back(possibleAssignment);
         }
-    // If this is a label inbetween or at the start
+        // If this is a label inbetween or at the start
     } else {
         // set it to False
         possibleAssignment.setToFalse(label);
         // count the number of all true assignments which are true following this label being set to false
-        tempValue = processAssignmentsRecursively(labels, possibleAssignment, testNode, assignmentList);    
+        tempValue = processAssignmentsRecursively(labels, possibleAssignment,
+                                                  testNode, assignmentList);
         // increase the number of true assignments accordingly
         returnValue += tempValue;
 
         // set it to True
         possibleAssignment.setToTrue(label);
         // count the number of all true assignments which are true following this label being set to true
-        tempValue = processAssignmentsRecursively(labels, possibleAssignment, testNode, assignmentList);    
+        tempValue = processAssignmentsRecursively(labels, possibleAssignment,
+                                                  testNode, assignmentList);
         // increase the number of true assignments accordingly
-        returnValue += tempValue;        
+        returnValue += tempValue;
     }
-    
+
     // reinsert the label aftwewards
-    labels.insert(labels.begin(),label);
+    labels.insert(labels.begin(), label);
 
     // return the number of true assignments
     return returnValue;
@@ -737,14 +731,14 @@ OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
     OGFromFileNode* currentRhsNode = rhs->getRoot();
 
     std::string currentName;
-    currentName = currentOGNode->getName() + "x" + currentRhsNode->getName();
+    currentName = currentOGNode->getName() + "x"+ currentRhsNode->getName();
 
     GraphFormulaCNF* currentFormula = createProductAnnotation(currentOGNode,
-        currentRhsNode);
+                                                              currentRhsNode);
 
     // building the new root node of the product OG
     OGFromFileNode* productNode = new OGFromFileNode(currentName,
-        currentFormula);
+            currentFormula);
     productOG->addNode(productNode);
     productOG->setRoot(productNode);
 
@@ -780,7 +774,7 @@ void OGFromFile::buildProductOG(OGFromFileNode* currentOGNode,
                                 OGFromFileNode* currentRhsNode,
                                 OGFromFile* productOG) {
 
-    trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): start\n");
+    trace(TRACE_5, "OGFromFile::buildProductOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentRhsNode, OGFromFile* productOG): start\n");
 
     // at this time, the node constructed from currentOGNode and
     // currentRhsNode is already inserted
@@ -789,8 +783,8 @@ void OGFromFile::buildProductOG(OGFromFileNode* currentOGNode,
 
     // iterate over all outgoing edges from current node of OG
     std::string currentLabel;
-    OGFromFileNode::LeavingEdges::ConstIterator edgeIter =
-        currentOGNode->getLeavingEdgesConstIterator();
+    OGFromFileNode::LeavingEdges::ConstIterator
+            edgeIter =currentOGNode->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
         GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
@@ -822,15 +816,15 @@ void OGFromFile::buildProductOG(OGFromFileNode* currentOGNode,
 
             if (found != NULL) {
                 // the node was known before, so we just have to add a new edge
-                productOG->addTransition(currentName, newProductName, currentLabel);
+                productOG->addTransition(currentName, newProductName,
+                                         currentLabel);
 
-                trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): end\n");
+                trace(TRACE_5, "OGFromFile::buildProductOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentRhsNode, OGFromFile* productOG): end\n");
             } else {
                 // we computed a new node, so we add a node and an edge
                 // trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
 
-                GraphFormulaCNF* newProductFormula = createProductAnnotation(
-                    newOGNode, newRhsNode);
+                GraphFormulaCNF* newProductFormula = createProductAnnotation(newOGNode, newRhsNode);
 
                 OGFromFileNode* newProductNode = new OGFromFileNode(newProductName, newProductFormula);
 
@@ -844,16 +838,16 @@ void OGFromFile::buildProductOG(OGFromFileNode* currentOGNode,
         }
     }
     delete edgeIter;
-    trace(TRACE_5, "OGFromFile::buildProductOG(const OGFromFileNode* currentOGNode, const OGFromFileNode* currentRhsNode, OGFromFile* productOG): end\n");
+    trace(TRACE_5, "OGFromFile::buildProductOG(OGFromFileNode* currentOGNode, OGFromFileNode* currentRhsNode, OGFromFile* productOG): end\n");
 }
 
 
 GraphFormulaCNF* OGFromFile::createProductAnnotation(const OGFromFileNode* lhs,
-    const OGFromFileNode* rhs) const {
+                                                     const OGFromFileNode* rhs) const {
 
     GraphFormulaMultiaryAnd* conjunction = new GraphFormulaMultiaryAnd(
-        lhs->getAnnotation()->getDeepCopy(),
-        rhs->getAnnotation()->getDeepCopy());
+            lhs->getAnnotation()->getDeepCopy(),
+            rhs->getAnnotation()->getDeepCopy());
 
     GraphFormulaCNF* cnf = conjunction->getCNF();
     delete conjunction;
@@ -888,7 +882,7 @@ std::string OGFromFile::stripOGFileSuffix(const std::string& filename) {
 
 
 void OGFromFile::printDotFile(const std::string& filenamePrefix,
-    const std::string& dotGraphTitle) const {
+                              const std::string& dotGraphTitle) const {
 
     trace(TRACE_0, "creating the dot file of the OG...\n");
 
@@ -909,7 +903,7 @@ void OGFromFile::printDotFile(const std::string& filenamePrefix,
     dotFileHandle.close();
 
     // prepare dot command line for printing
-    string cmd = "dot -Tpng \"" + dotFile + "\" -o \"" + pngFile + "\"";
+    string cmd = "dot -Tpng \"" + dotFile + "\" -o \""+ pngFile + "\"";
 
     // print commandline and execute system command
     trace(TRACE_0, cmd + "\n\n");
@@ -926,7 +920,9 @@ void OGFromFile::printDotFile(const std::string& filenamePrefix) const {
 //! \param os output stream
 //! \param visitedNodes maps nodes to Bools remembering already visited nodes
 //! \brief dfs through the graph printing each node and edge to the output stream
-void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFromFileNode*, bool>& visitedNodes) const {
+void OGFromFile::printGraphToDot(OGFromFileNode* v,
+                                 fstream& os,
+                                 std::map<OGFromFileNode*, bool>& visitedNodes) const {
 
     if (v == NULL) {
         // print the empty OG...
@@ -935,25 +931,28 @@ void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFrom
     }
 
     if (visitedNodes[v] != true) {
-        os << "p" << v->getName() << " [label=\"# " << v->getName() << "\\n";
+        os << "p"<< v->getName() << " [label=\"# "<< v->getName() << "\\n";
         os << v->getAnnotation()->asString();
         os << "\", fontcolor=black, color=blue];\n";
         visitedNodes[v] = true;
 
         std::string currentLabel;
 
-        OGFromFileNode::LeavingEdges::ConstIterator edgeIter =
-            v->getLeavingEdgesConstIterator();
+        OGFromFileNode::LeavingEdges::ConstIterator
+                edgeIter =v->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
             GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
 
             // remember the label of the egde
             currentLabel = edge->getLabel();
-            OGFromFileNode* successor = v->fireTransitionWithLabel(currentLabel);
+            OGFromFileNode
+                    * successor = v->fireTransitionWithLabel(currentLabel);
             assert(successor != NULL);
 
-            os << "p" << v->getName() << "->" << "p" << successor->getName() << " [label=\"" << currentLabel << "\", fontcolor=black, color= blue];\n";
+            os << "p" << v->getName() << "->" << "p" << successor->getName()
+               << " [label=\"" << currentLabel
+               << "\", fontcolor=black, color= blue];\n";
             printGraphToDot(successor, os, visitedNodes);
         }
         delete edgeIter;
@@ -963,39 +962,36 @@ void OGFromFile::printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFrom
 
 //! \brief prints all nodes and transitions of an OG to file .og
 void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
-    fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(),
-        ios_base::out | ios_base::trunc);
+    fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(), ios_base::out | ios_base::trunc);
 
     if (hasNoRoot()) {
         // print file for empty OG
-        ogFile << "NODES" << endl << "  0 : " << GraphFormulaLiteral::FALSE
-               << " : "
-               << GraphNodeColor(RED).toString() << ';' << endl << endl
-               << "INITIALNODE" << endl << "  0;" << endl << endl
-               << "TRANSITIONS" << endl << "  ;" << endl;
+        ogFile << "NODES" << endl
+               << "  0 : " << GraphFormulaLiteral::FALSE << " : "<< GraphNodeColor(RED).toString() << ';' << endl << endl
+               << "INITIALNODE" << endl
+               << "  0;" << endl << endl
+               << "TRANSITIONS" << endl
+               << "  ;" << endl;
 
         ogFile.close();
         return;
     }
 
-    ogFile << "NODES" << endl;
+    ogFile << "NODES"<< endl;
     bool printedFirstNode = false;
-    for (nodes_t::const_iterator iNode = nodes.begin();
-         iNode != nodes.end();
-         ++iNode) {
+    for (nodes_t::const_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
 
         if (printedFirstNode) {
-            ogFile << ',' << endl;
+            ogFile << ','<< endl;
         }
 
         OGFromFileNode* node = *iNode;
-        ogFile << "  " << node->getName() << " : " 
-               << node->getAnnotationAsString() << " : "
-               << node->getColor().toString();
+        ogFile << "  " << node->getName() << " : "
+               << node->getAnnotationAsString() << " : " << node->getColor().toString();
 
         printedFirstNode = true;
     }
-    ogFile << ';' << endl << endl;
+    ogFile << ';'<< endl << endl;
 
     ogFile << "INITIALNODE" << endl;
     assert(getRoot() != NULL);
@@ -1003,12 +999,11 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
 
     ogFile << "TRANSITIONS" << endl;
     bool printedFirstTransition = false;
-    for (nodes_t::const_iterator iNode = nodes.begin();
-         iNode != nodes.end(); ++iNode) {
+    for (nodes_t::const_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
 
         OGFromFileNode* node = *iNode;
-        OGFromFileNode::LeavingEdges::ConstIterator iEdge =
-            node->getLeavingEdgesConstIterator();
+        OGFromFileNode::LeavingEdges::ConstIterator
+                iEdge = node->getLeavingEdgesConstIterator();
 
         while (iEdge->hasNext()) {
             if (printedFirstTransition) {
@@ -1016,15 +1011,13 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
             }
 
             GraphEdge<OGFromFileNode>* edge = iEdge->getNext();
-            ogFile << "  " << node->getName() << " -> "
-                   << edge->getDstNode()->getName() << " : "
-                   << edge->getLabel();
+            ogFile << "  " << node->getName() << " -> " << edge->getDstNode()->getName() << " : " << edge->getLabel();
 
             printedFirstTransition = true;
         }
         delete iEdge;
     }
-    ogFile << ';' << endl;
+    ogFile << ';'<< endl;
 
     ogFile.close();
 }

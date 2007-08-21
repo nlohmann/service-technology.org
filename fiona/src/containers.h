@@ -42,7 +42,7 @@ class State;
 typedef std::set<State*> StateSet;
 
 struct compareVertices {
-  bool operator() (GraphNode const * left, GraphNode const * right);
+    bool operator()(GraphNode const * left, GraphNode const * right);
 };
 
 typedef std::set<GraphNode*, compareVertices> GraphNodeSet;
@@ -50,25 +50,27 @@ typedef std::set<GraphNode*, compareVertices> GraphNodeSet;
 typedef std::multiset<unsigned int> messageMultiSet;
 
 struct compareMessageMultiSets {
-  bool operator() (messageMultiSet const left, messageMultiSet const right) {
-    if (left.size() < right.size()) {
-        return true;
-    }
-    if (left.size() > right.size()) {
-        return false;
-    }
-    for (std::multiset<unsigned int>::iterator s1 = left.begin(); s1 != left.end(); s1++) {
-        for (std::multiset<unsigned int>::iterator s2 = right.begin(); s2 != right.end(); s2++) {
-            if (*s1 < *s2) {
-                return true;
-            }
-            if (*s1 > *s2) {
-                return false;
+    bool operator()(messageMultiSet const left, messageMultiSet const right) {
+        if (left.size() < right.size()) {
+            return true;
+        }
+        if (left.size() > right.size()) {
+            return false;
+        }
+        for (std::multiset<unsigned int>::iterator s1 = left.begin(); s1
+                != left.end(); s1++) {
+            for (std::multiset<unsigned int>::iterator s2 = right.begin(); s2
+                    != right.end(); s2++) {
+                if (*s1 < *s2) {
+                    return true;
+                }
+                if (*s1 > *s2) {
+                    return false;
+                }
             }
         }
+        return false;
     }
-    return false;
-  }
 }; // compareMessageMultiSets
 
 typedef std::set<messageMultiSet, compareMessageMultiSets> setOfMessages;

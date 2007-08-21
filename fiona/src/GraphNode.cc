@@ -54,14 +54,17 @@ GraphNodeColor::GraphNodeColor(GraphNodeColor_enum color) :
 
 std::string GraphNodeColor::toString() const {
     switch (color_) {
-        case BLUE:  return "blue";
-        case RED:   return "red";
-        
+        case BLUE:
+            return "blue";
+        case RED:
+            return "red";
+
         default:
             assert(false);
-            return "undefined color";            
+            return "undefined color";
     }
 }
+
 
 GraphNodeColor::operator GraphNodeColor_enum() const {
     return color_;
@@ -74,23 +77,31 @@ GraphNodeColor::operator GraphNodeColor_enum() const {
 
 GraphNodeDiagnosisColor::GraphNodeDiagnosisColor(GraphNodeDiagnosisColor_enum color) :
     diagnosis_color_(color) {
-    
+
 }
+
 
 std::string GraphNodeDiagnosisColor::toString() const {
     switch (diagnosis_color_) {
-        case DIAG_UNSET:    return "unset";
-        case DIAG_RED:      return "red";
-        case DIAG_BLUE:     return "blue";
-        case DIAG_GREEN:    return "green";
-        case DIAG_ORANGE:   return "darkorange";
-        case DIAG_VIOLET:   return "violetred";
+        case DIAG_UNSET:
+            return "unset";
+        case DIAG_RED:
+            return "red";
+        case DIAG_BLUE:
+            return "blue";
+        case DIAG_GREEN:
+            return "green";
+        case DIAG_ORANGE:
+            return "darkorange";
+        case DIAG_VIOLET:
+            return "violetred";
 
         default:
             assert(false);
             return "undefined color";
     }
 }
+
 
 GraphNodeDiagnosisColor::operator GraphNodeDiagnosisColor_enum() const {
     return diagnosis_color_;
@@ -104,20 +115,19 @@ GraphNodeDiagnosisColor::operator GraphNodeDiagnosisColor_enum() const {
 
 //! \brief constructor
 GraphNode::GraphNode() :
-
-    GraphNodeCommon<>(),                // initialize father
-
+    GraphNodeCommon<>(), // initialize father
     diagnosis_color(DIAG_UNSET),
     hasFinalStateInStateSet(false) {
 
     eventsUsed = new int [PN->getInputPlaceCount() + PN->getOutputPlaceCount()];
 
-    for (unsigned int i = 0; i < PN->getInputPlaceCount() + PN->getOutputPlaceCount(); i++) {
+    for (unsigned int i = 0;
+         i < PN->getInputPlaceCount() + PN->getOutputPlaceCount(); i++) {
         eventsUsed[i] = 0;
     }
 }
 
-
+    
 //! \brief destructor
 GraphNode::~GraphNode() {
     trace(TRACE_5, "GraphNode::~GraphNode() : start\n");
@@ -136,7 +146,7 @@ GraphNode::~GraphNode() {
 bool GraphNode::addState(State * s) {
     assert(s != NULL);
     pair<StateSet::iterator, bool> result = reachGraphStateSet.insert(s);
-    return result.second;       // returns whether the element got inserted (true) or not (false)
+    return result.second; // returns whether the element got inserted (true) or not (false)
 }
 
 
@@ -149,17 +159,17 @@ void GraphNode::addClause(GraphFormulaMultiaryOr* myclause) {
 
 void GraphNode::removeLiteralFromAnnotation(const std::string& literal) {
     trace(TRACE_5, "GraphNode::removeLiteralFromAnnotation(const string& literal) : start\n");
-    
+
     //cout << "remove literal " << literal << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
     annotation->removeLiteral(literal);
-    
+
     trace(TRACE_5, "GraphNode::removeLiteralFromAnnotation(const string& literal) : end\n");
 }
 
 
 void GraphNode::removeUnneededLiteralsFromAnnotation() {
-    GraphNode::LeavingEdges::ConstIterator edgeIter =
-        getLeavingEdgesConstIterator();
+    GraphNode::LeavingEdges::ConstIterator
+            edgeIter =getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
         GraphEdge<>* edge = edgeIter->getNext();
@@ -186,13 +196,12 @@ GraphNodeDiagnosisColor GraphNode::getDiagnosisColor() const {
 
 
 bool GraphNode::isToShow(const GraphNode* rootOfGraph) const {
-    
-    if (parameters[P_SHOW_ALL_NODES] ||
-        (parameters[P_SHOW_NO_RED_NODES] && (getColor() != RED)) ||
-        (!parameters[P_SHOW_NO_RED_NODES] && (getColor() == RED)) ||
-        (getColor() == BLUE) ||
+
+    if (parameters[P_SHOW_ALL_NODES] || (parameters[P_SHOW_NO_RED_NODES] &&
+        (getColor() != RED))|| (!parameters[P_SHOW_NO_RED_NODES] &&
+        (getColor() == RED))|| (getColor() == BLUE) ||
         (this == rootOfGraph)) {
-        
+
         return (parameters[P_SHOW_EMPTY_NODE] || reachGraphStateSet.size() != 0);
     } else {
         return false;
@@ -234,10 +243,12 @@ void GraphNode::analyseNode() {
     delete myassignment;
 
     if (result) {
-        trace(TRACE_3, "\t\t\t node analysed blue, formula " + this->getAnnotation()->asString() + "\n");
+        trace(TRACE_3, "\t\t\t node analysed blue, formula "
+                + this->getAnnotation()->asString() + "\n");
         this->setColor(BLUE);
     } else {
-        trace(TRACE_3, "\t\t\t node analysed red, formula " + this->getAnnotation()->asString() + "\n");
+        trace(TRACE_3, "\t\t\t node analysed red, formula "
+                + this->getAnnotation()->asString() + "\n");
         this->setColor(RED);
     }
 
@@ -248,6 +259,6 @@ void GraphNode::analyseNode() {
 //! \param left left hand GraphNode
 //! \param right right hand GraphNode
 //! \brief implements the operator < by comparing the states of the two vertices
-bool operator < (GraphNode const& left, GraphNode const& right) {
-    return (left.reachGraphStateSet < right.reachGraphStateSet);	
+bool operator <(GraphNode const& left, GraphNode const& right) {
+    return (left.reachGraphStateSet < right.reachGraphStateSet);
 }

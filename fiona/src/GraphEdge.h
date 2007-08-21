@@ -48,84 +48,77 @@ enum GraphEdgeType {SENDING, RECEIVING};
  * @todo TODO: Turn this template class into a normal class with GraphNodeType =
  * GraphNode when GraphNode and OGFromFileNode are merged.
  */
-template<typename GraphNodeType = GraphNode>
-class GraphEdge {
-private:
-    /**
-     * Points to the destination node of this edge.
-     */
-    GraphNodeType* dstNode;
+template<typename GraphNodeType = GraphNode> class GraphEdge {
+    private:
+        /**
+         * Points to the destination node of this edge.
+         */
+        GraphNodeType* dstNode;
 
-    /** Label of the edge. */
-    std::string label;
+        /** Label of the edge. */
+        std::string label;
 
-public:
-    /**
-     * Constructs a GraphEdge.
-     * @param dstNodeP Points to the destination of this edge.
-     * @param labelP label of this edge.
-     */
-    GraphEdge(GraphNodeType* dstNodeP, const std::string& labelP);
+    public:
+        /**
+         * Constructs a GraphEdge.
+         * @param dstNodeP Points to the destination of this edge.
+         * @param labelP label of this edge.
+         */
+        GraphEdge(GraphNodeType* dstNodeP, const std::string& labelP);
 
-    /**
-     * Returns the label of this edge.
-     */
-    std::string getLabel() const;
+        /**
+         * Returns the label of this edge.
+         */
+        std::string getLabel() const;
 
-    /**
-     * Returns the type if this edge. (RECEIVING or SENDING)
-     */
-    GraphEdgeType getType() const;
+        /**
+         * Returns the type if this edge. (RECEIVING or SENDING)
+         */
+        GraphEdgeType getType() const;
 
-    /**
-     * Returns the node this edge points to.
-     */
-    GraphNodeType* getDstNode() const;
+        /**
+         * Returns the node this edge points to.
+         */
+        GraphNodeType* getDstNode() const;
 
 #undef new
-    /**
-     * Provides user defined operator new. Needed to trace all new operations
-     * on this class.
-     */
-    NEW_OPERATOR(GraphEdge)
+        /**
+         * Provides user defined operator new. Needed to trace all new operations
+         * on this class.
+         */
+        NEW_OPERATOR(GraphEdge)
 #define new NEW_NEW
 };
 
 
-template<typename GraphNodeType>
-GraphEdge<GraphNodeType>::GraphEdge(GraphNodeType* dstNodeP,
-    const std::string& labelP) :
-    dstNode(dstNodeP),
-    label(labelP) {
+template<typename GraphNodeType> GraphEdge<GraphNodeType>::GraphEdge(GraphNodeType* dstNodeP,
+                                                                     const std::string& labelP) :
+    dstNode(dstNodeP), label(labelP) {
 }
 
 
-template<typename GraphNodeType>
-GraphNodeType* GraphEdge<GraphNodeType>::getDstNode() const {
+template<typename GraphNodeType> GraphNodeType* GraphEdge<GraphNodeType>::getDstNode() const {
     return dstNode;
 }
 
 
-template<typename GraphNodeType>
-std::string GraphEdge<GraphNodeType>::getLabel() const {
+template<typename GraphNodeType> std::string GraphEdge<GraphNodeType>::getLabel() const {
     return label;
 }
 
 
-template<typename GraphNodeType>
-GraphEdgeType GraphEdge<GraphNodeType>::getType() const {
+template<typename GraphNodeType> GraphEdgeType GraphEdge<GraphNodeType>::getType() const {
     assert(label.size() != 0);
     switch (label[0]) {
-        case '?': return RECEIVING;
-        case '!': return SENDING;
-        default :
+        case '?':
+            return RECEIVING;
+        case '!':
+            return SENDING;
+        default:
             // This should never happen.
             assert(false);
-            throw new std::invalid_argument("Cannot determine type of this "
-                "GraphEdge with label '" + label + "'.");
+            throw new std::invalid_argument("Cannot determine type of this GraphEdge with label '" + label + "'.");
     }
 }
 
-
 #endif //GRAPHEDGE_H
-

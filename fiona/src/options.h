@@ -43,16 +43,15 @@
 #include "getopt.h"
 #include "OGFromFile.h"
 
-typedef enum
-{
+typedef enum {
     O_HELP,
     O_VERSION,
     O_DEBUG,
-    O_GRAPH_TYPE,	//!< OG or IG
+    O_GRAPH_TYPE, //!< OG or IG
     O_MESSAGES_MAX,
     O_EVENT_USE_MAX,
     O_CALC_REDUCED_IG,
-    O_SHOW_NODES,	//!<
+    O_SHOW_NODES, //!<
     O_CALC_ALL_STATES,
     O_BDD,
     O_OTF, //on the fly
@@ -62,32 +61,33 @@ typedef enum
     O_SIMULATES,
     O_EQUALS,
     O_OUTFILEPREFIX,
-    O_NOOUTPUTFILES,  // produce no output files
-    O_SYNTHESIZE_PARTNER_OWFN,    //!< compute an oWFN from the IG/OG
-    O_DISTRIBUTED,                //!< check for distributed controllability
+    O_NOOUTPUTFILES, // produce no output files
+    O_SYNTHESIZE_PARTNER_OWFN, //!< compute an oWFN from the IG/OG
+    O_DISTRIBUTED, //!< check for distributed controllability
     O_COUNT_SERVICES,
     O_CHECK_ACYCLIC,
     O_PNG,
-    O_DIAGNOSIS                   //!< diagnosis information
+    O_DIAGNOSIS //!< diagnosis information
 } possibleOptions;
 
-typedef enum
-{
-    P_IG,                         //!< compute IG  
-    P_OG,                         //!< compute OG
-    P_SHOW_ALL_NODES,             //!< show red and blue nodes
-    P_SHOW_BLUE_NODES_ONLY,       //!< show blue nodes only (empty node not shown though) 
-    P_SHOW_NO_RED_NODES,          //!< show all blue nodes (including empty node)
-    P_SHOW_EMPTY_NODE,            //!< same as above
-    P_SHOW_STATES_PER_NODE,       //!< show all states in a node (aka "knowledge")
-    P_SHOW_DEADLOCKS_PER_NODE     //!< show deadlock states only
+
+typedef enum {
+    P_IG, //!< compute IG  
+    P_OG, //!< compute OG
+    P_SHOW_ALL_NODES, //!< show red and blue nodes
+    P_SHOW_BLUE_NODES_ONLY, //!< show blue nodes only (empty node not shown though) 
+    P_SHOW_NO_RED_NODES, //!< show all blue nodes (including empty node)
+    P_SHOW_EMPTY_NODE, //!< same as above
+    P_SHOW_STATES_PER_NODE, //!< show all states in a node (aka "knowledge")
+    P_SHOW_DEADLOCKS_PER_NODE //!< show deadlock states only
 } possibleParameters;
 
 
 // some file names and pointers (in options.cc)
 // different modes controlled by command line (in options.cc)
 
-extern std::map<possibleOptions,    bool> options;
+
+extern std::map<possibleOptions, bool> options;
 extern std::map<possibleParameters, bool> parameters;
 
 extern OGFromFile::ogfiles_t ogfiles;
@@ -98,23 +98,13 @@ extern unsigned int messages_manual;
 extern int events_manual;
 extern int bdd_reordermethod;
 
-
-
-/// pointer to input stream
-//extern std::istream * input;
-/// pointer to output stream
-//extern std::ostream * output;
-/// pointer to log stream
 extern std::ostream * log_output;
 
 void parse_command_line(int argc, char* argv[]);
 
-enum FileType { FILETYPE_OWFN, FILETYPE_OG, FILETYPE_UNKNOWN };
+enum FileType {FILETYPE_OWFN, FILETYPE_OG, FILETYPE_UNKNOWN};
 extern FileType getFileType(const std::string& fileName);
 
-extern bool contains(
-    const std::string& hostString,
-    const std::string& subString);
+extern bool contains(const std::string& hostString, const std::string& subString);
 
 #endif
-

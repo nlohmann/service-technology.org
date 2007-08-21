@@ -45,14 +45,8 @@
 //! \param _net
 //! \brief constructor
 owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) :
-    Node(name),
-    type(_type),
-    index(0),
-    capacity(0),
-    nrbits(0),
-    max_occurence(1),
-    cardprop(0),
-    proposition(NULL) {
+    Node(name), type(_type), index(0), capacity(0), nrbits(0),
+            max_occurence(1), cardprop(0), proposition(NULL) {
 
     references = initial_marking = hash_factor = 0;
     net = _net;
@@ -78,7 +72,7 @@ std::string owfnPlace::getLabelForCommGraph() const {
     string label;
     switch (type) {
         case INPUT:
-            label  = '!';
+            label = '!';
             break;
         case OUTPUT:
             label = '?';
@@ -96,7 +90,7 @@ std::string owfnPlace::getLabelForMatching() const {
     string label;
     switch (type) {
         case INPUT:
-            label  = '?';
+            label = '?';
             break;
         case OUTPUT:
             label = '!';

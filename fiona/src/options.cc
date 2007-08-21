@@ -61,33 +61,34 @@ int bdd_reordermethod;
 // const int GETOPT_BLA = 256;
 
 /// pointer to log stream
-std::ostream * log_output = &std::cout;   // &std::clog;
+std::ostream * log_output = &std::cout; // &std::clog;
 
 // different modes controlled by command line
-std::map<possibleOptions,    bool> options;
+std::map<possibleOptions, bool> options;
 std::map<possibleParameters, bool> parameters;
 
 
 // long options
 static struct option longopts[] = {
 //  { "bla",           no_argument,       NULL, GETOPT_BLA },
-  { "help",            no_argument,       NULL, 'h' },
-  { "version",         no_argument,       NULL, 'v' },
-  { "debug",           required_argument, NULL, 'd' },
-  { "type",            required_argument, NULL, 't' },
-  { "show",            required_argument, NULL, 's' },
-  { "reduce-nodes",    no_argument,       NULL, 'R' },
-  { "reduceIG",        no_argument,       NULL, 'r' },
-  { "messagemaximum",  required_argument, NULL, 'm' },
-  { "eventsmaximum",   required_argument, NULL, 'e' },
-  { "BDD",             required_argument, NULL, 'b' },
-  { "OnTheFly",        required_argument, NULL, 'B' },
-  { "output",          required_argument, NULL, 'o' },
-  { "no-output",       no_argument,       NULL, 'Q' },
-  { NULL,              0,                 NULL, 0   }
+    { "help",            no_argument,       NULL, 'h' },
+    { "version",         no_argument,       NULL, 'v' },
+    { "debug",           required_argument, NULL, 'd' },
+    { "type",            required_argument, NULL, 't' },
+    { "show",            required_argument, NULL, 's' },
+    { "reduce-nodes",    no_argument,       NULL, 'R' },
+    { "reduceIG",        no_argument,       NULL, 'r' },
+    { "messagemaximum",  required_argument, NULL, 'm' },
+    { "eventsmaximum",   required_argument, NULL, 'e' },
+    { "BDD",             required_argument, NULL, 'b' },
+    { "OnTheFly",        required_argument, NULL, 'B' },
+    { "output",          required_argument, NULL, 'o' },
+    { "no-output",       no_argument,       NULL, 'Q' },
+    { NULL,              0,                 NULL, 0   }
 };
 
-const char * par_string = "hvd:t:s:Rrm:e:b:B:o:Q";
+
+const char* par_string = "hvd:t:s:Rrm:e:b:B:o:Q";
 
 
 // --------------------- functions for command line evaluation ------------------------
@@ -190,12 +191,12 @@ void print_help() {
 
 // Prints some version information
 void print_version() {
-  trace(std::string(PACKAGE_STRING) + " -- ");
-  trace("Functional InteractiON Analysis of open workflow nets\n");
-  trace("\n");
-  trace("Copyright (C) 2005, 2006, 2007 Peter Massuthe and Daniela Weinberg\n");
-  trace("This is free software; see the source for copying conditions. There is NO\n");
-  trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
+    trace(std::string(PACKAGE_STRING) + " -- ");
+    trace("Functional InteractiON Analysis of open workflow nets\n");
+    trace("\n");
+    trace("Copyright (C) 2005, 2006, 2007 Peter Massuthe and Daniela Weinberg\n");
+    trace("This is free software; see the source for copying conditions. There is NO\n");
+    trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 }
 
 
@@ -243,7 +244,7 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_MATCH] = false;
     options[O_PRODUCTOG] = false;
     options[O_SIMULATES] = false;
-	options[O_EQUALS] = false;
+    options[O_EQUALS] = false;
     options[O_OUTFILEPREFIX] = false;
     options[O_NOOUTPUTFILES] = false;
     options[O_COUNT_SERVICES] = false;
@@ -384,7 +385,7 @@ void parse_command_line(int argc, char* argv[]) {
                 options[O_EVENT_USE_MAX] = true;
                 events_manual = atoi(optarg);
                 if (events_manual < 0) {
-                	options[O_EVENT_USE_MAX] = false;
+                    options[O_EVENT_USE_MAX] = false;
                 }
                 break;
             case 's':
@@ -606,4 +607,3 @@ FileType getFileType(const std::string& fileName) {
 bool contains(const std::string& hostString, const std::string& subString) {
     return hostString.find(subString, 0) != std::string::npos;
 }
-

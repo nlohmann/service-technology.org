@@ -40,30 +40,31 @@
 SymbolTab<PlSymbol>* PlaceTable;
 
 
-Symbol::Symbol(const std::string& n) : name(n)
-{
+Symbol::Symbol(const std::string& n) :
+    name(n) {
 }
 
-std::string Symbol::getName() const
-{
+
+std::string Symbol::getName() const {
     return name;
 }
 
-PlSymbol::PlSymbol(owfnPlace* p) : Symbol(p->name), place(p)
-{
+
+PlSymbol::PlSymbol(owfnPlace* p) :
+    Symbol(p->name), place(p) {
 }
 
-owfnPlace* PlSymbol::getPlace() const
-{
+
+owfnPlace* PlSymbol::getPlace() const {
     return place;
 }
 
-TrSymbol::TrSymbol(owfnTransition* t) : Symbol(t->name), transition(t)
-{
+
+TrSymbol::TrSymbol(owfnTransition* t) :
+    Symbol(t->name), transition(t) {
 }
 
-owfnTransition* TrSymbol::getTransition() const
-{
+
+owfnTransition* TrSymbol::getTransition() const {
     return transition;
 }
-

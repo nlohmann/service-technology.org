@@ -44,50 +44,51 @@
 class oWFN;
 class formula;
 
-enum placeType {INPUT, OUTPUT, INTERNAL};	//< type of place
+enum placeType {INPUT, OUTPUT, INTERNAL}; //< type of place
+
 
 class owfnPlace : public Node {
-    private :
-        oWFN * net;		// pointer to underlying petri net (needed for hash value)
-        std::string port;       ///< the port of this place
+    private:
+        oWFN * net; // pointer to underlying petri net (needed for hash value)
+        std::string port; ///< the port of this place
 
     public:
         owfnPlace(char *, placeType, oWFN *);
         ~owfnPlace();
 
-        placeType type;		// type of place (input, output, internal)
+        placeType type; // type of place (input, output, internal)
         std::string getLabelForCommGraph() const;
         std::string getLabelForMatching() const;
-        
+
         unsigned int initial_marking;
         unsigned int hash_factor;
-        void operator += (unsigned int);  // increment marking of place
-        void operator -= (unsigned int);  // decrement marking of place
-        bool operator >= (unsigned int);  // test enabledness with respect to place
-                                          //	  	void set_marking(unsigned int);   // set initial 1marking of place;
-        void set_hash(unsigned int);      // define a factor for hash value calculation
-                                          // hash(m) = sum(p in P) p.hash_factor*CurrentMarking[p]
+        void operator +=(unsigned int); // increment marking of place
+        void operator -=(unsigned int); // decrement marking of place
+        bool operator >=(unsigned int); // test enabledness with respect to place
+        // void set_marking(unsigned int);   // set initial 1marking of place;
+        void set_hash(unsigned int); // define a factor for hash value calculation
+        // hash(m) = sum(p in P) p.hash_factor*CurrentMarking[p]
         unsigned int index; // index in place array, necessary for symmetries
         unsigned int references; // we remove isolated places 
-        unsigned int capacity;   // maximum capacity
-        int nrbits;     // nr of bits required for storing its marking (= log capacity)
-        int startbit;   // first bit representing this place in bit vector
+        unsigned int capacity; // maximum capacity
+        int nrbits; // nr of bits required for storing its marking (= log capacity)
+        int startbit; // first bit representing this place in bit vector
         int max_occurence;
-        //	placeType getType();
+        // placeType getType();
         unsigned int cardprop; // number of propositions in final condition that mention this place
         formula ** proposition; // array of propositions in final condition that mention this place
-                                // used for quick re-evaluation of condition
-    
+        // used for quick re-evaluation of condition
+
         // *** Definitions for stubborn set calculations
 #ifdef STUBBORN
-        std::vector<owfnTransition*> PreTransitions;    // these transitions must be included in
-                                                    // stubborn set if this place is scapegoat
-        void initialize();		 // initialize PreTransitions
-        
+        std::vector<owfnTransition*> PreTransitions; // these transitions must be included in
+        // stubborn set if this place is scapegoat
+        void initialize(); // initialize PreTransitions
+
         /// set the port of the place
         void set_port(std::string port);
 #endif
-    
+
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.
 #undef new

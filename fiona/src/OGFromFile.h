@@ -48,8 +48,8 @@
 
 using namespace std;
 
-template<typename T>
-class GraphEdge;
+template<typename T> class GraphEdge;
+
 
 class GraphFormula;
 class GraphFormulaAssignment;
@@ -57,146 +57,159 @@ class GraphFormulaCNF;
 
 class OGFromFileNode : public GraphNodeCommon<OGFromFileNode> {
 
-public:
-    OGFromFileNode(const std::string& name_, GraphFormula* annotation_,
-        GraphNodeColor color = BLUE);
+    public:
+        OGFromFileNode(const std::string& name_,
+                       GraphFormula* annotation_,
+                       GraphNodeColor color = BLUE);
 
-    bool hasTransitionWithLabel(const std::string& transitionLabel) const;
-    bool hasBlueTransitionWithLabel(const std::string& transitionLabel) const;
+        bool hasTransitionWithLabel(const std::string& transitionLabel) const;
+        bool
+                hasBlueTransitionWithLabel(const std::string& transitionLabel) const;
 
-    GraphEdge<OGFromFileNode>* getTransitionWithLabel(
-        const std::string& transitionLabel) const;
-    OGFromFileNode* fireTransitionWithLabel(const std::string& transitionLabel);
+        GraphEdge<OGFromFileNode>
+                * getTransitionWithLabel(const std::string& transitionLabel) const;
+        OGFromFileNode
+                * fireTransitionWithLabel(const std::string& transitionLabel);
 
-    bool assignmentSatisfiesAnnotation(
-        const GraphFormulaAssignment& assignment) const;
+        bool
+                assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const;
 
-	GraphFormulaAssignment* getAssignment() const;
+        GraphFormulaAssignment* getAssignment() const;
 
-    void removeTransitionsToNode(const OGFromFileNode* nodeToDelete);
+        void removeTransitionsToNode(const OGFromFileNode* nodeToDelete);
 };
 
 class oWFN;
 
 class OGFromFile {
-private:
-    OGFromFileNode* root;
-    typedef std::set<OGFromFileNode*> nodes_t;
-    nodes_t nodes; // needed for proper deletion of OG.
-    typedef nodes_t::const_iterator nodes_const_iterator;
-    typedef nodes_t::iterator nodes_iterator;
+    private:
+        OGFromFileNode* root;
+        typedef std::set<OGFromFileNode*> nodes_t;
+        nodes_t nodes; // needed for proper deletion of OG.
+        typedef nodes_t::const_iterator nodes_const_iterator;
+        typedef nodes_t::iterator nodes_iterator;
 
-    void removeTransitionsToNodeFromAllOtherNodes(
-        const OGFromFileNode* nodeToDelete);
+        void
+                removeTransitionsToNodeFromAllOtherNodes(const OGFromFileNode* nodeToDelete);
 
-    /**
-     * Recursive coordinated dfs through OG and rhs OG.
-     * \param currentOGNode the current node of the OG
-     * \param currentRhsNode the current node of the rhs OG
-     * \param productOG the resulting product OG
-     */
-    void buildProductOG(OGFromFileNode* currentOGNode,
-        OGFromFileNode* currentRhsNode, OGFromFile* productOG);
+        /**
+         * Recursive coordinated dfs through OG and rhs OG.
+         * \param currentOGNode the current node of the OG
+         * \param currentRhsNode the current node of the rhs OG
+         * \param productOG the resulting product OG
+         */
+        void buildProductOG(OGFromFileNode* currentOGNode,
+                            OGFromFileNode* currentRhsNode,
+                            OGFromFile* productOG);
 
-	bool simulatesRecursive ( OGFromFileNode *myNode, 
-							  set<OGFromFileNode*> *myVisitedNodes, 
-							  OGFromFileNode *simNode,
-							  set<OGFromFileNode*> *simVisitedNodes);
-public:
-    OGFromFile();
-    ~OGFromFile();
-    void addNode(OGFromFileNode* node);
-    OGFromFileNode* addNode(const std::string& nodeName,
-        GraphFormula* annotation, GraphNodeColor color = BLUE);
-    void addTransition(const std::string& srcName, const std::string& dstName,
-        const std::string& label);
-    bool hasNodeWithName(const std::string& nodeName) const;
-    OGFromFileNode* getRoot() const;
-    void setRoot(OGFromFileNode* newRoot);
-    void setRootToNodeWithName(const std::string& nodeName);
-    OGFromFileNode* getNodeWithName(const std::string& nodeName) const;
-    bool hasNoRoot() const;
+        bool simulatesRecursive(OGFromFileNode *myNode,
+                                set<OGFromFileNode*> *myVisitedNodes,
+                                OGFromFileNode *simNode,
+                                set<OGFromFileNode*> *simVisitedNodes);
+    public:
+        OGFromFile();
+        ~OGFromFile();
+        void addNode(OGFromFileNode* node);
+        OGFromFileNode* addNode(const std::string& nodeName,
+                                GraphFormula* annotation,
+                                GraphNodeColor color = BLUE);
+        void addTransition(const std::string& srcName,
+                           const std::string& dstName,
+                           const std::string& label);
+        bool hasNodeWithName(const std::string& nodeName) const;
+        OGFromFileNode* getRoot() const;
+        void setRoot(OGFromFileNode* newRoot);
+        void setRootToNodeWithName(const std::string& nodeName);
+        OGFromFileNode* getNodeWithName(const std::string& nodeName) const;
+        bool hasNoRoot() const;
 
-    /**
-     * @todo Remove unreachable nodes after (or during) removal of false
-     * nodes.
-     */
-    void removeFalseNodes();
+        /**
+         * @todo Remove unreachable nodes after (or during) removal of false
+         * nodes.
+         */
+        void removeFalseNodes();
 
-    /**
-     * Type of container passed to OGFromFile::product().
-     */
-    typedef std::list<OGFromFile*> ogs_t;
+        /**
+         * Type of container passed to OGFromFile::product().
+         */
+        typedef std::list<OGFromFile*> ogs_t;
 
-    /**
-     * Type of container passed to OGFromFile::getProductOGFilePrefix().
-     */
-    typedef std::list<std::string> ogfiles_t;
+        /**
+         * Type of container passed to OGFromFile::getProductOGFilePrefix().
+         */
+        typedef std::list<std::string> ogfiles_t;
 
-    /**
-     * Returns the product OG of all given OGs. The caller has to delete the
-     * returned OGFromFile.
-     * \param ogs Given OGs. Must contain at least two OG.
-     */
-    static OGFromFile* product(const ogs_t& ogs);
+        /**
+         * Returns the product OG of all given OGs. The caller has to delete the
+         * returned OGFromFile.
+         * \param ogs Given OGs. Must contain at least two OG.
+         */
+        static OGFromFile* product(const ogs_t& ogs);
 
-    /**
-     * Returns the product OG of this OG and the passed one. The caller has to
-     * delete the returned OGFromFile.
-     */
-    OGFromFile* product(const OGFromFile* rhs);
+        /**
+         * Returns the product OG of this OG and the passed one. The caller has to
+         * delete the returned OGFromFile.
+         */
+        OGFromFile* product(const OGFromFile* rhs);
 
-    /**
-     * Creates and returns the annotation for the product node of the given two
-     * nodes. The caller is responsible for deleting the returned formula.
-     */
-    GraphFormulaCNF* createProductAnnotation(const OGFromFileNode* lhs,
-        const OGFromFileNode* rhs) const;
+        /**
+         * Creates and returns the annotation for the product node of the given two
+         * nodes. The caller is responsible for deleting the returned formula.
+         */
+        GraphFormulaCNF
+                * createProductAnnotation(const OGFromFileNode* lhs,
+                                          const OGFromFileNode* rhs) const;
 
-    /**
-     * Produces from the given OG file names the default prefix of the
-     * product OG output file.
-     */
-    static std::string getProductOGFilePrefix(const ogfiles_t& ogfiles);
+        /**
+         * Produces from the given OG file names the default prefix of the
+         * product OG output file.
+         */
+        static std::string getProductOGFilePrefix(const ogfiles_t& ogfiles);
 
-    /**
-     * Strips the OG file suffix from filename and returns the result.
-     */
-    static std::string stripOGFileSuffix(const std::string& filename);
+        /**
+         * Strips the OG file suffix from filename and returns the result.
+         */
+        static std::string stripOGFileSuffix(const std::string& filename);
 
-    void printGraphToDot(OGFromFileNode* v, fstream& os, std::map<OGFromFileNode*, bool>&) const;
+        void printGraphToDot(OGFromFileNode* v,
+                             fstream& os,
+                             std::map<OGFromFileNode*, bool>&) const;
 
-    void printDotFile(const std::string& filenamePrefix) const;
-    void printDotFile(const std::string& filenamePrefix,
-        const std::string& dotGraphTitle) const;
+        void printDotFile(const std::string& filenamePrefix) const;
+        void printDotFile(const std::string& filenamePrefix,
+                          const std::string& dotGraphTitle) const;
 
-    /**
-     * Prints this OG in OG file format to a file with the given prefix. The
-     * suffix is added automatically by this method.
-     */
-    void printOGFile(const std::string& filenamePrefix) const;
+        /**
+         * Prints this OG in OG file format to a file with the given prefix. The
+         * suffix is added automatically by this method.
+         */
+        void printOGFile(const std::string& filenamePrefix) const;
 
-    /**
-     * Adds the suffix for OG files to the given file name prefix and returns
-     * the result. The suffix includes the . (dot).
-     */
-    static std::string addOGFileSuffix(const std::string& filePrefix);
+        /**
+         * Adds the suffix for OG files to the given file name prefix and returns
+         * the result. The suffix includes the . (dot).
+         */
+        static std::string addOGFileSuffix(const std::string& filePrefix);
 
-    bool simulates ( OGFromFile *smallerOG );
+        bool simulates(OGFromFile *smallerOG);
 
-    /**
-     * computes the number of Services determined by this OG
-     */
-    unsigned int numberOfServices();
-    unsigned int numberOfServicesRecursively(set<OGFromFileNode*> activeNodes, map<OGFromFileNode*, unsigned int>& followers,
-                                             map<OGFromFileNode*, list <set<OGFromFileNode*> > >& validFollowerCombinations,
-                                             map<set<OGFromFileNode*>, unsigned int>& eliminateRedundantCounting);
-    unsigned int processAssignmentsRecursively(set<string> labels, GraphFormulaAssignment possibleAssignment,
-                                               OGFromFileNode* testNode,list<GraphFormulaAssignment>& assignmentList);
+        /**
+         * computes the number of Services determined by this OG
+         */
+        unsigned int numberOfServices();
+        unsigned int
+                numberOfServicesRecursively(set<OGFromFileNode*> activeNodes,
+                                            map<OGFromFileNode*, unsigned int>& followers,
+                                            map<OGFromFileNode*, list <set<OGFromFileNode*> > >& validFollowerCombinations,
+                                            map<set<OGFromFileNode*>, unsigned int>& eliminateRedundantCounting);
+        unsigned int
+                processAssignmentsRecursively(set<string> labels,
+                                              GraphFormulaAssignment possibleAssignment,
+                                              OGFromFileNode* testNode,
+                                              list<GraphFormulaAssignment>& assignmentList);
 
-    //! Tests, if this OG is acyclic
-    bool isAcyclic();
+        //! Tests, if this OG is acyclic
+        bool isAcyclic();
 };
-
 
 #endif

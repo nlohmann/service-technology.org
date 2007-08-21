@@ -1,10 +1,6 @@
 #ifndef SET_HELPERS_H
 #define HELPERS_H
 
-
-
-
-
 /******************************************************************************
  * Headers
  *****************************************************************************/
@@ -14,9 +10,6 @@
 using std::set;
 using std::insert_iterator;
 using std::less;
-
-
-
 
 
 /******************************************************************************
@@ -30,18 +23,13 @@ using std::less;
  * \param b  a set of type T
  * \returns set \f$a \cup b\f$
  */
-template <class T>
-set<T> setUnion(set<T> a, set<T> b)
-{
-  set<T> result;
-  insert_iterator<set<T, less<T> > > res_ins(result, result.begin());
-  set_union(a.begin(), a.end(), b.begin(), b.end(), res_ins);
+template<class T> set<T> setUnion(set<T> a, set<T> b) {
+    set<T> result;
+    insert_iterator<set<T, less<T> > > res_ins(result, result.begin());
+    set_union(a.begin(), a.end(), b.begin(), b.end(), res_ins);
 
-  return result;
+    return result;
 }
-
-
-
 
 
 /*!
@@ -51,18 +39,13 @@ set<T> setUnion(set<T> a, set<T> b)
  * \param b  a set of type T
  * \returns set \f$a \cap b\f$
  */
-template <class T>
-set<T> setIntersection(set<T> a, set<T> b)
-{
-  set<T> result;
-  insert_iterator<set<T, less<T> > > res_ins(result, result.begin());
-  set_intersection(a.begin(), a.end(), b.begin(), b.end(), res_ins);
+template<class T> set<T> setIntersection(set<T> a, set<T> b) {
+    set<T> result;
+    insert_iterator<set<T, less<T> > > res_ins(result, result.begin());
+    set_intersection(a.begin(), a.end(), b.begin(), b.end(), res_ins);
 
-  return result;
+    return result;
 }
-
-
-
 
 
 /*!
@@ -72,18 +55,12 @@ set<T> setIntersection(set<T> a, set<T> b)
  * \param b  a set of type T
  * \returns set \f$a \;\backslash\; b\f$
  */
-template <class T>
-set<T> setDifference(set<T> a, set<T> b)
-{
-  set<T> result;
-  insert_iterator<set<T, less<T> > > res_ins(result, result.begin());
-  set_difference(a.begin(), a.end(), b.begin(), b.end(), res_ins);
+template<class T> set<T> setDifference(set<T> a, set<T> b) {
+    set<T> result;
+    insert_iterator<set<T, less<T> > > res_ins(result, result.begin());
+    set_difference(a.begin(), a.end(), b.begin(), b.end(), res_ins);
 
-  return result;
+    return result;
 }
-
-
-
-
 
 #endif

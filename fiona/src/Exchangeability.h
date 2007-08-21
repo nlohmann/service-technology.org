@@ -34,7 +34,6 @@
 #ifndef EXCHANGEABILITY_H_
 #define EXCHANGEABILITY_H_
 
-
 #include "mynew.h"
 #include <list>
 //#include <vector>
@@ -54,13 +53,14 @@ using namespace std;
 
 class Exchangeability {
     public:
-        Exchangeability(string filename, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
+        Exchangeability(string filename,
+                        Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
         ~Exchangeability();
 
         bool check(Exchangeability* bdd);
-		void print();
-		void printMemoryInUse();
-		void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
+        void print();
+        void printMemoryInUse();
+        void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.
@@ -68,23 +68,23 @@ class Exchangeability {
         NEW_OPERATOR(Exchangeability)
 #define new NEW_NEW
 
-	private:	  
-		static DdManager* mgrMp;
-		static DdManager* mgrAnn;
-		static int nbrBdd; //Number of represented operating guidelines
-		
-		DdNode* bddMp;
-		DdNode* bddAnn;
-		char** names; //varibles names of bddAnn
-		int nbrVarAnn; //size of array names
-		list<char*> labelList;
-		
-		void loadBdd(std::string filename);
-		void loadHeader(FILE* fp, char*** names, int* nVars, int** permids);
-		void loadOptimalOrder(DdManager* mgr, int size, int* permids);
-		DdNode* loadDiagram(FILE* fp, DdManager* mgr);
-		void printDotFile(char* filename, char** varNames, DdNode* bddMp, DdNode* bddAnn);
-		//void checkManager(DdManager* mgr, char* table);
-};
+        private:
+        static DdManager* mgrMp;
+        static DdManager* mgrAnn;
+        static int nbrBdd; //Number of represented operating guidelines
+
+        DdNode* bddMp;
+        DdNode* bddAnn;
+        char** names; //varibles names of bddAnn
+        int nbrVarAnn; //size of array names
+        list<char*> labelList;
+
+        void loadBdd(std::string filename);
+        void loadHeader(FILE* fp, char*** names, int* nVars, int** permids);
+        void loadOptimalOrder(DdManager* mgr, int size, int* permids);
+        DdNode* loadDiagram(FILE* fp, DdManager* mgr);
+        void printDotFile(char* filename, char** varNames, DdNode* bddMp, DdNode* bddAnn);
+        //void checkManager(DdManager* mgr, char* table);
+    };
 
 #endif /*EXCHANGEABILIY_H_*/

@@ -34,67 +34,76 @@
 #include "BddLabel.h"
 #include <string>
 
-BddLabel::BddLabel(const std::string& c, int n, BddLabelTab * table) : name(c)
-{
-	nbr = n;	
-	next = (BddLabel *) 0;
-	table->add(this);
+
+BddLabel::BddLabel(const std::string& c, int n, BddLabelTab * table) :
+    name(c) {
+    nbr = n;
+    next = (BddLabel *) 0;
+    table->add(this);
 }
 
-BddLabel::~BddLabel()
-{}
 
-BddLabelTab::BddLabelTab(unsigned int s){
-	size = s;
-	table = new BddLabel * [s];
-	card = 0;
-	for(unsigned int i = 0; i < s;i++){
-		table[i] = (BddLabel *) 0;
-	}
+BddLabel::~BddLabel() {
 }
 
-BddLabelTab::~BddLabelTab(){
-	BddLabel * temp;
-	for(unsigned int i = 0;i < size;i++){
-		while(table[i]){
-			temp = table[i];
-			//std::cout << table[i]->name << "  ";
-			table[i] = table[i] -> next;
-			delete temp;
-		}	
-	}
-	delete [] table;
+
+BddLabelTab::BddLabelTab(unsigned int s) {
+    size = s;
+    table = new BddLabel * [s];
+    card = 0;
+    for (unsigned int i = 0; i < s; i++) {
+        table[i] = (BddLabel *) 0;
+    }
 }
 
-	
+
+BddLabelTab::~BddLabelTab() {
+    BddLabel* temp;
+    for (unsigned int i = 0; i < size; i++) {
+        while (table[i]) {
+            temp = table[i];
+            //std::cout << table[i]->name << "  ";
+            table[i] = table[i] -> next;
+            delete temp;
+        }
+    }
+    delete [] table;
+}
+
+
 BddLabel * BddLabelTab::lookup(const std::string& name) const {
-  	/* 1. Hashvalue bestimmen */
-  	unsigned int h,i;
-  	BddLabel * lst = (BddLabel *) 0;
-  	h = 0;
-  	for(i = 0; i < name.size(); i++){
-      	h += (int) name[i];
-      	h %= size;
-   	}
-  	/* 2. suchen */
-  	for(lst = table[h]; lst; lst = lst -> next){
-  		if (lst->name == name) {
-	   		break;
-	 	}
+
+    /* 1. Hashvalue bestimmen */
+    unsigned int h, i;
+    BddLabel * lst = (BddLabel *) 0;
+    h = 0;
+    for (i = 0; i < name.size(); i++) {
+        h += (int) name[i];
+        h %= size;
     }
-  	return lst;
+
+    /* 2. suchen */
+    for (lst = table[h]; lst; lst = lst -> next) {
+        if (lst->name == name) {
+            break;
+        }
+    }
+    return lst;
 }
-  
-void BddLabelTab::add(BddLabel * s){
-  	/* 1. Hashvalue bestimmen */
-  	unsigned int h,i;
-  	h = 0;
-  	for(i = 0; i < s->name.size(); i++){
-      	h += (int) s->name[i];
-      	h %= size;
+
+
+void BddLabelTab::add(BddLabel * s) {
+
+    /* 1. Hashvalue bestimmen */
+    unsigned int h, i;
+    h = 0;
+    for (i = 0; i < s->name.size(); i++) {
+        h += (int) s->name[i];
+        h %= size;
     }
-  	/* 2. eintragen */
-  	s->next = table[h];
-  	table[h] = s;
-  	card++;
+
+    /* 2. eintragen */
+    s->next = table[h];
+    table[h] = s;
+    card++;
 }

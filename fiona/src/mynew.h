@@ -85,9 +85,7 @@
     void* operator new[] (size_t size, const std::string &file, int line) \
     NEW_OPERATOR_BODY(CLASSNAME)
 
-
 #else // LOG_NEW
-
 // LOG_NEW is undefined. So leave new defined as new. And let NEW_OPERATOR() be
 // void.
 
@@ -95,7 +93,6 @@
 #define NEW_OPERATOR(CLASSNAME)
 
 #endif // LOG_NEW
-
 #define new NEW_NEW
 
 #endif // MYNEW_H_

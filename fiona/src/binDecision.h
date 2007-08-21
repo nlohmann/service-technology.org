@@ -38,35 +38,37 @@ using namespace std;
 class oWFN;
 class State;
 
+
 /**
  * binDecision records form a binary decision tree
  */
 class binDecision {
-public:
-    int bitnr;
-    binDecision*  nextold;
-    binDecision*  nextnew;
+    public:
+        int bitnr;
+        binDecision* nextold;
+        binDecision* nextnew;
 
-    /** actual bit vector */
-    unsigned char* vector;
+        /** actual bit vector */
+        unsigned char* vector;
 
-    /** backlink to previous decision */
-    binDecision* prev;
+        /** backlink to previous decision */
+        binDecision* prev;
 
-    /** link to state record for this state */
-    State* state;
+        /** link to state record for this state */
+        State* state;
 
-    binDecision(int b, long int bitVectorSize);
-    ~binDecision();
+        binDecision(int b, long int bitVectorSize);
+        ~binDecision();
 
 #undef new
-    /**
-     * Provides user defined operator new. Needed to trace all new operations
-     * on this class.
-     */
-    NEW_OPERATOR(binDecision)
+        /**
+         * Provides user defined operator new. Needed to trace all new operations
+         * on this class.
+         */
+        NEW_OPERATOR(binDecision)
 #define new NEW_NEW
 };
+
 
 void binDelete(binDecision** Bucket, long int BitVectorSize);
 void binDeleteAll(binDecision* d);
@@ -76,8 +78,12 @@ State* binInsert(binDecision** Bucket, oWFN* PN);
 State* binSearch(oWFN* PN);
 State* binSearch(binDecision* Bucket, oWFN* PN);
 
-void inttobits(unsigned char* bytepos, int bitpos, int nrbits,
-    unsigned int value);
+
+void inttobits(unsigned char* bytepos,
+               int bitpos,
+               int nrbits,
+               unsigned int value);
+
 
 int logzwo(int m);
 

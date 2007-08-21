@@ -50,29 +50,31 @@ extern int bin_b; // bit nr at start of byte
 extern binDecision * fromdec, * todec;
 extern binDecision * vectordec;
 
+
 class SearchTrace {
-public:
-	unsigned char bn_byte;	// byte to be matched against tree vector; constructed from MARKINGVECTOR
-	int bn_t;				// index in tree vector
-	unsigned char * bn_v;	// current tree vector
-	int bn_s;				// nr of bits pending in byte from previous iteration
-	int bn_dir;				// did we go "old" or "new" in last decision?
-	int bn_b;				// bit nr at start of byte
-	binDecision * frmdec, * tdec;
-	binDecision * vectrdec;
+    public:
+        unsigned char bn_byte; // byte to be matched against tree vector; constructed from MARKINGVECTOR
+        int bn_t; // index in tree vector
+        unsigned char * bn_v; // current tree vector
+        int bn_s; // nr of bits pending in byte from previous iteration
+        int bn_dir; // did we go "old" or "new" in last decision?
+        int bn_b; // bit nr at start of byte
+        binDecision * frmdec, * tdec;
+        binDecision * vectrdec;
 };
 
+
 inline void trace() {
-	// bin_p = index, bin_pb = 0!
-	Trace[bin_p].bn_byte =  bin_byte; 
-	Trace[bin_p].bn_t = bin_t; 
-	Trace[bin_p].bn_v = bin_v; 
-	Trace[bin_p].bn_s = bin_s; 
-	Trace[bin_p].bn_dir = bin_dir; 
-	Trace[bin_p].bn_b = bin_b; 
-	Trace[bin_p].frmdec = fromdec;
+    // bin_p = index, bin_pb = 0!
+    Trace[bin_p].bn_byte = bin_byte;
+    Trace[bin_p].bn_t = bin_t;
+    Trace[bin_p].bn_v = bin_v;
+    Trace[bin_p].bn_s = bin_s;
+    Trace[bin_p].bn_dir = bin_dir;
+    Trace[bin_p].bn_b = bin_b;
+    Trace[bin_p].frmdec = fromdec;
     Trace[bin_p].vectrdec = vectordec;
-	Trace[bin_p].tdec = todec;
+    Trace[bin_p].tdec = todec;
 }
 
 #endif

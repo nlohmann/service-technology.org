@@ -42,14 +42,14 @@
 class oWFN;
 class owfnPlace;
 
+
 /**
  * A place that is adjecent to a owfnTransition. An owfnTransition can have
  * multiple AdjacentPlaces. Each contains a pointer to its corresponding
  * owfnPlace and stores the multiplicity of the arc between that place and the
  * owning owfnTransition.
  */
-class AdjacentPlace
-{
+class AdjacentPlace {
     private:
         /**
          * Points to corresponding owfnPlace.
@@ -79,8 +79,8 @@ class AdjacentPlace
         unsigned int getMultiplicity() const;
 };
 
-class owfnTransition: public Node
-{
+
+class owfnTransition : public Node {
     private:
         std::string labelForMatching;
 

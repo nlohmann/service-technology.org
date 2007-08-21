@@ -91,6 +91,7 @@ class GraphNodeColor {
         operator GraphNodeColor_enum() const;
 };
 
+
 /*********************************
  * class GraphNodeDiagnosisColor *
  *********************************/
@@ -132,106 +133,97 @@ class GraphNodeDiagnosisColor {
  * corresponding type. The template type is called GraphNodeType. It can be
  * GraphNode (the default) or OGFromFileNode.
  */
-template<typename GraphNodeType = GraphNode>
-class GraphNodeCommon {
-public:
+template<typename GraphNodeType = GraphNode> class GraphNodeCommon {
+    public:
 
-    /**
-     * Type of the container that holds all leaving edges of this GraphNode.
-     */
-    typedef SList<GraphEdge<GraphNodeType>*> LeavingEdges;
+        /// Type of the container that holds all leaving edges of this GraphNode.
+        typedef SList<GraphEdge<GraphNodeType>*> LeavingEdges;
 
-protected:
+    protected:
 
-    //! Number of this GraphNode in the graph.
-    unsigned int number;
+        /// Number of this GraphNode in the graph.
+        unsigned int number;
 
-    //! Name of this GraphNode in the graph.
-    std::string name;
+        /// Name of this GraphNode in the graph.
+        std::string name;
 
-    //! Color of this GraphNode.
-    GraphNodeColor color;
+        /// Color of this GraphNode.
+        GraphNodeColor color;
 
-    //! Annotation of this node (a CNF) as a formula.
-    GraphFormulaCNF* annotation;
+        /// Annotation of this node (a CNF) as a formula.
+        GraphFormulaCNF* annotation;
 
-    //! Contains all leaving edges.
-    LeavingEdges leavingEdges;
+        /// Contains all leaving edges.
+        LeavingEdges leavingEdges;
 
-public:
+    public:
 
-    //! constructor
-    GraphNodeCommon();
+        /// constructor
+        GraphNodeCommon();
 
-    //! constructor
-    //! \param _name
-    //! \param _annotation
-    //! \param _color
-    GraphNodeCommon(const std::string& _name, GraphFormula* _annotation, GraphNodeColor _color);
+        //! constructor
+        //! \param _name
+        //! \param _annotation
+        //! \param _color
+        GraphNodeCommon(const std::string& _name,
+                        GraphFormula* _annotation,
+                        GraphNodeColor _color);
 
-    /// get the node number
-    unsigned int getNumber() const;
+        /// get the node number
+        unsigned int getNumber() const;
 
-    /// set the node number
-    void setNumber(unsigned int);
+        /// set the node number
+        void setNumber(unsigned int);
 
-    /// get the node name
-    std::string getName() const;
+        /// get the node name
+        std::string getName() const;
 
-    /// set the node name
-    void setName(std::string);
+        /// set the node name
+        void setName(std::string);
 
-    /// get the node color
-    GraphNodeColor getColor() const;
+        /// get the node color
+        GraphNodeColor getColor() const;
 
-    /// set the node color
-    void setColor(GraphNodeColor c);
+        /// set the node color
+        void setColor(GraphNodeColor c);
 
-    /// is the node color blue?
-    bool isBlue() const;
+        /// is the node color blue?
+        bool isBlue() const;
 
-    /// is the node color red?
-    bool isRed() const;
+        /// is the node color red?
+        bool isRed() const;
 
-    //! get the annotation
-    GraphFormulaCNF* getAnnotation() const;
+        /// get the annotation
+        GraphFormulaCNF* getAnnotation() const;
 
-    //! get the annotation as a string
-    std::string getAnnotationAsString() const;
+        /// get the annotation as a string
+        std::string getAnnotationAsString() const;
 
-//----------
+        /// Destroys this GraphNodeCommon.
+        ~GraphNodeCommon();
 
-    /**
-     * Destroys this GraphNodeCommon.
-     */
-    ~GraphNodeCommon();
+        /// Adds a leaving edge to this node.
+        void addLeavingEdge(GraphEdge<GraphNodeType>* edge);
 
-    /**
-     * Adds a leaving edge to this node.
-     */
-    void addLeavingEdge(GraphEdge<GraphNodeType>* edge);
+        /**
+         * Returns an iterator that can be used to traverse all leaving edges of
+         * this GraphNode from begin to end. This iterator can also be used to
+         * modify the list of leaving edges, e.g., to remove an edge.
+         * Consult SList<T>::getIterator() for instructions how to use this
+         * iterator.
+         */
+        typename LeavingEdges::Iterator getLeavingEdgesIterator();
 
-    /**
-     * Returns an iterator that can be used to traverse all leaving edges of
-     * this GraphNode from begin to end. This iterator can also be used to
-     * modify the list of leaving edges, e.g., to remove an edge.
-     * Consult SList<T>::getIterator() for instructions how to use this
-     * iterator.
-     */
-    typename LeavingEdges::Iterator getLeavingEdgesIterator();
+        /**
+         * Returns a const iterator that can be used to traverse all leaving edges
+         * of this GraphNode. You can not modify the list of leaving edges with
+         * this const iterator. Consult SList<T>::getConstIterator() for
+         * instructions how to use this iterator.
+         */
+        typename LeavingEdges::ConstIterator getLeavingEdgesConstIterator() const;
 
-    /**
-     * Returns a const iterator that can be used to traverse all leaving edges
-     * of this GraphNode. You can not modify the list of leaving edges with
-     * this const iterator. Consult SList<T>::getConstIterator() for
-     * instructions how to use this iterator.
-     */
-    typename LeavingEdges::ConstIterator getLeavingEdgesConstIterator() const;
-
-    /**
-     * Returns the number of leaving edges.
-     */
-    unsigned int getLeavingEdgesCount() const;
+        /// Returns the number of leaving edges.
+        unsigned int getLeavingEdgesCount() const;
 
 };
 
@@ -241,51 +233,51 @@ public:
  *******************/
 
 class GraphNode : public GraphNodeCommon<> {
-private:
+    private:
 
-    //! Diagnosis color of this GraphNode.
-    GraphNodeDiagnosisColor diagnosis_color;    
+        //! Diagnosis color of this GraphNode.
+        GraphNodeDiagnosisColor diagnosis_color;
 
-public:
+    public:
 
-    bool hasFinalStateInStateSet;
-    int * eventsUsed;
+        bool hasFinalStateInStateSet;
+        int * eventsUsed;
 
-    // this set contains only a reduced number of states in case the state
-    // reduced graph is to be build.
-    StateSet reachGraphStateSet;
+        // this set contains only a reduced number of states in case the state
+        // reduced graph is to be build.
+        StateSet reachGraphStateSet;
 
-    GraphNode();
-    ~GraphNode();
+        GraphNode();
+        ~GraphNode();
 
-    /// adds a state to the states of a GraphNode
-    bool addState(State *);
+        /// adds a state to the states of a GraphNode
+        bool addState(State *);
 
-    void addClause(GraphFormulaMultiaryOr*);
+        void addClause(GraphFormulaMultiaryOr*);
 
-    /// analyses the node and sets its color
-    void analyseNode();
+        /// analyses the node and sets its color
+        void analyseNode();
 
-    /// get the node diagnosis color
-    GraphNodeDiagnosisColor getDiagnosisColor() const;    
+        /// get the node diagnosis color
+        GraphNodeDiagnosisColor getDiagnosisColor() const;
 
-    /// set the diagnosis color
-    GraphNodeDiagnosisColor setDiagnosisColor(GraphNodeDiagnosisColor c);
+        /// set the diagnosis color
+        GraphNodeDiagnosisColor setDiagnosisColor(GraphNodeDiagnosisColor c);
 
-    bool isToShow(const GraphNode* rootOfGraph) const;
+        bool isToShow(const GraphNode* rootOfGraph) const;
 
-    void removeLiteralFromAnnotation(const std::string& literal);
+        void removeLiteralFromAnnotation(const std::string& literal);
 
-    /// Removes unneeded literals from the node's annotation. Labels of edges to
-    /// red nodes are unneeded.
-    void removeUnneededLiteralsFromAnnotation();
+        /// Removes unneeded literals from the node's annotation. Labels of edges to
+        /// red nodes are unneeded.
+        void removeUnneededLiteralsFromAnnotation();
 
-    friend bool operator < (GraphNode const&, GraphNode const& );
+        friend bool operator <(GraphNode const&, GraphNode const&);
 
 #undef new
-    /// Provides user defined operator new. Needed to trace all new operations
-    /// on this class.
-    NEW_OPERATOR(GraphNode)
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphNode)
 #define new NEW_NEW
 };
 
@@ -294,26 +286,19 @@ public:
  * class GraphNodeCommon *
  *************************/
 
-
 //! \brief constructor
-template<typename GraphNodeType>
-GraphNodeCommon<GraphNodeType>::GraphNodeCommon() :
-        number(12345678),
-        name("12345678"),
-        color(BLUE) {
-    
-    annotation = new GraphFormulaCNF();
+template<typename GraphNodeType> GraphNodeCommon<GraphNodeType>::GraphNodeCommon() :
+    number(12345678), name("12345678"), color(BLUE) {
 
+    annotation = new GraphFormulaCNF();
 }
 
 
 //! \brief constructor
-template<typename GraphNodeType>
-GraphNodeCommon<GraphNodeType>::
-    GraphNodeCommon(const std::string& _name, GraphFormula* _annotation, GraphNodeColor _color) :
-        number(12345678),
-        name(_name),
-        color(_color) {
+template<typename GraphNodeType> GraphNodeCommon<GraphNodeType>::GraphNodeCommon(const std::string& _name,
+                                                                                 GraphFormula* _annotation,
+                                                                                 GraphNodeColor _color) :
+    number(12345678), name(_name), color(_color) {
 
     annotation = _annotation->getCNF();
     delete _annotation; // because getCNF() returns a newly create formula
@@ -322,80 +307,69 @@ GraphNodeCommon<GraphNodeType>::
 
 //! returns the number of this node
 //! \return number of this node
-template<typename GraphNodeType>
-unsigned int GraphNodeCommon<GraphNodeType>::getNumber() const {
+template<typename GraphNodeType> unsigned int GraphNodeCommon<GraphNodeType>::getNumber() const {
     return number;
 }
 
 
 //! sets the number of this node
 //! \param newNumber number of this node in the graph
-template<typename GraphNodeType>
-void GraphNodeCommon<GraphNodeType>::setNumber(unsigned int newNumber) {
+template<typename GraphNodeType> void GraphNodeCommon<GraphNodeType>::setNumber(unsigned int newNumber) {
     number = newNumber;
 }
 
 
 //! returns the name of this node
 //! \return name of this node
-template<typename GraphNodeType>
-std::string GraphNodeCommon<GraphNodeType>::getName() const {
+template<typename GraphNodeType> std::string GraphNodeCommon<GraphNodeType>::getName() const {
     return name;
 }
 
 
 //! sets the name of this node
 //! \param newName new name of this node in the graph
-template<typename GraphNodeType>
-void GraphNodeCommon<GraphNodeType>::setName(std::string newName) {
+template<typename GraphNodeType> void GraphNodeCommon<GraphNodeType>::setName(std::string newName) {
     name = newName;
 }
 
 
 //! returns the color of the GraphNode
 //! \return color of this node
-template<typename GraphNodeType>
-GraphNodeColor GraphNodeCommon<GraphNodeType>::getColor() const {
+template<typename GraphNodeType> GraphNodeColor GraphNodeCommon<GraphNodeType>::getColor() const {
     return color;
 }
 
 
 //! sets the color of the GraphNode to the given color
 //! \param c color of GraphNode
-template<typename GraphNodeType>
-void GraphNodeCommon<GraphNodeType>::setColor(GraphNodeColor c) {
+template<typename GraphNodeType> void GraphNodeCommon<GraphNodeType>::setColor(GraphNodeColor c) {
     color = c;
 }
 
 
-template<typename GraphNodeType>
-bool GraphNodeCommon<GraphNodeType>::isBlue() const {
+template<typename GraphNodeType> bool GraphNodeCommon<GraphNodeType>::isBlue() const {
     return getColor() == BLUE;
 }
 
 
-template<typename GraphNodeType>
-bool GraphNodeCommon<GraphNodeType>::isRed() const {
+template<typename GraphNodeType> bool GraphNodeCommon<GraphNodeType>::isRed() const {
     return getColor() == RED;
 }
 
 
 // returns the CNF formula that is the annotation of a node as a Boolean formula
-template<typename GraphNodeType>
-GraphFormulaCNF* GraphNodeCommon<GraphNodeType>::getAnnotation() const {
+template<typename GraphNodeType> GraphFormulaCNF* GraphNodeCommon<GraphNodeType>::getAnnotation() const {
     return annotation;
 }
 
 
-template<typename GraphNodeType>
-std::string GraphNodeCommon<GraphNodeType>::getAnnotationAsString() const {
+template<typename GraphNodeType> std::string GraphNodeCommon<GraphNodeType>::getAnnotationAsString() const {
     assert(annotation != NULL);
     return annotation->asString();
 }
 
 
-template<typename GraphNodeType>
-GraphNodeCommon<GraphNodeType>::~GraphNodeCommon<GraphNodeType>() {
+template<typename GraphNodeType> GraphNodeCommon<GraphNodeType>::~GraphNodeCommon<GraphNodeType>() {
     typename LeavingEdges::ConstIterator iEdge = getLeavingEdgesConstIterator();
     while (iEdge->hasNext()) {
         GraphEdge<GraphNodeType>* edge = iEdge->getNext();
@@ -407,30 +381,25 @@ GraphNodeCommon<GraphNodeType>::~GraphNodeCommon<GraphNodeType>() {
 }
 
 
-template<typename GraphNodeType>
-void GraphNodeCommon<GraphNodeType>::addLeavingEdge(
-    GraphEdge<GraphNodeType>* edge) {
+template<typename GraphNodeType> void GraphNodeCommon<GraphNodeType>::addLeavingEdge(GraphEdge<GraphNodeType>* edge) {
 
     leavingEdges.add(edge);
 }
 
 
-template<typename GraphNodeType>
-typename GraphNodeCommon<GraphNodeType>::LeavingEdges::Iterator
-GraphNodeCommon<GraphNodeType>::getLeavingEdgesIterator() {
+template<typename GraphNodeType> typename GraphNodeCommon<GraphNodeType>::LeavingEdges::Iterator GraphNodeCommon<
+        GraphNodeType>::getLeavingEdgesIterator() {
     return leavingEdges.getIterator();
 }
 
 
-template<typename GraphNodeType>
-typename GraphNodeCommon<GraphNodeType>::LeavingEdges::ConstIterator
-GraphNodeCommon<GraphNodeType>::getLeavingEdgesConstIterator() const {
+template<typename GraphNodeType> typename GraphNodeCommon<GraphNodeType>::LeavingEdges::ConstIterator GraphNodeCommon<
+        GraphNodeType>::getLeavingEdgesConstIterator() const {
     return leavingEdges.getConstIterator();
 }
 
 
-template<typename GraphNodeType>
-unsigned int GraphNodeCommon<GraphNodeType>::getLeavingEdgesCount() const {
+template<typename GraphNodeType> unsigned int GraphNodeCommon<GraphNodeType>::getLeavingEdgesCount() const {
     return leavingEdges.size();
 }
 

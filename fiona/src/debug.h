@@ -44,12 +44,12 @@ extern std::string ogfileToParse;
 extern std::string owfnfileToParse;
 
 typedef enum {
-  TRACE_0,			//!< no messages
-  TRACE_1,			//!< keep track of nodes
-  TRACE_2,       	//!< edges
-  TRACE_3,			//!< number of states: global, local
-  TRACE_4,          //!< to be defined
-  TRACE_5			//!< all
+    TRACE_0, //!< no messages
+    TRACE_1, //!< keep track of nodes
+    TRACE_2, //!< edges
+    TRACE_3, //!< number of states: global, local
+    TRACE_4, //!< to be defined
+    TRACE_5 //!< all
 } trace_level_fiona;
 
 extern trace_level_fiona debug_level;
@@ -91,5 +91,3 @@ int yyerror(const char* msg);
 int og_yyerror(const char* msg);
 
 #endif
-
-

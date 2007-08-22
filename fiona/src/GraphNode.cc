@@ -84,13 +84,11 @@ GraphNodeDiagnosisColor::GraphNodeDiagnosisColor(GraphNodeDiagnosisColor_enum co
 std::string GraphNodeDiagnosisColor::toString() const {
     switch (diagnosis_color_) {
         case DIAG_UNSET:
-            return "unset";
+            return "darkgreen";
         case DIAG_RED:
             return "red";
         case DIAG_BLUE:
             return "blue";
-        case DIAG_GREEN:
-            return "green";
         case DIAG_ORANGE:
             return "darkorange";
         case DIAG_VIOLET:
@@ -283,7 +281,7 @@ bool GraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) c
         GraphEdge<> *element = edgeIter->getNext();
         GraphNode *vNext = element->getDstNode();
         
-        if (vNext != this)
+        if (vNext == this)
             continue;
         
         if (vNext->getDiagnosisColor() != color) {

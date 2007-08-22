@@ -65,9 +65,8 @@ enum GraphNodeDiagnosisColor_enum {
     DIAG_UNSET,     ///< color of this node is not yet set
     DIAG_RED,       ///< bad node: you will reach a deadlock
     DIAG_BLUE,      ///< good node: you will reach a final state
-    DIAG_GREEN,     ///< innocent node: you did not make anything wrong yet
     DIAG_ORANGE,    ///< dangerous node: be careful!
-    DIAG_VIOLET
+    DIAG_VIOLET     ///< bad node: in some state you will reach a deadlock
 };
 
 

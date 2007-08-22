@@ -943,11 +943,13 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     ///////////////////////////////////////////////////////
     // CASE 6: RED SUCCESSOR CANNOT BE AVOIDED => VIOLET //
     ///////////////////////////////////////////////////////
-    if (!v->coloredSuccessorsAvoidable(DIAG_RED)) {
-        assert (red_child);
+    if (red_child && !v->coloredSuccessorsAvoidable(DIAG_RED)) {
         assert (!internal_deadlock_seen);
         assert (external_deadlock_seen);
+        cerr << v->getNumber() << " is now violet" << endl;
         return v->setDiagnosisColor(DIAG_VIOLET);
+    } else if (red_child) {
+        cerr << v->getNumber() << " is not violet" << endl;
     }
     
     ///////////////////////////////////////////////////////////////////////
@@ -966,6 +968,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     }
     delete edgeIter;
     
+    cerr << "found no color for " << v->getNumber() << endl;
     
     // no color found yet
     return v->setDiagnosisColor(DIAG_UNSET);

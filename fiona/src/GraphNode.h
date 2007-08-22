@@ -204,7 +204,7 @@ template<typename GraphNodeType = GraphNode> class GraphNodeCommon {
 
         /// Adds a leaving edge to this node.
         void addLeavingEdge(GraphEdge<GraphNodeType>* edge);
-
+        
         /**
          * Returns an iterator that can be used to traverse all leaving edges of
          * this GraphNode from begin to end. This iterator can also be used to
@@ -264,6 +264,7 @@ class GraphNode : public GraphNodeCommon<> {
         /// set the diagnosis color
         GraphNodeDiagnosisColor setDiagnosisColor(GraphNodeDiagnosisColor c);
 
+        /// returns true iff node should be shown according to the "show" parameter
         bool isToShow(const GraphNode* rootOfGraph) const;
 
         void removeLiteralFromAnnotation(const std::string& literal);
@@ -272,6 +273,17 @@ class GraphNode : public GraphNodeCommon<> {
         /// red nodes are unneeded.
         void removeUnneededLiteralsFromAnnotation();
 
+        
+        /// returns true iff a colored successor of v can be avoided
+        bool coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const;        
+        
+        /// returns true iff edge e is possible in every state
+        bool edgeEnforcable(GraphEdge<> *e) const;
+        
+        /// returns true iff e changes the color of the common successors
+        bool changes_color(GraphEdge<> *e) const;
+        
+        
         friend bool operator <(GraphNode const&, GraphNode const&);
 
 #undef new

@@ -34,11 +34,14 @@
 #ifndef STATE_H
 #define STATE_H
 
-//! Possible types of states:
-//! FINALSTATE == state fulfills finalmarking or finalcondition (may be transient, too)
-//! DEADLOCK == no transition is enabled (may be internal or external DL)
-//! TRANS == there is at least one enabled transition
-enum stateType {TRANS, DEADLOCK, FINALSTATE};
+/// Possible types of states
+enum stateType {
+    TRANS,          ///< there is at least one enabled transition
+    DEADLOCK,       ///< no transition is enabled (may be internal or external DL)
+    FINALSTATE,     ///< state fulfills finalmarking or finalcondition (may be transient, too)
+    I_DEADLOCK,     ///< internal deadlock (used by exactType())
+    E_DEADLOCK      ///< external deadlock (used by exactType())
+};
 
 class binDecision;
 class owfnTransition;
@@ -87,6 +90,9 @@ class State {
 
         /** type of state (Deadlock, Final, Transient) */
         stateType type;
+        
+        /// returns exact type of state (Final, iDL, eDL, TR)
+        stateType exactType();
 
         /**
          * Same as decodeShowOnly(), but initializes all transition of the given 'PN'.

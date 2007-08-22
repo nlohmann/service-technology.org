@@ -261,3 +261,50 @@ bool State::hasLeavingTauTransitionForMatching() const {
 
     return false;
 }
+
+
+
+/*!
+ * \brief   returns exact type of state (Final, iDL, eDL, TR)
+ *
+ * \return  The exact type of the state. Unlike the "state" member variable
+ *          this function distinguishes between internal and external deadlocks.
+ *          A marking is a deadlock iff it does not quasi-enable a transition.
+ *          A deadlock is internal if no output place of the net is marked. A
+ *          deadlock where an output place is marked is an external deadlock.
+ *
+ * \note    This function will never return the value "DEADLOCK".
+ *
+ * \post    CurrentMarking is overwritten by marking of the state under
+ *          consideration if the state is a deadlock (see below).
+ */
+stateType State::exactType() {
+    switch (type) {
+        case DEADLOCK: {
+            bool internal_deadlock = true;
+            
+            if (PN->transNrQuasiEnabled > 0) {
+                internal_deadlock = false;
+            } else {
+                decode(PN); // overwrites PN->CurrentMarking !
+                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                    if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                        internal_deadlock = false;
+                        continue;
+                    }
+                }
+            }
+            
+            if (internal_deadlock) {
+                return I_DEADLOCK;
+            } else {
+                return E_DEADLOCK;
+            }
+        }
+        
+        // the other types do not need to be distinguished
+        default: {
+            return type;
+        }
+    }
+}

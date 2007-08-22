@@ -262,3 +262,185 @@ void GraphNode::analyseNode() {
 bool operator <(GraphNode const& left, GraphNode const& right) {
     return (left.reachGraphStateSet < right.reachGraphStateSet);
 }
+
+
+/*!
+ * \brief  returns true iff a colored successor can be avoided
+ *
+ * \param  color   the color under consideration
+ *
+ * \return true iff there is either a sending edge to a differently colored
+ *         successor or, for each external deadlock, there exists a receiving
+ *         edge to a non-colored successor
+ */
+bool GraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const {    
+    // collect all edges to differently colored successor nodes
+    set<GraphEdge<>*> edges_to_differently_colored_successors;
+    bool colored_successor_present = false;
+    
+    GraphNode::LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<> *element = edgeIter->getNext();
+        GraphNode *vNext = element->getDstNode();
+        
+        if (vNext != this)
+            continue;
+        
+        if (vNext->getDiagnosisColor() != color) {
+            // if there is a sending edge to a differently colored sucessor, take this edge;
+            // otherwise: store this edge for future considerations
+            if (element->getType() == SENDING ) {
+                return true;
+            } else {
+                edges_to_differently_colored_successors.insert(element);
+            }
+        } else {
+            colored_successor_present = true;
+        }
+    }
+    delete edgeIter;
+    
+    // if there is no such colored successor, it can be clearly avoided
+    if (!colored_successor_present) {
+        return true;
+    }
+    
+    // if there are no differently colored successors, the colored successors can not be avoided
+    if (edges_to_differently_colored_successors.empty() ) {
+        return false;
+    }
+    
+    // last chance: look if each external deadlock "enables" a receiving edge
+    // to a differently colored successor
+    for (StateSet::const_iterator state = reachGraphStateSet.begin();
+         state != reachGraphStateSet.end(); state++) {
+        (*state)->decode(PN);
+        
+        bool found_enabled_state = false;
+        
+        if ((*state)->type == DEADLOCK) {
+            for (set<GraphEdge<>*>::iterator edge = edges_to_differently_colored_successors.begin();
+                 edge != edges_to_differently_colored_successors.end(); edge++) {
+                if ((*edge)->getType() == SENDING ) {
+                    continue;
+                }
+                
+                string edge_label = (*edge)->getLabel().substr(1, (*edge)->getLabel().length());
+                
+                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                    if (PN->getOutputPlace(i)->name == edge_label) {
+                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                            found_enabled_state = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // looked at all edges but did not finde an enabling state
+            if (!found_enabled_state) {
+                return false;
+            }
+        }
+    }
+    
+    // looked at all edges but did not abort earlier
+    return true;
+}
+
+
+/*!
+ * \brief  returns true iff edge e is possible in every state
+ *
+ * \param  e  an edge
+ *
+ * \return true, iff the edge e is labeled with a sending event, or a
+ *         receiving event that is present in every external deadlock state
+ *
+ * \note   For performance issues, it is not checked whether edge e is really
+ *         leaving this node.
+ */
+bool GraphNode::edgeEnforcable(GraphEdge<> *e) const {
+    assert (e != NULL);
+    
+    if (e->getType() == SENDING) {
+        return true;
+    } else {
+        string edge_label = e->getLabel().substr(1, e->getLabel().length());
+        bool edge_enforcable = true;
+        
+        // iterate the states and look for deadlocks where the considered
+        // message is not present: then, the receiving of this message can
+        // not be enforced
+        for (StateSet::const_iterator state = reachGraphStateSet.begin();
+             state != reachGraphStateSet.end(); state++) {
+            (*state)->decode(PN);
+            
+            if ((*state)->type == DEADLOCK) {
+                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                    if (PN->getOutputPlace(i)->name == edge_label) {
+                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] == 0) {
+                            edge_enforcable = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return edge_enforcable;
+    }
+}
+
+
+/*!
+ * \brief  returns true iff e changes the color of the common successors
+ *
+ * \param  e  an edge
+ *
+ * \todo   Comment me!
+ */
+bool GraphNode::changes_color(GraphEdge<> *e) const {
+    assert(e != NULL);
+    
+    GraphNode *vNext = e->getDstNode();
+    
+    if ( vNext->getDiagnosisColor() == DIAG_RED )
+        return false;
+    
+    if ( !edgeEnforcable(e) )
+        return false;
+    
+    
+    map< string, GraphEdge<>* > v_edges;
+    map< string, GraphEdge<>* > vNext_edges;
+    
+    GraphNode::LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<> *element = edgeIter->getNext();
+        v_edges[element->getLabel()] = element;
+    }
+    edgeIter = vNext->getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<> *element = edgeIter->getNext();
+        vNext_edges[element->getLabel()] = element;
+    }
+    delete edgeIter;
+    
+    
+    for (map< string, GraphEdge<>* >::const_iterator v_edge = v_edges.begin();
+         v_edge != v_edges.end(); v_edge++) {
+        GraphEdge<> *vNext_edge = vNext_edges[v_edge->first];
+        
+        if (vNext_edge == NULL)
+            continue;
+        
+        if ( (vNext_edge->getDstNode()->getDiagnosisColor() != v_edge->second->getDstNode()->getDiagnosisColor()) &&
+             (vNext_edge->getDstNode()->getDiagnosisColor() == DIAG_RED) &&
+             (v_edge->second->getDstNode()->getDiagnosisColor() != DIAG_VIOLET) ) {
+            return true;
+        }
+    }
+    
+    return false;
+}

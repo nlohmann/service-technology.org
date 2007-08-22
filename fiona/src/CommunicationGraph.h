@@ -114,13 +114,6 @@ class CommunicationGraph {
          */
         unsigned int nBlueEdges;
 
-        /// returns true iff edge e is possible in every state of node v
-        bool edge_enforcable(GraphNode *v, GraphEdge<> *e) const;
-
-        /// returns true iff a colored successor of v can be avoided
-        bool colored_successors_avoidable(GraphNode *v,
-                                          GraphNodeDiagnosisColor_enum color) const;
-
     protected:
         oWFN* PN; //!< pointer to the underlying petri net
 

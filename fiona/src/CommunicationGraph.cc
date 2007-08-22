@@ -443,12 +443,34 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v,
 
         for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
 
-            (*iter)->decode(PN); // need to decide if it is an external or internal deadlock
+            // a marking is printed if it is a deadlock, a final state or if the parameter "-s allstates"
+            if ((*iter)->type == DEADLOCK ||
+                (*iter)->type == FINALSTATE ||
+                parameters[P_SHOW_STATES_PER_NODE] ) {
+                os << "[" << PN->getCurrentMarkingAsString() << "]";
+                os << " (";
+                
+                // print the suffix (state type)
+                switch ((*iter)->exactType()) {
+                    case I_DEADLOCK:    os << "iDL";    break;
+                    case E_DEADLOCK:    os << "eDL";    break;
+                    case FINALSTATE:    os << "FS";     break;
+                    case TRANS:         os << "TR";     break;
+                    default:            assert(false);
+                }
 
-            string kindOfDeadlock = "i"; // letter for 'i' internal or 'e' external deadlock
-            unsigned int i;
+                os << ")" << "\\n";
+            }
+                        
+            /*
+             // the old call
+             
+             (*iter)->decode(PN); // need to decide if it is an external or internal deadlock
+             
+             string kindOfDeadlock = "i"; // letter for 'i' internal or 'e' external deadlock
+             unsigned int i;
 
-            switch ((*iter)->type) {
+             switch ((*iter)->type) {
                 case DEADLOCK:
                     os << "[" << PN->getCurrentMarkingAsString() << "]";
                     os << " (";
@@ -477,6 +499,7 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v,
                     }
                     break;
             }
+            */
         }
     }
 
@@ -522,7 +545,7 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v,
         }
 
         // in diagnosis mode, draw "unenforcable" arcs dashed
-        if (options[O_DIAGNOSIS] && !edge_enforcable(v, element)) {
+        if (options[O_DIAGNOSIS] && !v->edgeEnforcable(element)) {
             os << ", style=dashed";
         }
 
@@ -824,19 +847,13 @@ void CommunicationGraph::diagnose() {
 }
 
 
-GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode *v,
-                                                                      std::map<GraphNode*, bool>& visitedNodes) {
+GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes) {
     assert(v != NULL);
 
     // if color is known already, return it
     if (v->getDiagnosisColor() != DIAG_UNSET) {
         assert(visitedNodes[v]);
         return v->getDiagnosisColor();
-    }
-
-    // this is new...
-    if (visitedNodes[v]) {
-        return DIAG_UNSET;
     }
 
     visitedNodes[v] = true;
@@ -850,42 +867,15 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
          state != v->reachGraphStateSet.end(); state++) {
         (*state)->decode(PN);
 
-        switch ((*state)->type) {
-            case DEADLOCK: {
-                // check if state is internal deadlock
-                bool internal_deadlock = true;
-
-                if (PN->transNrQuasiEnabled > 0) {
-                    internal_deadlock = false;
-                } else {
-                    for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-                            internal_deadlock = false;
-                            continue;
-                        }
-                    }
-                }
-
-                if (internal_deadlock) {
-                    internal_deadlock_seen = true;
-                } else {
-                    external_deadlock_seen = true;
-                }
-
-                break;
-            }
-
-            case FINALSTATE: {
-                final_state_seen = true;
-                break;
-            }
-
-            case TRANS: {
-                break;
-            }
+        switch ((*state)->exactType()) {
+            case I_DEADLOCK: internal_deadlock_seen = true; break;
+            case E_DEADLOCK: external_deadlock_seen = true; break;
+            case FINALSTATE: final_state_seen = true;       break;
+            default: break;
         }
     }
 
+    
     ///////////////////////////////////////////////
     // CASE 1: NODE HAS INTERNAL DEADLOCK => RED //
     ///////////////////////////////////////////////
@@ -897,8 +887,10 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     // CASE 2: NODE HAS FINAL STATE AND NO DEADLOCK => BLUE //
     //////////////////////////////////////////////////////////
     if (final_state_seen && !external_deadlock_seen) {
+        assert (!internal_deadlock_seen);
         return v->setDiagnosisColor(DIAG_BLUE);
     }
+    
 
     // node color cannot be quickly derived, so the children have to be considered
     set<GraphNodeDiagnosisColor_enum> childrenDiagnosisColors;
@@ -907,9 +899,6 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     while (edgeIter->hasNext()) {
         GraphEdge<> *element = edgeIter->getNext();
         GraphNode *vNext = element->getDstNode();
-
-        if (!vNext->isToShow(root))
-            continue;
 
         if (vNext != v) {
             childrenDiagnosisColors.insert(diagnose_recursively(vNext, visitedNodes));
@@ -922,15 +911,13 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
             != childrenDiagnosisColors.end());
     bool blue_child = (childrenDiagnosisColors.find(DIAG_BLUE)
             != childrenDiagnosisColors.end());
-    bool violet_child = (childrenDiagnosisColors.find(DIAG_VIOLET)
-            != childrenDiagnosisColors.end());
-    bool green_child = (childrenDiagnosisColors.find(DIAG_GREEN)
-            != childrenDiagnosisColors.end());
 
+    
     /////////////////////////////////////////////////
     // CASE 3: NODE HAS ONLY BLUE CHILDREN => BLUE //
     /////////////////////////////////////////////////
-    if (blue_child && !red_child && !violet_child && !green_child) {
+    if (childrenDiagnosisColors.size() == 1 && blue_child) {
+        assert (!internal_deadlock_seen);
         return v->setDiagnosisColor(DIAG_BLUE);
     }
 
@@ -938,197 +925,47 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     // CASE 4: NODE HAS A FINAL STATE AND A RED CHILD => VIOLET //
     //////////////////////////////////////////////////////////////
     if (final_state_seen && red_child) {
+        assert (!internal_deadlock_seen);
+        assert (external_deadlock_seen);
         return v->setDiagnosisColor(DIAG_VIOLET);
     }
-
-    ///////////////////////////////////////////////////////
-    // CASE 5: NODE HAS ONLY RED CHILDREN => RED         //
-    // CASE 6: RED SUCCESSOR CANNOT BE AVOIDED => VIOLET //
-    // CASE 7: AVOIDABLE RED CHILD => ORANGE             //
-    ///////////////////////////////////////////////////////
-    if (red_child) {
-        if (!violet_child && !blue_child && !green_child) {
-            // only red children
-            return v->setDiagnosisColor(DIAG_RED);
-        }
-        if (!colored_successors_avoidable(v, DIAG_RED)) {
-            // red child cannot be avoided
-            return v->setDiagnosisColor(DIAG_VIOLET);
-        } else {
-            // red child can be avoided
-            if (!colored_successors_avoidable(v, DIAG_VIOLET)) {
-                cerr << "node " << v->getNumber()
-                     << " is an example for an orange node that cannot avoid violet children"
-                     << endl;
-            }
-
-            return v->setDiagnosisColor(DIAG_ORANGE);
-        }
+    
+    ///////////////////////////////////////////////
+    // CASE 5: NODE HAS ONLY RED CHILDREN => RED //
+    ///////////////////////////////////////////////
+    if (childrenDiagnosisColors.size() == 1 && red_child) {
+        assert (!internal_deadlock_seen);
+        assert (external_deadlock_seen);
+        return v->setDiagnosisColor(DIAG_RED);
     }
     
-    /*
-    // display a warning
-    if (!green_child && !colored_successors_avoidable(v, DIAG_VIOLET)) {
-        cerr << "Problem in node " << v->getNumber() << ":" << endl;
-        cerr << "  Undistinguishable deadlocking states  ";
-
-        for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
-             state != v->reachGraphStateSet.end(); state++) {
-            (*state)->decode(PN);
-
-            if ((*state)->type == DEADLOCK) {
-                cerr << "[" << PN->getCurrentMarkingAsString() << "]  ";
-            }
-        }
-        cerr << endl << "  require different treatments  ";
-        GraphNode::LeavingEdges::ConstIterator
-                edgeIter = v->getLeavingEdgesConstIterator();
-        while (edgeIter->hasNext()) {
-            GraphEdge<> *element = edgeIter->getNext();
-            GraphNode *vNext = element->getDstNode();
-
-            if (!vNext->isToShow(root))
-                continue;
-
-            if (element->getType() == SENDING) {
-                cerr << element->getLabel() << "  ";
-            }
-        }
-        delete edgeIter;
-        cerr << endl;
+    ///////////////////////////////////////////////////////
+    // CASE 6: RED SUCCESSOR CANNOT BE AVOIDED => VIOLET //
+    ///////////////////////////////////////////////////////
+    if (!v->coloredSuccessorsAvoidable(DIAG_RED)) {
+        assert (red_child);
+        assert (!internal_deadlock_seen);
+        assert (external_deadlock_seen);
+        return v->setDiagnosisColor(DIAG_VIOLET);
     }
-    */
-        
-    ////////////////////////////
-    // ANYTHING ELSE => GREEN //
-    ////////////////////////////
-    return v->setDiagnosisColor(DIAG_GREEN);
-}
-
-
-/*!
- * \brief  returns true iff edge e is possible in every state of node v
- *
- * \param  v  a node
- * \param  e  an edge, leaving from node v
- *
- * \return true, iff the edge e is labeled with a sending event, or a
- *         receiving event that is present in every external deadlock state of
- *         node v
- *
- * \note   For performance issues, it is not checked whether edge e is really
- *         leaving node v.
- */
-bool CommunicationGraph::edge_enforcable(GraphNode *v, GraphEdge<> *e) const {
-
-    assert (v != NULL);
-    assert (e != NULL);
-
-    if (e->getType() == SENDING) {
-        return true;
-    } else {
-        string edge_label = e->getLabel().substr(1, e->getLabel().length());
-        bool edge_enforcable = true;
-
-        // iterate the states and look for deadlocks where the considered
-        // message is not present: then, the receiving of this message can
-        // not be enforced
-        for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
-             state != v->reachGraphStateSet.end(); state++) {
-            (*state)->decode(PN);
-
-            if ((*state)->type == DEADLOCK) {
-                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-                    if (PN->getOutputPlace(i)->name == edge_label) {
-                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] == 0) {
-                            edge_enforcable = false;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return edge_enforcable;
-    }
-}
-
-
-/*!
- * \brief  returns true iff a colored successor of v can be avoided
- *
- * \param  v  node under consideration
- *
- * \return true iff there is either a sending edge to a non-colored successor or,
- *         for each external deadlock, there exists a receiving edge to a
- *         non-colored successor
- */
-bool CommunicationGraph::colored_successors_avoidable(GraphNode *v,
-                                                      GraphNodeDiagnosisColor_enum color) const {
-    assert (v != NULL);
-
-    // collect all edges to non-colored successor nodes
-    set<GraphEdge<>*> edges_to_noncolored_successors;
-    GraphNode::LeavingEdges::ConstIterator
-            edgeIter = v->getLeavingEdgesConstIterator();
+    
+    ///////////////////////////////////////////////////////////////////////
+    // CASE 7: IF AN EDGE BECOMES RED IN A SUCCESSOR => SUCCESSOR ORANGE //
+    ///////////////////////////////////////////////////////////////////////
+    edgeIter = v->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         GraphEdge<> *element = edgeIter->getNext();
         GraphNode *vNext = element->getDstNode();
-
-        if (!vNext->isToShow(root))
-            continue;
-
-        if (vNext != v && (vNext->getDiagnosisColor() != color)) {
-            // if there is a sending edge to a non-red sucessor, take this edge;
-            // otherwise: store this edge for future considerations
-            if (element->getType() == SENDING ) {
-                return true;
-            } else {
-                edges_to_noncolored_successors.insert(element);
+        
+        if (v->changes_color(element)) {
+            if (vNext->getDiagnosisColor() == DIAG_UNSET) {
+                vNext->setDiagnosisColor(DIAG_ORANGE);
             }
         }
     }
     delete edgeIter;
-
-    // if there are no non-colored successors, the red successors can not be avoided
-    if (edges_to_noncolored_successors.empty() ) {
-        return false;
-    }
-
-    // last chance: look if each external deadlock "enables" a receiving edge
-    // to a non-red successor
-    for (StateSet::const_iterator state = v->reachGraphStateSet.begin();
-         state != v->reachGraphStateSet.end(); state++) {
-        (*state)->decode(PN);
-
-        bool found_enabled_state = false;
-
-        if ((*state)->type == DEADLOCK) {
-            for (set<GraphEdge<>*>::iterator edge = edges_to_noncolored_successors.begin();
-                 edge != edges_to_noncolored_successors.end(); edge++) {
-                if ((*edge)->getType() == SENDING ) {
-                    continue;
-                }
-
-                string edge_label = (*edge)->getLabel().substr(1, (*edge)->getLabel().length());
-
-                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-                    if (PN->getOutputPlace(i)->name == edge_label) {
-                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-                            found_enabled_state = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // looked at all edges but did not finde an enabling state
-            if (!found_enabled_state) {
-                return false;
-            }
-        }
-    }
-
-    // looked at all edges but did not abort earlier
-    return true;
+    
+    
+    // no color found yet
+    return v->setDiagnosisColor(DIAG_UNSET);
 }

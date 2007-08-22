@@ -447,6 +447,7 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v,
             if ((*iter)->type == DEADLOCK ||
                 (*iter)->type == FINALSTATE ||
                 parameters[P_SHOW_STATES_PER_NODE] ) {
+                (*iter)->decode(PN);
                 os << "[" << PN->getCurrentMarkingAsString() << "]";
                 os << " (";
                 
@@ -461,8 +462,8 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v,
 
                 os << ")" << "\\n";
             }
-                        
-            /*
+            
+          /*              
              // the old call
              
              (*iter)->decode(PN); // need to decide if it is an external or internal deadlock

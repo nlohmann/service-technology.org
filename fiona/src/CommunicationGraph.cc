@@ -398,11 +398,14 @@ void CommunicationGraph::printGraphToDot() {
         if ((options[O_SHOW_NODES] && getNumberOfNodes() <= maxPrintingSize) ||
             (!options[O_SHOW_NODES] && getNumberOfBlueNodes() <= maxPrintingSize)) {
 
-            // print only, if number of nodes is lower than required
-            // if option is set to show all nodes, then we compare the number of all nodes
-            // otherwise, we compare the number of blue nodes only
-            trace(TRACE_0, dotCmd + "\n");
-            system(dotCmd.c_str());
+            if (!parameters[P_NOPNG]) {
+                // print only, if number of nodes is lower than required
+                // if option is set to show all nodes, then we compare the number of all nodes
+                // otherwise, we compare the number of blue nodes only
+                trace(TRACE_0, dotCmd + "\n");
+                
+                system(dotCmd.c_str());
+            }
 
 //            // on windows machines, the png file can be shown per system call
 //            if (parameters[P_OG]) {
@@ -946,10 +949,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     if (red_child && !v->coloredSuccessorsAvoidable(DIAG_RED)) {
         assert (!internal_deadlock_seen);
         assert (external_deadlock_seen);
-        cerr << v->getNumber() << " is now violet" << endl;
         return v->setDiagnosisColor(DIAG_VIOLET);
-    } else if (red_child) {
-        cerr << v->getNumber() << " is not violet" << endl;
     }
     
     ///////////////////////////////////////////////////////////////////////

@@ -79,7 +79,8 @@ typedef enum {
     P_SHOW_NO_RED_NODES, //!< show all blue nodes (including empty node)
     P_SHOW_EMPTY_NODE, //!< same as above
     P_SHOW_STATES_PER_NODE, //!< show all states in a node (aka "knowledge")
-    P_SHOW_DEADLOCKS_PER_NODE //!< show deadlock states only
+    P_SHOW_DEADLOCKS_PER_NODE, //!< show deadlock states only
+    P_NOPNG //!< do not create a PNG output
 } possibleParameters;
 
 

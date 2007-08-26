@@ -261,6 +261,11 @@ class GraphFormulaMultiary : public GraphFormula {
          * Returns true iff this formula has no subformulas.
          */
         bool empty() const;
+
+        /**
+         * Returns the the number of formulas, the multiary formula consists of.
+         */
+        int size() const;
 };
 
 

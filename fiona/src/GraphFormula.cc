@@ -367,6 +367,9 @@ bool GraphFormulaMultiary::empty() const {
     return subFormulas.empty();
 }
 
+int GraphFormulaMultiary::size() const {
+    return subFormulas.size();
+}
 
 GraphFormulaMultiaryAnd::GraphFormulaMultiaryAnd() {
 }

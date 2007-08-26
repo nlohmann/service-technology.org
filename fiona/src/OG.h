@@ -37,6 +37,7 @@
 #include "mynew.h"
 #include "CommunicationGraph.h"
 #include "BddRepresentation.h"
+#include <map>
 
 class oWFN;
 
@@ -121,6 +122,44 @@ class OG : public CommunicationGraph {
 #undef new
         NEW_OPERATOR(OG)
 #define new NEW_NEW
+};
+
+class PriorityMap {
+    public:
+        /**
+         * Type of key, which stores a pair of node number and type of event (input, output) 
+         */
+        typedef pair<oWFN::Places_t::size_type, placeType> KeyType;
+
+        /**
+         * Fills the priority map according to the given annotation.
+         * @param annotation the annotation, from which the priority map will be extracted. 
+         */
+        void fill(GraphFormulaCNF *annotation);
+
+        /**
+         * Delivers the element from the priority map with the highest  priority.
+         * This element will be removed afterwards.
+         */ 
+        KeyType pop();
+
+        /**
+         * Returns true if the priority map is empty. Return false otherwise.
+         */
+        bool empty() const;
+
+    private:
+        /**
+         * Type of value, which is associated with a key.
+         */
+        typedef pair<int, int> ValueType;
+
+        /*
+         * Type of priority map.
+         */ 
+        typedef map<KeyType, ValueType> MapType;
+
+        MapType map;
 };
 
 #endif /*OG_H_*/

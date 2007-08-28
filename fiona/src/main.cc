@@ -266,7 +266,7 @@ void matchNet(OGFromFile* OGToMatch, oWFN* PN) {
 void computeOG(oWFN* PN) {
 
     time_t seconds, seconds2;
-    OG * graph = new OG(PN);
+    OG* graph = new OG(PN);
     bool controllable = false;
 
     trace(TRACE_0, "building the operating guideline...\n");

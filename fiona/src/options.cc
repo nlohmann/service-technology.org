@@ -76,7 +76,6 @@ static struct option longopts[] = {
     { "debug",           required_argument, NULL, 'd' },
     { "type",            required_argument, NULL, 't' },
     { "show",            required_argument, NULL, 's' },
-    { "parameter",       required_argument, NULL, 'p' },
     { "reduce-nodes",    no_argument,       NULL, 'R' },
     { "reduceIG",        no_argument,       NULL, 'r' },
     { "messagemaximum",  required_argument, NULL, 'm' },
@@ -89,7 +88,7 @@ static struct option longopts[] = {
 };
 
 
-const char* par_string = "hvd:t:s:p:Rrm:e:b:B:o:Q";
+const char* par_string = "hvd:t:s:Rrm:e:b:B:o:Q";
 
 
 // --------------------- functions for command line evaluation ------------------------
@@ -181,9 +180,7 @@ void print_help() {
   trace("                                   argument <reordering> specifies reodering\n");
   trace("                                   method (see option -b)\n");
   trace(" -o | --output=<filename prefix> . prefix of the output files\n");
-  trace(" -Q | --no-output ................ runs quietly, i.e., produces no output files\n");
-  trace(" -p | --parameter=<param>          additional parameter <param>\n");
-  trace("                                    no-png - does not create a PNG file");
+  trace(" -Q | --no-output ................ runs quiet, i.e., produces no output files\n");
   trace("\n");
   trace("\n");
   trace("For more information see:\n");
@@ -197,8 +194,7 @@ void print_version() {
     trace(std::string(PACKAGE_STRING) + " -- ");
     trace("Functional InteractiON Analysis of open workflow nets\n");
     trace("\n");
-    trace("Copyright (C) 2005, 2006, 2007 Peter Massuthe, Daniela Weinberg,\n");
-    trace("Karsten Wolf, Jan Bretschneider, Kathrin Kaschner, and Niels Lohmann.\n");
+    trace("Copyright (C) 2005, 2006, 2007 Peter Massuthe and Daniela Weinberg\n");
     trace("This is free software; see the source for copying conditions. There is NO\n");
     trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 }
@@ -375,18 +371,6 @@ void parse_command_line(int argc, char* argv[]) {
                     cerr << "Error:\twrong modus operandi (option -t)" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
-                    exit(1);
-                }
-                break;
-            }
-            case 'p': {
-                string lc_optarg = toLower(optarg);
-                if (lc_optarg == "no-png") {
-                    parameters[P_NOPNG] = true;
-                } else {
-                    cerr << "Error:\twrong parameter (option -p)" << endl
-                    << "\tEnter \"fiona --help\" for more information.\n"
-                    << endl;
                     exit(1);
                 }
                 break;
@@ -588,7 +572,6 @@ FileType getFileType(const std::string& fileName) {
 
     string line;
     while (getline(fileStream, line)) {
-        // owfn hits
         if (contains(line, "PLACE")) ++owfnHits;
         if (contains(line, "INTERNAL")) ++owfnHits;
         if (contains(line, "INPUT")) ++owfnHits;
@@ -605,7 +588,6 @@ FileType getFileType(const std::string& fileName) {
         if (contains(line, "ON_LOOP")) ++owfnHits;
         if (contains(line, "MAX_OCCURRENCES")) ++owfnHits;
 
-        // og hits
         if (contains(line, "NODES")) ++ogHits;
         if (contains(line, "INITIALNODE")) ++ogHits;
         if (contains(line, "TRANSITIONS")) ++ogHits;

@@ -68,6 +68,17 @@ class OGFromFileNode : public GraphNodeCommon<OGFromFileNode> {
 class oWFN;
 
 class OGFromFile {
+    public:
+        /**
+         * Type of container passed to OGFromFile::product().
+         */
+        typedef std::list<OGFromFile*> ogs_t;
+
+        /**
+         * Type of container passed to OGFromFile::getProductOGFilePrefix().
+         */
+        typedef std::list<std::string> ogfiles_t;
+
     private:
         GraphNodeCommon<OGFromFileNode>* root;
         typedef std::set<GraphNodeCommon<OGFromFileNode>*> nodes_t;
@@ -75,8 +86,7 @@ class OGFromFile {
         typedef nodes_t::const_iterator nodes_const_iterator;
         typedef nodes_t::iterator nodes_iterator;
 
-        void
-                removeTransitionsToNodeFromAllOtherNodes(const GraphNodeCommon<OGFromFileNode>* nodeToDelete);
+        void removeTransitionsToNodeFromAllOtherNodes(const GraphNodeCommon<OGFromFileNode>* nodeToDelete);
 
         /**
          * Recursive coordinated dfs through OG and rhs OG.
@@ -93,6 +103,7 @@ class OGFromFile {
                                 GraphNodeCommon<OGFromFileNode> *simNode,
                                 set<GraphNodeCommon<OGFromFileNode>*> *simVisitedNodes);
     public:
+
         OGFromFile();
         ~OGFromFile();
         void addNode(GraphNodeCommon<OGFromFileNode>* node);
@@ -116,16 +127,6 @@ class OGFromFile {
         void removeFalseNodes();
 
         /**
-         * Type of container passed to OGFromFile::product().
-         */
-        typedef std::list<OGFromFile*> ogs_t;
-
-        /**
-         * Type of container passed to OGFromFile::getProductOGFilePrefix().
-         */
-        typedef std::list<std::string> ogfiles_t;
-
-        /**
          * Returns the product OG of all given OGs. The caller has to delete the
          * returned OGFromFile.
          * \param ogs Given OGs. Must contain at least two OG.
@@ -142,8 +143,7 @@ class OGFromFile {
          * Creates and returns the annotation for the product node of the given two
          * nodes. The caller is responsible for deleting the returned formula.
          */
-        GraphFormulaCNF
-                * createProductAnnotation(const GraphNodeCommon<OGFromFileNode>* lhs,
+        GraphFormulaCNF* createProductAnnotation(const GraphNodeCommon<OGFromFileNode>* lhs,
                                           const GraphNodeCommon<OGFromFileNode>* rhs) const;
 
         /**

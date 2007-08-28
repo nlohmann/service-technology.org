@@ -193,6 +193,20 @@ GraphNodeDiagnosisColor GraphNode::getDiagnosisColor() const {
 }
 
 
+bool GraphNode::isToShow(const GraphNode* rootOfGraph) const {
+
+    if (parameters[P_SHOW_ALL_NODES] || (parameters[P_SHOW_NO_RED_NODES] &&
+        (getColor() != RED))|| (!parameters[P_SHOW_NO_RED_NODES] &&
+        (getColor() == RED))|| (getColor() == BLUE) ||
+        (this == rootOfGraph)) {
+
+        return (parameters[P_SHOW_EMPTY_NODE] || reachGraphStateSet.size() != 0);
+    } else {
+        return false;
+    }
+}
+
+
 //! \brief analyses the node and sets its color
 void GraphNode::analyseNode() {
 

@@ -41,7 +41,6 @@
 #include <cassert>
 #include "SinglyLinkedList.h"
 #include "GraphFormula.h"
-#include "options.h"
 
 class State;
 class literal;
@@ -140,13 +139,6 @@ template<typename GraphNodeType = GraphNode> class GraphNodeCommon {
         /// Type of the container that holds all leaving edges of this GraphNode.
         typedef SList<GraphEdge<GraphNodeType>*> LeavingEdges;
 
-        bool hasFinalStateInStateSet;
-        int* eventsUsed;
-
-        // this set contains only a reduced number of states in case the state
-        // reduced graph is to be build.
-        StateSet reachGraphStateSet;
-
     protected:
 
         /// Number of this GraphNode in the graph.
@@ -234,11 +226,7 @@ template<typename GraphNodeType = GraphNode> class GraphNodeCommon {
         unsigned int getLeavingEdgesCount() const;
 
 
-        /// returns true iff node should be shown according to the "show" parameter
-        bool isToShow(const GraphNodeCommon<>* rootOfGraph) const;
 
-
-        // originate from OGFromFileNode
         bool hasTransitionWithLabel(const std::string&) const;
         bool hasBlueTransitionWithLabel(const std::string&) const;
 
@@ -265,6 +253,13 @@ class GraphNode : public GraphNodeCommon<> {
 
     public:
 
+        bool hasFinalStateInStateSet;
+        int * eventsUsed;
+
+        // this set contains only a reduced number of states in case the state
+        // reduced graph is to be build.
+        StateSet reachGraphStateSet;
+
         GraphNode();
         ~GraphNode();
 
@@ -281,6 +276,9 @@ class GraphNode : public GraphNodeCommon<> {
 
         /// set the diagnosis color
         GraphNodeDiagnosisColor setDiagnosisColor(GraphNodeDiagnosisColor c);
+
+        /// returns true iff node should be shown according to the "show" parameter
+        bool isToShow(const GraphNode* rootOfGraph) const;
 
         void removeLiteralFromAnnotation(const std::string& literal);
 
@@ -433,20 +431,6 @@ template<typename GraphNodeType> unsigned int GraphNodeCommon<GraphNodeType>::ge
 
 
 
-
-
-template<typename GraphNodeType> bool GraphNodeCommon<GraphNodeType>::isToShow(const GraphNodeCommon<>* rootOfGraph) const {
-
-    if (parameters[P_SHOW_ALL_NODES] || (parameters[P_SHOW_NO_RED_NODES] &&
-        (getColor() != RED))|| (!parameters[P_SHOW_NO_RED_NODES] &&
-        (getColor() == RED))|| (getColor() == BLUE) ||
-        (this == rootOfGraph)) {
-
-        return (parameters[P_SHOW_EMPTY_NODE] || reachGraphStateSet.size() != 0);
-    } else {
-        return false;
-    }
-}
 
 
 // originate from OGFromFileNode

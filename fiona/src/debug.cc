@@ -101,7 +101,7 @@ std::string toUpper(const std::string& s) {
     // The next line does not work for some reason. So we transform by hand.
     // std::transform(s.begin(), s.end(), result.begin(), (int(*)(int))toupper);
 
-    for (string::size_type i = 0; i != s.size(); ++i) {
+    for (std::string::size_type i = 0; i != s.size(); ++i) {
         result += toupper(s[i]);
     }
 
@@ -115,7 +115,7 @@ std::string toLower(const std::string& s) {
     // The next line does not work for some reason. So we transform by hand.
     // std::transform(s.begin(), s.end(), result.begin(), (int(*)(int))tolower);
 
-    for (string::size_type i = 0; i != s.size(); ++i) {
+    for (std::string::size_type i = 0; i != s.size(); ++i) {
         result += tolower(s[i]);
     }
 

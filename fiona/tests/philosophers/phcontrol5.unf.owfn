@@ -53,8 +53,8 @@ INITIALMARKING
     th_4 : 1,
     th_5 : 1;
 
-FINALMARKING
-    endzustand : 1;
+FINALCONDITION
+    endzustand = 1 AND fo_1 = 1 AND fo_2 = 1 AND fo_3 = 1 AND fo_4 = 1 AND fo_5 = 1 AND ALL_OTHER_PLACES_EMPTY;
 
 TRANSITION r_y1
     CONSUME

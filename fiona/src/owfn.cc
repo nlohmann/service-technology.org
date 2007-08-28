@@ -1737,7 +1737,7 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
     currentState->type = typeOfState();
 
     // Initialize the currentOGNode with the root node of the OG.
-    GraphNodeCommon<OGFromFileNode> *currentOGNode = og->getRoot();
+    GraphNodeCommon<OGFromFileNode>* currentOGNode = og->getRoot();
 
     if (currentOGNode->isRed()) {
         reasonForFailedMatch = "The OG is empty (its root node is red).";
@@ -1750,7 +1750,7 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
 }
 
 
-bool oWFN::matchesWithOGRecursive(GraphNodeCommon<OGFromFileNode> *currentOGNode,
+bool oWFN::matchesWithOGRecursive(GraphNodeCommon<OGFromFileNode>* currentOGNode,
                                   State* currentState,
                                   string& reasonForFailedMatch) {
 
@@ -1814,7 +1814,7 @@ bool oWFN::matchesWithOGRecursive(GraphNodeCommon<OGFromFileNode> *currentOGNode
         // Save the currentOGNode to a temporary copy, so we can easily
         // revert to it if the state we reached to firing the current
         // transition lead us to an already seen state.
-        OGFromFileNode* oldOGNode = currentOGNode;
+        GraphNodeCommon<OGFromFileNode>* oldOGNode = currentOGNode;
 
         // if net makes a visible step, the OG node does so, too
         if (transition->hasNonTauLabelForMatching()) {

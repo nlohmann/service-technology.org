@@ -93,8 +93,7 @@ void OGFromFile::addTransition(const std::string& srcName,
 
     GraphNodeCommon<OGFromFileNode>* src = getNodeWithName(srcName);
     GraphNodeCommon<OGFromFileNode>* dstNode = getNodeWithName(dstNodeName);
-    assert(src != NULL);
-    assert(dstNode != NULL);
+
     GraphEdge<OGFromFileNode>* transition = new GraphEdge<OGFromFileNode>(dstNode,label);
     src->addLeavingEdge(transition);
 }

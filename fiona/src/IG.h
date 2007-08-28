@@ -43,8 +43,8 @@ class oWFN;
 class interactionGraph : public CommunicationGraph {
 
     private:
-        bool addGraphNode(GraphNode *,
-                          GraphNode *,
+        bool addGraphNode(GraphNodeCommon<GraphNode>*,
+                          GraphNodeCommon<GraphNode>*,
                           messageMultiSet,
                           GraphEdgeType); // for IG
 

@@ -35,12 +35,12 @@
 #define GraphNode_H_
 
 #include "mynew.h"
-#include "GraphEdge.h"
 #include "debug.h"
 #include <set>
 #include <cassert>
 #include "SinglyLinkedList.h"
 #include "GraphFormula.h"
+#include "GraphEdge.h"
 
 class State;
 class literal;

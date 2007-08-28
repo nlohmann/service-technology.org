@@ -39,10 +39,12 @@
 #include <stdexcept>
 #include <cassert>
 
-class GraphNode;
-
 //! Possible types of a GraphEdge.
 enum GraphEdgeType {SENDING, RECEIVING};
+
+class GraphNode;
+template<typename GraphNodeType> class GraphNodeCommon;
+
 
 /**
  * @todo TODO: Turn this template class into a normal class with GraphNodeType =
@@ -64,7 +66,7 @@ template<typename GraphNodeType = GraphNode> class GraphEdge {
          * @param dstNodeP Points to the destination of this edge.
          * @param labelP label of this edge.
          */
-        GraphEdge(GraphNodeType* dstNodeP, const std::string& labelP);
+        GraphEdge(GraphNodeCommon<GraphNodeType>* dstNodeP, const std::string& labelP);
 
         /**
          * Returns the label of this edge.
@@ -91,7 +93,7 @@ template<typename GraphNodeType = GraphNode> class GraphEdge {
 };
 
 
-template<typename GraphNodeType> GraphEdge<GraphNodeType>::GraphEdge(GraphNodeType* dstNodeP,
+template<typename GraphNodeType> GraphEdge<GraphNodeType>::GraphEdge(GraphNodeCommon<GraphNodeType>* dstNodeP,
                                                                      const std::string& labelP) :
     dstNode(dstNodeP), label(labelP) {
 }

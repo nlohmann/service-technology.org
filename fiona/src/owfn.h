@@ -101,7 +101,7 @@ class oWFN {
          * @retval true If this oWFN matches with given OG.
          * @retval false Otherwise.
          */
-        bool matchesWithOGRecursive(GraphNodeCommon<OGFromFile>* currentOGNode,
+        bool matchesWithOGRecursive(GraphNodeCommon<OGFromFileNode>* currentOGNode,
                                     State* currentState,
                                     string& reasonForFailedMatch);
 

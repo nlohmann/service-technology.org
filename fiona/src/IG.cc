@@ -285,11 +285,11 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
 //!
 //! if we actually found a node matching the new one, we just create an edge between the current node
 //! and the node we have just found, the found one gets the current node as a predecessor node
-bool interactionGraph::addGraphNode(GraphNode * sourceNode,
-                                    GraphNode * toAdd,
+bool interactionGraph::addGraphNode(GraphNodeCommon<GraphNode>* sourceNode,
+                                    GraphNodeCommon<GraphNode>* toAdd,
                                     messageMultiSet messages,
                                     GraphEdgeType type) {
-    trace( TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : start\n");
+    trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : start\n");
 
     if (getNumberOfNodes() == 0) { // graph contains no nodes at all
         root = toAdd; // the given node becomes the root node

@@ -44,6 +44,7 @@
 #include "main.h"
 #include "state.h"
 #include "containers.h"
+#include "GraphNode.h"
 #include "pnapi/pnapi.h"
 
 using namespace std;
@@ -100,7 +101,7 @@ class oWFN {
          * @retval true If this oWFN matches with given OG.
          * @retval false Otherwise.
          */
-        bool matchesWithOGRecursive(OGFromFileNode* currentOGNode,
+        bool matchesWithOGRecursive(GraphNodeCommon<OGFromFile>* currentOGNode,
                                     State* currentState,
                                     string& reasonForFailedMatch);
 

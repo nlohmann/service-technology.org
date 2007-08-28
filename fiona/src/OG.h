@@ -138,7 +138,7 @@ class PriorityMap {
         void fill(GraphFormulaCNF *annotation);
 
         /**
-         * Delivers the element from the priority map with the highest  priority.
+         * Delivers the element from the priority map with the highest priority.
          * This element will be removed afterwards.
          */ 
         KeyType pop();

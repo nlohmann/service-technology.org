@@ -83,6 +83,7 @@ void OG::buildGraph() {
     computeGraphStatistics();
 }
 
+
 void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
     // currentNode is the root of the currently considered subgraph

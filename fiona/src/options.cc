@@ -197,7 +197,8 @@ void print_version() {
     trace(std::string(PACKAGE_STRING) + " -- ");
     trace("Functional InteractiON Analysis of open workflow nets\n");
     trace("\n");
-    trace("Copyright (C) 2005, 2006, 2007 Peter Massuthe and Daniela Weinberg\n");
+    trace("Copyright (C) 2005, 2006, 2007 Peter Massuthe, Daniela Weinberg,\n");
+    trace("Karsten Wolf, Jan Bretschneider, Kathrin Kaschner, and Niels Lohmann.\n");
     trace("This is free software; see the source for copying conditions. There is NO\n");
     trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 }
@@ -587,6 +588,7 @@ FileType getFileType(const std::string& fileName) {
 
     string line;
     while (getline(fileStream, line)) {
+        // owfn hits
         if (contains(line, "PLACE")) ++owfnHits;
         if (contains(line, "INTERNAL")) ++owfnHits;
         if (contains(line, "INPUT")) ++owfnHits;
@@ -603,6 +605,7 @@ FileType getFileType(const std::string& fileName) {
         if (contains(line, "ON_LOOP")) ++owfnHits;
         if (contains(line, "MAX_OCCURRENCES")) ++owfnHits;
 
+        // og hits
         if (contains(line, "NODES")) ++ogHits;
         if (contains(line, "INITIALNODE")) ++ogHits;
         if (contains(line, "TRANSITIONS")) ++ogHits;

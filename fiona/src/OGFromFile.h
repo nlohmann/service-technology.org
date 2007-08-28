@@ -56,41 +56,27 @@ class GraphFormulaAssignment;
 class GraphFormulaCNF;
 
 class OGFromFileNode : public GraphNodeCommon<OGFromFileNode> {
-
-    public:
-        OGFromFileNode(const std::string& name_,
-                       GraphFormula* annotation_,
-                       GraphNodeColor color = BLUE);
-
-        bool hasTransitionWithLabel(const std::string& transitionLabel) const;
-        bool
-                hasBlueTransitionWithLabel(const std::string& transitionLabel) const;
-
-        GraphEdge<OGFromFileNode>
-                * getTransitionWithLabel(const std::string& transitionLabel) const;
-        OGFromFileNode
-                * fireTransitionWithLabel(const std::string& transitionLabel);
-
-        bool
-                assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const;
-
-        GraphFormulaAssignment* getAssignment() const;
-
-        void removeTransitionsToNode(const OGFromFileNode* nodeToDelete);
+//
+//    public:
+//        OGFromFileNode(const std::string& name_,
+//                       GraphFormula* annotation_,
+//                       GraphNodeColor color = BLUE);
+//
 };
+
 
 class oWFN;
 
 class OGFromFile {
     private:
-        OGFromFileNode* root;
-        typedef std::set<OGFromFileNode*> nodes_t;
+        GraphNodeCommon<OGFromFileNode>* root;
+        typedef std::set<GraphNodeCommon<OGFromFileNode>*> nodes_t;
         nodes_t nodes; // needed for proper deletion of OG.
         typedef nodes_t::const_iterator nodes_const_iterator;
         typedef nodes_t::iterator nodes_iterator;
 
         void
-                removeTransitionsToNodeFromAllOtherNodes(const OGFromFileNode* nodeToDelete);
+                removeTransitionsToNodeFromAllOtherNodes(const GraphNodeCommon<OGFromFileNode>* nodeToDelete);
 
         /**
          * Recursive coordinated dfs through OG and rhs OG.
@@ -98,29 +84,29 @@ class OGFromFile {
          * \param currentRhsNode the current node of the rhs OG
          * \param productOG the resulting product OG
          */
-        void buildProductOG(OGFromFileNode* currentOGNode,
-                            OGFromFileNode* currentRhsNode,
+        void buildProductOG(GraphNodeCommon<OGFromFileNode>* currentOGNode,
+                            GraphNodeCommon<OGFromFileNode>* currentRhsNode,
                             OGFromFile* productOG);
 
-        bool simulatesRecursive(OGFromFileNode *myNode,
-                                set<OGFromFileNode*> *myVisitedNodes,
-                                OGFromFileNode *simNode,
-                                set<OGFromFileNode*> *simVisitedNodes);
+        bool simulatesRecursive(GraphNodeCommon<OGFromFileNode> *myNode,
+                                set<GraphNodeCommon<OGFromFileNode>*> *myVisitedNodes,
+                                GraphNodeCommon<OGFromFileNode> *simNode,
+                                set<GraphNodeCommon<OGFromFileNode>*> *simVisitedNodes);
     public:
         OGFromFile();
         ~OGFromFile();
-        void addNode(OGFromFileNode* node);
-        OGFromFileNode* addNode(const std::string& nodeName,
+        void addNode(GraphNodeCommon<OGFromFileNode>* node);
+        GraphNodeCommon<OGFromFileNode>* addNode(const std::string& nodeName,
                                 GraphFormula* annotation,
                                 GraphNodeColor color = BLUE);
         void addTransition(const std::string& srcName,
                            const std::string& dstName,
                            const std::string& label);
         bool hasNodeWithName(const std::string& nodeName) const;
-        OGFromFileNode* getRoot() const;
-        void setRoot(OGFromFileNode* newRoot);
+        GraphNodeCommon<OGFromFileNode>* getRoot() const;
+        void setRoot(GraphNodeCommon<OGFromFileNode>* newRoot);
         void setRootToNodeWithName(const std::string& nodeName);
-        OGFromFileNode* getNodeWithName(const std::string& nodeName) const;
+        GraphNodeCommon<OGFromFileNode>* getNodeWithName(const std::string& nodeName) const;
         bool hasNoRoot() const;
 
         /**
@@ -157,8 +143,8 @@ class OGFromFile {
          * nodes. The caller is responsible for deleting the returned formula.
          */
         GraphFormulaCNF
-                * createProductAnnotation(const OGFromFileNode* lhs,
-                                          const OGFromFileNode* rhs) const;
+                * createProductAnnotation(const GraphNodeCommon<OGFromFileNode>* lhs,
+                                          const GraphNodeCommon<OGFromFileNode>* rhs) const;
 
         /**
          * Produces from the given OG file names the default prefix of the
@@ -171,9 +157,9 @@ class OGFromFile {
          */
         static std::string stripOGFileSuffix(const std::string& filename);
 
-        void printGraphToDot(OGFromFileNode* v,
+        void printGraphToDot(GraphNodeCommon<OGFromFileNode>* v,
                              fstream& os,
-                             std::map<OGFromFileNode*, bool>&) const;
+                             std::map<GraphNodeCommon<OGFromFileNode>*, bool>&) const;
 
         void printDotFile(const std::string& filenamePrefix) const;
         void printDotFile(const std::string& filenamePrefix,
@@ -197,15 +183,13 @@ class OGFromFile {
          * computes the number of Services determined by this OG
          */
         unsigned int numberOfServices();
-        unsigned int
-                numberOfServicesRecursively(set<OGFromFileNode*> activeNodes,
-                                            map<OGFromFileNode*, unsigned int>& followers,
-                                            map<OGFromFileNode*, list <set<OGFromFileNode*> > >& validFollowerCombinations,
-                                            map<set<OGFromFileNode*>, unsigned int>& eliminateRedundantCounting);
-        unsigned int
-                processAssignmentsRecursively(set<string> labels,
+        unsigned int numberOfServicesRecursively(set<GraphNodeCommon<OGFromFileNode>*> activeNodes,
+                                            map<GraphNodeCommon<OGFromFileNode>*, unsigned int>& followers,
+                                            map<GraphNodeCommon<OGFromFileNode>*, list <set<GraphNodeCommon<OGFromFileNode>*> > >& validFollowerCombinations,
+                                            map<set<GraphNodeCommon<OGFromFileNode>*>, unsigned int>& eliminateRedundantCounting);
+        unsigned int processAssignmentsRecursively(set<string> labels,
                                               GraphFormulaAssignment possibleAssignment,
-                                              OGFromFileNode* testNode,
+                                              GraphNodeCommon<OGFromFileNode>* testNode,
                                               list<GraphFormulaAssignment>& assignmentList);
 
         //! Tests, if this OG is acyclic

@@ -1737,7 +1737,7 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
     currentState->type = typeOfState();
 
     // Initialize the currentOGNode with the root node of the OG.
-    OGFromFileNode* currentOGNode = og->getRoot();
+    GraphNodeCommon<OGFromFileNode> *currentOGNode = og->getRoot();
 
     if (currentOGNode->isRed()) {
         reasonForFailedMatch = "The OG is empty (its root node is red).";
@@ -1750,7 +1750,7 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
 }
 
 
-bool oWFN::matchesWithOGRecursive(OGFromFileNode* currentOGNode,
+bool oWFN::matchesWithOGRecursive(GraphNodeCommon<OGFromFileNode> *currentOGNode,
                                   State* currentState,
                                   string& reasonForFailedMatch) {
 

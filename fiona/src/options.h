@@ -41,7 +41,8 @@
 #include <list>
 #include <cstdio>
 #include "getopt.h"
-#include "OGFromFile.h"
+
+class OGFromFile;
 
 typedef enum {
     O_HELP,
@@ -90,8 +91,6 @@ typedef enum {
 
 extern std::map<possibleOptions, bool> options;
 extern std::map<possibleParameters, bool> parameters;
-
-extern OGFromFile::ogfiles_t ogfiles;
 
 extern std::string outfilePrefix;
 

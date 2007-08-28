@@ -36,14 +36,16 @@
 
 #include "mynew.h"
 #include "GraphEdge.h"
-#include "owfn.h"
+#include "debug.h"
 #include <set>
 #include <cassert>
 #include "SinglyLinkedList.h"
 #include "GraphFormula.h"
+#include "options.h"
 
 class State;
 class literal;
+class OGFromFileNode;
 //class GraphFormula;
 //class GraphFormulaAssignment;
 //class GraphFormulaMultiaryOr;
@@ -138,6 +140,13 @@ template<typename GraphNodeType = GraphNode> class GraphNodeCommon {
         /// Type of the container that holds all leaving edges of this GraphNode.
         typedef SList<GraphEdge<GraphNodeType>*> LeavingEdges;
 
+        bool hasFinalStateInStateSet;
+        int* eventsUsed;
+
+        // this set contains only a reduced number of states in case the state
+        // reduced graph is to be build.
+        StateSet reachGraphStateSet;
+
     protected:
 
         /// Number of this GraphNode in the graph.
@@ -224,6 +233,23 @@ template<typename GraphNodeType = GraphNode> class GraphNodeCommon {
         /// Returns the number of leaving edges.
         unsigned int getLeavingEdgesCount() const;
 
+
+        /// returns true iff node should be shown according to the "show" parameter
+        bool isToShow(const GraphNodeCommon<>* rootOfGraph) const;
+
+
+        // originate from OGFromFileNode
+        bool hasTransitionWithLabel(const std::string&) const;
+        bool hasBlueTransitionWithLabel(const std::string&) const;
+
+        GraphEdge<OGFromFileNode>* getTransitionWithLabel(const std::string&) const;
+        OGFromFileNode* fireTransitionWithLabel(const std::string&);
+
+        bool assignmentSatisfiesAnnotation(const GraphFormulaAssignment&) const;
+
+        GraphFormulaAssignment* getAssignment() const;
+
+        void removeTransitionsToNode(const OGFromFileNode*);
 };
 
 
@@ -238,13 +264,6 @@ class GraphNode : public GraphNodeCommon<> {
         GraphNodeDiagnosisColor diagnosis_color;
 
     public:
-
-        bool hasFinalStateInStateSet;
-        int * eventsUsed;
-
-        // this set contains only a reduced number of states in case the state
-        // reduced graph is to be build.
-        StateSet reachGraphStateSet;
 
         GraphNode();
         ~GraphNode();
@@ -263,15 +282,11 @@ class GraphNode : public GraphNodeCommon<> {
         /// set the diagnosis color
         GraphNodeDiagnosisColor setDiagnosisColor(GraphNodeDiagnosisColor c);
 
-        /// returns true iff node should be shown according to the "show" parameter
-        bool isToShow(const GraphNode* rootOfGraph) const;
-
         void removeLiteralFromAnnotation(const std::string& literal);
 
         /// Removes unneeded literals from the node's annotation. Labels of edges to
         /// red nodes are unneeded.
         void removeUnneededLiteralsFromAnnotation();
-
         
         /// returns true iff a colored successor of v can be avoided
         bool coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const;        
@@ -293,9 +308,12 @@ class GraphNode : public GraphNodeCommon<> {
 };
 
 
+
+
 /*************************
  * class GraphNodeCommon *
  *************************/
+
 
 //! \brief constructor
 template<typename GraphNodeType> GraphNodeCommon<GraphNodeType>::GraphNodeCommon() :
@@ -393,19 +411,18 @@ template<typename GraphNodeType> GraphNodeCommon<GraphNodeType>::~GraphNodeCommo
 
 
 template<typename GraphNodeType> void GraphNodeCommon<GraphNodeType>::addLeavingEdge(GraphEdge<GraphNodeType>* edge) {
-
     leavingEdges.add(edge);
 }
 
 
-template<typename GraphNodeType> typename GraphNodeCommon<GraphNodeType>::LeavingEdges::Iterator GraphNodeCommon<
-        GraphNodeType>::getLeavingEdgesIterator() {
+template<typename GraphNodeType> typename GraphNodeCommon<GraphNodeType>::LeavingEdges::Iterator 
+        GraphNodeCommon<GraphNodeType>::getLeavingEdgesIterator() {
     return leavingEdges.getIterator();
 }
 
 
-template<typename GraphNodeType> typename GraphNodeCommon<GraphNodeType>::LeavingEdges::ConstIterator GraphNodeCommon<
-        GraphNodeType>::getLeavingEdgesConstIterator() const {
+template<typename GraphNodeType> typename GraphNodeCommon<GraphNodeType>::LeavingEdges::ConstIterator
+        GraphNodeCommon<GraphNodeType>::getLeavingEdgesConstIterator() const {
     return leavingEdges.getConstIterator();
 }
 
@@ -413,5 +430,116 @@ template<typename GraphNodeType> typename GraphNodeCommon<GraphNodeType>::Leavin
 template<typename GraphNodeType> unsigned int GraphNodeCommon<GraphNodeType>::getLeavingEdgesCount() const {
     return leavingEdges.size();
 }
+
+
+
+
+
+template<typename GraphNodeType> bool GraphNodeCommon<GraphNodeType>::isToShow(const GraphNodeCommon<>* rootOfGraph) const {
+
+    if (parameters[P_SHOW_ALL_NODES] || (parameters[P_SHOW_NO_RED_NODES] &&
+        (getColor() != RED))|| (!parameters[P_SHOW_NO_RED_NODES] &&
+        (getColor() == RED))|| (getColor() == BLUE) ||
+        (this == rootOfGraph)) {
+
+        return (parameters[P_SHOW_EMPTY_NODE] || reachGraphStateSet.size() != 0);
+    } else {
+        return false;
+    }
+}
+
+
+// originate from OGFromFileNode
+
+template<typename GraphNodeType> bool GraphNodeCommon<GraphNodeType>::hasTransitionWithLabel(const std::string& transitionLabel) const {
+
+    return getTransitionWithLabel(transitionLabel) != NULL;
+}
+
+
+template<typename GraphNodeType> bool GraphNodeCommon<GraphNodeType>::hasBlueTransitionWithLabel(const std::string& transitionLabel) const {
+
+    GraphEdge<GraphNodeType>* transition = getTransitionWithLabel(transitionLabel);
+    if (transition == NULL)
+        return false;
+
+    return transition->getDstNode()->isBlue();
+}
+
+
+template<typename GraphNodeType> GraphEdge<OGFromFileNode>* GraphNodeCommon<GraphNodeType>::getTransitionWithLabel(const std::string& transitionLabel) const {
+
+    typename LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
+
+        if (edge->getLabel() == transitionLabel) {
+            delete edgeIter;
+            return edge;
+        }
+    }
+
+    delete edgeIter;
+    return NULL;
+}
+
+
+template<typename GraphNodeType> OGFromFileNode* GraphNodeCommon<GraphNodeType>::fireTransitionWithLabel(const std::string& transitionLabel) {
+
+    assert(transitionLabel != GraphFormulaLiteral::TAU);
+
+    GraphEdge<OGFromFileNode>
+            * transition = getTransitionWithLabel(transitionLabel);
+    if (transition == NULL) {
+        return NULL;
+    }
+
+    return transition->getDstNode();
+}
+
+
+template<typename GraphNodeType> bool GraphNodeCommon<GraphNodeType>::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const {
+
+    assert(annotation != NULL);
+    return annotation->satisfies(assignment);
+}
+
+
+// return the assignment that is imposed by present or absent arcs leaving the node
+template<typename GraphNodeType> GraphFormulaAssignment* GraphNodeCommon<GraphNodeType>::getAssignment() const {
+
+    trace(TRACE_5, "computing annotation of node " + getName() + "\n");
+
+    GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
+
+    // traverse outgoing edges and set the corresponding literals
+    // to true if the respective node is BLUE
+
+    typename LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
+        myassignment->setToTrue(edge->getLabel());
+    }
+    delete edgeIter;
+
+    // we assume that literal final is always true
+    myassignment->setToTrue(GraphFormulaLiteral::FINAL);
+
+    return myassignment;
+}
+
+
+template<typename GraphNodeType> void GraphNodeCommon<GraphNodeType>::removeTransitionsToNode(const OGFromFileNode* nodeToDelete) {
+    typename LeavingEdges::Iterator iEdge = getLeavingEdgesIterator();
+    while (iEdge->hasNext()) {
+        GraphEdge<OGFromFileNode>* edge = iEdge->getNext();
+        if (edge->getDstNode() == nodeToDelete) {
+            delete edge;
+            iEdge->remove();
+        }
+    }
+    delete iEdge;
+}
+
 
 #endif /*GraphNode_H_*/

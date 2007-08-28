@@ -37,7 +37,7 @@
 
 #include <string>
 
-extern oWFN * PN;
+extern oWFN* PN;
 extern unsigned int numberOfDecodes;
 extern unsigned int NonEmptyHash;
 extern unsigned int numberDeletedVertices;

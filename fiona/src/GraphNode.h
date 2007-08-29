@@ -44,13 +44,7 @@
 #include "GraphFormula.h"
 #include "GraphEdge.h"
 
-//class State;
-class literal;
-class OGFromFileNode;
-//class GraphFormula;
-//class GraphFormulaAssignment;
-//class GraphFormulaMultiaryOr;
-//class GraphFormulaCNF;
+//class literal;
 
 typedef std::set<State*> StateSet;
 
@@ -265,8 +259,6 @@ class GraphNode {
         /// returns true iff node should be shown according to the "show" parameter
         bool isToShow(const GraphNode* rootOfGraph) const;
         
-        
-        // originate from OGFromFileNode
         bool hasTransitionWithLabel(const std::string&) const;
         bool hasBlueTransitionWithLabel(const std::string&) const;
 

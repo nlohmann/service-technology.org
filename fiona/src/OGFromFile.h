@@ -49,37 +49,29 @@
 using namespace std;
 
 class GraphEdge;
-
-
 class GraphFormula;
 class GraphFormulaAssignment;
 class GraphFormulaCNF;
-
-
-class OGFromFileNode : public GraphNode {
-
-};
-
-
 class oWFN;
 
 class OGFromFile {
     public:
-        /**
-         * Type of container passed to OGFromFile::product().
-         */
+
+        /// Type of container passed to OGFromFile::product().
         typedef std::list<OGFromFile*> ogs_t;
 
-        /**
-         * Type of container passed to OGFromFile::getProductOGFilePrefix().
-         */
+        /// Type of container passed to OGFromFile::getProductOGFilePrefix().
         typedef std::list<std::string> ogfiles_t;
 
     private:
         GraphNode* root;
+
         typedef std::set<GraphNode*> nodes_t;
+
         nodes_t nodes; // needed for proper deletion of OG.
+
         typedef nodes_t::const_iterator nodes_const_iterator;
+
         typedef nodes_t::iterator nodes_iterator;
 
         void removeTransitionsToNodeFromAllOtherNodes(const GraphNode* nodeToDelete);
@@ -94,26 +86,36 @@ class OGFromFile {
                             GraphNode* currentRhsNode,
                             OGFromFile* productOG);
 
-        bool simulatesRecursive(GraphNode *myNode,
-                                set<GraphNode*> *myVisitedNodes,
-                                GraphNode *simNode,
-                                set<GraphNode*> *simVisitedNodes);
+        bool simulatesRecursive(GraphNode* myNode,
+                                set<GraphNode*>* myVisitedNodes,
+                                GraphNode* simNode,
+                                set<GraphNode*>* simVisitedNodes);
     public:
 
         OGFromFile();
+
         ~OGFromFile();
+
         void addNode(GraphNode* node);
+
         GraphNode* addNode(const std::string& nodeName,
-                                GraphFormula* annotation,
-                                GraphNodeColor color = BLUE);
+                           GraphFormula* annotation,
+                           GraphNodeColor color = BLUE);
+
         void addTransition(const std::string& srcName,
                            const std::string& dstName,
                            const std::string& label);
+
         bool hasNodeWithName(const std::string& nodeName) const;
+
         GraphNode* getRoot() const;
+
         void setRoot(GraphNode* newRoot);
+
         void setRootToNodeWithName(const std::string& nodeName);
+
         GraphNode* getNodeWithName(const std::string& nodeName) const;
+
         bool hasNoRoot() const;
 
         /**
@@ -140,7 +142,7 @@ class OGFromFile {
          * nodes. The caller is responsible for deleting the returned formula.
          */
         GraphFormulaCNF* createProductAnnotation(const GraphNode* lhs,
-                                          const GraphNode* rhs) const;
+                                                 const GraphNode* rhs) const;
 
         /**
          * Produces from the given OG file names the default prefix of the
@@ -173,20 +175,22 @@ class OGFromFile {
          */
         static std::string addOGFileSuffix(const std::string& filePrefix);
 
-        bool simulates(OGFromFile *smallerOG);
+        bool simulates(OGFromFile* smallerOG);
 
         /**
          * computes the number of Services determined by this OG
          */
         unsigned int numberOfServices();
+
         unsigned int numberOfServicesRecursively(set<GraphNode*> activeNodes,
-                                            map<GraphNode*, unsigned int>& followers,
-                                            map<GraphNode*, list <set<GraphNode*> > >& validFollowerCombinations,
-                                            map<set<GraphNode*>, unsigned int>& eliminateRedundantCounting);
+                                                 map<GraphNode*, unsigned int>& followers,
+                                                 map<GraphNode*, list <set<GraphNode*> > >& validFollowerCombinations,
+                                                 map<set<GraphNode*>, unsigned int>& eliminateRedundantCounting);
+
         unsigned int processAssignmentsRecursively(set<string> labels,
-                                              GraphFormulaAssignment possibleAssignment,
-                                              GraphNode* testNode,
-                                              list<GraphFormulaAssignment>& assignmentList);
+                                                   GraphFormulaAssignment possibleAssignment,
+                                                   GraphNode* testNode,
+                                                   list<GraphFormulaAssignment>& assignmentList);
 
         //! Tests, if this OG is acyclic
         bool isAcyclic();

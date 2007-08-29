@@ -56,8 +56,7 @@ class PlSymbol;
 class TrSymbol;
 class Arc;
 class OGFromFile;
-class OGFromFileNode;
- class GraphNode;
+class GraphNode;
 class GraphFormulaAssignment;
 
 

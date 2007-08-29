@@ -43,13 +43,7 @@
 enum GraphEdgeType {SENDING, RECEIVING};
 
 class GraphNode;
- class GraphNode;
 
-
-/**
- * @todo TODO: Turn this template class into a normal class with GraphNodeType =
- * GraphNode when GraphNode and OGFromFileNode are merged.
- */
 class GraphEdge {
     private:
         /**

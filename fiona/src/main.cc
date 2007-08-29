@@ -31,21 +31,21 @@
  *
  */
 
+#include "OGFromFile.h"
 #include "owfn.h"
-#include "main.h"
 #include "state.h"
 #include "IG.h"
 #include "OG.h"
 #include "Exchangeability.h"
 #include "options.h"
 #include "debug.h"
-#include "OGFromFile.h"
+#include "main.h"
+
 #include <list>
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include "pnapi/pnapi.h"
-
 
 // #defines YY_FLEX_HAS_YYLEX_DESTROY if we can call yylex_destroy()
 #include "lexer_owfn_wrap.h"
@@ -53,25 +53,31 @@
 #include "newlogger.h"
 #endif
 #include <libgen.h>
+
 using namespace std;
+
 extern int owfn_yylineno;
 extern int owfn_yydebug;
 extern int owfn_yy_flex_debug;
 extern FILE *owfn_yyin;
 extern int owfn_yyerror();
 extern int owfn_yyparse();
+
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
 extern int owfn_yylex_destroy();
 #endif
+
 extern int og_yylineno;
 extern int og_yydebug;
 extern int og_yy_flex_debug;
 extern FILE *og_yyin;
 extern int og_yyerror();
 extern int og_yyparse();
+
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
 extern int og_yylex_destroy();
 #endif
+
 extern unsigned int State::state_count;
 extern std::list<std::string> netfiles;
 extern std::list<std::string> ogfiles;
@@ -450,7 +456,7 @@ void makePNG(oWFN* PN) {
     }
 
     // create temporary stream as target for the dot output of the PNapiNet
-    ostringstream *dot = new ostringstream(ostringstream::out);
+    ostringstream* dot = new ostringstream(ostringstream::out);
 
     // set the output format to dot
     PNapiNet->set_format(PNapi::FORMAT_DOT, true);

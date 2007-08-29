@@ -48,11 +48,6 @@
 
 using namespace std;
 
-class GraphEdge;
-class GraphFormula;
-class GraphFormulaAssignment;
-class GraphFormulaCNF;
-class oWFN;
 
 class OGFromFile {
     public:

@@ -35,11 +35,6 @@
 #include <cassert>
 #include <queue>
 #include "OGFromFile.h"
-#include "GraphNode.h"
-#include "debug.h"
-#include "options.h"
-#include "main.h"
-#include "GraphFormula.h"
 
 
 // TRUE and FALSE #defined in cudd package may interfere with

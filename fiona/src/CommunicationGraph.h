@@ -39,13 +39,10 @@
 #include "GraphNode.h" // for GraphNodeDiagnosisColor_enum
 #include "owfn.h"
 #include <fstream>
-
 #include <set>
 
 using namespace std;
 
-class oWFN;
-class State;
 
 extern double global_progress;
 extern int show_progress;

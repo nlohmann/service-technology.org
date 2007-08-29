@@ -34,17 +34,16 @@
 #ifndef GraphNode_H_
 #define GraphNode_H_
 
-#include "mynew.h"
-#include "debug.h"
 #include "state.h"
-#include "options.h"
-#include <set>
-#include <cassert>
 #include "SinglyLinkedList.h"
 #include "GraphFormula.h"
 #include "GraphEdge.h"
+#include "mynew.h"
+#include "debug.h"
+#include "options.h"
+#include <set>
+#include <cassert>
 
-//class literal;
 
 typedef std::set<State*> StateSet;
 

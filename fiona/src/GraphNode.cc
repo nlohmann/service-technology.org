@@ -33,10 +33,6 @@
 
 #include "mynew.h"
 #include "GraphNode.h"
-#include "GraphFormula.h"
-#include "state.h"
-#include "debug.h"
-#include "options.h"
 #include <cassert>
 
 using namespace std;

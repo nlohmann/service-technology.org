@@ -37,15 +37,9 @@
 #include <set>
 
 class GraphNode;
- class GraphNode;
 class State;
 
 typedef std::set<State*> StateSet;
-
-//struct compareVertices {
-//    bool operator <(GraphNode const * left, GraphNode const * right);
-//};
-
 
 struct compareVertices {
     bool operator()(GraphNode const * left, GraphNode const * right);

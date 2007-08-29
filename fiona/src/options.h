@@ -37,11 +37,10 @@
 #define OPTIONS_H
 
 #include "mynew.h"
+#include "getopt.h"
 #include <map>
 #include <list>
 #include <cstdio>
-#include "getopt.h"
-//#include "GraphNode.h"
 
 
 typedef enum {
@@ -97,7 +96,7 @@ extern unsigned int messages_manual;
 extern int events_manual;
 extern int bdd_reordermethod;
 
-extern std::ostream * log_output;
+extern std::ostream* log_output;
 
 void parse_command_line(int argc, char* argv[]);
 

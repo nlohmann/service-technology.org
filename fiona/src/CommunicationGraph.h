@@ -68,8 +68,8 @@ class CommunicationGraph {
          * @param visitedNodes[] Array of bool storing the nodes that we have
          *     already looked at.
          */
-        void computeNumberOfStatesAndEdgesHelper(GraphNodeCommon<GraphNode>* v,
-                                                 std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes);
+        void computeNumberOfStatesAndEdgesHelper(GraphNode* v,
+                                                 std::map<GraphNode*, bool>& visitedNodes);
 
         /**
          * Computes the number of all blue to be shown nodes and edges in this
@@ -85,7 +85,7 @@ class CommunicationGraph {
          * @param visitedNodes[] Array of bool storing the nodes that we have
          *     already looked at.
          */
-        void computeNumberOfBlueNodesEdgesHelper(GraphNodeCommon<GraphNode>* v, std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes);
+        void computeNumberOfBlueNodesEdgesHelper(GraphNode* v, std::map<GraphNode*, bool>& visitedNodes);
 
         /**
          * The total number of all states stored in all nodes in this graph.
@@ -114,7 +114,7 @@ class CommunicationGraph {
     protected:
         oWFN* PN; //!< pointer to the underlying petri net
 
-        GraphNodeCommon<GraphNode>* root; //!< the root node of the graph
+        GraphNode* root; //!< the root node of the graph
 
         void addProgress(double);
 
@@ -125,7 +125,7 @@ class CommunicationGraph {
 
         GraphNodeSet setOfVertices;
 
-        GraphNodeCommon<GraphNode>* getRoot() const;
+        GraphNode* getRoot() const;
 
         void calculateRootNode();
 
@@ -158,9 +158,9 @@ class CommunicationGraph {
          */
         unsigned int getNumberOfBlueEdges() const;
 
-        GraphNodeCommon<GraphNode>* findGraphNodeInSet(GraphNodeCommon<GraphNode>*);
+        GraphNode* findGraphNodeInSet(GraphNode*);
 
-        void analyseNode(GraphNodeCommon<GraphNode>*);
+        void analyseNode(GraphNode*);
 
         void printProgressFirst();
         void printProgress();
@@ -168,26 +168,26 @@ class CommunicationGraph {
         void buildGraphRandom();
 
         void printGraphToDot();
-        void printGraphToDotRecursively(GraphNodeCommon<GraphNode>* v,
+        void printGraphToDotRecursively(GraphNode* v,
                                         fstream& os,
-                                        std::map<GraphNodeCommon<GraphNode>*, bool>&);
+                                        std::map<GraphNode*, bool>&);
 
         // functions to create an STG representation of the IG or OG
         void printGraphToSTG();
-        void printGraphToSTGRecursively(GraphNodeCommon<GraphNode>* v,
+        void printGraphToSTGRecursively(GraphNode* v,
                                         fstream& os,
-                                        std::map<GraphNodeCommon<GraphNode>*, bool>&);
+                                        std::map<GraphNode*, bool>&);
 
         // functions to annotate the OG for distributed controllability
         bool annotateGraphDistributedly();
-        bool annotateGraphDistributedlyRecursively(GraphNodeCommon<GraphNode>* v,
-                                                   std::map<GraphNodeCommon<GraphNode>*, bool>&);
-        void removeLabeledSuccessor(GraphNodeCommon<GraphNode>* v, std::string label);
+        bool annotateGraphDistributedlyRecursively(GraphNode* v,
+                                                   std::map<GraphNode*, bool>&);
+        void removeLabeledSuccessor(GraphNode* v, std::string label);
 
         // functions for diagnosis
         void diagnose();
-        GraphNodeDiagnosisColor_enum diagnose_recursively(GraphNodeCommon<GraphNode>* v,
-                                                          std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes);
+        GraphNodeDiagnosisColor_enum diagnose_recursively(GraphNode* v,
+                                                          std::map<GraphNode*, bool>& visitedNodes);
 
         /**
          * Computes statistics about this graph. They can be printed by

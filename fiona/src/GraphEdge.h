@@ -43,19 +43,19 @@
 enum GraphEdgeType {SENDING, RECEIVING};
 
 class GraphNode;
-template<typename GraphNodeType> class GraphNodeCommon;
+ class GraphNode;
 
 
 /**
  * @todo TODO: Turn this template class into a normal class with GraphNodeType =
  * GraphNode when GraphNode and OGFromFileNode are merged.
  */
-template<typename GraphNodeType = GraphNode> class GraphEdge {
+class GraphEdge {
     private:
         /**
          * Points to the destination node of this edge.
          */
-        GraphNodeCommon<GraphNodeType>* dstNode;
+        GraphNode* dstNode;
 
         /** Label of the edge. */
         std::string label;
@@ -66,7 +66,7 @@ template<typename GraphNodeType = GraphNode> class GraphEdge {
          * @param dstNodeP Points to the destination of this edge.
          * @param labelP label of this edge.
          */
-        GraphEdge(GraphNodeCommon<GraphNodeType>* dstNodeP, const std::string& labelP);
+        GraphEdge(GraphNode* dstNodeP, const std::string& labelP);
 
         /**
          * Returns the label of this edge.
@@ -81,7 +81,7 @@ template<typename GraphNodeType = GraphNode> class GraphEdge {
         /**
          * Returns the node this edge points to.
          */
-        GraphNodeCommon<GraphNodeType>* getDstNode() const;
+        GraphNode* getDstNode() const;
 
 #undef new
         /**
@@ -91,36 +91,5 @@ template<typename GraphNodeType = GraphNode> class GraphEdge {
         NEW_OPERATOR(GraphEdge)
 #define new NEW_NEW
 };
-
-
-template<typename GraphNodeType> GraphEdge<GraphNodeType>::GraphEdge(GraphNodeCommon<GraphNodeType>* dstNodeP,
-                                                                     const std::string& labelP) :
-    dstNode(dstNodeP), label(labelP) {
-}
-
-
-template<typename GraphNodeType> GraphNodeCommon<GraphNodeType>* GraphEdge<GraphNodeType>::getDstNode() const {
-    return dstNode;
-}
-
-
-template<typename GraphNodeType> std::string GraphEdge<GraphNodeType>::getLabel() const {
-    return label;
-}
-
-
-template<typename GraphNodeType> GraphEdgeType GraphEdge<GraphNodeType>::getType() const {
-    assert(label.size() != 0);
-    switch (label[0]) {
-        case '?':
-            return RECEIVING;
-        case '!':
-            return SENDING;
-        default:
-            // This should never happen.
-            assert(false);
-            throw new std::invalid_argument("Cannot determine type of this GraphEdge with label '" + label + "'.");
-    }
-}
 
 #endif //GRAPHEDGE_H

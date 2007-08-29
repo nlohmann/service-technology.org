@@ -57,7 +57,7 @@ class TrSymbol;
 class Arc;
 class OGFromFile;
 class OGFromFileNode;
-template<typename GraphNodeType> class GraphNodeCommon;
+ class GraphNode;
 class GraphFormulaAssignment;
 
 
@@ -101,7 +101,7 @@ class oWFN {
          * @retval true If this oWFN matches with given OG.
          * @retval false Otherwise.
          */
-        bool matchesWithOGRecursive(GraphNodeCommon<OGFromFileNode>* currentOGNode,
+        bool matchesWithOGRecursive(GraphNode* currentOGNode,
                                     State* currentState,
                                     string& reasonForFailedMatch);
 
@@ -204,15 +204,15 @@ class oWFN {
 
         void addPlace(owfnPlace*);
 
-        void addSuccStatesToList(GraphNodeCommon<GraphNode>*, State*);
+        void addSuccStatesToList(GraphNode*, State*);
         void addSuccStatesToListStubborn(StateSet&,
                                          owfnPlace*,
                                          State*,
-                                         GraphNodeCommon<GraphNode>*);
+                                         GraphNode*);
         void addSuccStatesToListStubborn(StateSet&,
                                          messageMultiSet,
                                          State*,
-                                         GraphNodeCommon<GraphNode>*);
+                                         GraphNode*);
 
         // void addSuccStatesToListOrig(GraphNode *, State *);		
 
@@ -228,12 +228,12 @@ class oWFN {
 
         unsigned int* copyCurrentMarking();
         void copyMarkingToCurrentMarking(unsigned int* copy);
-        void calculateReachableStatesOutputEvent(GraphNodeCommon<GraphNode>*);
-        void calculateReachableStatesInputEvent(GraphNodeCommon<GraphNode>*);
-        void calculateReachableStates(StateSet&, owfnPlace*, GraphNodeCommon<GraphNode>*);
-        void calculateReachableStates(StateSet&, messageMultiSet, GraphNodeCommon<GraphNode>*);
+        void calculateReachableStatesOutputEvent(GraphNode*);
+        void calculateReachableStatesInputEvent(GraphNode*);
+        void calculateReachableStates(StateSet&, owfnPlace*, GraphNode*);
+        void calculateReachableStates(StateSet&, messageMultiSet, GraphNode*);
 
-        void calculateReachableStatesFull(GraphNodeCommon<GraphNode>*);
+        void calculateReachableStatesFull(GraphNode*);
 
         void addInputMessage(unsigned int);
         void addInputMessage(messageMultiSet); // adds input message to the current marking

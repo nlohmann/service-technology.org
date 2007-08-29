@@ -302,7 +302,7 @@ owfnTransition ** oWFN::quasiFirelist() {
 //! \param n the node to add the states to
 //! \param currentState the currently added state
 //! \brief decodes state, checks for message bound violation and adds successors recursively
-void oWFN::addSuccStatesToList(GraphNodeCommon<GraphNode>* n, State * currentState) {
+void oWFN::addSuccStatesToList(GraphNode* n, State * currentState) {
 
     assert(n != NULL);
 
@@ -354,7 +354,7 @@ void oWFN::addSuccStatesToList(GraphNodeCommon<GraphNode>* n, State * currentSta
 void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
                                        owfnPlace * outputPlace,
                                        State * currentState,
-                                       GraphNodeCommon<GraphNode>* n) {
+                                       GraphNode* n) {
 
     if (currentState != NULL) {
         currentState->decodeShowOnly(this); // decodes currently considered state
@@ -393,7 +393,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
 void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
                                        messageMultiSet messages,
                                        State * currentState,
-                                       GraphNodeCommon<GraphNode>* n) {
+                                       GraphNode* n) {
 
     if (currentState != NULL) {
         currentState->decodeShowOnly(this); // decodes currently considered state
@@ -513,7 +513,7 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 
 //! \param n the node to be calculated in case of an output event
 //! \brief calculates the reduced set of states of the new GraphNode in case of an output event
-void oWFN::calculateReachableStatesOutputEvent(GraphNodeCommon<GraphNode>* n) {
+void oWFN::calculateReachableStatesOutputEvent(GraphNode* n) {
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(GraphNode * n): start\n");
 
@@ -665,7 +665,7 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNodeCommon<GraphNode>* n) {
 //! \param n the node to be calculated in case of an input event
 //! \brief calculates the reduced set of states of the new GraphNode in case of an input event
 // for IG with node reduction
-void oWFN::calculateReachableStatesInputEvent(GraphNodeCommon<GraphNode>* n) {
+void oWFN::calculateReachableStatesInputEvent(GraphNode* n) {
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(GraphNode * n): start\n");
 
@@ -824,7 +824,7 @@ void oWFN::calculateReachableStatesInputEvent(GraphNodeCommon<GraphNode>* n) {
 //  for OG or full IG
 void oWFN::calculateReachableStates(StateSet& stateSet,
                                     owfnPlace * outputPlace,
-                                    GraphNodeCommon<GraphNode>* n) {
+                                    GraphNode* n) {
 
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : start\n");
@@ -1016,7 +1016,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
 //  for IG
 void oWFN::calculateReachableStates(StateSet& stateSet,
                                     messageMultiSet messages,
-                                    GraphNodeCommon<GraphNode>* n) {
+                                    GraphNode* n) {
 
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages, GraphNode * n) : start\n");
@@ -1259,7 +1259,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
 //! \brief NO REDUCTION! calculate all reachable states from the current marking
 //! and store them in the node n (== GraphNode of CommunicationGraph);
 //! it will color the node n RED if a given message bound is violated
-void oWFN::calculateReachableStatesFull(GraphNodeCommon<GraphNode>* n) {
+void oWFN::calculateReachableStatesFull(GraphNode* n) {
 
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStatesFull(GraphNode* n) : start\n");
@@ -1737,7 +1737,7 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
     currentState->type = typeOfState();
 
     // Initialize the currentOGNode with the root node of the OG.
-    GraphNodeCommon<OGFromFileNode>* currentOGNode = og->getRoot();
+    GraphNode* currentOGNode = og->getRoot();
 
     if (currentOGNode->isRed()) {
         reasonForFailedMatch = "The OG is empty (its root node is red).";
@@ -1750,7 +1750,7 @@ bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
 }
 
 
-bool oWFN::matchesWithOGRecursive(GraphNodeCommon<OGFromFileNode>* currentOGNode,
+bool oWFN::matchesWithOGRecursive(GraphNode* currentOGNode,
                                   State* currentState,
                                   string& reasonForFailedMatch) {
 
@@ -1813,7 +1813,7 @@ bool oWFN::matchesWithOGRecursive(GraphNodeCommon<OGFromFileNode>* currentOGNode
         // Save the currentOGNode to a temporary copy, so we can easily
         // revert to it if the state we reached to firing the current
         // transition lead us to an already seen state.
-        GraphNodeCommon<OGFromFileNode>* oldOGNode = currentOGNode;
+        GraphNode* oldOGNode = currentOGNode;
 
         // if net makes a visible step, the OG node does so, too
         if (transition->hasNonTauLabelForMatching()) {

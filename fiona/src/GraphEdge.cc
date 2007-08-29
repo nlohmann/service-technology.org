@@ -40,3 +40,32 @@
 
 using namespace std;
 
+GraphEdge::GraphEdge(GraphNode* dstNodeP, const std::string& labelP) :
+    dstNode(dstNodeP), label(labelP) {
+}
+
+
+GraphNode* GraphEdge::getDstNode() const {
+    return dstNode;
+}
+
+
+std::string GraphEdge::getLabel() const {
+    return label;
+}
+
+
+GraphEdgeType GraphEdge::getType() const {
+    assert(label.size() != 0);
+    switch (label[0]) {
+        case '?':
+            return RECEIVING;
+        case '!':
+            return SENDING;
+        default:
+            // This should never happen.
+            assert(false);
+            throw new std::invalid_argument("Cannot determine type of this GraphEdge with label '" + label + "'.");
+    }
+}
+

@@ -54,7 +54,7 @@ using namespace std;
 //                               GraphNodeColor _color) :
 //
 //    // initialize father
-//    GraphNodeCommon<OGFromFileNode>(_name, _annotation, _color) {
+//    GraphNode(_name, _annotation, _color) {
 //
 //}
 //
@@ -72,16 +72,16 @@ OGFromFile::~OGFromFile() {
 }
 
 
-void OGFromFile::addNode(GraphNodeCommon<OGFromFileNode>* node) {
+void OGFromFile::addNode(GraphNode* node) {
     nodes.insert(node);
 }
 
 
-GraphNodeCommon<OGFromFileNode>* OGFromFile::addNode(const std::string& nodeName,
+GraphNode* OGFromFile::addNode(const std::string& nodeName,
                                                      GraphFormula* annotation,
                                                      GraphNodeColor color) {
 
-    GraphNodeCommon<OGFromFileNode>* node = new GraphNodeCommon<OGFromFileNode>(nodeName, annotation, color);
+    GraphNode* node = new GraphNode(nodeName, annotation, color);
     addNode(node);
     return node;
 }
@@ -91,10 +91,10 @@ void OGFromFile::addTransition(const std::string& srcName,
                                const std::string& dstNodeName,
                                const std::string& label) {
 
-    GraphNodeCommon<OGFromFileNode>* src = getNodeWithName(srcName);
-    GraphNodeCommon<OGFromFileNode>* dstNode = getNodeWithName(dstNodeName);
+    GraphNode* src = getNodeWithName(srcName);
+    GraphNode* dstNode = getNodeWithName(dstNodeName);
 
-    GraphEdge<OGFromFileNode>* transition = new GraphEdge<OGFromFileNode>(dstNode,label);
+    GraphEdge* transition = new GraphEdge(dstNode,label);
     src->addLeavingEdge(transition);
 }
 
@@ -104,7 +104,7 @@ bool OGFromFile::hasNodeWithName(const std::string& nodeName) const {
 }
 
 
-GraphNodeCommon<OGFromFileNode>* OGFromFile::getNodeWithName(const std::string& nodeName) const {
+GraphNode* OGFromFile::getNodeWithName(const std::string& nodeName) const {
 
     for (nodes_const_iterator node_iter = nodes.begin(); node_iter
             != nodes.end(); ++node_iter) {
@@ -118,12 +118,12 @@ GraphNodeCommon<OGFromFileNode>* OGFromFile::getNodeWithName(const std::string& 
 }
 
 
-GraphNodeCommon<OGFromFileNode>* OGFromFile::getRoot() const {
+GraphNode* OGFromFile::getRoot() const {
     return root;
 }
 
 
-void OGFromFile::setRoot(GraphNodeCommon<OGFromFileNode>* newRoot) {
+void OGFromFile::setRoot(GraphNode* newRoot) {
     root = newRoot;
 }
 
@@ -170,7 +170,7 @@ void OGFromFile::removeFalseNodes() {
 }
 
 
-void OGFromFile::removeTransitionsToNodeFromAllOtherNodes(const GraphNodeCommon<OGFromFileNode>* nodeToDelete) {
+void OGFromFile::removeTransitionsToNodeFromAllOtherNodes(const GraphNode* nodeToDelete) {
 
     for (nodes_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
         if (*iNode != nodeToDelete) {
@@ -190,9 +190,9 @@ bool OGFromFile::simulates(OGFromFile *smallerOG) {
         return false;
 
     //We need to remember the nodes we already visited.
-    set<GraphNodeCommon<OGFromFileNode>*> *myVisitedNodes, *simVisitedNodes;
-    myVisitedNodes = new set<GraphNodeCommon<OGFromFileNode>*>;
-    simVisitedNodes = new set<GraphNodeCommon<OGFromFileNode>*>;
+    set<GraphNode*> *myVisitedNodes, *simVisitedNodes;
+    myVisitedNodes = new set<GraphNode*>;
+    simVisitedNodes = new set<GraphNode*>;
 
     //Get things moving...
     bool result = false;
@@ -212,10 +212,10 @@ bool OGFromFile::simulates(OGFromFile *smallerOG) {
 //! \param myVisitedNodes a set containing the visited nodes in this OGFromFile
 //! \param simNode a node in the simulant
 //! \param simVisitedNodes same as myVisitedNodes in the simulant
-bool OGFromFile::simulatesRecursive(GraphNodeCommon<OGFromFileNode> *myNode,
-                                    set<GraphNodeCommon<OGFromFileNode>*> *myVisitedNodes,
-                                    GraphNodeCommon<OGFromFileNode> *simNode,
-                                    set<GraphNodeCommon<OGFromFileNode>*> *simVisitedNodes) {
+bool OGFromFile::simulatesRecursive(GraphNode *myNode,
+                                    set<GraphNode*> *myVisitedNodes,
+                                    GraphNode *simNode,
+                                    set<GraphNode*> *simVisitedNodes) {
     //If the simulant has no further nodes then myNode simulates simNode.
     if (simNode == NULL) {
         return true;
@@ -258,14 +258,14 @@ bool OGFromFile::simulatesRecursive(GraphNodeCommon<OGFromFileNode> *myNode,
 
     //Now, we have to check whether the two graphs are compatible.
     trace(TRACE_5, "Iterating over the transitions of the smallerOG's node.\n");
-    GraphNodeCommon<OGFromFileNode>::LeavingEdges::ConstIterator
+    GraphNode::LeavingEdges::ConstIterator
             simEdgeIter =simNode->getLeavingEdgesConstIterator();
 
     while (simEdgeIter->hasNext()) {
-        GraphEdge<OGFromFileNode>* simEdge = simEdgeIter->getNext();
+        GraphEdge* simEdge = simEdgeIter->getNext();
         trace(TRACE_5, "Trying to find the transition in the simulator.\n");
 
-        GraphEdge<OGFromFileNode>
+        GraphEdge
                 * myEdge =myNode->getTransitionWithLabel(simEdge->getLabel());
 
         if (myEdge == NULL) {
@@ -293,12 +293,12 @@ bool OGFromFile::isAcyclic() {
     trace(TRACE_5, "Test if the given OG is acyclic: start\n");
 
     // Define a set vor every Node, that will contain all transitive parent nodes
-    map<GraphNodeCommon<OGFromFileNode>*, set<GraphNodeCommon<OGFromFileNode>*> > parentNodes;
+    map<GraphNode*, set<GraphNode*> > parentNodes;
 
     // Define a queue for all nodes that still need to be tested and initialize it
-    queue<GraphNodeCommon<OGFromFileNode>*> testNodes;
+    queue<GraphNode*> testNodes;
     testNodes.push(root);
-    GraphNodeCommon<OGFromFileNode>* testNode;
+    GraphNode* testNode;
 
     // While there are still nodes in the queue
     while (!testNodes.empty()) {
@@ -310,11 +310,11 @@ bool OGFromFile::isAcyclic() {
         parentNodes[testNode].insert(testNode);
 
         // Iterate all transitions of that node
-        GraphNodeCommon<OGFromFileNode>::LeavingEdges::ConstIterator
+        GraphNode::LeavingEdges::ConstIterator
                 edgeIter =testNode->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
-            GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
+            GraphEdge* edge = edgeIter->getNext();
             // If the Node is the source of that transition and if the Destination is a valid node
             if (edge->getDstNode()->getColor() == BLUE) {
 
@@ -342,17 +342,17 @@ bool OGFromFile::isAcyclic() {
 unsigned int OGFromFile::numberOfServices() {
 
     // define variables that will be used in the recursive function
-    map<GraphNodeCommon<OGFromFileNode>*, list < set<GraphNodeCommon<OGFromFileNode>*> > >
+    map<GraphNode*, list < set<GraphNode*> > >
             validFollowerCombinations;
-    set<GraphNodeCommon<OGFromFileNode>*> activeNodes;
-    map<GraphNodeCommon<OGFromFileNode>*, unsigned int> followers;
-    map<set<GraphNodeCommon<OGFromFileNode>*>, unsigned int> eliminateRedundantCounting;
+    set<GraphNode*> activeNodes;
+    map<GraphNode*, unsigned int> followers;
+    map<set<GraphNode*>, unsigned int> eliminateRedundantCounting;
 
     // define variables that will be used in the preprocessing before starting the recursion
     set<string> labels;
     list<GraphFormulaAssignment> assignmentList;
     GraphFormulaAssignment possibleAssignment;
-    map<string, GraphEdge<OGFromFileNode>*> edges;
+    map<string, GraphEdge*> edges;
 
     // Preprocess all nodes of the OG in order to fill the variables needed in the recursion
     for (nodes_t::const_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
@@ -366,9 +366,9 @@ unsigned int OGFromFile::numberOfServices() {
         // get the labels of all outgoing edges, that reach a blue destination
         // save those labels in a set and fill a mapping that allows finding the
         // outgoing edges for a label. (does not work with non-determinism yet)
-        GraphNodeCommon<OGFromFileNode>::LeavingEdges::ConstIterator edgeIter =(*iNode)->getLeavingEdgesConstIterator();
+        GraphNode::LeavingEdges::ConstIterator edgeIter =(*iNode)->getLeavingEdgesConstIterator();
         while (edgeIter->hasNext()) {
-            GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
+            GraphEdge* edge = edgeIter->getNext();
             if (edge->getDstNode()->getColor() == BLUE) {
                 labels.insert(edge->getLabel());
                 edges[edge->getLabel()] = edge;
@@ -386,7 +386,7 @@ unsigned int OGFromFile::numberOfServices() {
                                                          assignmentList);
 
         // create a temporary variable for a set of nodes
-        set<GraphNodeCommon<OGFromFileNode>*> followerNodes;
+        set<GraphNode*> followerNodes;
 
         // for every true assignment in the list a set of nodes will be created. These are the nodes which are
         // reached by outgoing edges of which the labels were true in the assignment. This set is then saved in
@@ -395,7 +395,7 @@ unsigned int OGFromFile::numberOfServices() {
                 assignment = assignmentList.begin(); assignment
                 != assignmentList.end(); assignment++) {
 
-            followerNodes = set<GraphNodeCommon<OGFromFileNode>*>();
+            followerNodes = set<GraphNode*>();
             for (set<string>::iterator label = labels.begin(); label
                     != labels.end(); label++) {
 
@@ -419,10 +419,10 @@ unsigned int OGFromFile::numberOfServices() {
 
 //! \brief computes the number of possible services for a finished instance or proceed the active nodes
 //! \return number of Services
-unsigned int OGFromFile::numberOfServicesRecursively(set<GraphNodeCommon<OGFromFileNode>*> activeNodes,
-                                                     map<GraphNodeCommon<OGFromFileNode>*, unsigned int>& followers,
-                                                     map<GraphNodeCommon<OGFromFileNode>*,list<set<GraphNodeCommon<OGFromFileNode>*> > >& validFollowerCombinations,
-                                                     map<set<GraphNodeCommon<OGFromFileNode>*>, unsigned int>& eliminateRedundantCounting) {
+unsigned int OGFromFile::numberOfServicesRecursively(set<GraphNode*> activeNodes,
+                                                     map<GraphNode*, unsigned int>& followers,
+                                                     map<GraphNode*,list<set<GraphNode*> > >& validFollowerCombinations,
+                                                     map<set<GraphNode*>, unsigned int>& eliminateRedundantCounting) {
 
     // if an Instance with the same active Nodes has already been computed, use the saved value
     if (eliminateRedundantCounting[activeNodes] != 0) {
@@ -431,15 +431,15 @@ unsigned int OGFromFile::numberOfServicesRecursively(set<GraphNodeCommon<OGFromF
 
     // define needed variables
     unsigned int number = 0;
-    list< set<GraphNodeCommon<OGFromFileNode>*> > oldList;
-    list< set<GraphNodeCommon<OGFromFileNode>*> > newList;
-    set<GraphNodeCommon<OGFromFileNode>*> tempSet;
+    list< set<GraphNode*> > oldList;
+    list< set<GraphNode*> > newList;
+    set<GraphNode*> tempSet;
     bool first = true;
     bool usingNew = true;
     bool finalInstance = true;
 
     // process all active nodes of this instance
-    for (set<GraphNodeCommon<OGFromFileNode>*>::iterator activeNode = activeNodes.begin(); activeNode
+    for (set<GraphNode*>::iterator activeNode = activeNodes.begin(); activeNode
             != activeNodes.end(); activeNode++) {
 
         // if the active node has no valid outgoing edges, do nothing. If that happens
@@ -453,7 +453,7 @@ unsigned int OGFromFile::numberOfServicesRecursively(set<GraphNodeCommon<OGFromF
             if (first) {
 
                 first = false;
-                for (list<set<GraphNodeCommon<OGFromFileNode>*> >::iterator
+                for (list<set<GraphNode*> >::iterator
                         combination = validFollowerCombinations[(*activeNode)].begin(); combination
                         != validFollowerCombinations[(*activeNode)].end(); combination++) {
 
@@ -470,22 +470,22 @@ unsigned int OGFromFile::numberOfServicesRecursively(set<GraphNodeCommon<OGFromF
             if (usingNew) {
 
                 newList.clear();
-                for (list<set<GraphNodeCommon<OGFromFileNode>*> >::iterator
+                for (list<set<GraphNode*> >::iterator
                         oldListSet = oldList.begin(); oldListSet
                         != oldList.end(); oldListSet++) {
 
-                    for (list<set<GraphNodeCommon<OGFromFileNode>*> >::iterator
+                    for (list<set<GraphNode*> >::iterator
                             combination = validFollowerCombinations[(*activeNode)].begin(); combination
                             != validFollowerCombinations[(*activeNode)].end(); combination++) {
 
-                        tempSet = set<GraphNodeCommon<OGFromFileNode>*>();
+                        tempSet = set<GraphNode*>();
 
-                        for (set<GraphNodeCommon<OGFromFileNode>*>::iterator insertionNode = (*combination).begin(); insertionNode != (*combination).end(); insertionNode++) {
+                        for (set<GraphNode*>::iterator insertionNode = (*combination).begin(); insertionNode != (*combination).end(); insertionNode++) {
 
                             tempSet.insert((*insertionNode));
                         }
 
-                        for (set<GraphNodeCommon<OGFromFileNode>*>::iterator insertionNode = (*oldListSet).begin(); insertionNode != (*oldListSet).end(); insertionNode++) {
+                        for (set<GraphNode*>::iterator insertionNode = (*oldListSet).begin(); insertionNode != (*oldListSet).end(); insertionNode++) {
 
                             tempSet.insert((*insertionNode));
                         }
@@ -497,22 +497,22 @@ unsigned int OGFromFile::numberOfServicesRecursively(set<GraphNodeCommon<OGFromF
             } else {
 
                 oldList.clear();
-                for (list<set<GraphNodeCommon<OGFromFileNode>*> >::iterator
+                for (list<set<GraphNode*> >::iterator
                         newListSet = newList.begin(); newListSet
                         != newList.end(); newListSet++) {
 
-                    for (list<set<GraphNodeCommon<OGFromFileNode>*> >::iterator
+                    for (list<set<GraphNode*> >::iterator
                             combination = validFollowerCombinations[(*activeNode)].begin(); combination
                             != validFollowerCombinations[(*activeNode)].end(); combination++) {
 
-                        tempSet = set<GraphNodeCommon<OGFromFileNode>*>();
+                        tempSet = set<GraphNode*>();
 
-                        for (set<GraphNodeCommon<OGFromFileNode>*>::iterator insertionNode = (*combination).begin(); insertionNode != (*combination).end(); insertionNode++) {
+                        for (set<GraphNode*>::iterator insertionNode = (*combination).begin(); insertionNode != (*combination).end(); insertionNode++) {
 
                             tempSet.insert((*insertionNode));
                         }
 
-                        for (set<GraphNodeCommon<OGFromFileNode>*>::iterator insertionNode = (*newListSet).begin(); insertionNode != (*newListSet).end(); insertionNode++) {
+                        for (set<GraphNode*>::iterator insertionNode = (*newListSet).begin(); insertionNode != (*newListSet).end(); insertionNode++) {
 
                             tempSet.insert((*insertionNode));
                         }
@@ -533,14 +533,14 @@ unsigned int OGFromFile::numberOfServicesRecursively(set<GraphNodeCommon<OGFromF
     // if there were sets of following nodes, create a new instance of active nodes for every tuple of
     // following sets and add the results to this instance's number of services
     if (usingNew) {
-        for (list<set<GraphNodeCommon<OGFromFileNode>*> >::iterator oldListSet = oldList.begin(); oldListSet
+        for (list<set<GraphNode*> >::iterator oldListSet = oldList.begin(); oldListSet
                 != oldList.end(); oldListSet++) {
             number += numberOfServicesRecursively((*oldListSet), followers,
                                                   validFollowerCombinations,
                                                   eliminateRedundantCounting);
         }
     } else {
-        for (list<set<GraphNodeCommon<OGFromFileNode>*> >::iterator newListSet = newList.begin(); newListSet
+        for (list<set<GraphNode*> >::iterator newListSet = newList.begin(); newListSet
                 != newList.end(); newListSet++) {
             number += numberOfServicesRecursively((*newListSet), followers,
                                                   validFollowerCombinations,
@@ -562,7 +562,7 @@ unsigned int OGFromFile::numberOfServicesRecursively(set<GraphNodeCommon<OGFromF
 //! \return number of true Assignments
 unsigned int OGFromFile::processAssignmentsRecursively(set<string> labels,
                                                        GraphFormulaAssignment possibleAssignment,
-                                                       GraphNodeCommon<OGFromFileNode>* testNode,
+                                                       GraphNode* testNode,
                                                        list<GraphFormulaAssignment>& assignmentList) {
     // If there is no outgoing transition, return immediatly
     if (labels.empty()) {
@@ -634,8 +634,8 @@ OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
 
     // first we build a new root node that has name and annotation constructed
     // from the root nodes of OG and the rhs OG.
-    GraphNodeCommon<OGFromFileNode>* currentOGNode = this->getRoot();
-    GraphNodeCommon<OGFromFileNode>* currentRhsNode = rhs->getRoot();
+    GraphNode* currentOGNode = this->getRoot();
+    GraphNode* currentRhsNode = rhs->getRoot();
 
     std::string currentName;
     currentName = currentOGNode->getName() + "x"+ currentRhsNode->getName();
@@ -644,7 +644,7 @@ OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
                                                               currentRhsNode);
 
     // building the new root node of the product OG
-    GraphNodeCommon<OGFromFileNode>* productNode = new GraphNodeCommon<OGFromFileNode>(currentName, currentFormula);
+    GraphNode* productNode = new GraphNode(currentName, currentFormula);
     productOG->addNode(productNode);
     productOG->setRoot(productNode);
 
@@ -676,11 +676,11 @@ OGFromFile* OGFromFile::product(const ogs_t& ogs) {
 }
 
 
-void OGFromFile::buildProductOG(GraphNodeCommon<OGFromFileNode>* currentOGNode,
-                                GraphNodeCommon<OGFromFileNode>* currentRhsNode,
+void OGFromFile::buildProductOG(GraphNode* currentOGNode,
+                                GraphNode* currentRhsNode,
                                 OGFromFile* productOG) {
 
-    trace(TRACE_5, "OGFromFile::buildProductOG(GraphNodeCommon<OGFromFileNode>* currentOGNode, GraphNodeCommon<OGFromFileNode>* currentRhsNode, OGFromFile* productOG): start\n");
+    trace(TRACE_5, "OGFromFile::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, OGFromFile* productOG): start\n");
 
     // at this time, the node constructed from currentOGNode and
     // currentRhsNode is already inserted
@@ -689,11 +689,11 @@ void OGFromFile::buildProductOG(GraphNodeCommon<OGFromFileNode>* currentOGNode,
 
     // iterate over all outgoing edges from current node of OG
     std::string currentLabel;
-    GraphNodeCommon<OGFromFileNode>::LeavingEdges::ConstIterator
+    GraphNode::LeavingEdges::ConstIterator
             edgeIter =currentOGNode->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
-        GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
+        GraphEdge* edge = edgeIter->getNext();
 
         // remember the label of the egde
         currentLabel = edge->getLabel();
@@ -707,10 +707,10 @@ void OGFromFile::buildProductOG(GraphNodeCommon<OGFromFileNode>* currentOGNode,
             assert(productOG->hasNodeWithName(currentName));
 
             // compute both successors and recursively call buildProductOG again
-            GraphNodeCommon<OGFromFileNode>* newOGNode;
+            GraphNode* newOGNode;
             newOGNode = currentOGNode->fireTransitionWithLabel(currentLabel);
 
-            GraphNodeCommon<OGFromFileNode>* newRhsNode;
+            GraphNode* newRhsNode;
             newRhsNode = currentRhsNode->fireTransitionWithLabel(currentLabel);
 
             // build the new node of the product OG
@@ -718,21 +718,21 @@ void OGFromFile::buildProductOG(GraphNodeCommon<OGFromFileNode>* currentOGNode,
             std::string newProductName;
             newProductName = newOGNode->getName() + "x" + newRhsNode->getName();
             // if the node is new, add that node to the OG
-            GraphNodeCommon<OGFromFileNode>* found = productOG->getNodeWithName(newProductName);
+            GraphNode* found = productOG->getNodeWithName(newProductName);
 
             if (found != NULL) {
                 // the node was known before, so we just have to add a new edge
                 productOG->addTransition(currentName, newProductName,
                                          currentLabel);
 
-                trace(TRACE_5, "OGFromFile::buildProductOG(GraphNodeCommon<OGFromFileNode>* currentOGNode, GraphNodeCommon<OGFromFileNode>* currentRhsNode, OGFromFile* productOG): end\n");
+                trace(TRACE_5, "OGFromFile::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, OGFromFile* productOG): end\n");
             } else {
                 // we computed a new node, so we add a node and an edge
                 // trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
 
                 GraphFormulaCNF* newProductFormula = createProductAnnotation(newOGNode, newRhsNode);
 
-                GraphNodeCommon<OGFromFileNode>* newProductNode = new GraphNodeCommon<OGFromFileNode>(newProductName, newProductFormula);
+                GraphNode* newProductNode = new GraphNode(newProductName, newProductFormula);
 
                 productOG->addNode(newProductNode);
 
@@ -744,12 +744,12 @@ void OGFromFile::buildProductOG(GraphNodeCommon<OGFromFileNode>* currentOGNode,
         }
     }
     delete edgeIter;
-    trace(TRACE_5, "OGFromFile::buildProductOG(GraphNodeCommon<OGFromFileNode>* currentOGNode, GraphNodeCommon<OGFromFileNode>* currentRhsNode, OGFromFile* productOG): end\n");
+    trace(TRACE_5, "OGFromFile::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, OGFromFile* productOG): end\n");
 }
 
 
-GraphFormulaCNF* OGFromFile::createProductAnnotation(const GraphNodeCommon<OGFromFileNode>* lhs,
-                                                     const GraphNodeCommon<OGFromFileNode>* rhs) const {
+GraphFormulaCNF* OGFromFile::createProductAnnotation(const GraphNode* lhs,
+                                                     const GraphNode* rhs) const {
 
     GraphFormulaMultiaryAnd* conjunction = new GraphFormulaMultiaryAnd(
             lhs->getAnnotation()->getDeepCopy(),
@@ -802,7 +802,7 @@ void OGFromFile::printDotFile(const std::string& filenamePrefix,
     dotFileHandle << "node [fontname=\"Helvetica\" fontsize=10];\n";
     dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
-    std::map<GraphNodeCommon<OGFromFileNode>*, bool> visitedNodes;
+    std::map<GraphNode*, bool> visitedNodes;
     printGraphToDot(getRoot(), dotFileHandle, visitedNodes);
 
     dotFileHandle << "}";
@@ -826,9 +826,9 @@ void OGFromFile::printDotFile(const std::string& filenamePrefix) const {
 //! \param os output stream
 //! \param visitedNodes maps nodes to Bools remembering already visited nodes
 //! \brief dfs through the graph printing each node and edge to the output stream
-void OGFromFile::printGraphToDot(GraphNodeCommon<OGFromFileNode>* v,
+void OGFromFile::printGraphToDot(GraphNode* v,
                                  fstream& os,
-                                 std::map<GraphNodeCommon<OGFromFileNode>*, bool>& visitedNodes) const {
+                                 std::map<GraphNode*, bool>& visitedNodes) const {
 
     if (v == NULL) {
         // print the empty OG...
@@ -844,15 +844,15 @@ void OGFromFile::printGraphToDot(GraphNodeCommon<OGFromFileNode>* v,
 
         std::string currentLabel;
 
-        GraphNodeCommon<OGFromFileNode>::LeavingEdges::ConstIterator
+        GraphNode::LeavingEdges::ConstIterator
                 edgeIter =v->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
-            GraphEdge<OGFromFileNode>* edge = edgeIter->getNext();
+            GraphEdge* edge = edgeIter->getNext();
 
             // remember the label of the egde
             currentLabel = edge->getLabel();
-            GraphNodeCommon<OGFromFileNode>
+            GraphNode
                     * successor = v->fireTransitionWithLabel(currentLabel);
             assert(successor != NULL);
 
@@ -891,7 +891,7 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
             ogFile << ','<< endl;
         }
 
-        GraphNodeCommon<OGFromFileNode>* node = *iNode;
+        GraphNode* node = *iNode;
         ogFile << "  " << node->getName() << " : "
                << node->getAnnotationAsString() << " : " << node->getColor().toString();
 
@@ -907,8 +907,8 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
     bool printedFirstTransition = false;
     for (nodes_t::const_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
 
-        GraphNodeCommon<OGFromFileNode>* node = *iNode;
-        GraphNodeCommon<OGFromFileNode>::LeavingEdges::ConstIterator
+        GraphNode* node = *iNode;
+        GraphNode::LeavingEdges::ConstIterator
                 iEdge = node->getLeavingEdgesConstIterator();
 
         while (iEdge->hasNext()) {
@@ -916,7 +916,7 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
                 ogFile << ',' << endl;
             }
 
-            GraphEdge<OGFromFileNode>* edge = iEdge->getNext();
+            GraphEdge* edge = iEdge->getNext();
             ogFile << "  " << node->getName() << " -> " << edge->getDstNode()->getName() << " : " << edge->getLabel();
 
             printedFirstTransition = true;

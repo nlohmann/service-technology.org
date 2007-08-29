@@ -43,8 +43,8 @@ class oWFN;
 class interactionGraph : public CommunicationGraph {
 
     private:
-        bool addGraphNode(GraphNodeCommon<GraphNode>*,
-                          GraphNodeCommon<GraphNode>*,
+        bool addGraphNode(GraphNode*,
+                          GraphNode*,
                           messageMultiSet,
                           GraphEdgeType); // for IG
 
@@ -58,22 +58,22 @@ class interactionGraph : public CommunicationGraph {
         interactionGraph(oWFN*);
         ~interactionGraph();
 
-        bool checkMaximalEvents(messageMultiSet, GraphNodeCommon<GraphNode>*, GraphEdgeType);
+        bool checkMaximalEvents(messageMultiSet, GraphNode*, GraphEdgeType);
 
         void buildGraph();
-        void buildGraph(GraphNodeCommon<GraphNode>*);
-        void buildReducedGraph(GraphNodeCommon<GraphNode>*);
+        void buildGraph(GraphNode*);
+        void buildReducedGraph(GraphNode*);
 
-        void getActivatedEventsComputeCNF(GraphNodeCommon<GraphNode>*, setOfMessages&, setOfMessages&);
+        void getActivatedEventsComputeCNF(GraphNode*, setOfMessages&, setOfMessages&);
 
-        void calculateSuccStatesInput(messageMultiSet, GraphNodeCommon<GraphNode>*, GraphNodeCommon<GraphNode>*);
-        void calculateSuccStatesOutput(messageMultiSet, GraphNodeCommon<GraphNode>*, GraphNodeCommon<GraphNode>*);
+        void calculateSuccStatesInput(messageMultiSet, GraphNode*, GraphNode*);
+        void calculateSuccStatesOutput(messageMultiSet, GraphNode*, GraphNode*);
 
-        setOfMessages combineReceivingEvents(GraphNodeCommon<GraphNode>*, setOfMessages&);
-        setOfMessages receivingBeforeSending(GraphNodeCommon<GraphNode>*);
+        setOfMessages combineReceivingEvents(GraphNode*, setOfMessages&);
+        setOfMessages receivingBeforeSending(GraphNode*);
 
-        void calculateSuccStatesOutputSet(messageMultiSet, GraphNodeCommon<GraphNode>*);
-        void calculateSuccStatesInputReduced(messageMultiSet, GraphNodeCommon<GraphNode>*);
+        void calculateSuccStatesOutputSet(messageMultiSet, GraphNode*);
+        void calculateSuccStatesInputReduced(messageMultiSet, GraphNode*);
 };
 
 #endif /*IG_H_*/

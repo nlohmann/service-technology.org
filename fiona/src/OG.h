@@ -48,7 +48,7 @@ class OG : public CommunicationGraph {
          * @param node the node for which the annotation is calculated
          * @brief calculates the annotation (CNF) for the node
          */
-        void computeCNF(GraphNodeCommon<GraphNode>* node) const;
+        void computeCNF(GraphNode* node) const;
 
         /**
          * Builds the OG of the associated PN recursively starting at
@@ -62,14 +62,14 @@ class OG : public CommunicationGraph {
          *      setOfVertices contains currentNode. That means, buildGraph can be
          *      called with root, if calculateRootNode() has been called.
          */
-        void buildGraph(GraphNodeCommon<GraphNode>* currentNode, double progress_plus);
+        void buildGraph(GraphNode* currentNode, double progress_plus);
 
-        void calculateSuccStatesInput(unsigned int, GraphNodeCommon<GraphNode>*, GraphNodeCommon<GraphNode>*);
-        void calculateSuccStatesOutput(unsigned int, GraphNodeCommon<GraphNode>*, GraphNodeCommon<GraphNode>*);
+        void calculateSuccStatesInput(unsigned int, GraphNode*, GraphNode*);
+        void calculateSuccStatesOutput(unsigned int, GraphNode*, GraphNode*);
 
-        void addGraphNode(GraphNodeCommon<GraphNode>*, GraphNodeCommon<GraphNode>*); // for OG
-        void addGraphEdge(GraphNodeCommon<GraphNode>*,
-                          GraphNodeCommon<GraphNode>*,
+        void addGraphNode(GraphNode*, GraphNode*); // for OG
+        void addGraphEdge(GraphNode*,
+                          GraphNode*,
                           oWFN::Places_t::size_type,
                           GraphEdgeType); // for OG
 
@@ -102,18 +102,18 @@ class OG : public CommunicationGraph {
         void printOGtoFile() const;
 
         /** Prints nodes of the OG into an OG file below the NODES section. */
-        //        void printNodesToOGFile(GraphNodeCommon<GraphNode>* v, fstream& os, bool visitedNodes[]) const;
-        void printNodesToOGFile(GraphNodeCommon<GraphNode>* v,
+        //        void printNodesToOGFile(GraphNode* v, fstream& os, bool visitedNodes[]) const;
+        void printNodesToOGFile(GraphNode* v,
                                 fstream& os,
-                                std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes) const;
+                                std::map<GraphNode*, bool>& visitedNodes) const;
 
         /// Generates for the given node its name to be used in operating guidelines.
-        std::string NodeNameForOG(const GraphNodeCommon<GraphNode>* v) const;
+        std::string NodeNameForOG(const GraphNode* v) const;
 
         /// Prints transitions of the OG to an OG file below the TRANSITIONS section.
-        void printTransitionsToOGFile(GraphNodeCommon<GraphNode>* v,
+        void printTransitionsToOGFile(GraphNode* v,
                                       fstream& os,
-                                      std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes) const;
+                                      std::map<GraphNode*, bool>& visitedNodes) const;
 
         // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new

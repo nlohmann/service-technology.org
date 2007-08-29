@@ -84,7 +84,7 @@ void OG::buildGraph() {
 }
 
 
-void OG::buildGraph(GraphNodeCommon<GraphNode>* currentNode, double progress_plus) {
+void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
     // currentNode is the root of the currently considered subgraph
     // at this point, the states inside currentNode are already computed!
@@ -142,7 +142,7 @@ void OG::buildGraph(GraphNodeCommon<GraphNode>* currentNode, double progress_plu
                 PN->getInputPlace(i)->max_occurence > currentNode->eventsUsed[i]) {
                 // we have to consider this event
 
-                GraphNodeCommon<GraphNode>* v = new GraphNodeCommon<GraphNode>();    // create new GraphNode of the graph
+                GraphNode* v = new GraphNode();    // create new GraphNode of the graph
 
                 trace(TRACE_5, "\t\t\t\t    calculating successor states\n");
                 calculateSuccStatesInput(PN->getInputPlace(i)->index, currentNode, v);
@@ -161,7 +161,7 @@ void OG::buildGraph(GraphNodeCommon<GraphNode>* currentNode, double progress_plu
                     delete v;
                 } else {
                     // was the new node v computed before?
-                    GraphNodeCommon<GraphNode>* found = findGraphNodeInSet(v);
+                    GraphNode* found = findGraphNodeInSet(v);
 
                     if (found == NULL) {
                         trace(TRACE_1, "\t computed successor node new\n");
@@ -186,7 +186,7 @@ void OG::buildGraph(GraphNodeCommon<GraphNode>* currentNode, double progress_plu
 
                         // draw a new SENDING edge to the old node
                         string edgeLabel = PN->getInputPlace(i)->getLabelForCommGraph();
-                        GraphEdge<>* newEdge = new GraphEdge<>(found, edgeLabel);
+                        GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
                         currentNode->addLeavingEdge(newEdge);
 
                         // Still, if that node was computed red before, the literal
@@ -235,11 +235,11 @@ void OG::buildGraph(GraphNodeCommon<GraphNode>* currentNode, double progress_plu
             if (PN->getOutputPlace(i)->max_occurence < 0 ||
                 PN->getOutputPlace(i)->max_occurence > currentNode->eventsUsed[i + PN->getInputPlaceCount()]) {
 
-                GraphNodeCommon<GraphNode>* v = new GraphNodeCommon<GraphNode>();    // create new GraphNode of the graph
+                GraphNode* v = new GraphNode();    // create new GraphNode of the graph
                 calculateSuccStatesOutput(PN->getOutputPlace(i)->index, currentNode, v);
 
                 // was the new node computed before?
-                GraphNodeCommon<GraphNode>* found = findGraphNodeInSet(v);
+                GraphNode* found = findGraphNodeInSet(v);
 
                 if (found == NULL) {
                     trace(TRACE_1, "\t computed successor node new\n");
@@ -264,7 +264,7 @@ void OG::buildGraph(GraphNodeCommon<GraphNode>* currentNode, double progress_plu
 
                     // draw a new RECEIVING edge to the old node
                     string edgeLabel = PN->getOutputPlace(i)->getLabelForCommGraph();
-                    GraphEdge<>* newEdge = new GraphEdge<>(found, edgeLabel);
+                    GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
                     currentNode->addLeavingEdge(newEdge);
 
                     // Still, if that node was computed red before, the literal
@@ -318,7 +318,7 @@ void OG::buildGraph(GraphNodeCommon<GraphNode>* currentNode, double progress_plu
 
 //! \brief adds the node toAdd to the set of all nodes
 //! and copies the eventsUsed array from the sourceNode
-void OG::addGraphNode(GraphNodeCommon<GraphNode>* sourceNode, GraphNodeCommon<GraphNode>* toAdd) {
+void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
 
     trace(TRACE_5, "reachGraph::AddGraphNode(GraphNode* sourceNode, GraphNode * toAdd): start\n");
 
@@ -342,8 +342,8 @@ void OG::addGraphNode(GraphNodeCommon<GraphNode>* sourceNode, GraphNodeCommon<Gr
 //! adds an SENDING or RECEIVING edge from sourceNode to destNode
 //! and adds destNode to the successor list of sourceNode
 //! and increases eventsUsed of destNode by one
-void OG::addGraphEdge(GraphNodeCommon<GraphNode>* sourceNode,
-                      GraphNodeCommon<GraphNode>* destNode,
+void OG::addGraphEdge(GraphNode* sourceNode,
+                      GraphNode* destNode,
                       oWFN::Places_t::size_type label,
                       GraphEdgeType type) {
 
@@ -363,7 +363,7 @@ void OG::addGraphEdge(GraphNodeCommon<GraphNode>* sourceNode,
     }
 
     // add a new edge to the new node
-    GraphEdge<>* newEdge = new GraphEdge<>(destNode, edgeLabel);
+    GraphEdge* newEdge = new GraphEdge(destNode, edgeLabel);
 
     // add the edge to the leaving edges list
     sourceNode->addLeavingEdge(newEdge);
@@ -378,8 +378,8 @@ void OG::addGraphEdge(GraphNodeCommon<GraphNode>* sourceNode,
 //! \brief for each state of the old node:
 //! add input message and build reachability graph and add all states to new node
 void OG::calculateSuccStatesInput(unsigned int input,
-                                  GraphNodeCommon<GraphNode>* oldNode,
-                                  GraphNodeCommon<GraphNode>* newNode) {
+                                  GraphNode* oldNode,
+                                  GraphNode* newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode* oldNode, GraphNode* newNode) : start\n");
 
     StateSet::iterator iter; // iterator over the state set's elements
@@ -433,8 +433,8 @@ void OG::calculateSuccStatesInput(unsigned int input,
 //! \param newNode the new node where the new states go into
 //! \brief calculates the set of successor states in case of an output message
 void OG::calculateSuccStatesOutput(unsigned int output,
-                                   GraphNodeCommon<GraphNode>* node,
-                                   GraphNodeCommon<GraphNode>* newNode) {
+                                   GraphNode* node,
+                                   GraphNode* newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, GraphNode* node, GraphNode* newNode) : start\n");
 
     StateSet::iterator iter; // iterator over the stateList's elements
@@ -490,7 +490,7 @@ void OG::correctNodeColorsAndShortenAnnotations() {
         for (GraphNodeSet::iterator iNode = setOfVertices.begin(); iNode
                 != setOfVertices.end(); ++iNode) {
 
-            GraphNodeCommon<GraphNode>* node = *iNode;
+            GraphNode* node = *iNode;
             if (node->getColor() == RED) {
                 continue;
             }
@@ -512,13 +512,13 @@ void OG::correctNodeColorsAndShortenAnnotations() {
     for (GraphNodeSet::iterator iNode = setOfVertices.begin(); iNode
             != setOfVertices.end(); ++iNode) {
 
-        GraphNodeCommon<GraphNode>* node = *iNode;
+        GraphNode* node = *iNode;
         node->removeUnneededLiteralsFromAnnotation();
     }
 }
 
 
-void OG::computeCNF(GraphNodeCommon<GraphNode>* node) const {
+void OG::computeCNF(GraphNode* node) const {
 
     trace(TRACE_5, "OG::computeCNF(GraphNode * node): start\n");
 
@@ -642,7 +642,7 @@ void OG::computeCNF(GraphNodeCommon<GraphNode>* node) const {
 void OG::convertToBdd() {
     trace(TRACE_5, "OG::convertToBdd(): start\n");
 
-    std::map<GraphNodeCommon<GraphNode>*, bool> visitedNodes;
+    std::map<GraphNode*, bool> visitedNodes;
 
     bdd->convertRootNode(root);
     bdd->generateRepresentation(root, visitedNodes);
@@ -657,7 +657,7 @@ void OG::convertToBdd() {
 void OG::convertToBddFull() {
     trace(TRACE_5, "OG::convertToBddFull(): start\n");
 
-    std::map<GraphNodeCommon<GraphNode>*, bool> visitedNodes;
+    std::map<GraphNode*, bool> visitedNodes;
 
     trace(TRACE_0, "\nHIT A KEY TO CONTINUE (convertToBddFull)\n");
     //getchar();
@@ -694,7 +694,7 @@ void OG::printOGtoFile() const {
     ogFilename += ".og";
     fstream ogFile(ogFilename.c_str(), ios_base::out | ios_base::trunc);
 
-    std::map<GraphNodeCommon<GraphNode>*, bool> visitedNodes;
+    std::map<GraphNode*, bool> visitedNodes;
 
     ogFile << "NODES" << endl;
     printNodesToOGFile(root, ogFile, visitedNodes);
@@ -713,9 +713,9 @@ void OG::printOGtoFile() const {
 }
 
 
-void OG::printNodesToOGFile(GraphNodeCommon<GraphNode>* v,
+void OG::printNodesToOGFile(GraphNode* v,
                             fstream& os,
-                            std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes) const {
+                            std::map<GraphNode*, bool>& visitedNodes) const {
 
     if (v == NULL) {
         return;
@@ -736,11 +736,11 @@ void OG::printNodesToOGFile(GraphNodeCommon<GraphNode>* v,
     visitedNodes[v] = true;
 
     // recursively process successor nodes that have not been visited yet
-    GraphNodeCommon<GraphNode>::LeavingEdges::ConstIterator
+    GraphNode::LeavingEdges::ConstIterator
             edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
-        GraphNodeCommon<GraphNode>* vNext = edgeIter->getNext()->getDstNode();
+        GraphNode* vNext = edgeIter->getNext()->getDstNode();
 
         // do not process nodes already visited
         if (visitedNodes[vNext])
@@ -755,9 +755,9 @@ void OG::printNodesToOGFile(GraphNodeCommon<GraphNode>* v,
 }
 
 
-void OG::printTransitionsToOGFile(GraphNodeCommon<GraphNode>* v,
+void OG::printTransitionsToOGFile(GraphNode* v,
                                   fstream& os,
-                                  std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes) const {
+                                  std::map<GraphNode*, bool>& visitedNodes) const {
 
     if (v == NULL) {
         return;
@@ -772,12 +772,12 @@ void OG::printTransitionsToOGFile(GraphNodeCommon<GraphNode>* v,
     visitedNodes[v] = true;
 
     // recursively process successor nodes that have not been visited yet
-    GraphNodeCommon<GraphNode>::LeavingEdges::ConstIterator
+    GraphNode::LeavingEdges::ConstIterator
             edgeIter =v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
-        GraphEdge<>* edge = edgeIter->getNext();
-        GraphNodeCommon<GraphNode>* vNext = edge->getDstNode();
+        GraphEdge* edge = edgeIter->getNext();
+        GraphNode* vNext = edge->getDstNode();
 
         if (!vNext->isToShow(root))
             continue;
@@ -803,7 +803,7 @@ void OG::printTransitionsToOGFile(GraphNodeCommon<GraphNode>* v,
 }
 
 
-string OG::NodeNameForOG(const GraphNodeCommon<GraphNode>* v) const {
+string OG::NodeNameForOG(const GraphNode* v) const {
     return v->getName();
 }
 

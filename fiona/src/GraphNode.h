@@ -442,7 +442,7 @@ template<typename GraphNodeType> GraphNodeCommon<GraphNodeType>::~GraphNodeCommo
     delete annotation;
 
     if (eventsUsed != NULL) {
-        delete[] eventsUsed;
+//        delete[] eventsUsed;
     }
 
     numberDeletedVertices++;

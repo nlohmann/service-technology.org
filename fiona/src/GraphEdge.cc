@@ -45,11 +45,6 @@ GraphEdge::GraphEdge(GraphNode* dstNodeP, const std::string& labelP) :
 }
 
 
-GraphNode* GraphEdge::getDstNode() const {
-    return dstNode;
-}
-
-
 std::string GraphEdge::getLabel() const {
     return label;
 }
@@ -69,3 +64,7 @@ GraphEdgeType GraphEdge::getType() const {
     }
 }
 
+
+GraphNode* GraphEdge::getDstNode() const {
+    return dstNode;
+}

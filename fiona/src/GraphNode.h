@@ -151,7 +151,7 @@ class GraphNode {
         // reduced graph is to be build.
         StateSet reachGraphStateSet;
 
-        /// constructor
+        //! constructor
         GraphNode();
 
         //! constructor
@@ -167,7 +167,6 @@ class GraphNode {
         GraphNode(const std::string& _name,
                         GraphFormula* _annotation,
                         GraphNodeColor _color);
-
 
         /// get the node number
         unsigned int getNumber() const;
@@ -224,8 +223,6 @@ class GraphNode {
 
         /// Returns the number of leaving edges.
         unsigned int getLeavingEdgesCount() const;
-        
-        // originate from GraphNode
 
         /// adds a state to the states of a GraphNode
         bool addState(State *);
@@ -263,6 +260,7 @@ class GraphNode {
         bool hasBlueTransitionWithLabel(const std::string&) const;
 
         GraphEdge* getTransitionWithLabel(const std::string&) const;
+        
         GraphNode* fireTransitionWithLabel(const std::string&);
 
         bool assignmentSatisfiesAnnotation(const GraphFormulaAssignment&) const;
@@ -271,11 +269,11 @@ class GraphNode {
 
         void removeTransitionsToNode(const GraphNode*);
 
-//#undef new
-//        /// Provides user defined operator new. Needed to trace all new operations
-//        /// on this class.
-//        NEW_OPERATOR(GraphNode)
-//#define new NEW_NEW
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphNode)
+#define new NEW_NEW
 };
 
 #endif /*GraphNode_H_*/

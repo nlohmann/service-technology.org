@@ -39,7 +39,6 @@
 #include "options.h"
 #include <cassert>
 
-
 using namespace std;
 
 
@@ -47,9 +46,8 @@ using namespace std;
  * class GraphNodeColor *
  ************************/
 
-GraphNodeColor::GraphNodeColor(GraphNodeColor_enum color) :
-    color_(color) {
-
+GraphNodeColor::GraphNodeColor(GraphNodeColor_enum color) : color_(color) {
+    
 }
 
 std::string GraphNodeColor::toString() const {
@@ -106,13 +104,12 @@ GraphNodeDiagnosisColor::operator GraphNodeDiagnosisColor_enum() const {
 }
 
 
-/*******************
+/******************
 * class GraphNode *
 ******************/
 
 //! \brief constructor
-GraphNode::GraphNode() :
-    number(12345678), name("12345678"), color(BLUE),
+GraphNode::GraphNode() : number(12345678), name("12345678"), color(BLUE),
     diagnosis_color(DIAG_UNSET), hasFinalStateInStateSet(false) {
     
     annotation = new GraphFormulaCNF();
@@ -187,23 +184,26 @@ void GraphNode::setColor(GraphNodeColor c) {
     color = c;
 }
 
-
+//! is the node colour blue?
+//! \return true iff this node's colour is blue
 bool GraphNode::isBlue() const {
     return getColor() == BLUE;
 }
 
-
+//! is the node colour ret?
+//! \return true iff this node's colour is red
 bool GraphNode::isRed() const {
     return getColor() == RED;
 }
 
-
-// returns the CNF formula that is the annotation of a node as a Boolean formula
+//! returns the CNF formula that is this node's annotation as a Boolean formula
+//! \return this node's annotation as a GraphFormulaCNF
 GraphFormulaCNF* GraphNode::getAnnotation() const {
     return annotation;
 }
 
-
+//! returns the CNF formula that is this node's annotation as a String
+//! \return this node's annotation as a String
 std::string GraphNode::getAnnotationAsString() const {
     assert(annotation != NULL);
     return annotation->asString();
@@ -238,14 +238,12 @@ void GraphNode::addLeavingEdge(GraphEdge* edge) {
 }
 
 
-GraphNode::LeavingEdges::Iterator 
-GraphNode::getLeavingEdgesIterator() {
+GraphNode::LeavingEdges::Iterator GraphNode::getLeavingEdgesIterator() {
     return leavingEdges.getIterator();
 }
 
 
-GraphNode::LeavingEdges::ConstIterator
-GraphNode::getLeavingEdgesConstIterator() const {
+GraphNode::LeavingEdges::ConstIterator GraphNode::getLeavingEdgesConstIterator() const {
     return leavingEdges.getConstIterator();
 }
 
@@ -270,44 +268,6 @@ bool GraphNode::addState(State * s) {
 //! \brief adds a new clause to the CNF formula of the node
 void GraphNode::addClause(GraphFormulaMultiaryOr* myclause) {
     annotation->addClause(myclause);
-}
-
-
-void GraphNode::removeLiteralFromAnnotation(const std::string& literal) {
-    trace(TRACE_5, "GraphNode::removeLiteralFromAnnotation(const string& literal) : start\n");
-    
-    //cout << "remove literal " << literal << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
-    annotation->removeLiteral(literal);
-    
-    trace(TRACE_5, "GraphNode::removeLiteralFromAnnotation(const string& literal) : end\n");
-}
-
-
-void GraphNode::removeUnneededLiteralsFromAnnotation() {
-    LeavingEdges::ConstIterator
-    edgeIter = getLeavingEdgesConstIterator();
-    
-    while (edgeIter->hasNext()) {
-        GraphEdge* edge = edgeIter->getNext();
-        if (edge->getDstNode()->getColor() == RED) {
-            annotation->removeLiteral(edge->getLabel());
-        }
-    }
-    delete edgeIter;
-}
-
-
-//! \param c color of GraphNode
-//! \brief sets the color of the GraphNode to the given color
-GraphNodeDiagnosisColor GraphNode::setDiagnosisColor(GraphNodeDiagnosisColor c) {
-    diagnosis_color = c;
-    return c;
-}
-
-
-//! \brief returns the diagnosis color of the GraphNode
-GraphNodeDiagnosisColor GraphNode::getDiagnosisColor() const {
-    return diagnosis_color;
 }
 
 
@@ -358,8 +318,45 @@ void GraphNode::analyseNode() {
 }
 
 
-/*!
-* \brief  returns true iff a colored successor can be avoided
+//! \param c color of GraphNode
+//! \brief sets the color of the GraphNode to the given color
+GraphNodeDiagnosisColor GraphNode::setDiagnosisColor(GraphNodeDiagnosisColor c) {
+    diagnosis_color = c;
+    return c;
+}
+
+
+//! \brief returns the diagnosis color of the GraphNode
+GraphNodeDiagnosisColor GraphNode::getDiagnosisColor() const {
+    return diagnosis_color;
+}
+
+
+void GraphNode::removeLiteralFromAnnotation(const std::string& literal) {
+    trace(TRACE_5, "GraphNode::removeLiteralFromAnnotation(const string& literal) : start\n");
+    
+    //cout << "remove literal " << literal << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
+    annotation->removeLiteral(literal);
+    
+    trace(TRACE_5, "GraphNode::removeLiteralFromAnnotation(const string& literal) : end\n");
+}
+
+
+void GraphNode::removeUnneededLiteralsFromAnnotation() {
+    LeavingEdges::ConstIterator
+    edgeIter = getLeavingEdgesConstIterator();
+    
+    while (edgeIter->hasNext()) {
+        GraphEdge* edge = edgeIter->getNext();
+        if (edge->getDstNode()->getColor() == RED) {
+            annotation->removeLiteral(edge->getLabel());
+        }
+    }
+    delete edgeIter;
+}
+
+
+/*! \brief  returns true iff a colored successor can be avoided
  *
  * \param  color   the color under consideration
  *
@@ -443,8 +440,7 @@ bool GraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) c
 }
 
 
-/*!
-* \brief  returns true iff edge e is possible in every state
+/*! \brief  returns true iff edge e is possible in every state
  *
  * \param  e  an edge
  *
@@ -487,8 +483,7 @@ bool GraphNode::edgeEnforcable(GraphEdge* e) const {
 }
 
 
-/*!
-* \brief  returns true iff e changes the color of the common successors
+/*! \brief  returns true iff e changes the color of the common successors
  *
  * \param  e  an edge
  *
@@ -553,8 +548,6 @@ bool GraphNode::isToShow(const GraphNode* rootOfGraph) const {
     }
 }
 
-
-// originate from OGFromFileNode
 
 bool GraphNode::hasTransitionWithLabel(const std::string& transitionLabel) const {
     

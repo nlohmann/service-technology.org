@@ -41,7 +41,8 @@
 #include <list>
 #include <cstdio>
 #include "getopt.h"
-#include "OGFromFile.h"
+//#include "GraphNode.h"
+
 
 typedef enum {
     O_HELP,
@@ -79,18 +80,16 @@ typedef enum {
     P_SHOW_NO_RED_NODES, //!< show all blue nodes (including empty node)
     P_SHOW_EMPTY_NODE, //!< same as above
     P_SHOW_STATES_PER_NODE, //!< show all states in a node (aka "knowledge")
-    P_SHOW_DEADLOCKS_PER_NODE //!< show deadlock states only
+    P_SHOW_DEADLOCKS_PER_NODE, //!< show deadlock states only
+    P_NOPNG //!< do not create a PNG output
 } possibleParameters;
 
 
 // some file names and pointers (in options.cc)
 // different modes controlled by command line (in options.cc)
 
-
 extern std::map<possibleOptions, bool> options;
 extern std::map<possibleParameters, bool> parameters;
-
-extern OGFromFile::ogfiles_t ogfiles;
 
 extern std::string outfilePrefix;
 

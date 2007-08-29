@@ -49,7 +49,7 @@ using namespace std;
 
 // some file names and pointers
 std::list<string> netfiles;
-OGFromFile::ogfiles_t ogfiles;
+std::list<string> ogfiles;
 
 std::string ogfileToMatch;
 std::string outfilePrefix;
@@ -61,7 +61,7 @@ int bdd_reordermethod;
 // const int GETOPT_BLA = 256;
 
 /// pointer to log stream
-std::ostream * log_output = &std::cout; // &std::clog;
+std::ostream* log_output = &std::cout; // &std::clog;
 
 // different modes controlled by command line
 std::map<possibleOptions, bool> options;
@@ -76,6 +76,7 @@ static struct option longopts[] = {
     { "debug",           required_argument, NULL, 'd' },
     { "type",            required_argument, NULL, 't' },
     { "show",            required_argument, NULL, 's' },
+    { "parameter",       required_argument, NULL, 'p' },
     { "reduce-nodes",    no_argument,       NULL, 'R' },
     { "reduceIG",        no_argument,       NULL, 'r' },
     { "messagemaximum",  required_argument, NULL, 'm' },
@@ -88,7 +89,7 @@ static struct option longopts[] = {
 };
 
 
-const char* par_string = "hvd:t:s:Rrm:e:b:B:o:Q";
+const char* par_string = "hvd:t:s:p:Rrm:e:b:B:o:Q";
 
 
 // --------------------- functions for command line evaluation ------------------------
@@ -180,7 +181,9 @@ void print_help() {
   trace("                                   argument <reordering> specifies reodering\n");
   trace("                                   method (see option -b)\n");
   trace(" -o | --output=<filename prefix> . prefix of the output files\n");
-  trace(" -Q | --no-output ................ runs quiet, i.e., produces no output files\n");
+  trace(" -Q | --no-output ................ runs quietly, i.e., produces no output files\n");
+  trace(" -p | --parameter=<param>          additional parameter <param>\n");
+  trace("                                    no-png - does not create a PNG file");
   trace("\n");
   trace("\n");
   trace("For more information see:\n");
@@ -371,6 +374,18 @@ void parse_command_line(int argc, char* argv[]) {
                     cerr << "Error:\twrong modus operandi (option -t)" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
+                    exit(1);
+                }
+                break;
+            }
+            case 'p': {
+                string lc_optarg = toLower(optarg);
+                if (lc_optarg == "no-png") {
+                    parameters[P_NOPNG] = true;
+                } else {
+                    cerr << "Error:\twrong parameter (option -p)" << endl
+                    << "\tEnter \"fiona --help\" for more information.\n"
+                    << endl;
                     exit(1);
                 }
                 break;

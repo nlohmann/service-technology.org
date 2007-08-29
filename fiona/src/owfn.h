@@ -44,7 +44,6 @@
 #include "main.h"
 #include "state.h"
 #include "containers.h"
-#include "GraphNode.h"
 #include "pnapi/pnapi.h"
 
 using namespace std;
@@ -58,6 +57,7 @@ class TrSymbol;
 class Arc;
 class OGFromFile;
 class OGFromFileNode;
+template<typename GraphNodeType> class GraphNodeCommon;
 class GraphFormulaAssignment;
 
 
@@ -88,7 +88,7 @@ class oWFN {
         //! Contains all transitions of this oWFN.
         Transitions_t Transitions;
 
-        owfnTransition ** firelist();
+        owfnTransition** firelist();
 
         /**
          * helper for matchesWithOG
@@ -204,15 +204,15 @@ class oWFN {
 
         void addPlace(owfnPlace*);
 
-        void addSuccStatesToList(GraphNode *, State *);
-        void addSuccStatesToListStubborn(StateSet &,
-                                         owfnPlace *,
-                                         State *,
-                                         GraphNode *);
-        void addSuccStatesToListStubborn(StateSet &,
+        void addSuccStatesToList(GraphNodeCommon<GraphNode>*, State*);
+        void addSuccStatesToListStubborn(StateSet&,
+                                         owfnPlace*,
+                                         State*,
+                                         GraphNodeCommon<GraphNode>*);
+        void addSuccStatesToListStubborn(StateSet&,
                                          messageMultiSet,
-                                         State *,
-                                         GraphNode *);
+                                         State*,
+                                         GraphNodeCommon<GraphNode>*);
 
         // void addSuccStatesToListOrig(GraphNode *, State *);		
 
@@ -224,16 +224,16 @@ class oWFN {
          */
         void addRecursivelySuccStatesToSetOfTempStates(State* s);
 
-        State * calculateNextSate();
+        State* calculateNextSate();
 
-        unsigned int * copyCurrentMarking();
-        void copyMarkingToCurrentMarking(unsigned int * copy);
-        void calculateReachableStatesOutputEvent(GraphNode *);
-        void calculateReachableStatesInputEvent(GraphNode *);
-        void calculateReachableStates(StateSet&, owfnPlace *, GraphNode *);
-        void calculateReachableStates(StateSet&, messageMultiSet, GraphNode *);
+        unsigned int* copyCurrentMarking();
+        void copyMarkingToCurrentMarking(unsigned int* copy);
+        void calculateReachableStatesOutputEvent(GraphNodeCommon<GraphNode>*);
+        void calculateReachableStatesInputEvent(GraphNodeCommon<GraphNode>*);
+        void calculateReachableStates(StateSet&, owfnPlace*, GraphNodeCommon<GraphNode>*);
+        void calculateReachableStates(StateSet&, messageMultiSet, GraphNodeCommon<GraphNode>*);
 
-        void calculateReachableStatesFull(GraphNode *);
+        void calculateReachableStatesFull(GraphNodeCommon<GraphNode>*);
 
         void addInputMessage(unsigned int);
         void addInputMessage(messageMultiSet); // adds input message to the current marking
@@ -251,7 +251,7 @@ class oWFN {
          *
          * @param marking The marking to be printed out.
          */
-        std::string getMarkingAsString(unsigned int * marking) const;
+        std::string getMarkingAsString(unsigned int* marking) const;
 
         /**
          * Returns the label of the CurrentMarking. See

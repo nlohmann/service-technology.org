@@ -78,7 +78,7 @@ CommunicationGraph::~CommunicationGraph() {
 
 //! \return pointer to root
 //! \brief returns a pointer to the root node of the graph
-GraphNode* CommunicationGraph::getRoot() const {
+GraphNodeCommon<GraphNode>* CommunicationGraph::getRoot() const {
     return root;
 }
 
@@ -117,7 +117,7 @@ void CommunicationGraph::calculateRootNode() {
     assert(setOfVertices.size() == 0);
 
     // create new OG root node
-    root = new GraphNode();
+    root = new GraphNodeCommon<GraphNode>();
 
     // calc the reachable states from that marking
     if (options[O_CALC_ALL_STATES]) {
@@ -136,7 +136,7 @@ void CommunicationGraph::calculateRootNode() {
 
 //! \param toAdd the GraphNode we are looking for in the graph
 //! \brief this function uses the find method from the template set
-GraphNode * CommunicationGraph::findGraphNodeInSet(GraphNode * toAdd) {
+GraphNodeCommon<GraphNode>* CommunicationGraph::findGraphNodeInSet(GraphNodeCommon<GraphNode>* toAdd) {
 
     GraphNodeSet::iterator iter = setOfVertices.find(toAdd);
     if (iter != setOfVertices.end()) {
@@ -155,7 +155,7 @@ void CommunicationGraph::computeGraphStatistics() {
 
 void CommunicationGraph::computeNumberOfStatesAndEdges() {
 
-    std::map<GraphNode*, bool> visitedNodes;
+    std::map<GraphNodeCommon<GraphNode>*, bool> visitedNodes;
     nStoredStates = 0;
     nEdges = 0;
 
@@ -163,8 +163,8 @@ void CommunicationGraph::computeNumberOfStatesAndEdges() {
 }
 
 
-void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(GraphNode* v,
-                                                             std::map<GraphNode*, bool>& visitedNodes) {
+void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(GraphNodeCommon<GraphNode>* v,
+                                                             std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes) {
 
     assert(v != NULL);
 
@@ -174,12 +174,12 @@ void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(GraphNode* v,
     nStoredStates += v->reachGraphStateSet.size();
 
     // iterating over all successors
-    GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+    GraphNodeCommon<GraphNode>::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
         GraphEdge<>* leavingEdge = edgeIter->getNext();
 
-        GraphNode* vNext = leavingEdge->getDstNode();
+        GraphNodeCommon<GraphNode>* vNext = leavingEdge->getDstNode();
         assert(vNext != NULL);
 
         nEdges++;
@@ -194,7 +194,7 @@ void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(GraphNode* v,
 
 void CommunicationGraph::computeNumberOfBlueNodesEdges() {
 
-    std::map<GraphNode*, bool> visitedNodes;
+    std::map<GraphNodeCommon<GraphNode>*, bool> visitedNodes;
     nBlueNodes = 0;
     nBlueEdges = 0;
 
@@ -202,8 +202,8 @@ void CommunicationGraph::computeNumberOfBlueNodesEdges() {
 }
 
 
-void CommunicationGraph::computeNumberOfBlueNodesEdgesHelper(GraphNode* v,
-                                                             std::map<GraphNode*, bool>& visitedNodes) {
+void CommunicationGraph::computeNumberOfBlueNodesEdgesHelper(GraphNodeCommon<GraphNode>* v,
+                                                             std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes) {
 
     assert(v != NULL);
 
@@ -216,12 +216,12 @@ void CommunicationGraph::computeNumberOfBlueNodesEdgesHelper(GraphNode* v,
         nBlueNodes++;
 
         // iterating over all successors
-        GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+        GraphNodeCommon<GraphNode>::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
             GraphEdge<>* leavingEdge = edgeIter->getNext();
 
-            GraphNode* vNext = leavingEdge->getDstNode();
+            GraphNodeCommon<GraphNode>* vNext = leavingEdge->getDstNode();
             assert(vNext != NULL);
 
             if (vNext->getColor() == BLUE &&
@@ -338,7 +338,7 @@ void CommunicationGraph::printGraphToDot() {
     if (getNumberOfNodes() <= maxWritingSize) {
 
         trace(TRACE_0, "creating the dot file of the graph...\n");
-        GraphNode* rootNode = root;
+        GraphNodeCommon<GraphNode>* rootNode = root;
 
         string outfilePrefixWithOptions = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
 
@@ -383,7 +383,7 @@ void CommunicationGraph::printGraphToDot() {
         dotFile << "node [fontname=\"Helvetica\" fontsize=10];\n";
         dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
-        std::map<GraphNode*, bool> visitedNodes;
+        std::map<GraphNodeCommon<GraphNode>*, bool> visitedNodes;
 
         printGraphToDotRecursively(rootNode, dotFile, visitedNodes);
 
@@ -429,9 +429,9 @@ void CommunicationGraph::printGraphToDot() {
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
 //! \brief breadthsearch through the graph printing each node and edge to the output stream
-void CommunicationGraph::printGraphToDotRecursively(GraphNode * v,
+void CommunicationGraph::printGraphToDotRecursively(GraphNodeCommon<GraphNode>* v,
                                                     fstream& os,
-                                                    std::map<GraphNode*, bool>& visitedNodes) {
+                                                    std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes) {
 
     assert(v != NULL);
 
@@ -528,11 +528,11 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v,
 
     visitedNodes[v] = true;
 
-    GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+    GraphNodeCommon<GraphNode>::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
         GraphEdge<> * element = edgeIter->getNext();
-        GraphNode * vNext = element->getDstNode();
+        GraphNodeCommon<GraphNode>* vNext = element->getDstNode();
 
         if (!vNext->isToShow(root))
             continue;
@@ -564,7 +564,7 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode * v,
 //! \brief creates a STG file of the graph
 void CommunicationGraph::printGraphToSTG() {
     trace(TRACE_0, "\ncreating the STG file of the graph...\n");
-    GraphNode* rootNode = root;
+    GraphNodeCommon<GraphNode>* rootNode = root;
     string buffer;
 
     // set file name
@@ -608,7 +608,7 @@ void CommunicationGraph::printGraphToSTG() {
     dotFile << ".state graph" << endl;
 
     // mark all nodes as unvisited
-    std::map<GraphNode*, bool> visitedNodes;
+    std::map<GraphNodeCommon<GraphNode>*, bool> visitedNodes;
 
     // traverse the nodes recursively
     printGraphToSTGRecursively(rootNode, dotFile, visitedNodes);
@@ -657,9 +657,9 @@ void CommunicationGraph::printGraphToSTG() {
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
 //! \brief breadthsearch through the graph printing each node and edge to the output stream
-void CommunicationGraph::printGraphToSTGRecursively(GraphNode * v,
+void CommunicationGraph::printGraphToSTGRecursively(GraphNodeCommon<GraphNode>* v,
                                                     fstream& os,
-                                                    std::map<GraphNode*, bool>& visitedNodes) {
+                                                    std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes) {
     assert(v != NULL);
 
     if (!v->isToShow(root))
@@ -668,11 +668,11 @@ void CommunicationGraph::printGraphToSTGRecursively(GraphNode * v,
     visitedNodes[v] = true;
 
     // arcs
-    GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+    GraphNodeCommon<GraphNode>::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
         GraphEdge<>* element = edgeIter->getNext();
-        GraphNode* vNext = element->getDstNode();
+        GraphNodeCommon<GraphNode>* vNext = element->getDstNode();
 
         if (!vNext->isToShow(root))
             continue;
@@ -698,18 +698,18 @@ void CommunicationGraph::printGraphToSTGRecursively(GraphNode * v,
 
 
 bool CommunicationGraph::annotateGraphDistributedly() {
-    GraphNode* rootNode = root;
+    GraphNodeCommon<GraphNode>* rootNode = root;
 
     // mark all nodes as unvisited
-    std::map<GraphNode*, bool> visitedNodes;
+    std::map<GraphNodeCommon<GraphNode>*, bool> visitedNodes;
 
     // traverse the nodes recursively
     return annotateGraphDistributedlyRecursively(rootNode, visitedNodes);
 }
 
 
-bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v,
-                                                               std::map<GraphNode*, bool>& visitedNodes) {
+bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNodeCommon<GraphNode>* v,
+                                                               std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes) {
     assert(v != NULL);
     set<string> disabled, enabled;
 
@@ -717,10 +717,10 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v,
         return false;
 
     // save for each state the outgoing labels;
-    static map<GraphNode*, set<string> > outgoing_labels;
+    static map<GraphNodeCommon<GraphNode>*, set<string> > outgoing_labels;
 
     // store outgoing lables
-    GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+    GraphNodeCommon<GraphNode>::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
         GraphEdge<>* element = edgeIter->getNext();
@@ -735,7 +735,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v,
     edgeIter = v->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         GraphEdge<> *element = edgeIter->getNext();
-        GraphNode *vNext = element->getDstNode();
+        GraphNodeCommon<GraphNode>* vNext = element->getDstNode();
 
         if (!vNext->isToShow(root))
             continue;
@@ -751,8 +751,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v,
             ///////////////////////////////////////////
             // 1. organized events that enable others
             ///////////////////////////////////////////
-            enabled
-                    = setDifference(setDifference(outgoing_labels[vNext],
+            enabled = setDifference(setDifference(outgoing_labels[vNext],
                                                   PN->getPort(PN->getPortForLabel(element->getLabel()))),
                                     outgoing_labels[v]);
 
@@ -818,8 +817,9 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode *v,
 }
 
 
-void CommunicationGraph::removeLabeledSuccessor(GraphNode *v, std::string label) {
-    GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
+void CommunicationGraph::removeLabeledSuccessor(GraphNodeCommon<GraphNode>* v, std::string label) {
+
+    GraphNodeCommon<GraphNode>::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
 
     while (edgeIter->hasNext()) {
         GraphEdge<>* element = edgeIter->getNext();
@@ -845,13 +845,13 @@ void CommunicationGraph::diagnose() {
         cerr << "Please note: the net is controllable." << endl;
     }
 
-    std::map<GraphNode*, bool> visitedNodes;
+    std::map<GraphNodeCommon<GraphNode>*, bool> visitedNodes;
     diagnose_recursively(root, visitedNodes);
     cerr << endl;
 }
 
 
-GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode *v, std::map<GraphNode*, bool>& visitedNodes) {
+GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNodeCommon<GraphNode>* v, std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes) {
     assert(v != NULL);
 
     // if color is known already, return it
@@ -899,10 +899,10 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     // node color cannot be quickly derived, so the children have to be considered
     set<GraphNodeDiagnosisColor_enum> childrenDiagnosisColors;
 
-    GraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+    GraphNodeCommon<GraphNode>::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge<> *element = edgeIter->getNext();
-        GraphNode *vNext = element->getDstNode();
+        GraphEdge<>* element = edgeIter->getNext();
+        GraphNodeCommon<GraphNode>* vNext = element->getDstNode();
 
         if (vNext != v) {
             childrenDiagnosisColors.insert(diagnose_recursively(vNext, visitedNodes));
@@ -958,7 +958,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode 
     edgeIter = v->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         GraphEdge<> *element = edgeIter->getNext();
-        GraphNode *vNext = element->getDstNode();
+        GraphNodeCommon<GraphNode>* vNext = element->getDstNode();
         
         if (v->changes_color(element)) {
             if (vNext->getDiagnosisColor() == DIAG_UNSET) {

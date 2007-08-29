@@ -55,13 +55,9 @@ class GraphFormula;
 class GraphFormulaAssignment;
 class GraphFormulaCNF;
 
+
 class OGFromFileNode : public GraphNodeCommon<OGFromFileNode> {
-//
-//    public:
-//        OGFromFileNode(const std::string& name_,
-//                       GraphFormula* annotation_,
-//                       GraphNodeColor color = BLUE);
-//
+
 };
 
 

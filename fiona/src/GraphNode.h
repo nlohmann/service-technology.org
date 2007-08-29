@@ -36,13 +36,15 @@
 
 #include "mynew.h"
 #include "debug.h"
+#include "state.h"
+#include "options.h"
 #include <set>
 #include <cassert>
 #include "SinglyLinkedList.h"
 #include "GraphFormula.h"
 #include "GraphEdge.h"
 
-class State;
+//class State;
 class literal;
 class OGFromFileNode;
 //class GraphFormula;
@@ -51,6 +53,8 @@ class OGFromFileNode;
 //class GraphFormulaCNF;
 
 typedef std::set<State*> StateSet;
+
+using namespace std;
 
 
 /****************
@@ -150,6 +154,9 @@ template<typename GraphNodeType = GraphNode> class GraphNodeCommon {
         /// Color of this GraphNode.
         GraphNodeColor color;
 
+        //! Diagnosis color of this GraphNode.
+        GraphNodeDiagnosisColor diagnosis_color;
+
         /// Annotation of this node (a CNF) as a formula.
         GraphFormulaCNF* annotation;
 
@@ -158,8 +165,21 @@ template<typename GraphNodeType = GraphNode> class GraphNodeCommon {
 
     public:
 
+        bool hasFinalStateInStateSet;
+        int* eventsUsed;
+
+        // this set contains only a reduced number of states in case the state
+        // reduced graph is to be build.
+        StateSet reachGraphStateSet;
+
         /// constructor
         GraphNodeCommon();
+
+        //! constructor
+        //! \param _name
+        //! \param _annotation
+        GraphNodeCommon(const std::string& _name,
+                        GraphFormula* _annotation);
 
         //! constructor
         //! \param _name
@@ -168,6 +188,7 @@ template<typename GraphNodeType = GraphNode> class GraphNodeCommon {
         GraphNodeCommon(const std::string& _name,
                         GraphFormula* _annotation,
                         GraphNodeColor _color);
+
 
         /// get the node number
         unsigned int getNumber() const;
@@ -226,42 +247,8 @@ template<typename GraphNodeType = GraphNode> class GraphNodeCommon {
         unsigned int getLeavingEdgesCount() const;
 
 
-
-        bool hasTransitionWithLabel(const std::string&) const;
-        bool hasBlueTransitionWithLabel(const std::string&) const;
-
-        GraphEdge<OGFromFileNode>* getTransitionWithLabel(const std::string&) const;
-        OGFromFileNode* fireTransitionWithLabel(const std::string&);
-
-        bool assignmentSatisfiesAnnotation(const GraphFormulaAssignment&) const;
-
-        GraphFormulaAssignment* getAssignment() const;
-
-        void removeTransitionsToNode(const OGFromFileNode*);
-};
-
-
-/*******************
- * class GraphNode *
- *******************/
-
-class GraphNode : public GraphNodeCommon<> {
-    private:
-
-        //! Diagnosis color of this GraphNode.
-        GraphNodeDiagnosisColor diagnosis_color;
-
-    public:
-
-        bool hasFinalStateInStateSet;
-        int * eventsUsed;
-
-        // this set contains only a reduced number of states in case the state
-        // reduced graph is to be build.
-        StateSet reachGraphStateSet;
-
-        GraphNode();
-        ~GraphNode();
+        
+        // originate from GraphNode
 
         /// adds a state to the states of a GraphNode
         bool addState(State *);
@@ -276,9 +263,6 @@ class GraphNode : public GraphNodeCommon<> {
 
         /// set the diagnosis color
         GraphNodeDiagnosisColor setDiagnosisColor(GraphNodeDiagnosisColor c);
-
-        /// returns true iff node should be shown according to the "show" parameter
-        bool isToShow(const GraphNode* rootOfGraph) const;
 
         void removeLiteralFromAnnotation(const std::string& literal);
 
@@ -295,17 +279,44 @@ class GraphNode : public GraphNodeCommon<> {
         /// returns true iff e changes the color of the common successors
         bool changes_color(GraphEdge<> *e) const;
         
-        
-        friend bool operator <(GraphNode const&, GraphNode const&);
+        /// returns true iff node should be shown according to the "show" parameter
+        bool isToShow(const GraphNodeCommon<GraphNode>* rootOfGraph) const;
 
-#undef new
-        /// Provides user defined operator new. Needed to trace all new operations
-        /// on this class.
-        NEW_OPERATOR(GraphNode)
-#define new NEW_NEW
+        /// compare operator to enable use of sets of GraphNodes
+//        friend bool operator <(GraphNodeCommon<GraphNode> const&, GraphNodeCommon<GraphNode> const&);
+
+
+
+
+
+        // originate from OGFromFileNode
+        bool hasTransitionWithLabel(const std::string&) const;
+        bool hasBlueTransitionWithLabel(const std::string&) const;
+
+        GraphEdge<OGFromFileNode>* getTransitionWithLabel(const std::string&) const;
+        GraphNodeCommon<OGFromFileNode>* fireTransitionWithLabel(const std::string&);
+
+        bool assignmentSatisfiesAnnotation(const GraphFormulaAssignment&) const;
+
+        GraphFormulaAssignment* getAssignment() const;
+
+        void removeTransitionsToNode(const GraphNodeCommon<OGFromFileNode>*);
+
+//#undef new
+//        /// Provides user defined operator new. Needed to trace all new operations
+//        /// on this class.
+//        NEW_OPERATOR(GraphNode)
+//#define new NEW_NEW
 };
 
 
+///*******************
+// * class GraphNode *
+// *******************/
+//
+class GraphNode : public GraphNodeCommon<> {
+
+};
 
 
 /*************************
@@ -315,9 +326,30 @@ class GraphNode : public GraphNodeCommon<> {
 
 //! \brief constructor
 template<typename GraphNodeType> GraphNodeCommon<GraphNodeType>::GraphNodeCommon() :
-    number(12345678), name("12345678"), color(BLUE) {
+    number(12345678),
+    name("12345678"),
+    color(BLUE),
+    diagnosis_color(DIAG_UNSET),
+    hasFinalStateInStateSet(false) {
 
     annotation = new GraphFormulaCNF();
+
+    eventsUsed = new int [PN->getInputPlaceCount() + PN->getOutputPlaceCount()];
+
+    for (unsigned int i = 0;
+         i < PN->getInputPlaceCount() + PN->getOutputPlaceCount(); i++) {
+        eventsUsed[i] = 0;
+    }
+}
+
+
+//! \brief constructor
+template<typename GraphNodeType> GraphNodeCommon<GraphNodeType>::GraphNodeCommon(const std::string& _name,
+                                                                                 GraphFormula* _annotation) :
+    number(12345678), name(_name), color(BLUE) {
+
+    annotation = _annotation->getCNF();
+    delete _annotation; // because getCNF() returns a newly create formula
 }
 
 
@@ -397,6 +429,9 @@ template<typename GraphNodeType> std::string GraphNodeCommon<GraphNodeType>::get
 
 
 template<typename GraphNodeType> GraphNodeCommon<GraphNodeType>::~GraphNodeCommon<GraphNodeType>() {
+
+    trace(TRACE_5, "GraphNode::~GraphNode() : start\n");
+
     typename LeavingEdges::ConstIterator iEdge = getLeavingEdgesConstIterator();
     while (iEdge->hasNext()) {
         GraphEdge<GraphNodeType>* edge = iEdge->getNext();
@@ -405,6 +440,14 @@ template<typename GraphNodeType> GraphNodeCommon<GraphNodeType>::~GraphNodeCommo
     delete iEdge;
 
     delete annotation;
+
+    if (eventsUsed != NULL) {
+        delete[] eventsUsed;
+    }
+
+    numberDeletedVertices++;
+
+    trace(TRACE_5, "GraphNode::~GraphNode() : end\n");
 }
 
 
@@ -430,6 +473,319 @@ template<typename GraphNodeType> unsigned int GraphNodeCommon<GraphNodeType>::ge
 }
 
 
+
+//*********************************************************************
+
+
+// originate from GraphNode
+
+
+//! \param s pointer to the state that is to be added to this node
+//! \brief adds the state s to the list of states
+template<typename GraphNodeType> bool GraphNodeCommon<GraphNodeType>::addState(State * s) {
+    assert(s != NULL);
+    pair<StateSet::iterator, bool> result = reachGraphStateSet.insert(s);
+    return result.second; // returns whether the element got inserted (true) or not (false)
+}
+
+
+//! \param myclause the clause to be added to the annotation of the current node
+//! \brief adds a new clause to the CNF formula of the node
+template<typename GraphNodeType> void GraphNodeCommon<GraphNodeType>::addClause(GraphFormulaMultiaryOr* myclause) {
+    annotation->addClause(myclause);
+}
+
+
+template<typename GraphNodeType> void GraphNodeCommon<GraphNodeType>::removeLiteralFromAnnotation(const std::string& literal) {
+    trace(TRACE_5, "GraphNode::removeLiteralFromAnnotation(const string& literal) : start\n");
+
+    //cout << "remove literal " << literal << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
+    annotation->removeLiteral(literal);
+
+    trace(TRACE_5, "GraphNode::removeLiteralFromAnnotation(const string& literal) : end\n");
+}
+
+
+template<typename GraphNodeType> void GraphNodeCommon<GraphNodeType>::removeUnneededLiteralsFromAnnotation() {
+    typename LeavingEdges::ConstIterator
+            edgeIter = getLeavingEdgesConstIterator();
+
+    while (edgeIter->hasNext()) {
+        GraphEdge<>* edge = edgeIter->getNext();
+        if (edge->getDstNode()->getColor() == RED) {
+            annotation->removeLiteral(edge->getLabel());
+        }
+    }
+    delete edgeIter;
+}
+
+
+//! \param c color of GraphNode
+//! \brief sets the color of the GraphNode to the given color
+template<typename GraphNodeType> GraphNodeDiagnosisColor GraphNodeCommon<GraphNodeType>::setDiagnosisColor(GraphNodeDiagnosisColor c) {
+    diagnosis_color = c;
+    return c;
+}
+
+
+//! \brief returns the diagnosis color of the GraphNode
+template<typename GraphNodeType> GraphNodeDiagnosisColor GraphNodeCommon<GraphNodeType>::getDiagnosisColor() const {
+    return diagnosis_color;
+}
+
+
+//! \brief analyses the node and sets its color
+template<typename GraphNodeType> void GraphNodeCommon<GraphNodeType>::analyseNode() {
+
+    trace(TRACE_5, "GraphNode::analyseNodeByFormula() : start\n");
+
+    trace(TRACE_3, "\t\t\t analysing node ");
+    trace(TRACE_3, this->getNumber() + "...\n");
+
+    assert(this->getColor() == BLUE);
+
+    // computing the assignment given by outgoing edges (to blue nodes)
+    GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
+
+    // traverse outgoing edges and set the corresponding literals
+    // to true if the respective node is BLUE
+    typename LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<>* edge = edgeIter->getNext();
+        if (edge->getDstNode()->getColor() == BLUE) {
+            myassignment->setToTrue(edge->getLabel());
+        }
+    }
+    delete edgeIter;
+
+    // only if node has final state, set assignment of literal final to true
+    if (this->hasFinalStateInStateSet == true) {
+        myassignment->setToTrue(GraphFormulaLiteral::FINAL);
+    }
+
+    // evaluating the computed assignment
+    bool result = this->getAnnotation()->value(*myassignment);
+    delete myassignment;
+
+    if (result) {
+        trace(TRACE_3, "\t\t\t node analysed blue, formula "
+                + this->getAnnotation()->asString() + "\n");
+        this->setColor(BLUE);
+    } else {
+        trace(TRACE_3, "\t\t\t node analysed red, formula "
+                + this->getAnnotation()->asString() + "\n");
+        this->setColor(RED);
+    }
+
+    trace(TRACE_5, "GraphNode::analyseNodeByFormula() : end\n");
+}
+
+
+/*!
+ * \brief  returns true iff a colored successor can be avoided
+ *
+ * \param  color   the color under consideration
+ *
+ * \return true iff there is either a sending edge to a differently colored
+ *         successor or, for each external deadlock, there exists a receiving
+ *         edge to a non-colored successor
+ */
+template<typename GraphNodeType> bool GraphNodeCommon<GraphNodeType>::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const {    
+    // collect all edges to differently colored successor nodes
+    set<GraphEdge<>*> edges_to_differently_colored_successors;
+    bool colored_successor_present = false;
+    
+    typename LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<> *element = edgeIter->getNext();
+        GraphNodeCommon<GraphNodeType>* vNext = element->getDstNode();
+        
+        if (vNext == this)
+            continue;
+        
+        if (vNext->getDiagnosisColor() != color) {
+            // if there is a sending edge to a differently colored sucessor, take this edge;
+            // otherwise: store this edge for future considerations
+            if (element->getType() == SENDING ) {
+                return true;
+            } else {
+                edges_to_differently_colored_successors.insert(element);
+            }
+        } else {
+            colored_successor_present = true;
+        }
+    }
+    delete edgeIter;
+    
+    // if there is no such colored successor, it can be clearly avoided
+    if (!colored_successor_present) {
+        return true;
+    }
+    
+    // if there are no differently colored successors, the colored successors can not be avoided
+    if (edges_to_differently_colored_successors.empty() ) {
+        return false;
+    }
+    
+    // last chance: look if each external deadlock "enables" a receiving edge
+    // to a differently colored successor
+    for (StateSet::const_iterator state = reachGraphStateSet.begin();
+         state != reachGraphStateSet.end(); state++) {
+        (*state)->decode(PN);
+        
+        bool found_enabled_state = false;
+        
+        if ((*state)->type == DEADLOCK) {
+            for (set<GraphEdge<>*>::iterator edge = edges_to_differently_colored_successors.begin();
+                 edge != edges_to_differently_colored_successors.end(); edge++) {
+                if ((*edge)->getType() == SENDING ) {
+                    continue;
+                }
+                
+                string edge_label = (*edge)->getLabel().substr(1, (*edge)->getLabel().length());
+                
+                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                    if (PN->getOutputPlace(i)->name == edge_label) {
+                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                            found_enabled_state = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // looked at all edges but did not finde an enabling state
+            if (!found_enabled_state) {
+                return false;
+            }
+        }
+    }
+    
+    // looked at all edges but did not abort earlier
+    return true;
+}
+
+
+/*!
+ * \brief  returns true iff edge e is possible in every state
+ *
+ * \param  e  an edge
+ *
+ * \return true, iff the edge e is labeled with a sending event, or a
+ *         receiving event that is present in every external deadlock state
+ *
+ * \note   For performance issues, it is not checked whether edge e is really
+ *         leaving this node.
+ */
+template<typename GraphNodeType> bool GraphNodeCommon<GraphNodeType>::edgeEnforcable(GraphEdge<> *e) const {
+    assert (e != NULL);
+    
+    if (e->getType() == SENDING) {
+        return true;
+    } else {
+        string edge_label = e->getLabel().substr(1, e->getLabel().length());
+        bool edge_enforcable = true;
+        
+        // iterate the states and look for deadlocks where the considered
+        // message is not present: then, the receiving of this message can
+        // not be enforced
+        for (StateSet::const_iterator state = reachGraphStateSet.begin();
+             state != reachGraphStateSet.end(); state++) {
+            (*state)->decode(PN);
+            
+            if ((*state)->type == DEADLOCK) {
+                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                    if (PN->getOutputPlace(i)->name == edge_label) {
+                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] == 0) {
+                            edge_enforcable = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return edge_enforcable;
+    }
+}
+
+
+/*!
+ * \brief  returns true iff e changes the color of the common successors
+ *
+ * \param  e  an edge
+ *
+ * \todo   Comment me!
+ */
+template<typename GraphNodeType> bool GraphNodeCommon<GraphNodeType>::changes_color(GraphEdge<> *e) const {
+    assert(e != NULL);
+    
+    GraphNodeCommon<GraphNodeType>* vNext = e->getDstNode();
+    
+    if ( vNext->getDiagnosisColor() == DIAG_RED )
+        return false;
+    
+    if ( !edgeEnforcable(e) )
+        return false;
+    
+    
+    map< string, GraphEdge<>* > v_edges;
+    map< string, GraphEdge<>* > vNext_edges;
+    
+    typename LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<> *element = edgeIter->getNext();
+        v_edges[element->getLabel()] = element;
+    }
+    edgeIter = vNext->getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge<> *element = edgeIter->getNext();
+        vNext_edges[element->getLabel()] = element;
+    }
+    delete edgeIter;
+    
+    
+    for (map< string, GraphEdge<>* >::const_iterator v_edge = v_edges.begin();
+         v_edge != v_edges.end(); v_edge++) {
+        GraphEdge<> *vNext_edge = vNext_edges[v_edge->first];
+        
+        if (vNext_edge == NULL)
+            continue;
+        
+        if ( (vNext_edge->getDstNode()->getDiagnosisColor() != v_edge->second->getDstNode()->getDiagnosisColor()) &&
+             (vNext_edge->getDstNode()->getDiagnosisColor() == DIAG_RED) &&
+             (v_edge->second->getDstNode()->getDiagnosisColor() != DIAG_VIOLET) ) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+
+template<typename GraphNodeType> bool GraphNodeCommon<GraphNodeType>::isToShow(const GraphNodeCommon<GraphNode>* rootOfGraph) const {
+
+    if (parameters[P_SHOW_ALL_NODES] || (parameters[P_SHOW_NO_RED_NODES] &&
+        (getColor() != RED))|| (!parameters[P_SHOW_NO_RED_NODES] &&
+        (getColor() == RED))|| (getColor() == BLUE) ||
+        (this == rootOfGraph)) {
+
+        return (parameters[P_SHOW_EMPTY_NODE] || reachGraphStateSet.size() != 0);
+    } else {
+        return false;
+    }
+}
+
+
+//! \param left left hand GraphNode
+//! \param right right hand GraphNode
+//! \brief implements the operator < by comparing the states of the two vertices
+//bool operator <(GraphNodeCommon<GraphNode> const& left, GraphNodeCommon<GraphNode> const& right) {
+//    return (left.reachGraphStateSet < right.reachGraphStateSet);
+//}
+
+
+//*********************************************************************
 
 
 
@@ -468,12 +824,11 @@ template<typename GraphNodeType> GraphEdge<OGFromFileNode>* GraphNodeCommon<Grap
 }
 
 
-template<typename GraphNodeType> OGFromFileNode* GraphNodeCommon<GraphNodeType>::fireTransitionWithLabel(const std::string& transitionLabel) {
+template<typename GraphNodeType> GraphNodeCommon<OGFromFileNode>* GraphNodeCommon<GraphNodeType>::fireTransitionWithLabel(const std::string& transitionLabel) {
 
     assert(transitionLabel != GraphFormulaLiteral::TAU);
 
-    GraphEdge<OGFromFileNode>
-            * transition = getTransitionWithLabel(transitionLabel);
+    GraphEdge<OGFromFileNode>* transition = getTransitionWithLabel(transitionLabel);
     if (transition == NULL) {
         return NULL;
     }
@@ -513,7 +868,7 @@ template<typename GraphNodeType> GraphFormulaAssignment* GraphNodeCommon<GraphNo
 }
 
 
-template<typename GraphNodeType> void GraphNodeCommon<GraphNodeType>::removeTransitionsToNode(const OGFromFileNode* nodeToDelete) {
+template<typename GraphNodeType> void GraphNodeCommon<GraphNodeType>::removeTransitionsToNode(const GraphNodeCommon<OGFromFileNode>* nodeToDelete) {
     typename LeavingEdges::Iterator iEdge = getLeavingEdgesIterator();
     while (iEdge->hasNext()) {
         GraphEdge<OGFromFileNode>* edge = iEdge->getNext();

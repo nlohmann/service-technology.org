@@ -44,7 +44,7 @@
 //! \fn interactionGraph::interactionGraph(oWFN * _PN) 
 //! \param _PN
 //! \brief constructor
-interactionGraph::interactionGraph(oWFN * _PN) :
+interactionGraph::interactionGraph(oWFN* _PN) :
     CommunicationGraph(_PN) {
 }
 
@@ -77,7 +77,7 @@ void interactionGraph::buildGraph() {
 //! \fn void interactionGraph::buildGraph(GraphNode * node)
 //! \param node current node of the graph
 //! \brief builds up the graph recursively
-void interactionGraph::buildGraph(GraphNode * currentNode) {
+void interactionGraph::buildGraph(GraphNodeCommon<GraphNode>* currentNode) {
 
     // at this point, the states inside the current node node are already computed!
 
@@ -116,7 +116,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
             trace(TRACE_2, "\t\t\t\t    sending event: !");
 
             // create new GraphNode of the graph
-            GraphNode* v = new GraphNode();
+            GraphNodeCommon<GraphNode>* v = new GraphNodeCommon<GraphNode>();
             calculateSuccStatesInput(*iter, currentNode, v);
 
             if (v->getColor() == RED) {
@@ -153,7 +153,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
             trace(TRACE_2, "\t\t\t\t    output event: ?");
 
             // create new GraphNode of the graph
-            GraphNode* v = new GraphNode();
+            GraphNodeCommon<GraphNode>* v = new GraphNodeCommon<GraphNode>();
             calculateSuccStatesOutput(*iter, currentNode, v);
 
             if (currentNode->getColor() != RED && addGraphNode (currentNode, v, *iter, RECEIVING)) {
@@ -185,7 +185,7 @@ void interactionGraph::buildGraph(GraphNode * currentNode) {
 //! \fn void interactionGraph::buildReducedGraph(GraphNode * currentNode)
 //! \param currentNode current node of the graph
 //! \brief builds up the graph recursively
-void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
+void interactionGraph::buildReducedGraph(GraphNodeCommon<GraphNode>* currentNode) {
 
     if (currentNode->getColor() == RED) {
         // this may happen due to a message bound violation in current node
@@ -226,7 +226,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
             trace(TRACE_2, "\t\t\t\t    input event: ?");
 
             // create new GraphNode of the graph
-            GraphNode * v = new GraphNode();
+            GraphNodeCommon<GraphNode>* v = new GraphNodeCommon<GraphNode>();
 
             calculateSuccStatesInput(*iter, currentNode, v);
 
@@ -253,7 +253,7 @@ void interactionGraph::buildReducedGraph(GraphNode * currentNode) {
             trace(TRACE_2, "\t\t\t\t    output event: ?");
 
             // create new GraphNode of the graph
-            GraphNode* v = new GraphNode();
+            GraphNodeCommon<GraphNode>* v = new GraphNodeCommon<GraphNode>();
             calculateSuccStatesOutput(*iter, currentNode, v);
 
             if (currentNode->getColor() != RED && addGraphNode (currentNode, v, *iter, RECEIVING)) {
@@ -295,7 +295,7 @@ bool interactionGraph::addGraphNode(GraphNodeCommon<GraphNode>* sourceNode,
         root = toAdd; // the given node becomes the root node
         setOfVertices.insert(toAdd);
     } else {
-        GraphNode * found = findGraphNodeInSet(toAdd); //findGraphNode(toAdd);
+        GraphNodeCommon<GraphNode>* found = findGraphNodeInSet(toAdd); //findGraphNode(toAdd);
 
         string label;
         bool comma = false;
@@ -371,7 +371,7 @@ bool interactionGraph::addGraphNode(GraphNodeCommon<GraphNode>* sourceNode,
 //! \brief checks whether the set of input messages contains at least one input message
 //! that has been sent at its maximum
 bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
-                                          GraphNode * currentNode,
+                                          GraphNodeCommon<GraphNode>* currentNode,
                                           GraphEdgeType typeOfPlace) {
     trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, bool typeOfPlace): start\n");
 
@@ -447,9 +447,9 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
 //! \param inputMessages the set of input messages (sending events) that are activated in the current node 
 //! \param outputMessages the set of output messages (receiving events) that are activated in the current node 
 //! \brief creates a list of all activated sending and receiving events (input messages and output messages) of the current node
-void interactionGraph::getActivatedEventsComputeCNF(GraphNode * node,
-                                                    setOfMessages & inputMessages,
-                                                    setOfMessages & outputMessages) {
+void interactionGraph::getActivatedEventsComputeCNF(GraphNodeCommon<GraphNode>* node,
+                                                    setOfMessages& inputMessages,
+                                                    setOfMessages& outputMessages) {
     trace(TRACE_5, "interactionGraph::getActivatedEventsComputeCNF(GraphNode * node): start\n");
 
     int i;
@@ -488,8 +488,7 @@ void interactionGraph::getActivatedEventsComputeCNF(GraphNode * node,
 
                         inputMessages.insert(input);
 
-                        GraphFormulaLiteral
-                                * myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+                        GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
                         myclause->addSubFormula(myliteral);
 
                         //cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
@@ -507,8 +506,7 @@ void interactionGraph::getActivatedEventsComputeCNF(GraphNode * node,
 
                         outputMessages.insert(output);
 
-                        GraphFormulaLiteral
-                                * myliteral = new GraphFormulaLiteral(PN->getPlace(i)->getLabelForCommGraph());
+                        GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(i)->getLabelForCommGraph());
                         myclause->addSubFormula(myliteral);
 
                         //cl->addLiteral(PN->getPlace(i)->getLabelForCommGraph());	
@@ -519,8 +517,7 @@ void interactionGraph::getActivatedEventsComputeCNF(GraphNode * node,
                 if ((*iter)->type == FINALSTATE) {
                     node->hasFinalStateInStateSet = true;
 
-                    GraphFormulaLiteral
-                            * myliteral = new GraphFormulaLiteralFinal();
+                    GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
                     myclause->addSubFormula(myliteral);
                 }
 
@@ -554,8 +551,7 @@ void interactionGraph::getActivatedEventsComputeCNF(GraphNode * node,
 
                         inputMessages.insert(input);
 
-                        GraphFormulaLiteral
-                                * myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+                        GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
                         myclause->addSubFormula(myliteral);
 
                         //cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
@@ -571,8 +567,7 @@ void interactionGraph::getActivatedEventsComputeCNF(GraphNode * node,
 
                         outputMessages.insert(output);
 
-                        GraphFormulaLiteral
-                                * myliteral = new GraphFormulaLiteral(PN->getPlace(i)->getLabelForCommGraph());
+                        GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(i)->getLabelForCommGraph());
                         myclause->addSubFormula(myliteral);
 
                         //cl->addLiteral(PN->getPlace(i)->getLabelForCommGraph());	
@@ -604,8 +599,8 @@ void interactionGraph::getActivatedEventsComputeCNF(GraphNode * node,
 //! \param newNode the new node where the new states go into
 //! \brief calculates the set of successor states in case of an input message
 void interactionGraph::calculateSuccStatesInput(messageMultiSet input,
-                                                GraphNode * node,
-                                                GraphNode * newNode) {
+                                                GraphNodeCommon<GraphNode>* node,
+                                                GraphNodeCommon<GraphNode>* newNode) {
     trace(TRACE_5, "interactionGraph::calculateSuccStatesInput(messageMultiSet input, GraphNode * node, GraphNode * newNode) : start\n");
 
     PN->setOfStatesTemp.clear();
@@ -665,8 +660,8 @@ void interactionGraph::calculateSuccStatesInput(messageMultiSet input,
 //! \param newNode the new node where the new states go into
 //! \brief calculates the set of successor states in case of an output message
 void interactionGraph::calculateSuccStatesOutput(messageMultiSet output,
-                                                 GraphNode * node,
-                                                 GraphNode * newNode) {
+                                                 GraphNodeCommon<GraphNode>* node,
+                                                 GraphNodeCommon<GraphNode>* newNode) {
     trace(TRACE_5, "interactionGraph::calculateSuccStatesOutput(messageMultiSet output, GraphNode * node, GraphNode * newNode) : start\n");
 
     if (TRACE_2 <= debug_level) {
@@ -740,8 +735,8 @@ void interactionGraph::calculateSuccStatesOutput(messageMultiSet output,
 //! \param node the node for which the activated output events are calculated
 //! \param inputMessages
 //! \brief creates a list of all output messages of the current node
-setOfMessages interactionGraph::combineReceivingEvents(GraphNode * node,
-                                                       setOfMessages & inputMessages) {
+setOfMessages interactionGraph::combineReceivingEvents(GraphNodeCommon<GraphNode>* node,
+                                                       setOfMessages& inputMessages) {
 
     trace(TRACE_5, "interactionGraph::combineReceivingEvents(GraphNode * node): start\n");
 
@@ -881,8 +876,7 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode * node,
                     if (!subset && !supset) {
                         listOfOutputMessageLists.insert(outputMessages);
 
-                        GraphFormulaLiteral
-                                * myliteral = new GraphFormulaLiteral(PN->createLabel(outputMessages));
+                        GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->createLabel(outputMessages));
                         myclause->addSubFormula(myliteral);
 
                         //					cl->addLiteral(PN->createLabel(outputMessages));
@@ -896,8 +890,7 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode * node,
                 if ((*iter)->type == FINALSTATE) {
                     node->hasFinalStateInStateSet = true;
 
-                    GraphFormulaLiteral
-                            * myliteral = new GraphFormulaLiteralFinal();
+                    GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
                     myclause->addSubFormula(myliteral);
                 }
 
@@ -932,8 +925,7 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode * node,
 
                         inputMessages.insert(input);
 
-                        GraphFormulaLiteral
-                                * myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+                        GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
                         myclause->addSubFormula(myliteral);
 
                         //cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
@@ -1070,7 +1062,7 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode * node,
 //! \param node the node for which the activated input events are calculated
 //! \brief creates a list of all activated input events (messages) of the current node with respect to the
 //! receiving before sending rule
-setOfMessages interactionGraph::receivingBeforeSending(GraphNode * node) {
+setOfMessages interactionGraph::receivingBeforeSending(GraphNodeCommon<GraphNode>* node) {
 
     trace(TRACE_5, "interactionGraph::receivingBeforeSending(GraphNode * node): start\n");
 
@@ -1129,7 +1121,7 @@ setOfMessages interactionGraph::receivingBeforeSending(GraphNode * node) {
 //! \param node
 //! \brief calculates the set of successor states in case of an output message
 void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output,
-                                                    GraphNode * node) {
+                                                    GraphNodeCommon<GraphNode>* node) {
 
     /* iterate over all states of the current node 
      * and get rid of the output messages in the marking of the state
@@ -1172,7 +1164,7 @@ void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output,
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an input message
 void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input,
-                                                       GraphNode * node) {
+                                                       GraphNodeCommon<GraphNode>* node) {
 
 #ifdef DEBUG
     cout << "interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, GraphNode * node) : start" << endl;

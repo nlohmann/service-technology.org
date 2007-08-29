@@ -46,8 +46,6 @@ using namespace std;
 
 class oWFN;
 class State;
-class GraphNode;
-
 
 extern double global_progress;
 extern int show_progress;
@@ -70,8 +68,8 @@ class CommunicationGraph {
          * @param visitedNodes[] Array of bool storing the nodes that we have
          *     already looked at.
          */
-        void computeNumberOfStatesAndEdgesHelper(GraphNode* v,
-                                                 std::map<GraphNode*, bool>& visitedNodes);
+        void computeNumberOfStatesAndEdgesHelper(GraphNodeCommon<GraphNode>* v,
+                                                 std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes);
 
         /**
          * Computes the number of all blue to be shown nodes and edges in this
@@ -87,8 +85,7 @@ class CommunicationGraph {
          * @param visitedNodes[] Array of bool storing the nodes that we have
          *     already looked at.
          */
-        void computeNumberOfBlueNodesEdgesHelper(GraphNode* v,
-                                                 std::map<GraphNode*, bool>& visitedNodes);
+        void computeNumberOfBlueNodesEdgesHelper(GraphNodeCommon<GraphNode>* v, std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes);
 
         /**
          * The total number of all states stored in all nodes in this graph.
@@ -117,7 +114,7 @@ class CommunicationGraph {
     protected:
         oWFN* PN; //!< pointer to the underlying petri net
 
-        GraphNode* root; //!< the root node of the graph
+        GraphNodeCommon<GraphNode>* root; //!< the root node of the graph
 
         void addProgress(double);
 
@@ -128,7 +125,7 @@ class CommunicationGraph {
 
         GraphNodeSet setOfVertices;
 
-        GraphNode* getRoot() const;
+        GraphNodeCommon<GraphNode>* getRoot() const;
 
         void calculateRootNode();
 
@@ -161,9 +158,9 @@ class CommunicationGraph {
          */
         unsigned int getNumberOfBlueEdges() const;
 
-        GraphNode * findGraphNodeInSet(GraphNode *);
+        GraphNodeCommon<GraphNode>* findGraphNodeInSet(GraphNodeCommon<GraphNode>*);
 
-        void analyseNode(GraphNode *);
+        void analyseNode(GraphNodeCommon<GraphNode>*);
 
         void printProgressFirst();
         void printProgress();
@@ -171,26 +168,26 @@ class CommunicationGraph {
         void buildGraphRandom();
 
         void printGraphToDot();
-        void printGraphToDotRecursively(GraphNode * v,
+        void printGraphToDotRecursively(GraphNodeCommon<GraphNode>* v,
                                         fstream& os,
-                                        std::map<GraphNode*, bool>&);
+                                        std::map<GraphNodeCommon<GraphNode>*, bool>&);
 
         // functions to create an STG representation of the IG or OG
         void printGraphToSTG();
-        void printGraphToSTGRecursively(GraphNode *v,
+        void printGraphToSTGRecursively(GraphNodeCommon<GraphNode>* v,
                                         fstream& os,
-                                        std::map<GraphNode*, bool>&);
+                                        std::map<GraphNodeCommon<GraphNode>*, bool>&);
 
         // functions to annotate the OG for distributed controllability
         bool annotateGraphDistributedly();
-        bool annotateGraphDistributedlyRecursively(GraphNode *v,
-                                                   std::map<GraphNode*, bool>&);
-        void removeLabeledSuccessor(GraphNode *v, std::string label);
+        bool annotateGraphDistributedlyRecursively(GraphNodeCommon<GraphNode>* v,
+                                                   std::map<GraphNodeCommon<GraphNode>*, bool>&);
+        void removeLabeledSuccessor(GraphNodeCommon<GraphNode>* v, std::string label);
 
         // functions for diagnosis
         void diagnose();
-        GraphNodeDiagnosisColor_enum diagnose_recursively(GraphNode *v,
-                                                          std::map<GraphNode*, bool>& visitedNodes);
+        GraphNodeDiagnosisColor_enum diagnose_recursively(GraphNodeCommon<GraphNode>* v,
+                                                          std::map<GraphNodeCommon<GraphNode>*, bool>& visitedNodes);
 
         /**
          * Computes statistics about this graph. They can be printed by
@@ -204,7 +201,7 @@ class CommunicationGraph {
          */
         void printGraphStatistics();
 
-        bool stateActivatesOutputEvents(State *);
+        bool stateActivatesOutputEvents(State*);
 
         // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new

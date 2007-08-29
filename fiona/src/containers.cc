@@ -34,6 +34,7 @@
 #include "containers.h"
 #include "GraphNode.h"
 
-bool compareVertices::operator()(GraphNode const* left, GraphNode const* right) {
-    return (*left < *right);
+bool compareVertices::operator()(GraphNodeCommon<GraphNode> const* left, GraphNodeCommon<GraphNode> const* right) {
+    return (left->reachGraphStateSet < right->reachGraphStateSet);
+//    return (*left < *right);
 }

@@ -37,15 +37,22 @@
 #include <set>
 
 class GraphNode;
+template<typename GraphNodeType> class GraphNodeCommon;
 class State;
 
 typedef std::set<State*> StateSet;
 
+//struct compareVertices {
+//    bool operator <(GraphNodeCommon<GraphNode> const * left, GraphNodeCommon<GraphNode> const * right);
+//};
+
+
 struct compareVertices {
-    bool operator()(GraphNode const * left, GraphNode const * right);
+    bool operator()(GraphNodeCommon<GraphNode> const * left, GraphNodeCommon<GraphNode> const * right);
 };
 
-typedef std::set<GraphNode*, compareVertices> GraphNodeSet;
+
+typedef std::set<GraphNodeCommon<GraphNode>*, compareVertices> GraphNodeSet;
 
 typedef std::multiset<unsigned int> messageMultiSet;
 

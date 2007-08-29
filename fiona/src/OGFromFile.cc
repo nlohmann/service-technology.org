@@ -644,8 +644,7 @@ OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
                                                               currentRhsNode);
 
     // building the new root node of the product OG
-    GraphNodeCommon<OGFromFileNode>* productNode = new GraphNodeCommon<OGFromFileNode>(currentName,
-            currentFormula);
+    GraphNodeCommon<OGFromFileNode>* productNode = new GraphNodeCommon<OGFromFileNode>(currentName, currentFormula);
     productOG->addNode(productNode);
     productOG->setRoot(productNode);
 

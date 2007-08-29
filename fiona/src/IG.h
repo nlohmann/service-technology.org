@@ -55,25 +55,25 @@ class interactionGraph : public CommunicationGraph {
         NEW_OPERATOR(interactionGraph)
 #define new NEW_NEW
 
-        interactionGraph(oWFN *);
+        interactionGraph(oWFN*);
         ~interactionGraph();
 
-        bool checkMaximalEvents(messageMultiSet, GraphNode *, GraphEdgeType);
+        bool checkMaximalEvents(messageMultiSet, GraphNodeCommon<GraphNode>*, GraphEdgeType);
 
         void buildGraph();
-        void buildGraph(GraphNode * );
-        void buildReducedGraph(GraphNode * );
+        void buildGraph(GraphNodeCommon<GraphNode>*);
+        void buildReducedGraph(GraphNodeCommon<GraphNode>*);
 
-        void getActivatedEventsComputeCNF(GraphNode *, setOfMessages &, setOfMessages &);
+        void getActivatedEventsComputeCNF(GraphNodeCommon<GraphNode>*, setOfMessages&, setOfMessages&);
 
-        void calculateSuccStatesInput(messageMultiSet, GraphNode *, GraphNode *);
-        void calculateSuccStatesOutput(messageMultiSet, GraphNode *, GraphNode *);
+        void calculateSuccStatesInput(messageMultiSet, GraphNodeCommon<GraphNode>*, GraphNodeCommon<GraphNode>*);
+        void calculateSuccStatesOutput(messageMultiSet, GraphNodeCommon<GraphNode>*, GraphNodeCommon<GraphNode>*);
 
-        setOfMessages combineReceivingEvents(GraphNode *, setOfMessages &);
-        setOfMessages receivingBeforeSending(GraphNode *);
+        setOfMessages combineReceivingEvents(GraphNodeCommon<GraphNode>*, setOfMessages&);
+        setOfMessages receivingBeforeSending(GraphNodeCommon<GraphNode>*);
 
-        void calculateSuccStatesOutputSet(messageMultiSet, GraphNode *);
-        void calculateSuccStatesInputReduced(messageMultiSet, GraphNode *);
+        void calculateSuccStatesOutputSet(messageMultiSet, GraphNodeCommon<GraphNode>*);
+        void calculateSuccStatesInputReduced(messageMultiSet, GraphNodeCommon<GraphNode>*);
 };
 
 #endif /*IG_H_*/

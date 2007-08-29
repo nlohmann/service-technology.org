@@ -55,7 +55,7 @@ template<typename GraphNodeType = GraphNode> class GraphEdge {
         /**
          * Points to the destination node of this edge.
          */
-        GraphNodeType* dstNode;
+        GraphNodeCommon<GraphNodeType>* dstNode;
 
         /** Label of the edge. */
         std::string label;
@@ -81,7 +81,7 @@ template<typename GraphNodeType = GraphNode> class GraphEdge {
         /**
          * Returns the node this edge points to.
          */
-        GraphNodeType* getDstNode() const;
+        GraphNodeCommon<GraphNodeType>* getDstNode() const;
 
 #undef new
         /**
@@ -99,7 +99,7 @@ template<typename GraphNodeType> GraphEdge<GraphNodeType>::GraphEdge(GraphNodeCo
 }
 
 
-template<typename GraphNodeType> GraphNodeType* GraphEdge<GraphNodeType>::getDstNode() const {
+template<typename GraphNodeType> GraphNodeCommon<GraphNodeType>* GraphEdge<GraphNodeType>::getDstNode() const {
     return dstNode;
 }
 

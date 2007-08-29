@@ -37,7 +37,7 @@
 #include "IG.h"
 #include "OG.h"
 #include "Exchangeability.h"
-#include "options.h" 
+#include "options.h"
 #include "debug.h"
 #include "OGFromFile.h"
 #include <list>
@@ -73,7 +73,8 @@ extern int og_yyparse();
 extern int og_yylex_destroy();
 #endif
 extern unsigned int State::state_count;
-extern list<std::string> netfiles;
+extern std::list<std::string> netfiles;
+extern std::list<std::string> ogfiles;
 extern OGFromFile* OGToParse;
 
 // the currently considered owfn from the owfn list given by the command line;

@@ -1,6 +1,6 @@
 /*****************************************************************************
  * Copyright 2005, 2006, 2007 Jan Bretschneider, Peter Massuthe,             *
- *                            Robert Danitz                                  *
+ *           Robert Danitz                                                   *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *

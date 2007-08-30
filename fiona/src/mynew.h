@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright 2005, 2006 Jan Bretschneider                                    *
+ * Copyright 2005, 2006, 2007 Jan Bretschneider                              *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *

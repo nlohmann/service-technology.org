@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright 2006 Kathrin Kaschner                                           *
+ * Copyright 2006, 2007 Kathrin Kaschner, Peter Massuthe                     *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *

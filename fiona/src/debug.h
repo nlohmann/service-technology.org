@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright 2005, 2006 Niels Lohmann, Peter Massuthe, Daniela Weinberg      *
+ * Copyright 2005, 2006, 2007 Niels Lohmann, Peter Massuthe, Daniela Weinberg*
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *

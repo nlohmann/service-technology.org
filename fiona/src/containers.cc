@@ -1,6 +1,6 @@
 /*****************************************************************************
  * Copyright 2005, 2006, 2007 Peter Massuthe, Daniela Weinberg,              *
- *                            Jan Bretschneider                              *
+ *           Jan Bretschneider                                               *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *

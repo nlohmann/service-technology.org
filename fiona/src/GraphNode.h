@@ -143,29 +143,28 @@ class GraphNode {
 
     public:
 
+        /// These two are needed for OG/IG construction.
         bool hasFinalStateInStateSet;
         int* eventsUsed;
 
-        // this set contains only a reduced number of states in case the state
-        // reduced graph is to be build.
+        /// This set contains only a reduced number of states in case the state
+        /// reduced graph is to be build.
         StateSet reachGraphStateSet;
 
-        //! constructor
+        /// constructor (no parameters)
         GraphNode();
 
-        //! constructor
-        //! \param _name
-        //! \param _annotation
+        /// constructor (two parameters)
         GraphNode(const std::string& _name,
                         GraphFormula* _annotation);
 
-        //! constructor
-        //! \param _name
-        //! \param _annotation
-        //! \param _color
+        /// constructor (three parameters)
         GraphNode(const std::string& _name,
                         GraphFormula* _annotation,
                         GraphNodeColor _color);
+
+        /// Destroys this GraphNode.
+        ~GraphNode();
 
         /// get the node number
         unsigned int getNumber() const;
@@ -185,10 +184,10 @@ class GraphNode {
         /// set the node color
         void setColor(GraphNodeColor c);
 
-        /// is the node color blue?
+        /// Is the node color blue?
         bool isBlue() const;
 
-        /// is the node color red?
+        /// Is the node color red?
         bool isRed() const;
 
         /// get the annotation
@@ -197,27 +196,13 @@ class GraphNode {
         /// get the annotation as a string
         std::string getAnnotationAsString() const;
 
-        /// Destroys this GraphNode.
-        ~GraphNode();
-
         /// Adds a leaving edge to this node.
         void addLeavingEdge(GraphEdge* edge);
         
-        /**
-         * Returns an iterator that can be used to traverse all leaving edges of
-         * this GraphNode from begin to end. This iterator can also be used to
-         * modify the list of leaving edges, e.g., to remove an edge.
-         * Consult SList<T>::getIterator() for instructions how to use this
-         * iterator.
-         */
+        /// Returns an iterator for this node's leaving edges.
         LeavingEdges::Iterator getLeavingEdgesIterator();
 
-        /**
-         * Returns a const iterator that can be used to traverse all leaving edges
-         * of this GraphNode. You can not modify the list of leaving edges with
-         * this const iterator. Consult SList<T>::getConstIterator() for
-         * instructions how to use this iterator.
-         */
+        /// Returns a constant iterator for this node's leaving edges.
         LeavingEdges::ConstIterator getLeavingEdgesConstIterator() const;
 
         /// Returns the number of leaving edges.
@@ -226,6 +211,7 @@ class GraphNode {
         /// adds a state to the states of a GraphNode
         bool addState(State *);
 
+        /// adds a new clause to the CNF formula of the node
         void addClause(GraphFormulaMultiaryOr*);
 
         /// analyses the node and sets its color
@@ -237,10 +223,11 @@ class GraphNode {
         /// set the diagnosis color
         GraphNodeDiagnosisColor setDiagnosisColor(GraphNodeDiagnosisColor c);
 
+        /// removes the given literal from this node's annotation
         void removeLiteralFromAnnotation(const std::string& literal);
 
-        /// Removes unneeded literals from the node's annotation. Labels of edges to
-        /// red nodes are unneeded.
+        /// Removes unneeded literals from the node's annotation. Labels of
+        /// edges to red nodes are unneeded.
         void removeUnneededLiteralsFromAnnotation();
         
         /// returns true iff a colored successor of v can be avoided
@@ -255,17 +242,26 @@ class GraphNode {
         /// returns true iff node should be shown according to the "show" parameter
         bool isToShow(const GraphNode* rootOfGraph) const;
         
+        /// determines whether this node has a transition with the given label
         bool hasTransitionWithLabel(const std::string&) const;
+        
+        /// determines whether this node has a blue transition with a given label
         bool hasBlueTransitionWithLabel(const std::string&) const;
 
+        /// returns a transition of this node with the given label
         GraphEdge* getTransitionWithLabel(const std::string&) const;
         
+        /// returns the destination node of the transition with the given label
         GraphNode* fireTransitionWithLabel(const std::string&);
 
+        /// determines whether an assinment satisfies this node's annotation
         bool assignmentSatisfiesAnnotation(const GraphFormulaAssignment&) const;
 
+        /// returns the assignment that is imposed by present or absent arcs
+        /// leaving the node
         GraphFormulaAssignment* getAssignment() const;
 
+        /// removes all transition from this node to the given one
         void removeTransitionsToNode(const GraphNode*);
 
 #undef new

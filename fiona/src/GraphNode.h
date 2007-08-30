@@ -122,7 +122,7 @@ class GraphNode {
         /// Type of the container that holds all leaving edges of this GraphNode.
         typedef SList<GraphEdge*> LeavingEdges;
 
-    protected:
+    private:
 
         /// Number of this GraphNode in the graph.
         unsigned int number;
@@ -136,7 +136,7 @@ class GraphNode {
         //! Diagnosis color of this GraphNode.
         GraphNodeDiagnosisColor diagnosis_color;
 
-        /// Annotation of this node (a CNF) as a formula.
+        /// Annotation of this node as a formula (a CNF).
         GraphFormulaCNF* annotation;
 
         /// Contains all leaving edges.
@@ -191,15 +191,31 @@ class GraphNode {
         /// Is the node color red?
         bool isRed() const;
 
+        /// get the node diagnosis color
+        GraphNodeDiagnosisColor getDiagnosisColor() const;
+
+        /// set the diagnosis color
+        GraphNodeDiagnosisColor setDiagnosisColor(GraphNodeDiagnosisColor c);
+
         /// get the annotation
         GraphFormulaCNF* getAnnotation() const;
 
         /// get the annotation as a string
         std::string getAnnotationAsString() const;
 
+        /// adds a new clause to the CNF formula of the node
+        void addClause(GraphFormulaMultiaryOr*);
+
+        /// removes the given literal from this node's annotation
+        void removeLiteralFromAnnotation(const std::string& literal);
+
+        /// Removes unneeded literals from the node's annotation. Labels of
+        /// edges to red nodes are unneeded.
+        void removeUnneededLiteralsFromAnnotation();
+        
         /// Adds a leaving edge to this node.
         void addLeavingEdge(GraphEdge* edge);
-        
+
         /// Returns an iterator for this node's leaving edges.
         LeavingEdges::Iterator getLeavingEdgesIterator();
 
@@ -210,27 +226,11 @@ class GraphNode {
         unsigned int getLeavingEdgesCount() const;
 
         /// adds a state to the states of a GraphNode
-        bool addState(State *);
-
-        /// adds a new clause to the CNF formula of the node
-        void addClause(GraphFormulaMultiaryOr*);
+        bool addState(State*);
 
         /// analyses the node and sets its color
         void analyseNode();
 
-        /// get the node diagnosis color
-        GraphNodeDiagnosisColor getDiagnosisColor() const;
-
-        /// set the diagnosis color
-        GraphNodeDiagnosisColor setDiagnosisColor(GraphNodeDiagnosisColor c);
-
-        /// removes the given literal from this node's annotation
-        void removeLiteralFromAnnotation(const std::string& literal);
-
-        /// Removes unneeded literals from the node's annotation. Labels of
-        /// edges to red nodes are unneeded.
-        void removeUnneededLiteralsFromAnnotation();
-        
         /// returns true iff a colored successor of v can be avoided
         bool coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const;        
         

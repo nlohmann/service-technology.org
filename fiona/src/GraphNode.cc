@@ -826,4 +826,3 @@ void GraphNode::removeTransitionsToNode(const GraphNode* nodeToDelete) {
     }
     delete iEdge;
 }
-

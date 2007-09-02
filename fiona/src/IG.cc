@@ -321,11 +321,11 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
 
             unsigned int i = 0;
             if (type == RECEIVING) {
-                while (i < PN->getOutputPlaceCount() && PN->getOutputPlace(i)->index != *iter) {
+                while (i < PN->getOutputPlaceCount() && PN->getPlaceIndex(PN->getOutputPlace(i)) != *iter) {
                     i++;
                 }
             } else {
-                while (i < PN->getInputPlaceCount() && PN->getInputPlace(i)->index != *iter) {
+                while (i < PN->getInputPlaceCount() && PN->getPlaceIndex(PN->getInputPlace(i)) != *iter) {
                     i++;
                 }
             }
@@ -384,7 +384,7 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
             unsigned int i = 0;
             while (i < PN->getInputPlaceCount()-1 &&
                    PN->getInputPlace(i) &&
-                   PN->getInputPlace(i)->index != *iter) {
+                   PN->getPlaceIndex(PN->getInputPlace(i)) != *iter) {
                 i++;
             }
             // count the occurance of this message
@@ -394,7 +394,7 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
             unsigned int i = 0;
             while (i < PN->getOutputPlaceCount()-1 &&
                    PN->getOutputPlace(i) &&
-                   PN->getOutputPlace(i)->index != *iter) {
+                   PN->getPlaceIndex(PN->getOutputPlace(i)) != *iter) {
                 i++;
             }
             // count the occurance of this message
@@ -626,7 +626,7 @@ void interactionGraph::calculateSuccStatesInput(messageMultiSet input,
             // iterate over the set of input messages
             for (messageMultiSet::iterator iter = input.begin(); iter
                     != input.end(); iter++) {
-                if (PN->CurrentMarking[PN->getPlace(*iter)->index] == messages_manual) {
+                if (PN->CurrentMarking[PN->getPlaceIndex(PN->getPlace(*iter))] == messages_manual) {
                     // adding input message to state already using full message bound
                     trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
                     trace(TRACE_3, PN->getPlace(*iter)->name);

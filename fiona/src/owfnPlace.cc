@@ -46,7 +46,7 @@
 //! \param _net
 //! \brief constructor
 owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) :
-    Node(name), type(_type), index(0), capacity(0), nrbits(0),
+    Node(name), type(_type), capacity(0), nrbits(0),
             max_occurence(1), cardprop(0), proposition(NULL) {
 
     references = initial_marking = hash_factor = 0;
@@ -103,6 +103,10 @@ std::string owfnPlace::getLabelForMatching() const {
     return (label + name);
 }
 
+
+oWFN* owfnPlace::getUnderlyingOWFN() const {
+    return net;
+}
 
 void owfnPlace::operator += (unsigned int i) {
     initial_marking += i;

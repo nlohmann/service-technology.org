@@ -97,7 +97,7 @@ void owfnTransition::setQuasiEnabled(bool isQuasiEnabled) {
 
 #ifdef STUBBORN
 bool owfnTransition::prePlaceIsScapegoatForDisabledness(AdjacentPlace prePlace) const {
-    return (PN->CurrentMarking[prePlace.getOwfnPlace()->index] <
+    return (PN->CurrentMarking[PN->getPlaceIndex(prePlace.getOwfnPlace())] <
             prePlace.getMultiplicity());
 }
 #endif
@@ -219,7 +219,7 @@ void owfnTransition::fire(oWFN * PN) {
     for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i) {
         AdjacentPlace incrPlace = IncrPlaces[i];
         owfnPlace* incrOwfnPlace = incrPlace.getOwfnPlace();
-        PN->CurrentMarking[incrOwfnPlace->index] += incrPlace.getMultiplicity();
+        PN->CurrentMarking[PN->getPlaceIndex(incrOwfnPlace)] += incrPlace.getMultiplicity();
 #ifdef CHECKCAPACITY
         if(PN->CurrentMarking[incrOwfnPlace->index] > incrOwfnPlace->capacity) {
             cerr << "capacity of place " << incrOwfnPlace->name << " exceeded!" << endl;
@@ -230,18 +230,18 @@ void owfnTransition::fire(oWFN * PN) {
     for (AdjacentPlaces_t::size_type i = 0; i != DecrPlaces.size(); ++i) {
         AdjacentPlace decrPlace = DecrPlaces[i];
         owfnPlace* decrOwfnPlace = decrPlace.getOwfnPlace();
-        if (PN->CurrentMarking[decrOwfnPlace->index]
+        if (PN->CurrentMarking[PN->getPlaceIndex(decrOwfnPlace)]
                 < decrPlace.getMultiplicity()) {
             PN->printCurrentMarking();
             cerr << "marking of place "<< decrOwfnPlace->name<< " is: "
-                    << PN->CurrentMarking[decrOwfnPlace->index]
+                    << PN->CurrentMarking[PN->getPlaceIndex(decrOwfnPlace)]
                     << " but transition "<< this->name<< " consumes: "
                     << decrPlace.getMultiplicity() << endl;
             cerr << "number of states calculated so far: "<< State::state_count
                     << endl;
             _exit(4);
         } else {
-            PN->CurrentMarking[decrOwfnPlace->index] -= decrPlace.getMultiplicity();
+            PN->CurrentMarking[PN->getPlaceIndex(decrOwfnPlace)] -= decrPlace.getMultiplicity();
         }
     }
 
@@ -394,7 +394,7 @@ void owfnTransition::check_enabled(oWFN * PN) {
             mustbeincluded = preOwfnPlace->PreTransitions;
 #endif
             if (preOwfnPlace->type == INPUT) {
-                messageSet.insert(preOwfnPlace->index);
+                messageSet.insert(PN->getPlaceIndex(preOwfnPlace));
                 quasiEnabledNr++; // remember that we have found an input pre-place with no appropriate marking
             }
         } else {

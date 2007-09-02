@@ -469,7 +469,7 @@ finalmarking:
 		owfn_yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
-	PN->FinalMarking[PS->getPlace()->index] = i;
+	PN->FinalMarking[PN->getPlaceIndex(PS->getPlace())] = i;
     PN->finalMarkingString = PN->finalMarkingString + string($1) + ": " + string($3);
 	free($1);
 	free($3);
@@ -483,7 +483,7 @@ finalmarking:
 		owfn_yyerror(error.c_str());
 	}
 	sscanf("1","%u",&i);
-	PN->FinalMarking[PS->getPlace()->index] = i;
+	PN->FinalMarking[PN->getPlaceIndex(PS->getPlace())] = i;
     PN->finalMarkingString = PN->finalMarkingString + string($1) + ": 1";
 	free($1);
       }

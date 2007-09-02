@@ -146,7 +146,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                 GraphNode* v = new GraphNode();    // create new GraphNode of the graph
 
                 trace(TRACE_5, "\t\t\t\t    calculating successor states\n");
-                calculateSuccStatesInput(PN->getInputPlace(i)->index, currentNode, v);
+                calculateSuccStatesInput(PN->getPlaceIndex(PN->getInputPlace(i)), currentNode, v);
 
                 if (v->getColor() == RED) {
                     // message bound violation occured during calculateSuccStatesInput
@@ -237,7 +237,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                 PN->getOutputPlace(i)->max_occurence > currentNode->eventsUsed[i + PN->getInputPlaceCount()]) {
 
                 GraphNode* v = new GraphNode();    // create new GraphNode of the graph
-                calculateSuccStatesOutput(PN->getOutputPlace(i)->index, currentNode, v);
+                calculateSuccStatesOutput(PN->getPlaceIndex(PN->getOutputPlace(i)), currentNode, v);
 
                 // was the new node computed before?
                 GraphNode* found = findGraphNodeInSet(v);
@@ -395,7 +395,7 @@ void OG::calculateSuccStatesInput(unsigned int input,
         // test for each marking of current node if message bound k reached
         // then supress new sending event
         if (options[O_MESSAGES_MAX] == true) { // k-message-bounded set
-            if (PN->CurrentMarking[PN->getPlace(input)->index] == messages_manual) {
+            if (PN->CurrentMarking[PN->getPlaceIndex(PN->getPlace(input))] == messages_manual) {
                 // adding input message to state already using full message bound
                 trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
                 trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode* oldNode, GraphNode* newNode) : end\n");
@@ -571,7 +571,7 @@ void OG::computeCNF(GraphNode* node) const {
 
                 // get all activated output events
                 for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-                    if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                    if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] > 0) {
                         GraphFormulaLiteral
                                 * myliteral = new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
                         myclause->addSubFormula(myliteral);
@@ -623,7 +623,7 @@ void OG::computeCNF(GraphNode* node) const {
 
                 // get the activated output events
                 for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-                    if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                    if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] > 0) {
                         GraphFormulaLiteral
                                 * myliteral = new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
                         myclause->addSubFormula(myliteral);

@@ -289,7 +289,7 @@ stateType State::exactType() {
             } else {
                 decode(PN); // overwrites PN->CurrentMarking !
                 for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-                    if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                    if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] > 0) {
                         internal_deadlock = false;
                         continue;
                     }

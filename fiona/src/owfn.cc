@@ -178,8 +178,7 @@ void oWFN::initialize() {
 
     // initialize places
     for (i=0; i < getPlaceCount(); i++) {
-        PlaceIndices.insert(make_pair(getPlace(i), i));
-        getPlace(i)->index = i;
+        PlaceIndices[getPlace(i)] = i;
 
         if ((getPlace(i)->type == INPUT) && (CurrentMarking[i] < getPlace(i)->capacity)) {
             CurrentMarking[i] = getPlace(i)->capacity;
@@ -281,7 +280,7 @@ void oWFN::removeisolated() {
      */
     for (i=0; i<getPlaceCount(); i++) {
         // getPlace(i)->nr = i;
-        getPlace(i)->index = i;
+        PlaceIndices[getPlace(i)] = i;
     }
 }
 
@@ -375,7 +374,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
     if (currentState != NULL) {
         currentState->decodeShowOnly(this); // decodes currently considered state
 
-        if (CurrentMarking[outputPlace->index] > 0) {
+        if (CurrentMarking[getPlaceIndex(outputPlace)] > 0) {
             stateSet.insert(currentState);
             return;
         }
@@ -419,7 +418,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
         // shall we save this state? meaning, are the correct output places marked?
         for (messageMultiSet::iterator iter = messages.begin(); iter
                 != messages.end(); iter++) {
-            if (CurrentMarking[getPlace(*iter)->index] == 0) {
+            if (CurrentMarking[getPlaceIndex(getPlace(*iter))] == 0) {
                 somePlaceNotMarked = true;
                 break;
             }
@@ -468,7 +467,7 @@ bool oWFN::checkMessageBound() {
 
         // test input places
         for (i = 0; i < getInputPlaceCount(); i++) {
-            if (CurrentMarking[getInputPlace(i)->index] > messages_manual) {
+            if (CurrentMarking[getPlaceIndex(getInputPlace(i))] > messages_manual) {
                 trace(TRACE_3,
                       "\t\t\t checkMessageBound found violation for input place "
                               + string(getInputPlace(i)->name) + "\n");
@@ -478,7 +477,7 @@ bool oWFN::checkMessageBound() {
         }
         // test output places
         for (i = 0; i < getOutputPlaceCount(); i++) {
-            if (CurrentMarking[getOutputPlace(i)->index] > messages_manual) {
+            if (CurrentMarking[getPlaceIndex(getOutputPlace(i))] > messages_manual) {
                 trace(TRACE_3,
                       "\t\t\t checkMessageBound found violation for output place "
                               + string(getOutputPlace(i)->name) + "\n");
@@ -897,7 +896,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
     CurrentState->type = typeOfState();
 
     // shall we save this state? meaning, is the correct output place marked?
-    if (CurrentMarking[outputPlace->index] > 0) {
+    if (CurrentMarking[getPlaceIndex(outputPlace)] > 0) {
         stateSet.insert(CurrentState);
 
         trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace* outputPlace, GraphNode* n) : end\n");
@@ -929,7 +928,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
                 trace(TRACE_5, "Current marking already in local bintree \n");
 
                 // shall we save this state? meaning, is the correct output place marked?
-                if (CurrentMarking[outputPlace->index] > 0) {
+                if (CurrentMarking[getPlaceIndex(outputPlace)] > 0) {
                     stateSet.insert(NewState);
                 } else {
                     // no it is not marked, so we take a look at its successor states
@@ -980,7 +979,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
                 }
 
                 // shall we save this state? meaning, is the correct output place marked?
-                if (CurrentMarking[outputPlace->index] > 0) {
+                if (CurrentMarking[getPlaceIndex(outputPlace)] > 0) {
                     stateSet.insert(NewState);
 
                     trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace) : end\n");
@@ -1101,11 +1100,11 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
     // shall we save this state? meaning, are the correct output places all marked?
     for (messageMultiSet::iterator iter = messages.begin(); iter
             != messages.end(); iter++) {
-        if (tempCurrentMarking[getPlace(*iter)->index] == 0) {
+        if (tempCurrentMarking[getPlaceIndex(getPlace(*iter))] == 0) {
             somePlaceNotMarked = true;
             break;
         }
-        tempCurrentMarking[getPlace(*iter)->index] -= 1;
+        tempCurrentMarking[getPlaceIndex(getPlace(*iter))] -= 1;
     }
 
     if (!somePlaceNotMarked) { // if all places are appropriatly marked, we save this state
@@ -1149,11 +1148,11 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
                 // shall we save this state? meaning, are the correct output places marked?
                 for (messageMultiSet::iterator iter = messages.begin(); iter
                         != messages.end(); iter++) {
-                    if (CurrentMarking[getPlace(*iter)->index] == 0) {
+                    if (CurrentMarking[getPlaceIndex(getPlace(*iter))] == 0) {
                         somePlaceNotMarked = true;
                         break;
                     }
-                    CurrentMarking[getPlace(*iter)->index] -= 1;
+                    CurrentMarking[getPlaceIndex(getPlace(*iter))] -= 1;
                 }
 
                 if (!somePlaceNotMarked) { // if all places are appropriatly marked, we save this state
@@ -1222,11 +1221,11 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
                 // shall we save this state? meaning, are the correct output places marked?
                 for (messageMultiSet::iterator iter = messages.begin(); iter
                         != messages.end(); iter++) {
-                    if (tempCurrentMarking[getPlace(*iter)->index] == 0) {
+                    if (tempCurrentMarking[getPlaceIndex(getPlace(*iter))] == 0) {
                         somePlaceNotMarked = true;
                         break;
                     }
-                    tempCurrentMarking[getPlace(*iter)->index] -= 1;
+                    tempCurrentMarking[getPlaceIndex(getPlace(*iter))] -= 1;
                 }
 
                 if (!somePlaceNotMarked) { // if all places are appropriatly marked, we save this state
@@ -1599,7 +1598,6 @@ void oWFN::addPlace(owfnPlace *place) {
         outputPlaces.push_back(place);
     }
     PlaceIndices[place] = Places.size();
-    place->index = Places.size();
     Places.push_back(place);
 
     if (!(Places.size() % REPORTFREQUENCY)) {
@@ -2158,7 +2156,7 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
     // The TSCC based optimisation is included
 
     // 1. start with enabled transition
-    if (TarjanStack = startOfEnabledList) {
+    if ((TarjanStack = startOfEnabledList)) {
         maxdfs = 0;
         NewStubbStamp(this);
         TarjanStack->nextontarjanstack = TarjanStack;
@@ -2286,7 +2284,7 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
             p->mark((*place)->initial_marking);
         }
 
-        if (FinalMarking[(*place)->index] >= 1) {
+        if (FinalMarking[getPlaceIndex(*place)] >= 1) {
             p->isFinal = true;
         }
     }
@@ -2300,7 +2298,7 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
             p->mark((*place)->initial_marking);
         }
 
-        if (FinalMarking[(*place)->index] >= 1) {
+        if (FinalMarking[getPlaceIndex(*place)] >= 1) {
             p->isFinal = true;
         }
     }
@@ -2314,7 +2312,7 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
                 p->mark((*place)->initial_marking);
             }
 
-            if (FinalMarking[(*place)->index] >= 1) {
+            if (FinalMarking[getPlaceIndex(*place)] >= 1) {
                 p->isFinal = true;
             }
         }

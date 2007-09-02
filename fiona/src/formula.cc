@@ -34,6 +34,7 @@
  */
 
 #include "mynew.h"
+#include "owfn.h"
 #include "formula.h"
 #include "debug.h"
 #include <cassert>
@@ -179,27 +180,27 @@ booleanformula::~booleanformula() {
 bool atomicformula::init(unsigned int* CurrentMarking) {
     switch (type) {
         case eq:
-            if (CurrentMarking[p->index]==k)
+            if (CurrentMarking[p->getUnderlyingOWFN()->getPlaceIndex(p)]==k)
                 return (value=true);
             return (value=false);
         case neq:
-            if (CurrentMarking[p->index]!=k)
+            if (CurrentMarking[p->getUnderlyingOWFN()->getPlaceIndex(p)]!=k)
                 return (value=true);
             return (value=false);
         case leq:
-            if (CurrentMarking[p->index]<=k)
+            if (CurrentMarking[p->getUnderlyingOWFN()->getPlaceIndex(p)]<=k)
                 return (value=true);
             return (value=false);
         case geq:
-            if (CurrentMarking[p->index]>=k)
+            if (CurrentMarking[p->getUnderlyingOWFN()->getPlaceIndex(p)]>=k)
                 return (value=true);
             return (value=false);
         case lt:
-            if (CurrentMarking[p->index] <k)
+            if (CurrentMarking[p->getUnderlyingOWFN()->getPlaceIndex(p)] <k)
                 return (value=true);
             return (value=false);
         case gt:
-            if (CurrentMarking[p->index] >k)
+            if (CurrentMarking[p->getUnderlyingOWFN()->getPlaceIndex(p)] >k)
                 return (value=true);
             return (value=false);
         case conj: /* fall through */

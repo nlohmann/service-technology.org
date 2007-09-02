@@ -59,6 +59,7 @@ class owfnPlace : public Node {
         placeType type; // type of place (input, output, internal)
         std::string getLabelForCommGraph() const;
         std::string getLabelForMatching() const;
+        oWFN* getUnderlyingOWFN() const;
 
         unsigned int initial_marking;
         unsigned int hash_factor;
@@ -68,13 +69,12 @@ class owfnPlace : public Node {
         // void set_marking(unsigned int);   // set initial 1marking of place;
         void set_hash(unsigned int); // define a factor for hash value calculation
         // hash(m) = sum(p in P) p.hash_factor*CurrentMarking[p]
-        unsigned int index; // index in place array, necessary for symmetries
         unsigned int references; // we remove isolated places 
         unsigned int capacity; // maximum capacity
         int nrbits; // nr of bits required for storing its marking (= log capacity)
         int startbit; // first bit representing this place in bit vector
         int max_occurence;
-        // placeType getType();
+        placeType getType();
         unsigned int cardprop; // number of propositions in final condition that mention this place
         formula ** proposition; // array of propositions in final condition that mention this place
         // used for quick re-evaluation of condition

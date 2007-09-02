@@ -550,7 +550,7 @@ bool GraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) c
                 
                 for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
                     if (PN->getOutputPlace(i)->name == edge_label) {
-                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
+                        if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] > 0) {
                             found_enabled_state = true;
                             break;
                         }
@@ -600,7 +600,7 @@ bool GraphNode::edgeEnforcable(GraphEdge* e) const {
             if ((*state)->type == DEADLOCK) {
                 for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
                     if (PN->getOutputPlace(i)->name == edge_label) {
-                        if (PN->CurrentMarking[PN->getOutputPlace(i)->index] == 0) {
+                        if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] == 0) {
                             edge_enforcable = false;
                             break;
                         }

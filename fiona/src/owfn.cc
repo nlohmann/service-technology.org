@@ -103,6 +103,10 @@ oWFN::~oWFN() {
 
     ports.clear();
 
+    PlaceIndices.clear();
+    inputPlaceIndices.clear();
+    outputPlaceIndices.clear();
+
     delete[] CurrentMarking;
     delete[] FinalMarking;
     delete FinalCondition;
@@ -146,11 +150,21 @@ oWFN::Places_t::size_type oWFN::getOutputPlaceCount() const {
     return outputPlaces.size();
 }
 
-
 owfnPlace* oWFN::getOutputPlace(Places_t::size_type i) const {
     return outputPlaces[i];
 }
 
+oWFN::Places_t::size_type oWFN::getPlaceIndex(owfnPlace *Place) {
+    return(PlaceIndices[Place]);
+}
+
+oWFN::Places_t::size_type oWFN::getInputPlaceIndex(owfnPlace *inputPlace) {
+    return(inputPlaceIndices[inputPlace]);
+}
+
+oWFN::Places_t::size_type oWFN::getOutputPlaceIndex(owfnPlace *outputPlace) {
+    return(outputPlaceIndices[outputPlace]);
+}
 
 //! \brief initializes the owfn; is called right after the parsing of the net file is done
 void oWFN::initialize() {
@@ -164,6 +178,7 @@ void oWFN::initialize() {
 
     // initialize places
     for (i=0; i < getPlaceCount(); i++) {
+        PlaceIndices.insert(make_pair(getPlace(i), i));
         getPlace(i)->index = i;
 
         if ((getPlace(i)->type == INPUT) && (CurrentMarking[i] < getPlace(i)->capacity)) {
@@ -1577,12 +1592,15 @@ bool oWFN::addTransition(owfnTransition* transition) {
 
 void oWFN::addPlace(owfnPlace *place) {
     if (place->type == INPUT) {
+        inputPlaceIndices[place] = inputPlaces.size();
         inputPlaces.push_back(place);
     } else if (place->type == OUTPUT) {
+        outputPlaceIndices[place] = outputPlaces.size();
         outputPlaces.push_back(place);
     }
+    PlaceIndices[place] = Places.size();
+    place->index = Places.size();
     Places.push_back(place);
-    place->index = Places.size() - 1;
 
     if (!(Places.size() % REPORTFREQUENCY)) {
         cerr << "\n"<< Places.size() << "places parsed\n";

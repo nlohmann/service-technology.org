@@ -77,9 +77,17 @@ class oWFN {
 
         //! array of places
         Places_t Places;
-
         Places_t inputPlaces;
         Places_t outputPlaces;
+
+        //! associates places with their corresponding index in the place set
+        std::map<owfnPlace *, Places_t::size_type> PlaceIndices;
+
+        //! associates input places with their corresponding index in the input set
+        std::map<owfnPlace *, Places_t::size_type> inputPlaceIndices;
+
+        //! associates output places with their corresponding index in the output set 
+        std::map<owfnPlace *, Places_t::size_type> outputPlaceIndices;
 
         //! the ports
         std::map<std::string, Places_t> ports;
@@ -153,6 +161,15 @@ class oWFN {
         //! Get an output owfnPlace from index i. Indices start at 0. Get the
         //! total number of output owfnPlaces from getOutputPlaceCount().
         owfnPlace* getOutputPlace(Places_t::size_type i) const;
+
+        //! Get the index of Place in the place set
+        Places_t::size_type getPlaceIndex(owfnPlace *Place);
+
+        //! Get the index of inputPlace in the input place set
+        Places_t::size_type getInputPlaceIndex(owfnPlace *inputPlace);
+
+        //! Get the index of outputPlace in the output place set
+        Places_t::size_type getOutputPlaceIndex(owfnPlace *outputPlace);
 
         unsigned int getCardFireList();
 

@@ -123,7 +123,8 @@ class OG : public CommunicationGraph {
 
 class PriorityMap {
     public:
-   
+        typedef pair<oWFN::Places_t::size_type, placeType> KeyType;
+
         /*
          * Fills the priority map according to the given annotation.
          * @param annotation the annotation, from which the priority map will be extracted. 
@@ -134,7 +135,7 @@ class PriorityMap {
          * Delivers the element from the priority map with the highest priority.
          * This element will be removed afterwards.
          */ 
-        owfnPlace* pop();
+        KeyType PriorityMap::pop();
 
         /**
          * Returns true if the priority map is empty. Return false otherwise.
@@ -146,7 +147,7 @@ class PriorityMap {
         /*
          * Type of priority map.
          */ 
-        typedef map<owfnPlace *, pair<int, int> > MapType;
+        typedef map<KeyType, pair<int, int> > MapType;
 
         MapType map;
 };

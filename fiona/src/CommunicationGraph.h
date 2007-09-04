@@ -37,6 +37,7 @@
 #include "mynew.h"
 #include "GraphEdge.h"
 #include "GraphNode.h" // for GraphNodeDiagnosisColor_enum
+#include "Graph.h" // parent class
 #include "owfn.h"
 #include <fstream>
 #include <set>
@@ -48,7 +49,7 @@ extern double global_progress;
 extern int show_progress;
 
 /* communication graph */
-class CommunicationGraph {
+class CommunicationGraph : public Graph {
     private:
 
         /**
@@ -111,8 +112,6 @@ class CommunicationGraph {
     protected:
         oWFN* PN; //!< pointer to the underlying petri net
 
-        GraphNode* root; //!< the root node of the graph
-
         void addProgress(double);
 
     public:
@@ -121,8 +120,6 @@ class CommunicationGraph {
         ~CommunicationGraph();
 
         GraphNodeSet setOfVertices;
-
-        GraphNode* getRoot() const;
 
         void calculateRootNode();
 

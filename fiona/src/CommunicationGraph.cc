@@ -57,9 +57,7 @@ extern FILE *stg_yyin;
 
 //! \param _PN
 //! \brief constructor
-CommunicationGraph::CommunicationGraph(oWFN * _PN) :
-    root(NULL) {
-
+CommunicationGraph::CommunicationGraph(oWFN * _PN) {
     PN = _PN;
 }
 
@@ -74,13 +72,6 @@ CommunicationGraph::~CommunicationGraph() {
     }
 
     trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : end\n");
-}
-
-
-//! \return pointer to root
-//! \brief returns a pointer to the root node of the graph
-GraphNode* CommunicationGraph::getRoot() const {
-    return root;
 }
 
 

@@ -58,7 +58,7 @@ class Graph {
         /// Type of container passed to Graph::getProductOGFilePrefix().
         typedef std::list<std::string> ogfiles_t;
 
-    private:
+    protected:
         GraphNode* root;
 
         typedef std::set<GraphNode*> nodes_t;

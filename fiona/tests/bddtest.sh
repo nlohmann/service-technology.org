@@ -33,6 +33,8 @@ SUBDIR=sequence_suite
 DIR=$testdir/$SUBDIR
 FIONA=fiona
 
+result=0
+
 #loeschen aller erzeugten Dateien im letzten Durchlauf
 rm -f $DIR/*.out
 rm -f $DIR/*.png
@@ -51,7 +53,7 @@ fi
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.b4.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     $cmd  2>/dev/null 1>/dev/null
@@ -77,7 +79,7 @@ fi
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.b4.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
@@ -123,7 +125,7 @@ cmd="$FIONA $owfn $owfn_reference -t equivalence"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.n.n.x.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
@@ -155,7 +157,7 @@ fi
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.b4.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
@@ -200,7 +202,7 @@ cmd="$FIONA $owfn $owfn_reference -t equivalence"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.n.n.x.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`

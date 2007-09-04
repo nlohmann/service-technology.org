@@ -52,7 +52,7 @@ fi
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e10.m4.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
@@ -83,7 +83,7 @@ fi
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e10.m5.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
@@ -120,7 +120,7 @@ fi
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e10.m6.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
@@ -157,7 +157,7 @@ fi
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e10.m1.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
@@ -194,7 +194,7 @@ fi
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.e10.m2.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`

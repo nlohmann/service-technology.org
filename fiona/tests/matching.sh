@@ -46,7 +46,7 @@ cmd="$FIONA $owfn -t match $og"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.match.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
@@ -69,7 +69,7 @@ cmd="$FIONA $owfn -t match $og"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.match.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
@@ -92,7 +92,7 @@ cmd="$FIONA $owfn -t match $og"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.match.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
@@ -115,7 +115,7 @@ cmd="$FIONA $owfn -t match $og"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.match.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
@@ -142,7 +142,7 @@ cmd="$FIONA $owfn -t match $og"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.match.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`

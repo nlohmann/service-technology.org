@@ -58,7 +58,7 @@ cmd="$FIONA -t productog -o $outputPrefix $og1 $og2"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$outputPrefix.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
@@ -102,7 +102,7 @@ cmd="$FIONA -t productog -o $outputPrefix $og1 $og2 $og3"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$outputPrefix.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
@@ -146,7 +146,7 @@ cmd="$FIONA -t productog -o $outputPrefix $og3 $og1 $og2"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$outputPrefix.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`

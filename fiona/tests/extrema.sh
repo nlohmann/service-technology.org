@@ -88,7 +88,7 @@ for ((i=0; i<${#owfns[*]}; ++i)) do
     if [ "$memcheck" = "yes" ]; then
         memchecklog="$owfn.OG.memcheck.log"
         do_memcheck "$cmd" "$memchecklog"
-        result=$?
+        result=$(($result | $?))
     else
         expectation_controllable="${expectations_controllable[$i]}"
         echo running $cmd

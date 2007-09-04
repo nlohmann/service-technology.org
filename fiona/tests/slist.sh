@@ -41,7 +41,7 @@ cmd=$builddir/slistcheck
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$cmd.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$?
+    result=$(($result | $?))
 else
     $cmd
     result=$?

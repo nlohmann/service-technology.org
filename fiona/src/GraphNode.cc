@@ -155,26 +155,12 @@ GraphNode::GraphNode() : number(12345678), name("12345678"), color(BLUE),
  *
  * \param _name the name of this node
  * \param _annotation the annotation of this node
- */
-GraphNode::GraphNode(const std::string& _name, GraphFormula* _annotation) :
-    number(12345678), name(_name), color(BLUE) {
-    
-    annotation = _annotation->getCNF();
-    delete _annotation; // because getCNF() returns a newly create formula
-}
-
-
-/*!
- * \brief constructor (two parameters)
- *
- * \param _name the name of this node
- * \param _annotation the annotation of this node
  * \param _color the colour of this node
  */
 GraphNode::GraphNode(const std::string& _name,
                      GraphFormula* _annotation,
                      GraphNodeColor _color) :
-    number(12345678), name(_name), color(_color) {
+    number(12345678), name(_name), color(_color), eventsUsed(NULL) {
     
     annotation = _annotation->getCNF();
     delete _annotation; // because getCNF() returns a newly create formula
@@ -200,8 +186,7 @@ GraphNode::~GraphNode() {
     delete annotation;
     
     if (eventsUsed != NULL) {
-        // This leads to core dumps in make check (productog) on some machines.
-        //        delete[] eventsUsed;
+        delete[] eventsUsed;
     }
     
     numberDeletedVertices++;

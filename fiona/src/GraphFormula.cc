@@ -140,7 +140,6 @@ threeValueLogic GraphFormula::equals() {
 
 
 GraphFormulaCNF* GraphFormula::getCNF() {
-    GraphFormulaCNF* cnf = new GraphFormulaCNF;
     trace(TRACE_5, "GraphFormula::getCNF(): " + asString() + " is a\n");
 
     // CNF(literal) = literal 
@@ -149,6 +148,7 @@ GraphFormulaCNF* GraphFormula::getCNF() {
         trace(TRACE_5, "literal.\n");
 
         clause->addSubFormula(this->getDeepCopy());
+        GraphFormulaCNF* cnf = new GraphFormulaCNF;
         cnf->addClause(clause);
         return cnf;
     }
@@ -162,6 +162,7 @@ GraphFormulaCNF* GraphFormula::getCNF() {
     // CNF(phi AND psi) = CNF(phi) AND CNF(psi) 
     if (dynamic_cast<GraphFormulaMultiaryAnd*>(this)) {
         trace(TRACE_5, "MultiaryAnd. Going in deeper.\n");
+        GraphFormulaCNF* cnf = new GraphFormulaCNF;
         for (GraphFormulaMultiaryAnd::iterator
              i = dynamic_cast<GraphFormulaMultiaryAnd*>(this)->begin();
              i != dynamic_cast<GraphFormulaMultiaryAnd*>(this)->end(); i++) {
@@ -178,6 +179,7 @@ GraphFormulaCNF* GraphFormula::getCNF() {
     // CNF(phi OR psi) = ...  things becoming ugly 
     if (dynamic_cast<GraphFormulaMultiaryOr*>(this)) {
         trace(TRACE_5, "MultiaryOr. Going Underground.\n");
+        GraphFormulaCNF* cnf = new GraphFormulaCNF;
         GraphFormulaMultiaryOr* temp = dynamic_cast<GraphFormulaMultiaryOr*>(this);
         GraphFormulaMultiaryAnd *clause;
         //GraphFormulaCNF *conj = new GraphFormulaCNF;    

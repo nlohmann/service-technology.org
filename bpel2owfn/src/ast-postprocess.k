@@ -35,7 +35,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/08/10 11:09:04 $
+ * \date    \$Date: 2007/09/04 13:47:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.190 $
+ * \version \$Revision: 1.191 $
  */
 %}
 
@@ -63,6 +63,8 @@ Process(a,b,messageExchange,c,d,e,g,i,_id) ->
       unsigned int myid = _id->value;
       ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
+
+      resetActivityRelations();
 
       
 

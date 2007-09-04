@@ -30,17 +30,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/06/28 07:38:15 $
+ * \date    \$Date: 2007/09/04 13:47:12 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  *
  * \todo    Comment me!
  *
@@ -115,6 +115,7 @@ void enclosedActivities( unsigned int a, unsigned int b );
 void enterEnclosedActivities( unsigned int a, set< unsigned int > b );
 void consecutiveActivities( unsigned int a, unsigned int b );
 void enterConsecutiveActivities( unsigned int a, unsigned int b );
+void resetActivityRelations();
 
 
 /// increases the index vector

@@ -34,13 +34,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/08/10 11:09:04 $
+ * \date    \$Date: 2007/09/04 13:47:12 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.75 $
+ * \version \$Revision: 1.76 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -286,6 +286,21 @@ activityRelationType activityRelation(unsigned int a, unsigned int b)
     return activityRelationMap[pair<unsigned int,unsigned int>(a,b)];
     LEAVE("activityRelation");
 }
+
+/*!
+ * \brief Resets the activiyRelationMap in order to parse a new file.
+ *
+ * \ingroup creation
+ */
+void resetActivityRelations()
+{
+    ENTER("resetActivityRelations");
+    activityRelationMap.clear();
+    beforeActivities.clear();
+    afterActivities.clear();
+    LEAVE("resetActivityRelations");
+}
+
 
 /*!
  * \brief Defines two activities as conflicting.

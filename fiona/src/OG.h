@@ -135,7 +135,7 @@ class PriorityMap {
          * Delivers the element from the priority map with the highest priority.
          * This element will be removed afterwards.
          */ 
-        KeyType PriorityMap::pop();
+        KeyType pop();
 
         /**
          * Returns true if the priority map is empty. Return false otherwise.

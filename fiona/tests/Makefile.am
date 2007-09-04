@@ -210,5 +210,5 @@ covrunclean:
 clean-local: covrunclean cleandeps
 
 distclean-local:
-	test -d coverage_html/ && rm -rf coverage_html/
+	-test -d coverage_html/ && rm -rf coverage_html/
 

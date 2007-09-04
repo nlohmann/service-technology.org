@@ -31,8 +31,8 @@
  *
  */
 
-#ifndef GRAPH_H_
-#define GRAPH_H_
+#ifndef COMMUNICATIONGRAPH_H_
+#define COMMUNICATIONGRAPH_H_
 
 #include "mynew.h"
 #include "GraphEdge.h"

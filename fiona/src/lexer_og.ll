@@ -50,7 +50,7 @@
 #define YY_NO_UNPUT
 
 #include "debug.h"
-#include "OGFromFile.h"
+#include "Graph.h"
 #include "syntax_og.h"            // list of all tokens used
 #include <cstring>
 using namespace std;

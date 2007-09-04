@@ -31,7 +31,7 @@
  *
  */
 
-#include "OGFromFile.h"
+#include "Graph.h"
 #include "owfn.h"
 #include "state.h"
 #include "IG.h"
@@ -81,7 +81,7 @@ extern int og_yylex_destroy();
 extern unsigned int State::state_count;
 extern std::list<std::string> netfiles;
 extern std::list<std::string> ogfiles;
-extern OGFromFile* OGToParse;
+extern Graph* OGToParse;
 
 // the currently considered owfn from the owfn list given by the command line;
 // used only in main.cc
@@ -148,7 +148,7 @@ void readnet(const std::string& owfnfile) {
 
 
 //! \brief reads an OG from ogfile
-OGFromFile* readog(const std::string& ogfile) {
+Graph* readog(const std::string& ogfile) {
     og_yylineno = 1;
     og_yydebug = 0;
     og_yy_flex_debug = 0;
@@ -159,7 +159,7 @@ OGFromFile* readog(const std::string& ogfile) {
         cerr << "cannot open OG file '" << ogfile << "' for reading'\n" << endl;
         exit(4);
     }
-    OGToParse = new OGFromFile();
+    OGToParse = new Graph();
 
     ogfileToParse = ogfile;
     og_yyparse();
@@ -170,9 +170,9 @@ OGFromFile* readog(const std::string& ogfile) {
 
 
 //! \brief reads all OGs from a list
-void readAllOGs(OGFromFile::ogs_t& theOGs) {
+void readAllOGs(Graph::ogs_t& theOGs) {
 
-    for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+    for (Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
          iOgFile != ogfiles.end(); ++iOgFile) {
 
         theOGs.push_back(readog(*iOgFile));
@@ -257,7 +257,7 @@ void checkExchangeability() {
 
 
 // match a net against an og
-void matchNet(OGFromFile* OGToMatch, oWFN* PN) {
+void matchNet(Graph* OGToMatch, oWFN* PN) {
     string reasonForFailedMatch;
     if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
         trace(TRACE_0, "oWFN matches with OG: YES\n");
@@ -508,27 +508,27 @@ void makePNG(oWFN* PN) {
 
 
 // create the productOG of all given OGs
-void computeProductOG(OGFromFile::ogs_t OGsFromFiles) {
+void computeProductOG(Graph::ogs_t OGsFromFiles) {
     trace("Building product of the following OGs:\n");
 
-    for (OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+    for (Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
          iOgFile != ogfiles.end(); ++iOgFile) {
 
         trace(*iOgFile + "\n");
     }
     trace("\n");
 
-    OGFromFile* productOG = OGFromFile::product(OGsFromFiles);
+    Graph* productOG = Graph::product(OGsFromFiles);
     if (productOG->hasNoRoot()) {
         trace("The product OG is empty.\n\n");
     }
     if (!options[O_OUTFILEPREFIX]) {
-        outfilePrefix = OGFromFile::getProductOGFilePrefix(ogfiles);
+        outfilePrefix = Graph::getProductOGFilePrefix(ogfiles);
     }
 
     if (!options[O_NOOUTPUTFILES]) {
         trace("Saving product OG to:\n");
-        trace(OGFromFile::addOGFileSuffix(outfilePrefix));
+        trace(Graph::addOGFileSuffix(outfilePrefix));
         trace("\n");
         productOG->printOGFile(outfilePrefix);
         trace("\n");
@@ -538,7 +538,7 @@ void computeProductOG(OGFromFile::ogs_t OGsFromFiles) {
     }
 
     delete productOG;
-    for (OGFromFile::ogs_t::const_iterator iOg = OGsFromFiles.begin(); iOg
+    for (Graph::ogs_t::const_iterator iOg = OGsFromFiles.begin(); iOg
             != OGsFromFiles.end(); ++iOg) {
         delete *iOg;
     }
@@ -546,10 +546,10 @@ void computeProductOG(OGFromFile::ogs_t OGsFromFiles) {
 
 
 // check for simulation relation of two given OGs
-void checkSimulation(OGFromFile::ogs_t OGsFromFiles) {
-    list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
-    OGFromFile *simulator = *OGFromFileIter;
-    OGFromFile *simulant = *(++OGFromFileIter);
+void checkSimulation(Graph::ogs_t OGsFromFiles) {
+    list<Graph*>::iterator GraphIter = OGsFromFiles.begin();
+    Graph *simulator = *GraphIter;
+    Graph *simulant = *(++GraphIter);
     if (simulator->simulates(simulant)) {
         trace(TRACE_0, "\nThe first OG has all the strategies of the second one, possibly more.\n");
     } else {
@@ -559,10 +559,10 @@ void checkSimulation(OGFromFile::ogs_t OGsFromFiles) {
 
 
 // check if two given ogs are equal
-void checkEquality(OGFromFile::ogs_t OGsFromFiles) {
-    list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
-    OGFromFile *simulator = *OGFromFileIter;
-    OGFromFile *simulant = *(++OGFromFileIter);
+void checkEquality(Graph::ogs_t OGsFromFiles) {
+    list<Graph*>::iterator GraphIter = OGsFromFiles.begin();
+    Graph *simulator = *GraphIter;
+    Graph *simulant = *(++GraphIter);
     if (simulator->simulates(simulant)) {
         if (simulant->simulates(simulator)) {
             trace(TRACE_0, "\nThe two OGs are equivalent, that is, they have the same strategies.\n");
@@ -576,11 +576,11 @@ void checkEquality(OGFromFile::ogs_t OGsFromFiles) {
 
 
 // computes the number of Services that are determined by every single OG
-void countServices(OGFromFile::ogs_t OGsFromFiles) {
-    OGFromFile::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
-    for (list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin();
-         OGFromFileIter != OGsFromFiles.end(); OGFromFileIter++) {
-        if ((*OGFromFileIter)->isAcyclic()) {
+void countServices(Graph::ogs_t OGsFromFiles) {
+    Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+    for (list<Graph*>::iterator GraphIter = OGsFromFiles.begin();
+         GraphIter != OGsFromFiles.end(); GraphIter++) {
+        if ((*GraphIter)->isAcyclic()) {
 
             trace("Computing: ");
             trace(*iOgFile);
@@ -591,7 +591,7 @@ void countServices(OGFromFile::ogs_t OGsFromFiles) {
 
             seconds = time (NULL);
             // Compute and show the number of Services
-            trace("Computed number of Services: " + intToString((*OGFromFileIter)->numberOfServices()) + "\n");
+            trace("Computed number of Services: " + intToString((*GraphIter)->numberOfServices()) + "\n");
             seconds2 = time (NULL);
 
             cout << difftime(seconds2, seconds) << " s consumed for computation" << endl << endl;
@@ -613,10 +613,10 @@ void countServices(OGFromFile::ogs_t OGsFromFiles) {
 
 
 // checks whether an OG is acyclic
-void checkAcyclicity(OGFromFile::ogs_t OGsFromFiles) {
-    for (list<OGFromFile*>::iterator OGFromFileIter = OGsFromFiles.begin(); OGFromFileIter
-            != OGsFromFiles.end(); OGFromFileIter++) {
-        if ((*OGFromFileIter)->isAcyclic()) {
+void checkAcyclicity(Graph::ogs_t OGsFromFiles) {
+    for (list<Graph*>::iterator GraphIter = OGsFromFiles.begin(); GraphIter
+            != OGsFromFiles.end(); GraphIter++) {
+        if ((*GraphIter)->isAcyclic()) {
             trace("The given OG is acyclic\n\n");
         } else {
             trace("The given OG is is NOT ayclic\n\n");
@@ -646,7 +646,7 @@ int main(int argc, char ** argv) {
 //	}
 //	return 0;
 
-    OGFromFile* OGToMatch = NULL;
+    Graph* OGToMatch = NULL;
     set_new_handler(&myown_newhandler);
 
     // evaluate command line options
@@ -660,7 +660,7 @@ int main(int argc, char ** argv) {
             || options[O_CHECK_ACYCLIC]) {
 
         // reading all OG-files
-        OGFromFile::ogs_t OGsFromFiles;
+        Graph::ogs_t OGsFromFiles;
         readAllOGs(OGsFromFiles);
 
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
@@ -680,13 +680,13 @@ int main(int argc, char ** argv) {
         }
 
         if (options[O_SIMULATES]) {
-            // simulation on OGFromFile
+            // simulation on Graph
             checkSimulation(OGsFromFiles);
             return 0;
         }
 
         if (options[O_EQUALS]) {
-            // equivalence on OGFromFile
+            // equivalence on Graph
             checkEquality(OGsFromFiles);
             return 0;
         }

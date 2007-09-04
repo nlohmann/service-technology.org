@@ -36,7 +36,7 @@
 #include "state.h"
 #include "owfnTransition.h"
 #include "binDecision.h"
-#include "OGFromFile.h"
+#include "Graph.h"
 #include "debug.h"
 #include "options.h"
 #include "mynew.h"
@@ -1730,7 +1730,7 @@ string oWFN::createLabel(messageMultiSet m) const {
 }
 
 
-bool oWFN::matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch) {
+bool oWFN::matchesWithOG(const Graph* og, string& reasonForFailedMatch) {
     // Check whether the initial marking violates the message bound and exit
     // with an error message if it does.
     if (checkMessageBound()) {
@@ -1926,7 +1926,7 @@ bool oWFN::matchesWithOGRecursive(GraphNode* currentOGNode,
     // corresponding to currently enabled transitions are set to
     // true and all others to false; furthermore the literal
     // 'final' is set to true iff the currentState is a final
-    // state. Because in a OGFromFileFormulaAssignment every
+    // state. Because in a GraphFormulaAssignment every
     // unmentioned literal is considered false, we only set those
     // literals that should be considered true.
     //

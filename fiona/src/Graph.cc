@@ -19,9 +19,9 @@
  *****************************************************************************/
 
 /*!
- * \file    OGFromFile.cc
+ * \file    Graph.cc
  *
- * \brief   Implementation of class OGFromFile. See OGFromFile.h for further
+ * \brief   Implementation of class Graph. See Graph.h for further
  *          information.
  *
  * \author  responsible: Jan Bretschneider <bretschn@informatik.hu-berlin.de>
@@ -34,7 +34,7 @@
 
 #include <cassert>
 #include <queue>
-#include "OGFromFile.h"
+#include "Graph.h"
 
 
 // TRUE and FALSE #defined in cudd package may interfere with
@@ -45,12 +45,12 @@
 using namespace std;
 
 
-OGFromFile::OGFromFile() :
+Graph::Graph() :
     root(NULL) {
 }
 
 
-OGFromFile::~OGFromFile() {
+Graph::~Graph() {
     for (nodes_iterator node_iter = nodes.begin(); node_iter != nodes.end(); ++node_iter) {
 
         delete *node_iter;
@@ -58,12 +58,12 @@ OGFromFile::~OGFromFile() {
 }
 
 
-void OGFromFile::addNode(GraphNode* node) {
+void Graph::addNode(GraphNode* node) {
     nodes.insert(node);
 }
 
 
-GraphNode* OGFromFile::addNode(const std::string& nodeName,
+GraphNode* Graph::addNode(const std::string& nodeName,
                                GraphFormula* annotation,
                                GraphNodeColor color) {
 
@@ -73,7 +73,7 @@ GraphNode* OGFromFile::addNode(const std::string& nodeName,
 }
 
 
-void OGFromFile::addTransition(const std::string& srcName,
+void Graph::addTransition(const std::string& srcName,
                                const std::string& dstNodeName,
                                const std::string& label) {
 
@@ -85,12 +85,12 @@ void OGFromFile::addTransition(const std::string& srcName,
 }
 
 
-bool OGFromFile::hasNodeWithName(const std::string& nodeName) const {
+bool Graph::hasNodeWithName(const std::string& nodeName) const {
     return getNodeWithName(nodeName) != NULL;
 }
 
 
-GraphNode* OGFromFile::getNodeWithName(const std::string& nodeName) const {
+GraphNode* Graph::getNodeWithName(const std::string& nodeName) const {
 
     for (nodes_const_iterator node_iter = nodes.begin();
          node_iter != nodes.end(); ++node_iter) {
@@ -104,29 +104,29 @@ GraphNode* OGFromFile::getNodeWithName(const std::string& nodeName) const {
 }
 
 
-GraphNode* OGFromFile::getRoot() const {
+GraphNode* Graph::getRoot() const {
     return root;
 }
 
 
-void OGFromFile::setRoot(GraphNode* newRoot) {
+void Graph::setRoot(GraphNode* newRoot) {
     root = newRoot;
 }
 
 
-void OGFromFile::setRootToNodeWithName(const std::string& nodeName) {
+void Graph::setRootToNodeWithName(const std::string& nodeName) {
     setRoot(getNodeWithName(nodeName));
 }
 
 
-bool OGFromFile::hasNoRoot() const {
+bool Graph::hasNoRoot() const {
     return getRoot() == NULL;
 }
 
 
-void OGFromFile::removeFalseNodes() {
+void Graph::removeFalseNodes() {
 
-    trace(TRACE_5, "OGFromFile::removeFalseNodes(): start\n");
+    trace(TRACE_5, "Graph::removeFalseNodes(): start\n");
 
     bool nodesHaveChanged = true;
 
@@ -153,11 +153,11 @@ void OGFromFile::removeFalseNodes() {
         }
     }
 
-    trace(TRACE_5, "OGFromFile::removeFalseNodes(): end\n");
+    trace(TRACE_5, "Graph::removeFalseNodes(): end\n");
 }
 
 
-void OGFromFile::removeTransitionsToNodeFromAllOtherNodes(const GraphNode* nodeToDelete) {
+void Graph::removeTransitionsToNodeFromAllOtherNodes(const GraphNode* nodeToDelete) {
 
     for (nodes_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
         if (*iNode != nodeToDelete) {
@@ -167,11 +167,11 @@ void OGFromFile::removeTransitionsToNodeFromAllOtherNodes(const GraphNode* nodeT
 }
 
 
-//! \brief checks, whether this OGFromFile simulates the given simulant
+//! \brief checks, whether this Graph simulates the given simulant
 //! \return true on positive check, otherwise: false
 //! \param smallerOG the simulant that should be simulated
-bool OGFromFile::simulates(OGFromFile *smallerOG) {
-    trace(TRACE_5, "OGFromFile::simulates(OGFromFile *smallerOG): start\n");
+bool Graph::simulates(Graph *smallerOG) {
+    trace(TRACE_5, "Graph::simulates(Graph *smallerOG): start\n");
     //Simulation is impossible without a simulant.
     if (smallerOG == NULL )
         return false;
@@ -187,19 +187,19 @@ bool OGFromFile::simulates(OGFromFile *smallerOG) {
                            simVisitedNodes))
         result = true;
 
-    trace(TRACE_5, "OGFromFile::simulates(OGFromFile *smallerOG): end\n");
+    trace(TRACE_5, "Graph::simulates(Graph *smallerOG): end\n");
     return result;
 }
 
 
-//! \brief checks, whether the part of an OGFromFile below myNode simulates
-//         the part of an OGFromFile below simNode
+//! \brief checks, whether the part of an Graph below myNode simulates
+//         the part of an Graph below simNode
 //! \return true on positive check, otherwise: false
-//! \param myNode a node in this OGFromFile
-//! \param myVisitedNodes a set containing the visited nodes in this OGFromFile
+//! \param myNode a node in this Graph
+//! \param myVisitedNodes a set containing the visited nodes in this Graph
 //! \param simNode a node in the simulant
 //! \param simVisitedNodes same as myVisitedNodes in the simulant
-bool OGFromFile::simulatesRecursive(GraphNode *myNode,
+bool Graph::simulatesRecursive(GraphNode *myNode,
                                     set<GraphNode*> *myVisitedNodes,
                                     GraphNode *simNode,
                                     set<GraphNode*> *simVisitedNodes) {
@@ -228,14 +228,14 @@ bool OGFromFile::simulatesRecursive(GraphNode *myNode,
         return false;
     }
 
-    trace(TRACE_5, "OGFromFile::simulateRecursive: checking annotations\n");
+    trace(TRACE_5, "Graph::simulateRecursive: checking annotations\n");
 
     GraphFormulaCNF* simNodeAnnotationInCNF = simNode->getAnnotation()->getCNF();
     GraphFormulaCNF* myNodeAnnotationInCNF = myNode->getAnnotation()->getCNF();
     if (simNodeAnnotationInCNF->implies(myNodeAnnotationInCNF)) {
-        trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations ok\n");
+        trace(TRACE_5, "Graph::simulatesRecursive: annotations ok\n");
     } else {
-        trace(TRACE_5, "OGFromFile::simulatesRecursive: annotations incompatible\n");
+        trace(TRACE_5, "Graph::simulatesRecursive: annotations incompatible\n");
         delete simNodeAnnotationInCNF;
         delete myNodeAnnotationInCNF;
         return false;
@@ -273,9 +273,9 @@ bool OGFromFile::simulatesRecursive(GraphNode *myNode,
 }
 
 
-//! \brief checks, whether this OGFromFile is acyclic
+//! \brief checks, whether this Graph is acyclic
 //! \return true on positive check, otherwise: false
-bool OGFromFile::isAcyclic() {
+bool Graph::isAcyclic() {
     trace(TRACE_5, "Test if the given OG is acyclic: start\n");
 
     // Define a set vor every Node, that will contain all transitive parent nodes
@@ -325,7 +325,7 @@ bool OGFromFile::isAcyclic() {
 
 //! \brief computes the number of services determined by this OG
 //! \return number of Services
-unsigned int OGFromFile::numberOfServices() {
+unsigned int Graph::numberOfServices() {
 
     // define variables that will be used in the recursive function
     map<GraphNode*, list <set<GraphNode*> > > validFollowerCombinations;
@@ -404,7 +404,7 @@ unsigned int OGFromFile::numberOfServices() {
 
 //! \brief computes the number of possible services for a finished instance or proceed the active nodes
 //! \return number of Services
-unsigned int OGFromFile::numberOfServicesRecursively(set<GraphNode*> activeNodes,
+unsigned int Graph::numberOfServicesRecursively(set<GraphNode*> activeNodes,
                                                      map<GraphNode*, unsigned int>& followers,
                                                      map<GraphNode*, list<set<GraphNode*> > >& validFollowerCombinations,
                                                      map<set<GraphNode*>, unsigned int>& eliminateRedundantCounting) {
@@ -549,7 +549,7 @@ unsigned int OGFromFile::numberOfServicesRecursively(set<GraphNode*> activeNodes
 //!        saves them in an assignmentList for every node. The function works by recursively
 //!        computing and checking the powerset of all labels of the node
 //! \return number of true Assignments
-unsigned int OGFromFile::processAssignmentsRecursively(set<string> labels,
+unsigned int Graph::processAssignmentsRecursively(set<string> labels,
                                                        GraphFormulaAssignment possibleAssignment,
                                                        GraphNode* testNode,
                                                        list<GraphFormulaAssignment>& assignmentList) {
@@ -610,11 +610,11 @@ unsigned int OGFromFile::processAssignmentsRecursively(set<string> labels,
 }
 
 
-OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
-    trace(TRACE_5, "OGFromFile::product(const OGFromFile* rhs): start\n");
+Graph* Graph::product(const Graph* rhs) {
+    trace(TRACE_5, "Graph::product(const Graph* rhs): start\n");
 
     // this will be the product OG
-    OGFromFile* productOG = new OGFromFile;
+    Graph* productOG = new Graph;
 
     // If one of both OGs is empty, their product is empty, too.
     if (hasNoRoot() || rhs->hasNoRoot()) {
@@ -642,21 +642,21 @@ OGFromFile* OGFromFile::product(const OGFromFile* rhs) {
     buildProductOG(currentOGNode, currentRhsNode, productOG);
 
     productOG->removeFalseNodes();
-    trace(TRACE_5, "OGFromFile::product(const OGFromFile* rhs): end\n");
+    trace(TRACE_5, "Graph::product(const Graph* rhs): end\n");
 
     return productOG;
 }
 
 
-OGFromFile* OGFromFile::product(const ogs_t& ogs) {
+Graph* Graph::product(const ogs_t& ogs) {
     assert(ogs.size() > 1);
 
     ogs_t::const_iterator iOG = ogs.begin();
-    OGFromFile* firstOG = *iOG++;
-    OGFromFile* productOG = firstOG->product(*iOG);
+    Graph* firstOG = *iOG++;
+    Graph* productOG = firstOG->product(*iOG);
 
     for (++iOG; iOG != ogs.end(); ++iOG) {
-        OGFromFile* oldProductOG = productOG;
+        Graph* oldProductOG = productOG;
         productOG = productOG->product(*iOG);
         delete oldProductOG;
     }
@@ -665,11 +665,11 @@ OGFromFile* OGFromFile::product(const ogs_t& ogs) {
 }
 
 
-void OGFromFile::buildProductOG(GraphNode* currentOGNode,
+void Graph::buildProductOG(GraphNode* currentOGNode,
                                 GraphNode* currentRhsNode,
-                                OGFromFile* productOG) {
+                                Graph* productOG) {
 
-    trace(TRACE_5, "OGFromFile::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, OGFromFile* productOG): start\n");
+    trace(TRACE_5, "Graph::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, Graph* productOG): start\n");
 
     // at this time, the node constructed from currentOGNode and
     // currentRhsNode is already inserted
@@ -714,7 +714,7 @@ void OGFromFile::buildProductOG(GraphNode* currentOGNode,
                 productOG->addTransition(currentName, newProductName,
                                          currentLabel);
 
-                trace(TRACE_5, "OGFromFile::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, OGFromFile* productOG): end\n");
+                trace(TRACE_5, "Graph::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, Graph* productOG): end\n");
             } else {
                 // we computed a new node, so we add a node and an edge
                 // trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
@@ -733,11 +733,11 @@ void OGFromFile::buildProductOG(GraphNode* currentOGNode,
         }
     }
     delete edgeIter;
-    trace(TRACE_5, "OGFromFile::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, OGFromFile* productOG): end\n");
+    trace(TRACE_5, "Graph::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, Graph* productOG): end\n");
 }
 
 
-GraphFormulaCNF* OGFromFile::createProductAnnotation(const GraphNode* lhs,
+GraphFormulaCNF* Graph::createProductAnnotation(const GraphNode* lhs,
                                                      const GraphNode* rhs) const {
 
     GraphFormulaMultiaryAnd* conjunction = new GraphFormulaMultiaryAnd(
@@ -751,7 +751,7 @@ GraphFormulaCNF* OGFromFile::createProductAnnotation(const GraphNode* lhs,
 }
 
 
-std::string OGFromFile::getProductOGFilePrefix(const ogfiles_t& ogfiles) {
+std::string Graph::getProductOGFilePrefix(const ogfiles_t& ogfiles) {
     assert(ogfiles.size() != 0);
 
     ogfiles_t::const_iterator iOgFile = ogfiles.begin();
@@ -765,7 +765,7 @@ std::string OGFromFile::getProductOGFilePrefix(const ogfiles_t& ogfiles) {
 }
 
 
-std::string OGFromFile::stripOGFileSuffix(const std::string& filename) {
+std::string Graph::stripOGFileSuffix(const std::string& filename) {
 
     static const string ogFileSuffix = ".og";
     if (filename.substr(filename.size() - ogFileSuffix.size()) == ogFileSuffix) {
@@ -776,7 +776,7 @@ std::string OGFromFile::stripOGFileSuffix(const std::string& filename) {
 }
 
 
-void OGFromFile::printDotFile(const std::string& filenamePrefix,
+void Graph::printDotFile(const std::string& filenamePrefix,
                               const std::string& dotGraphTitle) const {
 
     trace(TRACE_0, "creating the dot file of the OG...\n");
@@ -806,7 +806,7 @@ void OGFromFile::printDotFile(const std::string& filenamePrefix,
 }
 
 
-void OGFromFile::printDotFile(const std::string& filenamePrefix) const {
+void Graph::printDotFile(const std::string& filenamePrefix) const {
     printDotFile(filenamePrefix, filenamePrefix);
 }
 
@@ -815,7 +815,7 @@ void OGFromFile::printDotFile(const std::string& filenamePrefix) const {
 //! \param os output stream
 //! \param visitedNodes maps nodes to Bools remembering already visited nodes
 //! \brief dfs through the graph printing each node and edge to the output stream
-void OGFromFile::printGraphToDot(GraphNode* v,
+void Graph::printGraphToDot(GraphNode* v,
                                  fstream& os,
                                  std::map<GraphNode*, bool>& visitedNodes) const {
 
@@ -855,7 +855,7 @@ void OGFromFile::printGraphToDot(GraphNode* v,
 
 
 //! \brief prints all nodes and transitions of an OG to file .og
-void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
+void Graph::printOGFile(const std::string& filenamePrefix) const {
     fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(), ios_base::out | ios_base::trunc);
 
     if (hasNoRoot()) {
@@ -917,6 +917,6 @@ void OGFromFile::printOGFile(const std::string& filenamePrefix) const {
 }
 
 
-std::string OGFromFile::addOGFileSuffix(const std::string& filePrefix) {
+std::string Graph::addOGFileSuffix(const std::string& filePrefix) {
     return filePrefix + ".og";
 }

@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-08-14 13:05:46 $ by $Author: bretschn $.
-# Version $Revision: 1.43 $
+# File last changed $Date: 2007-09-04 10:30:20 $ by $Author: kern $.
+# Version $Revision: 1.44 $
 
 include $(top_srcdir)/Makefile.covcommon
 
@@ -58,7 +58,7 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         state.h state.cc \
         newlogger.h newlogger.cc mynew.h \
         Exchangeability.h Exchangeability.cc \
-        OGFromFile.h OGFromFile.cc GraphFormula.h GraphFormula.cc \
+        Graph.h Graph.cc GraphFormula.h GraphFormula.cc \
         containers.h containers.cc\
         stg2owfn.cc set_helpers.h SinglyLinkedList.h
 

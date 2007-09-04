@@ -55,7 +55,7 @@ class State;
 class PlSymbol;
 class TrSymbol;
 class Arc;
-class OGFromFile;
+class Graph;
 class GraphNode;
 class GraphFormulaAssignment;
 
@@ -308,7 +308,7 @@ class oWFN {
          * @retval true If this oWFN matches with given OG.
          * @retval false Otherwise.
          */
-        bool matchesWithOG(const OGFromFile* og, string& reasonForFailedMatch);
+        bool matchesWithOG(const Graph* og, string& reasonForFailedMatch);
 
         /**
          * Creates an assignment for the given state of the oWFN used in the
@@ -318,7 +318,7 @@ class oWFN {
          * 'final' is assigned to true iff the given state is a final state.
          * All other propositions are implicetly taken to be false. This
          * implicit behaviour should be (and is) implemented by the class
-         * OGFromFileFormulaAssignment.
+         * GraphFormulaAssignment.
          *
          * @param currentState The state of this oWFN an assignment should be
          *     created for.

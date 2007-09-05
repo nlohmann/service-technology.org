@@ -151,16 +151,18 @@ GraphNode::GraphNode() : number(12345678), name("12345678"), color(BLUE),
 
 
 /*!
- * \brief constructor (two parameters)
+ * \brief constructor (four parameters)
  *
  * \param _name the name of this node
  * \param _annotation the annotation of this node
  * \param _color the colour of this node
+ * \param _number the number of this node
  */
 GraphNode::GraphNode(const std::string& _name,
                      GraphFormula* _annotation,
-                     GraphNodeColor _color) :
-    number(12345678), name(_name), color(_color), eventsUsed(NULL) {
+                     GraphNodeColor _color,
+                     unsigned int _number) :
+    number(_number), name(_name), color(_color), eventsUsed(NULL) {
     
     annotation = _annotation->getCNF();
     delete _annotation; // because getCNF() returns a newly create formula

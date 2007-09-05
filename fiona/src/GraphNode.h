@@ -155,10 +155,11 @@ class GraphNode {
         /// constructor (no parameters)
         GraphNode();
 
-        /// constructor (three parameters)
+        /// constructor (four parameters)
         GraphNode(const std::string& _name,
                         GraphFormula* _annotation,
-                        GraphNodeColor _color = BLUE);
+                        GraphNodeColor _color = BLUE,
+                        unsigned int number = 12345678);
 
         /// Destroys this GraphNode.
         ~GraphNode();

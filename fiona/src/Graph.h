@@ -61,9 +61,9 @@ class Graph {
     protected:
         GraphNode* root;
 
-        typedef std::set<GraphNode*> nodes_t;
+        typedef std::vector<GraphNode*> nodes_t;
 
-        nodes_t nodes; // needed for proper deletion of OG.
+        nodes_t setOfNodes; // needed for proper deletion of OG.
 
         typedef nodes_t::const_iterator nodes_const_iterator;
 

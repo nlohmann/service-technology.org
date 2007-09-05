@@ -324,7 +324,7 @@ void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
     trace(TRACE_5, "reachGraph::AddGraphNode(GraphNode* sourceNode, GraphNode * toAdd): start\n");
 
     assert(getNumberOfNodes() > 0);
-    assert(setOfVertices.size() > 0);
+    assert(setOfSortedNodes.size() > 0);
 
     // preparing the new node
     toAdd->setNumber(getNumberOfNodes());
@@ -334,7 +334,7 @@ void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
          i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
         toAdd->eventsUsed[i] = sourceNode->eventsUsed[i];
     }
-    setOfVertices.insert(toAdd);
+    setOfSortedNodes.insert(toAdd);
 
     trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode* sourceNode, GraphNode * toAdd): end\n");
 }
@@ -488,8 +488,8 @@ void OG::correctNodeColorsAndShortenAnnotations() {
     while (graphChangedInLoop) {
         graphChangedInLoop = false;
 
-        for (GraphNodeSet::iterator iNode = setOfVertices.begin(); iNode
-                != setOfVertices.end(); ++iNode) {
+        for (GraphNodeSet::iterator iNode = setOfSortedNodes.begin(); iNode
+                != setOfSortedNodes.end(); ++iNode) {
 
             GraphNode* node = *iNode;
             if (node->getColor() == RED) {
@@ -510,8 +510,8 @@ void OG::correctNodeColorsAndShortenAnnotations() {
         return;
     }
 
-    for (GraphNodeSet::iterator iNode = setOfVertices.begin(); iNode
-            != setOfVertices.end(); ++iNode) {
+    for (GraphNodeSet::iterator iNode = setOfSortedNodes.begin(); iNode
+            != setOfSortedNodes.end(); ++iNode) {
 
         GraphNode* node = *iNode;
         node->removeUnneededLiteralsFromAnnotation();

@@ -293,7 +293,7 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
 
     if (getNumberOfNodes() == 0) { // graph contains no nodes at all
         root = toAdd; // the given node becomes the root node
-        setOfVertices.insert(toAdd);
+        setOfSortedNodes.insert(toAdd);
     } else {
         GraphNode* found = findGraphNodeInSet(toAdd); //findGraphNode(toAdd);
 
@@ -344,7 +344,7 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
 
             GraphEdge* edgeSucc = new GraphEdge(toAdd, label);
             sourceNode->addLeavingEdge(edgeSucc);
-            setOfVertices.insert(toAdd);
+            setOfSortedNodes.insert(toAdd);
 
             trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
             return true;

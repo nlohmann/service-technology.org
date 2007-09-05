@@ -67,7 +67,7 @@ CommunicationGraph::~CommunicationGraph() {
     trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : start\n");
     GraphNodeSet::iterator iter;
 
-    for (iter = setOfVertices.begin(); iter != setOfVertices.end(); iter++) {
+    for (iter = setOfSortedNodes.begin(); iter != setOfSortedNodes.end(); iter++) {
         delete *iter;
     }
 
@@ -76,7 +76,7 @@ CommunicationGraph::~CommunicationGraph() {
 
 
 unsigned int CommunicationGraph::getNumberOfNodes() const {
-    return setOfVertices.size();
+    return setOfSortedNodes.size();
 }
 
 
@@ -106,7 +106,7 @@ void CommunicationGraph::calculateRootNode() {
 
     trace(TRACE_5, "void CommunicationGraph::calculateRootNode(): start\n");
 
-    assert(setOfVertices.size() == 0);
+    assert(setOfSortedNodes.size() == 0);
 
     // create new OG root node
     root = new GraphNode();
@@ -120,7 +120,7 @@ void CommunicationGraph::calculateRootNode() {
 
     root->setNumber(0);
     root->setName(intToString(0));
-    setOfVertices.insert(root);
+    setOfSortedNodes.insert(root);
 
     trace(TRACE_5, "void CommunicationGraph::calculateRootNode(): end\n");
 }
@@ -130,8 +130,8 @@ void CommunicationGraph::calculateRootNode() {
 //! \brief this function uses the find method from the template set
 GraphNode* CommunicationGraph::findGraphNodeInSet(GraphNode* toAdd) {
 
-    GraphNodeSet::iterator iter = setOfVertices.find(toAdd);
-    if (iter != setOfVertices.end()) {
+    GraphNodeSet::iterator iter = setOfSortedNodes.find(toAdd);
+    if (iter != setOfSortedNodes.end()) {
         return *iter;
     } else {
         return NULL;

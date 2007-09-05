@@ -119,7 +119,7 @@ class CommunicationGraph : public Graph {
         CommunicationGraph(oWFN *);
         ~CommunicationGraph();
 
-        GraphNodeSet setOfVertices;
+        GraphNodeSet setOfSortedNodes;
 
         void calculateRootNode();
 

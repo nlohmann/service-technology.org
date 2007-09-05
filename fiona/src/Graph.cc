@@ -51,7 +51,7 @@ Graph::Graph() :
 
 
 Graph::~Graph() {
-    for (nodes_iterator node_iter = nodes.begin(); node_iter != nodes.end(); ++node_iter) {
+    for (nodes_iterator node_iter = setOfNodes.begin(); node_iter != setOfNodes.end(); ++node_iter) {
 
         delete *node_iter;
     }
@@ -59,7 +59,7 @@ Graph::~Graph() {
 
 
 void Graph::addNode(GraphNode* node) {
-    nodes.insert(node);
+    setOfNodes.push_back(node);
 }
 
 
@@ -67,7 +67,10 @@ GraphNode* Graph::addNode(const std::string& nodeName,
                                GraphFormula* annotation,
                                GraphNodeColor color) {
 
-    GraphNode* node = new GraphNode(nodeName, annotation, color);
+    GraphNode* node = new GraphNode(nodeName, 
+                                    annotation, 
+                                    color, 
+                                    setOfNodes.size());
     addNode(node);
     return node;
 }
@@ -92,8 +95,8 @@ bool Graph::hasNodeWithName(const std::string& nodeName) const {
 
 GraphNode* Graph::getNodeWithName(const std::string& nodeName) const {
 
-    for (nodes_const_iterator node_iter = nodes.begin();
-         node_iter != nodes.end(); ++node_iter) {
+    for (nodes_const_iterator node_iter = setOfNodes.begin();
+         node_iter != setOfNodes.end(); ++node_iter) {
 
         if ((*node_iter)->getName() == nodeName) {
             return *node_iter;
@@ -132,9 +135,9 @@ void Graph::removeFalseNodes() {
 
     while (nodesHaveChanged) {
         nodesHaveChanged = false;
-        nodes_iterator iNode = nodes.begin();
+        nodes_iterator iNode = setOfNodes.begin();
 
-        while (iNode != nodes.end()) {
+        while (iNode != setOfNodes.end()) {
             GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
             if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
 
@@ -143,12 +146,12 @@ void Graph::removeFalseNodes() {
                     setRoot(NULL);
                 }
                 delete *iNode;
-                nodes.erase(iNode++);
+                iNode = setOfNodes.erase(iNode);
                 nodesHaveChanged = true;
             } else {
                 ++iNode;
             }
-
+            
             delete iNodeAssignment;
         }
     }
@@ -159,7 +162,7 @@ void Graph::removeFalseNodes() {
 
 void Graph::removeTransitionsToNodeFromAllOtherNodes(const GraphNode* nodeToDelete) {
 
-    for (nodes_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
+    for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
         if (*iNode != nodeToDelete) {
             (*iNode)->removeTransitionsToNode(nodeToDelete);
         }
@@ -340,7 +343,7 @@ unsigned int Graph::numberOfServices() {
     map<string, GraphEdge*> edges;
 
     // Preprocess all nodes of the OG in order to fill the variables needed in the recursion
-    for (nodes_t::const_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
+    for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
 
         // reset the temporary variables for every node
         labels.clear();
@@ -873,7 +876,7 @@ void Graph::printOGFile(const std::string& filenamePrefix) const {
 
     ogFile << "NODES"<< endl;
     bool printedFirstNode = false;
-    for (nodes_t::const_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
+    for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
 
         if (printedFirstNode) {
             ogFile << ',' << endl;
@@ -893,7 +896,7 @@ void Graph::printOGFile(const std::string& filenamePrefix) const {
 
     ogFile << "TRANSITIONS" << endl;
     bool printedFirstTransition = false;
-    for (nodes_t::const_iterator iNode = nodes.begin(); iNode != nodes.end(); ++iNode) {
+    for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
 
         GraphNode* node = *iNode;
         GraphNode::LeavingEdges::ConstIterator

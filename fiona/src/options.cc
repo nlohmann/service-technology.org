@@ -248,6 +248,7 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_PRODUCTOG] = false;
     options[O_SIMULATES] = false;
     options[O_EQUALS] = false;
+    options[O_FILTER] = false;
     options[O_OUTFILEPREFIX] = false;
     options[O_NOOUTPUTFILES] = false;
     options[O_COUNT_SERVICES] = false;
@@ -340,6 +341,9 @@ void parse_command_line(int argc, char* argv[]) {
                     // using simulation in both directions
                     options[O_EQUALS] = true;
                     parameters[P_IG] = false;
+                } else if (lc_optarg == "filter") {
+                    options[O_FILTER] = true;
+                    parameters[P_IG] = false; 
                 } else if (lc_optarg == "equivalence") {
                     // using BDDs
                     options[O_EX] = true;
@@ -557,6 +561,12 @@ void parse_command_line(int argc, char* argv[]) {
 
     if (options[O_EQUALS] && ogfiles.size() != 2) {
         cerr << "Error: \t If option -t equals is used, exactly two OG files must be entered\n" << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
+    }
+
+    if (options[O_FILTER] && ogfiles.size() != 2) {
+        cerr << "Error: \t If option -t filter is used, exactly two OG files must be entered\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }

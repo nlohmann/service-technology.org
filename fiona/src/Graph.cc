@@ -170,6 +170,16 @@ void Graph::removeTransitionsToNodeFromAllOtherNodes(const GraphNode* nodeToDele
 }
 
 
+void Graph::removeTransitionsFromNodeToAllOtherNodes(GraphNode* nodeToDelete) {
+
+    for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
+        if (*iNode != nodeToDelete) {
+            nodeToDelete->removeTransitionsToNode(*iNode);
+        }
+    }
+}
+
+
 //! \brief checks, whether this Graph simulates the given simulant
 //! \return true on positive check, otherwise: false
 //! \param smallerOG the simulant that should be simulated
@@ -273,6 +283,150 @@ bool Graph::simulatesRecursive(GraphNode *myNode,
 
     // All checks were successful.
     return true;
+}
+
+
+//! \brief filters the current OG through a given OG in such a way,
+//!        that the operand simulates the filter; the current OG is created empty
+//!        if such a simulation is not possible
+//! \param rhsOG the operator OG
+void Graph::filter(Graph *rhsOG) {
+    trace(TRACE_5, "Graph::filter(Graph *rhsOG): start\n");
+
+    if (rhsOG == NULL )
+        return;
+
+    // we may need a seperated "true" node, so we construct it
+    // if we do not need the node, it remains isolated; there shouldn't be conflicts
+    GraphFormulaTrue* trueAnnotation = new GraphFormulaTrue();
+    GraphNode* trueNode = new GraphNode("_true", trueAnnotation);
+    addNode(trueNode);
+
+    //We need to remember the nodes we already visited.
+    set<GraphNode*> *VisitedNodes;
+    VisitedNodes = new set<GraphNode*>;
+    VisitedNodes->insert(trueNode);
+
+    // start the filter construction by top down traversation
+    filterRecursive(getRoot(), rhsOG->getRoot(), VisitedNodes);
+
+    trace(TRACE_5, "Graph::filter(Graph *rhsOG): end\n");
+}
+
+
+//! \brief filters the current OG through a given OG below myNode (rhsNode respectively)
+//!        in such a way, that the complete OG given as the operand simulates the current OG
+//! \param myNode a node in the current OG
+//! \param rhsNode a node in the operand
+//! \param VisitedNodes a set of Nodes as a reminder of the already visited nodes; starts as empty
+void Graph::filterRecursive(GraphNode *myNode,
+                                 GraphNode *rhsNode,
+                                 set<GraphNode*> *VisitedNodes) {
+    trace(TRACE_5, "Graph::filterRecursive(...): begin\n");
+
+    // nothing to be done
+    if (myNode == NULL) return;
+
+    // nothing to be done
+    if (rhsNode == NULL) return;
+
+    // we iterate within the operand, thus look at the rhs
+    if (VisitedNodes->find(rhsNode) != VisitedNodes->end()) {
+        // if we already visited this node in the operand then we're done
+        return;
+    } else {
+        // otherwise mark node as visited
+        VisitedNodes->insert(rhsNode);
+    }
+
+    GraphFormulaCNF* rhsNodeAnnotationInCNF = rhsNode->getAnnotation()->getCNF();
+    GraphFormulaCNF* myNodeAnnotationInCNF = myNode->getAnnotation()->getCNF();
+
+    // iterate over each outgoing edge of the operand node
+    trace(TRACE_5, "Graph::filterRecursive: pre order creation\n");
+    GraphNode::LeavingEdges::Iterator
+        rhsEdgeIter = rhsNode->getLeavingEdgesIterator();
+    while (rhsEdgeIter->hasNext()) {
+        GraphEdge* rhsEdge = rhsEdgeIter->getNext();
+
+        GraphEdge* myEdge = myNode->getTransitionWithLabel(rhsEdge->getLabel());
+        if (myEdge == NULL) {
+            // the operand node has an edge which the current og node doesn't
+            if (rhsEdge->getType() == SENDING) {
+                // if it is an ! event, we cannot filter it properly
+                removeTransitionsToNodeFromAllOtherNodes(myNode);
+                removeTransitionsFromNodeToAllOtherNodes(myNode);
+                delete rhsEdgeIter;
+                delete rhsNodeAnnotationInCNF;
+                delete myNodeAnnotationInCNF;
+                return;
+            }
+            if (rhsEdge->getType() == RECEIVING) {
+                // if it is an ? event, we allow this communication, but we won't get final again
+                addTransition(myNode->getName(), "_true", rhsEdge->getLabel());
+                myNode->removeLiteralFromAnnotation(rhsEdge->getLabel());
+                rhsNodeAnnotationInCNF->removeLiteral(rhsEdge->getLabel());
+            }
+        }
+    }
+    delete rhsEdgeIter;
+
+    trace(TRACE_5, "Graph::filterRecursive: checking annotations\n");
+    if (rhsNodeAnnotationInCNF->implies(myNodeAnnotationInCNF)) {
+        // implication succesfull ... simulation is possible
+        delete rhsNodeAnnotationInCNF;
+        delete myNodeAnnotationInCNF;
+    } else {
+        // implication failed ... we cannot construct a simulation; abort
+        removeTransitionsToNodeFromAllOtherNodes(myNode);
+        removeTransitionsFromNodeToAllOtherNodes(myNode);
+        delete rhsNodeAnnotationInCNF;
+        delete myNodeAnnotationInCNF;
+        return;
+    }
+
+    // traverse the operand og
+    trace(TRACE_5, "Graph::filterRecursive: traverse through OG\n");
+    rhsEdgeIter = rhsNode->getLeavingEdgesIterator();
+    while (rhsEdgeIter->hasNext()) {
+        GraphEdge* rhsEdge = rhsEdgeIter->getNext();
+
+        GraphEdge* myEdge = myNode->getTransitionWithLabel(rhsEdge->getLabel());
+        if (myEdge == NULL) {
+            // this should not happen! every edge in the operand IS present in the current og
+            delete rhsEdgeIter;
+            return;
+        } else {
+            // iterate over the outgoin edges
+            filterRecursive(myEdge->getDstNode(), rhsEdge->getDstNode(), VisitedNodes);
+        }
+    }
+    delete rhsEdgeIter;
+
+    // after top down construction of the filter,
+    // we backtrack and make sure the filter remains consist
+    trace(TRACE_5, "Graph::filterRecursive: post order creation\n");
+    rhsEdgeIter = rhsNode->getLeavingEdgesIterator();
+    while (rhsEdgeIter->hasNext()) {
+        GraphEdge* rhsEdge = rhsEdgeIter->getNext();
+
+        GraphEdge* myEdge = myNode->getTransitionWithLabel(rhsEdge->getLabel());
+        if (myEdge == NULL) {
+            if (rhsEdge->getType() == SENDING) {
+                removeTransitionsToNodeFromAllOtherNodes(myNode);
+                removeTransitionsFromNodeToAllOtherNodes(myNode);
+                delete rhsEdgeIter;
+                return;
+            }
+            if (rhsEdge->getType() == RECEIVING) {
+                addTransition(myNode->getName(), "_true", rhsEdge->getLabel());
+                myNode->removeLiteralFromAnnotation(rhsEdge->getLabel());
+            }
+        }
+    }
+    delete rhsEdgeIter;
+
+    trace(TRACE_5, "Graph::filterRecursive(...): end\n");
 }
 
 

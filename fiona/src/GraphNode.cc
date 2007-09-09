@@ -807,6 +807,7 @@ void GraphNode::removeTransitionsToNode(const GraphNode* nodeToDelete) {
     while (iEdge->hasNext()) {
         GraphEdge* edge = iEdge->getNext();
         if (edge->getDstNode() == nodeToDelete) {
+            removeLiteralFromAnnotation(edge->getLabel());
             delete edge;
             iEdge->remove();
         }

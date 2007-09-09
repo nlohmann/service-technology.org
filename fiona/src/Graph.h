@@ -71,6 +71,8 @@ class Graph {
 
         void removeTransitionsToNodeFromAllOtherNodes(const GraphNode* nodeToDelete);
 
+        void removeTransitionsFromNodeToAllOtherNodes(GraphNode* nodeToDelete);
+
         /**
          * Recursive coordinated dfs through OG and rhs OG.
          * \param currentOGNode the current node of the OG
@@ -85,6 +87,18 @@ class Graph {
                                 set<GraphNode*>* myVisitedNodes,
                                 GraphNode* simNode,
                                 set<GraphNode*>* simVisitedNodes);
+
+        /** 
+         * filters the current OG through a given OG below myNode (rhsNode respectively)
+         * in such a way, that the complete OG given as the operand simulates the current OG
+         * \param myNode a node in the current OGFromFile
+         * \param rhsNode a node in the operand
+         * \param VisitedNodes a set of Nodes as a reminder of the already visited nodes; starts as empty
+         */
+        void filterRecursive(GraphNode* myNode,
+                             GraphNode* rhsNode,
+                             set<GraphNode*>* VisitedNodes);
+
     public:
 
         Graph();
@@ -171,6 +185,14 @@ class Graph {
         static std::string addOGFileSuffix(const std::string& filePrefix);
 
         bool simulates(Graph* smallerOG);
+
+        /** 
+         * filters the current OG through a given OG in such a way,
+         * that the operand simulates the filtered og; the current OG is created empty
+         * if such a simulation is not possible
+         * \param rhsOG the operator OG
+         */
+        void filter(Graph* rhsOG);
 
         /**
          * computes the number of Services determined by this OG

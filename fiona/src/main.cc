@@ -575,6 +575,40 @@ void checkEquality(Graph::ogs_t OGsFromFiles) {
 }
 
 
+// create a filtered OG
+void createFiltered(Graph::ogs_t OGsFromFiles) {
+    list<Graph*>::iterator GraphIter = OGsFromFiles.begin();
+    Graph *lhs = *GraphIter;
+    Graph *rhs = *(++GraphIter);
+
+    trace("Filter OG from file ");
+    trace(*ogfiles.begin() + " through OG from file ");
+    trace(*(++ogfiles.begin()) + ".\n\n");
+
+    lhs->filter(rhs);
+
+    if (lhs->hasNoRoot()) {
+        trace("The filtered OG is empty.\n\n");
+    }
+
+    if (!options[O_OUTFILEPREFIX]) {
+        outfilePrefix = Graph::stripOGFileSuffix(*ogfiles.begin()) + ".filtered";
+    }
+
+    if (!options[O_NOOUTPUTFILES]) {
+        trace("Saving filtered OG to:\n");
+        trace(Graph::addOGFileSuffix(outfilePrefix));
+        trace("\n\n");
+
+        lhs->printOGFile(outfilePrefix);
+        lhs->printDotFile(outfilePrefix);
+    }
+
+    delete rhs;
+    delete lhs;
+}
+
+
 // computes the number of Services that are determined by every single OG
 void countServices(Graph::ogs_t OGsFromFiles) {
     Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
@@ -655,9 +689,9 @@ int main(int argc, char ** argv) {
     // **********************************************************************************
     // start OG file dependant operations
 
-    if (options[O_MATCH] || options[O_PRODUCTOG]|| options[O_SIMULATES]
-            ||options[O_EQUALS]|| options[O_COUNT_SERVICES]
-            || options[O_CHECK_ACYCLIC]) {
+    if (options[O_MATCH] || options[O_PRODUCTOG] || options[O_SIMULATES]
+        || options[O_EQUALS] || options[O_FILTER] || options[O_COUNT_SERVICES]
+        || options[O_CHECK_ACYCLIC]) {
 
         // reading all OG-files
         Graph::ogs_t OGsFromFiles;
@@ -688,6 +722,12 @@ int main(int argc, char ** argv) {
         if (options[O_EQUALS]) {
             // equivalence on Graph
             checkEquality(OGsFromFiles);
+            return 0;
+        }
+
+        if (options[O_FILTER]) {
+            // filtration on OG
+            createFiltered(OGsFromFiles);
             return 0;
         }
 

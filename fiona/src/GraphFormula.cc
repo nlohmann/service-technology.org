@@ -296,8 +296,9 @@ void GraphFormulaMultiary::addSubFormula(GraphFormula* subformula) {
 }
 
 
-void GraphFormulaMultiary::removeSubFormula(iterator subformula) {
-    subFormulas.erase(subformula);
+GraphFormulaMultiary::iterator
+GraphFormulaMultiary::removeSubFormula(iterator subformula) {
+    return subFormulas.erase(subformula);
 }
 
 
@@ -319,9 +320,8 @@ void GraphFormulaMultiary::removeLiteral(const std::string& name) {
             // the current formula is a literal
             if (currentFormula->asString() == name) {
                 // the literal has the right name, so remove it
-                subFormulas_t::iterator iOldFormula = iCurrentFormula++;
-                delete *iOldFormula;
-                subFormulas.erase(iOldFormula);
+                delete *iCurrentFormula;
+                iCurrentFormula = subFormulas.erase(iCurrentFormula);
             } else {
                 iCurrentFormula++;
             }
@@ -616,9 +616,8 @@ void GraphFormulaCNF::simplify() {
             GraphFormulaMultiaryOr* rhs =dynamic_cast<GraphFormulaMultiaryOr*>(*iRhs);
             assert(rhs != NULL);
             if (lhs->implies(rhs)) {
-                GraphFormulaCNF::iterator iOldRhs = iRhs++;
-                delete *iOldRhs;
-                removeSubFormula(iOldRhs);
+                delete *iRhs;
+                iRhs = removeSubFormula(iRhs);
             } else {
                 ++iRhs;
             }

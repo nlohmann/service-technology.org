@@ -233,7 +233,7 @@ class GraphFormulaMultiary : public GraphFormula {
         virtual const GraphFormulaFixed& getEmptyFormulaEquivalent() const = 0;
 
         void addSubFormula(GraphFormula* subformula);
-        void removeSubFormula(iterator subformula);
+        iterator removeSubFormula(iterator subformula);
         virtual void removeLiteral(const std::string&);
         void deepCopyMultiaryPrivateMembersToNewFormula(GraphFormulaMultiary* newFormula) const;
 

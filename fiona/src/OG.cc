@@ -78,6 +78,7 @@ void OG::buildGraph() {
 
     // start building up the rest of the graph
     // second parameter means: if finished, 100% of the graph is constructed
+    setOfNodes.push_back(getRoot());
     buildGraph(getRoot(), 1);
     correctNodeColorsAndShortenAnnotations();
 
@@ -335,6 +336,7 @@ void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
         toAdd->eventsUsed[i] = sourceNode->eventsUsed[i];
     }
     setOfSortedNodes.insert(toAdd);
+    setOfNodes.push_back(toAdd);
 
     trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode* sourceNode, GraphNode * toAdd): end\n");
 }
@@ -680,133 +682,6 @@ void OG::convertToBddFull() {
 }
 
 
-void OG::printOGtoFile() const {
-
-    string ogFilename = "";
-    if (options[O_OUTFILEPREFIX]) {
-        ogFilename = outfilePrefix;
-    } else {
-        ogFilename = string(PN->filename);
-    }
-
-    if (!options[O_CALC_ALL_STATES]) {
-        ogFilename += ".R";
-    }
-    ogFilename += ".og";
-    fstream ogFile(ogFilename.c_str(), ios_base::out | ios_base::trunc);
-
-    std::map<GraphNode*, bool> visitedNodes;
-
-    ogFile << "NODES" << endl;
-    printNodesToOGFile(root, ogFile, visitedNodes);
-    ogFile << ';' << endl << endl;
-
-    ogFile << "INITIALNODE" << endl;
-    ogFile << "  " << NodeNameForOG(root) << ';'<< endl << endl;
-
-    visitedNodes.clear();
-
-    ogFile << "TRANSITIONS" << endl;
-    printTransitionsToOGFile(root, ogFile, visitedNodes);
-    ogFile << ';' << endl;
-
-    ogFile.close();
-}
-
-
-void OG::printNodesToOGFile(GraphNode* v,
-                            fstream& os,
-                            std::map<GraphNode*, bool>& visitedNodes) const {
-
-    if (v == NULL) {
-        return;
-    }
-
-    // print node name (separated by comma to previous node if needed)
-    if (v != root) {
-        os << ',' << endl;
-    }
-    os << "  " << NodeNameForOG(v);
-
-    // print node annotation
-    os << " : " << v->getAnnotation()->asString();
-
-    os << " : " << v->getColor().toString();
-
-    // mark current node as visited
-    visitedNodes[v] = true;
-
-    // recursively process successor nodes that have not been visited yet
-    GraphNode::LeavingEdges::ConstIterator
-            edgeIter = v->getLeavingEdgesConstIterator();
-
-    while (edgeIter->hasNext()) {
-        GraphNode* vNext = edgeIter->getNext()->getDstNode();
-
-        // do not process nodes already visited
-        if (visitedNodes[vNext])
-            continue;
-
-        if (!vNext->isToShow(root))
-            continue;
-
-        printNodesToOGFile(vNext, os, visitedNodes);
-    }
-    delete edgeIter;
-}
-
-
-void OG::printTransitionsToOGFile(GraphNode* v,
-                                  fstream& os,
-                                  std::map<GraphNode*, bool>& visitedNodes) const {
-
-    if (v == NULL) {
-        return;
-    }
-
-    static bool firstTransitionSeen = false;
-    if (v == root) {
-        firstTransitionSeen = false;
-    }
-
-    // mark current node as visited
-    visitedNodes[v] = true;
-
-    // recursively process successor nodes that have not been visited yet
-    GraphNode::LeavingEdges::ConstIterator
-            edgeIter =v->getLeavingEdgesConstIterator();
-
-    while (edgeIter->hasNext()) {
-        GraphEdge* edge = edgeIter->getNext();
-        GraphNode* vNext = edge->getDstNode();
-
-        if (!vNext->isToShow(root))
-            continue;
-
-        // output transition (separated by comma to previous transition if
-        // needed)
-        if (firstTransitionSeen) {
-            os << ',' << endl;
-        } else {
-            firstTransitionSeen = true;
-        }
-
-        os << "  " << NodeNameForOG(v) << " -> " << NodeNameForOG(vNext);
-        os << " : " << edge->getLabel();
-
-        // do not process nodes already visited
-        if (visitedNodes[vNext])
-            continue;
-
-        printTransitionsToOGFile(vNext, os, visitedNodes);
-    }
-    delete edgeIter;
-}
-
-
-string OG::NodeNameForOG(const GraphNode* v) const {
-    return v->getName();
-}
 
 PriorityMap::KeyType PriorityMap::pop() {
     KeyType key;

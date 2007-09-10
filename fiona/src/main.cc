@@ -327,9 +327,20 @@ void computeOG(oWFN* PN) {
         }
 
         graph->printGraphToDot(); // .out
-        graph->printOGtoFile(); // .og
 
-
+        string ogFilename = "";
+        if (options[O_OUTFILEPREFIX]) {
+            ogFilename = outfilePrefix;
+        } else {
+            ogFilename = graph->returnOWFnFilename();
+        }
+        
+        if (!options[O_CALC_ALL_STATES]) {
+            ogFilename += ".R";
+        }
+        
+        graph->printOGFile(ogFilename);
+        
         if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
             if (controllable) {
                 graph->printGraphToSTG();
@@ -342,6 +353,7 @@ void computeOG(oWFN* PN) {
             //graph->bdd->printGraphToDot();
             graph->bdd->save("OTF");
         }
+
     }
 
     if (options[O_BDD]) {
@@ -358,13 +370,15 @@ void computeOG(oWFN* PN) {
     }
 
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
-
+    graph->clearNodeSet();
     delete graph;
     trace(TRACE_5, "graph deleted\n");
 
     // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
     trace(TRACE_0, "=================================================================\n");
     trace(TRACE_0, "\n");
+
+
 }
 
 

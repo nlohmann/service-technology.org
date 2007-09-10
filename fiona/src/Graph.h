@@ -211,6 +211,10 @@ class Graph {
 
         //! Tests, if this OG is acyclic
         bool isAcyclic();
+
+        // A function needed for successful deletion of the graph
+        void clearNodeSet();
+
 };
 
 #endif

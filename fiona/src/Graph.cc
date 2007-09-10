@@ -1010,6 +1010,11 @@ void Graph::printGraphToDot(GraphNode* v,
     }
 }
 
+// A function needed for successful deletion of the graph
+void Graph::clearNodeSet() {
+    setOfNodes.clear();
+}
+
 
 //! \brief prints all nodes and transitions of an OG to file .og
 void Graph::printOGFile(const std::string& filenamePrefix) const {

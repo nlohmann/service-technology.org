@@ -689,6 +689,11 @@ void CommunicationGraph::printGraphToSTGRecursively(GraphNode* v,
 }
 
 
+string CommunicationGraph::returnOWFnFilename()
+{
+    return (string(PN->filename));
+}
+
 bool CommunicationGraph::annotateGraphDistributedly() {
     GraphNode* rootNode = root;
 

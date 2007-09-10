@@ -197,6 +197,8 @@ class CommunicationGraph : public Graph {
 
         bool stateActivatesOutputEvents(State*);
 
+        string returnOWFnFilename();
+
         // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
         NEW_OPERATOR(CommunicationGraph)

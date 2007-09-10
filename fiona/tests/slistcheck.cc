@@ -205,6 +205,56 @@ int test5() {
     return equal(list, expectedOutput) ? 0 : 1;
 }
 
+/**
+ * Tests isEmpty().
+ */
+int test6() {
+    SList<int> list;
+
+    if (!list.isEmpty()) {
+        return 1;
+    }
+
+    list.add(5);
+    
+    if (list.isEmpty()) {
+        return 1;
+    }
+
+    list.remove(5);
+    
+    if (!list.isEmpty()) {
+        return 1;
+    }
+
+    return 0;
+}
+
+/**
+ * Tests get().
+ */
+int test7() {
+    SList<int> list;
+
+    list.add(2);
+    list.add(3);
+    list.add(5);
+
+    if (list.get(0) != 2) {
+        return 1;
+    }
+
+    if (list.get(1) != 3) {
+        return 1;
+    }
+
+    if (list.get(2) != 5) {
+        return 1;
+    }
+
+    return 0;
+}
+
 typedef int (*testFunction)();
 
 int main() {
@@ -217,6 +267,8 @@ int main() {
         test3,
         test4,
         test5,
+        test6,
+        test7,
         NULL   // sentinel to mark end of array
     };
 

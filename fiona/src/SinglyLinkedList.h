@@ -40,6 +40,8 @@
 #define SINGLYLINKEDLIST_H
 
 #include <cstdlib> // NULL
+#include <stdexcept>
+
 // This file contains _template_ classes. That is why they are also implemented
 // here.
 
@@ -405,6 +407,41 @@ template<typename T> class SList {
          */
         unsigned int size() const {
             return size_;
+        }
+
+        /**
+         * Returns true iff this SList is empty.
+         */
+        bool isEmpty() const {
+            return size_ == 0;
+        }
+
+        /**
+         * Returns the element at the given 'index'. The first element has
+         * index 0.
+         * @throw invalid_argument is the given 'index' is out of bounds.
+         */
+        T get(unsigned int index) {
+            if (index >= size()) {
+                throw std::invalid_argument("index is out of bounds.");
+            }
+
+            unsigned int current = 0;
+            ConstIterator iter = getConstIterator();
+            while (iter->hasNext()) {
+                T result = iter->getNext();
+                if (current == index) {
+                    delete iter;
+                    return result;
+                }
+                ++current;
+            }
+            delete iter;
+
+            // This line should never be reached. We cannot return something
+            // here to silence compiler warning about exit from non-void
+            // function. So we throw an exception here.
+            throw std::invalid_argument("index is out of bounds.");
         }
 };
 

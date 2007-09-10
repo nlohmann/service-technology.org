@@ -41,12 +41,30 @@ class State;
 
 typedef std::set<State*> StateSet;
 
-struct compareVertices {
+/**
+ * Used as compare criterion for GraphNodeSet.
+ */
+struct CompareGraphNodes {
+    /**
+     * 'left' is less than 'right', if the reachGraphStateSet of 'left'
+     * lexicographical less than 'right's reachGraphStateSet. Consequently,
+     * 'left' and 'right' are equall iff both their reachGraphStateSets contain
+     * the same states.
+     * @returns true left is less than right.
+     * @returns false left is greater or equal to right.
+     */
     bool operator()(GraphNode const * left, GraphNode const * right);
 };
 
 
-typedef std::set<GraphNode*, compareVertices> GraphNodeSet;
+/**
+ * In a GraphNodeSet, all GraphNodes with exactly the same states in their
+ * reachGraphStateSets are considered equal. That follows from the criterion
+ * used by CompareGraphNodes to define a GraphNode* less than another one. This
+ * allows for quickly checking whether a newly calculated GraphNode (with a
+ * reachGraphStateSet) has the same reachGraphStateSet as an already seen one.
+ */
+typedef std::set<GraphNode*, CompareGraphNodes> GraphNodeSet;
 
 typedef std::multiset<unsigned int> messageMultiSet;
 

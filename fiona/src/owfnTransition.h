@@ -131,9 +131,6 @@ class owfnTransition : public Node {
          */
         ImproveDisEnabling_t ImproveDisabling;
 
-        void excludeTransitionFromEnabledList(oWFN *);
-        void excludeTransitionFromQuasiEnabledList(oWFN *);
-
         /**  change of hash value by firing t; */
         int hash_change;
         void set_hashchange();
@@ -200,20 +197,6 @@ class owfnTransition : public Node {
         void setQuasiEnabled(bool isQuasiEnabled);
 
         std::set<unsigned int> messageSet;
-
-        /**
-         * double linking in list of enabled transitions. in the sequel,
-         * lists are NIL-terminated
-         */
-        owfnTransition *NextEnabled;
-        owfnTransition *PrevEnabled;
-
-        /**
-         * double linking in list of quasi enabled transitions in the sequel,
-         * lists are NIL-terminated
-         */
-        owfnTransition *NextQuasiEnabled;
-        owfnTransition *PrevQuasiEnabled;
 
         /** Set above arrays, list, enabled... */
         void initialize();

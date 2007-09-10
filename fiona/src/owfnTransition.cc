@@ -60,9 +60,7 @@ unsigned int AdjacentPlace::getMultiplicity() const {
 
 owfnTransition::owfnTransition(const std::string& name) :
     Node(name), labelForMatching(GraphFormulaLiteral::TAU), isEnabled_(false),
-            isQuasiEnabled_(false), quasiEnabledNr(0), enabledNr(0),
-            NextEnabled(NULL), PrevEnabled(NULL), NextQuasiEnabled(NULL),
-            PrevQuasiEnabled(NULL) {
+            isQuasiEnabled_(false), quasiEnabledNr(0), enabledNr(0) {
 }
 
 
@@ -342,33 +340,6 @@ void owfnTransition::backfire(oWFN * PN) {
 }
 
 
-void owfnTransition::excludeTransitionFromEnabledList(oWFN * PN) {
-    // exclude transition from list of enabled transitions
-    if (NextEnabled) {
-        NextEnabled -> PrevEnabled = PrevEnabled;
-    }
-    if (PrevEnabled) {
-        PrevEnabled -> NextEnabled = NextEnabled;
-    } else {
-        PN->startOfEnabledList = NextEnabled;
-    }
-}
-
-
-void owfnTransition::excludeTransitionFromQuasiEnabledList(oWFN * PN) {
-
-    // exclude transition from list of quasi enabled transitions
-    if (NextQuasiEnabled) {
-        NextQuasiEnabled -> PrevQuasiEnabled = PrevQuasiEnabled;
-    }
-    if (PrevQuasiEnabled) {
-        PrevQuasiEnabled -> NextQuasiEnabled = NextQuasiEnabled;
-    } else {
-        PN->startOfQuasiEnabledList = NextQuasiEnabled;
-    }
-}
-
-
 //! \fn void owfnTransition::check_enabled(oWFN * PN)
 //! \param PN owfn this transition is part of
 //! \brief check whether this transition is (quasi) enabled at the current marking
@@ -403,52 +374,36 @@ void owfnTransition::check_enabled(oWFN * PN) {
     }
 
     if (enabledNr == getArrivingArcsCount()) { // there are as many pre-places appropriatly marked as there are incoming arcs
-        if (!isEnabled() || PN->startOfEnabledList == 0) { // transition was not enabled before
+        if (!isEnabled()) { // transition was not enabled before
             // include transition into list of enabled transitions
-            NextEnabled = PN->startOfEnabledList;
-            if (PN->startOfEnabledList) {
-                NextEnabled -> PrevEnabled = this;
-            }
-            PN->startOfEnabledList = this;
-            PrevEnabled = (owfnTransition *) 0;
+            PN->enabledTransitions.add(this);
             setEnabled(true);
-            PN->transNrEnabled++;
         }
         if (isQuasiEnabled()) { // transition was quasi enabled before
             setQuasiEnabled(false);
-            PN->transNrQuasiEnabled--;
-            excludeTransitionFromQuasiEnabledList(PN); // delete transition from list of quasi enabled transtions
+            PN->quasiEnabledTransitions.remove(this); // delete transition from list of quasi enabled transtions
         }
     } else if ((enabledNr + quasiEnabledNr) == getArrivingArcsCount()) {
         // transition is quasi enabled
         if (!isQuasiEnabled()) { // transition was not quasi enabled before
             // include transition into list of quasi enabled transitions
-            NextQuasiEnabled = PN->startOfQuasiEnabledList;
-            if (PN->startOfQuasiEnabledList) {
-                NextQuasiEnabled -> PrevQuasiEnabled = this;
-            }
-            PN->startOfQuasiEnabledList = this;
-            PrevQuasiEnabled = (owfnTransition *) 0;
+            PN->quasiEnabledTransitions.add(this);
             setQuasiEnabled(true);
-            PN->transNrQuasiEnabled++;
         }
         if (isEnabled()) { // transition was enabled before
             setEnabled(false);
-            PN->transNrEnabled--;
-            excludeTransitionFromEnabledList(PN); // delete transition from list of enabled transtions
+            PN->enabledTransitions.remove(this); // delete transition from list of enabled transtions
 
         }
     } else { // transition is not enabled at all
         if (isEnabled()) { // transition was enabled before
             setEnabled(false);
-            PN->transNrEnabled--;
-            excludeTransitionFromEnabledList(PN); // delete transition from list of enabled transtions
+            PN->enabledTransitions.remove(this); // delete transition from list of enabled transtions
 
         }
         if (isQuasiEnabled()) { // transition was quasi enabled before
             setQuasiEnabled(false);
-            PN->transNrQuasiEnabled--;
-            excludeTransitionFromQuasiEnabledList(PN); // delete transition from list of quasi enabled transtions
+            PN->quasiEnabledTransitions.remove(this); // delete transition from list of quasi enabled transtions
         }
     }
     // cout << "current marking: " << PN->getCurrentMarkingAsString() << endl;

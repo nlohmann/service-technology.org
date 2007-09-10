@@ -59,9 +59,7 @@ bool compare(const owfnPlace* lhs, const owfnPlace* rhs) {
 oWFN::oWFN() :
     arcCnt(0), CurrentCardFireList(0), CurrentCardQuasiFireList(0),
     tempBinDecision(NULL), FinalCondition(NULL), currentState(0),
-    transNrEnabled(0), transNrQuasiEnabled(0), placeHashValue(0),
-    BitVectorSize(0), startOfQuasiEnabledList(NULL),
-    startOfEnabledList(NULL) {
+    placeHashValue(0), BitVectorSize(0) {
 
     filename = "";
     unsigned int i;
@@ -205,9 +203,7 @@ void oWFN::initialize() {
         CurrentMarking[i] = getPlace(i)->initial_marking;
     }
 
-    for (Transitions_t::size_type i = 0; i < getTransitionCount(); ++i) {
-        getTransition(i)->check_enabled(this);
-    }
+    checkEnablednessOfAllTransitions();
 
     // sort the inputPlacesArray and the outputPlacesArray
     sort(inputPlaces.begin(), inputPlaces.end(), compare);
@@ -222,27 +218,7 @@ void oWFN::initialize() {
 }
 
 
-void oWFN::initializeTransitions() {
-    for (Transitions_t::size_type i = 0; i < getTransitionCount(); ++i) {
-        getTransition(i)->PrevEnabled
-                = (i == 0 ? (owfnTransition *) 0 : Transitions[i-1]);
-        getTransition(i)->NextEnabled
-                = (i == getTransitionCount() - 1 ? (owfnTransition *) 0 : Transitions[i+1]);
-        getTransition(i)->setEnabled(true);
-        getTransition(i)->PrevQuasiEnabled
-                = (i == 0 ? (owfnTransition *) 0 : Transitions[i-1]);
-        getTransition(i)->NextQuasiEnabled
-                = (i == getTransitionCount() - 1 ? (owfnTransition *) 0 : Transitions[i+1]);
-        getTransition(i)->setQuasiEnabled(true);
-    }
-    startOfEnabledList = (getTransitionCount() > 0) ? getTransition(0) : NULL;
-
-    transNrEnabled = getTransitionCount();
-
-    startOfQuasiEnabledList
-            = (getTransitionCount() > 0) ? getTransition(0) : NULL;
-    transNrQuasiEnabled = getTransitionCount();
-
+void oWFN::checkEnablednessOfAllTransitions() {
     for (Transitions_t::size_type i = 0; i < getTransitionCount(); ++i) {
         getTransition(i)->check_enabled(this);
     }
@@ -286,28 +262,31 @@ void oWFN::removeisolated() {
 
 
 owfnTransition ** oWFN::firelist() {
-    owfnTransition ** tl;
-    owfnTransition * t;
-    int i;
-    tl = new owfnTransition * [transNrEnabled + 1];
-    for (i = 0, t = startOfEnabledList; t; t = t->NextEnabled) {
-        tl[i++] = t;
+    owfnTransition** tl = new owfnTransition * [enabledTransitions.size() + 1];
+    int i = 0;
+    EnabledTransitions::ConstIterator iTrans =
+        enabledTransitions.getConstIterator();
+    while (iTrans->hasNext()) {
+        tl[i++] = iTrans->getNext();
     }
-    tl[i] = (owfnTransition *) 0;
+    delete iTrans;
+    tl[i] = NULL;
     CurrentCardFireList = i;
     return tl;
 }
 
 
 owfnTransition ** oWFN::quasiFirelist() {
-    owfnTransition ** tl;
-    owfnTransition * t;
-    int i;
-    tl = new owfnTransition * [transNrQuasiEnabled + 1];
-    for (i = 0, t = startOfQuasiEnabledList; t; t = t->NextQuasiEnabled) {
-        tl[i++] = t;
+    owfnTransition ** tl =
+        new owfnTransition * [quasiEnabledTransitions.size() + 1];
+    int i = 0;
+    QuasiEnabledTransitions::ConstIterator iTrans =
+        quasiEnabledTransitions.getConstIterator();
+    while (iTrans->hasNext()) {
+        tl[i++] = iTrans->getNext();
     }
-    tl[i] = (owfnTransition *) 0;
+    delete iTrans;
+    tl[i] = NULL;
     CurrentCardQuasiFireList = i;
 
     return tl;
@@ -1675,7 +1654,7 @@ stateType oWFN::typeOfState() {
         return FINALSTATE;
     }
 
-    if (transNrEnabled == 0) {
+    if (enabledTransitions.isEmpty()) {
         trace(TRACE_5, "oWFN::typeOfState() : end\n");
         return DEADLOCK; // state is an internal deadlock, no transition is enabled or quasi-enabled
     }
@@ -2156,7 +2135,8 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
     // The TSCC based optimisation is included
 
     // 1. start with enabled transition
-    if ((TarjanStack = startOfEnabledList)) {
+    if (!enabledTransitions.isEmpty()) {
+        TarjanStack = enabledTransitions.get(0);
         maxdfs = 0;
         NewStubbStamp(this);
         TarjanStack->nextontarjanstack = TarjanStack;
@@ -2167,6 +2147,7 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
         CallStack = current;
         current->nextoncallstack = (owfnTransition *) 0;
     } else {
+        TarjanStack = NULL;
         result = new owfnTransition * [1];
         result[0] = (owfnTransition *) 0;
         CurrentCardFireList = 0;

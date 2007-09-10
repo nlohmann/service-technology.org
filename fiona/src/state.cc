@@ -73,7 +73,7 @@ void State::decode(oWFN * PN) {
     trace(TRACE_5, "void State::decode(int * v, oWFN * PN):start\n");
     decodeShowOnly(PN);
     PN->placeHashValue = placeHashValue;
-    PN->initializeTransitions();
+    PN->checkEnablednessOfAllTransitions();
     trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
 }
 
@@ -284,7 +284,7 @@ stateType State::exactType() {
         case DEADLOCK: {
             bool internal_deadlock = true;
             
-            if (PN->transNrQuasiEnabled > 0) {
+            if (!PN->quasiEnabledTransitions.isEmpty()) {
                 internal_deadlock = false;
             } else {
                 decode(PN); // overwrites PN->CurrentMarking !

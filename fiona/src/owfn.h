@@ -45,6 +45,7 @@
 #include "state.h"
 #include "containers.h"
 #include "pnapi/pnapi.h"
+#include "SinglyLinkedList.h"
 
 using namespace std;
 
@@ -59,12 +60,20 @@ class Graph;
 class GraphNode;
 class GraphFormulaAssignment;
 
-
 class oWFN {
     // first public typedefs, then private members, then public methods
     public:
         //! Type of the container holding all transitions of this oWFN.
         typedef std::vector<owfnTransition*> Transitions_t;
+
+        //! Type of the container holding all enabled transitions of this oWFN.
+        typedef SList<owfnTransition*> EnabledTransitions;
+
+        /**
+         * Type of the container holding all quasi enabled transitions of this
+         * oWFN.
+         */
+        typedef SList<owfnTransition*> QuasiEnabledTransitions;
 
         //! Type of the containers holding all places of this oWFN.
         typedef std::vector<owfnPlace*> Places_t;
@@ -129,7 +138,7 @@ class oWFN {
         StateSet setOfStatesTemp; //!< this set contains all states of the newly calculated node
         StateSet visitedStates; //!< in case of state reduction, remember those state that we have visited so far by calculating the new node
 
-        void initializeTransitions(); //!< calls the check_enabled function for all transitions
+        void checkEnablednessOfAllTransitions(); //!< calls the check_enabled function for all transitions
 
         //! returns the number of all places of the net
         Places_t::size_type getPlaceCount() const;
@@ -182,13 +191,14 @@ class oWFN {
         std::string finalMarkingString;
         State * currentState;
 
-        unsigned int transNrEnabled; //!< number of really enabled transitions
-        unsigned int transNrQuasiEnabled; //!< number of quasi enabled transitions
         unsigned int placeHashValue;
         long int BitVectorSize;
 
-        owfnTransition * startOfQuasiEnabledList; //!< start of list of quasi enabled transitions
-        owfnTransition * startOfEnabledList; //!< start of list of real enabled transitions
+        /** List of quasi enabled transitions. */
+        QuasiEnabledTransitions quasiEnabledTransitions;
+
+        /** Real enabled transitions. */
+        EnabledTransitions enabledTransitions;
 
         // **** Definitions for Stubborn set calculations
 #ifdef STUBBORN

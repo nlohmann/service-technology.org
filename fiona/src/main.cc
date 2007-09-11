@@ -751,6 +751,7 @@ int main(int argc, char ** argv) {
             // counts the number of deterministic strategies
             // that are characterized by a given OG
             countServices(OGsFromFiles);
+            deleteOGs(OGsFromFiles);
             return 0;
         }
 

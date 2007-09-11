@@ -80,6 +80,28 @@ else
     fi
 fi
 
+############################################################################
+# count services                                                           #
+############################################################################
+og="$DIR/1.og"
+cmd="$FIONA -t count $og"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "Computed number of Services: 5" > /dev/null
+    resultCyclic=$?
+
+    if [ $resultCyclic -ne 0 ]; then
+        result=1
+        echo   ... expected number of services differs.
+    fi
+fi
+
 echo
 
 exit $result

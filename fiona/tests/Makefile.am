@@ -132,6 +132,7 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              partner/sequence3-partner.expected.owfn \
              countservices/acyclic.og \
              countservices/cyclic.og \
+             countservices/1.og \
              sim_og/test11.owfn \
              sim_og/test12.owfn \
              sim_og/test21.owfn \

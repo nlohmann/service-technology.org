@@ -1,0 +1,20 @@
+NODES
+  0 : (!a + !b) * (!a + !c),
+  1 : !b,
+  2 : !a,
+  3 : !d + !e,
+  4 : final,
+  5 : final,
+  6 : !f;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 1 : !a,
+  0 -> 2 : !b,
+  0 -> 3 : !c,
+  1 -> 4 : !b,
+  2 -> 4 : !a,
+  3 -> 5 : !d,
+  3 -> 6 : !e;

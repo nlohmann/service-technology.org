@@ -484,6 +484,8 @@ bool Graph::isAcyclic() {
 //! \return number of Services
 unsigned int Graph::numberOfServices() {
 
+    removeFalseNodes();
+
     // define variables that will be used in the recursive function
     map<GraphNode*, list <set<GraphNode*> > > validFollowerCombinations;
     set<GraphNode*> activeNodes;

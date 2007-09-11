@@ -35,7 +35,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/07/30 19:56:41 $
+ * \date    \$Date: 2007/09/11 07:28:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  */
 %}
 
@@ -182,6 +182,13 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
         // Indicate the process's initial and final marking.
         p1->mark();
         p2->isFinal = true;
+        
+        // If process's attribute "executionOptional" set to "yes", the initial marking
+        // is also a final marking (used for choreographies).
+        if (globals::ASTEmap[phylum->id]->attributes["executionOptional"] == "yes")
+        {
+          p1->isFinal = true;
+        }
         
         // Read process's parameter "reinstantiate" and add transition
         // accordingly.
@@ -338,6 +345,13 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
         // Indicate the process's initial and final marking.
         p1->mark();
         p2->isFinal = true;
+        
+        // If process's attribute "executionOptional" set to "yes", the initial marking
+        // is also a final marking (used for choreographies).
+        if (globals::ASTEmap[phylum->id]->attributes["executionOptional"] == "yes")
+        {
+          p1->isFinal = true;
+        }
         
         // Read process's parameter "reinstantiate" and add transition
         // accordingly.

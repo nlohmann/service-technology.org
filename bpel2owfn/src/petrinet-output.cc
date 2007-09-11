@@ -34,13 +34,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/08/07 12:01:37 $
+ * \date    \$Date: 2007/09/11 07:28:06 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.111 $
+ * \version \$Revision: 1.112 $
  *
  * \ingroup petrinet
  */
@@ -1407,27 +1407,44 @@ void PetriNet::output_owfn(ostream *output) const
   
   if (globals::owfn_statepredicate == "")
   {
-    (*output) << "FINALCONDITION" << endl;
+    (*output) << "FINALCONDITION" << endl << "  (";
     count = 1;
     for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     {
       if ( (*p)->isFinal )
       {
+        // handle final markings: in BPEL2oWFN, either one place (1.process.initial or
+        // 1.process.final) is marked by the final marking, or both. In the latter case,
+        // a disjunction has to be added.
         if (count != 1)
+#ifdef USING_BPEL2OWFN
+          (*output) << " OR";
+#else
           (*output) << " AND";
+#endif
+
+        // choose the name
+#ifdef USING_BPEL2OWFN
+        (*output) << " (" << (*p)->nodeShortName() << " = 1)";
+#else
+        (*output) << " (" << (*p)->nodeName() << " = 1)";
+#endif
         
-  #ifdef USING_BPEL2OWFN
-        (*output) << "  (" << (*p)->nodeShortName() << " = 1)";
-  #else
-        (*output) << "  (" << (*p)->nodeName() << " = 1)";
-  #endif
+       
         
         // (*output) << " {final place}";
-        
-        if (count++ != 1)
-          (*output) << endl;      
+  
+        count++;
+//        if (count++ != 1)
+//          (*output) << endl;      
       }
     }
+    (*output) << " )";
+
+#ifdef USING_BPEL2OWFN
+    (*output) << " AND ALL_OTHER_EXTERNAL_PLACES_EMPTY";
+#endif
+    
   }
   else
   {

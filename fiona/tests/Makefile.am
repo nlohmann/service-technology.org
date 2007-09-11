@@ -23,7 +23,7 @@ include $(top_srcdir)/Makefile.covcommon
 
 TESTS = slist.sh syntax.sh extrema.sh messages.sh cyclic.sh \
         matching.sh sim_og.sh productog.sh \
-        sequences.sh samples.sh bddtest.sh
+        sequences.sh partner.sh samples.sh bddtest.sh
 
 check_PROGRAMS = slistcheck
 
@@ -122,6 +122,14 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              philosophers/phcontrol7.unf.owfn.png \
              philosophers/phcontrol8.unf.owfn.png \
              philosophers/phcontrol9.unf.owfn.png \
+             productog/1.og \
+             productog/2.og \
+             productog/3.og \
+             productog/1_X_2.expected.og \
+             productog/1_X_2_X_3.expected.og \
+             productog/3_X_1_X_2.expected.og \
+             partner/sequence3.owfn \
+             partner/sequence3-partner.expected.owfn \
              sim_og/test11.owfn \
              sim_og/test12.owfn \
              sim_og/test21.owfn \
@@ -209,6 +217,28 @@ covrunclean:
 
 clean-local: covrunclean cleandeps
 
+DISTCLEAN_FILES = productog/1_X_2.output.og \
+                  productog/1_X_2.output.out \
+                  productog/1_X_2.output.png \
+                  productog/1_X_2_X_3.output.og \
+                  productog/1_X_2_X_3.output.out \
+                  productog/1_X_2_X_3.output.png \
+                  productog/3_X_1_X_2.output.og \
+                  productog/3_X_1_X_2.output.out \
+                  productog/3_X_1_X_2.output.png \
+                  partner/sequence3.owfn \
+                  partner/sequence3.owfn.OG.out \
+                  partner/sequence3.owfn.OG.png \
+                  partner/sequence3.owfn.og \
+                  partner/sequence3.owfn.OG.stg \
+                  partner/sequence3.owfn.OG.pn \
+                  partner/sequence3-partner.owfn \
+                  partner/sequence3-partner.dot \
+                  partner/sequence3-partner.png \
+                  petrify.log
+
 distclean-local:
 	-test -d coverage_html/ && rm -rf coverage_html/
+	rm -rf $(DISTCLEAN_FILES)    
+   
 

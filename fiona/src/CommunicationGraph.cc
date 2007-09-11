@@ -550,6 +550,7 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode* v,
             printGraphToDotRecursively(vNext, os, visitedNodes);
         }
     } // while
+    delete edgeIter;
 }
 
 

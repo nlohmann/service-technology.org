@@ -55,7 +55,7 @@ extern int stg_yylex();
 %token_table
 
 %union {
-  const char *str;
+  char *str;
 }
 
 /* the types of the non-terminal symbols */
@@ -83,6 +83,8 @@ transition_list:
     { transitions.insert(string($1));
       if (in_arc_list)
         tempNodeSet.insert(string($1));
+
+      free($1);
     }
 | /* empty */
 ;
@@ -94,17 +96,27 @@ place_list:
         initialMarked.insert(string($1));
       else
         tempNodeSet.insert(string($1));
+
+      free($1);
     }
 | /* empty */
 ;
 
 tp_list:
-  TRANSITIONNAME place_list newline { arcs[string($1)] = tempNodeSet; tempNodeSet.clear(); } tp_list
+  TRANSITIONNAME place_list newline
+   { arcs[string($1)] = tempNodeSet;
+     tempNodeSet.clear();
+     free($1);
+   } tp_list
 | /* empty */
 ;
 
 pt_list:
-  PLACENAME transition_list newline { arcs[string($1)] = tempNodeSet; tempNodeSet.clear(); } pt_list
+  PLACENAME transition_list newline
+   { arcs[string($1)] = tempNodeSet;
+     tempNodeSet.clear();
+     free($1);
+   } pt_list
 | /* empty */
 ;
 

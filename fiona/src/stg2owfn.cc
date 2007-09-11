@@ -8,6 +8,13 @@
 #include "CommunicationGraph.h"
 #include "pnapi/pnapi.h"
 
+// #defines YY_FLEX_HAS_YYLEX_DESTROY if we can call yylex_destroy()
+#include "lexer_owfn_wrap.h"
+
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
+extern int stg_yylex_destroy();
+#endif
+
 using std::map;
 using std::set;
 using std::string;
@@ -30,6 +37,11 @@ PetriNet STG2oWFN_init() {
     // call STG parser
     stg_yyparse();
     fclose(stg_yyin);
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
+    // Destroy buffer of OG parser.
+    // Must NOT be called before fclose(og_yyin);
+    stg_yylex_destroy();
+#endif
 
     // create a Petri Net object
     PetriNet STGPN = PetriNet();
@@ -115,6 +127,7 @@ void STG2oWFN_main() {
     (*file) << STGPN;
 
     file->close();
+    delete file;
 
     // also generate the png file
     filename = netfile.substr(0, string(netfile).length()-5) + "-partner.dot";
@@ -124,6 +137,7 @@ void STG2oWFN_main() {
     (*file) << STGPN;
 
     file->close();
+    delete file;
 
     // Make a systemcall to dot in order to create the png
     string systemcall = "dot -q -Tpng -o\"" + netfile.substr(0, string(netfile).length()-5) + "-partner.png\" "+ filename;

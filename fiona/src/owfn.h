@@ -124,7 +124,6 @@ class oWFN {
     public:
         oWFN();
         ~oWFN();
-        void RemoveGraph();
 
         string filename;
 

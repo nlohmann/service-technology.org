@@ -1585,18 +1585,6 @@ void oWFN::addPlace(owfnPlace *place) {
 }
 
 
-void oWFN::RemoveGraph() {
-    int i;
-
-    for (i = 0; i < HASHSIZE; i++) {
-        if (binHashTable[i]) {
-            delete binHashTable[i];
-        }
-        binHashTable[i] = (binDecision *) 0;
-    }
-}
-
-
 //! \param message name of message to be deleted from currentmarking
 //! \brief removes an output message from the current marking,
 //! if an output place was found, the marking on that place is

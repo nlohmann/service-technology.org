@@ -78,6 +78,11 @@ extern int og_yyparse();
 extern int og_yylex_destroy();
 #endif
 
+/**
+ * Deletes all OGs in 'OGsFromFiles'.
+ */
+void deleteOGs(const Graph::ogs_t& OGsFromFiles);
+
 extern unsigned int State::state_count;
 extern std::list<std::string> netfiles;
 extern std::list<std::string> ogfiles;
@@ -522,7 +527,7 @@ void makePNG(oWFN* PN) {
 
 
 // create the productOG of all given OGs
-void computeProductOG(Graph::ogs_t OGsFromFiles) {
+void computeProductOG(const Graph::ogs_t& OGsFromFiles) {
     trace("Building product of the following OGs:\n");
 
     for (Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
@@ -552,16 +557,12 @@ void computeProductOG(Graph::ogs_t OGsFromFiles) {
     }
 
     delete productOG;
-    for (Graph::ogs_t::const_iterator iOg = OGsFromFiles.begin(); iOg
-            != OGsFromFiles.end(); ++iOg) {
-        delete *iOg;
-    }
 }
 
 
 // check for simulation relation of two given OGs
-void checkSimulation(Graph::ogs_t OGsFromFiles) {
-    list<Graph*>::iterator GraphIter = OGsFromFiles.begin();
+void checkSimulation(const Graph::ogs_t& OGsFromFiles) {
+    Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
     Graph *simulator = *GraphIter;
     Graph *simulant = *(++GraphIter);
     if (simulator->simulates(simulant)) {
@@ -573,8 +574,8 @@ void checkSimulation(Graph::ogs_t OGsFromFiles) {
 
 
 // check if two given ogs are equal
-void checkEquality(Graph::ogs_t OGsFromFiles) {
-    list<Graph*>::iterator GraphIter = OGsFromFiles.begin();
+void checkEquality(const Graph::ogs_t& OGsFromFiles) {
+    Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
     Graph *simulator = *GraphIter;
     Graph *simulant = *(++GraphIter);
     if (simulator->simulates(simulant)) {
@@ -590,8 +591,8 @@ void checkEquality(Graph::ogs_t OGsFromFiles) {
 
 
 // create a filtered OG
-void createFiltered(Graph::ogs_t OGsFromFiles) {
-    list<Graph*>::iterator GraphIter = OGsFromFiles.begin();
+void createFiltered(const Graph::ogs_t& OGsFromFiles) {
+    Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
     Graph *lhs = *GraphIter;
     Graph *rhs = *(++GraphIter);
 
@@ -624,9 +625,9 @@ void createFiltered(Graph::ogs_t OGsFromFiles) {
 
 
 // computes the number of Services that are determined by every single OG
-void countServices(Graph::ogs_t OGsFromFiles) {
+void countServices(const Graph::ogs_t& OGsFromFiles) {
     Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
-    for (list<Graph*>::iterator GraphIter = OGsFromFiles.begin();
+    for (Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
          GraphIter != OGsFromFiles.end(); GraphIter++) {
         if ((*GraphIter)->isAcyclic()) {
 
@@ -661,13 +662,13 @@ void countServices(Graph::ogs_t OGsFromFiles) {
 
 
 // checks whether an OG is acyclic
-void checkAcyclicity(Graph::ogs_t OGsFromFiles) {
-    for (list<Graph*>::iterator GraphIter = OGsFromFiles.begin(); GraphIter
+void checkAcyclicity(const Graph::ogs_t& OGsFromFiles) {
+    for (Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin(); GraphIter
             != OGsFromFiles.end(); GraphIter++) {
         if ((*GraphIter)->isAcyclic()) {
             trace("The given OG is acyclic\n\n");
         } else {
-            trace("The given OG is is NOT ayclic\n\n");
+            trace("The given OG is NOT ayclic\n\n");
         }
     }
 }
@@ -724,6 +725,7 @@ int main(int argc, char ** argv) {
         if (options[O_PRODUCTOG]) {
             // calculating the product OG
             computeProductOG(OGsFromFiles);
+            deleteOGs(OGsFromFiles);
             return 0;
         }
 
@@ -756,6 +758,7 @@ int main(int argc, char ** argv) {
             // counts the number of deterministic strategies
             // that are characterized by a given OG
             checkAcyclicity(OGsFromFiles);
+            deleteOGs(OGsFromFiles);
             return 0;
         }
     }
@@ -870,4 +873,11 @@ std::string platform_basename(const std::string& path) {
     free(ppath);
     return result;
 #endif
+}
+
+void deleteOGs(const Graph::ogs_t& OGsFromFiles) {
+    for (Graph::ogs_t::const_iterator iOg = OGsFromFiles.begin(); iOg
+            != OGsFromFiles.end(); ++iOg) {
+        delete *iOg;
+    }
 }

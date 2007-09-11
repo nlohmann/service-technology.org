@@ -23,7 +23,7 @@ include $(top_srcdir)/Makefile.covcommon
 
 TESTS = slist.sh syntax.sh extrema.sh messages.sh cyclic.sh \
         matching.sh sim_og.sh productog.sh \
-        sequences.sh partner.sh samples.sh bddtest.sh
+        sequences.sh partner.sh countservices.sh samples.sh bddtest.sh
 
 check_PROGRAMS = slistcheck
 
@@ -130,6 +130,8 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              productog/3_X_1_X_2.expected.og \
              partner/sequence3.owfn \
              partner/sequence3-partner.expected.owfn \
+             countservices/acyclic.og \
+             countservices/cyclic.og \
              sim_og/test11.owfn \
              sim_og/test12.owfn \
              sim_og/test21.owfn \

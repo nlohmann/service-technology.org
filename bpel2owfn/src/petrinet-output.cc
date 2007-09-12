@@ -30,17 +30,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/09/11 07:28:06 $
+ * \date    \$Date: 2007/09/12 11:42:04 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.112 $
+ * \version \$Revision: 1.113 $
  *
  * \ingroup petrinet
  */
@@ -1404,40 +1404,48 @@ void PetriNet::output_owfn(ostream *output) const
   
   
   // final marking
-  
+
   if (globals::owfn_statepredicate == "")
   {
     (*output) << "FINALCONDITION" << endl << "  (";
-    count = 1;
-    for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    
+    // iterate the final set list and conjugate the disjunctive place sets in order to create the final condition
+    bool first_set = true;
+    for (list< set<Place *> >::const_iterator final_set = final_set_list.begin(); final_set != final_set_list.end(); final_set++)
     {
-      if ( (*p)->isFinal )
+      if (!first_set)
       {
-        // handle final markings: in BPEL2oWFN, either one place (1.process.initial or
-        // 1.process.final) is marked by the final marking, or both. In the latter case,
-        // a disjunction has to be added.
-        if (count != 1)
-#ifdef USING_BPEL2OWFN
-          (*output) << " OR";
-#else
-          (*output) << " AND";
-#endif
-
-        // choose the name
-#ifdef USING_BPEL2OWFN
-        (*output) << " (" << (*p)->nodeShortName() << " = 1)";
-#else
-        (*output) << " (" << (*p)->nodeName() << " = 1)";
-#endif
-        
-       
-        
-        // (*output) << " {final place}";
-  
-        count++;
-//        if (count++ != 1)
-//          (*output) << endl;      
+        (*output) << " AND ";
       }
+      
+      if ((*final_set).size() == 1)
+      {
+        Place* p = (*((*final_set).begin()));
+#ifdef USING_BPEL2OWFN
+        (*output) << " (" << p->nodeShortName() << " = 1)";
+#else
+        (*output) << " (" << p->nodeName() << " = 1)";
+#endif
+      }
+      else
+      {
+        (*output) << " (";
+        bool first_place = true;
+        for( set<Place *>::const_iterator p = (*final_set).begin(); p != (*final_set).end(); p++)
+        {
+          if (!first_place)
+            (*output) << " OR ";
+          
+#ifdef USING_BPEL2OWFN
+          (*output) << (*p)->nodeShortName() << " = 1";
+#else
+          (*output) << (*p)->nodeName() << " = 1";
+#endif
+          first_place = false;
+        }
+        (*output) << ")";
+      }
+      first_set = false;
     }
     (*output) << " )";
 

@@ -31,11 +31,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/09/11 07:28:06 $
+ * \date    \$Date: 2007/09/12 11:42:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  */
 %}
 
@@ -201,6 +201,15 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
           PN.newArc(p2, loop);
           PN.newArc(loop, p1);
         }
+        
+        // Add final places to the final set
+        set<Place *> final_set;
+        if (p1->isFinal)
+          final_set.insert(p1); 
+        if (p2->isFinal)
+          final_set.insert(p2); 
+        // Add final final set to the final set list
+        PN.final_set_list.push_back(final_set);
         
         Transition *t1 = PN.newTransition(prefix + "initialize");
         PN.newArc(p1, t1);
@@ -364,6 +373,15 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
           PN.newArc(p2, loop);
           PN.newArc(loop, p1);
         }
+
+        // Add final places to the final set
+        set<Place *> final_set;
+        if (p1->isFinal)
+          final_set.insert(p1); 
+        if (p2->isFinal)
+          final_set.insert(p2); 
+        // Add final final set to the final set list
+        PN.final_set_list.push_back(final_set);
         
         // Unparse the embedded activity.
         phylum->activity_1->unparse(pseudoPrinter, current_view);

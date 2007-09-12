@@ -743,12 +743,14 @@ int main(int argc, char ** argv) {
         if (options[O_SIMULATES]) {
             // simulation on Graph
             checkSimulation(OGsFromFiles);
+            deleteOGs(OGsFromFiles);
             return 0;
         }
 
         if (options[O_EQUALS]) {
             // equivalence on Graph
             checkEquality(OGsFromFiles);
+            deleteOGs(OGsFromFiles);
             return 0;
         }
 

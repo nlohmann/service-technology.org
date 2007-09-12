@@ -54,7 +54,6 @@ class owfnTransition;
 class binDecision;
 class State;
 class PlSymbol;
-class TrSymbol;
 class Arc;
 class Graph;
 class GraphNode;

@@ -58,13 +58,3 @@ PlSymbol::PlSymbol(owfnPlace* p) :
 owfnPlace* PlSymbol::getPlace() const {
     return place;
 }
-
-
-TrSymbol::TrSymbol(owfnTransition* t) :
-    Symbol(t->name), transition(t) {
-}
-
-
-owfnTransition* TrSymbol::getTransition() const {
-    return transition;
-}

@@ -1677,7 +1677,6 @@ bool oWFN::isFinal() const {
         trace(TRACE_5, "bool oWFN::isFinal() : end\n");
         return true;
     }
-    trace(TRACE_5, "bool oWFN::isFinal() : end\n");
 }
 
 

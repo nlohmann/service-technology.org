@@ -164,7 +164,6 @@ InTransitionParsePosition inTransitionParsePosition;
 	arc_list * al;
 	owfnPlace * pl;
 	owfnTransition * tr;
-	TrSymbol * ts;
 	formula * form;
 }
 

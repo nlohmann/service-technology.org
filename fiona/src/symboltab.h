@@ -42,7 +42,6 @@
 //-------------------------- forward declarations -----------------------------
 class Symbol;
 class PlSymbol;
-class TrSymbol;
 
 template<typename SymbolType> class SymbolTab;
 
@@ -106,22 +105,6 @@ class PlSymbol : public Symbol {
         // Provides user defined operator new. Needed to trace all new operations
         // on this class.
         NEW_OPERATOR(PlSymbl);
-#define new NEW_NEW
-};
-
-
-//----------------------------- class TrSymbol --------------------------------
-class TrSymbol : public Symbol {
-    private:
-        owfnTransition* transition;
-    public:
-        TrSymbol(owfnTransition* transition);
-        owfnTransition* getTransition() const;
-
-#undef new
-        // Provides user defined operator new. Needed to trace all new operations
-        // on this class.
-        NEW_OPERATOR(TrSymbol);
 #define new NEW_NEW
 };
 

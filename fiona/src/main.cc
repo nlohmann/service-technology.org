@@ -480,8 +480,12 @@ void makePNG(oWFN* PN) {
     // set the output format to dot
     PNapiNet->set_format(PNapi::FORMAT_DOT, true);
 
+    trace(TRACE_3, "start creating dot stream\n");
+
     // create the dot
     (*dot) << (*PNapiNet);
+
+    trace(TRACE_3, "finish dot stream\n");
 
     // generate a string from the stream to be modified for piping
     string dotString = dot->str();
@@ -491,12 +495,17 @@ void makePNG(oWFN* PN) {
     unsigned int position;
     unsigned int deletePosition;
 
+    trace(TRACE_3, "start modifiyng dot stream\n");
+
     // delete all comments in the dot output of the PNapiNet, since the endlines will 
     // be deleted for echo piping and "//" comments won't work anymore
-    while ((position = dotString.find_first_of("/")) != string::npos) {
+    int counter = 0;
+    while ((position = dotString.find_first_of("/", counter)) != string::npos) {
         if (dotString.at(position+1)=='/') {
             deletePosition = dotString.find_first_of("\n", (position + 2));
             dotString.erase(position, (deletePosition - position));
+        } else {
+          counter = position+1;
         }
     }
 
@@ -519,6 +528,8 @@ void makePNG(oWFN* PN) {
     // finish the string for the system call
     dotString = "echo \"" + dotString + "\" | dot -q -Tpng -o \""
             + globals::output_filename + ".png\"";
+
+    trace(TRACE_3, "dotstring modified\n");
 
     // create the output
     system(dotString.c_str());

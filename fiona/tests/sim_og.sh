@@ -100,6 +100,202 @@ done
 
 #############################################################################
 
+og1="$DIR/compact.og"
+og2="$DIR/coarse.og"
+
+cmd="$FIONA ${og1} ${og2} -t simulation"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.1.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The first OG has all the strategies of the second one, possibly more." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... Simulation failed, although it should not.
+    fi
+fi
+    
+#############################################################################
+
+og1="$DIR/coarse.og"
+og2="$DIR/compact.og"
+
+cmd="$FIONA ${og1} ${og2} -t simulation"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.1.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The first OG has all the strategies of the second one, possibly more." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... Simulation failed, although it should not.
+    fi
+fi
+    
+#############################################################################
+
+og1="$DIR/coarse.og"
+og2="$DIR/coarse-chopped.og"
+
+cmd="$FIONA ${og1} ${og2} -t simulation"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.2.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The first OG has all the strategies of the second one, possibly more." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... Simulation failed, although it should not.
+    fi
+fi
+    
+#############################################################################
+
+og1="$DIR/coarse-chopped.og"
+og2="$DIR/coarse.og"
+
+cmd="$FIONA ${og1} ${og2} -t simulation"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.1.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The second OG has a strategy which the first one hasn't." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... Simulation succeded, although it should not.
+    fi
+fi
+    
+#############################################################################
+
+og1="$DIR/compact.og"
+og2="$DIR/coarse-chopped.og"
+
+cmd="$FIONA ${og1} ${og2} -t simulation"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.2.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The first OG has all the strategies of the second one, possibly more." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... Simulation failed, although it should not.
+    fi
+fi
+    
+#############################################################################
+
+og1="$DIR/coarse-chopped.og"
+og2="$DIR/compact.og"
+
+cmd="$FIONA ${og1} ${og2} -t simulation"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.2.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The second OG has a strategy which the first one hasn't." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... Simulation succeded, although it should not.
+    fi
+fi
+    
+#############################################################################
+
+og1="$DIR/compact.og"
+og2="$DIR/coarse.og"
+
+cmd="$FIONA ${og1} ${og2} -t equality"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.3.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The two OGs are equivalent, that is, they have the same strategies." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... OGs determined not equivalent, although they are.
+    fi
+fi
+    
+#############################################################################
+
+og1="$DIR/coarse.og"
+og2="$DIR/coarse-chopped.og"
+
+cmd="$FIONA ${og1} ${og2} -t equality"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.3.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The first OG has a strategy which the second one hasn't." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... first OG not found to simulate the second one, although it does.
+    fi
+fi
+    
+#############################################################################
+
+og1="$DIR/compact.og"
+og2="$DIR/coarse-chopped.og"
+
+cmd="$FIONA ${og1} ${og2} -t equality"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.4.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The first OG has a strategy which the second one hasn't." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... first OG not found to simulate the second one, although it does.
+    fi
+fi
+
 echo
 
 exit $result

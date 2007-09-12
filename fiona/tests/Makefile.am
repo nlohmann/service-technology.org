@@ -168,7 +168,10 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              sim_og/test81.owfn.og \
              sim_og/test82.owfn.og \
              sim_og/test91.owfn.og \
-             sim_og/test92.owfn.og
+             sim_og/test92.owfn.og \
+             sim_og/coarse-chopped.og \
+             sim_og/coarse.og \
+             sim_og/compact.og
 
 # Global check-loud target. Runs all tests. Output files are generated.
 check-loud:

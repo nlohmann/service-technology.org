@@ -1,3 +1,3 @@
-*.og
 *.png
 *.out
+*.memcheck.log

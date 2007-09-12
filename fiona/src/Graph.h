@@ -42,6 +42,7 @@
 #include <fstream>
 #include <string>
 #include <set>
+#include <utility>
 #include <map>
 #include <list>
 #include "GraphNode.h"
@@ -83,10 +84,8 @@ class Graph {
                             GraphNode* currentRhsNode,
                             Graph* productOG);
 
-        bool simulatesRecursive(GraphNode* myNode,
-                                set<GraphNode*>* myVisitedNodes,
-                                GraphNode* simNode,
-                                set<GraphNode*>* simVisitedNodes);
+        bool simulatesRecursive(GraphNode* myNode, GraphNode* simNode,
+            set<pair<GraphNode*, GraphNode*> >& visitedNodes);
 
         /** 
          * filters the current OG through a given OG below myNode (rhsNode respectively)

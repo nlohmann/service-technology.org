@@ -34,6 +34,7 @@
 
 #include <cassert>
 #include <queue>
+#include <utility>
 #include "Graph.h"
 
 
@@ -189,15 +190,12 @@ bool Graph::simulates(Graph* smallerOG) {
     if (smallerOG == NULL)
         return false;
 
-    //We need to remember the nodes we already visited.
-    set<GraphNode*> *myVisitedNodes, *simVisitedNodes;
-    myVisitedNodes = new set<GraphNode*>;
-    simVisitedNodes = new set<GraphNode*>;
+    //We need to remember the pairs of nodes we already visited.
+    set<pair<GraphNode*, GraphNode*> > visitedNodes;
 
     //Get things moving...
     bool result = false;
-    if (simulatesRecursive(root, myVisitedNodes,
-                           smallerOG->getRoot(), simVisitedNodes)) {
+    if (simulatesRecursive(root, smallerOG->getRoot(), visitedNodes)) {
         result = true;
     }
 
@@ -210,15 +208,10 @@ bool Graph::simulates(Graph* smallerOG) {
 //         the part of an Graph below simNode
 //! \return true on positive check, otherwise: false
 //! \param myNode a node in this Graph
-//! \param myVisitedNodes a set containing the visited nodes in this Graph
 //! \param simNode a node in the simulant
-//! \param simVisitedNodes same as myVisitedNodes in the simulant
-bool Graph::simulatesRecursive(GraphNode *myNode,
-                               set<GraphNode*> *myVisitedNodes,
-                               GraphNode *simNode,
-                               set<GraphNode*> *simVisitedNodes) {
-
-    assert(myVisitedNodes->size() == 0);
+//! \param visitedNodes Holds all visited pairs of nodes.
+bool Graph::simulatesRecursive(GraphNode *myNode, GraphNode *simNode,
+    set<pair<GraphNode*, GraphNode*> >& visitedNodes) {
 
     // If the simulant has no further nodes then myNode simulates simNode.
     if (simNode == NULL) {
@@ -233,16 +226,12 @@ bool Graph::simulatesRecursive(GraphNode *myNode,
     // edges pointing to NULL, or should they? Let's just keep those checks
     // there for now.
 
-    // If we already visited this node in the simulant, then we're done.
-    if (simVisitedNodes->find(simNode) != simVisitedNodes->end()) {
+    // If we already visited this pair of nodes, then we're done.
+    if (visitedNodes.find(make_pair(myNode, simNode)) !=
+        visitedNodes.end()) {
         return true;
     } else {
-        simVisitedNodes->insert(simNode);
-    }
-    // If we have visited this node in the simulator, but not in the simulant,
-    // then we screwed up badly (I think). Simulation isn't possible, for sure.
-    if (myVisitedNodes->find(myNode) != myVisitedNodes->end()) {
-        return false;
+        visitedNodes.insert(make_pair(myNode, simNode));
     }
 
     trace(TRACE_5, "Graph::simulateRecursive: checking annotations\n");
@@ -276,8 +265,8 @@ bool Graph::simulatesRecursive(GraphNode *myNode,
             return false;
         } else {
             trace(TRACE_5, "These two nodes seem compatible.\n");
-            if (!simulatesRecursive(myEdge->getDstNode(), myVisitedNodes,
-                                    simEdge->getDstNode(), simVisitedNodes)) {
+            if (!simulatesRecursive(myEdge->getDstNode(), simEdge->getDstNode(),
+                                    visitedNodes)) {
                 delete simEdgeIter;
                 return false;
             }

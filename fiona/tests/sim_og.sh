@@ -22,6 +22,7 @@
 ############################################################################
 
 source defaults.sh
+source memcheck_helper.sh
 
 echo
 echo ---------------------------------------------------------------------
@@ -52,17 +53,21 @@ do
     #OUTPUT=`$FIONA $owfn2 -t OG`
 
     cmd="$FIONA ${owfn1}.og ${owfn2}.og -t simulation"
-
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "The first OG has all the strategies of the second one, possibly more." > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]
-    then
-        let "result += 1"
-        echo ... Simulation failed, although it should not.
+    
+    if [ "$memcheck" = "yes" ]; then
+        memchecklog="$owfn1.memcheck.log"
+        do_memcheck "$cmd" "$memchecklog"
+        result=$(($result | $?))
+    else
+        echo running $cmd
+        OUTPUT=`$cmd 2>&1`
+        echo $OUTPUT | grep "The first OG has all the strategies of the second one, possibly more." > /dev/null
+        resultSIM=$?
+        if [ $resultSIM -ne 0 ]; then
+            let "result += 1"
+            echo ... Simulation failed, although it should not.
+        fi
     fi
-
 done
 
 for i in 7 9;
@@ -77,17 +82,23 @@ do
 
     cmd="$FIONA ${owfn1}.og ${owfn2}.og -t simulation"
 
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "The second OG has a strategy which the first one hasn't." > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]
-    then
-        let "result += 1"
-        echo ... Simulation succeded, although it should not.
+    if [ "$memcheck" = "yes" ]; then
+        memchecklog="$owfn1.memcheck.log"
+        do_memcheck "$cmd" "$memchecklog"
+        result=$(($result | $?))
+    else
+        echo running $cmd
+        OUTPUT=`$cmd 2>&1`
+        echo $OUTPUT | grep "The second OG has a strategy which the first one hasn't." > /dev/null
+        resultSIM=$?
+        if [ $resultSIM -ne 0 ]; then
+            let "result += 1"
+            echo ... Simulation succeded, although it should not.
+        fi
     fi
-
 done
+
+#############################################################################
 
 echo
 

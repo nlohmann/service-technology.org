@@ -503,7 +503,7 @@ GraphFormulaMultiaryOr* GraphFormulaMultiaryOr::merge() {
 bool GraphFormulaMultiaryOr::implies(GraphFormulaMultiaryOr *op) {
     bool result;
 
-    trace(TRACE_5, this->asString() + " -> "+ op->asString() + " ? ... ");
+    trace(TRACE_5, this->asString() + " -> " + op->asString() + " ? ... ");
 
     // GraphFormulaCNF::simplify() depends on this if clause to remove superfluous
     // true-clauses.
@@ -514,7 +514,7 @@ bool GraphFormulaMultiaryOr::implies(GraphFormulaMultiaryOr *op) {
     for (GraphFormulaMultiaryOr::iterator i = this->begin(); i != this->end(); i++) {
         result = false;
         for (GraphFormulaMultiaryOr::iterator j = op->begin(); j != op->end(); j++) {
-            result |= (dynamic_cast<GraphFormulaLiteral*>(*i)->asString()== dynamic_cast<GraphFormulaLiteral*>(*j)->asString());
+            result |= (dynamic_cast<GraphFormulaLiteral*>(*i)->asString() == dynamic_cast<GraphFormulaLiteral*>(*j)->asString());
         }
         if (!result) {
             trace(TRACE_5, "false.\n");

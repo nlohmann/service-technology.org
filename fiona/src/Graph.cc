@@ -183,10 +183,10 @@ void Graph::removeTransitionsFromNodeToAllOtherNodes(GraphNode* nodeToDelete) {
 //! \brief checks, whether this Graph simulates the given simulant
 //! \return true on positive check, otherwise: false
 //! \param smallerOG the simulant that should be simulated
-bool Graph::simulates(Graph *smallerOG) {
+bool Graph::simulates(Graph* smallerOG) {
     trace(TRACE_5, "Graph::simulates(Graph *smallerOG): start\n");
     //Simulation is impossible without a simulant.
-    if (smallerOG == NULL )
+    if (smallerOG == NULL)
         return false;
 
     //We need to remember the nodes we already visited.
@@ -196,9 +196,10 @@ bool Graph::simulates(Graph *smallerOG) {
 
     //Get things moving...
     bool result = false;
-    if (simulatesRecursive(root, myVisitedNodes, smallerOG->getRoot(),
-                           simVisitedNodes))
+    if (simulatesRecursive(root, myVisitedNodes,
+                           smallerOG->getRoot(), simVisitedNodes)) {
         result = true;
+    }
 
     trace(TRACE_5, "Graph::simulates(Graph *smallerOG): end\n");
     return result;
@@ -213,9 +214,12 @@ bool Graph::simulates(Graph *smallerOG) {
 //! \param simNode a node in the simulant
 //! \param simVisitedNodes same as myVisitedNodes in the simulant
 bool Graph::simulatesRecursive(GraphNode *myNode,
-                                    set<GraphNode*> *myVisitedNodes,
-                                    GraphNode *simNode,
-                                    set<GraphNode*> *simVisitedNodes) {
+                               set<GraphNode*> *myVisitedNodes,
+                               GraphNode *simNode,
+                               set<GraphNode*> *simVisitedNodes) {
+
+    assert(myVisitedNodes->size() == 0);
+
     // If the simulant has no further nodes then myNode simulates simNode.
     if (simNode == NULL) {
         return true;
@@ -259,7 +263,7 @@ bool Graph::simulatesRecursive(GraphNode *myNode,
     // Now, we have to check whether the two graphs are compatible.
     trace(TRACE_5, "Iterating over the transitions of the smallerOG's node.\n");
     GraphNode::LeavingEdges::ConstIterator
-            simEdgeIter =simNode->getLeavingEdgesConstIterator();
+            simEdgeIter = simNode->getLeavingEdgesConstIterator();
 
     while (simEdgeIter->hasNext()) {
         GraphEdge* simEdge = simEdgeIter->getNext();
@@ -272,8 +276,8 @@ bool Graph::simulatesRecursive(GraphNode *myNode,
             return false;
         } else {
             trace(TRACE_5, "These two nodes seem compatible.\n");
-            if (!simulatesRecursive (myEdge->getDstNode(), myVisitedNodes,
-                                     simEdge->getDstNode(), simVisitedNodes)) {
+            if (!simulatesRecursive(myEdge->getDstNode(), myVisitedNodes,
+                                    simEdge->getDstNode(), simVisitedNodes)) {
                 delete simEdgeIter;
                 return false;
             }

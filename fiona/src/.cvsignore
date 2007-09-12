@@ -1,6 +1,7 @@
 .deps
 Makefile
 Makefile.in
+fiona
 fiona.h
 fiona.h.in
 lexer.cc

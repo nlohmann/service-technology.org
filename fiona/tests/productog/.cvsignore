@@ -1,0 +1,10 @@
+*.memcheck.log
+1_X_2.output.og
+1_X_2.output.out
+1_X_2.output.png
+1_X_2_X_3.output.og
+1_X_2_X_3.output.out
+1_X_2_X_3.output.png
+3_X_1_X_2.output.og
+3_X_1_X_2.output.out
+3_X_1_X_2.output.png

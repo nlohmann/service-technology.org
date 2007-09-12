@@ -50,7 +50,7 @@ resultSingle=0
 owfn="$DIR/sequence3.owfn"
 owfnCopy="$builddir/$SUBDIR/sequence3.owfn"
 output="$builddir/$SUBDIR/sequence3-partner.owfn"
-outputExpected="$srcdir/$SUBDIR/sequence3-partner.expected.owfn"
+outputExpected="$testdir/$SUBDIR/sequence3-partner.expected.owfn"
 
 # for make distcheck: make copy of $owfn and work on it
 if [ "$testdir" != "$builddir" ]; then

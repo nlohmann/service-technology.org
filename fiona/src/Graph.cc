@@ -1032,11 +1032,15 @@ void Graph::printOGFile(const std::string& filenamePrefix) const {
     bool printedFirstNode = false;
     for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
 
+        GraphNode* node = *iNode;
+        if (!node->isToShow(root)) {
+            continue;
+        }
+        
         if (printedFirstNode) {
             ogFile << ',' << endl;
         }
 
-        GraphNode* node = *iNode;
         ogFile << "  " << node->getName() << " : "
                << node->getAnnotationAsString() << " : " << node->getColor().toString();
 
@@ -1053,15 +1057,23 @@ void Graph::printOGFile(const std::string& filenamePrefix) const {
     for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
 
         GraphNode* node = *iNode;
+        if (!node->isToShow(root)) {
+            continue;
+        }
+
         GraphNode::LeavingEdges::ConstIterator
                 iEdge = node->getLeavingEdgesConstIterator();
 
         while (iEdge->hasNext()) {
+            GraphEdge* edge = iEdge->getNext();
+            if (!edge->getDstNode()->isToShow(root)) {
+                continue;
+            }
+
             if (printedFirstTransition) {
                 ogFile << ',' << endl;
             }
 
-            GraphEdge* edge = iEdge->getNext();
             ogFile << "  " << node->getName() << " -> " << edge->getDstNode()->getName() << " : " << edge->getLabel();
 
             printedFirstTransition = true;

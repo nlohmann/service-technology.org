@@ -664,16 +664,12 @@ bool GraphNode::changes_color(GraphEdge* e) const {
  * \return true iff this node should be shown according to the "show" parameter
  */
 bool GraphNode::isToShow(const GraphNode* rootOfGraph) const {
-    
-    if (parameters[P_SHOW_ALL_NODES] || (parameters[P_SHOW_NO_RED_NODES] &&
-                                         (getColor() != RED))|| (!parameters[P_SHOW_NO_RED_NODES] &&
-                                                                 (getColor() == RED))|| (getColor() == BLUE) ||
-        (this == rootOfGraph)) {
-        
-        return (parameters[P_SHOW_EMPTY_NODE] || reachGraphStateSet.size() != 0);
-    } else {
-        return false;
-    }
+#undef TRUE    
+    return ((parameters[P_SHOW_ALL_NODES]) ||
+            (getColor() == BLUE && annotation->asString() != GraphFormulaLiteral::TRUE) ||
+            (getColor() == BLUE && parameters[P_SHOW_EMPTY_NODE]) ||
+            (this == rootOfGraph));
+#define TRUE 1
 }
 
 

@@ -240,7 +240,7 @@ class oWFN {
 
         // void addSuccStatesToListOrig(GraphNode *, State *);		
 
-        bool checkMessageBound();
+        bool violatesMessageBound();
 
         /**
          * Adds recursively the State s and all its successor states to

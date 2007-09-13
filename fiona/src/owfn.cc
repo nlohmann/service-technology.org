@@ -306,7 +306,7 @@ void oWFN::addSuccStatesToList(GraphNode* n, State * currentState) {
         currentState->decodeShowOnly(this); // decodes currently considered state
 
         // test decoded current marking if message bound k reached
-        if (checkMessageBound()) {
+        if (violatesMessageBound()) {
             n->setColor(RED);
             trace(TRACE_3, "\t\t\t message bound violation detected in node "
                     + n->getName() + " (addSuccStatesToList)\n");
@@ -359,7 +359,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
         }
 
         // test decoded current marking if message bound k reached
-        if (checkMessageBound()) {
+        if (violatesMessageBound()) {
             n->setColor(RED);
             trace(TRACE_3, "\t\t\t message bound violation detected in node "
                     + n->getName() + " (addSuccStatesToList)\n");
@@ -415,7 +415,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
         }
 
         // test decoded current marking if message bound k reached
-        if (checkMessageBound()) {
+        if (violatesMessageBound()) {
             n->setColor(RED);
             trace(TRACE_3, "\t\t\t message bound violation detected in node "
                     + n->getName() + " (addSuccStatesToList)\n");
@@ -437,7 +437,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
 
 //! \return returns true iff current marking VIOLATES message bound
 //! \brief checks if message bound is violated by the current marking (for interface places only)
-bool oWFN::checkMessageBound() {
+bool oWFN::violatesMessageBound() {
     trace(TRACE_5, "oWFN::checkMessageBound(): start\n");
     // test marking of current state if message bound k reached
     if (options[O_MESSAGES_MAX] == true) { // k-message-bounded set
@@ -824,7 +824,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
     trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : start\n");
 
     // test current marking if message bound k reached
-    if (checkMessageBound()) {
+    if (violatesMessageBound()) {
         n->setColor(RED);
         trace(TRACE_3, "\t\t\t message bound violated; color of node "
                 + n->getName()
@@ -950,7 +950,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
                 CurrentState = NewState;
 
                 // test current marking if message bound k reached
-                if (checkMessageBound()) {
+                if (violatesMessageBound()) {
                     n->setColor(RED);
                     trace(TRACE_3, "\t\t\t message bound violated; color of node " + n->getName() + " set to RED (calculateReachableStates, during fire)\n");
                     trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, GraphNode * n) : end\n");
@@ -1016,7 +1016,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
     trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages, GraphNode * n) : start\n");
 
     // test current marking if message bound k reached
-    if (checkMessageBound()) {
+    if (violatesMessageBound()) {
         n->setColor(RED);
         trace(TRACE_3, "\t\t\t message bound violated; color of node "
                        + n->getName() + " set to RED (calculateReachableStates, oben)\n");
@@ -1176,7 +1176,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
                 CurrentState = NewState;
 
                 // test current marking if message bound k reached
-                if (checkMessageBound()) {
+                if (violatesMessageBound()) {
                     n->setColor(RED);
                     trace(TRACE_3, "\t\t\t message bound violated; color of node "
                                    + n->getName()
@@ -1259,7 +1259,7 @@ void oWFN::calculateReachableStatesFull(GraphNode* n) {
     trace(TRACE_5, "oWFN::calculateReachableStatesFull(GraphNode* n) : start\n");
 
     // test current marking if message bound k reached
-    if (checkMessageBound()) {
+    if (violatesMessageBound()) {
         n->setColor(RED);
         trace(TRACE_3, "\t\t\t message bound violated; color of node "
                        + n->getName()
@@ -1390,7 +1390,7 @@ void oWFN::calculateReachableStatesFull(GraphNode* n) {
                     CurrentState = NewState;
 
                     // test current marking if message bound k reached
-                    if (checkMessageBound()) {
+                    if (violatesMessageBound()) {
                         n->setColor(RED);
                         trace(TRACE_3, "\t\t\t message bound violated; color of node "
                                        + n->getName()
@@ -1699,7 +1699,7 @@ string oWFN::createLabel(messageMultiSet m) const {
 bool oWFN::matchesWithOG(const Graph* og, string& reasonForFailedMatch) {
     // Check whether the initial marking violates the message bound and exit
     // with an error message if it does.
-    if (checkMessageBound()) {
+    if (violatesMessageBound()) {
         reasonForFailedMatch = "Current marking: '"
                                + getCurrentMarkingAsString()
                                + "' violated message bound.";
@@ -1865,7 +1865,7 @@ bool oWFN::matchesWithOGRecursive(GraphNode* currentOGNode,
 
             // Check whether the initial marking violates the message bound
             // and exit with an error message if it does.
-            if (checkMessageBound()) {
+            if (violatesMessageBound()) {
                 reasonForFailedMatch = "Current marking: '"
                                        + getCurrentMarkingAsString()
                                        + "' violated message bound.";

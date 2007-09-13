@@ -106,7 +106,7 @@ class OG : public CommunicationGraph {
 
 class PriorityMap {
     public:
-        typedef pair<oWFN::Places_t::size_type, placeType> KeyType;
+        typedef owfnPlace* KeyType;
 
         /*
          * Fills the priority map according to the given annotation.

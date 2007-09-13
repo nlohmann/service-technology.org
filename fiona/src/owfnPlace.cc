@@ -68,6 +68,10 @@ owfnPlace::~owfnPlace() {
 }
 
 
+placeType owfnPlace::getType() const {
+    return type;
+}
+
 std::string owfnPlace::getLabelForCommGraph() const {
 
     string label;

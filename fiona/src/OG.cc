@@ -122,7 +122,6 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 //    double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount() + PN->getOutputPlaceCnt()));
     double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount()));
 
-    oWFN::Places_t::size_type i = 0;
     PriorityMap pm;
     PriorityMap::KeyType key;
 
@@ -132,173 +131,108 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
     while(!pm.empty())
     {
         key = pm.pop();
-        i = key.first;
 
-        trace(TRACE_2, "\t\t  iterating over inputSet of the oWFN\n");
-        if(key.second == INPUT) {
+        if (key->getType() == INPUT) {
+            trace(TRACE_2, "\t\t\t    sending event: ");
+        } else if (key->getType() == OUTPUT) {
+            trace(TRACE_2, "\t\t\t  receiving event: ");
+        } 
+        trace(TRACE_2, key->getLabelForCommGraph() + "\n");
 
-            trace(TRACE_2, "\t\t\t    sending event: !");
-            trace(TRACE_2, string(PN->getInputPlace(i)->name) + "\n");
+        if (key->max_occurence < 0 || 
+            (key->getType() == INPUT && key->max_occurence > currentNode->eventsUsed[PN->getInputPlaceIndex(key)]) || 
+            (key->getType() == OUTPUT && key->max_occurence > currentNode->eventsUsed[PN->getOutputPlaceIndex(key) 
+             + PN->getInputPlaceCount()])) {
+            // we have to consider this event
 
-            if (PN->getInputPlace(i)->max_occurence < 0 ||
-                PN->getInputPlace(i)->max_occurence > currentNode->eventsUsed[i]) {
-                // we have to consider this event
+            GraphNode* v = new GraphNode();    // create new GraphNode of the graph
 
-                GraphNode* v = new GraphNode();    // create new GraphNode of the graph
+            trace(TRACE_5, "\t\t\t\t    calculating successor states\n");
+            if (key->getType() == INPUT) {
+                calculateSuccStatesInput(PN->getPlaceIndex(key), currentNode, v);
+            } else if (key->getType() == OUTPUT) {
+                calculateSuccStatesOutput(PN->getPlaceIndex(key), currentNode, v);
+            }
 
-                trace(TRACE_5, "\t\t\t\t    calculating successor states\n");
-                calculateSuccStatesInput(PN->getPlaceIndex(PN->getInputPlace(i)), currentNode, v);
+            if (key->getType() == INPUT && v->getColor() == RED) {
+                // message bound violation occured during calculateSuccStatesInput
+                trace(TRACE_2, "\t\t\t            event suppressed (message bound violated)\n");
 
-                if (v->getColor() == RED) {
-                    // message bound violation occured during calculateSuccStatesInput
-                    trace(TRACE_2, "\t\t\t            event suppressed (message bound violated)\n");
-
-                    currentNode->removeLiteralFromAnnotation(
-                        PN->getInputPlace(i)->getLabelForCommGraph());
-
-                    addProgress(your_progress);
-                    printProgress();
-
-                    numberDeletedVertices--;      // elsewise deletion of v is counted twice
-                    delete v;
-                } else {
-                    // was the new node v computed before?
-                    GraphNode* found = findGraphNodeInSet(v);
-
-                    if (found == NULL) {
-                        trace(TRACE_1, "\t computed successor node new\n");
-                        // node v is new, so the node as well as the edge to it is added
-
-                        addGraphNode(currentNode, v);
-                        addGraphEdge(currentNode, v, i, SENDING);
-
-                        // going down with sending event...
-                        buildGraph(v, your_progress);
-
-                        trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
-                        if (v->getColor() == RED) {
-                            currentNode->removeLiteralFromAnnotation(
-                                PN->getInputPlace(i)->getLabelForCommGraph());
-                        }
-                    } else {
-                        // node was computed before, so only add a new edge to the old node
-                        trace(TRACE_1, "\t computed successor node already known: " + found->getName());
-                        trace(TRACE_1, " (color " + toUpper(found->getColor().toString()) + ")");
-                        trace(TRACE_1, "\n");
-
-                        // draw a new SENDING edge to the old node
-                        string edgeLabel = PN->getInputPlace(i)->getLabelForCommGraph();
-                        GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
-                        currentNode->addLeavingEdge(newEdge);
-
-                        // Still, if that node was computed red before, the literal
-                        // of the edge from currentNode to the old node must be removed
-                        // in the annotation of currentNode.
-                        if (found->getColor() == RED) {
-                            currentNode->removeLiteralFromAnnotation(
-                                PN->getInputPlace(i)->getLabelForCommGraph());
-                        }
-                        delete v;
-
-                        addProgress(your_progress);
-                        printProgress();
-                    }
-                }
-            } else {
-                trace(TRACE_2, "\t\t\t            event suppressed (max_occurence reached)\n");
-
-                currentNode->removeLiteralFromAnnotation(
-                    PN->getInputPlace(i)->getLabelForCommGraph());
+                currentNode->removeLiteralFromAnnotation(key->getLabelForCommGraph());
 
                 addProgress(your_progress);
                 printProgress();
-            }
-            i++;
-        }
 
-        // early checking if the node's annotation cannot be made true
-        if (currentNode->getAnnotation()->equals() == FALSE) {
-            trace(TRACE_3, "\t\t any further event suppressed (annotation of node ");
-            trace(TRACE_3, currentNode->getName() + " is unsatisfiable)\n");
-            trace(TRACE_5, "\t\t formula was " + currentNode->getAnnotation()->asString());
-            trace(TRACE_3, "\n");
-            currentNode->setColor(RED);
-
-            // an dieser stelle alle ?-literale loeschen???
-
-            return;
-        }
-
-        if(key.second == OUTPUT) {
-
-            trace(TRACE_2, "\t\t\t  receiving event: ?");
-            trace(TRACE_2, string(PN->getOutputPlace(i)->name) + "\n");
-
-            if (PN->getOutputPlace(i)->max_occurence < 0 ||
-                PN->getOutputPlace(i)->max_occurence > currentNode->eventsUsed[i + PN->getInputPlaceCount()]) {
-
-                GraphNode* v = new GraphNode();    // create new GraphNode of the graph
-                calculateSuccStatesOutput(PN->getPlaceIndex(PN->getOutputPlace(i)), currentNode, v);
-
-                // was the new node computed before?
+                numberDeletedVertices--;      // elsewise deletion of v is counted twice
+                delete v;
+            } else {
+                // was the new node v computed before?
                 GraphNode* found = findGraphNodeInSet(v);
 
                 if (found == NULL) {
                     trace(TRACE_1, "\t computed successor node new\n");
                     // node v is new, so the node as well as the edge to it is added
-                    addGraphNode(currentNode, v);
-                    addGraphEdge(currentNode, v, i, RECEIVING);
 
-                    // going down with receiving event...
-                    // buildGraph(v, your_progress);
-                    buildGraph(v, 0);
+                    addGraphNode(currentNode, v);
+                    if (key->getType() == INPUT) {
+                        addGraphEdge(currentNode, v, PN->getInputPlaceIndex(key), SENDING);
+
+                        // going down with sending event ...
+                        buildGraph(v, your_progress);
+                    } else if (key->getType() == OUTPUT) {
+                        addGraphEdge(currentNode, v, PN->getOutputPlaceIndex(key), RECEIVING);
+
+                        // going down with receiving event ...
+                        buildGraph(v, 0);
+                    } 
 
                     trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
                     if (v->getColor() == RED) {
-                        currentNode->removeLiteralFromAnnotation(
-                            PN->getOutputPlace(i)->getLabelForCommGraph());
+                        currentNode->removeLiteralFromAnnotation(key->getLabelForCommGraph());
                     }
                 } else {
-                    // node v was computed before, so only add a new edge to the old node
+                    // node was computed before, so only add a new edge to the old node
                     trace(TRACE_1, "\t computed successor node already known: " + found->getName());
                     trace(TRACE_1, " (color " + toUpper(found->getColor().toString()) + ")");
                     trace(TRACE_1, "\n");
 
-                    // draw a new RECEIVING edge to the old node
-                    string edgeLabel = PN->getOutputPlace(i)->getLabelForCommGraph();
+                    // draw a new edge to the old node
+                    string edgeLabel = key->getLabelForCommGraph();
                     GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
                     currentNode->addLeavingEdge(newEdge);
 
                     // Still, if that node was computed red before, the literal
-                    // of the edge from currentNode to the old node must be removed in the
-                    // annotation of currentNode.
+                    // of the edge from currentNode to the old node must be removed
+                    // in the annotation of currentNode.
                     if (found->getColor() == RED) {
-                        currentNode->removeLiteralFromAnnotation(edgeLabel);
+                        currentNode->removeLiteralFromAnnotation(key->getLabelForCommGraph());
                     }
                     delete v;
 
-                    // addProgress(your_progress);
-                    // printProgress();
+                    if (key->getType() == INPUT) {
+                        addProgress(your_progress);
+                        printProgress();
+                    }
                 }
-            } else {
-                trace(TRACE_2, "\t\t\t            event suppressed (max_occurence reached)\n");
-
-                currentNode->removeLiteralFromAnnotation(
-                    PN->getOutputPlace(i)->getLabelForCommGraph());
-
-                // addProgress(your_progress);
-                // printProgress();
             }
+        } else {
+            trace(TRACE_2, "\t\t\t            event suppressed (max_occurence reached)\n");
 
-            // check whether annotation is still satisfiable
-            if (currentNode->getAnnotation()->equals() == FALSE) {
-                currentNode->setColor(RED);
-                trace(TRACE_3, "\t\t any further event suppressed (annotation of node ");
-                trace(TRACE_3, currentNode->getName() + " is unsatisfiable)\n");
-                trace(TRACE_5, "\t\t formula was " + currentNode->getAnnotation()->asString());
-                trace(TRACE_3, "\n");
-                return;
+            currentNode->removeLiteralFromAnnotation(key->getLabelForCommGraph());
+
+            if (key->getType() == INPUT) {
+                addProgress(your_progress);
+                printProgress();
             }
+        }
+        
+        if (currentNode->getAnnotation()->equals() == FALSE) {
+            currentNode->setColor(RED);
+            trace(TRACE_3, "\t\t any further event suppressed (annotation of node ");
+            trace(TRACE_3, currentNode->getName() + " is unsatisfiable)\n");
+            trace(TRACE_5, "\t\t formula was " + currentNode->getAnnotation()->asString());
+            trace(TRACE_3, "\n");
+            return;
         }
     }
 
@@ -682,83 +616,64 @@ void OG::convertToBddFull() {
 }
 
 
-
 PriorityMap::KeyType PriorityMap::pop() {
+    trace(TRACE_5, "PriorityMap::pop()::begin()\n");
     KeyType key;
+
     int min_depth = INT_MAX;
     int max_occ = 0;
-
-    key.first = 0;
-    key.second = INTERNAL;
 
     MapType::iterator i;
     for(i = map.begin(); i != map.end(); i++) {
         if(i->second.first ==  min_depth) {
             if(i->second.second >= max_occ) {
-                key.first = i->first.first;
-                key.second = i->first.second;
+                key = i->first;
                 min_depth = i->second.first;
                 max_occ   = i->second.second;
             }
         }
         else if(i->second.first <= min_depth) {
-            key.first = i->first.first;
-            key.second = i->first.second;
+            key = i->first;
             min_depth = i->second.first;
             max_occ   = i->second.second;
         }
     }
     map.erase(key);
 
+    trace(TRACE_5, "PriorityMap::pop()::end()\n");
     return key;
 }
 
 void PriorityMap::fill(GraphFormulaCNF *annotation) {
+    trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation)::begin()\n");
+ 
     oWFN::Places_t::size_type i;
     KeyType key;
 
-    key.second = INPUT;
-    for(i = 0; i < PN->getInputPlaceCount(); i++) {
+    for(i = 0; i < PN->getPlaceCount(); i++) {
 
-        key.first = i;
-        map[key].first  = INT_MAX;
-        map[key].second = 0;
+        key = PN->getPlace(i);
+        if (key != NULL && (key->getType() == INPUT || key->getType() == OUTPUT)) {
+            map[key].first  = INT_MAX;
+            map[key].second = 0;
 
-        for(GraphFormulaMultiaryAnd::iterator j = annotation->begin(); j != annotation->end(); j++) {
+            for(GraphFormulaMultiaryAnd::iterator j = annotation->begin(); j != annotation->end(); j++) {
 
-            GraphFormulaMultiaryOr *clause = dynamic_cast<GraphFormulaMultiaryOr*>(*j);
-            for(GraphFormulaMultiaryOr::iterator k = clause->begin(); k != clause->end(); k++) {
+                GraphFormulaMultiaryOr *clause = dynamic_cast<GraphFormulaMultiaryOr*>(*j);
+                for(GraphFormulaMultiaryOr::iterator k = clause->begin(); k != clause->end(); k++) {
 
-                GraphFormulaLiteral *lit = dynamic_cast<GraphFormulaLiteral*>(*k);
-                if(lit->asString() == PN->getInputPlace(i)->getLabelForCommGraph()) {
-                    map[key].second++;
-                    if(clause->size() < map[key].first) map[key].first = clause->size();
+                    GraphFormulaLiteral *lit = dynamic_cast<GraphFormulaLiteral*>(*k);
+                    if (lit->asString() == key->getLabelForCommGraph()) {
+                        map[key].second++;
+                        if(clause->size() < map[key].first) 
+                            map[key].first = clause->size();
+                    } 
                 }
             }
         }
     }
 
-    key.second = OUTPUT;
-    for(i = 0; i < PN->getOutputPlaceCount(); i++) {
-
-        key.first = i;
-        map[key].first  = INT_MAX;
-        map[key].second = 0;
-
-        for(GraphFormulaMultiaryAnd::iterator j = annotation->begin(); j != annotation->end(); j++) {
-
-            GraphFormulaMultiaryOr *clause = dynamic_cast<GraphFormulaMultiaryOr*>(*j);
-            for(GraphFormulaMultiaryOr::iterator k = clause->begin(); k != clause->end(); k++) {
-
-                GraphFormulaLiteral *lit = dynamic_cast<GraphFormulaLiteral*>(*k);
-                if(lit->asString() == PN->getOutputPlace(i)->getLabelForCommGraph()) {
-                    map[key].second++;
-                    if(clause->size() < map[key].first) map[key].first = clause->size();
-                }
-            }
-        }
-    }
-
+    trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation)::end()\n");
 }
 
 bool PriorityMap::empty() const {

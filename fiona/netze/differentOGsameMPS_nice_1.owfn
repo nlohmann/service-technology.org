@@ -1,0 +1,39 @@
+{ sending b optional, afterwards wait for a }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,
+  p2;
+INPUT
+  a;
+OUTPUT
+  b;
+
+INITIALMARKING
+  p0: 1;
+
+FINALCONDITION
+  p2 = 1 AND ALL_OTHER_PLACES_EMPTY;
+
+TRANSITION t1    { !b }
+CONSUME
+  p0: 1;
+PRODUCE
+  p1: 1,
+  b: 1;
+
+TRANSITION t2    { tau }
+CONSUME
+  p0: 1;
+PRODUCE
+  p1: 1;
+
+TRANSITION t3    { ?a }
+CONSUME
+  p1: 1,
+  a: 1;
+PRODUCE
+  p2: 1;
+
+{ END OF FILE }

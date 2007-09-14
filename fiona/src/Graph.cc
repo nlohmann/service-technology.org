@@ -479,6 +479,10 @@ unsigned int Graph::numberOfServices() {
 
     removeFalseNodes();
 
+    if (root == NULL) {
+        return 0;
+    }
+
     // define variables that will be used in the recursive function
     map<GraphNode*, list <set<GraphNode*> > > validFollowerCombinations;
     set<GraphNode*> activeNodes;

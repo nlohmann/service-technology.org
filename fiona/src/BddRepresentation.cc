@@ -26,7 +26,7 @@
  * \author  responsible: Kathrin Kaschner <kathrin.kaschner@informatik.uni-rostock.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universit zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -98,26 +98,22 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels,
     bddAnn = Cudd_Not(Cudd_ReadOne(mgrAnn)); //BDDannotation
     Cudd_Ref(bddAnn);
 
-    labelTable = new BddLabelTab(2*(nbrLabels+1));
-    assert(PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= pow(double(2), double(sizeof(int)*8-1)) - 1); //PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= 2^31 -1
+    labelTable = new BddLabelTab(2 * (nbrLabels + 1));
+    assert(PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= pow(double(2), double(sizeof(int) * 8 - 1)) - 1); //PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= 2^31 -1
     assert(nbrLabels == 1 + int(PN->getInputPlaceCount() + PN->getOutputPlaceCount())); //final + labels
 
     //add the labels and their bddNumber to the labelTable
     BddLabel * label;
     for (unsigned int i = 0; i < PN->getInputPlaceCount(); ++i) {
         //the labels must be coded in alphabetical order
-        if (i > 0) {
-            assert(PN->getInputPlace(i-1)->getLabelForCommGraph()< PN->getInputPlace(i)->getLabelForCommGraph());
-        }
+        assert( i == 0 || (PN->getInputPlace(i - 1)->getLabelForCommGraph() < PN->getInputPlace(i)->getLabelForCommGraph()));
         label = new BddLabel(PN->getInputPlace(i)->getLabelForCommGraph(), i, labelTable);
         //cout << i << "  " << PN->getInputPlace(i)->name << endl;
     }
 
     for (unsigned int i = 0; i < PN->getOutputPlaceCount(); ++i) {
         //the labels must be coded in alphabetical order
-        if (i > 0) {
-            assert(PN->getOutputPlace(i-1)->getLabelForCommGraph()< PN->getOutputPlace(i)->getLabelForCommGraph());
-        }
+        assert( i == 0 || (PN->getOutputPlace(i - 1)->getLabelForCommGraph() < PN->getOutputPlace(i)->getLabelForCommGraph()));
         label = new BddLabel(PN->getOutputPlace(i)->getLabelForCommGraph(), i + PN->getInputPlaceCount(), labelTable);
         //cout << i + PN->getInputPlaceCount() << "  " << PN->getOutputPlace(i)->name << endl;
     }
@@ -126,7 +122,7 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels,
     //cout << PN->getOutputPlaceCount() + PN->getInputPlaceCount() << "  " << "final" << endl;
     label = new BddLabel(GraphFormulaLiteral::FINAL, PN->getOutputPlaceCount() + PN->getInputPlaceCount(), labelTable);
 
-    /*	BddLabel * temp;
+    /* BddLabel * temp;
      for (unsigned int i = 0; i < labelTable->size; i++) {
          BddLabel * temp;
          temp = labelTable->table[i];
@@ -188,8 +184,9 @@ void BddRepresentation::generateRepresentation(GraphNode* v,
     Cudd_RecursiveDeref(mgrAnn, bddAnn);
     bddAnn = tmp;
 
-    if (v->getColor() == BLUE) {
-        if (v->reachGraphStateSet.size() != 0) {
+    bddMp = nodesToBddMp(0, 1);
+
+    if (v->getColor() == BLUE && v->reachGraphStateSet.size() != 0) {
             visitedNodes[v] = true;
 
             GraphNode::LeavingEdges::ConstIterator
@@ -205,10 +202,8 @@ void BddRepresentation::generateRepresentation(GraphNode* v,
 
                     //label
                     DdNode * label = labelToBddMp(element->getLabel());
-
                     //nodes
-                    DdNode * nodes = nodesToBddMp(v->getNumber(),
-                                                  vNext->getNumber());
+                    DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
 
                     //edge
                     DdNode * edge = Cudd_bddAnd(mgrMp, label, nodes);
@@ -235,7 +230,6 @@ void BddRepresentation::generateRepresentation(GraphNode* v,
                 }
             } //end while
             delete edgeIter;
-        }
     }
     trace(TRACE_5, "BddRepresentation::generateRepresentation(GraphNode* v, bool visitedNodes[]): end\n");
 }
@@ -320,6 +314,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(GraphNode* v) {
 }
 
 
+//! \brief returns the BDD of the given label
 DdNode* BddRepresentation::labelToBddMp(const std::string& label) {
 
     trace(TRACE_5, "BddRepresentation::labelToBddMp(const std::string& label): start\n");
@@ -410,6 +405,7 @@ DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2) 
 }
 
 
+//! \brief returns the BDD of the annotation of a given node
 DdNode* BddRepresentation::annotationToBddAnn(GraphNode* v) {
     trace(TRACE_5, "DdNode* BddRepresentation::annotationToBddAnn(GraphNode * v): start\n");
 
@@ -493,8 +489,7 @@ DdNode* BddRepresentation::clauseToBddAnn(const GraphFormulaMultiaryOr* myclause
 
     for (GraphFormulaMultiaryOr::const_iterator iLiteral =myclause->begin(); iLiteral
             != myclause->end(); ++iLiteral) {
-        GraphFormulaLiteral
-                * literal =dynamic_cast<GraphFormulaLiteral*>(*iLiteral);
+        GraphFormulaLiteral * literal =dynamic_cast<GraphFormulaLiteral*>(*iLiteral);
         assert(literal != NULL);
         BddLabel* label = labelTable->lookup(literal->asString());
         int i = label->nbr;
@@ -649,7 +644,7 @@ void BddRepresentation::reorder(Cudd_ReorderingType heuristic) {
     /*
      if (filename == "bddMp.dot"){
      //Variablen im bddMp Gruppieren:
-     //die Variablen für den zweiten Knoten sind im BDD immer unten => günstig für Restrict beim Matching
+     //die Variablen fr den zweiten Knoten sind im BDD immer unten => gnstig fr Restrict beim Matching
      Cudd_MakeTreeNode(mgrMp, 0 ,maxChannelBits + maxNodeBits, MTR_DEFAULT); //1. Gruppe: innerhalb der Gruppe ist die Variablenordnung beliebig
      Cudd_MakeTreeNode(mgrMp, maxChannelBits + maxNodeBits, maxNodeBits, MTR_DEFAULT); //2. Gruppe: innerhalb der Gruppe ist die Variablenordnung beliebig
      Cudd_MakeTreeNode(mgrMp, 0 ,maxNodeBits, MTR_FIXED);   //1. und 2. Gruppe sind wieder in einer Gruppe, in dieser ist aber die Reihenfolge der Elemente (hier die beiden Gruppen) fest
@@ -676,9 +671,9 @@ void BddRepresentation::reorder(Cudd_ReorderingType heuristic) {
 
 
 //! \brief creates dot files of the BDDs
-// mit dot -Tps fileName -o neu.ps kann das BDD graphisch dargestellt werden
+// use dot -Tps fileName -o new.ps for drawing the BDD
 void BddRepresentation::printDotFile(char** varNames, char* option) {
-    if ((Cudd_DagSize(bddMp) < 200000)&&(Cudd_DagSize(bddAnn) < 200000)) {
+    if ((Cudd_DagSize(bddMp) < 20000) && (Cudd_DagSize(bddAnn) < 20000)) {
 
         char bufferMp[256];
         char bufferAnn[256];
@@ -694,15 +689,11 @@ void BddRepresentation::printDotFile(char** varNames, char* option) {
             }
         } else {
             if (options[O_CALC_ALL_STATES]) {
-                sprintf(bufferMp, "%s.%s.BDD_MP.out", PN->filename.c_str(),
-                        option);
-                sprintf(bufferAnn, "%s.%s.BDD_ANN.out", PN->filename.c_str(),
-                        option);
+                sprintf(bufferMp, "%s.%s.BDD_MP.out", PN->filename.c_str(), option);
+                sprintf(bufferAnn, "%s.%s.BDD_ANN.out", PN->filename.c_str(), option);
             } else {
-                sprintf(bufferMp, "%s.R.%s.BDD_MP.out", PN->filename.c_str(),
-                        option);
-                sprintf(bufferAnn, "%s.R.%s.BDD_ANN.out", PN->filename.c_str(),
-                        option);
+                sprintf(bufferMp, "%s.R.%s.BDD_MP.out", PN->filename.c_str(), option);
+                sprintf(bufferAnn, "%s.R.%s.BDD_ANN.out", PN->filename.c_str(), option);
             }
         }
 
@@ -837,7 +828,8 @@ void BddRepresentation::save(char* option) {
     int size = nbrLabels + maxNodeBits;
     char** names = new char*[size];
 
-    assert(PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= pow(double(2), double(sizeof(int)*8-1)) - 1); //PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= 2^31 -1
+    assert(PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= pow(double(2), double(sizeof(int)*8-1)) - 1);
+    //PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= 2^31 -1
 
     for (unsigned int i = 0; i < PN->getInputPlaceCount(); ++i) {
         assert((int)i < nbrLabels + maxNodeBits);
@@ -1011,7 +1003,7 @@ void BddRepresentation::testSymbRepresentation(GraphNode* v,
             assert(ogNode != NULL);
             Cudd_Ref(ogNode);
             Cudd_RecursiveDeref(mgrMp, edge);
-            //KEIN "Cudd_RecursiveDeref(mgrMp, states)", da states noch für andere Kanten gebraucht werden
+            //KEIN "Cudd_RecursiveDeref(mgrMp, states)", da states noch fr andere Kanten gebraucht werden
             //Cudd_PrintMinterm(mgrMp, ogNode);
 
             if (v->getColor() == BLUE && vNext->getColor() == BLUE) {

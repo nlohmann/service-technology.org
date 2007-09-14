@@ -26,7 +26,7 @@
  * \author  responsible: Kathrin Kaschner <kathrin.kaschner@informatik.uni-rostock.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitï¿½ zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -36,6 +36,7 @@
 #include "debug.h"
 #include <iostream>
 #include <string.h>
+#include <stdlib.h>
 #include "Exchangeability.h"
 
 
@@ -43,6 +44,9 @@ DdManager* Exchangeability::mgrMp = NULL;
 DdManager* Exchangeability::mgrAnn = NULL;
 int Exchangeability::nbrBdd = 0;
 
+int comparestr( const void* a, const void* b){
+    return strcmp( * (char**) a, *(char**) b);	
+}
 
 //! \brief constructor  
 Exchangeability::Exchangeability(string filename, Cudd_ReorderingType heuristic) {
@@ -66,18 +70,18 @@ Exchangeability::Exchangeability(string filename, Cudd_ReorderingType heuristic)
     ++nbrBdd;
 
     for (int i = 0; i < nbrVarAnn; ++i) {
-        if (names[i][0] == '!'|| names[i][0] == '?') {
+        if (names[i][0] == '!' || names[i][0] == '?') {
             (labelList).push_back(names[i]);
         }
     }
 
-    /* list<char*>::iterator list_iter;
-     for( list_iter = labelList.begin(); list_iter != labelList.end(); ++list_iter) {
-     cout << *list_iter;
-     }
-     cout << endl;           
-     */
-    trace(TRACE_5, "Exchangeability::Exchangeability(char* filename): end\n");
+//     list<char*>::iterator list_iter;
+//     for( list_iter = labelList.begin(); list_iter != labelList.end(); ++list_iter) {
+//     cout << *list_iter;
+//     }
+//     cout << endl;
+//
+//     trace(TRACE_5, "Exchangeability::Exchangeability(char* filename): end\n");
 }
 
 
@@ -146,29 +150,31 @@ void Exchangeability::loadBdd(std::string filename) {
     }
 
     // load header of bddAnn
-    int* permids = NULL; //optimal variable ordering      
-    loadHeader(fpAnn, &names, &nbrVarAnn, &permids);
-    fseek(fpAnn, 0, SEEK_SET); //File-Pointer auf Anfang der Datei setzen, damit später BDD geladen werden kann;      
+    int* permids = NULL; //optimal variable ordering
+    int nbrSuppVarsAnn = 0; //size of array permids in BddAnn
+    loadHeader(fpAnn, &names, &nbrVarAnn, &permids, &nbrSuppVarsAnn);
+    fseek(fpAnn, 0, SEEK_SET); //for loading the BDD set the File-Pointer to the beginnig of the file
 
     //load bddAnn
     if (nbrBdd == 0) {
-        loadOptimalOrder(mgrAnn, nbrVarAnn, permids);
+        loadOptimalOrder(mgrAnn, nbrSuppVarsAnn, permids, nbrVarAnn);
     }
     bddAnn = loadDiagram(fpAnn, mgrAnn);
     fclose(fpAnn);
 
-    int nbrVarMp = 0; //number of variables in bddMp
-
     free(permids);
     permids = NULL;
 
+    int nbrVarMp = 0; //size of array permids in BddMp
+    int nbrSuppVarsMp = 0;
+
     //load header of bddMp
-    loadHeader(fpMp, NULL, &nbrVarMp, &permids);
-    fseek(fpMp, 0, SEEK_SET); //File-Pointer auf Anfang der Datei setzen, damit Bdd geladen werden kann;
+    loadHeader(fpMp, NULL, &nbrVarMp, &permids, &nbrSuppVarsMp);
+    fseek(fpMp, 0, SEEK_SET); //for loading the BDD set the File-Pointer to the beginnig of the file
 
     //load bddMp
     if (nbrBdd == 0) {
-        loadOptimalOrder(mgrMp, nbrVarMp, permids);
+        loadOptimalOrder(mgrMp, nbrSuppVarsMp, permids, nbrVarMp);
     }
     bddMp = loadDiagram(fpMp, mgrMp);
     fclose(fpMp);
@@ -180,19 +186,19 @@ void Exchangeability::loadBdd(std::string filename) {
 void Exchangeability::loadHeader(FILE* fp,
                                  char*** names,
                                  int* nVars,
-                                 int** permids) {
+                                 int** permids,
+                                 int* nSuppVars) {
     trace(TRACE_5, "Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids): begin\n");
     Dddmp_DecompType ddType; //possible Values: DDDMP_BDD,DDDMP_ADD,DDDMP_CNF,DDDMP_NONE
-    int nsuppvars;
     char** orderedVarNames;
     char** suppVarNames;
     int* ids;
-    int* auxids; //Hilfsvariablen?
+    int* auxids; 
     int nRoots;
 
     Dddmp_cuddHeaderLoad (&ddType /* OUT: selects the proper decomp type */,
                           nVars /* OUT: number of DD variables */,
-                          &nsuppvars /* OUT: number of support variables */,
+                          nSuppVars /* OUT: number of support variables */,
                           &suppVarNames /* OUT: array of support variable names */,
                           &orderedVarNames/* OUT: array of variable names */,
                           &ids /* OUT: array of variable ids */,
@@ -203,31 +209,37 @@ void Exchangeability::loadHeader(FILE* fp,
     );
 
     if (ddType != DDDMP_BDD) {
-        cout << "\nFehler beim Laden des BDDs: DD-Typ falsch";
+        cout << "\nError while loading the BDDs: wrong DD-Type";
         exit(1);
     }
     if (nRoots != 1) {
         cout
-                << "\nFehler beim Laden des BDDs: in Datei muss genau ein BDD enthalten sein";
+                << "\nError while loading the BDDs: the file must contain exactly one BDD";
         exit(1);
     }
+
+    if (nVars == 0) {
+        cout << "Error nVars == 0";
+        exit(1);
+    }
+
     if (names != NULL) {
-        if (suppVarNames == NULL) {
-            cout << "FEHLER suppVarNames == NULL";
+        if (orderedVarNames== NULL) {
+            cout << "Error orderedVarNames == NULL";
             exit(1);
         }
-        *names = suppVarNames;
-    }
-    if (nVars == 0) {
-        cout << "FEHLER nVars == 0";
-        exit(1);
+        qsort((void*)orderedVarNames, *nVars, sizeof(char*), comparestr);
+        *names = orderedVarNames; //suppVarNames;
     }
     trace(TRACE_5, "Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids): end\n");
 }
 
 
-//! \brief loads a good variable order to the BDD manager  
-void Exchangeability::loadOptimalOrder(DdManager* mgr, int size, int* permids) {
+//! \brief loads a good variable order to the BDD manager
+//! \param permids gives the optimal order 
+//! \param size size of permids (=numer of BDD variables)
+//! \param maxId highest possible number in permids 
+void Exchangeability::loadOptimalOrder(DdManager* mgr, int size, int* permids, int maxId) {
     int length;
     if (size < Cudd_ReadSize(mgr)) {
         length = Cudd_ReadSize(mgr);
@@ -236,12 +248,12 @@ void Exchangeability::loadOptimalOrder(DdManager* mgr, int size, int* permids) {
     }
     int idOrder[length]; //The size of idOrder should be equal or greater to the number of variables currently in use in mgr
     for (int i = 0; i < size; ++i) {
-        assert(permids[i] < size);
+        assert(permids[i] < maxId);
         idOrder[permids[i]] = i;
     }
-    for (int i = size; i < length; ++i) {
-        idOrder[i] = i;
-    }
+//     for (int i = size; i < length; ++i) {
+//         idOrder[i] = i;
+//     }
 
     assert (length >= Cudd_ReadSize(mgr));
     int res = Cudd_ShuffleHeap(mgr, idOrder);

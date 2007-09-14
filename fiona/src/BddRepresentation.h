@@ -26,7 +26,7 @@
  * \author  responsible: Kathrin Kaschner <kathrin.kaschner@informatik.uni-rostock.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitï¿½ zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -79,7 +79,7 @@ class BddRepresentation {
         NEW_OPERATOR(BddRepresentation)
 #define new NEW_NEW
 
-        private:
+     private:
         DdManager* mgrMp;
         DdManager* mgrAnn;
         DdNode* bddMp;

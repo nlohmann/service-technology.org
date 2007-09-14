@@ -26,7 +26,7 @@
  * \author  responsible: Kathrin Kaschner <kathrin.kaschner@informatik.uni-rostock.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitï¿½ zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -80,8 +80,8 @@ class Exchangeability {
         list<char*> labelList;
 
         void loadBdd(std::string filename);
-        void loadHeader(FILE* fp, char*** names, int* nVars, int** permids);
-        void loadOptimalOrder(DdManager* mgr, int size, int* permids);
+        void loadHeader(FILE* fp, char*** names, int* nVars, int** permids, int* nSuppVars);
+        void loadOptimalOrder(DdManager* mgr, int size, int* permids, int maxId);
         DdNode* loadDiagram(FILE* fp, DdManager* mgr);
         void printDotFile(char* filename, char** varNames, DdNode* bddMp, DdNode* bddAnn);
         //void checkManager(DdManager* mgr, char* table);

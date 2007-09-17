@@ -201,7 +201,8 @@ class Graph {
         unsigned int numberOfServicesRecursively(set<GraphNode*> activeNodes,
                                                  map<GraphNode*, unsigned int>& followers,
                                                  map<GraphNode*, list <set<GraphNode*> > >& validFollowerCombinations,
-                                                 map<set<GraphNode*>, unsigned int>& eliminateRedundantCounting);
+                                                 map<set<GraphNode*>, unsigned int>& eliminateRedundantCounting,
+                                                 unsigned int& instances);
 
         unsigned int processAssignmentsRecursively(set<string> labels,
                                                    GraphFormulaAssignment possibleAssignment,

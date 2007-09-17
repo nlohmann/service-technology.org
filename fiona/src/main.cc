@@ -638,14 +638,21 @@ void createFiltered(const Graph::ogs_t& OGsFromFiles) {
 // computes the number of Services that are determined by every single OG
 void countServices(const Graph::ogs_t& OGsFromFiles) {
     Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+    
+    // Abort if there are no OGs at all
+    if (OGsFromFiles.begin() == OGsFromFiles.end()) {
+        trace("Error:  No OGs have been given for computation\n\n");
+        trace("        Enter \"fiona --help\" for more information\n\n");        
+    }
+    
     for (Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
          GraphIter != OGsFromFiles.end(); GraphIter++) {
-        if ((*GraphIter)->isAcyclic()) {
 
-            trace("Computing: ");
-            trace(*iOgFile);
-            trace("\n");
-            trace(TRACE_1, "The given OG is acyclic\n");
+        trace("Computing: ");
+        trace(*iOgFile);
+        trace("\n");
+
+        if ((*GraphIter)->isAcyclic()) {
 
             time_t seconds, seconds2;
 
@@ -659,11 +666,7 @@ void countServices(const Graph::ogs_t& OGsFromFiles) {
             // increment filename counter
             iOgFile++;
         } else {
-            trace("Computing: ");
-            trace(*iOgFile);
-            trace("\n");
-            trace("The given OG is is NOT ayclic\n");
-            trace("Cannot compute number of Services\n\n");
+            trace("Cannot compute number of Services, since the given OG is not acyclic\n\n");
 
             // increment filename counter
             iOgFile++;
@@ -674,13 +677,28 @@ void countServices(const Graph::ogs_t& OGsFromFiles) {
 
 // checks whether an OG is acyclic
 void checkAcyclicity(const Graph::ogs_t& OGsFromFiles) {
+    Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+
+    // Abort if there are no OGs at all
+    if (OGsFromFiles.begin() == OGsFromFiles.end()) {
+        trace("Error:  No OGs have been given for computation\n\n");
+        trace("        Enter \"fiona --help\" for more information\n\n");        
+    }
+    
     for (Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin(); GraphIter
             != OGsFromFiles.end(); GraphIter++) {
+
+        trace("Computing: ");
+        trace(*iOgFile);
+        trace("\n");
+
         if ((*GraphIter)->isAcyclic()) {
             trace("The given OG is acyclic\n\n");
         } else {
             trace("The given OG is NOT ayclic\n\n");
         }
+        
+        iOgFile++;
     }
 }
 
@@ -833,9 +851,11 @@ int main(int argc, char ** argv) {
             }
 
             // adjust events_manual and print limit of considering events
-            reportOptionValues();
+            if (parameters[P_OG] || parameters[P_IG] || options[O_MATCH]) {
+                reportOptionValues();
+            }
+            
             // start computation
-
             if (options[O_MATCH]) {
                 // matching current oWFN against the OG 
                 matchNet(OGToMatch, PN);

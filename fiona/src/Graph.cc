@@ -426,7 +426,7 @@ void Graph::filterRecursive(GraphNode *myNode,
 //! \brief checks, whether this Graph is acyclic
 //! \return true on positive check, otherwise: false
 bool Graph::isAcyclic() {
-    trace(TRACE_2, "Test if the given OG is acyclic: start\n");
+    trace(TRACE_5, "Graph::isAcyclic(...): start\n");
 
     // Define a set vor every Node, that will contain all transitive parent nodes
     map<GraphNode*, set<GraphNode*> > parentNodes;
@@ -459,7 +459,7 @@ bool Graph::isAcyclic() {
                 if (parentNodes[testNode].find(edge->getDstNode())
                         != parentNodes[testNode].end()) {
                     delete edgeIter;
-                    trace(TRACE_3, "Test if the given OG is acyclic: finished, OG is cyclic\n");
+                    trace(TRACE_5, "Graph::isAcyclic(...): end\n");
                     return false;
                 } else {
                     testNodes.push(edge->getDstNode());
@@ -470,7 +470,7 @@ bool Graph::isAcyclic() {
         }
         delete edgeIter;
     }
-    trace(TRACE_2, "Test if the given OG is acyclic: finished, OG is acyclic\n");
+    trace(TRACE_5, "Graph::isAcyclic(...): end\n");
     return true;
 }
 
@@ -479,8 +479,9 @@ bool Graph::isAcyclic() {
 //! \return number of Services
 unsigned int Graph::numberOfServices() {
 
-    trace(TRACE_1, "Computing number of Services: started\n");
+    trace(TRACE_5, "Graph::numberOfServices(...): start\n");
 
+    trace(TRACE_1, "Removing false nodes...\n");
     removeFalseNodes();
 
     if (root == NULL) {
@@ -499,7 +500,7 @@ unsigned int Graph::numberOfServices() {
     GraphFormulaAssignment possibleAssignment;
     map<string, GraphEdge*> edges;
 
-    trace(TRACE_3, "Computing true assignments for all nodes: started\n");
+    trace(TRACE_2, "Computing true assignments for all nodes\n");
     // Preprocess all nodes of the OG in order to fill the variables needed in the recursion
     for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
 
@@ -512,7 +513,7 @@ unsigned int Graph::numberOfServices() {
         // get the labels of all outgoing edges, that reach a blue destination
         // save those labels in a set and fill a mapping that allows finding the
         // outgoing edges for a label. (does not work with non-determinism yet)
-        trace(TRACE_5, "Collecting labels of outgoing edges for current node: started\n");
+        trace(TRACE_5, "Collecting labels of outgoing edges for current node\n");
         GraphNode::LeavingEdges::ConstIterator edgeIter =(*iNode)->getLeavingEdgesConstIterator();
         while (edgeIter->hasNext()) {
             GraphEdge* edge = edgeIter->getNext();
@@ -521,7 +522,6 @@ unsigned int Graph::numberOfServices() {
                 edges[edge->getLabel()] = edge;
             }
         }
-        trace(TRACE_5, "Collecting labels of outgoing edges for current node: finished\n");
 
         // get rid of the iterator
         delete edgeIter;
@@ -554,31 +554,28 @@ unsigned int Graph::numberOfServices() {
         }
     }
 
-    trace(TRACE_3, "Computing true assignments for all nodes: finished\n");
-
     // initialize the first instance for the recursive function
     activeNodes.insert(root);
 
     unsigned int number = 0;
     unsigned int instances = 0;
 
-    trace(TRACE_4, "Recursive computing of number of Services: started\n");
+    trace(TRACE_1, "Starting recursive computation of number of Services\n");
     // process Instances recursively
     number = numberOfServicesRecursively(activeNodes,
                                        followers,
                                        validFollowerCombinations,
                                        eliminateRedundantCounting,
                                        instances);
-    trace(TRACE_4, "Recursive computing of number of Services: finished\n");
-
-    trace(TRACE_1, "Computing number of Services: finished\n");
 
     if (instances > 100000) {
         trace(TRACE_2, "Valid Number of instances exceeded.\n");        
         trace(TRACE_0, "The number of services cannot be computed in a reasonable amount of time.\n");        
         trace(TRACE_0, "The return value will be set to 0.\n");
-        return 0;        
+        trace(TRACE_5, "Graph::numberOfServices(...): end\n");
+       return 0;        
     } else {
+        trace(TRACE_5, "Graph::numberOfServices(...): end\n");
         return number;
     }
 }

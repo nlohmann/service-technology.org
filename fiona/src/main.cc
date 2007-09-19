@@ -457,12 +457,10 @@ void computeIG(oWFN* PN) {
 // create an PNG of the given oWFN
 void makePNG(oWFN* PN) {
 
-    trace(TRACE_1, "internal translation of the net into PNapi format...\n");
+    trace(TRACE_1, "Internal translation of the net into PNapi format...\n");
 
     // translate the net into PNapi format
     PNapi::PetriNet* PNapiNet = PN->returnPNapiNet();
-
-    trace(TRACE_1, "internal translation of the net into PNapi format finished.\n");
 
     // set strings needed in PNapi output
     globals::output_filename = PN->filename;
@@ -480,12 +478,10 @@ void makePNG(oWFN* PN) {
     // set the output format to dot
     PNapiNet->set_format(PNapi::FORMAT_DOT, true);
 
-    trace(TRACE_3, "start creating dot stream\n");
+    trace(TRACE_1, "Creating dot stream\n");
 
     // create the dot
     (*dot) << (*PNapiNet);
-
-    trace(TRACE_3, "finish dot stream\n");
 
     // generate a string from the stream to be modified for piping
     string dotString = dot->str();
@@ -495,7 +491,7 @@ void makePNG(oWFN* PN) {
     unsigned int position;
     unsigned int deletePosition;
 
-    trace(TRACE_3, "start modifiyng dot stream\n");
+    trace(TRACE_3, "Modifiyng dot stream\n");
 
     // delete all comments in the dot output of the PNapiNet, since the endlines will 
     // be deleted for echo piping and "//" comments won't work anymore
@@ -525,11 +521,12 @@ void makePNG(oWFN* PN) {
         }
     }
 
+
     // finish the string for the system call
     dotString = "echo \"" + dotString + "\" | dot -q -Tpng -o \""
             + globals::output_filename + ".png\"";
 
-    trace(TRACE_3, "dotstring modified\n");
+    trace(TRACE_1, "Piping the stream to dot\n");
 
     // create the output
     system(dotString.c_str());
@@ -636,69 +633,45 @@ void createFiltered(const Graph::ogs_t& OGsFromFiles) {
 
 
 // computes the number of Services that are determined by every single OG
-void countServices(const Graph::ogs_t& OGsFromFiles) {
-    Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
-    
-    // Abort if there are no OGs at all
-    if (OGsFromFiles.begin() == OGsFromFiles.end()) {
-        trace("Error:  No OGs have been given for computation\n\n");
-        trace("        Enter \"fiona --help\" for more information\n\n");        
-    }
-    
-    for (Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
-         GraphIter != OGsFromFiles.end(); GraphIter++) {
+void countServices(Graph* OG, string graphName) {
 
-        trace("Computing: ");
-        trace(*iOgFile);
-        trace("\n");
+    trace("Processing: ");
+    trace(graphName);
+    trace("\n");
 
-        if ((*GraphIter)->isAcyclic()) {
+    trace(TRACE_1, "Checking if the net is acyclic\n");
 
-            time_t seconds, seconds2;
+    if (OG->isAcyclic()) {
 
-            seconds = time (NULL);
-            // Compute and show the number of Services
-            trace("Computed number of Services: " + intToString((*GraphIter)->numberOfServices()) + "\n");
-            seconds2 = time (NULL);
+        time_t seconds, seconds2;
 
-            cout << difftime(seconds2, seconds) << " s consumed for computation" << endl << endl;
+        seconds = time (NULL);
+        trace("Started computing the number of services\n");
+        // Compute and show the number of Services
+        trace("Computed number of Services: " + intToString(OG->numberOfServices()) + "\n");
+        seconds2 = time (NULL);
 
-            // increment filename counter
-            iOgFile++;
-        } else {
-            trace("Cannot compute number of Services, since the given OG is not acyclic\n\n");
+        cout << difftime(seconds2, seconds) << " s consumed for computation" << endl << endl;
 
-            // increment filename counter
-            iOgFile++;
-        }
+    } else {
+        trace("Cannot compute number of Services, since the given OG is not acyclic\n\n");
     }
 }
 
 
 // checks whether an OG is acyclic
-void checkAcyclicity(const Graph::ogs_t& OGsFromFiles) {
-    Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+void checkAcyclicity(Graph* OG, string graphName) {
 
-    // Abort if there are no OGs at all
-    if (OGsFromFiles.begin() == OGsFromFiles.end()) {
-        trace("Error:  No OGs have been given for computation\n\n");
-        trace("        Enter \"fiona --help\" for more information\n\n");        
-    }
-    
-    for (Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin(); GraphIter
-            != OGsFromFiles.end(); GraphIter++) {
+    trace("Processing: ");
+    trace(graphName);
+    trace("\n");
 
-        trace("Computing: ");
-        trace(*iOgFile);
-        trace("\n");
+    trace(TRACE_1, "Checking if the net is acyclic\n");
 
-        if ((*GraphIter)->isAcyclic()) {
-            trace("The given OG is acyclic\n\n");
-        } else {
-            trace("The given OG is NOT ayclic\n\n");
-        }
-        
-        iOgFile++;
+    if (OG->isAcyclic()) {
+        trace("The given OG is acyclic\n\n");
+    } else {
+        trace("The given OG is NOT ayclic\n\n");
     }
 }
 
@@ -734,8 +707,7 @@ int main(int argc, char ** argv) {
     // start OG file dependant operations
 
     if (options[O_MATCH] || options[O_PRODUCTOG] || options[O_SIMULATES]
-        || options[O_EQUALS] || options[O_FILTER] || options[O_COUNT_SERVICES]
-        || options[O_CHECK_ACYCLIC]) {
+        || options[O_EQUALS] || options[O_FILTER]) {
 
         // reading all OG-files
         Graph::ogs_t OGsFromFiles;
@@ -777,24 +749,40 @@ int main(int argc, char ** argv) {
             createFiltered(OGsFromFiles);
             return 0;
         }
-
-        if (options[O_COUNT_SERVICES]) {
-            // counts the number of deterministic strategies
-            // that are characterized by a given OG
-            countServices(OGsFromFiles);
-            deleteOGs(OGsFromFiles);
-            return 0;
-        }
-
-        if (options[O_CHECK_ACYCLIC]) {
-            // counts the number of deterministic strategies
-            // that are characterized by a given OG
-            checkAcyclicity(OGsFromFiles);
-            deleteOGs(OGsFromFiles);
-            return 0;
-        }
     }
 
+    if (options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC]) {
+
+        // Abort if there are no OGs at all
+        if (ogfiles.begin() == ogfiles.end()) {
+            trace("Error:  No OGs have been given for computation\n\n");
+            trace("        Enter \"fiona --help\" for more information\n\n");        
+        }
+
+        // iterate all input files
+        for (Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+         iOgFile != ogfiles.end(); ++iOgFile) {
+        
+            Graph* readOG;
+            readOG = readog(*iOgFile);
+        
+            if (options[O_COUNT_SERVICES]) {
+                // counts the number of deterministic strategies
+                // that are characterized by a given OG
+                countServices(readOG, (*iOgFile));
+                delete readOG;
+            }
+    
+            if (options[O_CHECK_ACYCLIC]) {
+                // counts the number of deterministic strategies
+                // that are characterized by a given OG
+                checkAcyclicity(readOG, (*iOgFile));
+                delete readOG;
+            }
+        }
+        return 0;
+    }
+    
     // **********************************************************************************
     // start petrinet-file dependant operations
 

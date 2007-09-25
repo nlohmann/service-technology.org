@@ -674,49 +674,49 @@ bool GraphNode::isToShow(const GraphNode* rootOfGraph) const {
 
 
 /*!
- * \brief determines whether this node has a transition with the given label
+ * \brief determines whether this node has a edge with the given label
  *
- * \param transitionLabel the label of the transition
+ * \param edgeLabel the label of the edge
  *
- * \return true iff this node has a transition with the given label
+ * \return true iff this node has a edge with the given label
  */
-bool GraphNode::hasTransitionWithLabel(const std::string& transitionLabel) const {
-    return getTransitionWithLabel(transitionLabel) != NULL;
+bool GraphNode::hasEdgeWithLabel(const std::string& edgeLabel) const {
+    return getEdgeWithLabel(edgeLabel) != NULL;
 }
 
 
 /*!
- * \brief determines whether this node has a blue transition with a given label
+ * \brief determines whether this node has a blue edge with a given label
  *
- * \param transitionLabel the label of the blue transition
+ * \param edgeLabel the label of the blue edge
  *
- * \return true iff this node has a blue transition with the given label
+ * \return true iff this node has a blue edge with the given label
  */
-bool GraphNode::hasBlueTransitionWithLabel(const std::string& transitionLabel) const {
+bool GraphNode::hasBlueEdgeWithLabel(const std::string& edgeLabel) const {
     
-    GraphEdge* transition = getTransitionWithLabel(transitionLabel);
-    if (transition == NULL)
+    GraphEdge* edge = getEdgeWithLabel(edgeLabel);
+    if (edge == NULL)
         return false;
     
-    return transition->getDstNode()->isBlue();
+    return edge->getDstNode()->isBlue();
 }
 
 
 /*!
- * \brief returns a transition of this node with the given label
+ * \brief returns a edge of this node with the given label
  *
- * \param transitionLabel the label of the transition that we look for
+ * \param edgeLabel the label of the edge that we look for
  *
- * \return a transition of this node with the given label, NULL if no such
- *         transition exists
+ * \return a edge of this node with the given label, NULL if no such
+ *         edge exists
  */
-GraphEdge* GraphNode::getTransitionWithLabel(const std::string& transitionLabel) const {
+GraphEdge* GraphNode::getEdgeWithLabel(const std::string& edgeLabel) const {
     
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         GraphEdge* edge = edgeIter->getNext();
         
-        if (edge->getLabel() == transitionLabel) {
+        if (edge->getLabel() == edgeLabel) {
             delete edgeIter;
             return edge;
         }
@@ -728,24 +728,24 @@ GraphEdge* GraphNode::getTransitionWithLabel(const std::string& transitionLabel)
 
 
 /*!
- * \brief "fires" the transition of this node with the given label, that is
- *        it returns the destination node of that transition
+ * \brief "fires" the edge of this node with the given label, that is
+ *        it returns the destination node of that edge
  *
- * \param transitionLabel the label of this transition that is to be fired
+ * \param edgeLabel the label of this edge that is to be fired
  *
- * \return the destination node of the labeled transition, NULL if the
- *         transition could not be found
+ * \return the destination node of the labeled edge, NULL if the
+ *         edge could not be found
  */
-GraphNode* GraphNode::fireTransitionWithLabel(const std::string& transitionLabel) {
+GraphNode* GraphNode::followEdgeWithLabel(const std::string& edgeLabel) {
     
-    assert(transitionLabel != GraphFormulaLiteral::TAU);
+    assert(edgeLabel != GraphFormulaLiteral::TAU);
     
-    GraphEdge* transition = getTransitionWithLabel(transitionLabel);
-    if (transition == NULL) {
+    GraphEdge* edge = getEdgeWithLabel(edgeLabel);
+    if (edge == NULL) {
         return NULL;
     }
     
-    return transition->getDstNode();
+    return edge->getDstNode();
 }
 
 
@@ -794,11 +794,11 @@ GraphFormulaAssignment* GraphNode::getAssignment() const {
 
 
 /*!
- * \brief removes all transition from this node to the given one
+ * \brief removes all edge from this node to the given one
  *
  * \param nodeToDelete the target node
  */
-void GraphNode::removeTransitionsToNode(const GraphNode* nodeToDelete) {
+void GraphNode::removeEdgesToNode(const GraphNode* nodeToDelete) {
     LeavingEdges::Iterator iEdge = getLeavingEdgesIterator();
     while (iEdge->hasNext()) {
         GraphEdge* edge = iEdge->getNext();

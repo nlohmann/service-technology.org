@@ -77,7 +77,7 @@ GraphNode* Graph::addNode(const std::string& nodeName,
 }
 
 
-void Graph::addTransition(const std::string& srcName,
+void Graph::addEdge(const std::string& srcName,
                                const std::string& dstNodeName,
                                const std::string& label) {
 
@@ -142,7 +142,7 @@ void Graph::removeFalseNodes() {
             GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
             if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
 
-                removeTransitionsToNodeFromAllOtherNodes(*iNode);
+                removeEdgesToNodeFromAllOtherNodes(*iNode);
                 if (*iNode == getRoot()) {
                     setRoot(NULL);
                 }
@@ -161,21 +161,21 @@ void Graph::removeFalseNodes() {
 }
 
 
-void Graph::removeTransitionsToNodeFromAllOtherNodes(const GraphNode* nodeToDelete) {
+void Graph::removeEdgesToNodeFromAllOtherNodes(const GraphNode* nodeToDelete) {
 
     for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
         if (*iNode != nodeToDelete) {
-            (*iNode)->removeTransitionsToNode(nodeToDelete);
+            (*iNode)->removeEdgesToNode(nodeToDelete);
         }
     }
 }
 
 
-void Graph::removeTransitionsFromNodeToAllOtherNodes(GraphNode* nodeToDelete) {
+void Graph::removeEdgesFromNodeToAllOtherNodes(GraphNode* nodeToDelete) {
 
     for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
         if (*iNode != nodeToDelete) {
-            nodeToDelete->removeTransitionsToNode(*iNode);
+            nodeToDelete->removeEdgesToNode(*iNode);
         }
     }
 }
@@ -258,7 +258,7 @@ bool Graph::simulatesRecursive(GraphNode *myNode, GraphNode *simNode,
         GraphEdge* simEdge = simEdgeIter->getNext();
         trace(TRACE_5, "Trying to find the transition in the simulator.\n");
 
-        GraphEdge* myEdge = myNode->getTransitionWithLabel(simEdge->getLabel());
+        GraphEdge* myEdge = myNode->getEdgeWithLabel(simEdge->getLabel());
 
         if (myEdge == NULL) {
             delete simEdgeIter;
@@ -342,13 +342,13 @@ void Graph::filterRecursive(GraphNode *myNode,
     while (rhsEdgeIter->hasNext()) {
         GraphEdge* rhsEdge = rhsEdgeIter->getNext();
 
-        GraphEdge* myEdge = myNode->getTransitionWithLabel(rhsEdge->getLabel());
+        GraphEdge* myEdge = myNode->getEdgeWithLabel(rhsEdge->getLabel());
         if (myEdge == NULL) {
             // the operand node has an edge which the current og node doesn't
             if (rhsEdge->getType() == SENDING) {
                 // if it is an ! event, we cannot filter it properly
-                removeTransitionsToNodeFromAllOtherNodes(myNode);
-                removeTransitionsFromNodeToAllOtherNodes(myNode);
+                removeEdgesToNodeFromAllOtherNodes(myNode);
+                removeEdgesFromNodeToAllOtherNodes(myNode);
                 delete rhsEdgeIter;
                 delete rhsNodeAnnotationInCNF;
                 delete myNodeAnnotationInCNF;
@@ -356,7 +356,7 @@ void Graph::filterRecursive(GraphNode *myNode,
             }
             if (rhsEdge->getType() == RECEIVING) {
                 // if it is an ? event, we allow this communication, but we won't get final again
-                addTransition(myNode->getName(), "_true", rhsEdge->getLabel());
+                addEdge(myNode->getName(), "_true", rhsEdge->getLabel());
                 myNode->removeLiteralFromAnnotation(rhsEdge->getLabel());
                 rhsNodeAnnotationInCNF->removeLiteral(rhsEdge->getLabel());
             }
@@ -371,8 +371,8 @@ void Graph::filterRecursive(GraphNode *myNode,
         delete myNodeAnnotationInCNF;
     } else {
         // implication failed ... we cannot construct a simulation; abort
-        removeTransitionsToNodeFromAllOtherNodes(myNode);
-        removeTransitionsFromNodeToAllOtherNodes(myNode);
+        removeEdgesToNodeFromAllOtherNodes(myNode);
+        removeEdgesFromNodeToAllOtherNodes(myNode);
         delete rhsNodeAnnotationInCNF;
         delete myNodeAnnotationInCNF;
         return;
@@ -384,7 +384,7 @@ void Graph::filterRecursive(GraphNode *myNode,
     while (rhsEdgeIter->hasNext()) {
         GraphEdge* rhsEdge = rhsEdgeIter->getNext();
 
-        GraphEdge* myEdge = myNode->getTransitionWithLabel(rhsEdge->getLabel());
+        GraphEdge* myEdge = myNode->getEdgeWithLabel(rhsEdge->getLabel());
         if (myEdge == NULL) {
             // this should not happen! every edge in the operand IS present in the current og
             delete rhsEdgeIter;
@@ -403,16 +403,16 @@ void Graph::filterRecursive(GraphNode *myNode,
     while (rhsEdgeIter->hasNext()) {
         GraphEdge* rhsEdge = rhsEdgeIter->getNext();
 
-        GraphEdge* myEdge = myNode->getTransitionWithLabel(rhsEdge->getLabel());
+        GraphEdge* myEdge = myNode->getEdgeWithLabel(rhsEdge->getLabel());
         if (myEdge == NULL) {
             if (rhsEdge->getType() == SENDING) {
-                removeTransitionsToNodeFromAllOtherNodes(myNode);
-                removeTransitionsFromNodeToAllOtherNodes(myNode);
+                removeEdgesToNodeFromAllOtherNodes(myNode);
+                removeEdgesFromNodeToAllOtherNodes(myNode);
                 delete rhsEdgeIter;
                 return;
             }
             if (rhsEdge->getType() == RECEIVING) {
-                addTransition(myNode->getName(), "_true", rhsEdge->getLabel());
+                addEdge(myNode->getName(), "_true", rhsEdge->getLabel());
                 myNode->removeLiteralFromAnnotation(rhsEdge->getLabel());
             }
         }
@@ -880,7 +880,7 @@ void Graph::buildProductOG(GraphNode* currentOGNode,
         currentLabel = edge->getLabel();
 
         // if the rhs automaton allows this edge
-        if (currentRhsNode->hasTransitionWithLabel(currentLabel)) {
+        if (currentRhsNode->hasEdgeWithLabel(currentLabel)) {
 
             // remember the name of the old node of the product OG
             std::string currentName;
@@ -889,10 +889,10 @@ void Graph::buildProductOG(GraphNode* currentOGNode,
 
             // compute both successors and recursively call buildProductOG again
             GraphNode* newOGNode;
-            newOGNode = currentOGNode->fireTransitionWithLabel(currentLabel);
+            newOGNode = currentOGNode->followEdgeWithLabel(currentLabel);
 
             GraphNode* newRhsNode;
-            newRhsNode = currentRhsNode->fireTransitionWithLabel(currentLabel);
+            newRhsNode = currentRhsNode->followEdgeWithLabel(currentLabel);
 
             // build the new node of the product OG
             // that has name and annotation constructed from current nodes of OG and rhs OG
@@ -903,7 +903,7 @@ void Graph::buildProductOG(GraphNode* currentOGNode,
 
             if (found != NULL) {
                 // the node was known before, so we just have to add a new edge
-                productOG->addTransition(currentName, newProductName,
+                productOG->addEdge(currentName, newProductName,
                                          currentLabel);
 
                 trace(TRACE_5, "Graph::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, Graph* productOG): end\n");
@@ -918,7 +918,7 @@ void Graph::buildProductOG(GraphNode* currentOGNode,
                 productOG->addNode(newProductNode);
 
                 // going down recursively
-                productOG->addTransition(currentName, newProductName, currentLabel);
+                productOG->addEdge(currentName, newProductName, currentLabel);
 
                 buildProductOG(newOGNode, newRhsNode, productOG);
             }
@@ -1033,7 +1033,7 @@ void Graph::printGraphToDot(GraphNode* v,
 
             // remember the label of the egde
             currentLabel = edge->getLabel();
-            GraphNode* successor = v->fireTransitionWithLabel(currentLabel);
+            GraphNode* successor = v->followEdgeWithLabel(currentLabel);
             assert(successor != NULL);
 
             os << "p" << v->getName() << "->" << "p" << successor->getName()
@@ -1093,7 +1093,7 @@ void Graph::printOGFile(const std::string& filenamePrefix) const {
     ogFile << "  " << getRoot()->getName() << ';' << endl << endl;
 
     ogFile << "TRANSITIONS" << endl;
-    bool printedFirstTransition = false;
+    bool printedFirstEdge = false;
     for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
 
         GraphNode* node = *iNode;
@@ -1110,13 +1110,13 @@ void Graph::printOGFile(const std::string& filenamePrefix) const {
                 continue;
             }
 
-            if (printedFirstTransition) {
+            if (printedFirstEdge) {
                 ogFile << ',' << endl;
             }
 
             ogFile << "  " << node->getName() << " -> " << edge->getDstNode()->getName() << " : " << edge->getLabel();
 
-            printedFirstTransition = true;
+            printedFirstEdge = true;
         }
         delete iEdge;
     }

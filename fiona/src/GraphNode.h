@@ -240,17 +240,17 @@ class GraphNode {
         /// returns true iff node should be shown according to the "show" parameter
         bool isToShow(const GraphNode* rootOfGraph) const;
         
-        /// determines whether this node has a transition with the given label
-        bool hasTransitionWithLabel(const std::string&) const;
+        /// determines whether this node has a edge with the given label
+        bool hasEdgeWithLabel(const std::string&) const;
         
-        /// determines whether this node has a blue transition with a given label
-        bool hasBlueTransitionWithLabel(const std::string&) const;
+        /// determines whether this node has a blue edge with a given label
+        bool hasBlueEdgeWithLabel(const std::string&) const;
 
-        /// returns a transition of this node with the given label
-        GraphEdge* getTransitionWithLabel(const std::string&) const;
+        /// returns a edge of this node with the given label
+        GraphEdge* getEdgeWithLabel(const std::string&) const;
         
-        /// returns the destination node of the transition with the given label
-        GraphNode* fireTransitionWithLabel(const std::string&);
+        /// returns the destination node of the edge with the given label
+        GraphNode* followEdgeWithLabel(const std::string&);
 
         /// determines whether an assinment satisfies this node's annotation
         bool assignmentSatisfiesAnnotation(const GraphFormulaAssignment&) const;
@@ -259,8 +259,8 @@ class GraphNode {
         /// leaving the node
         GraphFormulaAssignment* getAssignment() const;
 
-        /// removes all transition from this node to the given one
-        void removeTransitionsToNode(const GraphNode*);
+        /// removes all edge from this node to the given one
+        void removeEdgesToNode(const GraphNode*);
 
 #undef new
         /// Provides user defined operator new. Needed to trace all new operations

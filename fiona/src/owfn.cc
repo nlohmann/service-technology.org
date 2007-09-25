@@ -1775,13 +1775,13 @@ bool oWFN::matchesWithOGRecursive(GraphNode* currentOGNode,
         // OG. If not, exit this function returning false, because the oWFN
         // does not match with the OG.
         if (transition->hasNonTauLabelForMatching() &&
-            !currentOGNode->hasBlueTransitionWithLabel(transition->getLabelForMatching())) {
+            !currentOGNode->hasBlueEdgeWithLabel(transition->getLabelForMatching())) {
 
             reasonForFailedMatch = "A transition labeled with '"
                                    + transition->getLabelForMatching()
                                    + "' leaves the marking '"
                                    + getCurrentMarkingAsString()
-                                   + "' in the oWFN, but no blue transition with the same label"
+                                   + "' in the oWFN, but no blue edge with the same label"
                                    + " the node '" + currentOGNode->getName()
                                    + "' in the OG.";
 
@@ -1802,7 +1802,7 @@ bool oWFN::matchesWithOGRecursive(GraphNode* currentOGNode,
         if (transition->hasNonTauLabelForMatching()) {
             // Fire the transition in the OG that belongs to the transition we
             // just fired in the oWFN.
-            currentOGNode = currentOGNode->fireTransitionWithLabel(transition->getLabelForMatching());
+            currentOGNode = currentOGNode->followEdgeWithLabel(transition->getLabelForMatching());
         } else {
             // if net makes a silent step, the OG node stays unchanged
             // so do nothing.

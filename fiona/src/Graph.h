@@ -70,9 +70,9 @@ class Graph {
 
         typedef nodes_t::iterator nodes_iterator;
 
-        void removeTransitionsToNodeFromAllOtherNodes(const GraphNode* nodeToDelete);
+        void removeEdgesToNodeFromAllOtherNodes(const GraphNode* nodeToDelete);
 
-        void removeTransitionsFromNodeToAllOtherNodes(GraphNode* nodeToDelete);
+        void removeEdgesFromNodeToAllOtherNodes(GraphNode* nodeToDelete);
 
         /**
          * Recursive coordinated dfs through OG and rhs OG.
@@ -110,7 +110,7 @@ class Graph {
                            GraphFormula* annotation,
                            GraphNodeColor color = BLUE);
 
-        void addTransition(const std::string& srcName,
+        void addEdge(const std::string& srcName,
                            const std::string& dstName,
                            const std::string& label);
 

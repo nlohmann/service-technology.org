@@ -207,7 +207,7 @@ transition: ident arrow ident colon ident
             og_yyerror_unknown_node($3);
         }
 
-        OGToParse->addTransition($1, $3, $5);
+        OGToParse->addEdge($1, $3, $5);
         free($1);
         free($3);
         free($5);

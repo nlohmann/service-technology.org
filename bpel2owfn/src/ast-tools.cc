@@ -34,13 +34,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/09/04 13:47:12 $
+ * \date    \$Date: 2007/09/25 14:00:38 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -390,6 +390,10 @@ void enterEnclosedActivities( unsigned int a, set< unsigned int > b )
 void consecutiveActivities( unsigned int a, unsigned int b )
 {
     ENTER("consecutiveActivities");
+    if ((a == 0) || (b == 0))
+    {
+      return;
+    }
     beforeActivities[b].insert(a);
     afterActivities[a].insert(b);
     for (set< unsigned int >::iterator first = beforeActivities[b].begin(); first != beforeActivities[b].end(); first++)

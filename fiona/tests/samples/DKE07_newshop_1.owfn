@@ -37,8 +37,8 @@ INITIALMARKING
  p32:	1,
  p37:	1;
 
-FINALMARKING
-  p52 {final place};
+FINALCONDITION
+  p52 = 1 {final place};
 
 
 TRANSITION t1

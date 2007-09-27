@@ -780,6 +780,13 @@ int main(int argc, char ** argv) {
                 delete readOG;
             }
         }
+
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
+        // Destroy buffer of OG parser.
+        // Must NOT be called before fclose(og_yyin);
+        og_yylex_destroy();
+#endif
+
         return 0;
     }
     

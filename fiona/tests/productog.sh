@@ -44,7 +44,7 @@ resultSingle=0
 og1="$DIR/1.og"
 og2="$DIR/2.og"
 outputPrefix="$builddir/productog/1_X_2.output"
-outputExpected="$srcdir/productog/1_X_2.expected.og"
+outputExpected="$testdir/productog/1_X_2.expected.og"
 
 # for make distcheck: make copy of $owfn and work on it
 if [ "$testdir" != "$builddir" ]; then
@@ -88,7 +88,7 @@ og1="$DIR/1.og"
 og2="$DIR/2.og"
 og3="$DIR/3.og"
 outputPrefix="$builddir/productog/1_X_2_X_3.output"
-outputExpected="$srcdir/productog/1_X_2_X_3.expected.og"
+outputExpected="$testdir/productog/1_X_2_X_3.expected.og"
 
 # for make distcheck: make copy of $owfn and work on it
 if [ "$testdir" != "$builddir" ]; then
@@ -132,7 +132,7 @@ og1="$DIR/1.og"
 og2="$DIR/2.og"
 og3="$DIR/3.og"
 outputPrefix="$builddir/productog/3_X_1_X_2.output"
-outputExpected="$srcdir/productog/3_X_1_X_2.expected.og"
+outputExpected="$testdir/productog/3_X_1_X_2.expected.og"
 
 # for make distcheck: make copy of $owfn and work on it
 if [ "$testdir" != "$builddir" ]; then

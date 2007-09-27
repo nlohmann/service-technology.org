@@ -21,7 +21,7 @@
 
 include $(top_srcdir)/Makefile.covcommon
 
-TESTS = slist.sh syntax.sh extrema.sh messages.sh cyclic.sh \
+TESTS = slist.sh syntax.sh formula.sh extrema.sh messages.sh cyclic.sh \
         matching.sh sim_og.sh productog.sh \
         sequences.sh partner.sh countservices.sh samples.sh bddtest.sh
 
@@ -133,6 +133,7 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              countservices/acyclic.og \
              countservices/cyclic.og \
              countservices/1.og \
+             countservices/nostrat.og \
              sim_og/test11.owfn \
              sim_og/test12.owfn \
              sim_og/test21.owfn \
@@ -171,7 +172,9 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              sim_og/test92.owfn.og \
              sim_og/coarse-chopped.og \
              sim_og/coarse.og \
-             sim_og/compact.og
+             sim_og/compact.og \
+             formula/1.owfn \
+             formula/1.owfn.expected.og
 
 # Global check-loud target. Runs all tests. Output files are generated.
 check-loud:
@@ -241,6 +244,7 @@ DISTCLEAN_FILES = productog/1_X_2.output.og \
                   partner/sequence3-partner.owfn \
                   partner/sequence3-partner.dot \
                   partner/sequence3-partner.png \
+                  formula/*output* \
                   petrify.log
 
 distclean-local:

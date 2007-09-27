@@ -78,8 +78,6 @@ class oWFN {
         typedef std::vector<owfnPlace*> Places_t;
 
     private:
-        unsigned int NrOfStates;
-        unsigned int arcCnt; //!< number of arcs
         unsigned int CurrentCardFireList;
         unsigned int CurrentCardQuasiFireList;
 

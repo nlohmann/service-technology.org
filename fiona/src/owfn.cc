@@ -57,7 +57,7 @@ bool compare(const owfnPlace* lhs, const owfnPlace* rhs) {
 
 //! \brief constructor
 oWFN::oWFN() :
-    arcCnt(0), CurrentCardFireList(0), CurrentCardQuasiFireList(0),
+    CurrentCardFireList(0), CurrentCardQuasiFireList(0),
     tempBinDecision(NULL), FinalCondition(NULL), currentState(0),
     placeHashValue(0), BitVectorSize(0) {
 

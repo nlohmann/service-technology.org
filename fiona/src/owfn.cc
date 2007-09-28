@@ -1456,7 +1456,6 @@ void oWFN::addInputMessage(messageMultiSet messages) {
             placeHashValue += getPlace(*iter)->hash_factor;
             placeHashValue %= HASHSIZE;
 
-            // TODO: check_enabled!!!!!!!! so richtig?!
             for (Node::Arcs_t::size_type k = 0; k < getPlace(*iter)->getLeavingArcsCount(); k++) {
                 ((owfnTransition *) getPlace(*iter)->getLeavingArc(k)->Destination)->check_enabled(this);
             }
@@ -1596,7 +1595,6 @@ bool oWFN::removeOutputMessage(unsigned int message) {
         placeHashValue -= getPlace(message)->hash_factor;
         placeHashValue %= HASHSIZE;
 
-        // TODO: check_enabled!!!!!!!! so richtig?!
         for (Node::Arcs_t::size_type k = 0; k < getPlace(message)->getLeavingArcsCount(); k++) {
             ((owfnTransition *) getPlace(message)->getLeavingArc(k)->Destination)->check_enabled(this);
         }
@@ -1624,7 +1622,6 @@ bool oWFN::removeOutputMessage(messageMultiSet messages) {
                 placeHashValue -= getPlace(*iter)->hash_factor;
                 placeHashValue %= HASHSIZE;
 
-                // TODO: check_enabled!!!!!!!! so richtig?!
                 for (Node::Arcs_t::size_type k = 0; k < getPlace(*iter)->getLeavingArcsCount(); k++) {
                     ((owfnTransition *) getPlace(*iter)->getLeavingArc(k)->Destination)->check_enabled(this);
                 }

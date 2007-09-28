@@ -670,13 +670,12 @@ void CommunicationGraph::printGraphToSTGRecursively(GraphNode* v,
         if (!vNext->isToShow(root))
             continue;
 
-        string this_edges_label = element->getLabel().substr(1, element->getLabel().size());
+        string this_edges_label = element->getLabelWithoutPrefix();
         os << "p" << v->getNumber() << " ";
 
-        if (element->getLabel().substr(0, 1) == "!") {
-            os << "out.";
-        } else if (element->getLabel().substr(0, 1) == "?") {
-            os << "in.";
+        switch (element->getType()) {
+            case SENDING  : os << "out."; break;
+            case RECEIVING: os << "in.";  break;
         }
 
         os << this_edges_label;

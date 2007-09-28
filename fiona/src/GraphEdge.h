@@ -69,6 +69,12 @@ class GraphEdge {
         std::string getLabel() const;
 
         /**
+         * Returns the label of this edge without its prefix denoting whether
+         * it is a sending or receiving edge.
+         */
+        std::string getLabelWithoutPrefix() const;
+
+        /**
          * Returns the type if this edge. (RECEIVING or SENDING)
          */
         GraphEdgeType getType() const;

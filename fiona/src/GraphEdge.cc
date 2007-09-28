@@ -51,6 +51,12 @@ std::string GraphEdge::getLabel() const {
 }
 
 
+std::string GraphEdge::getLabelWithoutPrefix() const {
+    assert(label[0] == '?' || label[0] == '!');
+    return label.substr(1);
+}
+
+
 GraphEdgeType GraphEdge::getType() const {
     assert(label.size() != 0);
     switch (label[0]) {

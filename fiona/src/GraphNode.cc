@@ -171,8 +171,6 @@ GraphNode::GraphNode(const std::string& _name,
 
 /*!
  * \brief destructor
- * \todo figure out why deleting eventsUsed leads to core dumps in some cases
- *       on some machines
  */
 GraphNode::~GraphNode() {
     

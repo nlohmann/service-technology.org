@@ -85,6 +85,10 @@ void GraphFormula::removeLiteral(const std::string&) {
 }
 
 
+void GraphFormula::removeLiteralByHiding(const std::string&) {
+}
+
+
 threeValueLogic GraphFormula::equals() {
 
     if (dynamic_cast<GraphFormulaLiteral*>(this)) {
@@ -333,6 +337,45 @@ void GraphFormulaMultiary::removeLiteral(const std::string& name) {
     }
 
     trace(TRACE_5, "GraphFormulaMultiary::removeLiteral(const std::string& name) : end\n");
+}
+
+
+void GraphFormulaMultiary::removeLiteralByHiding(const std::string& name) {
+
+    trace(TRACE_5, "GraphFormulaMultiary::removeLiteralByHiding(const std::string& name) : start\n");
+
+    subFormulas_t::iterator iCurrentFormula;
+    //cout << "\tanzahl von klauseln: " << subFormulas.size() << endl; int i = 1;
+    //cout << "\tremoving literal " << name << " from clause nr " << i++ << endl;
+
+    for (iCurrentFormula = subFormulas.begin();
+         iCurrentFormula != subFormulas.end();) {
+
+        // if the considered current formula is a literal, then remove it;
+        // call the function recursively, otherwise
+        GraphFormulaLiteral* currentFormula = dynamic_cast<GraphFormulaLiteral*> (*iCurrentFormula);
+        if (currentFormula != NULL) {
+            // the current formula is a literal
+            if (currentFormula->asString() == name) {
+                // the literal has the right name, so remove it
+                delete *iCurrentFormula;
+                iCurrentFormula = subFormulas.erase(iCurrentFormula);
+            } else {
+                iCurrentFormula++;
+            }
+        } else {
+            // the current formula is no literal, so call removeLiteral again
+            (*iCurrentFormula)->removeLiteralByHiding(name);
+            if ((dynamic_cast<GraphFormulaMultiary*>(*iCurrentFormula))->empty()) {
+                delete *iCurrentFormula;
+                iCurrentFormula = subFormulas.erase(iCurrentFormula);
+            } else {
+                iCurrentFormula++;
+            }
+        }
+    }
+
+    trace(TRACE_5, "GraphFormulaMultiary::removeLiteralByHiding(const std::string& name) : end\n");
 }
 
 

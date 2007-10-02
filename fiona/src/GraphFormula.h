@@ -142,6 +142,7 @@ class GraphFormula {
          */
         virtual bool value(const GraphFormulaAssignment& assignment) const = 0;
         virtual void removeLiteral(const std::string&);
+        virtual void removeLiteralByHiding(const std::string&);
         virtual GraphFormula* getDeepCopy() const = 0;
         threeValueLogic equals();
 
@@ -235,6 +236,7 @@ class GraphFormulaMultiary : public GraphFormula {
         void addSubFormula(GraphFormula* subformula);
         iterator removeSubFormula(iterator subformula);
         virtual void removeLiteral(const std::string&);
+        virtual void removeLiteralByHiding(const std::string&);
         void deepCopyMultiaryPrivateMembersToNewFormula(GraphFormulaMultiary* newFormula) const;
 
         /**

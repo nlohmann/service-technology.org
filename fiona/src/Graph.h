@@ -187,8 +187,8 @@ class Graph {
 
         /** 
          * filters the current OG through a given OG in such a way,
-         * that the operand simulates the filtered og; the current OG is created empty
-         * if such a simulation is not possible
+         * that the filtered current OG simulates the opernad og; 
+         * the current OG is created empty if such a simulation is not possible
          * \param rhsOG the operator OG
          */
         void filter(Graph* rhsOG);

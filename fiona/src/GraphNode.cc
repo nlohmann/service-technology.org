@@ -453,6 +453,23 @@ void GraphNode::removeLiteralFromAnnotation(const std::string& literal) {
 
 
 /*!
+ * \brief removes the given literal from this node's annotation
+ *        by absorbing the literal; multiary formulas made empty
+ *        will be removed
+ *
+ * \param literal the literal which is to be removed
+ */
+void GraphNode::removeLiteralFromAnnotationByHiding(const std::string& literal) {
+    trace(TRACE_5, "GraphNode::removeLiteralFromAnnotationByHiding(const string& literal) : start\n");
+   
+    //cout << "remove literal " << literal << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
+    annotation->removeLiteralByHiding(literal);
+   
+    trace(TRACE_5, "GraphNode::removeLiteralFromAnnotationByHiding(const string& literal) : end\n");
+}
+
+
+/*!
  * \brief Removes unneeded literals from the node's annotation. Labels of
  *        edges to red nodes are unneeded.
  */
@@ -801,7 +818,7 @@ void GraphNode::removeEdgesToNode(const GraphNode* nodeToDelete) {
     while (iEdge->hasNext()) {
         GraphEdge* edge = iEdge->getNext();
         if (edge->getDstNode() == nodeToDelete) {
-            removeLiteralFromAnnotation(edge->getLabel());
+            removeLiteralFromAnnotationByHiding(edge->getLabel());
             delete edge;
             iEdge->remove();
         }

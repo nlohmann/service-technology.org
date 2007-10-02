@@ -357,8 +357,8 @@ void Graph::filterRecursive(GraphNode *myNode,
             if (rhsEdge->getType() == RECEIVING) {
                 // if it is an ? event, we allow this communication, but we won't get final again
                 addEdge(myNode->getName(), "_true", rhsEdge->getLabel());
-                myNode->removeLiteralFromAnnotation(rhsEdge->getLabel());
-                rhsNodeAnnotationInCNF->removeLiteral(rhsEdge->getLabel());
+                myNode->removeLiteralFromAnnotationByHiding(rhsEdge->getLabel());
+                // rhsNodeAnnotationInCNF->removeLiteral(rhsEdge->getLabel());
             }
         }
     }
@@ -397,7 +397,7 @@ void Graph::filterRecursive(GraphNode *myNode,
     delete rhsEdgeIter;
 
     // after top down construction of the filter,
-    // we backtrack and make sure the filter remains consist
+    // we backtrack and make sure the filter remains consistent
     trace(TRACE_5, "Graph::filterRecursive: post order creation\n");
     rhsEdgeIter = rhsNode->getLeavingEdgesIterator();
     while (rhsEdgeIter->hasNext()) {
@@ -413,7 +413,7 @@ void Graph::filterRecursive(GraphNode *myNode,
             }
             if (rhsEdge->getType() == RECEIVING) {
                 addEdge(myNode->getName(), "_true", rhsEdge->getLabel());
-                myNode->removeLiteralFromAnnotation(rhsEdge->getLabel());
+                myNode->removeLiteralFromAnnotationByHiding(rhsEdge->getLabel());
             }
         }
     }

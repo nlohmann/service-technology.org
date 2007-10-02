@@ -116,6 +116,8 @@ void print_help() {
   trace("                                     simulation  - check whether the first OG\n");
   trace("                                                   characterizes more strategies\n");
   trace("                                                   than the second one\n");
+  trace("                                     filter      - reduces the first OG to the point that\n");
+  trace("                                                   it simulates the second OG - if possible\n"); 
   trace("                                     equality    - check whether two OGs\n");
   trace("                                                   characterize the same\n");
   trace("                                                   strategies\n");

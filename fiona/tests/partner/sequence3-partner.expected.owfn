@@ -28,7 +28,7 @@ FINALCONDITION
 
 
 TRANSITION a { output }
-  CONSUME p0;
+  CONSUME p2;
   PRODUCE out.a;
 
 TRANSITION b { output }
@@ -36,7 +36,7 @@ TRANSITION b { output }
   PRODUCE out.b;
 
 TRANSITION c { output }
-  CONSUME p2;
+  CONSUME p0;
   PRODUCE out.c;
 
 

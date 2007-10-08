@@ -698,10 +698,26 @@ unsigned int Graph::numberOfServicesRecursively(set<GraphNode*> activeNodes,
         }
     }
 
-    // if none of the active nodes had followers this is a finished service of the OG and thus returns 1
+    // if none of the active nodes had followers this is a finished service of the OG
     if (finalInstance) {
-        eliminateRedundantCounting[activeNodes] = 1;
-        return 1;
+        
+        bool valid = true;
+        
+        // All nodes without followers need to be final for this service to be valid
+        for (set<GraphNode*>::iterator activeNode = activeNodes.begin();
+             activeNode != activeNodes.end(); activeNode++) {
+            if (!((*activeNode)->getAnnotationAsString() == "((final))")) {
+                valid = false;
+            }
+        }
+        
+        if (valid) {
+            eliminateRedundantCounting[activeNodes] = 1;
+            return 1;
+        } else {
+            eliminateRedundantCounting[activeNodes] = 0;
+            return 0;
+        }
     }
 
     // if there were sets of following nodes, create a new instance of active nodes for every tuple of

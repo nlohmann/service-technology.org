@@ -481,8 +481,8 @@ unsigned int Graph::numberOfServices() {
 
     trace(TRACE_5, "Graph::numberOfServices(...): start\n");
 
-    trace(TRACE_1, "Removing false nodes...\n");
-    removeFalseNodes();
+    //trace(TRACE_1, "Removing false nodes...\n");
+    //removeFalseNodes();
 
     if (root == NULL) {
         return 0;
@@ -696,28 +696,27 @@ unsigned int Graph::numberOfServicesRecursively(set<GraphNode*> activeNodes,
                 usingNew = true;
             }
         }
+        else
+        {
+            bool valid = false;
+            for (list<set<GraphNode*> >::iterator combination = validFollowerCombinations[(*activeNode)].begin();
+                 combination != validFollowerCombinations[(*activeNode)].end();
+                 combination++) {
+                if ((*combination).empty()) {
+                    valid = true;
+                }
+            }
+            if(!valid) {
+                eliminateRedundantCounting[activeNodes] = 0;
+                return 0;                
+            }
+        }
     }
 
     // if none of the active nodes had followers this is a finished service of the OG
     if (finalInstance) {
-        
-        bool valid = true;
-        
-        // All nodes without followers need to be final for this service to be valid
-        for (set<GraphNode*>::iterator activeNode = activeNodes.begin();
-             activeNode != activeNodes.end(); activeNode++) {
-            if (!((*activeNode)->getAnnotationAsString() == "((final))")) {
-                valid = false;
-            }
-        }
-        
-        if (valid) {
             eliminateRedundantCounting[activeNodes] = 1;
             return 1;
-        } else {
-            eliminateRedundantCounting[activeNodes] = 0;
-            return 0;
-        }
     }
 
     // if there were sets of following nodes, create a new instance of active nodes for every tuple of
@@ -761,8 +760,14 @@ unsigned int Graph::processAssignmentsRecursively(set<string> labels,
                                                        GraphFormulaAssignment possibleAssignment,
                                                        GraphNode* testNode,
                                                        list<GraphFormulaAssignment>& assignmentList) {
+
     // If there is no outgoing transition, return immediatly
     if (labels.empty()) {
+        possibleAssignment.setToTrue("true");
+        possibleAssignment.setToTrue("final");        
+        if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)) {
+            assignmentList.push_back(possibleAssignment);            
+        }
         return 0;
     }
 

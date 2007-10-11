@@ -481,8 +481,8 @@ unsigned int Graph::numberOfServices() {
 
     trace(TRACE_5, "Graph::numberOfServices(...): start\n");
 
-    //trace(TRACE_1, "Removing false nodes...\n");
-    //removeFalseNodes();
+    trace(TRACE_1, "Removing false nodes...\n");
+    removeFalseNodes();
 
     if (root == NULL) {
         return 0;

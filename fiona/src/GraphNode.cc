@@ -818,7 +818,12 @@ void GraphNode::removeEdgesToNode(const GraphNode* nodeToDelete) {
     while (iEdge->hasNext()) {
         GraphEdge* edge = iEdge->getNext();
         if (edge->getDstNode() == nodeToDelete) {
-            removeLiteralFromAnnotationByHiding(edge->getLabel());
+            // -"ByHiding" does not work in the numberOfServices() function
+            // since an OG without any strategies will become a single root
+            // node with the annotation "true", when calling the 
+            // removeFalseNodes() function beforehand
+            // removeLiteralFromAnnotationByHiding(edge->getLabel());
+            removeLiteralFromAnnotation(edge->getLabel());
             delete edge;
             iEdge->remove();
         }

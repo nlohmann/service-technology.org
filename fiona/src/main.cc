@@ -796,7 +796,7 @@ int main(int argc, char ** argv) {
     if (options[O_EX] || options[O_MATCH] || parameters[P_OG] || parameters[P_IG] ||
         options[O_PNG]) {
 
-        if (options[O_EX] == true) {
+        if (options[O_EX]) {
             // checking exchangeability using BDDs
             checkExchangeability();
             return 0;

@@ -530,14 +530,14 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
-    if (options[O_EX] == true && netfiles.size() != 2) {
+    if (options[O_EX] && netfiles.size() != 2) {
         cerr << "Error: \t If option '-t equivalence' is used, exactly two oWFNs must be entered\n" << endl;
         cerr << "       \t and their BDDs must have been computed before." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
 
-    if (options[O_PNG] == true && netfiles.size() == 0) {
+    if ((options[O_PNG]||parameters[P_IG]||parameters[P_OG]) && netfiles.size() == 0) {
         cerr << "Error: \t No oWFNs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);

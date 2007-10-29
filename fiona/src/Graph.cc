@@ -428,7 +428,7 @@ void Graph::filterRecursive(GraphNode *myNode,
 bool Graph::isAcyclic() {
     trace(TRACE_5, "Graph::isAcyclic(...): start\n");
 
-    // Define a set vor every Node, that will contain all transitive parent nodes
+    // Define a set for every Node, that will contain all transitive parent nodes
     map<GraphNode*, set<GraphNode*> > parentNodes;
 
     // Define a queue for all nodes that still need to be tested and initialize it

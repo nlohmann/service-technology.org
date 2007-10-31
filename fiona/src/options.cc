@@ -28,7 +28,7 @@
  * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitt zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -85,11 +85,16 @@ static struct option longopts[] = {
     { "OnTheFly",        required_argument, NULL, 'B' },
     { "output",          required_argument, NULL, 'o' },
     { "no-output",       no_argument,       NULL, 'Q' },
+// CODE FROM PL
+    { "multipledeadlocks", no_argument,     NULL, 'M' },
+// END OF CODE FROM PL  
     { NULL,              0,                 NULL, 0   }
 };
 
-
-const char* par_string = "hvd:t:s:p:Rrm:e:b:B:o:Q";
+// CODE FROM PL
+// slightly modified
+const char* par_string = "hvd:t:s:p:Rrm:e:b:B:o:Q:M";
+// END OF CODE FROM PL
 
 
 // --------------------- functions for command line evaluation ------------------------
@@ -131,6 +136,10 @@ void print_help() {
   trace("                                                   given OG\n");  
   trace("                                     png         - generate png files from all\n");
   trace("                                                   given of oWFNs\n");  
+// CODE FROM PL
+  trace("                                     PV - calculate the Public View Service\n");
+  trace("                                          Automaton for a given OG\n");
+// END OF CODE FROM PL
   trace(" -m | --messagemaximum=<level> ... set maximum number of same messages per\n");
   trace("                                   state to <level>\n");
   trace("                                   (default is 1)\n");
@@ -186,6 +195,11 @@ void print_help() {
   trace(" -Q | --no-output ................ runs quietly, i.e., produces no output files\n");
   trace(" -p | --parameter=<param>          additional parameter <param>\n");
   trace("                                    no-png - does not create a PNG file");
+// CODE FROM PL
+  trace(" -M | --multipledeadlocks ........ create multiple deadlocks when constructing\n");
+  trace("                                   the Public View Service Automaton\n");
+  trace("                                   (only relevant in PV mode -tPV)\n");  
+// END OF CODE FROM PL
   trace("\n");
   trace("\n");
   trace("For more information see:\n");
@@ -258,6 +272,9 @@ void parse_command_line(int argc, char* argv[]) {
 
     options[O_MESSAGES_MAX] = true;
     options[O_EVENT_USE_MAX] = false;
+// CODE FROM PL
+	options[O_PV_MULTIPLE_DEADLOCKS] = false;
+// END OF CODE FROM PL    
 
     // initialize parameters
     parameters[P_IG] = true;
@@ -268,6 +285,9 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_SHOW_EMPTY_NODE] = false;
     parameters[P_SHOW_STATES_PER_NODE] = false;
     parameters[P_SHOW_DEADLOCKS_PER_NODE] = false;
+// CODE FROM PL
+	parameters[P_PV] = false;
+// END OF CODE FROM PL    
 
     bdd_reordermethod = 0;
 
@@ -376,6 +396,11 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_SHOW_EMPTY_NODE] = true;
                     parameters[P_SHOW_NO_RED_NODES] = false;
                     parameters[P_SHOW_BLUE_NODES_ONLY] = false;
+// CODE FROM PL
+                } else if ((lc_optarg == "pv") || (lc_optarg == "publicview")) {
+                	parameters[P_PV] = true;
+                	parameters[P_IG] = false;
+// END OF CODE FROM PL
                 } else {
                     cerr << "Error:\twrong modus operandi (option -t)" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
@@ -492,6 +517,11 @@ void parse_command_line(int argc, char* argv[]) {
             case 'Q':
                 options[O_NOOUTPUTFILES] = true;
                 break;
+// CODE FROM PL
+			case 'M':
+				options[O_PV_MULTIPLE_DEADLOCKS] = true;
+				break;
+// END OF CODE FROM PL
             case '?':
                 cerr << "Error:\toption error" << endl
                      << "\tEnter \"fiona --help\" for more information.\n"
@@ -583,6 +613,20 @@ void parse_command_line(int argc, char* argv[]) {
         cerr << "Warning: \t computing IG -- BDD option ignored\n" << endl;
         options[O_BDD] = false;
     }
+
+// CODE FROM PL
+	if (ogfiles.size() == 0 && parameters[P_PV]) {
+		cerr << "Error:\tNo OG given. Public View Service Automaton cannot be generated." << endl
+		     << "\tCalculate the OG of your service/oWFN first." << endl
+             << "\tEnter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
+	}
+	
+	if (!parameters[P_PV] && options[O_PV_MULTIPLE_DEADLOCKS]) {
+		cerr << "not computing Public View Service Automaton - multiple deadlocks option ignored\n" << endl;
+		options[O_PV_MULTIPLE_DEADLOCKS] = false;
+	}
+// END OF CODE FROM PL
 }
 
 

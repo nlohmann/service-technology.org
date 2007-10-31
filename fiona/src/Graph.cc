@@ -27,7 +27,7 @@
  * \author  responsible: Jan Bretschneider <bretschn@informatik.hu-berlin.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitt zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -78,8 +78,8 @@ GraphNode* Graph::addNode(const std::string& nodeName,
 
 
 void Graph::addEdge(const std::string& srcName,
-                               const std::string& dstNodeName,
-                               const std::string& label) {
+                    const std::string& dstNodeName,
+                    const std::string& label) {
 
     GraphNode* src = getNodeWithName(srcName);
     GraphNode* dstNode = getNodeWithName(dstNodeName);
@@ -1150,3 +1150,268 @@ void Graph::printOGFile(const std::string& filenamePrefix) const {
 std::string Graph::addOGFileSuffix(const std::string& filePrefix) {
     return filePrefix + ".og";
 }
+
+
+// CODE FROM PL
+//! \brief removes a node from the Graph
+//! \param node node to remove
+void Graph::removeNode(GraphNode* node) {
+	assert(node);
+	setOfNodes.erase(node);
+}
+
+
+//! \brief removes all nodes annotated with true and all their incoming/outgoing transitions
+void Graph::removeNodesAnnotatedWithTrue() {
+	// iterate over all nodes of the Graph
+	for (nodes_iterator node_iter = setOfNodes.begin();
+			node_iter != setOfNodes.end(); ++node_iter) {
+		GraphNode* currNode = *node_iter;
+		// check whether node is annotated with true
+		if (currNode->getAnnotationAsString() == GraphFormulaLiteral::TRUE) {
+			// node is annotated with true
+			// remove node and all its incoming/outgoing transitions
+			removeEdgesToNodeFromAllOtherNodes(currNode);
+			removeNode(currNode);
+			trace(TRACE_5, "removed node " + currNode->getName() + " (annotation: " +
+				currNode->getAnnotationAsString() + ")\n");
+			delete currNode;
+		}
+	}
+}	
+
+//! \brief constructs the dual service by toggling all event types of the underlying graph 
+//	(SIDE-EFFECT: stores all events into sets by type)
+//! \complexity O(n+m), with n nodes and m edges in the given Graph
+void Graph::constructDualService() {
+	// iterate over all nodes of the Graph
+	for (nodes_iterator node_iter = setOfNodes.begin();
+			node_iter != setOfNodes.end(); ++node_iter) {
+		GraphNode* currNode = *node_iter;
+		// iterate over all leaving edges of the current node
+		GraphNode::LeavingEdges::Iterator edge_iter = currNode->getLeavingEdgesIterator();
+    	while (edge_iter->hasNext()) {
+			GraphEdge* currEdge = edge_iter->getNext();
+			// toggle event type of the current edge
+			currEdge->toggleType();
+			// store event in the corresponding event set
+			switch (currEdge->getType()) {
+				case SENDING:
+					sendEvents.insert(currEdge->getLabel());
+					break;
+				case RECEIVING:
+					recvEvents.insert(currEdge->getLabel());
+					break;
+				case INTERNAL:
+					// do nothing
+					break;
+				default:
+					// should never be reached
+					trace(TRACE_0, "discovered an event with unknown type (label was " +
+						currEdge->getLabel() + ")\n");
+					// do nothing
+					break;
+			}
+		}
+		delete edge_iter;
+    }
+}
+
+//! \brief applies 1st and 2nd fix to dual service in order to obtain a correct result
+//! \complexity O(n*2i*o+m), with n nodes, m edges, i input and o output events
+void Graph::fixDualService() {
+	// prepare deadlock creation
+	GraphNode* deadlock = NULL;
+	map<std::string, GraphNode*> deadlockMap;
+	unsigned int currNumberOfDeadlocks = 0;
+	if (! options[O_PV_MULTIPLE_DEADLOCKS]) {
+		// create new deadlock node
+		deadlock = new GraphNode("deadlock", new GraphFormulaFixed(false, ""), RED);
+	}
+	
+	// iterate over all nodes of the Graph
+	for (nodes_iterator node_iter = setOfNodes.begin();
+			node_iter != setOfNodes.end(); ++node_iter) {
+		GraphNode* currNode = *node_iter;
+
+		// 1st fix: if !a is disabled in q of OG, add ?a->Deadlock in q of dual service
+		// preparation: assume all receive events are disabled in current node (dual service)
+		set<std::string> disabledRecvEvents = recvEvents; 
+
+		// 2nd fix: if ?z is enabled in q of OG, but ?z does not occur in the
+		//	annotation of q create a new node without ?z and a tau-transition
+		// preparation: assume we don't have to apply the 2nd fix in current node
+		bool apply2ndFix = false;
+		// preparation: we need to store the leaving edges for the new node somewhere
+		set<GraphEdge*> newNodesEdges;
+		GraphNode::LeavingEdges::Iterator edge_iter = currNode->getLeavingEdgesIterator();
+    	while (edge_iter->hasNext()) {
+			newNodesEdges.insert(edge_iter->getNext());
+    	}
+    	delete edge_iter;
+		
+		// preparation: we need to know whether the current node has outgoing
+		//   sending transitions, when deciding if it's a final node of the PVSA
+		bool hasSendingTransitions = false;
+
+		// iterate over all leaving edges of the current node
+		edge_iter = currNode->getLeavingEdgesIterator();
+    	while (edge_iter->hasNext()) {
+            GraphEdge* currEdge = edge_iter->getNext();
+			std::string currLabel = currEdge->getLabel();
+			std::string currAnnotation = currNode->getAnnotationAsString();
+			// act on transition type
+			switch (currEdge->getType()) {
+				case RECEIVING:
+					// current edge represents a receive event
+					// erase this event from the set of disabled receive events
+					disabledRecvEvents.erase(currLabel);
+					break;
+				case SENDING:
+					// current edge represents a send event
+					// we want to look for the current edge's label in the current node's
+					// annotation, so we have to toggle the edge type temporarily
+					currLabel[0] = '?';
+					// check whether the current edge's label occurs in the annotation
+					if (currAnnotation.find(currLabel) == std::string::npos) {
+						// current edge's label does not occur in the annotation
+						// we have to apply the 2nd fix at this node
+						apply2ndFix = true;
+						trace(TRACE_5, "need to apply 2nd fix at node " + currNode->getName() + "\n");
+						trace(TRACE_5, "transition " + currLabel + " does not occur in annotation!\n");
+						// erase current transition from the set of transitions of the new node
+						newNodesEdges.erase(currEdge);
+					}
+					// set the flag for outgoing sending transitions
+					hasSendingTransitions = true;
+					break;
+				default:
+					// type is either INTERNAL or unknown
+					// do nothing
+					break;
+			}
+		}
+		delete edge_iter;
+		
+		// iterate over all disabled receive events
+		// if 1st fix needs to be applied, the set of disabled receive events is not empty
+		for (set<std::string>::iterator event_iter = disabledRecvEvents.begin();
+				event_iter != disabledRecvEvents.end(); ++event_iter) {
+			if (options[O_PV_MULTIPLE_DEADLOCKS]) {
+				// O_PV_MULTIPLE_DEADLOCKS is set
+				// try to read deadlock node from the mapping event->node
+				deadlock = deadlockMap[*event_iter];
+				// check whether the deadlock node could be determined
+				if (deadlock == NULL) {
+					// deadlock node could not be determined
+					// create new deadlock node
+					deadlock = new GraphNode("deadlock" + 
+						intToString(currNumberOfDeadlocks++),	
+						new GraphFormulaFixed(false, ""), RED);
+					deadlockMap[*event_iter] = deadlock;
+				}
+			}
+			// create new leaving edge from current node to the deadlock node
+			//   labeled with current event
+			GraphEdge* disabledEvent = new GraphEdge(deadlock, *event_iter);
+			currNode->addLeavingEdge(disabledEvent);
+		}
+		
+		// check whether the 2nd fix needs to be applied at this node
+		if (apply2ndFix) {
+			// 2nd fix needs to be applied at this node
+			trace(TRACE_5, "applying 2nd fix at node " + currNode->getName() + "\n");
+			// create new node
+			// as there exists a leaving edge representing a send event in currNode,
+			//   currNode cannot be annotated with final (same goes for newNode)
+			GraphNode* newNode = new GraphNode(currNode->getName() + "_",
+				new GraphFormulaFixed(true, ""), currNode->getColor());
+			trace(TRACE_5, "created new node " + newNode->getName() + "\n");
+			// create tau transition from current to new node
+			GraphEdge* tauTransition = new GraphEdge(newNode, GraphFormulaLiteral::TAU);
+			currNode->addLeavingEdge(tauTransition);
+			trace(TRACE_5, "created tau transition from " + currNode->getName() +
+				" to " + newNode->getName() + "\n");
+
+			// add current node's leaving edges to new node 
+			//   except those that don't occur in the annotation
+			trace(TRACE_5, "adding leaving edges to new node\n");
+	    	for (set<GraphEdge*>::iterator edge_iter = newNodesEdges.begin();
+			        edge_iter != newNodesEdges.end(); ++edge_iter) {
+				// create new leaving edge
+				GraphEdge* newEdge = new GraphEdge((*edge_iter)->getDstNode(), 
+					(*edge_iter)->getLabel());
+				newNode->addLeavingEdge(newEdge);
+				trace(TRACE_5, "\tadding edge " + newEdge->getLabel() + 
+					" from " + newNode->getName() + " to " +
+					newEdge->getDstNode()->getName() + "\n");
+			}
+			// add disabled receive events from 1st fix to new node
+			for (set<std::string>::iterator event_iter = disabledRecvEvents.begin();
+					event_iter != disabledRecvEvents.end(); ++event_iter) {
+				if (options[O_PV_MULTIPLE_DEADLOCKS]) {
+					// O_PV_MULTIPLE_DEADLOCKS is set
+					// try to read deadlock node from the mapping event->node
+					deadlock = deadlockMap[*event_iter];
+					// deadlock node should have been created already by 1st fix
+					assert(deadlock);
+				}
+				// create new edge from new node to the deadlock node
+				//   labeled with current event
+				GraphEdge* disabledEvent = new GraphEdge(deadlock, *event_iter);
+				newNode->addLeavingEdge(disabledEvent);
+				trace(TRACE_5, "\tadding edge " + disabledEvent->getLabel() + 
+					" from " + newNode->getName() + " to " + deadlock->getName() + "\n");
+			}
+			
+			trace(TRACE_5, "successfully applied 2nd fix at node " + currNode->getName() + "\n");
+		}
+
+		// check whether the current node is annotated with final
+		string::size_type loc = 
+			(currNode->getAnnotationAsString()).find(
+				GraphFormulaLiteral::FINAL, 0);
+		if ((loc != string::npos) && !hasSendingTransitions) {
+			// current node is annotated with final and has no sending transitions
+			// reduce annotation to final only (mark final state of the automaton)
+
+            GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
+            myclause->addSubFormula(new GraphFormulaLiteralFinal());
+		    currNode->setAnnotation(new GraphFormulaCNF(myclause));
+		} else {
+			// current node is not annotated with final or has sending transitions
+			// remove annotation of the current node
+            GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
+            myclause->addSubFormula(new GraphFormulaFixed(true, GraphFormulaLiteral::TRUE));
+//            myclause->addSubFormula(new GraphFormulaFixed(true, ""));
+            currNode->setAnnotation(new GraphFormulaCNF(myclause));
+		}
+    }
+
+    // add deadlocks to the node set of the SA
+	if (! options[O_PV_MULTIPLE_DEADLOCKS]) {
+		this->addNode(deadlock);
+	} else {
+		map<std::string, GraphNode*>::iterator deadlockIter;
+		for (deadlockIter = deadlockMap.begin(); deadlockIter != deadlockMap.end();
+				++deadlockIter) {
+			this->addNode(deadlockIter->second);
+		}
+	}
+}
+
+void Graph::transformToPublicView() {
+	removeNodesAnnotatedWithTrue();
+	constructDualService();
+	fixDualService();
+
+	trace(TRACE_0, "PVSA statistics: \n");
+	trace(TRACE_0, "  nodes: " + intToString(setOfNodes.size()) + "\n");
+	unsigned int edges = 0;
+	for (nodes_iterator nodeIter = setOfNodes.begin(); 
+			nodeIter != setOfNodes.end(); ++nodeIter) {
+		edges += (*nodeIter)->getLeavingEdgesCount();
+	}
+	trace(TRACE_0, "  edges: " + intToString(edges) + "\n"); 
+}
+// END OF CODE FROM PL

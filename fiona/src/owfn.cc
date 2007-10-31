@@ -1801,7 +1801,7 @@ bool oWFN::matchesWithOGRecursive(GraphNode* currentOGNode,
             // just fired in the oWFN.
             currentOGNode = currentOGNode->followEdgeWithLabel(transition->getLabelForMatching());
         } else {
-            // if net makes a silent step, the OG node stays unchanged
+            // if net just made a silent step, the OG node stays unchanged
             // so do nothing.
         }
 
@@ -1897,7 +1897,7 @@ bool oWFN::matchesWithOGRecursive(GraphNode* currentOGNode,
     // checking the annotation because it is satisfied for sure.
     if (!currentState->hasLeavingTauTransitionForMatching()) {
         GraphFormulaAssignment
-                assignment =makeAssignmentForOGMatchingForState(currentState);
+                assignment = makeAssignmentForOGMatchingForState(currentState);
 
         if (!currentOGNode->assignmentSatisfiesAnnotation(assignment)) {
             // Clean up the temporary copy of the former CurrentMarking

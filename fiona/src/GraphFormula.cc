@@ -462,7 +462,7 @@ GraphFormulaMultiaryAnd* GraphFormulaMultiaryAnd::merge() {
 
 
 GraphFormulaMultiaryAnd* GraphFormulaMultiaryAnd::getDeepCopy() const {
-    GraphFormulaMultiaryAnd* newFormula =new GraphFormulaMultiaryAnd(*this);
+    GraphFormulaMultiaryAnd* newFormula = new GraphFormulaMultiaryAnd(*this);
 
     deepCopyMultiaryPrivateMembersToNewFormula(newFormula);
 

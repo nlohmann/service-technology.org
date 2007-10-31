@@ -27,7 +27,7 @@
  * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitt zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -283,6 +283,20 @@ bool GraphNode::isRed() const {
 GraphFormulaCNF* GraphNode::getAnnotation() const {
     return annotation;
 }
+
+// CODE FROM PL
+/*!
+ * \brief sets the annotation of this node
+ * 
+ * \param newAnnotation annotation of the node
+ */ 
+void GraphNode::setAnnotation(GraphFormulaCNF* newAnnotation) {
+	if (annotation != NULL) {
+		delete annotation;
+	}
+	annotation = newAnnotation;
+}
+// END OF CODE FROM PL
 
 
 /*!

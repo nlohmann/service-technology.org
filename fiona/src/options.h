@@ -28,7 +28,7 @@
  * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitt zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -69,12 +69,18 @@ typedef enum {
     O_CHECK_ACYCLIC,
     O_PNG,
     O_DIAGNOSIS //!< diagnosis information
+// CODE FROM PL
+    , O_PV_MULTIPLE_DEADLOCKS
+// END OF CODE FROM PL
 } possibleOptions;
 
 
 typedef enum {
     P_IG, //!< compute IG  
     P_OG, //!< compute OG
+// CODE FROM PL
+	P_PV,                         //!< compute Public View Service Automaton
+// END OF CODE FROM PL    
     P_SHOW_ALL_NODES, //!< show red and blue nodes
     P_SHOW_BLUE_NODES_ONLY, //!< show blue nodes only (empty node not shown though) 
     P_SHOW_NO_RED_NODES, //!< show all blue nodes (including empty node)

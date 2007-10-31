@@ -27,7 +27,7 @@
  * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitt zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -196,6 +196,11 @@ class GraphNode {
 
         /// get the annotation
         GraphFormulaCNF* getAnnotation() const;
+
+// CODE FROM PL
+        /// set the annotation
+        void setAnnotation(GraphFormulaCNF*);
+// END OF CODE FROM PL
 
         /// get the annotation as a string
         std::string getAnnotationAsString() const;

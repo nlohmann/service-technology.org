@@ -27,7 +27,7 @@
  * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitt zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -41,7 +41,7 @@
 #include <cassert>
 
 //! Possible types of a GraphEdge.
-enum GraphEdgeType {SENDING, RECEIVING};
+enum GraphEdgeType {SENDING, RECEIVING, SILENT};
 
 class GraphNode;
 
@@ -75,9 +75,16 @@ class GraphEdge {
         std::string getLabelWithoutPrefix() const;
 
         /**
-         * Returns the type if this edge. (RECEIVING or SENDING)
+         * Returns the type if this edge. (RECEIVING or SENDING or SILENT)
          */
         GraphEdgeType getType() const;
+
+// CODE FROM PL
+        /**
+         * Switches the type of this edge between RECEIVING and SENDING 
+         */
+        void toggleType();
+// END OF CODE FROM PL
 
         /**
          * Returns the node this edge points to.

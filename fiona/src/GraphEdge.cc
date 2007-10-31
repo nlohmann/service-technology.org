@@ -27,7 +27,7 @@
  * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitt zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -59,18 +59,44 @@ std::string GraphEdge::getLabelWithoutPrefix() const {
 
 GraphEdgeType GraphEdge::getType() const {
     assert(label.size() != 0);
-    switch (label[0]) {
-        case '?':
-            return RECEIVING;
-        case '!':
-            return SENDING;
-        default:
-            // This should never happen.
-            assert(false);
-            throw new std::invalid_argument("Cannot determine type of this GraphEdge with label '" + label + "'.");
+// CODE FROM PL
+    if (label == GraphFormulaLiteral::TAU) {
+    	return SILENT;
+    } else {
+// END OF CODE FROM PL
+	    switch (label[0]) {
+	        case '?':
+	            return RECEIVING;
+	        case '!':
+	            return SENDING;
+	        default:
+	            // This should never happen.
+	            assert(false);
+	            throw new std::invalid_argument("Cannot determine type of this GraphEdge with label '" + label + "'.");
+	    }
+// CODE FROM PL
     }
+// END OF CODE FROM PL
 }
 
+// CODE FROM PL
+void GraphEdge::toggleType() {
+	switch (this->getType()) {
+		case RECEIVING:
+			// switch to SENDING by relabeling
+			label[0] = '!';
+			break;
+		case SENDING:
+			// switch to RECEIVING by relabeling
+			label[0] = '?';
+			break;
+		default:
+			// type is either SILENT or unknown
+			// transitions of this type cannot be toggled
+			break;
+	}
+}
+// END OF CODE FROM PL
 
 GraphNode* GraphEdge::getDstNode() const {
     return dstNode;

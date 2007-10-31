@@ -26,7 +26,7 @@
  * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitt zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -676,6 +676,26 @@ void checkAcyclicity(Graph* OG, string graphName) {
 }
 
 
+// CODE FROM PL
+// ------------- Public View Generation -----------------------
+void generatePublicView(const Graph::ogs_t& OGsFromFiles) {	
+	Graph* OG = *(OGsFromFiles.begin());
+	trace(TRACE_0, "generating the Public View Service Automaton...\n");
+	OG->transformToPublicView();
+
+    if (!options[O_OUTFILEPREFIX]) {
+        outfilePrefix = Graph::stripOGFileSuffix(*(ogfiles.begin()));
+        outfilePrefix += ".pvsa";
+    }
+
+	trace(TRACE_0, "generating dot output...\n");
+	OG->printDotFile(outfilePrefix, "Public View Service Automaton of " + 
+		Graph::stripOGFileSuffix(*(ogfiles.begin())));		
+}
+// END OF CODE FROM PL    
+
+
+
 // **********************************************************************************
 // ********                   MAIN                                           ********
 // **********************************************************************************
@@ -707,7 +727,7 @@ int main(int argc, char ** argv) {
     // start OG file dependant operations
 
     if (options[O_MATCH] || options[O_PRODUCTOG] || options[O_SIMULATES]
-        || options[O_EQUALS] || options[O_FILTER]) {
+        || options[O_EQUALS] || options[O_FILTER] || parameters[P_PV]) {
 
         // reading all OG-files
         Graph::ogs_t OGsFromFiles;
@@ -748,7 +768,16 @@ int main(int argc, char ** argv) {
             // filtration on OG
             createFiltered(OGsFromFiles);
             return 0;
+
         }
+        
+        // CODE FROM PL
+        if (parameters[P_PV]) {
+            generatePublicView(OGsFromFiles);
+            deleteOGs(OGsFromFiles);
+            return 0;
+        }
+        // END OF CODE FROM PL
     }
 
     if (options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC]) {

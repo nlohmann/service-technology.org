@@ -31,7 +31,7 @@
  * \author  responsible: Jan Bretschneider <bretschn@informatik.hu-berlin.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitt zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -97,6 +97,16 @@ class Graph {
         void filterRecursive(GraphNode* myNode,
                              GraphNode* rhsNode,
                              set<GraphNode*>* VisitedNodes);
+
+// CODE FROM PL
+        set<std::string> sendEvents;
+        set<std::string> recvEvents;
+	
+        void removeNode(GraphNode*);
+        void removeNodesAnnotatedWithTrue();
+        void constructDualService();
+        void fixDualService();
+// END OF CODE FROM PL
 
     public:
 
@@ -214,6 +224,10 @@ class Graph {
 
         // A function needed for successful deletion of the graph
         void clearNodeSet();
+
+// CODE FROM PL
+        void transformToPublicView();
+// END OF CODE FROM PL
 
 };
 

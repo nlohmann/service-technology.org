@@ -199,3 +199,4 @@ int og_yyerror(const char* msg) {
 
     return yyerror(msg, og_yylineno, og_yytext, ogfileToParse.c_str());
 }
+

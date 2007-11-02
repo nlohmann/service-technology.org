@@ -1157,7 +1157,15 @@ std::string Graph::addOGFileSuffix(const std::string& filePrefix) {
 //! \param node node to remove
 void Graph::removeNode(GraphNode* node) {
 	assert(node);
-	setOfNodes.erase(node);
+	//setOfNodes.erase(node);
+	
+    for(vector<GraphNode*>::iterator testnode = setOfNodes.begin(); testnode != setOfNodes.end(); testnode++) {
+	    if ((*testnode) == node) {
+	       setOfNodes.erase(testnode);
+	       break;
+        }
+	}
+	
 }
 
 

@@ -93,7 +93,7 @@ static struct option longopts[] = {
 
 // CODE FROM PL
 // slightly modified
-const char* par_string = "hvd:t:s:p:Rrm:e:b:B:o:Q:M";
+const char* par_string = "hvd:t:s:p:Rrm:e:b:B:o:QM";
 // END OF CODE FROM PL
 
 

@@ -123,11 +123,8 @@ void print_help() {
   trace("                                                   than the second one\n");
   trace("                                     filter      - reduces the first OG to the point that\n");
   trace("                                                   it simulates the second OG - if possible\n"); 
-  trace("                                     equality    - check whether two OGs\n");
-  trace("                                                   characterize the same\n");
-  trace("                                                   strategies\n");
   trace("                                     equivalence - check whether two OGs (given\n");
-  trace("                                                   as BDDs) are equivalent\n");
+  trace("                                                   as BDDs or OG-/oWFN-files) are equivalent\n");
   trace("                                     productog   - calculate the product OG of\n");
   trace("                                                   all given OGs\n");
   trace("                                     isacyclic   - check a given OG for cycles\n");
@@ -263,7 +260,7 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_MATCH] = false;
     options[O_PRODUCTOG] = false;
     options[O_SIMULATES] = false;
-    options[O_EQUALS] = false;
+//    options[O_EQUALS] = false;
     options[O_FILTER] = false;
     options[O_OUTFILEPREFIX] = false;
     options[O_NOOUTPUTFILES] = false;
@@ -359,15 +356,11 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if (lc_optarg == "simulation") {
                     options[O_SIMULATES] = true;
                     parameters[P_IG] = false;
-                } else if (lc_optarg == "equality") {
-                    // using simulation in both directions
-                    options[O_EQUALS] = true;
-                    parameters[P_IG] = false;
                 } else if (lc_optarg == "filter") {
                     options[O_FILTER] = true;
                     parameters[P_IG] = false; 
                 } else if (lc_optarg == "equivalence") {
-                    // using BDDs
+                    // using BDDs or OGs/oWFNs
                     options[O_EX] = true;
                     options[O_GRAPH_TYPE] = false;
                     parameters[P_IG] = false;
@@ -552,17 +545,18 @@ void parse_command_line(int argc, char* argv[]) {
         }
     }
 
-
     // check if the numbers of inputfiles corresponds to the chosen mode
     if (ogfiles.size() == 0 && netfiles.size() == 0) {
         cerr << "Error: \t No oWFNs or OGs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
-
-    if (options[O_EX] && netfiles.size() != 2) {
-        cerr << "Error: \t If option '-t equivalence' is used, exactly two oWFNs must be entered\n" << endl;
-        cerr << "       \t and their BDDs must have been computed before." << endl;
+    
+    if (options[O_EX] && (((netfiles.size() + ogfiles.size()) != 2)
+                          || (options[O_BDD] && netfiles.size() != 2))) {
+        cerr << "Error: \t If option '-t equivalence' is used, either two OG-/oWFN-files must be" << endl;
+        cerr << "       \t given or (in case of BDD-equivalence) exactly two oWFNs have to be" << endl;
+        cerr << "       \t entered and their BDDs must have been computed before." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
@@ -587,12 +581,6 @@ void parse_command_line(int argc, char* argv[]) {
 
     if (options[O_SIMULATES] && ogfiles.size() != 2) {
         cerr << "Error: \t If option -t simulation is used, exactly two OG files must be entered\n" << endl;
-        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
-    }
-
-    if (options[O_EQUALS] && ogfiles.size() != 2) {
-        cerr << "Error: \t If option -t equals is used, exactly two OG files must be entered\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }

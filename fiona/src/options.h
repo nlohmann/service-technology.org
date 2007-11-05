@@ -59,7 +59,6 @@ typedef enum {
     O_MATCH,
     O_PRODUCTOG,
     O_SIMULATES,
-    O_EQUALS,
     O_FILTER,
     O_OUTFILEPREFIX,
     O_NOOUTPUTFILES, // produce no output files

@@ -235,7 +235,7 @@ fi
 og1="$DIR/compact.og"
 og2="$DIR/coarse.og"
 
-cmd="$FIONA ${og1} ${og2} -t equality"
+cmd="$FIONA ${og1} ${og2} -t equivalence"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og1.3.memcheck.log"
@@ -257,7 +257,7 @@ fi
 og1="$DIR/coarse.og"
 og2="$DIR/coarse-chopped.og"
 
-cmd="$FIONA ${og1} ${og2} -t equality"
+cmd="$FIONA ${og1} ${og2} -t equivalence"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og1.3.memcheck.log"
@@ -279,7 +279,7 @@ fi
 og1="$DIR/compact.og"
 og2="$DIR/coarse-chopped.og"
 
-cmd="$FIONA ${og1} ${og2} -t equality"
+cmd="$FIONA ${og1} ${og2} -t equivalence"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og1.4.memcheck.log"

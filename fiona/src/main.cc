@@ -727,7 +727,7 @@ int main(int argc, char ** argv) {
     // start OG file dependant operations
 
     if (options[O_MATCH] || options[O_PRODUCTOG] || options[O_SIMULATES]
-        || options[O_EQUALS] || options[O_FILTER] || parameters[P_PV]) {
+        || (options[O_EX] && !options[O_BDD]) || options[O_FILTER] || parameters[P_PV]) {
 
         // reading all OG-files
         Graph::ogs_t OGsFromFiles;
@@ -759,8 +759,74 @@ int main(int argc, char ** argv) {
             return 0;
         }
 
-        if (options[O_EQUALS]) {
+        if (options[O_EX]) {
             // equivalence on Graph
+            // While we don't have enough OGs, compute some from the given
+            // netfiles.
+            while (OGsFromFiles.size() < 2) {
+                // save state of some parameters
+                bool tempO_SHOW_NODES = options[O_SHOW_NODES];
+                bool tempP_SHOW_EMPTY_NODE = parameters[P_SHOW_EMPTY_NODE];
+                // now adjust them to compute the correct OG
+                options[O_SHOW_NODES] = true;
+                parameters[P_SHOW_EMPTY_NODE] = true;
+                
+                list<std::string>::iterator netiter = netfiles.begin();
+                
+                numberOfEvents = 0;
+                numberOfDecodes = 0;
+                garbagefound = 0;
+                global_progress = 0;
+                show_progress = 0;
+                State::state_count = 0; // number of states
+                numberDeletedVertices = 0;
+                
+                currentowfnfile = *netiter;
+                assert(currentowfnfile != "");
+                
+                // prepare getting the net
+                PlaceTable = new SymbolTab<PlSymbol>;
+                
+                // get the net
+                readnet(currentowfnfile);
+                delete PlaceTable;
+                
+                trace(TRACE_0, "=================================================================\n");
+                trace(TRACE_0, "processing net " + currentowfnfile + "\n");
+                
+                // report the net
+                trace(TRACE_0, "    places: " + intToString(PN->getPlaceCount()));
+                trace(TRACE_0, " (including "
+                      + intToString(PN->getInputPlaceCount()) + " input places, "
+                      + intToString(PN->getOutputPlaceCount())
+                      + " output places)\n");
+                trace(TRACE_0, "    transitions: "
+                      + intToString(PN->getTransitionCount()) + "\n");
+                trace(TRACE_0, "    ports: " + intToString(PN->getPortCount())
+                      + "\n\n");
+                if (PN->FinalCondition) {
+                    trace(TRACE_0, "finalcondition used\n\n");
+                } else if (PN->FinalMarking) {
+                    trace(TRACE_0, "finalmarking used\n\n");
+                } else {
+                    trace(TRACE_0, "neither finalcondition nor finalmarking given\n");
+                }
+                
+                // compute OG
+                OG* graph = new OG(PN);
+                trace(TRACE_0, "building the operating guideline...\n");
+                graph->printProgressFirst();
+                graph->buildGraph(); // build operating guideline
+                trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
+                
+                // restore state of parameters
+                options[O_SHOW_NODES] = tempO_SHOW_NODES;
+                parameters[P_SHOW_EMPTY_NODE] = tempP_SHOW_EMPTY_NODE;
+                
+                OGsFromFiles.push_back(graph);
+                delete graph;
+            }
+            
             checkEquality(OGsFromFiles);
             trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
             trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
@@ -826,7 +892,7 @@ int main(int argc, char ** argv) {
     // **********************************************************************************
     // start petrinet-file dependant operations
 
-    if (options[O_EX] || options[O_MATCH] || parameters[P_OG] || parameters[P_IG] ||
+    if ((options[O_EX] && options[O_BDD]) || options[O_MATCH] || parameters[P_OG] || parameters[P_IG] ||
         options[O_PNG]) {
 
         if (options[O_EX]) {

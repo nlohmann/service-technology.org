@@ -140,9 +140,10 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
         trace(TRACE_2, key->getLabelForCommGraph() + "\n");
 
         if (key->max_occurence < 0 || 
-            (key->getType() == INPUT && key->max_occurence > currentNode->eventsUsed[PN->getInputPlaceIndex(key)]) || 
-            (key->getType() == OUTPUT && key->max_occurence > currentNode->eventsUsed[PN->getOutputPlaceIndex(key) 
-             + PN->getInputPlaceCount()])) {
+            (key->getType() == INPUT &&
+             key->max_occurence > currentNode->eventsUsed[PN->getInputPlaceIndex(key)]) || 
+            (key->getType() == OUTPUT &&
+             key->max_occurence > currentNode->eventsUsed[PN->getOutputPlaceIndex(key) + PN->getInputPlaceCount()])) {
             // we have to consider this event
 
             GraphNode* v = new GraphNode();    // create new GraphNode of the graph

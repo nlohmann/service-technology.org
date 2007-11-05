@@ -254,9 +254,9 @@ void checkExchangeability() {
     Exchangeability* og2 = new Exchangeability(*(++netiter));
     trace(TRACE_0, "The two operating guidelines are equal: ");
     if (og1->check(og2) == true) {
-        trace(TRACE_0, "YES\n");
+        trace(TRACE_0, "YES\n\n");
     } else {
-        trace(TRACE_0, "NO\n");
+        trace(TRACE_0, "NO\n\n");
     }
 }
 
@@ -265,10 +265,10 @@ void checkExchangeability() {
 void matchNet(Graph* OGToMatch, oWFN* PN) {
     string reasonForFailedMatch;
     if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
-        trace(TRACE_0, "oWFN matches with OG: YES\n");
+        trace(TRACE_0, "oWFN matches with OG: YES\n\n");
     } else {
         trace(TRACE_0, "oWFN matches with OG: NO\n");
-        trace(TRACE_0, "Match failed, because: " +reasonForFailedMatch + "\n");
+        trace(TRACE_0, "Match failed, because: " +reasonForFailedMatch + "\n\n");
     }
     delete OGToMatch;
 }
@@ -574,9 +574,9 @@ void checkSimulation(const Graph::ogs_t& OGsFromFiles) {
     Graph *simulator = *GraphIter;
     Graph *simulant = *(++GraphIter);
     if (simulator->simulates(simulant)) {
-        trace(TRACE_0, "\nThe first OG has all the strategies of the second one, possibly more.\n");
+        trace(TRACE_0, "\nThe first OG has all the strategies of the second one, possibly more.\n\n");
     } else {
-        trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
+        trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n\n");
     }
 }
 
@@ -588,12 +588,12 @@ void checkEquality(const Graph::ogs_t& OGsFromFiles) {
     Graph *simulant = *(++GraphIter);
     if (simulator->simulates(simulant)) {
         if (simulant->simulates(simulator)) {
-            trace(TRACE_0, "\nThe two OGs are equivalent, that is, they have the same strategies.\n");
+            trace(TRACE_0, "\nThe two OGs are equivalent, that is, they have the same strategies.\n\n");
         } else {
-            trace(TRACE_0, "\nThe first OG has a strategy which the second one hasn't.\n");
+            trace(TRACE_0, "\nThe first OG has a strategy which the second one hasn't.\n\n");
         }
     } else {
-        trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n");
+        trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n\n");
     }
 }
 
@@ -753,6 +753,8 @@ int main(int argc, char ** argv) {
         if (options[O_SIMULATES]) {
             // simulation on Graph
             checkSimulation(OGsFromFiles);
+            trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
+            trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
             deleteOGs(OGsFromFiles);
             return 0;
         }
@@ -760,6 +762,8 @@ int main(int argc, char ** argv) {
         if (options[O_EQUALS]) {
             // equivalence on Graph
             checkEquality(OGsFromFiles);
+            trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
+            trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
             deleteOGs(OGsFromFiles);
             return 0;
         }

@@ -34,6 +34,7 @@
 
 #include "mynew.h"
 #include "GraphNode.h"
+#include "options.h"
 #include <cassert>
 
 using namespace std;
@@ -767,7 +768,9 @@ GraphEdge* GraphNode::getEdgeWithLabel(const std::string& edgeLabel) const {
  */
 GraphNode* GraphNode::followEdgeWithLabel(const std::string& edgeLabel) {
     
-    assert(edgeLabel != GraphFormulaLiteral::TAU);
+    if (!(parameters[P_PV])) {
+        assert(edgeLabel != GraphFormulaLiteral::TAU);
+    }
     
     GraphEdge* edge = getEdgeWithLabel(edgeLabel);
     if (edge == NULL) {

@@ -659,7 +659,7 @@ else
 fi
 
 ############################################################################
-# OG with node reduction ... takes too long (more than a minute!)
+# OG with node reduction
 ############################################################################
 
 #shop6bluenodes_soll=7
@@ -667,7 +667,7 @@ fi
 #shop6storedstates_soll=761
 
 #owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
-#cmd="$FIONA $owfn -a -t OG"
+#cmd="$FIONA $owfn -R -t OG"
 
 #if [ "$quiet" != "no" ]; then
 #    cmd="$cmd -Q"
@@ -878,33 +878,34 @@ fi
 ############################################################################
 # OG
 ############################################################################
-
-dkeshopbluenodes_soll=22
-dkeshopblueedges_soll=36
-dkeshopstoredstates_soll=18221
-
-dkeshopbluenodes=0
-dkeshopblueedges=0
-dkeshopstoredstates=0
-
-owfn="$DIR/DKE07_shop.owfn"
-cmd="$FIONA $owfn -t OG"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.OG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    dkeshopcontrol=$?
-
+# DKE-Shops brauchen zu lang (ca. 60 bzw 80 Sekunden)
+#
+#dkeshopbluenodes_soll=83
+#dkeshopblueedges_soll=176
+#dkeshopstoredstates_soll=97688
+#
+#dkeshopbluenodes=0
+#dkeshopblueedges=0
+#dkeshopstoredstates=0
+#
+#owfn="$DIR/dke07_shop_sect_3.owfn"
+#cmd="$FIONA $owfn -t OG -e 1"
+#
+#if [ "$quiet" != "no" ]; then
+#    cmd="$cmd -Q"
+#fi
+#
+#if [ "$memcheck" = "yes" ]; then
+#    memchecklog="$owfn.OG.memcheck.log"
+#    do_memcheck "$cmd" "$memchecklog"
+#    result=$(($result | $?))
+#else
+#    echo running $cmd
+#    OUTPUT=`$cmd 2>&1`
+#
+#    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+#    dkeshopcontrol=$?
+#
 #    echo $OUTPUT | grep "number of blue nodes: $dkeshopbluenodes_soll" > /dev/null
 #    dkeshopbluenodes=$?
 #
@@ -913,14 +914,62 @@ else
 #
 #    echo $OUTPUT | grep "number of states stored in nodes: $dkeshopstoredstates_soll" > /dev/null
 #    dkeshopstoredstates=$?
+#
+#    if [ $dkeshopcontrol -ne 0 -o $dkeshopbluenodes -ne 0 -o $dkeshopblueedges -ne 0 -o $dkeshopstoredstates -ne 0 ]
+#    then
+#    echo   ... failed to build OG correctly
+#    fi
+#
+#    result=`expr $result + $dkeshopcontrol + $dkeshopbluenodes + $dkeshopblueedges + $dkeshopstoredstates`
+#fi
 
-    if [ $dkeshopcontrol -ne 0 -o $dkeshopbluenodes -ne 0 -o $dkeshopblueedges -ne 0 -o $dkeshopstoredstates -ne 0 ]
-    then
-    echo   ... failed to build OG correctly
-    fi
-
-    result=`expr $result + $dkeshopcontrol + $dkeshopbluenodes + $dkeshopblueedges + $dkeshopstoredstates`
-fi
+############################################################################
+# OG
+############################################################################
+# DKE-Shops brauchen zu lang (ca. 60 bzw 80 Sekunden)
+#
+#dkeshopbluenodes_soll=5
+#dkeshopblueedges_soll=4
+#dkeshopstoredstates_soll=76976
+#
+#dkeshopbluenodes=0
+#dkeshopblueedges=0
+#dkeshopstoredstates=0
+#
+#owfn="$DIR/dke07_shop_sect_6.owfn"
+#cmd="$FIONA $owfn -t OG -e 1"
+#
+#if [ "$quiet" != "no" ]; then
+#    cmd="$cmd -Q"
+#fi
+#
+#if [ "$memcheck" = "yes" ]; then
+#    memchecklog="$owfn.OG.memcheck.log"
+#    do_memcheck "$cmd" "$memchecklog"
+#    result=$(($result | $?))
+#else
+#    echo running $cmd
+#    OUTPUT=`$cmd 2>&1`
+#
+#    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+#    dkeshopcontrol=$?
+#
+#    echo $OUTPUT | grep "number of blue nodes: $dkeshopbluenodes_soll" > /dev/null
+#    dkeshopbluenodes=$?
+#
+#    echo $OUTPUT | grep "number of blue edges: $dkeshopblueedges_soll" > /dev/null
+#    dkeshopblueedges=$?
+#
+#    echo $OUTPUT | grep "number of states stored in nodes: $dkeshopstoredstates_soll" > /dev/null
+#    dkeshopstoredstates=$?
+#
+#    if [ $dkeshopcontrol -ne 0 -o $dkeshopbluenodes -ne 0 -o $dkeshopblueedges -ne 0 -o $dkeshopstoredstates -ne 0 ]
+#    then
+#    echo   ... failed to build OG correctly
+#    fi
+#
+#    result=`expr $result + $dkeshopcontrol + $dkeshopbluenodes + $dkeshopblueedges + $dkeshopstoredstates`
+#fi
 
 echo
 

@@ -4,7 +4,7 @@ NODES
   2 : ((final)) : blue;
 
 INITIALNODE
-  0;
+  0; 
 
 TRANSITIONS
   0 -> 1 : ?x,

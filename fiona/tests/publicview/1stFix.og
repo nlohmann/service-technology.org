@@ -1,0 +1,11 @@
+NODES
+  0 : ((?x) + (!y)) : blue,
+  1 : ((!y)) : blue,
+  2 : ((final)) : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 1 : ?x,
+  1 -> 2 : !y;

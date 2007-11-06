@@ -1152,6 +1152,46 @@ std::string Graph::addOGFileSuffix(const std::string& filePrefix) {
 }
 
 
+Graph::TransitionMap Graph::getTransitionMap() {
+    trace(TRACE_3, "Graph::getTransitionMap()::begin()\n");
+    TransitionMap tm;
+
+    for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
+        if ((*iNode)->isBlue() && (parameters[P_SHOW_EMPTY_NODE] || (*iNode)->reachGraphStateSet.size() != 0)) {
+            GraphNode::LeavingEdges::Iterator iEdge = (*iNode)->getLeavingEdgesIterator();
+            while (iEdge->hasNext()) {
+                GraphEdge* edge = iEdge->getNext();
+                if (edge->getDstNode()->isBlue() && (parameters[P_SHOW_EMPTY_NODE] || edge->getDstNode()->reachGraphStateSet.size() != 0))
+                    tm[edge->getLabel()].insert((*iNode)->getName() + "@" + edge->getLabel() + "@" + edge->getDstNode()->getName());
+            }
+        }
+    }
+
+    trace(TRACE_3, "Graph::getTransitionMap()::end()\n");
+    return tm;
+}
+
+
+GraphFormulaCNF *Graph::createCovFormula(TransitionMap tm) {
+    trace(TRACE_3, "Graph::createCovFormula(TransitionMap)::begin()\n");
+
+    GraphFormulaCNF *formula = new GraphFormulaCNF;
+
+    for(TransitionMap::iterator i = tm.begin(); i != tm.end(); i++) {
+        GraphFormulaMultiaryOr *clause = new GraphFormulaMultiaryOr;
+        for (EdgeSet::iterator j = i->second.begin(); j != i->second.end(); j++) {
+            GraphFormulaLiteral *literal = new GraphFormulaLiteral(*j);
+            clause->addSubFormula(literal);
+        }
+        formula->addClause(clause);
+    }
+        
+    trace(TRACE_3, "Graph::createCovFormula(): " + formula->asString() + "\n");
+    trace(TRACE_3, "Graph::createCovFormula(TransitionMap)::end()\n");
+    return formula;
+}
+
+
 // CODE FROM PL
 //! \brief removes a node from the Graph
 //! \param node node to remove

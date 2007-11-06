@@ -59,6 +59,11 @@ class Graph {
         /// Type of container passed to Graph::getProductOGFilePrefix().
         typedef std::list<std::string> ogfiles_t;
 
+        typedef set<std::string> EdgeSet;
+        
+        /// Type of container of transitions associated to each label
+        typedef map<string, EdgeSet> TransitionMap;
+
     protected:
         GraphNode* root;
 
@@ -224,6 +229,12 @@ class Graph {
 
         // A function needed for successful deletion of the graph
         void clearNodeSet();
+
+        //! Get all transitions from the graph, each associated to a specific label
+        TransitionMap getTransitionMap();
+        
+        //! Create the formula describing the ooverability criteria 
+        GraphFormulaCNF *createCovFormula(TransitionMap tm);
 
 // CODE FROM PL
         void transformToPublicView();

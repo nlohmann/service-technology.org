@@ -119,7 +119,7 @@ owfn="$builddir/$SUBDIR/sequence3.owfn"
 cmd="$FIONA $owfn -b 4 -t OG"
 $cmd 2>/dev/null 1>/dev/null
 
-cmd="$FIONA $owfn $owfn_reference -t equivalence"
+cmd="$FIONA $owfn $owfn_reference -t equivalence -b1"
 
 
 if [ "$memcheck" = "yes" ]; then
@@ -196,7 +196,7 @@ owfn="$builddir/$SUBDIR/phcontrol4.unf.owfn"
 cmd="$FIONA $owfn -b 4 -t OG"
 $cmd 2>/dev/null 1>/dev/null
 
-cmd="$FIONA $owfn $owfn_reference -t equivalence"
+cmd="$FIONA $owfn $owfn_reference -t equivalence -b1"
 
 
 if [ "$memcheck" = "yes" ]; then

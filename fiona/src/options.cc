@@ -79,22 +79,17 @@ static struct option longopts[] = {
     { "parameter",       required_argument, NULL, 'p' },
     { "reduce-nodes",    no_argument,       NULL, 'R' },
     { "reduceIG",        no_argument,       NULL, 'r' },
-    { "messagemaximum",  required_argument, NULL, 'm' },
+    { "messagebound",    required_argument, NULL, 'm' },
     { "eventsmaximum",   required_argument, NULL, 'e' },
     { "BDD",             required_argument, NULL, 'b' },
     { "OnTheFly",        required_argument, NULL, 'B' },
     { "output",          required_argument, NULL, 'o' },
     { "no-output",       no_argument,       NULL, 'Q' },
-// CODE FROM PL
     { "multipledeadlocks", no_argument,     NULL, 'M' },
-// END OF CODE FROM PL  
     { NULL,              0,                 NULL, 0   }
 };
 
-// CODE FROM PL
-// slightly modified
 const char* par_string = "hvd:t:s:p:Rrm:e:b:B:o:QM";
-// END OF CODE FROM PL
 
 
 // --------------------- functions for command line evaluation ------------------------
@@ -102,101 +97,103 @@ const char* par_string = "hvd:t:s:p:Rrm:e:b:B:o:QM";
 void print_help() {
   trace("Usage: fiona [OPTION]... [FILE]...\n");
   trace("\n");
-  trace("Options: (if an option is skipped, the default settings are denoted)\n");
+  trace("[FILE]:  can be one ore more oWFN(s) and/or OG(s)\n");
+  trace("         (wildcards (*,?) are allowed\n");
   trace("\n");
-  trace(" -h | --help ..................... print this information and exit\n");
-  trace(" -v | --version .................. print version information and exit\n");
-  trace(" -d | --debug=<level> ............ set debug <level>:\n");
-  trace("                                     1 - show nodes and dfs information\n");
-  trace("                                     2 - show analyse information (i.e. colors)\n");
-  trace("                                     3 - show information on events and states\n");
-  trace("                                     4 - yet to be defined ;)\n");
-  trace("                                     5 - show detailed information on everything\n");
-  trace(" -t | --type=<type> .............. select the modus operandi of fiona <type>:\n");
-  trace("                                     OG - compute operating guideline\n");
-  trace("                                     IG - compute interaction graph (default)\n");
-  trace("                                     match - check if given oWFN matches\n");
-  trace("                                             with the operating guideline given\n");
-  trace("                                             in [FILE]\n");
-  trace("                                     simulation  - check whether the first OG\n");
-  trace("                                                   characterizes more strategies\n");
-  trace("                                                   than the second one\n");
-  trace("                                     filter      - reduces the first OG to the point that\n");
-  trace("                                                   it simulates the second OG - if possible\n"); 
-  trace("                                     equivalence - check whether two OGs (given\n");
-  trace("                                                   as BDDs or OG-/oWFN-files) are equivalent\n");
-  trace("                                     productog   - calculate the product OG of\n");
-  trace("                                                   all given OGs\n");
-  trace("                                     isacyclic   - check a given OG for cycles\n");
-  trace("                                     count       - count the number of services\n");
-  trace("                                                   that are characterized by a\n");  
-  trace("                                                   given OG\n");  
-  trace("                                     png         - generate png files from all\n");
-  trace("                                                   given of oWFNs\n");  
-// CODE FROM PL
-  trace("                                     PV - calculate the Public View Service\n");
-  trace("                                          Automaton for a given OG\n");
-// END OF CODE FROM PL
-  trace(" -m | --messagemaximum=<level> ... set maximum number of same messages per\n");
-  trace("                                   state to <level>\n");
-  trace("                                   (default is 1)\n");
-//  trace(" -e | --eventsmaximum=<level> .... set event to occur at most <level> times\n");
-//  trace("                                   (default is 1)\n");
-//  trace("                                   (-1 means disabling -e option, but is only\n");
-//  trace("                                   possible if -m option is set)\n");
-//  trace("                                   (only relevant for OG)\n");
-  trace(" -r | --reduceIG ................. use reduction rules for IG\n");
-  trace(" -R | --reduce-nodes ............. use node reduction (IG or OG) which\n");
-  trace("                                   stores less states per node of IG/OG\n");
-  trace("                                   and reduces memory, but increases time\n");
-  trace(" -s | --show=<parameter> ......... different display options <parameter>:\n");
-  trace("                                     allnodes  - show nodes of all colors\n");
-  trace("                                     blue      - show blue nodes only (default)\n");
-  trace("                                     rednodes  - show blue and red nodes (no\n");
-  trace("                                                 empty node and no black nodes)\n");
-  trace("                                     empty     - show empty node\n");
-  trace("                                     allstates - show all calculated states per\n");
-  trace("                                                 node\n");
-  trace("                                     deadlocks - show all but transient states\n");
-  trace(" -b | --BDD=<reordering> ......... enable BDD construction\n");
-  trace("                                   (only relevant for OG)\n");
-  trace("                                   argument <reordering> specifies reodering\n");
-  trace("                                   method:\n");
-  trace("                                      0 - CUDD_REORDER_SAME\n");
-  trace("                                      1 - CUDD_REORDER_NONE\n");
-  trace("                                      2 - CUDD_REORDER_RANDOM\n");
-  trace("                                      3 - CUDD_REORDER_RANDOM_PIVOT\n");
-  trace("                                      4 - CUDD_REORDER_SIFT\n");
-  trace("                                      5 - CUDD_REORDER_SIFT_CONVERGE\n");
-  trace("                                      6 - CUDD_REORDER_SYMM_SIFT\n");
-  trace("                                      7 - CUDD_REORDER_SYMM_SIFT_CONV\n");
-  trace("                                      8 - CUDD_REORDER_WINDOW2\n");
-  trace("                                      9 - CUDD_REORDER_WINDOW3\n");
-  trace("                                     10 - CUDD_REORDER_WINDOW4\n");
-  trace("                                     11 - CUDD_REORDER_WINDOW2_CONV\n");
-  trace("                                     12 - CUDD_REORDER_WINDOW3_CONV\n");
-  trace("                                     13 - CUDD_REORDER_WINDOW4_CONV\n");
-  trace("                                     14 - CUDD_REORDER_GROUP_SIFT\n");
-  trace("                                     15 - CUDD_REORDER_GROUP_SIFT_CONV\n");
-  trace("                                     16 - CUDD_REORDER_ANNEALING\n");
-  trace("                                     17 - CUDD_REORDER_GENETIC\n");
-  trace("                                     18 - CUDD_REORDER_LINEAR\n");
-  trace("                                     19 - CUDD_REORDER_LINEAR_CONVERGE\n");
-  trace("                                     20 - CUDD_REORDER_LAZY_SIFT\n");
-  trace("                                     21 - CUDD_REORDER_EXACT\n");
-  trace(" -B | --OnTheFly=<reordering> .... enable BDD construction on the fly\n");
-  trace("                                   (only relevant for OG)\n");
-  trace("                                   argument <reordering> specifies reodering\n");
-  trace("                                   method (see option -b)\n");
-  trace(" -o | --output=<filename prefix> . prefix of the output files\n");
-  trace(" -Q | --no-output ................ runs quietly, i.e., produces no output files\n");
-  trace(" -p | --parameter=<param>          additional parameter <param>\n");
-  trace("                                    no-png - does not create a PNG file");
-// CODE FROM PL
-  trace(" -M | --multipledeadlocks ........ create multiple deadlocks when constructing\n");
-  trace("                                   the Public View Service Automaton\n");
-  trace("                                   (only relevant in PV mode -tPV)\n");  
-// END OF CODE FROM PL
+  trace("Options: can be any of the follwing\n");
+  trace("         (if an option is skipped, the default settings are denoted)\n");
+  trace("\n");
+  trace(" -h | --help ................... print this information and exit\n");
+  trace(" -v | --version ................ print version information and exit\n");
+  trace(" -d | --debug=<level> .......... set debug <level>:\n");
+  trace("                                   1 - show nodes and dfs information\n");
+  trace("                                   2 - show analyse information (i.e. colors)\n");
+  trace("                                   3 - show information on events and states\n");
+  trace("                                   4 - yet to be defined ;)\n");
+  trace("                                   5 - show detailed information on everything\n");
+  trace(" -t | --type=<type> ............ select the modus operandi of fiona <type>:\n");
+  trace("                                 (only one type is allowed; default is IG)\n");
+  trace("                                   IG          - compute interaction graph\n");
+  trace("                                   OG          - compute operating guideline\n");
+  trace("                                   match       - check whether a given oWFN\n");
+  trace("                                                 matches with a given OG\n");
+  trace("                                   PV          - calculate the public view of a\n");
+  trace("                                                 given OG (the result is an\n");
+  trace("                                                 automaton in OG file format)\n");
+  trace("                                   productog   - calculate the product OG of\n");
+  trace("                                                 all given OGs\n");
+  trace("                                   simulation  - check whether the first OG\n");
+  trace("                                                 characterizes more strategies\n");
+  trace("                                                 than the second one\n");
+  trace("                                                 (if an oWFN is given, its OG\n");
+  trace("                                                 is computed automatically)\n");
+  trace("                                   equivalence - check whether two OGs\n");
+  trace("                                                 characterize the same strategies\n");
+  trace("                                                 (if an oWFN is given, its OG\n");
+  trace("                                                 is computed automatically)\n");
+  trace("                                                 (option -b1 can be used to check\n");
+  trace("                                                 equivalence of (already present!) BDDs)\n");
+  trace("                                   filter      - reduces the first OG such that\n");
+  trace("                                                 it simulates the second OG\n"); 
+  trace("                                                 (if possible)\n");
+  trace("                                   isacyclic   - check a given OG for cycles\n");
+  trace("                                   count       - count the number of strategies\n");
+  trace("                                                 that are characterized by a\n");  
+  trace("                                                 given OG\n");  
+  trace("                                   png         - generate png files for all\n");
+  trace("                                                 given oWFNs\n");  
+  trace(" -m | --messagebound=<level> ... set maximum number of same messages per\n");
+  trace("                                 state to <level>  (default is 1)\n");
+//  trace(" -e | --eventsmaximum=<level> .. set event to occur at most <level> times\n");
+//  trace("                                 (default is 1)\n");
+//  trace("                                 (-1 means disabling -e option, but is only\n");
+//  trace("                                 possible if -m option is set)\n");
+//  trace("                                 (only relevant for OG)\n");
+  trace(" -r | --reduceIG ............... use reduction rules for IG\n");
+  trace(" -R | --reduce-nodes ........... use node reduction (IG or OG) which stores\n");
+  trace("                                 less states per IG/OG node\n");
+  trace("                                 (reduces memory, but increases time)\n");
+  trace(" -s | --show=<parameter> ....... different display options <parameter>:\n");
+  trace("                                   allnodes  - show all nodes\n");
+  trace("                                   blue      - show blue nodes only (default)\n");
+  trace("                                   rednodes  - show blue and red nodes\n");
+  trace("                                               (only empty node is skipped)\n");
+  trace("                                   empty     - show empty node\n");
+  trace("                                   allstates - show all calculated states per\n");
+  trace("                                               node\n");
+  trace("                                   deadlocks - show all but transient states\n");
+  trace(" -b | --BDD=<reordering> ....... enable BDD construction (only relevant for OG)\n");
+  trace("                                 <reordering> specifies reodering method:\n");
+  trace("                                    0 - CUDD_REORDER_SAME\n");
+  trace("                                    1 - CUDD_REORDER_NONE\n");
+  trace("                                    2 - CUDD_REORDER_RANDOM\n");
+  trace("                                    3 - CUDD_REORDER_RANDOM_PIVOT\n");
+  trace("                                    4 - CUDD_REORDER_SIFT\n");
+  trace("                                    5 - CUDD_REORDER_SIFT_CONVERGE\n");
+  trace("                                    6 - CUDD_REORDER_SYMM_SIFT\n");
+  trace("                                    7 - CUDD_REORDER_SYMM_SIFT_CONV\n");
+  trace("                                    8 - CUDD_REORDER_WINDOW2\n");
+  trace("                                    9 - CUDD_REORDER_WINDOW3\n");
+  trace("                                   10 - CUDD_REORDER_WINDOW4\n");
+  trace("                                   11 - CUDD_REORDER_WINDOW2_CONV\n");
+  trace("                                   12 - CUDD_REORDER_WINDOW3_CONV\n");
+  trace("                                   13 - CUDD_REORDER_WINDOW4_CONV\n");
+  trace("                                   14 - CUDD_REORDER_GROUP_SIFT\n");
+  trace("                                   15 - CUDD_REORDER_GROUP_SIFT_CONV\n");
+  trace("                                   16 - CUDD_REORDER_ANNEALING\n");
+  trace("                                   17 - CUDD_REORDER_GENETIC\n");
+  trace("                                   18 - CUDD_REORDER_LINEAR\n");
+  trace("                                   19 - CUDD_REORDER_LINEAR_CONVERGE\n");
+  trace("                                   20 - CUDD_REORDER_LAZY_SIFT\n");
+  trace("                                   21 - CUDD_REORDER_EXACT\n");
+  trace(" -B | --OnTheFly=<reordering> .. BDD construction on the fly (only for OG)\n");
+  trace("                                 <reordering> as above\n");
+  trace(" -o | --output=<filename> ...... prefix of the output files\n");
+  trace(" -Q | --no-output .............. runs quietly, i.e., produces no output files\n");
+  trace(" -M | --multipledeadlocks ...... create multiple deadlocks of public view\n");
+  trace("                                 (only relevant for PV mode -t PV)\n");  
+  trace(" -p | --parameter=<param> ...... additional parameter <param>\n");
+  trace("                                    no-png - does not create a PNG file\n");
   trace("\n");
   trace("\n");
   trace("For more information see:\n");
@@ -298,8 +295,13 @@ void parse_command_line(int argc, char* argv[]) {
            != EOF) {
 
         switch (optc) {
-            case 'h': print_help();      exit(0);
-            case 'v': print_version();   exit(0);
+            // case GETOPT_REDUCENODES:
+            case 'h':
+                print_help();
+                exit(0);
+            case 'v':
+                print_version();
+                exit(0);
             case 'd':
                 if (string(optarg) == "1") {
                     options[O_DEBUG] = true;
@@ -389,11 +391,9 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_SHOW_EMPTY_NODE] = true;
                     parameters[P_SHOW_NO_RED_NODES] = false;
                     parameters[P_SHOW_BLUE_NODES_ONLY] = false;
-// CODE FROM PL
                 } else if ((lc_optarg == "pv") || (lc_optarg == "publicview")) {
                 	parameters[P_PV] = true;
                 	parameters[P_IG] = false;
-// END OF CODE FROM PL
                 } else {
                     cerr << "Error:\twrong modus operandi (option -t)" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
@@ -408,16 +408,14 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_NOPNG] = true;
                 } else {
                     cerr << "Error:\twrong parameter (option -p)" << endl
-                    << "\tEnter \"fiona --help\" for more information.\n"
-                    << endl;
+                    << "\tEnter \"fiona --help\" for more information.\n" << endl;
                     exit(1);
                 }
                 break;
             }
             case 'm':
                 options[O_MESSAGES_MAX] = true;
-                testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary(
-                    "-m", optarg);
+                testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary("-m", optarg);
                 messages_manual = atoi(optarg);
                 break;
             case 'e':
@@ -460,7 +458,6 @@ void parse_command_line(int argc, char* argv[]) {
                     exit(1);
                 }
                 break;
-//            case GETOPT_REDUCENODES:
             case 'R':
                 options[O_CALC_ALL_STATES] = false;
                 break;
@@ -510,11 +507,9 @@ void parse_command_line(int argc, char* argv[]) {
             case 'Q':
                 options[O_NOOUTPUTFILES] = true;
                 break;
-// CODE FROM PL
 			case 'M':
 				options[O_PV_MULTIPLE_DEADLOCKS] = true;
 				break;
-// END OF CODE FROM PL
             case '?':
                 cerr << "Error:\toption error" << endl
                      << "\tEnter \"fiona --help\" for more information.\n"
@@ -602,7 +597,6 @@ void parse_command_line(int argc, char* argv[]) {
         options[O_BDD] = false;
     }
 
-// CODE FROM PL
 	if (ogfiles.size() == 0 && parameters[P_PV]) {
 		cerr << "Error:\tNo OG given. Public View Service Automaton cannot be generated." << endl
 		     << "\tCalculate the OG of your service/oWFN first." << endl
@@ -614,7 +608,6 @@ void parse_command_line(int argc, char* argv[]) {
 		cerr << "not computing Public View Service Automaton - multiple deadlocks option ignored\n" << endl;
 		options[O_PV_MULTIPLE_DEADLOCKS] = false;
 	}
-// END OF CODE FROM PL
 }
 
 

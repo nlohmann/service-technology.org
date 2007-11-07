@@ -852,8 +852,12 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                                 }
                             }
                             if (supset) {
+                            	
+                            	node->getAnnotation()->removeLiteralForReal(PN->createLabel(*iter1));
+                            	
                                 listOfOutputMessageLists.erase(iter1);
                                 label = PN->createLabel(outputMessages);
+                                
                                 break;
                             }
                         }
@@ -905,9 +909,9 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
 
             if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) { // we just consider the maximal states only
 
-#ifdef DEBUG
-                cout << "\t state "<< (*iter) << " activates the output events: " << endl;
-#endif		
+
+                //cout << "\t state "<< (*iter) << " activates the output events: " << endl;
+	
                 unsigned int i = 0;
                 // this clause's first literal
                 GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
@@ -915,7 +919,9 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                 //			literal * cl = new literal();			// create a new clause for this particular state
 
                 // "receiving before sending" reduction rule
-                while (!stateActivatesOutputEvents(*iter) &&(*iter)->quasiFirelist&&(*iter)->quasiFirelist[i]) {
+                while (!stateActivatesOutputEvents(*iter) &&
+                			(*iter)->quasiFirelist &&
+                			(*iter)->quasiFirelist[i]) {
 
                     for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin(); index
                             != (*iter)->quasiFirelist[i]->messageSet.end(); index++) {
@@ -933,7 +939,7 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                     i++;
                 }
 
-                messageMultiSet outputMessages; // multiset of all input messages of the current state
+                messageMultiSet outputMessages; // multiset of all output messages of the current state
 
                 (*iter)->decode(PN);
 
@@ -945,9 +951,10 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                         }
 
                         found = true;
-#ifdef DEBUG
-                        cout << "\t\t" << PN->getPlace(i)->name << endl;
-#endif
+
+                        //cout << "\t\t" << PN->getPlace(i)->name << endl;
+                        //cout << "\t\t" << i << endl;
+
                     }
                 }
 
@@ -959,12 +966,14 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                 if (found) {
 
                     for (setOfMessages::iterator
-                            iter1 = listOfOutputMessageLists.begin(); iter1
-                            != listOfOutputMessageLists.end(); iter1++) {
+                            iter1 = listOfOutputMessageLists.begin(); 
+                            iter1 != listOfOutputMessageLists.end(); iter1++) {
 
                         subset = false;
 
-                        for (messageMultiSet::iterator tmp2 = (*iter1).begin(); tmp2 != (*iter1).end(); tmp2++) {
+                        for (messageMultiSet::iterator tmp2 = (*iter1).begin(); 
+                        										tmp2 != (*iter1).end(); tmp2++) {
+                        											
                             if (outputMessages.count(*tmp2) >= (*iter1).count(*tmp2)) {
                                 subset = true;
                             } else {
@@ -981,15 +990,16 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
 
                     if (!subset) {
                         for (setOfMessages::iterator
-                                iter1 = listOfOutputMessageLists.begin(); iter1
-                                != listOfOutputMessageLists.end(); iter1++) {
+                                iter2 = listOfOutputMessageLists.begin(); 
+                                iter2 != listOfOutputMessageLists.end(); iter2++) {
 
                             supset = false;
 
                             for (messageMultiSet::iterator
                                     tmp2 = outputMessages.begin(); tmp2
                                     != outputMessages.end(); tmp2++) {
-                                if (outputMessages.count(*tmp2) <= (*iter1).count(*tmp2)) {
+                                    	
+                                if (outputMessages.count(*tmp2) <= (*iter2).count(*tmp2)) {
                                     supset = true;
                                 } else {
                                     supset = false;
@@ -997,7 +1007,13 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                                 }
                             }
                             if (supset) {
-                                listOfOutputMessageLists.erase(iter1);
+                            	
+//                            	cout << "remove literal... " << endl;
+//                            	cout << "\t before removal: " << node->getAnnotation()->asString() << endl;
+                                node->getAnnotation()->removeLiteralForReal(PN->createLabel(*iter2));
+//                                cout << "\t after removal: " << node->getAnnotation()->asString() << endl;
+                                
+                                listOfOutputMessageLists.erase(iter2);
                                 label = PN->createLabel(outputMessages);
                                 break;
                             }
@@ -1021,7 +1037,7 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
 
                     if (!subset && !supset) {
                         listOfOutputMessageLists.insert(outputMessages);
-
+					//	cout << "label: " << PN->createLabel(outputMessages) << endl;
                         GraphFormulaLiteral
                                 * myliteral = new GraphFormulaLiteral(PN->createLabel(outputMessages));
                         myclause->addSubFormula(myliteral);
@@ -1042,17 +1058,23 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                 }
 
                 node->addClause(myclause);
+                
+                
                 //node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
             }
 
         }
     }
+    
+  //  cout << "node's new clause: " << node->getAnnotationAsString() << endl;
 
     trace(TRACE_5, "interactionGraph::combineReceivingEvents(GraphNode * node): end\n");
 
     /* check the set of output-messages for containing subsets */
     /* e.g. the set contains [a, b] and [a, b, c] */
     /* [a, b] is subset of [a, b, c], therefore the set [a, b, c] is removed */
+
+//	cout << "size of listOfOutputMessageLists: " << listOfOutputMessageLists.size() << endl;
 
     return listOfOutputMessageLists;
 }

@@ -142,9 +142,13 @@ class GraphFormula {
          */
         virtual bool value(const GraphFormulaAssignment& assignment) const = 0;
         virtual void removeLiteral(const std::string&);
+        virtual void removeLiteralForReal(const std::string&);
         virtual void removeLiteralByHiding(const std::string&);
         virtual GraphFormula* getDeepCopy() const = 0;
         threeValueLogic equals();
+
+        virtual int getSubFormulaSize() const;
+
 
         /**
          * Returns this formula in conjunctive normal form. The caller is
@@ -235,8 +239,20 @@ class GraphFormulaMultiary : public GraphFormula {
 
         void addSubFormula(GraphFormula* subformula);
         iterator removeSubFormula(iterator subformula);
+        
         virtual void removeLiteral(const std::string&);
+        
+        /**
+         * removes a literal from the formula, if this literal is the only one of a clause,
+         * the clause gets removed as well
+         * this function is used in the IG reduction
+        **/
+        virtual void removeLiteralForReal(const std::string&);
+        
         virtual void removeLiteralByHiding(const std::string&);
+        
+        virtual int getSubFormulaSize() const;
+        
         void deepCopyMultiaryPrivateMembersToNewFormula(GraphFormulaMultiary* newFormula) const;
 
         /**

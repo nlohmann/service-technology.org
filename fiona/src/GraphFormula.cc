@@ -84,10 +84,14 @@ bool GraphFormula::satisfies(const GraphFormulaAssignment& assignment) const {
 void GraphFormula::removeLiteral(const std::string&) {
 }
 
+void GraphFormula::removeLiteralForReal(const std::string&) {
+}
+
+int GraphFormula::getSubFormulaSize() const {
+}
 
 void GraphFormula::removeLiteralByHiding(const std::string&) {
 }
-
 
 threeValueLogic GraphFormula::equals() {
 
@@ -308,7 +312,7 @@ GraphFormulaMultiary::removeSubFormula(iterator subformula) {
 
 void GraphFormulaMultiary::removeLiteral(const std::string& name) {
 
-    trace(TRACE_5, "GraphFormulaMultiary::removeLiteral(const std::string& name) : start\n");
+    trace(TRACE_3, "GraphFormulaMultiary::removeLiteral(const std::string& name) : start\n");
 
     subFormulas_t::iterator iCurrentFormula;
     //cout << "\tanzahl von klauseln: " << subFormulas.size() << endl; int i = 1;
@@ -321,6 +325,9 @@ void GraphFormulaMultiary::removeLiteral(const std::string& name) {
         // call the function recursively, otherwise
         GraphFormulaLiteral* currentFormula = dynamic_cast<GraphFormulaLiteral*> (*iCurrentFormula);
         if (currentFormula != NULL) {
+        	
+        	cout << "currentFormula->asString(): " << currentFormula->asString() << endl;
+        	
             // the current formula is a literal
             if (currentFormula->asString() == name) {
                 // the literal has the right name, so remove it
@@ -336,7 +343,67 @@ void GraphFormulaMultiary::removeLiteral(const std::string& name) {
         }
     }
 
-    trace(TRACE_5, "GraphFormulaMultiary::removeLiteral(const std::string& name) : end\n");
+    trace(TRACE_3, "GraphFormulaMultiary::removeLiteral(const std::string& name) : end\n");
+}
+
+int GraphFormulaMultiary::getSubFormulaSize() const {
+	return subFormulas.size();
+}
+
+// \descr 
+void GraphFormulaMultiary::removeLiteralForReal(const std::string& name) {
+
+    trace(TRACE_3, "GraphFormulaMultiary::removeLiteralForReal(const std::string& name) : start\n");
+
+    subFormulas_t::iterator iCurrentFormula;
+    
+    std::list<subFormulas_t::iterator> listOfFormulaIterator;
+    
+    std::list<subFormulas_t::iterator>::iterator iterOfListOfFormulaIterator;
+    
+    //cout << "\tanzahl von klauseln: " << subFormulas.size() << endl; int i = 1;
+    //cout << "\tremoving literal " << name << " from clause nr " << i++ << endl;	
+
+    for (iCurrentFormula = subFormulas.begin();
+         iCurrentFormula != subFormulas.end();) {
+        // if the considered current formula is a literal, then remove it;
+        // call the function recursively, otherwise
+        GraphFormulaLiteral* currentFormula = dynamic_cast<GraphFormulaLiteral*> (*iCurrentFormula);
+        if (currentFormula != NULL) {
+        	
+            // the current formula is a literal
+            if (currentFormula->asString() == name) {
+                // the literal has the right name, so remove it
+                delete *iCurrentFormula;
+                iCurrentFormula = subFormulas.erase(iCurrentFormula);
+            } else {
+                iCurrentFormula++;
+            }
+        } else {
+        	if ((*iCurrentFormula)->getSubFormulaSize() > 0) {
+            	// the current formula is no literal, so call removeLiteral again
+            	(*iCurrentFormula)->removeLiteralForReal(name);
+            	if ((*iCurrentFormula)->getSubFormulaSize() == 0) {
+            		// this clause just got empty, so we store it in a temporary list
+            		// later on we want to remove this clause from the formula
+            		listOfFormulaIterator.push_back(iCurrentFormula);
+            	}
+        	} 
+           	iCurrentFormula++;
+        }
+    }
+    
+    for (iterOfListOfFormulaIterator = listOfFormulaIterator.begin();
+    		iterOfListOfFormulaIterator != listOfFormulaIterator.end(); 
+    		iterOfListOfFormulaIterator++) {
+    
+    	// now we remove the clause that we have stored before from the formula
+    	// otherwise we would get a (false) when evaluating this formula -> this is not our intention
+    	subFormulas.erase(*iterOfListOfFormulaIterator);		
+    
+    }
+
+    trace(TRACE_3, "GraphFormulaMultiary::removeLiteral(const std::string& name) : end\n");
 }
 
 

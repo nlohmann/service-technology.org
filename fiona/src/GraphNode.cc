@@ -411,6 +411,8 @@ void GraphNode::analyseNode() {
         myassignment->setToTrue(GraphFormulaLiteral::FINAL);
     }
     
+//    cout << "*myassignment: " << *myassignment->asString << endl;
+    
     // evaluating the computed assignment
     bool result = this->getAnnotation()->value(*myassignment);
     delete myassignment;

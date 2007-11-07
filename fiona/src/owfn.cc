@@ -1685,7 +1685,9 @@ string oWFN::createLabel(messageMultiSet m) const {
         if (comma) {
             label += ", ";
         }
+        
         label += getPlace(*iter1)->getLabelForCommGraph();
+         
         comma = true;
     }
 

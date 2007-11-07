@@ -47,6 +47,8 @@
 #include <fstream>
 #include "pnapi/pnapi.h"
 
+#include "GraphFormula.h"
+
 // #defines YY_FLEX_HAS_YYLEX_DESTROY if we can call yylex_destroy()
 #include "lexer_owfn_wrap.h"
 #ifdef LOG_NEW
@@ -716,6 +718,53 @@ int main(int argc, char ** argv) {
 //		bdd->printMemoryInUse();
 //	}
 //	return 0;
+
+
+/*    GraphFormulaCNF* annotation = new GraphFormulaCNF();
+	GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
+	
+    GraphFormulaLiteral* myliteral = new GraphFormulaLiteral("1-1stLiteral");
+	myclause->addSubFormula(myliteral);
+	
+//	myliteral = new GraphFormulaLiteral("1-2ndLiteral");
+//	myclause->addSubFormula(myliteral);
+//	
+//	myliteral = new GraphFormulaLiteral("1-3rdLiteral");
+//	myclause->addSubFormula(myliteral);
+//	
+//	myliteral = new GraphFormulaLiteral("1-4thLiteral");
+//	myclause->addSubFormula(myliteral);
+
+	annotation->addClause(myclause);
+
+	cout << "anno size: " << annotation->size() << endl;
+	cout << "annotation: " << annotation->asString() << endl;
+	
+	myclause = new GraphFormulaMultiaryOr();
+	
+	myliteral = new GraphFormulaLiteral("2-1stLiteral");
+	myclause->addSubFormula(myliteral);
+	
+	myliteral = new GraphFormulaLiteral("2-2ndLiteral");
+	myclause->addSubFormula(myliteral);
+	
+	myliteral = new GraphFormulaLiteral("2-3rdLiteral");
+	myclause->addSubFormula(myliteral);
+	
+	myliteral = new GraphFormulaLiteral("2-4thLiteral");
+	myclause->addSubFormula(myliteral);
+
+	annotation->addClause(myclause);
+	
+	cout << "annotation: " << annotation->asString() << endl;
+
+	cout << "anno size: " << annotation->size() << endl;
+	annotation->removeLiteralForReal("2-1stLiteral");
+	
+	cout << "annotation: " << annotation->asString() << endl;
+	cout << "anno size: " << annotation->size() << endl;
+	
+	return 0; */
 
     Graph* OGToMatch = NULL;
     set_new_handler(&myown_newhandler);

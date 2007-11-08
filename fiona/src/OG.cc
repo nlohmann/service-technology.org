@@ -617,57 +617,84 @@ void OG::convertToBddFull() {
 }
 
 
+//! \brief Delivers the element from the priority map with the highest priority.
+//!        The element with the highest priority will be in a clause with minimal length
+//!        and will have the maximal count of occurences throughout the annotation
+//!        in regards to other elements with minimal clause length. 
+//!        The element will be removed afterwards. 
 PriorityMap::KeyType PriorityMap::pop() {
     trace(TRACE_5, "PriorityMap::pop()::begin()\n");
     KeyType key;
 
+    // initialize with minimum priority values
     int min_depth = INT_MAX;
     int max_occ = 0;
 
+    // iterate over the mapped set of interface places
     MapType::iterator i;
-    for(i = map.begin(); i != map.end(); i++) {
+    for(i = pm.begin(); i != pm.end(); i++) {
+        
+        // consider the element with a minimal depth clause (to catch the init values) 
         if(i->second.first ==  min_depth) {
+            // consider the second moment of priority (occurence count) 
             if(i->second.second >= max_occ) {
                 key = i->first;
                 min_depth = i->second.first;
                 max_occ   = i->second.second;
             }
         }
-        else if(i->second.first <= min_depth) {
+        // first moment of priority suffices 
+        else if(i->second.first < min_depth) {
             key = i->first;
             min_depth = i->second.first;
             max_occ   = i->second.second;
         }
     }
-    map.erase(key);
+    
+    // remove popped element
+    pm.erase(key);
 
     trace(TRACE_5, "PriorityMap::pop()::end()\n");
     return key;
 }
 
+
+//! \brief Fills the priority map according to the given annotation with interface places and their corresponding priority.
+//!        NOTE: All interface places will be considered; places not in the
+//!        annotation will have a minimal priority.
+//! @param annotation the annotation, from which the priority map will be extracted.
 void PriorityMap::fill(GraphFormulaCNF *annotation) {
     trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation)::begin()\n");
  
     oWFN::Places_t::size_type i;
     KeyType key;
 
+    // iterate over all places in the net
     for(i = 0; i < PN->getPlaceCount(); i++) {
 
         key = PN->getPlace(i);
+        // only consider interface places
         if (key != NULL && (key->getType() == INPUT || key->getType() == OUTPUT)) {
-            map[key].first  = INT_MAX;
-            map[key].second = 0;
+            // initialize with a minimal priority
+            pm[key].first  = INT_MAX; // minimal clause length
+            pm[key].second = 0;       // maximal occurence in the annotation
 
+            // iterate over the annotation (in cnf) in regards to a specific interface place
             for(GraphFormulaMultiaryAnd::iterator j = annotation->begin(); j != annotation->end(); j++) {
 
                 GraphFormulaMultiaryOr *clause = dynamic_cast<GraphFormulaMultiaryOr*>(*j);
+                // iterate over disjunctive clauses
                 for(GraphFormulaMultiaryOr::iterator k = clause->begin(); k != clause->end(); k++) {
 
                     GraphFormulaLiteral *lit = dynamic_cast<GraphFormulaLiteral*>(*k);
+                    // interface place found in the clause?
                     if (lit->asString() == key->getLabelForCommGraph()) {
-                        map[key].second++;
-                        if(clause->size() < map[key].first) 
-                            map[key].first = clause->size();
+                        // for every literal found, increase the count of occurence 
+                        pm[key].second++;
+    
+                        // if this label's actual clause is shorter than the former minimum, set the new minimum
+                        if(clause->size() < pm[key].first) 
+                            pm[key].first = clause->size();
                     } 
                 }
             }
@@ -678,5 +705,5 @@ void PriorityMap::fill(GraphFormulaCNF *annotation) {
 }
 
 bool PriorityMap::empty() const {
-    return map.empty();
+    return pm.empty();
 }

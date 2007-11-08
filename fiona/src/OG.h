@@ -104,12 +104,16 @@ class OG : public CommunicationGraph {
 #define new NEW_NEW
 };
 
+
 class PriorityMap {
     public:
+
         typedef owfnPlace* KeyType;
 
         /*
-         * Fills the priority map according to the given annotation.
+         * Fills the priority map according to the given annotation with interface places.
+         * NOTE: All interface places will be considered; places not in the 
+         * annotation will have a minimal priority.
          * @param annotation the annotation, from which the priority map will be extracted. 
          */
         void fill(GraphFormulaCNF *annotation);
@@ -121,7 +125,7 @@ class PriorityMap {
         KeyType pop();
 
         /**
-         * Returns true if the priority map is empty. Return false otherwise.
+         * Returns true iff the priority map is empty.
          */
         bool empty() const;
 
@@ -129,10 +133,15 @@ class PriorityMap {
 
         /*
          * Type of priority map.
+         * The first element of number represents the minimal clause containing the key element.
+         * The second element of number represents the maximal occurence of the key element throughout the annotation. 
          */ 
         typedef map<KeyType, pair<int, int> > MapType;
 
-        MapType map;
+        /*
+         * Underlying representation of association between interface places and their priority.
+         */
+        MapType pm;
 };
 
 #endif /*OG_H_*/

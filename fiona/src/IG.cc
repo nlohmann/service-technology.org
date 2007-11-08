@@ -128,7 +128,7 @@ void interactionGraph::buildGraph(GraphNode* currentNode) {
                 numberDeletedVertices--;
                 delete v;
             } else {
-                if (addGraphNode (currentNode, v, *iter, SENDING)) {
+                if (addGraphNode(currentNode, v, *iter, SENDING)) {
 
 #ifdef LOOP
                     cout << "calc next node? [y,n]" << endl;
@@ -607,8 +607,8 @@ void interactionGraph::calculateSuccStatesInput(messageMultiSet input,
     PN->visitedStates.clear();
 
     if (TRACE_2 <= debug_level) {
-        for (messageMultiSet::iterator iter1 = input.begin(); iter1
-                != input.end(); iter1++) {
+        for (messageMultiSet::iterator iter1 = input.begin();
+             iter1 != input.end(); iter1++) {
             trace(TRACE_2, PN->getPlace(*iter1)->name);
             trace(TRACE_2, " ");
         }

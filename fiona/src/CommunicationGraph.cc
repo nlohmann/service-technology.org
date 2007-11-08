@@ -676,6 +676,7 @@ void CommunicationGraph::printGraphToSTGRecursively(GraphNode* v,
         switch (element->getType()) {
             case SENDING  : os << "out."; break;
             case RECEIVING: os << "in.";  break;
+            default: break;
         }
 
         os << this_edges_label;

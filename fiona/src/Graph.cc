@@ -1250,11 +1250,12 @@ void Graph::constructDualService() {
 				case RECEIVING:
 					recvEvents.insert(currEdge->getLabel());
 					break;
-				case INTERNAL:
+				case SILENT:
 					// do nothing
 					break;
 				default:
 					// should never be reached
+				    assert(false);
 					trace(TRACE_0, "discovered an event with unknown type (label was " +
 						currEdge->getLabel() + ")\n");
 					// do nothing

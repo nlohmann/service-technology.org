@@ -197,10 +197,8 @@ class GraphNode {
         /// get the annotation
         GraphFormulaCNF* getAnnotation() const;
 
-// CODE FROM PL
         /// set the annotation
         void setAnnotation(GraphFormulaCNF*);
-// END OF CODE FROM PL
 
         /// get the annotation as a string
         std::string getAnnotationAsString() const;

@@ -360,7 +360,6 @@ void computeOG(oWFN* PN) {
             //graph->bdd->printGraphToDot();
             graph->bdd->save("OTF");
         }
-
     }
 
     if (options[O_BDD]) {
@@ -384,7 +383,6 @@ void computeOG(oWFN* PN) {
     // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
     trace(TRACE_0, "=================================================================\n");
     trace(TRACE_0, "\n");
-
 
 }
 
@@ -438,7 +436,7 @@ void computeIG(oWFN* PN) {
         graph->printGraphToDot(); // .out
 
         if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
-            if (controllable ) {
+            if (controllable) {
                 graph->printGraphToSTG();
             } else {
                 trace(TRACE_0, "\nCannot synthesize a partner for a net, that is not controllable\n\n");
@@ -873,6 +871,7 @@ int main(int argc, char ** argv) {
                 parameters[P_SHOW_EMPTY_NODE] = tempP_SHOW_EMPTY_NODE;
                 
                 OGsFromFiles.push_back(graph);
+
                 delete graph;
             }
             
@@ -941,8 +940,8 @@ int main(int argc, char ** argv) {
     // **********************************************************************************
     // start petrinet-file dependant operations
 
-    if ((options[O_EX] && options[O_BDD]) || options[O_MATCH] || parameters[P_OG] || parameters[P_IG] ||
-        options[O_PNG]) {
+    if ((options[O_EX] && options[O_BDD]) || options[O_MATCH] || options[O_PNG] ||
+        parameters[P_IG] || parameters[P_OG]) {
 
         if (options[O_EX]) {
             // checking exchangeability using BDDs
@@ -977,14 +976,11 @@ int main(int argc, char ** argv) {
 
             // report the net
             trace(TRACE_0, "    places: " + intToString(PN->getPlaceCount()));
-            trace(TRACE_0, " (including "
-                           + intToString(PN->getInputPlaceCount()) + " input places, "
-                           + intToString(PN->getOutputPlaceCount())
-                           + " output places)\n");
-            trace(TRACE_0, "    transitions: "
-                           + intToString(PN->getTransitionCount()) + "\n");
-            trace(TRACE_0, "    ports: " + intToString(PN->getPortCount())
-                           + "\n\n");
+            trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCount()));
+            trace(TRACE_0, " input places, " + intToString(PN->getOutputPlaceCount()));
+            trace(TRACE_0, " output places)\n");
+            trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCount()) + "\n");
+            trace(TRACE_0, "    ports: " + intToString(PN->getPortCount()) + "\n\n");
             if (PN->FinalCondition) {
                 trace(TRACE_0, "finalcondition used\n\n");
             } else if (PN->FinalMarking) {

@@ -123,43 +123,45 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
     double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount()));
 
     PriorityMap pm;
-    PriorityMap::KeyType key;
+    PriorityMap::KeyType currentEvent;
 
     pm.fill(currentNode->getAnnotation());
 
     // iterate over all input and output places of the oWFN
-    while(!pm.empty())
-    {
-        key = pm.pop();
+    // in the order which is given by PriorityMap pm
+    while(!pm.empty()) {
 
-        if (key->getType() == INPUT) {
+        currentEvent = pm.pop();
+
+        if (currentEvent->getType() == INPUT) {
             trace(TRACE_2, "\t\t\t    sending event: ");
-        } else if (key->getType() == OUTPUT) {
+        } else if (currentEvent->getType() == OUTPUT) {
             trace(TRACE_2, "\t\t\t  receiving event: ");
         } 
-        trace(TRACE_2, key->getLabelForCommGraph() + "\n");
+        trace(TRACE_2, currentEvent->getLabelForCommGraph() + "\n");
 
-        if (key->max_occurence < 0 || 
-            (key->getType() == INPUT &&
-             key->max_occurence > currentNode->eventsUsed[PN->getInputPlaceIndex(key)]) || 
-            (key->getType() == OUTPUT &&
-             key->max_occurence > currentNode->eventsUsed[PN->getOutputPlaceIndex(key) + PN->getInputPlaceCount()])) {
+        if (currentEvent->max_occurence < 0 || 
+            (currentEvent->getType() == INPUT &&
+             currentEvent->max_occurence > currentNode->eventsUsed[PN->getInputPlaceIndex(currentEvent)]) || 
+            (currentEvent->getType() == OUTPUT &&
+             currentEvent->max_occurence > currentNode->eventsUsed[PN->getOutputPlaceIndex(currentEvent)
+                                                                 + PN->getInputPlaceCount()])) {
             // we have to consider this event
 
             GraphNode* v = new GraphNode();    // create new GraphNode of the graph
 
             trace(TRACE_5, "\t\t\t\t    calculating successor states\n");
-            if (key->getType() == INPUT) {
-                calculateSuccStatesInput(PN->getPlaceIndex(key), currentNode, v);
-            } else if (key->getType() == OUTPUT) {
-                calculateSuccStatesOutput(PN->getPlaceIndex(key), currentNode, v);
+            if (currentEvent->getType() == INPUT) {
+                calculateSuccStatesInput(PN->getPlaceIndex(currentEvent), currentNode, v);
+            } else if (currentEvent->getType() == OUTPUT) {
+                calculateSuccStatesOutput(PN->getPlaceIndex(currentEvent), currentNode, v);
             }
 
-            if (key->getType() == INPUT && v->getColor() == RED) {
+            if (currentEvent->getType() == INPUT && v->getColor() == RED) {
                 // message bound violation occured during calculateSuccStatesInput
                 trace(TRACE_2, "\t\t\t            event suppressed (message bound violated)\n");
 
-                currentNode->removeLiteralFromAnnotation(key->getLabelForCommGraph());
+                currentNode->removeLiteralFromAnnotation(currentEvent->getLabelForCommGraph());
 
                 addProgress(your_progress);
                 printProgress();
@@ -175,13 +177,13 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                     // node v is new, so the node as well as the edge to it is added
 
                     addGraphNode(currentNode, v);
-                    if (key->getType() == INPUT) {
-                        addGraphEdge(currentNode, v, PN->getInputPlaceIndex(key), SENDING);
+                    if (currentEvent->getType() == INPUT) {
+                        addGraphEdge(currentNode, v, PN->getInputPlaceIndex(currentEvent), SENDING);
 
                         // going down with sending event ...
                         buildGraph(v, your_progress);
-                    } else if (key->getType() == OUTPUT) {
-                        addGraphEdge(currentNode, v, PN->getOutputPlaceIndex(key), RECEIVING);
+                    } else if (currentEvent->getType() == OUTPUT) {
+                        addGraphEdge(currentNode, v, PN->getOutputPlaceIndex(currentEvent), RECEIVING);
 
                         // going down with receiving event ...
                         buildGraph(v, 0);
@@ -189,7 +191,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
                     trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
                     if (v->getColor() == RED) {
-                        currentNode->removeLiteralFromAnnotation(key->getLabelForCommGraph());
+                        currentNode->removeLiteralFromAnnotation(currentEvent->getLabelForCommGraph());
                     }
                 } else {
                     // node was computed before, so only add a new edge to the old node
@@ -198,7 +200,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                     trace(TRACE_1, "\n");
 
                     // draw a new edge to the old node
-                    string edgeLabel = key->getLabelForCommGraph();
+                    string edgeLabel = currentEvent->getLabelForCommGraph();
                     GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
                     currentNode->addLeavingEdge(newEdge);
 
@@ -206,11 +208,11 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                     // of the edge from currentNode to the old node must be removed
                     // in the annotation of currentNode.
                     if (found->getColor() == RED) {
-                        currentNode->removeLiteralFromAnnotation(key->getLabelForCommGraph());
+                        currentNode->removeLiteralFromAnnotation(currentEvent->getLabelForCommGraph());
                     }
                     delete v;
 
-                    if (key->getType() == INPUT) {
+                    if (currentEvent->getType() == INPUT) {
                         addProgress(your_progress);
                         printProgress();
                     }
@@ -219,9 +221,9 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
         } else {
             trace(TRACE_2, "\t\t\t            event suppressed (max_occurence reached)\n");
 
-            currentNode->removeLiteralFromAnnotation(key->getLabelForCommGraph());
+            currentNode->removeLiteralFromAnnotation(currentEvent->getLabelForCommGraph());
 
-            if (key->getType() == INPUT) {
+            if (currentEvent->getType() == INPUT) {
                 addProgress(your_progress);
                 printProgress();
             }
@@ -252,6 +254,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
         bdd->addOrDeleteLeavingEdges(currentNode);
     }
 }
+
 
 //! \brief adds the node toAdd to the set of all nodes
 //! and copies the eventsUsed array from the sourceNode

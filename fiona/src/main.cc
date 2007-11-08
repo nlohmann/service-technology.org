@@ -810,15 +810,15 @@ int main(int argc, char ** argv) {
             // equivalence on Graph
             // While we don't have enough OGs, compute some from the given
             // netfiles.
+            // save state of some parameters
+            bool tempO_SHOW_NODES = options[O_SHOW_NODES];
+            bool tempP_SHOW_EMPTY_NODE = parameters[P_SHOW_EMPTY_NODE];
+            // now adjust them to compute the correct OG
+            options[O_SHOW_NODES] = true;
+            parameters[P_SHOW_EMPTY_NODE] = true;
+            
+            list<std::string>::iterator netiter = netfiles.begin();
             while (OGsFromFiles.size() < 2) {
-                // save state of some parameters
-                bool tempO_SHOW_NODES = options[O_SHOW_NODES];
-                bool tempP_SHOW_EMPTY_NODE = parameters[P_SHOW_EMPTY_NODE];
-                // now adjust them to compute the correct OG
-                options[O_SHOW_NODES] = true;
-                parameters[P_SHOW_EMPTY_NODE] = true;
-                
-                list<std::string>::iterator netiter = netfiles.begin();
                 
                 numberOfEvents = 0;
                 numberOfDecodes = 0;
@@ -866,14 +866,14 @@ int main(int argc, char ** argv) {
                 graph->buildGraph(); // build operating guideline
                 trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
                 
-                // restore state of parameters
-                options[O_SHOW_NODES] = tempO_SHOW_NODES;
-                parameters[P_SHOW_EMPTY_NODE] = tempP_SHOW_EMPTY_NODE;
-                
                 OGsFromFiles.push_back(graph);
 
-                delete graph;
+                netiter++;
             }
+                
+            // restore state of parameters
+            options[O_SHOW_NODES] = tempO_SHOW_NODES;
+            parameters[P_SHOW_EMPTY_NODE] = tempP_SHOW_EMPTY_NODE;
             
             checkEquality(OGsFromFiles);
             trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");

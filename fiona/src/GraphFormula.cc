@@ -326,8 +326,6 @@ void GraphFormulaMultiary::removeLiteral(const std::string& name) {
         GraphFormulaLiteral* currentFormula = dynamic_cast<GraphFormulaLiteral*> (*iCurrentFormula);
         if (currentFormula != NULL) {
         	
-        	cout << "currentFormula->asString(): " << currentFormula->asString() << endl;
-        	
             // the current formula is a literal
             if (currentFormula->asString() == name) {
                 // the literal has the right name, so remove it

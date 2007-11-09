@@ -205,6 +205,15 @@ void readAllOGs(Graph::ogs_t& theOGs) {
 }
 
 
+//! \brief deletes all OGs from a list
+void deleteOGs(const Graph::ogs_t& OGsFromFiles) {
+    for (Graph::ogs_t::const_iterator iOg = OGsFromFiles.begin(); iOg
+            != OGsFromFiles.end(); ++iOg) {
+        delete *iOg;
+    }
+}
+
+
 //! \brief reports values for -e and -m option
 void reportOptionValues() {
     trace(TRACE_5, "-e option found: ");
@@ -547,7 +556,13 @@ void checkSimulation(const Graph::ogs_t& OGsFromFiles) {
 //!        if called with an oWFN, then the corresponding OG is computed first
 void checkEquivalence(Graph::ogs_t& OGsFromFiles) {
 
+    // OGs given by command line are already stored in OGsFromFiles
+
     bool calledWithNet = false;
+
+    // we can only check exactly 2 OGs for equivalence
+    // a possible violation should have been rejected by options.cc
+    assert(netfiles.size() + OGsFromFiles.size() == 2);
 
     if (OGsFromFiles.size() < 2) {
         // oWFN(s) was given on command line, so compute the corresponding OGs
@@ -883,9 +898,10 @@ int main(int argc, char ** argv) {
 
     // **********************************************************************************
     // ********                start OG file dependant operations                ********
+    // ********                       (all OGs read first)                       ********
     // **********************************************************************************
 
-    if (options[O_MATCH] || options[O_PRODUCTOG] || options[O_SIMULATES]
+    if (options[O_PRODUCTOG] || options[O_SIMULATES]
         || (options[O_EX] && !options[O_BDD]) || options[O_FILTER]) {
 
         // reading all OG-files
@@ -897,11 +913,6 @@ int main(int argc, char ** argv) {
         // Must NOT be called before fclose(og_yyin);
         og_yylex_destroy();
 #endif
-        if (options[O_MATCH]) {
-            // matching against an OG
-            OGToMatch = *(OGsFromFiles.begin());
-        }
-
         if (options[O_PRODUCTOG]) {
             // calculating the product OG
             computeProductOG(OGsFromFiles);
@@ -928,6 +939,11 @@ int main(int argc, char ** argv) {
             return 0;
         }
     }
+
+    // **********************************************************************************
+    // ********                start OG file dependant operations                ********
+    // ********                  (OGs read one after the other)                  ********
+    // **********************************************************************************
 
     if (parameters[P_PV] || options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC]) {
 
@@ -972,6 +988,11 @@ int main(int argc, char ** argv) {
         return 0;
     }
 
+    // **********************************************************************************
+    // ********                start PN file dependant operations                ********
+    // **********************************************************************************
+
+    // netfiles only used for getting the correct name strings
     if (options[O_EX] && options[O_BDD]) {
         // checking exchangeability using BDDs
 
@@ -987,11 +1008,14 @@ int main(int argc, char ** argv) {
         return 0;
     }
 
-    // **********************************************************************************
-    // ********                start PN file dependant operations                ********
-    // **********************************************************************************
-
     if (parameters[P_IG] || parameters[P_OG] || options[O_MATCH] || options[O_PNG]) {
+
+        if (options[O_MATCH]) {
+            assert(ogfiles.size() == 1);
+            // we match multiple oWFNs with one OG,
+            // so read the og first, then iterate over the nets
+            OGToMatch = readog(*(ogfiles.begin()));
+        }
 
         // ---------------- processing every single net -------------------
         for (list<std::string>::iterator netiter = netfiles.begin();
@@ -1018,35 +1042,34 @@ int main(int argc, char ** argv) {
             reportNet();
             delete PlaceTable;
 
-            // adjust events_manual and print limit of considering events
-            if (parameters[P_OG] || parameters[P_IG] || options[O_MATCH]) {
-                reportOptionValues();
-            }
             // start computation
 
             if (parameters[P_IG]) {
                 // computing IG of the current oWFN
+                reportOptionValues(); // adjust events_manual and print limit of considering events
                 computeIG(PN);
             }
 
             if (parameters[P_OG]) {
                 // computing OG of the current oWFN
+                reportOptionValues(); // adjust events_manual and print limit of considering events
                 computeOG(PN);
             }
 
             if (options[O_MATCH]) {
-                // matching current oWFN against the OG 
+                // matching the current oWFN against the single OG 
                 checkMatching(OGToMatch, PN);
             }
 
             if (options[O_PNG]) {
-                // create a png file from the given net
+                // create a png file of the given net
                 makePNG(PN);
             }
 
+            // cout << "numberOfDecodes: " << numberOfDecodes << endl;   
+
             delete PN;
             trace(TRACE_5, "net deleted\n");
-            // cout << "numberOfDecodes: " << numberOfDecodes << endl;   
         }
 
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
@@ -1056,6 +1079,7 @@ int main(int argc, char ** argv) {
 #endif
 
     } // end of petrinet dependant operations
+
 
 #ifdef LOG_NEW
     NewLogger::printall();
@@ -1075,11 +1099,4 @@ std::string platform_basename(const std::string& path) {
     free(ppath);
     return result;
 #endif
-}
-
-void deleteOGs(const Graph::ogs_t& OGsFromFiles) {
-    for (Graph::ogs_t::const_iterator iOg = OGsFromFiles.begin(); iOg
-            != OGsFromFiles.end(); ++iOg) {
-        delete *iOg;
-    }
 }

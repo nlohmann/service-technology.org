@@ -93,7 +93,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "Computed number of Services: 5" > /dev/null
+    echo $OUTPUT | grep "Computed number of strategies: 5" > /dev/null
     resultCyclic=$?
 
     if [ $resultCyclic -ne 0 ]; then
@@ -113,7 +113,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "Computed number of Services: 0" > /dev/null
+    echo $OUTPUT | grep "Computed number of strategies: 0" > /dev/null
     resultCyclic=$?
 
     if [ $resultCyclic -ne 0 ]; then

@@ -61,7 +61,7 @@ do
     else
         echo running $cmd
         OUTPUT=`$cmd 2>&1`
-        echo $OUTPUT | grep "The first OG has all the strategies of the second one, possibly more." > /dev/null
+        echo $OUTPUT | grep "The first OG characterizes all strategies of the second one, possibly more." > /dev/null
         resultSIM=$?
         if [ $resultSIM -ne 0 ]; then
             let "result += 1"
@@ -89,7 +89,7 @@ do
     else
         echo running $cmd
         OUTPUT=`$cmd 2>&1`
-        echo $OUTPUT | grep "The second OG has a strategy which the first one hasn't." > /dev/null
+        echo $OUTPUT | grep "The second OG characterizes at least one strategy that is" > /dev/null
         resultSIM=$?
         if [ $resultSIM -ne 0 ]; then
             let "result += 1"
@@ -112,7 +112,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "The first OG has all the strategies of the second one, possibly more." > /dev/null
+    echo $OUTPUT | grep "The first OG characterizes all strategies of the second one, possibly more." > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
@@ -134,7 +134,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "The first OG has all the strategies of the second one, possibly more." > /dev/null
+    echo $OUTPUT | grep "The first OG characterizes all strategies of the second one, possibly more." > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
@@ -156,7 +156,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "The first OG has all the strategies of the second one, possibly more." > /dev/null
+    echo $OUTPUT | grep "The first OG characterizes all strategies of the second one, possibly more." > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
@@ -178,7 +178,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "The second OG has a strategy which the first one hasn't." > /dev/null
+    echo $OUTPUT | grep "The second OG characterizes at least one strategy that is" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
@@ -200,7 +200,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "The first OG has all the strategies of the second one, possibly more." > /dev/null
+    echo $OUTPUT | grep "The first OG characterizes all strategies of the second one, possibly more." > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
@@ -222,7 +222,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "The second OG has a strategy which the first one hasn't." > /dev/null
+    echo $OUTPUT | grep "The second OG characterizes at least one strategy that is" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"

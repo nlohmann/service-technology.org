@@ -53,7 +53,7 @@ do
     #OUTPUT=`$FIONA $owfn2 -t OG`
 
     cmd="$FIONA ${owfn1}.og ${owfn2}.og -t simulation"
-    
+
     if [ "$memcheck" = "yes" ]; then
         memchecklog="$owfn1.memcheck.log"
         do_memcheck "$cmd" "$memchecklog"
@@ -119,7 +119,7 @@ else
         echo ... Simulation failed, although it should not.
     fi
 fi
-    
+
 #############################################################################
 
 og1="$DIR/coarse.og"
@@ -141,7 +141,7 @@ else
         echo ... Simulation failed, although it should not.
     fi
 fi
-    
+
 #############################################################################
 
 og1="$DIR/coarse.og"
@@ -163,7 +163,7 @@ else
         echo ... Simulation failed, although it should not.
     fi
 fi
-    
+
 #############################################################################
 
 og1="$DIR/coarse-chopped.og"
@@ -185,7 +185,7 @@ else
         echo ... Simulation succeded, although it should not.
     fi
 fi
-    
+
 #############################################################################
 
 og1="$DIR/compact.og"
@@ -207,7 +207,7 @@ else
         echo ... Simulation failed, although it should not.
     fi
 fi
-    
+
 #############################################################################
 
 og1="$DIR/coarse-chopped.og"
@@ -229,7 +229,7 @@ else
         echo ... Simulation succeded, although it should not.
     fi
 fi
-    
+
 #############################################################################
 
 og1="$DIR/compact.og"
@@ -244,14 +244,14 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "The two OGs are equivalent, that is, they have the same strategies." > /dev/null
+    echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... OGs determined not equivalent, although they are.
     fi
 fi
-    
+
 #############################################################################
 
 og1="$DIR/coarse.og"
@@ -266,14 +266,14 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "The first OG has a strategy which the second one hasn't." > /dev/null
+    echo $OUTPUT | grep "The first OG characterizes all strategies of the second one" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... first OG not found to simulate the second one, although it does.
     fi
 fi
-    
+
 #############################################################################
 
 og1="$DIR/compact.og"
@@ -288,7 +288,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "The first OG has a strategy which the second one hasn't." > /dev/null
+    echo $OUTPUT | grep "The first OG characterizes all strategies of the second one" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"

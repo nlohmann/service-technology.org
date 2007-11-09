@@ -264,20 +264,74 @@ void reportOptionValues() {
 }
 
 
-// **********************************************************************************
+ // **********************************************************************************
 // *******                    mode dependent functions                       ********
 // **********************************************************************************
 
-// match a net against an og
-void matchNet(Graph* OGToMatch, oWFN* PN) {
-    string reasonForFailedMatch;
-    if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
-        trace(TRACE_0, "oWFN matches with OG: YES\n\n");
+// create an IG of an oWFN
+void computeIG(oWFN* PN) {
+
+    time_t seconds, seconds2;
+    interactionGraph * graph = new interactionGraph(PN);
+    bool controllable = false;
+
+    if (options[O_CALC_REDUCED_IG]) {
+        trace(TRACE_0, "building the reduced interaction graph...\n");
     } else {
-        trace(TRACE_0, "oWFN matches with OG: NO\n");
-        trace(TRACE_0, "Match failed, because: " +reasonForFailedMatch + "\n\n");
+        trace(TRACE_0, "building the interaction graph...\n");
     }
-    delete OGToMatch;
+
+    seconds = time (NULL);
+
+    graph->buildGraph(); // build interaction graph
+
+    seconds2 = time (NULL);
+
+    if (options[O_CALC_REDUCED_IG]) {
+        trace(TRACE_0, "building the reduced interaction graph finished.\n");
+    } else {
+        trace(TRACE_0, "\nbuilding the interaction graph finished.\n");
+    }
+
+    cout << difftime(seconds2, seconds) << " s consumed for building graph" << endl;
+
+    trace(TRACE_0, "\nnet is controllable: ");
+    if (graph->getRoot()->getColor() == BLUE) {
+        trace(TRACE_0, "YES\n\n");
+        controllable = true;
+    } else {
+        trace(TRACE_0, "NO\n\n");
+    }
+
+    // print statistics
+    trace(TRACE_0, "IG statistics:\n");
+    graph->printGraphStatistics();
+    trace(TRACE_0, "\n");
+
+    if (!options[O_NOOUTPUTFILES]) {
+        if (options[O_DIAGNOSIS]) {
+            graph->diagnose();
+        }
+
+        // generate output files
+        graph->printGraphToDot(); // .out
+
+        if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
+            if (controllable) {
+                graph->printGraphToSTG();
+            } else {
+                trace(TRACE_0, "\nCannot synthesize a partner for a net, that is not controllable\n\n");
+            }
+        }
+    }
+
+    trace(TRACE_5, "computation finished -- trying to delete graph\n");
+    // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+
+    delete graph;
+    trace(TRACE_5, "graph deleted\n");
+    trace(TRACE_0, "=================================================================\n");
+    trace(TRACE_0, "\n");
 }
 
 
@@ -392,154 +446,7 @@ void computeOG(oWFN* PN) {
 }
 
 
-// create an IG of an oWFN
-void computeIG(oWFN* PN) {
-
-    time_t seconds, seconds2;
-    interactionGraph * graph = new interactionGraph(PN);
-    bool controllable = false;
-
-    if (options[O_CALC_REDUCED_IG]) {
-        trace(TRACE_0, "building the reduced interaction graph...\n");
-    } else {
-        trace(TRACE_0, "building the interaction graph...\n");
-    }
-
-    seconds = time (NULL);
-
-    graph->buildGraph(); // build interaction graph
-
-    seconds2 = time (NULL);
-
-    if (options[O_CALC_REDUCED_IG]) {
-        trace(TRACE_0, "building the reduced interaction graph finished.\n");
-    } else {
-        trace(TRACE_0, "\nbuilding the interaction graph finished.\n");
-    }
-
-    cout << difftime(seconds2, seconds) << " s consumed for building graph" << endl;
-
-    trace(TRACE_0, "\nnet is controllable: ");
-    if (graph->getRoot()->getColor() == BLUE) {
-        trace(TRACE_0, "YES\n\n");
-        controllable = true;
-    } else {
-        trace(TRACE_0, "NO\n\n");
-    }
-
-    // print statistics
-    trace(TRACE_0, "IG statistics:\n");
-    graph->printGraphStatistics();
-    trace(TRACE_0, "\n");
-
-    if (!options[O_NOOUTPUTFILES]) {
-        if (options[O_DIAGNOSIS]) {
-            graph->diagnose();
-        }
-
-        // generate output files
-        graph->printGraphToDot(); // .out
-
-        if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
-            if (controllable) {
-                graph->printGraphToSTG();
-            } else {
-                trace(TRACE_0, "\nCannot synthesize a partner for a net, that is not controllable\n\n");
-            }
-        }
-    }
-
-    trace(TRACE_5, "computation finished -- trying to delete graph\n");
-    // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
-
-    delete graph;
-    trace(TRACE_5, "graph deleted\n");
-    trace(TRACE_0, "=================================================================\n");
-    trace(TRACE_0, "\n");
-}
-
-
-// create an PNG of the given oWFN
-void makePNG(oWFN* PN) {
-
-    trace(TRACE_1, "Internal translation of the net into PNapi format...\n");
-
-    // translate the net into PNapi format
-    PNapi::PetriNet* PNapiNet = PN->returnPNapiNet();
-
-    // set strings needed in PNapi output
-    globals::output_filename = PN->filename;
-    if (PN->finalConditionString != "") {
-        globals::filename = PN->filename + " | Final Condition: "
-                + PN->finalConditionString;
-    } else {
-        globals::filename = PN->filename + " | Final Marking: "
-                + PN->finalMarkingString;
-    }
-
-    // create temporary stream as target for the dot output of the PNapiNet
-    ostringstream* dot = new ostringstream(ostringstream::out);
-
-    // set the output format to dot
-    PNapiNet->set_format(PNapi::FORMAT_DOT, true);
-
-    trace(TRACE_1, "Creating dot stream\n");
-
-    // create the dot
-    (*dot) << (*PNapiNet);
-
-    // generate a string from the stream to be modified for piping
-    string dotString = dot->str();
-
-    delete(dot);
-
-    unsigned int position;
-    unsigned int deletePosition;
-
-    trace(TRACE_3, "Modifiyng dot stream\n");
-
-    // delete all comments in the dot output of the PNapiNet, since the endlines will 
-    // be deleted for echo piping and "//" comments won't work anymore
-    int counter = 0;
-    while ((position = dotString.find_first_of("/", counter)) != string::npos) {
-        if (dotString.at(position+1)=='/') {
-            deletePosition = dotString.find_first_of("\n", (position + 2));
-            dotString.erase(position, (deletePosition - position));
-        } else {
-          counter = position+1;
-        }
-    }
-
-    // delete all endlines and escape all quotes for the echo string
-    for (unsigned int i = 0; i != dotString.size(); i++) {
-        char testchar;
-        testchar = dotString[i];
-
-        if (testchar == '\n') {
-            dotString.erase(i, 1);
-            dotString.insert(i, " ");
-        }
-
-        if (testchar == '"') {
-            dotString.insert(i, "\\");
-            i++;
-        }
-    }
-
-
-    // finish the string for the system call
-    dotString = "echo \"" + dotString + "\" | dot -q -Tpng -o \""
-            + globals::output_filename + ".png\"";
-
-    trace(TRACE_1, "Piping the stream to dot\n");
-
-    // create the output
-    system(dotString.c_str());
-    trace(TRACE_0, (globals::output_filename + ".png generated\n\n"));
-}
-
-
-// create the productOG of all given OGs
+//! \brief create the productOG of all given OGs
 void computeProductOG(const Graph::ogs_t& OGsFromFiles) {
     trace("Building product of the following OGs:\n");
 
@@ -573,28 +480,77 @@ void computeProductOG(const Graph::ogs_t& OGsFromFiles) {
 }
 
 
-// check for simulation relation of two given OGs
-void checkSimulation(const Graph::ogs_t& OGsFromFiles) {
-    Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
-    Graph *simulator = *GraphIter;
-    Graph *simulant = *(++GraphIter);
-    if (simulator->simulates(simulant)) {
-        trace(TRACE_0, "\nThe first OG has all the strategies of the second one, possibly more.\n\n");
-    } else {
-        trace(TRACE_0, "\nThe second OG has a strategy which the first one hasn't.\n\n");
+//! \brief public view generation
+void computePublicView(Graph* OG, string graphName) {
+
+    trace(TRACE_0, "generating the public view for\n");
+    trace(graphName);
+    trace("\n");
+
+    outfilePrefix = Graph::stripOGFileSuffix(graphName);
+    outfilePrefix += ".pvsa";
+
+    //    if (!options[O_OUTFILEPREFIX]) {
+//        outfilePrefix = Graph::stripOGFileSuffix(graphName);
+//        outfilePrefix += ".pvsa";
+//    }
+
+    OG->transformToPublicView();
+
+    // generate output files
+    if (!options[O_NOOUTPUTFILES]) {
+        trace(TRACE_0, "generating dot output...\n");
+
+        // .out
+        OG->printDotFile(outfilePrefix, "Public View Service Automaton of "
+                                         + Graph::stripOGFileSuffix(*(ogfiles.begin())));
+
+        // .og
+        OG->printOGFile(outfilePrefix);
     }
 }
 
 
-// check if two given ogs are equal
+//! \brief match a net against an og
+void checkMatching(Graph* OGToMatch, oWFN* PN) {
+    string reasonForFailedMatch;
+    if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
+        trace(TRACE_0, "oWFN matches with OG: YES\n\n");
+    } else {
+        trace(TRACE_0, "oWFN matches with OG: NO\n");
+        trace(TRACE_0, "Match failed, because: " +reasonForFailedMatch + "\n\n");
+    }
+    delete OGToMatch;
+}
+
+
+//! \brief check for simulation relation of two given OGs
+void checkSimulation(const Graph::ogs_t& OGsFromFiles) {
+    Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
+    Graph *firstOG = *GraphIter;
+    Graph *secondOG = *(++GraphIter);
+
+    trace(TRACE_1, "checking simulation\n");
+    if (firstOG->simulates(secondOG)) {
+        trace(TRACE_0, "The first OG characterizes all strategies of the second one\n\n");
+    } else {
+        trace(TRACE_0, "The second OG characterizes at least one strategy that is\n");
+        trace(TRACE_0, "not characterized by the first one.\n\n");
+    }
+
+    trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
+    trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
+}
+
+
+//! \brief check if two given OGs characterize the same set of strategies;
+//!        if called with an oWFN, then the corresponding OG is computed first
 void checkEquivalence(Graph::ogs_t& OGsFromFiles) {
 
     bool calledWithNet = false;
 
     if (OGsFromFiles.size() < 2) {
-        // if oWFNs are given on command line, compute the corresponding
-        // OGs first
-
+        // oWFN(s) was given on command line, so compute the corresponding OGs
         calledWithNet = true;
 
         // equivalence on OGs depends heavily on empty node,
@@ -689,7 +645,7 @@ void checkEquivalence(Graph::ogs_t& OGsFromFiles) {
 
 
 // create a filtered OG
-void createFiltered(const Graph::ogs_t& OGsFromFiles) {
+void computeFilteredOG(const Graph::ogs_t& OGsFromFiles) {
     Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
     Graph *lhs = *GraphIter;
     Graph *rhs = *(++GraphIter);
@@ -722,29 +678,109 @@ void createFiltered(const Graph::ogs_t& OGsFromFiles) {
 }
 
 
-// computes the number of Services that are determined by every single OG
-void countServices(Graph* OG, string graphName) {
+// create an PNG of the given oWFN
+void makePNG(oWFN* PN) {
+
+    trace(TRACE_1, "Internal translation of the net into PNapi format...\n");
+
+    // translate the net into PNapi format
+    PNapi::PetriNet* PNapiNet = PN->returnPNapiNet();
+
+    // set strings needed in PNapi output
+    globals::output_filename = PN->filename;
+    if (PN->finalConditionString != "") {
+        globals::filename = PN->filename + " | Final Condition: "
+                + PN->finalConditionString;
+    } else {
+        globals::filename = PN->filename + " | Final Marking: "
+                + PN->finalMarkingString;
+    }
+
+    // create temporary stream as target for the dot output of the PNapiNet
+    ostringstream* dot = new ostringstream(ostringstream::out);
+
+    // set the output format to dot
+    PNapiNet->set_format(PNapi::FORMAT_DOT, true);
+
+    trace(TRACE_1, "Creating dot stream\n");
+
+    // create the dot
+    (*dot) << (*PNapiNet);
+
+    // generate a string from the stream to be modified for piping
+    string dotString = dot->str();
+
+    delete(dot);
+
+    unsigned int position;
+    unsigned int deletePosition;
+
+    trace(TRACE_3, "Modifiyng dot stream\n");
+
+    // delete all comments in the dot output of the PNapiNet, since the endlines will 
+    // be deleted for echo piping and "//" comments won't work anymore
+    int counter = 0;
+    while ((position = dotString.find_first_of("/", counter)) != string::npos) {
+        if (dotString.at(position+1)=='/') {
+            deletePosition = dotString.find_first_of("\n", (position + 2));
+            dotString.erase(position, (deletePosition - position));
+        } else {
+          counter = position+1;
+        }
+    }
+
+    // delete all endlines and escape all quotes for the echo string
+    for (unsigned int i = 0; i != dotString.size(); i++) {
+        char testchar;
+        testchar = dotString[i];
+
+        if (testchar == '\n') {
+            dotString.erase(i, 1);
+            dotString.insert(i, " ");
+        }
+
+        if (testchar == '"') {
+            dotString.insert(i, "\\");
+            i++;
+        }
+    }
+
+
+    // finish the string for the system call
+    dotString = "echo \"" + dotString + "\" | dot -q -Tpng -o \""
+            + globals::output_filename + ".png\"";
+
+    trace(TRACE_1, "Piping the stream to dot\n");
+
+    // create the output
+    system(dotString.c_str());
+    trace(TRACE_0, (globals::output_filename + ".png generated\n\n"));
+}
+
+
+// computes the number of strategies that are characterized by a given OG
+void countStrategies(Graph* OG, string graphName) {
 
     trace("Processing: ");
     trace(graphName);
     trace("\n");
 
-    trace(TRACE_1, "Checking if the net is acyclic\n");
+    trace(TRACE_1, "Checking if the OG is acyclic\n");
 
     if (OG->isAcyclic()) {
 
         time_t seconds, seconds2;
 
         seconds = time (NULL);
-        trace("Started computing the number of services\n");
+        trace("Started computing the number of strategies\n");
         // Compute and show the number of Services
-        trace("Computed number of Services: " + intToString(OG->numberOfServices()) + "\n");
+        trace("Computed number of strategies: " + intToString(OG->numberOfServices()) + "\n");
         seconds2 = time (NULL);
 
         cout << difftime(seconds2, seconds) << " s consumed for computation" << endl << endl;
 
     } else {
-        trace("Cannot compute number of Services, since the given OG is not acyclic\n\n");
+        trace("Cannot compute number of strategies, since the given OG is not acyclic\n\n");
     }
 }
 
@@ -756,7 +792,7 @@ void checkAcyclicity(Graph* OG, string graphName) {
     trace(graphName);
     trace("\n");
 
-    trace(TRACE_1, "Checking if the net is acyclic\n");
+    trace(TRACE_1, "Checking if the OG is acyclic\n");
 
     if (OG->isAcyclic()) {
         trace("The given OG is acyclic\n\n");
@@ -766,26 +802,13 @@ void checkAcyclicity(Graph* OG, string graphName) {
 }
 
 
-// public view generation
-void generatePublicView(const Graph::ogs_t& OGsFromFiles) {	
-    Graph* OG = *(OGsFromFiles.begin());
-    trace(TRACE_0, "generating the Public View Service Automaton...\n");
-    OG->transformToPublicView();
-
-    if (!options[O_OUTFILEPREFIX]) {
-        outfilePrefix = Graph::stripOGFileSuffix(*(ogfiles.begin()));
-        outfilePrefix += ".pvsa";
-    }
-
-    trace(TRACE_0, "generating dot output...\n");
-    OG->printDotFile(outfilePrefix, "Public View Service Automaton of "
-                                     + Graph::stripOGFileSuffix(*(ogfiles.begin())));		
-}
-
-
 // **********************************************************************************
-// ********                   MAIN                                           ********
 // **********************************************************************************
+// ********                               MAIN                               ********
+// **********************************************************************************
+// **********************************************************************************
+
+
 int main(int argc, char ** argv) {
 
 //	bool readExpliciteOG = false;
@@ -857,11 +880,13 @@ int main(int argc, char ** argv) {
     // evaluate command line options
     parse_command_line(argc, argv);
 
+
     // **********************************************************************************
-    // start OG file dependant operations
+    // ********                start OG file dependant operations                ********
+    // **********************************************************************************
 
     if (options[O_MATCH] || options[O_PRODUCTOG] || options[O_SIMULATES]
-        || (options[O_EX] && !options[O_BDD]) || options[O_FILTER] || parameters[P_PV]) {
+        || (options[O_EX] && !options[O_BDD]) || options[O_FILTER]) {
 
         // reading all OG-files
         Graph::ogs_t OGsFromFiles;
@@ -877,12 +902,6 @@ int main(int argc, char ** argv) {
             OGToMatch = *(OGsFromFiles.begin());
         }
 
-        if (parameters[P_PV]) {
-            generatePublicView(OGsFromFiles);
-            deleteOGs(OGsFromFiles);
-            return 0;
-        }
-
         if (options[O_PRODUCTOG]) {
             // calculating the product OG
             computeProductOG(OGsFromFiles);
@@ -893,26 +912,24 @@ int main(int argc, char ** argv) {
         if (options[O_SIMULATES]) {
             // simulation on Graph
             checkSimulation(OGsFromFiles);
-            trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
-            trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
             deleteOGs(OGsFromFiles);
+            return 0;
+        }
+
+        if (options[O_EX] && !options[O_BDD]) {
+            // equivalence on (explicit representation of) operating guidelines
+            checkEquivalence(OGsFromFiles);
             return 0;
         }
 
         if (options[O_FILTER]) {
             // filtration on OG
-            createFiltered(OGsFromFiles);
-            return 0;
-        }
-
-        if (options[O_EX]) {
-            // equivalence on (explicit representation of) operating guidelines
-            checkEquivalence(OGsFromFiles);
+            computeFilteredOG(OGsFromFiles);
             return 0;
         }
     }
 
-    if (options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC]) {
+    if (parameters[P_PV] || options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC]) {
 
         // Abort if there are no OGs at all
         if (ogfiles.begin() == ogfiles.end()) {
@@ -926,10 +943,17 @@ int main(int argc, char ** argv) {
         
             Graph* readOG = readog(*iOgFile);
         
+            if (parameters[P_PV]) {
+                // computes a service automaton "public view" which has the same
+                // OG as given in readOG
+                computePublicView(readOG, (*iOgFile));
+                delete readOG;
+            }
+
             if (options[O_COUNT_SERVICES]) {
                 // counts the number of deterministic strategies
                 // that are characterized by a given OG
-                countServices(readOG, (*iOgFile));
+                countStrategies(readOG, (*iOgFile));
                 delete readOG;
             }
     
@@ -948,27 +972,26 @@ int main(int argc, char ** argv) {
         return 0;
     }
 
+    if (options[O_EX] && options[O_BDD]) {
+        // checking exchangeability using BDDs
+
+        list<std::string>::iterator netiter = netfiles.begin();
+        Exchangeability* og1 = new Exchangeability(*netiter);
+        Exchangeability* og2 = new Exchangeability(*(++netiter));
+        trace(TRACE_0, "The two operating guidelines are equal: ");
+        if (og1->check(og2) == true) {
+            trace(TRACE_0, "YES\n\n");
+        } else {
+            trace(TRACE_0, "NO\n\n");
+        }
+        return 0;
+    }
 
     // **********************************************************************************
-    // start petrinet-file dependant operations
+    // ********                start PN file dependant operations                ********
+    // **********************************************************************************
 
-    if ((options[O_EX] && options[O_BDD]) || options[O_MATCH] || options[O_PNG] ||
-        parameters[P_IG] || parameters[P_OG]) {
-
-        if (options[O_EX] && options[O_BDD]) {
-            // checking exchangeability using BDDs
-
-            list<std::string>::iterator netiter = netfiles.begin();
-            Exchangeability* og1 = new Exchangeability(*netiter);
-            Exchangeability* og2 = new Exchangeability(*(++netiter));
-            trace(TRACE_0, "The two operating guidelines are equal: ");
-            if (og1->check(og2) == true) {
-                trace(TRACE_0, "YES\n\n");
-            } else {
-                trace(TRACE_0, "NO\n\n");
-            }
-            return 0;
-        }
+    if (parameters[P_IG] || parameters[P_OG] || options[O_MATCH] || options[O_PNG]) {
 
         // ---------------- processing every single net -------------------
         for (list<std::string>::iterator netiter = netfiles.begin();
@@ -999,11 +1022,11 @@ int main(int argc, char ** argv) {
             if (parameters[P_OG] || parameters[P_IG] || options[O_MATCH]) {
                 reportOptionValues();
             }
-            
             // start computation
-            if (options[O_MATCH]) {
-                // matching current oWFN against the OG 
-                matchNet(OGToMatch, PN);
+
+            if (parameters[P_IG]) {
+                // computing IG of the current oWFN
+                computeIG(PN);
             }
 
             if (parameters[P_OG]) {
@@ -1011,9 +1034,9 @@ int main(int argc, char ** argv) {
                 computeOG(PN);
             }
 
-            if (parameters[P_IG]) {
-                // computing IG of the current oWFN
-                computeIG(PN);
+            if (options[O_MATCH]) {
+                // matching current oWFN against the OG 
+                checkMatching(OGToMatch, PN);
             }
 
             if (options[O_PNG]) {

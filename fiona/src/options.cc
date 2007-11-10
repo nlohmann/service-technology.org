@@ -574,8 +574,8 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
-    if (options[O_SIMULATES] && ogfiles.size() != 2) {
-        cerr << "Error: \t If option -t simulation is used, exactly two OG files must be entered\n" << endl;
+    if (options[O_SIMULATES] && ((netfiles.size() + ogfiles.size()) != 2)) {
+        cerr << "Error: \t If option -t simulation is used, exactly two OG/oWFN files must be entered\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }

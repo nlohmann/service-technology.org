@@ -529,21 +529,88 @@ void checkMatching(Graph* OGToMatch, oWFN* PN) {
 
 
 //! \brief check for simulation relation of two given OGs
-void checkSimulation(const Graph::ogs_t& OGsFromFiles) {
-    Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
-    Graph *firstOG = *GraphIter;
-    Graph *secondOG = *(++GraphIter);
-
+void checkSimulation(Graph::ogs_t& OGsFromFiles) {
+    
+    // OGs given by command line are already stored in OGsFromFiles
+    
+    bool calledWithNet = false;
+    
+    // we can only check exactly 2 OGs for simulation
+    // a possible violation should have been rejected by options.cc
+    assert(netfiles.size() + OGsFromFiles.size() == 2);
+    
+    if (OGsFromFiles.size() < 2) {
+        // oWFN(s) was given on command line, so compute the corresponding OGs
+        calledWithNet = true;
+        
+        // equivalence (which is just bidirectional simulation) on OGs depends
+        // heavily on empty node,
+        // so set the correct options to compute OG with empty node
+        options[O_SHOW_NODES] = true;
+        parameters[P_SHOW_EMPTY_NODE] = true;
+    }
+    
+    // generate the OGs
+    list<std::string>::iterator netiter = netfiles.begin();
+    while (OGsFromFiles.size() < 2) {
+        
+        numberOfEvents = 0;
+        numberOfDecodes = 0;
+        garbagefound = 0;
+        global_progress = 0;
+        show_progress = 0;
+        State::state_count = 0; // number of states
+        numberDeletedVertices = 0;
+        
+        currentowfnfile = *netiter;
+        assert(currentowfnfile != "");
+        
+        // prepare getting the net
+        PlaceTable = new SymbolTab<PlSymbol>;
+        
+        // get the net into variable PN
+        readnet(currentowfnfile);
+        trace(TRACE_0, "=================================================================\n");
+        trace(TRACE_0, "processing net " + currentowfnfile + "\n");
+        reportNet();
+        delete PlaceTable;
+        
+        // compute OG
+        OG* graph = new OG(PN);
+        trace(TRACE_0, "building the operating guideline...\n");
+        graph->printProgressFirst();
+        graph->buildGraph(); // build operating guideline
+        trace(TRACE_0, "\nbuilding the operating guideline finished.\n\n");
+        
+        // add new OG to the list
+        OGsFromFiles.push_back(graph);
+        delete PN;
+        
+        netiter++;
+    }
+    
+    //    // restore state of parameters
+    //    options[O_SHOW_NODES] = tempO_SHOW_NODES;
+    //    parameters[P_SHOW_EMPTY_NODE] = tempP_SHOW_EMPTY_NODE;
+    
+    Graph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
+    Graph *firstOG = *currentOGfile;
+    Graph *secondOG = *(++currentOGfile);
+    
     trace(TRACE_1, "checking simulation\n");
     if (firstOG->simulates(secondOG)) {
-        trace(TRACE_0, "The first OG characterizes all strategies of the second one, possibly more.\n\n");
+        trace(TRACE_1, "simulation holds\n\n");
+        trace(TRACE_0, "The first OG characterizes all strategies of the second one.\n\n");
     } else {
+        trace(TRACE_1, "simulation does not hold\n\n");
         trace(TRACE_0, "The second OG characterizes at least one strategy that is\n");
         trace(TRACE_0, "not characterized by the first one.\n\n");
     }
-
-    trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
-    trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
+    
+    if (!calledWithNet) {
+        trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
+        trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
+    }
 }
 
 

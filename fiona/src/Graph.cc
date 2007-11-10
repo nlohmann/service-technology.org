@@ -1304,7 +1304,7 @@ void Graph::fixDualService() {
     unsigned int currNumberOfDeadlocks = 0;
     if (!options[O_PV_MULTIPLE_DEADLOCKS]) {
         // create new deadlock node
-        deadlock = new GraphNode("deadlock", new GraphFormulaFixed(false, ""), RED);
+        deadlock = new GraphNode("deadlock", new GraphFormulaFixed(false, GraphFormulaLiteral::FALSE));
     }
 
     // iterate over all nodes of the Graph
@@ -1323,8 +1323,7 @@ void Graph::fixDualService() {
         bool apply2ndFix = false;
         // preparation: we need to store the leaving edges for the new node somewhere
         set<GraphEdge*> newNodesEdges;
-        GraphNode::LeavingEdges::Iterator
-                edge_iter = currNode->getLeavingEdgesIterator();
+        GraphNode::LeavingEdges::Iterator edge_iter = currNode->getLeavingEdgesIterator();
         while (edge_iter->hasNext()) {
             newNodesEdges.insert(edge_iter->getNext());
         }
@@ -1377,8 +1376,9 @@ void Graph::fixDualService() {
 
         // iterate over all disabled receive events
         // if 1st fix needs to be applied, the set of disabled receive events is not empty
-        for (set<std::string>::iterator event_iter = disabledRecvEvents.begin(); event_iter
-                != disabledRecvEvents.end(); ++event_iter) {
+        for (set<std::string>::iterator event_iter = disabledRecvEvents.begin();
+             event_iter != disabledRecvEvents.end(); ++event_iter) {
+
             if (options[O_PV_MULTIPLE_DEADLOCKS]) {
                 // O_PV_MULTIPLE_DEADLOCKS is set
                 // try to read deadlock node from the mapping event->node
@@ -1387,9 +1387,11 @@ void Graph::fixDualService() {
                 if (deadlock == NULL) {
                     // deadlock node could not be determined
                     // create new deadlock node
-                    deadlock = new GraphNode("deadlock" +
-                            intToString(currNumberOfDeadlocks++),
-                            new GraphFormulaFixed(false, ""), RED);
+                    deadlock =
+                        new GraphNode("deadlock" +
+                                      intToString(currNumberOfDeadlocks++),
+                                      new GraphFormulaFixed(false,
+                                                            GraphFormulaLiteral::FALSE));
                     deadlockMap[*event_iter] = deadlock;
                 }
             }
@@ -1492,9 +1494,11 @@ void Graph::transformToPublicView() {
     trace(TRACE_0, "PVSA statistics: \n");
     trace(TRACE_0, "  nodes: " + intToString(setOfNodes.size()) + "\n");
     unsigned int edges = 0;
-    for (nodes_iterator nodeIter = setOfNodes.begin(); nodeIter
-            != setOfNodes.end(); ++nodeIter) {
+    for (nodes_iterator nodeIter = setOfNodes.begin();
+         nodeIter != setOfNodes.end(); ++nodeIter) {
+
         edges += (*nodeIter)->getLeavingEdgesCount();
     }
     trace(TRACE_0, "  edges: " + intToString(edges) + "\n");
 }
+

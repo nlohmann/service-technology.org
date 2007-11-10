@@ -499,11 +499,6 @@ void computePublicView(Graph* OG, string graphName) {
     outfilePrefix = Graph::stripOGFileSuffix(graphName);
     outfilePrefix += ".pvsa";
 
-    //    if (!options[O_OUTFILEPREFIX]) {
-//        outfilePrefix = Graph::stripOGFileSuffix(graphName);
-//        outfilePrefix += ".pvsa";
-//    }
-
     OG->transformToPublicView();
 
     // generate output files
@@ -511,7 +506,7 @@ void computePublicView(Graph* OG, string graphName) {
         trace(TRACE_0, "generating dot output...\n");
 
         // .out
-        OG->printDotFile(outfilePrefix, "Public View Service Automaton of "
+        OG->printDotFile(outfilePrefix, "public view of "
                                          + Graph::stripOGFileSuffix(*(ogfiles.begin())));
 
         // .og
@@ -541,7 +536,7 @@ void checkSimulation(const Graph::ogs_t& OGsFromFiles) {
 
     trace(TRACE_1, "checking simulation\n");
     if (firstOG->simulates(secondOG)) {
-        trace(TRACE_0, "The first OG characterizes all strategies of the second one\n\n");
+        trace(TRACE_0, "The first OG characterizes all strategies of the second one, possibly more.\n\n");
     } else {
         trace(TRACE_0, "The second OG characterizes at least one strategy that is\n");
         trace(TRACE_0, "not characterized by the first one.\n\n");
@@ -556,7 +551,7 @@ void checkSimulation(const Graph::ogs_t& OGsFromFiles) {
 //!        if called with an oWFN, then the corresponding OG is computed first
 void checkEquivalence(Graph::ogs_t& OGsFromFiles) {
 
-    // OGs given by command line are already stored in OGsFromFiles
+    // the OGs given by command line are already stored in OGsFromFiles
 
     bool calledWithNet = false;
 
@@ -613,10 +608,6 @@ void checkEquivalence(Graph::ogs_t& OGsFromFiles) {
         netiter++;
     }
 
-//    // restore state of parameters
-//    options[O_SHOW_NODES] = tempO_SHOW_NODES;
-//    parameters[P_SHOW_EMPTY_NODE] = tempP_SHOW_EMPTY_NODE;
-
     trace(TRACE_0, "\n=================================================================\n");
     trace(TRACE_0, "Checking equivalence of generated OGs...\n\n");            
 
@@ -659,8 +650,13 @@ void checkEquivalence(Graph::ogs_t& OGsFromFiles) {
 }
 
 
-// create a filtered OG
-void computeFilteredOG(const Graph::ogs_t& OGsFromFiles) {
+//! \brief modifies the first OG such that it simulates the second OG
+//!        by filtering non-simulating branches
+void filterOG(const Graph::ogs_t& OGsFromFiles) {
+
+    // exactly 2 OGs must be given
+    assert(OGsFromFiles.size() == 2);
+
     Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
     Graph *lhs = *GraphIter;
     Graph *rhs = *(++GraphIter);
@@ -935,7 +931,7 @@ int main(int argc, char ** argv) {
 
         if (options[O_FILTER]) {
             // filtration on OG
-            computeFilteredOG(OGsFromFiles);
+            filterOG(OGsFromFiles);
             return 0;
         }
     }

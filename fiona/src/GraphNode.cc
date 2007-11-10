@@ -137,15 +137,20 @@ GraphNodeDiagnosisColor::operator GraphNodeDiagnosisColor_enum() const {
 /*!
  * \brief constructor (no parameters)
  */
-GraphNode::GraphNode() : number(12345678), name("12345678"), color(BLUE),
-    diagnosis_color(DIAG_UNSET), hasFinalStateInStateSet(false) {
-    
+GraphNode::GraphNode() :
+        number(12345678),
+        name("12345678"),
+        color(BLUE),
+        diagnosis_color(DIAG_UNSET),
+        hasFinalStateInStateSet(false) {
+
     annotation = new GraphFormulaCNF();
-    
+
     eventsUsed = new int [PN->getInputPlaceCount() + PN->getOutputPlaceCount()];
-    
+
     for (unsigned int i = 0;
          i < PN->getInputPlaceCount() + PN->getOutputPlaceCount(); i++) {
+
         eventsUsed[i] = 0;
     }
 }

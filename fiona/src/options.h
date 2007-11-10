@@ -44,49 +44,45 @@
 
 
 typedef enum {
-    O_HELP,
-    O_VERSION,
-    O_DEBUG,
-    O_GRAPH_TYPE, //!< OG or IG
-    O_MESSAGES_MAX,
-    O_EVENT_USE_MAX,
-    O_CALC_REDUCED_IG,
-    O_SHOW_NODES, //!<
-    O_CALC_ALL_STATES,
-    O_BDD,
-    O_OTF, //on the fly
-    O_EX,
-    O_MATCH,
-    O_PRODUCTOG,
-    O_SIMULATES,
-    O_FILTER,
-    O_OUTFILEPREFIX,
-    O_NOOUTPUTFILES, // produce no output files
-    O_SYNTHESIZE_PARTNER_OWFN, //!< compute an oWFN from the IG/OG
-    O_DISTRIBUTED, //!< check for distributed controllability
-    O_COUNT_SERVICES,
-    O_CHECK_ACYCLIC,
-    O_PNG,
-    O_DIAGNOSIS //!< diagnosis information
-// CODE FROM PL
-    , O_PV_MULTIPLE_DEADLOCKS
-// END OF CODE FROM PL
+    O_HELP,                     //!< 
+    O_VERSION,                  //!< 
+    O_DEBUG,                    //!< 
+    O_GRAPH_TYPE,               //!< OG or IG
+    O_MESSAGES_MAX,             //!< 
+    O_EVENT_USE_MAX,            //!< 
+    O_CALC_REDUCED_IG,          //!< 
+    O_SHOW_NODES,               //!< 
+    O_CALC_ALL_STATES,          //!< 
+    O_BDD,                      //!< BDD-representation of OG is computed
+    O_OTF,                      //!< BDD-representation of OG is computed on the fly
+    O_EX,                       //!< 
+    O_MATCH,                    //!< 
+    O_PRODUCTOG,                //!< 
+    O_SIMULATES,                //!< 
+    O_FILTER,                   //!< 
+    O_OUTFILEPREFIX,            //!< 
+    O_NOOUTPUTFILES,            //!< produce no output files
+    O_SYNTHESIZE_PARTNER_OWFN,  //!< compute an oWFN from the IG/OG
+    O_DISTRIBUTED,              //!< check for distributed controllability
+    O_COUNT_SERVICES,           //!< 
+    O_CHECK_ACYCLIC,            //!< 
+    O_PNG,                      //!< 
+    O_DIAGNOSIS,                //!< diagnosis information
+    O_PV_MULTIPLE_DEADLOCKS     //!< 
 } possibleOptions;
 
 
 typedef enum {
-    P_IG, //!< compute IG  
-    P_OG, //!< compute OG
-// CODE FROM PL
-	P_PV,                         //!< compute Public View Service Automaton
-// END OF CODE FROM PL    
-    P_SHOW_ALL_NODES, //!< show red and blue nodes
-    P_SHOW_BLUE_NODES_ONLY, //!< show blue nodes only (empty node not shown though) 
-    P_SHOW_NO_RED_NODES, //!< show all blue nodes (including empty node)
-    P_SHOW_EMPTY_NODE, //!< same as above
-    P_SHOW_STATES_PER_NODE, //!< show all states in a node (aka "knowledge")
-    P_SHOW_DEADLOCKS_PER_NODE, //!< show deadlock states only
-    P_NOPNG //!< do not create a PNG output
+    P_IG,                       //!< compute IG
+    P_OG,                       //!< compute OG
+	P_PV,                       //!< compute Public View Service Automaton
+    P_SHOW_BLUE_NODES,          //!< show blue nodes only (empty node not shown though)
+    P_SHOW_EMPTY_NODE,          //!< show all blue nodes (including empty node)
+    P_SHOW_RED_NODES,           //!< show blue and red nodes (empty node not shown)
+    P_SHOW_ALL_NODES,           //!< show red, blue, and empty nodes
+    P_SHOW_STATES_PER_NODE,     //!< show all states in a node (aka "knowledge")
+    P_SHOW_DEADLOCKS_PER_NODE,  //!< show deadlock states only
+    P_NOPNG                     //!< do not create a PNG output
 } possibleParameters;
 
 

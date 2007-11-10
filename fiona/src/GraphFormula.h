@@ -109,9 +109,7 @@ class GraphFormulaAssignment {
  */
 class GraphFormula {
     public:
-        /**
-         * Destroys the given GraphFormula and all its subformulas.
-         */
+        /// Destroys the given GraphFormula and all its subformulas.
         virtual ~GraphFormula() {
         };
 
@@ -169,25 +167,17 @@ class GraphFormula {
  */
 class GraphFormulaMultiary : public GraphFormula {
     public:
-        /**
-         * Type of the container holding all subformula of this multiary formula.
-         */
+        /// Type of the container holding all subformula of this multiary formula.
         typedef std::list<GraphFormula*> subFormulas_t;
 
-        /**
-         * Type of the iterator over subformulas.
-         */
+        /// Type of the iterator over subformulas.
         typedef subFormulas_t::iterator iterator;
 
-        /**
-         * Type of the const iterator over subformulas.
-         */
+        /// Type of the const iterator over subformulas.
         typedef subFormulas_t::const_iterator const_iterator;
 
     private:
-        /**
-         * Holds all subformulas of this multiary formula.
-         */
+        /// Holds all subformulas of this multiary formula.
         subFormulas_t subFormulas;
 
     public:
@@ -210,9 +200,7 @@ class GraphFormulaMultiary : public GraphFormula {
          */
         GraphFormulaMultiary(GraphFormula* lhs, GraphFormula* rhs);
 
-        /**
-         * Destroys this GraphFormulaMultiary and all its subformulas.
-         */
+        /// Destroys this GraphFormulaMultiary and all its subformulas.
         virtual ~GraphFormulaMultiary();
 
         virtual std::string asString() const;
@@ -239,50 +227,38 @@ class GraphFormulaMultiary : public GraphFormula {
 
         void addSubFormula(GraphFormula* subformula);
         iterator removeSubFormula(iterator subformula);
-        
+
         virtual void removeLiteral(const std::string&);
-        
+
         /**
          * removes a literal from the formula, if this literal is the only one of a clause,
          * the clause gets removed as well
          * this function is used in the IG reduction
         **/
         virtual void removeLiteralForReal(const std::string&);
-        
+
         virtual void removeLiteralByHiding(const std::string&);
-        
+
         virtual int getSubFormulaSize() const;
-        
+
         void deepCopyMultiaryPrivateMembersToNewFormula(GraphFormulaMultiary* newFormula) const;
 
-        /**
-         * Returns an iterator to the first subformula.
-         */
+        /// Returns an iterator to the first subformula.
         iterator begin();
 
-        /**
-         * Returns an iterator to the first subformula.
-         */
+        /// Returns an iterator to the first subformula.
         const_iterator begin() const;
 
-        /**
-         * Returns an iterator to one past the last subformula.
-         */
+        /// Returns an iterator to one past the last subformula.
         iterator end();
 
-        /**
-         * Returns an iterator to one past the last subformula.
-         */
+        /// Returns an iterator to one past the last subformula.
         const_iterator end() const;
 
-        /**
-         * Returns true iff this formula has no subformulas.
-         */
+        /// Returns true iff this formula has no subformulas.
         bool empty() const;
 
-        /**
-         * Returns the the number of formulas, the multiary formula consists of.
-         */
+        /// Returns the the number of formulas, the multiary formula consists of.
         int size() const;
 };
 
@@ -302,7 +278,7 @@ class GraphFormulaMultiaryAnd : public GraphFormulaMultiary {
          */
         static const GraphFormulaFixed emptyFormulaEquivalent;
     public:
-        /** See GraphFormulaMultiary(). */
+        /// See GraphFormulaMultiary()
         GraphFormulaMultiaryAnd();
         GraphFormulaMultiaryAnd(GraphFormula* subformula_);
         GraphFormulaMultiaryAnd(GraphFormula* lhs, GraphFormula* rhs);
@@ -316,9 +292,8 @@ class GraphFormulaMultiaryAnd : public GraphFormulaMultiary {
 
         virtual GraphFormulaMultiaryAnd* getDeepCopy() const;
 
-        /** Destroys this GraphFormulaMultiaryAnd and all its subformulas. */
-        virtual ~GraphFormulaMultiaryAnd() {
-        };
+        /// Destroys this GraphFormulaMultiaryAnd and all its subformulas. */
+        virtual ~GraphFormulaMultiaryAnd() { };
         virtual std::string getOperator() const;
         virtual const GraphFormulaFixed& getEmptyFormulaEquivalent() const;
 };
@@ -336,7 +311,7 @@ class GraphFormulaMultiaryOr : public GraphFormulaMultiary {
          */
         static const GraphFormulaFixed emptyFormulaEquivalent;
     public:
-        /** See GraphFormulaMultiary(). */
+        /// See GraphFormulaMultiary()
         GraphFormulaMultiaryOr();
         GraphFormulaMultiaryOr(GraphFormula* subformula_);
         GraphFormulaMultiaryOr(GraphFormula* lhs, GraphFormula* rhs);
@@ -351,9 +326,8 @@ class GraphFormulaMultiaryOr : public GraphFormulaMultiary {
         bool implies(GraphFormulaMultiaryOr *);
         virtual GraphFormulaMultiaryOr* getDeepCopy() const;
 
-        /** Destroys this GraphFormulaMultiaryOr and all its subformulas. */
-        virtual ~GraphFormulaMultiaryOr() {
-        };
+        /// Destroys this GraphFormulaMultiaryOr and all its subformulas
+        virtual ~GraphFormulaMultiaryOr() { };
         virtual std::string getOperator() const;
         virtual const GraphFormulaFixed& getEmptyFormulaEquivalent() const;
 };
@@ -368,25 +342,23 @@ class GraphFormulaCNF : public GraphFormulaMultiaryAnd {
     private:
     public:
         GraphFormulaCNF();
-        //** constructs a new CNF and adds the clause to the CNF
+        /// constructs a new CNF and adds the clause to the CNF
         GraphFormulaCNF(GraphFormulaMultiaryOr* clause);
         GraphFormulaCNF(GraphFormulaMultiaryOr* clause1,
                         GraphFormulaMultiaryOr* clause2);
 
-        //** destroys the CNF and all its clauses
+        /// destroys the CNF and all its clauses
         virtual ~GraphFormulaCNF() {
         };
 
         virtual GraphFormulaCNF* getDeepCopy() const;
 
-        //** adds a clause to the CNF
+        /// adds a clause to the CNF
         void addClause(GraphFormulaMultiaryOr* clause);
 
         bool implies(GraphFormulaCNF *);
 
-        /**
-         * Simplifies the formula by removing redundant clauses.
-         */
+        /// Simplifies the formula by removing redundant clauses.
         void simplify();
 };
 

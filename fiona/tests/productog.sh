@@ -53,7 +53,7 @@ if [ "$testdir" != "$builddir" ]; then
     fi
 fi
 
-cmd="$FIONA -t productog -o $outputPrefix $og1 $og2"
+cmd="$FIONA -t productog $og1 $og2 -o $outputPrefix"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$outputPrefix.memcheck.log"
@@ -97,7 +97,7 @@ if [ "$testdir" != "$builddir" ]; then
     fi
 fi
 
-cmd="$FIONA -t productog -o $outputPrefix $og1 $og2 $og3"
+cmd="$FIONA -t productog $og1 $og2 $og3 -o $outputPrefix"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$outputPrefix.memcheck.log"
@@ -141,7 +141,7 @@ if [ "$testdir" != "$builddir" ]; then
     fi
 fi
 
-cmd="$FIONA -t productog -o $outputPrefix $og3 $og1 $og2"
+cmd="$FIONA -t productog $og3 $og1 $og2 -o $outputPrefix"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$outputPrefix.memcheck.log"

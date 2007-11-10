@@ -273,17 +273,26 @@ GraphFormulaMultiary::~GraphFormulaMultiary() {
 
 
 std::string GraphFormulaMultiary::asString() const {
-    if (subFormulas.empty())
+    if (subFormulas.empty()) {
+        // we found an empty OR (equivalent to FALSE) or AND (equivalent to TRUE)
         return getEmptyFormulaEquivalent().asString();
-
-    subFormulas_t::const_iterator currentFormula = subFormulas.begin();
-    std::string formulaString = '(' + (*currentFormula)->asString();
-
-    while (++currentFormula != subFormulas.end()) {
-        formulaString += " " + getOperator() + " " + (*currentFormula)->asString();
     }
 
-    return formulaString + ')';
+    std::string formulaString = "";
+    subFormulas_t::const_iterator currentFormula = subFormulas.begin();
+
+    if (subFormulas.size() == 1) {
+        // we omit parenthesis if only one element in formula
+        return (*currentFormula)->asString();
+    } else {
+        formulaString += '(' + (*currentFormula)->asString();
+
+        while (++currentFormula != subFormulas.end()) {
+            formulaString += " " + getOperator() + " " + (*currentFormula)->asString();
+        }
+
+        return formulaString + ')';
+    }
 }
 
 

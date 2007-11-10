@@ -1,8 +1,8 @@
 NODES
-  0x0 : ((!a)) : blue,
-  1x1 : ((true)) : blue,
+  0x0 : !a : blue,
+  1x1 : true : blue,
   2x2 : ((final + ?y) * (!b + ?y)) : blue,
-  3x1 : ((final)) : blue;
+  3x1 : final : blue;
 
 INITIALNODE
   0x0;

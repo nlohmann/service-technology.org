@@ -693,19 +693,18 @@ bool GraphNode::changes_color(GraphEdge* e) const {
 }
 
 
-/*!
- * \brief returns true iff node should be shown according to the "show" parameter
- *
- * \param rootOfGraph the root node of the current graph
- *
- * \return true iff this node should be shown according to the "show" parameter
- */
+//! \brief returns true iff node should be shown according to the "show" parameter
+//! \param rootOfGraph the root node of the current graph
+//! \return true iff this node should be shown according to the "show" parameter
 bool GraphNode::isToShow(const GraphNode* rootOfGraph) const {
-#undef TRUE    
+#undef TRUE
+
     return ((parameters[P_SHOW_ALL_NODES]) ||
-            (getColor() == BLUE && annotation->asString() != GraphFormulaLiteral::TRUE) ||
-            (getColor() == BLUE && parameters[P_SHOW_EMPTY_NODE]) ||
+            (getColor() == BLUE && (annotation->asString() != GraphFormulaLiteral::TRUE ||
+                                    parameters[P_SHOW_EMPTY_NODE])) ||
+            (getColor() == RED && parameters[P_SHOW_RED_NODES]) ||
             (this == rootOfGraph));
+
 #define TRUE 1
 }
 

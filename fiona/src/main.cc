@@ -457,7 +457,21 @@ void computeOG(oWFN* PN) {
 
 //! \brief create the productOG of all given OGs
 void computeProductOG(const Graph::ogs_t& OGsFromFiles) {
+
     trace("Building product of the following OGs:\n");
+
+    // A node annotated with true can only appear in product OG
+    // if all argument OGs contain a true node.
+    // Such a node should not be rejected, so we adjust parameters as if
+    // -s empty were given.
+    if (!options[O_SHOW_NODES]) {
+        // but only if not explicitly requested to hide empty node on command line
+        // by -s blue, for example
+        parameters[P_SHOW_BLUE_NODES] = true;
+        parameters[P_SHOW_EMPTY_NODE] = true;
+        parameters[P_SHOW_RED_NODES] = false;
+        parameters[P_SHOW_ALL_NODES] = false;
+    }
 
     for (Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
          iOgFile != ogfiles.end(); ++iOgFile) {
@@ -477,9 +491,9 @@ void computeProductOG(const Graph::ogs_t& OGsFromFiles) {
     if (!options[O_NOOUTPUTFILES]) {
         trace("Saving product OG to:\n");
         trace(Graph::addOGFileSuffix(outfilePrefix));
-        trace("\n");
-        productOG->printOGFile(outfilePrefix);
-        trace("\n");
+        trace("\n\n");
+//        productOG->printOGFile(outfilePrefix);
+//        trace("\n");
 
         productOG->printOGFile(outfilePrefix);
         productOG->printDotFile(outfilePrefix);

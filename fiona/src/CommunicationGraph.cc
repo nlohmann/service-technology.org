@@ -324,10 +324,10 @@ void CommunicationGraph::printGraphStatistics() {
 //! \brief creates a dot file of the graph
 void CommunicationGraph::printGraphToDot() {
 
-    unsigned int maxWritingSize = 5000; // number relevant for .out file
-    unsigned int maxPrintingSize = 500; // number relevant to generate png
+    unsigned int maxSizeForDotFile = 5000; // number relevant for .out file
+    unsigned int maxSizeForPNGFile = 500; // number relevant to generate png
 
-    if (getNumberOfNodes() <= maxWritingSize) {
+    if (getNumberOfNodes() <= maxSizeForDotFile) {
 
         trace(TRACE_0, "creating the dot file of the graph...\n");
         GraphNode* rootNode = root;
@@ -377,25 +377,47 @@ void CommunicationGraph::printGraphToDot() {
 
         std::map<GraphNode*, bool> visitedNodes;
 
+
+        // filling the file with nodes and edges
         printGraphToDotRecursively(rootNode, dotFile, visitedNodes);
+
 
         dotFile << "}";
         dotFile.close();
+        // ... dot file created (.out) //
 
-        // prepare dot command line for printing
+        // prepare dot command line creating the picture
         string imgFileName = outfilePrefixWithOptions + ".png";
         string dotCmd = "dot -Tpng \"" + dotFileName + "\" -o \"" + imgFileName + "\"";
 
-        // print commandline and execute system command
-        if ((options[O_SHOW_NODES] && getNumberOfNodes() <= maxPrintingSize) ||
-            (!options[O_SHOW_NODES] && getNumberOfBlueNodes() <= maxPrintingSize)) {
+        // print only, if number of nodes is lower than required
+        // if option is set to show all nodes, then we compare the number of all nodes
+        // otherwise, we compare the number of blue nodes only
+        bool graphToBigForPNG = false;
+        std::string reasonForFail = "";
 
+        if (parameters[P_SHOW_RED_NODES] || parameters[P_SHOW_ALL_NODES]) {
+            // we have to check number of ALL nodes
+            if (getNumberOfNodes() > maxSizeForPNGFile) {
+                reasonForFail = "more than " + intToString(maxSizeForPNGFile) + " nodes";
+                graphToBigForPNG = true;
+            }
+        } else if (parameters[P_SHOW_EMPTY_NODE] || parameters[P_SHOW_BLUE_NODES]) {
+            // we have to check number of BLUE nodes
+            if (getNumberOfBlueNodes() > maxSizeForPNGFile) {
+                reasonForFail = "more than " + intToString(maxSizeForPNGFile) + " blue nodes";
+                graphToBigForPNG = true;
+            }
+        }
+
+        if (graphToBigForPNG) {
+            trace(TRACE_0, "graph is too big to create the graphics :( ");
+            trace(TRACE_0, "(" + reasonForFail + ")\n");
+            trace(TRACE_0, dotCmd + "\n");
+        } else {
             if (!parameters[P_NOPNG]) {
-                // print only, if number of nodes is lower than required
-                // if option is set to show all nodes, then we compare the number of all nodes
-                // otherwise, we compare the number of blue nodes only
+                // print commandline and execute system command
                 trace(TRACE_0, dotCmd + "\n");
-                
                 system(dotCmd.c_str());
             }
 
@@ -406,10 +428,6 @@ void CommunicationGraph::printGraphToDot() {
 //                system(showCmd.c_str());
 //            }
 
-        } else {
-            trace(TRACE_0, "graph is too big to create the graphics :( ");
-            trace(TRACE_0, "(greater " + intToString(maxPrintingSize) + ")\n");
-            trace(TRACE_0, dotCmd + "\n");
         }
     } else {
         trace(TRACE_0, "graph is too big to create dot file\n");
@@ -427,6 +445,7 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode* v,
 
     assert(v != NULL);
 
+    // continue only if current node v is to show
     if (!v->isToShow(root))
         return;
 
@@ -445,7 +464,7 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode* v,
                 (*iter)->decode(PN);
                 os << "[" << PN->getCurrentMarkingAsString() << "]";
                 os << " (";
-                
+
                 // print the suffix (state type)
                 switch ((*iter)->exactType()) {
                     case I_DEADLOCK:    os << "iDL";    break;
@@ -457,45 +476,6 @@ void CommunicationGraph::printGraphToDotRecursively(GraphNode* v,
 
                 os << ")" << "\\n";
             }
-            
-          /*              
-             // the old call
-             
-             (*iter)->decode(PN); // need to decide if it is an external or internal deadlock
-             
-             string kindOfDeadlock = "i"; // letter for 'i' internal or 'e' external deadlock
-             unsigned int i;
-
-             switch ((*iter)->type) {
-                case DEADLOCK:
-                    os << "[" << PN->getCurrentMarkingAsString() << "]";
-                    os << " (";
-
-                    if (PN->transNrQuasiEnabled > 0) {
-                        kindOfDeadlock = "e";
-                    } else {
-                        for (i = 0; i < PN->getOutputPlaceCount(); i++) {
-                            if (PN->CurrentMarking[PN->getOutputPlace(i)->index] > 0) {
-                                kindOfDeadlock = "e";
-                                continue;
-                            }
-                        }
-                    }
-                    os << kindOfDeadlock << "DL" << ")" << "\\n";
-                    break;
-                case FINALSTATE:
-                    os << "[" << PN->getCurrentMarkingAsString() << "]";
-                    os << " (";
-                    os << "FS" << ")" << "\\n";
-                    break;
-                default:
-                    if (parameters[P_SHOW_STATES_PER_NODE]) {
-                        os << "[" << PN->getCurrentMarkingAsString() << "]";
-                        os << " (" << "TR" << ")" << "\\n";
-                    }
-                    break;
-            }
-            */
         }
     }
 

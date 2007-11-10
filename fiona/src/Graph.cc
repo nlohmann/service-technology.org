@@ -838,7 +838,7 @@ Graph* Graph::product(const Graph* rhs) {
     trace(TRACE_5, "Graph::product(const Graph* rhs): start\n");
 
     // this will be the product OG
-    Graph* productOG= new Graph;
+    Graph* productOG = new Graph;
 
     // If one of both OGs is empty, their product is empty, too.
     if (hasNoRoot() || rhs->hasNoRoot()) {
@@ -857,7 +857,7 @@ Graph* Graph::product(const Graph* rhs) {
                                                               currentRhsNode);
 
     // building the new root node of the product OG
-    GraphNode* productNode= new GraphNode(currentName, currentFormula);
+    GraphNode* productNode = new GraphNode(currentName, currentFormula);
     productOG->addNode(productNode);
     productOG->setRoot(productNode);
 
@@ -1101,18 +1101,22 @@ void Graph::printOGFile(const std::string& filenamePrefix) const {
 
     if (hasNoRoot()) {
         // print file for empty OG
-        ogFile << "NODES"<< endl<< "  0 : "<< GraphFormulaLiteral::FALSE
-                << " : "<< GraphNodeColor(RED).toString() << ';'<< endl << endl<< "INITIALNODE"<< endl
-                << "  0;"<< endl << endl<< "TRANSITIONS"<< endl<< "  ;"<< endl;
+        ogFile << "NODES" << endl
+               << "  0 : " << GraphFormulaLiteral::FALSE << " : "
+               << GraphNodeColor(RED).toString() << ';' << endl << endl
+               << "INITIALNODE" << endl
+               << "  0;" << endl << endl
+               << "TRANSITIONS" << endl
+               << "  ;" << endl;
 
         ogFile.close();
         return;
     }
 
-    ogFile << "NODES"<< endl;
+    ogFile << "NODES" << endl;
     bool printedFirstNode = false;
-    for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode
-            != setOfNodes.end(); ++iNode) {
+    for (nodes_t::const_iterator iNode = setOfNodes.begin();
+         iNode != setOfNodes.end(); ++iNode) {
 
         GraphNode* node = *iNode;
         if (!node->isToShow(root)) {
@@ -1120,11 +1124,11 @@ void Graph::printOGFile(const std::string& filenamePrefix) const {
         }
 
         if (printedFirstNode) {
-            ogFile << ','<< endl;
+            ogFile << ',' << endl;
         }
 
-        ogFile << "  "<< node->getName() << " : "
-                << node->getAnnotationAsString() << " : "<< node->getColor().toString();
+        ogFile << "  " << node->getName() << " : "
+               << node->getAnnotationAsString() << " : " << node->getColor().toString();
 
         printedFirstNode = true;
     }
@@ -1132,20 +1136,20 @@ void Graph::printOGFile(const std::string& filenamePrefix) const {
 
     ogFile << "INITIALNODE"<< endl;
     assert(getRoot() != NULL);
-    ogFile << "  "<< getRoot()->getName() << ';'<< endl << endl;
+    ogFile << "  " << getRoot()->getName() << ';' << endl << endl;
 
-    ogFile << "TRANSITIONS"<< endl;
+    ogFile << "TRANSITIONS" << endl;
     bool printedFirstEdge = false;
-    for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode
-            != setOfNodes.end(); ++iNode) {
+    for (nodes_t::const_iterator iNode = setOfNodes.begin();
+         iNode != setOfNodes.end(); ++iNode) {
 
         GraphNode* node = *iNode;
         if (!node->isToShow(root)) {
             continue;
         }
 
-        GraphNode::LeavingEdges::ConstIterator
-                iEdge = node->getLeavingEdgesConstIterator();
+        GraphNode::LeavingEdges::ConstIterator iEdge =
+            node->getLeavingEdgesConstIterator();
 
         while (iEdge->hasNext()) {
             GraphEdge* edge = iEdge->getNext();
@@ -1154,16 +1158,17 @@ void Graph::printOGFile(const std::string& filenamePrefix) const {
             }
 
             if (printedFirstEdge) {
-                ogFile << ','<< endl;
+                ogFile << ',' << endl;
             }
 
-            ogFile << "  "<< node->getName() << " -> "<< edge->getDstNode()->getName() << " : "<< edge->getLabel();
+            ogFile << "  " << node->getName() << " -> "
+                   << edge->getDstNode()->getName() << " : " << edge->getLabel();
 
             printedFirstEdge = true;
         }
         delete iEdge;
     }
-    ogFile << ';'<< endl;
+    ogFile << ';' << endl;
 
     ogFile.close();
 }

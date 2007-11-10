@@ -154,11 +154,12 @@ void print_help() {
   trace("                                 less states per IG/OG node\n");
   trace("                                 (reduces memory, but increases time)\n");
   trace(" -s | --show=<parameter> ....... different display options <parameter>:\n");
-  trace("                                   allnodes  - show all nodes\n");
   trace("                                   blue      - show blue nodes only (default)\n");
-  trace("                                   rednodes  - show blue and red nodes\n");
-  trace("                                               (only empty node is skipped)\n");
+  trace("                                               (empty node not shown)\n");
   trace("                                   empty     - show empty node\n");
+  trace("                                   rednodes  - show blue and red nodes\n");
+  trace("                                               (only empty node not shown\n");
+  trace("                                   allnodes  - show all nodes\n");
   trace("                                   allstates - show all calculated states per\n");
   trace("                                               node\n");
   trace("                                   deadlocks - show all but transient states\n");
@@ -273,15 +274,13 @@ void parse_command_line(int argc, char* argv[]) {
     // initialize parameters
     parameters[P_IG] = true;
     parameters[P_OG] = false;
-    parameters[P_SHOW_ALL_NODES] = false;
-    parameters[P_SHOW_BLUE_NODES_ONLY] = true;
-    parameters[P_SHOW_NO_RED_NODES] = true;
+    parameters[P_PV] = false;
+    parameters[P_SHOW_BLUE_NODES] = true;
     parameters[P_SHOW_EMPTY_NODE] = false;
+    parameters[P_SHOW_RED_NODES] = false;
+    parameters[P_SHOW_ALL_NODES] = false;
     parameters[P_SHOW_STATES_PER_NODE] = false;
     parameters[P_SHOW_DEADLOCKS_PER_NODE] = false;
-// CODE FROM PL
-	parameters[P_PV] = false;
-// END OF CODE FROM PL    
 
     bdd_reordermethod = 0;
 
@@ -386,11 +385,11 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_OG] = false;
                     parameters[P_IG] = true; 
                     options[O_SHOW_NODES] = true;
-                    parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
-                    parameters[P_SHOW_ALL_NODES] = true;
+                    parameters[P_SHOW_BLUE_NODES] = true;
                     parameters[P_SHOW_EMPTY_NODE] = true;
-                    parameters[P_SHOW_NO_RED_NODES] = false;
-                    parameters[P_SHOW_BLUE_NODES_ONLY] = false;
+                    parameters[P_SHOW_RED_NODES] = true;
+                    parameters[P_SHOW_ALL_NODES] = true;
+                    parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
                 } else if ((lc_optarg == "pv") || (lc_optarg == "publicview")) {
                 	parameters[P_PV] = true;
                 	parameters[P_IG] = false;
@@ -428,23 +427,28 @@ void parse_command_line(int argc, char* argv[]) {
             case 's':
                 if (string(optarg) == "blue") {
                     options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_BLUE_NODES] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = false;
+                    parameters[P_SHOW_RED_NODES] = false;
                     parameters[P_SHOW_ALL_NODES] = false;
-                    parameters[P_SHOW_NO_RED_NODES] = false;
-                    parameters[P_SHOW_BLUE_NODES_ONLY] = true;
-                } else if (string(optarg) == "rednodes") {
-                    options[O_SHOW_NODES] = true;
-                    parameters[P_SHOW_ALL_NODES] = false;
-                    parameters[P_SHOW_NO_RED_NODES] = false;
-                    parameters[P_SHOW_BLUE_NODES_ONLY] = false;
                 } else if (string(optarg) == "empty") {
                     options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_BLUE_NODES] = true;
                     parameters[P_SHOW_EMPTY_NODE] = true;
+                    parameters[P_SHOW_RED_NODES] = false;
+                    parameters[P_SHOW_ALL_NODES] = false;
+                } else if (string(optarg) == "rednodes") {
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_BLUE_NODES] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = false;
+                    parameters[P_SHOW_RED_NODES] = true;
+                    parameters[P_SHOW_ALL_NODES] = false;
                 } else if (string(optarg) == "allnodes") {
                     options[O_SHOW_NODES] = true;
-                    parameters[P_SHOW_ALL_NODES] = true;
+                    parameters[P_SHOW_BLUE_NODES] = true;
                     parameters[P_SHOW_EMPTY_NODE] = true;
-                    parameters[P_SHOW_NO_RED_NODES] = false;
-                    parameters[P_SHOW_BLUE_NODES_ONLY] = false;
+                    parameters[P_SHOW_RED_NODES] = true;
+                    parameters[P_SHOW_ALL_NODES] = true;
                 } else if (string(optarg) == "allstates") {
                     options[O_SHOW_NODES] = true;
                     parameters[P_SHOW_STATES_PER_NODE] = true;

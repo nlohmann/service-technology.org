@@ -62,18 +62,15 @@ class interactionGraph : public CommunicationGraph {
 
         void buildGraph();
         void buildGraph(GraphNode*);
-        void buildReducedGraph(GraphNode*);
 
         void getActivatedEventsComputeCNF(GraphNode*, setOfMessages&, setOfMessages&);
 
-        void calculateSuccStatesInput(messageMultiSet, GraphNode*, GraphNode*);
-        void calculateSuccStatesOutput(messageMultiSet, GraphNode*, GraphNode*);
+        void calculateSuccStatesSendingEvent(messageMultiSet, GraphNode*, GraphNode*);
+        void calculateSuccStatesReceivingEvent(messageMultiSet, GraphNode*, GraphNode*);
 
         setOfMessages combineReceivingEvents(GraphNode*, setOfMessages&);
         setOfMessages receivingBeforeSending(GraphNode*);
 
-        void calculateSuccStatesOutputSet(messageMultiSet, GraphNode*);
-        void calculateSuccStatesInputReduced(messageMultiSet, GraphNode*);
 };
 
 #endif /*IG_H_*/

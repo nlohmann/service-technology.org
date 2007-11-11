@@ -853,3 +853,201 @@ void GraphNode::removeEdgesToNode(const GraphNode* nodeToDelete) {
     }
     delete iEdge;
 }
+
+
+//! \brief Delivers the element from the priority map with the highest priority.
+//!        The element with the highest priority will be in a clause with minimal length
+//!        and will have the maximal count of occurences throughout the annotation
+//!        in regards to other elements with minimal clause length. 
+//!        The element will be removed afterwards. 
+PriorityMap::KeyType PriorityMap::pop() {
+    trace(TRACE_5, "PriorityMap::pop()::begin()\n");
+    KeyType key;
+
+    // initialize with minimum priority values
+    int min_depth = INT_MAX;
+    int max_occ = 0;
+
+    // iterate over the mapped set of interface places
+    MapType::iterator i;
+    for (i = pm.begin(); i != pm.end(); i++) {
+
+        // consider the element with a minimal depth clause (to catch the init values) 
+        if (i->second.first ==  min_depth) {
+            // consider the second moment of priority (occurence count) 
+            if (i->second.second >= max_occ) {
+                key = i->first;
+                min_depth = i->second.first;
+                max_occ   = i->second.second;
+            }
+        }
+        // first moment of priority suffices 
+        else if (i->second.first < min_depth) {
+            key = i->first;
+            min_depth = i->second.first;
+            max_occ   = i->second.second;
+        }
+    }
+
+    // remove popped element
+    pm.erase(key);
+
+    trace(TRACE_5, "PriorityMap::pop()::end()\n");
+    return key;
+}
+
+//! \brief Delivers the element from the priority map with the highest priority.
+//!        The element with the highest priority will be in a clause with minimal length
+//!        and will have the maximal count of occurences throughout the annotation
+//!        in regards to other elements with minimal clause length. 
+//!        The element will be removed afterwards. 
+messageMultiSet PriorityMap::popIG() {
+    trace(TRACE_5, "PriorityMap::popIG()::begin()\n");
+    messageMultiSet key;
+
+    // initialize with minimum priority values
+    int min_depth = INT_MAX;
+    int max_occ = 0;
+
+    // iterate over the mapped set of interface places
+    MapTypeIG::iterator i;
+    for (i = pmIG.begin(); i != pmIG.end(); i++) {
+
+        // consider the element with a minimal depth clause (to catch the init values) 
+        if (i->second.first ==  min_depth) {
+            // consider the second moment of priority (occurence count) 
+            if (i->second.second >= max_occ) {
+                key = i->first;
+                min_depth = i->second.first;
+                max_occ   = i->second.second;
+            }
+        }
+        // first moment of priority suffices 
+        else if (i->second.first < min_depth) {
+            key = i->first;
+            min_depth = i->second.first;
+            max_occ   = i->second.second;
+        }
+    }
+
+    // remove popped element
+    pmIG.erase(key);
+
+    trace(TRACE_5, "PriorityMap::popIG()::end()\n");
+    return key;
+}
+
+//! \brief Fills the priority map according to the given annotation with interface places 
+//!		   and their corresponding priority.
+//!        NOTE: All interface places will be considered; places not in the
+//!        annotation will have a minimal priority.
+//! @param annotation the annotation, from which the priority map will be extracted.
+void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
+    trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation)::begin()\n");
+
+    oWFN::Places_t::size_type i;
+    KeyType key;
+
+    // iterate over all places in the net
+    for (i = 0; i < PN->getPlaceCount(); i++) {
+
+        key = PN->getPlace(i);
+        // only consider interface places
+        if (key != NULL && (key->getType() == INPUT || key->getType() == OUTPUT)) {
+            // initialize with a minimal priority
+            pm[key].first  = INT_MAX; // minimal clause length
+            pm[key].second = 0;       // maximal occurence in the annotation
+
+            // iterate over the annotation (in cnf) in regards to a specific interface place
+            for (GraphFormulaMultiaryAnd::iterator j = annotation->begin();
+                 j != annotation->end(); j++) {
+
+                GraphFormulaMultiaryOr* clause = dynamic_cast<GraphFormulaMultiaryOr*>(*j);
+                // iterate over disjunctive clauses
+                for (GraphFormulaMultiaryOr::iterator k = clause->begin(); k != clause->end(); k++) {
+
+                    GraphFormulaLiteral* lit = dynamic_cast<GraphFormulaLiteral*>(*k);
+                    // interface place found in the clause?
+                    if (lit->asString() == key->getLabelForCommGraph()) {
+                        // for every literal found, increase the count of occurence 
+                        pm[key].second++;
+
+                        // if this label's actual clause is shorter than the former minimum, set the new minimum
+                        if (clause->size() < pm[key].first) {
+                            pm[key].first = clause->size();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation)::end()\n");
+}
+
+//! \brief Fills the priority map according to the given annotation with interface places 
+//!		   and their corresponding priority.
+//!        NOTE: All interface places will be considered; places not in the
+//!        annotation will have a minimal priority.
+//! @param annotation the annotation, from which the priority map will be extracted.
+void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphFormulaCNF *annotation) {
+    
+	trace(TRACE_3, "PriorityMap::fillForIG(GraphFormulaCNF *annotation)::begin()\n");
+
+	// just to remember which event we have considered already, 
+	// needed for initialising the priority map correctly
+	map<messageMultiSet, bool> eventFound;    
+
+	// iterate over all activated events stored in the set
+	for (setOfMessages::iterator activatedEvent = activatedEvents.begin();
+									activatedEvent != activatedEvents.end();
+									activatedEvent++) {
+
+		// check, if we have not considered this event yet
+		map<messageMultiSet, bool>::iterator found = eventFound.find(*activatedEvent); 
+		if (found != eventFound.end()) {   	
+			// initialize with a minimal priority
+			pmIG[*activatedEvent].first  = INT_MAX; // minimal clause length
+			pmIG[*activatedEvent].second = 0;       // maximal occurences in the annotation
+
+			// remember this that we took a look at this event
+			eventFound[*activatedEvent] = true;
+		}
+
+		// iterate over the annotation (in cnf) with respect to a specific interface place
+		for (GraphFormulaMultiaryAnd::iterator j = annotation->begin();
+												j != annotation->end(); j++) {
+
+			GraphFormulaMultiaryOr* clause = dynamic_cast<GraphFormulaMultiaryOr*>(*j);
+			// iterate over disjunctive clauses
+			for (GraphFormulaMultiaryOr::iterator k = clause->begin(); k != clause->end(); k++) {
+
+				GraphFormulaLiteral* lit = dynamic_cast<GraphFormulaLiteral*>(*k);
+
+				// activated event found in the clause?
+				if (lit->asString() == PN->createLabel(*activatedEvent)) {
+
+					// for every literal found, increase the number of occurences 
+					pmIG[*activatedEvent].second++;
+
+					// if this label's actual clause is shorter than the former minimum, 
+					// set the new minimum
+					if (clause->size() < pmIG[*activatedEvent].first) {
+						pmIG[*activatedEvent].first = clause->size();
+					}
+				}
+			}
+		}
+	}
+
+	trace(TRACE_3, "PriorityMap::fillForIG(GraphFormulaCNF *annotation)::end()\n");
+}
+
+
+bool PriorityMap::empty() const {
+    return pm.empty();
+}
+
+bool PriorityMap::emptyIG() const {
+    return pmIG.empty();
+}

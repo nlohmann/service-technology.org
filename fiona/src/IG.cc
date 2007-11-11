@@ -39,7 +39,7 @@
 #include "GraphFormula.h"
 #include "owfnTransition.h"
 #include "binDecision.h"
-
+#include "GraphNode.h"
 
 //! \fn interactionGraph::interactionGraph(oWFN * _PN) 
 //! \param _PN
@@ -64,11 +64,9 @@ void interactionGraph::buildGraph() {
 
     calculateRootNode(); // creates the root node and calculates its reachability graph (set of states)
 
-    if (options[O_CALC_REDUCED_IG]) {
-        buildReducedGraph(getRoot());
-    } else {
-        buildGraph(getRoot());
-    }
+    // build the IG, whether the reduced or not reduced one is built is being decided in that
+    // function itself
+    buildGraph(getRoot());
 
     computeGraphStatistics();
 }
@@ -99,178 +97,118 @@ void interactionGraph::buildGraph(GraphNode* currentNode) {
         return;
     }
 
-    setOfMessages inputSet;
-    setOfMessages outputSet;
+    setOfMessages sendingEvents;
+    setOfMessages receivingEvents;
 
-    getActivatedEventsComputeCNF(currentNode, inputSet, outputSet);
+    if (options[O_CALC_REDUCED_IG]) {
+    	// build up the reduced interaction graph
+    	// rules applied: "combine receiving events" + "receiving before sending"
+    	receivingEvents = combineReceivingEvents(currentNode, sendingEvents);
+    } else {
+    	// build up the interaction graph without applying reduction rules
+    	getActivatedEventsComputeCNF(currentNode, sendingEvents, receivingEvents);
+    }
 
-    trace(TRACE_1, "\n-----------------------------------------------------------------\n");
+    // collection of all activated events
+    setOfMessages activatedEvents;
+    
+    // collect the receiving events
+    for (setOfMessages::iterator iter = receivingEvents.begin(); iter != receivingEvents.end(); iter++) {
+       	activatedEvents.insert(*iter);
+    }
+    // collect the sending events
+    for (setOfMessages::iterator iter = sendingEvents.begin(); iter != sendingEvents.end(); iter++) {
+    	activatedEvents.insert(*iter);
+    }
+    
+    // priority map of all activated events
+    PriorityMap pmIG;
+    
+    // multiset of the currently considered activated event
+    // we need a multiset here because such an activated event might be the combination of more than
+    // one event
+    messageMultiSet mmSet;
+    
+    // what type of edge are we creating
+    GraphEdgeType typeOfEdge;
 
-    trace(TRACE_2, "iterating over inputSet\n");
-    // iterate over all elements of inputSet
-    for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
+    // create the priority of all activated events
+    pmIG.fillForIG(activatedEvents, PN, currentNode->getAnnotation());
+    
+    // iterate over all activated events
+    // in the order which is given by the PriorityMap pmIG
+    while(!pmIG.emptyIG()) {
+        mmSet = pmIG.popIG();
 
+        // find out what kind of event we consider now
+        // since a multiset of messages contains only one type of messages,
+        // we just check the first message/event of the multiset
+        if (PN->getPlace(*mmSet.begin())->getType() == INPUT) {
+        	typeOfEdge = SENDING;
+        } else {
+        	typeOfEdge = RECEIVING;
+        }
+        
+        // do we actually need to calculate a new node? 
         if (((options[O_MESSAGES_MAX] == false) && (options[O_EVENT_USE_MAX] == false))
-            || checkMaximalEvents(*iter, currentNode, SENDING)) {
-
-            trace(TRACE_2, "\t\t\t\t    sending event: !");
-
+            || checkMaximalEvents(mmSet, currentNode, typeOfEdge)) {
+        	
+        	if (typeOfEdge == SENDING) {
+        		trace(TRACE_2, "\t\t\t\t    sending event: ");
+        	} else {
+        		trace(TRACE_2, "\t\t\t\t    receiving event: ");
+            }
+        	
+        	trace(TRACE_2, PN->createLabel(mmSet) + "\n");
+        	
             // create new GraphNode of the graph
             GraphNode* v = new GraphNode();
-            calculateSuccStatesInput(*iter, currentNode, v);
+            
+            if (typeOfEdge == SENDING) {
+            	// sending event
+            	calculateSuccStatesSendingEvent(mmSet, currentNode, v);
+            	
+            	if (v->getColor() == RED) {
+            		// message bound violation occured during calculateSuccStatesSendingEvent
+            		trace(TRACE_2, "\t\t\t\t    sending event: ");
+                	trace(TRACE_2, PN->createLabel(mmSet));
+            		trace(TRACE_2, " at node " + currentNode->getName() + " suppressed (message bound violated)\n");
 
-            if (v->getColor() == RED) {
-                // message bound violation occured during calculateSuccStatesInput
-                trace(TRACE_2, "\t\t\t\t    sending event: !");
-                // trace(TRACE_2, PN->getPlace(*iter)->name);
-                trace(TRACE_2, " at node " + currentNode->getName() + " suppressed (message bound violated)\n");
-
-                numberDeletedVertices--;
-                delete v;
+                    currentNode->removeLiteralFromAnnotation(PN->createLabel(mmSet));
+            		
+            		numberDeletedVertices--;
+            		delete v;
+            		v = NULL;
+            	}            	
             } else {
-                if (addGraphNode(currentNode, v, *iter, SENDING)) {
-
-#ifdef LOOP
-                    cout << "calc next node? [y,n]" << endl;
-                    char a = getchar();
-                    if (a == 'y') {
-#endif
-
-                    buildGraph(v);
-                    trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
-#ifdef LOOP
-                }
-#endif	
-                }
+            	// receiving event
+                calculateSuccStatesReceivingEvent(mmSet, currentNode, v);
             }
+
+            if (v != NULL && currentNode->getColor() != RED && 
+            		addGraphNode(currentNode, v, mmSet, typeOfEdge)) {
+            	buildGraph(v);
+            	trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
+            }
+        }
+
+        if (currentNode->getAnnotation()->equals() == FALSE) {
+            currentNode->setColor(RED);
+            trace(TRACE_3, "\t\t any further event suppressed (annotation of node ");
+            trace(TRACE_3, currentNode->getName() + " is unsatisfiable)\n");
+            trace(TRACE_5, "\t\t formula was " + currentNode->getAnnotation()->asString());
+            trace(TRACE_3, "\n");
+            return;
         }
     }
 
-    trace(TRACE_3, "iterating over outputSet\n");
-    for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
-        if ((options[O_EVENT_USE_MAX] == false) ||checkMaximalEvents(*iter, currentNode, RECEIVING)) {
-
-            trace(TRACE_2, "\t\t\t\t    output event: ?");
-
-            // create new GraphNode of the graph
-            GraphNode* v = new GraphNode();
-            calculateSuccStatesOutput(*iter, currentNode, v);
-
-            if (currentNode->getColor() != RED && addGraphNode (currentNode, v, *iter, RECEIVING)) {
-
-#ifdef LOOP
-                cout << "calc next node? [y,n]" << endl;
-                char a = getchar();
-                if (a == 'y') {
-#endif
-
-                buildGraph(v);
-                trace(TRACE_1, "\t backtracking to node "
-                        + currentNode->getName() + "\n");
-
-#ifdef LOOP
-            }
-#endif
-
-            }
-        }
+    if (currentNode->getColor() != RED) {
+    	currentNode->analyseNode();
     }
-    currentNode->analyseNode();
     trace(TRACE_5, "node analysed\n");
 
     trace(TRACE_1, "\t\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()) + "\n");
 }
-
-
-//! \fn void interactionGraph::buildReducedGraph(GraphNode * currentNode)
-//! \param currentNode current node of the graph
-//! \brief builds up the graph recursively
-void interactionGraph::buildReducedGraph(GraphNode* currentNode) {
-
-    if (currentNode->getColor() == RED) {
-        // this may happen due to a message bound violation in current node
-        // then, function calculateReachableStatesFull sets node color RED
-        trace(TRACE_3, "\t\t\t node " + currentNode->getName() + " has color RED\n");
-        trace(TRACE_1, "\n-----------------------------------------------------------------\n");
-        return;
-    }
-
-    trace(TRACE_1, "\n-----------------------------------------------------------------\n");
-    trace(TRACE_1, "\t current node: ");
-    trace(TRACE_1, currentNode->getName() + "\n");
-
-    trace(TRACE_3, "\t number of states in node: ");
-    trace(TRACE_3, intToString(currentNode->reachGraphStateSet.size()) + "\n");
-
-    setOfMessages inputSet;
-    setOfMessages outputSet;
-
-    // initialize node
-    if (PN->getInputPlaceCount() > 0) {
-        // inputSet = receivingBeforeSending(currentNode);		// per node
-    }
-
-    // if (PN->getOutputPlaceCnt() > 0) {
-    outputSet = combineReceivingEvents(currentNode, inputSet);
-    // }
-
-    PN->setOfStatesTemp.clear();
-    PN->visitedStates.clear();
-
-    trace(TRACE_3, "iterating over inputSet\n");
-    // iterate over all elements of inputSet
-    for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
-        if (((options[O_MESSAGES_MAX] == false) && (options[O_EVENT_USE_MAX] == false))
-            ||checkMaximalEvents(*iter, currentNode, SENDING)) {
-
-            trace(TRACE_2, "\t\t\t\t    input event: ?");
-
-            // create new GraphNode of the graph
-            GraphNode* v = new GraphNode();
-
-            calculateSuccStatesInput(*iter, currentNode, v);
-
-            if (v->getColor() == RED) {
-                // message bound violation occured during calculateSuccStatesInput
-                trace(TRACE_2, "\t\t\t\t    sending event: !");
-                // trace(TRACE_2, PN->getPlace(*iter)->name);
-                trace(TRACE_2, " at node " + currentNode->getName() + " suppressed (message bound violated)\n");
-
-                numberDeletedVertices--;
-                delete v;
-
-            } else if (addGraphNode (currentNode, v, *iter, SENDING)) {
-                buildReducedGraph(v);
-                trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
-            }
-        }
-    }
-
-    trace(TRACE_3, "iterating over outputSet\n");
-    for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
-        if ((options[O_EVENT_USE_MAX] == false) || checkMaximalEvents(*iter, currentNode, RECEIVING)) {
-
-            trace(TRACE_2, "\t\t\t\t    output event: ?");
-
-            // create new GraphNode of the graph
-            GraphNode* v = new GraphNode();
-            calculateSuccStatesOutput(*iter, currentNode, v);
-
-            if (currentNode->getColor() != RED && addGraphNode (currentNode, v, *iter, RECEIVING)) {
-                buildReducedGraph(v);
-                trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
-                // analyseNode(currentNode, false);
-                // trace(TRACE_5, "node analysed\n");
-            }
-        }
-    }
-
-    currentNode->analyseNode();
-    trace(TRACE_5, "node analysed\n");
-
-    trace(TRACE_1, "\t\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()) + "\n");
-}
-
 
 //! \param sourceNode a reference to the father of toAdd (needed for implicitly adding the edge, too)
 //! \param toAdd a reference to the GraphNode that is to be added to the graph
@@ -289,7 +227,7 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
                                     GraphNode* toAdd,
                                     messageMultiSet messages,
                                     GraphEdgeType type) {
-    trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : start\n");
+    trace(TRACE_5, "interactionGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : start\n");
 
     if (getNumberOfNodes() == 0) { // graph contains no nodes at all
         root = toAdd; // the given node becomes the root node
@@ -346,7 +284,7 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
             sourceNode->addLeavingEdge(edgeSucc);
             setOfSortedNodes.insert(toAdd);
 
-            trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
+            trace(TRACE_5, "interactionGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
             return true;
         } else {
             trace(TRACE_1, "\t successor node already known: " + found->getName() + "\n");
@@ -355,7 +293,7 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
             sourceNode->addLeavingEdge(edgeSucc);
             delete toAdd;
 
-            trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
+            trace(TRACE_5, "interactionGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
             return false;
         }
     }
@@ -598,7 +536,7 @@ void interactionGraph::getActivatedEventsComputeCNF(GraphNode* node,
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
 //! \brief calculates the set of successor states in case of an input message
-void interactionGraph::calculateSuccStatesInput(messageMultiSet input,
+void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
                                                 GraphNode* node,
                                                 GraphNode* newNode) {
     trace(TRACE_5, "interactionGraph::calculateSuccStatesInput(messageMultiSet input, GraphNode * node, GraphNode * newNode) : start\n");
@@ -606,7 +544,7 @@ void interactionGraph::calculateSuccStatesInput(messageMultiSet input,
     PN->setOfStatesTemp.clear();
     PN->visitedStates.clear();
 
-    if (TRACE_2 <= debug_level) {
+    /*if (TRACE_2 <= debug_level) {
         for (messageMultiSet::iterator iter1 = input.begin();
              iter1 != input.end(); iter1++) {
             trace(TRACE_2, PN->getPlace(*iter1)->name);
@@ -614,7 +552,7 @@ void interactionGraph::calculateSuccStatesInput(messageMultiSet input,
         }
         trace(TRACE_2, "\n");
     }
-
+*/
     for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
             != node->reachGraphStateSet.end(); iter++) {
 
@@ -655,16 +593,16 @@ void interactionGraph::calculateSuccStatesInput(messageMultiSet input,
 }
 
 
-//! \param output the output messages that are taken from the marking
+//! \param receivingEvent the output messages that are taken from the marking
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
 //! \brief calculates the set of successor states in case of an output message
-void interactionGraph::calculateSuccStatesOutput(messageMultiSet output,
+void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivingEvent,
                                                  GraphNode* node,
                                                  GraphNode* newNode) {
     trace(TRACE_5, "interactionGraph::calculateSuccStatesOutput(messageMultiSet output, GraphNode * node, GraphNode * newNode) : start\n");
 
-    if (TRACE_2 <= debug_level) {
+/*    if (TRACE_2 <= debug_level) {
         for (messageMultiSet::iterator iter1 = output.begin(); iter1
                 != output.end(); iter1++) {
             trace(TRACE_2, PN->getPlace(*iter1)->name);
@@ -672,12 +610,12 @@ void interactionGraph::calculateSuccStatesOutput(messageMultiSet output,
         }
         trace(TRACE_2, "\n");
     }
-
+*/
     if (options[O_CALC_ALL_STATES]) {
         for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
                 != node->reachGraphStateSet.end(); iter++) {
             (*iter)->decode(PN);
-            if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
+            if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
                 PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
             }
         }
@@ -707,14 +645,14 @@ void interactionGraph::calculateSuccStatesOutput(messageMultiSet output,
             // calculated States would deleted by the binDecision destructor
             // causing a segmentation fault while trying to call decode() on
             // one those deleted states in the following for loop.
-            PN->calculateReachableStates(stateSet, output, newNode);
+            PN->calculateReachableStates(stateSet, receivingEvent, newNode);
         }
 
         for (StateSet::iterator iter2 = stateSet.begin(); iter2
                 != stateSet.end(); iter2++) {
             (*iter2)->decode(PN); // get the marking of the state
 
-            if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
+            if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
                 PN->calculateReachableStatesOutputEvent(newNode); // calc the reachable states from that marking
             }
         }
@@ -732,21 +670,25 @@ void interactionGraph::calculateSuccStatesOutput(messageMultiSet output,
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 //! \fn setOfMessages interactionGraph::combineReceivingEvents(GraphNode * node, setOfMessages & inputMessages)
-//! \param node the node for which the activated output events are calculated
-//! \param inputMessages
-//! \brief creates a list of all output messages of the current node
+//! \param node the node for which the activated receiving and sending events are calculated
+//! \param sendingEvents set of sending events that are activated in the current node
+//! \brief creates a list of all receiving events of the current node and creates the set of
+//!			sending events
+//!			applies the reduction rules: "combine receiving events" and "receiving before sending"
 setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
-                                                       setOfMessages& inputMessages) {
+                                                       setOfMessages& sendingEvents) {
 
     trace(TRACE_5, "interactionGraph::combineReceivingEvents(GraphNode * node): start\n");
 
-    std::vector<StateSet::iterator> statesVector; // remember those states that activate an output event
+    // remember those states that activate a receiving event
+    std::vector<StateSet::iterator> statesVector; 
 
-    setOfMessages listOfOutputMessageLists; // list 
+    setOfMessages listOfReceivingEvents; 	// list of all the receiving events in this node
+    										// is a set of multisets
 
-    messageMultiSet outputMessages; // multiset of all input messages of the current state
+    messageMultiSet receivingEvent; // multiset of the receiving event of the current state
 
-    StateSet::iterator iter;
+    StateSet::iterator iter;	// iterator over all states of the current node
 
     bool found = false;
     bool skip = false;
@@ -758,15 +700,10 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
 
             if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) { // we just consider the maximal states only
 
-#ifdef DEBUG
-                cout << "\t state "<< (*iter) << " activates the output events: " << endl;
-#endif		
                 unsigned int i = 0;
 
                 // this clause's first literal
                 GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
-
-                //literal * cl = new literal();			// create a new clause for this particular state
 
                 // "receiving before sending" reduction rule
                 while (!stateActivatesOutputEvents(*iter) &&(*iter)->quasiFirelist&&(*iter)->quasiFirelist[i]) {
@@ -777,13 +714,11 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                         messageMultiSet input; // multiset holding one input message
                         input.insert(*index);
 
-                        inputMessages.insert(input);
+                        sendingEvents.insert(input);
 
                         GraphFormulaLiteral
                                 * myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
                         myclause->addSubFormula(myliteral);
-
-                        //cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
                     }
                     i++;
                 }
@@ -800,9 +735,6 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                         }
 
                         found = true;
-#ifdef DEBUG
-                        cout << "\t\t" << PN->getPlace(i)->name << endl;
-#endif
                     }
                 }
 
@@ -814,8 +746,8 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                 if (found) {
 
                     for (setOfMessages::iterator
-                            iter1 = listOfOutputMessageLists.begin(); iter1
-                            != listOfOutputMessageLists.end(); iter1++) {
+                            iter1 = listOfReceivingEvents.begin(); iter1
+                            != listOfReceivingEvents.end(); iter1++) {
 
                         subset = false;
 
@@ -836,8 +768,8 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
 
                     if (!subset) {
                         for (setOfMessages::iterator
-                                iter1 = listOfOutputMessageLists.begin(); iter1
-                                != listOfOutputMessageLists.end(); iter1++) {
+                                iter1 = listOfReceivingEvents.begin(); iter1
+                                != listOfReceivingEvents.end(); iter1++) {
 
                             supset = false;
 
@@ -855,7 +787,7 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                             	
                             	node->getAnnotation()->removeLiteralForReal(PN->createLabel(*iter1));
                             	
-                                listOfOutputMessageLists.erase(iter1);
+                                listOfReceivingEvents.erase(iter1);
                                 label = PN->createLabel(outputMessages);
                                 
                                 break;
@@ -866,24 +798,19 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                             GraphFormulaLiteral
                                     * myliteral = new GraphFormulaLiteral(label);
                             myclause->addSubFormula(myliteral);
-
-                            //cl->addLiteral(label);	
-                            listOfOutputMessageLists.insert(outputMessages);
+                            listOfReceivingEvents.insert(outputMessages);
                         }
                     } else {
                         GraphFormulaLiteral
                                 * myliteral = new GraphFormulaLiteral(label);
                         myclause->addSubFormula(myliteral);
-                        //cl->addLiteral(label);	
                     }
 
                     if (!subset && !supset) {
-                        listOfOutputMessageLists.insert(outputMessages);
+                        listOfReceivingEvents.insert(outputMessages);
 
                         GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->createLabel(outputMessages));
                         myclause->addSubFormula(myliteral);
-
-                        //					cl->addLiteral(PN->createLabel(outputMessages));
                     }
 
                     found = false;
@@ -899,7 +826,6 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                 }
 
                 node->addClause(myclause);
-                //node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
             }
 
         }
@@ -909,14 +835,9 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
 
             if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) { // we just consider the maximal states only
 
-
-                //cout << "\t state "<< (*iter) << " activates the output events: " << endl;
-	
                 unsigned int i = 0;
                 // this clause's first literal
                 GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
-
-                //			literal * cl = new literal();			// create a new clause for this particular state
 
                 // "receiving before sending" reduction rule
                 while (!stateActivatesOutputEvents(*iter) &&
@@ -929,12 +850,10 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                         messageMultiSet input; // multiset holding one input message
                         input.insert(*index);
 
-                        inputMessages.insert(input);
+                        sendingEvents.insert(input);
 
                         GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
                         myclause->addSubFormula(myliteral);
-
-                        //cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
                     }
                     i++;
                 }
@@ -951,10 +870,6 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                         }
 
                         found = true;
-
-                        //cout << "\t\t" << PN->getPlace(i)->name << endl;
-                        //cout << "\t\t" << i << endl;
-
                     }
                 }
 
@@ -966,8 +881,8 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                 if (found) {
 
                     for (setOfMessages::iterator
-                            iter1 = listOfOutputMessageLists.begin(); 
-                            iter1 != listOfOutputMessageLists.end(); iter1++) {
+                            iter1 = listOfReceivingEvents.begin(); 
+                            iter1 != listOfReceivingEvents.end(); iter1++) {
 
                         subset = false;
 
@@ -990,8 +905,8 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
 
                     if (!subset) {
                         for (setOfMessages::iterator
-                                iter2 = listOfOutputMessageLists.begin(); 
-                                iter2 != listOfOutputMessageLists.end(); iter2++) {
+                                iter2 = listOfReceivingEvents.begin(); 
+                                iter2 != listOfReceivingEvents.end(); iter2++) {
 
                             supset = false;
 
@@ -1007,13 +922,9 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                                 }
                             }
                             if (supset) {
-                            	
-//                            	cout << "remove literal... " << endl;
-//                            	cout << "\t before removal: " << node->getAnnotation()->asString() << endl;
                                 node->getAnnotation()->removeLiteralForReal(PN->createLabel(*iter2));
-//                                cout << "\t after removal: " << node->getAnnotation()->asString() << endl;
                                 
-                                listOfOutputMessageLists.erase(iter2);
+                                listOfReceivingEvents.erase(iter2);
                                 label = PN->createLabel(outputMessages);
                                 break;
                             }
@@ -1023,25 +934,19 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                             GraphFormulaLiteral
                                     * myliteral = new GraphFormulaLiteral(label);
                             myclause->addSubFormula(myliteral);
-
-                            //cl->addLiteral(label);	
-                            listOfOutputMessageLists.insert(outputMessages);
+                            listOfReceivingEvents.insert(outputMessages);
                         }
                     } else {
                         GraphFormulaLiteral
                                 * myliteral = new GraphFormulaLiteral(label);
                         myclause->addSubFormula(myliteral);
-
-                        //cl->addLiteral(label);	
                     }
 
                     if (!subset && !supset) {
-                        listOfOutputMessageLists.insert(outputMessages);
-					//	cout << "label: " << PN->createLabel(outputMessages) << endl;
+                        listOfReceivingEvents.insert(outputMessages);
                         GraphFormulaLiteral
                                 * myliteral = new GraphFormulaLiteral(PN->createLabel(outputMessages));
                         myclause->addSubFormula(myliteral);
-                        //cl->addLiteral(PN->createLabel(outputMessages));
                     }
 
                     found = false;
@@ -1058,15 +963,10 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                 }
 
                 node->addClause(myclause);
-                
-                
-                //node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
             }
 
         }
     }
-    
-  //  cout << "node's new clause: " << node->getAnnotationAsString() << endl;
 
     trace(TRACE_5, "interactionGraph::combineReceivingEvents(GraphNode * node): end\n");
 
@@ -1074,143 +974,5 @@ setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
     /* e.g. the set contains [a, b] and [a, b, c] */
     /* [a, b] is subset of [a, b, c], therefore the set [a, b, c] is removed */
 
-//	cout << "size of listOfOutputMessageLists: " << listOfOutputMessageLists.size() << endl;
-
-    return listOfOutputMessageLists;
-}
-
-
-//! \fn setOfMessageSet interactionGraph::receivingBeforeSending(GraphNode * node)
-//! \param node the node for which the activated input events are calculated
-//! \brief creates a list of all activated input events (messages) of the current node with respect to the
-//! receiving before sending rule
-setOfMessages interactionGraph::receivingBeforeSending(GraphNode* node) {
-
-    trace(TRACE_5, "interactionGraph::receivingBeforeSending(GraphNode * node): start\n");
-
-    int i;
-
-    StateSet::iterator iter;
-
-    setOfMessages inputMessages; // list of all input messages of the current node
-
-    for (iter = node->reachGraphStateSet.begin(); iter
-            != node->reachGraphStateSet.end(); iter++) {
-
-        if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) { // we just consider the maximal states only
-            i = 0;
-
-            // this clause's first literal
-            GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
-
-            (*iter)->decode(PN);
-            while (!stateActivatesOutputEvents(*iter) &&(*iter)->quasiFirelist&&(*iter)->quasiFirelist[i]) {
-
-                for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin(); index
-                        != (*iter)->quasiFirelist[i]->messageSet.end(); index++) {
-
-                    messageMultiSet input; // multiset holding one input message
-                    input.insert(*index);
-
-                    inputMessages.insert(input);
-
-                    GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
-                    myclause->addSubFormula(myliteral);
-
-                    //cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
-                }
-                i++;
-            }
-            if ((*iter)->type == FINALSTATE) {
-                GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
-                myclause->addSubFormula(myliteral);
-
-                node->addClause(myclause);
-            } else {
-                delete myclause;
-            }
-        }
-    }
-
-    trace(TRACE_5, "number of input events: " + intToString(inputMessages.size()) + "\n");
-    trace(TRACE_5, "interactionGraph::receivingBeforeSending(GraphNode * node): end\n");
-    return inputMessages; // return the list of activated input messages
-}
-
-
-//! \fn void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, GraphNode * node)
-//! \param output the output messages that are taken from the marking
-//! \param node
-//! \brief calculates the set of successor states in case of an output message
-void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output,
-                                                    GraphNode* node) {
-
-    /* iterate over all states of the current node 
-     * and get rid of the output messages in the marking of the state
-     */
-
-#ifdef DEBUG
-    cout << "interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, GraphNode * node): start" << endl;
-    cout << "checking node: " << *node << endl;
-#endif
-    StateSet::iterator iter;
-
-    // iterate over all states of the current node 
-    for (iter = node->reachGraphStateSet.begin(); iter
-            != node->reachGraphStateSet.end(); iter++) {
-
-        //		PN->setCurrentMarkingFromState(*iter);		// set the net to the marking of the state being considered
-        (*iter)->decode(PN);
-        if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
-            owfnPlace * outputPlace;
-
-            // CHANGE THAT!!!!!!!!!!! is just a hack, stubborn set method does not yet work for more than one output event!
-            for (messageMultiSet::iterator iter = output.begin(); iter
-                    != output.end(); iter++) {
-                outputPlace = PN->getPlace(*iter);
-            }
-
-            // if there is a state for which an output event was activated, catch that state
-            if (options[O_CALC_ALL_STATES]) {
-                PN->calculateReachableStatesFull(node); // calc the reachable states from that marking
-            } else {
-                PN->calculateReachableStatesOutputEvent(node); // calc the reachable states from that marking
-            }
-        }
-    }
-}
-
-
-//! \fn void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, GraphNode * node)
-//! \param input set of input messages
-//! \param node the node for which the successor states are to be calculated
-//! \brief calculates the set of successor states in case of an input message
-void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input,
-                                                       GraphNode* node) {
-
-#ifdef DEBUG
-    cout << "interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, GraphNode * node) : start" << endl;
-#endif
-
-    StateSet::iterator iter;
-    // iterate over all states of the current node 
-    for (iter = node->reachGraphStateSet.begin(); iter
-            != node->reachGraphStateSet.end(); iter++) {
-
-#ifdef DEBUG
-        cout << "add input message " << input << " to state " << (*iter) << endl;
-#endif
-        if (true) { // if state is representative for this node
-        //			PN->setCurrentMarkingFromState(*iter);		// set the net to the marking of the state being considered
-
-            (*iter)->decode(PN);
-
-            PN->addInputMessage(input); // add the input message to the current marking
-            if (options[O_CALC_ALL_STATES]) {
-                PN->calculateReachableStatesFull(node); // calc the reachable states from that marking
-            } else {
-                PN->calculateReachableStatesInputEvent(node); // calc the reachable states from that marking
-            }
-        }
-    }
+    return listOfReceivingEvents;
 }

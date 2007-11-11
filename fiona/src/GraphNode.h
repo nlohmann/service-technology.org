@@ -276,4 +276,63 @@ class GraphNode {
 #define new NEW_NEW
 };
 
+
+class PriorityMap {
+    public:
+
+        typedef owfnPlace* KeyType;
+
+        /*
+         * Fills the priority map according to the given annotation with interface places.
+         * NOTE: All interface places will be considered; places not in the 
+         * annotation will have a minimal priority.
+         * @param annotation the annotation, from which the priority map will be extracted. 
+         */
+        void fill(oWFN * PN, GraphFormulaCNF *annotation);
+        void fillForIG(setOfMessages&, oWFN*, GraphFormulaCNF*);
+        
+        /**
+         * Delivers the element from the priority map with the highest priority.
+         * This element will be removed afterwards.
+         */ 
+        KeyType pop();
+
+        messageMultiSet popIG();
+        
+        /**
+         * Returns true iff the priority map is empty.
+         */
+        bool empty() const;
+
+        bool emptyIG() const;
+        
+    private:
+
+        /*
+         * Type of priority map.
+         * The first element of number represents the minimal length of a clause containing the key element.
+         * The second element of number represents the maximal occurence of the key element throughout the annotation. 
+         */ 
+        typedef map<KeyType, pair<int, int> > MapType;
+
+        /*
+         * Type of priority map for the IG.
+         * as the first element of the map we use a multiset of messages
+         * The first element of int represents the minimal length of a clause containing the key element.
+         * The second element of int represents the maximal occurence of the key element throughout the annotation. 
+         */ 
+        typedef map<messageMultiSet, pair<int, int> > MapTypeIG;
+        
+        /*
+         * Underlying representation of association between interface places and their priority.
+         */
+        MapType pm;
+
+        /*
+         * Underlying representation of association between a set of messages and their priority.
+         */
+        MapTypeIG pmIG;
+};
+
+
 #endif /*GraphNode_H_*/

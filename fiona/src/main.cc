@@ -338,10 +338,8 @@ void computeIG(oWFN* PN) {
         }
 
         igFilename += ".ig";
-
         
-        
-     //   graph->printOGFile(igFilename);
+        graph->printOGFile(igFilename);
 
 /* */
         if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
@@ -356,6 +354,7 @@ void computeIG(oWFN* PN) {
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
     // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
 
+    graph->clearNodeSet();
     delete graph;
     trace(TRACE_5, "graph deleted\n");
     trace(TRACE_0, "=================================================================\n");

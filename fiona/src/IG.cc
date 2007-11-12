@@ -68,6 +68,8 @@ void interactionGraph::buildGraph() {
     // function itself
     buildGraph(getRoot());
 
+    setOfNodes.push_back(getRoot());
+    
     computeGraphStatistics();
 }
 
@@ -241,7 +243,7 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
     if (getNumberOfNodes() == 0) { // graph contains no nodes at all
         root = toAdd; // the given node becomes the root node
         setOfSortedNodes.insert(toAdd);
-       // setOfNodes.push_back(toAdd);
+       setOfNodes.push_back(toAdd);
     } else {
         GraphNode* found = findGraphNodeInSet(toAdd); //findGraphNode(toAdd);
 
@@ -299,7 +301,7 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
             GraphEdge* edgeSucc = new GraphEdge(toAdd, label);
             sourceNode->addLeavingEdge(edgeSucc);
             setOfSortedNodes.insert(toAdd);
-           // setOfNodes.push_back(toAdd);
+           setOfNodes.push_back(toAdd);
             
             trace(TRACE_5, "interactionGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
             return true;

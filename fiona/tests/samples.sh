@@ -445,7 +445,7 @@ fi
 
 shop3bluenodes_soll=11
 shop3blueedges_soll=13
-shop3storedstates_soll=687 #728
+shop3storedstates_soll=657 #687 #728
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 cmd="$FIONA $owfn -t IG"
@@ -490,7 +490,7 @@ fi
 
 shop3bluenodes_soll=11
 shop3blueedges_soll=13
-shop3storedstates_soll=70 #83
+shop3storedstates_soll=54 #70 #83
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 cmd="$FIONA $owfn -R -t IG"

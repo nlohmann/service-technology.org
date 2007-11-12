@@ -51,11 +51,13 @@ Graph::Graph() :
 
 
 Graph::~Graph() {
+	trace(TRACE_5, "Graph::~Graph() : start\n");
     for (nodes_iterator node_iter = setOfNodes.begin();
          node_iter != setOfNodes.end(); ++node_iter) {
 
         delete *node_iter;
     }
+    trace(TRACE_5, "Graph::~Graph() : end\n");
 }
 
 

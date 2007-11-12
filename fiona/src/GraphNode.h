@@ -144,9 +144,10 @@ class GraphNode {
 
     public:
 
-        /// These two are needed for OG/IG construction.
+        /// These three are needed for OG/IG construction.
         bool hasFinalStateInStateSet;
-        int* eventsUsed;
+        int* eventsUsedInput;
+        int* eventsUsedOutput;
 
         /// This set contains only a reduced number of states in case the state
         /// reduced graph is to be build.

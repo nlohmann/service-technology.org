@@ -143,10 +143,9 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
         if (currentEvent->max_occurence < 0 || 
             (currentEvent->getType() == INPUT &&
-             currentEvent->max_occurence > currentNode->eventsUsed[PN->getInputPlaceIndex(currentEvent)]) || 
+             currentEvent->max_occurence > currentNode->eventsUsedInput[PN->getInputPlaceIndex(currentEvent)]) || 
             (currentEvent->getType() == OUTPUT &&
-             currentEvent->max_occurence > currentNode->eventsUsed[PN->getOutputPlaceIndex(currentEvent)
-                                                                 + PN->getInputPlaceCount()])) {
+             currentEvent->max_occurence > currentNode->eventsUsedOutput[PN->getOutputPlaceIndex(currentEvent)])) {
             // we have to consider this event
 
             GraphNode* v = new GraphNode();    // create new GraphNode of the graph
@@ -270,9 +269,12 @@ void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
     toAdd->setNumber(getNumberOfNodes());
     toAdd->setName(intToString(getNumberOfNodes()));
 
-    for (oWFN::Places_t::size_type i = 0;
-         i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
-        toAdd->eventsUsed[i] = sourceNode->eventsUsed[i];
+    for (oWFN::Places_t::size_type i = 0; i < PN->getInputPlaceCount(); i++ ) {
+        toAdd->eventsUsedInput[i] = sourceNode->eventsUsedInput[i];
+    }
+    
+    for (oWFN::Places_t::size_type i = 0; i < PN->getOutputPlaceCount(); i++ ) {
+        toAdd->eventsUsedOutput[i] = sourceNode->eventsUsedOutput[i];
     }
 
     setOfSortedNodes.insert(toAdd);
@@ -299,10 +301,10 @@ void OG::addGraphEdge(GraphNode* sourceNode,
     string edgeLabel;
     if (type == SENDING) {
         edgeLabel = PN->getInputPlace(label)->getLabelForCommGraph();
-        destNode->eventsUsed[label]++;
+        destNode->eventsUsedInput[label]++;
     } else {
         edgeLabel = PN->getOutputPlace(label)->getLabelForCommGraph();
-        destNode->eventsUsed[PN->getInputPlaceCount() + label]++;
+        destNode->eventsUsedOutput[label]++;
     }
 
     // add a new edge to the new node

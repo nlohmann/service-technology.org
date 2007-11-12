@@ -247,16 +247,14 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
 
         string label;
         bool comma = false;
-        unsigned int offset = 0;
-
-        if (type == RECEIVING) {
-            offset = PN->getInputPlaceCount();
-        }
 
         if (found == NULL) {
-            // copy the events used from the parent node
-            for (unsigned int i = 0; i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
-                toAdd->eventsUsed[i] = sourceNode->eventsUsed[i];
+            for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
+                toAdd->eventsUsedInput[i] = sourceNode->eventsUsedInput[i];
+            }
+            
+            for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                toAdd->eventsUsedOutput[i] = sourceNode->eventsUsedOutput[i];
             }
         }
 
@@ -278,9 +276,17 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
                 }
             }
             if (found == 0) {
-                toAdd->eventsUsed[offset + i]++;
+                if (type == RECEIVING) {
+                    toAdd->eventsUsedOutput[i]++;
+                } else {
+                    toAdd->eventsUsedInput[i]++;
+                }
             } else {
-                found->eventsUsed[offset + i]++;
+                if (type == RECEIVING) {
+                    found->eventsUsedOutput[i]++;
+                } else {
+                    found->eventsUsedInput[i]++;
+                }
             }
         }
 
@@ -365,7 +371,7 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
     if (typeOfPlace == SENDING) {
         for (iter = numberOfInputMessages.begin(); iter != numberOfInputMessages.end(); ++iter) {
             if (options[O_EVENT_USE_MAX] == true) { // max use of events set
-                if (currentNode->eventsUsed[iter->first] + iter->second > PN->getInputPlace(iter->first)->max_occurence) {
+                if (currentNode->eventsUsedInput[iter->first] + iter->second > PN->getInputPlace(iter->first)->max_occurence) {
 
                     // this input event shall not be sent anymore, so quit here
                     trace(TRACE_3, "maximal occurrences of event ");
@@ -380,7 +386,7 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
     } else if (typeOfPlace == RECEIVING) {
         for (iter = numberOfOutputMessages.begin(); iter != numberOfOutputMessages.end(); ++iter) {
             if (options[O_EVENT_USE_MAX] == true) { // max use of events set
-                if (currentNode->eventsUsed[iter->first + PN->getInputPlaceCount()] +iter->second> PN->getOutputPlace(iter->first)->max_occurence) {
+                if (currentNode->eventsUsedOutput[iter->first] +iter->second> PN->getOutputPlace(iter->first)->max_occurence) {
 
                     // this output event shall not be received anymore, so quit here
                     trace(TRACE_3, "maximal occurrences of event ");

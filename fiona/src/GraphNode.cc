@@ -146,12 +146,15 @@ GraphNode::GraphNode() :
 
     annotation = new GraphFormulaCNF();
 
-    eventsUsed = new int [PN->getInputPlaceCount() + PN->getOutputPlaceCount()];
-
-    for (unsigned int i = 0;
-         i < PN->getInputPlaceCount() + PN->getOutputPlaceCount(); i++) {
-
-        eventsUsed[i] = 0;
+    eventsUsedInput = new int[PN->getInputPlaceCount()];
+    eventsUsedOutput = new int[PN->getOutputPlaceCount()];
+    
+    for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
+        eventsUsedInput[i] = 0;
+    }
+    
+    for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+        eventsUsedOutput[i] = 0;
     }
 }
 
@@ -168,7 +171,8 @@ GraphNode::GraphNode(const std::string& _name,
                      GraphFormula* _annotation,
                      GraphNodeColor _color,
                      unsigned int _number) :
-    number(_number), name(_name), color(_color), eventsUsed(NULL) {
+    number(_number), name(_name), color(_color), eventsUsedInput(NULL),
+    eventsUsedOutput(NULL) {
     
     annotation = _annotation->getCNF();
     delete _annotation; // because getCNF() returns a newly create formula
@@ -191,8 +195,12 @@ GraphNode::~GraphNode() {
     
     delete annotation;
     
-    if (eventsUsed != NULL) {
-        delete[] eventsUsed;
+    if (eventsUsedInput != NULL) {
+        delete[] eventsUsedInput;
+    }
+    
+    if (eventsUsedOutput != NULL) {
+        delete[] eventsUsedOutput;
     }
     
     numberDeletedVertices++;

@@ -859,7 +859,7 @@ void makePNG(oWFN* PN) {
     if (!options[O_OUTFILEPREFIX]) {
         outFileName = globals::output_filename;
     } else {
-        outFileName = outfilePrefix + globals::output_filename;
+        outFileName = outfilePrefix;
     }
 
     // finish the string for the system call

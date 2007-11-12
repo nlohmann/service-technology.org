@@ -612,6 +612,13 @@ void parse_command_line(int argc, char* argv[]) {
 		cerr << "not computing Public View Service Automaton - multiple deadlocks option ignored\n" << endl;
 		options[O_PV_MULTIPLE_DEADLOCKS] = false;
 	}
+
+    if (!options[O_FILTER] && !options[O_PRODUCTOG] && !options[O_SIMULATES] && !options[O_EX] &&
+        options[O_OUTFILEPREFIX] && (ogfiles.size() > 1 || netfiles.size() > 1)) {
+        cerr << "Error: \t The output option cannot be used if multiple output files are to be created!\n" << endl;
+        exit(1);
+    }
+
 }
 
 

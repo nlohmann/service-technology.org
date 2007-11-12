@@ -1,12 +1,12 @@
 NODES
-  0 : ((!a + !b)) : blue,
-  1 : ((!a)) : blue,
-  2 : ((?c + ?d)) : blue,
-  3 : ((?c)) : blue,
-  4 : ((final)) : blue,
-  12 : ((?d)) : blue,
-  14 : ((!b + ?c)) : blue,
-  15 : ((!b)) : blue;
+  0 : (!a + !b) : blue,
+  1 : !a : blue,
+  2 : (?c + ?d) : blue,
+  3 : ?c : blue,
+  4 : final : blue,
+  12 : ?d : blue,
+  14 : (!b + ?c) : blue,
+  15 : !b : blue;
 
 INITIALNODE
   0;

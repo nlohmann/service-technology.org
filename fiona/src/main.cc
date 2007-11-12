@@ -564,7 +564,7 @@ void checkMatching(Graph* OGToMatch, oWFN* PN) {
 //! \brief check for simulation relation of two given OGs
 void checkSimulation(Graph::ogs_t& OGsFromFiles) {
     
-    // OGs given by command line are already stored in OGsFromFiles
+    // the OGs given by command line are already stored in OGsFromFiles
     
     bool calledWithNet = false;
     
@@ -576,8 +576,7 @@ void checkSimulation(Graph::ogs_t& OGsFromFiles) {
         // oWFN(s) was given on command line, so compute the corresponding OGs
         calledWithNet = true;
         
-        // equivalence (which is just bidirectional simulation) on OGs depends
-        // heavily on empty node,
+        // simulation  on OGs depends heavily on empty node,
         // so set the correct options to compute OG with empty node
         options[O_SHOW_NODES] = true;
         parameters[P_SHOW_EMPTY_NODE] = true;
@@ -997,8 +996,8 @@ int main(int argc, char ** argv) {
     // ********                       (all OGs read first)                       ********
     // **********************************************************************************
 
-    if (options[O_PRODUCTOG] || options[O_SIMULATES]
-        || (options[O_EX] && !options[O_BDD]) || options[O_FILTER]) {
+    if (options[O_PRODUCTOG] ||
+        options[O_SIMULATES]|| (options[O_EX] && !options[O_BDD]) || options[O_FILTER]) {
 
         // reading all OG-files
         Graph::ogs_t OGsFromFiles;
@@ -1052,9 +1051,9 @@ int main(int argc, char ** argv) {
         // iterate all input files
         for (Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
              iOgFile != ogfiles.end(); ++iOgFile) {
-        
+
             Graph* readOG = readog(*iOgFile);
-        
+
             if (parameters[P_PV]) {
                 // computes a service automaton "public view" which has the same
                 // OG as given in readOG
@@ -1068,7 +1067,7 @@ int main(int argc, char ** argv) {
                 countStrategies(readOG, (*iOgFile));
                 delete readOG;
             }
-    
+
             if (options[O_CHECK_ACYCLIC]) {
                 // counts the number of deterministic strategies
                 // that are characterized by a given OG
@@ -1092,9 +1091,13 @@ int main(int argc, char ** argv) {
     if (options[O_EX] && options[O_BDD]) {
         // checking exchangeability using BDDs
 
+        assert(netfiles.size() == 2);
+        // the BDD representations of the given nets are assumed to exist already
+
         list<std::string>::iterator netiter = netfiles.begin();
         Exchangeability* og1 = new Exchangeability(*netiter);
         Exchangeability* og2 = new Exchangeability(*(++netiter));
+
         trace(TRACE_0, "The two operating guidelines are equal: ");
         if (og1->check(og2) == true) {
             trace(TRACE_0, "YES\n\n");

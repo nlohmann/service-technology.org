@@ -317,11 +317,11 @@ void OG::addGraphEdge(GraphNode* sourceNode,
 }
 
 
+//! \brief for each state of the old node: add input message
+//!        and build reachability graph and add all states to new node
 //! \param input the sending event currently performed
 //! \param oldNode the old node carrying the states
 //! \param newNode the new node wich is computed
-//! \brief for each state of the old node:
-//! add input message and build reachability graph and add all states to new node
 void OG::calculateSuccStatesInput(unsigned int input,
                                   GraphNode* oldNode,
                                   GraphNode* newNode) {

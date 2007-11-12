@@ -62,10 +62,13 @@ void interactionGraph::buildGraph() {
     PN->setOfStatesTemp.clear();
     PN->visitedStates.clear();
 
-    calculateRootNode(); // creates the root node and calculates its reachability graph (set of states)
+    // creates the root node and calculates its reachability graph (set of states)
+    calculateRootNode();
 
-    // build the IG, whether the reduced or not reduced one is built is being decided in that
-    // function itself
+    setOfNodes.push_back(getRoot());
+
+    // build the IG, whether the reduced or not reduced one is built is being
+    // decided in that function itself
     buildGraph(getRoot());
 
     computeGraphStatistics();
@@ -210,6 +213,7 @@ void interactionGraph::buildGraph(GraphNode* currentNode) {
     trace(TRACE_1, "\t\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()) + "\n");
 }
 
+
 //! \param sourceNode a reference to the father of toAdd (needed for implicitly adding the edge, too)
 //! \param toAdd a reference to the GraphNode that is to be added to the graph
 //! \param messages the label of the edge between the current GraphNode and the one to be added
@@ -283,6 +287,7 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
             GraphEdge* edgeSucc = new GraphEdge(toAdd, label);
             sourceNode->addLeavingEdge(edgeSucc);
             setOfSortedNodes.insert(toAdd);
+            setOfNodes.push_back(toAdd);
 
             trace(TRACE_5, "interactionGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
             return true;

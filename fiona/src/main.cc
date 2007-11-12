@@ -325,6 +325,23 @@ void computeIG(oWFN* PN) {
         // generate output files
         graph->printGraphToDot(); // .out
 
+/* create also an .og file to enable comparison of different IGs */
+        string igFilename = "";
+        if (options[O_OUTFILEPREFIX]) {
+            igFilename = outfilePrefix;
+        } else {
+            igFilename = graph->returnOWFnFilename();
+        }
+
+        if (!options[O_CALC_ALL_STATES]) {
+            igFilename += ".R";
+        }
+
+        igFilename += ".ig";
+
+        graph->printOGFile(igFilename);
+
+/* */
         if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
             if (controllable) {
                 graph->printGraphToSTG();

@@ -76,9 +76,10 @@ void OG::buildGraph() {
         bdd->convertRootNode(getRoot());
     }
 
+    setOfNodes.push_back(getRoot());
+
     // start building up the rest of the graph
     // second parameter means: if finished, 100% of the graph is constructed
-    setOfNodes.push_back(getRoot());
     buildGraph(getRoot(), 1);
     correctNodeColorsAndShortenAnnotations();
 
@@ -273,6 +274,7 @@ void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
          i < (PN->getInputPlaceCount() + PN->getOutputPlaceCount()); i++) {
         toAdd->eventsUsed[i] = sourceNode->eventsUsed[i];
     }
+
     setOfSortedNodes.insert(toAdd);
     setOfNodes.push_back(toAdd);
 
@@ -602,9 +604,10 @@ void OG::convertToBddFull() {
 
     trace(TRACE_0, "\nHIT A KEY TO CONTINUE (convertToBddFull)\n");
     //getchar();
-    unsigned int nbrLabels = PN->getInputPlaceCount()
-            + PN->getOutputPlaceCount();
-    BddRepresentation * testbdd = new BddRepresentation(nbrLabels, (Cudd_ReorderingType)bdd_reordermethod, getNumberOfNodes(), true);
+    unsigned int nbrLabels = PN->getInputPlaceCount() + PN->getOutputPlaceCount();
+    BddRepresentation* testbdd =
+        new BddRepresentation(nbrLabels, (Cudd_ReorderingType)bdd_reordermethod, getNumberOfNodes(), true);
+
     testbdd->convertRootNode(root);
     testbdd->setMaxPlaceBits(root, visitedNodes);
 
@@ -618,5 +621,3 @@ void OG::convertToBddFull() {
     delete testbdd;
     trace(TRACE_5, "OG::convertToBdd(): end\n");
 }
-
-

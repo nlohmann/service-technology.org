@@ -855,16 +855,23 @@ void makePNG(oWFN* PN) {
         }
     }
 
+    string outFileName;    
+    if (!options[O_OUTFILEPREFIX]) {
+        outFileName = globals::output_filename;
+    } else {
+        outFileName = outfilePrefix + globals::output_filename;
+    }
 
     // finish the string for the system call
     dotString = "echo \"" + dotString + "\" | dot -q -Tpng -o \""
-            + globals::output_filename + ".png\"";
-
-    trace(TRACE_1, "Piping the stream to dot\n");
+            + outFileName + ".png\"";
 
     // create the output
-    system(dotString.c_str());
-    trace(TRACE_0, (globals::output_filename + ".png generated\n\n"));
+    if (!options[O_NOOUTPUTFILES]) {
+        trace(TRACE_1, "Piping the stream to dot\n");
+        system(dotString.c_str());
+        trace(TRACE_0, (outFileName + ".png generated\n\n"));
+    }
 }
 
 

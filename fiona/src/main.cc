@@ -339,7 +339,9 @@ void computeIG(oWFN* PN) {
 
         igFilename += ".ig";
 
-        graph->printOGFile(igFilename);
+        
+        
+     //   graph->printOGFile(igFilename);
 
 /* */
         if (options[O_SYNTHESIZE_PARTNER_OWFN]) {

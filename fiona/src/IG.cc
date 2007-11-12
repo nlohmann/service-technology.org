@@ -62,13 +62,10 @@ void interactionGraph::buildGraph() {
     PN->setOfStatesTemp.clear();
     PN->visitedStates.clear();
 
-    // creates the root node and calculates its reachability graph (set of states)
-    calculateRootNode();
+    calculateRootNode(); // creates the root node and calculates its reachability graph (set of states)
 
-    setOfNodes.push_back(getRoot());
-
-    // build the IG, whether the reduced or not reduced one is built is being
-    // decided in that function itself
+    // build the IG, whether the reduced or not reduced one is built is being decided in that
+    // function itself
     buildGraph(getRoot());
 
     computeGraphStatistics();
@@ -192,8 +189,17 @@ void interactionGraph::buildGraph(GraphNode* currentNode) {
             		addGraphNode(currentNode, v, mmSet, typeOfEdge)) {
             	buildGraph(v);
             	trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
+            	
+            	if (v->getColor() == RED) {
+            		currentNode->removeLiteralFromAnnotation(PN->createLabel(mmSet));
+            	}
             }
+        } else {
+            trace(TRACE_2, "\t\t\t            event suppressed (max_occurence reached)\n");
+
+            currentNode->removeLiteralFromAnnotation(PN->createLabel(mmSet));
         }
+
 
         if (currentNode->getAnnotation()->equals() == FALSE) {
             currentNode->setColor(RED);
@@ -212,7 +218,6 @@ void interactionGraph::buildGraph(GraphNode* currentNode) {
 
     trace(TRACE_1, "\t\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()) + "\n");
 }
-
 
 //! \param sourceNode a reference to the father of toAdd (needed for implicitly adding the edge, too)
 //! \param toAdd a reference to the GraphNode that is to be added to the graph
@@ -236,6 +241,7 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
     if (getNumberOfNodes() == 0) { // graph contains no nodes at all
         root = toAdd; // the given node becomes the root node
         setOfSortedNodes.insert(toAdd);
+       // setOfNodes.push_back(toAdd);
     } else {
         GraphNode* found = findGraphNodeInSet(toAdd); //findGraphNode(toAdd);
 
@@ -287,8 +293,8 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
             GraphEdge* edgeSucc = new GraphEdge(toAdd, label);
             sourceNode->addLeavingEdge(edgeSucc);
             setOfSortedNodes.insert(toAdd);
-            setOfNodes.push_back(toAdd);
-
+           // setOfNodes.push_back(toAdd);
+            
             trace(TRACE_5, "interactionGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
             return true;
         } else {
@@ -296,6 +302,14 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
 
             GraphEdge* edgeSucc = new GraphEdge(found, label);
             sourceNode->addLeavingEdge(edgeSucc);
+
+            // Still, if that node was computed red before, the literal
+            // of the edge from currentNode to the old node must be removed
+            // in the annotation of currentNode.
+            if (found->getColor() == RED) {
+            	sourceNode->removeLiteralFromAnnotation(label);
+            }
+            
             delete toAdd;
 
             trace(TRACE_5, "interactionGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");

@@ -39,7 +39,7 @@
 #include "debug.h"
 #include "state.h"
 #include "options.h"
-#include "Graph.h"
+#include "AnnotatedGraph.h"
 #include "GraphFormula.h"
 
 

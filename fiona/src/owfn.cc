@@ -36,7 +36,7 @@
 #include "state.h"
 #include "owfnTransition.h"
 #include "binDecision.h"
-#include "Graph.h"
+#include "AnnotatedGraph.h"
 #include "debug.h"
 #include "options.h"
 #include "mynew.h"
@@ -1695,7 +1695,7 @@ string oWFN::createLabel(messageMultiSet m) const {
 }
 
 
-bool oWFN::matchesWithOG(const Graph* og, string& reasonForFailedMatch) {
+bool oWFN::matchesWithOG(const AnnotatedGraph* og, string& reasonForFailedMatch) {
     // Check whether the initial marking violates the message bound and exit
     // with an error message if it does.
     if (violatesMessageBound()) {

@@ -31,7 +31,7 @@
  *
  */
 
-#include "Graph.h"
+#include "AnnotatedGraph.h"
 #include "owfn.h"
 #include "state.h"
 #include "IG.h"
@@ -83,12 +83,12 @@ extern int og_yylex_destroy();
 /**
  * Deletes all OGs in 'OGsFromFiles'.
  */
-void deleteOGs(const Graph::ogs_t& OGsFromFiles);
+void deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles);
 
 extern unsigned int State::state_count;
 extern std::list<std::string> netfiles;
 extern std::list<std::string> ogfiles;
-extern Graph* OGToParse;
+extern AnnotatedGraph* OGToParse;
 
 // the currently considered owfn from the owfn list given by the command line;
 // used only in main.cc
@@ -173,7 +173,7 @@ void reportNet() {
 
 
 //! \brief reads an OG from ogfile
-Graph* readog(const std::string& ogfile) {
+AnnotatedGraph* readog(const std::string& ogfile) {
     og_yylineno = 1;
     og_yydebug = 0;
     og_yy_flex_debug = 0;
@@ -184,7 +184,7 @@ Graph* readog(const std::string& ogfile) {
         cerr << "cannot open OG file '" << ogfile << "' for reading'\n" << endl;
         exit(4);
     }
-    OGToParse = new Graph();
+    OGToParse = new AnnotatedGraph();
 
     ogfileToParse = ogfile;
     og_yyparse();
@@ -195,9 +195,9 @@ Graph* readog(const std::string& ogfile) {
 
 
 //! \brief reads all OGs from a list
-void readAllOGs(Graph::ogs_t& theOGs) {
+void readAllOGs(AnnotatedGraph::ogs_t& theOGs) {
 
-    for (Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+    for (AnnotatedGraph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
          iOgFile != ogfiles.end(); ++iOgFile) {
 
         theOGs.push_back(readog(*iOgFile));
@@ -206,8 +206,8 @@ void readAllOGs(Graph::ogs_t& theOGs) {
 
 
 //! \brief deletes all OGs from a list
-void deleteOGs(const Graph::ogs_t& OGsFromFiles) {
-    for (Graph::ogs_t::const_iterator iOg = OGsFromFiles.begin(); iOg
+void deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles) {
+    for (AnnotatedGraph::ogs_t::const_iterator iOg = OGsFromFiles.begin(); iOg
             != OGsFromFiles.end(); ++iOg) {
         delete *iOg;
     }
@@ -474,7 +474,7 @@ void computeOG(oWFN* PN) {
 
 
 //! \brief create the productOG of all given OGs
-void computeProductOG(const Graph::ogs_t& OGsFromFiles) {
+void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 
     trace("Building product of the following OGs:\n");
 
@@ -491,24 +491,24 @@ void computeProductOG(const Graph::ogs_t& OGsFromFiles) {
         parameters[P_SHOW_ALL_NODES] = false;
     }
 
-    for (Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+    for (AnnotatedGraph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
          iOgFile != ogfiles.end(); ++iOgFile) {
 
         trace(*iOgFile + "\n");
     }
     trace("\n");
 
-    Graph* productOG = Graph::product(OGsFromFiles);
+    AnnotatedGraph* productOG = AnnotatedGraph::product(OGsFromFiles);
     if (productOG->hasNoRoot()) {
         trace("The product OG is empty.\n\n");
     }
     if (!options[O_OUTFILEPREFIX]) {
-        outfilePrefix = Graph::getProductOGFilePrefix(ogfiles);
+        outfilePrefix = AnnotatedGraph::getProductOGFilePrefix(ogfiles);
     }
 
     if (!options[O_NOOUTPUTFILES]) {
         trace("Saving product OG to:\n");
-        trace(Graph::addOGFileSuffix(outfilePrefix));
+        trace(AnnotatedGraph::addOGFileSuffix(outfilePrefix));
         trace("\n\n");
 //        productOG->printOGFile(outfilePrefix);
 //        trace("\n");
@@ -522,13 +522,13 @@ void computeProductOG(const Graph::ogs_t& OGsFromFiles) {
 
 
 //! \brief public view generation
-void computePublicView(Graph* OG, string graphName) {
+void computePublicView(AnnotatedGraph* OG, string graphName) {
 
     trace(TRACE_0, "generating the public view for\n");
     trace(graphName);
     trace("\n");
 
-    outfilePrefix = Graph::stripOGFileSuffix(graphName);
+    outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
     outfilePrefix += ".pvsa";
 
     OG->transformToPublicView();
@@ -539,7 +539,7 @@ void computePublicView(Graph* OG, string graphName) {
 
         // .out
         OG->printDotFile(outfilePrefix, "public view of "
-                                         + Graph::stripOGFileSuffix(*(ogfiles.begin())));
+                                         + AnnotatedGraph::stripOGFileSuffix(*(ogfiles.begin())));
 
         // .og
         OG->printOGFile(outfilePrefix);
@@ -548,7 +548,7 @@ void computePublicView(Graph* OG, string graphName) {
 
 
 //! \brief match a net against an og
-void checkMatching(Graph* OGToMatch, oWFN* PN) {
+void checkMatching(AnnotatedGraph* OGToMatch, oWFN* PN) {
     string reasonForFailedMatch;
     if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
         trace(TRACE_0, "oWFN matches with OG: YES\n\n");
@@ -561,7 +561,7 @@ void checkMatching(Graph* OGToMatch, oWFN* PN) {
 
 
 //! \brief check for simulation relation of two given OGs
-void checkSimulation(Graph::ogs_t& OGsFromFiles) {
+void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
     
     // the OGs given by command line are already stored in OGsFromFiles
     
@@ -624,9 +624,9 @@ void checkSimulation(Graph::ogs_t& OGsFromFiles) {
     //    options[O_SHOW_NODES] = tempO_SHOW_NODES;
     //    parameters[P_SHOW_EMPTY_NODE] = tempP_SHOW_EMPTY_NODE;
     
-    Graph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
-    Graph *firstOG = *currentOGfile;
-    Graph *secondOG = *(++currentOGfile);
+    AnnotatedGraph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
+    AnnotatedGraph *firstOG = *currentOGfile;
+    AnnotatedGraph *secondOG = *(++currentOGfile);
     
     trace(TRACE_1, "checking simulation\n");
     if (firstOG->simulates(secondOG)) {
@@ -647,7 +647,7 @@ void checkSimulation(Graph::ogs_t& OGsFromFiles) {
 
 //! \brief check if two given OGs characterize the same set of strategies;
 //!        if called with an oWFN, then the corresponding OG is computed first
-void checkEquivalence(Graph::ogs_t& OGsFromFiles) {
+void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
     // the OGs given by command line are already stored in OGsFromFiles
 
@@ -709,9 +709,9 @@ void checkEquivalence(Graph::ogs_t& OGsFromFiles) {
     trace(TRACE_0, "\n=================================================================\n");
     trace(TRACE_0, "Checking equivalence of generated OGs...\n\n");            
 
-    Graph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
-    Graph *firstOG = *currentOGfile;
-    Graph *secondOG = *(++currentOGfile);
+    AnnotatedGraph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
+    AnnotatedGraph *firstOG = *currentOGfile;
+    AnnotatedGraph *secondOG = *(++currentOGfile);
 
     trace(TRACE_1, "checking first simulation\n");
     if (firstOG->simulates(secondOG)) {
@@ -750,14 +750,14 @@ void checkEquivalence(Graph::ogs_t& OGsFromFiles) {
 
 //! \brief modifies the first OG such that it simulates the second OG
 //!        by filtering non-simulating branches
-void filterOG(const Graph::ogs_t& OGsFromFiles) {
+void filterOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 
     // exactly 2 OGs must be given
     assert(OGsFromFiles.size() == 2);
 
-    Graph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
-    Graph *lhs = *GraphIter;
-    Graph *rhs = *(++GraphIter);
+    AnnotatedGraph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
+    AnnotatedGraph *lhs = *GraphIter;
+    AnnotatedGraph *rhs = *(++GraphIter);
 
     trace("Filter OG from file ");
     trace(*ogfiles.begin() + " through OG from file ");
@@ -770,12 +770,12 @@ void filterOG(const Graph::ogs_t& OGsFromFiles) {
     }
 
     if (!options[O_OUTFILEPREFIX]) {
-        outfilePrefix = Graph::stripOGFileSuffix(*ogfiles.begin()) + ".filtered";
+        outfilePrefix = AnnotatedGraph::stripOGFileSuffix(*ogfiles.begin()) + ".filtered";
     }
 
     if (!options[O_NOOUTPUTFILES]) {
         trace("Saving filtered OG to:\n");
-        trace(Graph::addOGFileSuffix(outfilePrefix));
+        trace(AnnotatedGraph::addOGFileSuffix(outfilePrefix));
         trace("\n\n");
 
         lhs->printOGFile(outfilePrefix);
@@ -875,7 +875,7 @@ void makePNG(oWFN* PN) {
 
 
 // computes the number of strategies that are characterized by a given OG
-void countStrategies(Graph* OG, string graphName) {
+void countStrategies(AnnotatedGraph* OG, string graphName) {
 
     trace("Processing: ");
     trace(graphName);
@@ -902,7 +902,7 @@ void countStrategies(Graph* OG, string graphName) {
 
 
 // checks whether an OG is acyclic
-void checkAcyclicity(Graph* OG, string graphName) {
+void checkAcyclicity(AnnotatedGraph* OG, string graphName) {
 
     trace("Processing: ");
     trace(graphName);
@@ -990,7 +990,7 @@ int main(int argc, char ** argv) {
 	
 	return 0; */
 
-    Graph* OGToMatch = NULL;
+    AnnotatedGraph* OGToMatch = NULL;
     set_new_handler(&myown_newhandler);
 
     // evaluate command line options
@@ -1006,7 +1006,7 @@ int main(int argc, char ** argv) {
         options[O_SIMULATES]|| (options[O_EX] && !options[O_BDD]) || options[O_FILTER]) {
 
         // reading all OG-files
-        Graph::ogs_t OGsFromFiles;
+        AnnotatedGraph::ogs_t OGsFromFiles;
         readAllOGs(OGsFromFiles);
 
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
@@ -1022,7 +1022,7 @@ int main(int argc, char ** argv) {
         }
 
         if (options[O_SIMULATES]) {
-            // simulation on Graph
+            // simulation on AnnotatedGraph
             checkSimulation(OGsFromFiles);
             deleteOGs(OGsFromFiles);
             return 0;
@@ -1055,10 +1055,10 @@ int main(int argc, char ** argv) {
         }
 
         // iterate all input files
-        for (Graph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
+        for (AnnotatedGraph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
              iOgFile != ogfiles.end(); ++iOgFile) {
 
-            Graph* readOG = readog(*iOgFile);
+            AnnotatedGraph* readOG = readog(*iOgFile);
 
             if (parameters[P_PV]) {
                 // computes a service automaton "public view" which has the same

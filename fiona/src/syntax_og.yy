@@ -55,10 +55,10 @@ extern int og_yylex();
 #include "mynew.h"
 #include "debug.h"
 
-#include "Graph.h"
+#include "AnnotatedGraph.h"
 #include "GraphFormula.h"
 
-Graph* OGToParse;
+AnnotatedGraph* OGToParse;
 
 using namespace std;
 

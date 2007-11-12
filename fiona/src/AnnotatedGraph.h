@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*!
- * \file    Graph.h
+ * \file    AnnotatedGraph.h
  *
  * \brief   Holds an Operating Guidelines (OG) read from a OG file. We do not
  *          use the class OG for storing OGs read from a file because the class
@@ -50,13 +50,13 @@
 using namespace std;
 
 
-class Graph {
+class AnnotatedGraph {
     public:
 
-        /// Type of container passed to Graph::product().
-        typedef std::list<Graph*> ogs_t;
+        /// Type of container passed to AnnotatedGraph::product().
+        typedef std::list<AnnotatedGraph*> ogs_t;
 
-        /// Type of container passed to Graph::getProductOGFilePrefix().
+        /// Type of container passed to AnnotatedGraph::getProductOGFilePrefix().
         typedef std::list<std::string> ogfiles_t;
 
         typedef set<std::string> EdgeSet;
@@ -87,7 +87,7 @@ class Graph {
          */
         void buildProductOG(GraphNode* currentOGNode,
                             GraphNode* currentRhsNode,
-                            Graph* productOG);
+                            AnnotatedGraph* productOG);
 
         bool simulatesRecursive(GraphNode* myNode, GraphNode* simNode,
             set<pair<GraphNode*, GraphNode*> >& visitedNodes);
@@ -115,9 +115,9 @@ class Graph {
 
     public:
 
-        Graph();
+        AnnotatedGraph();
 
-        ~Graph();
+        ~AnnotatedGraph();
 
         void addNode(GraphNode* node);
 
@@ -149,16 +149,16 @@ class Graph {
 
         /**
          * Returns the product OG of all given OGs. The caller has to delete the
-         * returned Graph.
+         * returned AnnotatedGraph.
          * \param ogs Given OGs. Must contain at least two OG.
          */
-        static Graph* product(const ogs_t& ogs);
+        static AnnotatedGraph* product(const ogs_t& ogs);
 
         /**
          * Returns the product OG of this OG and the passed one. The caller has to
-         * delete the returned Graph.
+         * delete the returned AnnotatedGraph.
          */
-        Graph* product(const Graph* rhs);
+        AnnotatedGraph* product(const AnnotatedGraph* rhs);
 
         /**
          * Creates and returns the annotation for the product node of the given two
@@ -198,7 +198,7 @@ class Graph {
          */
         static std::string addOGFileSuffix(const std::string& filePrefix);
 
-        bool simulates(Graph* smallerOG);
+        bool simulates(AnnotatedGraph* smallerOG);
 
         /** 
          * filters the current OG through a given OG in such a way,
@@ -206,7 +206,7 @@ class Graph {
          * the current OG is created empty if such a simulation is not possible
          * \param rhsOG the operator OG
          */
-        void filter(Graph* rhsOG);
+        void filter(AnnotatedGraph* rhsOG);
 
         /**
          * computes the number of Services determined by this OG

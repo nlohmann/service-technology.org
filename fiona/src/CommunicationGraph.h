@@ -37,7 +37,7 @@
 #include "mynew.h"
 #include "GraphEdge.h"
 #include "GraphNode.h" // for GraphNodeDiagnosisColor_enum
-#include "Graph.h" // parent class
+#include "AnnotatedGraph.h" // parent class
 #include "owfn.h"
 #include <fstream>
 #include <set>
@@ -49,7 +49,7 @@ extern double global_progress;
 extern int show_progress;
 
 /* communication graph */
-class CommunicationGraph : public Graph {
+class CommunicationGraph : public AnnotatedGraph {
     private:
 
         /**

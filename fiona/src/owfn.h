@@ -55,7 +55,7 @@ class binDecision;
 class State;
 class PlSymbol;
 class Arc;
-class Graph;
+class AnnotatedGraph;
 class GraphNode;
 class GraphFormulaAssignment;
 
@@ -314,7 +314,7 @@ class oWFN {
          * @retval true If this oWFN matches with given OG.
          * @retval false Otherwise.
          */
-        bool matchesWithOG(const Graph* og, string& reasonForFailedMatch);
+        bool matchesWithOG(const AnnotatedGraph* og, string& reasonForFailedMatch);
 
         /**
          * Creates an assignment for the given state of the oWFN used in the

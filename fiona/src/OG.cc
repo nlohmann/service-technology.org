@@ -138,7 +138,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
             trace(TRACE_2, "\t\t\t    sending event: ");
         } else if (currentEvent->getType() == OUTPUT) {
             trace(TRACE_2, "\t\t\t  receiving event: ");
-        } 
+        }
         trace(TRACE_2, currentEvent->getLabelForCommGraph() + "\n");
 
         if (currentEvent->max_occurence < 0 || 
@@ -187,7 +187,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
                         // going down with receiving event ...
                         buildGraph(v, 0);
-                    } 
+                    }
 
                     trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
                     if (v->getColor() == RED) {
@@ -229,13 +229,16 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
             }
         }
         
-        if (currentNode->getAnnotation()->equals() == FALSE) {
-            currentNode->setColor(RED);
-            trace(TRACE_3, "\t\t any further event suppressed (annotation of node ");
-            trace(TRACE_3, currentNode->getName() + " is unsatisfiable)\n");
-            trace(TRACE_5, "\t\t formula was " + currentNode->getAnnotation()->asString());
-            trace(TRACE_3, "\n");
-            return;
+        if (!options[O_DIAGNOSIS]) {
+            // do not optimize when trying diagnosis
+            if (currentNode->getAnnotation()->equals() == FALSE) {
+                currentNode->setColor(RED);
+                trace(TRACE_3, "\t\t any further event suppressed (annotation of node ");
+                trace(TRACE_3, currentNode->getName() + " is unsatisfiable)\n");
+                trace(TRACE_5, "\t\t formula was " + currentNode->getAnnotation()->asString());
+                trace(TRACE_3, "\n");
+                return;
+            }
         }
     }
 

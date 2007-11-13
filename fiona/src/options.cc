@@ -194,7 +194,8 @@ void print_help() {
   trace(" -M | --multipledeadlocks ...... create multiple deadlocks of public view\n");
   trace("                                 (only relevant for PV mode -t PV)\n");  
   trace(" -p | --parameter=<param> ...... additional parameter <param>\n");
-  trace("                                    no-png - does not create a PNG file\n");
+  trace("                                    no-png    - does not create a PNG file\n");
+  trace("                                    diagnosis - disables optimizations\n");
   trace("\n");
   trace("\n");
   trace("For more information see:\n");
@@ -264,12 +265,11 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_NOOUTPUTFILES] = false;
     options[O_COUNT_SERVICES] = false;
     options[O_CHECK_ACYCLIC] = false;
+    options[O_DIAGNOSIS] = false;
 
     options[O_MESSAGES_MAX] = true;
     options[O_EVENT_USE_MAX] = false;
-// CODE FROM PL
 	options[O_PV_MULTIPLE_DEADLOCKS] = false;
-// END OF CODE FROM PL    
 
     // initialize parameters
     parameters[P_IG] = true;
@@ -379,17 +379,6 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
                     options[O_PNG] = true;
-                } else if (lc_optarg == "diagnosis") {
-                    options[O_GRAPH_TYPE] = true;
-                    options[O_DIAGNOSIS] = true;
-                    parameters[P_OG] = false;
-                    parameters[P_IG] = true; 
-                    options[O_SHOW_NODES] = true;
-                    parameters[P_SHOW_BLUE_NODES] = true;
-                    parameters[P_SHOW_EMPTY_NODE] = true;
-                    parameters[P_SHOW_RED_NODES] = true;
-                    parameters[P_SHOW_ALL_NODES] = true;
-                    parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
                 } else if ((lc_optarg == "pv") || (lc_optarg == "publicview")) {
                 	parameters[P_PV] = true;
                 	parameters[P_IG] = false;
@@ -405,6 +394,17 @@ void parse_command_line(int argc, char* argv[]) {
                 string lc_optarg = toLower(optarg);
                 if (lc_optarg == "no-png") {
                     parameters[P_NOPNG] = true;
+                } else if (lc_optarg == "diagnosis") {
+//                    options[O_GRAPH_TYPE] = true;
+                    options[O_DIAGNOSIS] = true;
+//                    parameters[P_OG] = false;
+//                    parameters[P_IG] = true; 
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_BLUE_NODES] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = true;
+                    parameters[P_SHOW_RED_NODES] = true;
+                    parameters[P_SHOW_ALL_NODES] = true;
+                    parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
                 } else {
                     cerr << "Error:\twrong parameter (option -p)" << endl
                     << "\tEnter \"fiona --help\" for more information.\n" << endl;

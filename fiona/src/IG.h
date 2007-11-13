@@ -46,7 +46,8 @@ class interactionGraph : public CommunicationGraph {
         bool addGraphNode(GraphNode*,
                           GraphNode*,
                           messageMultiSet,
-                          GraphEdgeType); // for IG
+                          GraphEdgeType,
+                          double); // for IG
 
     public:
         // Provides user defined operator new. Needed to trace all new
@@ -61,7 +62,7 @@ class interactionGraph : public CommunicationGraph {
         bool checkMaximalEvents(messageMultiSet, GraphNode*, GraphEdgeType);
 
         void buildGraph();
-        void buildGraph(GraphNode*);
+        void buildGraph(GraphNode*, double);
 
         void getActivatedEventsComputeCNF(GraphNode*, setOfMessages&, setOfMessages&);
 

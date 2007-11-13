@@ -66,7 +66,7 @@ void interactionGraph::buildGraph() {
 
     // build the IG, whether the reduced or not reduced one is built is being decided in that
     // function itself
-    buildGraph(getRoot());
+    buildGraph(getRoot(), 1);
 
     setOfNodes.push_back(getRoot());
     
@@ -77,7 +77,7 @@ void interactionGraph::buildGraph() {
 //! \fn void interactionGraph::buildGraph(GraphNode * node)
 //! \param node current node of the graph
 //! \brief builds up the graph recursively
-void interactionGraph::buildGraph(GraphNode* currentNode) {
+void interactionGraph::buildGraph(GraphNode* currentNode, double progress_plus) {
 
     // at this point, the states inside the current node node are already computed!
 
@@ -96,6 +96,10 @@ void interactionGraph::buildGraph(GraphNode* currentNode) {
         // then, function calculateReachableStatesFull sets node color RED
         trace(TRACE_3, "\t\t\t node " + currentNode->getName() + " has color RED\n");
         trace(TRACE_1, "\n-----------------------------------------------------------------\n");
+        
+        addProgress(progress_plus);
+        printProgress();
+
         return;
     }
 
@@ -111,6 +115,8 @@ void interactionGraph::buildGraph(GraphNode* currentNode) {
     	getActivatedEventsComputeCNF(currentNode, sendingEvents, receivingEvents);
     }
 
+    double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount()));
+    
     // collection of all activated events
     setOfMessages activatedEvents;
     
@@ -178,6 +184,9 @@ void interactionGraph::buildGraph(GraphNode* currentNode) {
 
                     currentNode->removeLiteralFromAnnotation(PN->createLabel(mmSet));
             		
+                    addProgress(your_progress);
+                    printProgress();
+                    
             		numberDeletedVertices--;
             		delete v;
             		v = NULL;
@@ -188,8 +197,13 @@ void interactionGraph::buildGraph(GraphNode* currentNode) {
             }
 
             if (v != NULL && currentNode->getColor() != RED && 
-            		addGraphNode(currentNode, v, mmSet, typeOfEdge)) {
-            	buildGraph(v);
+            		addGraphNode(currentNode, v, mmSet, typeOfEdge, progress_plus)) {
+            	
+            	if (typeOfEdge == RECEIVING) {
+            		buildGraph(v, 0);            	
+            	} else {
+            		buildGraph(v, your_progress);
+            	}
             	trace(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
             	
             	if (v->getColor() == RED) {
@@ -201,15 +215,22 @@ void interactionGraph::buildGraph(GraphNode* currentNode) {
 
             currentNode->removeLiteralFromAnnotation(PN->createLabel(mmSet));
         }
-
-
-        if (currentNode->getAnnotation()->equals() == FALSE) {
-            currentNode->setColor(RED);
-            trace(TRACE_3, "\t\t any further event suppressed (annotation of node ");
-            trace(TRACE_3, currentNode->getName() + " is unsatisfiable)\n");
-            trace(TRACE_5, "\t\t formula was " + currentNode->getAnnotation()->asString());
-            trace(TRACE_3, "\n");
-            return;
+        
+        if (!options[O_DIAGNOSIS]) {
+        	// do not optimize when trying diagnosis
+        	if (currentNode->getAnnotation()->equals() == FALSE) {
+        		currentNode->setColor(RED);
+        		trace(TRACE_3, "\t\t any further event suppressed (annotation of node ");
+        		trace(TRACE_3, currentNode->getName() + " is unsatisfiable)\n");
+        		trace(TRACE_5, "\t\t formula was " + currentNode->getAnnotation()->asString());
+        		trace(TRACE_3, "\n");
+        		return;
+        	}
+        }
+        
+        if (typeOfEdge == SENDING) {
+        	addProgress(your_progress);
+        	printProgress();
         }
     }
 
@@ -237,7 +258,8 @@ void interactionGraph::buildGraph(GraphNode* currentNode) {
 bool interactionGraph::addGraphNode(GraphNode* sourceNode,
                                     GraphNode* toAdd,
                                     messageMultiSet messages,
-                                    GraphEdgeType type) {
+                                    GraphEdgeType type,
+                                    double progress_plus) {
     trace(TRACE_5, "interactionGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : start\n");
 
     if (getNumberOfNodes() == 0) { // graph contains no nodes at all
@@ -301,7 +323,7 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
             GraphEdge* edgeSucc = new GraphEdge(toAdd, label);
             sourceNode->addLeavingEdge(edgeSucc);
             setOfSortedNodes.insert(toAdd);
-           setOfNodes.push_back(toAdd);
+            setOfNodes.push_back(toAdd);
             
             trace(TRACE_5, "interactionGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
             return true;
@@ -317,7 +339,12 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
             if (found->getColor() == RED) {
             	sourceNode->removeLiteralFromAnnotation(label);
             }
-            
+
+            if (type == SENDING) {
+            	addProgress(progress_plus);
+            	printProgress();
+            }
+
             delete toAdd;
 
             trace(TRACE_5, "interactionGraph::AddGraphNode (GraphNode * sourceNode, GraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");

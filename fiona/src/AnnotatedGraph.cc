@@ -1101,9 +1101,6 @@ void AnnotatedGraph::clearNodeSet() {
 void AnnotatedGraph::printOGFile(const std::string& filenamePrefix) const {
     fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(), ios_base::out | ios_base::trunc);
 
-    
-    cout << "number of nodes: " << setOfNodes.size() << endl;
-    
     if (hasNoRoot()) {
         // print file for empty OG
         ogFile << "NODES" << endl

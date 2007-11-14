@@ -45,7 +45,7 @@ CHECKLOUD_ENVIRONMENT = $(TESTS_ENVIRONMENT) quiet=no
 #   o Messing around with VPATH is ugly.
 #   o More reasons at http://www.gnu.org/software/automake/manual/html_mono/automake.html#wildcards
 EXTRA_DIST = $(TESTS) memcheck_helper.sh \
-             $(TESTS) defaults.sh \
+             defaults.sh \
              cyclic/livelockInP.owfn \
              cyclic/zyklusP.owfn \
              cyclic/zyklusPmitCommit.owfn \

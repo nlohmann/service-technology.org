@@ -4,12 +4,15 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 2.0, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.28 $)
+AC_REVISION($Revision: 1.29 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
 
 AM_INIT_AUTOMAKE
+
+# delete file with enviroment variables for some progs
+rm env.sh >& /dev/null
 
 # Checks for programs.
 AC_PROG_CXX
@@ -53,6 +56,12 @@ if test "$PETRIFY" = "not found"; then
  AC_DEFINE(HAVE_PETRIFY, "not found", [Petrify can not be used on this system.])
 else
  AC_DEFINE_UNQUOTED(HAVE_PETRIFY, "${PETRIFY}", [Petrify can be used on this system.])
+fi
+
+if test -e env.sh; then
+  echo "PETRIFY=\"$PETRIFY\"" >> env.sh;
+else
+  echo "PETRIFY=\"$PETRIFY\"" > env.sh;
 fi
 
 AC_CHECK_PROG(YACC, bison, bison, not found)

@@ -28,6 +28,13 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
+if test "$PETRIFY" = "not found"; then
+  echo Note: fiona was built without Petrify support!
+  echo
+  echo skipping $0
+  exit 0
+fi
+
 SUBDIR=partner
 DIR=$testdir/$SUBDIR
 FIONA=fiona

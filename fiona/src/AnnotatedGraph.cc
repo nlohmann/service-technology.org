@@ -45,11 +45,13 @@
 using namespace std;
 
 
+//! \brief a basic constructor of AnnotadedGraph
 AnnotatedGraph::AnnotatedGraph() :
     root(NULL) {
 }
 
 
+//! \brief a basic destructor of AnnotadedGraph
 AnnotatedGraph::~AnnotatedGraph() {
 	trace(TRACE_5, "AnnotatedGraph::~AnnotatedGraph() : start\n");
     for (nodes_iterator node_iter = setOfNodes.begin();
@@ -61,11 +63,18 @@ AnnotatedGraph::~AnnotatedGraph() {
 }
 
 
+//! \brief add an already existing Node to the Graphs node set
+//! \param node a pointer to a GraphNode
 void AnnotatedGraph::addNode(GraphNode* node) {
     setOfNodes.push_back(node);
 }
 
 
+//! \brief create a new node and add it to the graphs node set
+//! \param nodeName a string containing the name of the new node
+//! \param GraphFormula a pointer to a GraphFormula being the annotation of the new node
+//! \param color color of the node
+//! \return returns a pointer to the created GraphNode
 GraphNode* AnnotatedGraph::addNode(const std::string& nodeName,
                           GraphFormula* annotation,
                           GraphNodeColor color) {
@@ -76,6 +85,10 @@ GraphNode* AnnotatedGraph::addNode(const std::string& nodeName,
 }
 
 
+//! \brief create a new edge in the graph
+//! \param srcName a string containing the name of the source node
+//! \param dstNodeName a string containing the name of the destination node
+//! \param label a string containing the label of the edge
 void AnnotatedGraph::addEdge(const std::string& srcName,
                     const std::string& dstNodeName,
                     const std::string& label) {
@@ -88,11 +101,17 @@ void AnnotatedGraph::addEdge(const std::string& srcName,
 }
 
 
+//! \brief checks if the graph has a node with the given name
+//! \param nodeName the name to be matched
+//! \return returns true if a node with the given name exists, else false
 bool AnnotatedGraph::hasNodeWithName(const std::string& nodeName) const {
     return getNodeWithName(nodeName) != NULL;
 }
 
 
+//! \brief returns a pointer to the node that matches a given name, or NULL else
+//! \param nodeName the name to be matched
+//! \return returns a pointer to the found node or NULL
 GraphNode* AnnotatedGraph::getNodeWithName(const std::string& nodeName) const {
 
     for (nodes_const_iterator node_iter = setOfNodes.begin();
@@ -107,26 +126,37 @@ GraphNode* AnnotatedGraph::getNodeWithName(const std::string& nodeName) const {
 }
 
 
+//! \brief returns a GraphNode pointer to the root node
+//! \return returns a pointer to the root node
 GraphNode* AnnotatedGraph::getRoot() const {
     return root;
 }
 
 
+//! \brief sets the root node of the graph to a given node
+//! \param newRoot a pointer to the node to become the new root
 void AnnotatedGraph::setRoot(GraphNode* newRoot) {
     root = newRoot;
 }
 
 
+//! \brief sets the root node of the graph to one matching the given name
+//! \param nodeName a string containing the name of the node to become the new root
 void AnnotatedGraph::setRootToNodeWithName(const std::string& nodeName) {
     setRoot(getNodeWithName(nodeName));
 }
 
 
+//! \brief checks wether a root node is set
+//! \return returns true if the rootnode is NULL, else false
 bool AnnotatedGraph::hasNoRoot() const {
     return getRoot() == NULL;
 }
 
 
+//! \brief removes all nodes that have annotations that cannot become
+//!        true. The function continues removing until no node fullfils
+//!        the mentioned criterion
 void AnnotatedGraph::removeFalseNodes() {
 
     trace(TRACE_5, "AnnotatedGraph::removeFalseNodes(): start\n");
@@ -160,6 +190,8 @@ void AnnotatedGraph::removeFalseNodes() {
 }
 
 
+//! \brief removes all edges that have a given node as destination
+//! \param nodeToDelete a pointer to the node that will be deleted
 void AnnotatedGraph::removeEdgesToNodeFromAllOtherNodes(const GraphNode* nodeToDelete) {
 
     for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
@@ -170,6 +202,8 @@ void AnnotatedGraph::removeEdgesToNodeFromAllOtherNodes(const GraphNode* nodeToD
 }
 
 
+//! \brief removes all edges that have a given node as source
+//! \param nodeToDelete a pointer to the node that will be deleted
 void AnnotatedGraph::removeEdgesFromNodeToAllOtherNodes(GraphNode* nodeToDelete) {
 
     for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
@@ -597,8 +631,15 @@ unsigned int AnnotatedGraph::numberOfServices() {
 }
 
 
-//! \brief computes the number of possible services for a finished instance or proceed the active nodes
-//! \return number of Services
+//! \brief compute the number of possible services for a finished instance or proceed the active nodes
+//! \param activeNodes a set of node pointers containing the currently visited nodes
+//! \param followers a map that contains the follower nodes of every node in the graph
+//! \param validFollowerCombinations a map that contains all sets of follower nodes that succeed to
+//!        fullfill the annotation of the predecessor with the edges leading to them            
+//! \param eliminateRedundantCounting map containing all already computed number of services for 
+//!        possible active node sets 
+//! \param instances number of already processed sets of active Nodes
+//! \return number of Services for the current set of active nodes
 unsigned int AnnotatedGraph::numberOfServicesRecursively(set<GraphNode*> activeNodes,
                                                 map<GraphNode*, unsigned int>& followers,
                                                 map<GraphNode*, list<set<GraphNode*> > >& validFollowerCombinations,
@@ -768,6 +809,11 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(set<GraphNode*> activeN
 //! \brief computes the number of true assignments for the given formula of an OG node and additionally
 //!        saves them in an assignmentList for every node. The function works by recursively
 //!        computing and checking the powerset of all labels of the node
+//! \param labels a set labels not yet set to a value, used for the recursion
+//! \param possibleAssignments the currently processed assignment containing all label valuse that
+//!        already have been set
+//! \param testNode a pointer to the node currently tested            
+//! \param assignmentList a list of assignment that already have turned true in recursion 
 //! \return number of true Assignments
 unsigned int AnnotatedGraph::processAssignmentsRecursively(set<string> labels,
                                                   GraphFormulaAssignment possibleAssignment,
@@ -836,6 +882,10 @@ unsigned int AnnotatedGraph::processAssignmentsRecursively(set<string> labels,
 }
 
 
+//! \brief Returns the product OG of this OG and the passed one. The caller has to delete the returned 
+//!        AnnotatedGraph.
+//! \param rhs the OG to be used for computing the product
+//! \return returns the product OG
 AnnotatedGraph* AnnotatedGraph::product(const AnnotatedGraph* rhs) {
     trace(TRACE_5, "AnnotatedGraph::product(const AnnotatedGraph* rhs): start\n");
 
@@ -874,6 +924,9 @@ AnnotatedGraph* AnnotatedGraph::product(const AnnotatedGraph* rhs) {
 }
 
 
+//! \brief Returns the product OG of all given OGs. The caller has to delete the AnnotatedGraph
+//! \param ogs a list of OGs
+//! \return returns the product OG
 AnnotatedGraph* AnnotatedGraph::product(const ogs_t& ogs) {
     assert(ogs.size() > 1);
 
@@ -891,6 +944,10 @@ AnnotatedGraph* AnnotatedGraph::product(const ogs_t& ogs) {
 }
 
 
+//! \brief Recursive coordinated dfs through OG and rhs OG.
+//! \param currentOGNode the current node of the OG
+//! \param currentRhsNode the current node of the rhs OG
+//! \param productOG the resulting product OG
 void AnnotatedGraph::buildProductOG(GraphNode* currentOGNode,
                            GraphNode* currentRhsNode,
                            AnnotatedGraph* productOG) {
@@ -971,7 +1028,11 @@ void AnnotatedGraph::buildProductOG(GraphNode* currentOGNode,
           "AnnotatedGraph::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, AnnotatedGraph* productOG): end\n");
 }
 
-
+//! \brief Creates and returns the annotation for the product node of the given two nodes.
+//!        The caller has to delete the formula after usage.
+//! \param lhs the first node
+//! \param rhs the second node
+//! \return returns the Formula of the product node
 GraphFormulaCNF* AnnotatedGraph::createProductAnnotation(const GraphNode* lhs,
                                                 const GraphNode* rhs) const {
 
@@ -986,6 +1047,10 @@ GraphFormulaCNF* AnnotatedGraph::createProductAnnotation(const GraphNode* lhs,
 }
 
 
+//! \brief Produces from the given OG file names the default prefix of the
+//!        product OG output file.
+//! \param ogfiles a set of the filenames of the used OGs
+//! \return returns a string for the name of the product og
 std::string AnnotatedGraph::getProductOGFilePrefix(const ogfiles_t& ogfiles) {
     assert(ogfiles.size() != 0);
 
@@ -1001,6 +1066,9 @@ std::string AnnotatedGraph::getProductOGFilePrefix(const ogfiles_t& ogfiles) {
 }
 
 
+//! \brief strips the OG file suffix from filename and returns the result
+//! \param filename name of the og file
+//! \param returns the filename without suffix
 std::string AnnotatedGraph::stripOGFileSuffix(const std::string& filename) {
 
     static const string ogFileSuffix = ".og";
@@ -1012,6 +1080,9 @@ std::string AnnotatedGraph::stripOGFileSuffix(const std::string& filename) {
 }
 
 
+//! \brief creates a dot output of the graph and calls dot to create an image from it
+//! \param filenamePrefix a string containing the prefix of the output file name
+//! \param dotGraphTitle a title for the graph to be shown in the image
 void AnnotatedGraph::printDotFile(const std::string& filenamePrefix,
                          const std::string& dotGraphTitle) const {
 
@@ -1042,15 +1113,17 @@ void AnnotatedGraph::printDotFile(const std::string& filenamePrefix,
 }
 
 
+//! \brief creates a dot output of the graph and calls dot to create an image from it
+//! \param filenamePrefix a string containing the prefix of the output file name
 void AnnotatedGraph::printDotFile(const std::string& filenamePrefix) const {
     printDotFile(filenamePrefix, filenamePrefix);
 }
 
 
+//! \brief dfs through the graph printing each node and edge to the output stream
 //! \param v current node in the iteration process
 //! \param os output stream
 //! \param visitedNodes maps nodes to Bools remembering already visited nodes
-//! \brief dfs through the graph printing each node and edge to the output stream
 void AnnotatedGraph::printGraphToDot(GraphNode* v,
                             fstream& os,
                             std::map<GraphNode*, bool>& visitedNodes) const {
@@ -1091,13 +1164,15 @@ void AnnotatedGraph::printGraphToDot(GraphNode* v,
 }
 
 
-// A function needed for successful deletion of the graph
+//! \brief A function needed for successful deletion of the graph
 void AnnotatedGraph::clearNodeSet() {
     setOfNodes.clear();
 }
 
 
-//! \brief prints all nodes and transitions of an OG to file .og
+//! \brief Prints this OG in OG file format to a file with the given prefix. The
+//!        suffix is added automatically by this method.
+//! \param filenamePrefix a prefix for th filename
 void AnnotatedGraph::printOGFile(const std::string& filenamePrefix) const {
     fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(), ios_base::out | ios_base::trunc);
 
@@ -1176,11 +1251,16 @@ void AnnotatedGraph::printOGFile(const std::string& filenamePrefix) const {
 }
 
 
+//! \brief adds the suffix ".og" to a string
+//! \param filePrefix a string to be modified
+//! \return returns the string with the og suffix
 std::string AnnotatedGraph::addOGFileSuffix(const std::string& filePrefix) {
     return filePrefix + ".og";
 }
 
 
+//! \brief Get all transitions from the graph, each associated to a specific label
+//! return returns the transition map
 AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap() {
     trace(TRACE_3, "AnnotatedGraph::getTransitionMap()::begin()\n");
     TransitionMap tm;
@@ -1203,6 +1283,9 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap() {
 }
 
 
+//! \brief Create the formula describing the coverability criteria
+//! \param TransitionMap a mapping of all transitions to their specific labels
+//! \return returns the coverability formula 
 GraphFormulaCNF *AnnotatedGraph::createCovFormula(TransitionMap tm) {
     trace(TRACE_3, "AnnotatedGraph::createCovFormula(TransitionMap)::begin()\n");
 
@@ -1223,7 +1306,7 @@ GraphFormulaCNF *AnnotatedGraph::createCovFormula(TransitionMap tm) {
 }
 
 
-//! \brief removes a node from the AnnotatedGraph
+//! \brief remove a node from the AnnotatedGraph
 //! \param node node to remove
 void AnnotatedGraph::removeNode(GraphNode* node) {
     assert(node);
@@ -1493,6 +1576,7 @@ void AnnotatedGraph::fixDualService() {
 }
 
 
+//! \brief transforms the graph into its public view
 void AnnotatedGraph::transformToPublicView() {
     removeNodesAnnotatedWithTrue();
     constructDualService();

@@ -75,30 +75,24 @@ class AnnotatedGraph {
 
         typedef nodes_t::iterator nodes_iterator;
 
+        /// remove all edges that have a given node as destination
         void removeEdgesToNodeFromAllOtherNodes(const GraphNode* nodeToDelete);
 
+        /// remove all edges that have a given node as source
         void removeEdgesFromNodeToAllOtherNodes(GraphNode* nodeToDelete);
 
-        /**
-         * Recursive coordinated dfs through OG and rhs OG.
-         * \param currentOGNode the current node of the OG
-         * \param currentRhsNode the current node of the rhs OG
-         * \param productOG the resulting product OG
-         */
+        /// Recursive coordinated dfs through OG and rhs OG.
         void buildProductOG(GraphNode* currentOGNode,
                             GraphNode* currentRhsNode,
                             AnnotatedGraph* productOG);
 
+        /// checks, whether the part of an AnnotatedGraph below myNode simulates
+        /// the part of an AnnotatedGraph below simNode
         bool simulatesRecursive(GraphNode* myNode, GraphNode* simNode,
             set<pair<GraphNode*, GraphNode*> >& visitedNodes);
 
-        /** 
-         * filters the current OG through a given OG below myNode (rhsNode respectively)
-         * in such a way, that the complete OG given as the operand simulates the current OG
-         * \param myNode a node in the current OGFromFile
-         * \param rhsNode a node in the operand
-         * \param VisitedNodes a set of Nodes as a reminder of the already visited nodes; starts as empty
-         */
+        /// filters the current OG through a given OG below myNode (rhsNode respectively)
+        /// in such a way, that the complete OG given as the operand simulates the current OG
         void filterRecursive(GraphNode* myNode,
                              GraphNode* rhsNode,
                              set<GraphNode*>* VisitedNodes);
@@ -107,136 +101,133 @@ class AnnotatedGraph {
         set<std::string> sendEvents;
         set<std::string> recvEvents;
 	
+        /// remove a node from the annotated graph
         void removeNode(GraphNode*);
+        
+        /// remove all nodes that have the annotation "true"
         void removeNodesAnnotatedWithTrue();
+        
+        /// constructs the dual service
         void constructDualService();
+        
+        /// applies 1st and 2nd fix to dual service
         void fixDualService();
 // END OF CODE FROM PL
 
     public:
 
+        /// basic constructor
         AnnotatedGraph();
 
+        /// basic deconstructor
         ~AnnotatedGraph();
 
+        /// adds a node to the graph
         void addNode(GraphNode* node);
 
+        /// creates a new node in the graph
         GraphNode* addNode(const std::string& nodeName,
                            GraphFormula* annotation,
                            GraphNodeColor color = BLUE);
 
+        /// creates a new edge in the graph
         void addEdge(const std::string& srcName,
                            const std::string& dstName,
                            const std::string& label);
 
+        /// returns true if a node with the given name was found
         bool hasNodeWithName(const std::string& nodeName) const;
 
+        /// returns a pointer to the root node
         GraphNode* getRoot() const;
 
+        /// sets a new root node
         void setRoot(GraphNode* newRoot);
 
+        /// sets the root node to the one with the given name
         void setRootToNodeWithName(const std::string& nodeName);
 
+        /// retruns a node with the given name, or NULL else
         GraphNode* getNodeWithName(const std::string& nodeName) const;
 
+        /// retruns true if the graph's root node is NULL
         bool hasNoRoot() const;
 
-        /**
-         * @todo Remove unreachable nodes after (or during) removal of false
-         * nodes.
-         */
+        /// removes all nodes that are always false
         void removeFalseNodes();
 
-        /**
-         * Returns the product OG of all given OGs. The caller has to delete the
-         * returned AnnotatedGraph.
-         * \param ogs Given OGs. Must contain at least two OG.
-         */
+        /// Returns the product OG of all given OGs.
         static AnnotatedGraph* product(const ogs_t& ogs);
 
-        /**
-         * Returns the product OG of this OG and the passed one. The caller has to
-         * delete the returned AnnotatedGraph.
-         */
+        /// Returns the product OG of this OG and the passed one
         AnnotatedGraph* product(const AnnotatedGraph* rhs);
 
-        /**
-         * Creates and returns the annotation for the product node of the given two
-         * nodes. The caller is responsible for deleting the returned formula.
-         */
+        /// Creates and returns the annotation for the product node of the given two nodes. 
         GraphFormulaCNF* createProductAnnotation(const GraphNode* lhs,
                                                  const GraphNode* rhs) const;
 
-        /**
-         * Produces from the given OG file names the default prefix of the
-         * product OG output file.
-         */
+        /// Produces the default prefix of the product OG output file.
         static std::string getProductOGFilePrefix(const ogfiles_t& ogfiles);
 
-        /**
-         * Strips the OG file suffix from filename and returns the result.
-         */
+        /// Strips the OG file suffix from filename and returns the result.
         static std::string stripOGFileSuffix(const std::string& filename);
 
+        /// dfs through the graph printing each node and edge to the output stream
         void printGraphToDot(GraphNode* v,
                              fstream& os,
                              std::map<GraphNode*, bool>&) const;
 
+        /// creates a dot output of the graph and calls dot to create an image from it
         void printDotFile(const std::string& filenamePrefix) const;
+
+        /// creates a dot output of the graph and calls dot to create an image from it
         void printDotFile(const std::string& filenamePrefix,
                           const std::string& dotGraphTitle) const;
 
-        /**
-         * Prints this OG in OG file format to a file with the given prefix. The
-         * suffix is added automatically by this method.
-         */
+        
+        /// Prints this OG in OG file format 
         void printOGFile(const std::string& filenamePrefix) const;
 
-        /**
-         * Adds the suffix for OG files to the given file name prefix and returns
-         * the result. The suffix includes the . (dot).
-         */
+        /// Adds the suffix for OG files to the given file name prefix 
         static std::string addOGFileSuffix(const std::string& filePrefix);
 
+        /// checks, whether this AnnotatedGraph simulates the given simulant
         bool simulates(AnnotatedGraph* smallerOG);
 
-        /** 
-         * filters the current OG through a given OG in such a way,
-         * that the filtered current OG simulates the opernad og; 
-         * the current OG is created empty if such a simulation is not possible
-         * \param rhsOG the operator OG
-         */
+        /// filters the current OG through a given OG in such a way,
+        /// that the filtered current OG simulates the opernad og; 
         void filter(AnnotatedGraph* rhsOG);
 
-        /**
-         * computes the number of Services determined by this OG
-         */
+        /// computes the number of Services determined by this OG
         unsigned int numberOfServices();
 
+        /// recursive function for computing the number of services
         unsigned int numberOfServicesRecursively(set<GraphNode*> activeNodes,
                                                  map<GraphNode*, unsigned int>& followers,
                                                  map<GraphNode*, list <set<GraphNode*> > >& validFollowerCombinations,
                                                  map<set<GraphNode*>, unsigned int>& eliminateRedundantCounting,
                                                  unsigned int& instances);
 
+        /// recursive function for computing the number of true assignments for a node
         unsigned int processAssignmentsRecursively(set<string> labels,
                                                    GraphFormulaAssignment possibleAssignment,
                                                    GraphNode* testNode,
                                                    list<GraphFormulaAssignment>& assignmentList);
 
-        //! Tests, if this OG is acyclic
+        /// tests if this OG is acyclic
         bool isAcyclic();
 
-        // A function needed for successful deletion of the graph
+        /// a function needed for successful deletion of the graph
         void clearNodeSet();
 
-        //! Get all transitions from the graph, each associated to a specific label
+        /// Get all transitions from the graph, each associated to a specific label
         TransitionMap getTransitionMap();
         
-        //! Create the formula describing the ooverability criteria 
+        /// Create the formula describing the coverability criteria 
         GraphFormulaCNF *createCovFormula(TransitionMap tm);
 
 // CODE FROM PL
+        /// transforms the graph to the public view
         void transformToPublicView();
 // END OF CODE FROM PL
 

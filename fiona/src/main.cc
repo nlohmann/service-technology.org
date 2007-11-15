@@ -80,9 +80,7 @@ extern int og_yyparse();
 extern int og_yylex_destroy();
 #endif
 
-/**
- * Deletes all OGs in 'OGsFromFiles'.
- */
+/// Deletes all OGs in 'OGsFromFiles'.
 void deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles);
 
 extern unsigned int State::state_count;
@@ -102,6 +100,7 @@ unsigned int numberDeletedVertices;
 unsigned int numberOfEvents;
 
 
+//! \brief an exit function in case the memory is exhausted
 void myown_newhandler() {
     cerr << "new failed, memory exhausted"<< endl;
     exit(2);
@@ -109,6 +108,7 @@ void myown_newhandler() {
 
 
 //! \brief reads an oWFN from owfnfile
+//! \param owfnfile the owfnfile to be read from
 void readnet(const std::string& owfnfile) {
     owfn_yylineno = 1;
     owfn_yydebug = 0;
@@ -154,7 +154,7 @@ void readnet(const std::string& owfnfile) {
 }
 
 
-//! \brief reports the net
+//! \brief reports the net statistics
 void reportNet() {
     trace(TRACE_0, "    places: " + intToString(PN->getPlaceCount()));
     trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCount()));
@@ -173,6 +173,8 @@ void reportNet() {
 
 
 //! \brief reads an OG from ogfile
+//! \param ogfile to be read from
+//! \return returns the OG object
 AnnotatedGraph* readog(const std::string& ogfile) {
     og_yylineno = 1;
     og_yydebug = 0;
@@ -194,7 +196,8 @@ AnnotatedGraph* readog(const std::string& ogfile) {
 }
 
 
-//! \brief reads all OGs from a list
+//! \brief reads all OGs from files and adds them to the given list
+//! \param theOGs a list of OGs
 void readAllOGs(AnnotatedGraph::ogs_t& theOGs) {
 
     for (AnnotatedGraph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
@@ -206,6 +209,7 @@ void readAllOGs(AnnotatedGraph::ogs_t& theOGs) {
 
 
 //! \brief deletes all OGs from a list
+//! \param OGsFromFiles a list of OGs
 void deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles) {
     for (AnnotatedGraph::ogs_t::const_iterator iOg = OGsFromFiles.begin(); iOg
             != OGsFromFiles.end(); ++iOg) {
@@ -277,7 +281,8 @@ void reportOptionValues() {
 // *******                    mode dependent functions                       ********
 // **********************************************************************************
 
-// create an IG of an oWFN
+//! \brief create an IG of an oWFN
+//! \param PN the given oWFN
 void computeIG(oWFN* PN) {
 
     time_t seconds, seconds2;
@@ -362,7 +367,8 @@ void computeIG(oWFN* PN) {
 }
 
 
-// create an OG of an oWFN
+//! \brief create an OG of an oWFN
+//! \param PN the given oWFN
 void computeOG(oWFN* PN) {
 
     time_t seconds, seconds2;
@@ -474,6 +480,7 @@ void computeOG(oWFN* PN) {
 
 
 //! \brief create the productOG of all given OGs
+//! \param OGsFromFiles a list of all OGs for the product
 void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 
     trace("Building product of the following OGs:\n");
@@ -521,7 +528,9 @@ void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 }
 
 
-//! \brief public view generation
+//! \brief generate a public view for a given og
+//! \param OG an og to generate the public view of
+//! \param graphName a name for the graph in the output
 void computePublicView(AnnotatedGraph* OG, string graphName) {
 
     trace(TRACE_0, "generating the public view for\n");
@@ -548,6 +557,8 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
 
 
 //! \brief match a net against an og
+//! \param OGToMatch an og to be matched against
+//! \param PN an oWFN to matched against an og
 void checkMatching(AnnotatedGraph* OGToMatch, oWFN* PN) {
     string reasonForFailedMatch;
     if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
@@ -561,6 +572,7 @@ void checkMatching(AnnotatedGraph* OGToMatch, oWFN* PN) {
 
 
 //! \brief check for simulation relation of two given OGs
+//! \param OGsFromFiles a list containing exactly two OGs
 void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
     
     // the OGs given by command line are already stored in OGsFromFiles
@@ -647,6 +659,7 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
 //! \brief check if two given OGs characterize the same set of strategies;
 //!        if called with an oWFN, then the corresponding OG is computed first
+//! \param OGsFromFiles a list containing all OGs that are not provided as oWFNs
 void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
     // the OGs given by command line are already stored in OGsFromFiles
@@ -750,6 +763,7 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
 //! \brief modifies the first OG such that it simulates the second OG
 //!        by filtering non-simulating branches
+//! \param OGsFromFiles a list containing exactly two OGs
 void filterOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 
     // exactly 2 OGs must be given
@@ -787,7 +801,8 @@ void filterOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 }
 
 
-// create an PNG of the given oWFN
+//! \brief create a PNG of the given oWFN
+//! \param PN an oWFN to generate a PNG from
 void makePNG(oWFN* PN) {
 
     trace(TRACE_1, "Internal translation of the net into PNapi format...\n");
@@ -874,7 +889,9 @@ void makePNG(oWFN* PN) {
 }
 
 
-// computes the number of strategies that are characterized by a given OG
+//! \brief compute the number of strategies that are characterized by a given OG
+//! \param OG an og to compute the number of strategies for
+//! \param graphName a string with the name of the file, the og was taken from
 void countStrategies(AnnotatedGraph* OG, string graphName) {
 
     trace("Processing: ");
@@ -901,7 +918,9 @@ void countStrategies(AnnotatedGraph* OG, string graphName) {
 }
 
 
-// checks whether an OG is acyclic
+//! \brief check whether an OG is acyclic
+//! \param OG an og to compute the be checked for acyclicity
+//! \param graphName a string with the name of the file, the og was taken from
 void checkAcyclicity(AnnotatedGraph* OG, string graphName) {
 
     trace("Processing: ");

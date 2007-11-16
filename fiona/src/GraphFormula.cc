@@ -44,6 +44,7 @@ using namespace std;
 #undef TRUE
 #undef FALSE
 
+
 const std::string GraphFormulaLiteral::FINAL = std::string("final");
 const std::string GraphFormulaLiteral::TAU = std::string("tau");
 const std::string GraphFormulaLiteral::TRUE = std::string("true");
@@ -84,14 +85,21 @@ bool GraphFormula::satisfies(const GraphFormulaAssignment& assignment) const {
 void GraphFormula::removeLiteral(const std::string&) {
 }
 
+
 void GraphFormula::removeLiteralForReal(const std::string&) {
 }
 
+
 int GraphFormula::getSubFormulaSize() const {
+    // ich habe keine ahnung, warum diese funktion existiert (peter)
+    assert(false);
+    return 0;
 }
+
 
 void GraphFormula::removeLiteralByHiding(const std::string&) {
 }
+
 
 threeValueLogic GraphFormula::equals() {
 
@@ -353,9 +361,11 @@ void GraphFormulaMultiary::removeLiteral(const std::string& name) {
     trace(TRACE_3, "GraphFormulaMultiary::removeLiteral(const std::string& name) : end\n");
 }
 
+
 int GraphFormulaMultiary::getSubFormulaSize() const {
 	return subFormulas.size();
 }
+
 
 // \descr 
 void GraphFormulaMultiary::removeLiteralForReal(const std::string& name) {
@@ -486,9 +496,11 @@ bool GraphFormulaMultiary::empty() const {
     return subFormulas.empty();
 }
 
+
 int GraphFormulaMultiary::size() const {
     return subFormulas.size();
 }
+
 
 GraphFormulaMultiaryAnd::GraphFormulaMultiaryAnd() {
 }
@@ -552,7 +564,7 @@ std::string GraphFormulaMultiaryAnd::getOperator() const {
 const GraphFormulaFixed GraphFormulaMultiaryAnd::emptyFormulaEquivalent = GraphFormulaTrue();
 
 
-const GraphFormulaFixed&GraphFormulaMultiaryAnd::getEmptyFormulaEquivalent() const {
+const GraphFormulaFixed& GraphFormulaMultiaryAnd::getEmptyFormulaEquivalent() const {
     return emptyFormulaEquivalent;
 }
 
@@ -647,7 +659,7 @@ bool GraphFormulaMultiaryOr::implies(GraphFormulaMultiaryOr *op) {
 const GraphFormulaFixed GraphFormulaMultiaryOr::emptyFormulaEquivalent = GraphFormulaFalse();
 
 
-const GraphFormulaFixed&GraphFormulaMultiaryOr::getEmptyFormulaEquivalent() const {
+const GraphFormulaFixed& GraphFormulaMultiaryOr::getEmptyFormulaEquivalent() const {
     return emptyFormulaEquivalent;
 }
 

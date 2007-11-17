@@ -1309,6 +1309,66 @@ GraphFormulaCNF *AnnotatedGraph::createCovFormula(TransitionMap tm) {
 }
 
 
+//! \brief Create the formula describing t event-structure of the graph
+//! NOTE: the graph has to be acyclic!
+//! \return returns the structure formula
+GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormula() {
+    trace(TRACE_3, "AnnotatedGraph::createStructureFormula()::begin()\n");
+ 
+    assert(isAcyclic());
+    
+    GraphFormulaMultiaryAnd *formula = createStructureFormulaRecursively(getRoot());
+
+    trace(TRACE_3, "AnnotatedGraph::createStructureFormula(): " + formula->asString() + "\n");
+    trace(TRACE_3, "AnnotatedGraph::createStructureFormula()::end()\n");
+    return formula;
+}
+
+
+//! \brief Creates the formula describing the event-structure of the subgraph under node
+//! NOTE: the subgraph has to be acyclic!
+//! \param node the root of the subgraph
+//! \return returns the structure formula of the subgraph
+GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormulaRecursively(GraphNode *node) {
+    trace(TRACE_5, "AnnotatedGraph::createStructureFormulaRecursively()::begin()\n");
+    
+    GraphFormulaMultiaryAnd *formula = new GraphFormulaMultiaryAnd;
+    
+    if (node == NULL) {
+        return formula;
+    }
+    
+    GraphFormulaCNF *annotation = node->getAnnotation();
+    for (GraphFormulaMultiaryAnd::iterator i = annotation->begin();
+          i != annotation->end(); i++) {
+
+         GraphFormulaMultiaryOr* clause = dynamic_cast<GraphFormulaMultiaryOr*>(*i);
+         GraphFormulaMultiaryOr* new_clause = new GraphFormulaMultiaryOr;
+         // iterate over disjunctive clauses
+         for (GraphFormulaMultiaryOr::iterator j = clause->begin(); j != clause->end(); j++) {
+
+             GraphFormulaLiteral* lit = dynamic_cast<GraphFormulaLiteral*>(*j);
+             GraphFormulaLiteral* new_lit;
+             if((dynamic_cast<GraphFormulaFixed*>(*j) == NULL) && (dynamic_cast<GraphFormulaLiteralFinal*>(*j) == NULL)) {
+                 new_lit = new GraphFormulaLiteral(node->getName() + "@" + lit->asString() + "@"
+                         + node->followEdgeWithLabel(lit->asString())->getName());
+             }
+             else {
+                 new_lit = new GraphFormulaLiteral(lit->asString());
+             }
+             GraphFormulaMultiaryAnd* new_and = new GraphFormulaMultiaryAnd(new_lit, 
+                     createStructureFormulaRecursively(node->followEdgeWithLabel(lit->asString())));
+             new_clause->addSubFormula(new_and);
+         }
+         formula->addSubFormula(new_clause);
+    }
+    
+    trace(TRACE_5, "AnnotatedGraph::createStructureFormulaRecursively(): " + formula->asString() + "\n");
+    trace(TRACE_5, "AnnotatedGraph::createStructureFormulaRecursively()::end()\n");
+    return formula;
+}
+
+
 //! \brief remove a node from the AnnotatedGraph
 //! \param node node to remove
 void AnnotatedGraph::removeNode(GraphNode* node) {

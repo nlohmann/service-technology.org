@@ -97,6 +97,10 @@ class AnnotatedGraph {
                              GraphNode* rhsNode,
                              set<GraphNode*>* VisitedNodes);
 
+        //! Create the formula describing the structure of the subgraph under the given node through events
+        //! NOTE: graph has to be acyclic!
+        GraphFormulaMultiaryAnd *createStructureFormulaRecursively(GraphNode *);
+
 // CODE FROM PL
         set<std::string> sendEvents;
         set<std::string> recvEvents;
@@ -225,6 +229,10 @@ class AnnotatedGraph {
         
         /// Create the formula describing the coverability criteria 
         GraphFormulaCNF *createCovFormula(TransitionMap tm);
+
+        //! Create the formula describing the structure of the complete graph through events
+        //! NOTE: graph has to be acyclic!
+        GraphFormulaMultiaryAnd *createStructureFormula();
 
 // CODE FROM PL
         /// transforms the graph to the public view

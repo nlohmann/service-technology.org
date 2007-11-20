@@ -52,61 +52,37 @@ extern int show_progress;
 class CommunicationGraph : public AnnotatedGraph {
     private:
 
-        /**
-         * Computes the total number of all states stored in all nodes and the
-         * number of all edges in this graph.
-         */
+        /// Computes the total number of all states stored in all nodes and the
+        /// number of all edges in this graph.
         void computeNumberOfStatesAndEdges();
 
-        /**
-         * Helps computeNumberOfStatesAndEdges to computes the total number of all
-         * states stored in all nodes and the number of all edges in this graph.
-         * This is done recursively (dfs).
-         * @param v Current node in the iteration process.
-         * @param visitedNodes[] Array of bool storing the nodes that we have
-         *     already looked at.
-         */
+        /// Helps computeNumberOfStatesAndEdges to computes the total number of all
+        /// states stored in all nodes and the number of all edges in this graph.
         void computeNumberOfStatesAndEdgesHelper(GraphNode* v,
                                                  std::map<GraphNode*, bool>& visitedNodes);
 
-        /**
-         * Computes the number of all blue to be shown nodes and edges in this
-         * graph.
-         */
+        /// Computes the number of all blue to be shown nodes and edges in this
+        /// graph.
         void computeNumberOfBlueNodesEdges();
 
-        /**
-         * Helps computeNumberOfStatesAndEdges() to computes the number of all blue
-         * to be shown nodes and edges in this graph.
-         * This is done recursively (dfs).
-         * @param v Current node in the iteration process.
-         * @param visitedNodes[] Array of bool storing the nodes that we have
-         *     already looked at.
-         */
+        /// Helps computeNumberOfBlueNodesEdges() to computes the number of all blue
+        /// to be shown nodes and edges in this graph.
         void computeNumberOfBlueNodesEdgesHelper(GraphNode* v, std::map<GraphNode*, bool>& visitedNodes);
 
-        /**
-         * The total number of all states stored in all nodes in this graph.
-         * Is computed by computeNumberOfStatesAndEdges().
-         */
+        /// The total number of all states stored in all nodes in this graph.
+        /// Is computed by computeNumberOfStatesAndEdges().
         unsigned int nStoredStates;
 
-        /**
-         * The number of all edges in this graph.
-         * Is computed by computeNumberOfStatesAndEdges().
-         */
+        /// The number of all edges in this graph.
+        /// Is computed by computeNumberOfStatesAndEdges().
         unsigned int nEdges;
 
-        /**
-         * The number of blue to be shown nodes in this graph.
-         * Is computed by computeNumberOfBlueNodesEdges().
-         */
+        /// The number of blue to be shown nodes in this graph.
+        /// Is computed by computeNumberOfBlueNodesEdges().
         unsigned int nBlueNodes;
 
-        /**
-         * The number of blue to be shown edges in this graph.
-         * Is computed by computeNumberOfBlueNodesEdges().
-         */
+        /// The number of blue to be shown edges in this graph.
+        /// Is computed by computeNumberOfBlueNodesEdges().
         unsigned int nBlueEdges;
 
     protected:
@@ -116,87 +92,93 @@ class CommunicationGraph : public AnnotatedGraph {
 
     public:
 
+        /// basic constructor
         CommunicationGraph(oWFN *);
+        
+        /// basic deconstructor
         ~CommunicationGraph();
 
         GraphNodeSet setOfSortedNodes;
 
+        /// calculate a root node for the graph
         void calculateRootNode();
 
-        /**
-         * Returns the number of nodes in this graph.
-         */
+        /// Returns the number of nodes in this graph.
         unsigned int getNumberOfNodes() const;
 
-        /**
-         * Returns the total number of all states stored in all nodes in this
-         * graph. May only be called after computeGraphStatistics().
-         */
+        /// Returns the total number of all states stored in all nodes in this
+        /// graph. May only be called after computeGraphStatistics().
         unsigned int getNumberOfStoredStates() const;
 
-        /**
-         * Returns the number of all edges in this graph. May only be called after
-         * computeGraphStatistics().
-         */
+        /// Returns the number of all edges in this graph. May only be called after
+        /// computeGraphStatistics().
         unsigned int getNumberOfEdges() const;
 
-        /**
-         * Returns the number of all blue to be shown nodes in this graph. May only
-         * be called after computeGraphStatistics().
-         */
+        /// Returns the number of all blue to be shown nodes in this graph. May only
+        /// be called after computeGraphStatistics().
         unsigned int getNumberOfBlueNodes() const;
 
-        /**
-         * Returns the number of all blue to be shown edges in this graph. May only
-         * be called after computeGraphStatistics().
-         */
+        /// Returns the number of all blue to be shown edges in this graph. May only
+        /// be called after computeGraphStatistics().
         unsigned int getNumberOfBlueEdges() const;
 
+        /// checks if the given node is in the graphs node set
         GraphNode* findGraphNodeInSet(GraphNode*);
 
-        void analyseNode(GraphNode*);
-
+        /// prints the current global progress value depending whether the value
+        /// changed significantly and depending on the debug-level set
         void printProgressFirst();
+
+        /// prints the current global progress value depending whether the value
+        /// changed significantly and depending on the debug-level set
         void printProgress();
 
         void buildGraphRandom();
+        void analyseNode(GraphNode*);
 
+        /// brief creates a dot file of the graph
         void printGraphToDot();
+
+        /// recursive helper function for printGraphToDot()
         void printGraphToDotRecursively(GraphNode* v,
                                         fstream& os,
                                         std::map<GraphNode*, bool>&);
 
-        // functions to create an STG representation of the IG or OG
+        /// function to create an STG representation of the IG or OG
         void printGraphToSTG();
+
+        /// recursive helper function for printGraphToSTG()
         void printGraphToSTGRecursively(GraphNode* v,
                                         fstream& os,
                                         std::map<GraphNode*, bool>&);
 
-        // functions to annotate the OG for distributed controllability
+        /// function to annotate the OG for distributed controllability
         bool annotateGraphDistributedly();
+
+        /// recursive helper function for annotateGraphDistributedly()
         bool annotateGraphDistributedlyRecursively(GraphNode* v,
                                                    std::map<GraphNode*, bool>&);
+        /// helper function for annotateGraphDistributedly()
         void removeLabeledSuccessor(GraphNode* v, std::string label);
 
-        // functions for diagnosis
+        /// gives a diagnosis of the graph
         void diagnose();
+
+        /// recursive helper function for diagnose()
         GraphNodeDiagnosisColor_enum diagnose_recursively(GraphNode* v,
                                                           std::map<GraphNode*, bool>& visitedNodes);
 
-        /**
-         * Computes statistics about this graph. They can be printed by
-         * printGraphStatistics().
-         */
+        /// Computes statistics about this graph
         void computeGraphStatistics();
 
-        /**
-         * Prints statistics about this graph. May only be called after
-         * computeGraphStatistics().
-         */
+        /// Prints statistics about this graph. May only be called after
+        /// computeGraphStatistics().
         void printGraphStatistics();
 
+        /// checks wethe a state activates output events
         bool stateActivatesOutputEvents(State*);
 
+        /// returns the oWFN Filename this graph was created from
         string returnOWFnFilename();
 
         // Provides user defined operator new. Needed to trace all new operations on this class.

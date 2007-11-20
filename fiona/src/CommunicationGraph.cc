@@ -55,8 +55,8 @@ extern void STG2oWFN_main();
 extern FILE *stg_yyin;
 
 
-//! \param _PN
 //! \brief constructor
+//! \param _PN
 CommunicationGraph::CommunicationGraph(oWFN * _PN) {
     PN = _PN;
 }
@@ -75,33 +75,47 @@ CommunicationGraph::~CommunicationGraph() {
 }
 
 
+//! \brief returns the number of nodes
+//! \return number of nodes
 unsigned int CommunicationGraph::getNumberOfNodes() const {
     return setOfSortedNodes.size();
 }
 
 
+//! \brief returns the number of stored states
+//!        may only be called after computeGraphStatistics()
+//! \return number stored states
 unsigned int CommunicationGraph::getNumberOfStoredStates() const {
     return nStoredStates;
 }
 
 
+//! \brief returns the number of edges
+//!        may only be called after computeGraphStatistics()
+//! \return number edges
 unsigned int CommunicationGraph::getNumberOfEdges() const {
     return nEdges;
 }
 
 
+//! \brief returns the number of blue nodes
+//!        may only be called after computeGraphStatistics()
+//! \return number of blue nodes
 unsigned int CommunicationGraph::getNumberOfBlueNodes() const {
     return nBlueNodes;
 }
 
 
+//! \brief returns the number of blue edges
+//!        may only be called after computeGraphStatistics()
+//! \return number blue edges
 unsigned int CommunicationGraph::getNumberOfBlueEdges() const {
     return nBlueEdges;
 }
 
 
 //! \brief calculates the root node of the graph
-// for IG and OG
+//!        for IG and OG
 void CommunicationGraph::calculateRootNode() {
 
     trace(TRACE_5, "void CommunicationGraph::calculateRootNode(): start\n");
@@ -126,8 +140,9 @@ void CommunicationGraph::calculateRootNode() {
 }
 
 
-//! \param toAdd the GraphNode we are looking for in the graph
 //! \brief this function uses the find method from the template set
+//! \param toAdd the GraphNode we are looking for in the graph
+//! \return toAdd itself or NULL if toAdd could not be found 
 GraphNode* CommunicationGraph::findGraphNodeInSet(GraphNode* toAdd) {
 
     GraphNodeSet::iterator iter = setOfSortedNodes.find(toAdd);
@@ -138,13 +153,16 @@ GraphNode* CommunicationGraph::findGraphNodeInSet(GraphNode* toAdd) {
     }
 }
 
-
+//! \brief Computes statistics about this graph. They can be printed by
+//!        printGraphStatistics().
 void CommunicationGraph::computeGraphStatistics() {
     computeNumberOfStatesAndEdges();
     computeNumberOfBlueNodesEdges();
 }
 
 
+//! \brief Computes the total number of all states stored in all nodes and the
+//!        number of all edges in this graph.
 void CommunicationGraph::computeNumberOfStatesAndEdges() {
 
     std::map<GraphNode*, bool> visitedNodes;
@@ -155,6 +173,12 @@ void CommunicationGraph::computeNumberOfStatesAndEdges() {
 }
 
 
+//! \brief Helps computeNumberOfStatesAndEdges to computes the total number of all
+//!        states stored in all nodes and the number of all edges in this graph.
+//!        This is done recursively (dfs).
+//! \param v Current node in the iteration process.
+//! \param visitedNodes[] Array of bool storing the nodes that we have
+//!        already looked at.
 void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(GraphNode* v,
                                                              std::map<GraphNode*, bool>& visitedNodes) {
 
@@ -184,6 +208,8 @@ void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(GraphNode* v,
 }
 
 
+//! \brief Computes the number of all blue to be shown nodes and edges in this
+//!        graph.
 void CommunicationGraph::computeNumberOfBlueNodesEdges() {
 
     std::map<GraphNode*, bool> visitedNodes;
@@ -194,6 +220,12 @@ void CommunicationGraph::computeNumberOfBlueNodesEdges() {
 }
 
 
+//! \brief Helps computeNumberOfBlueNodesEdges() to computes the number of all blue
+//!        to be shown nodes and edges in this graph.
+//!        This is done recursively (dfs).
+//! \param v Current node in the iteration process.
+//! \param visitedNodes[] Array of bool storing the nodes that we have
+//!        already looked at.
 void CommunicationGraph::computeNumberOfBlueNodesEdgesHelper(GraphNode* v,
                                                              std::map<GraphNode*, bool>& visitedNodes) {
 
@@ -231,8 +263,9 @@ void CommunicationGraph::computeNumberOfBlueNodesEdgesHelper(GraphNode* v,
 }
 
 
+//! \brief checks if the given state activates at least one output event
 //! \param s the state that is checked for activating output events
-//! \brief returns true, if the given state activates at least one output event
+//! \return returns true, if the given state activates at least one output event, else false
 bool CommunicationGraph::stateActivatesOutputEvents(State * s) {
     s->decode(PN);
 
@@ -245,8 +278,8 @@ bool CommunicationGraph::stateActivatesOutputEvents(State * s) {
 }
 
 
-//! \param toAddValue the additional progress value
 //! \brief adds toAddValue to global progress value
+//! \param toAddValue the additional progress value
 void CommunicationGraph::addProgress(double toAddValue) {
 
     trace(TRACE_4, "\t adding ");
@@ -274,7 +307,7 @@ void CommunicationGraph::addProgress(double toAddValue) {
 
 
 //! \brief prints the current global progress value depending whether the value
-//! changed significantly and depending on the debug-level set
+//!        changed significantly and depending on the debug-level set
 void CommunicationGraph::printProgress() {
 
 //    return;
@@ -296,7 +329,7 @@ void CommunicationGraph::printProgress() {
 
 
 //! \brief prints the current global progress value depending whether the value
-//! changed significantly and depending on the debug-level set
+//!        changed significantly and depending on the debug-level set
 void CommunicationGraph::printProgressFirst() {
 
     trace(TRACE_0, "    ");
@@ -310,6 +343,8 @@ void CommunicationGraph::printProgressFirst() {
 }
 
 
+//! \brief Prints statistics about this graph. May only be called after
+//!       computeGraphStatistics().
 void CommunicationGraph::printGraphStatistics() {
     trace(TRACE_0, "    number of nodes: " + intToString(getNumberOfNodes()) + "\n");
     trace(TRACE_0, "    number of edges: " + intToString(getNumberOfEdges()) + "\n");
@@ -435,10 +470,10 @@ void CommunicationGraph::printGraphToDot() {
 }
 
 
+//! \brief breadthsearch through the graph printing each node and edge to the output stream
 //! \param v current node in the iteration process
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
-//! \brief breadthsearch through the graph printing each node and edge to the output stream
 void CommunicationGraph::printGraphToDotRecursively(GraphNode* v,
                                                     fstream& os,
                                                     std::map<GraphNode*, bool>& visitedNodes) {
@@ -626,10 +661,10 @@ void CommunicationGraph::printGraphToSTG() {
 }
 
 
+//! \brief breadthsearch through the graph printing each node and edge to the output stream
 //! \param v current node in the iteration process
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
-//! \brief breadthsearch through the graph printing each node and edge to the output stream
 void CommunicationGraph::printGraphToSTGRecursively(GraphNode* v,
                                                     fstream& os,
                                                     std::map<GraphNode*, bool>& visitedNodes) {
@@ -670,11 +705,15 @@ void CommunicationGraph::printGraphToSTGRecursively(GraphNode* v,
 }
 
 
+//! \brief returns the filename of the owfn this graph has been created from
+//! \return filename
 string CommunicationGraph::returnOWFnFilename()
 {
     return (string(PN->filename));
 }
 
+//! \brief DESCRIPTION
+//! \return DESCRIPTION
 bool CommunicationGraph::annotateGraphDistributedly() {
     GraphNode* rootNode = root;
 
@@ -686,6 +725,10 @@ bool CommunicationGraph::annotateGraphDistributedly() {
 }
 
 
+//! \brief DESCRIPTION
+//! \param v current node in the iteration process
+//! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
+//! \return DESCRIPTION
 bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode* v,
                                                                std::map<GraphNode*, bool>& visitedNodes) {
     assert(v != NULL);
@@ -795,6 +838,9 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(GraphNode* v,
 }
 
 
+//! \brief DESCRIPTION
+//! \param DESCRIPTION
+//! \param DESCRIPTION
 void CommunicationGraph::removeLabeledSuccessor(GraphNode* v, std::string label) {
 
     GraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
@@ -817,6 +863,7 @@ void CommunicationGraph::removeLabeledSuccessor(GraphNode* v, std::string label)
 }
 
 
+//! \brief DESCRIPTION
 void CommunicationGraph::diagnose() {
     cerr << "Diagnosis:" << endl;
     if (root->getColor() == BLUE) {
@@ -829,6 +876,10 @@ void CommunicationGraph::diagnose() {
 }
 
 
+//! \brief DESCRIPTION
+//! \param v current node in the iteration process
+//! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
+//! \return DESCRIPTION
 GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(GraphNode* v, std::map<GraphNode*, bool>& visitedNodes) {
     assert(v != NULL);
 

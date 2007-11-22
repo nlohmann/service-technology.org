@@ -51,21 +51,35 @@ const std::string GraphFormulaLiteral::TRUE = std::string("true");
 const std::string GraphFormulaLiteral::FALSE = std::string("false");
 
 
+//! \brief  Sets the given literal to the given truth value within this
+//!         GraphFormulaAssignment.
+//! \param literal Literal whose truth value should be set.
+//! \param value Truth value the given literal should be set to.
 void GraphFormulaAssignment::set(const std::string& literal, bool value) {
     literal2bool[literal] = value;
 }
 
 
+//! \brief Sets the given literal to true within this GraphFormulaAssignment.
+//! \param literal Literal which should be set to true.
 void GraphFormulaAssignment::setToTrue(const std::string& literal) {
     set(literal, true);
 }
 
 
+//! \brief Sets the given literal to false within this GraphFormulaAssignment.
+//! \param literal Literal which should be set to false.
 void GraphFormulaAssignment::setToFalse(const std::string& literal) {
     set(literal, false);
 }
 
 
+//! \brief Gets the truth value of the given literal within this
+//!        GraphFormulaAssignment. If no truth value was previously set for
+//!        this literal by set() or setToTrue(), then the truth value of the given
+//!        literal is implicetly false.
+//! \param literal Literal whose truth value should be determined.
+//! \returns Truth value of the given literal.
 bool GraphFormulaAssignment::get(const std::string& literal) const {
     literal2bool_t::const_iterator
             literal2bool_iter = literal2bool.find(literal);
@@ -77,30 +91,39 @@ bool GraphFormulaAssignment::get(const std::string& literal) const {
 }
 
 
+//! \brief Determines whether this GraphFormula satisfies the given
+//!        GraphFormulaAssignment. Equivalent to value().
 bool GraphFormula::satisfies(const GraphFormulaAssignment& assignment) const {
     return value(assignment);
 }
 
 
+//! \brief Placeholder for a virtual function
 void GraphFormula::removeLiteral(const std::string&) {
 }
 
 
+//! \brief Placeholder for a virtual function
 void GraphFormula::removeLiteralForReal(const std::string&) {
 }
 
 
+//! \brief DESCRIPTION
+//! \return DESCRIPTION
 int GraphFormula::getSubFormulaSize() const {
     // ich habe keine ahnung, warum diese funktion existiert (peter)
+    // ich auch nicht (martin)
     assert(false);
     return 0;
 }
 
 
+//! \brief Placeholder for a virtual function
 void GraphFormula::removeLiteralByHiding(const std::string&) {
 }
 
-
+//! \brief computes and returns the value of the formula without an assigment
+//! \return returns unknown, true or false
 threeValueLogic GraphFormula::equals() {
 
     if (dynamic_cast<GraphFormulaLiteral*>(this)) {
@@ -155,6 +178,9 @@ threeValueLogic GraphFormula::equals() {
 }
 
 
+//! \brief Returns this formula in conjunctive normal form. The caller is
+//!        responsible for deleting the newly created and returned formula.
+/// \return returns the CNF
 GraphFormulaCNF* GraphFormula::getCNF() {
     trace(TRACE_5, "GraphFormula::getCNF(): " + asString() + " is a\n");
 
@@ -252,23 +278,33 @@ GraphFormulaCNF* GraphFormula::getCNF() {
     return NULL; // should not happen! probably new derivate of GraphFormula
 }
 
-
+//! \brief basic constructor
 GraphFormulaMultiary::GraphFormulaMultiary() :
     GraphFormula() {
 }
 
 
+//! \brief Constructs a multiary formula from a given subformula by adding the
+//!        subformula into the set of subformulae.
+//! \param newformula The subformula to be added
 GraphFormulaMultiary::GraphFormulaMultiary(GraphFormula* newformula) {
     subFormulas.push_back(newformula);
 }
 
-
+//! \brief Constructs a multiary formula from two given subformulas. This
+//!        constructor exists to conviently construct binary formulas from a left
+//!        hand side and a right hand side subformula.
+//! \param lhs Left hand side subformula of the to be constructed binary
+//!        formula.
+//! \param rhs Reft hand side subformula of the to be constructed binary
+//!        formula.
 GraphFormulaMultiary::GraphFormulaMultiary(GraphFormula* lhs, GraphFormula* rhs) {
     subFormulas.push_back(lhs);
     subFormulas.push_back(rhs);
 }
 
 
+//! \brief deconstructor
 GraphFormulaMultiary::~GraphFormulaMultiary() {
     trace(TRACE_5, "GraphFormulaMultiary::~GraphFormulaMultiary() : start\n");
 
@@ -280,6 +316,8 @@ GraphFormulaMultiary::~GraphFormulaMultiary() {
 }
 
 
+//! \brief turns the formula into a string
+//! \return the formula as string
 std::string GraphFormulaMultiary::asString() const {
     if (subFormulas.empty()) {
         // we found an empty OR (equivalent to FALSE) or AND (equivalent to TRUE)
@@ -304,6 +342,10 @@ std::string GraphFormulaMultiary::asString() const {
 }
 
 
+//! \brief computes and returns the value of this formula under the given
+//!        assignment
+//! \param assignment an assignment for the formulas literals
+//! \return true if the formula is true under the assginment, else false
 bool GraphFormulaMultiary::value(const GraphFormulaAssignment& assignment) const {
     for (subFormulas_t::const_iterator currentFormula = subFormulas.begin();
          currentFormula != subFormulas.end(); ++currentFormula) {
@@ -316,17 +358,24 @@ bool GraphFormulaMultiary::value(const GraphFormulaAssignment& assignment) const
 }
 
 
+//! \brief adds a given subformula to this multiary
+//! \param subformula the subformula to be added
 void GraphFormulaMultiary::addSubFormula(GraphFormula* subformula) {
     subFormulas.push_back(subformula);
 }
 
 
+//! \brief removes the subformula at the given iterator position
+//! \param subformula iterator at the position to be deleted
+//! \return returns an iterator to the formula following the erased one
 GraphFormulaMultiary::iterator
 GraphFormulaMultiary::removeSubFormula(iterator subformula) {
     return subFormulas.erase(subformula);
 }
 
 
+//! \brief removes the given literal from the formula
+//! \param name the name of the literal to be removed
 void GraphFormulaMultiary::removeLiteral(const std::string& name) {
 
     trace(TRACE_3, "GraphFormulaMultiary::removeLiteral(const std::string& name) : start\n");
@@ -362,12 +411,16 @@ void GraphFormulaMultiary::removeLiteral(const std::string& name) {
 }
 
 
+//! \brief returns the number of subformulas
+//! \return number of subformulas
 int GraphFormulaMultiary::getSubFormulaSize() const {
 	return subFormulas.size();
 }
 
 
-// \descr 
+//! \brief removes the given literal from the formula, if this literal is the 
+//!        only one of a clause, the clause gets removed as well
+//! \param name name of the literal to be removed 
 void GraphFormulaMultiary::removeLiteralForReal(const std::string& name) {
 
     trace(TRACE_3, "GraphFormulaMultiary::removeLiteralForReal(const std::string& name) : start\n");
@@ -424,6 +477,8 @@ void GraphFormulaMultiary::removeLiteralForReal(const std::string& name) {
 }
 
 
+//! \brief removes the given literal from the formula by hiding it
+//! \param name name of the literal to be removed 
 void GraphFormulaMultiary::removeLiteralByHiding(const std::string& name) {
 
     trace(TRACE_5, "GraphFormulaMultiary::removeLiteralByHiding(const std::string& name) : start\n");
@@ -463,6 +518,8 @@ void GraphFormulaMultiary::removeLiteralByHiding(const std::string& name) {
 }
 
 
+//! \brief deep copies the private members of this formula to a given one
+//! \param newFormula formulamultiary to be copied to
 void GraphFormulaMultiary::deepCopyMultiaryPrivateMembersToNewFormula(GraphFormulaMultiary* newFormula) const {
     newFormula->subFormulas.clear();
     for (subFormulas_t::const_iterator iFormula = subFormulas.begin();
@@ -471,52 +528,78 @@ void GraphFormulaMultiary::deepCopyMultiaryPrivateMembersToNewFormula(GraphFormu
     }
 }
 
-
+//! \brief returns an iterator to the begin of the subformula list
+//! \return iterator to the begin of the subformula list
 GraphFormulaMultiary::iterator GraphFormulaMultiary::begin() {
     return subFormulas.begin();
 }
 
 
+//! \brief returns a const iterator to the begin of the subformula list
+//! \return const iterator to the begin of the subformula list
 GraphFormulaMultiary::const_iterator GraphFormulaMultiary::begin() const {
     return subFormulas.begin();
 }
 
 
+//! \brief returns an iterator to the end of the subformula list
+//! \return iterator to the end of the subformula list
 GraphFormulaMultiary::iterator GraphFormulaMultiary::end() {
     return subFormulas.end();
 }
 
 
+//! \brief returns a const iterator to the end of the subformula list
+//! \return iterator to the begin of the subformula list
 GraphFormulaMultiary::const_iterator GraphFormulaMultiary::end() const {
     return subFormulas.end();
 }
 
 
+//! \brief checks whether there are no subformulas
+//! \return returns true if there are no subformulas
 bool GraphFormulaMultiary::empty() const {
     return subFormulas.empty();
 }
 
 
+//! \brief returns the number of 
+//! \return iterator to the begin of the subformula list
 int GraphFormulaMultiary::size() const {
     return subFormulas.size();
 }
 
 
+//! \brief basic constructor 
 GraphFormulaMultiaryAnd::GraphFormulaMultiaryAnd() {
 }
 
 
+//! \brief Constructs a multiary and formula from a given subformula by adding the
+//!        subformula into the set of subformulae.
+//! \param formula The subformula to be added
 GraphFormulaMultiaryAnd::GraphFormulaMultiaryAnd(GraphFormula* formula) :
     GraphFormulaMultiary(formula) {
 }
 
 
+//! \brief Constructs a multiary and formula from two given subformulas. This
+//!        constructor exists to conviently construct binary formulas from a left
+//!        hand side and a right hand side subformula.
+//! \param lhs Left hand side subformula of the to be constructed binary
+//!        formula.
+//! \param rhs Reft hand side subformula of the to be constructed binary
+//!        formula.
 GraphFormulaMultiaryAnd::GraphFormulaMultiaryAnd(GraphFormula* lhs_,
                                                  GraphFormula* rhs_) :
     GraphFormulaMultiary(lhs_, rhs_) {
 }
 
 
+//! \brief Returns the merged equivalent to this formula. Merging gets rid of
+//!        unnecessary nesting of subformulas. (a*(b*c)) becomes (a*b*c). The
+//!        caller is responsible for deleting the returned newly created formula.
+//! \return returns the merged equivalent
 GraphFormulaMultiaryAnd* GraphFormulaMultiaryAnd::merge() {
     bool final = true;
     GraphFormulaMultiaryAnd *result = new GraphFormulaMultiaryAnd;
@@ -547,6 +630,8 @@ GraphFormulaMultiaryAnd* GraphFormulaMultiaryAnd::merge() {
 }
 
 
+//! \brief deep copies this formula
+//! \return returns copy
 GraphFormulaMultiaryAnd* GraphFormulaMultiaryAnd::getDeepCopy() const {
     GraphFormulaMultiaryAnd* newFormula = new GraphFormulaMultiaryAnd(*this);
 
@@ -556,39 +641,58 @@ GraphFormulaMultiaryAnd* GraphFormulaMultiaryAnd::getDeepCopy() const {
 }
 
 
+//! \brief returns the "and"-operator specifying the virtual function
+//! \return returns "*"
 std::string GraphFormulaMultiaryAnd::getOperator() const {
     return "*";
 }
 
 
+//! \brief return an empty formula Equivalent as true
+//! \return true empty formula Equivalent
 const GraphFormulaFixed GraphFormulaMultiaryAnd::emptyFormulaEquivalent = GraphFormulaTrue();
 
-
+//! \brief return an empty formula Equivalent
+//! \return empty formula Equivalent
 const GraphFormulaFixed& GraphFormulaMultiaryAnd::getEmptyFormulaEquivalent() const {
     return emptyFormulaEquivalent;
 }
 
-
+//! \brief basic constructor 
 GraphFormulaMultiaryOr::GraphFormulaMultiaryOr() {
 }
 
 
+//! \brief Constructs a multiary or formula from a given subformula by adding the
+//!        subformula into the set of subformulae.
+//! \param formula The subformula to be added
 GraphFormulaMultiaryOr::GraphFormulaMultiaryOr(GraphFormula* formula) :
     GraphFormulaMultiary(formula) {
 }
 
 
+//! \brief Constructs a multiary or formula from two given subformulas. This
+//!        constructor exists to conviently construct binary formulas from a left
+//!        hand side and a right hand side subformula.
+//! \param lhs Left hand side subformula of the to be constructed binary
+//!        formula.
+//! \param rhs Reft hand side subformula of the to be constructed binary
+//!        formula.
 GraphFormulaMultiaryOr::GraphFormulaMultiaryOr(GraphFormula* lhs_,
                                                GraphFormula* rhs_) :
     GraphFormulaMultiary(lhs_, rhs_) {
 }
 
 
+//! \brief returns the "or"-operator specifying the virtual function
+//! \return returns "+"
 std::string GraphFormulaMultiaryOr::getOperator() const {
     return "+";
 }
 
 
+//! \brief deep copies this formula
+//! \return returns copy
 GraphFormulaMultiaryOr* GraphFormulaMultiaryOr::getDeepCopy() const {
     GraphFormulaMultiaryOr* newFormula =new GraphFormulaMultiaryOr(*this);
 
@@ -598,6 +702,10 @@ GraphFormulaMultiaryOr* GraphFormulaMultiaryOr::getDeepCopy() const {
 }
 
 
+//! \brief Returns the merged equivalent to this formula. Merging gets rid of
+//!        unnecessary nesting of subformulas. (a+(b+c)) becomes (a+b+c). The
+//!        caller is responsible for deleting the returned newly created formula.
+//! \return returns the merged equivalent
 GraphFormulaMultiaryOr* GraphFormulaMultiaryOr::merge() {
     bool final = true;
     GraphFormulaMultiaryOr *result = new GraphFormulaMultiaryOr;
@@ -628,7 +736,10 @@ GraphFormulaMultiaryOr* GraphFormulaMultiaryOr::merge() {
 }
 
 
-// shall only be used for clauses within cnf!
+//! \brief tests if a given formula is already implied in this one,
+//!        shall only be used for clauses within cnf!
+//! \param op the formula that could be implied
+//! \return returns true if the given formula is implied, else false
 bool GraphFormulaMultiaryOr::implies(GraphFormulaMultiaryOr *op) {
     bool result;
 
@@ -656,29 +767,41 @@ bool GraphFormulaMultiaryOr::implies(GraphFormulaMultiaryOr *op) {
 }
 
 
+//! \brief return an empty formula Equivalent as false
+//! \return true empty formula Equivalent
 const GraphFormulaFixed GraphFormulaMultiaryOr::emptyFormulaEquivalent = GraphFormulaFalse();
 
 
+//! \brief return an empty formula Equivalent
+//! \return empty formula Equivalent
 const GraphFormulaFixed& GraphFormulaMultiaryOr::getEmptyFormulaEquivalent() const {
     return emptyFormulaEquivalent;
 }
 
 
+//! \brief basic constructor 
 GraphFormulaCNF::GraphFormulaCNF() {
 }
 
 
+//! \brief Constructs a CNF formula containing a clause
+//! \param clause_ clause to be added 
 GraphFormulaCNF::GraphFormulaCNF(GraphFormulaMultiaryOr* clause_) :
     GraphFormulaMultiaryAnd(clause_) {
 }
 
 
+//! \brief Constructs a CNF formula containing the two given clauses
+//! \param clause1_ first clause
+//! \param clause2_ second clause
 GraphFormulaCNF::GraphFormulaCNF(GraphFormulaMultiaryOr* clause1_,
                                  GraphFormulaMultiaryOr* clause2_) :
     GraphFormulaMultiaryAnd(clause1_, clause2_) {
 }
 
 
+//! \brief deep copies this formula
+//! \return returns copy
 GraphFormulaCNF* GraphFormulaCNF::getDeepCopy() const {
     GraphFormulaMultiaryAnd* newFormula =GraphFormulaMultiaryAnd::getDeepCopy();
 
@@ -686,14 +809,16 @@ GraphFormulaCNF* GraphFormulaCNF::getDeepCopy() const {
 }
 
 
+//! \brief adds a clause to the CNF
+//! \param clause clause to be addded
 void GraphFormulaCNF::addClause(GraphFormulaMultiaryOr* clause) {
     addSubFormula(clause);
 }
 
 
-//! \fn bool GraphFormulaCNF::implies(GraphFormulaCNF *op)
-//! \param op the rhs of the implication
 //! \brief checks whether the current CNF formula implies the given one via op
+//! \param op the rhs of the implication
+//! \fn bool GraphFormulaCNF::implies(GraphFormulaCNF *op)
 //! Note: all literals have to occur non-negated!
 bool GraphFormulaCNF::implies(GraphFormulaCNF *op) {
     bool result;
@@ -731,6 +856,7 @@ bool GraphFormulaCNF::implies(GraphFormulaCNF *op) {
 }
 
 
+//! \brief Simplifies the formula by removing redundant clauses.
 void GraphFormulaCNF::simplify() {
     for (GraphFormulaCNF::const_iterator iLhs = begin(); iLhs != end(); ++iLhs) {
         GraphFormulaMultiaryOr* lhs =dynamic_cast<GraphFormulaMultiaryOr*>(*iLhs);
@@ -755,56 +881,77 @@ void GraphFormulaCNF::simplify() {
 }
 
 
+//! \brief Creates a formula with a given fixed value and string reprensentation.
+//! \param value Fixed truth value of this formula.
+//! \param asString String representation of this formula.
 GraphFormulaFixed::GraphFormulaFixed(bool value, const std::string& asString) :
     GraphFormulaLiteral(asString), _value(value) {
 }
 
 
+//! \brief returns the fixed value of the formula
+//! \param GraphFormulaAssignment An assignment to keep the structure of value
+//! \return returns the fixed value
 bool GraphFormulaFixed::value(const GraphFormulaAssignment&) const {
     return _value;
 }
 
 
+//! \brief deep copies this formula
+//! \return returns copy
 GraphFormulaFixed* GraphFormulaFixed::getDeepCopy() const {
     return new GraphFormulaFixed(*this);
 }
 
 
+//! \brief constructs the constant true formula
 GraphFormulaTrue::GraphFormulaTrue() :
     GraphFormulaFixed(true, GraphFormulaLiteral::TRUE) {
 }
 
 
+//! \brief constructs the constant false formula
 GraphFormulaFalse::GraphFormulaFalse() :
     GraphFormulaFixed(false, GraphFormulaLiteral::FALSE) {
 }
 
 
+//! \brief constructs an atomic literal formula
+//! \param literal_ name of the literal
 GraphFormulaLiteral::GraphFormulaLiteral(const std::string& literal_) :
     literal(literal_) {
 }
 
 
+//! \brief deep copies this formula
+//! \return returns copy
 GraphFormulaLiteral* GraphFormulaLiteral::getDeepCopy() const {
     return new GraphFormulaLiteral(*this);
 }
 
 
+//! \brief returns the value of this literal under the given assignment
+//! \param assignment an assignment
+//! \return true if the literal is true under the assginment, else false
 bool GraphFormulaLiteral::value(const GraphFormulaAssignment& assignment) const {
     return assignment.get(literal);
 }
 
 
+//! \brief returns the name of the literal
+//! \return name of the literal
 std::string GraphFormulaLiteral::asString() const {
     return literal;
 }
 
 
+//! \brief basic constructor
 GraphFormulaLiteralFinal::GraphFormulaLiteralFinal() :
     GraphFormulaLiteral(GraphFormulaLiteral::FINAL) {
 }
 
 
+//! \brief basic constructor
 GraphFormulaLiteralTau::GraphFormulaLiteralTau() :
     GraphFormulaLiteral(GraphFormulaLiteral::TAU) {
 }

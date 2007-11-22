@@ -47,8 +47,8 @@
 #undef TRUE
 
 
-//! \param _PN
 //! \brief constructor
+//! \param _PN
 OG::OG(oWFN * _PN) :
     CommunicationGraph(_PN) {
 
@@ -67,6 +67,7 @@ OG::~OG() {
 }
 
 
+//! \brief Computes the OG of the associated PN.
 void OG::buildGraph() {
 
     // creates the root node and calculates its reachability graph (set of states)
@@ -87,6 +88,16 @@ void OG::buildGraph() {
 }
 
 
+//! \brief Builds the OG of the associated PN recursively starting at
+//!        currentNode.
+//! \param currentNode Current node of the graph from which the build
+//!        algorithm starts.
+//! \param progress_plus The additional progress when the subgraph
+//!        starting at this node is finished.
+//! \pre The states of currentNode have been calculated, currentNode's
+//!      number has been set (e.g. by calling currentNode->setNumber), and
+//!      setOfVertices contains currentNode. That means, buildGraph can be
+//!      called with root, if calculateRootNode() has been called.
 void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
     // currentNode is the root of the currently considered subgraph
@@ -260,7 +271,9 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 
 
 //! \brief adds the node toAdd to the set of all nodes
-//! and copies the eventsUsed array from the sourceNode
+//!        and copies the eventsUsed array from the sourceNode
+//! \param sourceNode node to copy eventsUsed from
+//! \param toAdd node to be added
 void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
 
     trace(TRACE_5, "reachGraph::AddGraphNode(GraphNode* sourceNode, GraphNode * toAdd): start\n");
@@ -287,9 +300,13 @@ void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
 }
 
 
-//! adds an SENDING or RECEIVING edge from sourceNode to destNode
-//! and adds destNode to the successor list of sourceNode
-//! and increases eventsUsed of destNode by one
+//! \brief adds an SENDING or RECEIVING edge from sourceNode to destNode,
+//!        adds destNode to the successor list of sourceNode and
+//!        increases eventsUsed of destNode by one
+//! \param sourceNode source of the new edge
+//! \param destNode target of the new edge
+//! \param label label of the new edge
+//! \param type type of the new edge
 void OG::addGraphEdge(GraphNode* sourceNode,
                       GraphNode* destNode,
                       oWFN::Places_t::size_type label,
@@ -376,10 +393,10 @@ void OG::calculateSuccStatesInput(unsigned int input,
 }
 
 
+//! \brief calculates the set of successor states in case of an output message
 //! \param output the output messages that are taken from the marking
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
-//! \brief calculates the set of successor states in case of an output message
 void OG::calculateSuccStatesOutput(unsigned int output,
                                    GraphNode* node,
                                    GraphNode* newNode) {
@@ -426,6 +443,10 @@ void OG::calculateSuccStatesOutput(unsigned int output,
 }
 
 
+//! \brief Turns all blue nodes that should be red into red ones and
+//!        simplifies their annotations by removing unneeded literals.
+//! \pre OG has been built by buildGraph().
+//! \note Niels made this public since he needs it for distributed controllability.
 void OG::correctNodeColorsAndShortenAnnotations() {
     // This is a fixpoint operation. Do the following until nothing changes:
     //   1. Turn one blue node that should be red into a red one.
@@ -466,6 +487,8 @@ void OG::correctNodeColorsAndShortenAnnotations() {
 }
 
 
+//! \brief calculates the annotation (CNF) for the node
+//! \param node the node for which the annotation is calculated
 void OG::computeCNF(GraphNode* node) const {
 
     trace(TRACE_5, "OG::computeCNF(GraphNode * node): start\n");

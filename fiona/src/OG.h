@@ -44,57 +44,48 @@ class oWFN;
 
 class OG : public CommunicationGraph {
     private:
-        /**
-         * @param node the node for which the annotation is calculated
-         * @brief calculates the annotation (CNF) for the node
-         */
+        /// calculates the annotation (CNF) for the node
         void computeCNF(GraphNode* node) const;
 
-        /**
-         * Builds the OG of the associated PN recursively starting at
-         * currentNode.
-         * @param currentNode Current node of the graph from which the build
-         *        algorithm starts.
-         * @param progress_plus The additional progress when the subgraph
-         *        starting at this node is finished.
-         * @pre The states of currentNode have been calculated, currentNode's
-         *      number has been set (e.g. by calling currentNode->setNumber), and
-         *      setOfVertices contains currentNode. That means, buildGraph can be
-         *      called with root, if calculateRootNode() has been called.
-         */
+        /// Builds the OG of the associated PN recursively starting at
+        /// currentNode.
         void buildGraph(GraphNode* currentNode, double progress_plus);
 
+        /// calculates the set of successor states in case of an input message
         void calculateSuccStatesInput(unsigned int, GraphNode*, GraphNode*);
+        
+        /// calculates the set of successor states in case of an output message
         void calculateSuccStatesOutput(unsigned int, GraphNode*, GraphNode*);
 
+        /// adds a node to the OG
         void addGraphNode(GraphNode*, GraphNode*); // for OG
+        
+        /// creates an edge in the OG
         void addGraphEdge(GraphNode*,
                           GraphNode*,
                           oWFN::Places_t::size_type,
                           GraphEdgeType); // for OG
 
     public:
+        /// constructor
         OG(oWFN *);
+        
+        /// basic deconstructor
         ~OG();
 
         BddRepresentation * bdd;
 
-        /**
-         * Turns all blue nodes that should be red into red ones and
-         * simplifies their annotations by removing unneeded literals.
-         * @pre OG has been built by buildGraph().
-         *
-         * @note Niels made this public since he needs it for distributed controllability.
-         */
+        /// Turns all blue nodes that should be red into red ones and
+        /// simplifies their annotations by removing unneeded literals.
         void correctNodeColorsAndShortenAnnotations();
 
-        /**
-         * Computes the OG of the associated PN.
-         * @pre calculateRootNode() has been called.
-         */
+        /// Builds the OG of the associated PN
         void buildGraph();
 
+        /// converts an OG into its BDD representation
         void convertToBdd();
+
+        /// converts an OG into its BDD representation including the red nodes and the markings of the nodes
         void convertToBddFull();
 
 

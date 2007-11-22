@@ -41,22 +41,31 @@
 
 using namespace std;
 
+//! \brief basic constructor
+//! \param dstNodeP Points to the destination of this edge.
+//! \param labelP label of this edge.
 GraphEdge::GraphEdge(GraphNode* dstNodeP, const std::string& labelP) :
     dstNode(dstNodeP), label(labelP) {
 }
 
 
+//! \brief returns the label of the edge
+//! \return label of the edge
 std::string GraphEdge::getLabel() const {
     return label;
 }
 
 
+//! \brief returns the label of the edge without its prefix
+//! \return label of the edge
 std::string GraphEdge::getLabelWithoutPrefix() const {
     assert(label[0] == '?' || label[0] == '!');
     return label.substr(1);
 }
 
 
+//! \brief checks the type of the edge and returns it
+//! \return type of the edge
 GraphEdgeType GraphEdge::getType() const {
     assert(label.size() != 0);
 // CODE FROM PL
@@ -80,6 +89,7 @@ GraphEdgeType GraphEdge::getType() const {
 }
 
 // CODE FROM PL
+//! \brief modifies the edge according to its type
 void GraphEdge::toggleType() {
 	switch (this->getType()) {
 		case RECEIVING:
@@ -98,6 +108,8 @@ void GraphEdge::toggleType() {
 }
 // END OF CODE FROM PL
 
+//! \brief returns the destination node of the dge
+//! \return destination node
 GraphNode* GraphEdge::getDstNode() const {
     return dstNode;
 }

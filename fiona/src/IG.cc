@@ -41,22 +41,22 @@
 #include "binDecision.h"
 #include "GraphNode.h"
 
-//! \fn interactionGraph::interactionGraph(oWFN * _PN) 
-//! \param _PN
 //! \brief constructor
+//! \param _PN
+//! \fn interactionGraph::interactionGraph(oWFN * _PN) 
 interactionGraph::interactionGraph(oWFN* _PN) :
     CommunicationGraph(_PN) {
 }
 
 
-//! \fn interactionGraph::~interactionGraph() 
 //! \brief destructor !to be implemented!
+//! \fn interactionGraph::~interactionGraph() 
 interactionGraph::~interactionGraph() {
 }
 
 
-//! \fn void interactionGraph::buildGraph()
 //! \brief builds the graph starting with the root node
+//! \fn void interactionGraph::buildGraph()
 void interactionGraph::buildGraph() {
 
     PN->setOfStatesTemp.clear();
@@ -74,9 +74,9 @@ void interactionGraph::buildGraph() {
 }
 
 
-//! \fn void interactionGraph::buildGraph(GraphNode * node)
-//! \param node current node of the graph
 //! \brief builds up the graph recursively
+//! \param node current node of the graph
+//! \fn void interactionGraph::buildGraph(GraphNode * node)
 void interactionGraph::buildGraph(GraphNode* currentNode, double progress_plus) {
 
     // at this point, the states inside the current node node are already computed!
@@ -242,19 +242,19 @@ void interactionGraph::buildGraph(GraphNode* currentNode, double progress_plus) 
     trace(TRACE_1, "\t\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()) + "\n");
 }
 
+//! \brief adding a new GraphNode/ edge to the graph
+//!        if the graph already contains nodes, we first search the graph for a node that matches 
+//!        the new node if we did not find a node, we add the new node to the graph (here we add 
+//!        the new node to the successor node list of the current graph and add the current node 
+//!        to the list of predecessor nodes of the new node; after that the current GraphNode 
+//!        becomes to be the new node)
+//!        if we actually found a node matching the new one, we just create an edge between the 
+//!        current node and the node we have just found, the found one gets the current node as 
+//!        a predecessor node
 //! \param sourceNode a reference to the father of toAdd (needed for implicitly adding the edge, too)
 //! \param toAdd a reference to the GraphNode that is to be added to the graph
 //! \param messages the label of the edge between the current GraphNode and the one to be added
 //! \param type the type of the edge (SENDING, RECEIVING)
-//! \brief adding a new GraphNode/ edge to the graph
-//!
-//! if the graph already contains nodes, we first search the graph for a node that matches the new node
-//! if we did not find a node, we add the new node to the graph (here we add the new node to the
-//! successor node list of the current graph and add the current node to the list of predecessor nodes
-//! of the new node; after that the current GraphNode becomes to be the new node)
-//!
-//! if we actually found a node matching the new one, we just create an edge between the current node
-//! and the node we have just found, the found one gets the current node as a predecessor node
 bool interactionGraph::addGraphNode(GraphNode* sourceNode,
                                     GraphNode* toAdd,
                                     messageMultiSet messages,
@@ -356,12 +356,12 @@ bool interactionGraph::addGraphNode(GraphNode* sourceNode,
 }
 
 
-//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, GraphEdgeType typeOfPlace)
+//! \brief checks whether the set of input messages contains at least one input message
+//!        that has been sent at its maximum
 //! \param messages
 //! \param currentNode the node from which the input event is to be sent
 //! \param typeOfPlace
-//! \brief checks whether the set of input messages contains at least one input message
-//! that has been sent at its maximum
+//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, GraphNode * currentNode, GraphEdgeType typeOfPlace)
 bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
                                           GraphNode* currentNode,
                                           GraphEdgeType typeOfPlace) {
@@ -434,11 +434,11 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
 }
 
 
-//! \fn void interactionGraph::getActivatedEventsComputeCNF(GraphNode * node, setOfMessages & inputMessages, setOfMessages & outputMessages) {
+//! \brief creates a list of all activated sending and receiving events (input messages and output messages) of the current node
 //! \param node the node for which the activated input events are calculated
 //! \param inputMessages the set of input messages (sending events) that are activated in the current node 
 //! \param outputMessages the set of output messages (receiving events) that are activated in the current node 
-//! \brief creates a list of all activated sending and receiving events (input messages and output messages) of the current node
+//! \fn void interactionGraph::getActivatedEventsComputeCNF(GraphNode * node, setOfMessages & inputMessages, setOfMessages & outputMessages) {
 void interactionGraph::getActivatedEventsComputeCNF(GraphNode* node,
                                                     setOfMessages& inputMessages,
                                                     setOfMessages& outputMessages) {
@@ -586,10 +586,10 @@ void interactionGraph::getActivatedEventsComputeCNF(GraphNode* node,
 }
 
 
+//! \brief calculates the set of successor states in case of an input message
 //! \param input (multi) set of input messages
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
-//! \brief calculates the set of successor states in case of an input message
 void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
                                                 GraphNode* node,
                                                 GraphNode* newNode) {
@@ -647,10 +647,10 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
 }
 
 
+//! \brief calculates the set of successor states in case of an output message
 //! \param receivingEvent the output messages that are taken from the marking
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
-//! \brief calculates the set of successor states in case of an output message
 void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivingEvent,
                                                  GraphNode* node,
                                                  GraphNode* newNode) {
@@ -723,12 +723,12 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 // reduction rules
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-//! \fn setOfMessages interactionGraph::combineReceivingEvents(GraphNode * node, setOfMessages & inputMessages)
+//! \brief creates a list of all receiving events of the current node and creates the set of
+//!	       sending events applies the reduction rules: "combine receiving events" and 
+//!        "receiving before sending"
 //! \param node the node for which the activated receiving and sending events are calculated
 //! \param sendingEvents set of sending events that are activated in the current node
-//! \brief creates a list of all receiving events of the current node and creates the set of
-//!			sending events
-//!			applies the reduction rules: "combine receiving events" and "receiving before sending"
+//! \fn setOfMessages interactionGraph::combineReceivingEvents(GraphNode * node, setOfMessages & inputMessages)
 setOfMessages interactionGraph::combineReceivingEvents(GraphNode* node,
                                                        setOfMessages& sendingEvents) {
 

@@ -43,6 +43,7 @@ class oWFN;
 class interactionGraph : public CommunicationGraph {
 
     private:
+        /// adds a node and its connecting edge
         bool addGraphNode(GraphNode*,
                           GraphNode*,
                           messageMultiSet,
@@ -56,20 +57,38 @@ class interactionGraph : public CommunicationGraph {
         NEW_OPERATOR(interactionGraph)
 #define new NEW_NEW
 
+        /// conrtructor
         interactionGraph(oWFN*);
+        
+        /// basic deconstructor
         ~interactionGraph();
 
+        /// checks whether the set of input messages contains at least one input message
+        /// that has been sent at its maximum
         bool checkMaximalEvents(messageMultiSet, GraphNode*, GraphEdgeType);
 
+        /// Builds the IG of the associated PN starting with the root node
         void buildGraph();
+
+        /// Builds the IG of the associated PN recursively
         void buildGraph(GraphNode*, double);
 
+        /// creates a list of all activated sending and receiving events (input messages 
+        /// and output messages) of the current node
         void getActivatedEventsComputeCNF(GraphNode*, setOfMessages&, setOfMessages&);
 
+        /// calculates the set of successor states in case of an input message
         void calculateSuccStatesSendingEvent(messageMultiSet, GraphNode*, GraphNode*);
+
+        /// calculates the set of successor states in case of an output message
         void calculateSuccStatesReceivingEvent(messageMultiSet, GraphNode*, GraphNode*);
 
+        /// creates a list of all receiving events of the current node and creates the set of
+        /// sending events applies the reduction rules: "combine receiving events" and 
+        /// "receiving before sending"
         setOfMessages combineReceivingEvents(GraphNode*, setOfMessages&);
+        
+        /// not yet implemented
         setOfMessages receivingBeforeSending(GraphNode*);
 
 };

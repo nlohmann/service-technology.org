@@ -114,52 +114,81 @@ oWFN::~oWFN() {
 }
 
 
+//! \brief returns the number of places
+//! \return number of places
 oWFN::Places_t::size_type oWFN::getPlaceCount() const {
     return Places.size();
 }
 
 
+//! \brief returns the place at a given index
+//! \param i index of the place
+//! \return the indicated place
 owfnPlace* oWFN::getPlace(Places_t::size_type i) const {
     return Places[i];
 }
 
 
+//! \brief returns the number of transitions
+//! \return number of transitions
 oWFN::Transitions_t::size_type oWFN::getTransitionCount() const {
     return Transitions.size();
 }
 
 
+//! \brief returns the transition at a given index
+//! \param i index of the transition
+//! \return the indicated transition
 owfnTransition* oWFN::getTransition(Transitions_t::size_type i) const {
     return Transitions[i];
 }
 
 
+//! \brief returns the number of input places
+//! \return number of input places
 oWFN::Places_t::size_type oWFN::getInputPlaceCount() const {
     return inputPlaces.size();
 }
 
 
+//! \brief returns the input place at a given index
+//! \param i index of the input place
+//! \return the indicated input place
 owfnPlace* oWFN::getInputPlace(Places_t::size_type i) const {
     return inputPlaces[i];
 }
 
 
+//! \brief returns the number of output places
+//! \return number of output places
 oWFN::Places_t::size_type oWFN::getOutputPlaceCount() const {
     return outputPlaces.size();
 }
 
+//! \brief returns the output place at a given index
+//! \param i index of the output place
+//! \return the indicated output place
 owfnPlace* oWFN::getOutputPlace(Places_t::size_type i) const {
     return outputPlaces[i];
 }
 
+//! \brief returns the index of a given place
+//! \param Place the place to look for
+//! \return i index of the given place
 oWFN::Places_t::size_type oWFN::getPlaceIndex(owfnPlace *Place) {
     return(PlaceIndices[Place]);
 }
 
+//! \brief returns the index of a given input place
+//! \param Place the input place to look for
+//! \return i index of the given input place
 oWFN::Places_t::size_type oWFN::getInputPlaceIndex(owfnPlace *inputPlace) {
     return(inputPlaceIndices[inputPlace]);
 }
 
+//! \brief returns the index of a given output place
+//! \param Place the output place to look for
+//! \return i index of the given output place
 oWFN::Places_t::size_type oWFN::getOutputPlaceIndex(owfnPlace *outputPlace) {
     return(outputPlaceIndices[outputPlace]);
 }
@@ -217,14 +246,14 @@ void oWFN::initialize() {
     trace(TRACE_5, "oWFN::initialize(): end\n");
 }
 
-
+//! \brief checks for every transition if it is enabled
 void oWFN::checkEnablednessOfAllTransitions() {
     for (Transitions_t::size_type i = 0; i < getTransitionCount(); ++i) {
         getTransition(i)->check_enabled(this);
     }
 }
 
-
+//! \brief removes all isolated places
 void oWFN::removeisolated() {
     unsigned int i;
 
@@ -260,7 +289,8 @@ void oWFN::removeisolated() {
     }
 }
 
-
+//! \brief returns an array of transition pointers containing all enabled transition
+//! \return firelist
 owfnTransition ** oWFN::firelist() {
     owfnTransition** tl = new owfnTransition * [enabledTransitions.size() + 1];
     int i = 0;
@@ -276,6 +306,8 @@ owfnTransition ** oWFN::firelist() {
 }
 
 
+//! \brief returns an array of transition pointers containing all quasi enabled transition
+//! \return quasi firelist
 owfnTransition ** oWFN::quasiFirelist() {
     owfnTransition ** tl =
         new owfnTransition * [quasiEnabledTransitions.size() + 1];
@@ -293,9 +325,9 @@ owfnTransition ** oWFN::quasiFirelist() {
 }
 
 
+//! \brief decodes state, checks for message bound violation and adds successors recursively
 //! \param n the node to add the states to
 //! \param currentState the currently added state
-//! \brief decodes state, checks for message bound violation and adds successors recursively
 void oWFN::addSuccStatesToList(GraphNode* n, State * currentState) {
 
     assert(n != NULL);
@@ -340,11 +372,11 @@ void oWFN::addSuccStatesToList(GraphNode* n, State * currentState) {
 }
 
 
+//! \brief decodes state, checks for message bound violation and adds successors recursively
 //! \param stateSet 
 //! \param outputPlace
 //! \param currentState
 //! \param n
-//! \brief decodes state, checks for message bound violation and adds successors recursively
 void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
                                        owfnPlace * outputPlace,
                                        State * currentState,
@@ -379,11 +411,11 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
 }
 
 
+//! \brief decodes state, checks for message bound violation and adds successors recursively
 //! \param stateSet
 //! \param messages  
 //! \param currentState
 //! \param n
-//! \brief decodes state, checks for message bound violation and adds successors recursively
 void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
                                        messageMultiSet messages,
                                        State * currentState,
@@ -435,8 +467,8 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
 }
 
 
-//! \return returns true iff current marking VIOLATES message bound
 //! \brief checks if message bound is violated by the current marking (for interface places only)
+//! \return returns true iff current marking VIOLATES message bound
 bool oWFN::violatesMessageBound() {
     trace(TRACE_5, "oWFN::checkMessageBound(): start\n");
     // test marking of current state if message bound k reached
@@ -470,6 +502,8 @@ bool oWFN::violatesMessageBound() {
 }
 
 
+//! \brief Adds recursively the State s and all its successor states to setOfStatesTemp.
+//! \param s state to start at
 void oWFN::addRecursivelySuccStatesToSetOfTempStates(State* s) {
     trace(TRACE_5,
           "oWFN::addRecursivelySuccStatesToSetOfTempStates(State* s): start\n");
@@ -486,7 +520,8 @@ void oWFN::addRecursivelySuccStatesToSetOfTempStates(State* s) {
           "oWFN::addRecursivelySuccStatesToSetOfTempStates(State* s): end\n");
 }
 
-
+//! \brief Copies the current marking and returns it
+//! \return marking as an array of unsigned integers
 unsigned int * oWFN::copyCurrentMarking() {
     unsigned int * copy = new unsigned int [getPlaceCount()];
 
@@ -497,6 +532,8 @@ unsigned int * oWFN::copyCurrentMarking() {
 }
 
 
+//! \brief Copies a given marking to replace the current one
+//! \param copy marking as an array of unsigned integers
 void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 
     for (unsigned int i = 0; i < getPlaceCount(); i++) {
@@ -505,8 +542,8 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 }
 
 
-//! \param n the node to be calculated in case of an output event
 //! \brief calculates the reduced set of states of the new GraphNode in case of an output event
+//! \param n the node to be calculated in case of an output event
 void oWFN::calculateReachableStatesOutputEvent(GraphNode* n) {
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(GraphNode * n): start\n");
@@ -656,9 +693,9 @@ void oWFN::calculateReachableStatesOutputEvent(GraphNode* n) {
 }
 
 
-//! \param n the node to be calculated in case of an input event
 //! \brief calculates the reduced set of states of the new GraphNode in case of an input event
-// for IG with node reduction
+//!        for IG with node reduction
+//! \param n the node to be calculated in case of an input event
 void oWFN::calculateReachableStatesInputEvent(GraphNode* n) {
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(GraphNode * n): start\n");
@@ -810,12 +847,12 @@ void oWFN::calculateReachableStatesInputEvent(GraphNode* n) {
 }
 
 
+//! \brief calculates the set of states reachable from the current marking and stores them in the new GraphNode
+//!        this function is for the full IG and the OG since a single output place is considered
+//!        for OG or full IG
 //! \param stateSet set of states
 //! \param outputPlace the output place of the net that is associated with the receiving event for which the new GraphNode is calculated
 //! \param n new GraphNode 
-//! \brief calculates the set of states reachable from the current marking and stores them in the new GraphNode
-//! this function is for the full IG and the OG since a single output place is considered
-//  for OG or full IG
 void oWFN::calculateReachableStates(StateSet& stateSet,
                                     owfnPlace * outputPlace,
                                     GraphNode* n) {
@@ -1002,12 +1039,12 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
 }
 
 
+//! \brief calculates the set of states reachable from the current marking and stores them in the new GraphNode
+//!        this function is for the IG only since a multiset of output places is considered
+//!        for IG
 //! \param stateSet set of states
 //! \param messages the event(s) for which the new GraphNode's EG is calculated
 //! \param n new GraphNode 
-//! \brief calculates the set of states reachable from the current marking and stores them in the new GraphNode
-//! this function is for the IG only since a multiset of output places is considered
-//  for IG
 void oWFN::calculateReachableStates(StateSet& stateSet,
                                     messageMultiSet messages,
                                     GraphNode* n) {
@@ -1249,10 +1286,10 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
 }
 
 
-//! \param n the node for which the reachability graph is computed
 //! \brief NO REDUCTION! calculate all reachable states from the current marking
-//! and store them in the node n (== GraphNode of CommunicationGraph);
-//! it will color the node n RED if a given message bound is violated
+//!        and store them in the node n (== GraphNode of CommunicationGraph);
+//!        it will color the node n RED if a given message bound is violated
+//! \param n the node for which the reachability graph is computed
 void oWFN::calculateReachableStatesFull(GraphNode* n) {
 
     // calculates the EG starting at the current marking
@@ -1429,8 +1466,8 @@ void oWFN::calculateReachableStatesFull(GraphNode* n) {
 }
 
 
-//! \param message message to be added to the currentmarking
 //! \brief adds input message to the current marking
+//! \param message message to be added to the currentmarking
 void oWFN::addInputMessage(unsigned int message) {
 
     CurrentMarking[message]++;
@@ -1445,8 +1482,8 @@ void oWFN::addInputMessage(unsigned int message) {
 }
 
 
-//! \param messages multiset of messages to be added to the currentmarking
 //! \brief adds input messages to the current marking
+//! \param messages multiset of messages to be added to the currentmarking
 void oWFN::addInputMessage(messageMultiSet messages) {
     for (messageMultiSet::iterator iter = messages.begin(); iter
             != messages.end(); iter++) {
@@ -1464,11 +1501,14 @@ void oWFN::addInputMessage(messageMultiSet messages) {
 }
 
 
+//! \brief calls the printMarking() function with the current marking
 void oWFN::printCurrentMarking() const {
     printMarking(CurrentMarking);
 }
 
 
+// \brief prints a given marking to cout
+//! \param marking marking to be printed
 void oWFN::printMarking(unsigned int * marking) const {
     cout << "---------------------------------------------------------------"
          << endl;
@@ -1479,6 +1519,12 @@ void oWFN::printMarking(unsigned int * marking) const {
 }
 
 
+//! \brief Returns the label of the given marking, that means the label
+//!        consists of the names of the places of the net that have tokens
+//!        (is a multiset => occurance of name == number of tokens used in
+//!        dotFile creation (CommunicationGraph::printGraphToDot).
+//! \param marking The marking to be printed out.
+//! \return the string to be printed
 string oWFN::getMarkingAsString(unsigned int * marking) const {
     bool comma = false;
     string buffer = "";
@@ -1504,12 +1550,16 @@ string oWFN::getMarkingAsString(unsigned int * marking) const {
     return buffer;
 }
 
-
+//! \brief Returns the label of the CurrentMarking. See
+//!        getMarkingAsString() for more information.
+//! \return the string to be printed
 string oWFN::getCurrentMarkingAsString() const {
     return getMarkingAsString(CurrentMarking);
 }
 
 
+//! \brief DESCRIPTION
+//! \param b DESCRIPTION
 void oWFN::print_binDec(int h) {
 
     for (unsigned int i=0; i < getPlaceCount(); i++) {
@@ -1521,6 +1571,9 @@ void oWFN::print_binDec(int h) {
 }
 
 
+//! \brief DESCRIPTION
+//! \param b DESCRIPTION
+//! \param indent DESCRIPTION
 void oWFN::print_binDec(binDecision * d, int indent) {
     int i;
     // print bin decision table at hash entry h
@@ -1547,11 +1600,16 @@ void oWFN::print_binDec(binDecision * d, int indent) {
 }
 
 
+//! \brief returns the place hash value
+//! \return place hash value
 unsigned int oWFN::getPlaceHashValue() {
     return placeHashValue;
 }
 
 
+//! \brief adds a given transition to the owfn
+//! \param transition transition to be added
+//! \return returns true, if the transition was successfully added, else false
 bool oWFN::addTransition(owfnTransition* transition) {
     for (Transitions_t::size_type i = 0; i != Transitions.size(); ++i) {
         if (getTransition(i)->name == transition->name)
@@ -1567,6 +1625,8 @@ bool oWFN::addTransition(owfnTransition* transition) {
 }
 
 
+//! \brief adds a given place to the owfn
+//! \param place place to be added
 void oWFN::addPlace(owfnPlace *place) {
     if (place->type == INPUT) {
         inputPlaceIndices[place] = inputPlaces.size();
@@ -1584,10 +1644,10 @@ void oWFN::addPlace(owfnPlace *place) {
 }
 
 
-//! \param message name of message to be deleted from currentmarking
 //! \brief removes an output message from the current marking,
-//! if an output place was found, the marking on that place is
-//! decreased by one and the function returns true
+//!        if an output place was found, the marking on that place is
+//!        decreased by one and the function returns true
+//! \param message name of message to be deleted from currentmarking
 bool oWFN::removeOutputMessage(unsigned int message) {
 
     if (CurrentMarking[message] > 0) {
@@ -1604,10 +1664,10 @@ bool oWFN::removeOutputMessage(unsigned int message) {
 }
 
 
-//! \param messages multiset of messages to be deleted from currentmarking
 //! \brief removes output messages from the current marking,
-//! if an output place was found, the marking on that place is
-//! decreased by one and the function returns 1
+//!        if an output place was found, the marking on that place is
+//!        decreased by one and the function returns 1
+//! \param messages multiset of messages to be deleted from currentmarking
 bool oWFN::removeOutputMessage(messageMultiSet messages) {
     unsigned int found = 0;
 
@@ -1633,6 +1693,7 @@ bool oWFN::removeOutputMessage(messageMultiSet messages) {
 
 
 //! \brief returns type of state: {TRANS, DEADLOCK, FINALSTATE, NN}
+//! \return state type
 stateType oWFN::typeOfState() {
     trace(TRACE_5, "oWFN::typeOfState() : start\n");
     if (isFinal()) { // state is final
@@ -1651,7 +1712,8 @@ stateType oWFN::typeOfState() {
 
 
 //! \brief checks if the current marking satisfies final condition or final marking, resp.
-//! if a final condition is given, a possible final marking is ignored
+//!        if a final condition is given, a possible final marking is ignored
+//! \return if the owfn is currently in a final state
 bool oWFN::isFinal() const {
     trace(TRACE_5, "bool oWFN::isFinal() : start\n");
     if (FinalCondition) {
@@ -1676,7 +1738,9 @@ bool oWFN::isFinal() const {
     }
 }
 
-
+//! \brief creates a label from a message multi set
+//! \param m messageMultiSet
+//! \return the created label
 string oWFN::createLabel(messageMultiSet m) const {
     string label;
     bool comma = false;
@@ -1695,6 +1759,12 @@ string oWFN::createLabel(messageMultiSet m) const {
 }
 
 
+//! \brief Matches this oWFN with the given operating guideline (OG).
+//! \param og Operating guideline against this oWFN should be matched.
+//! \param reasonForFailedMatch In case of a failed match, holds a text
+//!        describing why the matching failed.
+//! \return true If this oWFN matches with given OG.
+//!         retval false Otherwise.
 bool oWFN::matchesWithOG(const AnnotatedGraph* og, string& reasonForFailedMatch) {
     // Check whether the initial marking violates the message bound and exit
     // with an error message if it does.
@@ -1732,6 +1802,13 @@ bool oWFN::matchesWithOG(const AnnotatedGraph* og, string& reasonForFailedMatch)
 }
 
 
+//! \brief helper for matchesWithOG
+//! \param currentOGNode current node in the OG, so we know where we are
+//! \param currentState current oWFN state
+//! \param reasonForFailedMatch In case of a failed match, holds a text
+//!        describing why the matching failed.
+//! \return true If this oWFN matches with given OG.
+//!         false Otherwise.
 bool oWFN::matchesWithOGRecursive(GraphNode* currentOGNode,
                                   State* currentState,
                                   string& reasonForFailedMatch) {
@@ -1944,6 +2021,17 @@ bool oWFN::matchesWithOGRecursive(GraphNode* currentOGNode,
 }
 
 
+//! \brief Creates an assignment for the given state of the oWFN used in the
+//!        matching algorithm. In this assignment the labels of transitions
+//!        leaving the given state are used as propositions and all transitions
+//!        that are enabled are assigned to true. Furthermore the proposition
+//!        'final' is assigned to true iff the given state is a final state.
+//!        All other propositions are implicetly taken to be false. This
+//!        implicit behaviour should be (and is) implemented by the class
+//!        GraphFormulaAssignment.
+//! \param currentState The state of this oWFN an assignment should be
+//!        created for.
+//! \return returns The above described assignment for the given state.
 GraphFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const State* currentState) const {
     GraphFormulaAssignment assignment;
 
@@ -1964,6 +2052,8 @@ GraphFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const State* cu
 // ****************** Implementation of Stubborn Set Calculation *******************
 #ifdef STUBBORN
 
+//! \brief DESCRIPTION		
+//! \param net DESCRIPTION
 void stubbornclosure(oWFN * net) {
     owfnTransition * current;
 
@@ -1987,7 +2077,9 @@ void stubbornclosure(oWFN * net) {
     }
 }
 
-
+//! \brief DESCRIPTION		
+//! \param net DESCRIPTION
+//! \param t DESCRIPTION
 void stubborninsert(oWFN * net, owfnTransition* t) {
     if (t -> instubborn) {
         return;
@@ -2003,8 +2095,8 @@ void stubborninsert(oWFN * net, owfnTransition* t) {
 }
 
 
-//! \param mess output message that is to be received
 //! \brief returns transitions to be fired for reduced state space for message successors		
+//! \param mess output message that is to be received
 owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess) {
 
     trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): begin\n");
@@ -2040,8 +2132,8 @@ owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess) {
 }
 
 
-//! \param messages multiset of output messages that are to be received
 //! \brief returns transitions to be fired for reduced state space for messages successors
+//! \param messages multiset of output messages that are to be received
 owfnTransition ** oWFN::stubbornfirelistmessage(messageMultiSet messages) {
 
     trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): begin\n");
@@ -2097,6 +2189,8 @@ owfnTransition ** oWFN::stubbornfirelistmessage(messageMultiSet messages) {
 
 unsigned int StubbStamp = 0;
 
+//! \brief DESCRIPTION		
+//! \param PN DESCRIPTION
 void NewStubbStamp(oWFN * PN) {
     if (StubbStamp < UINT_MAX) {
         StubbStamp ++;
@@ -2110,6 +2204,8 @@ void NewStubbStamp(oWFN * PN) {
 
 
 #define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
+//! \brief DESCRIPTION		
+//! \return DESCRIPTION
 owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
     trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): start\n");
 
@@ -2223,6 +2319,9 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
 #endif
 
 
+//! \brief adds a place to a port
+//! \param place place to be added
+//! \param port port to be added to
 void oWFN::add_place_to_port(owfnPlace *place, std::string port) {
     assert(place != NULL);
 
@@ -2232,12 +2331,15 @@ void oWFN::add_place_to_port(owfnPlace *place, std::string port) {
 }
 
 
+//! \brief returns the number of ports
+//! \return number of ports
 unsigned int oWFN::getPortCount() const {
     return ports.size();
 }
 
 
 //! \brief returns this net as an PNapi net
+//! \return PNapi version of the owfn
 PNapi::PetriNet* oWFN::returnPNapiNet() {
 
     PNapi::PetriNet* PN = new PNapi::PetriNet();
@@ -2311,11 +2413,13 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
 }
 
 
-/*!
- * \note  This function is implemented just for the functionality and not for
- *        any performance issues. As long as I don't know which functions I
- *        need, I will program with such stubs.
- */
+//! \brief returns the port of the interface place identified by a label
+//! \param label label to be found at a port
+//! \return a port with the corresponding label
+//! \note  This function is implemented just for the functionality and not for
+//!        any performance issues. As long as I don't know which functions I
+//!        need, I will program with such stubs.
+
 std::string oWFN::getPortForLabel(std::string label) const {
     for (map<std::string, Places_t>::const_iterator port = ports.begin(); port
             != ports.end(); port++) {
@@ -2331,11 +2435,12 @@ std::string oWFN::getPortForLabel(std::string label) const {
 }
 
 
-/*!
- * \note  This function is implemented just for the functionality and not for
- *        any performance issues. As long as I don't know which functions I
- *        need, I will program with such stubs.
- */
+//! \brief returns the port identified by its name
+//! \param label name of the port
+//! \return port with the given name
+//! \note  This function is implemented just for the functionality and not for
+//!        any performance issues. As long as I don't know which functions I
+//!        need, I will program with such stubs.
 std::set<std::string> oWFN::getPort(std::string name) const {
     Places_t places = ports.find(name)->second;
     set<string> temp;

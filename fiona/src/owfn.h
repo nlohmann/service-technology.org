@@ -62,120 +62,122 @@ class GraphFormulaAssignment;
 class oWFN {
     // first public typedefs, then private members, then public methods
     public:
-        //! Type of the container holding all transitions of this oWFN.
+        /// Type of the container holding all transitions of this oWFN.
         typedef std::vector<owfnTransition*> Transitions_t;
 
-        //! Type of the container holding all enabled transitions of this oWFN.
+        /// Type of the container holding all enabled transitions of this oWFN.
         typedef SList<owfnTransition*> EnabledTransitions;
 
-        /**
-         * Type of the container holding all quasi enabled transitions of this
-         * oWFN.
-         */
+        /// Type of the container holding all quasi enabled transitions of this
+        /// oWFN.
         typedef SList<owfnTransition*> QuasiEnabledTransitions;
 
-        //! Type of the containers holding all places of this oWFN.
+        /// Type of the containers holding all places of this oWFN.
         typedef std::vector<owfnPlace*> Places_t;
 
     private:
         unsigned int CurrentCardFireList;
         unsigned int CurrentCardQuasiFireList;
 
-        //! array of places
+        /// array of places
         Places_t Places;
         Places_t inputPlaces;
         Places_t outputPlaces;
 
-        //! associates places with their corresponding index in the place set
+        /// associates places with their corresponding index in the place set
         std::map<owfnPlace *, Places_t::size_type> PlaceIndices;
 
-        //! associates input places with their corresponding index in the input set
+        /// associates input places with their corresponding index in the input set
         std::map<owfnPlace *, Places_t::size_type> inputPlaceIndices;
 
-        //! associates output places with their corresponding index in the output set 
+        /// associates output places with their corresponding index in the output set 
         std::map<owfnPlace *, Places_t::size_type> outputPlaceIndices;
 
-        //! the ports
+        /// the ports
         std::map<std::string, Places_t> ports;
 
-        //! Contains all transitions of this oWFN.
+        /// Contains all transitions of this oWFN.
         Transitions_t Transitions;
 
+        /// returns an array of transition pointers containing all enabled transition
         owfnTransition** firelist();
 
-        /**
-         * helper for matchesWithOG
-         *
-         * @param currentOGNode current node in the OG, so we know where we are
-         * @param currentState current oWFN state
-         * @param reasonForFailedMatch In case of a failed match, holds a text
-         *     describing why the matching failed.
-         *
-         * @retval true If this oWFN matches with given OG.
-         * @retval false Otherwise.
-         */
+        /// helper for matchesWithOG
         bool matchesWithOGRecursive(GraphNode* currentOGNode,
                                     State* currentState,
                                     string& reasonForFailedMatch);
 
     public:
+        /// basic constructor
         oWFN();
+        
+        /// basic deconstructor
         ~oWFN();
 
         string filename;
 
+        /// returns an array of transition pointers containing all quasi enabled transition
         owfnTransition ** quasiFirelist();
+        
+        /// we want to store some the states calculated temporarily in a new binDecision structure
+        binDecision * tempBinDecision; 
 
-        binDecision * tempBinDecision; // we want to store some the states calculated temporarily in a new binDecision structure
+        /// activated input messages of current node
+        setOfMessages inputMessages; 
+        
+        /// activated output messages of current node
+        setOfMessages outputMessages; 
 
-        setOfMessages inputMessages; //!< activated input messages of current node
-        setOfMessages outputMessages; //!< activated output messages of current node
+        /// this set contains all states of the newly calculated node
+        StateSet setOfStatesTemp; 
+        
+        /// in case of state reduction, remember those state that we have visited so far by calculating the new node
+        StateSet visitedStates; 
 
-        StateSet setOfStatesTemp; //!< this set contains all states of the newly calculated node
-        StateSet visitedStates; //!< in case of state reduction, remember those state that we have visited so far by calculating the new node
+        /// calls the check_enabled function for all transitions
+        void checkEnablednessOfAllTransitions();
 
-        void checkEnablednessOfAllTransitions(); //!< calls the check_enabled function for all transitions
-
-        //! returns the number of all places of the net
+        /// returns the number of all places of the net
         Places_t::size_type getPlaceCount() const;
 
-        //! Get owfnPlace from index i. Indices start at 0. Get the total number
-        //! of owfnPlaces from getPlaceCount().
-
+        /// Get owfnPlace from index i. Indices start at 0. Get the total number
+        /// of owfnPlaces from getPlaceCount().
         owfnPlace* getPlace(Places_t::size_type i) const;
 
-        //! Returns the number of transitions this oWFN has.
+        /// Returns the number of transitions this oWFN has.
         Transitions_t::size_type getTransitionCount() const;
 
-        //! Return transition with index i of this oWFN. Indices start at 0.
-        //! Get the total number of transitions by getTransitionCount().
+        /// Return transition with index i of this oWFN. Indices start at 0.
+        /// Get the total number of transitions by getTransitionCount().
         owfnTransition* getTransition(Transitions_t::size_type i) const;
 
+        /// returns the place hash value
         unsigned int getPlaceHashValue();
 
-        //! returns the number of input places of the net.
+        /// returns the number of input places of the net.
         Places_t::size_type getInputPlaceCount() const;
 
-        //! Get an input owfnPlace from index i. Indices start at 0. Get the
-        //! total number of input owfnPlaces from getInputPlaceCount().
+        /// Get an input owfnPlace from index i. Indices start at 0. Get the
+        /// total number of input owfnPlaces from getInputPlaceCount().
         owfnPlace* getInputPlace(Places_t::size_type i) const;
 
-        //! returns the number of output places of the net.
+        /// returns the number of output places of the net.
         Places_t::size_type getOutputPlaceCount() const;
 
-        //! Get an output owfnPlace from index i. Indices start at 0. Get the
-        //! total number of output owfnPlaces from getOutputPlaceCount().
+        /// Get an output owfnPlace from index i. Indices start at 0. Get the
+        /// total number of output owfnPlaces from getOutputPlaceCount().
         owfnPlace* getOutputPlace(Places_t::size_type i) const;
 
-        //! Get the index of Place in the place set
+        /// Get the index of Place in the place set
         Places_t::size_type getPlaceIndex(owfnPlace *Place);
 
-        //! Get the index of inputPlace in the input place set
+        /// Get the index of inputPlace in the input place set
         Places_t::size_type getInputPlaceIndex(owfnPlace *inputPlace);
 
-        //! Get the index of outputPlace in the output place set
+        /// Get the index of outputPlace in the output place set
         Places_t::size_type getOutputPlaceIndex(owfnPlace *outputPlace);
 
+        /// DESCRIPTION
         unsigned int getCardFireList();
 
         binDecision ** binHashTable;
@@ -190,47 +192,57 @@ class oWFN {
         unsigned int placeHashValue;
         long int BitVectorSize;
 
-        /** List of quasi enabled transitions. */
+        /// List of quasi enabled transitions.
         QuasiEnabledTransitions quasiEnabledTransitions;
 
-        /** Real enabled transitions. */
+        /// Real enabled transitions.
         EnabledTransitions enabledTransitions;
 
         // **** Definitions for Stubborn set calculations
 #ifdef STUBBORN
-        owfnTransition * StartOfStubbornList; // anchor to linked list of ...
-        owfnTransition * EndOfStubbornList; // ... transitions in stubborn set
-        unsigned int NrStubborn; // # of activated (!) elements in stubborn set
-        owfnTransition * TarjanStack; // Stubborn Set Calculation involves ...
-        owfnTransition * CallStack; // ... SCC investigation on a graph of tr.
+        /// anchor to linked list of ...
+        owfnTransition * StartOfStubbornList; 
+        
+        /// ... transitions in stubborn set
+        owfnTransition * EndOfStubbornList; 
+        
+        /// # of activated (!) elements in stubborn set
+        unsigned int NrStubborn; 
+        
+        /// Stubborn Set Calculation involves ...
+        owfnTransition * TarjanStack; 
+        
+        /// ... SCC investigation on a graph of tr.
+        owfnTransition * CallStack; 
 
-        owfnTransition ** stubbornfirelistdeadlocks(); // returns transitions to be fired for
+        /// returns transitions to be fired for
+        owfnTransition ** stubbornfirelistdeadlocks(); 
 
+        /// returns transitions to be fired for
+        /// reduced state space for message (or messages)
+        /// successors
         owfnTransition ** stubbornfirelistmessage(owfnPlace *);
         owfnTransition ** stubbornfirelistmessage(messageMultiSet);
-        // returns transitions to be fired for
-        // reduced state space for message (or messages)
-        // successors
 #endif
 
         void initialize(); // initializes the net
 
-        /**
-         * Adds an owfnTransition to this oWFN.
-         * @retval true Method succeeded.
-         * @retval false Method failed. The given transition was not added,
-         *     because the oWFN already contains an owfnTransition with the
-         *     same name.
-         */
+        /// Adds an owfnTransition to this oWFN.
         bool addTransition(owfnTransition* transition);
 
+        /// Adds an owfnPlace to this oWFN.
         void addPlace(owfnPlace*);
 
+        /// decodes state, checks for message bound violation and adds successors
         void addSuccStatesToList(GraphNode*, State*);
+        
+        /// decodes state, checks for message bound violation and adds successors recursively
         void addSuccStatesToListStubborn(StateSet&,
                                          owfnPlace*,
                                          State*,
                                          GraphNode*);
+
+        /// decodes state, checks for message bound violation and adds successors recursively
         void addSuccStatesToListStubborn(StateSet&,
                                          messageMultiSet,
                                          State*,
@@ -238,98 +250,83 @@ class oWFN {
 
         // void addSuccStatesToListOrig(GraphNode *, State *);		
 
+        /// checks whether the message bound is violated
         bool violatesMessageBound();
 
-        /**
-         * Adds recursively the State s and all its successor states to
-         * setOfStatesTemp.
-         */
+        /// Adds recursively the State s and all its successor states to setOfStatesTemp.
         void addRecursivelySuccStatesToSetOfTempStates(State* s);
 
+        /// calculates and returns the next state
         State* calculateNextSate();
 
+        /// returns a copy of the current marking
         unsigned int* copyCurrentMarking();
+        
+        /// replaces the current marking with a given one
         void copyMarkingToCurrentMarking(unsigned int* copy);
+        
+        /// calculates the reduced set of states of the new GraphNode in case of an output event
         void calculateReachableStatesOutputEvent(GraphNode*);
+
+        /// calculates the reduced set of states of the new GraphNode in case of an input event
         void calculateReachableStatesInputEvent(GraphNode*);
+        
+        /// calculates the set of states reachable from the current marking and stores them in the new GraphNode
         void calculateReachableStates(StateSet&, owfnPlace*, GraphNode*);
         void calculateReachableStates(StateSet&, messageMultiSet, GraphNode*);
 
+        /// NO REDUCTION! calculate all reachable states from the current marking
+        /// and store them in the node n (== GraphNode of CommunicationGraph)
         void calculateReachableStatesFull(GraphNode*);
 
+        /// adds input message to the current marking
         void addInputMessage(unsigned int);
-        void addInputMessage(messageMultiSet); // adds input message to the current marking
+        
+        /// adds input messages to the current marking
+        void addInputMessage(messageMultiSet);
 
+        /// removes an output message from the current marking
         bool removeOutputMessage(unsigned int);
+
+        /// removes output messages from the current marking
         bool removeOutputMessage(messageMultiSet);
 
-        stateType typeOfState(); // returns the type of state (transient, maximal, minimal)
+        /// returns the type of state (transient, maximal, minimal)
+        stateType typeOfState(); 
 
-        /**
-         * Returns the label of the given marking, that means the label
-         * consists of the names of the places of the net that have tokens
-         * (is a multiset => occurance of name == number of tokens used in
-         * dotFile creation (CommunicationGraph::printGraphToDot).
-         *
-         * @param marking The marking to be printed out.
-         */
+        /// returns the given marking as a string
         std::string getMarkingAsString(unsigned int* marking) const;
 
-        /**
-         * Returns the label of the CurrentMarking. See
-         * getMarkingAsString() for more information.
-         */
+        /// returns the current marking as a string
         std::string getCurrentMarkingAsString() const;
 
-        //		bool isFinalMarking(unsigned int *);	// is the given marking == final marking of the net?
+        //		bool isFinalMarking(unsigned int *);	
+        
+        /// is the given marking == final marking of the net?
         bool isFinal() const; // does current marking satisfy final condition/final marking of the net?
 
-
-        /* print the net */
-
-        /** Prints the CurrentMarking. */
+        /// prints the current marking
         void printCurrentMarking() const;
 
-        /**
-         * Prints the given marking.
-         *
-         * @param marking Marking to be printed.
-         */
+        /// prints the given marking
         void printMarking(unsigned int * marking) const;
 
+        /// DESCRIPTION
         void print_binDec(int);
+
+        /// DESCRIPTION
         void print_binDec(binDecision *, int);
 
+        /// removes all isolated places
         void removeisolated();
 
+        /// creates a label from a message multiset
         std::string createLabel(messageMultiSet) const;
 
-        /**
-         * Matches this oWFN with the given operating guideline (OG).
-         *
-         * @param og Operating guideline against this oWFN should be matched.
-         * @param reasonForFailedMatch In case of a failed match, holds a text
-         *     describing why the matching failed.
-         *
-         * @retval true If this oWFN matches with given OG.
-         * @retval false Otherwise.
-         */
+        /// checks whether this owfn matches a given og and returns a reason if not so
         bool matchesWithOG(const AnnotatedGraph* og, string& reasonForFailedMatch);
 
-        /**
-         * Creates an assignment for the given state of the oWFN used in the
-         * matching algorithm. In this assignment the labels of transitions
-         * leaving the given state are used as propositions and all transitions
-         * that are enabled are assigned to true. Furthermore the proposition
-         * 'final' is assigned to true iff the given state is a final state.
-         * All other propositions are implicetly taken to be false. This
-         * implicit behaviour should be (and is) implemented by the class
-         * GraphFormulaAssignment.
-         *
-         * @param currentState The state of this oWFN an assignment should be
-         *     created for.
-         * @returns The above described assignment for the given state.
-         */
+        /// creates an assignment for the OG from a current state
         GraphFormulaAssignment makeAssignmentForOGMatchingForState(
                                        const State* currentState) const;
 

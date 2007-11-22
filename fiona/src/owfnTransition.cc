@@ -42,64 +42,84 @@
 #include "AnnotatedGraph.h"
 #include "GraphFormula.h"
 
-
+//! \brief constructor
 AdjacentPlace::AdjacentPlace(owfnPlace* place, unsigned int multiplicity) :
     place_(place), multiplicity_(multiplicity) {
 }
 
-
+//! \brief returns the owfn place of AdjacentPlace
+//! \return owfnPlace
 owfnPlace* AdjacentPlace::getOwfnPlace() const {
     return place_;
 }
 
 
+//! \brief returns the Multiplicity of AdjacentPlace
+//! \return multiplicity
 unsigned int AdjacentPlace::getMultiplicity() const {
     return multiplicity_;
 }
 
 
+//! \brief constructor
 owfnTransition::owfnTransition(const std::string& name) :
     Node(name), labelForMatching(GraphFormulaLiteral::TAU), isEnabled_(false),
             isQuasiEnabled_(false), quasiEnabledNr(0), enabledNr(0) {
 }
 
 
+//! \brief deconstructor
 owfnTransition::~owfnTransition() {
 }
 
 
+//! \brief Adds a owfnPlace to the pre-set of this owfnTransition.
+//! \param owfnPlace owfnPlace to be added to this owfnTransition's
+//!        pre-set.
+//! \param multiplicity Multiplicity of the arc from the given owfnPlace
+//!        to this owfnTransition.
 void owfnTransition::addPrePlace(owfnPlace* owfnPlace, unsigned int multiplicity) {
     PrePlaces.push_back(AdjacentPlace(owfnPlace, multiplicity));
 }
 
 
+//! \brief returns whether this transition is enabled
+//! \return true if so
 bool owfnTransition::isEnabled() const {
     return isEnabled_;
 }
 
-
+//! \brief Set enabledness of this owfnTransition.
+//! \param isEnabled New value of enabledness.
 void owfnTransition::setEnabled(bool isEnabled) {
     isEnabled_ = isEnabled;
 }
 
 
+//! \brief returns whether this transition is quasi enabled
+//! \return true if so
 bool owfnTransition::isQuasiEnabled() const {
     return isQuasiEnabled_;
 }
 
 
+//! \brief Set quasi enabledness of this owfnTransition.
+//! \param isEnabled New value of quasi enabledness.
 void owfnTransition::setQuasiEnabled(bool isQuasiEnabled) {
     isQuasiEnabled_ = isQuasiEnabled;
 }
 
 
 #ifdef STUBBORN
+//! \brief DESCRIPTON
+//! \return DESCRIPTON
 bool owfnTransition::prePlaceIsScapegoatForDisabledness(AdjacentPlace prePlace) const {
     return (PN->CurrentMarking[PN->getPlaceIndex(prePlace.getOwfnPlace())] <
             prePlace.getMultiplicity());
 }
 #endif
 
+//! \brief sets the hashchange
 void owfnTransition::set_hashchange() {
     hash_change = 0;
     for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i) {
@@ -114,6 +134,7 @@ void owfnTransition::set_hashchange() {
 }
 
 
+//! \brief sets initializes various values of the transition
 void owfnTransition::initialize() {
     // Create list of Pre-Places for enabling test
     for (unsigned int i = 0; i < getArrivingArcsCount(); ++i) {
@@ -210,6 +231,8 @@ void owfnTransition::initialize() {
 }
 
 
+//! \brief fires the transition in a given owfn and changes its state and marking accordingly
+//! \param PN the owfn to be fired in
 void owfnTransition::fire(oWFN * PN) {
 
     trace(TRACE_5, "owfnTransition::fire(oWFN * PN) : start\n");
@@ -289,6 +312,8 @@ void owfnTransition::fire(oWFN * PN) {
 //}
 
 
+//! \brief fires the transition in a given owfn backward and changes its state and marking accordingly
+//! \param PN the owfn to be fired in
 void owfnTransition::backfire(oWFN * PN) {
 
     /*
@@ -340,10 +365,10 @@ void owfnTransition::backfire(oWFN * PN) {
 }
 
 
-//! \fn void owfnTransition::check_enabled(oWFN * PN)
-//! \param PN owfn this transition is part of
 //! \brief check whether this transition is (quasi) enabled at the current marking
-//! quasi-enabled means, that this transition activates a sending event (this transition is a receiving transition)
+//!        quasi-enabled means, that this transition activates a sending event (this transition is a receiving transition)
+//! \param PN owfn this transition is part of
+//! \fn void owfnTransition::check_enabled(oWFN * PN)
 void owfnTransition::check_enabled(oWFN * PN) {
     //   	trace(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : start\n");
 
@@ -413,16 +438,22 @@ void owfnTransition::check_enabled(oWFN * PN) {
 }
 
 
+//! \brief sets the label for matching
+//! \param label new label
 void owfnTransition::setLabelForMatching(const std::string& label) {
     labelForMatching = label;
 }
 
 
+//! \brief returns the label for matching
+//! \return label for matching
 std::string owfnTransition::getLabelForMatching() const {
     return labelForMatching;
 }
 
 
+//! \brief returns true if there is no tau label for matching
+//! \return true if there is no tau label for matching, else false
 bool owfnTransition::hasNonTauLabelForMatching() const {
     return getLabelForMatching() != GraphFormulaLiteral::TAU;
 }

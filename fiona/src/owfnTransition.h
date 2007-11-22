@@ -51,31 +51,21 @@ class owfnPlace;
  */
 class AdjacentPlace {
     private:
-        /**
-         * Points to corresponding owfnPlace.
-         */
+        /// Points to corresponding owfnPlace.
         owfnPlace* place_;
 
-        /**
-         * The multiplicity of the arc between the corresponding owfnPlace and
-         * the owfnTransition that owns this PrePlace.
-         */
+        /// The multiplicity of the arc between the corresponding owfnPlace and
+        /// the owfnTransition that owns this PrePlace.
         unsigned int multiplicity_;
     public:
-        /**
-         * Creates a AdjacentPlace from the given place and multiplicity.
-         */
+        /// Creates a AdjacentPlace from the given place and multiplicity.
         AdjacentPlace(owfnPlace* place, unsigned int multiplicity);
 
-        /**
-         * Returns the owfnPlace that belongs to this AdjacentPlace.
-         */
+        /// Returns the owfnPlace that belongs to this AdjacentPlace.
         owfnPlace* getOwfnPlace() const;
 
-        /**
-         * Returns the multiplicity of the arc between the corresponding
-         * owfnPlace and the owning owfnTransition.
-         */
+        /// Returns the multiplicity of the arc between the corresponding
+        /// owfnPlace and the owning owfnTransition.
         unsigned int getMultiplicity() const;
 };
 
@@ -88,173 +78,139 @@ class owfnTransition : public Node {
 
         bool isQuasiEnabled_;
 
-        /** number of internal pre-places marked with appropriate tokens */
+        /// number of internal pre-places marked with appropriate tokens
         unsigned int quasiEnabledNr;
 
-        /** number of input pre-places marked with appropriate tokens */
+        /// number of input pre-places marked with appropriate tokens
         unsigned int enabledNr;
 
-        /**
-         * Type of the containers holding all adjacent places of this
-         * transition. */
+        /// Type of the containers holding all adjacent places of this
+        /// transition.
         typedef std::vector<AdjacentPlace> AdjacentPlaces_t;
 
-        /** Places with their multiplicities to be checked for enabledness. */
+        /// Places with their multiplicities to be checked for enabledness.
         AdjacentPlaces_t PrePlaces;
 
-        /**
-         * Places that are incremented by transition; together with the
-         * corresponding amounts of increment.
-         */
+        /// Places that are incremented by transition; together with the
+        /// corresponding amounts of increment.
         AdjacentPlaces_t IncrPlaces;
 
-        /**
-         * Places that are decremented by transition; together with the
-         * corresponding amounts of decrement.
-         */
+        /// Places that are decremented by transition; together with the
+        /// corresponding amounts of decrement.
         AdjacentPlaces_t DecrPlaces;
 
-        /**
-         * Type for ImproveEnabling and ImproveDisabling.
-         */
+        /// Type for ImproveEnabling and ImproveDisabling.
         typedef std::vector<owfnTransition*> ImproveDisEnabling_t;
 
-        /**
-         * list of transitions where enabledness must be checked again after
-         * firing this transition
-         */
+        /// list of transitions where enabledness must be checked again after
+        /// firing this transition
         ImproveDisEnabling_t ImproveEnabling;
 
-        /**
-         * list of transitions where disabledness must be checked again after
-         * firing this transition
-         */
+        /// list of transitions where disabledness must be checked again after
+        /// firing this transition
         ImproveDisEnabling_t ImproveDisabling;
 
-        /**  change of hash value by firing t; */
+        /// change of hash value by firing t;
         int hash_change;
         void set_hashchange();
 
-        /**
-         * dfsnum of last state where some fired transition disables this one
-         */
+        /// dfsnum of last state where some fired transition disables this one
         unsigned int lastdisabled;
 
-        /** dfsnum of last state where this tr. was fired */
+        /// dfsnum of last state where this tr. was fired
         unsigned int lastfired;
 
 #ifdef STUBBORN
+        ///
         bool prePlaceIsScapegoatForDisabledness(AdjacentPlace prePlace) const;
 
-        /** an insufficiently marked pre-place, if this disabled */
+        /// an insufficiently marked pre-place, if this disabled
         owfnPlace *scapegoat;
 
-        /** conflicting transitions, for use as mustbeincluded */
+        /// conflicting transitions, for use as mustbeincluded
         std::vector<owfnTransition*> conflicting;
 #endif
 
     public:
-        /**
-         * Constructs an owfnTransition with the given namen.
-         * @param name Name of this owfnTransition.
-         */
+        /// constructor
         owfnTransition(const std::string& name);
 
-        /**
-         * Destroys this owfnTransition.
-         */
+        /// destructor
         ~owfnTransition();
 
-        /**
-         * Adds a owfnPlace to the pre-set of this owfnTransition.
-         * @param owfnPlace owfnPlace to be added to this owfnTransition's
-         *     pre-set.
-         * @param multiplicity Multiplicity of the arc from the given owfnPlace
-         *     to this owfnTransition.
-         */
+        /// Adds a owfnPlace to the pre-set of this owfnTransition.
         void addPrePlace(owfnPlace* owfnPlace, unsigned int multiplicity);
 
-        /**
-         * Returns whether this owfnTransition is enabled or not.
-         */
+        /// Returns whether this owfnTransition is enabled or not.
         bool isEnabled() const;
 
-        /**
-         * Set enabledness of this owfnTransition.
-         * @param isEnabled New value of enabledness.
-         */
+        /// Set enabledness of this owfnTransition.
         void setEnabled(bool isEnabled);
 
-        /**
-         * Returns wether this owfnTransition in quasi enabled.
-         */
+        /// Returns wether this owfnTransition in quasi enabled.
         bool isQuasiEnabled() const;
 
-        /**
-         * Sets quasi enabledness of this owfnTransition.
-         * @param isQuasiEnabled New value of quasi enabledness.
-         */
+        /// Sets quasi enabledness of this owfnTransition.
         void setQuasiEnabled(bool isQuasiEnabled);
 
         std::set<unsigned int> messageSet;
 
-        /** Set above arrays, list, enabled... */
+        /// Set above arrays, list, enabled...
         void initialize();
 
-        /**
-         * replace current marking by successor marking, force enabling test
-         * where necessary
-         */
+        /// replace current marking by successor marking, force enabling test
+        /// where necessary
         void fire(oWFN *);
 
-        /**
-         * fire transition backwards to replace original state, force enabling
-         * tests where necessary
-         */
+        /// fire transition backwards to replace original state, force enabling
+        /// tests where necessary
         void backfire(oWFN *PN);
 
-        /** test if tr is enabled. If necessary, rearrange list; */
+        /// test if tr is enabled. If necessary, rearrange list;
         void check_enabled(oWFN *);
 
+        /// sets a label for the matching
         void setLabelForMatching(const std::string& label);
+        
+        /// returns a label for the matching
         std::string getLabelForMatching() const;
+        
+        /// returns true if there is no tau label for matching
         bool hasNonTauLabelForMatching() const;
 
 #undef new
-        /**
-         * Provides user defined operator new. Needed to trace all new
-         * operations on this class.
-         */
+        /// Provides user defined operator new. Needed to trace all new
+        /// operations on this class.
         NEW_OPERATOR(owfnTransition)
 #define new NEW_NEW
 
 #ifdef STUBBORN
 
-        /** elements of stubborn set are organized as linked list */
+        /// elements of stubborn set are organized as linked list
         owfnTransition *NextStubborn;
 
-        /** elements of stubborn set are marked. */
+        /// elements of stubborn set are marked. 
         bool instubborn;
 
-        /** If this is in stubborn set, so must be the ones in array */
+        /// If this is in stubborn set, so must be the ones in array
         std::vector<owfnTransition*> mustbeincluded;
 
-        /** stubborn sets are calculated through scc detection */
+        /// stubborn sets are calculated through scc detection 
         unsigned int dfs;
 
-        /** Tarjan's lowlink */
+        /// Tarjan's lowlink
         unsigned int min;
 
-        /** used to mark visited transitions */
+        /// used to mark visited transitions
         unsigned int stamp;
 
-        /** currently processed index in mustbeincluded */
+        /// currently processed index in mustbeincluded
         unsigned int mbiindex;
 
-        /** stack organized as list */
+        /// stack organized as list
         owfnTransition *nextontarjanstack;
 
-        /** stack organized as list */
+        /// stack organized as list
         owfnTransition *nextoncallstack;
 #endif
 };

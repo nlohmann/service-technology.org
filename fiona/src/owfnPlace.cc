@@ -41,10 +41,10 @@
 #include <cassert>
 
 
+//! \brief constructor
 //! \param name
 //! \param _type
 //! \param _net
-//! \brief constructor
 owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) :
     Node(name), type(_type), capacity(0), nrbits(0),
             max_occurence(1), cardprop(0), proposition(NULL) {
@@ -67,11 +67,14 @@ owfnPlace::~owfnPlace() {
     trace(TRACE_5, "owfnPlace::~owfnPlace() : end\n");
 }
 
-
+//! \brief return the type of this place
+//! \return type of this place
 placeType owfnPlace::getType() const {
     return type;
 }
 
+//! \brief return the label of the place for use in a communication graph
+//! \return label of the node
 std::string owfnPlace::getLabelForCommGraph() const {
 
     string label;
@@ -90,6 +93,8 @@ std::string owfnPlace::getLabelForCommGraph() const {
 }
 
 
+//! \brief return the label of the place for use in matching
+//! \return label of the node
 std::string owfnPlace::getLabelForMatching() const {
 
     string label;
@@ -108,10 +113,18 @@ std::string owfnPlace::getLabelForMatching() const {
 }
 
 
+//! \brief return the net this place is used in
+//! \return owfn
 oWFN* owfnPlace::getUnderlyingOWFN() const {
     return net;
 }
 
+        /// decrement marking of place
+        /// test enabledness with respect to place
+        /// define a factor for hash value calculation
+
+//! \brief increment marking of place by the given value
+//! \param i increment value
 void owfnPlace::operator += (unsigned int i) {
     initial_marking += i;
     net->placeHashValue += i*hash_factor;
@@ -119,6 +132,8 @@ void owfnPlace::operator += (unsigned int i) {
 }
 
 
+//! \brief decrement marking of place by the given value
+//! \param i decrement value
 void owfnPlace::operator -= (unsigned int i) {
     initial_marking -= i;
 
@@ -127,11 +142,16 @@ void owfnPlace::operator -= (unsigned int i) {
 }
 
 
+//! \brief check whether the marking of a place is greater or equal to a given i
+//! \param i relation value
+//! \return true if the makring is greater or equal to i, else false
 bool owfnPlace::operator >= (unsigned int i) {
     return((initial_marking >= i) ? 1 : 0);
 }
 
 
+//! \brief sets the hash value of the place to the given value
+//! \param i new hash value
 void owfnPlace::set_hash(unsigned int i) {
     net->placeHashValue -= hash_factor * initial_marking;
     hash_factor = i;
@@ -141,6 +161,7 @@ void owfnPlace::set_hash(unsigned int i) {
 
 
 //! \brief set the port of the oWFN place
+//! \param my_port port to be set
 void owfnPlace::set_port(std::string my_port) {
     port = my_port;
 }

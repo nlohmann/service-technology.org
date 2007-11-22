@@ -49,47 +49,88 @@ enum placeType {INPUT, OUTPUT, INTERNAL}; //< type of place
 
 class owfnPlace : public Node {
     private:
-        oWFN * net; // pointer to underlying petri net (needed for hash value)
-        std::string port; ///< the port of this place
+        /// pointer to underlying petri net (needed for hash value)
+        oWFN * net; 
+        
+        /// the port of this place
+        std::string port; 
 
     public:
+        /// constructor
         owfnPlace(char *, placeType, oWFN *);
+        
+        /// basic deconstructor
         ~owfnPlace();
 
-        placeType type; // type of place (input, output, internal)
+        /// type of place (input, output, internal)
+        placeType type; 
+        
+        /// returns the label fitting for the communication graph
         std::string getLabelForCommGraph() const;
+        
+        /// returns the label fitting for matching
         std::string getLabelForMatching() const;
+        
+        /// returns the underlying owfn
         oWFN* getUnderlyingOWFN() const;
 
+        /// initial marking of the place
         unsigned int initial_marking;
+        
+        /// hashfactor of the place
         unsigned int hash_factor;
-        void operator +=(unsigned int); // increment marking of place
-        void operator -=(unsigned int); // decrement marking of place
-        bool operator >=(unsigned int); // test enabledness with respect to place
-        // void set_marking(unsigned int);   // set initial 1marking of place;
-        void set_hash(unsigned int); // define a factor for hash value calculation
-        // hash(m) = sum(p in P) p.hash_factor*CurrentMarking[p]
-        unsigned int references; // we remove isolated places 
-        unsigned int capacity; // maximum capacity
-        int nrbits; // nr of bits required for storing its marking (= log capacity)
-        int startbit; // first bit representing this place in bit vector
+        
+        /// increment marking of place
+        void operator +=(unsigned int); 
+        
+        /// decrement marking of place
+        void operator -=(unsigned int); 
+        
+        /// test enabledness with respect to place
+        bool operator >=(unsigned int); 
+        
+        /// define a factor for hash value calculation
+        void set_hash(unsigned int); 
+        
+        /// we remove isolated places 
+        unsigned int references; 
+        
+        /// maximum capacity
+        unsigned int capacity; 
+        
+        /// nr of bits required for storing its marking (= log capacity)
+        int nrbits; 
+        
+        /// first bit representing this place in bit vector
+        int startbit; 
+        
+        /// max occurences of the node in its owfn
         int max_occurence;
+        
+        /// returns the type of the node
         placeType getType() const;
-        unsigned int cardprop; // number of propositions in final condition that mention this place
-        formula ** proposition; // array of propositions in final condition that mention this place
-        // used for quick re-evaluation of condition
+        
+        /// number of propositions in final condition that mention this place
+        unsigned int cardprop; 
+        
+        /// array of propositions in final condition that mention this place
+        formula ** proposition; 
 
-        // *** Definitions for stubborn set calculations
+        /// void set_marking(unsigned int);   /// set initial 1marking of place;
+        /// hash(m) = sum(p in P) p.hash_factor*CurrentMarking[p]
+
+
+        /// *** Definitions for stubborn set calculations
 #ifdef STUBBORN
-        std::vector<owfnTransition*> PreTransitions; // these transitions must be included in
-        // stubborn set if this place is scapegoat
-        void initialize(); // initialize PreTransitions
+        std::vector<owfnTransition*> PreTransitions; /// these transitions must be included in
+        /// stubborn set if this place is scapegoat
+        void initialize(); /// initialize PreTransitions
 
         /// set the port of the place
         void set_port(std::string port);
 #endif
 
-        // Provides user defined operator new. Needed to trace all new
+        /// Provides user defined operator new. Needed to trace all new
         // operations on this class.
 #undef new
         NEW_OPERATOR(owfnPlace)

@@ -44,22 +44,15 @@ using namespace std;
  * class GraphNodeColor *
  ************************/
 
-/*!
- * \brief constructor
- *
- * \param color initial colour value
- */
+//! \brief constructor
+//! \param color initial colour value
 GraphNodeColor::GraphNodeColor(GraphNodeColor_enum color) : color_(color) {
-    
 }
 
 
-/*!
- * \brief converts this colour value to a string
- *
- * \return "blue" if this colour is blue, "red" if it's red,
- *         "undefinded color" in any other case
- */
+//! \brief converts this colour value to a string
+//! \return "blue" if this colour is blue, "red" if it's red,
+//!         "undefinded color" in any other case
 std::string GraphNodeColor::toString() const {
     switch (color_) {
         case BLUE:
@@ -74,9 +67,7 @@ std::string GraphNodeColor::toString() const {
 }
 
 
-/*!
- * \brief typecast operator
- */
+//! \brief typecast operator
 GraphNodeColor::operator GraphNodeColor_enum() const {
     return color_;
 }
@@ -86,22 +77,16 @@ GraphNodeColor::operator GraphNodeColor_enum() const {
  * class GraphNodeDiagnosisColor *
  *********************************/
 
-/*!
- * \brief constructor
- *
- * \param color initial colour value
- */
+//! \brief constructor
+//! \param color initial colour value
 GraphNodeDiagnosisColor::GraphNodeDiagnosisColor(GraphNodeDiagnosisColor_enum color) :
     diagnosis_color_(color) {
 
 }
 
 
-/*!
- * \brief converts this colour value into a string
- *
- * \return a string representation of this colour
- */
+//! \brief converts this colour value into a string
+//! \return a string representation of this colour
 std::string GraphNodeDiagnosisColor::toString() const {
     switch (diagnosis_color_) {
         case DIAG_UNSET:
@@ -122,9 +107,7 @@ std::string GraphNodeDiagnosisColor::toString() const {
 }
 
 
-/*!
- * \brief typecast operator
- */
+//! \brief typecast operator
 GraphNodeDiagnosisColor::operator GraphNodeDiagnosisColor_enum() const {
     return diagnosis_color_;
 }
@@ -134,9 +117,7 @@ GraphNodeDiagnosisColor::operator GraphNodeDiagnosisColor_enum() const {
 * class GraphNode *
 ******************/
 
-/*!
- * \brief constructor (no parameters)
- */
+//! \brief constructor (no parameters)
 GraphNode::GraphNode() :
         number(12345678),
         name("12345678"),
@@ -159,14 +140,11 @@ GraphNode::GraphNode() :
 }
 
 
-/*!
- * \brief constructor (four parameters)
- *
- * \param _name the name of this node
- * \param _annotation the annotation of this node
- * \param _color the colour of this node
- * \param _number the number of this node
- */
+//! \brief constructor (four parameters)
+//! \param _name the name of this node
+//! \param _annotation the annotation of this node
+//! \param _color the colour of this node
+//! \param _number the number of this node
 GraphNode::GraphNode(const std::string& _name,
                      GraphFormula* _annotation,
                      GraphNodeColor _color,
@@ -179,9 +157,7 @@ GraphNode::GraphNode(const std::string& _name,
 }
 
 
-/*!
- * \brief destructor
- */
+//! \brief destructor
 GraphNode::~GraphNode() {
     
     trace(TRACE_5, "GraphNode::~GraphNode() : start\n");
@@ -209,101 +185,71 @@ GraphNode::~GraphNode() {
 }
 
 
-/*!
- * \brief returns the number of this node
- *
- * \return number of this node
- */
+//! \brief returns the number of this node
+//! \return number of this node
 unsigned int GraphNode::getNumber() const {
     return number;
 }
 
 
-/*!
- * \brief sets the number of this node
- *
- * \param newNumber number of this node in the graph
- */
+//! \brief sets the number of this node
+//! \param newNumber number of this node in the graph
 void GraphNode::setNumber(unsigned int newNumber) {
     number = newNumber;
 }
 
 
-/*!
- * \brief returns the name of this node
- *
- * \return name of this node
- */
+//! \brief returns the name of this node
+//! \return name of this node
 std::string GraphNode::getName() const {
     return name;
 }
 
 
-/*!
- * \brief sets the name of this node
- *
- * \param newName new name of this node in the graph
- */
+//! \brief sets the name of this node
+//! \param newName new name of this node in the graph
 void GraphNode::setName(std::string newName) {
     name = newName;
 }
 
 
-/*!
- * \brief returns the color of the GraphNode
- *
- * \return color of this node
- */
+//! \brief returns the color of the GraphNode
+//! \return color of this node
 GraphNodeColor GraphNode::getColor() const {
     return color;
 }
 
 
-/*!
- * \brief sets the color of the GraphNode to the given color
- *
- * \param c color of GraphNode
- */
+//! \brief sets the color of the GraphNode to the given color
+//! \param c color of GraphNode
 void GraphNode::setColor(GraphNodeColor c) {
     color = c;
 }
 
 
-/*!
- * \brief Is the node colour blue?
- *
- * \return true iff this node's colour is blue
- */
+//! \brief Is the node colour blue?
+//! \return true iff this node's colour is blue
 bool GraphNode::isBlue() const {
     return getColor() == BLUE;
 }
 
 
-/*!
- * \brief Is the node colour ret?
- *
- * \return true iff this node's colour is red
- */
+//! \brief Is the node colour ret?
+//! \return true iff this node's colour is red
 bool GraphNode::isRed() const {
     return getColor() == RED;
 }
 
 
-/*!
- * \brief returns the CNF formula that is this node's annotation
- *
- * \return this node's annotation as a GraphFormulaCNF
- */
+//! \brief returns the CNF formula that is this node's annotation
+//! \return this node's annotation as a GraphFormulaCNF
 GraphFormulaCNF* GraphNode::getAnnotation() const {
     return annotation;
 }
 
 // CODE FROM PL
-/*!
- * \brief sets the annotation of this node
- * 
- * \param newAnnotation annotation of the node
- */ 
+//! \brief sets the annotation of this node
+//! \param newAnnotation annotation of the node
 void GraphNode::setAnnotation(GraphFormulaCNF* newAnnotation) {
 	if (annotation != NULL) {
 		delete annotation;
@@ -313,69 +259,51 @@ void GraphNode::setAnnotation(GraphFormulaCNF* newAnnotation) {
 // END OF CODE FROM PL
 
 
-/*!
- * \brief returns the CNF formula that is this node's annotation as a String
- *
- * \return this node's annotation as a String
- */
+//! \brief returns the CNF formula that is this node's annotation as a String
+//! \return this node's annotation as a String
 std::string GraphNode::getAnnotationAsString() const {
     assert(annotation != NULL);
     return annotation->asString();
 }
 
 
-/*!
- * \brief Adds a leaving edge to this node.
- *
- * \param edge the new leaving edge
- */
+//! \brief Adds a leaving edge to this node.
+//! \param edge the new leaving edge
 void GraphNode::addLeavingEdge(GraphEdge* edge) {
     leavingEdges.add(edge);
 }
 
 
-/*!
- * \brief Returns an iterator that can be used to traverse all leaving edges of
- *        this GraphNode. This iterator can also be used to modify the list of
- *        leaving edges, e.g., to remove an edge.
- *        Consult SList<T>::getIterator() for instructions how to use this
- *        iterator.
- *
- * \return the iterator described above
- */
+//! \brief Returns an iterator that can be used to traverse all leaving edges of
+//!        this GraphNode. This iterator can also be used to modify the list of
+//!        leaving edges, e.g., to remove an edge.
+//!        Consult SList<T>::getIterator() for instructions how to use this
+//!        iterator.
+//! \return the iterator described above
 GraphNode::LeavingEdges::Iterator GraphNode::getLeavingEdgesIterator() {
     return leavingEdges.getIterator();
 }
 
 
-/*!
- * \brief Returns a const iterator that can be used to traverse all leaving
- *        edges of this GraphNode. You can not modify the list of leaving edges
- *        with this const iterator. Consult SList<T>::getConstIterator() for
- *        instructions how to use this iterator.
- *
- * \return the iterator described above
- */
+//! \brief Returns a const iterator that can be used to traverse all leaving
+//!        edges of this GraphNode. You can not modify the list of leaving edges
+//!        with this const iterator. Consult SList<T>::getConstIterator() for
+//!        instructions how to use this iterator.
+//! \return the iterator described above
 GraphNode::LeavingEdges::ConstIterator GraphNode::getLeavingEdgesConstIterator() const {
     return leavingEdges.getConstIterator();
 }
 
 
-/*!
- * \brief Returns the number of leaving edges.
- *
- * \return number of leaving edges
- */
+//! \brief Returns the number of leaving edges.
+//! \return number of leaving edges
 unsigned int GraphNode::getLeavingEdgesCount() const {
     return leavingEdges.size();
 }
 
 
-/*!
- * \brief adds the state s to the list of states
- *
- * \param s pointer to the state that is to be added to this node
- */
+//! \brief adds the state s to the list of states
+//! \param s pointer to the state that is to be added to this node
 bool GraphNode::addState(State * s) {
     assert(s != NULL);
     pair<StateSet::iterator, bool> result = reachGraphStateSet.insert(s);
@@ -383,19 +311,14 @@ bool GraphNode::addState(State * s) {
 }
 
 
-/*!
- * \brief adds a new clause to the CNF formula of the node
- *
- * \param myclause the clause to be added to the annotation of the current node
- */
+//! \brief adds a new clause to the CNF formula of the node
+//! \param myclause the clause to be added to the annotation of the current node
 void GraphNode::addClause(GraphFormulaMultiaryOr* myclause) {
     annotation->addClause(myclause);
 }
 
 
-/*!
- * \brief analyses the node and sets its color
- */
+//! \brief analyses the node and sets its color
 void GraphNode::analyseNode() {
     
     trace(TRACE_5, "GraphNode::analyseNodeByFormula() : start\n");
@@ -444,34 +367,24 @@ void GraphNode::analyseNode() {
 }
 
 
-/*!
- * \brief returns the diagnosis colour of the GraphNode
- *
- * \return the diagnosis colour
- */
+//! \brief returns the diagnosis colour of the GraphNode
+//! \return the diagnosis colour
 GraphNodeDiagnosisColor GraphNode::getDiagnosisColor() const {
     return diagnosis_color;
 }
 
 
-/*!
- * \brief sets the colour of the GraphNode to the given colour
- * 
- * \param c colour of GraphNode
- *
- * \return the new diagnosis colour
- */
+//! \brief sets the colour of the GraphNode to the given colour
+//! \param c colour of GraphNode
+//! \return the new diagnosis colour
 GraphNodeDiagnosisColor GraphNode::setDiagnosisColor(GraphNodeDiagnosisColor c) {
     diagnosis_color = c;
     return c;
 }
 
 
-/*!
- * \brief removes the given literal from this node's annotation
- *
- * \param literal the literal which is to be removed
- */
+//! \brief removes the given literal from this node's annotation
+//! \param literal the literal which is to be removed
 void GraphNode::removeLiteralFromAnnotation(const std::string& literal) {
     trace(TRACE_5, "GraphNode::removeLiteralFromAnnotation(const string& literal) : start\n");
     
@@ -482,13 +395,10 @@ void GraphNode::removeLiteralFromAnnotation(const std::string& literal) {
 }
 
 
-/*!
- * \brief removes the given literal from this node's annotation
- *        by absorbing the literal; multiary formulas made empty
- *        will be removed
- *
- * \param literal the literal which is to be removed
- */
+//! \brief removes the given literal from this node's annotation
+//!        by absorbing the literal; multiary formulas made empty
+//!        will be removed
+//! \param literal the literal which is to be removed
 void GraphNode::removeLiteralFromAnnotationByHiding(const std::string& literal) {
     trace(TRACE_5, "GraphNode::removeLiteralFromAnnotationByHiding(const string& literal) : start\n");
    
@@ -499,10 +409,8 @@ void GraphNode::removeLiteralFromAnnotationByHiding(const std::string& literal) 
 }
 
 
-/*!
- * \brief Removes unneeded literals from the node's annotation. Labels of
- *        edges to red nodes are unneeded.
- */
+//! \brief Removes unneeded literals from the node's annotation. Labels of
+//!        edges to red nodes are unneeded.
 void GraphNode::removeUnneededLiteralsFromAnnotation() {
     LeavingEdges::ConstIterator
     edgeIter = getLeavingEdgesConstIterator();
@@ -517,15 +425,11 @@ void GraphNode::removeUnneededLiteralsFromAnnotation() {
 }
 
 
-/*!
- * \brief  returns true iff a colored successor can be avoided
- *
- * \param  color   the color under consideration
- *
- * \return true iff there is either a sending edge to a differently colored
- *         successor or, for each external deadlock, there exists a receiving
- *         edge to a non-colored successor
- */
+//! \brief  returns true iff a colored successor can be avoided
+//! \param  color   the color under consideration
+//! \return true iff there is either a sending edge to a differently colored
+//!         successor or, for each external deadlock, there exists a receiving
+//!         edge to a non-colored successor
 bool GraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const {    
     // collect all edges to differently colored successor nodes
     set<GraphEdge*> edges_to_differently_colored_successors;
@@ -602,17 +506,12 @@ bool GraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) c
 }
 
 
-/*!
- * \brief  returns true iff edge e is possible in every state
- *
- * \param  e  an edge
- *
- * \return true, iff the edge e is labeled with a sending event, or a
- *         receiving event that is present in every external deadlock state
- *
- * \note   For performance issues, it is not checked whether edge e is really
- *         leaving this node.
- */
+//! \brief  returns true iff edge e is possible in every state
+//! \param  e a GraphEdge
+//! \return true, iff the edge e is labeled with a sending event, or a
+//!         receiving event that is present in every external deadlock state
+//! \note   For performance issues, it is not checked whether edge e is really
+//!         leaving this node.
 bool GraphNode::edgeEnforcable(GraphEdge* e) const {
     assert (e != NULL);
     
@@ -646,15 +545,10 @@ bool GraphNode::edgeEnforcable(GraphEdge* e) const {
 }
 
 
-/*!
- * \brief returns true iff e changes the color of the common successors
- *
- * \param e an edge
- *
- * \return true iff the given edge changes the color of the common successors
- *
- * \todo Whoever implemented me, please comment me!
- */
+//! \brief returns true iff e changes the color of the common successors
+//! \param e a GraphEdge
+//! \return true iff the given edge changes the color of the common successors
+//! \todo Whoever implemented me, please comment me!
 bool GraphNode::changes_color(GraphEdge* e) const {
     assert(e != NULL);
     
@@ -717,25 +611,17 @@ bool GraphNode::isToShow(const GraphNode* rootOfGraph) const {
 }
 
 
-/*!
- * \brief determines whether this node has a edge with the given label
- *
- * \param edgeLabel the label of the edge
- *
- * \return true iff this node has a edge with the given label
- */
+//! \brief determines whether this node has a edge with the given label
+//! \param edgeLabel the label of the edge
+//! \return true iff this node has a edge with the given label
 bool GraphNode::hasEdgeWithLabel(const std::string& edgeLabel) const {
     return getEdgeWithLabel(edgeLabel) != NULL;
 }
 
 
-/*!
- * \brief determines whether this node has a blue edge with a given label
- *
- * \param edgeLabel the label of the blue edge
- *
- * \return true iff this node has a blue edge with the given label
- */
+//! \brief determines whether this node has a blue edge with a given label
+//! \param edgeLabel the label of the blue edge
+//! \return true iff this node has a blue edge with the given label
 bool GraphNode::hasBlueEdgeWithLabel(const std::string& edgeLabel) const {
     
     GraphEdge* edge = getEdgeWithLabel(edgeLabel);
@@ -746,14 +632,10 @@ bool GraphNode::hasBlueEdgeWithLabel(const std::string& edgeLabel) const {
 }
 
 
-/*!
- * \brief returns a edge of this node with the given label
- *
- * \param edgeLabel the label of the edge that we look for
- *
- * \return a edge of this node with the given label, NULL if no such
- *         edge exists
- */
+//! \brief returns a edge of this node with the given label
+//! \param edgeLabel the label of the edge that we look for
+//! \return a edge of this node with the given label, NULL if no such
+//!         edge exists
 GraphEdge* GraphNode::getEdgeWithLabel(const std::string& edgeLabel) const {
     
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
@@ -771,15 +653,11 @@ GraphEdge* GraphNode::getEdgeWithLabel(const std::string& edgeLabel) const {
 }
 
 
-/*!
- * \brief "fires" the edge of this node with the given label, that is
- *        it returns the destination node of that edge
- *
- * \param edgeLabel the label of this edge that is to be fired
- *
- * \return the destination node of the labeled edge, NULL if the
- *         edge could not be found
- */
+//! \brief "fires" the edge of this node with the given label, that is
+//!        it returns the destination node of that edge
+//! \param edgeLabel the label of this edge that is to be fired
+//! \return the destination node of the labeled edge, NULL if the
+//!         edge could not be found
 GraphNode* GraphNode::followEdgeWithLabel(const std::string& edgeLabel) {
     
     if (!(parameters[P_PV])) {
@@ -795,14 +673,10 @@ GraphNode* GraphNode::followEdgeWithLabel(const std::string& edgeLabel) {
 }
 
 
-/*!
- * \brief determines whether the given assignment satisfies this node's
- *        annotation
- *
- * \param assignment the assignment that satisfies the annotation or not
- *
- * \return true iff the assignment satisfies the annotation
- */
+//! \brief determines whether the given assignment satisfies this node's
+//!        annotation
+//! \param assignment the assignment that satisfies the annotation or not
+//! \return true iff the assignment satisfies the annotation
 bool GraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const {
     
     assert(annotation != NULL);
@@ -810,12 +684,9 @@ bool GraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assi
 }
 
 
-/*!
- * \brief return the assignment that is imposed by present or absent arcs
- *        leaving the node
- *
- * \return the assignment described above
- */
+//! \brief return the assignment that is imposed by present or absent arcs
+//!        leaving the node
+//! \return the assignment described above
 GraphFormulaAssignment* GraphNode::getAssignment() const {
     
     trace(TRACE_5, "computing annotation of node " + getName() + "\n");
@@ -839,11 +710,8 @@ GraphFormulaAssignment* GraphNode::getAssignment() const {
 }
 
 
-/*!
- * \brief removes all edge from this node to the given one
- *
- * \param nodeToDelete the target node
- */
+//! \brief removes all edge from this node to the given one
+//! \param nodeToDelete the target node
 void GraphNode::removeEdgesToNode(const GraphNode* nodeToDelete) {
     LeavingEdges::Iterator iEdge = getLeavingEdgesIterator();
     while (iEdge->hasNext()) {
@@ -1052,10 +920,14 @@ void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphForm
 }
 
 
+//! \brief checks wether the priority map is empty
+//! \return returns true iff the priority map is empty.
 bool PriorityMap::empty() const {
     return pm.empty();
 }
 
+//! \brief DESCRIPTION
+//! \return DESCRIPTION
 bool PriorityMap::emptyIG() const {
     return pmIG.empty();
 }

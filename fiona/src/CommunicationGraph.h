@@ -37,6 +37,7 @@
 #include "mynew.h"
 #include "GraphEdge.h"
 #include "GraphNode.h" // for GraphNodeDiagnosisColor_enum
+#include "AnnotatedGraphNode.h"
 #include "AnnotatedGraph.h" // parent class
 #include "owfn.h"
 #include <fstream>
@@ -58,8 +59,8 @@ class CommunicationGraph : public AnnotatedGraph {
 
         /// Helps computeNumberOfStatesAndEdges to computes the total number of all
         /// states stored in all nodes and the number of all edges in this graph.
-        void computeNumberOfStatesAndEdgesHelper(GraphNode* v,
-                                                 std::map<GraphNode*, bool>& visitedNodes);
+        void computeNumberOfStatesAndEdgesHelper(AnnotatedGraphNode* v,
+                                                 std::map<AnnotatedGraphNode*, bool>& visitedNodes);
 
         /// Computes the number of all blue to be shown nodes and edges in this
         /// graph.
@@ -67,7 +68,7 @@ class CommunicationGraph : public AnnotatedGraph {
 
         /// Helps computeNumberOfBlueNodesEdges() to computes the number of all blue
         /// to be shown nodes and edges in this graph.
-        void computeNumberOfBlueNodesEdgesHelper(GraphNode* v, std::map<GraphNode*, bool>& visitedNodes);
+        void computeNumberOfBlueNodesEdgesHelper(AnnotatedGraphNode* v, std::map<AnnotatedGraphNode*, bool>& visitedNodes);
 
         /// The total number of all states stored in all nodes in this graph.
         /// Is computed by computeNumberOfStatesAndEdges().
@@ -123,7 +124,7 @@ class CommunicationGraph : public AnnotatedGraph {
         unsigned int getNumberOfBlueEdges() const;
 
         /// checks if the given node is in the graphs node set
-        GraphNode* findGraphNodeInSet(GraphNode*);
+        AnnotatedGraphNode* findGraphNodeInSet(AnnotatedGraphNode*);
 
         /// prints the current global progress value depending whether the value
         /// changed significantly and depending on the debug-level set
@@ -134,39 +135,39 @@ class CommunicationGraph : public AnnotatedGraph {
         void printProgress();
 
         void buildGraphRandom();
-        void analyseNode(GraphNode*);
+        void analyseNode(AnnotatedGraphNode*);
 
         /// brief creates a dot file of the graph
         void printGraphToDot();
 
         /// recursive helper function for printGraphToDot()
-        void printGraphToDotRecursively(GraphNode* v,
+        void printGraphToDotRecursively(AnnotatedGraphNode* v,
                                         fstream& os,
-                                        std::map<GraphNode*, bool>&);
+                                        std::map<AnnotatedGraphNode*, bool>&);
 
         /// function to create an STG representation of the IG or OG
         void printGraphToSTG();
 
         /// recursive helper function for printGraphToSTG()
-        void printGraphToSTGRecursively(GraphNode* v,
+        void printGraphToSTGRecursively(AnnotatedGraphNode* v,
                                         fstream& os,
-                                        std::map<GraphNode*, bool>&);
+                                        std::map<AnnotatedGraphNode*, bool>&);
 
         /// function to annotate the OG for distributed controllability
         bool annotateGraphDistributedly();
 
         /// recursive helper function for annotateGraphDistributedly()
-        bool annotateGraphDistributedlyRecursively(GraphNode* v,
-                                                   std::map<GraphNode*, bool>&);
+        bool annotateGraphDistributedlyRecursively(AnnotatedGraphNode* v,
+                                                   std::map<AnnotatedGraphNode*, bool>&);
         /// helper function for annotateGraphDistributedly()
-        void removeLabeledSuccessor(GraphNode* v, std::string label);
+        void removeLabeledSuccessor(AnnotatedGraphNode* v, std::string label);
 
         /// gives a diagnosis of the graph
         void diagnose();
 
         /// recursive helper function for diagnose()
-        GraphNodeDiagnosisColor_enum diagnose_recursively(GraphNode* v,
-                                                          std::map<GraphNode*, bool>& visitedNodes);
+        GraphNodeDiagnosisColor_enum diagnose_recursively(AnnotatedGraphNode* v,
+                                                          std::map<AnnotatedGraphNode*, bool>& visitedNodes);
 
         /// Computes statistics about this graph
         void computeGraphStatistics();

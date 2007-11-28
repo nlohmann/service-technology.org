@@ -36,8 +36,8 @@
  *
  */
 
-#ifndef GRAPH_H_
-#define GRAPH_H_
+#ifndef ANNOTATEDGRAPH_H_
+#define ANNOTATEDGRAPH_H_
 
 #include <fstream>
 #include <string>
@@ -45,12 +45,13 @@
 #include <utility>
 #include <map>
 #include <list>
-#include "GraphNode.h"
+#include "AnnotatedGraphNode.h"
+#include "Graph.h"
 
 using namespace std;
 
 
-class AnnotatedGraph {
+class AnnotatedGraph : public Graph {
     public:
 
         /// Type of container passed to AnnotatedGraph::product().
@@ -65,9 +66,9 @@ class AnnotatedGraph {
         typedef map<string, EdgeSet> TransitionMap;
 
     protected:
-        GraphNode* root;
+        AnnotatedGraphNode* root;
 
-        typedef std::vector<GraphNode*> nodes_t;
+        typedef std::vector<AnnotatedGraphNode*> nodes_t;
 
         nodes_t setOfNodes; // needed for proper deletion of OG.
 
@@ -76,37 +77,37 @@ class AnnotatedGraph {
         typedef nodes_t::iterator nodes_iterator;
 
         /// remove all edges that have a given node as destination
-        void removeEdgesToNodeFromAllOtherNodes(const GraphNode* nodeToDelete);
+        void removeEdgesToNodeFromAllOtherNodes(const AnnotatedGraphNode* nodeToDelete);
 
         /// remove all edges that have a given node as source
-        void removeEdgesFromNodeToAllOtherNodes(GraphNode* nodeToDelete);
+        void removeEdgesFromNodeToAllOtherNodes(AnnotatedGraphNode* nodeToDelete);
 
         /// Recursive coordinated dfs through OG and rhs OG.
-        void buildProductOG(GraphNode* currentOGNode,
-                            GraphNode* currentRhsNode,
+        void buildProductOG(AnnotatedGraphNode* currentOGNode,
+                            AnnotatedGraphNode* currentRhsNode,
                             AnnotatedGraph* productOG);
 
         /// checks, whether the part of an AnnotatedGraph below myNode simulates
         /// the part of an AnnotatedGraph below simNode
-        bool simulatesRecursive(GraphNode* myNode, GraphNode* simNode,
-            set<pair<GraphNode*, GraphNode*> >& visitedNodes);
+        bool simulatesRecursive(AnnotatedGraphNode* myNode, AnnotatedGraphNode* simNode,
+            set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes);
 
         /// filters the current OG through a given OG below myNode (rhsNode respectively)
         /// in such a way, that the complete OG given as the operand simulates the current OG
-        void filterRecursive(GraphNode* myNode,
-                             GraphNode* rhsNode,
-                             set<GraphNode*>* VisitedNodes);
+        void filterRecursive(AnnotatedGraphNode* myNode,
+                             AnnotatedGraphNode* rhsNode,
+                             set<AnnotatedGraphNode*>* VisitedNodes);
 
         //! Create the formula describing the structure of the subgraph under the given node through events
         //! NOTE: graph has to be acyclic!
-        GraphFormulaMultiaryAnd *createStructureFormulaRecursively(GraphNode *);
+        GraphFormulaMultiaryAnd *createStructureFormulaRecursively(AnnotatedGraphNode *);
 
 // CODE FROM PL
         set<std::string> sendEvents;
         set<std::string> recvEvents;
 	
         /// remove a node from the annotated graph
-        void removeNode(GraphNode*);
+        void removeNode(AnnotatedGraphNode*);
         
         /// remove all nodes that have the annotation "true"
         void removeNodesAnnotatedWithTrue();
@@ -127,10 +128,10 @@ class AnnotatedGraph {
         ~AnnotatedGraph();
 
         /// adds a node to the graph
-        void addNode(GraphNode* node);
+        void addNode(AnnotatedGraphNode* node);
 
         /// creates a new node in the graph
-        GraphNode* addNode(const std::string& nodeName,
+        AnnotatedGraphNode* addNode(const std::string& nodeName,
                            GraphFormula* annotation,
                            GraphNodeColor color = BLUE);
 
@@ -143,16 +144,16 @@ class AnnotatedGraph {
         bool hasNodeWithName(const std::string& nodeName) const;
 
         /// returns a pointer to the root node
-        GraphNode* getRoot() const;
+        AnnotatedGraphNode* getRoot() const;
 
         /// sets a new root node
-        void setRoot(GraphNode* newRoot);
+        void setRoot(AnnotatedGraphNode* newRoot);
 
         /// sets the root node to the one with the given name
         void setRootToNodeWithName(const std::string& nodeName);
 
         /// retruns a node with the given name, or NULL else
-        GraphNode* getNodeWithName(const std::string& nodeName) const;
+        AnnotatedGraphNode* getNodeWithName(const std::string& nodeName) const;
 
         /// retruns true if the graph's root node is NULL
         bool hasNoRoot() const;
@@ -167,8 +168,8 @@ class AnnotatedGraph {
         AnnotatedGraph* product(const AnnotatedGraph* rhs);
 
         /// Creates and returns the annotation for the product node of the given two nodes. 
-        GraphFormulaCNF* createProductAnnotation(const GraphNode* lhs,
-                                                 const GraphNode* rhs) const;
+        GraphFormulaCNF* createProductAnnotation(const AnnotatedGraphNode* lhs,
+                                                 const AnnotatedGraphNode* rhs) const;
 
         /// Produces the default prefix of the product OG output file.
         static std::string getProductOGFilePrefix(const ogfiles_t& ogfiles);
@@ -177,9 +178,9 @@ class AnnotatedGraph {
         static std::string stripOGFileSuffix(const std::string& filename);
 
         /// dfs through the graph printing each node and edge to the output stream
-        void printGraphToDot(GraphNode* v,
+        void printGraphToDot(AnnotatedGraphNode* v,
                              fstream& os,
-                             std::map<GraphNode*, bool>&) const;
+                             std::map<AnnotatedGraphNode*, bool>&) const;
 
         /// creates a dot output of the graph and calls dot to create an image from it
         void printDotFile(const std::string& filenamePrefix) const;
@@ -206,16 +207,16 @@ class AnnotatedGraph {
         unsigned int numberOfServices();
 
         /// recursive function for computing the number of services
-        unsigned int numberOfServicesRecursively(set<GraphNode*> activeNodes,
-                                                 map<GraphNode*, unsigned int>& followers,
-                                                 map<GraphNode*, list <set<GraphNode*> > >& validFollowerCombinations,
-                                                 map<set<GraphNode*>, unsigned int>& eliminateRedundantCounting,
+        unsigned int numberOfServicesRecursively(set<AnnotatedGraphNode*> activeNodes,
+                                                 map<AnnotatedGraphNode*, unsigned int>& followers,
+                                                 map<AnnotatedGraphNode*, list <set<AnnotatedGraphNode*> > >& validFollowerCombinations,
+                                                 map<set<AnnotatedGraphNode*>, unsigned int>& eliminateRedundantCounting,
                                                  unsigned int& instances);
 
         /// recursive function for computing the number of true assignments for a node
         unsigned int processAssignmentsRecursively(set<string> labels,
                                                    GraphFormulaAssignment possibleAssignment,
-                                                   GraphNode* testNode,
+                                                   AnnotatedGraphNode* testNode,
                                                    list<GraphFormulaAssignment>& assignmentList);
 
         /// tests if this OG is acyclic

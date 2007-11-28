@@ -187,7 +187,6 @@ AnnotatedGraph* readog(const std::string& ogfile) {
         exit(4);
     }
     OGToParse = new AnnotatedGraph();
-
     ogfileToParse = ogfile;
     og_yyparse();
     fclose(og_yyin);

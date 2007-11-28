@@ -38,7 +38,7 @@
 #include "options.h"
 #include "debug.h"
 #include "owfn.h"
-#include "GraphNode.h"
+#include "AnnotatedGraphNode.h"
 #include "GraphFormula.h"
 #include "binDecision.h"
 
@@ -98,7 +98,7 @@ void OG::buildGraph() {
 //!      number has been set (e.g. by calling currentNode->setNumber), and
 //!      setOfVertices contains currentNode. That means, buildGraph can be
 //!      called with root, if calculateRootNode() has been called.
-void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
+void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
 
     // currentNode is the root of the currently considered subgraph
     // at this point, the states inside currentNode are already computed!
@@ -159,7 +159,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
              currentEvent->max_occurence > currentNode->eventsUsedOutput[PN->getOutputPlaceIndex(currentEvent)])) {
             // we have to consider this event
 
-            GraphNode* v = new GraphNode();    // create new GraphNode of the graph
+            AnnotatedGraphNode* v = new AnnotatedGraphNode();    // create new AnnotatedGraphNode of the graph
 
             trace(TRACE_5, "\t\t\t\t    calculating successor states\n");
             if (currentEvent->getType() == INPUT) {
@@ -181,7 +181,7 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
                 delete v;
             } else {
                 // was the new node v computed before?
-                GraphNode* found = findGraphNodeInSet(v);
+                AnnotatedGraphNode* found = findGraphNodeInSet(v);
 
                 if (found == NULL) {
                     trace(TRACE_1, "\t computed successor node new\n");
@@ -274,9 +274,9 @@ void OG::buildGraph(GraphNode* currentNode, double progress_plus) {
 //!        and copies the eventsUsed array from the sourceNode
 //! \param sourceNode node to copy eventsUsed from
 //! \param toAdd node to be added
-void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
+void OG::addGraphNode(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* toAdd) {
 
-    trace(TRACE_5, "reachGraph::AddGraphNode(GraphNode* sourceNode, GraphNode * toAdd): start\n");
+    trace(TRACE_5, "reachGraph::AddGraphNode(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode * toAdd): start\n");
 
     assert(getNumberOfNodes() > 0);
     assert(setOfSortedNodes.size() > 0);
@@ -296,7 +296,7 @@ void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
     setOfSortedNodes.insert(toAdd);
     setOfNodes.push_back(toAdd);
 
-    trace(TRACE_5, "reachGraph::AddGraphNode (GraphNode* sourceNode, GraphNode * toAdd): end\n");
+    trace(TRACE_5, "reachGraph::AddGraphNode (AnnotatedGraphNode* sourceNode, AnnotatedGraphNode * toAdd): end\n");
 }
 
 
@@ -307,12 +307,12 @@ void OG::addGraphNode(GraphNode* sourceNode, GraphNode* toAdd) {
 //! \param destNode target of the new edge
 //! \param label label of the new edge
 //! \param type type of the new edge
-void OG::addGraphEdge(GraphNode* sourceNode,
-                      GraphNode* destNode,
+void OG::addGraphEdge(AnnotatedGraphNode* sourceNode,
+                      AnnotatedGraphNode* destNode,
                       oWFN::Places_t::size_type label,
                       GraphEdgeType type) {
 
-    trace(TRACE_5, "reachGraph::AddGraphEdge(GraphNode* sourceNode, GraphNode* destNode, unsigned int label, GraphEdgeType type): start\n");
+    trace(TRACE_5, "reachGraph::AddGraphEdge(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* destNode, unsigned int label, GraphEdgeType type): start\n");
 
     assert(sourceNode != NULL);
     assert(destNode != NULL);
@@ -333,7 +333,7 @@ void OG::addGraphEdge(GraphNode* sourceNode,
     // add the edge to the leaving edges list
     sourceNode->addLeavingEdge(newEdge);
 
-    trace(TRACE_5, "reachGraph::AddGraphEdge(GraphNode* sourceNode, GraphNode* destNode, unsigned int label, GraphEdgeType type): end\n");
+    trace(TRACE_5, "reachGraph::AddGraphEdge(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* destNode, unsigned int label, GraphEdgeType type): end\n");
 }
 
 
@@ -343,9 +343,9 @@ void OG::addGraphEdge(GraphNode* sourceNode,
 //! \param oldNode the old node carrying the states
 //! \param newNode the new node wich is computed
 void OG::calculateSuccStatesInput(unsigned int input,
-                                  GraphNode* oldNode,
-                                  GraphNode* newNode) {
-    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode* oldNode, GraphNode* newNode) : start\n");
+                                  AnnotatedGraphNode* oldNode,
+                                  AnnotatedGraphNode* newNode) {
+    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : start\n");
 
     StateSet::iterator iter; // iterator over the state set's elements
 
@@ -362,7 +362,7 @@ void OG::calculateSuccStatesInput(unsigned int input,
             if (PN->CurrentMarking[PN->getPlaceIndex(PN->getPlace(input))] == messages_manual) {
                 // adding input message to state already using full message bound
                 trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
-                trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode* oldNode, GraphNode* newNode) : end\n");
+                trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
                 newNode->setColor(RED);
                 return;
             }
@@ -382,13 +382,13 @@ void OG::calculateSuccStatesInput(unsigned int input,
         if (newNode->getColor() == RED) {
             // a message bound violation occured during computation of reachability graph
             trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
-            trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode* oldNode, GraphNode* newNode) : end\n");
+            trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
             return;
         }
     }
 
     trace(TRACE_3, "\t\t\t\t input event added without message bound violation\n");
-    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, GraphNode* oldNode, GraphNode* newNode) : end\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
     return;
 }
 
@@ -398,9 +398,9 @@ void OG::calculateSuccStatesInput(unsigned int input,
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
 void OG::calculateSuccStatesOutput(unsigned int output,
-                                   GraphNode* node,
-                                   GraphNode* newNode) {
-    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, GraphNode* node, GraphNode* newNode) : start\n");
+                                   AnnotatedGraphNode* node,
+                                   AnnotatedGraphNode* newNode) {
+    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, AnnotatedGraphNode* node, AnnotatedGraphNode* newNode) : start\n");
 
     StateSet::iterator iter; // iterator over the stateList's elements
 
@@ -439,7 +439,7 @@ void OG::calculateSuccStatesOutput(unsigned int output,
         delete PN->tempBinDecision;
         PN->tempBinDecision = NULL;
     }
-    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, GraphNode* node, GraphNode* newNode) : end\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, AnnotatedGraphNode* node, AnnotatedGraphNode* newNode) : end\n");
 }
 
 
@@ -459,7 +459,7 @@ void OG::correctNodeColorsAndShortenAnnotations() {
         for (GraphNodeSet::iterator iNode = setOfSortedNodes.begin(); iNode
                 != setOfSortedNodes.end(); ++iNode) {
 
-            GraphNode* node = *iNode;
+            AnnotatedGraphNode* node = *iNode;
             if (node->getColor() == RED) {
                 continue;
             }
@@ -481,7 +481,7 @@ void OG::correctNodeColorsAndShortenAnnotations() {
     for (GraphNodeSet::iterator iNode = setOfSortedNodes.begin(); iNode
             != setOfSortedNodes.end(); ++iNode) {
 
-        GraphNode* node = *iNode;
+        AnnotatedGraphNode* node = *iNode;
         node->removeUnneededLiteralsFromAnnotation();
     }
 }
@@ -489,9 +489,9 @@ void OG::correctNodeColorsAndShortenAnnotations() {
 
 //! \brief calculates the annotation (CNF) for the node
 //! \param node the node for which the annotation is calculated
-void OG::computeCNF(GraphNode* node) const {
+void OG::computeCNF(AnnotatedGraphNode* node) const {
 
-    trace(TRACE_5, "OG::computeCNF(GraphNode * node): start\n");
+    trace(TRACE_5, "OG::computeCNF(AnnotatedGraphNode * node): start\n");
 
     // initially, the annoation is empty (and therefore equivalent to true)
     assert(node->getAnnotation()->equals() == TRUE);
@@ -605,7 +605,7 @@ void OG::computeCNF(GraphNode* node) const {
         }
     }
 
-    trace(TRACE_5, "OG::computeCNF(GraphNode * node): end\n");
+    trace(TRACE_5, "OG::computeCNF(AnnotatedGraphNode * node): end\n");
 }
 
 
@@ -613,7 +613,7 @@ void OG::computeCNF(GraphNode* node) const {
 void OG::convertToBdd() {
     trace(TRACE_5, "OG::convertToBdd(): start\n");
 
-    std::map<GraphNode*, bool> visitedNodes;
+    std::map<AnnotatedGraphNode*, bool> visitedNodes;
 
     bdd->convertRootNode(root);
     bdd->generateRepresentation(root, visitedNodes);
@@ -628,7 +628,7 @@ void OG::convertToBdd() {
 void OG::convertToBddFull() {
     trace(TRACE_5, "OG::convertToBddFull(): start\n");
 
-    std::map<GraphNode*, bool> visitedNodes;
+    std::map<AnnotatedGraphNode*, bool> visitedNodes;
 
     trace(TRACE_0, "\nHIT A KEY TO CONTINUE (convertToBddFull)\n");
     //getchar();

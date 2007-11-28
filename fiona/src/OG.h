@@ -45,24 +45,24 @@ class oWFN;
 class OG : public CommunicationGraph {
     private:
         /// calculates the annotation (CNF) for the node
-        void computeCNF(GraphNode* node) const;
+        void computeCNF(AnnotatedGraphNode* node) const;
 
         /// Builds the OG of the associated PN recursively starting at
         /// currentNode.
-        void buildGraph(GraphNode* currentNode, double progress_plus);
+        void buildGraph(AnnotatedGraphNode* currentNode, double progress_plus);
 
         /// calculates the set of successor states in case of an input message
-        void calculateSuccStatesInput(unsigned int, GraphNode*, GraphNode*);
+        void calculateSuccStatesInput(unsigned int, AnnotatedGraphNode*, AnnotatedGraphNode*);
         
         /// calculates the set of successor states in case of an output message
-        void calculateSuccStatesOutput(unsigned int, GraphNode*, GraphNode*);
+        void calculateSuccStatesOutput(unsigned int, AnnotatedGraphNode*, AnnotatedGraphNode*);
 
         /// adds a node to the OG
-        void addGraphNode(GraphNode*, GraphNode*); // for OG
+        void addGraphNode(AnnotatedGraphNode*, AnnotatedGraphNode*); // for OG
         
         /// creates an edge in the OG
-        void addGraphEdge(GraphNode*,
-                          GraphNode*,
+        void addGraphEdge(AnnotatedGraphNode*,
+                          AnnotatedGraphNode*,
                           oWFN::Places_t::size_type,
                           GraphEdgeType); // for OG
 

@@ -32,8 +32,8 @@
  */
 
 #include "containers.h"
-#include "GraphNode.h"
+#include "AnnotatedGraphNode.h"
 
-bool CompareGraphNodes::operator()(GraphNode const* left, GraphNode const* right) {
+bool CompareGraphNodes::operator()(AnnotatedGraphNode const* left, AnnotatedGraphNode const* right) {
     return (left->reachGraphStateSet < right->reachGraphStateSet);
 }

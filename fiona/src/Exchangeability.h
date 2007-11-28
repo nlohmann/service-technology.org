@@ -39,7 +39,7 @@
 //#include <vector>
 //#include <map>
 
-//#include "GraphNode.h"
+//#include "AnnotatedGraphNode.h"
 //#include "CNF.h"
 
 #include "util.h"

@@ -44,8 +44,8 @@ class interactionGraph : public CommunicationGraph {
 
     private:
         /// adds a node and its connecting edge
-        bool addGraphNode(GraphNode*,
-                          GraphNode*,
+        bool addGraphNode(AnnotatedGraphNode*,
+                          AnnotatedGraphNode*,
                           messageMultiSet,
                           GraphEdgeType,
                           double); // for IG
@@ -65,31 +65,31 @@ class interactionGraph : public CommunicationGraph {
 
         /// checks whether the set of input messages contains at least one input message
         /// that has been sent at its maximum
-        bool checkMaximalEvents(messageMultiSet, GraphNode*, GraphEdgeType);
+        bool checkMaximalEvents(messageMultiSet, AnnotatedGraphNode*, GraphEdgeType);
 
         /// Builds the IG of the associated PN starting with the root node
         void buildGraph();
 
         /// Builds the IG of the associated PN recursively
-        void buildGraph(GraphNode*, double);
+        void buildGraph(AnnotatedGraphNode*, double);
 
         /// creates a list of all activated sending and receiving events (input messages 
         /// and output messages) of the current node
-        void getActivatedEventsComputeCNF(GraphNode*, setOfMessages&, setOfMessages&);
+        void getActivatedEventsComputeCNF(AnnotatedGraphNode*, setOfMessages&, setOfMessages&);
 
         /// calculates the set of successor states in case of an input message
-        void calculateSuccStatesSendingEvent(messageMultiSet, GraphNode*, GraphNode*);
+        void calculateSuccStatesSendingEvent(messageMultiSet, AnnotatedGraphNode*, AnnotatedGraphNode*);
 
         /// calculates the set of successor states in case of an output message
-        void calculateSuccStatesReceivingEvent(messageMultiSet, GraphNode*, GraphNode*);
+        void calculateSuccStatesReceivingEvent(messageMultiSet, AnnotatedGraphNode*, AnnotatedGraphNode*);
 
         /// creates a list of all receiving events of the current node and creates the set of
         /// sending events applies the reduction rules: "combine receiving events" and 
         /// "receiving before sending"
-        setOfMessages combineReceivingEvents(GraphNode*, setOfMessages&);
+        setOfMessages combineReceivingEvents(AnnotatedGraphNode*, setOfMessages&);
         
         /// not yet implemented
-        setOfMessages receivingBeforeSending(GraphNode*);
+        setOfMessages receivingBeforeSending(AnnotatedGraphNode*);
 
 };
 

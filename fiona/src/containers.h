@@ -36,7 +36,7 @@
 
 #include <set>
 
-class GraphNode;
+class AnnotatedGraphNode;
 class State;
 
 typedef std::set<State*> StateSet;
@@ -53,7 +53,7 @@ struct CompareGraphNodes {
      * @returns true left is less than right.
      * @returns false left is greater or equal to right.
      */
-    bool operator()(GraphNode const * left, GraphNode const * right);
+    bool operator()(AnnotatedGraphNode const * left, AnnotatedGraphNode const * right);
 };
 
 
@@ -64,7 +64,7 @@ struct CompareGraphNodes {
  * allows for quickly checking whether a newly calculated GraphNode (with a
  * reachGraphStateSet) has the same reachGraphStateSet as an already seen one.
  */
-typedef std::set<GraphNode*, CompareGraphNodes> GraphNodeSet;
+typedef std::set<AnnotatedGraphNode*, CompareGraphNodes> GraphNodeSet;
 
 /**
  * multiset containing messages (input and output events), thus only the index of the corresponding

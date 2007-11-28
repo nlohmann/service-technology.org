@@ -45,27 +45,21 @@
 using namespace std;
 
 
-//! \brief a basic constructor of AnnotadedGraph
-AnnotatedGraph::AnnotatedGraph() :
-    root(NULL) {
+//! \brief a basic constructor of AnnotatedGraph
+AnnotatedGraph::AnnotatedGraph() {
 }
 
 
-//! \brief a basic destructor of AnnotadedGraph
+//! \brief a basic destructor of AnnotatedGraph
 AnnotatedGraph::~AnnotatedGraph() {
 	trace(TRACE_5, "AnnotatedGraph::~AnnotatedGraph() : start\n");
-    for (nodes_iterator node_iter = setOfNodes.begin();
-         node_iter != setOfNodes.end(); ++node_iter) {
-
-        delete *node_iter;
-    }
     trace(TRACE_5, "AnnotatedGraph::~AnnotatedGraph() : end\n");
 }
 
 
 //! \brief add an already existing Node to the Graphs node set
-//! \param node a pointer to a GraphNode
-void AnnotatedGraph::addNode(GraphNode* node) {
+//! \param node a pointer to a AnnotatedGraphNode
+void AnnotatedGraph::addNode(AnnotatedGraphNode* node) {
     setOfNodes.push_back(node);
 }
 
@@ -74,12 +68,12 @@ void AnnotatedGraph::addNode(GraphNode* node) {
 //! \param nodeName a string containing the name of the new node
 //! \param GraphFormula a pointer to a GraphFormula being the annotation of the new node
 //! \param color color of the node
-//! \return returns a pointer to the created GraphNode
-GraphNode* AnnotatedGraph::addNode(const std::string& nodeName,
+//! \return returns a pointer to the created AnnotatedGraphNode
+AnnotatedGraphNode* AnnotatedGraph::addNode(const std::string& nodeName,
                           GraphFormula* annotation,
                           GraphNodeColor color) {
 
-    GraphNode* node = new GraphNode(nodeName, annotation, color, setOfNodes.size());
+    AnnotatedGraphNode* node = new AnnotatedGraphNode(nodeName, annotation, color, setOfNodes.size());
     addNode(node);
     return node;
 }
@@ -93,8 +87,8 @@ void AnnotatedGraph::addEdge(const std::string& srcName,
                     const std::string& dstNodeName,
                     const std::string& label) {
 
-    GraphNode* src = getNodeWithName(srcName);
-    GraphNode* dstNode = getNodeWithName(dstNodeName);
+    AnnotatedGraphNode* src = getNodeWithName(srcName);
+    AnnotatedGraphNode* dstNode = getNodeWithName(dstNodeName);
 
     GraphEdge* transition= new GraphEdge(dstNode,label);
     src->addLeavingEdge(transition);
@@ -112,13 +106,12 @@ bool AnnotatedGraph::hasNodeWithName(const std::string& nodeName) const {
 //! \brief returns a pointer to the node that matches a given name, or NULL else
 //! \param nodeName the name to be matched
 //! \return returns a pointer to the found node or NULL
-GraphNode* AnnotatedGraph::getNodeWithName(const std::string& nodeName) const {
-
+AnnotatedGraphNode* AnnotatedGraph::getNodeWithName(const std::string& nodeName) const {
+    
     for (nodes_const_iterator node_iter = setOfNodes.begin();
          node_iter != setOfNodes.end(); ++node_iter) {
-
-        if ((*node_iter)->getName() == nodeName) {
-            return *node_iter;
+            if ((*node_iter)->getName() == nodeName) {
+                return *node_iter;
         }
     }
 
@@ -126,16 +119,16 @@ GraphNode* AnnotatedGraph::getNodeWithName(const std::string& nodeName) const {
 }
 
 
-//! \brief returns a GraphNode pointer to the root node
+//! \brief returns a AnnotatedGraphNode pointer to the root node
 //! \return returns a pointer to the root node
-GraphNode* AnnotatedGraph::getRoot() const {
+AnnotatedGraphNode* AnnotatedGraph::getRoot() const {
     return root;
 }
 
 
 //! \brief sets the root node of the graph to a given node
 //! \param newRoot a pointer to the node to become the new root
-void AnnotatedGraph::setRoot(GraphNode* newRoot) {
+void AnnotatedGraph::setRoot(AnnotatedGraphNode* newRoot) {
     root = newRoot;
 }
 
@@ -192,7 +185,7 @@ void AnnotatedGraph::removeFalseNodes() {
 
 //! \brief removes all edges that have a given node as destination
 //! \param nodeToDelete a pointer to the node that will be deleted
-void AnnotatedGraph::removeEdgesToNodeFromAllOtherNodes(const GraphNode* nodeToDelete) {
+void AnnotatedGraph::removeEdgesToNodeFromAllOtherNodes(const AnnotatedGraphNode* nodeToDelete) {
 
     for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
         if (*iNode != nodeToDelete) {
@@ -204,7 +197,7 @@ void AnnotatedGraph::removeEdgesToNodeFromAllOtherNodes(const GraphNode* nodeToD
 
 //! \brief removes all edges that have a given node as source
 //! \param nodeToDelete a pointer to the node that will be deleted
-void AnnotatedGraph::removeEdgesFromNodeToAllOtherNodes(GraphNode* nodeToDelete) {
+void AnnotatedGraph::removeEdgesFromNodeToAllOtherNodes(AnnotatedGraphNode* nodeToDelete) {
 
     for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
         if (*iNode != nodeToDelete) {
@@ -224,7 +217,7 @@ bool AnnotatedGraph::simulates(AnnotatedGraph* smallerOG) {
         return false;
 
     // We need to remember the pairs of nodes we already visited.
-    set<pair<GraphNode*, GraphNode*> > visitedNodes;
+    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
 
     // Get things moving...
     bool result = false;
@@ -243,9 +236,9 @@ bool AnnotatedGraph::simulates(AnnotatedGraph* smallerOG) {
 //! \param myNode a node in this AnnotatedGraph
 //! \param simNode a node in the simulant
 //! \param visitedNodes Holds all visited pairs of nodes.
-bool AnnotatedGraph::simulatesRecursive(GraphNode *myNode,
-                               GraphNode *simNode,
-                               set<pair<GraphNode*, GraphNode*> >& visitedNodes) {
+bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
+                               AnnotatedGraphNode *simNode,
+                               set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes) {
 
     // checking, whether myNode simulates simNode; result is true, iff
     // 1) anno of simNode implies anno of myNode and
@@ -293,7 +286,7 @@ bool AnnotatedGraph::simulatesRecursive(GraphNode *myNode,
 
     // now we check whether myNode has each outgoing event of simNode
     trace(TRACE_3, "\t\t checking edges...\n");
-    GraphNode::LeavingEdges::ConstIterator
+    AnnotatedGraphNode::LeavingEdges::ConstIterator
             simEdgeIter = simNode->getLeavingEdgesConstIterator();
 
     while (simEdgeIter->hasNext()) {
@@ -310,8 +303,8 @@ bool AnnotatedGraph::simulatesRecursive(GraphNode *myNode,
         } else {
             trace(TRACE_4, "\t\t\t event present, going down\n");
 
-            if (!simulatesRecursive(myEdge->getDstNode(),
-                                    simEdge->getDstNode(),
+            if (!simulatesRecursive((AnnotatedGraphNode*)myEdge->getDstNode(),
+                                    (AnnotatedGraphNode*)simEdge->getDstNode(),
                                     visitedNodes)) {
                 delete simEdgeIter;
                 return false;
@@ -338,12 +331,12 @@ void AnnotatedGraph::filter(AnnotatedGraph *rhsOG) {
     // we may need a seperated "true" node, so we construct it
     // if we do not need the node, it remains isolated; there shouldn't be conflicts
     GraphFormulaTrue* trueAnnotation= new GraphFormulaTrue();
-    GraphNode* trueNode= new GraphNode("_true", trueAnnotation);
+    AnnotatedGraphNode* trueNode= new AnnotatedGraphNode("_true", trueAnnotation);
     addNode(trueNode);
 
     //We need to remember the nodes we already visited.
-    set<GraphNode*> *VisitedNodes;
-    VisitedNodes = new set<GraphNode*>;
+    set<AnnotatedGraphNode*> *VisitedNodes;
+    VisitedNodes = new set<AnnotatedGraphNode*>;
     VisitedNodes->insert(trueNode);
 
     // start the filter construction by top down traversation
@@ -358,9 +351,9 @@ void AnnotatedGraph::filter(AnnotatedGraph *rhsOG) {
 //! \param myNode a node in the current OG
 //! \param rhsNode a node in the operand
 //! \param VisitedNodes a set of Nodes as a reminder of the already visited nodes; starts as empty
-void AnnotatedGraph::filterRecursive(GraphNode *myNode,
-                            GraphNode *rhsNode,
-                            set<GraphNode*> *VisitedNodes) {
+void AnnotatedGraph::filterRecursive(AnnotatedGraphNode *myNode,
+                            AnnotatedGraphNode *rhsNode,
+                            set<AnnotatedGraphNode*> *VisitedNodes) {
     trace(TRACE_5, "AnnotatedGraph::filterRecursive(...): begin\n");
 
     // nothing to be done
@@ -385,7 +378,7 @@ void AnnotatedGraph::filterRecursive(GraphNode *myNode,
 
     // iterate over each outgoing edge of the operand node
     trace(TRACE_5, "AnnotatedGraph::filterRecursive: pre order creation\n");
-    GraphNode::LeavingEdges::Iterator
+    AnnotatedGraphNode::LeavingEdges::Iterator
             rhsEdgeIter = rhsNode->getLeavingEdgesIterator();
     while (rhsEdgeIter->hasNext()) {
         GraphEdge* rhsEdge = rhsEdgeIter->getNext();
@@ -439,7 +432,7 @@ void AnnotatedGraph::filterRecursive(GraphNode *myNode,
             return;
         } else {
             // iterate over the outgoin edges
-            filterRecursive(myEdge->getDstNode(), rhsEdge->getDstNode(),
+            filterRecursive((AnnotatedGraphNode*)myEdge->getDstNode(), (AnnotatedGraphNode*)rhsEdge->getDstNode(),
                             VisitedNodes);
         }
     }
@@ -478,12 +471,12 @@ bool AnnotatedGraph::isAcyclic() {
     trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): start\n");
 
     // Define a set for every Node, that will contain all transitive parent nodes
-    map<GraphNode*, set<GraphNode*> > parentNodes;
+    map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> > parentNodes;
 
     // Define a queue for all nodes that still need to be tested and initialize it
-    queue<GraphNode*> testNodes;
+    queue<AnnotatedGraphNode*> testNodes;
     testNodes.push(root);
-    GraphNode* testNode;
+    AnnotatedGraphNode* testNode;
 
     // While there are still nodes in the queue
     while (!testNodes.empty()) {
@@ -495,7 +488,7 @@ bool AnnotatedGraph::isAcyclic() {
         parentNodes[testNode].insert(testNode);
 
         // Iterate all transitions of that node
-        GraphNode::LeavingEdges::ConstIterator
+        AnnotatedGraphNode::LeavingEdges::ConstIterator
                 edgeIter = testNode->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
@@ -505,14 +498,14 @@ bool AnnotatedGraph::isAcyclic() {
 
                 // Return false if an outgoing transition points at a transitive parent node,
                 // else add the destination to the queue and update its transitive parent nodes
-                if (parentNodes[testNode].find(edge->getDstNode())
+                if (parentNodes[testNode].find((AnnotatedGraphNode*)edge->getDstNode())
                         != parentNodes[testNode].end()) {
                     delete edgeIter;
                     trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): end\n");
                     return false;
                 } else {
-                    testNodes.push(edge->getDstNode());
-                    parentNodes[edge->getDstNode()].insert(parentNodes[testNode].begin(),
+                    testNodes.push((AnnotatedGraphNode*)edge->getDstNode());
+                    parentNodes[(AnnotatedGraphNode*)edge->getDstNode()].insert(parentNodes[testNode].begin(),
                                       parentNodes[testNode].end());
                 }
             }
@@ -538,10 +531,10 @@ unsigned int AnnotatedGraph::numberOfServices() {
     }
 
     // define variables that will be used in the recursive function
-    map<GraphNode*, list <set<GraphNode*> > > validFollowerCombinations;
-    set<GraphNode*> activeNodes;
-    map<GraphNode*, unsigned int> followers;
-    map<set<GraphNode*>, unsigned int> eliminateRedundantCounting;
+    map<AnnotatedGraphNode*, list <set<AnnotatedGraphNode*> > > validFollowerCombinations;
+    set<AnnotatedGraphNode*> activeNodes;
+    map<AnnotatedGraphNode*, unsigned int> followers;
+    map<set<AnnotatedGraphNode*>, unsigned int> eliminateRedundantCounting;
 
     // define variables that will be used in the preprocessing before starting the recursion
     set<string> labels;
@@ -564,7 +557,7 @@ unsigned int AnnotatedGraph::numberOfServices() {
         // save those labels in a set and fill a mapping that allows finding the
         // outgoing edges for a label. (does not work with non-determinism yet)
         trace(TRACE_5, "Collecting labels of outgoing edges for current node\n");
-        GraphNode::LeavingEdges::ConstIterator edgeIter =(*iNode)->getLeavingEdgesConstIterator();
+        AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =(*iNode)->getLeavingEdgesConstIterator();
         while (edgeIter->hasNext()) {
             GraphEdge* edge = edgeIter->getNext();
             if (edge->getDstNode()->getColor() == BLUE) {
@@ -584,7 +577,7 @@ unsigned int AnnotatedGraph::numberOfServices() {
                                                          assignmentList);
 
         // create a temporary variable for a set of nodes
-        set<GraphNode*> followerNodes;
+        set<AnnotatedGraphNode*> followerNodes;
 
         // for every true assignment in the list a set of nodes will be created. These are the nodes which are
         // reached by outgoing edges of which the labels were true in the assignment. This set is then saved in
@@ -593,12 +586,12 @@ unsigned int AnnotatedGraph::numberOfServices() {
                 assignment = assignmentList.begin(); assignment
                 != assignmentList.end(); assignment++) {
 
-            followerNodes = set<GraphNode*>();
+            followerNodes = set<AnnotatedGraphNode*>();
             for (set<string>::iterator label = labels.begin(); label
                     != labels.end(); label++) {
 
                 if (assignment->get((*label))) {
-                    followerNodes.insert(edges[(*label)]->getDstNode());
+                    followerNodes.insert((AnnotatedGraphNode*)edges[(*label)]->getDstNode());
                 }
             }
             validFollowerCombinations[(*iNode)].push_back(followerNodes);
@@ -640,10 +633,10 @@ unsigned int AnnotatedGraph::numberOfServices() {
 //!        possible active node sets 
 //! \param instances number of already processed sets of active Nodes
 //! \return number of Services for the current set of active nodes
-unsigned int AnnotatedGraph::numberOfServicesRecursively(set<GraphNode*> activeNodes,
-                                                map<GraphNode*, unsigned int>& followers,
-                                                map<GraphNode*, list<set<GraphNode*> > >& validFollowerCombinations,
-                                                map<set<GraphNode*>, unsigned int>& eliminateRedundantCounting,
+unsigned int AnnotatedGraph::numberOfServicesRecursively(set<AnnotatedGraphNode*> activeNodes,
+                                                map<AnnotatedGraphNode*, unsigned int>& followers,
+                                                map<AnnotatedGraphNode*, list<set<AnnotatedGraphNode*> > >& validFollowerCombinations,
+                                                map<set<AnnotatedGraphNode*>, unsigned int>& eliminateRedundantCounting,
                                                 unsigned int& instances) {
     if (instances % 10000== 0&& instances != 0) {
         if (instances > 100000) {
@@ -661,15 +654,15 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(set<GraphNode*> activeN
 
     // define needed variables
     unsigned int number = 0;
-    list< set<GraphNode*> > oldList;
-    list< set<GraphNode*> > newList;
-    set<GraphNode*> tempSet;
+    list< set<AnnotatedGraphNode*> > oldList;
+    list< set<AnnotatedGraphNode*> > newList;
+    set<AnnotatedGraphNode*> tempSet;
     bool first = true;
     bool usingNew = true;
     bool finalInstance = true;
 
     // process all active nodes of this instance
-    for (set<GraphNode*>::iterator activeNode = activeNodes.begin(); activeNode
+    for (set<AnnotatedGraphNode*>::iterator activeNode = activeNodes.begin(); activeNode
             != activeNodes.end(); activeNode++) {
 
         // if the active node has no valid outgoing edges, do nothing. If that happens
@@ -683,7 +676,7 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(set<GraphNode*> activeN
             if (first) {
 
                 first = false;
-                for (list<set<GraphNode*> >::iterator
+                for (list<set<AnnotatedGraphNode*> >::iterator
                         combination = validFollowerCombinations[(*activeNode)].begin(); combination
                         != validFollowerCombinations[(*activeNode)].end(); combination++) {
 
@@ -700,22 +693,22 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(set<GraphNode*> activeN
             if (usingNew) {
 
                 newList.clear();
-                for (list<set<GraphNode*> >::iterator
+                for (list<set<AnnotatedGraphNode*> >::iterator
                         oldListSet = oldList.begin(); oldListSet
                         != oldList.end(); oldListSet++) {
 
-                    for (list<set<GraphNode*> >::iterator
+                    for (list<set<AnnotatedGraphNode*> >::iterator
                             combination = validFollowerCombinations[(*activeNode)].begin(); combination
                             != validFollowerCombinations[(*activeNode)].end(); combination++) {
 
-                        tempSet = set<GraphNode*>();
+                        tempSet = set<AnnotatedGraphNode*>();
 
-                        for (set<GraphNode*>::iterator insertionNode = (*combination).begin(); insertionNode != (*combination).end(); insertionNode++) {
+                        for (set<AnnotatedGraphNode*>::iterator insertionNode = (*combination).begin(); insertionNode != (*combination).end(); insertionNode++) {
 
                             tempSet.insert((*insertionNode));
                         }
 
-                        for (set<GraphNode*>::iterator insertionNode = (*oldListSet).begin(); insertionNode != (*oldListSet).end(); insertionNode++) {
+                        for (set<AnnotatedGraphNode*>::iterator insertionNode = (*oldListSet).begin(); insertionNode != (*oldListSet).end(); insertionNode++) {
 
                             tempSet.insert((*insertionNode));
                         }
@@ -727,22 +720,22 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(set<GraphNode*> activeN
             } else {
 
                 oldList.clear();
-                for (list<set<GraphNode*> >::iterator
+                for (list<set<AnnotatedGraphNode*> >::iterator
                         newListSet = newList.begin(); newListSet
                         != newList.end(); newListSet++) {
 
-                    for (list<set<GraphNode*> >::iterator
+                    for (list<set<AnnotatedGraphNode*> >::iterator
                             combination = validFollowerCombinations[(*activeNode)].begin(); combination
                             != validFollowerCombinations[(*activeNode)].end(); combination++) {
 
-                        tempSet = set<GraphNode*>();
+                        tempSet = set<AnnotatedGraphNode*>();
 
-                        for (set<GraphNode*>::iterator insertionNode = (*combination).begin(); insertionNode != (*combination).end(); insertionNode++) {
+                        for (set<AnnotatedGraphNode*>::iterator insertionNode = (*combination).begin(); insertionNode != (*combination).end(); insertionNode++) {
 
                             tempSet.insert((*insertionNode));
                         }
 
-                        for (set<GraphNode*>::iterator insertionNode = (*newListSet).begin(); insertionNode != (*newListSet).end(); insertionNode++) {
+                        for (set<AnnotatedGraphNode*>::iterator insertionNode = (*newListSet).begin(); insertionNode != (*newListSet).end(); insertionNode++) {
 
                             tempSet.insert((*insertionNode));
                         }
@@ -753,7 +746,7 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(set<GraphNode*> activeN
             }
         } else {
             bool valid = false;
-            for (list<set<GraphNode*> >::iterator
+            for (list<set<AnnotatedGraphNode*> >::iterator
                     combination = validFollowerCombinations[(*activeNode)].begin(); combination
                     != validFollowerCombinations[(*activeNode)].end(); combination++) {
                 if ((*combination).empty()) {
@@ -776,7 +769,7 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(set<GraphNode*> activeN
     // if there were sets of following nodes, create a new instance of active nodes for every tuple of
     // following sets and add the results to this instance's number of services
     if (usingNew) {
-        for (list<set<GraphNode*> >::iterator oldListSet = oldList.begin(); oldListSet
+        for (list<set<AnnotatedGraphNode*> >::iterator oldListSet = oldList.begin(); oldListSet
                 != oldList.end(); oldListSet++) {
 
             number += numberOfServicesRecursively((*oldListSet), followers,
@@ -785,7 +778,7 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(set<GraphNode*> activeN
                                                   instances);
         }
     } else {
-        for (list<set<GraphNode*> >::iterator newListSet = newList.begin(); newListSet
+        for (list<set<AnnotatedGraphNode*> >::iterator newListSet = newList.begin(); newListSet
                 != newList.end(); newListSet++) {
 
             number += numberOfServicesRecursively((*newListSet), followers,
@@ -817,7 +810,7 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(set<GraphNode*> activeN
 //! \return number of true Assignments
 unsigned int AnnotatedGraph::processAssignmentsRecursively(set<string> labels,
                                                   GraphFormulaAssignment possibleAssignment,
-                                                  GraphNode* testNode,
+                                                  AnnotatedGraphNode* testNode,
                                                   list<GraphFormulaAssignment>& assignmentList) {
 
     // If there is no outgoing transition, return immediatly
@@ -899,8 +892,8 @@ AnnotatedGraph* AnnotatedGraph::product(const AnnotatedGraph* rhs) {
 
     // first we build a new root node that has name and annotation constructed
     // from the root nodes of OG and the rhs OG.
-    GraphNode* currentOGNode = this->getRoot();
-    GraphNode* currentRhsNode = rhs->getRoot();
+    AnnotatedGraphNode* currentOGNode = this->getRoot();
+    AnnotatedGraphNode* currentRhsNode = rhs->getRoot();
 
     std::string currentName;
     currentName = currentOGNode->getName() + "x"+ currentRhsNode->getName();
@@ -909,7 +902,7 @@ AnnotatedGraph* AnnotatedGraph::product(const AnnotatedGraph* rhs) {
                                                               currentRhsNode);
 
     // building the new root node of the product OG
-    GraphNode* productNode = new GraphNode(currentName, currentFormula);
+    AnnotatedGraphNode* productNode = new AnnotatedGraphNode(currentName, currentFormula);
     productOG->addNode(productNode);
     productOG->setRoot(productNode);
 
@@ -951,13 +944,13 @@ AnnotatedGraph* AnnotatedGraph::product(const ogs_t& ogs) {
 //! \param currentOGNode the current node of the OG
 //! \param currentRhsNode the current node of the rhs OG
 //! \param productOG the resulting product OG
-void AnnotatedGraph::buildProductOG(GraphNode* currentOGNode,
-                           GraphNode* currentRhsNode,
+void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
+                           AnnotatedGraphNode* currentRhsNode,
                            AnnotatedGraph* productOG) {
 
     trace(
           TRACE_5,
-          "AnnotatedGraph::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, AnnotatedGraph* productOG): start\n");
+          "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): start\n");
 
     // at this time, the node constructed from currentOGNode and
     // currentRhsNode is already inserted
@@ -966,7 +959,7 @@ void AnnotatedGraph::buildProductOG(GraphNode* currentOGNode,
 
     // iterate over all outgoing edges from current node of OG
     std::string currentLabel;
-    GraphNode::LeavingEdges::ConstIterator
+    AnnotatedGraphNode::LeavingEdges::ConstIterator
             edgeIter = currentOGNode->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
@@ -985,18 +978,18 @@ void AnnotatedGraph::buildProductOG(GraphNode* currentOGNode,
             assert(productOG->hasNodeWithName(currentName));
 
             // compute both successors and recursively call buildProductOG again
-            GraphNode* newOGNode;
-            newOGNode = currentOGNode->followEdgeWithLabel(currentLabel);
+            AnnotatedGraphNode* newOGNode;
+            newOGNode = (AnnotatedGraphNode*)currentOGNode->followEdgeWithLabel(currentLabel);
 
-            GraphNode* newRhsNode;
-            newRhsNode = currentRhsNode->followEdgeWithLabel(currentLabel);
+            AnnotatedGraphNode* newRhsNode;
+            newRhsNode = (AnnotatedGraphNode*)currentRhsNode->followEdgeWithLabel(currentLabel);
 
             // build the new node of the product OG
             // that has name and annotation constructed from current nodes of OG and rhs OG
             std::string newProductName;
             newProductName = newOGNode->getName() + "x"+ newRhsNode->getName();
             // if the node is new, add that node to the OG
-            GraphNode* found = productOG->getNodeWithName(newProductName);
+            AnnotatedGraphNode* found = productOG->getNodeWithName(newProductName);
 
             if (found != NULL) {
                 // the node was known before, so we just have to add a new edge
@@ -1004,7 +997,7 @@ void AnnotatedGraph::buildProductOG(GraphNode* currentOGNode,
 
                 trace(
                       TRACE_5,
-                      "AnnotatedGraph::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, AnnotatedGraph* productOG): end\n");
+                      "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): end\n");
             } else {
                 // we computed a new node, so we add a node and an edge
                 // trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
@@ -1014,7 +1007,7 @@ void AnnotatedGraph::buildProductOG(GraphNode* currentOGNode,
                                                                       newOGNode,
                                                                       newRhsNode);
 
-                GraphNode* newProductNode= new GraphNode(newProductName, newProductFormula);
+                AnnotatedGraphNode* newProductNode= new AnnotatedGraphNode(newProductName, newProductFormula);
 
                 productOG->addNode(newProductNode);
 
@@ -1028,7 +1021,7 @@ void AnnotatedGraph::buildProductOG(GraphNode* currentOGNode,
     delete edgeIter;
     trace(
           TRACE_5,
-          "AnnotatedGraph::buildProductOG(GraphNode* currentOGNode, GraphNode* currentRhsNode, AnnotatedGraph* productOG): end\n");
+          "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): end\n");
 }
 
 //! \brief Creates and returns the annotation for the product node of the given two nodes.
@@ -1036,8 +1029,8 @@ void AnnotatedGraph::buildProductOG(GraphNode* currentOGNode,
 //! \param lhs the first node
 //! \param rhs the second node
 //! \return returns the Formula of the product node
-GraphFormulaCNF* AnnotatedGraph::createProductAnnotation(const GraphNode* lhs,
-                                                const GraphNode* rhs) const {
+GraphFormulaCNF* AnnotatedGraph::createProductAnnotation(const AnnotatedGraphNode* lhs,
+                                                const AnnotatedGraphNode* rhs) const {
 
     GraphFormulaMultiaryAnd* conjunction= new GraphFormulaMultiaryAnd(
             lhs->getAnnotation()->getDeepCopy(),
@@ -1101,7 +1094,7 @@ void AnnotatedGraph::printDotFile(const std::string& filenamePrefix,
     dotFileHandle << "node [fontname=\"Helvetica\" fontsize=10];\n";
     dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
-    std::map<GraphNode*, bool> visitedNodes;
+    std::map<AnnotatedGraphNode*, bool> visitedNodes;
     printGraphToDot(getRoot(), dotFileHandle, visitedNodes);
 
     dotFileHandle << "}";
@@ -1127,9 +1120,9 @@ void AnnotatedGraph::printDotFile(const std::string& filenamePrefix) const {
 //! \param v current node in the iteration process
 //! \param os output stream
 //! \param visitedNodes maps nodes to Bools remembering already visited nodes
-void AnnotatedGraph::printGraphToDot(GraphNode* v,
+void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v,
                             fstream& os,
-                            std::map<GraphNode*, bool>& visitedNodes) const {
+                            std::map<AnnotatedGraphNode*, bool>& visitedNodes) const {
 
     if (v == NULL) {
         // print the empty OG...
@@ -1146,7 +1139,7 @@ void AnnotatedGraph::printGraphToDot(GraphNode* v,
 
         std::string currentLabel;
 
-        GraphNode::LeavingEdges::ConstIterator
+        AnnotatedGraphNode::LeavingEdges::ConstIterator
                 edgeIter = v->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
@@ -1154,7 +1147,7 @@ void AnnotatedGraph::printGraphToDot(GraphNode* v,
 
             // remember the label of the egde
             currentLabel = edge->getLabel();
-            GraphNode* successor = v->followEdgeWithLabel(currentLabel);
+            AnnotatedGraphNode* successor = (AnnotatedGraphNode*)v->followEdgeWithLabel(currentLabel);
             assert(successor != NULL);
 
             os << "p"<< v->getName() << "->"<< "p"<< successor->getName()
@@ -1198,7 +1191,7 @@ void AnnotatedGraph::printOGFile(const std::string& filenamePrefix) const {
     for (nodes_t::const_iterator iNode = setOfNodes.begin();
          iNode != setOfNodes.end(); ++iNode) {
 
-        GraphNode* node = *iNode;
+        AnnotatedGraphNode* node = *iNode;
         if (!node->isToShow(root)) {
             continue;
         }
@@ -1223,12 +1216,12 @@ void AnnotatedGraph::printOGFile(const std::string& filenamePrefix) const {
     for (nodes_t::const_iterator iNode = setOfNodes.begin();
          iNode != setOfNodes.end(); ++iNode) {
 
-        GraphNode* node = *iNode;
+        AnnotatedGraphNode* node = *iNode;
         if (!node->isToShow(root)) {
             continue;
         }
 
-        GraphNode::LeavingEdges::ConstIterator iEdge =
+        AnnotatedGraphNode::LeavingEdges::ConstIterator iEdge =
             node->getLeavingEdgesConstIterator();
 
         while (iEdge->hasNext()) {
@@ -1270,7 +1263,7 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap() {
 
     for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
         if ((*iNode)->isBlue() && (parameters[P_SHOW_EMPTY_NODE] || (*iNode)->reachGraphStateSet.size() != 0)) {
-            GraphNode::LeavingEdges::Iterator iEdge = (*iNode)->getLeavingEdgesIterator();
+            AnnotatedGraphNode::LeavingEdges::Iterator iEdge = (*iNode)->getLeavingEdgesIterator();
             while (iEdge->hasNext()) {
                 GraphEdge* edge = iEdge->getNext();
                 if (edge->getDstNode()->isBlue() && (parameters[P_SHOW_EMPTY_NODE]
@@ -1329,7 +1322,7 @@ GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormula() {
 //! NOTE: the subgraph has to be acyclic!
 //! \param node the root of the subgraph
 //! \return returns the structure formula of the subgraph
-GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormulaRecursively(GraphNode *node) {
+GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormulaRecursively(AnnotatedGraphNode *node) {
     trace(TRACE_5, "AnnotatedGraph::createStructureFormulaRecursively()::begin()\n");
     
     GraphFormulaMultiaryAnd *formula = new GraphFormulaMultiaryAnd;
@@ -1357,7 +1350,7 @@ GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormulaRecursively(Graph
                  new_lit = new GraphFormulaLiteral(lit->asString());
              }
              GraphFormulaMultiaryAnd* new_and = new GraphFormulaMultiaryAnd(new_lit, 
-                     createStructureFormulaRecursively(node->followEdgeWithLabel(lit->asString())));
+                     createStructureFormulaRecursively((AnnotatedGraphNode*)node->followEdgeWithLabel(lit->asString())));
              new_clause->addSubFormula(new_and);
          }
          formula->addSubFormula(new_clause);
@@ -1371,11 +1364,11 @@ GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormulaRecursively(Graph
 
 //! \brief remove a node from the AnnotatedGraph
 //! \param node node to remove
-void AnnotatedGraph::removeNode(GraphNode* node) {
+void AnnotatedGraph::removeNode(AnnotatedGraphNode* node) {
     assert(node);
     // setOfNodes.erase(node);  // only valid if container is a std::set
 
-    for (vector<GraphNode*>::iterator testnode = setOfNodes.begin(); testnode
+    for (vector<AnnotatedGraphNode*>::iterator testnode = setOfNodes.begin(); testnode
             != setOfNodes.end(); testnode++) {
         if ((*testnode) == node) {
             setOfNodes.erase(testnode);
@@ -1391,7 +1384,7 @@ void AnnotatedGraph::removeNodesAnnotatedWithTrue() {
     // iterate over all nodes of the AnnotatedGraph
     for (nodes_iterator node_iter = setOfNodes.begin(); node_iter
             != setOfNodes.end(); ++node_iter) {
-        GraphNode* currNode = *node_iter;
+        AnnotatedGraphNode* currNode = *node_iter;
         // check whether node is annotated with true
         if (currNode->getAnnotationAsString() == GraphFormulaLiteral::TRUE) {
             // node is annotated with true
@@ -1414,9 +1407,9 @@ void AnnotatedGraph::constructDualService() {
     // iterate over all nodes of the AnnotatedGraph
     for (nodes_iterator node_iter = setOfNodes.begin(); node_iter
             != setOfNodes.end(); ++node_iter) {
-        GraphNode* currNode = *node_iter;
+        AnnotatedGraphNode* currNode = *node_iter;
         // iterate over all leaving edges of the current node
-        GraphNode::LeavingEdges::Iterator
+        AnnotatedGraphNode::LeavingEdges::Iterator
                 edge_iter = currNode->getLeavingEdgesIterator();
         while (edge_iter->hasNext()) {
             GraphEdge* currEdge = edge_iter->getNext();
@@ -1452,19 +1445,19 @@ void AnnotatedGraph::constructDualService() {
 //! \complexity O(n*2i*o+m), with n nodes, m edges, i input and o output events
 void AnnotatedGraph::fixDualService() {
     // prepare deadlock creation
-    GraphNode* deadlock = NULL;
-    map<std::string, GraphNode*> deadlockMap;
+    AnnotatedGraphNode* deadlock = NULL;
+    map<std::string, AnnotatedGraphNode*> deadlockMap;
     unsigned int currNumberOfDeadlocks = 0;
     if (!options[O_PV_MULTIPLE_DEADLOCKS]) {
         // create new deadlock node
-        deadlock = new GraphNode("deadlock", new GraphFormulaFixed(false, GraphFormulaLiteral::FALSE));
+        deadlock = new AnnotatedGraphNode("deadlock", new GraphFormulaFixed(false, GraphFormulaLiteral::FALSE));
     }
 
     // iterate over all nodes of the AnnotatedGraph
     for (nodes_iterator node_iter = setOfNodes.begin();
          node_iter != setOfNodes.end(); ++node_iter) {
 
-        GraphNode* currNode = *node_iter;
+        AnnotatedGraphNode* currNode = *node_iter;
 
         // 1st fix: if !a is disabled in q of OG, add ?a->Deadlock in q of dual service
         // preparation: assume all receive events are disabled in current node (dual service)
@@ -1476,7 +1469,7 @@ void AnnotatedGraph::fixDualService() {
         bool apply2ndFix = false;
         // preparation: we need to store the leaving edges for the new node somewhere
         set<GraphEdge*> newNodesEdges;
-        GraphNode::LeavingEdges::Iterator edge_iter = currNode->getLeavingEdgesIterator();
+        AnnotatedGraphNode::LeavingEdges::Iterator edge_iter = currNode->getLeavingEdgesIterator();
         while (edge_iter->hasNext()) {
             newNodesEdges.insert(edge_iter->getNext());
         }
@@ -1541,7 +1534,7 @@ void AnnotatedGraph::fixDualService() {
                     // deadlock node could not be determined
                     // create new deadlock node
                     deadlock =
-                        new GraphNode("deadlock" +
+                        new AnnotatedGraphNode("deadlock" +
                                       intToString(currNumberOfDeadlocks++),
                                       new GraphFormulaFixed(false,
                                                             GraphFormulaLiteral::FALSE));
@@ -1562,7 +1555,7 @@ void AnnotatedGraph::fixDualService() {
             // create new node
             // as there exists a leaving edge representing a send event in currNode,
             //   currNode cannot be annotated with final (same goes for newNode)
-            GraphNode* newNode= new GraphNode(currNode->getName() + "_",
+            AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_",
                     new GraphFormulaFixed(true, ""), currNode->getColor());
             trace(TRACE_5, "created new node " + newNode->getName() + "\n");
             // create tau transition from current to new node
@@ -1630,7 +1623,7 @@ void AnnotatedGraph::fixDualService() {
     if (!options[O_PV_MULTIPLE_DEADLOCKS]) {
         this->addNode(deadlock);
     } else {
-        map<std::string, GraphNode*>::iterator deadlockIter;
+        map<std::string, AnnotatedGraphNode*>::iterator deadlockIter;
         for (deadlockIter = deadlockMap.begin(); deadlockIter
                 != deadlockMap.end(); ++deadlockIter) {
             this->addNode(deadlockIter->second);

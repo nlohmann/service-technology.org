@@ -1,0 +1,487 @@
+/*****************************************************************************
+ * Copyright 2005, 2006, 2007 Peter Massuthe, Daniela Weinberg,              *
+ *           Jan Bretschneider, Leonard Kern                                 *
+ *                                                                           *
+ * This file is part of Fiona.                                               *
+ *                                                                           *
+ * Fiona is free software; you can redistribute it and/or modify it          *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
+ * option) any later version.                                                *
+ *                                                                           *
+ * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                             *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ *****************************************************************************/
+
+/*!
+ * \file    AnnotatedGraphNode.cc
+ *
+ * \brief   functions for handling of nodes of IG / OG
+ *
+ * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
+ *
+ * \note    This file is part of the tool Fiona and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universitt zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
+ *
+ */
+
+#include "mynew.h"
+#include "AnnotatedGraphNode.h"
+#include "options.h"
+#include <cassert>
+
+using namespace std;
+
+/******************
+* class AnnotatedGraphNode *
+******************/
+
+/*!
+ * \brief constructor (no parameters)
+ */
+AnnotatedGraphNode::AnnotatedGraphNode() {
+
+    annotation = new GraphFormulaCNF();
+}
+
+
+/*!
+ * \brief constructor (four parameters)
+ *
+ * \param _name the name of this node
+ * \param _annotation the annotation of this node
+ * \param _color the colour of this node
+ * \param _number the number of this node
+ */
+AnnotatedGraphNode::AnnotatedGraphNode(const std::string& _name,
+                                       GraphFormula* _annotation,
+                                       GraphNodeColor _color,
+                                       unsigned int _number) : GraphNode(_name, _color, _number) {
+    
+    annotation = _annotation->getCNF();
+    delete _annotation; // because getCNF() returns a newly create formula
+}
+
+
+/*!
+ * \brief destructor
+ */
+AnnotatedGraphNode::~AnnotatedGraphNode() {
+    
+    trace(TRACE_5, "AnnotatedGraphNode::~AnnotatedGraphNode() : start\n");
+    
+    delete annotation;
+    
+    trace(TRACE_5, "AnnotatedGraphNode::~AnnotatedGraphNode() : end\n");
+}
+
+
+/*!
+ * \brief returns the CNF formula that is this node's annotation
+ *
+ * \return this node's annotation as a GraphFormulaCNF
+ */
+GraphFormulaCNF* AnnotatedGraphNode::getAnnotation() const {
+    return annotation;
+}
+
+// CODE FROM PL
+/*!
+ * \brief sets the annotation of this node
+ * 
+ * \param newAnnotation annotation of the node
+ */ 
+void AnnotatedGraphNode::setAnnotation(GraphFormulaCNF* newAnnotation) {
+	if (annotation != NULL) {
+		delete annotation;
+	}
+	annotation = newAnnotation;
+}
+// END OF CODE FROM PL
+
+
+/*!
+ * \brief returns the CNF formula that is this node's annotation as a String
+ *
+ * \return this node's annotation as a String
+ */
+std::string AnnotatedGraphNode::getAnnotationAsString() const {
+    assert(annotation != NULL);
+    return annotation->asString();
+}
+
+
+/*!
+ * \brief adds a new clause to the CNF formula of the node
+ *
+ * \param myclause the clause to be added to the annotation of the current node
+ */
+void AnnotatedGraphNode::addClause(GraphFormulaMultiaryOr* myclause) {
+    annotation->addClause(myclause);
+}
+
+
+/*!
+ * \brief analyses the node and sets its color
+ */
+void AnnotatedGraphNode::analyseNode() {
+    
+    trace(TRACE_5, "AnnotatedGraphNode::analyseNodeByFormula() : start\n");
+    
+    trace(TRACE_3, "\t\t\t analysing node ");
+    trace(TRACE_3, this->getNumber() + "...\n");
+    
+    assert(this->getColor() == BLUE);
+    
+    // computing the assignment given by outgoing edges (to blue nodes)
+    GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
+    
+    // traverse outgoing edges and set the corresponding literals
+    // to true if the respective node is BLUE
+    LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge* edge = edgeIter->getNext();
+        if (edge->getDstNode()->getColor() == BLUE) {
+            myassignment->setToTrue(edge->getLabel());
+        }
+    }
+    delete edgeIter;
+    
+    // only if node has final state, set assignment of literal final to true
+    if (this->hasFinalStateInStateSet == true) {
+        myassignment->setToTrue(GraphFormulaLiteral::FINAL);
+    }
+    
+//    cout << "*myassignment: " << *myassignment->asString << endl;
+    
+    // evaluating the computed assignment
+    bool result = this->getAnnotation()->value(*myassignment);
+    delete myassignment;
+    
+    if (result) {
+        trace(TRACE_3, "\t\t\t node analysed blue, formula "
+              + this->getAnnotation()->asString() + "\n");
+        this->setColor(BLUE);
+    } else {
+        trace(TRACE_3, "\t\t\t node analysed red, formula "
+              + this->getAnnotation()->asString() + "\n");
+        this->setColor(RED);
+    }
+    
+    trace(TRACE_5, "AnnotatedGraphNode::analyseNodeByFormula() : end\n");
+}
+
+
+/*!
+ * \brief removes the given literal from this node's annotation
+ *
+ * \param literal the literal which is to be removed
+ */
+void AnnotatedGraphNode::removeLiteralFromAnnotation(const std::string& literal) {
+    trace(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotation(const string& literal) : start\n");
+    
+    //cout << "remove literal " << literal << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
+    annotation->removeLiteral(literal);
+    
+    trace(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotation(const string& literal) : end\n");
+}
+
+
+/*!
+ * \brief removes the given literal from this node's annotation
+ *        by absorbing the literal; multiary formulas made empty
+ *        will be removed
+ *
+ * \param literal the literal which is to be removed
+ */
+void AnnotatedGraphNode::removeLiteralFromAnnotationByHiding(const std::string& literal) {
+    trace(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotationByHiding(const string& literal) : start\n");
+   
+    //cout << "remove literal " << literal << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
+    annotation->removeLiteralByHiding(literal);
+   
+    trace(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotationByHiding(const string& literal) : end\n");
+}
+
+
+/*!
+ * \brief Removes unneeded literals from the node's annotation. Labels of
+ *        edges to red nodes are unneeded.
+ */
+void AnnotatedGraphNode::removeUnneededLiteralsFromAnnotation() {
+    LeavingEdges::ConstIterator
+    edgeIter = getLeavingEdgesConstIterator();
+    
+    while (edgeIter->hasNext()) {
+        GraphEdge* edge = edgeIter->getNext();
+        if (edge->getDstNode()->getColor() == RED) {
+            annotation->removeLiteral(edge->getLabel());
+        }
+    }
+    delete edgeIter;
+}
+
+
+//! \brief returns true iff node should be shown according to the "show" parameter
+//! \param rootOfGraph the root node of the current graph
+//! \return true iff this node should be shown according to the "show" parameter
+bool AnnotatedGraphNode::isToShow(const AnnotatedGraphNode* rootOfGraph) const {
+#undef TRUE
+
+    return ((parameters[P_SHOW_ALL_NODES]) ||
+            (getColor() == BLUE && (annotation->asString() != GraphFormulaLiteral::TRUE ||
+                                    parameters[P_SHOW_EMPTY_NODE])) ||
+            (getColor() == RED && parameters[P_SHOW_RED_NODES]) ||
+            (this == rootOfGraph));
+
+#define TRUE 1
+}
+
+
+/*!
+ * \brief determines whether the given assignment satisfies this node's
+ *        annotation
+ *
+ * \param assignment the assignment that satisfies the annotation or not
+ *
+ * \return true iff the assignment satisfies the annotation
+ */
+bool AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const {
+    
+    assert(annotation != NULL);
+    return annotation->satisfies(assignment);
+}
+
+
+/*!
+ * \brief return the assignment that is imposed by present or absent arcs
+ *        leaving the node
+ *
+ * \return the assignment described above
+ */
+GraphFormulaAssignment* AnnotatedGraphNode::getAssignment() const {
+    
+    trace(TRACE_5, "computing annotation of node " + getName() + "\n");
+    
+    GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
+    
+    // traverse outgoing edges and set the corresponding literals
+    // to true if the respective node is BLUE
+    
+    LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        GraphEdge* edge = edgeIter->getNext();
+        myassignment->setToTrue(edge->getLabel());
+    }
+    delete edgeIter;
+    
+    // we assume that literal final is always true
+    myassignment->setToTrue(GraphFormulaLiteral::FINAL);
+    
+    return myassignment;
+}
+
+
+//! \brief Delivers the element from the priority map with the highest priority.
+//!        The element with the highest priority will be in a clause with minimal length
+//!        and will have the maximal count of occurences throughout the annotation
+//!        in regards to other elements with minimal clause length. 
+//!        The element will be removed afterwards. 
+PriorityMap::KeyType PriorityMap::pop() {
+    trace(TRACE_5, "PriorityMap::pop()::begin()\n");
+    KeyType key;
+
+    // initialize with minimum priority values
+    int min_depth = INT_MAX;
+    int max_occ = 0;
+
+    // iterate over the mapped set of interface places
+    MapType::iterator i;
+    for (i = pm.begin(); i != pm.end(); i++) {
+
+        // consider the element with a minimal depth clause (to catch the init values) 
+        if (i->second.first ==  min_depth) {
+            // consider the second moment of priority (occurence count) 
+            if (i->second.second >= max_occ) {
+                key = i->first;
+                min_depth = i->second.first;
+                max_occ   = i->second.second;
+            }
+        }
+        // first moment of priority suffices 
+        else if (i->second.first < min_depth) {
+            key = i->first;
+            min_depth = i->second.first;
+            max_occ   = i->second.second;
+        }
+    }
+
+    // remove popped element
+    pm.erase(key);
+
+    trace(TRACE_5, "PriorityMap::pop()::end()\n");
+    return key;
+}
+
+//! \brief Delivers the element from the priority map with the highest priority.
+//!        The element with the highest priority will be in a clause with minimal length
+//!        and will have the maximal count of occurences throughout the annotation
+//!        in regards to other elements with minimal clause length. 
+//!        The element will be removed afterwards. 
+messageMultiSet PriorityMap::popIG() {
+    trace(TRACE_5, "PriorityMap::popIG()::begin()\n");
+    messageMultiSet key;
+
+    // initialize with minimum priority values
+    int min_depth = INT_MAX;
+    int max_occ = 0;
+
+    // iterate over the mapped set of interface places
+    MapTypeIG::iterator i;
+    for (i = pmIG.begin(); i != pmIG.end(); i++) {
+
+        // consider the element with a minimal depth clause (to catch the init values) 
+        if (i->second.first ==  min_depth) {
+            // consider the second moment of priority (occurence count) 
+            if (i->second.second >= max_occ) {
+                key = i->first;
+                min_depth = i->second.first;
+                max_occ   = i->second.second;
+            }
+        }
+        // first moment of priority suffices 
+        else if (i->second.first < min_depth) {
+            key = i->first;
+            min_depth = i->second.first;
+            max_occ   = i->second.second;
+        }
+    }
+
+    // remove popped element
+    pmIG.erase(key);
+
+    trace(TRACE_5, "PriorityMap::popIG()::end()\n");
+    return key;
+}
+
+//! \brief Fills the priority map according to the given annotation with interface places 
+//!		   and their corresponding priority.
+//!        NOTE: All interface places will be considered; places not in the
+//!        annotation will have a minimal priority.
+//! @param annotation the annotation, from which the priority map will be extracted.
+void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
+    trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation)::begin()\n");
+
+    oWFN::Places_t::size_type i;
+    KeyType key;
+
+    // iterate over all places in the net
+    for (i = 0; i < PN->getPlaceCount(); i++) {
+
+        key = PN->getPlace(i);
+        // only consider interface places
+        if (key != NULL && (key->getType() == INPUT || key->getType() == OUTPUT)) {
+            // initialize with a minimal priority
+            pm[key].first  = INT_MAX; // minimal clause length
+            pm[key].second = 0;       // maximal occurence in the annotation
+
+            // iterate over the annotation (in cnf) in regards to a specific interface place
+            for (GraphFormulaMultiaryAnd::iterator j = annotation->begin();
+                 j != annotation->end(); j++) {
+
+                GraphFormulaMultiaryOr* clause = dynamic_cast<GraphFormulaMultiaryOr*>(*j);
+                // iterate over disjunctive clauses
+                for (GraphFormulaMultiaryOr::iterator k = clause->begin(); k != clause->end(); k++) {
+
+                    GraphFormulaLiteral* lit = dynamic_cast<GraphFormulaLiteral*>(*k);
+                    // interface place found in the clause?
+                    if (lit->asString() == key->getLabelForCommGraph()) {
+                        // for every literal found, increase the count of occurence 
+                        pm[key].second++;
+
+                        // if this label's actual clause is shorter than the former minimum, set the new minimum
+                        if (clause->size() < pm[key].first) {
+                            pm[key].first = clause->size();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation)::end()\n");
+}
+
+//! \brief Fills the priority map according to the given annotation with interface places 
+//!		   and their corresponding priority.
+//!        NOTE: All interface places will be considered; places not in the
+//!        annotation will have a minimal priority.
+//! @param annotation the annotation, from which the priority map will be extracted.
+void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphFormulaCNF *annotation) {
+    
+	trace(TRACE_3, "PriorityMap::fillForIG(GraphFormulaCNF *annotation)::begin()\n");
+
+	// just to remember which event we have considered already, 
+	// needed for initialising the priority map correctly
+	map<messageMultiSet, bool> eventFound;    
+
+	// iterate over all activated events stored in the set
+	for (setOfMessages::iterator activatedEvent = activatedEvents.begin();
+									activatedEvent != activatedEvents.end();
+									activatedEvent++) {
+
+		// check, if we have not considered this event yet
+		map<messageMultiSet, bool>::iterator found = eventFound.find(*activatedEvent); 
+		if (found != eventFound.end()) {   	
+			// initialize with a minimal priority
+			pmIG[*activatedEvent].first  = INT_MAX; // minimal clause length
+			pmIG[*activatedEvent].second = 0;       // maximal occurences in the annotation
+
+			// remember this that we took a look at this event
+			eventFound[*activatedEvent] = true;
+		}
+
+		// iterate over the annotation (in cnf) with respect to a specific interface place
+		for (GraphFormulaMultiaryAnd::iterator j = annotation->begin();
+												j != annotation->end(); j++) {
+
+			GraphFormulaMultiaryOr* clause = dynamic_cast<GraphFormulaMultiaryOr*>(*j);
+			// iterate over disjunctive clauses
+			for (GraphFormulaMultiaryOr::iterator k = clause->begin(); k != clause->end(); k++) {
+
+				GraphFormulaLiteral* lit = dynamic_cast<GraphFormulaLiteral*>(*k);
+
+				// activated event found in the clause?
+				if (lit->asString() == PN->createLabel(*activatedEvent)) {
+
+					// for every literal found, increase the number of occurences 
+					pmIG[*activatedEvent].second++;
+
+					// if this label's actual clause is shorter than the former minimum, 
+					// set the new minimum
+					if (clause->size() < pmIG[*activatedEvent].first) {
+						pmIG[*activatedEvent].first = clause->size();
+					}
+				}
+			}
+		}
+	}
+
+	trace(TRACE_3, "PriorityMap::fillForIG(GraphFormulaCNF *annotation)::end()\n");
+}
+
+
+bool PriorityMap::empty() const {
+    return pm.empty();
+}
+
+bool PriorityMap::emptyIG() const {
+    return pmIG.empty();
+}

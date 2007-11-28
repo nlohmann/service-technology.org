@@ -39,7 +39,7 @@
 #include <map>
 #include <list>
 
-#include "GraphNode.h"
+#include "AnnotatedGraphNode.h"
 
 #include "util.h"
 #include "cudd.h"
@@ -60,18 +60,18 @@ class BddRepresentation {
                           bool calcStates = false);
         ~BddRepresentation();
 
-        void convertRootNode(GraphNode* root);
-        void generateRepresentation(GraphNode* v, std::map<GraphNode*, bool>&);
-        void addOrDeleteLeavingEdges(GraphNode* v);
+        void convertRootNode(AnnotatedGraphNode* root);
+        void generateRepresentation(AnnotatedGraphNode* v, std::map<AnnotatedGraphNode*, bool>&);
+        void addOrDeleteLeavingEdges(AnnotatedGraphNode* v);
         void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
         void printDotFile(char** names = NULL, char* option = "OG");
         void print();
         void save(char* option = "OG");
         void printMemoryInUse();
 
-        void testSymbRepresentation(GraphNode* v, std::map<GraphNode*, bool>&);
+        void testSymbRepresentation(AnnotatedGraphNode* v, std::map<AnnotatedGraphNode*, bool>&);
         unsigned int getBound();
-        void setMaxPlaceBits(GraphNode* v, std::map<GraphNode*, bool>&);
+        void setMaxPlaceBits(AnnotatedGraphNode* v, std::map<AnnotatedGraphNode*, bool>&);
 
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.
@@ -98,7 +98,7 @@ class BddRepresentation {
         DdNode* labelToBddMp(const std::string& label);
 
         DdNode* nodesToBddMp(unsigned int node1, unsigned int node2);
-        DdNode* annotationToBddAnn(GraphNode* v);
+        DdNode* annotationToBddAnn(AnnotatedGraphNode* v);
         DdNode* clauseToBddAnn(const GraphFormulaMultiaryOr* cl);
         unsigned int getBddNumber(unsigned int node);
         void addBddVars(unsigned int max);
@@ -107,10 +107,10 @@ class BddRepresentation {
         string myitoa(unsigned int value, int base);
         void checkManager(DdManager* mgr, char* table);
 
-        DdNode* statesToBddMp(GraphNode* v);
+        DdNode* statesToBddMp(AnnotatedGraphNode* v);
         DdNode* markingToBddMp(unsigned int* marking);
         unsigned int bound;
-        void calculateBound(GraphNode* v, std::map<GraphNode*, bool>&);
+        void calculateBound(AnnotatedGraphNode* v, std::map<AnnotatedGraphNode*, bool>&);
         int maxPlaceBits;
 };
 

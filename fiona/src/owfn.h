@@ -56,7 +56,7 @@ class State;
 class PlSymbol;
 class Arc;
 class AnnotatedGraph;
-class GraphNode;
+class AnnotatedGraphNode;
 class GraphFormulaAssignment;
 
 class oWFN {
@@ -103,7 +103,7 @@ class oWFN {
         owfnTransition** firelist();
 
         /// helper for matchesWithOG
-        bool matchesWithOGRecursive(GraphNode* currentOGNode,
+        bool matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                                     State* currentState,
                                     string& reasonForFailedMatch);
 
@@ -234,21 +234,21 @@ class oWFN {
         void addPlace(owfnPlace*);
 
         /// decodes state, checks for message bound violation and adds successors
-        void addSuccStatesToList(GraphNode*, State*);
+        void addSuccStatesToList(AnnotatedGraphNode*, State*);
         
         /// decodes state, checks for message bound violation and adds successors recursively
         void addSuccStatesToListStubborn(StateSet&,
                                          owfnPlace*,
                                          State*,
-                                         GraphNode*);
+                                         AnnotatedGraphNode*);
 
         /// decodes state, checks for message bound violation and adds successors recursively
         void addSuccStatesToListStubborn(StateSet&,
                                          messageMultiSet,
                                          State*,
-                                         GraphNode*);
+                                         AnnotatedGraphNode*);
 
-        // void addSuccStatesToListOrig(GraphNode *, State *);		
+        // void addSuccStatesToListOrig(AnnotatedGraphNode *, State *);		
 
         /// checks whether the message bound is violated
         bool violatesMessageBound();
@@ -265,19 +265,19 @@ class oWFN {
         /// replaces the current marking with a given one
         void copyMarkingToCurrentMarking(unsigned int* copy);
         
-        /// calculates the reduced set of states of the new GraphNode in case of an output event
-        void calculateReachableStatesOutputEvent(GraphNode*);
+        /// calculates the reduced set of states of the new AnnotatedGraphNode in case of an output event
+        void calculateReachableStatesOutputEvent(AnnotatedGraphNode*);
 
-        /// calculates the reduced set of states of the new GraphNode in case of an input event
-        void calculateReachableStatesInputEvent(GraphNode*);
+        /// calculates the reduced set of states of the new AnnotatedGraphNode in case of an input event
+        void calculateReachableStatesInputEvent(AnnotatedGraphNode*);
         
-        /// calculates the set of states reachable from the current marking and stores them in the new GraphNode
-        void calculateReachableStates(StateSet&, owfnPlace*, GraphNode*);
-        void calculateReachableStates(StateSet&, messageMultiSet, GraphNode*);
+        /// calculates the set of states reachable from the current marking and stores them in the new AnnotatedGraphNode
+        void calculateReachableStates(StateSet&, owfnPlace*, AnnotatedGraphNode*);
+        void calculateReachableStates(StateSet&, messageMultiSet, AnnotatedGraphNode*);
 
         /// NO REDUCTION! calculate all reachable states from the current marking
-        /// and store them in the node n (== GraphNode of CommunicationGraph)
-        void calculateReachableStatesFull(GraphNode*);
+        /// and store them in the node n (== AnnotatedGraphNode of CommunicationGraph)
+        void calculateReachableStatesFull(AnnotatedGraphNode*);
 
         /// adds input message to the current marking
         void addInputMessage(unsigned int);

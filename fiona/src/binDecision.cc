@@ -51,6 +51,9 @@ binDecision* todec = NULL;
 binDecision* vectordec = NULL;
 
 
+//! \brief constructor (2 parameters)
+//! \param b bitnumber
+//! \param BitVectorSize size of the bit vector
 binDecision::binDecision(int b, long int BitVectorSize) :
     bitnr(b), nextold(NULL), nextnew(NULL) {
 
@@ -61,6 +64,7 @@ binDecision::binDecision(int b, long int BitVectorSize) :
 }
 
 
+//! \brief destructor
 binDecision::~binDecision() {
     delete[] vector;
     delete state;
@@ -69,6 +73,11 @@ binDecision::~binDecision() {
 }
 
 
+//! \brief turns an integer into a binary number
+//! \param DESCRIPTION
+//! \param DESCRIPTION
+//! \param DESCRIPTION
+//! \param DESCRIPTION
 void inttobits(unsigned char* bytepos,
                int bitpos,
                int nrbits,
@@ -100,6 +109,9 @@ void inttobits(unsigned char* bytepos,
 }
 
 
+//! \brief computes the logarithm to base 2 of m
+//! \param m integer for the computation
+//! \return returns log2 of m
 int logzwo(int m) {
     int k = 0;
     while (m) {
@@ -111,12 +123,19 @@ int logzwo(int m) {
 }
 
 
+//! \brief DESCRIPTION
+//! \param PN DESCRIPTION
+//! \return DESCRIPTION
 State* binInsert(oWFN* PN) {
     trace(TRACE_5, "binInsert(oWFN* PN)\n");
     return binInsert(PN->binHashTable + (PN->getPlaceHashValue()), PN);
 }
 
 
+//! \brief DESCRIPTION
+//! \param Bucket DESCRIPTION
+//! \param PN DESCRIPTION
+//! \return DESCRIPTION
 State* binInsert(binDecision** Bucket, oWFN* PN) {
     // relies on a previous bin_search with all values bin_* set properly!
     trace(TRACE_5, "binInsert(binDecision** Bucket, oWFN* PN): start\n");
@@ -200,9 +219,10 @@ State* binInsert(binDecision** Bucket, oWFN* PN) {
 }
 
 
+//! \brief deletes the top level state in HashTable[h]
+//! \param Bucket DESCRIPTION
+//! \param BitVectorSize DESCRIPTION
 void binDelete(binDecision** Bucket, long int BitVectorSize) {
-    // deletes the top level state in HashTable[h]
-
     // procedure:
     // - top level state has nextold, but no nextnew (no branch at -1)
     // - descend to end of nextold list (that state has largest common prefix with top level state)
@@ -278,6 +298,8 @@ void binDelete(binDecision** Bucket, long int BitVectorSize) {
 }
 
 
+//! \brief DESCRIPTION
+//! \param d DESCRIPTION
 void binDeleteAll(binDecision* d) {
     if (!d) {
         return;
@@ -289,6 +311,9 @@ void binDeleteAll(binDecision* d) {
 }
 
 
+//! \brief DESCRIPTION
+//! \param PN DESCRIPTION
+//! \param h DESCRIPTION
 void binDeleteAll(oWFN* PN, int h) {
     // delete all states in hash bucket h
     if (!PN->binHashTable[h]) {
@@ -301,12 +326,19 @@ void binDeleteAll(oWFN* PN, int h) {
 }
 
 
+//! \brief DESCRIPTION
+//! \param PN DESCRIPTION
+//! \return DESCRIPTION
 State* binSearch(oWFN* PN) {
     trace(TRACE_5, "binSearch(oWFN* PN)\n");
     return binSearch(PN->binHashTable[PN->getPlaceHashValue()], PN);
 }
 
 
+//! \brief DESCRIPTION
+//! \param Bucket DESCRIPTION
+//! \param PN DESCRIPTION
+//! \return DESCRIPTION
 State* binSearch(binDecision* Bucket, oWFN* PN) {
     // cout << "search for marking "
     //      << PN->getMarkingAsString(PN->CurrentMarking) << endl;

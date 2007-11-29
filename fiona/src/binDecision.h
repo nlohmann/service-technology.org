@@ -48,43 +48,58 @@ class binDecision {
         binDecision* nextold;
         binDecision* nextnew;
 
-        /** actual bit vector */
+        /// actual bit vector
         unsigned char* vector;
 
-        /** backlink to previous decision */
+        /// backlink to previous decision
         binDecision* prev;
 
-        /** link to state record for this state */
+        /// link to state record for this state
         State* state;
 
+        /// constructor (2 parameters)
         binDecision(int b, long int bitVectorSize);
+        
+        /// destructor
         ~binDecision();
 
 #undef new
-        /**
-         * Provides user defined operator new. Needed to trace all new operations
-         * on this class.
-         */
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
         NEW_OPERATOR(binDecision)
 #define new NEW_NEW
 };
 
 
+/// DESCRIPTION
 void binDelete(binDecision** Bucket, long int BitVectorSize);
+
+/// DESCRIPTION
 void binDeleteAll(binDecision* d);
+
+/// DESCRIPTION
 void binDeleteAll(oWFN* PN, int h);
+
+/// DESCRIPTION
 State* binInsert(oWFN* PN);
+
+/// DESCRIPTION
 State* binInsert(binDecision** Bucket, oWFN* PN);
+
+/// DESCRIPTION
 State* binSearch(oWFN* PN);
+
+/// DESCRIPTION
 State* binSearch(binDecision* Bucket, oWFN* PN);
 
 
+/// turns an integer into a binary number
 void inttobits(unsigned char* bytepos,
                int bitpos,
                int nrbits,
                unsigned int value);
 
-
+/// computes the logarithm to base 2 of m
 int logzwo(int m);
 
 #endif //BINDECISION_H

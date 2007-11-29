@@ -54,40 +54,30 @@ typedef enum {
 
 extern trace_level_fiona debug_level;
 
-/**
- * Provides output to stderr using different #trace_level_fiona 
- * (in order to regulate amount of output)
- *
- * \param pTraceLevel	the #trace_level_fiona
- * \param message	the output
- *
- */
+/// Provides output to stderr using different #trace_level_fiona 
+/// (in order to regulate amount of output)
 void trace(trace_level_fiona pTraceLevel, std::string message);
 
-/**
- * Works like #trace(trace_level,std::string) with trace_level_fiona = TRACE_ALWAYS
- *
- * \param message the output
- *
- */
+/// Works like #trace(trace_level,std::string) with trace_level_fiona = TRACE_ALWAYS
 void trace(std::string message);
 
+/// turns an integer into its string representation
 std::string intToString(int);
 
+/// checks whether a string shows a nonnegative integer
 bool isNonNegativeInteger(const std::string& s);
 
+/// returns the upper case of the given string
 std::string toUpper(const std::string& s);
+
+/// returns the lower case of the given string
 std::string toLower(const std::string& s);
 
 /// Signalling syntax errors.
 int yyerror(const char* msg);
 
-/**
- * Prints an error that has been encountered while parsing an OG file. The
- * program exits after printing the error.
- *
- * @param msg Error message to print.
- */
+/// Prints an error that has been encountered while parsing an OG file. The
+/// program exits after printing the error.
 int og_yyerror(const char* msg);
 
 #endif

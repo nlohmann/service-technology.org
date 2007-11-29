@@ -47,14 +47,10 @@ std::string owfnfileToParse;
 trace_level_fiona debug_level = TRACE_0;
 
 
-/**
- * Provides output to stderr using different #trace_level_fiona
- * (in order to regulate amount of output)
- *
- * \param pTraceLevel	the used trace level
- * \param message	the output
- *
- */
+//! \brief Provides output to stderr using different #trace_level_fiona
+//!        (in order to regulate amount of output)
+//! \param pTraceLevel	the used trace level
+//! \param message	the output
 void trace(trace_level_fiona pTraceLevel, std::string message) {
     if (pTraceLevel <= debug_level) {
         (*log_output) << message << std::flush;
@@ -62,21 +58,16 @@ void trace(trace_level_fiona pTraceLevel, std::string message) {
 }
 
 
-/**
- * Works like #trace(trace_level_fiona, std::string) with trace_level = TRACE_ALWAYS
- *
- * \param message the output
- *
- */
+//! \brief Works like #trace(trace_level_fiona, std::string) with trace_level = TRACE_ALWAYS
+//! \param message the output
 void trace(std::string message) {
     trace(TRACE_0, message);
 }
 
 
-/*!
- * \param i standard C int
- * \return  C++ string representing i
- */
+//! \brief turns an integer into a string
+//! \param i standard C int
+//! \return  C++ string representing i
 std::string intToString(int i) {
     char buffer[20];
     sprintf(buffer, "%d", i);
@@ -85,6 +76,9 @@ std::string intToString(int i) {
 }
 
 
+//! \brief tests wherther the given string shows a non negative integer
+//! \param s string to test
+//! \return true if so, false else
 bool isNonNegativeInteger(const std::string& s) {
     for (std::string::size_type i = 0; i != s.size(); ++i) {
         if (!std::isdigit(s[i])) {
@@ -95,6 +89,9 @@ bool isNonNegativeInteger(const std::string& s) {
 }
 
 
+//! \brief turns a string into upper case
+//! \param s string change
+//! \return upper case version of s
 std::string toUpper(const std::string& s) {
     std::string result;
 
@@ -109,6 +106,9 @@ std::string toUpper(const std::string& s) {
 }
 
 
+//! \brief turns a string into lower case
+//! \param s string change
+//! \return lower case version of s
 std::string toLower(const std::string& s) {
     std::string result;
 
@@ -123,19 +123,15 @@ std::string toLower(const std::string& s) {
 }
 
 
-/*!
- * This function is invoked by the parser and the lexer during the syntax
- * analysis. When an error occurs, it prints an accordant message and shows the
- * lines of the input files where the error occured.
- *
- * \param msg a message (mostly "Parse error") and some more information e.g.
- *            the location of the syntax error.
- * \param yylineno
- * \param yytext
- * \param file
- * 
- * \return 1, since an error occured
- */
+//! \brief This function is invoked by the parser and the lexer during the syntax
+//!        analysis. When an error occurs, it prints an accordant message and shows the
+//!        lines of the input files where the error occured.
+//! \param msg a message (mostly "Parse error") and some more information e.g.
+//!            the location of the syntax error.
+//! \param yylineno
+//! \param yytext
+//! \param file
+//! \return 1, since an error occured
 int yyerror(const char* msg, int yylineno, const char* yytext, const char* file) {
     trace("Error while parsing!\n\n");
     trace(msg);
@@ -183,6 +179,9 @@ int yyerror(const char* msg, int yylineno, const char* yytext, const char* file)
 }
 
 
+//! \brief function needed for the specific parser, calls yyerror
+//! \param msg error message to print
+//! \return returns 1
 int owfn_yyerror(const char* msg) {
     /* defined by flex */
     extern int owfn_yylineno; ///< line number of current token
@@ -192,6 +191,9 @@ int owfn_yyerror(const char* msg) {
 }
 
 
+//! \brief function needed for the specific parser, calls yyerror
+//! \param msg error message to print
+//! \return returns 1
 int og_yyerror(const char* msg) {
     /* defined by flex */
     extern int og_yylineno; ///< line number of current token

@@ -41,14 +41,22 @@ class BddLabelTab;
 
 class BddLabel {
     public:
-        std::string name; //name of Label
-        unsigned int nbr; //number of Label
+        /// name of Label
+        std::string name;
+        
+        ///number of Label
+        unsigned int nbr;
+        
         BddLabel * next;
+        
+        /// constructor (3 parameters)
         BddLabel(const std::string& c, int n, BddLabelTab * table);
+        
+        /// destructor
         ~BddLabel();
 
-        // Provides user defined operator new. Needed to trace all new
-        // operations on this class.
+        /// Provides user defined operator new. Needed to trace all new
+        /// operations on this class.
 #undef new
         NEW_OPERATOR(BddLabel)
 #define new NEW_NEW
@@ -58,15 +66,24 @@ class BddLabel {
 class BddLabelTab {
     public:
         BddLabel ** table;
+        
+        /// checks whether a BddLabel with the given string is part of the 
+        /// table and returns it
         BddLabel * lookup(const std::string&) const;
+        
+        /// Adds a BddLabel to the table
         void add(BddLabel *);
+        
+        /// constructor no parameters)
         BddLabelTab(unsigned int size = 65536);
+        
+        /// destructor
         ~BddLabelTab();
         unsigned int card;
         unsigned int size;
 
-        // Provides user defined operator new. Needed to trace all new
-        // operations on this class.
+        /// Provides user defined operator new. Needed to trace all new
+        /// operations on this class.
 #undef new
         NEW_OPERATOR(BddLabelTab)
 #define new NEW_NEW

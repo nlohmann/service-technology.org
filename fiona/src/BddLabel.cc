@@ -35,6 +35,10 @@
 #include <string>
 
 
+//! \brief constructor for the BddLabel
+//! \param c name of the new label
+//! \param n number of the new label
+//! \param table table to be added to
 BddLabel::BddLabel(const std::string& c, int n, BddLabelTab * table) :
     name(c) {
     nbr = n;
@@ -43,10 +47,13 @@ BddLabel::BddLabel(const std::string& c, int n, BddLabelTab * table) :
 }
 
 
+//! \brief deconstructor
 BddLabel::~BddLabel() {
 }
 
 
+//! \brief constructor for the BddLabelTab
+//! \param s size of the table
 BddLabelTab::BddLabelTab(unsigned int s) {
     size = s;
     table = new BddLabel * [s];
@@ -57,6 +64,7 @@ BddLabelTab::BddLabelTab(unsigned int s) {
 }
 
 
+//! \brief deconstructor
 BddLabelTab::~BddLabelTab() {
     BddLabel* temp;
     for (unsigned int i = 0; i < size; i++) {
@@ -71,6 +79,10 @@ BddLabelTab::~BddLabelTab() {
 }
 
 
+
+//! \brief checks whether a label with the given name exists in the table and returns it
+//! \param name name of the label
+//! \return returns either the label, or NULL if the name matches no label in the table
 BddLabel * BddLabelTab::lookup(const std::string& name) const {
 
     /* 1. Hashvalue bestimmen */
@@ -92,6 +104,8 @@ BddLabel * BddLabelTab::lookup(const std::string& name) const {
 }
 
 
+//! \brief adds a label to the label table :)
+//! \param s label to be added
 void BddLabelTab::add(BddLabel * s) {
 
     /* 1. Hashvalue bestimmen */

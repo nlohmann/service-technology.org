@@ -53,17 +53,27 @@ using namespace std;
 
 class Exchangeability {
     public:
+        /// constructor (1 parameter)
         Exchangeability(string filename,
                         Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
+
+        /// deconstructor
         ~Exchangeability();
 
+        /// checks the equality of two BDD representations
         bool check(Exchangeability* bdd);
+        
+        /// prints bdd_Mp and bdd_Ann
         void print();
+        
+        /// prints how much memory is currently in use
         void printMemoryInUse();
+        
+        /// reorders the bdd representation by another reordering type
         void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 
-        // Provides user defined operator new. Needed to trace all new
-        // operations on this class.
+        /// Provides user defined operator new. Needed to trace all new
+        /// operations on this class.
 #undef new
         NEW_OPERATOR(Exchangeability)
 #define new NEW_NEW
@@ -71,19 +81,35 @@ class Exchangeability {
         private:
         static DdManager* mgrMp;
         static DdManager* mgrAnn;
-        static int nbrBdd; //Number of represented operating guidelines
+        
+        /// Number of represented operating guidelines
+        static int nbrBdd; 
 
         DdNode* bddMp;
         DdNode* bddAnn;
-        char** names; //varibles names of bddAnn
-        int nbrVarAnn; //size of array names
+        
+        /// varibles names of bddAnn
+        char** names; 
+        
+        /// size of array names
+        int nbrVarAnn; 
         list<char*> labelList;
 
+        /// DESCRIPTION
         void loadBdd(std::string filename);
+        
+        /// DESCRIPTION
         void loadHeader(FILE* fp, char*** names, int* nVars, int** permids, int* nSuppVars);
+        
+        /// DESCRIPTION
         void loadOptimalOrder(DdManager* mgr, int size, int* permids, int maxId);
+        
+        /// DESCRIPTION
         DdNode* loadDiagram(FILE* fp, DdManager* mgr);
+        
+        /// DESCRIPTION
         void printDotFile(char* filename, char** varNames, DdNode* bddMp, DdNode* bddAnn);
+        
         //void checkManager(DdManager* mgr, char* table);
     };
 

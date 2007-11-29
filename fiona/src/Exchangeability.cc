@@ -49,6 +49,8 @@ int comparestr( const void* a, const void* b){
 }
 
 //! \brief constructor  
+//! \param filename name of the fale to check exchangebility for  
+//! \param heuristic Cudd Reorderding type
 Exchangeability::Exchangeability(string filename, Cudd_ReorderingType heuristic) {
     trace(TRACE_5, "Exchangeability::Exchangeability(char* filename): begin\n");
     // Init cudd package when first Exchangeability object is created.
@@ -115,6 +117,7 @@ Exchangeability::~Exchangeability() {
 
 
 //! \brief loads the BDD representation of the opereating guideline stored in filname
+//! \param filename name of the og file
 void Exchangeability::loadBdd(std::string filename) {
     trace(TRACE_5, "Exchangeability::loadBdds(string filename): begin\n");
     cout << "loading BDD-representation of the operating guideline of "
@@ -183,6 +186,11 @@ void Exchangeability::loadBdd(std::string filename) {
 }
 
 
+//! \brief DESCRIPTION
+//! \param names DESCRIPTION 
+//! \param nVars DESCRIPTION
+//! \param permids DESCRIPTION
+//! \param nSuppVars DESCRIPTION
 void Exchangeability::loadHeader(FILE* fp,
                                  char*** names,
                                  int* nVars,
@@ -261,6 +269,10 @@ void Exchangeability::loadOptimalOrder(DdManager* mgr, int size, int* permids, i
 }
 
 
+//! \brief DESCRPITION
+//! \param fp DESCRPITION 
+//! \param mgr DESCRPITION
+//! \return DESCRPITION
 DdNode* Exchangeability::loadDiagram(FILE* fp, DdManager* mgr) {
     trace(TRACE_5, "Exchangeability::loadDiagram(FILE* fp, DdManager* mgr, int size, int* permids): begin\n");
 
@@ -278,6 +290,12 @@ DdNode* Exchangeability::loadDiagram(FILE* fp, DdManager* mgr) {
 }
 
 
+//! \brief DESCRPITION
+//! \param filename DESCRPITION 
+//! \param varNames DESCRPITION
+//! \param bddMp DESCRPITION 
+//! \param bddAnn DESCRPITION
+//! \return DESCRPITION
 void Exchangeability::printDotFile(char* filename,
                                    char** varNames,
                                    DdNode* bddMp,
@@ -327,6 +345,7 @@ void Exchangeability::print() {
 
 
 //! \brief checks the equality of two BDD representations
+//! \param bdd BDD representation to check with
 bool Exchangeability::check(Exchangeability* bdd) {
     trace(TRACE_5, "Exchangeability::check(Exchangeability* bdd): begin\n");
 
@@ -358,6 +377,7 @@ bool Exchangeability::check(Exchangeability* bdd) {
 
 
 //! \brief reorders the variables of the BDDs according to a given heuristic
+//! \param heuristic type of Cudd reordering
 void Exchangeability::reorder(Cudd_ReorderingType heuristic) {
 
     Cudd_ReduceHeap(mgrMp, heuristic, 0);

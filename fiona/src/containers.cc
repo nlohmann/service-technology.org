@@ -34,6 +34,14 @@
 #include "containers.h"
 #include "AnnotatedGraphNode.h"
 
+//! \brief 'left' is less than 'right', if the reachGraphStateSet of 'left' is
+//!        lexicographical less than 'right's reachGraphStateSet. Consequently,
+//!        'left' and 'right' are equal iff both their reachGraphStateSets contain
+//!        the same states.
+//! \param left left node
+//! \param right right node
+//! \returns true left is less than right.
+//! \returns false left is greater or equal to right.
 bool CompareGraphNodes::operator()(AnnotatedGraphNode const* left, AnnotatedGraphNode const* right) {
     return (left->reachGraphStateSet < right->reachGraphStateSet);
 }

@@ -41,46 +41,31 @@ class State;
 
 typedef std::set<State*> StateSet;
 
-/**
- * Used as compare criterion for GraphNodeSet.
- */
+/// Used as compare criterion for GraphNodeSet.
 struct CompareGraphNodes {
-    /**
-     * 'left' is less than 'right', if the reachGraphStateSet of 'left' is
-     * lexicographical less than 'right's reachGraphStateSet. Consequently,
-     * 'left' and 'right' are equal iff both their reachGraphStateSets contain
-     * the same states.
-     * @returns true left is less than right.
-     * @returns false left is greater or equal to right.
-     */
+    /// compares two graphnodes
     bool operator()(AnnotatedGraphNode const * left, AnnotatedGraphNode const * right);
 };
 
 
-/**
- * In a GraphNodeSet, all GraphNodes with exactly the same states in their
- * reachGraphStateSets are considered equal. That follows from the criterion
- * used by CompareGraphNodes to define a GraphNode* less than another one. This
- * allows for quickly checking whether a newly calculated GraphNode (with a
- * reachGraphStateSet) has the same reachGraphStateSet as an already seen one.
- */
+/// In a GraphNodeSet, all GraphNodes with exactly the same states in their
+/// reachGraphStateSets are considered equal. That follows from the criterion
+/// used by CompareGraphNodes to define a GraphNode* less than another one. This
+/// allows for quickly checking whether a newly calculated GraphNode (with a
+/// reachGraphStateSet) has the same reachGraphStateSet as an already seen one.
 typedef std::set<AnnotatedGraphNode*, CompareGraphNodes> GraphNodeSet;
 
-/**
- * multiset containing messages (input and output events), thus only the index of the corresponding
- * interface place is stored in the multiset 
- */
+/// multiset containing messages (input and output events), thus only the index of the corresponding
+/// interface place is stored in the multiset 
 typedef std::multiset<unsigned int> messageMultiSet;
 
 struct compareMessageMultiSets {
-    /**
-     * 'left' is less than 'right', if the messageMultiSet of 'left' is
-     * lexicographical less than 'right's messageMultiSet. Consequently,
-     * 'left' and 'right' are equal iff both their messageMultiSet contain
-     * the same states.
-     * @returns true left is less than right.
-     * @returns false left is greater or equal to right.
-     */
+    /// 'left' is less than 'right', if the messageMultiSet of 'left' is
+    /// lexicographical less than 'right's messageMultiSet. Consequently,
+    /// 'left' and 'right' are equal iff both their messageMultiSet contain
+    /// the same states.
+    /// @returns true left is less than right.
+    /// @returns false left is greater or equal to right.
     bool operator()(messageMultiSet const left, messageMultiSet const right) {
         if (left.size() < right.size()) {
             return true;
@@ -102,12 +87,10 @@ struct compareMessageMultiSets {
         }
         return false;
     }
-}; // compareMessageMultiSets
+}; /// compareMessageMultiSets
 
-/**
- * set of multisets with its respective compare operator
- * for now only the IG uses this set to store the activated events of each node
- */
+/// set of multisets with its respective compare operator
+/// for now only the IG uses this set to store the activated events of each node
 typedef std::set<messageMultiSet, compareMessageMultiSets> setOfMessages;
 
 #endif

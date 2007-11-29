@@ -43,23 +43,18 @@ using namespace std;
 * class AnnotatedGraphNode *
 ******************/
 
-/*!
- * \brief constructor (no parameters)
- */
+//! \brief constructor (no parameters)
 AnnotatedGraphNode::AnnotatedGraphNode() {
 
     annotation = new GraphFormulaCNF();
 }
 
 
-/*!
- * \brief constructor (four parameters)
- *
- * \param _name the name of this node
- * \param _annotation the annotation of this node
- * \param _color the colour of this node
- * \param _number the number of this node
- */
+//! \brief constructor (four parameters)
+//! \param _name the name of this node
+//! \param _annotation the annotation of this node
+//! \param _color the colour of this node
+//! \param _number the number of this node
 AnnotatedGraphNode::AnnotatedGraphNode(const std::string& _name,
                                        GraphFormula* _annotation,
                                        GraphNodeColor _color,
@@ -70,9 +65,7 @@ AnnotatedGraphNode::AnnotatedGraphNode(const std::string& _name,
 }
 
 
-/*!
- * \brief destructor
- */
+//! \brief destructor
 AnnotatedGraphNode::~AnnotatedGraphNode() {
     
     trace(TRACE_5, "AnnotatedGraphNode::~AnnotatedGraphNode() : start\n");
@@ -83,21 +76,15 @@ AnnotatedGraphNode::~AnnotatedGraphNode() {
 }
 
 
-/*!
- * \brief returns the CNF formula that is this node's annotation
- *
- * \return this node's annotation as a GraphFormulaCNF
- */
+//! \brief returns the CNF formula that is this node's annotation
+//! \return this node's annotation as a GraphFormulaCNF
 GraphFormulaCNF* AnnotatedGraphNode::getAnnotation() const {
     return annotation;
 }
 
 // CODE FROM PL
-/*!
- * \brief sets the annotation of this node
- * 
- * \param newAnnotation annotation of the node
- */ 
+//! \brief sets the annotation of this node
+//! \param newAnnotation annotation of the node
 void AnnotatedGraphNode::setAnnotation(GraphFormulaCNF* newAnnotation) {
 	if (annotation != NULL) {
 		delete annotation;
@@ -107,30 +94,22 @@ void AnnotatedGraphNode::setAnnotation(GraphFormulaCNF* newAnnotation) {
 // END OF CODE FROM PL
 
 
-/*!
- * \brief returns the CNF formula that is this node's annotation as a String
- *
- * \return this node's annotation as a String
- */
+//! \brief returns the CNF formula that is this node's annotation as a String
+//! \return this node's annotation as a String
 std::string AnnotatedGraphNode::getAnnotationAsString() const {
     assert(annotation != NULL);
     return annotation->asString();
 }
 
 
-/*!
- * \brief adds a new clause to the CNF formula of the node
- *
- * \param myclause the clause to be added to the annotation of the current node
- */
+//! \brief adds a new clause to the CNF formula of the node
+//! \param myclause the clause to be added to the annotation of the current node
 void AnnotatedGraphNode::addClause(GraphFormulaMultiaryOr* myclause) {
     annotation->addClause(myclause);
 }
 
 
-/*!
- * \brief analyses the node and sets its color
- */
+//! \brief analyses the node and sets its color
 void AnnotatedGraphNode::analyseNode() {
     
     trace(TRACE_5, "AnnotatedGraphNode::analyseNodeByFormula() : start\n");
@@ -179,11 +158,8 @@ void AnnotatedGraphNode::analyseNode() {
 }
 
 
-/*!
- * \brief removes the given literal from this node's annotation
- *
- * \param literal the literal which is to be removed
- */
+//! \brief removes the given literal from this node's annotation
+//! \param literal the literal which is to be removed
 void AnnotatedGraphNode::removeLiteralFromAnnotation(const std::string& literal) {
     trace(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotation(const string& literal) : start\n");
     
@@ -194,13 +170,10 @@ void AnnotatedGraphNode::removeLiteralFromAnnotation(const std::string& literal)
 }
 
 
-/*!
- * \brief removes the given literal from this node's annotation
- *        by absorbing the literal; multiary formulas made empty
- *        will be removed
- *
- * \param literal the literal which is to be removed
- */
+//! \brief removes the given literal from this node's annotation
+//!        by absorbing the literal; multiary formulas made empty
+//!        will be removed
+//! \param literal the literal which is to be removed
 void AnnotatedGraphNode::removeLiteralFromAnnotationByHiding(const std::string& literal) {
     trace(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotationByHiding(const string& literal) : start\n");
    
@@ -211,10 +184,8 @@ void AnnotatedGraphNode::removeLiteralFromAnnotationByHiding(const std::string& 
 }
 
 
-/*!
- * \brief Removes unneeded literals from the node's annotation. Labels of
- *        edges to red nodes are unneeded.
- */
+//! \brief Removes unneeded literals from the node's annotation. Labels of
+//!        edges to red nodes are unneeded.
 void AnnotatedGraphNode::removeUnneededLiteralsFromAnnotation() {
     LeavingEdges::ConstIterator
     edgeIter = getLeavingEdgesConstIterator();
@@ -245,14 +216,10 @@ bool AnnotatedGraphNode::isToShow(const AnnotatedGraphNode* rootOfGraph) const {
 }
 
 
-/*!
- * \brief determines whether the given assignment satisfies this node's
- *        annotation
- *
- * \param assignment the assignment that satisfies the annotation or not
- *
- * \return true iff the assignment satisfies the annotation
- */
+//! \brief determines whether the given assignment satisfies this node's
+//!        annotation
+//! \param assignment the assignment that satisfies the annotation or not
+//! \return true iff the assignment satisfies the annotation
 bool AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const {
     
     assert(annotation != NULL);
@@ -260,12 +227,9 @@ bool AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignm
 }
 
 
-/*!
- * \brief return the assignment that is imposed by present or absent arcs
- *        leaving the node
- *
- * \return the assignment described above
- */
+//! \brief return the assignment that is imposed by present or absent arcs
+//!        leaving the node
+//! \return the assignment described above
 GraphFormulaAssignment* AnnotatedGraphNode::getAssignment() const {
     
     trace(TRACE_5, "computing annotation of node " + getName() + "\n");
@@ -375,7 +339,7 @@ messageMultiSet PriorityMap::popIG() {
 //!		   and their corresponding priority.
 //!        NOTE: All interface places will be considered; places not in the
 //!        annotation will have a minimal priority.
-//! @param annotation the annotation, from which the priority map will be extracted.
+//! \param annotation the annotation, from which the priority map will be extracted.
 void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
     trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation)::begin()\n");
 
@@ -423,7 +387,7 @@ void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
 //!		   and their corresponding priority.
 //!        NOTE: All interface places will be considered; places not in the
 //!        annotation will have a minimal priority.
-//! @param annotation the annotation, from which the priority map will be extracted.
+//! \param annotation the annotation, from which the priority map will be extracted.
 void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphFormulaCNF *annotation) {
     
 	trace(TRACE_3, "PriorityMap::fillForIG(GraphFormulaCNF *annotation)::begin()\n");
@@ -477,11 +441,14 @@ void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphForm
 	trace(TRACE_3, "PriorityMap::fillForIG(GraphFormulaCNF *annotation)::end()\n");
 }
 
-
+//! \brief returns whether the prioritymap is empty
+//! \return returns true if the Priority map is empty
 bool PriorityMap::empty() const {
     return pm.empty();
 }
 
+//! \brief DESCRIPTION
+//! \return DESCRIPTION
 bool PriorityMap::emptyIG() const {
     return pmIG.empty();
 }

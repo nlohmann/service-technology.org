@@ -45,20 +45,48 @@ class Arc;
 class Node {
     // public typedefs first, then private members, then public methods.
     public:
+    
+        /// vector including all arcs connected to this node
         typedef std::vector<Arc*> Arcs_t;
+        
     private:
+    
+        /// arriving arcs for this nod
         Arcs_t ArrivingArcs;
+        
+        /// leaving arcs for this node
         Arcs_t LeavingArcs;
+        
     public:
+    
+        /// name of the node
         std::string name;
+        
+        /// constructor
         Node(const std::string&);
+        
+        /// operator for node stream output
         ostream& operator <<(ostream &);
+        
+        /// destructor
         ~Node();
+        
+        /// adds an arriving arc to the node
         void addArrivingArc(Arc* arc);
+        
+        /// returns the number of arriving arcs
         Arcs_t::size_type getArrivingArcsCount() const;
+        
+        /// returns an arriving arc at the given iterator position
         Arc* getArrivingArc(Arcs_t::size_type i) const;
+        
+        /// adds an leaving arc to the node
         void addLeavingArc(Arc* arc);
+
+        /// returns the number of leaving arcs
         Arcs_t::size_type getLeavingArcsCount() const;
+
+        /// returns an leaving arc at the given iterator position
         Arc* getLeavingArc(Arcs_t::size_type i) const;
 };
 
@@ -69,18 +97,32 @@ class owfnPlace;
 
 class Arc {
     public:
+        
+        /// constructor
         Arc(owfnTransition *, owfnPlace *, bool, unsigned int);
 
-        //	static unsigned int cnt;
+        ///	static unsigned int cnt;
+        
+        /// source node of the arc
         Node * Source;
+        
+        /// destination node of the arc
         Node * Destination;
+        
+        /// pointer at the place of the arc
         owfnPlace * pl;
+        
+        /// pointer at the transition of the arc
         owfnTransition * tr;
+        
+        /// multiplicity of the arc
         unsigned int Multiplicity;
+        
+        /// multiplicity addition operator for arcs
         void operator +=(unsigned int);
 
-        // Provides user defined operator new. Needed to trace all new
-        // operations on this class.
+        /// Provides user defined operator new. Needed to trace all new
+        /// operations on this class.
 #undef new
         NEW_OPERATOR(Arc)
 #define new NEW_NEW

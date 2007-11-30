@@ -37,36 +37,51 @@
 #include "debug.h"
 
 
+//! \brief adds an arriving arc to this node
+//! \param arc arriving arc to be added
 void Node::addArrivingArc(Arc* arc) {
     ArrivingArcs.push_back(arc);
 }
 
 
+//! \brief adds an leaving arc to this node
+//! \param arc leaving arc to be added
 void Node::addLeavingArc(Arc* arc) {
     LeavingArcs.push_back(arc);
 }
 
 
+//! \brief returns the arriving art at the given iterator position
+//! \param i iterator position of the arc
+//! \returns the arc at the iterator position
 Arc* Node::getArrivingArc(Arcs_t::size_type i) const {
     return ArrivingArcs[i];
 }
 
 
+//! \brief returns the leaving art at the given iterator position
+//! \param i iterator position of the arc
+//! \returns the arc at the iterator position
 Arc* Node::getLeavingArc(Arcs_t::size_type i) const {
     return LeavingArcs[i];
 }
 
 
+//! \brief returns the number of arriving arcs
+//! \return number of arrivng arcs
 Node::Arcs_t::size_type Node::getArrivingArcsCount() const {
     return ArrivingArcs.size();
 }
 
 
+//! \brief returns the number of leaving arcs
+//! \return number of leaving arcs
 Node::Arcs_t::size_type Node::getLeavingArcsCount() const {
     return LeavingArcs.size();
 }
 
 
+//! \brief destructor
 Node::~Node() {
     trace(TRACE_5, "Node::~Node() : start\n");
 
@@ -81,17 +96,28 @@ Node::~Node() {
 }
 
 
+//! \brief constructor
+//! \param n name of the node
 Node::Node(const std::string& n) :
     name(n) {
 }
 
 
+//! \brief outputstream operator for nodes
+//! \param str stream to be written to
+//! \param n node to be written to stream
+//! \return updated stream
 inline ostream& operator <<(ostream & str, Node n) {
     str << n.name;
     return str;
 }
 
 
+//! \brief constructor
+//! \param t transition of the arc
+//! \param p place of the arc
+//! \param totrans true if this arc has a transition as destination, else false
+//! \param mult multiplicity of the arc
 Arc::Arc(owfnTransition * t, owfnPlace * p, bool totrans, unsigned int mult) {
     tr = t;
     pl = p;
@@ -102,6 +128,8 @@ Arc::Arc(owfnTransition * t, owfnPlace * p, bool totrans, unsigned int mult) {
 }
 
 
+//! \brief addition operator for arc multiplicities
+//! \param incr multuplicity incrementation
 void Arc::operator += (unsigned int incr) {
     Multiplicity += incr;
 }

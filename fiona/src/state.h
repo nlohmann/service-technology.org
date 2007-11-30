@@ -52,70 +52,64 @@ class owfnTransition;
 // State objects are nodes in the state graph.
 class State {
     public:
+        /// constructor
         State();
+        
+        /// destructor
         ~State();
 
-        /** number of states */
+        /// number of states
         static unsigned int state_count;
 
-        /** number of transitions to be fired */
+        /// number of transitions to be fired
         unsigned int cardFireList;
 
-        /** number of transitions to be fired */
+        /// number of transitions to be fired
         unsigned int cardStubbornFireList;
 
-        /** Transitions to be fired */
+        /// Transitions to be fired
         owfnTransition ** firelist;
 
-        /** Transitions to be fired in the stubborn set */
+        /// Transitions to be fired in the stubborn set
         owfnTransition ** stubbornFirelist;
 
-        /** Transitions that are quasi enabled */
+        /// Transitions that are quasi enabled
         owfnTransition ** quasiFirelist;
 
-        /** Nr of last already fired element of firelist */
+        /// Nr of last already fired element of firelist
         unsigned int current;
 
-        /** last branch in binary decision tree that represents marking */
+        /// last branch in binary decision tree that represents marking
         binDecision * my_entry;
 
-        /** hashValue of that state (necessary for binDecision) */
+        /// hashValue of that state (necessary for binDecision)
         unsigned int placeHashValue;
 
-        /** successor states in graph */
+        /// successor states in graph
         State ** succ;
 
-        /** state responsible for first generation */
+        /// state responsible for first generation
         State * parent;
 
-        /** type of state (Deadlock, Final, Transient) */
+        /// type of state (Deadlock, Final, Transient)
         stateType type;
         
         /// returns exact type of state (Final, iDL, eDL, TR)
         stateType exactType();
 
-        /**
-         * Same as decodeShowOnly(), but initializes all transition of the given 'PN'.
-         */
+        /// Same as decodeShowOnly(), but initializes all transition of the given 'PN'.
         void decode(oWFN* PN);
 
-        /**
-         * Decodes State in bintree and writes the corresponding marking into
-         * the CurrentMarking of the given 'PN'.
-         * @param PN The corresponding open workflow net.
-         */
+        /// Decodes State in bintree and writes the corresponding marking into
+        /// the CurrentMarking of the given 'PN'.
         void decodeShowOnly(oWFN* PN);
 
-        /**
-         * Returns true iff this state has an enabled tau labeled transition.
-         */
+        /// Returns true iff this state has an enabled tau labeled transition.
         bool hasLeavingTauTransitionForMatching() const;
 
 #undef new
-        /**
-         * Provides user defined operator new. Needed to trace all new operations
-         * on this class.
-         */
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
         NEW_OPERATOR(State)
 #define new NEW_NEW
     };

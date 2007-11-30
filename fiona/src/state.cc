@@ -39,9 +39,8 @@
 #include <cassert>
 
 
-//! \fn State::State()
 //! \brief constructor
-// inline rausgenommen!
+//! \fn State::State()
 State::State() :
     cardFireList(0), firelist(NULL), stubbornFirelist(NULL),
             quasiFirelist(NULL), current(0), my_entry(NULL), placeHashValue(0),
@@ -50,9 +49,8 @@ State::State() :
 }
 
 
-//! \fn State::~State()
 //! \brief destructor
-// inline rausgenommen!
+//! \fn State::~State()
 State::~State() {
     if (firelist) {
         delete [] firelist;
@@ -69,15 +67,9 @@ State::~State() {
 }
 
 
-void State::decode(oWFN * PN) {
-    trace(TRACE_5, "void State::decode(int * v, oWFN * PN):start\n");
-    decodeShowOnly(PN);
-    PN->placeHashValue = placeHashValue;
-    PN->checkEnablednessOfAllTransitions();
-    trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
-}
-
-
+/// \brief Decodes State in bintree and writes the corresponding marking into
+///        the CurrentMarking of the given 'PN'.
+/// \param PN The corresponding open workflow net.
 void State::decodeShowOnly(oWFN * PN) {
 
     trace(TRACE_5, "void State::decodeShowOnly(oWFN * PN) : start\n");
@@ -252,6 +244,16 @@ void State::decodeShowOnly(oWFN * PN) {
     cerr << "\tvoid State::decodeShowOnly(oWFN * PN) in graph.cc"<< endl;
 }
 
+//! \brief Same as decodeShowOnly(), but initializes all transition of the given 'PN'.
+//! \param PN given oWFN
+void State::decode(oWFN * PN) {
+    trace(TRACE_5, "void State::decode(int * v, oWFN * PN):start\n");
+    decodeShowOnly(PN);
+    PN->placeHashValue = placeHashValue;
+    PN->checkEnablednessOfAllTransitions();
+    trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
+}
+
 
 bool State::hasLeavingTauTransitionForMatching() const {
     for (size_t itrans = 0; itrans != cardFireList; ++itrans) {
@@ -265,20 +267,15 @@ bool State::hasLeavingTauTransitionForMatching() const {
 
 
 
-/*!
- * \brief   returns exact type of state (Final, iDL, eDL, TR)
- *
- * \return  The exact type of the state. Unlike the "state" member variable
- *          this function distinguishes between internal and external deadlocks.
- *          A marking is a deadlock iff it does not quasi-enable a transition.
- *          A deadlock is internal if no output place of the net is marked. A
- *          deadlock where an output place is marked is an external deadlock.
- *
- * \note    This function will never return the value "DEADLOCK".
- *
- * \post    CurrentMarking is overwritten by marking of the state under
- *          consideration if the state is a deadlock (see below).
- */
+//! \brief   returns exact type of state (Final, iDL, eDL, TR)
+//! \return  The exact type of the state. Unlike the "state" member variable
+//!          this function distinguishes between internal and external deadlocks.
+//!          A marking is a deadlock iff it does not quasi-enable a transition.
+//!          A deadlock is internal if no output place of the net is marked. A
+//!          deadlock where an output place is marked is an external deadlock.
+//! \note    This function will never return the value "DEADLOCK".
+//! \post    CurrentMarking is overwritten by marking of the state under
+//!          consideration if the state is a deadlock (see below).
 stateType State::exactType() {
     switch (type) {
         case DEADLOCK: {

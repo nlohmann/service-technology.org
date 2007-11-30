@@ -39,16 +39,26 @@
 #include "debug.h"
 #include <cassert>
 
+//! \brief returns the longest chain of formulas connected by a single given operator type
+//! \param FType type of the operator
+//! \return returns 1
 unsigned int atomicformula::counttype(FType) {
     return 1;
 }
 
 
+//! \brief returns the longest chain of formulas connected by a single given operator type
+//! \param FType type of the operator
+//! \return returns 1
 unsigned int unarybooleanformula::counttype(FType) {
     return 1;
 }
 
 
+//! \brief returns the longest chain of formulas connected by a single given operator type
+//! \param FType type of the operator
+//! \return returns 1, or the sum of the subformulas counttypes if the type of this binary
+//!         formula is matching the given type
 unsigned int binarybooleanformula::counttype(FType t) {
     if (type == t) {
         return left->counttype(t) + right->counttype(t);
@@ -57,6 +67,10 @@ unsigned int binarybooleanformula::counttype(FType t) {
 }
 
 
+//! \brief returns the longest chain of formulas connected by a single given operator type
+//! \param FType type of the operator
+//! \return returns 1, or the sum of the subformulas counttypes if the type of this boolean
+//!         formula is matching the given type
 unsigned int booleanformula::counttype(FType t) {
     if (type == t) {
         unsigned int i, c;
@@ -69,12 +83,24 @@ unsigned int booleanformula::counttype(FType t) {
 }
 
 
+//! \brief returns an array of subformulas consisting of longest chain of subformulas connected by 
+//!        a specified operator
+//! \param ty type of the operator
+//! \param subs array of subformulas to fill
+//! \param pos current position in the array
+//! \return the new position after subformulas have been added
 unsigned int atomicformula::collectsubs(FType, formula** subs, unsigned int pos) {
     subs[pos++] = this;
     return pos;
 }
 
 
+//! \brief returns an array of subformulas consisting of longest chain of subformulas connected by 
+//!        a specified operator
+//! \param ty type of the operator
+//! \param subs array of subformulas to fill
+//! \param pos current position in the array
+//! \return the new position after subformulas have been added
 unsigned int unarybooleanformula::collectsubs(FType,
                                               formula** subs,
                                               unsigned int pos) {
@@ -83,6 +109,12 @@ unsigned int unarybooleanformula::collectsubs(FType,
 }
 
 
+//! \brief returns an array of subformulas consisting of longest chain of subformulas connected by 
+//!        a specified operator
+//! \param ty type of the operator
+//! \param subs array of subformulas to fill
+//! \param pos current position in the array
+//! \return the new position after subformulas have been added
 unsigned int binarybooleanformula::collectsubs(FType ty,
                                                formula** subs,
                                                unsigned int pos) {
@@ -95,6 +127,12 @@ unsigned int binarybooleanformula::collectsubs(FType ty,
 }
 
 
+//! \brief returns an array of subformulas consisting of longest chain of subformulas connected by 
+//!        a specified operator
+//! \param ty type of the operator
+//! \param subs array of subformulas to fill
+//! \param pos current position in the array
+//! \return the new position after subformulas have been added
 unsigned int booleanformula::collectsubs(FType ty,
                                          formula** subs,
                                          unsigned int pos) {
@@ -109,23 +147,30 @@ unsigned int booleanformula::collectsubs(FType ty,
     return pos;
 }
 
-
+//! \brief collects all places that are used in the formula
+//! \param places set of places to be filled
 void atomicformula::collectplaces(std::set<owfnPlace*>& places) {
     places.insert(p);
 }
 
 
+//! \brief collects all places that are used in the formula
+//! \param places set of places to be filled
 void unarybooleanformula::collectplaces(std::set<owfnPlace*>& places) {
     sub->collectplaces(places);
 }
 
 
+//! \brief collects all places that are used in the formula
+//! \param places set of places to be filled
 void binarybooleanformula::collectplaces(std::set<owfnPlace*>& places) {
     left->collectplaces(places);
     right->collectplaces(places);
 }
 
 
+//! \brief collects all places that are used in the formula
+//! \param places set of places to be filled
 void booleanformula::collectplaces(std::set<owfnPlace*>& places) {
     for (size_t isub = 0; isub != cardsub; ++isub) {
         sub[isub]->collectplaces(places);
@@ -133,6 +178,10 @@ void booleanformula::collectplaces(std::set<owfnPlace*>& places) {
 }
 
 
+//! \brief constructor (3 parameters)
+//! \param t type of operator being used
+//! \param kk compare value for the operator
+//! \param pp place in comparision
 atomicformula::atomicformula(FType t, owfnPlace* pp, unsigned int kk) {
     type = t;
     p = pp;
@@ -140,12 +189,16 @@ atomicformula::atomicformula(FType t, owfnPlace* pp, unsigned int kk) {
 }
 
 
+//! \brief constructor (2 parameters)
+//! \param t type of operator being used
+//! \param l subformula the operator is applied to
 unarybooleanformula::unarybooleanformula(FType t, formula* l) {
     type = t;
     sub = l;
 }
 
 
+//! \brief deconstructor
 unarybooleanformula::~unarybooleanformula() {
     trace(TRACE_5, "unarybooleanformula::~unarybooleanformula() : start\n");
     delete sub;
@@ -153,6 +206,10 @@ unarybooleanformula::~unarybooleanformula() {
 }
 
 
+//! \brief constructor (3 parameters)
+//! \param t type of operator being used
+//! \param l left subformula the operator is applied to
+//! \param r right subformula the operator is applied to
 binarybooleanformula::binarybooleanformula(FType t, formula* l, formula* r) {
     type = t;
     left = l;
@@ -160,12 +217,13 @@ binarybooleanformula::binarybooleanformula(FType t, formula* l, formula* r) {
 }
 
 
+//! \brief deconstructor
 binarybooleanformula::~binarybooleanformula() {
     delete left;
     delete right;
 }
 
-
+//! \brief deconstructor
 booleanformula::~booleanformula() {
     trace(TRACE_5, "booleanformula::~booleanformula() : start\n");
     for (size_t isub = 0; isub != cardsub; ++isub) {
@@ -177,6 +235,9 @@ booleanformula::~booleanformula() {
 }
 
 
+//! \brief checks whether this atomic formula is true with a value from the current marking
+//! \param CurrentMarking number of tokens for all used places
+//! \return returns true if the given value satisfies the formula, false else
 bool atomicformula::init(unsigned int* CurrentMarking) {
     switch (type) {
         case eq:
@@ -214,6 +275,9 @@ bool atomicformula::init(unsigned int* CurrentMarking) {
 }
 
 
+//! \brief checks whether this unary boolean formula is true with a given current marking
+//! \param CurrentMarking number of tokens for all used places
+//! \return returns true if the given values satisfies the formula, false else
 bool unarybooleanformula::init(unsigned int* m) {
     if (sub->init(m))
         return (value = false);
@@ -221,6 +285,9 @@ bool unarybooleanformula::init(unsigned int* m) {
 }
 
 
+//! \brief checks whether this binary boolean formula is true with a given current marking
+//! \param CurrentMarking number of tokens for all used places
+//! \return returns true if the given values satisfies the formula, false else
 bool binarybooleanformula::init(unsigned int* m) {
     value = left->init(m);
     switch (type) {
@@ -246,6 +313,9 @@ bool binarybooleanformula::init(unsigned int* m) {
 }
 
 
+//! \brief checks whether this boolean formula is true with a given current marking
+//! \param CurrentMarking number of tokens for all used places
+//! \return returns true if the given values satisfies the formula, false else
 bool booleanformula::init(unsigned int* m) {
     firstvalid = cardsub;
     unsigned int n;
@@ -289,11 +359,15 @@ bool booleanformula::init(unsigned int* m) {
 }
 
 
+//! \brief returns a deep copy of this formula (which is a flat copy for an atomic formula)
+//! \return  deep copy (flat copy)
 atomicformula* atomicformula::deep_copy() {
     return flat_copy();
 }
 
 
+//! \brief returns a flat copy of this formula
+//! \return flat copy
 atomicformula* atomicformula::flat_copy() {
     atomicformula* f;
     f = new atomicformula(type, p, k);
@@ -304,6 +378,8 @@ atomicformula* atomicformula::flat_copy() {
 }
 
 
+//! \brief returns a deep copy of this formula
+//! \return deep copy
 unarybooleanformula* unarybooleanformula::deep_copy() {
     unarybooleanformula* f;
     f = new unarybooleanformula(type, sub->deep_copy());
@@ -315,6 +391,8 @@ unarybooleanformula* unarybooleanformula::deep_copy() {
 }
 
 
+//! \brief returns a flat copy of this formula
+//! \return flat copy
 unarybooleanformula* unarybooleanformula::flat_copy() {
     unarybooleanformula* f;
     f = new unarybooleanformula(type, sub);
@@ -325,6 +403,8 @@ unarybooleanformula* unarybooleanformula::flat_copy() {
 }
 
 
+//! \brief returns a deep copy of this formula
+//! \return deep copy
 binarybooleanformula* binarybooleanformula::deep_copy() {
     binarybooleanformula* f;
     f = new binarybooleanformula(type, left->deep_copy(), right->deep_copy());
@@ -336,6 +416,8 @@ binarybooleanformula* binarybooleanformula::deep_copy() {
 }
 
 
+//! \brief returns a flat copy of this formula
+//! \return flat copy
 binarybooleanformula* binarybooleanformula::flat_copy() {
     binarybooleanformula* f;
     f = new binarybooleanformula(type, left, right);
@@ -346,6 +428,8 @@ binarybooleanformula* binarybooleanformula::flat_copy() {
 }
 
 
+//! \brief returns a deep copy of this formula
+//! \return deep copy
 booleanformula* booleanformula::deep_copy() {
     unsigned int i;
     booleanformula* f;
@@ -370,6 +454,8 @@ booleanformula* booleanformula::deep_copy() {
 }
 
 
+//! \brief returns a flat copy of this formula
+//! \return flat copy
 booleanformula* booleanformula::flat_copy() {
     unsigned int i;
     booleanformula* f;
@@ -390,11 +476,17 @@ booleanformula* booleanformula::flat_copy() {
 }
 
 
+//! \brief Compress chains of AND or OR to single n-ary AND/OR and return a new
+//!        formula.
+//! \return compressed formula
 formula* atomicformula::merge() {
     return deep_copy();
 }
 
 
+//! \brief Compress chains of AND or OR to single n-ary AND/OR and return a new
+//!        formula.
+//! \return compressed formula
 formula* unarybooleanformula::merge() {
     unarybooleanformula* f = flat_copy();
     f->sub = f->sub->merge();
@@ -403,6 +495,9 @@ formula* unarybooleanformula::merge() {
 }
 
 
+//! \brief Compress chains of AND or OR to single n-ary AND/OR and return a new
+//!        formula.
+//! \return compressed formula
 formula* binarybooleanformula::merge() {
     booleanformula* f;
     f = new booleanformula();
@@ -469,6 +564,9 @@ formula* binarybooleanformula::merge() {
 }
 
 
+//! \brief Compress chains of AND or OR to single n-ary AND/OR and return a new
+//!        formula.
+//! \return compressed formula
 formula* booleanformula::merge() {
     booleanformula* f;
     f = new booleanformula();
@@ -536,6 +634,7 @@ formula* booleanformula::merge() {
 }
 
 
+//! \brief set links to parents and from/to mentioned places
 void atomicformula::setstatic() {
     if (!(p->proposition)) {
         p->proposition = new formula* [p->cardprop];
@@ -545,12 +644,14 @@ void atomicformula::setstatic() {
 }
 
 
+//! \brief set links to parents and from/to mentioned places
 void unarybooleanformula::setstatic() {
     sub->setstatic();
     sub->parent = this;
 }
 
 
+//! \brief set links to parents and from/to mentioned places
 void binarybooleanformula::setstatic() {
     left->setstatic();
     right->setstatic();
@@ -558,6 +659,7 @@ void binarybooleanformula::setstatic() {
 }
 
 
+//! \brief set links to parents and from/to mentioned places
 void booleanformula::setstatic() {
     unsigned int i;
     for (i=0; i < cardsub; i++) {
@@ -570,7 +672,8 @@ void booleanformula::setstatic() {
 
 unsigned int subindex;
 
-// m is new marking of place involved in this formula
+//! \brief incremental re-calculation of partial formula
+//!        m is new marking of place involved in this formula
 void atomicformula::update(unsigned int m) {
     bool newvalue;
     newvalue = false;
@@ -616,7 +719,8 @@ void atomicformula::update(unsigned int m) {
 }
 
 
-// m not used, just for type compliance with atomic formula
+//! \brief incremental re-calculation of partial formula
+//!        m not used, just for type compliance with atomic formula
 void unarybooleanformula::update(unsigned int m) {
     if (value) {
         value = false;
@@ -630,7 +734,8 @@ void unarybooleanformula::update(unsigned int m) {
 }
 
 
-// m not used
+//! \brief incremental re-calculation of partial formula
+//!        m not used
 void booleanformula::update(unsigned int m) {
     formula* tmp;
     bool newvalue;
@@ -671,6 +776,8 @@ void booleanformula::update(unsigned int m) {
 }
 
 
+//! \brief remove negation in formulae without temporal
+//! \return returns the modified formula
 formula* atomicformula::posate() {
     p->cardprop ++;
     return this;
@@ -708,16 +815,22 @@ formula* atomicformula::negate() {
 }
 
 
+//! \brief remove negation in formulae without temporal
+//! \return returns the modified formula
 formula* unarybooleanformula::posate() {
     return sub->negate();
 }
 
 
+//! \brief negates the formula
+//! \return returns the negated formula
 formula* unarybooleanformula::negate() {
     return sub->posate();
 }
 
 
+//! \brief remove negation in formulae without temporal
+//! \return returns the modified formula
 formula* booleanformula::posate() {
     unsigned int i;
     for (i=0; i<cardsub; i++) {
@@ -727,6 +840,8 @@ formula* booleanformula::posate() {
 }
 
 
+//! \brief negates the formula
+//! \return returns the negated formula
 formula* booleanformula::negate() {
     unsigned int i;
     for (i=0; i<cardsub; i++) {

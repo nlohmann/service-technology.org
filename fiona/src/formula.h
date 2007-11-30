@@ -50,129 +50,276 @@ typedef enum {eq, neq, geq, leq, lt, gt, conj, disj, neg} FType;
 class formula {
     public:
         FType type;
-        bool value; // value of formula w.r.t. CurrentMarking
-        virtual formula * posate() = 0; // remove negation in formulae without temporal
-        virtual formula * negate() = 0; // operators
-        virtual bool init(unsigned int *) = 0; // compute value of whole formula 
+        
+        /// value of formula w.r.t. CurrentMarking
+        bool value; 
+        
+        /// remove negation in formulae without temporal
+        virtual formula * posate() = 0; 
+        
+        /// negates the formula
+        virtual formula * negate() = 0; 
+
+        /// checks whether this unary boolean formula is true with a given current marking
+        virtual bool init(unsigned int *) = 0;
+
+        /// returns a deep copy of this formula
         virtual formula * deep_copy() = 0;
+
+        /// returns a flat copy of this formula
         virtual formula * flat_copy() = 0;
 
-        // Compress chains of AND or OR to single n-ary AND/OR and returns a new
-        // formula.
-        //
-        // BEWARE: After a call to merge() the old formula, that merge() was called
-        // on, MUST be deleted by the caller. The only exceptions are the other
-        // derived formula classes. They should not delete any old formula in their
-        // implementations of merge(), because they know that their old formulas are
-        // recursively deleted as soon as the outside caller deletes his old formula.
-        //
-        // FURTHERMORE: the caller MUST set the parent and parentindex variables
-        // of the returned newly created formula to appropriate values. merge()
-        // cannot do this for you, because the parent is known to the
-        // caller only. This requirement also applies to all derived formula classes
-        // that call merge(). You can, however, leave parent and parentindex of the
-        // returned formula alone if it has the same parent as the formula you called
-        // merge() on, because their values are simply copied (flat copy).
+        /// Compress chains of AND or OR to single n-ary AND/OR and returns a new
+        /// formula.
+        ///
+        /// BEWARE: After a call to merge() the old formula, that merge() was called
+        /// on, MUST be deleted by the caller. The only exceptions are the other
+        /// derived formula classes. They should not delete any old formula in their
+        /// implementations of merge(), because they know that their old formulas are
+        /// recursively deleted as soon as the outside caller deletes his old formula.
+        ///
+        /// FURTHERMORE: the caller MUST set the parent and parentindex variables
+        /// of the returned newly created formula to appropriate values. merge()
+        /// cannot do this for you, because the parent is known to the
+        /// caller only. This requirement also applies to all derived formula classes
+        /// that call merge(). You can, however, leave parent and parentindex of the
+        /// returned formula alone if it has the same parent as the formula you called
+        /// merge() on, because their values are simply copied (flat copy).
         virtual formula * merge() = 0;
-        virtual void setstatic() = 0; // set links to parents and from/to mentioned places
-        virtual void update(unsigned int) = 0; // incremental re-calculation of partial formula
-        virtual unsigned int counttype(FType) = 0; // explore size of AND or OR chain
-        virtual unsigned int collectsubs(FType, formula **, unsigned int) = 0; //collect elements of AND or OR chain
+        
+        /// set links to parents and from/to mentioned places
+        virtual void setstatic() = 0; 
+        
+        /// incremental re-calculation of partial formula
+        virtual void update(unsigned int) = 0; 
+        
+        /// returns the size of longest chain of subformulas connected by a specified operator
+        virtual unsigned int counttype(FType) = 0;
+
+        /// returns an array of subformulas consisting of longest chain of subformulas connected by 
+        /// a specified operator
+        virtual unsigned int collectsubs(FType, formula **, unsigned int) = 0;
+         
+        /// brief collects all places that are used in the formula
         virtual void collectplaces(std::set<owfnPlace*>& places) = 0; //collect all mentioned places and add them to /places/
+
         formula * parent;
-        unsigned int parentindex; //position of this in parent's array of subformulas
-        formula() : parent(NULL), parentindex(0) {
-        }
-        virtual ~formula() {
-        };
+        
+        /// position of this in parent's array of subformulas
+        unsigned int parentindex; 
+        
+        /// constructor
+        formula() : parent(NULL), parentindex(0) {}
+        
+        /// destructor
+        virtual ~formula() {};
 };
 
 
 class atomicformula : public formula {
     public:
-        owfnPlace * p; // Stelle
-        unsigned int k;// Vergleichszahl
+        
+        /// Stelle
+        owfnPlace * p; 
+        
+        /// Vergleichszahl
+        unsigned int k;
+        
+        /// constructor
         atomicformula(FType, owfnPlace *, unsigned int);
-        virtual ~atomicformula() {
-        };
+        
+        /// destructor
+        virtual ~atomicformula() {};
+
+        ///checks whether this unary boolean formula is true with a given current marking
         virtual bool init(unsigned int *);
+
+        /// incremental re-calculation of partial formula
         virtual void update(unsigned int);
+
+        /// remove negation in formulae without temporal
         virtual formula * posate();
+
+        /// negates the formula
         virtual formula * negate();
+
+        /// set links to parents and from/to mentioned places
         virtual void setstatic();
+
+        /// returns a deep copy of this formula
         virtual atomicformula * deep_copy();
+
+        /// returns a flat copy of this formula
         virtual atomicformula * flat_copy();
+
+        /// Compress chains of AND or OR to single n-ary AND/OR and returns a new
+        /// formula.
         virtual formula * merge();
+
+        /// returns an array of subformulas consisting of longest chain of subformulas connected by 
+        /// a specified operator
         virtual unsigned int collectsubs(FType, formula **, unsigned int);
+
+        /// brief collects all places that are used in the formula
         virtual void collectplaces(std::set<owfnPlace*>& places);
+
+        /// returns the longest chain of subformulas connected by a specified operator
         virtual unsigned int counttype(FType);
 };
 
 
 class unarybooleanformula : public formula {
     public:
-        formula * sub; // Teilformeln zum Parsen, AND/OR-Ketten werden
+        // Teilformeln zum Parsen, AND/OR-Ketten werden
         // nachher zu **sub komprimiert
+        formula * sub; 
+
+        /// constructor
         unarybooleanformula(FType, formula *);
+
+        /// destructor
         virtual ~unarybooleanformula();
+
+        /// incremental re-calculation of partial formula
         virtual void update(unsigned int);
+
+        /// Compress chains of AND or OR to single n-ary AND/OR and returns a new
+        /// formula.
         virtual formula * merge();
+
+        /// remove negation in formulae without temporal
         virtual formula * posate();
+
+        /// negates the formula
         virtual formula * negate();
+        
+        ///checks whether this unary boolean formula is true with a given current marking
         virtual bool init(unsigned int *);
+
+        /// set links to parents and from/to mentioned places
         virtual void setstatic();
+
+        /// returns an array of subformulas consisting of longest chain of subformulas connected by 
+        /// a specified operator
         virtual unsigned int collectsubs(FType, formula **, unsigned int);
+
+        /// brief collects all places that are used in the formula
         virtual void collectplaces(std::set<owfnPlace*>& places);
+
+        /// returns the longest chain of subformulas connected by a specified operator
         virtual unsigned int counttype(FType);
+
+        /// returns a deep copy of this formula
         virtual unarybooleanformula * deep_copy();
+
+        /// returns a flat copy of this formula
         virtual unarybooleanformula * flat_copy();
 };
 
 
 class binarybooleanformula : public formula {
     public:
-        formula * left, * right; // Teilformeln zum Parsen, AND/OR-Ketten werden
+        // Teilformeln zum Parsen, AND/OR-Ketten werden
         // nachher zu **sub komprimiert
+        formula * left, * right; 
+
+        /// constructor
         binarybooleanformula(FType, formula *, formula *);
+
+        /// destructor
         virtual ~binarybooleanformula();
+
+        /// Compress chains of AND or OR to single n-ary AND/OR and returns a new
+        /// formula.
         virtual formula * merge();
+
+        /// remove negation in formulae without temporal
         virtual formula * posate() {
             return (formula *) 0;
         }
+
+        /// negates the formula
         virtual formula * negate() {
             return (formula *) 0;
         }
+
+        /// set links to parents and from/to mentioned places
         virtual void setstatic();
-        virtual void update(unsigned int) {
-        }
+
+        /// incremental re-calculation of partial formula
+        virtual void update(unsigned int) {}
+
+        /// returns an array of subformulas consisting of longest chain of subformulas connected by 
+        /// a specified operator
         virtual unsigned int collectsubs(FType, formula **, unsigned int);
+
+        /// brief collects all places that are used in the formula
         virtual void collectplaces(std::set<owfnPlace*>& places);
+
+        /// returns the longest chain of subformulas connected by a specified operator
         virtual unsigned int counttype(FType);
+
+        /// returns a deep copy of this formula
         virtual binarybooleanformula * deep_copy();
+
+        /// returns a flat copy of this formula
         virtual binarybooleanformula * flat_copy();
+
+        ///checks whether this unary boolean formula is true with a given current marking
         virtual bool init(unsigned int *);
 };
 
 
 class booleanformula : public formula {
     public:
-        formula ** sub; // Teilformeln 
+        /// Teilformeln
+        formula ** sub; 
+
+        /// Compress chains of AND or OR to single n-ary AND/OR and returns a new
+        /// formula.
         virtual formula * merge();
+
+        /// remove negation in formulae without temporal
         virtual formula * posate();
+
+        /// negates the formula
         virtual formula * negate();
+
+        /// returns an array of subformulas consisting of longest chain of subformulas connected by 
+        /// a specified operator
         virtual unsigned int collectsubs(FType, formula **, unsigned int);
+
+        /// brief collects all places that are used in the formula
         virtual void collectplaces(std::set<owfnPlace*>& places);
+
+        /// incremental re-calculation of partial formula
         virtual void update(unsigned int);
+
+        /// returns the longest chain of subformulas connected by a specified operator
         virtual unsigned int counttype(FType);
+
+        /// set links to parents and from/to mentioned places
         virtual void setstatic();
+
+        /// returns a deep copy of this formula
         virtual booleanformula * deep_copy();
+
+        /// returns a flat copy of this formula
         virtual booleanformula * flat_copy();
+        
         unsigned int cardsub;
+
+        ///checks whether this unary boolean formula is true with a given current marking
         virtual bool init(unsigned int *);
-        unsigned int firstvalid; // Teilformeln werden manchmal nach Gueltigkeit sortiert
+
+        // Teilformeln werden manchmal nach Gueltigkeit sortiert
         // (links die ungueltigen, rechts die gueltigen)
-        booleanformula() {
-        }
+        unsigned int firstvalid; 
+        
+        /// constructor
+        booleanformula() {}
+        
+        /// destructor
         virtual ~booleanformula();
 };
 

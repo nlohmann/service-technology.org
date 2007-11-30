@@ -44,15 +44,15 @@
 #include <map>
 //#include <strstream>
 
-// prototypes for global operators new
+/// prototypes for global operators new
 void* operator new(size_t size, const std::string &file, int line);
 void* operator new[](size_t size, const std::string &file, int line);
 
-// prototypes for global operators delete
+/// prototypes for global operators delete
 void operator delete(void* mem);
 void operator delete[](void* mem);
 
-// prototypes own memory (re/de)allocation funtions that log their operations.
+/// prototypes own memory (re/de)allocation funtions that log their operations.
 void* mynew(size_t size,
             const std::string &file,
             int line,
@@ -62,167 +62,172 @@ void* mycalloc(size_t n, size_t s, const std::string &file, int line);
 void* myrealloc(void* oldptr, size_t newsize);
 void mydelete(void* mem);
 
-// Declare own memory allocation function that does _not_ log. Needed because
-// we have overwritten standard malloc with own version that logs.
+/// Declare own memory allocation function that does _not_ log. Needed because
+/// we have overwritten standard malloc with own version that logs.
 void* mynew_without_log(size_t size);
 
 
-// Collects memory allocation statistics for a particular type at a particular
-// source file position.
+/// Collects memory allocation statistics for a particular type at a particular
+/// source file position.
 class LogInfo {
     private:
-        // number of memory allocation calls for given type at given source
-        // file position
+        /// number of memory allocation calls for given type at given source
+        /// file position
         size_t allocCallCount;
 
-        // number of memory deallocation calls for given type at given source
-        // file position
+        /// number of memory deallocation calls for given type at given source
+        /// file position
         size_t deallocCallCount;
 
-        // number of currently allocated bytes for given type at given source
-        // file position
+        /// number of currently allocated bytes for given type at given source
+        /// file position
         size_t allocated_mem;
 
-        // peak number of bytes allocated for given type at given source file
-        // position
+        /// peak number of bytes allocated for given type at given source file
+        /// position
         size_t peak_allocated_mem;
 
     public:
-        std::string type; // name of class/type
-        std::string filepos; // source file position
+        
+        /// name of class/type
+        std::string type;
+         
+        /// source file position
+        std::string filepos; 
 
-        // Constructs empty LogInfo. Empty strings, other values 0.
+        /// Constructs empty LogInfo. Empty strings, other values 0.
         LogInfo();
 
-        // Constructs LogInfo with given type and filepos. All other values are
-        // initialized to 0.
+        /// Constructs LogInfo with given type and filepos. All other values are
+        /// initialized to 0.
         LogInfo(const std::string& type, const std::string& filepos);
 
-        // Logs an allocation operation. mem specifies number of allocated
-        // bytes by to be logged operation.
+        /// Logs an allocation operation. mem specifies number of allocated
+        /// bytes by to be logged operation.
         void logAllocation(size_t mem);
 
-        // Logs a reallocation operation.
+        /// Logs a reallocation operation.
         void logReallocation(size_t oldmemsize, size_t newmemsize);
 
-        // Logs a deallocation operation. mem specifies number of allocated
-        // bytes by to be logged operation.
+        /// Logs a deallocation operation. mem specifies number of allocated
+        /// bytes by to be logged operation.
         void logDeallocation(size_t mem);
 
-        // Returns allocation call count.
+        /// Returns allocation call count.
         size_t getAllocCallCount() const;
 
-        // Returns deallocation call count.
+        /// Returns deallocation call count.
         size_t getDeallocCallCount() const;
 
-        // Returns peak allocated memory in bytes.
+        /// Returns peak allocated memory in bytes.
         size_t getPeakAllocatedMem() const;
 
-        // Returns currently allocated memory in bytes.
+        /// Returns currently allocated memory in bytes.
         size_t getAllocatedMem() const;
 
-        // Returns true iff peak_allocated_mem of lhs is smaller than
-        // peak_allocated_mem of rhs.
+        /// Returns true iff peak_allocated_mem of lhs is smaller than
+        /// peak_allocated_mem of rhs.
         static bool compare_by_peakmem(const LogInfo* lhs, const LogInfo* rhs);
 };
 
 
-// Collects memory allocation statistics for a particular type.
+/// Collects memory allocation statistics for a particular type.
 class TypeLogInfo {
     public:
-        std::string type; // name of class/type
+        /// name of class/type
+        std::string type; 
 
-        // number of memory allocation calls for given type
+        /// number of memory allocation calls for given type
         size_t allocCallCount;
 
-        // number of memory deallocation calls for given type
+        /// number of memory deallocation calls for given type
         size_t deallocCallCount;
 
-        // total number of currently allocated bytes for given type
+        /// total number of currently allocated bytes for given type
         size_t allocated_mem;
 
-        // peak number of bytes allocated for given type
+        /// peak number of bytes allocated for given type
         size_t peak_allocated_mem;
 
-        // Constructs empty TypeLogInfo. Empty strings, other values 0.
+        /// Constructs empty TypeLogInfo. Empty strings, other values 0.
         TypeLogInfo();
 
-        // Returns true iff peak_allocated_mem of lhs is smaller than
-        // peak_allocated_mem of rhs.
+        /// Returns true iff peak_allocated_mem of lhs is smaller than
+        /// peak_allocated_mem of rhs.
         static bool compare_by_peakmem(const TypeLogInfo& lhs,
                                        const TypeLogInfo& rhs);
 };
 
 
-// Saves information about a pointer.
+/// Saves information about a pointer.
 class PointerInfo {
     private:
-        // The number of bytes allocated under the pointer.
+        /// The number of bytes allocated under the pointer.
         size_t allocated_mem;
 
-        // Holds information about the allocation call that returned the
-        // pointer.
+        /// Holds information about the allocation call that returned the
+        /// pointer.
         LogInfo* logInfo;
 
     public:
-        // We need a default constructor because PointerInfo is used as value
-        // in a map. Initializes everything to 0.
+        /// We need a default constructor because PointerInfo is used as value
+        /// in a map. Initializes everything to 0.
         PointerInfo();
 
-        // Constructs PointerInfo.
+        /// Constructs PointerInfo.
         PointerInfo(size_t mem, LogInfo* info);
 
-        // Logs a reallocation operation for pointer associated with this
-        // PointerInfo. newsize is the new size of the associated memory after
-        // the reallocation operation.
+        /// Logs a reallocation operation for pointer associated with this
+        /// PointerInfo. newsize is the new size of the associated memory after
+        /// the reallocation operation.
         void logReallocation(size_t newsize);
 
-        // Logs a deallocation operation for pointer associated with this
-        // PointerInfo.
+        /// Logs a deallocation operation for pointer associated with this
+        /// PointerInfo.
         void logDeallocation();
 
-        // Returns number of allocated bytes under corresponding pointer.
+        /// Returns number of allocated bytes under corresponding pointer.
         size_t getAllocatedMem() const;
 
-        // Returns pointer to LogInfo structure containing information about
-        // the allocation call that the returned the corresponding pointer.
+        /// Returns pointer to LogInfo structure containing information about
+        /// the allocation call that the returned the corresponding pointer.
         LogInfo* getLogInfo() const;
 };
 
 
-// Saves column widths of memory allocation report.
+/// Saves column widths of memory allocation report.
 class ReportRowFormat {
     public:
-        // Length of longest entry in type column.
+        /// Length of longest entry in type column.
         size_t type_length;
 
-        // Length of longest entry in filepos column.
+        /// Length of longest entry in filepos column.
         size_t filepos_length;
 
-        // Length of longest entry in callcount column.
+        /// Length of longest entry in callcount column.
         size_t callcount_length;
 
-        // Length of longest entry in allocated_mem column.
+        /// Length of longest entry in allocated_mem column.
         size_t allocated_mem_length;
 
-        // Constructs empty ReportRowFormat with all values initialized to 0.
+        /// Constructs empty ReportRowFormat with all values initialized to 0.
         ReportRowFormat();
 };
 
 
-// Saves information of memory allocations and prints summary report.
+/// Saves information of memory allocations and prints summary report.
 class NewLogger {
     private:
-        // saves memory allocation information for each type at each relevant
-        // source file position.
-        // key format: "file:line:type""
+        /// saves memory allocation information for each type at each relevant
+        /// source file position.
+        /// key format: "file:line:type""
         typedef std::map<std::string, LogInfo*> log_t;
         static log_t log;
 
         typedef std::map<const void*, PointerInfo> pointerLog_t;
         static pointerLog_t pointerLog;
 
-        // prints a row of the report table with given data and format
+        /// prints a row of the report table with given data and format
         template<typename T1, typename T2, typename T3, typename T4> static void
                 printReportRow(const T1& type,
                                const T2& filepos,
@@ -239,7 +244,7 @@ class NewLogger {
             std::cerr << std::endl;
         }
 
-        // prints a row of the report table with given data and format
+        /// prints a row of the report table with given data and format
         template<typename T1, typename T2, typename T3, typename T4, typename T5,
                  typename T6> static void printReportRow(const T1& type,
                                                          const T2& filepos,
@@ -258,39 +263,39 @@ class NewLogger {
             printReportRow(type, filepos, callcountcell, memcell, format);
         }
 
-        // prints a normal line for the report table
+        /// prints a normal line for the report table
         static void printReportLine(const ReportRowFormat& format,
                                     char line_character = '-');
 
-        // prints a double line for the report table
+        /// prints a double line for the report table
         static void printReportDoubleLine(const ReportRowFormat& format);
 
     public:
-        // Destructs the NewLogger.
+        /// Destructs the NewLogger.
         ~NewLogger();
 
-        // Adds memory allocation info to log for given type at fiven filepos.
-        // Format of filepos is: "file:line". size is newly allocated memory in
-        // bytes. pointer is the pointer returned by the allocation call.
+        /// Adds memory allocation info to log for given type at fiven filepos.
+        /// Format of filepos is: "file:line". size is newly allocated memory in
+        /// bytes. pointer is the pointer returned by the allocation call.
         static void logAllocation(std::string type,
                                   std::string filepos,
                                   size_t size,
                                   const void* pointer);
 
-        // Logs deallocation operation.
+        /// Logs deallocation operation.
         static void logReallocation(const void* oldptr,
                                     const void* newptr,
                                     size_t newsize);
 
-        // Logs deallocation for given pointer.
+        /// Logs deallocation for given pointer.
         static void logDeallocation(const void* pointer);
 
-        // Prints report table for all gathered data.
+        /// Prints report table for all gathered data.
         static void printall();
 
-        // Prints report table. Sorted by allocated memory, grouped by type.
+        /// Prints report table. Sorted by allocated memory, grouped by type.
         static void printall_by_typesize();
 };
 
-#endif // LOG_NEW
-#endif // NEWLOGGER_H_
+#endif /// LOG_NEW
+#endif /// NEWLOGGER_H_

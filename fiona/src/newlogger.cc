@@ -56,18 +56,24 @@
 using namespace std;
 
 
+//! \brief constructor
 LogInfo::LogInfo() :
     allocCallCount(0), deallocCallCount(0), allocated_mem(0),
     peak_allocated_mem(0) {
 }
 
 
+//! \brief constructor
+//! \param type_ name of the class type
+//! \param filepos_ source file position
 LogInfo::LogInfo(const string& type_, const string& filepos_) :
     allocCallCount(0), deallocCallCount(0), allocated_mem(0),
     peak_allocated_mem(0), type(type_), filepos(filepos_) {
 }
 
 
+//! \brief Logs an allocation operation 
+//! \param mem specifies number of allocated bytes by to be logged operation.
 void LogInfo::logAllocation(size_t mem) {
     ++allocCallCount;
     allocated_mem += mem;
@@ -75,12 +81,17 @@ void LogInfo::logAllocation(size_t mem) {
 }
 
 
+//! \brief Logs a reallocation operation.
+//! \param oldmemsize specifies number of allocated bytes by the old allocation
+//! \param newmemsize specifies number of allocated bytes by the new allocation
 void LogInfo::logReallocation(size_t oldmemsize, size_t newmemsize) {
     assert(oldmemsize <= allocated_mem);
     allocated_mem += (newmemsize - oldmemsize);
 }
 
 
+//! \brief Logs a deallocation operation 
+//! \param mem specifies number of allocated bytes by to be logged operation.
 void LogInfo::logDeallocation(size_t mem) {
     ++deallocCallCount;
     assert(mem <= allocated_mem);
@@ -88,74 +99,108 @@ void LogInfo::logDeallocation(size_t mem) {
 }
 
 
+//! \brief Returns allocation call count
+//! \return allocation call count
 size_t LogInfo::getAllocCallCount() const {
     return allocCallCount;
 }
 
+//! \brief Returns deallocation call count
+//! \return deallocation call count
 size_t LogInfo::getDeallocCallCount() const {
     return deallocCallCount;
 }
 
 
+//! \brief returned peak allocated memory in bytes
+//! \returns peak allocated memory in bytes
 size_t LogInfo::getPeakAllocatedMem() const {
     return peak_allocated_mem;
 }
 
 
+//! \brief returnes the currently allocated memory in bytes
+//! \returns currently allocated memory in bytes
 size_t LogInfo::getAllocatedMem() const {
     return allocated_mem;
 }
 
 
+//! \brief Returns true iff peak_allocated_mem of lhs is smaller than
+//!        peak_allocated_mem of rhs
+//! \param lhs left loginfo
+//! \param rhs right loginfo
+//! \return returns whether the peak of lhs is smaller than the peak of rhs
 bool LogInfo::compare_by_peakmem(const LogInfo* lhs, const LogInfo* rhs) {
     return lhs->peak_allocated_mem < rhs->peak_allocated_mem;
 }
 
 
+//! \brief constructor
 TypeLogInfo::TypeLogInfo() :
     allocCallCount(0), deallocCallCount(0), allocated_mem(0),
             peak_allocated_mem(0) {
 }
 
 
+//! \brief Returns true iff peak_allocated_mem of lhs is smaller than
+//!        peak_allocated_mem of rhs
+//! \param lhs left TypeLogInfo
+//! \param rhs right TypeLogInfo
+//! \return returns whether the peak of lhs is smaller than the peak of rhs
 bool TypeLogInfo::compare_by_peakmem(const TypeLogInfo& lhs,
                                      const TypeLogInfo& rhs) {
     return lhs.peak_allocated_mem < rhs.peak_allocated_mem;
 }
 
 
+//! \brief constructor
 PointerInfo::PointerInfo() :
     allocated_mem(0), logInfo(NULL) {
 }
 
 
+//! \brief constructor
+//! \param mem size of the memory that is being pointed at in bytes
+//! \param info Information about the allocation call of this pointer
 PointerInfo::PointerInfo(size_t mem, LogInfo* info) :
     allocated_mem(mem), logInfo(info) {
 }
 
 
+//! \brief returns the size of the memory pointed at in bytes
+//! \return returns memory size
 size_t PointerInfo::getAllocatedMem() const {
     return allocated_mem;
 }
 
 
+//! \brief returns the LogInfo if the pointer
+//! \return LogInfo
 LogInfo* PointerInfo::getLogInfo() const {
     return logInfo;
 }
 
 
+//! \brief Logs a reallocation operation for pointer associated with this
+//!        PointerInfo 
+//! \param newsize newsize is the new size of the associated memory after
+///        the reallocation operation.
 void PointerInfo::logReallocation(size_t newsize) {
     logInfo->logReallocation(allocated_mem, newsize);
     allocated_mem = newsize;
 }
 
 
+//! \brief Logs a deallocation operation for pointer associated with this
+//!        PointerInfo
 void PointerInfo::logDeallocation() {
     logInfo->logDeallocation(allocated_mem);
     allocated_mem = 0;
 }
 
 
+//! \brief constructor
 ReportRowFormat::ReportRowFormat() :
     type_length(0), filepos_length(0), callcount_length(0),
             allocated_mem_length(0) {
@@ -166,6 +211,7 @@ NewLogger::log_t NewLogger::log;
 NewLogger::pointerLog_t NewLogger::pointerLog;
 
 
+//! \brief destructor
 NewLogger::~NewLogger() {
     for (log_t::const_iterator iter = log.begin(); iter != log.end(); ++iter) {
         delete iter->second;
@@ -173,6 +219,11 @@ NewLogger::~NewLogger() {
 }
 
 
+//! \brief Adds memory allocation info to log for given type at fiven filepos
+//! \param type type of allocation
+//! \param filepos Format of filepos is: "file:line"
+//! \param size size is newly allocated memory in bytes
+//! \param pointer pointer is the pointer returned by the allocation call
 void NewLogger::logAllocation(std::string type,
                               std::string filepos,
                               size_t size,
@@ -197,6 +248,10 @@ void NewLogger::logAllocation(std::string type,
 }
 
 
+//! \brief logs a reallocation operation
+//! \param oldptr old pointer adress
+//! \param newptr new pointer adress
+//! \param size size of the allocated memory
 void NewLogger::logReallocation(const void* oldptr,
                                 const void* newptr,
                                 size_t newsize) {
@@ -210,6 +265,8 @@ void NewLogger::logReallocation(const void* oldptr,
 }
 
 
+//! \brief logs a deallocation
+//! \param pointer adress of the deallocation
 void NewLogger::logDeallocation(const void* pointer) {
     // There may be deletes from the C++ library. So just do nothing if we get
     // a pointer for which we have no log information.
@@ -222,11 +279,15 @@ void NewLogger::logDeallocation(const void* pointer) {
 }
 
 
+//! \brief prints report table for all gathered data
 void NewLogger::printall() {
     printall_by_typesize();
 }
 
 
+//! \brief prints a normal line for the report table
+//! \param format format to be printed in
+//! \param line_character line character
 void NewLogger::printReportLine(const ReportRowFormat& format,
                                 char line_character) {
     std::string line = "+" + string(format.type_length + 0, line_character) + "+"
@@ -238,11 +299,14 @@ void NewLogger::printReportLine(const ReportRowFormat& format,
 }
 
 
+//! \brief prints a double line for the report table
+//! \param format format to be printed in
 void NewLogger::printReportDoubleLine(const ReportRowFormat& format) {
     printReportLine(format, '=');
 }
 
 
+//! \brief Prints report table. Sorted by allocated memory, grouped by type.
 void NewLogger::printall_by_typesize() {
     // column names of report table
     std::string table_head1_type = "";
@@ -396,11 +460,18 @@ void NewLogger::printall_by_typesize() {
 }
 
 
+//! \brief new not logging 'new' function
+//! \param size size of the allocated memory
 void* mynew_without_log(size_t size) {
     return malloc(size);
 }
 
 
+//! \brief new logging 'new' function
+//! \param size size of the allocated memory
+//! \param file filename
+//! \param line line number
+//! \param type type of the object
 void* mynew(size_t size,
             const std::string &file,
             int line,
@@ -414,11 +485,18 @@ void* mynew(size_t size,
 }
 
 
+//! \brief new logging unary 'new' operator
+//! \param size size of the allocated memory
+//! \param file filename
+//! \param line line number
 void * operator new(size_t size, const std::string &file, int line) {
     return mynew(size, file, line, "");
 }
 
 
+//! \brief new reallocation function
+//! \param oldptr old pointer position
+//! \param newsize newsize new size after reallocation
 void* myrealloc(void* oldptr, size_t newsize) {
     void* newptr = realloc(oldptr, newsize);
     NewLogger::logReallocation(oldptr, newptr, newsize);
@@ -426,11 +504,20 @@ void* myrealloc(void* oldptr, size_t newsize) {
 }
 
 
+//! \brief new logging unary 'new' operator for arrays
+//! \param size size of the allocated memory
+//! \param file filename
+//! \param line line number
 void * operator new[](size_t size, const std::string &file, int line) {
     return mynew(size, file, line, "");
 }
 
 
+//! \brief new allocation function for arrays
+//! \param n size of a single object
+//! \param s size of the arry
+//! \param file filename
+//! \param line line number
 void* mycalloc(size_t n, size_t s, const std::string &file, int line) {
     std::string filepos(file);
     filepos += ':';
@@ -441,17 +528,23 @@ void* mycalloc(size_t n, size_t s, const std::string &file, int line) {
 }
 
 
+//! \brief new delete function
+//! \param mem pointer at the memory to be deleted
 void mydelete(void* mem) {
     NewLogger::logDeallocation(mem);
     free(mem);
 }
 
 
+//! \brief new unary delete operator
+//! \param mem pointer at the memory to be deleted
 void operator delete(void* mem) {
     mydelete(mem);
 }
 
 
+//! \brief new unary delete operator for arrays
+//! \param mem pointer at the memory to be deleted
 void operator delete[](void* mem) {
     mydelete(mem);
 }

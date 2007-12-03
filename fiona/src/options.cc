@@ -601,9 +601,8 @@ void parse_command_line(int argc, char* argv[]) {
         options[O_BDD] = false;
     }
 
-	if (ogfiles.size() == 0 && parameters[P_PV]) {
-		cerr << "Error:\tNo OG given. Public View Service Automaton cannot be generated." << endl
-		     << "\tCalculate the OG of your service/oWFN first." << endl
+	if (ogfiles.size() == 0 && netfiles.size() == 0 && parameters[P_PV]) {
+		cerr << "Error:\tNo OGs or oWFNs given. Public View Service Automaton cannot be generated." << endl
              << "\tEnter \"fiona --help\" for more information.\n" << endl;
         exit(1);
 	}

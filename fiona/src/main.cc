@@ -366,6 +366,33 @@ void computeIG(oWFN* PN) {
 }
 
 
+//! \brief generate a public view for a given og
+//! \param OG an og to generate the public view of
+//! \param graphName a name for the graph in the output
+void computePublicView(AnnotatedGraph* OG, string graphName) {
+
+    trace(TRACE_0, "generating the public view for\n");
+    trace(graphName);
+    trace("\n");
+
+    outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
+    outfilePrefix += ".pvsa";
+
+    OG->transformToPublicView();
+
+    // generate output files
+    if (!options[O_NOOUTPUTFILES]) {
+        trace(TRACE_0, "generating dot output...\n");
+
+        // .out
+        OG->printDotFile(outfilePrefix, "public view of " + graphName);
+
+        // .og
+        OG->printOGFile(outfilePrefix);
+    }
+}
+
+
 //! \brief create an OG of an oWFN
 //! \param PN the given oWFN
 void computeOG(oWFN* PN) {
@@ -400,6 +427,24 @@ void computeOG(oWFN* PN) {
     graph->printGraphStatistics();
     trace(TRACE_0, "\n");
 
+    // switch to publicview generation if the mode is PV
+    if (parameters[P_PV]) {
+        
+        string publicViewName;
+        
+        if (options[O_OUTFILEPREFIX]) {
+            publicViewName = outfilePrefix;
+        } else {
+            publicViewName = graph->returnOWFnFilename();
+            publicViewName = publicViewName.substr(0, publicViewName.size()-5);
+        }
+        
+        computePublicView(graph, publicViewName);
+        
+        delete graph;
+        return;
+    }
+    
     // generate output files
     if (!options[O_NOOUTPUTFILES]) {
         // distributed controllability?
@@ -526,34 +571,6 @@ void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
     }
 
     delete productOG;
-}
-
-
-//! \brief generate a public view for a given og
-//! \param OG an og to generate the public view of
-//! \param graphName a name for the graph in the output
-void computePublicView(AnnotatedGraph* OG, string graphName) {
-
-    trace(TRACE_0, "generating the public view for\n");
-    trace(graphName);
-    trace("\n");
-
-    outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
-    outfilePrefix += ".pvsa";
-
-    OG->transformToPublicView();
-
-    // generate output files
-    if (!options[O_NOOUTPUTFILES]) {
-        trace(TRACE_0, "generating dot output...\n");
-
-        // .out
-        OG->printDotFile(outfilePrefix, "public view of "
-                                         + AnnotatedGraph::stripOGFileSuffix(*(ogfiles.begin())));
-
-        // .og
-        OG->printOGFile(outfilePrefix);
-    }
 }
 
 
@@ -1069,7 +1086,7 @@ int main(int argc, char ** argv) {
     if (parameters[P_PV] || options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC]) {
 
         // Abort if there are no OGs at all
-        if (ogfiles.begin() == ogfiles.end()) {
+        if (ogfiles.begin() == ogfiles.end() && !(parameters[P_PV])) {
             trace("Error:  No OGs have been given for computation\n\n");
             trace("        Enter \"fiona --help\" for more information\n\n");        
         }
@@ -1106,7 +1123,9 @@ int main(int argc, char ** argv) {
         // Must NOT be called before fclose(og_yyin);
         og_yylex_destroy();
 #endif
-        return 0;
+        if (!parameters[P_PV]) {
+            return 0;
+        }
     }
 
     // **********************************************************************************
@@ -1133,7 +1152,7 @@ int main(int argc, char ** argv) {
         return 0;
     }
 
-    if (parameters[P_IG] || parameters[P_OG] || options[O_MATCH] || options[O_PNG]) {
+    if (parameters[P_IG] || parameters[P_OG] || options[O_MATCH] || options[O_PNG] || parameters[P_PV]) {
 
         if (options[O_MATCH]) {
             assert(ogfiles.size() == 1);
@@ -1175,7 +1194,7 @@ int main(int argc, char ** argv) {
                 computeIG(PN);
             }
 
-            if (parameters[P_OG]) {
+            if (parameters[P_OG] || parameters[P_PV]) {
                 // computing OG of the current oWFN
                 reportOptionValues(); // adjust events_manual and print limit of considering events
                 computeOG(PN);

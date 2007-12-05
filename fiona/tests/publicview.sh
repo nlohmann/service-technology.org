@@ -47,7 +47,7 @@ nodes_soll=4
 edges_soll=4
 
 og="$DIR/1stFix.og"
-cmd="$FIONA $og -tPV"
+cmd="$FIONA $og -t PV"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -84,7 +84,7 @@ nodes_soll=5
 edges_soll=10
 
 og="$DIR/2ndFix.og"
-cmd="$FIONA $og -tPV"
+cmd="$FIONA $og -t PV"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -114,14 +114,14 @@ fi
 
 
 ############################################################################
-# 1st Fix (-M)
+# 1st Fix (--multipledeadlocks)
 ############################################################################
 
 nodes_soll=4
 edges_soll=4
 
 og="$DIR/1stFix.og"
-cmd="$FIONA $og -tPV -M"
+cmd="$FIONA $og -t PV --multipledeadlocks"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -158,7 +158,7 @@ nodes_soll=6
 edges_soll=10
 
 og="$DIR/2ndFix.og"
-cmd="$FIONA $og -tPV --multipledeadlocks"
+cmd="$FIONA $og -t PV --multipledeadlocks"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -192,4 +192,3 @@ fi
 echo
 
 exit $result
-

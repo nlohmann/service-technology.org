@@ -70,9 +70,6 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              messages/messageboundtest2.owfn \
              samples/06-03-23_BPM06_shop_sect_3.owfn \
              samples/06-03-23_BPM06_shop_sect_6.owfn \
-             samples/DKE07_newshop_1.owfn \
-             samples/DKE07_newshop_2.owfn \
-             samples/DKE07_shop.owfn \
              samples/keesCoffee_condition.owfn \
              samples/myCoffee.owfn \
              sequence_suite/sequence10.owfn \

@@ -41,7 +41,6 @@ result=0
 resultSingle=0
 owfn="$DIR/big.owfn"
 outputPrefix="$builddir/png/big.owfn.output"
-outputExpected="$testdir/png/big.owfn.expected.png"
 
 # for make distcheck: make copy of $owfn and work on it
 if [ "$testdir" != "$builddir" ]; then
@@ -64,13 +63,9 @@ else
         resultSingle=1
     fi
 
-    if [ $resultSingle -eq 0 ] ; then
-        if ! diff "$outputPrefix.png" "$outputExpected" >/dev/null ; then
-            echo "... failed: Output and expected output differ. Compare " \
-                 "$outputPrefix.png" "$outputExpected"
-            resultSingle=1
-        fi
-    fi
+    echo $OUTPUT | grep "big.owfn.output.png generated" > /dev/null
+    resultSingle=$?
+
 fi
 
 if [ $resultSingle -ne 0 ]; then

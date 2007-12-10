@@ -1279,14 +1279,48 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap() {
 }
 
 
-//! \brief Create the formula describing the coverability criteria
-//! \param TransitionMap a mapping of all transitions to their specific labels
+//! \brief Get all transitions from the graph with a label from the given label set, 
+//! each associated to a specific label
+//! return returns the transition map
+AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap(set<string>* labels) {
+    trace(TRACE_3, "AnnotatedGraph::getTransitionMap(set<string>* labels)::begin()\n");
+    TransitionMap tm;
+
+    for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
+        if ((*iNode)->isBlue() && (parameters[P_SHOW_EMPTY_NODE] || (*iNode)->reachGraphStateSet.size() != 0)) {
+            AnnotatedGraphNode::LeavingEdges::Iterator iEdge = (*iNode)->getLeavingEdgesIterator();
+            while (iEdge->hasNext()) {
+                GraphEdge* edge = iEdge->getNext();
+                if ((labels->find(edge->getLabel()) != labels->end()) && edge->getDstNode()->isBlue() && 
+                    (parameters[P_SHOW_EMPTY_NODE] || edge->getDstNode()->reachGraphStateSet.size() != 0))
+                    tm[edge->getLabel()].insert((*iNode)->getName() + "@"+ edge->getLabel() + "@"
+                            + edge->getDstNode()->getName());
+            }
+        }
+    }
+
+    trace(TRACE_3, "AnnotatedGraph::getTransitionMap()::end()\n");
+    return tm;
+}
+
+
+//! \brief Create the formula describing the coverability criteria when covering labels from the given set
+//! \param labels the set that containts all the events that shall be covered; omitting is equal NULL and refers to
+//! covering the whole interface set
 //! \return returns the coverability formula 
-GraphFormulaCNF *AnnotatedGraph::createCovFormula(TransitionMap tm) {
-    trace(TRACE_3, "AnnotatedGraph::createCovFormula(TransitionMap)::begin()\n");
+void AnnotatedGraph::createCovFormula(set<string>* labels = NULL) {
+    trace(TRACE_3, "AnnotatedGraph::createCovFormula(set<string>* labels)::begin()\n");
 
     GraphFormulaCNF *formula= new GraphFormulaCNF;
-
+    TransitionMap tm;
+    
+    if (!labels) {
+        tm = getTransitionMap(labels);
+    }
+    else {
+        tm = getTransitionMap();
+    }
+    
     for (TransitionMap::iterator i = tm.begin(); i != tm.end(); i++) {
         GraphFormulaMultiaryOr *clause= new GraphFormulaMultiaryOr;
         for (EdgeSet::iterator j = i->second.begin(); j != i->second.end(); j++) {
@@ -1296,13 +1330,14 @@ GraphFormulaCNF *AnnotatedGraph::createCovFormula(TransitionMap tm) {
         formula->addClause(clause);
     }
 
+    covConstraint = formula;
+
     trace(TRACE_3, "AnnotatedGraph::createCovFormula(): " + formula->asString() + "\n");
-    trace(TRACE_3, "AnnotatedGraph::createCovFormula(TransitionMap)::end()\n");
-    return formula;
+    trace(TRACE_3, "AnnotatedGraph::createCovFormula()::end()\n");
 }
 
 
-//! \brief Create the formula describing t event-structure of the graph
+//! \brief Create the formula describing the event-structure of the graph
 //! NOTE: the graph has to be acyclic!
 //! \return returns the structure formula
 GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormula() {
@@ -1313,7 +1348,7 @@ GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormula() {
     GraphFormulaMultiaryAnd *formula = createStructureFormulaRecursively(getRoot());
 
     trace(TRACE_3, "AnnotatedGraph::createStructureFormula(): " + formula->asString() + "\n");
-    trace(TRACE_3, "AnnotatedGraph::createStructureFormula()::end()\n");
+    trace(TRACE_3, "AnnotatedGraph::createStrctureFormula()::end()\n");
     return formula;
 }
 

@@ -253,6 +253,59 @@ GraphFormulaAssignment* AnnotatedGraphNode::getAssignment() const {
 }
 
 
+//! \brief create the annotation in CNF for coverability uses
+//! through a given global constraint, describing the coverability criteria
+//! \param global_constraint formula describing the coverability critera
+void AnnotatedGraphNode::createCovAnnotation(GraphFormula* global_constraint) {
+    trace(TRACE_5, "AnnotatedGraphNode::createCovAnnotation(GraphFormula* global_constraint)::begin()\n");
+    
+    if (!global_constraint) return;
+        
+    GraphFormulaCNF* cov_annotation = getAnnotation();
+    GraphFormulaCNF* global_constraintCNF = global_constraint->getCNF();
+    
+    bool add_literal;
+    
+    // for every outgoing edge, check if the label is true in every satification of the global_constraint
+    // that is, if the cnf of the global_constraint has a clause with this single label
+    LeavingEdges::Iterator iEdge = getLeavingEdgesIterator();
+    while (iEdge->hasNext()) {
+        GraphEdge* edge = iEdge->getNext();
+
+        add_literal = false;
+        for (GraphFormulaMultiaryAnd::iterator iClause = global_constraintCNF->begin();
+              iClause != cov_annotation->end(); iClause++) {
+
+             GraphFormulaMultiaryOr* clause = dynamic_cast<GraphFormulaMultiaryOr*>(*iClause);
+             // the clause has just one literal?
+             if (clause->begin() == clause->end()) {
+                 GraphFormulaLiteral* transition = dynamic_cast<GraphFormulaLiteral*>(*clause->begin());
+                 
+                 string lit = transition->asString().substr(transition->asString().find_first_of('@'),
+                         transition->asString().find_last_of('@') - transition->asString().find_first_of('@'));
+                  
+                 // the literal is the edge's label?
+                 if (edge->getLabel() == lit) {
+                     // add the literal to the coverability annotation (conjunction)
+                     add_literal = true; 
+                 }
+             }
+        }
+        
+        if (add_literal) {
+            GraphFormulaLiteral* lit = new GraphFormulaLiteral(edge->getLabel());
+            GraphFormulaMultiaryOr* clause = new GraphFormulaMultiaryOr(lit);
+            cov_annotation->addClause(clause);
+        }
+    }
+    delete iEdge;
+    delete global_constraintCNF;
+    
+    covAnnotation = cov_annotation;
+    trace(TRACE_5, "AnnotatedGraphNode::createCovAnnotation()::end()\n");
+}    
+
+
 //! \brief Delivers the element from the priority map with the highest priority.
 //!        The element with the highest priority will be in a clause with minimal length
 //!        and will have the maximal count of occurences throughout the annotation

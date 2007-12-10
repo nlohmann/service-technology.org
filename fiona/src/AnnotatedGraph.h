@@ -68,6 +68,8 @@ class AnnotatedGraph : public Graph {
     protected:
         AnnotatedGraphNode* root;
 
+        GraphFormulaCNF *covConstraint;
+        
         typedef std::vector<AnnotatedGraphNode*> nodes_t;
 
         nodes_t setOfNodes; // needed for proper deletion of OG.
@@ -227,9 +229,16 @@ class AnnotatedGraph : public Graph {
 
         /// Get all transitions from the graph, each associated to a specific label
         TransitionMap getTransitionMap();
+
+        /// Get all transitions from the graph with a label from the given set, each associated to a specific label
+        /// NULL refers to covering the whole interface set
+        TransitionMap getTransitionMap(set<string>* labels);
         
-        /// Create the formula describing the coverability criteria 
-        GraphFormulaCNF *createCovFormula(TransitionMap tm);
+        /// Create the formula describing the coverability criteria
+        void createCovFormula();
+                
+        /// Create the formula describing the coverability criteria when covering labels in the given set.
+        void createCovFormula(set<string>* labels);
 
         //! Create the formula describing the structure of the complete graph through events
         //! NOTE: graph has to be acyclic!

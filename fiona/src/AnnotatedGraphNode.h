@@ -62,6 +62,9 @@ class AnnotatedGraphNode : public GraphNode {
         /// Annotation of this node as a formula (a CNF).
         GraphFormulaCNF* annotation;
 
+        /// Annotation of this node as a formula in CNF used for Coverability
+        GraphFormulaCNF* covAnnotation;
+
     public:
 
         /// constructor (no parameters)
@@ -78,6 +81,9 @@ class AnnotatedGraphNode : public GraphNode {
     
         /// get the annotation
         GraphFormulaCNF* getAnnotation() const;
+
+        /// get annotation of this node in CNF for coverability uses
+        GraphFormulaCNF* getCovAnnotation() const;
 
         /// set the annotation
         void setAnnotation(GraphFormulaCNF*);
@@ -111,6 +117,10 @@ class AnnotatedGraphNode : public GraphNode {
         /// returns the assignment that is imposed by present or absent arcs
         /// leaving the node
         GraphFormulaAssignment* getAssignment() const;
+
+        /// create the annotation in CNF for coverability uses
+        /// through a given global constraint, describing the coverability criteria
+        void createCovAnnotation(GraphFormula* global_constraint);
 
 #undef new
         /// Provides user defined operator new. Needed to trace all new operations

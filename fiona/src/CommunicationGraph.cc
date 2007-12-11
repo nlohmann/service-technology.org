@@ -539,7 +539,7 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
 
     while (edgeIter->hasNext()) {
          AnnotatedGraphEdge* element = edgeIter->getNext();
-        AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
+        AnnotatedGraphNode* vNext = element->getDstNode();
 
         if (!vNext->isToShow(root))
             continue;
@@ -680,7 +680,7 @@ void CommunicationGraph::printGraphToSTGRecursively(AnnotatedGraphNode* v,
 
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* element = edgeIter->getNext();
-        AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
+        AnnotatedGraphNode* vNext = element->getDstNode();
 
         if (!vNext->isToShow(root))
             continue;
@@ -756,7 +756,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(AnnotatedGraphNod
     edgeIter = v->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* element = edgeIter->getNext();
-        AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
+        AnnotatedGraphNode* vNext = element->getDstNode();
 
         if (!vNext->isToShow(root))
             continue;
@@ -931,7 +931,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* element = edgeIter->getNext();
-        AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
+        AnnotatedGraphNode* vNext = element->getDstNode();
 
         if (vNext != v) {
             childrenDiagnosisColors.insert(diagnose_recursively(vNext, visitedNodes));
@@ -987,7 +987,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
     edgeIter = v->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* element = edgeIter->getNext();
-        AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
+        AnnotatedGraphNode* vNext = element->getDstNode();
         
         if (v->changes_color(element)) {
             if (vNext->getDiagnosisColor() == DIAG_UNSET) {

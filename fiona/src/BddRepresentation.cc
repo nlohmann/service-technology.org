@@ -194,7 +194,7 @@ void BddRepresentation::generateRepresentation(AnnotatedGraphNode* v,
 
             while (edgeIter->hasNext()) {
                 AnnotatedGraphEdge* element = edgeIter->getNext();
-                AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
+                AnnotatedGraphNode* vNext = element->getDstNode();
 
                 if (vNext->getColor() == BLUE &&
                     vNext->reachGraphStateSet.size() != 0 &&
@@ -265,7 +265,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(AnnotatedGraphNode* v) {
 
         while (edgeIter->hasNext()) {
             AnnotatedGraphEdge* element = edgeIter->getNext();
-            AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
+            AnnotatedGraphNode* vNext = element->getDstNode();
             if (vNext != NULL) {
 
                 //label
@@ -976,7 +976,7 @@ void BddRepresentation::testSymbRepresentation(AnnotatedGraphNode* v,
 
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* element = edgeIter->getNext();
-        AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
+        AnnotatedGraphNode* vNext = element->getDstNode();
 
         if (vNext != NULL) {
 
@@ -1108,7 +1108,7 @@ void BddRepresentation::calculateBound(AnnotatedGraphNode* v,
 
             while (edgeIter->hasNext()) {
                 AnnotatedGraphEdge* element = edgeIter->getNext();
-                AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
+                AnnotatedGraphNode* vNext = element->getDstNode();
 
                 if (vNext->reachGraphStateSet.size() != 0 &&
                     vNext != NULL &&

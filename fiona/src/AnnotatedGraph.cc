@@ -162,8 +162,9 @@ void AnnotatedGraph::removeFalseNodes() {
 
         while (iNode != setOfNodes.end()) {
             GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
+            
             if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
-
+                
                 removeEdgesToNodeFromAllOtherNodes(*iNode);
                 if (*iNode == getRoot()) {
                     setRoot(NULL);
@@ -303,8 +304,8 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
         } else {
             trace(TRACE_4, "\t\t\t event present, going down\n");
 
-            if (!simulatesRecursive((AnnotatedGraphNode*)myEdge->getDstNode(),
-                                    (AnnotatedGraphNode*)simEdge->getDstNode(),
+            if (!simulatesRecursive(myEdge->getDstNode(),
+                                    simEdge->getDstNode(),
                                     visitedNodes)) {
                 delete simEdgeIter;
                 return false;
@@ -432,7 +433,7 @@ void AnnotatedGraph::filterRecursive(AnnotatedGraphNode *myNode,
             return;
         } else {
             // iterate over the outgoin edges
-            filterRecursive((AnnotatedGraphNode*)myEdge->getDstNode(), (AnnotatedGraphNode*)rhsEdge->getDstNode(),
+            filterRecursive(myEdge->getDstNode(), rhsEdge->getDstNode(),
                             VisitedNodes);
         }
     }
@@ -498,14 +499,14 @@ bool AnnotatedGraph::isAcyclic() {
 
                 // Return false if an outgoing transition points at a transitive parent node,
                 // else add the destination to the queue and update its transitive parent nodes
-                if (parentNodes[testNode].find((AnnotatedGraphNode*)edge->getDstNode())
+                if (parentNodes[testNode].find(edge->getDstNode())
                         != parentNodes[testNode].end()) {
                     delete edgeIter;
                     trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): end\n");
                     return false;
                 } else {
-                    testNodes.push((AnnotatedGraphNode*)edge->getDstNode());
-                    parentNodes[(AnnotatedGraphNode*)edge->getDstNode()].insert(parentNodes[testNode].begin(),
+                    testNodes.push(edge->getDstNode());
+                    parentNodes[edge->getDstNode()].insert(parentNodes[testNode].begin(),
                                       parentNodes[testNode].end());
                 }
             }
@@ -591,7 +592,7 @@ unsigned int AnnotatedGraph::numberOfServices() {
                     != labels.end(); label++) {
 
                 if (assignment->get((*label))) {
-                    followerNodes.insert((AnnotatedGraphNode*)edges[(*label)]->getDstNode());
+                    followerNodes.insert(edges[(*label)]->getDstNode());
                 }
             }
             validFollowerCombinations[(*iNode)].push_back(followerNodes);
@@ -948,8 +949,7 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
                            AnnotatedGraphNode* currentRhsNode,
                            AnnotatedGraph* productOG) {
 
-    trace(
-          TRACE_5,
+    trace(TRACE_5,
           "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): start\n");
 
     // at this time, the node constructed from currentOGNode and
@@ -979,10 +979,10 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
 
             // compute both successors and recursively call buildProductOG again
             AnnotatedGraphNode* newOGNode;
-            newOGNode = (AnnotatedGraphNode*)currentOGNode->followEdgeWithLabel(currentLabel);
+            newOGNode = currentOGNode->followEdgeWithLabel(currentLabel);
 
             AnnotatedGraphNode* newRhsNode;
-            newRhsNode = (AnnotatedGraphNode*)currentRhsNode->followEdgeWithLabel(currentLabel);
+            newRhsNode = currentRhsNode->followEdgeWithLabel(currentLabel);
 
             // build the new node of the product OG
             // that has name and annotation constructed from current nodes of OG and rhs OG
@@ -1147,7 +1147,7 @@ void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v,
 
             // remember the label of the egde
             currentLabel = edge->getLabel();
-            AnnotatedGraphNode* successor = (AnnotatedGraphNode*)v->followEdgeWithLabel(currentLabel);
+            AnnotatedGraphNode* successor = v->followEdgeWithLabel(currentLabel);
             assert(successor != NULL);
 
             os << "p"<< v->getName() << "->"<< "p"<< successor->getName()
@@ -1385,7 +1385,7 @@ GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormulaRecursively(Annot
                  new_lit = new GraphFormulaLiteral(lit->asString());
              }
              GraphFormulaMultiaryAnd* new_and = new GraphFormulaMultiaryAnd(new_lit, 
-                     createStructureFormulaRecursively((AnnotatedGraphNode*)node->followEdgeWithLabel(lit->asString())));
+                     createStructureFormulaRecursively(node->followEdgeWithLabel(lit->asString())));
              new_clause->addSubFormula(new_and);
          }
          formula->addSubFormula(new_clause);

@@ -394,7 +394,7 @@ void AnnotatedGraphNode::removeEdgesToNode(const AnnotatedGraphNode* nodeToDelet
             // node with the annotation "true", when calling the 
             // removeFalseNodes() function beforehand
             // removeLiteralFromAnnotationByHiding(edge->getLabel());
-            //removeLiteralFromAnnotation(edge->getLabel());
+            removeLiteralFromAnnotation(edge->getLabel());
             delete edge;
             iEdge->remove();
         }

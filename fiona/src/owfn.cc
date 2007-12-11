@@ -1878,7 +1878,7 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
         if (transition->hasNonTauLabelForMatching()) {
             // Fire the transition in the OG that belongs to the transition we
             // just fired in the oWFN.
-            currentOGNode = (AnnotatedGraphNode*)currentOGNode->followEdgeWithLabel(transition->getLabelForMatching());
+            currentOGNode = currentOGNode->followEdgeWithLabel(transition->getLabelForMatching());
         } else {
             // if net just made a silent step, the OG node stays unchanged
             // so do nothing.

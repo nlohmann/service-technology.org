@@ -35,7 +35,7 @@
 #define COMMUNICATIONGRAPH_H_
 
 #include "mynew.h"
-#include "GraphEdge.h"
+#include "AnnotatedGraphEdge.h"
 #include "GraphNode.h" // for GraphNodeDiagnosisColor_enum
 #include "AnnotatedGraphNode.h"
 #include "AnnotatedGraph.h" // parent class

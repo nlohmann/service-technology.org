@@ -207,7 +207,7 @@ class GraphNode {
         bool addState(State*);
 
         /// returns true iff a colored successor of v can be avoided
-        bool coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const;        
+        bool coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const;
         
         /// returns true iff edge e is possible in every state
         bool edgeEnforcable(GraphEdge* e) const;

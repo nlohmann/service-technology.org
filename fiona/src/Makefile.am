@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-11-28 16:20:25 $ by $Author: kern $.
-# Version $Revision: 1.46 $
+# File last changed $Date: 2007-12-11 11:25:44 $ by $Author: kern $.
+# Version $Revision: 1.47 $
 
 include $(top_srcdir)/Makefile.covcommon
 
@@ -46,6 +46,7 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         searchTrace.h \
         debug.h \
         GraphEdge.h GraphEdge.cc \
+        AnnotatedGraphEdge.h AnnotatedGraphEdge.cc \
         dimensions.h main.cc symboltab.cc\
         main.h symboltab.h\
         options.cc userconfig.h\

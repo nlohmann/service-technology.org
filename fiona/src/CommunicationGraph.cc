@@ -35,7 +35,7 @@
 
 #include "mynew.h"
 #include "state.h"
-#include "GraphEdge.h"
+#include "AnnotatedGraphEdge.h"
 #include "GraphFormula.h"
 #include "options.h"
 #include "debug.h"
@@ -193,7 +193,7 @@ void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(AnnotatedGraphNode*
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
-        GraphEdge* leavingEdge = edgeIter->getNext();
+        AnnotatedGraphEdge* leavingEdge = edgeIter->getNext();
 
         AnnotatedGraphNode* vNext = (AnnotatedGraphNode *)leavingEdge->getDstNode();
         assert(vNext != NULL);
@@ -243,7 +243,7 @@ void CommunicationGraph::computeNumberOfBlueNodesEdgesHelper(AnnotatedGraphNode*
         AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
-            GraphEdge* leavingEdge = edgeIter->getNext();
+            AnnotatedGraphEdge* leavingEdge = edgeIter->getNext();
 
             AnnotatedGraphNode* vNext = (AnnotatedGraphNode *)leavingEdge->getDstNode();
             assert(vNext != NULL);
@@ -538,7 +538,7 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
-        GraphEdge * element = edgeIter->getNext();
+         AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
 
         if (!vNext->isToShow(root))
@@ -679,7 +679,7 @@ void CommunicationGraph::printGraphToSTGRecursively(AnnotatedGraphNode* v,
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
-        GraphEdge* element = edgeIter->getNext();
+        AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
 
         if (!vNext->isToShow(root))
@@ -744,7 +744,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(AnnotatedGraphNod
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
-        GraphEdge* element = edgeIter->getNext();
+        AnnotatedGraphEdge* element = edgeIter->getNext();
         if (element->getDstNode() != NULL &&element->getDstNode()->isToShow(root) ) {
             outgoing_labels[v].insert(element->getLabel());
         }
@@ -755,7 +755,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(AnnotatedGraphNod
 
     edgeIter = v->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge *element = edgeIter->getNext();
+        AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
 
         if (!vNext->isToShow(root))
@@ -846,7 +846,7 @@ void CommunicationGraph::removeLabeledSuccessor(AnnotatedGraphNode* v, std::stri
     AnnotatedGraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
 
     while (edgeIter->hasNext()) {
-        GraphEdge* element = edgeIter->getNext();
+        AnnotatedGraphEdge* element = edgeIter->getNext();
 
         if (element->getLabel() == label) {
             // AnnotatedGraphNode *vNext = element->getDstNode();
@@ -930,7 +930,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
 
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge* element = edgeIter->getNext();
+        AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
 
         if (vNext != v) {
@@ -986,7 +986,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
     ///////////////////////////////////////////////////////////////////////
     edgeIter = v->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge *element = edgeIter->getNext();
+        AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
         
         if (v->changes_color(element)) {

@@ -90,7 +90,7 @@ void AnnotatedGraph::addEdge(const std::string& srcName,
     AnnotatedGraphNode* src = getNodeWithName(srcName);
     AnnotatedGraphNode* dstNode = getNodeWithName(dstNodeName);
 
-    GraphEdge* transition= new GraphEdge(dstNode,label);
+    AnnotatedGraphEdge* transition= new AnnotatedGraphEdge(dstNode,label);
     src->addLeavingEdge(transition);
 }
 
@@ -290,10 +290,10 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
             simEdgeIter = simNode->getLeavingEdgesConstIterator();
 
     while (simEdgeIter->hasNext()) {
-        GraphEdge* simEdge = simEdgeIter->getNext();
+        AnnotatedGraphEdge* simEdge = simEdgeIter->getNext();
         trace(TRACE_4, "\t\t\t checking event " + simEdge->getLabel() + "\n");
 
-        GraphEdge* myEdge = myNode->getEdgeWithLabel(simEdge->getLabel());
+        AnnotatedGraphEdge* myEdge = myNode->getEdgeWithLabel(simEdge->getLabel());
 
         if (myEdge == NULL) {
             // simNode has edge which myNode hasn't
@@ -381,9 +381,9 @@ void AnnotatedGraph::filterRecursive(AnnotatedGraphNode *myNode,
     AnnotatedGraphNode::LeavingEdges::Iterator
             rhsEdgeIter = rhsNode->getLeavingEdgesIterator();
     while (rhsEdgeIter->hasNext()) {
-        GraphEdge* rhsEdge = rhsEdgeIter->getNext();
+        AnnotatedGraphEdge* rhsEdge = rhsEdgeIter->getNext();
 
-        GraphEdge* myEdge = myNode->getEdgeWithLabel(rhsEdge->getLabel());
+        AnnotatedGraphEdge* myEdge = myNode->getEdgeWithLabel(rhsEdge->getLabel());
         if (myEdge == NULL) {
             // the operand node has an edge which the current og node doesn't
             if (rhsEdge->getType() == SENDING) {
@@ -423,9 +423,9 @@ void AnnotatedGraph::filterRecursive(AnnotatedGraphNode *myNode,
     trace(TRACE_5, "AnnotatedGraph::filterRecursive: traverse through OG\n");
     rhsEdgeIter = rhsNode->getLeavingEdgesIterator();
     while (rhsEdgeIter->hasNext()) {
-        GraphEdge* rhsEdge = rhsEdgeIter->getNext();
+        AnnotatedGraphEdge* rhsEdge = rhsEdgeIter->getNext();
 
-        GraphEdge* myEdge = myNode->getEdgeWithLabel(rhsEdge->getLabel());
+        AnnotatedGraphEdge* myEdge = myNode->getEdgeWithLabel(rhsEdge->getLabel());
         if (myEdge == NULL) {
             // this should not happen! every edge in the operand IS present in the current og
             delete rhsEdgeIter;
@@ -443,9 +443,9 @@ void AnnotatedGraph::filterRecursive(AnnotatedGraphNode *myNode,
     trace(TRACE_5, "AnnotatedGraph::filterRecursive: post order creation\n");
     rhsEdgeIter = rhsNode->getLeavingEdgesIterator();
     while (rhsEdgeIter->hasNext()) {
-        GraphEdge* rhsEdge = rhsEdgeIter->getNext();
+        AnnotatedGraphEdge* rhsEdge = rhsEdgeIter->getNext();
 
-        GraphEdge* myEdge = myNode->getEdgeWithLabel(rhsEdge->getLabel());
+        AnnotatedGraphEdge* myEdge = myNode->getEdgeWithLabel(rhsEdge->getLabel());
         if (myEdge == NULL) {
             if (rhsEdge->getType() == SENDING) {
                 removeEdgesToNodeFromAllOtherNodes(myNode);
@@ -492,7 +492,7 @@ bool AnnotatedGraph::isAcyclic() {
                 edgeIter = testNode->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
-            GraphEdge* edge = edgeIter->getNext();
+            AnnotatedGraphEdge* edge = edgeIter->getNext();
             // If the Node is the source of that transition and if the Destination is a valid node
             if (edge->getDstNode()->getColor() == BLUE) {
 
@@ -540,7 +540,7 @@ unsigned int AnnotatedGraph::numberOfServices() {
     set<string> labels;
     list<GraphFormulaAssignment> assignmentList;
     GraphFormulaAssignment possibleAssignment;
-    map<string, GraphEdge*> edges;
+    map<string, AnnotatedGraphEdge*> edges;
 
     trace(TRACE_2, "Computing true assignments for all nodes\n");
     // Preprocess all nodes of the OG in order to fill the variables needed in the recursion
@@ -559,7 +559,7 @@ unsigned int AnnotatedGraph::numberOfServices() {
         trace(TRACE_5, "Collecting labels of outgoing edges for current node\n");
         AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =(*iNode)->getLeavingEdgesConstIterator();
         while (edgeIter->hasNext()) {
-            GraphEdge* edge = edgeIter->getNext();
+            AnnotatedGraphEdge* edge = edgeIter->getNext();
             if (edge->getDstNode()->getColor() == BLUE) {
                 labels.insert(edge->getLabel());
                 edges[edge->getLabel()] = edge;
@@ -963,7 +963,7 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
             edgeIter = currentOGNode->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
-        GraphEdge* edge = edgeIter->getNext();
+        AnnotatedGraphEdge* edge = edgeIter->getNext();
 
         // remember the label of the egde
         currentLabel = edge->getLabel();
@@ -1143,7 +1143,7 @@ void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v,
                 edgeIter = v->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
-            GraphEdge* edge = edgeIter->getNext();
+            AnnotatedGraphEdge* edge = edgeIter->getNext();
 
             // remember the label of the egde
             currentLabel = edge->getLabel();
@@ -1225,7 +1225,7 @@ void AnnotatedGraph::printOGFile(const std::string& filenamePrefix) const {
             node->getLeavingEdgesConstIterator();
 
         while (iEdge->hasNext()) {
-            GraphEdge* edge = iEdge->getNext();
+            AnnotatedGraphEdge* edge = iEdge->getNext();
             if (!edge->getDstNode()->isToShow(root)) {
                 continue;
             }
@@ -1265,7 +1265,7 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap() {
         if ((*iNode)->isBlue() && (parameters[P_SHOW_EMPTY_NODE] || (*iNode)->reachGraphStateSet.size() != 0)) {
             AnnotatedGraphNode::LeavingEdges::Iterator iEdge = (*iNode)->getLeavingEdgesIterator();
             while (iEdge->hasNext()) {
-                GraphEdge* edge = iEdge->getNext();
+                AnnotatedGraphEdge* edge = iEdge->getNext();
                 if (edge->getDstNode()->isBlue() && (parameters[P_SHOW_EMPTY_NODE]
                         || edge->getDstNode()->reachGraphStateSet.size() != 0))
                     tm[edge->getLabel()].insert((*iNode)->getName() + "@"+ edge->getLabel() + "@"
@@ -1447,7 +1447,7 @@ void AnnotatedGraph::constructDualService() {
         AnnotatedGraphNode::LeavingEdges::Iterator
                 edge_iter = currNode->getLeavingEdgesIterator();
         while (edge_iter->hasNext()) {
-            GraphEdge* currEdge = edge_iter->getNext();
+            AnnotatedGraphEdge* currEdge = edge_iter->getNext();
             // toggle event type of the current edge
             currEdge->toggleType();
             // store event in the corresponding event set
@@ -1503,7 +1503,7 @@ void AnnotatedGraph::fixDualService() {
         // preparation: assume we don't have to apply the 2nd fix in current node
         bool apply2ndFix = false;
         // preparation: we need to store the leaving edges for the new node somewhere
-        set<GraphEdge*> newNodesEdges;
+        set<AnnotatedGraphEdge*> newNodesEdges;
         AnnotatedGraphNode::LeavingEdges::Iterator edge_iter = currNode->getLeavingEdgesIterator();
         while (edge_iter->hasNext()) {
             newNodesEdges.insert(edge_iter->getNext());
@@ -1517,7 +1517,7 @@ void AnnotatedGraph::fixDualService() {
         // iterate over all leaving edges of the current node
         edge_iter = currNode->getLeavingEdgesIterator();
         while (edge_iter->hasNext()) {
-            GraphEdge* currEdge = edge_iter->getNext();
+            AnnotatedGraphEdge* currEdge = edge_iter->getNext();
             std::string currLabel = currEdge->getLabel();
             std::string currAnnotation = currNode->getAnnotationAsString();
             // act on transition type
@@ -1578,7 +1578,7 @@ void AnnotatedGraph::fixDualService() {
             }
             // create new leaving edge from current node to the deadlock node
             //   labeled with current event
-            GraphEdge* disabledEvent= new GraphEdge(deadlock, *event_iter);
+            AnnotatedGraphEdge* disabledEvent= new AnnotatedGraphEdge(deadlock, *event_iter);
             currNode->addLeavingEdge(disabledEvent);
         }
 
@@ -1594,7 +1594,7 @@ void AnnotatedGraph::fixDualService() {
                     new GraphFormulaFixed(true, ""), currNode->getColor());
             trace(TRACE_5, "created new node " + newNode->getName() + "\n");
             // create tau transition from current to new node
-            GraphEdge* tauTransition= new GraphEdge(newNode, GraphFormulaLiteral::TAU);
+            AnnotatedGraphEdge* tauTransition= new AnnotatedGraphEdge(newNode, GraphFormulaLiteral::TAU);
             currNode->addLeavingEdge(tauTransition);
             trace(TRACE_5, "created tau transition from " + currNode->getName()
                     +" to "+ newNode->getName() + "\n");
@@ -1602,10 +1602,10 @@ void AnnotatedGraph::fixDualService() {
             // add current node's leaving edges to new node 
             //   except those that don't occur in the annotation
             trace(TRACE_5, "adding leaving edges to new node\n");
-            for (set<GraphEdge*>::iterator edge_iter = newNodesEdges.begin(); edge_iter
+            for (set<AnnotatedGraphEdge*>::iterator edge_iter = newNodesEdges.begin(); edge_iter
                     != newNodesEdges.end(); ++edge_iter) {
                 // create new leaving edge
-                GraphEdge* newEdge= new GraphEdge((*edge_iter)->getDstNode(),
+                AnnotatedGraphEdge* newEdge= new AnnotatedGraphEdge((*edge_iter)->getDstNode(),
                         (*edge_iter)->getLabel());
                 newNode->addLeavingEdge(newEdge);
                 trace(TRACE_5, "\tadding edge " + newEdge->getLabel() +" from "
@@ -1624,7 +1624,7 @@ void AnnotatedGraph::fixDualService() {
                 }
                 // create new edge from new node to the deadlock node
                 //   labeled with current event
-                GraphEdge* disabledEvent= new GraphEdge(deadlock, *event_iter);
+                AnnotatedGraphEdge* disabledEvent= new AnnotatedGraphEdge(deadlock, *event_iter);
                 newNode->addLeavingEdge(disabledEvent);
                 trace(TRACE_5, "\tadding edge " + disabledEvent->getLabel()
                         +" from "+ newNode->getName() + " to "

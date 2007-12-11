@@ -260,7 +260,7 @@ bool interactionGraph::addGraphNode(AnnotatedGraphNode* sourceNode,
                                     messageMultiSet messages,
                                     GraphEdgeType type,
                                     double progress_plus) {
-    trace(TRACE_5, "interactionGraph::AddGraphNode (AnnotatedGraphNode * sourceNode, AnnotatedGraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : start\n");
+    trace(TRACE_5, "interactionGraph::AddGraphNode (AnnotatedGraphNode * sourceNode, AnnotatedGraphNode * toAdd, messageMultiSet messages, Type type) : start\n");
 
     if (getNumberOfNodes() == 0) { // graph contains no nodes at all
         root = toAdd; // the given node becomes the root node
@@ -320,17 +320,17 @@ bool interactionGraph::addGraphNode(AnnotatedGraphNode* sourceNode,
             toAdd->setNumber(getNumberOfNodes());
             toAdd->setName(intToString(getNumberOfNodes()));
 
-            GraphEdge* edgeSucc = new GraphEdge(toAdd, label);
+            AnnotatedGraphEdge* edgeSucc = new AnnotatedGraphEdge(toAdd, label);
             sourceNode->addLeavingEdge(edgeSucc);
             setOfSortedNodes.insert(toAdd);
             setOfNodes.push_back(toAdd);
             
-            trace(TRACE_5, "interactionGraph::AddGraphNode (AnnotatedGraphNode * sourceNode, AnnotatedGraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
+            trace(TRACE_5, "interactionGraph::AddGraphNode (AnnotatedGraphNode * sourceNode, AnnotatedGraphNode * toAdd, messageMultiSet messages, Type type) : end\n");
             return true;
         } else {
             trace(TRACE_1, "\t successor node already known: " + found->getName() + "\n");
 
-            GraphEdge* edgeSucc = new GraphEdge(found, label);
+            AnnotatedGraphEdge* edgeSucc = new AnnotatedGraphEdge(found, label);
             sourceNode->addLeavingEdge(edgeSucc);
 
             // Still, if that node was computed red before, the literal
@@ -347,7 +347,7 @@ bool interactionGraph::addGraphNode(AnnotatedGraphNode* sourceNode,
 
             delete toAdd;
 
-            trace(TRACE_5, "interactionGraph::AddGraphNode (AnnotatedGraphNode * sourceNode, AnnotatedGraphNode * toAdd, messageMultiSet messages, GraphEdgeType type) : end\n");
+            trace(TRACE_5, "interactionGraph::AddGraphNode (AnnotatedGraphNode * sourceNode, AnnotatedGraphNode * toAdd, messageMultiSet messages, Type type) : end\n");
             return false;
         }
     }
@@ -361,7 +361,7 @@ bool interactionGraph::addGraphNode(AnnotatedGraphNode* sourceNode,
 //! \param messages
 //! \param currentNode the node from which the input event is to be sent
 //! \param typeOfPlace
-//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, AnnotatedGraphNode * currentNode, GraphEdgeType typeOfPlace)
+//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, AnnotatedGraphNode * currentNode, Type typeOfPlace)
 bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
                                           AnnotatedGraphNode* currentNode,
                                           GraphEdgeType typeOfPlace) {

@@ -189,12 +189,12 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
 
                     addGraphNode(currentNode, v);
                     if (currentEvent->getType() == INPUT) {
-                        addGraphEdge(currentNode, v, PN->getInputPlaceIndex(currentEvent), SENDING);
+                        add(currentNode, v, PN->getInputPlaceIndex(currentEvent), SENDING);
 
                         // going down with sending event ...
                         buildGraph(v, your_progress);
                     } else if (currentEvent->getType() == OUTPUT) {
-                        addGraphEdge(currentNode, v, PN->getOutputPlaceIndex(currentEvent), RECEIVING);
+                        add(currentNode, v, PN->getOutputPlaceIndex(currentEvent), RECEIVING);
 
                         // going down with receiving event ...
                         buildGraph(v, 0);
@@ -212,7 +212,7 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
 
                     // draw a new edge to the old node
                     string edgeLabel = currentEvent->getLabelForCommGraph();
-                    GraphEdge* newEdge = new GraphEdge(found, edgeLabel);
+                    AnnotatedGraphEdge* newEdge = new AnnotatedGraphEdge(found, edgeLabel);
                     currentNode->addLeavingEdge(newEdge);
 
                     // Still, if that node was computed red before, the literal
@@ -307,12 +307,12 @@ void OG::addGraphNode(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* toAdd)
 //! \param destNode target of the new edge
 //! \param label label of the new edge
 //! \param type type of the new edge
-void OG::addGraphEdge(AnnotatedGraphNode* sourceNode,
+void OG::add(AnnotatedGraphNode* sourceNode,
                       AnnotatedGraphNode* destNode,
                       oWFN::Places_t::size_type label,
                       GraphEdgeType type) {
 
-    trace(TRACE_5, "reachGraph::AddGraphEdge(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* destNode, unsigned int label, GraphEdgeType type): start\n");
+    trace(TRACE_5, "reachGraph::Add(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* destNode, unsigned int label, Type type): start\n");
 
     assert(sourceNode != NULL);
     assert(destNode != NULL);
@@ -328,12 +328,12 @@ void OG::addGraphEdge(AnnotatedGraphNode* sourceNode,
     }
 
     // add a new edge to the new node
-    GraphEdge* newEdge = new GraphEdge(destNode, edgeLabel);
+    AnnotatedGraphEdge* newEdge = new AnnotatedGraphEdge(destNode, edgeLabel);
 
     // add the edge to the leaving edges list
     sourceNode->addLeavingEdge(newEdge);
 
-    trace(TRACE_5, "reachGraph::AddGraphEdge(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* destNode, unsigned int label, GraphEdgeType type): end\n");
+    trace(TRACE_5, "reachGraph::Add(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* destNode, unsigned int label, Type type): end\n");
 }
 
 

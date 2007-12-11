@@ -61,7 +61,7 @@ AnnotatedGraphNode::AnnotatedGraphNode(const std::string& _name,
                                        unsigned int _number) : GraphNode(_name, _color, _number) {
     
     annotation = _annotation->getCNF();
-    delete _annotation; // because getCNF() returns a newly create formula
+    delete _annotation; // because getCNF() returns a newly created formula
 }
 
 
@@ -69,6 +69,13 @@ AnnotatedGraphNode::AnnotatedGraphNode(const std::string& _name,
 AnnotatedGraphNode::~AnnotatedGraphNode() {
     
     trace(TRACE_5, "AnnotatedGraphNode::~AnnotatedGraphNode() : start\n");
+    
+    LeavingEdges::ConstIterator iEdge = getLeavingEdgesConstIterator();
+    while (iEdge->hasNext()) {
+        AnnotatedGraphEdge* edge = iEdge->getNext();
+        delete edge;
+    }
+    delete iEdge;
     
     delete annotation;
     
@@ -109,6 +116,294 @@ void AnnotatedGraphNode::addClause(GraphFormulaMultiaryOr* myclause) {
 }
 
 
+//! \brief Adds a leaving edge to this node.
+//! \param edge the new leaving edge
+void AnnotatedGraphNode::addLeavingEdge(AnnotatedGraphEdge* edge) {
+    leavingEdges.add(edge);
+}
+
+
+//! \brief Returns an iterator that can be used to traverse all leaving edges of
+//!        this GraphNode. This iterator can also be used to modify the list of
+//!        leaving edges, e.g., to remove an edge.
+//!        Consult SList<T>::getIterator() for instructions how to use this
+//!        iterator.
+//! \return the iterator described above
+AnnotatedGraphNode::LeavingEdges::Iterator AnnotatedGraphNode::getLeavingEdgesIterator() {
+    return leavingEdges.getIterator();
+}
+
+
+//! \brief Returns a const iterator that can be used to traverse all leaving
+//!        edges of this GraphNode. You can not modify the list of leaving edges
+//!        with this const iterator. Consult SList<T>::getConstIterator() for
+//!        instructions how to use this iterator.
+//! \return the iterator described above
+AnnotatedGraphNode::LeavingEdges::ConstIterator AnnotatedGraphNode::getLeavingEdgesConstIterator() const {
+    return leavingEdges.getConstIterator();
+}
+
+
+//! \brief Returns the number of leaving edges.
+//! \return number of leaving edges
+unsigned int AnnotatedGraphNode::getLeavingEdgesCount() const {
+    return leavingEdges.size();
+}
+
+//! \brief  returns true iff a colored successor can be avoided
+//! \param  color   the color under consideration
+//! \return true iff there is either a sending edge to a differently colored
+//!         successor or, for each external deadlock, there exists a receiving
+//!         edge to a non-colored successor
+bool AnnotatedGraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const {    
+    // collect all edges to differently colored successor nodes
+    set<AnnotatedGraphEdge*> edges_to_differently_colored_successors;
+    bool colored_successor_present = false;
+    
+    LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        AnnotatedGraphEdge *element = edgeIter->getNext();
+        AnnotatedGraphNode* vNext = element->getDstNode();
+        
+        if (vNext == this)
+            continue;
+        
+        if (vNext->getDiagnosisColor() != color) {
+            // if there is a sending edge to a differently colored sucessor, take this edge;
+            // otherwise: store this edge for future considerations
+            if (element->getType() == SENDING ) {
+                return true;
+            } else {
+                edges_to_differently_colored_successors.insert(element);
+            }
+        } else {
+            colored_successor_present = true;
+        }
+    }
+    delete edgeIter;
+    
+    // if there is no such colored successor, it can be clearly avoided
+    if (!colored_successor_present) {
+        return true;
+    }
+    
+    // if there are no differently colored successors, the colored successors can not be avoided
+    if (edges_to_differently_colored_successors.empty() ) {
+        return false;
+    }
+    
+    // last chance: look if each external deadlock "enables" a receiving edge
+    // to a differently colored successor
+    for (StateSet::const_iterator state = reachGraphStateSet.begin();
+         state != reachGraphStateSet.end(); state++) {
+        (*state)->decode(PN);
+        
+        bool found_enabled_state = false;
+        
+        if ((*state)->type == DEADLOCK) {
+            for (set<AnnotatedGraphEdge*>::iterator edge = edges_to_differently_colored_successors.begin();
+                 edge != edges_to_differently_colored_successors.end(); edge++) {
+                if ((*edge)->getType() == SENDING ) {
+                    continue;
+                }
+                
+                string edge_label = (*edge)->getLabel().substr(1, (*edge)->getLabel().length());
+                
+                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                    if (PN->getOutputPlace(i)->name == edge_label) {
+                        if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] > 0) {
+                            found_enabled_state = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // looked at all edges but did not finde an enabling state
+            if (!found_enabled_state) {
+                return false;
+            }
+        }
+    }
+    
+    // looked at all edges but did not abort earlier
+    return true;
+}
+
+
+//! \brief  returns true iff edge e is possible in every state
+//! \param  e a GraphEdge
+//! \return true, iff the edge e is labeled with a sending event, or a
+//!         receiving event that is present in every external deadlock state
+//! \note   For performance issues, it is not checked whether edge e is really
+//!         leaving this node.
+bool AnnotatedGraphNode::edgeEnforcable(AnnotatedGraphEdge* e) const {
+    assert (e != NULL);
+    
+    if (e->getType() == SENDING) {
+        return true;
+    } else {
+        string edge_label = e->getLabel().substr(1, e->getLabel().length());
+        bool edge_enforcable = true;
+        
+        // iterate the states and look for deadlocks where the considered
+        // message is not present: then, the receiving of this message can
+        // not be enforced
+        for (StateSet::const_iterator state = reachGraphStateSet.begin();
+             state != reachGraphStateSet.end(); state++) {
+            (*state)->decode(PN);
+            
+            if ((*state)->type == DEADLOCK) {
+                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+                    if (PN->getOutputPlace(i)->name == edge_label) {
+                        if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] == 0) {
+                            edge_enforcable = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return edge_enforcable;
+    }
+}
+
+
+//! \brief returns true iff e changes the color of the common successors
+//! \param e a GraphEdge
+//! \return true iff the given edge changes the color of the common successors
+//! \todo Whoever implemented me, please comment me!
+bool AnnotatedGraphNode::changes_color(AnnotatedGraphEdge* e) const {
+    assert(e != NULL);
+    
+    AnnotatedGraphNode* vNext = e->getDstNode();
+    
+    if ( vNext->getDiagnosisColor() == DIAG_RED )
+        return false;
+    
+    if ( !edgeEnforcable(e) )
+        return false;
+    
+    
+    map< string, AnnotatedGraphEdge* > v_edges;
+    map< string, AnnotatedGraphEdge* > vNext_edges;
+    
+    LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        AnnotatedGraphEdge* element = edgeIter->getNext();
+        v_edges[element->getLabel()] = element;
+    }
+    edgeIter = vNext->getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        AnnotatedGraphEdge* element = edgeIter->getNext();
+        vNext_edges[element->getLabel()] = element;
+    }
+    delete edgeIter;
+    
+    
+    for (map< string, AnnotatedGraphEdge* >::const_iterator v_edge = v_edges.begin();
+         v_edge != v_edges.end(); v_edge++) {
+        AnnotatedGraphEdge* vNext_edge = vNext_edges[v_edge->first];
+        
+        if (vNext_edge == NULL)
+            continue;
+        
+        if ( (vNext_edge->getDstNode()->getDiagnosisColor() != v_edge->second->getDstNode()->getDiagnosisColor()) &&
+            (vNext_edge->getDstNode()->getDiagnosisColor() == DIAG_RED) &&
+            (v_edge->second->getDstNode()->getDiagnosisColor() != DIAG_VIOLET) ) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+
+//! \brief determines whether this node has a edge with the given label
+//! \param edgeLabel the label of the edge
+//! \return true iff this node has a edge with the given label
+bool AnnotatedGraphNode::hasEdgeWithLabel(const std::string& edgeLabel) const {
+    return getEdgeWithLabel(edgeLabel) != NULL;
+}
+
+
+//! \brief determines whether this node has a blue edge with a given label
+//! \param edgeLabel the label of the blue edge
+//! \return true iff this node has a blue edge with the given label
+bool AnnotatedGraphNode::hasBlueEdgeWithLabel(const std::string& edgeLabel) const {
+    
+    AnnotatedGraphEdge* edge = getEdgeWithLabel(edgeLabel);
+    if (edge == NULL)
+        return false;
+    
+    return edge->getDstNode()->isBlue();
+}
+
+
+//! \brief returns a edge of this node with the given label
+//! \param edgeLabel the label of the edge that we look for
+//! \return a edge of this node with the given label, NULL if no such
+//!         edge exists
+AnnotatedGraphEdge* AnnotatedGraphNode::getEdgeWithLabel(const std::string& edgeLabel) const {
+    
+    LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        AnnotatedGraphEdge* edge = edgeIter->getNext();
+        
+        if (edge->getLabel() == edgeLabel) {
+            delete edgeIter;
+            return edge;
+        }
+    }
+    
+    delete edgeIter;
+    return NULL;
+}
+
+
+//! \brief "fires" the edge of this node with the given label, that is
+//!        it returns the destination node of that edge
+//! \param edgeLabel the label of this edge that is to be fired
+//! \return the destination node of the labeled edge, NULL if the
+//!         edge could not be found
+AnnotatedGraphNode* AnnotatedGraphNode::followEdgeWithLabel(const std::string& edgeLabel) {
+    
+    if (!(parameters[P_PV])) {
+        assert(edgeLabel != GraphFormulaLiteral::TAU);
+    }
+    
+    AnnotatedGraphEdge* edge = getEdgeWithLabel(edgeLabel);
+    if (edge == NULL) {
+        return NULL;
+    }
+    
+    return edge->getDstNode();
+}
+
+
+//! \brief removes all edge from this node to the given one
+//! \param nodeToDelete the target node
+void AnnotatedGraphNode::removeEdgesToNode(const AnnotatedGraphNode* nodeToDelete) {
+    LeavingEdges::Iterator iEdge = getLeavingEdgesIterator();
+    while (iEdge->hasNext()) {
+        AnnotatedGraphEdge* edge = iEdge->getNext();
+        if (edge->getDstNode() == nodeToDelete) {
+            // -"ByHiding" does not work in the numberOfServices() function
+            // since an OG without any strategies will become a single root
+            // node with the annotation "true", when calling the 
+            // removeFalseNodes() function beforehand
+            // removeLiteralFromAnnotationByHiding(edge->getLabel());
+            //removeLiteralFromAnnotation(edge->getLabel());
+            delete edge;
+            iEdge->remove();
+        }
+    }
+    delete iEdge;
+}
+
+
+
 //! \brief analyses the node and sets its color
 void AnnotatedGraphNode::analyseNode() {
     
@@ -126,7 +421,7 @@ void AnnotatedGraphNode::analyseNode() {
     // to true if the respective node is BLUE
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge* edge = edgeIter->getNext();
+        AnnotatedGraphEdge* edge = edgeIter->getNext();
         if (edge->getDstNode()->getColor() == BLUE) {
             myassignment->setToTrue(edge->getLabel());
         }
@@ -191,7 +486,7 @@ void AnnotatedGraphNode::removeUnneededLiteralsFromAnnotation() {
     edgeIter = getLeavingEdgesConstIterator();
     
     while (edgeIter->hasNext()) {
-        GraphEdge* edge = edgeIter->getNext();
+        AnnotatedGraphEdge* edge = edgeIter->getNext();
         if (edge->getDstNode()->getColor() == RED) {
             annotation->removeLiteral(edge->getLabel());
         }
@@ -241,7 +536,7 @@ GraphFormulaAssignment* AnnotatedGraphNode::getAssignment() const {
     
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
-        GraphEdge* edge = edgeIter->getNext();
+        AnnotatedGraphEdge* edge = edgeIter->getNext();
         myassignment->setToTrue(edge->getLabel());
     }
     delete edgeIter;

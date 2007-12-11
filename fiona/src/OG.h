@@ -61,7 +61,7 @@ class OG : public CommunicationGraph {
         void addGraphNode(AnnotatedGraphNode*, AnnotatedGraphNode*); // for OG
         
         /// creates an edge in the OG
-        void addGraphEdge(AnnotatedGraphNode*,
+        void add(AnnotatedGraphNode*,
                           AnnotatedGraphNode*,
                           oWFN::Places_t::size_type,
                           GraphEdgeType); // for OG

@@ -37,7 +37,7 @@
 #include <sstream>
 #include "BddRepresentation.h"
 #include "BddLabel.h"
-#include "GraphEdge.h"
+#include "AnnotatedGraphEdge.h"
 #include "GraphFormula.h"
 
 #include "options.h"
@@ -193,7 +193,7 @@ void BddRepresentation::generateRepresentation(AnnotatedGraphNode* v,
                     edgeIter =v->getLeavingEdgesConstIterator();
 
             while (edgeIter->hasNext()) {
-                GraphEdge* element = edgeIter->getNext();
+                AnnotatedGraphEdge* element = edgeIter->getNext();
                 AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
 
                 if (vNext->getColor() == BLUE &&
@@ -264,7 +264,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(AnnotatedGraphNode* v) {
                 edgeIter = v->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
-            GraphEdge* element = edgeIter->getNext();
+            AnnotatedGraphEdge* element = edgeIter->getNext();
             AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
             if (vNext != NULL) {
 
@@ -975,7 +975,7 @@ void BddRepresentation::testSymbRepresentation(AnnotatedGraphNode* v,
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
-        GraphEdge* element = edgeIter->getNext();
+        AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
 
         if (vNext != NULL) {
@@ -1107,7 +1107,7 @@ void BddRepresentation::calculateBound(AnnotatedGraphNode* v,
             AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
             while (edgeIter->hasNext()) {
-                GraphEdge* element = edgeIter->getNext();
+                AnnotatedGraphEdge* element = edgeIter->getNext();
                 AnnotatedGraphNode* vNext = (AnnotatedGraphNode*)element->getDstNode();
 
                 if (vNext->reachGraphStateSet.size() != 0 &&

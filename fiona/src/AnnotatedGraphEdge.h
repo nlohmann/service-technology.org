@@ -20,7 +20,7 @@
  *****************************************************************************/
 
 /*!
- * \file    GraphEdge.h
+ * \file    AnnotatedGraphEdge.h
  *
  * \brief   functions for traversing IG / OG
  *
@@ -32,55 +32,34 @@
  *
  */
 
-#ifndef GRAPHEDGE_H
-#define GRAPHEDGE_H
+#ifndef ANNOTATEDGRAPHEDGE_H
+#define ANNOTATEDGRAPHEDGE_H
 
 #include "mynew.h"
 #include <string>
 #include <stdexcept>
 #include <cassert>
+#include "GraphEdge.h"
 
-//! Possible types of a GraphEdge.
-enum GraphEdgeType {SENDING, RECEIVING, SILENT};
+class AnnotatedGraphNode;
 
-class GraphNode;
-
-class GraphEdge {
-    private:
-        /// Points to the destination node of this edge.
-        GraphNode* dstNode;
+class AnnotatedGraphEdge : public GraphEdge {
+private:
+    /// Points to the destination node of this edge.
+    AnnotatedGraphNode* dstNode;
     
-    protected:
-        /// Label of the edge.
-        std::string label;
-
-    public:
-        /// Constructs a GraphEdge.
-        GraphEdge(GraphNode* dstNodeP, const std::string& labelP);
-
-        /// Returns the label of this edge.
-        std::string getLabel() const;
-
-        /// Returns the label of this edge without its prefix denoting whether
-        /// it is a sending or receiving edge.
-        std::string getLabelWithoutPrefix() const;
-
-        /// Returns the type if this edge. (RECEIVING or SENDING or SILENT)
-        GraphEdgeType getType() const;
-
-// CODE FROM PL
-        /// Switches the type of this edge between RECEIVING and SENDING 
-        void toggleType();
-// END OF CODE FROM PL
-
-        /// Returns the node this edge points to.
-        GraphNode* getDstNode() const;
-
+public:
+    /// Constructs a GraphEdge.
+    AnnotatedGraphEdge(AnnotatedGraphNode* dstNodeP, const std::string& labelP);
+    
+    /// Returns the node this edge points to.
+    AnnotatedGraphNode* getDstNode() const;
+    
 #undef new
-        /// Provides user defined operator new. Needed to trace all new operations
-        /// on this class.
-        NEW_OPERATOR(GraphEdge)
+    /// Provides user defined operator new. Needed to trace all new operations
+    /// on this class.
+    NEW_OPERATOR(AnnotatedGraphEdge)
 #define new NEW_NEW
 };
 
-#endif //GRAPHEDGE_H
+#endif //ANNOTATEDGRAPHEDGE_H

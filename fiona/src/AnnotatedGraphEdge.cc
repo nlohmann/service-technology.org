@@ -1,6 +1,6 @@
 /*****************************************************************************
  * Copyright 2005, 2006, 2007 Peter Massuthe, Daniela Weinberg,              *
- *           Jan Bretschneider, Leonard Kern                                 *
+ *           Jan Bretschneider                                               *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
@@ -20,7 +20,7 @@
  *****************************************************************************/
 
 /*!
- * \file    GraphEdge.h
+ * \file    AnnotatedGraphEdge.cc
  *
  * \brief   functions for traversing IG / OG
  *
@@ -32,55 +32,24 @@
  *
  */
 
-#ifndef GRAPHEDGE_H
-#define GRAPHEDGE_H
-
-#include "mynew.h"
 #include <string>
 #include <stdexcept>
 #include <cassert>
+#include "mynew.h"
+#include "AnnotatedGraphEdge.h"
+#include "AnnotatedGraphNode.h"
 
-//! Possible types of a GraphEdge.
-enum GraphEdgeType {SENDING, RECEIVING, SILENT};
+using namespace std;
 
-class GraphNode;
+//! \brief basic constructor
+//! \param dstNodeP Points to the destination of this edge.
+//! \param labelP label of this edge.
+AnnotatedGraphEdge::AnnotatedGraphEdge(AnnotatedGraphNode* dstNodeP, const std::string& labelP) :
+GraphEdge(NULL,labelP), dstNode(dstNodeP) {
+}
 
-class GraphEdge {
-    private:
-        /// Points to the destination node of this edge.
-        GraphNode* dstNode;
-    
-    protected:
-        /// Label of the edge.
-        std::string label;
-
-    public:
-        /// Constructs a GraphEdge.
-        GraphEdge(GraphNode* dstNodeP, const std::string& labelP);
-
-        /// Returns the label of this edge.
-        std::string getLabel() const;
-
-        /// Returns the label of this edge without its prefix denoting whether
-        /// it is a sending or receiving edge.
-        std::string getLabelWithoutPrefix() const;
-
-        /// Returns the type if this edge. (RECEIVING or SENDING or SILENT)
-        GraphEdgeType getType() const;
-
-// CODE FROM PL
-        /// Switches the type of this edge between RECEIVING and SENDING 
-        void toggleType();
-// END OF CODE FROM PL
-
-        /// Returns the node this edge points to.
-        GraphNode* getDstNode() const;
-
-#undef new
-        /// Provides user defined operator new. Needed to trace all new operations
-        /// on this class.
-        NEW_OPERATOR(GraphEdge)
-#define new NEW_NEW
-};
-
-#endif //GRAPHEDGE_H
+//! \brief returns the destination node of the dge
+//! \return destination node
+AnnotatedGraphNode* AnnotatedGraphEdge::getDstNode() const {
+    return dstNode;
+}

@@ -46,7 +46,7 @@ using namespace std;
 
 
 //! \brief a basic constructor of AnnotatedGraph
-AnnotatedGraph::AnnotatedGraph() {
+AnnotatedGraph::AnnotatedGraph(): root(NULL), covConstraint(NULL) {
 }
 
 

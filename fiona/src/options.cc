@@ -536,14 +536,14 @@ void parse_command_line(int argc, char* argv[]) {
         switch (getFileType(argv[optind])) {
             case FILETYPE_OWFN:
                 if (firstfile) {
-                    OGfirst = true;
+                    OGfirst = false;
                     firstfile = false;
                 }
                 netfiles.push_back(argv[optind]);
                 break;
             case FILETYPE_OG:
                 if (firstfile) {
-                    OGfirst = false;
+                    OGfirst = true;
                     firstfile = false;
                 }
                 ogfiles.push_back(argv[optind]);

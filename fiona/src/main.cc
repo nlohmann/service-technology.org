@@ -739,7 +739,11 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace(TRACE_0, "\nbuilding the operating guideline finished.\n\n");
 
         // add new OG to the list
-        OGsFromFiles.push_back(graph);
+        if (!OGfirst && netfiles.size() == 1) {
+            OGsFromFiles.push_front(graph);
+        } else {
+            OGsFromFiles.push_back(graph);
+        }
         delete PN;
 
         netiter++;
@@ -751,6 +755,9 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
     AnnotatedGraph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
     AnnotatedGraph *firstOG = *currentOGfile;
     AnnotatedGraph *secondOG = *(++currentOGfile);
+
+    firstOG->removeFalseNodes();
+    secondOG->removeFalseNodes();
 
     trace(TRACE_1, "checking first simulation\n");
     if (firstOG->simulates(secondOG)) {

@@ -42,7 +42,91 @@ rm -f $DIR/*.png
 
 result=0
 
-for i in 1 2 3 4 5 6 8;
+for i in 1 2;
+do
+    #echo running test$i
+
+    owfn1="$DIR/test${i}1.owfn"
+    owfn2="$DIR/test${i}2.owfn"
+
+    #OUTPUT=`$FIONA $owfn1 -t OG`
+    #OUTPUT=`$FIONA $owfn2 -t OG`
+
+    cmd="$FIONA ${owfn1} ${owfn2} -t simulation"
+
+    if [ "$memcheck" = "yes" ]; then
+        memchecklog="$owfn1.memcheck.log"
+        do_memcheck "$cmd" "$memchecklog"
+        result=$(($result | $?))
+    else
+        echo running $cmd
+        OUTPUT=`$cmd 2>&1`
+        echo $OUTPUT | grep "The first OG characterizes all strategies of the second one." > /dev/null
+        resultSIM=$?
+        if [ $resultSIM -ne 0 ]; then
+            let "result += 1"
+            echo ... Simulation failed, although it should not.
+        fi
+    fi
+done
+
+for i in 3 4;
+do
+    #echo running test$i
+
+    owfn1="$DIR/test${i}1.owfn"
+    owfn2="$DIR/test${i}2.owfn"
+
+    #OUTPUT=`$FIONA $owfn1 -t OG`
+    #OUTPUT=`$FIONA $owfn2 -t OG`
+
+    cmd="$FIONA ${owfn1} ${owfn2}.og -t simulation"
+
+    if [ "$memcheck" = "yes" ]; then
+        memchecklog="$owfn1.memcheck.log"
+        do_memcheck "$cmd" "$memchecklog"
+        result=$(($result | $?))
+    else
+        echo running $cmd
+        OUTPUT=`$cmd 2>&1`
+        echo $OUTPUT | grep "The first OG characterizes all strategies of the second one." > /dev/null
+        resultSIM=$?
+        if [ $resultSIM -ne 0 ]; then
+            let "result += 1"
+            echo ... Simulation failed, although it should not.
+        fi
+    fi
+done
+
+for i in 5 6;
+do
+    #echo running test$i
+
+    owfn1="$DIR/test${i}1.owfn"
+    owfn2="$DIR/test${i}2.owfn"
+
+    #OUTPUT=`$FIONA $owfn1 -t OG`
+    #OUTPUT=`$FIONA $owfn2 -t OG`
+
+    cmd="$FIONA ${owfn1}.og ${owfn2} -t simulation"
+
+    if [ "$memcheck" = "yes" ]; then
+        memchecklog="$owfn1.memcheck.log"
+        do_memcheck "$cmd" "$memchecklog"
+        result=$(($result | $?))
+    else
+        echo running $cmd
+        OUTPUT=`$cmd 2>&1`
+        echo $OUTPUT | grep "The first OG characterizes all strategies of the second one." > /dev/null
+        resultSIM=$?
+        if [ $resultSIM -ne 0 ]; then
+            let "result += 1"
+            echo ... Simulation failed, although it should not.
+        fi
+    fi
+done
+
+for i in 8;
 do
     #echo running test$i
 

@@ -96,6 +96,9 @@ extern std::string outfilePrefix;
 
 extern unsigned int messages_manual;
 extern int events_manual;
+
+extern bool OGfirst;
+
 extern int bdd_reordermethod;
 
 extern std::ostream* log_output;

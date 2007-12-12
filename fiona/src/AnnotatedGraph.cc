@@ -220,6 +220,12 @@ bool AnnotatedGraph::simulates(AnnotatedGraph* smallerOG) {
     // We need to remember the pairs of nodes we already visited.
     set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
 
+    if (smallerOG->getRoot() == NULL) {
+        return true;
+    } else if (root == NULL) {
+        return false;
+    }
+
     // Get things moving...
     bool result = false;
     if (simulatesRecursive(root, smallerOG->getRoot(), visitedNodes)) {
@@ -244,7 +250,7 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
     // checking, whether myNode simulates simNode; result is true, iff
     // 1) anno of simNode implies anno of myNode and
     // 2) myNode has each outgoing event of simNode, too
-
+    
     assert(myNode);
     assert(simNode);
 
@@ -292,8 +298,9 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
 
     while (simEdgeIter->hasNext()) {
         AnnotatedGraphEdge* simEdge = simEdgeIter->getNext();
-        trace(TRACE_4, "\t\t\t checking event " + simEdge->getLabel() + "\n");
 
+        trace(TRACE_4, "\t\t\t checking event " + simEdge->getLabel() + "\n");
+        
         AnnotatedGraphEdge* myEdge = myNode->getEdgeWithLabel(simEdge->getLabel());
 
         if (myEdge == NULL) {

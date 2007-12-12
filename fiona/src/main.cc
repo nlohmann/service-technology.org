@@ -644,7 +644,11 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace(TRACE_0, "\nbuilding the operating guideline finished.\n\n");
         
         // add new OG to the list
-        OGsFromFiles.push_back(graph);
+        if (!OGfirst && netfiles.size() == 1) {
+            OGsFromFiles.push_front(graph);
+        } else {
+            OGsFromFiles.push_back(graph);
+        }
         delete PN;
         
         netiter++;
@@ -657,6 +661,9 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
     AnnotatedGraph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
     AnnotatedGraph *firstOG = *currentOGfile;
     AnnotatedGraph *secondOG = *(++currentOGfile);
+    
+    firstOG->removeFalseNodes();
+    secondOG->removeFalseNodes();
     
     trace(TRACE_1, "checking simulation\n");
     if (firstOG->simulates(secondOG)) {
@@ -672,6 +679,7 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
         trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
     }
+    deleteOGs(OGsFromFiles);
 }
 
 
@@ -1061,7 +1069,7 @@ int main(int argc, char ** argv) {
         if (options[O_SIMULATES]) {
             // simulation on AnnotatedGraph
             checkSimulation(OGsFromFiles);
-            deleteOGs(OGsFromFiles);
+            //deleteOGs(OGsFromFiles);
             return 0;
         }
 

@@ -51,6 +51,9 @@ using namespace std;
 std::list<string> netfiles;
 std::list<string> ogfiles;
 
+// boolean value do save which file was mentioned first for simulation
+bool OGfirst;
+
 std::string ogfileToMatch;
 std::string outfilePrefix;
 
@@ -527,13 +530,22 @@ void parse_command_line(int argc, char* argv[]) {
         }
     }
 
+    bool firstfile = true;
     // reading all oWFNs and OGs
     for ( ; optind < argc; ++optind) {
         switch (getFileType(argv[optind])) {
             case FILETYPE_OWFN:
+                if (firstfile) {
+                    OGfirst = true;
+                    firstfile = false;
+                }
                 netfiles.push_back(argv[optind]);
                 break;
             case FILETYPE_OG:
+                if (firstfile) {
+                    OGfirst = false;
+                    firstfile = false;
+                }
                 ogfiles.push_back(argv[optind]);
                 break;
             case FILETYPE_UNKNOWN:

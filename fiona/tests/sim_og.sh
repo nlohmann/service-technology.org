@@ -338,6 +338,50 @@ fi
 
 #############################################################################
 
+og1="$DIR/mixed.owfn"
+og2="$DIR/mixed.owfn"
+
+cmd="$FIONA ${og1}.og ${og2} -t equivalence"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.3.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... OGs determined not equivalent, although they are.
+    fi
+fi
+
+#############################################################################
+
+og1="$DIR/mixed.owfn"
+og2="$DIR/mixed.owfn"
+
+cmd="$FIONA ${og1} ${og2}.og -t equivalence"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.3.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... OGs determined not equivalent, although they are.
+    fi
+fi
+
+#############################################################################
+
 og1="$DIR/coarse.og"
 og2="$DIR/coarse-chopped.og"
 

@@ -40,6 +40,39 @@ rm -f $DIR/*.log
 result=0
 
 ############################################################################
+# basic (owfn)
+############################################################################
+
+nodes_soll=5
+edges_soll=8
+
+og="$DIR/basic.owfn"
+cmd="$FIONA $og -t PV -Q"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
+    nodes=$?
+
+    echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
+    edges=$?
+
+    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    then
+    echo   ... failed to build PVSA correctly
+    fi
+
+    result=`expr $result + $nodes + $edges`
+fi
+
+
+############################################################################
 # 1st Fix
 ############################################################################
 

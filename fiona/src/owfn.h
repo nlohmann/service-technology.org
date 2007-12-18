@@ -119,17 +119,11 @@ class oWFN {
         /// returns an array of transition pointers containing all quasi enabled transition
         owfnTransition ** quasiFirelist();
         
-        /// we want to store some states calculated temporarily in a new binDecision structure
-        //binDecision * tempBinDecision; 
-
         /// activated input messages of current node
         setOfMessages inputMessages; 
         
         /// activated output messages of current node
         setOfMessages outputMessages; 
-
-        /// in case of state reduction, remember those state that we have visited so far by calculating the new node
-        StateSet visitedStates; 
 
         /// calls the check_enabled function for all transitions
         void checkEnablednessOfAllTransitions();

@@ -377,7 +377,6 @@ void OG::calculateSuccStatesInput(unsigned int input,
             PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
         } else {
             setOfStatesStubbornTemp.clear();
-            PN->visitedStates.clear();
             PN->calculateReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, 
             											newNode); // calc the reachable states from that marking
             
@@ -426,7 +425,6 @@ void OG::calculateSuccStatesOutput(unsigned int output,
     	binDecision * tempBinDecision = (binDecision *) 0;
     	
     	setOfStatesStubbornTemp.clear();
-        PN->visitedStates.clear();
         owfnPlace * outputPlace = PN->getPlace(output);
 
         StateSet stateSet;

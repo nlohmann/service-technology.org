@@ -60,7 +60,6 @@ interactionGraph::~interactionGraph() {
 void interactionGraph::buildGraph() {
 
     setOfStatesStubbornTemp.clear();
-    PN->visitedStates.clear();
 
     calculateRootNode(); // creates the root node and calculates its reachability graph (set of states)
 
@@ -598,7 +597,6 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
     binDecision * tempBinDecision = (binDecision *) 0;
     
     setOfStatesStubbornTemp.clear();
-    PN->visitedStates.clear();
 
     /*if (TRACE_2 <= debug_level) {
         for (messageMultiSet::iterator iter1 = input.begin();
@@ -690,7 +688,6 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
     	// state reduction
     	
         setOfStatesStubbornTemp.clear();
-        PN->visitedStates.clear();
 
         StateSet stateSet;
         // stateSet.clear();

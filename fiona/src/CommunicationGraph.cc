@@ -130,8 +130,12 @@ void CommunicationGraph::calculateRootNode() {
     	// no state reduction
         PN->calculateReachableStatesFull(root);
     } else {
+    	binDecision * tempBinDecision = (binDecision *) 0;
     	// state reduction
-        PN->calculateReachableStatesInputEvent(setOfStatesStubbornTemp, root);
+        PN->calculateReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, root);
+        if (tempBinDecision) {
+        	delete tempBinDecision;
+        }
     }
 
     root->setNumber(0);

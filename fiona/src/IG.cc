@@ -595,6 +595,8 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
                                                 AnnotatedGraphNode* newNode) {
     trace(TRACE_5, "interactionGraph::calculateSuccStatesInput(messageMultiSet input, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : start\n");
 
+    binDecision * tempBinDecision = (binDecision *) 0;
+    
     setOfStatesStubbornTemp.clear();
     PN->visitedStates.clear();
 
@@ -635,8 +637,16 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
         	PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
         } else {
         	// state reduction
-            PN->calculateReachableStatesInputEvent(setOfStatesStubbornTemp, newNode); // calc the reachable states from that marking
+            PN->calculateReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, newNode); // calc the reachable states from that marking
+        
+            if (tempBinDecision) {
+            	delete tempBinDecision;
+            }
+
         }
+        
+        
+        
         if (newNode->getColor() == RED) {
             // a message bound violation occured during computation of reachability graph
             trace(TRACE_5, "interactionGraph::calculateSuccStatesInput(messageMultiSet input, AnnotatedGraphNode * node) : end\n");
@@ -685,7 +695,7 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
         StateSet stateSet;
         // stateSet.clear();
 
-        PN->tempBinDecision = NULL;
+        binDecision * tempBinDecision = (binDecision *) 0;
         
         for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
                 != node->reachGraphStateSet.end(); iter++) {
@@ -706,7 +716,7 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 ////            // calculated States would deleted by the binDecision destructor
 ////            // causing a segmentation fault while trying to call decode() on
 ////            // one those deleted states in the following for loop.
-            PN->calculateReachableStates(stateSet, receivingEvent, newNode);
+            PN->calculateReachableStates(stateSet, &tempBinDecision, receivingEvent, newNode);
        }
 
         for (StateSet::iterator iter2 = stateSet.begin(); iter2
@@ -714,12 +724,14 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
             (*iter2)->decode(PN); // get the marking of the state
 
             if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
-                PN->calculateReachableStatesOutputEvent(setOfStatesStubbornTemp, newNode); // calc the reachable states from that marking
+                PN->calculateReachableStatesOutputEvent(setOfStatesStubbornTemp, &tempBinDecision, 
+                											newNode); // calc the reachable states from that marking
+
             }
         }
-     //   binDeleteAll(PN->tempBinDecision);
-        delete PN->tempBinDecision;
-        PN->tempBinDecision = NULL;
+        if (tempBinDecision) {
+        	delete tempBinDecision;
+        }
     }
 
     trace(TRACE_5, "interactionGraph::calculateSuccStatesOutput(messageMultiSet output, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : end\n");

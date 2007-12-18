@@ -58,7 +58,7 @@ bool compare(const owfnPlace* lhs, const owfnPlace* rhs) {
 //! \brief constructor
 oWFN::oWFN() :
     CurrentCardFireList(0), CurrentCardQuasiFireList(0),
-    tempBinDecision(NULL), FinalCondition(NULL), currentState(0),
+    FinalCondition(NULL), currentState(0),
     placeHashValue(0), BitVectorSize(0) {
 
     filename = "";
@@ -108,7 +108,6 @@ oWFN::~oWFN() {
     delete[] CurrentMarking;
     delete[] FinalMarking;
     delete FinalCondition;
-    delete tempBinDecision;
 
     trace(TRACE_5, "oWFN::~oWFN() : end\n");
 }
@@ -544,8 +543,11 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 
 //! \brief calculates the reduced set of states of the new AnnotatedGraphNode in case of an output event
 //! \param n the node to be calculated in case of an output event
-void oWFN::calculateReachableStatesOutputEvent(StateSet& stateSet, AnnotatedGraphNode* n) {
-    // calculates the EG starting at the current marking
+void oWFN::calculateReachableStatesOutputEvent(StateSet& stateSet, 
+												binDecision** tempBinDecision,
+												AnnotatedGraphNode* n) {
+
+	// calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(AnnotatedGraphNode * n): start\n");
 
     State * CurrentState;
@@ -697,7 +699,9 @@ void oWFN::calculateReachableStatesOutputEvent(StateSet& stateSet, AnnotatedGrap
 //!        for IG and OG with state set reduction
 //! \param stateSet set of states storing the states that were calculated using the stubborn set method
 //! \param n the node to be calculated in case of an input event
-void oWFN::calculateReachableStatesInputEvent(StateSet& stateSet, AnnotatedGraphNode* n) {
+void oWFN::calculateReachableStatesInputEvent(StateSet& stateSet, 
+												binDecision** tempBinDecision,
+												AnnotatedGraphNode* n) {
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(AnnotatedGraphNode * n): start\n");
 
@@ -848,13 +852,14 @@ void oWFN::calculateReachableStatesInputEvent(StateSet& stateSet, AnnotatedGraph
 }
 
 
-//! \brief calculates the set of states reachable from the current marking and stores them in the given stateSet
+//! \brief calculates the reduced set of states reachable from the current marking and stores them in the given stateSet
 //!        this function is for state reduced OG since a single output place is considered
 //!        for OG
 //! \param stateSet set of states
 //! \param outputPlace the output place of the net that is associated with the receiving event for which the new AnnotatedGraphNode is calculated
 //! \param n new AnnotatedGraphNode 
 void oWFN::calculateReachableStates(StateSet& stateSet,
+									binDecision** tempBinDecision,
                                     owfnPlace * outputPlace,
                                     AnnotatedGraphNode* n) {
 
@@ -873,8 +878,6 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
     State * CurrentState;
     State * NewState;
 
-    tempBinDecision = (binDecision *) 0;
-
     CurrentState = binSearch(this);
 
     unsigned int * tempCurrentMarking = NULL;
@@ -884,8 +887,8 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
         // we have a marking which has not yet a state object assigned to it
         CurrentState = binInsert(this); // save current state to the global binDecision
 
-        CurrentState = binSearch(tempBinDecision, this);
-        CurrentState = binInsert(&tempBinDecision, this); // save current state to the local binDecision 
+        CurrentState = binSearch(*tempBinDecision, this);
+        CurrentState = binInsert(tempBinDecision, this); // save current state to the local binDecision 
 
       //  cout << "inserted into tempBinDecision (OG, IG): " << CurrentState << endl;
         
@@ -897,8 +900,8 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
         //	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace): end\n");
         //return;
     } else {
-        CurrentState = binSearch(tempBinDecision, this);
-        CurrentState = binInsert(&tempBinDecision, this); // save current state to the local binDecision 
+        CurrentState = binSearch(*tempBinDecision, this);
+        CurrentState = binInsert(tempBinDecision, this); // save current state to the local binDecision 
     //    cout << "inserted into tempBinDecision (OG, IG): " << CurrentState << endl;
     }
 
@@ -941,7 +944,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
 
             // fire and reach next state
             CurrentState->stubbornFirelist[CurrentState->current]->fire(this);
-            NewState = binSearch(tempBinDecision, this);
+            NewState = binSearch(*tempBinDecision, this);
 
             if (NewState != NULL) {
                 // Current marking already in local bintree 
@@ -970,7 +973,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
                 (CurrentState->current)++;
             } else {
                 trace(TRACE_5, "Current marking new\n");
-                NewState = binInsert(&tempBinDecision, this);
+                NewState = binInsert(tempBinDecision, this);
               //  cout << "inserted into tempBinDecision (OG, IG): " << CurrentState << endl;
                 NewState->stubbornFirelist
                         = stubbornfirelistmessage(outputPlace);
@@ -1051,6 +1054,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
 //! \param messages the event(s) for which the new AnnotatedGraphNode's EG is calculated
 //! \param n new AnnotatedGraphNode 
 void oWFN::calculateReachableStates(StateSet& stateSet,
+									binDecision** tempBinDecision,
                                     messageMultiSet messages,
                                     AnnotatedGraphNode* n) {
 
@@ -1068,8 +1072,6 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
     State * CurrentState;
     State * NewState;
 
- //  tempBinDecision = NULL;
-
     CurrentState = binSearch(this);
 
     unsigned int * tempCurrentMarking = NULL;
@@ -1079,9 +1081,9 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
         // we have a marking which has not yet a state object assigned to it
         CurrentState = binInsert(this); // save current state to the global binDecision
 
-        CurrentState = binSearch(tempBinDecision, this);
-        CurrentState = binInsert(&tempBinDecision, this); // save current state to the local binDecision 
-        
+        CurrentState = binSearch(*tempBinDecision, this);
+        CurrentState = binInsert(tempBinDecision, this); // save current state to the local binDecision 
+
         CurrentState->current = 0;
         CurrentState->parent = NULL;
 
@@ -1090,10 +1092,10 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
         //	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace): end\n");
         //return;
     } else {
-        CurrentState = binSearch(tempBinDecision, this);
+        CurrentState = binSearch(*tempBinDecision, this);
 
         // save current state to the local binDecision 
-        CurrentState = binInsert(&tempBinDecision, this);
+        CurrentState = binInsert(tempBinDecision, this);
     }
 
     CurrentState->stubbornFirelist = stubbornfirelistmessage(messages);
@@ -1158,7 +1160,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
 
             // fire and reach next state
             CurrentState->stubbornFirelist[CurrentState->current]->fire(this);
-            NewState = binSearch(tempBinDecision, this);
+            NewState = binSearch(*tempBinDecision, this);
 
             if (NewState != NULL) {
                 // Current marking already in local bintree 
@@ -1198,7 +1200,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
                 (CurrentState->current)++;
             } else {
                 trace(TRACE_5, "Current marking new\n");
-                NewState = binInsert(&tempBinDecision, this);
+                NewState = binInsert(tempBinDecision, this);
                 NewState->stubbornFirelist = stubbornfirelistmessage(messages);
                 NewState->cardStubbornFireList = CurrentCardFireList;
 

@@ -120,7 +120,7 @@ class oWFN {
         owfnTransition ** quasiFirelist();
         
         /// we want to store some states calculated temporarily in a new binDecision structure
-        binDecision * tempBinDecision; 
+        //binDecision * tempBinDecision; 
 
         /// activated input messages of current node
         setOfMessages inputMessages; 
@@ -263,14 +263,14 @@ class oWFN {
         void copyMarkingToCurrentMarking(unsigned int* copy);
         
         /// calculates the reduced set of states of the new AnnotatedGraphNode in case of an output event
-        void calculateReachableStatesOutputEvent(StateSet&, AnnotatedGraphNode*);
+        void calculateReachableStatesOutputEvent(StateSet&, binDecision**, AnnotatedGraphNode*);
 
         /// calculates the reduced set of states of the new AnnotatedGraphNode in case of an input event
-        void calculateReachableStatesInputEvent(StateSet&, AnnotatedGraphNode*);
+        void calculateReachableStatesInputEvent(StateSet&, binDecision**, AnnotatedGraphNode*);
         
         /// calculates the set of states reachable from the current marking and stores them in the new AnnotatedGraphNode
-        void calculateReachableStates(StateSet&, owfnPlace*, AnnotatedGraphNode*);
-        void calculateReachableStates(StateSet&, messageMultiSet, AnnotatedGraphNode*);
+        void calculateReachableStates(StateSet&, binDecision**, owfnPlace*, AnnotatedGraphNode*);
+        void calculateReachableStates(StateSet&, binDecision**, messageMultiSet, AnnotatedGraphNode*);
 
         /// NO REDUCTION! calculate all reachable states from the current marking
         /// and store them in the node n (== AnnotatedGraphNode of CommunicationGraph)

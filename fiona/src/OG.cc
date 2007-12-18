@@ -347,6 +347,8 @@ void OG::calculateSuccStatesInput(unsigned int input,
                                   AnnotatedGraphNode* newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : start\n");
 
+    binDecision * tempBinDecision = (binDecision *) 0;
+    
     StateSet::iterator iter; // iterator over the state set's elements
 
     for (iter = oldNode->reachGraphStateSet.begin();
@@ -376,9 +378,17 @@ void OG::calculateSuccStatesInput(unsigned int input,
         } else {
             setOfStatesStubbornTemp.clear();
             PN->visitedStates.clear();
-            PN->calculateReachableStatesInputEvent(setOfStatesStubbornTemp, newNode); // calc the reachable states from that marking
+            PN->calculateReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, 
+            											newNode); // calc the reachable states from that marking
+            
+            if (tempBinDecision) {
+            	delete tempBinDecision;
+            }
+
         }
 
+        
+        
         if (newNode->getColor() == RED) {
             // a message bound violation occured during computation of reachability graph
             trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
@@ -413,7 +423,9 @@ void OG::calculateSuccStatesOutput(unsigned int output,
             }
         }
     } else {
-        setOfStatesStubbornTemp.clear();
+    	binDecision * tempBinDecision = (binDecision *) 0;
+    	
+    	setOfStatesStubbornTemp.clear();
         PN->visitedStates.clear();
         owfnPlace * outputPlace = PN->getPlace(output);
 
@@ -424,7 +436,7 @@ void OG::calculateSuccStatesOutput(unsigned int output,
 
             (*iter)->decode(PN);
             // calculate temporary state set with the help of stubborn set method
-            PN->calculateReachableStates(stateSet, outputPlace, newNode);
+            PN->calculateReachableStates(stateSet, &tempBinDecision, outputPlace, newNode);
         }
 
         for (StateSet::iterator iter2 = stateSet.begin(); iter2
@@ -432,12 +444,16 @@ void OG::calculateSuccStatesOutput(unsigned int output,
             (*iter2)->decode(PN); // get the marking of the state
 
             if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
-                PN->calculateReachableStatesOutputEvent(setOfStatesStubbornTemp, newNode); // calc the reachable states from that marking
+                PN->calculateReachableStatesOutputEvent(setOfStatesStubbornTemp, &tempBinDecision, 
+                											newNode); // calc the reachable states from that marking
+                
+                if (tempBinDecision) {
+                	delete tempBinDecision;
+                }
+
             }
         }
 
-        delete PN->tempBinDecision;
-        PN->tempBinDecision = NULL;
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, AnnotatedGraphNode* node, AnnotatedGraphNode* newNode) : end\n");
 }

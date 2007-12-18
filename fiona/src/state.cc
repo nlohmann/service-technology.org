@@ -52,6 +52,7 @@ State::State() :
 //! \brief destructor
 //! \fn State::~State()
 State::~State() {
+	
     if (firelist) {
         delete [] firelist;
     }

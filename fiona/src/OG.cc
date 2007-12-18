@@ -374,9 +374,9 @@ void OG::calculateSuccStatesInput(unsigned int input,
         if (options[O_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
         } else {
-            PN->setOfStatesTemp.clear();
+            setOfStatesStubbornTemp.clear();
             PN->visitedStates.clear();
-            PN->calculateReachableStatesInputEvent(newNode); // calc the reachable states from that marking
+            PN->calculateReachableStatesInputEvent(setOfStatesStubbornTemp, newNode); // calc the reachable states from that marking
         }
 
         if (newNode->getColor() == RED) {
@@ -413,7 +413,7 @@ void OG::calculateSuccStatesOutput(unsigned int output,
             }
         }
     } else {
-        PN->setOfStatesTemp.clear();
+        setOfStatesStubbornTemp.clear();
         PN->visitedStates.clear();
         owfnPlace * outputPlace = PN->getPlace(output);
 
@@ -432,7 +432,7 @@ void OG::calculateSuccStatesOutput(unsigned int output,
             (*iter2)->decode(PN); // get the marking of the state
 
             if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
-                PN->calculateReachableStatesOutputEvent(newNode); // calc the reachable states from that marking
+                PN->calculateReachableStatesOutputEvent(setOfStatesStubbornTemp, newNode); // calc the reachable states from that marking
             }
         }
 
@@ -555,8 +555,8 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
         // WITH state reduction
 
         // iterate over all states of the node
-        for (iter = PN->setOfStatesTemp.begin(); iter
-                != PN->setOfStatesTemp.end(); iter++) {
+        for (iter = setOfStatesStubbornTemp.begin(); iter
+                != setOfStatesStubbornTemp.end(); iter++) {
 
             if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
                 // we just consider the maximal states only

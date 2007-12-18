@@ -59,7 +59,7 @@ interactionGraph::~interactionGraph() {
 //! \fn void interactionGraph::buildGraph()
 void interactionGraph::buildGraph() {
 
-    PN->setOfStatesTemp.clear();
+    setOfStatesStubbornTemp.clear();
     PN->visitedStates.clear();
 
     calculateRootNode(); // creates the root node and calculates its reachability graph (set of states)
@@ -451,7 +451,7 @@ void interactionGraph::getActivatedEventsComputeCNF(AnnotatedGraphNode* node,
 
         // as the current node has been computed a temporal set of states was created
         // this set of states includes the deadlocks as well
-        for (iter = PN->setOfStatesTemp.begin(); iter != PN->setOfStatesTemp.end(); iter++) {
+        for (iter = setOfStatesStubbornTemp.begin(); iter != setOfStatesStubbornTemp.end(); iter++) {
             // we just consider the maximal states only
             if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
 
@@ -595,7 +595,7 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
                                                 AnnotatedGraphNode* newNode) {
     trace(TRACE_5, "interactionGraph::calculateSuccStatesInput(messageMultiSet input, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : start\n");
 
-    PN->setOfStatesTemp.clear();
+    setOfStatesStubbornTemp.clear();
     PN->visitedStates.clear();
 
     /*if (TRACE_2 <= debug_level) {
@@ -631,9 +631,11 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
 
         PN->addInputMessage(input); // add the input message to the current marking
         if (options[O_CALC_ALL_STATES]) {
-            PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
+        	// no state reduction
+        	PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
         } else {
-            PN->calculateReachableStatesInputEvent(newNode); // calc the reachable states from that marking
+        	// state reduction
+            PN->calculateReachableStatesInputEvent(setOfStatesStubbornTemp, newNode); // calc the reachable states from that marking
         }
         if (newNode->getColor() == RED) {
             // a message bound violation occured during computation of reachability graph
@@ -666,6 +668,7 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
     }
 */
     if (options[O_CALC_ALL_STATES]) {
+    	// no state reduction
         for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
                 != node->reachGraphStateSet.end(); iter++) {
             (*iter)->decode(PN);
@@ -674,43 +677,47 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
             }
         }
     } else {
-        PN->setOfStatesTemp.clear();
+    	// state reduction
+    	
+        setOfStatesStubbornTemp.clear();
         PN->visitedStates.clear();
 
         StateSet stateSet;
         // stateSet.clear();
 
+        PN->tempBinDecision = NULL;
+        
         for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
                 != node->reachGraphStateSet.end(); iter++) {
 
             (*iter)->decode(PN);
-            // calculate temporary state set with the help of stubborn set method
-            // TODO: Fix this memory leak.
-            // The following method sets tempBinDecision to NULL before
-            // filling tempBinDecision anew without deleting the old one.
-            // Consequently, some binDecisions become unreachable and
-            // cannot be deleted at the end of this method. This produces a
-            // memory leak. Not setting tempBinDecision to NULL in the
-            // following method call obviously fixes this memory leak. But this
-            // would cause unintended behaviour, wouldn't it? I figure that
-            // each State in stateSet needs a separate tempBinDecision. Then,
-            // each of those tempBinDecision must be kept alive until the
-            // following for loop is completed because otherwise the just
-            // calculated States would deleted by the binDecision destructor
-            // causing a segmentation fault while trying to call decode() on
-            // one those deleted states in the following for loop.
+////            // calculate temporary state set with the help of stubborn set method
+////            // TODO: Fix this memory leak.
+////            // The following method sets tempBinDecision to NULL before
+////            // filling tempBinDecision anew without deleting the old one.
+////            // Consequently, some binDecisions become unreachable and
+////            // cannot be deleted at the end of this method. This produces a
+////            // memory leak. Not setting tempBinDecision to NULL in the
+////            // following method call obviously fixes this memory leak. But this
+////            // would cause unintended behaviour, wouldn't it? I figure that
+////            // each State in stateSet needs a separate tempBinDecision. Then,
+////            // each of those tempBinDecision must be kept alive until the
+////            // following for loop is completed because otherwise the just
+////            // calculated States would deleted by the binDecision destructor
+////            // causing a segmentation fault while trying to call decode() on
+////            // one those deleted states in the following for loop.
             PN->calculateReachableStates(stateSet, receivingEvent, newNode);
-        }
+       }
 
         for (StateSet::iterator iter2 = stateSet.begin(); iter2
                 != stateSet.end(); iter2++) {
             (*iter2)->decode(PN); // get the marking of the state
 
             if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
-                PN->calculateReachableStatesOutputEvent(newNode); // calc the reachable states from that marking
+                PN->calculateReachableStatesOutputEvent(setOfStatesStubbornTemp, newNode); // calc the reachable states from that marking
             }
         }
-        // binDeleteAll(PN->tempBinDecision);
+     //   binDeleteAll(PN->tempBinDecision);
         delete PN->tempBinDecision;
         PN->tempBinDecision = NULL;
     }
@@ -749,8 +756,8 @@ setOfMessages interactionGraph::combineReceivingEvents(AnnotatedGraphNode* node,
 
     if (!options[O_CALC_ALL_STATES]) { // in case of the state reduced graph
 
-        for (iter = PN->setOfStatesTemp.begin(); iter
-                != PN->setOfStatesTemp.end(); iter++) {
+        for (iter = setOfStatesStubbornTemp.begin(); iter
+                != setOfStatesStubbornTemp.end(); iter++) {
 
             if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) { // we just consider the maximal states only
 

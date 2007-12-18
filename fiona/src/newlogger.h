@@ -35,6 +35,7 @@
 #define NEWLOGGER_H_ 
 
 #include "userconfig.h"
+#include "debug.h"
 #ifdef LOG_NEW
 
 #include <new>
@@ -254,11 +255,11 @@ class NewLogger {
                                                          const T6& allocatedMem,
                                                          const ReportRowFormat& format) {
 
-            std::string callcountcell = toString(allocCallCount) + " ("
-                    +toString(allocCallCount - deallocCallCount) + ")";
+            std::string callcountcell = intToString(allocCallCount) + " ("
+                    +intToString(allocCallCount - deallocCallCount) + ")";
 
-            std::string memcell = toString(peakAllocatedMem) + " ("
-                    +toString(allocatedMem) + ")";
+            std::string memcell = intToString(peakAllocatedMem) + " ("
+                    +intToString(allocatedMem) + ")";
 
             printReportRow(type, filepos, callcountcell, memcell, format);
         }

@@ -119,7 +119,7 @@ class oWFN {
         /// returns an array of transition pointers containing all quasi enabled transition
         owfnTransition ** quasiFirelist();
         
-        /// we want to store some the states calculated temporarily in a new binDecision structure
+        /// we want to store some states calculated temporarily in a new binDecision structure
         binDecision * tempBinDecision; 
 
         /// activated input messages of current node
@@ -128,9 +128,6 @@ class oWFN {
         /// activated output messages of current node
         setOfMessages outputMessages; 
 
-        /// this set contains all states of the newly calculated node
-        StateSet setOfStatesTemp; 
-        
         /// in case of state reduction, remember those state that we have visited so far by calculating the new node
         StateSet visitedStates; 
 
@@ -253,8 +250,8 @@ class oWFN {
         /// checks whether the message bound is violated
         bool violatesMessageBound();
 
-        /// Adds recursively the State s and all its successor states to setOfStatesTemp.
-        void addRecursivelySuccStatesToSetOfTempStates(State* s);
+        /// Adds recursively the State s and all its successor states to setOfStatesStubbornTemp.
+        void addRecursivelySuccStatesToGivenSetOfStates(StateSet&, State* s);
 
         /// calculates and returns the next state
         State* calculateNextSate();
@@ -266,10 +263,10 @@ class oWFN {
         void copyMarkingToCurrentMarking(unsigned int* copy);
         
         /// calculates the reduced set of states of the new AnnotatedGraphNode in case of an output event
-        void calculateReachableStatesOutputEvent(AnnotatedGraphNode*);
+        void calculateReachableStatesOutputEvent(StateSet&, AnnotatedGraphNode*);
 
         /// calculates the reduced set of states of the new AnnotatedGraphNode in case of an input event
-        void calculateReachableStatesInputEvent(AnnotatedGraphNode*);
+        void calculateReachableStatesInputEvent(StateSet&, AnnotatedGraphNode*);
         
         /// calculates the set of states reachable from the current marking and stores them in the new AnnotatedGraphNode
         void calculateReachableStates(StateSet&, owfnPlace*, AnnotatedGraphNode*);

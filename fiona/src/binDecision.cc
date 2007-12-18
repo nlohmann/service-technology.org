@@ -58,7 +58,7 @@ binDecision::binDecision(int b, long int BitVectorSize) :
     bitnr(b), nextold(NULL), nextnew(NULL) {
 
     vector = new unsigned char [(BitVectorSize - (bitnr + 2)) / 8 + 2];
-    for (int i = 0; i < (BitVectorSize - (bitnr + 2))/8 +2; ++i) {
+    for (int i = 0; i < (BitVectorSize - (bitnr + 2))/8 + 2; ++i) {
         vector[i] = 0;
     }
 }
@@ -66,7 +66,9 @@ binDecision::binDecision(int b, long int BitVectorSize) :
 
 //! \brief destructor
 binDecision::~binDecision() {
-    delete[] vector;
+    
+	delete[] vector;
+	
     delete state;
     delete nextold;
     delete nextnew;

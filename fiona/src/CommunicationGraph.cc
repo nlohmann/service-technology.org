@@ -127,9 +127,11 @@ void CommunicationGraph::calculateRootNode() {
 
     // calc the reachable states from that marking
     if (options[O_CALC_ALL_STATES]) {
+    	// no state reduction
         PN->calculateReachableStatesFull(root);
     } else {
-        PN->calculateReachableStatesInputEvent(root);
+    	// state reduction
+        PN->calculateReachableStatesInputEvent(setOfStatesStubbornTemp, root);
     }
 
     root->setNumber(0);
@@ -399,6 +401,9 @@ void CommunicationGraph::printGraphToDot() {
         if (parameters[P_IG] && options[O_CALC_REDUCED_IG]) {
             dotFile << " -r";
         }
+        if (parameters[P_IG] && !options[O_CALC_ALL_STATES]) {
+                    dotFile << " -R";
+                }
         if (options[O_MESSAGES_MAX]) {
             dotFile << " -m" << intToString(messages_manual);
         }

@@ -101,6 +101,9 @@ class CommunicationGraph : public AnnotatedGraph {
 
         GraphNodeSet setOfSortedNodes;
 
+        /// this set contains all states of the newly calculated node
+        StateSet setOfStatesStubbornTemp; 
+        
         /// calculate a root node for the graph
         void calculateRootNode();
 

@@ -502,22 +502,22 @@ bool oWFN::violatesMessageBound() {
 }
 
 
-//! \brief Adds recursively the State s and all its successor states to setOfStatesTemp.
+//! \brief Adds recursively the State s and all its successor states to setOfStatesStubbornTemp.
 //! \param s state to start at
-void oWFN::addRecursivelySuccStatesToSetOfTempStates(State* s) {
+void oWFN::addRecursivelySuccStatesToGivenSetOfStates(StateSet& stateSet, State* s) {
     trace(TRACE_5,
-          "oWFN::addRecursivelySuccStatesToSetOfTempStates(State* s): start\n");
+          "oWFN::addRecursivelySuccStatesToSetOfTempStates(StateSet&, State* s): start\n");
 
-    setOfStatesTemp.insert(s);
+    stateSet.insert(s);
 
     // get the successor states	and add them, too.
     for (unsigned int i = 0; i < s->cardFireList; i++) {
         if (s->succ[i]) {
-            addRecursivelySuccStatesToSetOfTempStates(s->succ[i]);
+            addRecursivelySuccStatesToGivenSetOfStates(stateSet, s->succ[i]);
         }
     }
     trace(TRACE_5,
-          "oWFN::addRecursivelySuccStatesToSetOfTempStates(State* s): end\n");
+          "oWFN::addRecursivelySuccStatesToSetOfTempStates(StateSet&, State* s): end\n");
 }
 
 //! \brief Copies the current marking and returns it
@@ -544,7 +544,7 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 
 //! \brief calculates the reduced set of states of the new AnnotatedGraphNode in case of an output event
 //! \param n the node to be calculated in case of an output event
-void oWFN::calculateReachableStatesOutputEvent(AnnotatedGraphNode* n) {
+void oWFN::calculateReachableStatesOutputEvent(StateSet& stateSet, AnnotatedGraphNode* n) {
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(AnnotatedGraphNode * n): start\n");
 
@@ -559,7 +559,7 @@ void oWFN::calculateReachableStatesOutputEvent(AnnotatedGraphNode* n) {
     if (CurrentState != NULL) {
         // marking already has a state -> put it (and all its successors) into the node
         if (n->addState(CurrentState)) {
-            addRecursivelySuccStatesToSetOfTempStates(CurrentState);
+            addRecursivelySuccStatesToGivenSetOfStates(stateSet, CurrentState);
         }
         trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(AnnotatedGraphNode * n): end\n");
         return;
@@ -594,7 +594,7 @@ void oWFN::calculateReachableStatesOutputEvent(AnnotatedGraphNode* n) {
 
     assert(CurrentState != NULL);
     n->addState(CurrentState);
-    setOfStatesTemp.insert(CurrentState);
+    stateSet.insert(CurrentState);
 
     // building EG in a node
     while (CurrentState) {
@@ -624,7 +624,7 @@ void oWFN::calculateReachableStatesOutputEvent(AnnotatedGraphNode* n) {
             if (NewState != NULL) {
                 // Current marking already in bintree 
                 trace(TRACE_5, "Current marking already in bintree \n");
-                addRecursivelySuccStatesToSetOfTempStates(NewState);
+                addRecursivelySuccStatesToGivenSetOfStates(stateSet, NewState);
 
                 copyMarkingToCurrentMarking(tempCurrentMarking);
 
@@ -667,7 +667,7 @@ void oWFN::calculateReachableStatesOutputEvent(AnnotatedGraphNode* n) {
 
                 CurrentState = NewState;
 
-                addRecursivelySuccStatesToSetOfTempStates(NewState);
+                addRecursivelySuccStatesToGivenSetOfStates(stateSet, NewState);
 
                 if (tempCurrentMarking) {
                     delete[] tempCurrentMarking;
@@ -694,9 +694,10 @@ void oWFN::calculateReachableStatesOutputEvent(AnnotatedGraphNode* n) {
 
 
 //! \brief calculates the reduced set of states of the new AnnotatedGraphNode in case of an input event
-//!        for IG with node reduction
+//!        for IG and OG with state set reduction
+//! \param stateSet set of states storing the states that were calculated using the stubborn set method
 //! \param n the node to be calculated in case of an input event
-void oWFN::calculateReachableStatesInputEvent(AnnotatedGraphNode* n) {
+void oWFN::calculateReachableStatesInputEvent(StateSet& stateSet, AnnotatedGraphNode* n) {
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(AnnotatedGraphNode * n): start\n");
 
@@ -711,7 +712,7 @@ void oWFN::calculateReachableStatesInputEvent(AnnotatedGraphNode* n) {
     if (CurrentState != NULL) {
         // marking already has a state -> put it (and all its successors) into the node
         if (n->addState(CurrentState)) {
-            addRecursivelySuccStatesToSetOfTempStates(CurrentState);
+            addRecursivelySuccStatesToGivenSetOfStates(stateSet, CurrentState);
         }
         trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(AnnotatedGraphNode * n): end\n");
         return;
@@ -743,11 +744,11 @@ void oWFN::calculateReachableStatesInputEvent(AnnotatedGraphNode* n) {
     CurrentState->placeHashValue = placeHashValue;
     CurrentState->type = typeOfState();
 
-    setOfStatesTemp.insert(CurrentState);
+    stateSet.insert(CurrentState);
 
     assert(CurrentState != NULL);
     n->addState(CurrentState);
-    addRecursivelySuccStatesToSetOfTempStates(CurrentState);
+    addRecursivelySuccStatesToGivenSetOfStates(stateSet, CurrentState);
 
     // building EG in a node
     while (CurrentState) {
@@ -779,7 +780,7 @@ void oWFN::calculateReachableStatesInputEvent(AnnotatedGraphNode* n) {
                 // Current marking already in bintree 
                 trace(TRACE_5, "Current marking already in bintree \n");
 
-                addRecursivelySuccStatesToSetOfTempStates(NewState);
+                addRecursivelySuccStatesToGivenSetOfStates(stateSet, NewState);
 
                 copyMarkingToCurrentMarking(tempCurrentMarking);
 
@@ -820,7 +821,7 @@ void oWFN::calculateReachableStatesInputEvent(AnnotatedGraphNode* n) {
                 CurrentState->succ[CurrentState->current] = NewState;
                 CurrentState = NewState;
 
-                addRecursivelySuccStatesToSetOfTempStates(NewState);
+                addRecursivelySuccStatesToGivenSetOfStates(stateSet, NewState);
 
                 if (tempCurrentMarking) {
                     delete[] tempCurrentMarking;
@@ -847,9 +848,9 @@ void oWFN::calculateReachableStatesInputEvent(AnnotatedGraphNode* n) {
 }
 
 
-//! \brief calculates the set of states reachable from the current marking and stores them in the new AnnotatedGraphNode
-//!        this function is for the full IG and the OG since a single output place is considered
-//!        for OG or full IG
+//! \brief calculates the set of states reachable from the current marking and stores them in the given stateSet
+//!        this function is for state reduced OG since a single output place is considered
+//!        for OG
 //! \param stateSet set of states
 //! \param outputPlace the output place of the net that is associated with the receiving event for which the new AnnotatedGraphNode is calculated
 //! \param n new AnnotatedGraphNode 
@@ -886,6 +887,8 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
         CurrentState = binSearch(tempBinDecision, this);
         CurrentState = binInsert(&tempBinDecision, this); // save current state to the local binDecision 
 
+      //  cout << "inserted into tempBinDecision (OG, IG): " << CurrentState << endl;
+        
         CurrentState->current = 0;
         CurrentState->parent = (State *) 0;
 
@@ -896,6 +899,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
     } else {
         CurrentState = binSearch(tempBinDecision, this);
         CurrentState = binInsert(&tempBinDecision, this); // save current state to the local binDecision 
+    //    cout << "inserted into tempBinDecision (OG, IG): " << CurrentState << endl;
     }
 
     CurrentState->stubbornFirelist = stubbornfirelistmessage(outputPlace);
@@ -967,6 +971,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
             } else {
                 trace(TRACE_5, "Current marking new\n");
                 NewState = binInsert(&tempBinDecision, this);
+              //  cout << "inserted into tempBinDecision (OG, IG): " << CurrentState << endl;
                 NewState->stubbornFirelist
                         = stubbornfirelistmessage(outputPlace);
                 NewState->cardStubbornFireList = CurrentCardFireList;
@@ -1039,9 +1044,9 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
 }
 
 
-//! \brief calculates the set of states reachable from the current marking and stores them in the new AnnotatedGraphNode
-//!        this function is for the IG only since a multiset of output places is considered
-//!        for IG
+//! \brief is only used in case of an output event and calculates the set of states reachable from 
+//!		   the current marking and stores them in the given stateSet 
+//!		   (this function is used for the IG only since a multiset of output places is considered for IG)
 //! \param stateSet set of states
 //! \param messages the event(s) for which the new AnnotatedGraphNode's EG is calculated
 //! \param n new AnnotatedGraphNode 
@@ -1063,7 +1068,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
     State * CurrentState;
     State * NewState;
 
-    tempBinDecision = NULL;
+ //  tempBinDecision = NULL;
 
     CurrentState = binSearch(this);
 
@@ -1076,7 +1081,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet,
 
         CurrentState = binSearch(tempBinDecision, this);
         CurrentState = binInsert(&tempBinDecision, this); // save current state to the local binDecision 
-
+        
         CurrentState->current = 0;
         CurrentState->parent = NULL;
 

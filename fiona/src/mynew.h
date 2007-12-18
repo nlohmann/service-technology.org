@@ -60,7 +60,7 @@
     {                                                                   \
         std::string filepos(file);                                      \
         filepos += ':';                                                 \
-        filepos += toString(line);                                      \
+        filepos += intToString(line);                                      \
         void* ptr = mynew_without_log(size);                            \
         NewLogger::logAllocation(#CLASSNAME, filepos, size, ptr);       \
         return ptr;                                                     \

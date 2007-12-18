@@ -227,24 +227,24 @@ class oWFN {
         /// decodes state, checks for message bound violation and adds successors
         void addSuccStatesToList(AnnotatedGraphNode*, State*);
         
-        /// decodes state, checks for message bound violation and adds successors recursively
+        /// decodes state, figures out if state activates output event, 
+        ///		checks for message bound violation and adds successors recursively
         void addSuccStatesToListStubborn(StateSet&,
                                          owfnPlace*,
                                          State*,
                                          AnnotatedGraphNode*);
 
-        /// decodes state, checks for message bound violation and adds successors recursively
+        /// decodes state, figures out if state activates output event, 
+        ///		checks for message bound violation and adds successors recursively
         void addSuccStatesToListStubborn(StateSet&,
                                          messageMultiSet,
                                          State*,
                                          AnnotatedGraphNode*);
 
-        // void addSuccStatesToListOrig(AnnotatedGraphNode *, State *);		
-
         /// checks whether the message bound is violated
         bool violatesMessageBound();
 
-        /// Adds recursively the State s and all its successor states to setOfStatesStubbornTemp.
+        /// adds recursively the state s and all its successor states to the given state set
         void addRecursivelySuccStatesToGivenSetOfStates(StateSet&, State* s);
 
         /// calculates and returns the next state
@@ -262,7 +262,8 @@ class oWFN {
         /// calculates the reduced set of states of the new AnnotatedGraphNode in case of an input event
         void calculateReducedSetOfReachableStatesInputEvent(StateSet&, binDecision**, AnnotatedGraphNode*);
         
-        /// calculates the set of states reachable from the current marking and stores them in the new AnnotatedGraphNode
+        /// calculates the reduced set of states reachable from the current marking and stores them 
+        /// given state set
         void calculateReducedSetOfReachableStates(StateSet&, binDecision**, owfnPlace*, AnnotatedGraphNode*);
         void calculateReducedSetOfReachableStates(StateSet&, binDecision**, messageMultiSet, AnnotatedGraphNode*);
 

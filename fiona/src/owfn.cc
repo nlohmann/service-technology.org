@@ -371,11 +371,12 @@ void oWFN::addSuccStatesToList(AnnotatedGraphNode* n, State * currentState) {
 }
 
 
-//! \brief decodes state, checks for message bound violation and adds successors recursively
-//! \param stateSet 
-//! \param outputPlace
-//! \param currentState
-//! \param n
+//! \brief decodes state, figures out if state activates output event, 
+//!			checks for message bound violation and adds successors recursively
+//! \param stateSet set of states where the current state will be stored in
+//! \param outputPlace _one_ output (place) message needed to figure out whether to store the current state or not 
+//! \param currentState state to start at
+//! \param n the current node, in case of message bound violation this node becomes red
 void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
                                        owfnPlace * outputPlace,
                                        State * currentState,
@@ -384,6 +385,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
     if (currentState != NULL) {
         currentState->decodeShowOnly(this); // decodes currently considered state
 
+        // does current state activate the output event? meaning is this place marked
         if (CurrentMarking[getPlaceIndex(outputPlace)] > 0) {
             stateSet.insert(currentState);
             return;
@@ -410,11 +412,12 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
 }
 
 
-//! \brief decodes state, checks for message bound violation and adds successors recursively
-//! \param stateSet
-//! \param messages  
-//! \param currentState
-//! \param n
+//! \brief decodes state, figures out if state activates output event, 
+//!			checks for message bound violation and adds successors recursively
+//! \param stateSet set of states where the current state will be stored in
+//! \param messages _set_ of output messages needed to figure out whether to store the current state or not 
+//! \param currentState state to start at
+//! \param n the current node, in case of message bound violation this node becomes red
 void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
                                        messageMultiSet messages,
                                        State * currentState,
@@ -501,7 +504,8 @@ bool oWFN::violatesMessageBound() {
 }
 
 
-//! \brief Adds recursively the State s and all its successor states to setOfStatesStubbornTemp.
+//! \brief adds recursively the state s and all its successor states to the given state set
+//! \param stateSet set of states where the successors of the given state shall be stored in
 //! \param s state to start at
 void oWFN::addRecursivelySuccStatesToGivenSetOfStates(StateSet& stateSet, State* s) {
     trace(TRACE_5,
@@ -542,6 +546,8 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 
 
 //! \brief calculates the reduced set of states of the new AnnotatedGraphNode in case of an output event
+//! \param tempBinDecision store calculated states temporarily in a binDecicion structure
+//! \param stateSet store calculated states in this state set
 //! \param n the node to be calculated in case of an output event
 void oWFN::calculateReducedSetOfReachableStatesOutputEvent(StateSet& stateSet, 
 												binDecision** tempBinDecision,
@@ -697,6 +703,7 @@ void oWFN::calculateReducedSetOfReachableStatesOutputEvent(StateSet& stateSet,
 
 //! \brief calculates the reduced set of states of the new AnnotatedGraphNode in case of an input event
 //!        for IG and OG with state set reduction
+//! \param tempBinDecision store calculated states temporarily in a binDecicion structure
 //! \param stateSet set of states storing the states that were calculated using the stubborn set method
 //! \param n the node to be calculated in case of an input event
 void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet, 
@@ -855,7 +862,8 @@ void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet,
 //! \brief calculates the reduced set of states reachable from the current marking and stores them in the given stateSet
 //!        this function is for state reduced OG since a single output place is considered
 //!        for OG
-//! \param stateSet set of states
+//! \param tempBinDecision store calculated states temporarily in a binDecicion structure
+//! \param stateSet store calculated states in this state set
 //! \param outputPlace the output place of the net that is associated with the receiving event for which the new AnnotatedGraphNode is calculated
 //! \param n new AnnotatedGraphNode 
 void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
@@ -1050,7 +1058,8 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
 //! \brief is only used in case of an output event and calculates the set of states reachable from 
 //!		   the current marking and stores them in the given stateSet 
 //!		   (this function is used for the IG only since a multiset of output places is considered for IG)
-//! \param stateSet set of states
+//! \param tempBinDecision store calculated states temporarily in a binDecicion structure
+//! \param stateSet store calculated states in this state set
 //! \param messages the event(s) for which the new AnnotatedGraphNode's EG is calculated
 //! \param n new AnnotatedGraphNode 
 void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,

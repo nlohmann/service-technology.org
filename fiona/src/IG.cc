@@ -594,19 +594,8 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
                                                 AnnotatedGraphNode* newNode) {
     trace(TRACE_5, "interactionGraph::calculateSuccStatesInput(messageMultiSet input, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : start\n");
 
-    binDecision * tempBinDecision = (binDecision *) 0;
-    
     setOfStatesStubbornTemp.clear();
 
-    /*if (TRACE_2 <= debug_level) {
-        for (messageMultiSet::iterator iter1 = input.begin();
-             iter1 != input.end(); iter1++) {
-            trace(TRACE_2, PN->getPlace(*iter1)->name);
-            trace(TRACE_2, " ");
-        }
-        trace(TRACE_2, "\n");
-    }
-*/
     for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
             != node->reachGraphStateSet.end(); iter++) {
 
@@ -635,15 +624,14 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
         	PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
         } else {
         	// state reduction
-            PN->calculateReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, newNode); // calc the reachable states from that marking
-        
+            binDecision * tempBinDecision = (binDecision *) 0;
+            PN->calculateReducedSetOfReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, newNode); // calc the reachable states from that marking
+
             if (tempBinDecision) {
             	delete tempBinDecision;
             }
-
+        
         }
-        
-        
         
         if (newNode->getColor() == RED) {
             // a message bound violation occured during computation of reachability graph
@@ -651,6 +639,7 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
             return;
         }
     }
+
 
     trace(TRACE_5, "IG::calculateSuccStatesInput(messageMultiSet input, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : end\n");
     return;
@@ -713,7 +702,7 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 ////            // calculated States would deleted by the binDecision destructor
 ////            // causing a segmentation fault while trying to call decode() on
 ////            // one those deleted states in the following for loop.
-            PN->calculateReachableStates(stateSet, &tempBinDecision, receivingEvent, newNode);
+            PN->calculateReducedSetOfReachableStates(stateSet, &tempBinDecision, receivingEvent, newNode);
        }
 
         for (StateSet::iterator iter2 = stateSet.begin(); iter2
@@ -721,7 +710,7 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
             (*iter2)->decode(PN); // get the marking of the state
 
             if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
-                PN->calculateReachableStatesOutputEvent(setOfStatesStubbornTemp, &tempBinDecision, 
+                PN->calculateReducedSetOfReachableStatesOutputEvent(setOfStatesStubbornTemp, &tempBinDecision, 
                 											newNode); // calc the reachable states from that marking
 
             }

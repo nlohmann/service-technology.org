@@ -257,14 +257,14 @@ class oWFN {
         void copyMarkingToCurrentMarking(unsigned int* copy);
         
         /// calculates the reduced set of states of the new AnnotatedGraphNode in case of an output event
-        void calculateReachableStatesOutputEvent(StateSet&, binDecision**, AnnotatedGraphNode*);
+        void calculateReducedSetOfReachableStatesOutputEvent(StateSet&, binDecision**, AnnotatedGraphNode*);
 
         /// calculates the reduced set of states of the new AnnotatedGraphNode in case of an input event
-        void calculateReachableStatesInputEvent(StateSet&, binDecision**, AnnotatedGraphNode*);
+        void calculateReducedSetOfReachableStatesInputEvent(StateSet&, binDecision**, AnnotatedGraphNode*);
         
         /// calculates the set of states reachable from the current marking and stores them in the new AnnotatedGraphNode
-        void calculateReachableStates(StateSet&, binDecision**, owfnPlace*, AnnotatedGraphNode*);
-        void calculateReachableStates(StateSet&, binDecision**, messageMultiSet, AnnotatedGraphNode*);
+        void calculateReducedSetOfReachableStates(StateSet&, binDecision**, owfnPlace*, AnnotatedGraphNode*);
+        void calculateReducedSetOfReachableStates(StateSet&, binDecision**, messageMultiSet, AnnotatedGraphNode*);
 
         /// NO REDUCTION! calculate all reachable states from the current marking
         /// and store them in the node n (== AnnotatedGraphNode of CommunicationGraph)

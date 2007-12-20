@@ -35,7 +35,7 @@
 #define NEWLOGGER_H_ 
 
 #include "userconfig.h"
-#include "debug.h"
+// #include "debug.h"
 #ifdef LOG_NEW
 
 #include <new>

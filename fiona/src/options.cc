@@ -262,6 +262,7 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_MATCH] = false;
     options[O_PRODUCTOG] = false;
     options[O_SIMULATES] = false;
+    options[O_SIMULATES_WITH_COV] = false;
 //    options[O_EQUALS] = false;
     options[O_FILTER] = false;
     options[O_OUTFILEPREFIX] = false;
@@ -359,6 +360,9 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_IG] = false;
                 } else if (lc_optarg == "simulation") {
                     options[O_SIMULATES] = true;
+                    parameters[P_IG] = false;
+                } else if (lc_optarg == "cover_simulation") {
+                    options[O_SIMULATES_WITH_COV] = true;
                     parameters[P_IG] = false;
                 } else if (lc_optarg == "filter") {
                     options[O_FILTER] = true;
@@ -596,6 +600,12 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
+    if (options[O_SIMULATES_WITH_COV] && ((netfiles.size() + ogfiles.size()) != 2)) {
+        cerr << "Error: \t If option -t cover_simulation is used, exactly two OG/oWFN files must be entered\n" << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
+    }
+
     if (options[O_FILTER] && ogfiles.size() != 2) {
         cerr << "Error: \t If option -t filter is used, exactly two OG files must be entered\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
@@ -624,8 +634,8 @@ void parse_command_line(int argc, char* argv[]) {
 		options[O_PV_MULTIPLE_DEADLOCKS] = false;
 	}
 
-    if (!options[O_FILTER] && !options[O_PRODUCTOG] && !options[O_SIMULATES] && !options[O_EX] &&
-        options[O_OUTFILEPREFIX] && (ogfiles.size() > 1 || netfiles.size() > 1)) {
+    if (!options[O_FILTER] && !options[O_PRODUCTOG] && !options[O_SIMULATES] && !options[O_SIMULATES_WITH_COV] && 
+        !options[O_EX] && options[O_OUTFILEPREFIX] && (ogfiles.size() > 1 || netfiles.size() > 1)) {
         cerr << "Error: \t The output option cannot be used if multiple output files are to be created!\n" << endl;
         exit(1);
     }

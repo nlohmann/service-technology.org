@@ -109,6 +109,12 @@ std::string AnnotatedGraphNode::getAnnotationAsString() const {
 }
 
 
+//! \brief returns the CNF formula that is this node's annotation for coverability purpose
+//! \return this node's annotation as a GraphFormulaCNF
+GraphFormulaCNF* AnnotatedGraphNode::getCovAnnotation() const {
+    return covAnnotation;
+}
+
 //! \brief adds a new clause to the CNF formula of the node
 //! \param myclause the clause to be added to the annotation of the current node
 void AnnotatedGraphNode::addClause(GraphFormulaMultiaryOr* myclause) {

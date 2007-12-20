@@ -326,6 +326,133 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
 }
 
 
+//! \brief checks, whether this AnnotatedGraph simulates the given simulant
+//!        while covering all interface transitions
+//! \return true on positive check, otherwise: false
+//! \param smallerOG the simulant that should be simulated
+bool AnnotatedGraph::covSimulates(AnnotatedGraph* smallerOG) {
+    trace(TRACE_5, "AnnotatedGraph::covSimulates(AnnotatedGraph *smallerOG): start\n");
+    // Simulation is impossible without a simulant.
+    if (smallerOG == NULL)
+        return false;
+
+    // We need to remember the pairs of nodes we already visited.
+    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
+
+    if (smallerOG->getRoot() == NULL) {
+        return true;
+    } else if (root == NULL) {
+        return false;
+    }
+
+    createCovConstraint();             // global coverability formula for normal form
+    smallerOG->createCovConstraint();
+    
+    // Get things moving...
+    bool result = false;
+    if (covSimulatesRecursive(root, smallerOG->getRoot(), visitedNodes, covConstraint, smallerOG->covConstraint)) {
+        result = true;
+    }
+
+    trace(TRACE_5, "AnnotatedGraph::covSimulates(AnnotatedGraph *smallerOG): end\n");
+    return result;
+}
+
+
+//! \brief checks, whether the part of an AnnotatedGraph below myNode simulates
+//         the part of an AnnotatedGraph below simNode while covering all interface transitions
+//! \return true on positive check, otherwise: false
+//! \param myNode a node in this AnnotatedGraph
+//! \param simNode a node in the simulant
+//! \param visitedNodes Holds all visited pairs of nodes.
+bool AnnotatedGraph::covSimulatesRecursive(AnnotatedGraphNode *myNode,
+                               AnnotatedGraphNode *simNode,
+                               set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes,
+                               GraphFormulaCNF* myCovConstraint, GraphFormulaCNF* simCovConstraint) {
+
+    // checking, whether myNode simulates simNode; result is true, iff
+    // 1) anno of simNode implies anno of myNode and
+    // 2) myNode has each outgoing event of simNode, too
+    
+    assert(myNode);
+    assert(simNode);
+
+    trace(TRACE_2, "\t checking whether node " + myNode->getName());
+    trace(TRACE_2, " simulates node " + simNode->getName() + "\n");
+
+    // If we already visited this pair of nodes, then we're done.
+    if (visitedNodes.find(make_pair(myNode, simNode)) != visitedNodes.end()) {
+        return true;
+    } else {
+        visitedNodes.insert(make_pair(myNode, simNode));
+    }
+
+    myNode->createCovAnnotation(myCovConstraint);
+    simNode->createCovAnnotation(simCovConstraint);
+    
+    // first we check implication of annotations: simNode -> myNode
+    trace(TRACE_3, "\t\t checking annotations...\n");
+    GraphFormulaCNF* simNodeCovAnnotationInCNF = simNode->getCovAnnotation()->getCNF();
+    GraphFormulaCNF* myNodeCovAnnotationInCNF = myNode->getCovAnnotation()->getCNF();
+
+    if (simNodeCovAnnotationInCNF->implies(myNodeCovAnnotationInCNF)) {
+        trace(TRACE_3, "\t\t\t annotations ok\n");
+        trace(TRACE_4, "\t\t\t   " + simNode->getAnnotation()->asString() + "\n");
+        trace(TRACE_4, "\t\t\t   ->\n");
+        trace(TRACE_4, "\t\t\t   " + myNode->getAnnotation()->asString() + "\n");
+
+        delete simNodeCovAnnotationInCNF;
+        delete myNodeCovAnnotationInCNF;
+    } else {
+        trace(TRACE_3, "\t\t\t annotation implication false\n");
+        trace(TRACE_4, "\t\t\t   " + simNode->getAnnotation()->asString() + "\n");
+        trace(TRACE_4, "\t\t\t   -/->\n");
+        trace(TRACE_4, "\t\t\t   " + myNode->getAnnotation()->asString() + "\n");
+
+        delete simNodeCovAnnotationInCNF;
+        delete myNodeCovAnnotationInCNF;
+
+        trace(TRACE_2, "\t\t simulation failed (annotation)\n");
+
+        return false;
+    }
+
+    // now we check whether myNode has each outgoing event of simNode
+    trace(TRACE_3, "\t\t checking edges...\n");
+    AnnotatedGraphNode::LeavingEdges::ConstIterator
+            simEdgeIter = simNode->getLeavingEdgesConstIterator();
+
+    while (simEdgeIter->hasNext()) {
+        AnnotatedGraphEdge* simEdge = simEdgeIter->getNext();
+
+        trace(TRACE_4, "\t\t\t checking event " + simEdge->getLabel() + "\n");
+        
+        AnnotatedGraphEdge* myEdge = myNode->getEdgeWithLabel(simEdge->getLabel());
+
+        if (myEdge == NULL) {
+            // simNode has edge which myNode hasn't
+            trace(TRACE_2, "\t\t simulation failed (edges)\n");
+            delete simEdgeIter;
+            return false;
+        } else {
+            trace(TRACE_4, "\t\t\t event present, going down\n");
+
+            if (!covSimulatesRecursive(myEdge->getDstNode(),
+                                    simEdge->getDstNode(),
+                                    visitedNodes,
+                                    myCovConstraint, simCovConstraint)) {
+                delete simEdgeIter;
+                return false;
+            }
+        }
+    }
+    delete simEdgeIter;
+
+    // All checks were successful.
+    return true;
+}
+
+
 //! \brief filters the current OG through a given OG in such a way,
 //!        that the operand simulates the filter; the current OG is created empty
 //!        if such a simulation is not possible
@@ -1315,7 +1442,7 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap(set<string>* labe
 //! \param labels the set that containts all the events that shall be covered; omitting is equal NULL and refers to
 //! covering the whole interface set
 //! \return returns the coverability formula 
-void AnnotatedGraph::createCovFormula(set<string>* labels = NULL) {
+void AnnotatedGraph::createCovConstraint(set<string>* labels) {
     trace(TRACE_3, "AnnotatedGraph::createCovFormula(set<string>* labels)::begin()\n");
 
     GraphFormulaCNF *formula= new GraphFormulaCNF;

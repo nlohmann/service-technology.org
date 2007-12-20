@@ -58,7 +58,8 @@ typedef enum {
     O_EX,                       //!< 
     O_MATCH,                    //!< 
     O_PRODUCTOG,                //!< 
-    O_SIMULATES,                //!< 
+    O_SIMULATES,                //!<
+    O_SIMULATES_WITH_COV,       //!<
     O_FILTER,                   //!< 
     O_OUTFILEPREFIX,            //!< 
     O_NOOUTPUTFILES,            //!< produce no output files

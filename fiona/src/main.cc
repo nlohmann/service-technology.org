@@ -834,6 +834,100 @@ void filterOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 }
 
 
+//! \brief 
+//! \param
+void checkCovSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
+    
+    // the OGs given by command line are already stored in OGsFromFiles
+    
+    bool calledWithNet = false;
+    
+    // we can only check exactly 2 OGs for simulation
+    // a possible violation should have been rejected by options.cc
+    assert(netfiles.size() + OGsFromFiles.size() == 2);
+    
+    if (OGsFromFiles.size() < 2) {
+        // oWFN(s) was given on command line, so compute the corresponding OGs
+        calledWithNet = true;
+        
+        // simulation  on OGs depends heavily on empty node,
+        // so set the correct options to compute OG with empty node
+        options[O_SHOW_NODES] = true;
+        parameters[P_SHOW_EMPTY_NODE] = true;
+    }
+    
+    // generate the OGs
+    list<std::string>::iterator netiter = netfiles.begin();
+    while (OGsFromFiles.size() < 2) {
+        
+        numberOfEvents = 0;
+        numberOfDecodes = 0;
+        garbagefound = 0;
+        global_progress = 0;
+        show_progress = 0;
+        State::state_count = 0; // number of states
+        numberDeletedVertices = 0;
+        
+        currentowfnfile = *netiter;
+        assert(currentowfnfile != "");
+        
+        // prepare getting the net
+        PlaceTable = new SymbolTab<PlSymbol>;
+        
+        // get the net into variable PN
+        readnet(currentowfnfile);
+        trace(TRACE_0, "=================================================================\n");
+        trace(TRACE_0, "processing net " + currentowfnfile + "\n");
+        reportNet();
+        delete PlaceTable;
+        
+        // compute OG
+        OG* graph = new OG(PN);
+        trace(TRACE_0, "building the operating guideline...\n");
+        graph->printProgressFirst();
+        graph->buildGraph(); // build operating guideline
+        trace(TRACE_0, "\nbuilding the operating guideline finished.\n\n");
+        
+        // add new OG to the list
+        if (!OGfirst && netfiles.size() == 1) {
+            OGsFromFiles.push_front(graph);
+        } else {
+            OGsFromFiles.push_back(graph);
+        }
+        delete PN;
+        
+        netiter++;
+    }
+    
+    //    // restore state of parameters
+    //    options[O_SHOW_NODES] = tempO_SHOW_NODES;
+    //    parameters[P_SHOW_EMPTY_NODE] = tempP_SHOW_EMPTY_NODE;
+    
+    AnnotatedGraph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
+    AnnotatedGraph *firstOG = *currentOGfile;
+    AnnotatedGraph *secondOG = *(++currentOGfile);
+    
+    firstOG->removeFalseNodes();
+    secondOG->removeFalseNodes();
+    
+    trace(TRACE_1, "checking simulation\n");
+    if (firstOG->simulates(secondOG)) {
+        trace(TRACE_1, "simulation holds\n\n");
+        trace(TRACE_0, "The first OG characterizes all strategies of the second one while covering all external transitions.\n\n");
+    } else {
+        trace(TRACE_1, "simulation does not hold\n\n");
+        trace(TRACE_0, "The second OG characterizes at least one strategy that is\n");
+        trace(TRACE_0, "not characterized by the first one or does not cover all external transitions.\n\n");
+    }
+    
+    if (!calledWithNet) {
+        trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
+        trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
+    }
+    deleteOGs(OGsFromFiles);
+}
+
+
 //! \brief create a PNG of the given oWFN
 //! \param PN an oWFN to generate a PNG from
 void makePNG(oWFN* PN) {
@@ -1054,8 +1148,8 @@ int main(int argc, char ** argv) {
     // ********                       (all OGs read first)                       ********
     // **********************************************************************************
 
-    if (options[O_PRODUCTOG] ||
-        options[O_SIMULATES]|| (options[O_EX] && !options[O_BDD]) || options[O_FILTER]) {
+    if (options[O_PRODUCTOG] || options[O_SIMULATES_WITH_COV] ||
+        options[O_SIMULATES] || (options[O_EX] && !options[O_BDD]) || options[O_FILTER]) {
 
         // reading all OG-files
         AnnotatedGraph::ogs_t OGsFromFiles;
@@ -1076,6 +1170,13 @@ int main(int argc, char ** argv) {
         if (options[O_SIMULATES]) {
             // simulation on AnnotatedGraph
             checkSimulation(OGsFromFiles);
+            //deleteOGs(OGsFromFiles);
+            return 0;
+        }
+
+        if (options[O_SIMULATES_WITH_COV]) {
+            // simulation on AnnotatedGraph
+            checkCovSimulation(OGsFromFiles);
             //deleteOGs(OGsFromFiles);
             return 0;
         }

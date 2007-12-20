@@ -94,6 +94,12 @@ class AnnotatedGraph : public Graph {
         bool simulatesRecursive(AnnotatedGraphNode* myNode, AnnotatedGraphNode* simNode,
             set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes);
 
+        /// checks, whether the part of an AnnotatedGraph below myNode simulates
+        /// the part of an AnnotatedGraph below simNode while covering all interface transitions
+        bool covSimulatesRecursive(AnnotatedGraphNode* myNode, AnnotatedGraphNode* simNode,
+            set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes,
+            GraphFormulaCNF* myCovConstraint, GraphFormulaCNF* simCovConstraint);
+
         /// filters the current OG through a given OG below myNode (rhsNode respectively)
         /// in such a way, that the complete OG given as the operand simulates the current OG
         void filterRecursive(AnnotatedGraphNode* myNode,
@@ -201,6 +207,9 @@ class AnnotatedGraph : public Graph {
         /// checks, whether this AnnotatedGraph simulates the given simulant
         bool simulates(AnnotatedGraph* smallerOG);
 
+        /// checks, whether this AnnotatedGraph simulates the given simulant while covering all interface transitions
+        bool covSimulates(AnnotatedGraph* smallerOG);
+
         /// filters the current OG through a given OG in such a way,
         /// that the filtered current OG simulates the opernad og; 
         void filter(AnnotatedGraph* rhsOG);
@@ -234,11 +243,8 @@ class AnnotatedGraph : public Graph {
         /// NULL refers to covering the whole interface set
         TransitionMap getTransitionMap(set<string>* labels);
         
-        /// Create the formula describing the coverability criteria
-        void createCovFormula();
-                
         /// Create the formula describing the coverability criteria when covering labels in the given set.
-        void createCovFormula(set<string>* labels);
+        void createCovConstraint(set<string>* labels = NULL);
 
         //! Create the formula describing the structure of the complete graph through events
         //! NOTE: graph has to be acyclic!

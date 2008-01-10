@@ -1080,8 +1080,8 @@ AnnotatedGraph* AnnotatedGraph::product(const ogs_t& ogs) {
 //! \param currentRhsNode the current node of the rhs OG
 //! \param productOG the resulting product OG
 void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
-                           AnnotatedGraphNode* currentRhsNode,
-                           AnnotatedGraph* productOG) {
+                                    AnnotatedGraphNode* currentRhsNode,
+                                    AnnotatedGraph* productOG) {
 
     trace(TRACE_5,
           "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): start\n");
@@ -1129,17 +1129,14 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
                 // the node was known before, so we just have to add a new edge
                 productOG->addEdge(currentName, newProductName, currentLabel);
 
-                trace(
-                      TRACE_5,
+                trace(TRACE_5,
                       "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): end\n");
             } else {
                 // we computed a new node, so we add a node and an edge
                 // trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
 
-                GraphFormulaCNF
-                        * newProductFormula = createProductAnnotation(
-                                                                      newOGNode,
-                                                                      newRhsNode);
+                GraphFormulaCNF* newProductFormula = createProductAnnotation(newOGNode,
+                                                                             newRhsNode);
 
                 AnnotatedGraphNode* newProductNode= new AnnotatedGraphNode(newProductName, newProductFormula);
 
@@ -1153,8 +1150,7 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
         }
     }
     delete edgeIter;
-    trace(
-          TRACE_5,
+    trace(TRACE_5,
           "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): end\n");
 }
 

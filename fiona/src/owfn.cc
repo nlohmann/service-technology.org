@@ -1904,6 +1904,16 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
         // reached.
         State* newState = binSearch(this);
         if (newState != NULL) {
+
+            // TODO: was ist, wenn der state zwar schon gesehen war, aber
+            //       mit nem anderen OG-knoten
+            //       dann muss doch trotzdem was überprüft werden, oder???
+            
+            cout << "markierung [" << getCurrentMarkingAsString();
+            cout << "] schon gesehen," << endl;
+            cout << "  backtracking bei Knoten " << currentOGNode->getName();
+            cout << " mit anno " << currentOGNode->getAnnotationAsString() << endl;
+            
             // We have already seen the state we just reaching by firing
             // the transition above. So we have to revert to the state that
             // the transition left from.
@@ -1934,6 +1944,9 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
         } else {
             // The state we reached by firing the above transition is new.
             // So we have to initialize this newly seen state.
+
+            cout << "neue markierung [" << getCurrentMarkingAsString() << "]" << endl;
+            
             newState = binInsert(this);
             newState->firelist = firelist();
             newState->cardFireList = CurrentCardFireList;
@@ -1958,9 +1971,9 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
             // Check whether the initial marking violates the message bound
             // and exit with an error message if it does.
             if (violatesMessageBound()) {
-                reasonForFailedMatch = "Current marking: '"
+                reasonForFailedMatch = "Current marking: ["
                                        + getCurrentMarkingAsString()
-                                       + "' violated message bound.";
+                                       + "] violated message bound.";
                 return false;
             }
 
@@ -2011,6 +2024,10 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                                    + "' in the OG.";
 
             return false;
+        } else {
+            cout << "markierung [" << getCurrentMarkingAsString() << "] erfüllt";
+            cout << " anno " << currentOGNode->getAnnotationAsString();
+            cout << " von Knoten " << currentOGNode->getName() << endl;
         }
     }
 

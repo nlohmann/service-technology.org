@@ -61,7 +61,7 @@ class AnnotatedGraph : public Graph {
         typedef std::list<std::string> ogfiles_t;
 
         typedef set<std::string> EdgeSet;
-        
+
         /// Type of container of transitions associated to each label
         typedef map<string, EdgeSet> TransitionMap;
 

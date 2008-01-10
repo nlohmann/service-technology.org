@@ -214,23 +214,30 @@ class GraphNode {
         
         /// returns true iff e changes the color of the common successors
         bool changes_color(GraphEdge* e) const;
-        
+
         /// returns true iff node should be shown according to the "show" parameter
         bool isToShow(const GraphNode* rootOfGraph) const;
-        
+
         /// determines whether this node has a edge with the given label
         bool hasEdgeWithLabel(const std::string&) const;
-        
+
         /// determines whether this node has a blue edge with a given label
         bool hasBlueEdgeWithLabel(const std::string&) const;
 
         /// returns a edge of this node with the given label
         GraphEdge* getEdgeWithLabel(const std::string&) const;
-        
+
         /// returns the destination node of the edge with the given label
         GraphNode* followEdgeWithLabel(const std::string&);
 
-        /// removes all edge from this node to the given one
+        /// determines whether an assinment satisfies this node's annotation
+        bool assignmentSatisfiesAnnotation(const GraphFormulaAssignment&) const;
+
+        /// returns the assignment that is imposed by present or absent arcs
+        /// leaving the node
+        GraphFormulaAssignment* getAssignment() const;
+
+        /// removes all edges from this node to the given one
         void removeEdgesToNode(const GraphNode*);
 
 #undef new

@@ -59,6 +59,7 @@ extern FILE *stg_yyin;
 //! \param _PN
 CommunicationGraph::CommunicationGraph(oWFN * _PN) {
     PN = _PN;
+    tempBinDecision = (binDecision *) 0;
 }
 
 
@@ -71,6 +72,10 @@ CommunicationGraph::~CommunicationGraph() {
         delete *iter;
     }
 
+    if (tempBinDecision) {
+    	delete tempBinDecision;
+    }
+    
     trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : end\n");
 }
 
@@ -131,12 +136,18 @@ void CommunicationGraph::calculateRootNode() {
         PN->calculateReachableStatesFull(root);
     } else {
     	// state reduction
-    	binDecision * tempBinDecision = (binDecision *) 0;
+    	
+    	// forget about all the states we have calculated so far
+    	setOfStatesStubbornTemp.clear();
     	
         PN->calculateReducedSetOfReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, root);
-        if (tempBinDecision) {
-        	delete tempBinDecision;
+    
+        for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
+                                        != setOfStatesStubbornTemp.end(); iter2++) {
+                    	
+        	root->addState(*iter2);            	
         }
+    
     }
 
     root->setNumber(0);

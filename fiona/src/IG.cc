@@ -594,7 +594,10 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
                                                 AnnotatedGraphNode* newNode) {
     trace(TRACE_5, "interactionGraph::calculateSuccStatesInput(messageMultiSet input, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : start\n");
 
+    // forget about all the states we have calculated so far
     setOfStatesStubbornTemp.clear();
+    
+    binDecision * tempBinDecision = (binDecision *) 0;
 
     for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
             != node->reachGraphStateSet.end(); iter++) {
@@ -624,13 +627,7 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
         	PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
         } else {
         	// state reduction
-            binDecision * tempBinDecision = (binDecision *) 0;
             PN->calculateReducedSetOfReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, newNode); // calc the reachable states from that marking
-
-            if (tempBinDecision) {
-            	delete tempBinDecision;
-            }
-        
         }
         
         if (newNode->getColor() == RED) {
@@ -639,8 +636,16 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
             return;
         }
     }
-
-
+    for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
+                                               != setOfStatesStubbornTemp.end(); iter2++) {
+                           	
+    	//newNode->addState(*iter2);            	
+    }
+    
+    if (tempBinDecision) {
+    	delete tempBinDecision;
+    }
+    
     trace(TRACE_5, "IG::calculateSuccStatesInput(messageMultiSet input, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : end\n");
     return;
 }
@@ -655,15 +660,6 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
                                                  AnnotatedGraphNode* newNode) {
     trace(TRACE_5, "interactionGraph::calculateSuccStatesOutput(messageMultiSet output, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : start\n");
 
-/*    if (TRACE_2 <= debug_level) {
-        for (messageMultiSet::iterator iter1 = output.begin(); iter1
-                != output.end(); iter1++) {
-            trace(TRACE_2, PN->getPlace(*iter1)->name);
-            trace(TRACE_2, " ");
-        }
-        trace(TRACE_2, "\n");
-    }
-*/
     if (options[O_CALC_ALL_STATES]) {
     	// no state reduction
         for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
@@ -679,31 +675,18 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
         setOfStatesStubbornTemp.clear();
 
         StateSet stateSet;
-        // stateSet.clear();
 
         binDecision * tempBinDecision = (binDecision *) 0;
+        
+        // forget about all the states we have calculated so far
+        setOfStatesStubbornTemp.clear();
         
         for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
                 != node->reachGraphStateSet.end(); iter++) {
 
             (*iter)->decode(PN);
-////            // calculate temporary state set with the help of stubborn set method
-////            // TODO: Fix this memory leak.
-////            // The following method sets tempBinDecision to NULL before
-////            // filling tempBinDecision anew without deleting the old one.
-////            // Consequently, some binDecisions become unreachable and
-////            // cannot be deleted at the end of this method. This produces a
-////            // memory leak. Not setting tempBinDecision to NULL in the
-////            // following method call obviously fixes this memory leak. But this
-////            // would cause unintended behaviour, wouldn't it? I figure that
-////            // each State in stateSet needs a separate tempBinDecision. Then,
-////            // each of those tempBinDecision must be kept alive until the
-////            // following for loop is completed because otherwise the just
-////            // calculated States would deleted by the binDecision destructor
-////            // causing a segmentation fault while trying to call decode() on
-////            // one those deleted states in the following for loop.
             PN->calculateReducedSetOfReachableStates(stateSet, &tempBinDecision, receivingEvent, newNode);
-       }
+        }
 
         for (StateSet::iterator iter2 = stateSet.begin(); iter2
                 != stateSet.end(); iter2++) {
@@ -715,6 +698,13 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 
             }
         }
+        
+        for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
+                                        != setOfStatesStubbornTemp.end(); iter2++) {
+                    	
+        //	newNode->addState(*iter2);            	
+        }
+        
         if (tempBinDecision) {
         	delete tempBinDecision;
         }

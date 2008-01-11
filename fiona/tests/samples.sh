@@ -490,7 +490,7 @@ fi
 
 shop3bluenodes_soll=11
 shop3blueedges_soll=13
-shop3storedstates_soll=54 #70 #83
+shop3storedstates_soll=72 #54 #70 #83
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 cmd="$FIONA $owfn -R -t IG"
@@ -578,7 +578,7 @@ fi
 
 shop3bluenodes_soll=8
 shop3blueedges_soll=8
-shop3storedstates_soll=33
+shop3storedstates_soll=49
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 cmd="$FIONA $owfn -t IG -r -R"
@@ -748,7 +748,7 @@ fi
 
 shop6bluenodes_soll=6
 shop6blueedges_soll=5
-shop6storedstates_soll=229 #314
+shop6storedstates_soll=247 #314
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 cmd="$FIONA $owfn -R -t IG"
@@ -788,8 +788,6 @@ fi
 ############################################################################
 # reduced IG
 ############################################################################
-
-# Don't run this test, because -R is buggy.
 
 shop6bluenodes_soll=6
 shop6blueedges_soll=5
@@ -838,7 +836,7 @@ fi
 
 shop6bluenodes_soll=6
 shop6blueedges_soll=5
-shop6storedstates_soll=146
+shop6storedstates_soll=158
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 cmd="$FIONA $owfn -t IG -r -R"

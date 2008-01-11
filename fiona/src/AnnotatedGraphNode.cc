@@ -744,7 +744,7 @@ void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
 //! \param annotation the annotation, from which the priority map will be extracted.
 void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphFormulaCNF *annotation) {
     
-	trace(TRACE_3, "PriorityMap::fillForIG(GraphFormulaCNF *annotation)::begin()\n");
+	trace(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation)::begin()\n");
 
 	// just to remember which event we have considered already, 
 	// needed for initialising the priority map correctly
@@ -792,7 +792,7 @@ void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphForm
 		}
 	}
 
-	trace(TRACE_3, "PriorityMap::fillForIG(GraphFormulaCNF *annotation)::end()\n");
+	trace(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation)::end()\n");
 }
 
 //! \brief returns whether the prioritymap is empty

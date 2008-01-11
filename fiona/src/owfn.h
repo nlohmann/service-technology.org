@@ -74,6 +74,8 @@ class oWFN {
 
         /// Type of the containers holding all places of this oWFN.
         typedef std::vector<owfnPlace*> Places_t;
+        
+        typedef std::map<State*, std::set<unsigned int> > StateNodesAssoc_t;
 
     private:
         unsigned int CurrentCardFireList;
@@ -105,7 +107,8 @@ class oWFN {
         /// helper for matchesWithOG
         bool matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                                     State* currentState,
-                                    string& reasonForFailedMatch);
+                                    string& reasonForFailedMatch,
+                                    StateNodesAssoc_t& stateNodesAssoc);
 
     public:
         /// basic constructor

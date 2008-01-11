@@ -1804,9 +1804,13 @@ bool oWFN::matchesWithOG(const AnnotatedGraph* og, string& reasonForFailedMatch)
     currentState->placeHashValue = placeHashValue;
     currentState->type = typeOfState();
 
+    // remember that we checked the currentState and the root node of the graph
+    StateNodesAssoc_t stateNodesAssoc;
+    
     // Initialize the currentOGNode with the root node of the OG.
     AnnotatedGraphNode* currentOGNode = og->getRoot();
-
+    stateNodesAssoc[currentState].insert(currentOGNode->getNumber());
+    
     if (currentOGNode->isRed()) {
         reasonForFailedMatch = "The OG is empty (its root node is red).";
         return false;
@@ -1814,7 +1818,7 @@ bool oWFN::matchesWithOG(const AnnotatedGraph* og, string& reasonForFailedMatch)
 
     // We return true if (and only if) the recusive method succeeded.
     return matchesWithOGRecursive(currentOGNode, currentState,
-                                  reasonForFailedMatch);
+                                  reasonForFailedMatch, stateNodesAssoc);
 }
 
 
@@ -1827,7 +1831,8 @@ bool oWFN::matchesWithOG(const AnnotatedGraph* og, string& reasonForFailedMatch)
 //!         false Otherwise.
 bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                                   State* currentState,
-                                  string& reasonForFailedMatch) {
+                                  string& reasonForFailedMatch,
+                                  StateNodesAssoc_t& stateNodesAssoc) {
 
     // A temporary copy of the CurrentMarking. Used to revert to the
     // CurrentMarking if firing of a transition leads to an already seen
@@ -1903,7 +1908,11 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
         // Determine whether we have already seen the state we just
         // reached.
         State* newState = binSearch(this);
-        if (newState != NULL) {
+        
+        // let's see if we have not yet checked the current state 
+        // and if we have not yet checked the current state and the current node already
+        if (newState != NULL && 
+        		(stateNodesAssoc[newState].find(currentOGNode->getNumber()) != stateNodesAssoc[newState].end())) {
 
             // TODO: was ist, wenn der state zwar schon gesehen war, aber
             //       mit nem anderen OG-knoten
@@ -1968,6 +1977,9 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                 tmpCurrentMarking = NULL;
             }
 
+            // remember that we have checked the current state with a certain (current) node
+            stateNodesAssoc[newState].insert(currentOGNode->getNumber());
+            
             // Check whether the initial marking violates the message bound
             // and exit with an error message if it does.
             if (violatesMessageBound()) {
@@ -1981,7 +1993,8 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
             // currentOGNode.
             // Upon success, don't forget to continue to work with oldOGNode.
             if (!matchesWithOGRecursive(currentOGNode, newState,
-                                        reasonForFailedMatch)) {
+                                        reasonForFailedMatch,
+                                        stateNodesAssoc)) {
                 return false;
             } else {
                 currentOGNode = oldOGNode;

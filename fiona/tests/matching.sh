@@ -157,8 +157,57 @@ else
         result=1
     fi
 fi
+
+############################################################################
+og="$DIR/agency_traveler.og"
 ############################################################################
 
+owfn="$DIR/airline.owfn"
+cmd="$FIONA $owfn -t match $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    if [ $? -ne 0 ]; then
+        echo ... fiona exited with nonzero return value although it should not
+        result=1
+    fi
+
+    echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+    if [ $? -ne 0 ]; then
+        echo ... oWFN does not match with OG although it should
+        result=1
+    fi
+fi
+
+############################################################################
+og="$DIR/airline.og"
+############################################################################
+
+owfn="$DIR/agency_traveler.owfn"
+cmd="$FIONA $owfn -t match $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    if [ $? -ne 0 ]; then
+        echo ... fiona exited with nonzero return value although it should not
+        result=1
+    fi
+
+    echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+    if [ $? -ne 0 ]; then
+        echo ... oWFN does not match with OG although it should
+        result=1
+    fi
+fi
+############################################################################
 echo
 
 exit $result

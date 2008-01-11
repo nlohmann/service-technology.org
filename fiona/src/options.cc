@@ -131,11 +131,13 @@ void print_help() {
   trace("                                                 (if an oWFN is given, its OG\n");
   trace("                                                 is computed automatically)\n");
   trace("                                   equivalence - check whether two OGs\n");
-  trace("                                                 characterize the same strategies\n");
-  trace("                                                 (if an oWFN is given, its OG\n");
-  trace("                                                 is computed automatically)\n");
-  trace("                                                 (option -b1 can be used to check\n");
-  trace("                                                 equivalence of (already present!) BDDs)\n");
+  trace("                                                 characterize the same\n");
+  trace("                                                 strategies (if an oWFN is\n");  
+  trace("                                                 given, its OG is computed\n");
+  trace("                                                 automatically)\n");
+  trace("                                                 (option -b1 can be used to\n");
+  trace("                                                 check the equivalence of \n");
+  trace("                                                 (already present!) BDDs)\n");
   trace("                                   filter      - reduces the first OG such that\n");
   trace("                                                 it simulates the second OG\n"); 
   trace("                                                 (if possible)\n");

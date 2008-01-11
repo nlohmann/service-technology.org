@@ -89,6 +89,9 @@ class CommunicationGraph : public AnnotatedGraph {
     protected:
         oWFN* PN; //!< pointer to the underlying petri net
 
+        /// store temporarily calculated states in binDecision structure
+        binDecision * tempBinDecision;
+        
         void addProgress(double);
 
     public:

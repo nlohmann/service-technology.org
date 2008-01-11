@@ -583,7 +583,7 @@ void checkMatching(AnnotatedGraph* OGToMatch, oWFN* PN) {
         trace(TRACE_0, "oWFN matches with OG: YES\n\n");
     } else {
         trace(TRACE_0, "oWFN matches with OG: NO\n");
-        trace(TRACE_0, "Match failed, because: " +reasonForFailedMatch + "\n\n");
+        trace(TRACE_0, "Match failed: " +reasonForFailedMatch + "\n\n");
     }
     delete OGToMatch;
 }

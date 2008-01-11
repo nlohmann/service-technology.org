@@ -1874,13 +1874,13 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
         if (transition->hasNonTauLabelForMatching() &&
             !currentOGNode->hasBlueEdgeWithLabel(transition->getLabelForMatching())) {
 
-            reasonForFailedMatch = "A transition labeled with '"
+            reasonForFailedMatch = "A transition labeled with \""
                                    + transition->getLabelForMatching()
-                                   + "' leaves the marking '"
+                                   + "\" leaves the marking ["
                                    + getCurrentMarkingAsString()
-                                   + "' in the oWFN, but no blue edge with the same label"
-                                   + " the node '" + currentOGNode->getName()
-                                   + "' in the OG.";
+                                   + "] in the oWFN, but no blue edge with the same label"
+                                   + " leaves the node \"" + currentOGNode->getName()
+                                   + "\" in the OG.";
 
             delete[] tmpCurrentMarking;
             return false;
@@ -2028,13 +2028,13 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                 tmpCurrentMarking = NULL;
             }
 
-            reasonForFailedMatch = "The marking '"
+            reasonForFailedMatch = "The marking ["
                                    + getCurrentMarkingAsString()
-                                   + "' of the oWFN does not satisfy the annotation '"
+                                   + "] of the oWFN does not satisfy the annotation \""
                                    + currentOGNode->getAnnotationAsString()
-                                   + "' of the corresponding node '"
+                                   + "\" of the corresponding node \""
                                    + currentOGNode->getName()
-                                   + "' in the OG.";
+                                   + "\" in the OG.";
 
             return false;
         } else {

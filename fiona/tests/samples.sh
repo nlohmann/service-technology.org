@@ -171,103 +171,6 @@ else
     result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
 fi
 
-############################################################################
-# reduced IG
-############################################################################
-
-# Don't run this test, because -R is buggy.
-
-#mycoffeebluenodes_soll=5
-#mycoffeeblueedges_soll=5
-#mycoffeestoredstates_soll=5
-#mycoffeestates_soll=19
-#
-#owfn="$DIR/myCoffee.owfn"
-#cmd="$FIONA $owfn -r -R -t IG"
-#
-#if [ "$quiet" != "no" ]; then
-#    cmd="$cmd -Q"
-#fi
-#
-#if [ "$memcheck" = "yes" ]; then
-#    memchecklog="$owfn.rR.IG.memcheck.log"
-#    do_memcheck "$cmd" "$memchecklog"
-#    result=$(($result | $?))
-#else
-#    echo running $cmd
-#    OUTPUT=`$cmd 2>&1`
-#
-#    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-#    mycoffeecontrol=$?
-#
-#    echo $OUTPUT | grep "number of states calculated: $mycoffeestates_soll" > /dev/null
-#    mycoffeestates=$?
-#
-#    echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
-#    mycoffeebluenodes=$?
-#
-#    echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
-#    mycoffeeblueedges=$?
-#
-#    echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
-#    mycoffeestoredstates=$?
-#
-#    if [ $mycoffeecontrol -ne 0 -o $mycoffeestates -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
-#    then
-#    echo   ... failed to build reduced IG correctly
-#    fi
-#
-#    result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
-#fi
-
-############################################################################
-# IG with node reduction
-############################################################################
-
-# Don't run this test, because -R is buggy.
-
-#mycoffeebluenodes_soll=5
-#mycoffeeblueedges_soll=5
-#mycoffeestoredstates_soll=5
-#mycoffeestates_soll=19
-#
-#owfn="$DIR/myCoffee.owfn"
-#cmd="$FIONA $owfn -R -t IG"
-#
-#if [ "$quiet" != "no" ]; then
-#    cmd="$cmd -Q"
-#fi
-#
-#if [ "$memcheck" = "yes" ]; then
-#    memchecklog="$owfn.R.IG.memcheck.log"
-#    do_memcheck "$cmd" "$memchecklog"
-#    result=$(($result | $?))
-#else
-#    echo running $cmd
-#    OUTPUT=`$cmd 2>&1`
-#
-#    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-#    mycoffeecontrol=$?
-#
-#    echo $OUTPUT | grep "number of states calculated: $mycoffeestates_soll" > /dev/null
-#    mycoffeestates=$?
-#
-#    echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
-#    mycoffeebluenodes=$?
-#
-#    echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
-#    mycoffeeblueedges=$?
-#
-#    echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
-#    mycoffeestoredstates=$?
-#
-#    if [ $mycoffeecontrol -ne 0 -o $mycoffeestates -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
-#    then
-#    echo   ... failed to build IG with node reduction correctly
-#    fi
-#
-#    result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
-#fi
 
 ############################################################################
 
@@ -394,50 +297,6 @@ else
     result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
 fi
 
-############################################################################
-# OG with node reduction
-############################################################################
-
-# Don't run this test, because -R is buggy.
-
-#shop3bluenodes_soll=12
-#shop3blueedges_soll=15
-#shop3storedstates_soll=978
-#
-#owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
-#cmd="$FIONA $owfn -R -t OG"
-#
-#if [ "$quiet" != "no" ]; then
-#    cmd="$cmd -Q"
-#fi
-#
-#if [ "$memcheck" = "yes" ]; then
-#    memchecklog="$owfn.R.OG.memcheck.log"
-#    do_memcheck "$cmd" "$memchecklog"
-#    result=$(($result | $?))
-#else
-#    echo running $cmd
-#    OUTPUT=`$cmd 2>&1`
-#
-#    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-#    shop3control=$?
-#
-#    echo $OUTPUT | grep "number of blue nodes: $shop3bluenodes_soll" > /dev/null
-#    shop3bluenodes=$?
-#
-#    echo $OUTPUT | grep "number of blue edges: $shop3blueedges_soll" > /dev/null
-#    shop3blueedges=$?
-#
-#    echo $OUTPUT | grep "number of states stored in nodes: $shop3storedstates_soll" > /dev/null
-#    shop3storedstates=$?
-#
-#    if [ $shop3control -ne 0 -o $shop3bluenodes -ne 0 -o $shop3blueedges -ne 0 -o $shop3storedstates -ne 0 ]
-#    then
-#    echo   ... failed to build OG with node reduction correctly
-#    fi
-#
-#    result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
-#fi
 
 ############################################################################
 # IG
@@ -482,50 +341,6 @@ else
     result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
 fi
 
-############################################################################
-# reduced IG with node reduction
-############################################################################
-
-# Don't run this test, because -R is buggy.
-
-shop3bluenodes_soll=11
-shop3blueedges_soll=13
-shop3storedstates_soll=72 #54 #70 #83
-
-owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
-cmd="$FIONA $owfn -R -t IG"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.R.IG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    shop3control=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $shop3bluenodes_soll" > /dev/null
-    shop3bluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $shop3blueedges_soll" > /dev/null
-    shop3blueedges=$?
-
-    echo $OUTPUT | grep "number of states stored in nodes: $shop3storedstates_soll" > /dev/null
-    shop3storedstates=$?
-
-    if [ $shop3control -ne 0 -o $shop3bluenodes -ne 0 -o $shop3blueedges -ne 0 -o $shop3storedstates -ne 0 ]
-    then
-    echo   ... failed to build the IG with node reduction correctly
-    fi
-
-    result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
-fi
 
 ############################################################################
 # IG reduced
@@ -570,50 +385,6 @@ else
     result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
 fi
 
-############################################################################
-# reduced IG with node reduction
-############################################################################
-
-# Don't run this test, because -R is buggy.
-
-shop3bluenodes_soll=8
-shop3blueedges_soll=8
-shop3storedstates_soll=49
-
-owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
-cmd="$FIONA $owfn -t IG -r -R"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.rR.IG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    shop3control=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $shop3bluenodes_soll" > /dev/null
-    shop3bluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $shop3blueedges_soll" > /dev/null
-    shop3blueedges=$?
-
-    echo $OUTPUT | grep "number of states stored in nodes: $shop3storedstates_soll" > /dev/null
-    shop3storedstates=$?
-
-    if [ $shop3control -ne 0 -o $shop3bluenodes -ne 0 -o $shop3blueedges -ne 0 -o $shop3storedstates -ne 0 ]
-    then
-    echo   ... failed to build the reduced IG with node reduction correctly
-    fi
-
-    result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
-fi
 
 ############################################################################
 # OG
@@ -658,42 +429,6 @@ else
     result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
 fi
 
-############################################################################
-# OG with node reduction
-############################################################################
-
-#shop6bluenodes_soll=7
-#shop6blueedges_soll=7
-#shop6storedstates_soll=761
-
-#owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
-#cmd="$FIONA $owfn -R -t OG"
-
-#if [ "$quiet" != "no" ]; then
-#    cmd="$cmd -Q"
-#fi
-
-#echo running $cmd
-#OUTPUT=`$cmd 2>&1`
-
-#echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-#shop6control=$?
-
-#echo $OUTPUT | grep "number of blue nodes: $shop6bluenodes_soll" > /dev/null
-#shop6bluenodes=$?
-
-#echo $OUTPUT | grep "number of blue edges: $shop6blueedges_soll" > /dev/null
-#shop6blueedges=$?
-
-#echo $OUTPUT | grep "number of states stored in nodes: $shop6storedstates_soll" > /dev/null
-#shop6storedstates=$?
-
-#if [ $shop6control -ne 0 -o $shop6bluenodes -ne 0 -o $shop6blueedges -ne 0 -o $shop6storedstates -ne 0 ]
-#then
-#echo   ... failed to build OG correctly
-#fi
-
-#result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
 
 ############################################################################
 # IG
@@ -740,50 +475,6 @@ else
     result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges  # + $shop6storedstates`
 fi
 
-############################################################################
-# IG with node reduction
-############################################################################
-
-# Don't run this test, because -R is buggy.
-
-shop6bluenodes_soll=6
-shop6blueedges_soll=5
-shop6storedstates_soll=247 #314
-
-owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
-cmd="$FIONA $owfn -R -t IG"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.R.IG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    shop6control=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $shop6bluenodes_soll" > /dev/null
-    shop6bluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $shop6blueedges_soll" > /dev/null
-    shop6blueedges=$?
-
-    echo $OUTPUT | grep "number of states stored in nodes: $shop6storedstates_soll" > /dev/null
-    shop6storedstates=$?
-
-    if [ $shop6control -ne 0 -o $shop6bluenodes -ne 0 -o $shop6blueedges -ne 0 -o $shop6storedstates -ne 0 ]
-    then
-    echo   ... failed to build IG with node reduction correctly
-    fi
-
-    result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
-fi
 
 ############################################################################
 # reduced IG
@@ -823,51 +514,6 @@ else
     if [ $shop6control -ne 0 -o $shop6bluenodes -ne 0 -o $shop6blueedges -ne 0 -o $shop6storedstates -ne 0 ]
     then
     echo   ... failed to build reduced IG correctly
-    fi
-
-    result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
-fi
-
-############################################################################
-# reduced IG with node reduction and IG reduction
-############################################################################
-
-# Don't run this test, because -R is buggy.
-
-shop6bluenodes_soll=6
-shop6blueedges_soll=5
-shop6storedstates_soll=158
-
-owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
-cmd="$FIONA $owfn -t IG -r -R"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.rR.IG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    shop6control=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $shop6bluenodes_soll" > /dev/null
-    shop6bluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $shop6blueedges_soll" > /dev/null
-    shop6blueedges=$?
-
-    echo $OUTPUT | grep "number of states stored in nodes: $shop6storedstates_soll" > /dev/null
-    shop6storedstates=$?
-
-    if [ $shop6control -ne 0 -o $shop6bluenodes -ne 0 -o $shop6blueedges -ne 0 -o $shop6storedstates -ne 0 ]
-    then
-    echo   ... failed to build reduced IG with node reduction correctly
     fi
 
     result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`

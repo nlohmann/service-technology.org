@@ -86,6 +86,39 @@ else
     result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
 fi
 
+############################################################################
+# check if graph using -R is the same as the one generated without -R
+############################################################################
+owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
+cmd1="$FIONA $owfn -R -t IG -s empty"
+
+echo checking equivalence of the graphs with and without -R ...
+
+#echo running $cmd1
+OUTPUT=`$cmd1 2>&1`
+
+cmd2="$FIONA $owfn -t IG -s empty"
+
+#echo running $cmd2
+OUTPUT=`$cmd2 2>&1`
+
+
+
+cmd="$FIONA -t equivalence $owfn.ig.og $owfn.R.ig.og"
+
+echo   running $cmd
+OUTPUT=`$cmd 2>&1`
+
+echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+    equivalent=$?
+
+if [ $equivalent -ne 0 ]
+then
+    echo   ... the two graphs do not characterize the same strategies
+fi
+
+
+result=`expr $result + $equivalent`
 
 ############################################################################
 # reduced IG with node reduction
@@ -132,6 +165,40 @@ else
     result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
 fi
 
+############################################################################
+# check if graph using -R is the same as the one generated without -R
+############################################################################
+#owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
+#cmd1="$FIONA $owfn -R -r -t IG -s empty"
+
+#echo checking equivalence of the graphs with and without -R ...
+
+#echo running $cmd1
+#OUTPUT=`$cmd1 2>&1`
+
+#cmd2="$FIONA $owfn -r -t IG -s empty"
+
+#echo running $cmd2
+#OUTPUT=`$cmd2 2>&1`
+
+
+
+#cmd="$FIONA -t equivalence $owfn.ig.og $owfn.R.ig.og"
+
+#echo   running $cmd
+#OUTPUT=`$cmd 2>&1`
+
+#echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+#    equivalent=$?
+
+#if [ $equivalent -ne 0 ]
+#then
+#    echo   ... the two graphs do not characterize the same strategies
+#fi
+
+
+#result=`expr $result + $equivalent`
+
 
 ############################################################################
 # IG with node reduction
@@ -141,7 +208,7 @@ fi
 
 shop6bluenodes_soll=6
 shop6blueedges_soll=5
-shop6storedstates_soll=247 #314
+shop6storedstates_soll=263 #314
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 cmd="$FIONA $owfn -R -t IG"
@@ -178,6 +245,39 @@ else
     result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
 fi
 
+############################################################################
+# check if graph using -R is the same as the one generated without -R
+############################################################################
+owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
+cmd1="$FIONA $owfn -R -t IG -s empty"
+
+echo checking equivalence of the graphs with and without -R ...
+
+#echo running $cmd1
+OUTPUT=`$cmd1 2>&1`
+
+cmd2="$FIONA $owfn -t IG -s empty"
+
+#echo running $cmd2
+OUTPUT=`$cmd2 2>&1`
+
+
+
+cmd="$FIONA -t equivalence $owfn.ig.og $owfn.R.ig.og"
+
+echo   running $cmd
+OUTPUT=`$cmd 2>&1`
+
+echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+    equivalent=$?
+
+if [ $equivalent -ne 0 ]
+then
+    echo   ... the two graphs do not characterize the same strategies
+fi
+
+
+result=`expr $result + $equivalent`
 
 ############################################################################
 # reduced IG with node reduction and IG reduction
@@ -187,7 +287,7 @@ fi
 
 shop6bluenodes_soll=6
 shop6blueedges_soll=5
-shop6storedstates_soll=158
+shop6storedstates_soll=170
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 cmd="$FIONA $owfn -t IG -r -R"
@@ -223,6 +323,119 @@ else
 
     result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
 fi
+
+############################################################################
+# check if graph using -R is the same as the one generated without -R
+############################################################################
+#owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
+#cmd1="$FIONA $owfn -R -r -t IG -s empty"
+
+#echo checking equivalence of the graphs with and without -R ...
+
+#echo running $cmd1
+#OUTPUT=`$cmd1 2>&1`
+
+#cmd2="$FIONA $owfn -r -t IG -s empty"
+
+#echo running $cmd2
+#OUTPUT=`$cmd2 2>&1`
+
+
+
+#cmd="$FIONA -t equivalence $owfn.ig.og $owfn.R.ig.og"
+
+#echo   running $cmd
+#OUTPUT=`$cmd 2>&1`
+
+#echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+#    equivalent=$?
+
+#if [ $equivalent -ne 0 ]
+#then
+#    echo   ... the two graphs do not characterize the same strategies
+#fi
+
+
+#result=`expr $result + $equivalent`
+
+############################################################################
+
+############################################################################
+# reduced IG with node reduction
+############################################################################
+
+myCoffeebluenodes_soll=5
+myCoffeeblueedges_soll=5
+myCoffeestoredstates_soll=5
+
+owfn="$DIR/myCoffee.owfn"
+cmd="$FIONA $owfn -t IG -R"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.rR.IG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    myCoffeecontrol=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $myCoffeebluenodes_soll" > /dev/null
+    myCoffeebluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $myCoffeeblueedges_soll" > /dev/null
+    myCoffeeblueedges=$?
+
+    echo $OUTPUT | grep "number of states stored in nodes: $myCoffeestoredstates_soll" > /dev/null
+    myCoffeestoredstates=$?
+
+    if [ $myCoffeecontrol -ne 0 -o $myCoffeebluenodes -ne 0 -o $myCoffeeblueedges -ne 0 -o $myCoffeestoredstates -ne 0 ]
+    then
+    echo   ... failed to build reduced IG with node reduction correctly
+    fi
+
+    result=`expr $result + $myCoffeecontrol + $myCoffeebluenodes + $myCoffeeblueedges + $myCoffeestoredstates`
+fi
+
+############################################################################
+# check if graph using -R is the same as the one generated without -R
+############################################################################
+owfn="$DIR/myCoffee.owfn"
+cmd1="$FIONA $owfn -R -t IG -s empty"
+
+echo checking equivalence of the graphs with and without -R ...
+
+#echo running $cmd1
+OUTPUT=`$cmd1 2>&1`
+
+cmd2="$FIONA $owfn -t IG -s empty"
+
+#echo running $cmd2
+OUTPUT=`$cmd2 2>&1`
+
+
+
+cmd="$FIONA -t equivalence $owfn.ig.og $owfn.R.ig.og"
+
+echo   running $cmd
+OUTPUT=`$cmd 2>&1`
+
+echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+    equivalent=$?
+
+if [ $equivalent -ne 0 ]
+then
+    echo   ... the two graphs do not characterize the same strategies
+fi
+
+
+result=`expr $result + $equivalent`
 
 ############################################################################
 

@@ -437,7 +437,171 @@ fi
 
 result=`expr $result + $equivalent`
 
+
 ############################################################################
+# reduced IG with node reduction
+############################################################################
+
+DKE3bluenodes_soll=172
+DKE3blueedges_soll=357
+DKE3storedstates_soll=2586
+
+owfn="$DIR/dke07_shop_sect_3.owfn"
+cmd="$FIONA $owfn -t IG -R"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.rR.IG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    DKE3control=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $DKE3bluenodes_soll" > /dev/null
+    DKE3bluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $DKE3blueedges_soll" > /dev/null
+    DKE3blueedges=$?
+
+    echo $OUTPUT | grep "number of states stored in nodes: $DKE3storedstates_soll" > /dev/null
+    DKE3storedstates=$?
+
+    if [ $DKE3control -ne 0 -o $DKE3bluenodes -ne 0 -o $DKE3blueedges -ne 0 -o $DKE3storedstates -ne 0 ]
+    then
+    echo   ... failed to build reduced IG with node reduction correctly
+    fi
+
+    result=`expr $result + $DKE3control + $DKE3bluenodes + $DKE3blueedges + $DKE3storedstates`
+fi
+
+############################################################################
+# check if graph using -R is the same as the one generated without -R
+############################################################################
+owfn="$DIR/dke07_shop_sect_3.owfn"
+cmd1="$FIONA $owfn -R -t IG -s empty"
+
+echo checking equivalence of the graphs with and without -R ...
+
+#echo running $cmd1
+OUTPUT=`$cmd1 2>&1`
+
+cmd2="$FIONA $owfn -t IG -s empty"
+
+#echo running $cmd2
+OUTPUT=`$cmd2 2>&1`
+
+
+
+cmd="$FIONA -t equivalence $owfn.ig.og $owfn.R.ig.og"
+
+echo   running $cmd
+OUTPUT=`$cmd 2>&1`
+
+echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+    equivalent=$?
+
+if [ $equivalent -ne 0 ]
+then
+    echo   ... the two graphs do not characterize the same strategies
+fi
+
+
+result=`expr $result + $equivalent`
+
+############################################################################
+# reduced IG with node reduction
+############################################################################
+
+DKE6bluenodes_soll=5
+DKE6blueedges_soll=4
+DKE6storedstates_soll=2318
+
+owfn="$DIR/dke07_shop_sect_6.owfn"
+cmd="$FIONA $owfn -t IG -R"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.rR.IG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    DKE6control=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $DKE6bluenodes_soll" > /dev/null
+    DKE6bluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $DKE6blueedges_soll" > /dev/null
+    DKE6blueedges=$?
+
+    echo $OUTPUT | grep "number of states stored in nodes: $DKE6storedstates_soll" > /dev/null
+    DKE6storedstates=$?
+
+    if [ $DKE6control -ne 0 -o $DKE6bluenodes -ne 0 -o $DKE6blueedges -ne 0 -o $DKE6storedstates -ne 0 ]
+    then
+    echo   ... failed to build reduced IG with node reduction correctly
+    fi
+
+    result=`expr $result + $DKE6control + $DKE6bluenodes + $DKE6blueedges + $DKE6storedstates`
+fi
+
+############################################################################
+# check if graph using -R is the same as the one generated without -R
+############################################################################
+owfn="$DIR/dke07_shop_sect_6.owfn"
+cmd1="$FIONA $owfn -R -t IG -s empty"
+
+echo checking equivalence of the graphs with and without -R ...
+
+#echo running $cmd1
+OUTPUT=`$cmd1 2>&1`
+
+cmd2="$FIONA $owfn -t IG -s empty"
+
+#echo running $cmd2
+OUTPUT=`$cmd2 2>&1`
+
+
+
+cmd="$FIONA -t equivalence $owfn.ig.og $owfn.R.ig.og"
+
+echo   running $cmd
+OUTPUT=`$cmd 2>&1`
+
+echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+    equivalent=$?
+
+if [ $equivalent -ne 0 ]
+then
+    echo   ... the two graphs do not characterize the same strategies
+fi
+
+
+result=`expr $result + $equivalent`
+
+############################################################################
+
+############################################################################
+
+#loeschen aller erzeugten Dateien im letzten Durchlauf
+rm -f $DIR/*.out
+rm -f $DIR/*.OG.png
+rm -f $DIR/*.IG.png
+rm -f $DIR/*.og
+rm -f $DIR/*.log
 
 echo
 

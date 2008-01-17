@@ -507,20 +507,30 @@ bool oWFN::violatesMessageBound() {
 //! \brief adds recursively the state s and all its successor states to the given state set
 //! \param stateSet set of states where the successors of the given state shall be stored in
 //! \param s state to start at
-void oWFN::addRecursivelySuccStatesToGivenSetOfStates(StateSet& stateSet, State* s) {
+void oWFN::addRecursivelySuccStatesToGivenSetOfStates(AnnotatedGraphNode* n, StateSet& stateSet, State* s) {
     trace(TRACE_5,
-          "oWFN::addRecursivelySuccStatesToSetOfTempStates(StateSet&, State* s): start\n");
+          "oWFN::addRecursivelySuccStatesToSetOfTempStates(AnnotatedGraphNode*, StateSet&, State* s): start\n");
 
+    s->decodeShowOnly(this); // decodes currently considered state
+
+    // test decoded current marking if message bound k reached
+    if (violatesMessageBound()) {
+        n->setColor(RED);
+        trace(TRACE_3, "\t\t\t message bound violation detected in node "
+                + n->getName() + " (addSuccStatesToList)\n");
+        return;
+    }
+    
     stateSet.insert(s);
 
     // get the successor states	and add them, too.
     for (unsigned int i = 0; i < s->cardFireList; i++) {
         if (s->succ[i]) {
-            addRecursivelySuccStatesToGivenSetOfStates(stateSet, s->succ[i]);
+            addRecursivelySuccStatesToGivenSetOfStates(n, stateSet, s->succ[i]);
         }
     }
     trace(TRACE_5,
-          "oWFN::addRecursivelySuccStatesToSetOfTempStates(StateSet&, State* s): end\n");
+          "oWFN::addRecursivelySuccStatesToSetOfTempStates(AnnotatedGraphNode*, StateSet&, State* s): end\n");
 }
 
 //! \brief Copies the current marking and returns it
@@ -567,7 +577,7 @@ void oWFN::calculateReducedSetOfReachableStatesOutputEvent(StateSet& stateSet,
     if (CurrentState != NULL) {
         // marking already has a state -> put it (and all its successors) into the node
         if (n->addState(CurrentState)) {
-            addRecursivelySuccStatesToGivenSetOfStates(stateSet, CurrentState);
+            addRecursivelySuccStatesToGivenSetOfStates(n, stateSet, CurrentState);
         }
         trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(AnnotatedGraphNode * n): end\n");
         return;
@@ -632,7 +642,7 @@ void oWFN::calculateReducedSetOfReachableStatesOutputEvent(StateSet& stateSet,
             if (NewState != NULL) {
                 // Current marking already in bintree 
                 trace(TRACE_5, "Current marking already in bintree \n");
-                addRecursivelySuccStatesToGivenSetOfStates(stateSet, NewState);
+                addRecursivelySuccStatesToGivenSetOfStates(n, stateSet, NewState);
 
                 copyMarkingToCurrentMarking(tempCurrentMarking);
 
@@ -675,7 +685,7 @@ void oWFN::calculateReducedSetOfReachableStatesOutputEvent(StateSet& stateSet,
 
                 CurrentState = NewState;
 
-                addRecursivelySuccStatesToGivenSetOfStates(stateSet, NewState);
+                addRecursivelySuccStatesToGivenSetOfStates(n, stateSet, NewState);
 
                 if (tempCurrentMarking) {
                     delete[] tempCurrentMarking;
@@ -712,6 +722,15 @@ void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet,
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStatesInputEvent(AnnotatedGraphNode * n): start\n");
 
+    // test current marking if message bound k reached
+    if (violatesMessageBound()) {
+        n->setColor(RED);
+        trace(TRACE_3, "\t\t\t message bound violated; color of node "
+                       + n->getName()
+                       + " set to RED (calculateReachableStatesFull, oben)\n");
+        return;
+    }
+    
     State * CurrentState;
     State * NewState;
 
@@ -723,7 +742,7 @@ void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet,
     if (CurrentState != NULL) {
         // marking already has a state -> put it (and all its successors) into the node
         if (n->addState(CurrentState)) {
-            addRecursivelySuccStatesToGivenSetOfStates(stateSet, CurrentState);
+            addRecursivelySuccStatesToGivenSetOfStates(n, stateSet, CurrentState);
         }
         trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStatesInputEvent(AnnotatedGraphNode * n): end\n");
         return;
@@ -759,7 +778,7 @@ void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet,
 
     assert(CurrentState != NULL);
     n->addState(CurrentState);
-    addRecursivelySuccStatesToGivenSetOfStates(stateSet, CurrentState);
+    addRecursivelySuccStatesToGivenSetOfStates(n, stateSet, CurrentState);
 
     // building EG in a node
     while (CurrentState) {
@@ -791,8 +810,17 @@ void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet,
                 // Current marking already in bintree 
                 trace(TRACE_5, "Current marking already in bintree \n");
 
-                addRecursivelySuccStatesToGivenSetOfStates(stateSet, NewState);
+                addRecursivelySuccStatesToGivenSetOfStates(n, stateSet, NewState);
 
+                if (n->getColor() == RED) {
+                    trace(TRACE_3, "\t\t\t message bound violated; color of node "
+                                   + n->getName()
+                                   + " set to RED (calculateReducedSetOfReachableStatesInputEvent, during fire)\n");
+                    trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStatesInputEvent(AnnotatedGraphNode * n) : end\n");
+                    delete[] tempCurrentMarking;
+                    return;
+                }
+                
                 copyMarkingToCurrentMarking(tempCurrentMarking);
 
                 CurrentState->firelist[CurrentState->current]->backfire(this);
@@ -806,7 +834,7 @@ void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet,
                 CurrentState->succ[CurrentState->current] = NewState;
                 (CurrentState->current)++;
             } else {
-                trace(TRACE_5, "Current marking new\n");
+                trace(TRACE_5, "Current marking new!\n");
 
                 NewState = binInsert(this);
                 NewState->firelist = stubbornfirelistdeadlocks();
@@ -832,8 +860,18 @@ void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet,
                 CurrentState->succ[CurrentState->current] = NewState;
                 CurrentState = NewState;
 
-                addRecursivelySuccStatesToGivenSetOfStates(stateSet, NewState);
+                addRecursivelySuccStatesToGivenSetOfStates(n, stateSet, NewState);
 
+                // test current marking if message bound k reached
+               if (violatesMessageBound()) {
+                   n->setColor(RED);
+                   trace(TRACE_3, "\t\t\t message bound violated; color of node "
+                                  + n->getName()
+                                  + " set to RED (calculateReducedSetOfReachableStatesInputEvent, during fire)\n");
+                   trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStatesInputEvent(AnnotatedGraphNode * n) : end\n");
+                   delete[] tempCurrentMarking;
+                   return;
+               }
                 if (tempCurrentMarking) {
                     delete[] tempCurrentMarking;
                     tempCurrentMarking = NULL;
@@ -965,6 +1003,14 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                     // no it is not marked, so we take a look at its successor states
                     addSuccStatesToListStubborn(stateSet, outputPlace,
                                                 NewState, n);
+                    if (n->getColor() == RED) {
+                        trace(TRACE_3, "\t\t\t message bound violated; color of node "
+                                       + n->getName()
+                                       + " set to RED (calculateReachableStatesFull, during fire)\n");
+                        trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
+                        delete[] tempCurrentMarking;
+                        return;
+                    }
                 }
 
                 copyMarkingToCurrentMarking(tempCurrentMarking);
@@ -1192,6 +1238,14 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                 } else {
                     // no it is not marked appropriatly, so we take a look at its successor states
                     addSuccStatesToListStubborn(stateSet, messages, NewState, n);
+                    if (n->getColor() == RED) {
+                        trace(TRACE_3, "\t\t\t message bound violated; color of node "
+                                       + n->getName()
+                                       + " set to RED (calculateReachableStatesFull, during fire)\n");
+                        trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
+                        delete[] tempCurrentMarking;
+                        return;
+                    }
                 }
 
                 // we don't need the current marking anymore so we step back to the marking before

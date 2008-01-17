@@ -75,6 +75,7 @@ class oWFN {
         /// Type of the containers holding all places of this oWFN.
         typedef std::vector<owfnPlace*> Places_t;
         
+        /// Type needed for matching -> remember which state and node we have checked so far
         typedef std::map<State*, std::set<unsigned int> > StateNodesAssoc_t;
 
     private:
@@ -248,7 +249,7 @@ class oWFN {
         bool violatesMessageBound();
 
         /// adds recursively the state s and all its successor states to the given state set
-        void addRecursivelySuccStatesToGivenSetOfStates(StateSet&, State* s);
+        void addRecursivelySuccStatesToGivenSetOfStates(AnnotatedGraphNode*, StateSet&, State* s);
 
         /// calculates and returns the next state
         State* calculateNextSate();

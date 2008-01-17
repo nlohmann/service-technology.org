@@ -561,10 +561,10 @@ void AnnotatedGraphNode::createCovAnnotation(GraphFormula* global_constraint) {
     trace(TRACE_5, "AnnotatedGraphNode::createCovAnnotation(GraphFormula* global_constraint)::begin()\n");
     
     if (!global_constraint) return;
-        
+    
     GraphFormulaCNF* cov_annotation = getAnnotation();
     GraphFormulaCNF* global_constraintCNF = global_constraint->getCNF();
-    
+        
     bool add_literal;
     
     // for every outgoing edge, check if the label is true in every satification of the global_constraint
@@ -575,24 +575,40 @@ void AnnotatedGraphNode::createCovAnnotation(GraphFormula* global_constraint) {
 
         add_literal = false;
         for (GraphFormulaMultiaryAnd::iterator iClause = global_constraintCNF->begin();
-              iClause != cov_annotation->end(); iClause++) {
+              iClause != global_constraintCNF->end(); iClause++) {
 
-             GraphFormulaMultiaryOr* clause = dynamic_cast<GraphFormulaMultiaryOr*>(*iClause);
-             // the clause has just one literal?
-             if (clause->begin() == clause->end()) {
-                 GraphFormulaLiteral* transition = dynamic_cast<GraphFormulaLiteral*>(*clause->begin());
-                 
+            // the clause has just one literal?
+             if (GraphFormulaLiteral* transition = dynamic_cast<GraphFormulaLiteral*>(*iClause)) {
+
                  string lit = transition->asString().substr(transition->asString().find_first_of('@'),
-                         transition->asString().find_last_of('@') - transition->asString().find_first_of('@'));
-                  
+                     transition->asString().find_last_of('@') - transition->asString().find_first_of('@'));
+             
                  // the literal is the edge's label?
                  if (edge->getLabel() == lit) {
                      // add the literal to the coverability annotation (conjunction)
                      add_literal = true; 
                  }
+                 
+             }
+             else {
+                 GraphFormulaMultiaryOr* clause = dynamic_cast<GraphFormulaMultiaryOr*>(*iClause);
+                 if (clause && clause->size() == 1) {
+                     GraphFormulaLiteral* transition = dynamic_cast<GraphFormulaLiteral*>(*clause->begin());
+ 
+                     // extract labels name from the transition name
+                     string lit = transition->asString().substr(transition->asString().find_first_of('@') + 1,
+                         transition->asString().find_last_of('@') - transition->asString().find_first_of('@') - 1);
+                 
+                     // the literal is the edge's label?
+                     if ((edge->getLabel() == lit) && 
+                             (getName() == transition->asString().substr(0, transition->asString().find_first_of('@')))) {
+                         // add the literal to the coverability annotation (conjunction)
+                         add_literal = true; 
+                     }
+                 }
              }
         }
-        
+
         if (add_literal) {
             GraphFormulaLiteral* lit = new GraphFormulaLiteral(edge->getLabel());
             GraphFormulaMultiaryOr* clause = new GraphFormulaMultiaryOr(lit);
@@ -603,6 +619,8 @@ void AnnotatedGraphNode::createCovAnnotation(GraphFormula* global_constraint) {
     delete global_constraintCNF;
     
     covAnnotation = cov_annotation;
+    
+    trace(TRACE_5, "AnnotatedGraphNode::covAnnotation: " + covAnnotation->asString() + "\n");
     trace(TRACE_5, "AnnotatedGraphNode::createCovAnnotation()::end()\n");
 }    
 

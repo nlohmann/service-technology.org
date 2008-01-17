@@ -347,7 +347,7 @@ bool AnnotatedGraph::covSimulates(AnnotatedGraph* smallerOG) {
 
     createCovConstraint();             // global coverability formula for normal form
     smallerOG->createCovConstraint();
-    
+        
     // Get things moving...
     bool result = false;
     if (covSimulatesRecursive(root, smallerOG->getRoot(), visitedNodes, covConstraint, smallerOG->covConstraint)) {
@@ -387,6 +387,7 @@ bool AnnotatedGraph::covSimulatesRecursive(AnnotatedGraphNode *myNode,
         visitedNodes.insert(make_pair(myNode, simNode));
     }
 
+    // compute annotations for coverability uses
     myNode->createCovAnnotation(myCovConstraint);
     simNode->createCovAnnotation(simCovConstraint);
     
@@ -1391,16 +1392,16 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap() {
     trace(TRACE_3, "AnnotatedGraph::getTransitionMap()::begin()\n");
     TransitionMap tm;
 
+    // itertate over all nodes
     for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
-        if ((*iNode)->isBlue() && (parameters[P_SHOW_EMPTY_NODE] || (*iNode)->reachGraphStateSet.size() != 0)) {
-            AnnotatedGraphNode::LeavingEdges::Iterator iEdge = (*iNode)->getLeavingEdgesIterator();
-            while (iEdge->hasNext()) {
-                AnnotatedGraphEdge* edge = iEdge->getNext();
-                if (edge->getDstNode()->isBlue() && (parameters[P_SHOW_EMPTY_NODE]
-                        || edge->getDstNode()->reachGraphStateSet.size() != 0))
-                    tm[edge->getLabel()].insert((*iNode)->getName() + "@"+ edge->getLabel() + "@"
-                            + edge->getDstNode()->getName());
-            }
+        AnnotatedGraphNode::LeavingEdges::Iterator iEdge = (*iNode)->getLeavingEdgesIterator();
+
+        // iterate over all transitions from a node
+        while (iEdge->hasNext()) {
+            AnnotatedGraphEdge* edge = iEdge->getNext();
+            // create a transition named "srcNode@label@destNode"
+            tm[edge->getLabel()].insert((*iNode)->getName() + "@"+ edge->getLabel() + "@"
+                + edge->getDstNode()->getName());
         }
     }
 
@@ -1415,21 +1416,23 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap() {
 AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap(set<string>* labels) {
     trace(TRACE_3, "AnnotatedGraph::getTransitionMap(set<string>* labels)::begin()\n");
     TransitionMap tm;
-
+    
+    // itertate over all nodes
     for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
-        if ((*iNode)->isBlue() && (parameters[P_SHOW_EMPTY_NODE] || (*iNode)->reachGraphStateSet.size() != 0)) {
-            AnnotatedGraphNode::LeavingEdges::Iterator iEdge = (*iNode)->getLeavingEdgesIterator();
-            while (iEdge->hasNext()) {
-                GraphEdge* edge = iEdge->getNext();
-                if ((labels->find(edge->getLabel()) != labels->end()) && edge->getDstNode()->isBlue() && 
-                    (parameters[P_SHOW_EMPTY_NODE] || edge->getDstNode()->reachGraphStateSet.size() != 0))
-                    tm[edge->getLabel()].insert((*iNode)->getName() + "@"+ edge->getLabel() + "@"
-                            + edge->getDstNode()->getName());
+        AnnotatedGraphNode::LeavingEdges::Iterator iEdge = (*iNode)->getLeavingEdgesIterator();
+
+        // iterate over all transitions from a node
+        while (iEdge->hasNext()) {
+            GraphEdge* edge = iEdge->getNext();
+            if (labels->find(edge->getLabel()) != labels->end()) { // label found in subset?
+                // create a transition named "srcNode@label@destNode"
+                tm[edge->getLabel()].insert((*iNode)->getName() + "@"+ edge->getLabel() + "@"
+                    + edge->getDstNode()->getName());
             }
         }
     }
 
-    trace(TRACE_3, "AnnotatedGraph::getTransitionMap()::end()\n");
+    trace(TRACE_3, "AnnotatedGraph::getTransitionMap(set<string>* labels)::end()\n");
     return tm;
 }
 
@@ -1439,24 +1442,30 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap(set<string>* labe
 //! covering the whole interface set
 //! \return returns the coverability formula 
 void AnnotatedGraph::createCovConstraint(set<string>* labels) {
-    trace(TRACE_3, "AnnotatedGraph::createCovFormula(set<string>* labels)::begin()\n");
+    trace(TRACE_3, "AnnotatedGraph::createCovFormula()::begin()\n");
 
     GraphFormulaCNF *formula= new GraphFormulaCNF;
     TransitionMap tm;
     
-    if (!labels) {
+    if (labels) {
+        // using subset of label set
         tm = getTransitionMap(labels);
     }
     else {
+        // using whole label set
         tm = getTransitionMap();
     }
     
+    // iterate over all transitions
     for (TransitionMap::iterator i = tm.begin(); i != tm.end(); i++) {
         GraphFormulaMultiaryOr *clause= new GraphFormulaMultiaryOr;
+        // for each transition with the same label, create a disjunction
         for (EdgeSet::iterator j = i->second.begin(); j != i->second.end(); j++) {
             GraphFormulaLiteral *literal= new GraphFormulaLiteral(*j);
             clause->addSubFormula(literal);
         }
+        
+        // add disjunction to cnf
         formula->addClause(clause);
     }
 

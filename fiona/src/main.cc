@@ -834,8 +834,8 @@ void filterOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 }
 
 
-//! \brief 
-//! \param
+//! \brief check for simulation relation of two given OGs while covering all external transitions
+//! \param OGsFromFiles a list containing exactly two OGs
 void checkCovSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
     
     // the OGs given by command line are already stored in OGsFromFiles
@@ -911,7 +911,7 @@ void checkCovSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
     secondOG->removeFalseNodes();
     
     trace(TRACE_1, "checking simulation\n");
-    if (firstOG->simulates(secondOG)) {
+    if (firstOG->covSimulates(secondOG)) {
         trace(TRACE_1, "simulation holds\n\n");
         trace(TRACE_0, "The first OG characterizes all strategies of the second one while covering all external transitions.\n\n");
     } else {

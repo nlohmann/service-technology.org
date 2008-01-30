@@ -56,6 +56,7 @@ typedef enum {
     O_BDD,                      //!< BDD-representation of OG is computed
     O_OTF,                      //!< BDD-representation of OG is computed on the fly
     O_EX,                       //!< 
+    O_EQ_R,                     //!< equivalence of two graphs (with -R and without -R), but the two graphs are computed automatically
     O_MATCH,                    //!< 
     O_PRODUCTOG,                //!< 
     O_SIMULATES,                //!<

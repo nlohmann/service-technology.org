@@ -282,12 +282,14 @@ void reportOptionValues() {
 
 //! \brief create an IG of an oWFN
 //! \param PN the given oWFN
-void computeIG(oWFN* PN) {
+string computeIG(oWFN* PN) {
 
     time_t seconds, seconds2;
     interactionGraph * graph = new interactionGraph(PN);
     bool controllable = false;
 
+    string igFilename = "";
+    
     if (options[O_CALC_REDUCED_IG]) {
         trace(TRACE_0, "building the reduced interaction graph...\n");
     } else {
@@ -330,7 +332,7 @@ void computeIG(oWFN* PN) {
         graph->printGraphToDot(); // .out
 
 /* create also an .og file to enable comparison of different IGs */
-        string igFilename = "";
+        
         if (options[O_OUTFILEPREFIX]) {
             igFilename = outfilePrefix;
         } else {
@@ -363,6 +365,8 @@ void computeIG(oWFN* PN) {
     trace(TRACE_5, "graph deleted\n");
     trace(TRACE_0, "=================================================================\n");
     trace(TRACE_0, "\n");
+    
+    return igFilename;
 }
 
 
@@ -395,12 +399,13 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
 
 //! \brief create an OG of an oWFN
 //! \param PN the given oWFN
-void computeOG(oWFN* PN) {
+string computeOG(oWFN* PN) {
 
     time_t seconds, seconds2;
     OG* graph = new OG(PN);
     bool controllable = false;
-
+    string ogFilename = "";
+    
     trace(TRACE_0, "building the operating guideline...\n");
     seconds = time (NULL);
 
@@ -442,7 +447,7 @@ void computeOG(oWFN* PN) {
         computePublicView(graph, publicViewName);
         
         delete graph;
-        return;
+        return "";
     }
     
     // generate output files
@@ -471,7 +476,6 @@ void computeOG(oWFN* PN) {
 
         graph->printGraphToDot(); // .out
 
-        string ogFilename = "";
         if (options[O_OUTFILEPREFIX]) {
             ogFilename = outfilePrefix;
         } else {
@@ -520,6 +524,7 @@ void computeOG(oWFN* PN) {
     trace(TRACE_0, "=================================================================\n");
     trace(TRACE_0, "\n");
 
+    return ogFilename;
 }
 
 
@@ -694,7 +699,12 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
     // we can only check exactly 2 OGs for equivalence
     // a possible violation should have been rejected by options.cc
-    assert(netfiles.size() + OGsFromFiles.size() == 2);
+    
+    if (!options[O_EQ_R]) {
+    	assert(netfiles.size() + OGsFromFiles.size() == 2);
+    } else {
+    	assert(OGsFromFiles.size() == 2);
+    }
 
     if (OGsFromFiles.size() < 2) {
         // oWFN(s) was given on command line, so compute the corresponding OGs
@@ -1277,59 +1287,91 @@ int main(int argc, char ** argv) {
             OGToMatch = readog(*(ogfiles.begin()));
         }
 
+        string fileName;
+        int loop = 0;		// in case the option -t eqR is set, we need each netfile to be processed twice
+        ogfiles.clear();
+        
+        if (!options[O_EQ_R]) {		// option is not set, so we don't do the loop
+        	loop = 27;				// loop needs to be higher than 1 ;-)
+        }
+        
         // ---------------- processing every single net -------------------
         for (list<std::string>::iterator netiter = netfiles.begin();
              netiter != netfiles.end(); ++netiter) {
 
-            numberOfEvents = 0;
-            numberOfDecodes = 0;
-            garbagefound = 0;
-            global_progress = 0;
-            show_progress = 0;
-            State::state_count = 0; // number of states
-            numberDeletedVertices = 0;
-
-            currentowfnfile = *netiter;
-            assert(currentowfnfile != "");
-
-            // prepare getting the net
-            PlaceTable = new SymbolTab<PlSymbol>;
-
-            // get the net
-            readnet(currentowfnfile);
-            trace(TRACE_0, "=================================================================\n");
-            trace(TRACE_0, "processing net " + currentowfnfile + "\n");
-            reportNet();
-            delete PlaceTable;
-
-            // start computation
-
-            if (parameters[P_IG]) {
-                // computing IG of the current oWFN
-                reportOptionValues(); // adjust events_manual and print limit of considering events
-                computeIG(PN);
-            }
-
-            if (parameters[P_OG] || parameters[P_PV]) {
-                // computing OG of the current oWFN
-                reportOptionValues(); // adjust events_manual and print limit of considering events
-                computeOG(PN);
-            }
-
-            if (options[O_MATCH]) {
-                // matching the current oWFN against the single OG 
-                checkMatching(OGToMatch, PN);
-            }
-
-            if (options[O_PNG]) {
-                // create a png file of the given net
-                makePNG(PN);
-            }
-
-            // cout << "numberOfDecodes: " << numberOfDecodes << endl;   
-
-            delete PN;
-            trace(TRACE_5, "net deleted\n");
+	        do {	
+	            numberOfEvents = 0;
+	            numberOfDecodes = 0;
+	            garbagefound = 0;
+	            global_progress = 0;
+	            show_progress = 0;
+	            State::state_count = 0; // number of states
+	            numberDeletedVertices = 0;
+	
+	            currentowfnfile = *netiter;
+	            assert(currentowfnfile != "");
+	
+	            // prepare getting the net
+	            PlaceTable = new SymbolTab<PlSymbol>;
+	
+	            // get the net
+	            readnet(currentowfnfile);
+	            trace(TRACE_0, "=================================================================\n");
+	            trace(TRACE_0, "processing net " + currentowfnfile + "\n");
+	            reportNet();
+	            delete PlaceTable;
+	
+	            // start computation
+	            fileName = "";		// name of computed og-file
+	            
+	            if (parameters[P_IG]) {
+	                // computing IG of the current oWFN
+	                reportOptionValues(); // adjust events_manual and print limit of considering events
+	                fileName = computeIG(PN);
+	            }
+	
+	            if (parameters[P_OG] || parameters[P_PV]) {
+	                // computing OG of the current oWFN
+	                reportOptionValues(); // adjust events_manual and print limit of considering events
+	                fileName = computeOG(PN);
+	            }
+	
+	            if (options[O_MATCH]) {
+	                // matching the current oWFN against the single OG 
+	                checkMatching(OGToMatch, PN);
+	            }
+	
+	            if (options[O_PNG]) {
+	                // create a png file of the given net
+	                makePNG(PN);
+	            }
+	
+	            if (options[O_EQ_R]) {
+	            	// reverse reduction mode for the next loop
+		            options[O_CALC_ALL_STATES] = !options[O_CALC_ALL_STATES];
+	            	ogfiles.push_back(AnnotatedGraph::addOGFileSuffix(fileName));
+	            }
+	            
+	            // cout << "numberOfDecodes: " << numberOfDecodes << endl;   
+	
+	            delete PN;
+	            trace(TRACE_5, "net deleted\n");
+	            
+	            loop++;
+	        } while (loop <= 1);	// calculate the graph of the same net twice --> once with -R and once with no -R
+	        
+	        if (options[O_EQ_R]) {
+	            // reading all og-files
+	            AnnotatedGraph::ogs_t OGsFromFiles;
+	            readAllOGs(OGsFromFiles);
+	            
+	            // check equivalence of both graphs
+	            checkEquivalence(OGsFromFiles);
+	            
+	            OGsFromFiles.clear();
+	        	loop = 0;
+	        	ogfiles.clear();
+	        }
         }
 
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY

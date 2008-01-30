@@ -261,6 +261,7 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_BDD] = false;
     options[O_OTF] = false;
     options[O_EX] = false;
+    options[O_EQ_R] = false;
     options[O_MATCH] = false;
     options[O_PRODUCTOG] = false;
     options[O_SIMULATES] = false;
@@ -375,12 +376,14 @@ void parse_command_line(int argc, char* argv[]) {
                     options[O_GRAPH_TYPE] = false;
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
-                } else if (lc_optarg == "eqR") {
-                	options[O_CALC_ALL_STATES] = false;
-                    options[O_EX] = true;
-                    options[O_GRAPH_TYPE] = false;
-                    parameters[P_IG] = false;
-                    parameters[P_OG] = false;
+                } else if (lc_optarg == "eqr") {
+                	options[O_EQ_R] = true;
+                	// make sure -s empty is set by setting it ;-)
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_BLUE_NODES] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = true;
+                    parameters[P_SHOW_RED_NODES] = false;
+                    parameters[P_SHOW_ALL_NODES] = false;
                 } else if (lc_optarg == "productog") {
                     parameters[P_IG] = false;
                     options[O_PRODUCTOG] = true;

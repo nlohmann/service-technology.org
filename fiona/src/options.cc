@@ -375,6 +375,12 @@ void parse_command_line(int argc, char* argv[]) {
                     options[O_GRAPH_TYPE] = false;
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
+                } else if (lc_optarg == "eqR") {
+                	options[O_CALC_ALL_STATES] = false;
+                    options[O_EX] = true;
+                    options[O_GRAPH_TYPE] = false;
+                    parameters[P_IG] = false;
+                    parameters[P_OG] = false;
                 } else if (lc_optarg == "productog") {
                     parameters[P_IG] = false;
                     options[O_PRODUCTOG] = true;

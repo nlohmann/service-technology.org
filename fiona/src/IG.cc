@@ -633,6 +633,11 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
         if (newNode->getColor() == RED) {
             // a message bound violation occured during computation of reachability graph
             trace(TRACE_5, "interactionGraph::calculateSuccStatesInput(messageMultiSet input, AnnotatedGraphNode * node) : end\n");
+            // delete temporarily calculated set of states
+            if (tempBinDecision) {
+            	delete tempBinDecision;
+            }
+            
             return;
         }
     }
@@ -641,7 +646,7 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
                            	
     	//newNode->addState(*iter2);            	
     }
-    
+    // delete temporarily calculated set of states
     if (tempBinDecision) {
     	delete tempBinDecision;
     }

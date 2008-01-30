@@ -45,8 +45,6 @@ result=0
 # reduced IG with node reduction
 ############################################################################
 
-# Don't run this test, because -R is buggy.
-
 shop3bluenodes_soll=11
 shop3blueedges_soll=13
 shop3storedstates_soll=72 
@@ -199,6 +197,40 @@ fi
 
 #result=`expr $result + $equivalent`
 
+############################################################################
+# check if graph using -R is the same as the one generated without -R
+# ==> OG
+############################################################################
+owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
+cmd1="$FIONA $owfn -R -t OG -s empty"
+
+echo checking equivalence of the graphs with and without -R ...
+
+echo running $cmd1
+OUTPUT=`$cmd1 2>&1`
+
+cmd2="$FIONA $owfn -t OG -s empty"
+
+echo running $cmd2
+OUTPUT=`$cmd2 2>&1`
+
+
+
+cmd="$FIONA -t equivalence $owfn.og $owfn.R.og"
+
+echo   running $cmd
+OUTPUT=`$cmd 2>&1`
+
+echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+    equivalent=$?
+
+if [ $equivalent -ne 0 ]
+then
+    echo   ... the two graphs do not characterize the same strategies
+fi
+
+
+result=`expr $result + $equivalent`
 
 ############################################################################
 # IG with node reduction
@@ -376,7 +408,7 @@ if [ "$quiet" != "no" ]; then
 fi
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.rR.IG.memcheck.log"
+    memchecklog="$owfn.R.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
     result=$(($result | $?))
 else
@@ -397,7 +429,7 @@ else
 
     if [ $myCoffeecontrol -ne 0 -o $myCoffeebluenodes -ne 0 -o $myCoffeeblueedges -ne 0 -o $myCoffeestoredstates -ne 0 ]
     then
-    echo   ... failed to build reduced IG with node reduction correctly
+    echo   ... failed to build IG with node reduction correctly
     fi
 
     result=`expr $result + $myCoffeecontrol + $myCoffeebluenodes + $myCoffeeblueedges + $myCoffeestoredstates`
@@ -454,7 +486,7 @@ if [ "$quiet" != "no" ]; then
 fi
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.rR.IG.memcheck.log"
+    memchecklog="$owfn.R.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
     result=$(($result | $?))
 else
@@ -475,7 +507,7 @@ else
 
     if [ $DKE3control -ne 0 -o $DKE3bluenodes -ne 0 -o $DKE3blueedges -ne 0 -o $DKE3storedstates -ne 0 ]
     then
-    echo   ... failed to build reduced IG with node reduction correctly
+    echo   ... failed to build IG with node reduction correctly
     fi
 
     result=`expr $result + $DKE3control + $DKE3bluenodes + $DKE3blueedges + $DKE3storedstates`
@@ -531,7 +563,7 @@ if [ "$quiet" != "no" ]; then
 fi
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.rR.IG.memcheck.log"
+    memchecklog="$owfn.R.IG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
     result=$(($result | $?))
 else
@@ -552,7 +584,7 @@ else
 
     if [ $DKE6control -ne 0 -o $DKE6bluenodes -ne 0 -o $DKE6blueedges -ne 0 -o $DKE6storedstates -ne 0 ]
     then
-    echo   ... failed to build reduced IG with node reduction correctly
+    echo   ... failed to build IG with node reduction correctly
     fi
 
     result=`expr $result + $DKE6control + $DKE6bluenodes + $DKE6blueedges + $DKE6storedstates`
@@ -593,10 +625,87 @@ fi
 result=`expr $result + $equivalent`
 
 ############################################################################
+# reduced IG with node reduction
+############################################################################
+
+Reservationsbluenodes_soll=5
+Reservationsblueedges_soll=4
+Reservationsstoredstates_soll=2318
+
+owfn="$DIR/Reservations.owfn"
+cmd="$FIONA $owfn -t IG -R"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.R.IG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    Reservationscontrol=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $Reservationsbluenodes_soll" > /dev/null
+    Reservationsbluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $Reservationsblueedges_soll" > /dev/null
+    Reservationsblueedges=$?
+
+    echo $OUTPUT | grep "number of states stored in nodes: $Reservationsstoredstates_soll" > /dev/null
+    Reservationsstoredstates=$?
+
+    if [ $Reservationscontrol -ne 0 -o $Reservationsbluenodes -ne 0 -o $Reservationsblueedges -ne 0 -o $Reservationsstoredstates -ne 0 ]
+    then
+    echo   ... failed to build IG with node reduction correctly
+    fi
+
+    result=`expr $result + $Reservationscontrol + $Reservationsbluenodes + $Reservationsblueedges + $Reservationsstoredstates`
+fi
+
+############################################################################
+# check if graph using -R is the same as the one generated without -R
+############################################################################
+owfn="$DIR/dke07_shop_sect_6.owfn"
+cmd1="$FIONA $owfn -R -t IG -s empty"
+
+echo checking equivalence of the graphs with and without -R ...
+
+#echo running $cmd1
+OUTPUT=`$cmd1 2>&1`
+
+cmd2="$FIONA $owfn -t IG -s empty"
+
+#echo running $cmd2
+OUTPUT=`$cmd2 2>&1`
+
+
+
+cmd="$FIONA -t equivalence $owfn.ig.og $owfn.R.ig.og"
+
+echo   running $cmd
+OUTPUT=`$cmd 2>&1`
+
+echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+    equivalent=$?
+
+if [ $equivalent -ne 0 ]
+then
+    echo   ... the two graphs do not characterize the same strategies
+fi
+
+
+result=`expr $result + $equivalent`
 
 ############################################################################
 
-#loeschen aller erzeugten Dateien im letzten Durchlauf
+############################################################################
+
+#loeschen aller erzeugten Dateien, die im Durchlauf entstanden sind
 rm -f $DIR/*.out
 rm -f $DIR/*.OG.png
 rm -f $DIR/*.IG.png

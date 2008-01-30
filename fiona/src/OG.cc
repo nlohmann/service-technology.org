@@ -350,7 +350,10 @@ void OG::calculateSuccStatesInput(unsigned int input,
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : start\n");
 
     StateSet::iterator iter; // iterator over the state set's elements
-
+    
+    binDecision * tempBinDecision = (binDecision *) 0;
+    setOfStatesStubbornTemp.clear();
+    
     for (iter = oldNode->reachGraphStateSet.begin();
          iter != oldNode->reachGraphStateSet.end(); iter++) {
 
@@ -376,29 +379,28 @@ void OG::calculateSuccStatesInput(unsigned int input,
         if (options[O_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
         } else {
-
-        	binDecision * tempBinDecision = (binDecision *) 0;
-        	
-        	setOfStatesStubbornTemp.clear();
             PN->calculateReducedSetOfReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, 
             											newNode); // calc the reachable states from that marking
-            
-            if (tempBinDecision) {
-            	delete tempBinDecision;
-            }
-
         }
-
-        
         
         if (newNode->getColor() == RED) {
             // a message bound violation occured during computation of reachability graph
             trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
             trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+            
+            // delete temporarily calculated set of states
+            if (tempBinDecision) {
+            	delete tempBinDecision;
+            }
             return;
         }
     }
 
+    // delete temporarily calculated set of states
+    if (tempBinDecision) {
+    	delete tempBinDecision;
+    }
+    
     trace(TRACE_3, "\t\t\t\t input event added without message bound violation\n");
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
     return;

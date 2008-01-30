@@ -411,6 +411,15 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
     }
 }
 
+bool oWFN::isMinimal() {
+	for (unsigned int i = 0; i < getPlaceCount(); i++) {
+		if (getPlace(i)->type == OUTPUT && CurrentMarking[i] > 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
 
 //! \brief decodes state, figures out if state activates output event, 
 //!			checks for message bound violation and adds successors recursively
@@ -803,7 +812,13 @@ void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet,
             trace(TRACE_5, "fire transition\n");
 
             CurrentState->firelist[CurrentState->current]->fire(this);
-            //			minimal = isMinimal();
+            
+         //   cout << "firing transition: " << CurrentState->firelist[CurrentState->current]->getLabelForMatching() << endl;
+            
+            //minimal = isMinimal();
+            if (isMinimal()) {
+            //	n->addState(NewState);
+            }
             NewState = binSearch(this);
 
             if (NewState != NULL) {

@@ -298,6 +298,10 @@ class oWFN {
 
         //		bool isFinalMarking(unsigned int *);	
         
+        
+        /// is the current marking minimal?
+        bool isMinimal();
+        
         /// is the given marking == final marking of the net?
         bool isFinal() const; // does current marking satisfy final condition/final marking of the net?
 

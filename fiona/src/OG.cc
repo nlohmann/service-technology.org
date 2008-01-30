@@ -84,6 +84,8 @@ void OG::buildGraph() {
     buildGraph(getRoot(), 1);
     correctNodeColorsAndShortenAnnotations();
 
+    assignFinalNodes();
+
     computeGraphStatistics();
 }
 
@@ -662,4 +664,26 @@ void OG::convertToBddFull() {
     testbdd->printDotFile();
     delete testbdd;
     trace(TRACE_5, "OG::convertToBdd(): end\n");
+}
+
+//! \brief assigns the final nodes of the OG according to Gierds 2007
+void OG::assignFinalNodes() {
+    trace(TRACE_5, "OG::assignFinalNodes(): start\n");
+    
+    for (nodes_t::iterator node = setOfNodes.begin(); node != setOfNodes.end(); node++) {
+        if ( (*node)->hasFinalStateInStateSet) {
+            bool receivesOnly = true;
+            SList<AnnotatedGraphEdge*>::ConstIterator edge = (*node)->getLeavingEdgesConstIterator();
+            while (edge->hasNext()) {
+                if (((*edge).getNext())->getType() != RECEIVING)
+                    receivesOnly = false;
+            }
+            
+            if (receivesOnly) {
+                finalNodes.push_back(*node);
+            }
+        }
+    }
+    
+    trace(TRACE_5, "OG::assignFinalNodes(): start\n");
 }

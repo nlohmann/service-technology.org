@@ -56,6 +56,8 @@ class Graph {
 
         nodes_t setOfNodes; // needed for proper deletion of OG.
 
+        nodes_t finalNodes; // final nodes of the graph
+
         typedef nodes_t::const_iterator nodes_const_iterator;
 
         typedef nodes_t::iterator nodes_iterator;

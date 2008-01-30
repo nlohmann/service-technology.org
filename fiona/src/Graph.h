@@ -79,6 +79,9 @@ class Graph {
         /// adds a node to the graph
         void addNode(GraphNode* node);
 
+        /// makes an already added node a final node
+        void makeNodeFinal(GraphNode* node);
+
         /// creates a new node in the graph
         GraphNode* addNode(const std::string& nodeName,
                            GraphNodeColor color = BLUE);

@@ -382,14 +382,16 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
     outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
     outfilePrefix += ".pvsa";
 
-    OG->transformToPublicView();
+    Graph* cleanPV = new Graph();
+    
+    OG->transformToPublicView(cleanPV);
 
     // generate output files
     if (!options[O_NOOUTPUTFILES]) {
         trace(TRACE_0, "generating dot output...\n");
 
         // .out
-        OG->printDotFile(outfilePrefix, "public view of " + graphName);
+        cleanPV->printDotFile(outfilePrefix, "public view of " + graphName);
 
         // .og
         OG->printOGFile(outfilePrefix);

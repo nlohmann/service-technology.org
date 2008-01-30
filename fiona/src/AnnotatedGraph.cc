@@ -1823,7 +1823,7 @@ void AnnotatedGraph::fixDualService() {
 
 
 //! \brief transforms the graph into its public view
-void AnnotatedGraph::transformToPublicView() {
+void AnnotatedGraph::transformToPublicView(Graph* cleanPV) {
     removeNodesAnnotatedWithTrue();
     constructDualService();
     fixDualService();
@@ -1837,5 +1837,54 @@ void AnnotatedGraph::transformToPublicView() {
         edges += (*nodeIter)->getLeavingEdgesCount();
     }
     trace(TRACE_0, "  edges: " + intToString(edges) + "\n");
+
+    transformOGToService(cleanPV);
+
+}
+
+//! \brief transforms the public view modified OG to a Service
+void AnnotatedGraph::transformOGToService(Graph* cleanPV) {
+
+    // CALL BY REFERENCE IST WARSCHEINLICH DAS PROBLEM BEIM ERSTELLEN DER NEUEN OBJEKTE
+
+    map<AnnotatedGraphNode*, GraphNode*> nodeMap;
+    
+    for (nodes_t::iterator copyNode = setOfNodes.begin(); copyNode != setOfNodes.end(); copyNode++) {
+
+        GraphNode* copiedNode;
+        
+        std::string stringVal;
+        stringVal.assign((*copyNode)->getName());
+        GraphNodeColor colorVal = (*copyNode)->getColor();
+        unsigned int numberVal = (*copyNode)->getNumber();
+        
+        copiedNode = new GraphNode(stringVal, colorVal, numberVal);
+        
+        nodeMap[(*copyNode)] = copiedNode;
+        
+        cleanPV->addNode(copiedNode);
+
+        if (root == (*copyNode)) {
+            cleanPV->setRoot(copiedNode);
+        }
+
+        if (((*copyNode)->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0) != string::npos ) {
+            cleanPV->makeNodeFinal(copiedNode);                
+        } 
+    }
+    
+    for (nodes_t::iterator copyNode = setOfNodes.begin(); copyNode != setOfNodes.end(); copyNode++) {
+
+        if (((*copyNode)->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0) != string::npos ) {
+            continue;
+        }
+
+        AnnotatedGraphNode::LeavingEdges::Iterator edge_iter = (*copyNode)->getLeavingEdgesIterator();
+        while (edge_iter->hasNext()) {
+            AnnotatedGraphEdge* edge = edge_iter->getNext();
+            nodeMap[(*copyNode)]->addLeavingEdge(new GraphEdge( nodeMap[(edge)->getDstNode()], (edge)->getLabel()));
+        }
+    }
+
 }
 

@@ -127,6 +127,10 @@ class AnnotatedGraph : public Graph {
         
         /// applies 1st and 2nd fix to dual service
         void fixDualService();
+
+        /// transforms the public view annotated graph to a non annotated Graph
+        void transformOGToService( Graph* cleanPV);
+
 // END OF CODE FROM PL
 
     public:
@@ -254,7 +258,7 @@ class AnnotatedGraph : public Graph {
 
 // CODE FROM PL
         /// transforms the graph to the public view
-        void transformToPublicView();
+        void transformToPublicView(Graph* cleanPV);
 // END OF CODE FROM PL
 
 };

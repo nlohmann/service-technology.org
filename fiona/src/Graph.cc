@@ -69,6 +69,12 @@ void Graph::addNode(GraphNode* node) {
     setOfNodes.push_back(node);
 }
 
+//! \brief add an already existing Node to the Graphs final node set
+//! \param node a pointer to a GraphNode
+void Graph::makeNodeFinal(GraphNode* node) {
+    finalNodes.push_back(node);
+}
+
 
 //! \brief create a new node and add it to the graphs node set
 //! \param nodeName a string containing the name of the new node

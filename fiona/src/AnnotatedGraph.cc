@@ -1263,9 +1263,25 @@ void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v,
     }
 
     if (visitedNodes[v] != true) {
-        os << "p"<< v->getName() << " [label=\"# "<< v->getName() << "\\n";
-        os << v->getAnnotation()->asString();
-        os << "\", fontcolor=black, color=blue];\n";
+
+        bool finalNode = false;
+
+        for ( nodes_t::const_iterator checkNode = finalNodes.begin(); checkNode != finalNodes.end(); checkNode++) {
+            if ((*checkNode) == v) {
+                finalNode = true;
+            }
+        }
+
+        if (finalNode) {
+            os << "p"<< v->getName() << " [label=\"# "<< v->getName() << "\\n";
+            os << v->getAnnotation()->asString();
+            os << "\", fontcolor=black, color=blue, peripheries=2];\n";
+        } else {
+            os << "p"<< v->getName() << " [label=\"# "<< v->getName() << "\\n";
+            os << v->getAnnotation()->asString();
+            os << "\", fontcolor=black, color=blue];\n";
+        }
+
         visitedNodes[v] = true;
 
         std::string currentLabel;

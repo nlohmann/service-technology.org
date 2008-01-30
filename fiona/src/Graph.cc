@@ -283,8 +283,23 @@ void Graph::printGraphToDot(GraphNode* v,
     }
 
     if (visitedNodes[v] != true) {
+
         os << "p"<< v->getName() << " [label=\"# "<< v->getName() << "\\n";
-        os << "\", fontcolor=black, color=blue];\n";
+        os << "\", fontcolor=black, color=blue";
+
+        bool finalNode = false;
+
+        for ( nodes_t::const_iterator checkNode = finalNodes.begin(); checkNode != finalNodes.end(); checkNode++) {
+            if ((*checkNode) == v) {
+                finalNode = true;
+            }
+        }
+
+        if (finalNode) {
+            os << ", peripheries=2";        
+        }
+        
+        os << "];\n";
         visitedNodes[v] = true;
 
         std::string currentLabel;

@@ -490,9 +490,8 @@ bool oWFN::violatesMessageBound() {
         // test input places
         for (i = 0; i < getInputPlaceCount(); i++) {
             if (CurrentMarking[getPlaceIndex(getInputPlace(i))] > messages_manual) {
-                trace(TRACE_3,
-                      "\t\t\t checkMessageBound found violation for input place "
-                              + string(getInputPlace(i)->name) + "\n");
+                trace(TRACE_3, "\t\t\t checkMessageBound found violation for");
+                trace(TRACE_3, " input place " + string(getInputPlace(i)->name) + "\n");
                 trace(TRACE_5, "oWFN::checkMessageBound(): end\n");
                 return true;
             }
@@ -500,9 +499,8 @@ bool oWFN::violatesMessageBound() {
         // test output places
         for (i = 0; i < getOutputPlaceCount(); i++) {
             if (CurrentMarking[getPlaceIndex(getOutputPlace(i))] > messages_manual) {
-                trace(TRACE_3,
-                      "\t\t\t checkMessageBound found violation for output place "
-                              + string(getOutputPlace(i)->name) + "\n");
+                trace(TRACE_3, "\t\t\t checkMessageBound found violation for");
+                trace(TRACE_3, " output place " + string(getOutputPlace(i)->name) + "\n");
                 trace(TRACE_5, "oWFN::checkMessageBound(): end\n");
                 return true;
             }
@@ -568,9 +566,9 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 //! \param tempBinDecision store calculated states temporarily in a binDecicion structure
 //! \param stateSet store calculated states in this state set
 //! \param n the node to be calculated in case of an output event
-void oWFN::calculateReducedSetOfReachableStatesOutputEvent(StateSet& stateSet, 
-												binDecision** tempBinDecision,
-												AnnotatedGraphNode* n) {
+void oWFN::calculateReducedSetOfReachableStatesOutputEvent(StateSet& stateSet,
+                                                           binDecision** tempBinDecision,
+												           AnnotatedGraphNode* n) {
 
 	// calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(AnnotatedGraphNode * n): start\n");
@@ -725,9 +723,10 @@ void oWFN::calculateReducedSetOfReachableStatesOutputEvent(StateSet& stateSet,
 //! \param tempBinDecision store calculated states temporarily in a binDecicion structure
 //! \param stateSet set of states storing the states that were calculated using the stubborn set method
 //! \param n the node to be calculated in case of an input event
-void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet, 
-												binDecision** tempBinDecision,
-												AnnotatedGraphNode* n) {
+void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet,
+                                                          binDecision** tempBinDecision,
+                                                          AnnotatedGraphNode* n) {
+
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStatesInputEvent(AnnotatedGraphNode * n): start\n");
 
@@ -920,9 +919,9 @@ void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet,
 //! \param outputPlace the output place of the net that is associated with the receiving event for which the new AnnotatedGraphNode is calculated
 //! \param n new AnnotatedGraphNode 
 void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
-									binDecision** tempBinDecision,
-                                    owfnPlace * outputPlace,
-                                    AnnotatedGraphNode* n) {
+                                                binDecision** tempBinDecision,
+                                                owfnPlace* outputPlace,
+                                                AnnotatedGraphNode* n) {
 
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet, owfnPlace * outputPlace, AnnotatedGraphNode * n) : start\n");
@@ -936,12 +935,12 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
         return;
     }
 
-    State * CurrentState;
-    State * NewState;
+    State* CurrentState;
+    State* NewState;
 
     CurrentState = binSearch(this);
 
-    unsigned int * tempCurrentMarking = NULL;
+    unsigned int* tempCurrentMarking = NULL;
     unsigned int tempPlaceHashValue;
 
     if (CurrentState == NULL) {
@@ -1016,8 +1015,9 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                     stateSet.insert(NewState);
                 } else {
                     // no it is not marked, so we take a look at its successor states
-                    addSuccStatesToListStubborn(stateSet, outputPlace,
-                                                NewState, n);
+
+                    addSuccStatesToListStubborn(stateSet, outputPlace, NewState, n);
+
                     if (n->getColor() == RED) {
                         trace(TRACE_3, "\t\t\t message bound violated; color of node "
                                        + n->getName()
@@ -1066,7 +1066,9 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                 // test current marking if message bound k reached
                 if (violatesMessageBound()) {
                     n->setColor(RED);
-                    trace(TRACE_3, "\t\t\t message bound violated; color of node " + n->getName() + " set to RED (calculateReachableStates, during fire)\n");
+                    trace(TRACE_3, "\t\t\t message bound violated;");
+                    trace(TRACE_3, " color of node " + n->getName());
+                    trace(TRACE_3, " set to RED (calculateReachableStates, during fire)\n");
                     trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet, owfnPlace * outputPlace, AnnotatedGraphNode * n) : end\n");
                     return;
                 }
@@ -1124,9 +1126,9 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
 //! \param messages the event(s) for which the new AnnotatedGraphNode's EG is calculated
 //! \param n new AnnotatedGraphNode 
 void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
-									binDecision** tempBinDecision,
-                                    messageMultiSet messages,
-                                    AnnotatedGraphNode* n) {
+                                                binDecision** tempBinDecision,
+                                                messageMultiSet messages,
+                                                AnnotatedGraphNode* n) {
 
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet, messageMultiSet messages, AnnotatedGraphNode * n) : start\n");
@@ -1139,12 +1141,12 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
         return;
     }
 
-    State * CurrentState;
-    State * NewState;
+    State* CurrentState;
+    State* NewState;
 
     CurrentState = binSearch(this);
 
-    unsigned int * tempCurrentMarking = NULL;
+    unsigned int* tempCurrentMarking = NULL;
     unsigned int tempPlaceHashValue;
 
     if (CurrentState == NULL) {

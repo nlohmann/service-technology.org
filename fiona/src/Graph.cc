@@ -283,8 +283,7 @@ void Graph::printGraphToDot(GraphNode* v,
 
     if (v == NULL) {
         // print the empty OG...
-        os << "p0"
-                << " [label=\"#0\", fontcolor=black, color=red, style=dashed];\n";
+        os << "p0" << " [label=\"#0\", fontcolor=black, color=red, style=dashed];\n";
         return;
     }
 
@@ -310,8 +309,8 @@ void Graph::printGraphToDot(GraphNode* v,
 
         std::string currentLabel;
 
-        GraphNode::LeavingEdges::ConstIterator
-                edgeIter = v->getLeavingEdgesConstIterator();
+        GraphNode::LeavingEdges::ConstIterator edgeIter =
+            v->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
             GraphEdge* edge = edgeIter->getNext();

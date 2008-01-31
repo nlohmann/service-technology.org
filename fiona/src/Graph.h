@@ -88,8 +88,8 @@ class Graph {
 
         /// creates a new edge in the graph
         void addEdge(const std::string& srcName,
-                           const std::string& dstName,
-                           const std::string& label);
+                     const std::string& dstName,
+                     const std::string& label);
 
         /// returns true if a node with the given name was found
         bool hasNodeWithName(const std::string& nodeName) const;

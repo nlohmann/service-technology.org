@@ -44,6 +44,8 @@
 
 using namespace std;
 
+//extern std::list<std::string> netfiles;
+//extern std::list<std::string> ogfiles;
 
 //! \brief a basic constructor of AnnotatedGraph
 AnnotatedGraph::AnnotatedGraph(): root(NULL), covConstraint(NULL) {
@@ -70,8 +72,8 @@ void AnnotatedGraph::addNode(AnnotatedGraphNode* node) {
 //! \param color color of the node
 //! \return returns a pointer to the created AnnotatedGraphNode
 AnnotatedGraphNode* AnnotatedGraph::addNode(const std::string& nodeName,
-                          GraphFormula* annotation,
-                          GraphNodeColor color) {
+                                            GraphFormula* annotation,
+                                            GraphNodeColor color) {
 
     AnnotatedGraphNode* node = new AnnotatedGraphNode(nodeName, annotation, color, setOfNodes.size());
     addNode(node);
@@ -84,13 +86,13 @@ AnnotatedGraphNode* AnnotatedGraph::addNode(const std::string& nodeName,
 //! \param dstNodeName a string containing the name of the destination node
 //! \param label a string containing the label of the edge
 void AnnotatedGraph::addEdge(const std::string& srcName,
-                    const std::string& dstNodeName,
-                    const std::string& label) {
+                             const std::string& dstNodeName,
+                             const std::string& label) {
 
     AnnotatedGraphNode* src = getNodeWithName(srcName);
     AnnotatedGraphNode* dstNode = getNodeWithName(dstNodeName);
 
-    AnnotatedGraphEdge* transition= new AnnotatedGraphEdge(dstNode,label);
+    AnnotatedGraphEdge* transition = new AnnotatedGraphEdge(dstNode, label);
     src->addLeavingEdge(transition);
 }
 
@@ -109,8 +111,10 @@ bool AnnotatedGraph::hasNodeWithName(const std::string& nodeName) const {
 AnnotatedGraphNode* AnnotatedGraph::getNodeWithName(const std::string& nodeName) const {
     
     for (nodes_const_iterator node_iter = setOfNodes.begin();
-         node_iter != setOfNodes.end(); ++node_iter) {
-            if ((*node_iter)->getName() == nodeName) {
+         node_iter != setOfNodes.end();
+         ++node_iter) {
+
+        if ((*node_iter)->getName() == nodeName) {
                 return *node_iter;
         }
     }
@@ -244,8 +248,8 @@ bool AnnotatedGraph::simulates(AnnotatedGraph* smallerOG) {
 //! \param simNode a node in the simulant
 //! \param visitedNodes Holds all visited pairs of nodes.
 bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
-                               AnnotatedGraphNode *simNode,
-                               set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes) {
+                                        AnnotatedGraphNode *simNode,
+                                        set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes) {
 
     // checking, whether myNode simulates simNode; result is true, iff
     // 1) anno of simNode implies anno of myNode and
@@ -1211,7 +1215,7 @@ std::string AnnotatedGraph::stripOGFileSuffix(const std::string& filename) {
 //! \param filenamePrefix a string containing the prefix of the output file name
 //! \param dotGraphTitle a title for the graph to be shown in the image
 void AnnotatedGraph::printDotFile(const std::string& filenamePrefix,
-                         const std::string& dotGraphTitle) const {
+                                  const std::string& dotGraphTitle) const {
 
     trace(TRACE_0, "creating the dot file of the OG...\n");
 
@@ -1252,13 +1256,12 @@ void AnnotatedGraph::printDotFile(const std::string& filenamePrefix) const {
 //! \param os output stream
 //! \param visitedNodes maps nodes to Bools remembering already visited nodes
 void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v,
-                            fstream& os,
-                            std::map<AnnotatedGraphNode*, bool>& visitedNodes) const {
+                                     fstream& os,
+                                     std::map<AnnotatedGraphNode*, bool>& visitedNodes) const {
 
     if (v == NULL) {
         // print the empty OG...
-        os << "p0"
-                << " [label=\"#0\", fontcolor=black, color=red, style=dashed];\n";
+        os << "p0" << " [label=\"#0\", fontcolor=black, color=red, style=dashed];\n";
         return;
     }
 

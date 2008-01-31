@@ -68,16 +68,14 @@ class AnnotatedGraph : public Graph {
     protected:
         AnnotatedGraphNode* root;
 
-        GraphFormulaCNF *covConstraint;
-        
-        typedef std::vector<AnnotatedGraphNode*> nodes_t;
+        GraphFormulaCNF* covConstraint;
 
+        typedef std::vector<AnnotatedGraphNode*> nodes_t;
         nodes_t setOfNodes; // needed for proper deletion of OG.
 
         nodes_t finalNodes; // final nodes of the graph
 
         typedef nodes_t::const_iterator nodes_const_iterator;
-
         typedef nodes_t::iterator nodes_iterator;
 
         /// remove all edges that have a given node as destination
@@ -93,14 +91,17 @@ class AnnotatedGraph : public Graph {
 
         /// checks, whether the part of an AnnotatedGraph below myNode simulates
         /// the part of an AnnotatedGraph below simNode
-        bool simulatesRecursive(AnnotatedGraphNode* myNode, AnnotatedGraphNode* simNode,
-            set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes);
+        bool simulatesRecursive(AnnotatedGraphNode* myNode,
+                                AnnotatedGraphNode* simNode,
+                                set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes);
 
         /// checks, whether the part of an AnnotatedGraph below myNode simulates
         /// the part of an AnnotatedGraph below simNode while covering all interface transitions
-        bool covSimulatesRecursive(AnnotatedGraphNode* myNode, AnnotatedGraphNode* simNode,
-            set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes,
-            GraphFormulaCNF* myCovConstraint, GraphFormulaCNF* simCovConstraint);
+        bool covSimulatesRecursive(AnnotatedGraphNode* myNode,
+                                   AnnotatedGraphNode* simNode,
+                                   set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes,
+                                   GraphFormulaCNF* myCovConstraint,
+                                   GraphFormulaCNF* simCovConstraint);
 
         /// filters the current OG through a given OG below myNode (rhsNode respectively)
         /// in such a way, that the complete OG given as the operand simulates the current OG
@@ -110,7 +111,7 @@ class AnnotatedGraph : public Graph {
 
         //! Create the formula describing the structure of the subgraph under the given node through events
         //! NOTE: graph has to be acyclic!
-        GraphFormulaMultiaryAnd *createStructureFormulaRecursively(AnnotatedGraphNode *);
+        GraphFormulaMultiaryAnd* createStructureFormulaRecursively(AnnotatedGraphNode*);
 
 // CODE FROM PL
         set<std::string> sendEvents;
@@ -146,13 +147,13 @@ class AnnotatedGraph : public Graph {
 
         /// creates a new node in the graph
         AnnotatedGraphNode* addNode(const std::string& nodeName,
-                           GraphFormula* annotation,
-                           GraphNodeColor color = BLUE);
+                                    GraphFormula* annotation,
+                                    GraphNodeColor color = BLUE);
 
         /// creates a new edge in the graph
         void addEdge(const std::string& srcName,
-                           const std::string& dstName,
-                           const std::string& label);
+                     const std::string& dstName,
+                     const std::string& label);
 
         /// returns true if a node with the given name was found
         bool hasNodeWithName(const std::string& nodeName) const;
@@ -203,7 +204,6 @@ class AnnotatedGraph : public Graph {
         void printDotFile(const std::string& filenamePrefix,
                           const std::string& dotGraphTitle) const;
 
-        
         /// Prints this OG in OG file format 
         void printOGFile(const std::string& filenamePrefix) const;
 

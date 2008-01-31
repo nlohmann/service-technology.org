@@ -657,7 +657,7 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
             OGsFromFiles.push_back(graph);
         }
         delete PN;
-        
+
         netiter++;
     }
     

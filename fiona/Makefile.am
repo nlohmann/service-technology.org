@@ -19,8 +19,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-08-14 13:05:07 $ by $Author: bretschn $.
-# Version $Revision: 1.16 $
+# File last changed $Date: 2008-02-04 10:15:40 $ by $Author: gierds $.
+# Version $Revision: 1.17 $
 
 SUBDIRS = cudd src tests doc
 
@@ -145,3 +145,4 @@ allcov:
 # Do code coverage check for test suite.
 covcheck: allcov
 	(cd tests && $(MAKE) $(AM_MAKEFLAGS) covcheck)
+

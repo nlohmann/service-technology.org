@@ -52,6 +52,11 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              cyclic/zyklusPmitCommit.owfn \
              cyclic/zyklusR.owfn \
              cyclic/zyklusReturn.owfn \
+             cyclic/livelockInP.owfn.png \
+             cyclic/zyklusP.owfn.png \
+             cyclic/zyklusPmitCommit.owfn.png \
+             cyclic/zyklusR.owfn.png \
+             cyclic/zyklusReturn.owfn.png \
              extrema/all_final_marking.owfn \
              extrema/empty.owfn \
              extrema/multiple_input.owfn \
@@ -67,12 +72,21 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              extrema/one_input_one_output.owfn \
              extrema/one_output.owfn \
              extrema/one_output_marked.owfn \
+             messages/innerUnbounded.owfn \
              messages/messageboundtest1.owfn \
              messages/messageboundtest2.owfn \
              samples/06-03-23_BPM06_shop_sect_3.owfn \
              samples/06-03-23_BPM06_shop_sect_6.owfn \
+             samples/dke07_shop_sect_3.owfn \
+             samples/dke07_shop_sect_6.owfn \
              samples/keesCoffee_condition.owfn \
              samples/myCoffee.owfn \
+             samples/06-03-23_BPM06_shop_sect_3.owfn.png \
+             samples/06-03-23_BPM06_shop_sect_6.owfn.png \
+             samples/dke07_shop_sect_3.owfn.png \
+             samples/dke07_shop_sect_6.owfn.png \
+             samples/keesCoffee_condition.owfn.png \
+             samples/myCoffee.owfn.png \
              sequence_suite/sequence10.owfn \
              sequence_suite/sequence11.owfn \
              sequence_suite/sequence12.owfn \
@@ -91,6 +105,10 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              sequence_suite/sequence7.owfn \
              sequence_suite/sequence8.owfn \
              sequence_suite/sequence9.owfn \
+             matching/airline.og \
+             matching/airline.owfn \
+             matching/agency_traveler.og \
+             matching/agency_traveler.owfn \
              matching/client_match_1.owfn \
              matching/client_nomatch_1.owfn \
              matching/client_nomatch_2.owfn \
@@ -104,6 +122,8 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              bdd_ref/phcontrol4.unf_reference.owfn.OG.BDD_MP.cudd \
              bdd_ref/sequence3_reference.owfn.OG.BDD_ANN.cudd \
              bdd_ref/sequence3_reference.owfn.OG.BDD_MP.cudd \
+             bdd_ref/phcontrol4.unf_reference.owfn.OG.png \
+             bdd_ref/sequence3_reference.owfn.OG.png \
              philosophers/phcontrol10.unf.owfn \
              philosophers/phcontrol3.unf.owfn \
              philosophers/phcontrol4.unf.owfn \
@@ -128,6 +148,7 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              productog/3_X_1_X_2.expected.og \
              publicview/1stFix.og \
              publicview/2ndFix.og \
+             publicview/basic.owfn \
              partner/sequence3.owfn \
              partner/sequence3-partner.expected.owfn \
              countservices/acyclic.og \
@@ -173,6 +194,14 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              sim_og/coarse-chopped.og \
              sim_og/coarse.og \
              sim_og/compact.og \
+             sim_og/mixed.owfn \
+             sim_og/mixed.owfn.og \
+             statesReduction/06-03-23_BPM06_shop_sect_3.owfn \
+             statesReduction/06-03-23_BPM06_shop_sect_6.owfn \
+             statesReduction/dke07_shop_sect_3.owfn \
+             statesReduction/dke07_shop_sect_6.owfn \
+             statesReduction/myCoffee.owfn \
+             statesReduction/Reservations.owfn \
              png/big.owfn \
              formula/1.owfn \
              formula/1.owfn.expected.og

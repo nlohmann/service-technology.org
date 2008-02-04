@@ -67,11 +67,13 @@ owfnPlace::~owfnPlace() {
     trace(TRACE_5, "owfnPlace::~owfnPlace() : end\n");
 }
 
+
 //! \brief return the type of this place
 //! \return type of this place
 placeType owfnPlace::getType() const {
     return type;
 }
+
 
 //! \brief return the label of the place for use in a communication graph
 //! \return label of the node
@@ -119,9 +121,6 @@ oWFN* owfnPlace::getUnderlyingOWFN() const {
     return net;
 }
 
-        /// decrement marking of place
-        /// test enabledness with respect to place
-        /// define a factor for hash value calculation
 
 //! \brief increment marking of place by the given value
 //! \param i increment value

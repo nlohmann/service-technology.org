@@ -175,14 +175,14 @@ class oWFN {
         /// DESCRIPTION
         unsigned int getCardFireList();
 
-        binDecision ** binHashTable;
+        binDecision** binHashTable;
 
-        unsigned int * CurrentMarking;
-        unsigned int * FinalMarking;
-        formula * FinalCondition;
+        unsigned int* CurrentMarking;
+        unsigned int* FinalMarking;
+        formula* FinalCondition;
         std::string finalConditionString;
         std::string finalMarkingString;
-        State * currentState;
+        State* currentState;
 
         unsigned int placeHashValue;
         long int BitVectorSize;

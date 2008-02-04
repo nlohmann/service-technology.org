@@ -1009,6 +1009,7 @@ void makePNG(oWFN* PN) {
     }
 
     string outFileName;    
+    
     if (!options[O_OUTFILEPREFIX]) {
         outFileName = globals::output_filename;
     } else {

@@ -174,7 +174,6 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              sim_og/coarse.og \
              sim_og/compact.og \
              png/big.owfn \
-             png/big.owfn.expected.png \
              formula/1.owfn \
              formula/1.owfn.expected.og
 

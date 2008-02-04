@@ -197,6 +197,7 @@ fi
 
 #result=`expr $result + $equivalent`
 
+
 ############################################################################
 # check if graph using -R is the same as the one generated without -R
 # ==> OG

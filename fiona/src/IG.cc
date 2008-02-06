@@ -677,10 +677,7 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
     } else {
     	// state reduction
     	
-        setOfStatesStubbornTemp.clear();
-
         StateSet stateSet;
-
         binDecision * tempBinDecision = (binDecision *) 0;
         
         // forget about all the states we have calculated so far

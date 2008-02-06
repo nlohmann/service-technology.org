@@ -382,7 +382,11 @@ void CommunicationGraph::printGraphToDot() {
     unsigned int maxSizeForDotFile = 5000; // number relevant for .out file
     unsigned int maxSizeForPNGFile = 500; // number relevant to generate png
 
-    if (getNumberOfNodes() <= maxSizeForDotFile) {
+    if (((parameters[P_SHOW_RED_NODES] || parameters[P_SHOW_ALL_NODES]) && 
+    		(getNumberOfNodes() <= maxSizeForDotFile))
+    	 ||
+    	 ((parameters[P_SHOW_EMPTY_NODE] || parameters[P_SHOW_BLUE_NODES]) && 
+    	 getNumberOfBlueNodes() <= maxSizeForDotFile)) {
 
         trace(TRACE_0, "creating the dot file of the graph...\n");
         AnnotatedGraphNode* rootNode = root;
@@ -520,6 +524,7 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
                 (*iter)->type == FINALSTATE ||
                 parameters[P_SHOW_STATES_PER_NODE] ) {
                 (*iter)->decode(PN);
+                os << "(" << *iter << ") " ;
                 os << "[" << PN->getCurrentMarkingAsString() << "]";
                 os << " (";
 

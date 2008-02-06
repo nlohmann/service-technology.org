@@ -83,7 +83,7 @@ oWFN::~oWFN() {
     trace(TRACE_5, "oWFN::~oWFN() : start\n");
 
     for (int i = 0; i < HASHSIZE; i++) {
-        if (binHashTable[i]) {
+    	if (binHashTable[i]) {
             delete binHashTable[i];
         }
         binHashTable[i] = (binDecision *) 0;
@@ -335,12 +335,12 @@ void oWFN::addSuccStatesToList(AnnotatedGraphNode* n, State * currentState) {
         assert(!n->addState(currentState)); // currentState was added to node before
 
         currentState->decodeShowOnly(this); // decodes currently considered state
-
         // test decoded current marking if message bound k reached
         if (violatesMessageBound()) {
             n->setColor(RED);
             trace(TRACE_3, "\t\t\t message bound violation detected in node "
-                    + n->getName() + " (addSuccStatesToList)\n");
+                    + n->getName() + " (addSuccStatesToList) --> node set to RED\n");
+            
             return;
         }
 
@@ -352,19 +352,21 @@ void oWFN::addSuccStatesToList(AnnotatedGraphNode* n, State * currentState) {
                     addSuccStatesToList(n, currentState->succ[i]);
                 }
             } else {
-                //TODO: this is a guess!! we should not rely on this
-                // can only happen if currentState would have a successor
+                // this can only happen if currentState would have a successor
                 // which violates message bound;
-                // but instead currentState has NULL successor -- don't know why ;)
+                // but instead currentState has NULL successor
 
+            	// if current state has a successor, which violates the message bound
+            	
                 // if the above is true, then current node n must be
                 // considered to violate message bound, too
-                n->setColor(RED);
-                trace(TRACE_3,
-                      "\t\t\t message bound violation detected in node "
-                              + n->getName()
-                              + " (addSuccStatesToList with NULL successor)\n");
-                return;
+//                n->setColor(RED);
+//                trace(TRACE_3,
+//                      "\t\t\t message bound violation detected in node "
+//                              + n->getName()
+//                              + " (addSuccStatesToList with NULL successor)\n");
+//                printCurrentMarking();
+//                return;
             }
         }
     }
@@ -651,6 +653,19 @@ void oWFN::calculateReducedSetOfReachableStatesOutputEvent(StateSet& stateSet,
                 trace(TRACE_5, "Current marking already in bintree \n");
                 addRecursivelySuccStatesToGivenSetOfStates(n, stateSet, NewState);
 
+                if (n->getColor() == RED) {
+                    trace(TRACE_3, "\t\t\t message bound violated; color of node "
+                                   + n->getName()
+                                   + " set to RED (calculateReducedSetOfReachableStatesInputEvent, during fire)\n");
+                    trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStatesInputEvent(AnnotatedGraphNode * n) : end\n");
+
+                    assert(CurrentState->succ[CurrentState->current] == NULL);
+                    CurrentState->succ[CurrentState->current] = NewState;                    
+                    
+                    delete[] tempCurrentMarking;
+                    return;
+                }
+
                 copyMarkingToCurrentMarking(tempCurrentMarking);
 
                 CurrentState->firelist[CurrentState->current]->backfire(this);
@@ -693,7 +708,17 @@ void oWFN::calculateReducedSetOfReachableStatesOutputEvent(StateSet& stateSet,
                 CurrentState = NewState;
 
                 addRecursivelySuccStatesToGivenSetOfStates(n, stateSet, NewState);
+                if (n->getColor() == RED) {
+                    trace(TRACE_3, "\t\t\t message bound violated; color of node "
+                                   + n->getName()
+                                   + " set to RED (calculateReducedSetOfReachableStatesInputEvent, during fire)\n");
+                    trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStatesInputEvent(AnnotatedGraphNode * n) : end\n");
 
+                    
+                    delete[] tempCurrentMarking;
+                    return;
+                }
+                
                 if (tempCurrentMarking) {
                     delete[] tempCurrentMarking;
                     tempCurrentMarking = NULL;
@@ -831,6 +856,10 @@ void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet,
                                    + n->getName()
                                    + " set to RED (calculateReducedSetOfReachableStatesInputEvent, during fire)\n");
                     trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStatesInputEvent(AnnotatedGraphNode * n) : end\n");
+
+                    assert(CurrentState->succ[CurrentState->current] == NULL);
+                    CurrentState->succ[CurrentState->current] = NewState;                    
+                    
                     delete[] tempCurrentMarking;
                     return;
                 }
@@ -1023,6 +1052,10 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                                        + n->getName()
                                        + " set to RED (calculateReachableStatesFull, during fire)\n");
                         trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
+
+                        assert(CurrentState->succ[CurrentState->current] == NULL);
+                        CurrentState->succ[CurrentState->current] = NewState;
+
                         delete[] tempCurrentMarking;
                         return;
                     }
@@ -1109,9 +1142,9 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
     }
     if (tempCurrentMarking) {
         delete[] tempCurrentMarking;
+        tempCurrentMarking = NULL;
     }
 
-    //binDeleteAll(*tempBinDecision);
 
     trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet, owfnPlace * outputPlace, AnnotatedGraphNode * n) : end\n");
     return;
@@ -1260,6 +1293,10 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                                        + n->getName()
                                        + " set to RED (calculateReachableStatesFull, during fire)\n");
                         trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
+
+                        assert(CurrentState->succ[CurrentState->current] == NULL);
+                        CurrentState->succ[CurrentState->current] = NewState;                        
+                        
                         delete[] tempCurrentMarking;
                         return;
                     }
@@ -1382,7 +1419,6 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
     // calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) : start\n");
 
-    // test current marking if message bound k reached
     if (violatesMessageBound()) {
         n->setColor(RED);
         trace(TRACE_3, "\t\t\t message bound violated; color of node "
@@ -1462,14 +1498,19 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
 
                 if (NewState != NULL) {
                     // Current marking already in bintree 
-                    trace(TRACE_5, "Current marking already in bintree \n");
+                    trace(TRACE_5, "Current marking already in bintree \n"); 
                     if (n->addState(NewState)) {
                         addSuccStatesToList(n, NewState);
                         if (n->getColor() == RED) {
                             trace(TRACE_3, "\t\t\t message bound violated; color of node "
                                            + n->getName()
-                                           + " set to RED (calculateReachableStatesFull, during fire)\n");
+                                           + " set to RED (calculateReachableStatesFull, during fire (known state)\n");
                             trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
+
+                            assert(CurrentState->succ[CurrentState->current] == NULL);
+                            CurrentState->succ[CurrentState->current] = NewState;
+
+                            
                             delete[] tempCurrentMarking;
                             return;
                         }
@@ -1488,13 +1529,13 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                     CurrentState->succ[CurrentState->current] = NewState;
                     (CurrentState->current)++;
                 } else {
-                    trace(TRACE_5, "Current marking new\n");
+                    trace(TRACE_5, "Current marking new\n");	
                     NewState = binInsert(this);
                     NewState->firelist = firelist();
                     NewState->cardFireList = CurrentCardFireList;
                     if (parameters[P_IG]) {
                         if (NewState->quasiFirelist) {
-                            delete [] NewState->quasiFirelist;
+                            delete[] NewState->quasiFirelist;
                             NewState->quasiFirelist = NULL;
                         }
                         NewState->quasiFirelist = quasiFirelist();
@@ -1502,7 +1543,7 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                     NewState->current = 0;
                     NewState->parent = CurrentState;
                     assert(NewState->succ == NULL);
-                    NewState->succ = new State * [CurrentCardFireList];
+                    NewState->succ = new State* [CurrentCardFireList];
                     for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
                         NewState->succ[istate] = NULL;
                     }
@@ -1518,7 +1559,7 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                         n->setColor(RED);
                         trace(TRACE_3, "\t\t\t message bound violated; color of node "
                                        + n->getName()
-                                       + " set to RED (calculateReachableStatesFull, during fire)\n");
+                                       + " set to RED (calculateReachableStatesFull, during fire (new state))\n");
                         trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
                         delete[] tempCurrentMarking;
                         return;
@@ -1650,7 +1691,7 @@ string oWFN::getCurrentMarkingAsString() const {
 void oWFN::print_binDec(int h) {
 
     for (unsigned int i=0; i < getPlaceCount(); i++) {
-        cout << getPlace(i) -> name<< ": "<< getPlace(i) -> nrbits;
+        cout << getPlace(i) -> name<< ": "<< getPlace(i) -> nrbits << "; ";
     }
     cout << endl;
 

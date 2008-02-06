@@ -201,7 +201,7 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                 currentNode->setColor(RED);
                 trace(TRACE_3, "\t\t any further event suppressed (annotation of node ");
                 trace(TRACE_3, currentNode->getName() + " is unsatisfiable)\n");
-                trace(TRACE_5, "\t\t formula was " + currentNode->getAnnotation()->asString());
+                trace(TRACE_3, "\t\t formula was " + currentNode->getAnnotation()->asString());
                 trace(TRACE_3, "\n");
                 return;
             }
@@ -365,10 +365,9 @@ void OG::calculateSuccStatesOutput(unsigned int output,
             if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
                 PN->calculateReducedSetOfReachableStatesOutputEvent(setOfStatesStubbornTemp, &tempBinDecision, 
                 											newNode); // calc the reachable states from that marking
-                
             }
         }
-        
+
         if (tempBinDecision) {
         	delete tempBinDecision;
         }

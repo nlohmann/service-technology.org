@@ -248,9 +248,8 @@ bool AnnotatedGraph::simulates(AnnotatedGraph* smallerOG) {
 //! \param simNode a node in the simulant
 //! \param visitedNodes Holds all visited pairs of nodes.
 bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
-                                        AnnotatedGraphNode *simNode,
-                                        set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes) {
-
+										AnnotatedGraphNode *simNode,
+										set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes) {
     // checking, whether myNode simulates simNode; result is true, iff
     // 1) anno of simNode implies anno of myNode and
     // 2) myNode has each outgoing event of simNode, too
@@ -263,6 +262,7 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
 
     // If we already visited this pair of nodes, then we're done.
     if (visitedNodes.find(make_pair(myNode, simNode)) != visitedNodes.end()) {
+    	trace(TRACE_3, "\t already been checked\n");
         return true;
     } else {
         visitedNodes.insert(make_pair(myNode, simNode));
@@ -284,9 +284,35 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
     } else {
         trace(TRACE_3, "\t\t\t annotation implication false\n");
         trace(TRACE_4, "\t\t\t   " + simNode->getAnnotation()->asString() + "\n");
+        trace(TRACE_4, "\t\t\t   leaving edges (" + intToString(simNode->getLeavingEdgesCount()) + "):\n");
+        
+        AnnotatedGraphNode::LeavingEdges::Iterator
+                edgeIter = simNode->getLeavingEdgesIterator();
+        while (edgeIter->hasNext()) {
+            AnnotatedGraphEdge* edge = edgeIter->getNext();
+            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + "(");
+            switch (edge->getDstNode()->getColor()) {
+            case BLUE: trace(TRACE_4, "BLUE"); break;
+            case RED: trace(TRACE_4, "RED"); break;
+            }
+            trace(TRACE_4, ")\n");
+        }
+        
+        
         trace(TRACE_4, "\t\t\t   -/->\n");
         trace(TRACE_4, "\t\t\t   " + myNode->getAnnotation()->asString() + "\n");
+        trace(TRACE_4, "\t\t\t   leaving edges (" + intToString(myNode->getLeavingEdgesCount()) + "):\n");
 
+        edgeIter = myNode->getLeavingEdgesIterator();
+        while (edgeIter->hasNext()) {
+            AnnotatedGraphEdge* edge = edgeIter->getNext();
+            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + "(");
+            switch (edge->getDstNode()->getColor()) {
+            case BLUE: trace(TRACE_4, "BLUE"); break;
+            case RED: trace(TRACE_4, "RED"); break;
+            }
+            trace(TRACE_4, ")\n");
+        }        
         delete simNodeAnnotationInCNF;
         delete myNodeAnnotationInCNF;
 
@@ -310,6 +336,21 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
         if (myEdge == NULL) {
             // simNode has edge which myNode hasn't
             trace(TRACE_2, "\t\t simulation failed (edges)\n");
+            trace(TRACE_4, "\t\t leaving edges of the node " + myNode->getName() + " (" + intToString(myNode->getLeavingEdgesCount()) + "): \n");
+            
+            AnnotatedGraphNode::LeavingEdges::Iterator
+                    edgeIter = myNode->getLeavingEdgesIterator();
+            while (edgeIter->hasNext()) {
+                AnnotatedGraphEdge* edge = edgeIter->getNext();
+                trace(TRACE_4, "\t\t\t" + edge->getLabel() + "\n");
+            }
+            trace(TRACE_4, "\t\t leaving edges of the node " + simNode->getName() + " (" + intToString(myNode->getLeavingEdgesCount()) + "): \n");
+            
+            edgeIter = simNode->getLeavingEdgesIterator();
+            while (edgeIter->hasNext()) {
+                AnnotatedGraphEdge* edge = edgeIter->getNext();
+                trace(TRACE_4, "\t\t\t" + edge->getLabel() + "\n");
+            }
             delete simEdgeIter;
             return false;
         } else {

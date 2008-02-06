@@ -117,7 +117,10 @@ void readnet(const std::string& owfnfile) {
     // diagnosefilename = (char *) 0;
 
     trace(TRACE_5, "reading from file " + owfnfile + "\n");
-    owfn_yyin = fopen(owfnfile.c_str(), "r");
+    if (owfnfile == "<stdin>") {
+        owfn_yyin = stdin;
+    }
+    else owfn_yyin = fopen(owfnfile.c_str(), "r");
     if (!owfn_yyin) {
         cerr << "cannot open owfn file " << owfnfile << "' for reading'\n" << endl;
         exit(4);
@@ -125,7 +128,10 @@ void readnet(const std::string& owfnfile) {
     // diagnosefilename = owfnfile;
 
     PN = new oWFN();
-    PN->filename = owfnfile;
+    if (owfnfile == "<stdin>") {
+        PN->filename = "stdin";
+    }
+    else PN->filename = owfnfile;
 
     owfnfileToParse = owfnfile;
     owfn_yyparse();
@@ -1183,7 +1189,7 @@ int main(int argc, char ** argv) {
         if (options[O_SIMULATES]) {
             // simulation on AnnotatedGraph
             checkSimulation(OGsFromFiles);
-            //deleteOGs(OGsFromFiles);
+            // deleteOGs(OGsFromFiles);
             return 0;
         }
 
@@ -1323,6 +1329,8 @@ int main(int argc, char ** argv) {
 	            trace(TRACE_0, "processing net " + currentowfnfile + "\n");
 	            reportNet();
 	            delete PlaceTable;
+
+                    if (currentowfnfile == "<stdin>") currentowfnfile = "stdin";
 	
 	            // start computation
 	            fileName = "";		// name of computed og-file

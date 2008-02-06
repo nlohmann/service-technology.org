@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright 2005, 2006, 2007 Peter Massuthe, Daniela Weinberg,              *
+ * Copyright 2005, 2006, 2007, 2008 Peter Massuthe, Daniela Weinberg,        *
  *           Jan Bretschneider, Niels Lohmann, Christian Gierds,             *
  *           Leonard Kern, Martin Znamirowski                                *
  *                                                                           *
@@ -569,6 +569,11 @@ void parse_command_line(int argc, char* argv[]) {
                      << "\tEnter \"fiona --help\" for more information.\n"
                      << endl;
         }
+    }
+
+    // read net from stdin
+    if (ogfiles.size() == 0 && netfiles.size() == 0 && (parameters[P_IG] || parameters[P_OG] || options[O_PNG])) {
+        netfiles.push_back("<stdin>");
     }
 
     // check if the numbers of inputfiles corresponds to the chosen mode

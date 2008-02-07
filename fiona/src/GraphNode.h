@@ -159,7 +159,7 @@ class GraphNode {
                         unsigned int number = 12345678);
 
         /// Destroys this GraphNode.
-        ~GraphNode();
+        virtual ~GraphNode();
 
         /// get the node number
         unsigned int getNumber() const;

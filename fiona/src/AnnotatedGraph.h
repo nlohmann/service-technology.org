@@ -66,6 +66,9 @@ class AnnotatedGraph : public Graph {
         typedef map<string, EdgeSet> TransitionMap;
 
     protected:
+        /// name of the file that was source of the graph
+        std::string filename;
+
         AnnotatedGraphNode* root;
 
         GraphFormulaCNF* covConstraint;
@@ -140,7 +143,7 @@ class AnnotatedGraph : public Graph {
         AnnotatedGraph();
 
         /// basic deconstructor
-        ~AnnotatedGraph();
+        virtual ~AnnotatedGraph();
 
         /// adds a node to the graph
         void addNode(AnnotatedGraphNode* node);
@@ -176,6 +179,9 @@ class AnnotatedGraph : public Graph {
         /// removes all nodes that are always false
         void removeFalseNodes();
 
+        /// returns the name of the source file for the Graph
+        std::string getFilename();
+        
         /// Returns the product OG of all given OGs.
         static AnnotatedGraph* product(const ogs_t& ogs);
 
@@ -261,6 +267,10 @@ class AnnotatedGraph : public Graph {
         void transformToPublicView(Graph* cleanPV);
 // END OF CODE FROM PL
 
+        // Provides user defined operator new. Needed to trace all new operations on this class.
+#undef new
+        NEW_OPERATOR(AnnotatedGraph)
+#define new NEW_NEW
 };
 
 #endif

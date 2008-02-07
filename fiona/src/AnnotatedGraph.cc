@@ -55,7 +55,9 @@ AnnotatedGraph::AnnotatedGraph(): root(NULL), covConstraint(NULL) {
 //! \brief a basic destructor of AnnotatedGraph
 AnnotatedGraph::~AnnotatedGraph() {
 	trace(TRACE_5, "AnnotatedGraph::~AnnotatedGraph() : start\n");
-    trace(TRACE_5, "AnnotatedGraph::~AnnotatedGraph() : end\n");
+        for (unsigned int i = 0; i < setOfNodes.size(); i++)
+            delete setOfNodes[i];
+        trace(TRACE_5, "AnnotatedGraph::~AnnotatedGraph() : end\n");
 }
 
 
@@ -187,6 +189,11 @@ void AnnotatedGraph::removeFalseNodes() {
     trace(TRACE_5, "AnnotatedGraph::removeFalseNodes(): end\n");
 }
 
+//! \brief returns the name of the graph's source file
+std::string AnnotatedGraph::getFilename()
+{
+    return filename;
+}
 
 //! \brief removes all edges that have a given node as destination
 //! \param nodeToDelete a pointer to the node that will be deleted

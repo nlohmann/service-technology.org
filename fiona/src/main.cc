@@ -342,7 +342,7 @@ string computeIG(oWFN* PN) {
         if (options[O_OUTFILEPREFIX]) {
             igFilename = outfilePrefix;
         } else {
-            igFilename = graph->returnOWFnFilename();
+            igFilename = graph->getFilename();
         }
 
         if (!options[O_CALC_ALL_STATES]) {
@@ -448,7 +448,7 @@ string computeOG(oWFN* PN) {
         if (options[O_OUTFILEPREFIX]) {
             publicViewName = outfilePrefix;
         } else {
-            publicViewName = graph->returnOWFnFilename();
+            publicViewName = graph->getFilename();
             publicViewName = publicViewName.substr(0, publicViewName.size()-5);
         }
         
@@ -487,7 +487,7 @@ string computeOG(oWFN* PN) {
         if (options[O_OUTFILEPREFIX]) {
             ogFilename = outfilePrefix;
         } else {
-            ogFilename = graph->returnOWFnFilename();
+            ogFilename = graph->getFilename();
         }
         
         if (!options[O_CALC_ALL_STATES]) {
@@ -648,7 +648,7 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace(TRACE_0, "processing net " + currentowfnfile + "\n");
         reportNet();
         delete PlaceTable;
-        
+       
         // compute OG
         OG* graph = new OG(PN);
         trace(TRACE_0, "building the operating guideline...\n");
@@ -662,7 +662,9 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         } else {
             OGsFromFiles.push_back(graph);
         }
-        delete PN;
+        // we just need the graph and no longer the oWFN
+        graph->deleteOWFN();
+        PN = NULL;
 
         netiter++;
     }
@@ -672,9 +674,9 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
     //    parameters[P_SHOW_EMPTY_NODE] = tempP_SHOW_EMPTY_NODE;
     
     AnnotatedGraph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
-    AnnotatedGraph *firstOG = *currentOGfile;
-    AnnotatedGraph *secondOG = *(++currentOGfile);
-    
+    AnnotatedGraph *firstOG = *(currentOGfile++);
+    AnnotatedGraph *secondOG = *(currentOGfile);
+
     firstOG->removeFalseNodes();
     secondOG->removeFalseNodes();
     
@@ -762,7 +764,7 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         } else {
             OGsFromFiles.push_back(graph);
         }
-        delete PN;
+        graph->deleteOWFN();
 
         netiter++;
     }
@@ -912,7 +914,7 @@ void checkCovSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         } else {
             OGsFromFiles.push_back(graph);
         }
-        delete PN;
+        graph->deleteOWFN();
         
         netiter++;
     }
@@ -1190,7 +1192,7 @@ int main(int argc, char ** argv) {
             // simulation on AnnotatedGraph
             checkSimulation(OGsFromFiles);
             // deleteOGs(OGsFromFiles);
-            return 0;
+            // return 0;
         }
 
         if (options[O_SIMULATES_WITH_COV]) {
@@ -1218,7 +1220,7 @@ int main(int argc, char ** argv) {
     // ********                  (OGs read one after the other)                  ********
     // **********************************************************************************
 
-    if (parameters[P_PV] || options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC]) {
+    else if (parameters[P_PV] || options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC]) {
 
         // Abort if there are no OGs at all
         if (ogfiles.begin() == ogfiles.end() && !(parameters[P_PV])) {
@@ -1365,7 +1367,7 @@ int main(int argc, char ** argv) {
 	            
 	            // cout << "numberOfDecodes: " << numberOfDecodes << endl;   
 	
-	            delete PN;
+	            // delete PN;
 	            trace(TRACE_5, "net deleted\n");
 	            
 	            loop++;

@@ -185,8 +185,8 @@ class CommunicationGraph : public AnnotatedGraph {
         /// checks wethe a state activates output events
         bool stateActivatesOutputEvents(State*);
 
-        /// returns the oWFN Filename this graph was created from
-        string returnOWFnFilename();
+        /// deletes the corresponding oWFN
+        void deleteOWFN();
 
         // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new

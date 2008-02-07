@@ -38,6 +38,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include "mynew.h"
 
 
 // TRUE and FALSE #defined in cudd package may interfere with
@@ -81,6 +82,12 @@ class GraphFormulaAssignment {
 
         /// returns the bool value of a literal
         bool get(const std::string& literal) const;
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphFormulaAssignment)
+#define new NEW_NEW
 };
 
 
@@ -138,6 +145,12 @@ class GraphFormula {
         /// Returns this formula in conjunctive normal form. The caller is
         /// responsible for deleting the newly created and returned formula.
         GraphFormulaCNF *getCNF();
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphFormula)
+#define new NEW_NEW
 };
 
 
@@ -236,6 +249,12 @@ class GraphFormulaMultiary : public GraphFormula {
 
         /// Returns the the number of formulas, the multiary formula consists of.
         int size() const;
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphFormulaMultiary)
+#define new NEW_NEW
 };
 
 
@@ -271,6 +290,12 @@ class GraphFormulaMultiaryAnd : public GraphFormulaMultiary {
         
         /// returns a constant empty formula equivalent
         virtual const GraphFormulaFixed& getEmptyFormulaEquivalent() const;
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphMultiaryAnd)
+#define new NEW_NEW
 };
 
 
@@ -308,6 +333,12 @@ class GraphFormulaMultiaryOr : public GraphFormulaMultiary {
         
         /// returns an empty formula equivalent
         virtual const GraphFormulaFixed& getEmptyFormulaEquivalent() const;
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphFormulaMultiaryOr)
+#define new NEW_NEW
 };
 
 
@@ -344,6 +375,12 @@ class GraphFormulaCNF : public GraphFormulaMultiaryAnd {
 
         /// Simplifies the formula by removing redundant clauses.
         void simplify();
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphFormulaCNF)
+#define new NEW_NEW
 };
 
 
@@ -387,6 +424,12 @@ class GraphFormulaLiteral : public GraphFormula {
         
         /// returns the name of the literal
         virtual std::string asString() const;
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphFormulaLiteral)
+#define new NEW_NEW
 };
 
 
@@ -414,6 +457,12 @@ class GraphFormulaFixed : public GraphFormulaLiteral {
         
         /// returns the prefixed value of this formula
         virtual bool value(const GraphFormulaAssignment& assignment) const;
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphFormulaFixed)
+#define new NEW_NEW
 };
 
 
@@ -428,6 +477,12 @@ class GraphFormulaTrue : public GraphFormulaFixed {
         /// basic deconstructor
         virtual ~GraphFormulaTrue() {
         };
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphFormulaTrue)
+#define new NEW_NEW
 };
 
 
@@ -442,6 +497,12 @@ class GraphFormulaFalse : public GraphFormulaFixed {
         /// basic deconstructor
         virtual ~GraphFormulaFalse() {
         };
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphFormulaFalse)
+#define new NEW_NEW
 };
 
 
@@ -456,6 +517,12 @@ class GraphFormulaLiteralFinal : public GraphFormulaLiteral {
         /// basic deconstructor
         virtual ~GraphFormulaLiteralFinal() {
         };
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphFormulaLiteralFinal)
+#define new NEW_NEW
 };
 
 
@@ -470,5 +537,11 @@ class GraphFormulaLiteralTau : public GraphFormulaLiteral {
         /// basic deconstructor
         virtual ~GraphFormulaLiteralTau() {
         };
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(GraphFormulaLiteralTau)
+#define new NEW_NEW
 };
 #endif

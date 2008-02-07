@@ -126,6 +126,12 @@ class Graph {
 
         /// a function needed for successful deletion of the graph
         void clearNodeSet();
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(Graph)
+#define new NEW_NEW
 };
 
 #endif

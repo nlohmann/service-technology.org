@@ -60,21 +60,35 @@ extern FILE *stg_yyin;
 CommunicationGraph::CommunicationGraph(oWFN * _PN) {
     PN = _PN;
     tempBinDecision = (binDecision *) 0;
+    filename = PN->filename;
 }
 
 
 //! \brief destructor
 CommunicationGraph::~CommunicationGraph() {
     trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : start\n");
+    trace(TRACE_5, "Deleting OG of file " + filename + "\n");
+
+    for (unsigned int i = 0; i < setOfNodes.size(); i++){
+         delete setOfNodes[i];
+         setOfSortedNodes.erase(setOfNodes[i]);
+    }
+    setOfNodes.clear();
+    
+/*
     GraphNodeSet::iterator iter;
 
     for (iter = setOfSortedNodes.begin(); iter != setOfSortedNodes.end(); iter++) {
         delete *iter;
+        setOfNodes.erase(*iter);
     }
-
+*/
     if (tempBinDecision) {
     	delete tempBinDecision;
     }
+
+    if (PN)
+        delete PN;
     
     trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : end\n");
 }
@@ -155,6 +169,7 @@ void CommunicationGraph::calculateRootNode() {
     root->setNumber(0);
     root->setName(intToString(0));
     setOfSortedNodes.insert(root);
+    // setOfNodes.push_back(root);
 
     trace(TRACE_5, "void CommunicationGraph::calculateRootNode(): end\n");
 }
@@ -745,13 +760,6 @@ void CommunicationGraph::printGraphToSTGRecursively(AnnotatedGraphNode* v,
 }
 
 
-//! \brief returns the filename of the owfn this graph has been created from
-//! \return filename
-string CommunicationGraph::returnOWFnFilename()
-{
-    return (string(PN->filename));
-}
-
 //! \brief DESCRIPTION
 //! \return DESCRIPTION
 bool CommunicationGraph::annotateGraphDistributedly() {
@@ -1042,3 +1050,10 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
     // no color found yet
     return v->setDiagnosisColor(DIAG_UNSET);
 }
+
+//! \brief deletes the corresponding oWFN
+void CommunicationGraph::deleteOWFN() {
+    if (PN) delete PN;
+    PN = NULL;
+}
+

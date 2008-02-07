@@ -113,6 +113,12 @@ class formula {
         
         /// destructor
         virtual ~formula() {};
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(formula)
+#define new NEW_NEW
 };
 
 
@@ -165,6 +171,12 @@ class atomicformula : public formula {
 
         /// returns the longest chain of subformulas connected by a specified operator
         virtual unsigned int counttype(FType);
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(atomicformula)
+#define new NEW_NEW
 };
 
 
@@ -214,6 +226,12 @@ class unarybooleanformula : public formula {
 
         /// returns a flat copy of this formula
         virtual unarybooleanformula * flat_copy();
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(unarybooleanformula)
+#define new NEW_NEW
 };
 
 
@@ -267,6 +285,12 @@ class binarybooleanformula : public formula {
 
         ///checks whether this unary boolean formula is true with a given current marking
         virtual bool init(unsigned int *);
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(binarybooleanformula)
+#define new NEW_NEW
 };
 
 
@@ -321,6 +345,12 @@ class booleanformula : public formula {
         
         /// destructor
         virtual ~booleanformula();
+
+#undef new
+        /// Provides user defined operator new. Needed to trace all new operations
+        /// on this class.
+        NEW_OPERATOR(booleanformula)
+#define new NEW_NEW
 };
 
 #endif

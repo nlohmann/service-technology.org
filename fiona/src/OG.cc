@@ -53,9 +53,11 @@ OG::OG(oWFN * _PN) :
 }
 //! \brief destructor
 OG::~OG() {
+    trace(TRACE_5, "OG::~OG() : start\n");
     if (options[O_BDD] == true) {
         delete bdd;
     }
+    trace(TRACE_5, "OG::~OG() : end\n");
 }
 //! \brief Computes the OG of the associated PN.
 void OG::buildGraph() {

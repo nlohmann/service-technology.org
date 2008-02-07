@@ -32,11 +32,11 @@
  * 
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: znamirow $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2006/09/10
- *          - last changed: \$Date: 2007/07/25 09:28:07 $
+ *          - last changed: \$Date: 2008/02/07 16:20:19 $
  * 
  * \note    This file is part of the tool PNML2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -45,7 +45,7 @@
  * \note    This file was created using GNU Bison reading file pnml-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  * 
  */
 %}
@@ -172,7 +172,7 @@ Place* p = NULL;
 ******************************************************************************/
 
 tPnml: 	
-		X_OPEN P_PNML X_NEXT 
+		X_OPEN P_PNML attributes X_NEXT 
 		 tNet 		
 		X_NEXT X_SLASH P_PNML X_CLOSE
 ;

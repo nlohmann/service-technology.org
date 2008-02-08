@@ -61,7 +61,7 @@ class interactionGraph : public CommunicationGraph {
         interactionGraph(oWFN*);
         
         /// basic deconstructor
-        ~interactionGraph();
+        virtual ~interactionGraph();
 
         /// checks whether the set of input messages contains at least one input message
         /// that has been sent at its maximum

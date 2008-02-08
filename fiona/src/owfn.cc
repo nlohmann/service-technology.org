@@ -569,8 +569,8 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 //! \param stateSet store calculated states in this state set
 //! \param n the node to be calculated in case of an output event
 void oWFN::calculateReducedSetOfReachableStatesOutputEvent(StateSet& stateSet,
-                                                           binDecision** tempBinDecision,
-												           AnnotatedGraphNode* n) {
+                                                           binDecision**,
+							   AnnotatedGraphNode* n) {
 
 	// calculates the EG starting at the current marking
     trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(AnnotatedGraphNode * n): start\n");
@@ -749,7 +749,7 @@ void oWFN::calculateReducedSetOfReachableStatesOutputEvent(StateSet& stateSet,
 //! \param stateSet set of states storing the states that were calculated using the stubborn set method
 //! \param n the node to be calculated in case of an input event
 void oWFN::calculateReducedSetOfReachableStatesInputEvent(StateSet& stateSet,
-                                                          binDecision** tempBinDecision,
+                                                          binDecision**,
                                                           AnnotatedGraphNode* n) {
 
     // calculates the EG starting at the current marking

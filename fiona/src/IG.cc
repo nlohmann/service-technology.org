@@ -195,8 +195,8 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
                 calculateSuccStatesReceivingEvent(mmSet, currentNode, v);
             }
 
-            if (v != NULL && currentNode->getColor() != RED && 
-            		addGraphNode(currentNode, v, mmSet, typeOfEdge, progress_plus)) {
+            bool added = addGraphNode(currentNode, v, mmSet, typeOfEdge, progress_plus);
+            if (v != NULL && currentNode->getColor() != RED && added) {
             	
             	if (typeOfEdge == RECEIVING) {
             		buildGraph(v, 0);            	

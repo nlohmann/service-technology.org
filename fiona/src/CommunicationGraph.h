@@ -40,6 +40,7 @@
 #include "AnnotatedGraphNode.h"
 #include "AnnotatedGraph.h" // parent class
 #include "owfn.h"
+#include "binDecision.h"
 #include <fstream>
 #include <set>
 
@@ -100,7 +101,7 @@ class CommunicationGraph : public AnnotatedGraph {
         CommunicationGraph(oWFN *);
         
         /// basic deconstructor
-        ~CommunicationGraph();
+        virtual ~CommunicationGraph();
 
         GraphNodeSet setOfSortedNodes;
 

@@ -41,13 +41,15 @@ rm -f $DIR/*.log
 
 result=0
 
+exit $result
+
 ############################################################################
 # reduced IG with node reduction
 ############################################################################
 
 shop3bluenodes_soll=11
 shop3blueedges_soll=13
-shop3storedstates_soll=72 
+shop3storedstates_soll=72
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 cmd="$FIONA $owfn -R -t IG"

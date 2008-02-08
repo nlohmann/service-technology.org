@@ -83,11 +83,6 @@ class GraphFormulaAssignment {
         /// returns the bool value of a literal
         bool get(const std::string& literal) const;
 
-#undef new
-        /// Provides user defined operator new. Needed to trace all new operations
-        /// on this class.
-        NEW_OPERATOR(GraphFormulaAssignment)
-#define new NEW_NEW
 };
 
 

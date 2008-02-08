@@ -111,6 +111,9 @@ class CommunicationGraph : public AnnotatedGraph {
         /// calculate a root node for the graph
         void calculateRootNode();
 
+        /// remove a node from the annotated graph
+        virtual void removeNode(AnnotatedGraphNode*);
+        
         /// Returns the number of nodes in this graph.
         unsigned int getNumberOfNodes() const;
 

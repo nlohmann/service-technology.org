@@ -75,14 +75,15 @@ CommunicationGraph::~CommunicationGraph() {
     }
     setOfNodes.clear();
     
-/*
-    GraphNodeSet::iterator iter;
 
-    for (iter = setOfSortedNodes.begin(); iter != setOfSortedNodes.end(); iter++) {
-        delete *iter;
-        setOfNodes.erase(*iter);
+    GraphNodeSet::iterator iter;
+    int i = 0;
+
+    for (iter = setOfSortedNodes.begin(); iter != setOfSortedNodes.end(); ++iter) {
+      delete *iter;
     }
-*/
+    setOfSortedNodes.clear();
+
     if (tempBinDecision) {
     	delete tempBinDecision;
     }
@@ -174,6 +175,27 @@ void CommunicationGraph::calculateRootNode() {
 
     trace(TRACE_5, "void CommunicationGraph::calculateRootNode(): end\n");
 }
+
+//! \brief remove a node from the CommunicationGraph
+//! \param node node to remove
+void CommunicationGraph::removeNode(AnnotatedGraphNode* node) {
+
+    trace(TRACE_5, "void CommunicationGraph::removeNode(): start\n");
+    assert(node);
+    
+    setOfSortedNodes.erase(node);  // only valid if container is a std::set
+
+    for (vector<AnnotatedGraphNode*>::iterator testnode = setOfNodes.begin(); testnode
+            != setOfNodes.end(); testnode++) {
+        if ((*testnode) == node) {
+            setOfNodes.erase(testnode);
+            break;
+        }
+    }
+    trace(TRACE_5, "void CommunicationGraph::removeNode(): end\n");
+
+}
+
 
 
 //! \brief this function uses the find method from the template set

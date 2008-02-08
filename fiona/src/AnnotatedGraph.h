@@ -121,7 +121,7 @@ class AnnotatedGraph : public Graph {
         set<std::string> recvEvents;
 	
         /// remove a node from the annotated graph
-        void removeNode(AnnotatedGraphNode*);
+        virtual void removeNode(AnnotatedGraphNode*);
         
         /// remove all nodes that have the annotation "true"
         void removeNodesAnnotatedWithTrue();
@@ -177,7 +177,7 @@ class AnnotatedGraph : public Graph {
         bool hasNoRoot() const;
 
         /// removes all nodes that are always false
-        void removeFalseNodes();
+        virtual void removeFalseNodes();
 
         /// returns the name of the source file for the Graph
         std::string getFilename();

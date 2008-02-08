@@ -167,15 +167,16 @@ void AnnotatedGraph::removeFalseNodes() {
 
         while (iNode != setOfNodes.end()) {
             GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
-            
             if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
                 
                 removeEdgesToNodeFromAllOtherNodes(*iNode);
                 if (*iNode == getRoot()) {
                     setRoot(NULL);
                 }
-                delete *iNode;
+                AnnotatedGraphNode * n = *iNode; 
                 iNode = setOfNodes.erase(iNode);
+                removeNode(n);
+                delete n;
                 nodesHaveChanged = true;
             } else {
                 ++iNode;
@@ -1605,8 +1606,9 @@ GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormulaRecursively(Annot
 //! \brief remove a node from the AnnotatedGraph
 //! \param node node to remove
 void AnnotatedGraph::removeNode(AnnotatedGraphNode* node) {
+
+    trace(TRACE_5, "AnnotatedGraph::removeNode(): start\n");
     assert(node);
-    // setOfNodes.erase(node);  // only valid if container is a std::set
 
     for (vector<AnnotatedGraphNode*>::iterator testnode = setOfNodes.begin(); testnode
             != setOfNodes.end(); testnode++) {
@@ -1615,6 +1617,7 @@ void AnnotatedGraph::removeNode(AnnotatedGraphNode* node) {
             break;
         }
     }
+    trace(TRACE_5, "AnnotatedGraph::removeNode(): end\n");
 
 }
 

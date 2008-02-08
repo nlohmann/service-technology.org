@@ -94,6 +94,9 @@ bool GraphFormulaAssignment::get(const std::string& literal) const {
 //! \brief Determines whether this GraphFormula satisfies the given
 //!        GraphFormulaAssignment. Equivalent to value().
 bool GraphFormula::satisfies(const GraphFormulaAssignment& assignment) const {
+
+    trace(TRACE_5, "GraphFormula::satisfies(const GraphFormulaAssignment& assignment) const: start\n");
+    trace(TRACE_5, "GraphFormula::satisfies(const GraphFormulaAssignment& assignment) const: end\n");
     return value(assignment);
 }
 

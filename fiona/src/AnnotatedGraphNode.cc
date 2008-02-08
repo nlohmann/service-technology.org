@@ -69,7 +69,7 @@ AnnotatedGraphNode::AnnotatedGraphNode(const std::string& _name,
 AnnotatedGraphNode::~AnnotatedGraphNode() {
     
     trace(TRACE_5, "AnnotatedGraphNode::~AnnotatedGraphNode() : start\n");
-    
+
     LeavingEdges::ConstIterator iEdge = getLeavingEdgesConstIterator();
     while (iEdge->hasNext()) {
         AnnotatedGraphEdge* edge = iEdge->getNext();
@@ -523,7 +523,9 @@ bool AnnotatedGraphNode::isToShow(const AnnotatedGraphNode* rootOfGraph) const {
 //! \return true iff the assignment satisfies the annotation
 bool AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const {
     
+    trace(TRACE_5, "AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const: start\n");
     assert(annotation != NULL);
+    trace(TRACE_5, "AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const: end\n");
     return annotation->satisfies(assignment);
 }
 
@@ -533,6 +535,7 @@ bool AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignm
 //! \return the assignment described above
 GraphFormulaAssignment* AnnotatedGraphNode::getAssignment() const {
     
+    trace(TRACE_5, "AnnotatedGraphNode::getAssignment(): start\n");
     trace(TRACE_5, "computing annotation of node " + getName() + "\n");
     
     GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
@@ -550,6 +553,7 @@ GraphFormulaAssignment* AnnotatedGraphNode::getAssignment() const {
     // we assume that literal final is always true
     myassignment->setToTrue(GraphFormulaLiteral::FINAL);
     
+    trace(TRACE_5, "AnnotatedGraphNode::getAssignment(): end\n");
     return myassignment;
 }
 

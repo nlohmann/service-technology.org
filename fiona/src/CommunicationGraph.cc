@@ -77,7 +77,6 @@ CommunicationGraph::~CommunicationGraph() {
     
 
     GraphNodeSet::iterator iter;
-    int i = 0;
 
     for (iter = setOfSortedNodes.begin(); iter != setOfSortedNodes.end(); ++iter) {
       delete *iter;

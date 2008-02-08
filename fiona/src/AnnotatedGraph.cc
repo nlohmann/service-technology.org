@@ -113,8 +113,7 @@ bool AnnotatedGraph::hasNodeWithName(const std::string& nodeName) const {
 AnnotatedGraphNode* AnnotatedGraph::getNodeWithName(const std::string& nodeName) const {
     
     for (nodes_const_iterator node_iter = setOfNodes.begin();
-         node_iter != setOfNodes.end();
-         ++node_iter) {
+         node_iter != setOfNodes.end(); ++node_iter) {
 
         if ((*node_iter)->getName() == nodeName) {
                 return *node_iter;

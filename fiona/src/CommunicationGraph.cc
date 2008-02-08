@@ -67,11 +67,11 @@ CommunicationGraph::CommunicationGraph(oWFN * _PN) {
 //! \brief destructor
 CommunicationGraph::~CommunicationGraph() {
     trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : start\n");
-    trace(TRACE_5, "Deleting OG of file " + filename + "\n");
+    trace(TRACE_5, "Deleting CommunicationGraph of file " + filename + "\n");
 
-    for (unsigned int i = 0; i < setOfNodes.size(); i++){
-         delete setOfNodes[i];
-         setOfSortedNodes.erase(setOfNodes[i]);
+    for (unsigned int i = 0; i < setOfNodes.size(); i++) {
+        setOfSortedNodes.erase(setOfNodes[i]);
+        delete setOfNodes[i];
     }
     setOfNodes.clear();
     
@@ -87,8 +87,9 @@ CommunicationGraph::~CommunicationGraph() {
     	delete tempBinDecision;
     }
 
-    if (PN)
+    if (PN) {
         delete PN;
+    }
     
     trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : end\n");
 }

@@ -216,10 +216,14 @@ void readAllOGs(AnnotatedGraph::ogs_t& theOGs) {
 //! \brief deletes all OGs from a list
 //! \param OGsFromFiles a list of OGs
 void deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles) {
-    for (AnnotatedGraph::ogs_t::const_iterator iOg = OGsFromFiles.begin(); iOg
-            != OGsFromFiles.end(); ++iOg) {
+    trace(TRACE_5, "main: deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles) : start\n");
+
+    for (AnnotatedGraph::ogs_t::const_iterator iOg = OGsFromFiles.begin();
+         iOg != OGsFromFiles.end(); ++iOg) {
         delete *iOg;
     }
+
+    trace(TRACE_5, "main: deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles) : end\n");
 }
 
 
@@ -674,8 +678,8 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
     //    parameters[P_SHOW_EMPTY_NODE] = tempP_SHOW_EMPTY_NODE;
     
     AnnotatedGraph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
-    AnnotatedGraph *firstOG = *(currentOGfile++);
-    AnnotatedGraph *secondOG = *(currentOGfile);
+    AnnotatedGraph* firstOG = *(currentOGfile++);
+    AnnotatedGraph* secondOG = *(currentOGfile);
 
     firstOG->removeFalseNodes();
     secondOG->removeFalseNodes();
@@ -694,6 +698,7 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
         trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
     }
+
     deleteOGs(OGsFromFiles);
 }
 

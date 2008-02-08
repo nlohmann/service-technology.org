@@ -59,6 +59,8 @@ OG::~OG() {
     }
     trace(TRACE_5, "OG::~OG() : end\n");
 }
+
+
 //! \brief Computes the OG of the associated PN.
 void OG::buildGraph() {
     // creates the root node and calculates its reachability graph (set of states)
@@ -74,6 +76,8 @@ void OG::buildGraph() {
     assignFinalNodes();
     computeGraphStatistics();
 }
+
+
 //! \brief Builds the OG of the associated PN recursively starting at
 //!        currentNode.
 //! \param currentNode Current node of the graph from which the build
@@ -221,6 +225,8 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
         bdd->addOrDeleteLeavingEdges(currentNode);
     }
 }
+
+
 //! \brief adds the node toAdd to the set of all nodes
 //!        and copies the eventsUsed array from the sourceNode
 //! \param sourceNode node to copy eventsUsed from
@@ -376,6 +382,8 @@ void OG::calculateSuccStatesOutput(unsigned int output,
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, AnnotatedGraphNode* node, AnnotatedGraphNode* newNode) : end\n");
 }
+
+
 //! \brief Turns all blue nodes that should be red into red ones and
 //!        simplifies their annotations by removing unneeded literals.
 //! \pre OG has been built by buildGraph().
@@ -411,6 +419,8 @@ void OG::correctNodeColorsAndShortenAnnotations() {
         node->removeUnneededLiteralsFromAnnotation();
     }
 }
+
+
 //! \brief calculates the annotation (CNF) for the node
 //! \param node the node for which the annotation is calculated
 void OG::computeCNF(AnnotatedGraphNode* node) const {
@@ -484,8 +494,7 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
                         continue;
                     } else {
                         node->hasFinalStateInStateSet = true;
-                        GraphFormulaLiteral
-                                * myliteral = new GraphFormulaLiteralFinal();
+                        GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
                         myclause->addSubFormula(myliteral);
                     }
                 }
@@ -508,6 +517,8 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
     }
     trace(TRACE_5, "OG::computeCNF(AnnotatedGraphNode * node): end\n");
 }
+
+
 //! \brief converts an OG into its BDD representation
 void OG::convertToBdd() {
     trace(TRACE_5, "OG::convertToBdd(): start\n");
@@ -518,6 +529,8 @@ void OG::convertToBdd() {
     bdd->printMemoryInUse();
     trace(TRACE_5, "OG::convertToBdd(): end\n");
 }
+
+
 //! \brief converts an OG into its BDD representation including the red nodes and the markings of the nodes
 void OG::convertToBddFull() {
     trace(TRACE_5, "OG::convertToBddFull(): start\n");
@@ -538,6 +551,8 @@ void OG::convertToBddFull() {
     delete testbdd;
     trace(TRACE_5, "OG::convertToBdd(): end\n");
 }
+
+
 //! \brief assigns the final nodes of the OG according to Gierds 2007
 void OG::assignFinalNodes() {
     trace(TRACE_5, "OG::assignFinalNodes(): start\n");

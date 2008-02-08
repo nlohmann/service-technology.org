@@ -147,6 +147,7 @@ void print_help() {
   trace("                                                 given OG\n");  
   trace("                                   png         - generate png files for all\n");
   trace("                                                 given oWFNs\n");  
+  trace("                                   readOG      - only reads a given OG File\n");
   trace(" -m | --messagebound=<level> ... set maximum number of same messages per\n");
   trace("                                 state to <level>  (default is 1)\n");
 //  trace(" -e | --eventsmaximum=<level> .. set event to occur at most <level> times\n");
@@ -288,6 +289,7 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_SHOW_ALL_NODES] = false;
     parameters[P_SHOW_STATES_PER_NODE] = false;
     parameters[P_SHOW_DEADLOCKS_PER_NODE] = false;
+    parameters[P_READ_OG] = false;
 
     bdd_reordermethod = 0;
 
@@ -400,6 +402,11 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if ((lc_optarg == "pv") || (lc_optarg == "publicview")) {
                 	parameters[P_PV] = true;
                 	parameters[P_IG] = false;
+                } else if (lc_optarg == "readog") {
+                    options[O_GRAPH_TYPE] = true;
+                    parameters[P_IG] = false;
+                    parameters[P_OG] = false;
+                    parameters[P_READ_OG] = true;
                 } else {
                     cerr << "Error:\twrong modus operandi (option -t)" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
@@ -592,7 +599,7 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
-    if ((options[O_PNG]||parameters[P_IG]||parameters[P_OG]) && netfiles.size() == 0) {
+    if ((options[O_PNG] || parameters[P_IG] || parameters[P_OG]) && netfiles.size() == 0) {
         cerr << "Error: \t No oWFNs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
@@ -624,6 +631,12 @@ void parse_command_line(int argc, char* argv[]) {
 
     if (options[O_FILTER] && ogfiles.size() != 2) {
         cerr << "Error: \t If option -t filter is used, exactly two OG files must be entered\n" << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
+    }
+
+    if (parameters[P_READ_OG] && ogfiles.size() != 1) {
+        cerr << "Error: \t If option -t readOG is used, exactly one OG files must be entered\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }

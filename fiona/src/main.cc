@@ -61,7 +61,7 @@ using namespace std;
 extern int owfn_yylineno;
 extern int owfn_yydebug;
 extern int owfn_yy_flex_debug;
-extern FILE *owfn_yyin;
+extern FILE* owfn_yyin;
 extern int owfn_yyerror();
 extern int owfn_yyparse();
 
@@ -72,7 +72,7 @@ extern int owfn_yylex_destroy();
 extern int og_yylineno;
 extern int og_yydebug;
 extern int og_yy_flex_debug;
-extern FILE *og_yyin;
+extern FILE* og_yyin;
 extern int og_yyerror();
 extern int og_yyparse();
 
@@ -497,9 +497,9 @@ string computeOG(oWFN* PN) {
         if (!options[O_CALC_ALL_STATES]) {
             ogFilename += ".R";
         }
-        
+
         graph->printOGFile(ogFilename);
-        
+
         if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
             if (controllable) {
                 graph->printGraphToSTG();
@@ -1097,7 +1097,7 @@ void checkAcyclicity(AnnotatedGraph* OG, string graphName) {
 // **********************************************************************************
 
 
-int main(int argc, char ** argv) {
+int main(int argc, char** argv) {
 
 //	bool readExpliciteOG = false;
 //	parse_command_line(argc, argv);
@@ -1174,7 +1174,7 @@ int main(int argc, char ** argv) {
     // ********                       (all OGs read first)                       ********
     // **********************************************************************************
 
-    if (options[O_PRODUCTOG] || options[O_SIMULATES_WITH_COV] ||
+    if (options[O_PRODUCTOG] || options[O_SIMULATES_WITH_COV] || parameters[P_READ_OG] ||
         options[O_SIMULATES] || (options[O_EX] && !options[O_BDD]) || options[O_FILTER]) {
 
         // reading all OG-files
@@ -1186,6 +1186,18 @@ int main(int argc, char ** argv) {
         // Must NOT be called before fclose(og_yyin);
         og_yylex_destroy();
 #endif
+
+        if (parameters[P_READ_OG]) {
+            trace(TRACE_0, "OG was read from file\n");
+            trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+
+            // only print OG size information
+#ifdef LOG_NEW
+            NewLogger::printall();
+#endif
+            return 0;
+        }
+
         if (options[O_PRODUCTOG]) {
             // calculating the product OG
             computeProductOG(OGsFromFiles);
@@ -1315,7 +1327,7 @@ int main(int argc, char ** argv) {
         for (list<std::string>::iterator netiter = netfiles.begin();
              netiter != netfiles.end(); ++netiter) {
 
-	        do {	
+	        do {
 	            numberOfEvents = 0;
 	            numberOfDecodes = 0;
 	            garbagefound = 0;
@@ -1374,7 +1386,7 @@ int main(int argc, char ** argv) {
 	
 	            // delete PN;
 	            trace(TRACE_5, "net deleted\n");
-	            
+
 	            loop++;
 	        } while (loop <= 1);	// calculate the graph of the same net twice --> once with -R and once with no -R
 	        
@@ -1400,11 +1412,12 @@ int main(int argc, char ** argv) {
 
     } // end of petrinet dependant operations
 
-
 #ifdef LOG_NEW
     NewLogger::printall();
 #endif
+
     return 0;
+
 }
 
 

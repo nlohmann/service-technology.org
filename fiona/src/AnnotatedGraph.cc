@@ -1690,6 +1690,8 @@ void AnnotatedGraph::fixDualService() {
     // prepare deadlock creation
     AnnotatedGraphNode* deadlock = NULL;
     map<std::string, AnnotatedGraphNode*> deadlockMap;
+    set<AnnotatedGraphNode*> createdNodes;
+    
     unsigned int currNumberOfDeadlocks = 0;
     if (!options[O_PV_MULTIPLE_DEADLOCKS]) {
         // create new deadlock node
@@ -1800,6 +1802,7 @@ void AnnotatedGraph::fixDualService() {
             //   currNode cannot be annotated with final (same goes for newNode)
             AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_",
                     new GraphFormulaFixed(true, ""), currNode->getColor());
+            createdNodes.insert(newNode);
             trace(TRACE_5, "created new node " + newNode->getName() + "\n");
             // create tau transition from current to new node
             AnnotatedGraphEdge* tauTransition= new AnnotatedGraphEdge(newNode, GraphFormulaLiteral::TAU);
@@ -1871,6 +1874,12 @@ void AnnotatedGraph::fixDualService() {
                 != deadlockMap.end(); ++deadlockIter) {
             this->addNode(deadlockIter->second);
         }
+    }
+
+    // add tau transition destination nodes
+    for (set<AnnotatedGraphNode*>::iterator n = createdNodes.begin(); n != createdNodes.end();
+    		++n) {
+    	this->addNode((*n));
     }
 }
 

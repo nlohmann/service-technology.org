@@ -240,7 +240,7 @@ void Graph::printDotFile(const std::string& filenamePrefix,
                          const std::string& dotGraphTitle) const {
 
     trace(TRACE_0, "creating the dot file of the OG...\n");
-
+    
     string dotFile = filenamePrefix + ".out";
     string pngFile = filenamePrefix + ".png";
     fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);

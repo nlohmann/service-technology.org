@@ -1802,7 +1802,6 @@ void AnnotatedGraph::fixDualService() {
             //   currNode cannot be annotated with final (same goes for newNode)
             AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_",
                     new GraphFormulaFixed(true, ""), currNode->getColor());
-            createdNodes.insert(newNode);
             trace(TRACE_5, "created new node " + newNode->getName() + "\n");
             // create tau transition from current to new node
             AnnotatedGraphEdge* tauTransition= new AnnotatedGraphEdge(newNode, GraphFormulaLiteral::TAU);
@@ -1844,6 +1843,7 @@ void AnnotatedGraph::fixDualService() {
 
             trace(TRACE_5, "successfully applied 2nd fix at node "
                     + currNode->getName() + "\n");
+            createdNodes.insert(newNode);
         }
 
         // check whether the current node is annotated with final
@@ -1936,10 +1936,6 @@ void AnnotatedGraph::transformOGToService(Graph* cleanPV) {
     }
     
     for (nodes_t::iterator copyNode = setOfNodes.begin(); copyNode != setOfNodes.end(); copyNode++) {
-
-        if (((*copyNode)->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0) != string::npos ) {
-            continue;
-        }
 
         AnnotatedGraphNode::LeavingEdges::Iterator edge_iter = (*copyNode)->getLeavingEdgesIterator();
         while (edge_iter->hasNext()) {

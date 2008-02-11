@@ -113,8 +113,8 @@ fi
 # 2nd Fix
 ############################################################################
 
-nodes_soll=5
-edges_soll=10
+nodes_soll=6
+edges_soll=12
 
 og="$DIR/2ndFix.og"
 cmd="$FIONA $og -t PV"
@@ -187,8 +187,8 @@ fi
 # 2nd Fix (--multipledeadlocks)
 ############################################################################
 
-nodes_soll=6
-edges_soll=10
+nodes_soll=7
+edges_soll=12
 
 og="$DIR/2ndFix.og"
 cmd="$FIONA $og -t PV --multipledeadlocks"

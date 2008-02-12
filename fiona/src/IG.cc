@@ -261,10 +261,14 @@ bool interactionGraph::addGraphNode(AnnotatedGraphNode* sourceNode,
                                     double progress_plus) {
     trace(TRACE_5, "interactionGraph::AddGraphNode (AnnotatedGraphNode * sourceNode, AnnotatedGraphNode * toAdd, messageMultiSet messages, Type type) : start\n");
 
+    if (toAdd == NULL) {
+    	return false;
+    }
+    
     if (getNumberOfNodes() == 0) { // graph contains no nodes at all
         root = toAdd; // the given node becomes the root node
         setOfSortedNodes.insert(toAdd);
-       setOfNodes.push_back(toAdd);
+        setOfNodes.push_back(toAdd);
     } else {
         AnnotatedGraphNode* found = findGraphNodeInSet(toAdd); //findGraphNode(toAdd);
 

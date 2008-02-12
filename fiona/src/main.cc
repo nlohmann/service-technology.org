@@ -1315,7 +1315,7 @@ int main(int argc, char** argv) {
             OGToMatch = readog(*(ogfiles.begin()));
         }
 
-        string fileName;
+        string fileName;	// name of og-file
         int loop = 0;		// in case the option -t eqR is set, we need each netfile to be processed twice
         ogfiles.clear();
         
@@ -1327,6 +1327,8 @@ int main(int argc, char** argv) {
         for (list<std::string>::iterator netiter = netfiles.begin();
              netiter != netfiles.end(); ++netiter) {
 
+        	// calculate the graph of the same net twice --> once with -R and once with no -R
+        	// in case the option -t eqR is set, otherwise we go through this loop only once
 	        do {
 	            numberOfEvents = 0;
 	            numberOfDecodes = 0;
@@ -1379,15 +1381,14 @@ int main(int argc, char** argv) {
 	            if (options[O_EQ_R]) {
 	            	// reverse reduction mode for the next loop
 		            options[O_CALC_ALL_STATES] = !options[O_CALC_ALL_STATES];
+		            // remember file name of og-file to check equivalence later on
 	            	ogfiles.push_back(AnnotatedGraph::addOGFileSuffix(fileName));
 	            }
 	            
-	            // cout << "numberOfDecodes: " << numberOfDecodes << endl;   
-	
-	            // delete PN;
-	            trace(TRACE_5, "net deleted\n");
+        		delete PN;
+       	        trace(TRACE_5, "net deleted\n");
 
-	            loop++;
+       	        loop++;
 	        } while (loop <= 1);	// calculate the graph of the same net twice --> once with -R and once with no -R
 	        
 	        if (options[O_EQ_R]) {

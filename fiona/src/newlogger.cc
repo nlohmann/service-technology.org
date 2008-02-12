@@ -220,7 +220,6 @@ NewLogger::~NewLogger() {
     trace(TRACE_5, "NewLogger::~NewLogger() : end\n");
 }
 
-
 //! \brief Adds memory allocation info to log for given type at fiven filepos
 //! \param type type of allocation
 //! \param filepos Format of filepos is: "file:line"
@@ -460,7 +459,6 @@ void NewLogger::printall_by_typesize() {
          << total_alloccallcount - total_dealloccallcount
          << " allocs w/o matching deallocs" << endl;
 }
-
 
 //! \brief new not logging 'new' function
 //! \param size size of the allocated memory

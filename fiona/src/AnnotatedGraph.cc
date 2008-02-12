@@ -320,6 +320,7 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
             }
             trace(TRACE_4, ")\n");
         }        
+        delete edgeIter;
         delete simNodeAnnotationInCNF;
         delete myNodeAnnotationInCNF;
 
@@ -358,6 +359,7 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
                 AnnotatedGraphEdge* edge = edgeIter->getNext();
                 trace(TRACE_4, "\t\t\t" + edge->getLabel() + "\n");
             }
+            delete edgeIter;
             delete simEdgeIter;
             return false;
         } else {

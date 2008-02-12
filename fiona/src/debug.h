@@ -64,6 +64,9 @@ void trace(std::string message);
 /// turns an integer into its string representation
 std::string intToString(int);
 
+/// turns a double value into its string representation
+std::string doubleToString(double);
+
 /// checks whether a string shows a nonnegative integer
 bool isNonNegativeInteger(const std::string& s);
 

@@ -296,6 +296,7 @@ class NewLogger {
 
         /// Prints report table. Sorted by allocated memory, grouped by type.
         static void printall_by_typesize();
+        
 };
 
 #endif /// LOG_NEW

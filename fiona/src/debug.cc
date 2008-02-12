@@ -75,6 +75,15 @@ std::string intToString(int i) {
     return std::string(buffer);
 }
 
+//! \brief turns a double value into a string
+//! \param i standard C double
+//! \return  C++ string representing i
+std::string doubleToString(double i) {
+    char buffer[20];
+    sprintf(buffer, "%.2f", i);
+
+    return std::string(buffer);
+}
 
 //! \brief tests wherther the given string shows a non negative integer
 //! \param s string to test

@@ -66,7 +66,6 @@ binDecision::binDecision(int b, long int BitVectorSize) :
 
 //! \brief destructor
 binDecision::~binDecision() {
-    
 	delete[] vector;
 	
     delete state;

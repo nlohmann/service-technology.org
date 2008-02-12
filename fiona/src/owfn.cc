@@ -106,7 +106,9 @@ oWFN::~oWFN() {
     outputPlaceIndices.clear();
 
     delete[] CurrentMarking;
+
     delete[] FinalMarking;
+
     delete FinalCondition;
 
     trace(TRACE_5, "oWFN::~oWFN() : end\n");

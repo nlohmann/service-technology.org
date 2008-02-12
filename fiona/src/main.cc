@@ -1384,8 +1384,8 @@ int main(int argc, char** argv) {
 		            // remember file name of og-file to check equivalence later on
 	            	ogfiles.push_back(AnnotatedGraph::addOGFileSuffix(fileName));
 	            }
-	            
-        		delete PN;
+
+	            //delete PN;
        	        trace(TRACE_5, "net deleted\n");
 
        	        loop++;

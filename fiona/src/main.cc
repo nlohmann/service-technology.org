@@ -390,7 +390,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
     trace("\n");
 
     outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
-    outfilePrefix += ".pvsa";
+    outfilePrefix += ".sa";
 
     Graph* cleanPV = new Graph();
     

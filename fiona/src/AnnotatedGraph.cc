@@ -1689,15 +1689,34 @@ void AnnotatedGraph::constructDualService() {
 //! \brief applies 1st and 2nd fix to dual service in order to obtain a correct result
 //! \complexity O(n*2i*o+m), with n nodes, m edges, i input and o output events
 void AnnotatedGraph::fixDualService() {
+	
+	// NEEDS COMPLETLY NEW COMMENTING DUE TO SEVERE CHANGES
+	
     // prepare deadlock creation
     AnnotatedGraphNode* deadlock = NULL;
     map<std::string, AnnotatedGraphNode*> deadlockMap;
+    unsigned int currNumberOfDeadlocks = 0;
+    
+    // prepare sinkNode creation 
+    AnnotatedGraphNode* sinkNode = NULL;
+    bool addSink = false;
+    
+    // gather created nodes in order to add it to the graph
     set<AnnotatedGraphNode*> createdNodes;
     
-    unsigned int currNumberOfDeadlocks = 0;
+    // save all nodes where 2ndFixB has been applied, so they are not made final
+    set<AnnotatedGraphNode*> FixBNodes;
+    
     if (!options[O_PV_MULTIPLE_DEADLOCKS]) {
         // create new deadlock node
         deadlock = new AnnotatedGraphNode("deadlock", new GraphFormulaFixed(false, GraphFormulaLiteral::FALSE));
+    }
+
+    // NOTE: This parameter is currently a placeholder, a parameter for 
+    //       multiple sinks will be implemented soon
+    if (!options[O_PV_MULTIPLE_DEADLOCKS]) {
+        // create new sink node
+        sinkNode = new AnnotatedGraphNode("sink", new GraphFormulaLiteralFinal());
     }
 
     // iterate over all nodes of the AnnotatedGraph
@@ -1710,10 +1729,22 @@ void AnnotatedGraph::fixDualService() {
         // preparation: assume all receive events are disabled in current node (dual service)
         set<std::string> disabledRecvEvents = recvEvents;
 
-        // 2nd fix: if ?z is enabled in q of OG, but ?z does not occur in the
+        // 2nd fix A: if ?z is enabled in q of OG and no ?-literals occur in the
         //	annotation of q create a new node without ?z and a tau-transition
-        // preparation: assume we don't have to apply the 2nd fix in current node
-        bool apply2ndFix = false;
+        // preparation: assume we don't have to apply the 2ndA fix in current node
+        bool apply2ndFixA = false;
+        
+        // 2nd fix B: if there are no ?-literals in the annotation of q, if there is at
+        // least one outgoing transition and if q has "final" in it's annotation, create
+        // a new final node q_tau in the pvsa and a tau-transition q -> q_tau 
+        // preparation: assume we don't have to apply the 2ndB fix in current node        
+        bool apply2ndFixB = false;
+                
+        // 3rd fix: if q has "final" in it's annotation and there are only outgoing ?-Transition
+        // create a new final node q' in the pvsa and a tau-transition q -> q_tau
+        // Note: These final nodes can be merged into one, which is then called "sink"
+        bool apply3rdFix = false;
+
         // preparation: we need to store the leaving edges for the new node somewhere
         set<AnnotatedGraphEdge*> newNodesEdges;
         AnnotatedGraphNode::LeavingEdges::Iterator edge_iter = currNode->getLeavingEdgesIterator();
@@ -1731,7 +1762,19 @@ void AnnotatedGraph::fixDualService() {
         while (edge_iter->hasNext()) {
             AnnotatedGraphEdge* currEdge = edge_iter->getNext();
             std::string currLabel = currEdge->getLabel();
-            std::string currAnnotation = currNode->getAnnotationAsString();
+            
+            // Simplify the annotation so only literals that matter are left over
+            currNode->getAnnotation()->simplify();
+            std::string currAnnotation = currNode->getAnnotation()->asString();
+
+            // Check whether the 2ndFix B has to be applied
+            if (currAnnotation.find("?") == std::string::npos) {
+            	if (!(currAnnotation.find("final") == std::string::npos)) {
+            		apply2ndFixB = true;
+            		FixBNodes.insert(currNode);
+            	}
+            }
+
             // act on transition type
             switch (currEdge->getType()) {
                 case RECEIVING:
@@ -1744,18 +1787,27 @@ void AnnotatedGraph::fixDualService() {
                     // we want to look for the current edge's label in the current node's
                     // annotation, so we have to toggle the edge type temporarily
                     currLabel[0] = '?';
-                    // check whether the current edge's label occurs in the annotation
-                    if (currAnnotation.find(currLabel) == std::string::npos) {
-                        // current edge's label does not occur in the annotation
-                        // we have to apply the 2nd fix at this node
-                        apply2ndFix = true;
-                        trace(TRACE_5, "need to apply 2nd fix at node "
+                    // check whether any ?-literals occur in the annotation
+                    if (currAnnotation.find("?") == std::string::npos) {
+                        // no ?-literals occur in the annotation
+                        // we have to apply the 2nd A fix at this node
+                        apply2ndFixA = true;
+                        trace(TRACE_5, "need to apply 2nd fix A at node "
                                 + currNode->getName() + "\n");
-                        trace(TRACE_5, "transition " + currLabel
-                                + " does not occur in annotation!\n");
+
                         // erase current transition from the set of transitions of the new node
                         newNodesEdges.erase(currEdge);
                     }
+                    
+                	// check whether the 3rd Fix needs to be applied
+                    if (!(currAnnotation.find("final") == std::string::npos) &&
+                			!(currAnnotation.find(currLabel) == std::string::npos)) {
+                		apply3rdFix = true;
+                		
+                		// the sink node will be added to the nodes of the graph at the end
+                		addSink = true;
+                	}
+
                     // set the flag for outgoing sending transitions
                     hasSendingTransitions = true;
                     break;
@@ -1767,6 +1819,12 @@ void AnnotatedGraph::fixDualService() {
         }
         delete edge_iter;
 
+        // This should never happen, still it has not been proven yet
+        if ((apply2ndFixA && apply2ndFixB)) {
+        	trace(TRACE_5, "Conflict between 2ndFixA and 2ndFixB!");
+        	apply2ndFixA = false;
+        }
+        
         // iterate over all disabled receive events
         // if 1st fix needs to be applied, the set of disabled receive events is not empty
         for (set<std::string>::iterator event_iter = disabledRecvEvents.begin();
@@ -1788,23 +1846,82 @@ void AnnotatedGraph::fixDualService() {
                     deadlockMap[*event_iter] = deadlock;
                 }
             }
+            
             // create new leaving edge from current node to the deadlock node
             //   labeled with current event
             AnnotatedGraphEdge* disabledEvent= new AnnotatedGraphEdge(deadlock, *event_iter);
             currNode->addLeavingEdge(disabledEvent);
         }
 
-        // check whether the 2nd fix needs to be applied at this node
-        if (apply2ndFix) {
-            // 2nd fix needs to be applied at this node
+        // check whether the 2nd fix A needs to be applied at this node
+        if (apply2ndFixA) {
+            // 2nd fix A needs to be applied at this node
             trace(TRACE_5, "applying 2nd fix at node " + currNode->getName()
                     + "\n");
             // create new node
             // as there exists a leaving edge representing a send event in currNode,
             //   currNode cannot be annotated with final (same goes for newNode)
-            AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_",
+            AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_tau",
                     new GraphFormulaFixed(true, ""), currNode->getColor());
             trace(TRACE_5, "created new node " + newNode->getName() + "\n");
+            // create tau transition from current to new node
+            AnnotatedGraphEdge* tauTransition= new AnnotatedGraphEdge(newNode, GraphFormulaLiteral::TAU);
+            currNode->addLeavingEdge(tauTransition);
+            trace(TRACE_5, "created tau transition from " + currNode->getName()
+                    +" to "+ newNode->getName() + "\n");
+
+            // add current node's leaving edges to new node 
+            //   except those that don't occur in the annotation
+            trace(TRACE_5, "adding leaving edges to new node\n");
+            for (set<AnnotatedGraphEdge*>::iterator edge_iter = newNodesEdges.begin(); edge_iter
+                    != newNodesEdges.end(); ++edge_iter) {
+                // create new leaving edge
+                AnnotatedGraphEdge* newEdge= new AnnotatedGraphEdge((*edge_iter)->getDstNode(),
+                        (*edge_iter)->getLabel());
+                newNode->addLeavingEdge(newEdge);
+                trace(TRACE_5, "\tadding edge " + newEdge->getLabel() +" from "
+                        + newNode->getName() + " to "+newEdge->getDstNode()->getName() + "\n");
+            }
+            
+            // add disabled receive events from 1st fix to new node
+            for (set<std::string>::iterator
+                    event_iter = disabledRecvEvents.begin(); event_iter
+                    != disabledRecvEvents.end(); ++event_iter) {
+                if (options[O_PV_MULTIPLE_DEADLOCKS]) {
+                    // O_PV_MULTIPLE_DEADLOCKS is set
+                    // try to read deadlock node from the mapping event->node
+                    deadlock = deadlockMap[*event_iter];
+                    // deadlock node should have been created already by 1st fix
+                    assert(deadlock);
+                }
+                // create new edge from new node to the deadlock node
+                //   labeled with current event
+                AnnotatedGraphEdge* disabledEvent= new AnnotatedGraphEdge(deadlock, *event_iter);
+                newNode->addLeavingEdge(disabledEvent);
+                trace(TRACE_5, "\tadding edge " + disabledEvent->getLabel()
+                        +" from "+ newNode->getName() + " to "
+                        + deadlock->getName() + "\n");
+            }
+
+            trace(TRACE_5, "successfully applied 2nd fix at node "
+                    + currNode->getName() + "\n");
+            
+            // insert node into the set of created nodes
+            createdNodes.insert(newNode);
+        }
+
+        // check whether the 2nd fix B needs to be applied at this node
+        if (apply2ndFixB) {
+            // 2nd fix B needs to be applied at this node
+            trace(TRACE_5, "applying 2nd fix B at node " + currNode->getName()
+                    + "\n");
+            // create new node
+            // this node is a final node of the pvsa
+            AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_tau",
+                    new GraphFormulaLiteralFinal(), currNode->getColor());
+            
+            trace(TRACE_5, "created new node " + newNode->getName() + "\n");
+            
             // create tau transition from current to new node
             AnnotatedGraphEdge* tauTransition= new AnnotatedGraphEdge(newNode, GraphFormulaLiteral::TAU);
             currNode->addLeavingEdge(tauTransition);
@@ -1834,6 +1951,7 @@ void AnnotatedGraph::fixDualService() {
                     // deadlock node should have been created already by 1st fix
                     assert(deadlock);
                 }
+                
                 // create new edge from new node to the deadlock node
                 //   labeled with current event
                 AnnotatedGraphEdge* disabledEvent= new AnnotatedGraphEdge(deadlock, *event_iter);
@@ -1848,10 +1966,41 @@ void AnnotatedGraph::fixDualService() {
             createdNodes.insert(newNode);
         }
 
+        // check whether the 3rd fix needs to be applied at this node
+        if (apply3rdFix) {
+            // 3rd fix needs to be applied at this node
+            trace(TRACE_5, "applying 3rd fix at node " + currNode->getName()
+                    + "\n");
+            // create new node
+            // as there exists a leaving edge representing a send event in currNode,
+            //   currNode cannot be annotated with final (same goes for newNode)
+            if (options[O_PV_MULTIPLE_DEADLOCKS]) {
+            	AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_tau",
+            			new GraphFormulaLiteralFinal(), currNode->getColor());
+            	trace(TRACE_5, "created new node " + newNode->getName() + "\n");
+            	sinkNode = newNode;
+            }
+            
+            // create tau transition from current to new node
+            AnnotatedGraphEdge* tauTransition= new AnnotatedGraphEdge(sinkNode, GraphFormulaLiteral::TAU);
+            currNode->addLeavingEdge(tauTransition);
+            trace(TRACE_5, "created tau transition from " + currNode->getName()
+                    +" to "+ sinkNode->getName() + "\n");
+
+            trace(TRACE_5, "successfully applied 2nd fix at node "
+                    + currNode->getName() + "\n");
+            
+            // Add the sink node of this specific current node to the created nodes
+            if (options[O_PV_MULTIPLE_DEADLOCKS]) {
+            	createdNodes.insert(sinkNode);
+            }
+        }
+
         // check whether the current node is annotated with final
         string::size_type loc =(currNode->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0);
-        if ((loc != string::npos) && !hasSendingTransitions) {
+        if ((loc != string::npos) && !hasSendingTransitions && FixBNodes.find(currNode)==FixBNodes.end()) {
             // current node is annotated with final and has no sending transitions
+        	// and is not a node that was already fixed by 2nd Fix B
             // reduce annotation to final only (mark final state of the automaton)
 
             GraphFormulaMultiaryOr* myclause= new GraphFormulaMultiaryOr();
@@ -1859,7 +2008,7 @@ void AnnotatedGraph::fixDualService() {
             currNode->setAnnotation(new GraphFormulaCNF(myclause));
         } else {
             // current node is not annotated with final or has sending transitions
-            // remove annotation of the current node
+            // or was already fixed by 2nd Fix B, remove annotation of the current node
             GraphFormulaMultiaryOr* myclause= new GraphFormulaMultiaryOr();
             myclause->addSubFormula(new GraphFormulaFixed(true, GraphFormulaLiteral::TRUE));
             //            myclause->addSubFormula(new GraphFormulaFixed(true, ""));
@@ -1878,11 +2027,18 @@ void AnnotatedGraph::fixDualService() {
         }
     }
 
+    // add the sink node in case it was used and if there was only one sink for the whole pvsa
+    if (!(options[O_PV_MULTIPLE_DEADLOCKS]) && addSink) {
+    	createdNodes.insert(sinkNode);
+    }
+
     // add tau transition destination nodes
     for (set<AnnotatedGraphNode*>::iterator n = createdNodes.begin(); n != createdNodes.end();
     		++n) {
     	this->addNode((*n));
     }
+
+
 }
 
 

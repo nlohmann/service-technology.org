@@ -1,0 +1,24 @@
+{test2 op1}
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1;
+
+INPUT
+  a;
+
+INITIALMARKING
+  p0:   1;
+
+FINALCONDITION
+  ((p1 = 1) OR (p0 = 1));
+
+TRANSITION t1    
+CONSUME
+  p0:   1,
+  a:    1;
+PRODUCE
+  p1:   1;
+
+{ END OF FILE }

@@ -40,39 +40,6 @@ rm -f $DIR/*.log
 result=0
 
 ############################################################################
-# basic (owfn)
-############################################################################
-
-nodes_soll=5
-edges_soll=8
-
-og="$DIR/basic.owfn"
-cmd="$FIONA $og -t PV -Q"
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$og.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
-    nodes=$?
-
-    echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
-    edges=$?
-
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
-    then
-    echo   ... failed to build PVSA correctly
-    fi
-
-    result=`expr $result + $nodes + $edges`
-fi
-
-
-############################################################################
 # 1st Fix
 ############################################################################
 
@@ -110,13 +77,13 @@ fi
 
 
 ############################################################################
-# 2nd Fix
+# 2nd FixA
 ############################################################################
 
-nodes_soll=6
-edges_soll=12
+nodes_soll=5
+edges_soll=6
 
-og="$DIR/2ndFix.og"
+og="$DIR/2ndFixA.og"
 cmd="$FIONA $og -t PV"
 
 if [ "$quiet" != "no" ]; then
@@ -145,6 +112,151 @@ else
     result=`expr $result + $nodes + $edges`
 fi
 
+
+############################################################################
+# 2nd FixB
+############################################################################
+
+nodes_soll=4
+edges_soll=4
+
+og="$DIR/2ndFixB.og"
+cmd="$FIONA $og -t PV"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
+    nodes=$?
+
+    echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
+    edges=$?
+
+    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    then
+    echo   ... failed to build PVSA correctly
+    fi
+
+    result=`expr $result + $nodes + $edges`
+fi
+
+############################################################################
+# 3rd Fix
+############################################################################
+
+nodes_soll=6
+edges_soll=5
+
+og="$DIR/3rdFix.og"
+cmd="$FIONA $og -t PV"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
+    nodes=$?
+
+    echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
+    edges=$?
+
+    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    then
+    echo   ... failed to build PVSA correctly
+    fi
+
+    result=`expr $result + $nodes + $edges`
+fi
+
+
+############################################################################
+# 2nd FixB as owfn
+############################################################################
+
+nodes_soll=4
+edges_soll=4
+
+og="$DIR/2ndFixB.owfn"
+cmd="$FIONA $og -t PV"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
+    nodes=$?
+
+    echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
+    edges=$?
+
+    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    then
+    echo   ... failed to build PVSA correctly
+    fi
+
+    result=`expr $result + $nodes + $edges`
+fi
+
+############################################################################
+# 3rd Fix as owfn
+############################################################################
+
+nodes_soll=6
+edges_soll=5
+
+og="$DIR/3rdFix.owfn"
+cmd="$FIONA $og -t PV"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
+    nodes=$?
+
+    echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
+    edges=$?
+
+    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    then
+    echo   ... failed to build PVSA correctly
+    fi
+
+    result=`expr $result + $nodes + $edges`
+fi
 
 ############################################################################
 # 1st Fix (--multipledeadlocks)
@@ -184,13 +296,13 @@ fi
 
 
 ############################################################################
-# 2nd Fix (--multipledeadlocks)
+# 2nd FixA (--multipledeadlocks)
 ############################################################################
 
-nodes_soll=7
-edges_soll=12
+nodes_soll=5
+edges_soll=6
 
-og="$DIR/2ndFix.og"
+og="$DIR/2ndFixA.og"
 cmd="$FIONA $og -t PV --multipledeadlocks"
 
 if [ "$quiet" != "no" ]; then

@@ -201,7 +201,6 @@ void CommunicationGraph::removeNode(AnnotatedGraphNode* node) {
 //! \param toAdd the AnnotatedGraphNode we are looking for in the graph
 //! \return toAdd itself or NULL if toAdd could not be found 
 AnnotatedGraphNode* CommunicationGraph::findGraphNodeInSet(AnnotatedGraphNode* toAdd) {
-
     GraphNodeSet::iterator iter = setOfSortedNodes.find(toAdd);
     if (iter != setOfSortedNodes.end()) {
         return *iter;

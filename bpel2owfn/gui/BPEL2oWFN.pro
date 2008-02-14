@@ -15,7 +15,7 @@ TRANSLATIONS += translation_de.ts
 
 # the icon used for the application
 mac:ICON     += resource/bpel2owfn.icns
-# win32:RC_FILE+= resource/bpel2owfn.rc
+win32:RC_FILE+= resource/bpel2owfn.rc
 
 # a file containing information about used resources (icons, graphics)
 RESOURCES    += BPEL2oWFN.qrc

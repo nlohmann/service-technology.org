@@ -80,8 +80,8 @@ extern int og_yyparse();
 extern int og_yylex_destroy();
 #endif
 
-/// Deletes all OGs in 'OGsFromFiles'.
-void deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles);
+/// Deletes all OGs in 'OGsFromFiles' and clears list.
+void deleteOGs(AnnotatedGraph::ogs_t& OGsFromFiles);
 
 extern unsigned int State::state_count;
 extern std::list<std::string> netfiles;
@@ -215,13 +215,15 @@ void readAllOGs(AnnotatedGraph::ogs_t& theOGs) {
 
 //! \brief deletes all OGs from a list
 //! \param OGsFromFiles a list of OGs
-void deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles) {
+void deleteOGs(AnnotatedGraph::ogs_t& OGsFromFiles) {
     trace(TRACE_5, "main: deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles) : start\n");
 
     for (AnnotatedGraph::ogs_t::const_iterator iOg = OGsFromFiles.begin();
          iOg != OGsFromFiles.end(); ++iOg) {
         delete *iOg;
     }
+
+    OGsFromFiles.clear();
 
     trace(TRACE_5, "main: deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles) : end\n");
 }
@@ -1380,15 +1382,15 @@ int main(int argc, char** argv) {
 	
 	            if (options[O_EQ_R]) {
 	            	// reverse reduction mode for the next loop
-		            options[O_CALC_ALL_STATES] = !options[O_CALC_ALL_STATES];
-		            // remember file name of og-file to check equivalence later on
+		        options[O_CALC_ALL_STATES] = !options[O_CALC_ALL_STATES];
+		        // remember file name of og-file to check equivalence later on
 	            	ogfiles.push_back(AnnotatedGraph::addOGFileSuffix(fileName));
 	            }
 
 	            //delete PN;
-       	        trace(TRACE_5, "net deleted\n");
+       	            //trace(TRACE_5, "net deleted\n");
 
-       	        loop++;
+       	            loop++;
 	        } while (loop <= 1);	// calculate the graph of the same net twice --> once with -R and once with no -R
 	        
 	        if (options[O_EQ_R]) {
@@ -1400,8 +1402,8 @@ int main(int argc, char** argv) {
 	            checkEquivalence(OGsFromFiles);
 	            
 	            OGsFromFiles.clear();
-	        	loop = 0;
-	        	ogfiles.clear();
+	            loop = 0;
+	            ogfiles.clear();
 	        }
         }
 

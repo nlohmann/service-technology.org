@@ -822,7 +822,9 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(AnnotatedGraphNod
     // standard procedurce
     visitedNodes[v] = true;
 
+    delete edgeIter;
     edgeIter = v->getLeavingEdgesConstIterator();
+
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = element->getDstNode();

@@ -300,6 +300,7 @@ bool AnnotatedGraphNode::changes_color(AnnotatedGraphEdge* e) const {
         AnnotatedGraphEdge* element = edgeIter->getNext();
         v_edges[element->getLabel()] = element;
     }
+    delete edgeIter;
     edgeIter = vNext->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* element = edgeIter->getNext();

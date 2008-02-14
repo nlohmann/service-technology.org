@@ -695,6 +695,8 @@ void OG::assignFinalNodes() {
                 }
             }
             
+            delete edge;
+
             if (receivesOnly) {
                 finalNodes.push_back(*node);
             }

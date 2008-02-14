@@ -56,7 +56,10 @@ AnnotatedGraph::AnnotatedGraph(): root(NULL), covConstraint(NULL) {
 AnnotatedGraph::~AnnotatedGraph() {
 	trace(TRACE_5, "AnnotatedGraph::~AnnotatedGraph() : start\n");
         for (unsigned int i = 0; i < setOfNodes.size(); i++)
+        {
             delete setOfNodes[i];
+        }
+        setOfNodes.clear();
         trace(TRACE_5, "AnnotatedGraph::~AnnotatedGraph() : end\n");
 }
 

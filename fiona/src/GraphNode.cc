@@ -316,6 +316,7 @@ bool GraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) c
             // if there is a sending edge to a differently colored sucessor, take this edge;
             // otherwise: store this edge for future considerations
             if (element->getType() == SENDING ) {
+                delete edgeIter;
                 return true;
             } else {
                 edges_to_differently_colored_successors.insert(element);
@@ -438,6 +439,7 @@ bool GraphNode::changes_color(GraphEdge* e) const {
         GraphEdge* element = edgeIter->getNext();
         v_edges[element->getLabel()] = element;
     }
+    delete edgeIter;
     edgeIter = vNext->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         GraphEdge* element = edgeIter->getNext();

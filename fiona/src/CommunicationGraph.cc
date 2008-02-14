@@ -163,7 +163,7 @@ void CommunicationGraph::calculateRootNode() {
         //	root->addState(*iter2);            	
         }
         if (tempBinDecision) {
-        //	delete tempBinDecision;
+        	delete tempBinDecision;
         }
     }
 

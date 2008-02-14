@@ -160,7 +160,7 @@ void CommunicationGraph::calculateRootNode() {
         for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
                                         != setOfStatesStubbornTemp.end(); iter2++) {
                     	
-        	root->addState(*iter2);            	
+        //	root->addState(*iter2);            	
         }
         if (tempBinDecision) {
         //	delete tempBinDecision;

@@ -461,8 +461,6 @@ void interactionGraph::getActivatedEventsComputeCNF(AnnotatedGraphNode* node,
                 // this clause's first literal
                 GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
 
-                //literal * cl = new literal();			// create a new clause for this particular state
-
                 (*iter)->decode(PN); // get the marking for this state
 
                 if ((*iter)->quasiFirelist) { // delete the list of quasi enabled transitions
@@ -470,10 +468,10 @@ void interactionGraph::getActivatedEventsComputeCNF(AnnotatedGraphNode* node,
                     (*iter)->quasiFirelist = NULL;
                 }
                 (*iter)->quasiFirelist = PN->quasiFirelist(); // get the firelist of the quasi enabled transitions
-
+                
                 i = 0;
                 // get the activated input events
-                //	cout << "state " << PN->getCurrentMarkingAsString() << " activates the input events: " << (*iter)->quasiFirelist << ", " << (*iter)->quasiFirelist[i] << endl;
+               // cout << "state " << PN->getCurrentMarkingAsString() << " activates the input events: " << (*iter)->quasiFirelist << ", " << (*iter)->quasiFirelist[i]->name << endl;
                 while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
                     for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin(); index
                             != (*iter)->quasiFirelist[i]->messageSet.end(); index++) {
@@ -485,10 +483,8 @@ void interactionGraph::getActivatedEventsComputeCNF(AnnotatedGraphNode* node,
 
                         GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
                         myclause->addSubFormula(myliteral);
-
-                        //cl->addLiteral(PN->getPlace(*index)->getLabelForCommGraph());
-
-                        //			cout << "\t" << PN->getPlace(*index)->name << endl;
+                        
+                       // cout << "node no: " << node->getName() << " found input: " << PN->getPlace(*index)->getLabelForCommGraph() << endl;
                     }
                     i++;
                 }
@@ -503,8 +499,6 @@ void interactionGraph::getActivatedEventsComputeCNF(AnnotatedGraphNode* node,
 
                         GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(i)->getLabelForCommGraph());
                         myclause->addSubFormula(myliteral);
-
-                        //cl->addLiteral(PN->getPlace(i)->getLabelForCommGraph());	
                     }
                 }
 
@@ -517,7 +511,6 @@ void interactionGraph::getActivatedEventsComputeCNF(AnnotatedGraphNode* node,
                 }
 
                 node->addClause(myclause);
-                //node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
             }
         }
     } else {
@@ -531,12 +524,18 @@ void interactionGraph::getActivatedEventsComputeCNF(AnnotatedGraphNode* node,
                 // this clause's first literal
                 GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
 
-                //				literal * cl = new literal();			// create a new clause for this particular state
                 (*iter)->decode(PN);
 
+                if ((*iter)->quasiFirelist) { // delete the list of quasi enabled transitions
+                    delete [] (*iter)->quasiFirelist;
+                    (*iter)->quasiFirelist = NULL;
+                }
+                (*iter)->quasiFirelist = PN->quasiFirelist(); // get the firelist of the quasi enabled transitions
+
+                
                 i = 0;
                 // get the activated input events
-                //	cout << "state " << PN->getCurrentMarkingAsString() << " activates the input events: " << (*iter)->quasiFirelist << ", " << (*iter)->quasiFirelist[i] << endl;
+                //cout << "state " << PN->getCurrentMarkingAsString() << " activates the input events: " << (*iter)->quasiFirelist << ", " << (*iter)->quasiFirelist[i] << endl;
                 while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
                     for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin(); index
                             != (*iter)->quasiFirelist[i]->messageSet.end(); index++) {
@@ -584,6 +583,10 @@ void interactionGraph::getActivatedEventsComputeCNF(AnnotatedGraphNode* node,
         }
 
     }
+    
+  //  cout << "node no. " << node->getName() << " annotation: " << node->getAnnotationAsString() << endl;
+    
+    
     trace(TRACE_5, "interactionGraph::getActivatedInputEvents(AnnotatedGraphNode * node): end\n");
 
 }

@@ -398,6 +398,10 @@ void owfnTransition::check_enabled(oWFN * PN) {
         }
     }
 
+  //  cout << "BEFORE" << endl;
+ //   cout << "current marking: " << PN->getCurrentMarkingAsString() << endl;
+ //   cout << "transition " << name << " is quasiEnabled: " << isQuasiEnabled() << " and enabled: " << isEnabled() << endl;
+    
     if (enabledNr == getArrivingArcsCount()) { // there are as many pre-places appropriatly marked as there are incoming arcs
         if (!isEnabled()) { // transition was not enabled before
             // include transition into list of enabled transitions
@@ -431,8 +435,10 @@ void owfnTransition::check_enabled(oWFN * PN) {
             PN->quasiEnabledTransitions.remove(this); // delete transition from list of quasi enabled transtions
         }
     }
-    // cout << "current marking: " << PN->getCurrentMarkingAsString() << endl;
-    // cout << "transition " << name << " is quasiEnabled: " << isQuasiEnabled() << " and enabled: " << enabled << endl;
+    
+//    cout << "AFTER" << endl;
+ //  cout << "current marking: " << PN->getCurrentMarkingAsString() << endl;
+ //  cout << "transition " << name << "(" << this << ")" << " is quasiEnabled: " << isQuasiEnabled() << " and enabled: " << isEnabled() << endl;
 
     // trace(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : end\n");
 }

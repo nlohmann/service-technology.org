@@ -648,11 +648,7 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
             return;
         }
     }
- //   for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
- //                                              != setOfStatesStubbornTemp.end(); iter2++) {
-                           	
-    	//newNode->addState(*iter2);            	
-   // }
+
     // delete temporarily calculated set of states
     if (tempBinDecision) {
     	delete tempBinDecision;
@@ -697,25 +693,25 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
             PN->calculateReducedSetOfReachableStates(stateSet, &tempBinDecision, receivingEvent, newNode);
         }
 
+        binDecision * tempBinDecision2 = (binDecision *) 0;
+        
         for (StateSet::iterator iter2 = stateSet.begin(); iter2
                 != stateSet.end(); iter2++) {
             (*iter2)->decode(PN); // get the marking of the state
 
             if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
-                PN->calculateReducedSetOfReachableStatesOutputEvent(setOfStatesStubbornTemp, &tempBinDecision, 
+                PN->calculateReducedSetOfReachableStatesOutputEvent(setOfStatesStubbornTemp, 
+                											&tempBinDecision2, 
                 											newNode); // calc the reachable states from that marking
 
             }
         }
         
-   //     for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
-    //                                    != setOfStatesStubbornTemp.end(); iter2++) {
-                    	
-        //	newNode->addState(*iter2);            	
-   //     }
-        
         if (tempBinDecision) {
         	delete tempBinDecision;
+        }
+        if (tempBinDecision2) {
+        	delete tempBinDecision2;
         }
     }
 

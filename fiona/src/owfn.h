@@ -242,6 +242,7 @@ class oWFN {
         /// decodes state, figures out if state activates output event, 
         ///		checks for message bound violation and adds successors recursively
         void addSuccStatesToListStubborn(StateSet&,
+        								 StateSet &,
                                          messageMultiSet,
                                          State*,
                                          AnnotatedGraphNode*);

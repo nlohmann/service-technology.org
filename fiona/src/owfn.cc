@@ -417,10 +417,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
             	
                 addSuccStatesToListStubborn(stateSet, stateSetTemp, outputPlace,
                                             currentState->succ[i], n);
-            } else if (stateSet.find(currentState->succ[i]) == stateSet.end() ||
-            		stateSetTemp.find(currentState->succ[i]) == stateSetTemp.end()) {
-            	cout << "already in list " << endl;
-            }
+            } 
         }
     }
 }
@@ -442,6 +439,7 @@ bool oWFN::isMinimal() {
 //! \param currentState state to start at
 //! \param n the current node, in case of message bound violation this node becomes red
 void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
+									   StateSet & stateSetTemp,
                                        messageMultiSet messages,
                                        State * currentState,
                                        AnnotatedGraphNode* n) {
@@ -449,6 +447,8 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
     if (currentState != NULL) {
         currentState->decodeShowOnly(this); // decodes currently considered state
 
+        stateSetTemp.insert(currentState);
+        
         bool somePlaceNotMarked = false; // remember if a place is not marked at the current marking
 
         // shall we save this state? meaning, are the correct output places marked?
@@ -482,9 +482,10 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
         // add successors
         for (unsigned int i = 0; i < currentState->cardStubbornFireList; i++) {
             // test if successor state has not yet been added to the state set
-            if (stateSet.find(currentState->succ[i]) == stateSet.end()) {
+            if (stateSet.find(currentState->succ[i]) == stateSet.end() &&
+            		stateSetTemp.find(currentState->succ[i]) == stateSetTemp.end()) {
                 // its successors need only be added if state was not yet in current state set
-                addSuccStatesToListStubborn(stateSet, messages,
+                addSuccStatesToListStubborn(stateSet, stateSetTemp, messages,
                                             currentState->succ[i], n);
             }
         }
@@ -1197,7 +1198,7 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
 
     if (CurrentState == NULL) {
         // we have a marking which has not yet a state object assigned to it
-        CurrentState = binInsert(this); // save current state to the global binDecision
+      //  CurrentState = binInsert(this); // save current state to the global binDecision
 
         CurrentState = binSearch(*tempBinDecision, this);
         CurrentState = binInsert(tempBinDecision, this); // save current state to the local binDecision 
@@ -1299,8 +1300,11 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                 if (!somePlaceNotMarked) { // if all places are appropriatly marked, we save this state
                     stateSet.insert(CurrentState);
                 } else {
+                	StateSet stateSetTemp;
                     // no it is not marked appropriatly, so we take a look at its successor states
-                    addSuccStatesToListStubborn(stateSet, messages, NewState, n);
+                    addSuccStatesToListStubborn(stateSet, stateSetTemp, messages, NewState, n);
+                    stateSetTemp.clear();
+                    
                     if (n->getColor() == RED) {
                         trace(TRACE_3, "\t\t\t message bound violated; color of node "
                                        + n->getName()

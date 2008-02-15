@@ -129,6 +129,7 @@ int logzwo(int m) {
 //! \return DESCRIPTION
 State* binInsert(oWFN* PN) {
     trace(TRACE_5, "binInsert(oWFN* PN)\n");
+    
     return binInsert(PN->binHashTable + (PN->getPlaceHashValue()), PN);
 }
 

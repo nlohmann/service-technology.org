@@ -451,18 +451,23 @@ void OG::calculateSuccStatesOutput(unsigned int output,
             PN->calculateReducedSetOfReachableStates(stateSet, &tempBinDecision, outputPlace, newNode);
         }
 
+        binDecision * tempBinDecision2 = (binDecision *) 0;
+        
         for (StateSet::iterator iter2 = stateSet.begin(); iter2
                 != stateSet.end(); iter2++) {
             (*iter2)->decode(PN); // get the marking of the state
 
             if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
-                PN->calculateReducedSetOfReachableStatesOutputEvent(setOfStatesStubbornTemp, &tempBinDecision, 
+            	PN->calculateReducedSetOfReachableStatesOutputEvent(setOfStatesStubbornTemp, &tempBinDecision2, 
                 											newNode); // calc the reachable states from that marking
             }
         }
 
         if (tempBinDecision) {
         	delete tempBinDecision;
+        }
+        if (tempBinDecision2) {
+        	delete tempBinDecision2;
         }
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, AnnotatedGraphNode* node, AnnotatedGraphNode* newNode) : end\n");

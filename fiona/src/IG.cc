@@ -648,11 +648,11 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
             return;
         }
     }
-    for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
-                                               != setOfStatesStubbornTemp.end(); iter2++) {
+ //   for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
+ //                                              != setOfStatesStubbornTemp.end(); iter2++) {
                            	
     	//newNode->addState(*iter2);            	
-    }
+   // }
     // delete temporarily calculated set of states
     if (tempBinDecision) {
     	delete tempBinDecision;
@@ -708,11 +708,11 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
             }
         }
         
-        for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
-                                        != setOfStatesStubbornTemp.end(); iter2++) {
+   //     for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
+    //                                    != setOfStatesStubbornTemp.end(); iter2++) {
                     	
         //	newNode->addState(*iter2);            	
-        }
+   //     }
         
         if (tempBinDecision) {
         	delete tempBinDecision;

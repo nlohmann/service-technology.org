@@ -157,11 +157,11 @@ void CommunicationGraph::calculateRootNode() {
     	
         PN->calculateReducedSetOfReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, root);
     
-        for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
-                                        != setOfStatesStubbornTemp.end(); iter2++) {
+    //    for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
+    //                                    != setOfStatesStubbornTemp.end(); iter2++) {
                     	
         //	root->addState(*iter2);            	
-        }
+   //     }
         if (tempBinDecision) {
         	delete tempBinDecision;
         }

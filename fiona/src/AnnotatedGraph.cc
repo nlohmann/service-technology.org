@@ -1715,13 +1715,6 @@ void AnnotatedGraph::fixDualService() {
         deadlock = new AnnotatedGraphNode("deadlock", new GraphFormulaFixed(false, GraphFormulaLiteral::FALSE));
     }
 
-    // NOTE: This parameter is currently a placeholder, a parameter for 
-    //       multiple sinks will be implemented soon
-    if (!options[O_PV_MULTIPLE_DEADLOCKS]) {
-        // create new sink node
-        sinkNode = new AnnotatedGraphNode("sink", new GraphFormulaLiteralFinal());
-    }
-
     // iterate over all nodes of the AnnotatedGraph
     for (nodes_iterator node_iter = setOfNodes.begin();
          node_iter != setOfNodes.end(); ++node_iter) {
@@ -1977,12 +1970,10 @@ void AnnotatedGraph::fixDualService() {
             // create new node
             // as there exists a leaving edge representing a send event in currNode,
             //   currNode cannot be annotated with final (same goes for newNode)
-            if (options[O_PV_MULTIPLE_DEADLOCKS]) {
-            	AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_tau",
-            			new GraphFormulaLiteralFinal(), currNode->getColor());
-            	trace(TRACE_5, "created new node " + newNode->getName() + "\n");
-            	sinkNode = newNode;
-            }
+        	AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_tau",
+        			new GraphFormulaLiteralFinal(), currNode->getColor());
+        	trace(TRACE_5, "created new node " + newNode->getName() + "\n");
+        	sinkNode = newNode;
             
             // create tau transition from current to new node
             AnnotatedGraphEdge* tauTransition= new AnnotatedGraphEdge(sinkNode, GraphFormulaLiteral::TAU);
@@ -1992,11 +1983,47 @@ void AnnotatedGraph::fixDualService() {
 
             trace(TRACE_5, "successfully applied 2nd fix at node "
                     + currNode->getName() + "\n");
+
+            // add current node's leaving edges to new node 
+            //   except those that don't occur in the annotation
+            trace(TRACE_5, "adding leaving edges to new node\n");
+            for (set<AnnotatedGraphEdge*>::iterator edge_iter = newNodesEdges.begin(); edge_iter
+                    != newNodesEdges.end(); ++edge_iter) {
+                
+            	// create new leaving edge
+                if ((*edge_iter)->getType() == RECEIVING) {
+                	AnnotatedGraphEdge* newEdge= new AnnotatedGraphEdge((*edge_iter)->getDstNode(),
+                            (*edge_iter)->getLabel());
+                    sinkNode->addLeavingEdge(newEdge);
+                    trace(TRACE_5, "\tadding edge " + newEdge->getLabel() +" from "
+                            + sinkNode->getName() + " to "+newEdge->getDstNode()->getName() + "\n");                	
+                }
+            }
+
+            // add disabled receive events from 1st fix to new node
+            for (set<std::string>::iterator
+                    event_iter = disabledRecvEvents.begin(); event_iter
+                    != disabledRecvEvents.end(); ++event_iter) {
+                if (options[O_PV_MULTIPLE_DEADLOCKS]) {
+                    // O_PV_MULTIPLE_DEADLOCKS is set
+                    // try to read deadlock node from the mapping event->node
+                    deadlock = deadlockMap[*event_iter];
+                    // deadlock node should have been created already by 1st fix
+                    assert(deadlock);
+                }
+                
+                // create new edge from new node to the deadlock node
+                //   labeled with current event
+                AnnotatedGraphEdge* disabledEvent= new AnnotatedGraphEdge(deadlock, *event_iter);
+                sinkNode->addLeavingEdge(disabledEvent);
+                trace(TRACE_5, "\tadding edge " + disabledEvent->getLabel()
+                        +" from "+ sinkNode->getName() + " to "
+                        + deadlock->getName() + "\n");
+            }
+            
             
             // Add the sink node of this specific current node to the created nodes
-            if (options[O_PV_MULTIPLE_DEADLOCKS]) {
-            	createdNodes.insert(sinkNode);
-            }
+        	createdNodes.insert(sinkNode);
         }
 
         // check whether the current node is annotated with final

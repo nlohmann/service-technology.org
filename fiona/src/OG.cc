@@ -384,10 +384,13 @@ void OG::calculateSuccStatesInput(unsigned int input,
         PN->addInputMessage(input); // add the input message to the current marking
 
         if (options[O_CALC_ALL_STATES]) {
-            PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
+        	// calc the reachable states from that marking
+            PN->calculateReachableStatesFull(newNode); 
         } else {
-            PN->calculateReducedSetOfReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, 
-            											newNode); // calc the reachable states from that marking
+        	// calc the reachable states from that marking using stubborn set method taking
+        	// care of deadlocks
+        	PN->calculateReducedSetOfReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, 
+            											newNode); 
         }
         
         if (newNode->getColor() == RED) {
@@ -447,7 +450,9 @@ void OG::calculateSuccStatesOutput(unsigned int output,
         for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
                 != node->reachGraphStateSet.end(); iter++) {
             (*iter)->decode(PN);
-            // calculate temporary state set with the help of stubborn set method
+            // calc reachable states from that marking using stubborn set method that
+            // calculates all those states that activate the given receiving event 
+            // --> not necessarily the deadlock states
             PN->calculateReducedSetOfReachableStates(stateSet, &tempBinDecision, outputPlace, newNode);
         }
 
@@ -458,8 +463,10 @@ void OG::calculateSuccStatesOutput(unsigned int output,
             (*iter2)->decode(PN); // get the marking of the state
 
             if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
+            	// calc the reachable states from that marking using stubborn set method taking
+            	// care of deadlocks
             	PN->calculateReducedSetOfReachableStatesOutputEvent(setOfStatesStubbornTemp, &tempBinDecision2, 
-                											newNode); // calc the reachable states from that marking
+                											newNode); 
             }
         }
 

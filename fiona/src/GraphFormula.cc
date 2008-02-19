@@ -315,6 +315,7 @@ GraphFormulaMultiary::~GraphFormulaMultiary() {
          currentFormula != subFormulas.end(); ++currentFormula) {
         delete *currentFormula;
     }
+    
     trace(TRACE_5, "GraphFormulaMultiary::~GraphFormulaMultiary() : end\n");
 }
 
@@ -663,6 +664,8 @@ const GraphFormulaFixed& GraphFormulaMultiaryAnd::getEmptyFormulaEquivalent() co
 
 //! \brief basic constructor 
 GraphFormulaMultiaryOr::GraphFormulaMultiaryOr() {
+	trace(TRACE_5, "GraphFormulaMultiaryOr::GraphFormulaMultiaryOr(): start\n");
+	trace(TRACE_5, "GraphFormulaMultiaryOr::GraphFormulaMultiaryOr(): end\n");
 }
 
 

@@ -362,13 +362,13 @@ void oWFN::addSuccStatesToList(AnnotatedGraphNode* n, State * currentState) {
             	
                 // if the above is true, then current node n must be
                 // considered to violate message bound, too
-//                n->setColor(RED);
-//                trace(TRACE_3,
-//                      "\t\t\t message bound violation detected in node "
-//                              + n->getName()
-//                              + " (addSuccStatesToList with NULL successor)\n");
-//                printCurrentMarking();
-//                return;
+                n->setColor(RED);
+                trace(TRACE_3,
+                      "\t\t\t message bound violation detected in node "
+                              + n->getName()
+                              + " (addSuccStatesToList with NULL successor)\n");
+               // printCurrentMarking();
+                return;
             }
         }
     }
@@ -409,7 +409,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
         //cout << "stateSet.size(): " << stateSet.size() << endl;
         
         // add successors
-        for (unsigned int i = 0; i < currentState->cardStubbornFireList; i++) {
+        for (unsigned int i = 0; i < currentState->cardFireList; i++) {
             // test if successor state has not yet been added to the state set
             if (currentState->succ[i] != NULL && 
             		stateSet.find(currentState->succ[i]) == stateSet.end() &&
@@ -480,7 +480,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
         }
 
         // add successors
-        for (unsigned int i = 0; i < currentState->cardStubbornFireList; i++) {
+        for (unsigned int i = 0; i < currentState->cardFireList; i++) {
             // test if successor state has not yet been added to the state set
             if (stateSet.find(currentState->succ[i]) == stateSet.end() &&
             		stateSetTemp.find(currentState->succ[i]) == stateSetTemp.end()) {
@@ -1004,9 +1004,13 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
     //    cout << "inserted into tempBinDecision (OG, IG): " << CurrentState << endl;
     }
 
-    CurrentState->stubbornFirelist = stubbornfirelistmessage(outputPlace);
-    CurrentState->cardStubbornFireList = CurrentCardFireList;
+ //   CurrentState->stubbornFirelist = stubbornfirelistmessage(outputPlace);
+ //   CurrentState->cardStubbornFireList = CurrentCardFireList;
 
+    CurrentState->firelist = stubbornfirelistmessage(outputPlace);
+    CurrentState->cardFireList = CurrentCardFireList;
+    
+    
     if (CurrentState->succ == NULL) {
         CurrentState->succ = new State * [CurrentCardFireList];
         for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
@@ -1031,7 +1035,7 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
     while (CurrentState) {
 
         // no more transition to fire from current state?
-        if (CurrentState->current < CurrentState->cardStubbornFireList) {
+        if (CurrentState->current < CurrentState->cardFireList) {
             // there is a next state that needs to be explored
 
             if (tempCurrentMarking) {
@@ -1043,7 +1047,7 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
             tempPlaceHashValue = placeHashValue;
 
             // fire and reach next state
-            CurrentState->stubbornFirelist[CurrentState->current]->fire(this);
+            CurrentState->firelist[CurrentState->current]->fire(this);
             
             NewState = binSearch(*tempBinDecision, this);
 
@@ -1076,7 +1080,7 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
 
                 copyMarkingToCurrentMarking(tempCurrentMarking);
 
-                CurrentState->stubbornFirelist[CurrentState->current]->backfire(this);
+                CurrentState->firelist[CurrentState->current]->backfire(this);
 
                 placeHashValue = tempPlaceHashValue;
 
@@ -1090,9 +1094,9 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                 trace(TRACE_5, "Current marking new\n");
                 NewState = binInsert(tempBinDecision, this);
                 
-                NewState->stubbornFirelist
+                NewState->firelist
                         = stubbornfirelistmessage(outputPlace);
-                NewState->cardStubbornFireList = CurrentCardFireList;
+                NewState->cardFireList = CurrentCardFireList;
                 
                 NewState->current = 0;
                 NewState->parent = CurrentState;
@@ -1121,7 +1125,8 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
 
                 // shall we save this state? meaning, is the correct output place marked?
                 // and is it a deadlock state?
-                if (CurrentMarking[getPlaceIndex(outputPlace)] > 0 && NewState->cardStubbornFireList == 0) {
+                if (CurrentMarking[getPlaceIndex(outputPlace)] > 0) { 
+                	// && NewState->cardFireList == 0) {
                     stateSet.insert(NewState);
 
                     trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet, owfnPlace * outputPlace) : end\n");
@@ -1217,8 +1222,11 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
         CurrentState = binInsert(tempBinDecision, this);
     }
 
-    CurrentState->stubbornFirelist = stubbornfirelistmessage(messages);
-    CurrentState->cardStubbornFireList = CurrentCardFireList;
+    //CurrentState->stubbornFirelist = stubbornfirelistmessage(messages);
+    //CurrentState->cardStubbornFireList = CurrentCardFireList;
+
+    CurrentState->firelist = stubbornfirelistmessage(messages);
+    CurrentState->cardFireList = CurrentCardFireList;
 
     if (CurrentState->succ == NULL) {
         CurrentState->succ = new State * [CurrentCardFireList];
@@ -1265,7 +1273,8 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
     while (CurrentState) {
 
         // no more transition to fire from current state?
-        if (CurrentState->current < CurrentState->cardStubbornFireList) {
+    	if (CurrentState->current < CurrentState->cardFireList) {
+        //if (CurrentState->current < CurrentState->cardStubbornFireList) {
             // there is a next state that needs to be explored
 
             if (tempCurrentMarking) {
@@ -1278,7 +1287,7 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
             tempPlaceHashValue = placeHashValue;
 
             // fire and reach next state
-            CurrentState->stubbornFirelist[CurrentState->current]->fire(this);
+            CurrentState->firelist[CurrentState->current]->fire(this);
             NewState = binSearch(*tempBinDecision, this);
 
             if (NewState != NULL) {
@@ -1322,7 +1331,7 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                 // we don't need the current marking anymore so we step back to the marking before
                 copyMarkingToCurrentMarking(tempCurrentMarking);
 
-                CurrentState->stubbornFirelist[CurrentState->current]->backfire(this);
+                CurrentState->firelist[CurrentState->current]->backfire(this);
 
                 placeHashValue = tempPlaceHashValue;
 
@@ -1335,8 +1344,8 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
             } else {
                 trace(TRACE_5, "Current marking new\n");
                 NewState = binInsert(tempBinDecision, this);
-                NewState->stubbornFirelist = stubbornfirelistmessage(messages);
-                NewState->cardStubbornFireList = CurrentCardFireList;
+                NewState->firelist = stubbornfirelistmessage(messages);
+                NewState->cardFireList = CurrentCardFireList;
 
                 NewState->current = 0;
                 NewState->parent = CurrentState;
@@ -1524,9 +1533,8 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                                            + " set to RED (calculateReachableStatesFull, during fire (known state)\n");
                             trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
 
-                            assert(CurrentState->succ[CurrentState->current] == NULL);
-                            CurrentState->succ[CurrentState->current] = NewState;
-
+//                            assert(CurrentState->succ[CurrentState->current] == NULL);
+//                            CurrentState->succ[CurrentState->current] = NewState;
                             
                             delete[] tempCurrentMarking;
                             return;

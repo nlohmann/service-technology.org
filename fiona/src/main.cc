@@ -340,8 +340,10 @@ string computeIG(oWFN* PN) {
             graph->diagnose();
         }
 
-        // generate output files
-        graph->printGraphToDot(); // .out
+        if (!options[O_EQ_R]) {	// don't create png if we are in eqr mode
+        	// generate output files
+        	graph->printGraphToDot(); // .out, .png
+        }
 
 /* create also an .og file to enable comparison of different IGs */
         
@@ -488,7 +490,9 @@ string computeOG(oWFN* PN) {
             }
         }
 
-        graph->printGraphToDot(); // .out
+        if (!options[O_EQ_R]) {	// don't create png if we are in eqr mode
+        	graph->printGraphToDot(); // .out, .png
+        }
 
         if (options[O_OUTFILEPREFIX]) {
             ogFilename = outfilePrefix;

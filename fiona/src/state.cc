@@ -42,7 +42,7 @@
 //! \brief constructor
 //! \fn State::State()
 State::State() :
-    cardFireList(0), firelist(NULL), stubbornFirelist(NULL),
+    cardFireList(0), firelist(NULL), 
             quasiFirelist(NULL), current(0), my_entry(NULL), placeHashValue(0),
             succ(NULL), parent(NULL), type(TRANS) {
     state_count++;
@@ -55,9 +55,6 @@ State::~State() {
 	
     if (firelist) {
         delete [] firelist;
-    }
-    if (stubbornFirelist) {
-        delete [] stubbornFirelist;
     }
     if (quasiFirelist) {
         delete [] quasiFirelist;

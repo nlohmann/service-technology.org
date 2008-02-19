@@ -64,14 +64,10 @@ class State {
         /// number of transitions to be fired
         unsigned int cardFireList;
 
-        /// number of transitions to be fired
-        unsigned int cardStubbornFireList;
-
-        /// Transitions to be fired
+        /// Transitions to be fired 
+        /// note: in case of -R (state reduction in nodes) this list contains
+        /// transitions, that are stubborn!!!
         owfnTransition ** firelist;
-
-        /// Transitions to be fired in the stubborn set
-        owfnTransition ** stubbornFirelist;
 
         /// Transitions that are quasi enabled
         owfnTransition ** quasiFirelist;

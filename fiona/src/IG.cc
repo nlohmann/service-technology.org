@@ -63,7 +63,7 @@ void interactionGraph::buildGraph() {
 
     calculateRootNode(); // creates the root node and calculates its reachability graph (set of states)
 
-    // build the IG, whether the reduced or not reduced one is built is being decided in that
+    // build the IG, whether the reduced or not the reduced one is built is being decided in that
     // function itself
     buildGraph(getRoot(), 1);
 
@@ -690,6 +690,9 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
                 != node->reachGraphStateSet.end(); iter++) {
 
             (*iter)->decode(PN);
+            // calc reachable states from that marking using stubborn set method that
+            // calculates all those states that activate the given receiving event 
+            // --> not necessarily the deadlock states
             PN->calculateReducedSetOfReachableStates(stateSet, &tempBinDecision, receivingEvent, newNode);
         }
 
@@ -700,9 +703,12 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
             (*iter2)->decode(PN); // get the marking of the state
 
             if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
-                PN->calculateReducedSetOfReachableStatesOutputEvent(setOfStatesStubbornTemp, 
+
+            	// calc the reachable states from that marking using stubborn set method taking
+            	// care of deadlocks
+            	PN->calculateReducedSetOfReachableStatesOutputEvent(setOfStatesStubbornTemp, 
                 											&tempBinDecision2, 
-                											newNode); // calc the reachable states from that marking
+                											newNode); 
 
             }
         }
@@ -892,7 +898,7 @@ setOfMessages interactionGraph::combineReceivingEvents(AnnotatedGraphNode* node,
                 unsigned int i = 0;
                 // this clause's first literal
                 GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
-
+                
                 // "receiving before sending" reduction rule
                 while (!stateActivatesOutputEvents(*iter) &&
                 			(*iter)->quasiFirelist &&
@@ -1015,10 +1021,9 @@ setOfMessages interactionGraph::combineReceivingEvents(AnnotatedGraphNode* node,
                             * myliteral = new GraphFormulaLiteralFinal();
                     myclause->addSubFormula(myliteral);
                 }
-
+                
                 node->addClause(myclause);
             }
-
         }
     }
 

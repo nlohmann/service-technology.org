@@ -389,8 +389,7 @@ void OG::calculateSuccStatesInput(unsigned int input,
         } else {
         	// calc the reachable states from that marking using stubborn set method taking
         	// care of deadlocks
-        	PN->calculateReducedSetOfReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, 
-            											newNode); 
+        	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
         }
         
         if (newNode->getColor() == RED) {
@@ -465,8 +464,7 @@ void OG::calculateSuccStatesOutput(unsigned int output,
             if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
             	// calc the reachable states from that marking using stubborn set method taking
             	// care of deadlocks
-            	PN->calculateReducedSetOfReachableStatesOutputEvent(setOfStatesStubbornTemp, &tempBinDecision2, 
-                											newNode); 
+            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
             }
         }
 

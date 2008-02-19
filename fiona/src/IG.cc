@@ -634,7 +634,9 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
         	PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
         } else {
         	// state reduction
-            PN->calculateReducedSetOfReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, newNode); // calc the reachable states from that marking
+        	// calc the reachable states from that marking using stubborn set method taking
+        	// care of deadlocks
+            PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); // calc the reachable states from that marking
         }
         
         if (newNode->getColor() == RED) {
@@ -706,8 +708,7 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 
             	// calc the reachable states from that marking using stubborn set method taking
             	// care of deadlocks
-            	PN->calculateReducedSetOfReachableStatesOutputEvent(setOfStatesStubbornTemp, 
-                											&tempBinDecision2, 
+            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, 
                 											newNode); 
 
             }

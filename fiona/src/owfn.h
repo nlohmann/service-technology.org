@@ -263,10 +263,10 @@ class oWFN {
         void copyMarkingToCurrentMarking(unsigned int* copy);
         
         /// calculates the reduced set of states of the new AnnotatedGraphNode in case of an output event
-        void calculateReducedSetOfReachableStatesOutputEvent(StateSet&, binDecision**, AnnotatedGraphNode*);
+//        void calculateReducedSetOfReachableStatesOutputEvent(StateSet&, binDecision**, AnnotatedGraphNode*);
 
         /// calculates the reduced set of states of the new AnnotatedGraphNode in case of an input event
-        void calculateReducedSetOfReachableStatesInputEvent(StateSet&, binDecision**, AnnotatedGraphNode*);
+        void calculateReachableStatesStubbornDeadlocks(StateSet&, AnnotatedGraphNode*);
         
         /// calculates the reduced set of states reachable from the current marking and stores them 
         /// given state set

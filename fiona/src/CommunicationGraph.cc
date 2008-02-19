@@ -155,7 +155,7 @@ void CommunicationGraph::calculateRootNode() {
     	// forget about all the states we have calculated so far
     	setOfStatesStubbornTemp.clear();
     	
-        PN->calculateReducedSetOfReachableStatesInputEvent(setOfStatesStubbornTemp, &tempBinDecision, root);
+        PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, root);
     
     //    for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
     //                                    != setOfStatesStubbornTemp.end(); iter2++) {

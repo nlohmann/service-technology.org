@@ -19,8 +19,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2008-02-04 10:15:40 $ by $Author: gierds $.
-# Version $Revision: 1.17 $
+# File last changed $Date: 2008-02-20 15:03:07 $ by $Author: gierds $.
+# Version $Revision: 1.18 $
 
 SUBDIRS = cudd src tests doc
 
@@ -91,7 +91,7 @@ BINARYDISTFILES = src/$(PACKAGE)$(EXEEXT) COPYING
 BINARYFILES = src/$(PACKAGE)$(EXEEXT) COPYING
 
 # target to create a binary distribution
-bindist: clean binarydistreadme all create_bindist_archive
+bindist: libclean binarydistreadme all create_bindist_archive
 
 # target to create a binary distribution for systems having no cygwin1.dll.
 win32bindist: clean binarydistreadme win32

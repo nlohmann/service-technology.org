@@ -13,7 +13,7 @@
 
 This manual is for @acronym{Fiona}, Version @value{VERSION}.
 @acronym{Fiona} is a tool to automatically analyze the interactional behavior
-of a given open workflow net (@acronym{oWFN}). This manual does not explain how to setup or install
+of open workflow nets (@acronym{oWFN}). This manual does not explain how to setup or install
 @acronym{Fiona}. For this information please read the
 Installation Manual which is part of the distribution or can be
 downloaded from the website of @acronym{Fiona}
@@ -34,7 +34,7 @@ notice and this notice are preserved.
 Public License.
 
 Copyright @copyright{} 2005, 2006, 2007 Daniela Weinberg, Peter Massuthe, Karsten Wolf,
-Kathrin Kaschner, Christian Gierds and Jan Bretschneider.
+Kathrin Kaschner, Christian Gierds and Jan Bretschneider, Martin Znamirowski.
 
 @iftex
 @image{images/tools4bpel,,0.4in}
@@ -85,10 +85,14 @@ funded by the Bundesministerium f@"ur Bildung und Forschung. See
 
 @menu
 * Overview:: What @acronym{Fiona} does.
+* Installation:: Short guide how to install @acronym{Fiona}.
 * Invoking Fiona:: How to invoke @acronym{Fiona}.
-* File Format owfn:: The file format that @acronym{Fiona} uses as input.
-* Interaction Graph:: Deciding the controllability of an @acronym{oWFN} efficiently.
-* Operating Guideline:: Generating the operating guideline of an @acronym{oWFN}.
+* Input Formats:: Desrciption of the file formats that @acronym{Fiona} uses as input.
+* Checking Controllability:: Checking the controllability of a service with @acronym{Fiona}.
+* Operating Guidelines:: Characterizing all correctly interacting partners for a service.
+* Matching:: Determining if a given service interacts as specified by an operating guideline.
+* Partner Synthesis:: Generating a partner for a service.
+* Other Modes:: Additional functionality.
 * Limitations and Bugs:: What @acronym{Fiona} cannot do.
 * Future Work:: What @acronym{Fiona} will do in the future.
 * References:: Bibliography of cited literature.
@@ -108,18 +112,23 @@ funded by the Bundesministerium f@"ur Bildung und Forschung. See
 
 @section Introduction
 
-@acronym{Fiona} is a tool to automatically analyze the interactional behavior of a given
-open workflow net (@acronym{oWFN}) [MRS05].
-It provides two techniques:
+@acronym{Fiona} is a tool to automatically analyze the interactional behavior of
+open workflow nets (@acronym{oWFN}) [MRS05].
+It provides the following techniques:
 
 @itemize
 @item it checks for the controllability of the given net by
-computing the interactiong graph [Wei06],
+computing the interaction graph [Wei04],
 @item it calculates the operating guideline [MRS05] for the
 net.
+@item it matches an open workflow net (@acronym{oWFN}) with an already existing
+operating guideline [MRS05]
+@item it can do various calculations on operating guidelines, including checks for equality and
+equivalence, computing the product of two operating guidelines, computing the number of characterized services, simulating and filtering
+
 @end itemize
 
-Fiona uses oWFNs as its input which is the output of the tool @acronym{BPEL2oWFN}. Thus,
+Fiona uses operating guidelines and oWFNs as inputs. oWFNs are the output of the tool @acronym{BPEL2oWFN}. Thus,
 any @acronym{BPEL} (@acronym{Business Process Execution Language for Web Services}) [ACD@math{^+}03]
 process can easily be analyzed.
 
@@ -128,7 +137,7 @@ were implemented in the model checking tool @acronym{LoLA}.
 
 
 @acronym{Fiona} was written by Daniela Weinberg, Peter Massuthe, Karsten Wolf, Kathrin Kaschner,
-Christian Gierds and Jan Bretschneider. It is part of the Tools4@acronym{BPEL} project
+Christian Gierds and Jan Bretschneider, Martin Znamirowski. It is part of the Tools4@acronym{BPEL} project
 funded by the German Bundesministerium f@"ur Bildung und Forschung. See
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 
@@ -136,29 +145,71 @@ funded by the German Bundesministerium f@"ur Bildung und Forschung. See
 
 @c ----------------------------------------------------------------------------
 
+@node Installation
+@chapter Installation
+
+There are two possibilities to get @acronym{Fiona} running. Either using the
+precompiled binaries for a variety of operating systems or compiling the source
+code yourself. Both, the binaries and the source code can be found at 
+@url{http://www2.informatik.hu-berlin.de/top/tools4bpel/fiona/download.html}
+
+@section Using the binaries
+
+Even when using the binaries, @acronym{Fiona} will not have its complete functionality
+unless GraphViz dot is installed. In order to create graphical output @acronym{Fiona} uses
+systemcalls to dot, so either dot has to be callable in the same from which fiona is called
+or no graphical output will created. Not having dot installed should not interfere with
+execution in any other way than lacking graphical output.
+
+@section Using the source code
+
+Unpack the the fiona-2.0.tar.gz into one directory keeping the archived folder structure. 
+Before fiona can be compiled a number of tools has to be available at the shell. For
+a detailed list of those tools refer to the installation guide given in the "/doc"
+directory. Supposing that all needed tools are available you can compile fiona by entering
+the source directory and typing the following commands.
+
+@code{automake -i}
+
+@code{./configure}
+
+@code{make}
+
+
+To check if the compilation was succesful you can also type
+@code{makecheck}
+The check should pass all tests except for those mentioned in @ref{Limitations and Bugs}
+
+@c ----------------------------------------------------------------------------
+
 @node Invoking Fiona
 @chapter Invoking @acronym{Fiona}
 
 
-A given @acronym{oWFN} can be analyzed in two ways by @acronym{Fiona}.
-Therefore the standard invocation of @acronym{Fiona} is:
+@acronym{Fiona}s primary uses are to decide about controllability of and to 
+build operating guidelines for services given as @acronym{oWFN}s.
+Therefore the standard invocations of @acronym{Fiona} are:
 
 @itemize
-@item checking controllability: @code{fiona -n inputNet.owfn -t IG}
-@item calculating the operating guideline: @code{fiona -n inputNet.owfn -t OG}
+@item checking controllability: @code{fiona -t ig inputNet.owfn}
+@item calculating the operating guideline: @code{fiona -t og inputNet.owfn}
 @end itemize
 
 where @file{inputNet.owfn} contains an @acronym{oWFN} written in the appropriate
-format @ref{File Format owfn}.
-The option @samp{-t IG} lets @acronym{Fiona} generate the interaction graph of the given net.
+format @ref{Input Formats}.
+The option @samp{-t ig} lets @acronym{Fiona} generate the interaction graph of the given net.
 In case the graph's size is not too big, a png graphics is created that shows the
-interaction graph. Further, an output is written on the command line indicating the
+interaction graph. Further an output is written on the command line indicating the
 size of the graph and the statement whether the oWFN is controllable or not.
 
-The option @samp{-t OG} lets @acronym{Fiona} generate the operating guideline of the
+The option @samp{-t og} lets @acronym{Fiona} generate the operating guideline of the
 given @acronym{oWFN}. In case the graph's size is not too big, a png graphics is created that shows the
-interaction graph. Further, an output is written on the command line indicating the
-size of the graph and the statement whether the oWFN is controllable or not.
+operating guideline. Further an output is written on the command line indicating various
+statistics of the operating guideline.
+
+Since the beginning of fiona a lot of additional operations that primarily deal with operating
+guidelines have been included. A short description of those functions is given in this 
+chapter, for more details on operating guidelines see @ref{Operating Guidelines}
 
 For more examples, see @ref{Examples}.
 
@@ -166,80 +217,119 @@ For more examples, see @ref{Examples}.
 interaction graph of the @acronym{oWFN}, that is being read from the standard input
 (@code{stdin}).
 
+The invocationscheme looks as follows
 
+fiona [OPTION]* [FILES]*
+
+Note: Every file read will be automatically recognized as an oWFN or operating guideline 
+by its content or throw an error. Fiona supports reading multiple files by the '*' operator, 
+for example:
+
+@example
+fiona -t og *.owfn
+@end example
 
 @section Options
 
 @acronym{Fiona} supports the following command-line options:
 
-@table @samp
-@item --help
-@itemx -h
+@subheading * Help Function
+
 Print an overview of the command-line options and exit.
-@*
 
-@item --version
-@itemx -v
-Print version information and exit.
-@*
+Command: @code{--help} or @code{-h}
 
-@item --debug=<level>
-@itemx  -d
-Set the debug <level> to
+
+@subheading * Version Information
+Print the complete version information.
+
+Command: @code{--version} or @code{-v}
+
+
+@subheading * Debugging
+Set the debuglevel to a value between 1-5
+
+Command: @code{--debug = <level>} or @code{-d <level>}
+
+Parameters:
 @example
 1 - show nodes and dfs information
 2 - show analysis information (i.e. colors)
 3 - show information on events and states
-5 - show detailed information on everything
+4 - show more detailed information
+5 - show detailed information on literally everything
 @end example
 
-@item --net=<filename>
-@itemx -n
-Read input owfn from <filename>
-@*
+@subheading * Modus Operandi
 
-@item --graphtype=<type>
-@itemx -t
-Selects the graph <type> to be calculated:
-    OG - operating guideline
-    IG - interaction graph (default)
+Selects the <type> of action you want fiona to process
 
-@item --messagemaximum=<level>
-@itemx -m
-Set the maximum number of same messages per state to <level>
-@*
+Command: @code{--type=<type>} or @code{-t <type>}
 
-@item --eventsmaximum=<level>
-@itemx -e
-set event to occur at most <level> times (only relevant for OG)
-@*
-
-@item --reduceIG
-@itemx -r
-use reduction rules for IG
-@*
-
-@item --show=<parameter>
-@itemx -s
-different display options <parameter>:
+Parameters:
 @example
-allnodes - show nodes of all colors
-blue     - show blue nodes only (default)
-rednodes - show blue and red nodes (no empty node and no black nodes)
-empty    - show empty node
-allstates- show all calculated states per node
+    og          - generate the operating guidelines for every given oWFN
+    ig          - generate the interaction graphs for every given oWFN
+    smallpartner - generate the interaction graph and synthesize a small 
+                   partner oWFN for every given oWFN
+    mostpermissivepartner - generate the interaction graph and synthesize 
+                            the most permissive partner oWFN for every given 
+                            oWFN
+    distrubuted - generate the operating guideline and annotate it for
+                  distrubuted controllability for every given oWFN
+    match       - check if given oWFN matches with an operating guideline 
+                  given
+    simulation  - check whether the first OG characterizes more strategies
+                  than the second one
+    filter      - reduces the first OG to the point that it simulates the 
+                  second OG - if possible 
+    equality    - check whether two OGs characterize the same strategies
+    equivalence - check whether two OGs (given as BDDs) are equivalent
+    productog   - calculate the product OG of all given OGs
+    isacyclic   - check a given OG for cycles 
+    count       - count the number of services that are characterized by a  
+                  given OG  
+    png         - generate png files from all given of oWFNs
 @end example
 
-@item --exchangeability
-@itemx -x
-check for two oWFN the equality of its operating guidelines (the BDD-representation
-must have been computed before) syntax: -n netfile1 -n netfile2 -x
-@*
 
-@item --BDD=<reordering>
-@itemx -b
+@subheading * Set message maximum
+Set the maximum number of same messages per state to <level>
+
+Command: @code{--messagemaximum = <level>} or @code{-m <level>}
+
+@subheading * Reduce IG
+Apply reduction rules to the generated IG.
+
+Command: @code{--reduceIG} or @code{-r}
+
+@subheading * Reduce Node states
+use node reduction (IG or OG) which stores less states per node of IG/OG
+and reduces memory, but increases time
+
+Command: @code{--reduce-nodes} or @code{-R}
+
+@subheading * Show additional information
+Different display options according to the output of operating guidelines
+
+Command: @code{--show = <parameter>} or @code{-s <parameter>}
+
+Parameters:
+@example
+allnodes  - show nodes of all colors
+blue      - show blue nodes only (default)
+rednodes  - show blue and red nodes (no empty node and no black nodes)
+empty     - show empty node
+allstates - show all calculated states per node
+deadlocks - show all but transient states
+@end example
+
+@subheading * BDD Construction
 enable BDD construction (only relevant for OG) argument <reordering> specifies reodering
-method:
+
+Command: @code{--BDD = <reordering>} or @code{-b <reordering>}
+
+Parameters:
 @example
 0 - CUDD_REORDER_SAME
 1 - CUDD_REORDER_NONE
@@ -265,143 +355,244 @@ method:
 21 - CUDD_REORDER_EXACT
 @end example
 
-@item --match=<OG filename>
-@itemx -b
-check if given oWFN (-n) matches with operating guideline given in <OG filename>
 
+@subheading * On the Fly BDD Construction
+enable BDD construction on the fly (only relevant for OG) argument <reordering> 
 
-@end table
+Command: @code{--OnTheFly = <reordering>} or @code{-B <reordering>}
+
+Parameters:
+See BDD Construction for possible parameters
+
+@subheading * Output prefix
+sets a prefix string for all output files
+
+Command: @code{--output = <filename prefix>} or @code{-o <filename prefix>}
+
+@subheading * No output
+No output will be generated at all.
+
+Command: @code{--no-output } or @code{-Q}
+
+@subheading * Additional parameters
+Further modification of the exection
+
+Command: @code{--paramter = <parameter> } or @code{-p <parameter>}
+
+Parameters:
+@example
+no-png - does not create a PNG file
+@end example
 
 @anchor{Examples}
 @section Examples
-In this section we show some examples how @acronym{Fiona} can be
-invoked.
 
-@table @samp
-@item ....
+@example
+fiona -t og -b 0 -p no-png *.owfn 
+@end example
+generates an OG reordered by CUDD_REORDER_SAME 
+and saves the OG in a file named [oldfilename].og
+for every oWFN in the current folder. No 
+graphical output is generated  
+
+@example
+fiona -t png *.owfn 
+@end example
+generates a graphviz-dot graph of every oWFN in the
+same folder
+
+@example
+fiona -t productog *.og
+@end example
+generates an operating guideline product from all
+operating guidelines in the same folder
+
+@example
+fiona -t match -d5 toMatch.og toBeMatched.owfn
+@end example
+checks if the oWFN toBeMatched.owfn matches with the toMatch.og
+operating guideline with all debug information being shown in the
+process
 
 
-@end table
 
 
 @c ----------------------------------------------------------------------------
 
-@node File Format owfn
-@chapter File Format @acronym{owfn}
+@node Input Formats
+@chapter Input Formats
 
-@acronym{Fiona} expects the @acronym{owfn} file format as its input.
+@acronym{Fiona} can have @acronym{oWFN}s and operating guidelines as its inputs.
+
+@section @acronym{oWFN} File Format
 
 An open workflow net is a Petri net with an @i{interface}, i.e.@: two sets of
 places: @i{input places} and @i{output places}. Additionally an open workflow
 net has a set of final markings. To represent @acronym{oWFN}s
-the @acronym{LoLA} format was extended to implement this categorization.
-
-@section Syntax of the owfn file format
-The owfn file consists of 4 sections:
-@itemize
-@item @code{PLACES},
-@item @code{INITIALMARKING},
-@item @code{FINALMARKING} or @code{FINALCONDITION}
-@item and a section to specify the transitions of the net.
-@end itemize
-First, the places of the net are specified. Here we distinguish between @code{INTERNAL}, @code{INPUT} and
-@code{OUTPUT} places. Then the @code{INITIALMARKING} of the net has to be specified. After that
-one can either declare a @code{FINALMARKING} or a @code{FINALCONDITION}.
-In the transition section one has to specify all the transitions of the net.
-Comments can be written in between  @{ and @}.
-
-In the @code{INITIALMARKING}, @code{FINALMARKING}, @code{FINALCONDITION}, after
-each place name one can specify the number of tokens on that place (e.g. @code{p1: 2}). If no number is
-given (e.g. @code{p1}) one token is assumed. In the transition section the number after a place indicates the weight
-of the arrow pointing to or from the place.
+the @acronym{LoLA} format was extended to implement this categorization. Following
+is an example for a valid @acronym(oWFN) file.
 
 @example
 @{ sample oWFN @}
 
-PLACE
+PLACES
   INTERNAL
     p1,
     p2;
   INPUT
-    a,
-    b;
+    a;
   OUTPUT
     x,
-    y;
+    y,
+    z;
 
 INITIALMARKING
   p1:  2;
 
-FINALMARKING
-  p2: 1;
+FINALCONDITION
+  p2 = 4 AND ALL_OTHER_PLACES_EMPTY;
 
 TRANSITION t1
 CONSUME
   p1,
-  a,
-  b;
+  a;
 PRODUCE
-  p2,
+  p2:2,
   x,
-  y;
+  y,
+  z;
 @end example
 
-@section Usage of special FINALCONDITION options
+@subsection Structure of the @acronym{oWFN} file format
+The structure of a net is determined by its places, transitions and the edges in between of those. In
+the oWFN-Format edges are not seperately defined, but are part of the transition definitions at the end
+of the file.
+An oWFN file consists of 4 sections:
+@itemize
+@item place definitions
+@item initial marking
+@item final markings
+@item transition definitions
+@end itemize
+Comments in the oWFN code can be written in between  @{ and @}. 
 
-On the usage of @code{ALL_OTHER_PLACES_EMPTY, ALL_OTHER_INTERNAL_PLACES_EMPTY}, and
-@code{ALL_OTHER_EXTERNAL_PLACES_EMPTY} in FINALCONDITION
+@subsection Places 
 
+In the @code{PLACES} section the places of the net are specified. Here we distinguish between 
+@code{INTERNAL}, @code{INPUT} and @code{OUTPUT} places. A @code{PLACES} section of a net 
+looks like this:
 
-Suppose you have an @acronym{oWFN} with many places and you want to specify in the
-@code{FINALCONDITION} of your @acronym{oWFN} that a state is a final state iff one certain place
-of your @acronym{oWFN} has exactly one token and all other places are empty. How do you
-do this? Saying
+@example
+PLACES
+  INTERNAL
+    p1,
+    p2;
+  INPUT
+    a;
+  OUTPUT
+    x,
+    y,
+    z;
+@end example
+In this example we have two internal, one input and three output places. The names of the places
+must be disjoint over all three categories, thus a place cannot be an input and an output place 
+at the same time.
 
-    @code{FINALCONDITION p1 = 1;}
+After the @code{PLACES} follow the @code{INITIALMARKING} and @code{FINALMARKING} respectively
+@code{FINALCONDITION} sections, which are explained later on.
 
-is insufficient if there are other places except p1, because then the state
-@code{p1 = 1, p2 = 1} also is a final state because it fulfills the @code{FINALCONDITION}.
+@subsection Transitions
+After the three first sections the transitions of the net including their attached edges are defined.
+The fourth section does not have a headline like the first three, but rather one for every transition.
+A transition definition looks like this.
+@example
+TRANSITION t1
+CONSUME
+  p1,
+  a;
+PRODUCE
+  p2:2,
+  x,
+  y,
+  z;
+@end example
+This example defines a transition named t1 with six edges. Two that lead from the places @code{p1} and @code{a} 
+to the transition and four that lead from the transition to the places @code{p2}, @code{x}, @code{y} and @code{z}, 
+with the edge to @code{p2} having a weight of 2. 
+A single place can be present under both @code{CONSUME} and @code{PRODUCE} in the same transition, such a structure 
+is called a loop. Any other transitions of the net would just be listed further with the same syntax, thus starting 
+with the @code{TRANSITION} keyword, followed by the name of the transition followed by the @code{CONSUME} and 
+@code{PRODUCE} parts containing places, that must have been defined in the @code{PLACES} section beforehand. 
+@code{CONSUME} and @code{PRODUCE} are allowed to be empty, thus representing a transition which is not in any 
+way connected to the rest of the net.
 
+@subsection Initial Marking
+After the @code{PLACES} section comes the @code{INITIALMARKING} section. Every place which is not listed in
+the @code{INITIALMARKING} section is implicitly assumed to have zero tokens. If one wants to create an initial
+state that differs from all places being empty one has to list places, which are to contain a number of tokens,
+in the @code{INITIALMARKING} section. Such a section looks as following:
+@example
+INITIALMARKING
+  p1:  2;
+@end example
+After this definition the place @code{p1} would contain two tokens. One can initially mark more than one place, by
+seperating the places by commata and finishing the section with a semicolon. If a place is listed without a colon and
+the corresponding number of tokens, the @acronym{oWFN} File Formatimplies one token. 
 
-Specifying
+@subsection Final Markings
 
-    @code{FINALCONDITION p1 = 1 AND p2 = 0 AND p3 = 0 AND ...;}
+A final marking is defined either as a @code{FINALMARKING} or a @code{FINALCONDITION}. The main difference is that a
+@code{FINALMARKING} can only describe one final state while a @code{FINALCONDITION} can describe multiple final states.
 
-may become long and tedious to type if your oWFN has many places. Therefore the
-keyword @code{ALL_OTHER_PLACES_EMPTY} exists. Using this keyword you can now specify
-the following:
+@b{FINALMARKING:} The @code{FINALMARKING} section follows the same syntax as the @code{INITIALMARKING} section. 
+Thus one can list a number of places with corresponding numbers of tokens. The final state described by a 
 
-    @code{FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY;}
+@code{FINALMARKING} is meant to be a state in which the marking exactly matches the described one, including not 
+mentioned places as having a token number of zero. In the same way this means, that a @code{FINALMARKING} can 
+only describe exactly one final state. A final marking looks like this: 
+@example
+FINALMARKING
+  p2:  4;
+@end example
+This would describe a final state in which the place @code{p2} has exactly four tokens and all other places have none.
 
-meaning exactly what you expect it to mean, namely the same as
-
-    @code{FINALCONDITION p1 = 1 AND p2 = 0 and p3 = 0;}
-
-if your oWFN has exactly the places @code{p1, p2, and p3.}
-
-
-If you require only the internal places of your oWFN to be empty, use the
+@b{FINALCONDITION:} A @code{FINALCONDITION} has a different syntax, than a @code{FINALMARKING}. If one wants to express that
+the place p2 has to contain four tokens, the @code{FINALCONDITION} would like like this.
+@example
+FINALCONDITION
+  p2 = 4;
+@end example
+This @code{FINALCONDITION} describes any state in which there are exactly four tokens on the place p2. One could have instead used a different relation than equality. The @acronym(oWFN) file format supports equal, not equal, lesser, greater, less or equal and greater or equal. 
+The two examples are semantically different. While the examplary @code{FINALCONDITION} accepts any state with four tokens on p2 as a final state the examplary @code{FINALMARKING} only accepts one final state, and that is where p2 has four tokens and all other places have zero tokens.
+If one wants to create a @code{FINALCONDITION} equal to the exemplary @code{FINALMARKING}, one can use the boolean keywords 
+@code{AND}, @code{OR} and @code{NOT}. The equal definition would then look as follows:
+@example
+FINALCONDITION
+  p2 = 4 AND p1 = 0 AND a = 0 AND x = 0 AND y =0 AND z = 0;
+@end example
+All markings that fullfill the boolean formula are considered a final state of the oWFN. In this
+case it is  exactly the same finalstate, as defined by the @code{FINALMARKING} with @code{p2} containing four tokens
+and all other places zero.
+It can quickly become a nuisance to write or read such a formula, especially if the @acronym{oWFN}s become big. That
+is why there is a keyword that can gather up most of the information.
+@example
+FINALCONDITION 
+  p2 = 4 AND ALL_OTHER_PLACES_EMPTY;
+@end example
+The meaning of this final condition is exactly the same as of the one mentioned before.
+If one requires only the internal places of his oWFN to be empty, one can use the
 keyword @code{ALL_OTHER_INTERNAL_PLACES_EMPTY}. Requiring the same for the external
 places only (that are all non-internal or interface places) can be achieved
 with the keyword @code{ALL_OTHER_EXTERNAL_PLACES_EMPTY}.
 
 All three keywords can be combined at will. Saying
 
-    @code{FINALCONDITION p1 = 1 AND ALL_OTHER_INTERNAL_PLACES_EMPTY AND
+    @code{FINALCONDITION p2 = 4 AND ALL_OTHER_INTERNAL_PLACES_EMPTY AND
                               ALL_OTHER_EXTERNAL_PLACES_EMPTY;}
 
 is the same as
 
-    @code{FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY;}
-
-which in turn is the same as
-
-    @code{FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY AND;
-                              ALL_OTHER_INTERNAL_PLACES_EMPTY AND
-                              ALL_OTHER_EXTERNAL_PLACES_EMPTY;}
-
-The latter, of course, is highly redundant.
-
+    @code{FINALCONDITION p2 = 4 AND ALL_OTHER_PLACES_EMPTY;}
 
 All three keywords can only be used as the right hand side of a conjunction
 with another state predicate while the whole conjunction is then again a state
@@ -413,11 +604,11 @@ The scope of @code{ALL_OTHER_PLACES_EMPTY} is the left hand side of state predic
 the above conjunction. All places that are not mentioned in the left hand side
 predicate are then required to be empty.
 
-For you to decide the scope of @code{ALL_OTHER_PLACES_EMPTY}, it is crucial that you
-understand all bracing and precedence rules of state predicate formulas and
-that you can construct the fully braced form of your formula in your mind!
+For one to decide the scope of @code{ALL_OTHER_PLACES_EMPTY}, it is crucial that one
+understands all bracing and precedence rules of state predicate formulas and
+that one can construct the fully braced form of his formula in his mind!
 
-Suppose you have an oWFN with places @code{p1, p2, p3, and p4}. Then the formula:
+Suppose a different oWFN with places @code{p1, p2, p3, and p4}. Then the formula:
 
     @code{FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY OR
                    p2 = 1 AND ALL_OTHER_PLACES_EMPTY;}
@@ -450,7 +641,7 @@ it all together and removing redundant braces results in
 
 which is the formula that was stated as the expansion in the first place.
 
-As you have probably already noticed, this formula is unsatisfiable because it
+As one might have already noticed, this formula is unsatisfiable because it
 requires p2 to be empty and marked at the same time. Therefore it is
 recommended to use @code{ALL_OTHER_PLACES_EMPTY} only at the very end of an n-ary
 conjunction (or anywhere along with proper explicit bracing).
@@ -458,22 +649,127 @@ conjunction (or anywhere along with proper explicit bracing).
 The same rules, of course, apply to @code{ALL_OTHER_INTERNAL_PLACES_EMPTY} and
 @code{ALL_OTHER_EXTERNAL_PLACES_EMPTY}.
 
-Now, feel free to use and misuse these great keywords at your own private risk.
+@section File Format OG
+
+@acronym{Fiona} can have the og file format as its input.
+
+The og file consists of 3 sections:
+
+@itemize
+@item NODES
+@item INITIALNODE
+@item TRANSITIONS
+@end itemize
+
+In the first section, all nodes of the graph are specified. Each definition
+contains the node's name and the boolean annotation of the node. Additionally
+a color for the node can be provided, which is either red or blue. Red nodes
+are those that are not part of the final operating guideline, but rather left
+over from building the operating guideline and have not been deleted yet for
+diagnosis reasons. Blue nodes are equal to colorless nodes and are part of the
+actual operating guideline. The different nodes are divided by commata, a 
+semicolon finishes the section. 
+Every node follows this syntax.
+
+@example
+nodeName:nodeAnnotation[:nodeColor]
+@end example
+
+In the second section one of the nodes is determined as root node by its name,
+the section is finished by a semicolon
+
+@example
+nodeName
+@end example
+
+In the last section all edges of the graph are specified. The different
+edges are divided by commata, a semicolon finishes the section. Every edge follows this syntax
+
+@example
+sourceNodeName -> targetNodeName:edgeAnnotation
+@end example
+
+
+Here is an example for a valid og file:
+
+@example
+NODES
+  0 : ((!a)) : blue,
+  1 : ((true)) : blue,
+  2 : ((final + ?y) * (!b + ?y)) : blue,
+  3 : ((final)) : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 1 : ?x,
+  0 -> 2 : !a,
+  2 -> 3 : ?y;
+
+@end example
+
+@c ----------------------------------------------------------------------------
+
+@node Checking Controllability
+@chapter Checking Controllability
+
+@section Interaction Graph
+
+@itemize 
+@item ig
+@item smallpartner
+@item diagnosis
+@end itemize
+
+The interaction graph shows the states of the service, treating all inner states with the same
+further communication behaviour as equal. By analyzing the interaction graph controllability of
+the service can be efficiently decided. For more information on interaction graphs see. [Wei04].
+@section Operating Guideline
+
+@itemize 
+@item og
+@item mostpermissivepartner
+@item distributed
+@item productog
+@end itemize
+
+
+@itemize 
+@item match
+@item productog
+@item simulates
+@item filter
+@item isacyclic
+@item count
+@end itemize
+
+The operating guideline of a service characterizes every possible behaviour of the service's 
+environment that leads to a correct execution of the service, thus its termination. Any behaviour
+of an environment, that is a subgraph of the operating guideline, includes the root node and fullfills
+every nodes boolean annotation is a strategy for this service. For more detailed information on operating
+guidelines refer to [MRS05].
 
 
 @c ----------------------------------------------------------------------------
 
-@node Interaction Graph
-@chapter Interaction Graph
+@node Operating Guidelines
+@chapter Operating Guidelines
 
 @c ----------------------------------------------------------------------------
 
-@node Operating Guideline
-@chapter Operating Guideline
+@node Matching
+@chapter Matching
 
-@section Explicit Representation
+@c ----------------------------------------------------------------------------
 
-@section Symbolic Representation
+@node Partner Synthesis
+@chapter Partner Synthesis
+
+@c ----------------------------------------------------------------------------
+
+@node Other Modes
+@chapter Other Modes
 
 @c ----------------------------------------------------------------------------
 
@@ -482,26 +778,34 @@ Now, feel free to use and misuse these great keywords at your own private risk.
 
 
 
-@c @section Limitations
-@c
-@c The current version of @acronym{Fiona} underlies several limitations:
-@c
-@c @itemize
-@c @item ........
-@c @end itemize
+@section Limitations
+
+The current version of @acronym{Fiona} underlies several limitations:
+
+@itemize
+@item number of strategies: The number of strategies, which are determined by the given og
+can only be calculated if the og is acyclic and deterministic. It will also hold with a
+warning in case the calculation becomes to ressourceful. The complexity of the used algorithm
+is not polynomial. 
+@item Sequences: oWFNs model asynchronous communication behaviour. Even if the net has already
+sent a message - therefore put a token on an output place - there is no mechanism to stop 
+the net until the message is consumed. Thus a simple sequence of sent messages quickly results 
+in a large operating guideline, which models every order of the consumption of those sent messages. 
+Examples can be taken from the "/tests/sequence_suite" directory
+@end itemize
 
 
 
 @section Known Bugs
 
-........
+In the current version of Fiona are the following issues.
 
 @itemize
 
-@item @b{Problem:} .......
+@item @b{Problem:} The test suite in the current release does not pass all tests. The 'samples'
+and the 'bddtest' tests do not work properly.
  @end itemize
-@b{Solution:} ........
-
+@b{Solution:} The test suite is going to be fixed.
 
 
 @anchor{Reporting Bugs}
@@ -512,7 +816,7 @@ is not a known bug listed in `Known Bugs'. Otherwise please send us
 an electronic mail to @email{weinberg@@informatik.hu-berlin.de}.
 Include the version number which you can find by running
 @samp{fiona --version}. Also include in your message the input
-@acronym{owfn} process and the output that the program produced. We
+@acronym{oWFN} process and the output that the program produced. We
 will try to answer your mail within a week.
 
 If you have other questions, comments or suggestions about
@@ -555,7 +859,7 @@ For future releases of @acronym{Fiona} the following features are planned:
 
 @itemize
 
-@c @item ....
+@c @item 
 @end itemize
 
 

@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.3 2007-09-04 10:27:42 bretschn Exp $
+# $Id: Makefile.in,v 1.4 2008-02-21 11:15:19 gierds Exp $
 #
 # Makefile for the CUDD distribution kit 
 #---------------------------------------------------------------------------
@@ -316,7 +316,7 @@ objlib:
 	make CPP=$(CPP) CPPFLAGS=$(CPPFLAGS) RANLIB=$(RANLIB) MFLAG= MNEMLIB= ICFLAGS="$(ICFLAGS)" XCFLAGS="$(XCFLAGS)" DDDEBUG="$(DDDEBUG)" MTRDEBUG="$(MTRDEBUG)" LDFLAGS="$(LDFLAGS)" PURE="$(PURE)" EXE="$(EXE)" )
 
 win32:
-	make XCFLAGS="$(XCFLAGS) -mno-cygwin" build objlib
+	make XCFLAGS="$(XCFLAGS) -mno-cygwin -U _WIN32" build objlib
 
 testobj: objlib
 	@(cd obj; \

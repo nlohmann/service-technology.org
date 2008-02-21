@@ -458,6 +458,18 @@ void NewLogger::printall_by_typesize() {
     cerr << "total not deallocated memory: " << total_allocated_mem << " bytes; "
          << total_alloccallcount - total_dealloccallcount
          << " allocs w/o matching deallocs" << endl;
+
+// debugging for memory leaks:
+    for (NewLogger::pointerLog_t::iterator pointer = pointerLog.begin(); pointer != pointerLog.end(); pointer++) 
+    {
+        PointerInfo pinfo = pointer->second;
+        LogInfo linfo = *(pinfo.getLogInfo());
+        cerr << "ERROR at "<<__FILE__ << ':' << __LINE__ << ". "
+            << "Memory allocated at " << linfo.filepos << " was not freed."
+            << " (pointer: " << pointer->first << ")"
+            << endl;
+    }
+
 }
 
 //! \brief new not logging 'new' function

@@ -430,7 +430,7 @@ An open workflow net is a Petri net with an @i{interface}, i.e.@: two sets of
 places: @i{input places} and @i{output places}. Additionally an open workflow
 net has a set of final markings. To represent @acronym{oWFN}s
 the @acronym{LoLA} format was extended to implement this categorization. Following
-is an example for a valid @acronym(oWFN) file.
+is an example for a valid @acronym{oWFN} file.
 
 @example
 @{ sample oWFN @}
@@ -562,7 +562,7 @@ the place p2 has to contain four tokens, the @code{FINALCONDITION} would like li
 FINALCONDITION
   p2 = 4;
 @end example
-This @code{FINALCONDITION} describes any state in which there are exactly four tokens on the place p2. One could have instead used a different relation than equality. The @acronym(oWFN) file format supports equal, not equal, lesser, greater, less or equal and greater or equal. 
+This @code{FINALCONDITION} describes any state in which there are exactly four tokens on the place p2. One could have instead used a different relation than equality. The @acronym{oWFN} file format supports equal, not equal, lesser, greater, less or equal and greater or equal. 
 The two examples are semantically different. While the examplary @code{FINALCONDITION} accepts any state with four tokens on p2 as a final state the examplary @code{FINALMARKING} only accepts one final state, and that is where p2 has four tokens and all other places have zero tokens.
 If one wants to create a @code{FINALCONDITION} equal to the exemplary @code{FINALMARKING}, one can use the boolean keywords 
 @code{AND}, @code{OR} and @code{NOT}. The equal definition would then look as follows:

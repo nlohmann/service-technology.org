@@ -60,6 +60,9 @@ class State {
 
         /// number of states
         static unsigned int state_count;
+        
+        /// number of states
+        static unsigned int state_count_stored_in_binDec;
 
         /// number of transitions to be fired
         unsigned int cardFireList;

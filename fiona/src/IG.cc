@@ -604,8 +604,6 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
     // forget about all the states we have calculated so far
     setOfStatesStubbornTemp.clear();
     
-    binDecision * tempBinDecision = (binDecision *) 0;
-
     for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
             != node->reachGraphStateSet.end(); iter++) {
 
@@ -633,29 +631,23 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
         	// no state reduction
         	PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
         } else {
-        	// state reduction
-        	// calc the reachable states from that marking using stubborn set method taking
-        	// care of deadlocks
-            PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); // calc the reachable states from that marking
+        	if (parameters[P_SINGLE]) {
+	        	// state reduction
+	        	// calc the reachable states from that marking using stubborn set method taking
+	        	// care of deadlocks
+	            PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+        	} else if (parameters[P_REPRESENTATIVE]) {
+        		PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode);
+        	}
         }
         
         if (newNode->getColor() == RED) {
             // a message bound violation occured during computation of reachability graph
             trace(TRACE_5, "interactionGraph::calculateSuccStatesInput(messageMultiSet input, AnnotatedGraphNode * node) : end\n");
-            // delete temporarily calculated set of states
-            if (tempBinDecision) {
-            	delete tempBinDecision;
-            }
-            
             return;
         }
     }
 
-    // delete temporarily calculated set of states
-    if (tempBinDecision) {
-    	delete tempBinDecision;
-    }
-    
     trace(TRACE_5, "IG::calculateSuccStatesInput(messageMultiSet input, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : end\n");
     return;
 }
@@ -682,44 +674,58 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
     } else {
     	// state reduction
     	
-        StateSet stateSet;
-        binDecision * tempBinDecision = (binDecision *) 0;
-        
         // forget about all the states we have calculated so far
         setOfStatesStubbornTemp.clear();
+
+      //  cout << "node: " << node->getName() << endl;
+     //   cout << "states of node ...  " << endl;
+
+    	if (parameters[P_SINGLE]) {
+
+    		StateSet stateSet;
+            binDecision * tempBinDecision = (binDecision *) 0;
+
+	        for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
+	                != node->reachGraphStateSet.end(); iter++) {
+	
+	            (*iter)->decode(PN);
+	            
+	            // calc reachable states from that marking using stubborn set method that
+	            // calculates all those states that activate the given receiving event 
+	            // --> not necessarily the deadlock states
+	            PN->calculateReducedSetOfReachableStates(stateSet, &tempBinDecision, receivingEvent, newNode);
+	        }
+
+	        //  cout << "receiving event activating states of node ...  " << endl;
         
-        for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
-                != node->reachGraphStateSet.end(); iter++) {
+	        for (StateSet::iterator iter2 = stateSet.begin(); iter2
+	        		!= stateSet.end(); iter2++) {
+	        	
+	        	(*iter2)->decode(PN); // get the marking of the state
+            
+	        	if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
+	            	// calc the reachable states from that marking using stubborn set method taking
+	            	// care of deadlocks
+	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+	        	}
+	        }
+	        if (tempBinDecision) {
+	        	delete tempBinDecision;
+	        }
 
-            (*iter)->decode(PN);
-            // calc reachable states from that marking using stubborn set method that
-            // calculates all those states that activate the given receiving event 
-            // --> not necessarily the deadlock states
-            PN->calculateReducedSetOfReachableStates(stateSet, &tempBinDecision, receivingEvent, newNode);
-        }
-
-        binDecision * tempBinDecision2 = (binDecision *) 0;
-        
-        for (StateSet::iterator iter2 = stateSet.begin(); iter2
-                != stateSet.end(); iter2++) {
-            (*iter2)->decode(PN); // get the marking of the state
-
-            if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
-
-            	// calc the reachable states from that marking using stubborn set method taking
-            	// care of deadlocks
-            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, 
-                											newNode); 
-
-            }
-        }
-        
-        if (tempBinDecision) {
-        	delete tempBinDecision;
-        }
-        if (tempBinDecision2) {
-        	delete tempBinDecision2;
-        }
+    	} else if (parameters[P_REPRESENTATIVE]) {
+	        for (StateSet::iterator iter2 = node->reachGraphStateSet.begin(); iter2
+	        		!= node->reachGraphStateSet.end(); iter2++) {
+	        	
+	        	(*iter2)->decode(PN); // get the marking of the state
+            
+	        	if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
+	            	// calc the reachable states from that marking using stubborn set method taking
+	            	// care of deadlocks
+	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+	        	}
+	        }
+    	}
     }
 
     trace(TRACE_5, "interactionGraph::calculateSuccStatesOutput(messageMultiSet output, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : end\n");

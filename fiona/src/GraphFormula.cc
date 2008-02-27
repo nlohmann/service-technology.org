@@ -382,7 +382,7 @@ GraphFormulaMultiary::removeSubFormula(iterator subformula) {
 //! \param name the name of the literal to be removed
 void GraphFormulaMultiary::removeLiteral(const std::string& name) {
 
-    trace(TRACE_3, "GraphFormulaMultiary::removeLiteral(const std::string& name) : start\n");
+    trace(TRACE_5, "GraphFormulaMultiary::removeLiteral(const std::string& name) : start\n");
 
     subFormulas_t::iterator iCurrentFormula;
     //cout << "\tanzahl von klauseln: " << subFormulas.size() << endl; int i = 1;
@@ -411,7 +411,7 @@ void GraphFormulaMultiary::removeLiteral(const std::string& name) {
         }
     }
 
-    trace(TRACE_3, "GraphFormulaMultiary::removeLiteral(const std::string& name) : end\n");
+    trace(TRACE_5, "GraphFormulaMultiary::removeLiteral(const std::string& name) : end\n");
 }
 
 

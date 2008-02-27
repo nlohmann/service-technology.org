@@ -344,7 +344,6 @@ void OG::add(AnnotatedGraphNode* sourceNode,
     trace(TRACE_5, "reachGraph::Add(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* destNode, unsigned int label, Type type): end\n");
 }
 
-
 //! \brief for each state of the old node: add input message
 //!        and build reachability graph and add all states to new node
 //! \param input the sending event currently performed
@@ -357,7 +356,6 @@ void OG::calculateSuccStatesInput(unsigned int input,
 	trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : start\n");
     StateSet::iterator iter; // iterator over the state set's elements
     
-    binDecision * tempBinDecision = (binDecision *) 0;
     setOfStatesStubbornTemp.clear();
     
     for (iter = oldNode->reachGraphStateSet.begin();
@@ -387,9 +385,16 @@ void OG::calculateSuccStatesInput(unsigned int input,
         	// calc the reachable states from that marking
             PN->calculateReachableStatesFull(newNode); 
         } else {
-        	// calc the reachable states from that marking using stubborn set method taking
-        	// care of deadlocks
-        	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+        	if (parameters[P_SINGLE]) {
+	        	// calc the reachable states from that marking using stubborn set method taking
+	        	// care of deadlocks
+        		// --> the current state is stored in the node, the states reachable from the current state
+        		//     are not stored in the node        	
+        		PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+        	} else if (parameters[P_REPRESENTATIVE]) {
+        		// --> store the current state and all "minimal" states in the node
+        		PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode);
+        	}
         }
         
         if (newNode->getColor() == RED) {
@@ -398,25 +403,14 @@ void OG::calculateSuccStatesInput(unsigned int input,
             trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
             trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
             
-            // delete temporarily calculated set of states
-            if (tempBinDecision) {
-            	delete tempBinDecision;
-            }
-
             return;
         }
     }
 
-    // delete temporarily calculated set of states
-    if (tempBinDecision) {
-    	delete tempBinDecision;
-    }
-    
     trace(TRACE_3, "\t\t\t\t input event added without message bound violation\n");
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
     return;
 }
-
 
 //! \brief calculates the set of successor states in case of an output message
 //! \param output the output messages that are taken from the marking
@@ -440,44 +434,53 @@ void OG::calculateSuccStatesOutput(unsigned int output,
             }
         }
     } else {
-    	binDecision * tempBinDecision = (binDecision *) 0;
-    	
-    	setOfStatesStubbornTemp.clear();
-        owfnPlace * outputPlace = PN->getPlace(output);
-        StateSet stateSet;
+    	if (parameters[P_SINGLE]) {
+	    	binDecision * tempBinDecision = (binDecision *) 0;
+	    	
+	    	setOfStatesStubbornTemp.clear();
+	        owfnPlace * outputPlace = PN->getPlace(output);
+	        StateSet stateSet;
+	
+	        for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
+	                != node->reachGraphStateSet.end(); iter++) {
+	            (*iter)->decode(PN);
+	            // calc reachable states from that marking using stubborn set method that
+	            // calculates all those states that activate the given receiving event 
+	            // --> not necessarily the deadlock states
+	            PN->calculateReducedSetOfReachableStates(stateSet, &tempBinDecision, outputPlace, newNode);
+	        }
+	
+	        for (StateSet::iterator iter2 = stateSet.begin(); iter2
+	                != stateSet.end(); iter2++) {
+	            (*iter2)->decode(PN); // get the marking of the state
+	
+	            if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
+	            	// calc the reachable states from that marking using stubborn set method taking
+	            	// care of deadlocks
+	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+	            }
+	        }
+	
+	        if (tempBinDecision) {
+	        	delete tempBinDecision;
+	        }
+    	} else if (parameters[P_REPRESENTATIVE]) {
+	        for (StateSet::iterator iter2 = node->reachGraphStateSet.begin(); iter2
+	        		!= node->reachGraphStateSet.end(); iter2++) {
+	        	
+	        	(*iter2)->decode(PN); // get the marking of the state
+            
+	        	if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
+	            	// calc the reachable states from that marking using stubborn set method taking
+	            	// care of deadlocks
+	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
 
-        for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
-                != node->reachGraphStateSet.end(); iter++) {
-            (*iter)->decode(PN);
-            // calc reachable states from that marking using stubborn set method that
-            // calculates all those states that activate the given receiving event 
-            // --> not necessarily the deadlock states
-            PN->calculateReducedSetOfReachableStates(stateSet, &tempBinDecision, outputPlace, newNode);
-        }
-
-        binDecision * tempBinDecision2 = (binDecision *) 0;
-        
-        for (StateSet::iterator iter2 = stateSet.begin(); iter2
-                != stateSet.end(); iter2++) {
-            (*iter2)->decode(PN); // get the marking of the state
-
-            if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
-            	// calc the reachable states from that marking using stubborn set method taking
-            	// care of deadlocks
-            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
-            }
-        }
-
-        if (tempBinDecision) {
-        	delete tempBinDecision;
-        }
-        if (tempBinDecision2) {
-        	delete tempBinDecision2;
-        }
+	        	}
+	        }
+    	}
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, AnnotatedGraphNode* node, AnnotatedGraphNode* newNode) : end\n");
 }
-
 
 //! \brief Turns all blue nodes that should be red into red ones and
 //!        simplifies their annotations by removing unneeded literals.

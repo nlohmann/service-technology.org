@@ -80,7 +80,7 @@ static struct option longopts[] = {
     { "type",            required_argument, NULL, 't' },
     { "show",            required_argument, NULL, 's' },
     { "parameter",       required_argument, NULL, 'p' },
-    { "reduce-nodes",    no_argument,       NULL, 'R' },
+    { "reduce-nodes",    no_argument, 		NULL, 'R' },
     { "reduceIG",        no_argument,       NULL, 'r' },
     { "messagebound",    required_argument, NULL, 'm' },
     { "eventsmaximum",   required_argument, NULL, 'e' },
@@ -290,6 +290,9 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_SHOW_STATES_PER_NODE] = false;
     parameters[P_SHOW_DEADLOCKS_PER_NODE] = false;
     parameters[P_READ_OG] = false;
+    
+    parameters[P_REPRESENTATIVE] = false;
+    parameters[P_SINGLE] = true;
 
     bdd_reordermethod = 0;
 
@@ -430,6 +433,12 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_SHOW_RED_NODES] = true;
                     parameters[P_SHOW_ALL_NODES] = true;
                     parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
+                } else if (lc_optarg == "representative") {
+                	parameters[P_REPRESENTATIVE] = true;
+                	parameters[P_SINGLE] = false;
+                } else if (lc_optarg == "single") {
+                	parameters[P_SINGLE] = true;
+                	parameters[P_REPRESENTATIVE] = false;
                 } else {
                     cerr << "Error:\twrong parameter (option -p)" << endl
                     << "\tEnter \"fiona --help\" for more information.\n" << endl;

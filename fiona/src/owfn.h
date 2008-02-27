@@ -218,6 +218,7 @@ class oWFN {
         /// successors
         owfnTransition ** stubbornfirelistmessage(owfnPlace *);
         owfnTransition ** stubbornfirelistmessage(messageMultiSet);
+        owfnTransition ** stubbornFirelistAllMessages();
 #endif
 
         void initialize(); // initializes the net
@@ -229,7 +230,13 @@ class oWFN {
         void addPlace(owfnPlace*);
 
         /// decodes state, checks for message bound violation and adds successors
-        void addSuccStatesToList(AnnotatedGraphNode*, State*);
+        void addSuccStatesToNode(AnnotatedGraphNode*, State*);
+
+        /// decodes state, checks for message bound violation and adds successors
+        void addSuccStatesToNodeStubborn(AnnotatedGraphNode*, 
+											StateSet&, 
+											unsigned int*,
+											State *);        
         
         /// decodes state, figures out if state activates output event, 
         ///		checks for message bound violation and adds successors recursively
@@ -258,6 +265,9 @@ class oWFN {
 
         /// returns a copy of the current marking
         unsigned int* copyCurrentMarking();
+
+        /// returns a copy of the given marking
+        unsigned int* copyGivenMarking(unsigned int*);
         
         /// replaces the current marking with a given one
         void copyMarkingToCurrentMarking(unsigned int* copy);
@@ -272,6 +282,11 @@ class oWFN {
         /// given state set
         void calculateReducedSetOfReachableStates(StateSet&, binDecision**, owfnPlace*, AnnotatedGraphNode*);
         void calculateReducedSetOfReachableStates(StateSet&, binDecision**, messageMultiSet, AnnotatedGraphNode*);
+        
+        bool currentMarkingActivatesReceivingEvent(unsigned int* );
+        
+        void calculateStubbornTransitions(State*);
+        void calculateReducedSetOfReachableStatesStoreInNode(StateSet&, AnnotatedGraphNode*);
 
         /// NO REDUCTION! calculate all reachable states from the current marking
         /// and store them in the node n (== AnnotatedGraphNode of CommunicationGraph)

@@ -154,17 +154,16 @@ void CommunicationGraph::calculateRootNode() {
     	
     	// forget about all the states we have calculated so far
     	setOfStatesStubbornTemp.clear();
-    	
-        PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, root);
-    
-    //    for (StateSet::iterator iter2 = setOfStatesStubbornTemp.begin(); iter2
-    //                                    != setOfStatesStubbornTemp.end(); iter2++) {
-                    	
-        //	root->addState(*iter2);            	
-   //     }
-        if (tempBinDecision) {
-        	delete tempBinDecision;
-        }
+    	if (parameters[P_SINGLE]) {
+        	// calc the reachable states from that marking using stubborn set method taking
+        	// care of deadlocks
+    		// --> the current state is stored in the node, the states reachable from the current state
+    		//     are not stored in the node
+            PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, root); 
+    	} else if (parameters[P_REPRESENTATIVE]) {
+    		// --> store the current state and all "minimal" states in the node
+    		PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, root);
+    	}
     }
 
     root->setNumber(0);
@@ -408,6 +407,7 @@ void CommunicationGraph::printGraphStatistics() {
     trace(TRACE_0, "    number of blue nodes: " + intToString(getNumberOfBlueNodes()) + "\n");
     trace(TRACE_0, "    number of blue edges: " + intToString(getNumberOfBlueEdges()) + "\n");
     trace(TRACE_0, "    number of states calculated: " + intToString(State::state_count) + "\n");
+    trace(TRACE_0, "    number of states stored in datastructure: " + intToString(State::state_count_stored_in_binDec) + "\n");
     trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStoredStates()) + "\n");
 }
 
@@ -573,7 +573,7 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
                     default:            assert(false);
                 }
 
-                os << ")" << "\\n";
+                os << ")" << " (parent: " << (*iter)->parent << ")\\n";
             }
         }
     }

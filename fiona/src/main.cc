@@ -84,6 +84,7 @@ extern int og_yylex_destroy();
 void deleteOGs(AnnotatedGraph::ogs_t& OGsFromFiles);
 
 extern unsigned int State::state_count;
+extern unsigned int State::state_count_stored_in_binDec;
 extern std::list<std::string> netfiles;
 extern std::list<std::string> ogfiles;
 extern AnnotatedGraph* OGToParse;
@@ -644,6 +645,7 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         global_progress = 0;
         show_progress = 0;
         State::state_count = 0; // number of states
+        State::state_count_stored_in_binDec = 0; // number of states
         numberDeletedVertices = 0;
         
         currentowfnfile = *netiter;
@@ -747,6 +749,7 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         global_progress = 0;
         show_progress = 0;
         State::state_count = 0; // number of states
+        State::state_count_stored_in_binDec = 0; // number of states
         numberDeletedVertices = 0;
 
         currentowfnfile = *netiter;
@@ -897,6 +900,7 @@ void checkCovSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         global_progress = 0;
         show_progress = 0;
         State::state_count = 0; // number of states
+        State::state_count_stored_in_binDec = 0; // number of states
         numberDeletedVertices = 0;
         
         currentowfnfile = *netiter;
@@ -1342,6 +1346,7 @@ int main(int argc, char** argv) {
 	            global_progress = 0;
 	            show_progress = 0;
 	            State::state_count = 0; // number of states
+	            State::state_count_stored_in_binDec = 0; // number of states
 	            numberDeletedVertices = 0;
 	
 	            currentowfnfile = *netiter;

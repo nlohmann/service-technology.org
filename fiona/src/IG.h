@@ -49,7 +49,7 @@ class interactionGraph : public CommunicationGraph {
                           messageMultiSet,
                           GraphEdgeType,
                           double); // for IG
-
+        
     public:
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.

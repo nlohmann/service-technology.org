@@ -693,22 +693,23 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 	            // calc reachable states from that marking using stubborn set method that
 	            // calculates all those states that activate the given receiving event 
 	            // --> not necessarily the deadlock states
-	            PN->calculateReducedSetOfReachableStates(stateSet, &tempBinDecision, receivingEvent, newNode);
+	            PN->calculateReducedSetOfReachableStates(stateSet, setOfStatesStubbornTemp, 
+	            											&tempBinDecision, receivingEvent, newNode);
 	        }
 
 	        //  cout << "receiving event activating states of node ...  " << endl;
-        
-	        for (StateSet::iterator iter2 = stateSet.begin(); iter2
-	        		!= stateSet.end(); iter2++) {
-	        	
-	        	(*iter2)->decode(PN); // get the marking of the state
-            
-	        	if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
-	            	// calc the reachable states from that marking using stubborn set method taking
-	            	// care of deadlocks
-	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
-	        	}
-	        }
+//        
+//	        for (StateSet::iterator iter2 = stateSet.begin(); iter2
+//	        		!= stateSet.end(); iter2++) {
+//	        	
+//	        	(*iter2)->decode(PN); // get the marking of the state
+//            
+//	        	if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
+//	            	// calc the reachable states from that marking using stubborn set method taking
+//	            	// care of deadlocks
+//	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+//	        	}
+//	        }
 	        if (tempBinDecision) {
 	        	delete tempBinDecision;
 	        }

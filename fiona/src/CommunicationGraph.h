@@ -94,7 +94,7 @@ class CommunicationGraph : public AnnotatedGraph {
         binDecision * tempBinDecision;
         
         void addProgress(double);
-
+        
     public:
 
         /// basic constructor

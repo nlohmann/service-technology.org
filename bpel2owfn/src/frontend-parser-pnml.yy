@@ -36,7 +36,7 @@
  *          
  * \date 
  *          - created: 2006/09/10
- *          - last changed: \$Date: 2008/02/28 16:31:02 $
+ *          - last changed: \$Date: 2008/02/28 16:52:41 $
  * 
  * \note    This file is part of the tool PNML2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -45,7 +45,7 @@
  * \note    This file was created using GNU Bison reading file pnml-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  * 
  */
 %}
@@ -344,7 +344,6 @@ tTransformation:
 tInitialmarking:
   P_INITIALMARKING X_NEXT tText X_NEXT X_SLASH P_INITIALMARKING
     {
-        std::cerr << $3->name << std::endl;
         sscanf($3->name,">%u<",&isMarked);
     	// isMarked = 1;
     }

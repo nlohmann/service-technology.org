@@ -1,0 +1,231 @@
+\documentclass[]{elsart}
+
+% Letzte Änderungen von: $Author: suermeli $ am $Date: 2008-02-29 14:15:11 $
+
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{bbm}
+\usepackage[latin1]{inputenc}
+
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage[outercaption]{sidecap}
+\usepackage{xspace}
+
+\journal{DKE}
+
+%\setlength{\intextsep}{2mm}%{6mm plus 2mm minus 2mm}
+
+\newcommand{\abb}[1]{{\small\textsf{#1}}\xspace}
+%\newcommand{\abb}[1]{\textsf{#1}}
+
+\begin{document}
+
+\newlength{\abovecaptionskip}
+\setlength{\abovecaptionskip}{0pt}
+\newlength{\belowcaptionskip}
+\setlength{\belowcaptionskip}{0pt}
+
+\begin{frontmatter}
+
+\title{Fiona - Functional Interaction Analysis for Open Workflow Nets}
+\subtitle{User's Manual}
+
+\author{Peter Massuthe},  \ead{massuthe@informatik.hu-berlin.de}%
+\author{Daniela Weinberg} \ead{weinberg@informatik.hu-berlin.de}%
+
+\address{Humboldt-Universit\"at zu Berlin, Institut f\"ur Informatik,\\ Unter den Linden 6, 10099 Berlin,
+Germany}
+
+\begin{abstract}
+This manual is for \textit{Fiona}, Version \textit{VERSION}. \textit{Fiona} is a tool to
+automatically analyze the interactional behavior of a given open workflow net (\textit{oWFN}). This
+manual does not explain how to setup or install \textit{Fiona}. For this information please read
+the Installation Manual which is part of the distribution or can be downloaded from the website of
+\textit{Fiona} (\textit{http://www.informatik.hu-berlin.de/top/tools4bpel/fiona}). Last update
+\textit{UPDATED}.
+
+Copying and distribution of this file, with or without modification, are permitted in any medium
+without royalty provided the copyright notice and this notice are preserved. \textit{Fiona} is
+licensed under the \textit{GNU} General Public License.
+
+Copyright \copyright 2005, 2006, 2007 Daniela Weinberg, Peter Massuthe, Karsten Wolf, Kathrin
+Kaschner, Christian Gierds and Jan Bretschneider.
+
+\end{abstract}
+
+\begin{keyword}
+dsf
+\end{keyword}
+
+\end{frontmatter}
+
+
+\section{Overview}
+\subsection{Introduction}%
+\textit{Fiona} is a tool to automatically analyze the interactional behavior of a given open
+workflow net (\textit{oWFN}) [MRS05]. It provides two techniques:
+
+\begin{itemize}
+\item it checks for the controllability of the given net by computing the interactiong
+graph [Wei06],
+\item it calculates the operating guideline [MRS05] for the net.
+\end{itemize}
+
+Fiona uses oWFNs as its input which is the output of the tool \textit{BPEL2oWFN}. Thus, any
+\textit{BPEL} (\textit{Business Process Execution Language for Web Services}) \ref{} process can
+easily be analyzed.
+
+To compute the states of the graph nodes \textit{Fiona} uses the efficient algorithms that were
+implemented in the model checking tool \textit{LoLA}.
+
+\textit{Fiona} was written by Daniela Weinberg, Peter Massuthe, Karsten Wolf, Kathrin Kaschner,
+Christian Gierds and Jan Bretschneider. It is part of the Tools4\textit{BPEL} project funded by the
+German Bundesministerium f"ur Bildung und Forschung. See
+@url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
+
+\section{Invoking Fiona}
+
+A given \textit{oWFN} can be analyzed in two ways by \textit{Fiona}. Therefore the standard
+invocation of \textit{Fiona} is:
+
+\begin{itemize}
+\item checking controllability: \texttt{fiona -n inputNet.owfn -t IG}
+\item calculating the operating guideline: \texttt{fiona -n inputNet.owfn -t OG}
+\end{itemize}
+
+where \texttt{inputNet.owfn} contains an \textit{oWFN} written in the appropriate format
+\texttt{File Format owfn}. The option \texttt{-t IG} lets \textit{Fiona} generate the interaction
+graph of the given net. In case the graph's size is not too big, a png graphics is created that
+shows the interaction graph. Further, an output is written on the command line indicating the size
+of the graph and the statement whether the oWFN is controllable or not.
+
+The option @samp{-t OG} lets \textit{Fiona} generate the operating guideline of the given
+\textit{oWFN}. In case the graph's size is not too big, a png graphics is created that shows the
+interaction graph. Further, an output is written on the command line indicating the size of the
+graph and the statement whether the oWFN is controllable or not.
+
+For more examples, see @ref{Examples}.
+
+\textit{Fiona} can be called without any parameter. In this case, it calculates the interaction
+graph of the \textit{oWFN}, that is being read from the standard input (\texttt{stdin}).
+
+\subsection{Options}
+
+\textit{Fiona} supports the following command-line options:
+
+\begin{tabular}{|l|l|l|}
+  \hline
+ -h $|$ --help & print this information and exit\\
+ -v $|$ --version & print version information and exit\\
+ -d $|$ --debug=$<$level$>$& set debug $<$level$>$:\\
+                     &              1 - show nodes and dfs information\\
+                     &              2 - show analyse information (i.e. colors)\\
+                     &              3 - show information on events and states\\
+                     &              4 - yet to be defined ;)\\
+                     &              5 - show detailed information on everything\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{|l|ll|}
+  \hline
+ -t $|$ --type=$<$type$>$& \multicolumn{2}{l|}{select the modus operandi of fiona $<$type$>$:}\\
+                      &           \multicolumn{2}{l|}{(only one type is allowed; default is IG)}\\
+                      &             IG          &compute interaction graph\\
+                      &             OG          &compute operating guideline\\
+                      &             match       &check whether a given oWFN matches with a given OG\\
+                      &             PV          &calculate the public view of a given OG (the result is an\\
+                      &                         &automaton in OG file format)\\
+                      &             productog   &calculate the product OG of all given OGs\\
+                      &             simulation  &check whether the first OG characterizes more strategies\\
+                      &                         &than the second one (if an oWFN is given, its OG\\
+                      &                         &is computed automatically)\\
+                      &             equivalence &check whether two OGs characterize the same\\
+                      &                         &strategies (if an oWFN is given, its OG is computed\\
+                      &                         &automatically) (option -b1 can be used to\\
+                      &                         &check the equivalence of (already present!) BDDs)\\
+                      &             filter      &reduces the first OG such that it simulates the second OG\\
+                      &                         &(if possible)\\
+                      &             isacyclic   &check a given OG for cycles\\
+                      &             count       &count the number of strategies that are characterized by a\\
+                      &                         &given OG\\
+                      &             png         &generate png files for all given oWFNs\\
+                      &             readOG      &only reads a given OG File\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{|l|l|l|}
+\hline
+ -m $|$ --messagebound=$<$level$>$& set maximum number of same messages per\\
+                      &           state to $<$level$>$  (default is 1)\\
+ -r $|$ --reduceIG& use reduction rules for IG\\
+ -R $|$ --reduce-nodes& use node reduction (IG or OG) which stores\\
+                      &           less states per IG/OG node\\
+                      &           (reduces memory, but increases time)\\
+\hline
+\end{tabular}
+
+\begin{tabular}{|l|ll|}
+  \hline
+ -s $|$ --show=$<$parameter$>$&\multicolumn{2}{l|}{different display options $<$parameter$>$:}\\
+                      &            blue       &show blue nodes only (default)\\
+                      &                       &(empty node not shown)\\
+                      &             empty     &show empty node\\
+                      &             rednodes  &show blue and red nodes\\
+                      &                       &(only empty node not shown\\
+                      &             allnodes  &show all nodes\\
+                      &             allstates &show all calculated states per\\
+                      &                       &node\\
+                      &             deadlocks &show all but transient states\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{|l|l|l|}
+  \hline
+ -b $|$ --BDD=$<$reordering$>$& enable BDD construction (only relevant for OG)\\
+                      &              $<$reordering$>$ specifies reodering method:\\
+                      &              0 - CUDD\_REORDER\_SAME\\
+                      &              1 - CUDD\_REORDER\_NONE\\
+                      &              2 - CUDD\_REORDER\_RANDOM\\
+                      &              3 - CUDD\_REORDER\_RANDOM\_PIVOT\\
+                      &              4 - CUDD\_REORDER\_SIFT\\
+                      &              5 - CUDD\_REORDER\_SIFT\_CONVERGE\\
+                      &              6 - CUDD\_REORDER\_SYMM\_SIFT\\
+                      &              7 - CUDD\_REORDER\_SYMM\_SIFT\_CONV\\
+                      &              8 - CUDD\_REORDER\_WINDOW2\\
+                      &              9 - CUDD\_REORDER\_WINDOW3\\
+                      &             10 - CUDD\_REORDER\_WINDOW4\\
+                      &             11 - CUDD\_REORDER\_WINDOW2\_CONV\\
+                      &             12 - CUDD\_REORDER\_WINDOW3\_CONV\\
+                      &             13 - CUDD\_REORDER\_WINDOW4\_CONV\\
+                      &             14 - CUDD\_REORDER\_GROUP\_SIFT\\
+                      &             15 - CUDD\_REORDER\_GROUP\_SIFT\_CONV\\
+                      &             16 - CUDD\_REORDER\_ANNEALING\\
+                      &             17 - CUDD\_REORDER\_GENETIC\\
+                      &             18 - CUDD\_REORDER\_LINEAR\\
+                      &             19 - CUDD\_REORDER\_LINEAR\_CONVERGE\\
+                      &             20 - CUDD\_REORDER\_LAZY\_SIFT\\
+                      &             21 - CUDD\_REORDER\_EXACT\\
+ -B $|$ --OnTheFly=$<$reordering$>$&  BDD construction on the fly (only for OG)\\
+                      &           $<$reordering$>$ as above\\
+ -o $|$ --output=$<$filename$>$& prefix of the output files\\
+ -Q $|$ --no-output& runs quietly, i.e., produces no output files\\
+ -M $|$ --multipledeadlocks& create multiple deadlocks of public view\\
+                      &          (only relevant for PV mode -t PV)\\
+ -p $|$ --parameter=$<$param$>$& additional parameter $<$param$>$\\
+                      &              no-png    - does not create a PNG file\\
+                      &              diagnosis - disables optimizations\\
+\hline
+\end{tabular}
+
+
+%Literaturverzeichnis
+%\bibliographystyle{elsart-num}
+%\bibliography{bibs}
+%\bibliography{../bibs_mit-TB}
+
+
+\end{document}

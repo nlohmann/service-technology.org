@@ -660,7 +660,7 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
 void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivingEvent,
                                                  AnnotatedGraphNode* node,
                                                  AnnotatedGraphNode* newNode) {
-    trace(TRACE_5, "interactionGraph::calculateSuccStatesOutput(messageMultiSet output, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : start\n");
+    trace(TRACE_5, "interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet output, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : start\n");
 
     if (options[O_CALC_ALL_STATES]) {
     	// no state reduction
@@ -695,6 +695,12 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 	            // --> not necessarily the deadlock states
 	            PN->calculateReducedSetOfReachableStates(stateSet, setOfStatesStubbornTemp, 
 	            											&tempBinDecision, receivingEvent, newNode);
+            	if (newNode->getColor() == RED) {
+                	// a message bound violation occured during computation of reachability graph
+                    trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
+                    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+                    return;
+                }
 	        }
 
 	        //  cout << "receiving event activating states of node ...  " << endl;
@@ -724,12 +730,18 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 	            	// calc the reachable states from that marking using stubborn set method taking
 	            	// care of deadlocks
 	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+	            	if (newNode->getColor() == RED) {
+	                	// a message bound violation occured during computation of reachability graph
+	                    trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
+	                    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+	                    return;
+	                }
 	        	}
 	        }
     	}
     }
 
-    trace(TRACE_5, "interactionGraph::calculateSuccStatesOutput(messageMultiSet output, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : end\n");
+    trace(TRACE_5, "interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet output, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : end\n");
 }
 
 

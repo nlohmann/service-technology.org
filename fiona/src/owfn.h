@@ -237,7 +237,23 @@ class oWFN {
 											StateSet&, 
 											unsigned int*,
 											State *);        
+        /// helper function for addSuccStatesToNodeStubborn
+        void addSuccStatesToNodeStubborn(AnnotatedGraphNode*, 
+											StateSet&,
+											StateSet&,
+											unsigned int*,
+											State *);        
+
         
+        /// decodes state, figures out if state activates output event, 
+        ///		checks for message bound violation and adds successors recursively
+        void addSuccStatesToListStubborn(StateSet&,
+        								 StateSet &,
+                                         owfnPlace*,
+                                         State*,
+                                         AnnotatedGraphNode*);
+
+        /// helper function
         /// decodes state, figures out if state activates output event, 
         ///		checks for message bound violation and adds successors recursively
         void addSuccStatesToListStubborn(StateSet&,
@@ -247,6 +263,7 @@ class oWFN {
                                          State*,
                                          AnnotatedGraphNode*);
 
+        
         /// decodes state, figures out if state activates output event, 
         ///		checks for message bound violation and adds successors recursively
         void addSuccStatesToListStubborn(StateSet&,
@@ -256,12 +273,23 @@ class oWFN {
                                          State*,
                                          AnnotatedGraphNode*);
 
+        /// helper function
+        /// decodes state, figures out if state activates output event, 
+        ///		checks for message bound violation and adds successors recursively
+        void addSuccStatesToListStubborn(StateSet&,
+        								 StateSet &,
+                                         messageMultiSet,
+                                         State*,
+                                         AnnotatedGraphNode*);
+
+        
         /// checks whether the message bound is violated
         bool violatesMessageBound();
 
         /// adds recursively the state s and all its successor states to the given state set
-        void addRecursivelySuccStatesToGivenSetOfStates(AnnotatedGraphNode*, StateSet&, State* s);
-        void addRecursivelySuccStatesToGivenSetOfStates(AnnotatedGraphNode*, StateSet&, StateSet&, State* s);
+        void addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode*, StateSet&, StateSet&, State* s);
+        /// helper function to add recursively the state s and all its successor states to the given state set
+        void addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode*, StateSet&, State* s);
         
         /// calculates and returns the next state
         State* calculateNextSate();

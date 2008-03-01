@@ -448,6 +448,12 @@ void OG::calculateSuccStatesOutput(unsigned int output,
 	            // calculates all those states that activate the given receiving event 
 	            // --> not necessarily the deadlock states
 	            PN->calculateReducedSetOfReachableStates(stateSet, setOfStatesStubbornTemp, &tempBinDecision, outputPlace, newNode);
+            	if (newNode->getColor() == RED) {
+                	// a message bound violation occured during computation of reachability graph
+                    trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
+                    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+                    return;
+                }
 	        }
 	
 //	        for (StateSet::iterator iter2 = stateSet.begin(); iter2
@@ -474,7 +480,13 @@ void OG::calculateSuccStatesOutput(unsigned int output,
 	            	// calc the reachable states from that marking using stubborn set method taking
 	            	// care of deadlocks
 	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
-
+	                
+	            	if (newNode->getColor() == RED) {
+	                	// a message bound violation occured during computation of reachability graph
+	                    trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
+	                    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+	                    return;
+	                }
 	        	}
 	        }
     	}

@@ -139,6 +139,9 @@ class Graph {
         /// a function needed for successful deletion of the graph
         void clearNodeSet();
 
+        /// a function that returns the number of nodes in the graph
+        unsigned int numberOfNodes();
+
 #undef new
         /// Provides user defined operator new. Needed to trace all new operations
         /// on this class.

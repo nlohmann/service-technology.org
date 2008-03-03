@@ -2074,11 +2074,12 @@ void AnnotatedGraph::fixDualService() {
 
 //! \brief transforms the graph into its public view
 void AnnotatedGraph::transformToPublicView(Graph* cleanPV) {
+	removeFalseNodes();
     removeNodesAnnotatedWithTrue();
     constructDualService();
     fixDualService();
 
-    trace(TRACE_0, "PVSA statistics: \n");
+    trace(TRACE_0, "Statistics of the public view service automaton: \n");
     trace(TRACE_0, "  nodes: " + intToString(setOfNodes.size()) + "\n");
     unsigned int edges = 0;
     for (nodes_iterator nodeIter = setOfNodes.begin();
@@ -2086,7 +2087,7 @@ void AnnotatedGraph::transformToPublicView(Graph* cleanPV) {
 
         edges += (*nodeIter)->getLeavingEdgesCount();
     }
-    trace(TRACE_0, "  edges: " + intToString(edges) + "\n");
+    trace(TRACE_0, "  edges: " + intToString(edges) + "\n\n");
 
     transformOGToService(cleanPV);
 

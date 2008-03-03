@@ -390,10 +390,12 @@ string computeIG(oWFN* PN) {
 //! \param graphName a name for the graph in the output
 void computePublicView(AnnotatedGraph* OG, string graphName) {
 
-    trace(TRACE_0, "generating the public view for\n");
+    trace(TRACE_0, "generating the public view for ");
     trace(graphName);
-    trace("\n");
+    trace("\n\n");
 
+    unsigned int maxSizeForDot = 120;
+    
     outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
     outfilePrefix += ".sa";
 
@@ -403,16 +405,25 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
 
     // generate output files
     if (!options[O_NOOUTPUTFILES]) {
-        trace(TRACE_0, "generating dot output...\n");
+    	
+    	if(cleanPV->numberOfNodes() > maxSizeForDot)
+    	{
+    		trace(TRACE_0, "the public view service automaton is to big to generate a dot file\n\n");
+    	} else {
+    		trace(TRACE_0, "generating dot output...\n");
 
-        // .out
-        cleanPV->printDotFile(outfilePrefix, "public view of " + graphName);
-       
+    		// .out
+    		cleanPV->printDotFile(outfilePrefix, "public view of " + graphName);
+    	}
+    	
         //transform to owfn
         PNapi::PetriNet* PVoWFN = new PNapi::PetriNet(); 
         PVoWFN->set_format(PNapi::FORMAT_OWFN, true);
         cleanPV->transformToOWFN(PVoWFN);
 
+		trace(TRACE_0, "Public View oWFN statistics:\n");
+        trace(PVoWFN->information());
+		trace(TRACE_0, "\n");
         
         ofstream output;
         const string owfnOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".sa.owfn";
@@ -421,10 +432,8 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
         (output) << (*PVoWFN);
         output.close();
 
-
-        
-        // .og
-        OG->printOGFile(outfilePrefix);
+        trace(TRACE_0, "=================================================================\n");
+        trace(TRACE_0, "\n");
     }
 }
 

@@ -181,6 +181,12 @@ void Graph::removeEdgesFromNodeToAllOtherNodes(GraphNode* nodeToDelete) {
     }
 }
 
+//! \brief returns the number of nodes in the Graph
+//! \return number of nodes
+unsigned int Graph::numberOfNodes() {
+	return (setOfNodes.size());
+}
+
 //! \brief checks, whether this Graph is acyclic
 //! \return true on positive check, otherwise: false
 bool Graph::isAcyclic() {
@@ -334,7 +340,7 @@ void Graph::printGraphToDot(GraphNode* v,
 //! \param dotGraphTitle a title for the graph to be shown in the image
 void Graph::transformToOWFN(PNapi::PetriNet* PN) {
 
-	trace(TRACE_0, "creating the oWFN from the service automaton\n");
+	trace(TRACE_0, "creating the oWFN from the service automaton ...\n");
     
     GraphNode* currentNode = getRoot(); 
     set<GraphNode*> visitedNodes;

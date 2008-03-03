@@ -67,6 +67,15 @@ class Graph {
 
         /// remove all edges that have a given node as source
         void removeEdgesFromNodeToAllOtherNodes(GraphNode* nodeToDelete);
+        
+        /// transforms the service automaton to an OWFN recursively
+        void Graph::transformToOWFNRecursively(GraphNode* currentNode,
+        		   							   set<GraphNode*>& visitedNodes,	
+        		   							   set<string>& finalNodeNames,
+        		   							   PNapi::PetriNet* PN, // The resulting petri net
+        		   							   unsigned int& transitionNumber, // The current transition number
+        		   							   PNapi::Transition* incomingTransition // The transition that leads to this node
+        		   							   );  
 
     public:
 
@@ -123,6 +132,9 @@ class Graph {
     
         /// tests if this OG is acyclic
         bool isAcyclic();
+
+        /// transforms this service automaton into an owfn
+        void transformToOWFN(PNapi::PetriNet* PN);
 
         /// a function needed for successful deletion of the graph
         void clearNodeSet();

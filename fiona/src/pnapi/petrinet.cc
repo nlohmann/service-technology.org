@@ -31,17 +31,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007-07-18 08:16:54 $
+ * \date    \$Date: 2008-03-03 12:06:14 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  *
  * \ingroup petrinet
  */
@@ -229,8 +229,20 @@ void Place::mark(unsigned int my_tokens)
   tokens = my_tokens;
 }
 
+/*!
+ * \brief   add this place to a final marking
+ */
+void Place::addToFinalMarking(Marking* marking, unsigned int tokens) {
+	marking->insert(pair<Place*,int>(this,tokens));
+	finalMarkings.insert(marking);
+}
 
-
+/*!
+ * \brief is part of a final marking = (!finalMarkings.empty());
+ */
+bool Place::isInFinalMarking() {
+	return (!finalMarkings.empty());
+}
 
 
 /*!
@@ -238,6 +250,9 @@ void Place::mark(unsigned int my_tokens)
  */
 Place::~Place()
 {
+	for (set<Marking*>::iterator fm = finalMarkings.begin(); fm != finalMarkings.end(); ++fm) {
+		(*fm)->erase(this);
+	}
 }
 
 
@@ -568,6 +583,9 @@ PetriNet::~PetriNet()
 
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
     delete *t;
+  
+  for (set<Marking *>::iterator m = finalMarkings.begin(); m != finalMarkings.end(); ++m) 
+	  delete *m;
 }
 
 
@@ -612,7 +630,11 @@ Place *PetriNet::newPlace(string my_role, communication_type my_type)
 }
 
 
-
+Marking* PetriNet::addFinalMarking() {
+	Marking* marking = new Marking();
+	finalMarkings.insert(marking);
+	return marking;
+}
 
 
 /*---------------------------------------------------------------------------*/
@@ -2006,6 +2028,7 @@ void PetriNet::produce(const PetriNet &net)
   assert(net.P_out.empty());
 
 
+  map<Place*, Place*> oldNew;
   // copy the constraint oWFN's places to the oWFN
   for (set<Place *>::iterator p = net.P.begin(); p != net.P.end(); p++)
   {
@@ -2013,8 +2036,23 @@ void PetriNet::produce(const PetriNet &net)
 
     p_new->isFinal = (*p)->isFinal;
     p_new->tokens = (*p)->tokens;
+
+    oldNew.insert(pair<Place*, Place*>(*p, p_new));
   }
 
+  // Copy final markings
+  // For each final marking...
+  for (set<Marking*>::iterator finalIt = net.finalMarkings.begin(); finalIt != net.finalMarkings.end(); ++finalIt) {
+	// ...Create new final marking in petri net...
+	Marking* m = addFinalMarking();
+	// ...and for each place in that marking
+	for (Marking::iterator finalSingleIt = (*finalIt)->begin(); finalSingleIt != (*finalIt)->end(); ++finalSingleIt) {
+		// ...retrieve the new place pointer from the map
+		Place* newPlace = oldNew[(*finalSingleIt).first];
+		// ...and add the new pointer to the final marking
+		newPlace->addToFinalMarking(m,(*finalSingleIt).second);
+	}
+  }
 
   // copy the constraint oWFN's unlabeled transitions to the oWFN
   for (set<Transition *>::iterator t = net.T.begin(); t != net.T.end(); t++)

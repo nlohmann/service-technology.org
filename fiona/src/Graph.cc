@@ -329,6 +329,94 @@ void Graph::printGraphToDot(GraphNode* v,
     }
 }
 
+//! \brief creates a simple oWFN from a service automaton
+//! \param filenamePrefix a string containing the prefix of the output file name
+//! \param dotGraphTitle a title for the graph to be shown in the image
+void Graph::transformToOWFN(PNapi::PetriNet* PN) {
+
+	trace(TRACE_0, "creating the oWFN from the service automaton\n");
+    
+    GraphNode* currentNode = getRoot(); 
+    set<GraphNode*> visitedNodes;
+    set<string> finalNodeNames;
+    unsigned int transitionNumber = 0;
+    PNapi::Transition* incomingTransition = NULL;
+    
+    transformToOWFNRecursively(currentNode,visitedNodes,finalNodeNames,PN, transitionNumber, incomingTransition);
+    
+    for (set<string>::iterator finalNodesIt = finalNodeNames.begin(); finalNodesIt != finalNodeNames.end(); ++finalNodesIt) {
+    	// PN->findPlace(*finalNodesIt)->isFinal = true;    	
+    	PNapi::Marking* finalMarking = PN->addFinalMarking();
+    	PN->findPlace(*finalNodesIt)->addToFinalMarking(finalMarking);
+    }
+
+    
+}
+
+void Graph::transformToOWFNRecursively(GraphNode* currentNode,
+		   							   set<GraphNode*>& visitedNodes,
+		   							   set<string>& finalNodeNames,
+		   							   PNapi::PetriNet* PN,
+		   							   unsigned int& transitionNumber,
+		   							   PNapi::Transition* incomingTransition) {
+    
+	
+    if(visitedNodes.find(currentNode) != visitedNodes.end()) {
+        if (incomingTransition != NULL) {
+        	PN->newArc(incomingTransition, PN->findPlace(currentNode->getName()));
+        } 
+     	return;
+    }
+
+    PNapi::Place* place = PN->newPlace(currentNode->getName());
+  	visitedNodes.insert(currentNode);
+  	
+  	if (find(finalNodes.begin(), finalNodes.end(),currentNode) != finalNodes.end())
+  		finalNodeNames.insert(currentNode->getName());
+  		
+  	if (incomingTransition != NULL) {
+  		PN->newArc(incomingTransition, place);
+    }
+    else { // Wenn die incomingTransition null ist, sind wir am ersten Knoten --> Initial Marking
+    	place->mark();
+    }
+  	
+    
+    GraphNode::LeavingEdges::ConstIterator edgeIter =
+        currentNode->getLeavingEdgesConstIterator();
+
+    while (edgeIter->hasNext()) {
+
+    	GraphEdge* edge = edgeIter->getNext();
+    	string currentLabel = edge->getLabel();
+    	
+    	PNapi::Transition* t =PN->newTransition("t" + intToString(transitionNumber));
+        ++transitionNumber;
+        PN->newArc(place,t);
+
+        // Adding places and arcs for input and output. 
+    	if (currentLabel[0] == '?') {
+    		PNapi::Place* input; 
+    		currentLabel.erase(0,1);
+    		input = PN->findPlace(currentLabel);
+    		if (input == NULL) {
+    			input = PN->newPlace(currentLabel, PNapi::IN);
+    		} 
+            PN->newArc(input,t);
+    	} else if (currentLabel[0] == '!') {
+    		PNapi::Place* output; 
+    		currentLabel.erase(0,1);
+    		output = PN->findPlace(currentLabel);
+        	if (output == NULL) {
+    			output = PN->newPlace(currentLabel, PNapi::OUT);
+    		} 
+    		PN->newArc(t,output);
+    	}
+        transformToOWFNRecursively(edge->getDstNode(), visitedNodes, finalNodeNames, PN, transitionNumber, t);
+    }
+}
+
+
 
 //! \brief A function needed for successful deletion of the graph
 void Graph::clearNodeSet() {

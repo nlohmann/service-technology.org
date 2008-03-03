@@ -30,17 +30,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007-08-08 06:57:32 $
+ * \date    \$Date: 2008-03-03 12:06:14 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *
  * \ingroup petrinet
  */
@@ -1259,14 +1259,43 @@ void PetriNet::output_owfn(ostream *output) const
   
   
   // final marking
+  
+  // if the set of final markings is not empty: iterate and add all final markings
+  // else: there is only one final marking, have a look at all places and check isFinal.
+  
   (*output) << "FINALCONDITION" << endl;
+  
+  if (!finalMarkings.empty()) {
+	  int fcount = 0;
+	  for (	set<Marking*>::iterator finalmarking = finalMarkings.begin(); finalmarking != finalMarkings.end(); ++finalmarking) {
+		  if (fcount > 0) (*output) << " OR ";
+		  (*output) << "( ";
+		  int fcount2 = 0;
+		  for (Marking::iterator thePair = (*finalmarking)->begin(); thePair != (*finalmarking)->end(); ++thePair) {
+			  if (fcount2 > 0) (*output) << " AND ";
+			  (*output) << "(";
+				#ifdef USING_BPEL2OWFN
+			  	(*output) << (*thePair).first->nodeShortName();
+  				#else
+			  	(*output) << (*thePair).first->nodeName();
+  				#endif
+			  	(*output) << "=" << (*thePair).second << ")";
+			  ++fcount2;
+		  }
+		  (*output) << " AND ALL_OTHER_PLACES_EMPTY )";
+		  ++fcount;
+	  }
+	  
+  }
+  else {
   count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
     if ( (*p)->isFinal )
     {
-      if (count != 1)
-        (*output) << " AND";
+    	if (count != 1) {
+    		(*output) << " AND";
+    	}
         
   #ifdef USING_BPEL2OWFN
       (*output) << "  (" << (*p)->nodeShortName() << "=1)";
@@ -1279,6 +1308,7 @@ void PetriNet::output_owfn(ostream *output) const
       if (count++ != 1)
         (*output) << endl;      
     }
+  }
   }
   (*output) << ";" << endl << endl << endl;
   

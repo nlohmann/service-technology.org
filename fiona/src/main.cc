@@ -407,7 +407,22 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
 
         // .out
         cleanPV->printDotFile(outfilePrefix, "public view of " + graphName);
+       
+        //transform to owfn
+        PNapi::PetriNet* PVoWFN = new PNapi::PetriNet(); 
+        PVoWFN->set_format(PNapi::FORMAT_OWFN, true);
+        cleanPV->transformToOWFN(PVoWFN);
 
+        
+        ofstream output;
+        const string owfnOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".sa.owfn";
+        output.open (owfnOutput.c_str(),ios::out);
+
+        (output) << (*PVoWFN);
+        output.close();
+
+
+        
         // .og
         OG->printOGFile(outfilePrefix);
     }

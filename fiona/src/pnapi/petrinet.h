@@ -31,17 +31,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007-07-18 10:01:28 $
+ * \date    \$Date: 2008-03-03 12:06:15 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  *
  * \ingroup petrinet
  */
@@ -168,7 +168,15 @@ typedef enum
   FORMAT_PNML		///< Petri Net Markup Language (PNML)
 } output_format;
 
-    
+/*!
+* \brief   Marking
+ *
+ *          A set of pairs, each containing a Place-Pointer and a token count.
+ *
+ * \ingroup petrinet
+ */
+class Place;
+typedef map<Place*,int> Marking;   
     
     
 
@@ -333,7 +341,7 @@ class Place: public Node
 
     /// create a place and add a first role to the history
     Place(unsigned int id, string role, communication_type type);
-
+    
   public:
     /// destructor
     virtual ~Place();
@@ -341,11 +349,21 @@ class Place: public Node
     /// mark the place
     void mark(unsigned int tokens = 1);
 
+    /// add this place to a final marking
+    void addToFinalMarking(Marking* marking, unsigned int tokens = 1);
+   
+    /// is part of a final marking = (!finalMarkings.empty);
+    bool isInFinalMarking();
+
+    /// is a final place in markings...
+    set<Marking*> finalMarkings;
+    
     /// the short name of the place
     string nodeShortName() const;
 
     /// true if place is marked in the final marking
     bool isFinal;
+    
 };
 
 
@@ -529,11 +547,17 @@ class PetriNet
     /// destructor
     ~PetriNet();
 
+    /// Final Markings
+    set<Marking*> finalMarkings;
+
+    /// Adds an empty final marking to the set and returns a pointer to it.
+    Marking* addFinalMarking();
 
   private:
+
     /// removes a place from the net
     void removePlace(Place *p);
-
+    
     /// removes an arc from the net
     void removeArc(Arc *f);
 

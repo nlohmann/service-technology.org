@@ -334,6 +334,64 @@ fi
 
 ############################################################################
 
+############################################################################
+# complexPV equivalence
+############################################################################
+
+nodes_soll=46
+edges_soll=151
+
+service="$DIR/complexPV"
+cmd="$FIONA $service.owfn -t PV"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$service.owfn.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
+    nodes=$?
+
+    echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
+    edges=$?
+
+    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    then
+    echo   ... failed to build PVSA correctly
+    fi
+
+    result=`expr $result + $nodes + $edges`
+fi
+
+cmd="$FIONA $service.sa.owfn $service.owfn.og -t equivalence"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$service.sa.owfn.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    
+    echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... equivalence check of the service's and its public view's OGs failed.
+    fi
+fi
+
+
+
+############################################################################
+
 echo
 
 exit $result

@@ -152,6 +152,8 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              publicview/2ndFixB.owfn \
              publicview/3rdFix.og \
              publicview/3rdFix.owfn \
+             publicview/complexPV.owfn \
+             publicview/complexPV.owfn.og \
              partner/sequence3.owfn \
              partner/sequence3-partner.expected.owfn \
              countservices/acyclic.og \

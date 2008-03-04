@@ -725,11 +725,11 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 	        		!= node->reachGraphStateSet.end(); iter2++) {
 	        	
 	        	(*iter2)->decode(PN); // get the marking of the state
-            
+
 	        	if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
 	            	// calc the reachable states from that marking using stubborn set method taking
 	            	// care of deadlocks
-	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+	            	PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode); 
 	            	if (newNode->getColor() == RED) {
 	                	// a message bound violation occured during computation of reachability graph
 	                    trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");

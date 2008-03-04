@@ -393,44 +393,42 @@ void oWFN::addSuccStatesToNodeStubborn(AnnotatedGraphNode* n,
 	
     assert(n != NULL);
 
-    if (currentState != NULL) {
-        currentState->decodeShowOnly(this); // decodes currently considered state
+    currentState->decodeShowOnly(this); // decodes currently considered state
+    
+    // test decoded current marking if message bound k reached
+    if (violatesMessageBound()) {
+        n->setColor(RED);
+        trace(TRACE_3, "\t\t\t message bound violation detected in node "
+                + n->getName() + " (addSuccStatesToList) --> node set to RED\n");
         
-        // test decoded current marking if message bound k reached
-        if (violatesMessageBound()) {
-            n->setColor(RED);
-            trace(TRACE_3, "\t\t\t message bound violation detected in node "
-                    + n->getName() + " (addSuccStatesToList) --> node set to RED\n");
-            
-            return;
-        }
+        return;
+    }
 
-        if (currentMarkingActivatesReceivingEvent(parentMarking)) {
-        	n->addState(currentState);
-        	trace(TRACE_5, "added state [" + getCurrentMarkingAsString() + "] to node\n");
-        }
-        
-        if (currentState->type == DEADLOCK || currentState->type == FINALSTATE) {
-        	stateSet.insert(currentState);
-            trace(TRACE_5, "added state [" + getCurrentMarkingAsString() + "] to state set\n");
-        }
-        
-        stateSetTemp.insert(currentState);
-        
-        // add successors
-        for (unsigned int i = 0; i < currentState->cardFireList; i++) {
-            if (currentState->succ[i] != NULL && 
-            		stateSetTemp.find(currentState->succ[i]) == stateSetTemp.end() &&
-            		n->reachGraphStateSet.find(currentState->succ[i]) == n->reachGraphStateSet.end()) {
-            	
-                // its successors need only be added if state was not yet in current node
-            	unsigned int * tempParentMarking = copyCurrentMarking();
-            	addSuccStatesToNodeStubborn(n, stateSet, stateSetTemp, tempParentMarking, currentState->succ[i]);
-            	if (tempParentMarking) {
-            		delete[] tempParentMarking;
-            	}
-            } 
-        }
+    if (currentMarkingActivatesReceivingEvent(parentMarking)) {
+    	n->addState(currentState);
+    	trace(TRACE_5, "added state [" + getCurrentMarkingAsString() + "] to node\n");
+    }
+    
+    if (currentState->type == DEADLOCK || currentState->type == FINALSTATE) {
+    	stateSet.insert(currentState);
+        trace(TRACE_5, "added state [" + getCurrentMarkingAsString() + "] to state set\n");
+    }
+    
+    stateSetTemp.insert(currentState);
+    
+    // add successors
+    for (unsigned int i = 0; i < currentState->cardFireList; i++) {
+        if (currentState->succ[i] != NULL && 
+        		stateSetTemp.find(currentState->succ[i]) == stateSetTemp.end() &&
+        		n->reachGraphStateSet.find(currentState->succ[i]) == n->reachGraphStateSet.end()) {
+        	
+            // its successors need only be added if state was not yet in current node
+        	unsigned int * tempParentMarking = copyCurrentMarking();
+        	addSuccStatesToNodeStubborn(n, stateSet, stateSetTemp, tempParentMarking, currentState->succ[i]);
+        	if (tempParentMarking) {
+        		delete[] tempParentMarking;
+        	}
+        } 
     }
     trace(TRACE_5, "void oWFN::addSuccStatesToNodeStubborn(AnnotatedGraphNode* n, StateSet& stateSet, unsigned int* parentMarking, State * currentState) : end\n");
 }
@@ -447,7 +445,32 @@ void oWFN::addSuccStatesToNodeStubborn(AnnotatedGraphNode* n, StateSet& stateSet
 	trace(TRACE_5, "void oWFN::addSuccStatesToNodeStubborn(AnnotatedGraphNode* n, StateSet& stateSet, unsigned int* parentMarking, State * currentState) : start\n");
 	
 	StateSet stateSetTemp;
-	addSuccStatesToNodeStubborn(n, stateSet, stateSetTemp, parentMarking, currentState);
+    if (currentMarkingActivatesReceivingEvent(parentMarking)) {
+    	n->addState(currentState);
+    	trace(TRACE_5, "added state [" + getCurrentMarkingAsString() + "] to node\n");
+    }
+    
+    if (currentState->type == DEADLOCK || currentState->type == FINALSTATE) {
+    	stateSet.insert(currentState);
+        trace(TRACE_5, "added state [" + getCurrentMarkingAsString() + "] to state set\n");
+    }
+    
+    stateSetTemp.insert(currentState);
+    
+    // add successors
+    for (unsigned int i = 0; i < currentState->cardFireList; i++) {
+        if (currentState->succ[i] != NULL && 
+        		stateSetTemp.find(currentState->succ[i]) == stateSetTemp.end() &&
+        		n->reachGraphStateSet.find(currentState->succ[i]) == n->reachGraphStateSet.end()) {
+        	
+            // its successors need only be added if state was not yet in current node
+        	unsigned int * tempParentMarking = copyCurrentMarking();
+        	addSuccStatesToNodeStubborn(n, stateSet, stateSetTemp, tempParentMarking, currentState->succ[i]);
+        	if (tempParentMarking) {
+        		delete[] tempParentMarking;
+        	}
+        } 
+    }
 	stateSetTemp.clear();
 	
 	trace(TRACE_5, "void oWFN::addSuccStatesToNodeStubborn(AnnotatedGraphNode* n, StateSet& stateSet, unsigned int* parentMarking, State * currentState) : end\n");
@@ -561,7 +584,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
     // add successors
     for (unsigned int i = 0; i < currentState->cardFireList; i++) {
         // test if successor state has not yet been added to the state set
-        if (currentState->succ[i] != NULL && stateSet.find(currentState->succ[i]) == stateSet.end()) {
+        if (currentState->succ[i] != NULL && stateSetTemp.find(currentState->succ[i]) == stateSetTemp.end()) {
             addSuccStatesToListStubborn(stateSet, stateSetTemp, setOfStatesStubbornTemp, outputPlace,
                                         currentState->succ[i], n);
         } 
@@ -705,7 +728,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
     // add successors
     for (unsigned int i = 0; i < currentState->cardFireList; i++) {
         // test if successor state has not yet been added to the state set
-        if (currentState->succ[i] != NULL && stateSet.find(currentState->succ[i]) == stateSet.end()) {
+        if (currentState->succ[i] != NULL && stateSetTemp.find(currentState->succ[i]) == stateSetTemp.end()) {
             // its successors need only be added if state was not yet in current state set
             addSuccStatesToListStubborn(stateSet, stateSetTemp, setOfStatesStubbornTemp, messages,
                                         currentState->succ[i], n);
@@ -895,9 +918,7 @@ void oWFN::calculateReachableStatesStubbornDeadlocks(StateSet& stateSet, Annotat
 
     // the other case:
     // we have a marking which has not yet a state object assigned to it
-    if (CurrentState == NULL) {
-        CurrentState = binInsert(this);
-    }
+    CurrentState = binInsert(this);
 
     CurrentState->firelist = stubbornfirelistdeadlocks();
     CurrentState->cardFireList = CurrentCardFireList;
@@ -1852,6 +1873,9 @@ void oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, A
                 // Current marking already in bintree 
                 trace(TRACE_5, "Current marking [" + getCurrentMarkingAsString() +  "] already in bintree \n");
 
+                assert(CurrentState->succ[CurrentState->current] == NULL);
+                CurrentState->succ[CurrentState->current] = NewState;
+
                 addSuccStatesToNodeStubborn(n, stateSet, tempCurrentMarking, NewState);
 
                 if (n->getColor() == RED) {
@@ -1859,10 +1883,6 @@ void oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, A
                                    + n->getName()
                                    + " set to RED (calculateReachableStatesStubbornDeadlocks, during fire)\n");
                     trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, binDecision**, AnnotatedGraphNode* n) : end\n");
-
-                    assert(CurrentState->succ[CurrentState->current] == NULL);
-                    CurrentState->succ[CurrentState->current] = NewState;                    
-                    
                     delete[] tempCurrentMarking;
                     return;
                 }
@@ -1876,8 +1896,6 @@ void oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, A
                 delete[] tempCurrentMarking;
                 tempCurrentMarking = NULL;
 
-                assert(CurrentState->succ[CurrentState->current] == NULL);
-                CurrentState->succ[CurrentState->current] = NewState;
                 (CurrentState->current)++;
             } else {
                 trace(TRACE_5, "Current marking [" + getCurrentMarkingAsString() +  "] new!\n");

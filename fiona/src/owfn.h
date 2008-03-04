@@ -237,6 +237,7 @@ class oWFN {
 											StateSet&, 
 											unsigned int*,
 											State *);        
+
         /// helper function for addSuccStatesToNodeStubborn
         void addSuccStatesToNodeStubborn(AnnotatedGraphNode*, 
 											StateSet&,

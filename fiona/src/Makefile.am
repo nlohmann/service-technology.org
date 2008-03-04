@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-12-11 11:25:44 $ by $Author: kern $.
-# Version $Revision: 1.47 $
+# File last changed $Date: 2008-03-04 12:12:11 $ by $Author: gierds $.
+# Version $Revision: 1.48 $
 
 include $(top_srcdir)/Makefile.covcommon
 
@@ -36,6 +36,8 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         lexer_owfn.ll lexer_owfn_wrap.h\
         syntax_og.yy lexer_og.ll\
         syntax_stg.yy lexer_stg.ll \
+        syntax_adapt_rules.yy lexer_adapt_rules.ll \
+        syntax_dot.yy lexer_dot.ll \
         PetriNetNode.h PetriNetNode.cc\
         IG.cc owfnPlace.cc CommunicationGraph.h\
         IG.h owfnPlace.h\
@@ -63,6 +65,7 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         Graph.h Graph.cc \
         AnnotatedGraph.h AnnotatedGraph.cc GraphFormula.h GraphFormula.cc \
         containers.h containers.cc\
+	adapter.h adapter.cc\
         stg2owfn.cc set_helpers.h SinglyLinkedList.h
 
 BUILT_SOURCES = lexer_owfn.h

@@ -198,6 +198,12 @@ std::string AnnotatedGraph::getFilename()
     return filename;
 }
 
+//! \brief returns the name of the graph's source file
+void AnnotatedGraph::setFilename(std::string filename)
+{
+    this->filename = filename;
+}
+
 //! \brief removes all edges that have a given node as destination
 //! \param nodeToDelete a pointer to the node that will be deleted
 void AnnotatedGraph::removeEdgesToNodeFromAllOtherNodes(const AnnotatedGraphNode* nodeToDelete) {
@@ -2134,4 +2140,26 @@ void AnnotatedGraph::transformOGToService(Graph* cleanPV) {
     }
 
 }
+
+// CODE FROM CG FOR STRUCTURAL REDUCTION
+
+/// returns the vector, so that all nodes in the vector have leaving edges to node
+AnnotatedGraph::nodes_t AnnotatedGraph::getPredecessorNodes(AnnotatedGraphNode * node)
+{
+
+}
+
+/// returns the vector, so that node has leaving edges to all nodes in the vector
+AnnotatedGraph::nodes_t AnnotatedGraph::getSuccessorNodes(AnnotatedGraphNode * node)
+{
+
+}
+
+void AnnotatedGraph::reduceStructurally()
+{
+
+}
+
+
+// END OD CODE FROM CG
 

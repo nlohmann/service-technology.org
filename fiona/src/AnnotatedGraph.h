@@ -137,6 +137,15 @@ class AnnotatedGraph : public Graph {
 
 // END OF CODE FROM PL
 
+// CODE FROM CG FOR STRUCTURAL REDUCTION
+        /// returns the vector, so that all nodes in the vector have leaving edges to node
+        nodes_t getPredecessorNodes(AnnotatedGraphNode * node);
+
+        /// returns the vector, so that node has leaving edges to all nodes in the vector
+        nodes_t getSuccessorNodes(AnnotatedGraphNode * node);
+
+// END OD CODE FROM CG
+
     public:
 
         /// basic constructor
@@ -181,6 +190,9 @@ class AnnotatedGraph : public Graph {
 
         /// returns the name of the source file for the Graph
         std::string getFilename();
+        
+        /// sets the name of the source file for the Graph
+        void setFilename(std::string filename);
         
         /// Returns the product OG of all given OGs.
         static AnnotatedGraph* product(const ogs_t& ogs);
@@ -266,6 +278,10 @@ class AnnotatedGraph : public Graph {
         /// transforms the graph to the public view
         void transformToPublicView(Graph* cleanPV);
 // END OF CODE FROM PL
+
+// CODE FROM CG FOR STRUCTURAL REDUCTION
+        virtual void reduceStructurally();
+// END OD CODE FROM CG
 
         // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new

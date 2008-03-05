@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2008/03/05 10:33:24 $ by $Author: gierds $.
-# Version $Revision: 1.52 $
+# File last changed $Date: 2008/03/05 11:10:52 $ by $Author: gierds $.
+# Version $Revision: 1.53 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
@@ -46,19 +46,10 @@ AC_CONFIG_HEADERS(src/bpel2owfn.h)
 AC_CANONICAL_BUILD
 
 
-# Checks for programs.
-AC_PROG_AWK
+# Checks for C/C++ details.
 AC_PROG_CXX
 AC_PROG_CC
-AC_PROG_INSTALL
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
 
-# Checks for libraries.
-
-# Checks for header files.
-AC_FUNC_ALLOCA
-AC_HEADER_STDC
 
 # Unset compiler flags to avoid optimization.
 CXXFLAGS=""
@@ -66,22 +57,10 @@ CFLAGS=""
 
 
 # Checks for header files and functions.
-AC_CHECK_HEADERS([windows.h libintl.h limits.h malloc.h stddef.h stdlib.h string.h strings.h unistd.h])
+AC_CHECK_HEADERS([windows.h])
 #AC_CHECK_FUNCS([pow])
 
-AM_PROG_CC_C_O
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-AC_C_CONST
-AC_C_INLINE
-AC_TYPE_SIZE_T
-
-# Checks for library functions.
-AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
-AC_CHECK_FUNCS([memset pow])
+#AM_PROG_CC_C_O
 
 
 # Check for optional programs.
@@ -121,3 +100,4 @@ chmod 775 gui/static_release.sh
 chmod 775 maintainer/fink/create_fink_package.sh
 
 #AC_OUTPUT
+

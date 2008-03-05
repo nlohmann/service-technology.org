@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/07/25 09:28:06 $ by $Author: znamirow $.
-# Version $Revision: 1.87 $
+# File last changed $Date: 2008/03/05 10:33:24 $ by $Author: gierds $.
+# Version $Revision: 1.88 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -43,8 +43,8 @@ KCFLAGS = --yystype --file-prefix=ast-system- --suffix=cc --no-csgio
 
 # Set compiler flags to warn a lot and to check compliance to ANSI C++
 # (un-comment or change to "-O2" before distribution).
-bpel2owfn_CXXFLAGS = -ansi -Wall -Wno-unused -pedantic
-bpel2owfn_CFLAGS = -ansi -Wall -Wno-unused -pedantic
+bpel2owfn_CXXFLAGS = -ansi -Wall -Wno-unused -pedantic -g
+bpel2owfn_CFLAGS = -ansi -Wall -Wno-unused -pedantic -g
 
 
 

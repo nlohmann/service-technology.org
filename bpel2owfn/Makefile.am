@@ -23,8 +23,8 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2007/08/01 13:53:35 $ by $Author: nielslohmann $
-# Version $Revision: 1.72 $
+# File last changed $Date: 2008/03/05 10:33:24 $ by $Author: gierds $
+# Version $Revision: 1.73 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc maintainer/rpm
@@ -131,6 +131,11 @@ binarydistreadme:
 	@echo -e Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, >> BINARYREADME
 	@echo -e MA 02110-1301  USA. >> BINARYREADME
 
+# create binary with optimization
+release:
+	$(MAKE) --directory=src clean
+	$(MAKE) --directory=src bpel2owfn_CXXFLAGS="" bpel2owfn_CFLAGS="" CXXFLAGS+="-O3 -D NDEBUG" CFLAGS+="-O3 -D NDEBUG" # use optimization
+
 # name of the directory/archive for a binary distribution
 BINARYDISTDIR = $(distdir)-$(OS)
 
@@ -139,7 +144,7 @@ BINARYDISTDIR = $(distdir)-$(OS)
 # distributions (see target "binarydistreadme").
 binarydist: pdf binarydistreadme
 	$(MAKE) --directory=src clean
-	$(MAKE) --directory=src CXXFLAGS+="-O3 -D NDEBUG" CFLAGS+="-O3 -D NDEBUG" # use optimization
+	$(MAKE) --directory=src bpel2owfn_CXXFLAGS="" bpel2owfn_CFLAGS="" CXXFLAGS+="-O3 -D NDEBUG" CFLAGS+="-O3 -D NDEBUG" # use optimization
 	$(mkdir_p) $(BINARYDISTDIR)
 	cp doc/$(PACKAGE).pdf $(BINARYDISTDIR)
 	cp src/$(PACKAGE)$(EXEEXT) COPYING $(BINARYDISTDIR)

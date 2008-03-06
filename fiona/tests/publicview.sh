@@ -366,7 +366,7 @@ else
     result=`expr $result + $nodes + $edges`
 fi
 
-cmd="$FIONA $service.sa.owfn $service.owfn.og -t equivalence"
+cmd="$FIONA $service.PV.owfn $service.owfn.og -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"

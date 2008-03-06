@@ -35,13 +35,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2008-03-06 10:23:42 $
+ * \date    \$Date: 2008-03-06 11:24:41 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  *
  * \ingroup petrinet
  */
@@ -1190,14 +1190,20 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
   // change final places in the final sets
   for (list<set<Place *> >::iterator final_set = final_set_list.begin(); final_set != final_set_list.end(); final_set++)
   {
+    set<Place *> s1;
+    set<Place *> s2;
     for (set<Place *>::iterator p = (*final_set).begin(); p != (*final_set).end(); p++)
     {
       if ((*p) == p1 || (*p) == p2)
       {
-        (*final_set).erase(p--);
-        (*final_set).insert(p12);        
+        s1.insert(p12); 
+      }
+      else
+      {
+        s2.insert(*p);
       }
     }
+    (*final_set) = setUnion(s1,s2);
   } 
   
   for (list<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)

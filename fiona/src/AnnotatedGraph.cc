@@ -1657,15 +1657,19 @@ void AnnotatedGraph::removeNodesAnnotatedWithTrue() {
 //! \brief constructs the dual service by toggling all event types of the underlying graph 
 //	(SIDE-EFFECT: stores all events into sets by type)
 //! \complexity O(n+m), with n nodes and m edges in the given AnnotatedGraph
-void AnnotatedGraph::constructDualService() {
+void AnnotatedGraph::constructDualService() 
+{
     // iterate over all nodes of the AnnotatedGraph
     for (nodes_iterator node_iter = setOfNodes.begin(); node_iter
-            != setOfNodes.end(); ++node_iter) {
+            != setOfNodes.end(); ++node_iter) 
+    {
         AnnotatedGraphNode* currNode = *node_iter;
         // iterate over all leaving edges of the current node
         AnnotatedGraphNode::LeavingEdges::Iterator
                 edge_iter = currNode->getLeavingEdgesIterator();
-        while (edge_iter->hasNext()) {
+    
+        while (edge_iter->hasNext()) 
+        {
             AnnotatedGraphEdge* currEdge = edge_iter->getNext();
             // toggle event type of the current edge
             currEdge->toggleType();

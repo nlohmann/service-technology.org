@@ -352,8 +352,11 @@ void Graph::transformToOWFN(PNapi::PetriNet* PN) {
     
     for (set<string>::iterator finalNodesIt = finalNodeNames.begin(); finalNodesIt != finalNodeNames.end(); ++finalNodesIt) {
     	// PN->findPlace(*finalNodesIt)->isFinal = true;    	
-    	PNapi::Marking* finalMarking = PN->addFinalMarking();
-    	PN->findPlace(*finalNodesIt)->addToFinalMarking(finalMarking);
+    	//PNapi::Marking* finalMarking = PN->addFinalMarking();
+    	//PN->findPlace(*finalNodesIt)->addToFinalMarking(finalMarking);
+        set< PNapi::Place * > finalMarking;
+        finalMarking.insert(PN->findPlace(*finalNodesIt));
+        PN->final_set_list.push_back(finalMarking);
     }
 
     

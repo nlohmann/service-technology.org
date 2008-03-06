@@ -70,14 +70,16 @@ typedef enum {
     O_CHECK_ACYCLIC,            //!< 
     O_PNG,                      //!< 
     O_DIAGNOSIS,                //!< diagnosis information
-    O_PV_MULTIPLE_DEADLOCKS     //!< 
+    O_PV_MULTIPLE_DEADLOCKS,    //!< 
+    O_ADAPTER_FILE              //!< file with adapter rules
 } possibleOptions;
 
 
 typedef enum {
     P_IG,                       //!< compute IG
     P_OG,                       //!< compute OG
-	P_PV,                       //!< compute Public View Service Automaton
+    P_PV,                       //!< compute Public View Service Automaton
+    P_ADAPTER,                  //!< compute adapter for given services
     P_SHOW_BLUE_NODES,          //!< show blue nodes only (empty node not shown though)
     P_SHOW_EMPTY_NODE,          //!< show all blue nodes (including empty node)
     P_SHOW_RED_NODES,           //!< show blue and red nodes (empty node not shown)
@@ -86,8 +88,8 @@ typedef enum {
     P_SHOW_DEADLOCKS_PER_NODE,  //!< show deadlock states only
     P_NOPNG,                    //!< do not create a PNG output
     P_READ_OG,                  //!< only read an OG from a file
-    P_REPRESENTATIVE,			//!< state reduction in node using representatives
-    P_SINGLE					//!< state reduction in node using single marking as representative
+    P_REPRESENTATIVE,		//!< state reduction in node using representatives
+    P_SINGLE                    //!< state reduction in node using single marking as representative
 } possibleParameters;
 
 
@@ -98,6 +100,7 @@ extern std::map<possibleOptions, bool> options;
 extern std::map<possibleParameters, bool> parameters;
 
 extern std::string outfilePrefix;
+extern std::string adapterRulesFile;
 
 extern unsigned int messages_manual;
 extern int events_manual;
@@ -116,3 +119,4 @@ extern FileType getFileType(const std::string& fileName);
 extern bool contains(const std::string& hostString, const std::string& subString);
 
 #endif
+

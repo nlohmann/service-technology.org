@@ -40,6 +40,7 @@
 #include "options.h"
 #include "debug.h"
 #include "main.h"
+#include "adapter.h"
 
 #include <list>
 #include <iostream>
@@ -1211,7 +1212,8 @@ int main(int argc, char** argv) {
     // **********************************************************************************
 
     if (options[O_PRODUCTOG] || options[O_SIMULATES_WITH_COV] || parameters[P_READ_OG] ||
-        options[O_SIMULATES] || (options[O_EX] && !options[O_BDD]) || options[O_FILTER]) {
+        options[O_SIMULATES] || (options[O_EX] && !options[O_BDD]) || options[O_FILTER]) 
+    {
 
         // reading all OG-files
         AnnotatedGraph::ogs_t OGsFromFiles;
@@ -1339,12 +1341,18 @@ int main(int argc, char** argv) {
         } else {
             trace(TRACE_0, "NO\n\n");
         }
-        return 0;
+        // return 0;
     }
 
-    if (parameters[P_IG] || parameters[P_OG] || options[O_MATCH] || options[O_PNG] || parameters[P_PV]) {
+    else if (parameters[P_ADAPTER])
+    {
+        generateAdapter();
+    }
+    else if (parameters[P_IG] || parameters[P_OG] || options[O_MATCH] || options[O_PNG] || parameters[P_PV]) 
+    {
 
-        if (options[O_MATCH]) {
+        if (options[O_MATCH]) 
+        {
             assert(ogfiles.size() == 1);
             // we match multiple oWFNs with one OG,
             // so read the og first, then iterate over the nets

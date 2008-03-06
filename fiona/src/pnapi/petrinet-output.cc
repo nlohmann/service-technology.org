@@ -30,17 +30,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2008-03-03 12:06:14 $
+ * \date    \$Date: 2008-03-06 10:23:41 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  *
  * \ingroup petrinet
  */
@@ -444,8 +444,8 @@ string Transition::output_dot() const
   
   result += "]\n";
   
-  result += " t" + toString(id) + "_l\t[shape=none];\n";
-  result += " t" + toString(id) + "_l -> t" + toString(id) + " [headlabel=\"" + label + "\"]\n";
+  result += " t" + toString(id) + "_l\t[style=invis];\n";
+  result += " t" + toString(id) + "_l -> t" + toString(id) + " [headlabel=\"" + label + "\" style=invis]\n";
   
   return result;
 }
@@ -524,12 +524,12 @@ string Place::output_dot() const
   
   result += "]\n";
   
-  result += " p" + toString(id) + "_l\t[shape=none];\n";
+  result += " p" + toString(id) + "_l\t[style=invis];\n";
   
   if (type == OUT)
-    result += " p" + toString(id) + " -> p" + toString(id) + "_l [taillabel=\"" + label + "\"]\n";
+    result += " p" + toString(id) + " -> p" + toString(id) + "_l [taillabel=\"" + label + "\" style=invis]\n";
   else
-    result += " p" + toString(id) + "_l -> p" + toString(id) + " [headlabel=\"" + label + "\"]\n";
+    result += " p" + toString(id) + "_l -> p" + toString(id) + " [headlabel=\"" + label + "\" style=invis]\n";
   
   return result;
 }
@@ -555,7 +555,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   assert(output != NULL);
   
   (*output) << "digraph N {" << endl;
-  (*output) << " graph [fontname=\"Helvetica\" nodesep=0.3 ranksep=\"0.2 equally\" fontsize=10 label=\"";
+  (*output) << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\" fontsize=10 remincross=true label=\"";
   
   if (globals::reduction_level == 5)
     (*output) << "structurally reduced ";
@@ -579,34 +579,39 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
       (*output) << (*p)->output_dot();
     for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
       (*output) << (*p)->output_dot();
-  }
-  
-  // list the transitions
-  (*output) << "\n // transitions" << endl;
-  (*output) << " node [shape=box]" << endl;
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-    (*output) << (*t)->output_dot();
-  
-  
-  (*output) << "\n // cluster the inner of the net" << endl;
-  (*output) << " subgraph cluster1\n {\n ";
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-    (*output) << " t" << (*t)->id << " t" << (*t)->id << "_l";
-  (*output) << "\n ";
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-  {
-    if ((*p)->tokens > 0)
-      (*output) << " p" << (*p)->id;
+    
+    
+    
+    // list the transitions
+    (*output) << "\n // transitions" << endl;
+    (*output) << " node [shape=box]" << endl;
+    for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+      (*output) << (*t)->output_dot();
+    
+    
+    // the inner of the net
+    (*output) << "\n // cluster the inner of the net" << endl;
+    (*output) << " subgraph cluster1\n {\n ";
+    for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+      (*output) << " t" << (*t)->id << " t" << (*t)->id << "_l";
+    (*output) << "\n ";
+    for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    {
+      if ((*p)->tokens > 0)
+        (*output) << " p" << (*p)->id;
+      else
+        (*output) << " p" << (*p)->id << " p" << (*p)->id << "_l";
+    }
+    
+    if (draw_interface)
+      (*output) << "\n  label=\"\" style=\"dashed\"" << endl;
     else
-      (*output) << " p" << (*p)->id << " p" << (*p)->id << "_l";
-  }
-  
-  if (draw_interface)
-    (*output) << "\n  label=\"\" style=dashed" << endl;
-  else
-    (*output) << "\n  label=\"\" style=invis" << endl;
-  
-  (*output) << " }" << endl;
+      (*output) << "\n  label=\"\" style=invis" << endl;
+    
+    (*output) << " }" << endl;
+  }    
+    
+    
   
   
   // list the arcs
@@ -615,7 +620,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     (*output) << (*f)->output_dot(draw_interface);
   
-  (*output) << "}" << endl;
+  (*output) << endl << "}" << endl;
 }
 
 
@@ -1061,23 +1066,31 @@ void PetriNet::output_lola(ostream *output) const
   
   (*output) << "{ Petri net created by " << PACKAGE_STRING << " reading " << globals::filename << " }" << endl << endl;
   
-  
-  // places (only internal)
-  (*output) << "PLACE" << endl;
-  unsigned int count = 1;
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); count++, p++)
   {
-    (*output) << "  " << (*p)->nodeShortName();
+    /************************
+     * STANDARD LOLA FORMAT *
+     ************************/
     
-    if (count < P.size())
-      (*output) << "," << endl;
+    // places (only internal)
+    (*output) << "PLACE" << endl;
+    unsigned int count = 1;
+    for (set<Place *>::iterator p = P.begin(); p != P.end(); count++, p++)
+    {
+      (*output) << "  " << (*p)->nodeShortName();
+      
+      if (count < P.size())
+        (*output) << "," << endl;
+    }
+    (*output) << endl << ";" << endl << endl << endl;
   }
-  (*output) << endl << ";" << endl << endl << endl;
+  
+  
+  // from here on, both standard LoLA and I/O-annotated LoLA formats are equal
   
   
   // initial marking
   (*output) << "MARKING" << endl;
-  count = 1;
+  unsigned int count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
     if ((*p)->tokens > 0)
@@ -1158,14 +1171,12 @@ void PetriNet::output_owfn(ostream *output) const
   
   (*output) << "{" << endl;
   (*output) << "  generated by: " << PACKAGE_STRING << endl;
-
 #ifdef USING_BPEL2OWFN
   (*output) << "  input file:   `" << globals::filename << "' (process `" << globals::ASTEmap[1]->attributes["name"] << "')" << endl;
 #endif
 #ifndef USING_BPEL2OWFN
   (*output) << "  input file:   `" << globals::filename << "'" << endl;
 #endif
-  
   (*output) << "  invocation:   `" << globals::invocation << "'" << endl;
   (*output) << "  net size:     " << information() << endl;
   (*output) << "}" << endl << endl;
@@ -1202,10 +1213,10 @@ void PetriNet::output_owfn(ostream *output) const
     (*output) << "    " << (*p)->nodeName();
 #endif
     
-    if ((*p)->max_occurrences != UINT_MAX && (*p)->max_occurrences != 0)
-      (*output) << " {$ MAX_OCCURRENCES = " << (*p)->max_occurrences << " $}";
-    if ((*p)->max_occurrences == UINT_MAX)
-      (*output) << " {$ MAX_OCCURRENCES = -1 $}";
+      if ((*p)->max_occurrences != UINT_MAX && (*p)->max_occurrences != 0)
+        (*output) << " {$ MAX_OCCURRENCES = " << (*p)->max_occurrences << " $}";
+      if ((*p)->max_occurrences == UINT_MAX)
+        (*output) << " {$ MAX_OCCURRENCES = -1 $}";
     
     if (count < P_in.size())
       (*output) << "," << endl;
@@ -1224,19 +1235,19 @@ void PetriNet::output_owfn(ostream *output) const
     (*output) << "    " << (*p)->nodeName();
 #endif
     
-    if ((*p)->max_occurrences != UINT_MAX && (*p)->max_occurrences != 0)
-      (*output) << " {$ MAX_OCCURRENCES = " << (*p)->max_occurrences << " $}";
-    if ((*p)->max_occurrences == UINT_MAX)
-      (*output) << " {$ MAX_OCCURRENCES = -1 $}";
+      if ((*p)->max_occurrences != UINT_MAX && (*p)->max_occurrences != 0)
+        (*output) << " {$ MAX_OCCURRENCES = " << (*p)->max_occurrences << " $}";
+      if ((*p)->max_occurrences == UINT_MAX)
+        (*output) << " {$ MAX_OCCURRENCES = -1 $}";
     
     if (count < P_out.size())
       (*output) << "," << endl;
   }
-  (*output) << ";" << endl << endl << endl;
+  (*output) << ";" << endl << endl;
   
   
   // initial marking
-  (*output) << "INITIALMARKING" << endl;
+  (*output) << endl << "INITIALMARKING" << endl;
   count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
@@ -1263,52 +1274,53 @@ void PetriNet::output_owfn(ostream *output) const
   // if the set of final markings is not empty: iterate and add all final markings
   // else: there is only one final marking, have a look at all places and check isFinal.
   
-  (*output) << "FINALCONDITION" << endl;
-  
-  if (!finalMarkings.empty()) {
-	  int fcount = 0;
-	  for (	set<Marking*>::iterator finalmarking = finalMarkings.begin(); finalmarking != finalMarkings.end(); ++finalmarking) {
-		  if (fcount > 0) (*output) << " OR ";
-		  (*output) << "( ";
-		  int fcount2 = 0;
-		  for (Marking::iterator thePair = (*finalmarking)->begin(); thePair != (*finalmarking)->end(); ++thePair) {
-			  if (fcount2 > 0) (*output) << " AND ";
-			  (*output) << "(";
-				#ifdef USING_BPEL2OWFN
-			  	(*output) << (*thePair).first->nodeShortName();
-  				#else
-			  	(*output) << (*thePair).first->nodeName();
-  				#endif
-			  	(*output) << "=" << (*thePair).second << ")";
-			  ++fcount2;
-		  }
-		  (*output) << " AND ALL_OTHER_PLACES_EMPTY )";
-		  ++fcount;
-	  }
-	  
-  }
-  else {
-  count = 1;
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if ( (*p)->isFinal )
+    (*output) << "FINALCONDITION" << endl << "  (";
+    
+    // iterate the final set list and conjugate the disjunctive place sets in order to create the final condition
+    bool first_set = true;
+    for (list< set<Place *> >::const_iterator final_set = final_set_list.begin(); final_set != final_set_list.end(); final_set++)
     {
-    	if (count != 1) {
-    		(*output) << " AND";
-    	}
-        
-  #ifdef USING_BPEL2OWFN
-      (*output) << "  (" << (*p)->nodeShortName() << "=1)";
-  #else
-      (*output) << "  (" << (*p)->nodeName() << "=1)";
-  #endif
-        
-      // (*output) << " {final place}";
-        
-      if (count++ != 1)
-        (*output) << endl;      
+      if (!first_set)
+      {
+        (*output) << " OR ";
+      }
+      
+      if ((*final_set).size() == 1)
+      {
+        Place* p = (*((*final_set).begin()));
+#ifdef USING_BPEL2OWFN
+        (*output) << "( (" << p->nodeShortName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
+#else
+        (*output) << "( (" << p->nodeName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
+#endif
+      }
+      else
+      {
+        (*output) << "( ";
+        bool first_place = true;
+        for( set<Place *>::const_iterator p = (*final_set).begin(); p != (*final_set).end(); p++)
+        {
+          if (!first_place)
+            (*output) << " AND ";
+          
+#ifdef USING_BPEL2OWFN
+          (*output) << "(" << (*p)->nodeShortName() << "=1)";
+#else
+          (*output) << "(" << (*p)->nodeName() << "=1)";
+#endif
+          first_place = false;
+        }
+        (*output) << " AND ALL_OTHER_PLACES_EMPTY )";
+      }
+      first_set = false;
     }
-  }
+    (*output) << " )";
+
+#ifdef USING_BPEL2OWFN
+    (*output) << " AND ALL_OTHER_EXTERNAL_PLACES_EMPTY";
+#endif
+    
   }
   (*output) << ";" << endl << endl << endl;
   
@@ -1419,3 +1431,4 @@ void PetriNet::set_format(output_format my_format, bool standard)
   format = my_format;
   use_standard_style = standard;
 }
+

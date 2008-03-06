@@ -85,7 +85,7 @@ class AnnotatedGraphNode : public GraphNode {
                         unsigned int number = 12345678);
 
         /// Destroys this AnnotatedGraphNode.
-        ~AnnotatedGraphNode();
+        virtual ~AnnotatedGraphNode();
     
         /// get the annotation
         GraphFormulaCNF* getAnnotation() const;

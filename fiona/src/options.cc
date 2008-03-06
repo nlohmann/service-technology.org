@@ -56,6 +56,7 @@ bool OGfirst;
 
 std::string ogfileToMatch;
 std::string outfilePrefix;
+std::string adapterRulesFile;
 
 int events_manual;
 unsigned int messages_manual;
@@ -80,7 +81,7 @@ static struct option longopts[] = {
     { "type",            required_argument, NULL, 't' },
     { "show",            required_argument, NULL, 's' },
     { "parameter",       required_argument, NULL, 'p' },
-    { "reduce-nodes",    no_argument, 		NULL, 'R' },
+    { "reduce-nodes",    no_argument,       NULL, 'R' },
     { "reduceIG",        no_argument,       NULL, 'r' },
     { "messagebound",    required_argument, NULL, 'm' },
     { "eventsmaximum",   required_argument, NULL, 'e' },
@@ -89,6 +90,7 @@ static struct option longopts[] = {
     { "output",          required_argument, NULL, 'o' },
     { "no-output",       no_argument,       NULL, 'Q' },
     { "multipledeadlocks", no_argument,     NULL, 'M' },
+    { "adapterrules",    required_argument, NULL, 'a' },
     { NULL,              0,                 NULL, 0   }
 };
 
@@ -123,6 +125,8 @@ void print_help() {
   trace("                                   PV          - calculate the public view of a\n");
   trace("                                                 given OG (the result is an\n");
   trace("                                                 automaton in OG file format)\n");
+  trace("                                   adapter     - calculate an adapter for a\n");
+  trace("                                                 given set of services");
   trace("                                   productog   - calculate the product OG of\n");
   trace("                                                 all given OGs\n");
   trace("                                   simulation  - check whether the first OG\n");
@@ -202,6 +206,7 @@ void print_help() {
   trace(" -p | --parameter=<param> ...... additional parameter <param>\n");
   trace("                                    no-png    - does not create a PNG file\n");
   trace("                                    diagnosis - disables optimizations\n");
+  trace(" -a | --adapterrules=<filename>  read adapter rules from <filename>\n");
   trace("\n");
   trace("\n");
   trace("For more information see:\n");
@@ -215,7 +220,7 @@ void print_version() {
     trace(std::string(PACKAGE_STRING) + " -- ");
     trace("Functional InteractiON Analysis of open workflow nets\n");
     trace("\n");
-    trace("Copyright (C) 2005, 2006, 2007 Peter Massuthe and Daniela Weinberg\n");
+    trace("Copyright (C) 2005, 2006, 2007, 2008 Peter Massuthe and Daniela Weinberg\n");
     trace("This is free software; see the source for copying conditions. There is NO\n");
     trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 }
@@ -283,6 +288,7 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_IG] = true;
     parameters[P_OG] = false;
     parameters[P_PV] = false;
+    parameters[P_ADAPTER] = false;
     parameters[P_SHOW_BLUE_NODES] = true;
     parameters[P_SHOW_EMPTY_NODE] = false;
     parameters[P_SHOW_RED_NODES] = false;
@@ -346,6 +352,11 @@ void parse_command_line(int argc, char* argv[]) {
                     options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = false;
                     parameters[P_IG] = true;
+                } else if (lc_optarg == "adapter") {
+                    options[O_GRAPH_TYPE] = true;
+                    parameters[P_OG] = false;
+                    parameters[P_IG] = true;
+                    parameters[P_ADAPTER] = true;
                 } else if (lc_optarg == "smallpartner") {
                     options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = false;
@@ -548,6 +559,17 @@ void parse_command_line(int argc, char* argv[]) {
 			case 'M':
 				options[O_PV_MULTIPLE_DEADLOCKS] = true;
 				break;
+            case 'a':
+                if (optarg) {
+                    options[O_ADAPTER_FILE] = true;
+                    adapterRulesFile = optarg;
+                } else {
+                    cerr << "Error:\toutput filename prefix missing" << endl
+                         << "\tEnter \"fiona --help\" for more information.\n"
+                         << endl;
+                    exit(1);
+                }
+                break;
             case '?':
                 cerr << "Error:\toption error" << endl
                      << "\tEnter \"fiona --help\" for more information.\n"

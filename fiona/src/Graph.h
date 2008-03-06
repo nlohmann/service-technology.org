@@ -69,13 +69,13 @@ class Graph {
         void removeEdgesFromNodeToAllOtherNodes(GraphNode* nodeToDelete);
         
         /// transforms the service automaton to an OWFN recursively
-        void Graph::transformToOWFNRecursively(GraphNode* currentNode,
-        		   							   set<GraphNode*>& visitedNodes,	
-        		   							   set<string>& finalNodeNames,
-        		   							   PNapi::PetriNet* PN, // The resulting petri net
-        		   							   unsigned int& transitionNumber, // The current transition number
-        		   							   PNapi::Transition* incomingTransition // The transition that leads to this node
-        		   							   );  
+        void transformToOWFNRecursively(GraphNode* currentNode,
+                                        set<GraphNode*>& visitedNodes,	
+        		   		set<string>& finalNodeNames,
+        		   		PNapi::PetriNet* PN, // The resulting petri net
+        		   		unsigned int& transitionNumber, // The current transition number
+        		   		PNapi::Transition* incomingTransition // The transition that leads to this node
+        		   	       );  
 
     public:
 

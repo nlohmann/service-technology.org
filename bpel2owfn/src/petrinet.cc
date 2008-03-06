@@ -31,17 +31,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/09/12 11:42:04 $
+ * \date    \$Date: 2008/03/06 09:45:37 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.227 $
+ * \version \$Revision: 1.228 $
  *
  * \ingroup petrinet
  */
@@ -1601,6 +1601,16 @@ set< Place * > PetriNet::getFinalPlaces() const
   }
 
   return result;
+}
+
+/*!
+ * \brief   returns a set of all interface places
+ *
+ * \return  the set with all interface places
+ */
+set< Place * > PetriNet::getInterfacePlaces() const
+{
+  return setUnion(P_in, P_out);
 }
 
 

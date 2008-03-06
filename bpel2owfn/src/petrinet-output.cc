@@ -30,17 +30,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/09/12 11:42:04 $
+ * \date    \$Date: 2008/03/06 09:45:37 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.113 $
+ * \version \$Revision: 1.114 $
  *
  * \ingroup petrinet
  */
@@ -1415,35 +1415,35 @@ void PetriNet::output_owfn(ostream *output) const
     {
       if (!first_set)
       {
-        (*output) << " AND ";
+        (*output) << " OR ";
       }
       
       if ((*final_set).size() == 1)
       {
         Place* p = (*((*final_set).begin()));
 #ifdef USING_BPEL2OWFN
-        (*output) << " (" << p->nodeShortName() << " = 1)";
+        (*output) << "( (" << p->nodeShortName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
 #else
-        (*output) << " (" << p->nodeName() << " = 1)";
+        (*output) << "( (" << p->nodeName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
 #endif
       }
       else
       {
-        (*output) << " (";
+        (*output) << "( ";
         bool first_place = true;
         for( set<Place *>::const_iterator p = (*final_set).begin(); p != (*final_set).end(); p++)
         {
           if (!first_place)
-            (*output) << " OR ";
+            (*output) << " AND ";
           
 #ifdef USING_BPEL2OWFN
-          (*output) << (*p)->nodeShortName() << " = 1";
+          (*output) << "(" << (*p)->nodeShortName() << "=1)";
 #else
-          (*output) << (*p)->nodeName() << " = 1";
+          (*output) << "(" << (*p)->nodeName() << "=1)";
 #endif
           first_place = false;
         }
-        (*output) << ")";
+        (*output) << " AND ALL_OTHER_PLACES_EMPTY )";
       }
       first_set = false;
     }
@@ -1452,7 +1452,6 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
     (*output) << " AND ALL_OTHER_EXTERNAL_PLACES_EMPTY";
 #endif
-    
   }
   else
   {

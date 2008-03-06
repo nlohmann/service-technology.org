@@ -400,7 +400,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
     unsigned int maxSizeForDot = 120;
     
     outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
-    outfilePrefix += ".PV";
+    outfilePrefix += ".PV.sa";
 
     Graph* cleanPV = new Graph();
     

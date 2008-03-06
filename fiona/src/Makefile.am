@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2008-03-04 12:12:11 $ by $Author: gierds $.
-# Version $Revision: 1.48 $
+# File last changed $Date: 2008-03-06 10:10:34 $ by $Author: gierds $.
+# Version $Revision: 1.49 $
 
 include $(top_srcdir)/Makefile.covcommon
 
@@ -85,9 +85,9 @@ else
 LINK_COMPILE_64BIT_FLAG =
 endif
 
-OPTIMIZATION_LEVEL=-O2
+OPTIMIZATION_LEVEL=
 
-WARNINGS=-W -Wall
+WARNINGS=-W -Wall -Wno-unused
 
 # Collect all compile flags
 fiona_CXXFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(OPTIMIZATION_LEVEL) $(WARNINGS)

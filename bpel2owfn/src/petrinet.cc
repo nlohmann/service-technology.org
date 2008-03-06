@@ -35,13 +35,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2008/03/06 11:20:33 $
+ * \date    \$Date: 2008/03/06 14:37:07 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.230 $
+ * \version \$Revision: 1.231 $
  *
  * \ingroup petrinet
  */
@@ -1196,7 +1196,7 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
     {
       if ((*p) == p1 || (*p) == p2)
       {
-        s1.insert(p12); 
+        s1.insert(p12);
       }
       else
       {
@@ -1217,6 +1217,16 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
       roleMap[p2->prefix + *role] = p12;
       p12->history.push_back(p2->prefix + *role);
     }
+    // change state predicate, if necessary
+    if (globals::owfn_statepredicate != "")
+    {
+      string old = " " + *role + " ";
+      string::size_type pos;
+      while ( (pos = globals::owfn_statepredicate.find(old)) != string::npos)
+      {
+        globals::owfn_statepredicate.replace(pos, old.length(), (string(" " + p12->nodeShortName() + " ")).c_str(), 0, (string(" " + p12->nodeShortName() + " ")).length() );
+      }
+    }
   }
   
   for (list<string>::iterator role = p2->history.begin(); role != p2->history.end(); role++)
@@ -1230,8 +1240,18 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
       roleMap[p2->prefix + *role] = p12;
       p12->history.push_back(p2->prefix + *role);
     }
+    // change state predicate, if necessary
+    if (globals::owfn_statepredicate != "")
+    {
+      string old = " " + *role + " ";
+      string::size_type pos;
+      while ( (pos = globals::owfn_statepredicate.find(old)) != string::npos)
+      {
+        globals::owfn_statepredicate.replace(pos, old.length(), (string(" " + p12->nodeShortName() + " ")).c_str(), 0, (string(" " + p12->nodeShortName() + " ")).length() );
+      }
+    }
   }
-  
+
   // merge pre- and postsets for p12
   p12->preset=setUnion(p1->preset, p2->preset);
   p12->postset=setUnion(p1->postset, p2->postset);
@@ -1949,7 +1969,19 @@ void PetriNet::reenumerate()
   int currentId = 1;
 
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    // change state predicate, if necessary
+    if (globals::owfn_statepredicate != "")
+    {
+      string old = " " + (*p)->nodeShortName() + " ";
+      string::size_type pos;
+      while ( (pos = globals::owfn_statepredicate.find(old)) != string::npos)
+      {
+        globals::owfn_statepredicate.replace(pos, old.length(), (string(" p" + toString(currentId) + " ")).c_str(), 0, (string(" p" + toString(currentId) + " ")).length() );
+      }
+    }
     (*p)->id = currentId++;
+  }
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
     (*p)->id = currentId++;
   for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)

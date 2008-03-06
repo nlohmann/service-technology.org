@@ -73,6 +73,7 @@ extern PetriNet PN;
 
 set<string> in;
 set<string> out;
+set<Place*> finalMarking;
 string nodename;
 string current_port;
 int readmode=0;
@@ -218,11 +219,11 @@ commands:
     }
 | KEY_MAX_OCCURRENCES OP_EQ NUMBER commands
     {
-      globals::owfn_commands[nodename] = globals::owfn_commands[nodename] + "MAX_OCCURENCES = " + strip_namespace($3->name) + " ";
+      globals::owfn_commands[nodename] = globals::owfn_commands[nodename] + "MAX_OCCURRENCES = " + strip_namespace($3->name) + " ";
     }
 | KEY_MAX_OCCURRENCES OP_EQ NEGATIVE_NUMBER commands
     {
-      globals::owfn_commands[nodename] = globals::owfn_commands[nodename] + "MAX_OCCURENCES = " + strip_namespace($3->name) + " ";
+      globals::owfn_commands[nodename] = globals::owfn_commands[nodename] + "MAX_OCCURRENCES = " + strip_namespace($3->name) + " ";
     }
 ;
 
@@ -244,19 +245,40 @@ marking:
 ;
 
 finalmarkinglist: 
-| finalmarking
-| finalmarkinglist COMMA finalmarking
+  /* empty */
+| 
+  finalmarking
+    {
+      if (!finalMarking.empty())
+      {
+        PN.final_set_list.push_back(finalMarking);
+        finalMarking.clear();
+      }
+    }
+
+| 
+  finalmarkinglist COMMA finalmarking
+    {
+      if (!finalMarking.empty())
+      {
+        PN.final_set_list.push_back(finalMarking);
+        finalMarking.clear();
+      }
+    }
 ;
 
 finalmarking: 
   nodeident COLON NUMBER 
-      {
-       (PN.findPlace(nodename))->isFinal = true; // BAM
-      }
-| nodeident
-      {
-       (PN.findPlace(nodename))->isFinal = true;
-      }
+    {
+      (PN.findPlace(nodename))->isFinal = true; // BAM
+      finalMarking.insert(PN.findPlace(nodename));
+    }
+| 
+  nodeident
+    {
+      (PN.findPlace(nodename))->isFinal = true;
+      finalMarking.insert(PN.findPlace(nodename));
+    }
 ;
 
 
@@ -357,12 +379,12 @@ arc:
 statepredicate:
 | LPAR 
   {
-    globals::owfn_statepredicate += "(";  
+    globals::owfn_statepredicate += "( ";  
   }
   statepredicate 
   RPAR 
   {
-    globals::owfn_statepredicate += ")";  
+    globals::owfn_statepredicate += " )";  
   }
 
 | statepredicate OP_AND  
@@ -394,26 +416,44 @@ statepredicate:
   statepredicate 
 | nodeident OP_EQ NUMBER 
   {
-    globals::owfn_statepredicate = globals::owfn_statepredicate + nodename + " = " + strip_namespace($3->name);  
+    globals::owfn_statepredicate = globals::owfn_statepredicate + nodename + " = " + strip_namespace($3->name); 
+    Place * p = PN.findPlace(nodename);
+    assert(p != NULL);
+    p->isFinal = true;
   }
 | nodeident OP_NE NUMBER 
   {
     globals::owfn_statepredicate = globals::owfn_statepredicate + nodename + " != " + strip_namespace($3->name);  
+    Place * p = PN.findPlace(nodename);
+    assert(p != NULL);
+    p->isFinal = true;
   }
 | nodeident OP_LT NUMBER 
   {
     globals::owfn_statepredicate = globals::owfn_statepredicate + nodename + " < " + strip_namespace($3->name);  
+    Place * p = PN.findPlace(nodename);
+    assert(p != NULL);
+    p->isFinal = true;
   }
 | nodeident OP_GT NUMBER 
   {
     globals::owfn_statepredicate = globals::owfn_statepredicate + nodename + " > " + strip_namespace($3->name);  
+    Place * p = PN.findPlace(nodename);
+    assert(p != NULL);
+    p->isFinal = true;
   }
 | nodeident OP_GE NUMBER 
   {
     globals::owfn_statepredicate = globals::owfn_statepredicate + nodename + " >= " + strip_namespace($3->name);  
+    Place * p = PN.findPlace(nodename);
+    assert(p != NULL);
+    p->isFinal = true;
   }
 | nodeident OP_LE NUMBER 
   {
     globals::owfn_statepredicate = globals::owfn_statepredicate + nodename + " <= " + strip_namespace($3->name);  
+    Place * p = PN.findPlace(nodename);
+    assert(p != NULL);
+    p->isFinal = true;
   }
 ;

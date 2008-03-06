@@ -1,7 +1,7 @@
 \documentclass[a4paper,11pt]{article}
 
-% Letzte Änderungen von: $Author: suermeli $ am $Date: 2008-02-29 14:15:12 $
-% UEBERARBEITET VON JAN SUERMELI AM 29.02.2008 
+% Letzte Änderungen von: $Author: weinberg $ am $Date: 2008-03-06 16:18:53 $
+% UEBERARBEITET VON JAN SUERMELI AM 29.02.2008
 
 \usepackage{url}
 \usepackage{amsmath}
@@ -18,12 +18,12 @@
 \setlength{\parindent}{0pt}
 \usepackage[pdftex,bookmarks=true,bookmarksnumbered=true]{hyperref}
 \hypersetup{
-	pdfauthor = {Daniela Weinberg},
-	pdftitle = {Guide to Fiona},
-	pdfsubject = {Fiona - Functional Interaction Analysis for Open Workflow Nets},
-	pdfkeywords = {},
-	pdfcreator = {LaTeX with hyperref package},
-	pdfproducer = {dvips + ps2pdf}
+    pdfauthor = {Daniela Weinberg},
+    pdftitle = {Guide to Fiona},
+    pdfsubject = {Fiona - Functional Interaction Analysis for Open Workflow Nets},
+    pdfkeywords = {},
+    pdfcreator = {LaTeX with hyperref package},
+    pdfproducer = {dvips + ps2pdf}
 }
 %\journal{DKE}
 
@@ -34,7 +34,7 @@
 % NEED TO BE CHANGED!!!!
 \newcommand{\VERSION}{1.0}
 \newcommand{\LASTUPDATE}{\today}
-	
+
 \sectionfont{\sf}
 \subsectionfont{\sf}
 \subsubsectionfont{\sf}
@@ -42,7 +42,7 @@
 %\newcommand{\abb}[1]{\textsf{#1}}
 
 \begin{document}
-% 
+%
 \title{Fiona -- Functional Interaction Analysis for Open Workflow Nets}
 %\subtitle{User's Manual}
 
@@ -54,13 +54,14 @@ Unter den Linden 6, 10099 Berlin, Germany\\\url{http://www.informatik.hu-berlin.
 \date{\today}
 
 \maketitle
-\begin{abstract} 
-This manual is for \textit{Fiona}, Version \VERSION. \textit{Fiona} is a tool
-to automatically analyze the interactional behavior of open workflow nets (\textit{oWFN}). This manual does not explain how to setup or install \textit{Fiona}. For this
-information please read the Installation Manual which is part of the distribution
-or can be downloaded from the \textit{Fiona} website. Last update: \LASTUPDATE.
+\begin{abstract}
+This manual is for \textsc{Fiona}, Version \VERSION. \textsc{Fiona} is a tool to automatically
+analyze the interactional behavior of open workflow nets (\textit{oWFN}). This manual does not
+explain how to setup or install \textsc{Fiona}. For this information please read the Installation
+Manual which is part of the distribution or can be downloaded from the \textsc{Fiona} website. Last
+update: \LASTUPDATE.
 \end{abstract}
-\begin{quote} 
+\begin{quote}
 \sf
 \scriptsize
 \copyright 2007 Daniela Weinberg. Copying and distribution of this file, with or without modification,
@@ -69,9 +70,10 @@ notice are preserved.
 \\
 \selectlanguage{ngerman}
 \\\copyright 2005, 2006, 2007 Daniela Weinberg, Peter
-Massuthe, Karsten Wolf, Kathrin Kaschner, Christian Gierds and Jan
-Bretschneider, Martin Znamirowski. \selectlanguage{english}\textit{Fiona} is licensed under the \textit{GNU} General Public License.
-\\\\\textit{Fiona} is
+Massuthe, Karsten Wolf, Kathrin Kaschner, Christian Gierds and Jan Bretschneider, Martin
+Znamirowski. \selectlanguage{english}\textsc{Fiona} is licensed under the \textit{GNU} General
+Public License.
+\\\\\textsc{Fiona} is
 part of the Tools4\textit{BPEL} project funded by the Bundesministerium für Bildung und Forschung. See \url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 \end{quote}
 
@@ -84,7 +86,7 @@ part of the Tools4\textit{BPEL} project funded by the Bundesministerium für Bild
 \section{Overview}\label{sec:Overview}
 \subsection{Introduction}\label{subsec:Introduction}
 
-\textit{Fiona} is a tool to automatically analyze the interactional behavior of open workflow nets
+\textsc{Fiona} is a tool to automatically analyze the interactional behavior of open workflow nets
 (\textit{oWFN}) [MRS05]. It provides the following techniques:
 
 \begin{itemize}
@@ -103,79 +105,83 @@ Fiona uses operating guidelines and oWFNs as its input. oWFNs are the output of 
 \textit{BPEL2oWFN}. Thus, any \textit{BPEL} (\textit{Business Process Execution Language for Web
 Services}) process can easily be analyzed.
 
-To compute the states of the graph nodes \textit{Fiona} uses the efficient algorithms that were
+To compute the states of the graph nodes \textsc{Fiona} uses the efficient algorithms that were
 implemented in the model checking tool \textit{LoLA}.
 
-\textit{Fiona} was developed by \selectlanguage{ngerman}Daniela Weinberg, Peter Massuthe, Karsten Wolf,
-Kathrin Kaschner, Christian Gierds, Jan Bretschneider and Martin Znamirowski. \selectlanguage{english} It is part of the
-Tools4\textit{BPEL} project funded by the German Bundesministerium für Bildung und Forschung. 
+\textsc{Fiona} was developed by \selectlanguage{ngerman}Daniela Weinberg, Peter Massuthe, Karsten
+Wolf, Kathrin Kaschner, Christian Gierds, Jan Bretschneider and Martin Znamirowski.
+\selectlanguage{english} It is part of the Tools4\textit{BPEL} project funded by the German
+Bundesministerium für Bildung und Forschung.
 
 See \url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 
 \newpage
 \section{Installation}\label{sec:Installation}
-There are two possibilities to get \textit{Fiona} running. Either using the precompiled binaries
-for a variety of operating systems or compiling the source code yourself. Both, the binaries and
-the source code can be found in the download section of the website:
-\begin{quote} 
+There are two possibilities to get \textsc{Fiona} running. Either by using the precompiled binaries
+that are provided for a variety of operating systems or by compiling the source code yourself.
+Both, the binaries and the source code can be found in the download section of the website:
+\begin{quote}
 \url{http://www2.informatik.hu-berlin.de/top/tools4bpel/fiona/download.html}
 \end{quote}
 
 \subsection{Using the binaries}\label{subsec:UsingTheBinaries}
 
-Even when using the binaries, \textit{Fiona} will not have its complete functionality unless
-\textit{GraphViz dot} is installed. In order to create graphical output \textit{Fiona} uses system calls to
-\textit{dot}, so either \textit{dot} has to be callable in the same form which fiona is called or no graphical output will be created. 
-Not having \textit{dot} installed should not interfere with execution in any other way than
-lacking graphical output.
+Even when using the binaries, \textsc{Fiona} will not be completely functional unless
+\textit{GraphViz dot} is installed. In order to create graphical output \textsc{Fiona} uses system
+calls to \textit{dot}. So \textit{dot} has to be callable from within the directory \textsc{Fiona}
+is called. Otherwise no graphical output will be created. Not having \textit{dot} installed should
+not interfere with the execution of \textsc{Fiona} in any other way than lacking graphical output.
 
 \subsection{Using the source code}\label{subsec:UsingTheSourceCode}
 
-Unpack the the \texttt{fiona-2.0.tar.gz} into one directory keeping the archived folder structure. Before
-fiona can be compiled a number of tools has to be available at the shell. For a detailed list of
-those tools refer to the installation guide given in the \texttt{/doc}-directory. Supposing that all
-necessary tools are available you can compile fiona by entering the source directory and typing the
-following commands:
-\begin{quote} 
-\begin{verbatim} 
-automake -i
-./configure
-make
+Extract the compressed archive \texttt{fiona-2.0.tar.gz} into one directory. Make sure that the
+archived folder structure is maintained. Before \textsc{Fiona} can be compiled, a number of tools
+have to be available at the shell. For a detailed list of those tools please refer to the
+installation guide given in the \texttt{/doc}-directory. Provided that all necessary tools are
+available you can compile \textsc{Fiona} by typing the following commands in the \texttt{fiona}
+directory:
+\begin{quote}
+\begin{verbatim}
+$fiona/
+automake -i ./configure make
 \end{verbatim}
 \end{quote}
-To check if the compilation was succesful you can also type \texttt{make check}. The check should
-pass all tests except for those mentioned in section \ref{sec:LimitationsAndBugs} on page \pageref{sec:LimitationsAndBugs}.
+To check if the compilation was succesful you can type \texttt{make check}. In general, the check
+should pass all tests. In section \ref{sec:LimitationsAndBugs} on page
+\pageref{sec:LimitationsAndBugs} we give a list of those tests that may not be successful in the
+current distribution.
 
 \newpage
-\section{Invoking \textit{Fiona}}\label{sec:InvokingFiona}
+\section{Invoking \textsc{Fiona}}\label{sec:InvokingFiona}
 
-\textit{Fiona}'s primary uses are deciding controllability of and building operating
-guidelines for services given as \textit{oWFN}s. Therefore the standard invocations of
-\textit{Fiona} are:
+\textsc{Fiona}'s primary uses are deciding controllability of and building operating guidelines for
+services given as \textit{oWFN}s. Therefore the standard invocations of \textsc{Fiona} are:
 
 \begin{itemize}
 \item checking controllability: \texttt{fiona -t ig inputNet.owfn}
 \item calculating the operating guideline: \texttt{fiona -t og inputNet.owfn}
 \end{itemize}
 
-where \texttt{inputNet.owfn} contains an \textit{oWFN} written in the appropriate format
-\ref{sec:InputFormats} on page \pageref{sec:InputFormats}. The option \texttt{-t ig} lets \textit{Fiona} generate the interaction
-graph of the given net. In case the graph's size is not too big, a \texttt{png} graphic file is created that
-shows the interaction graph. Furthermore an output is written on the command line indicating the size
-of the graph and the statement whether the oWFN is controllable or not.
+where \texttt{inputNet.owfn} contains an \textit{oWFN} written in the appropriate format (see
+\ref{sec:InputFormats} on page \pageref{sec:InputFormats}). The option \texttt{-t ig} lets
+\textsc{Fiona} generate the interaction graph of the given net. In case the graph's size is not too
+big, a \texttt{png} graphic file is created that shows the interaction graph. Furthermore an output
+is written on the command line indicating the size of the graph and the statement whether the oWFN
+is controllable or not.
 
-The option \texttt{-t og} lets \textit{Fiona} generate the operating guideline of the given
-\textit{oWFN}. In case the graph's size is not too big, a \texttt{png} graphic file is created that shows the
-operating guideline. Furthermore an output is written on the command line indicating various statistics
-of the operating guideline.
+The option \texttt{-t og} lets \textsc{Fiona} generate the operating guideline of the given
+\textit{oWFN}. In case the graph's size is not too big, a \texttt{png} graphic file is created that
+shows the operating guideline. Furthermore an output is written on the command line indicating
+various statistics of the operating guideline.
 
-Since the start of the \textit{fiona} development process a lot of additional operations that primarily deal with operating
-guidelines have been included. A short description of those functions is given in this section, for
-more details on operating guidelines see section \ref{sec:OG} on page \pageref{sec:OG}.
+Since the start of the \textsc{Fiona} development process a lot of additional operations that
+primarily deal with operating guidelines have been included. A short description of those functions
+is given in this section, for more details on operating guidelines see section \ref{sec:OG} on page
+\pageref{sec:OG}.
 
 For more examples, see subsection \ref{subsec:Examples} on page \pageref{subsec:Examples}.
 
-\textit{Fiona} can be called without any parameter. In this case, it calculates the interaction
+\textsc{Fiona} can be called without any parameter. In this case, it calculates the interaction
 graph of the \textit{oWFN}, that is being read from the standard input (\texttt{stdin}).
 
 The invocationscheme is as follows:
@@ -185,7 +191,7 @@ The invocationscheme is as follows:
 
 Note: Every file read will be automatically recognized as an oWFN or operating guideline by its
 content or throw an error. Fiona supports reading multiple files by the '*' operator, for example:
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
 fiona -t og *.owfn
 \end{verbatim}
@@ -193,7 +199,7 @@ fiona -t og *.owfn
 
 \subsection{Options}\label{subsec:Options}
 
-\textit{Fiona} supports the following command-line options:
+\textsc{Fiona} supports the following command-line options:
 
 \paragraph{Help Function}
 
@@ -209,14 +215,14 @@ Command: \texttt{--version} or \texttt{-v}
 
 
 \paragraph{Debugging}
-Set the debuglevel to a value between 1-5
+Set the debuglevel to a value between 1 and 5.
 
 Command: \texttt{--debug = <level>} or \texttt{-d <level>}
 
 Parameters:
-\begin{quote} 
+\begin{quote}
 \sf
-\begin{tabular}{rl} 
+\begin{tabular}{rl}
 \hline
 \texttt{1 }& show nodes and dfs information\\
 \hline
@@ -233,8 +239,8 @@ Parameters:
 \end{quote}
 
 \paragraph{Modus Operandi}
-Selects the \texttt{<type>} of action you want fiona to process
-\begin{quote} 
+Selects the \texttt{<type>} of action you want \textsc{Fiona} to process
+\begin{quote}
 Command: \texttt{--type=<type>} or \texttt{-t <type>}
 
 Parameters:
@@ -250,27 +256,28 @@ Set the maximum number of same messages per state to \texttt{<level>}.
 Command: \texttt{--messagemaximum = <level>} or \texttt{-m <level>}
 
 \paragraph{Reduce IG}
-Apply reduction rules to the generated IG.
+Generate a reduced IG by applying reduction rules while the graph is calculated.
 
 Command: \texttt{--reduceIG} or \texttt{-r}
 
 \paragraph{Reduce Node states}
-Use node reduction (IG or OG) which stores less states per node of IG/OG and reduces memory, but
-increases time.
+This reduction technique stores less states in each node of the IG/OG and during the calculation of
+the graphs. So, in general it reduces memory. However, it might increase the computation time.
 
 Command: \texttt{--reduce-nodes} or \texttt{-R}
 
 \paragraph{Show additional information}
-Different display options according to the output of operating guidelines.
-\begin{quote} 
+There are different display options for the graphics of operating guidelines and interaction
+graphs.
+\begin{quote}
 Command: \texttt{--show = <parameter>} or \texttt{-s <parameter>}
 
 Parameters:
 
 \sf
-\begin{longtable}{ll} 
+\begin{longtable}{ll}
 \hline
-\texttt{allnodes }& show nodes of all colors\\
+\texttt{allnodes }& show all nodes of the graph\\
 \hline
 \texttt{blue }& show blue nodes only (default)\\
 \hline
@@ -287,9 +294,11 @@ Parameters:
 \end{quote}
 
 \paragraph{ BDD Construction}
-enable BDD construction (only relevant for OG) argument \texttt{<reordering>} specifies reodering
+The operating guidelines can represented as BDDs. Here, the BDD is created after the operating
+guideline has been calculated. The argument \texttt{<reordering>} specifies the type of reodering
+that is used.
 
-\begin{quote} 
+\begin{quote}
 Command: \texttt{--BDD = <reordering>} or \texttt{-b <reordering>}
 \sf
 Parameters:
@@ -344,16 +353,15 @@ Parameters:
 \end{quote}
 
 
-\paragraph{ On the Fly BDD Construction}
-Enable BDD construction on the fly (only relevant for OG) argument \texttt{<reordering>}.
+\paragraph{On the Fly BDD Construction}
+The operating guidelines can also be calculated as BDDs on the fly.
 
 Command: \texttt{--OnTheFly = <reordering>} or \texttt{-B <reordering>}
 
-Parameters:
-See \textit{BDD Construction} for possible parameters!
+Parameters: See \textit{BDD Construction} for possible parameters.
 
 \paragraph{Output prefix}
-Sets a prefix string for all output files.
+Sets a prefix string to all output files.
 
 Command: \texttt{--output = <filename prefix>} or \texttt{-o <filename prefix>}
 
@@ -363,13 +371,13 @@ No output will be generated at all.
 Command: \texttt{--no-output } or \texttt{-Q}
 
 \paragraph{Additional parameters}
-Further modification of the execution. 
+Further modification of the execution.
 
 Command: \texttt{--parameter = <parameter> } or \texttt{-p <parameter>}
 
 Parameters:
 
-\begin{quote} 
+\begin{quote}
 \begin{tabular}{ll}
 \hline
 \texttt{no-png} & \textsf{does not create a PNG file} \\
@@ -378,54 +386,58 @@ Parameters:
 \end{quote}
 
 
-\subsection{Examples}\label{subsec:Examples}
-This section features some use cases for \textit{Fiona}:
-\begin{quote} 
+\subsection{Examples Invocations}\label{subsec:Examples}
+This section features some example invocations of \textsc{Fiona}.
+
+\begin{itemize}
+
+\item Generate an OG reordered by CUDD\_REORDER\_SAME and store the OG in a file named
+\texttt{[oldfilename].og} for every oWFN in the current folder. No graphical output is generated.
+\begin{quote}
 \begin{verbatim}
 fiona -t og -b 0 -p no-png *.owfn
 \end{verbatim}
 \end{quote}
 
-Generates an OG reordered by CUDD\_REORDER\_SAME and saves the OG in a file named \texttt{[oldfilename].og}
-for every oWFN in the current folder. No graphical output is generated. 
-
-\begin{quote} 
+\item Generate a \textit{GraphViz dot} graph of each oWFN in the same folder.
+\begin{quote}
 \begin{verbatim}
 fiona -t png *.owfn
 \end{verbatim}
 \end{quote}
 
-Generates a \textit{graphviz dot} graph of each oWFN in the same folder. 
-
-\begin{quote} 
+\item Generate an operating guideline product from all operating guidelines in the same folder.
+\begin{quote}
 \begin{verbatim}
 fiona -t productog *.og
 \end{verbatim}
 \end{quote}
 
-Generates an operating guideline product from all operating guidelines in the same folder.
 
-\begin{quote} 
+\item Check if the oWFN toBeMatched.owfn matches with the toMatch.og operating guideline with all
+debug information being shown in the process.
+\begin{quote}
 \begin{verbatim}
 fiona -t match -d 5 toMatch.og toBeMatched.owfn
 \end{verbatim}
 \end{quote}
 
-Checks if the oWFN toBeMatched.owfn matches with the toMatch.og operating guideline with all debug
-information being shown in the process. 
+
+\end{itemize}
 
 \newpage
 \section{Input Formats}\label{sec:InputFormats}
 
-\textit{Fiona} can have \textit{oWFN}s and \textit{operating guidelines} as its input. The following subsections describe the corresponding file formats. 
+\textsc{Fiona} can have \textit{oWFN}s and \textit{operating guidelines} as its input. The
+following subsections describe the corresponding file formats.
 
 \subsection{\textit{oWFN} File Format}\label{subsec:oWFNFileFormat}
 
 An open workflow net is a Petri net with an \textit{interface}, i.e. two additional sets of places:
 \textit{input places} and \textit{output places}. Additionally an open workflow net has a set of
 final markings. To represent \textit{oWFN}s the \textit{LoLA}-format was extended to implement this
-class of petri nets. Following is an example for a valid \textit(oWFN) file.
-\begin{quote} 
+class of Petri nets. The following code shows an example of a valid \textit(oWFN) file.
+\begin{quote}
 \begin{verbatim}
 { sample oWFN }
 
@@ -459,8 +471,8 @@ PRODUCE
 \end{quote}
 
 \subsubsection{Structure of the \textit{oWFN} file format}
-The structure of a net is determined by its places, transitions and the edges in between of those.
-In the oWFN-Format edges are not seperately defined, but are part of the transition definitions at
+The structure of a net is determined by its places, transitions and the edges in between them. In
+the oWFN-Format edges are not defined seperately. They are part of the transition definitions at
 the end of the file. An oWFN file consists of 4 sections:
 
 \begin{enumerate}
@@ -477,7 +489,7 @@ Comments in the oWFN code can be written in between \texttt{\{} and \texttt{\}}.
 In the \texttt{PLACES} section the places of the net are specified. Here we distinguish between
 \texttt{INTERNAL}, \texttt{INPUT} and \texttt{OUTPUT} places. A \texttt{PLACES} section of a net
 looks like this:
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
 PLACES
   INTERNAL
@@ -496,14 +508,14 @@ In this example we have two internal, one input and three output places. The nam
 must be disjoint over all three categories, thus a place cannot be an input and an output place
 at the same time.
 
-After the \texttt{PLACES} follow the \texttt{INITIALMARKING} and \texttt{FINALMARKING} respectively
+The \texttt{PLACES} section is followed by the \texttt{INITIALMARKING} and \texttt{FINALMARKING} or
 \texttt{FINALCONDITION} sections, which are explained later on.
 
 \subsubsection{Transitions}
-After the three first sections the transitions of the net including their attached edges are defined.
-The fourth section does not have a headline like the first three, but rather one for each transition.
-A transition definition looks like this:
-\begin{quote} 
+After the first three sections the transitions of the net including their incoming and outgoing
+edges are defined. The fourth section does not have a headline like the first three. Rather, there
+is one for each transition. A transition definition looks like this:
+\begin{quote}
 \begin{verbatim}
 TRANSITION t1
 CONSUME
@@ -517,34 +529,36 @@ PRODUCE
 \end{verbatim}
 \end{quote}
 
-This example defines a transition named \texttt{t1} with six edges. Two that lead from the places
-\texttt{p1} and \texttt{a} to the transition and four that lead from the transition to the places
+This example defines a transition named \texttt{t1} with six edges. Two edges lead from the places
+\texttt{p1} and \texttt{a} to the transition and four lead from the transition to the places
 \texttt{p2}, \texttt{x}, \texttt{y} and \texttt{z}, with the edge to \texttt{p2} having a weight of
 2. A single place can be present under both \texttt{CONSUME} and \texttt{PRODUCE} in the same
-transition, such a structure is called a loop. Any other transitions of the net would just be
-listed further with the same syntax, thus starting with the \texttt{TRANSITION} keyword, followed
-by the name of the transition followed by the \texttt{CONSUME} and \texttt{PRODUCE} parts
-containing places, that must have been defined in the \texttt{PLACES} section beforehand.
-\texttt{CONSUME} and \texttt{PRODUCE} are allowed to be empty, thus representing a transition which
-is not in any way connected to the rest of the net.
+transition. Such a structure is called a loop. Any other transitions of the net would just be
+listed with the same syntax, thus starting with the \texttt{TRANSITION} keyword, followed by the
+name of the transition followed by the \texttt{CONSUME} and \texttt{PRODUCE} parts containing
+places, that must have been defined in the \texttt{PLACES} section beforehand. \texttt{CONSUME} and
+\texttt{PRODUCE} are allowed to be empty, thus representing a transition which is not in connected
+to the rest of the net in any way.
 
 \subsubsection{Initial Marking}
 After the \texttt{PLACES} section comes the \texttt{INITIALMARKING} section. Every place which is
-not listed in the \texttt{INITIALMARKING} section is implicitly assumed to have zero tokens. If one
-wants to create an initial state that differs from all places being empty one has to list places,
-which are to contain a number of tokens, in the \texttt{INITIALMARKING} section. Such a section
-looks as following:
-\begin{quote} 
+not listed in the \texttt{INITIALMARKING} section is implicitly assumed to have zero tokens
+initially. If you want to create an initial state in which some places are marked, you have to list
+exactly those places in the \texttt{INITIALMARKING} section. Make sure that you specify the correct
+number of tokens of each place. \texttt{INITIALMARKING} section can look as follows:
+\begin{quote}
 \begin{verbatim}
 INITIALMARKING
-  p1:  2;
+  p1:  2,
+  p2;
 \end{verbatim}
 \end{quote}
 
-After this definition the place \texttt{p1} would contain two tokens. One can initially mark more
-than one place, by seperating the places by commata and finishing the section with a semicolon. If
-a place is listed without a colon and the corresponding number of tokens, the \textit{oWFN} file
-format implies the place is marked with one token.
+This definition specifies that the place \texttt{p1} contains two tokens and the place \texttt{p2}
+contains one token initially. You can mark more than one place, by seperating the places by commata
+and finishing the section with a semicolon. If a place is listed without a colon and the
+corresponding number of tokens, the \textit{oWFN} file format implies the place is marked with one
+token.
 
 \subsubsection{Final Markings}
 
@@ -553,26 +567,25 @@ difference is that a \texttt{FINALMARKING} can only describe one final state whi
 \texttt{FINALCONDITION} can describe multiple final states.
 \paragraph{Final Marking}
 
-The \texttt{FINALMARKING} section follows the same syntax as the \texttt{INITIALMARKING} section.
-Thus one can list a number of places with corresponding numbers of tokens. The final state
-described by a \texttt{FINALMARKING} is meant to be a state in which the marking exactly matches the described
-one, including not mentioned places as having a token number of zero. In the same way this means,
-that a \texttt{FINALMARKING} can only describe exactly one final state. A final marking looks like
-this:
-\begin{quote} 
+The \texttt{FINALMARKING} section has the same syntax as the \texttt{INITIALMARKING} section. Thus
+one can list a number of places with a corresponding number of tokens. The final state described by
+a \texttt{FINALMARKING} is meant to be a state in which the marking exactly matches the described
+one, including not mentioned places as having a zero tokens. In the same way this means, that a
+\texttt{FINALMARKING} can only describe exactly one final state. A final marking looks like this:
+\begin{quote}
 \begin{verbatim}
 FINALMARKING
   p2:  4;
 \end{verbatim}
 \end{quote}
-This would describe a final state in which the place \texttt{p2} has exactly four tokens and all
-other places are empty.
+This describes a final state in which the place \texttt{p2} has exactly four tokens and all other
+places are empty.
 
 \paragraph{Final Condition}
 The syntax of a \tt FINALCONDITION \rm is different from that of a \tt
 FINALMARKING \rm. If one wants to express that the place \texttt{p2} has to contain four tokens, the \texttt{FINALCONDITION} would look like
 this:
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
 FINALCONDITION
   p2 = 4;
@@ -588,7 +601,7 @@ state, and that is where \texttt{p2} has four tokens and all other places have z
 create a \texttt{FINALCONDITION} equal to the exemplary \texttt{FINALMARKING}, one can use the
 boolean keywords \texttt{AND}, \texttt{OR} and \texttt{NOT}. The equal definition would then look
 as follows:
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
 FINALCONDITION
   p2 = 4 AND p1 = 0 AND a = 0 AND
@@ -601,7 +614,7 @@ case it is  exactly the same finalstate, as defined by the \texttt{FINALMARKING}
 and all other places zero.
 It can quickly become a nuisance to write or read such a formula, especially if the \textit{oWFN}s become big. That
 is why there is a keyword that can gather up most of the information.
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
 FINALCONDITION
   p2 = 4 AND ALL_OTHER_PLACES_EMPTY;
@@ -615,15 +628,15 @@ places only (that are all non-internal or interface places) can be achieved
 with the keyword \texttt{ALL\_OTHER\_EXTERNAL\_PLACES\_EMPTY}.
 
 All three keywords can be combined at will. Saying
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
-FINALCONDITION p2 = 4 AND ALL_OTHER_INTERNAL_PLACES_EMPTY 
-					  AND ALL_OTHER_EXTERNAL_PLACES_EMPTY;
+FINALCONDITION p2 = 4 AND ALL_OTHER_INTERNAL_PLACES_EMPTY
+                      AND ALL_OTHER_EXTERNAL_PLACES_EMPTY;
 \end{verbatim}
 \end{quote}
 
 is the same as
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
 FINALCONDITION p2 = 4 AND ALL_OTHER_PLACES_EMPTY;
 \end{verbatim}
@@ -633,10 +646,10 @@ All three keywords can only be used as the right hand side of a conjunction
 with another state predicate while the whole conjunction is then again a state
 predicate. So the rule is
 
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
-statepredicate := statepredicate 
-				  AND ALL_OTHER_PLACES_EMPTY
+statepredicate := statepredicate
+                  AND ALL_OTHER_PLACES_EMPTY
 \end{verbatim}
 \end{quote}
 
@@ -649,21 +662,21 @@ understands all bracing and precedence rules of state predicate formulas and
 that one can construct the fully braced form of his formula in his mind!
 
 Suppose a different oWFN with places \texttt{p1}, \texttt{p2}, \texttt{p3}, and \texttt{p4}. Then the formula:
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
-FINALCONDITION 
-p1 = 1 AND ALL_OTHER_PLACES_EMPTY OR 
+FINALCONDITION
+p1 = 1 AND ALL_OTHER_PLACES_EMPTY OR
 p2 = 1 AND ALL_OTHER_PLACES_EMPTY;
 \end{verbatim}
 \end{quote}
 
 
 expands to:
-\begin{quote} 
+\begin{quote}
 
 \begin{verbatim}
-FINALCONDITION 
-(p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0) OR 
+FINALCONDITION
+(p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0) OR
 (p2 = 1 AND p1 = 0 AND p3 = 0 AND p4 = 0);
 \end{verbatim}
 \end{quote}
@@ -671,37 +684,37 @@ FINALCONDITION
 because \texttt{AND} takes precedence over \texttt{OR}.
 
 In the same oWFN the formula
-\begin{quote} 
-\begin{verbatim} 
-FINALCONDITION 
+\begin{quote}
+\begin{verbatim}
+FINALCONDITION
 p1 = 1 AND ALL_OTHER_PLACES_EMPTY AND p2 = 1;
 \end{verbatim}
 \end{quote}
 
 expands to
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
-FINALCONDITION 
+FINALCONDITION
 p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0 AND p2 = 1;
 \end{verbatim}
 \end{quote}
 
 because \texttt{AND} is left associative. So the fully braced form of the original
 formula is:
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
-FINALCONDITION 
+FINALCONDITION
 (((p1 = 1) AND ALL_OTHER_PLACES_EMPTY) AND (p2 = 1));
 \end{verbatim}
 \end{quote}
 
 
 Consequently \texttt{(p1 = 1)} is the scope of \texttt{ALL\_OTHER\_PLACES\_EMPTY}. Therefore
-\texttt{ALL\_OTHER\_PLACES\_EMPTY} expands to \texttt{((p2 = 0) AND (p3 = 0) AND (p4 = 0))}. 
+\texttt{ALL\_OTHER\_PLACES\_EMPTY} expands to \texttt{((p2 = 0) AND (p3 = 0) AND (p4 = 0))}.
 Putting it all together and removing redundant braces results in
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
-FINALCONDITION 
+FINALCONDITION
 p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0 AND p2 = 1;
 \end{verbatim}
 \end{quote}
@@ -718,7 +731,7 @@ The same rules, of course, apply to \texttt{ALL\_OTHER\_INTERNAL\_PLACES\_EMPTY}
 
 \subsection{File Format OG}\label{subsec:FileFormatOG}
 
-\textit{Fiona} can have the og file format as its input.
+\textsc{Fiona} can have the og file format as its input.
 
 The og file consists of 3 sections:
 
@@ -735,10 +748,10 @@ are those that are not part of the final operating guideline, but rather left
 over from building the operating guideline and have not been deleted yet for
 diagnosis reasons. Blue nodes are equal to colorless nodes and are part of the
 actual operating guideline. The different nodes are divided by commata, a
-semicolon finishes the section. 
+semicolon finishes the section.
 
 Every node follows this syntax:
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
 nodeName:nodeAnnotation[:nodeColor]
 \end{verbatim}
@@ -746,7 +759,7 @@ nodeName:nodeAnnotation[:nodeColor]
 
 In the second section, one of the nodes is determined as \textit{root node} by its name,
 the section is finished by a semicolon:
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
 nodeName
 \end{verbatim}
@@ -755,7 +768,7 @@ nodeName
 In the last section all edges of the graph are specified. The different
 edges are divided by commata, a semicolon finishes the section. Every edge follows this syntax:
 
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
 sourceNodeName -> targetNodeName:edgeAnnotation
 \end{verbatim}
@@ -763,7 +776,7 @@ sourceNodeName -> targetNodeName:edgeAnnotation
 
 
 Here is an example for a valid og file:
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
 NODES
   0 : ((!a)) : blue,
@@ -840,7 +853,7 @@ guidelines refer to [MRS05].
 
 \subsection{Limitations}\label{subsec:Limitations}
 
-The current version of \textit{Fiona} has several limitations:
+The current version of \textsc{Fiona} has several limitations:
 
 \paragraph{Number of Strategies} The number of strategies, which are determined by the given og
 can only be calculated if the og is acyclic and deterministic. It will also hold with a
@@ -858,22 +871,20 @@ Examples can be taken from the \texttt{/tests/sequence\_suite} directory
 In the current version of Fiona are the following issues:
 
 \begin{description}
-	\item[Problem] The test suite in the current release does not pass all tests. The 'samples' and the 'bddtest' tests do not work properly.
-	\item[Solution] The test suite is going to be fixed.
+    \item[Problem] The test suite in the current release does not pass all tests. The 'samples' and the 'bddtest' tests do not work properly.
+    \item[Solution] The test suite is going to be fixed.
 \end{description}
 
 
 \subsection{Reporting Bugs}\label{subsec:ReportingBugs}
 
-If you find a bug in \textit{Fiona}, please first check that it
-is not a known bug listed in `Known Bugs'. Otherwise please send us
-an electronic mail to \url{weinberg@informatik.hu-berlin.de}.
-Include the version number which you can find by running
-\texttt{fiona --version}. Also include in your message the input
-\texttt{oWFN} process and the output that the program produced. We
-will try to answer your mail within a week.
+If you find a bug in \textsc{Fiona}, please first check that it is not a known bug listed in `Known
+Bugs'. Otherwise please send us an electronic mail to \url{weinberg@informatik.hu-berlin.de}.
+Include the version number which you can find by running \texttt{fiona --version}. Also include in
+your message the input \texttt{oWFN} process and the output that the program produced. We will try
+to answer your mail within a week.
 
-If you have other questions, comments or suggestions about
-\textit{Fiona}, contact us via electronic mail to \url{weinberg@informatik.hu-berlin.de}.
+If you have other questions, comments or suggestions about \textsc{Fiona}, contact us via
+electronic mail to \url{weinberg@informatik.hu-berlin.de}.
 
 \end{document}

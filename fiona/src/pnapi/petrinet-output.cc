@@ -30,17 +30,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2008-03-06 10:23:41 $
+ * \date    \$Date: 2008-03-06 15:38:24 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  *
  * \ingroup petrinet
  */
@@ -611,6 +611,34 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
     (*output) << " }" << endl;
   }    
     
+
+    // draw the ports
+    for (map<string, set<Place *> >::const_iterator port = ports.begin();
+         port != ports.end(); port++)
+    {
+        (*output) << " // cluster for port " << port->first << endl; 
+        (*output) << " subgraph cluster_" << port->first << "\n {\n";
+        (*output) << "  label=\"" << port->first << "\";" << endl;
+        (*output) << "  style=\"filled,rounded\"; bgcolor=grey95  labelloc=t;" << endl;
+        //(*output) << "  rankdir=TB;" << endl;
+        
+        for (set<Place*>::const_iterator place = port->second.begin();
+             place != port->second.end(); place++)
+        {
+            (*output) << "  p" + toString((*place)->id) << ";" << endl;
+            (*output) << "  p" + toString((*place)->id) << "_l;" << endl;
+            
+            // make the port more compact
+            for (set<Place*>::const_iterator place2 = port->second.begin();
+                 place2 != port->second.end(); place2++)
+            {
+                if ( (*place) != (*place2) )
+                    (*output) << "  p" + toString((*place)->id) + " -> p" + toString((*place2)->id) + " [style=invis];" << endl;  
+            }
+        }
+        
+        (*output) << " }" << endl << endl;
+    }
     
   
   

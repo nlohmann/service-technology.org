@@ -382,6 +382,9 @@ class oWFN {
         /// adds a place to a port
         void add_place_to_port(owfnPlace *place, std::string port);
 
+        /// returns the port of a given interface place
+        std::string get_port_from_place(const owfnPlace *place) const;
+
         /// counts the ports
         unsigned int getPortCount() const;
 

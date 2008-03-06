@@ -44,6 +44,7 @@
 
 #include <stdlib.h>
 #include <cassert>
+#include <algorithm>
 #include <limits.h>
 
 using namespace std;
@@ -3374,6 +3375,43 @@ void oWFN::add_place_to_port(owfnPlace *place, std::string port) {
 }
 
 
+
+
+/*!
+ * \brief  returns the port of a given place
+ *
+ * \param  place  a place
+ * \return the name of the place's port of "" if no port was found (e.g., if
+ *         the place is internal or the oWFN has no ports)
+ *
+ * \todo   The handling of ports should be implemented more efficiently, for
+ *         example using also a mapping from places to port names This would
+ *         make this function unnecessary.
+ *
+ * \author Niels Lohmann <niels.lohmann@uni-rostock.de>
+ */
+std::string oWFN::get_port_from_place(const owfnPlace *place) const {
+    assert(place != NULL);
+    
+    // iterate the ports
+    for ( std::map<std::string, Places_t>::const_iterator port = ports.begin();
+         port != ports.end(); port++) {
+
+        // look if the given place is of this port
+        Places_t::const_iterator p_it = find(port->second.begin(), port->second.end(), place);
+        
+        // if place is found in the port, return the port's name
+        if (p_it != port->second.end())
+            return port->first;
+    }
+    
+    // port not found
+    return "";
+}
+
+
+
+
 //! \brief returns the number of ports
 //! \return number of ports
 unsigned int oWFN::getPortCount() const {
@@ -3390,7 +3428,7 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
     // translate all input places
     for (Places_t::const_iterator place = inputPlaces.begin(); place
             != inputPlaces.end(); place++) {
-        PNapi::Place* p = PN->newPlace((*place)->name, PNapi::IN);
+        PNapi::Place* p = PN->newPlace((*place)->name, PNapi::IN, get_port_from_place(*place));
         // Warning: tokens of a place in PNapi is private. The number of tokens is not translated correctly!
         if ((*place)->initial_marking >= 1) {
             p->mark((*place)->initial_marking);
@@ -3404,7 +3442,7 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
     // translate all output places
     for (Places_t::const_iterator place = outputPlaces.begin(); place
             != outputPlaces.end(); place++) {
-        PNapi::Place* p = PN->newPlace((*place)->name, PNapi::OUT);
+        PNapi::Place* p = PN->newPlace((*place)->name, PNapi::OUT, get_port_from_place(*place));
         // Warning: tokens of a place in PNapi is private. The number of tokens is not translated correctly!
         if ((*place)->initial_marking >= 1) {
             p->mark((*place)->initial_marking);

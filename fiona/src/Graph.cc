@@ -372,16 +372,16 @@ void Graph::transformToOWFNRecursively(GraphNode* currentNode,
 	
     if(visitedNodes.find(currentNode) != visitedNodes.end()) {
         if (incomingTransition != NULL) {
-        	PN->newArc(incomingTransition, PN->findPlace(currentNode->getName()));
+        	PN->newArc(incomingTransition, PN->findPlace("p" + currentNode->getName()));
         } 
      	return;
     }
 
-    PNapi::Place* place = PN->newPlace(currentNode->getName());
+    PNapi::Place* place = PN->newPlace("p" + currentNode->getName());
   	visitedNodes.insert(currentNode);
   	
   	if (find(finalNodes.begin(), finalNodes.end(),currentNode) != finalNodes.end())
-  		finalNodeNames.insert(currentNode->getName());
+  		finalNodeNames.insert("p" + currentNode->getName());
   		
   	if (incomingTransition != NULL) {
   		PN->newArc(incomingTransition, place);

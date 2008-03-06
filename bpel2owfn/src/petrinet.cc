@@ -35,13 +35,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2008/03/06 09:45:37 $
+ * \date    \$Date: 2008/03/06 10:05:06 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.228 $
+ * \version \$Revision: 1.229 $
  *
  * \ingroup petrinet
  */
@@ -1715,10 +1715,17 @@ void PetriNet::compose(const PetriNet &net)
 {
   using namespace std;
 
-  // merge the final set lists
-  for (list<set<Place *> >::const_iterator final_set = net.final_set_list.begin(); final_set != net.final_set_list.end(); final_set++)
   {
-    final_set_list.push_back(*final_set);
+    list<set<Place *> > newFinalSet;
+    // merge the final set lists
+    for (list<set<Place *> >::const_iterator final_setA = net.final_set_list.begin(); final_setA != net.final_set_list.end(); final_setA++)
+    {
+      for (list<set<Place *> >::const_iterator final_setB = final_set_list.begin(); final_setB != final_set_list.end(); final_setB++)
+      {
+        newFinalSet.push_back(setUnion(*final_setA, *final_setB));
+      }
+    }
+    final_set_list = newFinalSet;
   }
 
   // add all internal places

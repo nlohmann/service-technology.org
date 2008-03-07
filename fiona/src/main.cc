@@ -355,7 +355,7 @@ void makeGasTex(CommunicationGraph* graph) {
 
     for(int i = 0; texBuffer[i] != ""; i++) {
         texFile << texBuffer[i];
-    } 
+    }
 
     for (int i = 0; i < texFooterCount; i++) {
         texFile << texFooter[i];

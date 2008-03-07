@@ -118,11 +118,9 @@ graph:  /* empty */
 stmt_list: /* empty */
         stmt KW_SEMICOLON
             { 
-//                cout << "stmt KW_SEMICOLON" << endl; 
             }
         | stmt KW_SEMICOLON stmt_list 
             { 
-//                cout << "stmt KW_SEMICOLON stmt_list" << endl; 
             }
 ;
 
@@ -130,19 +128,16 @@ stmt:   /* empty */
         attr_stmt
             {
                 (*$$) = (*$1);
-//                cout << (*$$) << endl;
             }
         | node_stmt 
             { 
                 (*$$) = (*$1);
-                buffer[i++] = (*$$);
-//                cout << (*$$) << endl;  
+                texBuffer[i++] = (*$$) + "\n";
             }
         | edge_stmt 
             { 
                 (*$$) = (*$1);
-                buffer[i++] = (*$$);
-//                cout << (*$$) << endl; 
+                texBuffer[i++] = (*$$) + "\n";
             }
 ;
 
@@ -150,41 +145,34 @@ attr_stmt: /* empty */
         KW_GRAPH attr_list 
             {
                 (*$$) = ""; 
-//                cout << "KW_GRAPH attr_list" << endl; 
             }
         | KW_NODE attr_list
             { 
                 (*$$) = "";
-//                cout << "KW_NODE attr_list" << endl; 
             }
         | KW_EDGE attr_list
             { 
                 (*$$) = "";
-//                cout << "KW_EDGE attr_list" << endl; 
             }
 ;
 
 attr_list: /* empty */
         KW_LBRACKET KW_RBRACKET
             {
-//                cout << "KW_LBRACKET KW_RBRACKET" << endl; 
             }
         | KW_LBRACKET a_list KW_RBRACKET
             { 
     		  (*$$) = (*$2); 
-//                cout << "KW_LBRACKET a_list KW_RBRACKET" << endl; 
             }
 ;
 
 node_attr_list: /* empty */
         KW_LBRACKET KW_RBRACKET
             {
-//                cout << "KW_LBRACKET KW_RBRACKET" << endl; 
             }
         | KW_LBRACKET node_a_list KW_RBRACKET
             { 
               (*$$) = (*$2); 
-//                cout << "KW_LBRACKET a_list KW_RBRACKET" << endl; 
             }
 ;
 
@@ -200,7 +188,6 @@ a_list: /* empty */
                 } else { 
                     (*$$) = "";
                 }
-//                cout << "KW_ID KW_EQUAL KW_STRING" << endl; 
             }
         | KW_ID KW_EQUAL KW_STRING KW_COMMA a_list
             {
@@ -213,22 +200,14 @@ a_list: /* empty */
                 } else {
                     (*$$) = (*$5);
                 }
-//                cout << "KW_ID KW_EQUAL KW_STRING KW_COMMA a_list" << endl; 
             }
         | KW_ID KW_EQUAL KW_INT
             {
                 (*$$) = ""; 
-/*                if ((*$1) == "fontsize") {
-                    char temp[4];
-                    sprintf(temp, "%d", $3);
-                    (*$$) = (*$1) + ": " + temp;
-	        }*/
-//                cout << "KW_ID KW_EQUAL KW_INT" << endl; 
             }
         | KW_ID KW_EQUAL KW_ID KW_COMMA a_list
             {
 		(*$$) = (*$5); 
-//                cout << "KW_ID KW_EQUAL KW_ID KW_COMMA a_list" << endl; 
             }
 ;
 
@@ -244,7 +223,6 @@ node_a_list: /* empty */
                 } else { 
                     (*$$) = "";
                 }
-//                cout << "KW_ID KW_EQUAL KW_STRING" << endl; 
             }
         | KW_ID KW_EQUAL KW_STRING KW_COMMA node_a_list
             {
@@ -272,37 +250,31 @@ node_a_list: /* empty */
                 } else {
                     (*$$) = (*$5);
                 }
-//                cout << "KW_ID KW_EQUAL KW_STRING KW_COMMA node_a_list" << endl; 
             }
         | KW_ID KW_EQUAL KW_INT
             {
                 (*$$) = ""; 
-/*                if ((*$1) == "fontsize") {
-                    char buffer[4];
-                    sprintf(buffer, "%d", $3);
-                    (*$$) = (*$1) + ": " + buffer;
-            }*/
-//                cout << "KW_ID KW_EQUAL KW_INT" << endl; 
             }
         | KW_ID KW_EQUAL KW_ID KW_COMMA node_a_list
             {
-        (*$$) = (*$5); 
-//                cout << "KW_ID KW_EQUAL KW_ID KW_COMMA node_a_list" << endl; 
+                (*$$) = (*$5); 
             }
+        | KW_ID KW_EQUAL KW_INT KW_COMMA node_a_list
+            {
+                (*$$) = (*$5);
+            } 
 ;
 
 node_stmt: /* empty */
         node_id
             {
                 (*$$) = node_stmt_str[0] + (*$1) + node_stmt_str[1];
-//                cout << "node_id" << endl; 
             }
         | node_id node_attr_list        
             { 
                 char buffer[128];
                 sprintf(buffer, "%i", label_length($2));
                 (*$$) = node_stmt2_str[0] + buffer + node_stmt2_str[1] + (*$1) + node_stmt2_str[2] + (*$2);
-//               cout << "node_id node_attr_list" << endl; 
             }
 ;
 
@@ -310,7 +282,6 @@ node_id: /* empty */
         KW_ID 
             {
                 (*$$) = (*$1);
-//                cout << "KW_ID" << endl; 
             }
 ;
 
@@ -319,7 +290,6 @@ edge_stmt: /* empty */
             {
                 (*$$) = edge_stmt_str[0] + (*$1) + edge_stmt_str[1] + (*$2) + edge_stmt_str[2] + 
                     ($3)->substr(($3)->find_first_of("{"), ($3)->find_first_of("}") - ($3)->find_first_of("{") + 1);
-//                cout << "node_id edgeRHS attr_list" << endl; 
             }
 ;
 
@@ -327,7 +297,6 @@ edgeRHS: /* empty */
         KW_EDGEOP node_id
             {
                 (*$$) = (*$2);
-//                cout << "KW_EDGEOP node_id" << endl; 
             }
 ;
             

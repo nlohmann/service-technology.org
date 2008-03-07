@@ -11,7 +11,7 @@
 #include "syntax_dot.h"
 int dot_yyerror(char *s);
 
-string buffer[max_lines];
+string texBuffer[max_lines];
 
 int minx;
 int maxx;

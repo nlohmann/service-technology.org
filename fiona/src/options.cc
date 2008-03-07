@@ -433,6 +433,8 @@ void parse_command_line(int argc, char* argv[]) {
                 string lc_optarg = toLower(optarg);
                 if (lc_optarg == "no-png") {
                     parameters[P_NOPNG] = true;
+                } else if (lc_optarg == "tex") {
+                    parameters[P_TEX] = true;
                 } else if (lc_optarg == "diagnosis") {
 //                    options[O_GRAPH_TYPE] = true;
                     options[O_DIAGNOSIS] = true;

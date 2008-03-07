@@ -87,8 +87,9 @@ typedef enum {
     P_SHOW_STATES_PER_NODE,     //!< show all states in a node (aka "knowledge")
     P_SHOW_DEADLOCKS_PER_NODE,  //!< show deadlock states only
     P_NOPNG,                    //!< do not create a PNG output
+    P_TEX,                      //!<
     P_READ_OG,                  //!< only read an OG from a file
-    P_REPRESENTATIVE,		//!< state reduction in node using representatives
+    P_REPRESENTATIVE,	      	//!< state reduction in node using representatives
     P_SINGLE                    //!< state reduction in node using single marking as representative
 } possibleParameters;
 

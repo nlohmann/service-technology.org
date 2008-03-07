@@ -41,6 +41,7 @@ extern oWFN* PN;
 extern unsigned int numberOfDecodes;
 extern unsigned int NonEmptyHash;
 extern unsigned int numberDeletedVertices;
+extern string texBuffer[];
 
 
 ///Equivalent for basename() on Posix systems. See 'man 3 basename'.

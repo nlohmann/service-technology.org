@@ -41,6 +41,7 @@
 #include "debug.h"
 #include "main.h"
 #include "adapter.h"
+#include "dot2tex.h"
 
 #include <list>
 #include <iostream>
@@ -79,6 +80,17 @@ extern int og_yyparse();
 
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
 extern int og_yylex_destroy();
+#endif
+
+extern int dot_yylineno;
+extern int dot_yydebug;
+extern int dot_yy_flex_debug;
+extern FILE* dot_yyin;
+extern int dot_yyerror();
+extern int dot_yyparse();
+
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
+extern int dot_yylex_destroy();
 #endif
 
 /// Deletes all OGs in 'OGsFromFiles' and clears list.
@@ -296,6 +308,65 @@ void reportOptionValues() {
 // *******                    mode dependent functions                       ********
 // **********************************************************************************
 
+
+//! \brief create a GasTex file of the given oWFN
+//! \param PN an oWFN to generate a GasTex file from
+void makeGasTex(CommunicationGraph* graph) {
+    
+    trace(TRACE_1, "Internal translation of the net into GasTex format...\n");
+    
+    string outfilePrefixWithOptions = options[O_OUTFILEPREFIX] ? outfilePrefix : graph->getFilename();
+
+    if (!options[O_CALC_ALL_STATES]) {
+        outfilePrefixWithOptions += ".R";
+    }
+
+    if (options[O_DIAGNOSIS]) {
+        outfilePrefixWithOptions += ".diag";
+    } else {
+        if (parameters[P_OG]) {
+            outfilePrefixWithOptions += ".OG";
+        } else {
+            outfilePrefixWithOptions += ".IG";
+        }
+    }
+    
+    string outFileName = outfilePrefixWithOptions + ".out";
+
+    system((string("dot -Tdot ") + outFileName + " -o " + 
+           outFileName + ".dot").c_str());
+
+    dot_yylineno = 1;
+    dot_yydebug = 0;
+
+    dot_yyin = fopen((outFileName + ".dot").c_str(), "r");
+    if (!dot_yyin) {
+        cerr << "cannot open graph file '" << outFileName << ".dot" << "' for reading'\n" << endl;
+        exit(4);
+    }
+
+    dot_yyparse();
+
+    fclose(dot_yyin);
+    system((string("rm -f ") + outFileName + ".dot").c_str());
+
+    string texFileName = outfilePrefixWithOptions + ".tex";
+    fstream texFile(texFileName.c_str(), ios_base::out | ios_base::trunc);
+
+    for(int i = 0; i < texHeaderCount; i++) {
+        texFile << texHeader[i];
+    }
+
+    for(int i = 0; texBuffer[i] != ""; i++) {
+        texFile << texBuffer[i];
+    } 
+
+    for (int i = 0; i < texFooterCount; i++) {
+        texFile << texFooter[i];
+    }
+}
+
+
 //! \brief create an IG of an oWFN
 //! \param PN the given oWFN
 string computeIG(oWFN* PN) {
@@ -347,6 +418,10 @@ string computeIG(oWFN* PN) {
         if (!options[O_EQ_R]) {	// don't create png if we are in eqr mode
         	// generate output files
         	graph->printGraphToDot(); // .out, .png
+
+                if (parameters[P_TEX]) {
+                    makeGasTex(graph);
+                }
         }
 
 /* create also an .og file to enable comparison of different IGs */
@@ -525,6 +600,10 @@ string computeOG(oWFN* PN) {
 
         if (!options[O_EQ_R]) {	// don't create png if we are in eqr mode
         	graph->printGraphToDot(); // .out, .png
+        	
+        	if (parameters[P_TEX]) {
+        	    makeGasTex(graph);
+        	}
         }
 
         if (options[O_OUTFILEPREFIX]) {

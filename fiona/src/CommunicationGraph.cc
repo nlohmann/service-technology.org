@@ -443,7 +443,7 @@ void CommunicationGraph::printGraphToDot() {
             }
         }
 
-        string dotFileName = outfilePrefixWithOptions + ".out";
+        string dotFileName = outfilePrefixWithOptions + ".dot";
         fstream dotFile(dotFileName.c_str(), ios_base::out | ios_base::trunc);
         dotFile << "digraph g1 {\n";
         dotFile << "graph [fontname=\"Helvetica\", label=\"";
@@ -482,11 +482,17 @@ void CommunicationGraph::printGraphToDot() {
 
         dotFile << "}";
         dotFile.close();
-        // ... dot file created (.out) //
+        // ... dot file created (.dot) //
+
+        string annotatedDotFileName = outfilePrefixWithOptions + ".out";
+        // annotate .dot file
+        system(("dot -Tdot " + dotFileName + " -o " + annotatedDotFileName).c_str());
+        // clean up
+        system(("rm -f " + dotFileName).c_str());
 
         // prepare dot command line creating the picture
         string imgFileName = outfilePrefixWithOptions + ".png";
-        string dotCmd = "dot -Tpng \"" + dotFileName + "\" -o \"" + imgFileName + "\"";
+        string dotCmd = "dot -Tpng \"" + annotatedDotFileName + "\" -o \"" + imgFileName + "\"";
 
         // print only, if number of nodes is lower than required
         // if option is set to show all nodes, then we compare the number of all nodes

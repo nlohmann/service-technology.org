@@ -333,22 +333,18 @@ void makeGasTex(CommunicationGraph* graph) {
     
     string outFileName = outfilePrefixWithOptions + ".out";
 
-    system((string("dot -Tdot ") + outFileName + " -o " + 
-           outFileName + ".dot").c_str());
-
     dot_yylineno = 1;
     dot_yydebug = 0;
 
-    dot_yyin = fopen((outFileName + ".dot").c_str(), "r");
+    dot_yyin = fopen((outFileName).c_str(), "r");
     if (!dot_yyin) {
-        cerr << "cannot open graph file '" << outFileName << ".dot" << "' for reading'\n" << endl;
+        cerr << "cannot open graph file '" << outFileName << "' for reading'\n" << endl;
         exit(4);
     }
 
     dot_yyparse();
 
     fclose(dot_yyin);
-    system((string("rm -f ") + outFileName + ".dot").c_str());
 
     string texFileName = outfilePrefixWithOptions + ".tex";
     fstream texFile(texFileName.c_str(), ios_base::out | ios_base::trunc);

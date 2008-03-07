@@ -355,6 +355,7 @@ annotation_list:
 ;
 
 arclist: 
+  /* empty */
 | arc 
 | arc COMMA arclist 
 ;
@@ -377,14 +378,15 @@ arc:
 ;
 
 statepredicate:
+  /* empty */
 | LPAR 
   {
-    globals::owfn_statepredicate += "( ";  
+    globals::owfn_statepredicate += "(";  
   }
   statepredicate 
   RPAR 
   {
-    globals::owfn_statepredicate += " )";  
+    globals::owfn_statepredicate += ")";  
   }
 
 | statepredicate OP_AND  
@@ -416,42 +418,42 @@ statepredicate:
   statepredicate 
 | nodeident OP_EQ NUMBER 
   {
-    globals::owfn_statepredicate = globals::owfn_statepredicate + nodename + " = " + strip_namespace($3->name); 
+    globals::owfn_statepredicate = globals::owfn_statepredicate + " " + nodename + " = " + strip_namespace($3->name); 
     Place * p = PN.findPlace(nodename);
     assert(p != NULL);
     p->isFinal = true;
   }
 | nodeident OP_NE NUMBER 
   {
-    globals::owfn_statepredicate = globals::owfn_statepredicate + nodename + " != " + strip_namespace($3->name);  
+    globals::owfn_statepredicate = globals::owfn_statepredicate + " " + nodename + " != " + strip_namespace($3->name);  
     Place * p = PN.findPlace(nodename);
     assert(p != NULL);
     p->isFinal = true;
   }
 | nodeident OP_LT NUMBER 
   {
-    globals::owfn_statepredicate = globals::owfn_statepredicate + nodename + " < " + strip_namespace($3->name);  
+    globals::owfn_statepredicate = globals::owfn_statepredicate + " " + nodename + " < " + strip_namespace($3->name);  
     Place * p = PN.findPlace(nodename);
     assert(p != NULL);
     p->isFinal = true;
   }
 | nodeident OP_GT NUMBER 
   {
-    globals::owfn_statepredicate = globals::owfn_statepredicate + nodename + " > " + strip_namespace($3->name);  
+    globals::owfn_statepredicate = globals::owfn_statepredicate + " " + nodename + " > " + strip_namespace($3->name);  
     Place * p = PN.findPlace(nodename);
     assert(p != NULL);
     p->isFinal = true;
   }
 | nodeident OP_GE NUMBER 
   {
-    globals::owfn_statepredicate = globals::owfn_statepredicate + nodename + " >= " + strip_namespace($3->name);  
+    globals::owfn_statepredicate = globals::owfn_statepredicate + " " + nodename + " >= " + strip_namespace($3->name);  
     Place * p = PN.findPlace(nodename);
     assert(p != NULL);
     p->isFinal = true;
   }
 | nodeident OP_LE NUMBER 
   {
-    globals::owfn_statepredicate = globals::owfn_statepredicate + nodename + " <= " + strip_namespace($3->name);  
+    globals::owfn_statepredicate = globals::owfn_statepredicate + " " + nodename + " <= " + strip_namespace($3->name);  
     Place * p = PN.findPlace(nodename);
     assert(p != NULL);
     p->isFinal = true;

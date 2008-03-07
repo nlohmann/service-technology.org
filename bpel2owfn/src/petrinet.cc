@@ -35,13 +35,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2008/03/06 16:16:44 $
+ * \date    \$Date: 2008/03/07 10:12:09 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.232 $
+ * \version \$Revision: 1.233 $
  *
  * \ingroup petrinet
  */
@@ -1973,11 +1973,15 @@ void PetriNet::reenumerate()
     // change state predicate, if necessary
     if (globals::owfn_statepredicate != "")
     {
-      string old = " " + (*p)->nodeName() + " ";
-      string::size_type pos;
-      while ( (pos = globals::owfn_statepredicate.find(old)) != string::npos)
+      string oldName = " " + (*p)->nodeName() + " ";
+      string newName = " p" + toString(currentId) + " "; 
+      if (oldName != newName)
       {
-        globals::owfn_statepredicate.replace(pos, old.length(), (string(" p" + toString(currentId) + " ")).c_str(), 0, (string(" p" + toString(currentId) + " ")).length() );
+        string::size_type pos;
+        while ( (pos = globals::owfn_statepredicate.find(oldName)) != string::npos)
+        {
+          globals::owfn_statepredicate.replace(pos, oldName.length(), newName.c_str(), 0, newName.length() );
+        }
       }
     }
     (*p)->id = currentId++;

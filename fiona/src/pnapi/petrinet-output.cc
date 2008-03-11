@@ -30,17 +30,17 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2008-03-06 15:38:24 $
+ * \date    \$Date: 2008-03-11 16:25:44 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  *
  * \ingroup petrinet
  */
@@ -159,11 +159,11 @@ string PNapi::Node::nodeName() const
  *
  * \return  the name of the node for DOT output
  */
-string PNapi::Node::nodeFullName() const
+string PNapi::Node::nodeFullName(bool withPrefix) const
 {
   string result = *history.begin();
 
-  if ( type == INTERNAL || nodeType == TRANSITION )
+  if ( withPrefix || type == INTERNAL || nodeType == TRANSITION )
     result = prefix + result;
 
   return result;
@@ -445,7 +445,7 @@ string Transition::output_dot() const
   result += "]\n";
   
   result += " t" + toString(id) + "_l\t[style=invis];\n";
-  result += " t" + toString(id) + "_l -> t" + toString(id) + " [headlabel=\"" + label + "\" style=invis]\n";
+  result += " t" + toString(id) + "_l -> t" + toString(id) + " [headlabel=\"" + label + "\" ]\n";
   
   return result;
 }
@@ -490,7 +490,11 @@ string Place::output_dot() const
   }
   
 #else
-  string label = nodeName();
+  string label;
+  if ( wasExternal != "")
+    label = wasExternal;
+  else
+    label = nodeShortName();
 #endif
   
   // truncate prefix (could be a problem with ports later on, but looks nice)
@@ -527,9 +531,9 @@ string Place::output_dot() const
   result += " p" + toString(id) + "_l\t[style=invis];\n";
   
   if (type == OUT)
-    result += " p" + toString(id) + " -> p" + toString(id) + "_l [taillabel=\"" + label + "\" style=invis]\n";
+    result += " p" + toString(id) + " -> p" + toString(id) + "_l [taillabel=\"" + label + "\" ]\n";
   else
-    result += " p" + toString(id) + "_l -> p" + toString(id) + " [headlabel=\"" + label + "\" style=invis]\n";
+    result += " p" + toString(id) + "_l -> p" + toString(id) + " [headlabel=\"" + label + "\" ]\n";
   
   return result;
 }
@@ -1222,7 +1226,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
     (*output) << (*p)->nodeShortName();
 #else
-    (*output) << (*p)->nodeName();
+    (*output) << (*p)->nodeShortName();
 #endif
     if (count < P.size())
       (*output) << ", ";
@@ -1287,7 +1291,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
       (*output) << "  " << (*p)->nodeShortName() << ":\t" << (*p)->tokens;
 #else
-      (*output) << "  " << (*p)->nodeName() << ":\t" << (*p)->tokens;
+      (*output) << "  " << (*p)->nodeShortName() << ":\t" << (*p)->tokens;
 #endif
       
       if ((*p)->historyContains("1.internal.initial"))
@@ -1302,6 +1306,29 @@ void PetriNet::output_owfn(ostream *output) const
   // if the set of final markings is not empty: iterate and add all final markings
   // else: there is only one final marking, have a look at all places and check isFinal.
   
+  if (final_set_list.size() <= 1)
+  {
+    (*output) << "FINALMARKING" << endl << "  ";
+    if (final_set_list.begin() != final_set_list.end())
+    {
+      set<Place*> finalMarking = *(final_set_list.begin());
+      bool first_place = true;
+      for( set<Place *>::const_iterator p = finalMarking.begin(); p != finalMarking.end(); p++)
+      {
+        if (!first_place)
+          (*output) << ", ";
+          
+#ifdef USING_BPEL2OWFN
+        (*output) << (*p)->nodeShortName();
+#else
+        (*output) << (*p)->nodeShortName();
+#endif
+        first_place = false;
+      }
+      // (*output) << ";" << endl;
+    }
+  }
+  else
   {
     (*output) << "FINALCONDITION" << endl << "  (";
     
@@ -1320,7 +1347,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
         (*output) << "( (" << p->nodeShortName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
 #else
-        (*output) << "( (" << p->nodeName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
+        (*output) << "( (" << p->nodeShortName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
 #endif
       }
       else
@@ -1335,7 +1362,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
           (*output) << "(" << (*p)->nodeShortName() << "=1)";
 #else
-          (*output) << "(" << (*p)->nodeName() << "=1)";
+          (*output) << "(" << (*p)->nodeShortName() << "=1)";
 #endif
           first_place = false;
         }
@@ -1351,7 +1378,7 @@ void PetriNet::output_owfn(ostream *output) const
     
   }
   (*output) << ";" << endl << endl << endl;
-  
+
   
   // transitions
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
@@ -1359,7 +1386,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
     (*output) << "TRANSITION " << (*t)->nodeShortName();
 #else
-    (*output) << "TRANSITION " << (*t)->nodeName();
+    (*output) << "TRANSITION " << (*t)->nodeShortName();
 #endif
     switch( (*t)->type )
     {
@@ -1376,7 +1403,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
       (*output) << (*pre)->nodeShortName();
 #else
-      (*output) << (*pre)->nodeName();
+      (*output) << (*pre)->nodeShortName();
 #endif
       
       if (arc_weight(*pre, *t) != 1)
@@ -1395,7 +1422,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
       (*output) << (*post)->nodeShortName();
 #else
-      (*output) << (*post)->nodeName();
+      (*output) << (*post)->nodeShortName();
 #endif
       if (arc_weight(*t, *post) != 1)
         (*output) << ":" << arc_weight(*t, *post);
@@ -1406,7 +1433,7 @@ void PetriNet::output_owfn(ostream *output) const
     
     (*output) << ";" << endl << endl;
   }  
-  (*output) << endl << "{ END OF FILE `" << globals::output_filename << ".owfn' }" << endl;
+  (*output) << endl << "{ END OF FILE `" << globals::output_filename << ".owfn' }" << endl << endl;
 }
 
 

@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2008-03-06 10:23:42 $
+ * \date    \$Date: 2008-03-11 16:25:45 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *
  * \ingroup petrinet
  */
@@ -203,7 +203,7 @@ class Node
   
   public:
     /// the name of the node
-    string nodeFullName() const;
+    string nodeFullName( bool withPrefix = false ) const;
 
     /// type of node as defined in #communication_type
     communication_type type;
@@ -452,7 +452,7 @@ class PetriNet
     void mirror();
     
     /// adds a prefix to the name of all nodes of the net
-    void addPrefix(string prefix);
+    void addPrefix(string prefix, bool renameInterface = false);
     
     /// adds a suffix to the name of all interface places of the net
     void add_interface_suffix(string suffix);

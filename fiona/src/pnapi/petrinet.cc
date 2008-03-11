@@ -35,13 +35,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2008-03-06 11:24:41 $
+ * \date    \$Date: 2008-03-11 16:25:44 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *
  * \ingroup petrinet
  */
@@ -1665,7 +1665,7 @@ void PetriNet::add_interface_suffix(string suffix)
  *
  * \param   prefix The prefix to add.
  */
-void PetriNet::addPrefix(string prefix)
+void PetriNet::addPrefix(string prefix, bool renameInterface)
 {
   for (set< Place * >::iterator place = P.begin(); place != P.end(); place ++)
   {
@@ -1683,6 +1683,11 @@ void PetriNet::addPrefix(string prefix)
     for(list< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
     {
       roleMap[(prefix + *name)] = *place;
+      if (renameInterface)
+      {
+        *name = prefix + (*name);
+        roleMap[*name] = NULL;
+      }
     }
   }
   for (set< Place * >::iterator place = P_out.begin(); place != P_out.end(); place ++)
@@ -1692,6 +1697,11 @@ void PetriNet::addPrefix(string prefix)
     for(list< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
     {
       roleMap[(prefix + *name)] = *place;
+      if (renameInterface)
+      {
+        *name = prefix + (*name);
+        roleMap[*name] = NULL;
+      }
     }
   }
 
@@ -1721,19 +1731,6 @@ void PetriNet::compose(const PetriNet &net)
 {
   using namespace std;
 
-  {
-    list<set<Place *> > newFinalSet;
-    // merge the final set lists
-    for (list<set<Place *> >::const_iterator final_setA = net.final_set_list.begin(); final_setA != net.final_set_list.end(); final_setA++)
-    {
-      for (list<set<Place *> >::const_iterator final_setB = final_set_list.begin(); final_setB != final_set_list.end(); final_setB++)
-      {
-        newFinalSet.push_back(setUnion(*final_setA, *final_setB));
-      }
-    }
-    final_set_list = newFinalSet;
-  }
-
   // add all internal places
   for (set< Place * >::iterator place = net.P.begin(); place != net.P.end(); place ++)
   {
@@ -1743,25 +1740,46 @@ void PetriNet::compose(const PetriNet &net)
     newPlace->postset.clear();
     P.insert( newPlace );
     
-    // if p was in the final set, the pointer has to be redirected to the new place
-    for (list<set<Place *> >::iterator final_set = final_set_list.begin(); final_set != final_set_list.end(); final_set++)
-    {
-      for (set<Place *>::iterator p = (*final_set).begin(); p != (*final_set).end(); p++)
-      {
-        if ((*p) == (*place))
-        {
-          (*final_set).erase(p--);
-          (*final_set).insert(newPlace);
-        }
-      }
-    } 
-    
-    
     roleMap[ newPlace->nodeFullName() ] = newPlace;
 
     for(list< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
       roleMap[(newPlace->prefix + *name)] = newPlace;
   }
+
+  // recalculate final markings:
+  { 
+    list<set<Place *> > netFinalList;
+
+    for (list<set<Place *> >::const_iterator netFinal = net.final_set_list.begin(); netFinal != net.final_set_list.end(); netFinal++)
+    {
+      set<Place *> finalMarking;
+      for (set<Place *>::const_iterator p = netFinal->begin(); p != netFinal->end(); p++)
+      {
+        finalMarking.insert(findPlace((*p)->nodeFullName()));
+      }
+      if (! finalMarking.empty())
+        netFinalList.push_back(finalMarking);
+    }
+
+    if ( ! netFinalList.empty() && ! final_set_list.empty())
+    {
+      // if p was in the final set, the pointer has to be redirected to the new place
+      list<set<Place *> > newFinalSet;
+      // merge the final set lists
+      for (list<set<Place *> >::const_iterator final_setA = netFinalList.begin(); final_setA != netFinalList.end(); final_setA++)
+      {
+        for (list<set<Place *> >::const_iterator final_setB = final_set_list.begin(); final_setB != final_set_list.end(); final_setB++)
+        {
+          newFinalSet.push_back(setUnion(*final_setA, *final_setB));
+        }
+      }
+      final_set_list = newFinalSet;
+    } 
+    else
+    {
+      final_set_list.merge(netFinalList);
+    }
+  }    
 
   // add all input places
   for (set< Place * >::iterator place = net.P_in.begin(); place != net.P_in.end(); place ++)
@@ -1773,6 +1791,12 @@ void PetriNet::compose(const PetriNet &net)
 
     // check if input place with same name already exists
     if (roleMap[ newPlace->nodeFullName() ] == NULL )
+    {
+      // no, all fine
+      roleMap[ newPlace->nodeFullName() ] = newPlace;
+      P_in.insert( newPlace );
+    }
+    else if (roleMap[ newPlace->nodeFullName() ]->type == OUT)
     {
       // no, all fine
       roleMap[ newPlace->nodeFullName() ] = newPlace;
@@ -1792,8 +1816,14 @@ void PetriNet::compose(const PetriNet &net)
     newPlace->preset.clear();
     newPlace->postset.clear();
 
-    // check if output place with same name already exists
+    // check if input place with same name already exists
     if (roleMap[ newPlace->nodeFullName() ] == NULL )
+    {
+      // no, all fine
+      roleMap[ newPlace->nodeFullName() ] = newPlace;
+      P_out.insert( newPlace );
+    }
+    else if (roleMap[ newPlace->nodeFullName() ]->type == IN)
     {
       // no, all fine
       roleMap[ newPlace->nodeFullName() ] = newPlace;
@@ -1841,23 +1871,27 @@ void PetriNet::compose(const PetriNet &net)
   // merge appropriate input and output places (same name, different prefixes)
   for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
   {
-    /*
-    set< Place * >::iterator oPlace = P_out.begin();
+    
+    set< Place * >::iterator pPlace = P_out.begin();
     bool finished = false;
-    while ( ! finished && oPlace != P_out.end())
+    
+
+    while ( ! finished && pPlace != P_out.end())
     {
 
-      if ((*oPlace)->nodeFullName().erase(0,4) != (*place)->nodeFullName().erase(0,3))
-	oPlace++;
+      if (/* (*pPlace)->nodeFullName().erase(0,4) != (*place)->nodeFullName().erase(0,3) && */
+           (*pPlace)->nodeFullName() != (*place)->nodeFullName()   )
+	pPlace++;
       else
 	finished = true;
     }
-    */
+    
 
-    Place * oPlace = findPlace("out." + (*place)->nodeFullName().erase(0,3));
+    // Place * oPlace = findPlace("out." + (*place)->nodeFullName().erase(0,3));
+    Place * oPlace = *pPlace;
 
-    // if (finished)
-    if ( oPlace != NULL )
+    if (finished)
+    // if ( oPlace != NULL )
     {
       if ( (*place)->prefix != (oPlace)->prefix )
       {
@@ -1871,7 +1905,7 @@ void PetriNet::compose(const PetriNet &net)
         (oPlace)->type = INTERNAL;
         (oPlace)->history.push_front( (oPlace)->nodeFullName() );
         roleMap[(oPlace)->nodeFullName()] = (oPlace);
-        (oPlace)->wasExternal = (oPlace)->nodeFullName().substr((oPlace)->nodeFullName().find_first_of(".") + 1);
+        (oPlace)->wasExternal = (oPlace)->nodeFullName(); //.substr((oPlace)->nodeFullName().find_first_of(".") + 1);
         P.insert(*place);
         P.insert(oPlace);
         mergePlaces((*place)->nodeFullName(), (oPlace)->nodeFullName());
@@ -1949,7 +1983,9 @@ void PetriNet::reenumerate()
   int currentId = 1;
 
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  {
     (*p)->id = currentId++;
+  }
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
     (*p)->id = currentId++;
   for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)

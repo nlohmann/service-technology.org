@@ -111,6 +111,12 @@ class oWFN {
                                     string& reasonForFailedMatch,
                                     StateNodesAssoc_t& stateNodesAssoc);
 
+        /// returns the port of a given interface place
+        std::string get_port_from_place(const owfnPlace *place) const;
+    
+        /// detaches an interface place from the oWFN
+        void detachInterfacePlace(owfnPlace *p);
+    
     public:
         /// basic constructor
         oWFN();
@@ -382,9 +388,6 @@ class oWFN {
         /// adds a place to a port
         void add_place_to_port(owfnPlace *place, std::string port);
 
-        /// returns the port of a given interface place
-        std::string get_port_from_place(const owfnPlace *place) const;
-
         /// counts the ports
         unsigned int getPortCount() const;
 
@@ -396,7 +399,10 @@ class oWFN {
 
         /// returns a pointer to this petrinet in the PNapi net format
         PNapi::PetriNet* returnPNapiNet();
-
+    
+        /// restricts the oWFN to a given port (i.e., removes all other ports)
+        void restrictToPort(const std::string &portName);
+        
         // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
         NEW_OPERATOR(oWFN)

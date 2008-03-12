@@ -2276,7 +2276,7 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
         CurrentState->firelist = firelist();
         CurrentState->cardFireList = CurrentCardFireList;
 
-        if (parameters[P_IG]) {
+        if (parameters[P_IG] || true) { // "|| true" inserted by Niels //// REMOVE ME BEFORE CHECKIN!
             if (CurrentState->quasiFirelist) {
                 delete [] CurrentState->quasiFirelist;
                 CurrentState->quasiFirelist = NULL;
@@ -3378,7 +3378,7 @@ void oWFN::add_place_to_port(owfnPlace *place, std::string port) {
 
 
 /*!
- * \brief  returns the port of a given place
+ * \brief  returns the port of a given interface place
  *
  * \param  place  a place
  * \return the name of the place's port of "" if no port was found (e.g., if
@@ -3532,4 +3532,115 @@ std::set<std::string> oWFN::getPort(std::string name) const {
     }
 
     return temp;
+}
+
+
+/*!
+ * \brief  detaches an interface place from the oWFN
+ *
+ * This function detaches and interface place from the oWFN by removing all
+ * arcs that connect the interface place with the inner of the net.
+ *
+ * \param  p  the place to detach
+ *
+ * \todo Remove debug output or change to appropriate trace function.
+ *
+ * \author Niels Lohmann <niels.lohmann@uni-rostock.de>
+ */
+void oWFN::detachInterfacePlace(owfnPlace *p) {
+    assert(p != NULL);
+    assert(p->type != INTERNAL);
+    
+    owfnTransition *t = NULL;
+    
+    // find the connected transitions and remove the connecting arcs
+    if (p->type == INPUT) {        
+        for (unsigned i = 0; i < p->getLeavingArcsCount(); i++) {
+            Arc *a = p->getLeavingArc(i);
+            assert(a != NULL);
+
+            t = static_cast<owfnTransition*>(a->Destination);
+            assert(t != NULL);            
+            t->removeArrivingArc(a);            
+            p->removeLeavingArc(a);
+            
+            // remember that this transition was connected to an input place of
+            // a port that has been detached
+            t->isConnectedToOtherPort = true;
+            cerr << t->name << " is connected to the other port " << endl;
+            
+            delete a;
+        }
+    }
+
+    if (p->type == OUTPUT) {        
+        for (unsigned i = 0; i < p->getArrivingArcsCount(); i++) {
+            Arc *a = p->getArrivingArc(i);
+            assert(a != NULL);
+            
+            t = static_cast<owfnTransition*>(a->Source);
+            assert(t != NULL);
+            t->removeLeavingArc(a);
+            p->removeArrivingArc(a);
+
+            delete a;
+        }
+    }
+}
+
+
+/*!
+ * \brief  restricts the oWFN to a given port (i.e., removes all other ports)
+ *
+ * The function does not delete the interface, but only removes all arcs from
+ * or to the interface places of the ports that are not mentioned. The function
+ * is needed to check for autonomous controllability.
+ *
+ * \param  portName  the name of a port
+ *
+ * \warning If an invalid port name is given (e.g., the empty string or a port
+ *          name that is not present in the net), the whole interface is cut
+ *          from the net.
+ *
+ * \todo Remove debug output or change to appropriate trace function.
+ *
+ * \author Niels Lohmann <niels.lohmann@uni-rostock.de>
+ */
+void oWFN::restrictToPort(const std::string &portName) {
+    // iterate the ports
+    for ( std::map<std::string, Places_t>::const_iterator port = ports.begin();
+         port != ports.end(); port++) {
+        
+        // if the current port is not the given port, change interface places
+        // to internal places and remove the leaving/arrving arcs to the
+        // transitions
+        if (port->first != portName) {
+            cerr << "detaching port " << port->first << endl;
+            for ( unsigned int i = 0; i < port->second.size(); i++ ) {
+                assert(port->second[i]->type != INTERNAL);
+                detachInterfacePlace( port->second[i] );
+            }
+        }
+
+        // if the current port is the port to that the net should be restricted,
+        // traverse all input places of the port and mark the receiving
+        // transitions
+        if (port->first == portName) {
+            for ( unsigned int i = 0; i < port->second.size(); i++ ) {
+                if (port->second[i]->type == INPUT) {
+                    owfnPlace *p = port->second[i];
+                    assert(p != NULL);
+                
+                    for (unsigned int j = 0; j < p->getLeavingArcsCount(); j++) {
+                        Arc *a = p->getLeavingArc(j);
+                        assert(a != NULL);
+                        owfnTransition *t = static_cast<owfnTransition*>(a->Destination);
+                        assert(t != NULL);
+                        t->isConnectedToMyPort = true;
+                        cerr << t->name << " is connected to my port " << portName << endl;
+                    }
+                }
+            }
+        }
+    }
 }

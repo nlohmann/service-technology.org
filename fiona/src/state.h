@@ -44,7 +44,7 @@ enum stateType {
 };
 
 class binDecision;
-class owfnTransition;
+//class owfnTransition;
 
 // Include owfn.h after declaration of stateType to avoid cyclic dependencies!
 #include "owfn.h"
@@ -105,6 +105,9 @@ class State {
 
         /// Returns true iff this state has an enabled tau labeled transition.
         bool hasLeavingTauTransitionForMatching() const;
+    
+        /// is transient in autonomous setting
+        bool isNotAutonomouslyTransient() const;
 
 #undef new
         /// Provides user defined operator new. Needed to trace all new operations

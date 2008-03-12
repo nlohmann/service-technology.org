@@ -33,6 +33,7 @@
  */
 
 #include "state.h"
+#include "options.h"
 #include "binDecision.h"
 #include "debug.h"
 #include "owfnTransition.h"
@@ -308,3 +309,56 @@ stateType State::exactType() {
     }
 }
 
+
+/*!
+ * \brief is state transient in autonomous setting
+ *
+ * The function traverses all quasi-enabled and all enabled transitions of the
+ * state. If both the current port and one other port has a transition
+ * (quasi-) enabled, then this state can not be seen as transient in the
+ * autonomous setting, because otherwise ports would pass the responsibility
+ * to resolve deadlocks to each other.
+ *
+ * \note This code is not entirely tested. In particular, it might be
+ *       sufficient to only check quasi-enabled transitions. Likewise, an early
+ *       abortion might be possible if a "real" transient transition was found.
+ *
+ * \return false iff the state can be seen as transient in autonomous setting
+ *
+ * \author Niels Lohmann <niels.lohmann@uni-rostock.de>
+ */
+bool State::isNotAutonomouslyTransient() const {
+    if (!options[O_AUTONOMOUS])
+        return true;
+    
+    assert(cardFireList > 0);
+    
+    bool foundMy = false;
+    bool foundOther = false;
+    bool foundTransient = false;
+    
+    // traverse and check quasi-enabled transitions
+    size_t i = 0;
+    while (quasiFirelist && quasiFirelist[i]) {
+        foundMy = foundMy || quasiFirelist[i]->isConnectedToMyPort;
+        foundOther = foundOther || quasiFirelist[i]->isConnectedToOtherPort;
+
+        i++;
+    }
+    
+    // traverse the enabled transitions
+    for (size_t t = 0; t != cardFireList; t++) {
+        foundMy = foundMy || firelist[t]->isConnectedToMyPort;
+        foundOther = foundOther || firelist[t]->isConnectedToOtherPort;
+        
+        if (!firelist[t]->isConnectedToMyPort && !firelist[t]->isConnectedToOtherPort)
+            foundTransient = true;        
+    }
+
+    // if my port and another port has a transition that might fire, then this
+    // marking can not be seen as transient in the autonomous setting
+    if (foundOther && foundMy && !foundTransient)
+        return true;
+    
+    return false;
+}

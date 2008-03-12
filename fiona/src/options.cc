@@ -203,8 +203,9 @@ void print_help() {
   trace(" -M | --multipledeadlocks ...... create multiple deadlocks of public view\n");
   trace("                                 (only relevant for PV mode -t PV)\n");  
   trace(" -p | --parameter=<param> ...... additional parameter <param>\n");
-  trace("                                    no-png    - does not create a PNG file\n");
-  trace("                                    diagnosis - disables optimizations\n");
+  trace("                                   no-png     - does not create a PNG file\n");
+  trace("                                   diagnosis  - disables optimizations\n");
+  trace("                                   autonomous - autonomous controllability\n");
   trace(" -a | --adapterrules=<filename>  read adapter rules from <filename>\n");
   trace("\n");
   trace("\n");
@@ -278,6 +279,7 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_COUNT_SERVICES] = false;
     options[O_CHECK_ACYCLIC] = false;
     options[O_DIAGNOSIS] = false;
+    options[O_AUTONOMOUS] = false;
 
     options[O_MESSAGES_MAX] = true;
     options[O_EVENT_USE_MAX] = false;
@@ -445,6 +447,8 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_SHOW_RED_NODES] = true;
                     parameters[P_SHOW_ALL_NODES] = true;
                     parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
+                } else if (lc_optarg == "autonomous") {
+                    options[O_AUTONOMOUS] = true;
                 } else if (lc_optarg == "representative") {
                 	parameters[P_REPRESENTATIVE] = true;
                 	parameters[P_SINGLE] = false;

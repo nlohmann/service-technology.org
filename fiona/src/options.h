@@ -71,7 +71,8 @@ typedef enum {
     O_PNG,                      //!< 
     O_DIAGNOSIS,                //!< diagnosis information
     O_PV_MULTIPLE_DEADLOCKS,    //!< 
-    O_ADAPTER_FILE              //!< file with adapter rules
+    O_ADAPTER_FILE,             //!< file with adapter rules
+    O_AUTONOMOUS                //!< check for autonomous controllability
 } possibleOptions;
 
 

@@ -35,7 +35,7 @@
 #include "mynew.h"
 #include "PetriNetNode.h"
 #include "debug.h"
-
+#include <cassert>
 
 //! \brief adds an arriving arc to this node
 //! \param arc arriving arc to be added

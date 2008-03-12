@@ -1,7 +1,7 @@
 // User configuration file for Fiona
 
 // specify whether each new operation shall be logged
-//#define LOG_NEW
+// #define LOG_NEW
 
 // Specify whether for debugging purposes various assertions should be checked.
 // Helps to prevent doing unintended memory operations such as writing outside

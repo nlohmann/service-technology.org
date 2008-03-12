@@ -323,13 +323,14 @@ stateType State::exactType() {
  *       sufficient to only check quasi-enabled transitions. Likewise, an early
  *       abortion might be possible if a "real" transient transition was found.
  *
- * \return false iff the state can be seen as transient in autonomous setting
+ * \return false iff the state can be seen as transient in autonomous setting,
+ *         or the option "autonomous" is not set
  *
  * \author Niels Lohmann <niels.lohmann@uni-rostock.de>
  */
 bool State::isNotAutonomouslyTransient() const {
     if (!options[O_AUTONOMOUS])
-        return true;
+        return false;
     
     assert(cardFireList > 0);
     

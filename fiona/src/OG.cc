@@ -539,8 +539,14 @@ void OG::correctNodeColorsAndShortenAnnotations() {
 }
 
 
-//! \brief calculates the annotation (CNF) for the node
-//! \param node the node for which the annotation is calculated
+/*!
+ * \brief calculates the annotation (CNF) for the node
+ *
+ * \param node the node for which the annotation is calculated
+ *
+ * \note This function uses State::isNotAutonomouslyTransient() which, in case
+ *       autonomous controllability is not checked, always returns false.
+ */
 void OG::computeCNF(AnnotatedGraphNode* node) const {
 
 	trace(TRACE_5, "OG::computeCNF(AnnotatedGraphNode * node): start\n");
@@ -558,7 +564,9 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
         for (iter = node->reachGraphStateSet.begin();
              iter != node->reachGraphStateSet.end(); iter++) {
 
-        	if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
+        	if ( (*iter)->type == DEADLOCK ||
+                 (*iter)->type == FINALSTATE ||
+                 (*iter)->isNotAutonomouslyTransient() ) {
 
         		// we just consider the maximal states only
                 // get the marking of this state
@@ -610,8 +618,10 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
         for (iter = setOfStatesStubbornTemp.begin(); iter
                 != setOfStatesStubbornTemp.end(); iter++) {
 
-        	if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
-
+        	if ( (*iter)->type == DEADLOCK ||
+                 (*iter)->type == FINALSTATE ||
+                 (*iter)->isNotAutonomouslyTransient() ) {
+                
         		// we just consider the maximal states only
                 // get the marking of this state
         		(*iter)->decodeShowOnly(PN);

@@ -13,15 +13,15 @@ PLACE
 ;
 
   OUTPUT
-    a,
-    b,
-    c;
+    out.a,
+    out.b,
+    out.c;
 
 
 INITIALMARKING
-  p1:	1,
-  p2:	1,
-  p3:	1;
+  p1: 1,
+  p2: 1,
+  p3: 1;
 
 FINALMARKING
   ;
@@ -29,16 +29,15 @@ FINALMARKING
 
 TRANSITION t7 { output }
   CONSUME p2;
-  PRODUCE a;
+  PRODUCE out.a;
 
 TRANSITION t8 { output }
   CONSUME p3;
-  PRODUCE b;
+  PRODUCE out.b;
 
 TRANSITION t9 { output }
   CONSUME p1;
-  PRODUCE c;
+  PRODUCE out.c;
 
 
 { END OF FILE `.owfn' }
-

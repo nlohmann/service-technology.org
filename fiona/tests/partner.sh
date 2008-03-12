@@ -83,11 +83,18 @@ else
     fi
 
     if [ $resultSingle -eq 0 ] ; then
-        if ! diff "$output" "$outputExpected" >/dev/null ; then
-            echo "... failed: Output and expected output differ. Compare " \
-                 "$output" "$outputExpected"
-            resultSingle=1
-        fi
+      OUTPUT=`fiona -t equivalence $output $outputExpected 2>&1`
+      echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+      resultSIM=$?
+      if [ $resultSIM -ne 0 ]; then
+          let "result += 1"
+          echo ... computed OG not equivalent to expected OG.
+      fi
+#        if ! diff "$output" "$outputExpected" >/dev/null ; then
+#            echo "... failed: Output and expected output differ. Compare " \
+#                 "$output" "$outputExpected"
+#            resultSingle=1
+#        fi
     fi
 fi
 

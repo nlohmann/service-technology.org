@@ -161,6 +161,6 @@ void owfnPlace::set_hash(unsigned int i) {
 
 //! \brief set the port of the oWFN place
 //! \param my_port port to be set
-void owfnPlace::set_port(std::string my_port) {
+void owfnPlace::set_port(const std::string my_port) {
     port = my_port;
 }

@@ -212,6 +212,12 @@ class owfnTransition : public Node {
 
         /// stack organized as list
         owfnTransition *nextoncallstack;
+    
+        /// true iff transition is connected to input place of other port
+        bool isConnectedToOtherPort;
+    
+        /// true iff transition is connected to input place of my port
+        bool isConnectedToMyPort;
 #endif
 };
 

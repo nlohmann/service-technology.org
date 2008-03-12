@@ -125,10 +125,10 @@ class owfnPlace : public Node {
         std::vector<owfnTransition*> PreTransitions; /// these transitions must be included in
         /// stubborn set if this place is scapegoat
         void initialize(); /// initialize PreTransitions
+#endif
 
         /// set the port of the place
-        void set_port(std::string port);
-#endif
+        void set_port(const std::string port);
 
         /// Provides user defined operator new. Needed to trace all new
         // operations on this class.

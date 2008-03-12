@@ -64,7 +64,8 @@ unsigned int AdjacentPlace::getMultiplicity() const {
 //! \brief constructor
 owfnTransition::owfnTransition(const std::string& name) :
     Node(name), labelForMatching(GraphFormulaLiteral::TAU), isEnabled_(false),
-            isQuasiEnabled_(false), quasiEnabledNr(0), enabledNr(0) {
+            isQuasiEnabled_(false), quasiEnabledNr(0), enabledNr(0),
+            isConnectedToOtherPort(false), isConnectedToMyPort(false) {
 }
 
 
@@ -236,10 +237,11 @@ void owfnTransition::initialize() {
 void owfnTransition::fire(oWFN * PN) {
 
     trace(TRACE_5, "owfnTransition::fire(oWFN * PN) : start\n");
-
+ 
     for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i) {
         AdjacentPlace incrPlace = IncrPlaces[i];
         owfnPlace* incrOwfnPlace = incrPlace.getOwfnPlace();
+        
         PN->CurrentMarking[PN->getPlaceIndex(incrOwfnPlace)] += incrPlace.getMultiplicity();
 #ifdef CHECKCAPACITY
         if(PN->CurrentMarking[incrOwfnPlace->index] > incrOwfnPlace->capacity) {
@@ -251,6 +253,7 @@ void owfnTransition::fire(oWFN * PN) {
     for (AdjacentPlaces_t::size_type i = 0; i != DecrPlaces.size(); ++i) {
         AdjacentPlace decrPlace = DecrPlaces[i];
         owfnPlace* decrOwfnPlace = decrPlace.getOwfnPlace();
+
         if (PN->CurrentMarking[PN->getPlaceIndex(decrOwfnPlace)]
                 < decrPlace.getMultiplicity()) {
             PN->printCurrentMarking();

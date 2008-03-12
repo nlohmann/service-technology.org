@@ -73,15 +73,21 @@ class Node {
         
         /// adds an arriving arc to the node
         void addArrivingArc(Arc* arc);
-        
+    
+        /// removes an arriving arc from the node
+        void removeArrivingArc(const Arc* arc);
+    
         /// returns the number of arriving arcs
         Arcs_t::size_type getArrivingArcsCount() const;
         
         /// returns an arriving arc at the given iterator position
         Arc* getArrivingArc(Arcs_t::size_type i) const;
         
-        /// adds an leaving arc to the node
+        /// adds a leaving arc to the node
         void addLeavingArc(Arc* arc);
+
+        /// removes a leaving arc from the node
+        void removeLeavingArc(const Arc* arc);
 
         /// returns the number of leaving arcs
         Arcs_t::size_type getLeavingArcsCount() const;

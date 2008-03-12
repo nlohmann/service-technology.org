@@ -44,10 +44,62 @@ void Node::addArrivingArc(Arc* arc) {
 }
 
 
-//! \brief adds an leaving arc to this node
+/*!
+ * \brief removes an arriving arc from this node
+ *
+ * \param arc  arriving arc to be removed
+ *
+ * \warning If the arc is not found as in the list of arriving arcs of this
+ *          transition, an error message is printed and a false-assertion is
+ *          thrown.
+ *
+ * \author Niels Lohmann <niels.lohmann@uni-rostock.de>
+ */
+void Node::removeArrivingArc(const Arc *arc) {
+    assert(arc != NULL);
+    
+    for (Arcs_t::iterator a = ArrivingArcs.begin(); a != ArrivingArcs.end(); a++) {
+        if (*a == arc) {
+            ArrivingArcs.erase(a);
+            return;
+        }
+    }
+    
+    cerr << "arc not found!" << endl;
+    assert(false);
+}
+
+
+//! \brief adds a leaving arc to this node
 //! \param arc leaving arc to be added
 void Node::addLeavingArc(Arc* arc) {
     LeavingArcs.push_back(arc);
+}
+
+
+/*!
+ * \brief removes a leaving arc from this node
+ *
+ * \param arc  leaving arc to be removed
+ *
+ * \warning If the arc is not found as in the list of leaving arcs of this
+ *          transition, an error message is printed and a false-assertion is
+ *          thrown.
+ *
+ * \author Niels Lohmann <niels.lohmann@uni-rostock.de>
+ */
+void Node::removeLeavingArc(const Arc *arc) {
+    assert(arc != NULL);
+    
+    for (Arcs_t::iterator a = LeavingArcs.begin(); a != LeavingArcs.end(); a++) {
+        if (*a == arc) {
+            LeavingArcs.erase(a);
+            return;
+        }
+    }
+    
+    cerr << "arc not found!" << endl;
+    assert(false);
 }
 
 

@@ -2276,7 +2276,8 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
         CurrentState->firelist = firelist();
         CurrentState->cardFireList = CurrentCardFireList;
 
-        if (parameters[P_IG] || true) { // "|| true" inserted by Niels //// REMOVE ME BEFORE CHECKIN!
+        // quasiFireList is needed for autonomous controllability
+        if (parameters[P_IG] || options[O_AUTONOMOUS]) {
             if (CurrentState->quasiFirelist) {
                 delete [] CurrentState->quasiFirelist;
                 CurrentState->quasiFirelist = NULL;

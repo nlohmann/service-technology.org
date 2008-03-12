@@ -96,7 +96,9 @@ class AnnotatedGraph : public Graph {
         /// the part of an AnnotatedGraph below simNode
         bool simulatesRecursive(AnnotatedGraphNode* myNode,
                                 AnnotatedGraphNode* simNode,
-                                set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes);
+                                set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes,
+                                AnnotatedGraph* greaterOG,
+                                AnnotatedGraph* smallerOG);
 
         /// checks, whether the part of an AnnotatedGraph below myNode simulates
         /// the part of an AnnotatedGraph below simNode while covering all interface transitions

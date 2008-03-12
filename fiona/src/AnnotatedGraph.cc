@@ -232,7 +232,7 @@ void AnnotatedGraph::removeEdgesFromNodeToAllOtherNodes(AnnotatedGraphNode* node
 //! \return true on positive check, otherwise: false
 //! \param smallerOG the simulant that should be simulated
 bool AnnotatedGraph::simulates(AnnotatedGraph* smallerOG) {
-    trace(TRACE_5, "AnnotatedGraph::simulates(AnnotatedGraph *smallerOG): start\n");
+    trace(TRACE_5, "AnnotatedGraph::simulates(AnnotatedGraph* smallerOG): start\n");
     // Simulation is impossible without a simulant.
     if (smallerOG == NULL)
         return false;
@@ -248,11 +248,11 @@ bool AnnotatedGraph::simulates(AnnotatedGraph* smallerOG) {
 
     // Get things moving...
     bool result = false;
-    if (simulatesRecursive(root, smallerOG->getRoot(), visitedNodes)) {
+    if (simulatesRecursive(root, smallerOG->getRoot(), visitedNodes, this, smallerOG)) {
         result = true;
     }
 
-    trace(TRACE_5, "AnnotatedGraph::simulates(AnnotatedGraph *smallerOG): end\n");
+    trace(TRACE_5, "AnnotatedGraph::simulates(AnnotatedGraph* smallerOG): end\n");
     return result;
 }
 
@@ -263,18 +263,23 @@ bool AnnotatedGraph::simulates(AnnotatedGraph* smallerOG) {
 //! \param myNode a node in this AnnotatedGraph
 //! \param simNode a node in the simulant
 //! \param visitedNodes Holds all visited pairs of nodes.
-bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
-										AnnotatedGraphNode *simNode,
-										set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes) {
+bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode* myNode,
+										AnnotatedGraphNode* simNode,
+										set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes,
+										AnnotatedGraph* greaterOG,
+										AnnotatedGraph* smallerOG) {
     // checking, whether myNode simulates simNode; result is true, iff
     // 1) anno of simNode implies anno of myNode and
     // 2) myNode has each outgoing event of simNode, too
-    
+
     assert(myNode);
     assert(simNode);
 
     trace(TRACE_2, "\t checking whether node " + myNode->getName());
-    trace(TRACE_2, " simulates node " + simNode->getName() + "\n");
+    trace(TRACE_3, " of " + greaterOG->getFilename());
+    trace(TRACE_2, " simulates node " + simNode->getName());
+    trace(TRACE_3, " of " + smallerOG->getFilename());
+    trace(TRACE_2, "\n");
 
     // If we already visited this pair of nodes, then we're done.
     if (visitedNodes.find(make_pair(myNode, simNode)) != visitedNodes.end()) {
@@ -376,7 +381,9 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode *myNode,
 
             if (!simulatesRecursive(myEdge->getDstNode(),
                                     simEdge->getDstNode(),
-                                    visitedNodes)) {
+                                    visitedNodes,
+                                    greaterOG,
+                                    smallerOG)) {
                 delete simEdgeIter;
                 return false;
             }

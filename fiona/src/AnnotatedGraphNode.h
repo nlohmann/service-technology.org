@@ -80,9 +80,9 @@ class AnnotatedGraphNode : public GraphNode {
 
         /// constructor (four parameters)
         AnnotatedGraphNode(const std::string& _name,
-                        GraphFormula* _annotation,
-                        GraphNodeColor _color = BLUE,
-                        unsigned int number = 12345678);
+                           GraphFormula* _annotation,
+                           GraphNodeColor _color = BLUE,
+                           unsigned int number = 12345678);
 
         /// Destroys this AnnotatedGraphNode.
         virtual ~AnnotatedGraphNode();

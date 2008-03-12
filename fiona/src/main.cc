@@ -799,12 +799,12 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
     firstOG->removeFalseNodes();
     secondOG->removeFalseNodes();
     
-    trace(TRACE_1, "checking simulation\n");
+    trace(TRACE_1, "checking whether " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + "\n");
     if (firstOG->simulates(secondOG)) {
-        trace(TRACE_1, "simulation holds\n\n");
+        trace(TRACE_1, "result: simulation holds: YES\n\n");
         trace(TRACE_0, "The first OG characterizes all strategies of the second one.\n\n");
     } else {
-        trace(TRACE_1, "simulation does not hold\n\n");
+        trace(TRACE_1, "result: simulation holds: NO\n\n");
         trace(TRACE_0, "The second OG characterizes at least one strategy that is\n");
         trace(TRACE_0, "not characterized by the first one.\n\n");
     }
@@ -900,27 +900,29 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
     firstOG->removeFalseNodes();
     secondOG->removeFalseNodes();
 
-    trace(TRACE_1, "checking first simulation: (\"" + firstOG->getFilename() + "\" simulates \"" + secondOG->getFilename() + "\")\n");
+    trace(TRACE_1, "checking whether " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + "\n");
     if (firstOG->simulates(secondOG)) {
-        trace(TRACE_1, "first simulation (\"" + firstOG->getFilename() + "\" simulates \"" + secondOG->getFilename() + "\") holds\n\n");
-        trace(TRACE_1, "checking second simulation (\"" + firstOG->getFilename() + "\" simulates \"" + secondOG->getFilename() + "\")\n");
+        trace(TRACE_1, "result: " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + ": YES\n\n");
+
+        trace(TRACE_1, "checking whether " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + "\n");
         if (secondOG->simulates(firstOG)) {
-            trace(TRACE_1, "second simulation holds (\"" + secondOG->getFilename() + "\" simulates \"" + firstOG->getFilename() + "\")\n\n");
+            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": YES\n\n");
             trace(TRACE_0, "The two OGs characterize the same strategies.\n\n");
         } else {
-            trace(TRACE_1, "second simulation (\"" + secondOG->getFilename() + "\" simulates \"" + firstOG->getFilename() + "\") does not hold\n\n");
-            trace(TRACE_0, "The first OG (\"" + firstOG->getFilename() + "\") characterizes all strategies of the second one (\"" + secondOG->getFilename() + "\")\n");
+            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": NO\n\n");
+            trace(TRACE_0, firstOG->getFilename() + " characterizes all strategies of " + secondOG->getFilename() + "\n");
             trace(TRACE_0, "(and at least one more).\n\n");
         }
     } else {
-        trace(TRACE_1, "first simulation (\"" + firstOG->getFilename() + "\" simulates \"" + secondOG->getFilename() + "\") does not hold\n\n");
-        trace(TRACE_1, "checking second simulation (\"" + secondOG->getFilename() + "\" simulates \"" + firstOG->getFilename() + "\")\n");
+        trace(TRACE_1, "result: " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + ": NO\n\n");
+
+        trace(TRACE_1, "checking whether " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + "\n");
         if (secondOG->simulates(firstOG)) {
-            trace(TRACE_1, "second simulation holds (\"" + secondOG->getFilename() + "\" simulates \"" + firstOG->getFilename() + "\")\n\n");
-            trace(TRACE_0, "The second OG (\"" + secondOG->getFilename() + "\") characterizes all strategies of the first one (\"" + firstOG->getFilename() + "\")\n");
+            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": YES\n\n");
+            trace(TRACE_0, secondOG->getFilename() + " characterizes all strategies of " + firstOG->getFilename() + "\n");
             trace(TRACE_0, "(and at least one more).\n\n");
         } else {
-            trace(TRACE_1, "second simulation (\"" + secondOG->getFilename() + "\" simulates \"" + firstOG->getFilename() + "\") does not hold\n\n");
+            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": NO\n\n");
             trace(TRACE_0, "Both OGs characterize at least one strategy that is\n");
             trace(TRACE_0, "not characterized by the other one.\n\n");
         }

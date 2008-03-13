@@ -100,6 +100,14 @@ class AnnotatedGraph : public Graph {
                                 AnnotatedGraph* greaterOG,
                                 AnnotatedGraph* smallerOG);
 
+        /// checks, whether the part of an AnnotatedGraph below leftNode is equivalent
+        /// to the part of an AnnotatedGraph below rightNode
+        bool isEquivalentRecursive(AnnotatedGraphNode* leftNode,
+                                   AnnotatedGraphNode* rightNode,
+                                   set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes,
+                                   AnnotatedGraph* leftOG,
+                                   AnnotatedGraph* rightOG);
+
         /// checks, whether the part of an AnnotatedGraph below myNode simulates
         /// the part of an AnnotatedGraph below simNode while covering all interface transitions
         bool covSimulatesRecursive(AnnotatedGraphNode* myNode,
@@ -136,8 +144,8 @@ class AnnotatedGraph : public Graph {
 
         /// transforms the public view annotated graph to a non annotated Graph
         void transformOGToService( Graph* cleanPV);
-
 // END OF CODE FROM PL
+
 
 // CODE FROM CG FOR STRUCTURAL REDUCTION
         /// returns the vector, so that all nodes in the vector have leaving edges to node
@@ -145,8 +153,21 @@ class AnnotatedGraph : public Graph {
 
         /// returns the vector, so that node has leaving edges to all nodes in the vector
         nodes_t getSuccessorNodes(AnnotatedGraphNode * node);
-
 // END OD CODE FROM CG
+
+
+        /// recursive function for computing the number of services
+        unsigned int numberOfServicesRecursively(set<AnnotatedGraphNode*> activeNodes,
+                                                 map<AnnotatedGraphNode*, unsigned int>& followers,
+                                                 map<AnnotatedGraphNode*, list <set<AnnotatedGraphNode*> > >& validFollowerCombinations,
+                                                 map<set<AnnotatedGraphNode*>, unsigned int>& eliminateRedundantCounting,
+                                                 unsigned int& instances);
+
+        /// recursive function for computing the number of true assignments for a node
+        unsigned int processAssignmentsRecursively(set<string> labels,
+                                                   GraphFormulaAssignment possibleAssignment,
+                                                   AnnotatedGraphNode* testNode,
+                                                   list<GraphFormulaAssignment>& assignmentList);
 
     public:
 
@@ -233,6 +254,9 @@ class AnnotatedGraph : public Graph {
         /// checks, whether this AnnotatedGraph simulates the given simulant
         bool simulates(AnnotatedGraph* smallerOG);
 
+        /// checks, whether this AnnotatedGraph is equivalent to the secondOG
+        bool isEquivalent(AnnotatedGraph* secondOG);
+
         /// checks, whether this AnnotatedGraph simulates the given simulant while covering all interface transitions
         bool covSimulates(AnnotatedGraph* smallerOG);
 
@@ -242,19 +266,6 @@ class AnnotatedGraph : public Graph {
 
         /// computes the number of Services determined by this OG
         unsigned int numberOfServices();
-
-        /// recursive function for computing the number of services
-        unsigned int numberOfServicesRecursively(set<AnnotatedGraphNode*> activeNodes,
-                                                 map<AnnotatedGraphNode*, unsigned int>& followers,
-                                                 map<AnnotatedGraphNode*, list <set<AnnotatedGraphNode*> > >& validFollowerCombinations,
-                                                 map<set<AnnotatedGraphNode*>, unsigned int>& eliminateRedundantCounting,
-                                                 unsigned int& instances);
-
-        /// recursive function for computing the number of true assignments for a node
-        unsigned int processAssignmentsRecursively(set<string> labels,
-                                                   GraphFormulaAssignment possibleAssignment,
-                                                   AnnotatedGraphNode* testNode,
-                                                   list<GraphFormulaAssignment>& assignmentList);
 
         /// tests if this OG is acyclic
         bool isAcyclic();
@@ -274,7 +285,7 @@ class AnnotatedGraph : public Graph {
 
         //! Create the formula describing the structure of the complete graph through events
         //! NOTE: graph has to be acyclic!
-        GraphFormulaMultiaryAnd *createStructureFormula();
+        GraphFormulaMultiaryAnd* createStructureFormula();
 
 // CODE FROM PL
         /// transforms the graph to the public view

@@ -900,33 +900,40 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
     firstOG->removeFalseNodes();
     secondOG->removeFalseNodes();
 
-    trace(TRACE_1, "checking whether " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + "\n");
-    if (firstOG->simulates(secondOG)) {
-        trace(TRACE_1, "result: " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + ": YES\n\n");
-
-        trace(TRACE_1, "checking whether " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + "\n");
-        if (secondOG->simulates(firstOG)) {
-            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": YES\n\n");
-            trace(TRACE_0, "The two OGs characterize the same strategies.\n\n");
-        } else {
-            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": NO\n\n");
-            trace(TRACE_0, firstOG->getFilename() + " characterizes all strategies of " + secondOG->getFilename() + "\n");
-            trace(TRACE_0, "(and at least one more).\n\n");
-        }
+    trace(TRACE_1, "checking whether " + firstOG->getFilename() + " is equivalent to " + secondOG->getFilename() + "\n");
+    if (firstOG->isEquivalent(secondOG)) {
+        trace(TRACE_0, "\nresult: " + firstOG->getFilename() + " and " + secondOG->getFilename() + " are equivalent: YES\n\n");
     } else {
-        trace(TRACE_1, "result: " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + ": NO\n\n");
-
-        trace(TRACE_1, "checking whether " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + "\n");
-        if (secondOG->simulates(firstOG)) {
-            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": YES\n\n");
-            trace(TRACE_0, secondOG->getFilename() + " characterizes all strategies of " + firstOG->getFilename() + "\n");
-            trace(TRACE_0, "(and at least one more).\n\n");
-        } else {
-            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": NO\n\n");
-            trace(TRACE_0, "Both OGs characterize at least one strategy that is\n");
-            trace(TRACE_0, "not characterized by the other one.\n\n");
-        }
+        trace(TRACE_0, "\nresult: " + firstOG->getFilename() + " and " + secondOG->getFilename() + " are equivalent: NO\n\n");
     }
+
+//    trace(TRACE_1, "checking whether " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + "\n");
+//    if (firstOG->simulates(secondOG)) {
+//        trace(TRACE_1, "result: " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + ": YES\n\n");
+//
+//        trace(TRACE_1, "checking whether " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + "\n");
+//        if (secondOG->simulates(firstOG)) {
+//            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": YES\n\n");
+//            trace(TRACE_0, "The two OGs characterize the same strategies.\n\n");
+//        } else {
+//            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": NO\n\n");
+//            trace(TRACE_0, firstOG->getFilename() + " characterizes all strategies of " + secondOG->getFilename() + "\n");
+//            trace(TRACE_0, "(and at least one more).\n\n");
+//        }
+//    } else {
+//        trace(TRACE_1, "result: " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + ": NO\n\n");
+//
+//        trace(TRACE_1, "checking whether " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + "\n");
+//        if (secondOG->simulates(firstOG)) {
+//            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": YES\n\n");
+//            trace(TRACE_0, secondOG->getFilename() + " characterizes all strategies of " + firstOG->getFilename() + "\n");
+//            trace(TRACE_0, "(and at least one more).\n\n");
+//        } else {
+//            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": NO\n\n");
+//            trace(TRACE_0, "Both OGs characterize at least one strategy that is\n");
+//            trace(TRACE_0, "not characterized by the other one.\n\n");
+//        }
+//    }
 
     if (!calledWithNet && !options[O_EQ_R]) {
         trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");

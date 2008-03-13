@@ -289,8 +289,10 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode* myNode,
         visitedNodes.insert(make_pair(myNode, simNode));
     }
 
+
+    // 1st step:
     // first we check implication of annotations: simNode -> myNode
-    trace(TRACE_3, "\t\t checking annotations...\n");
+    trace(TRACE_3, "\t\t checking annotations (2nd node's annotation implies 1st?)...\n");
     GraphFormulaCNF* simNodeAnnotationInCNF = simNode->getAnnotation()->getCNF();
     GraphFormulaCNF* myNodeAnnotationInCNF = myNode->getAnnotation()->getCNF();
 
@@ -303,50 +305,59 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode* myNode,
         delete simNodeAnnotationInCNF;
         delete myNodeAnnotationInCNF;
     } else {
-        trace(TRACE_3, "\t\t\t annotation implication false\n");
+        trace(TRACE_2, "\t\t simulation failed (annotation)\n");
+
         trace(TRACE_4, "\t\t\t   " + simNode->getAnnotation()->asString() + "\n");
-        trace(TRACE_4, "\t\t\t   leaving edges (" + intToString(simNode->getLeavingEdgesCount()) + "):\n");
-        
-        AnnotatedGraphNode::LeavingEdges::Iterator
-                edgeIter = simNode->getLeavingEdgesIterator();
+        trace(TRACE_4, "\t\t\t   -/->\n");
+        trace(TRACE_4, "\t\t\t   " + myNode->getAnnotation()->asString() + "\n");
+
+        // reporting all leaving edges of both nodes for debugging
+        AnnotatedGraphNode::LeavingEdges::Iterator edgeIter;
+
+        trace(TRACE_4, "\t\t\t   leaving edges of node ");
+        trace(TRACE_4, simNode->getName() + " of ");
+        trace(TRACE_4, smallerOG->getFilename());
+        trace(TRACE_4, " (" + intToString(simNode->getLeavingEdgesCount()) + "):\n");
+
+        edgeIter = simNode->getLeavingEdgesIterator();
         while (edgeIter->hasNext()) {
             AnnotatedGraphEdge* edge = edgeIter->getNext();
-            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + "(");
+            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + " (");
             switch (edge->getDstNode()->getColor()) {
-            case BLUE: trace(TRACE_4, "BLUE"); break;
-            case RED: trace(TRACE_4, "RED"); break;
+                case BLUE: trace(TRACE_4, "BLUE"); break;
+                case RED: trace(TRACE_4, "RED"); break;
             }
             trace(TRACE_4, ")\n");
         }
-        
-        
-        trace(TRACE_4, "\t\t\t   -/->\n");
-        trace(TRACE_4, "\t\t\t   " + myNode->getAnnotation()->asString() + "\n");
-        trace(TRACE_4, "\t\t\t   leaving edges (" + intToString(myNode->getLeavingEdgesCount()) + "):\n");
+
+        trace(TRACE_4, "\t\t\t   leaving edges of node ");
+        trace(TRACE_4, myNode->getName() + " of ");
+        trace(TRACE_4, greaterOG->getFilename());
+        trace(TRACE_4, " (" + intToString(myNode->getLeavingEdgesCount()) + "):\n");
 
         edgeIter = myNode->getLeavingEdgesIterator();
         while (edgeIter->hasNext()) {
             AnnotatedGraphEdge* edge = edgeIter->getNext();
             trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + "(");
             switch (edge->getDstNode()->getColor()) {
-            case BLUE: trace(TRACE_4, "BLUE"); break;
-            case RED: trace(TRACE_4, "RED"); break;
+                case BLUE: trace(TRACE_4, "BLUE"); break;
+                case RED: trace(TRACE_4, "RED"); break;
             }
             trace(TRACE_4, ")\n");
-        }        
+        }
+
         delete edgeIter;
         delete simNodeAnnotationInCNF;
         delete myNodeAnnotationInCNF;
 
-        trace(TRACE_2, "\t\t simulation failed (annotation)\n");
-
         return false;
     }
 
+
+    // 2nd step:
     // now we check whether myNode has each outgoing event of simNode
     trace(TRACE_3, "\t\t checking edges...\n");
-    AnnotatedGraphNode::LeavingEdges::ConstIterator
-            simEdgeIter = simNode->getLeavingEdgesConstIterator();
+    AnnotatedGraphNode::LeavingEdges::ConstIterator simEdgeIter = simNode->getLeavingEdgesConstIterator();
 
     while (simEdgeIter->hasNext()) {
         AnnotatedGraphEdge* simEdge = simEdgeIter->getNext();
@@ -358,23 +369,45 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode* myNode,
         if (myEdge == NULL) {
             // simNode has edge which myNode hasn't
             trace(TRACE_2, "\t\t simulation failed (edges)\n");
-            trace(TRACE_4, "\t\t leaving edges of the node " + myNode->getName() + " (" + intToString(myNode->getLeavingEdgesCount()) + "): \n");
-            
-            AnnotatedGraphNode::LeavingEdges::Iterator
-                    edgeIter = myNode->getLeavingEdgesIterator();
-            while (edgeIter->hasNext()) {
-                AnnotatedGraphEdge* edge = edgeIter->getNext();
-                trace(TRACE_4, "\t\t\t" + edge->getLabel() + "\n");
-            }
-            trace(TRACE_4, "\t\t leaving edges of the node " + simNode->getName() + " (" + intToString(myNode->getLeavingEdgesCount()) + "): \n");
-            
+
+            // reporting all leaving edges of both nodes for debugging
+            AnnotatedGraphNode::LeavingEdges::Iterator edgeIter;
+
+            trace(TRACE_4, "\t\t\t   leaving edges of node ");
+            trace(TRACE_4, simNode->getName() + " of ");
+            trace(TRACE_4, smallerOG->getFilename());
+            trace(TRACE_4, " (" + intToString(simNode->getLeavingEdgesCount()) + "):\n");
+
             edgeIter = simNode->getLeavingEdgesIterator();
             while (edgeIter->hasNext()) {
                 AnnotatedGraphEdge* edge = edgeIter->getNext();
-                trace(TRACE_4, "\t\t\t" + edge->getLabel() + "\n");
+                trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + " (");
+                switch (edge->getDstNode()->getColor()) {
+                    case BLUE: trace(TRACE_4, "BLUE"); break;
+                    case RED: trace(TRACE_4, "RED"); break;
+                }
+                trace(TRACE_4, ")\n");
             }
+
+            trace(TRACE_4, "\t\t\t   leaving edges of node ");
+            trace(TRACE_4, myNode->getName() + " of ");
+            trace(TRACE_4, greaterOG->getFilename());
+            trace(TRACE_4, " (" + intToString(myNode->getLeavingEdgesCount()) + "):\n");
+
+            edgeIter = myNode->getLeavingEdgesIterator();
+            while (edgeIter->hasNext()) {
+                AnnotatedGraphEdge* edge = edgeIter->getNext();
+                trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + "(");
+                switch (edge->getDstNode()->getColor()) {
+                    case BLUE: trace(TRACE_4, "BLUE"); break;
+                    case RED: trace(TRACE_4, "RED"); break;
+                }
+                trace(TRACE_4, ")\n");
+            }
+
             delete edgeIter;
             delete simEdgeIter;
+
             return false;
         } else {
             trace(TRACE_4, "\t\t\t event present, going down\n");
@@ -390,6 +423,274 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode* myNode,
         }
     }
     delete simEdgeIter;
+
+    // All checks were successful.
+    return true;
+}
+
+
+//! \brief checks, whether this AnnotatedGraph is equivalent to the given one
+//! \return true on positive check, otherwise: false
+//! \param secondOG the AnnotatedGraph that is checked for equivalence
+bool AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG) {
+    trace(TRACE_5, "AnnotatedGraph::isEuivalent(AnnotatedGraph* secondOG): start\n");
+    // Simulation is impossible without a simulant.
+    if (secondOG == NULL)
+        return false;
+
+    // We need to remember the pairs of nodes we already visited.
+    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
+
+    if (secondOG->getRoot() == NULL) {
+        return true;
+    } else if (root == NULL) {
+        return false;
+    }
+
+    // Get things moving...
+    bool result = false;
+    if (isEquivalentRecursive(root, secondOG->getRoot(), visitedNodes, this, secondOG)) {
+        result = true;
+    }
+
+    trace(TRACE_5, "AnnotatedGraph::isEuivalent(AnnotatedGraph* secondOG): end\n");
+    return result;
+}
+
+
+//! \brief checks, whether the part of an AnnotatedGraph below myNode is equivalent
+//         to the part of an AnnotatedGraph below simNode
+//! \return true on positive check, otherwise: false
+//! \param leftNode a node in this AnnotatedGraph
+//! \param rightNode a node in the second AnnotatedGraph
+//! \param visitedNodes Holds all visited pairs of nodes.
+//! \param leftOG the AnnotatedGraph corresponding to leftNode
+//! \param rightOG the AnnotatedGraph corresponding to rightNode
+bool AnnotatedGraph::isEquivalentRecursive(AnnotatedGraphNode* leftNode,
+                                           AnnotatedGraphNode* rightNode,
+                                           set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes,
+                                           AnnotatedGraph* leftOG,
+                                           AnnotatedGraph* rightOG) {
+    // checking, whether myNode simulates simNode; result is true, iff
+    // 1) anno of simNode implies anno of myNode and
+    // 2) myNode has each outgoing event of simNode, too
+
+    assert(leftNode);
+    assert(rightNode);
+
+    trace(TRACE_2, "\t checking whether node " + leftNode->getName());
+    trace(TRACE_3, " of " + leftOG->getFilename());
+    trace(TRACE_2, " is equivalent to node " + rightNode->getName());
+    trace(TRACE_3, " of " + rightOG->getFilename());
+    trace(TRACE_2, "\n");
+
+    // If we already visited this pair of nodes, then we're done.
+    if (visitedNodes.find(make_pair(leftNode, rightNode)) != visitedNodes.end()) {
+        trace(TRACE_3, "\t already been checked\n");
+        return true;
+    } else {
+        visitedNodes.insert(make_pair(leftNode, rightNode));
+    }
+
+    // iterator used for reporting and for recursively going down
+    AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter;
+
+    // remember whether equivalence of node is true/false for reporting
+    bool result = true;
+
+    // 1st step:
+    // first we check equivalence of annotations: leftNode <-> rightNode
+    trace(TRACE_3, "\t\t checking equivalence of annotations...\n");
+    GraphFormulaCNF* leftNodeAnnotationInCNF = leftNode->getAnnotation()->getCNF();
+    GraphFormulaCNF* rightNodeAnnotationInCNF = rightNode->getAnnotation()->getCNF();
+
+    if (leftNodeAnnotationInCNF->implies(rightNodeAnnotationInCNF)) {
+        trace(TRACE_3, "\t\t first annotation implication is ok\n");
+        trace(TRACE_4, "\t\t\t   " + leftNode->getAnnotation()->asString() + "\n");
+        trace(TRACE_4, "\t\t\t   ->\n");
+        trace(TRACE_4, "\t\t\t   " + rightNode->getAnnotation()->asString() + "\n");
+
+        if (rightNodeAnnotationInCNF->implies(leftNodeAnnotationInCNF)) {
+            trace(TRACE_3, "\t\t second annotation implication is ok\n");
+            trace(TRACE_4, "\t\t\t   " + rightNode->getAnnotation()->asString() + "\n");
+            trace(TRACE_4, "\t\t\t   ->\n");
+            trace(TRACE_4, "\t\t\t   " + leftNode->getAnnotation()->asString() + "\n");
+        } else {
+            trace(TRACE_3, "\t\t\t annotation implication false\n");
+            trace(TRACE_4, "\t\t\t   " + rightNode->getAnnotation()->asString() + "\n");
+            trace(TRACE_4, "\t\t\t   -/->\n");
+            trace(TRACE_4, "\t\t\t   " + leftNode->getAnnotation()->asString() + "\n");
+
+            result = false;
+        }
+    } else {
+        trace(TRACE_2, "\t\t equivalence failed (annotation)\n");
+        trace(TRACE_3, "\t\t\t annotation implication false\n");
+        trace(TRACE_4, "\t\t\t   " + leftNode->getAnnotation()->asString() + "\n");
+        trace(TRACE_4, "\t\t\t   -/->\n");
+        trace(TRACE_4, "\t\t\t   " + rightNode->getAnnotation()->asString() + "\n");
+
+        result = false;
+    }
+
+    delete rightNodeAnnotationInCNF;
+    delete leftNodeAnnotationInCNF;
+
+    if (result == false) {
+        // reporting all leaving edges of both nodes for debugging
+        AnnotatedGraphNode::LeavingEdges::Iterator edgeIter;
+
+        trace(TRACE_4, "\t\t\t   leaving edges of node ");
+        trace(TRACE_4, rightNode->getName() + " of ");
+        trace(TRACE_4, rightOG->getFilename());
+        trace(TRACE_4, " (" + intToString(rightNode->getLeavingEdgesCount()) + "):\n");
+
+        edgeIter = rightNode->getLeavingEdgesIterator();
+        while (edgeIter->hasNext()) {
+            AnnotatedGraphEdge* edge = edgeIter->getNext();
+            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + " (");
+            switch (edge->getDstNode()->getColor()) {
+                case BLUE: trace(TRACE_4, "BLUE"); break;
+                case RED: trace(TRACE_4, "RED"); break;
+            }
+            trace(TRACE_4, ")\n");
+        }
+
+        trace(TRACE_4, "\t\t\t   leaving edges of node ");
+        trace(TRACE_4, leftNode->getName() + " of ");
+        trace(TRACE_4, leftOG->getFilename());
+        trace(TRACE_4, " (" + intToString(leftNode->getLeavingEdgesCount()) + "):\n");
+
+        edgeIter = leftNode->getLeavingEdgesIterator();
+        while (edgeIter->hasNext()) {
+            AnnotatedGraphEdge* edge = edgeIter->getNext();
+            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + "(");
+            switch (edge->getDstNode()->getColor()) {
+                case BLUE: trace(TRACE_4, "BLUE"); break;
+                case RED: trace(TRACE_4, "RED"); break;
+            }
+            trace(TRACE_4, ")\n");
+        }
+
+        delete edgeIter;
+
+        return false;
+    }
+
+
+    // 2nd step:
+    // now we check whether both nodes have the same outgoing events
+    trace(TRACE_3, "\t\t checking edges...\n");
+
+    trace(TRACE_3, "\t\t\t checking whether each edge of ");
+    trace(TRACE_3, leftNode->getName());
+    trace(TRACE_3, " of " + leftOG->getFilename() + "\n");
+    trace(TRACE_3, "\t\t\t                 is present at ");
+    trace(TRACE_3, rightNode->getName());
+    trace(TRACE_3, " of " + rightOG->getFilename() + "...\n");
+
+    edgeIter = leftNode->getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        AnnotatedGraphEdge* leftEdge = edgeIter->getNext();
+        trace(TRACE_4, "\t\t\t\t checking event " + leftEdge->getLabel() + "\n");
+
+        AnnotatedGraphEdge* rightEdge = rightNode->getEdgeWithLabel(leftEdge->getLabel());
+        if (rightEdge == NULL) {
+            // first node has edge which second node hasn't
+            trace(TRACE_4, "\t\t\t\t event missing\n");
+            result = false;
+            break;
+        } else {
+            trace(TRACE_4, "\t\t\t\t event present\n");
+        }
+    }
+
+    trace(TRACE_3, "\t\t\t checking whether each edge of ");
+    trace(TRACE_3, rightNode->getName());
+    trace(TRACE_3, " of " + rightOG->getFilename() + "\n");
+    trace(TRACE_3, "\t\t\t                 is present at ");
+    trace(TRACE_3, leftNode->getName());
+    trace(TRACE_3, " of " + leftOG->getFilename() + "...\n");
+
+    edgeIter = rightNode->getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        AnnotatedGraphEdge* rightEdge = edgeIter->getNext();
+        trace(TRACE_4, "\t\t\t\t checking event " + rightEdge->getLabel() + "\n");
+
+        AnnotatedGraphEdge* leftEdge = leftNode->getEdgeWithLabel(rightEdge->getLabel());
+        if (leftEdge == NULL) {
+            // first node has edge which second node hasn't
+            trace(TRACE_4, "\t\t\t\t event missing\n");
+            result = false;
+            break;
+        } else {
+            trace(TRACE_4, "\t\t\t\t event present\n");
+        }
+    }
+
+    if (result == false) {
+        trace(TRACE_2, "\t\t equivalence failed (edges)\n");
+        // reporting all leaving edges of both nodes for debugging
+        AnnotatedGraphNode::LeavingEdges::Iterator edgeIter;
+
+        trace(TRACE_4, "\t\t\t   leaving edges of node ");
+        trace(TRACE_4, rightNode->getName() + " of ");
+        trace(TRACE_4, rightOG->getFilename());
+        trace(TRACE_4, " (" + intToString(rightNode->getLeavingEdgesCount()) + "):\n");
+
+        edgeIter = rightNode->getLeavingEdgesIterator();
+        while (edgeIter->hasNext()) {
+            AnnotatedGraphEdge* edge = edgeIter->getNext();
+            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + " (");
+            switch (edge->getDstNode()->getColor()) {
+                case BLUE: trace(TRACE_4, "BLUE"); break;
+                case RED: trace(TRACE_4, "RED"); break;
+            }
+            trace(TRACE_4, ")\n");
+        }
+
+        trace(TRACE_4, "\t\t\t   leaving edges of node ");
+        trace(TRACE_4, leftNode->getName() + " of ");
+        trace(TRACE_4, leftOG->getFilename());
+        trace(TRACE_4, " (" + intToString(leftNode->getLeavingEdgesCount()) + "):\n");
+
+        edgeIter = leftNode->getLeavingEdgesIterator();
+        while (edgeIter->hasNext()) {
+            AnnotatedGraphEdge* edge = edgeIter->getNext();
+            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + "(");
+            switch (edge->getDstNode()->getColor()) {
+                case BLUE: trace(TRACE_4, "BLUE"); break;
+                case RED: trace(TRACE_4, "RED"); break;
+            }
+            trace(TRACE_4, ")\n");
+        }
+
+        delete edgeIter;
+        return false;
+    }
+
+
+    // we know: both nodes have the same outgoing edges
+    trace(TRACE_4, "\t\t\t all events present at both nodes, going down\n");
+
+    edgeIter = leftNode->getLeavingEdgesConstIterator();
+
+    while (edgeIter->hasNext()) {
+        AnnotatedGraphEdge* leftEdge = edgeIter->getNext();
+        trace(TRACE_4, "\t\t\t performing event " + leftEdge->getLabel() + "\n");
+        AnnotatedGraphEdge* rightEdge = rightNode->getEdgeWithLabel(leftEdge->getLabel());
+
+        if (!isEquivalentRecursive(leftEdge->getDstNode(),
+                                   rightEdge->getDstNode(),
+                                   visitedNodes,
+                                   leftOG,
+                                   rightOG)) {
+            delete edgeIter;
+            return false;
+        }
+    }
+
+    delete edgeIter;
 
     // All checks were successful.
     return true;

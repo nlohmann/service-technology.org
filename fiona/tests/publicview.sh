@@ -380,7 +380,7 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     
-    echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"

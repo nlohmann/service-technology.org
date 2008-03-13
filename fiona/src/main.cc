@@ -742,6 +742,8 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         parameters[P_SHOW_EMPTY_NODE] = true;
     }
     
+    time_t seconds, seconds2;
+
     // generate the OGs
     list<std::string>::iterator netiter = netfiles.begin();
     while (OGsFromFiles.size() < 2) {
@@ -767,14 +769,24 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace(TRACE_0, "processing net " + currentowfnfile + "\n");
         reportNet();
         delete PlaceTable;
-       
+
+        seconds = time (NULL);
+
         // compute OG
         OG* graph = new OG(PN);
         trace(TRACE_0, "building the operating guideline...\n");
         graph->printProgressFirst();
         graph->buildGraph(); // build operating guideline
-        trace(TRACE_0, "\nbuilding the operating guideline finished.\n\n");
-        
+        trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
+
+        seconds2 = time (NULL);
+        cout << "    " << difftime(seconds2, seconds) << " s consumed for building graph" << endl << endl;
+
+        // print statistics
+        trace(TRACE_0, "OG statistics:\n");
+        graph->printGraphStatistics();
+        trace(TRACE_0, "\n");
+
         // add new OG to the list
         if (!OGfirst && netfiles.size() == 1) {
             OGsFromFiles.push_front(graph);
@@ -799,7 +811,8 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
     firstOG->removeFalseNodes();
     secondOG->removeFalseNodes();
     
-    trace(TRACE_1, "checking whether " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + "\n");
+    trace(TRACE_0, "\n=================================================================\n");
+    trace(TRACE_0, "checking whether " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + "...\n\n");
     if (firstOG->simulates(secondOG)) {
         trace(TRACE_1, "result: simulation holds: YES\n\n");
         trace(TRACE_0, "The first OG characterizes all strategies of the second one.\n\n");
@@ -846,6 +859,8 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         parameters[P_SHOW_EMPTY_NODE] = true;
     }
 
+    time_t seconds, seconds2;
+
     // generate the OGs
     list<std::string>::iterator netiter = netfiles.begin();
     while (OGsFromFiles.size() < 2) {
@@ -872,12 +887,22 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         reportNet();
         delete PlaceTable;
 
+        seconds = time (NULL);
+
         // compute OG
         OG* graph = new OG(PN);
         trace(TRACE_0, "building the operating guideline...\n");
         graph->printProgressFirst();
         graph->buildGraph(); // build operating guideline
-        trace(TRACE_0, "\nbuilding the operating guideline finished.\n\n");
+        trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
+
+        seconds2 = time (NULL);
+        cout << "    " << difftime(seconds2, seconds) << " s consumed for building graph" << endl << endl;
+
+        // print statistics
+        trace(TRACE_0, "OG statistics:\n");
+        graph->printGraphStatistics();
+        trace(TRACE_0, "\n");
 
         // add new OG to the list
         if (!OGfirst && netfiles.size() == 1) {
@@ -906,34 +931,6 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
     } else {
         trace(TRACE_0, "\nresult: " + firstOG->getFilename() + " and " + secondOG->getFilename() + " are equivalent: NO\n\n");
     }
-
-//    trace(TRACE_1, "checking whether " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + "\n");
-//    if (firstOG->simulates(secondOG)) {
-//        trace(TRACE_1, "result: " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + ": YES\n\n");
-//
-//        trace(TRACE_1, "checking whether " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + "\n");
-//        if (secondOG->simulates(firstOG)) {
-//            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": YES\n\n");
-//            trace(TRACE_0, "The two OGs characterize the same strategies.\n\n");
-//        } else {
-//            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": NO\n\n");
-//            trace(TRACE_0, firstOG->getFilename() + " characterizes all strategies of " + secondOG->getFilename() + "\n");
-//            trace(TRACE_0, "(and at least one more).\n\n");
-//        }
-//    } else {
-//        trace(TRACE_1, "result: " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + ": NO\n\n");
-//
-//        trace(TRACE_1, "checking whether " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + "\n");
-//        if (secondOG->simulates(firstOG)) {
-//            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": YES\n\n");
-//            trace(TRACE_0, secondOG->getFilename() + " characterizes all strategies of " + firstOG->getFilename() + "\n");
-//            trace(TRACE_0, "(and at least one more).\n\n");
-//        } else {
-//            trace(TRACE_1, "result: " + secondOG->getFilename() + " simulates " + firstOG->getFilename() + ": NO\n\n");
-//            trace(TRACE_0, "Both OGs characterize at least one strategy that is\n");
-//            trace(TRACE_0, "not characterized by the other one.\n\n");
-//        }
-//    }
 
     if (!calledWithNet && !options[O_EQ_R]) {
         trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");

@@ -811,6 +811,8 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
     firstOG->removeFalseNodes();
     secondOG->removeFalseNodes();
     
+    seconds = time (NULL);
+
     trace(TRACE_0, "\n=================================================================\n");
     trace(TRACE_0, "checking whether " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + "...\n\n");
     if (firstOG->simulates(secondOG)) {
@@ -822,6 +824,9 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace(TRACE_0, "not characterized by the first one.\n\n");
     }
     
+    seconds2 = time (NULL);
+    cout << "    " << difftime(seconds2, seconds) << " s consumed for checking equivalence" << endl << endl;
+
     if (!calledWithNet) {
         trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
         trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
@@ -925,12 +930,17 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
     firstOG->removeFalseNodes();
     secondOG->removeFalseNodes();
 
+    seconds = time (NULL);
+
     trace(TRACE_1, "checking whether " + firstOG->getFilename() + " is equivalent to " + secondOG->getFilename() + "\n");
     if (firstOG->isEquivalent(secondOG)) {
         trace(TRACE_0, "\nresult: " + firstOG->getFilename() + " and " + secondOG->getFilename() + " are equivalent: YES\n\n");
     } else {
         trace(TRACE_0, "\nresult: " + firstOG->getFilename() + " and " + secondOG->getFilename() + " are equivalent: NO\n\n");
     }
+
+    seconds2 = time (NULL);
+    cout << "    " << difftime(seconds2, seconds) << " s consumed for checking equivalence" << endl << endl;
 
     if (!calledWithNet && !options[O_EQ_R]) {
         trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");

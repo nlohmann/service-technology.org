@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2008-03-06 10:10:34 $ by $Author: gierds $.
-# Version $Revision: 1.49 $
+# File last changed $Date: 2008-03-14 22:54:15 $ by $Author: gierds $.
+# Version $Revision: 1.50 $
 
 include $(top_srcdir)/Makefile.covcommon
 
@@ -37,7 +37,7 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         syntax_og.yy lexer_og.ll\
         syntax_stg.yy lexer_stg.ll \
         syntax_adapt_rules.yy lexer_adapt_rules.ll \
-        syntax_dot.yy lexer_dot.ll \
+        syntax_dot.yy lexer_dot.ll dot2tex.h \
         PetriNetNode.h PetriNetNode.cc\
         IG.cc owfnPlace.cc CommunicationGraph.h\
         IG.h owfnPlace.h\

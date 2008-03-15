@@ -34,13 +34,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2008-03-11 16:25:44 $
+ * \date    \$Date: 2008-03-15 17:27:42 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  *
  * \ingroup petrinet
  */
@@ -494,7 +494,7 @@ string Place::output_dot() const
   if ( wasExternal != "")
     label = wasExternal;
   else
-    label = nodeShortName();
+    label = nodeName();
 #endif
   
   // truncate prefix (could be a problem with ports later on, but looks nice)
@@ -1226,7 +1226,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
     (*output) << (*p)->nodeShortName();
 #else
-    (*output) << (*p)->nodeShortName();
+    (*output) << (*p)->nodeName();
 #endif
     if (count < P.size())
       (*output) << ", ";
@@ -1291,7 +1291,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
       (*output) << "  " << (*p)->nodeShortName() << ":\t" << (*p)->tokens;
 #else
-      (*output) << "  " << (*p)->nodeShortName() << ":\t" << (*p)->tokens;
+      (*output) << "  " << (*p)->nodeName() << ":\t" << (*p)->tokens;
 #endif
       
       if ((*p)->historyContains("1.internal.initial"))
@@ -1321,7 +1321,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
         (*output) << (*p)->nodeShortName();
 #else
-        (*output) << (*p)->nodeShortName();
+        (*output) << (*p)->nodeName();
 #endif
         first_place = false;
       }
@@ -1347,7 +1347,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
         (*output) << "( (" << p->nodeShortName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
 #else
-        (*output) << "( (" << p->nodeShortName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
+        (*output) << "( (" << p->nodeName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
 #endif
       }
       else
@@ -1362,7 +1362,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
           (*output) << "(" << (*p)->nodeShortName() << "=1)";
 #else
-          (*output) << "(" << (*p)->nodeShortName() << "=1)";
+          (*output) << "(" << (*p)->nodeName() << "=1)";
 #endif
           first_place = false;
         }
@@ -1386,7 +1386,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
     (*output) << "TRANSITION " << (*t)->nodeShortName();
 #else
-    (*output) << "TRANSITION " << (*t)->nodeShortName();
+    (*output) << "TRANSITION " << (*t)->nodeName();
 #endif
     switch( (*t)->type )
     {
@@ -1403,7 +1403,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
       (*output) << (*pre)->nodeShortName();
 #else
-      (*output) << (*pre)->nodeShortName();
+      (*output) << (*pre)->nodeName();
 #endif
       
       if (arc_weight(*pre, *t) != 1)
@@ -1422,7 +1422,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
       (*output) << (*post)->nodeShortName();
 #else
-      (*output) << (*post)->nodeShortName();
+      (*output) << (*post)->nodeName();
 #endif
       if (arc_weight(*t, *post) != 1)
         (*output) << ":" << arc_weight(*t, *post);

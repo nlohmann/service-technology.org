@@ -26,7 +26,7 @@ string tex_format(string str) {
     if (strip_command_sequence) {
         for(pos = 0; pos < str.length(); ++pos) {
             switch (str[pos]) {
-		case '\\':
+        		case '\\':
                     str.replace(pos, 1, "\\textbackslash ");
                     pos += 1;
                     break;
@@ -44,7 +44,6 @@ string tex_format(string str) {
                     break;
                 default: ;
             }
-
         }
     }
     
@@ -217,7 +216,24 @@ node_a_list: /* empty */
                 if ((*$1) == "label") {
                     (*$$) = a_list_label_str[0] + (*$3).substr(1, ($3)->length() - 2) + a_list_label_str[1];
                 } else if ((*$1) == "pos") { 
-                    (*$$) = a_list_pos_str[0] + (*$3).substr(1, ($3)->length() - 2) + a_list_pos_str[1];
+                    //(*$$) = a_list_pos_str[0] + (*$3).substr(1, ($3)->length() - 2) + a_list_pos_str[1];
+                    int x, y;
+                    x = atoi((*$3).substr(1, ($3)->find_first_of(",")).c_str());
+                    x = (int)(x * scale_factor);
+                    
+                    y = atoi((*$3).substr(($3)->find_first_of(",") + 1, ($3)->length()).c_str());
+                    y = (int)(y * scale_factor);
+
+                    char temp[12];
+                    sprintf(temp, "%i, %i", x, y);
+                    
+                    minx = (minx < x) ? minx : x;
+                    miny = (miny < y) ? miny : y;
+                    maxx = (maxx > x) ? maxx : x;
+                    maxy = (maxy > y) ? maxy : y;
+                     
+                    (*$$) = a_list_pos_str[0] + temp + a_list_pos_str[1];
+
                 } else if ((*$1) == "bb") { 
                     (*$$) = a_list_bb_str[0] + (*$3).substr(1, ($3)->length() - 2) + a_list_bb_str[1];
                 } else { 

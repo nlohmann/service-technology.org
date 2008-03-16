@@ -20,7 +20,7 @@ const string node_stmt_str[2] = {"\t\\node(", ")"};
 const string node_stmt2_str[3] = {"\t\\node[Nw=", "](", ")"};
 const string edge_stmt_str[3] = {"\t\\drawedge(", ",", ")"};
 
-const int texHeaderCount = 27;
+const int texHeaderCount = 29;
 const string texHeader[texHeaderCount] = {
     "\\documentclass{article}\n",
     "\\usepackage{gastex}\n",
@@ -34,8 +34,10 @@ const string texHeader[texHeaderCount] = {
     "\\begin{document}\n",
     "\n",
     "\\begin{center}\n",
-    "\\begin{picture}(100, 100)(0, 0)\n",
-    "%\\put(24,-95){\\framebox(100, 100){}}\n",
+    "\\begin{picture}(250, 0)(50, 200)\n",
+    "%\\begin{picture}(oben-links)(unten-rechts)\n",
+    "%\\begin{picture}(max-X, min-Y)(min-X, max-Y)\n",
+    "%\\put(0,0){\\framebox(150, 200){}}\n",
     "\n",
     "  \\gasset{linewidth=0.3}                            % line width\n",
     "  \\gasset{ilength=7.65,iangle=129.47}               % arc to initial node\n",
@@ -64,9 +66,9 @@ const string texFooter[texFooterCount] = {
 
 const bool strip_command_sequence = true;
 
-const double char_width_ratio = 1.0;        // ration between length of node label and node width
+const double char_width_ratio = 1.0;  // ration between length of node label and node width
 const int max_lines = 1024;
-const double scale_factor = .5;
+const double scale_factor = .2;
 
 const int border_left = 10;
 const int border_right = 10;

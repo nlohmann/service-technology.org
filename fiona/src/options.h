@@ -88,8 +88,9 @@ typedef enum {
     P_SHOW_STATES_PER_NODE,     //!< show all states in a node (aka "knowledge")
     P_SHOW_DEADLOCKS_PER_NODE,  //!< show deadlock states only
     P_NOPNG,                    //!< do not create a PNG output
-    P_TEX,                      //!<
+    P_TEX,                      //!< create a gastex tex file in some other mode
     P_READ_OG,                  //!< only read an OG from a file
+    P_GASTEX,                   //!< read an annotated dot file and create a gastex tex file
     P_REPRESENTATIVE,	      	//!< state reduction in node using representatives
     P_SINGLE                    //!< state reduction in node using single marking as representative
 } possibleParameters;
@@ -115,7 +116,7 @@ extern std::ostream* log_output;
 
 void parse_command_line(int argc, char* argv[]);
 
-enum FileType {FILETYPE_OWFN, FILETYPE_OG, FILETYPE_UNKNOWN};
+enum FileType {FILETYPE_OWFN, FILETYPE_OG, FILETYPE_DOT, FILETYPE_UNKNOWN};
 extern FileType getFileType(const std::string& fileName);
 
 extern bool contains(const std::string& hostString, const std::string& subString);

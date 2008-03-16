@@ -50,6 +50,7 @@ using namespace std;
 // some file names and pointers
 std::list<string> netfiles;
 std::list<string> ogfiles;
+std::list<string> dotfiles;
 
 // boolean value do save which file was mentioned first for simulation
 bool OGfirst;
@@ -144,6 +145,8 @@ void print_help() {
   trace("                                   readOG      - only reads a given OG File\n");
   trace("                                   png         - generate png files for all\n");
   trace("                                                 given oWFNs\n");  
+//  trace("                                   tex         - generate gastex files for a\n");
+//  trace("                                                 given annotated dot file\n");  
   trace("                                   isacyclic   - check a given OG for cycles\n");
   trace("                                   count       - count the number of strategies\n");
   trace("                                                 that are characterized by a\n");  
@@ -297,7 +300,8 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_SHOW_STATES_PER_NODE] = false;
     parameters[P_SHOW_DEADLOCKS_PER_NODE] = false;
     parameters[P_READ_OG] = false;
-    
+    parameters[P_GASTEX] = false;
+
     parameters[P_REPRESENTATIVE] = false;
     parameters[P_SINGLE] = true;
 
@@ -414,6 +418,10 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
                     options[O_PNG] = true;
+                } else if (lc_optarg == "tex") {
+                    parameters[P_IG] = false;
+                    parameters[P_OG] = false;
+                    parameters[P_GASTEX] = true;
                 } else if ((lc_optarg == "pv") || (lc_optarg == "publicview")) {
                 	parameters[P_PV] = true;
                 	parameters[P_IG] = false;
@@ -520,8 +528,7 @@ void parse_command_line(int argc, char* argv[]) {
                 break;
             case 'b':
                 options[O_BDD] = true;
-                testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary(
-                    "-b", optarg);
+                testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary("-b", optarg);
                 i = atoi(optarg);
                 if (i >= 0 && i <= 21){
                     bdd_reordermethod = i;
@@ -606,6 +613,15 @@ void parse_command_line(int argc, char* argv[]) {
                 }
                 ogfiles.push_back(argv[optind]);
                 break;
+            case FILETYPE_DOT:
+                if (firstfile) {
+                    OGfirst = false;
+                    firstfile = false;
+                }
+                options[O_OUTFILEPREFIX] = true;
+                dotfiles.push_back(argv[optind]);
+                outfilePrefix = string(argv[optind]);
+                break;
             case FILETYPE_UNKNOWN:
                 cerr << "Error:\t Cannot determine file type of '"
                      << argv[optind] << "'" << endl
@@ -620,12 +636,19 @@ void parse_command_line(int argc, char* argv[]) {
     }
 
     // check if the numbers of inputfiles corresponds to the chosen mode
-    if (ogfiles.size() == 0 && netfiles.size() == 0) {
+    if (ogfiles.size() == 0 && netfiles.size() == 0 && dotfiles.size() == 0) {
         cerr << "Error: \t No oWFNs or OGs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
     
+    if (parameters[P_GASTEX] && dotfiles.size() != 1) {
+        cerr << "Error: \t If option '-t tex' is used, exactly one annotated dot " << endl;
+        cerr << "       \t file must be given." << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(1);        
+    }
+
     if (options[O_EX] && (((netfiles.size() + ogfiles.size()) != 2)
                           || (options[O_BDD] && netfiles.size() != 2))) {
         cerr << "Error: \t If option '-t equivalence' is used, either two OG-/oWFN-files must be" << endl;
@@ -695,7 +718,7 @@ void parse_command_line(int argc, char* argv[]) {
 	}
 	
 	if (!parameters[P_PV] && options[O_PV_MULTIPLE_DEADLOCKS]) {
-		cerr << "not computing Public View Service Automaton - multiple deadlocks option ignored\n" << endl;
+		cerr << "not computing a public view - multiple deadlocks option ignored\n" << endl;
 		options[O_PV_MULTIPLE_DEADLOCKS] = false;
 	}
 
@@ -711,6 +734,7 @@ void parse_command_line(int argc, char* argv[]) {
 FileType getFileType(const std::string& fileName) {
     unsigned int owfnHits = 0;
     unsigned int ogHits   = 0;
+    unsigned int dotHits  = 0;
 
     ifstream fileStream(fileName.c_str());
     if (!fileStream) {
@@ -740,14 +764,27 @@ FileType getFileType(const std::string& fileName) {
         if (contains(line, "NODES")) ++ogHits;
         if (contains(line, "INITIALNODE")) ++ogHits;
         if (contains(line, "TRANSITIONS")) ++ogHits;
+        if (contains(line, ": blue")) ++ogHits;
+        if (contains(line, "->")) ++ogHits;
+
+        if (contains(line, "digraph")) ++dotHits;
+        if (contains(line, "label=")) ++dotHits;
+        if (contains(line, "graph")) ++dotHits;
+        if (contains(line, "color=")) ++dotHits;
+        if (contains(line, "pos=")) ++dotHits;
+        if (contains(line, "fontcolor=")) ++dotHits;
     }
 
-    if (owfnHits > ogHits) {
+    if ((owfnHits > ogHits) && (owfnHits > dotHits)) {
         return FILETYPE_OWFN;
     }
 
-    if (owfnHits < ogHits) {
+    if ((ogHits > owfnHits) && (ogHits > dotHits)) {
         return FILETYPE_OG;
+    }
+
+    if ((dotHits > owfnHits) && (dotHits > ogHits)) {
+        return FILETYPE_DOT;
     }
 
     return FILETYPE_UNKNOWN;

@@ -737,14 +737,15 @@ bool AnnotatedGraph::covSimulates(AnnotatedGraph* smallerOG) {
 //! \param simNode a node in the simulant
 //! \param visitedNodes Holds all visited pairs of nodes.
 bool AnnotatedGraph::covSimulatesRecursive(AnnotatedGraphNode *myNode,
-                               AnnotatedGraphNode *simNode,
-                               set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes,
-                               GraphFormulaCNF* myCovConstraint, GraphFormulaCNF* simCovConstraint) {
+                                           AnnotatedGraphNode *simNode,
+                                           set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes,
+                                           GraphFormulaCNF* myCovConstraint,
+                                           GraphFormulaCNF* simCovConstraint) {
 
     // checking, whether myNode simulates simNode; result is true, iff
     // 1) anno of simNode implies anno of myNode and
     // 2) myNode has each outgoing event of simNode, too
-    
+
     assert(myNode);
     assert(simNode);
 
@@ -761,7 +762,7 @@ bool AnnotatedGraph::covSimulatesRecursive(AnnotatedGraphNode *myNode,
     // compute annotations for coverability uses
     myNode->createCovAnnotation(myCovConstraint);
     simNode->createCovAnnotation(simCovConstraint);
-    
+
     // first we check implication of annotations: simNode -> myNode
     trace(TRACE_3, "\t\t checking annotations...\n");
     GraphFormulaCNF* simNodeCovAnnotationInCNF = simNode->getCovAnnotation()->getCNF();
@@ -791,8 +792,7 @@ bool AnnotatedGraph::covSimulatesRecursive(AnnotatedGraphNode *myNode,
 
     // now we check whether myNode has each outgoing event of simNode
     trace(TRACE_3, "\t\t checking edges...\n");
-    AnnotatedGraphNode::LeavingEdges::ConstIterator
-            simEdgeIter = simNode->getLeavingEdgesConstIterator();
+    AnnotatedGraphNode::LeavingEdges::ConstIterator simEdgeIter = simNode->getLeavingEdgesConstIterator();
 
     while (simEdgeIter->hasNext()) {
         AnnotatedGraphEdge* simEdge = simEdgeIter->getNext();
@@ -810,9 +810,10 @@ bool AnnotatedGraph::covSimulatesRecursive(AnnotatedGraphNode *myNode,
             trace(TRACE_4, "\t\t\t event present, going down\n");
 
             if (!covSimulatesRecursive(myEdge->getDstNode(),
-                                    simEdge->getDstNode(),
-                                    visitedNodes,
-                                    myCovConstraint, simCovConstraint)) {
+                                       simEdge->getDstNode(),
+                                       visitedNodes,
+                                       myCovConstraint,
+                                       simCovConstraint)) {
                 delete simEdgeIter;
                 return false;
             }
@@ -858,9 +859,9 @@ void AnnotatedGraph::filter(AnnotatedGraph *rhsOG) {
 //! \param myNode a node in the current OG
 //! \param rhsNode a node in the operand
 //! \param VisitedNodes a set of Nodes as a reminder of the already visited nodes; starts as empty
-void AnnotatedGraph::filterRecursive(AnnotatedGraphNode *myNode,
-                            AnnotatedGraphNode *rhsNode,
-                            set<AnnotatedGraphNode*> *VisitedNodes) {
+void AnnotatedGraph::filterRecursive(AnnotatedGraphNode* myNode,
+                                     AnnotatedGraphNode* rhsNode,
+                                     set<AnnotatedGraphNode*> *VisitedNodes) {
     trace(TRACE_5, "AnnotatedGraph::filterRecursive(...): begin\n");
 
     // nothing to be done
@@ -972,6 +973,52 @@ void AnnotatedGraph::filterRecursive(AnnotatedGraphNode *myNode,
 }
 
 
+void AnnotatedGraph::minimizeGraph() {
+
+    // preparing a set where each node is in one equivalence class, [1]
+    int numberOfClasses = 1;
+    map<AnnotatedGraphNode*, int> equivalenceClassOfNode;
+    nodes_t::const_iterator iNode;
+    for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
+        equivalenceClassOfNode[(*iNode)] = 1;
+    }
+    set<nodes_t> setOfEquivalenceClasses;
+    setOfEquivalenceClasses.insert(setOfNodes);
+
+    // iterators for the for-loops
+    set<nodes_t>::const_iterator currentClassIter;
+    nodes_t::const_iterator currentNodeIter;
+
+    bool somethingToDo = true;
+
+    // checking whether states in one class are really equivalent...
+    while (somethingToDo) {
+        somethingToDo = false;
+        
+        // take each equivalence class
+        for (currentClassIter = setOfEquivalenceClasses.begin();
+             currentClassIter != setOfEquivalenceClasses.end();
+             ++currentClassIter) {
+
+            // take each node in the equivalence class
+            for (currentNodeIter = (*currentClassIter).begin();
+                 currentNodeIter != (*currentClassIter).end();
+                 ++currentNodeIter) {
+
+                cout << (*currentNodeIter)->getName() << endl;
+                cout << equivalenceClassOfNode[(*iNode)] << endl;
+                
+                // sammle infos über ausgehende kanten
+                
+                // vergleiche jeden mit jedem bzgl ausgehenden kanten
+                
+                // splitte ggf die klasse und setze somethingToDo auf false
+            }
+        }
+    }
+}
+
+
 //! \brief checks, whether this AnnotatedGraph is acyclic
 //! \return true on positive check, otherwise: false
 bool AnnotatedGraph::isAcyclic() {
@@ -1005,15 +1052,14 @@ bool AnnotatedGraph::isAcyclic() {
 
                 // Return false if an outgoing transition points at a transitive parent node,
                 // else add the destination to the queue and update its transitive parent nodes
-                if (parentNodes[testNode].find(edge->getDstNode())
-                        != parentNodes[testNode].end()) {
+                if (parentNodes[testNode].find(edge->getDstNode()) != parentNodes[testNode].end()) {
                     delete edgeIter;
                     trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): end\n");
                     return false;
                 } else {
                     testNodes.push(edge->getDstNode());
                     parentNodes[edge->getDstNode()].insert(parentNodes[testNode].begin(),
-                                      parentNodes[testNode].end());
+                                                           parentNodes[testNode].end());
                 }
             }
         }
@@ -1079,9 +1125,9 @@ unsigned int AnnotatedGraph::numberOfServices() {
         // return the number of true assignments for this node's formula and simultaniously
         // fill the given list with those true assignments
         followers[(*iNode)] = processAssignmentsRecursively(labels,
-                                                         possibleAssignment,
-                                                         (*iNode),
-                                                         assignmentList);
+                                                            possibleAssignment,
+                                                            (*iNode),
+                                                            assignmentList);
 
         // create a temporary variable for a set of nodes
         set<AnnotatedGraphNode*> followerNodes;
@@ -1089,9 +1135,9 @@ unsigned int AnnotatedGraph::numberOfServices() {
         // for every true assignment in the list a set of nodes will be created. These are the nodes which are
         // reached by outgoing edges of which the labels were true in the assignment. This set is then saved in
         // a map for the currently proceeded node.
-        for (list<GraphFormulaAssignment>::iterator
-                assignment = assignmentList.begin(); assignment
-                != assignmentList.end(); assignment++) {
+        for (list<GraphFormulaAssignment>::iterator assignment = assignmentList.begin();
+             assignment != assignmentList.end();
+             assignment++) {
 
             followerNodes = set<AnnotatedGraphNode*>();
             for (set<string>::iterator label = labels.begin(); label
@@ -1141,10 +1187,10 @@ unsigned int AnnotatedGraph::numberOfServices() {
 //! \param instances number of already processed sets of active Nodes
 //! \return number of Services for the current set of active nodes
 unsigned int AnnotatedGraph::numberOfServicesRecursively(set<AnnotatedGraphNode*> activeNodes,
-                                                map<AnnotatedGraphNode*, unsigned int>& followers,
-                                                map<AnnotatedGraphNode*, list<set<AnnotatedGraphNode*> > >& validFollowerCombinations,
-                                                map<set<AnnotatedGraphNode*>, unsigned int>& eliminateRedundantCounting,
-                                                unsigned int& instances) {
+                                                         map<AnnotatedGraphNode*, unsigned int>& followers,
+                                                         map<AnnotatedGraphNode*, list<set<AnnotatedGraphNode*> > >& validFollowerCombinations,
+                                                         map<set<AnnotatedGraphNode*>, unsigned int>& eliminateRedundantCounting,
+                                                         unsigned int& instances) {
     if (instances % 10000== 0&& instances != 0) {
         if (instances > 100000) {
             return 0;

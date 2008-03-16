@@ -267,6 +267,8 @@ class AnnotatedGraph : public Graph {
         /// computes the number of Services determined by this OG
         unsigned int numberOfServices();
 
+        void minimizeGraph();
+
         /// tests if this OG is acyclic
         bool isAcyclic();
 

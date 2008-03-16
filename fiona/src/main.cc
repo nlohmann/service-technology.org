@@ -309,12 +309,52 @@ void reportOptionValues() {
 // **********************************************************************************
 
 
-//! \brief create a GasTex file of the given oWFN
-//! \param PN an oWFN to generate a GasTex file from
+//! \brief create a GasTex file of annotated dot file 'myDotFile'
+//! \param myDotFile the dot file with layout annotations
+//! \param myFilePrefix the file prefix to add '.tex' to
+void makeGasTex(std::string myDotFile, std::string myFilePrefix) {
+    trace(TRACE_1, "makeGasTex called for file: ");
+    trace(TRACE_1, myDotFile + "\n");
+    trace(TRACE_1, "prefix of the file is: ");
+    trace(TRACE_1, myFilePrefix + "\n");
+
+    string dotFileName = myDotFile;
+
+    dot_yylineno = 1;
+    dot_yydebug = 0;
+
+    dot_yyin = fopen((dotFileName).c_str(), "r");
+    if (!dot_yyin) {
+        cerr << "cannot open dot file '" << dotFileName << "' for reading'\n" << endl;
+        exit(4);
+    }
+    dot_yyparse();
+    fclose(dot_yyin);
+
+    string texFileName = myFilePrefix + ".tex";
+    fstream texFile(texFileName.c_str(), ios_base::out | ios_base::trunc);
+
+    for(int i = 0; i < texHeaderCount; i++) {
+        texFile << texHeader[i];
+    }
+
+    for(int i = 0; texBuffer[i] != ""; i++) {
+        texFile << texBuffer[i];
+    }
+
+    for (int i = 0; i < texFooterCount; i++) {
+        texFile << texFooter[i];
+    }
+    trace(TRACE_0, "\n" + texFileName + " generated\n");
+}
+
+
+//! \brief create a GasTex file of the given IG/OG
+//! \param graph the IG/OG to generate a GasTex file from
 void makeGasTex(CommunicationGraph* graph) {
-    
-    trace(TRACE_1, "Internal translation of the net into GasTex format...\n");
-    
+
+    trace(TRACE_1, "Internal translation of the graph into GasTex format...\n");
+
     string outfilePrefixWithOptions = options[O_OUTFILEPREFIX] ? outfilePrefix : graph->getFilename();
 
     if (!options[O_CALC_ALL_STATES]) {
@@ -330,7 +370,7 @@ void makeGasTex(CommunicationGraph* graph) {
             outfilePrefixWithOptions += ".IG";
         }
     }
-    
+
     string outFileName = outfilePrefixWithOptions + ".out";
 
     dot_yylineno = 1;
@@ -360,6 +400,7 @@ void makeGasTex(CommunicationGraph* graph) {
     for (int i = 0; i < texFooterCount; i++) {
         texFile << texFooter[i];
     }
+    trace(TRACE_0, (texFileName + " generated\n"));
 }
 
 
@@ -474,14 +515,13 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
     outfilePrefix += ".PV.sa";
 
     Graph* cleanPV = new Graph();
-    
+
     OG->transformToPublicView(cleanPV);
 
     // generate output files
     if (!options[O_NOOUTPUTFILES]) {
-    	
-    	if(cleanPV->numberOfNodes() > maxSizeForDot)
-    	{
+
+    	if(cleanPV->numberOfNodes() > maxSizeForDot) {
     		trace(TRACE_0, "the public view service automaton is to big to generate a dot file\n\n");
     	} else {
     		trace(TRACE_0, "generating dot output...\n");
@@ -489,7 +529,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
     		// .out
     		cleanPV->printDotFile(outfilePrefix, "public view of " + graphName);
     	}
-    	
+
         //transform to owfn
         PNapi::PetriNet* PVoWFN = new PNapi::PetriNet(); 
         PVoWFN->set_format(PNapi::FORMAT_OWFN, true);
@@ -498,7 +538,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
 		trace(TRACE_0, "Public View oWFN statistics:\n");
         trace(PVoWFN->information());
 		trace(TRACE_0, "\n");
-        
+
         ofstream output;
         const string owfnOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".PV.owfn";
         output.open (owfnOutput.c_str(),ios::out);
@@ -507,10 +547,10 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
         output.close();
 
         // modifizierte Überreste von Peter Laufers output des SA als og-file
-        
+
         // const string saOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".PV.sa";
         // OG->printOGFile(saOutput);
-        
+
         trace(TRACE_0, "=================================================================\n");
         trace(TRACE_0, "\n");
     }
@@ -522,21 +562,19 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
 string computeOG(oWFN* PN) {
 
     time_t seconds, seconds2;
+
     OG* graph = new OG(PN);
     bool controllable = false;
     string ogFilename = "";
-    
-    trace(TRACE_0, "building the operating guideline...\n");
-    seconds = time (NULL);
 
+    trace(TRACE_0, "building the operating guideline...\n");
     graph->printProgressFirst();
 
+    seconds = time (NULL);
     graph->buildGraph(); // build operating guideline
-
     seconds2 = time (NULL);
 
     trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
-
     cout << "    " << difftime(seconds2, seconds) << " s consumed for building graph" << endl;
 
     trace(TRACE_0, "\nnet is controllable: ");
@@ -596,7 +634,7 @@ string computeOG(oWFN* PN) {
 
         if (!options[O_EQ_R]) {	// don't create png if we are in eqr mode
         	graph->printGraphToDot(); // .out, .png
-        	
+
         	if (parameters[P_TEX]) {
         	    makeGasTex(graph);
         	}
@@ -607,7 +645,7 @@ string computeOG(oWFN* PN) {
         } else {
             ogFilename = graph->getFilename();
         }
-        
+
         if (!options[O_CALC_ALL_STATES]) {
             ogFilename += ".R";
         }
@@ -1119,12 +1157,15 @@ void makePNG(oWFN* PN) {
     // generate a string from the stream to be modified for piping
     string dotString = dot->str();
 
+    // remember unmodified string for .out file if wanted
+    string dotFileString = dotString;
+
     delete(dot);
 
     unsigned int position;
     unsigned int deletePosition;
 
-    trace(TRACE_3, "Modifiyng dot stream\n");
+    trace(TRACE_3, "Modifying dot stream\n");
 
     // delete all comments in the dot output of the PNapiNet, since the endlines will 
     // be deleted for echo piping and "//" comments won't work anymore
@@ -1154,8 +1195,8 @@ void makePNG(oWFN* PN) {
         }
     }
 
-    string outFileName;    
-    
+    string outFileName;
+
     if (!options[O_OUTFILEPREFIX]) {
         outFileName = globals::output_filename;
     } else {
@@ -1163,11 +1204,29 @@ void makePNG(oWFN* PN) {
     }
 
     // finish the string for the system call
-    dotString = "echo \"" + dotString + "\" | dot -q -Tpng -o \""
-            + outFileName + ".png\"";
+    dotString = "echo \"" + dotString + "\"";
+    dotString += " | dot -q -Tpng -o \"" + outFileName + ".png\"";
 
     // create the output
     if (!options[O_NOOUTPUTFILES]) {
+        if (parameters[P_TEX]) {
+            // writing .dot file which is skipped elsewise
+            // will later be annotated with layout info in .out file
+            string dotFileName = outFileName + ".dot";
+            string annotatedDotFileName = outFileName + ".out";
+            fstream dotFile(dotFileName.c_str(), ios_base::out | ios_base::trunc);
+            dotFile << dotFileString;
+            dotFile.close();
+            // annotate .dot file
+            system(("dot -Tdot " + dotFileName + " -o " + annotatedDotFileName).c_str());
+            // clean up
+            system(("rm -f " + dotFileName).c_str());
+            trace(TRACE_0, (annotatedDotFileName + " generated\n"));
+
+            // transforming .out file into gastex format
+            makeGasTex(annotatedDotFileName, outFileName);
+        }
+
         trace(TRACE_1, "Piping the stream to dot\n");
         system(dotString.c_str());
         trace(TRACE_0, (outFileName + ".png generated\n\n"));
@@ -1303,13 +1362,29 @@ int main(int argc, char** argv) {
 
 
     // **********************************************************************************
+    // ********                start dot file dependant operations               ********
+    // **********************************************************************************
+
+    if (parameters[P_GASTEX]) {
+        // if -t tex was called, then outfileprefix still contains file suffix
+
+        // remember suffix in dotFileName
+        string dotFileName = outfilePrefix;
+        // try to remove .out suffix
+        static const string dotFileSuffix = ".out";
+        if (outfilePrefix.substr(outfilePrefix.size() - dotFileSuffix.size()) == dotFileSuffix) {
+            outfilePrefix=outfilePrefix.substr(0, outfilePrefix.size() - dotFileSuffix.size());
+        }
+        makeGasTex(dotFileName, outfilePrefix);
+    }
+
+    // **********************************************************************************
     // ********                start OG file dependant operations                ********
     // ********                       (all OGs read first)                       ********
     // **********************************************************************************
 
-    if (options[O_PRODUCTOG] || options[O_SIMULATES_WITH_COV] || parameters[P_READ_OG] ||
-        options[O_SIMULATES] || (options[O_EX] && !options[O_BDD]) || options[O_FILTER]) 
-    {
+    if (options[O_PRODUCTOG] || options[O_SIMULATES_WITH_COV] || options[O_FILTER] ||
+        options[O_SIMULATES] || (options[O_EX] && !options[O_BDD]) || parameters[P_READ_OG]) {
 
         // reading all OG-files
         AnnotatedGraph::ogs_t OGsFromFiles;
@@ -1438,17 +1513,12 @@ int main(int argc, char** argv) {
             trace(TRACE_0, "NO\n\n");
         }
         // return 0;
-    }
-
-    else if (parameters[P_ADAPTER])
-    {
+    } else if (parameters[P_ADAPTER]) {
         generateAdapter();
-    }
-    else if (parameters[P_IG] || parameters[P_OG] || options[O_MATCH] || options[O_PNG] || parameters[P_PV]) 
-    {
+    } else if (parameters[P_IG] || parameters[P_OG] || options[O_MATCH] ||
+               options[O_PNG] || parameters[P_PV]) {
 
-        if (options[O_MATCH]) 
-        {
+        if (options[O_MATCH]) {
             assert(ogfiles.size() == 1);
             // we match multiple oWFNs with one OG,
             // so read the og first, then iterate over the nets

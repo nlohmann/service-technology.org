@@ -70,12 +70,12 @@ class Graph {
         
         /// transforms the service automaton to an OWFN recursively
         void transformToOWFNRecursively(GraphNode* currentNode,
-                                        set<GraphNode*>& visitedNodes,	
-        		   		set<string>& finalNodeNames,
-        		   		PNapi::PetriNet* PN, // The resulting petri net
-        		   		unsigned int& transitionNumber, // The current transition number
-        		   		PNapi::Transition* incomingTransition // The transition that leads to this node
-        		   	       );  
+                                        set<GraphNode*>& visitedNodes,
+                                        set<string>& finalNodeNames,
+                                        PNapi::PetriNet* PN, // The resulting petri net
+                                        unsigned int& transitionNumber, // The current transition number
+                                        PNapi::Transition* incomingTransition // The transition that leads to this node
+        );
 
     public:
 
@@ -92,8 +92,7 @@ class Graph {
         void makeNodeFinal(GraphNode* node);
 
         /// creates a new node in the graph
-        GraphNode* addNode(const std::string& nodeName,
-                           GraphNodeColor color = BLUE);
+        GraphNode* addNode(const std::string& nodeName, GraphNodeColor color = BLUE);
 
         /// creates a new edge in the graph
         void addEdge(const std::string& srcName,
@@ -129,7 +128,7 @@ class Graph {
         /// creates a dot output of the graph and calls dot to create an image from it
         void printDotFile(const std::string& filenamePrefix,
                           const std::string& dotGraphTitle) const;
-    
+
         /// tests if this OG is acyclic
         bool isAcyclic();
 

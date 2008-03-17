@@ -27,7 +27,7 @@ string tex_format(string str) {
         for(pos = 0; pos < str.length(); ++pos) {
             switch (str[pos]) {
         		case '\\':
-                    str.replace(pos, 1, "\\textbackslash ");
+                    str.replace(pos, 1, "\\backslash ");
                     pos += 1;
                     break;
                 case '{':
@@ -304,8 +304,11 @@ node_id: /* empty */
 edge_stmt: /* empty */
         node_id edgeRHS attr_list
             {
-                (*$$) = edge_stmt_str[0] + (*$1) + edge_stmt_str[1] + (*$2) + edge_stmt_str[2] + 
-                    ($3)->substr(($3)->find_first_of("{"), ($3)->find_first_of("}") - ($3)->find_first_of("{") + 1);
+//                (*$$) = edge_stmt_str[0] + (*$1) + edge_stmt_str[1] + (*$2) + edge_stmt_str[2] + 
+//                    ($3)->substr(($3)->find_first_of("{"), ($3)->find_first_of("}") - ($3)->find_first_of("{") + 1);
+                
+                (*$$) = edge_stmt_str[0] + (*$1) + edge_stmt_str[1] + (*$2) + edge_stmt_str[2];
+                (*$$) += ($3)->substr(($3)->find_first_of("{"), ($3)->find_last_of("}") - ($3)->find_first_of("{") + 1);
             }
 ;
 

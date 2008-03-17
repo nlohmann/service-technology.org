@@ -13,14 +13,15 @@ using namespace std;
 #include <string>
 #include <climits>
 
-const string a_list_label_str[2] = {"{", "}"};
+//const string a_list_label_str[2] = {"{", "}"};
+const string a_list_label_str[2] = {"{$\\mathsf{", "}$}"};
 const string a_list_pos_str[2] = {"(", ")"};
 const string a_list_bb_str[2] = {"[", "]"};
 const string node_stmt_str[2] = {"\t\\node(", ")"};
 const string node_stmt2_str[3] = {"\t\\node[Nw=", "](", ")"};
 const string edge_stmt_str[3] = {"\t\\drawedge(", ",", ")"};
 
-const int texHeaderCount = 29;
+const int texHeaderCount = 33;
 const string texHeader[texHeaderCount] = {
     "\\documentclass{article}\n",
     "\\usepackage{gastex}\n",
@@ -40,20 +41,22 @@ const string texHeader[texHeaderCount] = {
     "%\\put(0,0){\\framebox(150, 200){}}\n",
     "\n",
     "  \\gasset{linewidth=0.3}                            % line width\n",
-    "  \\gasset{ilength=7.65,iangle=129.47}               % arc to initial node\n",
-    "  \\gasset{Nw=7.0,Nh=7.0}                            % node width, node height\n",
-    "  \\gasset{Nmr=3.0}                                  %\n",
-    "  \\gasset{AHangle=25,AHLength=3.5,AHlength=2}       % arrow shape\n",
-    "  \\gasset{ELdist=1.5}                               % distance from edge to label\n",
+    "  \\gasset{ilength=5,iangle=130}                     % arc to initial node\n",
+    "  \\gasset{Nw=5.5,Nh=5.5}                            % node width, node height\n",
+    "  \\gasset{Nmr=4.0}                                  % maximum radius of a node\n",
+    "                                                     % (less than Nw/2 results in a rectangle)\n",
+    "  \\gasset{AHangle=25,AHLength=2.7,AHlength=1.8}     % arrow shape\n",
+    "  \\gasset{ELdist=1.5,ELside=r}                      % distance from edge to label, side of label\n",
     "  %\\gasset{ELpos=25}                                % position of edge label (0 = source, ..., 100 = des}\n",
     "\n",
     "  %\\drawedge[dash={2.0 2.0}{0.0},AHnb=0](n1,n2){ }  % a dashed line\n",
     "  %\\drawedge[\\curvedepth=3.0](n1,n2){ }             % a curved line\n",
+    "\n",
     "  %\\node[Nfill=y,fillgray=0.8](p32)(112.0,-42.0){ } % a grey node\n",
-    "\n"
+    "\n",
+    "  %\\node[Nw=6,Nh=6,Nmarks=r]                        % a final node\n",
+     "\n"
 };
-
-
 
 
 const int texFooterCount = 3;

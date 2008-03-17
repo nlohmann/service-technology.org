@@ -365,9 +365,9 @@ void makeGasTex(CommunicationGraph* graph) {
         outfilePrefixWithOptions += ".diag";
     } else {
         if (parameters[P_OG]) {
-            outfilePrefixWithOptions += ".OG";
+            outfilePrefixWithOptions += ".og";
         } else {
-            outfilePrefixWithOptions += ".IG";
+            outfilePrefixWithOptions += ".ig";
         }
     }
 
@@ -512,7 +512,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
     unsigned int maxSizeForDot = 120;
     
     outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
-    outfilePrefix += ".PV.sa";
+    outfilePrefix += ".pv.sa";
 
     Graph* cleanPV = new Graph();
 
@@ -540,7 +540,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
 		trace(TRACE_0, "\n");
 
         ofstream output;
-        const string owfnOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".PV.owfn";
+        const string owfnOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".pv.owfn";
         output.open (owfnOutput.c_str(),ios::out);
 
         (output) << (*PVoWFN);
@@ -548,7 +548,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
 
         // modifizierte Überreste von Peter Laufers output des SA als og-file
 
-        // const string saOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".PV.sa";
+        // const string saOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".pv.sa";
         // OG->printOGFile(saOutput);
 
         trace(TRACE_0, "=================================================================\n");

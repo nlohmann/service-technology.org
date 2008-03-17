@@ -713,33 +713,33 @@ void BddRepresentation::printDotFile(char** varNames, char* option) {
                 const char * prefix = outfilePrefix.c_str();
                 if (options[O_CALC_ALL_STATES]) {
                     sprintf(bufferMp,
-                            "dot -Tpng \"%s.OG.BDD_MP.out\" -o \"%s.OG.BDD_MP.png\"",
+                            "dot -Tpng \"%s.og.BDD_MP.out\" -o \"%s.og.BDD_MP.png\"",
                             prefix, prefix);
                     sprintf(bufferAnn,
-                            "dot -Tpng \"%s.OG.BDD_ANN.out\" -o \"%s.OG.BDD_ANN.png\"",
+                            "dot -Tpng \"%s.og.BDD_ANN.out\" -o \"%s.og.BDD_ANN.png\"",
                             prefix, prefix);
                 } else {
                     sprintf(bufferMp,
-                            "dot -Tpng \"%s.R.OG.BDD_MP.out\" -o \"%s.R.OG.BDD_MP.png\"",
+                            "dot -Tpng \"%s.R.og.BDD_MP.out\" -o \"%s.R.og.BDD_MP.png\"",
                             prefix, prefix);
                     sprintf(bufferAnn,
-                            "dot -Tpng \"%s.R.OG.BDD_ANN.out\" -o \"%s.R.OG.BDD_ANN.png\"",
+                            "dot -Tpng \"%s.R.og.BDD_ANN.out\" -o \"%s.R.og.BDD_ANN.png\"",
                             prefix, prefix);
                 }
             } else {
                 if (options[O_CALC_ALL_STATES]) {
                     sprintf(bufferMp,
-                            "dot -Tpng \"%s.OG.BDD_MP.out\" -o \"%s.OG.BDD_MP.png\"",
+                            "dot -Tpng \"%s.og.BDD_MP.out\" -o \"%s.og.BDD_MP.png\"",
                             PN->filename.c_str(), PN->filename.c_str());
                     sprintf(bufferAnn,
-                            "dot -Tpng \"%s.OG.BDD_ANN.out\" -o \"%s.OG.BDD_ANN.png\"",
+                            "dot -Tpng \"%s.og.BDD_ANN.out\" -o \"%s.og.BDD_ANN.png\"",
                             PN->filename.c_str(), PN->filename.c_str());
                 } else {
                     sprintf(bufferMp,
-                            "dot -Tpng \"%s.R.OG.BDD_MP.out\" -o \"%s.R.OG.BDD_MP.png\"",
+                            "dot -Tpng \"%s.R.og.BDD_MP.out\" -o \"%s.R.og.BDD_MP.png\"",
                             PN->filename.c_str(), PN->filename.c_str());
                     sprintf(bufferAnn,
-                            "dot -Tpng \"%s.R.OG.BDD_ANN.out\" -o \"%s.R.OG.BDD_ANN.png\"",
+                            "dot -Tpng \"%s.R.og.BDD_ANN.out\" -o \"%s.R.og.BDD_ANN.png\"",
                             PN->filename.c_str(), PN->filename.c_str());
                 }
             }
@@ -780,21 +780,21 @@ void BddRepresentation::printDotFile(char** varNames, char* option) {
                     const char * prefix = outfilePrefix.c_str();
                     if (options[O_CALC_ALL_STATES]) {
                         sprintf(bufferMpRed,
-                                "dot -Tpng %s.OG.BDD_MPRED.out -o %s.OG.BDD_MPRED.png",
+                                "dot -Tpng %s.og.BDD_MPRED.out -o %s.og.BDD_MPRED.png",
                                 prefix, prefix);
                     } else {
                         sprintf(bufferMpRed,
-                                "dot -Tpng %s.R.OG.BDD_MPRED.out -o %s.R.OG.BDD_MPRED.png",
+                                "dot -Tpng %s.R.og.BDD_MPRED.out -o %s.R.og.BDD_MPRED.png",
                                 prefix, prefix);
                     }
                 } else {
                     if (options[O_CALC_ALL_STATES]) {
                         sprintf(bufferMpRed,
-                                "dot -Tpng %s.OG.BDD_MPRED.out -o %s.OG.BDD_MPRED.png",
+                                "dot -Tpng %s.og.BDD_MPRED.out -o %s.og.BDD_MPRED.png",
                                 PN->filename.c_str(), PN->filename.c_str());
                     } else {
                         sprintf(bufferMpRed,
-                                "dot -Tpng %s.R.OG.BDD_MPRED.out -o %s.R.OG.BDD_MPRED.png",
+                                "dot -Tpng %s.R.og.BDD_MPRED.out -o %s.R.og.BDD_MPRED.png",
                                 PN->filename.c_str(), PN->filename.c_str());
                     }
                 }

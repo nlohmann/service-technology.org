@@ -127,8 +127,8 @@ void Exchangeability::loadBdd(std::string filename) {
     std::string bufferMp;
     std::string bufferAnn;
 
-    bufferMp = filename + ".OG.BDD_MP.cudd";
-    bufferAnn = filename + ".OG.BDD_ANN.cudd";
+    bufferMp = filename + ".og.BDD_MP.cudd";
+    bufferAnn = filename + ".og.BDD_ANN.cudd";
 
     FILE* fpMp;
     fpMp = fopen(bufferMp.c_str(), "r");
@@ -137,8 +137,8 @@ void Exchangeability::loadBdd(std::string filename) {
     fpAnn = fopen(bufferAnn.c_str(), "r");
 
     if (fpMp == NULL || fpAnn == NULL) {
-        bufferMp = filename + ".R.OG.BDD_MP.cudd";
-        bufferAnn = filename + ".R.OG.BDD_ANN.cudd";
+        bufferMp = filename + ".R.og.BDD_MP.cudd";
+        bufferAnn = filename + ".R.og.BDD_ANN.cudd";
 
         fpMp = fopen(bufferMp.c_str(), "r");
         fpAnn = fopen(bufferAnn.c_str(), "r");

@@ -437,9 +437,9 @@ void CommunicationGraph::printGraphToDot() {
             outfilePrefixWithOptions += ".diag";
         } else {
             if (parameters[P_OG]) {
-                outfilePrefixWithOptions += ".OG";
+                outfilePrefixWithOptions += ".og";
             } else {
-                outfilePrefixWithOptions += ".IG";
+                outfilePrefixWithOptions += ".ig";
             }
         }
 
@@ -666,15 +666,15 @@ void CommunicationGraph::printGraphToSTG() {
 
     if (parameters[P_OG]) {
         if (options[O_CALC_ALL_STATES]) {
-            buffer += ".OG.stg";
+            buffer += ".og.stg";
         } else {
-            buffer += ".R.OG.stg";
+            buffer += ".R.og.stg";
         }
     } else {
         if (options[O_CALC_ALL_STATES]) {
-            buffer += ".IG.stg";
+            buffer += ".ig.stg";
         } else {
-            buffer += ".R.IG.stg";
+            buffer += ".R.ig.stg";
         }
     }
 
@@ -713,10 +713,10 @@ void CommunicationGraph::printGraphToSTG() {
     // prepare Petrify command line for printing
     if (parameters[P_OG]) {
         buffer = string(HAVE_PETRIFY) + " " + PN->filename
-                 + ".OG.stg -dead -ip -o " + PN->filename + ".OG.pn";
+                 + ".og.stg -dead -ip -o " + PN->filename + ".og.pn";
     } else {
         buffer = string(HAVE_PETRIFY) + " " + PN->filename
-                 + ".IG.stg -dead -ip -o " + PN->filename + ".IG.pn";
+                 + ".ig.stg -dead -ip -o " + PN->filename + ".ig.pn";
     }
 
     // print commandline and execute system command
@@ -732,9 +732,9 @@ void CommunicationGraph::printGraphToSTG() {
     // the filename of the generated Petri net
     string generated_stg_file = PN->filename;
     if (parameters[P_OG]) {
-        generated_stg_file += ".OG.pn";
+        generated_stg_file += ".og.pn";
     } else {
-        generated_stg_file += ".IG.pn";
+        generated_stg_file += ".ig.pn";
     }
 
     std::cerr << "parsing file file `" << generated_stg_file << "'..." << std::endl;

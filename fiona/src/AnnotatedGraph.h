@@ -208,6 +208,9 @@ class AnnotatedGraph : public Graph {
         /// retruns true if the graph's root node is NULL
         bool hasNoRoot() const;
 
+        /// returns a vector containing all nodes that are always false
+        void findFalseNodes(std::vector<AnnotatedGraphNode*>* falseNodes);
+
         /// removes all nodes that are always false
         virtual void removeFalseNodes();
 

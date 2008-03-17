@@ -176,7 +176,11 @@ void AnnotatedGraph::removeFalseNodes() {
                 if (*iNode == getRoot()) {
                     setRoot(NULL);
                 }
-                AnnotatedGraphNode * n = *iNode; 
+                AnnotatedGraphNode * n = *iNode;
+                
+                trace(TRACE_1, "\n\t Removing node: " + n->getName());
+                trace(TRACE_2, "\n\t\t Annotation: " + n->getAnnotationAsString());
+                
                 iNode = setOfNodes.erase(iNode);
                 removeNode(n);
                 delete n;
@@ -188,9 +192,31 @@ void AnnotatedGraph::removeFalseNodes() {
             delete iNodeAssignment;
         }
     }
-
+    if (getRoot() == NULL) 
+    	trace(TRACE_0, "\n\n!!!Removed the root node!!!\n");
     trace(TRACE_5, "AnnotatedGraph::removeFalseNodes(): end\n");
 }
+
+//! \brief finds all nodes that have annotations that cannot become
+//!        true. The function continues removing until no node fullfils
+//!        the mentioned criterion
+void AnnotatedGraph::findFalseNodes(std::vector<AnnotatedGraphNode*>* falseNodes) {
+
+    trace(TRACE_5, "AnnotatedGraph::findFalseNodes(): start\n");
+
+        nodes_iterator iNode = setOfNodes.begin();
+
+        while (iNode != setOfNodes.end()) {
+            GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
+            if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
+                falseNodes->push_back(*iNode); 
+        }
+            ++iNode;
+    }
+    trace(TRACE_5, "AnnotatedGraph::findFalseNodes(): end\n");
+}
+
+
 
 //! \brief returns the name of the graph's source file
 std::string AnnotatedGraph::getFilename()

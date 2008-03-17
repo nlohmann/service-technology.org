@@ -692,6 +692,42 @@ string computeOG(oWFN* PN) {
 }
 
 
+void checkFalseAnnos(AnnotatedGraph* toCheck) {
+	trace(TRACE_0, "Checking '" + toCheck->getFilename() + "' for false annotations...");
+	std::vector<AnnotatedGraphNode*> falseNodes;
+	toCheck->findFalseNodes(&falseNodes);
+	if (falseNodes.size() == 0) {
+		trace(TRACE_0, "\n\t No false annotations found!");
+	}
+	else {
+		trace(TRACE_0, "\n\t False annotations found!");
+		std::vector<AnnotatedGraphNode*>::iterator it = falseNodes.begin();
+		while (it != falseNodes.end()) {
+			AnnotatedGraphNode* currentNode = *it;
+			trace(TRACE_1, "\n\t\t Node '" + currentNode->getName() + "' violates its annotation. "); 
+			trace(TRACE_2, "\n\t\t\t Annotation is: " + currentNode->getAnnotationAsString());
+			++it;
+		}
+	}
+	trace(TRACE_0, "\n\n");
+}
+
+
+void removeFalseAnnos(AnnotatedGraph* toCheck) {
+	if (!options[O_OUTFILEPREFIX]) {
+		cerr << "Error: \tNo output file given -> no output file will be generated. \n\tUse modus operandi 'checkfalseannos' \n\tor specify an output file with '-o filename'." << endl;
+		exit(1);
+	}
+	trace(TRACE_0, "Removing nodes from the OG read from '" + toCheck->getFilename() + "' that violate their own annotation...");
+	toCheck->removeFalseNodes();
+	trace(TRACE_0, "\nRemoved all false nodes.\n");
+	trace(TRACE_0, "\nCreating new .og-file without false nodes with prefix '" + outfilePrefix + "'.\n");
+	toCheck->printOGFile(outfilePrefix);
+	trace(TRACE_0, "File with prefix '" + outfilePrefix + "' succesfully created.\n\n");
+		
+}
+
+
 //! \brief create the productOG of all given OGs
 //! \param OGsFromFiles a list of all OGs for the product
 void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
@@ -1446,7 +1482,7 @@ int main(int argc, char** argv) {
     // ********                  (OGs read one after the other)                  ********
     // **********************************************************************************
 
-    else if (parameters[P_PV] || options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC]) {
+    else if (parameters[P_PV] || options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC] || parameters[P_CHECK_FALSE_ANNOS] || parameters[P_REMOVE_FALSE_ANNOS]) {
 
         // Abort if there are no OGs at all
         if (ogfiles.begin() == ogfiles.end() && !(parameters[P_PV])) {
@@ -1480,6 +1516,20 @@ int main(int argc, char** argv) {
                 checkAcyclicity(readOG, (*iOgFile));
                 delete readOG;
             }
+            
+            if (parameters[P_CHECK_FALSE_ANNOS]) {
+            	// checks if there are nodes in the og which violate the annotation
+            	checkFalseAnnos(readOG);
+            	delete readOG;
+            }
+
+            if (parameters[P_REMOVE_FALSE_ANNOS]) {
+            	// checks if there are nodes in the og which violate the annotation
+            	removeFalseAnnos(readOG);
+            	delete readOG;
+            }
+
+            
         }
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
         // Destroy buffer of OG parser.

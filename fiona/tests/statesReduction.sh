@@ -53,7 +53,7 @@ cmd1="$FIONA $owfn -t eqR -t IG"
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
 
-echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     equivalent=$?
 
 if [ $equivalent -ne 0 ]
@@ -75,7 +75,7 @@ cmd1="$FIONA $owfn -t eqR -t OG"
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
 
-echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     equivalent=$?
 
 if [ $equivalent -ne 0 ]
@@ -95,7 +95,7 @@ cmd1="$FIONA $owfn -t eqR -t IG"
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
 
-echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     equivalent=$?
 
 if [ $equivalent -ne 0 ]
@@ -115,7 +115,7 @@ cmd1="$FIONA $owfn -t eqR -t IG"
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
 
-echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     equivalent=$?
 
 if [ $equivalent -ne 0 ]
@@ -135,7 +135,7 @@ cmd1="$FIONA $owfn -t eqR -t IG"
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
 
-echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     equivalent=$?
 
 if [ $equivalent -ne 0 ]
@@ -155,7 +155,7 @@ cmd1="$FIONA $owfn -t eqR -t IG"
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
 
-echo $OUTPUT | grep "The two OGs characterize the same strategies." > /dev/null
+echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     equivalent=$?
 
 if [ $equivalent -ne 0 ]

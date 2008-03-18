@@ -26,14 +26,6 @@ GasTexEdge dummyEdge(NULL, NULL);	// for temporary storage of edge values
 int i;
 bool first_node = true;
 
-int label_length(string* str) {
-    int length;
-
-    length = str->substr(str->find_first_of("{"), str->find_first_of("}")).length();
-    
-    return (int)(length * char_width_ratio);
-}
-
 %}
 
 // Bison options
@@ -304,8 +296,7 @@ edge_a_list: /* empty */
             
 %%
 
-int dot_yyerror(string s)
-{
+int dot_yyerror(string s) {
   extern int dot_yylineno;	// defined and maintained in lex.c
   extern char *dot_yytext;	// defined and maintained in lex.c
   
@@ -314,8 +305,7 @@ int dot_yyerror(string s)
   exit(1);
 }
 
-int yyerror(char *s)
-{
+int yyerror(char *s) {
   return yyerror(string(s));
 }
 

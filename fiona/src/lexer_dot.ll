@@ -10,14 +10,6 @@
 #include "dot2tex.h"
 #include "syntax_dot.h"
 int dot_yyerror(char *s);
-
-string texBuffer[max_lines];
-
-int minx;
-int maxx;
-int miny;
-int maxy;
-
 %}
 
 literal     [a-zA-Z]

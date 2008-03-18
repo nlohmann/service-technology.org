@@ -18,10 +18,10 @@ extern GasTexGraph* gastexGraph;
 
 string texformat(string);
 
-const string node_stmt_str[7] = {"\t\\node[Nw=", ", Nmarks=", "](", ")(", ",", "){$\\mathsf{", "}$}"};
+const string node_stmt_str[7] = {"\t\\node[Nw=", ", Nmarks=", "](", ")(", ",", "){\\textsf{", "}}"};
 const string edge_stmt_str[4] = {"\t\\drawedge(", ",", "){$\\mathsf{", "}$}"};
 
-const int texHeaderCount = 33;
+const int texHeaderCount = 38;
 const string texHeader[texHeaderCount] = {
     "\\documentclass{article}\n",
     "\\usepackage{gastex}\n",
@@ -32,10 +32,11 @@ const string texHeader[texHeaderCount] = {
     "  \\makebox[0pt][l]{\\kern-.73em\\mbox{--}}%\n",
     "  \\makebox[0pt][l]{\\kern-.71em\\raisebox{.25ex}{--}}}}\n",
     "\n",
-    "\\begin{document}\n",
+    "\\newcommand\\msf[1]{{\\ensuremath{\\mathsf{#1}}}}\n",
     "\n",
+    "\\begin{document}\n",
     "\\begin{center}\n",
-    "\\begin{picture}(250, 0)(50, 200)\n",
+    "\\begin{picture}(150, 0)(0, 200)\n",
     "%\\begin{picture}(oben-links)(unten-rechts)\n",
     "%\\begin{picture}(max-X, min-Y)(min-X, max-Y)\n",
     "%\\put(0,0){\\framebox(150, 200){}}\n",
@@ -46,27 +47,35 @@ const string texHeader[texHeaderCount] = {
     "  \\gasset{Nmr=4.0}                                  % maximum radius of a node\n",
     "                                                     % (less than Nw/2 results in a rectangle)\n",
     "  \\gasset{AHangle=25,AHLength=2.7,AHlength=1.8}     % arrow shape\n",
-    "  \\gasset{ELdist=1.5,ELside=r}                      % distance from edge to label, side of label\n",
+    "  \\gasset{ELdist=1.3,ELside=r}                      % distance from edge to label, side of label\n",
     "  %\\gasset{ELpos=25}                                % position of edge label (0 = source, ..., 100 = des}\n",
     "\n",
     "  %\\drawedge[dash={2.0 2.0}{0.0},AHnb=0](n1,n2){ }  % a dashed line\n",
-    "  %\\drawedge[\\curvedepth=3.0](n1,n2){ }             % a curved line\n",
+    "  %\\drawedge[curvedepth=3.0](n1,n2){ }              % a curved line\n",
     "\n",
-    "  %\\node[Nfill=y,fillgray=0.8](p32)(112.0,-42.0){ } % a grey node\n",
+    "  %\\node[Nfill=y,fillgray=0.8](p32)(30,20){ }       % a grey node\n",
+    "  %\\node[Nfill=y,fillcolor=Blue](p33)(30,20){ }     % a blue node\n",
+    "  %\\node[Nframe=n](p34)(30,20){ }                   % a node without frame\n",
     "\n",
     "  %\\node[Nw=6,Nh=6,Nmarks=r]                        % a final node\n",
-     "\n"
+    "\n",
+    "% -------------------------------------------------------------------------------------------------------\n",
+    "\n"
 };
 
-const int texFooterCount = 3;
+const int texFooterCount = 6;
 const string texFooter[texFooterCount] = {
-    "\n\\end{picture}\n",
-    "\\end{center}\n\n",
-
-    "\\end{document}\n" 
+    "\n",
+    "% -------------------------------------------------------------------------------------------------------\n",
+    "\n",
+    "\\end{picture}\n",
+    "\\end{center}\n",
+    "\\end{document}\n"
 };
+
 
 const bool strip_command_sequence = true;
+
 const float char_width_ratio = 30.0;        // ratio between length of node label and node width
 const float scale_factor = .2;
 

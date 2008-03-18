@@ -8,8 +8,8 @@ string texformat(string str) {
     if (strip_command_sequence) {
         for(pos = 0; pos < str.length(); ++pos) {
             switch (str[pos]) {
-                        case '\\':
-                    str.replace(pos, 1, "\\backslash ");
+                case '\\':
+                    str.replace(pos, 1, "\\textbackslash ");
                     pos += 1;
                     break;
                 case '{':

@@ -19,7 +19,7 @@ extern GasTexGraph* gastexGraph;
 string texformat(string);
 
 const string node_stmt_str[7] = {"\t\\node[Nw=", ", Nmarks=", "](", ")(", ",", "){\\textsf{", "}}"};
-const string edge_stmt_str[4] = {"\t\\drawedge(", ",", "){$\\mathsf{", "}$}"};
+const string edge_stmt_str[4] = {"\t\\drawedge(", ",", "){\\textsf{", "}}"};
 
 const int texHeaderCount = 38;
 const string texHeader[texHeaderCount] = {

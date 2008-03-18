@@ -1,6 +1,6 @@
 \documentclass[a4paper,11pt]{article}
 
-% Letzte Änderungen von: $Author: weinberg $ am $Date: 2008-03-06 16:18:53 $
+% Letzte Änderungen von: $Author: weinberg $ am $Date: 2008-03-18 09:39:30 $
 % UEBERARBEITET VON JAN SUERMELI AM 29.02.2008
 
 \usepackage{url}
@@ -16,15 +16,15 @@
 \usepackage{moreverb}
 \usepackage{longtable}
 \setlength{\parindent}{0pt}
-\usepackage[pdftex,bookmarks=true,bookmarksnumbered=true]{hyperref}
-\hypersetup{
-    pdfauthor = {Daniela Weinberg},
-    pdftitle = {Guide to Fiona},
-    pdfsubject = {Fiona - Functional Interaction Analysis for Open Workflow Nets},
-    pdfkeywords = {},
-    pdfcreator = {LaTeX with hyperref package},
-    pdfproducer = {dvips + ps2pdf}
-}
+%\usepackage[pdftex,bookmarks=true,bookmarksnumbered=true]{hyperref}
+%\hypersetup{
+%    pdfauthor = {Daniela Weinberg},
+%    pdftitle = {Guide to Fiona},
+%    pdfsubject = {Fiona - Functional Interaction Analysis for Open Workflow Nets},
+%    pdfkeywords = {},
+%    pdfcreator = {LaTeX with hyperref package},
+%    pdfproducer = {dvips + ps2pdf}
+%}
 %\journal{DKE}
 
 %\setlength{\intextsep}{2mm}%{6mm plus 2mm minus 2mm}
@@ -87,15 +87,15 @@ part of the Tools4\textit{BPEL} project funded by the Bundesministerium für Bild
 \subsection{Introduction}\label{subsec:Introduction}
 
 \textsc{Fiona} is a tool to automatically analyze the interactional behavior of open workflow nets
-(\textit{oWFN}) [MRS05]. It provides the following techniques:
+(\textit{oWFN}) \cite{massuthe05_AMCT}. It provides the following techniques:
 
 \begin{itemize}
 \item It checks for the controllability of the given net by
-computing the interaction graph [Wei04].
-\item It calculates the operating guideline [MRS05] for the
+computing the interaction graph \cite{weinberg2004-DA}.
+\item It calculates the operating guideline \cite{massuthe05_AMCT} for the
 net.
 \item It matches an open workflow net (\textit{oWFN}) with an already existing
-operating guideline [MRS05].
+operating guideline \cite{massuthe05_AMCT}.
 \item It can do various calculations on operating guidelines, including checks for equality and
 equivalence, computing the product of two operating guidelines, computing the number of
 characterized services, simulating and filtering.
@@ -274,7 +274,6 @@ Command: \texttt{--show = <parameter>} or \texttt{-s <parameter>}
 
 Parameters:
 
-\sf
 \begin{longtable}{ll}
 \hline
 \texttt{allnodes }& show all nodes of the graph\\
@@ -290,7 +289,6 @@ Parameters:
 \texttt{deadlocks }& show all but transient states\\
 \hline
 \end{longtable}
-\rm
 \end{quote}
 
 \paragraph{ BDD Construction}
@@ -380,7 +378,7 @@ Parameters:
 \begin{quote}
 \begin{tabular}{ll}
 \hline
-\texttt{no-png} & \textsf{does not create a PNG file} \\
+\texttt{no-png} & does not create a PNG file \\
 \hline
 \end{tabular}
 \end{quote}
@@ -470,21 +468,21 @@ PRODUCE
 \end{verbatim}
 \end{quote}
 
-\subsubsection{Structure of the \textit{oWFN} file format}
+\subsubsection{Structure of the \textit{oWFN} file format}\label{subsubsec:oWFNFileFormat}
 The structure of a net is determined by its places, transitions and the edges in between them. In
 the oWFN-Format edges are not defined seperately. They are part of the transition definitions at
 the end of the file. An oWFN file consists of 4 sections:
 
 \begin{enumerate}
-\item place definitions
-\item initial marking
-\item final markings
-\item transition definitions
+\item place definitions (see~\ref{subsubsec:places})
+\item initial marking (see~\ref{subsubsec:initialMarking})
+\item final markings (see~\ref{subsubsec:finalMarkings})
+\item transition definitions (see~\ref{subsubsec:transitions})
 \end{enumerate}
 
 Comments in the oWFN code can be written in between \texttt{\{} and \texttt{\}}.
 
-\subsubsection{Places}
+\subsubsection{Places}\label{subsubsec:places}
 
 In the \texttt{PLACES} section the places of the net are specified. Here we distinguish between
 \texttt{INTERNAL}, \texttt{INPUT} and \texttt{OUTPUT} places. A \texttt{PLACES} section of a net
@@ -511,7 +509,7 @@ at the same time.
 The \texttt{PLACES} section is followed by the \texttt{INITIALMARKING} and \texttt{FINALMARKING} or
 \texttt{FINALCONDITION} sections, which are explained later on.
 
-\subsubsection{Transitions}
+\subsubsection{Transitions}\label{subsubsec:transitions}
 After the first three sections the transitions of the net including their incoming and outgoing
 edges are defined. The fourth section does not have a headline like the first three. Rather, there
 is one for each transition. A transition definition looks like this:
@@ -537,15 +535,15 @@ transition. Such a structure is called a loop. Any other transitions of the net 
 listed with the same syntax, thus starting with the \texttt{TRANSITION} keyword, followed by the
 name of the transition followed by the \texttt{CONSUME} and \texttt{PRODUCE} parts containing
 places, that must have been defined in the \texttt{PLACES} section beforehand. \texttt{CONSUME} and
-\texttt{PRODUCE} are allowed to be empty, thus representing a transition which is not in connected
-to the rest of the net in any way.
+\texttt{PRODUCE} are allowed to be empty, thus representing a transition which is not connected to
+the rest of the net at all.
 
-\subsubsection{Initial Marking}
-After the \texttt{PLACES} section comes the \texttt{INITIALMARKING} section. Every place which is
-not listed in the \texttt{INITIALMARKING} section is implicitly assumed to have zero tokens
+\subsubsection{Initial Marking}\label{subsubsec:initialMarking}
+The \texttt{PLACES} section is followed by the \texttt{INITIALMARKING} section. Every place which
+is not listed in the \texttt{INITIALMARKING} section is implicitly assumed to have zero tokens
 initially. If you want to create an initial state in which some places are marked, you have to list
 exactly those places in the \texttt{INITIALMARKING} section. Make sure that you specify the correct
-number of tokens of each place. \texttt{INITIALMARKING} section can look as follows:
+number of tokens of each place. The \texttt{INITIALMARKING} section can look as follows:
 \begin{quote}
 \begin{verbatim}
 INITIALMARKING
@@ -560,18 +558,18 @@ and finishing the section with a semicolon. If a place is listed without a colon
 corresponding number of tokens, the \textit{oWFN} file format implies the place is marked with one
 token.
 
-\subsubsection{Final Markings}
+\subsubsection{Final Markings}\label{subsubsec:finalMarkings}
 
 A final marking is defined either as a \texttt{FINALMARKING} or a \texttt{FINALCONDITION}. The main
-difference is that a \texttt{FINALMARKING} can only describe one final state while a
+difference is that a \texttt{FINALMARKING} can only describe one final state whereas the
 \texttt{FINALCONDITION} can describe multiple final states.
 \paragraph{Final Marking}
 
 The \texttt{FINALMARKING} section has the same syntax as the \texttt{INITIALMARKING} section. Thus
 one can list a number of places with a corresponding number of tokens. The final state described by
 a \texttt{FINALMARKING} is meant to be a state in which the marking exactly matches the described
-one, including not mentioned places as having a zero tokens. In the same way this means, that a
-\texttt{FINALMARKING} can only describe exactly one final state. A final marking looks like this:
+one, including not mentioned places as having zero tokens. This means, that a \texttt{FINALMARKING}
+can only describe exactly one final state. A final marking looks like this:
 \begin{quote}
 \begin{verbatim}
 FINALMARKING
@@ -610,10 +608,48 @@ FINALCONDITION
 \end{quote}
 
 All markings that fullfill the boolean formula are considered a final state of the oWFN. In this
-case it is  exactly the same finalstate, as defined by the \texttt{FINALMARKING} with \texttt{p2} containing four tokens
-and all other places zero.
-It can quickly become a nuisance to write or read such a formula, especially if the \textit{oWFN}s become big. That
-is why there is a keyword that can gather up most of the information.
+case it is  exactly the same finalstate, as defined by the \texttt{FINALMARKING} with \texttt{p2}
+containing four tokens and all other places zero. It can quickly become a nuisance to write or read
+such a formula, especially if the \textit{oWFN}s become big. That is why there are a few keywords
+to express different kind of empty places.
+
+\begin{itemize}
+\item \texttt{ALL\_OTHER\_INTERNAL\_PLACES\_EMPTY} requires only the internal places of the oWFN to be
+empty.
+\begin{quote}
+\begin{verbatim}
+FINALCONDITION
+  p1 = 1 AND ALL_INTERNAL_PLACES_EMPTY;
+\end{verbatim}
+\end{quote}
+\item \texttt{ALL\_OTHER\_EXTERNAL\_PLACES\_EMPTY} requires only the external places
+(non-internal or interface places) of the oWFN to be empty.
+\begin{quote}
+\begin{verbatim}
+FINALCONDITION
+  p2 = 4 AND ALL_EXTERNAL_PLACES_EMPTY;
+\end{verbatim}
+\end{quote}
+\item \texttt{ALL\_OTHER\_PLACES\_EMPTY} requires all places (regardless of their type) of the oWFN
+that are not explicitly mentioned in the \texttt{FINALCONDITION} to be empty.
+\begin{quote}
+\begin{verbatim}
+FINALCONDITION
+  p2 = 4 AND ALL_OTHER_PLACES_EMPTY;
+\end{verbatim}
+\end{quote}
+\end{itemize}
+
+All three keywords can be combined at will. Saying
+\begin{quote}
+\begin{verbatim}
+FINALCONDITION
+  p2 = 4 AND ALL_OTHER_INTERNAL_PLACES_EMPTY
+         AND ALL_OTHER_EXTERNAL_PLACES_EMPTY;
+\end{verbatim}
+\end{quote}
+
+is the same as
 \begin{quote}
 \begin{verbatim}
 FINALCONDITION
@@ -621,30 +657,8 @@ FINALCONDITION
 \end{verbatim}
 \end{quote}
 
-The meaning of this final condition is exactly the same as of the one mentioned before.
-If one requires only the internal places of his oWFN to be empty, one can use the
-keyword \texttt{ALL\_OTHER\_INTERNAL\_PLACES\_EMPTY}. Requiring the same for the external
-places only (that are all non-internal or interface places) can be achieved
-with the keyword \texttt{ALL\_OTHER\_EXTERNAL\_PLACES\_EMPTY}.
-
-All three keywords can be combined at will. Saying
-\begin{quote}
-\begin{verbatim}
-FINALCONDITION p2 = 4 AND ALL_OTHER_INTERNAL_PLACES_EMPTY
-                      AND ALL_OTHER_EXTERNAL_PLACES_EMPTY;
-\end{verbatim}
-\end{quote}
-
-is the same as
-\begin{quote}
-\begin{verbatim}
-FINALCONDITION p2 = 4 AND ALL_OTHER_PLACES_EMPTY;
-\end{verbatim}
-\end{quote}
-
-All three keywords can only be used as the right hand side of a conjunction
-with another state predicate while the whole conjunction is then again a state
-predicate. So the rule is
+All three keywords can only be used on the right hand side of a conjunction. The left hand side has
+to be another state predicate. The whole conjunction is then again a state predicate. The rule is:
 
 \begin{quote}
 \begin{verbatim}
@@ -653,31 +667,30 @@ statepredicate := statepredicate
 \end{verbatim}
 \end{quote}
 
-The scope of \texttt{ALL\_OTHER\_PLACES\_EMPTY} is the left hand side of state predicate of
-the above conjunction. All places that are not mentioned in the left hand side
-predicate are then required to be empty.
+The scope of \texttt{ALL\_OTHER\_PLACES\_EMPTY} is the state predicate on the left hand side of the
+conjunction above. All places that are not mentioned in that predicate are then required to be
+empty.
 
-For one to decide the scope of \texttt{ALL\_OTHER\_PLACES\_EMPTY}, it is crucial that one
-understands all bracing and precedence rules of state predicate formulas and
-that one can construct the fully braced form of his formula in his mind!
+In order to decide the scope of \texttt{ALL\_OTHER\_PLACES\_EMPTY}, it is crucial to understand all
+bracing and precedence rules of state predicate formulas and that one can construct the whole
+formula (including the correct bracketing) in his mind!
 
 Suppose a different oWFN with places \texttt{p1}, \texttt{p2}, \texttt{p3}, and \texttt{p4}. Then the formula:
 \begin{quote}
 \begin{verbatim}
 FINALCONDITION
-p1 = 1 AND ALL_OTHER_PLACES_EMPTY OR
-p2 = 1 AND ALL_OTHER_PLACES_EMPTY;
+  p1 = 1 AND ALL_OTHER_PLACES_EMPTY OR
+  p2 = 1 AND ALL_OTHER_PLACES_EMPTY;
 \end{verbatim}
 \end{quote}
-
 
 expands to:
 \begin{quote}
 
 \begin{verbatim}
 FINALCONDITION
-(p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0) OR
-(p2 = 1 AND p1 = 0 AND p3 = 0 AND p4 = 0);
+  (p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0) OR
+  (p2 = 1 AND p1 = 0 AND p3 = 0 AND p4 = 0);
 \end{verbatim}
 \end{quote}
 
@@ -687,7 +700,7 @@ In the same oWFN the formula
 \begin{quote}
 \begin{verbatim}
 FINALCONDITION
-p1 = 1 AND ALL_OTHER_PLACES_EMPTY AND p2 = 1;
+  p1 = 1 AND ALL_OTHER_PLACES_EMPTY AND p2 = 1;
 \end{verbatim}
 \end{quote}
 
@@ -695,7 +708,7 @@ expands to
 \begin{quote}
 \begin{verbatim}
 FINALCONDITION
-p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0 AND p2 = 1;
+  p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0 AND p2 = 1;
 \end{verbatim}
 \end{quote}
 
@@ -704,7 +717,7 @@ formula is:
 \begin{quote}
 \begin{verbatim}
 FINALCONDITION
-(((p1 = 1) AND ALL_OTHER_PLACES_EMPTY) AND (p2 = 1));
+  (((p1 = 1) AND ALL_OTHER_PLACES_EMPTY) AND (p2 = 1));
 \end{verbatim}
 \end{quote}
 
@@ -715,7 +728,7 @@ Putting it all together and removing redundant braces results in
 \begin{quote}
 \begin{verbatim}
 FINALCONDITION
-p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0 AND p2 = 1;
+  p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0 AND p2 = 1;
 \end{verbatim}
 \end{quote}
 
@@ -731,9 +744,8 @@ The same rules, of course, apply to \texttt{ALL\_OTHER\_INTERNAL\_PLACES\_EMPTY}
 
 \subsection{File Format OG}\label{subsec:FileFormatOG}
 
-\textsc{Fiona} can have the og file format as its input.
-
-The og file consists of 3 sections:
+\textsc{Fiona} accepts the \textit{og} file format as its input. The \textit{og} file consists of 3
+sections:
 
 \begin{enumerate}
 \item \texttt{NODES}
@@ -741,32 +753,33 @@ The og file consists of 3 sections:
 \item \texttt{TRANSITIONS}
 \end{enumerate}
 
-In the first section, all nodes of the graph are specified. Each definition
-contains the node's name and the boolean annotation of the node. Additionally
-a color for the node can be provided, which is either red or blue. Red nodes
-are those that are not part of the final operating guideline, but rather left
-over from building the operating guideline and have not been deleted yet for
-diagnosis reasons. Blue nodes are equal to colorless nodes and are part of the
-actual operating guideline. The different nodes are divided by commata, a
-semicolon finishes the section.
 
-Every node follows this syntax:
+\subsubsection{Nodes}\label{subsubsection:nodesOG}
+In the first section, all nodes of the graph are specified. Each definition contains the node's
+name and the boolean annotation of the node. Additionally a color for the node can be provided,
+which is either red or blue. Red nodes are those that are not part of the final operating
+guideline, but rather left over from building the operating guideline and have not been deleted yet
+for diagnosis reasons. Blue nodes are equal to colorless nodes and are part of the actual operating
+guideline. The different nodes are divided by commata, a semicolon finishes the section. Every node
+has the following syntax:
 \begin{quote}
 \begin{verbatim}
 nodeName:nodeAnnotation[:nodeColor]
 \end{verbatim}
 \end{quote}
 
-In the second section, one of the nodes is determined as \textit{root node} by its name,
-the section is finished by a semicolon:
+\subsubsection{Initial Node}\label{subsubsection:initialNodeOG}
+In the second section, one of the nodes is determined as the \textit{root node} by its name, the
+section is finished by a semicolon:
 \begin{quote}
 \begin{verbatim}
 nodeName
 \end{verbatim}
 \end{quote}
 
-In the last section all edges of the graph are specified. The different
-edges are divided by commata, a semicolon finishes the section. Every edge follows this syntax:
+\subsubsection{Transitions}\label{subsubsection:transitionsOG}
+In the last section all edges of the graph are specified. The different edges are divided by
+commata, a semicolon finishes the section. Every edge has the following syntax:
 
 \begin{quote}
 \begin{verbatim}
@@ -774,8 +787,8 @@ sourceNodeName -> targetNodeName:edgeAnnotation
 \end{verbatim}
 \end{quote}
 
-
-Here is an example for a valid og file:
+\subsubsection{Example \textit{og} file}\label{subsubsection:exampleFileOG}
+Here is an example of a valid \textit{og} file:
 \begin{quote}
 \begin{verbatim}
 NODES
@@ -808,8 +821,9 @@ TRANSITIONS
 \rm
 
 The interaction graph shows the states of the service, treating all inner states with the same
-further communication behaviour as equal. By analyzing the interaction graph controllability of
-the service can be efficiently decided. For more information on interaction graphs see [Wei04].
+further communication behaviour as equal. By analyzing the interaction graph controllability of the
+service can be efficiently decided. For more information on interaction graphs see
+\cite{weinberg2004-DA}.
 
 \subsection{Operating Guidelines}\label{subsec:OG}
 
@@ -835,9 +849,9 @@ the service can be efficiently decided. For more information on interaction grap
 
 The operating guideline of a service characterizes every possible behaviour of the service's
 environment that leads to a correct execution of the service, thus its termination. Any behaviour
-of an environment, that is a subgraph of the operating guideline, includes the root node and fullfills
-every nodes boolean annotation is a strategy for this service. For more detailed information on operating
-guidelines refer to [MRS05].
+of an environment, that is a subgraph of the operating guideline, includes the root node and
+fullfills every nodes boolean annotation is a strategy for this service. For more detailed
+information on operating guidelines refer to \cite{massuthe05_AMCT}.
 
 \newpage
 \section{Operating Guidelines}\label{sec:OG}
@@ -868,11 +882,10 @@ Examples can be taken from the \texttt{/tests/sequence\_suite} directory
 
 \subsection{Known Bugs}\label{subsec:KnownBugs}
 
-In the current version of Fiona are the following issues:
+In the current version of Fiona there are the following issues:
 
 \begin{description}
-    \item[Problem] The test suite in the current release does not pass all tests. The 'samples' and the 'bddtest' tests do not work properly.
-    \item[Solution] The test suite is going to be fixed.
+\item currently there are no documented bugs
 \end{description}
 
 
@@ -886,5 +899,8 @@ to answer your mail within a week.
 
 If you have other questions, comments or suggestions about \textsc{Fiona}, contact us via
 electronic mail to \url{weinberg@informatik.hu-berlin.de}.
+
+\bibliography{bibs}
+\bibliographystyle{alpha}
 
 \end{document}

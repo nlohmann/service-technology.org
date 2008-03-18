@@ -13,13 +13,13 @@ using namespace std;
 #include <string>
 #include <climits>
 
-//const string a_list_label_str[2] = {"{", "}"};
-const string a_list_label_str[2] = {"{$\\mathsf{", "}$}"};
-const string a_list_pos_str[2] = {"(", ")"};
-const string a_list_bb_str[2] = {"[", "]"};
-const string node_stmt_str[2] = {"\t\\node(", ")"};
-const string node_stmt2_str[3] = {"\t\\node[Nw=", "](", ")"};
-const string edge_stmt_str[3] = {"\t\\drawedge(", ",", ")"};
+class GasTexGraph;
+extern GasTexGraph* gastexGraph;
+
+string texformat(string);
+
+const string node_stmt_str[7] = {"\t\\node[Nw=", ", Nmarks=", "](", ")(", ",", "){$\\mathsf{", "}$}"};
+const string edge_stmt_str[4] = {"\t\\drawedge(", ",", "){$\\mathsf{", "}$}"};
 
 const int texHeaderCount = 33;
 const string texHeader[texHeaderCount] = {
@@ -58,7 +58,6 @@ const string texHeader[texHeaderCount] = {
      "\n"
 };
 
-
 const int texFooterCount = 3;
 const string texFooter[texFooterCount] = {
     "\n\\end{picture}\n",
@@ -68,21 +67,13 @@ const string texFooter[texFooterCount] = {
 };
 
 const bool strip_command_sequence = true;
-
-const double char_width_ratio = 1.0;  // ration between length of node label and node width
-const int max_lines = 1024;
-const double scale_factor = .2;
+const float char_width_ratio = 30.0;        // ratio between length of node label and node width
+const float scale_factor = .2;
 
 const int border_left = 10;
 const int border_right = 10;
 const int border_top = 10;
 const int border_bottom = 10;
 
-extern string texBuffer[max_lines];
-
-extern int minx;
-extern int maxx;
-extern int miny;
-extern int maxy;
-
 #endif // _DOT2TEX_H_
+

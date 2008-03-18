@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2008-03-18 11:18:00 $ by $Author: gierds $.
-# Version $Revision: 1.51 $
+# File last changed $Date: 2008-03-18 15:41:21 $ by $Author: danitz $.
+# Version $Revision: 1.52 $
 
 include $(top_srcdir)/Makefile.covcommon
 
@@ -37,7 +37,8 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         syntax_og.yy lexer_og.ll\
         syntax_stg.yy lexer_stg.ll \
         syntax_adapt_rules.yy lexer_adapt_rules.ll \
-        syntax_dot.yy lexer_dot.ll dot2tex.h \
+        syntax_dot.yy lexer_dot.ll \
+        dot2tex.h dot2tex.cc\
         PetriNetNode.h PetriNetNode.cc\
         IG.cc owfnPlace.cc CommunicationGraph.h\
         IG.h owfnPlace.h\
@@ -66,7 +67,8 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         AnnotatedGraph.h AnnotatedGraph.cc GraphFormula.h GraphFormula.cc \
         containers.h containers.cc\
 	adapter.h adapter.cc\
-        stg2owfn.cc set_helpers.h SinglyLinkedList.h
+        stg2owfn.cc set_helpers.h SinglyLinkedList.h\
+        GastexGraph.h GastexGraph.cc
 
 BUILT_SOURCES = lexer_owfn.h syntax_owfn.h syntax_og.h syntax_stg.h syntax_adapt_rules.h syntax_dot.h \
 		syntax_owfn.cc syntax_og.cc syntax_stg.cc syntax_adapt_rules.cc syntax_dot.cc

@@ -32,6 +32,7 @@
  */
 
 #include "AnnotatedGraph.h"
+#include "GastexGraph.h"
 #include "owfn.h"
 #include "state.h"
 #include "IG.h"
@@ -101,6 +102,9 @@ extern unsigned int State::state_count_stored_in_binDec;
 extern std::list<std::string> netfiles;
 extern std::list<std::string> ogfiles;
 extern AnnotatedGraph* OGToParse;
+
+// will be filled during parsing
+extern GasTexGraph* gastexGraph;
 
 // the currently considered owfn from the owfn list given by the command line;
 // used only in main.cc
@@ -328,23 +332,18 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix) {
         cerr << "cannot open dot file '" << dotFileName << "' for reading'\n" << endl;
         exit(4);
     }
+    
+    if (gastexGraph) {
+        delete gastexGraph;
+    }
+    gastexGraph = new GasTexGraph();
     dot_yyparse();
     fclose(dot_yyin);
 
     string texFileName = myFilePrefix + ".tex";
-    fstream texFile(texFileName.c_str(), ios_base::out | ios_base::trunc);
 
-    for(int i = 0; i < texHeaderCount; i++) {
-        texFile << texHeader[i];
-    }
+    gastexGraph->makeGasTex(texFileName);
 
-    for(int i = 0; texBuffer[i] != ""; i++) {
-        texFile << texBuffer[i];
-    }
-
-    for (int i = 0; i < texFooterCount; i++) {
-        texFile << texFooter[i];
-    }
     trace(TRACE_0, "\n" + texFileName + " generated\n");
 }
 
@@ -382,25 +381,19 @@ void makeGasTex(CommunicationGraph* graph) {
         exit(4);
     }
 
+    if (gastexGraph) {
+        delete gastexGraph;
+    }
+    gastexGraph = new GasTexGraph();
     dot_yyparse();
 
     fclose(dot_yyin);
 
     string texFileName = outfilePrefixWithOptions + ".tex";
-    fstream texFile(texFileName.c_str(), ios_base::out | ios_base::trunc);
+    
+    gastexGraph->makeGasTex(texFileName);
 
-    for(int i = 0; i < texHeaderCount; i++) {
-        texFile << texHeader[i];
-    }
-
-    for(int i = 0; texBuffer[i] != ""; i++) {
-        texFile << texBuffer[i];
-    }
-
-    for (int i = 0; i < texFooterCount; i++) {
-        texFile << texFooter[i];
-    }
-    trace(TRACE_0, (texFileName + " generated\n"));
+    trace(TRACE_0, "\n" + texFileName + " generated\n");
 }
 
 

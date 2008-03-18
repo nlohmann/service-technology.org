@@ -390,6 +390,115 @@ else
 fi
 
 
+############################################################################
+# myCoffee equivalence
+############################################################################
+
+nodes_soll=8
+edges_soll=23
+
+service="$DIR/myCoffee"
+cmd="$FIONA $service.owfn -t pv"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$service.owfn.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
+    nodes=$?
+
+    echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
+    edges=$?
+
+    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    then
+    echo   ... failed to build public view correctly
+    fi
+
+    result=`expr $result + $nodes + $edges`
+fi
+
+cmd="$FIONA $service.pv.owfn $service.owfn.og -t equivalence"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$service.sa.owfn.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... equivalence check of the service's and its public view's OGs failed.
+    fi
+fi
+
+
+############################################################################
+# 06-03-23_BPM06_shop_sect_3 equivalence
+############################################################################
+
+nodes_soll=13
+edges_soll=56
+
+service="$DIR/06-03-23_BPM06_shop_sect_3"
+cmd="$FIONA $service.owfn -t pv"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$service.owfn.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
+    nodes=$?
+
+    echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
+    edges=$?
+
+    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    then
+    echo   ... failed to build public view correctly
+    fi
+
+    result=`expr $result + $nodes + $edges`
+fi
+
+cmd="$FIONA $service.pv.owfn $service.owfn.og -t equivalence"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$service.sa.owfn.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... equivalence check of the service's and its public view's OGs failed.
+    fi
+fi
+
 
 ############################################################################
 

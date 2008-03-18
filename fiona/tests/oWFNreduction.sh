@@ -43,7 +43,7 @@ nodes_soll=76
 transitions_soll=73
 
 owfn="$DIR/060116-misc-coffee"
-cmd="$FIONA $owfn.owfn -t reduce -l 1"
+cmd="$FIONA $owfn.owfn -t reduce -p r1"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og.memcheck.log"
@@ -98,7 +98,7 @@ nodes_soll=63
 transitions_soll=70
 
 owfn="$DIR/060116-misc-coffee"
-cmd="$FIONA $owfn.owfn -t reduce -l 2"
+cmd="$FIONA $owfn.owfn -t reduce -p r2"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og.memcheck.log"
@@ -153,7 +153,7 @@ nodes_soll=62
 transitions_soll=67
 
 owfn="$DIR/060116-misc-coffee"
-cmd="$FIONA $owfn.owfn -t reduce -l 3"
+cmd="$FIONA $owfn.owfn -t reduce -p r3"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og.memcheck.log"
@@ -208,7 +208,7 @@ nodes_soll=55
 transitions_soll=62
 
 owfn="$DIR/060116-misc-coffee"
-cmd="$FIONA $owfn.owfn -t reduce -l 4"
+cmd="$FIONA $owfn.owfn -t reduce -p r4"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og.memcheck.log"
@@ -263,7 +263,7 @@ nodes_soll=53
 transitions_soll=62
 
 owfn="$DIR/060116-misc-coffee"
-cmd="$FIONA $owfn.owfn -t reduce -l 5"
+cmd="$FIONA $owfn.owfn -t reduce -p r5"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og.memcheck.log"

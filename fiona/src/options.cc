@@ -145,6 +145,8 @@ void print_help() {
   trace("\treadOG\t\t\t- only reads a given OG File\n");
   trace("\tpng\t\t\t- generate png files for all\n");
   trace("\t\t\t\t  given oWFNs\n");  
+  trace("\treduce\t\t\t- structurally reduce all\n");
+  trace("\t\t\t\t  given oWFNs\n");  
 //  trace("\ttex         - generate gastex files for a\n");
 //  trace("\t              given annotated dot file\n");  
   trace("\tisacyclic\t\t- check a given OG for cycles\n");
@@ -286,6 +288,7 @@ void parse_command_line(int argc, char* argv[]) {
 //    options[O_EQUALS] = false;
     options[O_FILTER] = false;
     options[O_OUTFILEPREFIX] = false;
+    options[O_REDUCE] = false;
     options[O_NOOUTPUTFILES] = false;
     options[O_COUNT_SERVICES] = false;
     options[O_CHECK_ACYCLIC] = false;
@@ -434,6 +437,10 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
                     options[O_PNG] = true;
+                } else if (lc_optarg == "reduce") {
+                    parameters[P_IG] = false;
+                    parameters[P_OG] = false;
+                    options[O_REDUCE] = true;
                 } else if (lc_optarg == "tex") {
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
@@ -647,7 +654,7 @@ void parse_command_line(int argc, char* argv[]) {
     }
 
     // read net from stdin
-    if (ogfiles.size() == 0 && netfiles.size() == 0 && (parameters[P_IG] || parameters[P_OG] || options[O_PNG])) {
+    if (ogfiles.size() == 0 && netfiles.size() == 0 && (parameters[P_IG] || parameters[P_OG] || options[O_PNG] || options[O_REDUCE])) {
         netfiles.push_back("<stdin>");
     }
 
@@ -674,7 +681,7 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
-    if ((options[O_PNG] || parameters[P_IG] || parameters[P_OG]) && netfiles.size() == 0) {
+    if ((options[O_PNG] || options[O_REDUCE]|| parameters[P_IG] || parameters[P_OG]) && netfiles.size() == 0) {
         cerr << "Error: \t No oWFNs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);

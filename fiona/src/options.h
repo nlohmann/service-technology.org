@@ -68,7 +68,8 @@ typedef enum {
     O_DISTRIBUTED,              //!< check for distributed controllability
     O_COUNT_SERVICES,           //!< 
     O_CHECK_ACYCLIC,            //!< 
-    O_PNG,                      //!< 
+    O_PNG,                      //!< graphical output of all given oWFNs
+    O_REDUCE,                   //!< reduce given oWFNs 
     O_DIAGNOSIS,                //!< diagnosis information
     O_PV_MULTIPLE_DEADLOCKS,    //!< 
     O_ADAPTER_FILE,             //!< file with adapter rules

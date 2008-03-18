@@ -1270,6 +1270,59 @@ void makePNG(oWFN* PN) {
 }
 
 
+//! \brief create a PNG of the given oWFN
+//! \param PN an oWFN to generate a PNG from
+void reduceOWFN(oWFN* PN) {
+
+    trace(TRACE_1, "Internal translation of the net into PNapi format...\n");
+
+    // translate the net into PNapi format
+    PNapi::PetriNet* PNapiNet = PN->returnPNapiNet();
+
+    // set strings needed in PNapi output
+    globals::output_filename = PN->filename;
+    if (PN->finalConditionString != "") {
+        globals::filename = PN->filename + " | Final Condition: "
+                + PN->finalConditionString;
+    } else {
+        globals::filename = PN->filename + " | Final Marking: "
+                + PN->finalMarkingString;
+    }
+
+    // set the output format to dot
+    PNapiNet->set_format(PNapi::FORMAT_OWFN, true);
+
+    trace(TRACE_1, "Performing structural reduction ...\n\n");
+
+    // calling the reduce funtcion of the pnapi with reduction level 5
+    PNapiNet->reduce();
+
+    string outFileName;
+
+    if (!options[O_OUTFILEPREFIX]) {
+        outFileName = globals::output_filename;
+    } else {
+        outFileName = outfilePrefix;
+    }
+
+    // create the output
+    if (!options[O_NOOUTPUTFILES]) {
+        PNapiNet->set_format(PNapi::FORMAT_OWFN, true);
+
+		trace(TRACE_0, "Reduced oWFN statistics:\n");
+        trace(PNapiNet->information());
+		trace(TRACE_0, "\n\n");
+
+        ofstream output;
+        const string owfnOutput = outFileName.erase((outFileName.size()-5), outFileName.size()) + ".reduced.owfn";
+        output.open (owfnOutput.c_str(),ios::out);
+
+        (output) << (*PNapiNet);
+        output.close();
+    }
+}
+
+
 //! \brief compute the number of strategies that are characterized by a given OG
 //! \param OG an og to compute the number of strategies for
 //! \param graphName a string with the name of the file, the og was taken from
@@ -1566,7 +1619,7 @@ int main(int argc, char** argv) {
     } else if (parameters[P_ADAPTER]) {
         generateAdapter();
     } else if (parameters[P_IG] || parameters[P_OG] || options[O_MATCH] ||
-               options[O_PNG] || parameters[P_PV]) {
+               options[O_PNG] || options[O_REDUCE] ||parameters[P_PV]) {
 
         if (options[O_MATCH]) {
             assert(ogfiles.size() == 1);
@@ -1638,7 +1691,12 @@ int main(int argc, char** argv) {
 	                // create a png file of the given net
 	                makePNG(PN);
 	            }
-	
+
+	            if (options[O_REDUCE]) {
+	                // create a png file of the given net
+	                reduceOWFN(PN);
+	            }
+
 	            if (options[O_EQ_R]) {
 	            	// reverse reduction mode for the next loop
 		        options[O_CALC_ALL_STATES] = !options[O_CALC_ALL_STATES];

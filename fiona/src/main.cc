@@ -1297,6 +1297,11 @@ void reduceOWFN(oWFN* PN) {
     // calling the reduce funtcion of the pnapi with reduction level 5
     PNapiNet->reduce();
 
+    // Statistics of the reduced oWFN
+    trace(TRACE_0, "Reduced oWFN statistics:\n");
+    trace(PNapiNet->information());
+	trace(TRACE_0, "\n\n");
+
     string outFileName;
 
     if (!options[O_OUTFILEPREFIX]) {
@@ -1308,10 +1313,6 @@ void reduceOWFN(oWFN* PN) {
     // create the output
     if (!options[O_NOOUTPUTFILES]) {
         PNapiNet->set_format(PNapi::FORMAT_OWFN, true);
-
-		trace(TRACE_0, "Reduced oWFN statistics:\n");
-        trace(PNapiNet->information());
-		trace(TRACE_0, "\n\n");
 
         ofstream output;
         const string owfnOutput = outFileName.erase((outFileName.size()-5), outFileName.size()) + ".reduced.owfn";

@@ -86,7 +86,6 @@ static struct option longopts[] = {
     { "reduce-nodes",    no_argument,       NULL, 'R' },
     { "reduceIG",        no_argument,       NULL, 'r' },
     { "messagebound",    required_argument, NULL, 'm' },
-    { "reductionlevel",  required_argument, NULL, 'l' },
     { "eventsmaximum",   required_argument, NULL, 'e' },
     { "BDD",             required_argument, NULL, 'b' },
     { "OnTheFly",        required_argument, NULL, 'B' },
@@ -97,7 +96,7 @@ static struct option longopts[] = {
     { NULL,              0,                 NULL, 0   }
 };
 
-const char* par_string = "hvd:t:s:p:Rrm:l:e:b:B:o:QM";
+const char* par_string = "hvd:t:s:p:Rrm:e:b:B:o:QM";
 
 
 // --------------------- functions for command line evaluation ------------------------
@@ -168,8 +167,6 @@ void print_help() {
   
   trace(" -m | --messagebound=<level> ... set maximum number of same messages per\n");
   trace("                                 state to <level>  (default is 1)\n");
-  trace(" -l | --reductionlevel=<level> . set a reduction level for mode \"-t reduce\"\n");
-  trace("                                 (range is 1-5, default is 5)\n");
 //  trace(" -e | --eventsmaximum=<level> .. set event to occur at most <level> times\n");
 //  trace("                                 (default is 1)\n");
 //  trace("                                 (-1 means disabling -e option, but is only\n");
@@ -223,6 +220,9 @@ void print_help() {
   trace("                                   no-png     - does not create a PNG file\n");
   trace("                                   diagnosis  - disables optimizations\n");
   trace("                                   autonomous - autonomous controllability\n");
+  trace("                                   r1 - r5    - set reduction level in mode\n");
+  trace("                                                \"-t reduce\" to to the \n");
+  trace("                                                specified value \n");
   trace(" -a | --adapterrules=<filename>  read adapter rules from <filename>\n");
   trace("\n");
   trace("\n");
@@ -491,6 +491,16 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if (lc_optarg == "single") {
                 	parameters[P_SINGLE] = true;
                 	parameters[P_REPRESENTATIVE] = false;
+                } else if (string(optarg) == "r1") {
+                    globals::reduction_level = 1;
+                } else if (string(optarg) == "r2") {
+                    globals::reduction_level = 2;
+                } else if (string(optarg) == "r3") {
+                    globals::reduction_level = 3;
+                } else if (string(optarg) == "r4") {
+                    globals::reduction_level = 4;
+                } else if (string(optarg) == "r5") {
+                    globals::reduction_level = 5;
                 } else {
                     cerr << "Error:\twrong parameter (option -p)" << endl
                     << "\tEnter \"fiona --help\" for more information.\n" << endl;
@@ -502,24 +512,6 @@ void parse_command_line(int argc, char* argv[]) {
                 options[O_MESSAGES_MAX] = true;
                 testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary("-m", optarg);
                 messages_manual = atoi(optarg);
-                break;
-            case 'l':
-                if (string(optarg) == "1") {
-                    globals::reduction_level = 1;
-                } else if (string(optarg) == "2") {
-                    globals::reduction_level = 2;
-                } else if (string(optarg) == "3") {
-                    globals::reduction_level = 3;
-                } else if (string(optarg) == "4") {
-                    globals::reduction_level = 4;
-                } else if (string(optarg) == "5") {
-                    globals::reduction_level = 5;
-                } else {
-                    cerr << "Error:\twrong reduction level" << endl
-                         << "\tEnter \"fiona --help\" for more information.\n"
-                         << endl;
-                    exit(1);
-                }
                 break;
             case 'e':
                 options[O_EVENT_USE_MAX] = true;

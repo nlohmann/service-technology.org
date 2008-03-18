@@ -2,6 +2,7 @@
 
 ############################################################################
 # Copyright 2007 Peter Laufer                                              #
+# Copyright 2008 Peter Massuthe                                            #
 #                                                                          #
 #                                                                          #
 # This file is part of Fiona.                                              #
@@ -47,7 +48,7 @@ nodes_soll=4
 edges_soll=4
 
 og="$DIR/1stFix.og"
-cmd="$FIONA $og -t PV"
+cmd="$FIONA $og -t pv"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -69,7 +70,7 @@ else
 
     if [ $nodes -ne 0 -o $edges -ne 0 ]
     then
-    echo   ... failed to build PVSA correctly
+    echo   ... failed to build public view correctly
     fi
 
     result=`expr $result + $nodes + $edges`
@@ -84,7 +85,7 @@ nodes_soll=5
 edges_soll=6
 
 og="$DIR/2ndFixA.og"
-cmd="$FIONA $og -t PV"
+cmd="$FIONA $og -t pv"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -106,7 +107,7 @@ else
 
     if [ $nodes -ne 0 -o $edges -ne 0 ]
     then
-    echo   ... failed to build PVSA correctly
+    echo   ... failed to build public view correctly
     fi
 
     result=`expr $result + $nodes + $edges`
@@ -121,7 +122,7 @@ nodes_soll=4
 edges_soll=4
 
 og="$DIR/2ndFixB.og"
-cmd="$FIONA $og -t PV"
+cmd="$FIONA $og -t pv"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -143,7 +144,7 @@ else
 
     if [ $nodes -ne 0 -o $edges -ne 0 ]
     then
-    echo   ... failed to build PVSA correctly
+    echo   ... failed to build public view correctly
     fi
 
     result=`expr $result + $nodes + $edges`
@@ -157,7 +158,7 @@ nodes_soll=6
 edges_soll=5
 
 og="$DIR/3rdFix.og"
-cmd="$FIONA $og -t PV"
+cmd="$FIONA $og -t pv"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -179,7 +180,7 @@ else
 
     if [ $nodes -ne 0 -o $edges -ne 0 ]
     then
-    echo   ... failed to build PVSA correctly
+    echo   ... failed to build public view correctly
     fi
 
     result=`expr $result + $nodes + $edges`
@@ -194,7 +195,7 @@ nodes_soll=4
 edges_soll=4
 
 og="$DIR/2ndFixB.owfn"
-cmd="$FIONA $og -t PV"
+cmd="$FIONA $og -t pv"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -216,7 +217,7 @@ else
 
     if [ $nodes -ne 0 -o $edges -ne 0 ]
     then
-    echo   ... failed to build PVSA correctly
+    echo   ... failed to build public view correctly
     fi
 
     result=`expr $result + $nodes + $edges`
@@ -230,7 +231,7 @@ nodes_soll=6
 edges_soll=5
 
 og="$DIR/3rdFix.owfn"
-cmd="$FIONA $og -t PV"
+cmd="$FIONA $og -t pv"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -252,7 +253,7 @@ else
 
     if [ $nodes -ne 0 -o $edges -ne 0 ]
     then
-    echo   ... failed to build PVSA correctly
+    echo   ... failed to build public view correctly
     fi
 
     result=`expr $result + $nodes + $edges`
@@ -266,7 +267,7 @@ nodes_soll=4
 edges_soll=4
 
 og="$DIR/1stFix.og"
-cmd="$FIONA $og -t PV --multipledeadlocks"
+cmd="$FIONA $og -t pv --multipledeadlocks"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -288,7 +289,7 @@ else
 
     if [ $nodes -ne 0 -o $edges -ne 0 ]
     then
-    echo   ... failed to build PVSA correctly
+    echo   ... failed to build public view correctly
     fi
 
     result=`expr $result + $nodes + $edges`
@@ -303,7 +304,7 @@ nodes_soll=5
 edges_soll=6
 
 og="$DIR/2ndFixA.og"
-cmd="$FIONA $og -t PV --multipledeadlocks"
+cmd="$FIONA $og -t pv --multipledeadlocks"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -325,7 +326,7 @@ else
 
     if [ $nodes -ne 0 -o $edges -ne 0 ]
     then
-    echo   ... failed to build PVSA correctly
+    echo   ... failed to build public view correctly
     fi
 
     result=`expr $result + $nodes + $edges`
@@ -342,7 +343,7 @@ nodes_soll=46
 edges_soll=151
 
 service="$DIR/complexPV"
-cmd="$FIONA $service.owfn -t PV"
+cmd="$FIONA $service.owfn -t pv"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -360,13 +361,13 @@ else
 
     if [ $nodes -ne 0 -o $edges -ne 0 ]
     then
-    echo   ... failed to build PVSA correctly
+    echo   ... failed to build public view correctly
     fi
 
     result=`expr $result + $nodes + $edges`
 fi
 
-cmd="$FIONA $service.PV.owfn $service.owfn.og -t equivalence"
+cmd="$FIONA $service.pv.owfn $service.owfn.og -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -379,7 +380,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    
+
     echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then

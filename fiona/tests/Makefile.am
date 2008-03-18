@@ -125,7 +125,8 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              bdd_ref/phcontrol4.unf_reference.owfn.OG.png \
              bdd_ref/sequence3_reference.owfn.OG.png \
              oWFNreduction/060116-misc-coffee.owfn \
-             oWFNreduction/phcontrol10.unf.owfn \
+             oWFNreduction/phcontrol5.unf.owfn \
+             oWFNreduction/06-03-23_BPM06_shop_sect_6.owfn \
              philosophers/phcontrol10.unf.owfn \
              philosophers/phcontrol3.unf.owfn \
              philosophers/phcontrol4.unf.owfn \

@@ -1295,7 +1295,7 @@ void reduceOWFN(oWFN* PN) {
     trace(TRACE_1, "Performing structural reduction ...\n\n");
 
     // calling the reduce funtcion of the pnapi with reduction level 5
-    PNapiNet->reduce();
+    PNapiNet->reduce(globals::reduction_level);
 
     // Statistics of the reduced oWFN
     trace(TRACE_0, "Reduced oWFN statistics:\n");

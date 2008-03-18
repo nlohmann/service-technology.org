@@ -22,7 +22,7 @@
 include $(top_srcdir)/Makefile.covcommon
 
 TESTS = slist.sh png.sh syntax.sh formula.sh extrema.sh messages.sh cyclic.sh \
-        matching.sh sim_og.sh productog.sh publicview.sh \
+        matching.sh sim_og.sh productog.sh publicview.sh oWFNreduction.sh \
         sequences.sh partner.sh countservices.sh samples.sh bddtest.sh \
 	statesReduction.sh
 
@@ -124,6 +124,8 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              bdd_ref/sequence3_reference.owfn.OG.BDD_MP.cudd \
              bdd_ref/phcontrol4.unf_reference.owfn.OG.png \
              bdd_ref/sequence3_reference.owfn.OG.png \
+             oWFNreduction/060116-misc-coffee.owfn \
+             oWFNreduction/phcontrol10.unf.owfn \
              philosophers/phcontrol10.unf.owfn \
              philosophers/phcontrol3.unf.owfn \
              philosophers/phcontrol4.unf.owfn \
@@ -154,6 +156,10 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              publicview/3rdFix.owfn \
              publicview/complexPV.owfn \
              publicview/complexPV.owfn.og \
+             publicview/myCoffee.owfn \
+             publicview/myCoffee.owfn.og \
+             publicview/06-03-23_BPM06_shop_sect_3.owfn \
+             publicview/06-03-23_BPM06_shop_sect_3.owfn.og \
              partner/sequence3.owfn \
              partner/sequence3-partner.expected.owfn \
              countservices/acyclic.og \

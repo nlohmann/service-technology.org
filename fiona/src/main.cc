@@ -777,13 +777,15 @@ void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 //! \param PN an oWFN to matched against an og
 void checkMatching(AnnotatedGraph* OGToMatch, oWFN* PN) {
     string reasonForFailedMatch;
+    trace(TRACE_0, ("matching " + PN->filename + " with " + (OGToMatch->getFilename())+ "...\n\n"));
     if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
+    	trace(TRACE_1, "\n");
         trace(TRACE_0, "oWFN matches with OG: YES\n\n");
     } else {
-        trace(TRACE_0, "oWFN matches with OG: NO\n");
+    	trace(TRACE_1, "\n");
         trace(TRACE_0, "Match failed: " +reasonForFailedMatch + "\n\n");
+        trace(TRACE_0, "oWFN matches with OG: NO\n\n");
     }
-    delete OGToMatch;
 }
 
 
@@ -1718,6 +1720,7 @@ int main(int argc, char** argv) {
 	        }
         }
 
+       
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
         // Delete lexer buffer for parsing oWFNs.
         // Must NOT be called before fclose(owfn_yyin);

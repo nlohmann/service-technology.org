@@ -2866,10 +2866,9 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
             //       mit nem anderen OG-knoten
             //       dann muss doch trotzdem was überprüft werden, oder???
             
-            cout << "markierung [" << getCurrentMarkingAsString();
-            cout << "] schon gesehen," << endl;
-            cout << "  backtracking bei Knoten " << currentOGNode->getName();
-            cout << " mit anno " << currentOGNode->getAnnotationAsString() << endl;
+        	trace(TRACE_2, "marking[" + getCurrentMarkingAsString() + "] already seen,\n");
+        	trace(TRACE_2, "  backtracking at node " + currentOGNode->getName());
+        	trace(TRACE_2, " with annotation " + currentOGNode->getAnnotationAsString() + "\n");
             
             // We have already seen the state we just reaching by firing
             // the transition above. So we have to revert to the state that
@@ -2902,7 +2901,7 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
             // The state we reached by firing the above transition is new.
             // So we have to initialize this newly seen state.
 
-            cout << "neue markierung [" << getCurrentMarkingAsString() << "]" << endl;
+        	trace(TRACE_1, "new marking [" + getCurrentMarkingAsString() + "]\n");
             
             newState = binInsert(this);
             newState->firelist = firelist();
@@ -2986,9 +2985,9 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
 
             return false;
         } else {
-            cout << "markierung [" << getCurrentMarkingAsString() << "] erfüllt";
-            cout << " anno " << currentOGNode->getAnnotationAsString();
-            cout << " von Knoten " << currentOGNode->getName() << endl;
+        	trace(TRACE_4, "marking [" + getCurrentMarkingAsString() + "] satisfied\n");
+        	trace(TRACE_4, "  annotation " + currentOGNode->getAnnotationAsString());
+        	trace(TRACE_4, " of node " + currentOGNode->getName() + "\n");
         }
     }
 

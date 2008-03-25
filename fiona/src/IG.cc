@@ -108,7 +108,10 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
     if (options[O_CALC_REDUCED_IG]) {
     	// build up the reduced interaction graph
     	// rules applied: "combine receiving events" + "receiving before sending"
-    	receivingEvents = combineReceivingEvents(currentNode, sendingEvents);
+/*    	receivingBeforeSending(currentNode, sendingEvents);
+    	combineReceivingEvents(currentNode, receivingEvents);
+    	*/
+    	reduce(currentNode, sendingEvents, receivingEvents);
     } else {
     	// build up the interaction graph without applying reduction rules
     	getActivatedEventsComputeCNF(currentNode, sendingEvents, receivingEvents);
@@ -749,309 +752,187 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 // reduction rules
 /////////////////////////////////////////////////////////////////////////////////////////////
 
+void interactionGraph::reduce(AnnotatedGraphNode*  node, setOfMessages& sendingEvents, setOfMessages& receivingEvents) {
+	
+	StateSet::iterator iter;	// iterator over all states of the current node
+		StateSet::iterator iterEnd; // end of iterator iter
+		    
+		
+		if (!options[O_CALC_ALL_STATES]) { // in case of the state reduced graph
+			iter = setOfStatesStubbornTemp.begin();
+			iterEnd = setOfStatesStubbornTemp.end();
+		}
+
+		else {
+			iter = node->reachGraphStateSet.begin();
+			iterEnd = node->reachGraphStateSet.end();
+		}
+
+		for (iter; iter != iterEnd; iter++) {
+			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) { // we just consider the maximal states only
+
+		           // this clause's first literal
+		            GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
+					unsigned int i = 0;
+
+				// Call the reduction rules on the state. 
+				receivingBeforeSending(iter, myclause, sendingEvents); // computes the sending events
+				combineReceivingEvents(iter, myclause, receivingEvents, node); // computes the receiving events
+					
+				// in case of a final state we add special literal "final" to the clause
+	                if ((*iter)->type == FINALSTATE) {
+	                    node->hasFinalStateInStateSet = true;
+	                    GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
+	                    myclause->addSubFormula(myliteral);
+	                }
+
+	                node->addClause(myclause);
+			}
+	
+		}
+		
+}
+
+void interactionGraph::receivingBeforeSending(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& sendingEvents) {
+	trace(TRACE_5, "interactionGraph::sendBeforeReceiving(AnnotatedGraphNode * node): start\n");
+			unsigned int i = 0;
+			while (!stateActivatesOutputEvents(*iter) &&(*iter)->quasiFirelist&&(*iter)->quasiFirelist[i]) {
+				for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin(); 
+				index != (*iter)->quasiFirelist[i]->messageSet.end(); 
+				index++ ) {
+
+					messageMultiSet input; // multiset holding one input message
+					input.insert(*index);
+
+					sendingEvents.insert(input);
+
+					GraphFormulaLiteral
+					* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+					myclause->addSubFormula(myliteral);
+				}
+				i++;
+			}			
+    
+    trace(TRACE_5, "interactionGraph::sendBeforeReceiving(AnnotatedGraphNode * node): end\n");
+}
+
+
+
 //! \brief creates a list of all receiving events of the current node and creates the set of
 //!	       sending events applies the reduction rules: "combine receiving events" and 
 //!        "receiving before sending"
 //! \param node the node for which the activated receiving and sending events are calculated
 //! \param sendingEvents set of sending events that are activated in the current node
 //! \fn setOfMessages interactionGraph::combineReceivingEvents(AnnotatedGraphNode * node, setOfMessages & inputMessages)
-setOfMessages interactionGraph::combineReceivingEvents(AnnotatedGraphNode* node,
-                                                       setOfMessages& sendingEvents) {
+void interactionGraph::combineReceivingEvents(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause,
+		setOfMessages& receivingEvents, AnnotatedGraphNode* node) {
+
+	trace(TRACE_5, "interactionGraph::combineReceivingEvents(AnnotatedGraphNode * node): start\n");
+
+	// remember those states that activate a receiving event
+	std::vector<StateSet::iterator> statesVector; 
+	messageMultiSet receivingEvent; // multiset of the receiving event of the current state
+	bool found = false;
+	bool skip = false;
+	messageMultiSet outputMessages; // multiset of all input messages of the current state
+
+	(*iter)->decode(PN);
+
+	for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
+
+		if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {
+			for (unsigned int z = 0; z < PN->CurrentMarking[i]; z++) {
+				outputMessages.insert(i);
+			}
+
+			found = true;
+		}
+	}
+
+	bool subset = false;
+	bool supset = false;
+
+	string label;
+
+	if (found) {
+
+		for (setOfMessages::iterator
+				iter1 = receivingEvents.begin(); iter1
+				!= receivingEvents.end(); iter1++) {
+
+			subset = false;
+
+			for (messageMultiSet::iterator tmp2 = (*iter1).begin(); tmp2 != (*iter1).end(); tmp2++) {
+				if (outputMessages.count(*tmp2) >= (*iter1).count(*tmp2)) {
+					subset = true;
+				} else {
+					subset = false;
+					break;
+				}
+			}
+
+			if (subset) {
+				label = PN->createLabel(*iter1);
+				break;
+			}
+		}
+
+		if (!subset) {
+			for (setOfMessages::iterator
+					iter1 = receivingEvents.begin(); iter1
+					!= receivingEvents.end(); iter1++) {
+
+				supset = false;
+
+				for (messageMultiSet::iterator
+						tmp2 = outputMessages.begin(); tmp2
+						!= outputMessages.end(); tmp2++) {
+					if (outputMessages.count(*tmp2) <= (*iter1).count(*tmp2)) {
+						supset = true;
+					} else {
+						supset = false;
+						break;
+					}
+				}
+				if (supset) {
+
+					node->getAnnotation()->removeLiteralForReal(PN->createLabel(*iter1));
+
+					receivingEvents.erase(iter1);
+					label = PN->createLabel(outputMessages);
+
+					break;
+				}
+			}
+
+			if (supset) {
+				GraphFormulaLiteral
+				* myliteral = new GraphFormulaLiteral(label);
+				myclause->addSubFormula(myliteral);
+				receivingEvents.insert(outputMessages);
+			}
+		} else {
+			GraphFormulaLiteral
+			* myliteral = new GraphFormulaLiteral(label);
+			myclause->addSubFormula(myliteral);
+		}
+
+		if (!subset && !supset) {
+			receivingEvents.insert(outputMessages);
+
+			GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->createLabel(outputMessages));
+			myclause->addSubFormula(myliteral);
+		}
+
+		found = false;
+		skip = false;
+	}
 
-    trace(TRACE_5, "interactionGraph::combineReceivingEvents(AnnotatedGraphNode * node): start\n");
+	trace(TRACE_5, "interactionGraph::combineReceivingEvents(AnnotatedGraphNode * node): end\n");
 
-    // remember those states that activate a receiving event
-    std::vector<StateSet::iterator> statesVector; 
+	/* check the set of output-messages for containing subsets */
+	/* e.g. the set contains [a, b] and [a, b, c] */
+	/* [a, b] is subset of [a, b, c], therefore the set [a, b, c] is removed */
 
-    setOfMessages listOfReceivingEvents; 	// list of all the receiving events in this node
-    										// is a set of multisets
-
-    messageMultiSet receivingEvent; // multiset of the receiving event of the current state
-
-    StateSet::iterator iter;	// iterator over all states of the current node
-
-    bool found = false;
-    bool skip = false;
-
-    if (!options[O_CALC_ALL_STATES]) { // in case of the state reduced graph
-
-        for (iter = setOfStatesStubbornTemp.begin(); iter
-                != setOfStatesStubbornTemp.end(); iter++) {
-
-            if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) { // we just consider the maximal states only
-
-                unsigned int i = 0;
-
-                // this clause's first literal
-                GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
-
-                // "receiving before sending" reduction rule
-                while (!stateActivatesOutputEvents(*iter) &&(*iter)->quasiFirelist&&(*iter)->quasiFirelist[i]) {
-
-                    for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin(); index
-                            != (*iter)->quasiFirelist[i]->messageSet.end(); index++) {
-
-                        messageMultiSet input; // multiset holding one input message
-                        input.insert(*index);
-
-                        sendingEvents.insert(input);
-
-                        GraphFormulaLiteral
-                                * myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
-                        myclause->addSubFormula(myliteral);
-                    }
-                    i++;
-                }
-
-                messageMultiSet outputMessages; // multiset of all input messages of the current state
-
-                (*iter)->decode(PN);
-
-                for (i = 0; i < PN->getPlaceCount(); i++) {
-
-                    if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {
-                        for (unsigned int z = 0; z < PN->CurrentMarking[i]; z++) {
-                            outputMessages.insert(i);
-                        }
-
-                        found = true;
-                    }
-                }
-
-                bool subset = false;
-                bool supset = false;
-
-                string label;
-
-                if (found) {
-
-                    for (setOfMessages::iterator
-                            iter1 = listOfReceivingEvents.begin(); iter1
-                            != listOfReceivingEvents.end(); iter1++) {
-
-                        subset = false;
-
-                        for (messageMultiSet::iterator tmp2 = (*iter1).begin(); tmp2 != (*iter1).end(); tmp2++) {
-                            if (outputMessages.count(*tmp2) >= (*iter1).count(*tmp2)) {
-                                subset = true;
-                            } else {
-                                subset = false;
-                                break;
-                            }
-                        }
-
-                        if (subset) {
-                            label = PN->createLabel(*iter1);
-                            break;
-                        }
-                    }
-
-                    if (!subset) {
-                        for (setOfMessages::iterator
-                                iter1 = listOfReceivingEvents.begin(); iter1
-                                != listOfReceivingEvents.end(); iter1++) {
-
-                            supset = false;
-
-                            for (messageMultiSet::iterator
-                                    tmp2 = outputMessages.begin(); tmp2
-                                    != outputMessages.end(); tmp2++) {
-                                if (outputMessages.count(*tmp2) <= (*iter1).count(*tmp2)) {
-                                    supset = true;
-                                } else {
-                                    supset = false;
-                                    break;
-                                }
-                            }
-                            if (supset) {
-                            	
-                            	node->getAnnotation()->removeLiteralForReal(PN->createLabel(*iter1));
-                            	
-                                listOfReceivingEvents.erase(iter1);
-                                label = PN->createLabel(outputMessages);
-                                
-                                break;
-                            }
-                        }
-
-                        if (supset) {
-                            GraphFormulaLiteral
-                                    * myliteral = new GraphFormulaLiteral(label);
-                            myclause->addSubFormula(myliteral);
-                            listOfReceivingEvents.insert(outputMessages);
-                        }
-                    } else {
-                        GraphFormulaLiteral
-                                * myliteral = new GraphFormulaLiteral(label);
-                        myclause->addSubFormula(myliteral);
-                    }
-
-                    if (!subset && !supset) {
-                        listOfReceivingEvents.insert(outputMessages);
-
-                        GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->createLabel(outputMessages));
-                        myclause->addSubFormula(myliteral);
-                    }
-
-                    found = false;
-                    skip = false;
-                }
-
-                // in case of a final state we add special literal "final" to the clause
-                if ((*iter)->type == FINALSTATE) {
-                    node->hasFinalStateInStateSet = true;
-
-                    GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
-                    myclause->addSubFormula(myliteral);
-                }
-
-                node->addClause(myclause);
-            }
-
-        }
-    } else {
-        for (iter = node->reachGraphStateSet.begin(); iter
-                != node->reachGraphStateSet.end(); iter++) {
-
-            if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) { // we just consider the maximal states only
-
-                unsigned int i = 0;
-                // this clause's first literal
-                GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
-                
-                // "receiving before sending" reduction rule
-                while (!stateActivatesOutputEvents(*iter) &&
-                			(*iter)->quasiFirelist &&
-                			(*iter)->quasiFirelist[i]) {
-
-                    for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin(); index
-                            != (*iter)->quasiFirelist[i]->messageSet.end(); index++) {
-
-                        messageMultiSet input; // multiset holding one input message
-                        input.insert(*index);
-
-                        sendingEvents.insert(input);
-
-                        GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
-                        myclause->addSubFormula(myliteral);
-                    }
-                    i++;
-                }
-
-                messageMultiSet outputMessages; // multiset of all output messages of the current state
-
-                (*iter)->decode(PN);
-
-                for (i = 0; i < PN->getPlaceCount(); i++) {
-
-                    if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {
-                        for (unsigned int z = 0; z < PN->CurrentMarking[i]; z++) {
-                            outputMessages.insert(i);
-                        }
-
-                        found = true;
-                    }
-                }
-
-                bool subset = false;
-                bool supset = false;
-
-                string label;
-
-                if (found) {
-
-                    for (setOfMessages::iterator
-                            iter1 = listOfReceivingEvents.begin(); 
-                            iter1 != listOfReceivingEvents.end(); iter1++) {
-
-                        subset = false;
-
-                        for (messageMultiSet::iterator tmp2 = (*iter1).begin(); 
-                        										tmp2 != (*iter1).end(); tmp2++) {
-                        											
-                            if (outputMessages.count(*tmp2) >= (*iter1).count(*tmp2)) {
-                                subset = true;
-                            } else {
-                                subset = false;
-                                break;
-                            }
-                        }
-
-                        if (subset) {
-                            label = PN->createLabel(*iter1);
-                            break;
-                        }
-                    }
-
-                    if (!subset) {
-                        for (setOfMessages::iterator
-                                iter2 = listOfReceivingEvents.begin(); 
-                                iter2 != listOfReceivingEvents.end(); iter2++) {
-
-                            supset = false;
-
-                            for (messageMultiSet::iterator
-                                    tmp2 = outputMessages.begin(); tmp2
-                                    != outputMessages.end(); tmp2++) {
-                                    	
-                                if (outputMessages.count(*tmp2) <= (*iter2).count(*tmp2)) {
-                                    supset = true;
-                                } else {
-                                    supset = false;
-                                    break;
-                                }
-                            }
-                            if (supset) {
-                                node->getAnnotation()->removeLiteralForReal(PN->createLabel(*iter2));
-                                
-                                listOfReceivingEvents.erase(iter2);
-                                label = PN->createLabel(outputMessages);
-                                break;
-                            }
-                        }
-
-                        if (supset) {
-                            GraphFormulaLiteral
-                                    * myliteral = new GraphFormulaLiteral(label);
-                            myclause->addSubFormula(myliteral);
-                            listOfReceivingEvents.insert(outputMessages);
-                        }
-                    } else {
-                        GraphFormulaLiteral
-                                * myliteral = new GraphFormulaLiteral(label);
-                        myclause->addSubFormula(myliteral);
-                    }
-
-                    if (!subset && !supset) {
-                        listOfReceivingEvents.insert(outputMessages);
-                        GraphFormulaLiteral
-                                * myliteral = new GraphFormulaLiteral(PN->createLabel(outputMessages));
-                        myclause->addSubFormula(myliteral);
-                    }
-
-                    found = false;
-                    skip = false;
-                }
-
-                // in case of a final state we add special literal "final" to the clause
-                if ((*iter)->type == FINALSTATE) {
-                    node->hasFinalStateInStateSet = true;
-
-                    GraphFormulaLiteral
-                            * myliteral = new GraphFormulaLiteralFinal();
-                    myclause->addSubFormula(myliteral);
-                }
-                
-                node->addClause(myclause);
-            }
-        }
-    }
-
-    trace(TRACE_5, "interactionGraph::combineReceivingEvents(AnnotatedGraphNode * node): end\n");
-
-    /* check the set of output-messages for containing subsets */
-    /* e.g. the set contains [a, b] and [a, b, c] */
-    /* [a, b] is subset of [a, b, c], therefore the set [a, b, c] is removed */
-
-    return listOfReceivingEvents;
+    
 }

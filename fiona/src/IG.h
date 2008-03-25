@@ -86,10 +86,12 @@ class interactionGraph : public CommunicationGraph {
         /// creates a list of all receiving events of the current node and creates the set of
         /// sending events applies the reduction rules: "combine receiving events" and 
         /// "receiving before sending"
-        setOfMessages combineReceivingEvents(AnnotatedGraphNode*, setOfMessages&);
+        void combineReceivingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
         
         /// not yet implemented
-        setOfMessages receivingBeforeSending(AnnotatedGraphNode*);
+        void receivingBeforeSending(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&);
+        
+        void reduce(AnnotatedGraphNode*, setOfMessages&, setOfMessages&);
 
 };
 

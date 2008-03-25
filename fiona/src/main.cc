@@ -707,18 +707,21 @@ void checkFalseAnnos(AnnotatedGraph* toCheck) {
 
 
 void removeFalseAnnos(AnnotatedGraph* toCheck) {
-	if (!options[O_OUTFILEPREFIX]) {
-		cerr << "Error: \tNo output file given -> no output file will be generated. \n\tUse modus operandi 'checkfalseannos' \n\tor specify an output file with '-o filename'." << endl;
-		exit(1);
-	}
 	trace(TRACE_0, "Removing nodes from the OG read from '" + toCheck->getFilename() + "' that violate their own annotation...");
 	toCheck->removeFalseNodes();
 	trace(TRACE_0, "\nRemoved all false nodes.\n");
-	trace(TRACE_0, "\nCreating new .og-file without false nodes with prefix '" + outfilePrefix + "'.\n");
-	toCheck->printOGFile(outfilePrefix);
-	trace(TRACE_0, "File with prefix '" + outfilePrefix + "' succesfully created.\n\n");
-		
+	string newFilename;
+	if (options[O_OUTFILEPREFIX]) {
+		newFilename = outfilePrefix;
+	}
+	else {
+		newFilename = AnnotatedGraph::stripOGFileSuffix(toCheck->getFilename()) + ".blue";
+	}
+		trace(TRACE_0, "\nCreating new .og-file without false nodes... \n");
+		toCheck->printOGFile(newFilename);
+		trace(TRACE_0, "New .og-file '" + newFilename + "' succesfully created.\n\n");
 }
+
 
 
 //! \brief create the productOG of all given OGs

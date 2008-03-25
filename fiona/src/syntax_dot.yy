@@ -102,7 +102,6 @@ graph:  /* empty */
             }
         | KW_DIGRAPH KW_ID KW_LBRACE stmt_list KW_RBRACE
             {
-cout << "digraph id { stmt_list }" << endl; 
             }
         | KW_STRICT KW_DIGRAPH KW_LBRACE stmt_list KW_RBRACE
             {
@@ -113,59 +112,47 @@ cout << "digraph id { stmt_list }" << endl;
 ;
 
 stmt_list: /* empty */
-        | stmt
-            { 
-cout << "stmt" << endl; 
-            }
-        | stmt KW_SEMICOLON
-            { 
-cout << "stmt;" << endl; 
-            }
+//        | stmt
+//            { 
+//            }
+//        | stmt KW_SEMICOLON
+//            { 
+//            }
         | stmt stmt_list 
             { 
-cout << "stmt stmt_list" << endl; 
             }
         | stmt KW_SEMICOLON stmt_list 
             { 
-cout << "stmt stmt_list;" << endl; 
             }
 ;
 
 stmt:   /* empty */
         attr_stmt
             {
-cout << "attr_stmt" << endl; 
             }
         | node_stmt
-            { 
-cout << "node_stmt" << endl; 
-            }
+            {
+            } 
         | edge_stmt
             { 
-cout << "edge_stmt" << endl; 
             }
         | KW_ID KW_EQUAL KW_ID
             { 
-cout << "id = id" << endl; 
             }
         | subgraph 
             { 
-cout << "subgraph" << endl; 
             }
 ;
 
 subgraph: /* empty */
         KW_LBRACE stmt_list KW_RBRACE
             {
-cout << "{ stmt_list }" << endl; 
             }
         | KW_SUBGRAPH KW_LBRACE stmt_list KW_RBRACE
             {
-cout << "subgraph { stmt_list }" << endl; 
             }
         | KW_SUBGRAPH KW_ID KW_LBRACE stmt_list KW_RBRACE
             {
-cout << "subgraph id { stmt_list }" << endl; 
             }
 ;
 attr_stmt: /* empty */ 

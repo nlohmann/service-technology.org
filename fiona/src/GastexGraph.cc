@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright 2008 Robert Danitz                                              *
+ * Copyright 2005, 2006, 2007, 2008 Peter Massuthe, Robert Danitz            *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
@@ -137,23 +137,36 @@ void GasTexGraph::makeGasTex(string texFileName) {
         for(set<GasTexNode*>::iterator iNode = gastexGraph->nodes.begin();
             iNode != gastexGraph->nodes.end(); iNode++) {
 
-            texFile << node_stmt_str[0] << (int) ((*iNode)->width * char_width_ratio);
+            texFile << node_stmt_str[0];
             if((*iNode)->isInitial) {
                 texFile << node_stmt_str[1] << "i";
                 if((*iNode)->isFinal) {
                     texFile << "r";
                 }
-            } else {
-                if((*iNode)->isFinal) {
-                    texFile << node_stmt_str[1] << "r";
-                }
+                texFile << ", ";
+            } else if ((*iNode)->isFinal) {
+                texFile << node_stmt_str[1] << "r";
+                texFile << ", ";
             }
-            texFile << node_stmt_str[2] << (*iNode)->id;
-            texFile << node_stmt_str[3] << (*iNode)->posX;
-            texFile << node_stmt_str[4] << (*iNode)->posY;
-            texFile << node_stmt_str[5] << texformat((*iNode)->label);
-            texFile << node_stmt_str[6] << endl;
+
+            if ((*iNode)->isInitial || (*iNode)->isFinal) {
+                texFile << node_stmt_str[2] << ((*iNode)->width * char_width_ratio + .5);
+                texFile << ", ";
+                texFile << node_stmt_str[3] << ((*iNode)->height * char_height_ratio + .5);
+            } else {
+                texFile << node_stmt_str[2] << ((*iNode)->width * char_width_ratio);
+                texFile << ", ";
+                texFile << node_stmt_str[3] << ((*iNode)->height * char_height_ratio);
+            }
+
+            texFile << node_stmt_str[4] << (*iNode)->id;
+            texFile << node_stmt_str[5] << (*iNode)->posX;
+            texFile << node_stmt_str[6] << (*iNode)->posY;
+            texFile << node_stmt_str[7] << texFormat((*iNode)->label);
+            texFile << node_stmt_str[8] << endl;
         }
+
+        texFile << endl;
 
         // edges 
         for(set<GasTexNode*>::iterator iNode = gastexGraph->nodes.begin();
@@ -162,7 +175,7 @@ void GasTexGraph::makeGasTex(string texFileName) {
                 iEdge != (*iNode)->edges.end(); iEdge++) {
                 texFile << edge_stmt_str[0] << (*iEdge)->srcNode->id; 
                 texFile << edge_stmt_str[1] << (*iEdge)->destNode->id; 
-                texFile << edge_stmt_str[2] << (*iEdge)->label; 
+                texFile << edge_stmt_str[2] << texFormat((*iEdge)->label); 
                 texFile << edge_stmt_str[3] << endl; 
             }
         }

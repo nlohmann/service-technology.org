@@ -370,7 +370,7 @@ void makeGasTex(CommunicationGraph* graph) {
         }
     }
 
-    string outFileName = outfilePrefixWithOptions + ".out";
+    string outFileName = outfilePrefixWithOptions + ".dot";
 
     dot_yylineno = 1;
     dot_yydebug = 0;
@@ -1246,15 +1246,13 @@ void makePNG(oWFN* PN) {
         if (parameters[P_TEX]) {
             // writing .dot file which is skipped elsewise
             // will later be annotated with layout info in .out file
-            string dotFileName = outFileName + ".dot";
-            string annotatedDotFileName = outFileName + ".out";
+            string dotFileName = outFileName + ".out";
+            string annotatedDotFileName = outFileName + ".dot";
             fstream dotFile(dotFileName.c_str(), ios_base::out | ios_base::trunc);
             dotFile << dotFileString;
             dotFile.close();
             // annotate .dot file
             system(("dot -Tdot " + dotFileName + " -o " + annotatedDotFileName).c_str());
-            // clean up
-            system(("rm -f " + dotFileName).c_str());
             trace(TRACE_0, (annotatedDotFileName + " generated\n"));
 
             // transforming .out file into gastex format

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright 2008 Robert Danitz                                              *
+ * Copyright 2005, 2006, 2007, 2008 Peter Massuthe, Robert Danitz            *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *

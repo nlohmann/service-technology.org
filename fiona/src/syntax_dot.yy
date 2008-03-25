@@ -38,6 +38,7 @@ bool first_node = true;
 
 %start	graph 
 
+%type <str_val>    subgraph 
 %type <str_val>    KW_ID
 %type <str_val>    stmt
 %type <str_val>    attr_stmt
@@ -45,15 +46,14 @@ bool first_node = true;
 %type <str_val>    a_list
 %type <str_val>    node_stmt
 %type <str_val>    node_id
-%type <str_val>    node_attr_list
-%type <str_val>    node_a_list
+%type <str_val>    port 
+%type <str_val>    compass_pt 
 %type <str_val>    edge_stmt
 %type <str_val>    edgeRHS
-%type <str_val>    edge_attr_list
-%type <str_val>    edge_a_list
 
 %left KW_DIGRAPH
 %left KW_GRAPH
+%left KW_SUBGRAPH
 %left KW_NODE
 %left KW_EDGE
 %left KW_ID
@@ -68,41 +68,106 @@ bool first_node = true;
 %left KW_COMMA
 %left KW_SEMICOLON
 %left KW_COLON
-%left KW_FOO
 %left KW_EQUAL
 %left KW_AT
 %left KW_EDGEOP
 %left KW_STRICT
+%left KW_N
+%left KW_NE
+%left KW_E
+%left KW_SE
+%left KW_S
+%left KW_SW
+%left KW_W
+%left KW_NW
+
 
 %%
 
 graph:  /* empty */
-        KW_DIGRAPH KW_ID KW_LBRACE stmt_list KW_RBRACE
+        KW_GRAPH KW_LBRACE stmt_list KW_RBRACE
+            {
+            }
+        | KW_GRAPH KW_ID KW_LBRACE stmt_list KW_RBRACE
+            {
+            }
+        | KW_STRICT KW_GRAPH KW_LBRACE stmt_list KW_RBRACE
+            {
+            }
+        | KW_STRICT KW_GRAPH KW_ID KW_LBRACE stmt_list KW_RBRACE
+            {
+            }
+        | KW_DIGRAPH KW_LBRACE stmt_list KW_RBRACE
+            {
+            }
+        | KW_DIGRAPH KW_ID KW_LBRACE stmt_list KW_RBRACE
+            {
+cout << "digraph id { stmt_list }" << endl; 
+            }
+        | KW_STRICT KW_DIGRAPH KW_LBRACE stmt_list KW_RBRACE
+            {
+            }
+        | KW_STRICT KW_DIGRAPH KW_ID KW_LBRACE stmt_list KW_RBRACE
             {
             }
 ;
 
 stmt_list: /* empty */
-        stmt KW_SEMICOLON
+        | stmt
             { 
+cout << "stmt" << endl; 
+            }
+        | stmt KW_SEMICOLON
+            { 
+cout << "stmt;" << endl; 
+            }
+        | stmt stmt_list 
+            { 
+cout << "stmt stmt_list" << endl; 
             }
         | stmt KW_SEMICOLON stmt_list 
             { 
+cout << "stmt stmt_list;" << endl; 
             }
 ;
 
 stmt:   /* empty */
         attr_stmt
             {
+cout << "attr_stmt" << endl; 
             }
-        | node_stmt 
+        | node_stmt
             { 
+cout << "node_stmt" << endl; 
             }
-        | edge_stmt 
+        | edge_stmt
             { 
+cout << "edge_stmt" << endl; 
+            }
+        | KW_ID KW_EQUAL KW_ID
+            { 
+cout << "id = id" << endl; 
+            }
+        | subgraph 
+            { 
+cout << "subgraph" << endl; 
             }
 ;
 
+subgraph: /* empty */
+        KW_LBRACE stmt_list KW_RBRACE
+            {
+cout << "{ stmt_list }" << endl; 
+            }
+        | KW_SUBGRAPH KW_LBRACE stmt_list KW_RBRACE
+            {
+cout << "subgraph { stmt_list }" << endl; 
+            }
+        | KW_SUBGRAPH KW_ID KW_LBRACE stmt_list KW_RBRACE
+            {
+cout << "subgraph id { stmt_list }" << endl; 
+            }
+;
 attr_stmt: /* empty */ 
         KW_GRAPH attr_list 
             {
@@ -122,20 +187,98 @@ attr_list: /* empty */
         | KW_LBRACKET a_list KW_RBRACKET
             { 
             }
+        | KW_LBRACKET KW_RBRACKET attr_list
+            { 
+            }
+        | KW_LBRACKET a_list KW_RBRACKET attr_list
+            { 
+            }
 ;
 
 a_list: /* empty */ 
-        KW_ID KW_EQUAL KW_STRING
+        KW_ID
             {
             }
-        | KW_ID KW_EQUAL KW_STRING KW_COMMA a_list
+        | KW_ID KW_EQUAL KW_ID
+            {
+                if ((*$1) == "label") {
+                    dummyNode.label = (*$3).substr(1, (*$3).length() - 2);
+                    dummyEdge.label = (*$3).substr(1, (*$3).length() - 2);
+                } else if ((*$1) == "pos") {
+                    dummyNode.posX = atoi((*$3).substr(1, ($3)->find_first_of(",")).c_str());
+                    dummyNode.posY = atoi((*$3).substr(($3)->find_first_of(",") + 1, ($3)->length()).c_str());
+                    dummyNode.posX = (int) (dummyNode.posX * scale_factor);
+                    dummyNode.posY = (int) (dummyNode.posY * scale_factor);
+                } else if ((*$1) == "width") {
+                    dummyNode.width = atof((*$3).substr(1, ($3)->length() - 2).c_str());
+                } else if ((*$1) == "height") {
+                    dummyNode.height = atof((*$3).substr(1, ($3)->length() - 2).c_str());
+                } else if ((*$1) == "peripheries") {
+		    dummyNode.isFinal = true;
+                }
+            }
+        | KW_ID KW_COMMA 
             {
             }
-        | KW_ID KW_EQUAL KW_INT
+        | KW_ID a_list
+            {
+            }
+        | KW_ID KW_EQUAL KW_ID KW_COMMA
+            {
+                if ((*$1) == "label") {
+                    dummyNode.label = (*$3).substr(1, (*$3).length() - 2);
+                    dummyEdge.label = (*$3).substr(1, (*$3).length() - 2);
+                } else if ((*$1) == "pos") {
+                    dummyNode.posX = atoi((*$3).substr(1, ($3)->find_first_of(",")).c_str());
+                    dummyNode.posY = atoi((*$3).substr(($3)->find_first_of(",") + 1, ($3)->length()).c_str());
+                    dummyNode.posX = (int) (dummyNode.posX * scale_factor);
+                    dummyNode.posY = (int) (dummyNode.posY * scale_factor);
+                } else if ((*$1) == "width") {
+                    dummyNode.width = atof((*$3).substr(1, (*$3).length() - 2).c_str());
+                } else if ((*$1) == "height") {
+                    dummyNode.height = atof((*$3).substr(1, (*$3).length() - 2).c_str());
+                } else if ((*$1) == "peripheries") {
+		    dummyNode.isFinal = true;
+                }
+            }
+        | KW_ID KW_EQUAL KW_ID a_list 
+            {
+                if ((*$1) == "label") {
+                    dummyNode.label = (*$3).substr(1, (*$3).length() - 2);
+                    dummyEdge.label = (*$3).substr(1, (*$3).length() - 2);
+                } else if ((*$1) == "pos") {
+                    dummyNode.posX = atoi((*$3).substr(1, ($3)->find_first_of(",")).c_str());
+                    dummyNode.posY = atoi((*$3).substr(($3)->find_first_of(",") + 1, ($3)->length()).c_str());
+                    dummyNode.posX = (int) (dummyNode.posX * scale_factor);
+                    dummyNode.posY = (int) (dummyNode.posY * scale_factor);
+                } else if ((*$1) == "width") {
+                    dummyNode.width = atof((*$3).substr(1, (*$3).length() - 2).c_str());
+                } else if ((*$1) == "height") {
+                    dummyNode.height = atof((*$3).substr(1, (*$3).length() - 2).c_str());
+                } else if ((*$1) == "peripheries") {
+		    dummyNode.isFinal = true;
+                }
+            }
+        | KW_ID KW_COMMA a_list
             {
             }
         | KW_ID KW_EQUAL KW_ID KW_COMMA a_list
             {
+                if ((*$1) == "label") {
+                    dummyNode.label = (*$3).substr(1, (*$3).length() - 2);
+                    dummyEdge.label = (*$3).substr(1, (*$3).length() - 2);
+                } else if ((*$1) == "pos") {
+                    dummyNode.posX = atoi((*$3).substr(1, ($3)->find_first_of(",")).c_str());
+                    dummyNode.posY = atoi((*$3).substr(($3)->find_first_of(",") + 1, ($3)->length()).c_str());
+                    dummyNode.posX = (int) (dummyNode.posX * scale_factor);
+                    dummyNode.posY = (int) (dummyNode.posY * scale_factor);
+                } else if ((*$1) == "width") {
+                    dummyNode.width = atof((*$3).substr(1, (*$3).length() - 2).c_str());
+                } else if ((*$1) == "height") {
+                    dummyNode.height = atof((*$3).substr(1, (*$3).length() - 2).c_str());
+                } else if ((*$1) == "peripheries") {
+		    dummyNode.isFinal = true;
+                }
             }
 ;
 
@@ -153,10 +296,10 @@ node_stmt: /* empty */
                 dummyNode.isInitial = false;
                 dummyNode.isFinal = false; 
             }
-        | node_id node_attr_list        
+        | node_id attr_list        
             {
                 GasTexNode* node = new GasTexNode;
-                node->id = dummyNode.id;
+                node->id = (*$1); 
                 node->label = dummyNode.label;
 		node->isFinal = dummyNode.isFinal;
     		node->posX = dummyNode.posX;
@@ -179,75 +322,53 @@ node_id: /* empty */
             {
                 dummyNode.id = (*$1);
             }
-;
-
-node_attr_list: /* empty */
-        KW_LBRACKET KW_RBRACKET
+        | KW_ID port 
             {
-            }
-        | KW_LBRACKET node_a_list KW_RBRACKET
-            { 
+                dummyNode.id = (*$1);
             }
 ;
 
-node_a_list: /* empty */ 
-        KW_ID KW_EQUAL KW_STRING
-            {
-                if ((*$1) == "label") {
-                    dummyNode.label = (*$3).substr(1, ($3)->length() - 2);
-                } else if ((*$1) == "pos") {
-                    dummyNode.posX = atoi((*$3).substr(1, ($3)->find_first_of(",")).c_str());
-                    dummyNode.posY = atoi((*$3).substr(($3)->find_first_of(",") + 1, ($3)->length()).c_str());
-                    dummyNode.posX = (int) (dummyNode.posX * scale_factor);
-                    dummyNode.posY = (int) (dummyNode.posY * scale_factor);
-                } else if ((*$1) == "width") {
-                    dummyNode.width = atof((*$3).substr(1, ($3)->length() - 2).c_str());
-                } else if ((*$1) == "height") {
-                    dummyNode.height = atof((*$3).substr(1, ($3)->length() - 2).c_str());
-                }
-            }
-        | KW_ID KW_EQUAL KW_STRING KW_COMMA node_a_list
-            {
-                if ((*$1) == "label") {
-                    dummyNode.label = (*$3).substr(1, (*$3).length() - 2);
-                } else if ((*$1) == "pos") {
-                    dummyNode.posX = atoi((*$3).substr(1, ($3)->find_first_of(",")).c_str());
-                    dummyNode.posY = atoi((*$3).substr(($3)->find_first_of(",") + 1, ($3)->length()).c_str());
-                    dummyNode.posX = (int) (dummyNode.posX * scale_factor);
-                    dummyNode.posY = (int) (dummyNode.posY * scale_factor);
-                } else if ((*$1) == "width") {
-                    dummyNode.width = atof((*$3).substr(1, (*$3).length() - 2).c_str());
-                } else if ((*$1) == "height") {
-                    dummyNode.height = atof((*$3).substr(1, (*$3).length() - 2).c_str());
-                }
-            }
-        | KW_ID KW_EQUAL KW_ID
+port: /* empty */
+        KW_COLON KW_ID
             {
             }
-        | KW_ID KW_EQUAL KW_ID KW_COMMA node_a_list
+        | KW_COLON KW_ID KW_COLON compass_pt
             {
             }
-        | KW_ID KW_EQUAL KW_INT
+        | KW_COLON compass_pt
             {
-                if (((*$1) == "peripheries")) {
-		    dummyNode.isFinal = true;
-                }
             }
-        | KW_ID KW_EQUAL KW_INT KW_COMMA node_a_list
-            {
-                if (((*$1) == "peripheries")) {
-		    dummyNode.isFinal = true;
-                }
-            } 
+;
+
+compass_pt: /* empty */
+        KW_N {}
+        | KW_NE {}
+        | KW_E {}
+        | KW_SE {}
+        | KW_S {}
+        | KW_SW {}
+        | KW_W {}
+        | KW_NW {}
 ;
 
 edge_stmt: /* empty */
-        node_id edgeRHS edge_attr_list
+        node_id edgeRHS
             {
                 GasTexEdge* edge = new GasTexEdge(gastexGraph->getNode(*$1), gastexGraph->getNode(*$2));
                 edge->label = dummyEdge.label; 
-
                 gastexGraph->addEdge(edge);
+            }
+        | node_id edgeRHS attr_list
+            {
+                GasTexEdge* edge = new GasTexEdge(gastexGraph->getNode(*$1), gastexGraph->getNode(*$2));
+                edge->label = dummyEdge.label; 
+                gastexGraph->addEdge(edge);
+            }
+        | subgraph edgeRHS
+            {
+            }
+        | subgraph edgeRHS attr_list
+            {
             }
 ;
 
@@ -256,44 +377,18 @@ edgeRHS: /* empty */
             {
                 (*$$) = (*$2);
             }
+        | KW_EDGEOP node_id edgeRHS
+            {
+                (*$$) = (*$2);
+            }
+        | KW_EDGEOP subgraph
+            {
+            }
+        | KW_EDGEOP subgraph edgeRHS
+            {
+            }
 ;
 
-edge_attr_list: /* empty */
-        KW_LBRACKET KW_RBRACKET
-            {
-            }
-        | KW_LBRACKET edge_a_list KW_RBRACKET
-            { 
-            }
-;
-
-edge_a_list: /* empty */ 
-        KW_ID KW_EQUAL KW_STRING
-            {
-                if ((*$1) == "label") {
-                    dummyEdge.label = (*$3).substr(1, ($3)->length() - 2);
-                }
-            }
-        | KW_ID KW_EQUAL KW_STRING KW_COMMA edge_a_list
-            {
-                if ((*$1) == "label") {
-                    dummyEdge.label = (*$3).substr(1, ($3)->length() - 2);
-                }
-            }
-        | KW_ID KW_EQUAL KW_INT
-            {
-            }
-        | KW_ID KW_EQUAL KW_INT KW_COMMA edge_a_list
-            {
-            }
-        | KW_ID KW_EQUAL KW_ID
-            {
-            }
-        | KW_ID KW_EQUAL KW_ID KW_COMMA edge_a_list
-            {
-            }
-;
-            
 %%
 
 int dot_yyerror(string s) {

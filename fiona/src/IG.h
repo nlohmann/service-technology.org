@@ -73,10 +73,6 @@ class interactionGraph : public CommunicationGraph {
         /// Builds the IG of the associated PN recursively
         void buildGraph(AnnotatedGraphNode*, double);
 
-        /// creates a list of all activated sending and receiving events (input messages 
-        /// and output messages) of the current node
-        void getActivatedEventsComputeCNF(AnnotatedGraphNode*, setOfMessages&, setOfMessages&);
-
         /// calculates the set of successor states in case of an input message
         void calculateSuccStatesSendingEvent(messageMultiSet, AnnotatedGraphNode*, AnnotatedGraphNode*);
 

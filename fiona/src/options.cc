@@ -174,7 +174,8 @@ void print_help() {
 //  trace("                                 (-1 means disabling -e option, but is only\n");
 //  trace("                                 possible if -m option is set)\n");
 //  trace("                                 (only relevant for OG)\n");
-  trace(" -r | --reduceIG ............... use reduction rules for IG\n");
+  trace(" -r | --reduceIG ............... use reduction rules for IG. If no reduction \n");
+  trace("                                 rules are given (see -p), all rules are used. \n");
   trace(" -R | --reduce-nodes ........... use node reduction (IG or OG) which stores\n");
   trace("                                 less states per IG/OG node\n");
   trace("                                 (reduces memory, but increases time)\n");
@@ -225,6 +226,10 @@ void print_help() {
   trace("                                   r1 - r5    - set reduction level in mode\n");
   trace("                                                \"-t reduce\" to to the \n");
   trace("                                                specified value \n");
+  trace("                                   cre        - use \"combine receiving events\"\n");
+  trace("                                                rule for IG reduction (see -r)\n");
+  trace("                                   rbs        - use \"receive before sending\"\n");
+  trace("                                                rule for IG reduction (see -r)\n");
   trace(" -a | --adapterrules=<filename>  read adapter rules from <filename>\n");
   trace("\n");
   trace("\n");

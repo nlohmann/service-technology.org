@@ -444,7 +444,6 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
 //! \param node the node for which the activated input events are calculated
 //! \param inputMessages the set of input messages (sending events) that are activated in the current node 
 //! \param outputMessages the set of output messages (receiving events) that are activated in the current node 
-//! \fn void interactionGraph::getActivatedEventsComputeCNF(AnnotatedGraphNode * node, setOfMessages & inputMessages, setOfMessages & outputMessages) {
 void interactionGraph::getActivatedEventsComputeCNF(AnnotatedGraphNode* node,
                                                     setOfMessages& inputMessages,
                                                     setOfMessages& outputMessages) {
@@ -473,7 +472,7 @@ void interactionGraph::getActivatedEventsComputeCNF(AnnotatedGraphNode* node,
                 (*iter)->quasiFirelist = PN->quasiFirelist(); // get the firelist of the quasi enabled transitions
                 
                 i = 0;
-                // get the activated input events
+                // get the activated sending events
                // cout << "state " << PN->getCurrentMarkingAsString() << " activates the input events: " << (*iter)->quasiFirelist << ", " << (*iter)->quasiFirelist[i]->name << endl;
                 while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
                     for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin(); index
@@ -492,7 +491,7 @@ void interactionGraph::getActivatedEventsComputeCNF(AnnotatedGraphNode* node,
                     i++;
                 }
 
-                // get the activated output events			
+                // get the activated receiving events			
                 for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
                     if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {
                         messageMultiSet output;
@@ -680,9 +679,6 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
         // forget about all the states we have calculated so far
         setOfStatesStubbornTemp.clear();
 
-      //  cout << "node: " << node->getName() << endl;
-     //   cout << "states of node ...  " << endl;
-
     	if (parameters[P_SINGLE]) {
 
     		StateSet stateSet;
@@ -706,19 +702,6 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
                 }
 	        }
 
-	        //  cout << "receiving event activating states of node ...  " << endl;
-//        
-//	        for (StateSet::iterator iter2 = stateSet.begin(); iter2
-//	        		!= stateSet.end(); iter2++) {
-//	        	
-//	        	(*iter2)->decode(PN); // get the marking of the state
-//            
-//	        	if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
-//	            	// calc the reachable states from that marking using stubborn set method taking
-//	            	// care of deadlocks
-//	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
-//	        	}
-//	        }
 	        if (tempBinDecision) {
 	        	delete tempBinDecision;
 	        }
@@ -751,79 +734,83 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 /////////////////////////////////////////////////////////////////////////////////////////////
 // reduction rules
 /////////////////////////////////////////////////////////////////////////////////////////////
-
 void interactionGraph::reduce(AnnotatedGraphNode*  node, setOfMessages& sendingEvents, setOfMessages& receivingEvents) {
 	
 	StateSet::iterator iter;	// iterator over all states of the current node
 		StateSet::iterator iterEnd; // end of iterator iter
 		    
-		
-		if (!options[O_CALC_ALL_STATES]) { // in case of the state reduced graph
-			iter = setOfStatesStubbornTemp.begin();
-			iterEnd = setOfStatesStubbornTemp.end();
+	if (!options[O_CALC_ALL_STATES]) { // in case of the state reduced graph
+		iter = setOfStatesStubbornTemp.begin();
+		iterEnd = setOfStatesStubbornTemp.end();
+	} else {
+		iter = node->reachGraphStateSet.begin();
+		iterEnd = node->reachGraphStateSet.end();
+	}
+
+	for (iter; iter != iterEnd; iter++) {
+		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) { // we just consider the maximal states only
+
+			(*iter)->decode(PN);
+            if ((*iter)->quasiFirelist) { // delete the list of quasi enabled transitions
+                delete [] (*iter)->quasiFirelist;
+                (*iter)->quasiFirelist = NULL;
+            }
+            (*iter)->quasiFirelist = PN->quasiFirelist(); // get the firelist of the quasi enabled transitions
+
+			// this clause's first literal
+            GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
+			unsigned int i = 0;
+
+			// Call the reduction rules on the state. 
+			receivingBeforeSending(iter, myclause, sendingEvents); // computes the sending events
+			combineReceivingEvents(iter, myclause, receivingEvents, node); // computes the receiving events
+				
+			// in case of a final state we add special literal "final" to the clause
+            if ((*iter)->type == FINALSTATE) {
+                node->hasFinalStateInStateSet = true;
+                GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
+                myclause->addSubFormula(myliteral);
+            }
+
+            node->addClause(myclause);
 		}
 
-		else {
-			iter = node->reachGraphStateSet.begin();
-			iterEnd = node->reachGraphStateSet.end();
-		}
-
-		for (iter; iter != iterEnd; iter++) {
-			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) { // we just consider the maximal states only
-
-		           // this clause's first literal
-		            GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
-					unsigned int i = 0;
-
-				// Call the reduction rules on the state. 
-				receivingBeforeSending(iter, myclause, sendingEvents); // computes the sending events
-				combineReceivingEvents(iter, myclause, receivingEvents, node); // computes the receiving events
-					
-				// in case of a final state we add special literal "final" to the clause
-	                if ((*iter)->type == FINALSTATE) {
-	                    node->hasFinalStateInStateSet = true;
-	                    GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
-	                    myclause->addSubFormula(myliteral);
-	                }
-
-	                node->addClause(myclause);
-			}
-	
-		}
+	}
 		
 }
 
 void interactionGraph::receivingBeforeSending(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& sendingEvents) {
 	trace(TRACE_5, "interactionGraph::sendBeforeReceiving(AnnotatedGraphNode * node): start\n");
-			unsigned int i = 0;
-			while (!stateActivatesOutputEvents(*iter) &&(*iter)->quasiFirelist&&(*iter)->quasiFirelist[i]) {
-				for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin(); 
-				index != (*iter)->quasiFirelist[i]->messageSet.end(); 
-				index++ ) {
+	
+	unsigned int i = 0;
+	while (!stateActivatesOutputEvents(*iter) && (*iter)->quasiFirelist&&(*iter)->quasiFirelist[i]) {
+		for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin(); 
+					index != (*iter)->quasiFirelist[i]->messageSet.end(); 
+					index++ ) {
 
-					messageMultiSet input; // multiset holding one input message
-					input.insert(*index);
+			messageMultiSet input; // multiset holding one input message
+			input.insert(*index);
 
-					sendingEvents.insert(input);
+			sendingEvents.insert(input);
 
-					GraphFormulaLiteral
-					* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
-					myclause->addSubFormula(myliteral);
-				}
-				i++;
-			}			
+			GraphFormulaLiteral
+			* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
+			myclause->addSubFormula(myliteral);
+		}
+		i++;
+	}			
     
     trace(TRACE_5, "interactionGraph::sendBeforeReceiving(AnnotatedGraphNode * node): end\n");
 }
 
 
 
-//! \brief creates a list of all receiving events of the current node and creates the set of
-//!	       sending events applies the reduction rules: "combine receiving events" and 
-//!        "receiving before sending"
-//! \param node the node for which the activated receiving and sending events are calculated
-//! \param sendingEvents set of sending events that are activated in the current node
-//! \fn setOfMessages interactionGraph::combineReceivingEvents(AnnotatedGraphNode * node, setOfMessages & inputMessages)
+//! \brief creates a list of all receiving events of the current node by applying the reduction rule 
+//!			"combine receiving events"
+//! \param iter current state
+//!	\param myclause clause which is connected to the current state
+//! \param receivingEvents set of receiving events that are activated in the current node
+//! \param node the node for which the activated receiving events are calculated
 void interactionGraph::combineReceivingEvents(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause,
 		setOfMessages& receivingEvents, AnnotatedGraphNode* node) {
 
@@ -835,8 +822,6 @@ void interactionGraph::combineReceivingEvents(StateSet::iterator& iter, GraphFor
 	bool found = false;
 	bool skip = false;
 	messageMultiSet outputMessages; // multiset of all input messages of the current state
-
-	(*iter)->decode(PN);
 
 	for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
 

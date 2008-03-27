@@ -93,9 +93,13 @@ typedef enum {
     P_READ_OG,                  //!< only read an OG from a file
     P_GASTEX,                   //!< read an annotated dot file and create a gastex tex file
     P_REPRESENTATIVE,	      	//!< state reduction in node using representatives
-    P_SINGLE,                    //!< state reduction in node using single marking as representative
-    P_CHECK_FALSE_ANNOS,			//!< check false annotations in og
-    P_REMOVE_FALSE_ANNOS			//!< remove nodes with false annotations in og
+    P_SINGLE,                   //!< state reduction in node using single marking as representative
+    P_USE_CRE,                  //!< Use "combine receiving events" for IG-reduction
+    P_USE_RBS,                  //!< Use "receive before sending" for IG-reduction
+    P_CHECK_FALSE_ANNOS,	    //!< check false annotations in og
+    P_REMOVE_FALSE_ANNOS		//!< remove nodes with false annotations in og
+
+
 } possibleParameters;
 
 

@@ -83,15 +83,20 @@ class interactionGraph : public CommunicationGraph {
         /// calculates the set of successor states in case of an output message
         void calculateSuccStatesReceivingEvent(messageMultiSet, AnnotatedGraphNode*, AnnotatedGraphNode*);
 
-        /// creates a list of all receiving events of the current node and creates the set of
-        /// sending events applies the reduction rules: "combine receiving events" and 
-        /// "receiving before sending"
+        /// Calculates the set of receiving events without applying reduction rules.
+        void getReceivingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
+        
+        /// Calculates the set of sending events without applying reduction rules.
+        void getSendingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&);
+        
+        /// Calculates the set of receiving events using the "combine receiving events" rule
         void combineReceivingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
         
-        /// not yet implemented
+        /// Calculates the set of sending events using the "receive before sending" rule
         void receivingBeforeSending(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&);
         
-        void reduce(AnnotatedGraphNode*, setOfMessages&, setOfMessages&);
+        /// Calculate sending and receiving events using the reduction rules as specified. 
+        void calculateSendingAndReceivingEvents(AnnotatedGraphNode*, setOfMessages&, setOfMessages&);
 
 };
 

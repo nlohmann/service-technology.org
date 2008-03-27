@@ -305,6 +305,8 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_EVENT_USE_MAX] = false;
 	options[O_PV_MULTIPLE_DEADLOCKS] = false;
 
+
+
     // initialize parameters
     parameters[P_IG] = true;
     parameters[P_OG] = false;
@@ -321,8 +323,14 @@ void parse_command_line(int argc, char* argv[]) {
 
     parameters[P_REPRESENTATIVE] = false;
     parameters[P_SINGLE] = true;
+    
+    parameters[P_REMOVE_FALSE_ANNOS] = false;
+    parameters[P_CHECK_FALSE_ANNOS] = false;
 
-    bdd_reordermethod = 0;
+	parameters[P_USE_CRE] = false;
+	parameters[P_USE_RBS] = false;
+
+	bdd_reordermethod = 0;
 
     messages_manual = 1;
     events_manual = -1;
@@ -503,6 +511,10 @@ void parse_command_line(int argc, char* argv[]) {
                     globals::reduction_level = 4;
                 } else if (string(optarg) == "r5") {
                     globals::reduction_level = 5;
+                } else if (string(optarg) == "rbs") {
+                    parameters[P_USE_RBS] = true;
+                } else if (string(optarg) == "cre") {
+                    parameters[P_USE_CRE] = true;
                 } else {
                     cerr << "Error:\twrong parameter (option -p)" << endl
                     << "\tEnter \"fiona --help\" for more information.\n" << endl;
@@ -635,6 +647,14 @@ void parse_command_line(int argc, char* argv[]) {
         }
     }
 
+    // IG Reduction - correcting parameters if needed
+    if (options[O_CALC_REDUCED_IG]) {
+    	if (!parameters[P_USE_CRE] && !parameters[P_USE_RBS]) {
+    		parameters[P_USE_CRE] = true;
+    		parameters[P_USE_RBS] = true;
+    	}
+    }
+    
     bool firstfile = true;
     // reading all oWFNs and OGs
     for ( ; optind < argc; ++optind) {

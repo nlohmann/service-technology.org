@@ -1,6 +1,6 @@
 \documentclass[a4paper,11pt]{article}
 
-% Letzte Änderungen von: $Author: weinberg $ am $Date: 2008-03-18 09:39:30 $
+% Letzte Änderungen von: $Author: weinberg $ am $Date: 2008-03-31 08:37:38 $
 % UEBERARBEITET VON JAN SUERMELI AM 29.02.2008
 
 \usepackage{url}
@@ -509,35 +509,6 @@ at the same time.
 The \texttt{PLACES} section is followed by the \texttt{INITIALMARKING} and \texttt{FINALMARKING} or
 \texttt{FINALCONDITION} sections, which are explained later on.
 
-\subsubsection{Transitions}\label{subsubsec:transitions}
-After the first three sections the transitions of the net including their incoming and outgoing
-edges are defined. The fourth section does not have a headline like the first three. Rather, there
-is one for each transition. A transition definition looks like this:
-\begin{quote}
-\begin{verbatim}
-TRANSITION t1
-CONSUME
-  p1,
-  a;
-PRODUCE
-  p2:2,
-  x,
-  y,
-  z;
-\end{verbatim}
-\end{quote}
-
-This example defines a transition named \texttt{t1} with six edges. Two edges lead from the places
-\texttt{p1} and \texttt{a} to the transition and four lead from the transition to the places
-\texttt{p2}, \texttt{x}, \texttt{y} and \texttt{z}, with the edge to \texttt{p2} having a weight of
-2. A single place can be present under both \texttt{CONSUME} and \texttt{PRODUCE} in the same
-transition. Such a structure is called a loop. Any other transitions of the net would just be
-listed with the same syntax, thus starting with the \texttt{TRANSITION} keyword, followed by the
-name of the transition followed by the \texttt{CONSUME} and \texttt{PRODUCE} parts containing
-places, that must have been defined in the \texttt{PLACES} section beforehand. \texttt{CONSUME} and
-\texttt{PRODUCE} are allowed to be empty, thus representing a transition which is not connected to
-the rest of the net at all.
-
 \subsubsection{Initial Marking}\label{subsubsec:initialMarking}
 The \texttt{PLACES} section is followed by the \texttt{INITIALMARKING} section. Every place which
 is not listed in the \texttt{INITIALMARKING} section is implicitly assumed to have zero tokens
@@ -741,6 +712,34 @@ conjunction (or anywhere along with proper explicit bracing).
 
 The same rules, of course, apply to \texttt{ALL\_OTHER\_INTERNAL\_PLACES\_EMPTY} and
 \texttt{ALL\_OTHER\_EXTERNAL\_PLACES\_EMPTY}.
+
+\subsubsection{Transitions}\label{subsubsec:transitions}
+After the first three sections the transitions of the net including their incoming and outgoing
+edges are defined. The fourth section does not have a headline like the first three. Rather, there
+is one for each transition. A transition definition looks like this:
+\begin{quote}
+\begin{verbatim}
+TRANSITION t1 CONSUME
+  p1,
+  a;
+PRODUCE
+  p2:2,
+  x,
+  y,
+  z;
+\end{verbatim}
+\end{quote}
+
+This example defines a transition named \texttt{t1} with six edges. Two edges lead from the places
+\texttt{p1} and \texttt{a} to the transition and four lead from the transition to the places
+\texttt{p2}, \texttt{x}, \texttt{y} and \texttt{z}, with the edge to \texttt{p2} having a weight of
+2. A single place can be present under both \texttt{CONSUME} and \texttt{PRODUCE} in the same
+transition. Such a structure is called a loop. Any other transitions of the net would just be
+listed with the same syntax, thus starting with the \texttt{TRANSITION} keyword, followed by the
+name of the transition followed by the \texttt{CONSUME} and \texttt{PRODUCE} parts containing
+places, that must have been defined in the \texttt{PLACES} section beforehand. \texttt{CONSUME} and
+\texttt{PRODUCE} are allowed to be empty, thus representing a transition which is not connected to
+the rest of the net at all.
 
 \subsection{File Format OG}\label{subsec:FileFormatOG}
 

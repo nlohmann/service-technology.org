@@ -48,7 +48,7 @@ class interactionGraph : public CommunicationGraph {
                           AnnotatedGraphNode*,
                           messageMultiSet,
                           GraphEdgeType,
-                          double); // for IG
+                          double); 
         
     public:
         // Provides user defined operator new. Needed to trace all new
@@ -57,10 +57,10 @@ class interactionGraph : public CommunicationGraph {
         NEW_OPERATOR(interactionGraph)
 #define new NEW_NEW
 
-        /// conrtructor
+        /// constructor
         interactionGraph(oWFN*);
         
-        /// basic deconstructor
+        /// basic destructor
         virtual ~interactionGraph();
 
         /// checks whether the set of input messages contains at least one input message
@@ -79,20 +79,22 @@ class interactionGraph : public CommunicationGraph {
         /// calculates the set of successor states in case of an output message
         void calculateSuccStatesReceivingEvent(messageMultiSet, AnnotatedGraphNode*, AnnotatedGraphNode*);
 
+        /// Calculate sending and receiving events using the reduction rules as specified. 
+        void calculateSendingAndReceivingEvents(AnnotatedGraphNode*, setOfMessages&, setOfMessages&);
+        
         /// Calculates the set of receiving events without applying reduction rules.
         void getReceivingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
         
         /// Calculates the set of sending events without applying reduction rules.
         void getSendingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&);
         
+        // reduction rules
+        
         /// Calculates the set of receiving events using the "combine receiving events" rule
         void combineReceivingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
         
         /// Calculates the set of sending events using the "receive before sending" rule
         void receivingBeforeSending(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&);
-        
-        /// Calculate sending and receiving events using the reduction rules as specified. 
-        void calculateSendingAndReceivingEvents(AnnotatedGraphNode*, setOfMessages&, setOfMessages&);
 
 };
 

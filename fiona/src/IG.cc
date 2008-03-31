@@ -104,24 +104,9 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
 
     setOfMessages sendingEvents;
     setOfMessages receivingEvents;
-
     
-    
-/*    if (options[O_CALC_REDUCED_IG]) {
-    	// build up the reduced interaction graph
-    	// rules applied: "combine receiving events" + "receiving before sending"
-    	// receivingBeforeSending(currentNode, sendingEvents);
-    	// combineReceivingEvents(currentNode, receivingEvents);
-    	reduce(currentNode, sendingEvents, receivingEvents);
-    } else {
-    	// build up the interaction graph without applying reduction rules
-    	getActivatedEventsComputeCNF(currentNode, sendingEvents, receivingEvents);
-    }
-
-    */
-  
-    // Calculate sending and receiving events. 
-    // Use reduction rules as specified via parameters.
+    // calculate sending and receiving events. 
+    // usage of reduction rules is done in that function
     calculateSendingAndReceivingEvents(currentNode, sendingEvents, receivingEvents);
     
     double your_progress = progress_plus * (1 / double(PN->getInputPlaceCount()));
@@ -446,7 +431,7 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
     return true;
 }
 
-//! \brief creates a list of all sending events of the current node by applying no reduction rules.
+//! \brief creates a list of all sending events of the current node by applying NO reduction rules.
 //! \param iter current state
 //!	\param myclause clause which is connected to the current state
 //! \param inputMessages set of sending events that are activated in the current node
@@ -479,7 +464,7 @@ void interactionGraph::getSendingEvents(StateSet::iterator& iter, GraphFormulaMu
 }
 
 
-//! \brief creates a list of all receiving events of the current node by applying no reduction rules.
+//! \brief creates a list of all receiving events of the current node by applying NO reduction rules.
 //! \param iter current state
 //!	\param myclause clause which is connected to the current state
 //! \param outputMessages set of receiving events that are activated in the current node
@@ -644,8 +629,8 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 
 //! \brief calculates the sets of receiving and sending events for a given node, applies reduction rules as specified by the user. 
 //! \param node each state of this node is processed.
-//! \param sendingEvents an already existing message set that is filled with the sending events. 
-//! \param receivingEvents an already existing message set that is filled with the receiving events. 
+//! \param sendingEvents an already existing message set (previously empty) that is filled with the sending events. 
+//! \param receivingEvents an already existing message set (previously empty) that is filled with the receiving events. 
 void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  node, setOfMessages& sendingEvents, setOfMessages& receivingEvents) {
 
     trace(TRACE_5, "interactionGraph::receivingBeforeSending(AnnotatedGraphNode*  node, setOfMessages& sendingEvents, setOfMessages& receivingEvents): start\n");
@@ -654,21 +639,18 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
 	void (interactionGraph::*calcReceiving) (StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
 	void (interactionGraph::*calcSending) 	(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&);
 
-	
 	// Define the functions to be used for calculation
-
-	if (parameters[P_USE_CRE]) { // Use combine receiving events to calculate receiving events. 
+	if (parameters[P_USE_CRE]) { // Use "combine receiving events" to calculate receiving events. 
 		calcReceiving = &interactionGraph::combineReceivingEvents;
 	} else { // Do not use a reduction rule. 
 		calcReceiving = &interactionGraph::getReceivingEvents;
 	}
 		
-	if (parameters[P_USE_RBS]) { // Use receiving before sending to calculate sending events. 
+	if (parameters[P_USE_RBS]) { // Use "receiving before sending" to calculate sending events. 
 		calcSending = &interactionGraph::receivingBeforeSending;
 	} else { // Do not use a reduction rule. 
 		calcSending = &interactionGraph::getSendingEvents;
 	}
-
 
 	// Declare the iterators to be used for processing each state of the current node. 
 	StateSet::iterator iter;	// begin of iterator
@@ -682,7 +664,6 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
 		iter = node->reachGraphStateSet.begin();
 		iterEnd = node->reachGraphStateSet.end();
 	}
-
 
 	// Process each state in the node
 	for (iter; iter != iterEnd; iter++) {
@@ -753,8 +734,6 @@ void interactionGraph::receivingBeforeSending(StateSet::iterator& iter, GraphFor
     trace(TRACE_5, "interactionGraph::receivingBeforeSending(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& sendingEvents): end\n");
 }
 
-
-
 //! \brief creates a list of all receiving events of the current node by applying the reduction rule 
 //!			"combine receiving events"
 //! \param iter current state
@@ -779,7 +758,6 @@ void interactionGraph::combineReceivingEvents(StateSet::iterator& iter, GraphFor
 			for (unsigned int z = 0; z < PN->CurrentMarking[i]; z++) {
 				outputMessages.insert(i);
 			}
-
 			found = true;
 		}
 	}
@@ -812,6 +790,10 @@ void interactionGraph::combineReceivingEvents(StateSet::iterator& iter, GraphFor
 			}
 		}
 
+		/* check the set of output-messages for containing subsets */
+		/* e.g. the set contains [a, b] and [a, b, c] */
+		/* [a, b] is subset of [a, b, c], therefore the set [a, b, c] is removed */
+		
 		if (!subset) {
 			for (setOfMessages::iterator
 					iter1 = receivingEvents.begin(); iter1
@@ -864,10 +846,4 @@ void interactionGraph::combineReceivingEvents(StateSet::iterator& iter, GraphFor
 	}
 
 	trace(TRACE_5, "interactionGraph::combineReceivingEvents(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& receivingEvents, AnnotatedGraphNode* node): end\n");
-
-	/* check the set of output-messages for containing subsets */
-	/* e.g. the set contains [a, b] and [a, b, c] */
-	/* [a, b] is subset of [a, b, c], therefore the set [a, b, c] is removed */
-
-    
 }

@@ -24,7 +24,7 @@ include $(top_srcdir)/Makefile.covcommon
 TESTS = slist.sh png.sh syntax.sh formula.sh extrema.sh messages.sh cyclic.sh \
         matching.sh sim_og.sh productog.sh publicview.sh oWFNreduction.sh \
         sequences.sh partner.sh countservices.sh samples.sh bddtest.sh \
-	statesReduction.sh
+	statesReduction.sh falseannos.sh
 
 check_PROGRAMS = slistcheck
 

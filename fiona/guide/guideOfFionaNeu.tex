@@ -1,6 +1,6 @@
 \documentclass[a4paper,11pt]{article}
 
-% Letzte Änderungen von: $Author: weinberg $ am $Date: 2008-03-31 08:37:38 $
+% Letzte Änderungen von: $Author: suermeli $ am $Date: 2008-03-31 12:13:11 $
 % UEBERARBEITET VON JAN SUERMELI AM 29.02.2008
 
 \usepackage{url}
@@ -256,7 +256,10 @@ Set the maximum number of same messages per state to \texttt{<level>}.
 Command: \texttt{--messagemaximum = <level>} or \texttt{-m <level>}
 
 \paragraph{Reduce IG}
-Generate a reduced IG by applying reduction rules while the graph is calculated.
+Generate a reduced IG by applying reduction rules while the graph is
+calculated. By default, the rules ``combine receiving events'' and ``receiving
+before sending'' are applied. This can be changed by specifying the desired
+rules as parameters. If any rule is given, only the specified rules are used.
 
 Command: \texttt{--reduceIG} or \texttt{-r}
 
@@ -380,6 +383,10 @@ Parameters:
 \hline
 \texttt{no-png} & does not create a PNG file \\
 \hline
+\texttt{cre} & use the ``combine receiving events''-rule to reduce the IG \\
+\hline
+\texttt{rbs} & use the ``receiving before sending''-rule to reduce the IG \\
+\hline
 \end{tabular}
 \end{quote}
 
@@ -417,6 +424,15 @@ debug information being shown in the process.
 \begin{quote}
 \begin{verbatim}
 fiona -t match -d 5 toMatch.og toBeMatched.owfn
+\end{verbatim}
+\end{quote}
+
+
+\item Calculate the IG only using the ``combine receiving events''-rule, but
+not the ``receiving before sending''-rule. 
+\begin{quote}
+\begin{verbatim}
+fiona -t IG net.owfn -r -p cre
 \end{verbatim}
 \end{quote}
 

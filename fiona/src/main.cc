@@ -344,7 +344,7 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix) {
 
     gastexGraph->makeGasTex(texFileName);
 
-    trace(TRACE_0, "\n" + texFileName + " generated\n");
+    trace(TRACE_0, texFileName + " generated\n");
 }
 
 
@@ -393,7 +393,7 @@ void makeGasTex(CommunicationGraph* graph) {
     
     gastexGraph->makeGasTex(texFileName);
 
-    trace(TRACE_0, "\n" + texFileName + " generated\n");
+    trace(TRACE_0, texFileName + " generated\n");
 }
 
 
@@ -1255,7 +1255,7 @@ void makePNG(oWFN* PN) {
             system(("dot -Tdot " + dotFileName + " -o " + annotatedDotFileName).c_str());
             trace(TRACE_0, (annotatedDotFileName + " generated\n"));
 
-            // transforming .out file into gastex format
+            // transforming .dot file into gastex format
             makeGasTex(annotatedDotFileName, outFileName);
         }
 

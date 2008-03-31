@@ -53,6 +53,14 @@ public:
     bool isFinal;
     int posX, posY;
     float width, height;
+    string color;
+    string fillcolor;
+    string fontcolor;
+    string fontname;
+    int fontsize;
+    string shape;
+    string style;
+
     set<GasTexEdge*> edges;
 
     GasTexNode();
@@ -60,6 +68,7 @@ public:
 
     void addEdge(GasTexNode* dest);
     void addEdge(GasTexEdge* edge);
+    void setToDefault();
 };
 
 
@@ -67,12 +76,26 @@ class GasTexEdge {
 
 public:
     string label;
+    string labelfontcolor;
+    string labelfontname;
+    int labelfontsize;
+    string color;
+    string fontcolor;
+    string fontname;
+    int fontsize;
+    string headlabel;
+    string headport;
+    string taillabel;
+    string tailport;
+    string style;
 
     GasTexNode* srcNode;
     GasTexNode* destNode;
 
-    GasTexEdge(GasTexNode* src, GasTexNode* dest);
+    GasTexEdge(GasTexNode* src = 0, GasTexNode* dest = 0);
     ~GasTexEdge();
+
+    void setToDefault();
 };
 
 

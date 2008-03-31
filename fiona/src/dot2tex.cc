@@ -34,6 +34,7 @@
 #include <string>
 #include "dot2tex.h"
 
+
 string texFormat(string str) {
     string::size_type pos;
 

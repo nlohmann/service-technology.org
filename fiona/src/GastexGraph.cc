@@ -41,9 +41,10 @@ using namespace std;
 extern GasTexGraph* gastexGraph;
 
 
+/*** GasTexNode ***/
+
 GasTexNode::GasTexNode() {
-    isInitial = false;
-    isFinal = false;
+    setToDefault();
 }
 
 
@@ -70,15 +71,54 @@ void GasTexNode::addEdge(GasTexEdge* edge) {
 }
 
 
+void GasTexNode::setToDefault() {
+    id = "";
+    label = "";
+    isInitial = false;
+    isFinal = false;
+    posX = posY = 0;
+    width = height = 1.0;
+    color = "black";
+    fillcolor = "";
+    fontcolor = "";
+    fontsize = 10;
+    shape = "";
+    style = "";
+}
+
+
+/*** GasTexEdge ***/
+
 GasTexEdge::GasTexEdge(GasTexNode* src, GasTexNode* dest) {
     srcNode = src;
     destNode = dest;
+
+    setToDefault();
 }
 
 
 GasTexEdge::~GasTexEdge() {
 }
 
+
+void GasTexEdge::setToDefault() {
+    label = "";
+    labelfontcolor = "";
+    labelfontname = "";
+    labelfontsize = 12;
+    color = "";
+    fontcolor = "";
+    fontname = "";
+    fontsize = 10;
+    headlabel = "";
+    headport = "";
+    taillabel = "";
+    tailport = "";
+    style = "";
+}
+
+
+/*** GasTexGraph ***/
 
 GasTexGraph::GasTexGraph() {
     root = NULL;
@@ -137,33 +177,63 @@ void GasTexGraph::makeGasTex(string texFileName) {
         for(set<GasTexNode*>::iterator iNode = gastexGraph->nodes.begin();
             iNode != gastexGraph->nodes.end(); iNode++) {
 
-            texFile << node_stmt_str[0];
-            if((*iNode)->isInitial) {
-                texFile << node_stmt_str[1] << "i";
-                if((*iNode)->isFinal) {
-                    texFile << "r";
+            if ((*iNode)->style != "invis") {
+                texFile << node_stmt_str[0];
+                if((*iNode)->isInitial) {
+                    texFile << node_stmt_str[1] << "i";
+                    if((*iNode)->isFinal) {
+                        texFile << "r";
+                    }
+                    texFile << ", ";
+                } else if ((*iNode)->isFinal) {
+                    texFile << node_stmt_str[1] << "r";
+                    texFile << ", ";
                 }
-                texFile << ", ";
-            } else if ((*iNode)->isFinal) {
-                texFile << node_stmt_str[1] << "r";
-                texFile << ", ";
-            }
 
-            if ((*iNode)->isInitial || (*iNode)->isFinal) {
-                texFile << node_stmt_str[2] << ((*iNode)->width * char_width_ratio + .5);
-                texFile << ", ";
-                texFile << node_stmt_str[3] << ((*iNode)->height * char_height_ratio + .5);
-            } else {
-                texFile << node_stmt_str[2] << ((*iNode)->width * char_width_ratio);
-                texFile << ", ";
-                texFile << node_stmt_str[3] << ((*iNode)->height * char_height_ratio);
-            }
+                if ((*iNode)->isInitial || (*iNode)->isFinal) {
+                    texFile << node_stmt_str[2] << ((*iNode)->width * char_width_ratio + .5);
+                    if ((*iNode)->shape != "circle" && (*iNode)->shape != "box") {
+                        texFile << node_stmt_str[3] << ((*iNode)->height * char_height_ratio + .5);
+                    } else {
+                        texFile << node_stmt_str[3] << ((*iNode)->width * char_width_ratio + .5);
+                    }
+                } else {
+                    texFile << node_stmt_str[2] << ((*iNode)->width * char_width_ratio);
+                    if ((*iNode)->shape != "circle" && (*iNode)->shape != "box") {
+                        texFile << node_stmt_str[3] << ((*iNode)->height * char_height_ratio);
+                    } else {
+                        texFile << node_stmt_str[3] << ((*iNode)->width * char_width_ratio);
+                    }
+                }
 
-            texFile << node_stmt_str[4] << (*iNode)->id;
-            texFile << node_stmt_str[5] << (*iNode)->posX;
-            texFile << node_stmt_str[6] << (*iNode)->posY;
-            texFile << node_stmt_str[7] << texFormat((*iNode)->label);
-            texFile << node_stmt_str[8] << endl;
+                if ((*iNode)->shape == "box") {
+                    texFile << node_stmt_str[4] << "0";
+                } else if ((*iNode)->shape == "ellipse") {
+                    texFile << node_stmt_str[4] << "3";
+                } else if ((*iNode)->shape == "circle") {
+                    texFile << node_stmt_str[4] << "15";
+                }
+
+                if ((*iNode)->color != "") {
+                    texFile << node_stmt_str[5] << (char)toupper((*iNode)->color.at(0));
+                    texFile << (*iNode)->color.substr(1, (*iNode)->color.length());
+                }
+
+                if ((*iNode)->fillcolor != "") {
+                    texFile << node_stmt_str[6] << (char)toupper((*iNode)->fillcolor.at(0));
+                    texFile << (*iNode)->fillcolor.substr(1, (*iNode)->fillcolor.length());
+                }
+
+                texFile << node_stmt_str[7] << (*iNode)->id;
+                texFile << node_stmt_str[8] << (int) ((*iNode)->posX * scale_factor);
+                texFile << node_stmt_str[9] << (int) ((*iNode)->posY * scale_factor);
+                if ((*iNode)->label != "") {
+                    texFile << node_stmt_str[10] << texFormat((*iNode)->label);
+                } else {
+                    texFile << node_stmt_str[10] << texFormat((*iNode)->id);
+                }
+                texFile << node_stmt_str[11] << endl;
+            }
         }
 
         texFile << endl;
@@ -173,10 +243,13 @@ void GasTexGraph::makeGasTex(string texFileName) {
             iNode != gastexGraph->nodes.end(); iNode++) {
             for(set<GasTexEdge*>::iterator iEdge = (*iNode)->edges.begin();
                 iEdge != (*iNode)->edges.end(); iEdge++) {
-                texFile << edge_stmt_str[0] << (*iEdge)->srcNode->id; 
-                texFile << edge_stmt_str[1] << (*iEdge)->destNode->id; 
-                texFile << edge_stmt_str[2] << texFormat((*iEdge)->label); 
-                texFile << edge_stmt_str[3] << endl; 
+
+                if ((*iEdge)->srcNode->style != "invis" && (*iEdge)->destNode->style != "invis") {
+                    texFile << edge_stmt_str[0] << (*iEdge)->srcNode->id; 
+                    texFile << edge_stmt_str[1] << (*iEdge)->destNode->id; 
+                    texFile << edge_stmt_str[2] << texFormat((*iEdge)->label); 
+                    texFile << edge_stmt_str[3] << endl; 
+                }
             }
         }
     }

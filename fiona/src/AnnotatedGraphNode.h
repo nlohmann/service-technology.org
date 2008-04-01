@@ -58,7 +58,7 @@ using namespace std;
 class AnnotatedGraphNode : public GraphNode {
 
     public:
-    
+
         /// Type of the container that holds all leaving edges of this GraphNode.
         typedef SList<AnnotatedGraphEdge*> LeavingEdges;
 
@@ -66,7 +66,7 @@ class AnnotatedGraphNode : public GraphNode {
 
         /// Annotation of this node as a formula (a CNF).
         GraphFormulaCNF* annotation;
-        
+
         /// Contains all leaving edges.
         LeavingEdges leavingEdges;
 
@@ -86,7 +86,7 @@ class AnnotatedGraphNode : public GraphNode {
 
         /// Destroys this AnnotatedGraphNode.
         virtual ~AnnotatedGraphNode();
-    
+
         /// get the annotation
         GraphFormulaCNF* getAnnotation() const;
 
@@ -98,40 +98,40 @@ class AnnotatedGraphNode : public GraphNode {
 
         /// get the annotation as a string
         std::string getAnnotationAsString() const;
-        
+
         /// Adds a leaving edge to this node.
         void addLeavingEdge(AnnotatedGraphEdge* edge);
-        
+
         /// Returns an iterator for this node's leaving edges.
         LeavingEdges::Iterator getLeavingEdgesIterator();
-        
+
         /// Returns a constant iterator for this node's leaving edges.
         LeavingEdges::ConstIterator getLeavingEdgesConstIterator() const;
-        
+
         /// Returns the number of leaving edges.
         unsigned int getLeavingEdgesCount() const;
-        
+
         /// returns true iff a colored successor of v can be avoided
         bool coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const;
-        
+
         /// returns true iff edge e is possible in every state
         bool edgeEnforcable(AnnotatedGraphEdge* e) const;
-        
+
         /// returns true iff e changes the color of the common successors
         bool changes_color(AnnotatedGraphEdge* e) const;
-        
+
         /// determines whether this node has a edge with the given label
         bool hasEdgeWithLabel(const std::string&) const;
-        
+
         /// determines whether this node has a blue edge with a given label
         bool hasBlueEdgeWithLabel(const std::string&) const;
-        
+
         /// returns a edge of this node with the given label
         AnnotatedGraphEdge* getEdgeWithLabel(const std::string&) const;
-        
+
         /// returns the destination node of the edge with the given label
         AnnotatedGraphNode* followEdgeWithLabel(const std::string&);
-        
+
         /// removes all edge from this node to the given one
         void removeEdgesToNode(const AnnotatedGraphNode*);
 
@@ -151,7 +151,7 @@ class AnnotatedGraphNode : public GraphNode {
         /// Removes unneeded literals from the node's annotation. Labels of
         /// edges to red nodes are unneeded.
         void removeUnneededLiteralsFromAnnotation();
-        
+
         /// returns true iff node should be shown according to the "show" parameter
         bool isToShow(const AnnotatedGraphNode* rootOfGraph) const;
 
@@ -185,25 +185,25 @@ class PriorityMap {
         /// \param annotation the annotation, from which the priority map will be extracted. 
         void fill(oWFN * PN, GraphFormulaCNF *annotation);
         void fillForIG(setOfMessages&, oWFN*, GraphFormulaCNF*);
-        
+
         /// Delivers the element from the priority map with the highest priority.
         /// This element will be removed afterwards.
         KeyType pop();
 
         /// DESCRIPTION
         messageMultiSet popIG();
-        
+
         /// Returns true iff the priority map is empty.
         bool empty() const;
 
         /// DESCRIPTION
         bool emptyIG() const;
-        
+
     private:
 
         /// Type of priority map.
         /// The first element of number represents the minimal length of a clause containing the key element.
-        /// The second element of number represents the maximal occurence of the key element throughout the annotation. 
+        /// The second element of number represents the maximal occurence of the key element throughout the annotation.
         typedef map<KeyType, pair<int, int> > MapType;
 
         /// Type of priority map for the IG.
@@ -211,7 +211,7 @@ class PriorityMap {
         /// The first element of int represents the minimal length of a clause containing the key element.
         /// The second element of int represents the maximal occurence of the key element throughout the annotation. 
         typedef map<messageMultiSet, pair<int, int> > MapTypeIG;
-        
+
         /// Underlying representation of association between interface places and their priority.
         MapType pm;
 

@@ -263,14 +263,14 @@ bool AnnotatedGraph::simulates(AnnotatedGraph* smallerOG) {
     if (smallerOG == NULL)
         return false;
 
-    // We need to remember the pairs of nodes we already visited.
-    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
-
     if (smallerOG->getRoot() == NULL) {
         return true;
     } else if (root == NULL) {
         return false;
     }
+
+    // We need to remember the pairs of nodes we already visited.
+    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
 
     // Get things moving...
     bool result = false;
@@ -459,13 +459,10 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode* myNode,
 //! \return true on positive check, otherwise: false
 //! \param secondOG the AnnotatedGraph that is checked for equivalence
 bool AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG) {
-    trace(TRACE_5, "AnnotatedGraph::isEuivalent(AnnotatedGraph* secondOG): start\n");
+    trace(TRACE_5, "AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG): start\n");
     // Simulation is impossible without a simulant.
     if (secondOG == NULL)
         return false;
-
-    // We need to remember the pairs of nodes we already visited.
-    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
 
     if (secondOG->getRoot() == NULL) {
         return true;
@@ -473,13 +470,41 @@ bool AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG) {
         return false;
     }
 
+    // We need to remember the pairs of nodes we already visited.
+    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
+
     // Get things moving...
     bool result = false;
     if (isEquivalentRecursive(root, secondOG->getRoot(), visitedNodes, this, secondOG)) {
         result = true;
     }
 
-    trace(TRACE_5, "AnnotatedGraph::isEuivalent(AnnotatedGraph* secondOG): end\n");
+    trace(TRACE_5, "AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG): end\n");
+    return result;
+}
+
+
+//! \brief checks, whether the given two AnnotatedGraphNodes of this AnnotatedGraph
+//! are equivalent
+//! \return true on positive check, otherwise: false
+//! \param leftNode the first AnnotatedGraphNode
+//! \param rightNode the second AnnotatedGraphNode
+bool AnnotatedGraph::isEquivalent(AnnotatedGraphNode* leftNode, AnnotatedGraphNode* rightNode) {
+    trace(TRACE_5, "AnnotatedGraph::isEquivalent(AnnotatedGraphNode* firstNode, AnnotatedGraphNode* secondNode): start\n");
+
+    assert(leftNode);
+    assert(rightNode);
+
+    // We need to remember the pairs of nodes we already visited.
+    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
+
+    // Get things moving...
+    bool result = false;
+    if (isEquivalentRecursive(leftNode, rightNode, visitedNodes, this, this)) {
+        result = true;
+    }
+
+    trace(TRACE_5, "AnnotatedGraph::isEquivalent(AnnotatedGraphNode* firstNode, AnnotatedGraphNode* secondNode): end\n");
     return result;
 }
 
@@ -720,6 +745,99 @@ bool AnnotatedGraph::isEquivalentRecursive(AnnotatedGraphNode* leftNode,
 
     // All checks were successful.
     return true;
+}
+
+
+void AnnotatedGraph::minimizeGraph() {
+    cout << "starting minimization...\n" << endl;
+    cout << "number of nodes: " << setOfNodes.size() << endl;
+
+
+    // 1) preparing a map assigning to each pair of nodes, whether they are equivalent
+    map<pair<AnnotatedGraphNode*, AnnotatedGraphNode*>, bool > areEquivalent;
+    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > nodePairs;
+
+    nodes_t::const_iterator iNode, jNode;
+    for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
+        for (jNode = iNode + 1; jNode != setOfNodes.end(); ++jNode) {
+            nodePairs.insert(make_pair(*iNode, *jNode));
+        }
+    }
+
+
+    // 2) iterating each node pair which is to be considered
+    cout << "number of node pairs: " << nodePairs.size() << "\n" << endl;
+
+    // We need to remember the pairs of nodes we already visited.
+    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
+
+    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >::const_iterator iNodePairs;
+    for (iNodePairs = nodePairs.begin(); iNodePairs != nodePairs.end(); ++iNodePairs) {
+        cout << "node pair: (" << ((*iNodePairs).first)->getName() << ", " << (*iNodePairs).second->getName() << ")" << endl;
+
+// naive lösung ab hier
+        if (isEquivalentRecursive((*iNodePairs).first,
+                                  (*iNodePairs).second,
+                                  visitedNodes,
+                                  this,
+                                  this)) {
+            cout << "\t ...are equivalent :)" << endl;
+        } else {
+            cout << "\t ...are NOT equivalent :(" << endl;            
+        }
+// naive lösung bis hier
+    }
+    
+    
+    // 3) merging equivalent OG nodes
+    
+    
+    cout << "finished minimization...\n" << endl;
+
+// alter Quatsch ab hier...
+/*
+    // preparing a set where each node is in one equivalence class, [1]
+    int numberOfClasses = 1;
+    map<AnnotatedGraphNode*, int> equivalenceClassOfNode;
+    nodes_t::const_iterator iNode;
+    for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
+        equivalenceClassOfNode[(*iNode)] = 1;
+    }
+    set<nodes_t> setOfEquivalenceClasses;
+    setOfEquivalenceClasses.insert(setOfNodes);
+
+    // iterators for the for-loops
+    set<nodes_t>::const_iterator currentClassIter;
+    nodes_t::const_iterator currentNodeIter;
+
+    bool somethingToDo = true;
+
+    // checking whether states in one class are really equivalent...
+    while (somethingToDo) {
+        somethingToDo = false;
+        
+        // take each equivalence class
+        for (currentClassIter = setOfEquivalenceClasses.begin();
+             currentClassIter != setOfEquivalenceClasses.end();
+             ++currentClassIter) {
+
+            // take each node in the equivalence class
+            for (currentNodeIter = (*currentClassIter).begin();
+                 currentNodeIter != (*currentClassIter).end();
+                 ++currentNodeIter) {
+
+                cout << (*currentNodeIter)->getName() << endl;
+                cout << equivalenceClassOfNode[(*iNode)] << endl;
+                
+                // sammle infos über ausgehende kanten
+                
+                // vergleiche jeden mit jedem bzgl ausgehenden kanten
+                
+                // splitte ggf die klasse und setze somethingToDo auf false
+            }
+        }
+    }
+*/
 }
 
 
@@ -996,52 +1114,6 @@ void AnnotatedGraph::filterRecursive(AnnotatedGraphNode* myNode,
     delete rhsEdgeIter;
 
     trace(TRACE_5, "AnnotatedGraph::filterRecursive(...): end\n");
-}
-
-
-void AnnotatedGraph::minimizeGraph() {
-
-    // preparing a set where each node is in one equivalence class, [1]
-    int numberOfClasses = 1;
-    map<AnnotatedGraphNode*, int> equivalenceClassOfNode;
-    nodes_t::const_iterator iNode;
-    for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
-        equivalenceClassOfNode[(*iNode)] = 1;
-    }
-    set<nodes_t> setOfEquivalenceClasses;
-    setOfEquivalenceClasses.insert(setOfNodes);
-
-    // iterators for the for-loops
-    set<nodes_t>::const_iterator currentClassIter;
-    nodes_t::const_iterator currentNodeIter;
-
-    bool somethingToDo = true;
-
-    // checking whether states in one class are really equivalent...
-    while (somethingToDo) {
-        somethingToDo = false;
-        
-        // take each equivalence class
-        for (currentClassIter = setOfEquivalenceClasses.begin();
-             currentClassIter != setOfEquivalenceClasses.end();
-             ++currentClassIter) {
-
-            // take each node in the equivalence class
-            for (currentNodeIter = (*currentClassIter).begin();
-                 currentNodeIter != (*currentClassIter).end();
-                 ++currentNodeIter) {
-
-                cout << (*currentNodeIter)->getName() << endl;
-                cout << equivalenceClassOfNode[(*iNode)] << endl;
-                
-                // sammle infos über ausgehende kanten
-                
-                // vergleiche jeden mit jedem bzgl ausgehenden kanten
-                
-                // splitte ggf die klasse und setze somethingToDo auf false
-            }
-        }
-    }
 }
 
 

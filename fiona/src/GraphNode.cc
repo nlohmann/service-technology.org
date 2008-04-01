@@ -271,7 +271,7 @@ unsigned int GraphNode::getLeavingEdgesCount() const {
 
 //! \brief adds the state s to the list of states
 //! \param s pointer to the state that is to be added to this node
-bool GraphNode::addState(State * s) {
+bool GraphNode::addState(State* s) {
     assert(s != NULL);
     pair<StateSet::iterator, bool> result = reachGraphStateSet.insert(s);
     return result.second; // returns whether the element got inserted (true) or not (false)

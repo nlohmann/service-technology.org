@@ -260,6 +260,10 @@ class AnnotatedGraph : public Graph {
         /// checks, whether this AnnotatedGraph is equivalent to the secondOG
         bool isEquivalent(AnnotatedGraph* secondOG);
 
+        /// checks, whether two nodes of this AnnotatedGraph are equivalent
+        bool isEquivalent(AnnotatedGraphNode* leftNode,
+                          AnnotatedGraphNode* rightNode);
+
         /// checks, whether this AnnotatedGraph simulates the given simulant while covering all interface transitions
         bool covSimulates(AnnotatedGraph* smallerOG);
 
@@ -301,7 +305,8 @@ class AnnotatedGraph : public Graph {
         virtual void reduceStructurally();
 // END OD CODE FROM CG
 
-        // Provides user defined operator new. Needed to trace all new operations on this class.
+
+// Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
         NEW_OPERATOR(AnnotatedGraph)
 #define new NEW_NEW

@@ -302,7 +302,7 @@ void reportOptionValues() {
     // report message bound
     if (options[O_MESSAGES_MAX]) {
         trace(TRACE_0, "interface message bound set to: "
-                + intToString(messages_manual) +"\n");
+                        + intToString(messages_manual) + "\n");
     }
     trace(TRACE_0, "\n");
 }
@@ -1532,7 +1532,9 @@ int main(int argc, char** argv) {
     // ********                  (OGs read one after the other)                  ********
     // **********************************************************************************
 
-    else if (parameters[P_PV] || options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC] || parameters[P_CHECK_FALSE_ANNOS] || parameters[P_REMOVE_FALSE_ANNOS]) {
+    else if (parameters[P_PV] || options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC] ||
+             parameters[P_CHECK_FALSE_ANNOS] || parameters[P_REMOVE_FALSE_ANNOS] ||
+             parameters[P_MINIMIZE_OG]) {
 
         // Abort if there are no OGs at all
         if (ogfiles.begin() == ogfiles.end() && !(parameters[P_PV])) {
@@ -1545,6 +1547,12 @@ int main(int argc, char** argv) {
              iOgFile != ogfiles.end(); ++iOgFile) {
 
             AnnotatedGraph* readOG = readog(*iOgFile);
+
+            if (parameters[P_MINIMIZE_OG]) {
+                // minimizes a given OG
+                readOG->minimizeGraph();
+                delete readOG;
+            }
 
             if (parameters[P_PV]) {
                 // computes a service automaton "public view" which has the same

@@ -44,17 +44,17 @@
 
 
 typedef enum {
-    O_HELP,                     //!< 
-    O_VERSION,                  //!< 
-    O_DEBUG,                    //!< 
-    O_GRAPH_TYPE,               //!< OG or IG
-    O_MESSAGES_MAX,             //!< 
-    O_EVENT_USE_MAX,            //!< 
-    O_CALC_REDUCED_IG,          //!< 
-    O_SHOW_NODES,               //!< 
-    O_CALC_ALL_STATES,          //!< 
-    O_BDD,                      //!< BDD-representation of OG is computed
-    O_OTF,                      //!< BDD-representation of OG is computed on the fly
+    O_HELP,                     //!< -h
+    O_VERSION,                  //!< -v
+    O_DEBUG,                    //!< -d
+    O_GRAPH_TYPE,               //!< -t
+    O_MESSAGES_MAX,             //!< -m
+    O_EVENT_USE_MAX,            //!< -e
+    O_CALC_REDUCED_IG,          //!< -r
+    O_SHOW_NODES,               //!< -s
+    O_CALC_ALL_STATES,          //!< -R
+    O_BDD,                      //!< -b,  BDD-representation of OG is computed
+    O_OTF,                      //!< -B,  BDD-representation of OG is computed on the fly
     O_EX,                       //!< 
     O_EQ_R,                     //!< equivalence of two graphs (with -R and without -R), but the two graphs are computed automatically
     O_MATCH,                    //!< 
@@ -80,6 +80,7 @@ typedef enum {
 typedef enum {
     P_IG,                       //!< compute IG
     P_OG,                       //!< compute OG
+    P_MINIMIZE_OG,              //!< minimize a given OG
     P_PV,                       //!< compute Public View Service Automaton
     P_ADAPTER,                  //!< compute adapter for given services
     P_SHOW_BLUE_NODES,          //!< show blue nodes only (empty node not shown though)
@@ -98,8 +99,6 @@ typedef enum {
     P_USE_RBS,                  //!< Use "receive before sending" for IG-reduction
     P_CHECK_FALSE_ANNOS,	    //!< check false annotations in og
     P_REMOVE_FALSE_ANNOS		//!< remove nodes with false annotations in og
-
-
 } possibleParameters;
 
 

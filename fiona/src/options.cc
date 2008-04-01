@@ -127,6 +127,7 @@ void print_help() {
   trace("                                                 matches with a given OG\n");
   trace("                                   pv          - calculate the public view of a\n");
   trace("                                                 given OG\n");
+//  trace("                                   minimizeOG  - minimizes a given OG\n");
   trace("\n");
   trace("                                   productog   - calculate the product OG of\n");
   trace("                                                 all given OGs\n");
@@ -316,6 +317,7 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_IG] = true;
     parameters[P_OG] = false;
     parameters[P_PV] = false;
+    parameters[P_MINIMIZE_OG] = false;
     parameters[P_ADAPTER] = false;
     parameters[P_SHOW_BLUE_NODES] = true;
     parameters[P_SHOW_EMPTY_NODE] = false;
@@ -384,6 +386,15 @@ void parse_command_line(int argc, char* argv[]) {
                     options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = true;
                     parameters[P_IG] = false;
+                } else if (lc_optarg == "ig") {
+                    options[O_GRAPH_TYPE] = true;
+                    parameters[P_OG] = false;
+                    parameters[P_IG] = true;
+                } else if (lc_optarg == "minimizeog") {
+                    options[O_GRAPH_TYPE] = false;
+                    parameters[P_OG] = false;
+                    parameters[P_IG] = false;
+                    parameters[P_MINIMIZE_OG] = true;
                 } else if (lc_optarg == "checkfalseannos") {
                 	parameters[P_OG] = false;
                 	parameters[P_IG] = false;
@@ -392,10 +403,6 @@ void parse_command_line(int argc, char* argv[]) {
                 	parameters[P_OG] = false;
                 	parameters[P_IG] = false;
                 	parameters[P_REMOVE_FALSE_ANNOS] = true;
-                } else if (lc_optarg == "ig") {
-                    options[O_GRAPH_TYPE] = true;
-                    parameters[P_OG] = false;
-                    parameters[P_IG] = true;
                 } else if (lc_optarg == "adapter") {
                     options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = false;
@@ -706,12 +713,19 @@ void parse_command_line(int argc, char* argv[]) {
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
-    
+
+    if (parameters[P_MINIMIZE_OG] && ogfiles.size() == 0) {
+        cerr << "Error: \t If option '-t minimizeOG' is used, at least one OG" << endl;
+        cerr << "       \t file must be given." << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
+    }
+
     if (parameters[P_GASTEX] && dotfiles.size() != 1) {
         cerr << "Error: \t If option '-t tex' is used, exactly one annotated dot " << endl;
         cerr << "       \t file must be given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);        
+        exit(1);
     }
 
     if (options[O_EX] && (((netfiles.size() + ogfiles.size()) != 2)

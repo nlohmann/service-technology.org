@@ -81,22 +81,22 @@ static struct option longopts[] = {
     { "version",         no_argument,       NULL, 'v' },
     { "debug",           required_argument, NULL, 'd' },
     { "type",            required_argument, NULL, 't' },
-    { "show",            required_argument, NULL, 's' },
-    { "parameter",       required_argument, NULL, 'p' },
-    { "reduce-nodes",    no_argument,       NULL, 'R' },
-    { "reduceIG",        no_argument,       NULL, 'r' },
     { "messagebound",    required_argument, NULL, 'm' },
     { "eventsmaximum",   required_argument, NULL, 'e' },
+    { "reduceIG",        no_argument,       NULL, 'r' },
+    { "reduce-nodes",    no_argument,       NULL, 'R' },
+    { "show",            required_argument, NULL, 's' },
     { "BDD",             required_argument, NULL, 'b' },
     { "OnTheFly",        required_argument, NULL, 'B' },
     { "output",          required_argument, NULL, 'o' },
     { "no-output",       no_argument,       NULL, 'Q' },
     { "multipledeadlocks", no_argument,     NULL, 'M' },
+    { "parameter",       required_argument, NULL, 'p' },
     { "adapterrules",    required_argument, NULL, 'a' },
     { NULL,              0,                 NULL, 0   }
 };
 
-const char* par_string = "hvd:t:s:p:Rrm:e:b:B:o:QM";
+const char* par_string = "hvd:t:m:e:rRs:b:B:o:QMp:a:";
 
 
 // --------------------- functions for command line evaluation ------------------------
@@ -125,10 +125,12 @@ void print_help() {
   trace("                                   OG          - compute operating guideline\n");
   trace("                                   match       - check whether a given oWFN\n");
   trace("                                                 matches with a given OG\n");
-  trace("                                   pv          - calculate the public view of a\n");
-  trace("                                                 given OG\n");
 //  trace("                                   minimizeOG  - minimizes a given OG\n");
   trace("\n");
+  trace("                                   pv          - calculate the public view of a\n");
+  trace("                                                 given OG\n");
+  trace("                         mostpermissivepartner - generates the most permissive\n");
+  trace("                                                 partner for a given oWFN \n"); 
   trace("                                   productog   - calculate the product OG of\n");
   trace("                                                 all given OGs\n");
   trace("                                   simulation  - check whether the first OG\n");
@@ -161,6 +163,8 @@ void print_help() {
   trace("                                   count       - count the number of strategies\n");
   trace("                                                 that are characterized by a\n");
   trace("                                                 given OG\n");
+  trace("                                   distrubuted - checks a given oWFN for\n");
+  trace("                                                 distributed controllability\n");
   trace("                                   readOG      - only reads a given OG File\n");
   trace("                                   filter      - reduces the first OG such that\n");
   trace("                                                 it simulates the second OG\n");
@@ -285,58 +289,68 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_VERSION] = false;
     options[O_DEBUG] = false;
     options[O_GRAPH_TYPE] = false;
-    options[O_SHOW_NODES] = false;
-//    options[O_CALC_ALL_STATES] = false; // standard: man muss -a angeben, um voll
-    options[O_CALC_ALL_STATES] = true; // so lange Reduktion im Teststadium
-    options[O_CALC_REDUCED_IG] = false;
-    options[O_BDD] = false;
-    options[O_OTF] = false;
-    options[O_EX] = false;
-    options[O_EQ_R] = false;
-    options[O_MATCH] = false;
-    options[O_PRODUCTOG] = false;
-    options[O_SIMULATES] = false;
-    options[O_SIMULATES_WITH_COV] = false;
-//    options[O_EQUALS] = false;
-    options[O_FILTER] = false;
-    options[O_OUTFILEPREFIX] = false;
-    options[O_REDUCE] = false;
-    options[O_NOOUTPUTFILES] = false;
-    options[O_COUNT_SERVICES] = false;
-    options[O_CHECK_ACYCLIC] = false;
-    options[O_DIAGNOSIS] = false;
-    options[O_AUTONOMOUS] = false;
-
     options[O_MESSAGES_MAX] = true;
     options[O_EVENT_USE_MAX] = false;
+    options[O_CALC_REDUCED_IG] = false;
+//    options[O_CALC_ALL_STATES] = false; // standard: man muss -a angeben, um voll
+    options[O_CALC_ALL_STATES] = true; // so lange Reduktion im Teststadium
+    options[O_SHOW_NODES] = false;
+    options[O_BDD] = false;
+    options[O_OTF] = false;
+    options[O_OUTFILEPREFIX] = false;
+    options[O_NOOUTPUTFILES] = false;
 	options[O_PV_MULTIPLE_DEADLOCKS] = false;
-
-
+    options[O_PARAMETER] = false;
+    options[O_ADAPTER_FILE] = false;
 
     // initialize parameters
-    parameters[P_IG] = true;
+
+    // -t parameters
     parameters[P_OG] = false;
-    parameters[P_PV] = false;
+	parameters[P_IG] = true;
+    parameters[P_MATCH] = false;
     parameters[P_MINIMIZE_OG] = false;
+    parameters[P_PV] = false;
+    parameters[P_SYNTHESIZE_PARTNER_OWFN] = false;
+    parameters[P_PRODUCTOG] = false;
+    parameters[P_SIMULATES] = false;
+    parameters[P_SIMULATES_WITH_COV] = false;
+    parameters[P_EX] = false;
+    parameters[P_EQ_R] = false;
     parameters[P_ADAPTER] = false;
+    parameters[P_PNG] = false;
+    parameters[P_GASTEX] = false;
+    parameters[P_CHECK_FALSE_ANNOS] = false;
+    parameters[P_REMOVE_FALSE_ANNOS] = false;
+    parameters[P_CHECK_ACYCLIC] = false;
+    parameters[P_COUNT_SERVICES] = false;
+    parameters[P_DISTRIBUTED] = false;
+    parameters[P_READ_OG] = false;
+    parameters[P_FILTER] = false;
+    parameters[P_REDUCE] = false;
+
+    // -s parameters
     parameters[P_SHOW_BLUE_NODES] = true;
     parameters[P_SHOW_EMPTY_NODE] = false;
     parameters[P_SHOW_RED_NODES] = false;
     parameters[P_SHOW_ALL_NODES] = false;
     parameters[P_SHOW_STATES_PER_NODE] = false;
     parameters[P_SHOW_DEADLOCKS_PER_NODE] = false;
-    parameters[P_READ_OG] = false;
-    parameters[P_GASTEX] = false;
 
-    parameters[P_REPRESENTATIVE] = false;
-    parameters[P_SINGLE] = true;
-    
-    parameters[P_REMOVE_FALSE_ANNOS] = false;
-    parameters[P_CHECK_FALSE_ANNOS] = false;
-
+    // -p parameters
+    parameters[P_NOPNG] = false;
+    parameters[P_TEX] = false;
+    parameters[P_DIAGNOSIS] = false;
+    parameters[P_AUTONOMOUS] = false;
+    parameters[P_REDUCE_LEVEL] = false;
 	parameters[P_USE_CRE] = false;
 	parameters[P_USE_RBS] = false;
+    parameters[P_REPRESENTATIVE] = false;
+    parameters[P_SINGLE] = true;
 
+
+	
+	
 	bdd_reordermethod = 0;
 
     messages_manual = 1;
@@ -352,26 +366,24 @@ void parse_command_line(int argc, char* argv[]) {
         switch (optc) {
             // case GETOPT_REDUCENODES:
             case 'h':
+                options[O_HELP] = true;
                 print_help();
                 exit(0);
             case 'v':
+                options[O_VERSION] = true;
                 print_version();
                 exit(0);
             case 'd':
+                options[O_DEBUG] = true;
                 if (string(optarg) == "1") {
-                    options[O_DEBUG] = true;
                     debug_level = TRACE_1;
                 } else if (string(optarg) == "2") {
-                    options[O_DEBUG] = true;
                     debug_level = TRACE_2;
                 } else if (string(optarg) == "3") {
-                    options[O_DEBUG] = true;
                     debug_level = TRACE_3;
                 } else if (string(optarg) == "4") {
-                    options[O_DEBUG] = true;
                     debug_level = TRACE_4;
                 } else if (string(optarg) == "5") {
-                    options[O_DEBUG] = true;
                     debug_level = TRACE_5;
                 } else {
                     cerr << "Error:\twrong debug mode" << endl
@@ -381,20 +393,62 @@ void parse_command_line(int argc, char* argv[]) {
                 }
                 break;
             case 't': {
+                options[O_GRAPH_TYPE] = true;
                 string lc_optarg = toLower(optarg);
                 if (lc_optarg == "og") {
-                    options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = true;
                     parameters[P_IG] = false;
                 } else if (lc_optarg == "ig") {
-                    options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = false;
                     parameters[P_IG] = true;
+                } else if (lc_optarg == "match") {
+                    parameters[P_MATCH] = true;
+                    parameters[P_IG] = false;
                 } else if (lc_optarg == "minimizeog") {
-                    options[O_GRAPH_TYPE] = false;
                     parameters[P_OG] = false;
                     parameters[P_IG] = false;
                     parameters[P_MINIMIZE_OG] = true;
+                } else if ((lc_optarg == "pv") || (lc_optarg == "publicview")) {
+                	parameters[P_PV] = true;
+                	parameters[P_IG] = false;
+                } else if (lc_optarg == "mostpermissivepartner") {
+                    parameters[P_OG] = true;
+                    parameters[P_IG] = false;
+                    parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
+                } else if (lc_optarg == "productog") {
+                    parameters[P_IG] = false;
+                    parameters[P_PRODUCTOG] = true;
+                } else if (lc_optarg == "simulation") {
+                    parameters[P_SIMULATES] = true;
+                    parameters[P_IG] = false;
+                } else if (lc_optarg == "cover_simulation") {
+                    parameters[P_SIMULATES_WITH_COV] = true;
+                    parameters[P_IG] = false;
+                } else if (lc_optarg == "equivalence") {
+                    // using BDDs or OGs/oWFNs
+                    parameters[P_EX] = true;
+                    parameters[P_IG] = false;
+                    parameters[P_OG] = false;
+                } else if (lc_optarg == "eqr") {
+                	parameters[P_EQ_R] = true;
+                	// make sure -s empty is set by setting it ;-)
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_BLUE_NODES] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = true;
+                    parameters[P_SHOW_RED_NODES] = false;
+                    parameters[P_SHOW_ALL_NODES] = false;
+                } else if (lc_optarg == "adapter") {
+                    parameters[P_OG] = false;
+                    parameters[P_IG] = true;
+                    parameters[P_ADAPTER] = true;
+                } else if (lc_optarg == "png") {
+                    parameters[P_IG] = false;
+                    parameters[P_OG] = false;
+                    parameters[P_PNG] = true;
+                } else if (lc_optarg == "tex") {
+                    parameters[P_IG] = false;
+                    parameters[P_OG] = false;
+                    parameters[P_GASTEX] = true;
                 } else if (lc_optarg == "checkfalseannos") {
                 	parameters[P_OG] = false;
                 	parameters[P_IG] = false;
@@ -403,133 +457,33 @@ void parse_command_line(int argc, char* argv[]) {
                 	parameters[P_OG] = false;
                 	parameters[P_IG] = false;
                 	parameters[P_REMOVE_FALSE_ANNOS] = true;
-                } else if (lc_optarg == "adapter") {
-                    options[O_GRAPH_TYPE] = true;
-                    parameters[P_OG] = false;
-                    parameters[P_IG] = true;
-                    parameters[P_ADAPTER] = true;
-                } else if (lc_optarg == "smallpartner") {
-                    options[O_GRAPH_TYPE] = true;
-                    parameters[P_OG] = false;
-                    parameters[P_IG] = true;
-                    options[O_SYNTHESIZE_PARTNER_OWFN] = true;
-                } else if (lc_optarg == "mostpermissivepartner") {
-                    options[O_GRAPH_TYPE] = true;
-                    parameters[P_OG] = true;
+                } else if (lc_optarg == "isacyclic") {
                     parameters[P_IG] = false;
-                    options[O_SYNTHESIZE_PARTNER_OWFN] = true;
+                    parameters[P_CHECK_ACYCLIC] = true;
+                } else if (lc_optarg == "count") {
+                    parameters[P_IG] = false;
+                    parameters[P_COUNT_SERVICES] = true;
                 } else if (lc_optarg == "distributed") {
-                    options[O_GRAPH_TYPE] = true;
                     parameters[P_OG] = true;
                     parameters[P_IG] = false;
                     options[O_SHOW_NODES] = true;
                     parameters[P_SHOW_EMPTY_NODE] = true; // essential for theory!
-                    options[O_DISTRIBUTED] = true;
-                } else if (lc_optarg == "match") {
-                    options[O_MATCH] = true;
-                    parameters[P_IG] = false;
-                } else if (lc_optarg == "simulation") {
-                    options[O_SIMULATES] = true;
-                    parameters[P_IG] = false;
-                } else if (lc_optarg == "cover_simulation") {
-                    options[O_SIMULATES_WITH_COV] = true;
-                    parameters[P_IG] = false;
-                } else if (lc_optarg == "filter") {
-                    options[O_FILTER] = true;
-                    parameters[P_IG] = false; 
-                } else if (lc_optarg == "equivalence") {
-                    // using BDDs or OGs/oWFNs
-                    options[O_EX] = true;
-                    options[O_GRAPH_TYPE] = false;
-                    parameters[P_IG] = false;
-                    parameters[P_OG] = false;
-                } else if (lc_optarg == "eqr") {
-                	options[O_EQ_R] = true;
-                	// make sure -s empty is set by setting it ;-)
-                    options[O_SHOW_NODES] = true;
-                    parameters[P_SHOW_BLUE_NODES] = true;
-                    parameters[P_SHOW_EMPTY_NODE] = true;
-                    parameters[P_SHOW_RED_NODES] = false;
-                    parameters[P_SHOW_ALL_NODES] = false;
-                } else if (lc_optarg == "productog") {
-                    parameters[P_IG] = false;
-                    options[O_PRODUCTOG] = true;
-                } else if (lc_optarg == "count") {
-                    parameters[P_IG] = false;
-                    options[O_COUNT_SERVICES] = true;
-                } else if (lc_optarg == "isacyclic") {
-                    parameters[P_IG] = false;
-                    options[O_CHECK_ACYCLIC] = true;
-                } else if (lc_optarg == "png") {
-                    parameters[P_IG] = false;
-                    parameters[P_OG] = false;
-                    options[O_PNG] = true;
-                } else if (lc_optarg == "reduce") {
-                    parameters[P_IG] = false;
-                    parameters[P_OG] = false;
-                    options[O_REDUCE] = true;
-                } else if (lc_optarg == "tex") {
-                    parameters[P_IG] = false;
-                    parameters[P_OG] = false;
-                    parameters[P_GASTEX] = true;
-                } else if ((lc_optarg == "pv") || (lc_optarg == "publicview")) {
-                	parameters[P_PV] = true;
-                	parameters[P_IG] = false;
+                    parameters[P_DISTRIBUTED] = true;
                 } else if (lc_optarg == "readog") {
-                    options[O_GRAPH_TYPE] = true;
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
                     parameters[P_READ_OG] = true;
+                } else if (lc_optarg == "filter") {
+                    parameters[P_FILTER] = true;
+                    parameters[P_IG] = false; 
+                } else if (lc_optarg == "reduce") {
+                    parameters[P_IG] = false;
+                    parameters[P_OG] = false;
+                    parameters[P_REDUCE] = true;
                 } else {
                     cerr << "Error:\twrong modus operandi (option -t)" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
-                    exit(1);
-                }
-                break;
-            }
-            case 'p': {
-                string lc_optarg = toLower(optarg);
-                if (lc_optarg == "no-png") {
-                    parameters[P_NOPNG] = true;
-                } else if (lc_optarg == "tex") {
-                    parameters[P_TEX] = true;
-                } else if (lc_optarg == "diagnosis") {
-//                    options[O_GRAPH_TYPE] = true;
-                    options[O_DIAGNOSIS] = true;
-//                    parameters[P_OG] = false;
-//                    parameters[P_IG] = true; 
-                    options[O_SHOW_NODES] = true;
-                    parameters[P_SHOW_BLUE_NODES] = true;
-                    parameters[P_SHOW_EMPTY_NODE] = true;
-                    parameters[P_SHOW_RED_NODES] = true;
-                    parameters[P_SHOW_ALL_NODES] = true;
-                    parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
-                } else if (lc_optarg == "autonomous") {
-                    options[O_AUTONOMOUS] = true;
-                } else if (lc_optarg == "representative") {
-                	parameters[P_REPRESENTATIVE] = true;
-                	parameters[P_SINGLE] = false;
-                } else if (lc_optarg == "single") {
-                	parameters[P_SINGLE] = true;
-                	parameters[P_REPRESENTATIVE] = false;
-                } else if (string(optarg) == "r1") {
-                    globals::reduction_level = 1;
-                } else if (string(optarg) == "r2") {
-                    globals::reduction_level = 2;
-                } else if (string(optarg) == "r3") {
-                    globals::reduction_level = 3;
-                } else if (string(optarg) == "r4") {
-                    globals::reduction_level = 4;
-                } else if (string(optarg) == "r5") {
-                    globals::reduction_level = 5;
-                } else if (string(optarg) == "rbs") {
-                    parameters[P_USE_RBS] = true;
-                } else if (string(optarg) == "cre") {
-                    parameters[P_USE_CRE] = true;
-                } else {
-                    cerr << "Error:\twrong parameter (option -p)" << endl
-                    << "\tEnter \"fiona --help\" for more information.\n" << endl;
                     exit(1);
                 }
                 break;
@@ -546,36 +500,37 @@ void parse_command_line(int argc, char* argv[]) {
                     options[O_EVENT_USE_MAX] = false;
                 }
                 break;
+            case 'r':
+                options[O_CALC_REDUCED_IG] = true;
+                break;
+            case 'R':
+                options[O_CALC_ALL_STATES] = false;
+                break;
             case 's':
+                options[O_SHOW_NODES] = true;
                 if (string(optarg) == "blue") {
-                    options[O_SHOW_NODES] = true;
                     parameters[P_SHOW_BLUE_NODES] = true;
                     parameters[P_SHOW_EMPTY_NODE] = false;
                     parameters[P_SHOW_RED_NODES] = false;
                     parameters[P_SHOW_ALL_NODES] = false;
                 } else if (string(optarg) == "empty") {
-                    options[O_SHOW_NODES] = true;
                     parameters[P_SHOW_BLUE_NODES] = true;
                     parameters[P_SHOW_EMPTY_NODE] = true;
                     parameters[P_SHOW_RED_NODES] = false;
                     parameters[P_SHOW_ALL_NODES] = false;
                 } else if (string(optarg) == "rednodes") {
-                    options[O_SHOW_NODES] = true;
                     parameters[P_SHOW_BLUE_NODES] = true;
                     parameters[P_SHOW_EMPTY_NODE] = false;
                     parameters[P_SHOW_RED_NODES] = true;
                     parameters[P_SHOW_ALL_NODES] = false;
                 } else if (string(optarg) == "allnodes") {
-                    options[O_SHOW_NODES] = true;
                     parameters[P_SHOW_BLUE_NODES] = true;
                     parameters[P_SHOW_EMPTY_NODE] = true;
                     parameters[P_SHOW_RED_NODES] = true;
                     parameters[P_SHOW_ALL_NODES] = true;
                 } else if (string(optarg) == "allstates") {
-                    options[O_SHOW_NODES] = true;
                     parameters[P_SHOW_STATES_PER_NODE] = true;
                 } else if (string(optarg) == "deadlocks") {
-                    options[O_SHOW_NODES] = true;
                     parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
                 } else {
                     cerr << "Error:\twrong show option" << endl
@@ -583,12 +538,6 @@ void parse_command_line(int argc, char* argv[]) {
                          << endl;
                     exit(1);
                 }
-                break;
-            case 'R':
-                options[O_CALC_ALL_STATES] = false;
-                break;
-            case 'r':
-                options[O_CALC_REDUCED_IG] = true;
                 break;
             case 'b':
                 options[O_BDD] = true;
@@ -635,6 +584,57 @@ void parse_command_line(int argc, char* argv[]) {
 			case 'M':
 				options[O_PV_MULTIPLE_DEADLOCKS] = true;
 				break;
+            case 'p': {
+                string lc_optarg = toLower(optarg);
+				options[O_PARAMETER] = true;
+                if (lc_optarg == "no-png") {
+                    parameters[P_NOPNG] = true;
+                } else if (lc_optarg == "tex") {
+                    parameters[P_TEX] = true;
+                } else if (lc_optarg == "diagnosis") {
+                    parameters[P_DIAGNOSIS] = true;
+//                    parameters[P_OG] = false;
+//                    parameters[P_IG] = true; 
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_BLUE_NODES] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = true;
+                    parameters[P_SHOW_RED_NODES] = true;
+                    parameters[P_SHOW_ALL_NODES] = true;
+                    parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
+                } else if (lc_optarg == "autonomous") {
+                    parameters[P_AUTONOMOUS] = true;
+                } else if (string(optarg) == "r1") {
+                    parameters[P_REDUCE_LEVEL] = true;
+                    globals::reduction_level = 1;
+                } else if (string(optarg) == "r2") {
+                    parameters[P_REDUCE_LEVEL] = true;
+                    globals::reduction_level = 2;
+                } else if (string(optarg) == "r3") {
+                    parameters[P_REDUCE_LEVEL] = true;
+                    globals::reduction_level = 3;
+                } else if (string(optarg) == "r4") {
+                    parameters[P_REDUCE_LEVEL] = true;
+                    globals::reduction_level = 4;
+                } else if (string(optarg) == "r5") {
+                    parameters[P_REDUCE_LEVEL] = true;
+                    globals::reduction_level = 5;
+                } else if (string(optarg) == "cre") {
+                    parameters[P_USE_CRE] = true;
+                } else if (string(optarg) == "rbs") {
+                    parameters[P_USE_RBS] = true;
+                } else if (lc_optarg == "representative") {
+                	parameters[P_REPRESENTATIVE] = true;
+                	parameters[P_SINGLE] = false;
+                } else if (lc_optarg == "single") {
+                	parameters[P_SINGLE] = true;
+                	parameters[P_REPRESENTATIVE] = false;
+                } else {
+                    cerr << "Error:\twrong parameter (option -p)" << endl
+                    << "\tEnter \"fiona --help\" for more information.\n" << endl;
+                    exit(1);
+                }
+                break;
+            }
             case 'a':
                 if (optarg) {
                     options[O_ADAPTER_FILE] = true;
@@ -703,7 +703,7 @@ void parse_command_line(int argc, char* argv[]) {
     }
 
     // read net from stdin
-    if (ogfiles.size() == 0 && netfiles.size() == 0 && (parameters[P_IG] || parameters[P_OG] || options[O_PNG] || options[O_REDUCE])) {
+    if (ogfiles.size() == 0 && netfiles.size() == 0 && (parameters[P_IG] || parameters[P_OG] || parameters[P_PNG] || parameters[P_REDUCE])) {
         netfiles.push_back("<stdin>");
     }
 
@@ -728,7 +728,7 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
-    if (options[O_EX] && (((netfiles.size() + ogfiles.size()) != 2)
+    if (parameters[P_EX] && (((netfiles.size() + ogfiles.size()) != 2)
                           || (options[O_BDD] && netfiles.size() != 2))) {
         cerr << "Error: \t If option '-t equivalence' is used, either two OG-/oWFN-files must be" << endl;
         cerr << "       \t given or (in case of BDD-equivalence) exactly two oWFNs have to be" << endl;
@@ -737,37 +737,37 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
-    if ((options[O_PNG] || options[O_REDUCE]|| parameters[P_IG] || parameters[P_OG]) && netfiles.size() == 0) {
+    if ((parameters[P_PNG] || parameters[P_REDUCE]|| parameters[P_IG] || parameters[P_OG]) && netfiles.size() == 0) {
         cerr << "Error: \t No oWFNs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
 
-    if (options[O_MATCH] && ogfiles.size() != 1) {
+    if (parameters[P_MATCH] && ogfiles.size() != 1) {
         cerr << "Error: \t Exactly one operating guideline must be given for matching!\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
 
-    if (options[O_PRODUCTOG] && ogfiles.size() < 2) {
+    if (parameters[P_PRODUCTOG] && ogfiles.size() < 2) {
         cerr << "Error: \t Give at least two OGs to build their product!\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
 
-    if (options[O_SIMULATES] && ((netfiles.size() + ogfiles.size()) != 2)) {
+    if (parameters[P_SIMULATES] && ((netfiles.size() + ogfiles.size()) != 2)) {
         cerr << "Error: \t If option -t simulation is used, exactly two OG/oWFN files must be entered\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
 
-    if (options[O_SIMULATES_WITH_COV] && ((netfiles.size() + ogfiles.size()) != 2)) {
+    if (parameters[P_SIMULATES_WITH_COV] && ((netfiles.size() + ogfiles.size()) != 2)) {
         cerr << "Error: \t If option -t cover_simulation is used, exactly two OG/oWFN files must be entered\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
 
-    if (options[O_FILTER] && ogfiles.size() != 2) {
+    if (parameters[P_FILTER] && ogfiles.size() != 2) {
         cerr << "Error: \t If option -t filter is used, exactly two OG files must be entered\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
@@ -785,7 +785,7 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
-    if (options[O_BDD] && parameters[P_OG] == false && options[O_EX] == false) {
+    if (options[O_BDD] && parameters[P_OG] == false && parameters[P_EX] == false) {
         cerr << "Warning: \t computing IG -- BDD option ignored\n" << endl;
         options[O_BDD] = false;
     }
@@ -801,8 +801,8 @@ void parse_command_line(int argc, char* argv[]) {
 		options[O_PV_MULTIPLE_DEADLOCKS] = false;
 	}
 
-    if (!options[O_FILTER] && !options[O_PRODUCTOG] && !options[O_SIMULATES] && !options[O_SIMULATES_WITH_COV] && 
-        !options[O_EX] && options[O_OUTFILEPREFIX] && (ogfiles.size() > 1 || netfiles.size() > 1)) {
+    if (!parameters[P_FILTER] && !parameters[P_PRODUCTOG] && !parameters[P_SIMULATES] && !parameters[P_SIMULATES_WITH_COV] && 
+        !parameters[P_EX] && options[O_OUTFILEPREFIX] && (ogfiles.size() > 1 || netfiles.size() > 1)) {
         cerr << "Error: \t The output option cannot be used if multiple output files are to be created!\n" << endl;
         exit(1);
     }

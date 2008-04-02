@@ -433,7 +433,7 @@ void CommunicationGraph::printGraphToDot() {
             outfilePrefixWithOptions += ".R";
         }
 
-        if (options[O_DIAGNOSIS]) {
+        if (parameters[P_DIAGNOSIS]) {
             outfilePrefixWithOptions += ".diag";
         } else {
             if (parameters[P_OG]) {
@@ -448,7 +448,7 @@ void CommunicationGraph::printGraphToDot() {
         dotFile << "digraph g1 {\n";
         dotFile << "graph [fontname=\"Helvetica\", label=\"";
 
-        if (options[O_DIAGNOSIS]) {
+        if (parameters[P_DIAGNOSIS]) {
             dotFile << "diagnosis of ";
         } else {
             parameters[P_OG] ? dotFile << "OG of " : dotFile << "IG of ";
@@ -591,7 +591,7 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
     }
 
     // the diagnosis mode uses different colors
-    if (options[O_DIAGNOSIS]) {
+    if (parameters[P_DIAGNOSIS]) {
         os << "\", fontcolor=black, color=" << v->getDiagnosisColor().toString();
     } else {
         os << "\", fontcolor=black, color=" << v->getColor().toString();
@@ -631,14 +631,14 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
            << " [label=\"" << element->getLabel();
 
         // the diagnosis mode uses different colors
-        if (options[O_DIAGNOSIS]) {
+        if (parameters[P_DIAGNOSIS]) {
             os << "\", fontcolor=black, color=" << vNext->getDiagnosisColor().toString();
         } else {
             os << "\", fontcolor=black, color=" << vNext->getColor().toString();
         }
 
         // in diagnosis mode, draw "unenforcable" arcs dashed
-        if (options[O_DIAGNOSIS] && !v->edgeEnforcable(element)) {
+        if (parameters[P_DIAGNOSIS] && !v->edgeEnforcable(element)) {
             os << ", style=dashed";
         }
 

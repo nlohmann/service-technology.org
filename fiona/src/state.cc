@@ -329,7 +329,7 @@ stateType State::exactType() {
  * \author Niels Lohmann <niels.lohmann@uni-rostock.de>
  */
 bool State::isNotAutonomouslyTransient() const {
-    if (!options[O_AUTONOMOUS])
+    if (!parameters[P_AUTONOMOUS])
         return false;
     
     assert(cardFireList > 0);

@@ -360,7 +360,7 @@ void makeGasTex(CommunicationGraph* graph) {
         outfilePrefixWithOptions += ".R";
     }
 
-    if (options[O_DIAGNOSIS]) {
+    if (parameters[P_DIAGNOSIS]) {
         outfilePrefixWithOptions += ".diag";
     } else {
         if (parameters[P_OG]) {
@@ -441,11 +441,11 @@ string computeIG(oWFN* PN) {
     trace(TRACE_0, "\n");
 
     if (!options[O_NOOUTPUTFILES]) {
-        if (options[O_DIAGNOSIS]) {
+        if (parameters[P_DIAGNOSIS]) {
             graph->diagnose();
         }
 
-        if (!options[O_EQ_R]) {	// don't create png if we are in eqr mode
+        if (!parameters[P_EQ_R]) {	// don't create png if we are in eqr mode
         	// generate output files
         	graph->printGraphToDot(); // .out, .png
 
@@ -471,7 +471,7 @@ string computeIG(oWFN* PN) {
         graph->printOGFile(igFilename);
 
 /* */
-        if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
+        if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
             if (controllable) {
                 graph->printGraphToSTG();
             } else {
@@ -604,7 +604,7 @@ string computeOG(oWFN* PN) {
     // generate output files
     if (!options[O_NOOUTPUTFILES]) {
         // distributed controllability?
-        if (options[O_DISTRIBUTED]) {
+        if (parameters[P_DISTRIBUTED]) {
             trace(TRACE_0, "\nannotating OG for distributed controllability\n");
 
             bool graphChanged = true;
@@ -625,7 +625,7 @@ string computeOG(oWFN* PN) {
             }
         }
 
-        if (!options[O_EQ_R]) {	// don't create png if we are in eqr mode
+        if (!parameters[P_EQ_R]) {	// don't create png if we are in eqr mode
         	graph->printGraphToDot(); // .out, .png
 
         	if (parameters[P_TEX]) {
@@ -645,7 +645,7 @@ string computeOG(oWFN* PN) {
 
         graph->printOGFile(ogFilename);
 
-        if (options[O_SYNTHESIZE_PARTNER_OWFN]) {
+        if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
             if (controllable) {
                 graph->printGraphToSTG();
             } else {
@@ -920,7 +920,7 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
     // we can only check exactly 2 OGs for equivalence
     // a possible violation should have been rejected by options.cc
     
-    if (!options[O_EQ_R]) {
+    if (!parameters[P_EQ_R]) {
     	assert(netfiles.size() + OGsFromFiles.size() == 2);
     } else {
     	assert(OGsFromFiles.size() == 2);
@@ -1014,7 +1014,7 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
     seconds2 = time (NULL);
     cout << "    " << difftime(seconds2, seconds) << " s consumed for checking equivalence" << endl << endl;
 
-    if (!calledWithNet && !options[O_EQ_R]) {
+    if (!calledWithNet && !parameters[P_EQ_R]) {
         trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
         trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
     }
@@ -1469,8 +1469,8 @@ int main(int argc, char** argv) {
     // ********                       (all OGs read first)                       ********
     // **********************************************************************************
 
-    if (options[O_PRODUCTOG] || options[O_SIMULATES_WITH_COV] || options[O_FILTER] ||
-        options[O_SIMULATES] || (options[O_EX] && !options[O_BDD]) || parameters[P_READ_OG]) {
+    if (parameters[P_PRODUCTOG] || parameters[P_SIMULATES_WITH_COV] || parameters[P_FILTER] ||
+        parameters[P_SIMULATES] || (parameters[P_EX] && !options[O_BDD]) || parameters[P_READ_OG]) {
 
         // reading all OG-files
         AnnotatedGraph::ogs_t OGsFromFiles;
@@ -1493,34 +1493,34 @@ int main(int argc, char** argv) {
             return 0;
         }
 
-        if (options[O_PRODUCTOG]) {
+        if (parameters[P_PRODUCTOG]) {
             // calculating the product OG
             computeProductOG(OGsFromFiles);
             deleteOGs(OGsFromFiles);
             return 0;
         }
 
-        if (options[O_SIMULATES]) {
+        if (parameters[P_SIMULATES]) {
             // simulation on AnnotatedGraph
             checkSimulation(OGsFromFiles);
             // deleteOGs(OGsFromFiles);
             // return 0;
         }
 
-        if (options[O_SIMULATES_WITH_COV]) {
+        if (parameters[P_SIMULATES_WITH_COV]) {
             // simulation on AnnotatedGraph
             checkCovSimulation(OGsFromFiles);
             //deleteOGs(OGsFromFiles);
             return 0;
         }
 
-        if (options[O_EX] && !options[O_BDD]) {
+        if (parameters[P_EX] && !options[O_BDD]) {
             // equivalence on (explicit representation of) operating guidelines
             checkEquivalence(OGsFromFiles);
             return 0;
         }
 
-        if (options[O_FILTER]) {
+        if (parameters[P_FILTER]) {
             // filtration on OG
             filterOG(OGsFromFiles);
             return 0;
@@ -1532,7 +1532,7 @@ int main(int argc, char** argv) {
     // ********                  (OGs read one after the other)                  ********
     // **********************************************************************************
 
-    else if (parameters[P_PV] || options[O_COUNT_SERVICES] || options[O_CHECK_ACYCLIC] ||
+    else if (parameters[P_PV] || parameters[P_COUNT_SERVICES] || parameters[P_CHECK_ACYCLIC] ||
              parameters[P_CHECK_FALSE_ANNOS] || parameters[P_REMOVE_FALSE_ANNOS] ||
              parameters[P_MINIMIZE_OG]) {
 
@@ -1561,14 +1561,14 @@ int main(int argc, char** argv) {
                 delete readOG;
             }
 
-            if (options[O_COUNT_SERVICES]) {
+            if (parameters[P_COUNT_SERVICES]) {
                 // counts the number of deterministic strategies
                 // that are characterized by a given OG
                 countStrategies(readOG, (*iOgFile));
                 delete readOG;
             }
 
-            if (options[O_CHECK_ACYCLIC]) {
+            if (parameters[P_CHECK_ACYCLIC]) {
                 // counts the number of deterministic strategies
                 // that are characterized by a given OG
                 checkAcyclicity(readOG, (*iOgFile));
@@ -1604,7 +1604,7 @@ int main(int argc, char** argv) {
     // **********************************************************************************
 
     // netfiles only used for getting the correct name strings
-    if (options[O_EX] && options[O_BDD]) {
+    if (parameters[P_EX] && options[O_BDD]) {
         // checking exchangeability using BDDs
 
         assert(netfiles.size() == 2);
@@ -1623,10 +1623,10 @@ int main(int argc, char** argv) {
         // return 0;
     } else if (parameters[P_ADAPTER]) {
         generateAdapter();
-    } else if (parameters[P_IG] || parameters[P_OG] || options[O_MATCH] ||
-               options[O_PNG] || options[O_REDUCE] ||parameters[P_PV]) {
+    } else if (parameters[P_IG] || parameters[P_OG] || parameters[P_MATCH] ||
+               parameters[P_PNG] || parameters[P_REDUCE] ||parameters[P_PV]) {
 
-        if (options[O_MATCH]) {
+        if (parameters[P_MATCH]) {
             assert(ogfiles.size() == 1);
             // we match multiple oWFNs with one OG,
             // so read the og first, then iterate over the nets
@@ -1637,7 +1637,7 @@ int main(int argc, char** argv) {
         int loop = 0;		// in case the option -t eqR is set, we need each netfile to be processed twice
         ogfiles.clear();
         
-        if (!options[O_EQ_R]) {		// option is not set, so we don't do the loop
+        if (!parameters[P_EQ_R]) {		// option is not set, so we don't do the loop
         	loop = 27;				// loop needs to be higher than 1 ;-)
         }
         
@@ -1687,22 +1687,22 @@ int main(int argc, char** argv) {
 	                fileName = computeOG(PN);
 	            }
 	
-	            if (options[O_MATCH]) {
+	            if (parameters[P_MATCH]) {
 	                // matching the current oWFN against the single OG 
 	                checkMatching(OGToMatch, PN);
 	            }
 	
-	            if (options[O_PNG]) {
+	            if (parameters[P_PNG]) {
 	                // create a png file of the given net
 	                makePNG(PN);
 	            }
 
-	            if (options[O_REDUCE]) {
+	            if (parameters[P_REDUCE]) {
 	                // create a png file of the given net
 	                reduceOWFN(PN);
 	            }
 
-	            if (options[O_EQ_R]) {
+	            if (parameters[P_EQ_R]) {
 	            	// reverse reduction mode for the next loop
 		        options[O_CALC_ALL_STATES] = !options[O_CALC_ALL_STATES];
 		        // remember file name of og-file to check equivalence later on
@@ -1715,7 +1715,7 @@ int main(int argc, char** argv) {
        	            loop++;
 	        } while (loop <= 1);	// calculate the graph of the same net twice --> once with -R and once with no -R
 	        
-	        if (options[O_EQ_R]) {
+	        if (parameters[P_EQ_R]) {
 	            // reading all og-files
 	            AnnotatedGraph::ogs_t OGsFromFiles;
 	            readAllOGs(OGsFromFiles);

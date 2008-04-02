@@ -248,7 +248,7 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
             }
         }
         
-        if (!options[O_DIAGNOSIS]) {
+        if (!parameters[P_DIAGNOSIS]) {
 
         	// do not optimize when trying diagnosis
             if (currentNode->getAnnotation()->equals() == FALSE) {

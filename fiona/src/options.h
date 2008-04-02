@@ -44,61 +44,65 @@
 
 
 typedef enum {
-    O_HELP,                     //!< -h
-    O_VERSION,                  //!< -v
-    O_DEBUG,                    //!< -d
-    O_GRAPH_TYPE,               //!< -t
-    O_MESSAGES_MAX,             //!< -m
-    O_EVENT_USE_MAX,            //!< -e
-    O_CALC_REDUCED_IG,          //!< -r
-    O_SHOW_NODES,               //!< -s
-    O_CALC_ALL_STATES,          //!< -R
-    O_BDD,                      //!< -b,  BDD-representation of OG is computed
-    O_OTF,                      //!< -B,  BDD-representation of OG is computed on the fly
-    O_EX,                       //!< 
-    O_EQ_R,                     //!< equivalence of two graphs (with -R and without -R), but the two graphs are computed automatically
-    O_MATCH,                    //!< 
-    O_PRODUCTOG,                //!< 
-    O_SIMULATES,                //!<
-    O_SIMULATES_WITH_COV,       //!<
-    O_FILTER,                   //!< 
-    O_OUTFILEPREFIX,            //!< 
-    O_NOOUTPUTFILES,            //!< produce no output files
-    O_SYNTHESIZE_PARTNER_OWFN,  //!< compute an oWFN from the IG/OG
-    O_DISTRIBUTED,              //!< check for distributed controllability
-    O_COUNT_SERVICES,           //!< 
-    O_CHECK_ACYCLIC,            //!< 
-    O_PNG,                      //!< graphical output of all given oWFNs
-    O_REDUCE,                   //!< reduce given oWFNs 
-    O_DIAGNOSIS,                //!< diagnosis information
-    O_PV_MULTIPLE_DEADLOCKS,    //!< 
-    O_ADAPTER_FILE,             //!< file with adapter rules
-    O_AUTONOMOUS                //!< check for autonomous controllability
+    O_HELP,                     //!< -h, show the help output
+    O_VERSION,                  //!< -v, show the current fiona version
+    O_DEBUG,                    //!< -d, show additional debug information
+    O_GRAPH_TYPE,               //!< -t, set mode of operation
+    O_MESSAGES_MAX,             //!< -m, set a message maximum
+    O_EVENT_USE_MAX,            //!< -e, set an events maximum
+    O_CALC_REDUCED_IG,          //!< -r, reduce the ig
+    O_CALC_ALL_STATES,          //!< -R, calculate all states
+    O_SHOW_NODES,               //!< -s, show additional information in nodes
+    O_BDD,                      //!< -b, BDD-representation of OG is computed
+    O_OTF,                      //!< -B, BDD-representation of OG is computed on the fly
+    O_OUTFILEPREFIX,            //!< -o, set an outputfile prefix
+    O_NOOUTPUTFILES,            //!< -Q, produce no output files
+    O_PV_MULTIPLE_DEADLOCKS,    //!< -M, use multiple deadlocks in pv generation
+    O_PARAMETER,                //!< -p, use additional parameters
+    O_ADAPTER_FILE,             //!< -a, file with adapter rules
 } possibleOptions;
 
 
 typedef enum {
-    P_IG,                       //!< compute IG
     P_OG,                       //!< compute OG
+    P_IG,                       //!< compute IG
+    P_MATCH,                    //!< match an oWFN against an OG
     P_MINIMIZE_OG,              //!< minimize a given OG
     P_PV,                       //!< compute Public View Service Automaton
+    P_SYNTHESIZE_PARTNER_OWFN,  //!< compute an oWFN from the IG/OG
+    P_PRODUCTOG,                //!< compute the product of 2 OGs
+    P_SIMULATES,                //!< Check whether an OG simulates another
+    P_SIMULATES_WITH_COV,       //!< Check whether an OG simulates another including coverage formulas
+    P_EX,                       //!< check equivalence (former exchangability) of two OGs 
+    P_EQ_R,                     //!< equivalence of two graphs (with -R and without -R), but the two graphs are computed automatically
     P_ADAPTER,                  //!< compute adapter for given services
+    P_PNG,                      //!< graphical output of all given oWFNs
+    P_GASTEX,                   //!< read an annotated dot file and create a gastex tex file
+    P_CHECK_FALSE_ANNOS,	    //!< check false annotations in og
+    P_REMOVE_FALSE_ANNOS,		//!< remove nodes with false annotations in og
+    P_CHECK_ACYCLIC,            //!< Check whether an OG is acyclic 
+    P_COUNT_SERVICES,           //!< Compute the number of services characterized by an OG
+    P_DISTRIBUTED,              //!< check for distributed controllability
+    P_READ_OG,                  //!< only read an OG from a file
+    P_FILTER,                   //!<  
+    P_REDUCE,                   //!< reduce given oWFNs 
+
     P_SHOW_BLUE_NODES,          //!< show blue nodes only (empty node not shown though)
     P_SHOW_EMPTY_NODE,          //!< show all blue nodes (including empty node)
     P_SHOW_RED_NODES,           //!< show blue and red nodes (empty node not shown)
     P_SHOW_ALL_NODES,           //!< show red, blue, and empty nodes
     P_SHOW_STATES_PER_NODE,     //!< show all states in a node (aka "knowledge")
     P_SHOW_DEADLOCKS_PER_NODE,  //!< show deadlock states only
+
     P_NOPNG,                    //!< do not create a PNG output
     P_TEX,                      //!< create a gastex tex file in some other mode
-    P_READ_OG,                  //!< only read an OG from a file
-    P_GASTEX,                   //!< read an annotated dot file and create a gastex tex file
-    P_REPRESENTATIVE,	      	//!< state reduction in node using representatives
-    P_SINGLE,                   //!< state reduction in node using single marking as representative
+    P_DIAGNOSIS,                //!< diagnosis information
+    P_AUTONOMOUS,               //!< check for autonomous controllability
+    P_REDUCE_LEVEL,             //!< set reduction level of mode -t reduce
     P_USE_CRE,                  //!< Use "combine receiving events" for IG-reduction
     P_USE_RBS,                  //!< Use "receive before sending" for IG-reduction
-    P_CHECK_FALSE_ANNOS,	    //!< check false annotations in og
-    P_REMOVE_FALSE_ANNOS		//!< remove nodes with false annotations in og
+    P_REPRESENTATIVE,	      	//!< state reduction in node using representatives
+    P_SINGLE                    //!< state reduction in node using single marking as representative
 } possibleParameters;
 
 

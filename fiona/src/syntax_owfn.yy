@@ -199,7 +199,7 @@ net:
 				// Ignore (do not add to PN) external places if oWFN should
 				// be matched with an OG. That is because we match the
 				// reachability graph of the inner of the oWFN with the OG.
-				if (options[O_MATCH] &&
+				if (parameters[P_MATCH] &&
 					plSymbol->getPlace()->type != INTERNAL)
 				{
 					ignoredPlacesDueToMatching.insert(plSymbol->getPlace());
@@ -227,7 +227,7 @@ net:
 				    j < PN->getTransition(i)->getLeavingArcsCount(); j++)
 				{
 					owfnPlace * pl = PN->getTransition(i)->getLeavingArc(j)->pl;
-					if (options[O_MATCH] && pl->type != INTERNAL)
+					if (parameters[P_MATCH] && pl->type != INTERNAL)
 					{
 						continue;
 					}
@@ -237,7 +237,7 @@ net:
 				     j < PN->getTransition(i)->getArrivingArcsCount(); j++)
 				{
 					owfnPlace * pl = PN->getTransition(i)->getArrivingArc(j)->pl;
-					if (options[O_MATCH] && pl->type != INTERNAL)
+					if (parameters[P_MATCH] && pl->type != INTERNAL)
 					{
 						continue;
 					}
@@ -522,7 +522,7 @@ transition: KEY_TRANSITION tname
 		// Ignore external places if oWFN should be matched with an
 		// OG. That is because we match the reachability graph of
 		// the inner of the oWFN with the OG.
-		if (options[O_MATCH] && current->place->getPlace()->type != INTERNAL) {
+		if (parameters[P_MATCH] && current->place->getPlace()->type != INTERNAL) {
 			continue;
 		}
 
@@ -538,7 +538,7 @@ transition: KEY_TRANSITION tname
 			owfn_yyerror(msg.c_str());
 		}
 
-		if (options[O_MATCH] && current->place->getPlace()->type != INTERNAL) {
+		if (parameters[P_MATCH] && current->place->getPlace()->type != INTERNAL) {
 			if (T->hasNonTauLabelForMatching()) {
 				string msg = string("Transition '") + T->name + "' sends or "
 					"receives more than one message which is not allowed.";
@@ -584,7 +584,7 @@ transition: KEY_TRANSITION tname
 			owfn_yyerror(msg.c_str());
 		}
 
-		if (options[O_MATCH] && current->place->getPlace()->type != INTERNAL) {
+		if (parameters[P_MATCH] && current->place->getPlace()->type != INTERNAL) {
 			if (T->hasNonTauLabelForMatching()) {
 				string msg = string("Transition '") + T->name + "' sends or "
 					"receives more than one message which is not allowed.";

@@ -210,7 +210,7 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
             currentNode->removeLiteralFromAnnotation(PN->createLabel(mmSet));
         }
         
-        if (!options[O_DIAGNOSIS]) {
+        if (!parameters[P_DIAGNOSIS]) {
         	// do not optimize when trying diagnosis
         	if (currentNode->getAnnotation()->equals() == FALSE) {
         		currentNode->setColor(RED);

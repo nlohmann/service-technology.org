@@ -245,7 +245,7 @@ bool Graph::isAcyclic() {
 void Graph::printDotFile(const std::string& filenamePrefix,
                          const std::string& dotGraphTitle) const {
 
-    trace(TRACE_0, "creating the dot file of the OG...\n");
+    trace(TRACE_0, "creating the dot file of the graph...\n");
     
     string dotFile = filenamePrefix + ".out";
     string pngFile = filenamePrefix + ".png";
@@ -369,13 +369,15 @@ void Graph::transformToOWFNRecursively(GraphNode* currentNode,
 		   							   unsigned int& transitionNumber,
 		   							   PNapi::Transition* incomingTransition) {
     
-	
     if(visitedNodes.find(currentNode) != visitedNodes.end()) {
+    	trace(TRACE_3, "    node " + currentNode->getName() + " has already been visited\n");
         if (incomingTransition != NULL) {
         	PN->newArc(incomingTransition, PN->findPlace("p" + currentNode->getName()));
         } 
      	return;
     }
+
+	trace(TRACE_2, "    Processing node: " + currentNode->getName() + "\n");
 
     PNapi::Place* place = PN->newPlace("p" + currentNode->getName());
   	visitedNodes.insert(currentNode);

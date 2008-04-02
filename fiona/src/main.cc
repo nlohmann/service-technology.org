@@ -500,7 +500,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
 
     trace(TRACE_0, "generating the public view for ");
     trace(graphName);
-    trace("\n\n");
+    trace("\n");
 
     unsigned int maxSizeForDot = 120;
     

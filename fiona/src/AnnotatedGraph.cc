@@ -1563,7 +1563,7 @@ AnnotatedGraph* AnnotatedGraph::product(const AnnotatedGraph* rhs) {
     // therefore, we perform a coordinated dfs through OG and the rhs OG
     buildProductOG(currentOGNode, currentRhsNode, productOG);
 
-    if (!options[O_DIAGNOSIS]) {
+    if (!parameters[P_DIAGNOSIS]) {
         productOG->removeFalseNodes();
     }
 

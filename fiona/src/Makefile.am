@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2008-03-18 15:41:21 $ by $Author: danitz $.
-# Version $Revision: 1.52 $
+# File last changed $Date: 2008-04-07 16:43:46 $ by $Author: gierds $.
+# Version $Revision: 1.53 $
 
 include $(top_srcdir)/Makefile.covcommon
 
@@ -70,8 +70,9 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         stg2owfn.cc set_helpers.h SinglyLinkedList.h\
         GastexGraph.h GastexGraph.cc
 
-BUILT_SOURCES = lexer_owfn.h syntax_owfn.h syntax_og.h syntax_stg.h syntax_adapt_rules.h syntax_dot.h \
-		syntax_owfn.cc syntax_og.cc syntax_stg.cc syntax_adapt_rules.cc syntax_dot.cc
+BUILT_SOURCES = syntax_owfn.cc syntax_og.cc syntax_stg.cc syntax_adapt_rules.cc syntax_dot.cc \
+		lexer_owfn.h syntax_owfn.h syntax_og.h syntax_stg.h syntax_adapt_rules.h syntax_dot.h
+		
 
 EXTRA_DIST = lexer_owfn.h syntax_owfn.h syntax_og.h syntax_stg.h syntax_adapt_rules.h syntax_dot.h \
 	     syntax_owfn.cc syntax_og.cc syntax_stg.cc syntax_adapt_rules.cc syntax_dot.cc
@@ -89,7 +90,7 @@ else
 LINK_COMPILE_64BIT_FLAG =
 endif
 
-OPTIMIZATION_LEVEL=
+OPTIMIZATION_LEVEL=-g -O2
 
 WARNINGS=-W -Wall -Wno-unused
 

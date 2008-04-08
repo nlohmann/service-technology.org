@@ -196,8 +196,65 @@ void AnnotatedGraph::removeFalseNodes() {
     if (getRoot() == NULL) 
     	trace(TRACE_0, "\n\n!!!Removed the root node!!!\n");
 
+	// Remove any nodes, that have been disconnected from the root node
+    //removeDisconnectedNodes();
+
 	trace(TRACE_5, "AnnotatedGraph::removeFalseNodes(): end\n");
 }
+
+
+
+//! \brief removes all nodes that have been disconnected from the root
+//!        node due to other node removals
+void AnnotatedGraph::removeDisconnectedNodes() {
+
+    trace(TRACE_5, "AnnotatedGraph::removeDisconnectedNodes(): start\n");
+
+    set<AnnotatedGraphNode*> connectedNodes;
+    
+    if (getRoot() == NULL)
+    	return;
+ 
+    removeDisconnectedNodesRecursively(getRoot(), connectedNodes);
+
+    nodes_iterator iNode = setOfNodes.begin();
+    while (iNode != setOfNodes.end()) {
+        if (connectedNodes.find(*iNode) == connectedNodes.end()) {
+            removeEdgesToNodeFromAllOtherNodes(*iNode);
+            AnnotatedGraphNode * n = *iNode;
+            iNode = setOfNodes.erase(iNode);
+    	    removeNode(n);
+    	    delete n;
+        }
+    }
+	trace(TRACE_5, "AnnotatedGraph::removeDisconnectedNodes(): end\n");
+}
+
+
+//! \brief collects all connected Nodes in a set
+//! \param currentNode Current node to be added to the set
+//! \param connectedNodes set of connected nodes
+void AnnotatedGraph::removeDisconnectedNodesRecursively(AnnotatedGraphNode* currentNode,
+														set<AnnotatedGraphNode*>& connectedNodes) {
+
+    trace(TRACE_5, "AnnotatedGraph::removeDisconnectedNodesRecursively(): start\n");
+
+    if (connectedNodes.find(currentNode) != connectedNodes.end())
+    	return;
+    
+    connectedNodes.insert(currentNode);
+
+    AnnotatedGraphNode::LeavingEdges::ConstIterator
+            edgeIter = currentNode->getLeavingEdgesConstIterator();
+
+    while (edgeIter->hasNext()) {
+        AnnotatedGraphEdge* edge = edgeIter->getNext();
+    	removeDisconnectedNodesRecursively(edge->getDstNode(), connectedNodes);
+    }
+    
+    trace(TRACE_5, "AnnotatedGraph::removeDisconnectedNodesRecursively(): end\n");
+}
+
 
 //! \brief finds all nodes that have annotations that cannot become
 //!        true. The function continues removing until no node fullfils

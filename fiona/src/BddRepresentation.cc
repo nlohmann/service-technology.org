@@ -50,9 +50,7 @@ extern oWFN * PN;
 
 //! \brief constructor
 BddRepresentation::BddRepresentation(unsigned int numberOfLabels,
-                                     Cudd_ReorderingType heuristic,
-                                     unsigned int cntNodes,
-                                     bool calcStates) {
+                                     Cudd_ReorderingType heuristic) {
     trace(TRACE_5, "BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic): begin\n");
 
     nbrLabels = numberOfLabels + 1; //labels + final
@@ -62,23 +60,6 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels,
 
     int sizeMp = 2 * maxNodeBits + maxLabelBits;
     int sizeAnn = nbrLabels + maxNodeBits;
-
-    //for full symbolic representation (begin)
-    if (calcStates == true) {
-        bound = 0;
-        int max = cntNodes;
-        cout << "Number of Nodes in OG: "<< max << endl;
-
-        std::stringstream sstr();
-
-        for (int i = 1; i <= max; ++i) {
-            nodeMap.insert(make_pair(i, i));
-        }
-        maxNodeNumber = max;
-        maxNodeBits = nbrBits(max);
-        sizeMp = 2 * maxNodeBits + maxLabelBits + PN->getPlaceCount();
-    }
-    //for full symbolic representation (end)
 
     //init managers
     //mgrMp = Cudd_Init(sizeMp, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
@@ -641,15 +622,6 @@ void BddRepresentation::checkManager(DdManager* mgr, char* table) {
 
 //! \param heuristic
 void BddRepresentation::reorder(Cudd_ReorderingType heuristic) {
-    /*
-     if (filename == "bddMp.dot"){
-     //Variablen im bddMp Gruppieren:
-     //die Variablen fr den zweiten Knoten sind im BDD immer unten => gnstig fr Restrict beim Matching
-     Cudd_MakeTreeNode(mgrMp, 0 ,maxChannelBits + maxNodeBits, MTR_DEFAULT); //1. Gruppe: innerhalb der Gruppe ist die Variablenordnung beliebig
-     Cudd_MakeTreeNode(mgrMp, maxChannelBits + maxNodeBits, maxNodeBits, MTR_DEFAULT); //2. Gruppe: innerhalb der Gruppe ist die Variablenordnung beliebig
-     Cudd_MakeTreeNode(mgrMp, 0 ,maxNodeBits, MTR_FIXED);   //1. und 2. Gruppe sind wieder in einer Gruppe, in dieser ist aber die Reihenfolge der Elemente (hier die beiden Gruppen) fest
-     }
-     */
     Cudd_ReduceHeap(mgrMp, heuristic, 0);
     cout << "BDD_MP: number of nodes: " << Cudd_DagSize(bddMp);
     if (bddRed != Cudd_Not(Cudd_ReadOne(mgrMp))) {
@@ -947,190 +919,3 @@ void BddRepresentation::printMemoryInUse() {
          << " MB)" << endl;
 }
 
-void BddRepresentation::testSymbRepresentation(AnnotatedGraphNode* v,
-                                               std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
-
-    trace(TRACE_5, "BddRepresentation::generateRepresentation(AnnotatedGraphNode* v, bool visitedNodes[]): start\n");
-
-    // annotation
-    DdNode* annotation = annotationToBddAnn(v);
-    // cout << "annotation of node: " << v->getNumber() << "\n";
-    Cudd_PrintMinterm(mgrAnn, annotation);
-    cout << endl;
-    DdNode* tmp = Cudd_bddOr(mgrAnn, annotation, bddAnn);
-    assert(tmp != NULL);
-    Cudd_Ref(tmp);
-    Cudd_RecursiveDeref(mgrAnn, annotation);
-    Cudd_RecursiveDeref(mgrAnn, bddAnn);
-    bddAnn = tmp;
-
-    // states
-    DdNode* states = statesToBddMp(v);
-
-    // cout << "states of node: " << v->getNumber() << "\n";
-    // Cudd_PrintMinterm(mgrMp, states); cout << endl;
-
-    visitedNodes[v] = 1;
-
-    AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
-
-    while (edgeIter->hasNext()) {
-        AnnotatedGraphEdge* element = edgeIter->getNext();
-        AnnotatedGraphNode* vNext = element->getDstNode();
-
-        if (vNext != NULL) {
-
-            //label
-            DdNode * label = labelToBddMp(element->getLabel());
-
-            //nodes
-            DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
-
-            //edge
-            DdNode * edge = Cudd_bddAnd(mgrMp, label, nodes);
-            assert(edge != NULL);
-            Cudd_Ref(edge);
-            Cudd_RecursiveDeref(mgrMp, label);
-            Cudd_RecursiveDeref(mgrMp, nodes);
-
-            /*cout << "edge: " << v->getNumber() << " [" << element->getLabel() << "> " << vNext->getNumber() << endl;
-             cout << "edge: " << getBddNumber(v->getNumber()) << " [" << element->getLabel() << "> "
-             << getBddNumber(vNext->getNumber()) << " -new-\n";
-             Cudd_PrintMinterm(mgrMp, edge);
-             cout << "\n=====================\n\n";*/
-
-            DdNode* ogNode = Cudd_bddAnd(mgrMp, edge, states);
-            assert(ogNode != NULL);
-            Cudd_Ref(ogNode);
-            Cudd_RecursiveDeref(mgrMp, edge);
-            //KEIN "Cudd_RecursiveDeref(mgrMp, states)", da states noch fr andere Kanten gebraucht werden
-            //Cudd_PrintMinterm(mgrMp, ogNode);
-
-            if (v->getColor() == BLUE && vNext->getColor() == BLUE) {
-                tmp = Cudd_bddOr(mgrMp, ogNode, bddMp);
-                assert(tmp != NULL);
-                Cudd_Ref(tmp);
-                Cudd_RecursiveDeref(mgrMp, ogNode);
-                Cudd_RecursiveDeref(mgrMp, bddMp);
-                bddMp = tmp;
-            } else {
-                tmp = Cudd_bddOr(mgrMp, ogNode, bddRed);
-                assert(tmp != NULL);
-                Cudd_Ref(tmp);
-                Cudd_RecursiveDeref(mgrMp, ogNode);
-                Cudd_RecursiveDeref(mgrMp, bddRed);
-                bddRed = tmp;
-            }
-            if ((vNext != v) && !visitedNodes[vNext]) {
-                testSymbRepresentation(vNext, visitedNodes);
-            }
-        }
-    } //end while
-    delete edgeIter;
-
-    Cudd_RecursiveDeref(mgrMp, states);
-    trace(TRACE_5, "BddRepresentation::generateRepresentation(AnnotatedGraphNode* v, bool visitedNodes[]): end\n");
-}
-
-
-DdNode* BddRepresentation::statesToBddMp(AnnotatedGraphNode* v) {
-    StateSet::iterator iter; // iterator over the stateList's elements
-    DdNode* states = Cudd_Not(Cudd_ReadOne(mgrMp));
-    Cudd_Ref(states);
-    DdNode * bddMarking;
-    DdNode* tmp;
-
-    for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
-        (*iter)->decode(PN); //muss hier stehen, da sonst CurrentMarking nicht richtig;
-        bddMarking = markingToBddMp(PN->copyCurrentMarking());
-
-        tmp = Cudd_bddOr(mgrMp, states, bddMarking);
-        assert(tmp != NULL);
-        Cudd_Ref(tmp);
-        Cudd_RecursiveDeref(mgrMp, bddMarking);
-        Cudd_RecursiveDeref(mgrMp, states);
-        states = tmp;
-    }
-    return (states);
-}
-
-
-DdNode* BddRepresentation::markingToBddMp(unsigned int* marking) {
-    DdNode* bddMarking = Cudd_ReadOne(mgrMp);
-    Cudd_Ref(bddMarking);
-    DdNode* tmp;
-
-    //only for bounded nets
-    for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
-        //cout << PN->Places[i]->name << " ";
-
-        //calculate the BDD for assignment
-        unsigned int number = marking[i];
-        BitVector assignment = numberToBin(number, maxPlaceBits);
-        int pos = 2*maxNodeBits + maxLabelBits;
-        for (int j = 0; j < maxPlaceBits; ++j) {
-            if (assignment[j] == false) {
-                tmp = Cudd_bddAnd(mgrMp,
-                                  Cudd_Not(Cudd_bddIthVar(mgrMp, pos + i *maxPlaceBits + j)),
-                                  bddMarking);
-            } else {
-                tmp = Cudd_bddAnd(mgrMp,
-                                  Cudd_bddIthVar(mgrMp, pos + i *maxPlaceBits + j),
-                                  bddMarking);
-            }
-            assert(tmp != NULL);
-            Cudd_Ref(tmp);
-            Cudd_RecursiveDeref(mgrMp, bddMarking);
-            bddMarking = tmp;
-        }
-    }
-    return (bddMarking);
-}
-
-
-void BddRepresentation::calculateBound(AnnotatedGraphNode* v,
-                                       std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
-    if (v->reachGraphStateSet.size() != 0) {
-        StateSet::iterator iter; // iterator over the stateList's elements
-
-        for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
-            // (*iter)->decodeShowOnly(PN);
-            (*iter)->decode(PN); // need to decide if it is an external or internal deadlock
-            unsigned int* marking = PN->copyCurrentMarking();
-            for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
-                if (marking[i] >= bound) {
-                    bound = marking[i];
-                }
-            }
-            visitedNodes[v] = true;
-
-            AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
-
-            while (edgeIter->hasNext()) {
-                AnnotatedGraphEdge* element = edgeIter->getNext();
-                AnnotatedGraphNode* vNext = element->getDstNode();
-
-                if (vNext->reachGraphStateSet.size() != 0 &&
-                    vNext != NULL &&
-                    vNext != v && !visitedNodes[vNext]) {
-
-                    calculateBound(vNext, visitedNodes);
-                }
-            } // while
-            delete edgeIter;
-        }
-    }
-}
-
-
-unsigned int BddRepresentation::getBound() {
-    return bound;
-}
-
-
-void BddRepresentation::setMaxPlaceBits(AnnotatedGraphNode* v,
-                                        std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
-    calculateBound(v, visitedNodes);
-    maxPlaceBits = nbrBits(bound);
-    cout << "maxPlaceBits: " << maxPlaceBits << endl;
-}

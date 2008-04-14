@@ -54,10 +54,7 @@ class BddLabelTab;
 
 class BddRepresentation {
     public:
-        BddRepresentation(unsigned int numberOfLabels,
-                          Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT,
-                          unsigned int cntNodes = 1,
-                          bool calcStates = false);
+        BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
         ~BddRepresentation();
 
         void convertRootNode(AnnotatedGraphNode* root);
@@ -68,10 +65,6 @@ class BddRepresentation {
         void print();
         void save(char* option = "OG");
         void printMemoryInUse();
-
-        void testSymbRepresentation(AnnotatedGraphNode* v, std::map<AnnotatedGraphNode*, bool>&);
-        unsigned int getBound();
-        void setMaxPlaceBits(AnnotatedGraphNode* v, std::map<AnnotatedGraphNode*, bool>&);
 
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.
@@ -107,11 +100,6 @@ class BddRepresentation {
         string myitoa(unsigned int value, int base);
         void checkManager(DdManager* mgr, char* table);
 
-        DdNode* statesToBddMp(AnnotatedGraphNode* v);
-        DdNode* markingToBddMp(unsigned int* marking);
-        unsigned int bound;
-        void calculateBound(AnnotatedGraphNode* v, std::map<AnnotatedGraphNode*, bool>&);
-        int maxPlaceBits;
 };
 
 #endif /*BDDREPRESENTATION_H_*/

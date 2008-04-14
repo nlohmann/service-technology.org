@@ -684,35 +684,6 @@ void OG::convertToBdd() {
 }
 
 
-//! \brief converts an OG into its BDD representation including the red nodes and the markings of the nodes
-void OG::convertToBddFull() {
-
-	trace(TRACE_5, "OG::convertToBddFull(): start\n");
-
-	std::map<AnnotatedGraphNode*, bool> visitedNodes;
-
-	trace(TRACE_0, "\nHIT A KEY TO CONTINUE (convertToBddFull)\n");
-
-    //getchar();
-    unsigned int nbrLabels = PN->getInputPlaceCount() + PN->getOutputPlaceCount();
-    BddRepresentation* testbdd =
-        new BddRepresentation(nbrLabels, (Cudd_ReorderingType)bdd_reordermethod, getNumberOfNodes(), true);
-    testbdd->convertRootNode(root);
-    testbdd->setMaxPlaceBits(root, visitedNodes);
-
-    visitedNodes.clear();
-
-    trace(TRACE_0, "\n");
-    testbdd->testSymbRepresentation(root, visitedNodes);
-    testbdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
-    testbdd->printMemoryInUse();
-    testbdd->printDotFile();
-    delete testbdd;
-
-    trace(TRACE_5, "OG::convertToBdd(): end\n");
-}
-
-
 //! \brief assigns the final nodes of the OG according to Gierds 2007
 void OG::assignFinalNodes() {
 

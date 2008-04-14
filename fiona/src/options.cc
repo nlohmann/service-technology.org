@@ -248,6 +248,9 @@ void print_help() {
 void print_version() {
     trace(std::string(PACKAGE_STRING) + " -- ");
     trace("Functional InteractiON Analysis of open workflow nets\n");
+#ifdef COMPILE_DATE
+    trace("(compiled " + std::string(COMPILE_DATE) + ")\n");
+#endif
     trace("\n");
     trace("Copyright (C) 2005, 2006, 2007, 2008 Peter Massuthe and Daniela Weinberg\n");
     trace("This is free software; see the source for copying conditions. There is NO\n");
@@ -411,6 +414,11 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if ((lc_optarg == "pv") || (lc_optarg == "publicview")) {
                 	parameters[P_PV] = true;
                 	parameters[P_IG] = false;
+                	parameters[P_REMOVE_FALSE_ANNOS] = true;
+                } else if (lc_optarg == "smallpartner") {
+                    parameters[P_OG] = false;
+                    parameters[P_IG] = true;
+                    parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
                 } else if (lc_optarg == "mostpermissivepartner") {
                     parameters[P_OG] = true;
                     parameters[P_IG] = false;
@@ -438,9 +446,10 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_SHOW_RED_NODES] = false;
                     parameters[P_SHOW_ALL_NODES] = false;
                 } else if (lc_optarg == "adapter") {
-                    parameters[P_OG] = false;
-                    parameters[P_IG] = true;
+                    parameters[P_OG] = true;
+                    parameters[P_IG] = false;
                     parameters[P_ADAPTER] = true;
+                    parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
                 } else if (lc_optarg == "png") {
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;

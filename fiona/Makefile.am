@@ -19,8 +19,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2008-03-06 10:10:33 $ by $Author: gierds $.
-# Version $Revision: 1.19 $
+# File last changed $Date: 2008-04-14 13:13:43 $ by $Author: gierds $.
+# Version $Revision: 1.20 $
 
 SUBDIRS = cudd src tests doc
 
@@ -79,7 +79,7 @@ binarydistreadme:
 # target to create an executable that is independet of Cygwin
 win32:
 	(cd cudd && $(MAKE) win32)
-	(cd src && $(MAKE) fiona_CXXFLAGS="" fiona_CFLAGS="" CXXFLAGS+="-O3 -mno-cygwin -U _WIN32" CFLAGS+="-O3 -mno-cygwin -U _WIN32")
+	(cd src && $(MAKE) fiona_CXXFLAGS="" fiona_CFLAGS="" CXXFLAGS+="-O3 -mno-cygwin -U _WIN32 -DCOMPILE_DATE=\"\\\"`date`\\\"\"" CFLAGS+="-O3 -mno-cygwin -U _WIN32")
 
 # name of the directory/archive for a binary distribution
 BINARYDISTDIR = $(distdir)
@@ -90,13 +90,13 @@ BINARYDISTFILES = src/$(PACKAGE)$(EXEEXT) COPYING
 BINARYFILES = src/$(PACKAGE)$(EXEEXT) COPYING
 
 bindist_generic:
-	$(MAKE) fiona_CXXFLAGS="" fiona_CFLAGS="" CXXFLAGS="-O3" CFLAGS="-O3"
+	$(MAKE) fiona_CXXFLAGS="" fiona_CFLAGS="" CXXFLAGS="-O3 -DCOMPILE_DATE=\"\\\"`date`\\\"\"" CFLAGS="-O3 -DCOMPILE_DATE=\"`date`\""
 
 # target to create a binary distribution
 bindist: libclean binarydistreadme bindist_generic create_bindist_archive
 
 # target to create a binary distribution for systems having no cygwin1.dll.
-win32bindist: clean binarydistreadme win32
+win32bindist: libclean binarydistreadme win32
 	$(MAKE) create_bindist_archive BINARYDISTDIR="$(distdir)-win32"
 
 bindist_universal:

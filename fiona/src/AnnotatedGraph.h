@@ -216,11 +216,11 @@ class AnnotatedGraph : public Graph {
 
         /// removes all nodes that have been disconnected from the root
         /// node due to other node removals
-        void AnnotatedGraph::removeDisconnectedNodes();
+        void removeDisconnectedNodes();
 
         /// collects all connected Nodes in a set
-      	void AnnotatedGraph::removeDisconnectedNodesRecursively(AnnotatedGraphNode* currentNode,
-      															set<AnnotatedGraphNode*>& connectedNodes);
+      	void removeDisconnectedNodesRecursively(AnnotatedGraphNode* currentNode,
+                                                set<AnnotatedGraphNode*>& connectedNodes);
 
         /// returns the name of the source file for the Graph
         std::string getFilename();

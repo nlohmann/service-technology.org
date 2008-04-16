@@ -1,0 +1,31 @@
+{ net which violates k-bounded communication for any k }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1;
+OUTPUT
+  a,   { sent only once }
+  b;   { violates message bound }
+
+INITIALMARKING
+  p0: 1;
+
+FINALMARKING
+  p1: 1;
+
+TRANSITION t1    { !a }
+CONSUME
+  p0;
+PRODUCE
+  p1,
+  a;
+
+TRANSITION t2    { !b }
+CONSUME
+  p0;
+PRODUCE
+  p0,
+  b;
+
+{ END OF FILE }

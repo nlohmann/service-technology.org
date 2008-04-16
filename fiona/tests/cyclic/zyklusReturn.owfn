@@ -14,9 +14,6 @@ OUTPUT
 INITIALMARKING
   p0: 1;
 
-{FINALCONDITION}
-{  p0 = 1 AND p1 = 0 AND a = 0 AND b = 0;}
-
 FINALMARKING
   p0: 1;
 

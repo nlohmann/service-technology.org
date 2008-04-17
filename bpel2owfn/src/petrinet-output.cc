@@ -34,13 +34,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2008/03/06 11:20:32 $
+ * \date    \$Date: 2008/04/17 10:15:43 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.115 $
+ * \version \$Revision: 1.116 $
  *
  * \ingroup petrinet
  */
@@ -1422,7 +1422,7 @@ void PetriNet::output_owfn(ostream *output) const
       {
         Place* p = (*((*final_set).begin()));
 #ifdef USING_BPEL2OWFN
-        (*output) << "( (" << p->nodeShortName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
+        (*output) << "( (" << p->nodeShortName() << "=1) AND ALL_OTHER_EXTERNAL_PLACES_EMPTY )";
 #else
         (*output) << "( (" << p->nodeName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
 #endif

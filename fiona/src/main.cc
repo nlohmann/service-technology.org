@@ -2,6 +2,9 @@
  * Copyright 2005, 2006, 2007 Peter Massuthe, Daniela Weinberg,              *
  *           Jan Bretschneider, Christian Gierds, Leonard Kern               *
  *                                                                           *
+ * Copyright 2008                                                            *
+ *   Peter Massuthe, Daniela Weinberg                                        *
+ *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
  * Fiona is free software; you can redistribute it and/or modify it          *
@@ -992,8 +995,8 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         netiter++;
     }
 
-    trace(TRACE_0, "\n=================================================================\n");
-    trace(TRACE_0, "Checking equivalence of generated OGs...\n\n");            
+    trace(TRACE_0, "=================================================================\n");
+    trace(TRACE_0, "\n\nChecking equivalence of generated OGs...\n");
 
     AnnotatedGraph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
     AnnotatedGraph *firstOG = *currentOGfile;
@@ -1377,69 +1380,6 @@ void checkAcyclicity(AnnotatedGraph* OG, string graphName) {
 
 int main(int argc, char** argv) {
 
-//	bool readExpliciteOG = false;
-//	parse_command_line(argc, argv);
-//	if (readExpliciteOG){
-//		readog(ogfileToMatch);
-//		trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
-//		NewLogger::printall();
-//	}
-//	else{
-//		list<std::string>::iterator netiter = netfiles.begin();
-//		Exchangeability* bdd = new Exchangeability(*netiter);
-//		bdd->reorder();
-//		trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
-//		bdd->printMemoryInUse();
-//	}
-//	return 0;
-
-
-/*    GraphFormulaCNF* annotation = new GraphFormulaCNF();
-	GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
-	
-    GraphFormulaLiteral* myliteral = new GraphFormulaLiteral("1-1stLiteral");
-	myclause->addSubFormula(myliteral);
-	
-//	myliteral = new GraphFormulaLiteral("1-2ndLiteral");
-//	myclause->addSubFormula(myliteral);
-//	
-//	myliteral = new GraphFormulaLiteral("1-3rdLiteral");
-//	myclause->addSubFormula(myliteral);
-//	
-//	myliteral = new GraphFormulaLiteral("1-4thLiteral");
-//	myclause->addSubFormula(myliteral);
-
-	annotation->addClause(myclause);
-
-	cout << "anno size: " << annotation->size() << endl;
-	cout << "annotation: " << annotation->asString() << endl;
-	
-	myclause = new GraphFormulaMultiaryOr();
-	
-	myliteral = new GraphFormulaLiteral("2-1stLiteral");
-	myclause->addSubFormula(myliteral);
-	
-	myliteral = new GraphFormulaLiteral("2-2ndLiteral");
-	myclause->addSubFormula(myliteral);
-	
-	myliteral = new GraphFormulaLiteral("2-3rdLiteral");
-	myclause->addSubFormula(myliteral);
-	
-	myliteral = new GraphFormulaLiteral("2-4thLiteral");
-	myclause->addSubFormula(myliteral);
-
-	annotation->addClause(myclause);
-	
-	cout << "annotation: " << annotation->asString() << endl;
-
-	cout << "anno size: " << annotation->size() << endl;
-	annotation->removeLiteralForReal("2-1stLiteral");
-	
-	cout << "annotation: " << annotation->asString() << endl;
-	cout << "anno size: " << annotation->size() << endl;
-	
-	return 0; */
-
     AnnotatedGraph* OGToMatch = NULL;
     set_new_handler(&myown_newhandler);
 
@@ -1532,9 +1472,9 @@ int main(int argc, char** argv) {
     // ********                  (OGs read one after the other)                  ********
     // **********************************************************************************
 
-    else if (parameters[P_PV] || parameters[P_COUNT_SERVICES] || parameters[P_CHECK_ACYCLIC] ||
+    else if (parameters[P_COUNT_SERVICES] || parameters[P_CHECK_ACYCLIC] ||
              parameters[P_CHECK_FALSE_ANNOS] || parameters[P_REMOVE_FALSE_ANNOS] ||
-             parameters[P_MINIMIZE_OG]) {
+             parameters[P_PV] || parameters[P_MINIMIZE_OG]) {
 
         // Abort if there are no OGs at all
         if (ogfiles.begin() == ogfiles.end() && !(parameters[P_PV])) {
@@ -1548,52 +1488,56 @@ int main(int argc, char** argv) {
 
             AnnotatedGraph* readOG = readog(*iOgFile);
 
-            if (parameters[P_MINIMIZE_OG]) {
-                // minimizes a given OG
-                readOG->minimizeGraph();
-                delete readOG;
-            }
-
             if (parameters[P_PV]) {
                 // computes a service automaton "public view" which has the same
                 // OG as given in readOG
+                removeFalseAnnos(readOG);
                 computePublicView(readOG, (*iOgFile));
                 delete readOG;
             }
 
-            if (parameters[P_COUNT_SERVICES]) {
+            else if (parameters[P_MINIMIZE_OG]) {
+                // minimizes a given OG
+                removeFalseAnnos(readOG);
+                readOG->minimizeGraph();
+                delete readOG;
+            }
+
+            else if (parameters[P_COUNT_SERVICES]) {
                 // counts the number of deterministic strategies
                 // that are characterized by a given OG
+                removeFalseAnnos(readOG);
                 countStrategies(readOG, (*iOgFile));
                 delete readOG;
             }
 
-            if (parameters[P_CHECK_ACYCLIC]) {
+            else if (parameters[P_CHECK_ACYCLIC]) {
                 // counts the number of deterministic strategies
                 // that are characterized by a given OG
+                removeFalseAnnos(readOG);
                 checkAcyclicity(readOG, (*iOgFile));
                 delete readOG;
             }
-            
-            if (parameters[P_CHECK_FALSE_ANNOS]) {
+
+            else if (parameters[P_CHECK_FALSE_ANNOS]) {
             	// checks if there are nodes in the og which violate the annotation
             	checkFalseAnnos(readOG);
             	delete readOG;
             }
 
-            if (parameters[P_REMOVE_FALSE_ANNOS]) {
+            else if (parameters[P_REMOVE_FALSE_ANNOS]) {
             	// checks if there are nodes in the og which violate the annotation
             	removeFalseAnnos(readOG);
             	delete readOG;
             }
-
-            
         }
+
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
         // Destroy buffer of OG parser.
         // Must NOT be called before fclose(og_yyin);
         og_yylex_destroy();
 #endif
+
         if (!parameters[P_PV]) {
             return 0;
         }
@@ -1686,7 +1630,7 @@ int main(int argc, char** argv) {
 	                reportOptionValues(); // adjust events_manual and print limit of considering events
 	                fileName = computeOG(PN);
 	            }
-	
+
 	            if (parameters[P_MATCH]) {
 	                // matching the current oWFN against the single OG 
 	                checkMatching(OGToMatch, PN);

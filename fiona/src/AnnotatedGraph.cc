@@ -1,6 +1,9 @@
 /*****************************************************************************
  * Copyright 2005, 2006, 2007 Jan Bretschneider, Peter Massuthe, Leonard Kern*
  *                                                                           *
+ * Copyright 2008                                                            *
+ *   Peter Massuthe, Daniela Weinberg                                        *
+ *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
  * Fiona is free software; you can redistribute it and/or modify it          *
@@ -171,17 +174,17 @@ void AnnotatedGraph::removeFalseNodes() {
         while (iNode != setOfNodes.end()) {
             GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
             if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
-                
+
                 removeEdgesToNodeFromAllOtherNodes(*iNode);
                 if (*iNode == getRoot()) {
                     setRoot(NULL);
                 }
                 AnnotatedGraphNode * n = *iNode;
-                
+
                 trace(TRACE_2, "        Removing node: " + n->getName());
                 trace(TRACE_3, "\n            Annotation: " + n->getAnnotationAsString());
                 trace(TRACE_2, "\n");
-                
+
                 iNode = setOfNodes.erase(iNode);
                 removeNode(n);
                 delete n;
@@ -193,15 +196,16 @@ void AnnotatedGraph::removeFalseNodes() {
             delete iNodeAssignment;
         }
     }
-    if (getRoot() == NULL) 
-    	trace(TRACE_0, "\n\n!!!Removed the root node!!!\n");
+    if (getRoot() == NULL) {
+        trace(TRACE_0, "\n\nThe root was removed during removal of false OG nodes.\n");
+    	trace(TRACE_0, "The corresponding net is not controllable!\n");
+    }
 
 	// Remove any nodes, that have been disconnected from the root node
     //removeDisconnectedNodes();
 
 	trace(TRACE_5, "AnnotatedGraph::removeFalseNodes(): end\n");
 }
-
 
 
 //! \brief removes all nodes that have been disconnected from the root
@@ -813,8 +817,9 @@ void AnnotatedGraph::minimizeGraph() {
 
 
     // 1) preparing a map assigning to each pair of nodes, whether they are equivalent
-    map<pair<AnnotatedGraphNode*, AnnotatedGraphNode*>, bool > areEquivalent;
     set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > nodePairs;
+    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > areEquivalent;
+    map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> > isEquivalentWith;
 
     nodes_t::const_iterator iNode, jNode;
     for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
@@ -832,26 +837,31 @@ void AnnotatedGraph::minimizeGraph() {
 
     set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >::const_iterator iNodePairs;
     for (iNodePairs = nodePairs.begin(); iNodePairs != nodePairs.end(); ++iNodePairs) {
-        cout << "node pair: (" << ((*iNodePairs).first)->getName() << ", " << (*iNodePairs).second->getName() << ")" << endl;
+        // cout << "node pair: (" << ((*iNodePairs).first)->getName() << ", " << (*iNodePairs).second->getName() << ")" << endl;
 
-// naive lösung ab hier
+        // naive lösung ab hier
         if (isEquivalentRecursive((*iNodePairs).first,
                                   (*iNodePairs).second,
                                   visitedNodes,
                                   this,
                                   this)) {
+            cout << "node pair: (" << ((*iNodePairs).first)->getName() << ", " << (*iNodePairs).second->getName() << ")";// << endl;
             cout << "\t ...are equivalent :)" << endl;
+
+            // remember that they are equivalent
+            areEquivalent.insert(*iNodePairs);
+            isEquivalentWith[(*iNodePairs).first].insert((*iNodePairs).second);
         } else {
-            cout << "\t ...are NOT equivalent :(" << endl;            
+            // cout << "\t ...are NOT equivalent :(" << endl;            
         }
-// naive lösung bis hier
+        // naive lösung bis hier
     }
     
-    
+    cout << "number of equivalent pairs: " << areEquivalent.size() << "\n" << endl;    
     // 3) merging equivalent OG nodes
     
     
-    cout << "finished minimization...\n" << endl;
+    cout << "\nfinished minimization...\n" << endl;
 
 // alter Quatsch ab hier...
 /*
@@ -1322,11 +1332,9 @@ unsigned int AnnotatedGraph::numberOfServices() {
 
     if (instances > 100000) {
         trace(TRACE_2, "Valid Number of instances exceeded.\n");
-        trace(TRACE_0,
-              "The number of services cannot be computed in a reasonable amount of time.\n");
-        trace(TRACE_0, "The return value will be set to 0.\n");
+        trace(TRACE_0, "The number of strategies is approx INFINITY ;), aborting further calculation.\n");
         trace(TRACE_5, "AnnotatedGraph::numberOfServices(...): end\n");
-        return 0;
+        return number;
     } else {
         trace(TRACE_5, "AnnotatedGraph::numberOfServices(...): end\n");
         return number;

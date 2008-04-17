@@ -3,6 +3,10 @@
  *           Niels Lohmann, Jan Bretschneider, Christian Gierds,             *
  *           Martin Znamirowski                                              *
  *                                                                           *
+ * Copyright 2008             Peter Massuthe, Daniela Weinberg,              *
+ *                            Christian Gierds, Jan Suermeli,                *
+ *                            Martin Znamirowski                             *
+ *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
  * Fiona is free software; you can redistribute it and/or modify it          *

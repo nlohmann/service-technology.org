@@ -1,6 +1,9 @@
 /*****************************************************************************
  * Copyright 2005, 2006, 2007 Jan Bretschneider, Peter Massuthe, Leonard Kern*
  *                                                                           *
+ * Copyright 2008                                                            *
+ *   Peter Massuthe, Daniela Weinberg                                        *
+ *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
  * Fiona is free software; you can redistribute it and/or modify it          *

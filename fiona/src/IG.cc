@@ -1,6 +1,9 @@
 /*****************************************************************************
  * Copyright 2005, 2006, 2007 Peter Massuthe, Daniela Weinberg               *
  *                                                                           *
+ * Copyright 2008                                                            *
+ *   Peter Massuthe, Daniela Weinberg, Jan Suermeli                          *
+ *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
  * Fiona is free software; you can redistribute it and/or modify it          *

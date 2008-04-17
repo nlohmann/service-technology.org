@@ -3,6 +3,10 @@
  *           Jan Bretschneider, Niels Lohmann, Christian Gierds,             *
  *           Leonard Kern, Martin Znamirowski                                *
  *                                                                           *
+ * Copyright 2008                                                            *
+ *   Peter Massuthe, Daniela Weinberg, Niels Lohmann, Christian Gierds,      *
+ *   Martin Znamirowski, Jan Suermeli                                        *
+ *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
  * Fiona is free software; you can redistribute it and/or modify it          *
@@ -414,7 +418,6 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if ((lc_optarg == "pv") || (lc_optarg == "publicview")) {
                 	parameters[P_PV] = true;
                 	parameters[P_IG] = false;
-                	parameters[P_REMOVE_FALSE_ANNOS] = true;
                 } else if (lc_optarg == "smallpartner") {
                     parameters[P_OG] = false;
                     parameters[P_IG] = true;

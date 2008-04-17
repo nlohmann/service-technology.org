@@ -61,6 +61,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
     nodes=$?
@@ -68,12 +69,12 @@ else
     echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
     edges=$?
 
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    if [ $exitcode -ne 0 -o $nodes -ne 0 -o $edges -ne 0 ]
     then
     echo   ... failed to build public view correctly
     fi
 
-    result=`expr $result + $nodes + $edges`
+    result=`expr $result + $exitcode + $nodes + $edges`
 fi
 
 
@@ -98,6 +99,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
     nodes=$?
@@ -105,12 +107,12 @@ else
     echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
     edges=$?
 
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    if [ $exitcode -ne 0 -o $nodes -ne 0 -o $edges -ne 0 ]
     then
     echo   ... failed to build public view correctly
     fi
 
-    result=`expr $result + $nodes + $edges`
+    result=`expr $result + $exitcode + $nodes + $edges`
 fi
 
 
@@ -135,6 +137,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
     nodes=$?
@@ -142,12 +145,12 @@ else
     echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
     edges=$?
 
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    if [ $exitcode -ne 0 -o $nodes -ne 0 -o $edges -ne 0 ]
     then
     echo   ... failed to build public view correctly
     fi
 
-    result=`expr $result + $nodes + $edges`
+    result=`expr $result + $exitcode +$nodes + $edges`
 fi
 
 ############################################################################
@@ -171,6 +174,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
     nodes=$?
@@ -178,12 +182,12 @@ else
     echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
     edges=$?
 
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    if [ $exitcode -ne 0 -o $nodes -ne 0 -o $edges -ne 0 ]
     then
     echo   ... failed to build public view correctly
     fi
 
-    result=`expr $result + $nodes + $edges`
+    result=`expr $result + $exitcode + $nodes + $edges`
 fi
 
 
@@ -208,6 +212,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
     nodes=$?
@@ -215,12 +220,12 @@ else
     echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
     edges=$?
 
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    if [ $exitcode -ne 0 -o $nodes -ne 0 -o $edges -ne 0 ]
     then
     echo   ... failed to build public view correctly
     fi
 
-    result=`expr $result + $nodes + $edges`
+    result=`expr $result + $exitcode + $nodes + $edges`
 fi
 
 ############################################################################
@@ -244,6 +249,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
     nodes=$?
@@ -251,12 +257,12 @@ else
     echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
     edges=$?
 
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    if [ $exitcode -ne 0 -o $nodes -ne 0 -o $edges -ne 0 ]
     then
     echo   ... failed to build public view correctly
     fi
 
-    result=`expr $result + $nodes + $edges`
+    result=`expr $result + $exitcode + $nodes + $edges`
 fi
 
 ############################################################################
@@ -280,6 +286,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
     nodes=$?
@@ -287,12 +294,12 @@ else
     echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
     edges=$?
 
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    if [ $exitcode -ne 0 -o $nodes -ne 0 -o $edges -ne 0 ]
     then
     echo   ... failed to build public view correctly
     fi
 
-    result=`expr $result + $nodes + $edges`
+    result=`expr $result + $exitcode + $nodes + $edges`
 fi
 
 
@@ -317,6 +324,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
     nodes=$?
@@ -324,12 +332,12 @@ else
     echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
     edges=$?
 
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    if [ $exitcode -ne 0 -o $nodes -ne 0 -o $edges -ne 0 ]
     then
     echo   ... failed to build public view correctly
     fi
 
-    result=`expr $result + $nodes + $edges`
+    result=`expr $result + $exitcode + $nodes + $edges`
 fi
 
 
@@ -352,6 +360,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
     nodes=$?
@@ -359,12 +368,12 @@ else
     echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
     edges=$?
 
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    if [ $exitcode -ne 0 -o $nodes -ne 0 -o $edges -ne 0 ]
     then
     echo   ... failed to build public view correctly
     fi
 
-    result=`expr $result + $nodes + $edges`
+    result=`expr $result + $exitcode + $nodes + $edges`
 fi
 
 cmd="$FIONA $service.pv.owfn $service.owfn.og -t equivalence"
@@ -380,10 +389,11 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
+    if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... equivalence check of the service's and its public view's OGs failed.
     fi
@@ -407,6 +417,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
     nodes=$?
@@ -414,12 +425,12 @@ else
     echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
     edges=$?
 
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    if [ $exitcode -ne 0 -o $nodes -ne 0 -o $edges -ne 0 ]
     then
     echo   ... failed to build public view correctly
     fi
 
-    result=`expr $result + $nodes + $edges`
+    result=`expr $result + $exitcode + $nodes + $edges`
 fi
 
 cmd="$FIONA $service.pv.owfn $service.owfn.og -t equivalence"
@@ -435,10 +446,11 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
+    if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... equivalence check of the service's and its public view's OGs failed.
     fi
@@ -462,6 +474,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "nodes: $nodes_soll" > /dev/null
     nodes=$?
@@ -469,12 +482,12 @@ else
     echo $OUTPUT | grep "edges: $edges_soll" > /dev/null
     edges=$?
 
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
+    if [ $exitcode -ne 0 -o $nodes -ne 0 -o $edges -ne 0 ]
     then
     echo   ... failed to build public view correctly
     fi
 
-    result=`expr $result + $nodes + $edges`
+    result=`expr $result + $exitcode + $nodes + $edges`
 fi
 
 cmd="$FIONA $service.pv.owfn $service.owfn.og -t equivalence"
@@ -490,10 +503,11 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    exitcode=$?
 
     echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
+    if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... equivalence check of the service's and its public view's OGs failed.
     fi

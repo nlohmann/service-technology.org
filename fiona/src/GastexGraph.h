@@ -39,6 +39,8 @@
 #include <string>
 #include <set>
 
+#include "options.h"
+
 using namespace std;
 
 class GasTexNode;
@@ -99,6 +101,12 @@ public:
     void setToDefault();
 };
 
+struct BoundingBox {
+    int x;
+    int y;
+    int width;
+    int height;
+};
 
 class GasTexGraph {
 
@@ -109,6 +117,7 @@ public:
     int fontsize;
     string fontcolor; 
     int label_posx, label_posy;
+    set<BoundingBox*> boundingBoxes;
 
     GasTexNode* root;
     set<GasTexNode*> nodes; 
@@ -120,6 +129,8 @@ public:
     void addEdge(GasTexEdge* edge);
     GasTexNode* getNode(string id);
     void makeGasTex(string texFileName);
+    void makeGasTexOfPN(fstream& texFile);
+    void makeGasTexOfOG(fstream& texFile);
 };
 
 #endif

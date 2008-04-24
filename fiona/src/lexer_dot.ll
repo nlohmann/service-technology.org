@@ -29,7 +29,7 @@ id          {str}|{number}|{dq_str}|{html_str}
 "digraph"   { dot_yylval.str_val = new std::string(dot_yytext); return KW_DIGRAPH; }
 "graph"     { dot_yylval.str_val = new std::string(dot_yytext); return KW_GRAPH; }
 "subgraph"  { dot_yylval.str_val = new std::string(dot_yytext); return KW_SUBGRAPH; }
-"node"      { dot_yylval.str_val = new std::string(dot_yytext); return KW_NODE; }
+"node "      { dot_yylval.str_val = new std::string(dot_yytext); return KW_NODE; }
 "edge"      { dot_yylval.str_val = new std::string(dot_yytext); return KW_EDGE; }
 "strict"    { dot_yylval.str_val = new std::string(dot_yytext); return KW_STRICT; }
 {id}        { dot_yylval.str_val = new std::string(dot_yytext); return KW_ID; }

@@ -1,4 +1,4 @@
-/* dot.y */
+/* syntax_dot.yy */
 
 %{
 // options for Bison
@@ -13,6 +13,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stack>
 #include "dot2tex.h"
 #include "GastexGraph.h"
 int dot_yyerror(char *s);
@@ -28,8 +29,76 @@ GasTexEdge dummyEdge(NULL, NULL);	// for temporary storage of edge values
 GasTexNode defaultNode;                 // for setting default values in a node statement
 GasTexEdge defaultEdge;                 // for setting default values in an edge statement
 
-int i;
+stack<GasTexNode> defaultNodeStack;     // for subgraph statements 
+stack<GasTexEdge> defaultEdgeStack;     // for subgraph statements 
+
 bool firstNode = true;
+
+void parseAttrStr(string lhs, string rhs) {
+    if (lhs == "label") {
+        dummyNode.label = rhs.substr(1, rhs.length() - 2);
+        dummyEdge.label = rhs.substr(1, rhs.length() - 2);
+    } else if (lhs == "pos") {
+        dummyNode.posX = 
+        atoi(rhs.substr(1, rhs.find_first_of(",")).c_str());
+        dummyNode.posY = 
+        atoi(rhs.substr(rhs.find_first_of(",") + 1, rhs.length()).c_str());
+    } else if (lhs == "width") {
+        dummyNode.width = atof(rhs.substr(1, rhs.length() - 2).c_str());
+    } else if (lhs == "height") {
+        dummyNode.height = atof(rhs.substr(1, rhs.length() - 2).c_str());
+    } else if (lhs == "peripheries") {
+        if (rhs == "2") {
+            dummyNode.isFinal = true;
+        }
+    } else if (lhs == "color") {
+        dummyNode.color = rhs;
+        dummyEdge.color = rhs;
+    } else if (lhs == "fillcolor") {
+        dummyNode.fillcolor = rhs;
+    } else if (lhs == "fontcolor") {
+        dummyNode.fontcolor = rhs;
+        dummyEdge.fontcolor = rhs;
+    } else if (lhs == "fontname") {
+        dummyNode.fontname = rhs;
+        dummyEdge.fontname = rhs;
+    } else if (lhs == "fontsize") {
+        dummyNode.fontsize = atoi(rhs.c_str());
+        dummyEdge.fontsize = atoi(rhs.c_str());
+    } else if (lhs == "shape") {
+        dummyNode.shape = rhs;
+    } else if (lhs == "style") {
+        dummyNode.style = rhs;
+        dummyEdge.style = rhs;
+    } else if (lhs == "labelfontcolor") {
+        dummyEdge.labelfontcolor = rhs;
+    } else if (lhs == "labelfontname") {
+        dummyEdge.labelfontname = rhs;
+    } else if (lhs == "labelfontsize") {
+        dummyEdge.labelfontsize = atoi(rhs.c_str());
+    } else if (lhs == "headlabel") {
+        dummyEdge.headlabel = rhs;
+    } else if (lhs == "headport") {
+        dummyEdge.headport = rhs;
+    } else if (lhs == "taillabel") {
+        dummyEdge.taillabel = rhs;
+    } else if (lhs == "tailport") {
+        dummyEdge.tailport = rhs;
+    } else if (lhs == "bb") {
+        BoundingBox* bb = new BoundingBox;
+
+        rhs = rhs.substr(1, rhs.length()-1);
+        bb->x = atoi(rhs.substr(0, rhs.find_first_of(",")).c_str());
+        rhs = rhs.substr(rhs.find_first_of(",")+1, rhs.length()-1); 
+        bb->y = atoi(rhs.substr(0, rhs.find_first_of(",")).c_str());
+        rhs = rhs.substr(rhs.find_first_of(",")+1, rhs.length()-1); 
+        bb->width = atoi(rhs.substr(0, rhs.find_first_of(",")).c_str());
+        rhs = rhs.substr(rhs.find_first_of(",")+1, rhs.length()-1); 
+        bb->height = atoi(rhs.substr(0, rhs.length()-1).c_str());
+
+        gastexGraph->boundingBoxes.insert(bb);
+    }
+} 
 
 %}
 
@@ -39,14 +108,18 @@ bool firstNode = true;
 %union{
     int     	int_val;
     string*	str_val;
+    struct {
+        int cNode;
+        int cEdge;
+    } meta;
 }
 
 %start	graph 
 
-%type <str_val>    subgraph 
-%type <str_val>    KW_ID
-%type <str_val>    stmt
-%type <str_val>    attr_stmt
+%type <str_val>    graph 
+%type <meta>      stmt_list
+%type <meta>      stmt
+%type <meta>      attr_stmt
 %type <str_val>    attr_list
 %type <str_val>    a_list
 %type <str_val>    node_stmt
@@ -61,7 +134,7 @@ bool firstNode = true;
 %left KW_SUBGRAPH
 %left KW_NODE
 %left KW_EDGE
-%left KW_ID
+%left  <str_val> KW_ID
 %token <str_val> KW_STRING
 %token <int_val> KW_INT
 %left KW_LBRACE
@@ -89,7 +162,7 @@ bool firstNode = true;
 
 %%
 
-graph:  /* empty */
+graph:  /* empty */ 
         KW_GRAPH KW_LBRACE stmt_list KW_RBRACE
             {
             }
@@ -117,64 +190,121 @@ graph:  /* empty */
 ;
 
 stmt_list: /* empty */
-//        | stmt
-//            { 
-//            }
-//        | stmt KW_SEMICOLON
-//            { 
-//            }
-        | stmt stmt_list 
+        stmt
+            {
+                $$.cNode = $1.cNode;
+                $$.cEdge = $1.cEdge;
+            }
+        | stmt KW_SEMICOLON
             { 
+                $$.cNode = $1.cNode;
+                $$.cEdge = $1.cEdge;
+            }
+        | stmt stmt_list 
+            {
+                $$.cNode = $1.cNode + $2.cNode;
+                $$.cEdge = $1.cEdge + $2.cEdge;
             }
         | stmt KW_SEMICOLON stmt_list 
             { 
+                $$.cNode = $1.cNode + $3.cNode;
+                $$.cEdge = $1.cEdge + $3.cEdge;
             }
 ;
 
 stmt:   /* empty */
         attr_stmt
             {
+                $$.cNode = $1.cNode;
+                $$.cEdge = $1.cEdge;
             }
         | node_stmt
             {
+                $$.cNode = 0;
+                $$.cEdge = 0;
             } 
         | edge_stmt
             { 
+                $$.cNode = 0;
+                $$.cEdge = 0;
             }
         | KW_ID KW_EQUAL KW_ID
             { 
+                $$.cNode = 0;
+                $$.cEdge = 0;
             }
         | subgraph 
-            { 
+            {
+                $$.cNode = 0;
+                $$.cEdge = 0;
             }
 ;
 
 subgraph: /* empty */
         KW_LBRACE stmt_list KW_RBRACE
             {
+                for (int i=0; i<$2.cNode; ++i) {
+                    defaultNodeStack.pop();
+                }
+                for (int i=0; i<$2.cEdge; ++i) {
+                    defaultEdgeStack.pop();
+                }
             }
         | KW_SUBGRAPH KW_LBRACE stmt_list KW_RBRACE
             {
+                for (int i=0; i<$3.cNode; ++i) {
+                    defaultNodeStack.pop();
+                }
+                for (int i=0; i<$3.cEdge; ++i) {
+                    defaultEdgeStack.pop();
+                }
             }
         | KW_SUBGRAPH KW_ID KW_LBRACE stmt_list KW_RBRACE
             {
+                for (int i=0; i<$4.cNode; ++i) {
+                    defaultNodeStack.pop();
+                }
+                for (int i=0; i<$4.cEdge; ++i) {
+                    defaultEdgeStack.pop();
+                }
             }
 ;
+
 attr_stmt: /* empty */ 
         KW_GRAPH attr_list 
             {
-                dummyNode = defaultNode;;
-                dummyEdge = defaultEdge;
+                if (!defaultNodeStack.empty()) 
+                    dummyNode = defaultNodeStack.top();
+                else
+                    dummyNode.setToDefault(); 
+                if (!defaultEdgeStack.empty()) 
+                    dummyEdge = defaultEdgeStack.top();
+                else
+                    dummyEdge.setToDefault(); 
+                ($$).cNode = 0;
+                ($$).cEdge = 0;
             }
         | KW_NODE attr_list
             {
                 defaultNode = dummyNode;
-                dummyEdge = defaultEdge;
+                defaultNodeStack.push(defaultNode);
+                if (!defaultEdgeStack.empty()) 
+                    dummyEdge = defaultEdgeStack.top();
+                else
+                    dummyEdge.setToDefault(); 
+                ($$).cNode = 1;
+                ($$).cEdge = 0;
             }
         | KW_EDGE attr_list
             { 
+                if (!defaultNodeStack.empty()) 
+                    dummyNode = defaultNodeStack.top();
+                else
+                    dummyNode.setToDefault(); 
                 defaultEdge = dummyEdge; 
-                dummyNode = defaultNode;;
+                defaultEdgeStack.push(defaultEdge);
+                ($$).cNode = 0;
+                ($$).cEdge = 1;
             }
 ;
 
@@ -186,8 +316,8 @@ attr_list: /* empty */
             { 
             }
         | KW_LBRACKET KW_RBRACKET attr_list
-            { 
-            }
+            {
+            } 
         | KW_LBRACKET a_list KW_RBRACKET attr_list
             { 
             }
@@ -199,56 +329,7 @@ a_list: /* empty */
             }
         | KW_ID KW_EQUAL KW_ID
             {
-                if ((*$1) == "label") {
-                    dummyNode.label = (*$3).substr(1, (*$3).length() - 2);
-                    dummyEdge.label = (*$3).substr(1, (*$3).length() - 2);
-                } else if ((*$1) == "pos") {
-                    dummyNode.posX = 
-                        atoi((*$3).substr(1, (*$3).find_first_of(",")).c_str());
-                    dummyNode.posY = 
-                        atoi((*$3).substr((*$3).find_first_of(",") + 1, (*$3).length()).c_str());
-                } else if ((*$1) == "width") {
-                    dummyNode.width = atof((*$3).substr(1, (*$3).length() - 2).c_str());
-                } else if ((*$1) == "height") {
-                    dummyNode.height = atof((*$3).substr(1, (*$3).length() - 2).c_str());
-                } else if ((*$1) == "peripheries") {
-                    if ((*$3) == "2") {
-		        dummyNode.isFinal = true;
-                    }
-                } else if ((*$1) == "color") {
-		    dummyNode.color = (*$3);
-		    dummyEdge.color = (*$3);
-                } else if ((*$1) == "fillcolor") {
-		    dummyNode.fillcolor = (*$3);
-                } else if ((*$1) == "fontcolor") {
-		    dummyNode.fontcolor = (*$3);
-		    dummyEdge.fontcolor = (*$3);
-                } else if ((*$1) == "fontname") {
-		    dummyNode.fontname = (*$3);
-		    dummyEdge.fontname = (*$3);
-                } else if ((*$1) == "fontsize") {
-		    dummyNode.fontsize = atoi((*$3).c_str());
-		    dummyEdge.fontsize = atoi((*$3).c_str());
-                } else if ((*$1) == "shape") {
-		    dummyNode.shape = (*$3);
-                } else if ((*$1) == "style") {
-		    dummyNode.style = (*$3);
-		    dummyEdge.style = (*$3);
-                } else if ((*$1) == "labelfontcolor") {
-		    dummyEdge.labelfontcolor = (*$3);
-                } else if ((*$1) == "labelfontname") {
-		    dummyEdge.labelfontname = (*$3);
-                } else if ((*$1) == "labelfontsize") {
-		    dummyEdge.labelfontsize = atoi((*$3).c_str());
-                } else if ((*$1) == "headlabel") {
-		    dummyEdge.headlabel = (*$3);
-                } else if ((*$1) == "headport") {
-		    dummyEdge.headport = (*$3);
-                } else if ((*$1) == "taillabel") {
-		    dummyEdge.taillabel = (*$3);
-                } else if ((*$1) == "tailport") {
-		    dummyEdge.tailport = (*$3);
-                }
+                parseAttrStr((*$1), (*$3));
             }
         | KW_ID KW_COMMA 
             {
@@ -258,165 +339,18 @@ a_list: /* empty */
             }
         | KW_ID KW_EQUAL KW_ID KW_COMMA
             {
-                if ((*$1) == "label") {
-                    dummyNode.label = (*$3).substr(1, (*$3).length() - 2);
-                    dummyEdge.label = (*$3).substr(1, (*$3).length() - 2);
-                } else if ((*$1) == "pos") {
-                    dummyNode.posX = 
-                        atoi((*$3).substr(1, (*$3).find_first_of(",")).c_str());
-                    dummyNode.posY = 
-                        atoi((*$3).substr((*$3).find_first_of(",") + 1, (*$3).length()).c_str());
-                } else if ((*$1) == "width") {
-                    dummyNode.width = atof((*$3).substr(1, (*$3).length() - 2).c_str());
-                } else if ((*$1) == "height") {
-                    dummyNode.height = atof((*$3).substr(1, (*$3).length() - 2).c_str());
-                } else if ((*$1) == "peripheries") {
-                    if ((*$3) == "2") {
-		        dummyNode.isFinal = true;
-                    }
-                } else if ((*$1) == "color") {
-		    dummyNode.color = (*$3);
-		    dummyEdge.color = (*$3);
-                } else if ((*$1) == "fillcolor") {
-		    dummyNode.fillcolor = (*$3);
-                } else if ((*$1) == "fontcolor") {
-		    dummyNode.fontcolor = (*$3);
-		    dummyEdge.fontcolor = (*$3);
-                } else if ((*$1) == "fontname") {
-		    dummyNode.fontname = (*$3);
-		    dummyEdge.fontname = (*$3);
-                } else if ((*$1) == "fontsize") {
-		    dummyNode.fontsize = atoi((*$3).c_str());
-		    dummyEdge.fontsize = atoi((*$3).c_str());
-                } else if ((*$1) == "shape") {
-		    dummyNode.shape = (*$3);
-                } else if ((*$1) == "style") {
-		    dummyNode.style = (*$3);
-		    dummyEdge.style = (*$3);
-                } else if ((*$1) == "labelfontcolor") {
-		    dummyEdge.labelfontcolor = (*$3);
-                } else if ((*$1) == "labelfontname") {
-		    dummyEdge.labelfontname = (*$3);
-                } else if ((*$1) == "labelfontsize") {
-		    dummyEdge.labelfontsize = atoi((*$3).c_str());
-                } else if ((*$1) == "headlabel") {
-		    dummyEdge.headlabel = (*$3);
-                } else if ((*$1) == "headport") {
-		    dummyEdge.headport = (*$3);
-                } else if ((*$1) == "taillabel") {
-		    dummyEdge.taillabel = (*$3);
-                } else if ((*$1) == "tailport") {
-		    dummyEdge.tailport = (*$3);
-                }
+                parseAttrStr((*$1), (*$3));
             }
         | KW_ID KW_EQUAL KW_ID a_list 
             {
-                if ((*$1) == "label") {
-                    dummyNode.label = (*$3).substr(1, (*$3).length() - 2);
-                    dummyEdge.label = (*$3).substr(1, (*$3).length() - 2);
-                } else if ((*$1) == "pos") {
-                    dummyNode.posX = 
-                        atoi((*$3).substr(1, (*$3).find_first_of(",")).c_str());
-                    dummyNode.posY = 
-                        atoi((*$3).substr((*$3).find_first_of(",") + 1, (*$3).length()).c_str());
-                } else if ((*$1) == "width") {
-                    dummyNode.width = atof((*$3).substr(1, (*$3).length() - 2).c_str());
-                } else if ((*$1) == "height") {
-                    dummyNode.height = atof((*$3).substr(1, (*$3).length() - 2).c_str());
-                } else if ((*$1) == "peripheries") {
-                    if ((*$3) == "2") {
-		        dummyNode.isFinal = true;
-                    }
-                } else if ((*$1) == "color") {
-		    dummyNode.color = (*$3);
-		    dummyEdge.color = (*$3);
-                } else if ((*$1) == "fillcolor") {
-		    dummyNode.fillcolor = (*$3);
-                } else if ((*$1) == "fontcolor") {
-		    dummyNode.fontcolor = (*$3);
-		    dummyEdge.fontcolor = (*$3);
-                } else if ((*$1) == "fontname") {
-		    dummyNode.fontname = (*$3);
-		    dummyEdge.fontname = (*$3);
-                } else if ((*$1) == "fontsize") {
-		    dummyNode.fontsize = atoi((*$3).c_str());
-		    dummyEdge.fontsize = atoi((*$3).c_str());
-                } else if ((*$1) == "shape") {
-		    dummyNode.shape = (*$3);
-                } else if ((*$1) == "style") {
-		    dummyNode.style = (*$3);
-		    dummyEdge.style = (*$3);
-                } else if ((*$1) == "labelfontcolor") {
-		    dummyEdge.labelfontcolor = (*$3);
-                } else if ((*$1) == "labelfontname") {
-		    dummyEdge.labelfontname = (*$3);
-                } else if ((*$1) == "labelfontsize") {
-		    dummyEdge.labelfontsize = atoi((*$3).c_str());
-                } else if ((*$1) == "headlabel") {
-		    dummyEdge.headlabel = (*$3);
-                } else if ((*$1) == "headport") {
-		    dummyEdge.headport = (*$3);
-                } else if ((*$1) == "taillabel") {
-		    dummyEdge.taillabel = (*$3);
-                } else if ((*$1) == "tailport") {
-		    dummyEdge.tailport = (*$3);
-                }
+                parseAttrStr((*$1), (*$3));
             }
         | KW_ID KW_COMMA a_list
             {
             }
         | KW_ID KW_EQUAL KW_ID KW_COMMA a_list
             {
-                if ((*$1) == "label") {
-                    dummyNode.label = (*$3).substr(1, (*$3).length() - 2);
-                    dummyEdge.label = (*$3).substr(1, (*$3).length() - 2);
-                } else if ((*$1) == "pos") {
-                    dummyNode.posX = 
-                        atoi((*$3).substr(1, (*$3).find_first_of(",")).c_str());
-                    dummyNode.posY = 
-                        atoi((*$3).substr((*$3).find_first_of(",") + 1, (*$3).length()).c_str());
-                } else if ((*$1) == "width") {
-                    dummyNode.width = atof((*$3).substr(1, (*$3).length() - 2).c_str());
-                } else if ((*$1) == "height") {
-                    dummyNode.height = atof((*$3).substr(1, (*$3).length() - 2).c_str());
-                } else if ((*$1) == "peripheries") {
-                    if ((*$3) == "2") {
-		        dummyNode.isFinal = true;
-                    }
-                } else if ((*$1) == "color") {
-		    dummyNode.color = (*$3);
-		    dummyEdge.color = (*$3);
-                } else if ((*$1) == "fillcolor") {
-		    dummyNode.fillcolor = (*$3);
-                } else if ((*$1) == "fontcolor") {
-		    dummyNode.fontcolor = (*$3);
-		    dummyEdge.fontcolor = (*$3);
-                } else if ((*$1) == "fontname") {
-		    dummyNode.fontname = (*$3);
-		    dummyEdge.fontname = (*$3);
-                } else if ((*$1) == "fontsize") {
-		    dummyNode.fontsize = atoi((*$3).c_str());
-		    dummyEdge.fontsize = atoi((*$3).c_str());
-                } else if ((*$1) == "shape") {
-		    dummyNode.shape = (*$3);
-                } else if ((*$1) == "style") {
-		    dummyNode.style = (*$3);
-		    dummyEdge.style = (*$3);
-                } else if ((*$1) == "labelfontcolor") {
-		    dummyEdge.labelfontcolor = (*$3);
-                } else if ((*$1) == "labelfontname") {
-		    dummyEdge.labelfontname = (*$3);
-                } else if ((*$1) == "labelfontsize") {
-		    dummyEdge.labelfontsize = atoi((*$3).c_str());
-                } else if ((*$1) == "headlabel") {
-		    dummyEdge.headlabel = (*$3);
-                } else if ((*$1) == "headport") {
-		    dummyEdge.headport = (*$3);
-                } else if ((*$1) == "taillabel") {
-		    dummyEdge.taillabel = (*$3);
-                } else if ((*$1) == "tailport") {
-		    dummyEdge.tailport = (*$3);
-                }
+                parseAttrStr((*$1), (*$3));
             }
 ;
 
@@ -432,7 +366,10 @@ node_stmt: /* empty */
 
                 gastexGraph->addNode(node);
 
-                dummyNode = defaultNode;
+                if (!defaultNodeStack.empty()) 
+                    dummyNode = defaultNodeStack.top();
+                else
+                    dummyNode.setToDefault(); 
             }
         | node_id attr_list        
             {
@@ -445,7 +382,10 @@ node_stmt: /* empty */
                 
                 gastexGraph->addNode(node);
 
-                dummyNode = defaultNode; 
+                if (!defaultNodeStack.empty()) 
+                    dummyNode = defaultNodeStack.top(); 
+                else
+                    dummyNode.setToDefault(); 
             }
 ;
 
@@ -493,6 +433,11 @@ edge_stmt: /* empty */
                 edge->destNode = gastexGraph->getNode(*$2);
 
                 gastexGraph->addEdge(edge);
+
+                if (!defaultEdgeStack.empty()) 
+                    dummyEdge = defaultEdgeStack.top();
+                else
+                    dummyEdge.setToDefault(); 
             }
         | node_id edgeRHS attr_list
             {
@@ -503,6 +448,11 @@ edge_stmt: /* empty */
                 edge->destNode = gastexGraph->getNode(*$2);
 
                 gastexGraph->addEdge(edge);
+
+                if (!defaultEdgeStack.empty()) 
+                    dummyEdge = defaultEdgeStack.top(); 
+                else
+                    dummyEdge.setToDefault(); 
             }
         | subgraph edgeRHS
             {

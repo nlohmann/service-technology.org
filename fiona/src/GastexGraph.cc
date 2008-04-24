@@ -279,17 +279,18 @@ void GasTexGraph::makeGasTexOfOG(fstream& texFile) {
 
 void GasTexGraph::makeGasTexOfPN(fstream& texFile) {
 
-    /*
     // drawing bounding boxes
-    for(set<BoundingBox*>::iterator iBB = gastexGraph->boundingBoxes.begin()++; 
+    for(set<BoundingBox*>::iterator iBB = gastexGraph->boundingBoxes.begin(); 
         iBB != gastexGraph->boundingBoxes.end(); ++iBB) {
-        texFile << box_stmt_str[0] << (int)((*iBB)->x * scale_factor); 
-        texFile << box_stmt_str[1] << (int)((*iBB)->y * scale_factor); 
-        texFile << box_stmt_str[2] << (int)((*iBB)->width * scale_factor); 
-        texFile << box_stmt_str[3] << (int)((*iBB)->height * scale_factor); 
-        texFile << box_stmt_str[4] << endl; 
+        if (iBB == gastexGraph->boundingBoxes.begin()) {
+            continue;
+        }
+        texFile << pnBoxStmt[0] << (int)((*iBB)->x * scaleFactor); 
+        texFile << pnBoxStmt[1] << (int)((*iBB)->y * scaleFactor); 
+        texFile << pnBoxStmt[2] << (int)((*iBB)->width * scaleFactor); 
+        texFile << pnBoxStmt[3] << (int)((*iBB)->height * scaleFactor); 
+        texFile << pnBoxStmt[4] << endl; 
     }
-    */
 
     // drawing nodes
     if (pnNodeStdStmt != "") {

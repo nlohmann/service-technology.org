@@ -87,6 +87,7 @@ static struct option longopts[] = {
     { "type",            required_argument, NULL, 't' },
     { "messagebound",    required_argument, NULL, 'm' },
     { "eventsmaximum",   required_argument, NULL, 'e' },
+    { "readevents",      no_argument,       NULL, 'E' },
     { "reduceIG",        no_argument,       NULL, 'r' },
     { "reduce-nodes",    no_argument,       NULL, 'R' },
     { "show",            required_argument, NULL, 's' },
@@ -100,7 +101,7 @@ static struct option longopts[] = {
     { NULL,              0,                 NULL, 0   }
 };
 
-const char* par_string = "hvd:t:m:e:rRs:b:B:o:QMp:a:";
+const char* par_string = "hvd:t:m:e:ErRs:b:B:o:QMp:a:";
 
 
 // --------------------- functions for command line evaluation ------------------------
@@ -183,6 +184,9 @@ void print_help() {
 //  trace("                                 (-1 means disabling -e option, but is only\n");
 //  trace("                                 possible if -m option is set)\n");
 //  trace("                                 (only relevant for OG)\n");
+  trace(" -E | --readevents ............. set the occurences of events to values\n");
+  trace("                                 in the oWFN. If none are given eventsmaximum\n");
+  trace("                                 is used (default is no maximum)\n");
   trace(" -r | --reduceIG ............... use reduction rules for IG. If no reduction \n");
   trace("                                 rules are given (see -p), all rules are used. \n");
   trace(" -R | --reduce-nodes ........... use node reduction (IG or OG) which stores\n");
@@ -298,6 +302,7 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_GRAPH_TYPE] = false;
     options[O_MESSAGES_MAX] = true;
     options[O_EVENT_USE_MAX] = false;
+    options[O_READ_EVENTS] = false;
     options[O_CALC_REDUCED_IG] = false;
 //    options[O_CALC_ALL_STATES] = false; // standard: man muss -a angeben, um voll
     options[O_CALC_ALL_STATES] = true; // so lange Reduktion im Teststadium
@@ -511,6 +516,9 @@ void parse_command_line(int argc, char* argv[]) {
                 if (events_manual < 0) {
                     options[O_EVENT_USE_MAX] = false;
                 }
+                break;
+            case 'E':
+                options[O_READ_EVENTS] = true;
                 break;
             case 'r':
                 options[O_CALC_REDUCED_IG] = true;

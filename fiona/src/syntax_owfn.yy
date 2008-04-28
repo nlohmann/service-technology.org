@@ -349,8 +349,10 @@ commands:
 | KEY_MAX_OCCURRENCES OP_EQ NUMBER commands
     {
         // set max_occurence to value that was given in oWFN file
-        sscanf($3, "%u", &(PS->getPlace()->max_occurence));
-        free($3);
+        if (options[O_READ_EVENTS]) {
+            sscanf($3, "%u", &(PS->getPlace()->max_occurence));
+            free($3);
+        }
 //    	options[O_EVENT_USE_MAX] = true;
 //        if (options[O_EVENT_USE_MAX] &&
 //            PS->getPlace()->max_occurence > events_manual)
@@ -361,8 +363,11 @@ commands:
     }
 | KEY_MAX_OCCURRENCES OP_EQ NEGATIVE_NUMBER commands
     {
-        sscanf($3, "%d", &(PS->getPlace()->max_occurence));
-        free($3);
+        //set max_occurence to value that was given in oWFN file
+        if (options[O_READ_EVENTS]) {
+        	sscanf($3, "%d", &(PS->getPlace()->max_occurence));
+        	free($3);
+    	}
 //        if (options[O_EVENT_USE_MAX] &&
 //            PS->getPlace()->max_occurence > events_manual)
 //        {

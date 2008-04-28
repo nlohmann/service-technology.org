@@ -261,17 +261,11 @@ void reportOptionValues() {
         trace(TRACE_5, "no\n");
     }
 
-    // if options[O_EVENT_USE_MAX] (with non-negative value) is set, then
-    // values for max_occurence are totally ignored (overwritten)
-    // otherwise, take values of max_occurence
-    if (options[O_EVENT_USE_MAX]) {
-        assert(events_manual >= 0);
-        for (unsigned int e = 0; e < PN->getInputPlaceCount(); e++) {
-            PN->getInputPlace(e)->max_occurence = events_manual;
-        }
-        for (unsigned int e = 0; e < PN->getOutputPlaceCount(); e++) {
-            PN->getOutputPlace(e)->max_occurence = events_manual;
-        }
+    trace(TRACE_5, "-E option found: ");
+    if (options[O_READ_EVENTS]) {
+        trace(TRACE_5, "yes\n");
+    } else {
+        trace(TRACE_5, "no\n");
     }
 
     // report events

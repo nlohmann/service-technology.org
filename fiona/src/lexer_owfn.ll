@@ -81,6 +81,7 @@ FALSE                           { return KEY_FALSE; }
  /* keywords */
 SAFE                            { return KEY_SAFE; }
 PLACE                           { return KEY_PLACE; }
+INTERFACE                       { return KEY_INTERFACE; }
 INTERNAL                        { return KEY_INTERNAL; }
 INPUT                           { return KEY_INPUT; }
 OUTPUT                          { return KEY_OUTPUT; }
@@ -90,7 +91,10 @@ FINALMARKING                    { return KEY_FINALMARKING; }
 FINALCONDITION                  { return KEY_FINALCONDITION; }
 CONSUME                         { return KEY_CONSUME; }
 PRODUCE                         { return KEY_PRODUCE; }
+PORT                            { return KEY_PORT; }
 PORTS                           { return KEY_PORTS; }
+SYNCHRONOUS                     { return KEY_SYNCHRONOUS; }
+SYNCHRONIZE                     { return KEY_SYNCHRONIZE; }
 
  /* keywords for final conditions */
 ALL_OTHER_PLACES_EMPTY          { return KEY_ALL_OTHER_PLACES_EMPTY; }

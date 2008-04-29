@@ -107,7 +107,7 @@ owfnTransition *T; /** The transition that is currently parsed. */
 Symbol * S;
 PlSymbol * PS;
 oWFN * PN;					// the petri net
-string current_port; ///< the currently parsed port
+string current_port = ""; ///< the currently parsed port
 
 placeType type = INTERNAL;		/* type of place */
 
@@ -133,9 +133,10 @@ InTransitionParsePosition inTransitionParsePosition;
 
 // the terminal symbols (tokens)
 
-%token KEY_SAFE KEY_PLACE KEY_INTERNAL KEY_INPUT KEY_OUTPUT
+%token KEY_SAFE KEY_INTERFACE KEY_PLACE KEY_INTERNAL KEY_INPUT KEY_OUTPUT
+%token KEY_SYNCHRONIZE KEY_SYNCHRONOUS
 %token KEY_MARKING KEY_FINALMARKING KEY_FINALCONDITION
-%token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE KEY_PORTS
+%token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE KEY_PORT KEY_PORTS
 %token KEY_ALL_OTHER_PLACES_EMPTY
 %token KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
 %token KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
@@ -188,10 +189,10 @@ input:  net {
 ;
 
 net:
-		{
-			ignoredPlacesDueToMatching.clear();
-		}
-	KEY_PLACE place_area port_area KEY_MARKING
+  {
+    ignoredPlacesDueToMatching.clear();
+  }
+        interface KEY_MARKING
 		{
 			PlSymbol* plSymbol = NULL;
 			PlaceTable->initGetNextSymbol();
@@ -256,6 +257,44 @@ net:
 		}
 ;
 
+
+/********************************
+ * the new interface definition *
+ ********************************/
+
+interface:
+  KEY_PLACE place_area port_area /* deprecated syntax */
+| KEY_INTERFACE interface_area KEY_PLACE {type = INTERNAL; } placelists SEMICOLON /* new Luhme XIV syntax */
+;
+
+interface_area:
+  place_area_input place_area_output synchronous_area /* only one port without name */
+| port_list_new /* list of named ports */
+;
+
+port_list_new:
+  port_definition_new
+| port_list_new port_definition_new
+;
+
+port_definition_new:
+  KEY_PORT nodeident
+    { current_port = std::string($2); }
+  place_area_input place_area_output synchronous_area
+;
+
+synchronous_area:
+  KEY_SYNCHRONOUS labellist SEMICOLON
+| /* empty */
+;
+
+labellist:
+  nodeident
+| labellist COMMA nodeident
+;
+
+
+
 final: KEY_FINALMARKING finalmarkinglist SEMICOLON
 | KEY_FINALCONDITION statepredicate SEMICOLON {
 	PN->FinalCondition = $2;
@@ -274,16 +313,19 @@ place_area: place_area_internal place_area_input  place_area_output
 	  | place_area_lola
 ;
 
-place_area_input: KEY_INPUT {type = INPUT; } placelists SEMICOLON
-		| /* empty */
+place_area_input:
+  KEY_INPUT {type = INPUT; } placelists SEMICOLON
+| /* empty */
 ;
 
-place_area_output: KEY_OUTPUT {type = OUTPUT; } placelists SEMICOLON
-		 | /* empty */
+place_area_output:
+  KEY_OUTPUT {type = OUTPUT; } placelists SEMICOLON
+| /* empty */
 ;
 
-place_area_internal: KEY_INTERNAL {type = INTERNAL; } placelists SEMICOLON
-		   | /* empty */
+place_area_internal:
+  KEY_INTERNAL {type = INTERNAL; } placelists SEMICOLON
+| /* empty */
 ;
 
 place_area_lola: {type = INTERNAL; } placelists SEMICOLON;
@@ -322,6 +364,11 @@ place: nodeident {
 	if (type == INPUT || type == OUTPUT) {
 	    numberOfEvents += events_manual;
 	}
+    
+    /* annotate the place with the current port name if specified */
+    if (current_port != "" && type != INTERNAL)
+      PN->add_place_to_port(PS->getPlace(), current_port);
+    
     }
     controlcommands
 ;
@@ -617,6 +664,9 @@ transition: KEY_TRANSITION tname
 			current->place->getPlace()->references++;
 		}
 	}
+}
+opt_synchronize_label
+{
 
 	free($2);
 
@@ -624,6 +674,11 @@ transition: KEY_TRANSITION tname
 	delete $6;
 	delete $10;
 }
+;
+
+opt_synchronize_label:
+  /* empty */
+| KEY_SYNCHRONIZE
 ;
 
 

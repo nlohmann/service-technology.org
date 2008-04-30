@@ -184,9 +184,10 @@ void print_help() {
 //  trace("                                 (-1 means disabling -e option, but is only\n");
 //  trace("                                 possible if -m option is set)\n");
 //  trace("                                 (only relevant for OG)\n");
-  trace(" -E | --readevents ............. set the occurences of events to values\n");
-  trace("                                 in the oWFN. If none are given eventsmaximum\n");
-  trace("                                 is used (default is no maximum)\n");
+//  trace(" -E | --readevents ............. set the maximum occurences of events to\n");
+//  trace("                                 values taken from the oWFN file. If none\n");
+//  trace("                                 are given eventsmaximumis used. \n");
+//  trace("                                 (default is no maximum)\n");
   trace(" -r | --reduceIG ............... use reduction rules for IG. If no reduction \n");
   trace("                                 rules are given (see -p), all rules are used. \n");
   trace(" -R | --reduce-nodes ........... use node reduction (IG or OG) which stores\n");

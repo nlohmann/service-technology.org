@@ -566,14 +566,14 @@ string computeOG(oWFN* PN) {
 
     trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
     cout << "    " << difftime(seconds2, seconds) << " s consumed for building graph" << endl;
-
+  
     trace(TRACE_0, "\nnet is controllable: ");
-    if (graph->getRoot()->getColor() == BLUE) {
+    if (graph->hasNoRoot() || graph->getRoot()->getColor()==RED) {
+        trace(TRACE_0, "NO\n\n");
+    } else {
         trace(TRACE_0, "YES\n\n");
         controllable = true;
-    } else {
-        trace(TRACE_0, "NO\n\n");
-    }
+    }    
 
     // print statistics
     trace(TRACE_0, "OG statistics:\n");

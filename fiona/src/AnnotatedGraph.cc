@@ -165,44 +165,89 @@ void AnnotatedGraph::removeFalseNodes() {
 
     trace(TRACE_5, "AnnotatedGraph::removeFalseNodes(): start\n");
 
-    bool nodesHaveChanged = true;
+    bool modified = true;
 
-    while (nodesHaveChanged) {
-        nodesHaveChanged = false;
-        nodes_iterator iNode = setOfNodes.begin();
+    // As long as something changes...
+    while (modified) { 
 
-        while (iNode != setOfNodes.end()) {
-            GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
-            if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
+    	modified = false;
+    	
+    	// A set to store the nodes that violate their annotations
+    	set<AnnotatedGraphNode*> falseNodes;
 
-                removeEdgesToNodeFromAllOtherNodes(*iNode);
-                if (*iNode == getRoot()) {
-                    setRoot(NULL);
-                }
-                AnnotatedGraphNode * n = *iNode;
+    	// Iterate over all nodes
+    	for (nodes_iterator nodeIter = setOfNodes.begin(); nodeIter != setOfNodes.end(); ++nodeIter) {
+    		AnnotatedGraphNode* currentNode = *nodeIter;
+    		
+    		trace(TRACE_2, "\t\tprocessing node: " + (*nodeIter)->getName() + "\n");
 
-                trace(TRACE_2, "        Removing node: " + n->getName());
-                trace(TRACE_3, "\n            Annotation: " + n->getAnnotationAsString());
-                trace(TRACE_2, "\n");
+    		// A set to store edges that lead to false nodes
+   			set<AnnotatedGraphEdge*> falseEdges;
 
-                iNode = setOfNodes.erase(iNode);
-                removeNode(n);
-                delete n;
-                nodesHaveChanged = true;
-            } else {
-                ++iNode;
-            }
+   			// Iterate over all edges of the current node
+   			for (AnnotatedGraphNode::LeavingEdges::Iterator edgeIter = currentNode->getLeavingEdgesIterator(); edgeIter->hasNext();) {
+    			AnnotatedGraphEdge* currentEdge = edgeIter->getNext();
 
-            delete iNodeAssignment;
-        }
+        		trace(TRACE_4, "\t\t\tprocessing edge: " + (*nodeIter)->getName() + " - " + currentEdge->getLabel() + " > " + currentEdge->getDstNode()->getName() + "\n");
+
+        		// Check wether the edge leads to a false node
+    			if (falseNodes.find(currentEdge->getDstNode()) != falseNodes.end()) {
+    				// Insert the false edge into the set
+    				falseEdges.insert(currentEdge);
+
+    				trace(TRACE_4, "\t\t\tedge is leaving to a false node\n");
+    			}
+    		}
+
+    		
+   			// Something has changed!
+   			modified = falseEdges.size() > 0;
+   			
+   			// Iterate over all false edges found for that current node to delete them
+    		for (set<AnnotatedGraphEdge*>::iterator edgeIter = falseEdges.begin(); edgeIter != falseEdges.end(); ++edgeIter) {
+    			currentNode->removeEdgesToNode((*edgeIter)->getDstNode());
+    		}
+
+    		// Evaluate the annotation of the current node 
+    		if (!currentNode->assignmentSatisfiesAnnotation(*(currentNode->getAssignment()))) {
+    			// Insert the false node into the set
+    			falseNodes.insert(currentNode);
+    			
+    			trace(TRACE_2, "\t\tnode " + (*nodeIter)->getName() + " cannot satisfy its annotation.\n");
+    			trace(TRACE_3, "\t\tannotation: " + (*nodeIter)->getAnnotationAsString() + " \n");
+    		}
+
+    	}
+
+    	// Something has changed!
+    	modified = modified || falseNodes.size() > 0;
+    	
+    	// Iterate over the set of false nodes to delete them
+    	for (set<AnnotatedGraphNode*>::iterator nodeIter = falseNodes.begin(); nodeIter != falseNodes.end(); ++nodeIter) {
+    		
+    		// If the root node has to be deleted, we set the root to NULL. 
+    		if (*nodeIter == getRoot()) {
+				 setRoot(NULL);
+			}
+    		
+    		trace(TRACE_1, "\tremoved false node: " + (*nodeIter)->getName() + "\n");
+    		
+    		// Remove all edges leading to this node and the node itself. 
+    		removeEdgesToNodeFromAllOtherNodes(*nodeIter);
+    		removeNode(*nodeIter);
+    		delete *nodeIter;
+    	}
     }
-    if (getRoot() == NULL) {
-        trace(TRACE_0, "\n\nThe root was removed during removal of false OG nodes.\n");
-    	trace(TRACE_0, "The corresponding net is not controllable!\n");
-    }
 
+    trace(TRACE_0, "removing disconnected nodes ...\n");
+    
 	// Remove any nodes, that have been disconnected from the root node
-    //removeDisconnectedNodes();
+    removeDisconnectedNodes();
+
+    // Check whether the root node was also removed
+    if (hasNoRoot()) {
+		 trace(TRACE_0, "root node was removed!\n");
+    }
 
 	trace(TRACE_5, "AnnotatedGraph::removeFalseNodes(): end\n");
 }
@@ -214,23 +259,35 @@ void AnnotatedGraph::removeDisconnectedNodes() {
 
     trace(TRACE_5, "AnnotatedGraph::removeDisconnectedNodes(): start\n");
 
+    // create sets of connected and disconnected nodes
     set<AnnotatedGraphNode*> connectedNodes;
+    set<AnnotatedGraphNode*> disconnectedNodes;
     
-    if (getRoot() == NULL)
-    	return;
- 
-    removeDisconnectedNodesRecursively(getRoot(), connectedNodes);
-
-    nodes_iterator iNode = setOfNodes.begin();
-    while (iNode != setOfNodes.end()) {
-        if (connectedNodes.find(*iNode) == connectedNodes.end()) {
-            removeEdgesToNodeFromAllOtherNodes(*iNode);
-            AnnotatedGraphNode * n = *iNode;
-            iNode = setOfNodes.erase(iNode);
-    	    removeNode(n);
-    	    delete n;
+    // gather the connected nodes from the rootnode if there is a root node
+    if (!hasNoRoot()) {
+        removeDisconnectedNodesRecursively(getRoot(), connectedNodes);
+    }
+    
+    // insert all nodes which are not connected into the set of disconnected nodes
+    for (nodes_iterator nodeIter = setOfNodes.begin(); nodeIter != setOfNodes.end(); ++nodeIter) {
+        if (connectedNodes.find(*nodeIter) == connectedNodes.end()) {
+        	disconnectedNodes.insert(*nodeIter);
         }
     }
+    
+    // remove all disconnected nodes
+    for (set<AnnotatedGraphNode*>::iterator nodeIter = disconnectedNodes.begin(); nodeIter != disconnectedNodes.end(); ++nodeIter) {
+    	AnnotatedGraphNode* currentNode = *nodeIter;
+
+		trace(TRACE_1, "\tremoved disconnected node: " + (*nodeIter)->getName() + "\n");
+    	
+    	removeEdgesToNodeFromAllOtherNodes(currentNode);
+        removeNode(currentNode);
+	    delete currentNode;
+    }
+    	
+    
+    
 	trace(TRACE_5, "AnnotatedGraph::removeDisconnectedNodes(): end\n");
 }
 
@@ -242,18 +299,21 @@ void AnnotatedGraph::removeDisconnectedNodesRecursively(AnnotatedGraphNode* curr
 														set<AnnotatedGraphNode*>& connectedNodes) {
 
     trace(TRACE_5, "AnnotatedGraph::removeDisconnectedNodesRecursively(): start\n");
-
-    if (connectedNodes.find(currentNode) != connectedNodes.end())
-    	return;
-    
+   
+    // add the node to the connected nodes
     connectedNodes.insert(currentNode);
 
-    AnnotatedGraphNode::LeavingEdges::ConstIterator
-            edgeIter = currentNode->getLeavingEdgesConstIterator();
+	trace(TRACE_3, "\tnode " + currentNode->getName() +  " is connected.\n");
 
+    // iterate over all edges
+    AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = currentNode->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* edge = edgeIter->getNext();
-    	removeDisconnectedNodesRecursively(edge->getDstNode(), connectedNodes);
+        
+        // if the edge leads to a node that has not been determined as connected yet, proceed it
+        if (connectedNodes.find(edge->getDstNode()) == connectedNodes.end()) {
+        	removeDisconnectedNodesRecursively(edge->getDstNode(), connectedNodes);
+        }
     }
     
     trace(TRACE_5, "AnnotatedGraph::removeDisconnectedNodesRecursively(): end\n");
@@ -1196,6 +1256,12 @@ bool AnnotatedGraph::isAcyclic() {
 
     // Define a queue for all nodes that still need to be tested and initialize it
     queue<AnnotatedGraphNode*> testNodes;
+    
+    if (hasNoRoot()) {
+    	trace(TRACE_0, "The Graph is empty and thus acyclic!");
+    	return true;
+    }
+    
     testNodes.push(root);
     AnnotatedGraphNode* testNode;
 

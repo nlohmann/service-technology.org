@@ -150,7 +150,7 @@ else
     echo   ... failed to build public view correctly
     fi
 
-    result=`expr $result + $exitcode +$nodes + $edges`
+    result=`expr $result + $exitcode + $nodes + $edges`
 fi
 
 ############################################################################

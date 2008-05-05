@@ -33,7 +33,7 @@ DIR=$testdir/extrema FIONA=fiona
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
 rm -f $DIR/*.out
-rm -f $DIR/*.png
+#rm -f $DIR/*.png
 rm -f $DIR/*.og
 rm -f $DIR/*.log
 

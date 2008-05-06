@@ -51,11 +51,14 @@ using namespace std;
 
 
 class Graph {
-    
+
+    public:
+        typedef std::vector<GraphNode*> nodes_t;
+
+        typedef std::map< GraphNode*, GraphNode::LeavingEdges > predecessorMap;
+
     protected:
         GraphNode* root;
-
-        typedef std::vector<GraphNode*> nodes_t;
 
         nodes_t setOfNodes; // needed for proper deletion of OG.
 
@@ -143,6 +146,11 @@ class Graph {
 
         /// a function that returns the number of nodes in the graph
         unsigned int numberOfNodes();
+
+        /// function that returns a map from nodes to a vector of nodes
+        /// so that every node in the vector is a predecessor of the
+        /// corresponding node
+        void getPredecessorRelation(Graph::predecessorMap& resultMap);
 
 #undef new
         /// Provides user defined operator new. Needed to trace all new operations

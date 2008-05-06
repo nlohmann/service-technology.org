@@ -68,6 +68,10 @@ class AnnotatedGraph : public Graph {
         /// Type of container of transitions associated to each label
         typedef map<string, EdgeSet> TransitionMap;
 
+        typedef std::vector<AnnotatedGraphNode*> nodes_t;
+
+        typedef std::map< AnnotatedGraphNode*, AnnotatedGraphNode::LeavingEdges > predecessorMap;
+
     protected:
         /// name of the file that was source of the graph
         std::string filename;
@@ -76,7 +80,6 @@ class AnnotatedGraph : public Graph {
 
         GraphFormulaCNF* covConstraint;
 
-        typedef std::vector<AnnotatedGraphNode*> nodes_t;
         nodes_t setOfNodes; // needed for proper deletion of OG.
 
         nodes_t finalNodes; // final nodes of the graph
@@ -148,16 +151,6 @@ class AnnotatedGraph : public Graph {
         /// transforms the public view annotated graph to a non annotated Graph
         void transformOGToService( Graph* cleanPV);
 // END OF CODE FROM PL
-
-
-// CODE FROM CG FOR STRUCTURAL REDUCTION
-        /// returns the vector, so that all nodes in the vector have leaving edges to node
-        nodes_t getPredecessorNodes(AnnotatedGraphNode * node);
-
-        /// returns the vector, so that node has leaving edges to all nodes in the vector
-        nodes_t getSuccessorNodes(AnnotatedGraphNode * node);
-// END OD CODE FROM CG
-
 
         /// recursive function for computing the number of services
         unsigned int numberOfServicesRecursively(set<AnnotatedGraphNode*> activeNodes,
@@ -314,6 +307,12 @@ class AnnotatedGraph : public Graph {
 
 // CODE FROM CG FOR STRUCTURAL REDUCTION
         virtual void reduceStructurally();
+
+        /// function that returns a map from nodes to a vector of nodes
+        /// so that every node in the vector is a predecessor of the
+        /// corresponding node
+        void getPredecessorRelation(AnnotatedGraph::predecessorMap& resultMap);
+
 // END OD CODE FROM CG
 
 

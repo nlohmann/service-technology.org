@@ -39,6 +39,7 @@
 #include <queue>
 #include <utility>
 #include "Graph.h"
+#include "GraphNode.h"
 
 // TRUE and FALSE #defined in cudd package may interfere with
 // GraphFormulaLiteral::TRUE and ...::FALSE.
@@ -436,3 +437,32 @@ void Graph::transformToOWFNRecursively(GraphNode* currentNode,
 void Graph::clearNodeSet() {
     setOfNodes.clear();
 }
+
+/*!
+ *  \brief Calculates the predecessor relation of the graph
+ *
+ *  For the current structure of a Graph the predecessor relation ...
+ *
+ *  NOTE: If a node B is reachable from a node B via two different edges
+ *        then A is two times the predecessor of B
+ *
+ *  ??? Vorgänger zweimal drin, wenn über zwei Kanten erreichbar
+ */
+void Graph::getPredecessorRelation(Graph::predecessorMap& resultMap)
+{
+    resultMap.clear();
+
+    // iterate over all nodes of the graph
+    for (nodes_const_iterator node = setOfNodes.begin(); node != setOfNodes.end(); node++) {
+
+        // iterate over all edges in order to get the node's successors
+        GraphNode::LeavingEdges::ConstIterator edge = (*node)->getLeavingEdgesConstIterator();
+        while ( edge->hasNext() )
+        {
+        	GraphEdge * ed = edge->getNext();
+            // node is the predeccessor 
+            resultMap[ed->getDstNode()].add(new GraphEdge(*node, ed->getLabelWithoutPrefix() ));
+        }
+    }
+}
+

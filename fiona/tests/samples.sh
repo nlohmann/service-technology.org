@@ -36,7 +36,7 @@ FIONA=fiona
 rm -f $DIR/*.out
 rm -f $DIR/*.OG.png
 rm -f $DIR/*.IG.png
-rm -f $DIR/*.og
+#rm -f $DIR/*.og
 rm -f $DIR/*.log
 
 result=0

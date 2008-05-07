@@ -239,7 +239,7 @@ void AnnotatedGraph::removeFalseNodes() {
                 setRoot(NULL);
             }
 
-            trace(TRACE_1, "\tremoved false node: " + (*nodeIter)->getName() + "\n");
+            trace(TRACE_2, "\tremoved false node: " + (*nodeIter)->getName() + "\n");
 
             // Remove all edges leading to this node and the node itself. 
             removeEdgesToNodeFromAllOtherNodes(*nodeIter);
@@ -248,7 +248,7 @@ void AnnotatedGraph::removeFalseNodes() {
         }
     }
 
-    trace(TRACE_0, "removing disconnected nodes ...\n");
+    trace(TRACE_2, "removing disconnected nodes ...\n");
 
     // Remove any nodes, that have been disconnected from the root node
     removeDisconnectedNodes();
@@ -287,6 +287,7 @@ void AnnotatedGraph::removeDisconnectedNodes() {
     // remove all disconnected nodes
     for (set<AnnotatedGraphNode*>::iterator nodeIter = disconnectedNodes.begin();
          nodeIter != disconnectedNodes.end(); ++nodeIter) {
+
         AnnotatedGraphNode* currentNode = *nodeIter;
 
         trace(TRACE_1, "\tremoved disconnected node: " + (*nodeIter)->getName() + "\n");
@@ -924,11 +925,17 @@ bool AnnotatedGraph::isEquivalentRecursive(AnnotatedGraphNode* leftNode,
 //!        the graph such that it still characterizes the same strategies
 void AnnotatedGraph::minimizeGraph() {
     trace(TRACE_5, "AnnotatedGraph::minimizeGraph(): start\n");
-    cout << "starting minimization...\n" << endl;
+    trace(TRACE_0, "starting minimization...\n");
+
+    trace(TRACE_1, "number of nodes before minimization: " + intToString(setOfNodes.size()) + "\n");
+
+    // terminology:
+    // greater node means a node stored behind current node in setOfNodes
+
 
     // false nodes removed to increase performance only
     // should also work if nodes are unsatisfiable
-    trace(TRACE_1, "removing false nodes...\n");
+    trace(TRACE_2, "removing false nodes...\n");
     removeFalseNodes();
 
     if (hasNoRoot()) {
@@ -936,130 +943,91 @@ void AnnotatedGraph::minimizeGraph() {
         return;
     }
 
-    cout << "number of nodes: " << setOfNodes.size() << endl;
+    // iterators to consider all pairs of nodes
+    nodes_const_iterator iNode, jNode;
 
+    // We need to remember the pairs of nodes we already visited
+    // for recursively checking equivalence
+    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
 
-// 1) preparing a map of all pairs of nodes
-    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > nodePairs;
-    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > areEquivalent;
-    map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> > isEquivalentWith;
+    // remember for a node all equivalent nodes
+    map<AnnotatedGraphNode*, AnnotatedGraphNode*> isEquivalentWith;
 
+    // needed for redirecting incoming edges of equivalent nodes
     map<AnnotatedGraphNode*, AnnotatedGraphNode::LeavingEdges> myIncomingEdges;
 
-    nodes_const_iterator iNode, jNode;
+    // iterator over all edges for collecting information to myIncomingEdges
+    // and for redirecting incoming edges of equivalent nodes
+    AnnotatedGraphNode::LeavingEdges::ConstIterator iEdge;
+
+
+    // 1) checking for each node whether there is a greater node that is equivalent
     for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
 
-        // remember ingoing edges of each node for step 3)
-        AnnotatedGraphNode::LeavingEdges::ConstIterator iEdge = (*iNode)->getLeavingEdgesConstIterator();
+        // remember ingoing edges of each node for later merging of equivalent nodes
+        iEdge = (*iNode)->getLeavingEdgesConstIterator();
         while (iEdge->hasNext()) {
             AnnotatedGraphEdge* edge = iEdge->getNext();
             // node is the predeccessor 
             myIncomingEdges[edge->getDstNode()].add(edge);
         }
 
-        // remember all pairs of (node, greaterNode) which have to be checked for equivalence
+        // iterate over each greater node, trying to find at least one equivalent one
         for (jNode = iNode + 1; jNode != setOfNodes.end(); ++jNode) {
-            nodePairs.insert(make_pair(*iNode, *jNode));
-        }
-    }
-    cout << "number of node pairs: " << nodePairs.size() << "\n" << endl;
 
+            if (isEquivalentRecursive(*iNode,
+                                      *jNode,
+                                      visitedNodes,
+                                      this,
+                                      this)) {
+                trace(TRACE_2, "\tnodes:\t(" + (*iNode)->getName());
+                trace(TRACE_2, ", " + (*jNode)->getName() + ")");
+                trace(TRACE_2, "\t ...are equivalent :)\n");
 
-// 2) iterating each node pair which is to be considered
-    // We need to remember the pairs of nodes we already visited.
-    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
+                // remember that they are equivalent
+                isEquivalentWith[*iNode] = *jNode;
 
-    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >::const_iterator iNodePairs;
-    for (iNodePairs = nodePairs.begin(); iNodePairs != nodePairs.end(); ++iNodePairs) {
-        // cout << "nodes:\t(" << ((*iNodePairs).first)->getName() << ", " << (*iNodePairs).second->getName() << ")" << endl;
-
-        // naive lösung ab hier
-        if (isEquivalentRecursive((*iNodePairs).first,
-                                  (*iNodePairs).second,
-                                  visitedNodes,
-                                  this,
-                                  this)) {
-            cout << "nodes:\t(" << ((*iNodePairs).first)->getName();
-            cout << ", " << (*iNodePairs).second->getName() << ")";// << endl;
-            cout << "\t ...are equivalent :)" << endl;
-
-            // remember that they are equivalent
-            areEquivalent.insert(*iNodePairs);
-            isEquivalentWith[(*iNodePairs).first].insert((*iNodePairs).second);
-        } else {
-            // cout << "\t ...are NOT equivalent :(" << endl;            
-        }
-        // naive lösung bis hier
-    }
-
-    // at this point each node knows all equivalent nodes that are BEHIND that node
-    // in setOfNodes
-    // and each node knows its incoming edges
-
-
-// 3) merging equivalent OG nodes
-    // reporting...
-    cout << "\nnumber of equivalent pairs: " << areEquivalent.size() << "\n" << endl;    
-    set<AnnotatedGraphNode*>::const_iterator lNode;
-    for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
-        if (isEquivalentWith[*iNode].size() == 0) {
-            continue;
-        } else {
-            cout << "node " << (*iNode)->getName() << " is equivalent to nodes: ";
-            for (lNode = isEquivalentWith[*iNode].begin();
-                 lNode != isEquivalentWith[*iNode].end();
-                 ++lNode) {
-                cout << (*lNode)->getName() + ", ";
+                // stop inner loop if first equivalent node found and
+                // continue outer loop
+                break;
+            } else {
+                trace(TRACE_3, "\tnodes:\t(" + (*iNode)->getName());
+                trace(TRACE_3, ", " + (*jNode)->getName() + ")");
+                trace(TRACE_3, "\t ...are NOT equivalent :(\n");
             }
-            cout << endl;
-
-            cout << "\t" << (*iNode)->getName() << " has ingoing edges: ";
-            // iterate over all edges in map at position of current node
-
-            AnnotatedGraphNode::LeavingEdges::ConstIterator iEdge;
-            iEdge = myIncomingEdges[*iNode].getConstIterator();
-
-            while (iEdge->hasNext()) {
-                AnnotatedGraphEdge* edge = iEdge->getNext();
-                cout << edge->getLabel() + ", ";
-            }
-            cout << endl;
         }
     }
-    cout << "\n";
 
-    // merging idea: take all incoming edges of current node,
-    // redirect them to the first equivalent node behind this node in setOfNodes,
-    // delete the current node.
-    // works because if node has several equivalent nodes, the second one knows the third :)
+    // now merging equivalent OG nodes
 
     // redirect incoming arcs of a node to its first greater equivalent node
     // and delete the node afterwards
     for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
-        if (isEquivalentWith[*iNode].size() == 0) {
+        if (isEquivalentWith[*iNode] == NULL) {
             continue;
         } else {
             // current node has equivalent nodes, so redirect its incoming edges
-            AnnotatedGraphNode* myFirstEquivalent = *(isEquivalentWith[*iNode].begin());
 
-            AnnotatedGraphNode::LeavingEdges::ConstIterator iEdge;
             iEdge = myIncomingEdges[*iNode].getConstIterator();
-
             while (iEdge->hasNext()) {
                 AnnotatedGraphEdge* edge = iEdge->getNext();
-                edge->setDstNode(myFirstEquivalent);
+                edge->setDstNode(isEquivalentWith[*iNode]);
                 // for (possibly) later merging the first equivalent node
                 // with another equivalent node, add all redirected edges
                 // also to list of incoming edges
-                myIncomingEdges[myFirstEquivalent].add(edge);
+                myIncomingEdges[isEquivalentWith[*iNode]].add(edge);
             }
-
-            // afterwards, delete node
-            // ...
         }
     }
 
-    cout << "\nfinished minimization...\n" << endl;
+    // remove all nodes that became unreachable
+    removeDisconnectedNodes();
+
+    trace(TRACE_0, "finished minimization...\n\n");
+
+    // nicht noetig, weil final flag wird bewahrt
+    // assignFinalNodes();
+    trace(TRACE_1, "number of nodes after minimization: " + intToString(setOfNodes.size()) + "\n\n");
 
     if (!options[O_OUTFILEPREFIX]) {
         outfilePrefix = stripOGFileSuffix(this->getFilename()) + ".minimal";
@@ -1073,7 +1041,6 @@ void AnnotatedGraph::minimizeGraph() {
         printOGFile(outfilePrefix);
         printDotFile(outfilePrefix);
     }
-
 
     trace(TRACE_5, "AnnotatedGraph::minimizeGraph(): end\n");
 }
@@ -1538,7 +1505,8 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(
         map<AnnotatedGraphNode*, list<set<AnnotatedGraphNode*> > >& validFollowerCombinations,
         map<set<AnnotatedGraphNode*>, unsigned int>& eliminateRedundantCounting,
         unsigned int& instances) {
-    if (instances % 10000== 0&& instances != 0) {
+
+    if (instances % 10000 == 0 && instances != 0) {
         if (instances > 100000) {
             return 0;
         }
@@ -3023,12 +2991,13 @@ void AnnotatedGraph::getPredecessorRelation(AnnotatedGraph::predecessorMap& resu
 
 //! \brief assigns the final nodes of the OG according to Gierds 2007
 void AnnotatedGraph::assignFinalNodes() {
-    trace(TRACE_5, "OG::assignFinalNodes(): start\n");
+    trace(TRACE_5, "AnnotatedGraph::assignFinalNodes(): start\n");
 
 	for (nodes_t::iterator node = setOfNodes.begin(); node != setOfNodes.end(); node++) {
         if (((*node)->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0) != string::npos) {
             // current node has literal final in annotation
 
+            trace(TRACE_2, "found literal final in node " + (*node)->getName() + "\n");
             // check whether all outgoing edges are receiving ones
             bool receivesOnly = true;
             SList<AnnotatedGraphEdge*>::ConstIterator edge = (*node)->getLeavingEdgesConstIterator();
@@ -3042,10 +3011,11 @@ void AnnotatedGraph::assignFinalNodes() {
 
             // node is final iff literal final AND no non-receiving outgoing edge
             if (receivesOnly) {
+                trace(TRACE_2, "set final flag for node " + (*node)->getName() + "\n");
                 (*node)->setFinal(true);
             }
         }
     }
 
-    trace(TRACE_5, "OG::assignFinalNodes(): start\n");
+    trace(TRACE_5, "AnnotatedGraph::assignFinalNodes(): start\n");
 }

@@ -70,7 +70,7 @@ AnnotatedGraphNode::AnnotatedGraphNode(const std::string& _name,
 
 //! \brief destructor
 AnnotatedGraphNode::~AnnotatedGraphNode() {
-    
+
     trace(TRACE_5, "AnnotatedGraphNode::~AnnotatedGraphNode() : start\n");
 
     LeavingEdges::ConstIterator iEdge = getLeavingEdgesConstIterator();
@@ -79,9 +79,9 @@ AnnotatedGraphNode::~AnnotatedGraphNode() {
         delete edge;
     }
     delete iEdge;
-    
+
     delete annotation;
-    
+
     trace(TRACE_5, "AnnotatedGraphNode::~AnnotatedGraphNode() : end\n");
 }
 
@@ -91,6 +91,7 @@ AnnotatedGraphNode::~AnnotatedGraphNode() {
 GraphFormulaCNF* AnnotatedGraphNode::getAnnotation() const {
     return annotation;
 }
+
 
 // CODE FROM PL
 //! \brief sets the annotation of this node
@@ -117,6 +118,7 @@ std::string AnnotatedGraphNode::getAnnotationAsString() const {
 GraphFormulaCNF* AnnotatedGraphNode::getCovAnnotation() const {
     return covAnnotation;
 }
+
 
 //! \brief adds a new clause to the CNF formula of the node
 //! \param myclause the clause to be added to the annotation of the current node
@@ -158,6 +160,7 @@ AnnotatedGraphNode::LeavingEdges::ConstIterator AnnotatedGraphNode::getLeavingEd
 unsigned int AnnotatedGraphNode::getLeavingEdgesCount() const {
     return leavingEdges.size();
 }
+
 
 //! \brief  returns true iff a colored successor can be avoided
 //! \param  color   the color under consideration
@@ -366,7 +369,7 @@ AnnotatedGraphEdge* AnnotatedGraphNode::getEdgeWithLabel(const std::string& edge
             return edge;
         }
     }
-    
+
     delete edgeIter;
     return NULL;
 }
@@ -411,7 +414,6 @@ void AnnotatedGraphNode::removeEdgesToNode(const AnnotatedGraphNode* nodeToDelet
     }
     delete iEdge;
 }
-
 
 
 //! \brief analyses the node and sets its color
@@ -670,6 +672,7 @@ PriorityMap::KeyType PriorityMap::pop() {
 
     return key;
 }
+
 
 //! \brief Delivers the element from the priority map with the highest priority.
 //!        The element with the highest priority will be in a clause with minimal length

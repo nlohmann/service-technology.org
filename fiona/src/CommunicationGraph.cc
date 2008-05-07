@@ -623,11 +623,12 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
-         AnnotatedGraphEdge* element = edgeIter->getNext();
+        AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = element->getDstNode();
 
-        if (!vNext->isToShow(root))
+        if (!vNext->isToShow(root)) {
             continue;
+        }
 
         os << "p" << v->getNumber() << "->"
            << "p" << vNext->getNumber()
@@ -1085,7 +1086,10 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
 
 //! \brief deletes the corresponding oWFN
 void CommunicationGraph::deleteOWFN() {
-    if (PN) delete PN;
+    if (PN) {
+        delete PN;
+    }
+
     PN = NULL;
 }
 

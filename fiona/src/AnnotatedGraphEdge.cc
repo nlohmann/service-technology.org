@@ -41,15 +41,26 @@
 
 using namespace std;
 
+
 //! \brief basic constructor
 //! \param dstNodeP Points to the destination of this edge.
 //! \param labelP label of this edge.
-AnnotatedGraphEdge::AnnotatedGraphEdge(AnnotatedGraphNode* dstNodeP, const std::string& labelP) :
-GraphEdge(NULL,labelP), dstNode(dstNodeP) {
+AnnotatedGraphEdge::AnnotatedGraphEdge(AnnotatedGraphNode* dstNodeP,
+                                       const std::string& labelP) :
+    GraphEdge(NULL,labelP),
+    dstNode(dstNodeP) {
 }
 
-//! \brief returns the destination node of the dge
+
+//! \brief returns the destination node of the edge
 //! \return destination node
 AnnotatedGraphNode* AnnotatedGraphEdge::getDstNode() const {
     return dstNode;
+}
+
+
+//! \brief sets the destination node of the edge
+//! \param newNode the new destination of the edge
+void AnnotatedGraphEdge::setDstNode(AnnotatedGraphNode* newNode) {
+    dstNode = newNode;
 }

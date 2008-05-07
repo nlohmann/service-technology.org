@@ -186,7 +186,7 @@ void print_help() {
 //  trace("                                 (only relevant for OG)\n");
 //  trace(" -E | --readevents ............. set the maximum occurences of events to\n");
 //  trace("                                 values taken from the oWFN file. If none\n");
-//  trace("                                 are given eventsmaximumis used. \n");
+//  trace("                                 are given, eventsmaximum is used. \n");
 //  trace("                                 (default is no maximum)\n");
   trace(" -r | --reduceIG ............... use reduction rules for IG. If no reduction \n");
   trace("                                 rules are given (see -p), all rules are used. \n");
@@ -417,7 +417,7 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if (lc_optarg == "match") {
                     parameters[P_MATCH] = true;
                     parameters[P_IG] = false;
-                } else if (lc_optarg == "minimizeog") {
+                } else if (lc_optarg == "minimize") {
                     parameters[P_OG] = false;
                     parameters[P_IG] = false;
                     parameters[P_MINIMIZE_OG] = true;

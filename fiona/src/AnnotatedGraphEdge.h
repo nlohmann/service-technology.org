@@ -46,18 +46,22 @@
 
 class AnnotatedGraphNode;
 
+
 class AnnotatedGraphEdge : public GraphEdge {
 private:
     /// Points to the destination node of this edge.
     AnnotatedGraphNode* dstNode;
-    
+
 public:
     /// Constructs a GraphEdge.
     AnnotatedGraphEdge(AnnotatedGraphNode* dstNodeP, const std::string& labelP);
-    
+
     /// Returns the node this edge points to.
     AnnotatedGraphNode* getDstNode() const;
-    
+
+    /// Sets the node this edge points to.
+    void setDstNode(AnnotatedGraphNode* newDst);
+
 #undef new
     /// Provides user defined operator new. Needed to trace all new operations
     /// on this class.

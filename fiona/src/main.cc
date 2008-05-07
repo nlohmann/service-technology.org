@@ -1492,7 +1492,6 @@ int main(int argc, char** argv) {
 
             else if (parameters[P_MINIMIZE_OG]) {
                 // minimizes a given OG
-                removeFalseAnnos(readOG);
                 readOG->minimizeGraph();
                 delete readOG;
             }

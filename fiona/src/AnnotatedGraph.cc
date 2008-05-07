@@ -944,8 +944,20 @@ void AnnotatedGraph::minimizeGraph() {
     set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > areEquivalent;
     map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> > isEquivalentWith;
 
-    nodes_t::const_iterator iNode, jNode;
+    map<AnnotatedGraphNode*, AnnotatedGraphNode::LeavingEdges> myIncomingEdges;
+
+    nodes_const_iterator iNode, jNode;
     for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
+
+        // remember ingoing edges of each node for step 3)
+        AnnotatedGraphNode::LeavingEdges::ConstIterator iEdge = (*iNode)->getLeavingEdgesConstIterator();
+        while (iEdge->hasNext()) {
+            AnnotatedGraphEdge* edge = iEdge->getNext();
+            // node is the predeccessor 
+            myIncomingEdges[edge->getDstNode()].add(edge);
+        }
+
+        // remember all pairs of (node, greaterNode) which have to be checked for equivalence
         for (jNode = iNode + 1; jNode != setOfNodes.end(); ++jNode) {
             nodePairs.insert(make_pair(*iNode, *jNode));
         }
@@ -959,7 +971,7 @@ void AnnotatedGraph::minimizeGraph() {
 
     set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >::const_iterator iNodePairs;
     for (iNodePairs = nodePairs.begin(); iNodePairs != nodePairs.end(); ++iNodePairs) {
-        // cout << "node pair: (" << ((*iNodePairs).first)->getName() << ", " << (*iNodePairs).second->getName() << ")" << endl;
+        // cout << "nodes:\t(" << ((*iNodePairs).first)->getName() << ", " << (*iNodePairs).second->getName() << ")" << endl;
 
         // naive lösung ab hier
         if (isEquivalentRecursive((*iNodePairs).first,
@@ -967,7 +979,7 @@ void AnnotatedGraph::minimizeGraph() {
                                   visitedNodes,
                                   this,
                                   this)) {
-            cout << "nodes: (" << ((*iNodePairs).first)->getName();
+            cout << "nodes:\t(" << ((*iNodePairs).first)->getName();
             cout << ", " << (*iNodePairs).second->getName() << ")";// << endl;
             cout << "\t ...are equivalent :)" << endl;
 
@@ -979,11 +991,13 @@ void AnnotatedGraph::minimizeGraph() {
         }
         // naive lösung bis hier
     }
-    cout << "number of equivalent pairs: " << areEquivalent.size() << "\n" << endl;
 
     // at this point each node knows all equivalent nodes that are BEHIND that node
     // in setOfNodes
+    // and each node knows its incoming edges
 
+
+// 3) merging equivalent OG nodes
     // reporting...
     cout << "\nnumber of equivalent pairs: " << areEquivalent.size() << "\n" << endl;    
     set<AnnotatedGraphNode*>::const_iterator lNode;
@@ -998,40 +1012,69 @@ void AnnotatedGraph::minimizeGraph() {
                 cout << (*lNode)->getName() + ", ";
             }
             cout << endl;
-        }
-    }
-    cout << "\n";
 
+            cout << "\t" << (*iNode)->getName() << " has ingoing edges: ";
+            // iterate over all edges in map at position of current node
 
-// 3) merging equivalent OG nodes
-    // temporary variable storing all predecessors of current node
-    nodes_t currentNodePredecessors;
+            AnnotatedGraphNode::LeavingEdges::ConstIterator iEdge;
+            iEdge = myIncomingEdges[*iNode].getConstIterator();
 
-    for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
-        if (isEquivalentWith[*iNode].size() == 0) {
-            continue;
-        } else {
-            // TODO: kann sein, dass root node equivalent zu anderen;
-            // dann sind predecessors NULL ??
-//            assert(getPredecessorNodes(*iNode).size() != 0);
-//
-//            // current node has equivalent nodes, so redirect its incoming edges
-//            for (jNode = getPredecessorNodes(*iNode).begin();
-//                 jNode != getPredecessorNodes(*iNode).end();
-//                 ++jNode) {
-//
-//                cout << (*jNode)->getName() + ", ";
-//            }
+            while (iEdge->hasNext()) {
+                AnnotatedGraphEdge* edge = iEdge->getNext();
+                cout << edge->getLabel() + ", ";
+            }
             cout << endl;
         }
     }
+    cout << "\n";
 
     // merging idea: take all incoming edges of current node,
     // redirect them to the first equivalent node behind this node in setOfNodes,
     // delete the current node.
     // works because if node has several equivalent nodes, the second one knows the third :)
 
+    // redirect incoming arcs of a node to its first greater equivalent node
+    // and delete the node afterwards
+    for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
+        if (isEquivalentWith[*iNode].size() == 0) {
+            continue;
+        } else {
+            // current node has equivalent nodes, so redirect its incoming edges
+            AnnotatedGraphNode* myFirstEquivalent = *(isEquivalentWith[*iNode].begin());
+
+            AnnotatedGraphNode::LeavingEdges::ConstIterator iEdge;
+            iEdge = myIncomingEdges[*iNode].getConstIterator();
+
+            while (iEdge->hasNext()) {
+                AnnotatedGraphEdge* edge = iEdge->getNext();
+                edge->setDstNode(myFirstEquivalent);
+                // for (possibly) later merging the first equivalent node
+                // with another equivalent node, add all redirected edges
+                // also to list of incoming edges
+                myIncomingEdges[myFirstEquivalent].add(edge);
+            }
+
+            // afterwards, delete node
+            // ...
+        }
+    }
+
     cout << "\nfinished minimization...\n" << endl;
+
+    if (!options[O_OUTFILEPREFIX]) {
+        outfilePrefix = stripOGFileSuffix(this->getFilename()) + ".minimal";
+    }
+
+    if (!options[O_NOOUTPUTFILES]) {
+        trace("Saving minimized annotated graph to:\n");
+        trace(AnnotatedGraph::addOGFileSuffix(outfilePrefix));
+        trace("\n\n");
+
+        printOGFile(outfilePrefix);
+        printDotFile(outfilePrefix);
+    }
+
+
     trace(TRACE_5, "AnnotatedGraph::minimizeGraph(): end\n");
 }
 
@@ -2967,13 +3010,12 @@ bool isDiamond(AnnotatedGraphNode * node,
  *
  *  ??? Vorgänger zweimal drin, wenn über zwei Kanten erreichbar
  */
-void AnnotatedGraph::getPredecessorRelation(
-        AnnotatedGraph::predecessorMap& resultMap) {
+void AnnotatedGraph::getPredecessorRelation(AnnotatedGraph::predecessorMap& resultMap) {
+
     resultMap.clear();
 
     // iterate over all nodes of the graph
-    for (nodes_const_iterator node = setOfNodes.begin(); node
-            != setOfNodes.end(); node++) {
+    for (nodes_const_iterator node = setOfNodes.begin(); node != setOfNodes.end(); node++) {
 
         // iterate over all edges in order to get the node's successors
         AnnotatedGraphNode::LeavingEdges::ConstIterator edge = (*node)->getLeavingEdgesConstIterator();

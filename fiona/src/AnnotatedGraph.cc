@@ -1373,7 +1373,7 @@ bool AnnotatedGraph::isAcyclic() {
     queue<AnnotatedGraphNode*> testNodes;
 
     if (hasNoRoot()) {
-        trace(TRACE_0, "The Graph is empty and thus acyclic!");
+        trace(TRACE_0, "The graph is empty and thus acyclic!\n");
         return true;
     }
 
@@ -2804,7 +2804,6 @@ void AnnotatedGraph::fixDualService() {
 //! \brief transforms the graph into its public view
 void AnnotatedGraph::transformToPublicView(Graph* cleanPV) {
     trace(TRACE_1, "    removing nodes...\n");
-    removeFalseNodes();
     removeNodesAnnotatedWithTrue();
     trace(TRACE_2, "\n");
 

@@ -476,12 +476,16 @@ void CommunicationGraph::printGraphToDot() {
         dotFile << "node [fontname=\"Helvetica\" fontsize=10];\n";
         dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
+        if (rootNode == NULL) {
+            // print the empty OG...
+            dotFile << "p0"
+                    << " [label=\"#0\", fontcolor=black, color=red, style=dashed];\n";
+        } else {
         std::map<AnnotatedGraphNode*, bool> visitedNodes;
-
-
+        
         // filling the file with nodes and edges
         printGraphToDotRecursively(rootNode, dotFile, visitedNodes);
-
+        }
 
         dotFile << "}";
         dotFile.close();
@@ -549,9 +553,9 @@ void CommunicationGraph::printGraphToDot() {
 void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
                                                     fstream& os,
                                                     std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
-
-    assert(v != NULL);
-
+	// the given node pointer should never be NULL
+	assert(v != NULL);
+	
     // continue only if current node v is to show
     if (!v->isToShow(root))
         return;

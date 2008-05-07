@@ -90,9 +90,13 @@ void OG::buildGraph() {
     // start building up the rest of the graph
     // second parameter means: if finished, 100% of the graph is constructed
     buildGraph(getRoot(), 1);
-    correctNodeColorsAndShortenAnnotations();
     assignFinalNodes();
     computeGraphStatistics();
+    
+    if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
+    	removeFalseNodes();
+    }
+
 }
 
 

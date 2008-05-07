@@ -1207,7 +1207,6 @@ void AnnotatedGraph::filter(AnnotatedGraph *rhsOG) {
 void AnnotatedGraph::filterRecursive(AnnotatedGraphNode* myNode,
                                      AnnotatedGraphNode* rhsNode,
                                      set<AnnotatedGraphNode*> *VisitedNodes) {
-    trace(TRACE_5, "AnnotatedGraph::filterRecursive(...): begin\n");
 
     // nothing to be done
     if (myNode == NULL) {
@@ -1316,8 +1315,6 @@ void AnnotatedGraph::filterRecursive(AnnotatedGraphNode* myNode,
         }
     }
     delete rhsEdgeIter;
-
-    trace(TRACE_5, "AnnotatedGraph::filterRecursive(...): end\n");
 }
 
 
@@ -2135,7 +2132,7 @@ std::string AnnotatedGraph::addOGFileSuffix(const std::string& filePrefix) {
 //! \brief Get all transitions from the graph, each associated to a specific label
 //! return returns the transition map
 AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap() {
-    trace(TRACE_3, "AnnotatedGraph::getTransitionMap()::begin()\n");
+    trace(TRACE_5, "AnnotatedGraph::getTransitionMap(): start\n");
     TransitionMap tm;
 
     // itertate over all nodes
@@ -2151,7 +2148,7 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap() {
         }
     }
 
-    trace(TRACE_3, "AnnotatedGraph::getTransitionMap()::end()\n");
+    trace(TRACE_5, "AnnotatedGraph::getTransitionMap(): end\n");
     return tm;
 }
 
@@ -2161,8 +2158,8 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap() {
 //! return returns the transition map
 AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap(
         set<string>* labels) {
-    trace(TRACE_3,
-            "AnnotatedGraph::getTransitionMap(set<string>* labels)::begin()\n");
+    trace(TRACE_5,
+            "AnnotatedGraph::getTransitionMap(set<string>* labels): start\n");
     TransitionMap tm;
 
     // itertate over all nodes
@@ -2180,8 +2177,8 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap(
         }
     }
 
-    trace(TRACE_3,
-            "AnnotatedGraph::getTransitionMap(set<string>* labels)::end()\n");
+    trace(TRACE_5,
+            "AnnotatedGraph::getTransitionMap(set<string>* labels): end\n");
     return tm;
 }
 
@@ -2191,7 +2188,7 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap(
 //! covering the whole interface set
 //! \return returns the coverability formula 
 void AnnotatedGraph::createCovConstraint(set<string>* labels) {
-    trace(TRACE_3, "AnnotatedGraph::createCovFormula()::begin()\n");
+    trace(TRACE_5, "AnnotatedGraph::createCovFormula(): start\n");
 
     GraphFormulaCNF* formula = new GraphFormulaCNF;
     TransitionMap tm;
@@ -2219,9 +2216,7 @@ void AnnotatedGraph::createCovConstraint(set<string>* labels) {
 
     covConstraint = formula;
 
-    trace(TRACE_3, "AnnotatedGraph::createCovFormula(): " + formula->asString()
-            + "\n");
-    trace(TRACE_3, "AnnotatedGraph::createCovFormula()::end()\n");
+    trace(TRACE_5, "AnnotatedGraph::createCovFormula(): end\n");
 }
 
 
@@ -2229,16 +2224,14 @@ void AnnotatedGraph::createCovConstraint(set<string>* labels) {
 //! NOTE: the graph has to be acyclic!
 //! \return returns the structure formula
 GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormula() {
-    trace(TRACE_3, "AnnotatedGraph::createStructureFormula()::begin()\n");
+    trace(TRACE_5, "AnnotatedGraph::createStructureFormula(): start\n");
 
     assert(isAcyclic());
 
     GraphFormulaMultiaryAnd *formula =
             createStructureFormulaRecursively(getRoot());
 
-    trace(TRACE_3, "AnnotatedGraph::createStructureFormula(): "
-            + formula->asString() + "\n");
-    trace(TRACE_3, "AnnotatedGraph::createStrctureFormula()::end()\n");
+    trace(TRACE_5, "AnnotatedGraph::createStrctureFormula(): end\n");
     return formula;
 }
 
@@ -2249,8 +2242,6 @@ GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormula() {
 //! \return returns the structure formula of the subgraph
 GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormulaRecursively(
         AnnotatedGraphNode *node) {
-    trace(TRACE_5,
-            "AnnotatedGraph::createStructureFormulaRecursively()::begin()\n");
 
     GraphFormulaMultiaryAnd *formula= new GraphFormulaMultiaryAnd;
 
@@ -2285,10 +2276,6 @@ GraphFormulaMultiaryAnd *AnnotatedGraph::createStructureFormulaRecursively(
         formula->addSubFormula(new_clause);
     }
 
-    trace(TRACE_5, "AnnotatedGraph::createStructureFormulaRecursively(): "
-            + formula->asString() + "\n");
-    trace(TRACE_5,
-            "AnnotatedGraph::createStructureFormulaRecursively()::end()\n");
     return formula;
 }
 

@@ -1403,7 +1403,7 @@ int main(int argc, char** argv) {
     // ********                       (all OGs read first)                       ********
     // **********************************************************************************
 
-    if (parameters[P_PRODUCTOG] || parameters[P_SIMULATES_WITH_COV] || parameters[P_FILTER] ||
+    if (parameters[P_PRODUCTOG] || parameters[P_SIMULATES_WITH_COV] || // parameters[P_FILTER] ||
         parameters[P_SIMULATES] || (parameters[P_EX] && !options[O_BDD]) || parameters[P_READ_OG]) {
 
         // reading all OG-files
@@ -1454,11 +1454,11 @@ int main(int argc, char** argv) {
             return 0;
         }
 
-        if (parameters[P_FILTER]) {
-            // filtration on OG
-            filterOG(OGsFromFiles);
-            return 0;
-        }
+//        if (parameters[P_FILTER]) {
+//            // filtration on OG
+//            filterOG(OGsFromFiles);
+//            return 0;
+//        }
     }
 
     // **********************************************************************************

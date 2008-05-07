@@ -165,7 +165,7 @@ GasTexNode* GasTexGraph::getNode(string id) {
 
 
 void GasTexGraph::makeGasTex(string texFileName) {
-    trace(TRACE_5, "GasTexGraph::makeGasTex(string)::begin()\n");
+    trace(TRACE_5, "GasTexGraph::makeGasTex(string): start\n");
 
     fstream texFile(texFileName.c_str(), ios_base::out | ios_base::trunc);
     if (!texFile) {
@@ -189,7 +189,7 @@ void GasTexGraph::makeGasTex(string texFileName) {
         texFile << texFooter[i];
     }
 
-    trace(TRACE_5, "GasTexGraph::makeGasTex()::end\n");
+    trace(TRACE_5, "GasTexGraph::makeGasTex(): end\n");
 }
 
 void GasTexGraph::makeGasTexOfOG(fstream& texFile) {

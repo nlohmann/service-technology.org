@@ -171,9 +171,9 @@ void print_help() {
   trace("                                   distrubuted - checks a given oWFN for\n");
   trace("                                                 distributed controllability\n");
   trace("                                   readOG      - only reads a given OG File\n");
-  trace("                                   filter      - reduces the first OG such that\n");
-  trace("                                                 it simulates the second OG\n");
-  trace("                                                 (if possible)\n");
+//  trace("                                   filter      - reduces the first OG such that\n");
+//  trace("                                                 it simulates the second OG\n");
+//  trace("                                                 (if possible)\n");
   trace("                                   reduce      - structurally reduce all\n");
   trace("                                                 given oWFNs\n");
   trace("\n");
@@ -339,7 +339,7 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_COUNT_SERVICES] = false;
     parameters[P_DISTRIBUTED] = false;
     parameters[P_READ_OG] = false;
-    parameters[P_FILTER] = false;
+//    parameters[P_FILTER] = false;
     parameters[P_REDUCE] = false;
 
     // -s parameters
@@ -491,9 +491,9 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
                     parameters[P_READ_OG] = true;
-                } else if (lc_optarg == "filter") {
-                    parameters[P_FILTER] = true;
-                    parameters[P_IG] = false; 
+//                } else if (lc_optarg == "filter") {
+//                    parameters[P_FILTER] = true;
+//                    parameters[P_IG] = false; 
                 } else if (lc_optarg == "reduce") {
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
@@ -788,11 +788,11 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
-    if (parameters[P_FILTER] && ogfiles.size() != 2) {
-        cerr << "Error: \t If option -t filter is used, exactly two OG files must be entered\n" << endl;
-        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
-    }
+//    if (parameters[P_FILTER] && ogfiles.size() != 2) {
+//        cerr << "Error: \t If option -t filter is used, exactly two OG files must be entered\n" << endl;
+//        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+//        exit(1);
+//    }
 
     if (parameters[P_READ_OG] && ogfiles.size() != 1) {
         cerr << "Error: \t If option -t readOG is used, exactly one OG files must be entered\n" << endl;
@@ -822,7 +822,7 @@ void parse_command_line(int argc, char* argv[]) {
 		options[O_PV_MULTIPLE_DEADLOCKS] = false;
 	}
 
-    if (!parameters[P_FILTER] && !parameters[P_PRODUCTOG] && !parameters[P_SIMULATES] && !parameters[P_SIMULATES_WITH_COV] && 
+    if (!parameters[P_PRODUCTOG] && !parameters[P_SIMULATES] && !parameters[P_SIMULATES_WITH_COV] && // !parameters[P_FILTER] && 
         !parameters[P_EX] && options[O_OUTFILEPREFIX] && (ogfiles.size() > 1 || netfiles.size() > 1)) {
         cerr << "Error: \t The output option cannot be used if multiple output files are to be created!\n" << endl;
         exit(1);

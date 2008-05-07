@@ -566,7 +566,7 @@ GraphFormulaAssignment* AnnotatedGraphNode::getAssignment() const {
 //! through a given global constraint, describing the coverability criteria
 //! \param global_constraint formula describing the coverability critera
 void AnnotatedGraphNode::createCovAnnotation(GraphFormula* global_constraint) {
-    trace(TRACE_5, "AnnotatedGraphNode::createCovAnnotation(GraphFormula* global_constraint)::begin()\n");
+    trace(TRACE_5, "AnnotatedGraphNode::createCovAnnotation(GraphFormula* global_constraint): start\n");
     
     if (!global_constraint) return;
     
@@ -628,8 +628,7 @@ void AnnotatedGraphNode::createCovAnnotation(GraphFormula* global_constraint) {
     
     covAnnotation = cov_annotation;
     
-    trace(TRACE_5, "AnnotatedGraphNode::covAnnotation: " + covAnnotation->asString() + "\n");
-    trace(TRACE_5, "AnnotatedGraphNode::createCovAnnotation()::end()\n");
+    trace(TRACE_5, "AnnotatedGraphNode::createCovAnnotation(): end\n");
 }    
 
 
@@ -639,7 +638,6 @@ void AnnotatedGraphNode::createCovAnnotation(GraphFormula* global_constraint) {
 //!        in regards to other elements with minimal clause length. 
 //!        The element will be removed afterwards. 
 PriorityMap::KeyType PriorityMap::pop() {
-    trace(TRACE_5, "PriorityMap::pop()::begin()\n");
     KeyType key;
 
     // initialize with minimum priority values
@@ -670,7 +668,6 @@ PriorityMap::KeyType PriorityMap::pop() {
     // remove popped element
     pm.erase(key);
 
-    trace(TRACE_5, "PriorityMap::pop()::end()\n");
     return key;
 }
 
@@ -680,7 +677,6 @@ PriorityMap::KeyType PriorityMap::pop() {
 //!        in regards to other elements with minimal clause length. 
 //!        The element will be removed afterwards. 
 messageMultiSet PriorityMap::popIG() {
-    trace(TRACE_5, "PriorityMap::popIG()::begin()\n");
     messageMultiSet key;
 
     // initialize with minimum priority values
@@ -711,7 +707,6 @@ messageMultiSet PriorityMap::popIG() {
     // remove popped element
     pmIG.erase(key);
 
-    trace(TRACE_5, "PriorityMap::popIG()::end()\n");
     return key;
 }
 
@@ -721,7 +716,7 @@ messageMultiSet PriorityMap::popIG() {
 //!        annotation will have a minimal priority.
 //! \param annotation the annotation, from which the priority map will be extracted.
 void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
-    trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation)::begin()\n");
+    trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation): start\n");
 
     oWFN::Places_t::size_type i;
     KeyType key;
@@ -760,7 +755,7 @@ void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
         }
     }
 
-    trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation)::end()\n");
+    trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation): end\n");
 }
 
 //! \brief Fills the priority map according to the given annotation with interface places 
@@ -770,7 +765,7 @@ void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
 //! \param annotation the annotation, from which the priority map will be extracted.
 void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphFormulaCNF *annotation) {
     
-	trace(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation)::begin()\n");
+	trace(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation): start\n");
 
 	// just to remember which event we have considered already, 
 	// needed for initialising the priority map correctly
@@ -818,17 +813,17 @@ void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphForm
 		}
 	}
 
-	trace(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation)::end()\n");
+	trace(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation): end\n");
 }
 
-//! \brief returns whether the prioritymap is empty
-//! \return returns true if the Priority map is empty
+//! \brief returns whether the priority map is empty
+//! \return returns true if the priority map is empty, false otherwise
 bool PriorityMap::empty() const {
     return pm.empty();
 }
 
-//! \brief DESCRIPTION
-//! \return DESCRIPTION
+//! \brief returns whether the priority map for IGs is empty 
+//! \return returns true if the priority map is empty, false otherwise 
 bool PriorityMap::emptyIG() const {
     return pmIG.empty();
 }

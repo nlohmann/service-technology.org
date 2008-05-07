@@ -87,9 +87,6 @@ class OG : public CommunicationGraph {
         /// converts an OG into its BDD representation
         void convertToBdd();
 
-        /// assign the final nodes of the graph according to Gierds 2007
-        void assignFinalNodes();
-
 
         // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new

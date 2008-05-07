@@ -141,6 +141,9 @@ class GraphNode {
         /// Contains all leaving edges.
         LeavingEdges leavingEdges;
 
+        // Determindes whether the node is final
+        bool final;
+
     public:
 
         /// These three are needed for OG/IG construction.
@@ -241,6 +244,12 @@ class GraphNode {
 
         /// removes all edges from this node to the given one
         void removeEdgesToNode(const GraphNode*);
+
+        // set if the node is final
+        void setFinal(bool final);
+        
+        // return if the node is final
+        bool isFinal();
 
 #undef new
         /// Provides user defined operator new. Needed to trace all new operations

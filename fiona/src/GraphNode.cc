@@ -565,3 +565,16 @@ void GraphNode::removeEdgesToNode(const GraphNode* nodeToDelete) {
     }
     delete iEdge;
 }
+
+//! \brief set the node to be final or not
+//! \param finalValue the truth value of the node being final
+void GraphNode::setFinal(bool finalValue) {
+	final = finalValue;
+}
+
+//! \brief returns true, if the node is a final node
+//! \return true if the node is final
+bool GraphNode::isFinal() {
+	return final;
+}
+

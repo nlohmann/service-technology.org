@@ -87,7 +87,7 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
 %token key_nodes key_initialnode key_transitions
 %token key_red key_blue
 %token comma colon semicolon ident arrow
-%token key_true key_false
+%token key_true key_false key_finalnode
 %token lpar rpar
 
 %left op_or
@@ -102,12 +102,14 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
     char * str;
     GraphFormula* formula;
     GraphNodeColor_enum color;
+    bool boolVal;
 }
 
 /* the types of the non-terminal symbols */
 %type <str> ident
 %type <formula> formula
 %type <color> color_optional;
+%type <boolVal> finalnode_optional;
 
 
 %%
@@ -125,13 +127,14 @@ nodes_list: nodes_list comma node
 | /* empty */
 ;
 
-node: ident colon formula color_optional
+node: ident colon formula color_optional finalnode_optional
     {
         if (OGToParse->hasNodeWithName($1)) {
             og_yyerror_node_already_defined($1);
         }
 
-        OGToParse->addNode($1, $3, $4);
+        AnnotatedGraphNode* currentNode = OGToParse->addNode($1, $3, $4);
+        currentNode->setFinal($5);
         free($1);
     }
 ;
@@ -171,9 +174,31 @@ color_optional: colon key_blue
     {
         $$ = RED;
     }
+| colon key_blue colon
+    {
+        $$ = BLUE;
+    }
+| colon key_red colon
+    {
+        $$ = RED;
+    }
+| colon
+    {
+        $$ = BLUE;
+    }
 |
     {
         $$ = BLUE;
+    }
+;
+
+finalnode_optional: key_finalnode
+    {
+        $$ = true;
+    }
+|
+    {
+        $$ = false;
     }
 ;
 

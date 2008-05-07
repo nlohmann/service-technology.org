@@ -50,6 +50,7 @@ using namespace std;
 AnnotatedGraphNode::AnnotatedGraphNode() {
 
     annotation = new GraphFormulaCNF();
+    final = false;
 }
 
 
@@ -64,6 +65,7 @@ AnnotatedGraphNode::AnnotatedGraphNode(const std::string& _name,
                                        unsigned int _number) : GraphNode(_name, _color, _number) {
     
     annotation = _annotation->getCNF();
+    final = false;
     delete _annotation; // because getCNF() returns a newly created formula
 }
 

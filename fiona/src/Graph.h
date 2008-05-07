@@ -62,8 +62,6 @@ class Graph {
 
         nodes_t setOfNodes; // needed for proper deletion of OG.
 
-        nodes_t finalNodes; // final nodes of the graph
-
         typedef nodes_t::const_iterator nodes_const_iterator;
 
         typedef nodes_t::iterator nodes_iterator;
@@ -93,9 +91,6 @@ class Graph {
 
         /// adds a node to the graph
         void addNode(GraphNode* node);
-
-        /// makes an already added node a final node
-        void makeNodeFinal(GraphNode* node);
 
         /// creates a new node in the graph
         GraphNode* addNode(const std::string& nodeName, GraphNodeColor color = BLUE);

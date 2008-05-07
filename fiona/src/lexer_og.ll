@@ -85,6 +85,8 @@ TRANSITIONS   { return key_transitions; }
 [Rr][Ee][Dd]      { return key_red;  }
 [Bb][Ll][Uu][Ee]  { return key_blue; }
 
+[Ff][Ii][Nn][Aa][Ll][Nn][Oo][Dd][Ee]  { return key_finalnode; }
+
 \:            { return colon;     }
 \;            { return semicolon; }
 ,             { return comma;     }

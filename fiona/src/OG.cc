@@ -689,33 +689,3 @@ void OG::convertToBdd() {
 
     trace(TRACE_5, "OG::convertToBdd(): end\n");
 }
-
-
-//! \brief assigns the final nodes of the OG according to Gierds 2007
-void OG::assignFinalNodes() {
-    trace(TRACE_5, "OG::assignFinalNodes(): start\n");
-
-	for (nodes_t::iterator node = setOfNodes.begin(); node != setOfNodes.end(); node++) {
-        if (((*node)->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0) != string::npos) {
-            // current node has literal final in annotation
-
-            // check whether all outgoing edges are receiving ones
-            bool receivesOnly = true;
-            SList<AnnotatedGraphEdge*>::ConstIterator edge = (*node)->getLeavingEdgesConstIterator();
-            while (edge->hasNext()) {
-                AnnotatedGraphEdge* testedge = (*edge).getNext();
-                if (testedge->getType() != RECEIVING && testedge->getDstNode()->isBlue()) {
-                    receivesOnly = false;
-                }
-            }
-            delete edge;
-
-            // node is final iff literal final AND no non-receiving outgoing edge
-            if (receivesOnly) {
-                finalNodes.push_back(*node);
-            }
-        }
-    }
-
-    trace(TRACE_5, "OG::assignFinalNodes(): start\n");
-}

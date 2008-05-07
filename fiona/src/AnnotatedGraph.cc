@@ -2036,16 +2036,7 @@ void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v, fstream& os,
 
     if (visitedNodes[v] != true) {
 
-        bool finalNode = false;
-
-        for (nodes_t::const_iterator checkNode = finalNodes.begin(); checkNode
-                != finalNodes.end(); checkNode++) {
-            if ((*checkNode) == v) {
-                finalNode = true;
-            }
-        }
-
-        if (finalNode) {
+        if (v->isFinal()) {
             os << "p"<< v->getName() << " [label=\"# "<< v->getName() << "\\n";
             os << v->getAnnotation()->asString();
             os << "\", fontcolor=black, color=blue, peripheries=2];\n";
@@ -2121,6 +2112,10 @@ void AnnotatedGraph::printOGFile(const std::string& filenamePrefix) const {
         ogFile << "  " << node->getName() << " : "
                 << node->getAnnotationAsString() << " : " << node->getColor().toString();
 
+        if (node->isFinal()) {
+        	ogFile << " : finalnode";
+        }
+        
         printedFirstNode = true;
     }
     ogFile << ';'<< endl << endl;
@@ -2855,7 +2850,7 @@ void AnnotatedGraph::transformOGToService(Graph* cleanPV) {
         }
 
         if (((*copyNode)->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0) != string::npos) {
-            cleanPV->makeNodeFinal(copiedNode);
+            copiedNode->setFinal(true);
         }
 
         trace(TRACE_4, "    copied node: " + stringVal + "\n");
@@ -3024,4 +3019,33 @@ void AnnotatedGraph::getPredecessorRelation(AnnotatedGraph::predecessorMap& resu
             resultMap[ed->getDstNode()].add(new AnnotatedGraphEdge(*node, ed->getLabel() ));
         }
     }
+}
+
+//! \brief assigns the final nodes of the OG according to Gierds 2007
+void AnnotatedGraph::assignFinalNodes() {
+    trace(TRACE_5, "OG::assignFinalNodes(): start\n");
+
+	for (nodes_t::iterator node = setOfNodes.begin(); node != setOfNodes.end(); node++) {
+        if (((*node)->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0) != string::npos) {
+            // current node has literal final in annotation
+
+            // check whether all outgoing edges are receiving ones
+            bool receivesOnly = true;
+            SList<AnnotatedGraphEdge*>::ConstIterator edge = (*node)->getLeavingEdgesConstIterator();
+            while (edge->hasNext()) {
+                AnnotatedGraphEdge* testedge = (*edge).getNext();
+                if (testedge->getType() != RECEIVING && testedge->getDstNode()->isBlue()) {
+                    receivesOnly = false;
+                }
+            }
+            delete edge;
+
+            // node is final iff literal final AND no non-receiving outgoing edge
+            if (receivesOnly) {
+                (*node)->setFinal(true);
+            }
+        }
+    }
+
+    trace(TRACE_5, "OG::assignFinalNodes(): start\n");
 }

@@ -82,8 +82,6 @@ class AnnotatedGraph : public Graph {
 
         nodes_t setOfNodes; // needed for proper deletion of OG.
 
-        nodes_t finalNodes; // final nodes of the graph
-
         typedef nodes_t::const_iterator nodes_const_iterator;
         typedef nodes_t::iterator nodes_iterator;
 
@@ -92,6 +90,9 @@ class AnnotatedGraph : public Graph {
 
         /// remove all edges that have a given node as source
         void removeEdgesFromNodeToAllOtherNodes(AnnotatedGraphNode* nodeToDelete);
+        
+        /// assign the final nodes of the graph according to Gierds 2007
+        void assignFinalNodes();
 
         /// Recursive coordinated dfs through OG and rhs OG.
         void buildProductOG(AnnotatedGraphNode* currentOGNode,

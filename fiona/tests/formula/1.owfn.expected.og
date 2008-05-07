@@ -3,7 +3,7 @@ NODES
   1 : !a : blue,
   2 : (?c + ?d) : blue,
   3 : ?c : blue,
-  4 : final : blue,
+  4 : final : blue : finalnode,
   12 : ?d : blue,
   14 : (!b + ?c) : blue,
   15 : !b : blue;

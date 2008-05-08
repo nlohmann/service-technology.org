@@ -420,6 +420,8 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if (lc_optarg == "minimize") {
                     parameters[P_OG] = false;
                     parameters[P_IG] = false;
+                    // if original OG has empty node, then empty node must be kept
+                    parameters[P_SHOW_EMPTY_NODE] = true;
                     parameters[P_MINIMIZE_OG] = true;
                 } else if ((lc_optarg == "pv") || (lc_optarg == "publicview")) {
                 	parameters[P_PV] = true;

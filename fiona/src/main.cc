@@ -394,6 +394,63 @@ void makeGasTex(CommunicationGraph* graph) {
 }
 
 
+//! \brief generate a public view for a given og
+//! \param OG an og to generate the public view of
+//! \param graphName a name for the graph in the output
+void computePublicView(AnnotatedGraph* OG, string graphName) {
+
+    trace(TRACE_0, "generating the public view for ");
+    trace(graphName);
+    trace("\n");
+
+    unsigned int maxSizeForDot = 120;
+    
+    outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
+    outfilePrefix += ".pv.sa";
+
+    Graph* cleanPV = new Graph();
+
+    OG->transformToPublicView(cleanPV);
+
+    // generate output files
+    if (!options[O_NOOUTPUTFILES]) {
+
+        if(cleanPV->numberOfNodes() > maxSizeForDot) {
+            trace(TRACE_0, "the public view service automaton is to big to generate a dot file\n\n");
+        } else {
+            trace(TRACE_0, "generating dot output...\n");
+
+            // .out
+            cleanPV->printDotFile(outfilePrefix, "public view of " + graphName);
+        }
+
+        //transform to owfn
+        PNapi::PetriNet* PVoWFN = new PNapi::PetriNet(); 
+        PVoWFN->set_format(PNapi::FORMAT_OWFN, true);
+        cleanPV->transformToOWFN(PVoWFN);
+
+        trace(TRACE_0, "Public View oWFN statistics:\n");
+        trace(PVoWFN->information());
+        trace(TRACE_0, "\n");
+
+        ofstream output;
+        const string owfnOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".pv.owfn";
+        output.open (owfnOutput.c_str(),ios::out);
+
+        (output) << (*PVoWFN);
+        output.close();
+
+        // modifizierte Überreste von Peter Laufers output des SA als og-file
+
+        // const string saOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".pv.sa";
+        // OG->printOGFile(saOutput);
+
+        trace(TRACE_0, "=================================================================\n");
+        trace(TRACE_0, "\n");
+    }
+}
+
+
 //! \brief create an IG of an oWFN
 //! \param PN the given oWFN
 string computeIG(oWFN* PN) {
@@ -490,63 +547,6 @@ string computeIG(oWFN* PN) {
 }
 
 
-//! \brief generate a public view for a given og
-//! \param OG an og to generate the public view of
-//! \param graphName a name for the graph in the output
-void computePublicView(AnnotatedGraph* OG, string graphName) {
-
-    trace(TRACE_0, "generating the public view for ");
-    trace(graphName);
-    trace("\n");
-
-    unsigned int maxSizeForDot = 120;
-    
-    outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
-    outfilePrefix += ".pv.sa";
-
-    Graph* cleanPV = new Graph();
-
-    OG->transformToPublicView(cleanPV);
-
-    // generate output files
-    if (!options[O_NOOUTPUTFILES]) {
-
-    	if(cleanPV->numberOfNodes() > maxSizeForDot) {
-    		trace(TRACE_0, "the public view service automaton is to big to generate a dot file\n\n");
-    	} else {
-    		trace(TRACE_0, "generating dot output...\n");
-
-    		// .out
-    		cleanPV->printDotFile(outfilePrefix, "public view of " + graphName);
-    	}
-
-        //transform to owfn
-        PNapi::PetriNet* PVoWFN = new PNapi::PetriNet(); 
-        PVoWFN->set_format(PNapi::FORMAT_OWFN, true);
-        cleanPV->transformToOWFN(PVoWFN);
-
-		trace(TRACE_0, "Public View oWFN statistics:\n");
-        trace(PVoWFN->information());
-		trace(TRACE_0, "\n");
-
-        ofstream output;
-        const string owfnOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".pv.owfn";
-        output.open (owfnOutput.c_str(),ios::out);
-
-        (output) << (*PVoWFN);
-        output.close();
-
-        // modifizierte Überreste von Peter Laufers output des SA als og-file
-
-        // const string saOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".pv.sa";
-        // OG->printOGFile(saOutput);
-
-        trace(TRACE_0, "=================================================================\n");
-        trace(TRACE_0, "\n");
-    }
-}
-
-
 //! \brief create an OG of an oWFN
 //! \param PN the given oWFN
 string computeOG(oWFN* PN) {
@@ -591,9 +591,9 @@ string computeOG(oWFN* PN) {
             publicViewName = graph->getFilename();
             publicViewName = publicViewName.substr(0, publicViewName.size()-5);
         }
-        
+
         computePublicView(graph, publicViewName);
-        
+
         delete graph;
         return "";
     }

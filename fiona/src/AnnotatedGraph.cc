@@ -946,10 +946,6 @@ void AnnotatedGraph::minimizeGraph() {
     // iterators to consider all pairs of nodes
     nodes_const_iterator iNode, jNode;
 
-    // We need to remember the pairs of nodes we already visited
-    // for recursively checking equivalence
-    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
-
     // remember for a node all equivalent nodes
     map<AnnotatedGraphNode*, AnnotatedGraphNode*> isEquivalentWith;
 
@@ -975,11 +971,7 @@ void AnnotatedGraph::minimizeGraph() {
         // iterate over each greater node, trying to find at least one equivalent one
         for (jNode = iNode + 1; jNode != setOfNodes.end(); ++jNode) {
 
-            if (isEquivalentRecursive(*iNode,
-                                      *jNode,
-                                      visitedNodes,
-                                      this,
-                                      this)) {
+            if (isEquivalent(*iNode, *jNode)) {
                 trace(TRACE_2, "\tnodes:\t(" + (*iNode)->getName());
                 trace(TRACE_2, ", " + (*jNode)->getName() + ")");
                 trace(TRACE_2, "\t ...are equivalent :)\n");
@@ -1007,7 +999,6 @@ void AnnotatedGraph::minimizeGraph() {
             continue;
         } else {
             // current node has equivalent nodes, so redirect its incoming edges
-
             iEdge = myIncomingEdges[*iNode].getConstIterator();
             while (iEdge->hasNext()) {
                 AnnotatedGraphEdge* edge = iEdge->getNext();
@@ -1016,6 +1007,11 @@ void AnnotatedGraph::minimizeGraph() {
                 // with another equivalent node, add all redirected edges
                 // also to list of incoming edges
                 myIncomingEdges[isEquivalentWith[*iNode]].add(edge);
+            }
+
+            // if root node has equivalent nodes, then set root flag to new node
+            if (*iNode == getRoot()) {
+                setRoot(isEquivalentWith[*iNode]);
             }
         }
     }
@@ -1039,7 +1035,7 @@ void AnnotatedGraph::minimizeGraph() {
         trace("\n\n");
 
         printOGFile(outfilePrefix);
-        printDotFile(outfilePrefix);
+        printDotFile(outfilePrefix + ".og");
     }
 
     trace(TRACE_5, "AnnotatedGraph::minimizeGraph(): end\n");

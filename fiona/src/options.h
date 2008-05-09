@@ -83,8 +83,8 @@ typedef enum {
     P_ADAPTER,                  //!< compute adapter for given services
     P_PNG,                      //!< graphical output of all given oWFNs
     P_GASTEX,                   //!< read an annotated dot file and create a gastex tex file
-    P_CHECK_FALSE_ANNOS,	    //!< check false annotations in og
-    P_REMOVE_FALSE_ANNOS,		//!< remove nodes with false annotations in og
+    P_CHECK_FALSE_NODES,	    //!< check false annotations in og
+    P_REMOVE_FALSE_NODES,		//!< remove nodes with false annotations in og
     P_CHECK_ACYCLIC,            //!< Check whether an OG is acyclic 
     P_COUNT_SERVICES,           //!< Compute the number of services characterized by an OG
     P_DISTRIBUTED,              //!< check for distributed controllability

@@ -158,9 +158,9 @@ void print_help() {
   trace("                                                 given oWFNs\n");
 //  trace("                                   tex         - generate gastex files for a\n");
 //  trace("                                                 given annotated dot file\n");
-  trace("                               checkfalseannos - checks for nodes that\n");
+  trace("                               checkfalsenodes - checks for nodes that\n");
   trace("                                                 violate their own annotation.\n"); 
-  trace("                              removefalseannos - removes nodes that\n");
+  trace("                              removefalsenodes - removes nodes that\n");
   trace("                                                 violate their own annotation \n"); 
   trace("                                                 and stores the result to a\n"); 
   trace("                                                 specified output file (-o)\n"); 
@@ -333,8 +333,8 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_ADAPTER] = false;
     parameters[P_PNG] = false;
     parameters[P_GASTEX] = false;
-    parameters[P_CHECK_FALSE_ANNOS] = false;
-    parameters[P_REMOVE_FALSE_ANNOS] = false;
+    parameters[P_CHECK_FALSE_NODES] = false;
+    parameters[P_REMOVE_FALSE_NODES] = false;
     parameters[P_CHECK_ACYCLIC] = false;
     parameters[P_COUNT_SERVICES] = false;
     parameters[P_DISTRIBUTED] = false;
@@ -437,6 +437,8 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if (lc_optarg == "productog") {
                     parameters[P_IG] = false;
                     parameters[P_PRODUCTOG] = true;
+                    // if original OG has empty node, then empty node must be kept
+                    parameters[P_SHOW_EMPTY_NODE] = true;
                 } else if (lc_optarg == "simulation") {
                     parameters[P_SIMULATES] = true;
                     parameters[P_IG] = false;
@@ -472,11 +474,13 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if (lc_optarg == "checkfalseannos") {
                 	parameters[P_OG] = false;
                 	parameters[P_IG] = false;
-                	parameters[P_CHECK_FALSE_ANNOS] = true;
+                	parameters[P_CHECK_FALSE_NODES] = true;
                 } else if (lc_optarg == "removefalseannos") {
                 	parameters[P_OG] = false;
                 	parameters[P_IG] = false;
-                	parameters[P_REMOVE_FALSE_ANNOS] = true;
+                    // if original OG has empty node, then empty node must be kept
+                    parameters[P_SHOW_EMPTY_NODE] = true;
+                	parameters[P_REMOVE_FALSE_NODES] = true;
                 } else if (lc_optarg == "isacyclic") {
                     parameters[P_IG] = false;
                     parameters[P_CHECK_ACYCLIC] = true;

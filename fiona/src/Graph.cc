@@ -179,11 +179,13 @@ void Graph::removeEdgesFromNodeToAllOtherNodes(GraphNode* nodeToDelete) {
     }
 }
 
+
 //! \brief returns the number of nodes in the Graph
 //! \return number of nodes
 unsigned int Graph::numberOfNodes() {
 	return (setOfNodes.size());
 }
+
 
 //! \brief checks, whether this Graph is acyclic
 //! \return true on positive check, otherwise: false

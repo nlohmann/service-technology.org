@@ -164,8 +164,10 @@ bool AnnotatedGraph::hasNoRoot() const {
 //!        true. The function continues removing until no node fullfils
 //!        the mentioned criterion
 void AnnotatedGraph::removeFalseNodes() {
-
     trace(TRACE_5, "AnnotatedGraph::removeFalseNodes(): start\n");
+
+    trace(TRACE_1, "\tnumber of nodes before removal: ");
+    trace(TRACE_1, intToString(setOfNodes.size()) + "\n");
 
     bool modified = true;
 
@@ -183,7 +185,7 @@ void AnnotatedGraph::removeFalseNodes() {
 
             AnnotatedGraphNode* currentNode = *nodeIter;
 
-            trace(TRACE_2, "\t\tprocessing node: " + (*nodeIter)->getName() + "\n");
+            trace(TRACE_3, "\t\tprocessing node: " + (*nodeIter)->getName() + "\n");
 
             // A set to store edges that lead to false nodes
             set<AnnotatedGraphEdge*> falseEdges;
@@ -222,8 +224,8 @@ void AnnotatedGraph::removeFalseNodes() {
                 // Insert the false node into the set
                 falseNodes.insert(currentNode);
 
-                trace(TRACE_2, "\t\tnode " + (*nodeIter)->getName() + " cannot satisfy its annotation.\n");
-                trace(TRACE_3, "\t\tannotation: " + (*nodeIter)->getAnnotationAsString() + " \n");
+                trace(TRACE_3, "\t\tnode " + (*nodeIter)->getName() + " cannot satisfy its annotation.\n");
+                trace(TRACE_4, "\t\tannotation: " + (*nodeIter)->getAnnotationAsString() + " \n");
             }
         }
 
@@ -239,7 +241,7 @@ void AnnotatedGraph::removeFalseNodes() {
                 setRoot(NULL);
             }
 
-            trace(TRACE_2, "\tremoved false node: " + (*nodeIter)->getName() + "\n");
+            trace(TRACE_3, "\tremoved false node: " + (*nodeIter)->getName() + "\n");
 
             // Remove all edges leading to this node and the node itself. 
             removeEdgesToNodeFromAllOtherNodes(*nodeIter);
@@ -248,7 +250,7 @@ void AnnotatedGraph::removeFalseNodes() {
         }
     }
 
-    trace(TRACE_2, "removing disconnected nodes ...\n");
+    trace(TRACE_3, "\tremoving disconnected nodes ...\n");
 
     // Remove any nodes, that have been disconnected from the root node
     removeDisconnectedNodes();
@@ -257,6 +259,9 @@ void AnnotatedGraph::removeFalseNodes() {
     if (hasNoRoot()) {
         trace(TRACE_0, "root node was removed!\n");
     }
+
+    trace(TRACE_1, "\tnumber of nodes after removal: ");
+    trace(TRACE_1, intToString(setOfNodes.size()) + "\n");
 
     trace(TRACE_5, "AnnotatedGraph::removeFalseNodes(): end\n");
 }
@@ -290,7 +295,7 @@ void AnnotatedGraph::removeDisconnectedNodes() {
 
         AnnotatedGraphNode* currentNode = *nodeIter;
 
-        trace(TRACE_1, "\tremoved disconnected node: " + (*nodeIter)->getName() + "\n");
+        trace(TRACE_3, "\t\tremoved disconnected node: " + (*nodeIter)->getName() + "\n");
 
         removeEdgesToNodeFromAllOtherNodes(currentNode);
         removeNode(currentNode);
@@ -312,7 +317,7 @@ void AnnotatedGraph::removeDisconnectedNodesRecursively(AnnotatedGraphNode* curr
     // add the node to the connected nodes
     connectedNodes.insert(currentNode);
 
-    trace(TRACE_3, "\tnode " + currentNode->getName() + " is connected.\n");
+    trace(TRACE_3, "\t\tnode " + currentNode->getName() + " is connected.\n");
 
     // iterate over all edges
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = currentNode->getLeavingEdgesConstIterator();
@@ -933,7 +938,7 @@ void AnnotatedGraph::minimizeGraph() {
     // greater node means a node stored behind current node in setOfNodes
 
 
-    // false nodes removed to increase performance only
+    // false nodes are removed to increase performance only;
     // should also work if nodes are unsatisfiable
     trace(TRACE_2, "removing false nodes...\n");
     removeFalseNodes();

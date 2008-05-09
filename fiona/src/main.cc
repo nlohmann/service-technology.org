@@ -1428,7 +1428,7 @@ int main(int argc, char** argv) {
     // **********************************************************************************
 
     else if (parameters[P_COUNT_SERVICES] || parameters[P_CHECK_ACYCLIC] ||
-             parameters[P_CHECK_FALSE_ANNOS] || parameters[P_REMOVE_FALSE_ANNOS] ||
+             parameters[P_CHECK_FALSE_NODES] || parameters[P_REMOVE_FALSE_NODES] ||
              parameters[P_PV] || parameters[P_MINIMIZE_OG]) {
 
         // Abort if there are no OGs at all
@@ -1474,49 +1474,51 @@ int main(int argc, char** argv) {
                 delete readOG;
             }
 
-            else if (parameters[P_CHECK_FALSE_ANNOS]) {
+            else if (parameters[P_CHECK_FALSE_NODES]) {
             	// checks if there are nodes in the og which violate the annotation
-            	trace(TRACE_0, "Checking '" + readOG->getFilename() + "' for false annotations...");
-            	
+            	trace(TRACE_0, "Checking '" + readOG->getFilename() + "' ");
+            	trace(TRACE_0, "for nodes with false annotation...");
+
             	std::vector<AnnotatedGraphNode*> falseNodes;
             	readOG->findFalseNodes(&falseNodes);
-            	
+
             	if (falseNodes.size() == 0) {
-            		trace(TRACE_0, "\n\t No false annotations found!");
+            		trace(TRACE_0, "\n\t No nodes with false annotation found!");
             	} else {
-            		trace(TRACE_0, "\n\t False annotations found!");	
+            		trace(TRACE_0, "\n\t Node(s) with false annotation found!");
             		std::vector<AnnotatedGraphNode*>::iterator it = falseNodes.begin();
-            		
+
             		while (it != falseNodes.end()) {
             			AnnotatedGraphNode* currentNode = *it;
-            			trace(TRACE_1, "\n\t\t Node '" + currentNode->getName() + "' violates its annotation. "); 
+            			trace(TRACE_1, "\n\t\t Node '" + currentNode->getName() + "' violates its annotation. ");
             			trace(TRACE_2, "\n\t\t\t Annotation is: " + currentNode->getAnnotationAsString());
             			++it;
             		}
             	}
-            	
+
             	trace(TRACE_0, "\n\n");
             	delete readOG;
             }
 
-            else if (parameters[P_REMOVE_FALSE_ANNOS]) {
+            else if (parameters[P_REMOVE_FALSE_NODES]) {
             	// checks if there are nodes in the og which violate the annotation
-            	
-            	trace(TRACE_0, "Removing nodes from the OG read from '" + readOG->getFilename() + "' that violate their own annotation...\n");
+
+            	trace(TRACE_0, "Removing nodes from '" + readOG->getFilename() + "' ");
+            	trace(TRACE_0, "that violate their own annotation...\n");
             	readOG->removeFalseNodes();
-            	trace(TRACE_0, "\nRemoved all false nodes.\n");
-            	
+            	trace(TRACE_0, "Removed all nodes with false annotation.\n");
+
             	string newFilename;
             	if (options[O_OUTFILEPREFIX]) {
             		newFilename = outfilePrefix;
             	} else {
             		newFilename = AnnotatedGraph::stripOGFileSuffix(readOG->getFilename()) + ".blue";
             	}
-            		
+
             	trace(TRACE_0, "\nCreating new .og-file without false nodes... \n");
             	readOG->printOGFile(newFilename);
-            	trace(TRACE_0, "New .og-file '" + newFilename + "' succesfully created.\n\n");
-            	
+            	trace(TRACE_0, "New .og-file '" + newFilename + ".og' succesfully created.\n\n");
+
             	delete readOG;
             }
         }

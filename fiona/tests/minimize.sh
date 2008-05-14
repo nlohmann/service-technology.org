@@ -39,321 +39,358 @@ FIONA=fiona
 #rm -f $DIR/*.log
 
 result=0
-quiet="no"
 
-############################################################################
-# minimizing all OGs and checking equivalence with original one
 ############################################################################
 
 file1="$DIR/nostrat"
 cmd="$FIONA -t minimize $file1.og"
 
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file1.og.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... failed to minimize OG.
+fi
+result=$(($result | $exitcode))
+
+############################################################################
 
 cmd="$FIONA -t equivalence $file1.og $file1.minimal.og"
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$file9.og.memcheck.log"
+    memchecklog="$file1.equivalence.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... minimized OG not equivalent to original OG.
+fi
+result=$(($result | $exitcode))
 
 ############################################################################
 
 file2="$DIR/final_non-final"
 cmd="$FIONA -t minimize $file2.og"
 
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file2.og.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
+
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... failed to minimize OG.
+fi
+result=$(($result | $exitcode))
+
+############################################################################
 
 cmd="$FIONA -t equivalence $file2.og $file2.minimal.og"
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$file9.og.memcheck.log"
+    memchecklog="$file2.equivalence.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... minimized OG not equivalent to original OG.
+fi
+result=$(($result | $exitcode))
 
 ############################################################################
 
 file3="$DIR/non-final_final"
 cmd="$FIONA -t minimize $file3.og"
 
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file3.og.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... failed to minimize OG.
+fi
+result=$(($result | $exitcode))
+
+############################################################################
 
 cmd="$FIONA -t equivalence $file3.og $file3.minimal.og"
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$file9.og.memcheck.log"
+    memchecklog="$file3.equivalence.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... minimized OG not equivalent to original OG.
+fi
+result=$(($result | $exitcode))
+
+############################################################################
 
 cmd="$FIONA -t equivalence $file2.minimal.og $file3.minimal.og"
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$file9.og.memcheck.log"
+    memchecklog="$file2-3.equivalence.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... minimized OGs not equivalent to each other.
+fi
+result=$(($result | $exitcode))
 
 ############################################################################
 
 file4="$DIR/4-loop"
 cmd="$FIONA -t minimize $file4.og"
 
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file4.og.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... failed to minimize OG.
+fi
+result=$(($result | $exitcode))
+
+############################################################################
 
 cmd="$FIONA -t equivalence $file4.og $file4.minimal.og"
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$file9.og.memcheck.log"
+    memchecklog="$file4.equivalence.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... minimized OG not equivalent to original OG.
+fi
+result=$(($result | $exitcode))
 
 ############################################################################
 
 file5="$DIR/sample"
 cmd="$FIONA -t minimize $file5.og"
 
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file5.og.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... failed to minimize OG.
+fi
+result=$(($result | $exitcode))
+
+############################################################################
 
 cmd="$FIONA -t equivalence $file5.og $file5.minimal.og"
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$file9.og.memcheck.log"
+    memchecklog="$file5.equivalence.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... minimized OG not equivalent to original OG.
+fi
+result=$(($result | $exitcode))
 
 ############################################################################
 
 file6="$DIR/myCoffee"
 cmd="$FIONA -t minimize $file6.og"
 
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file6.og.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... failed to minimize OG.
+fi
+result=$(($result | $exitcode))
+
+############################################################################
 
 cmd="$FIONA -t equivalence $file6.og $file6.minimal.og"
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$file9.og.memcheck.log"
+    memchecklog="$file6.equivalence.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... minimized OG not equivalent to original OG.
+fi
+result=$(($result | $exitcode))
 
 ############################################################################
 
 file7="$DIR/keesCoffee_condition"
 cmd="$FIONA -t minimize $file7.og"
 
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file7.og.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
 
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... failed to minimize OG.
+fi
+result=$(($result | $exitcode))
+
+############################################################################
 
 cmd="$FIONA -t equivalence $file7.og $file7.minimal.og"
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$file9.og.memcheck.log"
+    memchecklog="$file7.equivalence.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... minimized OG not equivalent to original OG.
+fi
+result=$(($result | $exitcode))
 
 ############################################################################
 
 file8="$DIR/keesCoffee_condition.emptyNode"
 cmd="$FIONA -t minimize $file8.og"
 
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file8.og.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... failed to minimize OG.
+fi
+result=$(($result | $exitcode))
+
+############################################################################
 
 cmd="$FIONA -t equivalence $file8.og $file8.minimal.og"
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$file9.og.memcheck.log"
+    memchecklog="$file8.equivalence.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... minimized OG not equivalent to original OG.
+fi
+result=$(($result | $exitcode))
 
 ############################################################################
 
 file9="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
 cmd="$FIONA -t minimize $file9.og"
 
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file9.og.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
 
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... failed to minimize OG.
+fi
+result=$(($result | $exitcode))
+
+############################################################################
 
 cmd="$FIONA -t equivalence $file9.og $file9.minimal.og"
 
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$file9.og.memcheck.log"
+    memchecklog="$file9.equivalence.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    result=$(($result | $?))
 fi
+
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+  echo ... minimized OG not equivalent to original OG.
+fi
+result=$(($result | $exitcode))
 
 ############################################################################
 

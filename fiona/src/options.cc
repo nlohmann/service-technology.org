@@ -471,11 +471,11 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
                     parameters[P_GASTEX] = true;
-                } else if (lc_optarg == "checkfalseannos") {
+                } else if (lc_optarg == "checkfalsenodes") {
                 	parameters[P_OG] = false;
                 	parameters[P_IG] = false;
                 	parameters[P_CHECK_FALSE_NODES] = true;
-                } else if (lc_optarg == "removefalseannos") {
+                } else if (lc_optarg == "removefalsenodes") {
                 	parameters[P_OG] = false;
                 	parameters[P_IG] = false;
                     // if original OG has empty node, then empty node must be kept
@@ -885,11 +885,11 @@ FileType getFileType(const std::string& fileName) {
         return FILETYPE_OWFN;
     }
 
-    if ((ogHits > owfnHits) && (ogHits > dotHits)) {
+    else if ((ogHits > owfnHits) && (ogHits > dotHits)) {
         return FILETYPE_OG;
     }
 
-    if ((dotHits > owfnHits) && (dotHits > ogHits)) {
+    else if ((dotHits > owfnHits) && (dotHits > ogHits)) {
         return FILETYPE_DOT;
     }
 

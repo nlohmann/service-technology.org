@@ -1,0 +1,33 @@
+NODES
+  0 : (!in.client.onlineshop.abort + !in.client.onlineshop.login + !in.client.onlineshop.order) : blue,
+  29 : !in.client.onlineshop.login : blue,
+  30 : (?out.client.onlineshop.confirm * (?out.client.onlineshop.deliver + ?out.client.onlineshop.invoice)) : blue,
+  32 : (!in.client.onlineshop.abort + !in.client.onlineshop.terms) : blue,
+  33 : (?out.client.onlineshop.deliver + ?out.client.onlineshop.invoice) : blue,
+  34 : ?out.client.onlineshop.deliver : blue,
+  35 : final : blue : finalnode,
+  67 : ?out.client.onlineshop.invoice : blue,
+  96 : final : blue : finalnode,
+  97 : ?out.client.onlineshop.deliver : blue,
+  114 : !in.client.onlineshop.order : blue,
+  116 : final : blue : finalnode;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 29 : !in.client.onlineshop.order,
+  0 -> 114 : !in.client.onlineshop.login,
+  0 -> 116 : !in.client.onlineshop.abort,
+  29 -> 30 : !in.client.onlineshop.login,
+  30 -> 32 : ?out.client.onlineshop.confirm,
+  30 -> 97 : ?out.client.onlineshop.invoice,
+  30 -> 67 : ?out.client.onlineshop.deliver,
+  32 -> 33 : !in.client.onlineshop.terms,
+  32 -> 96 : !in.client.onlineshop.abort,
+  33 -> 34 : ?out.client.onlineshop.invoice,
+  33 -> 67 : ?out.client.onlineshop.deliver,
+  34 -> 35 : ?out.client.onlineshop.deliver,
+  67 -> 35 : ?out.client.onlineshop.invoice,
+  97 -> 35 : ?out.client.onlineshop.deliver,
+  114 -> 30 : !in.client.onlineshop.order;

@@ -3014,6 +3014,7 @@ void AnnotatedGraph::assignFinalNodes() {
                 AnnotatedGraphEdge* testedge = (*edge).getNext();
                 if (testedge->getType() != RECEIVING && testedge->getDstNode()->isBlue()) {
                     receivesOnly = false;
+                    break;
                 }
             }
             delete edge;

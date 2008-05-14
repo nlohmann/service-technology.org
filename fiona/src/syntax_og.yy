@@ -51,6 +51,7 @@
 extern char* og_yytext;
 extern int og_yylex();
 
+#include <map>
 
 #include "mynew.h"
 #include "debug.h"
@@ -58,9 +59,10 @@ extern int og_yylex();
 #include "AnnotatedGraph.h"
 #include "GraphFormula.h"
 
-AnnotatedGraph* OGToParse;
-
 using namespace std;
+
+AnnotatedGraph* OGToParse;
+map<string, bool> nodeAlreadyAdded;
 
 void og_yyerror_unknown_node(const std::string& nodeName)
 {
@@ -117,6 +119,9 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
 /* Grammar rules */
 
 og: nodes initialnode transitions
+    {
+        nodeAlreadyAdded.clear();
+    }
 ;
 
 nodes: key_nodes nodes_list semicolon
@@ -129,11 +134,12 @@ nodes_list: nodes_list comma node
 
 node: ident colon formula color_optional finalnode_optional
     {
-        if (OGToParse->hasNodeWithName($1)) {
+        if (nodeAlreadyAdded[$1]) {
             og_yyerror_node_already_defined($1);
         }
 
         AnnotatedGraphNode* currentNode = OGToParse->addNode($1, $3, $4);
+        nodeAlreadyAdded[$1] = true;
         currentNode->setFinal($5);
         free($1);
     }
@@ -204,7 +210,7 @@ finalnode_optional: key_finalnode
 
 initialnode: key_initialnode ident
     {
-        if (!OGToParse->hasNodeWithName($2)) {
+        if (!nodeAlreadyAdded[$2]) {
             og_yyerror_unknown_node($2);
         }
 
@@ -224,11 +230,11 @@ transitions_list: transitions_list comma transition
 
 transition: ident arrow ident colon ident
     {
-        if (!OGToParse->hasNodeWithName($1)) {
+        if (!nodeAlreadyAdded[$1]) {
             og_yyerror_unknown_node($1);
         }
 
-        if (!OGToParse->hasNodeWithName($3)) {
+        if (!nodeAlreadyAdded[$3]) {
             og_yyerror_unknown_node($3);
         }
 
@@ -238,3 +244,4 @@ transition: ident arrow ident colon ident
         free($5);
     }
 ;
+

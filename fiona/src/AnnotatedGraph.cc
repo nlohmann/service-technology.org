@@ -68,6 +68,46 @@ AnnotatedGraph::~AnnotatedGraph() {
 }
 
 
+//! \brief returns the name of the graph's source file
+std::string AnnotatedGraph::getFilename() {
+    return filename;
+}
+
+
+//! \brief returns the name of the graph's source file
+void AnnotatedGraph::setFilename(std::string filename) {
+    this->filename = filename;
+}
+
+
+//! \brief checks wether a root node is set
+//! \return returns true if the rootnode is NULL, else false
+bool AnnotatedGraph::hasNoRoot() const {
+    return getRoot() == NULL;
+}
+
+
+//! \brief returns a AnnotatedGraphNode pointer to the root node
+//! \return returns a pointer to the root node
+AnnotatedGraphNode* AnnotatedGraph::getRoot() const {
+    return root;
+}
+
+
+//! \brief sets the root node of the graph to a given node
+//! \param newRoot a pointer to the node to become the new root
+void AnnotatedGraph::setRoot(AnnotatedGraphNode* newRoot) {
+    root = newRoot;
+}
+
+
+//! \brief sets the root node of the graph to one matching the given name
+//! \param nodeName a string containing the name of the node to become the new root
+void AnnotatedGraph::setRootToNodeWithName(const std::string& nodeName) {
+    setRoot(getNodeWithName(nodeName));
+}
+
+
 //! \brief add an already existing Node to the Graphs node set
 //! \param node a pointer to a AnnotatedGraphNode
 void AnnotatedGraph::addNode(AnnotatedGraphNode* node) {
@@ -91,19 +131,9 @@ AnnotatedGraphNode* AnnotatedGraph::addNode(const std::string& nodeName,
 }
 
 
-//! \brief create a new edge in the graph
-//! \param srcName a string containing the name of the source node
-//! \param dstNodeName a string containing the name of the destination node
-//! \param label a string containing the label of the edge
-void AnnotatedGraph::addEdge(const std::string& srcName,
-                             const std::string& dstNodeName,
-                             const std::string& label) {
-
-    AnnotatedGraphNode* src = getNodeWithName(srcName);
-    AnnotatedGraphNode* dstNode = getNodeWithName(dstNodeName);
-
-    AnnotatedGraphEdge* transition = new AnnotatedGraphEdge(dstNode, label);
-    src->addLeavingEdge(transition);
+//! \brief A function needed for successful deletion of the graph
+void AnnotatedGraph::clearNodeSet() {
+    setOfNodes.clear();
 }
 
 
@@ -132,31 +162,482 @@ AnnotatedGraphNode* AnnotatedGraph::getNodeWithName(const std::string& nodeName)
 }
 
 
-//! \brief returns a AnnotatedGraphNode pointer to the root node
-//! \return returns a pointer to the root node
-AnnotatedGraphNode* AnnotatedGraph::getRoot() const {
-    return root;
+//! \brief create a new edge in the graph
+//! \param srcName a string containing the name of the source node
+//! \param dstNodeName a string containing the name of the destination node
+//! \param label a string containing the label of the edge
+void AnnotatedGraph::addEdge(const std::string& srcName,
+                             const std::string& dstNodeName,
+                             const std::string& label) {
+
+    AnnotatedGraphNode* src = getNodeWithName(srcName);
+    AnnotatedGraphNode* dstNode = getNodeWithName(dstNodeName);
+
+    AnnotatedGraphEdge* transition = new AnnotatedGraphEdge(dstNode, label);
+    src->addLeavingEdge(transition);
 }
 
 
-//! \brief sets the root node of the graph to a given node
-//! \param newRoot a pointer to the node to become the new root
-void AnnotatedGraph::setRoot(AnnotatedGraphNode* newRoot) {
-    root = newRoot;
+//! \brief removes all edges that have a given node as destination
+//! \param nodeToDelete a pointer to the node that will be deleted
+void AnnotatedGraph::removeEdgesToNodeFromAllOtherNodes(const AnnotatedGraphNode* nodeToDelete) {
+
+    for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
+        if (*iNode != nodeToDelete) {
+            (*iNode)->removeEdgesToNode(nodeToDelete);
+        }
+    }
 }
 
 
-//! \brief sets the root node of the graph to one matching the given name
-//! \param nodeName a string containing the name of the node to become the new root
-void AnnotatedGraph::setRootToNodeWithName(const std::string& nodeName) {
-    setRoot(getNodeWithName(nodeName));
+//! \brief removes all edges that have a given node as source
+//! \param nodeToDelete a pointer to the node that will be deleted
+void AnnotatedGraph::removeEdgesFromNodeToAllOtherNodes(AnnotatedGraphNode* nodeToDelete) {
+
+    for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
+        if (*iNode != nodeToDelete) {
+            nodeToDelete->removeEdgesToNode(*iNode);
+        }
+    }
 }
 
 
-//! \brief checks wether a root node is set
-//! \return returns true if the rootnode is NULL, else false
-bool AnnotatedGraph::hasNoRoot() const {
-    return getRoot() == NULL;
+//! \brief checks, whether this AnnotatedGraph is acyclic
+//! \return true on positive check, otherwise: false
+bool AnnotatedGraph::isAcyclic() {
+    trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): start\n");
+
+    // Define a set for every Node, that will contain all transitive parent nodes
+    map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> > parentNodes;
+
+    // Define a queue for all nodes that still need to be tested and initialize it
+    queue<AnnotatedGraphNode*> testNodes;
+
+    if (hasNoRoot()) {
+        trace(TRACE_0, "The graph is empty and thus acyclic!\n");
+        return true;
+    }
+
+    testNodes.push(root);
+    AnnotatedGraphNode* testNode;
+
+    // While there are still nodes in the queue
+    while (!testNodes.empty()) {
+
+        testNode = testNodes.front();
+        testNodes.pop();
+
+        // A node counts as a parent node to it self for the purpose of cycles
+        parentNodes[testNode].insert(testNode);
+
+        // Iterate all transitions of that node
+        AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =
+                testNode->getLeavingEdgesConstIterator();
+
+        while (edgeIter->hasNext()) {
+            AnnotatedGraphEdge* edge = edgeIter->getNext();
+            // If the Node is the source of that transition and if the Destination is a valid node
+            if (edge->getDstNode()->getColor() == BLUE) {
+
+                // Return false if an outgoing transition points at a transitive parent node,
+                // else add the destination to the queue and update its transitive parent nodes
+                if (parentNodes[testNode].find(edge->getDstNode())
+                        != parentNodes[testNode].end()) {
+                    delete edgeIter;
+                    trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): end\n");
+                    return false;
+                } else {
+                    testNodes.push(edge->getDstNode());
+                    parentNodes[edge->getDstNode()].insert(parentNodes[testNode].begin(),
+                            parentNodes[testNode].end());
+                }
+            }
+        }
+        delete edgeIter;
+    }
+    trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): end\n");
+    return true;
+}
+
+
+//! \brief computes the number of services determined by this OG
+//! \return number of Services
+unsigned int AnnotatedGraph::numberOfServices() {
+
+    trace(TRACE_5, "AnnotatedGraph::numberOfServices(...): start\n");
+
+    trace(TRACE_1, "Removing false nodes...\n");
+    removeFalseNodes();
+
+    if (root == NULL) {
+        return 0;
+    }
+
+    // define variables that will be used in the recursive function
+    map<AnnotatedGraphNode*, list <set<AnnotatedGraphNode*> > >
+            validFollowerCombinations;
+    set<AnnotatedGraphNode*> activeNodes;
+    map<AnnotatedGraphNode*, unsigned int> followers;
+    map<set<AnnotatedGraphNode*>, unsigned int> eliminateRedundantCounting;
+
+    // define variables that will be used in the preprocessing before starting the recursion
+    set<string> labels;
+    list<GraphFormulaAssignment> assignmentList;
+    GraphFormulaAssignment possibleAssignment;
+    map<string, AnnotatedGraphEdge*> edges;
+
+    trace(TRACE_2, "Computing true assignments for all nodes\n");
+    // Preprocess all nodes of the OG in order to fill the variables needed in the recursion
+    for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode
+            != setOfNodes.end(); ++iNode) {
+
+        // reset the temporary variables for every node
+        labels.clear();
+        assignmentList.clear();
+        edges.clear();
+        possibleAssignment = GraphFormulaAssignment();
+
+        // get the labels of all outgoing edges, that reach a blue destination
+        // save those labels in a set and fill a mapping that allows finding the
+        // outgoing edges for a label. (does not work with non-determinism yet)
+        trace(TRACE_5, "Collecting labels of outgoing edges for current node\n");
+        AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =(*iNode)->getLeavingEdgesConstIterator();
+        while (edgeIter->hasNext()) {
+            AnnotatedGraphEdge* edge = edgeIter->getNext();
+            if (edge->getDstNode()->getColor() == BLUE) {
+                labels.insert(edge->getLabel());
+                edges[edge->getLabel()] = edge;
+            }
+        }
+
+        // get rid of the iterator
+        delete edgeIter;
+
+        // return the number of true assignments for this node's formula and simultaniously
+        // fill the given list with those true assignments
+        followers[(*iNode)] = processAssignmentsRecursively(labels,
+                possibleAssignment, (*iNode), assignmentList);
+
+        // create a temporary variable for a set of nodes
+        set<AnnotatedGraphNode*> followerNodes;
+
+        // for every true assignment in the list a set of nodes will be created. These are the nodes which are
+        // reached by outgoing edges of which the labels were true in the assignment. This set is then saved in
+        // a map for the currently proceeded node.
+        for (list<GraphFormulaAssignment>::iterator assignment =
+                assignmentList.begin(); assignment != assignmentList.end(); assignment++) {
+
+            followerNodes = set<AnnotatedGraphNode*>();
+            for (set<string>::iterator label = labels.begin(); label
+                    != labels.end(); label++) {
+
+                if (assignment->get((*label))) {
+                    followerNodes.insert(edges[(*label)]->getDstNode());
+                }
+            }
+            validFollowerCombinations[(*iNode)].push_back(followerNodes);
+        }
+    }
+
+    // initialize the first instance for the recursive function
+    activeNodes.insert(root);
+
+    unsigned int number = 0;
+    unsigned int instances = 0;
+
+    trace(TRACE_1, "Starting recursive computation of number of Services\n");
+    // process Instances recursively
+    number = numberOfServicesRecursively(activeNodes, followers,
+            validFollowerCombinations, eliminateRedundantCounting, instances);
+
+    if (instances > 100000) {
+        trace(TRACE_2, "Valid Number of instances exceeded.\n");
+        trace(
+                TRACE_0,
+                "The number of strategies is approx INFINITY ;), aborting further calculation.\n");
+        trace(TRACE_5, "AnnotatedGraph::numberOfServices(...): end\n");
+        return number;
+    } else {
+        trace(TRACE_5, "AnnotatedGraph::numberOfServices(...): end\n");
+        return number;
+    }
+}
+
+
+//! \brief compute the number of possible services for a finished instance or proceed the active nodes
+//! \param activeNodes a set of node pointers containing the currently visited nodes
+//! \param followers a map that contains the follower nodes of every node in the graph
+//! \param validFollowerCombinations a map that contains all sets of follower nodes that succeed to
+//!        fullfill the annotation of the predecessor with the edges leading to them            
+//! \param eliminateRedundantCounting map containing all already computed number of services for 
+//!        possible active node sets 
+//! \param instances number of already processed sets of active Nodes
+//! \return number of Services for the current set of active nodes
+unsigned int AnnotatedGraph::numberOfServicesRecursively(
+        set<AnnotatedGraphNode*> activeNodes,
+        map<AnnotatedGraphNode*, unsigned int>& followers,
+        map<AnnotatedGraphNode*, list<set<AnnotatedGraphNode*> > >& validFollowerCombinations,
+        map<set<AnnotatedGraphNode*>, unsigned int>& eliminateRedundantCounting,
+        unsigned int& instances) {
+
+    if (instances % 10000 == 0 && instances != 0) {
+        if (instances > 100000) {
+            return 0;
+        }
+        trace(TRACE_2, "Processed number of instances: "
+                + intToString(instances) + "\n");
+    }
+    instances++;
+
+    // if an Instance with the same active Nodes has already been computed, use the saved value
+    if (eliminateRedundantCounting[activeNodes] != 0) {
+        return eliminateRedundantCounting[activeNodes];
+    }
+
+    // define needed variables
+    unsigned int number = 0;
+    list< set<AnnotatedGraphNode*> > oldList;
+    list< set<AnnotatedGraphNode*> > newList;
+    set<AnnotatedGraphNode*> tempSet;
+    bool first = true;
+    bool usingNew = true;
+    bool finalInstance = true;
+
+    // process all active nodes of this instance
+    for (set<AnnotatedGraphNode*>::iterator activeNode = activeNodes.begin(); activeNode
+            != activeNodes.end(); activeNode++) {
+
+        // if the active node has no valid outgoing edges, do nothing. If that happens
+        // with all active nodes, the finalInstance variable will stay true
+        if (followers[(*activeNode)] != 0) {
+
+            finalInstance = false;
+
+            // if this is the first iteration for this node, fill the newList with all combinations
+            // of followers of the currently proceeded active Node and continues the loop
+            if (first) {
+
+                first = false;
+                for (list<set<AnnotatedGraphNode*> >::iterator combination =
+                        validFollowerCombinations[(*activeNode)].begin(); combination
+                        != validFollowerCombinations[(*activeNode)].end(); combination++) {
+
+                    newList.push_back((*combination));
+                }
+                usingNew = false;
+                continue;
+            }
+
+            // the next two blocks work similarly. Either one takes the current list of followerSets
+            // as it was left by the last node, produces a new set for every combination of its own following
+            // sets and the already existing ones and saves it in the other list. This is executed for every node
+            // resulting in a list of all followingSet-tuples of all the active nodes
+            if (usingNew) {
+
+                newList.clear();
+                for (list<set<AnnotatedGraphNode*> >::iterator oldListSet =
+                        oldList.begin(); oldListSet != oldList.end(); oldListSet++) {
+
+                    for (list<set<AnnotatedGraphNode*> >::iterator combination =
+                            validFollowerCombinations[(*activeNode)].begin(); combination
+                            != validFollowerCombinations[(*activeNode)].end(); combination++) {
+
+                        tempSet = set<AnnotatedGraphNode*>();
+
+                        for (set<AnnotatedGraphNode*>::iterator insertionNode =
+                                (*combination).begin(); insertionNode
+                                != (*combination).end(); insertionNode++) {
+
+                            tempSet.insert((*insertionNode));
+                        }
+
+                        for (set<AnnotatedGraphNode*>::iterator insertionNode =
+                                (*oldListSet).begin(); insertionNode
+                                != (*oldListSet).end(); insertionNode++) {
+
+                            tempSet.insert((*insertionNode));
+                        }
+
+                        newList.push_back(tempSet);
+                    }
+                }
+                usingNew = false;
+            } else {
+
+                oldList.clear();
+                for (list<set<AnnotatedGraphNode*> >::iterator newListSet =
+                        newList.begin(); newListSet != newList.end(); newListSet++) {
+
+                    for (list<set<AnnotatedGraphNode*> >::iterator combination =
+                            validFollowerCombinations[(*activeNode)].begin(); combination
+                            != validFollowerCombinations[(*activeNode)].end(); combination++) {
+
+                        tempSet = set<AnnotatedGraphNode*>();
+
+                        for (set<AnnotatedGraphNode*>::iterator insertionNode =
+                                (*combination).begin(); insertionNode
+                                != (*combination).end(); insertionNode++) {
+
+                            tempSet.insert((*insertionNode));
+                        }
+
+                        for (set<AnnotatedGraphNode*>::iterator insertionNode =
+                                (*newListSet).begin(); insertionNode
+                                != (*newListSet).end(); insertionNode++) {
+
+                            tempSet.insert((*insertionNode));
+                        }
+                        oldList.push_back(tempSet);
+                    }
+                }
+                usingNew = true;
+            }
+        } else {
+            bool valid = false;
+            for (list<set<AnnotatedGraphNode*> >::iterator combination =
+                    validFollowerCombinations[(*activeNode)].begin(); combination
+                    != validFollowerCombinations[(*activeNode)].end(); combination++) {
+                if ((*combination).empty()) {
+                    valid = true;
+                }
+            }
+            if (!valid) {
+                eliminateRedundantCounting[activeNodes] = 0;
+                return 0;
+            }
+        }
+    }
+
+    // if none of the active nodes had followers this is a finished service of the OG
+    if (finalInstance) {
+        eliminateRedundantCounting[activeNodes] = 1;
+        return 1;
+    }
+
+    // if there were sets of following nodes, create a new instance of active nodes for every tuple of
+    // following sets and add the results to this instance's number of services
+    if (usingNew) {
+        for (list<set<AnnotatedGraphNode*> >::iterator oldListSet =
+                oldList.begin(); oldListSet != oldList.end(); oldListSet++) {
+
+            number += numberOfServicesRecursively((*oldListSet), followers,
+                    validFollowerCombinations, eliminateRedundantCounting,
+                    instances);
+        }
+    } else {
+        for (list<set<AnnotatedGraphNode*> >::iterator newListSet =
+                newList.begin(); newListSet != newList.end(); newListSet++) {
+
+            number += numberOfServicesRecursively((*newListSet), followers,
+                    validFollowerCombinations, eliminateRedundantCounting,
+                    instances);
+        }
+    }
+
+    // as soon as the counting for this set of active nodes is finished, save the number to prevent redundancy
+    eliminateRedundantCounting[activeNodes] = number;
+
+    // return the number of services for this instance
+    //trace(TRACE_5, "Number returned was: " + intToString(number) + "\n");
+    //trace(TRACE_5, "Current Instances are: " + intToString(instances) + "\n");
+
+    return number;
+}
+
+
+//! \brief computes the number of true assignments for the given formula of an OG node and additionally
+//!        saves them in an assignmentList for every node. The function works by recursively
+//!        computing and checking the powerset of all labels of the node
+//! \param labels a set labels not yet set to a value, used for the recursion
+//! \param possibleAssignments the currently processed assignment containing all label valuse that
+//!        already have been set
+//! \param testNode a pointer to the node currently tested            
+//! \param assignmentList a list of assignment that already have turned true in recursion 
+//! \return number of true Assignments
+unsigned int AnnotatedGraph::processAssignmentsRecursively(set<string> labels,
+        GraphFormulaAssignment possibleAssignment,
+        AnnotatedGraphNode* testNode,
+        list<GraphFormulaAssignment>& assignmentList) {
+
+    // If there is no outgoing transition, return immediatly
+    if (labels.empty()) {
+        possibleAssignment.setToTrue("true");
+        possibleAssignment.setToTrue("final");
+        if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)) {
+            assignmentList.push_back(possibleAssignment);
+        }
+        return 0;
+    }
+
+    // define variables
+    unsigned int returnValue = 0;
+    unsigned int tempValue = 0;
+    string label;
+    label = (*labels.begin());
+    labels.erase(labels.begin());
+
+    // if this was the last lable ...
+    if (labels.empty()) {
+
+        // set it to False
+        possibleAssignment.setToFalse(label);
+        if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)) {
+            // Increase the Number of true Assigments by one and save the assignment if the assignment is true
+            returnValue += 1;
+            assignmentList.push_back(possibleAssignment);
+        }
+
+        // set it to True
+        possibleAssignment.setToTrue(label);
+        if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)) {
+            // increase the Number of true Assigments by one and save the assignment if the assignment is true
+            returnValue += 1;
+            assignmentList.push_back(possibleAssignment);
+        }
+        // If this is a label inbetween or at the start
+    } else {
+        // set it to False
+        possibleAssignment.setToFalse(label);
+        // count the number of all true assignments which are true following this label being set to false
+        tempValue = processAssignmentsRecursively(labels, possibleAssignment,
+                testNode, assignmentList);
+        // increase the number of true assignments accordingly
+        returnValue += tempValue;
+
+        // set it to True
+        possibleAssignment.setToTrue(label);
+        // count the number of all true assignments which are true following this label being set to true
+        tempValue = processAssignmentsRecursively(labels, possibleAssignment,
+                testNode, assignmentList);
+        // increase the number of true assignments accordingly
+        returnValue += tempValue;
+    }
+
+    // reinsert the label aftwewards
+    labels.insert(labels.begin(), label);
+
+    // return the number of true assignments
+    return returnValue;
+}
+
+
+//! \brief finds all nodes that have annotations that cannot become
+//!        true. The function continues removing until no node fullfils
+//!        the mentioned criterion
+void AnnotatedGraph::findFalseNodes(std::vector<AnnotatedGraphNode*>* falseNodes) {
+
+    trace(TRACE_5, "AnnotatedGraph::findFalseNodes(): start\n");
+
+    nodes_iterator iNode = setOfNodes.begin();
+
+    while (iNode != setOfNodes.end()) {
+        GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
+        if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
+            falseNodes->push_back(*iNode);
+        }
+        ++iNode;
+    }
+    trace(TRACE_5, "AnnotatedGraph::findFalseNodes(): end\n");
 }
 
 
@@ -334,59 +815,126 @@ void AnnotatedGraph::removeDisconnectedNodesRecursively(AnnotatedGraphNode* curr
 }
 
 
-//! \brief finds all nodes that have annotations that cannot become
-//!        true. The function continues removing until no node fullfils
-//!        the mentioned criterion
-void AnnotatedGraph::findFalseNodes(std::vector<AnnotatedGraphNode*>* falseNodes) {
+//! \brief takes an AnnotatedGraph, finds equivalent nodes and minimizes
+//!        the graph such that it still characterizes the same strategies
+void AnnotatedGraph::minimizeGraph() {
+    trace(TRACE_5, "AnnotatedGraph::minimizeGraph(): start\n");
+    trace(TRACE_0, "starting minimization...\n");
 
-    trace(TRACE_5, "AnnotatedGraph::findFalseNodes(): start\n");
+    trace(TRACE_1, "number of nodes before minimization: " + intToString(setOfNodes.size()) + "\n");
 
-    nodes_iterator iNode = setOfNodes.begin();
+    // terminology:
+    // greater node means a node stored behind current node in setOfNodes
 
-    while (iNode != setOfNodes.end()) {
-        GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
-        if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
-            falseNodes->push_back(*iNode);
+    // false nodes are removed to increase performance only;
+    // should also work if nodes are unsatisfiable
+    trace(TRACE_2, "removing false nodes...\n");
+    removeFalseNodes();
+    // removeFalseNodes() automatically removes disconnected nodes as well
+
+    // we only have to minimize if at least two blue nodes are present...
+    if (setOfNodes.size() >= 2) {
+
+        // iterators to consider all pairs of nodes
+        nodes_const_iterator iNode, jNode;
+
+        // remember for a node the first greater equivalent node
+        map<AnnotatedGraphNode*, AnnotatedGraphNode*> firstEquivalentNode;
+
+        // needed for redirecting incoming edges of equivalent nodes
+        map<AnnotatedGraphNode*, AnnotatedGraphNode::LeavingEdges> myIncomingEdges;
+
+        // iterator over all edges for collecting information to myIncomingEdges
+        // and for redirecting incoming edges of equivalent nodes
+        AnnotatedGraphNode::LeavingEdges::ConstIterator iEdge;
+
+        // 1) checking for each node whether there is a greater node that is equivalent
+        for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
+
+            // remember ingoing edges of each node for later merging of equivalent nodes
+            iEdge = (*iNode)->getLeavingEdgesConstIterator();
+            while (iEdge->hasNext()) {
+                AnnotatedGraphEdge* edge = iEdge->getNext();
+                // node is the predeccessor 
+                myIncomingEdges[edge->getDstNode()].add(edge);
+            }
+
+            // iterate over each greater node, trying to find at least one equivalent one
+            for (jNode = iNode + 1; jNode != setOfNodes.end(); ++jNode) {
+
+                if (isEquivalent(*iNode, *jNode)) {
+                    trace(TRACE_2, "\tnodes:\t(" + (*iNode)->getName());
+                    trace(TRACE_2, ", " + (*jNode)->getName() + ")");
+                    trace(TRACE_2, "\t ...are equivalent :)\n");
+
+                    // remember that they are equivalent
+                    firstEquivalentNode[*iNode] = *jNode;
+
+                    // stop inner loop if first equivalent node found and
+                    // continue outer loop
+                    break;
+                } else {
+                    trace(TRACE_3, "\tnodes:\t(" + (*iNode)->getName());
+                    trace(TRACE_3, ", " + (*jNode)->getName() + ")");
+                    trace(TRACE_3, "\t ...are NOT equivalent :(\n");
+                }
+            }
         }
-        ++iNode;
-    }
-    trace(TRACE_5, "AnnotatedGraph::findFalseNodes(): end\n");
-}
 
+        // now merging equivalent OG nodes
 
-//! \brief returns the name of the graph's source file
-std::string AnnotatedGraph::getFilename() {
-    return filename;
-}
-
-
-//! \brief returns the name of the graph's source file
-void AnnotatedGraph::setFilename(std::string filename) {
-    this->filename = filename;
-}
-
-
-//! \brief removes all edges that have a given node as destination
-//! \param nodeToDelete a pointer to the node that will be deleted
-void AnnotatedGraph::removeEdgesToNodeFromAllOtherNodes(const AnnotatedGraphNode* nodeToDelete) {
-
-    for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
-        if (*iNode != nodeToDelete) {
-            (*iNode)->removeEdgesToNode(nodeToDelete);
+        // redirect incoming arcs of a node to its first greater equivalent node
+        // and delete the node afterwards
+        for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
+            if (firstEquivalentNode[*iNode] == NULL) {
+                continue;
+            } else {
+                // current node has equivalent nodes, so redirect its incoming edges
+                iEdge = myIncomingEdges[*iNode].getConstIterator();
+                while (iEdge->hasNext()) {
+                    AnnotatedGraphEdge* edge = iEdge->getNext();
+                    edge->setDstNode(firstEquivalentNode[*iNode]);
+                    // for (possibly) later merging the first equivalent node
+                    // with another equivalent node, add all redirected edges
+                    // also to list of incoming edges
+                    myIncomingEdges[firstEquivalentNode[*iNode]].add(edge);
+                }
+    
+                // if root node has equivalent nodes, then set root flag to new node
+                if (*iNode == getRoot()) {
+                    setRoot(firstEquivalentNode[*iNode]);
+                }
+            }
         }
+
+        // remove all nodes that became unreachable
+        removeDisconnectedNodes();
+
+    } else {
+        // we have less than 2 blue nodes :(
+        trace("Too few (blue) nodes. Minimizing skipped...\n\n");
     }
-}
 
+    trace(TRACE_0, "finished minimization...\n\n");
 
-//! \brief removes all edges that have a given node as source
-//! \param nodeToDelete a pointer to the node that will be deleted
-void AnnotatedGraph::removeEdgesFromNodeToAllOtherNodes(AnnotatedGraphNode* nodeToDelete) {
+    // nicht noetig, weil final flag wird bewahrt
+    // assignFinalNodes();
+    trace(TRACE_1, "number of nodes after minimization: " + intToString(setOfNodes.size()) + "\n\n");
 
-    for (nodes_iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
-        if (*iNode != nodeToDelete) {
-            nodeToDelete->removeEdgesToNode(*iNode);
-        }
+    if (!options[O_OUTFILEPREFIX]) {
+        outfilePrefix = stripOGFileSuffix(this->getFilename()) + ".minimal";
     }
+
+    if (!options[O_NOOUTPUTFILES]) {
+        trace("Saving minimized annotated graph to:\n");
+        trace(AnnotatedGraph::addOGFileSuffix(outfilePrefix));
+        trace("\n\n");
+
+        printOGFile(outfilePrefix);
+        printDotFile(outfilePrefix + ".og");
+    }
+
+    trace(TRACE_5, "AnnotatedGraph::minimizeGraph(): end\n");
 }
 
 
@@ -926,127 +1474,6 @@ bool AnnotatedGraph::isEquivalentRecursive(AnnotatedGraphNode* leftNode,
 }
 
 
-//! \brief takes an AnnotatedGraph, finds equivalent nodes and minimizes
-//!        the graph such that it still characterizes the same strategies
-void AnnotatedGraph::minimizeGraph() {
-    trace(TRACE_5, "AnnotatedGraph::minimizeGraph(): start\n");
-    trace(TRACE_0, "starting minimization...\n");
-
-    trace(TRACE_1, "number of nodes before minimization: " + intToString(setOfNodes.size()) + "\n");
-
-    // terminology:
-    // greater node means a node stored behind current node in setOfNodes
-
-
-    // false nodes are removed to increase performance only;
-    // should also work if nodes are unsatisfiable
-    trace(TRACE_2, "removing false nodes...\n");
-    removeFalseNodes();
-
-    if (hasNoRoot()) {
-        trace("The annotated graph is empty. No need for further minimizing :)\n\n");
-        return;
-    }
-
-    // iterators to consider all pairs of nodes
-    nodes_const_iterator iNode, jNode;
-
-    // remember for a node all equivalent nodes
-    map<AnnotatedGraphNode*, AnnotatedGraphNode*> isEquivalentWith;
-
-    // needed for redirecting incoming edges of equivalent nodes
-    map<AnnotatedGraphNode*, AnnotatedGraphNode::LeavingEdges> myIncomingEdges;
-
-    // iterator over all edges for collecting information to myIncomingEdges
-    // and for redirecting incoming edges of equivalent nodes
-    AnnotatedGraphNode::LeavingEdges::ConstIterator iEdge;
-
-
-    // 1) checking for each node whether there is a greater node that is equivalent
-    for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
-
-        // remember ingoing edges of each node for later merging of equivalent nodes
-        iEdge = (*iNode)->getLeavingEdgesConstIterator();
-        while (iEdge->hasNext()) {
-            AnnotatedGraphEdge* edge = iEdge->getNext();
-            // node is the predeccessor 
-            myIncomingEdges[edge->getDstNode()].add(edge);
-        }
-
-        // iterate over each greater node, trying to find at least one equivalent one
-        for (jNode = iNode + 1; jNode != setOfNodes.end(); ++jNode) {
-
-            if (isEquivalent(*iNode, *jNode)) {
-                trace(TRACE_2, "\tnodes:\t(" + (*iNode)->getName());
-                trace(TRACE_2, ", " + (*jNode)->getName() + ")");
-                trace(TRACE_2, "\t ...are equivalent :)\n");
-
-                // remember that they are equivalent
-                isEquivalentWith[*iNode] = *jNode;
-
-                // stop inner loop if first equivalent node found and
-                // continue outer loop
-                break;
-            } else {
-                trace(TRACE_3, "\tnodes:\t(" + (*iNode)->getName());
-                trace(TRACE_3, ", " + (*jNode)->getName() + ")");
-                trace(TRACE_3, "\t ...are NOT equivalent :(\n");
-            }
-        }
-    }
-
-    // now merging equivalent OG nodes
-
-    // redirect incoming arcs of a node to its first greater equivalent node
-    // and delete the node afterwards
-    for (iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
-        if (isEquivalentWith[*iNode] == NULL) {
-            continue;
-        } else {
-            // current node has equivalent nodes, so redirect its incoming edges
-            iEdge = myIncomingEdges[*iNode].getConstIterator();
-            while (iEdge->hasNext()) {
-                AnnotatedGraphEdge* edge = iEdge->getNext();
-                edge->setDstNode(isEquivalentWith[*iNode]);
-                // for (possibly) later merging the first equivalent node
-                // with another equivalent node, add all redirected edges
-                // also to list of incoming edges
-                myIncomingEdges[isEquivalentWith[*iNode]].add(edge);
-            }
-
-            // if root node has equivalent nodes, then set root flag to new node
-            if (*iNode == getRoot()) {
-                setRoot(isEquivalentWith[*iNode]);
-            }
-        }
-    }
-
-    // remove all nodes that became unreachable
-    removeDisconnectedNodes();
-
-    trace(TRACE_0, "finished minimization...\n\n");
-
-    // nicht noetig, weil final flag wird bewahrt
-    // assignFinalNodes();
-    trace(TRACE_1, "number of nodes after minimization: " + intToString(setOfNodes.size()) + "\n\n");
-
-    if (!options[O_OUTFILEPREFIX]) {
-        outfilePrefix = stripOGFileSuffix(this->getFilename()) + ".minimal";
-    }
-
-    if (!options[O_NOOUTPUTFILES]) {
-        trace("Saving minimized annotated graph to:\n");
-        trace(AnnotatedGraph::addOGFileSuffix(outfilePrefix));
-        trace("\n\n");
-
-        printOGFile(outfilePrefix);
-        printDotFile(outfilePrefix + ".og");
-    }
-
-    trace(TRACE_5, "AnnotatedGraph::minimizeGraph(): end\n");
-}
-
-
 //! \brief checks, whether this AnnotatedGraph simulates the given simulant
 //!        while covering all interface transitions
 //! \return true on positive check, otherwise: false
@@ -1326,425 +1753,6 @@ void AnnotatedGraph::filterRecursive(AnnotatedGraphNode* myNode,
         }
     }
     delete rhsEdgeIter;
-}
-
-
-//! \brief checks, whether this AnnotatedGraph is acyclic
-//! \return true on positive check, otherwise: false
-bool AnnotatedGraph::isAcyclic() {
-    trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): start\n");
-
-    // Define a set for every Node, that will contain all transitive parent nodes
-    map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> > parentNodes;
-
-    // Define a queue for all nodes that still need to be tested and initialize it
-    queue<AnnotatedGraphNode*> testNodes;
-
-    if (hasNoRoot()) {
-        trace(TRACE_0, "The graph is empty and thus acyclic!\n");
-        return true;
-    }
-
-    testNodes.push(root);
-    AnnotatedGraphNode* testNode;
-
-    // While there are still nodes in the queue
-    while (!testNodes.empty()) {
-
-        testNode = testNodes.front();
-        testNodes.pop();
-
-        // A node counts as a parent node to it self for the purpose of cycles
-        parentNodes[testNode].insert(testNode);
-
-        // Iterate all transitions of that node
-        AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =
-                testNode->getLeavingEdgesConstIterator();
-
-        while (edgeIter->hasNext()) {
-            AnnotatedGraphEdge* edge = edgeIter->getNext();
-            // If the Node is the source of that transition and if the Destination is a valid node
-            if (edge->getDstNode()->getColor() == BLUE) {
-
-                // Return false if an outgoing transition points at a transitive parent node,
-                // else add the destination to the queue and update its transitive parent nodes
-                if (parentNodes[testNode].find(edge->getDstNode())
-                        != parentNodes[testNode].end()) {
-                    delete edgeIter;
-                    trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): end\n");
-                    return false;
-                } else {
-                    testNodes.push(edge->getDstNode());
-                    parentNodes[edge->getDstNode()].insert(parentNodes[testNode].begin(),
-                            parentNodes[testNode].end());
-                }
-            }
-        }
-        delete edgeIter;
-    }
-    trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): end\n");
-    return true;
-}
-
-
-//! \brief computes the number of services determined by this OG
-//! \return number of Services
-unsigned int AnnotatedGraph::numberOfServices() {
-
-    trace(TRACE_5, "AnnotatedGraph::numberOfServices(...): start\n");
-
-    trace(TRACE_1, "Removing false nodes...\n");
-    removeFalseNodes();
-
-    if (root == NULL) {
-        return 0;
-    }
-
-    // define variables that will be used in the recursive function
-    map<AnnotatedGraphNode*, list <set<AnnotatedGraphNode*> > >
-            validFollowerCombinations;
-    set<AnnotatedGraphNode*> activeNodes;
-    map<AnnotatedGraphNode*, unsigned int> followers;
-    map<set<AnnotatedGraphNode*>, unsigned int> eliminateRedundantCounting;
-
-    // define variables that will be used in the preprocessing before starting the recursion
-    set<string> labels;
-    list<GraphFormulaAssignment> assignmentList;
-    GraphFormulaAssignment possibleAssignment;
-    map<string, AnnotatedGraphEdge*> edges;
-
-    trace(TRACE_2, "Computing true assignments for all nodes\n");
-    // Preprocess all nodes of the OG in order to fill the variables needed in the recursion
-    for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode
-            != setOfNodes.end(); ++iNode) {
-
-        // reset the temporary variables for every node
-        labels.clear();
-        assignmentList.clear();
-        edges.clear();
-        possibleAssignment = GraphFormulaAssignment();
-
-        // get the labels of all outgoing edges, that reach a blue destination
-        // save those labels in a set and fill a mapping that allows finding the
-        // outgoing edges for a label. (does not work with non-determinism yet)
-        trace(TRACE_5, "Collecting labels of outgoing edges for current node\n");
-        AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =(*iNode)->getLeavingEdgesConstIterator();
-        while (edgeIter->hasNext()) {
-            AnnotatedGraphEdge* edge = edgeIter->getNext();
-            if (edge->getDstNode()->getColor() == BLUE) {
-                labels.insert(edge->getLabel());
-                edges[edge->getLabel()] = edge;
-            }
-        }
-
-        // get rid of the iterator
-        delete edgeIter;
-
-        // return the number of true assignments for this node's formula and simultaniously
-        // fill the given list with those true assignments
-        followers[(*iNode)] = processAssignmentsRecursively(labels,
-                possibleAssignment, (*iNode), assignmentList);
-
-        // create a temporary variable for a set of nodes
-        set<AnnotatedGraphNode*> followerNodes;
-
-        // for every true assignment in the list a set of nodes will be created. These are the nodes which are
-        // reached by outgoing edges of which the labels were true in the assignment. This set is then saved in
-        // a map for the currently proceeded node.
-        for (list<GraphFormulaAssignment>::iterator assignment =
-                assignmentList.begin(); assignment != assignmentList.end(); assignment++) {
-
-            followerNodes = set<AnnotatedGraphNode*>();
-            for (set<string>::iterator label = labels.begin(); label
-                    != labels.end(); label++) {
-
-                if (assignment->get((*label))) {
-                    followerNodes.insert(edges[(*label)]->getDstNode());
-                }
-            }
-            validFollowerCombinations[(*iNode)].push_back(followerNodes);
-        }
-    }
-
-    // initialize the first instance for the recursive function
-    activeNodes.insert(root);
-
-    unsigned int number = 0;
-    unsigned int instances = 0;
-
-    trace(TRACE_1, "Starting recursive computation of number of Services\n");
-    // process Instances recursively
-    number = numberOfServicesRecursively(activeNodes, followers,
-            validFollowerCombinations, eliminateRedundantCounting, instances);
-
-    if (instances > 100000) {
-        trace(TRACE_2, "Valid Number of instances exceeded.\n");
-        trace(
-                TRACE_0,
-                "The number of strategies is approx INFINITY ;), aborting further calculation.\n");
-        trace(TRACE_5, "AnnotatedGraph::numberOfServices(...): end\n");
-        return number;
-    } else {
-        trace(TRACE_5, "AnnotatedGraph::numberOfServices(...): end\n");
-        return number;
-    }
-}
-
-
-//! \brief compute the number of possible services for a finished instance or proceed the active nodes
-//! \param activeNodes a set of node pointers containing the currently visited nodes
-//! \param followers a map that contains the follower nodes of every node in the graph
-//! \param validFollowerCombinations a map that contains all sets of follower nodes that succeed to
-//!        fullfill the annotation of the predecessor with the edges leading to them            
-//! \param eliminateRedundantCounting map containing all already computed number of services for 
-//!        possible active node sets 
-//! \param instances number of already processed sets of active Nodes
-//! \return number of Services for the current set of active nodes
-unsigned int AnnotatedGraph::numberOfServicesRecursively(
-        set<AnnotatedGraphNode*> activeNodes,
-        map<AnnotatedGraphNode*, unsigned int>& followers,
-        map<AnnotatedGraphNode*, list<set<AnnotatedGraphNode*> > >& validFollowerCombinations,
-        map<set<AnnotatedGraphNode*>, unsigned int>& eliminateRedundantCounting,
-        unsigned int& instances) {
-
-    if (instances % 10000 == 0 && instances != 0) {
-        if (instances > 100000) {
-            return 0;
-        }
-        trace(TRACE_2, "Processed number of instances: "
-                + intToString(instances) + "\n");
-    }
-    instances++;
-
-    // if an Instance with the same active Nodes has already been computed, use the saved value
-    if (eliminateRedundantCounting[activeNodes] != 0) {
-        return eliminateRedundantCounting[activeNodes];
-    }
-
-    // define needed variables
-    unsigned int number = 0;
-    list< set<AnnotatedGraphNode*> > oldList;
-    list< set<AnnotatedGraphNode*> > newList;
-    set<AnnotatedGraphNode*> tempSet;
-    bool first = true;
-    bool usingNew = true;
-    bool finalInstance = true;
-
-    // process all active nodes of this instance
-    for (set<AnnotatedGraphNode*>::iterator activeNode = activeNodes.begin(); activeNode
-            != activeNodes.end(); activeNode++) {
-
-        // if the active node has no valid outgoing edges, do nothing. If that happens
-        // with all active nodes, the finalInstance variable will stay true
-        if (followers[(*activeNode)] != 0) {
-
-            finalInstance = false;
-
-            // if this is the first iteration for this node, fill the newList with all combinations
-            // of followers of the currently proceeded active Node and continues the loop
-            if (first) {
-
-                first = false;
-                for (list<set<AnnotatedGraphNode*> >::iterator combination =
-                        validFollowerCombinations[(*activeNode)].begin(); combination
-                        != validFollowerCombinations[(*activeNode)].end(); combination++) {
-
-                    newList.push_back((*combination));
-                }
-                usingNew = false;
-                continue;
-            }
-
-            // the next two blocks work similarly. Either one takes the current list of followerSets
-            // as it was left by the last node, produces a new set for every combination of its own following
-            // sets and the already existing ones and saves it in the other list. This is executed for every node
-            // resulting in a list of all followingSet-tuples of all the active nodes
-            if (usingNew) {
-
-                newList.clear();
-                for (list<set<AnnotatedGraphNode*> >::iterator oldListSet =
-                        oldList.begin(); oldListSet != oldList.end(); oldListSet++) {
-
-                    for (list<set<AnnotatedGraphNode*> >::iterator combination =
-                            validFollowerCombinations[(*activeNode)].begin(); combination
-                            != validFollowerCombinations[(*activeNode)].end(); combination++) {
-
-                        tempSet = set<AnnotatedGraphNode*>();
-
-                        for (set<AnnotatedGraphNode*>::iterator insertionNode =
-                                (*combination).begin(); insertionNode
-                                != (*combination).end(); insertionNode++) {
-
-                            tempSet.insert((*insertionNode));
-                        }
-
-                        for (set<AnnotatedGraphNode*>::iterator insertionNode =
-                                (*oldListSet).begin(); insertionNode
-                                != (*oldListSet).end(); insertionNode++) {
-
-                            tempSet.insert((*insertionNode));
-                        }
-
-                        newList.push_back(tempSet);
-                    }
-                }
-                usingNew = false;
-            } else {
-
-                oldList.clear();
-                for (list<set<AnnotatedGraphNode*> >::iterator newListSet =
-                        newList.begin(); newListSet != newList.end(); newListSet++) {
-
-                    for (list<set<AnnotatedGraphNode*> >::iterator combination =
-                            validFollowerCombinations[(*activeNode)].begin(); combination
-                            != validFollowerCombinations[(*activeNode)].end(); combination++) {
-
-                        tempSet = set<AnnotatedGraphNode*>();
-
-                        for (set<AnnotatedGraphNode*>::iterator insertionNode =
-                                (*combination).begin(); insertionNode
-                                != (*combination).end(); insertionNode++) {
-
-                            tempSet.insert((*insertionNode));
-                        }
-
-                        for (set<AnnotatedGraphNode*>::iterator insertionNode =
-                                (*newListSet).begin(); insertionNode
-                                != (*newListSet).end(); insertionNode++) {
-
-                            tempSet.insert((*insertionNode));
-                        }
-                        oldList.push_back(tempSet);
-                    }
-                }
-                usingNew = true;
-            }
-        } else {
-            bool valid = false;
-            for (list<set<AnnotatedGraphNode*> >::iterator combination =
-                    validFollowerCombinations[(*activeNode)].begin(); combination
-                    != validFollowerCombinations[(*activeNode)].end(); combination++) {
-                if ((*combination).empty()) {
-                    valid = true;
-                }
-            }
-            if (!valid) {
-                eliminateRedundantCounting[activeNodes] = 0;
-                return 0;
-            }
-        }
-    }
-
-    // if none of the active nodes had followers this is a finished service of the OG
-    if (finalInstance) {
-        eliminateRedundantCounting[activeNodes] = 1;
-        return 1;
-    }
-
-    // if there were sets of following nodes, create a new instance of active nodes for every tuple of
-    // following sets and add the results to this instance's number of services
-    if (usingNew) {
-        for (list<set<AnnotatedGraphNode*> >::iterator oldListSet =
-                oldList.begin(); oldListSet != oldList.end(); oldListSet++) {
-
-            number += numberOfServicesRecursively((*oldListSet), followers,
-                    validFollowerCombinations, eliminateRedundantCounting,
-                    instances);
-        }
-    } else {
-        for (list<set<AnnotatedGraphNode*> >::iterator newListSet =
-                newList.begin(); newListSet != newList.end(); newListSet++) {
-
-            number += numberOfServicesRecursively((*newListSet), followers,
-                    validFollowerCombinations, eliminateRedundantCounting,
-                    instances);
-        }
-    }
-
-    // as soon as the counting for this set of active nodes is finished, save the number to prevent redundancy
-    eliminateRedundantCounting[activeNodes] = number;
-
-    // return the number of services for this instance
-    //trace(TRACE_5, "Number returned was: " + intToString(number) + "\n");
-    //trace(TRACE_5, "Current Instances are: " + intToString(instances) + "\n");
-
-    return number;
-}
-
-
-//! \brief computes the number of true assignments for the given formula of an OG node and additionally
-//!        saves them in an assignmentList for every node. The function works by recursively
-//!        computing and checking the powerset of all labels of the node
-//! \param labels a set labels not yet set to a value, used for the recursion
-//! \param possibleAssignments the currently processed assignment containing all label valuse that
-//!        already have been set
-//! \param testNode a pointer to the node currently tested            
-//! \param assignmentList a list of assignment that already have turned true in recursion 
-//! \return number of true Assignments
-unsigned int AnnotatedGraph::processAssignmentsRecursively(set<string> labels,
-        GraphFormulaAssignment possibleAssignment,
-        AnnotatedGraphNode* testNode,
-        list<GraphFormulaAssignment>& assignmentList) {
-
-    // If there is no outgoing transition, return immediatly
-    if (labels.empty()) {
-        possibleAssignment.setToTrue("true");
-        possibleAssignment.setToTrue("final");
-        if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)) {
-            assignmentList.push_back(possibleAssignment);
-        }
-        return 0;
-    }
-
-    // define variables
-    unsigned int returnValue = 0;
-    unsigned int tempValue = 0;
-    string label;
-    label = (*labels.begin());
-    labels.erase(labels.begin());
-
-    // if this was the last lable ...
-    if (labels.empty()) {
-
-        // set it to False
-        possibleAssignment.setToFalse(label);
-        if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)) {
-            // Increase the Number of true Assigments by one and save the assignment if the assignment is true
-            returnValue += 1;
-            assignmentList.push_back(possibleAssignment);
-        }
-
-        // set it to True
-        possibleAssignment.setToTrue(label);
-        if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)) {
-            // increase the Number of true Assigments by one and save the assignment if the assignment is true
-            returnValue += 1;
-            assignmentList.push_back(possibleAssignment);
-        }
-        // If this is a label inbetween or at the start
-    } else {
-        // set it to False
-        possibleAssignment.setToFalse(label);
-        // count the number of all true assignments which are true following this label being set to false
-        tempValue = processAssignmentsRecursively(labels, possibleAssignment,
-                testNode, assignmentList);
-        // increase the number of true assignments accordingly
-        returnValue += tempValue;
-
-        // set it to True
-        possibleAssignment.setToTrue(label);
-        // count the number of all true assignments which are true following this label being set to true
-        tempValue = processAssignmentsRecursively(labels, possibleAssignment,
-                testNode, assignmentList);
-        // increase the number of true assignments accordingly
-        returnValue += tempValue;
-    }
-
-    // reinsert the label aftwewards
-    labels.insert(labels.begin(), label);
-
-    // return the number of true assignments
-    return returnValue;
 }
 
 
@@ -2041,12 +2049,6 @@ void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v, fstream& os,
 }
 
 
-//! \brief A function needed for successful deletion of the graph
-void AnnotatedGraph::clearNodeSet() {
-    setOfNodes.clear();
-}
-
-
 //! \brief Prints this OG in OG file format to a file with the given prefix. The
 //!        suffix is added automatically by this method.
 //! \param filenamePrefix a prefix for th filename
@@ -2308,9 +2310,16 @@ void AnnotatedGraph::removeNode(AnnotatedGraphNode* node) {
 
 //! \brief removes all nodes annotated with true and all their incoming/outgoing transitions
 void AnnotatedGraph::removeNodesAnnotatedWithTrue() {
+
+    // TODO: If this method is used for Public view generation only,
+    //       then it should remove only the empty node! Removing every
+    //       true-annotated node might be too much!
+
     // iterate over all nodes of the AnnotatedGraph
-    for (nodes_iterator node_iter = setOfNodes.begin(); node_iter
-            != setOfNodes.end(); ++node_iter) {
+    for (nodes_iterator node_iter = setOfNodes.begin();
+         node_iter != setOfNodes.end();
+         ++node_iter) {
+
         AnnotatedGraphNode* currNode = *node_iter;
         // check whether node is annotated with true
         if (currNode->getAnnotationAsString() == GraphFormulaLiteral::TRUE) {
@@ -2319,8 +2328,7 @@ void AnnotatedGraph::removeNodesAnnotatedWithTrue() {
             removeEdgesToNodeFromAllOtherNodes(currNode);
             removeNode(currNode);
             trace(TRACE_2, "        Removing node: " + currNode->getName());
-            trace(TRACE_3, "\n            Annotation: "
-                    +currNode->getAnnotationAsString());
+            trace(TRACE_3, "\n            Annotation: " + currNode->getAnnotationAsString());
             trace(TRACE_2, "\n");
 
             delete currNode;

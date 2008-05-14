@@ -42,14 +42,14 @@ result=0
 
 
 ############################################################################
-# -t removefalseannos
+# -t removefalsenodes
 ############################################################################
 
 violating="$DIR/violating"
 
 cleanedPerHand="$DIR/cleaned.og"
 
-cmd="$FIONA $violating.og -t removefalseannos"
+cmd="$FIONA $violating.og -t removefalsenodes"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$violating.memcheck.log"
@@ -78,12 +78,12 @@ else
 fi
 
 ############################################################################
-# -t checkfalseannos
+# -t checkfalsenodes
 ############################################################################
 
 
 violating="$DIR/2ndviolating"
-cmd="$FIONA $violating.og -t removefalseannos"
+cmd="$FIONA $violating.og -t removefalsenodes"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -97,12 +97,12 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
 
-    cmd="$FIONA $violating.blue.og -t checkfalseannos"
+    cmd="$FIONA $violating.blue.og -t checkfalsenodes"
 
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
 
-    echo $OUTPUT | grep "No false annotations found" > /dev/null
+    echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
     ok=$?
 
     if [ $ok -ne 0 ]

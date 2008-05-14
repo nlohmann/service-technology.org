@@ -36,6 +36,8 @@
 #include "dot2tex.h"
 #include "debug.h"
 
+#include <vector>
+
 using namespace std;
 
 extern GasTexGraph* gastexGraph;
@@ -202,7 +204,41 @@ void GasTexGraph::makeGasTexOfOG(fstream& texFile) {
 
     for(set<GasTexNode*>::iterator iNode = gastexGraph->nodes.begin();
         iNode != gastexGraph->nodes.end(); ++iNode) {
+    	
+    	vector<string> strVector;
+    	
+    	// some preprocessing
+        if ((*iNode)->label != "") {
+        	if (parameters[P_SHOW_STATES_PER_NODE]) {
+	            string::size_type pos;
+	            
+	            pos = 0;
+	            string newLabel = texFormat((*iNode)->label);
 
+	            newLabel.insert(0, "\\#");
+	            
+	            while ((pos = newLabel.find(":", 0)) != string::npos ) {
+	            	if (pos == 0) {
+	            		break;
+	            	}
+	            	strVector.push_back(newLabel.substr(0, pos));
+	            	// todo: last position is supposed to be a blank, so we erase it as well
+	            	// need a trim function here
+	            	newLabel.erase(0, pos+2);
+	            }
+	            
+	            (*iNode)->height = (5*strVector.size()) / charHeightRatio;
+	            float width = 0.0;
+	            for (vector<string>::iterator iter = strVector.begin(); iter != strVector.end(); iter++) {
+	            	if (width < (*iter).length()) {
+	            		width = ((*iter).length());
+	            	}
+	            }
+	            (*iNode)->width = (width) / charWidthRatio + .3;
+        	} 
+        }
+    	
+    	
         texFile << ogNodeStmt[0];
         texFile << ogNodeStmt[1] << 5;
 
@@ -238,9 +274,35 @@ void GasTexGraph::makeGasTexOfOG(fstream& texFile) {
         texFile << ogNodeStmt[9] << (int) ((*iNode)->posY * scaleFactor);
         texFile << ogNodeStmt[10];
         if ((*iNode)->label != "") {
-            texFile << ogNodeStmt[11] << texFormat((*iNode)->label);
+        	if (parameters[P_SHOW_STATES_PER_NODE]) {
+
+	            double distStart = 0.0;
+	            double currentDist = 0.0;
+	            if (strVector.size() % 2 == 0) { // even number
+	            	distStart = 2.5 - 5*int(strVector.size() / 2);
+	            } else {
+	            	distStart = 0 - 5*int(strVector.size() / 2);
+	            }
+
+	            currentDist = distStart;
+	            texFile << ogNodeStmt[11];
+	            texFile << ogNodeStmt[12];
+	            
+	            for (vector<string>::iterator iter = strVector.begin(); iter != strVector.end(); iter++) {
+	            	texFile << "\\nodelabel[NLangle=270,NLdist=" << currentDist << "](" 
+	            					<< (*iNode)->id << "){\\textsf{\\msf{" 
+	            					<< *iter << "}}}" << "\n";
+
+	            	currentDist += 5;	// subtract 5
+	            }
+	            
+        	} else {
+        		texFile << ogNodeStmt[11] << texFormat((*iNode)->label);
+        		texFile << ogNodeStmt[12];
+        	}
         }
-        texFile << ogNodeStmt[12] << endl;
+        //texFile << ogNodeStmt[12] << endl;
+        texFile << endl;
     }
 
     texFile << endl;

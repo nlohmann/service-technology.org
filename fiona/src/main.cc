@@ -461,12 +461,22 @@ string computeIG(oWFN* PN) {
 
     string igFilename = "";
     
-    if (options[O_CALC_REDUCED_IG]) {
-        trace(TRACE_0, "building the reduced interaction graph...\n");
+    if (options[O_CALC_REDUCED_IG] || parameters[P_USE_EAD]) {
+        trace(TRACE_0, "building the reduced interaction graph by using reduction rule(s)\n");
+        if (parameters[P_USE_CRE]) {
+        	trace(TRACE_0, "\t \"combine receiving events\"\n");
+        }
+        if (parameters[P_USE_RBS]) {
+        	trace(TRACE_0, "\t \"receiving before sending\"\n");
+        }
+        if (parameters[P_USE_EAD]) {
+        	trace(TRACE_0, "\t \"early detection\"\n");
+        }
     } else {
         trace(TRACE_0, "building the interaction graph...\n");
     }
-
+    trace(TRACE_0, "\n");
+    
     seconds = time (NULL);
 
     graph->buildGraph(); // build interaction graph

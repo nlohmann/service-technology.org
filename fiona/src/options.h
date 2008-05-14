@@ -106,6 +106,7 @@ typedef enum {
     P_REDUCE_LEVEL,             //!< set reduction level of mode -t reduce
     P_USE_CRE,                  //!< Use "combine receiving events" for IG-reduction
     P_USE_RBS,                  //!< Use "receive before sending" for IG-reduction
+    P_USE_EAD,					//!< use "early detection" rule for IG-reduction
     P_REPRESENTATIVE,	      	//!< state reduction in node using representatives
     P_SINGLE                    //!< state reduction in node using single marking as representative
 } possibleParameters;

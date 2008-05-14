@@ -358,6 +358,7 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_REDUCE_LEVEL] = false;
 	parameters[P_USE_CRE] = false;
 	parameters[P_USE_RBS] = false;
+	parameters[P_USE_EAD] = false;
     parameters[P_REPRESENTATIVE] = false;
     parameters[P_SINGLE] = true;
 
@@ -649,6 +650,8 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_USE_CRE] = true;
                 } else if (string(optarg) == "rbs") {
                     parameters[P_USE_RBS] = true;
+                } else if (string(optarg) == "ead") {
+                	parameters[P_USE_EAD] = true;
                 } else if (lc_optarg == "representative") {
                 	parameters[P_REPRESENTATIVE] = true;
                 	parameters[P_SINGLE] = false;

@@ -463,17 +463,6 @@ void OG::calculateSuccStatesOutput(unsigned int output,
                 }
 	        }
 	
-//	        for (StateSet::iterator iter2 = stateSet.begin(); iter2
-//	                != stateSet.end(); iter2++) {
-//	            (*iter2)->decode(PN); // get the marking of the state
-//	
-//	            if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
-//	            	// calc the reachable states from that marking using stubborn set method taking
-//	            	// care of deadlocks
-//	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
-//	            }
-//	        }
-	
 	        if (tempBinDecision) {
 	        	delete tempBinDecision;
 	        }
@@ -486,7 +475,7 @@ void OG::calculateSuccStatesOutput(unsigned int output,
 	        	if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
 	            	// calc the reachable states from that marking using stubborn set method taking
 	            	// care of deadlocks
-	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+	        		PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode); 
 	                
 	            	if (newNode->getColor() == RED) {
 	                	// a message bound violation occured during computation of reachability graph

@@ -196,6 +196,8 @@ class PriorityMap {
         /// DESCRIPTION
         messageMultiSet popIG();
 
+        void adjustPM(oWFN *, const std::string&);
+        
         /// Returns true iff the priority map is empty.
         bool empty() const;
 
@@ -214,12 +216,16 @@ class PriorityMap {
         /// The first element of int represents the minimal length of a clause containing the key element.
         /// The second element of int represents the maximal occurence of the key element throughout the annotation. 
         typedef map<messageMultiSet, pair<int, int> > MapTypeIG;
+        
+        typedef map<int, set<std::string> > MapClauseEvents;
 
         /// Underlying representation of association between interface places and their priority.
         MapType pm;
 
         /// Underlying representation of association between a set of messages and their priority.
         MapTypeIG pmIG;
+        
+        MapClauseEvents pmClauseEvents;
 };
 
 

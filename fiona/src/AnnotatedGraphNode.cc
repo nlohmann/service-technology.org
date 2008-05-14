@@ -675,6 +675,52 @@ PriorityMap::KeyType PriorityMap::pop() {
     return key;
 }
 
+void PriorityMap::adjustPM(oWFN * PN, const std::string & eventName) {
+	
+	trace(TRACE_5, "PriorityMap::adjustPM(oWFN * PN, const std::string & eventName): start\n");
+	
+	MapClauseEvents::iterator iterClauses;
+	set<std::string>::iterator iterLiterals;
+	MapTypeIG::iterator iterPM;
+	
+	set<int> clausesToDelete;
+
+	messageMultiSet key;
+	
+	// consider each clause
+	for (iterClauses = pmClauseEvents.begin(); iterClauses != pmClauseEvents.end(); iterClauses++) {
+		
+		// the given event is found in the currently considered clause
+		if (iterClauses->second.find(eventName) != iterClauses->second.end()) {
+			
+			// now check each literal that is in the clause as well
+			for (iterLiterals = iterClauses->second.begin(); iterLiterals != iterClauses->second.end();
+					iterLiterals++) {
+
+				// iterate over the mapped set of interface places
+				for (iterPM = pmIG.begin(); iterPM != pmIG.end(); iterPM++) {
+					if (PN->createLabel(iterPM->first) == *iterLiterals) {
+						iterPM->second.second--;
+						if (iterPM->second.second <= 0) {
+							key = iterPM->first;
+						}
+						break;
+					}
+				}
+				pmIG.erase(key);
+			}
+			clausesToDelete.insert(iterClauses->first);
+		}
+	}
+	
+	for (set<int>::iterator iterClausesToDelete = clausesToDelete.begin(); 
+			iterClausesToDelete != clausesToDelete.end(); iterClausesToDelete++) {
+		
+		pmClauseEvents.erase(*iterClausesToDelete);
+	}
+
+	trace(TRACE_5, "PriorityMap::adjustPM(oWFN * PN, const std::string & eventName): end\n");
+}
 
 //! \brief Delivers the element from the priority map with the highest priority.
 //!        The element with the highest priority will be in a clause with minimal length
@@ -684,16 +730,16 @@ PriorityMap::KeyType PriorityMap::pop() {
 messageMultiSet PriorityMap::popIG() {
     messageMultiSet key;
 
+    MapTypeIG::iterator i;
+    
     // initialize with minimum priority values
     int min_depth = INT_MAX;
     int max_occ = 0;
 
     // iterate over the mapped set of interface places
-    MapTypeIG::iterator i;
     for (i = pmIG.begin(); i != pmIG.end(); i++) {
-
         // consider the element with a minimal depth clause (to catch the init values) 
-        if (i->second.first ==  min_depth) {
+        if (i->second.first == min_depth) {
             // consider the second moment of priority (occurence count) 
             if (i->second.second >= max_occ) {
                 key = i->first;
@@ -776,6 +822,8 @@ void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphForm
 	// needed for initialising the priority map correctly
 	map<messageMultiSet, bool> eventFound;    
 
+	int clauseNo = 0;  // clause counter needed to give each clause a unique number
+	
 	// iterate over all activated events stored in the set
 	for (setOfMessages::iterator activatedEvent = activatedEvents.begin();
 									activatedEvent != activatedEvents.end();
@@ -797,6 +845,7 @@ void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphForm
 												j != annotation->end(); j++) {
 
 			GraphFormulaMultiaryOr* clause = dynamic_cast<GraphFormulaMultiaryOr*>(*j);
+
 			// iterate over disjunctive clauses
 			for (GraphFormulaMultiaryOr::iterator k = clause->begin(); k != clause->end(); k++) {
 
@@ -814,7 +863,12 @@ void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphForm
 						pmIG[*activatedEvent].first = clause->size();
 					}
 				}
+				
+				// currently considered clause with number clauseNo contains the literal lit
+				pmClauseEvents[clauseNo].insert(lit->asString());	
 			}
+			
+			clauseNo++;	// we consider a new clause now, so increase the clause counter
 		}
 	}
 

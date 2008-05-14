@@ -227,6 +227,8 @@ class oWFN {
         owfnTransition ** stubbornfirelistmessage(owfnPlace *);
         owfnTransition ** stubbornfirelistmessage(messageMultiSet);
         owfnTransition ** stubbornFirelistAllMessages();
+        
+        owfnTransition ** stubbornfirelistmarking(unsigned int *);
 #endif
 
         void initialize(); // initializes the net
@@ -312,9 +314,15 @@ class oWFN {
         /// replaces the current marking with a given one
         void copyMarkingToCurrentMarking(unsigned int* copy);
         
+        /// checks if the current marking activates at least one of the receiving events of the given 
+        /// message multi set
+        bool currentMarkingActivatesNecessaryReceivingEvent(messageMultiSet);
+        
         /// calculates the reduced set of states of the new AnnotatedGraphNode in case of an output event
 //        void calculateReducedSetOfReachableStatesOutputEvent(StateSet&, binDecision**, AnnotatedGraphNode*);
 
+        void storeStateInNode(State*, AnnotatedGraphNode*);
+        
         /// calculates the reduced set of states of the new AnnotatedGraphNode in case of an input event
         void calculateReachableStatesStubbornDeadlocks(StateSet&, AnnotatedGraphNode*);
         

@@ -346,7 +346,7 @@ void oWFN::addSuccStatesToNode(AnnotatedGraphNode* n, State * currentState) {
         if (violatesMessageBound()) {
             n->setColor(RED);
             trace(TRACE_3, "\t\t\t message bound violation detected in node "
-                    + n->getName() + " (addSuccStatesToList) --> node set to RED\n");
+                    + n->getName() + " (addSuccStatesToNode) --> node set to RED\n");
             
             return;
         }
@@ -371,7 +371,7 @@ void oWFN::addSuccStatesToNode(AnnotatedGraphNode* n, State * currentState) {
                 trace(TRACE_3,
                       "\t\t\t message bound violation detected in node "
                               + n->getName()
-                              + " (addSuccStatesToList with NULL successor)\n");
+                              + " (addSuccStatesToNode with NULL successor)\n");
                 return;
             }
         }
@@ -386,6 +386,7 @@ void oWFN::addSuccStatesToNode(AnnotatedGraphNode* n, State * currentState) {
 //! \param n the node to add the states to
 //! \param stateSet set of states where the successors of the given state shall be stored in
 //! \param stateSetTemp set containing all states that we reach
+//! \param parentMarking
 //! \param currentState state to start at (currently added state)
 void oWFN::addSuccStatesToNodeStubborn(AnnotatedGraphNode* n, 
 										StateSet& stateSet, 
@@ -403,7 +404,7 @@ void oWFN::addSuccStatesToNodeStubborn(AnnotatedGraphNode* n,
     if (violatesMessageBound()) {
         n->setColor(RED);
         trace(TRACE_3, "\t\t\t message bound violation detected in node "
-                + n->getName() + " (addSuccStatesToList) --> node set to RED\n");
+                + n->getName() + " (addSuccStatesToNodeStubborn) --> node set to RED\n");
         
         return;
     }
@@ -432,6 +433,9 @@ void oWFN::addSuccStatesToNodeStubborn(AnnotatedGraphNode* n,
         	if (tempParentMarking) {
         		delete[] tempParentMarking;
         	}
+        	if (i < currentState->cardFireList) {
+        		currentState->decodeShowOnly(this); // decodes currently considered state
+        	}
         } 
     }
     trace(TRACE_5, "void oWFN::addSuccStatesToNodeStubborn(AnnotatedGraphNode* n, StateSet& stateSet, unsigned int* parentMarking, State * currentState) : end\n");
@@ -440,13 +444,24 @@ void oWFN::addSuccStatesToNodeStubborn(AnnotatedGraphNode* n,
 //! \brief decodes state, checks for message bound violation and adds successors recursively
 //! \param n the node to add the states to
 //! \param stateSet set of states where the successors of the given state shall be stored in
-
+//! \param parentMarking
 //! \param currentState state to start at (currently added state)
 void oWFN::addSuccStatesToNodeStubborn(AnnotatedGraphNode* n, StateSet& stateSet, 
 										unsigned int* parentMarking,
 										State * currentState) {
 
 	trace(TRACE_5, "void oWFN::addSuccStatesToNodeStubborn(AnnotatedGraphNode* n, StateSet& stateSet, unsigned int* parentMarking, State * currentState) : start\n");
+	
+    currentState->decodeShowOnly(this); // decodes currently considered state
+	
+    // test decoded current marking if message bound k reached
+    if (violatesMessageBound()) {
+        n->setColor(RED);
+        trace(TRACE_3, "\t\t\t message bound violation detected in node "
+                + n->getName() + " (addSuccStatesToNodeStubborn) --> node set to RED\n");
+        
+        return;
+    }	
 	
 	StateSet stateSetTemp;
     if (currentMarkingActivatesReceivingEvent(parentMarking)) {
@@ -473,6 +488,7 @@ void oWFN::addSuccStatesToNodeStubborn(AnnotatedGraphNode* n, StateSet& stateSet
         	if (tempParentMarking) {
         		delete[] tempParentMarking;
         	}
+        	currentState->decodeShowOnly(this); // decodes currently considered state
         } 
     }
 	stateSetTemp.clear();
@@ -518,15 +534,15 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
         if (CurrentMarking[getPlaceIndex(outputPlace)] > 0) {
             stateSet.insert(currentState);
             currentState->decode(this);
-            if (removeOutputMessage(getPlaceIndex(outputPlace))) { // remove the output message from the current marking
-            	// calc the reachable states from that marking using stubborn set method taking
-            	// care of deadlocks
-            	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n); 
-        	}
-            trace(
-                  TRACE_5,
-                  "oWFN::addSuccStatesToListStubborn(StateSet & stateSet, StateSet & stateSetTemp, StateSet & setOfStatesStubbornTemp, owfnPlace * outputPlace, State * currentState, AnnotatedGraphNode* n: end\n");
-            return;
+//            if (removeOutputMessage(getPlaceIndex(outputPlace))) { // remove the output message from the current marking
+//            	// calc the reachable states from that marking using stubborn set method taking
+//            	// care of deadlocks
+//            	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n); 
+//        	}
+//            trace(
+//                  TRACE_5,
+//                  "oWFN::addSuccStatesToListStubborn(StateSet & stateSet, StateSet & stateSetTemp, StateSet & setOfStatesStubbornTemp, owfnPlace * outputPlace, State * currentState, AnnotatedGraphNode* n: end\n");
+//            return;
         }
 
         stateSetTemp.insert(currentState);
@@ -567,18 +583,21 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
           TRACE_5,
           "oWFN::addSuccStatesToListStubborn(StateSet & stateSet, StateSet & setOfStatesStubbornTemp, owfnPlace * outputPlace, State * currentState, AnnotatedGraphNode* n: start\n");
 
+    // note: we don't need to decode the currentState, since it has been calculated fully
+    // 		 before, so all variables are set correctly already!	
+	
     // does current state activate the output event? meaning is this place marked
     if (CurrentMarking[getPlaceIndex(outputPlace)] > 0) {
         stateSet.insert(currentState);
-        if (removeOutputMessage(getPlaceIndex(outputPlace))) { // remove the output message from the current marking
-        	// calc the reachable states from that marking using stubborn set method taking
-        	// care of deadlocks
-        	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n); 
-    	}
-        trace(
-              TRACE_5,
-              "oWFN::addSuccStatesToListStubborn(StateSet & stateSet, StateSet & setOfStatesStubbornTemp, owfnPlace * outputPlace, State * currentState, AnnotatedGraphNode* n: end\n");
-        return;
+//        if (removeOutputMessage(getPlaceIndex(outputPlace))) { // remove the output message from the current marking
+//        	// calc the reachable states from that marking using stubborn set method taking
+//        	// care of deadlocks
+//        	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n); 
+//    	}
+//        trace(
+//              TRACE_5,
+//              "oWFN::addSuccStatesToListStubborn(StateSet & stateSet, StateSet & setOfStatesStubbornTemp, owfnPlace * outputPlace, State * currentState, AnnotatedGraphNode* n: end\n");
+//        return;
     }
 
     StateSet stateSetTemp;
@@ -651,17 +670,17 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
 
         if (!somePlaceNotMarked) { // if all places are appropriatly marked, we save this state
             stateSet.insert(currentState);
-            currentState->decode(this);
-            if (removeOutputMessage(messages)) { // remove the output message from the current marking
-            	// calc the reachable states from that marking using stubborn set method taking
-            	// care of deadlocks
-            	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n); 
-        	}
-            trace(
-                  TRACE_5,
-                  "oWFN::addSuccStatesToListStubborn(StateSet & stateSet, StateSet & stateSetTemp, StateSet & setOfStatesStubbornTemp, messageMultiSet messages, State * currentState, AnnotatedGraphNode* n: end\n");
-            // nothing else to be done here
-            return;
+//            currentState->decode(this);
+//            if (removeOutputMessage(messages)) { // remove the output message from the current marking
+//            	// calc the reachable states from that marking using stubborn set method taking
+//            	// care of deadlocks
+//            	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n); 
+//        	}
+//            trace(
+//                  TRACE_5,
+//                  "oWFN::addSuccStatesToListStubborn(StateSet & stateSet, StateSet & stateSetTemp, StateSet & setOfStatesStubbornTemp, messageMultiSet messages, State * currentState, AnnotatedGraphNode* n: end\n");
+//            // nothing else to be done here
+//            return;
 
         }
 
@@ -682,7 +701,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
           "oWFN::addSuccStatesToListStubborn(StateSet & stateSet, StateSet & stateSetTemp, StateSet & setOfStatesStubbornTemp, messageMultiSet messages, State * currentState, AnnotatedGraphNode* n: end\n");
 }
 
-//! \brief decodes state, figures out if state activates output event, 
+//! \brief  helper function, figures out if state activates output event, 
 //!			checks for message bound violation and adds successors recursively
 //! \param stateSet set of states where the successors of the given state shall be stored in
 //! \param setOfStatesStubbornTemp set of states containing all deadlock states we calculate in case of a
@@ -700,6 +719,9 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
           TRACE_5,
           "oWFN::addSuccStatesToListStubborn(StateSet & stateSet, StateSet & setOfStatesStubbornTemp, messageMultiSet messages, State * currentState, AnnotatedGraphNode* n: start\n");
 	
+    // note: we don't need to decode the currentState, since it has been calculated fully
+    // 		 before, so all variables are set correctly already!
+    
     bool somePlaceNotMarked = false; // remember if a place is not marked at the current marking
 
     // shall we save this state? meaning, are the correct output places marked?
@@ -713,16 +735,16 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet,
 
     if (!somePlaceNotMarked) { // if all places are appropriatly marked, we save this state
         stateSet.insert(currentState);
-        if (removeOutputMessage(messages)) { // remove the output message from the current marking
-        	// calc the reachable states from that marking using stubborn set method taking
-        	// care of deadlocks
-        	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n); 
-    	}
-        trace(
-              TRACE_5,
-              "oWFN::addSuccStatesToListStubborn(StateSet & stateSet, StateSet & setOfStatesStubbornTemp, messageMultiSet messages, State * currentState, AnnotatedGraphNode* n: end\n");
-        // nothing else to be done here
-        return;
+//        if (removeOutputMessage(messages)) { // remove the output message from the current marking
+//        	// calc the reachable states from that marking using stubborn set method taking
+//        	// care of deadlocks
+//        	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n); 
+//    	}
+//        trace(
+//              TRACE_5,
+//              "oWFN::addSuccStatesToListStubborn(StateSet & stateSet, StateSet & setOfStatesStubbornTemp, messageMultiSet messages, State * currentState, AnnotatedGraphNode* n: end\n");
+//        // nothing else to be done here
+//        return;
 
     }
     
@@ -791,7 +813,7 @@ bool oWFN::violatesMessageBound() {
 void oWFN::addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode* n, StateSet& stateSet, 
 														StateSet& stateSetTemp, State* s) {
     trace(TRACE_5,
-          "oWFN::addRecursivelySuccStatesToSetOfTempStates(AnnotatedGraphNode*, StateSet&, StateSet&, State* s): start\n");
+          "oWFN::addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode*, StateSet&, StateSet&, State* s): start\n");
 
     s->decodeShowOnly(this); // decodes currently considered state
 
@@ -816,7 +838,7 @@ void oWFN::addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode* n
         }
     }
     trace(TRACE_5,
-          "oWFN::addRecursivelySuccStatesToSetOfTempStates(AnnotatedGraphNode*, StateSet&, StateSet&, State* s): end\n");
+          "oWFN::addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode*, StateSet&, StateSet&, State* s): end\n");
 }
 
 //! \brief helper function to add recursively the state s and all its successor states to the given state set
@@ -824,7 +846,7 @@ void oWFN::addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode* n
 //! \param s state to start at
 void oWFN::addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode* n, StateSet& stateSet, State* s) {
     trace(TRACE_5,
-          "oWFN::addRecursivelySuccStatesToSetOfTempStates(AnnotatedGraphNode*, StateSet&, State* s): start\n");
+          "oWFN::addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode*, StateSet&, State* s): start\n");
 
     StateSet stateSetTemp;
     
@@ -844,7 +866,7 @@ void oWFN::addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode* n
     stateSetTemp.clear();
     
     trace(TRACE_5,
-          "oWFN::addRecursivelySuccStatesToSetOfTempStates(AnnotatedGraphNode*, StateSet&, State* s): end\n");
+          "oWFN::addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode*, StateSet&, State* s): end\n");
 }
 
 //! \brief Copies the current marking and returns it
@@ -883,10 +905,27 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
     }
 }
 
+void oWFN::storeStateInNode(State * CurrentState, AnnotatedGraphNode * node) {
+	
+	unsigned int * tempCurrentMarking;
+	tempCurrentMarking = copyCurrentMarking();
+	
+    for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
+            != node->reachGraphStateSet.end(); iter++) {
+    	
+    	(*iter)->decode(PN);
+    	// stubbornly activated transitions of current marking
+    	owfnTransition ** activatedTransitions = stubbornfirelistmarking(tempCurrentMarking); 
+	
+    	node->addState(CurrentState);
+    }
+}
+
 //! \brief calculates the reduced set of states of the new AnnotatedGraphNode 
 //!        for IG and OG with state set reduction
 //! \param stateSet set of states storing the states that were calculated using the stubborn set method
 //! \param n the node to be calculated in case of an input event
+//! \param storeStateInNode flag of whether to store the current state (at the beginning of the function) in the node or not
 void oWFN::calculateReachableStatesStubbornDeadlocks(StateSet& stateSet, AnnotatedGraphNode* n) {
 
     // calculates the EG starting at the current marking
@@ -913,9 +952,10 @@ void oWFN::calculateReachableStatesStubbornDeadlocks(StateSet& stateSet, Annotat
 
     if (CurrentState != NULL) {
         // marking already has a state -> put it (and all its successors) into the node
-        if (n->addState(CurrentState)) {
-            addSuccStatesToGivenSetOfStatesStubbornDeadlock(n, stateSet, CurrentState);
-        }
+        //storeStateInNode(CurrentState, n);
+    	if (n->addState(CurrentState)) {
+    		addSuccStatesToGivenSetOfStatesStubbornDeadlock(n, stateSet, CurrentState);
+    	}
         trace(TRACE_5, "oWFN::calculateReachableStatesStubbornDeadlocks(StateSet& stateSet, binDecision**, AnnotatedGraphNode* n): end\n");
         return;
     }
@@ -949,7 +989,10 @@ void oWFN::calculateReachableStatesStubbornDeadlocks(StateSet& stateSet, Annotat
     if (CurrentState->type == DEADLOCK || CurrentState->type == FINALSTATE) {
     	stateSet.insert(CurrentState);
     }
-    n->addState(CurrentState);
+    
+  //  if (storeInNode) {
+    	n->addState(CurrentState);
+ //   }
 
     // building EG in a node
     while (CurrentState) {
@@ -1125,6 +1168,8 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
     
     State* CurrentState = NULL;
     State* NewState;
+    
+    bool storeInNode = true;
 
     unsigned int* tempCurrentMarking = NULL;
     unsigned int tempPlaceHashValue;
@@ -1191,28 +1236,29 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                 trace(TRACE_5, "Current marking [" + getCurrentMarkingAsString() +  "] already in local bintree \n");
 
                 // shall we save this state? meaning, is the correct output place marked?
-                if (CurrentMarking[getPlaceIndex(outputPlace)] > 0) {
-                    //stateSet.insert(NewState);
-                    if (removeOutputMessage(getPlaceIndex(outputPlace))) { // remove the output message from the current marking
-                    	trace(TRACE_5, "activates receiving event " + outputPlace->getLabelForCommGraph() + "\n");
-                    	// calc the reachable states from that marking using stubborn set method taking
-                    	// care of deadlocks
-                    	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n); 
-                    	
-                        if (n->getColor() == RED) {
-                            trace(TRACE_3, "\t\t\t message bound violated; color of node "
-                                           + n->getName()
-                                           + " set to RED (calculateReachableStatesFull, during fire)\n");
-                            trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
-
-                            assert(CurrentState->succ[CurrentState->current] == NULL);
-                            CurrentState->succ[CurrentState->current] = NewState;
-
-                            delete[] tempCurrentMarking;
-                            return;
-                        }
-                	}
-                } else {
+//                if (CurrentMarking[getPlaceIndex(outputPlace)] > 0) {
+//                    //stateSet.insert(NewState);
+//                    if (removeOutputMessage(getPlaceIndex(outputPlace))) { // remove the output message from the current marking
+//                    	trace(TRACE_5, "activates receiving event " + outputPlace->getLabelForCommGraph() + "\n");
+//                    	// calc the reachable states from that marking using stubborn set method taking
+//                    	// care of deadlocks
+//                    	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n, storeInNode);
+//                    	storeInNode = false;
+//                    	
+//                        if (n->getColor() == RED) {
+//                            trace(TRACE_3, "\t\t\t message bound violated; color of node "
+//                                           + n->getName()
+//                                           + " set to RED (calculateReachableStatesFull, during fire)\n");
+//                            trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
+//
+//                            assert(CurrentState->succ[CurrentState->current] == NULL);
+//                            CurrentState->succ[CurrentState->current] = NewState;
+//
+//                            delete[] tempCurrentMarking;
+//                            return;
+//                        }
+//                	}
+//                } else {
                     // no it is not marked, so we take a look at its successor states
                     addSuccStatesToListStubborn(stateSet, setOfStatesStubbornTemp, outputPlace, NewState, n);
                     
@@ -1228,7 +1274,7 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                         delete[] tempCurrentMarking;
                         return;
                     }
-                }
+           //     }
 
                 CurrentState->decode(this);
                 CurrentState->firelist[CurrentState->current]->backfire(this);
@@ -1280,6 +1326,7 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                     	// calc the reachable states from that marking using stubborn set method taking
                     	// care of deadlocks
                     	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n); 
+                        storeInNode = false;
                         
                     	if (n->getColor() == RED) {
                             trace(TRACE_3, "\t\t\t message bound violated; color of node "
@@ -1346,6 +1393,35 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
 }
 
 
+//! \brief	checks if the current marking activates at least one of the receiving events of the given 
+//!			message multi set
+//! \param	messages	the event(s) for which the new AnnotatedGraphNode's EG is calculated, contains all receiving events
+bool oWFN::currentMarkingActivatesNecessaryReceivingEvent(messageMultiSet messages) {
+	// store the current marking 
+	unsigned int* tempCurrentMarking = copyCurrentMarking();
+	
+	// let's see if the current marking activates a receiving event already
+    bool somePlaceNotMarked = false; // remember if a place is not marked at the current marking
+
+    // shall we save this state? meaning, are the correct output places all marked?
+    for (messageMultiSet::iterator iter = messages.begin(); iter
+            != messages.end(); iter++) {
+        if (tempCurrentMarking[getPlaceIndex(getPlace(*iter))] == 0) {
+            somePlaceNotMarked = true;
+            break;
+        }
+        tempCurrentMarking[getPlaceIndex(getPlace(*iter))] -= 1;
+    }
+    
+    if (tempCurrentMarking) {
+        delete[] tempCurrentMarking;
+        tempCurrentMarking = NULL;
+    }
+    
+    return !somePlaceNotMarked;
+}
+
+
 //! \brief is only used in case of an output event and calculates the set of states reachable from 
 //!		   the current marking and stores them in the given stateSet 
 //!		   (this function is used for the IG only since a multiset of output places is considered for IG)
@@ -1378,7 +1454,9 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
 
     State* CurrentState = NULL;
     State* NewState;
-
+    
+    bool storeInNode = true;
+    
     // note: we don't need to look up the current marking in the global binDecision (CurrentState=binSearch(this))
     // we use the global binDecision to store states leading to a deadlock
     // in this function we are interested in those states that lead to a marking which activates receiving events
@@ -1388,22 +1466,7 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
     CurrentState->current = 0;
     CurrentState->parent = NULL;
 
-    // let's see if the current marking activates a receiving event already
-    bool somePlaceNotMarked = false; // remember if a place is not marked at the current marking
-    // store the current marking 
-    tempCurrentMarking = copyCurrentMarking();
-
-    // shall we save this state? meaning, are the correct output places all marked?
-    for (messageMultiSet::iterator iter = messages.begin(); iter
-            != messages.end(); iter++) {
-        if (tempCurrentMarking[getPlaceIndex(getPlace(*iter))] == 0) {
-            somePlaceNotMarked = true;
-            break;
-        }
-        tempCurrentMarking[getPlaceIndex(getPlace(*iter))] -= 1;
-    }
-
-    if (!somePlaceNotMarked) { // if all places are appropriatly marked, we save this state in a temporary state set
+    if (currentMarkingActivatesNecessaryReceivingEvent(messages)) { // if all places are appropriatly marked, we save this state in a temporary state set
         //stateSet.insert(CurrentState);
     	
         if (removeOutputMessage(messages)) { // remove the output message from the current marking
@@ -1475,44 +1538,44 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                     return;
                 }
                 
-                bool somePlaceNotMarked = false; // remember if a place is not marked at the current marking
+//                bool somePlaceNotMarked = false; // remember if a place is not marked at the current marking
+//                
+//                unsigned int* tempCurrentMarking2 = copyGivenMarking(tempCurrentMarking);
+//                
+//                // shall we save this state? meaning, are the correct output places marked?
+//                for (messageMultiSet::iterator iter = messages.begin(); iter
+//                        != messages.end(); iter++) {
+//                    if (tempCurrentMarking2[getPlaceIndex(getPlace(*iter))] <= 0) {
+//                        somePlaceNotMarked = true;
+//                        break;
+//                    }
+//                   	tempCurrentMarking2[getPlaceIndex(getPlace(*iter))] -= 1;
+//                }
+//
+//                delete[] tempCurrentMarking2;
                 
-                unsigned int* tempCurrentMarking2 = copyGivenMarking(tempCurrentMarking);
-                
-                // shall we save this state? meaning, are the correct output places marked?
-                for (messageMultiSet::iterator iter = messages.begin(); iter
-                        != messages.end(); iter++) {
-                    if (tempCurrentMarking2[getPlaceIndex(getPlace(*iter))] <= 0) {
-                        somePlaceNotMarked = true;
-                        break;
-                    }
-                   	tempCurrentMarking2[getPlaceIndex(getPlace(*iter))] -= 1;
-                }
-
-                delete[] tempCurrentMarking2;
-                
-                if (!somePlaceNotMarked) { // if all places are appropriatly marked, we save this state
-                	//stateSet.insert(CurrentState);
-                	if (removeOutputMessage(messages)) { // remove the output message from the current marking
-                		trace(TRACE_5, "activates receiving events\n");
-                		// calc the reachable states from that marking using stubborn set method taking
-                    	// care of deadlocks
-                    	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n);
-                        
-                    	if (n->getColor() == RED) {
-                            trace(TRACE_3, "\t\t\t message bound violated; color of node "
-                                           + n->getName()
-                                           + " set to RED (calculateReachableStatesFull, during fire)\n");
-                            trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
-
-                            assert(CurrentState->succ[CurrentState->current] == NULL);
-                            CurrentState->succ[CurrentState->current] = NewState;                        
-                            
-                            delete[] tempCurrentMarking;
-                            return;
-                        }
-                	} 
-                } else {
+//                if (!somePlaceNotMarked) { // if all places are appropriatly marked, we save this state
+//                	//stateSet.insert(CurrentState);
+//                	if (removeOutputMessage(messages)) { // remove the output message from the current marking
+//                		trace(TRACE_5, "activates receiving events\n");
+//                		// calc the reachable states from that marking using stubborn set method taking
+//                    	// care of deadlocks
+//                    	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n);
+//                        
+//                    	if (n->getColor() == RED) {
+//                            trace(TRACE_3, "\t\t\t message bound violated; color of node "
+//                                           + n->getName()
+//                                           + " set to RED (calculateReachableStatesFull, during fire)\n");
+//                            trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
+//
+//                            assert(CurrentState->succ[CurrentState->current] == NULL);
+//                            CurrentState->succ[CurrentState->current] = NewState;                        
+//                            
+//                            delete[] tempCurrentMarking;
+//                            return;
+//                        }
+//                	} 
+//                } else {
                     // no it is not marked appropriatly, so we take a look at its successor states
                     addSuccStatesToListStubborn(stateSet, setOfStatesStubbornTemp, messages, NewState, n);
                     
@@ -1528,7 +1591,7 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                         delete[] tempCurrentMarking;
                         return;
                     }
-                }
+               // }
 
                 // we don't need the current marking anymore so we step back to the marking before
                 CurrentState->decode(this);
@@ -1577,37 +1640,23 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                 NewState->placeHashValue = placeHashValue;
                 NewState->type = typeOfState();
 
-                bool somePlaceNotMarked = false; // remember if a place is not marked at the current marking
-
-                if (tempCurrentMarking != NULL) {
-                    delete[] tempCurrentMarking;
-                    tempCurrentMarking = NULL;
-                }
-                tempCurrentMarking = copyCurrentMarking();
-                
-                // shall we save this state? meaning, are the correct output places marked?
-                for (messageMultiSet::iterator iter = messages.begin(); iter
-                        != messages.end(); iter++) {
-                    if (tempCurrentMarking[getPlaceIndex(getPlace(*iter))] <= 0) {
-                        somePlaceNotMarked = true;
-                        break;
-                    }
-                    tempCurrentMarking[getPlaceIndex(getPlace(*iter))] -= 1;
-                }
-
-                if (!somePlaceNotMarked) { // if all places are appropriatly marked, we save this state
+                // if all places are appropriatly marked, we save this state
+                if (currentMarkingActivatesNecessaryReceivingEvent(messages)) { 
+                	
+                	storeInNode = true;//currentMarkingActivatesReceivingEvent(tempCurrentMarking);
+                	
                 	//stateSet.insert(CurrentState);
                 	if (removeOutputMessage(messages)) { // remove the output message from the current marking
                 		trace(TRACE_5, "activates receiving events\n");
                     	// calc the reachable states from that marking using stubborn set method taking
                     	// care of deadlocks
-                    	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n); 
+                		calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n);
                     	
                         if (n->getColor() == RED) {
                             trace(TRACE_3, "\t\t\t message bound violated; color of node "
                                            + n->getName()
-                                           + " set to RED (calculateReachableStatesFull, during fire)\n");
-                            trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
+                                           + " set to RED (calculateReducedSetOfReachableStates, during fire)\n");
+                            trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet, owfnPlace * outputPlace, AnnotatedGraphNode * n) : end\n");
 
                             assert(CurrentState->succ[CurrentState->current] == NULL);
                             CurrentState->succ[CurrentState->current] = NewState;                        
@@ -1615,18 +1664,20 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                             delete[] tempCurrentMarking;
                             return;
                         }
-
+                        
                         CurrentState->succ[CurrentState->current] = NewState;
                         
 	                    // nothing else to be done here
 	                    // so we go back to parent state
 	                    // close state and return to previous state
-	                    trace(TRACE_5, "close state [" + getCurrentMarkingAsString() + "] and return to previous state\n");
+	                  //  trace(TRACE_5, "close state [" + getCurrentMarkingAsString() + "] and return to previous state\n");
 //	                    CurrentState = CurrentState->parent;
 	
 	                    if (CurrentState) { // there is a father to further examine
 	                        CurrentState->decode(this);
 	                        CurrentState->current++;
+	                        
+	                        trace(TRACE_5, "close state [" + getCurrentMarkingAsString() + "] and calc next state\n");
 	                    }
                 	}
                 } else {
@@ -1677,6 +1728,12 @@ bool oWFN::currentMarkingActivatesReceivingEvent(unsigned int* parentMarking) {
 
     trace(TRACE_5, "oWFN::currentMarkingActivatesReceivingEvent(unsigned int* parentMarking) : start\n");
 	
+    if (parentMarking != NULL) {
+    	trace(TRACE_5, "parent marking: [" + getMarkingAsString(parentMarking) + "]\n");
+    } else {
+    	trace(TRACE_5, "parent marking: NULL\n");
+    }
+    
 	// if current marking has a predecessor marking
 	if (parentMarking != NULL) {
 		// test every possible receiving event, if it is activated in the current marking
@@ -1687,12 +1744,12 @@ bool oWFN::currentMarkingActivatesReceivingEvent(unsigned int* parentMarking) {
 	                          (CurrentMarking[getPlaceIndex(getOutputPlace(e))] > 0)) {
 	        	// no, parent marking does not activate this receiving event, but the current marking does
 	        	// !we found a receiving event that only the current marking activates for now
-	    		trace(TRACE_5, "marking [" + getCurrentMarkingAsString() + "] activates some receiving event that its parent did not activate: yes");
+	    		trace(TRACE_5, "marking [" + getCurrentMarkingAsString() + "] activates some receiving event that its parent did not activate: yes\n");
 	    		trace(TRACE_5, "oWFN::currentMarkingActivatesReceivingEvent(unsigned int* parentMarking) : end\n");
 	    		return true;
 	        }
 	    }
-		trace(TRACE_5, "marking [" + getCurrentMarkingAsString() + "] activates some receiving event that its parent did not activate: no");
+		trace(TRACE_5, "marking [" + getCurrentMarkingAsString() + "] activates some receiving event that its parent did not activate: no\n");
 		trace(TRACE_5, "oWFN::currentMarkingActivatesReceivingEvent(unsigned int* parentMarking) : end\n");
 		return false;
 	} else { // current marking has no predecessor marking - no parent
@@ -1700,14 +1757,14 @@ bool oWFN::currentMarkingActivatesReceivingEvent(unsigned int* parentMarking) {
 		for (unsigned int e = 0; e < PN->getOutputPlaceCount(); e++) {
 	        if (CurrentMarking[getPlaceIndex(getOutputPlace(e))] > 0) {
 	        	// current marking activates a receiving event, return true
-	    		trace(TRACE_5, "marking [" + getCurrentMarkingAsString() + "] activates some receiving event");
+	    		trace(TRACE_5, "marking [" + getCurrentMarkingAsString() + "] activates some receiving event\n");
 	        	trace(TRACE_5, "oWFN::currentMarkingActivatesReceivingEvent(unsigned int* parentMarking) : end\n");
 	            return true;
 	        }
 	    }
 	}
 
-	trace(TRACE_5, "marking [" + getCurrentMarkingAsString() + "] activates no receiving event");
+	trace(TRACE_5, "marking [" + getCurrentMarkingAsString() + "] activates no receiving event\n");
 	trace(TRACE_5, "oWFN::currentMarkingActivatesReceivingEvent(unsigned int* parentMarking) : end\n");
 	return false;
 }
@@ -1778,6 +1835,7 @@ void oWFN::calculateStubbornTransitions(State* state) {
 
 //! \brief calculates the reduced set of states of the new AnnotatedGraphNode 
 //!        for IG and OG with state set reduction
+//!		   --> by applying the "representative" approach
 //! \param stateSet set of states storing the states that were calculated using the stubborn set method
 //!		   needed to calculate the CNF later on
 //! \param n the node to be calculated in case of an input event
@@ -1885,7 +1943,7 @@ void oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, A
                 if (n->getColor() == RED) {
                     trace(TRACE_3, "\t\t\t message bound violated; color of node "
                                    + n->getName()
-                                   + " set to RED (calculateReachableStatesStubbornDeadlocks, during fire)\n");
+                                   + " set to RED (calculateReducedSetOfReachableStatesStoreInNode, during fire; known state)\n");
                     trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, binDecision**, AnnotatedGraphNode* n) : end\n");
                     delete[] tempCurrentMarking;
                     return;
@@ -1906,12 +1964,15 @@ void oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, A
                 
                 NewState = binInsert(this);
 
+                assert(CurrentState->succ[CurrentState -> current] == NULL);
+                CurrentState->succ[CurrentState -> current] = NewState;
+                
                 // test current marking if message bound k reached
                 if (violatesMessageBound()) {
                 	n->setColor(RED);
                 	trace(TRACE_3, "\t\t\t message bound violated; color of node "
                 			+ n->getName()
-                			+ " set to RED (calculateReachableStatesStubbornDeadlocks, during fire)\n");
+                			+ " set to RED (calculateReducedSetOfReachableStatesStoreInNode, during fire; new state)\n");
                 	trace(TRACE_5, "oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, binDecision**, AnnotatedGraphNode* n) : end\n");
                 	delete[] tempCurrentMarking;
                 	return;
@@ -1940,8 +2001,6 @@ void oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, A
                 NewState->placeHashValue = placeHashValue;
                 NewState->type = typeOfState();
                 
-                assert(CurrentState->succ[CurrentState->current] == NULL);
-                CurrentState->succ[CurrentState->current] = NewState;
                 CurrentState = NewState;
 
                 // store each marking that activates a receiving event in the new node
@@ -2334,8 +2393,8 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                                            + " set to RED (calculateReachableStatesFull, during fire (known state)\n");
                             trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
 
-//                            assert(CurrentState->succ[CurrentState->current] == NULL);
-//                            CurrentState->succ[CurrentState->current] = NewState;
+                            assert(CurrentState->succ[CurrentState->current] == NULL);
+                            CurrentState->succ[CurrentState->current] = NewState;
                             
                             delete[] tempCurrentMarking;
                             return;
@@ -3127,6 +3186,50 @@ owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess) {
     return result;
 }
 
+//! \brief returns transitions to be fired for reduced state space for message successors		
+//! \param mess output message that is to be received
+owfnTransition ** oWFN::stubbornfirelistmarking(unsigned int * marking) {
+
+    trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmarking(): begin\n");
+
+    bool inserted = false;
+    owfnTransition ** result;
+    owfnTransition * t;
+    unsigned int i;
+    
+    StartOfStubbornList = (owfnTransition *) 0;
+    
+    for (unsigned int k = 0; k < getPlaceCount(); k++) {
+        if (marking[k] > 0) {
+            for (i = 0; i != getPlace(k)->PreTransitions.size(); i++) {
+                stubborninsert(this, getPlace(k)->PreTransitions[i]);
+                inserted = true;
+            }
+        }
+    }
+            
+    if (!inserted) {
+        result = new owfnTransition * [1];
+        result[0] = (owfnTransition *) 0;
+        trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmarking(): end\n");
+        return result;
+    }
+    
+    stubbornclosure(this);
+    result = new owfnTransition * [NrStubborn + 1];
+    for (t=StartOfStubbornList, i=0; t; t = t -> NextStubborn) {
+        t -> instubborn = false;
+        if (t->isEnabled()) {
+            result[i++] = t;
+        }
+    }
+    result[i] = (owfnTransition *)0;
+    CurrentCardFireList = NrStubborn;
+    StartOfStubbornList = (owfnTransition *) 0;
+
+    trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmarking(): end\n");
+    return result;
+}
 
 //! \brief returns transitions to be fired for reduced state space for messages successors
 //! \param messages multiset of output messages that are to be received

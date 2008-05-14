@@ -463,8 +463,13 @@ void CommunicationGraph::printGraphToDot() {
             dotFile << " -r";
         }
         if (parameters[P_IG] && !options[O_CALC_ALL_STATES]) {
-                    dotFile << " -R";
-                }
+            dotFile << " -R";
+            if (parameters[P_REPRESENTATIVE]) {
+            	dotFile << " -p representative";
+            } else {
+            	dotFile << " -p single";
+            }
+        }
         if (options[O_MESSAGES_MAX]) {
             dotFile << " -m" << intToString(messages_manual);
         }
@@ -573,20 +578,21 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
                 (*iter)->type == FINALSTATE ||
                 parameters[P_SHOW_STATES_PER_NODE] ) {
                 (*iter)->decode(PN);
-                os << "(" << *iter << ") " ;
+               // os << "(" << *iter << ") " ;
                 os << "[" << PN->getCurrentMarkingAsString() << "]";
-                os << " (";
-
-                // print the suffix (state type)
-                switch ((*iter)->exactType()) {
-                    case I_DEADLOCK:    os << "iDL";    break;
-                    case E_DEADLOCK:    os << "eDL";    break;
-                    case FINALSTATE:    os << "FS";     break;
-                    case TRANS:         os << "TR";     break;
-                    default:            assert(false);
-                }
-
-                os << ")" << " (parent: " << (*iter)->parent << ")\\n";
+              //  os << " (";
+//
+//                // print the suffix (state type)
+//                switch ((*iter)->exactType()) {
+//                    case I_DEADLOCK:    os << "iDL";    break;
+//                    case E_DEADLOCK:    os << "eDL";    break;
+//                    case FINALSTATE:    os << "FS";     break;
+//                    case TRANS:         os << "TR";     break;
+//                    default:            assert(false);
+//                }
+//
+//                os << ")" << " (parent: " << (*iter)->parent << ")\\n";
+                os << "\\n";
             }
         }
     }

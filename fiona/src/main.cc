@@ -207,7 +207,7 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     og_yydebug = 0;
     og_yy_flex_debug = 0;
     assert(ogfile != "");
-    trace(TRACE_5, "reading from file " + ogfile + "\n");
+    trace(TRACE_4, "reading from file " + ogfile + "\n");
     og_yyin = fopen(ogfile.c_str(), "r");
     if (!og_yyin) {
         cerr << "cannot open OG file '" << ogfile << "' for reading'\n" << endl;
@@ -219,6 +219,7 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     fclose(og_yyin);
 
     OGToParse->setFilename(ogfile);
+    trace(TRACE_4, "file successfully read\n");
 
     return OGToParse;
 }
@@ -1439,7 +1440,7 @@ int main(int argc, char** argv) {
 
     else if (parameters[P_COUNT_SERVICES] || parameters[P_CHECK_ACYCLIC] ||
              parameters[P_CHECK_FALSE_NODES] || parameters[P_REMOVE_FALSE_NODES] ||
-             parameters[P_PV] || parameters[P_MINIMIZE_OG]) {
+             parameters[P_PV] || parameters[P_MINIMIZE_OG] || parameters[P_READ_OG]) {
 
         // Abort if there are no OGs at all
         if (ogfiles.begin() == ogfiles.end() && !(parameters[P_PV])) {
@@ -1463,7 +1464,7 @@ int main(int argc, char** argv) {
 
             else if (parameters[P_MINIMIZE_OG]) {
                 // minimizes a given OG
-                readOG->removeFalseNodes();
+                //readOG->removeFalseNodes();
                 readOG->minimizeGraph();
                 delete readOG;
             }
@@ -1530,6 +1531,12 @@ int main(int argc, char** argv) {
             	trace(TRACE_0, "New .og-file '" + newFilename + ".og' succesfully created.\n\n");
 
             	delete readOG;
+            }
+
+            else if (parameters[P_READ_OG]) {
+                // TODO print out graph statistics
+                // readOG->;
+                delete readOG;
             }
         }
 

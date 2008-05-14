@@ -823,13 +823,16 @@ void AnnotatedGraph::minimizeGraph() {
 
     trace(TRACE_1, "number of nodes before minimization: " + intToString(setOfNodes.size()) + "\n");
 
+    time_t seconds, seconds2;
+    seconds = time(NULL);
+
     // terminology:
     // greater node means a node stored behind current node in setOfNodes
 
     // false nodes are removed to increase performance only;
     // should also work if nodes are unsatisfiable
-    trace(TRACE_2, "removing false nodes...\n");
-    removeFalseNodes();
+//    trace(TRACE_2, "removing false nodes...\n");
+//    removeFalseNodes();
     // removeFalseNodes() automatically removes disconnected nodes as well
 
     // we only have to minimize if at least two blue nodes are present...
@@ -915,6 +918,8 @@ void AnnotatedGraph::minimizeGraph() {
         trace("Too few (blue) nodes. Minimizing skipped...\n\n");
     }
 
+    seconds2 = time(NULL);
+    cout << "    " << difftime(seconds2, seconds) << " s consumed" << endl;
     trace(TRACE_0, "finished minimization...\n\n");
 
     // nicht noetig, weil final flag wird bewahrt

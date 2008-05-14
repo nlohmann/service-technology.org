@@ -211,6 +211,7 @@ AnnotatedGraphNode* CommunicationGraph::findGraphNodeInSet(AnnotatedGraphNode* t
     }
 }
 
+
 //! \brief Computes statistics about this graph. They can be printed by
 //!        printGraphStatistics().
 void CommunicationGraph::computeGraphStatistics() {

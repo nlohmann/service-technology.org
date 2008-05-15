@@ -92,6 +92,7 @@ void OG::buildGraph() {
     buildGraph(getRoot(), 1);
 
 
+
     time_t seconds, seconds2;
     cout << endl;
 
@@ -112,7 +113,7 @@ void OG::buildGraph() {
     if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
         cout << "removing false nodes..." << endl;
         seconds = time(NULL);
-    	removeFalseNodes();
+        removeFalseNodes();
         seconds2 = time(NULL);
         cout << "    " << difftime(seconds2, seconds) << " s consumed" << endl;
         cout << "finished removing false nodes..." << endl;
@@ -184,13 +185,13 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
 
         trace(TRACE_2, currentEvent->getLabelForCommGraph() + "\n");
 
-        if (currentEvent->max_occurence < 0 || 
+        if (currentEvent->max_occurence < 0 ||
             (currentEvent->getType() == INPUT &&
-             currentEvent->max_occurence > currentNode->eventsUsedInput[PN->getInputPlaceIndex(currentEvent)]) || 
+             currentEvent->max_occurence > currentNode->eventsUsedInput[PN->getInputPlaceIndex(currentEvent)]) ||
             (currentEvent->getType() == OUTPUT &&
              currentEvent->max_occurence > currentNode->eventsUsedOutput[PN->getOutputPlaceIndex(currentEvent)])) {
 
-        	// we have to consider this event
+            // we have to consider this event
             AnnotatedGraphNode* v = new AnnotatedGraphNode();    // create new AnnotatedGraphNode of the graph
             trace(TRACE_5, "\t\t\t\t    calculating successor states\n");
 
@@ -202,7 +203,7 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
 
             if (currentEvent->getType() == INPUT && v->getColor() == RED) {
 
-            	// message bound violation occured during calculateSuccStatesInput
+                // message bound violation occured during calculateSuccStatesInput
                 trace(TRACE_2, "\t\t\t            event suppressed (message bound violated)\n");
                 currentNode->removeLiteralFromAnnotation(currentEvent->getLabelForCommGraph());
                 addProgress(your_progress);
@@ -211,7 +212,7 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                 delete v;
             } else {
 
-            	// was the new node v computed before?
+                // was the new node v computed before?
                 AnnotatedGraphNode* found = findGraphNodeInSet(v);
 
                 if (found == NULL) {
@@ -239,7 +240,7 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                     }
                 } else {
 
-                	// node was computed before, so only add a new edge to the old node
+                    // node was computed before, so only add a new edge to the old node
                     trace(TRACE_1, "\t computed successor node already known: " + found->getName());
                     trace(TRACE_1, " (color " + toUpper(found->getColor().toString()) + ")");
                     trace(TRACE_1, "\n");
@@ -274,10 +275,10 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                 printProgress();
             }
         }
-        
+
         if (!parameters[P_DIAGNOSIS]) {
 
-        	// do not optimize when trying diagnosis
+            // do not optimize when trying diagnosis
             if (currentNode->getAnnotation()->equals() == FALSE) {
                 currentNode->setColor(RED);
                 trace(TRACE_3, "\t\t any further event suppressed (annotation of node ");
@@ -312,9 +313,9 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
 //! \param toAdd node to be added
 void OG::addGraphNode(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* toAdd) {
 
-	trace(TRACE_5, "reachGraph::AddGraphNode(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode * toAdd): start\n");
+    trace(TRACE_5, "reachGraph::AddGraphNode(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode * toAdd): start\n");
 
-	assert(getNumberOfNodes() > 0);
+    assert(getNumberOfNodes() > 0);
     assert(setOfSortedNodes.size() > 0);
 
     // preparing the new node
@@ -324,13 +325,12 @@ void OG::addGraphNode(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* toAdd)
     for (oWFN::Places_t::size_type i = 0; i < PN->getInputPlaceCount(); i++ ) {
         toAdd->eventsUsedInput[i] = sourceNode->eventsUsedInput[i];
     }
-    
+
     for (oWFN::Places_t::size_type i = 0; i < PN->getOutputPlaceCount(); i++ ) {
         toAdd->eventsUsedOutput[i] = sourceNode->eventsUsedOutput[i];
     }
 
-    setOfSortedNodes.insert(toAdd);
-    setOfNodes.push_back(toAdd);
+    addNode(toAdd);
     trace(TRACE_5, "reachGraph::AddGraphNode (AnnotatedGraphNode* sourceNode, AnnotatedGraphNode * toAdd): end\n");
 }
 
@@ -347,9 +347,9 @@ void OG::add(AnnotatedGraphNode* sourceNode,
                       oWFN::Places_t::size_type label,
                       GraphEdgeType type) {
 
-	trace(TRACE_5, "reachGraph::Add(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* destNode, unsigned int label, Type type): start\n");
+    trace(TRACE_5, "reachGraph::Add(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* destNode, unsigned int label, Type type): start\n");
 
-	assert(sourceNode != NULL);
+    assert(sourceNode != NULL);
     assert(destNode != NULL);
 
     // preparing the new edge
@@ -380,17 +380,17 @@ void OG::calculateSuccStatesInput(unsigned int input,
                                   AnnotatedGraphNode* oldNode,
                                   AnnotatedGraphNode* newNode) {
 
-	trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : start\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : start\n");
     StateSet::iterator iter; // iterator over the state set's elements
-    
+
     setOfStatesStubbornTemp.clear();
-    
+
     for (iter = oldNode->reachGraphStateSet.begin();
          iter != oldNode->reachGraphStateSet.end(); iter++) {
 
-    	assert(*iter != NULL);
+        assert(*iter != NULL);
 
-    	// get the marking of this state
+        // get the marking of this state
         (*iter)->decode(PN);
 
         // test for each marking of current node if message bound k reached
@@ -409,27 +409,27 @@ void OG::calculateSuccStatesInput(unsigned int input,
         PN->addInputMessage(input); // add the input message to the current marking
 
         if (options[O_CALC_ALL_STATES]) {
-        	// calc the reachable states from that marking
-            PN->calculateReachableStatesFull(newNode); 
+            // calc the reachable states from that marking
+            PN->calculateReachableStatesFull(newNode);
         } else {
-        	if (parameters[P_SINGLE]) {
-	        	// calc the reachable states from that marking using stubborn set method taking
-	        	// care of deadlocks
-        		// --> the current state is stored in the node, the states reachable from the current state
-        		//     are not stored in the node        	
-        		PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
-        	} else if (parameters[P_REPRESENTATIVE]) {
-        		// --> store the current state and all "minimal" states in the node
-        		PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode);
-        	}
+            if (parameters[P_SINGLE]) {
+                // calc the reachable states from that marking using stubborn set method taking
+                // care of deadlocks
+                // --> the current state is stored in the node, the states reachable from the current state
+                //     are not stored in the node
+                PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode);
+            } else if (parameters[P_REPRESENTATIVE]) {
+                // --> store the current state and all "minimal" states in the node
+                PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode);
+            }
         }
-        
+
         if (newNode->getColor() == RED) {
 
-        	// a message bound violation occured during computation of reachability graph
+            // a message bound violation occured during computation of reachability graph
             trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
             trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
-            
+
             return;
         }
     }
@@ -447,9 +447,9 @@ void OG::calculateSuccStatesOutput(unsigned int output,
                                    AnnotatedGraphNode* node,
                                    AnnotatedGraphNode* newNode) {
 
-	trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, AnnotatedGraphNode* node, AnnotatedGraphNode* newNode) : start\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, AnnotatedGraphNode* node, AnnotatedGraphNode* newNode) : start\n");
 
-	StateSet::iterator iter; // iterator over the stateList's elements
+    StateSet::iterator iter; // iterator over the stateList's elements
 
     if (options[O_CALC_ALL_STATES]) {
         for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
@@ -461,51 +461,51 @@ void OG::calculateSuccStatesOutput(unsigned int output,
             }
         }
     } else {
-    	if (parameters[P_SINGLE]) {
-	    	binDecision * tempBinDecision = (binDecision *) 0;
-	    	
-	    	setOfStatesStubbornTemp.clear();
-	        owfnPlace * outputPlace = PN->getPlace(output);
-	        StateSet stateSet;
-	
-	        for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
-	                != node->reachGraphStateSet.end(); iter++) {
-	            (*iter)->decode(PN);
-	            // calc reachable states from that marking using stubborn set method that
-	            // calculates all those states that activate the given receiving event 
-	            // --> not necessarily the deadlock states
-	            PN->calculateReducedSetOfReachableStates(stateSet, setOfStatesStubbornTemp, &tempBinDecision, outputPlace, newNode);
-            	if (newNode->getColor() == RED) {
-                	// a message bound violation occured during computation of reachability graph
+        if (parameters[P_SINGLE]) {
+            binDecision * tempBinDecision = (binDecision *) 0;
+
+            setOfStatesStubbornTemp.clear();
+            owfnPlace * outputPlace = PN->getPlace(output);
+            StateSet stateSet;
+
+            for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
+                    != node->reachGraphStateSet.end(); iter++) {
+                (*iter)->decode(PN);
+                // calc reachable states from that marking using stubborn set method that
+                // calculates all those states that activate the given receiving event
+                // --> not necessarily the deadlock states
+                PN->calculateReducedSetOfReachableStates(stateSet, setOfStatesStubbornTemp, &tempBinDecision, outputPlace, newNode);
+                if (newNode->getColor() == RED) {
+                    // a message bound violation occured during computation of reachability graph
                     trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
                     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
                     return;
                 }
-	        }
-	
-	        if (tempBinDecision) {
-	        	delete tempBinDecision;
-	        }
-    	} else if (parameters[P_REPRESENTATIVE]) {
-	        for (StateSet::iterator iter2 = node->reachGraphStateSet.begin(); iter2
-	        		!= node->reachGraphStateSet.end(); iter2++) {
-	        	
-	        	(*iter2)->decode(PN); // get the marking of the state
-            
-	        	if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
-	            	// calc the reachable states from that marking using stubborn set method taking
-	            	// care of deadlocks
-	        		PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode); 
-	                
-	            	if (newNode->getColor() == RED) {
-	                	// a message bound violation occured during computation of reachability graph
-	                    trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
-	                    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
-	                    return;
-	                }
-	        	}
-	        }
-    	}
+            }
+
+            if (tempBinDecision) {
+                delete tempBinDecision;
+            }
+        } else if (parameters[P_REPRESENTATIVE]) {
+            for (StateSet::iterator iter2 = node->reachGraphStateSet.begin(); iter2
+                    != node->reachGraphStateSet.end(); iter2++) {
+
+                (*iter2)->decode(PN); // get the marking of the state
+
+                if (PN->removeOutputMessage(output)) { // remove the output message from the current marking
+                    // calc the reachable states from that marking using stubborn set method taking
+                    // care of deadlocks
+                    PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode);
+
+                    if (newNode->getColor() == RED) {
+                        // a message bound violation occured during computation of reachability graph
+                        trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
+                        trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+                        return;
+                    }
+                }
+            }
+        }
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, AnnotatedGraphNode* node, AnnotatedGraphNode* newNode) : end\n");
 }
@@ -516,7 +516,7 @@ void OG::calculateSuccStatesOutput(unsigned int output,
 //! \note Niels made this public since he needs it for distributed controllability.
 void OG::correctNodeColorsAndShortenAnnotations() {
 
-	// This is a fixpoint operation. Do the following until nothing changes:
+    // This is a fixpoint operation. Do the following until nothing changes:
     //   1. Turn one blue node that should be red into a red one.
     bool graphChangedInLoop = true;
     bool graphChanged = false;
@@ -565,9 +565,9 @@ void OG::correctNodeColorsAndShortenAnnotations() {
  */
 void OG::computeCNF(AnnotatedGraphNode* node) const {
 
-	trace(TRACE_5, "OG::computeCNF(AnnotatedGraphNode * node): start\n");
+    trace(TRACE_5, "OG::computeCNF(AnnotatedGraphNode * node): start\n");
 
-	// initially, the annoation is empty (and therefore equivalent to true)
+    // initially, the annoation is empty (and therefore equivalent to true)
     assert(node->getAnnotation()->equals() == TRUE);
 
     // assert(node->getAnnotation()->asString() == GraphFormulaLiteral::TRUE);
@@ -575,16 +575,16 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
 
     if (options[O_CALC_ALL_STATES]) {
 
-    	// NO state reduction
+        // NO state reduction
         // iterate over all states of the node
         for (iter = node->reachGraphStateSet.begin();
              iter != node->reachGraphStateSet.end(); iter++) {
 
-        	if ( (*iter)->type == DEADLOCK ||
+            if ( (*iter)->type == DEADLOCK ||
                  (*iter)->type == FINALSTATE ||
                  (*iter)->isNotAutonomouslyTransient() ) {
 
-        		// we just consider the maximal states only
+                // we just consider the maximal states only
                 // get the marking of this state
                 (*iter)->decodeShowOnly(PN);
 
@@ -629,20 +629,20 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
         }
     } else {
 
-    	// WITH state reduction
+        // WITH state reduction
         // iterate over all states of the node
         for (iter = setOfStatesStubbornTemp.begin(); iter
                 != setOfStatesStubbornTemp.end(); iter++) {
 
-        	if ( (*iter)->type == DEADLOCK ||
+            if ( (*iter)->type == DEADLOCK ||
                  (*iter)->type == FINALSTATE ||
                  (*iter)->isNotAutonomouslyTransient() ) {
-                
-        		// we just consider the maximal states only
-                // get the marking of this state
-        		(*iter)->decodeShowOnly(PN);
 
-        		// this clause's first literal
+                // we just consider the maximal states only
+                // get the marking of this state
+                (*iter)->decodeShowOnly(PN);
+
+                // this clause's first literal
                 GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
 
                 // in case of a final state we add special literal "final" to the clause
@@ -688,7 +688,7 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
 //! \brief converts an OG into its BDD representation
 void OG::convertToBdd() {
 
-	trace(TRACE_5, "OG::convertToBdd(): start\n");
+    trace(TRACE_5, "OG::convertToBdd(): start\n");
 
     std::map<AnnotatedGraphNode*, bool> visitedNodes;
     bdd->convertRootNode(root);

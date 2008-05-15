@@ -90,7 +90,7 @@ class AnnotatedGraph : public Graph {
 
         /// remove all edges that have a given node as source
         void removeEdgesFromNodeToAllOtherNodes(AnnotatedGraphNode* nodeToDelete);
-        
+
         /// assign the final nodes of the graph according to Gierds 2007
         void assignFinalNodes();
 
@@ -136,16 +136,16 @@ class AnnotatedGraph : public Graph {
 // CODE FROM PL
         set<std::string> sendEvents;
         set<std::string> recvEvents;
-	
+
         /// remove a node from the annotated graph
         virtual void removeNode(AnnotatedGraphNode*);
-        
+
         /// remove all nodes that have the annotation "true"
         void removeNodesAnnotatedWithTrue();
-        
+
         /// constructs the dual service
         void constructDualService();
-        
+
         /// applies 1st and 2nd fix to dual service
         void fixDualService();
 
@@ -166,6 +166,65 @@ class AnnotatedGraph : public Graph {
                                                    AnnotatedGraphNode* testNode,
                                                    list<GraphFormulaAssignment>& assignmentList);
 
+
+
+        /// Computes the total number of all states stored in all nodes and the
+        /// number of all edges in this graph.
+        void computeNumberOfStatesAndEdges();
+
+        /// Helps computeNumberOfStatesAndEdges to computes the total number of all
+        /// states stored in all nodes and the number of all edges in this graph.
+        void computeNumberOfStatesAndEdgesHelper(AnnotatedGraphNode* v,
+                                                 std::map<AnnotatedGraphNode*, bool>& visitedNodes);
+
+        /// Computes the number of all blue to be shown nodes and edges in this
+        /// graph.
+        void computeNumberOfBlueNodesEdges();
+
+        /// Helps computeNumberOfBlueNodesEdges() to computes the number of all blue
+        /// to be shown nodes and edges in this graph.
+        void computeNumberOfBlueNodesEdgesHelper(AnnotatedGraphNode* v, std::map<AnnotatedGraphNode*, bool>& visitedNodes);
+
+        /// The total number of all states stored in all nodes in this graph.
+        /// Is computed by computeNumberOfStatesAndEdges().
+        unsigned int nStoredStates;
+
+        /// The number of all edges in this graph.
+        /// Is computed by computeNumberOfStatesAndEdges().
+        unsigned int nEdges;
+
+        /// The number of blue to be shown nodes in this graph.
+        /// Is computed by computeNumberOfBlueNodesEdges().
+        unsigned int nBlueNodes;
+
+        /// The number of blue to be shown edges in this graph.
+        /// Is computed by computeNumberOfBlueNodesEdges().
+        unsigned int nBlueEdges;
+
+
+        /// Returns the total number of all states stored in all nodes in this
+        /// graph. May only be called after computeGraphStatistics().
+        unsigned int getNumberOfStoredStates() const;
+
+        /// Returns the number of all edges in this graph. May only be called after
+        /// computeGraphStatistics().
+        unsigned int getNumberOfEdges() const;
+
+        /// Returns the number of all blue to be shown nodes in this graph. May only
+        /// be called after computeGraphStatistics().
+        unsigned int getNumberOfBlueNodes() const;
+
+        /// Returns the number of all blue to be shown edges in this graph. May only
+        /// be called after computeGraphStatistics().
+        unsigned int getNumberOfBlueEdges() const;
+
+
+        /// collects all connected Nodes in a set (recursive helper function)
+          void removeDisconnectedNodesRecursively(AnnotatedGraphNode* currentNode,
+                                                set<AnnotatedGraphNode*>& connectedNodes);
+
+
+
     public:
 
         /// basic constructor
@@ -174,8 +233,8 @@ class AnnotatedGraph : public Graph {
         /// basic deconstructor
         virtual ~AnnotatedGraph();
 
-        /// adds a node to the graph
-        void addNode(AnnotatedGraphNode* node);
+        /// adds a node to the graph (directly to the node set)
+        virtual void addNode(AnnotatedGraphNode* node);
 
         /// creates a new node in the graph
         AnnotatedGraphNode* addNode(const std::string& nodeName,
@@ -187,10 +246,14 @@ class AnnotatedGraph : public Graph {
                      const std::string& dstName,
                      const std::string& label);
 
+
         /// creates a new edge in the graph
         void addEdge(AnnotatedGraphNode * src,
                      AnnotatedGraphNode * dst,
                      const std::string& label);
+
+        /// Returns the number of nodes in this graph.
+        virtual unsigned int getNumberOfNodes() const;
 
         /// returns true if a node with the given name was found
         bool hasNodeWithName(const std::string& nodeName) const;
@@ -204,7 +267,7 @@ class AnnotatedGraph : public Graph {
         /// sets the root node to the one with the given name
         void setRootToNodeWithName(const std::string& nodeName);
 
-        /// retruns a node with the given name, or NULL else
+        /// returns a node with the given name, or NULL else
         AnnotatedGraphNode* getNodeWithName(const std::string& nodeName) const;
 
         /// retruns true if the graph's root node is NULL
@@ -220,23 +283,19 @@ class AnnotatedGraph : public Graph {
         /// node due to other node removals
         void removeDisconnectedNodes();
 
-        /// collects all connected Nodes in a set
-      	void removeDisconnectedNodesRecursively(AnnotatedGraphNode* currentNode,
-                                                set<AnnotatedGraphNode*>& connectedNodes);
-
         /// returns the name of the source file for the Graph
         std::string getFilename();
-        
+
         /// sets the name of the source file for the Graph
         void setFilename(std::string filename);
-        
+
         /// Returns the product OG of all given OGs.
         static AnnotatedGraph* product(const ogs_t& ogs);
 
         /// Returns the product OG of this OG and the passed one
         AnnotatedGraph* product(const AnnotatedGraph* rhs);
 
-        /// Creates and returns the annotation for the product node of the given two nodes. 
+        /// Creates and returns the annotation for the product node of the given two nodes.
         GraphFormulaCNF* createProductAnnotation(const AnnotatedGraphNode* lhs,
                                                  const AnnotatedGraphNode* rhs) const;
 
@@ -258,10 +317,10 @@ class AnnotatedGraph : public Graph {
         void printDotFile(const std::string& filenamePrefix,
                           const std::string& dotGraphTitle) const;
 
-        /// Prints this OG in OG file format 
+        /// Prints this OG in OG file format
         void printOGFile(const std::string& filenamePrefix) const;
 
-        /// Adds the suffix for OG files to the given file name prefix 
+        /// Adds the suffix for OG files to the given file name prefix
         static std::string addOGFileSuffix(const std::string& filePrefix);
 
         /// checks, whether this AnnotatedGraph simulates the given simulant
@@ -278,7 +337,7 @@ class AnnotatedGraph : public Graph {
         bool covSimulates(AnnotatedGraph* smallerOG);
 
         /// filters the current OG through a given OG in such a way,
-        /// that the filtered current OG simulates the opernad og; 
+        /// that the filtered current OG simulates the opernad og;
         void filter(AnnotatedGraph* rhsOG);
 
         /// computes the number of Services determined by this OG
@@ -298,13 +357,23 @@ class AnnotatedGraph : public Graph {
         /// Get all transitions from the graph with a label from the given set, each associated to a specific label
         /// NULL refers to covering the whole interface set
         TransitionMap getTransitionMap(set<string>* labels);
-        
+
         /// Create the formula describing the coverability criteria when covering labels in the given set.
         void createCovConstraint(set<string>* labels = NULL);
 
         //! Create the formula describing the structure of the complete graph through events
         //! NOTE: graph has to be acyclic!
         GraphFormulaMultiaryAnd* createStructureFormula();
+
+        /// Computes and prints the statistics for this graph.
+        void computeAndPrintGraphStatistics();
+
+        /// Computes statistics about this graph
+        void computeGraphStatistics();
+
+        /// Prints statistics about this graph. May only be called after
+        /// computeGraphStatistics().
+        void printGraphStatistics();
 
 // CODE FROM PL
         /// transforms the graph to the public view

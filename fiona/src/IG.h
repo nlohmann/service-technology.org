@@ -50,8 +50,36 @@ class interactionGraph : public CommunicationGraph {
                           AnnotatedGraphNode*,
                           messageMultiSet,
                           GraphEdgeType,
-                          double); 
-        
+                          double);
+
+        /// Builds the IG of the associated PN recursively (helper function)
+        void buildGraph(AnnotatedGraphNode*, double);
+
+        /// calculates the set of successor states in case of an input message
+        void calculateSuccStatesSendingEvent(messageMultiSet, AnnotatedGraphNode*, AnnotatedGraphNode*);
+
+        /// calculates the set of successor states in case of an output message
+        void calculateSuccStatesReceivingEvent(messageMultiSet, AnnotatedGraphNode*, AnnotatedGraphNode*);
+
+        /// Calculate sending and receiving events using the reduction rules as specified.
+        void calculateSendingAndReceivingEvents(AnnotatedGraphNode*, setOfMessages&, setOfMessages&);
+
+        /// Calculates the set of receiving events without applying reduction rules.
+        void getReceivingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
+
+        /// Calculates the set of sending events without applying reduction rules.
+        void getSendingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&);
+
+        // reduction rules
+
+        /// Calculates the set of receiving events using the "combine receiving events" rule
+        void combineReceivingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
+
+        /// Calculates the set of sending events using the "receive before sending" rule
+        void receivingBeforeSending(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&);
+
+
+
     public:
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.
@@ -61,7 +89,7 @@ class interactionGraph : public CommunicationGraph {
 
         /// constructor
         interactionGraph(oWFN*);
-        
+
         /// basic destructor
         virtual ~interactionGraph();
 
@@ -71,32 +99,6 @@ class interactionGraph : public CommunicationGraph {
 
         /// Builds the IG of the associated PN starting with the root node
         void buildGraph();
-
-        /// Builds the IG of the associated PN recursively
-        void buildGraph(AnnotatedGraphNode*, double);
-
-        /// calculates the set of successor states in case of an input message
-        void calculateSuccStatesSendingEvent(messageMultiSet, AnnotatedGraphNode*, AnnotatedGraphNode*);
-
-        /// calculates the set of successor states in case of an output message
-        void calculateSuccStatesReceivingEvent(messageMultiSet, AnnotatedGraphNode*, AnnotatedGraphNode*);
-
-        /// Calculate sending and receiving events using the reduction rules as specified. 
-        void calculateSendingAndReceivingEvents(AnnotatedGraphNode*, setOfMessages&, setOfMessages&);
-        
-        /// Calculates the set of receiving events without applying reduction rules.
-        void getReceivingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
-        
-        /// Calculates the set of sending events without applying reduction rules.
-        void getSendingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&);
-        
-        // reduction rules
-        
-        /// Calculates the set of receiving events using the "combine receiving events" rule
-        void combineReceivingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
-        
-        /// Calculates the set of sending events using the "receive before sending" rule
-        void receivingBeforeSending(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&);
 
 };
 

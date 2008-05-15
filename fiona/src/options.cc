@@ -155,7 +155,7 @@ void print_help() {
   trace("                                                 given set of services\n");
   trace("\n");
   trace("                                   png         - generate png files for all\n");
-  trace("                                                 given oWFNs\n");
+  trace("                                                 given oWFNs or OGs\n");
 //  trace("                                   tex         - generate gastex files for a\n");
 //  trace("                                                 given annotated dot file\n");
   trace("                               checkfalsenodes - checks for nodes that\n");
@@ -767,12 +767,18 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
-    if ((parameters[P_PNG] || parameters[P_REDUCE]|| parameters[P_IG] || parameters[P_OG]) && netfiles.size() == 0) {
+    if ((parameters[P_REDUCE] || parameters[P_IG] || parameters[P_OG]) && netfiles.size() == 0) {
         cerr << "Error: \t No oWFNs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }
 
+    if (parameters[P_PNG] && netfiles.size() == 0 && ogfiles.size() == 0) {
+    	cerr << "Error: \t No oWFNs or OGs are given." << endl;
+    	cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+    	exit(1);
+    }
+    
     if (parameters[P_MATCH] && ogfiles.size() != 1) {
         cerr << "Error: \t Exactly one operating guideline must be given for matching!\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;

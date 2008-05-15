@@ -30,7 +30,7 @@
  * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-UniversitÃ¤t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -77,7 +77,7 @@ CommunicationGraph::~CommunicationGraph() {
         delete setOfNodes[i];
     }
     setOfNodes.clear();
-    
+
 
     GraphNodeSet::iterator iter;
 
@@ -87,53 +87,20 @@ CommunicationGraph::~CommunicationGraph() {
     setOfSortedNodes.clear();
 
     if (tempBinDecision) {
-    	delete tempBinDecision;
+        delete tempBinDecision;
     }
 
     if (PN) {
         delete PN;
     }
-    
+
     trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : end\n");
 }
-
 
 //! \brief returns the number of nodes
 //! \return number of nodes
 unsigned int CommunicationGraph::getNumberOfNodes() const {
     return setOfSortedNodes.size();
-}
-
-
-//! \brief returns the number of stored states
-//!        may only be called after computeGraphStatistics()
-//! \return number stored states
-unsigned int CommunicationGraph::getNumberOfStoredStates() const {
-    return nStoredStates;
-}
-
-
-//! \brief returns the number of edges
-//!        may only be called after computeGraphStatistics()
-//! \return number edges
-unsigned int CommunicationGraph::getNumberOfEdges() const {
-    return nEdges;
-}
-
-
-//! \brief returns the number of blue nodes
-//!        may only be called after computeGraphStatistics()
-//! \return number of blue nodes
-unsigned int CommunicationGraph::getNumberOfBlueNodes() const {
-    return nBlueNodes;
-}
-
-
-//! \brief returns the number of blue edges
-//!        may only be called after computeGraphStatistics()
-//! \return number blue edges
-unsigned int CommunicationGraph::getNumberOfBlueEdges() const {
-    return nBlueEdges;
 }
 
 
@@ -150,29 +117,29 @@ void CommunicationGraph::calculateRootNode() {
 
     // calc the reachable states from that marking
     if (options[O_CALC_ALL_STATES]) {
-    	// no state reduction
+        // no state reduction
         PN->calculateReachableStatesFull(root);
     } else {
-    	// state reduction
-    	
-    	// forget about all the states we have calculated so far
-    	setOfStatesStubbornTemp.clear();
-    	if (parameters[P_SINGLE]) {
-        	// calc the reachable states from that marking using stubborn set method taking
-        	// care of deadlocks
-    		// --> the current state is stored in the node, the states reachable from the current state
-    		//     are not stored in the node
-            PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, root); 
-    	} else if (parameters[P_REPRESENTATIVE]) {
-    		// --> store the current state and all "minimal" states in the node
-    		PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, root);
-    	}
+        // state reduction
+
+        // forget about all the states we have calculated so far
+        setOfStatesStubbornTemp.clear();
+        if (parameters[P_SINGLE]) {
+            // calc the reachable states from that marking using stubborn set method taking
+            // care of deadlocks
+            // --> the current state is stored in the node, the states reachable from the current state
+            //     are not stored in the node
+            PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, root);
+        } else if (parameters[P_REPRESENTATIVE]) {
+            // --> store the current state and all "minimal" states in the node
+            PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, root);
+        }
     }
 
     root->setNumber(0);
     root->setName(intToString(0));
     setOfSortedNodes.insert(root);
-    // setOfNodes.push_back(root);
+    // setOfNodes.push_back(root); <-- happens in the buildGraph-functions.
 
     trace(TRACE_5, "void CommunicationGraph::calculateRootNode(): end\n");
 }
@@ -183,7 +150,7 @@ void CommunicationGraph::removeNode(AnnotatedGraphNode* node) {
 
     trace(TRACE_5, "void CommunicationGraph::removeNode(): start\n");
     assert(node);
-    
+
     setOfSortedNodes.erase(node);  // only valid if container is a std::set
 
     for (vector<AnnotatedGraphNode*>::iterator testnode = setOfNodes.begin(); testnode
@@ -200,124 +167,14 @@ void CommunicationGraph::removeNode(AnnotatedGraphNode* node) {
 
 
 //! \brief this function uses the find method from the template set
-//! \param toAdd the AnnotatedGraphNode we are looking for in the graph
-//! \return toAdd itself or NULL if toAdd could not be found 
-AnnotatedGraphNode* CommunicationGraph::findGraphNodeInSet(AnnotatedGraphNode* toAdd) {
-    GraphNodeSet::iterator iter = setOfSortedNodes.find(toAdd);
+//! \param toFind the AnnotatedGraphNode we are looking for in the graph
+//! \return toFind itself or NULL if toFind could not be found
+AnnotatedGraphNode* CommunicationGraph::findGraphNodeInSet(AnnotatedGraphNode* toFind) {
+    GraphNodeSet::iterator iter = setOfSortedNodes.find(toFind);
     if (iter != setOfSortedNodes.end()) {
         return *iter;
     } else {
         return NULL;
-    }
-}
-
-
-//! \brief Computes statistics about this graph. They can be printed by
-//!        printGraphStatistics().
-void CommunicationGraph::computeGraphStatistics() {
-    computeNumberOfStatesAndEdges();
-    computeNumberOfBlueNodesEdges();
-}
-
-
-//! \brief Computes the total number of all states stored in all nodes and the
-//!        number of all edges in this graph.
-void CommunicationGraph::computeNumberOfStatesAndEdges() {
-
-    std::map<AnnotatedGraphNode*, bool> visitedNodes;
-    nStoredStates = 0;
-    nEdges = 0;
-
-    computeNumberOfStatesAndEdgesHelper(root, visitedNodes);
-}
-
-
-//! \brief Helps computeNumberOfStatesAndEdges to computes the total number of all
-//!        states stored in all nodes and the number of all edges in this graph.
-//!        This is done recursively (dfs).
-//! \param v Current node in the iteration process.
-//! \param visitedNodes[] Array of bool storing the nodes that we have
-//!        already looked at.
-void CommunicationGraph::computeNumberOfStatesAndEdgesHelper(AnnotatedGraphNode* v,
-                                                             std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
-
-    assert(v != NULL);
-
-    // counting the current node
-    visitedNodes[v] = true;
-
-    nStoredStates += v->reachGraphStateSet.size();
-
-    // iterating over all successors
-    AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
-
-    while (edgeIter->hasNext()) {
-        AnnotatedGraphEdge* leavingEdge = edgeIter->getNext();
-
-        AnnotatedGraphNode* vNext = (AnnotatedGraphNode *)leavingEdge->getDstNode();
-        assert(vNext != NULL);
-
-        nEdges++;
-
-        if ((vNext != v) && !visitedNodes[vNext]) {
-            computeNumberOfStatesAndEdgesHelper(vNext, visitedNodes);
-        }
-    }
-    delete edgeIter;
-}
-
-
-//! \brief Computes the number of all blue to be shown nodes and edges in this
-//!        graph.
-void CommunicationGraph::computeNumberOfBlueNodesEdges() {
-
-    std::map<AnnotatedGraphNode*, bool> visitedNodes;
-    nBlueNodes = 0;
-    nBlueEdges = 0;
-
-    computeNumberOfBlueNodesEdgesHelper(root, visitedNodes);
-}
-
-
-//! \brief Helps computeNumberOfBlueNodesEdges() to computes the number of all blue
-//!        to be shown nodes and edges in this graph.
-//!        This is done recursively (dfs).
-//! \param v Current node in the iteration process.
-//! \param visitedNodes[] Array of bool storing the nodes that we have
-//!        already looked at.
-void CommunicationGraph::computeNumberOfBlueNodesEdgesHelper(AnnotatedGraphNode* v,
-                                                             std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
-
-    assert(v != NULL);
-
-    // counting the current node
-    visitedNodes[v] = true;
-
-    if (v->getColor() == BLUE &&
-        (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
-
-        nBlueNodes++;
-
-        // iterating over all successors
-        AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
-
-        while (edgeIter->hasNext()) {
-            AnnotatedGraphEdge* leavingEdge = edgeIter->getNext();
-
-            AnnotatedGraphNode* vNext = (AnnotatedGraphNode *)leavingEdge->getDstNode();
-            assert(vNext != NULL);
-
-            if (vNext->getColor() == BLUE &&
-                (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
-
-                nBlueEdges++;
-            }
-
-            if ((vNext != v) && !visitedNodes[vNext]) {
-                computeNumberOfBlueNodesEdgesHelper(vNext, visitedNodes);
-            }
-        } // while
-        delete edgeIter;
     }
 }
 
@@ -402,18 +259,6 @@ void CommunicationGraph::printProgressFirst() {
 }
 
 
-//! \brief Prints statistics about this graph. May only be called after
-//!       computeGraphStatistics().
-void CommunicationGraph::printGraphStatistics() {
-    trace(TRACE_0, "    number of nodes: " + intToString(getNumberOfNodes()) + "\n");
-    trace(TRACE_0, "    number of edges: " + intToString(getNumberOfEdges()) + "\n");
-    trace(TRACE_0, "    number of deleted nodes: " + intToString(numberDeletedVertices) + "\n");
-    trace(TRACE_0, "    number of blue nodes: " + intToString(getNumberOfBlueNodes()) + "\n");
-    trace(TRACE_0, "    number of blue edges: " + intToString(getNumberOfBlueEdges()) + "\n");
-    trace(TRACE_0, "    number of states calculated: " + intToString(State::state_count) + "\n");
-    trace(TRACE_0, "    number of states stored in datastructure: " + intToString(State::state_count_stored_in_binDec) + "\n");
-    trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStoredStates()) + "\n");
-}
 
 
 //! \brief creates a dot file of the graph
@@ -422,11 +267,11 @@ void CommunicationGraph::printGraphToDot() {
     unsigned int maxSizeForDotFile = 5000; // number relevant for .out file
     unsigned int maxSizeForPNGFile = 500; // number relevant to generate png
 
-    if (((parameters[P_SHOW_RED_NODES] || parameters[P_SHOW_ALL_NODES]) && 
-    		(getNumberOfNodes() <= maxSizeForDotFile))
-    	 ||
-    	 ((parameters[P_SHOW_EMPTY_NODE] || parameters[P_SHOW_BLUE_NODES]) && 
-    	 getNumberOfBlueNodes() <= maxSizeForDotFile)) {
+    if (((parameters[P_SHOW_RED_NODES] || parameters[P_SHOW_ALL_NODES]) &&
+            (getNumberOfNodes() <= maxSizeForDotFile))
+         ||
+         ((parameters[P_SHOW_EMPTY_NODE] || parameters[P_SHOW_BLUE_NODES]) &&
+         getNumberOfBlueNodes() <= maxSizeForDotFile)) {
 
         trace(TRACE_0, "creating the dot file of the graph...\n");
         AnnotatedGraphNode* rootNode = root;
@@ -466,9 +311,9 @@ void CommunicationGraph::printGraphToDot() {
         if (parameters[P_IG] && !options[O_CALC_ALL_STATES]) {
             dotFile << " -R";
             if (parameters[P_REPRESENTATIVE]) {
-            	dotFile << " -p representative";
+                dotFile << " -p representative";
             } else {
-            	dotFile << " -p single";
+                dotFile << " -p single";
             }
         }
         if (options[O_MESSAGES_MAX]) {
@@ -488,7 +333,7 @@ void CommunicationGraph::printGraphToDot() {
                     << " [label=\"#0\", fontcolor=black, color=red, style=dashed];\n";
         } else {
         std::map<AnnotatedGraphNode*, bool> visitedNodes;
-        
+
         // filling the file with nodes and edges
         printGraphToDotRecursively(rootNode, dotFile, visitedNodes);
         }
@@ -559,9 +404,9 @@ void CommunicationGraph::printGraphToDot() {
 void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
                                                     fstream& os,
                                                     std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
-	// the given node pointer should never be NULL
-	assert(v != NULL);
-	
+    // the given node pointer should never be NULL
+    assert(v != NULL);
+
     // continue only if current node v is to show
     if (!v->isToShow(root))
         return;
@@ -992,7 +837,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
         }
     }
 
-    
+
     ///////////////////////////////////////////////
     // CASE 1: NODE HAS INTERNAL DEADLOCK => RED //
     ///////////////////////////////////////////////
@@ -1007,7 +852,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
         assert (!internal_deadlock_seen);
         return v->setDiagnosisColor(DIAG_BLUE);
     }
-    
+
 
     // node color cannot be quickly derived, so the children have to be considered
     set<GraphNodeDiagnosisColor_enum> childrenDiagnosisColors;
@@ -1029,7 +874,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
     bool blue_child = (childrenDiagnosisColors.find(DIAG_BLUE)
             != childrenDiagnosisColors.end());
 
-    
+
     /////////////////////////////////////////////////
     // CASE 3: NODE HAS ONLY BLUE CHILDREN => BLUE //
     /////////////////////////////////////////////////
@@ -1046,7 +891,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
         assert (external_deadlock_seen);
         return v->setDiagnosisColor(DIAG_VIOLET);
     }
-    
+
     ///////////////////////////////////////////////
     // CASE 5: NODE HAS ONLY RED CHILDREN => RED //
     ///////////////////////////////////////////////
@@ -1055,7 +900,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
         assert (external_deadlock_seen);
         return v->setDiagnosisColor(DIAG_RED);
     }
-    
+
     ///////////////////////////////////////////////////////
     // CASE 6: RED SUCCESSOR CANNOT BE AVOIDED => VIOLET //
     ///////////////////////////////////////////////////////
@@ -1064,7 +909,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
         assert (external_deadlock_seen);
         return v->setDiagnosisColor(DIAG_VIOLET);
     }
-    
+
     ///////////////////////////////////////////////////////////////////////
     // CASE 7: IF AN EDGE BECOMES RED IN A SUCCESSOR => SUCCESSOR ORANGE //
     ///////////////////////////////////////////////////////////////////////
@@ -1072,7 +917,7 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = element->getDstNode();
-        
+
         if (v->changes_color(element)) {
             if (vNext->getDiagnosisColor() == DIAG_UNSET) {
                 vNext->setDiagnosisColor(DIAG_ORANGE);
@@ -1080,9 +925,9 @@ GraphNodeDiagnosisColor_enum CommunicationGraph::diagnose_recursively(AnnotatedG
         }
     }
     delete edgeIter;
-    
+
     cerr << "found no color for " << v->getNumber() << endl;
-    
+
     // no color found yet
     return v->setDiagnosisColor(DIAG_UNSET);
 }
@@ -1096,3 +941,11 @@ void CommunicationGraph::deleteOWFN() {
     PN = NULL;
 }
 
+//! \brief Adds a node to the CommunicationGraph. The node is inserted in both sets.
+void CommunicationGraph::addNode(AnnotatedGraphNode* toAdd) {
+    trace(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : start\n");
+    setOfNodes.push_back(toAdd);
+    setOfSortedNodes.insert(toAdd);
+    trace(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : start\n");
+
+}

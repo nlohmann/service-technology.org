@@ -381,9 +381,9 @@ unsigned int AnnotatedGraph::numberOfServices() {
 //! \param activeNodes a set of node pointers containing the currently visited nodes
 //! \param followers a map that contains the follower nodes of every node in the graph
 //! \param validFollowerCombinations a map that contains all sets of follower nodes that succeed to
-//!        fullfill the annotation of the predecessor with the edges leading to them            
-//! \param eliminateRedundantCounting map containing all already computed number of services for 
-//!        possible active node sets 
+//!        fullfill the annotation of the predecessor with the edges leading to them
+//! \param eliminateRedundantCounting map containing all already computed number of services for
+//!        possible active node sets
 //! \param instances number of already processed sets of active Nodes
 //! \return number of Services for the current set of active nodes
 unsigned int AnnotatedGraph::numberOfServicesRecursively(
@@ -564,8 +564,8 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(
 //! \param labels a set labels not yet set to a value, used for the recursion
 //! \param possibleAssignments the currently processed assignment containing all label valuse that
 //!        already have been set
-//! \param testNode a pointer to the node currently tested            
-//! \param assignmentList a list of assignment that already have turned true in recursion 
+//! \param testNode a pointer to the node currently tested
+//! \param assignmentList a list of assignment that already have turned true in recursion
 //! \return number of true Assignments
 unsigned int AnnotatedGraph::processAssignmentsRecursively(set<string> labels,
         GraphFormulaAssignment possibleAssignment,
@@ -713,7 +713,7 @@ void AnnotatedGraph::removeFalseNodes() {
                 currentNode->removeEdgesToNode((*edgeIter)->getDstNode());
             }
 
-            // Evaluate the annotation of the current node 
+            // Evaluate the annotation of the current node
             if (!currentNode->assignmentSatisfiesAnnotation(*(currentNode->getAssignment()))) {
                 // Insert the false node into the set
                 falseNodes.insert(currentNode);
@@ -730,14 +730,14 @@ void AnnotatedGraph::removeFalseNodes() {
         for (set<AnnotatedGraphNode*>::iterator nodeIter = falseNodes.begin();
              nodeIter != falseNodes.end(); ++nodeIter) {
 
-            // If the root node has to be deleted, we set the root to NULL. 
+            // If the root node has to be deleted, we set the root to NULL.
             if (*nodeIter == getRoot()) {
                 setRoot(NULL);
             }
 
             trace(TRACE_3, "\tremoved false node: " + (*nodeIter)->getName() + "\n");
 
-            // Remove all edges leading to this node and the node itself. 
+            // Remove all edges leading to this node and the node itself.
             removeEdgesToNodeFromAllOtherNodes(*nodeIter);
             removeNode(*nodeIter);
             delete *nodeIter;
@@ -871,7 +871,7 @@ void AnnotatedGraph::minimizeGraph() {
             iEdge = (*iNode)->getLeavingEdgesConstIterator();
             while (iEdge->hasNext()) {
                 AnnotatedGraphEdge* edge = iEdge->getNext();
-                // node is the predeccessor 
+                // node is the predeccessor
                 myIncomingEdges[edge->getDstNode()].add(edge);
             }
 
@@ -915,7 +915,7 @@ void AnnotatedGraph::minimizeGraph() {
                     // also to list of incoming edges
                     myIncomingEdges[firstEquivalentNode[*iNode]].add(edge);
                 }
-    
+
                 // if root node has equivalent nodes, then set root flag to new node
                 if (*iNode == getRoot()) {
                     setRoot(firstEquivalentNode[*iNode]);
@@ -1774,7 +1774,7 @@ void AnnotatedGraph::filterRecursive(AnnotatedGraphNode* myNode,
 }
 
 
-//! \brief Returns the product OG of this OG and the passed one. The caller has to delete the returned 
+//! \brief Returns the product OG of this OG and the passed one. The caller has to delete the returned
 //!        AnnotatedGraph.
 //! \param rhs the OG to be used for computing the product
 //! \return returns the product OG
@@ -2102,9 +2102,9 @@ void AnnotatedGraph::printOGFile(const std::string& filenamePrefix) const {
                 << node->getAnnotationAsString() << " : " << node->getColor().toString();
 
         if (node->isFinal()) {
-        	ogFile << " : finalnode";
+            ogFile << " : finalnode";
         }
-        
+
         printedFirstNode = true;
     }
     ogFile << ';'<< endl << endl;
@@ -2180,7 +2180,7 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap() {
 }
 
 
-//! \brief Get all transitions from the graph with a label from the given label set, 
+//! \brief Get all transitions from the graph with a label from the given label set,
 //! each associated to a specific label
 //! return returns the transition map
 AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap(
@@ -2213,7 +2213,7 @@ AnnotatedGraph::TransitionMap AnnotatedGraph::getTransitionMap(
 //! \brief Create the formula describing the coverability criteria when covering labels from the given set
 //! \param labels the set that containts all the events that shall be covered; omitting is equal NULL and refers to
 //! covering the whole interface set
-//! \return returns the coverability formula 
+//! \return returns the coverability formula
 void AnnotatedGraph::createCovConstraint(set<string>* labels) {
     trace(TRACE_5, "AnnotatedGraph::createCovFormula(): start\n");
 
@@ -2355,8 +2355,8 @@ void AnnotatedGraph::removeNodesAnnotatedWithTrue() {
 }
 
 
-//! \brief constructs the dual service by toggling all event types of the underlying graph 
-//	(SIDE-EFFECT: stores all events into sets by type)
+//! \brief constructs the dual service by toggling all event types of the underlying graph
+//    (SIDE-EFFECT: stores all events into sets by type)
 //! \complexity O(n+m), with n nodes and m edges in the given AnnotatedGraph
 void AnnotatedGraph::constructDualService() {
     // iterate over all nodes of the AnnotatedGraph
@@ -2408,7 +2408,7 @@ void AnnotatedGraph::fixDualService() {
     map<std::string, AnnotatedGraphNode*> deadlockMap;
     unsigned int currNumberOfDeadlocks = 0;
 
-    // prepare sinkNode creation 
+    // prepare sinkNode creation
     AnnotatedGraphNode* sinkNode= NULL;
     bool addSink = false;
 
@@ -2434,14 +2434,14 @@ void AnnotatedGraph::fixDualService() {
         set<std::string> disabledRecvEvents = recvEvents;
 
         // 2nd fix A: if ?z is enabled in q of OG and no ?-literals occur in the
-        //	annotation of q create a new node without ?z and a tau-transition
+        //    annotation of q create a new node without ?z and a tau-transition
         // preparation: assume we don't have to apply the 2ndA fix in current node
         bool apply2ndFixA = false;
 
         // 2nd fix B: if there are no ?-literals in the annotation of q, if there is at
         // least one outgoing transition and if q has "final" in it's annotation, create
-        // a new final node q_tau in the pvsa and a tau-transition q -> q_tau 
-        // preparation: assume we don't have to apply the 2ndB fix in current node        
+        // a new final node q_tau in the pvsa and a tau-transition q -> q_tau
+        // preparation: assume we don't have to apply the 2ndB fix in current node
         bool apply2ndFixB = false;
 
         // 3rd fix: if q has "final" in it's annotation and there are only outgoing ?-Transition
@@ -2576,7 +2576,7 @@ void AnnotatedGraph::fixDualService() {
             trace(TRACE_4, "            created tau transition from "
                     + currNode->getName() +" to "+ newNode->getName() + "\n");
 
-            // add current node's leaving edges to new node 
+            // add current node's leaving edges to new node
             //   except those that don't occur in the annotation
             trace(TRACE_4, "            adding leaving edges to new node\n");
             for (set<AnnotatedGraphEdge*>::iterator edge_iter =
@@ -2637,7 +2637,7 @@ void AnnotatedGraph::fixDualService() {
             trace(TRACE_4, "            created tau transition from "
                     + currNode->getName() +" to "+ newNode->getName() + "\n");
 
-            // add current node's leaving edges to new node 
+            // add current node's leaving edges to new node
             //   except those that don't occur in the annotation
             trace(TRACE_4, "            adding leaving edges to new node\n");
             for (set<AnnotatedGraphEdge*>::iterator edge_iter =
@@ -2697,7 +2697,7 @@ void AnnotatedGraph::fixDualService() {
             trace(TRACE_4, "            created tau transition from "
                     + currNode->getName() +" to "+ sinkNode->getName() + "\n");
 
-            // add current node's leaving edges to new node 
+            // add current node's leaving edges to new node
             //   except those that don't occur in the annotation
             trace(TRACE_4, "            adding leaving edges to new node\n");
             for (set<AnnotatedGraphEdge*>::iterator edge_iter =
@@ -2934,13 +2934,13 @@ bool isDiamond(AnnotatedGraphNode * node,
                 cerr << "    | | |    seen before ..." << endl;
 
                 // compare annotations of the nodes
-                //				cerr << event << endl;
-                //				cerr << preFormula->asString() << endl;
+                //                cerr << event << endl;
+                //                cerr << preFormula->asString() << endl;
                 preFormula->removeLiteral(event);
-                //				cerr << preFormula->asString() << endl;
-                //				cerr << formula->asString() << endl;
+                //                cerr << preFormula->asString() << endl;
+                //                cerr << formula->asString() << endl;
                 formula->removeLiteral(event);
-                //				cerr << formula->asString() << endl;
+                //                cerr << formula->asString() << endl;
 
                 if ( !formula->implies(preFormula)
                         || !preFormula->implies(formula)) {
@@ -2997,7 +2997,7 @@ bool isDiamond(AnnotatedGraphNode * node,
  *  NOTE: If a node B is reachable from a node B via two different edges
  *        then A is two times the predecessor of B
  *
- *  ??? Vorgänger zweimal drin, wenn über zwei Kanten erreichbar
+ *  ??? Vorgï¿½nger zweimal drin, wenn ï¿½ber zwei Kanten erreichbar
  */
 void AnnotatedGraph::getPredecessorRelation(AnnotatedGraph::predecessorMap& resultMap) {
 
@@ -3010,7 +3010,7 @@ void AnnotatedGraph::getPredecessorRelation(AnnotatedGraph::predecessorMap& resu
         AnnotatedGraphNode::LeavingEdges::ConstIterator edge = (*node)->getLeavingEdgesConstIterator();
         while (edge->hasNext() ) {
             AnnotatedGraphEdge * ed = edge->getNext();
-            // node is the predeccessor 
+            // node is the predeccessor
             resultMap[ed->getDstNode()].add(new AnnotatedGraphEdge(*node, ed->getLabel() ));
         }
     }
@@ -3020,7 +3020,7 @@ void AnnotatedGraph::getPredecessorRelation(AnnotatedGraph::predecessorMap& resu
 void AnnotatedGraph::assignFinalNodes() {
     trace(TRACE_5, "AnnotatedGraph::assignFinalNodes(): start\n");
 
-	for (nodes_t::iterator node = setOfNodes.begin(); node != setOfNodes.end(); node++) {
+    for (nodes_t::iterator node = setOfNodes.begin(); node != setOfNodes.end(); node++) {
         if (((*node)->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0) != string::npos) {
             // current node has literal final in annotation
 
@@ -3047,3 +3047,216 @@ void AnnotatedGraph::assignFinalNodes() {
 
     trace(TRACE_5, "AnnotatedGraph::assignFinalNodes(): start\n");
 }
+
+
+/**** TRANSFERRED FROM COMMUNICATIONGRAPH START ****/
+
+//! \brief Computes the total number of all states stored in all nodes and the
+//!        number of all edges in this graph.
+void AnnotatedGraph::computeNumberOfStatesAndEdges() {
+
+    std::map<AnnotatedGraphNode*, bool> visitedNodes;
+    nStoredStates = 0;
+    nEdges = 0;
+
+    computeNumberOfStatesAndEdgesHelper(root, visitedNodes);
+}
+
+
+//! \brief Helps computeNumberOfStatesAndEdges to computes the total number of all
+//!        states stored in all nodes and the number of all edges in this graph.
+//!        This is done recursively (dfs).
+//! \param v Current node in the iteration process.
+//! \param visitedNodes[] Array of bool storing the nodes that we have
+//!        already looked at.
+void AnnotatedGraph::computeNumberOfStatesAndEdgesHelper(AnnotatedGraphNode* v,
+                                                             std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
+
+    assert(v != NULL);
+
+    // counting the current node
+    visitedNodes[v] = true;
+
+    nStoredStates += v->reachGraphStateSet.size();
+
+    // iterating over all successors
+    AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+
+    while (edgeIter->hasNext()) {
+        AnnotatedGraphEdge* leavingEdge = edgeIter->getNext();
+
+        AnnotatedGraphNode* vNext = (AnnotatedGraphNode *)leavingEdge->getDstNode();
+        assert(vNext != NULL);
+
+        nEdges++;
+
+        if ((vNext != v) && !visitedNodes[vNext]) {
+            computeNumberOfStatesAndEdgesHelper(vNext, visitedNodes);
+        }
+    }
+    delete edgeIter;
+}
+
+
+//! \brief Computes the number of all blue to be shown nodes and edges in this
+//!        graph.
+void AnnotatedGraph::computeNumberOfBlueNodesEdges() {
+
+    std::map<AnnotatedGraphNode*, bool> visitedNodes;
+    nBlueNodes = 0;
+    nBlueEdges = 0;
+
+    computeNumberOfBlueNodesEdgesHelper(root, visitedNodes);
+}
+
+
+//! \brief Helps computeNumberOfBlueNodesEdges() to computes the number of all blue
+//!        to be shown nodes and edges in this graph.
+//!        This is done recursively (dfs).
+//! \param v Current node in the iteration process.
+//! \param visitedNodes[] Array of bool storing the nodes that we have
+//!        already looked at.
+void AnnotatedGraph::computeNumberOfBlueNodesEdgesHelper(AnnotatedGraphNode* v,
+                                                             std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
+
+    assert(v != NULL);
+
+    // counting the current node
+    visitedNodes[v] = true;
+
+    if (v->getColor() == BLUE &&
+        (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
+
+        nBlueNodes++;
+
+        // iterating over all successors
+        AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+
+        while (edgeIter->hasNext()) {
+            AnnotatedGraphEdge* leavingEdge = edgeIter->getNext();
+
+            AnnotatedGraphNode* vNext = (AnnotatedGraphNode *)leavingEdge->getDstNode();
+            assert(vNext != NULL);
+
+            if (vNext->getColor() == BLUE &&
+                (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
+
+                nBlueEdges++;
+            }
+
+            if ((vNext != v) && !visitedNodes[vNext]) {
+                computeNumberOfBlueNodesEdgesHelper(vNext, visitedNodes);
+            }
+        } // while
+        delete edgeIter;
+    }
+}
+
+//! \brief Computes statistics about this graph. They can be printed by
+//!        printGraphStatistics().
+void AnnotatedGraph::computeGraphStatistics() {
+    computeNumberOfStatesAndEdges();
+    computeNumberOfBlueNodesEdges();
+
+}
+
+
+/** still needs work.
+
+ void AnnotatedGraph::alternativeComputeGraphStatistics() {
+
+    nBlueNodes = 0;
+    nBlueEdges = 0;
+    nEdges = 0;
+    nStoredStates = 0;
+
+
+    for (nodes_t::iterator it = setOfNodes.begin(); it != setOfNodes.end(); ++it) {
+        if ((*it)->getColor() == BLUE &&
+                (parameters[P_SHOW_EMPTY_NODE] || (*it)->reachGraphStateSet.size() != 0)) {
+            ++nBlueNodes;
+        }
+
+        nStoredStates += (*it)->reachGraphStateSet.size();
+
+        // iterating over all edges
+        AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = (*it)->getLeavingEdgesConstIterator();
+                while (edgeIter->hasNext()) {
+                    AnnotatedGraphEdge* leavingEdge = edgeIter->getNext();
+                    ++nEdges;
+
+                    AnnotatedGraphNode* vNext = (AnnotatedGraphNode *)leavingEdge->getDstNode();
+                    assert(vNext != NULL);
+
+
+                    if (vNext->getColor() == BLUE && (*it)->getColor() == BLUE &&
+                                    (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
+                                    ++nBlueEdges;
+                                    }
+                }
+    }
+
+}
+
+**/
+
+//! \brief Prints statistics about this graph. May only be called after
+//!       computeGraphStatistics().
+void AnnotatedGraph::printGraphStatistics() {
+    trace(TRACE_0, "    number of nodes: " + intToString(getNumberOfNodes()) + "\n");
+    trace(TRACE_0, "    number of edges: " + intToString(getNumberOfEdges()) + "\n");
+    trace(TRACE_0, "    number of deleted nodes: " + intToString(numberDeletedVertices) + "\n");
+    trace(TRACE_0, "    number of blue nodes: " + intToString(getNumberOfBlueNodes()) + "\n");
+    trace(TRACE_0, "    number of blue edges: " + intToString(getNumberOfBlueEdges()) + "\n");
+    trace(TRACE_0, "    number of states calculated: " + intToString(State::state_count) + "\n");
+    trace(TRACE_0, "    number of states stored in datastructure: " + intToString(State::state_count_stored_in_binDec) + "\n");
+    trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStoredStates()) + "\n");
+}
+
+//! \brief returns the number of stored states
+//!        may only be called after computeGraphStatistics()
+//! \return number stored states
+unsigned int AnnotatedGraph::getNumberOfStoredStates() const {
+    return nStoredStates;
+}
+
+
+//! \brief returns the number of edges
+//!        may only be called after computeGraphStatistics()
+//! \return number edges
+unsigned int AnnotatedGraph::getNumberOfEdges() const {
+    return nEdges;
+}
+
+
+//! \brief returns the number of blue nodes
+//!        may only be called after computeGraphStatistics()
+//! \return number of blue nodes
+unsigned int AnnotatedGraph::getNumberOfBlueNodes() const {
+    return nBlueNodes;
+}
+
+
+//! \brief returns the number of blue edges
+//!        may only be called after computeGraphStatistics()
+//! \return number blue edges
+unsigned int AnnotatedGraph::getNumberOfBlueEdges() const {
+    return nBlueEdges;
+}
+
+//! \brief returns the number of nodes
+//! \return number of nodes
+unsigned int AnnotatedGraph::getNumberOfNodes() const {
+    return setOfNodes.size();
+}
+
+/**** TRANSFERRED FROM COMMUNICATIONGRAPH END ****/
+
+//! \brief Computes and prints the statistics of this graph (Convenience method).
+void AnnotatedGraph::computeAndPrintGraphStatistics() {
+    trace(TRACE_5, "void AnnotatedGraph::computeAndPrintGraphStatistics() : start\n");
+    computeGraphStatistics();
+    printGraphStatistics();
+    trace(TRACE_5, "void AnnotatedGraph::computeAndPrintGraphStatistics() : end\n");
+}
+

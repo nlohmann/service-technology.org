@@ -465,13 +465,13 @@ string computeIG(oWFN* PN) {
     if (options[O_CALC_REDUCED_IG] || parameters[P_USE_EAD]) {
         trace(TRACE_0, "building the reduced interaction graph by using reduction rule(s)\n");
         if (parameters[P_USE_CRE]) {
-        	trace(TRACE_0, "\t \"combine receiving events\"\n");
+            trace(TRACE_0, "\t \"combine receiving events\"\n");
         }
         if (parameters[P_USE_RBS]) {
-        	trace(TRACE_0, "\t \"receiving before sending\"\n");
+            trace(TRACE_0, "\t \"receiving before sending\"\n");
         }
         if (parameters[P_USE_EAD]) {
-        	trace(TRACE_0, "\t \"early detection\"\n");
+            trace(TRACE_0, "\t \"early detection\"\n");
         }
     } else {
         trace(TRACE_0, "building the interaction graph...\n");
@@ -510,9 +510,9 @@ string computeIG(oWFN* PN) {
             graph->diagnose();
         }
 
-        if (!parameters[P_EQ_R]) {	// don't create png if we are in eqr mode
-        	// generate output files
-        	graph->printGraphToDot(); // .out, .png
+        if (!parameters[P_EQ_R]) {    // don't create png if we are in eqr mode
+            // generate output files
+            graph->printGraphToDot(); // .out, .png
 
                 if (parameters[P_TEX]) {
                     makeGasTex(graph);
@@ -633,12 +633,12 @@ string computeOG(oWFN* PN) {
             }
         }
 
-        if (!parameters[P_EQ_R]) {	// don't create png if we are in eqr mode
-        	graph->printGraphToDot(); // .out, .png
+        if (!parameters[P_EQ_R]) {    // don't create png if we are in eqr mode
+            graph->printGraphToDot(); // .out, .png
 
-        	if (parameters[P_TEX]) {
-        	    makeGasTex(graph);
-        	}
+            if (parameters[P_TEX]) {
+                makeGasTex(graph);
+            }
         }
 
         if (options[O_OUTFILEPREFIX]) {
@@ -751,10 +751,10 @@ void checkMatching(AnnotatedGraph* OGToMatch, oWFN* PN) {
     string reasonForFailedMatch;
     trace(TRACE_0, ("matching " + PN->filename + " with " + (OGToMatch->getFilename())+ "...\n\n"));
     if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
-    	trace(TRACE_1, "\n");
+        trace(TRACE_1, "\n");
         trace(TRACE_0, "oWFN matches with OG: YES\n\n");
     } else {
-    	trace(TRACE_1, "\n");
+        trace(TRACE_1, "\n");
         trace(TRACE_0, "Match failed: " +reasonForFailedMatch + "\n\n");
         trace(TRACE_0, "oWFN matches with OG: NO\n\n");
     }
@@ -890,9 +890,9 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
     // a possible violation should have been rejected by options.cc
     
     if (!parameters[P_EQ_R]) {
-    	assert(netfiles.size() + OGsFromFiles.size() == 2);
+        assert(netfiles.size() + OGsFromFiles.size() == 2);
     } else {
-    	assert(OGsFromFiles.size() == 2);
+        assert(OGsFromFiles.size() == 2);
     }
 
     if (OGsFromFiles.size() < 2) {
@@ -1265,7 +1265,7 @@ void reduceOWFN(oWFN* PN) {
     // Statistics of the reduced oWFN
     trace(TRACE_0, "Reduced oWFN statistics:\n");
     trace(PNapiNet->information());
-	trace(TRACE_0, "\n\n");
+    trace(TRACE_0, "\n\n");
 
     string outFileName;
 
@@ -1440,7 +1440,8 @@ int main(int argc, char** argv) {
 
     else if (parameters[P_COUNT_SERVICES] || parameters[P_CHECK_ACYCLIC] ||
              parameters[P_CHECK_FALSE_NODES] || parameters[P_REMOVE_FALSE_NODES] ||
-             parameters[P_PV] || parameters[P_MINIMIZE_OG] || parameters[P_READ_OG]) {
+             parameters[P_PV] || parameters[P_MINIMIZE_OG] || parameters[P_READ_OG] || 
+             (parameters[P_PNG] && ogfiles.size() != 0)) {
 
         // Abort if there are no OGs at all
         if (ogfiles.begin() == ogfiles.end() && !(parameters[P_PV])) {
@@ -1486,57 +1487,67 @@ int main(int argc, char** argv) {
             }
 
             else if (parameters[P_CHECK_FALSE_NODES]) {
-            	// checks if there are nodes in the og which violate the annotation
-            	trace(TRACE_0, "Checking '" + readOG->getFilename() + "' ");
-            	trace(TRACE_0, "for nodes with false annotation...");
+                // checks if there are nodes in the og which violate the annotation
+                trace(TRACE_0, "Checking '" + readOG->getFilename() + "' ");
+                trace(TRACE_0, "for nodes with false annotation...");
 
-            	std::vector<AnnotatedGraphNode*> falseNodes;
-            	readOG->findFalseNodes(&falseNodes);
+                std::vector<AnnotatedGraphNode*> falseNodes;
+                readOG->findFalseNodes(&falseNodes);
 
-            	if (falseNodes.size() == 0) {
-            		trace(TRACE_0, "\n\t No nodes with false annotation found!");
-            	} else {
-            		trace(TRACE_0, "\n\t Node(s) with false annotation found!");
-            		std::vector<AnnotatedGraphNode*>::iterator it = falseNodes.begin();
+                if (falseNodes.size() == 0) {
+                    trace(TRACE_0, "\n\t No nodes with false annotation found!");
+                } else {
+                    trace(TRACE_0, "\n\t Node(s) with false annotation found!");
+                    std::vector<AnnotatedGraphNode*>::iterator it = falseNodes.begin();
 
-            		while (it != falseNodes.end()) {
-            			AnnotatedGraphNode* currentNode = *it;
-            			trace(TRACE_1, "\n\t\t Node '" + currentNode->getName() + "' violates its annotation. ");
-            			trace(TRACE_2, "\n\t\t\t Annotation is: " + currentNode->getAnnotationAsString());
-            			++it;
-            		}
-            	}
+                    while (it != falseNodes.end()) {
+                        AnnotatedGraphNode* currentNode = *it;
+                        trace(TRACE_1, "\n\t\t Node '" + currentNode->getName() + "' violates its annotation. ");
+                        trace(TRACE_2, "\n\t\t\t Annotation is: " + currentNode->getAnnotationAsString());
+                        ++it;
+                    }
+                }
 
-            	trace(TRACE_0, "\n\n");
-            	delete readOG;
+                trace(TRACE_0, "\n\n");
+                delete readOG;
             }
 
             else if (parameters[P_REMOVE_FALSE_NODES]) {
-            	// checks if there are nodes in the og which violate the annotation
+                // checks if there are nodes in the og which violate the annotation
 
-            	trace(TRACE_0, "Removing nodes from '" + readOG->getFilename() + "' ");
-            	trace(TRACE_0, "that violate their own annotation...\n");
-            	readOG->removeFalseNodes();
-            	trace(TRACE_0, "Removed all nodes with false annotation.\n");
+                trace(TRACE_0, "Removing nodes from '" + readOG->getFilename() + "' ");
+                trace(TRACE_0, "that violate their own annotation...\n");
+                readOG->removeFalseNodes();
+                trace(TRACE_0, "Removed all nodes with false annotation.\n");
 
+                string newFilename;
+                if (options[O_OUTFILEPREFIX]) {
+                    newFilename = outfilePrefix;
+                } else {
+                    newFilename = AnnotatedGraph::stripOGFileSuffix(readOG->getFilename()) + ".blue";
+                }
+
+                trace(TRACE_0, "\nCreating new .og-file without false nodes... \n");
+                readOG->printOGFile(newFilename);
+                trace(TRACE_0, "New .og-file '" + newFilename + ".og' succesfully created.\n\n");
+
+                delete readOG;
+            }
+
+            else if (parameters[P_READ_OG]) {
+                readOG->computeAndPrintGraphStatistics();
+                delete readOG;
+            }
+            
+            else if (parameters[P_PNG]) {
             	string newFilename;
             	if (options[O_OUTFILEPREFIX]) {
             		newFilename = outfilePrefix;
             	} else {
-            		newFilename = AnnotatedGraph::stripOGFileSuffix(readOG->getFilename()) + ".blue";
+            		newFilename = readOG->getFilename();
             	}
-
-            	trace(TRACE_0, "\nCreating new .og-file without false nodes... \n");
-            	readOG->printOGFile(newFilename);
-            	trace(TRACE_0, "New .og-file '" + newFilename + ".og' succesfully created.\n\n");
-
+            	readOG->printDotFile(newFilename);
             	delete readOG;
-            }
-
-            else if (parameters[P_READ_OG]) {
-                // TODO print out graph statistics
-                // readOG->;
-                delete readOG;
             }
         }
 
@@ -1546,7 +1557,7 @@ int main(int argc, char** argv) {
         og_yylex_destroy();
 #endif
 
-        if (!parameters[P_PV]) {
+        if (!parameters[P_PV] && !parameters[P_PNG]) {
             return 0;
         }
     }
@@ -1585,100 +1596,100 @@ int main(int argc, char** argv) {
             OGToMatch = readog(*(ogfiles.begin()));
         }
 
-        string fileName;	// name of og-file
-        int loop = 0;		// in case the option -t eqR is set, we need each netfile to be processed twice
+        string fileName;    // name of og-file
+        int loop = 0;        // in case the option -t eqR is set, we need each netfile to be processed twice
         ogfiles.clear();
         
-        if (!parameters[P_EQ_R]) {		// option is not set, so we don't do the loop
-        	loop = 27;				// loop needs to be higher than 1 ;-)
+        if (!parameters[P_EQ_R]) {        // option is not set, so we don't do the loop
+            loop = 27;                // loop needs to be higher than 1 ;-)
         }
         
         // ---------------- processing every single net -------------------
         for (list<std::string>::iterator netiter = netfiles.begin();
              netiter != netfiles.end(); ++netiter) {
 
-        	// calculate the graph of the same net twice --> once with -R and once with no -R
-        	// in case the option -t eqR is set, otherwise we go through this loop only once
-	        do {
-	            numberOfEvents = 0;
-	            numberOfDecodes = 0;
-	            garbagefound = 0;
-	            global_progress = 0;
-	            show_progress = 0;
-	            State::state_count = 0; // number of states
-	            State::state_count_stored_in_binDec = 0; // number of states
-	            numberDeletedVertices = 0;
-	
-	            currentowfnfile = *netiter;
-	            assert(currentowfnfile != "");
-	
-	            // prepare getting the net
-	            PlaceTable = new SymbolTab<PlSymbol>;
-	
-	            // get the net
-	            readnet(currentowfnfile);
-	            trace(TRACE_0, "=================================================================\n");
-	            trace(TRACE_0, "processing net " + currentowfnfile + "\n");
-	            reportNet();
-	            delete PlaceTable;
+            // calculate the graph of the same net twice --> once with -R and once with no -R
+            // in case the option -t eqR is set, otherwise we go through this loop only once
+            do {
+                numberOfEvents = 0;
+                numberOfDecodes = 0;
+                garbagefound = 0;
+                global_progress = 0;
+                show_progress = 0;
+                State::state_count = 0; // number of states
+                State::state_count_stored_in_binDec = 0; // number of states
+                numberDeletedVertices = 0;
+    
+                currentowfnfile = *netiter;
+                assert(currentowfnfile != "");
+    
+                // prepare getting the net
+                PlaceTable = new SymbolTab<PlSymbol>;
+    
+                // get the net
+                readnet(currentowfnfile);
+                trace(TRACE_0, "=================================================================\n");
+                trace(TRACE_0, "processing net " + currentowfnfile + "\n");
+                reportNet();
+                delete PlaceTable;
 
                     if (currentowfnfile == "<stdin>") currentowfnfile = "stdin";
-	
-	            // start computation
-	            fileName = "";		// name of computed og-file
-	            
-	            if (parameters[P_IG]) {
-	                // computing IG of the current oWFN
-	                reportOptionValues(); // adjust events_manual and print limit of considering events
-	                fileName = computeIG(PN);
-	            }
-	
-	            if (parameters[P_OG] || parameters[P_PV]) {
-	                // computing OG of the current oWFN
-	                reportOptionValues(); // adjust events_manual and print limit of considering events
-	                fileName = computeOG(PN);
-	            }
+    
+                // start computation
+                fileName = "";        // name of computed og-file
+                
+                if (parameters[P_IG]) {
+                    // computing IG of the current oWFN
+                    reportOptionValues(); // adjust events_manual and print limit of considering events
+                    fileName = computeIG(PN);
+                }
+    
+                if (parameters[P_OG] || parameters[P_PV]) {
+                    // computing OG of the current oWFN
+                    reportOptionValues(); // adjust events_manual and print limit of considering events
+                    fileName = computeOG(PN);
+                }
 
-	            if (parameters[P_MATCH]) {
-	                // matching the current oWFN against the single OG 
-	                checkMatching(OGToMatch, PN);
-	            }
-	
-	            if (parameters[P_PNG]) {
-	                // create a png file of the given net
-	                makePNG(PN);
-	            }
+                if (parameters[P_MATCH]) {
+                    // matching the current oWFN against the single OG 
+                    checkMatching(OGToMatch, PN);
+                }
+    
+                if (parameters[P_PNG]) {
+                    // create a png file of the given net
+                    makePNG(PN);
+                }
 
-	            if (parameters[P_REDUCE]) {
-	                // create a png file of the given net
-	                reduceOWFN(PN);
-	            }
+                if (parameters[P_REDUCE]) {
+                    // create a png file of the given net
+                    reduceOWFN(PN);
+                }
 
-	            if (parameters[P_EQ_R]) {
-	            	// reverse reduction mode for the next loop
-		        options[O_CALC_ALL_STATES] = !options[O_CALC_ALL_STATES];
-		        // remember file name of og-file to check equivalence later on
-	            	ogfiles.push_back(AnnotatedGraph::addOGFileSuffix(fileName));
-	            }
+                if (parameters[P_EQ_R]) {
+                    // reverse reduction mode for the next loop
+                options[O_CALC_ALL_STATES] = !options[O_CALC_ALL_STATES];
+                // remember file name of og-file to check equivalence later on
+                    ogfiles.push_back(AnnotatedGraph::addOGFileSuffix(fileName));
+                }
 
-	            //delete PN;
-       	            //trace(TRACE_5, "net deleted\n");
+                //delete PN;
+                       //trace(TRACE_5, "net deleted\n");
 
-       	            loop++;
-	        } while (loop <= 1);	// calculate the graph of the same net twice --> once with -R and once with no -R
-	        
-	        if (parameters[P_EQ_R]) {
-	            // reading all og-files
-	            AnnotatedGraph::ogs_t OGsFromFiles;
-	            readAllOGs(OGsFromFiles);
-	            
-	            // check equivalence of both graphs
-	            checkEquivalence(OGsFromFiles);
-	            
-	            OGsFromFiles.clear();
-	            loop = 0;
-	            ogfiles.clear();
-	        }
+                       loop++;
+            } while (loop <= 1);    // calculate the graph of the same net twice --> once with -R and once with no -R
+            
+            if (parameters[P_EQ_R]) {
+                // reading all og-files
+                AnnotatedGraph::ogs_t OGsFromFiles;
+                readAllOGs(OGsFromFiles);
+                
+                // check equivalence of both graphs
+                checkEquivalence(OGsFromFiles);
+                
+                OGsFromFiles.clear();
+                loop = 0;
+                ogfiles.clear();
+            }
         }
 
        

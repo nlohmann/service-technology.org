@@ -29,7 +29,7 @@
  * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
  *
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universit‰t zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universit√§t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
@@ -57,87 +57,81 @@ extern int show_progress;
 class CommunicationGraph : public AnnotatedGraph {
     private:
 
-        /// Computes the total number of all states stored in all nodes and the
-        /// number of all edges in this graph.
-        void computeNumberOfStatesAndEdges();
+        /// recursive helper function for diagnose()
+        GraphNodeDiagnosisColor_enum diagnose_recursively(AnnotatedGraphNode* v,
+                                                          std::map<AnnotatedGraphNode*, bool>& visitedNodes);
 
-        /// Helps computeNumberOfStatesAndEdges to computes the total number of all
-        /// states stored in all nodes and the number of all edges in this graph.
-        void computeNumberOfStatesAndEdgesHelper(AnnotatedGraphNode* v,
-                                                 std::map<AnnotatedGraphNode*, bool>& visitedNodes);
 
-        /// Computes the number of all blue to be shown nodes and edges in this
-        /// graph.
-        void computeNumberOfBlueNodesEdges();
+        /// recursive helper function for printGraphToDot()
+        void printGraphToDotRecursively(AnnotatedGraphNode* v,
+                                        fstream& os,
+                                        std::map<AnnotatedGraphNode*, bool>&);
 
-        /// Helps computeNumberOfBlueNodesEdges() to computes the number of all blue
-        /// to be shown nodes and edges in this graph.
-        void computeNumberOfBlueNodesEdgesHelper(AnnotatedGraphNode* v, std::map<AnnotatedGraphNode*, bool>& visitedNodes);
+        /// recursive helper function for printGraphToSTG()
+        void printGraphToSTGRecursively(AnnotatedGraphNode* v,
+                                        fstream& os,
+                                        std::map<AnnotatedGraphNode*, bool>&);
 
-        /// The total number of all states stored in all nodes in this graph.
-        /// Is computed by computeNumberOfStatesAndEdges().
-        unsigned int nStoredStates;
+        /// recursive helper function for annotateGraphDistributedly()
+        bool annotateGraphDistributedlyRecursively(AnnotatedGraphNode* v,
+                                                   std::map<AnnotatedGraphNode*, bool>&);
 
-        /// The number of all edges in this graph.
-        /// Is computed by computeNumberOfStatesAndEdges().
-        unsigned int nEdges;
+        /// helper function for annotateGraphDistributedly()
+        void removeLabeledSuccessor(AnnotatedGraphNode* v, std::string label);
 
-        /// The number of blue to be shown nodes in this graph.
-        /// Is computed by computeNumberOfBlueNodesEdges().
-        unsigned int nBlueNodes;
-
-        /// The number of blue to be shown edges in this graph.
-        /// Is computed by computeNumberOfBlueNodesEdges().
-        unsigned int nBlueEdges;
 
     protected:
-        oWFN* PN; //!< pointer to the underlying petri net
+
+        /// Pointer to the underlying petri net.
+        oWFN* PN;
 
         /// store temporarily calculated states in binDecision structure
         binDecision * tempBinDecision;
-        
+
+        /// this set contains all states of the newly calculated node
+        StateSet setOfStatesStubbornTemp;
+
+        /// A sorted set of the nodes in the graph. Should always contain the same nodes as the vector, though iteration order can differ.
+        GraphNodeSet setOfSortedNodes;
+
         void addProgress(double);
-        
+
     public:
 
         /// basic constructor
         CommunicationGraph(oWFN *);
-        
-        /// basic deconstructor
+
+        /// basic destructor
         virtual ~CommunicationGraph();
 
-        GraphNodeSet setOfSortedNodes;
 
-        /// this set contains all states of the newly calculated node
-        StateSet setOfStatesStubbornTemp; 
-        
-        /// calculate a root node for the graph
-        void calculateRootNode();
+
+        /// Returns the number of nodes in this graph.
+        virtual unsigned int getNumberOfNodes() const;
+
+        /// Adds a node to the CommunicationGraph. The node is inserted in both sets.
+        virtual void addNode(AnnotatedGraphNode*);
 
         /// remove a node from the annotated graph
         virtual void removeNode(AnnotatedGraphNode*);
-        
-        /// Returns the number of nodes in this graph.
-        unsigned int getNumberOfNodes() const;
-
-        /// Returns the total number of all states stored in all nodes in this
-        /// graph. May only be called after computeGraphStatistics().
-        unsigned int getNumberOfStoredStates() const;
-
-        /// Returns the number of all edges in this graph. May only be called after
-        /// computeGraphStatistics().
-        unsigned int getNumberOfEdges() const;
-
-        /// Returns the number of all blue to be shown nodes in this graph. May only
-        /// be called after computeGraphStatistics().
-        unsigned int getNumberOfBlueNodes() const;
-
-        /// Returns the number of all blue to be shown edges in this graph. May only
-        /// be called after computeGraphStatistics().
-        unsigned int getNumberOfBlueEdges() const;
 
         /// checks if the given node is in the graphs node set
         AnnotatedGraphNode* findGraphNodeInSet(AnnotatedGraphNode*);
+
+
+
+        /// calculate a root node for the graph
+        void calculateRootNode();
+
+        /// function to annotate the OG for distributed controllability
+        bool annotateGraphDistributedly();
+
+        /// gives a diagnosis of the graph
+        void diagnose();
+
+        /// checks wether a state activates output events
+        bool stateActivatesOutputEvents(State*);
+
 
         /// prints the current global progress value depending whether the value
         /// changed significantly and depending on the debug-level set
@@ -147,53 +141,19 @@ class CommunicationGraph : public AnnotatedGraph {
         /// changed significantly and depending on the debug-level set
         void printProgress();
 
-        void buildGraphRandom();
-        void analyseNode(AnnotatedGraphNode*);
-
         /// brief creates a dot file of the graph
         void printGraphToDot();
-
-        /// recursive helper function for printGraphToDot()
-        void printGraphToDotRecursively(AnnotatedGraphNode* v,
-                                        fstream& os,
-                                        std::map<AnnotatedGraphNode*, bool>&);
 
         /// function to create an STG representation of the IG or OG
         void printGraphToSTG();
 
-        /// recursive helper function for printGraphToSTG()
-        void printGraphToSTGRecursively(AnnotatedGraphNode* v,
-                                        fstream& os,
-                                        std::map<AnnotatedGraphNode*, bool>&);
-
-        /// function to annotate the OG for distributed controllability
-        bool annotateGraphDistributedly();
-
-        /// recursive helper function for annotateGraphDistributedly()
-        bool annotateGraphDistributedlyRecursively(AnnotatedGraphNode* v,
-                                                   std::map<AnnotatedGraphNode*, bool>&);
-        /// helper function for annotateGraphDistributedly()
-        void removeLabeledSuccessor(AnnotatedGraphNode* v, std::string label);
-
-        /// gives a diagnosis of the graph
-        void diagnose();
-
-        /// recursive helper function for diagnose()
-        GraphNodeDiagnosisColor_enum diagnose_recursively(AnnotatedGraphNode* v,
-                                                          std::map<AnnotatedGraphNode*, bool>& visitedNodes);
-
-        /// Computes statistics about this graph
-        void computeGraphStatistics();
-
-        /// Prints statistics about this graph. May only be called after
-        /// computeGraphStatistics().
-        void printGraphStatistics();
-
-        /// checks wethe a state activates output events
-        bool stateActivatesOutputEvents(State*);
 
         /// deletes the corresponding oWFN
         void deleteOWFN();
+
+        /// Neither implemented nor used somewhere:
+        void buildGraphRandom();
+
 
         // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new

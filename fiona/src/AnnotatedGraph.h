@@ -187,6 +187,11 @@ class AnnotatedGraph : public Graph {
                      const std::string& dstName,
                      const std::string& label);
 
+        /// creates a new edge in the graph
+        void addEdge(AnnotatedGraphNode * src,
+                     AnnotatedGraphNode * dst,
+                     const std::string& label);
+
         /// returns true if a node with the given name was found
         bool hasNodeWithName(const std::string& nodeName) const;
 

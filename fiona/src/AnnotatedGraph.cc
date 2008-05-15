@@ -178,6 +178,19 @@ void AnnotatedGraph::addEdge(const std::string& srcName,
 }
 
 
+//! \brief create a new edge in the graph
+//! \param srcName a string containing the name of the source node
+//! \param dstNodeName a string containing the name of the destination node
+//! \param label a string containing the label of the edge
+void AnnotatedGraph::addEdge(AnnotatedGraphNode * src,
+                             AnnotatedGraphNode * dst,
+                             const std::string& label) {
+
+    AnnotatedGraphEdge* transition = new AnnotatedGraphEdge(dst, label);
+    src->addLeavingEdge(transition);
+}
+
+
 //! \brief removes all edges that have a given node as destination
 //! \param nodeToDelete a pointer to the node that will be deleted
 void AnnotatedGraph::removeEdgesToNodeFromAllOtherNodes(const AnnotatedGraphNode* nodeToDelete) {

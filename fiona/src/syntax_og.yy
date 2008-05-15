@@ -62,7 +62,7 @@ extern int og_yylex();
 using namespace std;
 
 AnnotatedGraph* OGToParse;
-map<string, bool> nodeAlreadyAdded;
+map<string, AnnotatedGraphNode*> nodes;
 
 void og_yyerror_unknown_node(const std::string& nodeName)
 {
@@ -120,7 +120,7 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
 
 og: nodes initialnode transitions
     {
-        nodeAlreadyAdded.clear();
+        nodes.clear();
     }
 ;
 
@@ -134,12 +134,12 @@ nodes_list: nodes_list comma node
 
 node: ident colon formula color_optional finalnode_optional
     {
-        if (nodeAlreadyAdded[$1]) {
+        if (nodes[$1] != NULL) {
             og_yyerror_node_already_defined($1);
         }
 
         AnnotatedGraphNode* currentNode = OGToParse->addNode($1, $3, $4);
-        nodeAlreadyAdded[$1] = true;
+        nodes[$1] = currentNode;
         currentNode->setFinal($5);
         free($1);
     }
@@ -210,7 +210,7 @@ finalnode_optional: key_finalnode
 
 initialnode: key_initialnode ident
     {
-        if (!nodeAlreadyAdded[$2]) {
+        if (nodes[$2] == NULL) {
             og_yyerror_unknown_node($2);
         }
 
@@ -230,15 +230,15 @@ transitions_list: transitions_list comma transition
 
 transition: ident arrow ident colon ident
     {
-        if (!nodeAlreadyAdded[$1]) {
+        if (nodes[$1] == NULL) {
             og_yyerror_unknown_node($1);
         }
-
-        if (!nodeAlreadyAdded[$3]) {
+    
+        if (nodes[$3] == NULL) {
             og_yyerror_unknown_node($3);
         }
 
-        OGToParse->addEdge($1, $3, $5);
+        OGToParse->addEdge(nodes[$1], nodes[$3], $5);
         free($1);
         free($3);
         free($5);

@@ -55,7 +55,9 @@
 
 
 class AnnotatedGraph : public Graph {
-    public:
+
+	// Public Typedefs
+	public:
 
         /// Type of container passed to AnnotatedGraph::product().
         typedef std::list<AnnotatedGraph*> ogs_t;
@@ -68,22 +70,29 @@ class AnnotatedGraph : public Graph {
         /// Type of container of transitions associated to each label
         typedef map<string, EdgeSet> TransitionMap;
 
+        /// Type of container of nodes stored in this graph
         typedef std::vector<AnnotatedGraphNode*> nodes_t;
 
+        /// Type of the predecessor map
         typedef std::map< AnnotatedGraphNode*, AnnotatedGraphNode::LeavingEdges > predecessorMap;
 
+    // Protected Methods and typedefs    
     protected:
+
+        /// Iterator types for nodes
+        typedef nodes_t::const_iterator nodes_const_iterator;
+        typedef nodes_t::iterator nodes_iterator;
+
         /// name of the file that was source of the graph
         std::string filename;
 
+        /// A pointer to the root node
         AnnotatedGraphNode* root;
 
         GraphFormulaCNF* covConstraint;
 
+        /// The nodes stored in this graph. Not a set on this level but a vector.
         nodes_t setOfNodes; // needed for proper deletion of OG.
-
-        typedef nodes_t::const_iterator nodes_const_iterator;
-        typedef nodes_t::iterator nodes_iterator;
 
         /// remove all edges that have a given node as destination
         void removeEdgesToNodeFromAllOtherNodes(const AnnotatedGraphNode* nodeToDelete);
@@ -169,21 +178,17 @@ class AnnotatedGraph : public Graph {
 
 
         /// Computes the total number of all states stored in all nodes and the
-        /// number of all edges in this graph.
-        void computeNumberOfStatesAndEdges();
+        /// number of all nodes and edges in this graph. Furthermore computes the
+        /// number of blue nodes and edges.
+        /// Uses computeNumberOfNodesAndStatesAndEdgesHelper to do a dfs. 
+        void computeNumberOfNodesAndStatesAndEdges();
 
         /// Helps computeNumberOfStatesAndEdges to computes the total number of all
-        /// states stored in all nodes and the number of all edges in this graph.
-        void computeNumberOfStatesAndEdgesHelper(AnnotatedGraphNode* v,
-                                                 std::map<AnnotatedGraphNode*, bool>& visitedNodes);
-
-        /// Computes the number of all blue to be shown nodes and edges in this
-        /// graph.
-        void computeNumberOfBlueNodesEdges();
-
-        /// Helps computeNumberOfBlueNodesEdges() to computes the number of all blue
-        /// to be shown nodes and edges in this graph.
-        void computeNumberOfBlueNodesEdgesHelper(AnnotatedGraphNode* v, std::map<AnnotatedGraphNode*, bool>& visitedNodes);
+        /// states stored in all nodes and the number of all nodes and edges in this graph.
+        /// Furthermore computes the number of blue nodes and edges.
+        void computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphNode* v,
+                                                 std::map<AnnotatedGraphNode*, bool>& visitedNodes, 
+                                                 bool onABluePath);
 
         /// The total number of all states stored in all nodes in this graph.
         /// Is computed by computeNumberOfStatesAndEdges().
@@ -220,11 +225,12 @@ class AnnotatedGraph : public Graph {
 
 
         /// collects all connected Nodes in a set (recursive helper function)
-          void removeDisconnectedNodesRecursively(AnnotatedGraphNode* currentNode,
+        void removeDisconnectedNodesRecursively(AnnotatedGraphNode* currentNode,
                                                 set<AnnotatedGraphNode*>& connectedNodes);
 
 
 
+    // Public methods
     public:
 
         /// basic constructor
@@ -343,6 +349,7 @@ class AnnotatedGraph : public Graph {
         /// computes the number of Services determined by this OG
         unsigned int numberOfServices();
 
+        /// Minimizes the graph
         void minimizeGraph();
 
         /// tests if this OG is acyclic
@@ -389,7 +396,6 @@ class AnnotatedGraph : public Graph {
         void getPredecessorRelation(AnnotatedGraph::predecessorMap& resultMap);
 
 // END OD CODE FROM CG
-
 
 // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new

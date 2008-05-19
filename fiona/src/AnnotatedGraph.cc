@@ -3051,158 +3051,98 @@ void AnnotatedGraph::assignFinalNodes() {
 
 /**** TRANSFERRED FROM COMMUNICATIONGRAPH START ****/
 
-//! \brief Computes the total number of all states stored in all nodes and the
-//!        number of all edges in this graph.
-void AnnotatedGraph::computeNumberOfStatesAndEdges() {
+//! \brief Computes the total number of all nodes, edges and states 
+//!        stored in all nodes in the graph. Also computes the number
+//!		   of blue nodes and edges in the graph by remembering if a 
+//!		   'blue path' is processed, which means the nodes and edges 
+//!		   processed were reached over a path of blue nodes and edges. 
+//!		   The function also respects the parameter if empty nodes are 
+//!		   to be shown or not. 
+void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdges() {
+	// Reset statistic variables
+	std::map<AnnotatedGraphNode*, bool> visitedNodes;
+	nStoredStates = 0;
+	nEdges = 0;
+	nBlueEdges = 0;
+	nBlueNodes = 0;
 
-    std::map<AnnotatedGraphNode*, bool> visitedNodes;
-    nStoredStates = 0;
-    nEdges = 0;
-
-    computeNumberOfStatesAndEdgesHelper(root, visitedNodes);
+	// Call the recursive helper
+	computeNumberOfNodesAndStatesAndEdgesHelper(root, visitedNodes, (root->getColor() == BLUE));
 }
 
 
 //! \brief Helps computeNumberOfStatesAndEdges to computes the total number of all
-//!        states stored in all nodes and the number of all edges in this graph.
+//!        states stored in all nodes, the number of nodes and the number of all 
+//!		   edges in this graph. Also finds out which nodes and edges are to be 
+//!        counted as blue. 
 //!        This is done recursively (dfs).
 //! \param v Current node in the iteration process.
 //! \param visitedNodes[] Array of bool storing the nodes that we have
 //!        already looked at.
-void AnnotatedGraph::computeNumberOfStatesAndEdgesHelper(AnnotatedGraphNode* v,
-                                                             std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
+//! \param onABluePath true if we are on a blue path
+void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphNode* v,
+		std::map<AnnotatedGraphNode*, bool>& visitedNodes, 
+		bool onABluePath) {
 
-    assert(v != NULL);
+	assert(v != NULL);
 
-    // counting the current node
-    visitedNodes[v] = true;
+	// counting the current node
+	visitedNodes[v] = true;
 
-    nStoredStates += v->reachGraphStateSet.size();
+	// Determine if we have a blue node and are on a blue path.
+	if (onABluePath && (v->getColor() == BLUE) && (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
+		++nBlueNodes;
+	} else {
+		onABluePath = false;
+	}
 
-    // iterating over all successors
-    AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+	// Add the new states
+	nStoredStates += v->reachGraphStateSet.size();
 
-    while (edgeIter->hasNext()) {
-        AnnotatedGraphEdge* leavingEdge = edgeIter->getNext();
+	// iterating over all successors
+	AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+	while (edgeIter->hasNext()) {
+		AnnotatedGraphEdge* leavingEdge = edgeIter->getNext();
 
-        AnnotatedGraphNode* vNext = (AnnotatedGraphNode *)leavingEdge->getDstNode();
-        assert(vNext != NULL);
+		AnnotatedGraphNode* vNext = (AnnotatedGraphNode *)leavingEdge->getDstNode();
+		assert(vNext != NULL);
 
-        nEdges++;
+		// We have found a new edge
+		++nEdges;
 
-        if ((vNext != v) && !visitedNodes[vNext]) {
-            computeNumberOfStatesAndEdgesHelper(vNext, visitedNodes);
-        }
-    }
-    delete edgeIter;
+		// Current blue path status
+		bool onABluePathInLoop = onABluePath;
+
+		// Determine wether we have a blue edge or not.
+		if (onABluePath && vNext->getColor() == BLUE &&
+				(parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
+			++nBlueEdges;
+		} else {
+			onABluePathInLoop = false;
+		}
+
+		if ((vNext != v) && !visitedNodes[vNext]) {
+			// Call recursively with the current blue path status. 
+			computeNumberOfNodesAndStatesAndEdgesHelper(vNext, visitedNodes, onABluePathInLoop);
+		}
+	}
+	delete edgeIter;
 }
 
 
-//! \brief Computes the number of all blue to be shown nodes and edges in this
-//!        graph.
-void AnnotatedGraph::computeNumberOfBlueNodesEdges() {
-
-    std::map<AnnotatedGraphNode*, bool> visitedNodes;
-    nBlueNodes = 0;
-    nBlueEdges = 0;
-
-    computeNumberOfBlueNodesEdgesHelper(root, visitedNodes);
-}
-
-
-//! \brief Helps computeNumberOfBlueNodesEdges() to computes the number of all blue
-//!        to be shown nodes and edges in this graph.
-//!        This is done recursively (dfs).
-//! \param v Current node in the iteration process.
-//! \param visitedNodes[] Array of bool storing the nodes that we have
-//!        already looked at.
-void AnnotatedGraph::computeNumberOfBlueNodesEdgesHelper(AnnotatedGraphNode* v,
-                                                             std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
-
-    assert(v != NULL);
-
-    // counting the current node
-    visitedNodes[v] = true;
-
-    if (v->getColor() == BLUE &&
-        (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
-
-        nBlueNodes++;
-
-        // iterating over all successors
-        AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
-
-        while (edgeIter->hasNext()) {
-            AnnotatedGraphEdge* leavingEdge = edgeIter->getNext();
-
-            AnnotatedGraphNode* vNext = (AnnotatedGraphNode *)leavingEdge->getDstNode();
-            assert(vNext != NULL);
-
-            if (vNext->getColor() == BLUE &&
-                (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
-
-                nBlueEdges++;
-            }
-
-            if ((vNext != v) && !visitedNodes[vNext]) {
-                computeNumberOfBlueNodesEdgesHelper(vNext, visitedNodes);
-            }
-        } // while
-        delete edgeIter;
-    }
-}
 
 //! \brief Computes statistics about this graph. They can be printed by
 //!        printGraphStatistics().
 void AnnotatedGraph::computeGraphStatistics() {
-    computeNumberOfStatesAndEdges();
-    computeNumberOfBlueNodesEdges();
-
+	trace(TRACE_5, "AnnotatedGraph::computeGraphStatistics(): start\n");
+	computeNumberOfNodesAndStatesAndEdges();
+	trace(TRACE_5, "AnnotatedGraph::computeGraphStatistics(): end\n");
 }
-
-
-/** still needs work.
-
- void AnnotatedGraph::alternativeComputeGraphStatistics() {
-
-    nBlueNodes = 0;
-    nBlueEdges = 0;
-    nEdges = 0;
-    nStoredStates = 0;
-
-
-    for (nodes_t::iterator it = setOfNodes.begin(); it != setOfNodes.end(); ++it) {
-        if ((*it)->getColor() == BLUE &&
-                (parameters[P_SHOW_EMPTY_NODE] || (*it)->reachGraphStateSet.size() != 0)) {
-            ++nBlueNodes;
-        }
-
-        nStoredStates += (*it)->reachGraphStateSet.size();
-
-        // iterating over all edges
-        AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = (*it)->getLeavingEdgesConstIterator();
-                while (edgeIter->hasNext()) {
-                    AnnotatedGraphEdge* leavingEdge = edgeIter->getNext();
-                    ++nEdges;
-
-                    AnnotatedGraphNode* vNext = (AnnotatedGraphNode *)leavingEdge->getDstNode();
-                    assert(vNext != NULL);
-
-
-                    if (vNext->getColor() == BLUE && (*it)->getColor() == BLUE &&
-                                    (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
-                                    ++nBlueEdges;
-                                    }
-                }
-    }
-
-}
-
-**/
 
 //! \brief Prints statistics about this graph. May only be called after
 //!       computeGraphStatistics().
 void AnnotatedGraph::printGraphStatistics() {
+	trace(TRACE_5, "AnnotatedGraph::printGraphStatistics(): start\n");
     trace(TRACE_0, "    number of nodes: " + intToString(getNumberOfNodes()) + "\n");
     trace(TRACE_0, "    number of edges: " + intToString(getNumberOfEdges()) + "\n");
     trace(TRACE_0, "    number of deleted nodes: " + intToString(numberDeletedVertices) + "\n");
@@ -3211,6 +3151,7 @@ void AnnotatedGraph::printGraphStatistics() {
     trace(TRACE_0, "    number of states calculated: " + intToString(State::state_count) + "\n");
     trace(TRACE_0, "    number of states stored in datastructure: " + intToString(State::state_count_stored_in_binDec) + "\n");
     trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStoredStates()) + "\n");
+	trace(TRACE_5, "AnnotatedGraph::printGraphStatistics(): end\n");
 }
 
 //! \brief returns the number of stored states

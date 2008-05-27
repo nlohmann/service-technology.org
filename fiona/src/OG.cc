@@ -91,33 +91,14 @@ void OG::buildGraph() {
     // second parameter means: if finished, 100% of the graph is constructed
     buildGraph(getRoot(), 1);
 
-
-
     time_t seconds, seconds2;
-    cout << endl;
 
-    cout << "setting final nodes..." << endl;
+    trace(TRACE_2, "setting final nodes...\n");
     seconds = time(NULL);
     assignFinalNodes();
     seconds2 = time(NULL);
-    cout << "    " << difftime(seconds2, seconds) << " s consumed" << endl;
-    cout << "finished setting final nodes..." << endl;
-
-    cout << "computing graph statistics..." << endl;
-    seconds = time(NULL);
-    computeGraphStatistics();
-    seconds2 = time(NULL);
-    cout << "    " << difftime(seconds2, seconds) << " s consumed" << endl;
-    cout << "finished computing graph statistics..." << endl;
-
-    if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
-        cout << "removing false nodes..." << endl;
-        seconds = time(NULL);
-        removeFalseNodes();
-        seconds2 = time(NULL);
-        cout << "    " << difftime(seconds2, seconds) << " s consumed" << endl;
-        cout << "finished removing false nodes..." << endl;
-    }
+    trace(TRACE_2, "finished setting final nodes...\n");
+    trace(TRACE_3, "    " + intToString((int) difftime(seconds2, seconds)) + " s consumed.\n");
 }
 
 

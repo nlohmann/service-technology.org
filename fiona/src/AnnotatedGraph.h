@@ -56,8 +56,8 @@
 
 class AnnotatedGraph : public Graph {
 
-	// Public Typedefs
-	public:
+    // Public Typedefs
+    public:
 
         /// Type of container passed to AnnotatedGraph::product().
         typedef std::list<AnnotatedGraph*> ogs_t;
@@ -142,6 +142,7 @@ class AnnotatedGraph : public Graph {
         //! NOTE: graph has to be acyclic!
         GraphFormulaMultiaryAnd* createStructureFormulaRecursively(AnnotatedGraphNode*);
 
+       
 // CODE FROM PL
         set<std::string> sendEvents;
         set<std::string> recvEvents;
@@ -283,11 +284,23 @@ class AnnotatedGraph : public Graph {
         void findFalseNodes(std::vector<AnnotatedGraphNode*>* falseNodes);
 
         /// removes all nodes that are always false
-        virtual void removeFalseNodes();
+        virtual void removeReachableFalseNodes();
+        
+        /// removes all nodes that are always false
+        virtual void removeReachableFalseNodesRecursively(set<AnnotatedGraphNode*>& candidates, map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >& parentNodes);
+        
+        /// removes all nodes that are always false
+        virtual void removeReachableFalseNodesInit(AnnotatedGraphNode* currentNode, set<AnnotatedGraphNode*>& redNodes, map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >& parentNodes, set<AnnotatedGraphNode*>& visitedNodes);
+        
 
         /// removes all nodes that have been disconnected from the root
         /// node due to other node removals
-        void removeDisconnectedNodes();
+        void removeUnreachableNodes();
+
+
+        /// deletes all visited nodes from the set of assumedly unreachable nodes
+          void removeUnreachableNodesRecursively(AnnotatedGraphNode* currentNode,
+                                                set<AnnotatedGraphNode*>& unreachableNodes);
 
         /// returns the name of the source file for the Graph
         std::string getFilename();

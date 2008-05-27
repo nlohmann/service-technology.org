@@ -38,6 +38,7 @@
 #define GraphFormula_H_
 
 #include <string>
+#include <set>
 #include <list>
 #include <map>
 #include "mynew.h"
@@ -118,6 +119,10 @@ class GraphFormula {
         ///  GraphFormulaAssignment.
         virtual bool value(const GraphFormulaAssignment& assignment) const = 0;
 
+        /// fills the given set of strings with all event-representing literals
+        /// from the formula
+        virtual void getEventLiterals(std::set<std::string>& events);        
+        
         /// removes a literal from the whole formula
         virtual void removeLiteral(const std::string&);
 
@@ -212,6 +217,10 @@ class GraphFormulaMultiary : public GraphFormula {
         /// removes the subformula at the given iterator
         iterator removeSubFormula(iterator subformula);
 
+        /// fills the given set of strings with all event-representing literals
+        /// from the formula
+        virtual void getEventLiterals(std::set<std::string>& events);        
+        
         /// removes a literal from this formula
         virtual void removeLiteral(const std::string&);
 
@@ -405,6 +414,10 @@ class GraphFormulaLiteral : public GraphFormula {
 #undef FALSE /* FALSE may interfere with macro in cudd package. */
         static const std::string FALSE;
 #define FALSE 0
+
+        /// fills the given set of strings with all event-representing literals
+        /// from the formula
+        void getEventLiterals(std::set<std::string>& events);        
 
         /// Constructs a literal with the given string representation.
         GraphFormulaLiteral(const std::string& literal);

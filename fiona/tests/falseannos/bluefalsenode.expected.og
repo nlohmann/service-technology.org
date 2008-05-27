@@ -1,0 +1,9 @@
+NODES
+  0 : !b : blue,
+  5 : final : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 5 : !b;

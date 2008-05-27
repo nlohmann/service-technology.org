@@ -105,6 +105,11 @@ bool GraphFormula::satisfies(const GraphFormulaAssignment& assignment) const {
 
 
 //! \brief Placeholder for a virtual function
+void GraphFormula::getEventLiterals(set<string>& events) {
+}
+
+
+//! \brief Placeholder for a virtual function
 void GraphFormula::removeLiteral(const std::string&) {
 }
 
@@ -380,6 +385,29 @@ GraphFormulaMultiary::removeSubFormula(iterator subformula) {
     return subFormulas.erase(subformula);
 }
 
+//! \brief fills the given set of strings with all event-representing 
+//!        literals from the formula
+//! \param events set of strings to fill
+void GraphFormulaMultiary::getEventLiterals(set<string>& events)  {
+
+    trace(TRACE_5, "GraphFormulaMultiary::getEventLiterals(set<string>& events) : start\n");
+
+    // iterate over all subformulas
+    subFormulas_t::iterator iCurrentFormula;
+
+    for (iCurrentFormula = subFormulas.begin();
+         iCurrentFormula != subFormulas.end();) {
+
+        // gather the events of every singe subformula
+        (*iCurrentFormula)->getEventLiterals(events);
+
+        iCurrentFormula++;
+    }
+
+    trace(TRACE_5, "GraphFormulaMultiary::getEventLiterals(set<string>& events) : end\n");
+    
+}
+
 
 //! \brief removes the given literal from the formula
 //! \param name the name of the literal to be removed
@@ -389,7 +417,7 @@ void GraphFormulaMultiary::removeLiteral(const std::string& name) {
 
     subFormulas_t::iterator iCurrentFormula;
     //cout << "\tanzahl von klauseln: " << subFormulas.size() << endl; int i = 1;
-    //cout << "\tremoving literal " << name << " from clause nr " << i++ << endl;	
+    //cout << "\tremoving literal " << name << " from clause nr " << i++ << endl;    
 
     for (iCurrentFormula = subFormulas.begin();
          iCurrentFormula != subFormulas.end();) {
@@ -398,7 +426,7 @@ void GraphFormulaMultiary::removeLiteral(const std::string& name) {
         // call the function recursively, otherwise
         GraphFormulaLiteral* currentFormula = dynamic_cast<GraphFormulaLiteral*> (*iCurrentFormula);
         if (currentFormula != NULL) {
-        	
+            
             // the current formula is a literal
             if (currentFormula->asString() == name) {
                 // the literal has the right name, so remove it
@@ -421,7 +449,7 @@ void GraphFormulaMultiary::removeLiteral(const std::string& name) {
 //! \brief returns the number of subformulas
 //! \return number of subformulas
 int GraphFormulaMultiary::getSubFormulaSize() const {
-	return subFormulas.size();
+    return subFormulas.size();
 }
 
 
@@ -439,7 +467,7 @@ void GraphFormulaMultiary::removeLiteralForReal(const std::string& name) {
     std::list<subFormulas_t::iterator>::iterator iterOfListOfFormulaIterator;
     
     //cout << "\tanzahl von klauseln: " << subFormulas.size() << endl; int i = 1;
-    //cout << "\tremoving literal " << name << " from clause nr " << i++ << endl;	
+    //cout << "\tremoving literal " << name << " from clause nr " << i++ << endl;    
 
     for (iCurrentFormula = subFormulas.begin();
          iCurrentFormula != subFormulas.end();) {
@@ -447,7 +475,7 @@ void GraphFormulaMultiary::removeLiteralForReal(const std::string& name) {
         // call the function recursively, otherwise
         GraphFormulaLiteral* currentFormula = dynamic_cast<GraphFormulaLiteral*> (*iCurrentFormula);
         if (currentFormula != NULL) {
-        	
+            
             // the current formula is a literal
             if (currentFormula->asString() == name) {
                 // the literal has the right name, so remove it
@@ -457,26 +485,26 @@ void GraphFormulaMultiary::removeLiteralForReal(const std::string& name) {
                 iCurrentFormula++;
             }
         } else {
-        	if ((*iCurrentFormula)->getSubFormulaSize() > 0) {
-            	// the current formula is no literal, so call removeLiteral again
-            	(*iCurrentFormula)->removeLiteralForReal(name);
-            	if ((*iCurrentFormula)->getSubFormulaSize() == 0) {
-            		// this clause just got empty, so we store it in a temporary list
-            		// later on we want to remove this clause from the formula
-            		listOfFormulaIterator.push_back(iCurrentFormula);
-            	}
-        	} 
-           	iCurrentFormula++;
+            if ((*iCurrentFormula)->getSubFormulaSize() > 0) {
+                // the current formula is no literal, so call removeLiteral again
+                (*iCurrentFormula)->removeLiteralForReal(name);
+                if ((*iCurrentFormula)->getSubFormulaSize() == 0) {
+                    // this clause just got empty, so we store it in a temporary list
+                    // later on we want to remove this clause from the formula
+                    listOfFormulaIterator.push_back(iCurrentFormula);
+                }
+            } 
+               iCurrentFormula++;
         }
     }
     
     for (iterOfListOfFormulaIterator = listOfFormulaIterator.begin();
-    		iterOfListOfFormulaIterator != listOfFormulaIterator.end(); 
-    		iterOfListOfFormulaIterator++) {
+            iterOfListOfFormulaIterator != listOfFormulaIterator.end(); 
+            iterOfListOfFormulaIterator++) {
     
-    	// now we remove the clause that we have stored before from the formula
-    	// otherwise we would get a (false) when evaluating this formula -> this is not our intention
-    	subFormulas.erase(*iterOfListOfFormulaIterator);		
+        // now we remove the clause that we have stored before from the formula
+        // otherwise we would get a (false) when evaluating this formula -> this is not our intention
+        subFormulas.erase(*iterOfListOfFormulaIterator);        
     
     }
 
@@ -667,8 +695,8 @@ const GraphFormulaFixed& GraphFormulaMultiaryAnd::getEmptyFormulaEquivalent() co
 
 //! \brief basic constructor 
 GraphFormulaMultiaryOr::GraphFormulaMultiaryOr() {
-	trace(TRACE_5, "GraphFormulaMultiaryOr::GraphFormulaMultiaryOr(): start\n");
-	trace(TRACE_5, "GraphFormulaMultiaryOr::GraphFormulaMultiaryOr(): end\n");
+    trace(TRACE_5, "GraphFormulaMultiaryOr::GraphFormulaMultiaryOr(): start\n");
+    trace(TRACE_5, "GraphFormulaMultiaryOr::GraphFormulaMultiaryOr(): end\n");
 }
 
 
@@ -951,6 +979,21 @@ bool GraphFormulaLiteral::value(const GraphFormulaAssignment& assignment) const 
 //! \return name of the literal
 std::string GraphFormulaLiteral::asString() const {
     return literal;
+}
+
+
+//! \brief adds this literal to the given set
+//! \param events set of strings to fill
+void GraphFormulaLiteral::getEventLiterals(set<string>& events)  {
+    
+    // If this literal represent an event, copy it into
+    // the set of events
+    if (literal != GraphFormulaLiteral::TRUE &&
+        literal != GraphFormulaLiteral::FALSE &&
+        literal != GraphFormulaLiteral::FINAL &&
+        literal != GraphFormulaLiteral::TAU) {
+        events.insert((new string())->assign(literal));
+    }
 }
 
 

@@ -142,7 +142,7 @@ class AnnotatedGraphNode : public GraphNode {
         void addClause(GraphFormulaMultiaryOr*);
 
         /// analyses the node and sets its color
-        void analyseNode();
+        void analyseNode(bool ignoreFinal = false);
 
         /// removes the given literal from this node's annotation
         void removeLiteralFromAnnotation(const std::string& literal);
@@ -164,6 +164,10 @@ class AnnotatedGraphNode : public GraphNode {
         /// returns the assignment that is imposed by present or absent arcs
         /// leaving the node
         GraphFormulaAssignment* getAssignment() const;
+
+        /// fills a given string set with all events, that are mentioned either
+        /// in the annotation of the node or labeling one of its outgoing edges
+        void getEvents(set<string>& events);
 
         /// create the annotation in CNF for coverability uses
         /// through a given global constraint, describing the coverability criteria

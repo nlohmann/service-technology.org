@@ -174,7 +174,7 @@ void readnet(const std::string& owfnfile) {
         PN->FinalCondition->setstatic();
     }
     // PN->removeisolated();
-    // TODO: better removal of places 
+    // TODO: better removal of places
     // doesn't work with, since array for input and output places
     // depend on the order of the Places array, reordering results in
     // a heavy crash
@@ -330,7 +330,7 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix) {
         cerr << "cannot open dot file '" << dotFileName << "' for reading'\n" << endl;
         exit(4);
     }
-    
+
     if (gastexGraph) {
         delete gastexGraph;
     }
@@ -388,7 +388,7 @@ void makeGasTex(CommunicationGraph* graph) {
     fclose(dot_yyin);
 
     string texFileName = outfilePrefixWithOptions + ".tex";
-    
+
     gastexGraph->makeGasTex(texFileName);
 
     trace(TRACE_0, texFileName + " generated\n");
@@ -405,7 +405,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
     trace("\n");
 
     unsigned int maxSizeForDot = 120;
-    
+
     outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
     outfilePrefix += ".pv.sa";
 
@@ -426,7 +426,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
         }
 
         //transform to owfn
-        PNapi::PetriNet* PVoWFN = new PNapi::PetriNet(); 
+        PNapi::PetriNet* PVoWFN = new PNapi::PetriNet();
         PVoWFN->set_format(PNapi::FORMAT_OWFN, true);
         cleanPV->transformToOWFN(PVoWFN);
 
@@ -461,7 +461,7 @@ string computeIG(oWFN* PN) {
     bool controllable = false;
 
     string igFilename = "";
-    
+
     if (options[O_CALC_REDUCED_IG] || parameters[P_USE_EAD]) {
         trace(TRACE_0, "building the reduced interaction graph by using reduction rule(s)\n");
         if (parameters[P_USE_CRE]) {
@@ -477,7 +477,7 @@ string computeIG(oWFN* PN) {
         trace(TRACE_0, "building the interaction graph...\n");
     }
     trace(TRACE_0, "\n");
-    
+
     seconds = time (NULL);
 
     graph->buildGraph(); // build interaction graph
@@ -520,7 +520,7 @@ string computeIG(oWFN* PN) {
         }
 
 /* create also an .og file to enable comparison of different IGs */
-        
+
         if (options[O_OUTFILEPREFIX]) {
             igFilename = outfilePrefix;
         } else {
@@ -532,7 +532,7 @@ string computeIG(oWFN* PN) {
         }
 
         igFilename += ".ig";
-        
+
         graph->printOGFile(igFilename);
 
 /* */
@@ -553,7 +553,7 @@ string computeIG(oWFN* PN) {
     trace(TRACE_5, "graph deleted\n");
     trace(TRACE_0, "=================================================================\n");
     trace(TRACE_0, "\n");
-    
+
     return igFilename;
 }
 
@@ -562,7 +562,11 @@ string computeIG(oWFN* PN) {
 //! \param PN the given oWFN
 string computeOG(oWFN* PN) {
 
-    time_t seconds, seconds2;
+    time_t  buildGraphTime1, buildGraphTime2,
+            seconds, seconds2,
+            graphStatsTime1, graphStatsTime2,
+            removeFalseNodesTime1, removeFalseNodesTime2,
+            removeUnreachableNodesTime1, removeUnreachableNodesTime2;
 
     OG* graph = new OG(PN);
     bool controllable = false;
@@ -572,11 +576,43 @@ string computeOG(oWFN* PN) {
     graph->printProgressFirst();
 
     seconds = time(NULL);
+
+    trace(TRACE_1, "Building the graph...\n");
+    buildGraphTime1 = time(NULL);
     graph->buildGraph(); // build operating guideline
+    buildGraphTime2 = time(NULL);
+    trace(TRACE_1, "finished building the graph\n");
+    trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n");
+
+    trace(TRACE_1, "computing graph statistics...\n");
+    graphStatsTime1 = time(NULL);
+    graph->computeGraphStatistics();
+    graphStatsTime2 = time(NULL);
+    trace(TRACE_1, "finished computing graph statistics\n");
+    trace(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n");
+
+
+    if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
+        trace(TRACE_1, "removing false nodes...\n");
+        removeFalseNodesTime1 = time(NULL);
+        graph->removeReachableFalseNodes();
+        removeFalseNodesTime2 = time(NULL);
+        trace(TRACE_1, "finished removing false nodes\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n");
+
+        trace(TRACE_1, "removing unreachable nodes...\n");
+        removeUnreachableNodesTime1 = time(NULL);
+        graph->removeUnreachableNodes();
+        removeUnreachableNodesTime2 = time(NULL);
+        trace(TRACE_1, "finished removing unreachable nodes\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n");
+    }
+
+
     seconds2 = time(NULL);
 
     trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
-    cout << "    " << difftime(seconds2, seconds) << " s consumed for building graph" << endl;
+    trace(TRACE_0, "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n");
 
     trace(TRACE_0, "\nnet is controllable: ");
     if (graph->hasNoRoot() || graph->getRoot()->getColor()==RED) {
@@ -593,9 +629,9 @@ string computeOG(oWFN* PN) {
 
     // switch to publicview generation if the mode is PV
     if (parameters[P_PV]) {
-        
+
         string publicViewName;
-        
+
         if (options[O_OUTFILEPREFIX]) {
             publicViewName = outfilePrefix;
         } else {
@@ -608,7 +644,7 @@ string computeOG(oWFN* PN) {
         delete graph;
         return "";
     }
-    
+
     // generate output files
     if (!options[O_NOOUTPUTFILES]) {
         // distributed controllability?
@@ -764,31 +800,35 @@ void checkMatching(AnnotatedGraph* OGToMatch, oWFN* PN) {
 //! \brief check for simulation relation of two given OGs
 //! \param OGsFromFiles a list containing exactly two OGs
 void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
-    
+
     // the OGs given by command line are already stored in OGsFromFiles
-    
+
     bool calledWithNet = false;
-    
+
     // we can only check exactly 2 OGs for simulation
     // a possible violation should have been rejected by options.cc
     assert(netfiles.size() + OGsFromFiles.size() == 2);
-    
+
     if (OGsFromFiles.size() < 2) {
         // oWFN(s) was given on command line, so compute the corresponding OGs
         calledWithNet = true;
-        
+
         // simulation  on OGs depends heavily on empty node,
         // so set the correct options to compute OG with empty node
         options[O_SHOW_NODES] = true;
         parameters[P_SHOW_EMPTY_NODE] = true;
     }
-    
-    time_t seconds, seconds2;
+
+    time_t  buildGraphTime1, buildGraphTime2,
+            seconds, seconds2,
+            graphStatsTime1, graphStatsTime2,
+            removeFalseNodesTime1, removeFalseNodesTime2,
+            removeUnreachableNodesTime1, removeUnreachableNodesTime2;
 
     // generate the OGs
     list<std::string>::iterator netiter = netfiles.begin();
     while (OGsFromFiles.size() < 2) {
-        
+
         numberOfEvents = 0;
         numberOfDecodes = 0;
         garbagefound = 0;
@@ -797,13 +837,13 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         State::state_count = 0; // number of states
         State::state_count_stored_in_binDec = 0; // number of states
         numberDeletedVertices = 0;
-        
+
         currentowfnfile = *netiter;
         assert(currentowfnfile != "");
-        
+
         // prepare getting the net
         PlaceTable = new SymbolTab<PlSymbol>;
-        
+
         // get the net into variable PN
         readnet(currentowfnfile);
         trace(TRACE_0, "=================================================================\n");
@@ -811,17 +851,50 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         reportNet();
         delete PlaceTable;
 
-        seconds = time (NULL);
-
         // compute OG
         OG* graph = new OG(PN);
+
         trace(TRACE_0, "building the operating guideline...\n");
         graph->printProgressFirst();
-        graph->buildGraph(); // build operating guideline
-        trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
 
-        seconds2 = time (NULL);
-        cout << "    " << difftime(seconds2, seconds) << " s consumed for building graph" << endl << endl;
+        seconds = time(NULL);
+
+        trace(TRACE_1, "Building the graph...\n");
+        buildGraphTime1 = time(NULL);
+        graph->buildGraph(); // build operating guideline
+        buildGraphTime2 = time(NULL);
+        trace(TRACE_1, "finished building the graph\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n");
+
+        trace(TRACE_1, "computing graph statistics...\n");
+        graphStatsTime1 = time(NULL);
+        graph->computeGraphStatistics();
+        graphStatsTime2 = time(NULL);
+        trace(TRACE_1, "finished computing graph statistics\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n");
+
+
+        if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
+            trace(TRACE_1, "removing false nodes...\n");
+            removeFalseNodesTime1 = time(NULL);
+            graph->removeReachableFalseNodes();
+            removeFalseNodesTime2 = time(NULL);
+            trace(TRACE_1, "finished removing false nodes\n");
+            trace(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n");
+
+            trace(TRACE_1, "removing unreachable nodes...\n");
+            removeUnreachableNodesTime1 = time(NULL);
+            graph->removeUnreachableNodes();
+            removeUnreachableNodesTime2 = time(NULL);
+            trace(TRACE_1, "finished removing unreachable nodes\n");
+            trace(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n");
+        }
+
+
+        seconds2 = time(NULL);
+
+        trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
+        trace(TRACE_0, "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n");
 
         // print statistics
         trace(TRACE_0, "OG statistics:\n");
@@ -840,18 +913,18 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
         netiter++;
     }
-    
+
     //    // restore state of parameters
     //    options[O_SHOW_NODES] = tempO_SHOW_NODES;
     //    parameters[P_SHOW_EMPTY_NODE] = tempP_SHOW_EMPTY_NODE;
-    
+
     AnnotatedGraph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
     AnnotatedGraph* firstOG = *(currentOGfile++);
     AnnotatedGraph* secondOG = *(currentOGfile);
 
-    firstOG->removeFalseNodes();
-    secondOG->removeFalseNodes();
-    
+    firstOG->removeReachableFalseNodes();
+    secondOG->removeReachableFalseNodes();
+
     seconds = time (NULL);
 
     trace(TRACE_0, "\n=================================================================\n");
@@ -864,7 +937,7 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace(TRACE_0, "The second OG characterizes at least one strategy that is\n");
         trace(TRACE_0, "not characterized by the first one.\n\n");
     }
-    
+
     seconds2 = time (NULL);
     cout << "    " << difftime(seconds2, seconds) << " s consumed for checking equivalence" << endl << endl;
 
@@ -888,7 +961,7 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
     // we can only check exactly 2 OGs for equivalence
     // a possible violation should have been rejected by options.cc
-    
+
     if (!parameters[P_EQ_R]) {
         assert(netfiles.size() + OGsFromFiles.size() == 2);
     } else {
@@ -905,7 +978,11 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         parameters[P_SHOW_EMPTY_NODE] = true;
     }
 
-    time_t seconds, seconds2;
+    time_t  buildGraphTime1, buildGraphTime2,
+            seconds, seconds2,
+            graphStatsTime1, graphStatsTime2,
+            removeFalseNodesTime1, removeFalseNodesTime2,
+            removeUnreachableNodesTime1, removeUnreachableNodesTime2;
 
     // generate the OGs
     list<std::string>::iterator netiter = netfiles.begin();
@@ -937,10 +1014,48 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
         // compute OG
         OG* graph = new OG(PN);
+
         trace(TRACE_0, "building the operating guideline...\n");
         graph->printProgressFirst();
+
+        seconds = time(NULL);
+
+        trace(TRACE_1, "Building the graph...\n");
+        buildGraphTime1 = time(NULL);
         graph->buildGraph(); // build operating guideline
+        buildGraphTime2 = time(NULL);
+        trace(TRACE_1, "finished building the graph\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n");
+
+        trace(TRACE_1, "computing graph statistics...\n");
+        graphStatsTime1 = time(NULL);
+        graph->computeGraphStatistics();
+        graphStatsTime2 = time(NULL);
+        trace(TRACE_1, "finished computing graph statistics\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n");
+
+
+        if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
+            trace(TRACE_1, "removing false nodes...\n");
+            removeFalseNodesTime1 = time(NULL);
+            graph->removeReachableFalseNodes();
+            removeFalseNodesTime2 = time(NULL);
+            trace(TRACE_1, "finished removing false nodes\n");
+            trace(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n");
+
+            trace(TRACE_1, "removing unreachable nodes...\n");
+            removeUnreachableNodesTime1 = time(NULL);
+            graph->removeUnreachableNodes();
+            removeUnreachableNodesTime2 = time(NULL);
+            trace(TRACE_1, "finished removing unreachable nodes\n");
+            trace(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n");
+        }
+
+
+        seconds2 = time(NULL);
+
         trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
+        trace(TRACE_0, "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n");
 
         seconds2 = time (NULL);
         cout << "    " << difftime(seconds2, seconds) << " s consumed for building graph" << endl << endl;
@@ -968,8 +1083,8 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
     AnnotatedGraph *firstOG = *currentOGfile;
     AnnotatedGraph *secondOG = *(++currentOGfile);
 
-    firstOG->removeFalseNodes();
-    secondOG->removeFalseNodes();
+    firstOG->removeReachableFalseNodes();
+    secondOG->removeReachableFalseNodes();
 
     seconds = time (NULL);
 
@@ -1035,29 +1150,29 @@ void filterOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 //! \brief check for simulation relation of two given OGs while covering all external transitions
 //! \param OGsFromFiles a list containing exactly two OGs
 void checkCovSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
-    
+
     // the OGs given by command line are already stored in OGsFromFiles
-    
+
     bool calledWithNet = false;
-    
+
     // we can only check exactly 2 OGs for simulation
     // a possible violation should have been rejected by options.cc
     assert(netfiles.size() + OGsFromFiles.size() == 2);
-    
+
     if (OGsFromFiles.size() < 2) {
         // oWFN(s) was given on command line, so compute the corresponding OGs
         calledWithNet = true;
-        
+
         // simulation  on OGs depends heavily on empty node,
         // so set the correct options to compute OG with empty node
         options[O_SHOW_NODES] = true;
         parameters[P_SHOW_EMPTY_NODE] = true;
     }
-    
+
     // generate the OGs
     list<std::string>::iterator netiter = netfiles.begin();
     while (OGsFromFiles.size() < 2) {
-        
+
         numberOfEvents = 0;
         numberOfDecodes = 0;
         garbagefound = 0;
@@ -1066,27 +1181,71 @@ void checkCovSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         State::state_count = 0; // number of states
         State::state_count_stored_in_binDec = 0; // number of states
         numberDeletedVertices = 0;
-        
+
         currentowfnfile = *netiter;
         assert(currentowfnfile != "");
-        
+
         // prepare getting the net
         PlaceTable = new SymbolTab<PlSymbol>;
-        
+
         // get the net into variable PN
         readnet(currentowfnfile);
         trace(TRACE_0, "=================================================================\n");
         trace(TRACE_0, "processing net " + currentowfnfile + "\n");
         reportNet();
         delete PlaceTable;
-        
+
+        time_t  buildGraphTime1, buildGraphTime2,
+                seconds, seconds2,
+                graphStatsTime1, graphStatsTime2,
+                removeFalseNodesTime1, removeFalseNodesTime2,
+                removeUnreachableNodesTime1, removeUnreachableNodesTime2;
+
         // compute OG
         OG* graph = new OG(PN);
+
         trace(TRACE_0, "building the operating guideline...\n");
         graph->printProgressFirst();
+
+        seconds = time(NULL);
+
+        trace(TRACE_1, "Building the graph...\n");
+        buildGraphTime1 = time(NULL);
         graph->buildGraph(); // build operating guideline
-        trace(TRACE_0, "\nbuilding the operating guideline finished.\n\n");
-        
+        buildGraphTime2 = time(NULL);
+        trace(TRACE_1, "finished building the graph\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n");
+
+        trace(TRACE_1, "computing graph statistics...\n");
+        graphStatsTime1 = time(NULL);
+        graph->computeGraphStatistics();
+        graphStatsTime2 = time(NULL);
+        trace(TRACE_1, "finished computing graph statistics\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n");
+
+
+        if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
+            trace(TRACE_1, "removing false nodes...\n");
+            removeFalseNodesTime1 = time(NULL);
+            graph->removeReachableFalseNodes();
+            removeFalseNodesTime2 = time(NULL);
+            trace(TRACE_1, "finished removing false nodes\n");
+            trace(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n");
+
+            trace(TRACE_1, "removing unreachable nodes...\n");
+            removeUnreachableNodesTime1 = time(NULL);
+            graph->removeUnreachableNodes();
+            removeUnreachableNodesTime2 = time(NULL);
+            trace(TRACE_1, "finished removing unreachable nodes\n");
+            trace(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n");
+        }
+
+
+        seconds2 = time(NULL);
+
+        trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
+        trace(TRACE_0, "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n");
+
         // add new OG to the list
         if (!OGfirst && netfiles.size() == 1) {
             OGsFromFiles.push_front(graph);
@@ -1094,21 +1253,21 @@ void checkCovSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
             OGsFromFiles.push_back(graph);
         }
         graph->deleteOWFN();
-        
+
         netiter++;
     }
-    
+
     //    // restore state of parameters
     //    options[O_SHOW_NODES] = tempO_SHOW_NODES;
     //    parameters[P_SHOW_EMPTY_NODE] = tempP_SHOW_EMPTY_NODE;
-    
+
     AnnotatedGraph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
     AnnotatedGraph *firstOG = *currentOGfile;
     AnnotatedGraph *secondOG = *(++currentOGfile);
-    
-    firstOG->removeFalseNodes();
-    secondOG->removeFalseNodes();
-    
+
+    firstOG->removeReachableFalseNodes();
+    secondOG->removeReachableFalseNodes();
+
     trace(TRACE_1, "checking simulation\n");
     if (firstOG->covSimulates(secondOG)) {
         trace(TRACE_1, "simulation holds\n\n");
@@ -1118,7 +1277,7 @@ void checkCovSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace(TRACE_0, "The second OG characterizes at least one strategy that is\n");
         trace(TRACE_0, "not characterized by the first one or does not cover all external transitions.\n\n");
     }
-    
+
     if (!calledWithNet) {
         trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
         trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
@@ -1170,7 +1329,7 @@ void makePNG(oWFN* PN) {
 
     trace(TRACE_3, "Modifying dot stream\n");
 
-    // delete all comments in the dot output of the PNapiNet, since the endlines will 
+    // delete all comments in the dot output of the PNapiNet, since the endlines will
     // be deleted for echo piping and "//" comments won't work anymore
     int counter = 0;
     while ((position = dotString.find_first_of("/", counter)) != string::npos) {
@@ -1440,13 +1599,13 @@ int main(int argc, char** argv) {
 
     else if (parameters[P_COUNT_SERVICES] || parameters[P_CHECK_ACYCLIC] ||
              parameters[P_CHECK_FALSE_NODES] || parameters[P_REMOVE_FALSE_NODES] ||
-             parameters[P_PV] || parameters[P_MINIMIZE_OG] || parameters[P_READ_OG] || 
+             parameters[P_PV] || parameters[P_MINIMIZE_OG] || parameters[P_READ_OG] ||
              (parameters[P_PNG] && ogfiles.size() != 0)) {
 
         // Abort if there are no OGs at all
         if (ogfiles.begin() == ogfiles.end() && !(parameters[P_PV])) {
             trace("Error:  No OGs have been given for computation\n\n");
-            trace("        Enter \"fiona --help\" for more information\n\n");        
+            trace("        Enter \"fiona --help\" for more information\n\n");
         }
 
         // iterate all input files
@@ -1458,14 +1617,14 @@ int main(int argc, char** argv) {
             if (parameters[P_PV]) {
                 // computes a service automaton "public view" which has the same
                 // OG as given in readOG
-                readOG->removeFalseNodes();
+                readOG->removeReachableFalseNodes();
                 computePublicView(readOG, (*iOgFile));
                 delete readOG;
             }
 
             else if (parameters[P_MINIMIZE_OG]) {
                 // minimizes a given OG
-                //readOG->removeFalseNodes();
+                //readOG->removeReachableFalseNodes();
                 readOG->minimizeGraph();
                 delete readOG;
             }
@@ -1473,7 +1632,7 @@ int main(int argc, char** argv) {
             else if (parameters[P_COUNT_SERVICES]) {
                 // counts the number of deterministic strategies
                 // that are characterized by a given OG
-                readOG->removeFalseNodes();
+                readOG->removeReachableFalseNodes();
                 countStrategies(readOG, (*iOgFile));
                 delete readOG;
             }
@@ -1481,7 +1640,7 @@ int main(int argc, char** argv) {
             else if (parameters[P_CHECK_ACYCLIC]) {
                 // counts the number of deterministic strategies
                 // that are characterized by a given OG
-                readOG->removeFalseNodes();
+                readOG->removeReachableFalseNodes();
                 checkAcyclicity(readOG, (*iOgFile));
                 delete readOG;
             }
@@ -1514,26 +1673,40 @@ int main(int argc, char** argv) {
 
             else if (parameters[P_REMOVE_FALSE_NODES]) {
                 // checks if there are nodes in the og which violate the annotation
-
-                trace(TRACE_0, "Removing nodes from '" + readOG->getFilename() + "' ");
-                trace(TRACE_0, "that violate their own annotation...\n");
-                readOG->removeFalseNodes();
-                trace(TRACE_0, "Removed all nodes with false annotation.\n");
-
                 string newFilename;
                 if (options[O_OUTFILEPREFIX]) {
                     newFilename = outfilePrefix;
                 } else {
                     newFilename = AnnotatedGraph::stripOGFileSuffix(readOG->getFilename()) + ".blue";
                 }
+                time_t seconds, seconds2;
+
+                readOG->computeAndPrintGraphStatistics();
+
+                trace(TRACE_0, "Removing nodes from '" + readOG->getFilename() + "' ");
+                trace(TRACE_0, "that violate their own annotation...\n");
+                seconds = time(NULL);
+                readOG->removeReachableFalseNodes();
+                seconds2 = time(NULL);
+                trace(TRACE_0, "Removed all nodes with false annotation.\n");
+                cout << "    " << difftime(seconds2, seconds) << " s consumed for removing reachable false nodes" << endl;
+
+                trace(TRACE_0, "Removing unreachable nodes from '" + readOG->getFilename() + "' \n");
+                seconds = time(NULL);
+                readOG->removeUnreachableNodes();
+                seconds2 = time(NULL);
+                trace(TRACE_0, "Removed all unreachable nodes.\n");
+                cout << "    " << difftime(seconds2, seconds) << " s consumed removing unreachable nodes" << endl;
+
+                readOG->computeAndPrintGraphStatistics();
 
                 trace(TRACE_0, "\nCreating new .og-file without false nodes... \n");
                 readOG->printOGFile(newFilename);
                 trace(TRACE_0, "New .og-file '" + newFilename + ".og' succesfully created.\n\n");
 
                 delete readOG;
-            }
 
+            }
             else if (parameters[P_READ_OG]) {
                 trace(TRACE_0, "OG was read from file '" + readOG->getFilename() + "'\n");
                 readOG->computeAndPrintGraphStatistics();
@@ -1546,16 +1719,18 @@ int main(int argc, char** argv) {
 #endif
                 delete readOG;
             }
-            
+
             else if (parameters[P_PNG]) {
-            	string newFilename;
-            	if (options[O_OUTFILEPREFIX]) {
-            		newFilename = outfilePrefix;
-            	} else {
-            		newFilename = readOG->getFilename();
-            	}
-            	readOG->printDotFile(newFilename);
-            	delete readOG;
+                readOG->computeAndPrintGraphStatistics();
+                string newFilename;
+                if (options[O_OUTFILEPREFIX]) {
+                    newFilename = outfilePrefix;
+                } else {
+                    newFilename = readOG->getFilename();
+                }
+                readOG->printDotFile(newFilename);
+                readOG->computeAndPrintGraphStatistics();
+                delete readOG;
             }
         }
 
@@ -1607,11 +1782,11 @@ int main(int argc, char** argv) {
         string fileName;    // name of og-file
         int loop = 0;        // in case the option -t eqR is set, we need each netfile to be processed twice
         ogfiles.clear();
-        
+
         if (!parameters[P_EQ_R]) {        // option is not set, so we don't do the loop
             loop = 27;                // loop needs to be higher than 1 ;-)
         }
-        
+
         // ---------------- processing every single net -------------------
         for (list<std::string>::iterator netiter = netfiles.begin();
              netiter != netfiles.end(); ++netiter) {
@@ -1627,13 +1802,13 @@ int main(int argc, char** argv) {
                 State::state_count = 0; // number of states
                 State::state_count_stored_in_binDec = 0; // number of states
                 numberDeletedVertices = 0;
-    
+
                 currentowfnfile = *netiter;
                 assert(currentowfnfile != "");
-    
+
                 // prepare getting the net
                 PlaceTable = new SymbolTab<PlSymbol>;
-    
+
                 // get the net
                 readnet(currentowfnfile);
                 trace(TRACE_0, "=================================================================\n");
@@ -1642,16 +1817,16 @@ int main(int argc, char** argv) {
                 delete PlaceTable;
 
                     if (currentowfnfile == "<stdin>") currentowfnfile = "stdin";
-    
+
                 // start computation
                 fileName = "";        // name of computed og-file
-                
+
                 if (parameters[P_IG]) {
                     // computing IG of the current oWFN
                     reportOptionValues(); // adjust events_manual and print limit of considering events
                     fileName = computeIG(PN);
                 }
-    
+
                 if (parameters[P_OG] || parameters[P_PV]) {
                     // computing OG of the current oWFN
                     reportOptionValues(); // adjust events_manual and print limit of considering events
@@ -1659,10 +1834,10 @@ int main(int argc, char** argv) {
                 }
 
                 if (parameters[P_MATCH]) {
-                    // matching the current oWFN against the single OG 
+                    // matching the current oWFN against the single OG
                     checkMatching(OGToMatch, PN);
                 }
-    
+
                 if (parameters[P_PNG]) {
                     // create a png file of the given net
                     makePNG(PN);
@@ -1685,22 +1860,22 @@ int main(int argc, char** argv) {
 
                        loop++;
             } while (loop <= 1);    // calculate the graph of the same net twice --> once with -R and once with no -R
-            
+
             if (parameters[P_EQ_R]) {
                 // reading all og-files
                 AnnotatedGraph::ogs_t OGsFromFiles;
                 readAllOGs(OGsFromFiles);
-                
+
                 // check equivalence of both graphs
                 checkEquivalence(OGsFromFiles);
-                
+
                 OGsFromFiles.clear();
                 loop = 0;
                 ogfiles.clear();
             }
         }
 
-       
+
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
         // Delete lexer buffer for parsing oWFNs.
         // Must NOT be called before fclose(owfn_yyin);

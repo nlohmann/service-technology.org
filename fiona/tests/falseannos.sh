@@ -42,12 +42,84 @@ result=0
 
 
 ############################################################################
-# -t removefalsenodes
+# -t removefalsenodes 1
 ############################################################################
 
 violating="$DIR/violating"
 
 cleanedPerHand="$DIR/cleaned.og"
+
+cmd="$FIONA $violating.og -t removefalsenodes"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$violating.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+fi
+
+cmd="diff $violating.blue.og $cleanedPerHand -q"
+
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$cleanedPerHand.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    if [ "$OUTPUT" != "" ]; then
+        let "result += 1"
+        echo ... automatically cleaned OG is not equivalent to manually cleaned OG.
+    fi
+fi
+
+############################################################################
+# -t removefalsenodes 2
+############################################################################
+
+violating="$DIR/bluefalsenode"
+
+cleanedPerHand="$DIR/bluefalsenode.expected.og"
+
+cmd="$FIONA $violating.og -t removefalsenodes"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$violating.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+fi
+
+cmd="diff $violating.blue.og $cleanedPerHand -q"
+
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$cleanedPerHand.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    if [ "$OUTPUT" != "" ]; then
+        let "result += 1"
+        echo ... automatically cleaned OG is not equivalent to manually cleaned OG.
+    fi
+fi
+
+############################################################################
+# -t removefalsenodes shorten annotations
+############################################################################
+
+violating="$DIR/shorten"
+
+cleanedPerHand="$DIR/shorten.expected.og"
 
 cmd="$FIONA $violating.og -t removefalsenodes"
 

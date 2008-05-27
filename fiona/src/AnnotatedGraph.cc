@@ -280,7 +280,7 @@ unsigned int AnnotatedGraph::numberOfServices() {
     trace(TRACE_5, "AnnotatedGraph::numberOfServices(...): start\n");
 
     trace(TRACE_1, "Removing false nodes...\n");
-    removeFalseNodes();
+    removeReachableFalseNodes();
 
     if (root == NULL) {
         return 0;
@@ -644,6 +644,7 @@ void AnnotatedGraph::findFalseNodes(std::vector<AnnotatedGraphNode*>* falseNodes
     nodes_iterator iNode = setOfNodes.begin();
 
     while (iNode != setOfNodes.end()) {
+
         GraphFormulaAssignment* iNodeAssignment = (*iNode)->getAssignment();
         if (!(*iNode)->assignmentSatisfiesAnnotation(*iNodeAssignment)) {
             falseNodes->push_back(*iNode);
@@ -653,178 +654,215 @@ void AnnotatedGraph::findFalseNodes(std::vector<AnnotatedGraphNode*>* falseNodes
     trace(TRACE_5, "AnnotatedGraph::findFalseNodes(): end\n");
 }
 
+//! \brief Removes all unneeded literals from all reachable nodes
+//!        and removes reachable nodes which do not satisfy their own annotation.
+void AnnotatedGraph::removeReachableFalseNodes() {
 
-//! \brief removes all nodes that have annotations that cannot become
-//!        true. The function continues removing until no node fullfils
-//!        the mentioned criterion
-void AnnotatedGraph::removeFalseNodes() {
-    trace(TRACE_5, "AnnotatedGraph::removeFalseNodes(): start\n");
+    trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodes(): start\n");
+    if (getRoot() == NULL) return;
 
-    trace(TRACE_1, "\tnumber of nodes before removal: ");
-    trace(TRACE_1, intToString(setOfNodes.size()) + "\n");
+    set<AnnotatedGraphNode*> visitedNodes, redNodes;
+    map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> > parentNodes;
 
-    bool modified = true;
+    removeReachableFalseNodesInit(getRoot(), redNodes, parentNodes, visitedNodes);
+    removeReachableFalseNodesRecursively(redNodes, parentNodes);
 
-    // As long as something changes...
-    while (modified) {
+    trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodes(): end\n");
+}
 
-        modified = false;
+//! \brief Helps AnnotatedGraph::removeReachableFalseNodes by recursively:
+//!        1. Constructing a parent function for all reachable nodes.
+//!        2. Shorten the annotation of every reachable node by removing event-literals which do not appear as the label of an outgoing edge.
+//!        3. Analyzes all blue nodes.
+//!        4. Gathers a first set of candidates for deletion: All red, reachable nodes.
+//! \param currentNode The node to be processed
+//! \param redNodes Set for storing first candidates (see 4.)
+//! \param parentNodes Map for storing the parent function (see 1.)
+//! \param visitedNodes Contains a pointer to each processed node
+void AnnotatedGraph::removeReachableFalseNodesInit(AnnotatedGraphNode* currentNode, set<AnnotatedGraphNode*>& redNodes, map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >& parentNodes, set<AnnotatedGraphNode*>& visitedNodes) {
 
-        // A set to store the nodes that violate their annotations
-        set<AnnotatedGraphNode*> falseNodes;
+    trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesInit(): start\n");
 
-        // Iterate over all nodes
-        for (nodes_iterator nodeIter = setOfNodes.begin();
-             nodeIter != setOfNodes.end(); ++nodeIter) {
+    // This node should not be processed again.
+    visitedNodes.insert(currentNode);
 
-            AnnotatedGraphNode* currentNode = *nodeIter;
+    // Collect all event-related literals from the annotation of the current node.
+    set<string> eventsInNode;
+    currentNode->getAnnotation()->getEventLiterals(eventsInNode);
 
-            trace(TRACE_3, "\t\tprocessing node: " + (*nodeIter)->getName() + "\n");
+    // If the current node is blue, it is analysed
+    if (currentNode->getColor() == BLUE) {
+        currentNode->analyseNode(true);
+    }
 
-            // A set to store edges that lead to false nodes
-            set<AnnotatedGraphEdge*> falseEdges;
+    // If the node is already red or became red during analysis, insert it into the set of candidates
+    if (currentNode->getColor() == RED) {
+        redNodes.insert(currentNode);
+    }
 
-            // Iterate over all edges of the current node
-            for (AnnotatedGraphNode::LeavingEdges::Iterator edgeIter = currentNode->getLeavingEdgesIterator();
-                 edgeIter->hasNext();) {
+    // Iterate over all leaving edges of the current node
+    AnnotatedGraphNode::LeavingEdges::Iterator edgeIter = currentNode->getLeavingEdgesIterator();
+    while (edgeIter->hasNext()) {
 
-                AnnotatedGraphEdge* currentEdge = edgeIter->getNext();
+        AnnotatedGraphEdge* currentEdge = edgeIter->getNext();
+        AnnotatedGraphNode* destNode = currentEdge->getDstNode();
 
-                trace(TRACE_4, "\t\t\tprocessing edge: " + (*nodeIter)->getName()
-                      + " - " + currentEdge->getLabel() + " > "
-                      + currentEdge->getDstNode()->getName() + "\n");
+        // Remove the current label from the set of event-related literals
+        eventsInNode.erase(currentEdge->getLabel());
 
-                // Check wether the edge leads to a false node
-                if (falseNodes.find(currentEdge->getDstNode()) != falseNodes.end()) {
-                    // Insert the false edge into the set
-                    falseEdges.insert(currentEdge);
+        // Insert this node as a parent of his child
+        parentNodes[destNode].insert(currentNode);
 
-                    trace(TRACE_4, "\t\t\tedge is leaving to a false node\n");
-                }
-            }
-
-            // Something has changed!
-            modified = falseEdges.size() > 0;
-
-            // Iterate over all false edges found for that current node to delete them
-            for (set<AnnotatedGraphEdge*>::iterator edgeIter = falseEdges.begin();
-                 edgeIter != falseEdges.end(); ++edgeIter) {
-
-                currentNode->removeEdgesToNode((*edgeIter)->getDstNode());
-            }
-
-            // Evaluate the annotation of the current node
-            if (!currentNode->assignmentSatisfiesAnnotation(*(currentNode->getAssignment()))) {
-                // Insert the false node into the set
-                falseNodes.insert(currentNode);
-
-                trace(TRACE_3, "\t\tnode " + (*nodeIter)->getName() + " cannot satisfy its annotation.\n");
-                trace(TRACE_4, "\t\tannotation: " + (*nodeIter)->getAnnotationAsString() + " \n");
-            }
+        // If this child has not yet been processed, descend recursively
+        if (visitedNodes.find(destNode) == visitedNodes.end()) {
+            removeReachableFalseNodesInit(destNode, redNodes, parentNodes, visitedNodes);
         }
 
-        // Something has changed!
-        modified = modified || falseNodes.size() > 0;
+    }
+    // Delete the LeavingEdgesIterator from the heap
+    delete edgeIter;
 
-        // Iterate over the set of false nodes to delete them
-        for (set<AnnotatedGraphNode*>::iterator nodeIter = falseNodes.begin();
-             nodeIter != falseNodes.end(); ++nodeIter) {
+    // Iterate over all event-related literals that were not removed during the iteration over the edges
+    for (set<string>::iterator unneededEvent = eventsInNode.begin(); unneededEvent != eventsInNode.end(); ++unneededEvent) {
+        // Remove the literal from the formula, since it is not needed.
+        currentNode->getAnnotation()->removeLiteral(*unneededEvent);
+    }
 
-            // If the root node has to be deleted, we set the root to NULL.
-            if (*nodeIter == getRoot()) {
+    trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesInit(): end\n");
+}
+
+//! \brief Proceeds a set of candidates for false nodes, removes proven false nodes
+//!        and designates their parents as candidates for the next recursive step.
+//! \param candidates Current candidates, in the first step filled with red nodes only.
+//! \param parentNodes The parent node function as created by AnnotatedGraph::removeReachableFalseNodesInit.
+void AnnotatedGraph::removeReachableFalseNodesRecursively(set<AnnotatedGraphNode*>& candidates, map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >& parentNodes) {
+
+    trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesRecursively(): s\n");
+
+    // The set to be filled with the new candidates
+    set<AnnotatedGraphNode*> newCandidates;
+
+    // Iterate over all candidates of this recursive step
+    for (set<AnnotatedGraphNode*>::iterator candidate = candidates.begin(); candidate != candidates.end(); ++candidate) {
+        // If the candidate is a blue node, re-analyse it
+        if ((*candidate)->getColor() == BLUE) {
+            (*candidate)->analyseNode(true);
+        }
+
+        // If the candidate was a red node or became red as result of the analysis
+        if ((*candidate)->getColor() == RED) {
+
+            // If the candidate is the root node, set the root to null and stop the recursion
+            if (*candidate == getRoot()) {
+                removeNode(*candidate);
                 setRoot(NULL);
+                return;
             }
 
-            trace(TRACE_3, "\tremoved false node: " + (*nodeIter)->getName() + "\n");
+            // Iterate over all outgoing edges of the candidate and erase this node as a parent from all its children
+            AnnotatedGraphNode::LeavingEdges::Iterator edgeIter = (*candidate)->getLeavingEdgesIterator();
+            while (edgeIter->hasNext()) {
+                AnnotatedGraphEdge* currentEdge = edgeIter->getNext();
+                parentNodes[currentEdge->getDstNode()].erase(*candidate);
+            }
+            delete edgeIter;
 
-            // Remove all edges leading to this node and the node itself.
-            removeEdgesToNodeFromAllOtherNodes(*nodeIter);
-            removeNode(*nodeIter);
-            delete *nodeIter;
+            // Iterate over all parent nodes and designate as new candidates after removing the edge(s)
+            for (set<AnnotatedGraphNode*>::iterator parentOfCandidate = parentNodes[(*candidate)].begin(); parentOfCandidate != parentNodes[(*candidate)].end(); ++parentOfCandidate) {
+                (*parentOfCandidate)->removeEdgesToNode(*candidate);
+                newCandidates.insert(*parentOfCandidate);
+            }
+
+            // Remove the candidate from the graph
+            removeNode(*candidate);
+            // If this node was designated by a another current candidate as a new candidate,
+            // remove it from the set since it does not exist anymore.
+            newCandidates.erase(*candidate);
+            delete *candidate;
         }
     }
-
-    trace(TRACE_3, "\tremoving disconnected nodes ...\n");
-
-    // Remove any nodes, that have been disconnected from the root node
-    removeDisconnectedNodes();
-
-    // Check whether the root node was also removed
-    if (hasNoRoot()) {
-        trace(TRACE_0, "root node was removed!\n");
+    // If there are no new candidates, stop the recursion, else proceed with the new candidates.
+    if (newCandidates.empty()) {
+        return;
+    } else {
+        removeReachableFalseNodesRecursively(newCandidates, parentNodes);
     }
 
-    trace(TRACE_1, "\tnumber of nodes after removal: ");
-    trace(TRACE_1, intToString(setOfNodes.size()) + "\n");
-
-    trace(TRACE_5, "AnnotatedGraph::removeFalseNodes(): end\n");
+    trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesRecursively(): end\n");
 }
 
 
 //! \brief removes all nodes that have been disconnected from the root
 //!        node due to other node removals
-void AnnotatedGraph::removeDisconnectedNodes() {
+void AnnotatedGraph::removeUnreachableNodes() {
 
-    trace(TRACE_5, "AnnotatedGraph::removeDisconnectedNodes(): start\n");
+    trace(TRACE_5, "AnnotatedGraph::removUnreachableNodes(): start\n");
 
-    // create sets of connected and disconnected nodes
-    set<AnnotatedGraphNode*> connectedNodes;
-    set<AnnotatedGraphNode*> disconnectedNodes;
+    set<AnnotatedGraphNode*> unreachableNodes;
 
-    // gather the connected nodes from the rootnode if there is a root node
-    if (!hasNoRoot()) {
-        removeDisconnectedNodesRecursively(getRoot(), connectedNodes);
+    // copy the nodes of the annotated graph into a set, assuming that all
+    // are unreachable from the root node
+    for (nodes_iterator nodeIter = setOfNodes.begin(); nodeIter != setOfNodes.end(); nodeIter++) {
+        unreachableNodes.insert(*nodeIter);
     }
 
-    // insert all nodes which are not connected into the set of disconnected nodes
-    for (nodes_iterator nodeIter = setOfNodes.begin(); nodeIter != setOfNodes.end(); ++nodeIter) {
-        if (connectedNodes.find(*nodeIter) == connectedNodes.end()) {
-            disconnectedNodes.insert(*nodeIter);
-        }
+    // start following connections through the graph from the root node
+    // and remove every reachable node from the set of unreachable nodes
+    if (!hasNoRoot()) {
+        removeUnreachableNodesRecursively(getRoot(), unreachableNodes);
     }
 
     // remove all disconnected nodes
-    for (set<AnnotatedGraphNode*>::iterator nodeIter = disconnectedNodes.begin();
-         nodeIter != disconnectedNodes.end(); ++nodeIter) {
+    for (set<AnnotatedGraphNode*>::iterator nodeIter = unreachableNodes.begin();
+         nodeIter != unreachableNodes.end(); ++nodeIter) {
 
         AnnotatedGraphNode* currentNode = *nodeIter;
 
-        trace(TRACE_3, "\t\tremoved disconnected node: " + (*nodeIter)->getName() + "\n");
+        trace(TRACE_3, "\t\tremoved unreachable node: " + (*nodeIter)->getName() + "\n");
 
-        removeEdgesToNodeFromAllOtherNodes(currentNode);
+        AnnotatedGraphNode::LeavingEdges::Iterator edgeIter = currentNode->getLeavingEdgesIterator();
+            while (edgeIter->hasNext()) {
+                AnnotatedGraphEdge* currentEdge = edgeIter->getNext();
+                currentNode->removeLiteralFromAnnotation(currentEdge->getLabel());
+                delete currentEdge;
+                edgeIter->remove();
+            }
+
+            delete edgeIter;
+
         removeNode(currentNode);
         delete currentNode;
     }
 
-    trace(TRACE_5, "AnnotatedGraph::removeDisconnectedNodes(): end\n");
+    trace(TRACE_5, "AnnotatedGraph::removeUnreachableNodes(): end\n");
 }
 
 
 //! \brief collects all connected Nodes in a set
 //! \param currentNode Current node to be added to the set
 //! \param connectedNodes set of connected nodes
-void AnnotatedGraph::removeDisconnectedNodesRecursively(AnnotatedGraphNode* currentNode,
-                                                        set<AnnotatedGraphNode*>& connectedNodes) {
+void AnnotatedGraph::removeUnreachableNodesRecursively(AnnotatedGraphNode* currentNode,
+                                                        set<AnnotatedGraphNode*>& unreachableNodes) {
 
-    trace(TRACE_5, "AnnotatedGraph::removeDisconnectedNodesRecursively(): start\n");
+    trace(TRACE_5, "AnnotatedGraph::removeUnreachableNodesRecursively(AnnotatedGraphNode* currentNode, set<AnnotatedGraphNode*>& unreachableNodes): start\n");
 
-    // add the node to the connected nodes
-    connectedNodes.insert(currentNode);
+    // remove the node from the set of unreachable nodes
+    unreachableNodes.erase(currentNode);
 
-    trace(TRACE_3, "\t\tnode " + currentNode->getName() + " is connected.\n");
+    trace(TRACE_4, "\t\tnode " + currentNode->getName() + " is reachable.\n");
 
     // iterate over all edges
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = currentNode->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* edge = edgeIter->getNext();
 
-        // if the edge leads to a node that has not been determined as connected yet, proceed it
-        if (connectedNodes.find(edge->getDstNode()) == connectedNodes.end()) {
-            removeDisconnectedNodesRecursively(edge->getDstNode(), connectedNodes);
+        // if the edge leads to a node that is yet assumed unreachable
+        if (unreachableNodes.find(edge->getDstNode()) != unreachableNodes.end()) {
+            removeUnreachableNodesRecursively(edge->getDstNode(), unreachableNodes);
         }
     }
 
-    trace(TRACE_5, "AnnotatedGraph::removeDisconnectedNodesRecursively(): end\n");
+    trace(TRACE_5, "AnnotatedGraph::removeUnreachableNodesRecursively(AnnotatedGraphNode* currentNode, set<AnnotatedGraphNode*>& unreachableNodes): end\n");
 }
 
 
@@ -845,7 +883,8 @@ void AnnotatedGraph::minimizeGraph() {
     // false nodes are removed to increase performance only;
     // should also work if nodes are unsatisfiable
     trace(TRACE_2, "removing false nodes...\n");
-    removeFalseNodes(); // automatically removes disconnected nodes as well
+    removeReachableFalseNodes(); 
+    removeUnreachableNodes();
 
     // we only have to minimize if at least two blue nodes are present...
     if (setOfNodes.size() >= 2) {
@@ -923,7 +962,7 @@ void AnnotatedGraph::minimizeGraph() {
         }
 
         // remove all nodes that became unreachable
-        removeDisconnectedNodes();
+        removeUnreachableNodes();
 
     } else {
         // we have less than 2 blue nodes :(
@@ -1810,7 +1849,7 @@ AnnotatedGraph* AnnotatedGraph::product(const AnnotatedGraph* rhs) {
     buildProductOG(currentOGNode, currentRhsNode, productOG);
 
     if (!parameters[P_DIAGNOSIS]) {
-        productOG->removeFalseNodes();
+        productOG->removeReachableFalseNodes();
     }
 
     trace(TRACE_5, "AnnotatedGraph::product(const AnnotatedGraph* rhs): end\n");
@@ -2010,7 +2049,7 @@ void AnnotatedGraph::printDotFile(const std::string& filenamePrefix,
 //! \brief creates a dot output of the graph and calls dot to create an image from it
 //! \param filenamePrefix a string containing the prefix of the output file name
 void AnnotatedGraph::printDotFile(const std::string& filenamePrefix) const {
-    printDotFile(filenamePrefix, filenamePrefix);
+ printDotFile(filenamePrefix, filenamePrefix);
 }
 
 
@@ -2021,6 +2060,7 @@ void AnnotatedGraph::printDotFile(const std::string& filenamePrefix) const {
 void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v, fstream& os,
         std::map<AnnotatedGraphNode*, bool>& visitedNodes) const {
 
+
     if (v == NULL) {
         // print the empty OG...
         os << "p0"
@@ -2029,6 +2069,7 @@ void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v, fstream& os,
     }
 
     if (visitedNodes[v] != true) {
+
 
         if (v->isFinal()) {
             os << "p"<< v->getName() << " [label=\"# "<< v->getName() << "\\n";
@@ -2044,6 +2085,7 @@ void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v, fstream& os,
 
         std::string currentLabel;
 
+
         AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =
                 v->getLeavingEdgesConstIterator();
 
@@ -2053,8 +2095,9 @@ void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v, fstream& os,
             // remember the label of the egde
             currentLabel = edge->getLabel();
             AnnotatedGraphNode* successor =
-                    v->followEdgeWithLabel(currentLabel);
-            assert(successor != NULL);
+//                    v->followEdgeWithLabel(currentLabel);
+                      edge->getDstNode();
+                assert(successor != NULL);
 
             os << "p"<< v->getName() << "->"<< "p"<< successor->getName()
                     << " [label=\""<< currentLabel
@@ -3050,82 +3093,84 @@ void AnnotatedGraph::assignFinalNodes() {
 
 /**** TRANSFERRED FROM COMMUNICATIONGRAPH START ****/
 
-//! \brief Computes the total number of all nodes, edges and states 
+//! \brief Computes the total number of all nodes, edges and states
 //!        stored in all nodes in the graph. Also computes the number
-//!		   of blue nodes and edges in the graph by remembering if a 
-//!		   'blue path' is processed, which means the nodes and edges 
-//!		   processed were reached over a path of blue nodes and edges. 
-//!		   The function also respects the parameter if empty nodes are 
-//!		   to be shown or not. 
+//!           of blue nodes and edges in the graph by remembering if a
+//!           'blue path' is processed, which means the nodes and edges
+//!           processed were reached over a path of blue nodes and edges.
+//!           The function also respects the parameter if empty nodes are
+//!           to be shown or not.
 void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdges() {
-	// Reset statistic variables
-	std::map<AnnotatedGraphNode*, bool> visitedNodes;
-	nStoredStates = 0;
-	nEdges = 0;
-	nBlueEdges = 0;
-	nBlueNodes = 0;
-
-	// Call the recursive helper
-	computeNumberOfNodesAndStatesAndEdgesHelper(root, visitedNodes, (root->getColor() == BLUE));
+    // Reset statistic variables
+    std::map<AnnotatedGraphNode*, bool> visitedNodes;
+    nStoredStates = 0;
+    nEdges = 0;
+    nBlueEdges = 0;
+    nBlueNodes = 0;
+if (hasNoRoot()) {
+    return;
+}
+    // Call the recursive helper
+    computeNumberOfNodesAndStatesAndEdgesHelper(root, visitedNodes, (root->getColor() == BLUE));
 }
 
 
 //! \brief Helps computeNumberOfStatesAndEdges to computes the total number of all
-//!        states stored in all nodes, the number of nodes and the number of all 
-//!		   edges in this graph. Also finds out which nodes and edges are to be 
-//!        counted as blue. 
+//!        states stored in all nodes, the number of nodes and the number of all
+//!           edges in this graph. Also finds out which nodes and edges are to be
+//!        counted as blue.
 //!        This is done recursively (dfs).
 //! \param v Current node in the iteration process.
 //! \param visitedNodes[] Array of bool storing the nodes that we have
 //!        already looked at.
 //! \param onABluePath true if we are on a blue path
 void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphNode* v,
-		std::map<AnnotatedGraphNode*, bool>& visitedNodes, 
-		bool onABluePath) {
+        std::map<AnnotatedGraphNode*, bool>& visitedNodes,
+        bool onABluePath) {
 
-	assert(v != NULL);
+    assert(v != NULL);
 
-	// counting the current node
-	visitedNodes[v] = true;
+    // counting the current node
+    visitedNodes[v] = true;
 
-	// Determine if we have a blue node and are on a blue path.
-	if (onABluePath && (v->getColor() == BLUE) && (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
-		++nBlueNodes;
-	} else {
-		onABluePath = false;
-	}
+    // Determine if we have a blue node and are on a blue path.
+    if (onABluePath && (v->getColor() == BLUE) && (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
+        ++nBlueNodes;
+    } else {
+        onABluePath = false;
+    }
 
-	// Add the new states
-	nStoredStates += v->reachGraphStateSet.size();
+    // Add the new states
+    nStoredStates += v->reachGraphStateSet.size();
 
-	// iterating over all successors
-	AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
-	while (edgeIter->hasNext()) {
-		AnnotatedGraphEdge* leavingEdge = edgeIter->getNext();
+    // iterating over all successors
+    AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        AnnotatedGraphEdge* leavingEdge = edgeIter->getNext();
 
-		AnnotatedGraphNode* vNext = (AnnotatedGraphNode *)leavingEdge->getDstNode();
-		assert(vNext != NULL);
+        AnnotatedGraphNode* vNext = (AnnotatedGraphNode *)leavingEdge->getDstNode();
+        assert(vNext != NULL);
 
-		// We have found a new edge
-		++nEdges;
+        // We have found a new edge
+        ++nEdges;
 
-		// Current blue path status
-		bool onABluePathInLoop = onABluePath;
+        // Current blue path status
+        bool onABluePathInLoop = onABluePath;
 
-		// Determine wether we have a blue edge or not.
-		if (onABluePath && vNext->getColor() == BLUE &&
-				(parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
-			++nBlueEdges;
-		} else {
-			onABluePathInLoop = false;
-		}
+        // Determine wether we have a blue edge or not.
+        if (onABluePath && vNext->getColor() == BLUE &&
+                (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
+            ++nBlueEdges;
+        } else {
+            onABluePathInLoop = false;
+        }
 
-		if ((vNext != v) && !visitedNodes[vNext]) {
-			// Call recursively with the current blue path status. 
-			computeNumberOfNodesAndStatesAndEdgesHelper(vNext, visitedNodes, onABluePathInLoop);
-		}
-	}
-	delete edgeIter;
+        if ((vNext != v) && !visitedNodes[vNext]) {
+            // Call recursively with the current blue path status.
+            computeNumberOfNodesAndStatesAndEdgesHelper(vNext, visitedNodes, onABluePathInLoop);
+        }
+    }
+    delete edgeIter;
 }
 
 
@@ -3133,15 +3178,15 @@ void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphN
 //! \brief Computes statistics about this graph. They can be printed by
 //!        printGraphStatistics().
 void AnnotatedGraph::computeGraphStatistics() {
-	trace(TRACE_5, "AnnotatedGraph::computeGraphStatistics(): start\n");
-	computeNumberOfNodesAndStatesAndEdges();
-	trace(TRACE_5, "AnnotatedGraph::computeGraphStatistics(): end\n");
+    trace(TRACE_5, "AnnotatedGraph::computeGraphStatistics(): start\n");
+    computeNumberOfNodesAndStatesAndEdges();
+    trace(TRACE_5, "AnnotatedGraph::computeGraphStatistics(): end\n");
 }
 
 //! \brief Prints statistics about this graph. May only be called after
 //!       computeGraphStatistics().
 void AnnotatedGraph::printGraphStatistics() {
-	trace(TRACE_5, "AnnotatedGraph::printGraphStatistics(): start\n");
+    trace(TRACE_5, "AnnotatedGraph::printGraphStatistics(): start\n");
     trace(TRACE_0, "    number of nodes: " + intToString(getNumberOfNodes()) + "\n");
     trace(TRACE_0, "    number of edges: " + intToString(getNumberOfEdges()) + "\n");
     trace(TRACE_0, "    number of deleted nodes: " + intToString(numberDeletedVertices) + "\n");
@@ -3150,7 +3195,7 @@ void AnnotatedGraph::printGraphStatistics() {
     trace(TRACE_0, "    number of states calculated: " + intToString(State::state_count) + "\n");
     trace(TRACE_0, "    number of states stored in datastructure: " + intToString(State::state_count_stored_in_binDec) + "\n");
     trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStoredStates()) + "\n");
-	trace(TRACE_5, "AnnotatedGraph::printGraphStatistics(): end\n");
+    trace(TRACE_5, "AnnotatedGraph::printGraphStatistics(): end\n");
 }
 
 //! \brief returns the number of stored states

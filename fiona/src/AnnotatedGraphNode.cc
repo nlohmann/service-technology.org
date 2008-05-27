@@ -99,10 +99,10 @@ GraphFormulaCNF* AnnotatedGraphNode::getAnnotation() const {
 //! \brief sets the annotation of this node
 //! \param newAnnotation annotation of the node
 void AnnotatedGraphNode::setAnnotation(GraphFormulaCNF* newAnnotation) {
-	if (annotation != NULL) {
-		delete annotation;
-	}
-	annotation = newAnnotation;
+    if (annotation != NULL) {
+        delete annotation;
+    }
+    annotation = newAnnotation;
 }
 // END OF CODE FROM PL
 
@@ -419,13 +419,12 @@ void AnnotatedGraphNode::removeEdgesToNode(const AnnotatedGraphNode* nodeToDelet
 
 
 //! \brief analyses the node and sets its color
-void AnnotatedGraphNode::analyseNode() {
+void AnnotatedGraphNode::analyseNode(bool ignoreFinal) {
     
     trace(TRACE_5, "AnnotatedGraphNode::analyseNodeByFormula() : start\n");
     
     trace(TRACE_3, "\t\t\t analysing node ");
-    trace(TRACE_3, this->getNumber() + "...\n");
-    
+    trace(TRACE_3, this->getName() + "...\n");
     assert(this->getColor() == BLUE);
     
     // computing the assignment given by outgoing edges (to blue nodes)
@@ -443,7 +442,7 @@ void AnnotatedGraphNode::analyseNode() {
     delete edgeIter;
     
     // only if node has final state, set assignment of literal final to true
-    if (this->hasFinalStateInStateSet == true) {
+    if ((this->hasFinalStateInStateSet == true) || ignoreFinal) {
         myassignment->setToTrue(GraphFormulaLiteral::FINAL);
     }
     
@@ -566,6 +565,32 @@ GraphFormulaAssignment* AnnotatedGraphNode::getAssignment() const {
 }
 
 
+//! \brief fills a given set of strings with all events appearing either
+//!        in the nodes formula or in one of it's leaving edges
+//! \param events set of string to fill
+void AnnotatedGraphNode::getEvents(set<string>& events) {
+    
+    trace(TRACE_5, "AnnotatedGraphNode::getEvents(): start\n");
+    trace(TRACE_5, "computing annotation of node " + getName() + "\n");
+    
+    // Adds all event-representing literals from the formula of the node
+    // to the set of events
+    annotation->getEventLiterals(events);    
+    
+    // Adds the labels of alle edges to the set
+    LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        AnnotatedGraphEdge* edge = edgeIter->getNext();
+        if (edge->getLabel() != GraphFormulaLiteral::TAU) {
+            events.insert(edge->getLabel());            
+        }
+    }
+    delete edgeIter;
+
+    trace(TRACE_5, "AnnotatedGraphNode::getEvents(): end\n");
+}
+
+
 //! \brief create the annotation in CNF for coverability uses
 //! through a given global constraint, describing the coverability criteria
 //! \param global_constraint formula describing the coverability critera
@@ -676,50 +701,50 @@ PriorityMap::KeyType PriorityMap::pop() {
 }
 
 void PriorityMap::adjustPM(oWFN * PN, const std::string & eventName) {
-	
-	trace(TRACE_5, "PriorityMap::adjustPM(oWFN * PN, const std::string & eventName): start\n");
-	
-	MapClauseEvents::iterator iterClauses;
-	set<std::string>::iterator iterLiterals;
-	MapTypeIG::iterator iterPM;
-	
-	set<int> clausesToDelete;
+    
+    trace(TRACE_5, "PriorityMap::adjustPM(oWFN * PN, const std::string & eventName): start\n");
+    
+    MapClauseEvents::iterator iterClauses;
+    set<std::string>::iterator iterLiterals;
+    MapTypeIG::iterator iterPM;
+    
+    set<int> clausesToDelete;
 
-	messageMultiSet key;
-	
-	// consider each clause
-	for (iterClauses = pmClauseEvents.begin(); iterClauses != pmClauseEvents.end(); iterClauses++) {
-		
-		// the given event is found in the currently considered clause
-		if (iterClauses->second.find(eventName) != iterClauses->second.end()) {
-			
-			// now check each literal that is in the clause as well
-			for (iterLiterals = iterClauses->second.begin(); iterLiterals != iterClauses->second.end();
-					iterLiterals++) {
+    messageMultiSet key;
+    
+    // consider each clause
+    for (iterClauses = pmClauseEvents.begin(); iterClauses != pmClauseEvents.end(); iterClauses++) {
+        
+        // the given event is found in the currently considered clause
+        if (iterClauses->second.find(eventName) != iterClauses->second.end()) {
+            
+            // now check each literal that is in the clause as well
+            for (iterLiterals = iterClauses->second.begin(); iterLiterals != iterClauses->second.end();
+                    iterLiterals++) {
 
-				// iterate over the mapped set of interface places
-				for (iterPM = pmIG.begin(); iterPM != pmIG.end(); iterPM++) {
-					if (PN->createLabel(iterPM->first) == *iterLiterals) {
-						iterPM->second.second--;
-						if (iterPM->second.second <= 0) {
-							key = iterPM->first;
-						}
-						break;
-					}
-				}
-				pmIG.erase(key);
-			}
-			clausesToDelete.insert(iterClauses->first);
-		}
-	}
-	
-	for (set<int>::iterator iterClausesToDelete = clausesToDelete.begin(); 
-			iterClausesToDelete != clausesToDelete.end(); iterClausesToDelete++) {
-		
-		pmClauseEvents.erase(*iterClausesToDelete);
-	}
+                // iterate over the mapped set of interface places
+                for (iterPM = pmIG.begin(); iterPM != pmIG.end(); iterPM++) {
+                    if (PN->createLabel(iterPM->first) == *iterLiterals) {
+                        iterPM->second.second--;
+                        if (iterPM->second.second <= 0) {
+                            key = iterPM->first;
+                        }
+                        break;
+                    }
+                }
+                pmIG.erase(key);
+            }
+            clausesToDelete.insert(iterClauses->first);
+        }
+    }
+    
+    for (set<int>::iterator iterClausesToDelete = clausesToDelete.begin(); 
+            iterClausesToDelete != clausesToDelete.end(); iterClausesToDelete++) {
+        
+        pmClauseEvents.erase(*iterClausesToDelete);
+    }
 
-	trace(TRACE_5, "PriorityMap::adjustPM(oWFN * PN, const std::string & eventName): end\n");
+    trace(TRACE_5, "PriorityMap::adjustPM(oWFN * PN, const std::string & eventName): end\n");
 }
 
 //! \brief Delivers the element from the priority map with the highest priority.
@@ -762,7 +787,7 @@ messageMultiSet PriorityMap::popIG() {
 }
 
 //! \brief Fills the priority map according to the given annotation with interface places 
-//!		   and their corresponding priority.
+//!           and their corresponding priority.
 //!        NOTE: All interface places will be considered; places not in the
 //!        annotation will have a minimal priority.
 //! \param annotation the annotation, from which the priority map will be extracted.
@@ -810,69 +835,69 @@ void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
 }
 
 //! \brief Fills the priority map according to the given annotation with interface places 
-//!		   and their corresponding priority.
+//!           and their corresponding priority.
 //!        NOTE: All interface places will be considered; places not in the
 //!        annotation will have a minimal priority.
 //! \param annotation the annotation, from which the priority map will be extracted.
 void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphFormulaCNF *annotation) {
     
-	trace(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation): start\n");
+    trace(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation): start\n");
 
-	// just to remember which event we have considered already, 
-	// needed for initialising the priority map correctly
-	map<messageMultiSet, bool> eventFound;    
+    // just to remember which event we have considered already, 
+    // needed for initialising the priority map correctly
+    map<messageMultiSet, bool> eventFound;    
 
-	int clauseNo = 0;  // clause counter needed to give each clause a unique number
-	
-	// iterate over all activated events stored in the set
-	for (setOfMessages::iterator activatedEvent = activatedEvents.begin();
-									activatedEvent != activatedEvents.end();
-									activatedEvent++) {
+    int clauseNo = 0;  // clause counter needed to give each clause a unique number
+    
+    // iterate over all activated events stored in the set
+    for (setOfMessages::iterator activatedEvent = activatedEvents.begin();
+                                    activatedEvent != activatedEvents.end();
+                                    activatedEvent++) {
 
-		// check, if we have not considered this event yet
-		map<messageMultiSet, bool>::iterator found = eventFound.find(*activatedEvent); 
-		if (found != eventFound.end()) {   	
-			// initialize with a minimal priority
-			pmIG[*activatedEvent].first  = INT_MAX; // minimal clause length
-			pmIG[*activatedEvent].second = 0;       // maximal occurences in the annotation
+        // check, if we have not considered this event yet
+        map<messageMultiSet, bool>::iterator found = eventFound.find(*activatedEvent); 
+        if (found != eventFound.end()) {       
+            // initialize with a minimal priority
+            pmIG[*activatedEvent].first  = INT_MAX; // minimal clause length
+            pmIG[*activatedEvent].second = 0;       // maximal occurences in the annotation
 
-			// remember this that we took a look at this event
-			eventFound[*activatedEvent] = true;
-		}
+            // remember this that we took a look at this event
+            eventFound[*activatedEvent] = true;
+        }
 
-		// iterate over the annotation (in cnf) with respect to a specific interface place
-		for (GraphFormulaMultiaryAnd::iterator j = annotation->begin();
-												j != annotation->end(); j++) {
+        // iterate over the annotation (in cnf) with respect to a specific interface place
+        for (GraphFormulaMultiaryAnd::iterator j = annotation->begin();
+                                                j != annotation->end(); j++) {
 
-			GraphFormulaMultiaryOr* clause = dynamic_cast<GraphFormulaMultiaryOr*>(*j);
+            GraphFormulaMultiaryOr* clause = dynamic_cast<GraphFormulaMultiaryOr*>(*j);
 
-			// iterate over disjunctive clauses
-			for (GraphFormulaMultiaryOr::iterator k = clause->begin(); k != clause->end(); k++) {
+            // iterate over disjunctive clauses
+            for (GraphFormulaMultiaryOr::iterator k = clause->begin(); k != clause->end(); k++) {
 
-				GraphFormulaLiteral* lit = dynamic_cast<GraphFormulaLiteral*>(*k);
+                GraphFormulaLiteral* lit = dynamic_cast<GraphFormulaLiteral*>(*k);
 
-				// activated event found in the clause?
-				if (lit->asString() == PN->createLabel(*activatedEvent)) {
+                // activated event found in the clause?
+                if (lit->asString() == PN->createLabel(*activatedEvent)) {
 
-					// for every literal found, increase the number of occurences 
-					pmIG[*activatedEvent].second++;
+                    // for every literal found, increase the number of occurences 
+                    pmIG[*activatedEvent].second++;
 
-					// if this label's actual clause is shorter than the former minimum, 
-					// set the new minimum
-					if (clause->size() < pmIG[*activatedEvent].first) {
-						pmIG[*activatedEvent].first = clause->size();
-					}
-				}
-				
-				// currently considered clause with number clauseNo contains the literal lit
-				pmClauseEvents[clauseNo].insert(lit->asString());	
-			}
-			
-			clauseNo++;	// we consider a new clause now, so increase the clause counter
-		}
-	}
+                    // if this label's actual clause is shorter than the former minimum, 
+                    // set the new minimum
+                    if (clause->size() < pmIG[*activatedEvent].first) {
+                        pmIG[*activatedEvent].first = clause->size();
+                    }
+                }
+                
+                // currently considered clause with number clauseNo contains the literal lit
+                pmClauseEvents[clauseNo].insert(lit->asString());    
+            }
+            
+            clauseNo++;    // we consider a new clause now, so increase the clause counter
+        }
+    }
 
-	trace(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation): end\n");
+    trace(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation): end\n");
 }
 
 //! \brief returns whether the priority map is empty

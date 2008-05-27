@@ -700,7 +700,7 @@ void parse_command_line(int argc, char* argv[]) {
     bool firstfile = true;
     // reading all oWFNs and OGs
     for ( ; optind < argc; ++optind) {
-        trace(TRACE_2, "trying to get file type of given file " + (string)(argv[optind]));
+        trace(TRACE_1, "trying to get file type of given file " + (string)(argv[optind]));
         switch (getFileType(argv[optind])) {
             case FILETYPE_OWFN:
                 if (firstfile) {
@@ -731,9 +731,9 @@ void parse_command_line(int argc, char* argv[]) {
                      << "\tEnter \"fiona --help\" for more information.\n"
                      << endl;
         }
-        trace(TRACE_2, " ... done\n");
+        trace(TRACE_1, " ... done\n");
     }
-    trace(TRACE_2, "\n");
+    trace(TRACE_1, "\n");
 
     // read net from stdin
     if (ogfiles.size() == 0 && netfiles.size() == 0 &&

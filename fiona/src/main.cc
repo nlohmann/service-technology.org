@@ -207,7 +207,7 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     og_yydebug = 0;
     og_yy_flex_debug = 0;
     assert(ogfile != "");
-    trace(TRACE_4, "reading from file " + ogfile + "\n");
+    trace(TRACE_1, "reading from file " + ogfile + "\n");
     og_yyin = fopen(ogfile.c_str(), "r");
     if (!og_yyin) {
         cerr << "cannot open OG file '" << ogfile << "' for reading'\n" << endl;
@@ -219,7 +219,7 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     fclose(og_yyin);
 
     OGToParse->setFilename(ogfile);
-    trace(TRACE_4, "file successfully read\n");
+    trace(TRACE_1, "file successfully read\n");
 
     return OGToParse;
 }
@@ -582,14 +582,14 @@ string computeOG(oWFN* PN) {
     graph->buildGraph(); // build operating guideline
     buildGraphTime2 = time(NULL);
     trace(TRACE_1, "finished building the graph\n");
-    trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n");
+    trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n\n");
 
     trace(TRACE_1, "computing graph statistics...\n");
     graphStatsTime1 = time(NULL);
     graph->computeGraphStatistics();
     graphStatsTime2 = time(NULL);
     trace(TRACE_1, "finished computing graph statistics\n");
-    trace(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n");
+    trace(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n\n");
 
 
     if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
@@ -598,21 +598,21 @@ string computeOG(oWFN* PN) {
         graph->removeReachableFalseNodes();
         removeFalseNodesTime2 = time(NULL);
         trace(TRACE_1, "finished removing false nodes\n");
-        trace(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n\n");
 
         trace(TRACE_1, "removing unreachable nodes...\n");
         removeUnreachableNodesTime1 = time(NULL);
         graph->removeUnreachableNodes();
         removeUnreachableNodesTime2 = time(NULL);
         trace(TRACE_1, "finished removing unreachable nodes\n");
-        trace(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n\n");
     }
 
 
     seconds2 = time(NULL);
 
     trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
-    trace(TRACE_0, "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n");
+    trace(TRACE_0, "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n\n");
 
     trace(TRACE_0, "\nnet is controllable: ");
     if (graph->hasNoRoot() || graph->getRoot()->getColor()==RED) {
@@ -1025,14 +1025,14 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         graph->buildGraph(); // build operating guideline
         buildGraphTime2 = time(NULL);
         trace(TRACE_1, "finished building the graph\n");
-        trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n\n");
 
         trace(TRACE_1, "computing graph statistics...\n");
         graphStatsTime1 = time(NULL);
         graph->computeGraphStatistics();
         graphStatsTime2 = time(NULL);
         trace(TRACE_1, "finished computing graph statistics\n");
-        trace(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n\n");
 
 
         if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
@@ -1041,21 +1041,21 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
             graph->removeReachableFalseNodes();
             removeFalseNodesTime2 = time(NULL);
             trace(TRACE_1, "finished removing false nodes\n");
-            trace(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n");
+            trace(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n\n");
 
             trace(TRACE_1, "removing unreachable nodes...\n");
             removeUnreachableNodesTime1 = time(NULL);
             graph->removeUnreachableNodes();
             removeUnreachableNodesTime2 = time(NULL);
             trace(TRACE_1, "finished removing unreachable nodes\n");
-            trace(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n");
+            trace(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n\n");
         }
 
 
         seconds2 = time(NULL);
 
         trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
-        trace(TRACE_0, "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n");
+        trace(TRACE_0, "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n\n");
 
         seconds2 = time (NULL);
         cout << "    " << difftime(seconds2, seconds) << " s consumed for building graph" << endl << endl;
@@ -1214,14 +1214,14 @@ void checkCovSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         graph->buildGraph(); // build operating guideline
         buildGraphTime2 = time(NULL);
         trace(TRACE_1, "finished building the graph\n");
-        trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n\n");
 
         trace(TRACE_1, "computing graph statistics...\n");
         graphStatsTime1 = time(NULL);
         graph->computeGraphStatistics();
         graphStatsTime2 = time(NULL);
         trace(TRACE_1, "finished computing graph statistics\n");
-        trace(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n");
+        trace(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n\n");
 
 
         if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
@@ -1230,21 +1230,21 @@ void checkCovSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
             graph->removeReachableFalseNodes();
             removeFalseNodesTime2 = time(NULL);
             trace(TRACE_1, "finished removing false nodes\n");
-            trace(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n");
+            trace(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n\n");
 
             trace(TRACE_1, "removing unreachable nodes...\n");
             removeUnreachableNodesTime1 = time(NULL);
             graph->removeUnreachableNodes();
             removeUnreachableNodesTime2 = time(NULL);
             trace(TRACE_1, "finished removing unreachable nodes\n");
-            trace(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n");
+            trace(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n\n");
         }
 
 
         seconds2 = time(NULL);
 
         trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
-        trace(TRACE_0, "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n");
+        trace(TRACE_0, "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n\n");
 
         // add new OG to the list
         if (!OGfirst && netfiles.size() == 1) {
@@ -1681,7 +1681,9 @@ int main(int argc, char** argv) {
                 }
                 time_t seconds, seconds2;
 
-                readOG->computeAndPrintGraphStatistics();
+                if(TRACE_1 <= debug_level) {
+                    readOG->computeAndPrintGraphStatistics();
+                }
 
                 trace(TRACE_0, "Removing nodes from '" + readOG->getFilename() + "' ");
                 trace(TRACE_0, "that violate their own annotation...\n");
@@ -1689,16 +1691,18 @@ int main(int argc, char** argv) {
                 readOG->removeReachableFalseNodes();
                 seconds2 = time(NULL);
                 trace(TRACE_0, "Removed all nodes with false annotation.\n");
-                cout << "    " << difftime(seconds2, seconds) << " s consumed for removing reachable false nodes" << endl;
+                cout << "    " << difftime(seconds2, seconds) << " s consumed for removing reachable false nodes" << endl << endl;
 
                 trace(TRACE_0, "Removing unreachable nodes from '" + readOG->getFilename() + "' \n");
                 seconds = time(NULL);
                 readOG->removeUnreachableNodes();
                 seconds2 = time(NULL);
                 trace(TRACE_0, "Removed all unreachable nodes.\n");
-                cout << "    " << difftime(seconds2, seconds) << " s consumed removing unreachable nodes" << endl;
+                cout << "    " << difftime(seconds2, seconds) << " s consumed removing unreachable nodes" << endl << endl;
 
-                readOG->computeAndPrintGraphStatistics();
+                if(TRACE_1 <= debug_level) {
+                    readOG->computeAndPrintGraphStatistics();
+                }
 
                 trace(TRACE_0, "\nCreating new .og-file without false nodes... \n");
                 readOG->printOGFile(newFilename);

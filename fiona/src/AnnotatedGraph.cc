@@ -882,7 +882,7 @@ void AnnotatedGraph::minimizeGraph() {
 
     // false nodes are removed to increase performance only;
     // should also work if nodes are unsatisfiable
-    trace(TRACE_2, "removing false nodes...\n");
+    trace(TRACE_1, "removing false nodes...\n");
     removeReachableFalseNodes(); 
     removeUnreachableNodes();
 
@@ -3066,7 +3066,7 @@ void AnnotatedGraph::assignFinalNodes() {
         if (((*node)->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0) != string::npos) {
             // current node has literal final in annotation
 
-            trace(TRACE_2, "found literal final in node " + (*node)->getName() + "\n");
+            trace(TRACE_2, "    found literal final in node " + (*node)->getName() + "\n");
             // check whether all outgoing edges are receiving ones
             bool receivesOnly = true;
             SList<AnnotatedGraphEdge*>::ConstIterator edge = (*node)->getLeavingEdgesConstIterator();
@@ -3081,7 +3081,7 @@ void AnnotatedGraph::assignFinalNodes() {
 
             // node is final iff literal final AND no non-receiving outgoing edge
             if (receivesOnly) {
-                trace(TRACE_2, "set final flag for node " + (*node)->getName() + "\n");
+                trace(TRACE_2, "    set final flag for node " + (*node)->getName() + "\n");
                 (*node)->setFinal(true);
             }
         }

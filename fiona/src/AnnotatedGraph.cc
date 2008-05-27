@@ -844,9 +844,8 @@ void AnnotatedGraph::minimizeGraph() {
 
     // false nodes are removed to increase performance only;
     // should also work if nodes are unsatisfiable
-//    trace(TRACE_2, "removing false nodes...\n");
-//    removeFalseNodes();
-    // removeFalseNodes() automatically removes disconnected nodes as well
+    trace(TRACE_2, "removing false nodes...\n");
+    removeFalseNodes(); // automatically removes disconnected nodes as well
 
     // we only have to minimize if at least two blue nodes are present...
     if (setOfNodes.size() >= 2) {

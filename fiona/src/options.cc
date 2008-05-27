@@ -700,6 +700,7 @@ void parse_command_line(int argc, char* argv[]) {
     bool firstfile = true;
     // reading all oWFNs and OGs
     for ( ; optind < argc; ++optind) {
+        trace(TRACE_2, "trying to get file type of given file " + (string)(argv[optind]));
         switch (getFileType(argv[optind])) {
             case FILETYPE_OWFN:
                 if (firstfile) {
@@ -730,10 +731,15 @@ void parse_command_line(int argc, char* argv[]) {
                      << "\tEnter \"fiona --help\" for more information.\n"
                      << endl;
         }
+        trace(TRACE_2, " ... done\n");
     }
+    trace(TRACE_2, "\n");
 
     // read net from stdin
-    if (ogfiles.size() == 0 && netfiles.size() == 0 && (parameters[P_IG] || parameters[P_OG] || parameters[P_PNG] || parameters[P_REDUCE])) {
+    if (ogfiles.size() == 0 && netfiles.size() == 0 &&
+        (parameters[P_IG] || parameters[P_OG] ||
+         parameters[P_PNG] || parameters[P_REDUCE])) {
+
         netfiles.push_back("<stdin>");
     }
 
@@ -809,8 +815,8 @@ void parse_command_line(int argc, char* argv[]) {
 //        exit(1);
 //    }
 
-    if (parameters[P_READ_OG] && ogfiles.size() != 1) {
-        cerr << "Error: \t If option -t readOG is used, exactly one OG files must be entered\n" << endl;
+    if (parameters[P_READ_OG] && ogfiles.size() < 1) {
+        cerr << "Error: \t If option -t readOG is used, at least one OG file must be entered\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);
     }

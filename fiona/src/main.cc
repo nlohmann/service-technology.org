@@ -1376,7 +1376,7 @@ int main(int argc, char** argv) {
     // **********************************************************************************
 
     if (parameters[P_PRODUCTOG] || parameters[P_SIMULATES_WITH_COV] || // parameters[P_FILTER] ||
-        parameters[P_SIMULATES] || (parameters[P_EX] && !options[O_BDD]) || parameters[P_READ_OG]) {
+        parameters[P_SIMULATES] || (parameters[P_EX] && !options[O_BDD])) {// || parameters[P_READ_OG]) {
 
         // reading all OG-files
         AnnotatedGraph::ogs_t OGsFromFiles;
@@ -1388,7 +1388,7 @@ int main(int argc, char** argv) {
         og_yylex_destroy();
 #endif
 
-        if (parameters[P_READ_OG]) {
+/*        if (parameters[P_READ_OG]) {
             trace(TRACE_0, "OG was read from file\n");
             trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
 
@@ -1398,7 +1398,7 @@ int main(int argc, char** argv) {
 #endif
             return 0;
         }
-
+*/
         if (parameters[P_PRODUCTOG]) {
             // calculating the product OG
             computeProductOG(OGsFromFiles);
@@ -1535,7 +1535,15 @@ int main(int argc, char** argv) {
             }
 
             else if (parameters[P_READ_OG]) {
+                trace(TRACE_0, "OG was read from file '" + readOG->getFilename() + "'\n");
                 readOG->computeAndPrintGraphStatistics();
+                trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+                trace(TRACE_0, "\n");
+
+                // only print OG size information
+#ifdef LOG_NEW
+                NewLogger::printall();
+#endif
                 delete readOG;
             }
             

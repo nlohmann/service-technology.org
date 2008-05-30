@@ -24,7 +24,7 @@ include $(top_srcdir)/Makefile.covcommon
 TESTS = slist.sh png.sh syntax.sh formula.sh extrema.sh messages.sh cyclic.sh \
         matching.sh sim_og.sh productog.sh publicview.sh oWFNreduction.sh \
         sequences.sh partner.sh countservices.sh samples.sh bddtest.sh \
-	statesReduction.sh falseannos.sh
+        statesReduction.sh falseannos.sh minimize.sh 
 
 check_PROGRAMS = slistcheck
 
@@ -72,6 +72,7 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              extrema/one_input_one_output.owfn \
              extrema/one_output.owfn \
              extrema/one_output_marked.owfn \
+             extrema/unlimited-communication.owfn \
              messages/innerUnbounded.owfn \
              messages/messageboundtest1.owfn \
              messages/messageboundtest2.owfn \
@@ -167,42 +168,13 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              countservices/cyclic.og \
              countservices/1.og \
              countservices/nostrat.og \
-             sim_og/test11.owfn \
-             sim_og/test12.owfn \
-             sim_og/test21.owfn \
-             sim_og/test22.owfn \
-             sim_og/test31.owfn \
-             sim_og/test32.owfn \
-             sim_og/test41.owfn \
-             sim_og/test42.owfn \
-             sim_og/test51.owfn \
-             sim_og/test52.owfn \
-             sim_og/test61.owfn \
-             sim_og/test62.owfn \
-             sim_og/test71.owfn \
-             sim_og/test72.owfn \
-             sim_og/test81.owfn \
-             sim_og/test82.owfn \
-             sim_og/test91.owfn \
-             sim_og/test92.owfn \
-             sim_og/test11.owfn.og \
-             sim_og/test12.owfn.og \
-             sim_og/test21.owfn.og \
-             sim_og/test22.owfn.og \
-             sim_og/test31.owfn.og \
-             sim_og/test32.owfn.og \
-             sim_og/test41.owfn.og \
-             sim_og/test42.owfn.og \
-             sim_og/test51.owfn.og \
-             sim_og/test52.owfn.og \
-             sim_og/test61.owfn.og \
-             sim_og/test62.owfn.og \
-             sim_og/test71.owfn.og \
-             sim_og/test72.owfn.og \
-             sim_og/test81.owfn.og \
-             sim_og/test82.owfn.og \
-             sim_og/test91.owfn.og \
-             sim_og/test92.owfn.og \
+             falseannos/2ndviolating.og \
+             falseannos/bluefalsenode.expected.og \
+             falseannos/bluefalsenode.og \
+             falseannos/cleaned.og \
+             falseannos/shorten.expected.og \
+             falseannos/shorten.og \
+             falseannos/violating.og \
              sim_og/coarse-chopped.og \
              sim_og/coarse.og \
              sim_og/compact.og \
@@ -215,6 +187,15 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              statesReduction/myCoffee.owfn \
              statesReduction/Reservations.owfn \
              png/big.owfn \
+             minimize/nostrat.og \
+             minimize/final_non-final.og \
+             minimize/non-final_final.og \
+             minimize/4-loop.og \
+             minimize/sample.og \
+             minimize/myCoffee.og \
+             minimize/keesCoffee_condition.og \
+             minimize/keesCoffee_condition.emptyNode.og \
+             minimize/06-03-23_BPM06_shop_sect_3.owfn.og \
              formula/1.owfn \
              formula/1.owfn.expected.og
 

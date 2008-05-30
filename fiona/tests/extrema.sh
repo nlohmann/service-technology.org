@@ -46,7 +46,7 @@ owfns=(
     $DIR/no_initial_marking.owfn
     $DIR/no_initial_marking2.owfn
     $DIR/empty.owfn
-    $DIR/'filename*.owfn'
+#   $DIR/'filename*.owfn'
     $DIR/one_input.owfn
     $DIR/one_output.owfn
     $DIR/one_input_marked.owfn
@@ -65,7 +65,7 @@ expectations_controllable=(
     NO
     YES
     YES
-    YES
+#   YES
     YES
     YES
     NO
@@ -76,6 +76,7 @@ expectations_controllable=(
     YES
     YES
 )
+
 
 result=0
 

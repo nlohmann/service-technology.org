@@ -60,7 +60,7 @@ else
     OUTPUT=`$cmd 2>&1`
 fi
 
-cmd="diff $violating.blue.og $cleanedPerHand -q"
+cmd="diff $violating.blue.og $cleanedPerHand "
 
 
 if [ "$memcheck" = "yes" ]; then
@@ -96,7 +96,7 @@ else
     OUTPUT=`$cmd 2>&1`
 fi
 
-cmd="diff $violating.blue.og $cleanedPerHand -q"
+cmd="diff $violating.blue.og $cleanedPerHand "
 
 
 if [ "$memcheck" = "yes" ]; then
@@ -132,7 +132,7 @@ else
     OUTPUT=`$cmd 2>&1`
 fi
 
-cmd="diff $violating.blue.og $cleanedPerHand -q"
+cmd="diff $violating.blue.og $cleanedPerHand "
 
 
 if [ "$memcheck" = "yes" ]; then

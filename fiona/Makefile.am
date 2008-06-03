@@ -19,8 +19,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2008-04-14 13:13:43 $ by $Author: gierds $.
-# Version $Revision: 1.20 $
+# File last changed $Date: 2008-06-03 09:20:18 $ by $Author: massuthe $.
+# Version $Revision: 1.21 $
 
 SUBDIRS = cudd src tests doc
 
@@ -55,7 +55,7 @@ hu-prepare: maintainer-clean
 
 # a README file for a binary distribution
 binarydistreadme:
-	@echo -e Copyright \(C\) 2005, 2006 Peter Massuthe and Daniela Weinberg > BINARYREADME
+	@echo -e Copyright \(C\) 2005, 2006, 2007, 2008 Peter Massuthe and Daniela Weinberg > BINARYREADME
 	@echo >> BINARYREADME
 	@echo -e This is a binary distribution of Fiona, a tool translating business >> BINARYREADME
 	@echo -e processes described in BPEL to open workflow nets \(oWFN\). The sources >> BINARYREADME

@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2008-04-07 16:43:46 $ by $Author: gierds $.
-# Version $Revision: 1.53 $
+# File last changed $Date: 2008-06-03 09:20:18 $ by $Author: massuthe $.
+# Version $Revision: 1.54 $
 
 include $(top_srcdir)/Makefile.covcommon
 
@@ -29,7 +29,8 @@ bin_PROGRAMS = fiona
 AM_YFLAGS = --yacc --defines #--no-lines
 
 YYSOURCES = lexer_owfn.cc lexer_owfn.h syntax_owfn.cc syntax_owfn.h \
-            lexer_og.cc lexer_og.h syntax_og.cc syntax_og.h
+            lexer_og.cc lexer_og.h syntax_og.cc syntax_og.h \
+            lexer_dot.cc lexer_dot.h syntax_dot.cc syntax_dot.h
 
 # the list of sources
 fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \

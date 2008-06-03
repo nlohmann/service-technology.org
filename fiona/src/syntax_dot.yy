@@ -494,4 +494,7 @@ int yyerror(char *s) {
   return yyerror(string(s));
 }
 
+int yyerror(char const *s) {
+  return yyerror(string(s));
+}
 

@@ -157,10 +157,6 @@ fi
 violating="$DIR/2ndviolating"
 cmd="$FIONA $violating.og -t removefalsenodes"
 
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$violating.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"

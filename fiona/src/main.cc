@@ -441,7 +441,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
         (output) << (*PVoWFN);
         output.close();
 
-        // modifizierte Überreste von Peter Laufers output des SA als og-file
+        // modifizierte Ãœberreste von Peter Laufers output des SA als og-file
 
         // const string saOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".pv.sa";
         // OG->printOGFile(saOutput);
@@ -1704,9 +1704,11 @@ int main(int argc, char** argv) {
                     readOG->computeAndPrintGraphStatistics();
                 }
 
-                trace(TRACE_0, "\nCreating new .og-file without false nodes... \n");
-                readOG->printOGFile(newFilename);
-                trace(TRACE_0, "New .og-file '" + newFilename + ".og' succesfully created.\n\n");
+                    if (!options[O_NOOUTPUTFILES]) {
+                    trace(TRACE_0, "\nCreating new .og-file without false nodes... \n");
+                    readOG->printOGFile(newFilename);
+                    trace(TRACE_0, "New .og-file '" + newFilename + ".og' succesfully created.\n\n");
+                }
 
                 delete readOG;
 

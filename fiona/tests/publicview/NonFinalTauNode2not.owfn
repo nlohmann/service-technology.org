@@ -1,0 +1,41 @@
+{test2 op1}
+
+PLACE
+INTERNAL
+  p0,
+  p1;
+
+INPUT
+  ;
+
+OUTPUT
+  a, b, c;
+
+INITIALMARKING
+  p0:   1;
+
+FINALCONDITION
+  (p1 = 1) AND ALL_OTHER_PLACES_EMPTY;
+
+TRANSITION t1
+CONSUME
+  p0:   1;
+PRODUCE
+  a:    1,
+  p1:   1;
+
+TRANSITION t2
+CONSUME
+  p0:   1;
+PRODUCE
+  b:    1,
+  p1:   1;
+
+TRANSITION t3
+CONSUME
+  p0:   1;
+PRODUCE
+  c:    1,
+  p1:   1;
+
+{ END OF FILE }

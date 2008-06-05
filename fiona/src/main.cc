@@ -398,25 +398,41 @@ void makeGasTex(CommunicationGraph* graph) {
 //! \brief generate a public view for a given og
 //! \param OG an og to generate the public view of
 //! \param graphName a name for the graph in the output
-void computePublicView(AnnotatedGraph* OG, string graphName) {
+void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
 
+	// if the OG is empty, there is no public view and the computation
+	// will be aborted
+	if(OG->hasNoRoot() || OG->getRoot()->getColor() == RED) {
+		if (fromOWFN) {
+			trace(TRACE_0,"\nThe given oWFN is not controllable. No PublicView will be generated.\n\n");
+		} else {
+			trace(TRACE_0,"\nThe given OG describes no partners. No PublicView will be generated.\n\n");
+		}
+		return;
+	}
+
+	
     trace(TRACE_0, "generating the public view for ");
     trace(graphName);
     trace("\n");
 
-    unsigned int maxSizeForDot = 120;
+    // dont create the public view automaton's png if it becomes to big
+    unsigned int maxSizeForDot = 150;
 
     outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
     outfilePrefix += ".pv.sa";
 
+    // create an empty graph to be made the public view
     Graph* cleanPV = new Graph();
 
-    OG->transformToPublicView(cleanPV);
+    // give the graph to the OG to be generated from
+    OG->transformToPublicView(cleanPV, fromOWFN);
 
     // generate output files
     if (!options[O_NOOUTPUTFILES]) {
 
-        if(cleanPV->numberOfNodes() > maxSizeForDot) {
+        // test whether this graph is too big
+    	if(cleanPV->numberOfNodes() > maxSizeForDot && !parameters[P_NOPNG]) {
             trace(TRACE_0, "the public view service automaton is to big to generate a dot file\n\n");
         } else {
             trace(TRACE_0, "generating dot output...\n");
@@ -425,26 +441,35 @@ void computePublicView(AnnotatedGraph* OG, string graphName) {
             cleanPV->printDotFile(outfilePrefix, "public view of " + graphName);
         }
 
+        // create sets for transferring the interface from the original owfn
+        // to the newly created one. If the original owfn is not known, these
+        // sets will stay empty
+        set<string> inputs;
+        set<string> outputs;
+
+        // Only fill those sets if the original interface is known
+        if (fromOWFN) {
+        	CommunicationGraph* casted = dynamic_cast<CommunicationGraph*>(OG);
+        	casted->returnInterface(inputs,outputs);
+        }
+
         //transform to owfn
         PNapi::PetriNet* PVoWFN = new PNapi::PetriNet();
         PVoWFN->set_format(PNapi::FORMAT_OWFN, true);
-        cleanPV->transformToOWFN(PVoWFN);
+        cleanPV->transformToOWFN(PVoWFN, inputs, outputs);
 
-        trace(TRACE_0, "Public View oWFN statistics:\n");
+        // print the information of the public view's owfn
+        trace(TRACE_1, "Public View oWFN statistics:\n");
         trace(PVoWFN->information());
-        trace(TRACE_0, "\n");
+        trace(TRACE_1, "\n");
 
+        // create the stream for the owfn output
         ofstream output;
         const string owfnOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".pv.owfn";
         output.open (owfnOutput.c_str(),ios::out);
 
         (output) << (*PVoWFN);
         output.close();
-
-        // modifizierte Überreste von Peter Laufers output des SA als og-file
-
-        // const string saOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".pv.sa";
-        // OG->printOGFile(saOutput);
 
         trace(TRACE_0, "=================================================================\n");
         trace(TRACE_0, "\n");
@@ -639,7 +664,7 @@ string computeOG(oWFN* PN) {
             publicViewName = publicViewName.substr(0, publicViewName.size()-5);
         }
 
-        computePublicView(graph, publicViewName);
+        computePublicView(graph, publicViewName, true);
 
         delete graph;
         return "";
@@ -1618,7 +1643,7 @@ int main(int argc, char** argv) {
                 // computes a service automaton "public view" which has the same
                 // OG as given in readOG
                 readOG->removeReachableFalseNodes();
-                computePublicView(readOG, (*iOgFile));
+                computePublicView(readOG, (*iOgFile), false);
                 delete readOG;
             }
 

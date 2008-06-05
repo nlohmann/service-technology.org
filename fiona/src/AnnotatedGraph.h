@@ -142,26 +142,31 @@ class AnnotatedGraph : public Graph {
         //! NOTE: graph has to be acyclic!
         GraphFormulaMultiaryAnd* createStructureFormulaRecursively(AnnotatedGraphNode*);
 
-       
-// CODE FROM PL
         set<std::string> sendEvents;
         set<std::string> recvEvents;
 
         /// remove a node from the annotated graph
         virtual void removeNode(AnnotatedGraphNode*);
 
-        /// remove all nodes that have the annotation "true"
-        void removeNodesAnnotatedWithTrue();
-
-        /// constructs the dual service
+        /// Public View Generation only:
+        /// constructs the dual service, by transforming all sending
+        /// events into receiving events and vice versa
         void constructDualService();
 
-        /// applies 1st and 2nd fix to dual service
-        void fixDualService();
+        /// Public View Generation only:
+        /// removed the emoty node only in case, that this og was created
+        /// from an owfn. In case that the OG was read from a file, all
+        /// true annotated nodes will be removed
+        void removeTrueNodes(bool fromOWFN);
 
-        /// transforms the public view annotated graph to a non annotated Graph
+        /// Public View Generation only:
+        /// applies various fixes to the dual service to ensure
+        /// equivalence of the public view's and the original process' OGs
+        void fixDualService(bool fromOWFN);
+
+        /// Public View Generation only:
+        /// transforms the public views annotated graph to a non annotated Graph
         void transformOGToService( Graph* cleanPV);
-// END OF CODE FROM PL
 
         /// recursive function for computing the number of services
         unsigned int numberOfServicesRecursively(set<AnnotatedGraphNode*> activeNodes,
@@ -223,13 +228,6 @@ class AnnotatedGraph : public Graph {
         /// Returns the number of all blue to be shown edges in this graph. May only
         /// be called after computeGraphStatistics().
         unsigned int getNumberOfBlueEdges() const;
-
-
-        /// collects all connected Nodes in a set (recursive helper function)
-        void removeDisconnectedNodesRecursively(AnnotatedGraphNode* currentNode,
-                                                set<AnnotatedGraphNode*>& connectedNodes);
-
-
 
     // Public methods
     public:
@@ -397,7 +395,7 @@ class AnnotatedGraph : public Graph {
 
 // CODE FROM PL
         /// transforms the graph to the public view
-        void transformToPublicView(Graph* cleanPV);
+        void transformToPublicView(Graph* cleanPV, bool fromOWFN);
 // END OF CODE FROM PL
 
 // CODE FROM CG FOR STRUCTURAL REDUCTION

@@ -2364,16 +2364,19 @@ void AnnotatedGraph::removeNode(AnnotatedGraphNode* node) {
         }
     }
     trace(TRACE_5, "AnnotatedGraph::removeNode(): end\n");
-
 }
 
 
-//! \brief removes all nodes annotated with true and all their incoming/outgoing transitions
-void AnnotatedGraph::removeNodesAnnotatedWithTrue() {
+//! \brief removes the emoty node only in case, that this og was created
+//!        from an owfn. In case that the OG was read from a file, all
+//!        true annotated nodes will be removed
+//! \param fromOWFN the algorithm needs to know if there are addition informations
+//!                 available from the oWFN
+void AnnotatedGraph::removeTrueNodes(bool fromOWFN) {
 
-    // TODO: If this method is used for Public view generation only,
-    //       then it should remove only the empty node! Removing every
-    //       true-annotated node might be too much!
+    // in order to ensure consistency the nodes will be removed after
+    // the iteration
+    set<AnnotatedGraphNode*> deleteNodes;
 
     // iterate over all nodes of the AnnotatedGraph
     for (nodes_iterator node_iter = setOfNodes.begin();
@@ -2381,38 +2384,66 @@ void AnnotatedGraph::removeNodesAnnotatedWithTrue() {
          ++node_iter) {
 
         AnnotatedGraphNode* currNode = *node_iter;
-        // check whether node is annotated with true
-        if (currNode->getAnnotationAsString() == GraphFormulaLiteral::TRUE) {
-            // node is annotated with true
-            // remove node and all its incoming/outgoing transitions
+
+        // If this OG was constructed from an oWFN the empty node
+        // can be easily identified containing no states.
+
+        // If this OG was read from an OG file, the states stored
+        // in a node are not present and thus the empty node is not
+        // identifiable. In this case all true nodes will be 
+        // deleted although there exist services which do not maintain
+        // their behaviour, this is a TODO
+
+        if (fromOWFN && currNode->reachGraphStateSet.empty()) {
+            // is an empty node and will be removed
             removeEdgesToNodeFromAllOtherNodes(currNode);
             removeNode(currNode);
+            trace(TRACE_2, "        Removing emptyNode: " + currNode->getName());
+            delete currNode;
+            return;
+        } else if (!fromOWFN && currNode->getAnnotationAsString() == GraphFormulaLiteral::TRUE) {
+            // node is annotated with true
+            // remove node and all its incoming/outgoing transitions
+            deleteNodes.insert(currNode);
             trace(TRACE_2, "        Removing node: " + currNode->getName());
             trace(TRACE_3, "\n            Annotation: " + currNode->getAnnotationAsString());
             trace(TRACE_2, "\n");
-
             delete currNode;
+            continue;
         }
+    }
+
+    // remove all true annotated nodes, in case this OG was read from a file
+    for (set<AnnotatedGraphNode*>::iterator node_iter = deleteNodes.begin();
+         node_iter != deleteNodes.end();
+         ++node_iter) {
+        removeEdgesToNodeFromAllOtherNodes(*node_iter);
+        removeNode(*node_iter);
     }
 }
 
 
-//! \brief constructs the dual service by toggling all event types of the underlying graph
-//    (SIDE-EFFECT: stores all events into sets by type)
-//! \complexity O(n+m), with n nodes and m edges in the given AnnotatedGraph
+//! \brief constructs the dual service, by transforming all sending
+//!        events into receiving events and vice versa
 void AnnotatedGraph::constructDualService() {
+
     // iterate over all nodes of the AnnotatedGraph
-    for (nodes_iterator node_iter = setOfNodes.begin(); node_iter
-            != setOfNodes.end(); ++node_iter) {
+    for (nodes_iterator node_iter = setOfNodes.begin();
+         node_iter != setOfNodes.end();
+         ++node_iter) {
+
         AnnotatedGraphNode* currNode = *node_iter;
+
         // iterate over all leaving edges of the current node
         AnnotatedGraphNode::LeavingEdges::Iterator edge_iter =
                 currNode->getLeavingEdgesIterator();
 
         while (edge_iter->hasNext()) {
             AnnotatedGraphEdge* currEdge = edge_iter->getNext();
+
             // toggle event type of the current edge
             currEdge->toggleType();
+
             // store event in the corresponding event set
             switch (currEdge->getType()) {
                 case SENDING:
@@ -2439,27 +2470,22 @@ void AnnotatedGraph::constructDualService() {
 }
 
 
-//! \brief applies 1st and 2nd fix to dual service in order to obtain a correct result
-//! \complexity O(n*2i*o+m), with n nodes, m edges, i input and o output events
-void AnnotatedGraph::fixDualService() {
-
-    // NEEDS COMPLETLY NEW COMMENTING DUE TO SEVERE CHANGES
+//! \brief applies various fixes to the dual service to ensure
+//!        equivalence of the public view's and the original process' OGs
+//! \param fromOWFN the algorithm needs to know if there are addition informations
+//!                 available from the oWFN
+void AnnotatedGraph::fixDualService(bool fromOWFN) {
 
     // prepare deadlock creation
-    AnnotatedGraphNode* deadlock= NULL;
+    AnnotatedGraphNode* deadlock = NULL;
     map<std::string, AnnotatedGraphNode*> deadlockMap;
     unsigned int currNumberOfDeadlocks = 0;
-
-    // prepare sinkNode creation
-    AnnotatedGraphNode* sinkNode= NULL;
-    bool addSink = false;
 
     // gather created nodes in order to add it to the graph
     set<AnnotatedGraphNode*> createdNodes;
 
-    // save all nodes where 2ndFixB has been applied, so they are not made final
-    set<AnnotatedGraphNode*> FixBNodes;
-
+    // if the multiple deadlock option is not activated, create one
+    // deadlock node for the whole public view
     if (!options[O_PV_MULTIPLE_DEADLOCKS]) {
         // create new deadlock node
         deadlock = new AnnotatedGraphNode("deadlock", new GraphFormulaFixed(false, GraphFormulaLiteral::FALSE));
@@ -2471,56 +2497,28 @@ void AnnotatedGraph::fixDualService() {
 
         AnnotatedGraphNode* currNode = *node_iter;
 
-        // 1st fix: if !a is disabled in q of OG, add ?a->Deadlock in q of dual service
+        // Simplify the annotation so only literals that matter are left over
+        currNode->getAnnotation()->simplify();
+        std::string currAnnotation = currNode->getAnnotation()->asString();
+
+        // If !a is disabled in q of OG, add ?a->Deadlock in q of dual service
         // preparation: assume all receive events are disabled in current node (dual service)
         set<std::string> disabledRecvEvents = recvEvents;
 
-        // 2nd fix A: if ?z is enabled in q of OG and no ?-literals occur in the
-        //    annotation of q create a new node without ?z and a tau-transition
-        // preparation: assume we don't have to apply the 2ndA fix in current node
-        bool apply2ndFixA = false;
+        // preparation: we need to gather outgoing sending transitions
+        // which do not appear in the current nodes annotation
+        set<string> sendingEventsNotInAnnotation;
 
-        // 2nd fix B: if there are no ?-literals in the annotation of q, if there is at
-        // least one outgoing transition and if q has "final" in it's annotation, create
-        // a new final node q_tau in the pvsa and a tau-transition q -> q_tau
-        // preparation: assume we don't have to apply the 2ndB fix in current node
-        bool apply2ndFixB = false;
+        // we need to know whether this node has outgoing sending
+        // events that do occur in the annotation
+        bool hasSendingEventThatOccursInAnnotation = false;
 
-        // 3rd fix: if q has "final" in it's annotation and there are only outgoing ?-Transition
-        // create a new final node q' in the pvsa and a tau-transition q -> q_tau
-        // Note: These final nodes can be merged into one, which is then called "sink"
-        bool apply3rdFix = false;
-
-        // preparation: we need to store the leaving edges for the new node somewhere
-        set<AnnotatedGraphEdge*> newNodesEdges;
+        // iterate over all leaving edges of the current node
         AnnotatedGraphNode::LeavingEdges::Iterator edge_iter =
                 currNode->getLeavingEdgesIterator();
         while (edge_iter->hasNext()) {
-            newNodesEdges.insert(edge_iter->getNext());
-        }
-        delete edge_iter;
-
-        // preparation: we need to know whether the current node has outgoing
-        //   sending transitions, when deciding if it's a final node of the PVSA
-        bool hasSendingTransitions = false;
-
-        // iterate over all leaving edges of the current node
-        edge_iter = currNode->getLeavingEdgesIterator();
-        while (edge_iter->hasNext()) {
             AnnotatedGraphEdge* currEdge = edge_iter->getNext();
             std::string currLabel = currEdge->getLabel();
-
-            // Simplify the annotation so only literals that matter are left over
-            currNode->getAnnotation()->simplify();
-            std::string currAnnotation = currNode->getAnnotation()->asString();
-
-            // Check whether the 2ndFix B has to be applied
-            if (currAnnotation.find("?") == std::string::npos) {
-                if (!(currAnnotation.find("final") == std::string::npos)) {
-                    apply2ndFixB = true;
-                    FixBNodes.insert(currNode);
-                }
-            }
 
             // act on transition type
             switch (currEdge->getType()) {
@@ -2534,30 +2532,15 @@ void AnnotatedGraph::fixDualService() {
                     // we want to look for the current edge's label in the current node's
                     // annotation, so we have to toggle the edge type temporarily
                     currLabel[0] = '?';
-                    // check whether any ?-literals occur in the annotation
-                    if (currAnnotation.find("?") == std::string::npos) {
-                        // no ?-literals occur in the annotation
-                        // we have to apply the 2nd A fix at this node
-                        apply2ndFixA = true;
-                        trace(TRACE_5, "need to apply 2nd fix A at node "
-                                + currNode->getName() + "\n");
 
-                        // erase current transition from the set of transitions of the new node
-                        newNodesEdges.erase(currEdge);
+                    // if the current edges label does not appear, this is a
+                    // nonAnnotatedSendingEvent
+                    if (currAnnotation.find(currLabel) == std::string::npos) {
+                        currLabel[0] = '!';
+                        sendingEventsNotInAnnotation.insert(currLabel);
+                    } else {
+                        hasSendingEventThatOccursInAnnotation = true;
                     }
-
-                    // check whether the 3rd Fix needs to be applied
-                    if (!(currAnnotation.find("final") == std::string::npos)
-                            && !(currAnnotation.find(currLabel)
-                                    == std::string::npos)) {
-                        apply3rdFix = true;
-
-                        // the sink node will be added to the nodes of the graph at the end
-                        addSink = true;
-                    }
-
-                    // set the flag for outgoing sending transitions
-                    hasSendingTransitions = true;
                     break;
                 default:
                     // type is either INTERNAL or unknown
@@ -2567,14 +2550,8 @@ void AnnotatedGraph::fixDualService() {
         }
         delete edge_iter;
 
-        // This should never happen, still it has not been proven yet
-        if ((apply2ndFixA && apply2ndFixB)) {
-            trace(TRACE_1, "Conflict between 2ndFixA and 2ndFixB!");
-            apply2ndFixA = false;
-        }
-
-        // iterate over all disabled receive events
-        // if 1st fix needs to be applied, the set of disabled receive events is not empty
+        // iterate over all disabled receive events and create an
+        // arc to this node's deadlock node for every such event
         for (set<std::string>::iterator event_iter = disabledRecvEvents.begin(); event_iter
                 != disabledRecvEvents.end(); ++event_iter) {
 
@@ -2595,214 +2572,82 @@ void AnnotatedGraph::fixDualService() {
             }
 
             // create new leaving edge from current node to the deadlock node
-            //   labeled with current event
-            AnnotatedGraphEdge* disabledEvent= new AnnotatedGraphEdge(deadlock, *event_iter);
+            // labeled with current event
+            AnnotatedGraphEdge* disabledEvent = new AnnotatedGraphEdge(deadlock, *event_iter);
             currNode->addLeavingEdge(disabledEvent);
         }
 
-        // check whether the 2nd fix A needs to be applied at this node
-        if (apply2ndFixA) {
-            // 2nd fix A needs to be applied at this node
-            trace(TRACE_2, "        applying 2nd fixA at node "
-                    + currNode->getName() + "\n");
+        // In case that this is a true node although the empty node has already been
+        // removed and if this node has no outgoing sending or tau transitions, do
+        // a local fix for the true annotation of the node. No other fixes will take
+        // place for this node.
+        string::size_type loc =((currNode)->getAnnotationAsString()).find(GraphFormulaLiteral::TRUE, 0);
+        if (loc != string::npos && !hasSendingEventThatOccursInAnnotation && sendingEventsNotInAnnotation.empty()) {
+            currNode->addLeavingEdge(new AnnotatedGraphEdge(currNode, GraphFormulaLiteral::TAU));
+            // Don't do anything else for this node
+            continue;
+        }
+
+        // In case that final appears in the OG's formula this node needs to be treated
+        // as a final node
+        bool hasFinalLiteral = false;
+        loc =(currNode->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0);
+        if (loc != string::npos) {
+            hasFinalLiteral = true;
+        }
+
+        // If either this node q is a final Node or has non-annotated sending events
+        // this node needs to be fixed. That means a new node q_tau will be created
+        // a tau-transition from q to q_tau. Additionally if q was final,
+        // q will be set to non-final and instead q_tau will be final. Afterwards
+        // q_tau will receive all of q's outgoing transitions, which appear in q's
+        // annotation and only receiving ones if q was final.
+        if (hasFinalLiteral || !sendingEventsNotInAnnotation.empty()) {
             // create new node
-            // as there exists a leaving edge representing a send event in currNode,
-            //   currNode cannot be annotated with final (same goes for newNode)
             AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_tau",
                     new GraphFormulaFixed(true, ""), currNode->getColor());
             trace(TRACE_3, "            created new node " + newNode->getName()
                     + "\n");
+            
             // create tau transition from current to new node
             AnnotatedGraphEdge* tauTransition= new AnnotatedGraphEdge(newNode, GraphFormulaLiteral::TAU);
             currNode->addLeavingEdge(tauTransition);
             trace(TRACE_4, "            created tau transition from "
                     + currNode->getName() +" to "+ newNode->getName() + "\n");
 
-            // add current node's leaving edges to new node
-            //   except those that don't occur in the annotation
+            // add current node's leaving receiving edges to new node
             trace(TRACE_4, "            adding leaving edges to new node\n");
-            for (set<AnnotatedGraphEdge*>::iterator edge_iter =
-                    newNodesEdges.begin(); edge_iter != newNodesEdges.end(); ++edge_iter) {
-                // create new leaving edge
-                AnnotatedGraphEdge* newEdge= new AnnotatedGraphEdge((*edge_iter)->getDstNode(),
-                        (*edge_iter)->getLabel());
-                newNode->addLeavingEdge(newEdge);
-                trace(TRACE_5, "            adding edge " + newEdge->getLabel()
-                        +" from " + newNode->getName() + " to "
-                        +newEdge->getDstNode()->getName() + "\n");
-            }
+            edge_iter = currNode->getLeavingEdgesIterator();
+            while (edge_iter->hasNext()) {
+                AnnotatedGraphEdge* currEdge = edge_iter->getNext();
 
-            // add disabled receive events from 1st fix to new node
-            for (set<std::string>::iterator event_iter =
-                    disabledRecvEvents.begin(); event_iter
-                    != disabledRecvEvents.end(); ++event_iter) {
-                if (options[O_PV_MULTIPLE_DEADLOCKS]) {
-                    // O_PV_MULTIPLE_DEADLOCKS is set
-                    // try to read deadlock node from the mapping event->node
-                    deadlock = deadlockMap[*event_iter];
-                    // deadlock node should have been created already by 1st fix
-                    assert(deadlock);
+                // Only copy edges that represent receiving events or (in case of q not being final
+                // are sending events that appear in the annotation 
+                if (currEdge->getType() == RECEIVING || 
+                       (currEdge->getType() == SENDING && 
+                        sendingEventsNotInAnnotation.find(currEdge->getLabel()) == sendingEventsNotInAnnotation.end() && 
+                        !hasFinalLiteral) ) {
+
+                    // create new leaving edge
+                    AnnotatedGraphEdge* newEdge= new AnnotatedGraphEdge((currEdge)->getDstNode(),
+                            (currEdge)->getLabel());
+                    newNode->addLeavingEdge(newEdge);
+                    trace(TRACE_5, "            adding edge " + newEdge->getLabel()
+                            +" from " + newNode->getName() + " to "
+                            + newEdge->getDstNode()->getName() + "\n");
                 }
-                // create new edge from new node to the deadlock node
-                //   labeled with current event
-                AnnotatedGraphEdge* disabledEvent= new AnnotatedGraphEdge(deadlock, *event_iter);
-                newNode->addLeavingEdge(disabledEvent);
-                trace(TRACE_5, "                adding edge "
-                        + disabledEvent->getLabel() +" from "
-                        + newNode->getName() + " to " + deadlock->getName()
-                        + "\n");
             }
 
-            trace(TRACE_4, "        successfully applied 2nd fix at node "
-                    + currNode->getName() + "\n");
-
+            // In any case the current node is not final any more. 
+            currNode->setFinal(false);
+            
+            //if (hasFinalLiteral && !hasSendingEventThatOccursInAnnotation && nonAnnotatedSendingEvents.empty()) {
+            if (hasFinalLiteral) {
+            newNode->setFinal(true);
+            }
+            
             // insert node into the set of created nodes
             createdNodes.insert(newNode);
-        }
-
-        // check whether the 2nd fix B needs to be applied at this node
-        if (apply2ndFixB) {
-            // 2nd fix B needs to be applied at this node
-            trace(TRACE_2, "        applying 2nd fix B at node "
-                    + currNode->getName() + "\n");
-            // create new node
-            // this node is a final node of the pvsa
-            AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_tau",
-                    new GraphFormulaLiteralFinal(), currNode->getColor());
-
-            trace(TRACE_3, "            created new node " + newNode->getName()
-                    + "\n");
-
-            // create tau transition from current to new node
-            AnnotatedGraphEdge* tauTransition= new AnnotatedGraphEdge(newNode, GraphFormulaLiteral::TAU);
-            currNode->addLeavingEdge(tauTransition);
-            trace(TRACE_4, "            created tau transition from "
-                    + currNode->getName() +" to "+ newNode->getName() + "\n");
-
-            // add current node's leaving edges to new node
-            //   except those that don't occur in the annotation
-            trace(TRACE_4, "            adding leaving edges to new node\n");
-            for (set<AnnotatedGraphEdge*>::iterator edge_iter =
-                    newNodesEdges.begin(); edge_iter != newNodesEdges.end(); ++edge_iter) {
-                // create new leaving edge
-                AnnotatedGraphEdge* newEdge= new AnnotatedGraphEdge((*edge_iter)->getDstNode(),
-                        (*edge_iter)->getLabel());
-                newNode->addLeavingEdge(newEdge);
-                trace(TRACE_5, "                adding edge "
-                        + newEdge->getLabel() +" from " + newNode->getName()
-                        + " to "+newEdge->getDstNode()->getName() + "\n");
-            }
-            // add disabled receive events from 1st fix to new node
-            for (set<std::string>::iterator event_iter =
-                    disabledRecvEvents.begin(); event_iter
-                    != disabledRecvEvents.end(); ++event_iter) {
-                if (options[O_PV_MULTIPLE_DEADLOCKS]) {
-                    // O_PV_MULTIPLE_DEADLOCKS is set
-                    // try to read deadlock node from the mapping event->node
-                    deadlock = deadlockMap[*event_iter];
-                    // deadlock node should have been created already by 1st fix
-                    assert(deadlock);
-                }
-
-                // create new edge from new node to the deadlock node
-                //   labeled with current event
-                AnnotatedGraphEdge* disabledEvent= new AnnotatedGraphEdge(deadlock, *event_iter);
-                newNode->addLeavingEdge(disabledEvent);
-                trace(TRACE_5, "                adding edge "
-                        + disabledEvent->getLabel() +" from "
-                        + newNode->getName() + " to " + deadlock->getName()
-                        + "\n");
-            }
-
-            trace(TRACE_3, "        successfully applied 2nd fix at node "
-                    + currNode->getName() + "\n");
-            createdNodes.insert(newNode);
-        }
-
-        // check whether the 3rd fix needs to be applied at this node
-        if (apply3rdFix) {
-            // 3rd fix needs to be applied at this node
-            trace(TRACE_2, "        applying 3rd fix at node "
-                    + currNode->getName() + "\n");
-            // create new node
-            // as there exists a leaving edge representing a send event in currNode,
-            //   currNode cannot be annotated with final (same goes for newNode)
-            AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_tau",
-                    new GraphFormulaLiteralFinal(), currNode->getColor());
-            trace(TRACE_3, "            created new node " + newNode->getName()
-                    + "\n");
-            sinkNode = newNode;
-
-            // create tau transition from current to new node
-            AnnotatedGraphEdge* tauTransition= new AnnotatedGraphEdge(sinkNode, GraphFormulaLiteral::TAU);
-            currNode->addLeavingEdge(tauTransition);
-            trace(TRACE_4, "            created tau transition from "
-                    + currNode->getName() +" to "+ sinkNode->getName() + "\n");
-
-            // add current node's leaving edges to new node
-            //   except those that don't occur in the annotation
-            trace(TRACE_4, "            adding leaving edges to new node\n");
-            for (set<AnnotatedGraphEdge*>::iterator edge_iter =
-                    newNodesEdges.begin(); edge_iter != newNodesEdges.end(); ++edge_iter) {
-
-                // create new leaving edge
-                if ((*edge_iter)->getType() == RECEIVING) {
-                    AnnotatedGraphEdge* newEdge= new AnnotatedGraphEdge((*edge_iter)->getDstNode(),
-                            (*edge_iter)->getLabel());
-                    sinkNode->addLeavingEdge(newEdge);
-                    trace(TRACE_5, "                adding edge "
-                            + newEdge->getLabel() +" from "
-                            + sinkNode->getName() + " to "+newEdge->getDstNode()->getName() + "\n");
-                }
-            }
-
-            // add disabled receive events from 1st fix to new node
-            for (set<std::string>::iterator event_iter =
-                    disabledRecvEvents.begin(); event_iter
-                    != disabledRecvEvents.end(); ++event_iter) {
-                if (options[O_PV_MULTIPLE_DEADLOCKS]) {
-                    // O_PV_MULTIPLE_DEADLOCKS is set
-                    // try to read deadlock node from the mapping event->node
-                    deadlock = deadlockMap[*event_iter];
-                    // deadlock node should have been created already by 1st fix
-                    assert(deadlock);
-                }
-
-                // create new edge from new node to the deadlock node
-                //   labeled with current event
-                AnnotatedGraphEdge* disabledEvent= new AnnotatedGraphEdge(deadlock, *event_iter);
-                sinkNode->addLeavingEdge(disabledEvent);
-                trace(TRACE_5, "                adding edge "
-                        + disabledEvent->getLabel() +" from "
-                        + sinkNode->getName() + " to " + deadlock->getName()
-                        + "\n");
-            }
-
-            trace(TRACE_3, "        successfully applied 3rd fix at node "
-                    + currNode->getName() + "\n");
-
-            // Add the sink node of this specific current node to the created nodes
-            createdNodes.insert(sinkNode);
-        }
-
-        // check whether the current node is annotated with final
-        string::size_type loc =(currNode->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0);
-        if ((loc != string::npos) && !hasSendingTransitions
-                && FixBNodes.find(currNode)==FixBNodes.end()) {
-            // current node is annotated with final and has no sending transitions
-            // and is not a node that was already fixed by 2nd Fix B
-            // reduce annotation to final only (mark final state of the automaton)
-
-            GraphFormulaMultiaryOr* myclause= new GraphFormulaMultiaryOr();
-            myclause->addSubFormula(new GraphFormulaLiteralFinal());
-            currNode->setAnnotation(new GraphFormulaCNF(myclause));
-        } else {
-            // current node is not annotated with final or has sending transitions
-            // or was already fixed by 2nd Fix B, remove annotation of the current node
-            GraphFormulaMultiaryOr* myclause= new GraphFormulaMultiaryOr();
-            myclause->addSubFormula(new GraphFormulaFixed(true, GraphFormulaLiteral::TRUE));
-            //            myclause->addSubFormula(new GraphFormulaFixed(true, ""));
-            currNode->setAnnotation(new GraphFormulaCNF(myclause));
         }
     }
 
@@ -2817,15 +2662,8 @@ void AnnotatedGraph::fixDualService() {
         }
     }
 
-    // add the sink node in case it was used and if there was only one sink for the whole pvsa
-    if (!(options[O_PV_MULTIPLE_DEADLOCKS]) && addSink) {
-        createdNodes.insert(sinkNode);
-    }
-
-    // add tau transition destination nodes
-    trace(TRACE_3,
-            "\n        inserting all newly created nodes into the graphs nodeset...\n");
-
+    // add the newly created nodes to the graph
+    trace(TRACE_3,"\n        inserting all newly created nodes into the graphs nodeset...\n");
     for (set<AnnotatedGraphNode*>::iterator n = createdNodes.begin(); n
             != createdNodes.end(); ++n) {
         this->addNode((*n));
@@ -2834,65 +2672,81 @@ void AnnotatedGraph::fixDualService() {
 
 
 //! \brief transforms the graph into its public view
-void AnnotatedGraph::transformToPublicView(Graph* cleanPV) {
-    trace(TRACE_1, "    removing nodes...\n");
-    removeNodesAnnotatedWithTrue();
-    trace(TRACE_2, "\n");
+void AnnotatedGraph::transformToPublicView(Graph* cleanPV, bool fromOWFN) {
 
+    // first either the empty node (if the owfn is given) or all true nodes
+    // need to be removed. 
+    trace(TRACE_1, "    removing true nodes ...\n");
+    removeTrueNodes(fromOWFN);
+    trace(TRACE_2, "\n");
+    
     trace(TRACE_1, "    constructing dual service...\n");
     constructDualService();
+    trace(TRACE_2, "\n");
 
     trace(TRACE_1, "    fixing dual service...\n");
-    fixDualService();
+    fixDualService(fromOWFN);
+    trace(TRACE_2, "\n");
 
-    trace(TRACE_0, "\nStatistics of the public view service automaton: \n");
-    trace(TRACE_0, "  nodes: " + intToString(setOfNodes.size()) + "\n");
+    trace(TRACE_1, "\nStatistics of the public view service automaton: \n");
+    trace(TRACE_1, "  nodes: " + intToString(setOfNodes.size()) + "\n");
     unsigned int edges = 0;
     for (nodes_iterator nodeIter = setOfNodes.begin(); nodeIter
             != setOfNodes.end(); ++nodeIter) {
 
         edges += (*nodeIter)->getLeavingEdgesCount();
     }
-    trace(TRACE_0, "  edges: " + intToString(edges) + "\n\n");
+    trace(TRACE_1, "  edges: " + intToString(edges) + "\n\n");
 
-    trace(TRACE_3, "internal translation from OG class to graph class...\n");
+    trace(TRACE_1, "internal translation from OG class to graph class...\n");
     transformOGToService(cleanPV);
-    trace(TRACE_3, "\n");
+    trace(TRACE_1, "\n");
 }
 
 
 //! \brief transforms the public view modified OG to a Service
 void AnnotatedGraph::transformOGToService(Graph* cleanPV) {
 
+    // map from every node in the annotated graph to its corresponding
+    // node in the graph
     map<AnnotatedGraphNode*, GraphNode*> nodeMap;
 
+    // iterate over all nodes
     for (nodes_t::iterator copyNode = setOfNodes.begin(); copyNode
             != setOfNodes.end(); copyNode++) {
 
+        // pointer for the copied node
         GraphNode* copiedNode;
 
+        // gather all relevent informatiion
         std::string stringVal;
         stringVal.assign((*copyNode)->getName());
         GraphNodeColor colorVal = (*copyNode)->getColor();
         unsigned int numberVal = (*copyNode)->getNumber();
 
+        // create the new node with the gathered information
         copiedNode = new GraphNode(stringVal, colorVal, numberVal);
 
+        // insert the new node into the nodemap
         nodeMap[(*copyNode)] = copiedNode;
 
+        // add the new node to the graph
         cleanPV->addNode(copiedNode);
 
+        // if this was the root node mark it as root node in the new
+        // graph as well
         if (root == (*copyNode)) {
             cleanPV->setRoot(copiedNode);
         }
 
-        if (((*copyNode)->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0) != string::npos) {
-            copiedNode->setFinal(true);
-        }
+        // if this node was final in the annotated graph
+        // it is final in the graph too
+        copiedNode->setFinal((*copyNode)->isFinal());
 
         trace(TRACE_4, "    copied node: " + stringVal + "\n");
     }
 
+    // create all edges after all nodes have been created in the graph
     for (nodes_t::iterator copyNode = setOfNodes.begin(); copyNode
             != setOfNodes.end(); copyNode++) {
 
@@ -2902,7 +2756,6 @@ void AnnotatedGraph::transformOGToService(Graph* cleanPV) {
             nodeMap[(*copyNode)]->addLeavingEdge(new GraphEdge( nodeMap[(edge)->getDstNode()], (edge)->getLabel()));
         }
     }
-
 }
 
 

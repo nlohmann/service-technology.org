@@ -132,7 +132,6 @@ class CommunicationGraph : public AnnotatedGraph {
         /// checks wether a state activates output events
         bool stateActivatesOutputEvents(State*);
 
-
         /// prints the current global progress value depending whether the value
         /// changed significantly and depending on the debug-level set
         void printProgressFirst();
@@ -147,6 +146,11 @@ class CommunicationGraph : public AnnotatedGraph {
         /// function to create an STG representation of the IG or OG
         void printGraphToSTG();
 
+        /// fills the given sets with the names of the inputs and outputs
+        /// needed for public view generation. The interfaces of the public view
+        /// and the original netmust be the same, even if some output/inputs are 
+        /// not used
+        void returnInterface(set<string>& inputs, set<string>& outputs);
 
         /// deletes the corresponding oWFN
         void deleteOWFN();

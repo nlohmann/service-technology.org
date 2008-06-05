@@ -327,98 +327,135 @@ void Graph::printGraphToDot(GraphNode* v,
     }
 }
 
-//! \brief creates a simple oWFN from a service automaton
-//! \param filenamePrefix a string containing the prefix of the output file name
-//! \param dotGraphTitle a title for the graph to be shown in the image
-void Graph::transformToOWFN(PNapi::PetriNet* PN) {
 
-	trace(TRACE_0, "creating the oWFN from the service automaton ...\n");
-    
+//! \brief creates a simple oWFN from a service automaton
+//! \param PN The owfn to be filled
+//! \param setOfInputs inputs that are not part of the graph but appeared in the
+//!        underlying owfn
+//! \param setOfOutputs outputs that are not part of the graph but appeared in the
+//!        underlying owfn
+void Graph::transformToOWFN(PNapi::PetriNet* PN, set<string> setOfInputs, set<string> setOfOutputs) {
+
+    trace(TRACE_0, "creating the oWFN from the service automaton ...\n");
+
     GraphNode* currentNode = getRoot(); 
+
+    // create all variables for storing information
+    // while perfomirng the recursion
     set<GraphNode*> visitedNodes;
     set<string> finalNodeNames;
     unsigned int transitionNumber = 0;
     PNapi::Transition* incomingTransition = NULL;
-    
+
+    // to assure that the interface of the public view and its original
+    // service are equivalent, even events that do not appear in the
+    // public service still need to be part of the interface. Those
+    // events have to be given to the function in extra sets
+    for(set<string>::iterator input = setOfInputs.begin(); input != setOfInputs.end(); input ++) {
+		PN->newPlace((*input), PNapi::IN);    	
+    }
+    for(set<string>::iterator output = setOfOutputs.begin(); output != setOfOutputs.end(); output ++) {
+		PN->newPlace((*output), PNapi::OUT);    	
+    }
+
+    // start the recursion
     transformToOWFNRecursively(currentNode,visitedNodes,finalNodeNames,PN, transitionNumber, incomingTransition);
-    
+
+    // create the final markings for the petri net
     for (set<string>::iterator finalNodesIt = finalNodeNames.begin(); finalNodesIt != finalNodeNames.end(); ++finalNodesIt) {
-    	// PN->findPlace(*finalNodesIt)->isFinal = true;    	
-    	//PNapi::Marking* finalMarking = PN->addFinalMarking();
-    	//PN->findPlace(*finalNodesIt)->addToFinalMarking(finalMarking);
         set< PNapi::Place * > finalMarking;
         finalMarking.insert(PN->findPlace(*finalNodesIt));
         PN->final_set_list.push_back(finalMarking);
     }
-
-    
 }
 
+
+//! \brief creates a simple oWFN from a service automaton by recursively constructing
+//!        a state machine petri net from this graph.
+//! \param currentNode Node to be processed
+//! \param visitedNodes set of visited nodes to stop the recursion
+//! \param finalNodeNames the final nodes need to be gathered for construction
+//!                       of the final markings afterwards
+//! \param PN the petrinet itself
+//! \param transitionNumber since the graphs transitions dont have names, they need
+//!                         to be created in an iterative way
+//! \param incomingTransition needed to creat the arc from the node that called the
+//!                           current one by following its edges
 void Graph::transformToOWFNRecursively(GraphNode* currentNode,
-		   							   set<GraphNode*>& visitedNodes,
-		   							   set<string>& finalNodeNames,
-		   							   PNapi::PetriNet* PN,
-		   							   unsigned int& transitionNumber,
-		   							   PNapi::Transition* incomingTransition) {
-    
-    if(visitedNodes.find(currentNode) != visitedNodes.end()) {
-    	trace(TRACE_3, "    node " + currentNode->getName() + " has already been visited\n");
+                                          set<GraphNode*>& visitedNodes,
+                                          set<string>& finalNodeNames,
+                                          PNapi::PetriNet* PN,
+                                          unsigned int& transitionNumber,
+                                          PNapi::Transition* incomingTransition) {
+
+    // If this node was already visited, simply connect the incoming transition
+	if(visitedNodes.find(currentNode) != visitedNodes.end()) {
+        trace(TRACE_3, "    node " + currentNode->getName() + " has already been visited\n");
         if (incomingTransition != NULL) {
-        	PN->newArc(incomingTransition, PN->findPlace("p" + currentNode->getName()));
+            PN->newArc(incomingTransition, PN->findPlace(currentNode->getName()));
         } 
-     	return;
+         return;
     }
 
-	trace(TRACE_2, "    Processing node: " + currentNode->getName() + "\n");
+    trace(TRACE_2, "    Processing node: " + currentNode->getName() + "\n");
 
-    PNapi::Place* place = PN->newPlace("p" + currentNode->getName());
-  	visitedNodes.insert(currentNode);
-  	
-  	if (currentNode->isFinal())
-  		finalNodeNames.insert("p" + currentNode->getName());
-  		
-  	if (incomingTransition != NULL) {
-  		PN->newArc(incomingTransition, place);
+    PNapi::Place* place;
+
+    // create a place for the current node in the graph
+    place = PN->newPlace(currentNode->getName());
+
+    // mark it as visited
+    visitedNodes.insert(currentNode);
+
+    // if it is final, insert its name into the finalNodeNames
+    if (currentNode->isFinal())
+        finalNodeNames.insert(currentNode->getName());
+
+    // if the incoming transition is NULL this is the root node and
+    // will be initially marked, else connect this node to its predecessor
+    if (incomingTransition != NULL) {
+        PN->newArc(incomingTransition, place);
+    } else {
+        place->mark();
     }
-    else { // Wenn die incomingTransition null ist, sind wir am ersten Knoten --> Initial Marking
-    	place->mark();
-    }
-  	
-    
+
     GraphNode::LeavingEdges::ConstIterator edgeIter =
         currentNode->getLeavingEdgesConstIterator();
 
+    // iterate over all edges
     while (edgeIter->hasNext()) {
 
-    	GraphEdge* edge = edgeIter->getNext();
-    	string currentLabel = edge->getLabel();
-    	
-    	PNapi::Transition* t =PN->newTransition("t" + intToString(transitionNumber));
+        GraphEdge* edge = edgeIter->getNext();
+        string currentLabel = edge->getLabel();
+
+        // create a transition in the net representing the edge and connect it
+        PNapi::Transition* t =PN->newTransition("t" + intToString(transitionNumber));
         ++transitionNumber;
         PN->newArc(place,t);
 
-        // Adding places and arcs for input and output. 
-    	if (currentLabel[0] == '?') {
-    		PNapi::Place* input; 
-    		currentLabel.erase(0,1);
-    		input = PN->findPlace(currentLabel);
-    		if (input == NULL) {
-    			input = PN->newPlace(currentLabel, PNapi::IN);
-    		} 
+        // Adding places and arcs for input and output
+        if (currentLabel[0] == '?') {
+            PNapi::Place* input; 
+            currentLabel.erase(0,1);
+            input = PN->findPlace(currentLabel);
+            if (input == NULL) {
+                input = PN->newPlace(currentLabel, PNapi::IN);
+            } 
             PN->newArc(input,t);
-    	} else if (currentLabel[0] == '!') {
-    		PNapi::Place* output; 
-    		currentLabel.erase(0,1);
-    		output = PN->findPlace(currentLabel);
-        	if (output == NULL) {
-    			output = PN->newPlace(currentLabel, PNapi::OUT);
-    		} 
-    		PN->newArc(t,output);
-    	}
+        } else if (currentLabel[0] == '!') {
+            PNapi::Place* output; 
+            currentLabel.erase(0,1);
+            output = PN->findPlace(currentLabel);
+            if (output == NULL) {
+                output = PN->newPlace(currentLabel, PNapi::OUT);
+            } 
+            PN->newArc(t,output);
+        }
+
+        // perform the recursion with all followernodes
         transformToOWFNRecursively(edge->getDstNode(), visitedNodes, finalNodeNames, PN, transitionNumber, t);
     }
 }
-
 
 
 //! \brief A function needed for successful deletion of the graph

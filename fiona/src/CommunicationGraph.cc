@@ -427,8 +427,7 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
                // os << "(" << *iter << ") " ;
                 os << "[" << PN->getCurrentMarkingAsString() << "]";
               //  os << " (";
-//
-//                // print the suffix (state type)
+                // print the suffix (state type)
 //                switch ((*iter)->exactType()) {
 //                    case I_DEADLOCK:    os << "iDL";    break;
 //                    case E_DEADLOCK:    os << "eDL";    break;
@@ -636,6 +635,34 @@ void CommunicationGraph::printGraphToSTGRecursively(AnnotatedGraphNode* v,
         }
     }
     delete edgeIter;
+}
+
+
+//! \brief fills the given sets with the names of the inputs and outputs
+//!        needed for public view generation. The interfaces of the public view
+//!        and the original netmust be the same, even if some output/inputs are 
+//!        not used
+//! \param inputs set to be filled with the names of all inputs
+//! \param outputs set to be filled with the names of all outputs
+void CommunicationGraph::returnInterface(set<string>& inputs, set<string>& outputs) {
+    
+    // Gather all inputs
+    unsigned int inputIterator = 0;
+    unsigned int endOfIteration = PN->getInputPlaceCount();
+    while (inputIterator < endOfIteration) {
+        owfnPlace* currentInputPlace = PN->getInputPlace(inputIterator);
+        inputs.insert((currentInputPlace->getLabelForMatching()).erase(0,1));
+        inputIterator++;
+    }
+
+    //Gather all outputs
+    unsigned int outputIterator = 0;
+    endOfIteration = PN->getOutputPlaceCount();
+    while (outputIterator < endOfIteration) {
+        owfnPlace* currentOutputPlace = PN->getOutputPlace(outputIterator);
+        outputs.insert((currentOutputPlace->getLabelForMatching()).erase(0,1));
+        outputIterator++;
+    }
 }
 
 

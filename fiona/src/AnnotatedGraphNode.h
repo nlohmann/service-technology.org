@@ -156,7 +156,7 @@ class AnnotatedGraphNode : public GraphNode {
         void removeUnneededLiteralsFromAnnotation();
 
         /// returns true iff node should be shown according to the "show" parameter
-        bool isToShow(const AnnotatedGraphNode* rootOfGraph) const;
+        bool isToShow(const AnnotatedGraphNode* rootOfGraph, bool hasOWFN) const;
 
         /// determines whether an assinment satisfies this node's annotation
         bool assignmentSatisfiesAnnotation(const GraphFormulaAssignment&) const;

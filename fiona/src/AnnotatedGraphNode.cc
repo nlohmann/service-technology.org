@@ -510,12 +510,15 @@ void AnnotatedGraphNode::removeUnneededLiteralsFromAnnotation() {
 
 //! \brief returns true iff node should be shown according to the "show" parameter
 //! \param rootOfGraph the root node of the current graph
+//! \param hasOWFN if the oWFN is given, the knowledge stored in the nodes can be
+//!                used to distinguish the empty node from other true nodes
 //! \return true iff this node should be shown according to the "show" parameter
-bool AnnotatedGraphNode::isToShow(const AnnotatedGraphNode* rootOfGraph) const {
+bool AnnotatedGraphNode::isToShow(const AnnotatedGraphNode* rootOfGraph, bool hasOWFN) const {
 #undef TRUE
 
     return ((parameters[P_SHOW_ALL_NODES]) ||
-            (getColor() == BLUE && (annotation->asString() != GraphFormulaLiteral::TRUE ||
+            (getColor() == BLUE && (!hasOWFN || 
+                                    reachGraphStateSet.size() != 0 || 
                                     parameters[P_SHOW_EMPTY_NODE])) ||
             (getColor() == RED && parameters[P_SHOW_RED_NODES]) ||
             (this == rootOfGraph));

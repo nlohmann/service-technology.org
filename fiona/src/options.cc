@@ -369,7 +369,7 @@ void parse_command_line(int argc, char* argv[]) {
 
     messages_manual = 1;
     events_manual = -1;
-    globals::reduction_level = 5;
+    globals::reduction_level = 0;
 
     // evaluate options and set parameters
     trace(TRACE_0, "\n");
@@ -502,6 +502,9 @@ void parse_command_line(int argc, char* argv[]) {
 //                    parameters[P_FILTER] = true;
 //                    parameters[P_IG] = false; 
                 } else if (lc_optarg == "reduce") {
+                    if (globals::reduction_level == 0) {
+                        globals::reduction_level =5;
+                    }
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
                     parameters[P_REDUCE] = true;

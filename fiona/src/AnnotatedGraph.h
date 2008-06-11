@@ -335,7 +335,7 @@ class AnnotatedGraph : public Graph {
                           const std::string& dotGraphTitle) const;
 
         /// Prints this OG in OG file format
-        void printOGFile(const std::string& filenamePrefix) const;
+        void printOGFile(const std::string& filenamePrefix, bool hasOWFN) const;
 
         /// Adds the suffix for OG files to the given file name prefix
         static std::string addOGFileSuffix(const std::string& filePrefix);

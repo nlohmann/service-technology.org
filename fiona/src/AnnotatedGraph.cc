@@ -986,7 +986,8 @@ void AnnotatedGraph::minimizeGraph() {
         trace(AnnotatedGraph::addOGFileSuffix(outfilePrefix));
         trace("\n\n");
 
-        printOGFile(outfilePrefix);
+        // the second parameter is false, since this OG has no underlying oWFN
+        printOGFile(outfilePrefix, false);
         printDotFile(outfilePrefix + ".og");
     }
 
@@ -2112,7 +2113,10 @@ void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v, fstream& os,
 //! \brief Prints this OG in OG file format to a file with the given prefix. The
 //!        suffix is added automatically by this method.
 //! \param filenamePrefix a prefix for th filename
-void AnnotatedGraph::printOGFile(const std::string& filenamePrefix) const {
+//! \param hasOWFN gives true if this Annotated Graph is also a Communication Graph
+//!                that contains it's oWFN. Important to determine whether a true
+//!                annotated node is the empty node or not.
+void AnnotatedGraph::printOGFile(const std::string& filenamePrefix, bool hasOWFN) const {
     fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(), ios_base::out | ios_base::trunc);
 
     if (hasNoRoot()) {
@@ -2132,7 +2136,7 @@ void AnnotatedGraph::printOGFile(const std::string& filenamePrefix) const {
             != setOfNodes.end(); ++iNode) {
 
         AnnotatedGraphNode* node = *iNode;
-        if (!node->isToShow(root)) {
+        if (!node->isToShow(root, hasOWFN)) {
             continue;
         }
 
@@ -2161,7 +2165,7 @@ void AnnotatedGraph::printOGFile(const std::string& filenamePrefix) const {
             != setOfNodes.end(); ++iNode) {
 
         AnnotatedGraphNode* node = *iNode;
-        if (!node->isToShow(root)) {
+        if (!node->isToShow(root, hasOWFN)) {
             continue;
         }
 
@@ -2170,7 +2174,7 @@ void AnnotatedGraph::printOGFile(const std::string& filenamePrefix) const {
 
         while (iEdge->hasNext()) {
             AnnotatedGraphEdge* edge = iEdge->getNext();
-            if (!edge->getDstNode()->isToShow(root)) {
+            if (!edge->getDstNode()->isToShow(root, hasOWFN)) {
                 continue;
             }
 

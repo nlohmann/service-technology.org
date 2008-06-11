@@ -295,7 +295,15 @@ labellist:
 
 
 
-final: KEY_FINALMARKING finalmarkinglist SEMICOLON
+final: KEY_FINALMARKING
+    {
+        PN->finalMarkingString = "[";
+    }
+    finalmarkinglist
+    {
+        PN->finalMarkingString = PN->finalMarkingString + "]";
+    }
+    SEMICOLON
 | KEY_FINALCONDITION statepredicate SEMICOLON {
 	PN->FinalCondition = $2;
 
@@ -521,7 +529,17 @@ finalmarking:
 	}
 	sscanf($3,"%u",&i);
 	PN->FinalMarking[PN->getPlaceIndex(PS->getPlace())] = i;
-    PN->finalMarkingString = PN->finalMarkingString + string($1) + ": " + string($3);
+	if (i < 5) {
+        for (unsigned int n = 0; n < i; n++) {
+            if (n != 0) {
+                PN->finalMarkingString = PN->finalMarkingString + ", ";
+            }
+            PN->finalMarkingString = PN->finalMarkingString + string($1);
+        }
+    } else {
+        PN->finalMarkingString = PN->finalMarkingString + string($1) + ":" + string($3);
+    }
+	
 	free($1);
 	free($3);
       }
@@ -535,7 +553,7 @@ finalmarking:
 	}
 	sscanf("1","%u",&i);
 	PN->FinalMarking[PN->getPlaceIndex(PS->getPlace())] = i;
-    PN->finalMarkingString = PN->finalMarkingString + string($1) + ": 1";
+    PN->finalMarkingString = PN->finalMarkingString + string($1);
 	free($1);
       }
 ;

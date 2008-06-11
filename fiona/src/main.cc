@@ -558,7 +558,9 @@ string computeIG(oWFN* PN) {
 
         igFilename += ".ig";
 
-        graph->printOGFile(igFilename);
+        // the second parameter is true, since the oWFN this IG was generated
+        // from still exists and additional information are available
+        graph->printOGFile(igFilename, true);
 
 /* */
         if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
@@ -712,7 +714,9 @@ string computeOG(oWFN* PN) {
             ogFilename += ".R";
         }
 
-        graph->printOGFile(ogFilename);
+        // the second parameter is true, since the oWFN this OG was generated
+        // from still exists and additional information are available
+        graph->printOGFile(ogFilename, true);
 
         if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
             if (controllable) {
@@ -794,11 +798,11 @@ void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace("Saving product OG to:\n");
         trace(AnnotatedGraph::addOGFileSuffix(outfilePrefix));
         trace("\n\n");
-//        productOG->printOGFile(outfilePrefix);
-//        trace("\n");
 
-        productOG->printOGFile(outfilePrefix);
+        // the second parameter is false, since this OG has no underlying oWFN
+        productOG->printOGFile(outfilePrefix, false);
         productOG->printDotFile(outfilePrefix);
+        trace("\n");
     }
 
     delete productOG;
@@ -969,6 +973,9 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
     if (!calledWithNet) {
         trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
         trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
+    } else if (netfiles.size() == 1) {
+        trace(TRACE_0, "Attention: This result is only valid if the given OG is complete\n");
+        trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
     }
 
     deleteOGs(OGsFromFiles);
@@ -1102,7 +1109,7 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
     }
 
     trace(TRACE_0, "=================================================================\n");
-    trace(TRACE_0, "\n\nChecking equivalence of generated OGs...\n");
+    trace(TRACE_0, "\n\nchecking equivalence of the OGs...\n");
 
     AnnotatedGraph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
     AnnotatedGraph *firstOG = *currentOGfile;
@@ -1114,10 +1121,16 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
     seconds = time (NULL);
 
     trace(TRACE_1, "checking whether " + firstOG->getFilename() + " is equivalent to " + secondOG->getFilename() + "\n");
-    if (firstOG->isEquivalent(secondOG)) {
-        trace(TRACE_0, "\nresult: " + firstOG->getFilename() + " and " + secondOG->getFilename() + " are equivalent: YES\n\n");
+
+    // Check the equivalence
+    bool areEquivalent = firstOG->isEquivalent(secondOG);
+
+    trace(TRACE_0, "\nresult: " + firstOG->getFilename() + " and " + secondOG->getFilename() + " are equivalent:");
+
+    if (areEquivalent) {
+        trace(TRACE_0, " YES\n\n");
     } else {
-        trace(TRACE_0, "\nresult: " + firstOG->getFilename() + " and " + secondOG->getFilename() + " are equivalent: NO\n\n");
+        trace(TRACE_0, " NO\n\n");
     }
 
     seconds2 = time (NULL);
@@ -1125,6 +1138,9 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
     if (!calledWithNet && !parameters[P_EQ_R]) {
         trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
+        trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
+    } else if (netfiles.size() == 1 && !parameters[P_EQ_R]) {
+        trace(TRACE_0, "Attention: This result is only valid if the given OG is complete\n");
         trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
     }
 
@@ -1163,7 +1179,8 @@ void filterOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace(AnnotatedGraph::addOGFileSuffix(outfilePrefix));
         trace("\n\n");
 
-        lhs->printOGFile(outfilePrefix);
+        // the second parameter is false, since this OG has no underlying oWFN
+        lhs->printOGFile(outfilePrefix, false);
         lhs->printDotFile(outfilePrefix);
     }
 
@@ -1306,7 +1323,11 @@ void checkCovSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
     if (!calledWithNet) {
         trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
         trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
+    } else if (netfiles.size() == 1) {
+        trace(TRACE_0, "Attention: This result is only valid if the given OG is complete\n");
+        trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
     }
+
     deleteOGs(OGsFromFiles);
 }
 
@@ -1323,10 +1344,10 @@ void makePNG(oWFN* PN) {
     // set strings needed in PNapi output
     globals::output_filename = PN->filename;
     if (PN->finalConditionString != "") {
-        globals::filename = PN->filename + " | Final Condition: "
+        globals::filename = PN->filename + " \\n Final Condition: "
                 + PN->finalConditionString;
     } else {
-        globals::filename = PN->filename + " | Final Marking: "
+        globals::filename = PN->filename + " \\n Final Marking: "
                 + PN->finalMarkingString;
     }
 
@@ -1430,13 +1451,7 @@ void reduceOWFN(oWFN* PN) {
 
     // set strings needed in PNapi output
     globals::output_filename = PN->filename;
-    if (PN->finalConditionString != "") {
-        globals::filename = PN->filename + " | Final Condition: "
-                + PN->finalConditionString;
-    } else {
-        globals::filename = PN->filename + " | Final Marking: "
-                + PN->finalMarkingString;
-    }
+    globals::filename = PN->filename;
 
     // set the output format to dot
     PNapiNet->set_format(PNapi::FORMAT_OWFN, true);
@@ -1731,7 +1746,8 @@ int main(int argc, char** argv) {
 
                     if (!options[O_NOOUTPUTFILES]) {
                     trace(TRACE_0, "\nCreating new .og-file without false nodes... \n");
-                    readOG->printOGFile(newFilename);
+                    // the second parameter is false, since the read OG has no underlying oWFN
+                    readOG->printOGFile(newFilename, false);
                     trace(TRACE_0, "New .og-file '" + newFilename + ".og' succesfully created.\n\n");
                 }
 

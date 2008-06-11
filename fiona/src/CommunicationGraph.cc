@@ -408,7 +408,7 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
     assert(v != NULL);
 
     // continue only if current node v is to show
-    if (!v->isToShow(root))
+    if (!v->isToShow(root, (PN != NULL)))
         return;
 
     os << "p" << v->getNumber() << " [label=\"# " << v->getNumber() << "\\n";
@@ -473,7 +473,7 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
         AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = element->getDstNode();
 
-        if (!vNext->isToShow(root)) {
+        if (!vNext->isToShow(root, (PN != NULL))) {
             continue;
         }
 
@@ -603,7 +603,7 @@ void CommunicationGraph::printGraphToSTGRecursively(AnnotatedGraphNode* v,
                                                     std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
     assert(v != NULL);
 
-    if (!v->isToShow(root))
+    if (!v->isToShow(root, (PN != NULL)))
         return;
 
     visitedNodes[v] = true;
@@ -615,7 +615,7 @@ void CommunicationGraph::printGraphToSTGRecursively(AnnotatedGraphNode* v,
         AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = element->getDstNode();
 
-        if (!vNext->isToShow(root))
+        if (!vNext->isToShow(root, (PN != NULL)))
             continue;
 
         string this_edges_label = element->getLabelWithoutPrefix();
@@ -688,7 +688,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(AnnotatedGraphNod
     assert(v != NULL);
     set<string> disabled, enabled;
 
-    if (!v->isToShow(root))
+    if (!v->isToShow(root, (PN != NULL)))
         return false;
 
     // save for each state the outgoing labels;
@@ -699,7 +699,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(AnnotatedGraphNod
 
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* element = edgeIter->getNext();
-        if (element->getDstNode() != NULL &&element->getDstNode()->isToShow(root) ) {
+        if (element->getDstNode() != NULL && element->getDstNode()->isToShow(root,(PN != NULL)) ) {
             outgoing_labels[v].insert(element->getLabel());
         }
     }
@@ -714,7 +714,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(AnnotatedGraphNod
         AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = element->getDstNode();
 
-        if (!vNext->isToShow(root))
+        if (!vNext->isToShow(root, (PN != NULL)))
             continue;
 
         if ((vNext != v) && !visitedNodes[vNext]) {

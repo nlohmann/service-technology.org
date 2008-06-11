@@ -3539,10 +3539,6 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
         if ((*place)->initial_marking >= 1) {
             p->mark((*place)->initial_marking);
         }
-
-        if (FinalMarking[getPlaceIndex(*place)] >= 1) {
-            p->isFinal = true;
-        }
     }
 
     // translate all output places
@@ -3553,12 +3549,12 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
         if ((*place)->initial_marking >= 1) {
             p->mark((*place)->initial_marking);
         }
-
-        if (FinalMarking[getPlaceIndex(*place)] >= 1) {
-            p->isFinal = true;
-        }
     }
 
+    // In case that this oWFN has a final marking rather than a final condition
+    // the appropriate final-marking for the PNapi net can be already filled here
+    set< PNapi::Place * > PNapiFinalMarking;
+    
     // translate all places which are not input or output places
     for (Places_t::const_iterator place = Places.begin(); place != Places.end(); place++) {
         if (PN->findPlace((*place)->name) == NULL) {
@@ -3570,6 +3566,7 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
 
             if (FinalMarking[getPlaceIndex(*place)] >= 1) {
                 p->isFinal = true;
+                PNapiFinalMarking.insert(p);
             }
         }
     }
@@ -3595,6 +3592,16 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
         }
 
     }
+
+    // assign the final marking to the PNapi-net in case that there was no final condition
+    if (FinalCondition == NULL) {
+        PN->final_set_list.push_back(PNapiFinalMarking);
+    }
+
+    // translate the final condition into final markings of the PNapi-net
+    // This needs all operators to be either AND, OR or EQ and all compare
+    // values to be 1 due to the structure of the finalmarkings in the PNapi
+    // so far this is a TODO
 
     return PN;
 }

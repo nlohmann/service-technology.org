@@ -122,7 +122,7 @@ echo "Running..."
 echo ""
 
 #the result string
-table="$table\n\n$delim Filename  $delim Add.Param. $delim / $delim Places (in , out) $delim Transitions $delim / $delim Nodes (IG -r) $delim Edges (IG -r) $delim Time (IG -r) $delim Mem (IG -r) $delim / $delim Nodes (IG) $delim Edges (IG) $delim Time (IG) $delim Mem (IG) $delim / $delim Nodes (OG) $delim Edges (OG) $delim Time (OG) $delim Mem (OG) $delim \n"
+table="$table\n\n$delim Filename  $delim Add.Param. $delim / $delim Places (in , out) $delim Transitions $delim / $delim Nodes (IG -r) $delim Edges (IG -r) $delim States (IGR) $delim Time (IG -r) $delim Mem (IG -r) $delim / $delim Nodes (IG) $delim Edges (IG) $delim States (IG) $delim Time (IG) $delim Mem (IG) $delim / $delim Nodes (OG) $delim Edges (OG) $delim States (OG) $delim Time (OG) $delim Mem (OG) $delim \n"
 
 
 #RUN
@@ -187,6 +187,7 @@ owfnName="${owfns[$i]}"
 
    nodesIGR=`egrep 'number of blue nodes: ([0-9]*)' IGROUTPUT | sed -e 's/number of blue nodes: //' | sed -e 's/$//'`
    edgesIGR=`egrep 'number of blue edges: ([0-9]*)' IGROUTPUT | sed -e 's/number of blue edges: //' | sed -e 's/$//'`
+   statesIGR=`egrep 'number of states stored in nodes: ([0-9]*)' IGROUTPUT | sed -e 's/number of states stored in nodes: //' | sed -e 's/$//'`
    timeIGR=`egrep '([0-9]*) s consumed for' IGROUTPUT | sed -e 's/ s consumed for building graph//' | sed -e 's/$//'`
 
 	cmd="$fionaCmdWN $igrParams"
@@ -217,6 +218,7 @@ owfnName="${owfns[$i]}"
 
  	nodesIG=`egrep 'number of blue nodes: ([0-9]*)' IGOUTPUT | sed -e 's/number of blue nodes: //' | sed -e 's/$//'`
 	edgesIG=`egrep 'number of blue edges: ([0-9]*)' IGOUTPUT | sed -e 's/number of blue edges: //' | sed -e 's/$//'`
+	statesIG=`egrep 'number of states stored in nodes: ([0-9]*)' IGOUTPUT | sed -e 's/number of states stored in nodes: //' | sed -e 's/$//'`
 	timeIG=`egrep '([0-9]*) s consumed for' IGOUTPUT | sed -e 's/ s consumed for building graph//' | sed -e 's/$//'`
 
 	cmd="$fionaCmdWN $igParams"
@@ -248,6 +250,7 @@ owfnName="${owfns[$i]}"
  	nodesOG=`egrep 'number of blue nodes: ([0-9]*)' OGOUTPUT | sed -e 's/number of blue nodes: //' | sed -e 's/$//'`
   	edgesOG=`egrep 'number of blue edges: ([0-9]*)' OGOUTPUT | sed -e 's/number of blue edges: //' | sed -e 's/$//'`
   	timeOG=`egrep '([0-9]*) s overall consumed for' OGOUTPUT | sed -e 's/ s overall consumed for OG computation.//' | sed -e 's/$//'`
+  	statesOG=`egrep 'number of states stored in nodes: ([0-9]*)' OGOUTPUT | sed -e 's/number of states stored in nodes: //' | sed -e 's/$//'`
 
 	cmd="$fionaCmdWN $ogParams"
 
@@ -271,7 +274,8 @@ owfnName="${owfns[$i]}"
 		paramCell=" - "
 	fi
 
-	table="$table$preRow$preCell$owfnName$postCell$preCell$paramCell$postCell$seperator$preCell$places$postCell$preCell$transitions$postCell$seperator$preCell$nodesIGR$postCell$preCell$edgesIGR$postCell$preCell$timeIGR$postCell$preCell$memoryIGR$postCell$preCell$seperator$nodesIG$postCell$preCell$edgesIG$postCell$preCell$timeIG$postCell$preCell$memoryIG$postCell$preCell$seperator$nodesOG$postCell$preCell$edgesOG$postCell$preCell$timeOG$postCell$preCell$memoryOG$postCell$postRow"
+	
+table="$table$preRow$preCell$owfnName$postCell$preCell$paramCell$postCell$seperator$preCell$places$postCell$preCell$transitions$postCell$seperator$preCell$nodesIGR$postCell$preCell$edgesIGR$postCell$preCell$statesIGR$postCell$preCell$timeIGR$postCell$preCell$memoryIGR$postCell$preCell$seperator$nodesIG$postCell$preCell$edgesIG$postCell$preCell$statesIG$postCell$preCell$timeIG$postCell$preCell$memoryIG$postCell$preCell$seperator$nodesOG$postCell$preCell$edgesOG$postCell$preCell$statesOG$postCell$preCell$timeOG$postCell$preCell$memoryOG$postCell$postRow"
        
 	if [ $buffer -eq 1 ]
 	then
@@ -307,4 +311,5 @@ echo ""
 echo "Results were stored in: $resultFile"
 echo ""
 echo ""
+
 

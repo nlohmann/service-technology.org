@@ -57,6 +57,40 @@ preCell=" "
 postCell=" |"
 seperator="$preCell / $postCell"
 
+# NETS TO BE PROCESSED
+
+# the folder with the owfns stored in
+PREF="owfn/"
+
+# the owfns to consider
+owfns=(
+	06-03-23_BPM06_shop_sect_3.owfn
+	06-03-23_BPM06_shop_sect_6.owfn
+	bignode1,1000000.owfn
+	bignode1,2500000.owfn
+	Melderegisterauskunft_clean.owfn
+	phcontrol3.unf.owfn
+	phcontrol5.unf.owfn
+	sequence10.owfn
+	sequence17.owfn
+)
+
+# additional parameters for the owfn at the same index, such as -s allNodes or -m 2. 
+additionalParams=(
+	""
+	""
+	""
+	""
+	""
+	""
+	""
+	""
+	""
+)
+
+
+
+
 #STARTUP
 echo ""
 echo "+++ FIONA BENCHMARKING +++"
@@ -132,30 +166,6 @@ table="$table\n\n$delim Filename  $delim Add.Param. $delim / $delim Places (in ,
 # get all the owfn files of the directory in $DIR
 # owfns=$(find $DIR -name "*.owfn" -print)
 
-PREF="owfn/"
-owfns=(
-	06-03-23_BPM06_shop_sect_3.owfn
-	06-03-23_BPM06_shop_sect_6.owfn
-	bignode1,1000000.owfn
-	bignode1,2500000.owfn
-	Melderegisterauskunft_clean.owfn
-	phcontrol3.unf.owfn
-	phcontrol5.unf.owfn
-	sequence10.owfn
-	sequence17.owfn
-)
-
-additionalParams=(
-	""
-	""
-	""
-	""
-	""
-	""
-	""
-	""
-	""
-)
 
 echo ""
 echo "Calling fiona with: $generalParams"

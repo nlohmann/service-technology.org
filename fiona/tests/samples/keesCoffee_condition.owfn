@@ -22,13 +22,8 @@ INITIALMARKING
   p0:   1;
 
 FINALCONDITION
-  (p0 = 1 AND p1 = 0 AND p2 = 0 AND p3 = 0 AND p4 = 0 AND
-    E = 0 AND  T = 0 AND  C = 0 AND  B = 0 AND EE = 0 AND end = 0) OR
-  (p0 = 0 AND p1 = 0 AND p2 = 0 AND p3 = 0 AND p4 = 1 AND
-    E = 0 AND  T = 0 AND  C = 0 AND  B = 0 AND EE = 0 AND end = 0);
-
-{FINALMARKING}
-{  p0 : 1;}
+  (p0 = 1 AND ALL_OTHER_PLACES_EMPTY) OR
+  (p4 = 1 AND ALL_OTHER_PLACES_EMPTY);
 
 TRANSITION t1    { ?e }
 CONSUME

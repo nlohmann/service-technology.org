@@ -86,13 +86,11 @@ bool AnnotatedGraph::hasNoRoot() const {
     return getRoot() == NULL;
 }
 
-
 //! \brief returns a AnnotatedGraphNode pointer to the root node
 //! \return returns a pointer to the root node
 AnnotatedGraphNode* AnnotatedGraph::getRoot() const {
     return root;
 }
-
 
 //! \brief sets the root node of the graph to a given node
 //! \param newRoot a pointer to the node to become the new root
@@ -1227,12 +1225,11 @@ bool AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG) {
         return false;
     }
 
-    if (secondOG->getRoot() == NULL) {
-        return true;
-    } else if (root == NULL) {
-        return false;
-    }
-
+    // if one of the OGs is empty, both need to be empty in order to be equivalent 
+    if (root == NULL || secondOG->getRoot() == NULL) {
+        return (root == NULL && secondOG->getRoot() == NULL);
+    } 
+    
     // We need to remember the pairs of nodes we already visited.
     set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
 

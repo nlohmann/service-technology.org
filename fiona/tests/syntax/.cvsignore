@@ -1,5 +1,3 @@
-*.out
-*.png
-*.og
-*.cudd
+formula.owfn.output.og.out
+formula.owfn.output.og
 *.log

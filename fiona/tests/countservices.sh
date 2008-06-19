@@ -32,6 +32,9 @@ echo
 DIR=$testdir/countservices
 FIONA=fiona
 
+#loeschen aller erzeugten Dateien im letzten Durchlauf
+rm -f $DIR/*.log
+
 ############################################################################
 
 result=0
@@ -40,7 +43,7 @@ result=0
 # acyclic                                                                  #
 ############################################################################
 og="$DIR/acyclic.og"
-cmd="$FIONA -t isacyclic $og"
+cmd="$FIONA $og -t isacyclic"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og.memcheck.log"
@@ -62,7 +65,7 @@ fi
 # cyclic                                                                   #
 ############################################################################
 og="$DIR/cyclic.og"
-cmd="$FIONA -t isacyclic $og"
+cmd="$FIONA $og -t isacyclic"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og.memcheck.log"
@@ -84,7 +87,7 @@ fi
 # count services                                                           #
 ############################################################################
 og="$DIR/1.og"
-cmd="$FIONA -t count $og"
+cmd="$FIONA $og -t count"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og.memcheck.log"
@@ -104,7 +107,7 @@ fi
 
 ############################################################################
 og="$DIR/nostrat.og"
-cmd="$FIONA -t count $og"
+cmd="$FIONA $og -t count"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og.memcheck.log"

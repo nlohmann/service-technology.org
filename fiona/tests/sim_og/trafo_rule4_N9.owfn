@@ -2,31 +2,34 @@
 
 PLACE
 INTERNAL
-  p0,  { initial }
-  p1,
-  p2;
+  q0,  { initial }
+  q1,
+  q2;
+
 INPUT
-  a,
+  a;
+
+OUTPUT
   b;
 
 INITIALMARKING
-  p0:   1;
+  q0:   1;
 
 FINALMARKING
-  p2:   1;
+  q2:   1;
 
 TRANSITION t1    
 CONSUME
-  p0:   1,
-  a: 1;
+  q0:   1;
 PRODUCE
-  p1:   1;
+  q1:   1,
+  b:    1;
 
 TRANSITION t2
-CONSUME 
-  p1:   1,
-  b: 1; 
+CONSUME
+  a:    1,
+  q1:   1;
 PRODUCE
-  p2:   1;
+  q2:   1;
 
 { END OF FILE }

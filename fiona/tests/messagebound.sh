@@ -29,13 +29,10 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-DIR=$testdir/messages
+DIR=$testdir/messagebound
 FIONA=fiona
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
-rm -f $DIR/*.out
-#rm -f $DIR/*.png
-rm -f $DIR/*.og
 rm -f $DIR/*.log
 
 result=0
@@ -66,80 +63,6 @@ else
     fi
 
     result=`expr $mb14control`
-fi
-
-############################################################################
-
-mb15bluenodes_soll=36
-mb15blueedges_soll=60
-
-owfn="$DIR/messageboundtest1.owfn"
-cmd="$FIONA $owfn -t OG -e10 -m5"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.e10.m5.OG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    mb15control=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $mb15bluenodes_soll" > /dev/null
-    mb15bluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $mb15blueedges_soll" > /dev/null
-    mb15blueedges=$?
-
-    if [ $mb15control -ne 0 -o $mb15bluenodes -ne 0 -o $mb15blueedges -ne 0 ]
-    then
-    echo   ... failed to build OG correctly
-    fi
-
-    result=`expr $result + $mb15control + $mb15bluenodes + $mb15blueedges`
-fi
-
-############################################################################
-
-mb16bluenodes_soll=46
-mb16blueedges_soll=78
-
-owfn="$DIR/messageboundtest1.owfn"
-cmd="$FIONA $owfn -t OG -e10 -m6"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.e10.m6.OG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    mb16control=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $mb16bluenodes_soll" > /dev/null
-    mb16bluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $mb16blueedges_soll" > /dev/null
-    mb16blueedges=$?
-
-    if [ $mb16control -ne 0 -o $mb16bluenodes -ne 0 -o $mb16blueedges -ne 0 ]
-    then
-    echo   ... failed to build OG correctly
-    fi
-
-    result=`expr $result + $mb16control + $mb16bluenodes + $mb16blueedges`
 fi
 
 ############################################################################
@@ -214,6 +137,136 @@ else
     fi
 
     result=`expr $result + $mb22control + $mb22bluenodes + $mb22blueedges`
+fi
+
+############################################################################
+
+mb22bluenodes_soll=3
+mb22blueedges_soll=2
+
+owfn="$DIR/messageboundtest3.owfn"
+cmd="$FIONA $owfn -t OG -m3"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.e10.m2.OG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    mb22control=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $mb22bluenodes_soll" > /dev/null
+    mb22bluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $mb22blueedges_soll" > /dev/null
+    mb22blueedges=$?
+
+    if [ $mb22control -ne 0 -o $mb22bluenodes -ne 0 -o $mb22blueedges -ne 0 ]
+    then
+    echo   ... failed to build OG correctly
+    fi
+
+    result=`expr $result + $mb22control + $mb22bluenodes + $mb22blueedges`
+fi
+
+############################################################################
+
+mb22bluenodes_soll=4
+mb22blueedges_soll=3
+
+owfn="$DIR/messageboundtest4.owfn"
+cmd="$FIONA $owfn -t OG -m3"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.e10.m2.OG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    mb22control=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $mb22bluenodes_soll" > /dev/null
+    mb22bluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $mb22blueedges_soll" > /dev/null
+    mb22blueedges=$?
+
+    if [ $mb22control -ne 0 -o $mb22bluenodes -ne 0 -o $mb22blueedges -ne 0 ]
+    then
+    echo   ... failed to build OG correctly
+    fi
+
+    result=`expr $result + $mb22control + $mb22bluenodes + $mb22blueedges`
+fi
+
+############################################################################
+
+owfn="$DIR/messageboundtest5.owfn"
+cmd="$FIONA $owfn -t OG -m2"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.e10.m2.OG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: NO" > /dev/null
+    mb22control=$?
+
+    if [ $mb22control -ne 0 ]
+    then
+    echo   ... failed to build OG correctly
+    fi
+
+    result=`expr $result + $mb22control`
+fi
+
+############################################################################
+
+owfn="$DIR/unlimited-communication.owfn"
+cmd="$FIONA $owfn -t OG -m2"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.e10.m2.OG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: NO" > /dev/null
+    mb22control=$?
+
+    if [ $mb22control -ne 0 ]
+    then
+    echo   ... failed to build OG correctly
+    fi
+
+    result=`expr $result + $mb22control`
 fi
 
 ############################################################################

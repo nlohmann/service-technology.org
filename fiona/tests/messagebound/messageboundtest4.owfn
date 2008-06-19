@@ -1,6 +1,6 @@
 PLACE
 INTERNAL
-  p0,p1;
+  p0;
 
 INPUT
   a;
@@ -9,17 +9,11 @@ INITIALMARKING
   p0;
 
 FINALMARKING
-  p1;
+  p0;
 
-TRANSITION t1
-CONSUME
-  p0:   1;
-PRODUCE
-  p0:   1;
-
-TRANSITION t2
+TRANSITION t1    { ?a }
 CONSUME
   a:    1,
   p0:   1;
 PRODUCE
-  p1:   1;
+  p0 : 1;

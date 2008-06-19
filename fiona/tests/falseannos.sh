@@ -34,8 +34,10 @@ DIR=$testdir/falseannos
 FIONA=fiona
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
-rm -f $DIR/*.blue.og
 rm -f $DIR/*.log
+rm -f $DIR/shorten.blue.og
+rm -f $DIR/violating.blue.og
+rm -f $DIR/bluefalsenode.blue.og
 
 result=0
 
@@ -47,7 +49,7 @@ result=0
 
 violating="$DIR/violating"
 
-cleanedPerHand="$DIR/cleaned.og"
+cleanedPerHand="$DIR/violating.expected.og"
 
 cmd="$FIONA $violating.og -t removefalsenodes"
 
@@ -58,6 +60,21 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+
+    cmd="$FIONA $violating.blue.og -t checkfalsenodes"
+
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
+    ok=$?
+
+    if [ $ok -ne 0 ]
+    then
+    echo   ... false annotated nodes found after removal.
+    fi
+
+    result=`expr $result + $ok`
 fi
 
 cmd="diff $violating.blue.og $cleanedPerHand "
@@ -94,6 +111,21 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+
+    cmd="$FIONA $violating.blue.og -t checkfalsenodes"
+
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
+    ok=$?
+
+    if [ $ok -ne 0 ]
+    then
+    echo   ... false annotated nodes found after removal.
+    fi
+
+    result=`expr $result + $ok`
 fi
 
 cmd="diff $violating.blue.og $cleanedPerHand "
@@ -130,6 +162,21 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+
+    cmd="$FIONA $violating.blue.og -t checkfalsenodes"
+
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
+    ok=$?
+
+    if [ $ok -ne 0 ]
+    then
+    echo   ... false annotated nodes found after removal.
+    fi
+
+    result=`expr $result + $ok`
 fi
 
 cmd="diff $violating.blue.og $cleanedPerHand "
@@ -147,38 +194,6 @@ else
         let "result += 1"
         echo ... automatically cleaned OG is not equivalent to manually cleaned OG.
     fi
-fi
-
-############################################################################
-# -t checkfalsenodes
-############################################################################
-
-
-violating="$DIR/2ndviolating"
-cmd="$FIONA $violating.og -t removefalsenodes"
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$violating.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    cmd="$FIONA $violating.blue.og -t checkfalsenodes"
-
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
-    ok=$?
-
-    if [ $ok -ne 0 ]
-    then
-    echo   ... false annotated nodes found after removal.
-    fi
-
-    result=`expr $result + $ok`
 fi
 
 ############################################################################

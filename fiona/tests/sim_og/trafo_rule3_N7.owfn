@@ -1,0 +1,32 @@
+{test2 oq1}
+
+PLACE
+INTERNAL
+  q0,  { initial }
+  q1;
+
+INPUT
+  a,
+  b;
+
+OUTPUT
+  c,
+  d;
+
+INITIALMARKING
+  q0:   1;
+
+FINALMARKING
+  q1:   1;
+
+TRANSITION t1    
+CONSUME
+  q0:   1,
+  a:    1,
+  b:    1;
+PRODUCE
+  q1:   1,
+  c:    1,
+  d:    1;
+
+{ END OF FILE }

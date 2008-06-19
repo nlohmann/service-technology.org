@@ -33,7 +33,8 @@ DIR=$testdir/$SUBDIR
 FIONA=fiona
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
-rm -f $DIR/*output*
+rm -f $DIR/big.owfn.output.png
+rm -f $DIR/*.log
 
 result=0
 
@@ -49,7 +50,7 @@ if [ "$testdir" != "$builddir" ]; then
     fi
 fi
 
-cmd="$FIONA -t png -o $outputPrefix $owfn"
+cmd="$FIONA $owfn -t png -o $outputPrefix"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$outputPrefix.memcheck.log"

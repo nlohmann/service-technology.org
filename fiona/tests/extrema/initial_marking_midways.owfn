@@ -1,25 +1,26 @@
 PLACE
 INTERNAL
-  p0,p1;
+  p0,p1,p2;
 
 INPUT
-  a;
+  a,b;
 
 INITIALMARKING
-  p0;
-
-FINALMARKING
   p1;
 
-TRANSITION t1
-CONSUME
-  p0:   1;
-PRODUCE
-  p0:   1;
+FINALMARKING
+  p2;
 
-TRANSITION t2
+TRANSITION t1
 CONSUME
   a:    1,
   p0:   1;
 PRODUCE
   p1:   1;
+
+TRANSITION t2
+CONSUME
+  b:    1,
+  p1:   1;
+PRODUCE
+  p2:   1;

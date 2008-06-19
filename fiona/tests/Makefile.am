@@ -21,10 +21,10 @@
 
 include $(top_srcdir)/Makefile.covcommon
 
-TESTS = slist.sh png.sh syntax.sh formula.sh extrema.sh messages.sh cyclic.sh \
-        matching.sh sim_og.sh productog.sh publicview.sh oWFNreduction.sh \
-        sequences.sh partner.sh countservices.sh samples.sh bddtest.sh \
-        statesReduction.sh falseannos.sh minimize.sh 
+TESTS = slist.sh syntax.sh extrema.sh cyclic.sh messagebound.sh png.sh \
+        countservices.sh falseannos.sh oWFNreduction.sh sim_og.sh \
+        matching.sh productog.sh publicview.sh samples.sh partner.sh \
+        minimize.sh statesReduction.sh bddtest.sh
 
 check_PROGRAMS = slistcheck
 
@@ -47,18 +47,16 @@ CHECKLOUD_ENVIRONMENT = $(TESTS_ENVIRONMENT) quiet=no
 #   o More reasons at http://www.gnu.org/software/automake/manual/html_mono/automake.html#wildcards
 EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              defaults.sh \
-             cyclic/livelockInP.owfn \
-             cyclic/zyklusP.owfn \
-             cyclic/zyklusPmitCommit.owfn \
-             cyclic/zyklusR.owfn \
-             cyclic/zyklusReturn.owfn \
-             cyclic/livelockInP.owfn.png \
-             cyclic/zyklusP.owfn.png \
-             cyclic/zyklusPmitCommit.owfn.png \
-             cyclic/zyklusR.owfn.png \
-             cyclic/zyklusReturn.owfn.png \
+             syntax/max_occurrence.owfn \
+             syntax/syntax_example.owfn \
+             syntax/syntax_example_new.owfn \
+             syntax/formula.owfn \
+             syntax/formula.owfn.expected.og \
              extrema/all_final_marking.owfn \
              extrema/empty.owfn \
+             extrema/initial_marking_midways.owfn \
+             extrema/initialmarking_is_a_finalmarking.owfn \
+             extrema/innerUnbounded.owfn \
              extrema/multiple_input.owfn \
              extrema/multiple_input_multiple_output.owfn \
              extrema/multiple_output.owfn \
@@ -72,10 +70,79 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              extrema/one_input_one_output.owfn \
              extrema/one_output.owfn \
              extrema/one_output_marked.owfn \
-             extrema/unlimited-communication.owfn \
-             messages/innerUnbounded.owfn \
-             messages/messageboundtest1.owfn \
-             messages/messageboundtest2.owfn \
+             extrema/transient_finalmarking.owfn \
+             cyclic/livelockInP.owfn \
+             cyclic/zyklusP.owfn \
+             cyclic/zyklusPmitCommit.owfn \
+             cyclic/zyklusR.owfn \
+             cyclic/zyklusReturn.owfn \
+             cyclic/livelockInP.owfn.png \
+             cyclic/zyklusP.owfn.png \
+             cyclic/zyklusPmitCommit.owfn.png \
+             cyclic/zyklusR.owfn.png \
+             cyclic/zyklusReturn.owfn.png \
+             messagesbound/innerUnbounded.owfn \
+             messagesbound/messageboundtest1.owfn \
+             messagesbound/messageboundtest2.owfn \
+             messagesbound/messageboundtest3.owfn \
+             messagesbound/messageboundtest4.owfn \
+             messagesbound/messageboundtest5.owfn \
+             messagesbound/unlimited-communication.owfn \
+             png/big.owfn \
+             countservices/acyclic.og \
+             countservices/cyclic.og \
+             countservices/1.og \
+             countservices/nostrat.og \
+             falseannos/bluefalsenode.expected.og \
+             falseannos/bluefalsenode.og \
+             falseannos/shorten.expected.og \
+             falseannos/shorten.og \
+             falseannos/violating.expected.og \
+             falseannos/violating.og \
+             oWFNreduction/060116-misc-coffee.owfn \
+             oWFNreduction/phcontrol3.unf.owfn \
+             oWFNreduction/06-03-23_BPM06_shop_sect_6.owfn \
+             sim_og/coarse-chopped.og \
+             sim_og/coarse.og \
+             sim_og/compact.og \
+             sim_og/cyclic1.og \
+             sim_og/cyclic2.og \
+             sim_og/trafo_rule3_N7.owfn \
+             sim_og/trafo_rule3_N8.owfn \
+             sim_og/trafo_rule4_N9.owfn \
+             sim_og/trafo_rule4_N10.owfn \
+             matching/airline.og \
+             matching/airline.owfn \
+             matching/agency_traveler.og \
+             matching/agency_traveler.owfn \
+             matching/client_match_1.owfn \
+             matching/client_nomatch_1.owfn \
+             matching/client_nosupport_1.owfn \
+             matching/shop.og \
+             matching/shop_rednodes.og \
+             matching/interface_rcv-a_snd-b.og \
+             matching/interface_rcv-a_snd-b.og.png \
+             matching/interface_rcv-a_snd-by.owfn \
+             matching/interface_rcv-a_snd-by.owfn.png \
+             matching/interface_rcv-ax_snd-b.owfn \
+             matching/interface_rcv-ax_snd-b.owfn.png \
+             productog/1.og \
+             productog/2.og \
+             productog/3.og \
+             productog/1x2.expected.og \
+             productog/1x2x3.expected.og \
+             productog/3x1x2.expected.og \
+             publicview/complexPV.owfn \
+             publicview/complexPV.owfn.og \
+             publicview/non_empty_true_node2.owfn \
+             publicview/non_empty_true_node3.owfn \
+             publicview/NonFinalTauNode1.owfn \
+             publicview/NonFinalTauNode2.owfn \
+             publicview/NonFinalTauNode3.owfn \
+             publicview/NonFinalTauNode4.owfn \
+             publicview/NonFinalTauNode1not.owfn \
+             publicview/NonFinalTauNode2not.owfn \
+             samples/sequence9.owfn \
              samples/06-03-23_BPM06_shop_sect_3.owfn \
              samples/06-03-23_BPM06_shop_sect_6.owfn \
              samples/dke07_shop_sect_3.owfn \
@@ -88,6 +155,31 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              samples/dke07_shop_sect_6.owfn.png \
              samples/keesCoffee_condition.owfn.png \
              samples/myCoffee.owfn.png \
+             partner/sequence3.owfn \
+             partner/sequence3-partner.expected.owfn \
+             minimize/nostrat.og \
+             minimize/final_non-final.og \
+             minimize/non-final_final.og \
+             minimize/4-loop.og \
+             minimize/sample.og \
+             minimize/myCoffee.og \
+             minimize/keesCoffee_condition.og \
+             minimize/keesCoffee_condition.emptyNode.og \
+             minimize/06-03-23_BPM06_shop_sect_3.owfn.og
+             statesReduction/06-03-23_BPM06_shop_sect_3.owfn \
+             statesReduction/06-03-23_BPM06_shop_sect_6.owfn \
+             statesReduction/dke07_shop_sect_3.owfn \
+             statesReduction/dke07_shop_sect_6.owfn \
+             statesReduction/myCoffee.owfn \
+             statesReduction/Reservations.owfn \
+             bdd_ref/phcontrol4.unf_reference.owfn \
+             bdd_ref/sequence3_reference.owfn \
+             bdd_ref/phcontrol4.unf_reference.owfn.OG.BDD_ANN.cudd \
+             bdd_ref/phcontrol4.unf_reference.owfn.OG.BDD_MP.cudd \
+             bdd_ref/sequence3_reference.owfn.OG.BDD_ANN.cudd \
+             bdd_ref/sequence3_reference.owfn.OG.BDD_MP.cudd \
+             bdd_ref/phcontrol4.unf_reference.owfn.OG.png \
+             bdd_ref/sequence3_reference.owfn.OG.png \
              sequence_suite/sequence10.owfn \
              sequence_suite/sequence11.owfn \
              sequence_suite/sequence12.owfn \
@@ -106,28 +198,6 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              sequence_suite/sequence7.owfn \
              sequence_suite/sequence8.owfn \
              sequence_suite/sequence9.owfn \
-             matching/airline.og \
-             matching/airline.owfn \
-             matching/agency_traveler.og \
-             matching/agency_traveler.owfn \
-             matching/client_match_1.owfn \
-             matching/client_nomatch_1.owfn \
-             matching/client_nomatch_2.owfn \
-             matching/client_nosupport_1.owfn \
-             matching/shop.og \
-             matching/shop_rednodes.og \
-             syntax/max_occurrence.owfn \
-             bdd_ref/phcontrol4.unf_reference.owfn \
-             bdd_ref/sequence3_reference.owfn \
-             bdd_ref/phcontrol4.unf_reference.owfn.OG.BDD_ANN.cudd \
-             bdd_ref/phcontrol4.unf_reference.owfn.OG.BDD_MP.cudd \
-             bdd_ref/sequence3_reference.owfn.OG.BDD_ANN.cudd \
-             bdd_ref/sequence3_reference.owfn.OG.BDD_MP.cudd \
-             bdd_ref/phcontrol4.unf_reference.owfn.OG.png \
-             bdd_ref/sequence3_reference.owfn.OG.png \
-             oWFNreduction/060116-misc-coffee.owfn \
-             oWFNreduction/phcontrol3.unf.owfn \
-             oWFNreduction/06-03-23_BPM06_shop_sect_6.owfn \
              philosophers/phcontrol10.unf.owfn \
              philosophers/phcontrol3.unf.owfn \
              philosophers/phcontrol4.unf.owfn \
@@ -144,60 +214,6 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              philosophers/phcontrol7.unf.owfn.png \
              philosophers/phcontrol8.unf.owfn.png \
              philosophers/phcontrol9.unf.owfn.png \
-             productog/1.og \
-             productog/2.og \
-             productog/3.og \
-             productog/1_X_2.expected.og \
-             productog/1_X_2_X_3.expected.og \
-             productog/3_X_1_X_2.expected.og \
-             publicview/1stFix.og \
-             publicview/2ndFixA.og \
-             publicview/2ndFixB.og \
-             publicview/2ndFixB.owfn \
-             publicview/3rdFix.og \
-             publicview/3rdFix.owfn \
-             publicview/complexPV.owfn \
-             publicview/complexPV.owfn.og \
-             publicview/myCoffee.owfn \
-             publicview/myCoffee.owfn.og \
-             publicview/06-03-23_BPM06_shop_sect_3.owfn \
-             publicview/06-03-23_BPM06_shop_sect_3.owfn.og \
-             partner/sequence3.owfn \
-             partner/sequence3-partner.expected.owfn \
-             countservices/acyclic.og \
-             countservices/cyclic.og \
-             countservices/1.og \
-             countservices/nostrat.og \
-             falseannos/2ndviolating.og \
-             falseannos/bluefalsenode.expected.og \
-             falseannos/bluefalsenode.og \
-             falseannos/cleaned.og \
-             falseannos/shorten.expected.og \
-             falseannos/shorten.og \
-             falseannos/violating.og \
-             sim_og/coarse-chopped.og \
-             sim_og/coarse.og \
-             sim_og/compact.og \
-             sim_og/mixed.owfn \
-             sim_og/mixed.owfn.og \
-             statesReduction/06-03-23_BPM06_shop_sect_3.owfn \
-             statesReduction/06-03-23_BPM06_shop_sect_6.owfn \
-             statesReduction/dke07_shop_sect_3.owfn \
-             statesReduction/dke07_shop_sect_6.owfn \
-             statesReduction/myCoffee.owfn \
-             statesReduction/Reservations.owfn \
-             png/big.owfn \
-             minimize/nostrat.og \
-             minimize/final_non-final.og \
-             minimize/non-final_final.og \
-             minimize/4-loop.og \
-             minimize/sample.og \
-             minimize/myCoffee.og \
-             minimize/keesCoffee_condition.og \
-             minimize/keesCoffee_condition.emptyNode.og \
-             minimize/06-03-23_BPM06_shop_sect_3.owfn.og \
-             formula/1.owfn \
-             formula/1.owfn.expected.og
 
 # Global check-loud target. Runs all tests. Output files are generated.
 check-loud:

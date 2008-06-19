@@ -3,11 +3,10 @@ PLACE
     p0,p1,p2,p3;
 
   INPUT
-    x,
-    a;
+    a,b,d;
 
   OUTPUT
-    ;
+    c;
 
 
 INITIALMARKING
@@ -18,17 +17,22 @@ FINALMARKING
 
 
 TRANSITION t1
-  CONSUME p0,x;
-  PRODUCE p1;
+  CONSUME p0, a;
+  PRODUCE p1, c;
 
 TRANSITION t2
   CONSUME p1;
   PRODUCE p2;
 
 TRANSITION t3
-  CONSUME a, p1;
-  PRODUCE p3;
+  CONSUME p2;
+  PRODUCE p1;
 
 TRANSITION t4
-  CONSUME p2;
-  PRODUCE p2;
+  CONSUME p1, d;
+  PRODUCE p3;
+
+TRANSITION t5
+  CONSUME p0, b;
+  PRODUCE p3;
+

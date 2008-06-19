@@ -32,9 +32,6 @@ echo
 DIR=$testdir/extrema FIONA=fiona
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
-rm -f $DIR/*.out
-#rm -f $DIR/*.png
-rm -f $DIR/*.og
 rm -f $DIR/*.log
 
 ############################################################################
@@ -56,6 +53,11 @@ owfns=(
     $DIR/multiple_input.owfn
     $DIR/multiple_output.owfn
     $DIR/multiple_input_multiple_output.owfn
+    $DIR/initial_marking_midways.owfn
+    $DIR/initialmarking_is_a_finalmarking.owfn
+    $DIR/non_empty_true_node.owfn
+    $DIR/non_empty_true_node2.owfn
+    $DIR/transient_finalmarking.owfn
 )
 
 expectations_controllable=(
@@ -75,6 +77,11 @@ expectations_controllable=(
     YES
     YES
     YES
+    YES
+    YES
+    YES
+    YES
+    NO
 )
 
 

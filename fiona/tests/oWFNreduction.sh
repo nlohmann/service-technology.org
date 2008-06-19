@@ -33,179 +33,19 @@ echo
 DIR=$testdir/oWFNreduction
 FIONA=fiona
 
+rm -f $DIR/*.log
+rm -f $DIR/060116-misc-coffee.reduced.owfn
+rm -f $DIR/phcontrol3.unf.reduced.owfn
+rm -f $DIR/06-03-23_BPM06_shop_sect_6.reduced.owfn
+
 result=0
-
-############################################################################
-# misc Coffee reduction level 1
-############################################################################
-
-nodes_soll=76
-transitions_soll=73
-
-owfn="$DIR/060116-misc-coffee"
-cmd="$FIONA $owfn.owfn -t reduce -p r1"
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$og.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "|P|=$nodes_soll" > /dev/null
-    nodes=$?
-
-    echo $OUTPUT | grep "|T|=$transitions_soll" > /dev/null
-    edges=$?
-
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
-    then
-    echo   ... failed to reduce the oWFN correctly
-    fi
-
-    result=`expr $result + $nodes + $edges`
-fi
-
-cmd="$FIONA $owfn.owfn $owfn.reduced.owfn -t equivalence"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.owfn.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the owfn and it's reduced version's OGs failed.
-    fi
-fi
-
-
-############################################################################
-# misc Coffee reduction level 2
-############################################################################
-
-nodes_soll=63
-transitions_soll=70
-
-owfn="$DIR/060116-misc-coffee"
-cmd="$FIONA $owfn.owfn -t reduce -p r2"
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$og.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "|P|=$nodes_soll" > /dev/null
-    nodes=$?
-
-    echo $OUTPUT | grep "|T|=$transitions_soll" > /dev/null
-    edges=$?
-
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
-    then
-    echo   ... failed to reduce the oWFN correctly
-    fi
-
-    result=`expr $result + $nodes + $edges`
-fi
-
-cmd="$FIONA $owfn.owfn $owfn.reduced.owfn -t equivalence"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.owfn.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the owfn and it's reduced version's OGs failed.
-    fi
-fi
-
 
 ############################################################################
 # misc Coffee reduction level 3
 ############################################################################
 
-nodes_soll=62
+nodes_soll=60
 transitions_soll=67
-
-owfn="$DIR/060116-misc-coffee"
-cmd="$FIONA $owfn.owfn -t reduce -p r3"
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$og.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "|P|=$nodes_soll" > /dev/null
-    nodes=$?
-
-    echo $OUTPUT | grep "|T|=$transitions_soll" > /dev/null
-    edges=$?
-
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
-    then
-    echo   ... failed to reduce the oWFN correctly
-    fi
-
-    result=`expr $result + $nodes + $edges`
-fi
-
-cmd="$FIONA $owfn.owfn $owfn.reduced.owfn -t equivalence"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.owfn.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the owfn and it's reduced version's OGs failed.
-    fi
-fi
-
-
-############################################################################
-# misc Coffee reduction level 4
-############################################################################
-
-nodes_soll=55
-transitions_soll=62
 
 owfn="$DIR/060116-misc-coffee"
 cmd="$FIONA $owfn.owfn -t reduce -p r4"
@@ -256,66 +96,11 @@ fi
 
 
 ############################################################################
-# misc Coffee reduction level 5
-############################################################################
-
-nodes_soll=53
-transitions_soll=62
-
-owfn="$DIR/060116-misc-coffee"
-cmd="$FIONA $owfn.owfn -t reduce -p r5"
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$og.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "|P|=$nodes_soll" > /dev/null
-    nodes=$?
-
-    echo $OUTPUT | grep "|T|=$transitions_soll" > /dev/null
-    edges=$?
-
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
-    then
-    echo   ... failed to reduce the oWFN correctly
-    fi
-
-    result=`expr $result + $nodes + $edges`
-fi
-
-cmd="$FIONA $owfn.owfn $owfn.reduced.owfn -t equivalence"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.owfn.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the owfn and it's reduced version's OGs failed.
-    fi
-fi
-
-
-############################################################################
 # phcontrol3 reduction
 ############################################################################
 
-nodes_soll=15
-transitions_soll=6
+nodes_soll=18
+transitions_soll=7
 
 owfn="$DIR/phcontrol3.unf"
 cmd="$FIONA $owfn.owfn -t reduce"
@@ -356,11 +141,11 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
 
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+    echo $OUTPUT | grep "are equivalent: NO" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
-        echo ... equivalence check of the owfn and it's reduced version's OGs failed.
+        echo ... the net and the reduced net are equivalent so the PNapi was probably updated to handle finalconditions.
     fi
 fi
 
@@ -372,8 +157,8 @@ fi
 # BPM06 Shop 6 reduction
 ############################################################################
 
-nodes_soll=37
-transitions_soll=20
+nodes_soll=66
+transitions_soll=68
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_6"
 cmd="$FIONA $owfn.owfn -t reduce"

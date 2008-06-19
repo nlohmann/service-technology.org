@@ -8,16 +8,10 @@ INPUT
 INITIALMARKING
   p0;
 
-FINALMARKING
-  p1;
+FINALCONDITION
+  ((p0 = 1) OR (p1 = 1));
 
 TRANSITION t1
-CONSUME
-  p0:   1;
-PRODUCE
-  p0:   1;
-
-TRANSITION t2
 CONSUME
   a:    1,
   p0:   1;

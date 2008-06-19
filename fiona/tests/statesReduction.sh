@@ -33,10 +33,18 @@ DIR=$testdir/statesReduction
 FIONA=fiona
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
-rm -f $DIR/*.out
-rm -f $DIR/*.OG.png
-rm -f $DIR/*.IG.png
-rm -f $DIR/*.og
+rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.ig.og
+rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.R.ig.og
+rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.og
+rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.R.og
+rm -f $DIR/06-03-23_BPM06_shop_sect_6.owfn.ig.og
+rm -f $DIR/06-03-23_BPM06_shop_sect_6.owfn.R.ig.og
+rm -f $DIR/myCoffee.owfn.ig.og
+rm -f $DIR/myCoffee.owfn.R.ig.og
+rm -f $DIR/dke07_shop_sect_3.owfn.ig.og
+rm -f $DIR/dke07_shop_sect_3.owfn.R.ig.og
+rm -f $DIR/dke07_shop_sect_6.owfn.ig.og
+rm -f $DIR/dke07_shop_sect_6.owfn.R.ig.og
 rm -f $DIR/*.log
 
 result=0
@@ -169,13 +177,6 @@ result=`expr $result + $equivalent`
 ############################################################################
 
 ############################################################################
-
-#loeschen aller erzeugten Dateien, die im Durchlauf entstanden sind
-rm -f $DIR/*.out
-rm -f $DIR/*.OG.png
-rm -f $DIR/*.IG.png
-rm -f $DIR/*.og
-rm -f $DIR/*.log
 
 echo
 

@@ -40,13 +40,15 @@ DIR=$testdir/$SUBDIR
 FIONA=fiona
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
-rm -f $DIR/*.og
-rm -f $DIR/*.out
-rm -f $DIR/*.dot
-rm -f $DIR/*.pn
-rm -f $DIR/*.png
-rm -f $DIR/*.stg
+rm -f $DIR/sequence3.owfn.og
+rm -f $DIR/sequence3.owfn.og.out
+rm -f $DIR/sequence3.owfn.dot
+rm -f $DIR/sequence3.owfn.og.pn
+rm -f $DIR/sequence3.owfn.og.png
+rm -f $DIR/sequence3.owfn.og.stg
+rm -f $DIR/sequence3-partner.dot
 rm -f $DIR/sequence3-partner.owfn
+rm -f $DIR/sequence3-partner.png
 
 result=0
 
@@ -68,7 +70,7 @@ if [ "$testdir" != "$builddir" ]; then
     cp $owfn $owfnCopy
 fi
 
-cmd="$FIONA -t mostpermissivepartner $owfnCopy"
+cmd="$FIONA $owfnCopy -t mostpermissivepartner"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.memcheck.log"

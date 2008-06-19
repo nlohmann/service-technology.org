@@ -13,13 +13,13 @@ FINALMARKING
 
 TRANSITION t1
 CONSUME
-  p0:   1;
-PRODUCE
-  p0:   1;
-
-TRANSITION t2
-CONSUME
   a:    1,
   p0:   1;
 PRODUCE
   p1:   1;
+
+TRANSITION t2
+CONSUME
+  p1:   1;
+PRODUCE
+  p0:   1;

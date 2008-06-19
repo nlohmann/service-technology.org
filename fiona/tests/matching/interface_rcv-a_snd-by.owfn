@@ -1,0 +1,29 @@
+PLACE
+  INTERNAL
+    p1, p2;
+
+  INPUT
+    a;
+
+  OUTPUT
+    b,
+    y;
+
+INITIALMARKING
+  p1;
+
+FINALMARKING
+  p2: 1;
+
+
+TRANSITION t1 { ?a }
+  CONSUME p1, a;
+  PRODUCE p2;
+
+TRANSITION t2 { !y }
+  CONSUME p1;
+  PRODUCE p2, y;
+
+TRANSITION t3 { !b }
+  CONSUME p1;
+  PRODUCE p2, b;

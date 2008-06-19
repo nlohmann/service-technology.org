@@ -87,29 +87,6 @@ fi
 
 ############################################################################
 
-owfn="$DIR/client_nomatch_2.owfn"
-cmd="$FIONA $owfn -t match $og"
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.match.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo ... fiona exited with nonzero return value although it should not
-        result=1
-    fi
-
-    echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
-    if [ $? -ne 0 ]; then
-        echo ... oWFN matches with OG although it should not
-        result=1
-    fi
-fi
-
-############################################################################
-
 owfn="$DIR/client_nosupport_1.owfn"
 cmd="$FIONA $owfn -t match $og"
 if [ "$memcheck" = "yes" ]; then
@@ -207,7 +184,57 @@ else
         result=1
     fi
 fi
+
 ############################################################################
+og="$DIR/interface_rcv-a_snd-b.og"
+############################################################################
+
+owfn="$DIR/interface_rcv-a_snd-by.owfn"
+cmd="$FIONA $owfn -t match $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    if [ $? -ne 0 ]; then
+        echo ... fiona exited with nonzero return value although it should not
+        result=1
+    fi
+
+    echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+    if [ $? -ne 0 ]; then
+        echo ... oWFN matches with OG although it should not
+        result=1
+    fi
+fi
+
+############################################################################
+
+owfn="$DIR/interface_rcv-ax_snd-b.owfn"
+cmd="$FIONA $owfn -t match $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    if [ $? -ne 0 ]; then
+        echo ... fiona exited with nonzero return value although it should not
+        result=1
+    fi
+
+    echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+    if [ $? -ne 0 ]; then
+        echo ... oWFN matches with OG although it should not
+        result=1
+    fi
+fi
+
+############################################################################
+
 echo
 
 exit $result

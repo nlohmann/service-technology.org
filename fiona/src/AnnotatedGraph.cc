@@ -1,4 +1,4 @@
-/*****************************************************************************
+#/*****************************************************************************
  * Copyright 2005, 2006, 2007 Jan Bretschneider, Peter Massuthe, Leonard Kern*
  *                                                                           *
  * Copyright 2008                                                            *
@@ -639,6 +639,11 @@ void AnnotatedGraph::findFalseNodes(std::vector<AnnotatedGraphNode*>* falseNodes
 
     trace(TRACE_5, "AnnotatedGraph::findFalseNodes(): start\n");
 
+    // if the og is empty, dont search for false nodes
+    if (getRoot()->getColor() == RED) {
+        return;
+    }
+
     nodes_iterator iNode = setOfNodes.begin();
 
     while (iNode != setOfNodes.end()) {
@@ -986,7 +991,10 @@ void AnnotatedGraph::minimizeGraph() {
 
         // the second parameter is false, since this OG has no underlying oWFN
         printOGFile(outfilePrefix, false);
-        printDotFile(outfilePrefix + ".og");
+        
+        if (!parameters[P_NOPNG]) {
+            printDotFile(outfilePrefix + ".og");
+        }
     }
 
     trace(TRACE_5, "AnnotatedGraph::minimizeGraph(): end\n");

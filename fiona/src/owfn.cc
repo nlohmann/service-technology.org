@@ -1002,6 +1002,10 @@ void oWFN::calculateReachableStatesStubbornDeadlocks(StateSet& stateSet, Annotat
                     + intToString(n->reachGraphStateSet.size()) + "\n");
         }
 
+#ifdef CHECKCAPACITY
+            try
+            {
+#endif
         // no more transition to fire from current state?
         if (CurrentState->current < CurrentState->cardFireList) {
             // there is a next state that needs to be explored
@@ -1128,6 +1132,21 @@ void oWFN::calculateReachableStatesStubbornDeadlocks(StateSet& stateSet, Annotat
                 CurrentState->current++;
             }
         }
+#ifdef CHECKCAPACITY
+            }
+            catch (CapacityException& ex)
+            {
+                trace(TRACE_1, "\t firing transition caused capacity violation on place " + ex.place + "\n");
+                CurrentState = CurrentState->parent;
+
+                if (CurrentState) 
+                { // there is a father to further examine
+                    CurrentState->decode(this);
+                    CurrentState->current++;
+                }
+                throw;
+            }
+#endif
     }
     if (tempCurrentMarking) {
         delete[] tempCurrentMarking;
@@ -1147,7 +1166,7 @@ void oWFN::calculateReachableStatesStubbornDeadlocks(StateSet& stateSet, Annotat
 //! \param outputPlace the output place of the net that is associated with the receiving event for which the new AnnotatedGraphNode is calculated
 //! \param n new AnnotatedGraphNode 
 void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
-												StateSet& setOfStatesStubbornTemp,
+                                                StateSet& setOfStatesStubbornTemp,
                                                 binDecision** tempBinDecision,
                                                 owfnPlace* outputPlace,
                                                 AnnotatedGraphNode* n) {
@@ -1214,6 +1233,10 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
     // building EG in a node
     while (CurrentState) {
 
+#ifdef CHECKCAPACITY
+            try
+            {
+#endif
         // no more transition to fire from current state?
         if (CurrentState->current < CurrentState->cardFireList) {
             // there is a next state that needs to be explored
@@ -1325,8 +1348,23 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                     	trace(TRACE_5, "activates receiving event " + outputPlace->getLabelForCommGraph() + "\n");
                     	// calc the reachable states from that marking using stubborn set method taking
                     	// care of deadlocks
+#ifdef CHECKCAPACITY
+                    try {
+#endif                
+                        // calc the reachable states from that marking
                     	calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, n); 
                         storeInNode = false;
+#ifdef CHECKCAPACITY
+                    }
+                    catch (CapacityException& ex)
+                    {
+                        trace(TRACE_1, "\t\t\t\t\t adding input event would cause capacity bound violation on place " + ex.place + "\n");
+                        trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+                        n->setColor(RED);
+                        throw;
+                        return;
+                    }
+#endif                
                         
                     	if (n->getColor() == RED) {
                             trace(TRACE_3, "\t\t\t message bound violated; color of node "
@@ -1334,7 +1372,7 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                                            + " set to RED (calculateReachableStatesFull, during fire)\n");
                             trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
 
-                            assert(CurrentState->succ[CurrentState->current] == NULL);
+                            //assert(CurrentState->succ[CurrentState->current] == NULL);
                             CurrentState->succ[CurrentState->current] = NewState;
 
                             delete[] tempCurrentMarking;
@@ -1381,6 +1419,21 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                 CurrentState->current++;
             }
         }
+#ifdef CHECKCAPACITY
+            }
+            catch (CapacityException& ex)
+            {
+                trace(TRACE_1, "\t firing transition caused capacity violation on place " + ex.place + "\n");
+                CurrentState = CurrentState->parent;
+
+                if (CurrentState) 
+                { // there is a father to further examine
+                    CurrentState->decode(this);
+                    CurrentState->current++;
+                }
+                throw;
+            }
+#endif
     }
     if (tempCurrentMarking) {
         delete[] tempCurrentMarking;
@@ -1502,6 +1555,10 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
     // building EG in a node
     while (CurrentState) {
 
+#ifdef CHECKCAPACITY
+            try
+            {
+#endif
         // no more transition to fire from current state?
     	if (CurrentState->current < CurrentState->cardFireList) {
             // there is a next state that needs to be explored
@@ -1707,6 +1764,21 @@ void oWFN::calculateReducedSetOfReachableStates(StateSet& stateSet,
                 CurrentState->current++;
             }
         }
+#ifdef CHECKCAPACITY
+            }
+            catch (CapacityException& ex)
+            {
+                trace(TRACE_1, "\t firing transition caused capacity violation on place " + ex.place + "\n");
+                CurrentState = CurrentState->parent;
+
+                if (CurrentState) 
+                { // there is a father to further examine
+                    CurrentState->decode(this);
+                    CurrentState->current++;
+                }
+                throw;
+            }
+#endif
     }
     if (tempCurrentMarking) {
         delete[] tempCurrentMarking;
@@ -1913,6 +1985,10 @@ void oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, A
                     + intToString(n->reachGraphStateSet.size()) + "\n");
         }
 
+#ifdef CHECKCAPACITY
+            try
+            {
+#endif
         // no more transition to fire from current state?
         if (CurrentState->current < CurrentState->cardFireList) {
             // there is a next state that needs to be explored
@@ -2037,6 +2113,21 @@ void oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, A
                 CurrentState->current++;
             }
         }
+#ifdef CHECKCAPACITY
+            }
+            catch (CapacityException& ex)
+            {
+                trace(TRACE_1, "\t firing transition caused capacity violation on place " + ex.place + "\n");
+                CurrentState = CurrentState->parent;
+
+                if (CurrentState) 
+                { // there is a father to further examine
+                    CurrentState->decode(this);
+                    CurrentState->current++;
+                }
+                throw;
+            }
+#endif
     }
     if (tempCurrentMarking) {
         delete[] tempCurrentMarking;
@@ -2364,8 +2455,12 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
         State * NewState;
 
         // building EG in a node
-        while (CurrentState) {
-
+        while (CurrentState) 
+        {
+#ifdef CHECKCAPACITY
+            try
+            {
+#endif
             // no more transition to fire from current state?
             if (CurrentState->current < CurrentState->cardFireList) {
                 // there is a next state that needs to be explored
@@ -2380,6 +2475,7 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
 
                 // fire and reach next state
                 CurrentState->firelist[CurrentState->current]->fire(this);
+
                 NewState = binSearch(this);
 
                 if (NewState != NULL) {
@@ -2482,6 +2578,21 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                     CurrentState->current++;
                 }
             }
+#ifdef CHECKCAPACITY
+            }
+            catch (CapacityException& ex)
+            {
+                trace(TRACE_1, "\t firing transition caused capacity violation on place " + ex.place + "\n");
+                CurrentState = CurrentState->parent;
+
+                if (CurrentState) 
+                { // there is a father to further examine
+                    CurrentState->decode(this);
+                    CurrentState->current++;
+                }
+                throw;
+            }
+#endif
         }
         if (tempCurrentMarking) {
             delete[] tempCurrentMarking;
@@ -3531,31 +3642,39 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
 
     PNapi::PetriNet* PN = new PNapi::PetriNet();
 
+    std::set< pair< PNapi::Place *, unsigned int > > finalMarking;
+
     // translate all input places
     for (Places_t::const_iterator place = inputPlaces.begin(); place
             != inputPlaces.end(); place++) {
-        PNapi::Place* p = PN->newPlace((*place)->name, PNapi::IN, get_port_from_place(*place));
+        PNapi::Place* p = PN->newPlace((*place)->name, PNapi::IN, (*place)->capacity, get_port_from_place(*place));
         // Warning: tokens of a place in PNapi is private. The number of tokens is not translated correctly!
         if ((*place)->initial_marking >= 1) {
             p->mark((*place)->initial_marking);
+        }
+
+        if (FinalMarking[getPlaceIndex(*place)] >= 1) {
+            p->isFinal = true;
+            finalMarking.insert(pair<PNapi::Place *,unsigned int>(p, FinalMarking[getPlaceIndex(*place)]));
         }
     }
 
     // translate all output places
     for (Places_t::const_iterator place = outputPlaces.begin(); place
             != outputPlaces.end(); place++) {
-        PNapi::Place* p = PN->newPlace((*place)->name, PNapi::OUT, get_port_from_place(*place));
+        PNapi::Place* p = PN->newPlace((*place)->name, PNapi::OUT, (*place)->capacity, get_port_from_place(*place));
         // Warning: tokens of a place in PNapi is private. The number of tokens is not translated correctly!
         if ((*place)->initial_marking >= 1) {
             p->mark((*place)->initial_marking);
         }
+
+        if (FinalMarking[getPlaceIndex(*place)] >= 1) {
+            p->isFinal = true;
+            finalMarking.insert(pair<PNapi::Place *,unsigned int>(p, FinalMarking[getPlaceIndex(*place)]));
+        }
     }
 
-    // In case that this oWFN has a final marking rather than a final condition
-    // the appropriate final-marking for the PNapi net can be already filled here
-    set< PNapi::Place * > PNapiFinalMarking;
-    
-    // translate all places which are not input or output places
+    // translate all places which are neither input nor output places
     for (Places_t::const_iterator place = Places.begin(); place != Places.end(); place++) {
         if (PN->findPlace((*place)->name) == NULL) {
             PNapi::Place* p = PN->newPlace((*place)->name);
@@ -3566,10 +3685,12 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
 
             if (FinalMarking[getPlaceIndex(*place)] >= 1) {
                 p->isFinal = true;
-                PNapiFinalMarking.insert(p);
+                finalMarking.insert(pair<PNapi::Place *,unsigned int>(p, FinalMarking[getPlaceIndex(*place)]));
             }
         }
     }
+
+    PN->final_set_list.push_back(finalMarking);
 
     // translate all transitions and generate all arcs
     for (Transitions_t::const_iterator transition = Transitions.begin(); transition
@@ -3591,11 +3712,6 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
                        arc->Multiplicity);
         }
 
-    }
-
-    // assign the final marking to the PNapi-net in case that there was no final condition
-    if (FinalCondition == NULL) {
-        PN->final_set_list.push_back(PNapiFinalMarking);
     }
 
     // translate the final condition into final markings of the PNapi-net

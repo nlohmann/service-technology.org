@@ -34,13 +34,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2008-03-15 17:27:42 $
+ * \date    \$Date: 2008-06-19 11:42:06 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  *
  * \ingroup petrinet
  */
@@ -64,6 +64,7 @@
 
 
 using std::endl;
+using std::cerr;
 using std::setw;
 using std::right;
 using std::left;
@@ -142,10 +143,7 @@ string PNapi::Node::nodeName() const
   string result = *history.begin();
 
   if ( type == INTERNAL || nodeType == TRANSITION )
-  {
-    result = result.substr(result.find_last_of(".")+1,result.length());
     result = prefix + result;
-  }
 
   return result;
 }
@@ -355,7 +353,7 @@ string Transition::output_dot() const
 #ifdef USING_BPEL2OWFN
   string label = nodeShortName();
 #else
-  string label = nodeName();
+  string label = nodeShortName();
 #endif
   
   switch(type)
@@ -1223,13 +1221,17 @@ void PetriNet::output_owfn(ostream *output) const
   unsigned int count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); count++, p++)
   {
+    if( (*p)->capacity > 0)
+    {
+      (*output) << "SAFE " << (*p)->capacity << " : ";
+    }
 #ifdef USING_BPEL2OWFN
     (*output) << (*p)->nodeShortName();
 #else
     (*output) << (*p)->nodeName();
 #endif
     if (count < P.size())
-      (*output) << ", ";
+      (*output) << "; ";
   }
   (*output) << ";" << endl << endl;
   
@@ -1311,18 +1313,25 @@ void PetriNet::output_owfn(ostream *output) const
     (*output) << "FINALMARKING" << endl << "  ";
     if (final_set_list.begin() != final_set_list.end())
     {
-      set<Place*> finalMarking = *(final_set_list.begin());
+      set<pair<Place *, unsigned int> > finalMarking = *(final_set_list.begin());
       bool first_place = true;
-      for( set<Place *>::const_iterator p = finalMarking.begin(); p != finalMarking.end(); p++)
+      for( set<pair<Place *, unsigned int> >::const_iterator p = finalMarking.begin(); p != finalMarking.end(); p++)
       {
         if (!first_place)
+        {
           (*output) << ", ";
+        }
           
 #ifdef USING_BPEL2OWFN
-        (*output) << (*p)->nodeShortName();
+        (*output) << (p->first)->nodeShortName();
 #else
-        (*output) << (*p)->nodeName();
+        (*output) << (p->first)->nodeName();
 #endif
+        assert(p->second > 0);
+        if (p->second > 1)
+        {
+          (*output) << " : " << p->second;
+        }
         first_place = false;
       }
       // (*output) << ";" << endl;
@@ -1334,7 +1343,7 @@ void PetriNet::output_owfn(ostream *output) const
     
     // iterate the final set list and conjugate the disjunctive place sets in order to create the final condition
     bool first_set = true;
-    for (list< set<Place *> >::const_iterator final_set = final_set_list.begin(); final_set != final_set_list.end(); final_set++)
+    for (list< set<pair<Place *,unsigned int> > >::const_iterator final_set = final_set_list.begin(); final_set != final_set_list.end(); final_set++)
     {
       if (!first_set)
       {
@@ -1343,26 +1352,26 @@ void PetriNet::output_owfn(ostream *output) const
       
       if ((*final_set).size() == 1)
       {
-        Place* p = (*((*final_set).begin()));
+        pair<Place*, unsigned int> p = (*((*final_set).begin()));
 #ifdef USING_BPEL2OWFN
-        (*output) << "( (" << p->nodeShortName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
+        (*output) << "( (" << p.first->nodeShortName() << "=" << p.second << ") AND ALL_OTHER_PLACES_EMPTY )";
 #else
-        (*output) << "( (" << p->nodeName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
+        (*output) << "( (" << p.first->nodeName() << "=" << p.second << ") AND ALL_OTHER_PLACES_EMPTY )";
 #endif
       }
       else
       {
         (*output) << "( ";
         bool first_place = true;
-        for( set<Place *>::const_iterator p = (*final_set).begin(); p != (*final_set).end(); p++)
+        for( set<pair<Place *,unsigned int> >::const_iterator p = (*final_set).begin(); p != (*final_set).end(); p++)
         {
           if (!first_place)
             (*output) << " AND ";
           
 #ifdef USING_BPEL2OWFN
-          (*output) << "(" << (*p)->nodeShortName() << "=1)";
+          (*output) << "(" << (p->first)->nodeShortName() << "=" p->second << ")";
 #else
-          (*output) << "(" << (*p)->nodeName() << "=1)";
+          (*output) << "(" << (p->first)->nodeName() << "=" << p->second << ")";
 #endif
           first_place = false;
         }
@@ -1386,7 +1395,7 @@ void PetriNet::output_owfn(ostream *output) const
 #ifdef USING_BPEL2OWFN
     (*output) << "TRANSITION " << (*t)->nodeShortName();
 #else
-    (*output) << "TRANSITION " << (*t)->nodeName();
+    (*output) << "TRANSITION " << (*t)->nodeShortName();
 #endif
     switch( (*t)->type )
     {

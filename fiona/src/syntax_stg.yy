@@ -24,6 +24,7 @@ extern char *stg_yytext;
 extern set<string> transitions;
 extern set<string> places;
 extern set<string> initialMarked;
+extern set<string> interface;
 extern map<string, set<string> > arcs;
 
 extern int stg_yylineno;
@@ -68,7 +69,7 @@ extern int stg_yylex();
 stg:
     {
       transitions.clear(); places.clear(); initialMarked.clear(); arcs.clear();
-      tempNodeSet.clear(); in_marking_list = false; in_arc_list = false;
+      tempNodeSet.clear(); interface.clear(); in_marking_list = false; in_arc_list = false;
     }
   K_MODEL IDENTIFIER newline
   K_DUMMY transition_list newline
@@ -80,9 +81,15 @@ stg:
 
 transition_list:
   TRANSITIONNAME transition_list
-    { transitions.insert(string($1));
-      if (in_arc_list)
+    { 
+      if (in_arc_list) 
+      {
         tempNodeSet.insert(string($1));
+        transitions.insert(string($1));
+      } else
+      {
+        interface.insert(string($1));
+      }
 
       free($1);
     }

@@ -535,9 +535,9 @@ string computeIG(oWFN* PN) {
             graph->diagnose();
         }
 
-        if (!parameters[P_EQ_R]) {    // don't create png if we are in eqr mode
-            // generate output files
-            graph->printGraphToDot(); // .out, .png
+        if (!parameters[P_EQ_R]) {	// don't create png if we are in eqr mode
+        	// generate output files
+        	graph->printGraphToDot(); // .out, .png
 
                 if (parameters[P_TEX]) {
                     makeGasTex(graph);
@@ -562,7 +562,8 @@ string computeIG(oWFN* PN) {
         // from still exists and additional information are available
         graph->printOGFile(igFilename, true);
 
-/* */
+/* create a .stg file for partner synthesis via petrify tool */
+
         if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
             if (controllable) {
                 graph->printGraphToSTG();
@@ -696,8 +697,8 @@ string computeOG(oWFN* PN) {
             }
         }
 
-        if (!parameters[P_EQ_R]) {    // don't create png if we are in eqr mode
-            graph->printGraphToDot(); // .out, .png
+        if (!parameters[P_EQ_R]) {	// don't create png if we are in eqr mode
+        	 graph->printGraphToDot(); // .out, .png
 
             if (parameters[P_TEX]) {
                 makeGasTex(graph);
@@ -1814,11 +1815,17 @@ int main(int argc, char** argv) {
             trace(TRACE_0, "NO\n\n");
         }
         // return 0;
-    } else if (parameters[P_ADAPTER]) {
-        generateAdapter();
-    } else if (parameters[P_IG] || parameters[P_OG] || parameters[P_MATCH] ||
-               parameters[P_PNG] || parameters[P_REDUCE] ||parameters[P_PV]) {
-
+    }
+    else if (parameters[P_ADAPTER] || parameters[P_SMALLADAPTER]) 
+    {
+    	Adapter adapter;
+    	adapter.generateAdapter();
+    	
+        //generateAdapter();
+    } 
+    else if (parameters[P_IG] || parameters[P_OG] || parameters[P_MATCH] ||
+               parameters[P_PNG] || parameters[P_REDUCE] ||parameters[P_PV]) 
+    {
         if (parameters[P_MATCH]) {
             assert(ogfiles.size() == 1);
             // we match multiple oWFNs with one OG,

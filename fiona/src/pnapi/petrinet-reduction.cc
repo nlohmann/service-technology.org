@@ -35,13 +35,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2008-03-11 16:25:44 $
+ * \date    \$Date: 2008-06-19 11:42:07 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  *
  * \ingroup petrinet
  */
@@ -97,7 +97,7 @@ using namespace PNapi;
  */
 unsigned int PetriNet::reduce_unused_status_places()
 {
-  // trace(TRACE_DEBUG, "[PN]\tReducing unused places...\n");
+  //trace(TRACE_DEBUG, "[PN]\tReducing unused places...\n");
   list<Place *> unused_status_places;
   unsigned int result = 0;
   
@@ -110,13 +110,17 @@ unsigned int PetriNet::reduce_unused_status_places()
   
   // remove unused places
   for (list<Place*>::iterator p = unused_status_places.begin(); p != unused_status_places.end(); p++)
+  {
     if (P.find(*p) != P.end())
     {
       removePlace(*p);
       result++;
     }
+  }
       if (result!=0)
-        // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
+      {
+        //trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
+      }
   return result;
 }
 
@@ -228,20 +232,24 @@ void PetriNet::reduce_dead_nodes()
     
     // remove dead places and transitions
     for (list<Place*>::iterator p = deadPlaces.begin(); p != deadPlaces.end(); p++)
+    {
       if (P.find(*p) != P.end())
       {
         removePlace(*p);
         result++;
       }
-        
-        for (list<Transition*>::iterator t = deadTransitions.begin(); t != deadTransitions.end(); t++)
-          if (T. find(*t) != T.end())
-          {
-            removeTransition(*t);
-            result++;
-          }
+    }   
+     
+    for (list<Transition*>::iterator t = deadTransitions.begin(); t != deadTransitions.end(); t++)
+    {
+      if (T. find(*t) != T.end())
+      {
+        removeTransition(*t);
+        result++;
+      }
+    }
             
-            
+     /*       
             // remove isolated communication places
             list<Place*> uselessInputPlaces;
     
@@ -268,6 +276,7 @@ void PetriNet::reduce_dead_nodes()
         P_out.erase(*p);
         result++;
       }
+      */
   }
 //    if (result!=0)
       // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " nodes.\n");
@@ -476,60 +485,52 @@ void PetriNet::reduce_series_places()
  * \todo
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
+ *       ???? What about initially marked and final places ????
  */
-void PetriNet::reduce_series_transitions()
-{
-  // trace(TRACE_DEBUG, "[PN]\tApplying rule RA2 (fusion of series transitions)...\n");
-  int result=0;
-  
-  set<string> uselessPlaces;
-  set<pair<string, string> > transitionPairs;
-  
-  
-  // iterate the places
-  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
-  {
-    if (((*p)->postset.size() == 1) && ((*p)->preset.size() == 1)) // precondition 1
-    {
-      Transition* t1 = static_cast<Transition*>(*((*p)->preset.begin()));
-      Transition* t2 = static_cast<Transition*>(*((*p)->postset.begin()));
-      
-      if (((t2)->preset.size() == 1) && // precondition 2
-          (arc_weight(t1, *p) == arc_weight(*p, t2))) // precondition 5
-      {
-        string id1 = (t1->nodeFullName());
-        string id2 = (t2->nodeFullName());
-        transitionPairs.insert(pair<string, string>(id1, id2));
-        uselessPlaces.insert(((*p)->nodeFullName()));
-      }
+void PetriNet::reduce_series_transitions() {
+    // trace(TRACE_DEBUG, "[PN]\tApplying rule RA2 (fusion of series transitions)...\n");
+    int result=0;
+
+    set<string> uselessPlaces;
+    set<pair<string, string> > transitionPairs;
+
+    // iterate the places
+    for (set<Place*>::iterator p = P.begin(); p != P.end(); p++) {
+        if (((*p)->postset.size() == 1) && ((*p)->preset.size() == 1) && !(*p)->isFinal && (!(*p)->tokens > 0)) // precondition 1
+        {
+            Transition* t1 = static_cast<Transition*>(*((*p)->preset.begin()));
+            Transition* t2 = static_cast<Transition*>(*((*p)->postset.begin()));
+
+            if (((t2)->preset.size() == 1) && // precondition 2
+                            (arc_weight(t1, *p) == arc_weight(*p, t2))) // precondition 5
+            {
+                string id1 = (t1->nodeFullName(true));
+                string id2 = (t2->nodeFullName(true));
+                transitionPairs.insert(pair<string, string>(id1, id2));
+                uselessPlaces.insert(((*p)->nodeFullName()));
+            }
+        }
     }
-  }
-  
-  
-  // remove useless places
-  for (set<string>::iterator label = uselessPlaces.begin();
-       label != uselessPlaces.end(); label++)
-  {
-    Place *uselessPlace = findPlace(*label);
-    removePlace(uselessPlace);
-  }
-  
-  
-  // merge transition pairs
-  for (set<pair<string, string> >::iterator transitionPair = transitionPairs.begin();
-       transitionPair != transitionPairs.end(); transitionPair++)
-  {
-    Transition* t1 = findTransition(transitionPair->first);
-    Transition* t2 = findTransition(transitionPair->second);
-    mergeTransitions(t1, t2);
-    result++;
-  }
-  //if (result!=0)
+
+    // remove useless places
+    for (set<string>::iterator label = uselessPlaces.begin(); label
+                    != uselessPlaces.end(); label++) {
+        Place *uselessPlace = findPlace(*label);
+        removePlace(uselessPlace);
+    }
+
+    // merge transition pairs
+    for (set<pair<string, string> >::iterator transitionPair =
+                    transitionPairs.begin(); transitionPair
+                    != transitionPairs.end(); transitionPair++) {
+        Transition* t1 = findTransition(transitionPair->first);
+        Transition* t2 = findTransition(transitionPair->second);
+        mergeTransitions(t1, t2);
+        result++;
+    }
+    //if (result!=0)
     // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " transitions.\n");
 }
-
-
-
 
 
 /*!
@@ -561,6 +562,7 @@ unsigned int PetriNet::reduce_self_loop_places()
     if ((*p)->tokens > 0)
       if ((*p)->postset.size() == 1 && (*p)->preset.size() == 1)
         if ((*p)->preset == (*p)->postset)
+          if (!(*p)->isFinal)
           self_loop_places.push_back(*p);
   
   // remove useless places
@@ -925,7 +927,9 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
     if (reduction_level >= 2)
     {
       reduce_unused_status_places();
+#ifdef USING_BPEL2OWFN
       reduce_suspicious_transitions();
+#endif
     }
     
     if (reduction_level >= 3)

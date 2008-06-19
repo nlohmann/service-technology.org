@@ -80,8 +80,9 @@ typedef enum {
     P_SIMULATES_WITH_COV,       //!< Check whether an OG simulates another including coverage formulas
     P_EX,                       //!< check equivalence (former exchangability) of two OGs 
     P_EQ_R,                     //!< equivalence of two graphs (with -R and without -R), but the two graphs are computed automatically
-    P_ADAPTER,                  //!< compute adapter for given services
-    P_PNG,                      //!< graphical output of all given oWFNs and OGs
+    P_ADAPTER,                  //!< compute adapter (with OG) for given services
+    P_SMALLADAPTER,             //!< compute small adapter (with IG) for given services
+    P_PNG,                      //!< graphical output of all given oWFNs
     P_GASTEX,                   //!< read an annotated dot file and create a gastex tex file
     P_CHECK_FALSE_NODES,	    //!< check false annotations in og
     P_REMOVE_FALSE_NODES,		//!< remove nodes with false annotations in og

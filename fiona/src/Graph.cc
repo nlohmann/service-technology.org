@@ -363,8 +363,11 @@ void Graph::transformToOWFN(PNapi::PetriNet* PN, set<string> setOfInputs, set<st
 
     // create the final markings for the petri net
     for (set<string>::iterator finalNodesIt = finalNodeNames.begin(); finalNodesIt != finalNodeNames.end(); ++finalNodesIt) {
-        set< PNapi::Place * > finalMarking;
-        finalMarking.insert(PN->findPlace(*finalNodesIt));
+    	// PN->findPlace(*finalNodesIt)->isFinal = true;    	
+    	//PNapi::Marking* finalMarking = PN->addFinalMarking();
+    	//PN->findPlace(*finalNodesIt)->addToFinalMarking(finalMarking);
+        set< pair<PNapi::Place *, unsigned int> > finalMarking;
+        finalMarking.insert(pair<PNapi::Place*, unsigned int>(PN->findPlace(*finalNodesIt), 1));
         PN->final_set_list.push_back(finalMarking);
     }
 }

@@ -342,7 +342,7 @@ placelists: capacity placelist
 | placelists SEMICOLON capacity placelist
 ;
 
-capacity: { CurrentCapacity = CAPACITY;}
+capacity: { CurrentCapacity = CAPACITY; }
 | KEY_SAFE    COLON  {CurrentCapacity = 1;}
 | KEY_SAFE NUMBER  COLON { 
 				sscanf($2, "%u", &CurrentCapacity);
@@ -365,7 +365,7 @@ place: nodeident {
 	PS = new PlSymbol(P);
 	PlaceTable->add(PS);
 	P->capacity = CurrentCapacity;
-	P->nrbits = CurrentCapacity > 0 ? logzwo(CurrentCapacity) : 32;
+	P->nrbits = (CurrentCapacity > 0 && logzwo(CurrentCapacity) < 32) ? logzwo(CurrentCapacity) + 1 : 32;
 	// set max_occurence to default value
 	P->max_occurence = events_manual;
 	free($1);

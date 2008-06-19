@@ -60,6 +60,9 @@ class Arc;
 class AnnotatedGraph;
 class AnnotatedGraphNode;
 class GraphFormulaAssignment;
+#ifdef CHECKCAPACITY
+class CapacityException;
+#endif
 
 class oWFN {
     // first public typedefs, then private members, then public methods
@@ -418,5 +421,24 @@ class oWFN {
         NEW_OPERATOR(oWFN)
 #define new NEW_NEW
 };
+
+#ifdef CHECKCAPACITY
+class CapacityException
+{
+    public:
+        /// name of place with capacity violation
+        std::string place;
+
+        /// Constructor
+        CapacityException(std::string name) : place(name) {}
+
+        // Provides user defined operator new. Needed to trace all new operations on this class.
+#undef new
+        NEW_OPERATOR(CapacityException)
+#define new NEW_NEW
+
+};
+#endif
+
 
 #endif /*OWFN_H_*/

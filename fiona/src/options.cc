@@ -153,7 +153,8 @@ void print_help() {
   trace("                                                 (already present!) BDDs)\n");
   trace("                                   adapter     - calculate an adapter for a\n");
   trace("                                                 given set of services\n");
-  trace("\n");
+  trace("                                  smalladapter - calculate a small adapter for\n");
+  trace("                                                 a given set of services\n");
   trace("                                   png         - generate png files for all\n");
   trace("                                                 given oWFNs or OGs\n");
 //  trace("                                   tex         - generate gastex files for a\n");
@@ -331,6 +332,7 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_EX] = false;
     parameters[P_EQ_R] = false;
     parameters[P_ADAPTER] = false;
+    parameters[P_SMALLADAPTER] = false;
     parameters[P_PNG] = false;
     parameters[P_GASTEX] = false;
     parameters[P_CHECK_FALSE_NODES] = false;
@@ -463,6 +465,11 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_OG] = true;
                     parameters[P_IG] = false;
                     parameters[P_ADAPTER] = true;
+                    parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
+                } else if (lc_optarg == "smalladapter") {
+                    parameters[P_OG] = false;
+                    parameters[P_IG] = true;
+                    parameters[P_SMALLADAPTER] = true;
                     parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
                 } else if (lc_optarg == "png") {
                     parameters[P_IG] = false;

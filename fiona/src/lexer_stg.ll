@@ -24,8 +24,9 @@ namechar		[A-Za-z\200-\377_0-9/.:]
 number			[0-9]+
 placename		"p"{number}
 name			{namestart}{namechar}*
-transitionname1		"out."{name}
-transitionname2		"in."{name}
+transitionname1		"t"{number}("/"{number})?
+transitionname2		"out."{name}
+transitionname3		"in."{name}
 
 
 %%
@@ -52,6 +53,9 @@ transitionname2		"in."{name}
                           return TRANSITIONNAME; }
 
 {transitionname2}	{ stg_yylval.str = strdup(stg_yytext);
+                          return TRANSITIONNAME; }
+
+{transitionname3}	{ stg_yylval.str = strdup(stg_yytext);
                           return TRANSITIONNAME; }
 
 "finalize"		{ stg_yylval.str = strdup(stg_yytext);

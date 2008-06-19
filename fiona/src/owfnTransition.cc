@@ -244,9 +244,10 @@ void owfnTransition::fire(oWFN * PN) {
         
         PN->CurrentMarking[PN->getPlaceIndex(incrOwfnPlace)] += incrPlace.getMultiplicity();
 #ifdef CHECKCAPACITY
-        if(PN->CurrentMarking[incrOwfnPlace->index] > incrOwfnPlace->capacity) {
+        if(PN->CurrentMarking[PN->getPlaceIndex(incrOwfnPlace)] > incrOwfnPlace->capacity) {
             cerr << "capacity of place " << incrOwfnPlace->name << " exceeded!" << endl;
-            _exit(4);
+            throw CapacityException(incrOwfnPlace->name);
+            //_exit(4);
         }
 #endif
     }

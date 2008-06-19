@@ -68,9 +68,10 @@ class CommunicationGraph : public AnnotatedGraph {
                                         std::map<AnnotatedGraphNode*, bool>&);
 
         /// recursive helper function for printGraphToSTG()
-        void printGraphToSTGRecursively(AnnotatedGraphNode* v,
-                                        fstream& os,
-                                        std::map<AnnotatedGraphNode*, bool>&);
+        void printGraphToSTGRecursively(AnnotatedGraphNode * v,
+                                        ostringstream & os,
+                                        std::map<AnnotatedGraphNode*, bool> &,
+					std::vector<string> &);
 
         /// recursive helper function for annotateGraphDistributedly()
         bool annotateGraphDistributedlyRecursively(AnnotatedGraphNode* v,

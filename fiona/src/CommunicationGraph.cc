@@ -47,6 +47,9 @@
 #include "set_helpers.h"
 #include <cassert>
 
+#include <sstream>
+#include <vector>
+
 using namespace std;
 
 
@@ -54,8 +57,8 @@ double global_progress = 0;
 int show_progress = 0;
 
 // for the STG->oWFN translation
-extern void STG2oWFN_main();
-extern FILE *stg_yyin;
+extern void STG2oWFN_main(vector<string> &, string);
+//extern FILE *stg_yyin;
 
 
 //! \brief constructor
@@ -502,139 +505,141 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
 }
 
 
-//! \brief creates a STG file of the graph
-void CommunicationGraph::printGraphToSTG() {
-    trace(TRACE_0, "\ncreating the STG file of the graph...\n");
-    AnnotatedGraphNode* rootNode = root;
-    string buffer;
-
-    // set file name
+//! \brief creates a STG file of the graph AND starts petrify AND parses petrify output to oWFN
+void CommunicationGraph::printGraphToSTG()
+{
+    // build STG file name
+    string STGFileName;
     if (options[O_OUTFILEPREFIX]) {
-        buffer = outfilePrefix;
+        STGFileName = outfilePrefix;
     } else {
-        buffer = PN->filename;
+        STGFileName = PN->filename;
     }
 
     if (parameters[P_OG]) {
         if (options[O_CALC_ALL_STATES]) {
-            buffer += ".og.stg";
+            STGFileName += ".og.stg";
         } else {
-            buffer += ".R.og.stg";
+            STGFileName += ".R.og.stg";
         }
     } else {
         if (options[O_CALC_ALL_STATES]) {
-            buffer += ".ig.stg";
+            STGFileName += ".ig.stg";
         } else {
-            buffer += ".R.ig.stg";
+            STGFileName += ".R.ig.stg";
         }
     }
+    trace(TRACE_0, "\ncreating the STG file " + STGFileName + "\n");
 
-    // create file
-    fstream dotFile(buffer.c_str(), ios_base::out | ios_base::trunc);
 
-    // print header
-    dotFile << ".model Labeled_Transition_System" << endl;
+	// create and fill stringstream for buffering graph information
+    map<AnnotatedGraphNode*, bool> visitedNodes;	// visited nodes
+	vector<string> edgeLabels;						// renamend transitions
+    AnnotatedGraphNode* rootNode = root;			// root node
+    ostringstream STGStringStream;					// used as buffer for graph information
 
-    // list transitions (use place names)
-    dotFile << ".dummy";
-    assert(PN != NULL);
-    for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
-        if (PN->getPlace(i)->type == INPUT) {
-            dotFile << " out." << PN->getPlace(i)->name;
-        } else if (PN->getPlace(i)->type == OUTPUT) {
-            dotFile << " in." << PN->getPlace(i)->name;
-        }
-    }
-    dotFile << endl;
-    dotFile << ".state graph" << endl;
+    STGStringStream << ".state graph" << "\n";
+    printGraphToSTGRecursively(rootNode, STGStringStream, visitedNodes, edgeLabels);
+    STGStringStream << ".marking {p" << rootNode->getNumber() << "}" << "\n";
+    STGStringStream << ".end";
 
-    // mark all nodes as unvisited
-    std::map<AnnotatedGraphNode*, bool> visitedNodes;
 
-    // traverse the nodes recursively
-    printGraphToSTGRecursively(rootNode, dotFile, visitedNodes);
+	// create STG file, print header, transition information and then add buffered graph information
+    fstream STGFileStream(STGFileName.c_str(), ios_base::out | ios_base::trunc | ios_base::binary);
+    STGFileStream << ".model Labeled_Transition_System" << "\n";
+    STGFileStream << ".dummy";
+	for (int i = 0; i < (int)edgeLabels.size(); i++)
+	{
+		STGFileStream << " t" << i;
+	}
+	string STGGraphString = STGStringStream.str();
+	STGFileStream << "\n" << STGGraphString << endl;
+	STGFileStream.close();
 
-    // the initial marking
-    dotFile << ".marking {p" << rootNode->getNumber() << "}" << endl;
 
-    // end and close file
-    dotFile << ".end"<< endl;
-    dotFile.close();
+    // prepare petrify command line and execute system command if possible
+	string PNFileName = STGFileName.substr(0, STGFileName.size() - 4) + ".pn"; // change .stg to .pn
+	string systemcall = string(HAVE_PETRIFY) + " " + STGFileName + " -dead -ip -nolog -o " + PNFileName;
 
-    // prepare Petrify command line for printing
-    if (parameters[P_OG]) {
-        buffer = string(HAVE_PETRIFY) + " " + PN->filename
-                 + ".og.stg -dead -ip -o " + PN->filename + ".og.pn";
-    } else {
-        buffer = string(HAVE_PETRIFY) + " " + PN->filename
-                 + ".ig.stg -dead -ip -o " + PN->filename + ".ig.pn";
-    }
-
-    // print commandline and execute system command
-    trace(TRACE_0, buffer + "\n");
-
+    trace(TRACE_0, systemcall + "\n");
     if (HAVE_PETRIFY != "not found") {
-        system(buffer.c_str());
+        system(systemcall.c_str());
     } else {
         trace(TRACE_0, "cannot execute command as Petrify was not found in path\n");
         return;
     }
 
-    // the filename of the generated Petri net
-    string generated_stg_file = PN->filename;
-    if (parameters[P_OG]) {
-        generated_stg_file += ".og.pn";
-    } else {
-        generated_stg_file += ".ig.pn";
-    }
 
-    std::cerr << "parsing file file `" << generated_stg_file << "'..." << std::endl;
-    stg_yyin = fopen(generated_stg_file.c_str(), "r");
-    STG2oWFN_main();
+    //stg_yyin = fopen(PNFileName.c_str(), "r");
+	// create oWFN out of petrify output
+    STG2oWFN_main( edgeLabels, PNFileName );
 }
 
 
-//! \brief breadthsearch through the graph printing each node and edge to the output stream
+//! \brief depth-first-search through the graph printing each node and edge to the output stream
 //! \param v current node in the iteration process
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
-void CommunicationGraph::printGraphToSTGRecursively(AnnotatedGraphNode* v,
-                                                    fstream& os,
-                                                    std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
+void CommunicationGraph::printGraphToSTGRecursively(AnnotatedGraphNode * v,
+                                                    ostringstream & os,
+                                                    std::map<AnnotatedGraphNode*, bool> & visitedNodes,
+													std::vector<string> & edgeLabels)
+{
     assert(v != NULL);
+    visitedNodes[v] = true; 			// mark current node as visited
 
     if (!v->isToShow(root, (PN != NULL)))
         return;
 
-    visitedNodes[v] = true;
-
-    // arcs
+	// go through all arcs
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
-
-    while (edgeIter->hasNext()) {
+    while (edgeIter->hasNext())
+	{
         AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = element->getDstNode();
 
-        if (!vNext->isToShow(root, (PN != NULL)))
-            continue;
+		//cout << "current node: " << v->getNumber() << endl;
+		//cout << "current edge: " << element->getLabel() << endl;
+		//cout << "next node: " << vNext->getNumber() << endl;
 
-        string this_edges_label = element->getLabelWithoutPrefix();
-        os << "p" << v->getNumber() << " ";
+        if (!vNext->isToShow(root, (PN != NULL))) continue; // continue if node is not to show
 
-        switch (element->getType()) {
-            case SENDING  : os << "out."; break;
-            case RECEIVING: os << "in.";  break;
-            default: break;
-        }
 
-        os << this_edges_label;
-        os << " p" << vNext->getNumber() << endl;
+		// build label vector:
+		// each label is mapped to his position in edgeLabes
+		string currentLabel = element->getLabel();
+		int foundPosition = -1;
+		for (int i = 0; i < (int)edgeLabels.size(); i++)
+		{
 
-        if ((vNext != v) && !visitedNodes[vNext]) {
-            printGraphToSTGRecursively(vNext, os, visitedNodes);
+			if ( currentLabel == edgeLabels.at(i) )
+			{
+				foundPosition = i;
+				//cout << "found edge befor" << endl;
+				break;
+			}
+		}
+		if ( foundPosition == -1 )
+		{
+			//cout << "didn't found edge befor - add to known labels" << endl;
+			foundPosition = (int)edgeLabels.size();
+			edgeLabels.push_back( currentLabel );
+		}
+		assert( foundPosition >= 0);
+		assert( currentLabel == edgeLabels.at(foundPosition) );
+
+
+		// print current transition to stream 
+        os << "p" << v->getNumber() << " t" << foundPosition << " p" << vNext->getNumber() << endl;
+
+
+		// recursion
+		if ( vNext != v && visitedNodes.find(vNext) == visitedNodes.end() )
+        //if ((vNext != v) && !visitedNodes[vNext])
+		{
+            printGraphToSTGRecursively(vNext, os, visitedNodes, edgeLabels);
         }
     }
-    delete edgeIter;
 }
 
 

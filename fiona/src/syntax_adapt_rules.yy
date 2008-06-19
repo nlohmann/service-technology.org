@@ -13,14 +13,31 @@
 #include <iostream>
 #include <set>
 #include <map>
+#include <list>
+
+#include "adapter.h"
+
 using std::cerr;
 using std::endl;
 using std::string;
 using std::set;
 using std::map;
+using std::list;
+using std::pair;
 
-extern char *adapt_rules_yytext;
+
+// from flex
+extern char* adapt_rules_yytext;
 extern int adapt_rules_yylineno;
+extern int adapt_rules_yylex();
+
+
+namespace
+{
+    list< string > channelList;	// a list of names for input/output places (channels)
+    adapterRule currentRule;	// current read rule
+}
+
 
 int adapt_rules_yyerror(const char* msg)
 {
@@ -29,9 +46,6 @@ int adapt_rules_yyerror(const char* msg)
   exit(1);
 }
 
-// from flex
-extern char* adapt_rules_yytext;
-extern int adapt_rules_yylex();
 %}
 
 // Bison options
@@ -57,13 +71,40 @@ extern int adapt_rules_yylex();
  *
  */
 adapt_rules:
-    adapt_rule SEMICOLON adapt_rules
+    adapt_rule
+    {
+        adapter_rules.push_back(currentRule);
+        currentRule.first = list< string >();
+        currentRule.second = list< string >();
+    }
+    SEMICOLON adapt_rules
 |
     /* empty */
 ;
 
 adapt_rule:
-    opt_channel_list ARROW opt_channel_list
+    opt_channel_list 
+    {
+        currentRule.first = channelList;
+        {
+            map< string, bool > seen;
+            for ( list< string >::iterator channel = channelList.begin(); channel != channelList.end(); channel++)
+            {
+                if (!seen[*channel])
+                {
+                    // count the number of rules in which current channel occurs
+                    seen[*channel] = true;
+                    rulesPerChannel[*channel] += 1;
+                }
+            }
+        }
+        channelList.clear();
+    }
+    ARROW opt_channel_list
+    {
+        currentRule.second = channelList;
+        channelList.clear();
+    }
 ;
 
 opt_channel_list:
@@ -74,7 +115,13 @@ opt_channel_list:
 
 channel_list:
     NAME
+    {
+        channelList.push_back($1);
+    }
 |
     NAME COMMA channel_list
+    {
+        channelList.push_back($1);
+    }
 ;
 

@@ -35,13 +35,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2008-03-11 16:25:44 $
+ * \date    \$Date: 2008-06-19 11:42:07 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  *
  * \ingroup petrinet
  */
@@ -202,7 +202,8 @@ void Transition::add_label(string new_label)
  */
 Place::Place(unsigned int my_id, string my_role, communication_type my_type) :
   tokens(0),
-  isFinal(false)
+  isFinal(false),
+  capacity(0)
 {
   id = my_id;
   type = my_type;
@@ -366,11 +367,12 @@ PetriNet::PetriNet(const PetriNet & net)
   nextId = net.nextId;
   format = FORMAT_OWFN;
 
+  
   // transfer the the final place set list
-  for (list<set<Place *> >::const_iterator final_set = net.final_set_list.begin(); final_set != net.final_set_list.end(); final_set++)
-  {
-    final_set_list.push_back(*final_set);
-  }
+  //for (list<set<pair<Place *,unsigned int> > >::const_iterator final_set = net.final_set_list.begin(); final_set != net.final_set_list.end(); final_set++)
+  //{
+  //  final_set_list.push_back(*final_set);
+  //}
 
   // add all internal places
   for (set< Place * >::iterator place = net.P.begin(); place != net.P.end(); place ++)
@@ -380,19 +382,6 @@ PetriNet::PetriNet(const PetriNet & net)
     newPlace->preset.clear();
     newPlace->postset.clear();
     P.insert( newPlace );
-
-    // if p was in the final set, the pointer has to be redirected to the new place
-    for (list<set<Place *> >::iterator final_set = final_set_list.begin(); final_set != final_set_list.end(); final_set++)
-    {
-      for (set<Place *>::iterator p = (*final_set).begin(); p != (*final_set).end(); p++)
-      {
-        if ((*p) == (*place))
-        {
-          (*final_set).erase(p--);
-          (*final_set).insert(newPlace);
-        }
-      }
-    } 
 
     roleMap[ newPlace->nodeFullName() ] = newPlace;
 
@@ -426,6 +415,22 @@ PetriNet::PetriNet(const PetriNet & net)
 
     for(list< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
       roleMap[*name] = newPlace;
+  }
+  // recalculate final markings:
+  { 
+    list<set<pair<Place *, unsigned int> > > netFinalList;
+
+    for (list<set<pair<Place *, unsigned int> > >::const_iterator netFinal = net.final_set_list.begin(); netFinal != net.final_set_list.end(); netFinal++)
+    {
+      set<pair<Place *, unsigned int> > finalMarking;
+      for (set<pair<Place *, unsigned int> >::const_iterator p = netFinal->begin(); p != netFinal->end(); p++)
+      {
+        finalMarking.insert(pair<Place *, unsigned int>(findPlace((p->first)->nodeFullName()), p->second));
+      }
+      if (! finalMarking.empty())
+        netFinalList.push_back(finalMarking);
+    }
+    final_set_list = netFinalList;
   }
   // add all transitions
   for (set< Transition * >::iterator transition = net.T.begin(); transition != net.T.end(); transition ++)
@@ -494,12 +499,6 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
   nextId = net.nextId;
   format = FORMAT_OWFN;
 
-  // transfer the final place set list
-  for (list<set<Place *> >::const_iterator final_set = net.final_set_list.begin(); final_set != net.final_set_list.end(); final_set++)
-  {
-    final_set_list.push_back(*final_set);
-  }
-
   // add all internal places
   for (set< Place * >::iterator place = net.P.begin(); place != net.P.end(); place ++)
   {
@@ -508,20 +507,6 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
     newPlace->preset.clear();
     newPlace->postset.clear();
     P.insert( newPlace );
-
-    // if p was in the final set, the pointer has to be redirected to the new place
-    for (list<set<Place *> >::iterator final_set = final_set_list.begin(); final_set != final_set_list.end(); final_set++)
-    {
-      for (set<Place *>::iterator p = (*final_set).begin(); p != (*final_set).end(); p++)
-      {
-        if ((*p) == (*place))
-        {
-          (*final_set).erase(p--);
-          (*final_set).insert(newPlace);
-        }
-      }
-    } 
-
 
     roleMap[ newPlace->nodeFullName() ] = newPlace;
 
@@ -555,6 +540,22 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
 
     for(list< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
       roleMap[*name] = newPlace;
+  }
+  // recalculate final markings:
+  { 
+    list<set<pair<Place *, unsigned int> > > netFinalList;
+
+    for (list<set<pair<Place *, unsigned int> > >::const_iterator netFinal = net.final_set_list.begin(); netFinal != net.final_set_list.end(); netFinal++)
+    {
+      set<pair<Place *, unsigned int> > finalMarking;
+      for (set<pair<Place *, unsigned int> >::const_iterator p = netFinal->begin(); p != netFinal->end(); p++)
+      {
+        finalMarking.insert(pair<Place *, unsigned int>(findPlace((p->first)->nodeFullName()), p->second));
+      }
+      if (! finalMarking.empty())
+        netFinalList.push_back(finalMarking);
+    }
+    final_set_list = netFinalList;
   }
   // add all transitions
   for (set< Transition * >::iterator transition = net.T.begin(); transition != net.T.end(); transition ++)
@@ -626,7 +627,7 @@ PetriNet::~PetriNet()
  *
  * \pre     No place with the given role is defined.
  */
-Place *PetriNet::newPlace(string my_role, communication_type my_type, string my_port)
+Place *PetriNet::newPlace(string my_role, communication_type my_type, unsigned int capacity, string my_port)
 {
   string my_role_with_suffix = my_role;
   
@@ -635,6 +636,7 @@ Place *PetriNet::newPlace(string my_role, communication_type my_type, string my_
   
   Place *p = new Place(getId(), my_role_with_suffix, my_type);
   assert(p != NULL);
+  p->capacity = capacity;
   
   // Decide in which set of places the place has to be inserted.
   switch(my_type)
@@ -812,8 +814,12 @@ void PetriNet::removePlace(Place *p)
   // Remove the roles of the place p, i.e. set the mappings to the NULL
   // pointer.
   for (list<string>::iterator role = p->history.begin(); role != p->history.end(); role++)
+  {
     if (roleMap[*role] == p)
+    {
       roleMap[*role] = NULL;
+    }
+  }
 
 
   // Decide from which set of places the place has to be removed.
@@ -951,10 +957,10 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   {
     roleMap[*role] = t12;
     t12->history.push_back(*role);
-    //    if (t1->prefix != "")
+    if (t1->prefix != "")
     {
-      //      roleMap[t1->prefix + *role] = t12;
-      //      t12->history.push_back(t1->prefix + *role);
+        roleMap[t1->prefix + *role] = t12;
+        t12->history.push_back(t1->prefix + *role);
     }
   }
   
@@ -963,10 +969,10 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   {
     roleMap[*role] = t12;
     t12->history.push_back(*role);
-    //    if (t1->prefix != "" || t2->prefix != "")
+    if (t1->prefix != "" || t2->prefix != "")
     {
-      //      roleMap[t2->prefix + *role] = t12;
-      //      t12->history.push_back(t2->prefix + *role);
+        roleMap[t2->prefix + *role] = t12;
+        t12->history.push_back(t2->prefix + *role);
     }
   }
   
@@ -1091,12 +1097,10 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
   {
     roleMap[*role] = t12;
     t12->history.push_back(*role);
-    if (t1->prefix != "" || t2->prefix != "")
+    if (t1->prefix != "")
     {
-      roleMap[t1->prefix + *role] = t12;
-      t12->history.push_back(t1->prefix + *role);
-      roleMap[t2->prefix + *role] = t12;
-      t12->history.push_back(t2->prefix + *role);
+        roleMap[t1->prefix + *role] = t12;
+        t12->history.push_back(t1->prefix + *role);
     }
   }
   
@@ -1107,10 +1111,8 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
     t12->history.push_back(*role);
     if (t1->prefix != "" || t2->prefix != "")
     {
-      roleMap[t1->prefix + *role] = t12;
-      t12->history.push_back(t1->prefix + *role);
-      roleMap[t2->prefix + *role] = t12;
-      t12->history.push_back(t2->prefix + *role);
+        roleMap[t2->prefix + *role] = t12;
+        t12->history.push_back(t2->prefix + *role);
     }
   }
   
@@ -1180,38 +1182,24 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
   assert(p2 != NULL);
   assert(p1->type == INTERNAL);
   assert(p2->type == INTERNAL);
-  
+ 
   Place *p12 = newPlace("");
   
   p12->tokens = max(p1->tokens, p2->tokens);
   p12->isFinal = (p1->isFinal || p2->isFinal);
   p12->wasExternal = p1->wasExternal + p2->wasExternal;
+  p12->capacity = max(p1->capacity, p2->capacity);
   
-  // change final places in the final sets
-  for (list<set<Place *> >::iterator final_set = final_set_list.begin(); final_set != final_set_list.end(); final_set++)
-  {
-    set<Place *> s1;
-    set<Place *> s2;
-    for (set<Place *>::iterator p = (*final_set).begin(); p != (*final_set).end(); p++)
-    {
-      if ((*p) == p1 || (*p) == p2)
-      {
-        s1.insert(p12); 
-      }
-      else
-      {
-        s2.insert(*p);
-      }
-    }
-    (*final_set) = setUnion(s1,s2);
-  } 
-  
+  p12->history.clear();
+  p12->prefix = p1->prefix;
+
   for (list<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
   {
     p12->history.push_back(*role);
     roleMap[*role] = p12;
     if (p1->prefix != "" || p2->prefix != "")
     {
+      p12->prefix = p1->prefix;
       roleMap[p1->prefix + *role] = p12;
       p12->history.push_back(p1->prefix + *role);
       roleMap[p2->prefix + *role] = p12;
@@ -1230,7 +1218,36 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
       roleMap[p2->prefix + *role] = p12;
       p12->history.push_back(p2->prefix + *role);
     }
+
   }
+  
+  list<set<pair<Place *, unsigned int> > > newFinalSetList;
+  // change final places in the final sets
+  for (list<set<pair<Place *, unsigned int> > >::iterator final_set = final_set_list.begin(); final_set != final_set_list.end(); final_set++)
+  {
+    set<pair<Place *, unsigned int> > s1;
+    set<pair<Place *, unsigned int> > s2;
+    for (set<pair<Place *, unsigned int> >::iterator p = final_set->begin(); p != final_set->end(); p++)
+    {
+      if ((p->first) == p1 || (p->first) == p2)
+      {
+        p12->isFinal = true;
+        s1.insert(pair<Place *, unsigned int>(p12,p->second));
+      }
+      else
+      {
+        s2.insert(*p);
+      }
+    }
+    set<pair<Place *, unsigned int> > s1s2 = setUnion(s1,s2);
+/*    
+    set<pair<Place *, unsigned int> > s1s2;
+    s1s2.insert(s1.begin(), s1.end());
+    s1s2.insert(s2.begin(), s2.end());
+*/    
+    newFinalSetList.push_back(s1s2);
+  } 
+  final_set_list = newFinalSetList;
   
   // merge pre- and postsets for p12
   p12->preset=setUnion(p1->preset, p2->preset);
@@ -1577,7 +1594,10 @@ Transition *PetriNet::findTransition(string role) const
   if (t != roleMap.end() && t->second != NULL )
   {
     if (t->second->nodeType == TRANSITION)
+    {
       return (dynamic_cast<Transition *>(t->second));
+      
+    }
     else
       return NULL;
   }
@@ -1727,50 +1747,60 @@ void PetriNet::addPrefix(string prefix, bool renameInterface)
  *
  * \param net the net that should be added (connected)
  */
-void PetriNet::compose(const PetriNet &net)
+void PetriNet::compose(const PetriNet &net, unsigned int capacityOnInterface)
 {
   using namespace std;
 
   // add all internal places
-  for (set< Place * >::iterator place = net.P.begin(); place != net.P.end(); place ++)
-  {
-    Place * newPlace = new Place( **place );
-    newPlace->id = getId();
-    newPlace->preset.clear();
-    newPlace->postset.clear();
-    P.insert( newPlace );
-    
-    roleMap[ newPlace->nodeFullName() ] = newPlace;
+  for (set< Place *>::iterator place = net.P.begin(); place != net.P.end(); place ++)
+        {
+            Place * newPlace = new Place( **place );
+            newPlace->id = getId();
+            newPlace->preset.clear();
+            newPlace->postset.clear();
+            P.insert( newPlace );
 
-    for(list< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
-      roleMap[(newPlace->prefix + *name)] = newPlace;
-  }
+            for(list< string>::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+            {
+                roleMap[(newPlace->prefix + *name)] = newPlace;
+                roleMap[ newPlace->nodeFullName() ] = newPlace;
+            }
+        }
 
   // recalculate final markings:
   { 
-    list<set<Place *> > netFinalList;
+    list<set<pair<Place *, unsigned int> > > netFinalList;
 
-    for (list<set<Place *> >::const_iterator netFinal = net.final_set_list.begin(); netFinal != net.final_set_list.end(); netFinal++)
+    // if p was in the final set, the pointer has to be redirected to the new place
+    for (list<set<pair<Place *, unsigned int> > >::const_iterator netFinal = net.final_set_list.begin(); netFinal != net.final_set_list.end(); netFinal++)
     {
-      set<Place *> finalMarking;
-      for (set<Place *>::const_iterator p = netFinal->begin(); p != netFinal->end(); p++)
+      set<pair<Place *, unsigned int> > finalMarking;
+      for (set<pair<Place *, unsigned int> >::const_iterator p = netFinal->begin(); p != netFinal->end(); p++)
       {
-        finalMarking.insert(findPlace((*p)->nodeFullName()));
+        assert (findPlace((p->first)->nodeFullName()) != NULL);
+        finalMarking.insert(pair<Place *, unsigned int>(findPlace((p->first)->nodeFullName()), p->second));
       }
       if (! finalMarking.empty())
+      {
         netFinalList.push_back(finalMarking);
+
+          for (set<pair<Place *, unsigned int> >::const_iterator p = finalMarking.begin(); p != finalMarking.end(); p++)
+          {
+            finalMarking.insert(pair<Place *, unsigned int>(findPlace((p->first)->nodeFullName()), p->second));
+          }
+      }
     }
 
     if ( ! netFinalList.empty() && ! final_set_list.empty())
     {
-      // if p was in the final set, the pointer has to be redirected to the new place
-      list<set<Place *> > newFinalSet;
+      list<set<pair<Place *,unsigned int> > > newFinalSet;
       // merge the final set lists
-      for (list<set<Place *> >::const_iterator final_setA = netFinalList.begin(); final_setA != netFinalList.end(); final_setA++)
+      for (list<set<pair<Place *, unsigned int> > >::const_iterator final_setA = netFinalList.begin(); final_setA != netFinalList.end(); final_setA++)
       {
-        for (list<set<Place *> >::const_iterator final_setB = final_set_list.begin(); final_setB != final_set_list.end(); final_setB++)
+        for (list<set<pair<Place *, unsigned int> > >::const_iterator final_setB = final_set_list.begin(); final_setB != final_set_list.end(); final_setB++)
         {
-          newFinalSet.push_back(setUnion(*final_setA, *final_setB));
+          set<pair<Place *,unsigned int> > finalMarking = setUnion(*final_setA, *final_setB);
+          newFinalSet.push_back(finalMarking);
         }
       }
       final_set_list = newFinalSet;
@@ -1804,8 +1834,9 @@ void PetriNet::compose(const PetriNet &net)
     }
     // else, we don't need to add the place, it already exist (arcs are connected with the existing place)
 
-    for(list< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+    for(list< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++) {
       roleMap[(newPlace->prefix + *name)] = newPlace;
+    }
   }
 
   // add all output places
@@ -1831,8 +1862,9 @@ void PetriNet::compose(const PetriNet &net)
     }
     // else, we don't need to add the place, it already exist (arcs are connected with the existing place)
 
-    for(list< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+    for(list< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++) {
       roleMap[(newPlace->prefix + *name)] = newPlace;
+    }
   }
 
   // add all transitions
@@ -1863,10 +1895,10 @@ void PetriNet::compose(const PetriNet &net)
     }
   }
 
+  {
   set< Place * > eraseP_in;
   set< Place * > additionalP_out;
-
-
+  set<pair<Place *, unsigned int> > finalMarking;
 
   // merge appropriate input and output places (same name, different prefixes)
   for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
@@ -1879,11 +1911,15 @@ void PetriNet::compose(const PetriNet &net)
     while ( ! finished && pPlace != P_out.end())
     {
 
-      if (/* (*pPlace)->nodeFullName().erase(0,4) != (*place)->nodeFullName().erase(0,3) && */
+      if ( // (*pPlace)->nodeFullName().erase(0,4) != (*place)->nodeFullName().erase(0,3) && 
            (*pPlace)->nodeFullName() != (*place)->nodeFullName()   )
+      {
 	pPlace++;
+      }
       else
+      {
 	finished = true;
+      }
     }
     
 
@@ -1895,6 +1931,7 @@ void PetriNet::compose(const PetriNet &net)
     {
       if ( (*place)->prefix != (oPlace)->prefix )
       {
+        string name = (*place)->nodeFullName();
         (*place)->type = INTERNAL;
         if ( (*place)->max_occurrences < (oPlace)->max_occurrences )
         {
@@ -1911,14 +1948,47 @@ void PetriNet::compose(const PetriNet &net)
         mergePlaces((*place)->nodeFullName(), (oPlace)->nodeFullName());
         eraseP_in.insert(*place);
         P_out.erase(oPlace);
+        // if capacity k on input places is given, create complementary place with k+1 token and a deadlock transition
+        if (capacityOnInterface > 0)
+        {
+          // complementary place is part of the initial and final marking
+          Place * p = findPlace(name);
+          Place * comp_p = newPlace("comp_" + name);
+          comp_p->mark(capacityOnInterface);
+          finalMarking.insert(pair<Place *, unsigned int>(comp_p, capacityOnInterface));
+
+          // create arcs to the pre- and posttransitions of p
+          const set<Node *> preSet = preset(p);
+          for (set<Node *>::const_iterator t = preSet.begin(); t != preSet.end(); t++)
+          {
+              newArc(comp_p, *t);
+          }
+
+          const set<Node *> postSet = postset(p);
+          for (set<Node *>::const_iterator t = postSet.begin(); t != postSet.end(); t++)
+          {
+              newArc(*t, comp_p);
+          }
+          
+          // add deadlock transition
+          Transition * t = newTransition("comp_" + name + "_DL");
+          newArc(comp_p, t, STANDARD, capacityOnInterface);
+        }
       }
     }
+  }
+
+  //adding complementary places to final sets
+  for (list<set<pair<Place *, unsigned int> > >::iterator final_set = final_set_list.begin(); final_set != final_set_list.end(); final_set++)
+  {
+    *final_set = setUnion(*final_set, finalMarking);
   }
 
   // erase input places, that were merged
   for (set< Place * >::iterator place = eraseP_in.begin(); place != eraseP_in.end(); place ++)
   {
     P_in.erase( *place );
+  }
   }
 
   // mark transitions as internal that are no longer communicating

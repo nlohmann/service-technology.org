@@ -35,13 +35,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2008-03-11 16:25:45 $
+ * \date    \$Date: 2008-06-19 11:42:07 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  *
  * \ingroup petrinet
  */
@@ -340,6 +340,9 @@ class Place: public Node
     
     /// true if place is marked in the final marking
     bool isFinal;
+
+    /// capacity, where 0 means unlimited
+    unsigned int capacity;
 };
 
 /*****************************************************************************/
@@ -395,7 +398,7 @@ class PetriNet
 {
   public:
     /// adds a place with a given role and type
-    Place* newPlace(string my_role, communication_type my_type = INTERNAL, string my_port = "");
+    Place* newPlace(string my_role, communication_type my_type = INTERNAL, unsigned int capacity = 0, string my_port = "");
 
     /// adds a transition with a given role
     Transition *newTransition(string my_role);
@@ -458,7 +461,7 @@ class PetriNet
     void add_interface_suffix(string suffix);
     
     /// composes a second Petri net
-    void compose(const PetriNet &net);
+    void compose(const PetriNet &net, unsigned int capacityOnInterface = 0);
     
     /// produces a second constraint oWFN
     void produce(const PetriNet &net);
@@ -512,7 +515,7 @@ class PetriNet
     ~PetriNet();
     
     /// conjunctive set of disjunctive place sets for simple final condition
-    list< set<Place *> > final_set_list;
+    list< set< pair<Place *, unsigned int > > > final_set_list;
 
   private:
     /// removes a place from the net

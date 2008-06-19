@@ -534,17 +534,56 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
 
         PN->addInputMessage(input); // add the input message to the current marking
         if (options[O_CALC_ALL_STATES]) {
-            // no state reduction
-            PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
-        } else {
-            if (parameters[P_SINGLE]) {
-                // state reduction
-                // calc the reachable states from that marking using stubborn set method taking
-                // care of deadlocks
-                PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode);
-            } else if (parameters[P_REPRESENTATIVE]) {
-                PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode);
+#ifdef CHECKCAPACITY
+            try {
+#endif                
+        	// no state reduction
+        	PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
+#ifdef CHECKCAPACITY
             }
+            catch (CapacityException& ex)
+            {
+                trace(TRACE_1, "\t\t\t\t\t adding input event would cause capacity bound violation on place " + ex.place + "\n");
+                trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+                newNode->setColor(RED);
+                return;
+            }
+#endif                
+        } else {
+        	if (parameters[P_SINGLE]) {
+	        	// state reduction
+	        	// calc the reachable states from that marking using stubborn set method taking
+	        	// care of deadlocks
+#ifdef CHECKCAPACITY
+            try {
+#endif                
+	            PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+#ifdef CHECKCAPACITY
+            }
+            catch (CapacityException& ex)
+            {
+                trace(TRACE_1, "\t\t\t\t\t adding input event would cause capacity bound violation on place " + ex.place + "\n");
+                trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+                newNode->setColor(RED);
+                return;
+            }
+#endif                
+        	} else if (parameters[P_REPRESENTATIVE]) {
+#ifdef CHECKCAPACITY
+            try {
+#endif                
+        		PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode);
+#ifdef CHECKCAPACITY
+            }
+            catch (CapacityException& ex)
+            {
+                trace(TRACE_1, "\t\t\t\t\t adding input event would cause capacity bound violation on place " + ex.place + "\n");
+                trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+                newNode->setColor(RED);
+                return;
+            }
+#endif                
+        	}
         }
 
         if (newNode->getColor() == RED) {
@@ -573,8 +612,36 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
         for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
                 != node->reachGraphStateSet.end(); iter++) {
             (*iter)->decode(PN);
-            if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
+/*        // test for each marking of current node if message bound k reached
+        // then supress new sending event
+        if (options[O_MESSAGES_MAX] == true) { // k-message-bounded set
+            for (unsigned int i = 0; i < PN->getPlaceCount(); i++)
+            {
+                if (PN->CurrentMarking[i] > messages_manual) 
+                {
+                    // adding output message to state already using full message bound
+                    trace(TRACE_3, "\t\t\t\t\t adding output event would cause capacity bound violation\n");
+                    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+                    newNode->setColor(RED);
+                    return;
+                }
+            }
+        }
+  */          if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
+#ifdef CHECKCAPACITY
+            try {
+#endif                
                 PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
+#ifdef CHECKCAPACITY
+            }
+            catch (CapacityException& ex)
+            {
+                trace(TRACE_1, "\t\t\t\t\t adding input event would cause capacity bound violation on place " + ex.place + "\n");
+                trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+                newNode->setColor(RED);
+                return;
+            }
+#endif                
             }
         }
     } else {
@@ -588,63 +655,73 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
             StateSet stateSet;
             binDecision * tempBinDecision = (binDecision *) 0;
 
-            for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
-                    != node->reachGraphStateSet.end(); iter++) {
-
-                (*iter)->decode(PN);
-
-                // calc reachable states from that marking using stubborn set method that
-                // calculates all those states that activate the given receiving event
-                // --> not necessarily the deadlock states
-                PN->calculateReducedSetOfReachableStates(stateSet, setOfStatesStubbornTemp,
-                                                            &tempBinDecision, receivingEvent, newNode);
-
-                StateSet tempStates;
-                for (StateSet::iterator iter2 = newNode->reachGraphStateSet.begin(); iter2 != newNode->reachGraphStateSet.end(); iter2++) {
-                    if ((*iter2)->parent != 0) {
-                        if (newNode->reachGraphStateSet.find((*iter2)->parent) != newNode->reachGraphStateSet.end()) {
-                            // in case the current state's parent is already stored in the node
-                            //newNode->reachGraphStateSet.erase(*iter);
-                            tempStates.insert(*iter2);
-                        }
-                    }
-                }
-                for (StateSet::iterator iter3 = tempStates.begin(); iter3 != tempStates.end(); iter3++) {
-                    newNode->reachGraphStateSet.erase(*iter3);
-                    cout << "delete a state" << endl;
-                }
-
-                if (newNode->getColor() == RED) {
-                    // a message bound violation occured during computation of reachability graph
+	        for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
+	                != node->reachGraphStateSet.end(); iter++) {
+	
+	            (*iter)->decode(PN);
+	            
+#ifdef CHECKCAPACITY
+            try {
+#endif                
+	            // calc reachable states from that marking using stubborn set method that
+	            // calculates all those states that activate the given receiving event 
+	            // --> not necessarily the deadlock states
+	            PN->calculateReducedSetOfReachableStates(stateSet, setOfStatesStubbornTemp, 
+	            											&tempBinDecision, receivingEvent, newNode);
+#ifdef CHECKCAPACITY
+            }
+            catch (CapacityException& ex)
+            {
+                trace(TRACE_1, "\t\t\t\t\t adding input event would cause capacity bound violation on place " + ex.place + "\n");
+                trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+                newNode->setColor(RED);
+                return;
+            }
+#endif                
+            	if (newNode->getColor() == RED) {
+                	// a message bound violation occured during computation of reachability graph
                     trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
                     trace(TRACE_5, "interactionGraph::calculateSuccStatesReceivingEvent(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
                     return;
                 }
             }
 
-            if (tempBinDecision) {
-                delete tempBinDecision;
+	        if (tempBinDecision) {
+	        	delete tempBinDecision;
+	        }
+
+    	} else if (parameters[P_REPRESENTATIVE]) {
+	        for (StateSet::iterator iter2 = node->reachGraphStateSet.begin(); iter2
+	        		!= node->reachGraphStateSet.end(); iter2++) {
+	        	
+	        	(*iter2)->decode(PN); // get the marking of the state
+
+	        	if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
+#ifdef CHECKCAPACITY
+            try {
+#endif                
+	            	// calc the reachable states from that marking using stubborn set method taking
+	            	// care of deadlocks
+	            	PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode); 
+#ifdef CHECKCAPACITY
             }
-
-        } else if (parameters[P_REPRESENTATIVE]) {
-            for (StateSet::iterator iter2 = node->reachGraphStateSet.begin(); iter2
-                    != node->reachGraphStateSet.end(); iter2++) {
-
-                (*iter2)->decode(PN); // get the marking of the state
-
-                if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
-                    // calc the reachable states from that marking using stubborn set method taking
-                    // care of deadlocks
-                    PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode);
-                    if (newNode->getColor() == RED) {
-                        // a message bound violation occured during computation of reachability graph
-                        trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
-                        trace(TRACE_5, "interactionGraph::calculateSuccStatesReceivingEvent(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
-                        return;
-                    }
-                }
+            catch (CapacityException& ex)
+            {
+                trace(TRACE_1, "\t\t\t\t\t adding input event would cause capacity bound violation on place " + ex.place + "\n");
+                trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+                newNode->setColor(RED);
+                return;
             }
-        }
+#endif                
+	            	if (newNode->getColor() == RED) {
+	                	// a message bound violation occured during computation of reachability graph
+	                    trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
+	                    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");
+	                    return;
+	                }
+	        	}
+	        }
+    	}
     }
 
     trace(TRACE_5, "interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet output, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : end\n");

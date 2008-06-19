@@ -165,7 +165,7 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              minimize/myCoffee.og \
              minimize/keesCoffee_condition.og \
              minimize/keesCoffee_condition.emptyNode.og \
-             minimize/06-03-23_BPM06_shop_sect_3.owfn.og
+             minimize/06-03-23_BPM06_shop_sect_3.owfn.og \
              statesReduction/06-03-23_BPM06_shop_sect_3.owfn \
              statesReduction/06-03-23_BPM06_shop_sect_6.owfn \
              statesReduction/dke07_shop_sect_3.owfn \
@@ -213,7 +213,7 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              philosophers/phcontrol6.unf.owfn.png \
              philosophers/phcontrol7.unf.owfn.png \
              philosophers/phcontrol8.unf.owfn.png \
-             philosophers/phcontrol9.unf.owfn.png \
+             philosophers/phcontrol9.unf.owfn.png
 
 # Global check-loud target. Runs all tests. Output files are generated.
 check-loud:

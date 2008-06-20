@@ -3035,12 +3035,9 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
         if (newState != NULL && 
         		(stateNodesAssoc[newState].find(currentOGNode->getNumber()) != stateNodesAssoc[newState].end())) {
 
-            // TODO: was ist, wenn der state zwar schon gesehen war, aber
-            //       mit nem anderen OG-knoten
-            //       dann muss doch trotzdem was überprüft werden, oder???
-            
-        	trace(TRACE_2, "marking[" + getCurrentMarkingAsString() + "] already seen,\n");
-        	trace(TRACE_2, "  backtracking at node " + currentOGNode->getName());
+        	trace(TRACE_2, "marking [" + getCurrentMarkingAsString() + "] already seen with node ");
+        	trace(TRACE_2, currentOGNode->getName() + "\n");
+        	trace(TRACE_2, "  backtracking from node " + currentOGNode->getName());
         	trace(TRACE_2, " with annotation " + currentOGNode->getAnnotationAsString() + "\n");
             
             // We have already seen the state we just reaching by firing
@@ -3074,8 +3071,9 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
             // The state we reached by firing the above transition is new.
             // So we have to initialize this newly seen state.
 
-        	trace(TRACE_1, "new marking [" + getCurrentMarkingAsString() + "]\n");
-            
+        	trace(TRACE_1, "found new marking [" + getCurrentMarkingAsString() + "] at node ");
+        	trace(TRACE_2, currentOGNode->getName() + "\n");
+        	
             newState = binInsert(this);
             newState->firelist = firelist();
             newState->cardFireList = CurrentCardFireList;

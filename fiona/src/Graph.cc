@@ -41,6 +41,7 @@
 #include "Graph.h"
 #include "GraphNode.h"
 
+
 // TRUE and FALSE #defined in cudd package may interfere with
 // GraphFormulaLiteral::TRUE and ...::FALSE.
 #undef TRUE

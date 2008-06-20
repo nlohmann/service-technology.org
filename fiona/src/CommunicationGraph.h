@@ -67,12 +67,6 @@ class CommunicationGraph : public AnnotatedGraph {
                                         fstream& os,
                                         std::map<AnnotatedGraphNode*, bool>&);
 
-        /// recursive helper function for printGraphToSTG()
-        void printGraphToSTGRecursively(AnnotatedGraphNode * v,
-                                        ostringstream & os,
-                                        std::map<AnnotatedGraphNode*, bool> &,
-					std::vector<string> &);
-
         /// recursive helper function for annotateGraphDistributedly()
         bool annotateGraphDistributedlyRecursively(AnnotatedGraphNode* v,
                                                    std::map<AnnotatedGraphNode*, bool>&);
@@ -143,9 +137,6 @@ class CommunicationGraph : public AnnotatedGraph {
 
         /// brief creates a dot file of the graph
         void printGraphToDot();
-
-        /// function to create an STG representation of the IG or OG
-        void printGraphToSTG();
 
         /// fills the given sets with the names of the inputs and outputs
         /// needed for public view generation. The interfaces of the public view

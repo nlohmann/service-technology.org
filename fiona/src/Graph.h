@@ -130,7 +130,9 @@ class Graph {
         void printDotFile(const std::string& filenamePrefix,
                           const std::string& dotGraphTitle) const;
 
-        /// tests if this OG is acyclic
+
+
+		/// tests if this OG is acyclic
         bool isAcyclic();
 
         /// transforms this service automaton into an owfn. In case that there

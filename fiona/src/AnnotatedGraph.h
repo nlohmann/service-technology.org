@@ -229,6 +229,12 @@ class AnnotatedGraph : public Graph {
         /// be called after computeGraphStatistics().
         unsigned int getNumberOfBlueEdges() const;
 
+		/// recursive helper function to printGraphToSTG
+		void AnnotatedGraph::printGraphToSTGRecursively(AnnotatedGraphNode * v,
+									   ostringstream & os,
+									   std::map<AnnotatedGraphNode*, bool> & visitedNodes,
+									   std::vector<string> & edgeLabels);
+
     // Public methods
     public:
 
@@ -392,6 +398,10 @@ class AnnotatedGraph : public Graph {
         /// Prints statistics about this graph. May only be called after
         /// computeGraphStatistics().
         void printGraphStatistics();
+
+		/// creates a STG file of the graph
+		void AnnotatedGraph::printGraphToSTG();
+
 
 // CODE FROM PL
         /// transforms the graph to the public view

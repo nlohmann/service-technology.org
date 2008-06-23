@@ -1386,10 +1386,10 @@ void makePNG(oWFN* PN) {
     // set strings needed in PNapi output
     globals::output_filename = PN->filename;
     if (PN->finalConditionString != "") {
-        globals::filename = PN->filename + " \\n Final Condition: "
+        globals::filename = PN->filename + " \\\\n Final Condition: "
                 + PN->finalConditionString;
     } else {
-        globals::filename = PN->filename + " \\n Final Marking: "
+        globals::filename = PN->filename + " \\\\n Final Marking: "
                 + PN->finalMarkingString;
     }
 
@@ -1439,10 +1439,11 @@ void makePNG(oWFN* PN) {
             dotString.insert(i, " ");
         }
 
-        if (testchar == '"') {
+/*       else if (testchar == '"') {
             dotString.insert(i, "\\");
             i++;
         }
+*/
     }
 
     string outFileName;
@@ -1454,7 +1455,7 @@ void makePNG(oWFN* PN) {
     }
 
     // finish the string for the system call
-    dotString = "echo \"" + dotString + "\"";
+    dotString = "echo '" + dotString + "'";
     dotString += " | dot -q -Tpng -o \"" + outFileName + ".png\"";
 
     // create the output
@@ -1476,6 +1477,7 @@ void makePNG(oWFN* PN) {
         }
 
         trace(TRACE_1, "Piping the stream to dot\n");
+    
         system(dotString.c_str());
         trace(TRACE_0, (outFileName + ".png generated\n\n"));
     }

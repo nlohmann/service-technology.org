@@ -432,10 +432,12 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if (lc_optarg == "smallpartner") {
                     parameters[P_OG] = false;
                     parameters[P_IG] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = true;
                     parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
                 } else if (lc_optarg == "mostpermissivepartner") {
                     parameters[P_OG] = true;
                     parameters[P_IG] = false;
+                    parameters[P_SHOW_EMPTY_NODE] = true;
                     parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
                 } else if (lc_optarg == "productog") {
                     parameters[P_IG] = false;
@@ -465,11 +467,13 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_OG] = true;
                     parameters[P_IG] = false;
                     parameters[P_ADAPTER] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = true;
                     parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
                 } else if (lc_optarg == "smalladapter") {
                     parameters[P_OG] = false;
                     parameters[P_IG] = true;
                     parameters[P_SMALLADAPTER] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = true;
                     parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
                 } else if (lc_optarg == "png") {
                     parameters[P_IG] = false;

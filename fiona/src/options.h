@@ -80,18 +80,20 @@ typedef enum {
     P_SIMULATES_WITH_COV,       //!< Check whether an OG simulates another including coverage formulas
     P_EX,                       //!< check equivalence (former exchangability) of two OGs 
     P_EQ_R,                     //!< equivalence of two graphs (with -R and without -R), but the two graphs are computed automatically
+    P_MATCH_PARTNER,            //!< first create a most permissive partner and then check for matching.
     P_ADAPTER,                  //!< compute adapter (with OG) for given services
     P_SMALLADAPTER,             //!< compute small adapter (with IG) for given services
     P_PNG,                      //!< graphical output of all given oWFNs
     P_GASTEX,                   //!< read an annotated dot file and create a gastex tex file
-    P_CHECK_FALSE_NODES,	    //!< check false annotations in og
-    P_REMOVE_FALSE_NODES,		//!< remove nodes with false annotations in og
+    P_CHECK_FALSE_NODES,        //!< check false annotations in og
+    P_REMOVE_FALSE_NODES,        //!< remove nodes with false annotations in og
     P_CHECK_ACYCLIC,            //!< Check whether an OG is acyclic 
     P_COUNT_SERVICES,           //!< Compute the number of services characterized by an OG
     P_DISTRIBUTED,              //!< check for distributed controllability
     P_READ_OG,                  //!< only read an OG from a file
     P_FILTER,                   //!<  
     P_REDUCE,                   //!< reduce given oWFNs 
+    P_PARTNER_TEST,             //!< first synthesize a partner, then match it with the og. 
 
     P_SHOW_BLUE_NODES,          //!< show blue nodes only (empty node not shown though)
     P_SHOW_EMPTY_NODE,          //!< show all blue nodes (including empty node)
@@ -107,8 +109,8 @@ typedef enum {
     P_REDUCE_LEVEL,             //!< set reduction level of mode -t reduce
     P_USE_CRE,                  //!< Use "combine receiving events" for IG-reduction
     P_USE_RBS,                  //!< Use "receive before sending" for IG-reduction
-    P_USE_EAD,					//!< use "early detection" rule for IG-reduction
-    P_REPRESENTATIVE,	      	//!< state reduction in node using representatives
+    P_USE_EAD,                    //!< use "early detection" rule for IG-reduction
+    P_REPRESENTATIVE,              //!< state reduction in node using representatives
     P_SINGLE                    //!< state reduction in node using single marking as representative
 } possibleParameters;
 

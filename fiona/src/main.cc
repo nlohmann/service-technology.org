@@ -137,7 +137,9 @@ void readnet(const std::string& owfnfile) {
     assert(owfnfile != "");
     // diagnosefilename = (char *) 0;
 
+    cerr << "Reading PN file:" << owfnfile << endl;
     trace(TRACE_5, "reading from file " + owfnfile + "\n");
+
     if (owfnfile == "<stdin>") {
         owfn_yyin = stdin;
     }
@@ -148,14 +150,24 @@ void readnet(const std::string& owfnfile) {
     }
     // diagnosefilename = owfnfile;
 
+    cerr << "Allocating memory..." << endl;
+
     PN = new oWFN();
+
+    cerr << "Assigning filename." << endl;
     if (owfnfile == "<stdin>") {
         PN->filename = "stdin";
     }
     else PN->filename = owfnfile;
 
+    cerr << "Preparing to parse" << endl;
+
     owfnfileToParse = owfnfile;
+
+    cerr << "Parse now." << endl;
     owfn_yyparse();
+
+    cerr << "Parsing complete." << endl;
     fclose(owfn_yyin);
     for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
         PN->CurrentMarking[i] = PN->getPlace(i)->initial_marking;
@@ -400,20 +412,20 @@ void makeGasTex(CommunicationGraph* graph) {
 //! \param graphName a name for the graph in the output
 void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
 
-	// if the OG is empty, there is no public view and the computation
-	// will be aborted
-	if(OG->hasNoRoot() || OG->getRoot()->getColor() == RED) {
-		if (fromOWFN) {
-			trace(TRACE_0,"\nThe given oWFN is not controllable. No PublicView will be generated.\n\n");
-		} else {
-			trace(TRACE_0,"\nThe given OG describes no partners. No PublicView will be generated.\n\n");
-		}
-		return;
-	}
+    // if the OG is empty, there is no public view and the computation
+    // will be aborted
+    if(OG->hasNoRoot() || OG->getRoot()->getColor() == RED) {
+        if (fromOWFN) {
+            trace(TRACE_0,"\nThe given oWFN is not controllable. No PublicView will be generated.\n\n");
+        } else {
+            trace(TRACE_0,"\nThe given OG describes no partners. No PublicView will be generated.\n\n");
+        }
+        return;
+    }
 
-	
-    trace(TRACE_0, "generating the public view for ");
+    trace(TRACE_0, "generating the public view for "); 
     trace(graphName);
+    
     trace("\n");
 
     // dont create the public view automaton's png if it becomes to big
@@ -432,7 +444,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
     if (!options[O_NOOUTPUTFILES]) {
 
         // test whether this graph is too big
-    	if(cleanPV->numberOfNodes() > maxSizeForDot && !parameters[P_NOPNG]) {
+        if(cleanPV->numberOfNodes() > maxSizeForDot && !parameters[P_NOPNG]) {
             trace(TRACE_0, "the public view service automaton is to big to generate a dot file\n\n");
         } else {
             trace(TRACE_0, "generating dot output...\n");
@@ -449,8 +461,8 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
 
         // Only fill those sets if the original interface is known
         if (fromOWFN) {
-        	CommunicationGraph* casted = dynamic_cast<CommunicationGraph*>(OG);
-        	casted->returnInterface(inputs,outputs);
+            CommunicationGraph* casted = dynamic_cast<CommunicationGraph*>(OG);
+            casted->returnInterface(inputs,outputs);
         }
 
         //transform to owfn
@@ -485,9 +497,9 @@ interactionGraph* computeIG(oWFN* PN, string & igFilename)
     interactionGraph * graph = new interactionGraph(PN);
     bool controllable = false;
     //string igFilename = "";
-	igFilename = "";
+    igFilename = "";
 
-	// print information about reduction rules (if desired)
+    // print information about reduction rules (if desired)
     if (options[O_CALC_REDUCED_IG] || parameters[P_USE_EAD]) {
         trace(TRACE_0, "building the reduced interaction graph by using reduction rule(s)\n");
         if (parameters[P_USE_CRE]) {
@@ -504,8 +516,8 @@ interactionGraph* computeIG(oWFN* PN, string & igFilename)
     }
     trace(TRACE_0, "\n");
 
-	
-	// build interaction graph
+    
+    // build interaction graph
     seconds = time (NULL);
     graph->buildGraph();
     seconds2 = time (NULL);
@@ -536,9 +548,9 @@ interactionGraph* computeIG(oWFN* PN, string & igFilename)
             graph->diagnose();
         }
 
-        if (!parameters[P_EQ_R]) {	// don't create png if we are in eqr mode
-        	// generate output files
-        	graph->printGraphToDot(); // .out, .png
+        if (!parameters[P_EQ_R]) {    // don't create png if we are in eqr mode
+            // generate output files
+            graph->printGraphToDot(); // .out, .png
 
                 if (parameters[P_TEX]) {
                     makeGasTex(graph);
@@ -564,14 +576,14 @@ interactionGraph* computeIG(oWFN* PN, string & igFilename)
         graph->printOGFile(igFilename, true);
     }
 
-	return graph;
+    return graph;
 }
 
 
 string computeIG(oWFN* PN)
 {
-	string igFilename = "";
-	interactionGraph* graph = computeIG(PN, igFilename);
+    string igFilename = "";
+    interactionGraph* graph = computeIG(PN, igFilename);
 
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
     // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
@@ -589,32 +601,32 @@ string computeIG(oWFN* PN)
 
 string computeSmallPartner(oWFN* PN)
 {
-	// 1. step: compute the IG of given net
-	string igFilename = "";
-	interactionGraph* graph = computeIG(PN, igFilename);
+    // 1. step: compute the IG of given net
+    string igFilename = "";
+    interactionGraph* graph = computeIG(PN, igFilename);
 
 
-	// 2. step: if the net is controllable create STG file for petrify out of computed IG
-	string stgFilename = "";
+    // 2. step: if the net is controllable create STG file for petrify out of computed IG
+    string stgFilename = "";
     if (graph->getRoot()->getColor() == BLUE)
-	{
-		graph->printGraphToSTG();
-	}
-	else
-	{
-		trace(TRACE_0, "\nCannot synthesize a partner for a net, that is not controllable\n\n");
-		return "";
-	}
+    {
+        graph->printGraphToSTG();
+    }
+    else
+    {
+        trace(TRACE_0, "\nCannot synthesize a partner for a net, that is not controllable\n\n");
+        return "";
+    }
 
 
-	// 3. step: invoke petrify on created STG file
+    // 3. step: invoke petrify on created STG file
 
 
 
-	// 4. step: create oWFN out of the petrinet computed by petrify
+    // 4. step: create oWFN out of the petrinet computed by petrify
 
 
-	// garbage collection
+    // garbage collection
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
     graph->clearNodeSet();
     delete graph;
@@ -738,8 +750,8 @@ string computeOG(oWFN* PN) {
             }
         }
 
-        if (!parameters[P_EQ_R]) {	// don't create png if we are in eqr mode
-        	 graph->printGraphToDot(); // .out, .png
+        if (!parameters[P_EQ_R]) {    // don't create png if we are in eqr mode
+             graph->printGraphToDot(); // .out, .png
 
             if (parameters[P_TEX]) {
                 makeGasTex(graph);
@@ -1859,16 +1871,14 @@ int main(int argc, char** argv) {
         }
         // return 0;
     }
-    else if (parameters[P_ADAPTER] || parameters[P_SMALLADAPTER]) 
-    {
-    	Adapter adapter;
-    	adapter.generateAdapter();
-    	
+    else if (parameters[P_ADAPTER] || parameters[P_SMALLADAPTER]) {
+        Adapter adapter;
+        adapter.generateAdapter();
+        
         //generateAdapter();
     } 
     else if (parameters[P_IG] || parameters[P_OG] || parameters[P_MATCH] ||
-               parameters[P_PNG] || parameters[P_REDUCE] ||parameters[P_PV]) 
-    {
+               parameters[P_PNG] || parameters[P_REDUCE] ||parameters[P_PV] || parameters[P_MATCH_PARTNER]) {
         if (parameters[P_MATCH]) {
             assert(ogfiles.size() == 1);
             // we match multiple oWFNs with one OG,
@@ -1890,9 +1900,7 @@ int main(int argc, char** argv) {
 
             // calculate the graph of the same net twice --> once with -R and once with no -R
             // in case the option -t eqR is set, otherwise we go through this loop only once
-			for (int i = (parameters[P_EQ_R]) ? 0 : 1; i <= 1; i++)
-            //do
-			{
+            for (int i = (parameters[P_EQ_R]) ? 0 : 1; i <= 1; i++) {
                 numberOfEvents = 0;
                 numberOfDecodes = 0;
                 garbagefound = 0;
@@ -1915,62 +1923,70 @@ int main(int argc, char** argv) {
                 reportNet();
                 delete PlaceTable;
 
-				if (currentowfnfile == "<stdin>")
-				{
-					currentowfnfile = "stdin";
-				}
-
-				// start computation
+                if (currentowfnfile == "<stdin>") {
+                        currentowfnfile = "stdin";
+                }
+                
+                // start computation
                 fileName = "";
 
-                if (parameters[P_IG])
-				{
+                if (parameters[P_IG]) {
                     reportOptionValues(); // adjust events_manual and print limit of considering events
-					if (parameters[P_SYNTHESIZE_PARTNER_OWFN])
-					{
-						fileName = computeSmallPartner(PN);	// compute a small partner
-					}
-					else
-					{
-						fileName = computeIG(PN);			// computing IG of the current oWFN
-					}
+                    if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
+                        fileName = computeSmallPartner(PN);    // compute a small partner
+                    } else {
+                        fileName = computeIG(PN);            // computing IG of the current oWFN 
+                                        }
                 }
 
-                if (parameters[P_OG] || parameters[P_PV])
-				{
-                    reportOptionValues();		// adjust events_manual and print limit of considering events
-                    fileName = computeOG(PN);	// computing OG of the current oWFN
+                if (parameters[P_OG] || parameters[P_PV]) {
+                    reportOptionValues();        // adjust events_manual and print limit of considering events
+                    fileName = computeOG(PN);    // computing OG of the current oWFN
                 }
 
-                if (parameters[P_MATCH])
-				{
+                if (parameters[P_MATCH]) {
                     checkMatching(OGToMatch, PN); // matching the current oWFN against the single OG
                 }
 
-                if (parameters[P_PNG])
-				{
+                if (parameters[P_PNG]) {
                     makePNG(PN); // create a png file of the given net
                 }
 
-                if (parameters[P_REDUCE])
-				{
-                    reduceOWFN(PN);	// reduce given net
+                if (parameters[P_REDUCE]) {
+                    reduceOWFN(PN);    // reduce given net
                 }
 
                 if (parameters[P_EQ_R])
-				{
+                {
                     // reverse reduction mode for the next loop
-					options[O_CALC_ALL_STATES] = !options[O_CALC_ALL_STATES];
-					// remember file name of og-file to check equivalence later on
+                    options[O_CALC_ALL_STATES] = !options[O_CALC_ALL_STATES];
+                    // remember file name of og-file to check equivalence later on
                     ogfiles.push_back(AnnotatedGraph::addOGFileSuffix(fileName));
                 }
+                
+                if (parameters[P_MATCH_PARTNER]) {
+                    
+                    parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
+                    parameters[P_OG] = true;
+                    
+                    string ogfilename = computeOG(PN);
+                    
+                    parameters[P_SYNTHESIZE_PARTNER_OWFN] = false;
+                    parameters[P_OG] = false;
+                    string PNFileName = currentowfnfile;    
+                    string netfile = PNFileName.substr(0, PNFileName.find(".owfn") );
+                    string partnerfilename = netfile + "-partner.owfn";
 
+                    system(("src/fiona -t match " + ogfilename + ".og " + partnerfilename).c_str());
+                    
+                }            
+                
                 //delete PN;
-				//trace(TRACE_5, "net deleted\n");
+                //trace(TRACE_5, "net deleted\n");
 
-				//loop++;
+                //loop++;
             }
-			//while (loop <= 1);    // calculate the graph of the same net twice --> once with -R and once with no -R
+            //while (loop <= 1);    // calculate the graph of the same net twice --> once with -R and once with no -R
 
             if (parameters[P_EQ_R]) {
                 // reading all og-files

@@ -313,7 +313,7 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_OTF] = false;
     options[O_OUTFILEPREFIX] = false;
     options[O_NOOUTPUTFILES] = false;
-	options[O_PV_MULTIPLE_DEADLOCKS] = false;
+    options[O_PV_MULTIPLE_DEADLOCKS] = false;
     options[O_PARAMETER] = false;
     options[O_ADAPTER_FILE] = false;
 
@@ -321,7 +321,7 @@ void parse_command_line(int argc, char* argv[]) {
 
     // -t parameters
     parameters[P_OG] = false;
-	parameters[P_IG] = true;
+    parameters[P_IG] = true;
     parameters[P_MATCH] = false;
     parameters[P_MINIMIZE_OG] = false;
     parameters[P_PV] = false;
@@ -343,6 +343,7 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_READ_OG] = false;
 //    parameters[P_FILTER] = false;
     parameters[P_REDUCE] = false;
+    parameters[P_MATCH_PARTNER] = false;
 
     // -s parameters
     parameters[P_SHOW_BLUE_NODES] = true;
@@ -358,16 +359,16 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_DIAGNOSIS] = false;
     parameters[P_AUTONOMOUS] = false;
     parameters[P_REDUCE_LEVEL] = false;
-	parameters[P_USE_CRE] = false;
-	parameters[P_USE_RBS] = false;
-	parameters[P_USE_EAD] = false;
+    parameters[P_USE_CRE] = false;
+    parameters[P_USE_RBS] = false;
+    parameters[P_USE_EAD] = false;
     parameters[P_REPRESENTATIVE] = false;
     parameters[P_SINGLE] = true;
 
 
-	
-	
-	bdd_reordermethod = 0;
+    
+    
+    bdd_reordermethod = 0;
 
     messages_manual = 1;
     events_manual = -1;
@@ -427,8 +428,8 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_SHOW_EMPTY_NODE] = true;
                     parameters[P_MINIMIZE_OG] = true;
                 } else if ((lc_optarg == "pv") || (lc_optarg == "publicview")) {
-                	parameters[P_PV] = true;
-                	parameters[P_IG] = false;
+                    parameters[P_PV] = true;
+                    parameters[P_IG] = false;
                 } else if (lc_optarg == "smallpartner") {
                     parameters[P_OG] = false;
                     parameters[P_IG] = true;
@@ -439,6 +440,12 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_IG] = false;
                     parameters[P_SHOW_EMPTY_NODE] = true;
                     parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
+                } else if (lc_optarg == "matchpartner") {
+                    parameters[P_OG] = false;
+                    parameters[P_IG] = false;
+                    parameters[P_SHOW_EMPTY_NODE] = true;
+                    parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
+                    parameters[P_MATCH_PARTNER] = true;
                 } else if (lc_optarg == "productog") {
                     parameters[P_IG] = false;
                     parameters[P_PRODUCTOG] = true;
@@ -456,8 +463,8 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
                 } else if (lc_optarg == "eqr") {
-                	parameters[P_EQ_R] = true;
-                	// make sure -s empty is set by setting it ;-)
+                    parameters[P_EQ_R] = true;
+                    // make sure -s empty is set by setting it ;-)
                     options[O_SHOW_NODES] = true;
                     parameters[P_SHOW_BLUE_NODES] = true;
                     parameters[P_SHOW_EMPTY_NODE] = true;
@@ -484,15 +491,15 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_OG] = false;
                     parameters[P_GASTEX] = true;
                 } else if (lc_optarg == "checkfalsenodes") {
-                	parameters[P_OG] = false;
-                	parameters[P_IG] = false;
-                	parameters[P_CHECK_FALSE_NODES] = true;
+                    parameters[P_OG] = false;
+                    parameters[P_IG] = false;
+                    parameters[P_CHECK_FALSE_NODES] = true;
                 } else if (lc_optarg == "removefalsenodes") {
-                	parameters[P_OG] = false;
-                	parameters[P_IG] = false;
+                    parameters[P_OG] = false;
+                    parameters[P_IG] = false;
                     // if original OG has empty node, then empty node must be kept
                     parameters[P_SHOW_EMPTY_NODE] = true;
-                	parameters[P_REMOVE_FALSE_NODES] = true;
+                    parameters[P_REMOVE_FALSE_NODES] = true;
                 } else if (lc_optarg == "isacyclic") {
                     parameters[P_IG] = false;
                     parameters[P_CHECK_ACYCLIC] = true;
@@ -623,12 +630,12 @@ void parse_command_line(int argc, char* argv[]) {
             case 'Q':
                 options[O_NOOUTPUTFILES] = true;
                 break;
-			case 'M':
-				options[O_PV_MULTIPLE_DEADLOCKS] = true;
-				break;
+            case 'M':
+                options[O_PV_MULTIPLE_DEADLOCKS] = true;
+                break;
             case 'p': {
                 string lc_optarg = toLower(optarg);
-				options[O_PARAMETER] = true;
+                options[O_PARAMETER] = true;
                 if (lc_optarg == "no-png") {
                     parameters[P_NOPNG] = true;
                 } else if (lc_optarg == "tex") {
@@ -665,13 +672,13 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if (string(optarg) == "rbs") {
                     parameters[P_USE_RBS] = true;
                 } else if (string(optarg) == "ead") {
-                	parameters[P_USE_EAD] = true;
+                    parameters[P_USE_EAD] = true;
                 } else if (lc_optarg == "representative") {
-                	parameters[P_REPRESENTATIVE] = true;
-                	parameters[P_SINGLE] = false;
+                    parameters[P_REPRESENTATIVE] = true;
+                    parameters[P_SINGLE] = false;
                 } else if (lc_optarg == "single") {
-                	parameters[P_SINGLE] = true;
-                	parameters[P_REPRESENTATIVE] = false;
+                    parameters[P_SINGLE] = true;
+                    parameters[P_REPRESENTATIVE] = false;
                 } else {
                     cerr << "Error:\twrong parameter (option -p)" << endl
                     << "\tEnter \"fiona --help\" for more information.\n" << endl;
@@ -705,10 +712,10 @@ void parse_command_line(int argc, char* argv[]) {
 
     // IG Reduction - correcting parameters if needed
     if (options[O_CALC_REDUCED_IG]) {
-    	if (!parameters[P_USE_CRE] && !parameters[P_USE_RBS]) {
-    		parameters[P_USE_CRE] = true;
-    		parameters[P_USE_RBS] = true;
-    	}
+        if (!parameters[P_USE_CRE] && !parameters[P_USE_RBS]) {
+            parameters[P_USE_CRE] = true;
+            parameters[P_USE_RBS] = true;
+        }
     }
     
     bool firstfile = true;
@@ -794,9 +801,9 @@ void parse_command_line(int argc, char* argv[]) {
     }
 
     if (parameters[P_PNG] && netfiles.size() == 0 && ogfiles.size() == 0) {
-    	cerr << "Error: \t No oWFNs or OGs are given." << endl;
-    	cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-    	exit(1);
+        cerr << "Error: \t No oWFNs or OGs are given." << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
     }
     
     if (parameters[P_MATCH] && ogfiles.size() != 1) {
@@ -846,16 +853,16 @@ void parse_command_line(int argc, char* argv[]) {
         options[O_BDD] = false;
     }
 
-	if (ogfiles.size() == 0 && netfiles.size() == 0 && parameters[P_PV]) {
-		cerr << "Error:\tNo OGs or oWFNs given. Public View Service Automaton cannot be generated." << endl
+    if (ogfiles.size() == 0 && netfiles.size() == 0 && parameters[P_PV]) {
+        cerr << "Error:\tNo OGs or oWFNs given. Public View Service Automaton cannot be generated." << endl
              << "\tEnter \"fiona --help\" for more information.\n" << endl;
         exit(1);
-	}
-	
-	if (!parameters[P_PV] && options[O_PV_MULTIPLE_DEADLOCKS]) {
-		cerr << "not computing a public view - multiple deadlocks option ignored\n" << endl;
-		options[O_PV_MULTIPLE_DEADLOCKS] = false;
-	}
+    }
+
+    if (!parameters[P_PV] && options[O_PV_MULTIPLE_DEADLOCKS]) {
+        cerr << "not computing a public view - multiple deadlocks option ignored\n" << endl;
+        options[O_PV_MULTIPLE_DEADLOCKS] = false;
+    }
 
     if (!parameters[P_PRODUCTOG] && !parameters[P_SIMULATES] && !parameters[P_SIMULATES_WITH_COV] && // !parameters[P_FILTER] && 
         !parameters[P_EX] && options[O_OUTFILEPREFIX] && (ogfiles.size() > 1 || netfiles.size() > 1)) {

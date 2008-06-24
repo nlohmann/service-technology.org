@@ -514,6 +514,8 @@ void AnnotatedGraphNode::removeUnneededLiteralsFromAnnotation() {
 //!                used to distinguish the empty node from other true nodes
 //! \return true iff this node should be shown according to the "show" parameter
 bool AnnotatedGraphNode::isToShow(const AnnotatedGraphNode* rootOfGraph, bool hasOWFN) const {
+// always call this method like: v->isToShow(root, (PN != NULL))
+    
 #undef TRUE
 
     return ((parameters[P_SHOW_ALL_NODES]) ||

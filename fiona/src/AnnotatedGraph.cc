@@ -3181,15 +3181,16 @@ void AnnotatedGraph::printGraphToSTG()
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
 void AnnotatedGraph::printGraphToSTGRecursively(AnnotatedGraphNode * v,
-                                       ostringstream & os,
-                                       std::map<AnnotatedGraphNode*, bool> & visitedNodes,
-                                       std::vector<string> & edgeLabels)
-{
+                                                ostringstream& os,
+                                                std::map<AnnotatedGraphNode*, bool> & visitedNodes,
+                                                std::vector<string> & edgeLabels) {
+
     assert(v != NULL);
     visitedNodes[v] = true;             // mark current node as visited
 
 //    cout << "current node " << v->getNumber() << endl;
-    if ( !v->isToShow(root, false) ) return;
+    if ( !v->isToShow(root, (PN != NULL)) )
+        return;
 
     if (v->isFinal()) {
         // each label is mapped to his position in edgeLabes
@@ -3202,37 +3203,33 @@ void AnnotatedGraph::printGraphToSTGRecursively(AnnotatedGraphNode * v,
 
     // go through all arcs
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
-    while (edgeIter->hasNext())
-    {
+    while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = element->getDstNode();
 
-        if ( !vNext->isToShow(root, false) ) continue; // continue if node is not to show
+        if ( !vNext->isToShow(root, (PN != NULL)) ) {
+            continue; // continue if node is not to show
+        }
 
+		// build label vector:
+		// each label is mapped to his position in edgeLabes
+		string currentLabel = element->getLabel();
+		int foundPosition = -1;
+		for (int i = 0; i < (int)edgeLabels.size(); i++) {
 
-        // build label vector:
-        // each label is mapped to his position in edgeLabes
-        string currentLabel = element->getLabel();
-        int foundPosition = -1;
-        for (int i = 0; i < (int)edgeLabels.size(); i++)
-        {
-
-            if ( currentLabel == edgeLabels.at(i) )
-            {
+            if (currentLabel == edgeLabels.at(i) ) {
                 foundPosition = i;
                 //cout << "found edge befor" << endl;
                 break;
             }
         }
-        if ( foundPosition == -1 )
-        {
+        if (foundPosition == -1) {
             //cout << "didn't found edge befor - add to known labels" << endl;
             foundPosition = (int)edgeLabels.size();
-            edgeLabels.push_back( currentLabel );
+            edgeLabels.push_back(currentLabel );
         }
-        assert( foundPosition >= 0);
-        assert( currentLabel == edgeLabels.at(foundPosition) );
-
+        assert(foundPosition >= 0);
+        assert(currentLabel == edgeLabels.at(foundPosition) );
 
         // print current transition to stream 
         os << "p" << v->getNumber() << " t" << foundPosition << " p" << vNext->getNumber() << endl;

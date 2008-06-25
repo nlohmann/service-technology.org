@@ -3108,12 +3108,18 @@ unsigned int AnnotatedGraph::getNumberOfNodes() const {
 //! \brief creates a STG file of the graph AND starts petrify AND parses petrify output to oWFN
 void AnnotatedGraph::printGraphToSTG()
 {
+    trace(TRACE_5, "void AnnotatedGraph::printGraphToSTG() : start\n");
+
     // build STG file name
     string STGFileName;
     if (options[O_OUTFILEPREFIX]) {
         STGFileName = outfilePrefix;
     } else {
-        STGFileName = PN->filename;
+        //assert(PN != NULL);
+        //STGFileName = PN->filename;
+        STGFileName = this->filename;
+        STGFileName = STGFileName.substr(0, STGFileName.find(".ig.og"));
+        STGFileName = STGFileName.substr(0, STGFileName.find(".og.og"));
     }
 
     if (parameters[P_OG]) {
@@ -3173,6 +3179,8 @@ void AnnotatedGraph::printGraphToSTG()
 
     // create oWFN out of petrify output
     STG2oWFN_main( edgeLabels, PNFileName );
+
+    trace(TRACE_5, "void AnnotatedGraph::printGraphToSTG() : end\n");
 }
 
 

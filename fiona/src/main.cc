@@ -490,14 +490,14 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
 
 
 //! \brief create an IG of an oWFN
-//! \param PN the given oWFN
-interactionGraph* computeIG(oWFN* PN, string & igFilename)
-{
+//! \param PN pointer to the given oWFN whose IG will be computed
+//! \param igFilename reference to a string containing the filename of the created IG
+interactionGraph* computeIG(oWFN* PN, string& igFilename) {
+
     time_t seconds, seconds2;
     interactionGraph * graph = new interactionGraph(PN);
-    bool controllable = false;
-    //string igFilename = "";
     igFilename = "";
+
 
     // print information about reduction rules (if desired)
     if (options[O_CALC_REDUCED_IG] || parameters[P_USE_EAD]) {
@@ -534,7 +534,6 @@ interactionGraph* computeIG(oWFN* PN, string & igFilename)
     trace(TRACE_0, "\nnet is controllable: ");
     if (graph->getRoot()->getColor() == BLUE) {
         trace(TRACE_0, "YES\n\n");
-        controllable = true;
     } else {
         trace(TRACE_0, "NO\n\n");
     }
@@ -543,6 +542,8 @@ interactionGraph* computeIG(oWFN* PN, string & igFilename)
     graph->printGraphStatistics();
     trace(TRACE_0, "\n");
 
+
+    // create output files if needed
     if (!options[O_NOOUTPUTFILES]) {
         if (parameters[P_DIAGNOSIS]) {
             graph->diagnose();
@@ -552,9 +553,9 @@ interactionGraph* computeIG(oWFN* PN, string & igFilename)
             // generate output files
             graph->printGraphToDot(); // .out, .png
 
-                if (parameters[P_TEX]) {
-                    makeGasTex(graph);
-                }
+            if (parameters[P_TEX]) {
+                makeGasTex(graph);
+            }
         }
 
 /* create also an .og file to enable comparison of different IGs */
@@ -580,13 +581,12 @@ interactionGraph* computeIG(oWFN* PN, string & igFilename)
 }
 
 
-string computeIG(oWFN* PN)
-{
+string computeIG(oWFN* PN) {
+
     string igFilename = "";
     interactionGraph* graph = computeIG(PN, igFilename);
 
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
-    // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
 
     graph->clearNodeSet();
     delete graph;
@@ -599,21 +599,19 @@ string computeIG(oWFN* PN)
 }
 
 
-string computeSmallPartner(oWFN* PN)
-{
-    // 1. step: compute the IG of given net
-    string igFilename = "";
-    interactionGraph* graph = computeIG(PN, igFilename);
+//! \brief creates a small partner out of a given IG
+//! \param IG a pointer to an IG of an oWFN whose small partner will be computed
+//! \return a string containing ???
+string computeSmallPartner(AnnotatedGraph* IG) {
 
+    trace(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : start\n");
 
+    // 1. step: was done before (computing the IG)
     // 2. step: if the net is controllable create STG file for petrify out of computed IG
     string stgFilename = "";
-    if (graph->getRoot()->getColor() == BLUE)
-    {
-        graph->printGraphToSTG();
-    }
-    else
-    {
+    if (IG->getRoot()->getColor() == BLUE) {
+        IG->printGraphToSTG();
+    } else {
         trace(TRACE_0, "\nCannot synthesize a partner for a net, that is not controllable\n\n");
         return "";
     }
@@ -628,12 +626,30 @@ string computeSmallPartner(oWFN* PN)
 
     // garbage collection
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
-    graph->clearNodeSet();
-    delete graph;
+    IG->clearNodeSet();
+    delete IG;
 
     trace(TRACE_5, "graph deleted\n");
     trace(TRACE_0, "=================================================================\n");
     trace(TRACE_0, "\n");
+
+    trace(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : end\n");
+
+    return ""; // return partner filename???
+}
+
+
+//! \brief creates a small partner out of a given oWFN
+//! \param PN a pointer to an oWFN whose small partner will be computed
+//! \return a string containing the filename of the computed IG from given oWFN
+string computeSmallPartner(oWFN* PN) {
+
+    // 1. step: compute the IG of given net
+    string igFilename = "";
+    interactionGraph* graph = computeIG(PN, igFilename);
+
+    // 2.-4. step wil be done with former computed IG (ignoring partner filename)
+    computeSmallPartner(graph);
 
     return igFilename;
 }
@@ -1696,7 +1712,9 @@ int main(int argc, char** argv) {
     else if (parameters[P_COUNT_SERVICES] || parameters[P_CHECK_ACYCLIC] ||
              parameters[P_CHECK_FALSE_NODES] || parameters[P_REMOVE_FALSE_NODES] ||
              parameters[P_PV] || parameters[P_MINIMIZE_OG] || parameters[P_READ_OG] ||
-             (parameters[P_PNG] && ogfiles.size() != 0)) {
+             (parameters[P_PNG] && ogfiles.size() != 0) ||
+             (parameters[P_SYNTHESIZE_PARTNER_OWFN] && !parameters[P_ADAPTER] &&
+              !parameters[P_SMALLADAPTER] && ogfiles.size() > 0) ) {
 
         // Abort if there are no OGs at all
         if (ogfiles.begin() == ogfiles.end() && !(parameters[P_PV])) {
@@ -1705,12 +1723,17 @@ int main(int argc, char** argv) {
         }
 
         // iterate all input files
-        for (AnnotatedGraph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
-             iOgFile != ogfiles.end(); ++iOgFile) {
+        for (AnnotatedGraph::ogfiles_t::const_iterator iOgFile = ogfiles.begin(); iOgFile != ogfiles.end(); ++iOgFile) {
 
             AnnotatedGraph* readOG = readog(*iOgFile);
 
-            if (parameters[P_PV]) {
+            if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
+                // computes partner out of IG
+                computeSmallPartner(readOG);
+                delete readOG;
+            }
+            
+            else if (parameters[P_PV]) {
                 // computes a service automaton "public view" which has the same
                 // OG as given in readOG
                 readOG->removeReachableFalseNodes();
@@ -1810,6 +1833,7 @@ int main(int argc, char** argv) {
                 delete readOG;
 
             }
+
             else if (parameters[P_READ_OG]) {
                 trace(TRACE_0, "OG was read from file '" + readOG->getFilename() + "'\n");
                 readOG->computeAndPrintGraphStatistics();
@@ -1872,13 +1896,13 @@ int main(int argc, char** argv) {
         // return 0;
     }
     else if (parameters[P_ADAPTER] || parameters[P_SMALLADAPTER]) {
+
         Adapter adapter;
         adapter.generateAdapter();
-        
-        //generateAdapter();
     } 
     else if (parameters[P_IG] || parameters[P_OG] || parameters[P_MATCH] ||
-               parameters[P_PNG] || parameters[P_REDUCE] ||parameters[P_PV] || parameters[P_MATCH_PARTNER]) {
+             parameters[P_PNG] || parameters[P_REDUCE] ||parameters[P_PV] || parameters[P_MATCH_PARTNER]) {
+
         if (parameters[P_MATCH]) {
             assert(ogfiles.size() == 1);
             // we match multiple oWFNs with one OG,
@@ -1889,14 +1913,8 @@ int main(int argc, char** argv) {
         string fileName;    // name of og-file
         ogfiles.clear();
 
-        //int loop = 0;        // in case the option -t eqR is set, we need each netfile to be processed twice
-        //if (!parameters[P_EQ_R]) {        // option is not set, so we don't do the loop
-        //    loop = 27;                // loop needs to be higher than 1 ;-)
-        //}
-
         // ---------------- processing every single net -------------------
-        for (list<std::string>::iterator netiter = netfiles.begin();
-             netiter != netfiles.end(); ++netiter) {
+        for (list<std::string>::iterator netiter = netfiles.begin(); netiter != netfiles.end(); ++netiter) {
 
             // calculate the graph of the same net twice --> once with -R and once with no -R
             // in case the option -t eqR is set, otherwise we go through this loop only once
@@ -1924,7 +1942,7 @@ int main(int argc, char** argv) {
                 delete PlaceTable;
 
                 if (currentowfnfile == "<stdin>") {
-                        currentowfnfile = "stdin";
+                    currentowfnfile = "stdin";
                 }
                 
                 // start computation
@@ -1933,10 +1951,10 @@ int main(int argc, char** argv) {
                 if (parameters[P_IG]) {
                     reportOptionValues(); // adjust events_manual and print limit of considering events
                     if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
-                        fileName = computeSmallPartner(PN);    // compute a small partner
+                        fileName = computeSmallPartner(PN); // compute a small partner
                     } else {
-                        fileName = computeIG(PN);            // computing IG of the current oWFN 
-                                        }
+                        fileName = computeIG(PN);           // computing IG of the current oWFN 
+                    }
                 }
 
                 if (parameters[P_OG] || parameters[P_PV]) {
@@ -1956,8 +1974,7 @@ int main(int argc, char** argv) {
                     reduceOWFN(PN);    // reduce given net
                 }
 
-                if (parameters[P_EQ_R])
-                {
+                if (parameters[P_EQ_R]) {
                     // reverse reduction mode for the next loop
                     options[O_CALC_ALL_STATES] = !options[O_CALC_ALL_STATES];
                     // remember file name of og-file to check equivalence later on
@@ -1983,11 +2000,9 @@ int main(int argc, char** argv) {
                 
                 //delete PN;
                 //trace(TRACE_5, "net deleted\n");
-
-                //loop++;
             }
-            //while (loop <= 1);    // calculate the graph of the same net twice --> once with -R and once with no -R
 
+            // in case the option -t eqR is set, check equivalence for both computed graphs
             if (parameters[P_EQ_R]) {
                 // reading all og-files
                 AnnotatedGraph::ogs_t OGsFromFiles;
@@ -1998,7 +2013,6 @@ int main(int argc, char** argv) {
 
                 OGsFromFiles.clear();
                 ogfiles.clear();
-                //loop = 0;
             }
         }
 

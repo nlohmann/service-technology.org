@@ -794,7 +794,21 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
-    if ((parameters[P_REDUCE] || parameters[P_IG] || parameters[P_OG]) && netfiles.size() == 0) {
+    if ((parameters[P_REDUCE] || parameters[P_IG] || parameters[P_OG]) &&
+        !parameters[P_SYNTHESIZE_PARTNER_OWFN] && netfiles.size() == 0) {
+        cerr << "Error: \t No oWFNs are given." << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
+    }
+
+    if ( parameters[P_SYNTHESIZE_PARTNER_OWFN] && (parameters[P_IG] || parameters[P_OG]) &&
+         ogfiles.size() == 0 && netfiles.size() == 0) {
+        cerr << "Error: \t No oWFNs or OGs are given." << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(1);
+    }
+
+    if ((parameters[P_ADAPTER] || parameters[P_SMALLADAPTER]) && netfiles.size() < 2) {
         cerr << "Error: \t No oWFNs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(1);

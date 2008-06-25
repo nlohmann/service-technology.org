@@ -93,32 +93,30 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
     for (set<string>::iterator t = interface.begin(); t != interface.end(); t++) {
         string remapped = remap(*t, edgeLabels);
     
-    if (remapped.substr(0,5) != "FINAL") {
-    
-        //cout << "original remapped: " << remapped << endl;
-        assert( remapped.find("/") == remapped.npos ); // petrify should not rename/create dummy transitions
+        if (remapped.substr(0,5) != "FINAL") {
+        
+            //cout << "original remapped: " << remapped << endl;
+            assert( remapped.find("/") == remapped.npos ); // petrify should not rename/create dummy transitions
 
             do {
                 // PRECONDITION: transitions are separated by ", "
-        string transitionName = remapped.substr( 0, remapped.find(",") );
-        //cout << "transitionName: \"" << transitionName << "\" remapped: \"" << remapped << "\"" << endl;
-        remapped = (remapped.find(",") != remapped.npos) ? remapped.substr( transitionName.size() + 2 ) : "";
-        //cout << "transitionName: \"" << transitionName << "\" remapped: \"" << remapped << "\"" << endl;
+                string transitionName = remapped.substr( 0, remapped.find(",") );
+                //cout << "transitionName: \"" << transitionName << "\" remapped: \"" << remapped << "\"" << endl;
+                remapped = (remapped.find(",") != remapped.npos) ? remapped.substr( transitionName.size() + 2 ) : "";
+                //cout << "transitionName: \"" << transitionName << "\" remapped: \"" << remapped << "\"" << endl;
 
-        string placeName = transitionName.substr( 1 );
-        if ( transitionName[0] == '?' ) {
-            Place *inPlace = STGPN.findPlace(placeName);
-            if (inPlace == NULL) 
-                                inPlace = STGPN.newPlace(placeName, IN);
-        } else if ( transitionName[0] == '!' ) {
-            Place *outPlace = STGPN.findPlace(placeName);
-            if (outPlace == NULL) 
-                                outPlace = STGPN.newPlace(placeName, OUT);
-        } else {
+                string placeName = transitionName.substr( 1 );
+                if ( transitionName[0] == '?' ) {
+                    Place *inPlace = STGPN.findPlace(placeName);
+                    if (inPlace == NULL) inPlace = STGPN.newPlace(placeName, IN);
+                } else if ( transitionName[0] == '!' ) {
+                    Place *outPlace = STGPN.findPlace(placeName);
+                    if (outPlace == NULL) outPlace = STGPN.newPlace(placeName, OUT);
+                } else {
                     cerr << "possible error in stg2owfn_init: found transition without ! or ? as first symbol" << endl;
-        }
+                }
             } while ( remapped != "" );
-    }
+        }
     }
 
 
@@ -126,44 +124,45 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
     trace(TRACE_1, "========== create transitions\n");
     
     for (set<string>::iterator t = transitions.begin(); t != transitions.end(); t++) {
-
-    // create transition if necessary
-    string remapped = remap(*t, edgeLabels);
-    Transition * transition = STGPN.findTransition("t" + remapped);
-    //cout << "\t" << remapped << endl;    
-    if (transition == NULL && remapped.substr(0,5) != "FINAL") transition = STGPN.newTransition("t" + remapped);
-
-    // create arcs t->p
-    if (transition != NULL) {
-        for (set<string>::iterator p = arcs[*t].begin(); p != arcs[*t].end(); p++) {
-            STGPN.newArc( transition, STGPN.findPlace(*p) );
-        }
-        
-                // create arcs t->interface and interface->t
+        string remapped = remap(*t, edgeLabels);
         //cout << "original remapped: \"" << remapped << "\"" << endl;
-        do {
-                    // PRECONDITION: transitions are separated by ", "
-            string placeName = remapped.substr( 0, remapped.find(",") );    // take next placename
-            placeName = placeName.substr( 1 );                                                        // remove first ! or ?
-            placeName = placeName.substr( 0, placeName.find("/") );                // remove possible /
 
-            //cout << "placeName: \"" << placeName << "\" remapped: \"" << remapped << "\"" << endl;
-            Place * place = STGPN.findPlace(placeName);
+        if (remapped.substr(0, 5) != "FINAL") {
 
-                    if ( remapped[0] == '?' ) {
-                if (place == NULL) place = STGPN.newPlace(placeName, IN);
-                STGPN.newArc(place, transition); 
-                    } else if ( remapped[0] == '!' ) {
-            if (place == NULL) place = STGPN.newPlace(placeName, OUT);
-                STGPN.newArc(transition, place);
-            } else {
-                cerr << "possible error in stg2owfn_init: found label without ! or ? as first symbol" << endl;
+            // create transition if necessary
+            Transition * transition = STGPN.findTransition("t" + remapped);
+            //cout << "\t" << remapped << endl;    
+            if (transition == NULL) transition = STGPN.newTransition("t" + remapped);
+
+            // create arcs t->p
+            for (set<string>::iterator p = arcs[*t].begin(); p != arcs[*t].end(); p++) {
+                STGPN.newArc( transition, STGPN.findPlace(*p) );
             }
+        
+            // create arcs t->interface and interface->t
+            do {
+                // PRECONDITION: transitions are separated by ", "
+                string placeName = remapped.substr( 0, remapped.find(",") ); // take next placename
+                placeName = placeName.substr( 1 );                           // remove first ! or ?
+                placeName = placeName.substr( 0, placeName.find("/") );      // remove possible /
 
-            // remove first symbol (! or ?), placename (read above) and separators (", ") from remapped
-            remapped = (remapped.find(",") != remapped.npos) ? remapped.substr( remapped.find(",") + 2 ) : "";
-            //cout << "placeName: \"" << placeName << "\" remapped: \"" << remapped << "\"" << endl;
-        } while ( remapped != "" );
+                //cout << "placeName: \"" << placeName << "\" remapped: \"" << remapped << "\"" << endl;
+                Place * place = STGPN.findPlace(placeName);
+
+                if ( remapped[0] == '?' ) {
+                    if (place == NULL) place = STGPN.newPlace(placeName, IN);
+                    STGPN.newArc(place, transition); 
+                } else if ( remapped[0] == '!' ) {
+                    if (place == NULL) place = STGPN.newPlace(placeName, OUT);
+                    STGPN.newArc(transition, place);
+                } else {
+                    cerr << "possible error in stg2owfn_init: found label without ! or ? as first symbol" << endl;
+                }
+
+                // remove first symbol (! or ?), placename (read above) and separators (", ") from remapped
+                remapped = (remapped.find(",") != remapped.npos) ? remapped.substr( remapped.find(",") + 2 ) : "";
+                //cout << "placeName: \"" << placeName << "\" remapped: \"" << remapped << "\"" << endl;
+            } while ( remapped != "" );
         }
     }
 
@@ -176,14 +175,15 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
         
     for (set<string>::iterator p = places.begin(); p != places.end(); p++) {
         for (set<string>::iterator t = arcs[*p].begin(); t != arcs[*p].end(); t++) {
-                string transitionName = remap(*t, edgeLabels);
-                if (transitionName.substr(0,5) != "FINAL") {
+            string transitionName = remap(*t, edgeLabels);
+
+            if (transitionName.substr(0,5) != "FINAL") {
                 STGPN.newArc(STGPN.findPlace(*p), STGPN.findTransition("t" + transitionName));
-                } else {
-                    // This place is the result of a final node
-                    // cerr << "Found a final marking place " << *p << endl;
-                    finalCondMap[transitionName].insert(*p);                                                                    
-                }
+            } else {
+                // This place is the result of a final node
+                // cerr << "Found a final marking place " << *p << endl;
+                finalCondMap[transitionName].insert(*p);                                                                    
+            }
         }
     }
 

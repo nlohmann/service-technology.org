@@ -1414,100 +1414,69 @@ void makePNG(oWFN* PN) {
     // set strings needed in PNapi output
     globals::output_filename = PN->filename;
     if (PN->finalConditionString != "") {
-        globals::filename = PN->filename + " \\\\n Final Condition: "
+        globals::filename = PN->filename + " \\n Final Condition: "
                 + PN->finalConditionString;
     } else {
-        globals::filename = PN->filename + " \\\\n Final Marking: "
+        globals::filename = PN->filename + " \\n Final Marking: "
                 + PN->finalMarkingString;
     }
-
-    // create temporary stream as target for the dot output of the PNapiNet
-    ostringstream* dot = new ostringstream(ostringstream::out);
 
     // set the output format to dot
     PNapiNet->set_format(PNapi::FORMAT_DOT, true);
 
-    trace(TRACE_1, "Creating dot stream\n");
-
-    // create the dot
-    (*dot) << (*PNapiNet);
-
-    // generate a string from the stream to be modified for piping
-    string dotString = dot->str();
-
-    // remember unmodified string for .out file if wanted
-    string dotFileString = dotString;
-
-    delete(dot);
-
-    unsigned int position;
-    unsigned int deletePosition;
-
-    trace(TRACE_3, "Modifying dot stream\n");
-
-    // delete all comments in the dot output of the PNapiNet, since the endlines will
-    // be deleted for echo piping and "//" comments won't work anymore
-    int counter = 0;
-    while ((position = dotString.find_first_of("/", counter)) != string::npos) {
-        if (dotString.at(position+1)=='/') {
-            deletePosition = dotString.find_first_of("\n", (position + 2));
-            dotString.erase(position, (deletePosition - position));
-        } else {
-          counter = position+1;
-        }
-    }
-
-    // delete all endlines and escape all quotes for the echo string
-    for (unsigned int i = 0; i != dotString.size(); i++) {
-        char testchar;
-        testchar = dotString[i];
-
-        if (testchar == '\n') {
-            dotString.erase(i, 1);
-            dotString.insert(i, " ");
-        }
-
-/*       else if (testchar == '"') {
-            dotString.insert(i, "\\");
-            i++;
-        }
-*/
-    }
-
+    // determine the output file name
     string outFileName;
-
     if (!options[O_OUTFILEPREFIX]) {
         outFileName = globals::output_filename;
     } else {
         outFileName = outfilePrefix;
     }
 
-    // finish the string for the system call
-    dotString = "echo '" + dotString + "'";
-    dotString += " | dot -q -Tpng -o \"" + outFileName + ".png\"";
+    string dotFileName = outFileName + ".out";
 
     // create the output
     if (!options[O_NOOUTPUTFILES]) {
-        if (parameters[P_TEX]) {
-            // writing .dot file which is skipped elsewise
-            // will later be annotated with layout info in .out file
-            string dotFileName = outFileName + ".out";
-            string annotatedDotFileName = outFileName + ".dot";
-            fstream dotFile(dotFileName.c_str(), ios_base::out | ios_base::trunc);
-            dotFile << dotFileString;
-            dotFile.close();
-            // annotate .dot file
-            system(("dot -Tdot " + dotFileName + " -o " + annotatedDotFileName).c_str());
-            trace(TRACE_0, (annotatedDotFileName + " generated\n"));
 
-            // transforming .dot file into gastex format
-            makeGasTex(annotatedDotFileName, outFileName);
+        // create the outputfilestream
+        ofstream *out = new ofstream(dotFileName.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
+
+        // check whether the stream was succesfully created
+        if (!out->is_open()) {
+            trace(TRACE_0, "File \"" + dotFileName + "\" could not be opened for writing access!\n");
+            exit(-1);
         }
 
-        trace(TRACE_1, "Piping the stream to dot\n");
-    
-        system(dotString.c_str());
-        trace(TRACE_0, (outFileName + ".png generated\n\n"));
+        // create the dot and write it to the file
+        (*out) << (*PNapiNet);
+
+        // close the outputfilestream
+        (*out) << flush;
+        (out)->close();
+        delete(out);
+        out = NULL;
+
+        if (parameters[P_TEX]) {
+            // annotate .dot file
+            int exitvalue = system(("dot -Tdot " + dotFileName + " -o " + outFileName + ".dot").c_str());
+            if (exitvalue == 0) {
+                trace(TRACE_0, (outFileName + ".dot generated\n\n"));
+            } else {
+                trace(TRACE_0, "error: Dot exited with non zero value! here\n\n");
+                exit(-1);
+            }
+
+            // transforming .dot file into gastex format
+            makeGasTex((outFileName + ".dot"), (outFileName));
+        }
+
+        // call dot to create the png file
+        int exitvalue = system(("dot -q -Tpng -o \"" + outFileName + ".png\" " + dotFileName).c_str());
+
+        if (exitvalue == 0) {
+            trace(TRACE_0, (outFileName + ".png generated\n\n"));
+        } else {
+            trace(TRACE_0, "error: Dot exited with non zero value! dort\n\n" + intToString(exitvalue));
+        }
     }
 }
 

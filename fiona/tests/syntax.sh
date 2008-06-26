@@ -119,6 +119,35 @@ else
 fi
 
 ############################################################################
+
+owfn="$DIR/syntax_example_new_short.owfn"
+cmd="$FIONA $owfn -t IG"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.OG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    syntaxexamplenew=$?
+
+
+    if [ $syntaxexamplenew -ne 0 ]
+    then
+    echo   ... failed to build OG correctly
+    fi
+
+    result=`expr $result + $syntaxexamplenew`
+fi
+
+############################################################################
 resultSingle=0
 owfn="$DIR/formula.owfn"
 outputPrefix="$builddir/syntax/formula.owfn.output"

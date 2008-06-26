@@ -34,6 +34,9 @@ FIONA=fiona
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
 rm -f $DIR/big.owfn.output.png
+rm -f $DIR/big.owfn.output.dot
+rm -f $DIR/big.owfn.output.out
+rm -f $DIR/big.owfn.output.tex
 rm -f $DIR/*.log
 
 result=0
@@ -50,7 +53,7 @@ if [ "$testdir" != "$builddir" ]; then
     fi
 fi
 
-cmd="$FIONA $owfn -t png -o $outputPrefix"
+cmd="$FIONA $owfn -t png -p tex -o $outputPrefix"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$outputPrefix.memcheck.log"
@@ -61,17 +64,26 @@ else
     OUTPUT=`$cmd 2>&1`
     if [ $? -ne 0 ]; then
         echo "... failed: $FIONA exited with non-zero return value."
-        resultSingle=1
+        result=1
+    fi
+
+    echo $OUTPUT | grep "big.owfn.output.tex generated" > /dev/null
+    resultSingle=$?
+
+    if [ $resultSingle -ne 0 ]; then
+        result=1
+        echo "... failed: no tex file was generated."
     fi
 
     echo $OUTPUT | grep "big.owfn.output.png generated" > /dev/null
     resultSingle=$?
 
+    if [ $resultSingle -ne 0 ]; then
+        result=1
+        echo "... failed: no png was generated."
+    fi
 fi
 
-if [ $resultSingle -ne 0 ]; then
-    result=1
-fi
 
 
 ###########################################################################

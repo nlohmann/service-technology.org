@@ -3072,7 +3072,7 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
             // So we have to initialize this newly seen state.
 
         	trace(TRACE_1, "found new marking [" + getCurrentMarkingAsString() + "] at node ");
-        	trace(TRACE_2, currentOGNode->getName() + "\n");
+        	trace(TRACE_1, currentOGNode->getName() + "\n");
         	
             newState = binInsert(this);
             newState->firelist = firelist();

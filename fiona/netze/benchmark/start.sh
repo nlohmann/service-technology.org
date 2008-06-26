@@ -73,6 +73,8 @@ owfns=(
 	phcontrol5.unf.owfn
 	sequence10.owfn
 	sequence17.owfn
+	dke07_shop_sect_3.owfn
+	dke07_shop_sect_6.owfn
 )
 
 # additional parameters for the owfn at the same index, such as -s allNodes or -m 2. 
@@ -86,7 +88,12 @@ additionalParams=(
 	""
 	""
 	""
+	""
+	""
 )
+
+# strings containing the information needed
+
 
 
 
@@ -165,7 +172,6 @@ table="$table\n\n$delim Filename  $delim Add.Param. $delim / $delim Places (in ,
 # PREF=""
 # get all the owfn files of the directory in $DIR
 # owfns=$(find $DIR -name "*.owfn" -print)
-
 
 echo ""
 echo "Calling fiona with: $generalParams"

@@ -38,6 +38,6 @@ cp $LOGFILE $WIKIPATH/fiona_benchmark.txt
 echo "Concatenate the files"
 cat  $WIKIPATH/fiona_benchmark.txt.old >>  $WIKIPATH/fiona_benchmark.txt
 
-echo "Fixing permissions"
-chmod g+w $WIKIPATH/fiona_benchmark.txt
-chmod o+w $WIKIPATH/fiona_benchmark.txt
+#echo "Fixing permissions"
+#chmod g+w $WIKIPATH/fiona_benchmark.txt
+#chmod o+w $WIKIPATH/fiona_benchmark.txt

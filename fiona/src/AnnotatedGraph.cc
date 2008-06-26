@@ -44,9 +44,6 @@
 #include <sstream>
 #include <vector>
 
-extern void STG2oWFN_main(vector<string> &, string);
-
-
 // TRUE and FALSE #defined in cudd package may interfere with
 // GraphFormulaLiteral::TRUE and ...::FALSE.
 #undef TRUE
@@ -3105,9 +3102,9 @@ unsigned int AnnotatedGraph::getNumberOfNodes() const {
 }
 
 
-//! \brief creates a STG file of the graph AND starts petrify AND parses petrify output to oWFN
-void AnnotatedGraph::printGraphToSTG()
-{
+//! \brief creates a STG file of the graph 
+//! \return the filename of the created STG file
+string AnnotatedGraph::printGraphToSTG(vector<string>& edgeLabels) {
     trace(TRACE_5, "void AnnotatedGraph::printGraphToSTG() : start\n");
 
     // build STG file name
@@ -3115,8 +3112,6 @@ void AnnotatedGraph::printGraphToSTG()
     if (options[O_OUTFILEPREFIX]) {
         STGFileName = outfilePrefix;
     } else {
-        //assert(PN != NULL);
-        //STGFileName = PN->filename;
         STGFileName = this->filename;
         STGFileName = STGFileName.substr(0, STGFileName.find(".ig.og"));
         STGFileName = STGFileName.substr(0, STGFileName.find(".og.og"));
@@ -3135,12 +3130,9 @@ void AnnotatedGraph::printGraphToSTG()
             STGFileName += ".R.ig.stg";
         }
     }
-    trace(TRACE_0, "\ncreating the STG file " + STGFileName + "\n");
-
 
     // create and fill stringstream for buffering graph information
     map<AnnotatedGraphNode*, bool> visitedNodes;    // visited nodes
-    vector<string> edgeLabels;                        // renamend transitions
     AnnotatedGraphNode* rootNode = getRoot();            // root node
     //GraphNode* rootNode = root;            // root node
     ostringstream STGStringStream;                    // used as buffer for graph information
@@ -3163,24 +3155,9 @@ void AnnotatedGraph::printGraphToSTG()
     STGFileStream << "\n" << STGGraphString << endl;
     STGFileStream.close();
 
-
-    // prepare petrify command line and execute system command if possible
-    string PNFileName = STGFileName.substr(0, STGFileName.size() - 4) + ".pn"; // change .stg to .pn
-    string systemcall = string(HAVE_PETRIFY) + " " + STGFileName + " -dead -ip -nolog -o " + PNFileName;
-
-    trace(TRACE_0, systemcall + "\n");
-    if (HAVE_PETRIFY != "not found") {
-        system(systemcall.c_str());
-    } else {
-        trace(TRACE_0, "cannot execute command as Petrify was not found in path\n");
-        return;
-    }
-
-
-    // create oWFN out of petrify output
-    STG2oWFN_main( edgeLabels, PNFileName );
-
     trace(TRACE_5, "void AnnotatedGraph::printGraphToSTG() : end\n");
+
+    return STGFileName;
 }
 
 
@@ -3196,7 +3173,6 @@ void AnnotatedGraph::printGraphToSTGRecursively(AnnotatedGraphNode * v,
     assert(v != NULL);
     visitedNodes[v] = true;             // mark current node as visited
 
-//    cout << "current node " << v->getNumber() << endl;
     if ( !v->isToShow(root, (PN != NULL)) )
         return;
 

@@ -400,7 +400,7 @@ class AnnotatedGraph : public Graph {
         void printGraphStatistics();
 
 		/// creates a STG file of the graph
-		void AnnotatedGraph::printGraphToSTG();
+		string AnnotatedGraph::printGraphToSTG(vector<string>& edgeLabels);
 
 
 // CODE FROM PL

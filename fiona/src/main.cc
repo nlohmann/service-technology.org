@@ -106,6 +106,8 @@ extern std::list<std::string> netfiles;
 extern std::list<std::string> ogfiles;
 extern AnnotatedGraph* OGToParse;
 
+extern string STG2oWFN_main(vector<string> &, string);
+
 // will be filled during parsing
 extern GasTexGraph* gastexGraph;
 
@@ -291,20 +293,20 @@ void reportOptionValues() {
         trace(TRACE_0, "considering the following events:\n");
         trace(TRACE_0, "    sending events:\n");
         for (unsigned int e = 0; e < PN->getInputPlaceCount(); e++) {
-            trace(TRACE_0, "\t!" + string(PN->getInputPlace(e)->name));
+            trace(TRACE_0, "    !" + string(PN->getInputPlace(e)->name));
             if (PN->getInputPlace(e)->max_occurence >= 0) {
-                trace(TRACE_0, "\t(max. " + intToString(PN->getInputPlace(e)->max_occurence) + "x)\n");
+                trace(TRACE_0, "    (max. " + intToString(PN->getInputPlace(e)->max_occurence) + "x)\n");
             } else {
-                trace(TRACE_0, "\t(no limit)\n");
+                trace(TRACE_0, "    (no limit)\n");
             }
         }
         trace(TRACE_0, "    receiving events:\n");
         for (unsigned int e = 0; e < PN->getOutputPlaceCount(); e++) {
-            trace(TRACE_0, "\t?" + string(PN->getOutputPlace(e)->name));
+            trace(TRACE_0, "    ?" + string(PN->getOutputPlace(e)->name));
             if (PN->getOutputPlace(e)->max_occurence >= 0) {
-                trace(TRACE_0, "\t(max. " + intToString(PN->getOutputPlace(e)->max_occurence) + "x)\n");
+                trace(TRACE_0, "    (max. " + intToString(PN->getOutputPlace(e)->max_occurence) + "x)\n");
             } else {
-                trace(TRACE_0, "\t(no limit)\n");
+                trace(TRACE_0, "    (no limit)\n");
             }
         }
     }
@@ -503,13 +505,13 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
     if (options[O_CALC_REDUCED_IG] || parameters[P_USE_EAD]) {
         trace(TRACE_0, "building the reduced interaction graph by using reduction rule(s)\n");
         if (parameters[P_USE_CRE]) {
-            trace(TRACE_0, "\t \"combine receiving events\"\n");
+            trace(TRACE_0, "     \"combine receiving events\"\n");
         }
         if (parameters[P_USE_RBS]) {
-            trace(TRACE_0, "\t \"receiving before sending\"\n");
+            trace(TRACE_0, "     \"receiving before sending\"\n");
         }
         if (parameters[P_USE_EAD]) {
-            trace(TRACE_0, "\t \"early detection\"\n");
+            trace(TRACE_0, "     \"early detection\"\n");
         }
     } else {
         trace(TRACE_0, "building the interaction graph...\n");
@@ -601,16 +603,99 @@ string computeIG(oWFN* PN) {
 
 //! \brief creates a small partner out of a given IG
 //! \param IG a pointer to an IG of an oWFN whose small partner will be computed
-//! \return a string containing ???
+//! \return a string containing the filename of the partner owfn
 string computeSmallPartner(AnnotatedGraph* IG) {
 
     trace(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : start\n");
 
+    trace(TRACE_0, "\n\nComputing partner oWFN \n");
     // 1. step: was done before (computing the IG)
     // 2. step: if the net is controllable create STG file for petrify out of computed IG
+    
+
+    
     string stgFilename = "";
-    if (IG->getRoot()->getColor() == BLUE) {
-        IG->printGraphToSTG();
+    vector<string> edgeLabels;                        // renamend transitions 
+
+    if (!IG->hasNoRoot() && IG->getRoot()->getColor() == BLUE) {
+    
+        trace(TRACE_1, "    Creating STG File\n");
+        
+        stgFilename = IG->printGraphToSTG(edgeLabels);
+    } else {
+        trace(TRACE_0, "\n    Cannot synthesize a partner for a net, that is not controllable\n\n");
+        return "";
+    }
+
+
+    // 3. step: invoke petrify on created STG file
+
+    // prepare petrify command line and execute system command if possible
+    string pnFilename = stgFilename.substr(0, stgFilename.size() - 4) + ".pn"; // change .stg to .pn
+
+    string systemcall = string(HAVE_PETRIFY) + " " + stgFilename + " -dead -ip -nolog -o " + pnFilename;
+    if (HAVE_PETRIFY != "not found") {
+        trace(TRACE_1, "    Calling Petrify.\n");
+        trace(TRACE_2, "        " + systemcall + "\n");
+        system(systemcall.c_str());
+    } else {
+        trace(TRACE_0, "cannot execute command as Petrify was not found in path\n");
+        return "";
+    }
+
+
+    // 4. step: create oWFN out of the petrinet computed by petrify
+
+    // create oWFN out of petrify output
+        
+    trace(TRACE_1, "    Converting petrify result to petri net.\n");
+    string owfnFilename = STG2oWFN_main( edgeLabels, pnFilename );
+
+    // garbage collection
+    trace(TRACE_5, "computation finished -- trying to delete graph\n");
+    IG->clearNodeSet();
+    delete IG;
+
+    trace(TRACE_5, "graph deleted\n");
+
+    trace(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : end\n");
+    
+    trace(TRACE_0, "Partner synthesis completed. Created file: " + owfnFilename + "\n");
+
+    return owfnFilename; // return partner filename
+}
+
+
+//! \brief creates a small partner out of a given oWFN
+//! \param PN a pointer to an oWFN whose small partner will be computed
+//! \return a string containing the filename of the computed IG from given oWFN
+string computeSmallPartner(oWFN* givenPN) {
+
+    // 1. step: compute the IG of given net
+    string igFilename = "";
+    interactionGraph* graph = computeIG(givenPN, igFilename);
+
+    // 2.-4. step wil be done with former computed IG (ignoring partner filename)
+    computeSmallPartner(graph);
+
+    return igFilename;
+}
+//! \brief creates a small partner out of a given IG
+//! \param IG a pointer to an IG of an oWFN whose small partner will be computed
+//! \return a string containing the filename of the partner owfn.
+string computeMostPermissivePartner(AnnotatedGraph* OG) {
+
+    trace(TRACE_5, "string computeMostPermissivePartner(AnnotatedGraph*) : start\n");
+
+    trace(TRACE_0, "\n\nComputing partner oWFN \n");
+    // 1. step: was done before (computing the OG)
+    // 2. step: if the net is controllable create STG file for petrify out of computed IG
+    string stgFilename = "";
+    vector<string> edgeLabels;                        // renamend transitions 
+
+    if (!OG->hasNoRoot() && OG->getRoot()->getColor() == BLUE) {
+        trace(TRACE_1, "    Creating STG File\n");
+        stgFilename = OG->printGraphToSTG(edgeLabels);
     } else {
         trace(TRACE_0, "\nCannot synthesize a partner for a net, that is not controllable\n\n");
         return "";
@@ -619,40 +704,35 @@ string computeSmallPartner(AnnotatedGraph* IG) {
 
     // 3. step: invoke petrify on created STG file
 
+    // prepare petrify command line and execute system command if possible
+    string pnFilename = stgFilename.substr(0, stgFilename.size() - 4) + ".pn"; // change .stg to .pn
+
+    string systemcall = string(HAVE_PETRIFY) + " " + stgFilename + " -dead -ip -nolog -o " + pnFilename;
+    if (HAVE_PETRIFY != "not found") {
+        trace(TRACE_1, "    Calling Petrify.\n");
+        trace(TRACE_2, "        " + systemcall + "\n");
+        system(systemcall.c_str());
+    } else {
+        trace(TRACE_0, "cannot execute command as Petrify was not found in path\n");
+        return "";
+    }
 
 
     // 4. step: create oWFN out of the petrinet computed by petrify
+    trace(TRACE_1, "    Converting petrify result to petri net.\n");
 
+    // create oWFN out of petrify output
+    string owfnFilename = STG2oWFN_main( edgeLabels, pnFilename );
 
-    // garbage collection
-    trace(TRACE_5, "computation finished -- trying to delete graph\n");
-    IG->clearNodeSet();
-    delete IG;
+    // garbage collection will be done later.
+    
+    trace(TRACE_0, "Partner synthesis completed. Created file: " + owfnFilename + "\n");
+    trace(TRACE_5, "string computeMostPermissivePartner(AnnotatedGraph*) : end\n");
 
-    trace(TRACE_5, "graph deleted\n");
-    trace(TRACE_0, "=================================================================\n");
-    trace(TRACE_0, "\n");
-
-    trace(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : end\n");
-
-    return ""; // return partner filename???
+    return owfnFilename; // return partner filename
 }
 
 
-//! \brief creates a small partner out of a given oWFN
-//! \param PN a pointer to an oWFN whose small partner will be computed
-//! \return a string containing the filename of the computed IG from given oWFN
-string computeSmallPartner(oWFN* PN) {
-
-    // 1. step: compute the IG of given net
-    string igFilename = "";
-    interactionGraph* graph = computeIG(PN, igFilename);
-
-    // 2.-4. step wil be done with former computed IG (ignoring partner filename)
-    computeSmallPartner(graph);
-
-    return igFilename;
-}
 
 
 //! \brief create an OG of an oWFN
@@ -787,13 +867,9 @@ string computeOG(oWFN* PN) {
         // the second parameter is true, since the oWFN this OG was generated
         // from still exists and additional information are available
         graph->printOGFile(ogFilename, true);
-
+        vector<string> edgeLabels;                        // renamend transitions
         if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
-            if (controllable) {
-                graph->printGraphToSTG();
-            } else {
-                trace(TRACE_0, "\nCannot synthesize a partner for a net, that is not controllable\n\n");
-            }
+            computeMostPermissivePartner(graph);
         }
 
         if (options[O_OTF]) {
@@ -1697,8 +1773,14 @@ int main(int argc, char** argv) {
             AnnotatedGraph* readOG = readog(*iOgFile);
 
             if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
-                // computes partner out of IG
-                computeSmallPartner(readOG);
+                // computes partner out of IG or a most permissive partner from
+                // an og. 
+
+                if (parameters[P_IG]) {
+                    computeSmallPartner(readOG);
+                } else if (parameters[P_OG]) {
+                    computeMostPermissivePartner(readOG);
+                }
                 delete readOG;
             }
             
@@ -1742,15 +1824,15 @@ int main(int argc, char** argv) {
                 readOG->findFalseNodes(&falseNodes);
 
                 if (falseNodes.size() == 0) {
-                    trace(TRACE_0, "\n\t No nodes with false annotation found!");
+                    trace(TRACE_0, "\n     No nodes with false annotation found!");
                 } else {
-                    trace(TRACE_0, "\n\t Node(s) with false annotation found!");
+                    trace(TRACE_0, "\n     Node(s) with false annotation found!");
                     std::vector<AnnotatedGraphNode*>::iterator it = falseNodes.begin();
 
                     while (it != falseNodes.end()) {
                         AnnotatedGraphNode* currentNode = *it;
-                        trace(TRACE_1, "\n\t\t Node '" + currentNode->getName() + "' violates its annotation. ");
-                        trace(TRACE_2, "\n\t\t\t Annotation is: " + currentNode->getAnnotationAsString());
+                        trace(TRACE_1, "\n         Node '" + currentNode->getName() + "' violates its annotation. ");
+                        trace(TRACE_2, "\n             Annotation is: " + currentNode->getAnnotationAsString());
                         ++it;
                     }
                 }

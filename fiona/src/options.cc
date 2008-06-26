@@ -136,8 +136,9 @@ void print_help() {
   trace("                                                 given OG\n");
   trace("                         mostpermissivepartner - generates the most permissive\n");
   trace("                                                 partner for a given oWFN \n"); 
-  trace("                                   productog   - calculate the product OG of\n");
-  trace("                                                 all given OGs\n");
+  trace("                                                 or all given OGs\n");
+  trace("                                  smallpartner - generates a (small) partner for\n");
+  trace("                                                 a given oWFN or IG\n"); 
   trace("                                   simulation  - check whether the first OG\n");
   trace("                                                 characterizes more strategies\n");
   trace("                                                 than the second one\n");

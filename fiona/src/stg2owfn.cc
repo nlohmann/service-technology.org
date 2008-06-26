@@ -46,8 +46,6 @@ string remap(string edge, vector<string> & edgeLabels) {
     indexStream.str( indexString );
     indexStream >> index;
 
-    //cout << "transitionName: " << edge << " remapped: " << edgeLabels.at(index) << affix << endl;
-    //cout << "affix: " << affix << ", indexString: " << indexString << ", read index: " << index << endl;
 
     return edgeLabels.at(index) + affix;
 }
@@ -58,10 +56,11 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 
     extern int stg_yyparse();
     extern FILE *stg_yyin;
-
+    
     // call STG parser
-    trace(TRACE_1, "========== starting STG parser\n");
+    trace(TRACE_2, "        starting STG parser\n");
     stg_yyin = fopen(PNFileName.c_str(), "r");
+    
     stg_yyparse();
     fclose(stg_yyin);
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
@@ -72,7 +71,7 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 
 
     // create a petrinet object and create places 
-    trace(TRACE_1, "========== create places\n");
+    trace(TRACE_2, "        create places\n");
     PetriNet STGPN = PetriNet();
     for (set<string>::iterator p = places.begin(); p != places.end(); p++) {
         STGPN.newPlace(*p);
@@ -80,7 +79,7 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
     
 
     // initially mark places
-    trace(TRACE_1, "========== initially mark places\n");
+    trace(TRACE_2, "        initially mark places\n");
     
     for (set<string>::iterator p = initialMarked.begin(); p != initialMarked.end(); p++) {
         STGPN.findPlace(*p)->mark();
@@ -88,22 +87,19 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 
     
     // create interface places out of dummy transitions
-    trace(TRACE_1, "========== create interface places\n");
+    trace(TRACE_2, "        create interface places\n");
 
     for (set<string>::iterator t = interface.begin(); t != interface.end(); t++) {
         string remapped = remap(*t, edgeLabels);
     
         if (remapped.substr(0,5) != "FINAL") {
         
-            //cout << "original remapped: " << remapped << endl;
             assert( remapped.find("/") == remapped.npos ); // petrify should not rename/create dummy transitions
 
             do {
                 // PRECONDITION: transitions are separated by ", "
                 string transitionName = remapped.substr( 0, remapped.find(",") );
-                //cout << "transitionName: \"" << transitionName << "\" remapped: \"" << remapped << "\"" << endl;
                 remapped = (remapped.find(",") != remapped.npos) ? remapped.substr( transitionName.size() + 2 ) : "";
-                //cout << "transitionName: \"" << transitionName << "\" remapped: \"" << remapped << "\"" << endl;
 
                 string placeName = transitionName.substr( 1 );
                 if ( transitionName[0] == '?' ) {
@@ -121,17 +117,15 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 
 
     // create transitions and arcs from/to interface places
-    trace(TRACE_1, "========== create transitions\n");
+    trace(TRACE_2, "        create transitions\n");
     
     for (set<string>::iterator t = transitions.begin(); t != transitions.end(); t++) {
         string remapped = remap(*t, edgeLabels);
-        //cout << "original remapped: \"" << remapped << "\"" << endl;
 
         if (remapped.substr(0, 5) != "FINAL") {
 
             // create transition if necessary
             Transition * transition = STGPN.findTransition("t" + remapped);
-            //cout << "\t" << remapped << endl;    
             if (transition == NULL) transition = STGPN.newTransition("t" + remapped);
 
             // create arcs t->p
@@ -146,7 +140,6 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
                 placeName = placeName.substr( 1 );                           // remove first ! or ?
                 placeName = placeName.substr( 0, placeName.find("/") );      // remove possible /
 
-                //cout << "placeName: \"" << placeName << "\" remapped: \"" << remapped << "\"" << endl;
                 Place * place = STGPN.findPlace(placeName);
 
                 if ( remapped[0] == '?' ) {
@@ -161,14 +154,13 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 
                 // remove first symbol (! or ?), placename (read above) and separators (", ") from remapped
                 remapped = (remapped.find(",") != remapped.npos) ? remapped.substr( remapped.find(",") + 2 ) : "";
-                //cout << "placeName: \"" << placeName << "\" remapped: \"" << remapped << "\"" << endl;
             } while ( remapped != "" );
         }
     }
 
 
     // create arcs p->t
-    trace(TRACE_1, "========== create arcs\n");
+    trace(TRACE_2, "        create arcs\n");
     
     // Create a map of string sets for final condition creation. 
     map<string, set<string> > finalCondMap; 
@@ -181,7 +173,6 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
                 STGPN.newArc(STGPN.findPlace(*p), STGPN.findTransition("t" + transitionName));
             } else {
                 // This place is the result of a final node
-                // cerr << "Found a final marking place " << *p << endl;
                 finalCondMap[transitionName].insert(*p);                                                                    
             }
         }
@@ -215,16 +206,13 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 }
 
 
-void STG2oWFN_main(vector<string> & edgeLabels, string PNFileName) {
-
-    cout << "creating the oWFN file out of " << PNFileName << endl;
+string STG2oWFN_main(vector<string> & edgeLabels, string PNFileName) {
 
     PetriNet STGPN = STG2oWFN_init( edgeLabels, PNFileName );
-    std::cerr << STGPN.information() << endl;
+    cout << "\n" << STGPN.information() << "\n" << endl;
 
     string netfile = PNFileName.substr(0, PNFileName.find(".owfn") );
     string filename = netfile + "-partner.owfn";
-    cerr << "writing partner oWFN to file `"<< filename << "'"<< endl;
     ofstream *file = new ofstream(filename.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
 
     STGPN.set_format(FORMAT_OWFN);
@@ -234,9 +222,8 @@ void STG2oWFN_main(vector<string> & edgeLabels, string PNFileName) {
     delete file;
 
     // generate the png file
-    //cerr << "=== generate png file" << endl;
-    filename = netfile + "-partner.dot";
-    file = new ofstream(filename.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
+    string dotFilename = netfile + "-partner.dot";
+    file = new ofstream(dotFilename.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
 
     STGPN.set_format(FORMAT_DOT);
     (*file) << STGPN;
@@ -245,6 +232,9 @@ void STG2oWFN_main(vector<string> & edgeLabels, string PNFileName) {
     delete file;
 
     // Make a systemcall to dot in order to create the png
-    string systemcall = "dot -q -Tpng -o\"" + netfile + "-partner.png\" "+ filename;
+    string systemcall = "dot -q -Tpng -o\"" + netfile + "-partner.png\" "+ dotFilename;
     system(systemcall.c_str());
+
+    return filename;
+
 }

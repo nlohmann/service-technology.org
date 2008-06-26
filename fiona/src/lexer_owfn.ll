@@ -88,6 +88,7 @@ OUTPUT                          { return KEY_OUTPUT; }
 TRANSITION                      { return KEY_TRANSITION; }
 INITIALMARKING                  { return KEY_MARKING; }
 FINALMARKING                    { return KEY_FINALMARKING; }
+NOFINALMARKING                  { return KEY_NOFINALMARKING; }
 FINALCONDITION                  { return KEY_FINALCONDITION; }
 CONSUME                         { return KEY_CONSUME; }
 PRODUCE                         { return KEY_PRODUCE; }

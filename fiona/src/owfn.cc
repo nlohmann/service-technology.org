@@ -111,7 +111,10 @@ oWFN::~oWFN() {
 
     delete[] CurrentMarking;
 
-    delete[] FinalMarking;
+    for (list<unsigned int*>::iterator finalMarking = FinalMarkingList.begin(); finalMarking != FinalMarkingList.end(); finalMarking++) {
+        
+        delete[] *finalMarking;
+    }
 
     delete FinalCondition;
 
@@ -2864,14 +2867,23 @@ bool oWFN::isFinal() const {
         trace(TRACE_5, "bool oWFN::isFinal() : end\n");
         return FinalCondition -> value;
     } else {
-        for (unsigned int i = 0; i < getPlaceCount(); i++) {
-            if (CurrentMarking[i] != FinalMarking[i]) {
+        for (list<unsigned int *>::const_iterator FinalMarking =
+                        FinalMarkingList.begin(); FinalMarking
+                        != FinalMarkingList.end(); FinalMarking++) {
+            bool finalMarkingFits = true;
+            for (unsigned int i = 0; i < getPlaceCount(); i++) {
+                if (CurrentMarking[i] != (*FinalMarking)[i]) {
+                    finalMarkingFits = false;
+                }
+            }
+            if (finalMarkingFits) {
+
                 trace(TRACE_5, "bool oWFN::isFinal() : end\n");
-                return false;
+                return true;
             }
         }
         trace(TRACE_5, "bool oWFN::isFinal() : end\n");
-        return true;
+        return false;
     }
 }
 
@@ -3640,8 +3652,6 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
 
     PNapi::PetriNet* PN = new PNapi::PetriNet();
 
-    std::set< pair< PNapi::Place *, unsigned int > > finalMarking;
-
     // translate all input places
     for (Places_t::const_iterator place = inputPlaces.begin(); place
             != inputPlaces.end(); place++) {
@@ -3649,11 +3659,6 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
         // Warning: tokens of a place in PNapi is private. The number of tokens is not translated correctly!
         if ((*place)->initial_marking >= 1) {
             p->mark((*place)->initial_marking);
-        }
-
-        if (FinalMarking[getPlaceIndex(*place)] >= 1) {
-            p->isFinal = true;
-            finalMarking.insert(pair<PNapi::Place *,unsigned int>(p, FinalMarking[getPlaceIndex(*place)]));
         }
     }
 
@@ -3665,11 +3670,6 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
         if ((*place)->initial_marking >= 1) {
             p->mark((*place)->initial_marking);
         }
-
-        if (FinalMarking[getPlaceIndex(*place)] >= 1) {
-            p->isFinal = true;
-            finalMarking.insert(pair<PNapi::Place *,unsigned int>(p, FinalMarking[getPlaceIndex(*place)]));
-        }
     }
 
     // translate all places which are neither input nor output places
@@ -3680,15 +3680,26 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
             if ((*place)->initial_marking >= 1) {
                 p->mark((*place)->initial_marking);
             }
-
-            if (FinalMarking[getPlaceIndex(*place)] >= 1) {
-                p->isFinal = true;
-                finalMarking.insert(pair<PNapi::Place *,unsigned int>(p, FinalMarking[getPlaceIndex(*place)]));
-            }
         }
     }
 
-    PN->final_set_list.push_back(finalMarking);
+    // translate list of final markings
+    for (list<unsigned int*>::iterator FinalMarking = FinalMarkingList.begin(); FinalMarking
+                    != FinalMarkingList.end(); FinalMarking++) {
+
+        std::set< pair< PNapi::Place *, unsigned int> > apiFinalMarking;
+
+        for (unsigned int i = 0; i < getPlaceCount(); i++) {
+
+            if ((*FinalMarking)[i] >= 1) {
+                PNapi::Place * p = PN->findPlace(getPlace(i)->name);
+                p->isFinal = true;
+                apiFinalMarking.insert(pair<PNapi::Place *, unsigned int>(p,
+                                (*FinalMarking)[i]));
+            }
+        }
+        PN->final_set_list.push_back(apiFinalMarking);
+    }
 
     // translate all transitions and generate all arcs
     for (Transitions_t::const_iterator transition = Transitions.begin(); transition

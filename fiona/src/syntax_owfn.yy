@@ -107,6 +107,7 @@ owfnTransition *T; /** The transition that is currently parsed. */
 Symbol * S;
 PlSymbol * PS;
 oWFN * PN;					// the petri net
+unsigned int * finalMarking;
 string current_port = ""; ///< the currently parsed port
 
 placeType type = INTERNAL;		/* type of place */
@@ -135,7 +136,7 @@ InTransitionParsePosition inTransitionParsePosition;
 
 %token KEY_SAFE KEY_INTERFACE KEY_PLACE KEY_INTERNAL KEY_INPUT KEY_OUTPUT
 %token KEY_SYNCHRONIZE KEY_SYNCHRONOUS
-%token KEY_MARKING KEY_FINALMARKING KEY_FINALCONDITION
+%token KEY_MARKING KEY_FINALMARKING KEY_NOFINALMARKING KEY_FINALCONDITION
 %token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE KEY_PORT KEY_PORTS
 %token KEY_ALL_OTHER_PLACES_EMPTY
 %token KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
@@ -143,7 +144,7 @@ InTransitionParsePosition inTransitionParsePosition;
 %token KEY_MAX_UNIQUE_EVENTS KEY_ON_LOOP KEY_MAX_OCCURRENCES
 %token KEY_TRUE KEY_FALSE LCONTROL RCONTROL
 %token COMMA COLON SEMICOLON IDENT NUMBER NEGATIVE_NUMBER
-%token LPAR RPAR
+%token LPAR RPAR LBRA RBRA
 
 %left OP_OR
 %left OP_AND
@@ -211,12 +212,6 @@ net:
 			}
 			
 			PN->CurrentMarking = new unsigned int [PlaceTable->getSize()];
-			PN->FinalMarking = new unsigned int [PlaceTable->getSize()];
-	
-		  	for (unsigned int i = 0; i < PlaceTable->getSize(); i++) {
-		  		PN->FinalMarking[i] = 0;
-		  	}
-		  
 			
 		}
 		
@@ -295,25 +290,62 @@ labellist:
 
 
 
-final: KEY_FINALMARKING
-    {
-        PN->finalMarkingString = "[";
-    }
-    finalmarkinglist
-    {
-        PN->finalMarkingString = PN->finalMarkingString + "]";
-    }
+final:
+    KEY_NOFINALMARKING
+|
+    KEY_FINALMARKING 
+    multiplefinalmarkinglists 
     SEMICOLON
-| KEY_FINALCONDITION statepredicate SEMICOLON {
+| 
+    KEY_FINALCONDITION statepredicate SEMICOLON 
+    {
 	PN->FinalCondition = $2;
 
 	// merge() and posate() can only be called on FinalCondition after the PN
 	// and the FinalCondition (in this order) have been initialized with the
 	// initial marking. This is done after parsing is complete.
-  }
-| KEY_FINALCONDITION SEMICOLON 
+    }
+| 
+    KEY_FINALCONDITION SEMICOLON 
     {
       PN->FinalCondition = NULL;
+    }
+;
+
+multiplefinalmarkinglists:
+    {
+        PN->finalMarkingString += "[";
+
+        finalMarking = new unsigned int [PlaceTable->getSize()];
+	
+        for (unsigned int i = 0; i < PlaceTable->getSize(); i++) {
+	
+            finalMarking[i] = 0;
+        }
+    }
+    finalmarkinglist 
+    {
+        PN->finalMarkingString += "]";
+
+        PN->FinalMarkingList.push_back(finalMarking);
+    }
+|
+    multiplefinalmarkinglists SEMICOLON     
+    {
+        PN->finalMarkingString += ", [";
+
+        finalMarking = new unsigned int [PlaceTable->getSize()];
+	
+        for (unsigned int i = 0; i < PlaceTable->getSize(); i++) {
+	
+            finalMarking[i] = 0;
+        }
+    }
+    finalmarkinglist
+    {
+        PN->finalMarkingString += "]";
+
+        PN->FinalMarkingList.push_back(finalMarking);
     }
 ;
 
@@ -528,17 +560,21 @@ finalmarking:
 		owfn_yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
-	PN->FinalMarking[PN->getPlaceIndex(PS->getPlace())] = i;
-	if (i < 5) {
-        for (unsigned int n = 0; n < i; n++) {
-            if (n != 0) {
-                PN->finalMarkingString = PN->finalMarkingString + ", ";
+	finalMarking[PN->getPlaceIndex(PS->getPlace())] = i;
+        if (i < 5) {
+            
+            for (unsigned int n = 0; n < i; n++) {
+                
+                if (n != 0) {
+                    
+                    PN->finalMarkingString = PN->finalMarkingString + ", ";
+                }
+                PN->finalMarkingString = PN->finalMarkingString + string($1);
             }
-            PN->finalMarkingString = PN->finalMarkingString + string($1);
+        } else {
+            
+            PN->finalMarkingString = PN->finalMarkingString + string($1) + ":" + string($3);
         }
-    } else {
-        PN->finalMarkingString = PN->finalMarkingString + string($1) + ":" + string($3);
-    }
 	
 	free($1);
 	free($3);
@@ -552,8 +588,8 @@ finalmarking:
 		owfn_yyerror(error.c_str());
 	}
 	sscanf("1","%u",&i);
-	PN->FinalMarking[PN->getPlaceIndex(PS->getPlace())] = i;
-    PN->finalMarkingString = PN->finalMarkingString + string($1);
+	finalMarking[PN->getPlaceIndex(PS->getPlace())] = i;
+        PN->finalMarkingString = PN->finalMarkingString + string($1);
 	free($1);
       }
 ;

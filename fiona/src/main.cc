@@ -203,7 +203,7 @@ void reportNet() {
     trace(TRACE_0, "    ports: " + intToString(PN->getPortCount()) + "\n\n");
     if (PN->FinalCondition) {
         trace(TRACE_0, "finalcondition used\n\n");
-    } else if (PN->FinalMarking) {
+    } else if (PN->FinalMarkingList.size() > 0) {
         trace(TRACE_0, "finalmarking used\n\n");
     } else {
         trace(TRACE_0, "neither finalcondition nor finalmarking given\n");

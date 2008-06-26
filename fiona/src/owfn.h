@@ -189,7 +189,7 @@ class oWFN {
         binDecision** binHashTable;
 
         unsigned int* CurrentMarking;
-        unsigned int* FinalMarking;
+        list<unsigned int*> FinalMarkingList;
         formula* FinalCondition;
         std::string finalConditionString;
         std::string finalMarkingString;

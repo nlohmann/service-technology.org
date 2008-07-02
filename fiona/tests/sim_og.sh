@@ -127,6 +127,72 @@ fi
 
 #############################################################################
 
+og1="$DIR/trafo_wsfm_M1.owfn"
+og2="$DIR/trafo_wsfm_M0.owfn"
+
+cmd="$FIONA ${og1} ${og2} -t simulation"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.3.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The first OG characterizes all strategies of the second one." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... OGs determined not equivalent, although they are.
+    fi
+fi
+
+#############################################################################
+
+og1="$DIR/trafo_wsfm_M2.owfn"
+og2="$DIR/trafo_wsfm_M0.owfn"
+
+cmd="$FIONA ${og1} ${og2} -t simulation"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.3.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The first OG characterizes all strategies of the second one." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... OGs determined not equivalent, although they are.
+    fi
+fi
+
+#############################################################################
+
+og1="$DIR/trafo_wsfm_M3.owfn"
+og2="$DIR/trafo_wsfm_M0.owfn"
+
+cmd="$FIONA ${og1} ${og2} -t simulation"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og1.3.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "The first OG characterizes all strategies of the second one." > /dev/null
+    resultSIM=$?
+    if [ $resultSIM -ne 0 ]; then
+        let "result += 1"
+        echo ... OGs determined not equivalent, although they are.
+    fi
+fi
+
+#############################################################################
+
 
 og1="$DIR/coarse.og"
 og2="$DIR/coarse-chopped.og"

@@ -1,3 +1,9 @@
+INTERFACE
+  INPUT
+;
+  OUTPUT
+;
+
 NODES
   0 : !b : blue,
   5 : final : blue;

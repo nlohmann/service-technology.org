@@ -229,11 +229,16 @@ class AnnotatedGraph : public Graph {
         /// be called after computeGraphStatistics().
         unsigned int getNumberOfBlueEdges() const;
 
-		/// recursive helper function to printGraphToSTG
-		void AnnotatedGraph::printGraphToSTGRecursively(AnnotatedGraphNode * v,
+		/// recursive helper function to printGraphToSTG()
+		void printGraphToSTGRecursively(AnnotatedGraphNode * v,
 									   ostringstream & os,
 									   std::map<AnnotatedGraphNode*, bool> & visitedNodes,
 									   std::vector<string> & edgeLabels);
+
+        /// recursive helper function to computeInterfaceFromGraph()
+        void computeInterfaceRecursively(AnnotatedGraphNode* v,
+                                         std::map<AnnotatedGraphNode*, bool>& visitedNodes);
+
 
     // Public methods
     public:
@@ -243,6 +248,13 @@ class AnnotatedGraph : public Graph {
 
         /// basic deconstructor
         virtual ~AnnotatedGraph();
+
+        /// stores interface information from associated oWFN(s)
+        set<string> inputPlacenames;
+        set<string> outputPlacenames;
+
+        /// computes above placenames from the graph
+        void computeInterfaceFromGraph();
 
         /// adds a node to the graph (directly to the node set)
         virtual void addNode(AnnotatedGraphNode* node);
@@ -296,14 +308,12 @@ class AnnotatedGraph : public Graph {
         /// removes all nodes that are always false
         virtual void removeReachableFalseNodesInit(AnnotatedGraphNode* currentNode, set<AnnotatedGraphNode*>& redNodes, map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >& parentNodes, set<AnnotatedGraphNode*>& visitedNodes);
         
-
         /// removes all nodes that have been disconnected from the root
         /// node due to other node removals
         void removeUnreachableNodes();
 
-
         /// deletes all visited nodes from the set of assumedly unreachable nodes
-          void removeUnreachableNodesRecursively(AnnotatedGraphNode* currentNode,
+        void removeUnreachableNodesRecursively(AnnotatedGraphNode* currentNode,
                                                 set<AnnotatedGraphNode*>& unreachableNodes);
 
         /// returns the name of the source file for the Graph

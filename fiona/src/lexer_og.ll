@@ -70,6 +70,10 @@ NODES         { return key_nodes;       }
 INITIALNODE   { return key_initialnode; }
 TRANSITIONS   { return key_transitions; }
 
+INTERFACE     { return key_interface;   }
+INPUT         { return key_input;       }
+OUTPUT        { return key_output;      }
+
  /* We want to match 'true' and 'false' case insensitively, but at least my
   * flex version did not accept the rule
   *     (?i:TRUE)  { return key_true; }

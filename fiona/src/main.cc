@@ -228,7 +228,7 @@ AnnotatedGraph* readog(const std::string& ogfile) {
         exit(4);
     }
     OGToParse = new AnnotatedGraph();
-    ogfileToParse = ogfile;
+    ogfileToParse = ogfile; // for debug - declaration in debug.cc
     og_yyparse();
     fclose(og_yyin);
 
@@ -532,6 +532,16 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
     cout << difftime(seconds2, seconds) << " s consumed for building graph" << endl;
 
 
+    // add interface information to graph: Input -> Output and vice versa
+    // input/outputPlacenames contain all possible labels for the IG
+    for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
+        graph->outputPlacenames.insert( (PN->getInputPlace(i))->name );
+    }
+    for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+        graph->inputPlacenames.insert( PN->getOutputPlace(i)->name );
+    }
+
+
     // print statistics
     trace(TRACE_0, "\nnet is controllable: ");
     if (graph->getRoot()->getColor() == BLUE) {
@@ -607,15 +617,12 @@ string computeIG(oWFN* PN) {
 string computeSmallPartner(AnnotatedGraph* IG) {
 
     trace(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : start\n");
-
     trace(TRACE_0, "\n\nComputing partner oWFN \n");
+
     // 1. step: was done before (computing the IG)
     // 2. step: if the net is controllable create STG file for petrify out of computed IG
-    
-
-    
     string stgFilename = "";
-    vector<string> edgeLabels;                        // renamend transitions 
+    vector<string> edgeLabels; // renamend transitions 
 
     if (!IG->hasNoRoot() && IG->getRoot()->getColor() == BLUE) {
     
@@ -629,7 +636,6 @@ string computeSmallPartner(AnnotatedGraph* IG) {
 
 
     // 3. step: invoke petrify on created STG file
-
     // prepare petrify command line and execute system command if possible
     string pnFilename = stgFilename.substr(0, stgFilename.size() - 4) + ".pn"; // change .stg to .pn
 
@@ -645,22 +651,11 @@ string computeSmallPartner(AnnotatedGraph* IG) {
 
 
     // 4. step: create oWFN out of the petrinet computed by petrify
-
-    // create oWFN out of petrify output
-        
     trace(TRACE_1, "    Converting petrify result to petri net.\n");
     string owfnFilename = STG2oWFN_main( edgeLabels, pnFilename );
 
-    // garbage collection
-    trace(TRACE_5, "computation finished -- trying to delete graph\n");
-    IG->clearNodeSet();
-    delete IG;
-
-    trace(TRACE_5, "graph deleted\n");
-
-    trace(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : end\n");
-    
     trace(TRACE_0, "Partner synthesis completed. Created file: " + owfnFilename + "\n");
+    trace(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : end\n");
 
     return owfnFilename; // return partner filename
 }
@@ -675,23 +670,30 @@ string computeSmallPartner(oWFN* givenPN) {
     string igFilename = "";
     interactionGraph* graph = computeIG(givenPN, igFilename);
 
+
     // 2.-4. step wil be done with former computed IG (ignoring partner filename)
     computeSmallPartner(graph);
 
+
+    // garbage collection
+    delete graph;
+
     return igFilename;
 }
+
+
 //! \brief creates a small partner out of a given IG
 //! \param IG a pointer to an IG of an oWFN whose small partner will be computed
 //! \return a string containing the filename of the partner owfn.
 string computeMostPermissivePartner(AnnotatedGraph* OG) {
 
     trace(TRACE_5, "string computeMostPermissivePartner(AnnotatedGraph*) : start\n");
-
     trace(TRACE_0, "\n\nComputing partner oWFN \n");
+
     // 1. step: was done before (computing the OG)
     // 2. step: if the net is controllable create STG file for petrify out of computed IG
     string stgFilename = "";
-    vector<string> edgeLabels;                        // renamend transitions 
+    vector<string> edgeLabels; // renamend transitions 
 
     if (!OG->hasNoRoot() && OG->getRoot()->getColor() == BLUE) {
         trace(TRACE_1, "    Creating STG File\n");
@@ -703,7 +705,6 @@ string computeMostPermissivePartner(AnnotatedGraph* OG) {
 
 
     // 3. step: invoke petrify on created STG file
-
     // prepare petrify command line and execute system command if possible
     string pnFilename = stgFilename.substr(0, stgFilename.size() - 4) + ".pn"; // change .stg to .pn
 
@@ -720,19 +721,13 @@ string computeMostPermissivePartner(AnnotatedGraph* OG) {
 
     // 4. step: create oWFN out of the petrinet computed by petrify
     trace(TRACE_1, "    Converting petrify result to petri net.\n");
-
-    // create oWFN out of petrify output
     string owfnFilename = STG2oWFN_main( edgeLabels, pnFilename );
 
-    // garbage collection will be done later.
-    
     trace(TRACE_0, "Partner synthesis completed. Created file: " + owfnFilename + "\n");
     trace(TRACE_5, "string computeMostPermissivePartner(AnnotatedGraph*) : end\n");
 
     return owfnFilename; // return partner filename
 }
-
-
 
 
 //! \brief create an OG of an oWFN
@@ -754,13 +749,24 @@ string computeOG(oWFN* PN) {
 
     seconds = time(NULL);
 
+    // build operating guideline
     trace(TRACE_1, "Building the graph...\n");
     buildGraphTime1 = time(NULL);
-    graph->buildGraph(); // build operating guideline
+    graph->buildGraph();
     buildGraphTime2 = time(NULL);
     trace(TRACE_1, "finished building the graph\n");
     trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n\n");
 
+    // add interface information to graph: Input -> Output and vice versa
+    // input/outputPlacenames contain all possible labels for the IG
+    for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
+        graph->outputPlacenames.insert( (PN->getInputPlace(i))->name );
+    }
+    for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+        graph->inputPlacenames.insert( PN->getOutputPlace(i)->name );
+    }
+
+    // print statistics
     trace(TRACE_1, "computing graph statistics...\n");
     graphStatsTime1 = time(NULL);
     graph->computeGraphStatistics();
@@ -867,7 +873,7 @@ string computeOG(oWFN* PN) {
         // the second parameter is true, since the oWFN this OG was generated
         // from still exists and additional information are available
         graph->printOGFile(ogFilename, true);
-        vector<string> edgeLabels;                        // renamend transitions
+        //vector<string> edgeLabels;                        // renamend transitions
         if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
             computeMostPermissivePartner(graph);
         }
@@ -1776,6 +1782,12 @@ int main(int argc, char** argv) {
                 // computes partner out of IG or a most permissive partner from
                 // an og. 
 
+                // it is possible that we read an old OG file where no interface information
+                // were stored, so we have to compute them from the graph
+                if (readOG->inputPlacenames.empty() && readOG->outputPlacenames.empty()) {
+                    readOG->computeInterfaceFromGraph();
+                }
+
                 if (parameters[P_IG]) {
                     computeSmallPartner(readOG);
                 } else if (parameters[P_OG]) {
@@ -2010,7 +2022,11 @@ int main(int argc, char** argv) {
 
                 if (parameters[P_OG] || parameters[P_PV]) {
                     reportOptionValues();        // adjust events_manual and print limit of considering events
-                    fileName = computeOG(PN);    // computing OG of the current oWFN
+                    //if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
+                    //    // TODO compute the most permissive partner
+                    //} else {
+                        fileName = computeOG(PN);    // computing OG of the current oWFN
+                    //}
                 }
 
                 if (parameters[P_MATCH]) {

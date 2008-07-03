@@ -68,6 +68,8 @@ AnnotatedGraph::~AnnotatedGraph() {
         delete setOfNodes[i];
     }
     setOfNodes.clear();
+    inputPlacenames.clear();
+    outputPlacenames.clear();
     trace(TRACE_5, "AnnotatedGraph::~AnnotatedGraph() : end\n");
 }
 
@@ -2119,6 +2121,64 @@ void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v, fstream& os,
 }
 
 
+//! \brief Computes input and output placenames from the graph.
+void AnnotatedGraph::computeInterfaceFromGraph() {
+
+    inputPlacenames.clear();
+    outputPlacenames.clear();
+
+    map<AnnotatedGraphNode*, bool> visitedNodes;    // visited nodes
+    AnnotatedGraphNode* rootNode = getRoot();       // root node
+
+    computeInterfaceRecursively(rootNode, visitedNodes);
+}
+
+
+//! \brief depth-first-search through the graph for computing input/output placenames
+//! \param v a pointer to a AnnotatedGraphNode which is the current node
+//! \param visitedNodes a reference to a map from AnnotatedGraphNode-Pointers
+//to boolean values which is used for marking all nodes that we have looked at so far
+void AnnotatedGraph::computeInterfaceRecursively(AnnotatedGraphNode* v,
+                                                std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
+
+    assert(v != NULL);
+    visitedNodes[v] = true; // mark current node as visited
+
+    //if ( !v->isToShow(root, (PN != NULL)) )
+    //    return;
+
+    // go through all arcs
+    AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = v->getLeavingEdgesConstIterator();
+    while (edgeIter->hasNext()) {
+        AnnotatedGraphEdge* element = edgeIter->getNext();
+        AnnotatedGraphNode* vNext = element->getDstNode();
+
+        //if ( !vNext->isToShow(root, (PN != NULL)) ) {
+        //    continue; // continue if node is not to show
+        //}
+
+
+        // build inputPlacenames and outputPlacenames
+		string currentLabel = element->getLabel();
+        string currentPlacename = currentLabel.substr(1);
+
+        if (currentLabel[0] == '?') {
+            inputPlacenames.insert(currentPlacename);
+        } else if (currentLabel[0] == '!') {
+            outputPlacenames.insert(currentPlacename);
+        } else {
+            cerr << "Error in computeInterfaceRecursively: Found unknown label." << endl;
+        }
+
+        // recursion
+        if ( vNext != v && visitedNodes.find(vNext) == visitedNodes.end() )
+        {
+            computeInterfaceRecursively(vNext, visitedNodes);
+        }
+    }
+}
+
+
 //! \brief Prints this OG in OG file format to a file with the given prefix. The
 //!        suffix is added automatically by this method.
 //! \param filenamePrefix a prefix for th filename
@@ -2126,6 +2186,9 @@ void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v, fstream& os,
 //!                that contains it's oWFN. Important to determine whether a true
 //!                annotated node is the empty node or not.
 void AnnotatedGraph::printOGFile(const std::string& filenamePrefix, bool hasOWFN) const {
+
+    trace(TRACE_5, "AnnotatedGraph::printOGFile(): start\n");
+
     fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(), ios_base::out | ios_base::trunc);
 
     if (hasNoRoot()) {
@@ -2138,6 +2201,26 @@ void AnnotatedGraph::printOGFile(const std::string& filenamePrefix, bool hasOWFN
         ogFile.close();
         return;
     }
+
+    ogFile << "INTERFACE" << endl;
+    ogFile << "  INPUT" << endl;
+    bool printedFirstPlace = false;
+    for (set<string>::const_iterator iter = inputPlacenames.begin(); iter != inputPlacenames.end(); iter++) {
+        if (printedFirstPlace) ogFile << "," << endl;
+        ogFile << "    " << *iter;
+        printedFirstPlace = true;
+    }
+    ogFile << ";" << endl;
+
+    ogFile << "  OUTPUT" << endl;
+    printedFirstPlace = false;
+    for (set<string>::const_iterator iter = outputPlacenames.begin(); iter != outputPlacenames.end(); iter++) {
+        if (printedFirstPlace) ogFile << "," << endl;
+        ogFile << "    " << *iter;
+        printedFirstPlace = true;
+    }
+    ogFile << ";" << endl << endl;
+
 
     ogFile << "NODES" << endl;
     bool printedFirstNode = false;
@@ -2200,6 +2283,8 @@ void AnnotatedGraph::printOGFile(const std::string& filenamePrefix, bool hasOWFN
     ogFile << ';' << endl;
 
     ogFile.close();
+
+    trace(TRACE_5, "AnnotatedGraph::printOGFile(): end\n");
 }
 
 
@@ -3103,6 +3188,7 @@ unsigned int AnnotatedGraph::getNumberOfNodes() const {
 
 
 //! \brief creates a STG file of the graph 
+//! \param edgeLabels TODO
 //! \return the filename of the created STG file
 string AnnotatedGraph::printGraphToSTG(vector<string>& edgeLabels) {
     trace(TRACE_5, "void AnnotatedGraph::printGraphToSTG() : start\n");

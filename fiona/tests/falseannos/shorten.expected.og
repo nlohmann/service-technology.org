@@ -1,3 +1,9 @@
+INTERFACE
+  INPUT
+;
+  OUTPUT
+;
+
 NODES
   0 : !e : blue,
   1 : !a : blue,

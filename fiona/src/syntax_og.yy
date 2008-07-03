@@ -52,6 +52,7 @@ extern char* og_yytext;
 extern int og_yylex();
 
 #include <map>
+#include <set>
 
 #include "mynew.h"
 #include "debug.h"
@@ -63,6 +64,7 @@ using namespace std;
 
 AnnotatedGraph* OGToParse;
 map<string, AnnotatedGraphNode*> nodes;
+bool readInputPlacenames = true;
 
 void og_yyerror_unknown_node(const std::string& nodeName)
 {
@@ -87,6 +89,7 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
 // the terminal symbols (tokens)
 
 %token key_nodes key_initialnode key_transitions
+%token key_interface key_input key_output
 %token key_red key_blue
 %token comma colon semicolon ident arrow
 %token key_true key_false key_finalnode
@@ -118,10 +121,33 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
 
 /* Grammar rules */
 
-og: nodes initialnode transitions
+og: interface nodes initialnode transitions
     {
         nodes.clear();
     }
+;
+
+interface: key_interface key_input places_list semicolon
+    {
+        readInputPlacenames = false;
+    }
+    key_output places_list semicolon
+| /* empty - old og format hold no separate interface information */
+;
+
+places_list: places_list comma place
+| place
+| /* empty */
+;
+
+place: ident
+     {
+        if (readInputPlacenames) {
+            OGToParse->inputPlacenames.insert($1);
+        } else {
+            OGToParse->outputPlacenames.insert($1);
+        }
+     }
 ;
 
 nodes: key_nodes nodes_list semicolon

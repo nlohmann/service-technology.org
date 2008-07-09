@@ -106,7 +106,7 @@ extern std::list<std::string> netfiles;
 extern std::list<std::string> ogfiles;
 extern AnnotatedGraph* OGToParse;
 
-extern string STG2oWFN_main(vector<string> &, string);
+extern string STG2oWFN_main(vector<string> &, string, set<string>&, set<string>&);
 
 // will be filled during parsing
 extern GasTexGraph* gastexGraph;
@@ -625,9 +625,7 @@ string computeSmallPartner(AnnotatedGraph* IG) {
     vector<string> edgeLabels; // renamend transitions 
 
     if (!IG->hasNoRoot() && IG->getRoot()->getColor() == BLUE) {
-    
         trace(TRACE_1, "    Creating STG File\n");
-        
         stgFilename = IG->printGraphToSTG(edgeLabels);
     } else {
         trace(TRACE_0, "\n    Cannot synthesize a partner for a net, that is not controllable\n\n");
@@ -651,8 +649,11 @@ string computeSmallPartner(AnnotatedGraph* IG) {
 
 
     // 4. step: create oWFN out of the petrinet computed by petrify
+    // 5. step: complete interface with the interface information stored in the
+    // IG (done in STG2oWFN_main
     trace(TRACE_1, "    Converting petrify result to petri net.\n");
-    string owfnFilename = STG2oWFN_main( edgeLabels, pnFilename );
+    string owfnFilename = STG2oWFN_main( edgeLabels, pnFilename, IG->inputPlacenames, IG->outputPlacenames );
+
 
     trace(TRACE_0, "Partner synthesis completed. Created file: " + owfnFilename + "\n");
     trace(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : end\n");
@@ -721,7 +722,7 @@ string computeMostPermissivePartner(AnnotatedGraph* OG) {
 
     // 4. step: create oWFN out of the petrinet computed by petrify
     trace(TRACE_1, "    Converting petrify result to petri net.\n");
-    string owfnFilename = STG2oWFN_main( edgeLabels, pnFilename );
+    string owfnFilename = STG2oWFN_main( edgeLabels, pnFilename, OG->inputPlacenames, OG->outputPlacenames );
 
     trace(TRACE_0, "Partner synthesis completed. Created file: " + owfnFilename + "\n");
     trace(TRACE_5, "string computeMostPermissivePartner(AnnotatedGraph*) : end\n");

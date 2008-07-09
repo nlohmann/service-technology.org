@@ -157,6 +157,12 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              samples/myCoffee.owfn.png \
              partner/sequence3.owfn \
              partner/sequence3-partner.expected.owfn \
+             partner/coffee.owfn \
+             partner/coffee-partner.expected.owfn \
+             partner/coffee2.owfn \
+             partner/coffee2-partner.expected.owfn \
+             partner/coffee_extended.owfn \
+             partner/coffee_extended-partner.expected.owfn \
              minimize/nostrat.og \
              minimize/final_non-final.og \
              minimize/non-final_final.og \

@@ -206,9 +206,23 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 }
 
 
-string STG2oWFN_main(vector<string> & edgeLabels, string PNFileName) {
+string STG2oWFN_main(vector<string>& edgeLabels,
+                     string PNFileName,
+                     set<string>& inputPlacenames,
+                     set<string>& outputPlacenames) {
 
     PetriNet STGPN = STG2oWFN_init( edgeLabels, PNFileName );
+
+    // complete interface with interface information from IG/OG
+    for (set<string>::const_iterator iter = inputPlacenames.begin(); iter != inputPlacenames.end(); iter++) {
+        Place *inPlace = STGPN.findPlace(*iter);
+        if (inPlace == NULL) STGPN.newPlace(*iter, IN);
+    }
+    for (set<string>::const_iterator iter = outputPlacenames.begin(); iter != outputPlacenames.end(); iter++) {
+        Place *outPlace = STGPN.findPlace(*iter);
+        if (outPlace == NULL) STGPN.newPlace(*iter, OUT);
+    }
+
     cout << "\n" << STGPN.information() << "\n" << endl;
 
     string netfile = PNFileName.substr(0, PNFileName.find(".owfn") );

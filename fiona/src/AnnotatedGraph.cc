@@ -3188,7 +3188,8 @@ unsigned int AnnotatedGraph::getNumberOfNodes() const {
 
 
 //! \brief creates a STG file of the graph 
-//! \param edgeLabels TODO
+//! \param edgeLabels a reference to a vector of strings containing the old
+//         label names from this graph
 //! \return the filename of the created STG file
 string AnnotatedGraph::printGraphToSTG(vector<string>& edgeLabels) {
     trace(TRACE_5, "void AnnotatedGraph::printGraphToSTG() : start\n");
@@ -3218,10 +3219,9 @@ string AnnotatedGraph::printGraphToSTG(vector<string>& edgeLabels) {
     }
 
     // create and fill stringstream for buffering graph information
-    map<AnnotatedGraphNode*, bool> visitedNodes;    // visited nodes
-    AnnotatedGraphNode* rootNode = getRoot();            // root node
-    //GraphNode* rootNode = root;            // root node
-    ostringstream STGStringStream;                    // used as buffer for graph information
+    map<AnnotatedGraphNode*, bool> visitedNodes; // visited nodes
+    AnnotatedGraphNode* rootNode = getRoot();    // root node
+    ostringstream STGStringStream;               // used as buffer for graph information
 
     STGStringStream << ".state graph" << "\n";
     printGraphToSTGRecursively(rootNode, STGStringStream, visitedNodes, edgeLabels);
@@ -3262,12 +3262,14 @@ void AnnotatedGraph::printGraphToSTGRecursively(AnnotatedGraphNode * v,
     if ( !v->isToShow(root, (PN != NULL)) )
         return;
 
+    // TODO: possibly buggy because for every final node is "FINAL" added?
     if (v->isFinal()) {
         // each label is mapped to his position in edgeLabes
         string currentLabel = "FINAL";
         currentLabel += intToString(v->getNumber());
         int foundPosition = (int)edgeLabels.size();
         edgeLabels.push_back( currentLabel );
+        // cout << "added FINAL to edgeLabels in printGraphToSTG" << endl;
         os << "p" << v->getNumber() << " t" << foundPosition << " p00" << endl;
     }
 

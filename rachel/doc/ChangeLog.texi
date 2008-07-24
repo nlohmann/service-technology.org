@@ -1,0 +1,319 @@
+@item Version 1.06
+
+added a Makefile target @samp{make bindist} to create a zipped archive with a binary and a documentation
+
+added an undocumented command line option @samp{--bug} to display debugging information that is meant to be emailed to the bugreport address in case a bug is found; looks like:
+
+@cartouche
+@smallexample
+Please email the following information to @email{rachel@@service-technology.org}:
+- tool:              Rachel
+- version:           1.06
+- compilation date:  Jul 16 2008
+- compiler version:  4.0.1 (Apple Inc. build 5484)
+- platform:          i386-apple-darwin9.4.0
+@end smallexample
+@end cartouche
+
+@item Version 1.05
+
+fixed a memory leak in the OG lexer
+
+fixed a memory leak in the command line parser
+
+
+@item Version 1.04
+
+added the experiments (file @file{exp/bpm2008.tgz}) from the paper
+
+@quotation
+Niels Lohmann. @b{Correcting Deadlocking Service Choreographies Using a Simulation-Based Graph Edit Distance}. In Marlon Dumas and Manfred Reichert, editors, @i{Business Process Management, 6th International Conference, BPM 2008, Milan, Italy, September 1--4, 2008, Proceedings}, Lecture Notes in Computer Science, September 2008. Springer-Verlag.
+@end quotation
+
+experiments can be invoked using @samp{make experiments}
+
+added PDF document (file @file{doc/background.pdf}) containing the paper
+
+@quotation
+Niels Lohmann. @b{Fixing Deadlocking Service Choreographies Using a Simulation-based Graph Edit Distance}. In Monika Solanki, Barry Norton, and Stephan Reiff-Marganiec, editors, @i{3rd Young Researchers Workshop on Service Oriented Computing, YR-SOC 2008, London, UK, 12--13 June 2008, Proceedings}, pages 13--20, June 2008.
+@end quotation
+
+overworked the documentation
+
+
+@item Version 1.03
+
+some adjustments to improve the compatibility between AspectC++ (@url{http://www.aspectc.org}) and Cygwin
+
+
+@item Version 1.02
+
+added more files to the deletion list of Makefile target @code{cvs-clean}
+
+acknowledged @url{service-technology.org} where possible (e.g., in the bug address @email{rachel@@service-technology.org})
+
+adjusted the parser to cope with Fiona's new OG file format; Rachel's parser stays backward compatible
+
+the parser now aborts the program in case of an error to avoid subsequent crashes caused by parse errors
+
+the lexer was overworked to be backward compatible with older Flex versions
+
+
+@item Version 1.01
+
+adding copyright notices to comply to the @acronym{GNU} @acronym{GPL}
+
+added comments
+
+overworked documentation
+
+
+@item Version 1.00
+
+Tool is now called Rachel = ``@b{R}epairing @b{A}utomata for @b{Ch}oreographies by @b{E}diting @b{L}abels''
+
+adjusted the parameters: changing is now preferred over deletion and insertion
+
+the service counting function @code{Graph::countServices} now uses @code{long double} to count up to @math{10^{4932}}
+
+added a function to calculate the average size of satisfying assignments of the OG's nodes (called with @option{verbose} parameter)
+
+added a preprocessing function to calculate values for node deletion in advance
+
+
+@item Version 0.20
+
+the check for acyclicity is done right after parsing and not during matching or simulation calculation
+
+added a function to re-enumerate the graphs' nodes to allow the usage of C-style arrays
+
+finally, using C-style multidimensional arrays to cache simulation values in @code{Simulation} and @code{Matching} classes
+
+re-organized @code{Simulation} and @code{Matching} classes: both now inherit from a new class @code{EditDistance} to avoid replication of code
+
+
+@item Version 0.19
+
+the aspected sources are automatically patched such that @code{size_t} is used instead of @code{unsigned long} in the generated @code{new}-operator
+
+@command{lp_solve} is currently not integrated for unsolved compatibility problems --- an archive @file{lp-solve.tar.gz} is still in the @file{src} folder
+
+documented usage of configuration files and added a sample configuration file
+
+@code{matching} is now the standard for the @option{--mode} parameter
+
+added a preprocessing function to calculate values for node insertion in advance
+
+added a function to count the deterministic acyclic services characterized by the OG (called with @option{verbose} parameter)
+
+the ChangeLog is automatically generated from the Texinfo sources
+
+
+@item Version 0.18
+
+overworked Makefiles
+
+manpage now shows result for @option{--detailed-help}
+
+added a @option{--debug} mode to trace all function calls of classes Matching and Simulation
+
+added a @option{--verbose} mode to display intermediate progress output
+
+using AspectC++ (@url{http://www.aspectc.org}) to add aspects like the trace calls
+
+added a great optimization in function @code{Matching::permuteEdges} by avoiding subsequent deletion and insertion of the same edge
+
+the ChangeLog is automatically integrated into documentation using a sed script
+
+
+
+@item Version 0.17
+
+overworked documentation
+
+caches are cleared after simulation/matching has been calculated
+
+more comments
+
+
+
+@item Version 0.16
+
+cleaned and commented code
+
+tidied Makefiles
+
+added a testscript for linear programming translatation
+
+commented linear programming translation
+
+linear programming translation is by @command{lp_solve} library
+
+dramatically improved performance of @code{Matching::perms()} function
+
+
+
+@item Version 0.15
+
+added a linear programming calculation for simulation (@option{--mode=lpsim})
+
+the translation to linear programming bases on the algorithm presented in the paper "Simulation-based graph similarity" by Oleg Sokolsky et al. (TACAS 2006)
+
+added @command{lp_solve} (@url{http://lpsolve.sourceforge.net/5.5}) to the distributed and linked it as static library (see @file{src/lp_solve/README.txt} for more information)
+
+the @samp{--mode} parameter is now passed as enumeration from getopt
+
+
+
+@item Version 0.14
+
+added testscripts for @command{make check}
+
+cache for simulation is again handled by an STL map
+
+
+
+@item Version 0.13
+
+Tool is now called ``WS-Fix''
+
+first release at @url{http://www.informatik.uni-rostock.de/~nl/tools}
+
+added cycle detection
+
+
+
+@item Version 0.12
+
+Dot and @acronym{PNG,Portable Network Graphics} file is created when @option{--dot} parameter is used
+
+extension and path is cropped from filenames to avoid errors from Dot
+
+reorganized files: helper functions moved to @file{helper.cc/h}
+
+fixed header inclusion to allow compilation on Unix machines
+
+added a Texinfo documentation
+
+using C-style multidimensional arrays to cache simulation values
+
+some statistical output in the main function
+
+the cost functions are declared as inline functions
+
+
+
+@item Version 0.11
+
+removed Gnulib again and replaced it by @file{getopt1.c}, @file{getopt.c}, and @file{getopt.h}
+
+usage line is now generated by @acronym{GNU} Gengetopt
+
+a manpage is created using @command{help2man}
+
+values of the algorithm can be configured using the command line or a configuration file
+
+
+
+@item Version 0.10
+
+@acronym{GNU} Gengetopt is not needed to configure/make
+
+Automake's missing script is found
+
+included headers for @code{assert} macro
+
+tidied configure script
+
+using Gnulib -- The @acronym{GNU} Portability Library (@url{http://www.gnu.org/software/gnulib}) to provide @file{getopt.h}
+
+
+
+@item Version 0.9
+
+using @acronym{GNU} Gengetopt (@url{http://www.gnu.org/software/gengetopt}) to parse command line parameters
+
+added parameter @option{-h} for help
+
+added parameter @option{-V} for version information
+
+added parameter @option{-a} for automaton file
+
+added parameter @option{-o} for OG file
+
+added parameter @option{-m} to select mode (standard: @code{simulation})
+
+
+
+@item Version 0.8
+
+the edit actions are annotated to a graph and can be dotted
+
+
+
+@item Version 0.7
+
+new nodes are rather added than inserted
+
+nodes are only insered once
+
+nodes are rather deleted than merged
+
+newly added nodes are not considered in function @code{successor()} or @code{outEdges()}
+
+newly added nodes are dotted as dashed nodes
+
+
+
+@item Version 0.6
+
+implemented @code{isFinal()} check to test whether final satisfies a formula of the OG
+
+the root node is now read from file instead of being assumed to be @code{1}
+
+nodes are explicitly stored to allow future operations such as adding nodes
+
+
+
+@item Version 0.5
+
+matching now returns the action edit actions and outputs them
+
+added Doxygen configuration file
+
+reorgaized headers again (added headers for simulation)
+
+
+
+@item Version 0.4
+
+parsed annotations are now used for simulation and matching
+
+reorganized headers (split omnipresent @file{main.h})
+
+
+
+@item Version 0.3
+
+annotations are parsed, but not used for calculation
+
+Dot output for graphs implemented
+
+
+
+@item Version 0.2
+
+added parser for OG files (taken and adapted from Fiona (@url{http://www.informatik.hu-berlin.de/top/tools4bpel/fiona}))
+
+currently ignores the annotations, but already works for service automata (simulation checking)
+
+
+
+@item Version 0.1
+
+simulation implemented
+
+matching rudimentarily implemented
+
+using @acronym{GNU} autotools
+

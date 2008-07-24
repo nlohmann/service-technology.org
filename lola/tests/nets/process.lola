@@ -1,0 +1,95 @@
+{ Petri net created by UML2OWFN 1.02 reading a3.xml.s00000121##s00002887 }
+
+PLACE
+  decision.s00002888.output.s00000631,
+  decision.s00002888.output.s00000632,
+  process.inputCriterion.s00000775.used,
+  process.outputCriterion.s00000776.fire_omega,
+  callToProcess.s00000825.output.s00000829,
+  decision.s00002888.output.s00000627,
+  alpha,
+  decision.s00002889.output.s00000637,
+  decision.s00002889.output.s00000628,
+  process.input.s00001663,
+  callToProcess.s00000825.output.s00000628
+;
+
+
+MARKING
+  alpha:	1
+;
+
+
+TRANSITION process.outputCriterion.s00000776.fire
+CONSUME
+  decision.s00002888.output.s00000631:	1,
+  process.inputCriterion.s00000775.used:	1,
+  callToProcess.s00000825.output.s00000829:	1,
+  decision.s00002889.output.s00000637:	1;
+PRODUCE
+  process.outputCriterion.s00000776.fire_omega:	1;
+
+TRANSITION decision.s00002888.fire.s00000626
+CONSUME
+  process.input.s00001663:	1;
+PRODUCE
+  decision.s00002888.output.s00000627:	1;
+
+TRANSITION process.inputCriterion.s00000775.fire
+CONSUME
+  alpha:	1;
+PRODUCE
+  process.inputCriterion.s00000775.used:	1,
+  process.input.s00001663:	1;
+
+TRANSITION decision.s00002888.fire.s00000630
+CONSUME
+  process.input.s00001663:	1;
+PRODUCE
+  decision.s00002888.output.s00000631:	1,
+  decision.s00002888.output.s00000632:	1;
+
+TRANSITION decision.s00002889.fire.s00000630
+CONSUME
+  decision.s00002888.output.s00000627:	1;
+PRODUCE
+  decision.s00002888.output.s00000631:	1,
+  decision.s00002889.output.s00000637:	1,
+  decision.s00002889.output.s00000628:	1;
+
+TRANSITION process.endNode.s00000767.clean.1
+CONSUME
+  process.outputCriterion.s00000776.fire_omega:	1,
+  callToProcess.s00000825.output.s00000628:	1;
+PRODUCE
+  process.outputCriterion.s00000776.fire_omega:	1;
+
+TRANSITION process.endNode.s00000621.clean.1
+CONSUME
+  decision.s00002888.output.s00000632:	1,
+  process.outputCriterion.s00000776.fire_omega:	1;
+PRODUCE
+  process.outputCriterion.s00000776.fire_omega:	1;
+
+TRANSITION process.outputCriterion.s00000776.fire_omega_omega.loop
+CONSUME
+  process.outputCriterion.s00000776.fire_omega:	1;
+PRODUCE
+  process.outputCriterion.s00000776.fire_omega:	1;
+
+TRANSITION decision.s00002889.fire.s00000626
+CONSUME
+  decision.s00002888.output.s00000627:	1;
+PRODUCE
+  decision.s00002888.output.s00000631:	1,
+  callToProcess.s00000825.output.s00000829:	1,
+  callToProcess.s00000825.output.s00000628:	1;
+
+TRANSITION process.endNode.s00000768.clean.1
+CONSUME
+  process.outputCriterion.s00000776.fire_omega:	1,
+  decision.s00002889.output.s00000628:	1;
+PRODUCE
+  process.outputCriterion.s00000776.fire_omega:	1;
+
+{ END OF FILE }

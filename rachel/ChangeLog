@@ -1,0 +1,297 @@
+Version 1.06
+     added a Makefile target `make bindist' to create a zipped archive
+     with a binary and a documentation
+
+     added an undocumented command line option `--bug' to display
+     debugging information that is meant to be emailed to the bugreport
+     address in case a bug is found; looks like:
+
+          Please email the following information to <rachel@service-technology.org>:
+          - tool:              Rachel
+          - version:           1.06
+          - compilation date:  Jul 16 2008
+          - compiler version:  4.0.1 (Apple Inc. build 5484)
+          - platform:          i386-apple-darwin9.4.0
+
+Version 1.05
+     fixed a memory leak in the OG lexer
+
+     fixed a memory leak in the command line parser
+
+Version 1.04
+     added the experiments (file `exp/bpm2008.tgz') from the paper
+
+          Niels Lohmann. Correcting Deadlocking Service Choreographies
+          Using a Simulation-Based Graph Edit Distance. In Marlon Dumas
+          and Manfred Reichert, editors, Business Process Management,
+          6th International Conference, BPM 2008, Milan, Italy,
+          September 1-4, 2008, Proceedings, Lecture Notes in Computer
+          Science, September 2008. Springer-Verlag.
+
+     experiments can be invoked using `make experiments'
+
+     added PDF document (file `doc/background.pdf') containing the paper
+
+          Niels Lohmann. Fixing Deadlocking Service Choreographies
+          Using a Simulation-based Graph Edit Distance. In Monika
+          Solanki, Barry Norton, and Stephan Reiff-Marganiec, editors,
+          3rd Young Researchers Workshop on Service Oriented Computing,
+          YR-SOC 2008, London, UK, 12-13 June 2008, Proceedings, pages
+          13-20, June 2008.
+
+     overworked the documentation
+
+Version 1.03
+     some adjustments to improve the compatibility between AspectC++
+     (`http://www.aspectc.org') and Cygwin
+
+Version 1.02
+     added more files to the deletion list of Makefile target
+     `cvs-clean'
+
+     acknowledged `service-technology.org' where possible (e.g., in the
+     bug address <rachel@service-technology.org>)
+
+     adjusted the parser to cope with Fiona's new OG file format;
+     Rachel's parser stays backward compatible
+
+     the parser now aborts the program in case of an error to avoid
+     subsequent crashes caused by parse errors
+
+     the lexer was overworked to be backward compatible with older Flex
+     versions
+
+Version 1.01
+     adding copyright notices to comply to the GNU GPL
+
+     added comments
+
+     overworked documentation
+
+Version 1.00
+     Tool is now called Rachel = "Repairing Automata for Choreographies
+     by Editing Labels"
+
+     adjusted the parameters: changing is now preferred over deletion
+     and insertion
+
+     the service counting function `Graph::countServices' now uses
+     `long double' to count up to 10^4932
+
+     added a function to calculate the average size of satisfying
+     assignments of the OG's nodes (called with `verbose' parameter)
+
+     added a preprocessing function to calculate values for node
+     deletion in advance
+
+Version 0.20
+     the check for acyclicity is done right after parsing and not
+     during matching or simulation calculation
+
+     added a function to re-enumerate the graphs' nodes to allow the
+     usage of C-style arrays
+
+     finally, using C-style multidimensional arrays to cache simulation
+     values in `Simulation' and `Matching' classes
+
+     re-organized `Simulation' and `Matching' classes: both now inherit
+     from a new class `EditDistance' to avoid replication of code
+
+Version 0.19
+     the aspected sources are automatically patched such that `size_t'
+     is used instead of `unsigned long' in the generated `new'-operator
+
+     `lp_solve' is currently not integrated for unsolved compatibility
+     problems -- an archive `lp-solve.tar.gz' is still in the `src'
+     folder
+
+     documented usage of configuration files and added a sample
+     configuration file
+
+     `matching' is now the standard for the `--mode' parameter
+
+     added a preprocessing function to calculate values for node
+     insertion in advance
+
+     added a function to count the deterministic acyclic services
+     characterized by the OG (called with `verbose' parameter)
+
+     the ChangeLog is automatically generated from the Texinfo sources
+
+Version 0.18
+     overworked Makefiles
+
+     manpage now shows result for `--detailed-help'
+
+     added a `--debug' mode to trace all function calls of classes
+     Matching and Simulation
+
+     added a `--verbose' mode to display intermediate progress output
+
+     using AspectC++ (`http://www.aspectc.org') to add aspects like the
+     trace calls
+
+     added a great optimization in function `Matching::permuteEdges' by
+     avoiding subsequent deletion and insertion of the same edge
+
+     the ChangeLog is automatically integrated into documentation using
+     a sed script
+
+Version 0.17
+     overworked documentation
+
+     caches are cleared after simulation/matching has been calculated
+
+     more comments
+
+Version 0.16
+     cleaned and commented code
+
+     tidied Makefiles
+
+     added a testscript for linear programming translatation
+
+     commented linear programming translation
+
+     linear programming translation is by `lp_solve' library
+
+     dramatically improved performance of `Matching::perms()' function
+
+Version 0.15
+     added a linear programming calculation for simulation
+     (`--mode=lpsim')
+
+     the translation to linear programming bases on the algorithm
+     presented in the paper "Simulation-based graph similarity" by Oleg
+     Sokolsky et al. (TACAS 2006)
+
+     added `lp_solve' (`http://lpsolve.sourceforge.net/5.5') to the
+     distributed and linked it as static library (see
+     `src/lp_solve/README.txt' for more information)
+
+     the `--mode' parameter is now passed as enumeration from getopt
+
+Version 0.14
+     added testscripts for `make check'
+
+     cache for simulation is again handled by an STL map
+
+Version 0.13
+     Tool is now called "WS-Fix"
+
+     first release at `http://www.informatik.uni-rostock.de/~nl/tools'
+
+     added cycle detection
+
+Version 0.12
+     Dot and PNG (Portable Network Graphics) file is created when
+     `--dot' parameter is used
+
+     extension and path is cropped from filenames to avoid errors from
+     Dot
+
+     reorganized files: helper functions moved to `helper.cc/h'
+
+     fixed header inclusion to allow compilation on Unix machines
+
+     added a Texinfo documentation
+
+     using C-style multidimensional arrays to cache simulation values
+
+     some statistical output in the main function
+
+     the cost functions are declared as inline functions
+
+Version 0.11
+     removed Gnulib again and replaced it by `getopt1.c', `getopt.c',
+     and `getopt.h'
+
+     usage line is now generated by GNU Gengetopt
+
+     a manpage is created using `help2man'
+
+     values of the algorithm can be configured using the command line
+     or a configuration file
+
+Version 0.10
+     GNU Gengetopt is not needed to configure/make
+
+     Automake's missing script is found
+
+     included headers for `assert' macro
+
+     tidied configure script
+
+     using Gnulib - The GNU Portability Library
+     (`http://www.gnu.org/software/gnulib') to provide `getopt.h'
+
+Version 0.9
+     using GNU Gengetopt (`http://www.gnu.org/software/gengetopt') to
+     parse command line parameters
+
+     added parameter `-h' for help
+
+     added parameter `-V' for version information
+
+     added parameter `-a' for automaton file
+
+     added parameter `-o' for OG file
+
+     added parameter `-m' to select mode (standard: `simulation')
+
+Version 0.8
+     the edit actions are annotated to a graph and can be dotted
+
+Version 0.7
+     new nodes are rather added than inserted
+
+     nodes are only insered once
+
+     nodes are rather deleted than merged
+
+     newly added nodes are not considered in function `successor()' or
+     `outEdges()'
+
+     newly added nodes are dotted as dashed nodes
+
+Version 0.6
+     implemented `isFinal()' check to test whether final satisfies a
+     formula of the OG
+
+     the root node is now read from file instead of being assumed to be
+     `1'
+
+     nodes are explicitly stored to allow future operations such as
+     adding nodes
+
+Version 0.5
+     matching now returns the action edit actions and outputs them
+
+     added Doxygen configuration file
+
+     reorgaized headers again (added headers for simulation)
+
+Version 0.4
+     parsed annotations are now used for simulation and matching
+
+     reorganized headers (split omnipresent `main.h')
+
+Version 0.3
+     annotations are parsed, but not used for calculation
+
+     Dot output for graphs implemented
+
+Version 0.2
+     added parser for OG files (taken and adapted from Fiona
+     (`http://www.informatik.hu-berlin.de/top/tools4bpel/fiona'))
+
+     currently ignores the annotations, but already works for service
+     automata (simulation checking)
+
+Version 0.1
+     simulation implemented
+
+     matching rudimentarily implemented
+
+     using GNU autotools
+

@@ -1,0 +1,114 @@
+\input texinfo
+@setfilename simmatch.info
+@include version.texi
+@afourpaper
+@finalout
+@settitle Match User's Manual
+
+@c ----------------------------------------------------------------------------
+
+@copying
+
+@b{About this document:}
+
+This manual is for oWFN2BPEL, version @value{VERSION}, a tool that translates a Petri net model into an abstract BPEL process, last updated @value{UPDATED}.
+
+Copyright @copyright{} 2008 Niels Lohmann
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.2 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify this GNU Manual. Buying copies from GNU Press supports the FSF in developing GNU and promoting software freedom.''
+@end quotation
+@end copying
+
+@dircategory Service Analysis Tools
+@direntry
+* owfn2bpel: (owfn2bpel).       oWFN2BPEL.
+@end direntry
+
+
+@c ----------------------------------------------------------------------------
+
+@titlepage
+
+@title oWFN2BPEL
+
+@subtitle translates a Petri net model into an abstract BPEL process
+@subtitle Version @value{VERSION}, @value{UPDATED}
+
+@author Niels Lohmann
+
+@page
+
+
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c ----------------------------------------------------------------------------
+
+@ifnottex
+@node Top
+@top WS-Fix
+@insertcopying
+@end ifnottex
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Options::Invoking oWFN2BPEL.
+* GNU Free Documentation License::The license of this manual.
+@end menu
+
+@c ----------------------------------------------------------------------------
+
+@contents
+@paragraphindent none
+
+@c ----------------------------------------------------------------------------
+
+
+@node Options
+@chapter Invoking oWFN2BPEL
+
+@section Command line options
+
+@cartouche
+@smallexample
+Usage: owfn2bpel -iFILE|--input=FILE [-h|--help] [--full-help] [-V|--version] 
+         [-oFILE|--output=FILE] [-r|--remove-opaque] [-s|--stats]
+
+About owfn2bpel:
+  -h, --help           Print help and exit
+      --full-help      Print help, including hidden options, and exit
+  -V, --version        Print version and exit
+
+File input/output:
+  -i, --input=FILE     Read oWFN from file. Note that a node name may not be 
+                         the prefix of another ('t1' and 't12' is not allowed), 
+                         node names may not end with '_', and arc weights are 
+                         not supported. (mandatory)
+  -o, --output=FILE    Write generated BPEL process to file. When the parameter 
+                         is not given, the filename is derived from the input 
+                         oWFN file.
+
+Options:
+  -r, --remove-opaque  Removes opaque activities where possible. These 
+                         activities are mainly translations from 
+                         non-communicating transitions.  (default=off)
+
+Debug and verbose output:
+  -s, --stats          Shows statistical values (the number of executions) 
+                         after the end of the transformation.  (default=off)
+@end smallexample
+@end cartouche
+
+
+
+
+@c ----------------------------------------------------------------------------
+
+@include fdl.texi
+
+@bye

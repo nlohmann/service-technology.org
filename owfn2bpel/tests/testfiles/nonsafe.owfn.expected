@@ -1,0 +1,119 @@
+PLACE
+INTERNAL
+replacement_initial_place_f_replacement_initial_place_flow_subnet, 
+ { <flow name="Act_flow_subnet_replacement_initial_place">
+  <links>
+    <link name="Link_8"/>
+    <link name="Link_7"/>
+    <link name="Link_5"/>
+    <link name="Link_2"/>
+    <link name="Link_4"/>
+    <link name="Link_6"/>
+    <link name="Link_3"/>
+    <link name="Link_1"/>
+  </links>
+
+  <empty name="Act_replacement_initial_place_flow_start">
+    <sources>
+      <source linkName="Link_6" />
+    </sources>
+  </empty>
+
+  <empty name="Act_p1">
+    <targets>
+      <target linkName="Link_8" />
+    </targets>
+    <sources>
+      <source linkName="Link_3" />
+    </sources>
+  </empty>
+
+  <empty name="Act_p3">
+    <targets>
+      <joinCondition>$Link_7 or $Link_5 or $Link_2</joinCondition>
+      <target linkName="Link_7" />
+      <target linkName="Link_5" />
+      <target linkName="Link_2" />
+    </targets>
+  </empty>
+
+  <empty name="Act_p2">
+    <targets>
+      <target linkName="Link_4" />
+    </targets>
+    <sources>
+      <source linkName="Link_1" />
+    </sources>
+  </empty>
+
+  <empty name="Act_replacement_initial_transition">
+    <sources>
+      <source linkName="Link_8" />
+      <source linkName="Link_7" />
+    </sources>
+  </empty>
+
+    <opaqueActivity name="Act_replacement_initial_transition">
+    </opaqueActivity>
+
+      <empty name="Act_replacement_initial_transition">
+        <targets>
+          <target linkName="Link_6" />
+        </targets>
+      </empty>
+
+  <empty name="Act_t1">
+    <sources>
+      <source linkName="Link_5" />
+      <source linkName="Link_4" />
+    </sources>
+  </empty>
+
+    <receive name="Act_a"
+      partnerLink="generic_pl"
+      operation="a"
+      variable="Var_a">
+    </receive>
+
+      <empty name="Act_t1">
+        <targets>
+          <target linkName="Link_3" />
+        </targets>
+      </empty>
+
+  <empty name="Act_t2">
+    <sources>
+      <source linkName="Link_2" />
+    </sources>
+  </empty>
+
+    <receive name="Act_a"
+      partnerLink="generic_pl"
+      operation="a"
+      variable="Var_a">
+    </receive>
+
+      <empty name="Act_t2">
+        <targets>
+          <target linkName="Link_1" />
+        </targets>
+      </empty>
+
+</flow>
+
+ }
+p4;
+ {  }
+
+INPUT
+;
+
+OUTPUT
+;
+
+INITIALMARKING
+replacement_initial_place_f_replacement_initial_place_flow_subnet : 1; { zufaellig ausgewaehlter Platz }
+
+FINALMARKING
+replacement_initial_place_f_replacement_initial_place_flow_subnet : 1; { zufaellig ausgewaehlter Platz }
+

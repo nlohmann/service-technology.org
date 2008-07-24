@@ -1,0 +1,24 @@
+Version 4.6
+-----------
++ a manpage is created
++ a Texinfo documentation is created
++ GNU gengetopt is used to manage command line parameters
++ output filename can be omitted: file.owfn will be translated to file.owfn.bpel
++ a correctly configured version of LoLA is added to the distribution
++ two papers on oWFN2BPEL are distributed in the "doc" directory
++ added testscripts for "make check"
+
+...
+
+Version 4.1
+-----------
++ GPL version 3
++ minor BPEL code corrections (transition conditions)
++ LoLA is called using the config.h
+
+
+Version 4.0
+-----------
++ GPL version 2
++ first release version
++ adapted code to support GNU autotools

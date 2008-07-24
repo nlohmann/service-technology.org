@@ -1,0 +1,5 @@
+Version 1.0
+-----------
+
++ initial version
++ allows the generation of randomized open workflow nets with a given size (number of places)

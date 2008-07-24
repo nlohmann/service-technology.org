@@ -1,0 +1,5 @@
+TESTS = test_init test_phils test_process test_planner test_tidy
+
+EXTRA_DIST = nets $(TESTS)
+
+TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests

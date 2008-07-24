@@ -1,0 +1,239 @@
+{ This file specifies the ECHO algorithm (see [reisig 98]) for grid like networks. }
+{ ECHO is a protocol for propagation of information with feedback in a network.     }
+{ The algorithm operates in an incomplete, but connected bidirectional network of  }
+{ agents. A distinguished agent (initiator), starts the distribution of a        }
+{ message by sending it to all its neighbors. On receiving some first message,    }
+{ every other agent forwards the message to all its neighbors, except the one it  }
+{ received its first message from. Then it awaits messages from all recipients of  }
+{ its forwards (regardless whether these messages had been intended as forwards or }
+{ acknowledgments) and replies to the agent where it received its first message   }
+{ from. As soon as the initiator receives a message from all its neighbors, the   }
+{ protocol terminates.                                                             }
+{ In this file, agents are arranged in a hypercube. The network can be scaled in   }
+{ two values: the number of dimensions and the number of agents per dimensions.    }
+{ For instance, a network with two dimensions and three agents per row would       }
+{ consist of 3^2 = 9 agents while a network with three dimensions and 4 agents per }
+{ row would consist of 4^3 = 64 agents.                                            }
+{ Regardless of the chosen values for these dimensions, we always connect agents   }
+{ that are immediate neighbors in one of the dimensions of the hypercube. We      }
+{ place the initiator into the center of the cube which means that the number of   }
+{ agents per row should be an odd number                                           }
+
+{ If you want to scale the system, scan through all lines that contain comments    }
+{ starting with ### and follow the instructions given there.                       }
+
+{-------------------------- Declarations ------------------------------------------}
+
+SORT dimensions = [ 1 , 3 ]; { ### change right hand side to desired nr. of dimensions }
+	 row = [ 1 , 3 ]; { ### change right hand side to (odd!!) nr. of agents per row }
+
+{ We address an agent by its co-ordinates in the grid. There are as many co-ordinates }
+{ as the number of dimensions while each co-ordinate can range between 1 and the     }
+{ specified number of agents per row                                                 }
+
+	 agent = ARRAY dimensions OF row ; 
+
+{ Messages consist of recipient and sender, both agents }
+
+	 message = RECORD
+				  receiver : agent;
+				  sender   : agent;
+			   END;
+
+FUNCTION X (a:agent;b:agent):message
+{ cross-products two agents to a message }
+
+	VAR m : message;
+
+BEGIN
+	m . receiver = a;
+	m . sender = b;
+	RETURN m 
+END
+
+FUNCTION i():agent
+{ specifies the co-ordinates of the initiator }
+
+	VAR res: agent;
+        k: dimensions; 
+		low : row;
+		high : row;
+		median : row;
+BEGIN
+	low = 1;
+	high = low - 1; { LoLA corrects values out of range modulo the sort range. }
+					{ Thus, value of high will always be sort's largest value. }
+	median = low + (high - low) / 2  ;
+	FOR ALL k DO
+		res [ k ] = median
+	END;
+	RETURN res
+END
+
+FUNCTION U(): agent
+{ returns the (multi-)set of all agents except the initiator }
+
+	VAR x: agent;
+BEGIN
+	FOR ALL x DO
+		IF x # i() THEN
+			RETURN x { Note that this statement does not terminate U()! }
+		END
+	END
+END
+
+FUNCTION N(z:agent):agent
+{ Returns all neighbors of z; this function actually codes the network. }
+{ An agent is a neighbor of z, if it equals z in all but one dimensions }
+{ while their difference is 1 in the remaining dimension.                }
+
+VAR l : dimensions;
+    low : row;
+	high : row;
+
+BEGIN
+	low = 1;
+	high = low - 1; { see comment in function i() }
+	FOR ALL l DO
+		IF z [ l ] > 1 THEN 
+			z [ l ] = z [ l ] - 1;
+			RETURN z;
+			z [ l ] = z [ l ] + 1
+		END;
+		IF z [ l ] < high THEN 
+			z [ l ] = z [ l ] + 1;
+			RETURN z;
+			z [ l ] = z [ l ] - 1
+		END
+	END
+END
+
+FUNCTION isneighbour(x:agent;z:agent) : BOOLEAN
+{ This is a boolean version of the neighborhood relation, used in transition guards }
+
+VAR l : dimensions ;
+    high : row;
+	low : row;
+    state : [ 1 , 2 ] ; { state 1: no differing dimension found yet  }
+     					{ state 2: differing dimension already found }
+
+BEGIN
+	state = 1; 
+	low = 1;
+	high = low - 1; { see comment in function i() }
+	FOR ALL l DO
+		IF state = 2 THEN
+			IF z [ l ] # x [ l ]  THEN RETURN FALSE; EXIT END { Neighbors must not }
+															  { differ in more than }
+															  { one dimension       }
+		END;
+		IF state = 1 THEN 
+			IF z [ l ] < high  AND x [ l ] = z [ l ] + 1 THEN state = 2 END;
+			IF z [ l ] > 1  AND x [ l ] = z [ l ] - 1 THEN state = 2 END
+		END;
+		IF state = 1 AND z [ l ] # x [  l ] THEN RETURN FALSE; EXIT END { difference }
+																		{ > 1        }
+	END;
+	IF state = 1 THEN RETURN FALSE ELSE RETURN TRUE END { no difference -- no neighbor }
+		
+END
+
+FUNCTION N1(z : agent ; z2 : agent):agent
+{ returns all neighbors of z, except z2. This function specifies the recipients of }
+{ messages that are sent by a non-initiator. Except the test for z2, this function  }
+{ resembles N                                                                       }
+
+VAR m : dimensions;
+    high : row;
+	low : row;
+	
+BEGIN
+	low = 1;
+	high = low - 1; 
+	FOR ALL m DO
+		IF z [ m ] > 1 THEN 
+			z [ m ] = z [ m ] - 1;
+			IF z # z2 THEN 
+				RETURN z 
+			END;
+			z [ m ] = z [ m ] + 1
+		END;
+		IF z [ m ] < high THEN 
+			z [ m ] = z [ m ]  + 1;
+			IF z # z2 THEN 
+				RETURN z 
+			END;
+			z [ m ]  = z [ m ] - 1
+		END
+	END
+END
+
+{---------------------- High level net for ECHO ------------------------------}
+
+PLACE	quiet      : agent,    { carries initiator before start of protocol }
+	    waiting    : agent,    { initiator during running protocol }
+		terminated : agent,    { initiator after terminated protocol }
+	    uninformed : agent,    { other agent before having read any message }
+		pending    : message,  { other agent while waiting for acknowledgments; }
+						       { we need a second component to store the sender  }
+						       { of the message it received first                }
+		accepted   : agent,    { other agent after having sent all acknowledgments }
+		mailbox    : message;  { pending messages }
+
+	
+MARKING quiet      : i(), { initial state of initiator }
+		uninformed : U(); { initial states of all other agents }
+
+TRANSITION t1
+{ starts the protocol by letting the initiator send messages to all neighbors }
+
+	VAR x: agent;
+
+	CONSUME	quiet   : x;
+	PRODUCE	waiting : x,
+			mailbox : X(N(x),x); { first component: recipient, second: sender }
+	
+TRANSITION t2 
+{ terminates the protocol on receipt of acknowledgments from all neighbors of }
+{ the initiator                                                                }
+
+	VAR x: agent;
+
+	CONSUME	waiting	  : x,
+			mailbox   : X(x,N(x));
+	PRODUCE terminated:	x;
+	
+TRANSITION t3 
+{ other agent forwards first message to all other neighbors and stores sender of }
+{ first message                                                                   }
+		
+	VAR x,z: agent;
+	GUARD isneighbour( x, z ) { This guard is not essential for correctness, but  }
+							  { reduces the size of LoLA's internal LL net, since }
+							  { no LL transition instances are generated for      }
+							  { variable assignments that violate the guard.      }
+							  { Likewise, LoLA removes isolated place instances   }
+							  { (instances of places 'message' and 'pending' for  }
+							  { non-neighbors which would not be isolated        }
+							  { without the guards in t3 and t4).                 }
+							  { In the 3^3 network, the reduction amounts to      }
+							  { having 351 LL places and 270 LL transitions rather}
+							  { than 1593 places and 1512 transitions without     }
+							  { removing guard-violating and isolated nodes       }
+	CONSUME uninformed : x,
+			mailbox    : X(x,z);
+	PRODUCE mailbox    : X(N1(x,z),x),
+			pending    : X(x,z);
+
+TRANSITION t4
+{ on receipt of acknowledgments to all its own messages, other agents reply to }
+{ their first message                                                          }
+
+	VAR x,z: agent;
+	GUARD isneighbour(x,z) { see comment for t3 }
+
+	CONSUME pending  : X(x,z),
+			mailbox  : X(x,N1(x,z));
+	PRODUCE accepted : x,
+			mailbox  : X(z,x);
+

@@ -1,0 +1,10 @@
+#! /bin/bash
+
+echo ""
+
+echo "test: lpsim"
+echo "      rachel -a $testdir/testfiles/traveler.og -o $testdir/testfiles/agency_airline.og -m lpsim &> /dev/null"
+rachel -a $testdir/testfiles/traveler.og -o $testdir/testfiles/agency_airline.og -m lpsim &> /dev/null
+rm problem.lp
+
+exit $?

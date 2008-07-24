@@ -1,0 +1,23 @@
+#! /bin/bash
+
+echo ""
+
+echo "test: translation of nonsafe.owfn"
+echo "      owfn2bpel --input $testdir/testfiles/nonsafe.owfn &> /dev/null"
+owfn2bpel --input $testdir/testfiles/nonsafe.owfn &> /dev/null
+result5=$?
+
+echo "test: comparing generated file with expected output"
+echo "      diff $testdir/testfiles/nonsafe.owfn.bpel $testdir/testfiles/nonsafe.owfn.expected"
+diff $testdir/testfiles/nonsafe.owfn.bpel $testdir/testfiles/nonsafe.owfn.expected
+result6=$?
+
+
+if [ $result5 -eq 2 -a $result6 -eq 0 ]
+then
+  result=0
+else
+  result=1
+fi
+
+exit $result

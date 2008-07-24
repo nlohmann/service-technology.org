@@ -1,0 +1,26 @@
+Copyright (c) 2008 Niels Lohmann
+
+Niels Lohmann
+Institut fuer Informatik
+Lehrstuhl Theorie der Programmiersprachen und Programmierung
+Universitaet Rostock
+
+http://www.informatik.uni-rostock.de/~nl/
+http://wwwteo.informatik.uni-rostock.de/ls_tpp/
+niels.lohmann@uni-rostock.de
+
+
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+Rachel is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+
+ACKNOWLEDGEMENTS
+----------------
++ The Flex/Bison parser for OG files was taken and adapted from Fiona, originally written by Jan Bretschneider.
+
++ The translation into an linear programming problem was derived from a program provided by Oleg Sokolsky.
+
++ lp_solve (http://lpsolve.sourceforge.net/5.5) is published under the GNU Lesser General Public License, see file COPYING.lib
+
++ The aspects are implemented with AspectC++ (http://www.aspectc.org).

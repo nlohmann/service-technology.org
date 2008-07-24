@@ -1,0 +1,97 @@
+purpose "Rachel: Repairing Automata for Choreographies by Editing Labels"
+
+description "About rachel:"
+
+section "File input"
+
+option "automaton"  a
+  "Read a service automaton. Any annotated formulae are ignored."
+  typestr="FILE"
+  string required
+
+option "og" o
+  "Read an operating guideline"
+  typestr="FILE"
+  string required
+
+
+section "File output"
+
+option "dot" d
+  "Create a Dot file. If no filename is given, it is derived from the input filenames: \"<automaton>_<og>_<mode>.dot\". If Graphviz Dot was found by the configure script, also a PNG file is created."
+  typestr="FILE"
+  string optional
+  argoptional
+
+
+section "Options"
+
+option "mode" m
+  "Edit distance"
+  string values="matching","simulation","lpsim" enum
+  typestr="MODE"
+  default="matching"
+  optional
+
+option "verbose" v
+  "Verbose output: mostly status information during longer calculations."
+  flag off
+
+
+section "Configuration of used cost function"
+
+option "node-similarity" -
+  "Node similarity"
+  double
+  default="1.0"
+  optional
+
+option "discount" -
+  "Discount factor"
+  double
+  default="0.5"
+  optional
+
+option "benefit-keep" -
+  "Benefit of label keeping"
+  double
+  default="1.0"
+  optional
+
+option "benefit-change" -
+  "Benefit of label change"
+  double
+  default="0.7"
+  optional
+
+option "benefit-insert" -
+  "Benefit of label insertion"
+  double
+  default="0.2"
+  optional
+
+option "benefit-delete" -
+  "Benefit of label deletion"
+  double
+  default="0.2"
+  optional
+
+option "conf-file" c
+  "Read configurations from file"
+  string
+  typestr="FILE"
+  optional
+
+
+section "Debugging"
+
+option "debug" -
+  "Debug output: mostly traces of function calls."
+  flag off
+  hidden
+
+option "bug" -
+  "Show helpful information (version number, compilation date, compiler version, and platform) in case a bug was found and should be reported."
+  flag off
+  hidden
+

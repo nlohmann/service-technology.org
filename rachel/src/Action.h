@@ -1,0 +1,93 @@
+/*****************************************************************************\
+ Rachel -- Repairing Automata for Choreographies by Editing Labels
+ 
+ Copyright (C) 2008  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ 
+ Rachel is free software; you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 3 of the License, or (at your option) any later
+ version.
+ 
+ Rachel is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along with
+ Rachel (see file COPYING); if not, see http://www.gnu.org/licenses or write to
+ the Free Software Foundation,Inc., 51 Franklin Street, Fifth
+ Floor, Boston, MA 02110-1301  USA.
+\*****************************************************************************/
+
+#ifndef __ACTION_H
+#define __ACTION_H
+
+
+#include "Formula.h"
+
+
+typedef enum action_type {
+    NONE,       ///< no action determined yet (this is not "keep"!)
+    INSERT,     ///< insert edge
+    DELETE,     ///< delete egde
+    MODIFY,     ///< modify edge
+    KEEP        ///< keep edge
+};
+typedef double Value;
+typedef unsigned int Node;
+typedef string Label;
+
+
+/// an edit action
+class Action {
+    private:
+        /// the type of the action
+        action_type type;
+    
+    public:
+        /// set the type of the action (INSERT, DELETE, ...)
+        void setType(const action_type t);
+
+        /// get the type of the action
+        action_type getType() const;
+    
+        /// value of the action
+        Value value;
+        
+        Node stateA;
+        Node stateB;
+        Label label_old;
+        Label label_new;
+        
+        /// return a string representation of the action
+        string toString() const;
+        
+        // constructor
+        Action(action_type myType, Value myValue,
+               Node myNodeA = 0, Node myNodeB = 0);
+};
+
+
+/// a script of edit actions
+class ActionScript {
+    public:
+        /// the vector of edit actions
+        vector<Action> script;
+        
+        /// the aggregated value of the script
+        Value value;
+        
+        /// add an action to the script
+        void add(const Action &a);
+        
+        /// return a string representation of the script
+        string toString() const;
+        
+        /// constructor
+        ActionScript();
+        
+        /// constructor to construct a singleton script
+        ActionScript(const Action &a);
+};
+
+
+#endif

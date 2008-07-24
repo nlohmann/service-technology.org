@@ -1,0 +1,10 @@
+oWFN GENERATOR 1.0
+==================
+
+Mit dem Aufruf
+
+  generator 10 100
+
+werden 100 oWFNs mit jeweils höchstens 10 Plätzen erzeugt. Die Dateinamen richten sich nach diesen Parametern und laufen von "generated-10-001.owfn" bis "generated-10-100.owfn".
+
+Wird die Anzahl weggelassen, werden 100 Netze erzeugt. Wird die Größe und die Anzahl weggelassen, werden 100 Netze der Größe 10 erzeugt.

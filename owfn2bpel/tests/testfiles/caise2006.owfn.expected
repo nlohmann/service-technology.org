@@ -1,0 +1,80 @@
+<process name="Act_process_../tests/testfiles/caise2006.owfn"
+  targetNamespace="http://docs.oasis-open.org/wsbpel/2.0/process/abstract"
+  xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/abstract"
+  suppressJoinFailure="yes"
+  xmlns:template="http://docs.oasisopen.org/wsbpel/2.0/process/abstract/simple-template/2006/08"
+  abstractProcessProfile="http://docs.oasisopen.org/wsbpel/2.0/process/abstract/simple-template/2006/08">
+    <partnerLinks>
+      <partnerLink name="generic_pl" partnerLinkType="##opaque"
+                   myRole="##opaque" partnerRole="##opaque" />
+    </partnerLinks>
+
+  <variables>
+    <variable name="Var_registration" element="##opaque" />
+    <variable name="Var_quest_in" element="##opaque" />
+    <variable name="Var_quest_out" element="##opaque" />
+    <variable name="Var_result" element="##opaque" />
+    <variable name="Var_archive" element="##opaque" />
+  </variables>
+
+  <sequence name="Act_sequence">
+    <receive name="Act_registration"
+      partnerLink="generic_pl"
+      operation="registration"
+      variable="Var_registration" />
+    <flow name="Act_a1">
+      <sequence name="Act_sequence">
+        <invoke name="Act_quest_out"
+          partnerLink="generic_pl"
+          operation="quest_out"
+          inputVariable="Var_quest_out" />
+        <receive name="Act_quest_in"
+          partnerLink="generic_pl"
+          operation="quest_in"
+          variable="Var_quest_in" />
+        <opaqueActivity name="Act_a4" />
+      </sequence>
+
+      <sequence name="Act_sequence">
+        <opaqueActivity name="Act_a5" />
+        <opaqueActivity name="Act_a6" />
+        <while name="Act_p3_a5_p7_a6_p8">
+          <condition opaque="yes" />
+          <sequence name="Act_sequence">
+            <opaqueActivity name="Act_a7" />
+            <opaqueActivity name="Act_NOK" />
+            <opaqueActivity name="Act_a5" />
+            <opaqueActivity name="Act_a6" />
+          </sequence>
+
+        </while>
+
+        <if name="Act_if_p3_a5_p7_a6_p8_to_p10_a8_p11">
+          <condition opaque="yes" />
+            <sequence name="Act_sequence">
+              <opaqueActivity name="Act_a7" />
+              <opaqueActivity name="Act_OK" />
+            </sequence>
+
+          <else>
+              <opaqueActivity name="Act_DONE" />
+          </else>
+        </if>
+
+        <invoke name="Act_result"
+          partnerLink="generic_pl"
+          operation="result"
+          inputVariable="Var_result" />
+      </sequence>
+
+    </flow>
+
+    <opaqueActivity name="Act_JOIN" />
+    <invoke name="Act_archive"
+      partnerLink="generic_pl"
+      operation="archive"
+      inputVariable="Var_archive" />
+  </sequence>
+
+</process>
+

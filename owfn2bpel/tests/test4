@@ -1,0 +1,23 @@
+#! /bin/bash
+
+echo ""
+
+echo "test: translation of opqaue.owfn with removal of opaque activities"
+echo "      owfn2bpel --input $testdir/testfiles/opaque.owfn -r &> /dev/null"
+owfn2bpel --input $testdir/testfiles/opaque.owfn -r &> /dev/null
+result7=$?
+
+echo "test: comparing generated file with expected output"
+echo "      diff $testdir/testfiles/opaque.owfn.bpel $testdir/testfiles/opaque.owfn.expected"
+diff $testdir/testfiles/opaque.owfn.bpel $testdir/testfiles/opaque.owfn.expected
+result8=$?
+
+
+if [ $result7 -eq 0 -a $result8 -eq 0 ]
+then
+  result=0
+else
+  result=1
+fi
+
+exit $result

@@ -1,0 +1,729 @@
+SORT
+  Display =  ENUMERATE EPS1 EPS3 EPS6 EPS8 NEC-MT1065 END;
+  Canvas =   ENUMERATE LW1 LW2 LW3 LW4 LW5 LW6 VD1 VD2 END;
+  Document = ENUMERATE Doc1 Doc2 END;
+  Lamp =     ENUMERATE Lamp1 Lamp2 Lamp3 Lamp4 Lamp5 Lamp6 END;
+
+  CanvasBool = RECORD
+                 cname : Canvas;
+                 cval  : BOOLEAN;
+               END;
+               
+  CanvasDisplayBool = RECORD
+                        cdb_cname : Canvas;
+                        cdb_dname : Display;
+                        cdb_val   : BOOLEAN;
+                      END;
+               
+  DocumentBool = RECORD
+                   db_name : Document;
+                   db_val  : BOOLEAN;
+                 END;
+
+  LampBool = RECORD
+               lname : Lamp;
+               lval : BOOLEAN;
+             END;
+             
+  DocumentCanvasBool = RECORD
+                         dcb_dname : Document;
+                         dcb_cname : Canvas;
+                         dcb_val   : BOOLEAN;
+                       END;
+  
+  DisplayDocumentBool = RECORD
+                          ddb_dispname : Display;
+                          ddb_docname  : Document;
+                          ddb_val      : BOOLEAN;
+                        END;
+
+{==============================================================================}
+
+FUNCTION toLampBool (n : Lamp ; v : BOOLEAN) : LampBool
+VAR
+  lb : LampBool;
+BEGIN
+  lb . lname = n;
+  lb . lval = v;
+  RETURN lb
+END
+
+FUNCTION toCanvasBool (c : Canvas ; v : BOOLEAN) : CanvasBool
+VAR
+  cb : CanvasBool;
+BEGIN
+  cb . cname = c;
+  cb . cval = v;
+  RETURN cb
+END
+
+FUNCTION toDocumentCanvasBool (d : Document ; c : Canvas ; v : BOOLEAN ) : DocumentCanvasBool
+VAR
+  dcb : DocumentCanvasBool;
+BEGIN
+  dcb . dcb_dname = d;
+  dcb . dcb_cname = c;
+  dcb . dcb_val = v;
+  RETURN dcb
+END
+
+FUNCTION toDocumentBool (d: Document ; v : BOOLEAN) : DocumentBool
+VAR
+  db : DocumentBool;
+BEGIN
+  db . db_name = d;
+  db . db_val = v;
+  RETURN db
+END
+
+FUNCTION toDisplayDocumentBool (disp : Display ; doc : Document ; v : BOOLEAN ) : DisplayDocumentBool
+VAR
+  ddb : DisplayDocumentBool;
+BEGIN
+  ddb . ddb_dispname = disp;
+  ddb . ddb_docname = doc;
+  ddb . ddb_val = v;
+  RETURN ddb
+END
+
+FUNCTION toCanvasDisplayBool (c: Canvas ; d : Display ; v : BOOLEAN) : CanvasDisplayBool
+VAR
+  cdb : CanvasDisplayBool;
+BEGIN
+  cdb . cdb_cname = c;
+  cdb . cdb_dname = d;
+  cdb . cdb_val = v;
+  RETURN cdb
+END
+
+{------------------------------------------------------------------------------}
+
+FUNCTION equalLamp (n : Lamp ; m : Lamp) : BOOLEAN
+BEGIN
+  IF n = m THEN RETURN TRUE
+           ELSE RETURN FALSE
+  END
+END
+
+FUNCTION equalCanvas (n : Canvas ; m : Canvas) : BOOLEAN
+BEGIN
+  IF n = m THEN RETURN TRUE
+           ELSE RETURN FALSE
+  END
+END
+
+FUNCTION unequalDocuments (n : Document ; m : Document) : BOOLEAN
+BEGIN
+  IF n <> m THEN RETURN TRUE
+            ELSE RETURN FALSE
+  END
+END
+
+FUNCTION equalDisplay (n : Display ; m : Display) : BOOLEAN
+BEGIN
+  IF n = m THEN RETURN TRUE
+           ELSE RETURN FALSE
+  END
+END
+
+FUNCTION unequalCanvas (n : Canvas ; m : Canvas) : BOOLEAN
+BEGIN
+  IF n <> m THEN RETURN TRUE
+            ELSE RETURN FALSE
+  END
+END
+
+{------------------------------------------------------------------------------}
+
+FUNCTION true () : BOOLEAN
+BEGIN
+  RETURN TRUE
+END
+
+FUNCTION false () : BOOLEAN
+BEGIN
+  RETURN FALSE
+END
+
+{------------------------------------------------------------------------------}
+
+FUNCTION InitialLightsOn () : LampBool
+VAR
+  l : Lamp;
+BEGIN
+  FOR ALL l DO
+    RETURN toLampBool(l,FALSE)
+  END
+END
+
+FUNCTION InitialCanvasDown () : CanvasBool
+VAR
+  c : Canvas;
+BEGIN
+  FOR ALL c DO
+    RETURN toCanvasBool(c,FALSE)
+  END
+END
+
+FUNCTION InitialDocShown () : DocumentCanvasBool
+VAR
+  d : Document;
+  c : Canvas;
+BEGIN
+  FOR ALL c DO
+    FOR ALL d DO
+      RETURN toDocumentCanvasBool(d,c,FALSE)
+    END
+  END
+END
+
+FUNCTION InitialPresent() : DocumentBool
+VAR
+  d : Document;
+BEGIN
+  FOR ALL d DO
+    RETURN toDocumentBool(d,TRUE)
+  END
+END
+
+FUNCTION InitialSent2Disp() : DisplayDocumentBool
+VAR
+  disp : Display;
+  doc  : Document;
+BEGIN
+  FOR ALL disp DO
+    FOR ALL doc DO
+      RETURN toDisplayDocumentBool(disp,doc,FALSE)
+    END
+  END
+END
+
+FUNCTION InitialPointing() : CanvasDisplayBool
+VAR
+  canv : Canvas;
+  disp : Display;
+BEGIN
+  FOR ALL canv DO
+    FOR ALL disp DO
+      IF (canv = LW5 AND disp = NEC-MT1065) THEN
+        RETURN toCanvasDisplayBool(canv,disp,true())
+      ELSE
+        RETURN toCanvasDisplayBool(canv,disp,false())
+      END
+    END
+  END
+END
+
+FUNCTION InitialDisplayNotUsed() : Display
+VAR
+  d : Display;
+BEGIN
+  FOR ALL d DO
+    RETURN d
+  END
+END
+
+FUNCTION InitialCanvasNotUsed() : Canvas
+VAR
+  c : Canvas;
+BEGIN
+  FOR ALL c DO
+    RETURN c
+  END
+END
+
+{==============================================================================}
+
+PLACE
+  LightOn        : LampBool,
+  CanvasDown     : CanvasBool,
+  DocShown       : DocumentCanvasBool,
+  Present        : DocumentBool,
+  Sent2Disp      : DisplayDocumentBool,
+  Pointing       : CanvasDisplayBool,
+  BeamerUsed,
+  BeamerNotUsed,
+  DisplayUsed    : Display,
+  DisplayNotUsed : Display,
+  CanvasUsed     : Canvas,
+  CanvasNotUsed  : Canvas;
+
+MARKING
+  LightOn        : InitialLightsOn(),
+  CanvasDown     : InitialCanvasDown(),
+  DocShown       : InitialDocShown(),
+  Present        : InitialPresent(),
+  Sent2Disp      : InitialSent2Disp(),
+  Pointing       : InitialPointing(),
+  BeamerNotUsed  : 1,
+  DisplayNotUsed : InitialDisplayNotUsed(),
+  CanvasNotUsed  : InitialCanvasNotUsed();
+
+{==============================================================================}
+
+{With the help of place DisplayUsed and DisplayNotUsed, we can avoid transition explosion}
+
+TRANSITION cm1_send
+VAR
+  Document_1 : Document;
+  Display_1  : Display;
+CONSUME
+  Present        : toDocumentBool(Document_1,true()),
+  DisplayNotUsed : Display_1;
+PRODUCE
+  Present     : toDocumentBool(Document_1,true()),
+  Sent2Disp   : toDisplayDocumentBool(Display_1,Document_1,true()),
+  DisplayUsed : Display_1;
+
+TRANSITION cm1_unsend
+VAR
+  Document_1 : Document;
+  Display_1  : Display;
+CONSUME
+  Present     : toDocumentBool(Document_1,true()),
+  DisplayUsed : Display_1;
+PRODUCE
+  Present        : toDocumentBool(Document_1,true()),
+  Sent2Disp      : toDisplayDocumentBool(Display_1,Document_1,false()),
+  DisplayNotUsed : Display_1;
+
+{------------------------------------------------------------------------------}
+
+TRANSITION cm2_show
+VAR
+  Document_1 : Document;
+  d          : Display;
+  c          : Canvas;
+GUARD
+  equalDisplay( d , EPS1 ) AND
+  equalCanvas( c , LW1 )
+CONSUME
+  Sent2Disp     : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown    : toCanvasBool(c,true()),
+  CanvasNotUsed : c;
+PRODUCE
+  Sent2Disp  : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown : toCanvasBool(c,true()),  
+  CanvasUsed : c,
+  DocShown   : toDocumentCanvasBool(Document_1,c,true());
+
+TRANSITION cm2_unshow
+VAR
+  Document_1 : Document;
+  d          : Display;
+  c          : Canvas;
+GUARD
+  equalDisplay( d , EPS1 ) AND
+  equalCanvas( c , LW1 )
+CONSUME
+  Sent2Disp  : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown : toCanvasBool(c,true()),
+  CanvasUsed : c;
+PRODUCE
+  Sent2Disp     : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown    : toCanvasBool(c,true()),  
+  CanvasNotUsed : c,
+  DocShown      : toDocumentCanvasBool(Document_1,c,false());
+
+TRANSITION cm3_show
+VAR
+  Document_1 : Document;
+  d          : Display;
+  c          : Canvas;
+GUARD
+  equalDisplay( d , EPS3 ) AND
+  equalCanvas( c , LW3 )
+CONSUME
+  Sent2Disp     : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown    : toCanvasBool(c,true()),
+  CanvasNotUsed : c;
+PRODUCE
+  Sent2Disp  : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown : toCanvasBool(c,true()),  
+  CanvasUsed : c,
+  DocShown   : toDocumentCanvasBool(Document_1,c,true());
+
+TRANSITION cm3_unshow
+VAR
+  Document_1 : Document;
+  d          : Display;
+  c          : Canvas;
+GUARD
+  equalDisplay( d , EPS3 ) AND
+  equalCanvas( c , LW3 )
+CONSUME
+  Sent2Disp  : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown : toCanvasBool(c,true()),
+  CanvasUsed : c;
+PRODUCE
+  Sent2Disp     : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown    : toCanvasBool(c,true()),  
+  CanvasNotUsed : c,
+  DocShown      : toDocumentCanvasBool(Document_1,c,false());
+
+TRANSITION cm4_show
+VAR
+  Document_1 : Document;
+  d          : Display;
+  c          : Canvas;
+GUARD
+  equalDisplay( d , EPS6 ) AND
+  equalCanvas( c , LW6 )
+CONSUME
+  Sent2Disp     : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown    : toCanvasBool(c,true()),
+  CanvasNotUsed : c;
+PRODUCE
+  Sent2Disp  : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown : toCanvasBool(c,true()),  
+  CanvasUsed : c,
+  DocShown   : toDocumentCanvasBool(Document_1,c,true());
+
+TRANSITION cm4_unshow
+VAR
+  Document_1 : Document;
+  d          : Display;
+  c          : Canvas;
+GUARD
+  equalDisplay( d , EPS6 ) AND
+  equalCanvas( c , LW6 )
+CONSUME
+  Sent2Disp  : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown : toCanvasBool(c,true()),
+  CanvasUsed : c;
+PRODUCE
+  Sent2Disp     : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown    : toCanvasBool(c,true()),  
+  CanvasNotUsed : c,
+  DocShown      : toDocumentCanvasBool(Document_1,c,false());
+
+TRANSITION cm5_show
+VAR
+  Document_1 : Document;
+  d          : Display;
+  c          : Canvas;
+GUARD
+  equalDisplay( d , EPS8 ) AND
+  equalCanvas( c , VD2 )
+CONSUME
+  Sent2Disp     : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown    : toCanvasBool(c,true()),
+  CanvasNotUsed : c;
+PRODUCE
+  Sent2Disp  : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown : toCanvasBool(c,true()),  
+  CanvasUsed : c,
+  DocShown   : toDocumentCanvasBool(Document_1,c,true());
+
+TRANSITION cm5_unshow
+VAR
+  Document_1 : Document;
+  d          : Display;
+  c          : Canvas;
+GUARD
+  equalDisplay( d , EPS8 ) AND
+  equalCanvas( c , VD2 )
+CONSUME
+  Sent2Disp  : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown : toCanvasBool(c,true()),
+  CanvasUsed : c;
+PRODUCE
+  Sent2Disp     : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown    : toCanvasBool(c,true()),  
+  CanvasNotUsed : c,
+  DocShown      : toDocumentCanvasBool(Document_1,c,false());
+
+TRANSITION cm6_show
+VAR
+  Document_1 : Document;
+  d          : Display;
+  Surface_1  : Canvas;
+GUARD
+  equalDisplay( d , NEC-MT1065 )
+CONSUME
+  Sent2Disp     : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown    : toCanvasBool(Surface_1,true()),
+  CanvasNotUsed : Surface_1,
+  Pointing      : toCanvasDisplayBool(Surface_1,d,true());
+PRODUCE
+  Sent2Disp  : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown : toCanvasBool(Surface_1,true()),  
+  CanvasUsed : Surface_1,
+  DocShown   : toDocumentCanvasBool(Document_1,Surface_1,true()),
+  Pointing   : toCanvasDisplayBool(Surface_1,d,true());
+
+TRANSITION cm6_unshow
+VAR
+  Document_1 : Document;
+  d          : Display;
+  Surface_1  : Canvas;
+GUARD
+  equalDisplay( d , NEC-MT1065 )
+CONSUME
+  Sent2Disp  : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown : toCanvasBool(Surface_1,true()),
+  CanvasUsed : Surface_1,
+  Pointing      : toCanvasDisplayBool(Surface_1,d,true());
+PRODUCE
+  Sent2Disp     : toDisplayDocumentBool(d,Document_1,true()),
+  CanvasDown    : toCanvasBool(Surface_1,true()),  
+  CanvasNotUsed : Surface_1,
+  DocShown      : toDocumentCanvasBool(Document_1,Surface_1,false()),
+  Pointing      : toCanvasDisplayBool(Surface_1,d,true());
+
+{------------------------------------------------------------------------------}
+
+TRANSITION cm7
+VAR c : Canvas;
+GUARD equalCanvas( c , VD1 )
+CONSUME CanvasDown : toCanvasBool(c,true()) ;
+PRODUCE CanvasDown : toCanvasBool(c,false()) ;
+
+TRANSITION cm8
+VAR c : Canvas;
+GUARD equalCanvas( c , VD2 )
+CONSUME CanvasDown : toCanvasBool(c,true()) ;
+PRODUCE CanvasDown : toCanvasBool(c,false()) ;
+
+TRANSITION cm9
+VAR c : Canvas;
+GUARD equalCanvas( c , LW1 )
+CONSUME CanvasDown : toCanvasBool(c,true()) ;
+PRODUCE CanvasDown : toCanvasBool(c,false()) ;
+
+TRANSITION cm10
+VAR c : Canvas;
+GUARD equalCanvas( c , LW2 )
+CONSUME CanvasDown : toCanvasBool(c,true()) ;
+PRODUCE CanvasDown : toCanvasBool(c,false()) ;
+
+TRANSITION cm11
+VAR c : Canvas;
+GUARD equalCanvas( c , LW3 )
+CONSUME CanvasDown : toCanvasBool(c,true()) ;
+PRODUCE CanvasDown : toCanvasBool(c,false()) ;
+
+TRANSITION cm12
+VAR c : Canvas;
+GUARD equalCanvas( c , LW4 )
+CONSUME CanvasDown : toCanvasBool(c,true()) ;
+PRODUCE CanvasDown : toCanvasBool(c,false()) ;
+
+TRANSITION cm13
+VAR c : Canvas;
+GUARD equalCanvas( c , LW5 )
+CONSUME CanvasDown : toCanvasBool(c,true()) ;
+PRODUCE CanvasDown : toCanvasBool(c,false()) ;
+
+TRANSITION cm14
+VAR c : Canvas;
+GUARD equalCanvas( c , LW6 )
+CONSUME CanvasDown : toCanvasBool(c,true()) ;
+PRODUCE CanvasDown : toCanvasBool(c,false()) ;
+
+{------------------------------------------------------------------------------}
+
+TRANSITION cm15
+VAR c : Canvas;
+GUARD equalCanvas( c , VD1 )
+CONSUME CanvasDown : toCanvasBool(c,false()) ;
+PRODUCE CanvasDown : toCanvasBool(c,true()) ;
+
+TRANSITION cm16
+VAR c : Canvas;
+GUARD equalCanvas( c , VD2 )
+CONSUME CanvasDown : toCanvasBool(c,false()) ;
+PRODUCE CanvasDown : toCanvasBool(c,true()) ;
+
+TRANSITION cm17
+VAR c : Canvas;
+GUARD equalCanvas( c , LW1 )
+CONSUME CanvasDown : toCanvasBool(c,false()) ;
+PRODUCE CanvasDown : toCanvasBool(c,true()) ;
+
+TRANSITION cm18
+VAR c : Canvas;
+GUARD equalCanvas( c , LW2 )
+CONSUME CanvasDown : toCanvasBool(c,false()) ;
+PRODUCE CanvasDown : toCanvasBool(c,true()) ;
+
+TRANSITION cm19
+VAR c : Canvas;
+GUARD equalCanvas( c , LW3 )
+CONSUME CanvasDown : toCanvasBool(c,false()) ;
+PRODUCE CanvasDown : toCanvasBool(c,true()) ;
+
+TRANSITION cm20
+VAR c : Canvas;
+GUARD equalCanvas( c , LW4 )
+CONSUME CanvasDown : toCanvasBool(c,false()) ;
+PRODUCE CanvasDown : toCanvasBool(c,true()) ;
+
+TRANSITION cm21
+VAR c : Canvas;
+GUARD equalCanvas( c , LW5 )
+CONSUME CanvasDown : toCanvasBool(c,false()) ;
+PRODUCE CanvasDown : toCanvasBool(c,true()) ;
+
+TRANSITION cm22
+VAR c : Canvas;
+GUARD equalCanvas( c , LW6 )
+CONSUME CanvasDown : toCanvasBool(c,false()) ;
+PRODUCE CanvasDown : toCanvasBool(c,true()) ;
+
+{------------------------------------------------------------------------------}
+
+TRANSITION cm23
+VAR l : Lamp;
+GUARD equalLamp( l , Lamp1 )
+CONSUME LightOn : toLampBool(l,false()) ;
+PRODUCE LightOn : toLampBool(l,true()) ;
+
+TRANSITION cm24
+VAR l : Lamp;
+GUARD equalLamp( l , Lamp2 )
+CONSUME LightOn : toLampBool(l,false()) ;
+PRODUCE LightOn : toLampBool(l,true()) ;
+
+TRANSITION cm25
+VAR l : Lamp;
+GUARD equalLamp( l , Lamp3 )
+CONSUME LightOn : toLampBool(l,false()) ;
+PRODUCE LightOn : toLampBool(l,true()) ;
+
+TRANSITION cm26
+VAR l : Lamp;
+GUARD equalLamp( l , Lamp4 )
+CONSUME LightOn : toLampBool(l,false()) ;
+PRODUCE LightOn : toLampBool(l,true()) ;
+
+TRANSITION cm27
+VAR l : Lamp;
+GUARD equalLamp( l , Lamp5 )
+CONSUME LightOn : toLampBool(l,false()) ;
+PRODUCE LightOn : toLampBool(l,true()) ;
+
+TRANSITION cm28
+VAR l : Lamp;
+GUARD equalLamp( l , Lamp6 )
+CONSUME LightOn : toLampBool(l,false()) ;
+PRODUCE LightOn : toLampBool(l,true()) ;
+
+{------------------------------------------------------------------------------}
+
+TRANSITION cm29
+VAR l : Lamp;
+GUARD equalLamp( l , Lamp1 )
+CONSUME LightOn : toLampBool(l,true()) ;
+PRODUCE LightOn : toLampBool(l,false()) ;
+
+TRANSITION cm30
+VAR l : Lamp;
+GUARD equalLamp( l , Lamp2 )
+CONSUME LightOn : toLampBool(l,true()) ;
+PRODUCE LightOn : toLampBool(l,false()) ;
+
+TRANSITION cm31
+VAR l : Lamp;
+GUARD equalLamp( l , Lamp3 )
+CONSUME LightOn : toLampBool(l,true()) ;
+PRODUCE LightOn : toLampBool(l,false()) ;
+
+TRANSITION cm32
+VAR l : Lamp;
+GUARD equalLamp( l , Lamp4 )
+CONSUME LightOn : toLampBool(l,true()) ;
+PRODUCE LightOn : toLampBool(l,false()) ;
+
+TRANSITION cm33
+VAR l : Lamp;
+GUARD equalLamp( l , Lamp5 )
+CONSUME LightOn : toLampBool(l,true()) ;
+PRODUCE LightOn : toLampBool(l,false()) ;
+
+TRANSITION cm34
+VAR l : Lamp;
+GUARD equalLamp( l , Lamp6 )
+CONSUME LightOn : toLampBool(l,true()) ;
+PRODUCE LightOn : toLampBool(l,false()) ;
+
+{------------------------------------------------------------------------------}
+{ We could not model the originally intended behavior. It was required that    }
+{ when moving the beamer to a canvas, all other canvases were set to 0.        }
+{ Instead, we introduced two auxiliary place "BeamerUsed" and "BeamerNotUsed". }
+
+TRANSITION cm35_on
+VAR
+  Surface_1        : Canvas;
+  d                : Display;
+GUARD
+  equalDisplay( d , NEC-MT1065 )
+CONSUME
+  Pointing      : toCanvasDisplayBool(Surface_1,d,false()),
+  BeamerNotUsed : 1;
+PRODUCE
+  Pointing   : toCanvasDisplayBool(Surface_1,d,true()),
+  BeamerUsed : 1;
+
+TRANSITION cm35_off
+VAR
+  Surface_1        : Canvas;
+  d                : Display;
+GUARD
+  equalDisplay( d , NEC-MT1065 )
+CONSUME
+  Pointing      : toCanvasDisplayBool(Surface_1,d,true()),
+  BeamerUsed : 0;
+PRODUCE
+  Pointing      : toCanvasDisplayBool(Surface_1,d,false()),
+  BeamerNotUsed : 1;
+
+{------------------------------------------------------------------------------}
+
+TRANSITION cm36
+VAR c : Canvas; Document_1 : Document;
+GUARD equalCanvas( c , LW1 )
+CONSUME DocShown : toDocumentCanvasBool(Document_1,c,true());
+PRODUCE DocShown : toDocumentCanvasBool(Document_1,c,false());
+
+TRANSITION cm37
+VAR c : Canvas; Document_1 : Document;
+GUARD equalCanvas( c , LW2 )
+CONSUME DocShown : toDocumentCanvasBool(Document_1,c,true());
+PRODUCE DocShown : toDocumentCanvasBool(Document_1,c,false());
+
+TRANSITION cm38
+VAR c : Canvas; Document_1 : Document;
+GUARD equalCanvas( c , LW3 )
+CONSUME DocShown : toDocumentCanvasBool(Document_1,c,true());
+PRODUCE DocShown : toDocumentCanvasBool(Document_1,c,false());
+
+TRANSITION cm39
+VAR c : Canvas; Document_1 : Document;
+GUARD equalCanvas( c , LW4 )
+CONSUME DocShown : toDocumentCanvasBool(Document_1,c,true());
+PRODUCE DocShown : toDocumentCanvasBool(Document_1,c,false());
+
+TRANSITION cm40
+VAR c : Canvas; Document_1 : Document;
+GUARD equalCanvas( c , LW5 )
+CONSUME DocShown : toDocumentCanvasBool(Document_1,c,true());
+PRODUCE DocShown : toDocumentCanvasBool(Document_1,c,false());
+
+TRANSITION cm41
+VAR c : Canvas; Document_1 : Document;
+GUARD equalCanvas( c , LW6 )
+CONSUME DocShown : toDocumentCanvasBool(Document_1,c,true());
+PRODUCE DocShown : toDocumentCanvasBool(Document_1,c,false());
+
+TRANSITION cm42
+VAR c : Canvas; Document_1 : Document;
+GUARD equalCanvas( c , VD1 )
+CONSUME DocShown : toDocumentCanvasBool(Document_1,c,true());
+PRODUCE DocShown : toDocumentCanvasBool(Document_1,c,false());
+
+TRANSITION cm43
+VAR c : Canvas; Document_1 : Document;
+GUARD equalCanvas( c , VD2 )
+CONSUME DocShown : toDocumentCanvasBool(Document_1,c,true());
+PRODUCE DocShown : toDocumentCanvasBool(Document_1,c,false());

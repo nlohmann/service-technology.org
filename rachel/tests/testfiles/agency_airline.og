@@ -1,0 +1,38 @@
+NODES
+  0 : (!booking + !payment + !reject + ?offer) : blue,
+  1 : (!booking + !payment + !reject) : blue,
+  2 : !booking : blue,
+  3 : (?confirm * ?refusal) : blue,
+  5 : final : blue,
+  15 : !payment : blue,
+  17 : final : blue,
+  18 : (!booking + ?offer) : blue,
+  19 : ((?offer + ?confirm) * (?offer + ?refusal)) : blue,
+  21 : ?offer : blue,
+  30 : (!payment + ?offer) : blue,
+  32 : ?offer : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 1 : ?offer,
+  0 -> 18 : !payment,
+  0 -> 30 : !booking,
+  0 -> 32 : !reject,
+  1 -> 2 : !payment,
+  1 -> 15 : !booking,
+  1 -> 17 : !reject,
+  2 -> 3 : !booking,
+  3 -> 5 : ?refusal,
+  3 -> 5 : ?confirm,
+  15 -> 3 : !payment,
+  18 -> 2 : ?offer,
+  18 -> 19 : !booking,
+  19 -> 3 : ?offer,
+  19 -> 21 : ?refusal,
+  19 -> 21 : ?confirm,
+  21 -> 5 : ?offer,
+  30 -> 15 : ?offer,
+  30 -> 19 : !payment,
+  32 -> 17 : ?offer;

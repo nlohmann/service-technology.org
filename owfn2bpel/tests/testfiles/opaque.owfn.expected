@@ -1,0 +1,29 @@
+<process name="Act_process_../tests/testfiles/opaque.owfn"
+  targetNamespace="http://docs.oasis-open.org/wsbpel/2.0/process/abstract"
+  xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/abstract"
+  suppressJoinFailure="yes"
+  xmlns:template="http://docs.oasisopen.org/wsbpel/2.0/process/abstract/simple-template/2006/08"
+  abstractProcessProfile="http://docs.oasisopen.org/wsbpel/2.0/process/abstract/simple-template/2006/08">
+    <partnerLinks>
+      <partnerLink name="generic_pl" partnerLinkType="##opaque"
+                   myRole="##opaque" partnerRole="##opaque" />
+    </partnerLinks>
+
+  <variables>
+    <variable name="Var_a" element="##opaque" />
+    <variable name="Var_b" element="##opaque" />
+  </variables>
+
+  <flow name="Act_t1">
+    <receive name="Act_a"
+      partnerLink="generic_pl"
+      operation="a"
+      variable="Var_a" />
+    <invoke name="Act_b"
+      partnerLink="generic_pl"
+      operation="b"
+      inputVariable="Var_b" />
+  </flow>
+
+</process>
+

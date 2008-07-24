@@ -1,0 +1,19 @@
+Version 1.01
+============
++ fixed bug #12062 <http://gna.org/bugs/?12062>
++ added Makefile target "cvs-clean" that removes all files that can be rebuilt by "autoreconf -iv"
++ the information gathered by the configure script is now collected in a header file "src/config.H"
++ tidied Makefiles
++ added a testsuite (invoked by Makefile target "check") consisting of
+  + the Dining Philosophers
+  + the Echo Algorithm (currently not used)
+  + a business process translated from a UML specification
+  + an AI planning problem
++ added the documentation from <http://www.informatik.hu-berlin.de/~kschmidt/doku.ps>
++ added a (undocumented) command line parameter "--bug" for debug purposes
+
+
+Version 1.00
+============
++ code of a version of Karsten Wolf that has not been officially released; this version is not a completely tested version and is only intended for internal purposes
++ minor adjustments (only affecting the frontend) to use the GNU Autotools

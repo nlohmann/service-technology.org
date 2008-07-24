@@ -1,0 +1,58 @@
+INTRODUCTION
+============
+
+oWFN2BPEL introduces a fully-automatic translation of Petri net
+models into abstract BPEL processes which can be refined to
+executable BPEL processes. It combines strengths of Petri nets
+in modeling and verification with the ability to execute BPEL
+processes. Furthermore, it completes the Tools4BPEL framework
+to synthesize BPEL processes which are correct by design.
+
+
+CONTENTS
+========
+
+README     this file
+INSTALL    generic installation instructions
+COPYING    the GNU GPL under which oWFN2BPEL is licensed
+/src       the source code
+/doc       documentation about the translation approach
+
+
+SETUP
+=====
+
+To translate, execute
+
+   ./configure
+   make
+
+For more information on the configuration and translation,
+read the file INSTALL.
+
+
+EXECUTION
+=========
+
+To translate a model, say "process.owfn" into a BPEL process,
+you have to execute oWFN2BPEL with
+
+    owfn2bpel -i process.owfn -o process.bpel
+
+to generate a file "process.bpel".
+
+
+DOCUMENTATION
+=============
+
+The folder "doc" contains two documents: a German diploma
+thesis ("Kleine_2007.doc") describing the whole translation
+approach in detail. Furthermore, an English research paper
+("LohmannKleine_2008.pdf") describes the translation more
+briefly and compares it with other translation approaches.
+
+
+MORE INFORMATION
+================
+If you have any questions or problems, feel free to contact
+Niels Lohmann <niels.lohmann@uni-rostock.de>.

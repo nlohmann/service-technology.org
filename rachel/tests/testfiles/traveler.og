@@ -1,0 +1,11 @@
+NODES
+ 0, 1, 2, 3, 4;
+
+INITIALNODE 0;
+
+TRANSITIONS
+ 0 -> 1 : ?offer,
+ 1 -> 2 : !reject,
+ 1 -> 3 : !booking,
+ 3 -> 4 : !payment,
+ 4 -> 2 : ?confirm;

@@ -1,7 +1,7 @@
 Version 1.02 (in progress)
-==========================
+============
 + fixed bug #12089 <https://gna.org/bugs/?12089>
-
++ added Makefile target "win-bin" that produces a Cygwin independent binary when compiling under Cygwin, helps to avoid bug #12071 <http://gna.org/bugs/?12071>
 
 Version 1.01
 ============

@@ -49,6 +49,7 @@ AC_CANONICAL_BUILD
 # Checks for C/C++ details.
 AC_PROG_CXX
 AC_PROG_CC
+AM_PROG_CC_C_O
 
 
 # Unset compiler flags to avoid optimization.

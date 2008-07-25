@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.59)
-AC_INIT([LoLA],[1.01],[niels.lohmann@uni-rostock.de],[lola])
+AC_PREREQ(2.60)
+AC_INIT([LoLA],[1.02],[niels.lohmann@uni-rostock.de],[lola])
 AM_INIT_AUTOMAKE
 
 # Set directories.

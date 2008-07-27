@@ -1,4 +1,4 @@
-<process name="Act_process_../tests/testfiles/caise2006.owfn"
+<process name="Act_process_caise2006.owfn"
   targetNamespace="http://docs.oasis-open.org/wsbpel/2.0/process/abstract"
   xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/abstract"
   suppressJoinFailure="yes"

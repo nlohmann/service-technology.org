@@ -1,3 +1,14 @@
+Version 4.7
+-----------
++ tidied Makefiles
++ added Makefile targets "cvs-clean", "bin-dist", and "upload"
++ added "--bug" parameter for debugging purposes
++ LoLA is now added as distribution tarball to oWFN2BPEL to avoid code deviation -- any new version has to be announced in the configure script by setting the variable LOLANAME
++ exit codes are unified to EXIT_FAILURE or EXIT_SUCCESS
++ implemented task #6103 <https://gna.org/task/?6103>
++ removed files that can be created by autoreconf
+
+
 Version 4.6
 -----------
 + a manpage is created

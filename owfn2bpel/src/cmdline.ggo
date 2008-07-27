@@ -24,15 +24,14 @@ option "remove-opaque" r
   off
 
 option "lola" l
-  "Path to LoLA executable that is compiled with flags 'FULL', 'CAPACITY 1', and 'CHECKCAPACITY'. (not yet implemented)"
+  "Path to LoLA executable that is compiled with flags 'FULL', 'CAPACITY 1', and 'CHECKCAPACITY'."
   string 
+  default="owfn2bpel_lola"
   typestr="PATH"
   optional
-  default="owfn2bpel_lola"
-  hidden
 
 
-section "Debug and verbose output"
+section "Verbose output"
 
 option "stats" s
   "Shows statistical values (the number of executions) after the end of the transformation."
@@ -51,13 +50,21 @@ option "min-verbose" m
   off
   hidden
 
+
+section "Debugging"
+
 option "debug" d
   "Shows the oWFN elements that get reduced (not yet implemented)."
   flag
   off
   hidden
 
+option "bug" -
+  "Show helpful information (version number, compilation date, compiler version, and platform) in case a bug was found and should be reported."
+  flag off
+  hidden
+
 text "\n"
-text "Written by Jens Kleine during his diploma thesis at HU Berlin. "
-text "Maintained by Niels Lohmann, http://www.informatik.uni-rostock.de/~nl/owfn2bpel. "
-text "Send bug reports to <bpel2owfn-bug@gnu.org>."
+text "Written by Jens Kleine as part of his diploma thesis at HU Berlin. "
+text "Maintained by Niels Lohmann. http://service-technology.org/owfn2bpel. "
+text "Send bug reports to <niels.lohmann@uni-rostock.de>."

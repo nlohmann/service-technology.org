@@ -3,13 +3,13 @@
 echo ""
 
 echo "test: translation of nonsafe.owfn"
-echo "      owfn2bpel --input $testdir/testfiles/nonsafe.owfn &> /dev/null"
-owfn2bpel --input $testdir/testfiles/nonsafe.owfn &> /dev/null
+echo "      owfn2bpel --input $testdir/testfiles/nonsafe.owfn -o nonsafe.owfn.bpel &> /dev/null"
+owfn2bpel --input $testdir/testfiles/nonsafe.owfn -o nonsafe.owfn.bpel &> /dev/null
 result5=$?
 
 echo "test: comparing generated file with expected output"
-echo "      diff $testdir/testfiles/nonsafe.owfn.bpel $testdir/testfiles/nonsafe.owfn.expected"
-diff $testdir/testfiles/nonsafe.owfn.bpel $testdir/testfiles/nonsafe.owfn.expected
+echo "      diff nonsafe.owfn.bpel $testdir/testfiles/nonsafe.owfn.expected"
+diff nonsafe.owfn.bpel $testdir/testfiles/nonsafe.owfn.expected
 result6=$?
 
 

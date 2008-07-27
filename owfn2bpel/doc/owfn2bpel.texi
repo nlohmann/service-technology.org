@@ -77,7 +77,8 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @cartouche
 @smallexample
 Usage: owfn2bpel -iFILE|--input=FILE [-h|--help] [--full-help] [-V|--version] 
-         [-oFILE|--output=FILE] [-r|--remove-opaque] [-s|--stats]
+         [-oFILE|--output=FILE] [-r|--remove-opaque] [-lPATH|--lola=PATH] 
+         [-s|--stats]
 
 About owfn2bpel:
   -h, --help           Print help and exit
@@ -97,8 +98,11 @@ Options:
   -r, --remove-opaque  Removes opaque activities where possible. These 
                          activities are mainly translations from 
                          non-communicating transitions.  (default=off)
+  -l, --lola=PATH      Path to LoLA executable that is compiled with flags 
+                         'FULL', 'CAPACITY 1', and 'CHECKCAPACITY'.  
+                         (default=`owfn2bpel_lola')
 
-Debug and verbose output:
+Verbose output:
   -s, --stats          Shows statistical values (the number of executions) 
                          after the end of the transformation.  (default=off)
 @end smallexample

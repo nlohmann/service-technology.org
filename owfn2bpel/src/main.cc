@@ -23,12 +23,16 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <cassert>
 
 #include "options.h"
 #include "classes.h"
 #include "cmdline.h"
 
 using namespace std;
+
+// variable holding the information from the command line
+gengetopt_args_info args_info;
 
 int *stat_array;
 int number_of_rounds;
@@ -77,12 +81,30 @@ void showStats(int interface[])
 
 int main(int argc, char *argv[])
 {
-    // variable holding the information from the command line
-    gengetopt_args_info args_info;
-
-    // let's call our cmdline parser
+    if (argc == 2 && std::string(argv[1]) == "--bug") {
+	    printf("\n\n");
+        printf("Please email the following information to %s:\n", PACKAGE_BUGREPORT);
+        printf("- tool:              %s\n", PACKAGE_NAME);
+        printf("- version:           %s\n", PACKAGE_VERSION);
+        printf("- compilation date:  %s\n", __DATE__);
+        printf("- compiler version:  %s\n", __VERSION__);
+        printf("- platform:          %s\n", BUILDSYSTEM);
+        printf("\n\n");
+        return EXIT_SUCCESS;
+    }
+	
+	
+    struct cmdline_parser_params *params;
+    
+    // set default values
+    cmdline_parser_init(&args_info);
+    
+    // initialize the parameters structure
+    params = cmdline_parser_params_create();
+    
+    // call the cmdline parser
     if (cmdline_parser (argc, argv, &args_info) != 0)
-        exit(1);    
+        exit(EXIT_FAILURE);    
         
         
     
@@ -338,7 +360,7 @@ int main(int argc, char *argv[])
     
 	cout << "Transformation from '" << args_info.input_arg << "' to '" << args_info.output_arg << "' complete." << endl;
     
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 

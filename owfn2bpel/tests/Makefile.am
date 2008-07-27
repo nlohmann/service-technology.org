@@ -1,9 +1,9 @@
 TESTS = test1 test2 test3 test4
 
-TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=.:../src:$$PATH
+TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=.:$(top_builddir)/src:$$PATH
 
-CLEANFILES = testfiles/*.bpel
+CLEANFILES = $(top_builddir)/tests/*.bpel
 	     
 EXTRA_DIST = $(TESTS) \
-	     testfiles/*.owfn \
-	     testfiles/*.owfn.expected
+	     $(top_srcdir)/tests/testfiles/*.owfn \
+	     $(top_srcdir)/tests/testfiles/*.owfn.expected

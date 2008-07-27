@@ -24,11 +24,18 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <libgen.h>
+#include <cassert>
 
 #include "options.h"
 #include "classes.h"
+#include "cmdline.h"
 
 using namespace std;
+
+// variable holding the information from the command line
+extern gengetopt_args_info args_info;
+
 
 
 
@@ -299,7 +306,7 @@ void owfn::write_bpel()
 	if(!bpel_file)
 	{
 		cout << "Error 1 in function 'write_bpel': BPEL file '" << outfile << "' could not be opened!" << endl;
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 #ifdef VERBOSE
@@ -349,7 +356,7 @@ void owfn::read_owfn()
 	if(!owfn_file)
 	{
 		cout << "Error 1 in function 'read_owfn': oWFN file '" << file << "' not found!\n";
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 #ifdef VERBOSE
@@ -367,7 +374,7 @@ void owfn::read_owfn()
 	}else
 	{
 		cout << "Error 2 in function 'read_owfn': Internal places were not found in oWFN file! There needs to be at least one place in the oWFN to generate BPEL code.\n";
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 	owfn_file.clear();
@@ -417,7 +424,7 @@ void owfn::read_owfn()
 	}else
 	{
 		cout << "Error 3 in function 'read_owfn': Initial marking was not found in oWFN file! There needs to be at least one place marked in the oWFN to generate BPEL code.\n";
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 	owfn_file.clear();
@@ -433,7 +440,7 @@ void owfn::read_owfn()
 	}else
 	{
 		cout << "Error 4 in function 'read_owfn': Final marking was not found in oWFN file! There needs to be at least one final marking in the oWFN to generate BPEL code.\n";
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 	owfn_file.clear();
@@ -1719,7 +1726,7 @@ int owfn::reoccrepl_linplaces()
 							if(placeptr == NULL)
 							{
 								cout << "Error 1 in function 'reoccrepl_linplaces': Place '" << placeA->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 							places->append_bpel(placeptr->bpel_code);
 							//delete place
@@ -1742,7 +1749,7 @@ int owfn::reoccrepl_linplaces()
 							if(transdel == NULL)
 							{
 								cout << "Error 2 in function 'reoccrepl_linplaces': Transition '" << transitionB->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 							if(transdel->bpel_code != NULL)
 							{
@@ -1762,7 +1769,7 @@ int owfn::reoccrepl_linplaces()
 							if(placeptr == NULL)
 							{
 								cout << "Error 3 in function 'reoccrepl_linplaces': Place '" << placeC->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 							places->append_bpel(placeptr->bpel_code);
 							//delete place
@@ -1965,7 +1972,7 @@ int owfn::reoccrepl_lintrans()
 							if(placeptr == NULL)
 							{
 								cout << "Error 1 of function 'reoccrepl_lintrans': Place '" << placeB->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 							transitions->append_bpel(placeptr->bpel_code);
 							//delete place
@@ -1996,7 +2003,7 @@ int owfn::reoccrepl_lintrans()
 							if(help == NULL)
 							{
 								cout << "Error 2 of function 'reoccrepl_lintrans': Transition '" << transitionC->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 
 							//delete transition A
@@ -2025,7 +2032,7 @@ int owfn::reoccrepl_lintrans()
 							if(help == NULL)
 							{
 								cout << "Error 3 of function 'reoccrepl_lintrans': Transition '" << transitionC->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 							//delete transition C
 							if(transprevC == NULL)	//first element of list
@@ -2123,7 +2130,7 @@ int owfn::reoccrepl_endplaces()
 						if(placeptr == NULL)
 						{
 							cout << "Error: Place '" << placeA->name << "' vanished. This should not happen...\n";
-							exit(1);
+							exit(EXIT_FAILURE);
 						}
 						if(transptr->bpel_code != NULL)
 						{
@@ -2425,7 +2432,7 @@ int owfn::reoccrepl_switch()
 					}else
 					{
 						cout << "Error 1 in function 'reoccrepl_switch': Transition '" << translistptr->transitionptr->name << "' vanished. This should not happen...\n";
-						exit(1);
+						exit(EXIT_FAILURE);
 					}
 					translistptr = translistptr->next;
 				}
@@ -2635,7 +2642,7 @@ int owfn::reoccrepl_switchshort()
 				if(secondplace == NULL)
 				{
 					cout << "Error: Place '" << placename << "' vanished. This should not happen...\n";
-					exit(1);
+					exit(EXIT_FAILURE);
 				}
 				places->append_bpel(secondplace->bpel_code);
 				//update consume and produce list of new place
@@ -2684,7 +2691,7 @@ int owfn::reoccrepl_switchshort()
 				if(firstplace == NULL)
 				{
 					cout << "Error: Place '" << placeptr->name << "' vanished. This should not happen...\n";
-					exit(1);
+					exit(EXIT_FAILURE);
 				}
 
 				//delete first place
@@ -2708,7 +2715,7 @@ int owfn::reoccrepl_switchshort()
 				if(secondplace == NULL)
 				{
 					cout << "Error: Place '" << placename << "' vanished. This should not happen...\n";
-					exit(1);
+					exit(EXIT_FAILURE);
 				}
 				if(placeprev == NULL)	//first element of list
 				{
@@ -2909,7 +2916,7 @@ int owfn::reoccrepl_switchshortopenend()
 				if(prod == NULL)
 				{
 					cout << "Error 1 in function 'reoccrepl_switchshortopenend': Place '" << placeptr->name << "' vanished. This should not happen...\n";
-					exit(1);
+					exit(EXIT_FAILURE);
 				}
 
 				//delete first place
@@ -2981,7 +2988,7 @@ int owfn::reoccrepl_circleshort()
 			if(placeptr == NULL)
 			{
 				cout << "Error 1 in function 'reoccrepl_circleshort': Place '" << transptr->consumes->name << "' vanished. This should not happen...\n";
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 			//don't copy a while as the last activity at a place
 			//copy place bpel code
@@ -3142,7 +3149,7 @@ int owfn::reoccrepl_flowshortopenend()
 					if(placeptr == NULL)
 					{
 						cout << "Error: Place '" << prod->name << "' vanished. This should not happen...\n";
-						exit(1);
+						exit(EXIT_FAILURE);
 					}
 					list = placeptr->bpel_code;
 
@@ -3344,7 +3351,7 @@ int owfn::reoccrepl_flowshort()
 						if(placeptr == NULL)
 						{
 							cout << "Error: Place '" << prod->name << "' vanished. This should not happen...\n";
-							exit(1);
+							exit(EXIT_FAILURE);
 						}
 						list = placeptr->bpel_code;
 
@@ -3391,7 +3398,7 @@ int owfn::reoccrepl_flowshort()
 					if(alltrans == NULL)
 					{
 						cout << "Error: Transition '" << transB->name << "' vanished. This should not happen...\n";
-						exit(1);
+						exit(EXIT_FAILURE);
 					}
 					if(transprev == NULL)	//first element of list
 					{
@@ -3776,7 +3783,7 @@ void owfn::create_B(place *start)
 							{
 								cout << alltrans->name << " soll drauf prod." << endl;
 								cout << "Error 1 in function 'create_B': Place '" << prod->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 							places_in_B = new placelist(placeptr, places_in_B);
 							create_B(placeptr);
@@ -3892,7 +3899,7 @@ int owfn::reoccrepl_copy_A()
 						if(prod == NULL)
 						{
 							cout << "Error 1 in function 'reoccrepl_copy': Place '" << X->name << "' vanished. This should not happen...\n";
-							exit(1);
+							exit(EXIT_FAILURE);
 						}
 						//let the produce list point to the newly created copy
 						prod->name = places->name;
@@ -3902,7 +3909,7 @@ int owfn::reoccrepl_copy_A()
 						}else
 						{
 							cout << "Error 2 in function 'reoccrepl_copy': List of transitions is shorter than counted. This should not happen...\n";
-							exit(1);
+							exit(EXIT_FAILURE);
 						}
 					}
 					//rename X
@@ -3914,7 +3921,7 @@ int owfn::reoccrepl_copy_A()
 					if(prod == NULL)
 					{
 						cout << "Error 1 in function 'reoccrepl_copy': Place '" << X->name << "' vanished. This should not happen...\n";
-						exit(1);
+						exit(EXIT_FAILURE);
 					}
 					prod->name = X->name + "_C0";
 					X->name = X->name + "_C0";
@@ -4012,7 +4019,7 @@ int owfn::reoccrepl_copy_A()
 								if(prod == NULL)
 								{
 									cout << "Error 3 in function 'reoccrepl_copy': Place '" << X->name << "' vanished. This should not happen...\n";
-									exit(1);
+									exit(EXIT_FAILURE);
 								}
 								//let the produce list point to the newly created copy
 								prod->name = places->name;
@@ -4022,7 +4029,7 @@ int owfn::reoccrepl_copy_A()
 								}else
 								{
 									cout << "Error 4 in function 'reoccrepl_copy': List of transitions is shorter than counted. This should not happen...\n";
-									exit(1);
+									exit(EXIT_FAILURE);
 								}
 							}
 							//rename X
@@ -4034,7 +4041,7 @@ int owfn::reoccrepl_copy_A()
 							if(prod == NULL)
 							{
 								cout << "Error 5 in function 'reoccrepl_copy': Place '" << X->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 							prod->name = X->name + "_C0";
 							X->name = X->name + "_C0";
@@ -4058,7 +4065,7 @@ int owfn::reoccrepl_copy_A()
 								if(placeptr == NULL)
 								{
 									cout << "Error 6 in function 'reoccrepl_copy': Place '" << placelistptr->placeptr->name << "' vanished. This should not happen...\n";
-									exit(1);
+									exit(EXIT_FAILURE);
 								}else
 								{
 									placeptr->name = placeptr->name + "_C0";
@@ -4252,7 +4259,7 @@ int owfn::reoccrepl_copy_B()
 						if(prod == NULL)
 						{
 							cout << "Error 1 in function 'reoccrepl_copy': Place '" << X->name << "' vanished. This should not happen...\n";
-							exit(1);
+							exit(EXIT_FAILURE);
 						}
 						//let the produce list point to the newly created copy
 						prod->name = places->name;
@@ -4262,7 +4269,7 @@ int owfn::reoccrepl_copy_B()
 						}else
 						{
 							cout << "Error 2 in function 'reoccrepl_copy': List of transitions is shorter than counted. This should not happen...\n";
-							exit(1);
+							exit(EXIT_FAILURE);
 						}
 					}
 					//rename X
@@ -4274,7 +4281,7 @@ int owfn::reoccrepl_copy_B()
 					if(prod == NULL)
 					{
 						cout << "Error 1 in function 'reoccrepl_copy': Place '" << X->name << "' vanished. This should not happen...\n";
-						exit(1);
+						exit(EXIT_FAILURE);
 					}
 					prod->name = X->name + "_C0";
 					X->name = X->name + "_C0";
@@ -4384,7 +4391,7 @@ int owfn::reoccrepl_copy_B()
 							if(prod == NULL)
 							{
 								cout << "Error 3 in function 'reoccrepl_copy': Place '" << X->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 							//let the produce list point to the newly created copy
 							prod->name = places->name;
@@ -4394,7 +4401,7 @@ int owfn::reoccrepl_copy_B()
 							}else
 							{
 								cout << "Error 4 in function 'reoccrepl_copy': List of transitions is shorter than counted. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 						}
 						//rename X
@@ -4406,7 +4413,7 @@ int owfn::reoccrepl_copy_B()
 						if(prod == NULL)
 						{
 							cout << "Error 5 in function 'reoccrepl_copy': Place '" << X->name << "' vanished. This should not happen...\n";
-							exit(1);
+							exit(EXIT_FAILURE);
 						}
 						prod->name = X->name + "_C0";
 						X->name = X->name + "_C0";
@@ -4635,7 +4642,7 @@ void owfn::final_links()
 			if(placeptr == NULL)
 			{
 				cout << "Error 1 in function 'final_links': Place '" << plist->name << "' vanished. This should not happen...\n";
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 
 			//turn arc from place to transition into a link
@@ -4658,7 +4665,7 @@ void owfn::final_links()
 			if(placeptr == NULL)
 			{
 				cout << "Error 2 in function 'final_links': Place '" << plist->name << "' vanished. This should not happen...\n";
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 
 			//falls der Platz bereits Ziel von Links ist, an dieser Stelle das OR Flag setzen
@@ -4819,7 +4826,9 @@ void owfn::final_create_final(char *name)
 {
 	string help;
 	bpel *final;
-	help = "process_" + string(name);
+    // use "basename()" to strip directory prefix
+	help = "process_" + string(basename(name));
+    cerr << help << endl;
 	final = new bpel(PROCESS, NULL, help);
 
 	final->add_branch();
@@ -5151,7 +5160,7 @@ void owfn::finish_while(bpel *start)
 		}else
 		{
 			cout << "Error 1 in function 'finish_even_more_empties': An empty branch has been created. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		help = help->next;
 	}
@@ -5359,7 +5368,7 @@ void owfn::finish_empties(bpel *start)
 		}else
 		{
 			cout << "Error 1 in function 'finish_empties': An empty branch has been created. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		help = help->next;
 	}
@@ -5433,7 +5442,7 @@ void owfn::finish_more_empties(bpel *start)
 		}else
 		{
 			cout << "Error 1 in function 'finish_more_empties': An empty branch has been created. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		help = help->next;
 	}
@@ -5492,7 +5501,7 @@ void owfn::finish_even_more_empties(bpel *start)
 		}else
 		{
 			cout << "Error 1 in function 'finish_even_more_empties': An empty branch has been created. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		help = help->next;
 	}
@@ -5572,7 +5581,7 @@ void owfn::finish_opaques(bpel *start)
 		}else
 		{
 			cout << "Error 1 in function 'finish_opaques': An empty branch has been created. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		help = help->next;
 	}
@@ -5646,7 +5655,7 @@ void owfn::finish_more_opaques(bpel *start)
 		}else
 		{
 			cout << "Error 1 in function 'finish_more_opaques': An empty branch has been created. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		help = help->next;
 	}
@@ -5705,7 +5714,7 @@ void owfn::finish_even_more_opaques(bpel *start)
 		}else
 		{
 			cout << "Error 1 in function 'finish_even_more_opaques': An empty branch has been created. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		help = help->next;
 	}
@@ -5901,7 +5910,7 @@ int owfn::reoccrepl_circlemultexits()
 							if(placeptr == NULL)
 							{
 								cout << "Error 1 in function 'reoccrepl_circlemultexits': Place '" << firsttrans->consumes->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 
 							if(placeptr->bpel_code != NULL)
@@ -5950,7 +5959,7 @@ int owfn::reoccrepl_circlemultexits()
 									if(placeptr == NULL)
 									{
 										cout << "Error 2 in function 'reoccrepl_circlemultexits': Place '" << tmplist->next->transitionptr->consumes->name << "' vanished. This should not happen...\n";
-										exit(1);
+										exit(EXIT_FAILURE);
 									}
 									if(placeptr->bpel_code != NULL)
 									{
@@ -5994,7 +6003,7 @@ int owfn::reoccrepl_circlemultexits()
 							if(realplace == NULL)
 							{
 								cout << "Error 2 in function 'reoccrepl_circlemultexits': Place '" << tmplist->next->transitionptr->consumes->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 							transptr = transitions;
 							while(transptr != NULL)
@@ -6109,7 +6118,7 @@ int owfn::reoccrepl_circlemultexits()
 									if(realplace == NULL)
 									{
 										cout << "Error 3 in function 'reoccrepl_circlemultexits': Place '" << tmplist->next->transitionptr->consumes->name << "' vanished. This should not happen...\n";
-										exit(1);
+										exit(EXIT_FAILURE);
 									}
 									transptr = transitions;
 									while(transptr != NULL)
@@ -6186,7 +6195,7 @@ int owfn::reoccrepl_circlemultexits()
 																if(placeptr == NULL)
 																{
 																	cout << "Error 4 in function 'reoccrepl_circlemultexits': Place '" << tlptr->next->transitionptr->consumes->name << "' vanished. This should not happen...\n";
-																	exit(1);
+																	exit(EXIT_FAILURE);
 																}
 																if(placeptr->bpel_code != NULL)
 																{
@@ -6245,7 +6254,7 @@ int owfn::reoccrepl_circlemultexits()
 							if(deltrans == NULL)
 							{
 								cout << "Error 2 in function 'reoccrepl_circlemultexits': Transition '" << firsttrans->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 							if(prev == NULL)
 							{
@@ -6271,7 +6280,7 @@ int owfn::reoccrepl_circlemultexits()
 								if(placeptr == NULL)
 								{
 									cout << "Error 3 in function 'reoccrepl_circlemultexits': Place '" << tmplist->transitionptr->produces->name << "' vanished. This should not happen...\n";
-									exit(1);
+									exit(EXIT_FAILURE);
 								}
 								if(prevplace == NULL)
 								{
@@ -6294,7 +6303,7 @@ int owfn::reoccrepl_circlemultexits()
 								if(deltrans == NULL)
 								{
 									cout << "Error 4 in function 'reoccrepl_circlemultexits': Transition '" << tmplist->transitionptr->name << "' vanished. This should not happen...\n";
-									exit(1);
+									exit(EXIT_FAILURE);
 								}
 								if(prev == NULL)
 								{
@@ -6399,7 +6408,7 @@ int owfn::find_circles(string startplatzname, string aktuellerplatz)
 			if(placeptr == NULL)
 			{
 				cout << "Error 1 in function 'find_circles': Place '" << aktuellerplatz << "' vanished. This should not happen...\n";
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 			places_in_B = new placelist(placeptr, places_in_B);
 
@@ -6433,7 +6442,7 @@ int owfn::find_circles(string startplatzname, string aktuellerplatz)
 					if(placeptr == NULL)
 					{
 						cout << "Error 2 in function 'find_circles': Place '" << aktuellerplatz << "' vanished. This should not happen...\n";
-						exit(1);
+						exit(EXIT_FAILURE);
 					}
 					places_in_B = new placelist(placeptr, places_in_B);
 
@@ -6580,7 +6589,7 @@ int owfn::reoccrepl_circlemultins()
 				if(tlptr == NULL)
 				{
 					cout << "Error 3 in function 'reoccrepl_circlemultins': Place '" << p1->name << "' vanished. This should not happen...\n";
-					exit(1);
+					exit(EXIT_FAILURE);
 				}
 //6.
 				//Ab p1 den BPEL Code aller Transitionen und Plätze kopieren, bis hin zum Platz selbst
@@ -6617,7 +6626,7 @@ int owfn::reoccrepl_circlemultins()
 					if(plptr == NULL)
 					{
 						cout << "Error 4 in function 'reoccrepl_circlemultins': Place '" << tlptr->transitionptr->produces->name << "' vanished. This should not happen...\n";
-						exit(1);
+						exit(EXIT_FAILURE);
 					}
 					
 					tmp = p0->bpel_code->branches->bpel_code;
@@ -6677,7 +6686,7 @@ int owfn::reoccrepl_circlemultins()
 						if(plptr == NULL)
 						{
 							cout << "Error 4 in function 'reoccrepl_circlemultins': Place '" << tlptr->transitionptr->produces->name << "' vanished. This should not happen...\n";
-							exit(1);
+							exit(EXIT_FAILURE);
 						}
 						
 						tmp = p0->bpel_code->branches->bpel_code;
@@ -6712,7 +6721,7 @@ int owfn::reoccrepl_circlemultins()
 				if(translistptr == NULL)
 				{
 					cout << "Error 1 in function 'reoccrepl_circlemultins': Transition vanished. This should not happen...\n";
-					exit(1);
+					exit(EXIT_FAILURE);
 				}
 
 				translistptr->transitionptr->produces->name = p0_name;
@@ -6753,7 +6762,7 @@ int owfn::reoccrepl_circlemultins()
 									if(con == NULL)
 									{
 										cout << "Error 2 in function 'reoccrepl_circlemultins': Place '" << placelistptr->placeptr->name << "' vanished. This should not happen...\n";
-										exit(1);
+										exit(EXIT_FAILURE);
 									}
 //4.
 									con->name = p0_name;
@@ -6770,7 +6779,7 @@ int owfn::reoccrepl_circlemultins()
 										if(tlptr == NULL)
 										{
 											cout << "Error 3 in function 'reoccrepl_circlemultins': Place '" << p1->name << "' vanished. This should not happen...\n";
-											exit(1);
+											exit(EXIT_FAILURE);
 										}
 										//Ab p1 den BPEL Code aller Transitionen und Plätze kopieren, bis hin zum Platz selbst
 										while(tlptr != NULL && tlptr->transitionptr->consumes->name != placelistptr->placeptr->name)
@@ -6794,7 +6803,7 @@ int owfn::reoccrepl_circlemultins()
 											if(plptr == NULL)
 											{
 												cout << "Error 4 in function 'reoccrepl_circlemultins': Place '" << tlptr->transitionptr->produces->name << "' vanished. This should not happen...\n";
-												exit(1);
+												exit(EXIT_FAILURE);
 											}
 											
 											tmp_code = copy_bpel(plptr->placeptr->bpel_code);
@@ -6827,7 +6836,7 @@ int owfn::reoccrepl_circlemultins()
 												if(plptr == NULL)
 												{
 													cout << "Error 4 in function 'reoccrepl_circlemultins': Place '" << tlptr->transitionptr->produces->name << "' vanished. This should not happen...\n";
-													exit(1);
+													exit(EXIT_FAILURE);
 												}
 												tmp_code = copy_bpel(plptr->placeptr->bpel_code);
 												copy_links(tmp_code);
@@ -7020,7 +7029,7 @@ void owfn::dfs(place *startplace, transition *starttrans)
 				if(realplace == NULL)
 				{
 					cout << "Error 1 in function 'dfs': Place '" << placeptr->name << "' vanished. This should not happen...\n";
-					exit(1);
+					exit(EXIT_FAILURE);
 				}
 
 				if(realplace->dfs == -1)
@@ -7132,7 +7141,7 @@ void owfn::in_to_in(place *start)
 							if(realplace == NULL)
 							{
 								cout << "Error 1 in function 'in_to_in': Place '" << prod->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 							if(placelistptr == NULL)
 							{
@@ -7227,7 +7236,7 @@ int owfn::reoccrepl_circlemultexecution()
 	}else
 	{
 		cout << "Error 1 in function 'reoccrepl_circlemultexecution': Start place vanished. This should not happen...\n";
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 	while(dfs_stack != NULL)
@@ -7450,7 +7459,7 @@ int owfn::reoccrepl_circlemultexecution()
 						if((newoWFN->places != NULL && newoWFN->transitions != NULL) || (newoWFN->places != NULL && newoWFN->places->next != NULL) || (newoWFN->transitions != NULL && newoWFN->transitions->next != NULL))
 						{
 							cout << "Error: Could not reduce sub-net. The oWFN seems to violate this tools specifications." << endl << "No output was generated." << endl;
-							exit(1);
+							exit(EXIT_FAILURE);
 						}
 						
 						if(newoWFN->places != NULL)
@@ -7689,7 +7698,7 @@ void owfn::owfn_to_file()
 	if(!bpel_file)
 	{
 		cout << "Error 1 in function 'owfn_to_file': BPEL file '" << outfile << "' could not be opened!" << endl;
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 		bpel_file << "PLACE" << endl << "INTERNAL" << endl;
@@ -7803,7 +7812,8 @@ int owfn::check_subnet(string start, int is_trans, string trans_start_name, stri
 	char *lola_name = "lola_safety.tmp";
 	char *lola_result = "lola_safety_result.tmp";
 	char keyword[9];
-	string tmp("owfn2bpel_lola/owfn2bpel_lola");
+    assert(args_info.lola_arg != NULL);
+	string tmp = string(args_info.lola_arg); //("owfn2bpel_lola/owfn2bpel_lola");
 	string execution;
 	string buffer;
 	string::size_type loc;
@@ -7981,7 +7991,7 @@ int owfn::check_subnet(string start, int is_trans, string trans_start_name, stri
 	if(!lola_file)
 	{
 		cout << "Error 1 in function 'check_subnet': Temporary file '" << lola_name << "' could not be opened!\n";
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 	//Allgemeines
@@ -8065,7 +8075,7 @@ int owfn::check_subnet(string start, int is_trans, string trans_start_name, stri
 	if(!lola_res)
 	{
 		cout << "Error 2 in function 'check_subnet': Temporary file '" << lola_result << "' could not be opened!\n";
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	strcpy(keyword, "exceeded");
 
@@ -8084,12 +8094,12 @@ int owfn::check_subnet(string start, int is_trans, string trans_start_name, stri
 	if(remove(lola_name) != 0)
 	{
 		cout << "Warning in function 'check_subnet': Temporary file '" << lola_name << "' could not be deleted!" << endl;
-		//exit(1);
+		//exit(EXIT_FAILURE);
 	}
 	if(remove(lola_result) != 0)
 	{
 		cout << "Warning in function 'check_subnet': Temporary file '" << lola_result << "' could not be deleted!" << endl;
-		//exit(1);
+		//exit(EXIT_FAILURE);
 	}
 
 	return lola;
@@ -8590,7 +8600,7 @@ void owfn::flow_links()
 			if(plptr == NULL)
 			{
 				cout << "Error 1 in function 'flow_links': Place '" << plist->name << "' vanished. This should not happen...\n";
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 
 			//turn arc from place to transition into a link
@@ -8613,7 +8623,7 @@ void owfn::flow_links()
 			if(plptr == NULL)
 			{
 				cout << "Error 2 in function 'flow_links': Place '" << plist->name << "' vanished. This should not happen...\n";
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 
 			//falls der Platz bereits Ziel von Links ist, an dieser Stelle das OR Flag setzen
@@ -8723,7 +8733,7 @@ void owfn::delete_subnet_original()
 		if(transptr == NULL)
 		{
 			cout << "Error 1 in function 'delete_subnet_original': Transition '" << trans_original->transitionptr->name << "' vanished. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}else
 		{
 			if(prevt == NULL)
@@ -8762,7 +8772,7 @@ void owfn::delete_subnet_original()
 		if(placeptr == NULL)
 		{
 			cout << "Error 2 in function 'delete_subnet_original': Place '" << places_original->placeptr->name << "' vanished. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}else
 		{
 			if(prevp == NULL)
@@ -8806,7 +8816,7 @@ void owfn::remove_place_from_original(string name)
 	if(plptr == NULL)
 	{
 		cout << "Error 1 in function 'remove_place_from_original': Place '" << name << "' vanished. This should not happen...\n";
-		exit(1);
+		exit(EXIT_FAILURE);
 	}else
 	{
 		if(prev == NULL)
@@ -9074,7 +9084,7 @@ int owfn::f_trans_end(transition *start, int max, placelist *selected)
 						if(realplace == NULL)
 						{
 							cout << "Error 1 in function 'f_trans_end': Place '" << con->name << "' vanished. This should not happen...\n";
-							exit(1);
+							exit(EXIT_FAILURE);
 						}
 						newplaces = new placelist(realplace, newplaces);
 						places_in_B = new placelist(realplace, places_in_B);
@@ -9106,7 +9116,7 @@ int owfn::f_trans_end(transition *start, int max, placelist *selected)
 		if(!remove_transition_from_original(start->name))
 		{
 			cout << "Error 2 in function 'f_trans_end': Transition '" << start->name << "' vanished. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 
 		if(check_subnet(start->name + "_flow_subnet", 1, start->name, ""))	//der Name des Platzes, der ganz oben steht, als Anfangsmarkierung für die LoLA Datei
@@ -9272,7 +9282,7 @@ int owfn::f_trans_end_a(transition *start, int max, placelist *fixed, placelist 
 		if(tmpplptr == NULL)
 		{
 			cout << "Error 1 in function 'f_trans_end_a': Place '" << plptr->placeptr->name << "' vanished. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		//tmpplptr zeigt nun auf den gleichen Platznamen wie plptr
 		//alles nach diesem letzten Element von fixed wird die Liste rest
@@ -9438,7 +9448,7 @@ int owfn::f_place_end_a(place *start, int max, transitionlist *fixed, transition
 		if(tl == NULL)
 		{
 			cout << "Error 1 in function 'f_place_end_a': Transition '" << tlptr->transitionptr->name << "' vanished. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		//tl zeigt nun auf die gleiche Transition wie tlptr
 		//alles nach diesem letzten Element von fixed wird die Liste rest
@@ -9632,7 +9642,7 @@ int owfn::f_place_end(place *start, int max, transitionlist *selected)
 					if(realplace == NULL)
 					{
 						cout << "Error 1 in function 'f_place_end': Place '" << con->name << "' vanished. This should not happen...\n";
-						exit(1);
+						exit(EXIT_FAILURE);
 					}
 					newplaces = new placelist(realplace, newplaces);
 					places_in_B = new placelist(realplace, places_in_B);
@@ -9699,7 +9709,7 @@ int owfn::f_place_end(place *start, int max, transitionlist *selected)
 		if(!(replace_place(start, "_flow_start")))
 		{
 			cout << "Error 2 in function 'f_place_end': Place '" << start->name << "' vanished. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		//startplatz aus Original Teilnetz entfernen, damit dieser nicht mitgelöscht wird
 		remove_place_from_original(start->name);
@@ -9858,7 +9868,7 @@ int owfn::f_place_to_place(place *start, int max, transitionlist *selected, plac
 					if(realplace == NULL)
 					{
 						cout << "Error 1 in function 'f_place_to_place': Place '" << con->name << "' vanished. This should not happen...\n";
-						exit(1);
+						exit(EXIT_FAILURE);
 					}
 					newplaces = new placelist(realplace, newplaces);
 					places_in_B = new placelist(realplace, places_in_B);
@@ -9963,7 +9973,7 @@ int owfn::f_place_to_place(place *start, int max, transitionlist *selected, plac
 		if(!(replace_place(start, "_flow_start")))
 		{
 			cout << "Error 2 in function 'f_place_to_place': Place '" << start->name << "' vanished. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		if(!(replace_place(ende, "_flow_ende")))
 		{
@@ -10145,7 +10155,7 @@ int owfn::f_place_circle(place *start, int max, transitionlist *selected)
 					if(realplace == NULL)
 					{
 						cout << "Error 1 in function 'f_place_circle': Place '" << con->name << "' vanished. This should not happen...\n";
-						exit(1);
+						exit(EXIT_FAILURE);
 					}
 					newplaces = new placelist(realplace, newplaces);
 					places_in_B = new placelist(realplace, places_in_B);
@@ -10251,7 +10261,7 @@ int owfn::f_place_circle(place *start, int max, transitionlist *selected)
 		if(!(replace_place_circle(start, "_flow_start", "_flow_ende")))
 		{
 			cout << "Error 2 in function 'f_place_circle': Place '" << start->name << "' vanished. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 	
 		//Start- und Endeplatz aus Original Teilnetz entfernen, damit dieser nicht mitgelöscht wird, wenn das ganze Teilnetz ersetzt wird
@@ -10482,7 +10492,7 @@ int owfn::f_place_to_trans(place *start, int max, transitionlist *selected, tran
 						if(realplace == NULL)
 						{
 							cout << "Error 1 in function 'f_place_to_trans': Place '" << con->name << "' vanished. This should not happen...\n";
-							exit(1);
+							exit(EXIT_FAILURE);
 						}
 						newplaces = new placelist(realplace, newplaces);
 						places_in_B = new placelist(realplace, places_in_B);
@@ -10584,7 +10594,7 @@ int owfn::f_place_to_trans(place *start, int max, transitionlist *selected, tran
 		if(!(replace_place(start, "_flow_start")))
 		{
 			cout << "Error 2 in function 'f_place_to_trans': Place '" << start->name << "' vanished. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		tlptr = trans_in_B;
 		while(tlptr != NULL && tlptr->transitionptr->name != ende->name)
@@ -10889,7 +10899,7 @@ int owfn::f_trans_to_place(transition *start, int max, placelist *selected, plac
 						if(realplace == NULL)
 						{
 							cout << "Error 1 in function 'f_trans_to_place': Place '" << con->name << "' vanished. This should not happen...\n";
-							exit(1);
+							exit(EXIT_FAILURE);
 						}
 						newplaces = new placelist(realplace, newplaces);
 						places_in_B = new placelist(realplace, places_in_B);
@@ -10921,7 +10931,7 @@ int owfn::f_trans_to_place(transition *start, int max, placelist *selected, plac
 		if(!remove_transition_from_original(start->name))
 		{
 			cout << "Error 2 in function 'f_trans_to_place': Transition '" << start->name << "' vanished. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 
 		if(!(replace_place(ende, "_flow_ende")))
@@ -11241,7 +11251,7 @@ int owfn::f_trans_to_trans(transition *start, int max, placelist *selected, tran
 							if(realplace == NULL)
 							{
 								cout << "Error 1 in function 'f_trans_to_trans': Place '" << con->name << "' vanished. This should not happen...\n";
-								exit(1);
+								exit(EXIT_FAILURE);
 							}
 							newplaces = new placelist(realplace, newplaces);
 							places_in_B = new placelist(realplace, places_in_B);
@@ -11303,7 +11313,7 @@ int owfn::f_trans_to_trans(transition *start, int max, placelist *selected, tran
 		if(!remove_transition_from_original(start->name))
 		{
 			cout << "Error 2 in function 'f_trans_to_trans': Transition '" << start->name << "' vanished. This should not happen...\n";
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		if(!remove_transition_from_original(ende->name))
 		{
@@ -11509,7 +11519,7 @@ void owfn::rename_place(string placename, string addition)
 	}else
 	{
 		cout << "Error 1 in function 'rename_place': Place '" << placename << "' vanished. This should not happen...\n";
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 }
 

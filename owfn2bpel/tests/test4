@@ -3,13 +3,13 @@
 echo ""
 
 echo "test: translation of opqaue.owfn with removal of opaque activities"
-echo "      owfn2bpel --input $testdir/testfiles/opaque.owfn -r &> /dev/null"
-owfn2bpel --input $testdir/testfiles/opaque.owfn -r &> /dev/null
+echo "      owfn2bpel --input $testdir/testfiles/opaque.owfn -o opaque.owfn.bpel -r &> /dev/null"
+owfn2bpel --input $testdir/testfiles/opaque.owfn -o opaque.owfn.bpel -r &> /dev/null
 result7=$?
 
 echo "test: comparing generated file with expected output"
-echo "      diff $testdir/testfiles/opaque.owfn.bpel $testdir/testfiles/opaque.owfn.expected"
-diff $testdir/testfiles/opaque.owfn.bpel $testdir/testfiles/opaque.owfn.expected
+echo "      diff opaque.owfn.bpel $testdir/testfiles/opaque.owfn.expected"
+diff opaque.owfn.bpel $testdir/testfiles/opaque.owfn.expected
 result8=$?
 
 

@@ -10,6 +10,7 @@
 #include "dimensions.H"
 
 using std::ostream;
+using std::ofstream; ///// LINE ADDED BY NIELS
 using std::cerr;
 using std::cout;
 using std::endl;

@@ -81,13 +81,13 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              cyclic/zyklusPmitCommit.owfn.png \
              cyclic/zyklusR.owfn.png \
              cyclic/zyklusReturn.owfn.png \
-             messagesbound/innerUnbounded.owfn \
-             messagesbound/messageboundtest1.owfn \
-             messagesbound/messageboundtest2.owfn \
-             messagesbound/messageboundtest3.owfn \
-             messagesbound/messageboundtest4.owfn \
-             messagesbound/messageboundtest5.owfn \
-             messagesbound/unlimited-communication.owfn \
+             messagebound/innerBounded.owfn \
+             messagebound/messageboundtest1.owfn \
+             messagebound/messageboundtest2.owfn \
+             messagebound/messageboundtest3.owfn \
+             messagebound/messageboundtest4.owfn \
+             messagebound/messageboundtest5.owfn \
+             messagebound/unlimited-communication.owfn \
              png/big.owfn \
              countservices/acyclic.og \
              countservices/cyclic.og \
@@ -149,12 +149,6 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              samples/dke07_shop_sect_6.owfn \
              samples/keesCoffee_condition.owfn \
              samples/myCoffee.owfn \
-             samples/06-03-23_BPM06_shop_sect_3.owfn.png \
-             samples/06-03-23_BPM06_shop_sect_6.owfn.png \
-             samples/dke07_shop_sect_3.owfn.png \
-             samples/dke07_shop_sect_6.owfn.png \
-             samples/keesCoffee_condition.owfn.png \
-             samples/myCoffee.owfn.png \
              partner/sequence3.owfn \
              partner/sequence3-partner.expected.owfn \
              partner/coffee.owfn \

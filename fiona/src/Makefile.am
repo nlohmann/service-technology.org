@@ -82,7 +82,7 @@ EXTRA_DIST = lexer_owfn.h syntax_owfn.h syntax_og.h syntax_stg.h syntax_adapt_ru
 MAINTAINERCLEANFILES = $(YYSOURCES) 
 
 # a target to avoid problems with Radon
-veryclean:
+veryclean: clean
 	-rm -f $(YYSOURCES)
 
 # set the include path found by configure

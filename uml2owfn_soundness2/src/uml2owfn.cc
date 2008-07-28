@@ -557,7 +557,7 @@ void extend_script_file (analysis_t analysis) {
  * 			calls #write_net_file(), #write_task_file(), #extend_script_file()
  * 			accordingly
  */
-void translate_process(Block *process, analysis_t analysis)
+bool translate_process(Block *process, analysis_t analysis, int reduction_level)
 {
 	trace(TRACE_DEBUG, "generating Petri net for " + process->name + "\n");	    	
 
@@ -600,7 +600,7 @@ void translate_process(Block *process, analysis_t analysis)
     }
     
 	// jump into Thomas Heidinger's part
-	if (globals::reduction_level > 0)
+	if (reduction_level > 0)
 	{
 		// structural reduction preserves livelocks and deadlocks
 		//if (analysis[A_DEADLOCKS] || analysis[A_LIVELOCKS])
@@ -609,7 +609,14 @@ void translate_process(Block *process, analysis_t analysis)
     		PN.reduce(globals::reduction_level);
 		}
 	}
-    	
+    
+	if (PN.getInternalPlaces().size() == 0) {
+		cerr << process->name << " retrying (reason: empty process)." << endl;
+		cerr << PN.information() << endl;
+		return false;
+	}
+	
+	// finished Petri net creation and manipulation, generate analysis files and scripts
     if (analysis[A_SOUNDNESS]) {
     	// generate formula that specifies the final state
     	/*
@@ -637,6 +644,11 @@ void translate_process(Block *process, analysis_t analysis)
     globals::output_filename_suffix = "." 
     								+ process_name_to_file_name(process->name)
     								+ analysis_suffix;
+    // if we work with the unreduced net, extend the file name 
+    if (reduction_level < globals::reduction_level) {
+    	globals::output_filename_suffix += ".unreduced";
+    }
+    
     globals::currentProcessName = process->name;
     
     
@@ -646,9 +658,17 @@ void translate_process(Block *process, analysis_t analysis)
     
     if (finalStateFormula != NULL)
     	delete finalStateFormula;	// TODO clean up subformulas!
+    
+    return true;
 }
 
-
+bool translate_process_reconcile (Block *process, analysis_t analysis)
+{
+	if (!translate_process(process, analysis, globals::reduction_level)) {
+		return translate_process(process, analysis, 0);
+	}
+	return true;
+}
 
 /******************************************************************************
  * main() function
@@ -705,6 +725,8 @@ int main( int argc, char *argv[])
 	    int processTranslated = 0; int processNum = 0;
 	    for(set<Block*>::iterator process = globals::processes.begin(); process != globals::processes.end(); process++)
 	    {
+	    	bool processWritten = true;
+	    	
 	    	processNum++;
     		trace(TRACE_DEBUG, "translate process " + toString(processNum) + "\n");
 	        // set the name variables of all blocks within this process to the parsed
@@ -761,15 +783,16 @@ int main( int argc, char *argv[])
 	    		analysis_t sub_analysis;
 	    		
 	    		sub_analysis = globals::analysis; sub_analysis[A_LIVELOCKS] = false;
-	    		translate_process(*process, sub_analysis);
+	    		processWritten &= translate_process_reconcile(*process, sub_analysis);
 	    		sub_analysis = globals::analysis; sub_analysis[A_DEADLOCKS] = false;
-	    		translate_process(*process, sub_analysis);
+	    		processWritten &= translate_process_reconcile(*process, sub_analysis);
 	    		
 	    	} else {
-	    		translate_process(*process, globals::analysis);
+	    		processWritten &= translate_process_reconcile(*process, globals::analysis);
 	    	}
-	
- 	    	processTranslated++;
+
+ 	    	if (processWritten)
+ 	    		processTranslated++;
 	    } // for all processes
 	    write_script_file();				// write script file for the entire process library
 	    scriptContents.flush();

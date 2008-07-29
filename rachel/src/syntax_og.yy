@@ -98,11 +98,11 @@ nodes_list:
 
 
 node:
-  number colon formula color_optional
+  number
+    { G_parsedGraph.addNode($1); }
+| number colon formula color_optional
     { G_parsedGraph.addNode($1);
       G_parsedGraph.addFormula($1, $3); }
-| number
-    { G_parsedGraph.addNode($1); }
 ;
 
 
@@ -147,8 +147,8 @@ transitions:
 
 transitions_list:
   /* empty */
-| transitions_list comma transition
 | transition
+| transitions_list comma transition
 ;
 
 

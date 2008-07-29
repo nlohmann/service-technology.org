@@ -39,7 +39,7 @@ unaspected_sources = Simulation.cc Matching.cc
 # filed at http://www.aspectc.org/bugzilla/show_bug.cgi?id=362
 aspected-%.cc: %.cc $(aspects)
 	-$(AGPP) --config $(dir $<)puma.config --weave_only -o aspected-$(notdir $<) $<
-	sed -e 's/new (unsigned long int/new (size_t/' aspected-$(notdir $<) > aspected-$(notdir $<)~
+	$(SED) -e 's/new (unsigned long int/new (size_t/' aspected-$(notdir $<) > aspected-$(notdir $<)~
 	echo "#include <new>" > aspected-$(notdir $<)
 	cat aspected-$(notdir $<)~ >> aspected-$(notdir $<)
 	rm aspected-$(notdir $<)~

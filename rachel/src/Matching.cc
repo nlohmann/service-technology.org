@@ -323,7 +323,7 @@ Value Matching::matching(Graph &g1, Graph &g2) {
     double hit_rate= 1 - (static_cast<double>(cache_miss) / static_cast<double>(cache_hit));
     fprintf(stderr, "cache: %u hits, %u misses, hit rate %.2f%%\n",
             cache_hit, cache_miss, hit_rate * 100);
-    fprintf(stderr, "%u added nodes\n", g1.addedNodes.size());
+    fprintf(stderr, "%Zu added nodes\n", g1.addedNodes.size());
     fprintf(stderr, "permuteEdges: %u, calcPermutations: %u, w: %u, matching: %u\n",
             permuteEdges_calls, calcPermutations_calls, w_calls, matching_calls);
 

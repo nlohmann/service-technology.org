@@ -48,13 +48,14 @@ string Action::toString() const {
 
 
 // constructor
-Action::Action(action_type myType, Value myValue, Node myNodeA, Node myNodeB) {
-    type = myType;
-    value = myValue;
-    stateA = myNodeA;
-    stateB = myNodeB;
-    label_old = "";
-    label_new = "";
+Action::Action(action_type myType, Value myValue, Node myNodeA, Node myNodeB) : 
+    type(myType),
+    value(myValue),
+    stateA(myNodeA),
+    stateB(myNodeB),
+    label_old(""),
+    label_new("")
+{
 }
 
 
@@ -93,13 +94,15 @@ string ActionScript::toString() const {
 
 
 /// constructor
-ActionScript::ActionScript() {
-    value = 0;
+ActionScript::ActionScript() :
+    script(), value(0)
+{
 }
 
 
 /// constructor to construct a singleton script
-ActionScript::ActionScript(const Action &a) {
-    value = 0;
+ActionScript::ActionScript(const Action &a) :
+    script(), value(0)
+{
     add(a);
 }

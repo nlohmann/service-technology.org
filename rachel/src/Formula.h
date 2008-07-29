@@ -35,6 +35,7 @@ class Formula {
     public:
         virtual string toString() const = 0;
         virtual bool sat(const set<string> &l) const = 0;
+        virtual ~Formula() {};
 };
 
 class FormulaAND : public Formula {

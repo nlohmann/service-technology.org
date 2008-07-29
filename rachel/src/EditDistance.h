@@ -50,6 +50,8 @@ class EditDistance {
 
         /// allocate memory for cache and initialize it
         static void emptyCache(Graph &g1, Graph &g2);
+    
+        virtual ~EditDistance() {};
 };
 
 #endif

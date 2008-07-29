@@ -26,24 +26,23 @@
  * constructors
  */
 
-FormulaAND::FormulaAND(Formula *_left, Formula *_right) {
+FormulaAND::FormulaAND(Formula *_left, Formula *_right) : 
+    left(_left), right(_right)
+{
     assert(_left != NULL);
     assert(_right != NULL);
-    
-    this->left = _left;
-    this->right = _right;
 }
 
-FormulaOR::FormulaOR(Formula *_left, Formula *_right) {
+FormulaOR::FormulaOR(Formula *_left, Formula *_right) :
+    left(_left), right(_right)
+{    
     assert(_left != NULL);
     assert(_right != NULL);
-    
-    this->left = _left;
-    this->right = _right;
 }
 
-FormulaLit::FormulaLit(const string _literal) {
-    this->literal = _literal;
+FormulaLit::FormulaLit(const string _literal) :
+    literal(_literal)
+{
 }
 
 

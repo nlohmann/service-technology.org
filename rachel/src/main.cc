@@ -23,6 +23,7 @@
 #include <stack>
 #include <cassert>
 #include <climits>
+#include <cstdlib>
 
 #include "Graph.h"
 #include "Matching.h"
@@ -234,9 +235,9 @@ int main(int argc, char** argv) {
     
     // statistical output
     fprintf(stderr, "calculating %s\n", mode_name(args_info.mode_arg).c_str());
-    fprintf(stderr, "source (SA): %s\t%u nodes\n",
+    fprintf(stderr, "source (SA): %s\t%Zu nodes\n",
             args_info.automaton_arg, A.nodes.size());
-    fprintf(stderr, "target (OG): %s\t%u nodes\n",
+    fprintf(stderr, "target (OG): %s\t%Zu nodes\n",
             args_info.og_arg, B.nodes.size());
     
     if (args_info.mode_arg != mode_arg_lpsim) {
@@ -251,14 +252,14 @@ int main(int argc, char** argv) {
     }
     
     if (args_info.verbose_flag && (args_info.mode_arg == mode_arg_matching)) {
-        fprintf(stderr, "OG characterizes %L.3e deterministic acyclic services (up to tree isomorphism)\n",
+        fprintf(stderr, "OG characterizes %.3Le deterministic acyclic services (up to tree isomorphism)\n",
                 B.countServices());
         fprintf(stderr, "OG has an average size of satisfying assignments of %f\n",
                 B.averageSatSize());
     }
 
     if (args_info.mode_arg == mode_arg_simulation) {
-        fprintf(stderr, "pairs to check: %u\n", (A.nodes.size() * B.nodes.size()));
+        fprintf(stderr, "pairs to check: %lu\n", (A.nodes.size() * B.nodes.size()));
     }
 
     

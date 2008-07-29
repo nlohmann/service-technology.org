@@ -21,8 +21,8 @@ cmdline.out: $(top_srcdir)/src/cmdline.ggo
 #############################################################################
 ../ChangeLog: ChangeLog.texi
 	$(MAKEINFO) -o ChangeLog.txt --no-split --no-headers rachel.texi
-	sed -n '/procrastination/,/The most recent change log/w ChangeLog2.txt' ChangeLog.txt
-	sed '1,2d' ChangeLog2.txt | sed -e '$$d' | sed -e '$$d' > ChangeLog.txt
+	$(SED) -n '/procrastination/,/The most recent change log/w ChangeLog2.txt' ChangeLog.txt
+	$(SED) '1,2d' ChangeLog2.txt | $(SED) -e '$$d' | $(SED) -e '$$d' > ChangeLog.txt
 	rm ChangeLog2.txt
 	mv ChangeLog.txt ../ChangeLog
 
@@ -36,6 +36,6 @@ manual: rachel.texi
 
 wiki: ChangeLog.texi
 	texi2html rachel.texi
-	sed -n '/procrastination/,/The most recent change log/w ChangeLog.tmp' rachel.html
-	cat ChangeLog.tmp | sed '1,2d' | sed -e 's/<dt> <b>/<h3>/;' | sed -e 's/<\/b><\/dt>/<\/h3>/;' | sed -e 's/<p>/<li>/;' | sed -e 's/<\/p>/<\/li>/;' | sed -e 's/<dd>/<ul>/;' | sed -e 's/<\/dd>/<\/ul>/;' | sed -e 's/<blockquote>/<ul>/;' | sed -e 's/<\/blockquote>/<\/ul>/;' > ChangeLog.htm
+	$(SED) -n '/procrastination/,/The most recent change log/w ChangeLog.tmp' rachel.html
+	cat ChangeLog.tmp | $(SED) '1,2d' | $(SED) -e 's/<dt> <b>/<h3>/;' | $(SED) -e 's/<\/b><\/dt>/<\/h3>/;' | $(SED) -e 's/<p>/<li>/;' | $(SED) -e 's/<\/p>/<\/li>/;' | $(SED) -e 's/<dd>/<ul>/;' | $(SED) -e 's/<\/dd>/<\/ul>/;' | $(SED) -e 's/<blockquote>/<ul>/;' | $(SED) -e 's/<\/blockquote>/<\/ul>/;' > ChangeLog.htm
 	rm rachel.html ChangeLog.tmp

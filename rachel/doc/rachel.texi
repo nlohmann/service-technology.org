@@ -205,9 +205,9 @@ Note: If not all parameters are defined, the standard values apply. Mandatory co
 
 Rachel is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
 
-@table @b
 @include ChangeLog.texi
-@end table
+
+@sp 3
 
 The most recent change log is available at Rachel's website at @url{http://service-technology.org/files/rachel/ChangeLog}.
 

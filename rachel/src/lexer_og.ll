@@ -25,6 +25,7 @@
 %option noyywrap
 %option yylineno
 %option nodefault
+%option nounput
 
 %{
 #include <cassert>

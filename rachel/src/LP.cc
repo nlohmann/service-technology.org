@@ -135,7 +135,7 @@ void LP::lp_gen(Graph g) {
 
     
     // statistical output
-    fprintf(stderr, "%u variables, %u constraints\n", vars.size(), constraints.size());
+    fprintf(stderr, "%Zu variables, %Zu constraints\n", vars.size(), constraints.size());
     
 
     write_lp(vars, constraints);

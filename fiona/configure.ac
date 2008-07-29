@@ -23,6 +23,7 @@ AC_PROG_EGREP
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+AC_PROG_SED
 
 if test "$RANLIB" = ":"; then
   AC_MSG_ERROR([ranlib was not found!])

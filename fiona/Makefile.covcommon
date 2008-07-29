@@ -26,4 +26,4 @@ COV_TMP_SUFFIX=.c++
 CXXCOV=cov++ -skip / -EXT $(COV_SRC_SUFFIX) $(COV_TMP_SUFFIX)
 
 cleandeps:
-	sed -i 's/\$(COV_TMP_SUFFIX)$$/$(COV_SRC_SUFFIX)/g' $(builddir)/.deps/*.Po
+	$(SED) -i 's/\$(COV_TMP_SUFFIX)$$/$(COV_SRC_SUFFIX)/g' $(builddir)/.deps/*.Po

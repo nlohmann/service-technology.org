@@ -1,5 +1,5 @@
 AC_PREREQ(2.60)
-AC_INIT([oWFN2BPEL],[4.7],[niels.lohmann@uni-rostock.de],[owfn2bpel])
+AC_INIT([oWFN2BPEL],[4.8],[niels.lohmann@uni-rostock.de],[owfn2bpel])
 AM_INIT_AUTOMAKE
 
 # Set directories.
@@ -11,13 +11,16 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_YACC
 AC_PROG_LEX
+AC_PROG_SED
 
+# Announce the build system
 AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
+AC_DEFINE_UNQUOTED([BUILDOS], ["$build_os"], [The OS.])
 
 # The name of the LoLA source distribution. The Makefiles will look for a file
 # called "src/LOLANAME.tar.gz" to compile LoLA.
-AC_SUBST(LOLANAME, lola-1.01)
+AC_SUBST(LOLANAME, lola-1.02)
 
 # Checks for GNU gengetopt and help2man
 AC_CHECK_PROG(GENGETOPT, gengetopt, gengetopt)

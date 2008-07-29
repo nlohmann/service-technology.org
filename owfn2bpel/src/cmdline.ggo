@@ -67,4 +67,3 @@ option "bug" -
 text "\n"
 text "Written by Jens Kleine as part of his diploma thesis at HU Berlin. "
 text "Maintained by Niels Lohmann. http://service-technology.org/owfn2bpel. "
-text "Send bug reports to <niels.lohmann@uni-rostock.de>."

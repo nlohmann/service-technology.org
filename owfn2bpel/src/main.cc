@@ -25,7 +25,7 @@
 #include <string>
 #include <cassert>
 
-#include "options.h"
+#include "config.h"
 #include "classes.h"
 #include "cmdline.h"
 

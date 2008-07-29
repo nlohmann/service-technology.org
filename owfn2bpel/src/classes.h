@@ -24,6 +24,9 @@
 #define _CLASSES_H_
 
 
+#include <cstring>
+#include <cstdlib>
+
 using namespace std;
 
 

@@ -24,7 +24,6 @@
 #include <iostream>
 #include <string>
 
-#include "options.h"
 #include "classes.h"
 
 using namespace std;

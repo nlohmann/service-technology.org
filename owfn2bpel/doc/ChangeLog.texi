@@ -1,0 +1,62 @@
+@heading Version 4.8
+
+@itemize
+@item fixed bug #12111 (@url{https://gna.org/bugs/?12111})
+@item removed the file @file{options.h} which became obsolete by using autoconf
+@item the needed LoLA binary is installed by @command{make install}
+@item ChangeLog is now organized by Texinfo reading file @file{doc/ChangeLog.texi}
+@item minor changes in the header files to allow compilation with GCC 4.3.1
+@item added a new release version of LoLA (@file{lola-1.02.tar.gz})
+@end itemize
+
+
+
+@heading Version 4.7
+
+@itemize
+@item tidied Makefiles
+@item added Makefile targets @option{cvs-clean}, @option{bin-dist}, and @option{upload}
+@item added @option{--bug} parameter for debugging purposes
+@item LoLA is now added as distribution tarball to oWFN2BPEL to avoid code deviation -- any new version has to be announced in the configure script by setting the variable @code{LOLANAME}
+@item exit codes are unified to @code{EXIT_FAILURE} or @code{EXIT_SUCCESS}
+@item implemented task #6103 <@url{https://gna.org/task/?6103}>
+@item removed files that can be created by autoreconf
+@end itemize
+
+
+
+@heading Version 4.6
+
+@itemize
+@item a manpage is created
+@item a Texinfo documentation is created
+@item GNU gengetopt is used to manage command line parameters
+@item output filename can be omitted: @file{file.owfn} will be translated to @file{file.owfn.bpel}
+@item a correctly configured version of LoLA is added to the distribution
+@item two papers on oWFN2BPEL are distributed in the @file{doc} directory
+@item added testscripts for @option{make check}
+@end itemize
+
+
+
+...
+
+
+
+@heading Version 4.1
+
+@itemize
+@item licensed under GPL version 3
+@item minor BPEL code corrections (transition conditions)
+@item LoLA is called using the @file{config.h}
+@end itemize
+
+
+
+@heading Version 4.0
+
+@itemize
+@item licensed under GPL version 2
+@item first release version
+@item adapted code to support GNU autotools
+@end itemize

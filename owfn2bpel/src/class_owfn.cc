@@ -27,7 +27,7 @@
 #include <libgen.h>
 #include <cassert>
 
-#include "options.h"
+#include "config.h"
 #include "classes.h"
 #include "cmdline.h"
 
@@ -7818,16 +7818,11 @@ int owfn::check_subnet(string start, int is_trans, string trans_start_name, stri
 	string buffer;
 	string::size_type loc;
 
-	execution = tmp + " lola_safety.tmp 2> lola_safety_result.tmp > /dev/null";
-//	execution = tmp + " lola_safety.tmp 2> lola_safety_result.tmp";
-
-#ifdef UNIX
-	execution = tmp + " lola_safety.tmp 2> lola_safety_result.tmp > /dev/null";
-#endif
-
-#ifdef WIN
-	execution = tmp + " lola_safety.tmp 2> lola_safety_result.tmp > NUL";
-#endif
+    if (BUILDSYSTEM == "i686-pc-cygwin")
+        execution = tmp + " lola_safety.tmp 2> lola_safety_result.tmp > NUL";
+    else
+        execution = tmp + " lola_safety.tmp 2> lola_safety_result.tmp > /dev/null";
+    
 	place *con;
 	place *placeptr;
 	placelist *plptr;

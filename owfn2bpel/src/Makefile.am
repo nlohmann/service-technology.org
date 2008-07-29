@@ -8,7 +8,7 @@ owfn2bpel_SOURCES = class_bpel.cc class_bpel.h \
 	  	    main.cc config.h \
 		    class_owfn.cc class_owfn.h \
 	      	    class_transition.cc class_transition.h \
-		    options.h cmdline.c cmdline.h getopt.h getopt.c getopt1.c
+		    cmdline.c cmdline.h getopt.h getopt.c getopt1.c
 
 BUILT_SOURCES = cmdline.c
 
@@ -30,3 +30,10 @@ owfn2bpel_lola: $(LOLANAME).tar.gz
 	$(srcdir)/create_lola
 	cp lola/src/lola $(builddir)/owfn2bpel_lola
 	rm -fr lola
+
+# organize installation and uninstallation of the needed LoLA binary
+install-exec-hook: owfn2bpel_lola
+	$(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) owfn2bpel_lola "$(DESTDIR)$(bindir)/owfn2bpel_lola"
+
+uninstall-hook:
+	rm $(DESTDIR)$(bindir)/owfn2bpel_lola

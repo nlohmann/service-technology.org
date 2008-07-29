@@ -48,16 +48,9 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @c ----------------------------------------------------------------------------
 
-@ifnottex
-@node Top
-@top WS-Fix
-@insertcopying
-@end ifnottex
-
-@c ----------------------------------------------------------------------------
-
 @menu
 * Options::Invoking oWFN2BPEL.
+* ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
 @end menu
 
@@ -72,41 +65,21 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @node Options
 @chapter Invoking oWFN2BPEL
 
-@section Command line options
-
-@cartouche
 @smallexample
-Usage: owfn2bpel -iFILE|--input=FILE [-h|--help] [--full-help] [-V|--version] 
-         [-oFILE|--output=FILE] [-r|--remove-opaque] [-lPATH|--lola=PATH] 
-         [-s|--stats]
-
-About owfn2bpel:
-  -h, --help           Print help and exit
-      --full-help      Print help, including hidden options, and exit
-  -V, --version        Print version and exit
-
-File input/output:
-  -i, --input=FILE     Read oWFN from file. Note that a node name may not be 
-                         the prefix of another ('t1' and 't12' is not allowed), 
-                         node names may not end with '_', and arc weights are 
-                         not supported. (mandatory)
-  -o, --output=FILE    Write generated BPEL process to file. When the parameter 
-                         is not given, the filename is derived from the input 
-                         oWFN file.
-
-Options:
-  -r, --remove-opaque  Removes opaque activities where possible. These 
-                         activities are mainly translations from 
-                         non-communicating transitions.  (default=off)
-  -l, --lola=PATH      Path to LoLA executable that is compiled with flags 
-                         'FULL', 'CAPACITY 1', and 'CHECKCAPACITY'.  
-                         (default=`owfn2bpel_lola')
-
-Verbose output:
-  -s, --stats          Shows statistical values (the number of executions) 
-                         after the end of the transformation.  (default=off)
+@include cmdline.out
 @end smallexample
-@end cartouche
+
+
+@node ChangeLog
+@chapter Change Log
+
+oWFN2BPEL is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+
+@include ChangeLog.texi
+
+@sp 3
+
+The most recent change log is available at oWFN2BPEL's website at @url{http://service-technology.org/files/owfn2bpel/ChangeLog}.
 
 
 

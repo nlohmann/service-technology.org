@@ -1,35 +1,77 @@
-Version 4.7
------------
-+ tidied Makefiles
-+ added Makefile targets "cvs-clean", "bin-dist", and "upload"
-+ added "--bug" parameter for debugging purposes
-+ LoLA is now added as distribution tarball to oWFN2BPEL to avoid code deviation -- any new version has to be announced in the configure script by setting the variable LOLANAME
-+ exit codes are unified to EXIT_FAILURE or EXIT_SUCCESS
-+ implemented task #6103 <https://gna.org/task/?6103>
-+ removed files that can be created by autoreconf
+Version 4.8
+===========
 
+   * fixed bug #12111 (`https://gna.org/bugs/?12111')
+
+   * removed the file `options.h' which became obsolete by using
+     autoconf
+
+   * the needed LoLA binary is installed by `make install'
+
+   * ChangeLog is now organized by Texinfo reading file
+     `doc/ChangeLog.texi'
+
+   * minor changes in the header files to allow compilation with GCC
+     4.3.1
+
+   * added a new release version of LoLA (`lola-1.02.tar.gz')
+
+Version 4.7
+===========
+
+   * tidied Makefiles
+
+   * added Makefile targets `cvs-clean', `bin-dist', and `upload'
+
+   * added `--bug' parameter for debugging purposes
+
+   * LoLA is now added as distribution tarball to oWFN2BPEL to avoid
+     code deviation - any new version has to be announced in the
+     configure script by setting the variable `LOLANAME'
+
+   * exit codes are unified to `EXIT_FAILURE' or `EXIT_SUCCESS'
+
+   * implemented task #6103 <`https://gna.org/task/?6103'>
+
+   * removed files that can be created by autoreconf
 
 Version 4.6
------------
-+ a manpage is created
-+ a Texinfo documentation is created
-+ GNU gengetopt is used to manage command line parameters
-+ output filename can be omitted: file.owfn will be translated to file.owfn.bpel
-+ a correctly configured version of LoLA is added to the distribution
-+ two papers on oWFN2BPEL are distributed in the "doc" directory
-+ added testscripts for "make check"
+===========
+
+   * a manpage is created
+
+   * a Texinfo documentation is created
+
+   * GNU gengetopt is used to manage command line parameters
+
+   * output filename can be omitted: `file.owfn' will be translated to
+     `file.owfn.bpel'
+
+   * a correctly configured version of LoLA is added to the distribution
+
+   * two papers on oWFN2BPEL are distributed in the `doc' directory
+
+   * added testscripts for `make check'
 
 ...
 
 Version 4.1
------------
-+ GPL version 3
-+ minor BPEL code corrections (transition conditions)
-+ LoLA is called using the config.h
+===========
 
+   * licensed under GPL version 3
+
+   * minor BPEL code corrections (transition conditions)
+
+   * LoLA is called using the `config.h'
 
 Version 4.0
------------
-+ GPL version 2
-+ first release version
-+ adapted code to support GNU autotools
+===========
+
+   * licensed under GPL version 2
+
+   * first release version
+
+   * adapted code to support GNU autotools
+
+
+

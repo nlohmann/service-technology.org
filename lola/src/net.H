@@ -4,6 +4,8 @@
 #define NET_H
 
 #include<streambuf>
+#include<cstring> ///// LINE ADDED BY NIELS
+#include<cstdlib> ///// LINE ADDED BY NIELS
 #include<iostream>
 #include<limits.h>
 #include<unistd.h>

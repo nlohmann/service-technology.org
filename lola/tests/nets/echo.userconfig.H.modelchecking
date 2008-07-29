@@ -12,8 +12,8 @@
 // space construction reaches a state with more tokens on a place
 // than specified.
 
-//#define CHECKCAPACITY 
-//#define CAPACITY 1
+#define CHECKCAPACITY 
+#define CAPACITY 1
 
 // REPORTFREQUENCY controls the output of progress messages to the
 // terminal (to be precise: to the standard error stream).
@@ -51,9 +51,9 @@
 //#define COVER
 #define STUBBORN
 //#define SYMMETRY
-//#define CYCLE
-//#define PREDUCTION
-//#define SMALLSTATE
+#define CYCLE
+#define PREDUCTION
+#define SMALLSTATE
 //#define BITHASH
 //#define DISTRIBUTE
 //#define SWEEP
@@ -117,7 +117,7 @@
 // generating set of the symmetries or the LL net.
 
 //#define REACHABILITY
-//#define MODELCHECKING
+#define MODELCHECKING
 //#define BOUNDEDPLACE
 //#define BOUNDEDNET
 //#define DEADTRANSITION
@@ -125,7 +125,7 @@
 //#define HOME
 //#define FINDPATH
 //#define FULL
-#define DEADLOCK
+//#define DEADLOCK
 //#define NONE
 //#define STATEPREDICATE
 //#define LIVEPROP

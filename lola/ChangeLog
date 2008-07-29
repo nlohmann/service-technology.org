@@ -1,7 +1,11 @@
-Version 1.02 (in progress)
+Version 1.02
 ============
 + fixed bug #12089 <https://gna.org/bugs/?12089>
 + added Makefile target "win-bin" that produces a Cygwin independent binary when compiling under Cygwin, helps to avoid bug #12071 <http://gna.org/bugs/?12071>
++ added a testcase "choreography" from a BPEL4Chor choreography using symmetries (see file "tests/nets/choreography.tar.gz" on how to create this file with BPEL2oWFN)
++ fixed bug #12097 <https://gna.org/bugs/?12097>
++ fixed bug #12109 <https://gna.org/bugs/?12109>
+
 
 Version 1.01
 ============

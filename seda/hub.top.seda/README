@@ -1,0 +1,4 @@
+This package defines the Eclipse feature "hub.top.seda" that provides the
+Service-Technology.org Editor Application Seda. The packages defines a
+feature configuration file (feature.xml) that defines the configuration of
+the entire application consisting of several Eclipse plugins. 

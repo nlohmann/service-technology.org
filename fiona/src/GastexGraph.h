@@ -38,6 +38,7 @@
 
 #include <string>
 #include <set>
+#include <cstdlib>
 
 #include "options.h"
 

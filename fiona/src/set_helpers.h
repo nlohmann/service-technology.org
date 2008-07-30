@@ -6,6 +6,7 @@
  *****************************************************************************/
 
 #include <set>
+#include <algorithm>
 
 using std::set;
 using std::insert_iterator;

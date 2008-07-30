@@ -48,6 +48,7 @@
 #include "options.h"
 #include <set>
 #include <cassert>
+#include <climits>
 
 
 typedef std::set<State*> StateSet;

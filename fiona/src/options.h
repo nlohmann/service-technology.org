@@ -45,6 +45,7 @@
 #include <map>
 #include <list>
 #include <cstdio>
+#include <string>
 
 
 typedef enum {

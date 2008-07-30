@@ -13,6 +13,8 @@
 #include <iostream>
 #include <set>
 #include <map>
+#include <cstdlib>
+
 using std::cerr;
 using std::endl;
 using std::string;

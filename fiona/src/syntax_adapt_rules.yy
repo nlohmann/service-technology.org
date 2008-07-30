@@ -14,6 +14,7 @@
 #include <set>
 #include <map>
 #include <list>
+#include <cstdlib>
 
 #include "adapter.h"
 

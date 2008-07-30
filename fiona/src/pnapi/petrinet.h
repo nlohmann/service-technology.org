@@ -633,7 +633,9 @@ class PetriNet
     map< pair< Node*, Node* >, int > weight;
 };
 
-
+    // repeated declaration to avoid compilation errors using gcc 4.3
+    // see <https://gna.org/bugs/?12113> for more information
+    ostream& operator<< (ostream& os, const PetriNet &obj);
 
 }
 

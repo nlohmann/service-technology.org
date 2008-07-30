@@ -1,0 +1,7 @@
+# Tracing options for the hub.top.editor.ptnetLoLA.diagram plug-in
+
+# Common issues
+hub.top.editor.ptnetLoLA.diagram/debug=false
+
+# Visual IDs
+hub.top.editor.ptnetLoLA.diagram/debug/visualID=false

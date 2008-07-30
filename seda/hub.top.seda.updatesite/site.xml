@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description url="http://download.gna.org/service-tech/seda/updatesite/">
+      This site provides access to official releases of the Service-Technology.org Editor Application &quot;Seda&quot;. To install Seda in Eclipse use the update site feature: in Eclipse open &quot;Help &gt; Software Update &gt; Find and Install...&quot;. There &quot;Search for new features to install,&quot; and add &quot;New Remote Site...&quot;. In the Dialogue set name: &quot;Serivce-Technology.org Editor Application (Seda) Updates&quot; and URL: &quot;http://download.gna.org/service-tech/seda/updatesite/&quot; (without quotes), click OK. Make sure the newly created update site entry is checked and click &quot;Finish&quot;.
+   </description>
+   <feature url="features/hub.top.seda_1.0.0.jar" id="hub.top.seda" version="1.0.0">
+      <category name="seda"/>
+   </feature>
+   <feature url="features/hub.top.seda.tef_1.0.4.1.jar" id="hub.top.seda.tef" version="1.0.4.1">
+      <category name="seda_tech_runtime"/>
+   </feature>
+   <category-def name="seda" label="Service-Technology.org Editor Application">
+      <description>
+         The core of the Service-Technology.org Editor Application.
+      </description>
+   </category-def>
+   <category-def name="seda_tech_runtime" label="Additional Seda Runtime Files">
+      <description>
+         Additional packages and programs that are required by Seda. Most of these packages can also be obtained from their original contributors. They are provided here for convenience and to ensure compatibility with the current release. Some original packages have been extended or modified to ensure compatibility.
+      </description>
+   </category-def>
+</site>

@@ -1,0 +1,4 @@
+This package defines the Eclipse feature "hub.top.seda.tef" that provides the
+runtime files of the Textual Editing Framework that are needed by the
+Service-Technology.org Editor Application Seda. This feature is optional to
+Seda if the plugins that are listed in this feature are available by other means.

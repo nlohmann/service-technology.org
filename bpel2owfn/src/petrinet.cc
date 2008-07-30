@@ -1140,6 +1140,239 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
 }
 
 
+/***** BEGIN CODE by Thomas Pillat *****/
+
+/*!
+ * \brief   computes and retruns the incidence matrix (algebraic representation) 
+ *          of this petri net
+ * 
+ * \pre     the set of places must contain at least one place
+ * \pre     the set of transitions must contain at least on transition
+ * 
+ * \return  if there either is no place or no transition NULL will be returned,
+ *          otherwise, the incidence matrix will be returned
+ */ 
+int** PetriNet::getIncidenceMatrix() const{
+    
+    if ( P.empty() || T.empty() )
+        return NULL;
+    
+    int rowsDim = P.size();
+    int colsDim = T.size();
+    // initialize the incidence matrix
+    int **incidenceMatrix;
+    // initialize the rows of the incidence matrix which represents the places of the petri net
+    incidenceMatrix = new int*[ rowsDim ];
+    // initialize the columns of the incidence matrix representing the transitions of the petri net
+    for ( int i = 0; i < rowsDim; i++ ){
+        incidenceMatrix[ i ] = new int[ colsDim ];
+    }
+    
+    
+    rowsDim = 0;
+    colsDim = 0;
+    // fill the incidence matrix
+    for ( set<Place *>::const_iterator p = P.begin(); p != P.end(); p++ ){
+        
+        for ( set<Transition *>::const_iterator t = T.begin(); t != T.end(); t++ ){
+            int pre = !isArcInFlowRelation( (*t), (*p) ) ? 0 : arc_weight( (*t), (*p) );
+            int post = !isArcInFlowRelation( (*p), (*t) ) ? 0 : arc_weight( (*p), (*t) );
+            
+            incidenceMatrix[rowsDim][colsDim] = pre - post;
+            colsDim++;
+        }
+        colsDim = 0;
+        rowsDim++;
+    }
+    
+    return incidenceMatrix;
+}
+
+/*!
+ * \brief   returns the arc was found in F
+ *
+ * \param   my_source  the source node of the arc to be checked
+ * \param   my_target  the target node of the arc to be checked
+ * \result  true if the arc [my_source, my_target] was found in F
+ */
+bool PetriNet::isArcInFlowRelation(Node *my_source, Node *my_target) const
+{
+
+  map< pair<Node*, Node*>, int >::const_iterator iter = weight.find(pair<Node*, Node*>(my_source, my_target));
+
+  return iter != weight.end() && iter->second > 0;
+}
+
+/*!
+ * \brief   merges the pre and the post set of a given place by calculating the cartesian product
+ *
+ *          Merges two transition sets. Given the pre- (U) and postset (V) of a place p:
+ *          -# |U|*|V| new Transitions with empty history 
+ *          -# this transition gets the union of the histories of transition
+ *             t1 and t2
+ *          -# the presets and postsets of t1 and t2 are calculated and united
+ *          -# t12 is connected with all the places in the preset and postset
+ *          -# the transitions t1 and t2 are removed
+ *
+ * \param   t1  first transition
+ * \param   t2  second transition
+ *
+ * \pre     t1 != NULL
+ * \pre     t2 != NULL
+ * \post    Transitions t1 and t2 removed.
+ * \post    Transition t12 having the incoming and outgoing arcs of t1 and t2
+ *          and the union of the histories of t1 and t2.
+ *
+ */
+void PetriNet::agglomerateTransitions( set<Transition *> preSet, set<Transition *> postSet )
+{
+
+    if ( !preSet.empty() && !postSet.empty() ){
+            
+        for ( set<Transition *>::const_iterator t1 = preSet.begin(); t1 != preSet.end(); t1++ ){
+            for ( set<Transition *>::const_iterator t2 = postSet.begin(); t2 != postSet.end(); t2++ ){
+                
+                  if (t1 == t2)
+                    return;
+                  
+                  assert(t1 != NULL);
+                  assert(t2 != NULL);
+                  
+                  // variable needed for correct arc weights
+                  bool sametarget = false;
+                  // container for arcs to be deleted
+                  set<Arc *>::iterator delArc;
+                  // the merged transition
+                  Node *t12 = newTransition("");
+                  
+                  // organize the communication type of the new transition
+                  if ((*t1)->type == (*t2)->type)
+                  {
+                    t12->type = (*t1)->type;
+                  }
+                  else if (((*t1)->type == IN && (*t2)->type == INTERNAL) ||
+                           ((*t1)->type == INTERNAL && (*t2)->type == IN))
+                  {
+                    t12->type = IN;
+                  }
+                  else if (((*t1)->type == INTERNAL && (*t2)->type == OUT) ||
+                           ((*t1)->type == OUT && (*t2)->type == INTERNAL))
+                  {
+                    t12->type = OUT;
+                  }
+                  else if (((*t1)->type == OUT && (*t2)->type == IN) ||
+                           ((*t1)->type == IN && (*t2)->type == OUT) ||
+                           ((*t1)->type == INOUT || (*t2)->type == INOUT))
+                  {
+                    t12->type = INOUT;
+                  }
+                  else assert(false); ///< this should never happer or we have missed a case
+                  
+                  t12->prefix = (*t1)->prefix;
+                  
+                  // copy t1's history to t12
+                  for (list<string>::iterator role = (*t1)->history.begin(); role != (*t1)->history.end(); role++)
+                  {
+                    roleMap[*role] = t12;
+                    t12->history.push_back(*role);
+                    //    if (t1->prefix != "")
+                    {
+                      //      roleMap[t1->prefix + *role] = t12;
+                      //      t12->history.push_back(t1->prefix + *role);
+                    }
+                  }
+                  
+                  // copy t2's history to t12
+                  for (list<string>::iterator role = (*t2)->history.begin(); role != (*t2)->history.end(); role++)
+                  {
+                    roleMap[*role] = t12;
+                    t12->history.push_back(*role);
+                    //    if (t1->prefix != "" || t2->prefix != "")
+                    {
+                      //      roleMap[t2->prefix + *role] = t12;
+                      //      t12->history.push_back(t2->prefix + *role);
+                    }
+                  }
+                  
+                  roleMap[(*t1)->nodeFullName()] = t12;
+                  roleMap[(*t2)->nodeFullName()] = t12;
+                  
+                  // merge pre- and postsets for t12
+                  t12->preset=setUnion((*t1)->preset, (*t2)->preset);
+                  t12->postset=setUnion((*t1)->postset, (*t2)->postset);
+                  
+                  // create the weighted arcs for t12
+                  
+                  // this is the preset of t12 without the preset of t1. It is needed not generate double arcs if
+                  // the preset of t1 and t2 were not distinct.
+                  set<Node *> preset2without1 = setDifference(t12->preset,(*t1)->preset);
+                  
+                  // create new arcs from the t1 preset to t12
+                  for (set<Node *>::iterator n = (*t1)->preset.begin(); n != (*t1)->preset.end(); n++)
+                    newArc((*n), t12, STANDARD, arc_weight((*n),(*t1)));
+                  
+                  // create new arcs from the preset of t2 to t12 without those, that have been already covered by the preset of t1
+                  for (set<Node *>::iterator n = preset2without1.begin(); n != preset2without1.end(); n++)
+                    newArc((*n), t12, STANDARD, arc_weight((*n),(*t2)));
+                  
+                  // create new arcs from t12 to postset of t1
+                  for (set<Node *>::iterator n = (*t1)->postset.begin(); n != (*t1)->postset.end(); n++) 
+                    newArc(t12, (*n), STANDARD, arc_weight((*t1),(*n)));
+                  
+                  // create new arcs from t12 to postset of t2 and adjust arcweights if a node of postset of t2 is also in postset of t1
+                  for (set<Node *>::iterator n = (*t2)->postset.begin(); n != (*t2)->postset.end(); n++)
+                  {    
+                    // Find an arc already created in because of the postset of t1
+                    for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+                    {
+                      if (((*f)->source == t12) && ((*f)->target == (*n)))
+                      {
+                        sametarget = true;
+                        delArc=f;
+                      }
+                    }
+                    
+                    // if such an arc was found, save its weight, delete it and add its weight to the arc from t12 to postset of t2
+                    if (sametarget)
+                    {
+                      int weightsave = arc_weight(t12,(*n));
+                      removeArc(*delArc);
+                      newArc(t12, (*n), STANDARD, (arc_weight((*t2),(*n)) + weightsave));
+                      sametarget = false;
+                    }
+                    // if no such arc was found, simply add an arc from t12 to postset of t2
+                    else
+                    {
+                      newArc(t12, (*n), STANDARD, arc_weight((*t2),(*n)));
+                    }
+                  }
+                  
+    
+    
+                  // set max_occurrences
+                  t12->max_occurrences = ((*t1)->max_occurrences > (*t2)->max_occurrences) ?
+                    (*t1)->max_occurrences :
+                    (*t2)->max_occurrences;
+            }
+        }
+
+        
+    }
+    
+    
+    
+    // remove all old transitions
+    for ( set<Transition *>::const_iterator t1 = preSet.begin(); t1 != preSet.end(); t1++ ){
+            removeTransition(*t1);
+    }
+    for ( set<Transition *>::const_iterator t2 = postSet.begin(); t2 != postSet.end(); t2++ ){
+
+        removeTransition(*t2);
+    }
+    
+}
+
+/***** END CODE by Thomas Pillat *****/
 
 
 

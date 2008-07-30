@@ -375,6 +375,11 @@ class PetriNet
     /// adds an arc given source and target node, and arc type
     Arc *newArc(Node *my_source, Node *my_target, arc_type my_type = STANDARD, unsigned int my_weight = 1);
     
+/***** BEGIN CODE by Thomas Pillat *****/
+    /// computes and returns the incidence matrix of this petri net
+    int ** getIncidenceMatrix() const;
+/***** END CODE by Thomas Pillat *****/
+
     /// merges two places
     void mergePlaces(Place * & p1, Place * & p2);
     
@@ -396,6 +401,11 @@ class PetriNet
     /// merges two parallel transitions
     void mergeParallelTransitions(Transition *t1, Transition *t2);
     
+/***** BEGIN CODE by Thomas Pillat *****/
+    /// merges two transition sets
+    void agglomerateTransitions( set<Transition *> preSet, set<Transition *> postSet );
+/***** END CODE by Thomas Pillat *****/
+
     /// finds place given a role
     Place* findPlace(string role) const;
     
@@ -562,6 +572,31 @@ class PetriNet
     /// remove unneeded initially marked places in choreographies
     void reduce_remove_initially_marked_places_in_choreographies();
     
+    /***** BEGIN CODE by Thomas Pillat *****/
+    /// remove places and merge the post- and preset of such a removed place
+    void reduce_esparzas_abstraction_rule();
+        
+    /// remove places and merge the post and pre set of the removed places
+    void reduce_pre_agglomeration();
+    
+    /// remove places and merge the post and pre set of the removed places
+    void reduce_post_agglomeration();
+    
+#ifdef HAVE_LIBLPSOLVE55
+    /// remove implicit places
+    void reduce_implicit_places();
+#endif
+    
+    /// checks whether the presets postset of the specified place only contains the specified place
+    bool is_presets_postset_singleton(Place *p) const;
+    
+    /// checks whether the postsets preset of the specified place only contains the specified place
+    bool is_postsets_preset_singleton(Place *p) const;
+
+    /// returns true if the arc was found in F
+    bool isArcInFlowRelation(Node *my_source, Node *my_target) const;
+    /***** END CODE by Thomas Pillat *****/
+
     /// returns an id for new nodes
     unsigned int getId();
     

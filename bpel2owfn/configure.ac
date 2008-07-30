@@ -63,6 +63,9 @@ AC_CHECK_HEADERS([windows.h])
 
 #AM_PROG_CC_C_O
 
+# Check for libraries
+# lpsolve55 solves linear problems
+AC_CHECK_LIB([lpsolve55], [solve])
 
 # Check for optional programs.
 AC_PROG_YACC

@@ -64,6 +64,10 @@
 #include "helpers.h"		// helper functions (toString, setUnion)
 #include "debug.h"		// (trace)
 
+#ifdef HAVE_LIBLPSOLVE55
+#include "lpsolve/lp_lib.h"
+#endif
+
 using std::list;
 using std::pair;
 using std::cerr;
@@ -877,6 +881,767 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
 }
 
 
+/***** BEGIN CODE by Thomas Pillat *****/
+/*!
+ * Abstraction rule as defined in [ES01]. This rule removes a place and merges the post- and preset 
+ * of this place if the place satisfies certain conditions. The
+ * rule preserves boundedness, state based LTL-X or action based LTL properties
+ * which only consider transitions of the reduced net or places of the reduced net, respectively.
+ * Furthemore, if the original net is live, the reduced net will also be live if
+ * the original net is safe. The conversion holds not. Thus, deadlock won't be preserved.
+ *
+ * \note As the place in \f$ t \f$'s preset/postset has ingoing and outgoing
+ *       arcs, it is an internal place. Thus, \f$ t \f$ does not communicate
+ *       and its removal does not affect controllability or the set of
+ *       communicating partners.
+ *
+ *
+ * \pre \f$ p \f$ is a place of the net: \f$ p \in P \f$
+ * \pre \f$ t \f$ is a transition in the postset of \f$ p \f$ but not in the preset of \f$ p \f$: \f$ p \in p^{\bullet}\setminus {^{\bullet}p} \f$
+ * \pre \f$ t \f$ is the only transition in the postset of \f$ p \fS: \f$ p^\bullet = \{t\} \f$
+ * \pre the preset of \f$ p \f$ must not be empty: \f$ {{^{bullet}}p}\neq\emptyset \f$
+ * \pre the postset of the preset of \f$ p \f$ is again \f$ p \f$: \f$ ({^{\bullet}p}^{\bullet})=\{p\} \f$
+ * \pre \f$ p \f$ must not be marked initially: \f$ M_0(p)=0 \f$
+ * \pre weights of all arcs form \f$ p \f$ to adjacent Transitions must be 1: \f$ \forall (p,t),(t,p)\in F\,:\,W((p,t))=W((t,p))=1  \f$
+ * 
+ * \post \f$ p \f$ is removed: \f$ P' = P \; \setminus \; \{p\} \f$
+ * \post \f$ t \f$ is removed and if the union of the preset of a transition \f$ u \in {^{\bullet}p} \f$ and of the preset of \f$ t \f$ is not empty, \f$ u \f$ is also removed: \f$T' = T \setminus (\{t\}\cup\{u \in {^{\bullet}p}\mid {^{\bullet}u}\cap{^{\bullet}u}\neq\emptyset\}) \f$
+ * \post 
+ */
+void PetriNet::reduce_esparzas_abstraction_rule() {
+    trace(TRACE_DEBUG,
+                    "[PN]\t Applying rule RE1 (Esparzas and Schroeters abstraction rule)...\n");
+    // p is a place satisfying the abstraction rule
+    set<Node *> none_p_preset_transitions;
+    set<Node *> none_p_places;
+    unsigned int p_result = 0;
+    unsigned int t_result = 0;
+    unsigned int old_P_size = 0;
+    bool isPlaceToRemove;
+    Place *placeToRemove;
+
+    while (old_P_size != P.size() ) {
+
+        isPlaceToRemove = false;
+        old_P_size = P.size();
+        // traverse the places
+        for (set<Place *>::const_iterator place = P.begin(); place != P.end(); place++) {
+
+            if (none_p_places.begin() != none_p_places.end()
+                            && none_p_places.find( *place)
+                                            != none_p_places.end() ) {
+                // this place is no candidate for a place satisfying the abstraction rule or was yet
+                // analyzed. Hence,...
+                continue; //... with the next place
+            }
+
+            set<Node *> p_postset = (*place)->postset;
+            set<Node *> p_preset = (*place)->preset;
+
+            if ( !p_preset.empty() // precondition 4 is satisfied
+            && !p_postset.empty() // this is necessary to satisfy condition 5
+            && (*place)->tokens == 0 // precondition 6 is satisfied                                      
+                            && p_postset.size() == 1 // precondition 3 is satisfied
+                            && setIntersection( p_postset, p_preset ).empty() // precondition 2 is satisfied 
+            && sameweights( *place) // precondition 7 is satisfied
+            && is_presets_postset_singleton( *place) ) { // precondition 5 is satisfied
+                // all conditions are satisfied, thus the loop must be left to remove the place
+                placeToRemove = *place;
+                isPlaceToRemove = true;
+                break;
+
+            } else { // one of the preconditions is not satisfied 
+                // ...hence all input transitions of this place cannot be the only input transtions of another place
+                none_p_preset_transitions.insert( (p_preset.begin()),
+                                (p_preset.end()));
+                // ...and the output places of their input transitions and so on
+                // cannot be places satisfying precondition 5
+                set<Node *> none_p_places_Tmp;
+                set<Node *> outputPlaces;
+                none_p_places_Tmp.insert( *place);
+                none_p_places.insert( *place);
+
+                while ( !none_p_places_Tmp.empty() ) {
+
+                    for (set<Node *>::const_iterator none_p =
+                                    none_p_places_Tmp.begin(); none_p
+                                    != none_p_places_Tmp.end(); none_p++) {
+                        set<Node *> presetTmp = (*none_p)->preset;
+
+                        for (set<Node *>::const_iterator t = presetTmp.begin(); t
+                                        != presetTmp.end(); t++) {
+
+                            if (none_p_preset_transitions.find( *t)
+                                            != none_p_preset_transitions.end() ) {
+                                outputPlaces.insert((*t)->postset.begin(), (*t)->postset.end() );
+                            }
+                        }
+                    }
+
+                    none_p_places_Tmp.erase( *place);
+                    if ( !outputPlaces.empty() ) {
+                        none_p_places_Tmp = setDifference(outputPlaces,
+                                        none_p_places);
+                        none_p_places.insert(outputPlaces.begin(),
+                                        outputPlaces.end() );
+                    }
+                }
+            }
+        }
+
+        if (isPlaceToRemove) {
+            set<Transition *> placeToRemovePreset;
+            set<Node *> preSet = placeToRemove->preset;
+
+            for (set<Node *>::const_iterator pre_t = preSet.begin(); pre_t
+                            != preSet.end(); pre_t++) {
+                placeToRemovePreset.insert( static_cast<Transition *>(*pre_t) );
+            }
+
+            set<Transition *> placeToRemovePostset;
+            set<Node *> postSet = placeToRemove->postset;
+
+            for (set<Node *>::const_iterator post_t = postSet.begin(); post_t
+                            != postSet.end(); post_t++) {
+                placeToRemovePostset.insert( static_cast<Transition *>(*post_t) );
+            }
+
+            set<Transition *> transitions_to_remove;
+            // Removes each transitions from the specified preset if and only if the unfication of
+            // the preset and the postset of the according transition is not empty.
+            for (set<Transition *>::const_iterator t_pre =
+                            placeToRemovePreset.begin(); t_pre
+                            != placeToRemovePreset.end(); t_pre++) {
+
+                for (set<Transition *>::const_iterator t_post =
+                                placeToRemovePostset.begin(); t_post
+                                != placeToRemovePostset.end(); t_post++) {
+
+                    if ( !(setIntersection( (*t_pre)->preset, (*t_post)->preset ).empty() )) {
+                        transitions_to_remove.insert( *t_pre);
+                    }
+                }
+            }
+
+            for (set<Transition *>::const_iterator t =
+                            transitions_to_remove.begin(); t
+                            != transitions_to_remove.end(); t++) {
+
+                placeToRemovePreset.erase( *t);
+                removeTransition( *t);
+                t_result++;
+            }
+
+            // detach the place from the petri net and remove it finally
+            removePlace(placeToRemove);
+            // compute the cartesian product and determine the pre and post set of the new places
+            agglomerateTransitions(placeToRemovePreset, placeToRemovePostset);
+            p_result++;
+            t_result++;
+        }
+        none_p_places.clear();
+    }
+
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(t_result)
+                    + " transitions.\n");
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(p_result) + " places.\n");
+}
+
+/*!
+ * Pre agglomeration rule as defined in [ES01]. This rule removes a place and 
+ * merges the post- and preset of this place if the place satisfies certain 
+ * conditions. The rule preserves boundedness, state based LTL-X or action based
+ * LTL properties which only consider transitions of the reduced net or places 
+ * of the reduced net.
+ * Furthemore, if the original net is live, the reduced net will also be live in
+ *  the case the the original net is safe. The conversion holds not. Thus, 
+ * deadlock won't be preserved.
+ *
+ * \note As the place in \f$ t \f$'s preset/postset has ingoing and outgoing
+ *       arcs, it is an internal place. Thus, \f$ t \f$ does not communicate
+ *       and its removal does not affect controllability or the set of
+ *       communicating partners.
+ *
+ *
+ * \pre \f$ p \f$ is a place of the net: \f$ p \in P \f$
+ * \pre \f$ u \f$ is a transition in the preset of \f$ p \f$ but not in the postset of \f$ p \f$: \f$ p \in {^{\bullet}p}\setminus p^{\bullet}\f$
+ * \pre \f$ u \f$ is the only transition in the preset of \f$ p \fS: \f$ {^\bullet}p = \{u\} \f$
+ * \pre the preset of \f$ p \f$ must not be empty: \f$ {{^{bullet}}p}\neq\emptyset \f$
+ * \pre the preset of the postset of \f$ p \f$ again is \f$ p \f$: \f$ {^{\bullet}(p^{\bullet})=\{p\} \f$
+ * \pre \f$ p \f$ must not be marked initially: \f$ M_0(p)=0 \f$
+ * \pre weights of all arcs form \f$ p \f$ to adjacent Transitions must be 1: \f$ \forall (p,t),(t,p)\in F\,:\,W((p,t))=W((t,p))=1  \f$
+ * 
+ * \post \f$ p \f$ is removed: \f$ P' = P \; \setminus \; \{p\} \f$
+ * \post \f$ t \f$ is removed and if the union of the preset of a transition \f$ u \in {^{\bullet}p} \f$ and of the preset of \f$ t \f$ is not empty, \f$ u \f$ is also removed: \f$T' = T \setminus (\{t\}\cup\{u \in {^{\bullet}p}\mid {^{\bullet}u}\cap{^{\bullet}u}\neq\emptyset\}) \f$
+ * \post 
+ */
+void PetriNet::reduce_pre_agglomeration() {
+    trace(TRACE_DEBUG,
+                    "[PN]\t Applying rule RE2 (Esparzas and Schroeters pre agglomeration)...\n");
+    // p is a place satisfying the abstraction rule
+    set<Node *> none_p_preset_transitions;
+    set<Node *> none_p_places;
+    unsigned int p_result = 0;
+    unsigned int t_result = 0;
+    unsigned int old_P_size = 0;
+    bool isPlaceToRemove;
+    Place *placeToRemove;
+
+    while (old_P_size != P.size() ) {
+
+        isPlaceToRemove = false;
+        old_P_size = P.size();
+        // traverse the places
+        for (set<Place *>::const_iterator place = P.begin(); place != P.end(); place++) {
+
+            if (none_p_places.begin() != none_p_places.end()
+                            && none_p_places.find( *place)
+                                            != none_p_places.end() ) {
+                // this place is no candidate for a place satisfying the abstraction rule or was yet
+                // analyzed. Hence,...
+                continue; //... with the next place
+            }
+
+            set<Node *> p_postset = (*place)->postset;
+            set<Node *> p_preset = (*place)->preset;
+
+            if ( !p_preset.empty() // precondition 4 is satisfied
+            && !p_postset.empty() // this is necessary to satisfy condition 5
+            && (*place)->tokens == 0 // precondition 6 is satisfied                                      
+                            && p_preset.size() == 1 // precondition 3 is satisfied
+                            && setIntersection( p_postset, p_preset ).empty() // precondition 2 is satisfied 
+            && sameweights( *place) // precondition 7 is satisfied
+            && is_presets_postset_singleton( *place) ) { // precondition 5 is satisfied
+                // all conditions are satisfied, thus the loop must be left to remove the place
+                placeToRemove = *place;
+                isPlaceToRemove = true;
+                break;
+
+            } else { // one of the preconditions is not satisfied 
+                // ...hence all input transitions of this place cannot be the only input transtions of another place
+                none_p_preset_transitions.insert( (p_preset.begin()),
+                                (p_preset.end()));
+                // ...and the output places of their input transitions and so on
+                // cannot be places satisfying precondition 5
+                set<Node *> none_p_places_Tmp;
+                set<Node *> outputPlaces;
+                none_p_places_Tmp.insert( *place);
+                none_p_places.insert( *place);
+
+                while ( !none_p_places_Tmp.empty() ) {
+
+                    for (set<Node *>::const_iterator none_p =
+                                    none_p_places_Tmp.begin(); none_p
+                                    != none_p_places_Tmp.end(); none_p++) {
+                        set<Node *> presetTmp = (*none_p)->preset;
+
+                        for (set<Node *>::const_iterator t = presetTmp.begin(); t
+                                        != presetTmp.end(); t++) {
+
+                            if (none_p_preset_transitions.find( *t)
+                                            != none_p_preset_transitions.end() ) {
+                                outputPlaces.insert((*t)->postset.begin(), (*t)->postset.end() );
+                            }
+                        }
+                    }
+
+                    none_p_places_Tmp.erase( *place);
+                    if ( !outputPlaces.empty() ) {
+                        none_p_places_Tmp = setDifference(outputPlaces,
+                                        none_p_places);
+                        none_p_places.insert(outputPlaces.begin(),
+                                        outputPlaces.end() );
+                    }
+                }
+            }
+        }
+
+        if (isPlaceToRemove) {
+            set<Transition *> placeToRemovePreset;
+            set<Node *> preSet = placeToRemove->preset;
+
+            for (set<Node *>::const_iterator pre_t = preSet.begin(); pre_t
+                            != preSet.end(); pre_t++) {
+                placeToRemovePreset.insert( static_cast<Transition *>(*pre_t) );
+            }
+
+            set<Transition *> placeToRemovePostset;
+            set<Node *> postSet = placeToRemove->postset;
+
+            for (set<Node *>::const_iterator post_t = postSet.begin(); post_t
+                            != postSet.end(); post_t++) {
+                placeToRemovePostset.insert( static_cast<Transition *>(*post_t) );
+            }
+
+            set<Transition *> transitions_to_remove;
+            // Removes each transitions from the specified postset if and only if the unfication of
+            // the preset and the postset of the according transition is not empty.
+            for (set<Transition *>::const_iterator t_pre =
+                            placeToRemovePreset.begin(); t_pre
+                            != placeToRemovePreset.end(); t_pre++) {
+
+                for (set<Transition *>::const_iterator t_post =
+                                placeToRemovePostset.begin(); t_post
+                                != placeToRemovePostset.end(); t_post++) {
+
+                    if ( !(setIntersection( (*t_pre)->preset, (*t_post)->preset ).empty() )) {
+                        transitions_to_remove.insert( *t_post);
+                    }
+                }
+            }
+
+            for (set<Transition *>::const_iterator t =
+                            transitions_to_remove.begin(); t
+                            != transitions_to_remove.end(); t++) {
+
+                placeToRemovePostset.erase( *t);
+                removeTransition( *t);
+                t_result++;
+            }
+
+            // detach the place from the petri net and remove it finally
+            removePlace(placeToRemove);
+            // compute the cartesian product and determine the pre and post set of the new places
+            agglomerateTransitions(placeToRemovePreset, placeToRemovePostset);
+
+            p_result++;
+            t_result++;
+        }
+
+        none_p_places.clear();
+    }
+
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(t_result)
+                    + " transitions.\n");
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(p_result) + " places.\n");
+}
+
+/*!
+ * Post agglomeration rule as defined in [ES01]. This rule removes a place and merges the post- and preset 
+ * of this place if the place satisfies certain conditions. The
+ * rule preserves boundedness, state based LTL-X or action based LTL properties
+ * which only consider transitions of the reduced net or places of the reduced net.
+ * Furthemore, if the original net is live, the reduced net will also be live in the case the
+ * the original net is safe. The conversion holds not. Thus, deadlock won't be preserved.
+ *
+ * \note As the place in \f$ t \f$'s preset/postset has ingoing and outgoing
+ *       arcs, it is an internal place. Thus, \f$ t \f$ does not communicate
+ *       and its removal does not affect controllability or the set of
+ *       communicating partners.
+ *
+ *
+ * \pre \f$ p \f$ is a place of the net: \f$ p \in P \f$
+ * \pre the preset of \f$ p \f$ must not be empty: \f$ {{^{bullet}}p}\neq\emptyset \f$
+ * \pre the postset of \f$ p \f$ must not be empty: \f$ p^{bullet}\neq\emptyset \f$
+ * \pre the postset of the preset of \f$ p \f$ is again \f$ p \f$: \f$ ({^{\bullet}p}^{\bullet})=\{p\} \f$
+ * \pre \f$ p \f$ must not be marked initially: \f$ M_0(p)=0 \f$
+ * \pre weights of all arcs form \f$ p \f$ to adjacent Transitions must be 1: \f$ \forall (p,t),(t,p)\in F\,:\,W((p,t))=W((t,p))=1  \f$
+ * 
+ * \post \f$ p \f$ is removed: \f$ P' = P \; \setminus \; \{p\} \f$
+ * \post \f$ t \f$ is removed and if the union of the preset of a transition \f$ u \in {^{\bullet}p} \f$ and of the preset of \f$ t \f$ is not empty, \f$ u \f$ is also removed: \f$T' = T \setminus (\{t\}\cup\{u \in {^{\bullet}p}\mid {^{\bullet}u}\cap{^{\bullet}u}\neq\emptyset\}) \f$
+ * \post 
+ */
+void PetriNet::reduce_post_agglomeration() {
+    trace(TRACE_DEBUG,
+                    "[PN]\t Applying rule RE3 (Esparzas and Schroeters post agglomeration)...\n");
+    // p is a place satisfying the abstraction rule
+    unsigned int p_result = 0;
+    unsigned int t_result = 0;
+    unsigned int old_P_size = 0;
+    bool isPlaceToRemove;
+    Place *placeToRemove;
+
+    while (old_P_size != P.size() ) {
+
+        isPlaceToRemove = false;
+        old_P_size = P.size();
+        // traverse the places
+        for (set<Place *>::const_iterator place = P.begin(); place != P.end(); place++) {
+
+            set<Node *> p_postset = (*place)->postset;
+            set<Node *> p_preset = (*place)->preset;
+
+            if ( !p_preset.empty() // precondition 4 is satisfied
+            && !p_postset.empty() // this is necessary to satisfy condition 5
+            && (*place)->tokens == 0 // precondition 6 is satisfied                                      
+                            && setIntersection( p_postset, p_preset ).empty() // precondition 2 is satisfied 
+            && sameweights( *place) // precondition 7 is satisfied
+            && is_postsets_preset_singleton( *place) ) { // precondition 5 is satisfied
+                // all conditions are satisfied, thus the loop must be left to remove the place
+                placeToRemove = *place;
+                isPlaceToRemove = true;
+                break;
+
+            }
+
+            if (isPlaceToRemove) {
+                set<Transition *> placeToRemovePreset;
+                set<Node *> preSet = placeToRemove->preset;
+
+                for (set<Node *>::const_iterator pre_t = preSet.begin(); pre_t
+                                != preSet.end(); pre_t++) {
+                    placeToRemovePreset.insert( static_cast<Transition *>(*pre_t) );
+                }
+
+                set<Transition *> placeToRemovePostset;
+                set<Node *> postSet = placeToRemove->postset;
+
+                for (set<Node *>::const_iterator post_t = postSet.begin(); post_t
+                                != postSet.end(); post_t++) {
+                    placeToRemovePostset.insert( static_cast<Transition *>(*post_t) );
+                }
+
+                // detach the place from the petri net and remove it finally
+                removePlace(placeToRemove);
+                // compute the cartesian product and determine the pre and post set of the new places
+                agglomerateTransitions(placeToRemovePreset,
+                                placeToRemovePostset);
+
+                p_result++;
+            }
+        }
+    }
+
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(t_result)
+                    + " transitions.\n");
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(p_result) + " places.\n");
+}
+
+/*!
+ * \brief Checks whether the presets postset of the specified place only contains the specified place itself.
+ * 
+ * \param p a place
+ * 
+ * returns true if the \f$ ({^{\bullet}p}^{\bullet})=\{p\} \f$
+ */
+bool PetriNet::is_presets_postset_singleton(Place *p) const {
+
+    set<Node *> p_preset = p->preset;
+
+    for (set<Node *>::const_iterator t = p_preset.begin(); t != p_preset.end(); t++) {
+        // the postset of every transition in the preset of p must contain only one element (p itself)
+        if ((*t)->postset.size() != 1)
+            return false;
+    }
+
+    return true;
+}
+
+/*!
+ * \brief Checks whether the postsets preset of the specified place only contains the specified place itself.
+ * 
+ * \param p a place
+ * 
+ * returns true if the \f$ ({^{\bullet}p}^{\bullet})=\{p\} \f$
+ */
+bool PetriNet::is_postsets_preset_singleton(Place *p) const {
+
+    set<Node *> p_postset = p->postset;
+
+    for (set<Node *>::const_iterator t = p_postset.begin(); t != p_postset.end(); t++) {
+        // the preset of every transition in the postset of p must contain only one element (p itself)
+        if ((*t)->preset.size() != 1)
+            return false;
+    }
+
+    return true;
+}
+
+/*!
+ * Implicite place rule as defined in [ES01]. This rule removes an implicit place. The
+ * rule preserves boundedness, liveness, state based LTL-X or action based LTL properties
+ * which only consider transitions of the reduced net or places of the reduced net.
+ *
+ * \note As the place in \f$ t \f$'s preset/postset has ingoing and outgoing
+ *       arcs, it is an internal place. Thus, \f$ t \f$ does not communicate
+ *       and its removal does not affect controllability or the set of
+ *       communicating partners.
+ *
+ *
+ * \pre  the place \f$ p $\f is implicit if the following linear program holds a solution
+ *          - minimize \f$ {\vec Y}^T \cdot M_0 + \mu $\f such that
+ *          - \f$ {\vec Y} \ge \mathbf{0} $\f
+ *          - \f$ {\vec Y}^T \cdot \mathbf{N} \le {\vec l_p}$\f
+ *          - \f$ Y(p) = 0 $\f
+ *          - \f$ \forall t_i \in p^{\bullet}\,:\, \sum_{p' \in {^{\bullet}t_i}} Y(p') \cdot F(p',t_i) + \mu \ge F(p,t_i) $\f 
+ *          - \f$ {\vec Y}^T \cdot M_0 + \mu \le M_0(p) $\f
+ * 
+ * \post \f$ p \f$ is removed: \f$ P' = P \; \setminus \; \{p\} \f$
+ */
+
+#ifdef HAVE_LIBLPSOLVE55
+
+void PetriNet::reduce_implicit_places() {
+    int result=0;
+    trace(TRACE_DEBUG,
+                    "[PN]\tApplying rule ES01 (removal of implicit places)...\n");
+
+    int Ncol, j, i, ret = 0, t_number = T.size(), p_number = P.size();
+    unsigned int prior_p_size = 0;
+
+    while (prior_p_size != P.size() ) {
+
+        map< string, int> pName2ConstraintIndex;
+
+        i = 0;
+
+        prior_p_size = P.size();
+        int **incidenceMatrix = getIncidenceMatrix();
+        p_number = P.size();
+
+        for (set<Place*>::const_iterator p_candidate = P.begin(); p_candidate
+                        != P.end(); p_candidate++) {
+
+            lprec *lp;
+            int *colno= NULL;
+            REAL *row = NULL;
+
+            /* We will build the model row by row
+             So we start with creating a model with 0 rows and P.size() + 1 columns */
+            Ncol = P.size() + 1; /* we have as many variables as places and the variable \f$ \mu \f$ additionally */
+
+            lp = make_lp(0, Ncol);
+            if (lp == NULL)
+                ret = 1; /* couldn't construct a new model... */
+
+            if (ret == 0) {
+
+                j = 1;
+                /* let us name our variables. Not required, but can be useful for debugging */
+                for (set<Place *>::const_iterator p = P.begin(); p != P.end(); p++) {
+                    char pName[4];
+                    strncpy(pName, ((*p)->nodeFullName()).c_str(), sizeof(pName )
+                                    - 1);
+                    set_col_name(lp, j, pName);
+                    pName2ConstraintIndex[ (*p)->nodeFullName() ] = j++;
+                }
+
+                set_col_name(lp, Ncol, "mu");
+
+                // all variables must be integers, it is an integer linear program
+                for (int x = 1; x <= Ncol; x++) {
+                    set_int(lp, x, TRUE);
+                }
+
+                /* create space large enough for one row */
+                colno = (int *) malloc(Ncol * sizeof(*colno));
+                row = (REAL *) malloc(Ncol * sizeof(*row));
+
+                if ((colno == NULL) || (row == NULL))
+                    ret = 2;
+            }
+
+            /* add all the constraints */
+
+            if (ret == 0) {
+
+                set_add_rowmode(lp, TRUE); /* makes building the model faster if it is done rows by row */
+
+                /* construct \f$ {\vec Y} \ge \mathbf{0} \f$ */
+                j = 0;
+                for (int y = 0; y <= Ncol; y++) {
+
+                    if (i == y) {
+                        // \f$ Y(p) = 0 $\f
+                        colno[j] = y + 1;
+                        row[j++] = 1;
+
+                        /* add the row to lpsolve */
+                        if ( !add_constraintex(lp, j, row, colno, EQ, 0) ) {
+                            ret = 3;
+                            break;
+                        }
+
+                    } else {
+                        colno[j] = y + 1;
+                        row[j++] = 1;
+
+                        /* add the row to lpsolve */
+                        if ( !add_constraintex(lp, j, row, colno, GE, 0) ) {
+                            ret = 3;
+                            break;
+                        }
+
+                    }
+
+                    j = 0;
+                }
+
+            }
+
+            /* build up the following inequation system
+             * \f$ {\vec Y}^T \cdot \mathbf{N} \le {\vec l_p}$\f
+             */
+            if (ret == 0) {
+
+                for (int x = 0; x < t_number; x++) {
+
+                    for (int y = 0; y < p_number; y++) {
+
+                        colno[y] = y + 1;
+                        row[y] = incidenceMatrix[y][x];
+                    }
+
+                    if ( !add_constraintex(lp, p_number, row, colno, LE,
+                                    incidenceMatrix[i][x]) )
+                        ret = 3;
+
+                }
+            }
+
+            set<Place *>::const_iterator p = P.begin();
+
+            /* build up the following inequation system
+             * \f$ \forall t_i \in p^{\bullet}\,:\, \sum_{p' \in {^{\bullet}t_i}} Y(p') \cdot F(p',t_i) + \mu \ge F(p,t_i) $\f 
+             */
+            if (ret == 0) {
+                set<Node *> postset = (*p)->postset;
+
+                for (set<Node *>::const_iterator t = postset.begin(); t
+                                != postset.end(); t++) {
+
+                    j = 0;
+                    set<Node *> preset = (*t)->preset;
+
+                    for (set<Node *>::const_iterator pPar = preset.begin(); pPar
+                                    != preset.end(); pPar++) {
+
+                        row[j] = arc_weight( *pPar, *t);
+                        map< string, int>::iterator
+                                        iter =
+                                                        pName2ConstraintIndex.find((*pPar)->nodeFullName() );
+
+                        if (iter != pName2ConstraintIndex.end() ) {
+                            colno[j++] = iter->second;
+                        }
+                    }
+
+                    colno[j] = Ncol;
+                    row[j++] = 1;
+
+                    if ( !add_constraintex(lp, j, row, colno, GE, arc_weight(
+                                    *p, *t) ) )
+                        ret = 3;
+
+                }
+
+            }
+
+            // \f$ {\vec Y}^T \cdot M_0 + \mu \le M_0(p) $\f
+            if (ret == 0) {
+
+                j = 0;
+                for (set<Place *>::const_iterator place = P.begin(); place
+                                != P.end(); place++) {
+
+                    row[j] = (*place)->tokens;
+                    map< string, int>::iterator iter =
+                                    pName2ConstraintIndex.find((*place)->nodeFullName() );
+
+                    if (iter != pName2ConstraintIndex.end() ) {
+                        colno[j++] = iter->second;
+                    }
+                }
+
+                colno[j] = Ncol;
+                row[j++] = 1;
+
+                if ( !add_constraintex(lp, j, row, colno, LE, (*p)->tokens) )
+                    ret = 3;
+
+            }
+
+            if (ret == 0) {
+
+                set_add_rowmode(lp, FALSE); /* rowmode should be turned off again when done building the model */
+
+                j = 0;
+                // setup the objective function: \f$ {\vec Y}^T \cdot M_0 + \mu $\f
+                for (set<Place *>::const_iterator place = P.begin(); place
+                                != P.end(); place++) {
+
+                    row[j] = (*place)->tokens;
+                    map< string, int>::iterator iter =
+                                    pName2ConstraintIndex.find((*place)->nodeFullName() );
+
+                    if (iter != pName2ConstraintIndex.end() ) {
+                        colno[j++] = iter->second;
+                    }
+                }
+
+                colno[j] = Ncol;
+                row[j++] = 1;
+
+                /* set the objective in lpsolve */
+                if (!set_obj_fnex(lp, j, row, colno) )
+                    ret = 4;
+            }
+
+            if (ret == 0) {
+                /* set the object direction to minimize */
+                set_minim(lp);
+
+                /* just out of curioucity, now show the model in lp format on screen */
+                /* this only works if this is a console application. If not, use write_lp and a filename */
+                // write_LP(lp, stdout);
+                // write_lp(lp, "model.lp");
+
+                /* I only want to see important messages on screen while solving */
+                set_verbose(lp, IMPORTANT);
+
+                /* Now let lpsolve calculate a solution */
+                ret = solve(lp);
+
+                if (ret == OPTIMAL && !(*p_candidate)->isFinal && !((*p_candidate)->tokens
+                                >0)) {
+                    ret = 0;
+                    removePlace( *p_candidate);
+                    result++;
+                    break;
+
+                } else {
+                    ret = 5;
+                }
+            }
+
+            if (ret == 0) {
+                /* a solution is calculated, now lets get some results */
+
+                /* objective value */
+                //              printf("Objective value: %f\n", get_objective(lp));
+
+                /* variable values */
+                get_variables(lp, row);
+                //              for(j = 0; j < Ncol; j++)
+                //                printf("%s: %f\n", get_col_name(lp, j + 1), row[j]);
+
+                /* we are done now */
+            }
+
+            /* free allocated memory */
+            if (row != NULL)
+                free(row);
+            if (colno != NULL)
+                free(colno);
+
+            if (lp != NULL) {
+                /* clean up such that all used memory by lpsolve is freed */
+                delete_lp(lp);
+            }
+
+            i++;
+            ret = 0;
+        }
+
+    }
+
+    if (result!=0)
+        trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result)
+                        + " places.\n");
+}
+
+#endif
+/***** END CODE by Thomas Pillat *****/
 
 
 
@@ -923,34 +1688,59 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
     
     if (reduction_level >= 2)
     {
+#ifdef USING_BPEL2OWFN
       reduce_unused_status_places();
       reduce_suspicious_transitions();
+#endif
     }
     
     if (reduction_level >= 3)
     {
-      reduce_identical_places();	// RB1
-      reduce_identical_transitions();	// RB2
+      reduce_identical_places();    // RB1
+      reduce_identical_transitions();   // RB2
     }
     
     if (reduction_level >= 4)
     {
-      reduce_series_places();		// RA1
-      reduce_series_transitions();	// RA2
+      reduce_series_places();       // RA1
+      reduce_series_transitions();  // RA2
     }
     
-    if (reduction_level == 5)
+    if (reduction_level >= 5)
     {
-      reduce_self_loop_places();	// RC1
-      reduce_self_loop_transitions();	// RC2
+      reduce_self_loop_places();    // RC1
+      reduce_self_loop_transitions();   // RC2
       reduce_remove_initially_marked_places_in_choreographies();
     }
     
     if (reduction_level == 6)
     {
-      reduce_equal_places();		// RD1
+#ifdef USING_BPEL2OWFN
+      reduce_equal_places();        // RD1
+#endif
     }
-    
+
+/***** BEGIN CODE by Thomas Pillat *****/
+    if (reduction_level >= 7)
+    {
+      /**
+       * TODO:
+       * These rules have to be checked, if there preserve controllablity!
+       * Until then there are not usable.
+       */
+        
+      //reduce_esparzas_abstraction_rule();       // RE1
+      //reduce_pre_agglomeration();               // RE2
+      //reduce_post_agglomeration();              // RE3
+    }
+
+#ifdef HAVE_LIBLPSOLVE55
+    if ( reduction_level >= 8 )
+    {
+       reduce_implicit_places();                // RI
+    }
+#endif
+/***** END CODE by Thomas Pillat *****/
     
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + toString(passes++) + ": " + information() + "\n");
     

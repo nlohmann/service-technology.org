@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Service-Technology.org Editor Resource Plugin
+Bundle-SymbolicName: hub.top.editor.resource
+Bundle-Version: 1.0.0
+Bundle-Activator: hub.top.editor.resource.Activator
+Bundle-Vendor: Service-Technology.org
+Require-Bundle: org.eclipse.gmf.runtime.diagram.ui,
+ org.eclipse.ui.ide
+Eclipse-LazyStart: true
+Export-Package: hub.top.editor.eclipse,
+ hub.top.editor.eclipse.ui

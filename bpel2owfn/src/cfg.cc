@@ -61,7 +61,7 @@
 #include <cassert>
 #include <iostream>
 
-#include "bpel2owfn.h"
+#include "config.h"
 #include "cfg.h"
 #include "options.h"
 #include "debug.h"

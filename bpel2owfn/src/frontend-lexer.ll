@@ -171,6 +171,7 @@ UB     			[\200-\277]
 
  /* <documentation tags> */
 <DOCUMENTATION>{docu_end}	{ /* skip */ BEGIN(currentView); }
+<DOCUMENTATION>{string} { /* skip */ }
 <DOCUMENTATION>[^<]		{ /* skip */ }
 <INITIAL>"documentation"	{ /* skip */ currentView = YY_START; BEGIN(DOCUMENTATION); }
 

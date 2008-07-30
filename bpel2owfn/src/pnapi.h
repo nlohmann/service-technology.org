@@ -5,7 +5,7 @@
 #define USING_BPEL2OWFN
 
 
-#include "bpel2owfn.h"
+#include "config.h"
 #include "petrinet.h"		// to define member functions
 #include "ast-details.h"	// (class ASTE)
 #include "globals.h"

@@ -1089,6 +1089,78 @@ void PetriNet::output_apnn(ostream *output) const
 
 
 /*!
+ * \brief   TPN-output
+ *
+ *          Outputs the net in TPN-format (Woflan). See
+ *          http://is.tm.tue.nl/research/woflan/ for a reference.
+ *
+ * \param   output  output stream
+ *
+ * \pre     output != NULL
+ *
+ * \todo    Maybe I need to use the "toLoLAident" function.
+ */
+void PetriNet::output_tpn(ostream *output) const
+{
+  assert(output != NULL);
+  
+  // header line
+  (*output) << "-- Petri net created by " << PACKAGE_STRING << " reading " << globals::filename << endl << endl;
+  
+  // places (only internal)
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    (*output) << "place \"" << (*p)->nodeFullName() << "\"";
+    
+    // initial marking
+    if ((*p)->tokens > 0)
+      (*output) << " init " << (*p)->tokens;
+    
+    (*output) << ";" << endl;
+  }
+  (*output) << endl;
+  
+  
+  // transitions
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  {
+    (*output) << "trans \"" << (*t)->nodeFullName() << "\"" << endl;
+    
+    (*output) << "    in";
+    for (set<Node *>::iterator pre = (*t)->preset.begin(); pre != (*t)->preset.end(); pre++)
+    {
+      // ignore input places
+      if ( (*pre)->nodeType == PLACE )
+        if ( P_in.find(static_cast<Place*>(*pre)) != P_in.end())
+          continue;
+      
+      for (unsigned int i = 0; i < arc_weight(*pre, *t); i++)
+        (*output) << " \"" << (*pre)->nodeFullName() << "\""; // << arc_weight(*pre, *t);
+    }
+    (*output) << endl;
+    
+    (*output) << "    out";
+    for (set<Node *>::iterator post = (*t)->postset.begin(); post != (*t)->postset.end(); post++)
+    {
+      // ignore output places
+      if ( (*post)->nodeType == PLACE )
+        if ( P_out.find(static_cast<Place*>(*post)) != P_out.end())
+          continue;
+      
+      for (unsigned int i = 0; i < arc_weight(*t, *post); i++)
+        (*output) << " \"" << (*post)->nodeFullName() << "\""; // << arc_weight(*t, *post);
+      
+    }
+    (*output) << endl << ";" << endl << endl;
+  }  
+  (*output) << endl;
+}
+
+
+
+
+
+/*!
  * \brief   LoLA-output
  *
  *          Outputs the net in LoLA-format.
@@ -1542,6 +1614,7 @@ ostream& PNapi::operator<< (ostream& os, const PNapi::PetriNet &obj)
     case(FORMAT_SPIN):	obj.output_spin(&os); break;
     case(FORMAT_INFO):	obj.output_info(&os); break;
     case(FORMAT_LOLA):	obj.output_lola(&os); break;
+    case(FORMAT_TPN):	obj.output_tpn(&os); break;
     case(FORMAT_IOLOLA):obj.output_lola(&os); break;
     case(FORMAT_OWFN):	obj.output_owfn(&os); break;
     case(FORMAT_PEP):	obj.output_pep(&os); break;

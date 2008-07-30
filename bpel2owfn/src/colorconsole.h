@@ -70,7 +70,7 @@
 
 #include <iostream>
 #include <iomanip>
-#include "bpel2owfn.h"
+#include "config.h"
 
 using std::ostream;
 

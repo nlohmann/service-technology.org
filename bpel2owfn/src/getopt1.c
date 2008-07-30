@@ -20,7 +20,7 @@
 
 #ifdef HAVE_CONFIG_H
 /* changed 2006-01-31 by gierds: our config.h is called bpel2owfn.h */
-#include <bpel2owfn.h>
+#include <config.h>
 #endif
 
 

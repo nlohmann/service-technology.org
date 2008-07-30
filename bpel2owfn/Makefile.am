@@ -23,23 +23,15 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2008/03/05 10:33:24 $ by $Author: gierds $
-# Version $Revision: 1.73 $
-
 # Where else are Makefiles?
-SUBDIRS = src tests doc maintainer/rpm
-
-# Which targets have no dependencies (i.e. always succeed)?
-.PHONY: binarydistreadme update
+SUBDIRS = src tests doc maintainer/rpm man
 
 
 ##################################
 # Targets to manage distribution #
 ##################################
 
-# do not publish CVS files
 dist-hook:
-	rm -rf `find $(distdir) -name CVS`
 	-make -C gui distclean
 
 EXTRA_DIST = gui maintainer/fink
@@ -50,23 +42,11 @@ EXTRA_DIST = gui maintainer/fink
 # Targets to clean generated files #
 ####################################
 
-# always remove vi's temporary files
-CLEANFILES = -r *~
-
-# all files that require the permission to execute
-SHELLSCRIPTS = tests/test1 \
-	       tests/test2 \
-	       tests/test3 \
-	       tests/test4 \
-	       tests/test5 \
-	       tests/test6
-
-# Delete all files that can be created by other files, repair file
-# permissions and set filetype to UNIX.
-hu-prepare: maintainer-clean
+# remove everything that can be rebuilt
+cvs-clean: maintainer-clean
 	-rm -f aclocal.m4
-	-rm -f compile
-	-rm -f configure
+	-rm -f compile COPYING
+	-rm -f configure config.guess config.sub
 	-rm -f depcomp
 	-rm -f install-sh
 	-rm -f Makefile.in
@@ -76,16 +56,14 @@ hu-prepare: maintainer-clean
 	-rm -f doc/mdate-sh
 	-rm -f doc/bpel2owfn
 	-rm -f doc/stamp-vti
-	-rm -f doc/version.texi
+	-rm -f doc/version.texi doc/texinfo.tex
 	-rm -f doc/Makefile.in
+	-rm -f man/Makefile.in
 	-rm -f src/Makefile.in
-	-rm -f src/bpel2owfn.h.in
+	-rm -f src/config.h.in src/config.h.in~
 	-rm -f -r src/.deps
 	-rm -f tests/Makefile.in
-	-rm -f mainainer/rpm/Makefile.in
-	find . -type d -exec chmod 755 {} \;
-	find . -type f -exec chmod 644 {} \;
-	chmod 755 $(SHELLSCRIPTS) doc/gendocs.sh gnupload
+	-rm -f maintainer/rpm/Makefile.in
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
 	@echo "  aclocal"
@@ -163,7 +141,7 @@ bindist_universal:
 	  LDFLAGS="-arch i386 -arch ppc"
 
 # Target to create an executable that is independet of Cygwin (i.e. uses the
-# MinGW libraries insread of Cygwin's own libraries. Whether the compilation
+# MinGW libraries instead of Cygwin's own libraries. Whether the compilation
 # succeeded can be checked with "cygcheck ./bpel2owfn.exe", which displays all
 # library dependencies.
 bindist_win32:

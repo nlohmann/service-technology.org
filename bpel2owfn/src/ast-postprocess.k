@@ -1744,7 +1744,7 @@ If(a,b,c,_id) ->
       /* above is generic */
       
       
-      // count the <if>'s branches for Thomas Heidinger's Diplomarbeit
+      // count the <if>'s branches
       globals::if_branches[myid] = 1;
       
 

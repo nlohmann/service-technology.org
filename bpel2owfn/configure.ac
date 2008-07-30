@@ -23,18 +23,15 @@
 # MA 02110-1301  USA.
 #############################################################################
 
-# File last changed $Date: 2008/03/05 11:10:52 $ by $Author: gierds $.
-# Version $Revision: 1.53 $
-
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([GNU BPEL2oWFN],[2.0.4],[bpel2owfn-bug@gnu.org],[bpel2owfn])
+AC_INIT([GNU BPEL2oWFN],[2.04],[bpel2owfn-bug@gnu.org],[bpel2owfn])
 AM_INIT_AUTOMAKE
 
 
 # Set directories.
 AC_CONFIG_SRCDIR(src/bpel2owfn.cc)
-AC_CONFIG_HEADERS(src/bpel2owfn.h)
+AC_CONFIG_HEADERS(src/config.h)
 
 
 # The next line has to be un-commented before releasing version.
@@ -44,6 +41,7 @@ AC_CONFIG_HEADERS(src/bpel2owfn.h)
 # Compute the canonical build-system type variable, build, and its three
 # individual parts build_cpu, build_vendor, and build_os.
 AC_CANONICAL_BUILD
+AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
 
 
 # Checks for C/C++ details.
@@ -52,33 +50,23 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 
 
-# Unset compiler flags to avoid optimization.
-CXXFLAGS=""
-CFLAGS=""
-
-
 # Checks for header files and functions.
 AC_CHECK_HEADERS([windows.h])
-#AC_CHECK_FUNCS([pow])
-
-#AM_PROG_CC_C_O
 
 # Check for libraries
 # lpsolve55 solves linear problems
 AC_CHECK_LIB([lpsolve55], [solve])
 
 # Check for optional programs.
+AM_MISSING_PROG(HELP2MAN, help2man)
 AC_PROG_YACC
 AC_PROG_LEX
+AC_PROG_SED
 
+AC_CHECK_PROG(GENGETOPT, gengetopt, gengetopt)
 AC_CHECK_PROG(KC, kc++, kc++, not found)
-if test "$KC" = "not found"; then
- AC_MSG_WARN([Kimwitu++ was not found. You will not be able to complile BPEL2oWFN from scratch.])
-fi
-
 AC_CHECK_PROG(DOT, dot, dot, not found)
 if test "$DOT" = "not found"; then
- AC_MSG_WARN([Graphviz dot was not found.])
  AC_DEFINE(HAVE_DOT, 0, [Graphviz dot can not be used on this system.])
 else
  AC_DEFINE(HAVE_DOT, 1, [Graphviz dot can be used on this system.])
@@ -89,6 +77,7 @@ fi
 AC_CONFIG_FILES([Makefile \
 	  doc/Makefile \
 	  src/Makefile \
+	  man/Makefile \
 	  src/Doxyfile \
 	  tests/Makefile \
 	  gui/static_release.sh \
@@ -102,6 +91,3 @@ AC_OUTPUT
 
 chmod 775 gui/static_release.sh
 chmod 775 maintainer/fink/create_fink_package.sh
-
-#AC_OUTPUT
-

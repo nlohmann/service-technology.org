@@ -144,6 +144,7 @@ typedef enum
   FORMAT_SPIN,		///< INA
   FORMAT_INFO,		///< Info File
   FORMAT_LOLA,		///< LoLA
+  FORMAT_TPN,		///< Woflan TPN
   FORMAT_OWFN,		///< Fiona open workflow net (oWFN)
   FORMAT_PEP,		///< Low-Level PEP Notation
   FORMAT_PNML,		///< Petri Net Markup Language (PNML)
@@ -529,7 +530,10 @@ class PetriNet
     
     /// LoLA-output
     void output_lola(ostream *output) const;
-    
+
+    /// Woflan-output
+    void output_tpn(ostream *output) const;
+
     /// oWFN-output
     void output_owfn(ostream *output) const;
     

@@ -126,6 +126,7 @@ typedef enum
 typedef enum
 {
   F_LOLA,		///< LoLA Petri net
+  F_TPN,		///< Woflan workflow net
   F_OWFN,		///< Fiona open workflow net
   F_DOT,		///< Graphviz dot format
   F_PEP,		///< low-level PEP notation
@@ -157,7 +158,6 @@ typedef enum
   P_LOOPCONTROL,	///< add communication to loops
   P_NOINTERFACE,	///< do not draw an interface
   P_DEADLOCKTEST,	///< removes the deadlock from the final place
-  P_DATA,		///< creates multiple nets (Diplomarbeit Thomas Heidinger)
   P_PORTS		///< outputs ports (affects oWFN and dot output)
 } possibleParameters;
 

@@ -106,8 +106,7 @@ namespace globals {
   string visArcs="";
 
   string invocation="";
-  string program_name ="";
-
+  
   string filename = "<STDIN>";
   string output_filename = "";
 

@@ -58,8 +58,9 @@
 #include <string>
 #include <cassert>
 #include <map>
+#include <cstdlib>
 
-#include "bpel2owfn.h"          // generated configuration file
+#include "config.h"          // generated configuration file
 
 #include "petrinet.h"           // Petri Net support
 #include "cfg.h"		// Control Flow Graph
@@ -68,7 +69,8 @@
 #include "ast-config.h"
 #include "ast-details.h"
 #include "globals.h"
-#include "extension-data.h"
+#include "cmdline.h"
+
 
 using std::cerr;
 using std::cout;
@@ -76,6 +78,18 @@ using std::endl;
 using std::string;
 using std::map;
 using namespace PNapi;
+
+
+
+
+
+/*!
+ * \brief the command line options
+ *
+ * Stores all information on the command line options.
+ */
+gengetopt_args_info args_info;
+
 
 
 
@@ -124,10 +138,7 @@ PetriNet PN2 = PetriNet();
 // analyzation of the commandline
 void analyze_cl(int argc, char *argv[]) 
 {
-
   // setting globals
-  globals::program_name = string(argv[0]);
-
   for (int i = 0; i < argc; i++)
   {
     globals::invocation += string(argv[i]);
@@ -381,14 +392,6 @@ void final_output()
   if (modus == M_CHOREOGRAPHY)
     PN = PN2;
 
-  
-  // jump into Thomas Heidinger's part
-  if (globals::parameters[P_DATA])
-  {
-    data_extension_main();
-    return;
-  }
-  
   
   if (modus == M_PETRINET || modus == M_CHOREOGRAPHY)
   {
@@ -672,6 +675,35 @@ void final_output()
  */
 int main( int argc, char *argv[])
 {
+    if (argc == 2 && std::string(argv[1]) == "--bug") {
+	    printf("\n\n");
+        printf("Please email the following information to %s:\n", PACKAGE_BUGREPORT);
+        printf("- tool:              %s\n", PACKAGE_NAME);
+        printf("- version:           %s\n", PACKAGE_VERSION);
+        printf("- compilation date:  %s\n", __DATE__);
+        printf("- compiler version:  %s\n", __VERSION__);
+        printf("- platform:          %s\n", BUILDSYSTEM);
+        printf("\n\n");
+        return EXIT_SUCCESS;
+    }    
+    
+  
+  //---------------------------------------------------------------------------
+  // process command line options
+  
+  struct cmdline_parser_params *params;
+  
+  // set default values
+  cmdline_parser_init(&args_info);
+  
+  // initialize the parameters structure
+  params = cmdline_parser_params_create();
+  
+  // call the cmdline parser
+  if (cmdline_parser (argc, argv, &args_info) != 0)
+    exit(EXIT_FAILURE);  
+  //---------------------------------------------------------------------------
+  
 
   // initilization of variables
   PetriNet PN2 = PetriNet();

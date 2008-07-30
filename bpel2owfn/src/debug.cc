@@ -59,7 +59,7 @@
 
 #include "debug.h"
 #include "options.h"
-#include "bpel2owfn.h"
+#include "config.h"
 #include "helpers.h"	// for toInt
 #include "globals.h"
 #include "colorconsole.h"

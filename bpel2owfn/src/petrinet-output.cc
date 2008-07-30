@@ -468,16 +468,19 @@ string Place::output_dot() const
   result += " p" + toString(id) + "  \t[";//label=\"\"";
     
 #ifdef USING_BPEL2OWFN
-    string label;
-    if ( wasExternal != "")
-      label = wasExternal;
+  string label;
+  if ( wasExternal != "")
+    label = wasExternal;
   else
     label = nodeShortName();
   
   if (type == IN || type == OUT)
   {
     // strip "in." or "out."
-    label = label.substr(label.find_first_of(".")+1, label.length());
+    if (label.find_first_of("in.") == 0 || label.find_first_of("out.") == 0)
+    {
+       label = label.substr(label.find_first_of(".")+1, label.length());
+    }
     
     // when drawing ports, strip the port (i.e. the partnerLink) name
     if (globals::parameters[P_PORTS])
@@ -532,9 +535,9 @@ string Place::output_dot() const
   result += " p" + toString(id) + "_l\t[style=invis];\n";
   
   if (type == OUT)
-    result += " p" + toString(id) + " -> p" + toString(id) + "_l [taillabel=\"" + label + "\" style=invis]\n";
+    result += " p" + toString(id) + " -> p" + toString(id) + "_l [taillabel=\"" + label + "\"]\n";
   else
-    result += " p" + toString(id) + "_l -> p" + toString(id) + " [headlabel=\"" + label + "\" style=invis]\n";
+    result += " p" + toString(id) + "_l -> p" + toString(id) + " [headlabel=\"" + label + "\"]\n";
   
   return result;
 }
@@ -562,7 +565,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   (*output) << "digraph N {" << endl;
   (*output) << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\" fontsize=10 remincross=true label=\"";
   
-  if (globals::reduction_level == 5)
+  if (globals::reduction_level > 0)
     (*output) << "structurally reduced ";
   
   (*output) << "Petri net generated from " << globals::filename << "\"]" << endl;
@@ -584,7 +587,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
       (*output) << (*p)->output_dot();
     for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
       (*output) << (*p)->output_dot();
-    
+  }
     
     
     // list the transitions
@@ -647,7 +650,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
         (*output) << " }" << endl << endl;
       }
     }
-  }
+  
   
   
   // list the arcs

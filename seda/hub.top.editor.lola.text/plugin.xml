@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="hub.top.editor.lola.text.TextEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            extensions="lola"
+            icon="icons/document.l.text.16.png"
+            id="hub.top.editor.lola.text.texteditor"
+            name="LoLA PT-Net Text Editor">
+      </editor>
+      <editor
+            class="hub.top.editor.lola.text.ModelEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            extensions="ptnetlola"
+            icon="icons/document.l.16.png"
+            id="hub.top.editor.lola.text.modeleditor"
+            name="LoLA PT-Net Model Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="hub.top.editor.lola.text.TextEditorON"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            extensions="owfn"
+            icon="icons/document.o.text.16.png"
+            id="hub.top.editor.opennet.text.texteditor"
+            name="Open Net Text Editor">
+      </editor>
+      <editor
+            class="hub.top.editor.lola.text.ModelEditorON"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            extensions="ptnetlola"
+            icon="icons/document.o.16.png"
+            id="hub.top.editor.opennet.text.modeleditor"
+            name="Open Net Model Editor">
+      </editor>
+   </extension>
+   <extension
+         point="hub.sam.tef.tokendescriptor">
+      <tokendescriptor
+            class="hub.top.editor.lola.text.syntax.LolaComment"
+            rccsymbol="`lolacomment`">
+      </tokendescriptor>
+   </extension>
+   <extension
+         point="hub.sam.tef.primitivetypedescriptor">
+      <primitivetypedescriptor
+            class="hub.top.editor.lola.text.syntax.LolaIdent"
+            rccsymbol="lolaident"
+            symbolname="LOLAIDENT">
+      </primitivetypedescriptor>
+      <primitivetypedescriptor
+            class="hub.top.editor.lola.text.syntax.LolaAnnotationDescriptor"
+            rccsymbol="lolaannotation"
+            symbolname="LOLAANNOTATION">
+      </primitivetypedescriptor>
+   </extension>
+
+
+</plugin>

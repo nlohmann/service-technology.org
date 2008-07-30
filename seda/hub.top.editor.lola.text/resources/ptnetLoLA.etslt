@@ -1,0 +1,69 @@
+/*****************************************************************************\
+ * ServiceTechnolog.org - PetriNet Editor
+ * Copyright (c) 2008 Dirk Fahland.
+ * All rights reserved.
+\*****************************************************************************/
+
+syntax(PtNet) "resources/ptnetLoLA.ecore" {
+    PtNet:element(PtNet) ->
+    	(Annotation:composite(annotation) ws(statement) ws(statement))?
+       	Places
+       	InitialMarking:composite(initialMarking)
+       	TransitionList;
+    
+    Places -> "PLACE"
+           ws(blockstart)
+               (PlaceList)?
+           ws(blockend) ws(statement)
+           ";" ws(statement) ws(statement);
+       
+    PlaceList [0] -> ws(indent) Place:composite(places);
+    PlaceList [1] -> ws(indent) Place:composite(places) ws(empty) "," ws(statement) PlaceList;
+    Place:element(Place) -> PlaceName:composite(name) (ws(space) Annotation:composite(annotation))?;
+    PlaceName -> LOLAIDENT;
+    
+    InitialMarking:element(Marking) -> "MARKING"
+           ws(blockstart)
+               (MarkedPlaceList)?
+           ws(blockend) ws(statement)
+           ";" ws(statement) ws(statement);
+           
+    MarkedPlaceList [0] -> ws(indent) PlaceMarking:composite(places);
+    MarkedPlaceList [1] -> ws(indent) PlaceMarking:composite(places) ws(empty) "," ws(statement) MarkedPlaceList;
+    PlaceMarking:element(RefMarkedPlace) ->
+       PlaceRef:reference(place) ws(space) ":" ws(space) /*INTEGER  { placeSetTokenNumber($0, $4);  }*/ INTEGER:composite(token) ;
+
+       
+    TransitionList -> (Transition:composite(transitions)  { addArcsToNet($0); }  )*;
+    Transition:element(Transition) ->
+       "TRANSITION" ws(space) LOLAIDENT:composite(name) (ws(space) Annotation:composite(annotation))? ws(statement)
+           "CONSUME"
+           ws(blockstart)
+               (ArcToTransitionList)? ws(empty) ";"
+           ws(blockend) ws(statement)
+           "PRODUCE"
+           ws(blockstart)
+               (ArcToPlaceList)? ws(empty) ";" 
+           ws(blockend) ws(statement)
+       ws(statement);
+
+    ArcToTransitionList [0] -> ws (indent) ArcToTransition:composite(incoming)  ;
+    ArcToTransitionList [1] -> ws (indent) ArcToTransition:composite(incoming) ws(empty) "," ws(statement) ArcToTransitionList ;
+    
+    ArcToTransition:element(ArcToTransition) ->
+       PlaceRef:reference(source) ws(space) ":" ws(space) INTEGER:composite(weight) ;
+       
+    ArcToPlaceList [0] -> ws (indent) ArcToPlace:composite(outgoing) ;
+    ArcToPlaceList [1] -> ws (indent) ArcToPlace:composite(outgoing) ws(empty) "," ws(statement) ArcToPlaceList ;
+    
+    ArcToPlace:element(ArcToPlace) ->
+       PlaceRef:reference(target) ws(space) ":" ws(space) INTEGER:composite(weight) ;
+
+    PlaceRef:elementRef(Place) -> PlaceName:composite(name) ;
+    
+    Annotation:element(Annotation) -> LOLAANNOTATION:composite(text);
+
+    token () {
+    	"`lolacomment`";
+    }
+}

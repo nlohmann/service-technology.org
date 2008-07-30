@@ -2,7 +2,7 @@
 <feature
       id="hub.top.seda"
       label="Service-Technology.org Editor Application"
-      version="1.0.0"
+      version="1.0.1"
       provider-name="Service-Technology.org">
 
    <description url="http://www.service-technology.org/wiki/">

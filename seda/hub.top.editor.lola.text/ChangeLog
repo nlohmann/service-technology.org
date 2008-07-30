@@ -1,0 +1,6 @@
+ChangeLog for hub.top.editor.lola.text
+--------------------------------------
+
+Version 1.0.1
+-------------
++ fixed plugin build configuration in MANIFEST.INF to include resources and icons

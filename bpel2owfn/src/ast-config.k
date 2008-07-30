@@ -64,6 +64,7 @@
  */
 
 #include <cassert>
+#include <climits>
 
 #include "ast-system-k.h"	// phylum definitions
 #include "ast-system-rk.h"	// rewrite rules
@@ -159,6 +160,7 @@ void printer(const char *s, uview v)
 %{ KC_TYPES_HEADER
 #include <string>
 #include <iostream>
+#include <cstring>
 #include <map>
 
 #include "debug.h"	// for (SAerror, trace)

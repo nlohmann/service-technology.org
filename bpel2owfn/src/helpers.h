@@ -62,6 +62,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <climits>
 
 #ifdef USING_BPEL2OWFN
 #include "ast-config.h"		// for kc::integer

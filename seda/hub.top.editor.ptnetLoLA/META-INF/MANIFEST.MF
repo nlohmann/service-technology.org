@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Service-Technology.org Petri Net Model
+Bundle-SymbolicName: hub.top.editor.ptnetLoLA;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: hub.top.editor.ptnetLoLA.base.Activator
+Bundle-Vendor: Service-Technology.org
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.emf;visibility:=reexport,
+ org.eclipse.emf.transaction,
+ org.eclipse.gmf.runtime.diagram.core,
+ org.eclipse.osgi.services,
+ org.eclipse.osgi.util,
+ org.eclipse.ui.ide,
+ hub.top.editor;visibility:=reexport
+Eclipse-LazyStart: true
+Eclipse-BuddyPolicy: registered
+Export-Package: hub.top.editor.ptnetLoLA,
+ hub.top.editor.ptnetLoLA.base,
+ hub.top.editor.ptnetLoLA.impl,
+ hub.top.editor.ptnetLoLA.util

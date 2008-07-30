@@ -1,0 +1,8 @@
+#Sun Jul 20 23:52:43 CEST 2008
+eclipse.preferences.version=1
+gmf_dashboard/domainGenerationModel=platform\:/resource/hub.top.editor.ptnetLoLA/model/ptnetLoLA.genmodel
+gmf_dashboard/domainModel=platform\:/resource/hub.top.editor.ptnetLoLA/model/ptnetLoLA.ecore
+gmf_dashboard/generationModel=platform\:/resource/hub.top.editor.ptnetLoLA/model/gmf/ptnetLoLA.gmfgen
+gmf_dashboard/graphicalDefinitionModel=platform\:/resource/hub.top.editor.ptnetLoLA/model/gmf/ptnetLoLA.gmfgraph
+gmf_dashboard/mappingModel=platform\:/resource/hub.top.editor.ptnetLoLA/model/gmf/ptnetLoLA.gmfmap
+gmf_dashboard/toolingDefinitionModel=platform\:/resource/hub.top.editor.ptnetLoLA/model/gmf/ptnetLoLA.gmftool

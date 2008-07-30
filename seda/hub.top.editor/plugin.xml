@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <category
+            name="Petri Nets"
+            id="hub.top.editor.importWizards.category">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.exportWizards">
+      <category
+            id="hub.top.editor.exportWizards.category"
+            name="Petri Nets">
+      </category>
+      <wizard
+            category="hub.top.editor.exportWizards.category"
+            class="hub.top.editor.eclipse.ui.ExportWizard"
+            icon="resources/document.export.16.png"
+            id="hub.top.editor.exportWizards.StandardExportWizard"
+            name="Export Petri net to File">
+         <description>
+            Export the selection to a compatible plain text format.
+         </description>
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="hub.top.editor.commands.category"
+            name="Petri Nets">
+      </category>
+   </extension>
+
+   
+</plugin>

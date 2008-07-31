@@ -1,7 +1,7 @@
 #!/bin/bash
 echo ">>> tidying directory"
 make -s distclean
-export PATH=~/Downloads/qt-static/bin:$PATH
+#export PATH=~/Downloads/qt-static/bin:$PATH
 
 echo ">>> calling qmake"
 qmake -config release

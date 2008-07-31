@@ -64,7 +64,7 @@ AC_PROG_LEX
 AC_PROG_SED
 
 AC_CHECK_PROG(GENGETOPT, gengetopt, gengetopt)
-AC_CHECK_PROG(KC, kc++, kc++, not found)
+AC_CHECK_PROG(KC, kc++, kc++)
 AC_CHECK_PROG(DOT, dot, dot, not found)
 if test "$DOT" = "not found"; then
  AC_DEFINE(HAVE_DOT, 0, [Graphviz dot can not be used on this system.])

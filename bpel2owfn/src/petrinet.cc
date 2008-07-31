@@ -1235,8 +1235,8 @@ void PetriNet::agglomerateTransitions( set<Transition *> preSet, set<Transition 
                   if (t1 == t2)
                     return;
                   
-                  assert(t1 != NULL);
-                  assert(t2 != NULL);
+                  assert(*t1 != NULL);
+                  assert(*t2 != NULL);
                   
                   // variable needed for correct arc weights
                   bool sametarget = false;

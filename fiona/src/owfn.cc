@@ -93,29 +93,37 @@ oWFN::~oWFN() {
         binHashTable[i] = (binDecision *) 0;
     }
 
+    trace(TRACE_5, "oWFN::~oWFN() : delete hashtable\n");
     delete[] binHashTable;
 
+    trace(TRACE_5, "oWFN::~oWFN() : delete places\n");
     for (Places_t::size_type i = 0; i < getPlaceCount(); ++i) {
         delete getPlace(i);
     }
 
+    trace(TRACE_5, "oWFN::~oWFN() : delete transitions\n");
     for (Transitions_t::size_type i = 0; i < getTransitionCount(); ++i) {
         delete getTransition(i);
     }
 
+    trace(TRACE_5, "oWFN::~oWFN() : clear ports\n");
     ports.clear();
 
+    trace(TRACE_5, "oWFN::~oWFN() : clear place indices\n");
     PlaceIndices.clear();
     inputPlaceIndices.clear();
     outputPlaceIndices.clear();
 
+    trace(TRACE_5, "oWFN::~oWFN() : delete current marking\n");
     delete[] CurrentMarking;
 
+    trace(TRACE_5, "oWFN::~oWFN() : delete final markings\n");
     for (list<unsigned int*>::iterator finalMarking = FinalMarkingList.begin(); finalMarking != FinalMarkingList.end(); finalMarking++) {
         
         delete[] *finalMarking;
     }
 
+    trace(TRACE_5, "oWFN::~oWFN() : delete final condition\n");
     delete FinalCondition;
 
     trace(TRACE_5, "oWFN::~oWFN() : end\n");
@@ -134,6 +142,22 @@ oWFN::Places_t::size_type oWFN::getPlaceCount() const {
 //! \return the indicated place
 owfnPlace* oWFN::getPlace(Places_t::size_type i) const {
     return Places[i];
+}
+
+
+//! \brief returns a pointer to first owfnPlace with given name or NULL if
+//!        none place was found
+//! \param name a string containing the placename
+//! \return a pointer to the owfnPlace or NULL
+owfnPlace* oWFN::getPlace(std::string name) const {
+
+    for (Places_t::const_iterator place = Places.begin(); place != Places.end(); place++) {
+        if ( (*place)->getName() == name ) {
+            return *place;
+        }
+    }
+
+    return NULL;
 }
 
 
@@ -215,6 +239,9 @@ void oWFN::initialize() {
     for (i=0; i < getPlaceCount(); i++) {
         PlaceIndices[getPlace(i)] = i;
 
+        // TODO: check if the next 5 lines of code are really necessary, because after
+        // TODO: "initialize transitions" there is another loop over all places
+        // TODO: which initializes CurrentMarking
         if ((getPlace(i)->type == INPUT) && (CurrentMarking[i] < getPlace(i)->capacity)) {
             CurrentMarking[i] = getPlace(i)->capacity;
         } else {
@@ -236,6 +263,7 @@ void oWFN::initialize() {
         getTransition(i)->initialize();
     }
 
+    // TODO: check if this loop is really necessary because of the loop above
     for (i=0; i < getPlaceCount(); i++) {
         CurrentMarking[i] = getPlace(i)->initial_marking;
     }
@@ -275,7 +303,7 @@ void oWFN::removeisolated() {
             //TODO: Loeschung in CurrentMarking und Reindexierung der Plaetze
             //TODO: implementieren.
             p = getPlace(getPlaceCount() - 1);
-            int m = CurrentMarking[getPlaceCount() - 1];
+            unsigned int m = CurrentMarking[getPlaceCount() - 1];
             Places[getPlaceCount() - 1] = getPlace(i);
             CurrentMarking[getPlaceCount() - 1] = CurrentMarking[i];
             Places[i] = p;
@@ -2867,9 +2895,8 @@ bool oWFN::isFinal() const {
         trace(TRACE_5, "bool oWFN::isFinal() : end\n");
         return FinalCondition -> value;
     } else {
-        for (list<unsigned int *>::const_iterator FinalMarking =
-                        FinalMarkingList.begin(); FinalMarking
-                        != FinalMarkingList.end(); FinalMarking++) {
+        for (list<unsigned int *>::const_iterator FinalMarking = FinalMarkingList.begin();
+             FinalMarking != FinalMarkingList.end(); FinalMarking++) {
             bool finalMarkingFits = true;
             for (unsigned int i = 0; i < getPlaceCount(); i++) {
                 if (CurrentMarking[i] != (*FinalMarking)[i]) {
@@ -3732,13 +3759,182 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
 }
 
 
+//! \brief returns this net as an PNapi net
+//! \return PNapi version of the owfn
+oWFN* oWFN::returnNormalOWFN() {
+
+    trace(TRACE_5, "oWFN* oWFN::returnNormalOWFN() : start\n");
+    const std::string suffix = "_normalized";
+
+    // create new oWFN
+    oWFN* result = new oWFN();
+
+
+    // set filename
+    result->filename = filename;
+
+
+    // create all places from this oWFN as internal places in normal oWFN
+    for (Places_t::const_iterator place = Places.begin(); place != Places.end(); place++) {
+
+        // WARNING: NAME CREATION FOR PLACES - HANDLE WITH CARE
+        std::string name = (*place)->getName() + (((*place)->getType() != INTERNAL) ? suffix : "");
+
+        trace(TRACE_5, "handle place: " + (*place)->getName() + ", create place: " + name + "\n");
+        owfnPlace* newPlace = new owfnPlace(name, INTERNAL, result);
+        newPlace->initial_marking = (*place)->initial_marking;
+        result->addPlace(newPlace);
+    }
+
+
+    // create all transitions from this oWFN as transitions in normal oWFN and create all arcs
+    for (Transitions_t::const_iterator transition = Transitions.begin(); transition != Transitions.end(); transition++) {
+        trace(TRACE_5, "handle and create transition: " + (*transition)->getName() + "\n");
+
+        owfnTransition* newTransition = new owfnTransition( (*transition)->getName() );
+        result->addTransition(newTransition);
+
+        // arriving arcs
+        trace(TRACE_5, "    found " + intToString((*transition)->Node::getArrivingArcsCount()) + " arriving arcs\n");
+        for (Node::Arcs_t::size_type i = 0; i < (*transition)->Node::getArrivingArcsCount(); i++) {
+
+            trace(TRACE_5, "        handle arriving arc " + intToString(i) + "\n");
+            Arc::Arc* arc = (*transition)->Node::getArrivingArc(i);
+
+            owfnPlace* destination = NULL;
+            if (arc->pl->getType() == INTERNAL) {
+                destination = result->getPlace( arc->pl->getName() );
+            } else {
+                destination = result->getPlace( arc->pl->getName() + suffix );
+            }
+            assert(destination != NULL);
+
+            trace(TRACE_5, "        create arriving arc " + intToString(i) + "\n");
+            Arc::Arc* newArc = new Arc(*transition, destination, true, arc->Multiplicity);
+
+            newTransition->addArrivingArc(newArc);
+        }
+
+        // leaving arcs
+        trace(TRACE_5, "    found " + intToString((*transition)->Node::getLeavingArcsCount()) + " leaving arcs\n");
+        for (Node::Arcs_t::size_type i = 0; i < (*transition)->Node::getLeavingArcsCount(); i++) {
+
+            trace(TRACE_5, "        handle leaving arc " + intToString(i) + "\n");
+            Arc::Arc* arc = (*transition)->Node::getLeavingArc(i);
+
+            owfnPlace* destination = NULL;
+            if (arc->pl->getType() == INTERNAL) {
+                destination = result->getPlace( arc->pl->getName() );
+            } else {
+                destination = result->getPlace( arc->pl->getName() + suffix );
+            }
+            assert(destination != NULL);
+
+            trace(TRACE_5, "        create leaving arc " + intToString(i) + "\n");
+            Arc::Arc* newArc = new Arc(*transition, destination, false, arc->Multiplicity);
+
+            newTransition->addLeavingArc(newArc);
+        }
+    }
+
+
+    // create new places, transitions and arcs for former input places
+    for (Places_t::const_iterator place = inputPlaces.begin(); place != inputPlaces.end(); place++) {
+        trace(TRACE_5, "create new inputplace: " + (*place)->getName() + "\n"); 
+
+        // create inputplace
+        owfnPlace* newPlace = new owfnPlace( (*place)->getName(), INPUT, result);
+        assert(newPlace != NULL);
+        result->addPlace(newPlace);
+
+        // create transition
+        std::string name = (*place)->getName();
+        owfnTransition* newTransition = new owfnTransition("t" + name + suffix);
+        assert(newTransition != NULL);
+        result->addTransition(newTransition);
+
+        // first arc
+        Arc::Arc* inArc = new Arc( newTransition, newPlace, true, 1 );
+        assert(inArc != NULL);
+        newTransition->addArrivingArc(inArc);
+
+        // second arc
+        owfnPlace* destination = result->getPlace( (*place)->getName() + suffix);
+        assert(destination != NULL);
+        Arc::Arc* outArc = new Arc( newTransition, destination, false, 1 );
+        assert(outArc != NULL);
+        newTransition->addLeavingArc(outArc);
+    }
+
+
+    // create new places, transitions and arcs for former output places
+    for (Places_t::const_iterator place = outputPlaces.begin(); place != outputPlaces.end(); place++) {
+        trace(TRACE_5, "create new outputplace: " + (*place)->getName() + "\n"); 
+
+        // create outputplace
+        owfnPlace* newPlace = new owfnPlace( (*place)->getName(), OUTPUT, result);
+        assert(newPlace != NULL);
+        result->addPlace(newPlace);
+
+        // create transition
+        std::string name = (*place)->getName();
+        owfnTransition* newTransition = new owfnTransition("t" + name + suffix);
+        assert(newTransition != NULL);
+        result->addTransition(newTransition);
+
+        // first arc
+        owfnPlace* destination = result->getPlace( (*place)->getName() + suffix);
+        assert(destination != NULL);
+        Arc::Arc* inArc = new Arc( newTransition, destination, true, 1 );
+        assert(inArc != NULL);
+        newTransition->addArrivingArc( inArc );
+
+        // second arc
+        Arc::Arc* outArc = new Arc( newTransition, newPlace, false, 1 );
+        assert(outArc != NULL);
+        newTransition->addLeavingArc( outArc );
+    }
+
+
+    // copy current marking
+    result->CurrentMarking = copyGivenMarking(CurrentMarking);
+
+
+    // create new list of final markings
+    for (list<unsigned int*>::iterator marking = FinalMarkingList.begin(); marking != FinalMarkingList.end(); marking++) {
+        trace(TRACE_5, "create new final marking\n");
+
+
+        // create new final marking for new count of places and initialize with 0
+        unsigned int * copy = new unsigned int [result->getPlaceCount()];
+        for (unsigned int i = 0; i < result->getPlaceCount(); i++) {
+            copy[i] = 0;
+        }
+
+        // copy former final marking information
+        for (unsigned int i = 0; i < getPlaceCount(); i++) {
+            owfnPlace* oldPlace = getPlace(i);
+            std::string newName = oldPlace->getName() + ((oldPlace->getType() != INTERNAL) ? suffix : "");
+            owfnPlace* newPlace = result->getPlace( newName );
+
+            copy[ result->getPlaceIndex(newPlace) ] = (*marking)[ i ];
+        }
+
+        result->FinalMarkingList.push_back( copy );
+    }
+
+
+    trace(TRACE_5, "oWFN* oWFN::returnNormalOWFN() : end\n");
+    return result;
+}
+
+
 //! \brief returns the port of the interface place identified by a label
 //! \param label label to be found at a port
 //! \return a port with the corresponding label
 //! \note  This function is implemented just for the functionality and not for
 //!        any performance issues. As long as I don't know which functions I
 //!        need, I will program with such stubs.
-
 std::string oWFN::getPortForLabel(std::string label) const {
     for (map<std::string, Places_t>::const_iterator port = ports.begin(); port
             != ports.end(); port++) {

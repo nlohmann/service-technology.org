@@ -49,11 +49,10 @@
 // We don't need yyunput().
 #define YY_NO_UNPUT
 
-#include "debug.h"
+//#include "debug.h"
 #include "AnnotatedGraph.h"
 #include "syntax_og.h"            // list of all tokens used
 #include <cstring>
-using namespace std;
 
 static void setlval();
 %}

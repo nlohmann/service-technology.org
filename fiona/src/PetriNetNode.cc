@@ -155,6 +155,12 @@ Node::Node(const std::string& n) :
 }
 
 
+//! \brief returns the name of the node
+std::string Node::getName() const {
+    return name;
+}
+
+
 //! \brief outputstream operator for nodes
 //! \param str stream to be written to
 //! \param n node to be written to stream

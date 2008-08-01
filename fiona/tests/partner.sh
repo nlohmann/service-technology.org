@@ -226,58 +226,57 @@ rm -f $DIR/coffee2-partner.png
 ############################################################################
 # Building small partner for coffee and coffee_extended out of OG          #
 ############################################################################
-# TODO: seems buggy
-#input="$DIR/coffee.owfn.ig.og"
-#inputCopy="$builddir/$SUBDIR/coffee.owfn.ig.og"
-#input2="$DIR/coffee2.owfn.ig.og"
-#inputCopy2="$builddir/$SUBDIR/coffee2.owfn.ig.og"
-#
-#output="$builddir/$SUBDIR/coffee-partner.owfn"
-#outputExpected="$testdir/$SUBDIR/coffee-partner.expected.owfn"
-#output2="$builddir/$SUBDIR/coffee2-partner.owfn"
-#outputExpected2="$testdir/$SUBDIR/coffee2-partner.expected.owfn"
-#
-#
-#if [ "$testdir" != "$builddir" ]; then
-#    if [ ! -e $builddir/$SUBDIR ]; then
-#        $MKDIR_P $builddir/$SUBDIR
-#    fi
-#
-#    cp $input $inputCopy
-#    cp $input2 $inputCopy2
-#fi
-#
-#cmd="$FIONA $inputCopy $inputCopy2 -t smallpartner"
-#check="$FIONA $output $outputExpected -t equivalence"
-#check2="$FIONA $output2 $outputExpected2 -t equivalence"
-#
-#if [ "$memcheck" = "yes" ]; then
-#    memchecklog="$input.memcheck.log"
-#    do_memcheck "$cmd" "$memchecklog"
-#    result=$(($result | $?))
-#else
-#    echo running $cmd
-#    OUTPUT=`$cmd 2>&1`
-#    if [ $? -ne 0 ]; then
-#        let "result += 1"
-#        echo "... failed: $FIONA exited with non-zero return value."
-#    else
-#        echo running $check
-#        OUTPUT=`$check 2>&1`
-#        echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-#        if [ $? -ne 0 ]; then
-#            let "result += 1"
-#            echo ... computed partner not equivalent to expected partner.
-#        fi
-#        echo running $check2
-#        OUTPUT=`$check2 2>&1`
-#        echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-#        if [ $? -ne 0 ]; then
-#            let "result += 1"
-#            echo ... computed partner not equivalent to expected partner.
-#        fi
-#    fi
-#fi
+input="$DIR/coffee.owfn.ig.og"
+inputCopy="$builddir/$SUBDIR/coffee.owfn.ig.og"
+input2="$DIR/coffee2.owfn.ig.og"
+inputCopy2="$builddir/$SUBDIR/coffee2.owfn.ig.og"
+
+output="$builddir/$SUBDIR/coffee-partner.owfn"
+outputExpected="$testdir/$SUBDIR/coffee-partner.expected.owfn"
+output2="$builddir/$SUBDIR/coffee2-partner.owfn"
+outputExpected2="$testdir/$SUBDIR/coffee2-partner.expected.owfn"
+
+
+if [ "$testdir" != "$builddir" ]; then
+    if [ ! -e $builddir/$SUBDIR ]; then
+        $MKDIR_P $builddir/$SUBDIR
+    fi
+
+    cp $input $inputCopy
+    cp $input2 $inputCopy2
+fi
+
+cmd="$FIONA $inputCopy $inputCopy2 -t smallpartner"
+check="$FIONA $output $outputExpected -t equivalence"
+check2="$FIONA $output2 $outputExpected2 -t equivalence"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$input.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    if [ $? -ne 0 ]; then
+        let "result += 1"
+        echo "... failed: $FIONA exited with non-zero return value."
+    else
+        echo running $check
+        OUTPUT=`$check 2>&1`
+        echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+        if [ $? -ne 0 ]; then
+            let "result += 1"
+            echo ... computed partner not equivalent to expected partner.
+        fi
+        echo running $check2
+        OUTPUT=`$check2 2>&1`
+        echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+        if [ $? -ne 0 ]; then
+            let "result += 1"
+            echo ... computed partner not equivalent to expected partner.
+        fi
+    fi
+fi
 
 ############################################################################
 # Building reduced small partner for coffee_extended out of oWFN           #

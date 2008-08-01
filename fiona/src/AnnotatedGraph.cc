@@ -688,7 +688,10 @@ void AnnotatedGraph::removeReachableFalseNodes() {
 //! \param redNodes Set for storing first candidates (see 4.)
 //! \param parentNodes Map for storing the parent function (see 1.)
 //! \param visitedNodes Contains a pointer to each processed node
-void AnnotatedGraph::removeReachableFalseNodesInit(AnnotatedGraphNode* currentNode, set<AnnotatedGraphNode*>& redNodes, map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >& parentNodes, set<AnnotatedGraphNode*>& visitedNodes) {
+void AnnotatedGraph::removeReachableFalseNodesInit(AnnotatedGraphNode* currentNode,
+                                                   set<AnnotatedGraphNode*>& redNodes,
+                                                   map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >& parentNodes,
+                                                   set<AnnotatedGraphNode*>& visitedNodes) {
 
     trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesInit(): start\n");
 
@@ -830,14 +833,14 @@ void AnnotatedGraph::removeUnreachableNodes() {
         trace(TRACE_3, "\t\tremoved unreachable node: " + (*nodeIter)->getName() + "\n");
 
         AnnotatedGraphNode::LeavingEdges::Iterator edgeIter = currentNode->getLeavingEdgesIterator();
-            while (edgeIter->hasNext()) {
-                AnnotatedGraphEdge* currentEdge = edgeIter->getNext();
-                currentNode->removeLiteralFromAnnotation(currentEdge->getLabel());
-                delete currentEdge;
-                edgeIter->remove();
-            }
+        while (edgeIter->hasNext()) {
+            AnnotatedGraphEdge* currentEdge = edgeIter->getNext();
+            currentNode->removeLiteralFromAnnotation(currentEdge->getLabel());
+            delete currentEdge;
+            edgeIter->remove();
+        }
 
-            delete edgeIter;
+        delete edgeIter;
 
         removeNode(currentNode);
         delete currentNode;
@@ -870,6 +873,7 @@ void AnnotatedGraph::removeUnreachableNodesRecursively(AnnotatedGraphNode* curre
             removeUnreachableNodesRecursively(edge->getDstNode(), unreachableNodes);
         }
     }
+    delete edgeIter;
 
     trace(TRACE_5, "AnnotatedGraph::removeUnreachableNodesRecursively(AnnotatedGraphNode* currentNode, set<AnnotatedGraphNode*>& unreachableNodes): end\n");
 }
@@ -2176,6 +2180,7 @@ void AnnotatedGraph::computeInterfaceRecursively(AnnotatedGraphNode* v,
             computeInterfaceRecursively(vNext, visitedNodes);
         }
     }
+    delete edgeIter;
 }
 
 
@@ -3314,6 +3319,7 @@ void AnnotatedGraph::printGraphToSTGRecursively(AnnotatedGraphNode * v,
             printGraphToSTGRecursively(vNext, os, visitedNodes, edgeLabels);
         }
     }
+    delete edgeIter;
 }
 
 

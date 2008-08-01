@@ -178,6 +178,7 @@ void print_help() {
 //  trace("                                                 (if possible)\n");
   trace("                                   reduce      - structurally reduce all\n");
   trace("                                                 given oWFNs\n");
+  trace("                                   normalize   - normalize all given oWFNs\n");
   trace("\n");
   trace(" -m | --messagebound=<level> ... set maximum number of same messages per\n");
   trace("                                 state to <level>  (default is 1)\n");
@@ -296,7 +297,7 @@ void parse_command_line(int argc, char* argv[]) {
     int i;
 
     // the program name on the commandline
-    std::string progname = std::string(argv[0]);
+    std::string progname(argv[0]);
 
     // initialize options
     options[O_HELP] = false;
@@ -344,6 +345,7 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_READ_OG] = false;
 //    parameters[P_FILTER] = false;
     parameters[P_REDUCE] = false;
+    parameters[P_NORMALIZE] = false;
     parameters[P_MATCH_PARTNER] = false;
 
     // -s parameters
@@ -527,8 +529,12 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
                     parameters[P_REDUCE] = true;
+                } else if (lc_optarg == "normalize") {
+                    parameters[P_IG] = false;
+                    parameters[P_OG] = false;
+                    parameters[P_NORMALIZE] = true;
                 } else {
-                    cerr << "Error:\twrong modus operandi (option -t)" << endl
+                    cerr << "Error:\t\"" << optarg << "\" is a wrong modus operandi (option -t)" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
                     exit(1);
@@ -900,7 +906,7 @@ FileType getFileType(const std::string& fileName) {
         exit(1);
     }
 
-    string line;
+    string line = "";
     while (getline(fileStream, line)) {
         if (contains(line, "PLACE")) ++owfnHits;
         if (contains(line, "INTERNAL")) ++owfnHits;

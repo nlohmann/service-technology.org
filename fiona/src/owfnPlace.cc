@@ -56,6 +56,20 @@ owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) :
 
 
 //! \brief constructor
+//! \param name
+//! \param _type
+//! \param _net
+owfnPlace::owfnPlace(const string& name, placeType _type, oWFN * _net) :
+    Node(name), type(_type), capacity(0), nrbits(0),
+            max_occurence(1), cardprop(0), proposition(NULL) {
+
+    references = initial_marking = hash_factor = 0;
+    net = _net;
+    port = "";
+}
+
+
+//! \brief destructor
 owfnPlace::~owfnPlace() {
     trace(TRACE_5, "owfnPlace::~owfnPlace() : start\n");
 

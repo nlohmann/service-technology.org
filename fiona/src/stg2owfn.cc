@@ -38,8 +38,8 @@ map<string, set<string> > arcs;
 //! \return a string containing the remapped label, e.g. if !Euro was mapped to t0, then t0 is remapped to !Euro
 //!         labels created by petrify need special handling, e.g. t0/1 is remapped to !Euro/1
 string remap(string edge, vector<string> & edgeLabels) {
-    string affix = (edge.find("/") != string::npos) ? edge.substr( edge.find("/") ) : "";    // read affix
-    string indexString = edge.substr( 1, edge.size() - affix.size() - 1 );                    // read index
+    string affix = (edge.find("/") != string::npos) ? edge.substr( edge.find("/") ) : ""; // read affix
+    string indexString = edge.substr( 1, edge.size() - affix.size() - 1 );                // read index
 
     istringstream indexStream; // read index as integer
     int index;
@@ -216,11 +216,15 @@ string STG2oWFN_main(vector<string>& edgeLabels,
     // complete interface with interface information from IG/OG
     for (set<string>::const_iterator iter = inputPlacenames.begin(); iter != inputPlacenames.end(); iter++) {
         Place *inPlace = STGPN.findPlace(*iter);
-        if (inPlace == NULL) STGPN.newPlace(*iter, IN);
+        if (inPlace == NULL) {
+            STGPN.newPlace(*iter, IN);
+        }
     }
     for (set<string>::const_iterator iter = outputPlacenames.begin(); iter != outputPlacenames.end(); iter++) {
         Place *outPlace = STGPN.findPlace(*iter);
-        if (outPlace == NULL) STGPN.newPlace(*iter, OUT);
+        if (outPlace == NULL) {
+            STGPN.newPlace(*iter, OUT);
+        }
     }
 
     cout << "\n" << STGPN.information() << "\n" << endl;

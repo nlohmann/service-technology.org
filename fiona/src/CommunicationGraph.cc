@@ -246,7 +246,6 @@ void CommunicationGraph::printProgress() {
 void CommunicationGraph::printProgressFirst() {
 
     trace(TRACE_0, "    ");
-//    return;
 
     if (debug_level == TRACE_0) {
         trace(TRACE_0, "progress (in %): 0 ");
@@ -254,8 +253,6 @@ void CommunicationGraph::printProgressFirst() {
         trace(TRACE_0, "progress: 0 %\n");
     }
 }
-
-
 
 
 //! \brief creates a dot file of the graph

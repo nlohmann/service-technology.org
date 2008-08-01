@@ -72,6 +72,9 @@ class Node {
         
         /// destructor
         ~Node();
+
+        /// returns the name of the node
+        std::string getName() const;
         
         /// adds an arriving arc to the node
         void addArrivingArc(Arc* arc);

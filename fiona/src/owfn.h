@@ -150,6 +150,9 @@ class oWFN {
         /// of owfnPlaces from getPlaceCount().
         owfnPlace* getPlace(Places_t::size_type i) const;
 
+        /// get a pointer to owfnPlace with given name
+        owfnPlace* getPlace(std::string) const;
+
         /// Returns the number of transitions this oWFN has.
         Transitions_t::size_type getTransitionCount() const;
 
@@ -413,6 +416,9 @@ class oWFN {
         /// returns a pointer to this petrinet in the PNapi net format
         PNapi::PetriNet* returnPNapiNet();
     
+        /// returns a pointer to a normalized copy of this petrinet in the oWFN format
+        oWFN* returnNormalOWFN();
+
         /// restricts the oWFN to a given port (i.e., removes all other ports)
         void restrictToPort(const std::string &portName);
         

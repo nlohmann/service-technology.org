@@ -94,6 +94,7 @@ typedef enum {
     P_READ_OG,                  //!< only read an OG from a file
     P_FILTER,                   //!<  
     P_REDUCE,                   //!< reduce given oWFNs 
+    P_NORMALIZE,                //!< normalize given oWFNs
     P_PARTNER_TEST,             //!< first synthesize a partner, then match it with the og. 
 
     P_SHOW_BLUE_NODES,          //!< show blue nodes only (empty node not shown though)

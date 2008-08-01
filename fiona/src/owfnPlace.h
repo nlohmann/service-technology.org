@@ -61,6 +61,9 @@ class owfnPlace : public Node {
         /// constructor
         owfnPlace(char *, placeType, oWFN *);
         
+        /// constructor
+        owfnPlace(const std::string&, placeType, oWFN *);
+        
         /// basic deconstructor
         ~owfnPlace();
 

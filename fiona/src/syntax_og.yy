@@ -60,11 +60,9 @@ extern int og_yylex();
 #include "AnnotatedGraph.h"
 #include "GraphFormula.h"
 
-using namespace std;
-
 AnnotatedGraph* OGToParse;
 map<string, AnnotatedGraphNode*> nodes;
-bool readInputPlacenames = true;
+bool readInputPlacenames;
 
 void og_yyerror_unknown_node(const std::string& nodeName)
 {
@@ -127,7 +125,11 @@ og: interface nodes initialnode transitions
     }
 ;
 
-interface: key_interface key_input places_list semicolon
+interface:
+    {
+        readInputPlacenames = true;
+    }
+    key_interface key_input places_list semicolon
     {
         readInputPlacenames = false;
     }
@@ -147,6 +149,7 @@ place: ident
         } else {
             OGToParse->outputPlacenames.insert($1);
         }
+        free($1);
      }
 ;
 

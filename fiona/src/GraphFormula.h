@@ -97,8 +97,7 @@ class GraphFormulaAssignment {
 class GraphFormula {
     public:
         /// Destroys the given GraphFormula and all its subformulas.
-        virtual ~GraphFormula() {
-        };
+        virtual ~GraphFormula() { };
 
         virtual bool satisfies(const GraphFormulaAssignment& assignment) const;
 
@@ -367,8 +366,7 @@ class GraphFormulaCNF : public GraphFormulaMultiaryAnd {
                         GraphFormulaMultiaryOr* clause2);
 
         /// destroys the CNF and all its clauses
-        virtual ~GraphFormulaCNF() {
-        };
+        virtual ~GraphFormulaCNF() { };
 
         /// deep copies this formula
         virtual GraphFormulaCNF* getDeepCopy() const;
@@ -426,8 +424,7 @@ class GraphFormulaLiteral : public GraphFormula {
         virtual GraphFormulaLiteral* getDeepCopy() const;
         
         /// basic deconstructor
-        virtual ~GraphFormulaLiteral() {
-        };
+        virtual ~GraphFormulaLiteral();
         
         /// returns the value of the literal in the given asisgnment
         virtual bool value(const GraphFormulaAssignment& assignment) const;

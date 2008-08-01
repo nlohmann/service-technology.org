@@ -660,8 +660,7 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
                         continue;
                     } else {
                         node->hasFinalStateInStateSet = true;
-                        GraphFormulaLiteral
-                                * myliteral = new GraphFormulaLiteralFinal();
+                        GraphFormulaLiteral * myliteral = new GraphFormulaLiteralFinal();
                         myclause->addSubFormula(myliteral);
                     }
                 }
@@ -675,8 +674,7 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
                 // get all activated output events
                 for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
                     if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] > 0) {
-                        GraphFormulaLiteral
-                                * myliteral = new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
+                        GraphFormulaLiteral * myliteral = new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
                         myclause->addSubFormula(myliteral);
                     }
                 }

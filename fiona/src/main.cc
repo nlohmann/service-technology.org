@@ -1564,8 +1564,8 @@ void makePNG(oWFN* PN) {
 }
 
 
-//! \brief create a PNG of the given oWFN
-//! \param PN an oWFN to generate a PNG from
+//! \brief reduce the given oWFN
+//! \param PN an oWFN to reduce
 void reduceOWFN(oWFN* PN) {
 
     trace(TRACE_1, "Internal translation of the net into PNapi format...\n");
@@ -1582,7 +1582,7 @@ void reduceOWFN(oWFN* PN) {
 
     trace(TRACE_1, "Performing structural reduction ...\n\n");
 
-    // calling the reduce funtcion of the pnapi with reduction level 5
+    // calling the reduce function of the pnapi with reduction level 5
     PNapiNet->reduce(globals::reduction_level);
 
     // Statistics of the reduced oWFN
@@ -1609,6 +1609,57 @@ void reduceOWFN(oWFN* PN) {
         (output) << (*PNapiNet);
         output.close();
     }
+
+    delete PNapiNet;
+}
+
+
+//! \brief normalize the given oWFN
+//! \param PN an oWFN to normalize
+void normalizeOWFN(oWFN* PN) {
+
+    trace(TRACE_5, "void normalizeOWFN(oWFN*) : start\n");
+
+    // normalize
+    trace(TRACE_0, "Performing normalization ...\n\n");
+    oWFN* normalOWFN = PN->returnNormalOWFN();
+
+
+    // translate the net into PNapi format
+    PNapi::PetriNet* PNapiNet = normalOWFN->returnPNapiNet();
+    globals::output_filename = normalOWFN->filename; // set strings needed in PNapi output
+    globals::filename = normalOWFN->filename;
+    PNapiNet->set_format(PNapi::FORMAT_OWFN, true); // set the output format to dot
+
+
+    // Statistics of the reduced oWFN
+    trace(TRACE_0, "Normalized oWFN statistics:\n");
+    trace(PNapiNet->information());
+    trace(TRACE_0, "\n\n");
+
+
+    // create the output
+    if (!options[O_NOOUTPUTFILES]) {
+
+        string outFileName;
+        if (!options[O_OUTFILEPREFIX]) {
+            outFileName = globals::output_filename;
+        } else {
+            outFileName = outfilePrefix;
+        }
+
+        ofstream output;
+        const string owfnOutput = outFileName.erase((outFileName.size()-5), outFileName.size()) + ".normalized.owfn";
+        output.open (owfnOutput.c_str(), ios::out);
+
+        (output) << (*PNapiNet);
+        output.close();
+    }
+
+    delete PNapiNet;
+    delete normalOWFN;
+
+    trace(TRACE_5, "void normalizeOWFN(oWFN*) : end\n");
 }
 
 
@@ -1780,8 +1831,7 @@ int main(int argc, char** argv) {
             AnnotatedGraph* readOG = readog(*iOgFile);
 
             if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
-                // computes partner out of IG or a most permissive partner from
-                // an og. 
+                // computes partner out of IG or a most permissive partner from an og 
 
                 // it is possible that we read an old OG file where no interface information
                 // were stored, so we have to compute them from the graph
@@ -1903,11 +1953,6 @@ int main(int argc, char** argv) {
                 readOG->computeAndPrintGraphStatistics();
                 trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
                 trace(TRACE_0, "\n");
-
-                // only print OG size information
-#ifdef LOG_NEW
-                NewLogger::printall();
-#endif
                 delete readOG;
             }
 
@@ -1929,6 +1974,10 @@ int main(int argc, char** argv) {
         // Destroy buffer of OG parser.
         // Must NOT be called before fclose(og_yyin);
         og_yylex_destroy();
+#endif
+
+#ifdef LOG_NEW
+        NewLogger::printall();
 #endif
 
         if (!parameters[P_PV] && !parameters[P_PNG]) {
@@ -1965,7 +2014,8 @@ int main(int argc, char** argv) {
         adapter.generateAdapter();
     } 
     else if (parameters[P_IG] || parameters[P_OG] || parameters[P_MATCH] ||
-             parameters[P_PNG] || parameters[P_REDUCE] ||parameters[P_PV] || parameters[P_MATCH_PARTNER]) {
+             parameters[P_PNG] || parameters[P_REDUCE] || parameters[P_NORMALIZE] ||
+             parameters[P_PV] || parameters[P_MATCH_PARTNER]) {
 
         if (parameters[P_MATCH]) {
             assert(ogfiles.size() == 1);
@@ -2040,6 +2090,10 @@ int main(int argc, char** argv) {
 
                 if (parameters[P_REDUCE]) {
                     reduceOWFN(PN);    // reduce given net
+                }
+
+                if (parameters[P_NORMALIZE]) {
+                    normalizeOWFN(PN);    // normalize given net
                 }
 
                 if (parameters[P_EQ_R]) {

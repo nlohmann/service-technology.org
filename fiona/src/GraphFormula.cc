@@ -320,7 +320,8 @@ GraphFormulaMultiary::~GraphFormulaMultiary() {
     trace(TRACE_5, "GraphFormulaMultiary::~GraphFormulaMultiary() : start\n");
 
     for (subFormulas_t::const_iterator currentFormula = subFormulas.begin();
-         currentFormula != subFormulas.end(); ++currentFormula) {
+         currentFormula != subFormulas.end();
+         currentFormula++) {
         delete *currentFormula;
     }
     
@@ -393,19 +394,15 @@ void GraphFormulaMultiary::getEventLiterals(set<string>& events)  {
     trace(TRACE_5, "GraphFormulaMultiary::getEventLiterals(set<string>& events) : start\n");
 
     // iterate over all subformulas
-    subFormulas_t::iterator iCurrentFormula;
-
-    for (iCurrentFormula = subFormulas.begin();
-         iCurrentFormula != subFormulas.end();) {
+    for (subFormulas_t::iterator iCurrentFormula = subFormulas.begin();
+         iCurrentFormula != subFormulas.end();
+         iCurrentFormula++) {
 
         // gather the events of every singe subformula
         (*iCurrentFormula)->getEventLiterals(events);
-
-        iCurrentFormula++;
     }
 
     trace(TRACE_5, "GraphFormulaMultiary::getEventLiterals(set<string>& events) : end\n");
-    
 }
 
 
@@ -954,11 +951,19 @@ GraphFormulaFalse::GraphFormulaFalse() :
 
 
 //! \brief constructs an atomic literal formula
-//! \param literal_ name of the literal
+//! \param literal_ a reference to a string containing the name of the literal
 GraphFormulaLiteral::GraphFormulaLiteral(const std::string& literal_) :
     literal(literal_) {
 }
 
+
+//! \brief deconstructor
+GraphFormulaLiteral::~GraphFormulaLiteral() {
+
+    trace(TRACE_5, "GraphFormulaLiteral::~GraphFormulaLiteral() : start\n");
+    trace(TRACE_5, "GraphFormulaLiteral::~GraphFormulaLiteral() : end\n");
+}
+    
 
 //! \brief deep copies this formula
 //! \return returns copy
@@ -986,13 +991,14 @@ std::string GraphFormulaLiteral::asString() const {
 //! \param events set of strings to fill
 void GraphFormulaLiteral::getEventLiterals(set<string>& events)  {
     
-    // If this literal represent an event, copy it into
-    // the set of events
+    // If this literal represent an event, copy it into the set of events
     if (literal != GraphFormulaLiteral::TRUE &&
         literal != GraphFormulaLiteral::FALSE &&
         literal != GraphFormulaLiteral::FINAL &&
         literal != GraphFormulaLiteral::TAU) {
-        events.insert((new string())->assign(literal));
+
+        string copy(literal);
+        events.insert(copy);
     }
 }
 

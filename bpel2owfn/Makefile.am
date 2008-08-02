@@ -90,7 +90,7 @@ cvs-clean: maintainer-clean
 	-rm -f src/config.h.in src/config.h.in~
 	-rm -f -r src/.deps src/doc
 	-rm -f tests/Makefile.in
-	-rm -f maintainer/rpm/Makefile.in
+	-rm -f maintainer/rpm/Makefile.in maintainer/gnu/Makefile.in
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
 	@echo "  aclocal"

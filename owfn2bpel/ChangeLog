@@ -1,18 +1,35 @@
+              __        _______ _   _ ____  ____  ____  _____ _     
+            __\ \      / /  ___| \ | |___ \| __ )|  _ \| ____| |    
+           / _ \ \ /\ / /| |_  |  \| | __) |  _ \| |_) |  _| | |    
+          | (_) \ V  V / |  _| | |\  |/ __/| |_) |  __/| |___| |___ 
+           \___/ \_/\_/  |_|   |_| \_|_____|____/|_|   |_____|_____|
+                    http://service-technology.org/owfn2bpel
+
+
+Version 4.9 (unreleased)
+========================
+
+   * some changes to optimize code
+
+   * cleaned header inclusions
+
+   * removed redundancy in class members and constructors
+
+   * renamed sources to match the class names (e.g. `class_transition.h' to
+     `Transition.h')
+
 Version 4.8
 ===========
 
    * fixed bug #12111 (`https://gna.org/bugs/?12111')
 
-   * removed the file `options.h' which became obsolete by using
-     autoconf
+   * removed the file `options.h' which became obsolete by using autoconf
 
    * the needed LoLA binary is installed by `make install'
 
-   * ChangeLog is now organized by Texinfo reading file
-     `doc/ChangeLog.texi'
+   * ChangeLog is now organized by Texinfo reading file `doc/ChangeLog.texi'
 
-   * minor changes in the header files to allow compilation with GCC
-     4.3.1
+   * minor changes in the header files to allow compilation with GCC 4.3.1
 
    * added a new release version of LoLA (`lola-1.02.tar.gz')
 
@@ -25,13 +42,13 @@ Version 4.7
 
    * added `--bug' parameter for debugging purposes
 
-   * LoLA is now added as distribution tarball to oWFN2BPEL to avoid
-     code deviation - any new version has to be announced in the
-     configure script by setting the variable `LOLANAME'
+   * LoLA is now added as distribution tarball to oWFN2BPEL to avoid code
+     deviation - any new version has to be announced in the configure script
+     by setting the variable `LOLANAME'
 
    * exit codes are unified to `EXIT_FAILURE' or `EXIT_SUCCESS'
 
-   * implemented task #6103 <`https://gna.org/task/?6103'>
+   * implemented task #6103 (`https://gna.org/task/?6103')
 
    * removed files that can be created by autoreconf
 

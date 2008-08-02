@@ -20,50 +20,40 @@
 */
 
 
-#ifndef _CLASS_PLACE_H_
-#define _CLASS_PLACE_H_
+#ifndef _CLASS_BPEL_H_
+#define _CLASS_BPEL_H_
 
-class place
+#include <fstream>
+#include <string>
+
+class Links;
+class Branch;
+class plists;
+
+class BPEL
 {
 	public:
+        int activity;
+        std::string name;
+        Links *source;
+        Links *target;
+        Branch *branches;
+        int link_is_or;
+        BPEL *next;
+        
+        BPEL(int act, BPEL *ptr = NULL, std::string str = "");
 
-	string name;
-	bpel *bpel_code;
-	place *next;
-	
-	int dfs;
-	int lowlink;
-
-//constructors
-
-	place(string str)
-	{
-		name = str;
-		next = NULL;
-		bpel_code = NULL;
-		
-		dfs = -1;
-		lowlink = -1;
-	}
-
-	place(string str, place *ptr)
-	{
-		name = str;
-		next = ptr;
-		bpel_code = NULL;
-		
-		dfs = -1;
-		lowlink = -1;
-	}
-	
-	void append_bpel(bpel *list);
-	void out();
-	void pure_out();
-	void owfn_out();
-	void add_bpel(int bpel_id);
-	void add_bpel(int bpel_id, string name);
-	void add_last_bpel(int bpel_id, string name);
-	
-}; //end of class place
+        //branch functions
+        std::string remove_fullstop(std::string str);
+        void delete_lists();
+        void add_branch();
+        void out();
+        void links_out(std::ofstream *bpel_file, int in = 0);
+        void code(std::ofstream *bpel_file, plists *ins = NULL, plists *outs = NULL, int in = 0);
+        void add_source();
+        void add_target();
+        void add_target(int i);
+        BPEL *is_target();        
+};
 
 #endif

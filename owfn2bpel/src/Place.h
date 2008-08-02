@@ -20,62 +20,30 @@
 */
 
 
-#ifndef _CLASS_TRANSITION_H_
-#define _CLASS_TRANSITION_H_
+#ifndef _CLASS_PLACE_H_
+#define _CLASS_PLACE_H_
 
-class transition
+#include <string>
+#include "BPEL.h"
+
+class Place
 {
 	public:
+        std::string name;
+        BPEL *bpel_code;
+        Place *next;
+        int dfs;
+        int lowlink;
 
-	string name;
-
-	place *consumes;
-	place *produces;
-	bpel *bpel_code;
-	transition *next;
-		
-	int dfs;
-	int lowlink;
-
-//constructors
-
-	transition(string str)
-	{
-		name = str;
-		next = NULL;
-		consumes = NULL;
-		produces = NULL;
-		bpel_code = NULL;
-
-		dfs = -1;
-		lowlink = -1;
-	}
-
-	transition(string str, transition *ptr)
-	{
-		name = str;
-		next = ptr;
-		consumes = NULL;
-		produces = NULL;
-		bpel_code = NULL;
-
-		dfs = -1;
-		lowlink = -1;
-	}
-
-	void add_consume(string str);
-	void add_produce(string str);
-	void del_produces();
-	void del_consumes();
-	void del_lists();
-	void add_bpel(int bpel_id);
-	void add_bpel(int bpel_id, string name);
-	void add_last_bpel(int bpel_id, string name);
-	void append_bpel(bpel *list);
-	void out();
-	void pure_out();
-	void owfn_out();
-	void list_out();
-}; //end of class transition
+        Place(std::string str, Place *ptr = NULL);
+        
+        void append_bpel(BPEL *list);
+        void out();
+        void pure_out();
+        void owfn_out();
+        void add_bpel(int bpel_id);
+        void add_bpel(int bpel_id, std::string name);
+        void add_last_bpel(int bpel_id, std::string name);	
+};
 
 #endif

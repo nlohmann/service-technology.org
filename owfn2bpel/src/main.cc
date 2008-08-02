@@ -27,6 +27,7 @@
 
 #include "config.h"
 #include "classes.h"
+#include "class_owfn.h"
 #include "cmdline.h"
 
 using namespace std;
@@ -38,7 +39,7 @@ int *stat_array;
 int number_of_rounds;
 
 //initialising number of links
-int links::link_counter = 0;
+int Links::link_counter = 0;
 
 
 /// shows statistics (triggered by flag "--stats")

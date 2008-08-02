@@ -26,21 +26,11 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <string>
 
-using namespace std;
-
-
-
-class plists;
-class links;
-class branch;
-class bpel;
-class transition;
-class transitionlist;
-class place;
-class placelist;
-class owfn;
-
+#include "Transition.h"
+#include "BPEL.h"
+#include "Place.h"
 
 
 extern int *stat_array;
@@ -49,157 +39,124 @@ extern char *lola_ex;
 enum activities {EMPTY, REPLY, RECEIVE, FLOW, SWITCH, PICK, PROCESS, WHILE, SEQUENCE, EXIT, INVOKE, FOREACH, SCOPE, OPAQUE};
 
 
+
+
+
 class plists
 {
-	public:
-	plists *next;
-	string name;
+    public:
+        std::string name;
+        plists *next;
 
-//constructors
+        plists(plists *ptr = NULL, std::string str = "") :
+            name(str),
+            next(ptr)
+        {
+        }
+};
 
-	plists()
-	{
-		next = NULL;
-		name = "";
-	}
 
-	plists(plists *ptr)
-	{
-		next = ptr;
-		name = "";
-	}
 
-	plists(plists *ptr, string str)
-	{
-		next = ptr;
-		name = str;
-	}
-}; //end of class plists
 
 
 //usage of class link: increment() once, create new instance in source and in target list with same id
 
-class links
+class Links
 {
-	public:
-	int link_id;
-	links *next;
-	static int link_counter;
+    public:
+        int link_id;
+        Links *next;
+        static int link_counter;
 
-//constructors
+        Links(Links *ptr = NULL) :
+            link_id(link_counter),
+            next(ptr)
+        {
+        }
 
-	links()
-	{
-		link_id = link_counter;
-		next = NULL;
-	}
+        static void increment()
+        {
+            link_counter++;
+        }
+};
 
-	links(links *ptr)
-	{
-		link_id = link_counter;
-		next = ptr;
-	}
-
-	static void increment()
-	{
-		link_counter++;
-	}
-}; //end of class links
 
 
 	
 	
-class branch
+class Branch
 {
-	public:
-	bpel *bpel_code;
-	branch *next;
-	string pick_receive;
+    public:
+        BPEL *bpel_code;
+        Branch *next;
+        std::string pick_receive;
 
-//constructors
-
-	branch()
-	{
-		bpel_code = NULL;
-		next = NULL;
-		pick_receive = "";
-	}
-
-	branch(branch *ptr)
-	{
-		bpel_code = NULL;
-		next = ptr;
-		pick_receive = "";
-	}
-}; //end of class branch
+        Branch(Branch *ptr = NULL) :
+            bpel_code(NULL),
+            next(ptr),
+            pick_receive("")    
+        {
+        }
+};
 
 
-#include "class_bpel.h"
-#include "class_place.h"
 
-class placelist
+
+
+class PlaceList
 {
-	public:
-	place *placeptr;
-	placelist *next;
-	int ausgang;
+    public:
+        Place *placeptr;
+        PlaceList *next;
+        int ausgang;
 
-//constructor
+        PlaceList(Place *plptr, PlaceList *listptr) :
+            placeptr(plptr),
+            next(listptr),
+            ausgang(0)    
+        {
+        }
 
-	placelist(place *plptr, placelist *listptr)
-	{
-		placeptr = plptr;
-		next = listptr;
-		ausgang = 0;
-	}
+        void out();
+};
 
-	void out();
 
-}; //end of class placelist
 
-#include "class_transition.h"
 
-class transitionlist
+class TransitionList
 {
-	public:
-	transition *transitionptr;
-	transitionlist *next;
+    public:
+        Transition *transitionptr;
+        TransitionList *next;
 
-//constructor
+        TransitionList(Transition *transptr, TransitionList *listptr) :
+            transitionptr(transptr),
+            next(listptr)
+        {
+        }
 
-	transitionlist(transition *transptr, transitionlist *listptr)
-	{
-		transitionptr = transptr;
-		next = listptr;
-	}
-
-	void out();
-	void list_out();
-
-}; //end of class transitionlist
+        void out();
+        void list_out();
+};
 
 
 
 
 
-class stack
+class Stack
 {
-	public:
-	place *placeptr;
-	transition *transptr;
+    public:
+        Place *placeptr;
+        Transition *transptr;
+        Stack *next;
 
-	stack *next;
+        Stack(Place *plptr, Transition *trptr, Stack *listptr) :
+            placeptr(plptr),
+            transptr(trptr),
+            next(listptr)    
+        {
+        }
+};
 
-//constructor
-
-	stack(place *plptr, transition *trptr, stack *listptr)
-	{
-		placeptr = plptr;
-		transptr = trptr;
-		next = listptr;
-	}
-}; //end of class stack
-
-#include "class_owfn.h"
 
 #endif

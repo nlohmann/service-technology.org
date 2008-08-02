@@ -23,44 +23,56 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-
 #include "classes.h"
 
-using namespace std;
+using std::string;
+using std::cout;
+using std::endl;
 
 
-void place::add_bpel(int bpel_id)	//fügt neue Aktivität am Ende an
+//constructor
+Place::Place(string str, Place *ptr) :
+    name(str),
+    bpel_code(NULL),
+    next(ptr),
+    dfs(-1),
+    lowlink(-1)    
 {
-	bpel_code = new bpel(bpel_id, bpel_code);
 }
 
-void place::add_bpel(int bpel_id, string name)
+
+void Place::add_bpel(int bpel_id)	//fügt neue Aktivität am Ende an
 {
-	bpel_code = new bpel(bpel_id, bpel_code, name);
+	bpel_code = new BPEL(bpel_id, bpel_code);
 }
 
-void place::add_last_bpel(int bpel_id, string name)	//fügt neue Aktivität vor dem Anfang an
+void Place::add_bpel(int bpel_id, string name)
 {
-	bpel *tmp;
+	bpel_code = new BPEL(bpel_id, bpel_code, name);
+}
+
+void Place::add_last_bpel(int bpel_id, string name)	//fügt neue Aktivität vor dem Anfang an
+{
+	BPEL *tmp;
 	
 	tmp = bpel_code;
 
 	if(tmp == NULL)
 	{
-		bpel_code = new bpel(bpel_id, bpel_code, name);
+		bpel_code = new BPEL(bpel_id, bpel_code, name);
 	}else
 	{
 		while(tmp->next != NULL)
 		{
 			tmp = tmp->next;
 		}
-		tmp->next = new bpel(bpel_id, NULL, name);
+		tmp->next = new BPEL(bpel_id, NULL, name);
 	}
 }
 
-void place::append_bpel(bpel *list)
+void Place::append_bpel(BPEL *list)
 {
-	bpel *help;
+	BPEL *help;
 
 	if(list != NULL)
 	{
@@ -74,7 +86,7 @@ void place::append_bpel(bpel *list)
 	}	//else nothing to do
 }
 
-void place::out()
+void Place::out()
 {
 	cout << "\nPlace: '" << name << "'" << " (dfs: " << dfs << ", lowlink: " << lowlink << ")" << endl;
 	if(bpel_code != NULL)
@@ -83,7 +95,7 @@ void place::out()
 		next->out();
 }
 
-void place::owfn_out()
+void Place::owfn_out()
 {
 	cout << name;
 	if(next != NULL)
@@ -96,7 +108,7 @@ void place::owfn_out()
 	}
 }
 
-void placelist::out()
+void PlaceList::out()
 {
 	cout << "Place: " << placeptr->name << "\n";
 	if(next != NULL)

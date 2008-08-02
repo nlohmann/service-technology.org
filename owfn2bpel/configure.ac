@@ -1,5 +1,5 @@
 AC_PREREQ(2.60)
-AC_INIT([oWFN2BPEL],[4.8],[niels.lohmann@uni-rostock.de],[owfn2bpel])
+AC_INIT([oWFN2BPEL],[4.9],[niels.lohmann@uni-rostock.de],[owfn2bpel])
 AM_INIT_AUTOMAKE
 
 # Set directories.

@@ -22,8 +22,10 @@ cmdline.out: $(top_srcdir)/src/cmdline.ggo
 # create ASCII ChangeLog out of Texinfo
 #############################################################################
 ../ChangeLog: ChangeLog.texi
-	$(MAKEINFO) -o ChangeLog.txt --no-split --no-headers owfn2bpel.texi
+	$(MAKEINFO) -o ChangeLog.txt --no-split --no-headers  --fill-column=78 owfn2bpel.texi
 	$(SED) -n '/procrastination/,/The most recent change log/w ChangeLog2.txt' ChangeLog.txt
 	$(SED) '1,2d' ChangeLog2.txt | $(SED) -e '$$d' | $(SED) -e '$$d' > ChangeLog.txt
 	rm ChangeLog2.txt
-	mv ChangeLog.txt ../ChangeLog
+	head -n8 ../README > ../ChangeLog
+	cat ChangeLog.txt >> ../ChangeLog
+	rm ChangeLog.txt

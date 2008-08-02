@@ -1,3 +1,13 @@
+@heading Version 4.9 (unreleased)
+@itemize
+@item some changes to optimize code
+@item cleaned header inclusions
+@item removed redundancy in class members and constructors
+@item renamed sources to match the class names (e.g. @file{class_transition.h} to @file{Transition.h})
+@end itemize
+
+
+
 @heading Version 4.8
 
 @itemize
@@ -19,7 +29,7 @@
 @item added @option{--bug} parameter for debugging purposes
 @item LoLA is now added as distribution tarball to oWFN2BPEL to avoid code deviation -- any new version has to be announced in the configure script by setting the variable @code{LOLANAME}
 @item exit codes are unified to @code{EXIT_FAILURE} or @code{EXIT_SUCCESS}
-@item implemented task #6103 <@url{https://gna.org/task/?6103}>
+@item implemented task #6103 (@url{https://gna.org/task/?6103})
 @item removed files that can be created by autoreconf
 @end itemize
 

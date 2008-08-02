@@ -29,9 +29,14 @@
 
 #include "config.h"
 #include "classes.h"
+#include "class_owfn.h"
 #include "cmdline.h"
 
-using namespace std;
+using std::stringstream;
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::ios;
 
 // variable holding the information from the command line
 extern gengetopt_args_info args_info;
@@ -39,13 +44,13 @@ extern gengetopt_args_info args_info;
 
 
 
-bpel *owfn::copy_bpel(bpel *bpel_code)
+BPEL *owfn::copy_bpel(BPEL *bpel_code)
 {
 //Warning: This function copies the links with their own id! Links can only be used once!
-	bpel *new_code;
-	bpel *returned_code;
-	branch *branches;
-	links *tmp;
+	BPEL *new_code;
+	BPEL *returned_code;
+	Branch *branches;
+	Links *tmp;
 
 	new_code = NULL;
 
@@ -53,7 +58,7 @@ bpel *owfn::copy_bpel(bpel *bpel_code)
 	{
 		returned_code = copy_bpel(bpel_code->next);
 		
-		new_code = new bpel(bpel_code->activity, returned_code, bpel_code->name);
+		new_code = new BPEL(bpel_code->activity, returned_code, bpel_code->name);
 
 		new_code->link_is_or = bpel_code->link_is_or;
 
@@ -89,13 +94,13 @@ bpel *owfn::copy_bpel(bpel *bpel_code)
 	return new_code;
 }
 
-void owfn::copy_links(bpel *bpel_code)
+void owfn::copy_links(BPEL *bpel_code)
 {
 	//Ändert die ids aller Links
 	int i;
 	int stop;
 
-	stop = links::link_counter;
+	stop = Links::link_counter;
 
 	for(i = 1; i <= stop; i++)
 	{
@@ -104,10 +109,10 @@ void owfn::copy_links(bpel *bpel_code)
 	}
 }
 
-void owfn::search_links(bpel *bpel_code, int start)
+void owfn::search_links(BPEL *bpel_code, int start)
 {
-	branch *branches;
-	links *tmp;
+	Branch *branches;
+	Links *tmp;
 
 	if(bpel_code != NULL)
 	{
@@ -118,8 +123,8 @@ void owfn::search_links(bpel *bpel_code, int start)
 			{
 				if(global_link_id == 0)
 				{
-					links::increment();
-					global_link_id = links::link_counter;
+					Links::increment();
+					global_link_id = Links::link_counter;
 				}
 				tmp->link_id = global_link_id;
 			}
@@ -133,8 +138,8 @@ void owfn::search_links(bpel *bpel_code, int start)
 			{
 				if(global_link_id == 0)
 				{
-					links::increment();
-					global_link_id = links::link_counter;
+					Links::increment();
+					global_link_id = Links::link_counter;
 				}
 				tmp->link_id = global_link_id;
 			}
@@ -156,7 +161,7 @@ void owfn::search_links(bpel *bpel_code, int start)
 }
 
 
-void owfn::copy_place(place *place_to_copy, int n)
+void owfn::copy_place(Place *place_to_copy, int n)
 {
 	string placename;
 	string number;
@@ -173,11 +178,11 @@ void owfn::copy_place(place *place_to_copy, int n)
 }
 
 
-void owfn::copy_transition(transition *transition_to_copy, int n)
+void owfn::copy_transition(Transition *transition_to_copy, int n)
 {
 //Warning: The copied transition expects copied place names!
 
-	place *lists;
+	Place *lists;
 	string transname;
 	string placename;
 	string number;
@@ -187,7 +192,7 @@ void owfn::copy_transition(transition *transition_to_copy, int n)
 	ss >> number;
 	
 	transname = transition_to_copy->name + "_C" + number;
-	transitions = new transition(transname, transitions);
+	transitions = new Transition(transname, transitions);
 
 	transitions->bpel_code = copy_bpel(transition_to_copy->bpel_code);
 	copy_links(transitions->bpel_code);
@@ -209,12 +214,12 @@ void owfn::copy_transition(transition *transition_to_copy, int n)
 }
 
 
-void owfn::copy_transition_once(transition *transition_to_copy, int n)
+void owfn::copy_transition_once(Transition *transition_to_copy, int n)
 {
 //doesn't change name in the consume list
 //doesn't change name in the produce list
 
-	place *lists;
+	Place *lists;
 	string transname;
 	string number;
 	stringstream ss;
@@ -223,7 +228,7 @@ void owfn::copy_transition_once(transition *transition_to_copy, int n)
 	ss >> number;
 	
 	transname = transition_to_copy->name + "_C" + number;
-	transitions = new transition(transname, transitions);
+	transitions = new Transition(transname, transitions);
 
 	transitions->bpel_code = copy_bpel(transition_to_copy->bpel_code);
 	copy_links(transitions->bpel_code);
@@ -242,7 +247,7 @@ void owfn::copy_transition_once(transition *transition_to_copy, int n)
 	}
 }
 
-void owfn::rename_copy(place *place, int n)
+void owfn::rename_copy(Place *place, int n)
 {
 	string number;
 	stringstream ss;
@@ -253,9 +258,9 @@ void owfn::rename_copy(place *place, int n)
 	place->name = place->name + "_C" + number;
 }
 
-place *owfn::return_placeptr(string placename)
+Place *owfn::return_placeptr(string placename)
 {
-	place *placeptr;
+	Place *placeptr;
 	
 	placeptr = places;
 	while(placeptr != NULL)
@@ -273,28 +278,28 @@ place *owfn::return_placeptr(string placename)
 
 void owfn::add_place(string name)
 {
-	places = new place(name, places);
+	places = new Place(name, places);
 }
 
 void owfn::add_initial(string name)
 {
-	initials = new place(name, initials);;
+	initials = new Place(name, initials);;
 }
 
 void owfn::add_final(string name)
 {
 	//TODO: This function: str name, int marking (mehrere?)
-	finals = new place(name, finals);;
+	finals = new Place(name, finals);;
 }
 
 void owfn::add_input(string name)
 {
-	inputs = new place(name, inputs);
+	inputs = new Place(name, inputs);
 }
 
 void owfn::add_output(string name)
 {
-	outputs = new place(name, outputs);
+	outputs = new Place(name, outputs);
 }
 
 
@@ -313,7 +318,7 @@ void owfn::write_bpel()
 	cout << "BPEL file opened...\n";
 #endif
 
-	place *input;
+	Place *input;
 	plists *inlist;
 	inlist = NULL;
 	input = inputs;
@@ -325,7 +330,7 @@ void owfn::write_bpel()
 		input = input->next;
 	}
 
-	place *output;
+	Place *output;
 	plists *outlist;
 	outlist = NULL;
 	output = outputs;
@@ -474,7 +479,7 @@ void owfn::store_transition()
 //first the name
 	owfn_file >> buffer;
 	name = remove_whitespace(buffer);
-	transitions = new transition(name, transitions);
+	transitions = new Transition(name, transitions);
 
 //consumed places go second
 
@@ -716,8 +721,8 @@ void owfn::intrans_oneinitial()
 	cout << " looking for a single initial marking...\n";
 #endif
 
-	transition *transptr;
-	place *placeptr;
+	Transition *transptr;
+	Place *placeptr;
 	int found = 0;
 	string new_place_name = "replacement_initial_place";
 	string new_trans_name = "replacement_initial_transition";
@@ -747,7 +752,7 @@ void owfn::intrans_oneinitial()
 	if(found)	//transitions produce on initial place (must be part of a circle)
 	{
 		add_place(new_place_name);
-		transitions = new transition(new_trans_name, transitions);
+		transitions = new Transition(new_trans_name, transitions);
 		transitions->add_consume(new_place_name);
 		transitions->add_produce(initials->name);
 		transitions->add_bpel(EMPTY, transitions->name);
@@ -772,8 +777,8 @@ void owfn::intrans_initialmarkings()
 #ifdef VERBOSE
 	cout << " looking for initial markings...\n";
 #endif
-	place *initialptr;
-	place *deleteptr;
+	Place *initialptr;
+	Place *deleteptr;
 	string new_place_name = "replacement_initial_place";
 	string new_trans_name = "replacement_initial_transition";
 
@@ -782,7 +787,7 @@ void owfn::intrans_initialmarkings()
 		if(initials->next != NULL)		//More than one initial place
 		{
 			add_place(new_place_name);
-			transitions = new transition(new_trans_name, transitions);
+			transitions = new Transition(new_trans_name, transitions);
 			transitions->add_consume(new_place_name);
 	
 			initialptr = initials;
@@ -819,12 +824,12 @@ int owfn::inrepl_ins()
 	cout << " looking for receiving transitions...\n";
 #endif
 	int return_value = 0;
-	transition *transptr;
-	place *placeptr;
-	place *inputptr;
-	place *prevptr;
-	bpel *newbpel;
-	branch *newbranch;
+	Transition *transptr;
+	Place *placeptr;
+	Place *inputptr;
+	Place *prevptr;
+	BPEL *newbpel;
+	Branch *newbranch;
 	int counter;
 	int nocounter;
 	int repeat;
@@ -889,7 +894,7 @@ int owfn::inrepl_ins()
 						//add a receive branch for every input place
 						transptr->bpel_code->add_branch();
 						newbranch = transptr->bpel_code->branches;
-						newbpel = new bpel(RECEIVE, NULL, inputptr->name);
+						newbpel = new BPEL(RECEIVE, NULL, inputptr->name);
 						newbranch->bpel_code = newbpel;
 						
 						//remove input place from consumes list
@@ -948,12 +953,12 @@ int owfn::inrepl_outs()
 	cout << " looking for sending transitions...\n";
 #endif
 	int return_value = 0;
-	transition *transptr;
-	place *placeptr;
-	place *inputptr;
-	place *prevptr;
-	bpel *newbpel;
-	branch *newbranch;
+	Transition *transptr;
+	Place *placeptr;
+	Place *inputptr;
+	Place *prevptr;
+	BPEL *newbpel;
+	Branch *newbranch;
 	int counter;
 	int nocounter;
 	int repeat;
@@ -1018,7 +1023,7 @@ int owfn::inrepl_outs()
 						//add a invoke branch for every output place
 						transptr->bpel_code->add_branch();
 						newbranch = transptr->bpel_code->branches;
-						newbpel = new bpel(INVOKE, NULL, inputptr->name);
+						newbpel = new BPEL(INVOKE, NULL, inputptr->name);
 						newbranch->bpel_code = newbpel;
 						
 						//remove output place from produces list
@@ -1074,12 +1079,12 @@ int owfn::inrepl_inout()
 	cout << " looking for receiving and sending transitions...\n";
 #endif
 	int return_value = 0;
-	transition *transptr;
-	place *placeptr;
-	place *inputptr;
-	place *prevptr;
-	bpel *newbpel;
-	branch *newbranch;
+	Transition *transptr;
+	Place *placeptr;
+	Place *inputptr;
+	Place *prevptr;
+	BPEL *newbpel;
+	Branch *newbranch;
 	int counterin;
 	int counterout;
 	int repeat;
@@ -1144,7 +1149,7 @@ int owfn::inrepl_inout()
 						//add a receive branch for every input place
 						transptr->bpel_code->add_branch();
 						newbranch = transptr->bpel_code->branches;
-						newbpel = new bpel(RECEIVE, NULL, inputptr->name);
+						newbpel = new BPEL(RECEIVE, NULL, inputptr->name);
 						newbranch->bpel_code = newbpel;
 						
 						//remove input place from consumes list
@@ -1190,7 +1195,7 @@ int owfn::inrepl_inout()
 						//add a invoke branch for every output place
 						transptr->bpel_code->add_branch();
 						newbranch = transptr->bpel_code->branches;
-						newbpel = new bpel(INVOKE, NULL, inputptr->name);
+						newbpel = new BPEL(INVOKE, NULL, inputptr->name);
 						newbranch->bpel_code = newbpel;
 						
 						//remove output place from produces list
@@ -1240,7 +1245,7 @@ int owfn::inrepl_inout()
 						//add a receive branch for every input place
 						transptr->bpel_code->add_branch();
 						newbranch = transptr->bpel_code->branches;
-						newbpel = new bpel(RECEIVE, NULL, inputptr->name);
+						newbpel = new BPEL(RECEIVE, NULL, inputptr->name);
 						newbranch->bpel_code = newbpel;
 						
 						//remove input place from consumes list
@@ -1371,7 +1376,7 @@ int owfn::inrepl_inout()
 						//add a invoke branch for every output place
 						transptr->bpel_code->add_branch();
 						newbranch = transptr->bpel_code->branches;
-						newbpel = new bpel(INVOKE, NULL, inputptr->name);
+						newbpel = new BPEL(INVOKE, NULL, inputptr->name);
 						newbranch->bpel_code = newbpel;
 						
 						//remove output place from produces list
@@ -1513,11 +1518,11 @@ int owfn::inrepl_inputs()
 	cout << " looking for single receiving transitions...\n";
 #endif
 	int return_value = 0;
-	transition *transptr;
-	place *prevptr;
-	place *placeptr;
-	place *inputptr;
-	place *nextplace;
+	Transition *transptr;
+	Place *prevptr;
+	Place *placeptr;
+	Place *inputptr;
+	Place *nextplace;
 
 	transptr = transitions;
 
@@ -1578,11 +1583,11 @@ int owfn::inrepl_outputs()
 	cout << " looking for single sending transitions...\n";
 #endif
 	int return_value = 0;
-	transition *transptr;
-	place *prevptr;
-	place *placeptr;
-	place *inputptr;
-	place *nextplace;
+	Transition *transptr;
+	Place *prevptr;
+	Place *placeptr;
+	Place *inputptr;
+	Place *nextplace;
 
 	transptr = transitions;
 
@@ -1645,17 +1650,17 @@ int owfn::reoccrepl_linplaces()
 	int return_value = 0;
 	int check;
 	//Places A and C, Transition B, 1) A* = {B}, 2) B* = {C}, 3) *B = {A}, 4) *C = {B}
-	place *placeA;
-	place *placeC;
-	transition *transitionB;
-	transition *transptr;
-	transition *transdel;
-	transition *transprev;
-	transition *next;		//needed to delete transition B
-	transition *update;
-	place *updateplace;
-	place *placeptr;
-	place *placeprev;
+	Place *placeA;
+	Place *placeC;
+	Transition *transitionB;
+	Transition *transptr;
+	Transition *transdel;
+	Transition *transprev;
+	Transition *next;		//needed to delete transition B
+	Transition *update;
+	Place *updateplace;
+	Place *placeptr;
+	Place *placeprev;
 	string placename;
 
 	transitionB = transitions;
@@ -1853,18 +1858,18 @@ int owfn::reoccrepl_lintrans()
 	int return_value = 0;
 	int check;
 	//Transitions A and C, Place B, 1) A* = {B}, 2) B* = {C}, 3) *B = {A}, 4) *C = {B}
-	transition *transitionA;
-	place *placeB;
-	transition *transitionC;
-	transition *transptr;
-	transition *transprev;
-	transition *transprevA;
-	transition *transprevC;
-	transition *help;
-	transition *nextA;		//needed to delete transition A
-	place *placeptr;
-	place *placeprev;
-	place *plist;
+	Transition *transitionA;
+	Place *placeB;
+	Transition *transitionC;
+	Transition *transptr;
+	Transition *transprev;
+	Transition *transprevA;
+	Transition *transprevC;
+	Transition *help;
+	Transition *nextA;		//needed to delete transition A
+	Place *placeptr;
+	Place *placeprev;
+	Place *plist;
 	string transitionname;
 	int trans_counter;
 
@@ -1932,7 +1937,7 @@ int owfn::reoccrepl_lintrans()
 							//A, B, C -> Transition(ABC)
 							//create new transition
 							transitionname = transitionA->name + "_" + placeB->name + "_" + transitionC->name;
-							transitions = new transition(transitionname, transitions);
+							transitions = new Transition(transitionname, transitions);
 
 #ifdef DEBUG
 							cout << "   A = " << transitionA->name << ", B = " << placeB->name << ", C = " << transitionC->name << " -> " << transitionname << "\n";
@@ -2075,14 +2080,14 @@ int owfn::reoccrepl_endplaces()
 
 	int return_value = 0;
 	int check;
-	transition *transptr;
-	transition *prev;
-	transition *next;
-	transition *other;
-	transition *update;
-	place *placeA;
-	place *placeptr;
-	place *updateplace;
+	Transition *transptr;
+	Transition *prev;
+	Transition *next;
+	Transition *other;
+	Transition *update;
+	Place *placeA;
+	Place *placeptr;
+	Place *updateplace;
 	string newname;
 	
 	prev = NULL;
@@ -2196,12 +2201,12 @@ int owfn::reoccrepl_endtrans()
 
 	int return_value = 0;
 	int check;
-	transition *transptr;
-	transition *othertrans;
-	place *otherplaces;
-	place *placeptr;
-	place *next;
-	place *prev;
+	Transition *transptr;
+	Transition *othertrans;
+	Place *otherplaces;
+	Place *placeptr;
+	Place *next;
+	Place *prev;
 	string newname;
 	
 	prev = NULL;
@@ -2306,21 +2311,21 @@ int owfn::reoccrepl_switch()
 #endif
 
 	int return_value = 0;
-	place *placeptr;
-	transition *transptr;
-	transition *transprev;
+	Place *placeptr;
+	Transition *transptr;
+	Transition *transprev;
 	string A;
 	string B;
 	string transname;
 	int found;
-	bpel *help;
-	bpel *list;
-	branch *newbranch;
+	BPEL *help;
+	BPEL *list;
+	Branch *newbranch;
 
-	transitionlist *translist;
-	transitionlist *translistptr;
-	transitionlist *tlist;
-	transitionlist *tlistptr;
+	TransitionList *translist;
+	TransitionList *translistptr;
+	TransitionList *tlist;
+	TransitionList *tlistptr;
 
 	placeptr = places;
 	while(placeptr != NULL)
@@ -2334,7 +2339,7 @@ int owfn::reoccrepl_switch()
 			//consumes only from A and produces only on one place that we'll later might call B
 			if(transptr->consumes != NULL && transptr->consumes->next == NULL && transptr->consumes->name == A && transptr->produces != NULL && transptr->produces->next == NULL && transptr->produces->name != A)
 			{
-				translist = new transitionlist(transptr, translist);
+				translist = new TransitionList(transptr, translist);
 			}
 			transptr = transptr->next;
 		}
@@ -2361,7 +2366,7 @@ int owfn::reoccrepl_switch()
 				{
 					if(translistptr->transitionptr->produces->name == B)
 					{
-						tlist = new transitionlist(translistptr->transitionptr, tlist);
+						tlist = new TransitionList(translistptr->transitionptr, tlist);
 					}
 					translistptr = translistptr->next;
 				}
@@ -2382,7 +2387,7 @@ int owfn::reoccrepl_switch()
 				cout << "   If from " << A << " to " << B << " -> " << transname << "\n";
 #endif
 				//create new transition
-				transitions = new transition(transname, transitions);
+				transitions = new Transition(transname, transitions);
 				transitions->add_consume(A);
 				transitions->add_produce(B);
 				transitions->add_bpel(SWITCH, transname);
@@ -2416,7 +2421,7 @@ int owfn::reoccrepl_switch()
 							newbranch->bpel_code = help; 
 						}else
 						{
-							newbranch->bpel_code = new bpel(OPAQUE, NULL, transptr->name);
+							newbranch->bpel_code = new BPEL(OPAQUE, NULL, transptr->name);
 						}
 
 						//delete transition
@@ -2478,20 +2483,20 @@ int owfn::reoccrepl_switchshort()
 #endif
 
 	int return_value = 0;
-	place *placeptr;
-	place *next;
-	place *prev;
-	place *prod;
-	transition *transptr;
-	transition *transprev;
-	transition *transnext;
+	Place *placeptr;
+	Place *next;
+	Place *prev;
+	Place *prod;
+	Transition *transptr;
+	Transition *transprev;
+	Transition *transnext;
 	string placename;
 	string newplace;
 	int found;
 	int check;
-	bpel *help;
-	bpel *list;
-	branch *newbranch;
+	BPEL *help;
+	BPEL *list;
+	Branch *newbranch;
 	
 	prev = NULL;
 	placeptr = places;
@@ -2610,7 +2615,7 @@ int owfn::reoccrepl_switchshort()
 							newbranch->bpel_code = help; 
 						}else
 						{
-							newbranch->bpel_code = new bpel(OPAQUE, NULL, transptr->name);
+							newbranch->bpel_code = new BPEL(OPAQUE, NULL, transptr->name);
 						}
 	
 						//delete transition
@@ -2630,8 +2635,8 @@ int owfn::reoccrepl_switchshort()
 				}
 
 				//find place
-				place *secondplace;
-				place *placeprev;
+				Place *secondplace;
+				Place *placeprev;
 				placeprev = NULL;
 				secondplace = places;
 				while(secondplace != NULL && secondplace->name != placename)
@@ -2680,7 +2685,7 @@ int owfn::reoccrepl_switchshort()
 				}
 
 				//find place
-				place *firstplace;
+				Place *firstplace;
 				prev = NULL;
 				firstplace = places;
 				while(firstplace != NULL && firstplace->name != placeptr->name)
@@ -2758,20 +2763,20 @@ int owfn::reoccrepl_switchshortopenend()
 #endif
 
 	int return_value = 0;
-	place *placeptr;
-	place *next;
-	place *prev;
-	place *prod;
-	transition *transptr;
-	transition *transprev;
-	transition *transnext;
+	Place *placeptr;
+	Place *next;
+	Place *prev;
+	Place *prod;
+	Transition *transptr;
+	Transition *transprev;
+	Transition *transnext;
 	string placename;
 	string newplace;
 	int found;
 	int check;
-	bpel *help;
-	bpel *list;
-	branch *newbranch;
+	BPEL *help;
+	BPEL *list;
+	Branch *newbranch;
 
 	placeptr = places;
 	while(placeptr != NULL)
@@ -2861,7 +2866,7 @@ int owfn::reoccrepl_switchshortopenend()
 							newbranch->bpel_code = help; 
 						}else
 						{
-							newbranch->bpel_code = new bpel(OPAQUE, NULL, transptr->name);
+							newbranch->bpel_code = new BPEL(OPAQUE, NULL, transptr->name);
 						}
 	
 						//delete transition
@@ -2962,11 +2967,11 @@ int owfn::reoccrepl_circleshort()
 
 	int return_value = 0;
 	int restart;
-	transition *transptr;
-	transition *transprev;
-	place *placeptr;
-	bpel *tmpptr;
-	bpel *help;
+	Transition *transptr;
+	Transition *transprev;
+	Place *placeptr;
+	BPEL *tmpptr;
+	BPEL *help;
 
 	transprev = NULL;
 	transptr = transitions;
@@ -3074,15 +3079,15 @@ int owfn::reoccrepl_flowshortopenend()
 
 	int return_value = 0;
 	int check;
-	transition *transptr;
-	transition *alltrans;
-	place *placeptr;
-	place *prev;
-	place *prod;
-	place *plist;
-	branch *newbranch;
-	bpel *list;
-	bpel *help;
+	Transition *transptr;
+	Transition *alltrans;
+	Place *placeptr;
+	Place *prev;
+	Place *prod;
+	Place *plist;
+	Branch *newbranch;
+	BPEL *list;
+	BPEL *help;
 	
 	transptr = transitions;
 	
@@ -3164,7 +3169,7 @@ int owfn::reoccrepl_flowshortopenend()
 						newbranch->bpel_code = help;
 					}else
 					{
-						newbranch->bpel_code = new bpel(OPAQUE, NULL, placeptr->name);
+						newbranch->bpel_code = new BPEL(OPAQUE, NULL, placeptr->name);
 					}
 
 					//delete place
@@ -3216,21 +3221,21 @@ int owfn::reoccrepl_flowshort()
 	int counter;
 	int check;
 	int found;
-	transition *transptr;
-	transition *alltrans;
-	transition *transA;
-	transition *transB;
-	transition *transprev;
-	place *placeptr;
+	Transition *transptr;
+	Transition *alltrans;
+	Transition *transA;
+	Transition *transB;
+	Transition *transprev;
+	Place *placeptr;
 	string finalplace;
-	place *prev;
-	place *prod;
-	place *plist;
-	branch *newbranch;
-	bpel *list;
-	bpel *help;
-	transitionlist *translist;
-	transitionlist *translistptr;
+	Place *prev;
+	Place *prod;
+	Place *plist;
+	Branch *newbranch;
+	BPEL *list;
+	BPEL *help;
+	TransitionList *translist;
+	TransitionList *translistptr;
 
 	transptr = transitions;
 
@@ -3267,7 +3272,7 @@ int owfn::reoccrepl_flowshort()
 						if(plist->name == prod->name)
 						{
 							counter++;
-							translist = new transitionlist(alltrans, translist);
+							translist = new TransitionList(alltrans, translist);
 						}
 						plist = plist->next;
 					}
@@ -3366,7 +3371,7 @@ int owfn::reoccrepl_flowshort()
 							newbranch->bpel_code = help; 
 						}else
 						{
-							newbranch->bpel_code = new bpel(OPAQUE, NULL, placeptr->name);
+							newbranch->bpel_code = new BPEL(OPAQUE, NULL, placeptr->name);
 						}
 					
 						//delete place
@@ -3473,14 +3478,14 @@ int owfn::reoccrepl_exfc_A()
 #endif
 
 	int return_value = 0;
-	transition *transptr;
-	transition *alltrans;
-	place *con;
-//	place *prod;
-	place *comparelist;
+	Transition *transptr;
+	Transition *alltrans;
+	Place *con;
+//	Place *prod;
+	Place *comparelist;
 	int cont;
-	transitionlist *translist;
-	transitionlist *translistptr;
+	TransitionList *translist;
+	TransitionList *translistptr;
 	
 	transptr = transitions;
 	while(transptr != NULL)
@@ -3527,7 +3532,7 @@ int owfn::reoccrepl_exfc_A()
 				if(cont)
 				{
 					//add alltrans to list of transitions with equal consume lists
-					translist = new transitionlist(alltrans, translist);
+					translist = new TransitionList(alltrans, translist);
 				}
 				alltrans = alltrans->next;
 			}
@@ -3543,7 +3548,7 @@ int owfn::reoccrepl_exfc_A()
 				return_value++;
 
 				//create a new transition
-				transitions = new transition("transition_for_cross_over", transitions);
+				transitions = new Transition("transition_for_cross_over", transitions);
 				transitions->add_bpel(EMPTY, transitions->name);
 
 				//add all the places from the consume list to the new transitions consume list
@@ -3555,7 +3560,7 @@ int owfn::reoccrepl_exfc_A()
 				}
 				
 				//create a new place
-				places = new place("place_for_cross_over", places);
+				places = new Place("place_for_cross_over", places);
 				
 				//add new place to new transitions produce list
 				transitions->add_produce(places->name);
@@ -3604,14 +3609,14 @@ int owfn::reoccrepl_exfc_B()
 #endif
 
 	int return_value = 0;
-	transition *transptr;
-	transition *alltrans;
-	place *con;
-//	place *prod;
-	place *comparelist;
+	Transition *transptr;
+	Transition *alltrans;
+	Place *con;
+//	Place *prod;
+	Place *comparelist;
 	int cont;
-	transitionlist *translist;
-	transitionlist *translistptr;
+	TransitionList *translist;
+	TransitionList *translistptr;
 	
 	transptr = transitions;
 	while(transptr != NULL)
@@ -3658,7 +3663,7 @@ int owfn::reoccrepl_exfc_B()
 				if(cont)
 				{
 					//add alltrans to list of transitions with equal consume lists
-					translist = new transitionlist(alltrans, translist);
+					translist = new TransitionList(alltrans, translist);
 				}
 				alltrans = alltrans->next;
 			}
@@ -3671,7 +3676,7 @@ int owfn::reoccrepl_exfc_B()
 				return_value++;
 
 				//create a new transition
-				transitions = new transition("transition_for_cross_over", transitions);
+				transitions = new Transition("transition_for_cross_over", transitions);
 				transitions->add_bpel(EMPTY, transitions->name);
 				
 				//add all the places from the produce list to the new transitions produce list
@@ -3683,7 +3688,7 @@ int owfn::reoccrepl_exfc_B()
 				}
 				
 				//create a new place
-				places = new place("place_for_cross_over", places);
+				places = new Place("place_for_cross_over", places);
 				
 				//add new place to new transitions consume list
 				transitions->add_consume(places->name);
@@ -3724,14 +3729,14 @@ int owfn::reoccrepl_exfc_B()
 }
 
 
-void owfn::create_B(place *start)
+void owfn::create_B(Place *start)
 {
-	transition *alltrans;
-	place *con;
-	place *prod;
-	place *placeptr;
-	placelist *placelistptr;
-	transitionlist *translistptr;
+	Transition *alltrans;
+	Place *con;
+	Place *prod;
+	Place *placeptr;
+	PlaceList *placelistptr;
+	TransitionList *translistptr;
 	int seen;
 
 	alltrans = transitions;
@@ -3756,7 +3761,7 @@ void owfn::create_B(place *start)
 				}
 				if(!seen)
 				{
-					trans_in_B = new transitionlist(alltrans, trans_in_B);
+					trans_in_B = new TransitionList(alltrans, trans_in_B);
 					prod = alltrans->produces;
 					while(prod != NULL)
 					{
@@ -3785,7 +3790,7 @@ void owfn::create_B(place *start)
 								cout << "Error 1 in function 'create_B': Place '" << prod->name << "' vanished. This should not happen...\n";
 								exit(EXIT_FAILURE);
 							}
-							places_in_B = new placelist(placeptr, places_in_B);
+							places_in_B = new PlaceList(placeptr, places_in_B);
 							create_B(placeptr);
 						}
 						prod = prod->next;
@@ -3812,21 +3817,21 @@ int owfn::reoccrepl_copy_A()
 	int stop;
 	int hit = 0;
 	
-	place *next_place_to_copy;
-	transition *next_trans_to_copy;
+	Place *next_place_to_copy;
+	Transition *next_trans_to_copy;
 	
-	place *allplaces;		//to find X
-	place *X;
-	place *prod;
-	place *con;
-	place *prev;
-	place *placeptr;
-	transition *alltrans;
-	transitionlist *producers;	//*X
-	transitionlist *translistptr;
-//	transitionlist *trans_in_B;	//globaly defined as part of the owfn
-//	placelist *places_in_B;
-	placelist *placelistptr;
+	Place *allplaces;		//to find X
+	Place *X;
+	Place *prod;
+	Place *con;
+	Place *prev;
+	Place *placeptr;
+	Transition *alltrans;
+	TransitionList *producers;	//*X
+	TransitionList *translistptr;
+//	TransitionList *trans_in_B;	//globaly defined as part of the owfn
+//	PlaceList *places_in_B;
+	PlaceList *placelistptr;
 
 
 	allplaces = places;
@@ -3843,7 +3848,7 @@ int owfn::reoccrepl_copy_A()
 				if(prod->name == allplaces->name)
 				{
 					counter++;
-					producers = new transitionlist(alltrans, producers);
+					producers = new TransitionList(alltrans, producers);
 				}
 				prod = prod->next;
 			}
@@ -4166,26 +4171,26 @@ int owfn::reoccrepl_copy_B()
 	int stop;
 	int hit = 0;
 	
-	place *next_place_to_copy;
-	transition *next_trans_to_copy;
+	Place *next_place_to_copy;
+	Transition *next_trans_to_copy;
 	
-	place *allplaces;		//to find X
-	place *X;
-	place *prod;
-	place *con;
-	place *prev;
-//	place *placeptr;
-	transition *alltrans;
-	transition *tmp;
-	transitionlist *producers;	//*X
-	transitionlist *translistptr;
-//	transitionlist *trans_in_B;	//globaly defined as part of the owfn
-//	placelist *places_in_B;
-	placelist *placelistptr;
-	transitionlist *end_of_arc;
-	placelist *arc_into_B;
-	transitionlist *tlp;
-	placelist *plp;
+	Place *allplaces;		//to find X
+	Place *X;
+	Place *prod;
+	Place *con;
+	Place *prev;
+//	Place *placeptr;
+	Transition *alltrans;
+	Transition *tmp;
+	TransitionList *producers;	//*X
+	TransitionList *translistptr;
+//	TransitionList *trans_in_B;	//globaly defined as part of the owfn
+//	PlaceList *places_in_B;
+	PlaceList *placelistptr;
+	TransitionList *end_of_arc;
+	PlaceList *arc_into_B;
+	TransitionList *tlp;
+	PlaceList *plp;
 
 	allplaces = places;
 	while(allplaces != NULL && !hit)	//if we hit something we stop, this function is in conflict with others
@@ -4201,7 +4206,7 @@ int owfn::reoccrepl_copy_B()
 				if(prod->name == allplaces->name)
 				{
 					counter++;
-					producers = new transitionlist(alltrans, producers);
+					producers = new TransitionList(alltrans, producers);
 				}
 				prod = prod->next;
 			}
@@ -4343,9 +4348,9 @@ int owfn::reoccrepl_copy_B()
 								}
 								if(placelistptr == NULL && con->name != X->name)	//arc from a place that is not in B
 								{
-									end_of_arc = new transitionlist(translistptr->transitionptr, end_of_arc);
+									end_of_arc = new TransitionList(translistptr->transitionptr, end_of_arc);
 									//this is not the real place but a copy, we need only the name, so it is ok
-									arc_into_B = new placelist(con, arc_into_B);
+									arc_into_B = new PlaceList(con, arc_into_B);
 									//remove but not delete the place from the consume list now and add it later to all copies
 								//this is stupid and resulted from copying the function
 									if(prev == NULL)
@@ -4586,8 +4591,8 @@ int owfn::reoccrepl_copy_B()
 
 void owfn::final_empty()
 {
-	transition *transptr;
-	place *placeptr;
+	Transition *transptr;
+	Place *placeptr;
 	
 	transptr = transitions;
 	while(transptr != NULL)
@@ -4623,10 +4628,10 @@ void owfn::final_empty()
 
 void owfn::final_links()
 {
-	transition *transptr;
-	place *plist;
-	place *placeptr;
-	bpel *tmp;
+	Transition *transptr;
+	Place *plist;
+	Place *placeptr;
+	BPEL *tmp;
 	
 	transptr = transitions;
 	while(transptr != NULL)
@@ -4646,7 +4651,7 @@ void owfn::final_links()
 			}
 
 			//turn arc from place to transition into a link
-			links::increment();
+			Links::increment();
 			placeptr->bpel_code->add_source();
 			transptr->bpel_code->add_target(1);
 
@@ -4675,7 +4680,7 @@ void owfn::final_links()
 			}
 
 			//turn arc from transition to place into a link
-			links::increment();
+			Links::increment();
 			placeptr->bpel_code->add_target(1);
 			transptr->bpel_code->add_source();
 
@@ -4689,14 +4694,14 @@ void owfn::final_links()
 
 void owfn::final_create_flow()
 {
-	transition *transptr;
-	place *placeptr;
-	branch *newbranch;
-	bpel *list;
-	bpel *help;
+	Transition *transptr;
+	Place *placeptr;
+	Branch *newbranch;
+	BPEL *list;
+	BPEL *help;
 	
 	//create new flow
-	final_code = new bpel(FLOW, final_code, "top_flow");
+	final_code = new BPEL(FLOW, final_code, "top_flow");
 
 	//add branch for every transition
 	transptr = transitions;
@@ -4748,10 +4753,10 @@ void owfn::final_create_flow()
 
 void owfn::final_switches()
 {
-	place *placeptr;
-	place *con;
-	place *con_prev;
-	transition *transptr;
+	Place *placeptr;
+	Place *con;
+	Place *con_prev;
+	Transition *transptr;
 	string placename;
 	string newplace;
 	int found;
@@ -4792,9 +4797,9 @@ void owfn::final_switches()
 					if(con->name == placeptr->name)
 					{
 						placeptr->bpel_code->add_branch();
-						placeptr->bpel_code->branches->bpel_code = new bpel(EMPTY, NULL, "empty_after_switch");
+						placeptr->bpel_code->branches->bpel_code = new BPEL(EMPTY, NULL, "empty_after_switch");
 						//create link arc
-						links::increment();
+						Links::increment();
 						placeptr->bpel_code->branches->bpel_code->add_source();
 						transptr->bpel_code->add_target(1);
 						//remove old arc
@@ -4825,11 +4830,11 @@ void owfn::final_switches()
 void owfn::final_create_final(char *name)
 {
 	string help;
-	bpel *final;
+	BPEL *final;
     // use "basename()" to strip directory prefix
 	help = "process_" + string(basename(name));
     cerr << help << endl;
-	final = new bpel(PROCESS, NULL, help);
+	final = new BPEL(PROCESS, NULL, help);
 
 	final->add_branch();
 	
@@ -4850,10 +4855,10 @@ void owfn::final_create_final(char *name)
 }
 
 
-void owfn::finish_sequence(branch *start)
+void owfn::finish_sequence(Branch *start)
 {
-	bpel *sequence;
-	bpel *bpelptr;
+	BPEL *sequence;
+	BPEL *bpelptr;
 
 	if(start->bpel_code->next != NULL)		//two activities in a row
 	{
@@ -4861,7 +4866,7 @@ void owfn::finish_sequence(branch *start)
 		//new sequence, including all bpels as branches
 		//but what links to it?
 
-		sequence = new bpel(SEQUENCE, NULL, "sequence");
+		sequence = new BPEL(SEQUENCE, NULL, "sequence");
 
 		bpelptr = start->bpel_code;
 		while(bpelptr != NULL)
@@ -4888,15 +4893,15 @@ void owfn::finish_sequence(branch *start)
 }
 
 
-void owfn::finish_links(bpel *start)
+void owfn::finish_links(BPEL *start)
 {
-	branch *help;
-	branch *prev;
-	branch *source_branch;
-	branch *tmp;
-	branch *tmp_b;
-	branch *tmp_prev;
-	bpel *target_bpel;
+	Branch *help;
+	Branch *prev;
+	Branch *source_branch;
+	Branch *tmp;
+	Branch *tmp_b;
+	Branch *tmp_prev;
+	BPEL *target_bpel;
 	int id;
 	int cont;
 
@@ -5015,11 +5020,11 @@ void owfn::finish_links(bpel *start)
 }
 
 
-void owfn::finish_pick(bpel *start)
+void owfn::finish_pick(BPEL *start)
 {
-	branch *help;
-	bpel *last_bpel;
-	bpel *prev_bpel;
+	Branch *help;
+	BPEL *last_bpel;
+	BPEL *prev_bpel;
 	int rec_found;
 
 	if(start->activity == SWITCH)
@@ -5089,14 +5094,14 @@ void owfn::finish_pick(bpel *start)
 }
 
 
-void owfn::finish_while(bpel *start)
+void owfn::finish_while(BPEL *start)
 {
-	bpel *bpelptr;
-	bpel *newif;
-	bpel *newwhile;
-	bpel *tmp;
-	bpel *prev;
-	branch *help;
+	BPEL *bpelptr;
+	BPEL *newif;
+	BPEL *newwhile;
+	BPEL *tmp;
+	BPEL *prev;
+	Branch *help;
 
 	help = start->branches;
 
@@ -5109,7 +5114,7 @@ void owfn::finish_while(bpel *start)
 			if(bpelptr->activity == WHILE && bpelptr->next != NULL && bpelptr->next->activity == WHILE && bpelptr->next->source == NULL && bpelptr->next->target == NULL && bpelptr->next->source == NULL && bpelptr->next->target == NULL)
 			{
 				//create new if
-				newif = new bpel(SWITCH, NULL, "multiple_whiles_if");
+				newif = new BPEL(SWITCH, NULL, "multiple_whiles_if");
 				//add the content of all whiles as branches to the new if
 				tmp = bpelptr;
 				while(tmp != NULL && tmp->activity == WHILE && tmp->target == NULL && tmp->source == NULL)
@@ -5119,7 +5124,7 @@ void owfn::finish_while(bpel *start)
 					tmp = tmp->next;
 				}
 				//create new while
-				newwhile = new bpel(WHILE, NULL, "multiple_whiles_while");
+				newwhile = new BPEL(WHILE, NULL, "multiple_whiles_while");
 				newwhile->add_branch();
 				newwhile->branches->bpel_code = newif;
 				//insert new if
@@ -5168,11 +5173,11 @@ void owfn::finish_while(bpel *start)
 
 
 
-void owfn::finish_if(bpel *start)
+void owfn::finish_if(BPEL *start)
 {
-	branch *help;
-	branch *last;
-	branch *prev;
+	Branch *help;
+	Branch *last;
+	Branch *prev;
 
 	if(start->activity == SWITCH)
 	{
@@ -5229,11 +5234,11 @@ void owfn::finish_if(bpel *start)
 }
 
 
-void owfn::finish_flow(bpel *start)
+void owfn::finish_flow(BPEL *start)
 {
-	branch *help;
-	branch *newbranches;
-	branch *prev;
+	Branch *help;
+	Branch *newbranches;
+	Branch *prev;
 	int cont;
 
 	if(start->activity == FLOW)
@@ -5297,12 +5302,12 @@ void owfn::finish_flow(bpel *start)
 }
 
 
-void owfn::finish_empties(bpel *start)
+void owfn::finish_empties(BPEL *start)
 {
-	branch *help;
-	bpel *bpel_c;
-	bpel *prev;
-	bpel *tmp;
+	Branch *help;
+	BPEL *bpel_c;
+	BPEL *prev;
+	BPEL *tmp;
 
 	//remove empties from the top row of activities of all the own branches
 	help = start->branches;
@@ -5374,12 +5379,12 @@ void owfn::finish_empties(bpel *start)
 	}
 }
 
-void owfn::finish_more_empties(bpel *start)
+void owfn::finish_more_empties(BPEL *start)
 {
-	bpel *bpelptr;
-	bpel *prev;
-	branch *help;
-	links *tmp;
+	BPEL *bpelptr;
+	BPEL *prev;
+	Branch *help;
+	Links *tmp;
 
 	help = start->branches;
 
@@ -5449,11 +5454,11 @@ void owfn::finish_more_empties(bpel *start)
 }
 
 
-void owfn::finish_even_more_empties(bpel *start)
+void owfn::finish_even_more_empties(BPEL *start)
 {
-	bpel *bpelptr;
-	bpel *del;
-	branch *help;
+	BPEL *bpelptr;
+	BPEL *del;
+	Branch *help;
 
 	help = start->branches;
 
@@ -5510,12 +5515,12 @@ void owfn::finish_even_more_empties(bpel *start)
 
 
 
-void owfn::finish_opaques(bpel *start)
+void owfn::finish_opaques(BPEL *start)
 {
-	branch *help;
-	bpel *bpel_c;
-	bpel *prev;
-	bpel *tmp;
+	Branch *help;
+	BPEL *bpel_c;
+	BPEL *prev;
+	BPEL *tmp;
 
 	//remove opaques from the top row of activities of all the own branches
 	help = start->branches;
@@ -5587,12 +5592,12 @@ void owfn::finish_opaques(bpel *start)
 	}
 }
 
-void owfn::finish_more_opaques(bpel *start)
+void owfn::finish_more_opaques(BPEL *start)
 {
-	bpel *bpelptr;
-	bpel *prev;
-	branch *help;
-	links *tmp;
+	BPEL *bpelptr;
+	BPEL *prev;
+	Branch *help;
+	Links *tmp;
 
 	help = start->branches;
 
@@ -5662,11 +5667,11 @@ void owfn::finish_more_opaques(bpel *start)
 }
 
 
-void owfn::finish_even_more_opaques(bpel *start)
+void owfn::finish_even_more_opaques(BPEL *start)
 {
-	bpel *bpelptr;
-	bpel *del;
-	branch *help;
+	BPEL *bpelptr;
+	BPEL *del;
+	Branch *help;
 
 	help = start->branches;
 
@@ -5728,30 +5733,30 @@ int owfn::reoccrepl_circlemultexits()
 #ifdef VERBOSE
 	cout << " looking for circles with multiple exits...\n";
 #endif
-	place *start;
-	place *checkplace;
-	place *tmpplace;
-	place *placeptr;
-	place *realplace;
-	place *prevplace;
-	place *con;
-	transitionlist *translistptr;
-	transitionlist *list_of_trans;
-	transitionlist *trans_of_circle;
-	transitionlist *delptr;
-	transitionlist *tmplist;
-	transitionlist *tlptr;
-	transition *firsttrans;
-	transition *transptr;
-	transition *deltrans;
-	transition *prev;
+	Place *start;
+	Place *checkplace;
+	Place *tmpplace;
+	Place *placeptr;
+	Place *realplace;
+	Place *prevplace;
+	Place *con;
+	TransitionList *translistptr;
+	TransitionList *list_of_trans;
+	TransitionList *trans_of_circle;
+	TransitionList *delptr;
+	TransitionList *tmplist;
+	TransitionList *tlptr;
+	Transition *firsttrans;
+	Transition *transptr;
+	Transition *deltrans;
+	Transition *prev;
 	int test1;
 	int test2;
 	int return_value = 0;
-	bpel *help;
-	bpel *tmpptr;
-	bpel *kopie;
-	bpel *new_bpel;
+	BPEL *help;
+	BPEL *tmpptr;
+	BPEL *kopie;
+	BPEL *new_bpel;
 
 	//test every place as a possible start of a circle
 	start = places;
@@ -5782,7 +5787,7 @@ int owfn::reoccrepl_circlemultexits()
 			{
 				if(tmpplace->name == start->name)
 				{
-					list_of_trans = new transitionlist(transptr, list_of_trans);
+					list_of_trans = new TransitionList(transptr, list_of_trans);
 					test2 = 1;
 				}
 				tmpplace = tmpplace->next;
@@ -5847,7 +5852,7 @@ int owfn::reoccrepl_circlemultexits()
 								if(transptr != NULL && transptr->consumes != NULL && transptr->consumes->next == NULL && transptr->produces != NULL && transptr->produces->next == NULL)
 								{
 									//add transition to circle and set checkplace to the next place to check
-									trans_of_circle = new transitionlist(transptr, trans_of_circle);
+									trans_of_circle = new TransitionList(transptr, trans_of_circle);
 									checkplace = transptr->consumes;
 								}else
 								{
@@ -6380,11 +6385,11 @@ int owfn::reoccrepl_circlemultexits()
 
 int owfn::find_circles(string startplatzname, string aktuellerplatz)
 {
-	transition *transptr;
-	transitionlist *translistptr;
-	transitionlist *delptr;
-	transitionlist *checklistptr;
-	place *placeptr;
+	Transition *transptr;
+	TransitionList *translistptr;
+	TransitionList *delptr;
+	TransitionList *checklistptr;
+	Place *placeptr;
 
 
 	//translistptr = Liste mit allen Transitionen im Nachbereich von aktuellerplatz, die nur einen Platz im Nachbereich haben
@@ -6394,7 +6399,7 @@ int owfn::find_circles(string startplatzname, string aktuellerplatz)
 	{
 		if(transptr->consumes != NULL && transptr->consumes->next == NULL && transptr->consumes->name == aktuellerplatz && transptr->produces != NULL && transptr->produces->next == NULL)
 		{
-			translistptr = new transitionlist(transptr, translistptr);
+			translistptr = new TransitionList(transptr, translistptr);
 		}
 		transptr = transptr->next;
 	}
@@ -6403,14 +6408,14 @@ int owfn::find_circles(string startplatzname, string aktuellerplatz)
 	{
 		if(translistptr->transitionptr->produces->name == startplatzname)
 		{
-			trans_in_B = new transitionlist(translistptr->transitionptr, trans_in_B);
+			trans_in_B = new TransitionList(translistptr->transitionptr, trans_in_B);
 			placeptr = return_placeptr(aktuellerplatz);
 			if(placeptr == NULL)
 			{
 				cout << "Error 1 in function 'find_circles': Place '" << aktuellerplatz << "' vanished. This should not happen...\n";
 				exit(EXIT_FAILURE);
 			}
-			places_in_B = new placelist(placeptr, places_in_B);
+			places_in_B = new PlaceList(placeptr, places_in_B);
 
 
 			//delete old translist
@@ -6431,20 +6436,20 @@ int owfn::find_circles(string startplatzname, string aktuellerplatz)
 			}
 			if(checklistptr == NULL)
 			{
-				checked_trans = new transitionlist(translistptr->transitionptr, checked_trans);
+				checked_trans = new TransitionList(translistptr->transitionptr, checked_trans);
 				
 				//if(Kreisende gefunden)
 				if(find_circles(startplatzname, translistptr->transitionptr->produces->name) == 1)
 				{
 					//Ein Kreisende wird immer weiter hochgereicht und alle Plätze und Transitionen auf dem Rückweg gespeichert
-					trans_in_B = new transitionlist(translistptr->transitionptr, trans_in_B);
+					trans_in_B = new TransitionList(translistptr->transitionptr, trans_in_B);
 					placeptr = return_placeptr(aktuellerplatz);
 					if(placeptr == NULL)
 					{
 						cout << "Error 2 in function 'find_circles': Place '" << aktuellerplatz << "' vanished. This should not happen...\n";
 						exit(EXIT_FAILURE);
 					}
-					places_in_B = new placelist(placeptr, places_in_B);
+					places_in_B = new PlaceList(placeptr, places_in_B);
 
 					//delete old translist
 					while(translistptr != NULL)
@@ -6477,26 +6482,26 @@ int owfn::reoccrepl_circlemultins()
 	cout << " looking for circles with multiple entrances...\n";
 #endif
 
-	place *start;
-	place *placeptr;
-	place *p0;
-	place *p1 = NULL;
-	place *con;
-	transition *transptr;
-//	transitionlist *trans_in_B;	//globaly defined
-//	transitionlist *checked_trans;
-//	placelist *places_in_B;
-	placelist *placelistptr;
-	placelist *plptr;
-	transitionlist *translistptr;
-	transitionlist *tlptr;
+	Place *start;
+	Place *placeptr;
+	Place *p0;
+	Place *p1 = NULL;
+	Place *con;
+	Transition *transptr;
+//	TransitionList *trans_in_B;	//globaly defined
+//	TransitionList *checked_trans;
+//	PlaceList *places_in_B;
+	PlaceList *placelistptr;
+	PlaceList *plptr;
+	TransitionList *translistptr;
+	TransitionList *tlptr;
 	string ex_name;
 	string in_name;
 	string p0_name;
-//	bpel *new_code;
-	bpel *tmp_code;
-	bpel *tmp;
-	bpel *var;
+//	BPEL *new_code;
+	BPEL *tmp_code;
+	BPEL *tmp;
+	BPEL *var;
 
 	int return_value = 0;
 	int entr;
@@ -6905,8 +6910,8 @@ int owfn::reoccrepl_circlemultins()
 
 void owfn::reset_dfs()
 {
-	transition *transptr;
-	place *placeptr;
+	Transition *transptr;
+	Place *placeptr;
 	
 	transptr = transitions;
 	while(transptr != NULL)
@@ -6926,12 +6931,12 @@ void owfn::reset_dfs()
 }
 
 
-void owfn::dfs(place *startplace, transition *starttrans)
+void owfn::dfs(Place *startplace, Transition *starttrans)
 {
-	place *placeptr;
-	place *realplace;
-	stack *stackptr;
-	transition *realtrans;
+	Place *placeptr;
+	Place *realplace;
+	Stack *stackptr;
+	Transition *realtrans;
 	int stop;
 
 //Function with place
@@ -6942,7 +6947,7 @@ void owfn::dfs(place *startplace, transition *starttrans)
 		max_dfs++;
 
 		//push
-		dfs_stack = new stack(startplace, NULL, dfs_stack);
+		dfs_stack = new Stack(startplace, NULL, dfs_stack);
 		
 		//find all transitions that consume from startplace
 		realtrans = transitions;
@@ -7013,7 +7018,7 @@ void owfn::dfs(place *startplace, transition *starttrans)
 			max_dfs++;
 			
 			//push
-			dfs_stack = new stack(NULL, starttrans, dfs_stack);
+			dfs_stack = new Stack(NULL, starttrans, dfs_stack);
 			
 			//find all places that starttrans produces on
 			placeptr = starttrans->produces;
@@ -7087,14 +7092,14 @@ void owfn::dfs(place *startplace, transition *starttrans)
 }
 
 
-void owfn::in_to_in(place *start)
+void owfn::in_to_in(Place *start)
 {
-	transitionlist *transptr;
-	place *placeptr;
-	place *realplace;
-	place *prod;
-	placelist *placelistptr;
-	transitionlist *translistptr;
+	TransitionList *transptr;
+	Place *placeptr;
+	Place *realplace;
+	Place *prod;
+	PlaceList *placelistptr;
+	TransitionList *translistptr;
 
 //no place
 	if(start == NULL)
@@ -7118,7 +7123,7 @@ void owfn::in_to_in(place *start)
 				
 				if(translistptr == NULL)
 				{
-					trans_in_B = new transitionlist(transptr->transitionptr, trans_in_B);
+					trans_in_B = new TransitionList(transptr->transitionptr, trans_in_B);
 					prod = transptr->transitionptr->produces;
 					while(prod != NULL)
 					{
@@ -7145,7 +7150,7 @@ void owfn::in_to_in(place *start)
 							}
 							if(placelistptr == NULL)
 							{
-								places_in_B = new placelist(realplace, places_in_B);
+								places_in_B = new PlaceList(realplace, places_in_B);
 								in_to_in(realplace);
 							}else
 							{
@@ -7180,21 +7185,21 @@ int owfn::reoccrepl_circlemultexecution()
 #endif
 
 	int return_value = 0;
-	place *startplace;
-	place *placeptr;
-	transition *transptr;
-	stack *dfs_stackptr;
+	Place *startplace;
+	Place *placeptr;
+	Transition *transptr;
+	Stack *dfs_stackptr;
 	int counter;
 	int i;
 	int stop;
 	owfn *newoWFN;
-	transitionlist *translistptr;
-	placelist *placelistptr;
-	placelist *ps;
-	transitionlist *ts;
-	place *prevp;
-	transition *prevt;
-	place *con;
+	TransitionList *translistptr;
+	PlaceList *placelistptr;
+	PlaceList *ps;
+	TransitionList *ts;
+	Place *prevp;
+	Transition *prevt;
+	Place *con;
 
 
 	max_dfs = 0;
@@ -7288,7 +7293,7 @@ int owfn::reoccrepl_circlemultexecution()
 			{
 				if(transptr->lowlink == i)
 				{
-					trans_in_circle = new transitionlist(transptr, trans_in_circle);
+					trans_in_circle = new TransitionList(transptr, trans_in_circle);
 				}
 				transptr = transptr->next;
 			}
@@ -7297,7 +7302,7 @@ int owfn::reoccrepl_circlemultexecution()
 			{
 				if(placeptr->lowlink == i)
 				{
-					places_in_circle = new placelist(placeptr, places_in_circle);
+					places_in_circle = new PlaceList(placeptr, places_in_circle);
 				}
 				placeptr = placeptr->next;
 			}
@@ -7319,7 +7324,7 @@ int owfn::reoccrepl_circlemultexecution()
 						{
 							if(placeptr->name == placelistptr->placeptr->name)
 							{
-								inoutplaces = new placelist(placeptr, inoutplaces);
+								inoutplaces = new PlaceList(placeptr, inoutplaces);
 								counter = 1;
 							}
 							placeptr = placeptr->next;
@@ -7329,7 +7334,7 @@ int owfn::reoccrepl_circlemultexecution()
 						{
 							if(placeptr->name == placelistptr->placeptr->name)
 							{
-								inoutplaces = new placelist(placeptr, inoutplaces);
+								inoutplaces = new PlaceList(placeptr, inoutplaces);
 								counter = 1;
 							}
 							placeptr = placeptr->next;
@@ -7370,8 +7375,8 @@ int owfn::reoccrepl_circlemultexecution()
 						newoWFN = new owfn();
 						
 						//add new start and end place
-						newoWFN->places = new place(placelistptr->placeptr->name + "_circle_start", newoWFN->places);
-						newoWFN->places = new place(end_place->name + "_circle_end", newoWFN->places);
+						newoWFN->places = new Place(placelistptr->placeptr->name + "_circle_start", newoWFN->places);
+						newoWFN->places = new Place(end_place->name + "_circle_end", newoWFN->places);
 						
 						//move all places and transitions from here to the new oWFN
 						ps = places_in_B;
@@ -7464,7 +7469,7 @@ int owfn::reoccrepl_circlemultexecution()
 						
 						if(newoWFN->places != NULL)
 						{
-							transitions = new transition(newoWFN->places->name, transitions);
+							transitions = new Transition(newoWFN->places->name, transitions);
 							transitions->bpel_code = newoWFN->places->bpel_code;
 							delete(newoWFN->places);
 							delete(newoWFN);
@@ -7472,7 +7477,7 @@ int owfn::reoccrepl_circlemultexecution()
 						{
 							if(newoWFN->transitions != NULL)
 							{
-								transitions = new transition(newoWFN->transitions->name, transitions);
+								transitions = new Transition(newoWFN->transitions->name, transitions);
 								transitions->bpel_code = newoWFN->transitions->bpel_code;
 								delete(newoWFN->transitions);
 								delete(newoWFN);
@@ -7690,8 +7695,8 @@ void owfn::owfn_out()
 
 void owfn::owfn_to_file()
 {
-	place *placeptr;
-	transition *transptr;
+	Place *placeptr;
+	Transition *transptr;
 	
 	bpel_file.open(outfile, ios::out);
 
@@ -7823,13 +7828,13 @@ int owfn::check_subnet(string start, int is_trans, string trans_start_name, stri
     else
         execution = tmp + " lola_safety.tmp 2> lola_safety_result.tmp > /dev/null";
     
-	place *con;
-	place *placeptr;
-	placelist *plptr;
-	transitionlist *tlptr;
-	transition *transptr;
-	transitionlist *deltrans;
-	placelist *delplace;
+	Place *con;
+	Place *placeptr;
+	PlaceList *plptr;
+	TransitionList *tlptr;
+	Transition *transptr;
+	TransitionList *deltrans;
+	PlaceList *delplace;
 	
 	int stop;
 	int lola;
@@ -8102,7 +8107,7 @@ int owfn::check_subnet(string start, int is_trans, string trans_start_name, stri
 
 
 
-bpel *owfn::transform_subnet(string start)
+BPEL *owfn::transform_subnet(string start)
 {
 	//Alles unmarkierte mit empty/opaque markieren
 	flow_empty();
@@ -8115,12 +8120,12 @@ bpel *owfn::transform_subnet(string start)
 }
 
 
-void owfn::circle_subnet_p(place *start, place *search)
+void owfn::circle_subnet_p(Place *start, Place *search)
 {
-	place *con;
-	place *prod;
-	transitionlist *tlptr;
-	placelist *complist;
+	Place *con;
+	Place *prod;
+	TransitionList *tlptr;
+	PlaceList *complist;
 
 	tlptr = trans_in_B;
 	while(tlptr != NULL)
@@ -8147,7 +8152,7 @@ void owfn::circle_subnet_p(place *start, place *search)
 						}
 						if(complist == NULL)
 						{
-							seen_places = new placelist(start, seen_places);
+							seen_places = new PlaceList(start, seen_places);
 							circle_subnet_p(prod, start);
 						}
 					}
@@ -8163,12 +8168,12 @@ void owfn::circle_subnet_p(place *start, place *search)
 
 
 
-void owfn::circle_subnet_t(transition *start, transition *search)
+void owfn::circle_subnet_t(Transition *start, Transition *search)
 {
-	place *con;
-	place *prod;
-	transitionlist *tlptr;
-	transitionlist *complist;
+	Place *con;
+	Place *prod;
+	TransitionList *tlptr;
+	TransitionList *complist;
 	
 	prod = start->produces;
 	while(prod != NULL)
@@ -8195,7 +8200,7 @@ void owfn::circle_subnet_t(transition *start, transition *search)
 						}
 						if(complist == NULL)
 						{
-							seen_trans = new transitionlist(tlptr->transitionptr, seen_trans);
+							seen_trans = new TransitionList(tlptr->transitionptr, seen_trans);
 							circle_subnet_t(tlptr->transitionptr, search);
 						}
 					}
@@ -8212,10 +8217,10 @@ void owfn::circle_subnet_t(transition *start, transition *search)
 
 void owfn::create_subnet_copy()
 {
-	transitionlist *tlptr;
-	placelist *plptr;
-	place *tmpp;
-	transition *tmpt;
+	TransitionList *tlptr;
+	PlaceList *plptr;
+	Place *tmpp;
+	Transition *tmpt;
 
 	trans_original = NULL;
 	places_original = NULL;
@@ -8224,8 +8229,8 @@ void owfn::create_subnet_copy()
 	while(tlptr != NULL)
 	{
 		tmpt = tlptr->transitionptr;
-		trans_original = new transitionlist(tmpt, trans_original);
-		tlptr->transitionptr = new transition(tmpt->name);
+		trans_original = new TransitionList(tmpt, trans_original);
+		tlptr->transitionptr = new Transition(tmpt->name);
 		tlptr->transitionptr->bpel_code = copy_bpel(tmpt->bpel_code);
 		copy_links(tlptr->transitionptr->bpel_code);
 		
@@ -8249,8 +8254,8 @@ void owfn::create_subnet_copy()
 	while(plptr != NULL)
 	{
 		tmpp = plptr->placeptr;
-		places_original = new placelist(tmpp, places_original);
-		plptr->placeptr = new place(tmpp->name);
+		places_original = new PlaceList(tmpp, places_original);
+		plptr->placeptr = new Place(tmpp->name);
 		plptr->placeptr->bpel_code = copy_bpel(tmpp->bpel_code);
 		copy_links(plptr->placeptr->bpel_code);
 
@@ -8261,9 +8266,9 @@ void owfn::create_subnet_copy()
 
 void owfn::delete_subnet_copy(int inc_bpel)
 {
-	transitionlist *tlptr;
-	placelist *plptr;
-	bpel *tmp;
+	TransitionList *tlptr;
+	PlaceList *plptr;
+	BPEL *tmp;
 
 	while(trans_in_B != NULL)
 	{
@@ -8304,13 +8309,13 @@ void owfn::delete_subnet_copy(int inc_bpel)
 }
 
 
-int owfn::replace_place(place *start, string name)
+int owfn::replace_place(Place *start, string name)
 {
 	string newname;
-	transitionlist *tlptr;
-	placelist *plptr;
-	place *con;
-	bpel *tmp;
+	TransitionList *tlptr;
+	PlaceList *plptr;
+	Place *con;
+	BPEL *tmp;
 	int found;
 	
 	newname = start->name + name;
@@ -8371,15 +8376,15 @@ int owfn::reoccrepl_bigflows()
 	int length;
 	int max_length;
 	int stop;
-	place *placeptr;
-	transition *transptr;
-	placelist *all_p;
-	placelist *tmp;
-	transitionlist *all_t;
-	transitionlist *tmp_t;
-	transition *t;
-	place *con;
-	place *prod;
+	Place *placeptr;
+	Transition *transptr;
+	PlaceList *all_p;
+	PlaceList *tmp;
+	TransitionList *all_t;
+	TransitionList *tmp_t;
+	Transition *t;
+	Place *con;
+	Place *prod;
 	
 	length = 3;
 	stop = 0;
@@ -8405,7 +8410,7 @@ int owfn::reoccrepl_bigflows()
 				{
 					if(con->name == placeptr->name)
 					{
-						all_t = new transitionlist(t, all_t);
+						all_t = new TransitionList(t, all_t);
 					}
 					con = con->next;
 				}
@@ -8430,7 +8435,7 @@ int owfn::reoccrepl_bigflows()
 			prod = transptr->produces;
 			while(prod != NULL)
 			{
-				all_p = new placelist(prod, all_p);
+				all_p = new PlaceList(prod, all_p);
 				prod = prod->next;
 			}
 			stop = f_trans_end_a(transptr, length, NULL, all_p);
@@ -8463,8 +8468,8 @@ int owfn::reoccrepl_bigflows()
 
 void owfn::flow_empty()
 {
-	transitionlist *tlptr;
-	placelist *plptr;
+	TransitionList *tlptr;
+	PlaceList *plptr;
 	
 	tlptr = trans_in_B;
 	while(tlptr != NULL)
@@ -8500,10 +8505,10 @@ void owfn::flow_empty()
 
 void owfn::flow_switches()
 {
-	placelist *plptr;
-	place *con;
-	place *con_prev;
-	transitionlist *tlptr;
+	PlaceList *plptr;
+	Place *con;
+	Place *con_prev;
+	TransitionList *tlptr;
 	string placename;
 	string newplace;
 	int found;
@@ -8544,9 +8549,9 @@ void owfn::flow_switches()
 					if(con->name == plptr->placeptr->name)
 					{
 						plptr->placeptr->bpel_code->add_branch();
-						plptr->placeptr->bpel_code->branches->bpel_code = new bpel(EMPTY, NULL, "empty_after_switch");
+						plptr->placeptr->bpel_code->branches->bpel_code = new BPEL(EMPTY, NULL, "empty_after_switch");
 						//create link arc
-						links::increment();
+						Links::increment();
 						plptr->placeptr->bpel_code->branches->bpel_code->add_source();
 						tlptr->transitionptr->bpel_code->add_target(1);
 						//remove old arc
@@ -8576,10 +8581,10 @@ void owfn::flow_switches()
 
 void owfn::flow_links()
 {
-	transitionlist *tlptr;
-	place *plist;
-	placelist *plptr;
-	bpel *tmp;
+	TransitionList *tlptr;
+	Place *plist;
+	PlaceList *plptr;
+	BPEL *tmp;
 	
 	tlptr = trans_in_B;
 	while(tlptr != NULL)
@@ -8599,7 +8604,7 @@ void owfn::flow_links()
 			}
 
 			//turn arc from place to transition into a link
-			links::increment();
+			Links::increment();
 			plptr->placeptr->bpel_code->add_source();
 			tlptr->transitionptr->bpel_code->add_target(1);
 
@@ -8629,7 +8634,7 @@ void owfn::flow_links()
 			}
 
 			//turn arc from transition to place into a link
-			links::increment();
+			Links::increment();
 			plptr->placeptr->bpel_code->add_target(1);
 			tlptr->transitionptr->bpel_code->add_source();
 
@@ -8641,17 +8646,17 @@ void owfn::flow_links()
 }
 
 
-bpel *owfn::flow_create_flow(string start)
+BPEL *owfn::flow_create_flow(string start)
 {
-	transitionlist *tlptr;
-	placelist *plptr;
-	branch *newbranch;
-	bpel *list;
-	bpel *help;
-	bpel *final_code;
+	TransitionList *tlptr;
+	PlaceList *plptr;
+	Branch *newbranch;
+	BPEL *list;
+	BPEL *help;
+	BPEL *final_code;
 
 	//create new flow
-	final_code = new bpel(FLOW, NULL, "flow_subnet_" + start);
+	final_code = new BPEL(FLOW, NULL, "flow_subnet_" + start);
 
 	//add branch for every transition
 	tlptr = trans_in_B;
@@ -8707,13 +8712,13 @@ bpel *owfn::flow_create_flow(string start)
 
 void owfn::delete_subnet_original()
 {
-	transitionlist *tlptr;
-	placelist *plptr;
-	transition *prevt;
-	transition *transptr;
-	place *prevp;
-	place *placeptr;
-	bpel *tmp;
+	TransitionList *tlptr;
+	PlaceList *plptr;
+	Transition *prevt;
+	Transition *transptr;
+	Place *prevp;
+	Place *placeptr;
+	BPEL *tmp;
 
 	while(trans_original != NULL)
 	{
@@ -8797,8 +8802,8 @@ void owfn::delete_subnet_original()
 
 void owfn::remove_place_from_original(string name)
 {
-	placelist *plptr;
-	placelist *prev;
+	PlaceList *plptr;
+	PlaceList *prev;
 	
 	plptr = places_original;
 	prev = NULL;
@@ -8828,8 +8833,8 @@ void owfn::remove_place_from_original(string name)
 
 int owfn::remove_transition_from_original(string name)
 {
-	transitionlist *tlptr;
-	transitionlist *prev;
+	TransitionList *tlptr;
+	TransitionList *prev;
 	
 	tlptr = trans_original;
 	prev = NULL;
@@ -8861,14 +8866,14 @@ int owfn::remove_transition_from_original(string name)
 
 
 
-void owfn::replace_trans(transition *start, string name, string placename, int start_or_end)
+void owfn::replace_trans(Transition *start, string name, string placename, int start_or_end)
 {
 	string newname;
-	transitionlist *tlptr;
-	place *con;
-	bpel *tmp;
-	place *prev;
-	placelist *plptr;
+	TransitionList *tlptr;
+	Place *con;
+	BPEL *tmp;
+	Place *prev;
+	PlaceList *plptr;
 	
 	newname = start->name + name;
 
@@ -8987,35 +8992,35 @@ void owfn::replace_trans(transition *start, string name, string placename, int s
 }
 
 
-int owfn::f_trans_end(transition *start, int max, placelist *selected)
+int owfn::f_trans_end(Transition *start, int max, PlaceList *selected)
 {
 	int i;
-	placelist *plptr;
-	placelist *newplaces;
-	placelist *placelistptr;
-	placelist *tmp;
-	transitionlist *tlptr;
-	transitionlist *newtrans;
-	transitionlist *translistptr;
-	transition *transptr;
-	place *con;
-	place *prev;
-	place *realplace;
-	place *placeptr;
+	PlaceList *plptr;
+	PlaceList *newplaces;
+	PlaceList *placelistptr;
+	PlaceList *tmp;
+	TransitionList *tlptr;
+	TransitionList *newtrans;
+	TransitionList *translistptr;
+	Transition *transptr;
+	Place *con;
+	Place *prev;
+	Place *realplace;
+	Place *placeptr;
 
 	places_in_B = NULL;
 	trans_in_B = NULL;
 	newplaces = NULL;
 	newtrans = NULL;
-	//newtrans = new transitionlist(start, newtrans);
-	trans_in_B = new transitionlist(start, trans_in_B);
+	//newtrans = new TransitionList(start, newtrans);
+	trans_in_B = new TransitionList(start, trans_in_B);
 
 	tmp = selected;
 	while(tmp != NULL)
 	{
 		realplace = return_placeptr(tmp->placeptr->name);
-		places_in_B = new placelist(realplace, places_in_B);
-		newplaces = new placelist(realplace, newplaces);
+		places_in_B = new PlaceList(realplace, places_in_B);
+		newplaces = new PlaceList(realplace, newplaces);
 		tmp = tmp->next;
 	}
 
@@ -9040,8 +9045,8 @@ int owfn::f_trans_end(transition *start, int max, placelist *selected)
 						}
 						if(translistptr == NULL)
 						{
-							newtrans = new transitionlist(transptr, newtrans);
-							trans_in_B = new transitionlist(transptr, trans_in_B);
+							newtrans = new TransitionList(transptr, newtrans);
+							trans_in_B = new TransitionList(transptr, trans_in_B);
 						}
 					}
 					con = con->next;
@@ -9081,8 +9086,8 @@ int owfn::f_trans_end(transition *start, int max, placelist *selected)
 							cout << "Error 1 in function 'f_trans_end': Place '" << con->name << "' vanished. This should not happen...\n";
 							exit(EXIT_FAILURE);
 						}
-						newplaces = new placelist(realplace, newplaces);
-						places_in_B = new placelist(realplace, places_in_B);
+						newplaces = new PlaceList(realplace, newplaces);
+						places_in_B = new PlaceList(realplace, places_in_B);
 					}
 					con = con->next;
 				}
@@ -9104,8 +9109,8 @@ int owfn::f_trans_end(transition *start, int max, placelist *selected)
 		create_subnet_copy();
 		//Umbau Teilnetz zu Teilnetz mit Kopie des Startplatzes
 		//zusätzlicher Platz und Transition ersetzen
-		placeptr = new place(start->name + "_flow_subnet");
-		places_in_B = new placelist(placeptr, places_in_B);
+		placeptr = new Place(start->name + "_flow_subnet");
+		places_in_B = new PlaceList(placeptr, places_in_B);
 		replace_trans(start, "_flow_start", "_flow_subnet", 1);
 		//starttransition aus Original Teilnetz entfernen, damit dieser nicht mitgelöscht wird
 		if(!remove_transition_from_original(start->name))
@@ -9116,7 +9121,7 @@ int owfn::f_trans_end(transition *start, int max, placelist *selected)
 
 		if(check_subnet(start->name + "_flow_subnet", 1, start->name, ""))	//der Name des Platzes, der ganz oben steht, als Anfangsmarkierung für die LoLA Datei
 		{
-			places = new place(start->name + "_flow_subnet", places);
+			places = new Place(start->name + "_flow_subnet", places);
 
 			//alle Kanten von start auf nun nicht mehr vorhandene Plätze in B entfernen
 			prev = NULL;
@@ -9241,15 +9246,15 @@ int owfn::f_trans_end(transition *start, int max, placelist *selected)
 	}
 }
 
-int owfn::f_trans_end_a(transition *start, int max, placelist *fixed, placelist *all)
+int owfn::f_trans_end_a(Transition *start, int max, PlaceList *fixed, PlaceList *all)
 {
-	placelist *plptr;
-	placelist *tmpplptr;
-	placelist *tmp;
-	placelist *rest;
-	placelist *neu;
-	place *placeptr;
-	transition *transptr;
+	PlaceList *plptr;
+	PlaceList *tmpplptr;
+	PlaceList *tmp;
+	PlaceList *rest;
+	PlaceList *neu;
+	Place *placeptr;
+	Transition *transptr;
 	
 	rest = NULL;
 	
@@ -9258,7 +9263,7 @@ int owfn::f_trans_end_a(transition *start, int max, placelist *fixed, placelist 
 		tmpplptr = all;
 		while(tmpplptr != NULL)
 		{
-			rest = new placelist(tmpplptr->placeptr, rest);
+			rest = new PlaceList(tmpplptr->placeptr, rest);
 			tmpplptr = tmpplptr->next;
 		}
 	}else
@@ -9284,7 +9289,7 @@ int owfn::f_trans_end_a(transition *start, int max, placelist *fixed, placelist 
 		tmpplptr = tmpplptr->next;	//ein Element weiter
 		while(tmpplptr != NULL)
 		{
-			rest = new placelist(tmpplptr->placeptr, rest);
+			rest = new PlaceList(tmpplptr->placeptr, rest);
 			tmpplptr = tmpplptr->next;
 		}
 	}
@@ -9305,7 +9310,7 @@ int owfn::f_trans_end_a(transition *start, int max, placelist *fixed, placelist 
 		{
 			if(neu == NULL)
 			{
-				neu = new placelist(tmpplptr->placeptr, NULL);
+				neu = new PlaceList(tmpplptr->placeptr, NULL);
 			}else
 			{
 				tmp = neu;
@@ -9313,13 +9318,13 @@ int owfn::f_trans_end_a(transition *start, int max, placelist *fixed, placelist 
 				{
 					tmp = tmp->next;
 				}
-				tmp->next = new placelist(tmpplptr->placeptr, NULL);
+				tmp->next = new PlaceList(tmpplptr->placeptr, NULL);
 			}
 			tmpplptr = tmpplptr->next;
 		}
 		if(neu == NULL)
 		{
-			neu = new placelist(plptr->placeptr, NULL);
+			neu = new PlaceList(plptr->placeptr, NULL);
 		}else
 		{
 			tmp = neu;
@@ -9327,7 +9332,7 @@ int owfn::f_trans_end_a(transition *start, int max, placelist *fixed, placelist 
 			{
 				tmp = tmp->next;
 			}
-			tmp->next = new placelist(plptr->placeptr, NULL);
+			tmp->next = new PlaceList(plptr->placeptr, NULL);
 		}
 
 		//hier testen, ob start + fixed Elemente im Nachbereich + max Tiefe einen Treffer ergeben
@@ -9407,15 +9412,15 @@ int owfn::f_trans_end_a(transition *start, int max, placelist *fixed, placelist 
 	return 0;
 }
 
-int owfn::f_place_end_a(place *start, int max, transitionlist *fixed, transitionlist *all)
+int owfn::f_place_end_a(Place *start, int max, TransitionList *fixed, TransitionList *all)
 {
-	transitionlist *tlptr;
-	transitionlist *tl;
-	transitionlist *rest;
-	transitionlist *neu;
-	transitionlist *tmp;
-	place *placeptr;
-	transition *transptr;
+	TransitionList *tlptr;
+	TransitionList *tl;
+	TransitionList *rest;
+	TransitionList *neu;
+	TransitionList *tmp;
+	Place *placeptr;
+	Transition *transptr;
 	
 	rest = NULL;
 	
@@ -9424,7 +9429,7 @@ int owfn::f_place_end_a(place *start, int max, transitionlist *fixed, transition
 		tl = all;
 		while(tl != NULL)
 		{
-			rest = new transitionlist(tl->transitionptr, rest);
+			rest = new TransitionList(tl->transitionptr, rest);
 			tl = tl->next;
 		}
 	}else
@@ -9450,7 +9455,7 @@ int owfn::f_place_end_a(place *start, int max, transitionlist *fixed, transition
 		tl = tl->next;	//ein Element weiter
 		while(tl != NULL)
 		{
-			rest = new transitionlist(tl->transitionptr, rest);
+			rest = new TransitionList(tl->transitionptr, rest);
 			tl = tl->next;
 		}
 	}
@@ -9471,7 +9476,7 @@ int owfn::f_place_end_a(place *start, int max, transitionlist *fixed, transition
 		{
 			if(neu == NULL)
 			{
-				neu = new transitionlist(tl->transitionptr, NULL);
+				neu = new TransitionList(tl->transitionptr, NULL);
 			}else
 			{
 				tmp = neu;
@@ -9479,13 +9484,13 @@ int owfn::f_place_end_a(place *start, int max, transitionlist *fixed, transition
 				{
 					tmp = tmp->next;
 				}
-				tmp->next = new transitionlist(tl->transitionptr, NULL);
+				tmp->next = new TransitionList(tl->transitionptr, NULL);
 			}
 			tl = tl->next;
 		}
 		if(neu == NULL)
 		{
-			neu = new transitionlist(tlptr->transitionptr, NULL);
+			neu = new TransitionList(tlptr->transitionptr, NULL);
 		}else
 		{
 			tmp = neu;
@@ -9493,7 +9498,7 @@ int owfn::f_place_end_a(place *start, int max, transitionlist *fixed, transition
 			{
 				tmp = tmp->next;
 			}
-			tmp->next = new transitionlist(tlptr->transitionptr, NULL);
+			tmp->next = new TransitionList(tlptr->transitionptr, NULL);
 		}
 
 		//hier testen, ob start + fixed Elemente im Nachbereich + max Tiefe einen Treffer ergeben
@@ -9586,34 +9591,34 @@ int owfn::f_place_end_a(place *start, int max, transitionlist *fixed, transition
 }
 
 
-int owfn::f_place_end(place *start, int max, transitionlist *selected)
+int owfn::f_place_end(Place *start, int max, TransitionList *selected)
 {
 	//funktion erzeugt Teilnetz mit allen Knoten im Nachbereich von Start
 
 	int i;
-	placelist *plptr;
-	placelist *newplaces;
-	placelist *placelistptr;
-	transitionlist *tlptr;
-	transitionlist *newtrans;
-	transitionlist *translistptr;
-	transitionlist *tmp;
-	transition *transptr;
-	place *con;
-	place *realplace;
+	PlaceList *plptr;
+	PlaceList *newplaces;
+	PlaceList *placelistptr;
+	TransitionList *tlptr;
+	TransitionList *newtrans;
+	TransitionList *translistptr;
+	TransitionList *tmp;
+	Transition *transptr;
+	Place *con;
+	Place *realplace;
 
 	places_in_B = NULL;
 	trans_in_B = NULL;
 	newplaces = NULL;
 	newtrans = NULL;
-//	newplaces = new placelist(start, newplaces);
-	places_in_B = new placelist(start, places_in_B);
+//	newplaces = new PlaceList(start, newplaces);
+	places_in_B = new PlaceList(start, places_in_B);
 	
 	tmp = selected;
 	while(tmp != NULL)
 	{
-		trans_in_B = new transitionlist(tmp->transitionptr, trans_in_B);
-		newtrans = new transitionlist(tmp->transitionptr, newtrans);
+		trans_in_B = new TransitionList(tmp->transitionptr, trans_in_B);
+		newtrans = new TransitionList(tmp->transitionptr, newtrans);
 		tmp = tmp->next;
 	}
 
@@ -9639,8 +9644,8 @@ int owfn::f_place_end(place *start, int max, transitionlist *selected)
 						cout << "Error 1 in function 'f_place_end': Place '" << con->name << "' vanished. This should not happen...\n";
 						exit(EXIT_FAILURE);
 					}
-					newplaces = new placelist(realplace, newplaces);
-					places_in_B = new placelist(realplace, places_in_B);
+					newplaces = new PlaceList(realplace, newplaces);
+					places_in_B = new PlaceList(realplace, places_in_B);
 				}
 				con = con->next;
 			}
@@ -9676,8 +9681,8 @@ int owfn::f_place_end(place *start, int max, transitionlist *selected)
 							}
 							if(translistptr == NULL)
 							{
-								newtrans = new transitionlist(transptr, newtrans);
-								trans_in_B = new transitionlist(transptr, trans_in_B);
+								newtrans = new TransitionList(transptr, newtrans);
+								trans_in_B = new TransitionList(transptr, trans_in_B);
 							}
 						}
 						con = con->next;
@@ -9711,7 +9716,7 @@ int owfn::f_place_end(place *start, int max, transitionlist *selected)
 
 		if(check_subnet(start->name + "_flow_start", 0, "", ""))
 		{
-			transitions = new transition(start->name + "_flow_subnet", transitions);
+			transitions = new Transition(start->name + "_flow_subnet", transitions);
 			transitions->add_consume(start->name);
 			transitions->bpel_code = transform_subnet(start->name);
 			
@@ -9779,35 +9784,35 @@ int owfn::f_place_end(place *start, int max, transitionlist *selected)
 }
 
 
-int owfn::f_place_to_place(place *start, int max, transitionlist *selected, place *ende)
+int owfn::f_place_to_place(Place *start, int max, TransitionList *selected, Place *ende)
 {
 	//funktion erzeugt Teilnetz mit allen Knoten im Nachbereich von Start bis Ende
 
 	int i;
 	int counter;
-	placelist *plptr;
-	placelist *newplaces;
-	placelist *placelistptr;
-	transitionlist *tlptr;
-	transitionlist *newtrans;
-	transitionlist *translistptr;
-	transitionlist *tmp;
-	transition *transptr;
-	place *con;
-	place *realplace;
+	PlaceList *plptr;
+	PlaceList *newplaces;
+	PlaceList *placelistptr;
+	TransitionList *tlptr;
+	TransitionList *newtrans;
+	TransitionList *translistptr;
+	TransitionList *tmp;
+	Transition *transptr;
+	Place *con;
+	Place *realplace;
 
 	places_in_B = NULL;
 	trans_in_B = NULL;
 	newplaces = NULL;
 	newtrans = NULL;
-//	newplaces = new placelist(start, newplaces);
-	places_in_B = new placelist(start, places_in_B);
+//	newplaces = new PlaceList(start, newplaces);
+	places_in_B = new PlaceList(start, places_in_B);
 	
 	tmp = selected;
 	while(tmp != NULL)
 	{
-		trans_in_B = new transitionlist(tmp->transitionptr, trans_in_B);
-		newtrans = new transitionlist(tmp->transitionptr, newtrans);
+		trans_in_B = new TransitionList(tmp->transitionptr, trans_in_B);
+		newtrans = new TransitionList(tmp->transitionptr, newtrans);
 		tmp = tmp->next;
 	}
 
@@ -9865,8 +9870,8 @@ int owfn::f_place_to_place(place *start, int max, transitionlist *selected, plac
 						cout << "Error 1 in function 'f_place_to_place': Place '" << con->name << "' vanished. This should not happen...\n";
 						exit(EXIT_FAILURE);
 					}
-					newplaces = new placelist(realplace, newplaces);
-					places_in_B = new placelist(realplace, places_in_B);
+					newplaces = new PlaceList(realplace, newplaces);
+					places_in_B = new PlaceList(realplace, places_in_B);
 				}
 				con = con->next;
 			}
@@ -9906,8 +9911,8 @@ int owfn::f_place_to_place(place *start, int max, transitionlist *selected, plac
 								}
 								if(translistptr == NULL)
 								{
-									newtrans = new transitionlist(transptr, newtrans);
-									trans_in_B = new transitionlist(transptr, trans_in_B);
+									newtrans = new TransitionList(transptr, newtrans);
+									trans_in_B = new TransitionList(transptr, trans_in_B);
 								}
 							}
 							con = con->next;
@@ -9997,7 +10002,7 @@ int owfn::f_place_to_place(place *start, int max, transitionlist *selected, plac
 
 		if(check_subnet(start->name + "_flow_start", 0, "", ""))
 		{
-			transitions = new transition(start->name + "_flow_subnet", transitions);
+			transitions = new Transition(start->name + "_flow_subnet", transitions);
 			transitions->add_consume(start->name);
 			transitions->add_produce(ende->name);
 			transitions->bpel_code = transform_subnet(start->name);
@@ -10066,35 +10071,35 @@ int owfn::f_place_to_place(place *start, int max, transitionlist *selected, plac
 }
 
 
-int owfn::f_place_circle(place *start, int max, transitionlist *selected)
+int owfn::f_place_circle(Place *start, int max, TransitionList *selected)
 {
 	//funktion erzeugt Teilnetz mit allen Knoten im Nachbereich von Start bis Ende
 
 	int i;
 	int counter;
-	placelist *plptr;
-	placelist *newplaces;
-	placelist *placelistptr;
-	transitionlist *tlptr;
-	transitionlist *newtrans;
-	transitionlist *translistptr;
-	transitionlist *tmp;
-	transition *transptr;
-	place *con;
-	place *realplace;
+	PlaceList *plptr;
+	PlaceList *newplaces;
+	PlaceList *placelistptr;
+	TransitionList *tlptr;
+	TransitionList *newtrans;
+	TransitionList *translistptr;
+	TransitionList *tmp;
+	Transition *transptr;
+	Place *con;
+	Place *realplace;
 
 	places_in_B = NULL;
 	trans_in_B = NULL;
 	newplaces = NULL;
 	newtrans = NULL;
-//	newplaces = new placelist(start, newplaces);
-	places_in_B = new placelist(start, places_in_B);
+//	newplaces = new PlaceList(start, newplaces);
+	places_in_B = new PlaceList(start, places_in_B);
 	
 	tmp = selected;
 	while(tmp != NULL)
 	{
-		trans_in_B = new transitionlist(tmp->transitionptr, trans_in_B);
-		newtrans = new transitionlist(tmp->transitionptr, newtrans);
+		trans_in_B = new TransitionList(tmp->transitionptr, trans_in_B);
+		newtrans = new TransitionList(tmp->transitionptr, newtrans);
 		tmp = tmp->next;
 	}
 
@@ -10152,8 +10157,8 @@ int owfn::f_place_circle(place *start, int max, transitionlist *selected)
 						cout << "Error 1 in function 'f_place_circle': Place '" << con->name << "' vanished. This should not happen...\n";
 						exit(EXIT_FAILURE);
 					}
-					newplaces = new placelist(realplace, newplaces);
-					places_in_B = new placelist(realplace, places_in_B);
+					newplaces = new PlaceList(realplace, newplaces);
+					places_in_B = new PlaceList(realplace, places_in_B);
 				}
 				con = con->next;
 			}
@@ -10193,8 +10198,8 @@ int owfn::f_place_circle(place *start, int max, transitionlist *selected)
 								}
 								if(translistptr == NULL)
 								{
-									newtrans = new transitionlist(transptr, newtrans);
-									trans_in_B = new transitionlist(transptr, trans_in_B);
+									newtrans = new TransitionList(transptr, newtrans);
+									trans_in_B = new TransitionList(transptr, trans_in_B);
 								}
 							}
 							con = con->next;
@@ -10250,7 +10255,7 @@ int owfn::f_place_circle(place *start, int max, transitionlist *selected)
 	{
 		//Kopie des gesamten Teilnetzes erstellen
 		create_subnet_copy();
-		places_in_B = new placelist(new place(start->name + "_flow_ende"), places_in_B);
+		places_in_B = new PlaceList(new Place(start->name + "_flow_ende"), places_in_B);
 		//Umbau Teilnetz zu Teilnetz mit Kopie des Start- und Endeplatzes
 		//start ist nun zweimal in der Platzmenge enthalten (falls wirklich ein Zyklus gefunden wurde)
 		if(!(replace_place_circle(start, "_flow_start", "_flow_ende")))
@@ -10266,7 +10271,7 @@ int owfn::f_place_circle(place *start, int max, transitionlist *selected)
 
 		if(check_subnet(start->name + "_flow_start", 0, "", ""))
 		{
-			transitions = new transition(start->name + "_flow_subnet", transitions);
+			transitions = new Transition(start->name + "_flow_subnet", transitions);
 			transitions->add_consume(start->name);
 			transitions->add_produce(start->name);
 			transitions->bpel_code = transform_subnet(start->name);
@@ -10337,14 +10342,14 @@ int owfn::f_place_circle(place *start, int max, transitionlist *selected)
 
 
 
-int owfn::replace_place_circle(place *start, string startname, string endname)
+int owfn::replace_place_circle(Place *start, string startname, string endname)
 {
 	string newstart;
 	string newende;
-	transitionlist *tlptr;
-	placelist *plptr;
-	place *con;
-	bpel *tmp;
+	TransitionList *tlptr;
+	PlaceList *plptr;
+	Place *con;
+	BPEL *tmp;
 	int found;
 	
 	newstart = start->name + startname;
@@ -10400,36 +10405,36 @@ int owfn::replace_place_circle(place *start, string startname, string endname)
 }
 
 
-int owfn::f_place_to_trans(place *start, int max, transitionlist *selected, transition *ende)
+int owfn::f_place_to_trans(Place *start, int max, TransitionList *selected, Transition *ende)
 {
 	//funktion erzeugt Teilnetz mit allen Knoten im Nachbereich von Start bis Ende
 
 	int i;
 	int counter;
-	placelist *plptr;
-	placelist *newplaces;
-	placelist *placelistptr;
-	transitionlist *tlptr;
-	transitionlist *newtrans;
-	transitionlist *translistptr;
-	transitionlist *tmp;
-	transition *transptr;
-	place *con;
-	place *prev;
-	place *realplace;
+	PlaceList *plptr;
+	PlaceList *newplaces;
+	PlaceList *placelistptr;
+	TransitionList *tlptr;
+	TransitionList *newtrans;
+	TransitionList *translistptr;
+	TransitionList *tmp;
+	Transition *transptr;
+	Place *con;
+	Place *prev;
+	Place *realplace;
 
 	places_in_B = NULL;
 	trans_in_B = NULL;
 	newplaces = NULL;
 	newtrans = NULL;
-//	newplaces = new placelist(start, newplaces);
-	places_in_B = new placelist(start, places_in_B);
+//	newplaces = new PlaceList(start, newplaces);
+	places_in_B = new PlaceList(start, places_in_B);
 	
 	tmp = selected;
 	while(tmp != NULL)
 	{
-		trans_in_B = new transitionlist(tmp->transitionptr, trans_in_B);
-		newtrans = new transitionlist(tmp->transitionptr, newtrans);
+		trans_in_B = new TransitionList(tmp->transitionptr, trans_in_B);
+		newtrans = new TransitionList(tmp->transitionptr, newtrans);
 		tmp = tmp->next;
 	}
 
@@ -10489,8 +10494,8 @@ int owfn::f_place_to_trans(place *start, int max, transitionlist *selected, tran
 							cout << "Error 1 in function 'f_place_to_trans': Place '" << con->name << "' vanished. This should not happen...\n";
 							exit(EXIT_FAILURE);
 						}
-						newplaces = new placelist(realplace, newplaces);
-						places_in_B = new placelist(realplace, places_in_B);
+						newplaces = new PlaceList(realplace, newplaces);
+						places_in_B = new PlaceList(realplace, places_in_B);
 					}
 					con = con->next;
 				}
@@ -10529,8 +10534,8 @@ int owfn::f_place_to_trans(place *start, int max, transitionlist *selected, tran
 							}
 							if(translistptr == NULL)
 							{
-								newtrans = new transitionlist(transptr, newtrans);
-								trans_in_B = new transitionlist(transptr, trans_in_B);
+								newtrans = new TransitionList(transptr, newtrans);
+								trans_in_B = new TransitionList(transptr, trans_in_B);
 							}
 						}
 						con = con->next;
@@ -10617,7 +10622,7 @@ int owfn::f_place_to_trans(place *start, int max, transitionlist *selected, tran
 			return 0;
 		}
 		replace_trans(ende, "_flow_end", "_flow_end", 0);
-		places_in_B = new placelist(new place(ende->name + "_flow_end"), places_in_B);
+		places_in_B = new PlaceList(new Place(ende->name + "_flow_end"), places_in_B);
 		
 		//Startplatz und Endetransition aus Original Teilnetz entfernen, damit diese nicht mitgelöscht werden
 		remove_place_from_original(start->name);
@@ -10628,11 +10633,11 @@ int owfn::f_place_to_trans(place *start, int max, transitionlist *selected, tran
 
 		if(check_subnet(start->name + "_flow_start", 0, "", ""))
 		{
-			transitions = new transition(start->name + "_flow_subnet", transitions);
+			transitions = new Transition(start->name + "_flow_subnet", transitions);
 			transitions->add_consume(start->name);
 			transitions->add_produce(start->name + "_flow_subnet_end");
 			transitions->bpel_code = transform_subnet(start->name);
-			places = new place(start->name + "_flow_subnet_end", places);
+			places = new Place(start->name + "_flow_subnet_end", places);
 
 
 			//es müssen alle Kanten entfernt werden, die aus B auf ende gezeigt haben
@@ -10731,36 +10736,36 @@ int owfn::f_place_to_trans(place *start, int max, transitionlist *selected, tran
 }
 
 
-int owfn::f_trans_to_place(transition *start, int max, placelist *selected, place *ende)
+int owfn::f_trans_to_place(Transition *start, int max, PlaceList *selected, Place *ende)
 {
 	//funktion erzeugt Teilnetz mit allen Knoten im Nachbereich von Start bis Ende
 
 	int i;
 	int counter;
-	placelist *plptr;
-	placelist *newplaces;
-	placelist *placelistptr;
-	transitionlist *tlptr;
-	transitionlist *newtrans;
-	transitionlist *translistptr;
-	placelist *tmp;
-	transition *transptr;
-	place *con;
-	place *prev;
-	place *realplace;
+	PlaceList *plptr;
+	PlaceList *newplaces;
+	PlaceList *placelistptr;
+	TransitionList *tlptr;
+	TransitionList *newtrans;
+	TransitionList *translistptr;
+	PlaceList *tmp;
+	Transition *transptr;
+	Place *con;
+	Place *prev;
+	Place *realplace;
 
 	places_in_B = NULL;
 	trans_in_B = NULL;
 	newplaces = NULL;
 	newtrans = NULL;
-	trans_in_B = new transitionlist(start, trans_in_B);
+	trans_in_B = new TransitionList(start, trans_in_B);
 
 	tmp = selected;
 	while(tmp != NULL)
 	{
 		realplace = return_placeptr(tmp->placeptr->name);
-		places_in_B = new placelist(realplace, places_in_B);
-		newplaces = new placelist(realplace, newplaces);
+		places_in_B = new PlaceList(realplace, places_in_B);
+		newplaces = new PlaceList(realplace, newplaces);
 		tmp = tmp->next;
 	}
 
@@ -10789,8 +10794,8 @@ int owfn::f_trans_to_place(transition *start, int max, placelist *selected, plac
 							}
 							if(translistptr == NULL)
 							{
-								newtrans = new transitionlist(transptr, newtrans);
-								trans_in_B = new transitionlist(transptr, trans_in_B);
+								newtrans = new TransitionList(transptr, newtrans);
+								trans_in_B = new TransitionList(transptr, trans_in_B);
 							}
 						}
 						con = con->next;
@@ -10896,8 +10901,8 @@ int owfn::f_trans_to_place(transition *start, int max, placelist *selected, plac
 							cout << "Error 1 in function 'f_trans_to_place': Place '" << con->name << "' vanished. This should not happen...\n";
 							exit(EXIT_FAILURE);
 						}
-						newplaces = new placelist(realplace, newplaces);
-						places_in_B = new placelist(realplace, places_in_B);
+						newplaces = new PlaceList(realplace, newplaces);
+						places_in_B = new PlaceList(realplace, places_in_B);
 					}
 					con = con->next;
 				}
@@ -10920,7 +10925,7 @@ int owfn::f_trans_to_place(transition *start, int max, placelist *selected, plac
 		create_subnet_copy();
 
 		//zusätzlicher Platz und Transition ersetzen
-		places_in_B = new placelist(new place(start->name + "_flow_subnet"), places_in_B);
+		places_in_B = new PlaceList(new Place(start->name + "_flow_subnet"), places_in_B);
 		replace_trans(start, "_flow_start", "_flow_subnet", 1);
 		//starttransition aus Original Teilnetz entfernen, damit dieser nicht mitgelöscht wird
 		if(!remove_transition_from_original(start->name))
@@ -10955,7 +10960,7 @@ int owfn::f_trans_to_place(transition *start, int max, placelist *selected, plac
 
 		if(check_subnet(start->name + "_flow_subnet", 1, start->name, ""))	//der Name des Platzes, der ganz oben steht, als Anfangsmarkierung für die LoLA Datei
 		{
-			places = new place(start->name + "_flow_subnet", places);
+			places = new Place(start->name + "_flow_subnet", places);
 			
 			//alle Kanten von start auf nun nicht mehr vorhandene Plätze in B entfernen
 			prev = NULL;
@@ -11017,7 +11022,7 @@ int owfn::f_trans_to_place(transition *start, int max, placelist *selected, plac
 			start->add_produce(start->name + "_flow_subnet");
 			places->bpel_code = transform_subnet(start->name);
 			
-			transitions = new transition(start->name + "_flow_subnet", transitions);
+			transitions = new Transition(start->name + "_flow_subnet", transitions);
 			transitions->add_consume(start->name + "_flow_subnet");
 			transitions->add_produce(ende->name);
 			transitions->add_bpel(EMPTY, start->name + "_flow_subnet");
@@ -11085,36 +11090,36 @@ int owfn::f_trans_to_place(transition *start, int max, placelist *selected, plac
 	}
 }
 
-int owfn::f_trans_to_trans(transition *start, int max, placelist *selected, transition *ende)
+int owfn::f_trans_to_trans(Transition *start, int max, PlaceList *selected, Transition *ende)
 {
 	//funktion erzeugt Teilnetz mit allen Knoten im Nachbereich von Start bis Ende
 
 	int i;
 	int counter;
-	placelist *plptr;
-	placelist *newplaces;
-	placelist *placelistptr;
-	transitionlist *tlptr;
-	transitionlist *newtrans;
-	transitionlist *translistptr;
-	placelist *tmp;
-	transition *transptr;
-	place *con;
-	place *prev;
-	place *realplace;
+	PlaceList *plptr;
+	PlaceList *newplaces;
+	PlaceList *placelistptr;
+	TransitionList *tlptr;
+	TransitionList *newtrans;
+	TransitionList *translistptr;
+	PlaceList *tmp;
+	Transition *transptr;
+	Place *con;
+	Place *prev;
+	Place *realplace;
 
 	places_in_B = NULL;
 	trans_in_B = NULL;
 	newplaces = NULL;
 	newtrans = NULL;
-	trans_in_B = new transitionlist(start, trans_in_B);
+	trans_in_B = new TransitionList(start, trans_in_B);
 
 	tmp = selected;
 	while(tmp != NULL)
 	{
 		realplace = return_placeptr(tmp->placeptr->name);
-		places_in_B = new placelist(realplace, places_in_B);
-		newplaces = new placelist(realplace, newplaces);
+		places_in_B = new PlaceList(realplace, places_in_B);
+		newplaces = new PlaceList(realplace, newplaces);
 		tmp = tmp->next;
 	}
 
@@ -11141,8 +11146,8 @@ int owfn::f_trans_to_trans(transition *start, int max, placelist *selected, tran
 						}
 						if(translistptr == NULL)
 						{
-							newtrans = new transitionlist(transptr, newtrans);
-							trans_in_B = new transitionlist(transptr, trans_in_B);
+							newtrans = new TransitionList(transptr, newtrans);
+							trans_in_B = new TransitionList(transptr, trans_in_B);
 						}
 					}
 					con = con->next;
@@ -11248,8 +11253,8 @@ int owfn::f_trans_to_trans(transition *start, int max, placelist *selected, tran
 								cout << "Error 1 in function 'f_trans_to_trans': Place '" << con->name << "' vanished. This should not happen...\n";
 								exit(EXIT_FAILURE);
 							}
-							newplaces = new placelist(realplace, newplaces);
-							places_in_B = new placelist(realplace, places_in_B);
+							newplaces = new PlaceList(realplace, newplaces);
+							places_in_B = new PlaceList(realplace, places_in_B);
 						}
 						con = con->next;
 					}
@@ -11298,10 +11303,10 @@ int owfn::f_trans_to_trans(transition *start, int max, placelist *selected, tran
 			return 0;
 		}
 		replace_trans(ende, "_flow_end", "_flow_end", 0);
-		places_in_B = new placelist(new place(ende->name + "_flow_end"), places_in_B);
+		places_in_B = new PlaceList(new Place(ende->name + "_flow_end"), places_in_B);
 
 		//zusätzlicher Platz und Transition ersetzen
-		places_in_B = new placelist(new place(start->name + "_flow_subnet"), places_in_B);
+		places_in_B = new PlaceList(new Place(start->name + "_flow_subnet"), places_in_B);
 		replace_trans(start, "_flow_start", "_flow_subnet", 1);
 
 		//starttransition aus Original Teilnetz entfernen, damit dieser nicht mitgelöscht wird
@@ -11403,7 +11408,7 @@ int owfn::f_trans_to_trans(transition *start, int max, placelist *selected, tran
 				}
 			}
 
-			places = new place(start->name + "_flow_subnet", places);
+			places = new Place(start->name + "_flow_subnet", places);
 			start->add_produce(start->name + "_flow_subnet");
 			ende->add_consume(start->name + "_flow_subnet");
 			places->bpel_code = transform_subnet(start->name);
@@ -11474,8 +11479,8 @@ int owfn::f_trans_to_trans(transition *start, int max, placelist *selected, tran
 
 void owfn::rename_place(string placename, string addition)
 {
-	place *placeptr;
-	transition *transptr;
+	Place *placeptr;
+	Transition *transptr;
 	
 	placeptr = places;
 	while(placeptr != NULL && placeptr->name != placename)

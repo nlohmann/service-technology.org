@@ -23,28 +23,44 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-
+#include "Transition.h"
+#include "BPEL.h"
 #include "classes.h"
 
-using namespace std;
+using std::string;
+using std::cout;
+using std::endl;
 
 
-void transition::add_consume(string str)
+//constructor
+Transition::Transition(string str, Transition *ptr) :
+    name(str),
+    consumes(NULL),
+    produces(NULL),
+    bpel_code(NULL),
+    next(ptr),
+    dfs(-1),
+    lowlink(-1)    
 {
-	consumes = new place(str, consumes);
 }
 
-void transition::add_produce(string str)
+
+void Transition::add_consume(string str)
 {
-	produces = new place(str, produces);
+	consumes = new Place(str, consumes);
+}
+
+void Transition::add_produce(string str)
+{
+	produces = new Place(str, produces);
 }
 
 
-void transition::del_produces()
+void Transition::del_produces()
 {
-	place *ptr;
-	place *help;
-
+	Place *ptr;
+	Place *help;
+    
 	ptr = produces;
 	while(ptr != NULL)
 	{
@@ -52,15 +68,15 @@ void transition::del_produces()
 		ptr = ptr->next;
 		delete(help);
 	}
-
+    
 	produces = NULL;
 }
 
-void transition::del_consumes()
+void Transition::del_consumes()
 {
-	place *ptr;
-	place *help;
-
+	Place *ptr;
+	Place *help;
+    
 	ptr = consumes;
 	while(ptr != NULL)
 	{
@@ -68,15 +84,15 @@ void transition::del_consumes()
 		ptr = ptr->next;
 		delete(help);
 	}
-
+    
 	consumes = NULL;
 }
 
-void transition::del_lists()
+void Transition::del_lists()
 {
-	place *ptr;
-	place *help;
-
+	Place *ptr;
+	Place *help;
+    
 	ptr = produces;
 	while(ptr != NULL)
 	{
@@ -91,45 +107,45 @@ void transition::del_lists()
 		ptr = ptr->next;
 		delete(help);
 	}
-
+    
 	produces = NULL;
 	consumes = NULL;
 }
 
-void transition::add_bpel(int bpel_id)
+void Transition::add_bpel(int bpel_id)
 {
-	bpel_code = new bpel(bpel_id, bpel_code);
+	bpel_code = new BPEL(bpel_id, bpel_code);
 }
 
-void transition::add_bpel(int bpel_id, string name)
+void Transition::add_bpel(int bpel_id, string name)
 {
-	bpel_code = new bpel(bpel_id, bpel_code, name);
+	bpel_code = new BPEL(bpel_id, bpel_code, name);
 }
 
-void transition::add_last_bpel(int bpel_id, string name)
+void Transition::add_last_bpel(int bpel_id, string name)
 {
-	bpel *tmp;
+	BPEL *tmp;
 	
 	tmp = bpel_code;
-
+    
 	if(tmp == NULL)
 	{
-		bpel_code = new bpel(bpel_id, bpel_code, name);
+		bpel_code = new BPEL(bpel_id, bpel_code, name);
 	}else
 	{
 		while(tmp->next != NULL)
 		{
 			tmp = tmp->next;
 		}
-		tmp->next = new bpel(bpel_id, NULL, name);
+		tmp->next = new BPEL(bpel_id, NULL, name);
 	}
 }
 
 
-void transition::append_bpel(bpel *list)
+void Transition::append_bpel(BPEL *list)
 {
-	bpel *help;
-
+	BPEL *help;
+    
 	if(list != NULL)
 	{
 		help = list;
@@ -142,9 +158,9 @@ void transition::append_bpel(bpel *list)
 	}	//else nothing to do
 }
 
-void transition::out()
+void Transition::out()
 {
-	place *tmpplaces;
+	Place *tmpplaces;
 	cout << endl << "Transition: '" << name << "'" << " (dfs: " << dfs << ", lowlink: " << lowlink << ")" << endl;
 	tmpplaces = consumes;
 	cout << "   Consumes: ";
@@ -167,16 +183,16 @@ void transition::out()
 		next->out();
 }
 
-void transition::pure_out()
+void Transition::pure_out()
 {
 	cout << "Transition: '" << name << "'" << endl;;
 	if(next != NULL)
 		next->pure_out();
 }
 
-void transition::owfn_out()
+void Transition::owfn_out()
 {
-	place *tmpplaces;
+	Place *tmpplaces;
 	cout << endl << "TRANSITION " << name << endl << "CONSUME" << endl;
 	tmpplaces = consumes;
 	if(tmpplaces == NULL)
@@ -197,7 +213,7 @@ void transition::owfn_out()
 		
 		tmpplaces = tmpplaces->next;
 	}
-
+    
 	tmpplaces = produces;
 	if(tmpplaces == NULL)
 	{
@@ -217,14 +233,14 @@ void transition::owfn_out()
 		
 		tmpplaces = tmpplaces->next;
 	}
-
+    
 	if(next != NULL)
 		next->owfn_out();
 }
 
-void transition::list_out()
+void Transition::list_out()
 {
-	place *tmpplaces;
+	Place *tmpplaces;
 	cout << endl << "Transition: '" << name << "'" << endl;
 	tmpplaces = consumes;
 	cout << "   Consumes: ";
@@ -245,18 +261,16 @@ void transition::list_out()
 
 
 
-void transitionlist::out()
+void TransitionList::out()
 {
 	cout << "Transition: " << transitionptr->name << endl;
 	if(next != NULL)
 		next->out();
 }
 
-void transitionlist::list_out()
+void TransitionList::list_out()
 {
 	transitionptr->list_out();
 	if(next != NULL)
 		next->list_out();
 }
-
-

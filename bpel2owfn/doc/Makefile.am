@@ -27,10 +27,9 @@
 # Version $Revision: 1.26 $
 
 
-# the manual
 info_TEXINFOS = bpel2owfn.texi
 
-bpel2owfn_TEXINFOS = fdl.texi \
+bpel2owfn_TEXINFOS = fdl.texi ChangeLog.texi \
 		     images/bpel2owfn.eps \
 		     images/example.eps \
 		     images/toolchain.eps \
@@ -59,34 +58,26 @@ bpel2owfn_TEXINFOS = fdl.texi \
 		     images/rb2.png \
 		     images/diagram.png
 
-# the installation manual
-install_TEXINFOS = install.texi
+TEXINFO_TEX = texinfo.tex
 
-CLEANFILES = install.aux \
-	     install.dvi \
-	     install.ky \
-	     install.pdf \
-	     install.toc \
-	     install.vr \
-	     install.cp \
-	     install.fn \
-	     install.log \
-	     install.pg \
-	     install.tmp \
-	     install.cps \
-	     install.tp \
-	     *~ \
-	     -fr manual
-
-EXTRA_DIST = install.texi gendocs.sh gendocs_template
+EXTRA_DIST = gendocs.sh gendocs_template semantics.pdf
 
 
-# rules to create the distribution documentation
-hu-createdistdocs: install.texi
-	$(MAKEINFO) $< -oinstall.txt --no-split --no-headers --no-number-section
-	sed -n '/BEGIN OF README/,/END OF README/w ../README' install.txt
-	sed -n '/BEGIN OF ChangeLog/,/END OF ChangeLog/w ../ChangeLog' install.txt
-	sed -n '/BEGIN OF AUTHORS/,/END OF AUTHORS/w ../AUTHORS' install.txt
-	sed -n '/BEGIN OF INSTALL/,/END OF INSTALL/w ../INSTALL' install.txt
-	rm install.txt
-	./gendocs.sh bpel2owfn "$(PACKAGE_STRING)"
+#############################################################################
+# create ASCII ChangeLog out of Texinfo
+#############################################################################
+../ChangeLog: ChangeLog.texi
+	$(MAKEINFO) -o ChangeLog.txt --no-split --no-headers --fill-column=78 bpel2owfn.texi
+	$(SED) -n '/procrastination/,/The most recent change log/w ChangeLog2.txt' ChangeLog.txt
+	$(SED) '1,2d' ChangeLog2.txt | $(SED) -e '$$d' | $(SED) -e '$$d' > ChangeLog.txt
+	rm ChangeLog2.txt
+	head -n8 ../README > ../ChangeLog
+	cat ChangeLog.txt >> ../ChangeLog
+	rm ChangeLog.txt
+
+
+#############################################################################
+# run the "gendocs.sh" script to create a manual in several formats
+#############################################################################
+manual: bpel2owfn.texi
+	./gendocs.sh $(PACKAGE) "$(PACKAGE_NAME)"

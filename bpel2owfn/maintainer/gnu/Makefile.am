@@ -1,0 +1,106 @@
+####################################
+# Targets for binary distributions #
+####################################
+
+EXTRA_DIST = gnupload tidy.directive
+
+# an operating system string (composed of information from configure)
+OS = $(build_cpu)-$(build_os)
+
+# a README file for a binary distribution
+binarydistreadme:
+	@echo -e Copyright \(C\) 2007 Niels Lohmann, Christian Gierds, and Martin Znamirowski > BINARYREADME
+	@echo -e Copyright \(C\) 2005, 2006 Niels Lohmann and Christian Gierds >> BINARYREADME
+	@echo >> BINARYREADME
+	@echo -e This is a binary distribution of @PACKAGE_NAME@ @PACKAGE_VERSION@, a tool translating >> BINARYREADME
+	@echo -e business processes described in BPEL to open workflow nets \(oWFN\). >> BINARYREADME
+	@echo -e The sources of GNU BPEL2oWFN can be downloaded from the website of >> BINARYREADME
+	@echo -e GNU BPEL2oWFN \(http://www.gnu.org/software/bpel2owfn\). >> BINARYREADME
+	@echo >> BINARYREADME
+	@echo -e GNU BPEL2oWFN is free software\; you can redistribute it and/or modify it >> BINARYREADME
+	@echo -e under the terms of the GNU General Public License as published by the Free >> BINARYREADME
+	@echo -e Software Foundation\; either version 3 of the License, or \(at your option\) any >> BINARYREADME
+	@echo -e later version. >> BINARYREADME
+	@echo >> BINARYREADME
+	@echo -e GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT >> BINARYREADME
+	@echo -e ANY WARRANTY\; without even the implied warranty of MERCHANTABILITY or FITNESS >> BINARYREADME
+	@echo -e FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more >> BINARYREADME
+	@echo -e details. >> BINARYREADME
+	@echo >> BINARYREADME
+	@echo -e You should have received a copy of the GNU General Public License along with >> BINARYREADME
+	@echo -e GNU BPEL2oWFN\; if not, see http://www.gnu.org/licenses or write to the Free >> BINARYREADME
+	@echo -e Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, >> BINARYREADME
+	@echo -e MA 02110-1301  USA. >> BINARYREADME
+
+# create binary with optimization
+release:
+	$(MAKE) --directory=src clean
+	$(MAKE) --directory=src bpel2owfn_CXXFLAGS="" bpel2owfn_CFLAGS="" CXXFLAGS+="-O3 -D NDEBUG" CFLAGS+="-O3 -D NDEBUG" # use optimization
+
+# name of the directory/archive for a binary distribution
+BINARYDISTDIR = $(distdir)-$(OS)
+
+# create a binary distribution tarball consisting of a binary executable of
+# the respective system, a PDF documentation and the README file for binary
+# distributions (see target "binarydistreadme").
+binarydist: pdf binarydistreadme
+	$(MAKE) --directory=src clean
+	$(MAKE) --directory=src bpel2owfn_CXXFLAGS="" bpel2owfn_CFLAGS="" CXXFLAGS+="-O3 -D NDEBUG" CFLAGS+="-O3 -D NDEBUG" # use optimization
+	$(mkdir_p) $(BINARYDISTDIR)
+	cp doc/$(PACKAGE).pdf $(BINARYDISTDIR)
+	cp src/$(PACKAGE)$(EXEEXT) COPYING $(BINARYDISTDIR)
+	mv BINARYREADME $(BINARYDISTDIR)/README
+	$(AMTAR) -cf $(BINARYDISTDIR).tar $(BINARYDISTDIR)
+	gzip $(BINARYDISTDIR).tar
+	rm -fr $(BINARYDISTDIR)
+
+# target to create a Mac Universal binary
+bindist_universal:
+	@echo "you have to configure with:"
+	@echo "  ./configure --disable-dependency-tracking"
+	@read answer
+	$(MAKE) binarydist OS=mac-universal CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+	  CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+	  LDFLAGS="-arch i386 -arch ppc"
+
+# Target to create an executable that is independet of Cygwin (i.e. uses the
+# MinGW libraries instead of Cygwin's own libraries. Whether the compilation
+# succeeded can be checked with "cygcheck ./bpel2owfn.exe", which displays all
+# library dependencies.
+bindist_win32:
+	$(MAKE) binarydist OS=$(build_cpu)-win32 CXXFLAGS="-mno-cygwin -U _WIN32" CFLAGS="-mno-cygwin -U _WIN32"
+
+# target for any other operating system
+bindist:
+	$(MAKE) binarydist CXXFLAGS="-O3" CFLAGS="-O3"
+
+
+#################################################################
+# Targets for automatic upload to ftp.gnu.org and alpha.gnu.org #
+#################################################################
+
+gnupload_alpha: *.tar.gz
+	@echo "====================================="
+	@echo " FILE DISTRIBUTION TO GNU FTP SERVER "
+	@echo "====================================="
+	@ls *.tar.gz
+	@echo
+	@echo "Are you sure you want to upload these files to"
+	@echo "  ftp://alpha.gnu.org/gnu/bpel2owfn/$(PACKAGE_VERSION)?"
+	@echo "If not, please press (crtl+c) now."
+	@read answer
+	./gnupload --to alpha.gnu.org:bpel2owfn/$(PACKAGE_VERSION) $^
+	rm $(^:.tar.gz=.tar.gz.sig)
+
+gnupload_release: *.tar.gz
+	@echo "============================================="
+	@echo " RELEASE FILE DISTRIBUTION TO GNU FTP SERVER "
+	@echo "============================================="
+	@ls *.tar.gz
+	@echo
+	@echo "Are you sure you want to upload these files to"
+	@echo "  ftp://ftp.gnu.org/gnu/bpel2owfn/$(PACKAGE_VERSION)?"
+	@echo "If not, please press (crtl+c) now."
+	@read answer
+	./gnupload --to ftp.gnu.org:bpel2owfn/$(PACKAGE_VERSION) $^
+	rm $(^:.tar.gz=.tar.gz.sig)

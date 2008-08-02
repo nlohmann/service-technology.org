@@ -57,6 +57,7 @@ AC_CHECK_HEADERS([windows.h])
 # lpsolve55 solves linear problems
 AC_CHECK_LIB([lpsolve55], [solve])
 
+
 # Check for optional programs.
 AM_MISSING_PROG(HELP2MAN, help2man)
 AC_PROG_YACC
@@ -76,18 +77,20 @@ fi
 # Set files to generate.
 AC_CONFIG_FILES([Makefile \
 	  doc/Makefile \
-	  src/Makefile \
+	  src/Makefile src/Doxyfile \
 	  man/Makefile \
-	  src/Doxyfile \
 	  tests/Makefile \
 	  gui/static_release.sh \
 	  maintainer/fink/bpel2owfn.info \
 	  maintainer/fink/create_fink_package.sh \
+	  maintainer/gnu/Makefile \
 	  maintainer/rpm/Makefile \
 	  maintainer/rpm/bpel2owfn.spec
 	  ])
 
 AC_OUTPUT
 
-chmod 775 gui/static_release.sh
-chmod 775 maintainer/fink/create_fink_package.sh
+
+# fix permissions of generated shell scripts
+chmod a+x gui/static_release.sh
+chmod a+x maintainer/fink/create_fink_package.sh

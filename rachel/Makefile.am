@@ -1,16 +1,6 @@
-SUBDIRS = src man doc tests exp
+SUBDIRS = src man doc tests exp maintainer
 
 EXTRA_DIST = COPYING.lib
-
-
-#############################################################################
-# upload distribution to gna.org
-#############################################################################
-upload: distcheck pdf
-	make ../ChangeLog -C doc
-	gpg --detach $(DIST_ARCHIVES)
-	scp $(DIST_ARCHIVES) $(DIST_ARCHIVES).sig ChangeLog doc/$(PACKAGE).pdf niels@download.gna.org:/upload/service-tech/$(PACKAGE_TARNAME)
-
 
 #############################################################################
 # remove everything that cannot be built
@@ -24,6 +14,7 @@ cvs-clean: maintainer-clean
 	rm -fr src/.DS_Store src/Makefile.in src/config.h.in config.h.in~ src/doc
 	rm -fr tests/Makefile.in tests/.DS_Store
 	rm -fr exp/Makefile.in exp/bpm2008
+	rm -fr maintainer/Makefile.in
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
 	@echo "  aclocal"
@@ -41,13 +32,11 @@ cvs-clean: maintainer-clean
 #############################################################################
 bindist:
 	make
-	make check > CHECKED
 	mkdir bin
 	cp src/$(PACKAGE_TARNAME) bin
 	wget http://download.gna.org/service-tech/$(PACKAGE_TARNAME)/$(PACKAGE_TARNAME).pdf
 	mv $(PACKAGE_TARNAME).pdf bin
 	cp COPYING bin
-	mv CHECKED bin
 	file bin/* > CONTENT
 	mv CONTENT bin
 	zip -r $(distdir)-$(build_cpu)-$(build_os).zip bin
@@ -59,4 +48,3 @@ bindist:
 #############################################################################
 experiments:
 	make experiments -C exp
-

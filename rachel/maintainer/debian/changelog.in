@@ -1,0 +1,6 @@
+rachel (@PACKAGE_VERSION@-1) hardy; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Niels Lohmann <niels.lohmann@gmail.com>  Sat, 02 Aug 2008 23:57:32 +0200
+

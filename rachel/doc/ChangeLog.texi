@@ -1,11 +1,23 @@
+@heading Version 1.08
+
+@itemize
+@item added a directory @file{maintainer/debian} containing files to create Debian and Redhat packages
+
+@item moved maintenance Makefile targets (@option{upload}) to @file{maintainer} directory
+
+@item the file @file{NEWS} is now extracted from file @file{doc/ChangeLog.texi}
+@end itemize
+
+
+
 @heading Version 1.07
 
 @itemize
-@item fixed bug #12112 (@url{https://gna.org/bugs/?12112})
+@item fixed bug #12112 (@url{https://gna.org/bugs/?12112}): allow to compile Rachel using GCC 4.3.1
 
 @item some changes in the way the change log is created
 
-@item minor changes to avoid compiler warnings and to allow to compile Rachel using GCC 4.3.1
+@item minor changes to avoid compiler warnings
 @end itemize
 
 
@@ -13,7 +25,7 @@
 @heading Version 1.06
 
 @itemize
-@item added a Makefile target @samp{make bindist} to create a zipped archive with a binary and a documentation
+@item added a Makefile target @command{make bindist} to create a zipped archive with a binary and a documentation
 
 @item added an undocumented command line option @option{--bug} to display debugging information that is meant to be emailed to the bugreport address in case a bug is found; looks like:
 

@@ -1,0 +1,13 @@
+Source: rachel
+Section: science
+Priority: optional
+Maintainer: Niels Lohmann <niels.lohmann@gmail.com>
+Build-Depends: debhelper (>= 7), autotools-dev
+Standards-Version: 3.7.3
+Homepage: http://service-technology.org/rachel
+
+Package: rachel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Rachel is a tool to repair deadlocking service choreographies
+ <insert long description, indented with spaces>

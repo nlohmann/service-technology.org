@@ -1,7 +1,41 @@
-See file "COPYING" for the license of Rachel.
+                          ____            _          _ 
+                         |  _ \ __ _  ___| |__   ___| |
+                         | |_) / _` |/ __| '_ \ / _ \ |
+                         |  _ < (_| | (__| | | |  __/ |
+                         |_| \_\__,_|\___|_| |_|\___|_|
+                      http://service-technology.org/rachel
 
-See file "AUTHORS" about the authors of Rachel.
 
-See file "INSTALL" for installation instructions.
+PURPOSE
+    Rachel is a tool to repair deadlocking service choreographies.
 
-See directory "doc" for documentation.
+
+COPYRIGHT
+    Copyright (c) 2008 Niels Lohmann
+
+
+AUTHOR
+    Rachel is written and maintained by Niels Lohmann. See file "AUTHORS" for
+    more information.
+
+
+LICENSE
+    License GPLv3+: GNU GPL version 3 or later
+    <http://gnu.org/licenses/gpl.html>
+
+    Rachel is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of Rachel.
+
+
+INSTALLATION
+    Rachel can be easily compiled and install. See file "INSTALL" for
+    instructions.
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of Rachel. It can also be
+    downloaded at <http://service-technology.org/files/rachel/rachel.pdf>.
+    Furthermore, the directory "doc" contains a paper ("background.pdf")
+    describing the setting in which Rachel is used.

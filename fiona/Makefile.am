@@ -124,6 +124,9 @@ clean:
 		fi \
 	done
 
+veryclean:
+	$(MAKE) $(AM_MAKEFLAGS) veryclean --directory=src
+
 libclean: clean
 	(cd cudd && $(MAKE) $(AM_MAKEFLAGS) clean)
 

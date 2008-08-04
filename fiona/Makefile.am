@@ -124,7 +124,7 @@ clean:
 		fi \
 	done
 
-veryclean:
+veryclean: clean
 	$(MAKE) $(AM_MAKEFLAGS) veryclean --directory=src
 
 libclean: clean

@@ -392,3 +392,6 @@ distdir:
 #	chmod u+x $(COPY_CMD_FILE)
 #	./$(COPY_CMD_FILE)
 #	$(RM) $(COPY_CMD_FILE)
+
+# just to make Fiona's maintainer-clean work
+maintainer-clean: distclean

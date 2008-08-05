@@ -990,6 +990,7 @@ void AnnotatedGraph::minimizeGraph() {
     // assignFinalNodes();
     trace(TRACE_1, "number of nodes after minimization: " + intToString(setOfNodes.size()) + "\n\n");
 
+/*
     if (!options[O_OUTFILEPREFIX]) {
         outfilePrefix = stripOGFileSuffix(this->getFilename()) + ".minimal";
     }
@@ -1006,6 +1007,7 @@ void AnnotatedGraph::minimizeGraph() {
             printDotFile(outfilePrefix + ".og");
         }
     }
+*/
 
     trace(TRACE_5, "AnnotatedGraph::minimizeGraph(): end\n");
 }
@@ -2033,12 +2035,13 @@ std::string AnnotatedGraph::stripOGFileSuffix(const std::string& filename) {
 //! \param filenamePrefix a string containing the prefix of the output file name
 //! \param dotGraphTitle a title for the graph to be shown in the image
 void AnnotatedGraph::printDotFile(const std::string& filenamePrefix,
-        const std::string& dotGraphTitle) const {
+                                  const std::string& dotGraphTitle) const {
 
     trace(TRACE_0, "creating the dot file of the OG...\n");
 
     string dotFile = filenamePrefix + ".out";
     string pngFile = filenamePrefix + ".png";
+
     fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
     dotFileHandle << "digraph g1 {\n";
     dotFileHandle << "graph [fontname=\"Helvetica\", label=\"";
@@ -2052,6 +2055,13 @@ void AnnotatedGraph::printDotFile(const std::string& filenamePrefix,
 
     dotFileHandle << "}";
     dotFileHandle.close();
+    // ... dot file created (.out) //
+
+    if (parameters[P_TEX]) {
+        string annotatedDotFileName = filenamePrefix + ".dot";
+        // annotate .dot file
+        system(("dot -Tdot " + dotFile + " -o " + annotatedDotFileName).c_str());
+    }
 
     // prepare dot command line for printing
     string cmd = "dot -Tpng \"" + dotFile + "\" -o \""+ pngFile + "\"";
@@ -2065,7 +2075,7 @@ void AnnotatedGraph::printDotFile(const std::string& filenamePrefix,
 //! \brief creates a dot output of the graph and calls dot to create an image from it
 //! \param filenamePrefix a string containing the prefix of the output file name
 void AnnotatedGraph::printDotFile(const std::string& filenamePrefix) const {
- printDotFile(filenamePrefix, filenamePrefix);
+    printDotFile(filenamePrefix, filenamePrefix);
 }
 
 
@@ -2193,6 +2203,7 @@ void AnnotatedGraph::computeInterfaceRecursively(AnnotatedGraphNode* v,
 void AnnotatedGraph::printOGFile(const std::string& filenamePrefix, bool hasOWFN) const {
 
     trace(TRACE_5, "AnnotatedGraph::printOGFile(): start\n");
+    trace(TRACE_1, "creating .og file for " + filenamePrefix + "\n");
 
     fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(), ios_base::out | ios_base::trunc);
 

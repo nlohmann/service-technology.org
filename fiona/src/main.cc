@@ -409,6 +409,40 @@ void makeGasTex(CommunicationGraph* graph) {
 }
 
 
+//! \brief create a GasTex file of the given IG/OG
+//! \param graph the IG/OG to generate a GasTex file from
+//! \param fileNamePrefix the filenameprefix for adding .dot and .tex, resp.
+//!        fileNamePrefix.dot is assumed to exist (as a layout annotated dot file)
+void makeGasTex(AnnotatedGraph* graph, string fileNamePrefix) {
+
+    trace(TRACE_1, "Internal translation of the graph into GasTex format...\n");
+
+    string dotFileName = fileNamePrefix + ".dot";
+    string texFileName = fileNamePrefix + ".tex";
+
+    dot_yylineno = 1;
+    dot_yydebug = 0;
+
+    dot_yyin = fopen((dotFileName).c_str(), "r");
+    if (!dot_yyin) {
+        cerr << "cannot open annotated dot file '" << dotFileName << "' for reading'\n" << endl;
+        exit(4);
+    }
+
+    if (gastexGraph) {
+        delete gastexGraph;
+    }
+    gastexGraph = new GasTexGraph();
+    dot_yyparse();
+
+    fclose(dot_yyin);
+
+    gastexGraph->makeGasTex(texFileName);
+
+    trace(TRACE_0, texFileName + " generated\n");
+}
+
+
 //! \brief generate a public view for a given og
 //! \param OG an og to generate the public view of
 //! \param graphName a name for the graph in the output
@@ -1857,8 +1891,35 @@ int main(int argc, char** argv) {
 
             else if (parameters[P_MINIMIZE_OG]) {
                 // minimizes a given OG
+
+                string ogFilename = "";
+
                 //readOG->removeReachableFalseNodes();
                 readOG->minimizeGraph();
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                // generate output files
+                if (!options[O_NOOUTPUTFILES]) {
+
+                    if (options[O_OUTFILEPREFIX]) {
+                        ogFilename = outfilePrefix;
+                    } else {
+                        ogFilename = readOG->getFilename() + ".minimal";
+                    }
+                    trace("Saving minimized annotated graph to:\n");
+                    trace(readOG->addOGFileSuffix(ogFilename));
+                    trace("\n\n");
+
+                    // the second parameter is false, since no oWFN is given
+                    readOG->printOGFile(ogFilename, false);
+
+                    readOG->printDotFile(ogFilename); // .out, .png
+
+                    if (parameters[P_TEX]) {
+                        makeGasTex(readOG, ogFilename);
+                    }
+                }
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 delete readOG;
             }
 

@@ -32,33 +32,33 @@ DIR=$testdir/minimize
 FIONA="fiona"
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
-rm -f $DIR/4-loop.minimal.og
-rm -f $DIR/4-loop.minimal.og.out
-rm -f $DIR/4-loop.minimal.og.png
-rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.minimal.og
-rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.minimal.og.out
-rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.minimal.og.png
-rm -f $DIR/final_non-final.minimal.og
-rm -f $DIR/final_non-final.minimal.og.out
-rm -f $DIR/final_non-final.minimal.og.png
-rm -f $DIR/keesCoffee_condition.emptyNode.minimal.og
-rm -f $DIR/keesCoffee_condition.emptyNode.minimal.og.out
-rm -f $DIR/keesCoffee_condition.emptyNode.minimal.og.png
-rm -f $DIR/keesCoffee_condition.minimal.og
-rm -f $DIR/keesCoffee_condition.minimal.og.out
-rm -f $DIR/keesCoffee_condition.minimal.og.png
-rm -f $DIR/myCoffee.minimal.og
-rm -f $DIR/myCoffee.minimal.og.out
-rm -f $DIR/myCoffee.minimal.og.png
-rm -f $DIR/non-final_final.minimal.og
-rm -f $DIR/non-final_final.minimal.og.out
-rm -f $DIR/non-final_final.minimal.og.png
-rm -f $DIR/nostrat.minimal.og
-rm -f $DIR/nostrat.minimal.og.out
-rm -f $DIR/nostrat.minimal.og.png
-rm -f $DIR/sample.minimal.og
-rm -f $DIR/sample.minimal.og.out
-rm -f $DIR/sample.minimal.og.png
+rm -f $DIR/4-loop.og.minimal.og
+rm -f $DIR/4-loop.og.minimal.og.out
+rm -f $DIR/4-loop.og.minimal.og.png
+rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.og.minimal.og
+rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.og.minimal.og.out
+rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.og.minimal.og.png
+rm -f $DIR/final_non-final.og.minimal.og
+rm -f $DIR/final_non-final.og.minimal.og.out
+rm -f $DIR/final_non-final.og.minimal.og.png
+rm -f $DIR/keesCoffee_condition.emptyNode.og.minimal.og
+rm -f $DIR/keesCoffee_condition.emptyNode.og.minimal.og.out
+rm -f $DIR/keesCoffee_condition.emptyNode.og.minimal.og.png
+rm -f $DIR/keesCoffee_condition.og.minimal.og
+rm -f $DIR/keesCoffee_condition.og.minimal.og.out
+rm -f $DIR/keesCoffee_condition.og.minimal.og.png
+rm -f $DIR/myCoffee.og.minimal.og
+rm -f $DIR/myCoffee.og.minimal.og.out
+rm -f $DIR/myCoffee.og.minimal.og.png
+rm -f $DIR/non-final_final.og.minimal.og
+rm -f $DIR/non-final_final.og.minimal.og.out
+rm -f $DIR/non-final_final.og.minimal.og.png
+rm -f $DIR/nostrat.og.minimal.og
+rm -f $DIR/nostrat.og.minimal.og.out
+rm -f $DIR/nostrat.og.minimal.og.png
+rm -f $DIR/sample.og.minimal.og
+rm -f $DIR/sample.og.minimal.og.out
+rm -f $DIR/sample.og.minimal.og.png
 rm -f $DIR/*.log
 
 result=0
@@ -84,7 +84,7 @@ result=$(($result | $exitcode))
 
 ############################################################################
 
-cmd="$FIONA -t equivalence $file1.og $file1.minimal.og -p no-png"
+cmd="$FIONA -t equivalence $file1.og $file1.og.minimal.og -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file1.equivalence.memcheck.log"
@@ -122,7 +122,7 @@ result=$(($result | $exitcode))
 
 ############################################################################
 
-cmd="$FIONA -t equivalence $file2.og $file2.minimal.og -p no-png"
+cmd="$FIONA -t equivalence $file2.og $file2.og.minimal.og -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file2.equivalence.memcheck.log"
@@ -159,7 +159,7 @@ result=$(($result | $exitcode))
 
 ############################################################################
 
-cmd="$FIONA -t equivalence $file3.og $file3.minimal.og -p no-png"
+cmd="$FIONA -t equivalence $file3.og $file3.og.minimal.og -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file3.equivalence.memcheck.log"
@@ -177,7 +177,7 @@ result=$(($result | $exitcode))
 
 ############################################################################
 
-cmd="$FIONA -t equivalence $file2.minimal.og $file3.minimal.og -p no-png"
+cmd="$FIONA -t equivalence $file2.og.minimal.og $file3.og.minimal.og -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file2-3.equivalence.memcheck.log"
@@ -214,7 +214,7 @@ result=$(($result | $exitcode))
 
 ############################################################################
 
-cmd="$FIONA -t equivalence $file4.og $file4.minimal.og -p no-png"
+cmd="$FIONA -t equivalence $file4.og $file4.og.minimal.og -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file4.equivalence.memcheck.log"
@@ -251,7 +251,7 @@ result=$(($result | $exitcode))
 
 ############################################################################
 
-cmd="$FIONA -t equivalence $file5.og $file5.minimal.og -p no-png"
+cmd="$FIONA -t equivalence $file5.og $file5.og.minimal.og -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file5.equivalence.memcheck.log"
@@ -288,7 +288,7 @@ result=$(($result | $exitcode))
 
 ############################################################################
 
-cmd="$FIONA -t equivalence $file6.og $file6.minimal.og -p no-png"
+cmd="$FIONA -t equivalence $file6.og $file6.og.minimal.og -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file6.equivalence.memcheck.log"
@@ -325,7 +325,7 @@ result=$(($result | $exitcode))
 
 ############################################################################
 
-cmd="$FIONA -t equivalence $file7.og $file7.minimal.og -p no-png"
+cmd="$FIONA -t equivalence $file7.og $file7.og.minimal.og -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file7.equivalence.memcheck.log"
@@ -362,7 +362,7 @@ result=$(($result | $exitcode))
 
 ############################################################################
 
-cmd="$FIONA -t equivalence $file8.og $file8.minimal.og -p no-png"
+cmd="$FIONA -t equivalence $file8.og $file8.og.minimal.og -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file8.equivalence.memcheck.log"
@@ -399,7 +399,7 @@ result=$(($result | $exitcode))
 
 ############################################################################
 
-cmd="$FIONA -t equivalence $file9.og $file9.minimal.og -p no-png"
+cmd="$FIONA -t equivalence $file9.og $file9.og.minimal.og -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$file9.equivalence.memcheck.log"

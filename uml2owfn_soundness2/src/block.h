@@ -300,6 +300,9 @@ class Block
     /// will not be translated due to violating the filtering rules
     bool filtered;
     
+    /// used to flag a block as erroneous (debugging purpose)
+    bool syntaxError;
+    
     /// basic constructor of Block
     Block (blockType mytype, bool ifcomplex, bool ifatomic);
     
@@ -339,6 +342,9 @@ class Block
 
     /// adds a role to the set of this blocks roles
     void addRole(string Role);
+    
+    /// in case the block is a complex process with no contents
+    bool isComplexEmpty();
     
     /// checks whether this block have to be filtered
     /// out due to having overlapping inputsets and/or outputsets

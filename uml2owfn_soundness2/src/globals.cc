@@ -75,13 +75,14 @@ namespace globals {
 
   map<possibleParameters, bool> parameters;
   analysis_t analysis;
+  bool multi_analysis = false;			///< used as a flag during translation
 
   string last_error_token = "";
   string last_error_line = "";
 
   unsigned int reduction_level = 0;
   
-// <Dirk.F start> store the current process name (for output)
+  // store the current process name (for output)
   string currentProcessName = "";
-// <Dirk.F end>
+
 }

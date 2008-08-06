@@ -110,11 +110,12 @@ namespace globals
   
   extern unsigned int reduction_level;
   
-// <Dirk.F start> 
   /// store current process name for output
   extern string currentProcessName;
-// <Dirk.F end>
 
+  /// in case multiple analysis tasks are performed on the same process
+  /// used as a flag during translation
+  extern bool multi_analysis;
 }
 
 #endif

@@ -76,10 +76,9 @@ BlockConnection::BlockConnection()
     enabled = true;
     roleCrossing = false;
     input = false;
-    // <Dirk.F start> proper initialization pointer members
-        tgt = NULL;
-        src = NULL;
-    // <Dirk.F end>
+    
+    tgt = NULL;
+    src = NULL;
 }
 
 
@@ -168,6 +167,12 @@ void Block::addRole(string Role)
     roleRequirements.insert(Role);
 }
 
+/*!
+ * \brief check whether a complex block has no contents
+ */
+bool Block::isComplexEmpty() {
+	return (children.empty());
+}
 
 //! \brief Checks whether overlapping inputsets and/or outputsets exist
 //!        and filters this block out if so
@@ -425,12 +430,25 @@ void Block::simpleOutput (string delay)
 //! \brief fills the "name" variable of this block and of all of its children.
 void Block::transferName ()
 {
+	//trace(TRACE_DEBUG, "setting name to: ");
     name=attributes["name"];
+    //trace(TRACE_DEBUG, name+"\n");
+    
     if (complex) {
     	for (set<Block*>::iterator child = children.begin(); child != children.end(); child++) {
-    		// instantiate child blocks
+    		
+    		if (*child == this) {
+    			trace(TRACE_ERROR, " [ERROR] node "+name+" has itself as child\n");
+    			syntaxError = true;
+    			return;
+    		}
+    		
+    		// resolve names of children
     		(*child)->transferName();
-        }      
+    		
+    		if ((*child)->syntaxError)	// inherit error value from child
+    			syntaxError = true;
+        }
     }
 }
 
@@ -1346,11 +1364,17 @@ PetriNet* Block::returnNet(PetriNet* PN, BomProcess *bom)
         PN->newArc(t,p);
         for (set<string>::iterator inputOfThisCriterion = inputCriterionSet[*inputCriterion].begin(); inputOfThisCriterion != inputCriterionSet[*inputCriterion].end(); inputOfThisCriterion++)
         {
-            p = PN->newPlace((globalPrefix + "input." +(*inputOfThisCriterion)), INTERNAL);
-            PN->newArc(t,p);
+        	string placeName = globalPrefix + "input." +(*inputOfThisCriterion);
+        	p = PN->findPlace(placeName);		// see if input place was already created
+        	// TODO: solution of input/output pins of blocks avoid this problem
+        	if (p == NULL) p = PN->newPlace(placeName, INTERNAL);
+            PN->newArc(t,p);			// add arc from the inputCriterion-transition
             bom->pinPlaces.insert(p);	// process-side place is a pin to the process
-            p = PN->newPlace((globalPrefix + "trueInput." +(*inputOfThisCriterion)), IN);
-            PN->newArc(p,t);
+            
+            placeName = globalPrefix + "trueInput." +(*inputOfThisCriterion);
+            p = PN->findPlace(placeName);		// see if input place was already created
+        	if (p == NULL) p = PN->newPlace(placeName, IN);
+            PN->newArc(p,t);			// add arc to the inputCriterion-transition
         }
     }
     
@@ -1374,10 +1398,15 @@ PetriNet* Block::returnNet(PetriNet* PN, BomProcess *bom)
         }
         for (set<string>::iterator outputOfThisCriterion = outputCriterionSet[*outputCriterion].begin(); outputOfThisCriterion != outputCriterionSet[*outputCriterion].end(); outputOfThisCriterion++)
         {
-            p = PN->newPlace((globalPrefix + "output." +(*outputOfThisCriterion)), INTERNAL);
+        	string placeName = globalPrefix + "output." +(*outputOfThisCriterion);
+        	p = PN->findPlace(placeName);  	// see if output place was already created
+        	if (p == NULL) p = PN->newPlace(placeName, INTERNAL);
             PN->newArc(p,t);
-            bom->pinPlaces.insert(p);	// process-side place is a pin to the process
-            p = PN->newPlace((globalPrefix + "trueOutput." +(*outputOfThisCriterion)), OUT);
+            bom->pinPlaces.insert(p);		// process-side place is a pin to the process
+            
+            placeName = globalPrefix + "trueOutput." +(*outputOfThisCriterion);
+            p = PN->findPlace(placeName);  	// see if output place was already created
+            if (p == NULL) p = PN->newPlace(placeName, OUT);
             PN->newArc(t,p);
         }
     }
@@ -2684,6 +2713,7 @@ Block::Block( blockType mytype, bool ifcomplex, bool ifatomic)
     atomic = ifatomic;
     enabled = true;
     filtered = false;
+    syntaxError = false;
 }
 Block::~Block()
 {

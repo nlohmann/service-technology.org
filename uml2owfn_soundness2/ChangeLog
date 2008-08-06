@@ -3,6 +3,10 @@ ChangeLog for UML2oWFN
 Version 1.03 (in progress)
 ============
 
++ extended filtering criteria: empty processes are not translated
++ fixed bug #12156: UML2oWFN: translation of overlapping pinsets fails, <https://gna.org/bugs/?12156>
++ added log file output for translation, with parameter "-p log" a log file (name "uml2owfn_<inputfile>.log") with entries of the form "<process-name>;<translated>;<reason-for-fail>" is written
++ changed lola executable file names (in the generated script) to "lola-dl" for deadlock analysis and "lola-mc" for modelchecking (soundness)
 + added check whether generated Petri net is empty, if this is the case, then the net is translated again without reduction rules, the name is extended with a ".unreduced" (if it is still emtpy, then the net is skipped: no net file, no analysis, not in script file)
 
 

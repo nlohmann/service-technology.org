@@ -97,7 +97,7 @@ static struct option longopts[] =
 };
 
 /// short options (needed by GNU getopt)
-const char *par_string = "hvi:of:p:d:r:a:";
+const char *par_string = "hvi:o::f:p:d:r:a:";
 
 
 /******************************************************************************
@@ -128,6 +128,7 @@ void print_help()
 	trace("\n");
 	trace("  PARAMETER is one of the following (multiple parameters permitted):\n");
 	trace("    filter              filter out infeasible processes from the library\n");
+	trace("    log                 write a log file for the translation\n");
 	trace("    taskfile            write analysis task to a separate file\n");
 	trace("\n");
 	trace("  FORMAT is one of the following (multiple formats permitted):\n");
@@ -287,6 +288,8 @@ void parse_command_line(int argc, char* argv[])
 				globals::parameters[P_FILTER] = true;
 			else if (parameter == "taskfile")
 				globals::parameters[P_TASKFILE] = true;
+			else if (parameter == "log")
+				globals::parameters[P_LOG] = true;
 			else {
 				trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
 				trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");
@@ -482,6 +485,15 @@ void parse_command_line(int argc, char* argv[])
 			trace(TRACE_INFORMATION, "checking for absence of deadlocks\n");
 		if (globals::analysis[A_LIVELOCKS])
 			trace(TRACE_INFORMATION, "checking for absence of livelocks\n");
+	}
+	
+	if (options[O_PARAMETER]) {
+		if (globals::parameters[P_FILTER])
+			trace(TRACE_INFORMATION, "filter processes for syntactical compliance\n");
+		if (globals::parameters[P_TASKFILE])
+			trace(TRACE_INFORMATION, "write analysis task in separate files\n");
+		if (globals::parameters[P_LOG])
+			trace(TRACE_INFORMATION, "write log file\n");
 	}
 }
 

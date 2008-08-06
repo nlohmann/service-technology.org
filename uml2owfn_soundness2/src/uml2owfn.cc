@@ -103,6 +103,8 @@ FormulaState* finalStateFormula;
 bool taskFileWritten;
 /// string holding the contents of a script
 stringstream scriptContents;
+/// string holding the contents of a log file
+stringstream logContents;
 
 /******************************************************************************
  * program parts
@@ -110,6 +112,9 @@ stringstream scriptContents;
 
 string generate_task_file_contents (analysis_t analysis);
 bool write_task_to_file (analysis_t analysis);
+
+void log_print (string text);
+void log_println (string text);
 
 /******************************************************************************
  * helper functions
@@ -196,6 +201,38 @@ void close_file(string file)
  *****************************************************************************/
 
 /*!
+ * \brief find the 'default' output format in the current program call
+ *        if multiple output formats are provided, then the first of all
+ *        output formats is returned, if no output format is set, then
+ *        the standard F_NONE is returned
+ */
+possibleFormats getOutputDefaultFormat_net () {
+	for (int f = (int)F_LOLA; f < (int)F_NONE; f++) {
+		if (formats[(possibleFormats)f])
+			return (possibleFormats)f;
+	}
+	return F_NONE;
+}
+
+/*!
+ * \brief return string of the output file name of the current process
+ * 
+ * \param format of the output file name
+ * 
+ * \pre globals::output_filename and globals::output_filename_suffix have been set
+ */ 
+string getOutputFilename_net (possibleFormats format) {
+	if (globals::output_filename == "")
+		return "";
+	else
+	{
+		string ext = "";
+		if (format != F_NONE) ext += "."+suffixes[format];
+		return globals::output_filename + globals::output_filename_suffix + ext;
+	}
+}
+
+/*!
  * \brief	write resulting Petri net to output (file or output stream)
  */
 void write_net_file(analysis_t analysis)
@@ -216,7 +253,7 @@ void write_net_file(analysis_t analysis)
   {
 	  if (globals::output_filename != "")
 	  {
-		  output = openOutput(globals::output_filename + globals::output_filename_suffix + "." + suffixes[F_OWFN]);
+		  output = openOutput(getOutputFilename_net(F_OWFN));
 	  }
 	  trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
 	  PN.set_format(FORMAT_OWFN);
@@ -234,7 +271,7 @@ void write_net_file(analysis_t analysis)
   {
 	  if (globals::output_filename != "")
 	  {
-		  output = openOutput(globals::output_filename + globals::output_filename_suffix + "." + suffixes[F_LOLA]);
+		  output = openOutput(getOutputFilename_net (F_LOLA));
 	  }
 	  trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
 	  PN.set_format(FORMAT_LOLA);
@@ -262,7 +299,7 @@ void write_net_file(analysis_t analysis)
   {
 	  if (globals::output_filename != "")
 	  {
-		  output = openOutput(globals::output_filename + globals::output_filename_suffix + "." + suffixes[F_PNML]);
+		  output = openOutput(getOutputFilename_net(F_PNML));
 	  }
 	  trace(TRACE_INFORMATION, "-> Printing Petri net for PNML ...\n");
 	  PN.set_format(FORMAT_PNML);
@@ -280,7 +317,7 @@ void write_net_file(analysis_t analysis)
   {
 	  if (globals::output_filename != "")
 	  {
-		  output = openOutput(globals::output_filename + globals::output_filename_suffix + "." + suffixes[F_PEP]);
+		  output = openOutput(getOutputFilename_net(F_PEP));
 	  }
 	  trace(TRACE_INFORMATION, "-> Printing Petri net for PEP ...\n");
 	  PN.set_format(FORMAT_PEP);
@@ -297,7 +334,7 @@ void write_net_file(analysis_t analysis)
     {
         if (globals::output_filename != "")
         {
-            output = openOutput(globals::output_filename + globals::output_filename_suffix + "." + suffixes[F_TPN]);
+            output = openOutput(getOutputFilename_net(F_TPN));
         }
         trace(TRACE_INFORMATION, "-> Printing Petri net for Woflan (TPN) ...\n");
         PN.set_format(FORMAT_TPN);
@@ -315,7 +352,7 @@ void write_net_file(analysis_t analysis)
   {
 	  if (globals::output_filename != "")
 	  {
-		  output = openOutput(globals::output_filename + globals::output_filename_suffix + "." + suffixes[F_INA]);
+		  output = openOutput(getOutputFilename_net(F_INA));
 	  }
 	  trace(TRACE_INFORMATION, "-> Printing Petri net for INA ...\n");
 	  PN.set_format(FORMAT_INA);
@@ -332,7 +369,7 @@ void write_net_file(analysis_t analysis)
   {
 	  if (globals::output_filename != "")
 	  {
-		  output = openOutput(globals::output_filename + globals::output_filename_suffix + "." + suffixes[F_SPIN]);
+		  output = openOutput(getOutputFilename_net(F_SPIN));
 	  }
 	  trace(TRACE_INFORMATION, "-> Printing Petri net for SPIN ...\n");
 	  PN.set_format(FORMAT_SPIN);
@@ -349,7 +386,7 @@ void write_net_file(analysis_t analysis)
   {
 	  if (globals::output_filename != "")
 	  {
-		  output = openOutput(globals::output_filename + globals::output_filename_suffix + "." + suffixes[F_APNN]);
+		  output = openOutput(getOutputFilename_net(F_APNN));
 	  }
 	  trace(TRACE_INFORMATION, "-> Printing Petri net for APNN ...\n");
 	  PN.set_format(FORMAT_APNN);
@@ -367,7 +404,7 @@ void write_net_file(analysis_t analysis)
   {
 	  if (globals::output_filename != "")
 	  {
-		  output = openOutput(globals::output_filename + globals::output_filename_suffix + "." + suffixes[F_DOT]);
+		  output = openOutput(getOutputFilename_net(F_DOT));
 	  }
 	  trace(TRACE_INFORMATION, "-> Printing Petri net for dot ...\n");
 	  PN.set_format(FORMAT_DOT, true);
@@ -378,7 +415,7 @@ void write_net_file(analysis_t analysis)
 		  output = NULL;
 
 #ifdef HAVE_DOT
-		  string systemcall = "dot -q -Tpng -o" + globals::output_filename + globals::output_filename_suffix + ".png " + globals::output_filename + globals::output_filename_suffix + "." + suffixes[F_DOT];
+		  string systemcall = "dot -q -Tpng -o" + getOutputFilename_net (F_NONE) + ".png " + getOutputFilename_net (F_DOT);
 		  trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
 		  trace(TRACE_INFORMATION, systemcall + "\n\n");
 		  system(systemcall.c_str());
@@ -392,7 +429,7 @@ void write_net_file(analysis_t analysis)
   {
 	  if (globals::output_filename != "")
 	  {
-		  output = openOutput(globals::output_filename + globals::output_filename_suffix + "." + suffixes[F_INFO]);
+		  output = openOutput(getOutputFilename_net(F_INFO));
 	  }
 	  trace(TRACE_INFORMATION, "-> Printing Petri net information ...\n");
 	  PN.set_format(FORMAT_INFO);
@@ -405,6 +442,47 @@ void write_net_file(analysis_t analysis)
   }
 }
 
+void log_print (string text) {
+	if (!globals::parameters[P_LOG]) return;
+	logContents << text;
+}
+
+void log_println (string text) {
+	if (!globals::parameters[P_LOG]) return;
+	logContents << text << endl;
+}
+
+void write_log_file () {
+	if (!globals::parameters[P_LOG]) return;
+	
+	// write log file
+	if (globals::output_filename != "")
+	{
+		trace(TRACE_INFORMATION, "writing log file to uml2owfn_" + globals::output_filename + ".log ... ");
+		output = openOutput("uml2owfn_" + globals::output_filename + ".log");
+	}
+	
+	(*output) << logContents.str() << endl;
+
+	if (globals::output_filename != "") {
+		closeOutput(output);
+		output = NULL;
+		trace(TRACE_INFORMATION, "done.\n");
+	}
+}
+
+/*!
+ * \brief creates a string that is the contents of task or analysis file,
+ *        in case of lola output and soundness analysis, the method
+ *        return the formula AG EF finalState in lola task file syntax
+ * 
+ * \param analysis the analysis setting for which the task file shall be
+ *        written
+ * 
+ * \pre   finalStateFormula != null
+ * 
+ * \return string to be written to a file
+ */ 
 string generate_task_file_contents (analysis_t analysis)
 {
 	stringstream taskContents;
@@ -517,20 +595,23 @@ void extend_script_file (analysis_t analysis) {
 			string lolaCommand;
 			if (analysis[A_DEADLOCKS]) {
 				analysis_text = " for deadlocks";
-				lolaCommand = "lola_deadlock";
+				lolaCommand = "lola-dl";
 			} else if (analysis[A_LIVELOCKS]) {
 				analysis_text = " for livelocks";
-				lolaCommand = "lola_deadlock";
+				lolaCommand = "lola-dl";
 			} else {
 				analysis_text = " for soundness";
-				lolaCommand = "lola";
+				lolaCommand = "lola-mc";
 			}
 			
 			scriptContents << "echo ----------------------------------------------------------------" << endl;
-			scriptContents << "echo  checking " << globals::output_filename + globals::output_filename_suffix << analysis_text << endl;
+			scriptContents << "echo  checking " << globals::output_filename << globals::output_filename_suffix << analysis_text << endl;
 			scriptContents << "echo ----------------------------------------------------------------" << endl;
 			
-
+			/*
+			string resultFile = "check_result.txt";
+			scriptContents << "printf \""<< globals::output_filename << globals::output_filename_suffix <<";\" >> " << resultFile << endl;
+			*/
 			
 			if (taskFileWritten)
 			{
@@ -547,6 +628,22 @@ void extend_script_file (analysis_t analysis) {
 						<< " -P" 
 						<< endl;
 			}
+			/*
+			scriptContents << "res=$?" << endl;
+			scriptContents << "if [ $res = 4 ]; then" << endl;
+			scriptContents << "  printf \"non-safe\" >> " << resultFile << endl;
+			scriptContents << "  let EXCEEDED_COUNT=$EXCEEDED_COUNT+1" << endl;
+			scriptContents << "else" << endl;
+			scriptContents << "  if [ $res = 0 ]; then" << endl;
+			scriptContents << "    printf \"true\" " << resultFile << endl;
+			scriptContents << "    let SOUNDNESS_COUNT=$SOUNDNESS_COUNT+1" << endl;
+			scriptContents << "  else" << endl;
+			scriptContents << "    printf \"false\" " << resultFile << endl;
+			scriptContents << "    let FALSE_COUNT=$FALSE_COUNT+1" << endl;
+			scriptContents << "  fi" << endl;
+			scriptContents << "fi" << endl;
+			scriptContents << "    printf \"\\n\" >> " << resultFile << endl;
+			*/
 			scriptContents << endl;
 		}
 	}
@@ -557,7 +654,7 @@ void extend_script_file (analysis_t analysis) {
  * 			calls #write_net_file(), #write_task_file(), #extend_script_file()
  * 			accordingly
  */
-bool translate_process(Block *process, analysis_t analysis, int reduction_level)
+bool translate_process(Block *process, analysis_t analysis, unsigned int reduction_level)
 {
 	trace(TRACE_DEBUG, "generating Petri net for " + process->name + "\n");	    	
 
@@ -600,20 +697,20 @@ bool translate_process(Block *process, analysis_t analysis, int reduction_level)
     }
     
 	// jump into Thomas Heidinger's part
-	if (reduction_level > 0)
-	{
+	if (reduction_level > 0) {
 		// structural reduction preserves livelocks and deadlocks
 		//if (analysis[A_DEADLOCKS] || analysis[A_LIVELOCKS])
 		{
     		trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
     		PN.reduce(globals::reduction_level);
 		}
-	}
-    
-	if (PN.getInternalPlaces().size() == 0) {
-		cerr << process->name << " retrying (reason: empty process)." << endl;
-		cerr << PN.information() << endl;
-		return false;
+		
+	    // check whether net reduction created an empty net 
+		if (PN.getInternalPlaces().size() == 0) {
+			cerr << process->name << " retrying (reason: empty process)." << endl;
+			cerr << PN.information() << endl;
+			return false;
+		}
 	}
 	
 	// finished Petri net creation and manipulation, generate analysis files and scripts
@@ -633,26 +730,26 @@ bool translate_process(Block *process, analysis_t analysis, int reduction_level)
     //PN.fixPlaceNames();
 
     cerr << process->name << "." << endl;
-    
-    string analysis_suffix = "";
-    if (analysis[A_DEADLOCKS])
-    	analysis_suffix += "_dl";
-    if (analysis[A_LIVELOCKS])
-        analysis_suffix += "_ll";
-    
-    // generate the output for the given process
-    globals::output_filename_suffix = "." 
-    								+ process_name_to_file_name(process->name)
-    								+ analysis_suffix;
+
+    // extend output file name suffix if necessary
+    if (globals::multi_analysis) {
+        // extend file name to distinguish analyses
+        string analysis_suffix = "";
+
+	    if (analysis[A_DEADLOCKS])
+	    	analysis_suffix += "_dl";
+	    if (analysis[A_LIVELOCKS])
+	        analysis_suffix += "_ll";
+	    globals::output_filename_suffix	+= analysis_suffix;
+    }
     // if we work with the unreduced net, extend the file name 
     if (reduction_level < globals::reduction_level) {
     	globals::output_filename_suffix += ".unreduced";
     }
-    
-    globals::currentProcessName = process->name;
-    
-    
-    write_net_file(analysis);		// write out current process and furthe related files
+
+    // generate the output for the given process
+    globals::currentProcessName = process->name;	// for comments about origin in generated net files
+    write_net_file(analysis);		// write out current process and further related files
     write_task_file(analysis);		// write task file for this process (if applciable)
     extend_script_file(analysis);	// extend script file for this process (if applicable)
     
@@ -722,6 +819,7 @@ int main( int argc, char *argv[])
     
     if (frontend_nerrs == 0)
     {
+    	//log_println("NET;CORRECT SYNTAX;SYNTAX ERROR");
 	    int processTranslated = 0; int processNum = 0;
 	    for(set<Block*>::iterator process = globals::processes.begin(); process != globals::processes.end(); process++)
 	    {
@@ -734,6 +832,24 @@ int main( int argc, char *argv[])
     		trace(TRACE_DEBUG, "-> resolving references and names, creating nodes of the process\n");
 	    	(*process)->transferName();
     		trace(TRACE_DEBUG, "-> resolved\n");
+    		
+    		// set suffix for this process, so we have an output file name
+    	    globals::output_filename_suffix =  "." + process_name_to_file_name((*process)->name);
+    	    // write output file name of this process to the log
+    	    log_print(getOutputFilename_net(getOutputDefaultFormat_net()));
+    	    
+	    	//if the process was filtered, dont create an output at all
+	    	if ((*process)->syntaxError) {
+	    		trace(TRACE_WARNINGS, "translation error: skipping process " + (*process)->name + "\n");
+	    		log_println(";false;translation error");
+	    		continue;
+	    	}
+	    	
+	    	if ((*process)->isComplexEmpty()) {
+	    		trace(TRACE_WARNINGS, "[ERROR] process has no contents, skipping process " + (*process)->name + "\n");
+	    		log_println(";false;empty process");
+	    		continue;
+	    	}
 	        
 	    	// link the information of processes, tasks and services that are referenced
 	    	// by "callto" blocks into the callto blocks and then tests if there
@@ -742,11 +858,10 @@ int main( int argc, char *argv[])
 	    	(*process)->linkInserts();
 	    	trace(TRACE_DEBUG, "-> created\n");
 
-	    	
 	    	//if the process was filtered, dont create an output at all
-	    	if (globals::parameters[P_FILTER] && (*process)->filtered)
-	    	{
+	    	if (globals::parameters[P_FILTER] && (*process)->filtered) {
 	    		trace(TRACE_WARNINGS, "filtering on: skipping process " + (*process)->name + "\n");
+	    		log_println(";false;overlapping");
 	    		continue;
 	    	}
 	    	
@@ -758,6 +873,7 @@ int main( int argc, char *argv[])
 	    	if (globals::parameters[P_FILTER] && (*process)->filtered)
 	    	{
 	    		trace(TRACE_WARNINGS, "filtering on: skipping process " + (*process)->name + " because of wrong pin multiplicities\n");
+	    		log_println(";false;multiplicities");
 	    		continue;
 	    	}
 	
@@ -780,6 +896,8 @@ int main( int argc, char *argv[])
  	    	if (globals::analysis[A_DEADLOCKS] && globals::analysis[A_LIVELOCKS]) {
 	    		// cannot check for deadlock and livelocks at once,
 	    		// create two dedicated nets
+ 	    		globals::multi_analysis = true; // start multi analysis
+ 	    		
 	    		analysis_t sub_analysis;
 	    		
 	    		sub_analysis = globals::analysis; sub_analysis[A_LIVELOCKS] = false;
@@ -787,15 +905,23 @@ int main( int argc, char *argv[])
 	    		sub_analysis = globals::analysis; sub_analysis[A_DEADLOCKS] = false;
 	    		processWritten &= translate_process_reconcile(*process, sub_analysis);
 	    		
+	    		globals::multi_analysis = false; // done
+	    		
 	    	} else {
 	    		processWritten &= translate_process_reconcile(*process, globals::analysis);
 	    	}
 
- 	    	if (processWritten)
+ 	    	if (processWritten) {
  	    		processTranslated++;
+ 	    		log_println(";true;---");
+ 	    	} else {
+ 	    		log_println(";false;unknown");
+ 	    	}
 	    } // for all processes
-	    write_script_file();				// write script file for the entire process library
+	    write_script_file();		// write script file for the entire process library
 	    scriptContents.flush();
+	    write_log_file();			// write translation log for the entire library
+	    logContents.flush();
     
 	    if (processTranslated > 1)
 	    	trace(TRACE_ALWAYS, toString(processTranslated)+" of "+toString(processNum)+" processes have been translated.\n");

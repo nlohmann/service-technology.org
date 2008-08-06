@@ -624,8 +624,9 @@ Place *PetriNet::newPlace(string my_role, communication_type my_type)
   // Test if the place is already defined.
   if (my_role != "")
   {
-    assert(roleMap[my_role_with_suffix] == NULL);
-    roleMap[my_role_with_suffix] = p;
+	  //cerr << "trying to create place " << my_role << endl;
+	  assert(roleMap[my_role_with_suffix] == NULL);
+	  roleMap[my_role_with_suffix] = p;
   }
 
   return p;

@@ -44,6 +44,7 @@ if ASPECTS
 	-$(AGPP) --config $(dir $<)puma.config --weave_only -o aspected-$(notdir $<) $<
 	$(SED) -i '1 i #include <new>' aspected-$(notdir $<)
 	$(SED) -i 's/new (unsigned long int/new (size_t/' aspected-$(notdir $<)
+	$(SED) -i 's/new (unsigned int/new (size_t/' aspected-$(notdir $<)
 	$(SED) -i 's/new (long unsigned int/new (size_t/' aspected-$(notdir $<)
 else
 	cp $(notdir $<) aspected-$(notdir $<)

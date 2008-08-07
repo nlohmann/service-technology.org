@@ -1,9 +1,43 @@
+@heading Version 1.09
+
+@itemize
+@item fixed bug #12153 (@url{https://gna.org/bugs/?12153}): the patch for the aspected sources now works on x86_64 machines
+
+@item fixed a bug in test script @file{tests/test4}: the wrong return value was returned to @command{make check}
+
+@item improved portability of Makefiles by using more built-in variables such as @code{$(MAKE) $(AM_MAKEFLAGS)} or @code{$(SED)}
+
+@item added file @file{doc/cmdline.out} to the distribution to avoid complete compilation just to execute @command{make doc}
+
+@item code complies to ISO C++
+
+@item listing the tools required to re-generated code (Flex, Bison, Gengetopt, and Kimwitu++) in the @file{README} file
+
+@item completed task #6131 (@url{https://gna.org/task/?6131}): whether or not the aspects of AspectC++ are used during compilation can be controlled by parameters of the configure script:
+
+@itemize
+@item @command{./configure}: use aspects
+@item @command{./configure --enable-aspects}: use aspects
+@item @command{./configure --enable-aspects=true}: use aspects
+@item @command{./configure --disable-aspects}: do not use aspects
+@item @command{./configure --enable-aspects=false}: do not used aspects
+@end itemize
+
+If aspects are disabled, the files @file{src/xxxx.cc} are directly copied to @file{src/aspected-xxxx.cc}, and the AspectC++ tools are not at all invoked.
+
+@item MAINTAINER: overworked the Makefile target @option{deb} in the directory @file{maintainer} to create a Debian source package
+
+Note that @command{make deb} can only be executed on a machine where the tools @command{dpkg-buildpackage} and @code{date -R} are present. To upload the source package to a Launchpad PPA (it is currently uploaded to @url{https://launchpad.net/~niels-lohmann/+archive}), the tool @command{dput} is needed. Furthermore, the tools  @command{fakeroot} and @command{alien} are needed to create an RPM binary package from the Debian binary package.
+@end itemize
+
+
+
 @heading Version 1.08
 
 @itemize
-@item added a directory @file{maintainer/debian} containing files to create Debian and Redhat packages
+@item MAINTAINER: added a directory @file{maintainer/debian} containing files to create Debian and Redhat packages
 
-@item moved maintenance Makefile targets (@option{upload}) to @file{maintainer} directory
+@item MAINTAINER: moved maintenance Makefile targets (@option{upload}) to @file{maintainer} directory
 
 @item the file @file{NEWS} is now extracted from file @file{doc/ChangeLog.texi}
 @end itemize

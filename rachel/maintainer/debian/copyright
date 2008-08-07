@@ -1,9 +1,4 @@
-This package was debianized by Niels Lohmann <niels.lohmann@gmail.com> on
-Sat, 02 Aug 2008 23:57:32 +0200.
-
-It was downloaded from <http://service-technology.org/rachel>
-
-Upstream Author(s):
+Upstream Author:
 
     Niels Lohmann <niels.lohmann@uni-rostock.de>
 
@@ -29,10 +24,3 @@ License:
 
 On Debian systems, the complete text of the GNU General
 Public License can be found in `/usr/share/common-licenses/GPL'.
-
-The Debian packaging is (C) 2008, Niels Lohmann <niels.lohmann@gmail.com> and
-is licensed under the GPL, see above.
-
-
-# Please also look if there are files or directories which have a
-# different copyright/license attached and list them here.

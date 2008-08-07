@@ -37,12 +37,17 @@ unaspected_sources = Simulation.cc Matching.cc
 # Since AspectC++ does use "unsigned int" instead of the more portable "size_t",
 # we have to run an edit script to fix the generated code. Thus bug has been
 # filed at http://www.aspectc.org/bugzilla/show_bug.cgi?id=362
+# if "./configure --disable-aspects" was used, the original sources are just copied
+# and ag++ is not invoked at all
 aspected-%.cc: %.cc $(aspects)
+if ASPECTS
 	-$(AGPP) --config $(dir $<)puma.config --weave_only -o aspected-$(notdir $<) $<
-	$(SED) -e 's/new (unsigned long int/new (size_t/' aspected-$(notdir $<) > aspected-$(notdir $<)~
-	echo "#include <new>" > aspected-$(notdir $<)
-	cat aspected-$(notdir $<)~ >> aspected-$(notdir $<)
-	rm aspected-$(notdir $<)~
+	$(SED) -i '1 i #include <new>' aspected-$(notdir $<)
+	$(SED) -i 's/new (unsigned long int/new (size_t/' aspected-$(notdir $<)
+	$(SED) -i 's/new (long unsigned int/new (size_t/' aspected-$(notdir $<)
+else
+	cp $(notdir $<) aspected-$(notdir $<)
+endif
 
 
 ################################################################

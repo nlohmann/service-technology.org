@@ -6,15 +6,52 @@
                       http://service-technology.org/rachel
 
 
-Version 1.08
+Version 1.09
 ============
 
-   * added a directory `maintainer/debian' containing files to create Debian
-     and Redhat packages
+* fixed bug #12153 (`https://gna.org/bugs/?12153'): the patch for the
+  aspected sources now works on x86_64 machines
 
-   * moved maintenance Makefile targets (`upload') to `maintainer' directory
+* fixed a bug in test script `tests/test4': the wrong return value was
+  returned to `make check'
 
-   * the file `NEWS' is now extracted from file `doc/ChangeLog.texi'
+* improved portability of Makefiles by using more built-in variables such as
+  `$(MAKE) $(AM_MAKEFLAGS)' or `$(SED)'
+
+* added file `doc/cmdline.out' to the distribution to avoid complete
+  compilation just to execute `make doc'
+
+* code complies to ISO C++
+
+* listing the tools required to re-generated code (Flex, Bison, Gengetopt,
+  and Kimwitu++) in the `README' file
+
+* completed task #6131 (`https://gna.org/task/?6131'): whether or not the
+  aspects of AspectC++ are used during compilation can be controlled by
+  parameters of the configure script:
+
+     * `./configure': use aspects
+
+     * `./configure --enable-aspects': use aspects
+
+     * `./configure --enable-aspects=true': use aspects
+
+     * `./configure --disable-aspects': do not use aspects
+
+     * `./configure --enable-aspects=false': do not used aspects
+
+  If aspects are disabled, the files `src/xxxx.cc' are directly copied to
+  `src/aspected-xxxx.cc', and the AspectC++ tools are not at all invoked.
+
+* MAINTAINER: overworked the Makefile target `deb' in the directory
+  `maintainer' to create a Debian source package
+
+  Note that `make deb' can only be executed on a machine where the tools
+  `dpkg-buildpackage' and `date -R' are present. To upload the source package
+  to a Launchpad PPA (it is currently uploaded to
+  `https://launchpad.net/~niels-lohmann/+archive'), the tool `dput' is
+  needed. Furthermore, the tools  `fakeroot' and `alien' are needed to create
+  an RPM binary package from the Debian binary package.
 
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for

@@ -2,12 +2,13 @@ Source: rachel
 Section: science
 Priority: optional
 Maintainer: Niels Lohmann <niels.lohmann@gmail.com>
-Build-Depends: debhelper (>= 7), autotools-dev
-Standards-Version: 3.7.3
+Build-Depends: debhelper (>= 5), autotools-dev
+Standards-Version: 3.8.0
 Homepage: http://service-technology.org/rachel
 
 Package: rachel
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Rachel is a tool to repair deadlocking service choreographies
- <insert long description, indented with spaces>
+Recommends: graphviz
+Description: a tool to repair deadlocking service choreographies
+ Many work has been conducted to analyze service choreographies to assert manyfold correctness criteria. While errors can be detected automatically, the correction of defective services is usually done manually. Rachel implements a graph-based approach to calculate the minimal edit distance between a given defective service and synthesized correct services. This edit distance helps to automatically fix found errors while keeping the rest of the service untouched.

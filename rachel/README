@@ -7,7 +7,14 @@
 
 
 PURPOSE
-    Rachel is a tool to repair deadlocking service choreographies.
+    Rachel is a tool to repair deadlocking service choreographies. Many work
+    has been conducted to analyze service choreographies to assert manyfold
+    correctness criteria. While errors can be detected automatically, the
+    correction of defective services is usually done manually. Rachel
+    implements a graph-based approach to calculate the minimal edit distance
+    between a given defective service and synthesized correct services. This
+    edit distance helps to automatically fix found errors while keeping the
+    rest of the service untouched.
 
 
 COPYRIGHT
@@ -30,8 +37,15 @@ LICENSE
 
 
 INSTALLATION
-    Rachel can be easily compiled and install. See file "INSTALL" for
+    Rachel can be easily compiled and installed. See file "INSTALL" for
     instructions.
+    
+    Rachel uses a lot of generated code. If you want to make changes to the
+    source code, you might need the following tools to regenerate the code:
+     * Flex (http://flex.sourceforge.net)
+     * Bison (http://www.gnu.org/software/bison)
+     * Gengetopt (http://www.gnu.org/software/gengetopt)
+     * AspectC++ (http://www.aspectc.org)
 
 
 DOCUMENTATION

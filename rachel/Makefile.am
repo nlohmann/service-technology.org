@@ -6,15 +6,15 @@ EXTRA_DIST = COPYING.lib
 # remove everything that cannot be built
 #############################################################################
 cvs-clean: maintainer-clean
-	rm -fr .DS_Store INSTALL Makefile.in aclocal.m4 compile configure depcomp \
+	rm -fr INSTALL Makefile.in aclocal.m4 compile configure depcomp \
 	  install-sh missing ylwrap $(DIST_ARCHIVES).sig config.sub config.guess \
 	  config.h.in~
-	rm -fr doc/.DS_Store doc/Makefile.in doc/mdate-sh doc/figs/.DS_Store doc/manual
+	rm -fr doc/Makefile.in doc/mdate-sh doc/manual
 	rm -fr man/Makefile.in
-	rm -fr src/.DS_Store src/Makefile.in src/config.h.in config.h.in~ src/doc
-	rm -fr tests/Makefile.in tests/.DS_Store
+	rm -fr src/Makefile.in src/config.h.in config.h.in~ src/doc
+	rm -fr tests/Makefile.in
 	rm -fr exp/Makefile.in exp/bpm2008
-	rm -fr maintainer/Makefile.in
+	rm -fr maintainer/Makefile.in maintainer/debian/changelog maintainer/debian/README.Debian
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
 	@echo "  aclocal"
@@ -31,7 +31,7 @@ cvs-clean: maintainer-clean
 # create a binary distribution
 #############################################################################
 bindist:
-	make
+	$(MAKE) $(AM_MAKEFLAGS)
 	mkdir bin
 	cp src/$(PACKAGE_TARNAME) bin
 	wget http://download.gna.org/service-tech/$(PACKAGE_TARNAME)/$(PACKAGE_TARNAME).pdf
@@ -47,4 +47,4 @@ bindist:
 # run experiments
 #############################################################################
 experiments:
-	make experiments -C exp
+	$(MAKE) $(AM_MAKEFLAGS) experiments -C exp

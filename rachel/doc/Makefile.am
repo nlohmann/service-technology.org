@@ -4,9 +4,11 @@ rachel_TEXINFOS = fdl.texi cmdline.out ChangeLog.texi
 
 TEXINFO_TEX = texinfo.tex
 
-EXTRA_DIST = gendocs.sh gendocs_template background.pdf
+EXTRA_DIST = gendocs.sh gendocs_template background.pdf cmdline.out
 
 MAINTAINERCLEANFILES = cmdline.out
+
+all: ../ChangeLog
 
 
 #############################################################################
@@ -20,9 +22,9 @@ cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
 # create ASCII ChangeLog/NEWS out of Texinfo (8 is height of header)
 #############################################################################
 ../ChangeLog: ChangeLog.texi
-	$(MAKEINFO) -o ChangeLog.txt --no-split --no-headers  --fill-column=78 rachel.texi
+	$(MAKEINFO) -o ChangeLog.txt --no-split --no-headers --fill-column=81 rachel.texi
 	$(SED) -n '/procrastination/,/The most recent change log/w ChangeLog2.txt' ChangeLog.txt
-	$(SED) '1,2d' ChangeLog2.txt | $(SED) -e '$$d' | $(SED) -e '$$d' > ChangeLog.txt
+	$(SED) '1,2d' ChangeLog2.txt | $(SED) -e '$$d' | $(SED) -e '$$d' | $(SED) 's/^   //' > ChangeLog.txt
 	rm ChangeLog2.txt
 	head -n8 ../README > ../ChangeLog
 	cat ChangeLog.txt >> ../ChangeLog

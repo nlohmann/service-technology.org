@@ -117,55 +117,6 @@ unsigned int PetriNet::reduce_unused_status_places()
         trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
   return result;
 }
-/* OLD VERSION
-unsigned int PetriNet::fix_lola_output()
-{
-  list<Place *> kill_places;
-  list<Transition *> kill_transitions;
-  unsigned int result = 0;
-  
-  for (set<Place*>::iterator p = P_in.begin(); p != P_in.end(); p++)
-  {
-    kill_places.push_back(*p);
-    if ( !(*p)->postset.empty() )
-    {
-        set<Node*>::iterator t = (*p)->postset.begin();
-        kill_transitions.push_back(static_cast<Transition*>(*t));
-        if ( !(*t)->postset.empty() )
-        {            
-            set<Node*>::iterator p1 = (*t)->postset.begin();
-            kill_places.push_back(static_cast<Place*>(*p1));
-        }
-    }
-  }
-  for (list<Place*>::iterator p = kill_places.begin(); p != kill_places.end(); p++)
-  {
-      removePlace(*p);
-      result++;
-  }
-
-  for (list<Transition*>::iterator p = kill_transitions.begin(); p != kill_transitions.end(); p++)
-  {
-      removeTransition(*p);
-      result++;
-  }    
-
-  string placeName = "inputFixPlace";
-
-  for (set<Transition*>::const_iterator t = T.begin(); t != T.end(); t++)
-  {
-    if ((*t)->preset.begin() == (*t)->preset.end())
-    {
-        Place* p = newPlace(placeName, INTERNAL);
-        p->mark();
-        placeName = placeName + "X";
-        newArc(p,(*t),STANDARD,1);
-    }
-  }
-
-  return result;
-}
-*/
 
 /*!
  * Remove transitions with empty pre or postset. These transitions occur mostly

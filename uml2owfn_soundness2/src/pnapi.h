@@ -7,7 +7,8 @@
 
 #include "uml2owfn.h"
 #include "petrinet.h"			// to define member functions
-#include "petrinet-formula.h" 	// <Dirk.F> soundness, proper termination predicate  
+#include "petrinet-formula.h" 	// <Dirk.F> soundness, proper termination predicate
+#include "petrinet-workflow.h" 	// workflow specific extensions of Petri nets  
 #include "globals.h"
 
 

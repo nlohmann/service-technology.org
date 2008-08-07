@@ -184,6 +184,7 @@ class Node
 {
   /// class PetriNet is allowed to access the privates of class Node
   friend class PetriNet;
+  friend class ExtendedWorkflowNet;
   friend class Block;
 
 
@@ -416,6 +417,7 @@ class Arc
 
 class PetriNet
 {
+  friend class ExtendedWorkflowNet;
   friend class Block;
 
   public:

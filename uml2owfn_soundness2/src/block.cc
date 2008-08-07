@@ -1333,7 +1333,7 @@ const string Block::globalPrefixString() const {
 //! \param PN petrinet to be filled with transitions, places and arcs
 //! \return returns zero in case that this block is not a process, thus cannot
 //!         be translated into a petrinet
-PetriNet* Block::returnNet(PetriNet* PN, BomProcess *bom)
+ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
 {
     
     // Only do this, if this block is a process

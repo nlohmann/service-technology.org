@@ -27,7 +27,7 @@
 # Version $Revision: 1.64 $
 
 # Where else are Makefiles?
-SUBDIRS = src
+SUBDIRS = src doc
 
 # Which targets have no dependencies (i.e. always succeed)?
 .PHONY: binarydistreadme update
@@ -103,7 +103,8 @@ OS = $(build_cpu)-$(build_os)
 
 # a README file for a binary distribution
 binarydistreadme:
-	@echo -e Copyright \(C\) 2007 Niels Lohmann, Christian Gierds, and Martin Znamirowski > BINARYREADME
+	@echo -e Copyright \(C\) 2007, 2008 Niels Lohmann, Christian Gierds, Martin Znamirowski, and > BINARYREADME
+	@echo -e                            Dirk Fahland  >> BINARYREADME
 	@echo -e Copyright \(C\) 2005, 2006 Niels Lohmann and Christian Gierds >> BINARYREADME
 	@echo >> BINARYREADME
 	@echo -e This is a binary distribution of @PACKAGE_NAME@ @PACKAGE_VERSION@, a tool translating >> BINARYREADME

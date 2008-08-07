@@ -3,6 +3,10 @@ ChangeLog for UML2oWFN
 Version 1.03 (in progress)
 ============
 
++ added documentation in ./doc/
++ added analysis scripts (by Niels)
++ modified soundness analysis scheme: the parameter combination "-a soundness -a deadlocks" tries to generate Petri nets for a deadlock based soundness analysis of the library. In case a net is a freechoice-workflow net, this is possible, in any other case a reachability analysis of the set of final markings must be done by CTL-model checking. For each case the corresponding net and analysis task is created.
++ added checks for free-choice nets and for workflow-nets (each node is on a path from alpha to omega); this additional Petri net functionality is implemented in the class ExtendedWorkflowNet which inherits from PetriNet
 + extended filtering criteria: empty processes are not translated
 + fixed bug #12156: UML2oWFN: translation of overlapping pinsets fails, <https://gna.org/bugs/?12156>
 + added log file output for translation, with parameter "-p log" a log file (name "uml2owfn_<inputfile>.log") with entries of the form "<process-name>;<translated>;<reason-for-fail>" is written

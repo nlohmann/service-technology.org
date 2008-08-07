@@ -1,22 +1,16 @@
-BEGIN OF README file for BPEL2oWFN Version 2.0.2
+BEGIN OF README file for UML2oWFN 1.03
 
 About this Distribution
 ***********************
 
-This file describes this distribution of BPEL2oWFN, version 2.0.2, a
-tool translating business processes described in BPEL to open workflow
-nets (oWFN), last updated 15 June 2007.
+This file describes this distribution of UML2oWFN, version 1.03, a
+tool translating business processes described in IBM Websphere Business
+Modeler XML to open workflow nets (oWFN), last updated 7 August 2008.
 
-BPEL2oWFN is licensed under the GNU General Public License.
+UML2oWFN is licensed under the GNU General Public License.
 
-Copyright (C) 2006, 2007 Niels Lohmann, Christian Gierds, and Martin
-Znamirowski.
+Copyright (C) 2007,2008 Martin Znamirowski, Dirk Fahland, and Niels Lohmann
 
-Copyright (C) 2005 Niels Lohmann and Christian Gierds.
-
-BPEL2oWFN is part of the Tools4BPEL project funded by the
-Bundesministerium fu"r Bildung und Forschung. See
-`http://www.informatik.hu-berlin.de/top/tools4bpel' for details.
 
 Contents of this Distribution
 *****************************
@@ -25,23 +19,23 @@ Files
 =====
 
 `AUTHORS'
-     A list of the authors of BPEL2oWFN, acknowledgements, and a contact
+     A list of the authors of UML2oWFN, acknowledgements, and a contact
      address.
 
 `ChangeLog'
      The change log listing all changes made during the distribution
-     versions of BPEL2oWFN.
+     versions of UML2oWFN.
 
 `COPYING'
-     The GNU General Public License (GPL) under which BPEL2oWFN is
+     The GNU General Public License (GPL) under which UML2oWFN is
      distributed.
 
 `INSTALL'
      Setup and Installation instructions and all information needed to
-     bootstrap BPEL2oWFN.
+     bootstrap UML2oWFN.
 
 `NEWS'
-     News concerning the most recent version of BPEL2oWFN.
+     News concerning the most recent version of UML2oWFN.
 
 `README'
      This file.
@@ -55,42 +49,33 @@ Directories
 ===========
 
 `src'
-     The sources of BPEL2oWFN. The current development sources can be
-     access via anonymous CVS, see
-     `https://savannah.gnu.org/cvs/?group=bpel2owfn' for more
-     information.
+     The sources of UML2oWFN.
 
      Each file contains a short documentation of what it does as well
      as Doxygen-styled comments (see
      `http://www.stack.nl/~dimitri/doxygen' for details).(1)
 
 `doc'
-     The documentation of BPEL2oWFN consisting of a manual and an
-     installation manual. The documentation is in Texinfo format and
-     can be converted into many file formats using `make FORMAT' where
-     `FORMAT' is a file format out of `dvi', `html', `pdf' or `ps'.
+     The documentation of UML2oWFN consisting of a manual and an
+     installation manual.
+     ( TODO: The documentation is in Texinfo format and
+     ( can be converted into many file formats using `make FORMAT' where
+     ( `FORMAT' is a file format out of `dvi', `html', `pdf' or `ps'.
 
 `tests'
-     Several test processes to self-test BPEL2oWFN. The sub-directory
-     `tesfiles' contains the example processes of the WS-BPEL 2.0 and
-     the BPEL4WS 1.2 specification, respectively. The sub-directory
-     `sa_tests' contains, for each supported static analysis goal, a
-     test file that triggers the respective static analysis error
-     message. Finally, sub-directoris `consistency' and `bpel4chor'
-     contain processes to check the `choreography' mode.
+     ( TODO: Several test processes to self-test UML2oWFN. 
 
-     The tests can be triggered with `make check'.
+     ( TODO: The tests can be triggered with `make check'.
 
 Copyright
 =========
 
-Copyright (C) 2005, 2006, 2007 Niels Lohmann
+Copyright (C) 2007, 2008 Dirk Fahland
 
      Copying and distribution of this file, with or without
      modification, are permitted in any medium without royalty provided
      the copyright notice and this notice are preserved.
 
-See `http://www.gnu.org/software/bpel2owfn' or the User's Manual for
-more information.
+See the User's Manual for more information.
 
-END OF README file for BPEL2oWFN Version 2.0.2
+END OF README file for UML2oWFN Version 1.03

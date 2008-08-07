@@ -1,11 +1,12 @@
 #############################################################################
 # GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
 #
-# Copyright (C) 2006, 2007  Niels Lohmann,
-#                           Christian Gierds, and
-#                           Martin Znamirowski
+# Copyright (C) 2006-2008   Niels Lohmann,
+#                           Christian Gierds,
+#                           Martin Znamirowski, and
+#                           Dirk Fahland
 # Copyright (C) 2005        Niels Lohmann and
-#			    Christian Gierds
+#			                Christian Gierds
 #
 # GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -49,6 +50,7 @@ uml2owfn_SOURCES = uml2owfn.cc \
 		    pnapi.h petrinet.h petrinet.cc \
 		    petrinet-output.cc petrinet-reduction.cc \
 		    petrinet-formula.cc petrinet-formula.h \
+		    petrinet-workflow.cc petrinet-workflow.h \
 		    helpers.cc helpers.h \
     	    colorconsole.h \
 		    frontend-parser.yy \

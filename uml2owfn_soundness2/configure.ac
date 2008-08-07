@@ -83,6 +83,7 @@ fi
 
 # Set files to generate.
 AC_CONFIG_FILES([src/Makefile \
+                 doc/Makefile \
                  Makefile])
 
 

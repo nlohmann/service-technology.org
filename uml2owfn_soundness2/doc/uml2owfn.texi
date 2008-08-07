@@ -1,0 +1,192 @@
+\input texinfo
+@setfilename uml2owfn.info
+@include version.texi
+@afourpaper
+@finalout
+@settitle UML2oWFN User's Manual
+
+@c ----------------------------------------------------------------------------
+
+@copying
+
+@b{About this document:}
+
+This manual is for UML2oWFN, version @value{VERSION}, a tool to translate models of the IBM Websphere Business Modeler to Petri nets, last updated @value{UPDATED}.
+
+Copyright @copyright{} 2008 Martin Znamirowski, Dirk Fahland, and Niels Lohmann
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.2 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify this GNU Manual. Buying copies from GNU Press supports the FSF in developing GNU and promoting software freedom.''
+@end quotation
+@end copying
+
+@dircategory service-technology.org
+@direntry
+* uml2owfn: (uml2owfn).       UML2oWFN.
+@end direntry
+
+
+@c ----------------------------------------------------------------------------
+
+@titlepage
+
+@title UML2oWFN
+
+@subtitle Translating Models of the IBM Websphere Business Modeler to Petri Nets
+@subtitle Version @value{VERSION}, @value{UPDATED}
+
+@author Dirk Fahland
+
+@page
+
+
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c ----------------------------------------------------------------------------
+
+@ifnottex
+@node Top
+@top UML2oWFN
+@insertcopying
+@end ifnottex
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Overview:: Overview.
+@end menu
+
+@c ----------------------------------------------------------------------------
+
+@contents
+@paragraphindent none
+
+@c ----------------------------------------------------------------------------
+
+@node Overview
+@chapter Overview
+
+UML2oWFN translates the XML export of the IBM Websphere Business Modeler into standard Petri net file formats. The translation can be targeted to a specific analysis like checking soundness, or for deriving contracts from business process specifications.
+
+
+@section Usage
+
+To translate a process library @file{input.xml} into Petri nets and print render these nets as graphs, call
+
+@cartouche
+@code{uml2owfn -i @i{input.xml} -f dot -o}
+@end cartouche
+
+The translation creates one output file @file{input.<catalog-name>__<process-name>.png} per process of the library.
+
+
+
+@section Setup and Installation
+
+@enumerate
+@item Go to @url{http://service-technology.org/files/bom-anon} and download the latest version of BOM-Anonymizer, say @file{bom-anon-@value{VERSION}.tar.gz}. To setup and compile BOM-Anonymizer, change into your download directory and type
+
+@cartouche
+@smallexample
+tar xfz bom-anon-@value{VERSION}.tar.gz
+cd bom-anon-@value{VERSION}
+./configure
+make
+@end smallexample
+@end cartouche
+
+After compilation, a binary @samp{src/bom-anon} is generated.@footnote{On Microsoft Windows, the file will be called @file{bom-anon.exe}.} If you experience any compiler warnings, don't panic: BOM-Anonymizer contains some generated or third party code. If an error occurs, please send the output to @email{niels.lohmann@@service-technology.org}.
+
+@item To install the binary and the documentation, type
+
+@cartouche
+@smallexample
+make install
+@end smallexample
+@end cartouche
+
+You might need superuser permissions to do so.
+@end enumerate
+
+If you need any further information, see file @file{INSTALL} for detailed instructions.
+
+
+@section Copyright
+
+UML2oWFN was written by Martin Znamirowski (@email{znamirow@@informatik.hu-berlin.de}) Dirk Fahland (@email{dirk.fahland@@service-technology.org}), and Niels Lohmann (@email{niels.lohmann@@service-technology.org}).
+
+
+@chapter Processing
+
+@section Soundness analysis with UML2oWFN
+
+@enumerate
+@item To prepare the soundness analysis you need three different binaries of the Low-Level Net Analyzer (LoLA, @url{http:// }) to be accessible from the command-line. (1) @file{lola-mc} - LoLA compiled with MODELCHECKING, (2) @file{lola-dl} - LoLA compiled with DEADLOCK, and (3) @file{lola-full} - LoLA compiled with FULL; each with CAPACITY 1 and CHECKCAPACITY. The analysis script files rely on these model checkers. 
+
+
+@item Translate the library @file{lib.xml} you want to verify with the following command-line arguments
+
+@cartouche
+@smallexample
+uml2owfn -i lib.xml -f lola -a soundness -a deadlocks -p filter -p log -d 2 -o > translate.log 2> translate-err.log
+@end smallexample
+@end cartouche
+
+This creates a set of @file{lib.XXX__YYY.lola} files where @samp{YYY} is the name of a process, and @samp{XXX} its containing catalog. Additionally the file @file{uml2owfn_lib.log} is written which contains structural analysis results of the files. The files @file{translate.log} and @file{translate-err.log} contains the verbose output of uml2owfn. Further the script @file{check_lib.sh} is created.
+
+During the run, UML2oWFN makes a number of structural checks on each process
+
+@enumerate
+@item @samp{-p filter} causes checking whether a process has overlapping pinsets or multiplicities at a pin that has an incoming or outgoing edge; processes that have this kind of structural properties are not translated.
+@item By @samp{-a soundess} uml2owfn automatically checks whether resulting net N of the translation is a free-choice net. uml2owfn adds a unique alpha place and a number of omega places (one for each stop node and each end node), and checks whether each node of the net N is on a path from alpha to one of the omega places (i.e. whether N has workflow structure).
+@end enumerate
+
+In case a net is a free-choice workflow net, the net is livelock free; thus the net is sound if it is also deadlock-free and safe. The verification only has to check for deadlocks, call 
+
+@cartouche
+@smallexample
+lola-dl lib.XXX__YYY.lola
+@end smallexample
+@end cartouche
+
+to check soundness of process @samp{YYY}.
+
+If the net is not free-choice or not a workflow-net, the verification has to check for deadlock-freedom, safeness, and livelock-freedom; this can only be done by checking the reachability of a set of final markings. In the latter case, the corresponding CTL model-checking property is appended to the net file; call
+
+@cartouche
+@smallexample
+lola-mc lib.XXX__YYY.lola
+@end smallexample
+@end cartouche
+
+to check soundness of process @samp{YYY}. 
+
+
+@item You may run the script 
+
+@cartouche
+@smallexample
+sh ./check_lib.sh
+@end smallexample
+@end cartouche
+
+to verify the entire library with the appropriate model-checking method, but you have to interpret the analysis result by yourself.
+
+
+@item Alternatively, you may run
+
+@cartouche
+@smallexample
+sh ./niels-full.sh;
+sh ./niels-analysis.sh
+@end smallexample
+@end cartouche
+
+in the directory of the generated @file{lib.XXX__YYY.lola} files. The script @file{niels-full.sh} first constructs the complete state space of each file (invoking @file{lola-full}) and writes the number of states and transitions into two different files. The script @file{niels-analysis.sh} then checks each net for soundness invoking @file{lola-dl} if the net is a free-choice workflow net, or @file{lola-dl} in the remaining cases. The results are compiled into the file @file{result.csv}. 
+@end enumerate
+
+@bye

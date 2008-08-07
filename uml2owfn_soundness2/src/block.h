@@ -403,7 +403,7 @@ class Block
     virtual ~Block();
     
     /// translates all blocks in this complex block to a petri net and connects them
-    PetriNet* returnNet(PetriNet* PN, BomProcess *bom);
+    ExtendedWorkflowNet* returnNet(ExtendedWorkflowNet* PN, BomProcess *bom);
 
     /// DECOMPOSITION: Sets the enabled and disabled values for a decompostion
     ///                of the net

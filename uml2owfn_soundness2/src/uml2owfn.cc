@@ -60,6 +60,7 @@
 #include <sstream>
 #include <cassert>
 #include <map>
+#include <set>
 
 #include "uml2owfn.h"   // generated configuration file
 #include "pnapi.h"      // Petri Net support
@@ -75,6 +76,7 @@ using std::endl;
 using std::string;
 using std::stringstream;
 using std::map;
+using std::set;
 
 
 
@@ -97,9 +99,9 @@ extern void frontend_restart(FILE*);		// from flex
  *****************************************************************************/
 
 /// The Petri Net
-PetriNet PN = PetriNet();
+ExtendedWorkflowNet PN = ExtendedWorkflowNet();
 /// formula specifying the final state
-FormulaState* finalStateFormula;
+FormulaState* finalStateFormula = NULL;
 bool taskFileWritten;
 /// string holding the contents of a script
 stringstream scriptContents;
@@ -587,7 +589,7 @@ void write_script_file () {
  * 			for the current output
  */
 void extend_script_file (analysis_t analysis) {
-    trace(TRACE_DEBUG, "-> extending script file\n");
+    trace(TRACE_DEBUG, "-> extending script file...");
 	if ( formats[F_LOLA] ) {
 		if ( analysis[A_SOUNDNESS] ) {
 			
@@ -647,21 +649,32 @@ void extend_script_file (analysis_t analysis) {
 			scriptContents << endl;
 		}
 	}
+	trace(TRACE_DEBUG, "done\n");
 }
+
+// translation results for handling errors during the translation
+typedef enum {
+	RES_OK,
+	RES_EMPTY_PROCESS,
+	RES_NOT_FREECHOICE,
+	RES_NO_WF_STRUCTURE
+} translationResult_t;
 
 /*!
  * \brief	translate the process according to the given analysis flags,
  * 			calls #write_net_file(), #write_task_file(), #extend_script_file()
  * 			accordingly
  */
-bool translate_process(Block *process, analysis_t analysis, unsigned int reduction_level)
+translationResult_t translate_process(Block *process, analysis_t analysis, unsigned int reduction_level)
 {
-	trace(TRACE_DEBUG, "generating Petri net for " + process->name + "\n");	    	
+	translationResult_t res = RES_OK;
+	
+	trace(TRACE_WARNINGS, "\ngenerating Petri net for " + process->name + "\n");	    	
 
     // Generates a petri net from the current process
     //PetriNet* tryPN = new PetriNet();
     BomProcess *bom = new BomProcess();
-    PN = PetriNet();	// get a new net
+    PN = ExtendedWorkflowNet();	// get a new net
     process->returnNet(&PN, bom);
     trace(TRACE_DEBUG, "-> done\n");
 
@@ -679,6 +692,19 @@ bool translate_process(Block *process, analysis_t analysis, unsigned int reducti
     
     // extend net for soundness checking
     if (analysis[A_SOUNDNESS]) {
+        
+        // check net structure: free choice?
+        trace(TRACE_DEBUG, "-> checking whether net is free-choice\n");
+        set<Node *> nonFC = PN.isFreeChoice();
+        if (!nonFC.empty()) {
+        	res = RES_NOT_FREECHOICE;
+        	string witnessString = "";
+        	for (set<Node*>::iterator n=nonFC.begin(); n!=nonFC.end(); n++) {
+        		witnessString += " '"+(*n)->nodeFullName()+"'";
+        	}
+        	trace(TRACE_WARNINGS, " [WARNING] process is not free-choice: transitions"+witnessString+" are not free-choice.\n"); 
+        }
+        
         trace(TRACE_DEBUG, "-> soundness analysis: creating alpha places\n");
     	// create proper initial marking
     	bom->soundness_initialPlaces(&PN);
@@ -694,6 +720,21 @@ bool translate_process(Block *process, analysis_t analysis, unsigned int reducti
             trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for general soundness analysis\n");
     		bom->soundness_terminalPlaces(&PN, true, analysis[A_STOP_NODES]);
     	}
+    	
+    	// check net structure: alpha to omega?
+        trace(TRACE_DEBUG, "-> checking whether each node is on a path from alpha to omega\n");
+        Node* ll_node = NULL;
+        if (res == RES_OK) ll_node = PN.isPathCovered();
+        if (ll_node != NULL){
+        	res = RES_NO_WF_STRUCTURE;
+        	trace(TRACE_WARNINGS, " [WARNING] process has no workflow-structure: node " + ll_node->nodeFullName() + " is not on alpha-omega path\n.");
+        }
+        
+        if (res != RES_OK) {
+        	// the net either is not a free-choice net or has no WF-structure
+        	// cannot use deadlock analysis to decide soundness
+        	analysis[A_DEADLOCKS] = false;
+        }
     }
     
 	// jump into Thomas Heidinger's part
@@ -709,18 +750,18 @@ bool translate_process(Block *process, analysis_t analysis, unsigned int reducti
 		if (PN.getInternalPlaces().size() == 0) {
 			cerr << process->name << " retrying (reason: empty process)." << endl;
 			cerr << PN.information() << endl;
-			return false;
+			return RES_EMPTY_PROCESS;
 		}
 	}
 	
 	// finished Petri net creation and manipulation, generate analysis files and scripts
-    if (analysis[A_SOUNDNESS]) {
+    if (analysis[A_SOUNDNESS] && !analysis[A_DEADLOCKS]) {
     	// generate formula that specifies the final state
     	/*
     	if (analysis[A_STOP_NODES])
     		finalStateFormula = bom->createFinalStatePredicate(&PN);
     	else*/ {
-        	trace(TRACE_DEBUG, "-> soundness analysis: creating final statea formula\n");
+        	trace(TRACE_DEBUG, "-> soundness analysis: creating final state formula\n");
     		finalStateFormula = bom->createOmegaPredicate(&PN, false);
     	}
     }
@@ -753,18 +794,25 @@ bool translate_process(Block *process, analysis_t analysis, unsigned int reducti
     write_task_file(analysis);		// write task file for this process (if applciable)
     extend_script_file(analysis);	// extend script file for this process (if applicable)
     
-    if (finalStateFormula != NULL)
+    if (finalStateFormula != NULL) {
     	delete finalStateFormula;	// TODO clean up subformulas!
+    	finalStateFormula = NULL;
+    }
     
-    return true;
+    return res;
 }
 
-bool translate_process_reconcile (Block *process, analysis_t analysis)
+translationResult_t translate_process_reconcile (Block *process, analysis_t analysis)
 {
-	if (!translate_process(process, analysis, globals::reduction_level)) {
-		return translate_process(process, analysis, 0);
+	translationResult_t result = translate_process(process, analysis, globals::reduction_level);
+	switch (result)
+	{
+		case RES_EMPTY_PROCESS:
+			return translate_process(process, analysis, 0);
+		default:
+			break;
 	}
-	return true;
+	return result;
 }
 
 /******************************************************************************
@@ -823,10 +871,8 @@ int main( int argc, char *argv[])
 	    int processTranslated = 0; int processNum = 0;
 	    for(set<Block*>::iterator process = globals::processes.begin(); process != globals::processes.end(); process++)
 	    {
-	    	bool processWritten = true;
-	    	
 	    	processNum++;
-    		trace(TRACE_DEBUG, "translate process " + toString(processNum) + "\n");
+    		trace(TRACE_DEBUG, "\ntranslate process " + toString(processNum) + "\n");
 	        // set the name variables of all blocks within this process to the parsed
 	    	// values
     		trace(TRACE_DEBUG, "-> resolving references and names, creating nodes of the process\n");
@@ -891,8 +937,9 @@ int main( int argc, char *argv[])
 	        // (*process)->adjustRoles();
 	        // (*process)->cutNet(testStrings, 2);
 	        // (*process)->disableStart();        
-	        // (*process)->disableEnd();        
-	        
+	        // (*process)->disableEnd();
+	    	
+	    	translationResult_t res;
  	    	if (globals::analysis[A_DEADLOCKS] && globals::analysis[A_LIVELOCKS]) {
 	    		// cannot check for deadlock and livelocks at once,
 	    		// create two dedicated nets
@@ -901,22 +948,36 @@ int main( int argc, char *argv[])
 	    		analysis_t sub_analysis;
 	    		
 	    		sub_analysis = globals::analysis; sub_analysis[A_LIVELOCKS] = false;
-	    		processWritten &= translate_process_reconcile(*process, sub_analysis);
-	    		sub_analysis = globals::analysis; sub_analysis[A_DEADLOCKS] = false;
-	    		processWritten &= translate_process_reconcile(*process, sub_analysis);
+	    		res = translate_process_reconcile(*process, sub_analysis);
+
+	    		if (res == RES_OK) {
+	    			sub_analysis = globals::analysis; sub_analysis[A_DEADLOCKS] = false;
+	    			res = translate_process_reconcile(*process, sub_analysis);
+	    		}
 	    		
 	    		globals::multi_analysis = false; // done
 	    		
 	    	} else {
-	    		processWritten &= translate_process_reconcile(*process, globals::analysis);
+	    		res = translate_process_reconcile(*process, globals::analysis);
 	    	}
-
- 	    	if (processWritten) {
- 	    		processTranslated++;
- 	    		log_println(";true;---");
- 	    	} else {
- 	    		log_println(";false;unknown");
+ 	    	
+ 	    	// evaluate translation result for this process
+ 	    	switch (res) {
+ 	    		case RES_OK:
+ 	 	    		processTranslated++;
+ 	 	    		log_println(";true;---");
+ 	 	    		break;
+ 	    		case RES_EMPTY_PROCESS:
+ 	    			log_println(";false;empty process");
+ 	    			break;
+ 	    		case RES_NOT_FREECHOICE:
+ 	    			log_println(";true;not free-choice");
+ 	    			break;
+ 	    		case RES_NO_WF_STRUCTURE:
+ 	    			log_println(";true;no workflow structure");
+ 	    			break;
  	    	}
+
 	    } // for all processes
 	    write_script_file();		// write script file for the entire process library
 	    scriptContents.flush();
@@ -944,10 +1005,6 @@ int main( int argc, char *argv[])
   // everything went fine
   return 0;
 }
-
-
-
-
 
 /*!
  * \defgroup frontend Front End

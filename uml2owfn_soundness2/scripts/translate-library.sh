@@ -45,7 +45,7 @@ cd lib_${1}
 # -f dot -a soundness -p filter -r 1 -o [-d <debug-level>]
 #
 ###########
-uml2owfn -i ${1}.xml -f lola -a soundness -p filter -p log -o -d 2 > translate.log 2> translate-err.log
+uml2owfn -i ${1}.xml -f lola -a soundness -a deadlocks -p filter -p log -o -d 2 > translate.log 2> translate-err.log
 # uml2owfn -i ${1}.xml -f lola -a soundness -p filter -p log -r 4 -o -d 2 > translate.log 2> translate-err.log
 # uml2owfn -i ${1}.xml -f dot -p filter -r 1 -d 2 -o > translate.log 2> translate-err.log
 

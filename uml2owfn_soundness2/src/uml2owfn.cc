@@ -558,6 +558,7 @@ string generate_task_file_contents_safeState (analysis_t analysis)
   
   if ( formats[F_LOLA] ) {
     if (analysis[A_SAFE]) {
+      safeStateFormula->set_format(FORMAT_LOLA_STATEPREDICATE);
       taskContents << (*safeStateFormula) << endl;
     }
   }
@@ -584,7 +585,7 @@ void write_task_file (analysis_t analysis)
 				// currently, we distinguish stop-nodes from end-nodes 
 				// by a state-predicate, written to a .task-file 
 				if (globals::output_filename != "")	{
-					output = openOutput(getOutputFilename() + "_fin.task");
+					output = openOutput(getOutputFilename_net(F_LOLA) + ".fin.task");
 				}
 				  
 			  (*output) << generate_task_file_contents_finalState(analysis) << endl << endl;
@@ -600,7 +601,7 @@ void write_task_file (analysis_t analysis)
 		if (analysis[A_SAFE]) {
 		  trace(TRACE_DEBUG, "-> writing safeness analysis task to file\n");
       if (globals::output_filename != "") {
-        output = openOutput(getOutputFilename() + "_safe.task");
+        output = openOutput(getOutputFilename_net(F_LOLA) + ".safe.task");
       }
         
       (*output) << generate_task_file_contents_safeState(analysis) << endl << endl;
@@ -671,12 +672,12 @@ void extend_script_file_subAnalysis_lola (possibleAnalysis an) {
   } else if (an == A_SAFE) {
     analysis_text = " for safeness";
     lolaCommand = "lola-state";
-    taskFile_suffix = "_safe"; // safeness of the net
+    taskFile_suffix = ".safe"; // safeness of the net
     isTaskFileAnalysis = true;
   } else if (an == A_SOUNDNESS) {
     analysis_text = " for soundness";
     lolaCommand = "lola-mc";
-    taskFile_suffix = "_fin"; // reachability of final state
+    taskFile_suffix = ".fin"; // reachability of final state
     isTaskFileAnalysis = true;
   } else {
     trace(TRACE_ERROR, " [ERROR] unknown analysis task , cannot generate script file\n");
@@ -690,7 +691,7 @@ void extend_script_file_subAnalysis_lola (possibleAnalysis an) {
   if (isTaskFileAnalysis && taskFileWritten) {
     scriptContents << "${1}" << lolaCommand << " "
       << getOutputFilename_net(F_LOLA) 
-      << " -a " << getOutputFilename() << taskFile_suffix << ".task"
+      << " -a " << getOutputFilename_net(F_LOLA) << taskFile_suffix << ".task"
       << " -P" 
       << endl;
   } else {
@@ -839,38 +840,39 @@ translationResult_t translate_process(Block *process, analysis_t analysis, unsig
     	finalStateFormula = bom->createOmegaPredicate(&PN, false);
     }
   }
+  
   if (analysis[A_SAFE]) {
     safeStateFormula = bom->createSafeStatePredicate(&PN);
   }
     
-    // fix names of places such that they can be read by 
-    // an owfn/lola parser after output
-    //PN.fixPlaceNames();
+  // fix names of places such that they can be read by 
+  // an owfn/lola parser after output
+  //PN.fixPlaceNames();
 
-    cerr << process->name << "." << endl;
+  cerr << process->name << "." << endl;
 
-    // extend output file name suffix if necessary
-    // if we work with the unreduced net, extend the file name 
-    if (reduction_level < globals::reduction_level) {
-    	globals::output_filename_suffix += ".unreduced";
-    }
+  // extend output file name suffix if necessary
+  // if we work with the unreduced net, extend the file name 
+  if (reduction_level < globals::reduction_level) {
+  	globals::output_filename_suffix += ".unreduced";
+  }
 
-    // generate the output for the given process
-    globals::currentProcessName = process->name;	// for comments about origin in generated net files
-    write_net_file(analysis);		// write out current process and further related files
-    write_task_file(analysis);		// write task file for this process (if applciable)
-    extend_script_file(analysis);	// extend script file for this process (if applicable)
-    
-    if (finalStateFormula != NULL) {
-    	delete finalStateFormula;	// TODO clean up subformulas!
-    	finalStateFormula = NULL;
-    }
-    if (safeStateFormula != NULL) {
-      delete safeStateFormula;  // TODO clean up subformulas!
-      safeStateFormula = NULL;
-    }
-    
-    return res;
+  // generate the output for the given process
+  globals::currentProcessName = process->name;	// for comments about origin in generated net files
+  write_net_file(analysis);		// write out current process and further related files
+  write_task_file(analysis);		// write task file for this process (if applciable)
+  extend_script_file(analysis);	// extend script file for this process (if applicable)
+  
+  if (finalStateFormula != NULL) {
+  	delete finalStateFormula;	// TODO clean up subformulas!
+  	finalStateFormula = NULL;
+  }
+  if (safeStateFormula != NULL) {
+    delete safeStateFormula;  // TODO clean up subformulas!
+    safeStateFormula = NULL;
+  }
+  
+  return res;
 }
 
 translationResult_t translate_process_reconcile (Block *process, analysis_t analysis)

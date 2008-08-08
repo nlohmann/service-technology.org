@@ -118,7 +118,7 @@ typedef enum
   A_STOP_NODES,		///< distinguishing stop nodes from end nodes
   A_KEEP_UNCONN_PINS,	///< keep unconnected pins
   A_DEADLOCKS,		///< check for absence of deadlocks
-  A_LIVELOCKS		///< check for absence of livelocks
+  A_SAFE		      ///< check for safeness
 } possibleAnalysis;
 
 typedef map<possibleAnalysis, bool> analysis_t;

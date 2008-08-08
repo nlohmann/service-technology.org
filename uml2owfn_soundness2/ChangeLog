@@ -3,6 +3,9 @@ ChangeLog for UML2oWFN
 Version 1.03 (in progress)
 ============
 
++ added parameter "-a safe" to check for safeness of a net using LoLA with state predicates, this parameter can be used together with "-a soundness" and "-a deadlocks"
++ worked on bug #12160: PNAPI: Petri net reduction rules do not preserve (un)-safeness, disallowing place/transition fusion if places/transitions are together in the preset/postset of another transition/place 
++ modified analysis scripts: fixed evaluation of LoLA return results (in case of deadlock analysis, return result '0' means 'unsound'), and preserving LoLA output in 'niels-analysis_lola.log' for further investigations
 + added documentation in ./doc/
 + added analysis scripts (by Niels)
 + modified soundness analysis scheme: the parameter combination "-a soundness -a deadlocks" tries to generate Petri nets for a deadlock based soundness analysis of the library. In case a net is a freechoice-workflow net, this is possible, in any other case a reachability analysis of the set of final markings must be done by CTL-model checking. For each case the corresponding net and analysis task is created.

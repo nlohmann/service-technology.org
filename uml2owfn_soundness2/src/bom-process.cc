@@ -103,6 +103,26 @@ FormulaState* BomProcess::createOmegaPredicate(PetriNet* PN, bool stopNodes)
 	return mainF;
 }
 
+FormulaState* BomProcess::createSafeStatePredicate (PetriNet* PN) {
+  // net is safe iff all internal places do not have more than one token
+  // the analysis checks for the violation of the safe state
+  FormulaState* mainF;
+  
+  // create a literal p = 0 for each internal place p of the process
+  set<Place*> PN_P = PN->getInternalPlaces();
+  set<PetriNetLiteral *>  processNodesLit_zero;
+  for (set<Place *>::iterator it = PN_P.begin(); it != PN_P.end(); it++) {
+    Place* p = static_cast<Place*>(*it);
+    
+    // all internal places must have not more than one token
+    processNodesLit_zero.insert(new PetriNetLiteral(p, COMPARE_GREATER, 1));
+  }
+  // disjunction over all literals
+  FormulaState* safeF = new FormulaState(LOG_OR);
+  safeF->subFormulas.insert(processNodesLit_zero.begin(), processNodesLit_zero.end());
+  return safeF;
+}
+
 /*!
  * \brief	remove places representing unconnected pins from the net
  * 

@@ -115,7 +115,7 @@ namespace globals
 
   /// in case multiple analysis tasks are performed on the same process
   /// used as a flag during translation
-  extern bool multi_analysis;
+  //extern bool multi_analysis;
 }
 
 #endif

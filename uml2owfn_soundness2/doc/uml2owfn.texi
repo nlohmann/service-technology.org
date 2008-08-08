@@ -132,20 +132,46 @@ UML2oWFN was written by Martin Znamirowski (@email{znamirow@@informatik.hu-berli
 
 @cartouche
 @smallexample
-uml2owfn -i lib.xml -f lola -a soundness -a deadlocks -p filter -p log -d 2 -o > translate.log 2> translate-err.log
+uml2owfn -i lib.xml -f lola -a soundness -a deadlocks -a safe -p filter -p log -d 2 -o > translate.log 2> translate-err.log
 @end smallexample
 @end cartouche
 
-This creates a set of @file{lib.XXX__YYY.lola} files where @samp{YYY} is the name of a process, and @samp{XXX} its containing catalog. Additionally the file @file{uml2owfn_lib.log} is written which contains structural analysis results of the files. The files @file{translate.log} and @file{translate-err.log} contains the verbose output of uml2owfn. Further the script @file{check_lib.sh} is created.
+This creates a set of @file{lib.XXX__YYY.lola} files where @samp{YYY} is the name
+of a process, and @samp{XXX} its containing catalog. Each @file{lib.XXX__YYY.lola} file get additionally a
+@file{lib.XXX__YYY_safe.task} file to check for safeness of the net, and depending
+on the net structure a @file{lib.XXX__YYY_fin.task} file to check for the
+reachability of a `good' final state. Additionally the file
+@file{uml2owfn_lib.log} is written which contains structural analysis results of
+the files.  The files @file{translate.log} and 
+@file{translate-err.log} contains the verbose output of uml2owfn. Further the
+script @file{check_lib.sh} is created.
 
 During the run, UML2oWFN makes a number of structural checks on each process
 
 @enumerate
-@item @samp{-p filter} causes checking whether a process has overlapping pinsets or multiplicities at a pin that has an incoming or outgoing edge; processes that have this kind of structural properties are not translated.
-@item By @samp{-a soundess} uml2owfn automatically checks whether resulting net N of the translation is a free-choice net. uml2owfn adds a unique alpha place and a number of omega places (one for each stop node and each end node), and checks whether each node of the net N is on a path from alpha to one of the omega places (i.e. whether N has workflow structure).
+@item @samp{-p filter} causes checking whether a process has overlapping pinsets
+or multiplicities at a pin that has an incoming or outgoing edge; processes that
+have this kind of structural properties are not translated.
+
+@item By @samp{-a soundess} uml2owfn automatically checks whether resulting net
+N of the translation is a free-choice net. uml2owfn adds a unique alpha place
+and a number of omega places (one for each stop node and each end node), and
+checks whether each node of the net N is on a path from alpha to one of the
+omega places (i.e. whether N has workflow structure). In this case no
+@file{lib.XXX__YYY_fin.task} file is generated.
 @end enumerate
 
-In case a net is a free-choice workflow net, the net is livelock free; thus the net is sound if it is also deadlock-free and safe. The verification only has to check for deadlocks, call 
+To check a net for safeness call
+
+@cartouche
+@smallexample
+lola-state lib.XXX__YYY.lola -a lib.XXX__YYY_safe.task
+@end smallexample
+@end cartouche
+
+In case a net is a free-choice workflow net, the net is livelock free; thus the
+net is sound if it is also deadlock-free and safe. The verification only has to
+check for deadlocks, call 
 
 @cartouche
 @smallexample
@@ -155,11 +181,15 @@ lola-dl lib.XXX__YYY.lola
 
 to check soundness of process @samp{YYY}.
 
-If the net is not free-choice or not a workflow-net, the verification has to check for deadlock-freedom, safeness, and livelock-freedom; this can only be done by checking the reachability of a set of final markings. In the latter case, the corresponding CTL model-checking property is appended to the net file; call
+If the net is not free-choice or not a workflow-net, the verification has to
+check for deadlock-freedom, safeness, and livelock-freedom; this can only be
+done by checking the reachability of a set of final markings. In the latter
+case, the corresponding CTL model-checking property is appended to the net file;
+call
 
 @cartouche
 @smallexample
-lola-mc lib.XXX__YYY.lola
+lola-mc lib.XXX__YYY.lola -a lib.XXX__YYY_safe_fin.task
 @end smallexample
 @end cartouche
 

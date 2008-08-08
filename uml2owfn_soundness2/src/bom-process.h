@@ -37,6 +37,7 @@ public:
 	/// create the formula describing the final state
 	FormulaState* createFinalStatePredicate (PetriNet* PN);
 	FormulaState* createOmegaPredicate (PetriNet* PN, bool stopNodes);
+	FormulaState* createSafeStatePredicate (PetriNet* PN);
 	
 	/// remove places representing unconnected pins in the given net
 	void removeUnconnectedPins (PetriNet *PN);

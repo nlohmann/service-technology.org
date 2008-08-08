@@ -138,6 +138,7 @@ void print_help()
 	trace("    soundness           analyze for soundness\n");
 	trace("    deadlocks           check for deadlocks (except in the final state),\n");
 	trace("                        requires -a soundness\n");
+	trace("    safe                analyze for safeness\n");
 	trace("    stop                distinguish stop nodes from end nodes\n");
 	trace("    keeppins            keep unconnected pins\n");
 	trace("\n");
@@ -352,8 +353,8 @@ void parse_command_line(int argc, char* argv[])
 				globals::analysis[A_KEEP_UNCONN_PINS] = true;
 			else if (parameter == "deadlocks")
 				globals::analysis[A_DEADLOCKS] = true;
-			else if (parameter == "livelocks")
-				globals::analysis[A_LIVELOCKS] = true;
+      else if (parameter == "safe")
+        globals::analysis[A_SAFE] = true;
 			else {
 				trace(TRACE_ALWAYS, "Unknown analysis task \"" + parameter +"\".\n");
 				trace(TRACE_ALWAYS, "Use -h to get a list of valid analysis tasks.\n");
@@ -483,8 +484,13 @@ void parse_command_line(int argc, char* argv[])
 			trace(TRACE_INFORMATION, "keeping unconnected pins\n");
 		if (globals::analysis[A_DEADLOCKS])
 			trace(TRACE_INFORMATION, "checking for absence of deadlocks\n");
-		if (globals::analysis[A_LIVELOCKS])
-			trace(TRACE_INFORMATION, "checking for absence of livelocks\n");
+		if (globals::analysis[A_SAFE])
+			trace(TRACE_INFORMATION, "checking for safeness\n");
+		if (globals::analysis[A_SAFE] && globals::analysis[A_SOUNDNESS]) {
+		  trace(TRACE_INFORMATION, "multiple model-checking analysis tasks: forcing analysis task files\n");
+		  options[O_PARAMETER] = true;
+		  globals::parameters[P_TASKFILE] = true;
+		}
 	}
 	
 	if (options[O_PARAMETER]) {

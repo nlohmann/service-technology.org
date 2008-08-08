@@ -180,8 +180,12 @@ ostream& operator<< (ostream& os, const FormulaState &obj)
 {
   switch (obj.format)
   {
-    case(FORMAT_LOLA_FORMULA):	obj.output_lola_complete(&os); break;
-    default:		break;
+    case(FORMAT_LOLA_FORMULA):
+    case(FORMAT_LOLA_STATEPREDICATE):
+      obj.output_lola_complete(&os);
+      break;
+    default:
+      break;
   }
   return os;
 }
@@ -198,7 +202,14 @@ void FormulaState::output_lola_complete(ostream *output) const
 	assert(output != NULL);
 	
 	// print header of the output and contents
-	(*output) << "FORMULA" << endl << output_lola() << endl;	
+	switch (format) {
+	  case FORMAT_LOLA_FORMULA:
+	    (*output) << "FORMULA" << endl << output_lola() << endl;
+	    break;
+	  case FORMAT_LOLA_STATEPREDICATE:
+	    (*output) << "FORMULA" << endl << output_lola() << endl;
+	    break;
+	}
 }
 
 /*!

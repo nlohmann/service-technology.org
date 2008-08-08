@@ -149,7 +149,8 @@ private:
  */
 typedef enum
 {
-	FORMAT_LOLA_FORMULA
+	FORMAT_LOLA_FORMULA,
+	FORMAT_LOLA_STATEPREDICATE
 } formula_output_format;
 
 
@@ -191,10 +192,10 @@ private:
 	/// output format for this formula
 	formula_output_format format;
 	
-    /// output LoLA formula
-    void output_lola_complete(ostream *output) const;
-    /// output LoLA formula without preceding header
-    const string output_lola() const;
+  /// output LoLA formula
+  void output_lola_complete(ostream *output) const;
+  /// output LoLA formula without preceding header
+  const string output_lola() const;
 };
 
 

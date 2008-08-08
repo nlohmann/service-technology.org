@@ -412,17 +412,15 @@ void PetriNet::reduce_series_places()
   
   set<string> uselessTransitions;
   set<pair<string, string> > placePairs;
-  
-  set<string> 	internal;
-  set<string>	interface;
-  
+  ////<Dirk.F> preserve (un)safeness of nets, 1 line
+  set<Place *> touched;
   
   // iterate the transtions
   for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
   {
     Place* prePlace = static_cast<Place*>(*((*t)->preset.begin()));
     Place* postPlace = static_cast<Place*>(*((*t)->postset.begin()));
-    
+
     if (((*t)->preset.size() == 1) && ((*t)->postset.size() == 1) && // precondition 1
         (prePlace != postPlace) &&			 // precondition 2
         ((prePlace)->postset.size() == 1) &&		 // precondition 3
@@ -430,10 +428,42 @@ void PetriNet::reduce_series_places()
         (postPlace->type == INTERNAL) &&
         (arc_weight(prePlace, *t) == 1 && arc_weight(*t, postPlace) == 1)) // precondition 5
     {
+      ////<Dirk.F> start, preserve (un)safeness of nets, 25 lines
+      if (touched.find(prePlace) != touched.end())
+          continue;
+      if (touched.find(postPlace) != touched.end())
+          continue;
+      
+      // check whether prePlace and postPlace have disjoint post-sets and disjoint pre-sets
+      // if not then their fusion either changes the number of produces tokens or the
+      // number of consumed tokens
+      bool disjoint = true;
+      for (set<Node*>::iterator t2 = prePlace->postset.begin(); t2 != prePlace->postset.end(); t2++) {
+        if (postPlace->postset.find(*t2) != postPlace->postset.end()) {
+          disjoint = false; break;
+        }
+      }
+      if (!disjoint)
+        continue;
+      
+      disjoint = true;
+      for (set<Node*>::iterator t2 = prePlace->preset.begin(); t2 != prePlace->preset.end(); t2++) {
+        if (postPlace->preset.find(*t2) != postPlace->preset.end()) {
+          disjoint = false; break;
+        }
+      }
+      if (!disjoint)
+        continue;
+      ////<Dirk.F> end, preserve (un)safeness of nets
+      
       string id1 = ((*((*t)->preset.begin()))->nodeFullName());
       string id2 = ((*((*t)->postset.begin()))->nodeFullName());
       placePairs.insert(pair<string, string>(id1, id2));
       uselessTransitions.insert(((*t)->nodeFullName()));
+      ////<Dirk.F> start, preserve (un)safeness of nets, 2 lines
+      touched.insert(prePlace);
+      touched.insert(postPlace);
+      ////<Dirk.F> end, preserve (un)safeness of nets
     }
   }
   
@@ -481,7 +511,8 @@ void PetriNet::reduce_series_transitions()
   
   set<string> uselessPlaces;
   set<pair<string, string> > transitionPairs;
-  
+  ////<Dirk.F> preserve (un)safeness of nets, 1 line
+  set<Transition *> touched;
   
   // iterate the places
   for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
@@ -491,6 +522,32 @@ void PetriNet::reduce_series_transitions()
       Transition* t1 = static_cast<Transition*>(*((*p)->preset.begin()));
       Transition* t2 = static_cast<Transition*>(*((*p)->postset.begin()));
       
+      ////<Dirk.F> start, preserve (un)safeness of nets, 24 lines
+      if (touched.find(t1) != touched.end())
+          continue;
+      if (touched.find(t2) != touched.end())
+          continue;
+      
+      // check whether t1 and t2 have disjoint post-sets and disjoint pre-sets
+      bool disjoint = true;
+      for (set<Node*>::iterator p2 = t1->postset.begin(); p2 != t1->postset.end(); p2++) {
+        if (t2->postset.find(*p2) != t2->postset.end()) {
+          disjoint = false; break;
+        }
+      }
+      if (!disjoint)
+        continue;
+      
+      disjoint = true;
+      for (set<Node*>::iterator p2 = t1->preset.begin(); p2 != t1->preset.end(); p2++) {
+        if (t2->preset.find(*p2) != t2->preset.end()) {
+          disjoint = false; break;
+        }
+      }
+      if (!disjoint)
+        continue;
+      ////<Dirk.F> end, preserve (un)safeness of nets
+      
       if (((t2)->preset.size() == 1) && // precondition 2
           (arc_weight(t1, *p) == arc_weight(*p, t2))) // precondition 5
       {
@@ -498,6 +555,10 @@ void PetriNet::reduce_series_transitions()
         string id2 = (t2->nodeFullName());
         transitionPairs.insert(pair<string, string>(id1, id2));
         uselessPlaces.insert(((*p)->nodeFullName()));
+        ////<Dirk.F> start, preserve (un)safeness of nets, 2 lines
+        touched.insert(t1);
+        touched.insert(t2);
+        ////<Dirk.F> end, preserve (un)safeness of nets
       }
     }
   }

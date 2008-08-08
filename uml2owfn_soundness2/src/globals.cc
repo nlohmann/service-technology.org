@@ -75,7 +75,7 @@ namespace globals {
 
   map<possibleParameters, bool> parameters;
   analysis_t analysis;
-  bool multi_analysis = false;			///< used as a flag during translation
+  //bool multi_analysis = false;			///< used as a flag during translation
 
   string last_error_token = "";
   string last_error_line = "";

@@ -609,235 +609,235 @@ void Block::linkInserts()
 //!        A connection is valid if its two pins can be found
 void Block::linkNodes()
 {
-	// TODO re-factor this method, it is too long!
-	
-    // only link nodes if this is a process
-	if (complex)
+  // TODO re-factor this method, it is too long!
+
+  // only link nodes if this is a process
+  if (complex)
+  {
+    // iterate over all connections
+    for (set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
     {
-	// iterate over all connections
-	for (set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
-	{
-		// assume that the source as well as the target pins are invalid
-		bool sourceValid = false;
-		bool targetValid = false;
-		
-		// If the sourcestring is empty this is either an input connection for
-		// the process, or invalid
-		if ((*con)->source == "")
-		{
-			// This connection has no contant pin and thus is invalid
-			if((*con)->sourceContact == "")
-			{
-				cerr << "Ungültige Connection. Kein Ziel spezifiziert !" << endl;
-			} 
-			else
-			{
-				// Search the inputs of the process whether they match the sourceContact 
-				for (set<string>::iterator input = inputs.begin(); input != inputs.end(); input++)
-				{
-					// if a matching input could be found, this source is valid
-					if ((*input) == (*con)->sourceContact)
-					{
-						sourceValid = true;
-						(*con)->src = this;
-						break;
-					}
-				}                    
-			}
-		}
-		else
-		// if the source string is not empty
-		{
-			if((*con)->sourceContact == "")
-			{
-				// In case that the source is not an empty string but the
-				// sourceContact is, this source is either invalid or atomic,
-				// thus being a pin in itself
-				for (set<Block*>::iterator child = children.begin(); child != children.end(); child++)
-				{
-					// if the source is atomic, this connection is valid
-					if ( (*child)->atomic && (*child)->name == (*con)->source)
-					{
-						sourceValid = true;
-						(*con)->src = (*child);
-						break;
-					}
-				}
-			} 
-			else
-			// if a source contact is given as well
-			{
-				// search all other blocks
-				for (set<Block*>::iterator child = children.begin(); child != children.end(); child++)
-				{
-					// if they are not atomic and the sourcename matches the blocks name
-					if ( !(*child)->atomic && (*con)->source == (*child)->name)
-					{
-						// iterate over all outputs to find the pin matching source contact
-						for (set<string>::iterator output = (*child)->outputs.begin(); output != (*child)->outputs.end(); output++)
-						{
-							// if a matching output could be found, this source is valid
-							if ( (*output) == (*con)->sourceContact)
-							{
-                                if ((*child)->wrongMultiplicity[(*output)])
-                                {
-                                    //std::cerr << "Process \"" << attributes["name"] <<"\" filtered out. Violated the rule of not having optional connections!\n\n";
-                                    filtered = true;
-                                    //return; // do not cancel translation
-                                }
-								sourceValid = true;
-								(*con)->src = (*child);
-								break;
-							}
-						}
+      // assume that the source as well as the target pins are invalid
+      bool sourceValid = false;
+      bool targetValid = false;
 
-						// iterate over all additional outputs to find the pin matching source contact
-						for (set<string>::iterator output = (*child)->additionalOutputs.begin(); output != (*child)->additionalOutputs.end(); output++)
-						{
-							// if a matching output could be found, this source is valid
-							if ( (*output) == (*con)->sourceContact)
-							{
-                                if ((*child)->wrongMultiplicity[(*output)])
-                                {
-                                    //std::cerr << "Process \"" << attributes["name"] <<"\" filtered out. Violated the rule of not having optional connections!\n\n";
-                                    filtered = true;
-                                    //return; // do not cancel translation
-                                }
-								sourceValid = true;
-								(*con)->sourceAdditional = true;
-								(*con)->src = (*child);
-								break;
-							}
-						}
-						break;
-					}
-				}
-			}
-		}
-		
-		// Now do the same tests for the target of this connection
+      // If the sourcestring is empty this is either an input connection for
+      // the process, or invalid
+      if ((*con)->source == "")
+      {
+        // This connection has no contant pin and thus is invalid
+        if((*con)->sourceContact == "")
+        {
+          cerr << "Ungültige Connection. Kein Ziel spezifiziert !" << endl;
+        } 
+        else
+        {
+          // Search the inputs of the process whether they match the sourceContact 
+          for (set<string>::iterator input = inputs.begin(); input != inputs.end(); input++)
+          {
+            // if a matching input could be found, this source is valid
+            if ((*input) == (*con)->sourceContact)
+            {
+              sourceValid = true;
+              (*con)->src = this;
+              break;
+            }
+          }                    
+        }
+      }
+      else
+        // if the source string is not empty
+      {
+        if((*con)->sourceContact == "")
+        {
+          // In case that the source is not an empty string but the
+          // sourceContact is, this source is either invalid or atomic,
+          // thus being a pin in itself
+          for (set<Block*>::iterator child = children.begin(); child != children.end(); child++)
+          {
+            // if the source is atomic, this connection is valid
+            if ( (*child)->atomic && (*child)->name == (*con)->source)
+            {
+              sourceValid = true;
+              (*con)->src = (*child);
+              break;
+            }
+          }
+        } 
+        else
+          // if a source contact is given as well
+        {
+          // search all other blocks
+          for (set<Block*>::iterator child = children.begin(); child != children.end(); child++)
+          {
+            // if they are not atomic and the sourcename matches the blocks name
+            if ( !(*child)->atomic && (*con)->source == (*child)->name)
+            {
+              // iterate over all outputs to find the pin matching source contact
+              for (set<string>::iterator output = (*child)->outputs.begin(); output != (*child)->outputs.end(); output++)
+              {
+                // if a matching output could be found, this source is valid
+                if ( (*output) == (*con)->sourceContact)
+                {
+                  if ((*child)->wrongMultiplicity[(*output)])
+                  {
+                    //std::cerr << "Process \"" << attributes["name"] <<"\" filtered out. Violated the rule of not having optional connections!\n\n";
+                    filtered = true;
+                    //return; // do not cancel translation
+                  }
+                  sourceValid = true;
+                  (*con)->src = (*child);
+                  break;
+                }
+              }
 
-		// If the targetstring is empty this is either an output connection for
-		// the process, or invalid
-		if ((*con)->target == "")
-		{
-			// This connection has no contant pin and thus is invalid
-			if((*con)->targetContact == "")
-			{
-				cerr << "Ungültige Connection. Kein Ziel spezifiziert !" << endl;
-			} 
-			else
-			{
-				// Search the outputs of the process whether they match the targetContact 
-				for (set<string>::iterator output = outputs.begin(); output != outputs.end(); output++)
-				{
-					// if a matching output could be found, this target is valid
-					if ((*output) == (*con)->targetContact)
-					{
-						targetValid = true;
-						(*con)->tgt = this;
-						break;
-					}
-				}                    
-			}
-		}
-		else
-		// if the source string is not empty
-		{
-			if((*con)->targetContact == "")
-			{
-				// In case that the target is not an empty string but the
-				// targetContact is, this target is either invalid or atomic,
-				// thus being a pin in itself
-				for (set<Block*>::iterator child = children.begin(); child != children.end(); child++)
-				{
-					// if the target is atomic, this connection is valid
-					if ( (*child)->atomic && (*child)->name == (*con)->target)
-					{
-						targetValid = true;
-						(*con)->tgt = (*child);
-						break;                        
-					}
-				}
-			} 
-			else
-			// if a source contact is given as well
-			{
-				// search all other blocks
-				for (set<Block*>::iterator child = children.begin(); child != children.end(); child++)
-				{
-					// if they are not atomic and the targetname matches the blocks name
-					if ( !(*child)->atomic && (*con)->target == (*child)->name)
-					{
-						// iterate over all outputs to find the pin matching target contact
-						for (set<string>::iterator input = (*child)->inputs.begin(); input != (*child)->inputs.end(); input++)
-						{
-							// if a matching input could be found, this target is valid
-							if ( (*input) == (*con)->targetContact)
-							{
-                                if ((*child)->wrongMultiplicity[(*input)])
-                                {
-                                    //std::cerr << "Process \"" << attributes["name"] <<"\" filtered out. Violated the rule of not having optional connections!\n\n";
-                                    filtered = true;
-                                    //return; // do not cancel translation
-                                }
-								targetValid = true;
-								(*con)->tgt = (*child);
-								break;
-							}
-						}
+              // iterate over all additional outputs to find the pin matching source contact
+              for (set<string>::iterator output = (*child)->additionalOutputs.begin(); output != (*child)->additionalOutputs.end(); output++)
+              {
+                // if a matching output could be found, this source is valid
+                if ( (*output) == (*con)->sourceContact)
+                {
+                  if ((*child)->wrongMultiplicity[(*output)])
+                  {
+                    //std::cerr << "Process \"" << attributes["name"] <<"\" filtered out. Violated the rule of not having optional connections!\n\n";
+                    filtered = true;
+                    //return; // do not cancel translation
+                  }
+                  sourceValid = true;
+                  (*con)->sourceAdditional = true;
+                  (*con)->src = (*child);
+                  break;
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
 
-						// iterate over all additional outputs to find the pin matching source contact
-						for (set<string>::iterator input = (*child)->additionalInputs.begin(); input != (*child)->additionalInputs.end(); input++)
-						{
-							// if a matching input could be found, this target is valid
-							if ( (*input) == (*con)->targetContact)
-							{
-                            	if ((*child)->wrongMultiplicity[(*input)])
-                                {
-                                    //std::cerr << "Process \"" << attributes["name"] <<"\" filtered out. Violated the rule of not having optional connections!\n\n";
-                                    filtered = true;
-                                    //return; // do not cancel translation
-                                }
-								targetValid = true;
-								(*con)->targetAdditional = true;
-								(*con)->tgt = (*child);
-								break;
-							}
-						}
-						break;
-					}
-				}
-			}
-		}      
+      // Now do the same tests for the target of this connection
 
-		// if the target and the source both are valid, this connection is valid
-		if (targetValid && sourceValid)
-		{
-			(*con)->valid = true;
-		}
-		else
-		{
-            cerr<< "Connection konnte nicht gueltig gemacht werden." << endl;
-            cerr<< "Process:\"" << name << "\"" << endl;                
-            cerr<< "Connectionname:\"" << (*con)->name << "\"" << endl;
-// <Dirk.F start> extended debug info
-            if (!sourceValid)
-            	cerr << "[invalid source]" << endl;
-// <Dirk.F end>
-            cerr<< "SourceContact:\"" << (*con)->sourceContact << "\"" << endl;                
-            cerr<< "SourceNode:\"" << (*con)->source << "\"" << endl;
-            
-// <Dirk.F start> extended debug info
-            if (!targetValid)
-            	cerr << "[invalid target]" << endl;
-// <Dirk.F end>
-            cerr<< "TargetContact:\"" << (*con)->targetContact << "\"" << endl;                
-            cerr<< "TargetNode:\"" << (*con)->target << "\"" << endl;                       
-		}
-	}
-	
-    } // end if(complex)
+      // If the targetstring is empty this is either an output connection for
+      // the process, or invalid
+      if ((*con)->target == "")
+      {
+        // This connection has no contant pin and thus is invalid
+        if((*con)->targetContact == "")
+        {
+          cerr << "Ungültige Connection. Kein Ziel spezifiziert !" << endl;
+        } 
+        else
+        {
+          // Search the outputs of the process whether they match the targetContact 
+          for (set<string>::iterator output = outputs.begin(); output != outputs.end(); output++)
+          {
+            // if a matching output could be found, this target is valid
+            if ((*output) == (*con)->targetContact)
+            {
+              targetValid = true;
+              (*con)->tgt = this;
+              break;
+            }
+          }                    
+        }
+      }
+      else
+        // if the source string is not empty
+      {
+        if((*con)->targetContact == "")
+        {
+          // In case that the target is not an empty string but the
+          // targetContact is, this target is either invalid or atomic,
+          // thus being a pin in itself
+          for (set<Block*>::iterator child = children.begin(); child != children.end(); child++)
+          {
+            // if the target is atomic, this connection is valid
+            if ( (*child)->atomic && (*child)->name == (*con)->target)
+            {
+              targetValid = true;
+              (*con)->tgt = (*child);
+              break;                        
+            }
+          }
+        } 
+        else
+          // if a source contact is given as well
+        {
+          // search all other blocks
+          for (set<Block*>::iterator child = children.begin(); child != children.end(); child++)
+          {
+            // if they are not atomic and the targetname matches the blocks name
+            if ( !(*child)->atomic && (*con)->target == (*child)->name)
+            {
+              // iterate over all outputs to find the pin matching target contact
+              for (set<string>::iterator input = (*child)->inputs.begin(); input != (*child)->inputs.end(); input++)
+              {
+                // if a matching input could be found, this target is valid
+                if ( (*input) == (*con)->targetContact)
+                {
+                  if ((*child)->wrongMultiplicity[(*input)])
+                  {
+                    //std::cerr << "Process \"" << attributes["name"] <<"\" filtered out. Violated the rule of not having optional connections!\n\n";
+                    filtered = true;
+                    //return; // do not cancel translation
+                  }
+                  targetValid = true;
+                  (*con)->tgt = (*child);
+                  break;
+                }
+              }
+
+              // iterate over all additional outputs to find the pin matching source contact
+              for (set<string>::iterator input = (*child)->additionalInputs.begin(); input != (*child)->additionalInputs.end(); input++)
+              {
+                // if a matching input could be found, this target is valid
+                if ( (*input) == (*con)->targetContact)
+                {
+                  if ((*child)->wrongMultiplicity[(*input)])
+                  {
+                    //std::cerr << "Process \"" << attributes["name"] <<"\" filtered out. Violated the rule of not having optional connections!\n\n";
+                    filtered = true;
+                    //return; // do not cancel translation
+                  }
+                  targetValid = true;
+                  (*con)->targetAdditional = true;
+                  (*con)->tgt = (*child);
+                  break;
+                }
+              }
+              break;
+            }
+          }
+        }
+      }      
+
+      // if the target and the source both are valid, this connection is valid
+      if (targetValid && sourceValid)
+      {
+        (*con)->valid = true;
+      }
+      else
+      {
+        cerr<< "Connection konnte nicht gueltig gemacht werden." << endl;
+        cerr<< "Process:\"" << name << "\"" << endl;                
+        cerr<< "Connectionname:\"" << (*con)->name << "\"" << endl;
+        // <Dirk.F start> extended debug info
+        if (!sourceValid)
+          cerr << "[invalid source]" << endl;
+        // <Dirk.F end>
+        cerr<< "SourceContact:\"" << (*con)->sourceContact << "\"" << endl;                
+        cerr<< "SourceNode:\"" << (*con)->source << "\"" << endl;
+
+        // <Dirk.F start> extended debug info
+        if (!targetValid)
+          cerr << "[invalid target]" << endl;
+        // <Dirk.F end>
+        cerr<< "TargetContact:\"" << (*con)->targetContact << "\"" << endl;                
+        cerr<< "TargetNode:\"" << (*con)->target << "\"" << endl;                       
+      }
+    }
+
+  } // end if(complex)
 }
 
 /*
@@ -1344,7 +1344,7 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
     Place* p;
     Transition* t;
     
-    bom->bom_nodes.insert(this);	// is a BOM-node of the process
+    //bom->bom_nodes.insert(this);	// is a BOM-node of the process
 
     set<Transition*> startingTransitions;
     map<string, Node*> processCentralNodes;
@@ -1362,19 +1362,23 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
         p = PN->newPlace((globalPrefix + "inputCriterion." +(*inputCriterion) + ".used"), INTERNAL);
         processCentralNodes[*inputCriterion] = p;
         PN->newArc(t,p);
+        
+        // is an 'input criterion used'-place
+        bom->process_inputCriterion_used.insert(p);
+        
         for (set<string>::iterator inputOfThisCriterion = inputCriterionSet[*inputCriterion].begin(); inputOfThisCriterion != inputCriterionSet[*inputCriterion].end(); inputOfThisCriterion++)
         {
         	string placeName = globalPrefix + "input." +(*inputOfThisCriterion);
         	p = PN->findPlace(placeName);		// see if input place was already created
         	// TODO: solution of input/output pins of blocks avoid this problem
         	if (p == NULL) p = PN->newPlace(placeName, INTERNAL);
-            PN->newArc(t,p);			// add arc from the inputCriterion-transition
-            bom->pinPlaces.insert(p);	// process-side place is a pin to the process
+          PN->newArc(t,p);			// add arc from the inputCriterion-transition
+          bom->pinPlaces.insert(p);	// process-side place is a pin to the process
             
-            placeName = globalPrefix + "trueInput." +(*inputOfThisCriterion);
-            p = PN->findPlace(placeName);		// see if input place was already created
+          placeName = globalPrefix + "trueInput." +(*inputOfThisCriterion);
+          p = PN->findPlace(placeName);		// see if input place was already created
         	if (p == NULL) p = PN->newPlace(placeName, IN);
-            PN->newArc(p,t);			// add arc to the inputCriterion-transition
+          PN->newArc(p,t);			// add arc to the inputCriterion-transition
         }
     }
     
@@ -1401,13 +1405,13 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
         	string placeName = globalPrefix + "output." +(*outputOfThisCriterion);
         	p = PN->findPlace(placeName);  	// see if output place was already created
         	if (p == NULL) p = PN->newPlace(placeName, INTERNAL);
-            PN->newArc(p,t);
-            bom->pinPlaces.insert(p);		// process-side place is a pin to the process
-            
-            placeName = globalPrefix + "trueOutput." +(*outputOfThisCriterion);
-            p = PN->findPlace(placeName);  	// see if output place was already created
-            if (p == NULL) p = PN->newPlace(placeName, OUT);
-            PN->newArc(t,p);
+          PN->newArc(p,t);
+          bom->pinPlaces.insert(p);		// process-side place is a pin to the process
+          
+          placeName = globalPrefix + "trueOutput." +(*outputOfThisCriterion);
+          p = PN->findPlace(placeName);  	// see if output place was already created
+          if (p == NULL) p = PN->newPlace(placeName, OUT);
+          PN->newArc(t,p);
         }
     }
     
@@ -2706,6 +2710,7 @@ void Block::adjustRoles()
         }
     }
 }
+
 Block::Block( blockType mytype, bool ifcomplex, bool ifatomic)
 {
     type = mytype;
@@ -2715,9 +2720,12 @@ Block::Block( blockType mytype, bool ifcomplex, bool ifatomic)
     filtered = false;
     syntaxError = false;
 }
+
+
 Block::~Block()
 {
 }
+
 Block* BlockConnection::getTarget()
 {
     return tgt;

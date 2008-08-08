@@ -225,7 +225,7 @@ class Block
 
     /// Set of all outputs of the block
     set<string> outputs;
-
+    
     /// Set of all inputCriteria of the block
     set<string> inputCriteria;
 

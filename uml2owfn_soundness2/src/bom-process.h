@@ -19,10 +19,10 @@ using std::set;
 class BomProcess
 {
 public:
-	set<Block*>			bom_nodes;
-	set<Node*>			pn_nodes;
+	//set<Block*>			bom_nodes;
+	//set<Node*>			pn_nodes;
 	
-	map<Node*, Block*>	pn_to_bom;
+	//map<Node*, Block*>	pn_to_bom;
 	
 	set<Place*>			pinPlaces;
 	
@@ -32,7 +32,9 @@ public:
 	set<Place*>			process_endNodes;
 	set<Place*>			process_stopNodes;
 	set<Place*>			process_internalPlaces;
-
+	
+	// places denoting that an incriterion has fired
+	set<Place*>     process_inputCriterion_used;
 
 	/// create the formula describing the final state
 	FormulaState* createFinalStatePredicate (PetriNet* PN);
@@ -41,6 +43,9 @@ public:
 	
 	/// remove places representing unconnected pins in the given net
 	void removeUnconnectedPins (PetriNet *PN);
+	
+	/// remove places and transitions representing unused output pinsets
+	void removeEmptyOutputPinSets (PetriNet *PN);
 	
 	/// make input places internal and introduce a unique initial place to the net
 	void soundness_initialPlaces (PetriNet *PN);

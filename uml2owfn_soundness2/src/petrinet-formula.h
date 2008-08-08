@@ -170,18 +170,20 @@ public:
 	
 	/// set the output format for this formula object
 	void set_format (formula_output_format aFormat);
- 
 
-    /// outputs the formula
-    friend ostream& operator<< (ostream& os, const FormulaState &obj);
-    
-    /// constructor for formula with boolean connectives
-    FormulaState(logical_connective aConn);
-    /// constructor for quantified formula
-    FormulaState(logical_quantifier aQuant);
+	/// number of sub formulas of this formula
+	unsigned int size() const;
 
-    /// destructor
-    virtual ~FormulaState();
+  /// outputs the formula
+  friend ostream& operator<< (ostream& os, const FormulaState &obj);
+  
+  /// constructor for formula with boolean connectives
+  FormulaState(logical_connective aConn);
+  /// constructor for quantified formula
+  FormulaState(logical_quantifier aQuant);
+
+  /// destructor
+  virtual ~FormulaState();
     
 private:
 	/// their common logical connective

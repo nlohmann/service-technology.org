@@ -1564,10 +1564,13 @@ arbitraryAttributes:
   /* empty */
 |   X_NAME X_EQUALS X_STRING arbitraryAttributes
     {
+    	// 1 = block
         if(attributeMode == 1)
         {
             currentBlock->attributes[$1] = $3;
         }
+        
+        // 2 = input
         if(attributeMode == 2  && !(relatedInputCriteria))
         {
             if ($1 == "name")
@@ -1600,6 +1603,8 @@ arbitraryAttributes:
                 }
             }
         }
+        
+        // 3 = output
         if(attributeMode == 3)
         {
             if ($1 == "name")
@@ -1632,6 +1637,8 @@ arbitraryAttributes:
                 }
             }
         }
+        
+        // 4 = connection
         if(attributeMode == 4)
         {
             if ($1 == "name")
@@ -1639,6 +1646,8 @@ arbitraryAttributes:
                 currentConnection->name = $3;
             }
         }
+        
+        // 5 = connection source
         if(attributeMode == 5)
         {
             if ($1 == "contactPoint")
@@ -1650,6 +1659,8 @@ arbitraryAttributes:
                 currentConnection->source = $3;
             }
         }
+        
+        // 6 = connection target
         if(attributeMode == 6)
         {
             if ($1 == "contactPoint")
@@ -1661,6 +1672,8 @@ arbitraryAttributes:
                 currentConnection->target = $3;
             }
         }
+        
+        // 7 = input criterion
         if(attributeMode == 7  && !(relatedInputCriteria))
         {
             if ($1 == "name")
@@ -1679,6 +1692,7 @@ arbitraryAttributes:
             }
         }
         
+        // 8 = output criterion
         if(attributeMode == 8)
         {
             if ($1 == "name")
@@ -1691,6 +1705,8 @@ arbitraryAttributes:
                 }
             }
         }
+        
+        // 9 = additional input
         if(attributeMode == 9)
         {
             if ($1 == "name")
@@ -1715,6 +1731,8 @@ arbitraryAttributes:
                 }
             }
         }
+        
+        // 10 = additional output
         if(attributeMode == 10)
         {
             if ($1 == "name")
@@ -1739,14 +1757,16 @@ arbitraryAttributes:
                 }
             }
         }
-        if(attributeMode == 11)
-        {
-            if ($1 == "name")
-            {
+        
+        // 11 = input branch
+        if(attributeMode == 11) {
+            if ($1 == "name") {
                 currentBlock->addInputBranch($3);
                 currentInputBranch = $3;
             }
         }
+        
+        // 12 = output branch
         if(attributeMode == 12)
         {
             if ($1 == "name")
@@ -1755,6 +1775,8 @@ arbitraryAttributes:
                 currentOutputBranch = $3;
             }
         }
+        
+        // 13 = role
         if(attributeMode == 13)
         {
             if ($1 == "role")

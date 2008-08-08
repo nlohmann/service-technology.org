@@ -85,7 +85,7 @@ FormulaState* BomProcess::createOmegaPredicate(PetriNet* PN, bool stopNodes)
 		return NULL;
 	} else {
 		FormulaState* omegaF = new FormulaState(LOG_OR);
-		
+
 		// for all final places (= omega places)
 		set<Place *>	finalPlaces = PN->getFinalPlaces();
 		for (set<Place*>::iterator it = finalPlaces.begin(); it != finalPlaces.end(); it++)
@@ -94,9 +94,10 @@ FormulaState* BomProcess::createOmegaPredicate(PetriNet* PN, bool stopNodes)
 			// pOmega > 0
 			omegaF->subFormulas.insert(new PetriNetLiteral(p, COMPARE_GREATER, 0));
 		}
-		// ( omega1 > 0 OR ... OR omegaN > 0) AND p1 = 0 AND ... AND pM = 0
-		mainF = new FormulaState(LOG_AND);
-		mainF->subFormulas.insert(omegaF);
+    // ( omega1 > 0 OR ... OR omegaN > 0) AND p1 = 0 AND ... AND pM = 0
+    mainF = new FormulaState(LOG_AND);
+		if (omegaF->size() > 0)
+		  mainF->subFormulas.insert(omegaF);
 		mainF->subFormulas.insert(processNodesLit_zero.begin(), processNodesLit_zero.end());
 	}
 
@@ -123,6 +124,11 @@ FormulaState* BomProcess::createSafeStatePredicate (PetriNet* PN) {
     // all internal places must have not more than one token
     processNodesLit_zero.insert(new PetriNetLiteral(p, COMPARE_GREATER, 1));
   }
+  
+  // no place that could become unsafe
+  if (processNodesLit_zero.empty())
+    return NULL;
+  
   // disjunction over all literals
   FormulaState* safeF = new FormulaState(LOG_OR);
   safeF->subFormulas.insert(processNodesLit_zero.begin(), processNodesLit_zero.end());
@@ -145,14 +151,78 @@ void BomProcess::removeUnconnectedPins(PetriNet *PN) {
 			to_remove.insert(p);
 	}
 	
-    // finally remove all gathered nodes
-    for (set< Place * >::iterator place = to_remove.begin(); place != to_remove.end(); place ++) {
-        //cerr << "Removing Place: " << (*place)->nodeFullName() << "\n";
-        PN->removePlace(*place);
-        // remove place from BOM process structure as well
-        process_internalPlaces.erase(*place);	
-        pinPlaces.erase(*place);
+  // finally remove all gathered nodes
+  for (set< Place * >::iterator place = to_remove.begin(); place != to_remove.end(); place ++) {
+      //cerr << "Removing Place: " << (*place)->nodeFullName() << "\n";
+      PN->removePlace(*place);
+      // remove place from BOM process structure as well
+      process_internalPlaces.erase(*place);	
+      pinPlaces.erase(*place);
+  }
+}
+
+/*!
+ * \brief remove places and transitions representing unused output pinsets
+ * 
+ * \param  PN  the net to be modified
+ */
+void BomProcess::removeEmptyOutputPinSets (PetriNet *PN) {
+  set<Transition*> removeT;
+  set<Place*> removeP;
+  
+  for (set<Transition*>::iterator it = process_outputPinSets.begin()
+        ; it != process_outputPinSets.end(); it++)
+  {
+    Transition*   t   = static_cast<Transition*>(*it);
+    set<Node*>    pre = t->getPreSet();
+    
+    bool          pinPlaceFound = false;
+    for (set<Node*>::iterator it2 = pre.begin(); it2 != pre.end(); it2++) {
+      Place*   p   = static_cast<Place*>(*it2);
+      if (pinPlaces.find(p) != pinPlaces.end()) {
+        pinPlaceFound = true; break;
+      }
     }
+    if (!pinPlaceFound) {
+      // this output pinset has no more incoming pins,
+      // remove it and all of its post-places (the true outgoing interface)
+      set<Node*>    post = t->getPostSet();
+      removeT.insert(t);
+      for (set<Node*>::iterator it2 = post.begin(); it2 != post.end(); it2++) {
+        Place*   p   = static_cast<Place*>(*it2);
+        removeP.insert(p);
+      }
+    }
+  }
+  
+  // remove all transitions and places
+  for (set<Transition*>::iterator it=removeT.begin(); it!=removeT.end(); it++) {
+    Transition*   t   = static_cast<Transition*>(*it);
+    PN->removeTransition(t);
+    process_outputPinSets.erase(t);
+  }
+  for (set<Place*>::iterator it=removeP.begin(); it!=removeP.end(); it++) {
+    Place*   p   = static_cast<Place*>(*it);
+    PN->removePlace(p);
+  }
+  removeP.clear();
+  
+  // remove dangling places that remember which input pinset was used
+  for (set<Place*>::iterator pUsed = process_inputCriterion_used.begin()
+         ; pUsed != process_inputCriterion_used.end(); pUsed++)
+  {
+    if ((*pUsed)->getPostSet().empty()) {
+      removeP.insert(*pUsed);
+    }
+  }
+  
+  for (set<Place*>::iterator it=removeP.begin(); it!=removeP.end(); it++) {
+    Place*   p   = static_cast<Place*>(*it);
+    PN->removePlace(p);
+    process_internalPlaces.erase(p);
+    pinPlaces.erase(p);
+  }
+
 }
 
 /*!
@@ -240,21 +310,21 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
     	for (set<Node *>::iterator it = outputPins.begin(); it != outputPins.end(); it++)
     	{
     		Place* place = static_cast<Place*>(*it);
-   	        places_to_remove.insert(place);
+   	    places_to_remove.insert(place);
     	}
     	noMoreOutput.insert((*outPS));
     	
-        Place* outputPlace = PN->newPlace((*outPS)->nodeFullName() + "_omega");
-        PN->newArc((*outPS), outputPlace);
-        outputPlace->isFinal = true;		// make it a final place
-        
-        omegaPlaces.insert(outputPlace);	// is one of the new final places
-        
-        if (liveLocks) {	// introduce live-lock at omega-place 
+      Place* outputPlace = PN->newPlace((*outPS)->nodeFullName() + "_omega");
+      PN->newArc((*outPS), outputPlace);
+      outputPlace->isFinal = true;		// make it a final place
+      
+      omegaPlaces.insert(outputPlace);	// is one of the new final places
+      
+      if (liveLocks) {	// introduce live-lock at omega-place 
 	    	Transition* tLoop = PN->newTransition(outputPlace->nodeFullName() + "_omega.loop");
 	    	PN->newArc(outputPlace, tLoop, STANDARD, 1);
 	    	PN->newArc(tLoop, outputPlace, STANDARD, 1);
-        }
+      }
     }
     
     // when checking soundness, transition which consume from

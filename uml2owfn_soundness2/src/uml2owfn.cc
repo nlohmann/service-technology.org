@@ -105,7 +105,7 @@ FormulaState* finalStateFormula = NULL;
 /// formula specifying safness of the net
 FormulaState* safeStateFormula = NULL;
 
-bool taskFileWritten;
+map<possibleAnalysis,bool> taskFileWritten;
 /// string holding the contents of a script
 stringstream scriptContents;
 /// string holding the contents of a log file
@@ -576,7 +576,9 @@ void write_task_file (analysis_t analysis)
 	if (!write_task_to_file(analysis))
 		return;	// skip
 	
-	taskFileWritten = false;	// in this run, we did not write a task-file yet 
+	// in this run, we did not write a task-file yet
+	for (int i=0;i<(int)A_MAX;i++)
+	  taskFileWritten[(possibleAnalysis)i] = false;
 	
 	if ( formats[F_LOLA] ) {
 		if (analysis[A_SOUNDNESS]) {
@@ -593,7 +595,7 @@ void write_task_file (analysis_t analysis)
 				if (globals::output_filename != "") {
 					closeOutput(output);
 					output = NULL;
-					taskFileWritten = true;
+					taskFileWritten[A_SOUNDNESS] = true;
 				}
 			}
 		}
@@ -609,7 +611,7 @@ void write_task_file (analysis_t analysis)
       if (globals::output_filename != "") {
         closeOutput(output);
         output = NULL;
-        taskFileWritten = true;
+        taskFileWritten[A_SAFE] = true;
       }
 		}
 	}
@@ -669,16 +671,19 @@ void extend_script_file_subAnalysis_lola (possibleAnalysis an) {
     analysis_text = " for deadlocks";
     lolaCommand = "lola-dl";
     taskFile_suffix = "";
+    
   } else if (an == A_SAFE) {
     analysis_text = " for safeness";
     lolaCommand = "lola-state";
     taskFile_suffix = ".safe"; // safeness of the net
     isTaskFileAnalysis = true;
+    
   } else if (an == A_SOUNDNESS) {
     analysis_text = " for soundness";
     lolaCommand = "lola-mc";
     taskFile_suffix = ".fin"; // reachability of final state
     isTaskFileAnalysis = true;
+    
   } else {
     trace(TRACE_ERROR, " [ERROR] unknown analysis task , cannot generate script file\n");
     return;
@@ -688,7 +693,7 @@ void extend_script_file_subAnalysis_lola (possibleAnalysis an) {
   scriptContents << "echo  checking " << getOutputFilename() << analysis_text << endl;
   scriptContents << "echo ----------------------------------------------------------------" << endl;
   
-  if (isTaskFileAnalysis && taskFileWritten) {
+  if (isTaskFileAnalysis && taskFileWritten[an]) {
     scriptContents << "${1}" << lolaCommand << " "
       << getOutputFilename_net(F_LOLA) 
       << " -a " << getOutputFilename_net(F_LOLA) << taskFile_suffix << ".task"
@@ -763,6 +768,7 @@ translationResult_t translate_process(Block *process, analysis_t analysis, unsig
     if (not(analysis[A_KEEP_UNCONN_PINS])) {
         trace(TRACE_DEBUG, "-> removing unconnected pins\n");
     	bom->removeUnconnectedPins(&PN);
+    	//bom->removeEmptyOutputPinSets(&PN);
     }
     
     // extend net for soundness checking
@@ -843,6 +849,9 @@ translationResult_t translate_process(Block *process, analysis_t analysis, unsig
   
   if (analysis[A_SAFE]) {
     safeStateFormula = bom->createSafeStatePredicate(&PN);
+    if (safeStateFormula == NULL || safeStateFormula->size() == 0)
+      // no formula needed to check safeness, net is safe
+      analysis[A_SAFE] = false;
   }
     
   // fix names of places such that they can be read by 
@@ -986,7 +995,7 @@ int main( int argc, char *argv[])
 	    	
 	    	// check whether all connections can find their starting and ending pins
     		trace(TRACE_DEBUG, "-> resolving links between nodes\n");
-	        (*process)->linkNodes();
+	      (*process)->linkNodes();
     		trace(TRACE_DEBUG, "-> resolved\n");
 	        
 	    	if (globals::parameters[P_FILTER] && (*process)->filtered)

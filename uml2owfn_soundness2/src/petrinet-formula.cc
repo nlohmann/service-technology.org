@@ -168,6 +168,13 @@ void FormulaState::set_format(formula_output_format aFormat)
 }
 
 /*!
+ * \brief returns the number of subformulas of this formula
+ */
+unsigned int FormulaState::size () const {
+  return subFormulas.size();
+}
+
+/*!
  * \brief   outputs the formula
  *
  *          Stream the formula object to a given output stream, using the

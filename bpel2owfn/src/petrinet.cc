@@ -1491,23 +1491,33 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
   
   // create the weighted arcs for p12
   
+  set<Node *> preset1without2 = setDifference(p12->preset,p2->preset);
   set<Node *> preset2without1 = setDifference(p12->preset,p1->preset);
+  set<Node *> preset1and2 =     setIntersection(p1->preset,p2->preset);
+  set<Node *> postset1without2 = setDifference(p12->postset,p2->postset);
   set<Node *> postset2without1 = setDifference(p12->postset,p1->postset);
+  set<Node *> postset1and2 =     setIntersection(p1->postset,p2->postset);
   
   if ((p1->preset.size() + p1->postset.size()) > 1000)
     std::cerr << (p1->preset.size() + p1->postset.size()) << " arcs to add..." << std::endl;
   
-  for (set<Node *>::iterator n = p1->preset.begin(); n != p1->preset.end(); n++)
+  for (set<Node *>::iterator n = preset1without2.begin(); n != preset1without2.end(); n++)
     newArc((*n), p12, STANDARD, arc_weight((*n),p1));
   
   for (set<Node *>::iterator n = preset2without1.begin(); n != preset2without1.end(); n++)
     newArc((*n), p12, STANDARD, arc_weight((*n),p2));
   
-  for (set<Node *>::iterator n = p1->postset.begin(); n != p1->postset.end(); n++)
+  for (set<Node *>::iterator n = preset1and2.begin(); n != preset1and2.end(); n++)
+    newArc((*n), p12, STANDARD, arc_weight((*n),p1) + arc_weight((*n),p2));
+  
+  for (set<Node *>::iterator n = postset1without2.begin(); n != postset1without2.end(); n++)
     newArc(p12, (*n), STANDARD, arc_weight(p1,(*n)));
   
   for (set<Node *>::iterator n = postset2without1.begin(); n != postset2without1.end(); n++)
     newArc(p12, (*n), STANDARD, arc_weight(p2,(*n)));
+  
+  for (set<Node *>::iterator n = postset1and2.begin(); n != postset1and2.end(); n++)
+    newArc(p12, (*n), STANDARD, arc_weight(p1,(*n)) + arc_weight(p2,(*n)));
   
   removePlace(p1);
   removePlace(p2);

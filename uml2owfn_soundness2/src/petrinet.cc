@@ -124,6 +124,28 @@ bool Node::historyContains(string role) const
   return false;
 }
 
+/*!
+ * \brief create and return a copy of the pre-set, the contained
+ *        places can be manipulated, but the pre-set of this node
+ *        cannot be changed by manipulating the returned set
+ */
+set<Node*> Node::getPreSet() const {
+  set<Node*> returnSet;
+  returnSet.insert(preset.begin(),preset.end());
+  return returnSet;
+}
+
+/*!
+ * \brief create and return a copy of the post-set, the contained
+ *        places can be manipulated, but the post-set of this node
+ *        cannot be changed by manipulating the returned set
+ */
+set<Node*> Node::getPostSet() const {
+  set<Node*> returnSet;
+  returnSet.insert(postset.begin(),postset.end());
+  return returnSet;
+}
+
 
 /*!
  * \brief  destructor

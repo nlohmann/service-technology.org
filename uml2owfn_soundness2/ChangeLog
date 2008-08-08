@@ -3,6 +3,7 @@ ChangeLog for UML2oWFN
 Version 1.03 (in progress)
 ============
 
++ changed task file naming scheme to 'net.lola.<tasktype>.task'
 + added parameter "-a safe" to check for safeness of a net using LoLA with state predicates, this parameter can be used together with "-a soundness" and "-a deadlocks"
 + worked on bug #12160: PNAPI: Petri net reduction rules do not preserve (un)-safeness, disallowing place/transition fusion if places/transitions are together in the preset/postset of another transition/place 
 + modified analysis scripts: fixed evaluation of LoLA return results (in case of deadlock analysis, return result '0' means 'unsound'), and preserving LoLA output in 'niels-analysis_lola.log' for further investigations

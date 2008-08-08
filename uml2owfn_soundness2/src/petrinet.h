@@ -198,6 +198,12 @@ class Node
     /// type of node as defined in #communication_type
     communication_type type;
     
+    /// return a copy of the preset of the node
+    set<Node*> getPreSet () const;
+    
+    /// return  a copy of the postset of the node
+    set<Node*> getPostSet () const;
+    
     /// destructor
     virtual ~Node();
 

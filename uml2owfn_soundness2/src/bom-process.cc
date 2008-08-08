@@ -114,6 +114,12 @@ FormulaState* BomProcess::createSafeStatePredicate (PetriNet* PN) {
   for (set<Place *>::iterator it = PN_P.begin(); it != PN_P.end(); it++) {
     Place* p = static_cast<Place*>(*it);
     
+    if (p->getPreSet().size() <= 1) {
+      // this place is only unsafe if its predecessor is unsafe
+      // or if it is unsafely marked
+      // TODO add check for initial marking
+      continue;
+    }
     // all internal places must have not more than one token
     processNodesLit_zero.insert(new PetriNetLiteral(p, COMPARE_GREATER, 1));
   }

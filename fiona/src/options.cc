@@ -550,9 +550,6 @@ void parse_command_line(int argc, char* argv[]) {
             case 'e':
                 options[O_EVENT_USE_MAX] = true;
                 events_manual = atoi(optarg);
-                if (events_manual < 0) {
-                    options[O_EVENT_USE_MAX] = false;
-                }
                 break;
             case 'E':
                 options[O_READ_EVENTS] = true;
@@ -725,6 +722,15 @@ void parse_command_line(int argc, char* argv[]) {
             parameters[P_USE_RBS] = true;
         }
     }
+
+    // Max Occurences - correcting parameters if needed
+    if (!options[O_READ_EVENTS] && !options[O_EVENT_USE_MAX]) {
+        options[O_READ_EVENTS] = true;
+    }
+    if (events_manual < 0) {
+        options[O_EVENT_USE_MAX] = false;
+    }
+
     
     bool firstfile = true;
     // reading all oWFNs and OGs

@@ -20,12 +20,12 @@
  *****************************************************************************/
 
 %{
+#include <libgen.h>
 #include "Graph.h"
 #include "Formula.h"
-#include "helpers.h"
 
 Graph G_parsedGraph("parsed");
-extern string G_filename;
+extern char *G_filename;
 
 /* Prologue: Syntax and usage of the prologue.
  * Bison Declarations: Syntax and usage of the Bison declarations section.
@@ -35,11 +35,6 @@ extern string G_filename;
 // options for Bison
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 0  // for verbose error messages
-
-
-// to avoid the message "parser stack overflow"
-#define YYMAXDEPTH 1000000
-#define YYINITDEPTH 10000
 
 
 // from flex
@@ -79,7 +74,7 @@ extern int og_yyerror(char *msg);
 
 
 og:
-   { G_parsedGraph = Graph(crop_filename(G_filename)); }
+   { G_parsedGraph = Graph(basename(G_filename)); }
  nodes initialnode transitions
    { G_parsedGraph.reenumerate(); }
 ;

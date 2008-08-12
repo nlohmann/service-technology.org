@@ -6,52 +6,31 @@
                       http://service-technology.org/rachel
 
 
-Version 1.09
-============
+Version 1.10 (unreleased)
+=========================
 
-* fixed bug #12153 (`https://gna.org/bugs/?12153'): the patch for the
-  aspected sources now works on x86_64 machines
+* Rachel does not need to be installed to execute `make experiments'
 
-* fixed a bug in test script `tests/test4': the wrong return value was
-  returned to `make check'
+* added configure script parameter `--enable-universal' to set flags to build
+  a Mac universal binary (`http://www.apple.com/universal')
 
-* improved portability of Makefiles by using more built-in variables such as
-  `$(MAKE) $(AM_MAKEFLAGS)' or `$(SED)'
+* added configure script parameter `--enable-win32' to set flags to build a
+  Windows binary which uses the MinGW framework (`http://www.mingw.org') to
+  be independent of the `cygwin1.dll' provided by Cygwin
+  (`http://www.cygwin.com')
 
-* added file `doc/cmdline.out' to the distribution to avoid complete
-  compilation just to execute `make doc'
+* added configure script parameter `--enable-use64bit' to set flags to build
+  a 64 bit binary (e.g. for x86_64, ppc64, or 64-Bit SPARC)
 
-* code complies to ISO C++
+* chosen configure script parameters are printed when using `--bug' command
+  line parameter
 
-* listing the tools required to re-generated code (Flex, Bison, Gengetopt,
-  and Kimwitu++) in the `README' file
+* added a command line parameter `--noop' to exit after parsing the input
+  files - mostly for debug information, e.g. if you want to count the
+  services characterized by an OG (combined with `--verbose')
 
-* completed task #6131 (`https://gna.org/task/?6131'): whether or not the
-  aspects of AspectC++ are used during compilation can be controlled by
-  parameters of the configure script:
-
-     * `./configure': use aspects
-
-     * `./configure --enable-aspects': use aspects
-
-     * `./configure --enable-aspects=true': use aspects
-
-     * `./configure --disable-aspects': do not use aspects
-
-     * `./configure --enable-aspects=false': do not used aspects
-
-  If aspects are disabled, the files `src/xxxx.cc' are directly copied to
-  `src/aspected-xxxx.cc', and the AspectC++ tools are not at all invoked.
-
-* MAINTAINER: overworked the Makefile target `deb' in the directory
-  `maintainer' to create a Debian source package
-
-  Note that `make deb' can only be executed on a machine where the tools
-  `dpkg-buildpackage' and `date -R' are present. To upload the source package
-  to a Launchpad PPA (it is currently uploaded to
-  `https://launchpad.net/~niels-lohmann/+archive'), the tool `dput' is
-  needed. Furthermore, the tools  `fakeroot' and `alien' are needed to create
-  an RPM binary package from the Debian binary package.
+* implemented a class `Scheduler' that implements a scheduler to eventually
+  use multiple threads when calculating simulation or matching
 
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for

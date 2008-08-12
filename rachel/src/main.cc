@@ -24,6 +24,7 @@
 #include <cassert>
 #include <climits>
 #include <cstdlib>
+#include <libgen.h>
 
 #include "Graph.h"
 #include "Matching.h"
@@ -32,6 +33,8 @@
 #include "config.h"
 #include "helpers.h"
 #include "LP.h"
+#include "Scheduler.h"
+
 
 
 using std::endl;
@@ -51,7 +54,7 @@ extern int og_yyparse();
 extern FILE *og_yyin;
 
 extern Graph G_parsedGraph;
-string G_filename;
+char *G_filename;
 
 /// a map caching the best script for all action pairs
 map<Node, map<Node, ActionScript> > G_script_cache;
@@ -62,6 +65,9 @@ map<Node, map<Node, ActionScript> > G_script_cache;
  * Stores all information on the command line options.
  */
 gengetopt_args_info args_info;
+
+/// a scheduler
+Scheduler sched;
 
 
 
@@ -121,8 +127,8 @@ void dotOutput(Graph &A, Graph &B, Graph &C) {
     
     // if no filename is given via command line, create it
     if (args_info.dot_arg == NULL) {
-        dot_filename = crop_filename(args_info.automaton_arg) + "_" +
-        crop_filename(args_info.og_arg) + "_" +
+        dot_filename = string(basename(args_info.automaton_arg)) + "_" +
+        string(basename(args_info.og_arg)) + "_" +
         mode_name(args_info.mode_arg) + ".dot";
     } else {
         dot_filename = args_info.dot_arg;
@@ -175,6 +181,10 @@ int main(int argc, char** argv) {
         printf("- compilation date:  %s\n", __DATE__);
         printf("- compiler version:  %s\n", __VERSION__);
         printf("- platform:          %s\n", BUILDSYSTEM);
+        printf("- config ASPECTS:    %s\n", CONFIG_ASPECTS);
+        printf("- config UNIVERSAL:  %s\n", CONFIG_UNIVERSAL);
+        printf("- config USE64BIT:   %s\n", CONFIG_USE64BIT);
+        printf("- config WIN32:      %s\n", CONFIG_WIN32);
         printf("\n\n");
         return EXIT_SUCCESS;
     }
@@ -203,8 +213,8 @@ int main(int argc, char** argv) {
     
     
     // read first graph
-    G_filename = string(args_info.automaton_arg);
-    og_yyin = fopen(G_filename.c_str(), "r");
+    G_filename = args_info.automaton_arg;
+    og_yyin = fopen(G_filename, "r");
     if (og_yyin == NULL) {
         fprintf(stderr, "automaton '%s' not found\n", args_info.automaton_arg);
         exit(0);
@@ -216,8 +226,8 @@ int main(int argc, char** argv) {
     Graph A = G_parsedGraph;
     
     // read second graph
-    G_filename = string(args_info.og_arg);
-    og_yyin = fopen(G_filename.c_str(), "r");
+    G_filename = args_info.og_arg;
+    og_yyin = fopen(G_filename, "r");
     if (og_yyin == NULL) {
         fprintf(stderr, "og '%s' not found\n", args_info.og_arg);
         exit(0);
@@ -235,10 +245,10 @@ int main(int argc, char** argv) {
     
     // statistical output
     fprintf(stderr, "calculating %s\n", mode_name(args_info.mode_arg).c_str());
-    fprintf(stderr, "source (SA): %s\t%Zu nodes\n",
-            args_info.automaton_arg, A.nodes.size());
-    fprintf(stderr, "target (OG): %s\t%Zu nodes\n",
-            args_info.og_arg, B.nodes.size());
+    fprintf(stderr, "source (SA): %s\t%u nodes\n",
+            basename(args_info.automaton_arg), static_cast<unsigned int>(A.nodes.size()));
+    fprintf(stderr, "target (OG): %s\t%u nodes\n",
+            basename(args_info.og_arg), static_cast<unsigned int>(B.nodes.size()));
     
     if (args_info.mode_arg != mode_arg_lpsim) {
         if (A.isCyclic()) {
@@ -261,7 +271,17 @@ int main(int argc, char** argv) {
     if (args_info.mode_arg == mode_arg_simulation) {
         fprintf(stderr, "pairs to check: %lu\n", (A.nodes.size() * B.nodes.size()));
     }
+    
 
+    // initialize the scheduler and print a schedule
+    sched.initialize(A, B, A.getRoot(), B.getRoot());
+    sched.schedule();
+
+    
+    // exit after parsing input files -- for debugging purposes
+    if (args_info.noop_given)
+        return EXIT_SUCCESS;
+    
     
     // do what you're told via "--mode" parameter
     switch (args_info.mode_arg) {
@@ -284,10 +304,8 @@ int main(int argc, char** argv) {
     
     // create dot if requested
     if (args_info.dot_given) {
-        // create a graph with the edit actions
         Graph C = outputEditScript(A,B);
-
-        dotOutput(A,B,C);
+        dotOutput(A, B, C);
     }
 
     fprintf(stderr, "done\n");

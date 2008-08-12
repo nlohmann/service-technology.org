@@ -3,7 +3,7 @@
 echo ""
 
 echo "test: matching"
-echo "      rachel -a $testdir/testfiles/traveler.og -o $testdir/testfiles/agency_airline.og -m matching &> /dev/null"
-rachel -a $testdir/testfiles/traveler.og -o $testdir/testfiles/agency_airline.og -m matching &> /dev/null
+echo "      rachel -a $testdir/testfiles/traveler.sa -o $testdir/testfiles/agency_airline.og -m matching &> /dev/null"
+rachel -a $testdir/testfiles/traveler.sa -o $testdir/testfiles/agency_airline.og -m matching &> /dev/null
 
 exit $?

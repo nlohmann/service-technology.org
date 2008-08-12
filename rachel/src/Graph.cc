@@ -77,7 +77,7 @@ bool Edge::operator < (const Edge &e) const {
  * Constructs an edge given source, target, and label.
  */
 Edge::Edge(Node _source, Node _target, const Label _label) :
-    source(_source), target(_target), label(_label) {
+    source(_source), target(_target), label(_label), type() {
 }
 
 
@@ -87,7 +87,7 @@ Edge::Edge(Node _source, Node _target, const Label _label) :
  * Constructs an empty edge, labeled with "" (epsilon).
  */
 Edge::Edge() :
-  source(0), target(0), label("") {
+  source(0), target(0), label(""), type() {
 }
 
 
@@ -180,7 +180,8 @@ Assignments Graph::sat(Node q) {
  *
  */
 Graph::Graph(const string _id) :
-  max_value(0), id(_id) {
+  edges(), root(), max_value(0), insertionValue(), deletionValue(),
+  formulas(), id(_id),  nodes(), addedNodes() {
 }
 
 

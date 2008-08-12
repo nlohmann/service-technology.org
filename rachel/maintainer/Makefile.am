@@ -35,7 +35,7 @@ tarballname:
 #############################################################################
 debian/control: ../README
 	$(SED) -n '1,/Description:/ p' debian/control > debian/control~
-	cat ../README | $(SED) -n '/PURPOSE/,/COPYRIGHT/ p' | $(SED) 'N;$!P;$!D;$d' | $(SED) '1d' | $(SED) 's/^  //' >> debian/control~
+	cat ../README | $(SED) -n '/PURPOSE/,/COPYRIGHT/ p' | $(SED) 'N;$$!P;$$!D;$$d;$$d' | $(SED) '1d' | $(SED) 's/^  //' >> debian/control~
 	mv debian/control~ debian/control
 
 

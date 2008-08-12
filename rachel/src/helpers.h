@@ -40,8 +40,4 @@ void next_index(std::vector<unsigned int> &current_index,
                 const std::vector<unsigned int> &max_index);
 
 
-/// crops path and extension of a filename
-std::string crop_filename(const std::string filename);
-
-
 #endif

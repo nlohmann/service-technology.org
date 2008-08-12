@@ -6,6 +6,32 @@
                       http://service-technology.org/rachel
 
 
+Version 1.10 (unreleased)
+=========================
+
+* Rachel does not need to be installed to execute `make experiments'
+
+* added configure script parameter `--enable-universal' to set flags to build
+  a Mac universal binary (`http://www.apple.com/universal')
+
+* added configure script parameter `--enable-win32' to set flags to build a
+  Windows binary which uses the MinGW framework (`http://www.mingw.org') to
+  be independent of the `cygwin1.dll' provided by Cygwin
+  (`http://www.cygwin.com')
+
+* added configure script parameter `--enable-use64bit' to set flags to build
+  a 64 bit binary (e.g. for x86_64, ppc64, or 64-Bit SPARC)
+
+* chosen configure script parameters are printed when using `--bug' command
+  line parameter
+
+* added a command line parameter `--noop' to exit after parsing the input
+  files - mostly for debug information, e.g. if you want to count the
+  services characterized by an OG (combined with `--verbose')
+
+* implemented a class `Scheduler' that implements a scheduler to eventually
+  use multiple threads when calculating simulation or matching
+
 Version 1.09
 ============
 

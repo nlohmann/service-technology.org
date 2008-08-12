@@ -1,3 +1,22 @@
+@heading Version 1.10 (unreleased)
+@itemize
+@item Rachel does not need to be installed to execute @command{make experiments}
+
+@item added configure script parameter @option{--enable-universal} to set flags to build a Mac universal binary (@url{http://www.apple.com/universal})
+
+@item added configure script parameter @option{--enable-win32} to set flags to build a Windows binary which uses the MinGW framework (@url{http://www.mingw.org}) to be independent of the @file{cygwin1.dll} provided by Cygwin (@url{http://www.cygwin.com})
+
+@item added configure script parameter @option{--enable-use64bit} to set flags to build a 64 bit binary (e.g. for x86_64, ppc64, or 64-Bit SPARC)
+
+@item chosen configure script parameters are printed when using @option{--bug} command line parameter
+
+@item added a command line parameter @option{--noop} to exit after parsing the input files -- mostly for debug information, e.g. if you want to count the services characterized by an OG (combined with @option{--verbose})
+
+@item implemented a class @code{Scheduler} that implements a scheduler to eventually use multiple threads when calculating simulation or matching
+@end itemize
+
+
+
 @heading Version 1.09
 
 @itemize

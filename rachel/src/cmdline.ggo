@@ -90,6 +90,11 @@ option "debug" -
   flag off
   hidden
 
+option "noop" -
+  "Only parse the input files and exit."
+  flag off
+  hidden
+
 option "bug" -
   "Show helpful information (version number, compilation date, compiler version, and platform) in case a bug was found and should be reported."
   flag off

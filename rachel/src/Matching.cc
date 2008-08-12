@@ -22,6 +22,8 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cstdio>
+#include <map>
+//#include <pthread.h> // can use HAVE_PTHREAD_H from config.h
 
 #include "Matching.h"
 #include "costfunction.h"
@@ -29,6 +31,37 @@
 #include "helpers.h"
 
 using std::map;
+
+
+
+/***********
+ * threads *
+ ***********/
+/*
+/// the maximal number of threads
+const short MAX_THREADS = 2;
+
+/// an array containing the threads
+pthread_t thread[MAX_THREADS];
+
+/// a mutex to organize memory access
+pthread_mutex_t mutex;
+
+typedef struct {
+    Node q1;
+    Node q2;
+} NodePair;
+
+
+void *calc(void *arg) {
+    NodePair *a = (NodePair*)arg;
+    assert(a != NULL);
+    
+    fprintf(stderr, "%d %d\n", a->q1, a->q2);
+    
+    return NULL;
+}
+*/
 
 
 /*************
@@ -78,7 +111,7 @@ Permutation Matching::permuteEdges(Edges &e1, Edges &e2) {
     for (size_t i = 0; i < e1.size(); i++) {
         if (e1[i].label != "" || e2[i].label != "") {
 
-            // Optimization: The variable anyway is set to true if the current
+            // Optimization: The variable already is set to true if the current
             // label was already used for deletion or insertion. In this case,
             // the function is directly ended, and an empty permutation is
             // returned.
@@ -181,12 +214,14 @@ ActionScript Matching::w(Graph &g1, Graph &g2, Node q1, Node q2) {
         unsigned int perm_size = 0;
         
         // iterate the permutations
-        for (Permutations::iterator perms = permutations.begin(); perms != permutations.end(); perms++) {
+        for (Permutations::iterator perms = permutations.begin();
+             perms != permutations.end(); perms++) {
 
             ActionScript permutation_script;
             
             // iterate the current permutation
-            for (Permutation::iterator perm = perms->begin(); perm != perms->end(); perm++) {
+            for (Permutation::iterator perm = perms->begin();
+                 perm != perms->end(); perm++) {
                 Value current_value = 0;
                 
                 Edge e1 = perm->first;
@@ -202,7 +237,8 @@ ActionScript Matching::w(Graph &g1, Graph &g2, Node q1, Node q2) {
                     current_value = L(e1.label, "") * g1.getDeletionValue(q1);
                 } else {
                     current_value = L(e1.label, e2.label) *
-                                        matching_recursively(g1, g2, e1.target, e2.target);
+                                        matching_recursively(g1, g2,
+                                                             e1.target, e2.target);
                 }
 
                 // if a node was added, use the new label for the action
@@ -268,7 +304,7 @@ Value Matching::matching_recursively(Graph &g1, Graph &g2, Node q1, Node q2) {
         
     // value was not in the cache: calculate it
     cache_miss++;
-    
+
     // statistical output
     if (args_info.verbose_flag && cache_miss > 0 && (cache_miss % 1000) == 0) {
         fprintf(stderr, "%8u\n", cache_miss);
@@ -278,12 +314,14 @@ Value Matching::matching_recursively(Graph &g1, Graph &g2, Node q1, Node q2) {
     if (g1.outEdges(q1).empty() && g2.isFinal(q2)) {
         cache[q1][q2] = N(q1,q2);
     } else {
+        // recursive call
         ActionScript s = w(g1,g2,q1,q2);
         cache[q1][q2] = (1-discount()) * N(q1,q2) + s.value;
         G_script_cache[q1][q2] = s;
     }
     
-        
+    
+    // probably the cache access can be avoided with a local variable
     return cache[q1][q2];
 }
 
@@ -323,7 +361,8 @@ Value Matching::matching(Graph &g1, Graph &g2) {
     double hit_rate= 1 - (static_cast<double>(cache_miss) / static_cast<double>(cache_hit));
     fprintf(stderr, "cache: %u hits, %u misses, hit rate %.2f%%\n",
             cache_hit, cache_miss, hit_rate * 100);
-    fprintf(stderr, "%Zu added nodes\n", g1.addedNodes.size());
+    fprintf(stderr, "%u added nodes\n",
+            static_cast<unsigned int>(g1.addedNodes.size()));
     fprintf(stderr, "permuteEdges: %u, calcPermutations: %u, w: %u, matching: %u\n",
             permuteEdges_calls, calcPermutations_calls, w_calls, matching_calls);
 

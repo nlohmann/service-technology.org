@@ -37,7 +37,7 @@ class Formula;
 
 #include "syntax_og.h"
 
-extern std::string G_filename;
+extern char* G_filename;
 extern int og_yyerror(char *msg);
 %}
 
@@ -90,9 +90,10 @@ TRANSITIONS                             { return key_transitions; }
 int og_yyerror(char *msg) {
     assert(msg != NULL);
     assert(og_yytext != NULL);
+    assert(G_filename != NULL);
 
     fprintf(stderr, "parse error in %s:%d: %s - token last read '%s'\n",
-            G_filename.c_str(), og_yylineno, msg, og_yytext);
+            G_filename, og_yylineno, msg, og_yytext);
     
     exit(EXIT_FAILURE);
 }

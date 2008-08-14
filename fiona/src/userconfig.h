@@ -8,7 +8,12 @@
 // of array bounds or losing memory by overwriting pointers that should not be
 // overwritten.
 #undef NDEBUG     // assertions are tested
-//#define NDEBUG 1     // assertions are ignored
+//#define NDEBUG 1    // assertions are ignored
+
+// enable Fiona to detect (T)SCC, when computing the reachability graph of each marking
+// the states shown in the nodes of the graphic are then annotated with information
+// about the SCC they are in and whether they are a representative of their SCC
+#define TSCC	
 
 // Select your operating system
 #define WINDOWS

@@ -52,6 +52,7 @@
 
 using namespace std;
 
+#define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
 
 //comparison function, in order to sort the input/output place names 
 bool compare(const owfnPlace* lhs, const owfnPlace* rhs) {
@@ -2485,6 +2486,15 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
 
         State * NewState;
 
+#ifdef TSCC
+//        CurrentState->succ = new State * [CurrentCardFireList + 1];
+        CurrentState->dfs = CurrentState->lowlink = CurrentState->state_count - 1;
+        CurrentState->nexttar = CurrentState->prevtar = CurrentState;
+        TarStack = CurrentState;
+        
+        MinBookmark = CurrentState->state_count;
+#endif        
+        
         // building EG in a node
         while (CurrentState) 
         {
@@ -2492,7 +2502,8 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
             try
             {
 #endif
-            // no more transition to fire from current state?
+            
+            	// no more transition to fire from current state?
             if (CurrentState->current < CurrentState->cardFireList) {
                 // there is a next state that needs to be explored
 
@@ -2513,7 +2524,7 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                     // Current marking already in bintree 
                     trace(TRACE_5, "Current marking already in bintree \n"); 
                     if (n->addState(NewState)) {
-                        addSuccStatesToNode(n, NewState);
+                    	addSuccStatesToNode(n, NewState);
                         if (n->getColor() == RED) {
                             trace(TRACE_3, "\t\t\t message bound violated; color of node "
                                            + n->getName()
@@ -2539,7 +2550,15 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
 
                     assert(CurrentState->succ[CurrentState->current] == NULL);
                     CurrentState->succ[CurrentState->current] = NewState;
-                    (CurrentState->current)++;
+                    
+#ifdef TSCC                    
+                    CurrentState->succ[CurrentState->current] = NewState;
+                    if(!(NewState->tarlevel)) {
+	      				CurrentState->lowlink = MINIMUM(CurrentState->lowlink, NewState->lowlink);
+                    }
+#endif                    
+                    
+	      			(CurrentState->current)++;
                 } else {
                     trace(TRACE_5, "Current marking new\n");	
                     NewState = binInsert(this);
@@ -2559,6 +2578,15 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                     }
                     
                     NewState->firelist = firelist();
+                    
+#ifdef TSCC
+                    NewState->dfs = NewState->lowlink = CurrentState->state_count - 1;
+					NewState->prevtar = TarStack;
+					NewState->nexttar = TarStack->nexttar;
+					TarStack = TarStack ->nexttar = NewState;
+					NewState->nexttar->prevtar = NewState;
+#endif                    
+                    
                     NewState->cardFireList = CurrentCardFireList;
                     if (parameters[P_IG]) {
                         if (NewState->quasiFirelist) {
@@ -2569,6 +2597,7 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                     }
                     NewState->current = 0;
                     NewState->parent = CurrentState;
+                    
                     assert(NewState->succ == NULL);
                     NewState->succ = new State* [CurrentCardFireList];
                     for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
@@ -2578,17 +2607,6 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                     NewState->type = typeOfState();
 
                     CurrentState = NewState;
-
-//                    // test current marking if message bound k reached
-//                    if (violatesMessageBound()) {
-//                        n->setColor(RED);
-//                        trace(TRACE_3, "\t\t\t message bound violated; color of node "
-//                                       + n->getName()
-//                                       + " set to RED (calculateReachableStatesFull, during fire (new state))\n");
-//                        trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
-//                        delete[] tempCurrentMarking;
-//                        return;
-//                    }
 
                     assert(NewState != NULL);
                     n->addState(NewState);
@@ -2600,10 +2618,27 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                 }
                 // no more transition to fire
             } else {
-                // close state and return to previous state
+#ifdef TSCC                    
+            	// state is part of a TSCC and it is the representative of it
+            	if((CurrentState->dfs == CurrentState->lowlink) 
+            			&& (CurrentState->dfs >= MinBookmark)) {
+
+            		MinBookmark = CurrentState->state_count;
+            		
+            		// remember that the current state is the representative of a TSCC
+            		CurrentState->repTSCC = true;
+            	}                     
+
+            	if(CurrentState->parent) {
+            		CurrentState->parent->lowlink = 
+            			MINIMUM(CurrentState->lowlink, CurrentState->parent->lowlink);
+            	}
+#endif
+            	
+            	// close state and return to previous state
                 trace(TRACE_5, "close state [" + getCurrentMarkingAsString() + "] and return to previous state\n");
                 CurrentState = CurrentState->parent;
-
+               
                 if (CurrentState) { // there is a father to further examine
                     CurrentState->decode(this);
                     CurrentState->current++;
@@ -2628,6 +2663,7 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
         if (tempCurrentMarking) {
             delete[] tempCurrentMarking;
         }
+        
         trace(TRACE_5, "oWFN::calculateReachableStatesFull(AnnotatedGraphNode * n) : end\n");
         return;
     }
@@ -3501,7 +3537,8 @@ void NewStubbStamp(oWFN * PN) {
 }
 
 
-#define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
+
+
 //! \brief DESCRIPTION		
 //! \return DESCRIPTION
 owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
@@ -3547,7 +3584,7 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
                 // already visited
                 if (next -> nextontarjanstack) {
                     // next still on stack
-                    current -> min = MINIMUM(current -> min, next -> dfs);
+                    current -> min = MINIMUM(current->min, next->dfs);
                 }
                 current -> mbiindex++;
             } else {
@@ -3603,7 +3640,7 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
             //	cout << "current -> nextoncallstack: " << current -> nextoncallstack << endl;
             // backtracking to previous state
             next = current -> nextoncallstack;
-            next -> min = MINIMUM(current -> min, next -> min);
+            next -> min = MINIMUM(current->min, next->min);
             next -> mbiindex++;
             current = next;
         }

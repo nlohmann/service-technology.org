@@ -419,8 +419,21 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
                 parameters[P_SHOW_STATES_PER_NODE] ) {
                 (*iter)->decode(PN);
                // os << "(" << *iter << ") " ;
+#ifdef TSCC                
+                os << "[" << PN->getCurrentMarkingAsString() << "], SCC:" << (*iter)->lowlink;
+                // check whether this state is representative of the SCC
+                if ((*iter)->lowlink == (*iter)->dfs) {
+                	// yes, it is
+                	os << ", rep.";
+                	if ((*iter)->repTSCC) {
+                		os << " (TSCC)";
+                	}
+                } 
+#else
                 os << "[" << PN->getCurrentMarkingAsString() << "]";
-              //  os << " (";
+#endif
+                
+                //  os << " (";
                 // print the suffix (state type)
 //                switch ((*iter)->exactType()) {
 //                    case I_DEADLOCK:    os << "iDL";    break;

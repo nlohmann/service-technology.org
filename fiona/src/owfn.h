@@ -64,6 +64,11 @@ class GraphFormulaAssignment;
 class CapacityException;
 #endif
 
+#ifdef TSCC
+class Statevector;
+class StatevectorList;
+#endif
+
 class oWFN {
     // first public typedefs, then private members, then public methods
     public:
@@ -87,6 +92,12 @@ class oWFN {
         unsigned int CurrentCardFireList;
         unsigned int CurrentCardQuasiFireList;
 
+#ifdef TSCC
+        State * TarStack;
+        unsigned int MinBookmark; // MIN number of the first closed marking
+                                  // in the currently or last recently processed TSCC
+#endif        
+        
         /// array of places
         Places_t Places;
         Places_t inputPlaces;

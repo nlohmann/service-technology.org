@@ -1,0 +1,109 @@
+{ each node of an OG or an IG has SCCs and TSCCs }
+
+PLACE
+INTERNAL
+  p0,
+  p1,
+  p2,
+  p3,
+  p4,
+  p5,
+  p6,
+  p7,
+  p8,
+  p9;
+
+INPUT
+  a;
+
+OUTPUT
+  b;
+
+INITIALMARKING
+  p0:	1;
+
+FINALMARKING
+  p9:	1;
+
+TRANSITION t1	 { !b }
+CONSUME
+  p0:	1;
+PRODUCE
+  b: 1,
+  p1 : 1;
+
+TRANSITION t2	 { \tau }
+CONSUME
+  p1:	1;
+PRODUCE
+  p2 : 1;
+
+TRANSITION t3	 { \tau }
+CONSUME
+  p1:	1;
+PRODUCE
+  p3 : 1;
+
+TRANSITION t4	 { \tau }
+CONSUME
+  p2 : 1;
+PRODUCE
+  p4 : 1;
+
+
+TRANSITION t5	 { \tau }
+CONSUME
+  p4 : 1;
+PRODUCE
+  p3 : 1;
+
+
+TRANSITION t6	 { \tau }
+CONSUME
+  p3 : 1;
+PRODUCE
+  p7 : 1;
+
+
+TRANSITION t7	 { \tau }
+CONSUME
+  p7 : 1;
+PRODUCE
+  p3 : 1;
+
+TRANSITION t8	 { \tau }
+CONSUME
+  p1 : 1;
+PRODUCE
+  p5 : 1;
+
+TRANSITION t9	 { \tau }
+CONSUME
+  p4 : 1;
+PRODUCE
+  p5 : 1;
+
+TRANSITION t10	 { \tau }
+CONSUME
+  p6 : 1;
+PRODUCE
+  p4 : 1;
+
+TRANSITION t11	 { \tau }
+CONSUME
+  p5 : 1;
+PRODUCE
+  p6 : 1;
+
+TRANSITION t12	 { \tau }
+CONSUME
+  p6 : 1;
+PRODUCE
+  p8 : 1;
+
+TRANSITION t13	 { ?a }
+CONSUME
+  p8 : 1,
+  a : 1;
+PRODUCE
+  p9 : 1;

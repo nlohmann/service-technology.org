@@ -151,3 +151,24 @@ allcov:
 covcheck: allcov
 	(cd tests && $(MAKE) $(AM_MAKEFLAGS) covcheck)
 
+
+#########################################################################
+# targets to organize creating and applying patches
+#########################################################################
+patch:
+	@svn diff > $(PACKAGE)-rev-`svn info | $(GREP) "Last Changed Rev" | $(AWK) '{print $$4}'`.patch
+	@echo "created patch $(PACKAGE)-rev-`svn info | $(GREP) "Last Changed Rev" | $(AWK) '{print $$4}'`.patch"
+	@echo
+	@echo "WARNING: This patch will only work for revision `svn info | $(GREP) "Last Changed Rev" | $(AWK) '{print $$4}'`."
+	@echo "         Do not try to apply this patch to a different version"
+	@echo "         unless you know what you are doing. You have been warned."
+	@echo
+
+patched: *.patch
+	@echo
+	@echo "WARNING: You are about to apply a patch to revision `svn info | $(GREP) "Last Changed Rev" | $(AWK) '{print $$4}'`".
+	@echo "         Make sure the patch $< was made for this revision."
+	@echo "         If you want to abort, press Ctrl+C now!"
+	@echo "         Otherwise, press return to continue. You have been warned."
+	@read
+	@patch -p0 -i $< && echo "applied patch $<"

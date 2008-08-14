@@ -8,8 +8,23 @@
 
 PURPOSE
     A tool translating business processes described in BPEL to open workflow
-    nets (oWFN).
+    nets (oWFN). This oWFN can be used to:
 
+    * check for controllability or generate the operating guideline using
+      the tool Fiona,
+    * check for deadlocks or any other Petri net property, or
+    * check any temporal logic formula with a variety of model checking
+      tools.
+
+    Furthermore, GNU BPEL2oWFN can translate a BPEL4Chor choreography to a
+    Petri net model. This model can be used to analyze properties of a
+    complete choreography or to synthesize a fitting service for an
+    incomplete choreography.
+
+    GNU BPEL2oWFN uses static analysis to make the generated Petri net model
+    as compact as possible to analyze a chosen property. This is called
+    flexible model generation. Furthermore, several design flaws can be
+    detected using control and data flow analysis.
 
 COPYRIGHT
     Copyright (C) 2008       Niels Lohmann
@@ -36,8 +51,16 @@ LICENSE
 
 
 INSTALLATION
-    Rachel can be easily compiled and install. See file "INSTALL" for
-    instructions.
+    GNU BPEL2oWFN can be easily compiled and installed. See file "INSTALL"
+    for instructions.
+
+    GNU BPEL2oWFN uses a lot of generated code. If you want to make changes
+    to the source code, you might need the following tools to regenerate
+    the code:
+     * Flex (http://flex.sourceforge.net)
+     * Bison (http://www.gnu.org/software/bison)
+     * Kimwitu++ (http://www.nongnu.org/kimwitu-pp)
+     * Gengetopt (http://www.gnu.org/software/gengetopt)
 
 
 DOCUMENTATION

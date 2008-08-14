@@ -28,6 +28,10 @@
 @item completed task #6078 (@url{https://gna.org/task/?6078}): implement Woflan file format
 
 @item fixed bug #12126 (@url{https://gna.org/bugs/?12126}): @command{make distcheck} does not finish successfully
+
+@item added Makefile targets @option{patch} and @option{patched} to create and apply patches against the Gna! subversion repository (@url{https://gna.org/svn/?group=service-tech})
+
+@item added a parameter @option{decomp} and implemented rudimentary decomposition support
 @end itemize
 
 

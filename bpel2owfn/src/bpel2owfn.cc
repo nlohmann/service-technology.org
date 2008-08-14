@@ -313,7 +313,7 @@ void single_output(set< string >::iterator file)
       trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
       PN.reduce(globals::reduction_level);
     }
-
+      
     if (modus == M_CHOREOGRAPHY)
     {
       // case 1: no instance of this process is needed
@@ -654,6 +654,71 @@ void final_output()
 
 
 
+/*!
+ * \brief use free choice conflict clusters to decompose the net
+ *
+ * This function determines the free choice conflict clusters of the Petri net
+ * created so far (assumes -m petrinet) and creates a net for each combination
+ * of conflict resolution. The filenames are suffixed with increasing numbers.
+ *
+ */
+void decompostion()
+{
+    PetriNet original(PN);
+    string original_filename = globals::output_filename;
+    
+    
+    vector< vector<string> > clusters = PN.getFreeChoiceClusters();
+    vector<unsigned int> current_index;
+    vector<unsigned int> max_index;
+    unsigned int decompositions = 1;
+    
+    for (unsigned int i = 0; i < clusters.size(); i++) {
+        current_index.push_back(0);
+        max_index.push_back(clusters[i].size());
+        
+        decompositions *= clusters[i].size();
+    }
+    
+    assert (current_index.size() == clusters.size());
+    assert (max_index.size() == clusters.size());
+    
+    cerr << decompositions << " decompositions of this net" << endl;
+    
+    for (unsigned int i = 0; i < decompositions; i++) {
+        cerr << "decomposition " << i+1 << " of " << decompositions << endl;
+        
+        // get next index
+        for (unsigned int j = 0; j < current_index.size(); j++)
+        {
+            if (current_index[j] < max_index[j]-1)
+            {
+                current_index[j]++;
+                break;
+            }
+            else
+                current_index[j] = 0;
+        }
+        
+        
+        PN = original;
+        
+        for (unsigned int j = 0; j < clusters.size(); j++) {
+            for (unsigned int k = 0; k < clusters[j].size(); k++) {
+                if (k == current_index[j])
+                    PN.removeTransition(PN.findTransition(clusters[j][k]));
+            }
+        }
+        
+        globals::output_filename = original_filename + toString(i);
+        final_output();
+    }
+}
+
+
+
+
+
 /******************************************************************************
  * main() function
  *****************************************************************************/
@@ -867,6 +932,13 @@ int main( int argc, char *argv[])
     } while (modus == M_CHOREOGRAPHY && file != inputfiles.end());
   }
   trace(TRACE_INFORMATION, "All files have been parsed.\n");
+
+
+    // decomposition
+    if (globals::parameters[P_DECOMP]) {
+        decompostion();
+    }
+    
 
   final_output();
 

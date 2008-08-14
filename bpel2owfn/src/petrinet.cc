@@ -2557,4 +2557,49 @@ unsigned int PetriNet::pop_forEach_suffix()
   return forEach_suffix.size();
 }
 
+    
+}    
+    
+    
+/******************************************************************************
+ * Functions to for decomposition
+ *****************************************************************************/
+
+/*!
+ * \brief return the free choice conflict clusters
+ *
+ * Traverse the net's places and find free choice conflict clusters. Each
+ * cluster is collected in a vector holding the transition names. The clusters
+ * themselves are collected in a vector which is returned to the calling
+ * function.
+ *
+ */
+vector< vector<string> > PNapi::PetriNet::getFreeChoiceClusters() {
+    vector< vector<string> > result;
+    
+    for (set<Place *>::const_iterator p = P.begin(); p != P.end(); p++) {
+        if ((*p)->postset.size() > 1) {            
+            set<Node*> referenceSet = (*((*p)->postset.begin()))->preset;
+            bool freeChoice = true;
+            
+            for (set<Node *>::const_iterator n = (*p)->postset.begin(); n != (*p)->postset.end(); n++) {
+                Transition *t = static_cast<Transition*>(*n);
+                
+                if (referenceSet != t->preset)
+                    freeChoice = false;
+            }
+
+            if (freeChoice) {
+                vector<string> current_cluster;
+                for (set<Node *>::const_iterator n = (*p)->postset.begin(); n != (*p)->postset.end(); n++) {
+                    Transition *t = static_cast<Transition*>(*n);
+                    current_cluster.push_back(*(t->history.begin()));
+                }
+                result.push_back(current_cluster);
+            }
+        }
+    }
+    
+    return result;
 }
+

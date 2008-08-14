@@ -12,7 +12,7 @@ option "mode" m
 
 option "parameter" p
   "Modify processing with given parameter"
-  string values="reduce","variables","standardfaults","fhfaults","communicationonly","xor","nointerface","loopcount","loopcontrol","deadlocktest","ports","small"
+  string values="reduce","variables","standardfaults","fhfaults","communicationonly","xor","nointerface","loopcount","loopcontrol","deadlocktest","ports","small","decomp"
   typestr="PARAM"
   optional
   multiple

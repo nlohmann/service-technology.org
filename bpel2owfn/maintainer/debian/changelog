@@ -1,0 +1,6 @@
+bpel2owfn (2.04-1) hardy; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Niels Lohmann <niels.lohmann@gmail.com>  Sat, 02 Aug 2008 22:19:28 +0200
+

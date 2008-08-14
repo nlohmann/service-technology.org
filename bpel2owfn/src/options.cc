@@ -346,6 +346,8 @@ void parse_command_line(int argc, char* argv[])
         globals::parameters[P_DEADLOCKTEST] = true;
       else if (parameter == "ports")
         globals::parameters[P_PORTS] = true;
+      else if(parameter == "decomp")
+        globals::parameters[P_DECOMP] = true;      
     }
   }
 

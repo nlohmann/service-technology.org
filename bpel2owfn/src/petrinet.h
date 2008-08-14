@@ -496,6 +496,9 @@ class PetriNet
     
     /// conjunctive set of disjunctive place sets for simple final condition
     list< set<Place *> > final_set_list;
+    
+    /// return the free choice conflict clusters
+    vector< vector<string> > getFreeChoiceClusters();
 
   private:
     /// removes a place from the net

@@ -44,6 +44,13 @@ Version 2.04 (not yet released)
    * fixed bug #12126 (`https://gna.org/bugs/?12126'): `make distcheck' does
      not finish successfully
 
+   * added Makefile targets `patch' and `patched' to create and apply patches
+     against the Gna! subversion repository
+     (`https://gna.org/svn/?group=service-tech')
+
+   * added a parameter `decomp' and implemented rudimentary decomposition
+     support
+
 Version 2.0.3 (29 June 2007)
 ============================
 

@@ -458,10 +458,9 @@ long double Graph::countServicesRecursively(Node q) {
         // add up the numbers of each satisfying assignment        
         result += temp;
     }
-    
-    // in case no assignment was found, set the result to 1
-    if (result == 0)
-        result = 1;
+
+    // in case no assignment was found, this node would be red!
+    assert (result != 0);
     
     cache[q] = result;
     return result;

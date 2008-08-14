@@ -99,6 +99,23 @@ bool FormulaFalse::sat(const set<string> &l) const {
     return false;
 }
 
+/*!
+ * When calculating the correcting matching between a service automaton and an
+ * OG, we require the service automaton's final states to be sink states, i.e.
+ * have no successors (see BPM2008 paper). Therefore, evaulation of formulas of
+ * nodes in which "final" occurred were not necessary, because in that case, a
+ * further correction of the automaton would be suboptimal (because adding more
+ * nodes beyond that point would increase the edit distance and will never be
+ * necessary due to the requirement that final states are sink states). 
+ * 
+ * When counting the services characterizes by an OG, however, the evaluation
+ * for formulas in which "final" occurs is important. Then, we can set the
+ * predicate "final" to true, because it does not change the number of
+ * characterized services, but only whether the characterized services have a
+ * final state or not.
+ *
+ * This bug was found by Martin Znamirowski. See <http://gna.org/bugs/?11944>.
+ */
 bool FormulaFinal::sat(const set<string> &l) const {
-    return (l.find("FINAL") != l.end());
+    return true;
 }

@@ -68,6 +68,7 @@ CommunicationGraph::CommunicationGraph(oWFN * _PN) {
 CommunicationGraph::~CommunicationGraph() {
     trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : start\n");
     trace(TRACE_5, "Deleting CommunicationGraph of file " + filename + "\n");
+    trace(TRACE_5, "setOfNodes.size() = " + intToString(setOfNodes.size()) + ", setOfSortedNodes.size() = " + intToString(setOfSortedNodes.size()) + "\n");
 
     for (unsigned int i = 0; i < setOfNodes.size(); i++) {
         setOfSortedNodes.erase(setOfNodes[i]);
@@ -75,9 +76,7 @@ CommunicationGraph::~CommunicationGraph() {
     }
     setOfNodes.clear();
 
-
     GraphNodeSet::iterator iter;
-
     for (iter = setOfSortedNodes.begin(); iter != setOfSortedNodes.end(); ++iter) {
       delete *iter;
     }
@@ -87,9 +86,10 @@ CommunicationGraph::~CommunicationGraph() {
         delete tempBinDecision;
     }
 
-    if (PN) {
-        delete PN;
-    }
+    // dont delete the underlying petrinet because we may need it later
+    //if (PN) {
+    //    delete PN;
+    //}
 
     trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : end\n");
 }
@@ -842,8 +842,9 @@ void CommunicationGraph::deleteOWFN() {
 //! \brief Adds a node to the CommunicationGraph. The node is inserted in both sets.
 void CommunicationGraph::addNode(AnnotatedGraphNode* toAdd) {
     trace(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : start\n");
+    trace(TRACE_5, "setOfNodes.size() = " + intToString(setOfNodes.size()) + ", setOfSortedNodes.size() = " + intToString(setOfSortedNodes.size()) + "\n");
     setOfNodes.push_back(toAdd);
     setOfSortedNodes.insert(toAdd);
-    trace(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : start\n");
-
+    trace(TRACE_5, "setOfNodes.size() = " + intToString(setOfNodes.size()) + ", setOfSortedNodes.size() = " + intToString(setOfSortedNodes.size()) + "\n");
+    trace(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : end\n");
 }

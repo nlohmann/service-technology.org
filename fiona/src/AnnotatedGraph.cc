@@ -2606,8 +2606,7 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
     }
 
     // iterate over all nodes of the AnnotatedGraph
-    for (nodes_iterator node_iter = setOfNodes.begin(); node_iter
-            != setOfNodes.end(); ++node_iter) {
+    for (nodes_iterator node_iter = setOfNodes.begin(); node_iter != setOfNodes.end(); ++node_iter) {
 
         AnnotatedGraphNode* currNode = *node_iter;
 
@@ -2628,8 +2627,7 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
         bool hasSendingEventThatOccursInAnnotation = false;
 
         // iterate over all leaving edges of the current node
-        AnnotatedGraphNode::LeavingEdges::Iterator edge_iter =
-                currNode->getLeavingEdgesIterator();
+        AnnotatedGraphNode::LeavingEdges::Iterator edge_iter = currNode->getLeavingEdgesIterator();
         while (edge_iter->hasNext()) {
             AnnotatedGraphEdge* currEdge = edge_iter->getNext();
             std::string currLabel = currEdge->getLabel();
@@ -2720,17 +2718,17 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
             // create new node
             AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_tau",
                     new GraphFormulaFixed(true, ""), currNode->getColor());
-            trace(TRACE_3, "            created new node " + newNode->getName()
+            trace(TRACE_3, "        created new node " + newNode->getName()
                     + "\n");
             
             // create tau transition from current to new node
             AnnotatedGraphEdge* tauTransition= new AnnotatedGraphEdge(newNode, GraphFormulaLiteral::TAU);
             currNode->addLeavingEdge(tauTransition);
-            trace(TRACE_4, "            created tau transition from "
+            trace(TRACE_4, "        created tau transition from "
                     + currNode->getName() +" to "+ newNode->getName() + "\n");
 
             // add current node's leaving receiving edges to new node
-            trace(TRACE_4, "            adding leaving edges to new node\n");
+            trace(TRACE_4, "        adding leaving edges to new node\n");
             edge_iter = currNode->getLeavingEdgesIterator();
             while (edge_iter->hasNext()) {
                 AnnotatedGraphEdge* currEdge = edge_iter->getNext();
@@ -2746,18 +2744,19 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
                     AnnotatedGraphEdge* newEdge= new AnnotatedGraphEdge((currEdge)->getDstNode(),
                             (currEdge)->getLabel());
                     newNode->addLeavingEdge(newEdge);
-                    trace(TRACE_5, "            adding edge " + newEdge->getLabel()
+                    trace(TRACE_5, "        adding edge " + newEdge->getLabel()
                             +" from " + newNode->getName() + " to "
                             + newEdge->getDstNode()->getName() + "\n");
                 }
             }
+            delete edge_iter;
 
             // In any case the current node is not final any more. 
             currNode->setFinal(false);
             
             //if (hasFinalLiteral && !hasSendingEventThatOccursInAnnotation && nonAnnotatedSendingEvents.empty()) {
             if (hasFinalLiteral) {
-            newNode->setFinal(true);
+                newNode->setFinal(true);
             }
             
             // insert node into the set of created nodes
@@ -2767,8 +2766,10 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
 
     // add deadlocks to the node set of the SA
     if (!options[O_PV_MULTIPLE_DEADLOCKS]) {
+        trace(TRACE_3,"\n    inserting deadlock node into the graphs nodeset...\n");
         this->addNode(deadlock);
     } else {
+        trace(TRACE_3,"\n    inserting deadlocks node into the graphs nodeset...\n");
         map<std::string, AnnotatedGraphNode*>::iterator deadlockIter;
         for (deadlockIter = deadlockMap.begin(); deadlockIter
                 != deadlockMap.end(); ++deadlockIter) {
@@ -2777,10 +2778,9 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
     }
 
     // add the newly created nodes to the graph
-    trace(TRACE_3,"\n        inserting all newly created nodes into the graphs nodeset...\n");
-    for (set<AnnotatedGraphNode*>::iterator n = createdNodes.begin(); n
-            != createdNodes.end(); ++n) {
-        this->addNode((*n));
+    for (set<AnnotatedGraphNode*>::iterator n = createdNodes.begin(); n != createdNodes.end(); ++n) {
+        trace(TRACE_3,"\n    inserting newly created node into the graphs nodeset...\n");
+        this->addNode(*n);
     }
 }
 
@@ -2805,9 +2805,7 @@ void AnnotatedGraph::transformToPublicView(Graph* cleanPV, bool fromOWFN) {
     trace(TRACE_1, "\nStatistics of the public view service automaton: \n");
     trace(TRACE_1, "  nodes: " + intToString(setOfNodes.size()) + "\n");
     unsigned int edges = 0;
-    for (nodes_iterator nodeIter = setOfNodes.begin(); nodeIter
-            != setOfNodes.end(); ++nodeIter) {
-
+    for (nodes_iterator nodeIter = setOfNodes.begin(); nodeIter != setOfNodes.end(); ++nodeIter) {
         edges += (*nodeIter)->getLeavingEdgesCount();
     }
     trace(TRACE_1, "  edges: " + intToString(edges) + "\n\n");
@@ -2818,7 +2816,7 @@ void AnnotatedGraph::transformToPublicView(Graph* cleanPV, bool fromOWFN) {
 }
 
 
-//! \brief transforms the public view modified OG to a Service
+//! \brief transforms the public view modified OG to a service
 void AnnotatedGraph::transformOGToService(Graph* cleanPV) {
 
     // map from every node in the annotated graph to its corresponding
@@ -2826,8 +2824,7 @@ void AnnotatedGraph::transformOGToService(Graph* cleanPV) {
     map<AnnotatedGraphNode*, GraphNode*> nodeMap;
 
     // iterate over all nodes
-    for (nodes_t::iterator copyNode = setOfNodes.begin(); copyNode
-            != setOfNodes.end(); copyNode++) {
+    for (nodes_t::iterator copyNode = setOfNodes.begin(); copyNode != setOfNodes.end(); copyNode++) {
 
         // pointer for the copied node
         GraphNode* copiedNode;
@@ -2869,6 +2866,7 @@ void AnnotatedGraph::transformOGToService(Graph* cleanPV) {
             AnnotatedGraphEdge* edge = edge_iter->getNext();
             nodeMap[(*copyNode)]->addLeavingEdge(new GraphEdge( nodeMap[(edge)->getDstNode()], (edge)->getLabel()));
         }
+        delete edge_iter;
     }
 }
 
@@ -3074,9 +3072,9 @@ void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdges() {
     nEdges = 0;
     nBlueEdges = 0;
     nBlueNodes = 0;
-if (hasNoRoot()) {
-    return;
-}
+    if (hasNoRoot()) {
+        return;
+    }
     // Call the recursive helper
     computeNumberOfNodesAndStatesAndEdgesHelper(root, visitedNodes, (root->getColor() == BLUE));
 }

@@ -3838,18 +3838,18 @@ oWFN* oWFN::returnNormalOWFN() {
             trace(TRACE_5, "        handle arriving arc " + intToString(i) + "\n");
             Arc::Arc* arc = (*transition)->Node::getArrivingArc(i);
 
-            owfnPlace* destination = NULL;
+            owfnPlace* source = NULL;
             if (arc->pl->getType() == INTERNAL) {
-                destination = result->getPlace( arc->pl->getName() );
+                source = result->getPlace( arc->pl->getName() );
             } else {
-                destination = result->getPlace( arc->pl->getName() + suffix );
+                source = result->getPlace( arc->pl->getName() + suffix );
             }
-            assert(destination != NULL);
+            assert(source != NULL);
 
             trace(TRACE_5, "        create arriving arc " + intToString(i) + "\n");
-            Arc::Arc* newArc = new Arc(*transition, destination, true, arc->Multiplicity);
-
+            Arc::Arc* newArc = new Arc(*transition, source, true, arc->Multiplicity);
             newTransition->addArrivingArc(newArc);
+            source->addLeavingArc(newArc);
         }
 
         // leaving arcs
@@ -3869,7 +3869,7 @@ oWFN* oWFN::returnNormalOWFN() {
 
             trace(TRACE_5, "        create leaving arc " + intToString(i) + "\n");
             Arc::Arc* newArc = new Arc(*transition, destination, false, arc->Multiplicity);
-
+            destination->addArrivingArc(newArc);
             newTransition->addLeavingArc(newArc);
         }
     }
@@ -3894,12 +3894,14 @@ oWFN* oWFN::returnNormalOWFN() {
         Arc::Arc* inArc = new Arc( newTransition, newPlace, true, 1 );
         assert(inArc != NULL);
         newTransition->addArrivingArc(inArc);
+        newPlace->addLeavingArc(inArc);
 
         // second arc
         owfnPlace* destination = result->getPlace( (*place)->getName() + suffix);
         assert(destination != NULL);
         Arc::Arc* outArc = new Arc( newTransition, destination, false, 1 );
         assert(outArc != NULL);
+        destination->addArrivingArc(outArc);
         newTransition->addLeavingArc(outArc);
     }
 
@@ -3924,12 +3926,14 @@ oWFN* oWFN::returnNormalOWFN() {
         assert(destination != NULL);
         Arc::Arc* inArc = new Arc( newTransition, destination, true, 1 );
         assert(inArc != NULL);
-        newTransition->addArrivingArc( inArc );
+        newTransition->addArrivingArc(inArc);
+        destination->addLeavingArc(inArc);
 
         // second arc
         Arc::Arc* outArc = new Arc( newTransition, newPlace, false, 1 );
         assert(outArc != NULL);
-        newTransition->addLeavingArc( outArc );
+        newPlace->addArrivingArc(outArc);
+        newTransition->addLeavingArc(outArc);
     }
 
 

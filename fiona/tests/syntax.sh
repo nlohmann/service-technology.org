@@ -54,9 +54,10 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+
     if [ $? -ne 0 ]; then
-        echo ... fiona exited with nonzero return value although it should not
-        result=1
+        let "result += 1"
+        echo "... failed: $FIONA exited with non-zero return value."
     fi
 fi
 
@@ -76,6 +77,11 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+
+    if [ $? -ne 0 ]; then
+        let "result += 1"
+        echo "... failed: $FIONA exited with non-zero return value."
+    fi
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     syntaxexample=$?
@@ -106,6 +112,11 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
 
+    if [ $? -ne 0 ]; then
+        let "result += 1"
+        echo "... failed: $FIONA exited with non-zero return value."
+    fi
+
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     syntaxexamplenew=$?
 
@@ -135,6 +146,11 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
 
+    if [ $? -ne 0 ]; then
+        let "result += 1"
+        echo "... failed: $FIONA exited with non-zero return value."
+    fi
+
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     syntaxexamplenew=$?
 
@@ -148,7 +164,6 @@ else
 fi
 
 ############################################################################
-resultSingle=0
 owfn="$DIR/formula.owfn"
 outputPrefix="$builddir/syntax/formula.owfn.output"
 outputExpected="$testdir/syntax/formula.owfn.expected.og"
@@ -169,23 +184,20 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+
     if [ $? -ne 0 ]; then
+        let "result += 1"
         echo "... failed: $FIONA exited with non-zero return value."
-        resultSingle=1
     fi
 
-    if [ $resultSingle -eq 0 ] ; then
+    if [ $? -eq 0 ] ; then
         echo "running diff  $outputPrefix.og $outputExpected"
         if ! diff "$outputPrefix.og" "$outputExpected" >/dev/null ; then
             echo "... failed: Output and expected output differ. Compare " \
                  "$outputPrefix.og" "$outputExpected"
-            resultSingle=1
+            let "result += 1"
         fi
     fi
-fi
-
-if [ $resultSingle -ne 0 ]; then
-    result=1
 fi
 
 ############################################################################

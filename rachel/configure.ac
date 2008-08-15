@@ -37,7 +37,7 @@ AC_ARG_ENABLE(aspects,
   yes) aspects=yes ;;
   no)  aspects=no ;;
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-aspects) ;;
-esac],[aspects=yes])
+esac],[aspects=no])
 AM_CONDITIONAL(ASPECTS, test x$aspects = xyes)
 AC_MSG_CHECKING([whether to use aspects])
 AC_MSG_RESULT($aspects)

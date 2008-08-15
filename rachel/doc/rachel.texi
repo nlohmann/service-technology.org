@@ -156,7 +156,7 @@ Experiments and case studies published in several papers. For each file, say @fi
 The manpage of Rachel which can be displayed using @samp{man rachel} after having Rachel installed (see Installation description above).
 
 @item src
-The source code of Rachel. The directory @file{src} also contains a tarball @file{lp_solve.tar.gz} with the lp_solve 5.5 library@footnote{Currently not integrated into Rachel.}. It is distributed under the GNU Lesser General Library, see file @file{COPYING.LIB}.
+The source code of Rachel.
 
 @item tests
 Testcases for Rachel which check the generated binary. The testscripts check the command line options, file input and output, simulation calculation, and matching calculation.

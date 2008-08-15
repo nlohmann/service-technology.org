@@ -28,7 +28,7 @@ section "Options"
 
 option "mode" m
   "Edit distance"
-  string values="matching","simulation","lpsim" enum
+  string values="matching","simulation" enum
   typestr="MODE"
   default="matching"
   optional

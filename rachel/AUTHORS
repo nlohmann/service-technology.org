@@ -34,7 +34,4 @@ ACKNOWLEDGEMENTS
   * The translation into an linear programming problem was derived from a
     program provided by Oleg Sokolsky.
 
-  * lp_solve (http://lpsolve.sourceforge.net/5.5) is published under the
-    GNU Lesser General Public License, see file COPYING.lib
-
   * The aspects are implemented with AspectC++ (http://www.aspectc.org).

@@ -32,8 +32,6 @@
 #include "cmdline.h"
 #include "config.h"
 #include "helpers.h"
-#include "LP.h"
-#include "Scheduler.h"
 
 
 
@@ -53,6 +51,9 @@ using std::ofstream;
 extern int og_yyparse();
 extern FILE *og_yyin;
 
+Graph A("");
+Graph B("");
+
 extern Graph G_parsedGraph;
 char *G_filename;
 
@@ -65,9 +66,6 @@ map<Node, map<Node, ActionScript> > G_script_cache;
  * Stores all information on the command line options.
  */
 gengetopt_args_info args_info;
-
-/// a scheduler
-Scheduler sched;
 
 
 
@@ -82,7 +80,6 @@ string mode_name(enum_mode mode) {
     switch (mode) {
         case(mode_arg_simulation): return "simulation";            
         case(mode_arg_matching):   return "matching";
-        case(mode_arg_lpsim):      return "lp_sim";
         default:                   assert(false);
     }
 }
@@ -223,7 +220,7 @@ int main(int argc, char** argv) {
     // call parser and copy read graph
     og_yyparse();
     fclose(og_yyin);
-    Graph A = G_parsedGraph;
+    A = G_parsedGraph;
     
     // read second graph
     G_filename = args_info.og_arg;
@@ -236,7 +233,7 @@ int main(int argc, char** argv) {
     // call parser and copy read graph
     og_yyparse();
     fclose(og_yyin);
-    Graph B = G_parsedGraph;
+    B = G_parsedGraph;
     
     // a hack for Luhme to show information on markings
 //    B.printStatisticsForMarkings();
@@ -250,15 +247,13 @@ int main(int argc, char** argv) {
     fprintf(stderr, "target (OG): %s\t%u nodes\n",
             basename(args_info.og_arg), static_cast<unsigned int>(B.nodes.size()));
     
-    if (args_info.mode_arg != mode_arg_lpsim) {
-        if (A.isCyclic()) {
-            fprintf(stderr, "graph %s is cyclic; aborting\n", args_info.automaton_arg);
-            _exit(EXIT_FAILURE);
-        }
-        if (B.isCyclic()) {
-            fprintf(stderr, "graph %s is cyclic; aborting\n", args_info.og_arg);
-            _exit(EXIT_FAILURE);
-        }
+    if (A.isCyclic()) {
+        fprintf(stderr, "graph %s is cyclic; aborting\n", args_info.automaton_arg);
+        _exit(EXIT_FAILURE);
+    }
+    if (B.isCyclic()) {
+        fprintf(stderr, "graph %s is cyclic; aborting\n", args_info.og_arg);
+        _exit(EXIT_FAILURE);
     }
     
     if (args_info.verbose_flag && (args_info.mode_arg == mode_arg_matching)) {
@@ -273,11 +268,6 @@ int main(int argc, char** argv) {
     }
     
 
-    // initialize the scheduler and print a schedule
-    sched.initialize(A, B, A.getRoot(), B.getRoot());
-    sched.schedule();
-
-    
     // exit after parsing input files -- for debugging purposes
     if (args_info.noop_given)
         return EXIT_SUCCESS;
@@ -286,19 +276,14 @@ int main(int argc, char** argv) {
     // do what you're told via "--mode" parameter
     switch (args_info.mode_arg) {
         case(mode_arg_simulation): {
-            fprintf(stderr, "similarity: %.2f\n", Simulation::simulation(A,B));
+            fprintf(stderr, "similarity: %.2f\n", Simulation::simulation());
             break;
         }
 
         case(mode_arg_matching): {
-            fprintf(stderr, "matching: %.2f\n", Matching::matching(A,B));
+            fprintf(stderr, "matching: %.2f\n", Matching::matching());
             break;
-        }
-        
-        case(mode_arg_lpsim): {
-            LP::lp_gen(A);
-            break;
-        }
+        }        
     }
 
     

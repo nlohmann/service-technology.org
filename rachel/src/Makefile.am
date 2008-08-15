@@ -4,13 +4,11 @@ rachel_SOURCES = syntax_og.yy lexer_og.ll \
 		 main.cc config.h \
 		 helpers.h helpers.cc \
 		 Graph.cc Graph.h \
-		 Scheduler.cc Scheduler.h \
 		 Formula.cc Formula.h \
 		 Action.cc Action.h \
 		 costfunction.h \
 		 Simulation.h Matching.h \
 		 EditDistance.h EditDistance.cc \
-		 LP.h LP.cc \
 		 cmdline.c cmdline.h \
 		 getopt.h getopt.c getopt1.c \
 		 $(aspected_sources)
@@ -24,15 +22,10 @@ BUILT_SOURCES = cmdline.c syntax_og.cc
 # organize flags
 ################################################################
 
+# initial setting necessary to enable "+=" statements later
 rachel_LDFLAGS  =
 rachel_CFLAGS   =
 rachel_CXXFLAGS =
-
-
-# flags to use threads
-#rachel_LDFLAGS  += -lpthread
-#rachel_CFLAGS   += -D_REENTRANT
-#rachel_CXXFLAGS += -D_REENTRANT
 
 
 # flags to build Mac Universal binary
@@ -64,8 +57,7 @@ endif
 ################################################################
 
 EXTRA_DIST = syntax_og.h cmdline.ggo simmatch.conf Doxydetails \
-	     $(aspects) \
-	     lp_solve.tar.gz
+	     $(aspects)
 
 MAINTAINERCLEANFILES = syntax_og.cc syntax_og.h lexer_og.cc \
 		       cmdline.c cmdline.h puma.config \
@@ -101,11 +93,3 @@ endif
 ################################################################
 cmdline.c: cmdline.ggo
 	$(GENGETOPT) --input=cmdline.ggo --long-help --include-getopt --show-required --conf-parser
-
-
-################################################################
-# include lp_solve as library
-################################################################
-#rachel_LDADD = lp_solve/liblpsolve55.a
-#INCLUDES = -Ilp_solve
-#SUBDIRS = lp_solve

@@ -10,9 +10,13 @@
 
 @item chosen configure script parameters are printed when using @option{--bug} command line parameter
 
+@item made the configure script option @option{--disable-aspects} standard
+
 @item added a command line parameter @option{--noop} to exit after parsing the input files -- mostly for debug information, e.g. if you want to count the services characterized by an OG (combined with @option{--verbose})
 
-@item implemented a class @code{Scheduler} that implements a scheduler to eventually use multiple threads when calculating simulation or matching
+@item fixed a bug: the requirements to calculate matching-based edit distance (final states are sink states) led to incorrect formula evaluation (see @url{https://gna.org/bugs/?11944}) when calculating the number of characterized services
+
+@item removed orphaned code for linear programming
 @end itemize
 
 

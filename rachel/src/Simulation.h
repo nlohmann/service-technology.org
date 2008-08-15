@@ -43,20 +43,17 @@
 class Simulation : EditDistance {
     private:
         /// helper function 1 for simulation: insertion
-        static ActionScript w1(Graph &g1, Graph &g2,
-                               Node q1, Node q2);
+        static ActionScript w1(Node q1, Node q2);
         
         /// helper function 2 for simulation: keep, modify, or delete
-        static ActionScript w2(Graph &g1, Graph &g2,
-                               Node q1, Node q2);
+        static ActionScript w2(Node q1, Node q2);
         
         /// weighted weak quantitative simulation (helper)
-        static Value simulation_recursively(Graph &g1, Graph &g2,
-                                            Node q1, Node q2);
+        static Value simulation_recursively(Node q1, Node q2);
     
     public:
         /// weighted weak quantitative simulation
-        static Value simulation(Graph &g1, Graph &g2);
+        static Value simulation();
 };
 
 #endif

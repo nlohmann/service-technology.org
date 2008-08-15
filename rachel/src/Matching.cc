@@ -23,7 +23,6 @@
 #include <cstdlib>
 #include <cstdio>
 #include <map>
-//#include <pthread.h> // can use HAVE_PTHREAD_H from config.h
 
 #include "Matching.h"
 #include "costfunction.h"
@@ -31,37 +30,6 @@
 #include "helpers.h"
 
 using std::map;
-
-
-
-/***********
- * threads *
- ***********/
-/*
-/// the maximal number of threads
-const short MAX_THREADS = 2;
-
-/// an array containing the threads
-pthread_t thread[MAX_THREADS];
-
-/// a mutex to organize memory access
-pthread_mutex_t mutex;
-
-typedef struct {
-    Node q1;
-    Node q2;
-} NodePair;
-
-
-void *calc(void *arg) {
-    NodePair *a = (NodePair*)arg;
-    assert(a != NULL);
-    
-    fprintf(stderr, "%d %d\n", a->q1, a->q2);
-    
-    return NULL;
-}
-*/
 
 
 /*************
@@ -73,6 +41,9 @@ extern map<Node, map<Node, ActionScript> > G_script_cache;
 
 /// the command line options
 extern gengetopt_args_info args_info;
+
+extern Graph A;
+extern Graph B;
 
 
 /**********************
@@ -88,7 +59,6 @@ unsigned int Matching::matching_calls = 0;
 /*************
  * functions *
  *************/
-
 
 /*!
  * \brief create a permutation
@@ -138,10 +108,8 @@ Permutation Matching::permuteEdges(Edges &e1, Edges &e2) {
 /*!
  * \brief calculates permutations
  *
- * \param   g1    a graph
- * \param   g2    a graph
- * \param   q1    a node of graph g1
- * \param   q2    a node of graph g2
+ * \param   q1    a node of graph A
+ * \param   q2    a node of graph B
  * \param   beta  an assignment to q2's formula
  *
  * \return  the set of all edge permutations
@@ -158,11 +126,11 @@ Permutation Matching::permuteEdges(Edges &e1, Edges &e2) {
  * \todo Understand the abortion criterion of the while loop: Why is the
  *       counter really necessary?
  */
-Permutations Matching::calcPermutations(Graph &g1, Graph &g2, Node q1, Node q2, Assignment &beta) {
+Permutations Matching::calcPermutations(Node q1, Node q2, Assignment &beta) {
     calcPermutations_calls++;
     
     // collect outgoing edges
-    Edges e1 = g1.outEdges(q1);
+    Edges e1 = A.outEdges(q1);
     Edges e2 = beta;
 
     // add epsilon-edges to fill edge vectors to equal size
@@ -199,15 +167,15 @@ Permutations Matching::calcPermutations(Graph &g1, Graph &g2, Node q1, Node q2, 
 
 
 /// helper function for matching
-ActionScript Matching::w(Graph &g1, Graph &g2, Node q1, Node q2) {
+ActionScript Matching::w(Node q1, Node q2) {
     w_calls++;
     
     ActionScript result;
     
     // get and iterate the satisfying assignments
-    Assignments assignments = g2.sat(q2);
+    Assignments assignments = B.sat(q2);
     for (unsigned int k = 0; k < assignments.size(); k++) {
-        Permutations permutations = calcPermutations(g1,g2,q1,q2,assignments[k]);
+        Permutations permutations = calcPermutations(q1,q2,assignments[k]);
 
         ActionScript assignment_script;
 
@@ -229,16 +197,15 @@ ActionScript Matching::w(Graph &g1, Graph &g2, Node q1, Node q2) {
                   
                 // add a node
                 if (e1.label == "") {
-                    Node q_new = g1.addNewNode(q1, e2.label);
+                    Node q_new = A.addNewNode(q1, e2.label);
                     e1.target = q_new;
                 }
 
                 if (e2.label == "") {
-                    current_value = L(e1.label, "") * g1.getDeletionValue(q1);
+                    current_value = L(e1.label, "") * A.getDeletionValue(q1);
                 } else {
                     current_value = L(e1.label, e2.label) *
-                                        matching_recursively(g1, g2,
-                                                             e1.target, e2.target);
+                                        matching_recursively(e1.target, e2.target);
                 }
 
                 // if a node was added, use the new label for the action
@@ -250,7 +217,7 @@ ActionScript Matching::w(Graph &g1, Graph &g2, Node q1, Node q2) {
                 Action current_action(MODIFY, current_value, e1.target, e2.target);
                 current_action.label_old = e1.label;
                 current_action.label_new = e2.label;
-                if (e1.label == "" || g1.addedNodes[e1.target])
+                if (e1.label == "" || A.addedNodes[e1.target])
                     current_action.setType(INSERT);
                 if (e2.label == "")
                     current_action.setType(DELETE);
@@ -281,19 +248,17 @@ ActionScript Matching::w(Graph &g1, Graph &g2, Node q1, Node q2) {
 /*!
  * \brief weighted matching (helper)
  *
- * \param g1  a graph (the source: a service automaton)
- * \param g2  a graph (the target: an operating guideline)
- * \param q1  a node of graph g1
- * \param q2  a node of graph g2
+ * \param q1  a node of graph A
+ * \param q2  a node of graph B
  *
  * \return    the weighted matching between node q1 and node q2
  */
-Value Matching::matching_recursively(Graph &g1, Graph &g2, Node q1, Node q2) {
+Value Matching::matching_recursively(Node q1, Node q2) {
     matching_calls++;
         
-    if (g1.addedNodes[q1]) {
+    if (A.addedNodes[q1]) {
         cache_hit++;
-        return g2.getInsertionValue(q2);
+        return B.getInsertionValue(q2);
     }
     
     // recycle previously calculated values
@@ -311,11 +276,11 @@ Value Matching::matching_recursively(Graph &g1, Graph &g2, Node q1, Node q2) {
     }
     
     // calculate successor values
-    if (g1.outEdges(q1).empty() && g2.isFinal(q2)) {
+    if (A.outEdges(q1).empty() && B.isFinal(q2)) {
         cache[q1][q2] = N(q1,q2);
     } else {
         // recursive call
-        ActionScript s = w(g1,g2,q1,q2);
+        ActionScript s = w(q1,q2);
         cache[q1][q2] = (1-discount()) * N(q1,q2) + s.value;
         G_script_cache[q1][q2] = s;
     }
@@ -329,17 +294,14 @@ Value Matching::matching_recursively(Graph &g1, Graph &g2, Node q1, Node q2) {
 /*!
  * \brief weighted matching
  *
- * \param g1  a graph (the source: a service automaton)
- * \param g2  a graph (the target: an operating guideline)
- *
- * \return    the weighted matching between graph g1 and graph g2
+ * \return    the weighted matching between graph A and graph B
  *
  * \pre  Both graphs have to be acyclic, because otherwise the algorithm does
  *       not terminate.
  *
  * \bug  Cache clearing currently crashes.
  */
-Value Matching::matching(Graph &g1, Graph &g2) {
+Value Matching::matching() {
     // reset static values
     permuteEdges_calls = 0;
     calcPermutations_calls = 0;
@@ -349,25 +311,25 @@ Value Matching::matching(Graph &g1, Graph &g2) {
     cache_miss = 0;
     
     // allocate memory for cache
-    initializeCache(g1, g2);
+    initializeCache(A, B);
     
     // preprocess OG to pre-calculate values for insertion
-    g2.preprocessInsertion();
+    B.preprocessInsertion();
     
     // calculate the matching between the root nodes
-    Value result = matching_recursively(g1, g2, g1.getRoot(), g2.getRoot());
+    Value result = matching_recursively(A.getRoot(), B.getRoot());
     
     // statistical output
     double hit_rate= 1 - (static_cast<double>(cache_miss) / static_cast<double>(cache_hit));
     fprintf(stderr, "cache: %u hits, %u misses, hit rate %.2f%%\n",
             cache_hit, cache_miss, hit_rate * 100);
     fprintf(stderr, "%u added nodes\n",
-            static_cast<unsigned int>(g1.addedNodes.size()));
+            static_cast<unsigned int>(A.addedNodes.size()));
     fprintf(stderr, "permuteEdges: %u, calcPermutations: %u, w: %u, matching: %u\n",
             permuteEdges_calls, calcPermutations_calls, w_calls, matching_calls);
 
     // delete cache
-    //emptyCache(g1, g2);    
+    //emptyCache(A, B);    
         
     return result;
 }

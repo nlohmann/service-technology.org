@@ -45,6 +45,9 @@ extern map<Node, map<Node, ActionScript> > G_script_cache;
 /// the command line options
 extern gengetopt_args_info args_info;
 
+extern Graph A;
+extern Graph B;
+
 
 /*************
  * functions *
@@ -58,19 +61,19 @@ extern gengetopt_args_info args_info;
  *        for every pair (q1,q2) of states.
  *
  */
-ActionScript Simulation::w1(Graph &g1, Graph &g2, Node q1, Node q2) {
+ActionScript Simulation::w1(Node q1, Node q2) {
     Action action_insert(INSERT, 0);
     
     // traverse B's edges and find edge with highest value if A stutters
-    for (size_t i = 0; i < g2.outEdges(q2).size(); i++)  {
-        Value currentvalue = L("", g2.outEdges(q2)[i].label) *
-            simulation_recursively(g1, g2, q1, g2.outEdges(q2)[i].target);
+    for (size_t i = 0; i < B.outEdges(q2).size(); i++)  {
+        Value currentvalue = L("", B.outEdges(q2)[i].label) *
+            simulation_recursively(q1, B.outEdges(q2)[i].target);
  
         if (currentvalue > action_insert.value) {
             action_insert.value = currentvalue;
             action_insert.stateA = q1;
-            action_insert.stateB = g2.outEdges(q2)[i].target;
-            action_insert.label_new = g2.outEdges(q2)[i].label;
+            action_insert.stateB = B.outEdges(q2)[i].target;
+            action_insert.label_new = B.outEdges(q2)[i].label;
         }
     }
     
@@ -86,32 +89,32 @@ ActionScript Simulation::w1(Graph &g1, Graph &g2, Node q1, Node q2) {
  *        for every pair (q1,q2) of states.
  *
  */
-ActionScript Simulation::w2(Graph &g1, Graph &g2, Node q1, Node q2) {
+ActionScript Simulation::w2(Node q1, Node q2) {
     ActionScript script;
     
     // traverse A's edges
-    for (size_t i = 0; i < g1.outEdges(q1).size(); i++) {
+    for (size_t i = 0; i < A.outEdges(q1).size(); i++) {
         Action action_modify(MODIFY, 0);
         
         // traverse B's edges: find edge with highest value if no-one stutters
-        for (size_t j = 0; j < g2.outEdges(q2).size(); j++) {
-            Value currentvalue = L(g1.outEdges(q1)[i].label, g2.outEdges(q2)[j].label) *
-                simulation_recursively(g1, g2, g1.outEdges(q1)[i].target, g2.outEdges(q2)[j].target);            
+        for (size_t j = 0; j < B.outEdges(q2).size(); j++) {
+            Value currentvalue = L(A.outEdges(q1)[i].label, B.outEdges(q2)[j].label) *
+                simulation_recursively(A.outEdges(q1)[i].target, B.outEdges(q2)[j].target);            
 
             if (currentvalue > action_modify.value) {
                 action_modify.value = currentvalue;
-                action_modify.stateA = g1.outEdges(q1)[i].target;
-                action_modify.stateB = g2.outEdges(q2)[j].target;
-                action_modify.label_old = g1.outEdges(q1)[i].label;
-                action_modify.label_new = g2.outEdges(q2)[j].label;
+                action_modify.stateA = A.outEdges(q1)[i].target;
+                action_modify.stateB = B.outEdges(q2)[j].target;
+                action_modify.label_old = A.outEdges(q1)[i].label;
+                action_modify.label_new = B.outEdges(q2)[j].label;
             }
         }
         
         // B stutters
-        Value value_delete = L(g1.outEdges(q1)[i].label, "") *
-            simulation_recursively(g1, g2, g1.outEdges(q1)[i].target, q2);
-        Action action_delete(DELETE, value_delete, g1.outEdges(q1)[i].target, q2);
-        action_delete.label_old = g1.outEdges(q1)[i].label;
+        Value value_delete = L(A.outEdges(q1)[i].label, "") *
+            simulation_recursively(A.outEdges(q1)[i].target, q2);
+        Action action_delete(DELETE, value_delete, A.outEdges(q1)[i].target, q2);
+        action_delete.label_old = A.outEdges(q1)[i].label;
         
         // add best action to script
         if (action_delete.value > action_modify.value) {
@@ -122,7 +125,7 @@ ActionScript Simulation::w2(Graph &g1, Graph &g2, Node q1, Node q2) {
     }
     
     // discount value of all actions using the sum of actions
-    script.value *= (discount() / g1.outEdges(q1).size());
+    script.value *= (discount() / A.outEdges(q1).size());
     
     return script;
 }
@@ -131,14 +134,12 @@ ActionScript Simulation::w2(Graph &g1, Graph &g2, Node q1, Node q2) {
 /*!
  * \brief   weighted weak quantitative simulation (helper)
  *
- * \param g1  a graph (the source: a service automaton)
- * \param g2  a graph (the target: an operating guideline)
- * \param q1  a node of graph g1
- * \param q2  a node of graph g2
+ * \param q1  a node of graph A
+ * \param q2  a node of graph B
  *
  * \return    the weighted simulation between node q1 and node q2
  */
-Value Simulation::simulation_recursively(Graph &g1, Graph &g2, Node q1, Node q2) {
+Value Simulation::simulation_recursively(Node q1, Node q2) {
     // recycle previously calculated values
     if (cache[q1][q2] != 0) {
         cache_hit++;
@@ -154,12 +155,12 @@ Value Simulation::simulation_recursively(Graph &g1, Graph &g2, Node q1, Node q2)
     }
     
     // calculate successor values
-    if (g1.outEdges(q1).empty()) {
+    if (A.outEdges(q1).empty()) {
         cache[q1][q2] = N(q1,q2);
     } else {
         // collect helper values and choose maximum
-        ActionScript script1 = w1(g1,g2,q1,q2);
-        ActionScript script2 = w2(g1,g2,q1,q2); 
+        ActionScript script1 = w1(q1,q2);
+        ActionScript script2 = w2(q1,q2); 
         ActionScript bestScript = (script1.value > script2.value) ? script1 : script2;
         
         // cache best action
@@ -179,30 +180,28 @@ Value Simulation::simulation_recursively(Graph &g1, Graph &g2, Node q1, Node q2)
  *
  * The function calculates the "weighted weak quantitative simulation" as it is
  * defined in the paper "Simulation-based graph matching" by Sokolsky et al.
- * Instead of returning a single value, the function returns an edit script
- * that describes how graph g1 has to be changed to acheive simulation to g2.
+ * In addition to returning a single value, the function also creates an edit
+ * script that describes how graph A has to be changed to acheive simulation
+ * to B.
  * 
- * \param g1  a graph (the source: a service automaton)
- * \param g2  a graph (the target: an operating guideline)
- *
- * \return    the weighted weak quantitative simulation between graph g1 and
- *            graph g2
+ * \return    the weighted weak quantitative simulation between graph A and
+ *            graph B
  *
  * \pre  Both graphs have to be acyclic, because otherwise the algorithm does
  *       not terminate.
  *
  * \post Cache is cleared.
  */ 
-Value Simulation::simulation(Graph &g1, Graph &g2) {
+Value Simulation::simulation() {
     // reset static values
     cache_hit = 0;
     cache_miss = 0;
     
     // allocate memory for cache
-    initializeCache(g1, g2);
+    initializeCache(A, B);
     
     // calculate the matching between the root nodes
-    Value result = simulation_recursively(g1, g2, g1.getRoot(), g2.getRoot());
+    Value result = simulation_recursively(A.getRoot(), B.getRoot());
     
     // statistical output
     double hit_rate = 1 - (static_cast<double>(cache_miss) / static_cast<double>(cache_hit));
@@ -210,7 +209,7 @@ Value Simulation::simulation(Graph &g1, Graph &g2) {
             cache_hit, cache_miss, hit_rate * 100);
     
     // delete cache
-    emptyCache(g1, g2);    
+    emptyCache(A, B);    
     
     return result;
 }

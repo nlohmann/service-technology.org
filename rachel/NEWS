@@ -25,12 +25,18 @@ Version 1.10 (unreleased)
 * chosen configure script parameters are printed when using `--bug' command
   line parameter
 
+* made the configure script option `--disable-aspects' standard
+
 * added a command line parameter `--noop' to exit after parsing the input
   files - mostly for debug information, e.g. if you want to count the
   services characterized by an OG (combined with `--verbose')
 
-* implemented a class `Scheduler' that implements a scheduler to eventually
-  use multiple threads when calculating simulation or matching
+* fixed a bug: the requirements to calculate matching-based edit distance
+  (final states are sink states) led to incorrect formula evaluation (see
+  `https://gna.org/bugs/?11944') when calculating the number of characterized
+  services
+
+* removed orphaned code for linear programming
 
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for

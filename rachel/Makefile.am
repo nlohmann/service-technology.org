@@ -1,12 +1,10 @@
 SUBDIRS = src man doc tests exp maintainer
 
-EXTRA_DIST = COPYING.lib
-
 #############################################################################
 # remove everything that cannot be built
 #############################################################################
 cvs-clean: maintainer-clean
-	rm -fr INSTALL Makefile.in aclocal.m4 compile configure depcomp \
+	rm -fr COPYING INSTALL Makefile.in aclocal.m4 compile configure depcomp \
 	  install-sh missing ylwrap $(DIST_ARCHIVES).sig config.sub config.guess \
 	  config.h.in~
 	rm -fr doc/Makefile.in doc/mdate-sh doc/manual

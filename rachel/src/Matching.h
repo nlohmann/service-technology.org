@@ -61,24 +61,21 @@ class Matching : EditDistance {
         static Permutation permuteEdges(Edges &e1, Edges &e2);
 
         /// calculates permutations
-        static Permutations calcPermutations(Graph &g1, Graph &g2,
-                                             Node q1, Node q2,
+        static Permutations calcPermutations(Node q1, Node q2,
                                              Assignment &beta);
 
         /// preprocess OG
         static Value preprocess(Graph &g, Node q);
     
         /// helper function for Matching::matching
-        static ActionScript w(Graph &g1, Graph &g2,
-                              Node q1, Node q2);
+        static ActionScript w(Node q1, Node q2);
 
         /// weighted matching (helper)
-        static Value matching_recursively(Graph &g1, Graph &g2,
-                                          Node q1, Node q2);
+        static Value matching_recursively(Node q1, Node q2);
     
     public:
         /// weighted matching
-        static Value matching(Graph &g1, Graph &g2);
+        static Value matching();
 };
 
 #endif

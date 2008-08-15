@@ -22,6 +22,7 @@
 #include <set>
 #include <algorithm>
 #include <string>
+#include <cassert>
 
 #include "Scheduler.h"
 
@@ -29,14 +30,14 @@ using std::pair;
 using std::string;
 using std::map;
 
-
-void Scheduler::addNode(Node q1, Node q2) {
-    nodes.insert(pair<Node,Node>(q1, q2));
-}
+extern Graph A;
+extern Graph B;
 
 
-void Scheduler::addEdge(Node q11, Node q12, Node q21, Node q22) {
-    edges[ pair<Node, Node>(q11, q12) ].insert( pair<Node, Node>(q21, q22) );
+void Scheduler::setThreads(unsigned int _threads) {
+    assert(_threads > 1);
+    threads = _threads;
+    fprintf(stderr, "created a scheduler for %d threads\n", threads);
 }
 
 
@@ -57,20 +58,20 @@ void Scheduler::toDot() {
 }
 
 
-void Scheduler::initialize(Graph &g1, Graph &g2, Node q1, Node q2) {
+void Scheduler::initialize(Node q1, Node q2) {
     // add current node pair
-    addNode(q1, q2);
+    nodes.insert(pair<Node,Node>(q1, q2));
     
     // dynamic programming cache
     static map<Node, map<Node, map<Node, map<Node, bool> > > > seen;
     
-    Edges out1 = g1.outEdges(q1);
-    Edges out2 = g2.outEdges(q2);
+    Edges out1 = A.outEdges(q1);
+    Edges out2 = B.outEdges(q2);
     
     for (size_t i = 0; i < out1.size(); i++) {
         for (size_t j = 0; j < out2.size(); j++) {
             // add edge to successor
-            addEdge(q1, q2, out1[i].target, out2[j].target);
+            edges[ pair<Node, Node>(q1, q2) ].insert( pair<Node, Node>(out1[i].target, out2[j].target) );
             
             // use dynamic programming cache
             if (seen[q1][q2][out1[i].target][out2[j].target])
@@ -78,22 +79,22 @@ void Scheduler::initialize(Graph &g1, Graph &g2, Node q1, Node q2) {
             seen[q1][q2][out1[i].target][out2[j].target] = true;
             
             // recursive call
-            initialize(g1, g2, out1[i].target, out2[j].target);
+            initialize(out1[i].target, out2[j].target);
         }
     }
 }
 
 
-void Scheduler::schedule() {
+void Scheduler::schedule() {   
     bool done;
-    set<pair<Node, Node> > seen;
     unsigned int max_width = 0;
-    unsigned int current_width = 0;
-    unsigned int max_height = 0;
+    int max_height = -1; // loop is repeated once after max heigt is reached
+    unsigned int task_id = 0;
     
     do {
         done = true;
-        current_width = 0;
+        set<pair<Node, Node> > seen;
+        unsigned int current_width = 0;
         max_height++;
         
         // iterate nodes
@@ -108,17 +109,25 @@ void Scheduler::schedule() {
         if (current_width > max_width)
             max_width = current_width;
         
-        // remove printed nodes
+        // remove seen nodes
         for(set<pair<Node, Node> >::iterator n = seen.begin(); n!= seen.end(); n++) {
             // remove respective edges
             for (set<pair<Node, Node> >::iterator n2 = nodes.begin(); n2 != nodes.end(); n2++) {
                 done = false;
                 edges[*n2].erase(*n);
             }
-            nodes.erase(*n);            
+            
+            // put state pair on the task stack
+            tasks.push_back(pair<unsigned int, pair<Node, Node> >(task_id++, *n));
+            //fprintf(stderr, "pushed task #%5d (%3d,%3d) for thread %2d at height %3\n", task_id-1, n->first, n->second, (task_id-1) % threads, max_height+1);
+            
+            nodes.erase(*n);
         }
+        
     } while (!done);
     
-    fprintf(stderr, "dependency width:   %4u\n", max_width);
-    fprintf(stderr, "depdendency height: %4u\n\n", max_height);
+    
+    fprintf(stderr, "\ndependency width:   %4u\n", max_width);
+    fprintf(stderr, "depdendency height: %4u\n", max_height);
+    fprintf(stderr, "%d tasks on the stack\n\n", tasks.size());
 }

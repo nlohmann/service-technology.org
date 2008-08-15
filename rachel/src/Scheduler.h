@@ -24,6 +24,7 @@
 #include <map>
 #include <set>
 #include <algorithm>
+#include <vector>
 
 #include "Graph.h"
 
@@ -32,15 +33,19 @@ class Scheduler {
     private:
         std::set<std::pair<Node, Node> > nodes;
         std::map<std::pair<Node, Node>, std::set<std::pair<Node, Node> > > edges;
-
-        void addNode(Node q1, Node q2);
-        void addEdge(Node q11, Node q12, Node q21, Node q22);
+        
+        unsigned int threads;
+        unsigned int currentTask;
 
     public:
-        void initialize(Graph &g1, Graph &g2, Node q1, Node q2);
+        std::vector<std::pair<unsigned int, std::pair<Node, Node> > > tasks;
+    
+        void initialize(Node q1, Node q2);
         void schedule();
 
         void toDot();
+    
+        void setThreads(unsigned int threads);
 };
 
 #endif

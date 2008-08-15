@@ -1,0 +1,31 @@
+Index: net.H
+===================================================================
+--- net.H	(revision 3227)
++++ net.H	(working copy)
+@@ -17,6 +17,12 @@
+ using std::cout;
+ using std::endl;
+ 
++///// 4 LINES ADDED BY NIELS
++extern void statistics(unsigned int s, unsigned int e, unsigned int h);
++extern unsigned int NrOfStates;
++extern unsigned int Edges;
++extern unsigned int NonEmptyHash;
++
+ #define true 1
+ #define false 0
+ 
+@@ -613,7 +619,12 @@
+ 	if(CurrentMarking[*p] > Places[*p]->capacity) 
+ 	{
+ 		cerr << "capacity of place " << Places[*p]->name << " exceeded!" << endl;
+-		_exit(4);
++        
++        ///// 2 LINES ADDED BY NIELS
++        statistics(NrOfStates,Edges,NonEmptyHash);
++        cout << std::flush;
++		
++        _exit(4);
+ 	}
+ #endif
+ #ifdef COVER

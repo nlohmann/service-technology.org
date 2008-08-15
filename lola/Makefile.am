@@ -1,7 +1,7 @@
 SUBDIRS = src tests
 
 
-EXTRA_DIST = doc
+EXTRA_DIST = doc patches
 
 ##############################################################################
 # remove everything that can be rebuilt

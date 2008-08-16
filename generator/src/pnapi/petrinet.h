@@ -68,6 +68,7 @@
 #include <map>
 #include <list>
 #include <deque>
+#include <algorithm>
 
 using std::string;
 using std::vector;
@@ -84,7 +85,6 @@ using std::ostream;
 
 namespace PNapi
 {
-
     
 /******************************************************************************
  * Data structure
@@ -649,7 +649,7 @@ class PetriNet
     map< pair< Node*, Node* >, int > weight;
 };
 
-
+ostream& operator<< (ostream& os, const PetriNet &obj);
 
 }
 

@@ -61,6 +61,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 using std::vector;
 using std::string;

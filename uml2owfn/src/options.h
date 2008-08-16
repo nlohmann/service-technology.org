@@ -43,6 +43,8 @@
 #include <list>
 #include <string>
 #include <iostream>
+#include <cstdlib>
+#include <climits>
 
 using std::map;
 using std::set;

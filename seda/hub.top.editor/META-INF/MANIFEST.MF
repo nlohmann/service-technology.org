@@ -2,10 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Service-Technology.org Editor Suite
 Bundle-SymbolicName: hub.top.editor;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.3.qualifier
 Bundle-Activator: hub.top.editor.Activator
 Bundle-Vendor: Service-Technology.org
 Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
  org.eclipse.gmf.runtime.diagram.core,
  org.eclipse.gmf.runtime.diagram.ui,
  org.eclipse.ui.ide,

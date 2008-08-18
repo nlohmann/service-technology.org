@@ -2,7 +2,7 @@
 <feature
       id="hub.top.seda"
       label="Service-Technology.org Editor Application"
-      version="1.0.3"
+      version="1.0.3.qualifier"
       provider-name="Service-Technology.org">
 
    <description url="http://www.service-technology.org/wiki/">
@@ -1171,10 +1171,10 @@ Library.
 
    <requires>
       <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.gmf.runtime.diagram.core"/>
       <import plugin="org.eclipse.gmf.runtime.diagram.ui"/>
       <import plugin="org.eclipse.ui.ide"/>
-      <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="hub.sam.tef" version="1.0.5" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.transaction"/>
@@ -1184,11 +1184,14 @@ Library.
       <import plugin="org.eclipse.core.expressions"/>
       <import plugin="org.eclipse.jface"/>
       <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.ui.views.properties.tabbed"/>
       <import plugin="org.eclipse.ui.navigator"/>
       <import plugin="org.eclipse.ui.navigator.resources"/>
       <import plugin="org.eclipse.emf.ecore"/>
       <import plugin="org.eclipse.emf.ecore.xmi"/>
       <import plugin="org.eclipse.emf.edit.ui"/>
+      <import plugin="org.eclipse.emf.transaction.ui"/>
+      <import plugin="org.eclipse.emf.workspace"/>
       <import plugin="org.eclipse.gmf.runtime.emf.core"/>
       <import plugin="org.eclipse.gmf.runtime.emf.commands.core"/>
       <import plugin="org.eclipse.gmf.runtime.emf.ui.properties"/>

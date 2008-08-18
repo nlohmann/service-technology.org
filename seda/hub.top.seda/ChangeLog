@@ -3,7 +3,7 @@ ChangeLog for hub.top.seda
 
 Version 1.0.3
 -------------
-- found bug #12197: "Seda: pre-compiled plugins fail under Linux" <https://gna.org/bugs/index.php?12197>, when compiling Seda under Debian 4.0/Java 1.5, installing the generated plugin via the Eclipse update feature causes a "java.lang.UnsupportedClassVersionError: Bad version number in .class file" upon opening one of the TEF-based editors
++ changed to X.Y.Z.qualifier versioning scheme to avoid problems with the Eclipse update mechanism, fixes bug #12197: "Seda: pre-compiled plugins fail under Linux" <https://gna.org/bugs/index.php?12197>
 + added check for dealing with workspace external files during conversion [hub.top.editor.resource, hub.top.editor.ptnetLoLA.diagram]
 + fixed bug to load workspace-external text files [hub.top.editor.resource, hub.top.editor.lola.text, hub.sam.tef]
 + changed to Java compiler compliance level 5, so Seda runs on systems with JavaSE 5 as well,

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Service-Technology.org Text Editors
 Bundle-SymbolicName: hub.top.editor.lola.text;singleton:=true
-Bundle-Version: 1.0.3
+Bundle-Version: 1.0.3.qualifier
 Bundle-Activator: hub.top.editor.lola.text.Activator
 Bundle-Vendor: Service-Technology.org
 Require-Bundle: org.eclipse.ui,

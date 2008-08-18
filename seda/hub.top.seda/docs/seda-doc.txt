@@ -1,0 +1,48 @@
+
+Package dependencies of hub.top.seda
+
+hub.sam.tef
+- org.eclipse.emf.ecore.editor (???)
+- org.eclipse.emf.ecore.xmi (???)
+- org.eclipse.emf.importer
+- org.eclipse.emf.importer.ecore (???)
+- org.eclipse.emf.validation (???)
+- org.eclipse.pde.ui
+
+hub.top.editor
+- org.eclipse.gmf.runtime.diagram.core
+- org.eclipse.gmf.runtime.diagram.ui
+
+hub.top.editor.lola.text
+- org.eclipse.emf.transaction
+- org.eclipse.gmf.runtime (???)
+- org.eclipse.osgi.util (???)
+
+hub.top.editor.ptnetLoLA
+- org.eclipse.emf
+- org.eclipse.emf.transaction
+- org.eclipse.gmf.runtime.diagram.core
+- org.eclipse.osgi.util (???)
+
+hub.top.editor.ptnetLoLA.diagram
+- org.eclipse.emf.ecore
+- org.eclipse.emf.ecore.xmi
+- org.eclipse.emf.edit.ui
+- org.eclipse.gef
+- org.eclipse.gmf.runtime.diagram.ui
+- org.eclipse.gmf.runtime.diagram.ui.properties
+- org.eclipse.gmf.runtime.diagram.ui.providers
+- org.eclipse.gmf.runtime.diagram.ui.providers.ide
+- org.eclipse.gmf.runtime.diagram.ui.render
+- org.eclipse.gmf.runtime.diagram.ui.resources.editor
+- org.eclipse.gmf.runtime.draw2d.ui
+- org.eclipse.gmf.runtime.emf.commands.core
+- org.eclipse.gmf.runtime.emf.core
+- org.eclipse.gmf.runtime.emf.ui.properties
+- org.eclipse.ocl.ecore
+
+hub.top.editor.ptnetLoLA.edit
+- org.eclipse.emf.edit
+
+hub.top.editor.resource
+- org.eclipse.gmf.runtime.diagram.ui

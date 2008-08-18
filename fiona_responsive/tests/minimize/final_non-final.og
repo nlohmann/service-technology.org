@@ -1,0 +1,11 @@
+NODES
+  0 : ?a + ?b,
+  1 : final : finalnode,
+  2 : final;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 1 : ?a,
+  0 -> 2 : ?b;

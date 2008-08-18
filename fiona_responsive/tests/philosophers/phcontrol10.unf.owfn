@@ -1,0 +1,329 @@
+PLACE
+INTERNAL
+    ea_1,
+    ea_2,
+    ea_3,
+    ea_4,
+    ea_5,
+    ea_6,
+    ea_7,
+    ea_8,
+    ea_9,
+    hl_1,
+    fo_1,
+    hl_2,
+    fo_2,
+    hl_3,
+    fo_3,
+    hl_4,
+    fo_4,
+    hl_5,
+    fo_5,
+    hl_6,
+    fo_6,
+    hl_7,
+    fo_7,
+    hl_8,
+    fo_8,
+    hl_9,
+    th_1,
+    fo_9,
+    th_2,
+    th_3,
+    th_4,
+    th_5,
+    th_6,
+    th_7,
+    th_8,
+    th_9,
+    ea_10,
+    hl_10,
+    fo_10,
+    th_10,
+    ready_1,
+    ready_2,
+    ready_3,
+    ready_4,
+    ready_5,
+    ready_6,
+    ready_7,
+    ready_8,
+    ready_9,
+    ready_10,
+    endzustand;
+
+INPUT
+    interface_in_1,
+    interface_in_2,
+    interface_in_3,
+    interface_in_4,
+    interface_in_5,
+    interface_in_6,
+    interface_in_7,
+    interface_in_8,
+    interface_in_9,
+    interface_in_10;
+
+OUTPUT
+    interface_out_1,
+    interface_out_2,
+    interface_out_3,
+    interface_out_4,
+    interface_out_5,
+    interface_out_6,
+    interface_out_7,
+    interface_out_8,
+    interface_out_9,
+    interface_out_10;
+
+INITIALMARKING
+    fo_1 : 1,
+    fo_2 : 1,
+    fo_3 : 1,
+    fo_4 : 1,
+    fo_5 : 1,
+    fo_6 : 1,
+    fo_7 : 1,
+    fo_8 : 1,
+    th_1 : 1,
+    fo_9 : 1,
+    th_2 : 1,
+    th_3 : 1,
+    th_4 : 1,
+    th_5 : 1,
+    th_6 : 1,
+    th_7 : 1,
+    th_8 : 1,
+    th_9 : 1,
+    fo_10 : 1,
+    th_10 : 1;
+
+FINALCONDITION
+    endzustand = 1
+    AND fo_1 = 1 AND fo_2 = 1 AND fo_3 = 1 AND fo_4 = 1 AND fo_5 = 1 AND fo_6 = 1 AND fo_7 = 1 AND fo_8 = 1 AND fo_9 = 1 AND fo_10 = 1
+    AND ALL_OTHER_PLACES_EMPTY;
+
+TRANSITION r_y1
+    CONSUME
+        ea_1 : 1;
+    PRODUCE
+        fo_2 : 1,
+        fo_1 : 1,
+        ready_1 : 1;
+TRANSITION r_y2
+    CONSUME
+        ea_2 : 1;
+    PRODUCE
+        fo_3 : 1,
+        fo_2 : 1,
+        ready_2 : 1;
+TRANSITION r_y3
+    CONSUME
+        ea_3 : 1;
+    PRODUCE
+        fo_4 : 1,
+        fo_3 : 1,
+        ready_3 : 1;
+TRANSITION r_y4
+    CONSUME
+        ea_4 : 1;
+    PRODUCE
+        fo_5 : 1,
+        fo_4 : 1,
+        ready_4 : 1;
+TRANSITION r_y5
+    CONSUME
+        ea_5 : 1;
+    PRODUCE
+        fo_6 : 1,
+        fo_5 : 1,
+        ready_5 : 1;
+TRANSITION r_y6
+    CONSUME
+        ea_6 : 1;
+    PRODUCE
+        fo_7 : 1,
+        fo_6 : 1,
+        ready_6 : 1;
+TRANSITION r_y7
+    CONSUME
+        ea_7 : 1;
+    PRODUCE
+        fo_8 : 1,
+        fo_7 : 1,
+        ready_7 : 1;
+TRANSITION r_y8
+    CONSUME
+        ea_8 : 1;
+    PRODUCE
+        fo_9 : 1,
+        fo_8 : 1,
+        ready_8 : 1;
+TRANSITION r_y9
+    CONSUME
+        ea_9 : 1;
+    PRODUCE
+        fo_10 : 1,
+        fo_9 : 1,
+        ready_9 : 1;
+TRANSITION r_y10
+    CONSUME
+        ea_10 : 1;
+    PRODUCE
+        fo_1 : 1,
+        fo_10 : 1,
+        ready_10 : 1;
+TRANSITION finish
+    CONSUME
+        ready_1 : 1,
+        ready_2 : 1,
+        ready_3 : 1,
+        ready_4 : 1,
+        ready_5 : 1,
+        ready_6 : 1,
+        ready_7 : 1,
+        ready_8 : 1,
+        ready_9 : 1,
+        ready_10 : 1;
+    PRODUCE
+        endzustand : 1;
+TRANSITION tl_y1
+    CONSUME
+        fo_1 : 1,
+        interface_in_1 : 1,
+        th_1 : 1;
+    PRODUCE
+        hl_1 : 1;
+TRANSITION tl_y2
+    CONSUME
+        fo_2 : 1,
+        interface_in_2 : 1,
+        th_2 : 1;
+    PRODUCE
+        hl_2 : 1;
+TRANSITION tl_y3
+    CONSUME
+        fo_3 : 1,
+        interface_in_3 : 1,
+        th_3 : 1;
+    PRODUCE
+        hl_3 : 1;
+TRANSITION tl_y4
+    CONSUME
+        fo_4 : 1,
+        interface_in_4 : 1,
+        th_4 : 1;
+    PRODUCE
+        hl_4 : 1;
+TRANSITION tl_y5
+    CONSUME
+        fo_5 : 1,
+        interface_in_5 : 1,
+        th_5 : 1;
+    PRODUCE
+        hl_5 : 1;
+TRANSITION tl_y6
+    CONSUME
+        fo_6 : 1,
+        interface_in_6 : 1,
+        th_6 : 1;
+    PRODUCE
+        hl_6 : 1;
+TRANSITION tr_y1
+    CONSUME
+        fo_2 : 1,
+        hl_1 : 1;
+    PRODUCE
+        interface_out_1 : 1,
+        ea_1 : 1;
+TRANSITION tl_y7
+    CONSUME
+        fo_7 : 1,
+        interface_in_7 : 1,
+        th_7 : 1;
+    PRODUCE
+        hl_7 : 1;
+TRANSITION tr_y2
+    CONSUME
+        fo_3 : 1,
+        hl_2 : 1;
+    PRODUCE
+        interface_out_2 : 1,
+        ea_2 : 1;
+TRANSITION tl_y8
+    CONSUME
+        fo_8 : 1,
+        interface_in_8 : 1,
+        th_8 : 1;
+    PRODUCE
+        hl_8 : 1;
+TRANSITION tr_y3
+    CONSUME
+        fo_4 : 1,
+        hl_3 : 1;
+    PRODUCE
+        interface_out_3 : 1,
+        ea_3 : 1;
+TRANSITION tl_y9
+    CONSUME
+        fo_9 : 1,
+        interface_in_9 : 1,
+        th_9 : 1;
+    PRODUCE
+        hl_9 : 1;
+TRANSITION tr_y4
+    CONSUME
+        fo_5 : 1,
+        hl_4 : 1;
+    PRODUCE
+        interface_out_4 : 1,
+        ea_4 : 1;
+TRANSITION tr_y5
+    CONSUME
+        fo_6 : 1,
+        hl_5 : 1;
+    PRODUCE
+        interface_out_5 : 1,
+        ea_5 : 1;
+TRANSITION tr_y6
+    CONSUME
+        fo_7 : 1,
+        hl_6 : 1;
+    PRODUCE
+        interface_out_6 : 1,
+        ea_6 : 1;
+TRANSITION tr_y7
+    CONSUME
+        fo_8 : 1,
+        hl_7 : 1;
+    PRODUCE
+        interface_out_7 : 1,
+        ea_7 : 1;
+TRANSITION tr_y8
+    CONSUME
+        fo_9 : 1,
+        hl_8 : 1;
+    PRODUCE
+        interface_out_8 : 1,
+        ea_8 : 1;
+TRANSITION tr_y9
+    CONSUME
+        fo_10 : 1,
+        hl_9 : 1;
+    PRODUCE
+        interface_out_9 : 1,
+        ea_9 : 1;
+TRANSITION tl_y10
+    CONSUME
+        fo_10 : 1,
+        interface_in_10 : 1,
+        th_10 : 1;
+    PRODUCE
+        hl_10 : 1;
+TRANSITION tr_y10
+    CONSUME
+        fo_1 : 1,
+        hl_10 : 1;
+    PRODUCE
+        interface_out_10 : 1,
+        ea_10 : 1;

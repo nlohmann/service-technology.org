@@ -1,0 +1,15 @@
+PLACE
+  INTERNAL
+    ;
+
+  INPUT
+    p1 {$ MAX_OCCURRENCES = 1 $};
+
+  OUTPUT
+    ;
+
+INITIALMARKING
+    ;
+
+FINALMARKING
+  ;

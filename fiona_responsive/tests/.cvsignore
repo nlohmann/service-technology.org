@@ -1,0 +1,7 @@
+Makefile
+Makefile.in
+.deps
+coverage_html
+slistcheck
+slistcheck.memcheck.log
+petrify.log

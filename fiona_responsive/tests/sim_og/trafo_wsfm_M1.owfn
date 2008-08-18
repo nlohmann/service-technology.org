@@ -1,0 +1,52 @@
+PLACE
+INTERNAL
+  q0,  { initial }
+  q1,
+  q2,
+  q3;
+
+INPUT
+  Ai,
+  Bi,
+  Ci;
+
+OUTPUT
+  Ao,
+  Bo,
+  Co;
+
+INITIALMARKING
+  q0:   1;
+
+FINALMARKING
+  q3:   1;
+
+TRANSITION t1
+CONSUME
+  q0:   1,
+  Ai:   1;
+PRODUCE
+  q1:   1,
+  Ao:   1;
+
+TRANSITION t2
+CONSUME
+  q1:   1,
+  Bi:   1;
+PRODUCE
+  q2:   1,
+  Bo:   1;
+
+TRANSITION t3
+CONSUME
+  q2:   1,
+  Ci:   1;
+PRODUCE
+  q3:   1,
+  Co:   1;
+
+TRANSITION t4
+CONSUME
+  q1:   1;
+PRODUCE
+  q1:   1;

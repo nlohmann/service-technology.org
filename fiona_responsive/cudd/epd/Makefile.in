@@ -1,0 +1,70 @@
+# $Id: Makefile.in,v 1.1 2007-05-23 13:16:07 bretschn Exp $
+#
+# epd -- extended precision
+#---------------------------------------------------------------------------
+.SUFFIXES: .c .o .u
+
+#-------------- Autoconf configuration section of this Makefile ------------
+VPATH = @srcdir@
+srcdir = @srcdir@
+builddir = @builddir@
+#------------------- End of Autoconf configuration section -----------------
+
+CC	= gcc
+RANLIB	= ranlib
+
+MFLAG	=
+ICFLAGS = -g -O6 -Wall
+CFLAGS  = $(ICFLAGS) $(MFLAG) $(XCFLAGS)
+
+LINTFLAGS = -u -n
+
+# this is to create the lint library
+LINTSWITCH = -o
+
+P	= epd
+PSRC	= epd.c
+PHDR	= epd.h
+POBJ	= $(PSRC:.c=.o)
+PUBJ	= $(PSRC:.c=.u)
+
+WHERE	= ..
+
+INCLUDE = -I$(WHERE)/include -I$(srcdir)/../../src
+#---------------------------
+
+lib$(P).a: $(POBJ)
+	ar rv $@ $?
+	$(RANLIB) $@
+
+.c.o: $(PSRC) $(PHDR)
+	$(CC) -c $< $(INCLUDE) $(CFLAGS)
+
+optimize_dec: lib$(P).b
+
+lib$(P).b: $(PUBJ)
+	ar rv $@ $?
+	$(RANLIB) $@
+
+.c.u: $(PSRC) $(PHDR)
+	cc -j $< $(INCLUDE) $(XCFLAGS)
+
+# if the header files change, recompile
+$(POBJ): $(PHDR)
+$(PUBJ): $(PHDR)
+
+lint: llib-l$(P).ln
+
+llib-l$(P).ln: $(PSRC) $(PHDR)
+	lint $(LINTFLAGS) $(LINTSWITCH)$(P) $(INCLUDE) $(PSRC)
+
+tags: $(PSRC) $(PHDR)
+	ctags $(PSRC) $(PHDR)
+
+all: lib$(P).a lib$(P).b llib-l$(P).ln tags
+
+clean:
+	rm -f *.o *.u .pure *.warnings
+
+distclean: clean
+	rm -f lib*.a lib$(P).b llib-l$(P).ln tags *~ *.bak *.qv *.qx

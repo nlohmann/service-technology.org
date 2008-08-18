@@ -1,0 +1,75 @@
+# $Id: Makefile.in,v 1.1 2007-05-23 13:18:51 bretschn Exp $
+#
+# util -- miscellaneous utility routines
+#---------------------------------------------------------------------------
+
+#-------------- Autoconf configuration section of this Makefile ------------
+VPATH = @srcdir@
+srcdir = @srcdir@
+builddir = @builddir@
+#------------------- End of Autoconf configuration section -----------------
+
+.SUFFIXES: .c .o .u
+
+CC	= gcc
+RANLIB	= ranlib
+
+#FLAGS	= -DUNIX
+MFLAG   =
+ICFLAGS = -g
+CFLAGS  = $(ICFLAGS) $(MFLAG) $(XCFLAGS)
+
+LINTFLAGS = -u -n
+
+# this is to create the lint library
+LINTSWITCH = -o
+
+P	= util
+PSRC	= cpu_time.c cpu_stats.c getopt.c safe_mem.c strsav.c texpand.c \
+	  ptime.c prtime.c pipefork.c pathsearch.c stub.c \
+	  tmpfile.c datalimit.c
+POBJ	= $(PSRC:.c=.o) ../../src/newlogger.o
+PUBJ	= $(PSRC:.c=.u)
+PHDR	= util.h ../../src/mynew.h
+
+WHERE	= ..
+INCLUDE = -I$(WHERE)/include -I$(srcdir)/../../src
+
+lib$(P).a: $(POBJ)
+	ar rv $@ $?
+	$(RANLIB) $@
+
+.c.o: $(PHDR)
+	$(CC) -c $< $(INCLUDE) $(FLAGS) $(CFLAGS)
+
+.cc.o: $(PHDR)
+	$(CPP) -c $< $(INCLUDE) $(FLAGS) $(CFLAGS) -o $@
+
+optimize_dec: lib$(P).b
+
+lib$(P).b: $(PUBJ)
+	ar rv $@ $?
+	$(RANLIB) $@
+
+.c.u: $(PHDR)
+	cc -j $< $(INCLUDE) $(FLAGS) $(XCFLAGS)
+
+# if the header files change, recompile
+$(POBJ): $(PHDR)
+$(PUBJ): $(PHDR)
+
+lint: llib-l$(P).ln
+
+llib-l$(P).ln: $(PSRC) $(PHDR)
+	lint $(LINTFLAGS) $(LINTSWITCH)$(P) $(INCLUDE) $(PSRC)
+
+tags: $(PSRC) $(PHDR)
+	ctags $(PSRC) $(PHDR)
+
+all: lib$(P).a lib$(P).b llib-l$(P).ln tags
+
+clean:
+	rm -f *.o *.u core *.warnings
+
+distclean: clean
+	rm -f lib$(P).a lib$(P).b llib-l$(P).ln tags *.bak *~ .pure

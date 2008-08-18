@@ -1,0 +1,76 @@
+{ coffee vending machine with reset }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,
+  p2,
+  p3,
+  p4;
+
+INPUT
+  E,
+  T,
+  C,
+  end;
+
+OUTPUT
+  B,
+  EE;
+
+INITIALMARKING
+  p0:   1;
+
+FINALCONDITION
+  (p0 = 1 AND ALL_OTHER_PLACES_EMPTY) OR
+  (p4 = 1 AND ALL_OTHER_PLACES_EMPTY);
+
+TRANSITION t1    { ?e }
+CONSUME
+  p0: 1,
+  E: 1;
+PRODUCE
+  p1: 1;
+
+TRANSITION t2    { ?t }
+CONSUME
+  T:    1,
+  p1: 1;
+PRODUCE
+  p2:   1;
+
+TRANSITION t3    { ?c }
+CONSUME
+  p1:   1,
+  C : 1;
+PRODUCE
+  p2:   1;
+
+TRANSITION t4    { !b }
+CONSUME
+  p2:   1;
+PRODUCE
+  B:    1,
+  p3 : 1;
+
+TRANSITION t5    { !ee }
+CONSUME
+  p2:   1;
+PRODUCE
+  EE:    1,
+  p3 : 1;
+
+TRANSITION t6    { tau }
+CONSUME
+  p3:   1;
+PRODUCE
+  p0: 1;
+
+TRANSITION t7    { ?end }
+CONSUME
+  p0:   1,
+  end: 1;
+PRODUCE
+  p4: 1;
+
+{ END OF FILE }

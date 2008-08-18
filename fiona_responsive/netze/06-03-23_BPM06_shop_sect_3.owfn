@@ -1,0 +1,506 @@
+{ oWFN created by BPEL2oWFN 1.1 reading alt.bpel }
+
+PLACE
+  INTERNAL
+    p10,
+    p17,
+    p540,
+    p30,
+    p178,
+    p524,
+    p507,
+    p541,
+    p56,
+    p57,
+    p58,
+    p65,
+    p529,
+    p551,
+    p525,
+    p531,
+    p506,
+    p559,
+    p514,
+    p526,
+    p537,
+    p154,
+    p155,
+    p516,
+    p515,
+    p527,
+    p177,
+    p554,
+    p208,
+    p192,
+    p194,
+    p195,
+    p557,
+    p552,
+    p542,
+    p560,
+    p494,
+    p469,
+    p294,
+    p322,
+    p313,
+    p395,
+    p455,
+    p396,
+    p372,
+    p397,
+    p391,
+    p454,
+    p561,
+    p431,
+    p450,
+    p553,
+    p456,
+    p523
+;
+
+  INPUT
+    in.abort,
+    in.login,
+    in.order,
+    in.terms
+;
+
+  OUTPUT
+    out.confirm,
+    out.deliver,
+    out.invoice
+;
+
+INITIALMARKING
+  p10:	1
+;
+
+FINALMARKING
+  p525:	1
+;
+
+
+TRANSITION t565
+CONSUME
+  p542:	1,
+  p561:	1;
+PRODUCE
+  p551:	1;
+
+TRANSITION t567
+CONSUME
+  p208:	1,
+  p553:	1;
+PRODUCE
+  p552:	1;
+
+TRANSITION t44
+CONSUME
+  p10:	1;
+PRODUCE
+  p17:	1,
+  p540:	1,
+  p507:	1,
+  p531:	1,
+  p514:	1,
+  p537:	1,
+  p527:	1,
+  p177:	1,
+  p523:	1;
+
+TRANSITION t45
+CONSUME
+  p30:	1,
+  p507:	1,
+  p516:	1,
+  p523:	1;
+PRODUCE
+  p524:	1,
+  p525:	1,
+  p506:	1;
+
+TRANSITION t52
+CONSUME
+  p541:	1;
+PRODUCE
+  p30:	1,
+  p515:	1;
+
+TRANSITION t54
+CONSUME
+  p30:	1,
+  p542:	1;
+PRODUCE
+  p551:	1;
+
+TRANSITION t85
+CONSUME
+  p56:	1;
+PRODUCE
+  p57:	1,
+  p542:	1;
+
+TRANSITION t86
+CONSUME
+  p57:	1,
+  p552:	1;
+PRODUCE
+  p58:	1;
+
+TRANSITION t89
+CONSUME
+  p526:	1,
+  p523:	1;
+PRODUCE
+  p524:	1,
+  p56:	1,
+  p65:	1;
+
+TRANSITION t90
+CONSUME
+  p58:	1,
+  p65:	1,
+  p531:	1;
+PRODUCE
+  p529:	1,
+  p525:	1;
+
+TRANSITION t91
+CONSUME
+  p524:	1,
+  p526:	1;
+PRODUCE
+  p524:	1;
+
+TRANSITION t158
+CONSUME
+  p514:	1;
+PRODUCE
+  p154:	1,
+  p192:	1;
+
+TRANSITION t159
+CONSUME
+  p155:	1,
+  p554:	1;
+PRODUCE
+  p516:	1;
+
+TRANSITION t160
+CONSUME
+  p154:	1,
+  p515:	1;
+PRODUCE
+  p155:	1,
+  p194:	1;
+
+TRANSITION t162
+CONSUME
+  p551:	1,
+  p155:	1;
+PRODUCE
+  p195:	1;
+
+TRANSITION t163
+CONSUME
+  p551:	1,
+  p514:	1;
+PRODUCE
+  p552:	1;
+
+TRANSITION t164
+CONSUME
+  p551:	1,
+  p154:	1;
+PRODUCE
+  p208:	1;
+
+TRANSITION t165
+CONSUME
+  p551:	1,
+  p516:	1;
+PRODUCE
+  p552:	1;
+
+TRANSITION t173
+CONSUME
+  p178:	1,
+  p553:	1;
+PRODUCE
+  p178:	1,
+  p554:	1;
+
+TRANSITION t174
+CONSUME
+  p177:	1,
+  p553:	1;
+PRODUCE
+  p178:	1,
+  p526:	1,
+  p554:	1;
+
+TRANSITION t176
+CONSUME
+  p554:	1,
+  p208:	1;
+PRODUCE
+  p552:	1;
+
+TRANSITION t568
+CONSUME
+  p559:	1,
+  p396:	1;
+PRODUCE
+  p397:	1;
+
+TRANSITION t198
+CONSUME
+  in.abort:	1,
+  p192:	1;
+PRODUCE
+  p553:	1;
+
+TRANSITION t201
+CONSUME
+  p192:	1,
+  p194:	1;
+PRODUCE
+  p554:	1;
+
+TRANSITION t202
+CONSUME
+  p194:	1,
+  p195:	1;
+PRODUCE
+  p208:	1;
+
+TRANSITION t203
+CONSUME
+  p554:	1,
+  p195:	1;
+PRODUCE
+  p552:	1;
+
+TRANSITION t206
+CONSUME
+  p208:	1,
+  p192:	1;
+PRODUCE
+  p552:	1;
+
+TRANSITION t229
+CONSUME
+  in.login:	1,
+  p540:	1;
+PRODUCE
+  p561:	1;
+
+TRANSITION t231
+CONSUME
+  p540:	1,
+  p542:	1;
+PRODUCE
+  p551:	1;
+
+TRANSITION t547
+CONSUME
+  p542:	1,
+  p494:	1;
+PRODUCE
+  p551:	1;
+
+TRANSITION t279
+CONSUME
+  in.order:	1,
+  p313:	1;
+PRODUCE
+  p557:	1;
+
+TRANSITION t281
+CONSUME
+  p542:	1,
+  p313:	1;
+PRODUCE
+  p551:	1;
+
+TRANSITION t299
+CONSUME
+  p557:	1;
+PRODUCE
+  p294:	1;
+
+TRANSITION t300
+CONSUME
+  p294:	1;
+PRODUCE
+  out.invoice:	1,
+  p494:	1;
+
+TRANSITION t569
+CONSUME
+  p560:	1,
+  p455:	1;
+PRODUCE
+  p456:	1;
+
+TRANSITION t302
+CONSUME
+  p542:	1,
+  p294:	1;
+PRODUCE
+  p551:	1;
+
+TRANSITION t325
+CONSUME
+  p561:	1;
+PRODUCE
+  p322:	1,
+  p391:	1,
+  p450:	1;
+
+TRANSITION t326
+CONSUME
+  p322:	1,
+  p395:	1,
+  p454:	1;
+PRODUCE
+  p494:	1;
+
+TRANSITION t327
+CONSUME
+  p542:	1,
+  p322:	1;
+PRODUCE
+  p455:	1,
+  p396:	1;
+
+TRANSITION t328
+CONSUME
+  p397:	1,
+  p456:	1;
+PRODUCE
+  p551:	1;
+
+TRANSITION t357
+CONSUME
+  in.order:	1,
+  p391:	1;
+PRODUCE
+  p559:	1;
+
+TRANSITION t359
+CONSUME
+  p396:	1,
+  p391:	1;
+PRODUCE
+  p397:	1;
+
+TRANSITION t377
+CONSUME
+  p559:	1;
+PRODUCE
+  p372:	1;
+
+TRANSITION t378
+CONSUME
+  p372:	1;
+PRODUCE
+  out.confirm:	1,
+  p395:	1;
+
+TRANSITION t380
+CONSUME
+  p396:	1,
+  p372:	1;
+PRODUCE
+  p397:	1;
+
+TRANSITION t382
+CONSUME
+  p395:	1,
+  p396:	1;
+PRODUCE
+  p397:	1;
+
+TRANSITION t416
+CONSUME
+  in.terms:	1,
+  p450:	1;
+PRODUCE
+  p560:	1;
+
+TRANSITION t418
+CONSUME
+  p455:	1,
+  p450:	1;
+PRODUCE
+  p456:	1;
+
+TRANSITION t436
+CONSUME
+  p560:	1;
+PRODUCE
+  p431:	1;
+
+TRANSITION t437
+CONSUME
+  p431:	1;
+PRODUCE
+  out.invoice:	1,
+  p454:	1;
+
+TRANSITION t566
+CONSUME
+  p557:	1,
+  p542:	1;
+PRODUCE
+  p551:	1;
+
+TRANSITION t439
+CONSUME
+  p455:	1,
+  p431:	1;
+PRODUCE
+  p456:	1;
+
+TRANSITION t441
+CONSUME
+  p455:	1,
+  p454:	1;
+PRODUCE
+  p456:	1;
+
+TRANSITION t457
+CONSUME
+  p561:	1;
+PRODUCE
+  p313:	1;
+
+TRANSITION t474
+CONSUME
+  p494:	1;
+PRODUCE
+  p469:	1;
+
+TRANSITION t475
+CONSUME
+  p469:	1;
+PRODUCE
+  out.deliver:	1,
+  p541:	1;
+
+TRANSITION t477
+CONSUME
+  p542:	1,
+  p469:	1;
+PRODUCE
+  p551:	1;
+
+TRANSITION t479
+CONSUME
+  p541:	1,
+  p542:	1;
+PRODUCE
+  p551:	1;
+
+{ END OF FILE }

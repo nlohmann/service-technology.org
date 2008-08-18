@@ -1,0 +1,78 @@
+{ owfn by DW "RelSound2 von Axel"}
+
+PLACE
+INTERNAL
+  p1,
+  p2,
+  p3,
+  p4,
+  p5,
+  p6,
+  p7,
+  p8;
+
+INPUT
+  c;
+
+OUTPUT
+  a,
+  b;
+
+INITIALMARKING
+  p1:	1
+ ;
+
+FINALMARKING
+  p8:	1
+ ;
+
+TRANSITION t1	 { t1 }
+CONSUME
+  p1:	1;
+PRODUCE
+  p2:	1,
+  p3 : 1;
+
+TRANSITION t2	 { !a }
+CONSUME
+  p2:	1;
+PRODUCE
+  a:	1,
+  p4 : 1;
+
+TRANSITION t3	 { !b }
+CONSUME
+  p2:	1;
+PRODUCE
+  b:	1,
+  p5: 1;
+
+TRANSITION t4	 { !a }
+CONSUME
+  p3:	1;
+PRODUCE
+  b:	1,
+  p6: 1;
+
+TRANSITION t5	 { !a }
+CONSUME
+  p3:	1;
+PRODUCE
+  a:	1,
+  p7: 1;
+ 
+TRANSITION t6	 { ?c }
+CONSUME
+  p4:	1,
+  p6: 1,
+  c: 1;
+PRODUCE
+  p8: 1;
+
+TRANSITION t7	 { ?C }
+CONSUME
+  p5:	1,
+  p7: 1,
+  c: 1;
+PRODUCE
+  p8: 1;

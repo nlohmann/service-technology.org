@@ -1,0 +1,40 @@
+{ artifical net where R decides whether to enter or exit a cycle }
+
+PLACE
+INTERNAL
+  p0,
+  p1,
+  p2;
+
+OUTPUT
+  a,
+  b;
+
+INITIALMARKING
+  p0;
+
+FINALCONDITION
+  (p0 = 1 AND ALL_OTHER_PLACES_EMPTY) OR
+  (p2 = 1 AND ALL_OTHER_PLACES_EMPTY);
+
+TRANSITION t1    { !a }
+CONSUME
+  p0;
+PRODUCE
+  p1,
+  a;
+
+TRANSITION t2    { tau }
+CONSUME
+  p1;
+PRODUCE
+  p0;
+
+TRANSITION t3    { !b }
+CONSUME
+  p0;
+PRODUCE
+  p2,
+  b;
+
+{ end of file }

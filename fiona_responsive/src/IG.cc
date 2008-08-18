@@ -462,7 +462,7 @@ void interactionGraph::getSendingEvents(State* state, GraphFormulaMultiaryOr* my
             GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
             myclause->addSubFormula(myliteral);
 
-            // cout << "node no: " << node->getName() << " found input: " << PN->getPlace(*index)->getLabelForCommGraph() << endl;
+        //    cout << " found input: " << PN->getPlace(*index)->getLabelForCommGraph() << endl;
         }
         ++i;
     }
@@ -801,6 +801,7 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
             }
             
             do {
+            	
                 // delete the list of quasi enabled transitions
             	if (currentState->quasiFirelist) { 
             		delete [] currentState->quasiFirelist;
@@ -830,7 +831,7 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
             			currentState = currentState->nexttar;
             			if (currentState) {
             				// and decode it first
-            				currentState->decodeShowOnly(PN);
+            				currentState->decode(PN);
             			}
             		} else {
             			// we just left the TSCC, so get out of the loop as well

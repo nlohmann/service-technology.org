@@ -2486,12 +2486,22 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
 
         State * NewState;
 
+        // responsive partners are to be calculated, so we use the Tarjan algorithm
+        // to calculate (T)SCCs
         if (parameters[P_RESPONSIVE]) {
         	//        CurrentState->succ = new State * [CurrentCardFireList + 1];
-        	CurrentState->dfs = CurrentState->lowlink = CurrentState->state_count - 1;
-        	CurrentState->nexttar = CurrentState->prevtar = CurrentState;
-        	TarStack = CurrentState;
 
+        	// current state is the first state on the stack
+        	TarStack = CurrentState;
+        	
+        	// we start counting by 0, so the current state's depth first search number and
+        	// lowlink value is just the current number of overall states - 1
+        	CurrentState->dfs = CurrentState->lowlink = CurrentState->state_count - 1;
+        	
+        	// current state does not have any successor or predecessor states
+        	CurrentState->nexttar = CurrentState->prevtar = CurrentState;
+        	
+        	// we have not yet found a TSCC
         	MinBookmark = 0;
         }      
         
@@ -2579,8 +2589,14 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                     
                     NewState->firelist = firelist();
                     
+                    // responsive partners are to be calculated, so we use the Tarjan algorithm
+                    // to calculate (T)SCCs
                     if (parameters[P_RESPONSIVE]) {
+                    	// we start counting by 0, so the current state's depth first search number and
+                    	// lowlink value is just the current number of overall states - 1
                     	NewState->dfs = NewState->lowlink = CurrentState->state_count - 1;
+
+                    	// fit the newly calculated state into the Tarjan stack of states
                     	NewState->prevtar = TarStack;
                     	NewState->nexttar = TarStack->nexttar;
                     	TarStack = TarStack->nexttar = NewState;
@@ -2618,15 +2634,21 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                 }
                 // no more transition to fire
             } else {
+                // responsive partners are to be calculated, so we use the Tarjan algorithm
+                // to calculate (T)SCCs
             	if (parameters[P_RESPONSIVE]) {                    
             		// state is part of a TSCC and it is the representative of it
             		if((CurrentState->dfs == CurrentState->lowlink) 
             				&& (CurrentState->dfs >= MinBookmark)) {
 
+//            			cout << "found TSCC with id: " << CurrentState->dfs << endl;
+//            			cout << "minBookmark before: " << MinBookmark << endl;
             			MinBookmark = CurrentState->state_count;
 
             			// remember that the current state is the representative of a TSCC
             			CurrentState->repTSCC = true;
+            			
+//            			cout << "minBookmark after: " << MinBookmark << endl;
             		}                     
 
             		if(CurrentState->parent) {

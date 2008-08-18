@@ -49,7 +49,9 @@ State::State() :
     
 	state_count++;
     state_count_stored_in_binDec++;
-    
+
+    dfs = 0;
+    lowlink = 0;
     tarlevel = 0;
     repTSCC = false;
 }

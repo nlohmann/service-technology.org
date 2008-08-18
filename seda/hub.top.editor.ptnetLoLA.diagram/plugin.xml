@@ -125,34 +125,7 @@
       </GlobalActionHandlerProvider>
    </extension>
 
-   <extension point="org.eclipse.gmf.runtime.common.ui.services.action.contributionItemProviders">
-      <?gmfgen generated="true"?>
-      <contributionItemProvider
-            class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContributionItemProvider"
-            checkPluginLoaded="false">
-         <Priority name="Low"/>
-         <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionNameEditPart"/>
-            <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
-            <popupPredefinedItem id="deleteFromModelAction" remove="true"/>
-         </popupContribution>
-         <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceNameEditPart"/>
-            <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
-            <popupPredefinedItem id="deleteFromModelAction" remove="true"/>
-         </popupContribution>
-         <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToPlaceWeightEditPart"/>
-            <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
-            <popupPredefinedItem id="deleteFromModelAction" remove="true"/>
-         </popupContribution>
-         <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToTransitionWeightEditPart"/>
-            <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
-            <popupPredefinedItem id="deleteFromModelAction" remove="true"/>
-         </popupContribution>
-      </contributionItemProvider>
-   </extension>
+   
 
    <extension point="org.eclipse.core.runtime.preferences">
       <?gmfgen generated="true"?>
@@ -417,7 +390,7 @@
             priority="normal" 
             contentProvider="hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorContentProvider" 
             labelProvider="hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorLabelProvider"
-            icon="icons/document.net.bw.16.png"
+            icon="icons/document.net.bw_2.16.png"
             activeByDefault="true">
          <triggerPoints>
             <or>
@@ -453,7 +426,7 @@
             priority="normal" 
             contentProvider="hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLADomainNavigatorContentProvider" 
             labelProvider="hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLADomainNavigatorLabelProvider"
-            icon="icons/document.net.bw.16.png"
+            icon="icons/document.net.bw_2.16.png"
             activeByDefault="true">
          <triggerPoints>
             <or>

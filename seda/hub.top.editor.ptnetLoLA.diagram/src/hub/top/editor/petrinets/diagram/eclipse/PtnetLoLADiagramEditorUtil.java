@@ -62,7 +62,6 @@ public class PtnetLoLADiagramEditorUtil extends DiagramEditorUtil {
 	 * GEF sources
 	 * @see hub.top.editor.eclipse.DiagramEditorUtil#createDiagram(org.eclipse.emf.common.util.URI, org.eclipse.emf.common.util.URI, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public Resource createDiagram(URI diagramURI, URI modelURI,
 			IProgressMonitor progressMonitor) {
 		return hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorUtil.createDiagram(diagramURI, modelURI, progressMonitor);
@@ -71,7 +70,6 @@ public class PtnetLoLADiagramEditorUtil extends DiagramEditorUtil {
 	/**
 	 * @see hub.top.editor.eclipse.IDiagramEditorUtil#setCharset(org.eclipse.core.resources.IFile)
 	 */
-	@Override
 	public void setCharset(IFile file) {
 		hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorUtil.setCharset(file);
 	}
@@ -94,29 +92,24 @@ public class PtnetLoLADiagramEditorUtil extends DiagramEditorUtil {
 	 * method from the GMF-generated GEF sources
 	 * @see hub.top.editor.eclipse.DiagramEditorUtil#openDiagram(org.eclipse.emf.ecore.resource.Resource)
 	 */
-	@Override
 	public boolean openDiagram(Resource diagram)
 			throws PartInitException {
 		return hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorUtil.openDiagram(diagram);
 	}
 	
-	@Override
 	public String defaultFileExtension() {
 		return "ptnetlola_diagram";
 	}
 	
-	@Override
 	public String defaultModelFileExtension() {
 		return "ptnetlola";
 	}
 	
-	@Override
 	public boolean isCorrectRootElement(EObject obj) {
 		int vid = hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry.getDiagramVisualID(obj);
 		return vid == hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart.VISUAL_ID;
 	}
 	
-	@Override
 	public String msg_inCorrectRoolElement () {
 		return hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLANewDiagramFileWizard_IncorrectRootError;
 	}
@@ -131,7 +124,6 @@ public class PtnetLoLADiagramEditorUtil extends DiagramEditorUtil {
 	 * @throws ExecutionException if <code>root</code> is not a valid root
 	 * object for this diagram
 	 */
-	@Override
 	public Diagram createDiagram(EObject root) throws ExecutionException  {
 		if (!isCorrectRootElement(root)) {
 			throw new ExecutionException(msg_inCorrectRoolElement());

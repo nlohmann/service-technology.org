@@ -2,12 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: hub.top.editor.ptnetLoLA.edit; singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.3
 Bundle-ClassPath: .
 Bundle-Activator: hub.top.editor.ptnetLoLA.provider.PtnetLoLAEditPlugin$Implementation
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: hub.top.editor.ptnetLoLA.provider
 Require-Bundle: org.eclipse.core.runtime,
  hub.top.editor.ptnetLoLA;visibility:=reexport,

@@ -39,12 +39,16 @@ package hub.top.editor.eclipse;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -54,6 +58,7 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.XMLResource;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.transaction.util.TransactionUtil;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
@@ -106,32 +111,54 @@ public class ResourceHelper {
 	}
 	
 	/**
+	 * convert uri to file handle
+	 * @param uri
+	 * @return
+	 */
+	public static IFile uriToFile (java.net.URI uri) {
+		return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(uri.getPath())); 
+	}
+	
+	/**
+	 * @param uri
+	 * @return true iff the <code>uri</code> denotes a resource in the current workspace
+	 */
+	public static boolean isWorkspaceResource (URI uri)
+	{
+		// check whether the uri denotes a valid resource
+		if (uri.isPlatformResource()){
+			String platformString = uri.toPlatformString(true);
+			if (ResourcesPlugin.getWorkspace().getRoot().findMember(platformString, true) == null) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
 	 * convert uri to resource
 	 * @param uri
 	 * @param resources resource set into which resource shall be loaded,
 	 *                  (can be null)
 	 * @return
 	 */
-	public static Resource uriToResource (URI uri, ResourceSet resources)
-	{
-		if (uri == null) return null;
+	public static Resource uriToResource (URI uri, ResourceSet resources) {
+		if (uri == null)
+			return null;
 		
 		if (resources == null)
-			resources = new ResourceSetImpl();
+			return null;
 		
 		// check whether the uri denotes a valid resource
-		if (uri.isPlatformResource()){
-			String platformString = uri.toPlatformString(true);
-			if (ResourcesPlugin.getWorkspace().getRoot().findMember(platformString, true) == null) {
-				// no resource is known at the supplied uri
-				return null;	
-			}
-		}
-		return resources.getResource(uri, true);
+		if (isWorkspaceResource(uri))
+			return resources.getResource(uri, true);
+		else
+			return null;
 	}
 	
 	private final PluginHelper fPluginHelper;
 	
+	protected TransactionalEditingDomain editingDomain;
 	protected ResourceSet resources;
 	
 	private Resource 	resource;
@@ -153,9 +180,7 @@ public class ResourceHelper {
 	 * @param pluginHelper
 	 */
 	public ResourceHelper(PluginHelper pluginHelper) {
-		fPluginHelper = pluginHelper;
-		resources = new ResourceSetImpl();
-		mostRecentUpdate = MRU_NONE;
+		this(pluginHelper, null);
 	}
 	
 	/**
@@ -165,7 +190,8 @@ public class ResourceHelper {
 	 */
 	public ResourceHelper(PluginHelper pluginHelper, String ext) {
 		fPluginHelper = pluginHelper;
-		resources = new ResourceSetImpl();
+		editingDomain = TransactionalEditingDomain.Factory.INSTANCE.createEditingDomain();
+		resources = editingDomain.getResourceSet();
 		mostRecentUpdate = MRU_NONE;
 		setFeasibleExtension(ext);
 	}
@@ -257,6 +283,16 @@ public class ResourceHelper {
 	}
 	
 	/**
+	 * @return list of files affected when working with this helper
+	 */
+	public List<IFile> affectedFiles() {
+		List<IFile> fList = new LinkedList<IFile>();
+		if (getFile(true) != null)
+			fList.add(getFile(true));
+		return fList;
+	}
+	
+	/**
 	 * set resource URI
 	 * @param file
 	 * @param resolve update all other fields for the new value
@@ -295,6 +331,23 @@ public class ResourceHelper {
 	}
 	
 	/**
+	 * retrieve path of this resource
+	 * @param smart
+	 */
+	public IPath getPath (boolean smart) {
+		if (resourcePath != null) return resourcePath;
+		if (smart) {
+			String pathStr = null;
+			// retrieve uri from other fields
+			if (resource != null) pathStr = resource.getURI().path();
+			if (resourceURI != null) pathStr = resourceURI.path();
+			if (resourceFile != null) pathStr = resourceFile.toString();
+			return new Path(pathStr);
+		}
+		return null;
+	}
+	
+	/**
 	 * @return the feasible file extension
 	 */
 	public String getFeasibleExtension () {
@@ -308,6 +361,16 @@ public class ResourceHelper {
 		feasibleExtension = ext;
 	}
 
+	/**
+	 * @return the editing domain that manages the resources
+	 * of this helper
+	 */
+	public TransactionalEditingDomain getEditingDomain() {
+		assert(editingDomain != null);
+		assert(editingDomain instanceof TransactionalEditingDomain);
+		return editingDomain;
+	}
+	
 	/**
 	 * replace resource set of this helper with a different
 	 * resource set, reloads all member fields of this helper

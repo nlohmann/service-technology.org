@@ -42,11 +42,13 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ISetSelectionTarget;
 
@@ -60,9 +62,7 @@ public class EditorHelper extends ResourceHelper {
 	 *                   that will be wrapped in this helper (can be <code>null</code>)
 	 */
 	public EditorHelper (PluginHelper pluginHelper, IEditorUtil editorUtil) {
-		super(pluginHelper);
-		fEditorUtil = editorUtil;
-		updateResourceFromEditor();
+		this (pluginHelper, editorUtil, null);
 	}
 
 	/**
@@ -159,11 +159,16 @@ public class EditorHelper extends ResourceHelper {
 			IEditorUtil editorUtil = this.getEditorUtil();
 			if (editorUtil != null
 				&& editorUtil.getEditor() != null
-				&& editorUtil.getEditor().getEditorInput() != null
-				&& editorUtil.getEditor().getEditorInput() instanceof IFileEditorInput)
+				&& editorUtil.getEditor().getEditorInput() != null)
 			{
-				// if the editor has opened a file, retrieve it
-				file = ((IFileEditorInput)editorUtil.getEditor().getEditorInput()).getFile();
+				IEditorInput input = editorUtil.getEditor().getEditorInput();
+				if (input instanceof IFileEditorInput) {
+					// if the editor has opened a file, retrieve it
+					file = ((IFileEditorInput)input).getFile();
+				} else if (input instanceof FileStoreEditorInput) {
+					// if it is an external file, go via its URI
+					file = uriToFile(((FileStoreEditorInput)input).getURI());
+				}
 			}
 		}
 		// if none found, retrieve from underlying handler

@@ -2,7 +2,7 @@
 <feature
       id="hub.top.seda"
       label="Service-Technology.org Editor Application"
-      version="1.0.1"
+      version="1.0.3"
       provider-name="Service-Technology.org">
 
    <description url="http://www.service-technology.org/wiki/">
@@ -1163,7 +1163,10 @@ Library.
 
    <url>
       <update label="Service-Technology.org Seda Update Site" url="http://download.gna.org/service-tech/seda/updatesite/"/>
-      <discovery label="Textual Editing Framework Update site" url="http://tef.berlios.de/updatesite"/>
+      <discovery label="Textual Editing Framework (TEF) Updates" url="http://tef.berlios.de/updatesite"/>
+      <discovery label="Eclipse Modeling Framework (EMF) Updates" url="http://download.eclipse.org/modeling/emf/updates/releases/"/>
+      <discovery label="Graphical Editing Framework (GEF) Updates" url="http://download.eclipse.org/tools/gef/updates/releases/"/>
+      <discovery label="Graphical Modeling Framework (GMF) Updates" url="http://download.eclipse.org/modeling/gmf/updates/releases/"/>
    </url>
 
    <requires>
@@ -1173,7 +1176,7 @@ Library.
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.resources"/>
-      <import plugin="hub.sam.tef" version="1.0.4.1" match="greaterOrEqual"/>
+      <import plugin="hub.sam.tef" version="1.0.5" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.transaction"/>
       <import plugin="org.eclipse.osgi.services"/>
       <import plugin="org.eclipse.osgi.util"/>

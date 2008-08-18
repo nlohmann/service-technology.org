@@ -84,7 +84,7 @@ public class NewDiagramFileOperation extends AbstractTransactionalCommand {
 	//protected void execute(IProgressMonitor monitor) throws CoreException,
 	//			InvocationTargetException, InterruptedException
 	protected CommandResult doExecuteWithResult(IProgressMonitor monitor,
-			IAdaptable arg1) throws ExecutionException
+			IAdaptable adapter) throws ExecutionException
 	{
 		try {
 			Resource diagramResource =

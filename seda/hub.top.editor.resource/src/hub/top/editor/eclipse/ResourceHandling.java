@@ -44,7 +44,9 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.ui.IWorkbenchWindow;
 
@@ -104,9 +106,10 @@ public class ResourceHandling {
 	{
 		// resolve target file name from current editor input
 		IPath modelFilePath = createTargetPath(sourceHelper, targetHelper.getFeasibleExtension());
-		if (modelFilePath == null)
+		if (modelFilePath == null) {
+			targetHelper.getPluginHelper().logError("Unable to create target path from "+sourceHelper.getURI(true));
 			return;
-
+		}
 		// create a file object and retrieve the contents
 		// for the new model file
 		EObject netObject = (EObject) sourceHelper.getModelRoot();
@@ -117,12 +120,17 @@ public class ResourceHandling {
 		// create the operation to write the new model file
 		NewModelFileOperation op = targetHelper.storeModelContentsInResource(true);
 		try {
-			window.run(true, false, op);	
+			//IStatus status = OperationHistoryFactory.getOperationHistory().execute(op,
+			//		new NullProgressMonitor(), null);
+			//System.out.println("exited with status "+status);
+			window.run(true, false, op);
 		} catch (InvocationTargetException e) {
 			targetHelper.getPluginHelper().logError(new Error("Unable to store model in "+targetHelper.getURI(true)+". Could not invoke workspace operation: "+e.getCause(), e));
 		} catch (InterruptedException ex) {
 			targetHelper.getPluginHelper().logError(new Error("Storing resource "+targetHelper.getURI(true)+" has been interrupted by "+ex.getCause(), ex));
-		}
+		}/* catch (ExecutionException ex) {
+			targetHelper.getPluginHelper().logError("Unable to create model", ex);
+		}*/
 	}
 
 	public static void createDiagramResourceFromResource(IWorkbenchWindow window, ResourceHelper sourceHelper, ResourceHelper targetModelHelper, DiagramEditorHelper targetDiagramHelper)

@@ -101,7 +101,6 @@ public class ModelEditor extends hub.sam.tef.editor.model.ModelEditor implements
 			/* (non-Javadoc)
 			 * @see hub.top.editor.gef.EditorUtil#getCurrentResource()
 			 */
-			@Override
 			public Resource getCurrentResource() {
 				return ((ModelEditor)getEditor()).getCurrentModel();
 
@@ -123,7 +122,6 @@ public class ModelEditor extends hub.sam.tef.editor.model.ModelEditor implements
 				act.run();
 			}
 			
-			@Override
 			public String getCurrentText() {
 				return ((ModelEditor)getEditor()).getCurrentText();
 			}

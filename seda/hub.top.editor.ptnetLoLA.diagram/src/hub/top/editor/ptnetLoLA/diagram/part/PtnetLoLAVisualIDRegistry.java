@@ -18,9 +18,7 @@ public class PtnetLoLAVisualIDRegistry {
 	/**
 	 * @generated
 	 */
-	private static final String DEBUG_KEY = hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-			.getInstance().getBundle().getSymbolicName()
-			+ "/debug/visualID"; //$NON-NLS-1$
+	private static final String DEBUG_KEY = "hub.top.editor.ptnetLoLA.diagram/debug/visualID"; //$NON-NLS-1$
 
 	/**
 	 * @generated
@@ -217,16 +215,6 @@ public class PtnetLoLAVisualIDRegistry {
 	 */
 	private static boolean isDiagram(hub.top.editor.ptnetLoLA.PtNet element) {
 		return true;
-	}
-
-	/**
-	 * @generated
-	 */
-	private static boolean evaluate(
-			hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAAbstractExpression expression,
-			Object element) {
-		Object result = expression.evaluate(element);
-		return result instanceof Boolean && ((Boolean) result).booleanValue();
 	}
 
 }

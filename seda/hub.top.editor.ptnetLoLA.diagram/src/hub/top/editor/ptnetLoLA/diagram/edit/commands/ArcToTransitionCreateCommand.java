@@ -64,11 +64,11 @@ public class ArcToTransitionCreateCommand extends CreateElementCommand {
 			return false;
 		}
 		if (source != null
-				&& !(source instanceof hub.top.editor.ptnetLoLA.Node)) {
+				&& false == source instanceof hub.top.editor.ptnetLoLA.Node) {
 			return false;
 		}
 		if (target != null
-				&& !(target instanceof hub.top.editor.ptnetLoLA.Node)) {
+				&& false == target instanceof hub.top.editor.ptnetLoLA.Node) {
 			return false;
 		}
 		if (getSource() == null) {
@@ -87,7 +87,6 @@ public class ArcToTransitionCreateCommand extends CreateElementCommand {
 	 * @generated
 	 */
 	protected EObject doDefaultElementCreation() {
-		// hub.top.editor.ptnetLoLA.ArcToTransition newElement = (hub.top.editor.ptnetLoLA.ArcToTransition) super.doDefaultElementCreation();
 		hub.top.editor.ptnetLoLA.ArcToTransition newElement = hub.top.editor.ptnetLoLA.PtnetLoLAFactory.eINSTANCE
 				.createArcToTransition();
 		getContainer().getArcs().add(newElement);

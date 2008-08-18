@@ -132,8 +132,8 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 	 */
 	private long computeModificationStamp(ResourceSetInfo info) {
 		int result = 0;
-		for (Iterator it = info.getResourceSet().getResources().iterator(); it
-				.hasNext();) {
+		for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
+				.getLoadedResourcesIterator(); it.hasNext();) {
 			Resource nextResource = (Resource) it.next();
 			IFile file = WorkspaceSynchronizer.getFile(nextResource);
 			if (file != null) {
@@ -337,9 +337,9 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 			throws CoreException {
 		ResourceSetInfo info = getResourceSetInfo(element);
 		if (info != null) {
-			Collection files2Validate = new ArrayList();
-			for (Iterator it = info.getResourceSet().getResources().iterator(); it
-					.hasNext();) {
+			Collection/*<org.eclipse.core.resources.IFile>*/files2Validate = new ArrayList/*<org.eclipse.core.resources.IFile>*/();
+			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				IFile file = WorkspaceSynchronizer.getFile(nextResource);
 				if (file != null && file.isReadOnly()) {
@@ -412,8 +412,8 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 	protected void updateCache(Object element) throws CoreException {
 		ResourceSetInfo info = getResourceSetInfo(element);
 		if (info != null) {
-			for (Iterator it = info.getResourceSet().getResources().iterator(); it
-					.hasNext();) {
+			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				IFile file = WorkspaceSynchronizer.getFile(nextResource);
 				if (file != null && file.isReadOnly()) {
@@ -456,9 +456,9 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 	protected ISchedulingRule getResetRule(Object element) {
 		ResourceSetInfo info = getResourceSetInfo(element);
 		if (info != null) {
-			Collection rules = new ArrayList();
-			for (Iterator it = info.getResourceSet().getResources().iterator(); it
-					.hasNext();) {
+			Collection/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/rules = new ArrayList/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/();
+			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				IFile file = WorkspaceSynchronizer.getFile(nextResource);
 				if (file != null) {
@@ -478,9 +478,9 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 	protected ISchedulingRule getSaveRule(Object element) {
 		ResourceSetInfo info = getResourceSetInfo(element);
 		if (info != null) {
-			Collection rules = new ArrayList();
-			for (Iterator it = info.getResourceSet().getResources().iterator(); it
-					.hasNext();) {
+			Collection/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/rules = new ArrayList/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/();
+			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				IFile file = WorkspaceSynchronizer.getFile(nextResource);
 				if (file != null) {
@@ -499,9 +499,9 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 	protected ISchedulingRule getSynchronizeRule(Object element) {
 		ResourceSetInfo info = getResourceSetInfo(element);
 		if (info != null) {
-			Collection rules = new ArrayList();
-			for (Iterator it = info.getResourceSet().getResources().iterator(); it
-					.hasNext();) {
+			Collection/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/rules = new ArrayList/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/();
+			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				IFile file = WorkspaceSynchronizer.getFile(nextResource);
 				if (file != null) {
@@ -521,9 +521,9 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 	protected ISchedulingRule getValidateStateRule(Object element) {
 		ResourceSetInfo info = getResourceSetInfo(element);
 		if (info != null) {
-			Collection files = new ArrayList();
-			for (Iterator it = info.getResourceSet().getResources().iterator(); it
-					.hasNext();) {
+			Collection/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/files = new ArrayList/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/();
+			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				IFile file = WorkspaceSynchronizer.getFile(nextResource);
 				if (file != null) {
@@ -568,8 +568,8 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 			throws CoreException {
 		ResourceSetInfo info = getResourceSetInfo(element);
 		if (info != null) {
-			for (Iterator it = info.getResourceSet().getResources().iterator(); it
-					.hasNext();) {
+			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				handleElementChanged(info, nextResource, monitor);
 			}
@@ -596,13 +596,13 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 			}
 			info.stopResourceListening();
 			fireElementStateChanging(element);
-			List resources = info.getResourceSet().getResources();
 			try {
 				monitor
 						.beginTask(
 								hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLADocumentProvider_SaveDiagramTask,
-								resources.size() + 1); //"Saving diagram"
-				for (Iterator it = resources.iterator(); it.hasNext();) {
+								info.getResourceSet().getResources().size() + 1); //"Saving diagram"
+				for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
+						.getLoadedResourcesIterator(); it.hasNext();) {
 					Resource nextResource = (Resource) it.next();
 					monitor
 							.setTaskName(NLS
@@ -881,6 +881,14 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 		/**
 		 * @generated
 		 */
+		public Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/getLoadedResourcesIterator() {
+			return new ArrayList/*<org.eclipse.emf.ecore.resource.Resource>*/(
+					getResourceSet().getResources()).iterator();
+		}
+
+		/**
+		 * @generated
+		 */
 		public IEditorInput getEditorInput() {
 			return myEditorInput;
 		}
@@ -891,7 +899,7 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 		public void dispose() {
 			stopResourceListening();
 			getResourceSet().eAdapters().remove(myResourceSetListener);
-			for (Iterator it = getResourceSet().getResources().iterator(); it
+			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = getLoadedResourcesIterator(); it
 					.hasNext();) {
 				Resource resource = (Resource) it.next();
 				resource.unload();
@@ -1096,8 +1104,8 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 					Resource resource = (Resource) notification.getNotifier();
 					if (resource.isLoaded()) {
 						boolean modified = false;
-						for (Iterator it = myInfo.getResourceSet()
-								.getResources().iterator(); it.hasNext()
+						for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = myInfo
+								.getLoadedResourcesIterator(); it.hasNext()
 								&& !modified;) {
 							Resource nextResource = (Resource) it.next();
 							if (nextResource.isLoaded()) {

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Service-Technology.org Petri Net Model
 Bundle-SymbolicName: hub.top.editor.ptnetLoLA;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.3
 Bundle-Activator: hub.top.editor.ptnetLoLA.base.Activator
 Bundle-Vendor: Service-Technology.org
 Require-Bundle: org.eclipse.ui,

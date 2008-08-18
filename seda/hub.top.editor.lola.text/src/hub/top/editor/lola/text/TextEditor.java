@@ -46,7 +46,7 @@ import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
-import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IEditorInput;
 import org.osgi.framework.Bundle;
 
 
@@ -84,8 +84,8 @@ public class TextEditor extends hub.sam.tef.editor.text.TextEditor implements hu
 	 * @see org.eclipse.ui.part.EditorPart#getEditorInput()
 	 */
 	@Override
-	public IFileEditorInput getEditorInput() {
-		return (IFileEditorInput)super.getEditorInput();
+	public IEditorInput getEditorInput() {
+		return super.getEditorInput();
 	}
 	
 	/**
@@ -98,7 +98,6 @@ public class TextEditor extends hub.sam.tef.editor.text.TextEditor implements hu
 			/* (non-Javadoc)
 			 * @see hub.top.editor.gef.EditorUtil#getCurrentResource()
 			 */
-			@Override
 			public Resource getCurrentResource() {
 				return ((TextEditor)getEditor()).getCurrentModel();
 
@@ -113,7 +112,6 @@ public class TextEditor extends hub.sam.tef.editor.text.TextEditor implements hu
 				return "lola";
 			}
 			
-			@Override
 			public String getCurrentText() {
 				return ((TextEditor)getEditor()).getCurrentText();
 			}

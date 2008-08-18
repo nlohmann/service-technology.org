@@ -51,7 +51,6 @@ public abstract class DiagramEditorUtil extends EditorUtil implements IDiagramEd
 	 * own initial model
 	 * @see hub.top.editor.eclipse.IDiagramEditorUtil#standardCreate_InitializesModel()
 	 */
-	@Override
 	public boolean standardCreate_InitializesModel() {
 		return true;
 	}
@@ -61,7 +60,6 @@ public abstract class DiagramEditorUtil extends EditorUtil implements IDiagramEd
 	 * have no text representation by default (returns <code>null</code>)
 	 * @see hub.top.editor.eclipse.IEditorUtil#getCurrentText()
 	 */
-	@Override
 	public String getCurrentText() {
 		return null;
 	}

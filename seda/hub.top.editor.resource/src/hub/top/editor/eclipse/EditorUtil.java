@@ -87,7 +87,6 @@ public abstract class EditorUtil implements IEditorUtil {
 	/**
 	 * refresh the view of the editor on its current contents
 	 */
-	@Override
 	public void refreshEditorView() {
 		// standard refresh does nothing
 	}

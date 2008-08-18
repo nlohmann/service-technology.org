@@ -64,11 +64,11 @@ public class ArcToPlaceCreateCommand extends CreateElementCommand {
 			return false;
 		}
 		if (source != null
-				&& !(source instanceof hub.top.editor.ptnetLoLA.Node)) {
+				&& false == source instanceof hub.top.editor.ptnetLoLA.Node) {
 			return false;
 		}
 		if (target != null
-				&& !(target instanceof hub.top.editor.ptnetLoLA.Node)) {
+				&& false == target instanceof hub.top.editor.ptnetLoLA.Node) {
 			return false;
 		}
 		if (getSource() == null) {
@@ -87,7 +87,6 @@ public class ArcToPlaceCreateCommand extends CreateElementCommand {
 	 * @generated
 	 */
 	protected EObject doDefaultElementCreation() {
-		// hub.top.editor.ptnetLoLA.ArcToPlace newElement = (hub.top.editor.ptnetLoLA.ArcToPlace) super.doDefaultElementCreation();
 		hub.top.editor.ptnetLoLA.ArcToPlace newElement = hub.top.editor.ptnetLoLA.PtnetLoLAFactory.eINSTANCE
 				.createArcToPlace();
 		getContainer().getArcs().add(newElement);

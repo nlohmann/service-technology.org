@@ -60,8 +60,6 @@ public class DiagramEditorHelper extends EditorHelper {
 	/** the <code>{@link EditorHelper}</code> that underlies this diagram */
 	private ResourceHelper modelHelper;
 	
-	private TransactionalEditingDomain editingDomain;
-	
 	/**
 	 * initialize helper with a new transactional GMF editing domain
 	 * @param pluginHelper
@@ -97,24 +95,13 @@ public class DiagramEditorHelper extends EditorHelper {
 	}
 	
 	/**
-	 * @return the editing domain that manages the resources
-	 * of this helper
-	 */
-	public TransactionalEditingDomain getEditingDomain() {
-		assert(editingDomain != null);
-		assert(editingDomain instanceof TransactionalEditingDomain);
-		return editingDomain;
-	}
-	
-	/**
 	 * @return list of files affected when working with this helper
 	 */
+	@Override
 	public List<IFile> affectedFiles() {
-		List<IFile> fList = new LinkedList<IFile>();
-		if (modelHelper.getFile(true) != null)
-			fList.add(modelHelper.getFile(true));
-		if (getFile(true) != null)
-			fList.add(getFile(true));
+		List<IFile> fList = super.affectedFiles();
+		// extend list with model helper files 
+		fList.addAll(modelHelper.affectedFiles());
 		return fList;
 	}
 

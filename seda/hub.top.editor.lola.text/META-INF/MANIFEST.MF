@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Service-Technology.org Text Editors
 Bundle-SymbolicName: hub.top.editor.lola.text;singleton:=true
-Bundle-Version: 1.0.1
+Bundle-Version: 1.0.3
 Bundle-Activator: hub.top.editor.lola.text.Activator
 Bundle-Vendor: Service-Technology.org
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
- hub.sam.tef;bundle-version="1.0.4",
+ hub.sam.tef;bundle-version="1.0.5",
  hub.top.editor,
  hub.top.editor.ptnetLoLA,
  hub.top.editor.ptnetLoLA.edit,

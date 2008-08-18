@@ -63,6 +63,7 @@ import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
 import org.eclipse.gmf.runtime.diagram.ui.figures.BorderItemLocator;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.ConstrainedToolbarLayout;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel;
+import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
 import org.eclipse.gmf.runtime.notation.View;
@@ -308,7 +309,7 @@ public class PlaceEditPart extends AbstractBorderedShapeEditPart {
 		/**
 		 * @generated
 		 */
-		private WrapLabel fFigurePlaceTokenLabel;
+		private WrappingLabel fFigurePlaceTokenLabel;
 
 		/**
 		 * @generated not
@@ -332,7 +333,7 @@ public class PlaceEditPart extends AbstractBorderedShapeEditPart {
 		 */
 		private void createContents() {
 
-			fFigurePlaceTokenLabel = new WrapLabel();
+			fFigurePlaceTokenLabel = new WrappingLabel();
 			fFigurePlaceTokenLabel.setText("0");
 
 			fFigurePlaceTokenLabel.setFont(FFIGUREPLACETOKENLABEL_FONT);
@@ -363,7 +364,7 @@ public class PlaceEditPart extends AbstractBorderedShapeEditPart {
 		/**
 		 * @generated
 		 */
-		public WrapLabel getFigurePlaceTokenLabel() {
+		public WrappingLabel getFigurePlaceTokenLabel() {
 			return fFigurePlaceTokenLabel;
 		}
 

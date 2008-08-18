@@ -67,10 +67,9 @@ public class PtNetCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 		switch (visualID) {
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart.VISUAL_ID:
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart.VISUAL_ID:
-			return !semanticChildren.contains(view.getElement())
-					|| visualID != hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
-							.getNodeVisualID((View) getHost().getModel(), view
-									.getElement());
+			if (!semanticChildren.contains(view.getElement())) {
+				return true;
+			}
 		}
 		return false;
 	}

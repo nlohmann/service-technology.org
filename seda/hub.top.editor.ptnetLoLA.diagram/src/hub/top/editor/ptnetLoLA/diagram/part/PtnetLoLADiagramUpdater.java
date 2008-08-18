@@ -260,7 +260,7 @@ public class PtnetLoLADiagramUpdater {
 			hub.top.editor.ptnetLoLA.PtNet container) {
 		Collection result = new LinkedList();
 		for (Iterator links = container.getArcs().iterator(); links.hasNext();) {
-			Object linkObject = links.next();
+			EObject linkObject = (EObject) links.next();
 			if (false == linkObject instanceof hub.top.editor.ptnetLoLA.ArcToPlace) {
 				continue;
 			}
@@ -289,7 +289,7 @@ public class PtnetLoLADiagramUpdater {
 			hub.top.editor.ptnetLoLA.PtNet container) {
 		Collection result = new LinkedList();
 		for (Iterator links = container.getArcs().iterator(); links.hasNext();) {
-			Object linkObject = links.next();
+			EObject linkObject = (EObject) links.next();
 			if (false == linkObject instanceof hub.top.editor.ptnetLoLA.ArcToTransition) {
 				continue;
 			}
@@ -397,7 +397,7 @@ public class PtnetLoLADiagramUpdater {
 		}
 		Collection result = new LinkedList();
 		for (Iterator links = container.getArcs().iterator(); links.hasNext();) {
-			Object linkObject = links.next();
+			EObject linkObject = (EObject) links.next();
 			if (false == linkObject instanceof hub.top.editor.ptnetLoLA.ArcToPlace) {
 				continue;
 			}
@@ -442,7 +442,7 @@ public class PtnetLoLADiagramUpdater {
 		}
 		Collection result = new LinkedList();
 		for (Iterator links = container.getArcs().iterator(); links.hasNext();) {
-			Object linkObject = links.next();
+			EObject linkObject = (EObject) links.next();
 			if (false == linkObject instanceof hub.top.editor.ptnetLoLA.ArcToTransition) {
 				continue;
 			}

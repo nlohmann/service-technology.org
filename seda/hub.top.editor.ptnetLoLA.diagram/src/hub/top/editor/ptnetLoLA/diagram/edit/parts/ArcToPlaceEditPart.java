@@ -5,16 +5,19 @@ import org.eclipse.draw2d.PolylineDecoration;
 import org.eclipse.draw2d.RotatableDecoration;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ConnectionNodeEditPart;
+import org.eclipse.gmf.runtime.diagram.ui.editparts.ITreeBranchEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.PolylineConnectionEx;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel;
+import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.swt.graphics.Color;
 
 /**
  * @generated
  */
-public class ArcToPlaceEditPart extends ConnectionNodeEditPart {
+public class ArcToPlaceEditPart extends ConnectionNodeEditPart implements
+		ITreeBranchEditPart {
 
 	/**
 	 * @generated
@@ -88,7 +91,7 @@ public class ArcToPlaceEditPart extends ConnectionNodeEditPart {
 		/**
 		 * @generated
 		 */
-		private WrapLabel fFigureWeight;
+		private WrappingLabel fFigureWeight;
 
 		/**
 		 * @generated
@@ -105,7 +108,7 @@ public class ArcToPlaceEditPart extends ConnectionNodeEditPart {
 		 */
 		private void createContents() {
 
-			fFigureWeight = new WrapLabel();
+			fFigureWeight = new WrappingLabel();
 			fFigureWeight.setText("1");
 
 			this.add(fFigureWeight);
@@ -124,7 +127,7 @@ public class ArcToPlaceEditPart extends ConnectionNodeEditPart {
 		/**
 		 * @generated
 		 */
-		public WrapLabel getFigureWeight() {
+		public WrappingLabel getFigureWeight() {
 			return fFigureWeight;
 		}
 

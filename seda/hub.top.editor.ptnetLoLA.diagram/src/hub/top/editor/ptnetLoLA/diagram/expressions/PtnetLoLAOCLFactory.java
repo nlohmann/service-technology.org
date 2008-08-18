@@ -128,20 +128,6 @@ public class PtnetLoLAOCLFactory {
 		/**
 		 * @generated
 		 */
-		protected Object performCast(Object value, ETypedElement targetType) {
-			if (targetType.getEType() instanceof EEnum) {
-				if (value instanceof EEnumLiteral) {
-					EEnumLiteral literal = (EEnumLiteral) value;
-					return (literal.getInstance() != null) ? literal
-							.getInstance() : literal;
-				}
-			}
-			return super.performCast(value, targetType);
-		}
-
-		/**
-		 * @generated
-		 */
 		private void initExtentMap(Object context) {
 			if (!getStatus().isOK() || context == null) {
 				return;

@@ -42,7 +42,7 @@ public class ArcToTransitionReorientCommand extends EditElementCommand {
 	 * @generated
 	 */
 	public boolean canExecute() {
-		if (!(getElementToEdit() instanceof hub.top.editor.ptnetLoLA.ArcToTransition)) {
+		if (false == getElementToEdit() instanceof hub.top.editor.ptnetLoLA.ArcToTransition) {
 			return false;
 		}
 		if (reorientDirection == ReorientRelationshipRequest.REORIENT_SOURCE) {

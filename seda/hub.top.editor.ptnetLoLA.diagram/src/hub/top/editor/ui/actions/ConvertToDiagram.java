@@ -42,17 +42,18 @@ import hub.top.editor.eclipse.EditorUtil;
 import hub.top.editor.eclipse.IFrameWorkEditor;
 import hub.top.editor.eclipse.PluginHelper;
 import hub.top.editor.eclipse.ResourceHandling;
+import hub.top.editor.eclipse.ResourceHelper;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class ConvertToDiagram extends AbstractHandler implements IHandler {
-
-	@Override
+	
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		PluginHelper plugin = hub.top.editor.Activator.getPluginHelper();
@@ -62,10 +63,12 @@ public class ConvertToDiagram extends AbstractHandler implements IHandler {
 					hub.top.editor.eclipse.IFrameWorkEditor ))
 				throw new Exception("Convert to Diagram failed: action works in ServiceTechnology.org framework editors only.");
 
+			// retrieve and prepare editor utils 
 			EditorUtil sourceEditor = ((IFrameWorkEditor)window.getActivePage().getActiveEditor()).getEditorUtil();
 			hub.top.editor.eclipse.DiagramEditorUtil targetDiagramEditor =
 				new hub.top.editor.petrinets.diagram.eclipse.PtnetLoLADiagramEditorUtil(null);
-
+			
+			// retrieve and prepare specific resource helpers
 			EditorHelper sourceHelper = new EditorHelper(plugin, sourceEditor, sourceEditor.defaultFileExtension());
 			EditorHelper targetModelHelper;
 			// check whether the source contains a valid model for the target diagram (by file extension)
@@ -75,8 +78,16 @@ public class ConvertToDiagram extends AbstractHandler implements IHandler {
 				targetModelHelper = new EditorHelper(plugin, null, targetDiagramEditor.defaultModelFileExtension());
 			DiagramEditorHelper targetDiagramHelper = new DiagramEditorHelper(plugin, targetDiagramEditor, targetModelHelper, targetDiagramEditor.defaultFileExtension());
 			
+			// check whether operation will succeed
+			if (!ResourceHelper.isWorkspaceResource(sourceHelper.getURI(true))) {
+				//System.err.println("is not a workspace resource");
+				MessageDialog.openInformation(window.getShell(),
+						"Convert to diagram", "We're sorry, we cannot convert files which are stored outside the workspace.\nPlease import your file into the workspace and try again.");
+				return null;
+			}
 			
-			//ResourceHandling.createModelResourceFromResource(window, lolaTextHelper, targetModelHelper);
+			// now everything is fine, invoke transformation
+			//ResourceHandling.createModelResourceFromResource(window, sourceHelper, targetModelHelper);
 			ResourceHandling.createDiagramResourceFromResource(window, sourceHelper, targetModelHelper, targetDiagramHelper);
 			//targetModelHelper.openFileInEditor(window);
 			// FIXME do refresh only if file contents was touched
@@ -87,6 +98,8 @@ public class ConvertToDiagram extends AbstractHandler implements IHandler {
 		}
 		catch (Exception exception) {
 			plugin.logError(exception);
+			MessageDialog.openInformation(window.getShell(),
+					"Convert to diagram", "We're sorry, we could not convert the diagram. See the error log for details.");
 		}
 		return null;
 	}

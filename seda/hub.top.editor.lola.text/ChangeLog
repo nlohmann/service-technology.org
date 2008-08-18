@@ -1,6 +1,3 @@
-ChangeLog for hub.top.editor.lola.text
---------------------------------------
+ToP/Service-Technology.org Petri Net Text Editor ChangeLog
 
-Version 1.0.1
--------------
-+ fixed plugin build configuration in MANIFEST.INF to include resources and icons
+see hub.top.seda/ChangeLog

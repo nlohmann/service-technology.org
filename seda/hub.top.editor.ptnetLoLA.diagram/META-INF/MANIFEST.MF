@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: hub.top.editor.ptnetLoLA.diagram; singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.3.qualifier
 Bundle-ClassPath: .
 Bundle-Activator: hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
 Bundle-Vendor: %providerName
@@ -18,11 +18,15 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.ui.ide,
  org.eclipse.ui.views,
+ org.eclipse.ui.views.properties.tabbed,
  org.eclipse.ui.navigator,
  org.eclipse.ui.navigator.resources,
  org.eclipse.emf.ecore,
  org.eclipse.emf.ecore.xmi,
  org.eclipse.emf.edit.ui,
+ org.eclipse.emf.transaction,
+ org.eclipse.emf.transaction.ui,
+ org.eclipse.emf.workspace,
  org.eclipse.gmf.runtime.emf.core,
  org.eclipse.gmf.runtime.emf.commands.core,
  org.eclipse.gmf.runtime.emf.ui.properties,

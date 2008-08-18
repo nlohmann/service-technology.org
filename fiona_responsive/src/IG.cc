@@ -795,12 +795,13 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
             State * currentState = (*iter);
             
             // if we are in responsive mode, remember which TSCC we are in
+            // (since current state is a representative of the TSCC it holds: dfs==lowlink)
             if (parameters[P_RESPONSIVE]) {
             	visitedTSCCs[currentState->dfs] = true;
             }
             
             do {
-            	// delete the list of quasi enabled transitions
+                // delete the list of quasi enabled transitions
             	if (currentState->quasiFirelist) { 
             		delete [] currentState->quasiFirelist;
             		currentState->quasiFirelist = NULL;
@@ -823,31 +824,28 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
 
             	if (parameters[P_RESPONSIVE]) {
             		// get next state of TSCC, make sure that we stay in this TSCC by
-            		// comparing dfs values
+            		// comparing lowlink values
             		if (currentState->nexttar && 
-            				(currentState->dfs == currentState->nexttar->dfs)) {
+            				(currentState->lowlink == currentState->nexttar->lowlink)) {
             			currentState = currentState->nexttar;
             			if (currentState) {
             				// and decode it first
             				currentState->decodeShowOnly(PN);
             			}
+            		} else {
+            			// we just left the TSCC, so get out of the loop as well
+            			break;
             		}
             	}
-
             	// since in responsive mode, we are in a loop, we have to check if the current
             	// state is the one we have started with
             	// if we are not in responsive mode, we get out of here, since the current state
             	// stays the same
             } while (currentState && (currentState != (*iter)));
 
-        //    if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
-                // Add the clause to the current node
                 node->addClause(myclause);
-        //    } else {
-        //        delete myclause;
-        //    }
 
-        } // end if deadlock or finalstate
+        } // end if deadlock or finalstate / or responsive mode and it is rep of a TSCC
 
     } // end for
 

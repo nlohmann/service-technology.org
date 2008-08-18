@@ -673,6 +673,7 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
                 State * currentState = (*iter);
                 
                 // if we are in responsive mode, remember which TSCC we are in
+                // (since current state is a representative of the TSCC it holds: dfs==lowlink)
                 if (parameters[P_RESPONSIVE]) {
                 	visitedTSCCs[currentState->dfs] = true;
                 }
@@ -706,14 +707,17 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
 	                
 	                if (parameters[P_RESPONSIVE]) {
 		                // get next state of TSCC, make sure that we stay in this TSCC by
-	                	// comparing dfs values
+	                	// comparing lowlink values
 		                if (currentState->nexttar && 
-		                		(currentState->dfs == currentState->nexttar->dfs)) {
+		                		(currentState->lowlink == currentState->nexttar->lowlink)) {
 		                	currentState = currentState->nexttar;
 			                if (currentState) {
 			                	// and decode it first
 			                	currentState->decodeShowOnly(PN);
 			                }
+		                } else {
+		                	// we just left the TSCC, so get out of the loop as well
+		                	break;
 		                }
 	                }
 	              

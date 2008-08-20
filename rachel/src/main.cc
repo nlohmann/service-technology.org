@@ -183,7 +183,7 @@ int main(int argc, char** argv) {
         printf("- config USE64BIT:   %s\n", CONFIG_USE64BIT);
         printf("- config WIN32:      %s\n", CONFIG_WIN32);
         printf("\n\n");
-        return EXIT_SUCCESS;
+        exit(EXIT_SUCCESS);
     }
 		
     struct cmdline_parser_params *params;

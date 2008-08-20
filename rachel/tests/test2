@@ -1,9 +1,0 @@
-#! /bin/bash
-
-echo ""
-
-echo "test: simulation"
-echo "      rachel -a $testdir/testfiles/traveler.sa -o $testdir/testfiles/agency_airline.og -m simulation &> /dev/null"
-rachel -a $testdir/testfiles/traveler.sa -o $testdir/testfiles/agency_airline.og -m simulation &> /dev/null
-
-exit $?

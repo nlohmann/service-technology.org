@@ -1,0 +1,15 @@
+{ this is a comment }
+
+NODES
+  0 : true : blue,
+  1 : false : blue,
+  2 : final : blue,
+  3 : final : finalnode,
+  4 : ((a + b) * (c + false) * true) : red;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  4 -> 4 : a
+;

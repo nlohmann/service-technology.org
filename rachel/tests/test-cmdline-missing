@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="rachel -a $testdir/testfiles/traveler.sa"
+echo ""
+echo "test: missing command line parameter"
+echo "      $command"
+$command &> /dev/null

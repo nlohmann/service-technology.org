@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="rachel -a $testdir/testfiles/traveler.sa -o $testdir/testfiles/agency_airline.og -m matching"
+echo ""
+echo "test: matching"
+echo "      $command"
+$command &> /dev/null

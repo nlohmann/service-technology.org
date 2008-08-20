@@ -10,8 +10,10 @@ rachel_SOURCES = syntax_og.yy lexer_og.ll \
 		 Simulation.h Matching.h \
 		 EditDistance.h EditDistance.cc \
 		 cmdline.c cmdline.h \
-		 getopt.h getopt.c getopt1.c \
 		 $(aspected_sources)
+
+# no needed?
+# 		 getopt.h getopt.c getopt1.c
 
 EXTRA_rachel_SOURCES = $(unaspected_sources)
 
@@ -56,8 +58,10 @@ endif
 # organize cleaning, and distribution
 ################################################################
 
-EXTRA_DIST = syntax_og.h cmdline.ggo simmatch.conf Doxydetails \
+EXTRA_DIST = syntax_og.h cmdline.ggo rachel.conf Doxydetails \
 	     $(aspects)
+
+CLEANFILES = *.gcno *.gcda
 
 MAINTAINERCLEANFILES = syntax_og.cc syntax_og.h lexer_og.cc \
 		       cmdline.c cmdline.h puma.config \

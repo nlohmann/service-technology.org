@@ -1,4 +1,4 @@
-@heading Version 1.10 (unreleased)
+@heading Version 1.10
 @itemize
 @item Rachel does not need to be installed to execute @command{make experiments}
 
@@ -17,6 +17,10 @@
 @item fixed a bug: the requirements to calculate matching-based edit distance (final states are sink states) led to incorrect formula evaluation (see @url{https://gna.org/bugs/?11944}) when calculating the number of characterized services
 
 @item removed orphaned code for linear programming
+
+@item added more test cases (also expected failures)
+
+@item added code coverage checks using LTP LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}); checks can be invoked in directory @file{tests} with @command{make prepare-cover cover}
 @end itemize
 
 

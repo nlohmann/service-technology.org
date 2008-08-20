@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="rachel --bug"
+echo ""
+echo "test: bug output"
+echo "      $command"
+$command &> /dev/null

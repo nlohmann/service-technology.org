@@ -1,9 +1,0 @@
-#! /bin/bash
-
-echo ""
-
-echo "test: matching"
-echo "      rachel -a $testdir/testfiles/traveler.sa -o $testdir/testfiles/agency_airline.og -m matching &> /dev/null"
-rachel -a $testdir/testfiles/traveler.sa -o $testdir/testfiles/agency_airline.og -m matching &> /dev/null
-
-exit $?

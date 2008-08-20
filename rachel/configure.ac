@@ -1,5 +1,5 @@
 AC_PREREQ(2.61)
-AC_INIT(Rachel, 1.10-unreleased, rachel@service-technology.org, rachel)
+AC_INIT(Rachel, 1.10, rachel@service-technology.org, rachel)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS(src/config.h)
 

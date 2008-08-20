@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="rachel"
+echo ""
+echo "test: no command line parameters"
+echo "      $command"
+$command &> /dev/null

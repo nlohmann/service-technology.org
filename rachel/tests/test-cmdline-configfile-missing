@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="rachel -a $testdir/testfiles/traveler.sa -o $testdir/testfiles/agency_airline.og --noop -c $testdir/testfiles/missing.conf"
+echo ""
+echo "test: config file missing"
+echo "      $command"
+$command &> /dev/null

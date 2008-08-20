@@ -186,11 +186,11 @@ The parameters of the simulation and matching algorithm can be controlled using 
 
 @cartouche
 @smallexample
-rachel --automaton=impl.og --og=spec.og --conf-file=simmatch.conf
+rachel --automaton=impl.og --og=spec.og --conf-file=rachel.conf
 @end smallexample
 @end cartouche
 
-A configuration file consistes of @code{paramter = value} lines, each line setting the value of a parameter. An example file @file{simmatch.conf} is located in the @file{src} folder.
+A configuration file consistes of @code{paramter = value} lines, each line setting the value of a parameter. An example file @file{rachel.conf} is located in the @file{src} folder.
 
 Note: If not all parameters are defined, the standard values apply. Mandatory command-line options such as @samp{automaton} or @samp{og} cannot be defined in configuration files.
 

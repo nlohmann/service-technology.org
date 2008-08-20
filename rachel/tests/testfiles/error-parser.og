@@ -1,0 +1,12 @@
+NODES
+  0 0 : true : blue,
+  1 : false : blue,
+  2 : final : blue,
+  3 : a : red;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  3 -> 3 : a
+;

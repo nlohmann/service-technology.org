@@ -6,8 +6,8 @@
                       http://service-technology.org/rachel
 
 
-Version 1.10 (unreleased)
-=========================
+Version 1.10
+============
 
 * Rachel does not need to be installed to execute `make experiments'
 
@@ -37,6 +37,12 @@ Version 1.10 (unreleased)
   services
 
 * removed orphaned code for linear programming
+
+* added more test cases (also expected failures)
+
+* added code coverage checks using LTP LCOV
+  (`http://ltp.sourceforge.net/coverage/lcov.php'); checks can be invoked in
+  directory `tests' with `make prepare-cover cover'
 
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for

@@ -169,16 +169,19 @@ GasTexNode* GasTexGraph::getNode(string id) {
 void GasTexGraph::makeGasTex(string texFileName) {
     trace(TRACE_5, "GasTexGraph::makeGasTex(string): start\n");
 
+    // open the texFile for writing
     fstream texFile(texFileName.c_str(), ios_base::out | ios_base::trunc);
     if (!texFile) {
         cerr << "cannot write to file " << texFileName << endl;
         exit(4);
     }
 
+    // setting standard values for layout (from dot2tex.h)
     for(int i = 0; i < texHeaderCount; i++) {
         texFile << texHeader[i];
     }
 
+    // there are two styles available, onw for OG and one for IG 
     if (gastexGraph) {
         if (parameters[P_OG] || parameters[P_IG]) {
             makeGasTexOfOG(texFile);
@@ -187,6 +190,7 @@ void GasTexGraph::makeGasTex(string texFileName) {
         } 
     }
 
+    // end of gastex document (from dot2tex.h)
     for (int i = 0; i < texFooterCount; i++) {
         texFile << texFooter[i];
     }
@@ -204,12 +208,12 @@ void GasTexGraph::makeGasTexOfOG(fstream& texFile) {
 
     for(set<GasTexNode*>::iterator iNode = gastexGraph->nodes.begin();
         iNode != gastexGraph->nodes.end(); ++iNode) {
-    	
-    	vector<string> strVector;
-    	
-    	// some preprocessing
+    
+        vector<string> strVector;
+    
+        // some preprocessing
         if ((*iNode)->label != "") {
-        	if (parameters[P_SHOW_STATES_PER_NODE]) {
+            if (parameters[P_SHOW_STATES_PER_NODE]) {
 	            string::size_type pos;
 	            
 	            pos = 0;

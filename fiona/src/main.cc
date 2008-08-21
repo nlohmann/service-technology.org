@@ -339,21 +339,28 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix) {
     dot_yylineno = 1;
     dot_yydebug = 0;
 
+    // try to open the dot file for reading
     dot_yyin = fopen((dotFileName).c_str(), "r");
     if (!dot_yyin) {
         cerr << "cannot open dot file '" << dotFileName << "' for reading'\n" << endl;
         exit(4);
     }
 
+    // clear the graph holding the parsed informations
     if (gastexGraph) {
         delete gastexGraph;
     }
+
+    // preparing the global variable gastexGraph for parsing
     gastexGraph = new GasTexGraph();
+
+    // parsing the dot file into variable gastexGraph
     dot_yyparse();
     fclose(dot_yyin);
 
     string texFileName = myFilePrefix + ".tex";
 
+    // writing gastexGraph to new tex file
     gastexGraph->makeGasTex(texFileName);
 
     trace(TRACE_0, texFileName + " generated\n");
@@ -387,22 +394,29 @@ void makeGasTex(CommunicationGraph* graph) {
     dot_yylineno = 1;
     dot_yydebug = 0;
 
+    // try to open the dot file for reading
     dot_yyin = fopen((outFileName).c_str(), "r");
     if (!dot_yyin) {
         cerr << "cannot open graph file '" << outFileName << "' for reading'\n" << endl;
         exit(4);
     }
 
+    // clear the graph holding the parsed informations
     if (gastexGraph) {
         delete gastexGraph;
     }
+
+    // preparing the global variable gastexGraph for parsing
     gastexGraph = new GasTexGraph();
+
+    // parsing the dot file into variable gastexGraph
     dot_yyparse();
 
     fclose(dot_yyin);
 
     string texFileName = outfilePrefixWithOptions + ".tex";
 
+    // writing gastexGraph to new tex file
     gastexGraph->makeGasTex(texFileName);
 
     trace(TRACE_0, texFileName + " generated\n");
@@ -423,20 +437,27 @@ void makeGasTex(AnnotatedGraph* graph, string fileNamePrefix) {
     dot_yylineno = 1;
     dot_yydebug = 0;
 
+    // try to open the dot file for reading
     dot_yyin = fopen((dotFileName).c_str(), "r");
     if (!dot_yyin) {
         cerr << "cannot open annotated dot file '" << dotFileName << "' for reading'\n" << endl;
         exit(4);
     }
 
+    // clear the graph holding the parsed informations
     if (gastexGraph) {
         delete gastexGraph;
     }
+
+    // preparing the global variable gastexGraph for parsing
     gastexGraph = new GasTexGraph();
+
+    // parsing the dot file into variable gastexGraph
     dot_yyparse();
 
     fclose(dot_yyin);
 
+    // writing gastexGraph to new tex file
     gastexGraph->makeGasTex(texFileName);
 
     trace(TRACE_0, texFileName + " generated\n");

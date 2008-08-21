@@ -92,7 +92,6 @@ typedef enum {
     P_COUNT_SERVICES,           //!< Compute the number of services characterized by an OG
     P_DISTRIBUTED,              //!< check for distributed controllability
     P_READ_OG,                  //!< only read an OG from a file
-    P_FILTER,                   //!<  
     P_REDUCE,                   //!< reduce given oWFNs 
     P_NORMALIZE,                //!< normalize given oWFNs
     P_PARTNER_TEST,             //!< first synthesize a partner, then match it with the og. 

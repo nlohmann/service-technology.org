@@ -1361,47 +1361,6 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
 }
 
 
-//! \brief modifies the first OG such that it simulates the second OG
-//!        by filtering non-simulating branches
-//! \param OGsFromFiles a list containing exactly two OGs
-void filterOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
-
-    // exactly 2 OGs must be given
-    assert(OGsFromFiles.size() == 2);
-
-    AnnotatedGraph::ogs_t::const_iterator GraphIter = OGsFromFiles.begin();
-    AnnotatedGraph *lhs = *GraphIter;
-    AnnotatedGraph *rhs = *(++GraphIter);
-
-    trace("Filter OG from file ");
-    trace(*ogfiles.begin() + " through OG from file ");
-    trace(*(++ogfiles.begin()) + ".\n\n");
-
-    lhs->filter(rhs);
-
-    if (lhs->hasNoRoot()) {
-        trace("The filtered OG is empty.\n\n");
-    }
-
-    if (!options[O_OUTFILEPREFIX]) {
-        outfilePrefix = AnnotatedGraph::stripOGFileSuffix(*ogfiles.begin()) + ".filtered";
-    }
-
-    if (!options[O_NOOUTPUTFILES]) {
-        trace("Saving filtered OG to:\n");
-        trace(AnnotatedGraph::addOGFileSuffix(outfilePrefix));
-        trace("\n\n");
-
-        // the second parameter is false, since this OG has no underlying oWFN
-        lhs->printOGFile(outfilePrefix, false);
-        lhs->printDotFile(outfilePrefix);
-    }
-
-    delete rhs;
-    delete lhs;
-}
-
-
 //! \brief check for simulation relation of two given OGs while covering all external transitions
 //! \param OGsFromFiles a list containing exactly two OGs
 void checkCovSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
@@ -1811,7 +1770,7 @@ int main(int argc, char** argv) {
     // ********                       (all OGs read first)                       ********
     // **********************************************************************************
 
-    if (parameters[P_PRODUCTOG] || parameters[P_SIMULATES_WITH_COV] || // parameters[P_FILTER] ||
+    if (parameters[P_PRODUCTOG] || parameters[P_SIMULATES_WITH_COV] ||
         parameters[P_SIMULATES] || (parameters[P_EX] && !options[O_BDD])) {// || parameters[P_READ_OG]) {
 
         // reading all OG-files
@@ -1861,12 +1820,6 @@ int main(int argc, char** argv) {
             checkEquivalence(OGsFromFiles);
             return 0;
         }
-
-//        if (parameters[P_FILTER]) {
-//            // filtration on OG
-//            filterOG(OGsFromFiles);
-//            return 0;
-//        }
     }
 
     // **********************************************************************************

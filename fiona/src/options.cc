@@ -178,9 +178,6 @@ void print_help() {
   trace("                                   distributed - checks a given oWFN for\n");
   trace("                                                 distributed controllability\n");
   trace("                                   readOG      - only reads a given OG File\n");
-//  trace("                                   filter      - reduces the first OG such that\n");
-//  trace("                                                 it simulates the second OG\n");
-//  trace("                                                 (if possible)\n");
   trace(" -m | --messagebound=<level> ... set maximum number of same messages per\n");
   trace("                                 state to <level>  (default is 1)\n");
 //  trace(" -e | --eventsmaximum=<level> .. set event to occur at most <level> times\n");
@@ -344,7 +341,6 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_COUNT_SERVICES] = false;
     parameters[P_DISTRIBUTED] = false;
     parameters[P_READ_OG] = false;
-//    parameters[P_FILTER] = false;
     parameters[P_REDUCE] = false;
     parameters[P_NORMALIZE] = false;
     parameters[P_MATCH_PARTNER] = false;
@@ -520,9 +516,6 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
                     parameters[P_READ_OG] = true;
-//                } else if (lc_optarg == "filter") {
-//                    parameters[P_FILTER] = true;
-//                    parameters[P_IG] = false; 
                 } else if (lc_optarg == "reduce") {
                     if (globals::reduction_level == 0) {
                         globals::reduction_level =5;
@@ -858,12 +851,6 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
-//    if (parameters[P_FILTER] && ogfiles.size() != 2) {
-//        cerr << "Error: \t If option -t filter is used, exactly two OG files must be entered\n" << endl;
-//        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-//        exit(1);
-//    }
-
     if (parameters[P_READ_OG] && ogfiles.size() < 1) {
         cerr << "Error: \t If option -t readOG is used, at least one OG file must be entered\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
@@ -892,7 +879,7 @@ void parse_command_line(int argc, char* argv[]) {
         options[O_PV_MULTIPLE_DEADLOCKS] = false;
     }
 
-    if (!parameters[P_PRODUCTOG] && !parameters[P_SIMULATES] && !parameters[P_SIMULATES_WITH_COV] && // !parameters[P_FILTER] && 
+    if (!parameters[P_PRODUCTOG] && !parameters[P_SIMULATES] && !parameters[P_SIMULATES_WITH_COV] &&
         !parameters[P_EX] && options[O_OUTFILEPREFIX] && (ogfiles.size() > 1 || netfiles.size() > 1)) {
         cerr << "Error: \t The output option cannot be used if multiple output files are to be created!\n" << endl;
         exit(1);

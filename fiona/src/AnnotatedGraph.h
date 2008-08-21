@@ -132,12 +132,6 @@ class AnnotatedGraph : public Graph {
                                    GraphFormulaCNF* myCovConstraint,
                                    GraphFormulaCNF* simCovConstraint);
 
-        /// filters the current OG through a given OG below myNode (rhsNode respectively)
-        /// in such a way, that the complete OG given as the operand simulates the current OG
-        void filterRecursive(AnnotatedGraphNode* myNode,
-                             AnnotatedGraphNode* rhsNode,
-                             set<AnnotatedGraphNode*>* VisitedNodes);
-
         //! Create the formula describing the structure of the subgraph under the given node through events
         //! NOTE: graph has to be acyclic!
         GraphFormulaMultiaryAnd* createStructureFormulaRecursively(AnnotatedGraphNode*);
@@ -368,10 +362,6 @@ class AnnotatedGraph : public Graph {
 
         /// checks, whether this AnnotatedGraph simulates the given simulant while covering all interface transitions
         bool covSimulates(AnnotatedGraph* smallerOG);
-
-        /// filters the current OG through a given OG in such a way,
-        /// that the filtered current OG simulates the opernad og;
-        void filter(AnnotatedGraph* rhsOG);
 
         /// computes the number of Services determined by this OG
         unsigned int numberOfServices();

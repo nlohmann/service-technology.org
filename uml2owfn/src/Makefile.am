@@ -61,10 +61,10 @@ uml2owfn_SOURCES = uml2owfn.cc \
 
 
 # These sources have to be present before the rest is compiled.
-#BUILT_SOURCES = frontend-parser.cc
+BUILT_SOURCES = frontend-parser.cc
 
 # These files have to be distributed to compile without compiler generators.
-#EXTRA_DIST = frontend-parser.h
+EXTRA_DIST = frontend-parser.h
 
 
 

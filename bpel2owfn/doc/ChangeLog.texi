@@ -32,6 +32,22 @@
 @item added Makefile targets @option{patch} and @option{patched} to create and apply patches against the Gna! subversion repository (@url{https://gna.org/svn/?group=service-tech})
 
 @item added a parameter @option{decomp} and implemented rudimentary decomposition support
+
+@item removed unnecessary files @file{getopt.h}, @file{getopt.c}, and @file{getopt1.c} from @file{src} directory
+
+@item overworked the test cases
+
+@item added code coverage checks using LTP LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}); checks can be invoked in directory @file{tests} with @command{make prepare-cover cover}
+
+@item when static analysis checks [SA00007], [SA00077], or [SA00078] fail, the @code{error()} function is called instead of letting BPEL2oWFN run towards a possible segmentation fault
+
+@item completed task #6133 (@url{http://gna.org/task/?6133}): print number of partner links after parsing
+
+@item fixed a bug that occurred when BPEL2oWFN read a file from standard input
+
+@item cleaned Makefiles (removed explicit rules that were covered by implicit rules)
+
+@item removed maintainer scripts for Fink and RPM
 @end itemize
 
 

@@ -186,7 +186,8 @@ void show_process_information()
   cerr << globals::process_information.event_handlers << " EH) + ";
   cerr << globals::process_information.implicit_handlers << " implicit handlers" << endl;
 
-  cerr << globals::process_information.links << " links, ";
+  cerr << globals::process_information.partner_links << " partner links, ";
+  cerr << globals::process_information.links << " control links, ";
   cerr << globals::process_information.variables << " variables" << endl;
 
   cerr << endl;
@@ -628,7 +629,8 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	break; }
 
     case(7):
-      { cerr << "<compensateScope> activity must only be used within an FTC-handler" << endl;
+      { cerr << "<compensateScope> activity must only be used within an FTC-handler (critical)" << endl;
+          error();
 	break; }
 
     case(8):
@@ -784,11 +786,13 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	break; }
 
     case(77):
-      { cerr << "<scope> `" << information << "' is not immediately enclosed to current scope" << endl;
+      { cerr << "<scope> `" << information << "' is not immediately enclosed to current scope (critical)" << endl;
+          error();
 	break; }
 
     case(78):
-      { cerr << "`" << information << "' does not refer to a <scope> or an <invoke> activity" << endl;
+      { cerr << "`" << information << "' does not refer to a <scope> or an <invoke> activity (critical)" << endl;
+          error();
 	break; }
 
     case(79):

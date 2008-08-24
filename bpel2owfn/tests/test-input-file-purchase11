@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="bpel2owfn --input=$testdir/testfiles/purchase.bpel"
+echo ""
+echo "test: reading BPEL4WS 1.1 executable process (purchaseOrderProcess)"
+echo "      $command"
+$command &> /dev/null

@@ -391,7 +391,7 @@ UB     			[\200-\277]
 
 
  /* end of input file */
-<<EOF>>				{ return EOF; }
+<*><<EOF>>				{ return EOF; }
 
 
  /* anything else */

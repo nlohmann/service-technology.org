@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="bpel2owfn --input=$testdir/testfiles/purchaseOrderProcess.bpel --mode=petrinet --format=pep --output=purchaseOrderProcess"
+echo ""
+echo "test: Petri net file output: PEP format"
+echo "      $command"
+$command &> /dev/null

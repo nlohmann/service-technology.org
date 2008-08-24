@@ -927,6 +927,13 @@ int main( int argc, char *argv[])
         }
       }
   
+      
+      // in case we are reading from standard input, we are done now
+      if(globals::filename == "<STDIN>") {
+        break;
+      }
+      
+
       file++;
   
     } while (modus == M_CHOREOGRAPHY && file != inputfiles.end());
@@ -946,7 +953,7 @@ int main( int argc, char *argv[])
     cerr << "==============================================================================" << endl << endl;
 
   // everything went fine
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 

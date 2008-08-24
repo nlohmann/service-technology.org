@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="bpel2owfn --input=$testdir/bpel4chor/chor_paper_traveler.bpel --input=$testdir/bpel4chor/chor_paper_airline.bpel --input=$testdir/bpel4chor/chor_paper_traveler.bpel --topology=$testdir/bpel4chor/chor_paper_topology1.xml --mode=choreography --parameter=communicationonly --output=choreography1 --format=owfn"
+echo ""
+echo "test: BPEL4Chor choreography with 1 instance"
+echo "      $command"
+$command &> /dev/null

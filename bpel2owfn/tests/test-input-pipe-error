@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="cat $testdir/testfiles/error.bpel | bpel2owfn"
+echo ""
+echo "test: pipe input"
+echo "      $command"
+cat $testdir/testfiles/error.bpel | bpel2owfn &> /dev/null

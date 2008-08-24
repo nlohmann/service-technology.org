@@ -93,6 +93,7 @@ struct s_process_information
   unsigned int links;
   unsigned int implicit_activities;
   unsigned int implicit_handlers;
+  unsigned int partner_links;
 };
 
 

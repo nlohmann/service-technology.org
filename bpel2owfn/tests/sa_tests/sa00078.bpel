@@ -1,15 +1,15 @@
 <process name="SA00078" targetNamespace="none">
     
     <faultHandlers>
-	<catchAll>
-	    <sequence>
-		<compensateScope target="B" />
-	    </sequence>
-	</catchAll>
+        <catchAll>
+            <sequence>
+                <compensateScope target="B" />
+            </sequence>
+            </catchAll>
     </faultHandlers>
 
     <scope name="A">
-	    <empty />
+        <empty />
     </scope>
 
 </process>

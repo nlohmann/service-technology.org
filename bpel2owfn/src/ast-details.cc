@@ -144,6 +144,9 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype) :
       case(K_IF):
       case(K_FOREACH):
         globals::process_information.structured_activities++; break;
+            
+      case(K_PARTNERLINK):
+        globals::process_information.partner_links++; break;
     }
   }
   else

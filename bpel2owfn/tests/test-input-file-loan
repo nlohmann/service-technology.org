@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="bpel2owfn --input=$testdir/testfiles/loanApprovalProcess.bpel"
+echo ""
+echo "test: reading WS-BPEL 2.0 executable process (loanApprovalProcess)"
+echo "      $command"
+$command &> /dev/null

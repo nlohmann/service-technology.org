@@ -1,41 +1,12 @@
-#############################################################################
-# GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
-#
-# Copyright (C) 2006, 2007  Niels Lohmann,
-#                           Christian Gierds, and
-#                           Martin Znamirowski
-# Copyright (C) 2005        Niels Lohmann and
-#			    Christian Gierds
-#
-# GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation; either version 3 of the License, or (at your option) any
-# later version.
-#
-# GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# GNU BPEL2oWFN; if not, see http://www.gnu.org/licenses or write to the Free
-# Software Foundation,Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA 02110-1301  USA.
-#############################################################################
-
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([GNU BPEL2oWFN],[2.04],[bpel2owfn-bug@gnu.org],[bpel2owfn])
+AC_INIT([GNU BPEL2oWFN],[2.04-unreleased],[bpel2owfn-bug@gnu.org],[bpel2owfn])
 AM_INIT_AUTOMAKE
 
 
 # Set directories.
 AC_CONFIG_SRCDIR(src/bpel2owfn.cc)
 AC_CONFIG_HEADERS(src/config.h)
-
-
-# The next line has to be un-commented before releasing version.
-#AC_DEFINE(NDEBUG,1,[The release version does not need assert-calls.])
 
 
 # Compute the canonical build-system type variable, build, and its three
@@ -46,8 +17,6 @@ AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
 
 # Checks for C/C++ details.
 AC_PROG_CXX
-AC_PROG_CC
-AM_PROG_CC_C_O
 
 
 # Checks for header files and functions.
@@ -81,11 +50,7 @@ AC_CONFIG_FILES([Makefile \
 	  man/Makefile \
 	  tests/Makefile \
 	  gui/static_release.sh \
-	  maintainer/fink/bpel2owfn.info \
-	  maintainer/fink/create_fink_package.sh \
-	  maintainer/gnu/Makefile \
-	  maintainer/rpm/Makefile \
-	  maintainer/rpm/bpel2owfn.spec
+	  maintainer/gnu/Makefile
 	  ])
 
 AC_OUTPUT
@@ -93,4 +58,3 @@ AC_OUTPUT
 
 # fix permissions of generated shell scripts
 chmod a+x gui/static_release.sh
-chmod a+x maintainer/fink/create_fink_package.sh

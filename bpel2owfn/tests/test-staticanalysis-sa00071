@@ -1,0 +1,7 @@
+# /bin/bash
+
+command="bpel2owfn -mcfg --input=$testdir/sa_tests/sa00071.bpel"
+echo ""
+echo "test: static analysis test [SA00071]"
+echo "      $command"
+$command &> /dev/null

@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="bpel2owfn --input=$testdir/testfiles/purchaseOrderProcess.bpel --mode=petrinet --format=pnml --output=purchaseOrderProcess"
+echo ""
+echo "test: Petri net file output: PNML format"
+echo "      $command"
+$command &> /dev/null

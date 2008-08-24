@@ -61,6 +61,7 @@ INSTALLATION
      * Bison (http://www.gnu.org/software/bison)
      * Kimwitu++ (http://www.nongnu.org/kimwitu-pp)
      * Gengetopt (http://www.gnu.org/software/gengetopt)
+     * help2man (http://www.gnu.org/software/help2man)
 
 
 DOCUMENTATION

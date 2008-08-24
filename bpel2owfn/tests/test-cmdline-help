@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="bpel2owfn --help"
+echo ""
+echo "test: help output"
+echo "      $command"
+$command &> /dev/null

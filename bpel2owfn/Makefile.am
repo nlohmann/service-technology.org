@@ -1,30 +1,5 @@
-#############################################################################
-# GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
-#
-# Copyright (C) 2006, 2007  Niels Lohmann,
-#                           Christian Gierds, and
-#                           Martin Znamirowski
-# Copyright (C) 2005        Niels Lohmann and
-#			    Christian Gierds
-#
-# GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation; either version 3 of the License, or (at your option) any
-# later version.
-#
-# GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# GNU BPEL2oWFN; if not, see http://www.gnu.org/licenses or write to the Free
-# Software Foundation,Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA 02110-1301  USA.
-#############################################################################
-
 # Where else are Makefiles?
-SUBDIRS = src tests doc maintainer/gnu maintainer/rpm man
+SUBDIRS = src tests doc maintainer/gnu man
 
 
 ##################################
@@ -90,7 +65,7 @@ cvs-clean: maintainer-clean
 	-rm -f src/config.h.in src/config.h.in~
 	-rm -f -r src/.deps src/doc
 	-rm -f tests/Makefile.in
-	-rm -f maintainer/rpm/Makefile.in maintainer/gnu/Makefile.in
+	-rm -f maintainer/gnu/Makefile.in
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
 	@echo "  aclocal"
@@ -123,21 +98,3 @@ patched: *.patch
 	@echo "         Otherwise, press return to continue. You have been warned."
 	@read
 	@patch -p0 -i $< && echo "applied patch $<"
-
-
-#####################################
-# Targets to create and RPM package #
-#####################################
-
-#  Produce an rpm package using dist or from the given tarball
-#  Usage:
-#    make rpm-dist
-#    make release=1 rpm-dist
-#    make rpm-this
-#    make version=2.3.22 release=2 rpm-this
-#    make rpm-dist cparams='--enable-kanji --quiet' mparams='CFLAGS="-O2 -g"'
-
-rpm-dist: dist rpm-this
-
-rpm-this:
-	(cd rpm && $(MAKE) $(AM_MAKEFLAGS) rpm) || exit 1

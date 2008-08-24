@@ -1,33 +1,53 @@
-#############################################################################
-# GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
-#
-# Copyright (C) 2006, 2007  Niels Lohmann,
-#                           Christian Gierds, and
-#                           Martin Znamirowski
-# Copyright (C) 2005        Niels Lohmann and
-#			    Christian Gierds
-#
-# GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation; either version 3 of the License, or (at your option) any
-# later version.
-#
-# GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# GNU BPEL2oWFN; if not, see http://www.gnu.org/licenses or write to the Free
-# Software Foundation,Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA 02110-1301  USA.
-#############################################################################
-
 bin_PROGRAMS = bpel2owfn
 
-#########
-# flags #
-#########
+
+#######################
+# the list of sources #
+#######################
+
+# These files are actually compiled and linked for BPEL2oWFN (except the
+# frontend files: for them C++ code is generated).
+bpel2owfn_SOURCES = $(KCSOURCES) \
+		    frontend-parser.yy \
+		    frontend-parser-owfn.yy \
+		    frontend-parser-pnml.yy \
+		    frontend-parser-chor.yy \
+		    frontend-parser-wsdl.yy \
+		    frontend-lexer.ll \
+		    frontend-lexer-owfn.ll \
+     	    frontend-parser.h frontend-parser-owfn.h \
+		    bpel2owfn.cc \
+		    globals.cc globals.h \
+		    debug.cc debug.h \
+		    colorconsole.h \
+		    helpers.cc helpers.h \
+		    cfg.cc cfg.h \
+		    options.cc options.h \
+		    ast-tools.cc ast-tools.h \
+		    ast-details.cc ast-details.h \
+		    extension-wsdl.cc extension-wsdl.h \
+		    extension-chor.cc extension-chor.h \
+		    pnapi.h petrinet.h petrinet.cc \
+		    petrinet-output.cc petrinet-reduction.cc \
+		    cmdline.cc cmdline.h
+
+# These sources have to be present before the rest is compiled.
+BUILT_SOURCES = $(KCDUMMY) \
+		frontend-parser.cc \
+		frontend-parser-chor.cc \
+		frontend-parser-wsdl.cc \
+		frontend-parser-owfn.cc \
+		frontend-parser-pnml.cc \
+		cmdline.cc
+
+# These files have to be distributed to compile without compiler generators.
+EXTRA_DIST = $(KCDUMMY) $(KCFILES_TEMP) $(KCFILES_NECESSARY) \
+	         cmdline.ggo
+
+
+##########################################
+# everything about the Kimwitu++ sources #
+##########################################
 
 # define flags for Kimwitu++:
 #  - create a file "ast-system-yystype.h" for Flex and Bison
@@ -35,12 +55,6 @@ bin_PROGRAMS = bpel2owfn
 #  - suffix all generated files with "cc"
 #  - do not create functions for phylum I/O
 KCFLAGS = --yystype --file-prefix=ast-system- --suffix=cc --no-csgio
-
-
-
-##########################################
-# everything about the Kimwitu++ sources #
-##########################################
 
 # a dummy file to use Makefile's timestamps
 KCDUMMY = .timestamp
@@ -78,71 +92,21 @@ $(KCDUMMY): $(KCFILES_NECESSARY) $(KCFILES_TEMP)
 	-rm $(KCFILES_TEMP:.k=.cc) $(KCFILES_TEMP:.k=.h)
 
 
-
-#######################
-# the list of sources #
-#######################
-
-# These files are actually compiled and linked for BPEL2oWFN (except the
-# frontend files: for them C++ code is generated).
-bpel2owfn_SOURCES = $(KCSOURCES) \
-		    frontend-parser.yy \
-		    frontend-parser-owfn.yy \
-		    frontend-parser-pnml.yy \
-		    frontend-lexer.ll \
-		    frontend-lexer-owfn.ll \
-		    frontend-parser-chor.yy \
-		    frontend-parser-wsdl.yy \
-		    bpel2owfn.cc \
-		    globals.cc globals.h \
-		    debug.cc debug.h \
-		    colorconsole.h \
-		    helpers.cc helpers.h \
-		    cfg.cc cfg.h \
-		    options.cc options.h \
-		    getopt.h getopt.c getopt1.c \
-		    ast-tools.cc ast-tools.h \
-		    ast-details.cc ast-details.h \
-		    extension-wsdl.cc extension-wsdl.h \
-		    extension-chor.cc extension-chor.h \
-		    pnapi.h petrinet.h petrinet.cc \
-		    petrinet-output.cc petrinet-reduction.cc \
-		    cmdline.c cmdline.h
-
-# These sources have to be present before the rest is compiled.
-BUILT_SOURCES = $(KCDUMMY) \
-		frontend-parser.cc \
-		frontend-parser-chor.cc \
-		frontend-parser-wsdl.cc \
-		frontend-parser-owfn.cc \
-		frontend-parser-pnml.cc \
-		cmdline.c
-
-# These files have to be distributed to compile without compiler generators.
-EXTRA_DIST = $(KCDUMMY) \
-	     $(KCFILES_TEMP) \
-	     $(KCFILES_NECESSARY) \
-	     frontend-parser.h frontend-parser-owfn.h \
-	     cmdline.ggo
-
-	     
 ################################################################
 # use GNU gengetopt to create command line parser
 ################################################################
-cmdline.c: cmdline.ggo
-	$(GENGETOPT) --input=cmdline.ggo --long-help --include-getopt --show-required --unamed-opts
+cmdline.cc: cmdline.ggo
+	$(GENGETOPT) --input=cmdline.ggo --long-help --include-getopt --show-required --unamed-opts --c-extension=cc
 
 
 ############################
 # organization of cleaning #
 ############################
 
-# always clean the files generated by Kimwitu++, Flex and Bison
-MAINTAINERCLEANFILES = $(KCSOURCES) \
-		       $(KCDUMMY) \
-		       frontend-parser.h frontend-parser.cc frontend-lexer.cc \
-		       Doxyfile \
-		       cmdline.c cmdline.h
+# remove files generated by gcov
+CLEANFILES = *.gcda *.gcno
 
-veryclean: clean
-	-rm $(KCSOURCES) $(KCDUMMY) frontend-parser.cc frontend-lexer.cc
+# always clean the files generated by Kimwitu++, Bison, and gengetopt
+MAINTAINERCLEANFILES = $(KCSOURCES) $(KCDUMMY) \
+		       frontend-parser.h frontend-parser-owfn.h\
+		       cmdline.h

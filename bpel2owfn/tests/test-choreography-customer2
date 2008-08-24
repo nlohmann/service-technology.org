@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer1.bpel --mode=choreography --format=lola --parameter=communicationonly --parameter=reduce --output=coffee_customer2"
+echo ""
+echo "test: user-defined choreography, customer 2"
+echo "      $command"
+$command &> /dev/null

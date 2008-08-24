@@ -1,0 +1,7 @@
+#! /bin/bash
+
+command="bpel2owfn --input=$testdir/testfiles/purchaseOrderProcess.bpel --mode=petrinet --format=ina --output=purchaseOrderProcess"
+echo ""
+echo "test: Petri net file output: INA format"
+echo "      $command"
+$command &> /dev/null

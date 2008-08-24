@@ -29,7 +29,7 @@ bpel2owfn_SOURCES = $(KCSOURCES) \
 		    extension-chor.cc extension-chor.h \
 		    pnapi.h petrinet.h petrinet.cc \
 		    petrinet-output.cc petrinet-reduction.cc \
-		    cmdline.cc cmdline.h
+		    cmdline.c cmdline.h
 
 # These sources have to be present before the rest is compiled.
 BUILT_SOURCES = $(KCDUMMY) \
@@ -38,7 +38,7 @@ BUILT_SOURCES = $(KCDUMMY) \
 		frontend-parser-wsdl.cc \
 		frontend-parser-owfn.cc \
 		frontend-parser-pnml.cc \
-		cmdline.cc
+		cmdline.c
 
 # These files have to be distributed to compile without compiler generators.
 EXTRA_DIST = $(KCDUMMY) $(KCFILES_TEMP) $(KCFILES_NECESSARY) \
@@ -95,8 +95,8 @@ $(KCDUMMY): $(KCFILES_NECESSARY) $(KCFILES_TEMP)
 ################################################################
 # use GNU gengetopt to create command line parser
 ################################################################
-cmdline.cc: cmdline.ggo
-	$(GENGETOPT) --input=cmdline.ggo --long-help --include-getopt --show-required --unamed-opts --c-extension=cc
+cmdline.c: cmdline.ggo
+	$(GENGETOPT) --input=cmdline.ggo --long-help --include-getopt --show-required --unamed-opts
 
 
 ############################

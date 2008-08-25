@@ -328,7 +328,6 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_SYNTHESIZE_PARTNER_OWFN] = false;
     parameters[P_PRODUCTOG] = false;
     parameters[P_SIMULATES] = false;
-    parameters[P_SIMULATES_WITH_COV] = false;
     parameters[P_EX] = false;
     parameters[P_EQ_R] = false;
     parameters[P_ADAPTER] = false;
@@ -453,9 +452,6 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_SHOW_EMPTY_NODE] = true;
                 } else if (lc_optarg == "simulation") {
                     parameters[P_SIMULATES] = true;
-                    parameters[P_IG] = false;
-                } else if (lc_optarg == "cover_simulation") {
-                    parameters[P_SIMULATES_WITH_COV] = true;
                     parameters[P_IG] = false;
                 } else if (lc_optarg == "equivalence") {
                     // using BDDs or OGs/oWFNs
@@ -845,12 +841,6 @@ void parse_command_line(int argc, char* argv[]) {
         exit(1);
     }
 
-    if (parameters[P_SIMULATES_WITH_COV] && ((netfiles.size() + ogfiles.size()) != 2)) {
-        cerr << "Error: \t If option -t cover_simulation is used, exactly two OG/oWFN files must be entered\n" << endl;
-        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
-    }
-
     if (parameters[P_READ_OG] && ogfiles.size() < 1) {
         cerr << "Error: \t If option -t readOG is used, at least one OG file must be entered\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
@@ -879,7 +869,7 @@ void parse_command_line(int argc, char* argv[]) {
         options[O_PV_MULTIPLE_DEADLOCKS] = false;
     }
 
-    if (!parameters[P_PRODUCTOG] && !parameters[P_SIMULATES] && !parameters[P_SIMULATES_WITH_COV] &&
+    if (!parameters[P_PRODUCTOG] && !parameters[P_SIMULATES] &&
         !parameters[P_EX] && options[O_OUTFILEPREFIX] && (ogfiles.size() > 1 || netfiles.size() > 1)) {
         cerr << "Error: \t The output option cannot be used if multiple output files are to be created!\n" << endl;
         exit(1);

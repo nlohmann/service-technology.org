@@ -65,11 +65,6 @@ class AnnotatedGraph : public Graph {
         /// Type of container passed to AnnotatedGraph::getProductOGFilePrefix().
         typedef std::list<std::string> ogfiles_t;
 
-        typedef set<std::string> EdgeSet;
-
-        /// Type of container of transitions associated to each label
-        typedef map<string, EdgeSet> TransitionMap;
-
         /// Type of container of nodes stored in this graph
         typedef std::vector<AnnotatedGraphNode*> nodes_t;
 
@@ -88,8 +83,6 @@ class AnnotatedGraph : public Graph {
 
         /// A pointer to the root node
         AnnotatedGraphNode* root;
-
-        GraphFormulaCNF* covConstraint;
 
         /// The nodes stored in this graph. Not a set on this level but a vector.
         nodes_t setOfNodes; // needed for proper deletion of OG.
@@ -123,14 +116,6 @@ class AnnotatedGraph : public Graph {
                                    set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes,
                                    AnnotatedGraph* leftOG,
                                    AnnotatedGraph* rightOG);
-
-        /// checks, whether the part of an AnnotatedGraph below myNode simulates
-        /// the part of an AnnotatedGraph below simNode while covering all interface transitions
-        bool covSimulatesRecursive(AnnotatedGraphNode* myNode,
-                                   AnnotatedGraphNode* simNode,
-                                   set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> >& visitedNodes,
-                                   GraphFormulaCNF* myCovConstraint,
-                                   GraphFormulaCNF* simCovConstraint);
 
         //! Create the formula describing the structure of the subgraph under the given node through events
         //! NOTE: graph has to be acyclic!
@@ -360,9 +345,6 @@ class AnnotatedGraph : public Graph {
         bool isEquivalent(AnnotatedGraphNode* leftNode,
                           AnnotatedGraphNode* rightNode);
 
-        /// checks, whether this AnnotatedGraph simulates the given simulant while covering all interface transitions
-        bool covSimulates(AnnotatedGraph* smallerOG);
-
         /// computes the number of Services determined by this OG
         unsigned int numberOfServices();
 
@@ -374,20 +356,6 @@ class AnnotatedGraph : public Graph {
 
         /// a function needed for successful deletion of the graph
         void clearNodeSet();
-
-        /// Get all transitions from the graph, each associated to a specific label
-        TransitionMap getTransitionMap();
-
-        /// Get all transitions from the graph with a label from the given set, each associated to a specific label
-        /// NULL refers to covering the whole interface set
-        TransitionMap getTransitionMap(set<string>* labels);
-
-        /// Create the formula describing the coverability criteria when covering labels in the given set.
-        void createCovConstraint(set<string>* labels = NULL);
-
-        //! Create the formula describing the structure of the complete graph through events
-        //! NOTE: graph has to be acyclic!
-        GraphFormulaMultiaryAnd* createStructureFormula();
 
         /// Computes and prints the statistics for this graph.
         void computeAndPrintGraphStatistics();

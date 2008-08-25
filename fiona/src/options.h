@@ -78,7 +78,6 @@ typedef enum {
     P_SYNTHESIZE_PARTNER_OWFN,  //!< compute an oWFN from the IG/OG
     P_PRODUCTOG,                //!< compute the product of 2 OGs
     P_SIMULATES,                //!< Check whether an OG simulates another
-    P_SIMULATES_WITH_COV,       //!< Check whether an OG simulates another including coverage formulas
     P_EX,                       //!< check equivalence (former exchangability) of two OGs 
     P_EQ_R,                     //!< equivalence of two graphs (with -R and without -R), but the two graphs are computed automatically
     P_MATCH_PARTNER,            //!< first create a most permissive partner and then check for matching.

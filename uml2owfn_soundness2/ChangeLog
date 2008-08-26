@@ -3,6 +3,9 @@ ChangeLog for UML2oWFN
 Version 1.03 (in progress)
 ============
 
++ overrode the Petri net reduction method in the ExtendedWorkflowNet class, now implementing reduce_series_places (level 1) and reduce_identical_places (level 3)
++ moved re-implementation of reduce_series_places and reduce_series_transitions to ExtendedWorkflowNet and restored the original implementation
++ added routine to remove empty output pinsets which is needed for a deadlock-based soundness analysis of Petri nets, the routine is not used in this version because for BOM processes, only the modelchecking-based soundness analysis yields correct results (the inner of the process must be empty).
 + changed task file naming scheme to 'net.lola.<tasktype>.task'
 + added parameter "-a safe" to check for safeness of a net using LoLA with state predicates, this parameter can be used together with "-a soundness" and "-a deadlocks"
 + worked on bug #12160: PNAPI: Petri net reduction rules do not preserve (un)-safeness, disallowing place/transition fusion if places/transitions are together in the preset/postset of another transition/place 

@@ -1,8 +1,8 @@
 /*****************************************************************************\
   UML2oWFN - Petri Net API workflow extension.
-  
+
   Copyright (C) 2008 Dirk Fahland
-  
+
   UML2oWFN is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the Free
   Software Foundation; either version 3 of the License, or (at your option) any
@@ -54,10 +54,16 @@
 
 class ExtendedWorkflowNet: public PetriNet {
 	friend class Block;
-	
+
 public:
 	set< Node* > isFreeChoice() const; ///< check whether this net is a free-choice net
 	Node* isPathCovered() const; ///< check whether every node of the net is on a path from alpha to omega
+
+	unsigned int reduce(unsigned int reduction_level);
+
+private:
+  void reduce_series_places();
+  void reduce_series_transitions();
 };
 
 

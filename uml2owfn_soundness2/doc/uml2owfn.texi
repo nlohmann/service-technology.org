@@ -128,7 +128,8 @@ UML2oWFN was written by Martin Znamirowski (@email{znamirow@@informatik.hu-berli
 @item To prepare the soundness analysis you need three different binaries of the Low-Level Net Analyzer (LoLA, @url{http:// }) to be accessible from the command-line. (1) @file{lola-mc} - LoLA compiled with MODELCHECKING, (2) @file{lola-dl} - LoLA compiled with DEADLOCK, and (3) @file{lola-full} - LoLA compiled with FULL; each with CAPACITY 1 and CHECKCAPACITY. The analysis script files rely on these model checkers. 
 
 
-@item Translate the library @file{lib.xml} you want to verify with the following command-line arguments
+@item Translate the library @file{lib.xml} you want to verify with the
+following command-line arguments
 
 @cartouche
 @smallexample
@@ -137,9 +138,10 @@ uml2owfn -i lib.xml -f lola -a soundness -a deadlocks -a safe -p filter -p log -
 @end cartouche
 
 This creates a set of @file{lib.XXX__YYY.lola} files where @samp{YYY} is the name
-of a process, and @samp{XXX} its containing catalog. Each @file{lib.XXX__YYY.lola} file get additionally a
-@file{lib.XXX__YYY_safe.task} file to check for safeness of the net, and depending
-on the net structure a @file{lib.XXX__YYY_fin.task} file to check for the
+of a process, and @samp{XXX} its containing catalog. Each @file{lib.XXX__YYY.lola}
+file gets additionally a
+@file{lib.XXX__YYY.lola.safe.task} file to check for safeness of the net, and
+depending on the net structure a @file{lib.XXX__YYY_fin.task} file to check for the
 reachability of a `good' final state. Additionally the file
 @file{uml2owfn_lib.log} is written which contains structural analysis results of
 the files.  The files @file{translate.log} and 

@@ -316,6 +316,11 @@ void reportOptionValues() {
         trace(TRACE_0, "interface message bound set to: "
                         + intToString(messages_manual) + "\n");
     }
+    
+    if (parameters[P_RESPONSIVE]) {
+    	trace(TRACE_0, "\ncalculation of responsive partner(s)\n");
+    }
+    
     trace(TRACE_0, "\n");
 }
 
@@ -522,7 +527,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
             casted->returnInterface(inputs,outputs);
         }
 
-        // create new petrinet for transforming public view to oWFN
+        //transform to owfn
         PNapi::PetriNet* PVoWFN = new PNapi::PetriNet();
         PVoWFN->set_format(PNapi::FORMAT_OWFN, true);
         cleanPV->transformToOWFN(PVoWFN, inputs, outputs);
@@ -532,22 +537,17 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
         trace(PVoWFN->information());
         trace(TRACE_1, "\n");
 
-        // create the stream for the oWFN output, output oWFN and close stream
+        // create the stream for the owfn output
         ofstream output;
         const string owfnOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".pv.owfn";
         output.open (owfnOutput.c_str(),ios::out);
+
         (output) << (*PVoWFN);
         output.close();
-
-        // collect garbage
-        delete PVoWFN;
 
         trace(TRACE_0, "=================================================================\n");
         trace(TRACE_0, "\n");
     }
-
-    // collect garbage
-    delete cleanPV;
 }
 
 
@@ -1437,8 +1437,6 @@ void makePNG(oWFN* PN) {
             trace(TRACE_0, "error: Dot exited with non zero value! dort\n\n" + intToString(exitvalue));
         }
     }
-
-    delete PNapiNet;
 }
 
 
@@ -1985,7 +1983,7 @@ int main(int argc, char** argv) {
                 }
 
                 if (parameters[P_NORMALIZE]) {
-                    normalizeOWFN(PN); // normalize given net
+                    normalizeOWFN(PN);    // normalize given net
                 }
 
                 if (parameters[P_EQ_R]) {
@@ -2012,9 +2010,8 @@ int main(int argc, char** argv) {
                     
                 }            
                 
-                // deleting read net avoids memory leaks
-                delete PN;
-                trace(TRACE_5, "net deleted\n");
+                //delete PN;
+                //trace(TRACE_5, "net deleted\n");
             }
 
             // in case the option -t eqR is set, check equivalence for both computed graphs

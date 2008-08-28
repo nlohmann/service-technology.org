@@ -94,6 +94,7 @@ typedef enum {
     P_REDUCE,                   //!< reduce given oWFNs 
     P_NORMALIZE,                //!< normalize given oWFNs
     P_PARTNER_TEST,             //!< first synthesize a partner, then match it with the og. 
+    P_RESPONSIVE,				//!< generate responsive partners (IG/OG) using TSCCs
 
     P_SHOW_BLUE_NODES,          //!< show blue nodes only (empty node not shown though)
     P_SHOW_EMPTY_NODE,          //!< show all blue nodes (including empty node)

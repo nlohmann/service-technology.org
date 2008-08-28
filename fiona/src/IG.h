@@ -65,18 +65,18 @@ class interactionGraph : public CommunicationGraph {
         void calculateSendingAndReceivingEvents(AnnotatedGraphNode*, setOfMessages&, setOfMessages&);
 
         /// Calculates the set of receiving events without applying reduction rules.
-        void getReceivingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
+        void getReceivingEvents(State*, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
 
         /// Calculates the set of sending events without applying reduction rules.
-        void getSendingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&);
+        void getSendingEvents(State*, GraphFormulaMultiaryOr*, setOfMessages&);
 
         // reduction rules
 
         /// Calculates the set of receiving events using the "combine receiving events" rule
-        void combineReceivingEvents(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
+        void combineReceivingEvents(State *, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
 
         /// Calculates the set of sending events using the "receive before sending" rule
-        void receivingBeforeSending(StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&);
+        void receivingBeforeSending(State*, GraphFormulaMultiaryOr*, setOfMessages&);
 
 
 

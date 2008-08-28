@@ -45,15 +45,15 @@
 State::State() :
     		cardFireList(0), firelist(NULL), 
             quasiFirelist(NULL), current(0), my_entry(NULL), placeHashValue(0),
-            succ(NULL), parent(NULL), type(TRANS) {
+            succ(NULL), parent(NULL), type(TRANS), nexttar(NULL), prevtar(NULL) {
     
 	state_count++;
     state_count_stored_in_binDec++;
-    
-#ifdef TSCC
+
+    dfs = 0;
+    lowlink = 0;
     tarlevel = 0;
     repTSCC = false;
-#endif    
 }
 
 

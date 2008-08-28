@@ -632,53 +632,101 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
 
     if (options[O_CALC_ALL_STATES]) {
 
+    	// if parameter "responsive" is used, we consider TSCCs only and store which 
+    	// TSCC we have seen already
+    	// note: each TSCC has _at least_ one representative, it may have more than one though
+    	std::map<unsigned int, bool> visitedTSCCs;
+    	
         // NO state reduction
         // iterate over all states of the node
         for (iter = node->reachGraphStateSet.begin();
              iter != node->reachGraphStateSet.end(); iter++) {
 
-            if ( (*iter)->type == DEADLOCK ||
-                 (*iter)->type == FINALSTATE ||
-                 (*iter)->isNotAutonomouslyTransient() ) {
-
-                // we just consider the maximal states only
+        	// figure out, whether a clause shall be created for this state 
+        	bool useThisState = false;
+        	
+        	// if parameter "responsive" is not used
+        	if (!parameters[P_RESPONSIVE]) {
+        		useThisState = (*iter)->type == DEADLOCK ||
+                    				(*iter)->type == FINALSTATE ||
+                                    (*iter)->isNotAutonomouslyTransient(); 
+        	} else { // if parameter "responsive" is used, then we consider TSCCs only
+        		useThisState = ((*iter)->repTSCC && !visitedTSCCs[(*iter)->dfs]) ||
+                					(*iter)->isNotAutonomouslyTransient();
+        	}
+        	
+        	// we create a clause for the current state
+            if (useThisState) {
                 // get the marking of this state
                 (*iter)->decodeShowOnly(PN);
 
                 // this clause's first literal
                 GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
 
-                // in case of a final state we add special literal "final" to the clause
-                if ((*iter)->type == FINALSTATE) {
-                    if ((PN->FinalCondition) && (*iter)->cardFireList > 0) {
-                        cerr << "\n\t WARNING: found a finalstate which activates a transition";
-                        cerr << "\n\t          you shouldn't do this!"<< endl;
-
-                        // transient final states are ignored in annotation, just like
-                        // all other transient states
-                        delete myclause;
-                        continue;
-                    } else {
-                        node->hasFinalStateInStateSet = true;
-                        GraphFormulaLiteral * myliteral = new GraphFormulaLiteralFinal();
-                        myclause->addSubFormula(myliteral);
-                    }
-                }
-
                 // get all input events
                 for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
                     GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
                     myclause->addSubFormula(myliteral);
                 }
-
-                // get all activated output events
-                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-                    if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] > 0) {
-                        GraphFormulaLiteral * myliteral = new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
-                        myclause->addSubFormula(myliteral);
-                    }
+	            
+                // use a new reference of the currently considered state
+                State * currentState = (*iter);
+                
+                // if we are in responsive mode, remember which TSCC we are in
+                // (since current state is a representative of the TSCC it holds: dfs==lowlink)
+                if (parameters[P_RESPONSIVE]) {
+                	visitedTSCCs[currentState->dfs] = true;
                 }
+	            
+	            do {
+	            	// in case of a final state we add a special literal "final" to the clause
+	                if (currentState->type == FINALSTATE) {
+	                    cout << "it is final" << endl;
+	                	if ((PN->FinalCondition) && currentState->cardFireList > 0) {
+	                        cerr << "\n\t WARNING: found a finalstate which activates a transition";
+	                        cerr << "\n\t          you shouldn't do this!"<< endl;
+	
+	                        // transient final states are ignored in annotation, just like
+	                        // all other transient states
+	                       // delete myclause;
+	                        continue;
+	                    } else {
+	                        node->hasFinalStateInStateSet = true;
+	                        GraphFormulaLiteral * myliteral = new GraphFormulaLiteralFinal();
+	                        myclause->addSubFormula(myliteral);
+	                    }
+	                }
 
+	                // get all activated output events
+	                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
+	                    if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] > 0) {
+	                        GraphFormulaLiteral * myliteral = new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
+	                        myclause->addSubFormula(myliteral);
+	                    }
+	                }
+	                
+	                if (parameters[P_RESPONSIVE]) {
+		                // get next state of TSCC, make sure that we stay in this TSCC by
+	                	// comparing lowlink values
+		                if (currentState->nexttar && 
+		                		(currentState->lowlink == currentState->nexttar->lowlink)) {
+		                	currentState = currentState->nexttar;
+			                if (currentState) {
+			                	// and decode it first
+			                	currentState->decodeShowOnly(PN);
+			                }
+		                } else {
+		                	// we just left the TSCC, so get out of the loop as well
+		                	break;
+		                }
+	                }
+	              
+	                // since in responsive mode, we are in a loop, we have to check if the current
+	                // state is the one we have started with
+	                // if we are not in responsive mode, we get out of here, since the current state
+	                // stays the same
+	            } while (currentState && (currentState != (*iter)));
+	            
                 node->addClause(myclause);
             }
         }

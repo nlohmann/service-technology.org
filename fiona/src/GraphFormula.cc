@@ -398,7 +398,7 @@ void GraphFormulaMultiary::getEventLiterals(set<string>& events)  {
          iCurrentFormula != subFormulas.end();
          iCurrentFormula++) {
 
-        // gather the events of every singe subformula
+        // gather the events of every single subformula
         (*iCurrentFormula)->getEventLiterals(events);
     }
 
@@ -735,6 +735,24 @@ GraphFormulaMultiaryOr* GraphFormulaMultiaryOr::getDeepCopy() const {
     return newFormula;
 }
 
+//! \brief adds a given subformula to this clause
+//! \param subformula the subformula to be added
+void GraphFormulaMultiaryOr::addSubFormula(GraphFormula* subformula) {
+    trace(TRACE_5, "GraphFormulaMultiaryOr::addSubFormula: start\n");
+    
+    if (dynamic_cast<GraphFormulaLiteral*>(subformula)) {
+	    for (GraphFormulaMultiaryOr::iterator i = begin(); i != end(); i++) {
+	    	if (dynamic_cast<GraphFormulaLiteral*>(*i) &&
+	    			(dynamic_cast<GraphFormulaLiteral*>(*i)->asString() == 
+	    			dynamic_cast<GraphFormulaLiteral*>(subformula)->asString())) {
+	    		return ;
+	    	}
+	    }
+    }
+    subFormulas.push_back(subformula);
+    
+    trace(TRACE_5, "GraphFormulaMultiaryOr::addSubFormula: end\n");
+}
 
 //! \brief Returns the merged equivalent to this formula. Merging gets rid of
 //!        unnecessary nesting of subformulas. (a+(b+c)) becomes (a+b+c). The

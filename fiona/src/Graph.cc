@@ -459,8 +459,6 @@ void Graph::transformToOWFNRecursively(GraphNode* currentNode,
         // perform the recursion with all followernodes
         transformToOWFNRecursively(edge->getDstNode(), visitedNodes, finalNodeNames, PN, transitionNumber, t);
     }
-
-    delete edgeIter;
 }
 
 

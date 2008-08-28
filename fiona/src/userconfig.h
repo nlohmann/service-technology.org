@@ -13,7 +13,7 @@
 // enable Fiona to detect (T)SCC, when computing the reachability graph of each marking
 // the states shown in the nodes of the graphic are then annotated with information
 // about the SCC they are in and whether they are a representative of their SCC
-#define TSCC	
+//#define TSCC	
 
 // Select your operating system
 #define WINDOWS

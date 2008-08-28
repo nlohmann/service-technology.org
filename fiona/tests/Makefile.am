@@ -24,7 +24,7 @@ include $(top_srcdir)/Makefile.covcommon
 TESTS = slist.sh syntax.sh extrema.sh cyclic.sh messagebound.sh png.sh \
         countservices.sh falseannos.sh oWFNreduction.sh sim_og.sh \
         matching.sh productog.sh publicview.sh samples.sh partner.sh \
-        minimize.sh statesReduction.sh bddtest.sh
+        minimize.sh statesReduction.sh bddtest.sh responsive.sh
 
 check_PROGRAMS = slistcheck
 
@@ -213,7 +213,13 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              philosophers/phcontrol6.unf.owfn.png \
              philosophers/phcontrol7.unf.owfn.png \
              philosophers/phcontrol8.unf.owfn.png \
-             philosophers/phcontrol9.unf.owfn.png
+             philosophers/phcontrol9.unf.owfn.png \
+	     responsive/controllable_not_responsive_controllable.owfn \
+	     responsive/controllable_and_responsive_controllable.owfn \
+	     responsive/finalmarking_in_TSCC.owfn \
+	     responsive/2_TSCCs_in_1_node_with_communication_1.owfn \
+	     responsive/2_TSCCs_in_1_node_with_communication_2.owfn \
+	     responsive/cgvExample.owfn
 
 # Global check-loud target. Runs all tests. Output files are generated.
 check-loud:

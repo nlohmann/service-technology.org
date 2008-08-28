@@ -1,0 +1,99 @@
+{ a responsive net with 2 TSCCs in one node}
+
+PLACE
+INTERNAL
+  p0,
+  p1,
+  p2,
+  p3,
+  p4,
+  p5,
+  p6,
+  p7,
+  p8;
+
+INPUT
+  b,
+  c;
+
+OUTPUT
+  a,
+  d
+  ;
+
+INITIALMARKING
+  p0:	1;
+
+FINALMARKING
+  p8:	1;
+
+TRANSITION t1	 { !a }
+CONSUME
+  p0: 1;
+PRODUCE
+  p1 : 1,
+  a : 1;
+
+TRANSITION t2	 { \tau }
+CONSUME
+  p1:	1;
+PRODUCE
+  p2 : 1;
+
+TRANSITION t3	 { \tau }
+CONSUME
+  p1:	1;
+PRODUCE
+  p3 : 1;
+
+TRANSITION t4	 { \tau }
+CONSUME
+  p2:	1;
+PRODUCE
+  p4 : 1;
+
+TRANSITION t5	 { \tau }
+CONSUME
+  p3:	1;
+PRODUCE
+  p5 : 1;
+
+TRANSITION t6	 { \tau }
+CONSUME
+  p4 : 1;
+PRODUCE
+  p2 : 1;
+
+TRANSITION t7	 { \tau }
+CONSUME
+  p5 : 1;
+PRODUCE
+  p3 : 1;
+
+TRANSITION t8	 { ?b }
+CONSUME
+  p4:	1,
+  b : 1;
+PRODUCE
+  p6 : 1;
+
+TRANSITION t9	 { ?c }
+CONSUME
+  p5:	1,
+  b : 1;
+PRODUCE
+  p7 : 1;
+
+TRANSITION t10	 { !d }
+CONSUME
+  p6:	1;
+PRODUCE
+  p8 : 1,
+  d : 1;
+
+TRANSITION t11	 { !d }
+CONSUME
+  p7:	1;
+PRODUCE
+  p8 : 1,
+  d : 1;

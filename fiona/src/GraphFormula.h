@@ -175,7 +175,7 @@ class GraphFormulaMultiary : public GraphFormula {
         /// Type of the const iterator over subformulas.
         typedef subFormulas_t::const_iterator const_iterator;
 
-    private:
+    protected:
         /// Holds all subformulas of this multiary formula.
         subFormulas_t subFormulas;
 
@@ -338,6 +338,10 @@ class GraphFormulaMultiaryOr : public GraphFormulaMultiary {
         
         /// returns an empty formula equivalent
         virtual const GraphFormulaFixed& getEmptyFormulaEquivalent() const;
+        
+        /// intelligently adds a new subformula to the clause, if exactly the same
+        /// subformula already exists, the new one is not added
+        virtual void addSubFormula(GraphFormula*);
 
 #undef new
         /// Provides user defined operator new. Needed to trace all new operations

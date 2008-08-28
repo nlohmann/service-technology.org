@@ -160,6 +160,7 @@ void print_help() {
   trace("                                                 given set of services\n");
   trace("                                  smalladapter - calculate a small adapter for\n");
   trace("                                                 a given set of services\n");
+  trace("                                    responsive - create responsive partner(s)\n");
   trace("\n");
   trace("                                   png         - generate png files for all\n");
   trace("                                                 given oWFNs or OGs\n");
@@ -343,6 +344,7 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_REDUCE] = false;
     parameters[P_NORMALIZE] = false;
     parameters[P_MATCH_PARTNER] = false;
+    parameters[P_RESPONSIVE] = false;
 
     // -s parameters
     parameters[P_SHOW_BLUE_NODES] = true;
@@ -673,6 +675,8 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if (lc_optarg == "single") {
                     parameters[P_SINGLE] = true;
                     parameters[P_REPRESENTATIVE] = false;
+                } else if (lc_optarg == "responsive") {
+                    parameters[P_RESPONSIVE] = true;
                 } else {
                     cerr << "Error:\twrong parameter (option -p)" << endl
                     << "\tEnter \"fiona --help\" for more information.\n" << endl;
@@ -712,6 +716,13 @@ void parse_command_line(int argc, char* argv[]) {
         }
     }
 
+    // responsive partners can only be calculated if there is no state reduction
+    // in case, the graphs are to be calculated using state reduction, we set 
+    // responsive to false --> this is not possible yet
+    if (!options[O_CALC_ALL_STATES] && parameters[P_RESPONSIVE]) {
+    	parameters[P_RESPONSIVE] = false;
+    }
+    
     // Max Occurences - correcting parameters if needed
     if (!options[O_READ_EVENTS] && !options[O_EVENT_USE_MAX]) {
         options[O_READ_EVENTS] = true;

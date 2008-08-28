@@ -2486,14 +2486,24 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
 
         State * NewState;
 
-#ifdef TSCC
-//        CurrentState->succ = new State * [CurrentCardFireList + 1];
-        CurrentState->dfs = CurrentState->lowlink = CurrentState->state_count - 1;
-        CurrentState->nexttar = CurrentState->prevtar = CurrentState;
-        TarStack = CurrentState;
-        
-        MinBookmark = CurrentState->state_count;
-#endif        
+        // responsive partners are to be calculated, so we use the Tarjan algorithm
+        // to calculate (T)SCCs
+        if (parameters[P_RESPONSIVE]) {
+        	//        CurrentState->succ = new State * [CurrentCardFireList + 1];
+
+        	// current state is the first state on the stack
+        	TarStack = CurrentState;
+        	
+        	// we start counting by 0, so the current state's depth first search number and
+        	// lowlink value is just the current number of overall states - 1
+        	CurrentState->dfs = CurrentState->lowlink = CurrentState->state_count - 1;
+        	
+        	// current state does not have any successor or predecessor states
+        	CurrentState->nexttar = CurrentState->prevtar = CurrentState;
+        	
+        	// we have not yet found a TSCC
+        	MinBookmark = 0;
+        }      
         
         // building EG in a node
         while (CurrentState) 
@@ -2551,12 +2561,12 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                     assert(CurrentState->succ[CurrentState->current] == NULL);
                     CurrentState->succ[CurrentState->current] = NewState;
                     
-#ifdef TSCC                    
-                    CurrentState->succ[CurrentState->current] = NewState;
-                    if(!(NewState->tarlevel)) {
-	      				CurrentState->lowlink = MINIMUM(CurrentState->lowlink, NewState->lowlink);
+                    if (parameters[P_RESPONSIVE]) {                    
+                    	CurrentState->succ[CurrentState->current] = NewState;
+                    	if(!(NewState->tarlevel)) {
+                    		CurrentState->lowlink = MINIMUM(CurrentState->lowlink, NewState->lowlink);
+                    	}
                     }
-#endif                    
                     
 	      			(CurrentState->current)++;
                 } else {
@@ -2579,13 +2589,19 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                     
                     NewState->firelist = firelist();
                     
-#ifdef TSCC
-                    NewState->dfs = NewState->lowlink = CurrentState->state_count - 1;
-					NewState->prevtar = TarStack;
-					NewState->nexttar = TarStack->nexttar;
-					TarStack = TarStack ->nexttar = NewState;
-					NewState->nexttar->prevtar = NewState;
-#endif                    
+                    // responsive partners are to be calculated, so we use the Tarjan algorithm
+                    // to calculate (T)SCCs
+                    if (parameters[P_RESPONSIVE]) {
+                    	// we start counting by 0, so the current state's depth first search number and
+                    	// lowlink value is just the current number of overall states - 1
+                    	NewState->dfs = NewState->lowlink = CurrentState->state_count - 1;
+
+                    	// fit the newly calculated state into the Tarjan stack of states
+                    	NewState->prevtar = TarStack;
+                    	NewState->nexttar = TarStack->nexttar;
+                    	TarStack = TarStack->nexttar = NewState;
+                    	NewState->nexttar->prevtar = NewState;
+                    }                    
                     
                     NewState->cardFireList = CurrentCardFireList;
                     if (parameters[P_IG]) {
@@ -2618,22 +2634,28 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                 }
                 // no more transition to fire
             } else {
-#ifdef TSCC                    
-            	// state is part of a TSCC and it is the representative of it
-            	if((CurrentState->dfs == CurrentState->lowlink) 
-            			&& (CurrentState->dfs >= MinBookmark)) {
+                // responsive partners are to be calculated, so we use the Tarjan algorithm
+                // to calculate (T)SCCs
+            	if (parameters[P_RESPONSIVE]) {                    
+            		// state is part of a TSCC and it is the representative of it
+            		if((CurrentState->dfs == CurrentState->lowlink) 
+            				&& (CurrentState->dfs >= MinBookmark)) {
 
-            		MinBookmark = CurrentState->state_count;
-            		
-            		// remember that the current state is the representative of a TSCC
-            		CurrentState->repTSCC = true;
-            	}                     
+//            			cout << "found TSCC with id: " << CurrentState->dfs << endl;
+//            			cout << "minBookmark before: " << MinBookmark << endl;
+            			MinBookmark = CurrentState->state_count;
 
-            	if(CurrentState->parent) {
-            		CurrentState->parent->lowlink = 
-            			MINIMUM(CurrentState->lowlink, CurrentState->parent->lowlink);
+            			// remember that the current state is the representative of a TSCC
+            			CurrentState->repTSCC = true;
+            			
+//            			cout << "minBookmark after: " << MinBookmark << endl;
+            		}                     
+
+            		if(CurrentState->parent) {
+            			CurrentState->parent->lowlink = 
+            				MINIMUM(CurrentState->lowlink, CurrentState->parent->lowlink);
+            		}
             	}
-#endif
             	
             	// close state and return to previous state
                 trace(TRACE_5, "close state [" + getCurrentMarkingAsString() + "] and return to previous state\n");
@@ -3838,18 +3860,18 @@ oWFN* oWFN::returnNormalOWFN() {
             trace(TRACE_5, "        handle arriving arc " + intToString(i) + "\n");
             Arc::Arc* arc = (*transition)->Node::getArrivingArc(i);
 
-            owfnPlace* source = NULL;
+            owfnPlace* destination = NULL;
             if (arc->pl->getType() == INTERNAL) {
-                source = result->getPlace( arc->pl->getName() );
+                destination = result->getPlace( arc->pl->getName() );
             } else {
-                source = result->getPlace( arc->pl->getName() + suffix );
+                destination = result->getPlace( arc->pl->getName() + suffix );
             }
-            assert(source != NULL);
+            assert(destination != NULL);
 
             trace(TRACE_5, "        create arriving arc " + intToString(i) + "\n");
-            Arc::Arc* newArc = new Arc(*transition, source, true, arc->Multiplicity);
+            Arc::Arc* newArc = new Arc(*transition, destination, true, arc->Multiplicity);
+
             newTransition->addArrivingArc(newArc);
-            source->addLeavingArc(newArc);
         }
 
         // leaving arcs
@@ -3869,7 +3891,7 @@ oWFN* oWFN::returnNormalOWFN() {
 
             trace(TRACE_5, "        create leaving arc " + intToString(i) + "\n");
             Arc::Arc* newArc = new Arc(*transition, destination, false, arc->Multiplicity);
-            destination->addArrivingArc(newArc);
+
             newTransition->addLeavingArc(newArc);
         }
     }
@@ -3894,14 +3916,12 @@ oWFN* oWFN::returnNormalOWFN() {
         Arc::Arc* inArc = new Arc( newTransition, newPlace, true, 1 );
         assert(inArc != NULL);
         newTransition->addArrivingArc(inArc);
-        newPlace->addLeavingArc(inArc);
 
         // second arc
         owfnPlace* destination = result->getPlace( (*place)->getName() + suffix);
         assert(destination != NULL);
         Arc::Arc* outArc = new Arc( newTransition, destination, false, 1 );
         assert(outArc != NULL);
-        destination->addArrivingArc(outArc);
         newTransition->addLeavingArc(outArc);
     }
 
@@ -3926,14 +3946,12 @@ oWFN* oWFN::returnNormalOWFN() {
         assert(destination != NULL);
         Arc::Arc* inArc = new Arc( newTransition, destination, true, 1 );
         assert(inArc != NULL);
-        newTransition->addArrivingArc(inArc);
-        destination->addLeavingArc(inArc);
+        newTransition->addArrivingArc( inArc );
 
         // second arc
         Arc::Arc* outArc = new Arc( newTransition, newPlace, false, 1 );
         assert(outArc != NULL);
-        newPlace->addArrivingArc(outArc);
-        newTransition->addLeavingArc(outArc);
+        newTransition->addLeavingArc( outArc );
     }
 
 

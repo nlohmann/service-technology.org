@@ -109,11 +109,15 @@ class State {
         /// is transient in autonomous setting
         bool isNotAutonomouslyTransient() const;
 
-#ifdef TSCC
-        /// TARJAN's values
-        /// proposition: if s is start state of an SCC, then s.dfs == s.lowlink
-        /// 			 and we consider s to be the representative of the SCC
-        unsigned int dfs, lowlink; 
+        /// TARJAN's values, needed to calculate the (T)SCCs
+        /// proposition: if s is start state of an (T)SCC, then s.dfs == s.lowlink
+        /// 			 and we consider s to be the representative of the (T)SCC
+
+        /// depth first search number
+        unsigned int dfs;
+        
+        /// the ID of the SCC
+        unsigned int lowlink; 
 
         /// true,  iff this state is a representative of a TERMINAL SCC
         /// false, iff 
@@ -121,9 +125,11 @@ class State {
         ///		    (b) this state is a representative of an SCC
         bool repTSCC;	
         
+        /// previous and next state in the depth first search graph
+        /// it may lead to a state outside of the current SCC!
         State * nexttar, * prevtar;
+        
 		unsigned int tarlevel;
-#endif        
         
 #undef new
         /// Provides user defined operator new. Needed to trace all new operations

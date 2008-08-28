@@ -68,7 +68,6 @@ CommunicationGraph::CommunicationGraph(oWFN * _PN) {
 CommunicationGraph::~CommunicationGraph() {
     trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : start\n");
     trace(TRACE_5, "Deleting CommunicationGraph of file " + filename + "\n");
-    trace(TRACE_5, "setOfNodes.size() = " + intToString(setOfNodes.size()) + ", setOfSortedNodes.size() = " + intToString(setOfSortedNodes.size()) + "\n");
 
     for (unsigned int i = 0; i < setOfNodes.size(); i++) {
         setOfSortedNodes.erase(setOfNodes[i]);
@@ -76,7 +75,9 @@ CommunicationGraph::~CommunicationGraph() {
     }
     setOfNodes.clear();
 
+
     GraphNodeSet::iterator iter;
+
     for (iter = setOfSortedNodes.begin(); iter != setOfSortedNodes.end(); ++iter) {
       delete *iter;
     }
@@ -86,10 +87,9 @@ CommunicationGraph::~CommunicationGraph() {
         delete tempBinDecision;
     }
 
-    // dont delete the underlying petrinet because we may need it later
-    //if (PN) {
-    //    delete PN;
-    //}
+    if (PN) {
+        delete PN;
+    }
 
     trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : end\n");
 }
@@ -275,7 +275,9 @@ void CommunicationGraph::printGraphToDot() {
         if (!options[O_CALC_ALL_STATES]) {
             outfilePrefixWithOptions += ".R";
         }
-
+        if (parameters[P_RESPONSIVE]) {
+        	outfilePrefixWithOptions += ".responsive";
+        }
         if (parameters[P_DIAGNOSIS]) {
             outfilePrefixWithOptions += ".diag";
         } else {
@@ -309,6 +311,9 @@ void CommunicationGraph::printGraphToDot() {
             } else {
                 dotFile << " -p single";
             }
+        }
+        if (parameters[P_RESPONSIVE]) {
+        	dotFile << " -p responsive";
         }
         if (options[O_MESSAGES_MAX]) {
             dotFile << " -m" << intToString(messages_manual);
@@ -414,24 +419,24 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
         for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
 
             // a marking is printed if it is a deadlock, a final state or if the parameter "-s allstates"
-            if ((*iter)->type == DEADLOCK ||
-                (*iter)->type == FINALSTATE ||
-                parameters[P_SHOW_STATES_PER_NODE] ) {
-                (*iter)->decode(PN);
-               // os << "(" << *iter << ") " ;
-#ifdef TSCC                
-                os << "[" << PN->getCurrentMarkingAsString() << "], SCC:" << (*iter)->lowlink;
-                // check whether this state is representative of the SCC
-                if ((*iter)->lowlink == (*iter)->dfs) {
-                	// yes, it is
-                	os << ", rep.";
-                	if ((*iter)->repTSCC) {
-                		os << " (TSCC)";
-                	}
-                } 
-#else
-                os << "[" << PN->getCurrentMarkingAsString() << "]";
-#endif
+        	if ((*iter)->type == DEADLOCK ||
+        			(*iter)->type == FINALSTATE ||
+        			parameters[P_SHOW_STATES_PER_NODE] ) {
+        		(*iter)->decode(PN);
+        		// os << "(" << *iter << ") " ;
+        		if (parameters[P_RESPONSIVE]) {                
+        			os << "[" << PN->getCurrentMarkingAsString() << "], SCC:" << (*iter)->lowlink;
+        			// check whether this state is representative of the SCC
+        			if ((*iter)->lowlink == (*iter)->dfs) {
+        				// yes, it is
+        				os << ", rep.";
+        				if ((*iter)->repTSCC) {
+        					os << " (TSCC)";
+        				}
+        			} 
+        		} else {
+        			os << "[" << PN->getCurrentMarkingAsString() << "]";
+        		}
                 
                 //  os << " (";
                 // print the suffix (state type)
@@ -842,9 +847,8 @@ void CommunicationGraph::deleteOWFN() {
 //! \brief Adds a node to the CommunicationGraph. The node is inserted in both sets.
 void CommunicationGraph::addNode(AnnotatedGraphNode* toAdd) {
     trace(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : start\n");
-    trace(TRACE_5, "setOfNodes.size() = " + intToString(setOfNodes.size()) + ", setOfSortedNodes.size() = " + intToString(setOfSortedNodes.size()) + "\n");
     setOfNodes.push_back(toAdd);
     setOfSortedNodes.insert(toAdd);
-    trace(TRACE_5, "setOfNodes.size() = " + intToString(setOfNodes.size()) + ", setOfSortedNodes.size() = " + intToString(setOfSortedNodes.size()) + "\n");
-    trace(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : end\n");
+    trace(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : start\n");
+
 }

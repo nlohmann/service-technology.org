@@ -443,16 +443,16 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
 //! \param iter current state
 //!    \param myclause clause which is connected to the current state
 //! \param inputMessages set of sending events that are activated in the current node
-void interactionGraph::getSendingEvents(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& inputMessages) {
+void interactionGraph::getSendingEvents(State* state, GraphFormulaMultiaryOr* myclause, setOfMessages& inputMessages) {
 
     trace(TRACE_5, "interactionGraph::getSendingEvents(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& inputMessages): start\n");
 
     int i = 0;
 
     // get the activated sending events
-    while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
-        for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin(); index
-        != (*iter)->quasiFirelist[i]->messageSet.end(); index++) {
+    while (state->quasiFirelist && state->quasiFirelist[i]) {
+        for (std::set<unsigned int>::iterator index = state->quasiFirelist[i]->messageSet.begin(); index
+        != state->quasiFirelist[i]->messageSet.end(); index++) {
 
             messageMultiSet input; // multiset holding one input message
             input.insert(*index);
@@ -462,7 +462,7 @@ void interactionGraph::getSendingEvents(StateSet::iterator& iter, GraphFormulaMu
             GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getPlace(*index)->getLabelForCommGraph());
             myclause->addSubFormula(myliteral);
 
-            // cout << "node no: " << node->getName() << " found input: " << PN->getPlace(*index)->getLabelForCommGraph() << endl;
+        //    cout << " found input: " << PN->getPlace(*index)->getLabelForCommGraph() << endl;
         }
         ++i;
     }
@@ -476,7 +476,7 @@ void interactionGraph::getSendingEvents(StateSet::iterator& iter, GraphFormulaMu
 //!    \param myclause clause which is connected to the current state
 //! \param outputMessages set of receiving events that are activated in the current node
 //! \param node is not used but needed for having a unified function pointer.
-void interactionGraph::getReceivingEvents(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& outputMessages, AnnotatedGraphNode* node) {
+void interactionGraph::getReceivingEvents(State * state, GraphFormulaMultiaryOr* myclause, setOfMessages& outputMessages, AnnotatedGraphNode* node) {
 
     trace(TRACE_5, "interactionGraph::getReceivingEvents(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& receivingEvents, AnnotatedGraphNode* node): start\n");
 
@@ -736,9 +736,14 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
     trace(TRACE_5, "interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  node, setOfMessages& sendingEvents, setOfMessages& receivingEvents): start\n");
 
     // Declaring function pointers for the methods that shall be used.
-    void (interactionGraph::*calcReceiving) (StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
-    void (interactionGraph::*calcSending)     (StateSet::iterator&, GraphFormulaMultiaryOr*, setOfMessages&);
+    void (interactionGraph::*calcReceiving) (State *, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
+    void (interactionGraph::*calcSending)     (State *, GraphFormulaMultiaryOr*, setOfMessages&);
 
+	// if we calculate a responsive partner, we consider TSCCs only and store which 
+	// TSCC we have seen already
+	// note: each TSCC has _at least_ one representative, it may have more than one though
+	std::map<unsigned int, bool> visitedTSCCs;
+    
     // Define the functions to be used for calculation
     if (parameters[P_USE_CRE]) { // Use "combine receiving events" to calculate receiving events.
         calcReceiving = &interactionGraph::combineReceivingEvents;
@@ -767,37 +772,81 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
 
     // Process each state in the node
     for (iter; iter != iterEnd; iter++) {
-        if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) { // we just consider the maximal states only
-
+    	
+    	// figure out, whether a clause shall be created for this state 
+    	bool useThisState = false;
+    	
+    	// if a non-responsive partner shall be calculated
+    	if (!parameters[P_RESPONSIVE]) {
+    		useThisState = (*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE;
+    	} else { // if parameter "responsive" is used, then we consider TSCCs only
+    		useThisState = ((*iter)->repTSCC && !visitedTSCCs[(*iter)->dfs]);
+    	}
+    	
+    	// we do consider this state
+        if (useThisState) { 
+        	// first, get the state
             (*iter)->decode(PN);
-            if ((*iter)->quasiFirelist) { // delete the list of quasi enabled transitions
-                delete [] (*iter)->quasiFirelist;
-                (*iter)->quasiFirelist = NULL;
-            }
-            (*iter)->quasiFirelist = PN->quasiFirelist(); // get the firelist of the quasi enabled transitions
 
-            // Initialize the clause
+            // initialize the clause
             GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
+            
+            // use a new reference of the currently considered state
+            State * currentState = (*iter);
+            
+            // if we are in responsive mode, remember which TSCC we are in
+            // (since current state is a representative of the TSCC it holds: dfs==lowlink)
+            if (parameters[P_RESPONSIVE]) {
+            	visitedTSCCs[currentState->dfs] = true;
+            }
+            
+            do {
+            	
+                // delete the list of quasi enabled transitions
+            	if (currentState->quasiFirelist) { 
+            		delete [] currentState->quasiFirelist;
+            		currentState->quasiFirelist = NULL;
+            	}
 
-            // Call the functions to calculate receiving and sending events via function pointers (see above).
-            (this->*calcSending)    (iter, myclause, sendingEvents); // computes the sending events
-            (this->*calcReceiving)     (iter, myclause, receivingEvents, node); // computes the receiving events
+            	// get the firelist of the quasi enabled transitions
+            	currentState->quasiFirelist = PN->quasiFirelist(); 
 
-            // in case of a final state we add special literal "final" to the clause
-            if ((*iter)->type == FINALSTATE) {
-                node->hasFinalStateInStateSet = true;
-                GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
-                myclause->addSubFormula(myliteral);
-            } // end if finalstate
+            	// call the functions to calculate receiving and sending events via function pointers (see above)
+            	// based on the current state
+            	(this->*calcSending)    (currentState, myclause, sendingEvents); // computes the sending events
+            	(this->*calcReceiving)     (currentState, myclause, receivingEvents, node); // computes the receiving events
 
-        //    if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
-                // Add the clause to the current node
+            	// in case of a final state we add special literal "final" to the clause
+            	if (currentState->type == FINALSTATE) {
+            		node->hasFinalStateInStateSet = true;
+            		GraphFormulaLiteral* myliteral = new GraphFormulaLiteralFinal();
+            		myclause->addSubFormula(myliteral);
+            	} // end if finalstate
+
+            	if (parameters[P_RESPONSIVE]) {
+            		// get next state of TSCC, make sure that we stay in this TSCC by
+            		// comparing lowlink values
+            		if (currentState->nexttar && 
+            				(currentState->lowlink == currentState->nexttar->lowlink)) {
+            			currentState = currentState->nexttar;
+            			if (currentState) {
+            				// and decode it first
+            				currentState->decode(PN);
+            			}
+            		} else {
+            			// we just left the TSCC, so get out of the loop as well
+            			break;
+            		}
+            	}
+            	// since in responsive mode, we are in a loop, we have to check if the current
+            	// state is the one we have started with
+            	// if we are not in responsive mode, we get out of here, since the current state
+            	// stays the same
+            } while (currentState && (currentState != (*iter)));
+
                 node->addClause(myclause);
-        //    } else {
-        //        delete myclause;
-        //    }
 
-        } // end if deadlock or finalstate
+        } // end if deadlock or finalstate / or responsive mode and it is rep of a TSCC
 
     } // end for
 
@@ -814,13 +863,13 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
 //! \param iter current state
 //!    \param myclause clause which is connected to the current state
 //! \param sendingEvents set of sending events for the current node
-void interactionGraph::receivingBeforeSending(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& sendingEvents) {
+void interactionGraph::receivingBeforeSending(State * state, GraphFormulaMultiaryOr* myclause, setOfMessages& sendingEvents) {
     trace(TRACE_5, "interactionGraph::receivingBeforeSending(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& sendingEvents): start\n");
 
     unsigned int i = 0;
-    while (!stateActivatesOutputEvents(*iter) && (*iter)->quasiFirelist&&(*iter)->quasiFirelist[i]) {
-        for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
-                index != (*iter)->quasiFirelist[i]->messageSet.end();
+    while (!stateActivatesOutputEvents(state) && state->quasiFirelist&&state->quasiFirelist[i]) {
+        for (std::set<unsigned int>::iterator index = state->quasiFirelist[i]->messageSet.begin();
+                index != state->quasiFirelist[i]->messageSet.end();
                 index++ ) {
 
             messageMultiSet input; // multiset holding one input message
@@ -844,7 +893,7 @@ void interactionGraph::receivingBeforeSending(StateSet::iterator& iter, GraphFor
 //!    \param myclause clause which is connected to the current state
 //! \param receivingEvents set of receiving events that are activated in the current node
 //! \param node the node for which the activated receiving events are calculated
-void interactionGraph::combineReceivingEvents(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause,
+void interactionGraph::combineReceivingEvents(State * state, GraphFormulaMultiaryOr* myclause,
         setOfMessages& receivingEvents, AnnotatedGraphNode* node) {
 
     trace(TRACE_5, "interactionGraph::combineReceivingEvents(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& receivingEvents, AnnotatedGraphNode* node): start\n");

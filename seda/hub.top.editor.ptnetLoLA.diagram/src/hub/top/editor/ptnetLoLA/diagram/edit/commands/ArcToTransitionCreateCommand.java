@@ -79,8 +79,7 @@ public class ArcToTransitionCreateCommand extends CreateElementCommand {
 			return false;
 		}
 		return hub.top.editor.ptnetLoLA.diagram.edit.policies.PtnetLoLABaseItemSemanticEditPolicy.LinkConstraints
-				.canCreateArcToTransition_3002(getContainer(), getSource(),
-						getTarget());
+				.canCreateArcToTransition_4002(getContainer(), getSource(), getTarget());
 	}
 
 	/**
@@ -108,8 +107,7 @@ public class ArcToTransitionCreateCommand extends CreateElementCommand {
 	protected CommandResult doExecuteWithResult(IProgressMonitor monitor,
 			IAdaptable info) throws ExecutionException {
 		if (!canExecute()) {
-			throw new ExecutionException(
-					"Invalid arguments in create link command"); //$NON-NLS-1$
+			throw new ExecutionException("Invalid arguments in create link command"); //$NON-NLS-1$
 		}
 		return super.doExecuteWithResult(monitor, info);
 	}

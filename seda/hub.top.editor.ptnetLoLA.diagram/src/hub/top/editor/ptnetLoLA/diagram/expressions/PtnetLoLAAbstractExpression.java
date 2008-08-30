@@ -46,8 +46,7 @@ public abstract class PtnetLoLAAbstractExpression {
 				(message != null) ? message : "", throwable); //$NON-NLS-1$
 		if (!this.status.isOK()) {
 			hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-					.getInstance()
-					.logError(
+					.getInstance().logError(
 							"Expression problem:" + message + "body:" + body(), throwable); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}

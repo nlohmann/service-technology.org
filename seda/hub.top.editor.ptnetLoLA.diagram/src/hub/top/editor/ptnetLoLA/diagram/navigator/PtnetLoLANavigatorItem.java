@@ -9,8 +9,7 @@ import org.eclipse.gmf.runtime.notation.View;
 /**
  * @generated
  */
-public class PtnetLoLANavigatorItem
-		extends
+public class PtnetLoLANavigatorItem extends
 		hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem {
 
 	/**
@@ -18,24 +17,21 @@ public class PtnetLoLANavigatorItem
 	 */
 	static {
 		final Class[] supportedTypes = new Class[] { View.class, EObject.class };
-		Platform.getAdapterManager().registerAdapters(
-				new IAdapterFactory() {
+		Platform.getAdapterManager().registerAdapters(new IAdapterFactory() {
 
-					public Object getAdapter(Object adaptableObject,
-							Class adapterType) {
-						if (adaptableObject instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem
-								&& (adapterType == View.class || adapterType == EObject.class)) {
-							return ((hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem) adaptableObject)
-									.getView();
-						}
-						return null;
-					}
+			public Object getAdapter(Object adaptableObject, Class adapterType) {
+				if (adaptableObject instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem
+						&& (adapterType == View.class || adapterType == EObject.class)) {
+					return ((hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem) adaptableObject)
+							.getView();
+				}
+				return null;
+			}
 
-					public Class[] getAdapterList() {
-						return supportedTypes;
-					}
-				},
-				hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem.class);
+			public Class[] getAdapterList() {
+				return supportedTypes;
+			}
+		}, hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem.class);
 	}
 
 	/**

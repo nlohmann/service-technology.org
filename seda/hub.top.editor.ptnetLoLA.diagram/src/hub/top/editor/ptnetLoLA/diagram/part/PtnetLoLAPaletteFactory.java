@@ -92,14 +92,14 @@ public class PtnetLoLAPaletteFactory {
 	private ToolEntry createPlace1CreationTool() {
 		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
 		types
-				.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_1002);
+				.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002);
 		NodeToolEntry entry = new NodeToolEntry(
 				hub.top.editor.ptnetLoLA.diagram.part.Messages.Place1CreationTool_title,
 				hub.top.editor.ptnetLoLA.diagram.part.Messages.Place1CreationTool_desc,
 				types);
 		entry
 				.setSmallIcon(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes
-						.getImageDescriptor(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_1002));
+						.getImageDescriptor(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002));
 		entry.setLargeIcon(entry.getSmallIcon());
 		return entry;
 	}
@@ -110,14 +110,14 @@ public class PtnetLoLAPaletteFactory {
 	private ToolEntry createTransition2CreationTool() {
 		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
 		types
-				.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_1001);
+				.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001);
 		NodeToolEntry entry = new NodeToolEntry(
 				hub.top.editor.ptnetLoLA.diagram.part.Messages.Transition2CreationTool_title,
 				hub.top.editor.ptnetLoLA.diagram.part.Messages.Transition2CreationTool_desc,
 				types);
 		entry
 				.setSmallIcon(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes
-						.getImageDescriptor(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_1001));
+						.getImageDescriptor(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001));
 		entry.setLargeIcon(entry.getSmallIcon());
 		return entry;
 	}
@@ -128,16 +128,16 @@ public class PtnetLoLAPaletteFactory {
 	private ToolEntry createArc3CreationTool() {
 		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(2);
 		types
-				.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_3001);
+				.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001);
 		types
-				.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_3002);
+				.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002);
 		LinkToolEntry entry = new LinkToolEntry(
 				hub.top.editor.ptnetLoLA.diagram.part.Messages.Arc3CreationTool_title,
 				hub.top.editor.ptnetLoLA.diagram.part.Messages.Arc3CreationTool_desc,
 				types);
 		entry
 				.setSmallIcon(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes
-						.getImageDescriptor(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_3001));
+						.getImageDescriptor(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001));
 		entry.setLargeIcon(entry.getSmallIcon());
 		return entry;
 	}
@@ -168,8 +168,7 @@ public class PtnetLoLAPaletteFactory {
 		/**
 		 * @generated
 		 */
-		private NodeToolEntry(String title, String description,
-				List elementTypes) {
+		private NodeToolEntry(String title, String description, List elementTypes) {
 			super(title, description, null, null);
 			this.elementTypes = elementTypes;
 		}

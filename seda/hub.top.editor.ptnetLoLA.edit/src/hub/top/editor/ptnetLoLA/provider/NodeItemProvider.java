@@ -16,11 +16,8 @@ import java.util.List;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.common.util.ResourceLocator;
-
 import org.eclipse.emf.ecore.EStructuralFeature;
-
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
@@ -231,6 +228,8 @@ public class NodeItemProvider
 
 		switch (notification.getFeatureID(Node.class)) {
 			case PtnetLoLAPackage.NODE__NAME:
+			case PtnetLoLAPackage.NODE__INCOMING:
+			case PtnetLoLAPackage.NODE__OUTGOING:
 			case PtnetLoLAPackage.NODE__TYPE:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;

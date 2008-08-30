@@ -206,8 +206,8 @@ public class PtnetLoLADiagramEditorPlugin extends AbstractUIPlugin {
 			error = throwable.getMessage();
 		}
 		getLog().log(
-				new Status(IStatus.ERROR, PtnetLoLADiagramEditorPlugin.ID,
-						IStatus.OK, error, throwable));
+				new Status(IStatus.ERROR, PtnetLoLADiagramEditorPlugin.ID, IStatus.OK,
+						error, throwable));
 		debug(error, throwable);
 	}
 
@@ -226,8 +226,8 @@ public class PtnetLoLADiagramEditorPlugin extends AbstractUIPlugin {
 			message = throwable.getMessage();
 		}
 		getLog().log(
-				new Status(IStatus.INFO, PtnetLoLADiagramEditorPlugin.ID,
-						IStatus.OK, message, throwable));
+				new Status(IStatus.INFO, PtnetLoLADiagramEditorPlugin.ID, IStatus.OK,
+						message, throwable));
 		debug(message, throwable);
 	}
 

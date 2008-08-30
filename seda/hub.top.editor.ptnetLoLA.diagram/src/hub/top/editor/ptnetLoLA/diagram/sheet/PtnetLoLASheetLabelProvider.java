@@ -17,11 +17,9 @@ public class PtnetLoLASheetLabelProvider extends DecoratingLabelProvider {
 	 * @generated
 	 */
 	public PtnetLoLASheetLabelProvider() {
-		super(
-				new AdapterFactoryLabelProvider(
-						hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-								.getInstance().getItemProvidersAdapterFactory()),
-				null);
+		super(new AdapterFactoryLabelProvider(
+				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
+						.getInstance().getItemProvidersAdapterFactory()), null);
 	}
 
 	/**

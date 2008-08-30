@@ -7,6 +7,7 @@
 package hub.top.editor.ptnetLoLA.util;
 
 import hub.top.editor.ptnetLoLA.*;
+import hub.top.editor.ptnetLoLA.adapt.NodeAdapter;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
@@ -65,7 +66,7 @@ public class PtnetLoLAAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * The switch the delegates to the <code>createXXX</code> methods.
+	 * The switch that delegates to the <code>createXXX</code> methods.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -256,7 +257,7 @@ public class PtnetLoLAAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
 	 * @see hub.top.editor.ptnetLoLA.Arc
-	 * @generated
+	 * @generated not
 	 */
 	public Adapter createArcAdapter() {
 		return null;

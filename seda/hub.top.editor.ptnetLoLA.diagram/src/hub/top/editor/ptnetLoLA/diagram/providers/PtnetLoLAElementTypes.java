@@ -45,23 +45,27 @@ public class PtnetLoLAElementTypes extends ElementInitializers {
 	/**
 	 * @generated
 	 */
-	public static final IElementType PtNet_79 = getElementType("hub.top.editor.ptnetLoLA.diagram.PtNet_79"); //$NON-NLS-1$
+	public static final IElementType PtNet_1000 = getElementType("hub.top.editor.ptnetLoLA.diagram.PtNet_1000"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
-	public static final IElementType Transition_1001 = getElementType("hub.top.editor.ptnetLoLA.diagram.Transition_1001"); //$NON-NLS-1$
+	public static final IElementType Transition_2001 = getElementType("hub.top.editor.ptnetLoLA.diagram.Transition_2001"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
-	public static final IElementType Place_1002 = getElementType("hub.top.editor.ptnetLoLA.diagram.Place_1002"); //$NON-NLS-1$
+	public static final IElementType Place_2002 = getElementType("hub.top.editor.ptnetLoLA.diagram.Place_2002"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
-	public static final IElementType ArcToPlace_3001 = getElementType("hub.top.editor.ptnetLoLA.diagram.ArcToPlace_3001"); //$NON-NLS-1$
+	public static final IElementType ArcToPlace_4001 = getElementType("hub.top.editor.ptnetLoLA.diagram.ArcToPlace_4001"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
-	public static final IElementType ArcToTransition_3002 = getElementType("hub.top.editor.ptnetLoLA.diagram.ArcToTransition_3002"); //$NON-NLS-1$
+	public static final IElementType ArcToTransition_4002 = getElementType("hub.top.editor.ptnetLoLA.diagram.ArcToTransition_4002"); //$NON-NLS-1$
 
 	/**
 	 * @generated
@@ -91,8 +95,7 @@ public class PtnetLoLAElementTypes extends ElementInitializers {
 			EClassifier eType = feature.getEType();
 			if (eContainingClass != null && !eContainingClass.isAbstract()) {
 				element = eContainingClass;
-			} else if (eType instanceof EClass
-					&& !((EClass) eType).isAbstract()) {
+			} else if (eType instanceof EClass && !((EClass) eType).isAbstract()) {
 				element = eType;
 			}
 		}
@@ -101,8 +104,7 @@ public class PtnetLoLAElementTypes extends ElementInitializers {
 			if (!eClass.isAbstract()) {
 				return hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
 						.getInstance().getItemImageDescriptor(
-								eClass.getEPackage().getEFactoryInstance()
-										.create(eClass));
+								eClass.getEPackage().getEFactoryInstance().create(eClass));
 			}
 		}
 		// TODO : support structural features
@@ -174,23 +176,19 @@ public class PtnetLoLAElementTypes extends ElementInitializers {
 		if (elements == null) {
 			elements = new IdentityHashMap();
 
-			elements.put(PtNet_79,
-					hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
-							.getPtNet());
+			elements.put(PtNet_1000,
+					hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getPtNet());
 
-			elements.put(Transition_1001,
-					hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
-							.getTransition());
+			elements.put(Transition_2001,
+					hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getTransition());
 
-			elements.put(Place_1002,
-					hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
-							.getPlace());
+			elements.put(Place_2002,
+					hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getPlace());
 
-			elements.put(ArcToPlace_3001,
-					hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
-							.getArcToPlace());
+			elements.put(ArcToPlace_4001,
+					hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getArcToPlace());
 
-			elements.put(ArcToTransition_3002,
+			elements.put(ArcToTransition_4002,
 					hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
 							.getArcToTransition());
 		}
@@ -210,11 +208,11 @@ public class PtnetLoLAElementTypes extends ElementInitializers {
 	public static boolean isKnownElementType(IElementType elementType) {
 		if (KNOWN_ELEMENT_TYPES == null) {
 			KNOWN_ELEMENT_TYPES = new HashSet();
-			KNOWN_ELEMENT_TYPES.add(PtNet_79);
-			KNOWN_ELEMENT_TYPES.add(Transition_1001);
-			KNOWN_ELEMENT_TYPES.add(Place_1002);
-			KNOWN_ELEMENT_TYPES.add(ArcToPlace_3001);
-			KNOWN_ELEMENT_TYPES.add(ArcToTransition_3002);
+			KNOWN_ELEMENT_TYPES.add(PtNet_1000);
+			KNOWN_ELEMENT_TYPES.add(Transition_2001);
+			KNOWN_ELEMENT_TYPES.add(Place_2002);
+			KNOWN_ELEMENT_TYPES.add(ArcToPlace_4001);
+			KNOWN_ELEMENT_TYPES.add(ArcToTransition_4002);
 		}
 		return KNOWN_ELEMENT_TYPES.contains(elementType);
 	}

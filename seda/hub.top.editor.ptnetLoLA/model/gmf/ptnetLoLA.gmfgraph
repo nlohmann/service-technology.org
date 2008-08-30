@@ -107,7 +107,11 @@
       name="placeTokenCount"
       figure="PlaceFigure"
       elementIcon="false"
-      accessor="//@figures.0/@descriptors.1/@accessors.0"/>
+      accessor="//@figures.0/@descriptors.1/@accessors.0">
+    <facets
+        xsi:type="gmfgraph:AlignmentFacet"
+        alignment="CENTER"/>
+  </labels>
   <labels
       name="arcWeight"
       figure="ArcFigure"

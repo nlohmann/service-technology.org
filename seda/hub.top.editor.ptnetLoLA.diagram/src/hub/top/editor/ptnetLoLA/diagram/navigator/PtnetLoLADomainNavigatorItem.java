@@ -22,8 +22,7 @@ public class PtnetLoLADomainNavigatorItem extends PlatformObject {
 		Platform.getAdapterManager().registerAdapters(
 				new IAdapterFactory() {
 
-					public Object getAdapter(Object adaptableObject,
-							Class adapterType) {
+					public Object getAdapter(Object adaptableObject, Class adapterType) {
 						if (adaptableObject instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLADomainNavigatorItem) {
 							hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLADomainNavigatorItem domainNavigatorItem = (hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLADomainNavigatorItem) adaptableObject;
 							EObject eObject = domainNavigatorItem.getEObject();
@@ -31,8 +30,7 @@ public class PtnetLoLADomainNavigatorItem extends PlatformObject {
 								return eObject;
 							}
 							if (adapterType == IPropertySource.class) {
-								return domainNavigatorItem
-										.getPropertySourceProvider()
+								return domainNavigatorItem.getPropertySourceProvider()
 										.getPropertySource(eObject);
 							}
 						}

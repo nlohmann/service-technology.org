@@ -31,8 +31,7 @@ public class PtnetLoLADomainModelElementTester extends PropertyTester {
 				.getTransition()) {
 			return true;
 		}
-		if (eClass == hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
-				.getNode()) {
+		if (eClass == hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getNode()) {
 			return true;
 		}
 		if (eClass == hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
@@ -51,8 +50,7 @@ public class PtnetLoLADomainModelElementTester extends PropertyTester {
 				.getAnnotation()) {
 			return true;
 		}
-		if (eClass == hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
-				.getArc()) {
+		if (eClass == hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getArc()) {
 			return true;
 		}
 		if (eClass == hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE

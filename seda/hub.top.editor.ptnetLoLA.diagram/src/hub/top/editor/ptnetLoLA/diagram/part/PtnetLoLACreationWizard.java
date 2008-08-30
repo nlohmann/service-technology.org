@@ -118,8 +118,7 @@ public class PtnetLoLACreationWizard extends Wizard implements INewWizard {
 					fileName = fileName.substring(0, fileName.length()
 							- ".ptnetlola_diagram".length()); //$NON-NLS-1$
 					setFileName(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorUtil
-							.getUniqueFileName(getContainerFullPath(),
-									fileName, "ptnetlola")); //$NON-NLS-1$
+							.getUniqueFileName(getContainerFullPath(), fileName, "ptnetlola")); //$NON-NLS-1$
 				}
 				super.setVisible(visible);
 			}
@@ -137,11 +136,11 @@ public class PtnetLoLACreationWizard extends Wizard implements INewWizard {
 	public boolean performFinish() {
 		IRunnableWithProgress op = new WorkspaceModifyOperation(null) {
 
-			protected void execute(IProgressMonitor monitor)
-					throws CoreException, InterruptedException {
+			protected void execute(IProgressMonitor monitor) throws CoreException,
+					InterruptedException {
 				diagram = hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorUtil
-						.createDiagram(diagramModelFilePage.getURI(),
-								domainModelFilePage.getURI(), monitor);
+						.createDiagram(diagramModelFilePage.getURI(), domainModelFilePage
+								.getURI(), monitor);
 				if (isOpenNewlyCreatedDiagramEditor() && diagram != null) {
 					try {
 						hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorUtil
@@ -166,12 +165,10 @@ public class PtnetLoLACreationWizard extends Wizard implements INewWizard {
 						.openError(
 								getContainer().getShell(),
 								hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLACreationWizardCreationError,
-								null, ((CoreException) e.getTargetException())
-										.getStatus());
+								null, ((CoreException) e.getTargetException()).getStatus());
 			} else {
 				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-						.getInstance()
-						.logError(
+						.getInstance().logError(
 								"Error creating diagram", e.getTargetException()); //$NON-NLS-1$
 			}
 			return false;

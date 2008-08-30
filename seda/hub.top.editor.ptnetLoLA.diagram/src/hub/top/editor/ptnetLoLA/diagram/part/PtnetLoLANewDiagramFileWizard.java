@@ -52,8 +52,8 @@ public class PtnetLoLANewDiagramFileWizard extends Wizard {
 	/**
 	 * @generated
 	 */
-	public PtnetLoLANewDiagramFileWizard(URI domainModelURI,
-			EObject diagramRoot, TransactionalEditingDomain editingDomain) {
+	public PtnetLoLANewDiagramFileWizard(URI domainModelURI, EObject diagramRoot,
+			TransactionalEditingDomain editingDomain) {
 		assert domainModelURI != null : "Domain model uri must be specified"; //$NON-NLS-1$
 		assert diagramRoot != null : "Doagram root element must be specified"; //$NON-NLS-1$
 		assert editingDomain != null : "Editing domain must be specified"; //$NON-NLS-1$
@@ -71,20 +71,17 @@ public class PtnetLoLANewDiagramFileWizard extends Wizard {
 		IPath filePath;
 		String fileName = domainModelURI.trimFileExtension().lastSegment();
 		if (domainModelURI.isPlatformResource()) {
-			filePath = new Path(domainModelURI.trimSegments(1)
-					.toPlatformString(true));
+			filePath = new Path(domainModelURI.trimSegments(1).toPlatformString(true));
 		} else if (domainModelURI.isFile()) {
 			filePath = new Path(domainModelURI.trimSegments(1).toFileString());
 		} else {
 			// TODO : use some default path
-			throw new IllegalArgumentException(
-					"Unsupported URI: " + domainModelURI); //$NON-NLS-1$
+			throw new IllegalArgumentException("Unsupported URI: " + domainModelURI); //$NON-NLS-1$
 		}
 		myFileCreationPage.setContainerFullPath(filePath);
 		myFileCreationPage
 				.setFileName(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorUtil
-						.getUniqueFileName(filePath, fileName,
-								"ptnetlola_diagram")); //$NON-NLS-1$
+						.getUniqueFileName(filePath, fileName, "ptnetlola_diagram")); //$NON-NLS-1$
 
 		diagramRootElementSelectionPage = new DiagramRootElementSelectionPage(
 				hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLANewDiagramFileWizard_RootSelectionPageName);
@@ -124,9 +121,8 @@ public class PtnetLoLANewDiagramFileWizard extends Wizard {
 				hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLANewDiagramFileWizard_InitDiagramCommand,
 				affectedFiles) {
 
-			protected CommandResult doExecuteWithResult(
-					IProgressMonitor monitor, IAdaptable info)
-					throws ExecutionException {
+			protected CommandResult doExecuteWithResult(IProgressMonitor monitor,
+					IAdaptable info) throws ExecutionException {
 				int diagramVID = hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
 						.getDiagramVisualID(diagramRootElementSelectionPage
 								.getModelElement());
@@ -136,8 +132,7 @@ public class PtnetLoLANewDiagramFileWizard extends Wizard {
 				}
 				Diagram diagram = ViewService
 						.createDiagram(
-								diagramRootElementSelectionPage
-										.getModelElement(),
+								diagramRootElementSelectionPage.getModelElement(),
 								hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart.MODEL_ID,
 								hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
 				diagramResource.getContents().add(diagram);
@@ -154,12 +149,10 @@ public class PtnetLoLANewDiagramFileWizard extends Wizard {
 					.openDiagram(diagramResource);
 		} catch (ExecutionException e) {
 			hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-					.getInstance().logError(
-							"Unable to create model and diagram", e); //$NON-NLS-1$
+					.getInstance().logError("Unable to create model and diagram", e); //$NON-NLS-1$
 		} catch (IOException ex) {
 			hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-					.getInstance()
-					.logError(
+					.getInstance().logError(
 							"Save operation failed for: " + diagramModelURI, ex); //$NON-NLS-1$
 		} catch (PartInitException ex) {
 			hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin

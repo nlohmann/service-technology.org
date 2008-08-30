@@ -82,19 +82,19 @@ public class PtnetLoLANavigatorLabelProvider extends LabelProvider implements
 				.getVisualID(view)) {
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart.VISUAL_ID:
 			return getImage(
-					"Navigator?Diagram?http://www.informatik.hu-berlin.de/top/tools/editors/petrinets?PtNet", hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.PtNet_79); //$NON-NLS-1$
+					"Navigator?Diagram?http://www.informatik.hu-berlin.de/top/tools/editors/petrinets?PtNet", hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.PtNet_1000); //$NON-NLS-1$
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart.VISUAL_ID:
 			return getImage(
-					"Navigator?TopLevelNode?http://www.informatik.hu-berlin.de/top/tools/editors/petrinets?Transition", hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_1001); //$NON-NLS-1$
+					"Navigator?TopLevelNode?http://www.informatik.hu-berlin.de/top/tools/editors/petrinets?Transition", hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001); //$NON-NLS-1$
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart.VISUAL_ID:
 			return getImage(
-					"Navigator?TopLevelNode?http://www.informatik.hu-berlin.de/top/tools/editors/petrinets?Place", hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_1002); //$NON-NLS-1$
+					"Navigator?TopLevelNode?http://www.informatik.hu-berlin.de/top/tools/editors/petrinets?Place", hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002); //$NON-NLS-1$
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToPlaceEditPart.VISUAL_ID:
 			return getImage(
-					"Navigator?Link?http://www.informatik.hu-berlin.de/top/tools/editors/petrinets?ArcToPlace", hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_3001); //$NON-NLS-1$
+					"Navigator?Link?http://www.informatik.hu-berlin.de/top/tools/editors/petrinets?ArcToPlace", hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001); //$NON-NLS-1$
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToTransitionEditPart.VISUAL_ID:
 			return getImage(
-					"Navigator?Link?http://www.informatik.hu-berlin.de/top/tools/editors/petrinets?ArcToTransition", hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_3002); //$NON-NLS-1$
+					"Navigator?Link?http://www.informatik.hu-berlin.de/top/tools/editors/petrinets?ArcToTransition", hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002); //$NON-NLS-1$
 		}
 		return getImage("Navigator?UnknownElement", null); //$NON-NLS-1$
 	}
@@ -152,15 +152,15 @@ public class PtnetLoLANavigatorLabelProvider extends LabelProvider implements
 		switch (hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
 				.getVisualID(view)) {
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart.VISUAL_ID:
-			return getPtNet_79Text(view);
+			return getPtNet_1000Text(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart.VISUAL_ID:
-			return getTransition_1001Text(view);
+			return getTransition_2001Text(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart.VISUAL_ID:
-			return getPlace_1002Text(view);
+			return getPlace_2002Text(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToPlaceEditPart.VISUAL_ID:
-			return getArcToPlace_3001Text(view);
+			return getArcToPlace_4001Text(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToTransitionEditPart.VISUAL_ID:
-			return getArcToTransition_3002Text(view);
+			return getArcToTransition_4002Text(view);
 		}
 		return getUnknownElementText(view);
 	}
@@ -168,28 +168,26 @@ public class PtnetLoLANavigatorLabelProvider extends LabelProvider implements
 	/**
 	 * @generated
 	 */
-	private String getPtNet_79Text(View view) {
+	private String getPtNet_1000Text(View view) {
 		return ""; //$NON-NLS-1$
 	}
 
 	/**
 	 * @generated
 	 */
-	private String getTransition_1001Text(View view) {
+	private String getTransition_2001Text(View view) {
 		IAdaptable hintAdapter = new hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAParserProvider.HintAdapter(
-				hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_1001,
+				hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001,
 				(view.getElement() != null ? view.getElement() : view),
 				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
 						.getType(hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionNameEditPart.VISUAL_ID));
 		IParser parser = ParserService.getInstance().getParser(hintAdapter);
 
 		if (parser != null) {
-			return parser.getPrintString(hintAdapter, ParserOptions.NONE
-					.intValue());
+			return parser.getPrintString(hintAdapter, ParserOptions.NONE.intValue());
 		} else {
 			hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-					.getInstance().logError(
-							"Parser was not found for label " + 4001); //$NON-NLS-1$
+					.getInstance().logError("Parser was not found for label " + 5001); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 
@@ -198,21 +196,19 @@ public class PtnetLoLANavigatorLabelProvider extends LabelProvider implements
 	/**
 	 * @generated
 	 */
-	private String getPlace_1002Text(View view) {
+	private String getPlace_2002Text(View view) {
 		IAdaptable hintAdapter = new hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAParserProvider.HintAdapter(
-				hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_1002,
+				hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002,
 				(view.getElement() != null ? view.getElement() : view),
 				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
 						.getType(hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceNameEditPart.VISUAL_ID));
 		IParser parser = ParserService.getInstance().getParser(hintAdapter);
 
 		if (parser != null) {
-			return parser.getPrintString(hintAdapter, ParserOptions.NONE
-					.intValue());
+			return parser.getPrintString(hintAdapter, ParserOptions.NONE.intValue());
 		} else {
 			hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-					.getInstance().logError(
-							"Parser was not found for label " + 4002); //$NON-NLS-1$
+					.getInstance().logError("Parser was not found for label " + 5002); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 
@@ -221,21 +217,19 @@ public class PtnetLoLANavigatorLabelProvider extends LabelProvider implements
 	/**
 	 * @generated
 	 */
-	private String getArcToPlace_3001Text(View view) {
+	private String getArcToPlace_4001Text(View view) {
 		IAdaptable hintAdapter = new hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAParserProvider.HintAdapter(
-				hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_3001,
+				hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001,
 				(view.getElement() != null ? view.getElement() : view),
 				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
 						.getType(hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToPlaceWeightEditPart.VISUAL_ID));
 		IParser parser = ParserService.getInstance().getParser(hintAdapter);
 
 		if (parser != null) {
-			return parser.getPrintString(hintAdapter, ParserOptions.NONE
-					.intValue());
+			return parser.getPrintString(hintAdapter, ParserOptions.NONE.intValue());
 		} else {
 			hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-					.getInstance().logError(
-							"Parser was not found for label " + 4004); //$NON-NLS-1$
+					.getInstance().logError("Parser was not found for label " + 6001); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 
@@ -244,21 +238,19 @@ public class PtnetLoLANavigatorLabelProvider extends LabelProvider implements
 	/**
 	 * @generated
 	 */
-	private String getArcToTransition_3002Text(View view) {
+	private String getArcToTransition_4002Text(View view) {
 		IAdaptable hintAdapter = new hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAParserProvider.HintAdapter(
-				hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_3002,
+				hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002,
 				(view.getElement() != null ? view.getElement() : view),
 				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
 						.getType(hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToTransitionWeightEditPart.VISUAL_ID));
 		IParser parser = ParserService.getInstance().getParser(hintAdapter);
 
 		if (parser != null) {
-			return parser.getPrintString(hintAdapter, ParserOptions.NONE
-					.intValue());
+			return parser.getPrintString(hintAdapter, ParserOptions.NONE.intValue());
 		} else {
 			hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-					.getInstance().logError(
-							"Parser was not found for label " + 4005); //$NON-NLS-1$
+					.getInstance().logError("Parser was not found for label " + 6002); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 

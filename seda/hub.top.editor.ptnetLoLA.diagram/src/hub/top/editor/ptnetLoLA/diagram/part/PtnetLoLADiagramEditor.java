@@ -1,5 +1,7 @@
 package hub.top.editor.ptnetLoLA.diagram.part;
 
+import hub.top.editor.ptnetLoLA.transaction.PtnetLoLAEditingDomainFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -113,12 +115,21 @@ public class PtnetLoLADiagramEditor extends DiagramDocumentEditor implements
 	 * @generated
 	 */
 	protected IDocumentProvider getDocumentProvider(IEditorInput input) {
-		if (input instanceof IFileEditorInput
-				|| input instanceof URIEditorInput) {
+		if (input instanceof IFileEditorInput || input instanceof URIEditorInput) {
 			return hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
 					.getInstance().getDocumentProvider();
 		}
 		return super.getDocumentProvider(input);
+	}
+
+	/**
+	 * this editor operates on the ptnetlola editing domain
+	 * @return id for the ptnetlola editing domain
+	 * @generated not 
+	 */
+	@Override
+	protected String getEditingDomainID() {
+		return PtnetLoLAEditingDomainFactory.EDITING_DOMAIN_ID;
 	}
 
 	/**
@@ -137,8 +148,7 @@ public class PtnetLoLADiagramEditor extends DiagramDocumentEditor implements
 	 * @generated
 	 */
 	protected void setDocumentProvider(IEditorInput input) {
-		if (input instanceof IFileEditorInput
-				|| input instanceof URIEditorInput) {
+		if (input instanceof IFileEditorInput || input instanceof URIEditorInput) {
 			setDocumentProvider(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
 					.getInstance().getDocumentProvider());
 		} else {
@@ -214,8 +224,7 @@ public class PtnetLoLADiagramEditor extends DiagramDocumentEditor implements
 		IEditorMatchingStrategy matchingStrategy = getEditorDescriptor()
 				.getEditorMatchingStrategy();
 		IEditorReference[] editorRefs = PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getActivePage()
-				.getEditorReferences();
+				.getActiveWorkbenchWindow().getActivePage().getEditorReferences();
 		for (int i = 0; i < editorRefs.length; i++) {
 			if (matchingStrategy.matches(editorRefs[i], newInput)) {
 				MessageDialog
@@ -229,8 +238,7 @@ public class PtnetLoLADiagramEditor extends DiagramDocumentEditor implements
 		boolean success = false;
 		try {
 			provider.aboutToChange(newInput);
-			getDocumentProvider(newInput).saveDocument(progressMonitor,
-					newInput,
+			getDocumentProvider(newInput).saveDocument(progressMonitor, newInput,
 					getDocumentProvider().getDocument(getEditorInput()), true);
 			success = true;
 		} catch (CoreException x) {

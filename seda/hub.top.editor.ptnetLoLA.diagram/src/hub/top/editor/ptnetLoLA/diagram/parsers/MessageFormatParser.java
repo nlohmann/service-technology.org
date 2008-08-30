@@ -168,8 +168,8 @@ public class MessageFormatParser extends
 	 */
 	public String getPrintString(IAdaptable adapter, int flags) {
 		EObject element = (EObject) adapter.getAdapter(EObject.class);
-		return getViewProcessor().format(getValues(element),
-				new StringBuffer(), new FieldPosition(0)).toString();
+		return getViewProcessor().format(getValues(element), new StringBuffer(),
+				new FieldPosition(0)).toString();
 	}
 
 	/**
@@ -177,8 +177,8 @@ public class MessageFormatParser extends
 	 */
 	public String getEditString(IAdaptable adapter, int flags) {
 		EObject element = (EObject) adapter.getAdapter(EObject.class);
-		return getEditorProcessor().format(getValues(element),
-				new StringBuffer(), new FieldPosition(0)).toString();
+		return getEditorProcessor().format(getValues(element), new StringBuffer(),
+				new FieldPosition(0)).toString();
 	}
 
 	/**
@@ -205,8 +205,7 @@ public class MessageFormatParser extends
 	 */
 	public ICommand getParseCommand(IAdaptable adapter, String newString,
 			int flags) {
-		Object[] values = getEditProcessor().parse(newString,
-				new ParsePosition(0));
+		Object[] values = getEditProcessor().parse(newString, new ParsePosition(0));
 		return getParseCommand(adapter, values, flags);
 	}
 }

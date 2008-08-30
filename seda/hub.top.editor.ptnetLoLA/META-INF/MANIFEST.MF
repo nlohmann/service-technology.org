@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Service-Technology.org Petri Net Model
 Bundle-SymbolicName: hub.top.editor.ptnetLoLA;singleton:=true
-Bundle-Version: 1.0.3.qualifier
+Bundle-Version: 1.0.5.qualifier
 Bundle-Activator: hub.top.editor.ptnetLoLA.base.Activator
 Bundle-Vendor: Service-Technology.org
 Require-Bundle: org.eclipse.ui,
@@ -20,4 +20,7 @@ Eclipse-BuddyPolicy: registered
 Export-Package: hub.top.editor.ptnetLoLA,
  hub.top.editor.ptnetLoLA.base,
  hub.top.editor.ptnetLoLA.impl,
+ hub.top.editor.ptnetLoLA.transaction,
  hub.top.editor.ptnetLoLA.util
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

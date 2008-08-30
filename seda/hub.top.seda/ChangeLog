@@ -1,6 +1,12 @@
 ChangeLog for hub.top.seda
 --------------------------
 
+Version 1.0.5
+-------------
++ created a transactional editing domain "hub.top.editor.ptnetLoLA.editingDomain" for the EMF models
++ installed a listener and an adapter for "hub.top.editor.ptnetLoLA.editingDomain" to handle the removal of arcs from the net; now all references get updated properly such that arcs can be deleted from a model and this opeation is undoable
+
+
 Version 1.0.3
 -------------
 + changed to X.Y.Z.qualifier versioning scheme to avoid problems with the Eclipse update mechanism, fixes bug #12197: "Seda: pre-compiled plugins fail under Linux" <https://gna.org/bugs/index.php?12197>

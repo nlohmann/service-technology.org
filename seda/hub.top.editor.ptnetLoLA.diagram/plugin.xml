@@ -46,7 +46,7 @@
       <?gmfgen generated="true"?>
   	  <wizard
   	     name="%newWizardName"
-  	     icon="icons/document.net.bw_2.new.16.png"
+  	     icon="icons/document.net.bw_2.16.png"
   	     category="org.eclipse.ui.Examples"
   	     class="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLACreationWizard"
   	     id="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLACreationWizardID">
@@ -98,6 +98,16 @@
             </ElementType>
             <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart">
                <GlobalActionId actionId="save"/>
+            </ElementType>
+         </ViewId>
+      </GlobalActionHandlerProvider>
+      <GlobalActionHandlerProvider
+         class="org.eclipse.gmf.runtime.diagram.ui.printing.render.providers.DiagramWithPrintGlobalActionHandlerProvider"
+         id="PtnetLoLAPresentationPrint">
+         <Priority name="Lowest"/>
+         <ViewId id="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorID">
+            <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart">
+               <GlobalActionId actionId="print"/>
             </ElementType>
          </ViewId>
       </GlobalActionHandlerProvider>
@@ -276,52 +286,52 @@
       <?gmfgen generated="true"?>
       <metamodel nsURI="http://www.informatik.hu-berlin.de/top/tools/editors/petrinets">
          <metamodelType
-               id="hub.top.editor.ptnetLoLA.diagram.PtNet_79"
-               name="%metatype.name.PtNet_79"
+               id="hub.top.editor.ptnetLoLA.diagram.PtNet_1000"
+               name="%metatype.name.PtNet_1000"
                kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
                eclass="PtNet"
                edithelper="hub.top.editor.ptnetLoLA.diagram.edit.helpers.PtNetEditHelper">
-            <param name="semanticHint" value="79"/>
+            <param name="semanticHint" value="1000"/>
          </metamodelType>
       </metamodel>
       <metamodel nsURI="http://www.informatik.hu-berlin.de/top/tools/editors/petrinets">
          <metamodelType
-               id="hub.top.editor.ptnetLoLA.diagram.Transition_1001"
-               name="%metatype.name.Transition_1001"
+               id="hub.top.editor.ptnetLoLA.diagram.Transition_2001"
+               name="%metatype.name.Transition_2001"
                kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
                eclass="Transition"
                edithelper="hub.top.editor.ptnetLoLA.diagram.edit.helpers.TransitionEditHelper">
-            <param name="semanticHint" value="1001"/>
+            <param name="semanticHint" value="2001"/>
          </metamodelType>
       </metamodel>
       <metamodel nsURI="http://www.informatik.hu-berlin.de/top/tools/editors/petrinets">
          <metamodelType
-               id="hub.top.editor.ptnetLoLA.diagram.Place_1002"
-               name="%metatype.name.Place_1002"
+               id="hub.top.editor.ptnetLoLA.diagram.Place_2002"
+               name="%metatype.name.Place_2002"
                kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
                eclass="Place"
                edithelper="hub.top.editor.ptnetLoLA.diagram.edit.helpers.PlaceEditHelper">
-            <param name="semanticHint" value="1002"/>
+            <param name="semanticHint" value="2002"/>
          </metamodelType>
       </metamodel>
       <metamodel nsURI="http://www.informatik.hu-berlin.de/top/tools/editors/petrinets">
          <metamodelType
-               id="hub.top.editor.ptnetLoLA.diagram.ArcToPlace_3001"
-               name="%metatype.name.ArcToPlace_3001"
+               id="hub.top.editor.ptnetLoLA.diagram.ArcToPlace_4001"
+               name="%metatype.name.ArcToPlace_4001"
                kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
                eclass="ArcToPlace"
                edithelper="hub.top.editor.ptnetLoLA.diagram.edit.helpers.ArcToPlaceEditHelper">
-            <param name="semanticHint" value="3001"/>
+            <param name="semanticHint" value="4001"/>
          </metamodelType>
       </metamodel>
       <metamodel nsURI="http://www.informatik.hu-berlin.de/top/tools/editors/petrinets">
          <metamodelType
-               id="hub.top.editor.ptnetLoLA.diagram.ArcToTransition_3002"
-               name="%metatype.name.ArcToTransition_3002"
+               id="hub.top.editor.ptnetLoLA.diagram.ArcToTransition_4002"
+               name="%metatype.name.ArcToTransition_4002"
                kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
                eclass="ArcToTransition"
                edithelper="hub.top.editor.ptnetLoLA.diagram.edit.helpers.ArcToTransitionEditHelper">
-            <param name="semanticHint" value="3002"/>
+            <param name="semanticHint" value="4002"/>
          </metamodelType>
       </metamodel>
    </extension>
@@ -336,11 +346,11 @@
          </enablement>
       </clientContext> 
       <binding context="PtnetLoLAClientContext">
-         <elementType ref="hub.top.editor.ptnetLoLA.diagram.PtNet_79"/>
-         <elementType ref="hub.top.editor.ptnetLoLA.diagram.Transition_1001"/>
-         <elementType ref="hub.top.editor.ptnetLoLA.diagram.Place_1002"/>
-         <elementType ref="hub.top.editor.ptnetLoLA.diagram.ArcToPlace_3001"/>
-         <elementType ref="hub.top.editor.ptnetLoLA.diagram.ArcToTransition_3002"/>
+         <elementType ref="hub.top.editor.ptnetLoLA.diagram.PtNet_1000"/>
+         <elementType ref="hub.top.editor.ptnetLoLA.diagram.Transition_2001"/>
+         <elementType ref="hub.top.editor.ptnetLoLA.diagram.Place_2002"/>
+         <elementType ref="hub.top.editor.ptnetLoLA.diagram.ArcToPlace_4001"/>
+         <elementType ref="hub.top.editor.ptnetLoLA.diagram.ArcToTransition_4002"/>
          <advice ref="org.eclipse.gmf.runtime.diagram.core.advice.notationDepdendents"/>
       </binding>
    </extension>
@@ -536,6 +546,15 @@
             </command>
          </toolbar>
       </menuContribution>
+   </extension><extension point="org.eclipse.gmf.runtime.common.ui.services.action.contributionItemProviders">
+      <?gmfgen generated="true"?>
+      <contributionItemProvider class="hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAContributionItemProvider">
+         <Priority name="Low"/>
+         <partContribution id="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorID">
+            <partAction menubarPath="/file/print" id="printPreviewAction"/>
+         </partContribution>
+      </contributionItemProvider>
    </extension>
+
    
 </plugin>

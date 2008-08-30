@@ -34,8 +34,7 @@ public class PtnetLoLANavigatorLinkHelper implements ILinkHelper {
 	 */
 	private static IEditorInput getEditorInput(Diagram diagram) {
 		Resource diagramResource = diagram.eResource();
-		for (Iterator it = diagramResource.getContents().iterator(); it
-				.hasNext();) {
+		for (Iterator it = diagramResource.getContents().iterator(); it.hasNext();) {
 			EObject nextEObject = (EObject) it.next();
 			if (nextEObject == diagram) {
 				return new FileEditorInput(WorkspaceSynchronizer
@@ -57,8 +56,7 @@ public class PtnetLoLANavigatorLinkHelper implements ILinkHelper {
 	 */
 	public IStructuredSelection findSelection(IEditorInput anInput) {
 		IDiagramDocument document = hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-				.getInstance().getDocumentProvider()
-				.getDiagramDocument(anInput);
+				.getInstance().getDocumentProvider().getDiagramDocument(anInput);
 		if (document == null) {
 			return StructuredSelection.EMPTY;
 		}
@@ -108,10 +106,10 @@ public class PtnetLoLANavigatorLinkHelper implements ILinkHelper {
 		aPage.bringToTop(editor);
 		if (editor instanceof DiagramEditor) {
 			DiagramEditor diagramEditor = (DiagramEditor) editor;
-			ResourceSet diagramEditorResourceSet = diagramEditor
-					.getEditingDomain().getResourceSet();
-			EObject selectedView = diagramEditorResourceSet.getEObject(
-					EcoreUtil.getURI(navigatorView), true);
+			ResourceSet diagramEditorResourceSet = diagramEditor.getEditingDomain()
+					.getResourceSet();
+			EObject selectedView = diagramEditorResourceSet.getEObject(EcoreUtil
+					.getURI(navigatorView), true);
 			if (selectedView == null) {
 				return;
 			}

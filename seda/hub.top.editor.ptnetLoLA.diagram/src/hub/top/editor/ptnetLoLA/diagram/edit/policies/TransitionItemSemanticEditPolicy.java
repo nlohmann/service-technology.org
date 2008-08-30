@@ -35,8 +35,7 @@ public class TransitionItemSemanticEditPolicy
 	protected Command getCreateRelationshipCommand(CreateRelationshipRequest req) {
 		Command command = req.getTarget() == null ? getStartCreateRelationshipCommand(req)
 				: getCompleteCreateRelationshipCommand(req);
-		return command != null ? command : super
-				.getCreateRelationshipCommand(req);
+		return command != null ? command : super.getCreateRelationshipCommand(req);
 	}
 
 	/**
@@ -44,12 +43,12 @@ public class TransitionItemSemanticEditPolicy
 	 */
 	protected Command getStartCreateRelationshipCommand(
 			CreateRelationshipRequest req) {
-		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_3001 == req
+		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001 == req
 				.getElementType()) {
 			return getGEFWrapper(new hub.top.editor.ptnetLoLA.diagram.edit.commands.ArcToPlaceCreateCommand(
 					req, req.getSource(), req.getTarget()));
 		}
-		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_3002 == req
+		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002 == req
 				.getElementType()) {
 			return getGEFWrapper(new hub.top.editor.ptnetLoLA.diagram.edit.commands.ArcToTransitionCreateCommand(
 					req, req.getSource(), req.getTarget()));
@@ -62,12 +61,12 @@ public class TransitionItemSemanticEditPolicy
 	 */
 	protected Command getCompleteCreateRelationshipCommand(
 			CreateRelationshipRequest req) {
-		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_3001 == req
+		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001 == req
 				.getElementType()) {
 			return getGEFWrapper(new hub.top.editor.ptnetLoLA.diagram.edit.commands.ArcToPlaceCreateCommand(
 					req, req.getSource(), req.getTarget()));
 		}
-		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_3002 == req
+		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002 == req
 				.getElementType()) {
 			return getGEFWrapper(new hub.top.editor.ptnetLoLA.diagram.edit.commands.ArcToTransitionCreateCommand(
 					req, req.getSource(), req.getTarget()));

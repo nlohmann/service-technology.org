@@ -23,8 +23,7 @@ public abstract class PtnetLoLAAbstractNavigatorItem extends PlatformObject {
 		Platform.getAdapterManager().registerAdapters(
 				new IAdapterFactory() {
 
-					public Object getAdapter(Object adaptableObject,
-							Class adapterType) {
+					public Object getAdapter(Object adaptableObject, Class adapterType) {
 						if (adaptableObject instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem
 								&& adapterType == ITabbedPropertySheetPageContributor.class) {
 							return propertySheetPageContributor;

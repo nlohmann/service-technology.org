@@ -36,9 +36,9 @@ public class PtnetLoLAModelingAssistantProvider extends
 		if (editPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart) {
 			List types = new ArrayList();
 			types
-					.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_1001);
+					.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001);
 			types
-					.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_1002);
+					.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002);
 			return types;
 		}
 		return Collections.EMPTY_LIST;
@@ -65,8 +65,7 @@ public class PtnetLoLAModelingAssistantProvider extends
 	/**
 	 * @generated
 	 */
-	public List getRelTypesOnSourceAndTarget(IAdaptable source,
-			IAdaptable target) {
+	public List getRelTypesOnSourceAndTarget(IAdaptable source, IAdaptable target) {
 		IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
 				.getAdapter(IGraphicalEditPart.class);
 		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
@@ -77,8 +76,7 @@ public class PtnetLoLAModelingAssistantProvider extends
 	/**
 	 * @generated
 	 */
-	public List getTypesForSource(IAdaptable target,
-			IElementType relationshipType) {
+	public List getTypesForSource(IAdaptable target, IElementType relationshipType) {
 		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
 				.getAdapter(IGraphicalEditPart.class);
 		return Collections.EMPTY_LIST;
@@ -87,8 +85,7 @@ public class PtnetLoLAModelingAssistantProvider extends
 	/**
 	 * @generated
 	 */
-	public List getTypesForTarget(IAdaptable source,
-			IElementType relationshipType) {
+	public List getTypesForTarget(IAdaptable source, IElementType relationshipType) {
 		IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
 				.getAdapter(IGraphicalEditPart.class);
 		return Collections.EMPTY_LIST;
@@ -156,8 +153,8 @@ public class PtnetLoLAModelingAssistantProvider extends
 		ILabelProvider labelProvider = new AdapterFactoryLabelProvider(
 				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
 						.getInstance().getItemProvidersAdapterFactory());
-		ElementListSelectionDialog dialog = new ElementListSelectionDialog(
-				shell, labelProvider);
+		ElementListSelectionDialog dialog = new ElementListSelectionDialog(shell,
+				labelProvider);
 		dialog
 				.setMessage(hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLAModelingAssistantProviderMessage);
 		dialog

@@ -21,22 +21,22 @@ public class PtnetLoLAParserProvider extends AbstractProvider implements
 	/**
 	 * @generated
 	 */
-	private IParser transitionName_4001Parser;
+	private IParser transitionName_5001Parser;
 
 	/**
 	 * @generated
 	 */
-	private IParser getTransitionName_4001Parser() {
-		if (transitionName_4001Parser == null) {
-			transitionName_4001Parser = createTransitionName_4001Parser();
+	private IParser getTransitionName_5001Parser() {
+		if (transitionName_5001Parser == null) {
+			transitionName_5001Parser = createTransitionName_5001Parser();
 		}
-		return transitionName_4001Parser;
+		return transitionName_5001Parser;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected IParser createTransitionName_4001Parser() {
+	protected IParser createTransitionName_5001Parser() {
 		EAttribute[] features = new EAttribute[] { hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
 				.getNode_Name(), };
 		hub.top.editor.ptnetLoLA.diagram.parsers.MessageFormatParser parser = new hub.top.editor.ptnetLoLA.diagram.parsers.MessageFormatParser(
@@ -47,22 +47,22 @@ public class PtnetLoLAParserProvider extends AbstractProvider implements
 	/**
 	 * @generated
 	 */
-	private IParser placeName_4002Parser;
+	private IParser placeName_5002Parser;
 
 	/**
 	 * @generated
 	 */
-	private IParser getPlaceName_4002Parser() {
-		if (placeName_4002Parser == null) {
-			placeName_4002Parser = createPlaceName_4002Parser();
+	private IParser getPlaceName_5002Parser() {
+		if (placeName_5002Parser == null) {
+			placeName_5002Parser = createPlaceName_5002Parser();
 		}
-		return placeName_4002Parser;
+		return placeName_5002Parser;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected IParser createPlaceName_4002Parser() {
+	protected IParser createPlaceName_5002Parser() {
 		EAttribute[] features = new EAttribute[] { hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
 				.getNode_Name(), };
 		hub.top.editor.ptnetLoLA.diagram.parsers.MessageFormatParser parser = new hub.top.editor.ptnetLoLA.diagram.parsers.MessageFormatParser(
@@ -73,22 +73,22 @@ public class PtnetLoLAParserProvider extends AbstractProvider implements
 	/**
 	 * @generated
 	 */
-	private IParser placeToken_4003Parser;
+	private IParser placeToken_5003Parser;
 
 	/**
 	 * @generated
 	 */
-	private IParser getPlaceToken_4003Parser() {
-		if (placeToken_4003Parser == null) {
-			placeToken_4003Parser = createPlaceToken_4003Parser();
+	private IParser getPlaceToken_5003Parser() {
+		if (placeToken_5003Parser == null) {
+			placeToken_5003Parser = createPlaceToken_5003Parser();
 		}
-		return placeToken_4003Parser;
+		return placeToken_5003Parser;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected IParser createPlaceToken_4003Parser() {
+	protected IParser createPlaceToken_5003Parser() {
 		EAttribute[] features = new EAttribute[] { hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
 				.getPlace_Token(), };
 		hub.top.editor.ptnetLoLA.diagram.parsers.MessageFormatParser parser = new hub.top.editor.ptnetLoLA.diagram.parsers.MessageFormatParser(
@@ -99,22 +99,22 @@ public class PtnetLoLAParserProvider extends AbstractProvider implements
 	/**
 	 * @generated
 	 */
-	private IParser arcToPlaceWeight_4004Parser;
+	private IParser arcToPlaceWeight_6001Parser;
 
 	/**
 	 * @generated
 	 */
-	private IParser getArcToPlaceWeight_4004Parser() {
-		if (arcToPlaceWeight_4004Parser == null) {
-			arcToPlaceWeight_4004Parser = createArcToPlaceWeight_4004Parser();
+	private IParser getArcToPlaceWeight_6001Parser() {
+		if (arcToPlaceWeight_6001Parser == null) {
+			arcToPlaceWeight_6001Parser = createArcToPlaceWeight_6001Parser();
 		}
-		return arcToPlaceWeight_4004Parser;
+		return arcToPlaceWeight_6001Parser;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected IParser createArcToPlaceWeight_4004Parser() {
+	protected IParser createArcToPlaceWeight_6001Parser() {
 		EAttribute[] features = new EAttribute[] { hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
 				.getArc_Weight(), };
 		hub.top.editor.ptnetLoLA.diagram.parsers.MessageFormatParser parser = new hub.top.editor.ptnetLoLA.diagram.parsers.MessageFormatParser(
@@ -125,22 +125,22 @@ public class PtnetLoLAParserProvider extends AbstractProvider implements
 	/**
 	 * @generated
 	 */
-	private IParser arcToTransitionWeight_4005Parser;
+	private IParser arcToTransitionWeight_6002Parser;
 
 	/**
 	 * @generated
 	 */
-	private IParser getArcToTransitionWeight_4005Parser() {
-		if (arcToTransitionWeight_4005Parser == null) {
-			arcToTransitionWeight_4005Parser = createArcToTransitionWeight_4005Parser();
+	private IParser getArcToTransitionWeight_6002Parser() {
+		if (arcToTransitionWeight_6002Parser == null) {
+			arcToTransitionWeight_6002Parser = createArcToTransitionWeight_6002Parser();
 		}
-		return arcToTransitionWeight_4005Parser;
+		return arcToTransitionWeight_6002Parser;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected IParser createArcToTransitionWeight_4005Parser() {
+	protected IParser createArcToTransitionWeight_6002Parser() {
 		EAttribute[] features = new EAttribute[] { hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
 				.getArc_Weight(), };
 		hub.top.editor.ptnetLoLA.diagram.parsers.MessageFormatParser parser = new hub.top.editor.ptnetLoLA.diagram.parsers.MessageFormatParser(
@@ -154,15 +154,15 @@ public class PtnetLoLAParserProvider extends AbstractProvider implements
 	protected IParser getParser(int visualID) {
 		switch (visualID) {
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionNameEditPart.VISUAL_ID:
-			return getTransitionName_4001Parser();
+			return getTransitionName_5001Parser();
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceNameEditPart.VISUAL_ID:
-			return getPlaceName_4002Parser();
+			return getPlaceName_5002Parser();
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceTokenEditPart.VISUAL_ID:
-			return getPlaceToken_4003Parser();
+			return getPlaceToken_5003Parser();
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToPlaceWeightEditPart.VISUAL_ID:
-			return getArcToPlaceWeight_4004Parser();
+			return getArcToPlaceWeight_6001Parser();
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToTransitionWeightEditPart.VISUAL_ID:
-			return getArcToTransitionWeight_4005Parser();
+			return getArcToTransitionWeight_6002Parser();
 		}
 		return null;
 	}

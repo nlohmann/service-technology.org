@@ -60,8 +60,7 @@ public class PtnetLoLAViewProvider extends AbstractViewProvider {
 						|| (!(elementType instanceof IHintedType))) {
 					return null; // foreign element type
 				}
-				String elementTypeHint = ((IHintedType) elementType)
-						.getSemanticHint();
+				String elementTypeHint = ((IHintedType) elementType).getSemanticHint();
 				if (!semanticHint.equals(elementTypeHint)) {
 					return null; // if semantic hint is specified it should be the same as in element type
 				}
@@ -85,8 +84,7 @@ public class PtnetLoLAViewProvider extends AbstractViewProvider {
 				case hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart.VISUAL_ID:
 					if (domainElement == null
 							|| visualID != hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
-									.getNodeVisualID(containerView,
-											domainElement)) {
+									.getNodeVisualID(containerView, domainElement)) {
 						return null; // visual id in semantic hint should match visual id for domain element
 					}
 					break;

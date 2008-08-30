@@ -68,7 +68,7 @@ public class ArcToTransitionReorientCommand extends EditElementCommand {
 		hub.top.editor.ptnetLoLA.PtNet container = (hub.top.editor.ptnetLoLA.PtNet) getLink()
 				.eContainer();
 		return hub.top.editor.ptnetLoLA.diagram.edit.policies.PtnetLoLABaseItemSemanticEditPolicy.LinkConstraints
-				.canExistArcToTransition_3002(container, getNewSource(), target);
+				.canExistArcToTransition_4002(container, getNewSource(), target);
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class ArcToTransitionReorientCommand extends EditElementCommand {
 		hub.top.editor.ptnetLoLA.PtNet container = (hub.top.editor.ptnetLoLA.PtNet) getLink()
 				.eContainer();
 		return hub.top.editor.ptnetLoLA.diagram.edit.policies.PtnetLoLABaseItemSemanticEditPolicy.LinkConstraints
-				.canExistArcToTransition_3002(container, source, getNewTarget());
+				.canExistArcToTransition_4002(container, source, getNewTarget());
 	}
 
 	/**
@@ -94,8 +94,7 @@ public class ArcToTransitionReorientCommand extends EditElementCommand {
 	protected CommandResult doExecuteWithResult(IProgressMonitor monitor,
 			IAdaptable info) throws ExecutionException {
 		if (!canExecute()) {
-			throw new ExecutionException(
-					"Invalid arguments in reorient link command"); //$NON-NLS-1$
+			throw new ExecutionException("Invalid arguments in reorient link command"); //$NON-NLS-1$
 		}
 		if (reorientDirection == ReorientRelationshipRequest.REORIENT_SOURCE) {
 			return reorientSource();

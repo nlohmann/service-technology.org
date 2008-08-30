@@ -99,8 +99,8 @@ public class PtnetLoLABaseItemSemanticEditPolicy extends SemanticEditPolicy {
 			return null;
 		}
 		if (editHelperContext == null) {
-			editHelperContext = ViewUtil
-					.resolveSemanticElement((View) getHost().getModel());
+			editHelperContext = ViewUtil.resolveSemanticElement((View) getHost()
+					.getModel());
 		}
 		IElementType elementType = ElementTypeRegistry.getInstance()
 				.getElementType(editHelperContext);
@@ -124,8 +124,8 @@ public class PtnetLoLABaseItemSemanticEditPolicy extends SemanticEditPolicy {
 				if (!(command instanceof CompositeTransactionalCommand)) {
 					TransactionalEditingDomain editingDomain = ((IGraphicalEditPart) getHost())
 							.getEditingDomain();
-					command = new CompositeTransactionalCommand(editingDomain,
-							command.getLabel()).compose(command);
+					command = new CompositeTransactionalCommand(editingDomain, command
+							.getLabel()).compose(command);
 				}
 				semanticCommand = new ICommandProxy(command);
 			}
@@ -138,9 +138,8 @@ public class PtnetLoLABaseItemSemanticEditPolicy extends SemanticEditPolicy {
 			if (completedRequest instanceof DestroyRequest) {
 				TransactionalEditingDomain editingDomain = ((IGraphicalEditPart) getHost())
 						.getEditingDomain();
-				Command deleteViewCommand = new ICommandProxy(
-						new DeleteCommand(editingDomain, (View) getHost()
-								.getModel()));
+				Command deleteViewCommand = new ICommandProxy(new DeleteCommand(
+						editingDomain, (View) getHost().getModel()));
 				semanticCommand = semanticCommand == null ? deleteViewCommand
 						: semanticCommand.chain(deleteViewCommand);
 			}
@@ -296,8 +295,8 @@ public class PtnetLoLABaseItemSemanticEditPolicy extends SemanticEditPolicy {
 	 * @generated
 	 */
 	protected Command getDestroyElementCommand(View view) {
-		EditPart editPart = (EditPart) getHost().getViewer()
-				.getEditPartRegistry().get(view);
+		EditPart editPart = (EditPart) getHost().getViewer().getEditPartRegistry()
+				.get(view);
 		DestroyElementRequest request = new DestroyElementRequest(
 				getEditingDomain(), false);
 		return editPart.getCommand(new EditCommandRequestWrapper(request,
@@ -329,8 +328,7 @@ public class PtnetLoLABaseItemSemanticEditPolicy extends SemanticEditPolicy {
 		if (view.getEAnnotation("Shortcut") != null) { //$NON-NLS-1$
 			return;
 		}
-		for (Iterator it = view.getDiagram().getChildren().iterator(); it
-				.hasNext();) {
+		for (Iterator it = view.getDiagram().getChildren().iterator(); it.hasNext();) {
 			View nextView = (View) it.next();
 			if (nextView.getEAnnotation("Shortcut") == null || !nextView.isSetElement() || nextView.getElement() != view.getElement()) { //$NON-NLS-1$
 				continue;
@@ -351,47 +349,47 @@ public class PtnetLoLABaseItemSemanticEditPolicy extends SemanticEditPolicy {
 		/**
 		 * @generated
 		 */
-		private static hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAAbstractExpression ArcToPlace_3001_SourceExpression;
+		private static hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAAbstractExpression ArcToPlace_4001_SourceExpression;
 
 		/**
 		 * @generated
 		 */
-		private static hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAAbstractExpression ArcToPlace_3001_TargetExpression;
+		private static hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAAbstractExpression ArcToPlace_4001_TargetExpression;
 
 		/**
 		 * @generated
 		 */
-		private static hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAAbstractExpression ArcToTransition_3002_SourceExpression;
+		private static hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAAbstractExpression ArcToTransition_4002_SourceExpression;
 
 		/**
 		 * @generated
 		 */
-		private static hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAAbstractExpression ArcToTransition_3002_TargetExpression;
+		private static hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAAbstractExpression ArcToTransition_4002_TargetExpression;
 
 		/**
 		 * @generated
 		 */
-		public static boolean canCreateArcToPlace_3001(
+		public static boolean canCreateArcToPlace_4001(
 				hub.top.editor.ptnetLoLA.PtNet container,
 				hub.top.editor.ptnetLoLA.Node source,
 				hub.top.editor.ptnetLoLA.Node target) {
-			return canExistArcToPlace_3001(container, source, target);
+			return canExistArcToPlace_4001(container, source, target);
 		}
 
 		/**
 		 * @generated
 		 */
-		public static boolean canCreateArcToTransition_3002(
+		public static boolean canCreateArcToTransition_4002(
 				hub.top.editor.ptnetLoLA.PtNet container,
 				hub.top.editor.ptnetLoLA.Node source,
 				hub.top.editor.ptnetLoLA.Node target) {
-			return canExistArcToTransition_3002(container, source, target);
+			return canExistArcToTransition_4002(container, source, target);
 		}
 
 		/**
 		 * @generated
 		 */
-		public static boolean canExistArcToPlace_3001(
+		public static boolean canExistArcToPlace_4001(
 				hub.top.editor.ptnetLoLA.PtNet container,
 				hub.top.editor.ptnetLoLA.Node source,
 				hub.top.editor.ptnetLoLA.Node target) {
@@ -399,17 +397,15 @@ public class PtnetLoLABaseItemSemanticEditPolicy extends SemanticEditPolicy {
 				if (source == null) {
 					return true;
 				}
-				if (ArcToPlace_3001_SourceExpression == null) {
+				if (ArcToPlace_4001_SourceExpression == null) {
 					Map env = Collections.singletonMap(OPPOSITE_END_VAR,
-							hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
-									.getNode());
-					ArcToPlace_3001_SourceExpression = hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAOCLFactory
+							hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getNode());
+					ArcToPlace_4001_SourceExpression = hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAOCLFactory
 							.getExpression(
 									"self.oclIsKindOf(Transition)", hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getNode(), env); //$NON-NLS-1$
 				}
-				Object sourceVal = ArcToPlace_3001_SourceExpression.evaluate(
-						source, Collections.singletonMap(OPPOSITE_END_VAR,
-								target));
+				Object sourceVal = ArcToPlace_4001_SourceExpression.evaluate(source,
+						Collections.singletonMap(OPPOSITE_END_VAR, target));
 				if (false == sourceVal instanceof Boolean
 						|| !((Boolean) sourceVal).booleanValue()) {
 					return false;
@@ -417,17 +413,15 @@ public class PtnetLoLABaseItemSemanticEditPolicy extends SemanticEditPolicy {
 				if (target == null) {
 					return true;
 				}
-				if (ArcToPlace_3001_TargetExpression == null) {
+				if (ArcToPlace_4001_TargetExpression == null) {
 					Map env = Collections.singletonMap(OPPOSITE_END_VAR,
-							hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
-									.getNode());
-					ArcToPlace_3001_TargetExpression = hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAOCLFactory
+							hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getNode());
+					ArcToPlace_4001_TargetExpression = hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAOCLFactory
 							.getExpression(
 									"self.oclIsKindOf(Place)", hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getNode(), env); //$NON-NLS-1$
 				}
-				Object targetVal = ArcToPlace_3001_TargetExpression.evaluate(
-						target, Collections.singletonMap(OPPOSITE_END_VAR,
-								source));
+				Object targetVal = ArcToPlace_4001_TargetExpression.evaluate(target,
+						Collections.singletonMap(OPPOSITE_END_VAR, source));
 				if (false == targetVal instanceof Boolean
 						|| !((Boolean) targetVal).booleanValue()) {
 					return false;
@@ -435,8 +429,7 @@ public class PtnetLoLABaseItemSemanticEditPolicy extends SemanticEditPolicy {
 				return true;
 			} catch (Exception e) {
 				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-						.getInstance().logError(
-								"Link constraint evaluation error", e); //$NON-NLS-1$
+						.getInstance().logError("Link constraint evaluation error", e); //$NON-NLS-1$
 				return false;
 			}
 		}
@@ -444,7 +437,7 @@ public class PtnetLoLABaseItemSemanticEditPolicy extends SemanticEditPolicy {
 		/**
 		 * @generated
 		 */
-		public static boolean canExistArcToTransition_3002(
+		public static boolean canExistArcToTransition_4002(
 				hub.top.editor.ptnetLoLA.PtNet container,
 				hub.top.editor.ptnetLoLA.Node source,
 				hub.top.editor.ptnetLoLA.Node target) {
@@ -452,17 +445,15 @@ public class PtnetLoLABaseItemSemanticEditPolicy extends SemanticEditPolicy {
 				if (source == null) {
 					return true;
 				}
-				if (ArcToTransition_3002_SourceExpression == null) {
+				if (ArcToTransition_4002_SourceExpression == null) {
 					Map env = Collections.singletonMap(OPPOSITE_END_VAR,
-							hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
-									.getNode());
-					ArcToTransition_3002_SourceExpression = hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAOCLFactory
+							hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getNode());
+					ArcToTransition_4002_SourceExpression = hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAOCLFactory
 							.getExpression(
 									"self.oclIsKindOf(Place)", hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getNode(), env); //$NON-NLS-1$
 				}
-				Object sourceVal = ArcToTransition_3002_SourceExpression
-						.evaluate(source, Collections.singletonMap(
-								OPPOSITE_END_VAR, target));
+				Object sourceVal = ArcToTransition_4002_SourceExpression.evaluate(
+						source, Collections.singletonMap(OPPOSITE_END_VAR, target));
 				if (false == sourceVal instanceof Boolean
 						|| !((Boolean) sourceVal).booleanValue()) {
 					return false;
@@ -470,17 +461,15 @@ public class PtnetLoLABaseItemSemanticEditPolicy extends SemanticEditPolicy {
 				if (target == null) {
 					return true;
 				}
-				if (ArcToTransition_3002_TargetExpression == null) {
+				if (ArcToTransition_4002_TargetExpression == null) {
 					Map env = Collections.singletonMap(OPPOSITE_END_VAR,
-							hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
-									.getNode());
-					ArcToTransition_3002_TargetExpression = hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAOCLFactory
+							hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getNode());
+					ArcToTransition_4002_TargetExpression = hub.top.editor.ptnetLoLA.diagram.expressions.PtnetLoLAOCLFactory
 							.getExpression(
 									"self.oclIsKindOf(Transition)", hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getNode(), env); //$NON-NLS-1$
 				}
-				Object targetVal = ArcToTransition_3002_TargetExpression
-						.evaluate(target, Collections.singletonMap(
-								OPPOSITE_END_VAR, source));
+				Object targetVal = ArcToTransition_4002_TargetExpression.evaluate(
+						target, Collections.singletonMap(OPPOSITE_END_VAR, source));
 				if (false == targetVal instanceof Boolean
 						|| !((Boolean) targetVal).booleanValue()) {
 					return false;
@@ -488,8 +477,7 @@ public class PtnetLoLABaseItemSemanticEditPolicy extends SemanticEditPolicy {
 				return true;
 			} catch (Exception e) {
 				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-						.getInstance().logError(
-								"Link constraint evaluation error", e); //$NON-NLS-1$
+						.getInstance().logError("Link constraint evaluation error", e); //$NON-NLS-1$
 				return false;
 			}
 		}

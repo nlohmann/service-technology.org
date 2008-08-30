@@ -56,8 +56,7 @@ public class ModelElementSelectionPage extends WizardPage {
 		if (modelViewer != null) {
 			if (selectedModelElement != null) {
 				modelViewer.setInput(selectedModelElement.eResource());
-				modelViewer.setSelection(new StructuredSelection(
-						selectedModelElement));
+				modelViewer.setSelection(new StructuredSelection(selectedModelElement));
 			} else {
 				modelViewer.setInput(null);
 			}
@@ -88,27 +87,22 @@ public class ModelElementSelectionPage extends WizardPage {
 		layoutData.heightHint = 300;
 		layoutData.widthHint = 300;
 		modelViewer.getTree().setLayoutData(layoutData);
-		modelViewer
-				.setContentProvider(new AdapterFactoryContentProvider(
-						hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-								.getInstance().getItemProvidersAdapterFactory()));
-		modelViewer
-				.setLabelProvider(new AdapterFactoryLabelProvider(
-						hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-								.getInstance().getItemProvidersAdapterFactory()));
+		modelViewer.setContentProvider(new AdapterFactoryContentProvider(
+				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
+						.getInstance().getItemProvidersAdapterFactory()));
+		modelViewer.setLabelProvider(new AdapterFactoryLabelProvider(
+				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
+						.getInstance().getItemProvidersAdapterFactory()));
 		if (selectedModelElement != null) {
 			modelViewer.setInput(selectedModelElement.eResource());
-			modelViewer.setSelection(new StructuredSelection(
-					selectedModelElement));
+			modelViewer.setSelection(new StructuredSelection(selectedModelElement));
 		}
-		modelViewer
-				.addSelectionChangedListener(new ISelectionChangedListener() {
-					public void selectionChanged(SelectionChangedEvent event) {
-						ModelElementSelectionPage.this
-								.updateSelection((IStructuredSelection) event
-										.getSelection());
-					}
-				});
+		modelViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				ModelElementSelectionPage.this
+						.updateSelection((IStructuredSelection) event.getSelection());
+			}
+		});
 
 		setPageComplete(validatePage());
 	}
@@ -130,12 +124,10 @@ public class ModelElementSelectionPage extends WizardPage {
 		if (selection.size() == 1) {
 			Object selectedElement = selection.getFirstElement();
 			if (selectedElement instanceof IWrapperItemProvider) {
-				selectedElement = ((IWrapperItemProvider) selectedElement)
-						.getValue();
+				selectedElement = ((IWrapperItemProvider) selectedElement).getValue();
 			}
 			if (selectedElement instanceof FeatureMap.Entry) {
-				selectedElement = ((FeatureMap.Entry) selectedElement)
-						.getValue();
+				selectedElement = ((FeatureMap.Entry) selectedElement).getValue();
 			}
 			if (selectedElement instanceof EObject) {
 				selectedModelElement = (EObject) selectedElement;

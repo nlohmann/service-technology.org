@@ -57,8 +57,8 @@ public class PtnetLoLAReorientConnectionViewCommand extends
 	/**
 	 * @generated
 	 */
-	protected CommandResult doExecuteWithResult(
-			IProgressMonitor progressMonitor, IAdaptable info) {
+	protected CommandResult doExecuteWithResult(IProgressMonitor progressMonitor,
+			IAdaptable info) {
 		assert null != edgeAdaptor : "Null child in PtnetLoLAReorientConnectionViewCommand"; //$NON-NLS-1$
 		Edge edge = (Edge) getEdgeAdaptor().getAdapter(Edge.class);
 		assert null != edge : "Null edge in PtnetLoLAReorientConnectionViewCommand"; //$NON-NLS-1$

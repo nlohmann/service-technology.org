@@ -1,0 +1,25 @@
+The .genmodel is set to generate the following packages.
+
+Model plug-in ID: hub.top.editor.ptnetLoLA
+Model (source) directory: /hub.top.editor.ptnetLoLA/src
+
+Edit plug-in ID: hub.top.editor.ptnetLoLA.edit
+Edit plug-in class: hub.top.editor.ptnetLoLA.provider.PtnetLoLAEditPlugin
+Edit (source) directory: /hub.top.editor.ptnetLoLA.edit/src
+
+Editor - not generated -
+
+Tests - not generated -
+
+
+Package PtnetLoLA:
+
+base package: hub.top.editor
+Prefix: PtnetLoLA
+
+
+
+The .gmfgen is set to generate the following packages.
+
+Package name prefix: hub.top.editor.ptnetLoLA.diagram
+Model ID: PtnetLoLA

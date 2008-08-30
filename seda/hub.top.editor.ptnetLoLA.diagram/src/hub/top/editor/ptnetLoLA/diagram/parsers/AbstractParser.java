@@ -172,8 +172,7 @@ public abstract class AbstractParser implements IParser {
 		CompositeTransactionalCommand command = new CompositeTransactionalCommand(
 				editingDomain, "Set Values"); //$NON-NLS-1$
 		for (int i = 0; i < values.length; i++) {
-			command.compose(getModificationCommand(element, features[i],
-					values[i]));
+			command.compose(getModificationCommand(element, features[i], values[i]));
 		}
 		return command;
 	}

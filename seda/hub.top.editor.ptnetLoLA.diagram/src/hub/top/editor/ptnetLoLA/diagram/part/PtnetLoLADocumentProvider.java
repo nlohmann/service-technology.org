@@ -1,5 +1,7 @@
 package hub.top.editor.ptnetLoLA.diagram.part;
 
+import hub.top.editor.ptnetLoLA.transaction.PtnetLoLAEditingDomainFactory;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,8 +65,7 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 	/**
 	 * @generated
 	 */
-	protected ElementInfo createElementInfo(Object element)
-			throws CoreException {
+	protected ElementInfo createElementInfo(Object element) throws CoreException {
 		if (false == element instanceof FileEditorInput
 				&& false == element instanceof URIEditorInput) {
 			throw new CoreException(
@@ -157,6 +158,20 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 	}
 
 	/**
+	 * @generated not
+	 */
+	private TransactionalEditingDomain createEditingDomain_fromPackage() {
+		// -- uncomment the following lines in createEditingDomain() --
+		//TransactionalEditingDomain editingDomain = DiagramEditingDomainFactory
+		//.getInstance().createEditingDomain();
+		//editingDomain.setID("hub.top.editor.ptnetLoLA.diagram.EditingDomain"); //$NON-NLS-1$
+		// -- and call this method instead --
+		TransactionalEditingDomain editingDomain = TransactionalEditingDomain.Registry.INSTANCE
+				.getEditingDomain(PtnetLoLAEditingDomainFactory.EDITING_DOMAIN_ID);
+		return editingDomain;
+	}
+
+	/**
 	 * @generated
 	 */
 	private TransactionalEditingDomain createEditingDomain() {
@@ -165,10 +180,8 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 		editingDomain.setID("hub.top.editor.ptnetLoLA.diagram.EditingDomain"); //$NON-NLS-1$
 		final NotificationFilter diagramResourceModifiedFilter = NotificationFilter
 				.createNotifierFilter(editingDomain.getResourceSet()).and(
-						NotificationFilter
-								.createEventTypeFilter(Notification.ADD)).and(
-						NotificationFilter.createFeatureFilter(
-								ResourceSet.class,
+						NotificationFilter.createEventTypeFilter(Notification.ADD)).and(
+						NotificationFilter.createFeatureFilter(ResourceSet.class,
 								ResourceSet.RESOURCE_SET__RESOURCES));
 		editingDomain.getResourceSet().eAdapters().add(new Adapter() {
 
@@ -216,11 +229,10 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 			URI uri = ((URIEditorInput) element).getURI();
 			Resource resource = null;
 			try {
-				resource = domain.getResourceSet().getResource(
-						uri.trimFragment(), false);
+				resource = domain.getResourceSet().getResource(uri.trimFragment(),
+						false);
 				if (resource == null) {
-					resource = domain.getResourceSet().createResource(
-							uri.trimFragment());
+					resource = domain.getResourceSet().createResource(uri.trimFragment());
 				}
 				if (!resource.isLoaded()) {
 					try {
@@ -241,8 +253,7 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 						return;
 					}
 				} else {
-					for (Iterator it = resource.getContents().iterator(); it
-							.hasNext();) {
+					for (Iterator it = resource.getContents().iterator(); it.hasNext();) {
 						Object rootElement = it.next();
 						if (rootElement instanceof Diagram) {
 							document.setContent((Diagram) rootElement);
@@ -347,8 +358,8 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 				}
 			}
 			ResourcesPlugin.getWorkspace().validateEdit(
-					(IFile[]) files2Validate.toArray(new IFile[files2Validate
-							.size()]), computationContext);
+					(IFile[]) files2Validate.toArray(new IFile[files2Validate.size()]),
+					computationContext);
 		}
 
 		super.doValidateState(element, computationContext);
@@ -462,8 +473,8 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 				Resource nextResource = (Resource) it.next();
 				IFile file = WorkspaceSynchronizer.getFile(nextResource);
 				if (file != null) {
-					rules.add(ResourcesPlugin.getWorkspace().getRuleFactory()
-							.modifyRule(file));
+					rules.add(ResourcesPlugin.getWorkspace().getRuleFactory().modifyRule(
+							file));
 				}
 			}
 			return new MultiRule((ISchedulingRule[]) rules
@@ -530,9 +541,8 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 					files.add(file);
 				}
 			}
-			return ResourcesPlugin.getWorkspace().getRuleFactory()
-					.validateEditRule(
-							(IFile[]) files.toArray(new IFile[files.size()]));
+			return ResourcesPlugin.getWorkspace().getRuleFactory().validateEditRule(
+					(IFile[]) files.toArray(new IFile[files.size()]));
 		}
 		return null;
 	}
@@ -610,8 +620,7 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 											hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLADocumentProvider_SaveNextResourceTask,
 											nextResource.getURI()));
 					if (nextResource.isLoaded()
-							&& !info.getEditingDomain()
-									.isReadOnly(nextResource)) {
+							&& !info.getEditingDomain().isReadOnly(nextResource)) {
 						try {
 							nextResource
 									.save(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorUtil
@@ -622,8 +631,8 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 									new Status(
 											IStatus.ERROR,
 											hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin.ID,
-											EditorStatusCodes.RESOURCE_FAILURE,
-											e.getLocalizedMessage(), null));
+											EditorStatusCodes.RESOURCE_FAILURE, e
+													.getLocalizedMessage(), null));
 						}
 					}
 					monitor.worked(1);
@@ -642,8 +651,8 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 			if (element instanceof FileEditorInput) {
 				IFile newFile = ((FileEditorInput) element).getFile();
 				affectedFiles = Collections.singletonList(newFile);
-				newResoruceURI = URI.createPlatformResourceURI(newFile
-						.getFullPath().toString(), true);
+				newResoruceURI = URI.createPlatformResourceURI(newFile.getFullPath()
+						.toString(), true);
 			} else if (element instanceof URIEditorInput) {
 				newResoruceURI = ((URIEditorInput) element).getURI();
 			} else {
@@ -673,8 +682,8 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 			IDiagramDocument diagramDocument = (IDiagramDocument) document;
 			final Resource newResource = diagramDocument.getEditingDomain()
 					.getResourceSet().createResource(newResoruceURI);
-			final Diagram diagramCopy = (Diagram) EcoreUtil
-					.copy(diagramDocument.getDiagram());
+			final Diagram diagramCopy = (Diagram) EcoreUtil.copy(diagramDocument
+					.getDiagram());
 			try {
 				new AbstractTransactionalCommand(
 						diagramDocument.getEditingDomain(),
@@ -682,9 +691,8 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 								.bind(
 										hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLADocumentProvider_SaveAsOperation,
 										diagramCopy.getName()), affectedFiles) {
-					protected CommandResult doExecuteWithResult(
-							IProgressMonitor monitor, IAdaptable info)
-							throws ExecutionException {
+					protected CommandResult doExecuteWithResult(IProgressMonitor monitor,
+							IAdaptable info) throws ExecutionException {
 						newResource.getContents().add(diagramCopy);
 						return CommandResult.newOKCommandResult();
 					}
@@ -753,8 +761,8 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 		if (input instanceof FileEditorInput) {
 			IFile newFile = ResourcesPlugin.getWorkspace().getRoot().getFile(
 					new Path(URI.decode(uri.path())).removeFirstSegments(1));
-			fireElementMoved(input, newFile == null ? null
-					: new FileEditorInput(newFile));
+			fireElementMoved(input, newFile == null ? null : new FileEditorInput(
+					newFile));
 			return;
 		}
 		// TODO: append suffix to the URI! (use diagram as a parameter)
@@ -840,8 +848,7 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 		/**
 		 * @generated
 		 */
-		public ResourceSetInfo(IDiagramDocument document,
-				IEditorInput editorInput) {
+		public ResourceSetInfo(IDiagramDocument document, IEditorInput editorInput) {
 			super(document);
 			myDocument = document;
 			myEditorInput = editorInput;
@@ -1009,8 +1016,7 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 				}
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
-						handleElementChanged(ResourceSetInfo.this, resource,
-								null);
+						handleElementChanged(ResourceSetInfo.this, resource, null);
 					}
 				});
 				return true;
@@ -1028,8 +1034,7 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 				}
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
-						fireElementDeleted(ResourceSetInfo.this
-								.getEditorInput());
+						fireElementDeleted(ResourceSetInfo.this.getEditorInput());
 					}
 				});
 				return true;
@@ -1038,8 +1043,7 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 			/**
 			 * @generated
 			 */
-			public boolean handleResourceMoved(Resource resource,
-					final URI newURI) {
+			public boolean handleResourceMoved(Resource resource, final URI newURI) {
 				synchronized (ResourceSetInfo.this) {
 					if (ResourceSetInfo.this.fCanBeSaved) {
 						ResourceSetInfo.this.setUnSynchronized(resource);
@@ -1049,8 +1053,7 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 				if (myDocument.getDiagram().eResource() == resource) {
 					Display.getDefault().asyncExec(new Runnable() {
 						public void run() {
-							handleElementMoved(ResourceSetInfo.this
-									.getEditorInput(), newURI);
+							handleElementMoved(ResourceSetInfo.this.getEditorInput(), newURI);
 						}
 					});
 				} else {
@@ -1085,8 +1088,7 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 			myInfo = info;
 			myModifiedFilter = NotificationFilter.createEventTypeFilter(
 					Notification.SET).or(
-					NotificationFilter
-							.createEventTypeFilter(Notification.UNSET)).and(
+					NotificationFilter.createEventTypeFilter(Notification.UNSET)).and(
 					NotificationFilter.createFeatureFilter(Resource.class,
 							Resource.RESOURCE__IS_MODIFIED));
 		}
@@ -1098,15 +1100,13 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 			if (notification.getNotifier() instanceof ResourceSet) {
 				super.notifyChanged(notification);
 			}
-			if (!notification.isTouch()
-					&& myModifiedFilter.matches(notification)) {
+			if (!notification.isTouch() && myModifiedFilter.matches(notification)) {
 				if (notification.getNotifier() instanceof Resource) {
 					Resource resource = (Resource) notification.getNotifier();
 					if (resource.isLoaded()) {
 						boolean modified = false;
 						for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = myInfo
-								.getLoadedResourcesIterator(); it.hasNext()
-								&& !modified;) {
+								.getLoadedResourcesIterator(); it.hasNext() && !modified;) {
 							Resource nextResource = (Resource) it.next();
 							if (nextResource.isLoaded()) {
 								modified = nextResource.isModified();
@@ -1123,12 +1123,10 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 							}
 						}
 						if (dirtyStateChanged) {
-							fireElementDirtyStateChanged(myInfo
-									.getEditorInput(), modified);
+							fireElementDirtyStateChanged(myInfo.getEditorInput(), modified);
 
 							if (!modified) {
-								myInfo
-										.setModificationStamp(computeModificationStamp(myInfo));
+								myInfo.setModificationStamp(computeModificationStamp(myInfo));
 							}
 						}
 					}

@@ -24,7 +24,7 @@ public class PtnetLoLADiagramUpdater {
 		switch (hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
 				.getVisualID(view)) {
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart.VISUAL_ID:
-			return getPtNet_79SemanticChildren(view);
+			return getPtNet_1000SemanticChildren(view);
 		}
 		return Collections.EMPTY_LIST;
 	}
@@ -32,15 +32,14 @@ public class PtnetLoLADiagramUpdater {
 	/**
 	 * @generated
 	 */
-	public static List getPtNet_79SemanticChildren(View view) {
+	public static List getPtNet_1000SemanticChildren(View view) {
 		if (!view.isSetElement()) {
 			return Collections.EMPTY_LIST;
 		}
 		hub.top.editor.ptnetLoLA.PtNet modelElement = (hub.top.editor.ptnetLoLA.PtNet) view
 				.getElement();
 		List result = new LinkedList();
-		for (Iterator it = modelElement.getTransitions().iterator(); it
-				.hasNext();) {
+		for (Iterator it = modelElement.getTransitions().iterator(); it.hasNext();) {
 			hub.top.editor.ptnetLoLA.Transition childElement = (hub.top.editor.ptnetLoLA.Transition) it
 					.next();
 			int visualID = hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
@@ -74,15 +73,15 @@ public class PtnetLoLADiagramUpdater {
 		switch (hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
 				.getVisualID(view)) {
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart.VISUAL_ID:
-			return getPtNet_79ContainedLinks(view);
+			return getPtNet_1000ContainedLinks(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart.VISUAL_ID:
-			return getTransition_1001ContainedLinks(view);
+			return getTransition_2001ContainedLinks(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart.VISUAL_ID:
-			return getPlace_1002ContainedLinks(view);
+			return getPlace_2002ContainedLinks(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToPlaceEditPart.VISUAL_ID:
-			return getArcToPlace_3001ContainedLinks(view);
+			return getArcToPlace_4001ContainedLinks(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToTransitionEditPart.VISUAL_ID:
-			return getArcToTransition_3002ContainedLinks(view);
+			return getArcToTransition_4002ContainedLinks(view);
 		}
 		return Collections.EMPTY_LIST;
 	}
@@ -94,13 +93,13 @@ public class PtnetLoLADiagramUpdater {
 		switch (hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
 				.getVisualID(view)) {
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart.VISUAL_ID:
-			return getTransition_1001IncomingLinks(view);
+			return getTransition_2001IncomingLinks(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart.VISUAL_ID:
-			return getPlace_1002IncomingLinks(view);
+			return getPlace_2002IncomingLinks(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToPlaceEditPart.VISUAL_ID:
-			return getArcToPlace_3001IncomingLinks(view);
+			return getArcToPlace_4001IncomingLinks(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToTransitionEditPart.VISUAL_ID:
-			return getArcToTransition_3002IncomingLinks(view);
+			return getArcToTransition_4002IncomingLinks(view);
 		}
 		return Collections.EMPTY_LIST;
 	}
@@ -112,13 +111,13 @@ public class PtnetLoLADiagramUpdater {
 		switch (hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
 				.getVisualID(view)) {
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart.VISUAL_ID:
-			return getTransition_1001OutgoingLinks(view);
+			return getTransition_2001OutgoingLinks(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart.VISUAL_ID:
-			return getPlace_1002OutgoingLinks(view);
+			return getPlace_2002OutgoingLinks(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToPlaceEditPart.VISUAL_ID:
-			return getArcToPlace_3001OutgoingLinks(view);
+			return getArcToPlace_4001OutgoingLinks(view);
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToTransitionEditPart.VISUAL_ID:
-			return getArcToTransition_3002OutgoingLinks(view);
+			return getArcToTransition_4002OutgoingLinks(view);
 		}
 		return Collections.EMPTY_LIST;
 	}
@@ -126,57 +125,57 @@ public class PtnetLoLADiagramUpdater {
 	/**
 	 * @generated
 	 */
-	public static List getPtNet_79ContainedLinks(View view) {
+	public static List getPtNet_1000ContainedLinks(View view) {
 		hub.top.editor.ptnetLoLA.PtNet modelElement = (hub.top.editor.ptnetLoLA.PtNet) view
 				.getElement();
 		List result = new LinkedList();
 		result
-				.addAll(getContainedTypeModelFacetLinks_ArcToPlace_3001(modelElement));
+				.addAll(getContainedTypeModelFacetLinks_ArcToPlace_4001(modelElement));
 		result
-				.addAll(getContainedTypeModelFacetLinks_ArcToTransition_3002(modelElement));
+				.addAll(getContainedTypeModelFacetLinks_ArcToTransition_4002(modelElement));
 		return result;
 	}
 
 	/**
 	 * @generated
 	 */
-	public static List getTransition_1001ContainedLinks(View view) {
+	public static List getTransition_2001ContainedLinks(View view) {
 		return Collections.EMPTY_LIST;
 	}
 
 	/**
 	 * @generated
 	 */
-	public static List getPlace_1002ContainedLinks(View view) {
+	public static List getPlace_2002ContainedLinks(View view) {
 		return Collections.EMPTY_LIST;
 	}
 
 	/**
 	 * @generated
 	 */
-	public static List getArcToPlace_3001ContainedLinks(View view) {
+	public static List getArcToPlace_4001ContainedLinks(View view) {
 		return Collections.EMPTY_LIST;
 	}
 
 	/**
 	 * @generated
 	 */
-	public static List getArcToTransition_3002ContainedLinks(View view) {
+	public static List getArcToTransition_4002ContainedLinks(View view) {
 		return Collections.EMPTY_LIST;
 	}
 
 	/**
 	 * @generated
 	 */
-	public static List getTransition_1001IncomingLinks(View view) {
+	public static List getTransition_2001IncomingLinks(View view) {
 		hub.top.editor.ptnetLoLA.Transition modelElement = (hub.top.editor.ptnetLoLA.Transition) view
 				.getElement();
 		Map crossReferences = EcoreUtil.CrossReferencer.find(view.eResource()
 				.getResourceSet().getResources());
 		List result = new LinkedList();
-		result.addAll(getIncomingTypeModelFacetLinks_ArcToPlace_3001(
-				modelElement, crossReferences));
-		result.addAll(getIncomingTypeModelFacetLinks_ArcToTransition_3002(
+		result.addAll(getIncomingTypeModelFacetLinks_ArcToPlace_4001(modelElement,
+				crossReferences));
+		result.addAll(getIncomingTypeModelFacetLinks_ArcToTransition_4002(
 				modelElement, crossReferences));
 		return result;
 	}
@@ -184,15 +183,15 @@ public class PtnetLoLADiagramUpdater {
 	/**
 	 * @generated
 	 */
-	public static List getPlace_1002IncomingLinks(View view) {
+	public static List getPlace_2002IncomingLinks(View view) {
 		hub.top.editor.ptnetLoLA.Place modelElement = (hub.top.editor.ptnetLoLA.Place) view
 				.getElement();
 		Map crossReferences = EcoreUtil.CrossReferencer.find(view.eResource()
 				.getResourceSet().getResources());
 		List result = new LinkedList();
-		result.addAll(getIncomingTypeModelFacetLinks_ArcToPlace_3001(
-				modelElement, crossReferences));
-		result.addAll(getIncomingTypeModelFacetLinks_ArcToTransition_3002(
+		result.addAll(getIncomingTypeModelFacetLinks_ArcToPlace_4001(modelElement,
+				crossReferences));
+		result.addAll(getIncomingTypeModelFacetLinks_ArcToTransition_4002(
 				modelElement, crossReferences));
 		return result;
 	}
@@ -200,63 +199,61 @@ public class PtnetLoLADiagramUpdater {
 	/**
 	 * @generated
 	 */
-	public static List getArcToPlace_3001IncomingLinks(View view) {
+	public static List getArcToPlace_4001IncomingLinks(View view) {
 		return Collections.EMPTY_LIST;
 	}
 
 	/**
 	 * @generated
 	 */
-	public static List getArcToTransition_3002IncomingLinks(View view) {
+	public static List getArcToTransition_4002IncomingLinks(View view) {
 		return Collections.EMPTY_LIST;
 	}
 
 	/**
 	 * @generated
 	 */
-	public static List getTransition_1001OutgoingLinks(View view) {
+	public static List getTransition_2001OutgoingLinks(View view) {
 		hub.top.editor.ptnetLoLA.Transition modelElement = (hub.top.editor.ptnetLoLA.Transition) view
 				.getElement();
 		List result = new LinkedList();
+		result.addAll(getOutgoingTypeModelFacetLinks_ArcToPlace_4001(modelElement));
 		result
-				.addAll(getOutgoingTypeModelFacetLinks_ArcToPlace_3001(modelElement));
-		result
-				.addAll(getOutgoingTypeModelFacetLinks_ArcToTransition_3002(modelElement));
+				.addAll(getOutgoingTypeModelFacetLinks_ArcToTransition_4002(modelElement));
 		return result;
 	}
 
 	/**
 	 * @generated
 	 */
-	public static List getPlace_1002OutgoingLinks(View view) {
+	public static List getPlace_2002OutgoingLinks(View view) {
 		hub.top.editor.ptnetLoLA.Place modelElement = (hub.top.editor.ptnetLoLA.Place) view
 				.getElement();
 		List result = new LinkedList();
+		result.addAll(getOutgoingTypeModelFacetLinks_ArcToPlace_4001(modelElement));
 		result
-				.addAll(getOutgoingTypeModelFacetLinks_ArcToPlace_3001(modelElement));
-		result
-				.addAll(getOutgoingTypeModelFacetLinks_ArcToTransition_3002(modelElement));
+				.addAll(getOutgoingTypeModelFacetLinks_ArcToTransition_4002(modelElement));
 		return result;
 	}
 
 	/**
 	 * @generated
 	 */
-	public static List getArcToPlace_3001OutgoingLinks(View view) {
+	public static List getArcToPlace_4001OutgoingLinks(View view) {
 		return Collections.EMPTY_LIST;
 	}
 
 	/**
 	 * @generated
 	 */
-	public static List getArcToTransition_3002OutgoingLinks(View view) {
+	public static List getArcToTransition_4002OutgoingLinks(View view) {
 		return Collections.EMPTY_LIST;
 	}
 
 	/**
 	 * @generated
 	 */
-	private static Collection getContainedTypeModelFacetLinks_ArcToPlace_3001(
+	private static Collection getContainedTypeModelFacetLinks_ArcToPlace_4001(
 			hub.top.editor.ptnetLoLA.PtNet container) {
 		Collection result = new LinkedList();
 		for (Iterator links = container.getArcs().iterator(); links.hasNext();) {
@@ -276,7 +273,7 @@ public class PtnetLoLADiagramUpdater {
 							src,
 							dst,
 							link,
-							hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_3001,
+							hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001,
 							hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToPlaceEditPart.VISUAL_ID));
 		}
 		return result;
@@ -285,7 +282,7 @@ public class PtnetLoLADiagramUpdater {
 	/**
 	 * @generated
 	 */
-	private static Collection getContainedTypeModelFacetLinks_ArcToTransition_3002(
+	private static Collection getContainedTypeModelFacetLinks_ArcToTransition_4002(
 			hub.top.editor.ptnetLoLA.PtNet container) {
 		Collection result = new LinkedList();
 		for (Iterator links = container.getArcs().iterator(); links.hasNext();) {
@@ -305,7 +302,7 @@ public class PtnetLoLADiagramUpdater {
 							src,
 							dst,
 							link,
-							hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_3002,
+							hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002,
 							hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToTransitionEditPart.VISUAL_ID));
 		}
 		return result;
@@ -314,7 +311,7 @@ public class PtnetLoLADiagramUpdater {
 	/**
 	 * @generated
 	 */
-	private static Collection getIncomingTypeModelFacetLinks_ArcToPlace_3001(
+	private static Collection getIncomingTypeModelFacetLinks_ArcToPlace_4001(
 			hub.top.editor.ptnetLoLA.Node target, Map crossReferences) {
 		Collection result = new LinkedList();
 		Collection settings = (Collection) crossReferences.get(target);
@@ -338,7 +335,7 @@ public class PtnetLoLADiagramUpdater {
 							src,
 							target,
 							link,
-							hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_3001,
+							hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001,
 							hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToPlaceEditPart.VISUAL_ID));
 		}
 		return result;
@@ -347,7 +344,7 @@ public class PtnetLoLADiagramUpdater {
 	/**
 	 * @generated
 	 */
-	private static Collection getIncomingTypeModelFacetLinks_ArcToTransition_3002(
+	private static Collection getIncomingTypeModelFacetLinks_ArcToTransition_4002(
 			hub.top.editor.ptnetLoLA.Node target, Map crossReferences) {
 		Collection result = new LinkedList();
 		Collection settings = (Collection) crossReferences.get(target);
@@ -371,7 +368,7 @@ public class PtnetLoLADiagramUpdater {
 							src,
 							target,
 							link,
-							hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_3002,
+							hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002,
 							hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToTransitionEditPart.VISUAL_ID));
 		}
 		return result;
@@ -380,7 +377,7 @@ public class PtnetLoLADiagramUpdater {
 	/**
 	 * @generated
 	 */
-	private static Collection getOutgoingTypeModelFacetLinks_ArcToPlace_3001(
+	private static Collection getOutgoingTypeModelFacetLinks_ArcToPlace_4001(
 			hub.top.editor.ptnetLoLA.Node source) {
 		hub.top.editor.ptnetLoLA.PtNet container = null;
 		// Find container element for the link.
@@ -416,7 +413,7 @@ public class PtnetLoLADiagramUpdater {
 							src,
 							dst,
 							link,
-							hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_3001,
+							hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001,
 							hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToPlaceEditPart.VISUAL_ID));
 		}
 		return result;
@@ -425,7 +422,7 @@ public class PtnetLoLADiagramUpdater {
 	/**
 	 * @generated
 	 */
-	private static Collection getOutgoingTypeModelFacetLinks_ArcToTransition_3002(
+	private static Collection getOutgoingTypeModelFacetLinks_ArcToTransition_4002(
 			hub.top.editor.ptnetLoLA.Node source) {
 		hub.top.editor.ptnetLoLA.PtNet container = null;
 		// Find container element for the link.
@@ -461,7 +458,7 @@ public class PtnetLoLADiagramUpdater {
 							src,
 							dst,
 							link,
-							hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_3002,
+							hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002,
 							hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToTransitionEditPart.VISUAL_ID));
 		}
 		return result;

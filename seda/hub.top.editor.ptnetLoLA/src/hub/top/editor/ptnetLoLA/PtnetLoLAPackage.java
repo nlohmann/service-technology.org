@@ -942,7 +942,7 @@ public interface PtnetLoLAPackage extends EPackage {
 	 * @generated
 	 */
 	PtnetLoLAFactory getPtnetLoLAFactory();
-
+	
 	/**
 	 * <!-- begin-user-doc -->
 	 * Defines literals for the meta objects that represent

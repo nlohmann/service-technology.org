@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Service-Technology.org Editor Suite
 Bundle-SymbolicName: hub.top.editor;singleton:=true
-Bundle-Version: 1.0.3.qualifier
+Bundle-Version: 1.0.5.qualifier
 Bundle-Activator: hub.top.editor.Activator
 Bundle-Vendor: Service-Technology.org
 Require-Bundle: org.eclipse.ui,
@@ -13,3 +13,5 @@ Require-Bundle: org.eclipse.ui,
  hub.top.editor.resource
 Eclipse-LazyStart: true
 Export-Package: hub.top.editor
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy

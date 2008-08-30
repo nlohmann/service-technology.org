@@ -6,8 +6,7 @@ import java.util.LinkedList;
 /**
  * @generated
  */
-public class PtnetLoLANavigatorGroup
-		extends
+public class PtnetLoLANavigatorGroup extends
 		hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem {
 
 	/**

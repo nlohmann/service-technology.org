@@ -56,7 +56,7 @@ public class TransitionNameEditPart extends LabelEditPart implements
 	/**
 	 * @generated
 	 */
-	public static final int VISUAL_ID = 4001;
+	public static final int VISUAL_ID = 5001;
 
 	/**
 	 * @generated
@@ -100,8 +100,7 @@ public class TransitionNameEditPart extends LabelEditPart implements
 	 */
 	protected void createDefaultEditPolicies() {
 		super.createDefaultEditPolicies();
-		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE,
-				new LabelDirectEditPolicy());
+		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new LabelDirectEditPolicy());
 	}
 
 	/**
@@ -129,8 +128,7 @@ public class TransitionNameEditPart extends LabelEditPart implements
 				.getSize_Width())).intValue();
 		int height = ((Integer) getStructuralFeatureValue(NotationPackage.eINSTANCE
 				.getSize_Height())).intValue();
-		getBorderItemLocator()
-				.setConstraint(new Rectangle(x, y, width, height));
+		getBorderItemLocator().setConstraint(new Rectangle(x, y, width, height));
 	}
 
 	/**
@@ -223,8 +221,7 @@ public class TransitionNameEditPart extends LabelEditPart implements
 		String text = null;
 		EObject parserElement = getParserElement();
 		if (parserElement != null && getParser() != null) {
-			text = getParser().getPrintString(
-					new EObjectAdapter(parserElement),
+			text = getParser().getPrintString(new EObjectAdapter(parserElement),
 					getParserOptions().intValue());
 		}
 		if (text == null || text.length() == 0) {
@@ -253,8 +250,7 @@ public class TransitionNameEditPart extends LabelEditPart implements
 		if (getParserElement() == null || getParser() == null) {
 			return ""; //$NON-NLS-1$
 		}
-		return getParser().getEditString(
-				new EObjectAdapter(getParserElement()),
+		return getParser().getEditString(new EObjectAdapter(getParserElement()),
 				getParserOptions().intValue());
 	}
 
@@ -280,13 +276,12 @@ public class TransitionNameEditPart extends LabelEditPart implements
 								.runExclusive(new RunnableWithResult.Impl() {
 
 									public void run() {
-										setResult(parser.isValidEditString(
-												new EObjectAdapter(element),
-												(String) value));
+										setResult(parser.isValidEditString(new EObjectAdapter(
+												element), (String) value));
 									}
 								});
-						return valid.getCode() == ParserEditStatus.EDITABLE ? null
-								: valid.getMessage();
+						return valid.getCode() == ParserEditStatus.EDITABLE ? null : valid
+								.getMessage();
 					} catch (InterruptedException ie) {
 						ie.printStackTrace();
 					}
@@ -323,7 +318,7 @@ public class TransitionNameEditPart extends LabelEditPart implements
 		if (parser == null) {
 			String parserHint = ((View) getModel()).getType();
 			IAdaptable hintAdapter = new hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAParserProvider.HintAdapter(
-					hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_1001,
+					hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001,
 					getParserElement(), parserHint);
 			parser = ParserService.getInstance().getParser(hintAdapter);
 		}
@@ -335,9 +330,8 @@ public class TransitionNameEditPart extends LabelEditPart implements
 	 */
 	protected DirectEditManager getManager() {
 		if (manager == null) {
-			setManager(new TextDirectEditManager(
-					this,
-					TextDirectEditManager.getTextCellEditorClass(this),
+			setManager(new TextDirectEditManager(this, TextDirectEditManager
+					.getTextCellEditorClass(this),
 					hub.top.editor.ptnetLoLA.diagram.edit.parts.PtnetLoLAEditPartFactory
 							.getTextCellEditorLocator(this)));
 		}
@@ -363,8 +357,7 @@ public class TransitionNameEditPart extends LabelEditPart implements
 	 */
 	protected void performDirectEdit(Point eventLocation) {
 		if (getManager().getClass() == TextDirectEditManager.class) {
-			((TextDirectEditManager) getManager()).show(eventLocation
-					.getSWTPoint());
+			((TextDirectEditManager) getManager()).show(eventLocation.getSWTPoint());
 		}
 	}
 
@@ -389,10 +382,8 @@ public class TransitionNameEditPart extends LabelEditPart implements
 
 				public void run() {
 					if (isActive() && isEditable()) {
-						if (theRequest
-								.getExtendedData()
-								.get(
-										RequestConstants.REQ_DIRECTEDIT_EXTENDEDDATA_INITIAL_CHAR) instanceof Character) {
+						if (theRequest.getExtendedData().get(
+								RequestConstants.REQ_DIRECTEDIT_EXTENDEDDATA_INITIAL_CHAR) instanceof Character) {
 							Character initialChar = (Character) theRequest
 									.getExtendedData()
 									.get(
@@ -545,22 +536,18 @@ public class TransitionNameEditPart extends LabelEditPart implements
 		} else if (NotationPackage.eINSTANCE.getFontStyle_Underline().equals(
 				feature)) {
 			refreshUnderline();
-		} else if (NotationPackage.eINSTANCE.getFontStyle_StrikeThrough()
-				.equals(feature)) {
+		} else if (NotationPackage.eINSTANCE.getFontStyle_StrikeThrough().equals(
+				feature)) {
 			refreshStrikeThrough();
 		} else if (NotationPackage.eINSTANCE.getFontStyle_FontHeight().equals(
 				feature)
-				|| NotationPackage.eINSTANCE.getFontStyle_FontName().equals(
-						feature)
-				|| NotationPackage.eINSTANCE.getFontStyle_Bold()
-						.equals(feature)
-				|| NotationPackage.eINSTANCE.getFontStyle_Italic().equals(
-						feature)) {
+				|| NotationPackage.eINSTANCE.getFontStyle_FontName().equals(feature)
+				|| NotationPackage.eINSTANCE.getFontStyle_Bold().equals(feature)
+				|| NotationPackage.eINSTANCE.getFontStyle_Italic().equals(feature)) {
 			refreshFont();
 		} else {
 			if (getParser() != null
-					&& getParser().isAffectingEvent(event,
-							getParserOptions().intValue())) {
+					&& getParser().isAffectingEvent(event, getParserOptions().intValue())) {
 				refreshLabel();
 			}
 			if (getParser() instanceof ISemanticParser) {

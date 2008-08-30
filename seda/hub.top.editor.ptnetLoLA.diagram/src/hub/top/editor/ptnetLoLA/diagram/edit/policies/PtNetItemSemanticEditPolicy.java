@@ -18,7 +18,7 @@ public class PtNetItemSemanticEditPolicy
 	 * @generated
 	 */
 	protected Command getCreateCommand(CreateElementRequest req) {
-		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_1001 == req
+		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001 == req
 				.getElementType()) {
 			if (req.getContainmentFeature() == null) {
 				req
@@ -28,7 +28,7 @@ public class PtNetItemSemanticEditPolicy
 			return getGEFWrapper(new hub.top.editor.ptnetLoLA.diagram.edit.commands.TransitionCreateCommand(
 					req));
 		}
-		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_1002 == req
+		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002 == req
 				.getElementType()) {
 			if (req.getContainmentFeature() == null) {
 				req
@@ -59,11 +59,9 @@ public class PtNetItemSemanticEditPolicy
 		/**
 		 * @generated
 		 */
-		public DuplicateAnythingCommand(
-				TransactionalEditingDomain editingDomain,
+		public DuplicateAnythingCommand(TransactionalEditingDomain editingDomain,
 				DuplicateElementsRequest req) {
-			super(editingDomain, req.getLabel(), req
-					.getElementsToBeDuplicated(), req
+			super(editingDomain, req.getLabel(), req.getElementsToBeDuplicated(), req
 					.getAllDuplicatedElementsMap());
 		}
 

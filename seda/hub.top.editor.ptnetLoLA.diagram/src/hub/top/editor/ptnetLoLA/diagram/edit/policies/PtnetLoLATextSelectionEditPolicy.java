@@ -120,10 +120,8 @@ public class PtnetLoLATextSelectionEditPolicy extends SelectionEditPolicy {
 		if (getHostFigure() instanceof Label) {
 			Label feedbackFigure = new Label();
 			feedbackFigure.setOpaque(true);
-			feedbackFigure
-					.setBackgroundColor(ColorConstants.menuBackgroundSelected);
-			feedbackFigure
-					.setForegroundColor(ColorConstants.menuForegroundSelected);
+			feedbackFigure.setBackgroundColor(ColorConstants.menuBackgroundSelected);
+			feedbackFigure.setForegroundColor(ColorConstants.menuForegroundSelected);
 			return feedbackFigure;
 		} else {
 			RectangleFigure feedbackFigure = new RectangleFigure();
@@ -163,8 +161,7 @@ public class PtnetLoLATextSelectionEditPolicy extends SelectionEditPolicy {
 				updateLabel((Label) selectionFeedbackFigure);
 				selectionFeedbackFigure.setBounds(getFeedbackBounds());
 			} else {
-				selectionFeedbackFigure.setBounds(getFeedbackBounds().expand(5,
-						5));
+				selectionFeedbackFigure.setBounds(getFeedbackBounds().expand(5, 5));
 			}
 		}
 	}

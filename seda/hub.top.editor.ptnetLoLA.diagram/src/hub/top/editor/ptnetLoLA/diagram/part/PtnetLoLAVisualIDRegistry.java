@@ -62,8 +62,7 @@ public class PtnetLoLAVisualIDRegistry {
 					Platform.getDebugOption(DEBUG_KEY))) {
 				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
 						.getInstance().logError(
-								"Unable to parse view type as a visualID number: "
-										+ type);
+								"Unable to parse view type as a visualID number: " + type);
 			}
 		}
 		return -1;
@@ -118,8 +117,8 @@ public class PtnetLoLAVisualIDRegistry {
 		}
 		switch (containerVisualID) {
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart.VISUAL_ID:
-			if (hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
-					.getTransition().isSuperTypeOf(domainElement.eClass())) {
+			if (hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getTransition()
+					.isSuperTypeOf(domainElement.eClass())) {
 				return hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart.VISUAL_ID;
 			}
 			if (hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE.getPlace()

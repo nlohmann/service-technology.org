@@ -22,7 +22,7 @@ public class ArcToPlaceEditPart extends ConnectionNodeEditPart implements
 	/**
 	 * @generated
 	 */
-	public static final int VISUAL_ID = 3001;
+	public static final int VISUAL_ID = 4001;
 
 	/**
 	 * @generated

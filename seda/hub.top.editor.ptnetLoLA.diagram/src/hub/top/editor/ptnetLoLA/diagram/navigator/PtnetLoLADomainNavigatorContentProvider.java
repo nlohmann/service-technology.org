@@ -86,8 +86,8 @@ public class PtnetLoLADomainNavigatorContentProvider implements
 					}
 
 					public boolean handleResourceChanged(final Resource resource) {
-						for (Iterator it = myEditingDomain.getResourceSet()
-								.getResources().iterator(); it.hasNext();) {
+						for (Iterator it = myEditingDomain.getResourceSet().getResources()
+								.iterator(); it.hasNext();) {
 							Resource nextResource = (Resource) it.next();
 							nextResource.unload();
 						}
@@ -99,8 +99,8 @@ public class PtnetLoLADomainNavigatorContentProvider implements
 					}
 
 					public boolean handleResourceDeleted(Resource resource) {
-						for (Iterator it = myEditingDomain.getResourceSet()
-								.getResources().iterator(); it.hasNext();) {
+						for (Iterator it = myEditingDomain.getResourceSet().getResources()
+								.iterator(); it.hasNext();) {
 							Resource nextResource = (Resource) it.next();
 							nextResource.unload();
 						}
@@ -111,10 +111,9 @@ public class PtnetLoLADomainNavigatorContentProvider implements
 						return true;
 					}
 
-					public boolean handleResourceMoved(Resource resource,
-							final URI newURI) {
-						for (Iterator it = myEditingDomain.getResourceSet()
-								.getResources().iterator(); it.hasNext();) {
+					public boolean handleResourceMoved(Resource resource, final URI newURI) {
+						for (Iterator it = myEditingDomain.getResourceSet().getResources()
+								.iterator(); it.hasNext();) {
 							Resource nextResource = (Resource) it.next();
 							nextResource.unload();
 						}
@@ -181,12 +180,12 @@ public class PtnetLoLADomainNavigatorContentProvider implements
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof IFile) {
 			IFile file = (IFile) parentElement;
-			URI fileURI = URI.createPlatformResourceURI(file.getFullPath()
-					.toString(), true);
-			Resource resource = myEditingDomain.getResourceSet().getResource(
-					fileURI, true);
-			return wrapEObjects(myAdapterFctoryContentProvier
-					.getChildren(resource), parentElement);
+			URI fileURI = URI.createPlatformResourceURI(
+					file.getFullPath().toString(), true);
+			Resource resource = myEditingDomain.getResourceSet().getResource(fileURI,
+					true);
+			return wrapEObjects(myAdapterFctoryContentProvier.getChildren(resource),
+					parentElement);
 		}
 
 		if (parentElement instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLADomainNavigatorItem) {

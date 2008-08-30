@@ -42,8 +42,7 @@ public class PtNetCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 		View viewObject = (View) getHost().getModel();
 		List result = new LinkedList();
 		for (Iterator it = hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramUpdater
-				.getPtNet_79SemanticChildren(viewObject).iterator(); it
-				.hasNext();) {
+				.getPtNet_1000SemanticChildren(viewObject).iterator(); it.hasNext();) {
 			result
 					.add(((hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLANodeDescriptor) it
 							.next()).getModelElement());
@@ -121,8 +120,7 @@ public class PtNetCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 	/**
 	 * @generated
 	 */
-	protected boolean shouldIncludeConnection(Edge connector,
-			Collection children) {
+	protected boolean shouldIncludeConnection(Edge connector, Collection children) {
 		return false;
 	}
 
@@ -183,10 +181,8 @@ public class PtNetCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 						.next();
 				if (diagramLinkObject == nextLinkDescriptor.getModelElement()
 						&& diagramLinkSrc == nextLinkDescriptor.getSource()
-						&& diagramLinkDst == nextLinkDescriptor
-								.getDestination()
-						&& diagramLinkVisualID == nextLinkDescriptor
-								.getVisualID()) {
+						&& diagramLinkDst == nextLinkDescriptor.getDestination()
+						&& diagramLinkVisualID == nextLinkDescriptor.getVisualID()) {
 					linksIterator.remove();
 					LinkDescriptorsIterator.remove();
 				}
@@ -212,7 +208,7 @@ public class PtNetCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 			if (!domain2NotationMap.containsKey(view.getElement())) {
 				result
 						.addAll(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramUpdater
-								.getPtNet_79ContainedLinks(view));
+								.getPtNet_1000ContainedLinks(view));
 			}
 			if (!domain2NotationMap.containsKey(view.getElement())
 					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
@@ -224,7 +220,7 @@ public class PtNetCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 			if (!domain2NotationMap.containsKey(view.getElement())) {
 				result
 						.addAll(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramUpdater
-								.getTransition_1001ContainedLinks(view));
+								.getTransition_2001ContainedLinks(view));
 			}
 			if (!domain2NotationMap.containsKey(view.getElement())
 					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
@@ -236,7 +232,7 @@ public class PtNetCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 			if (!domain2NotationMap.containsKey(view.getElement())) {
 				result
 						.addAll(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramUpdater
-								.getPlace_1002ContainedLinks(view));
+								.getPlace_2002ContainedLinks(view));
 			}
 			if (!domain2NotationMap.containsKey(view.getElement())
 					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
@@ -248,7 +244,7 @@ public class PtNetCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 			if (!domain2NotationMap.containsKey(view.getElement())) {
 				result
 						.addAll(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramUpdater
-								.getArcToPlace_3001ContainedLinks(view));
+								.getArcToPlace_4001ContainedLinks(view));
 			}
 			if (!domain2NotationMap.containsKey(view.getElement())
 					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
@@ -260,7 +256,7 @@ public class PtNetCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 			if (!domain2NotationMap.containsKey(view.getElement())) {
 				result
 						.addAll(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramUpdater
-								.getArcToTransition_3002ContainedLinks(view));
+								.getArcToTransition_4002ContainedLinks(view));
 			}
 			if (!domain2NotationMap.containsKey(view.getElement())
 					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
@@ -269,14 +265,12 @@ public class PtNetCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 			break;
 		}
 		}
-		for (Iterator children = view.getChildren().iterator(); children
-				.hasNext();) {
-			result.addAll(collectAllLinks((View) children.next(),
-					domain2NotationMap));
+		for (Iterator children = view.getChildren().iterator(); children.hasNext();) {
+			result
+					.addAll(collectAllLinks((View) children.next(), domain2NotationMap));
 		}
 		for (Iterator edges = view.getSourceEdges().iterator(); edges.hasNext();) {
-			result.addAll(collectAllLinks((View) edges.next(),
-					domain2NotationMap));
+			result.addAll(collectAllLinks((View) edges.next(), domain2NotationMap));
 		}
 		return result;
 	}
@@ -291,17 +285,16 @@ public class PtNetCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 				.hasNext();) {
 			final hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLALinkDescriptor nextLinkDescriptor = (hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLALinkDescriptor) linkDescriptorsIterator
 					.next();
-			EditPart sourceEditPart = getEditPart(nextLinkDescriptor
-					.getSource(), domain2NotationMap);
-			EditPart targetEditPart = getEditPart(nextLinkDescriptor
-					.getDestination(), domain2NotationMap);
+			EditPart sourceEditPart = getEditPart(nextLinkDescriptor.getSource(),
+					domain2NotationMap);
+			EditPart targetEditPart = getEditPart(
+					nextLinkDescriptor.getDestination(), domain2NotationMap);
 			if (sourceEditPart == null || targetEditPart == null) {
 				continue;
 			}
 			CreateConnectionViewRequest.ConnectionViewDescriptor descriptor = new CreateConnectionViewRequest.ConnectionViewDescriptor(
-					nextLinkDescriptor.getSemanticAdapter(), null,
-					ViewUtil.APPEND, false, ((IGraphicalEditPart) getHost())
-							.getDiagramPreferencesHint());
+					nextLinkDescriptor.getSemanticAdapter(), null, ViewUtil.APPEND,
+					false, ((IGraphicalEditPart) getHost()).getDiagramPreferencesHint());
 			CreateConnectionViewRequest ccr = new CreateConnectionViewRequest(
 					descriptor);
 			ccr.setType(RequestConstants.REQ_CONNECTION_START);
@@ -328,8 +321,7 @@ public class PtNetCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 			Map domain2NotationMap) {
 		View view = (View) domain2NotationMap.get(domainModelElement);
 		if (view != null) {
-			return (EditPart) getHost().getViewer().getEditPartRegistry().get(
-					view);
+			return (EditPart) getHost().getViewer().getEditPartRegistry().get(view);
 		}
 		return null;
 	}

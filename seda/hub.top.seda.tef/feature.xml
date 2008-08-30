@@ -2,7 +2,7 @@
 <feature
       id="hub.top.seda.tef"
       label="TEF Runtime"
-      version="1.0.6.qualifier"
+      version="1.0.7"
       provider-name="Service-Technology.org">
 
    <description>

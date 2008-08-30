@@ -165,16 +165,23 @@ public class ArcItemProvider
 	 * children and by creating a viewer notification, which it passes to {@link #fireNotifyChanged}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated not
 	 */
 	@Override
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
-
+		
 		switch (notification.getFeatureID(Arc.class)) {
+			case PtnetLoLAPackage.ARC__SOURCE:
+			case PtnetLoLAPackage.ARC__TARGET:
 			case PtnetLoLAPackage.ARC__WEIGHT:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
+			//// <Dirk.F start> handle arcs removal, 3 lines
+			case PtnetLoLAPackage.PT_NET__ARCS:
+				System.err.println("ArcItemProvider: arcs changed");
+				return;
+			/// <Dirk.F end>
 		}
 		super.notifyChanged(notification);
 	}

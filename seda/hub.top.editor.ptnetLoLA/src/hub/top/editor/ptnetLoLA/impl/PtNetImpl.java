@@ -19,6 +19,7 @@ import java.util.Collection;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 
+import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 
 import org.eclipse.emf.ecore.EClass;
@@ -252,6 +253,26 @@ public class PtNetImpl extends EObjectImpl implements PtNet {
 	}
 
 	/**
+	 * 
+	 * @param newValue
+	 * 
+	 * @generated NOT
+	 */
+	private void setArcs(Collection<? extends Arc>newValue) {
+		EList<Arc> deleteArcs = new BasicEList<Arc>(getArcs());	// copy list of arcs
+		deleteArcs.removeAll(newValue);							// remove all values to be added
+		
+		getArcs().clear();
+		getArcs().addAll((Collection<? extends Arc>)newValue);
+		System.err.println("set arcs");
+		for (Arc arc : deleteArcs) {
+			System.err.println("removing arc "+arc);
+			arc.setSource(null);
+			arc.setTarget(null);
+		}
+	}
+	
+	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -342,6 +363,8 @@ public class PtNetImpl extends EObjectImpl implements PtNet {
 		return super.eGet(featureID, resolve, coreType);
 	}
 
+ 
+	
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -366,8 +389,7 @@ public class PtNetImpl extends EObjectImpl implements PtNet {
 				setAnnotation((Annotation)newValue);
 				return;
 			case PtnetLoLAPackage.PT_NET__ARCS:
-				getArcs().clear();
-				getArcs().addAll((Collection<? extends Arc>)newValue);
+				setArcs((Collection<? extends Arc>)newValue);
 				return;
 			case PtnetLoLAPackage.PT_NET__FINAL_MARKING:
 				setFinalMarking((Marking)newValue);

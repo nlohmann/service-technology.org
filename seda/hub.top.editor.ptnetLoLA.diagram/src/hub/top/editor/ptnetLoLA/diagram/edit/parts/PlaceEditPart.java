@@ -80,7 +80,7 @@ public class PlaceEditPart extends AbstractBorderedShapeEditPart {
 	/**
 	 * @generated
 	 */
-	public static final int VISUAL_ID = 1002;
+	public static final int VISUAL_ID = 2002;
 
 	/**
 	 * @generated
@@ -122,8 +122,7 @@ public class PlaceEditPart extends AbstractBorderedShapeEditPart {
 				if (child instanceof IBorderItemEditPart) {
 					return new BorderItemSelectionEditPolicy();
 				}
-				EditPolicy result = child
-						.getEditPolicy(EditPolicy.PRIMARY_DRAG_ROLE);
+				EditPolicy result = child.getEditPolicy(EditPolicy.PRIMARY_DRAG_ROLE);
 				if (result == null) {
 					result = new NonResizableEditPolicy();
 				}
@@ -322,8 +321,8 @@ public class PlaceEditPart extends AbstractBorderedShapeEditPart {
 			this.setLineWidth(2);
 			this.setForegroundColor(THIS_FORE);
 			this.setBackgroundColor(THIS_BACK);
-			this.setPreferredSize(new Dimension(getMapMode().DPtoLP(25),
-					getMapMode().DPtoLP(25)));
+			this.setPreferredSize(new Dimension(getMapMode().DPtoLP(25), getMapMode()
+					.DPtoLP(25)));
 			createContents();
 			recolorFigure();
 		}
@@ -337,6 +336,7 @@ public class PlaceEditPart extends AbstractBorderedShapeEditPart {
 			fFigurePlaceTokenLabel.setText("0");
 
 			fFigurePlaceTokenLabel.setFont(FFIGUREPLACETOKENLABEL_FONT);
+			fFigurePlaceTokenLabel.setAlignment(PositionConstants.CENTER);
 
 			this.add(fFigurePlaceTokenLabel, BorderLayout.CENTER);
 
@@ -408,8 +408,8 @@ public class PlaceEditPart extends AbstractBorderedShapeEditPart {
 	/**
 	 * @generated
 	 */
-	static final Font FFIGUREPLACETOKENLABEL_FONT = new Font(Display
-			.getCurrent(),
+	static final Font FFIGUREPLACETOKENLABEL_FONT = new Font(
+			Display.getCurrent(),
 			Display.getDefault().getSystemFont().getFontData()[0].getName(), 9,
 			SWT.BOLD);
 

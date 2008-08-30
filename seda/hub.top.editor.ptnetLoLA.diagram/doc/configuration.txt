@@ -1,0 +1,15 @@
+
+Consistency of EditingDomains
+
+in plugin.xml
+at extension point org.eclipse.gmf.runtime.emf.type.core.elementTypeBindings
+defining "PtnetLoLAClientContext"
+
+set the enablement test value
+  for "org.eclipse.gmf.runtime.emf.core.editingDomain"
+  to the ID of the Editing Domain defined in hub.top.editor.ptnetLoLA,
+  e.g. "hub.top.editor.ptnetLoLA.editingDomain"
+  
+the same value has to be used when initializing the editingDomains of the
+editor in PtnetLoLADocumentProvider#createEditingDomain()
+   and in PtnetLoLADiagramEditor#getEditingDomainID()

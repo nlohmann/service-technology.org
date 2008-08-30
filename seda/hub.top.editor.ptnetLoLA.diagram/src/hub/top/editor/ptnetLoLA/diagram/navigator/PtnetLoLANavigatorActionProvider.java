@@ -141,14 +141,11 @@ public class PtnetLoLANavigatorActionProvider extends CommonActionProvider {
 			IEditorInput editorInput = getEditorInput();
 			IWorkbenchPage page = myViewerSite.getPage();
 			try {
-				page
-						.openEditor(
-								editorInput,
-								hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditor.ID);
+				page.openEditor(editorInput,
+						hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditor.ID);
 			} catch (PartInitException e) {
 				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-						.getInstance().logError(
-								"Exception while openning diagram", e); //$NON-NLS-1$
+						.getInstance().logError("Exception while openning diagram", e); //$NON-NLS-1$
 			}
 		}
 
@@ -160,8 +157,8 @@ public class PtnetLoLANavigatorActionProvider extends CommonActionProvider {
 					.hasNext();) {
 				EObject nextEObject = (EObject) it.next();
 				if (nextEObject == myDiagram) {
-					return new FileEditorInput(WorkspaceSynchronizer
-							.getFile(myDiagram.eResource()));
+					return new FileEditorInput(WorkspaceSynchronizer.getFile(myDiagram
+							.eResource()));
 				}
 				if (nextEObject instanceof Diagram) {
 					break;

@@ -80,8 +80,8 @@ public class PtnetLoLANavigatorContentProvider implements
 					}
 
 					public boolean handleResourceChanged(final Resource resource) {
-						for (Iterator it = myEditingDomain.getResourceSet()
-								.getResources().iterator(); it.hasNext();) {
+						for (Iterator it = myEditingDomain.getResourceSet().getResources()
+								.iterator(); it.hasNext();) {
 							Resource nextResource = (Resource) it.next();
 							nextResource.unload();
 						}
@@ -93,8 +93,8 @@ public class PtnetLoLANavigatorContentProvider implements
 					}
 
 					public boolean handleResourceDeleted(Resource resource) {
-						for (Iterator it = myEditingDomain.getResourceSet()
-								.getResources().iterator(); it.hasNext();) {
+						for (Iterator it = myEditingDomain.getResourceSet().getResources()
+								.iterator(); it.hasNext();) {
 							Resource nextResource = (Resource) it.next();
 							nextResource.unload();
 						}
@@ -105,10 +105,9 @@ public class PtnetLoLANavigatorContentProvider implements
 						return true;
 					}
 
-					public boolean handleResourceMoved(Resource resource,
-							final URI newURI) {
-						for (Iterator it = myEditingDomain.getResourceSet()
-								.getResources().iterator(); it.hasNext();) {
+					public boolean handleResourceMoved(Resource resource, final URI newURI) {
+						for (Iterator it = myEditingDomain.getResourceSet().getResources()
+								.iterator(); it.hasNext();) {
 							Resource nextResource = (Resource) it.next();
 							nextResource.unload();
 						}
@@ -175,17 +174,15 @@ public class PtnetLoLANavigatorContentProvider implements
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof IFile) {
 			IFile file = (IFile) parentElement;
-			URI fileURI = URI.createPlatformResourceURI(file.getFullPath()
-					.toString(), true);
-			Resource resource = myEditingDomain.getResourceSet().getResource(
-					fileURI, true);
+			URI fileURI = URI.createPlatformResourceURI(
+					file.getFullPath().toString(), true);
+			Resource resource = myEditingDomain.getResourceSet().getResource(fileURI,
+					true);
 			Collection result = new ArrayList();
-			result
-					.addAll(createNavigatorItems(
-							selectViewsByType(
-									resource.getContents(),
-									hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart.MODEL_ID),
-							file, false));
+			result.addAll(createNavigatorItems(selectViewsByType(resource
+					.getContents(),
+					hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart.MODEL_ID),
+					file, false));
 			return result.toArray();
 		}
 
@@ -215,30 +212,23 @@ public class PtnetLoLANavigatorContentProvider implements
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart.VISUAL_ID: {
 			Collection result = new ArrayList();
 			hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup links = new hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup(
-					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_PtNet_79_links,
+					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_PtNet_1000_links,
 					"icons/linksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
 			Collection connectedViews = getChildrenByType(
 					Collections.singleton(view),
 					hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart.VISUAL_ID);
-			result.addAll(createNavigatorItems(connectedViews, parentElement,
-					false));
-			connectedViews = getChildrenByType(
-					Collections.singleton(view),
+			result.addAll(createNavigatorItems(connectedViews, parentElement, false));
+			connectedViews = getChildrenByType(Collections.singleton(view),
 					hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart.VISUAL_ID);
-			result.addAll(createNavigatorItems(connectedViews, parentElement,
-					false));
+			result.addAll(createNavigatorItems(connectedViews, parentElement, false));
 			connectedViews = getDiagramLinksByType(
 					Collections.singleton(view),
 					hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToPlaceEditPart.VISUAL_ID);
-			links
-					.addChildren(createNavigatorItems(connectedViews, links,
-							false));
+			links.addChildren(createNavigatorItems(connectedViews, links, false));
 			connectedViews = getDiagramLinksByType(
 					Collections.singleton(view),
 					hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToTransitionEditPart.VISUAL_ID);
-			links
-					.addChildren(createNavigatorItems(connectedViews, links,
-							false));
+			links.addChildren(createNavigatorItems(connectedViews, links, false));
 			if (!links.isEmpty()) {
 				result.add(links);
 			}
@@ -248,10 +238,10 @@ public class PtnetLoLANavigatorContentProvider implements
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart.VISUAL_ID: {
 			Collection result = new ArrayList();
 			hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup incominglinks = new hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup(
-					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_Transition_1001_incominglinks,
+					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_Transition_2001_incominglinks,
 					"icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
 			hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup outgoinglinks = new hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup(
-					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_Transition_1001_outgoinglinks,
+					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_Transition_2001_outgoinglinks,
 					"icons/outgoingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
 			Collection connectedViews = getIncomingLinksByType(
 					Collections.singleton(view),
@@ -285,10 +275,10 @@ public class PtnetLoLANavigatorContentProvider implements
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart.VISUAL_ID: {
 			Collection result = new ArrayList();
 			hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup incominglinks = new hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup(
-					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_Place_1002_incominglinks,
+					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_Place_2002_incominglinks,
 					"icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
 			hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup outgoinglinks = new hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup(
-					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_Place_1002_outgoinglinks,
+					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_Place_2002_outgoinglinks,
 					"icons/outgoingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
 			Collection connectedViews = getIncomingLinksByType(
 					Collections.singleton(view),
@@ -322,31 +312,25 @@ public class PtnetLoLANavigatorContentProvider implements
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToPlaceEditPart.VISUAL_ID: {
 			Collection result = new ArrayList();
 			hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup target = new hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup(
-					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_ArcToPlace_3001_target,
+					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_ArcToPlace_4001_target,
 					"icons/linkTargetNavigatorGroup.gif", parentElement); //$NON-NLS-1$
 			hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup source = new hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup(
-					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_ArcToPlace_3001_source,
+					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_ArcToPlace_4001_source,
 					"icons/linkSourceNavigatorGroup.gif", parentElement); //$NON-NLS-1$
 			Collection connectedViews = getLinksTargetByType(
 					Collections.singleton(view),
 					hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart.VISUAL_ID);
-			target.addChildren(createNavigatorItems(connectedViews, target,
-					true));
-			connectedViews = getLinksTargetByType(
-					Collections.singleton(view),
+			target.addChildren(createNavigatorItems(connectedViews, target, true));
+			connectedViews = getLinksTargetByType(Collections.singleton(view),
 					hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart.VISUAL_ID);
-			target.addChildren(createNavigatorItems(connectedViews, target,
-					true));
+			target.addChildren(createNavigatorItems(connectedViews, target, true));
 			connectedViews = getLinksSourceByType(
 					Collections.singleton(view),
 					hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart.VISUAL_ID);
-			source.addChildren(createNavigatorItems(connectedViews, source,
-					true));
-			connectedViews = getLinksSourceByType(
-					Collections.singleton(view),
+			source.addChildren(createNavigatorItems(connectedViews, source, true));
+			connectedViews = getLinksSourceByType(Collections.singleton(view),
 					hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart.VISUAL_ID);
-			source.addChildren(createNavigatorItems(connectedViews, source,
-					true));
+			source.addChildren(createNavigatorItems(connectedViews, source, true));
 			if (!target.isEmpty()) {
 				result.add(target);
 			}
@@ -359,31 +343,25 @@ public class PtnetLoLANavigatorContentProvider implements
 		case hub.top.editor.ptnetLoLA.diagram.edit.parts.ArcToTransitionEditPart.VISUAL_ID: {
 			Collection result = new ArrayList();
 			hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup target = new hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup(
-					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_ArcToTransition_3002_target,
+					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_ArcToTransition_4002_target,
 					"icons/linkTargetNavigatorGroup.gif", parentElement); //$NON-NLS-1$
 			hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup source = new hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup(
-					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_ArcToTransition_3002_source,
+					hub.top.editor.ptnetLoLA.diagram.part.Messages.NavigatorGroupName_ArcToTransition_4002_source,
 					"icons/linkSourceNavigatorGroup.gif", parentElement); //$NON-NLS-1$
 			Collection connectedViews = getLinksTargetByType(
 					Collections.singleton(view),
 					hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart.VISUAL_ID);
-			target.addChildren(createNavigatorItems(connectedViews, target,
-					true));
-			connectedViews = getLinksTargetByType(
-					Collections.singleton(view),
+			target.addChildren(createNavigatorItems(connectedViews, target, true));
+			connectedViews = getLinksTargetByType(Collections.singleton(view),
 					hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart.VISUAL_ID);
-			target.addChildren(createNavigatorItems(connectedViews, target,
-					true));
+			target.addChildren(createNavigatorItems(connectedViews, target, true));
 			connectedViews = getLinksSourceByType(
 					Collections.singleton(view),
 					hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart.VISUAL_ID);
-			source.addChildren(createNavigatorItems(connectedViews, source,
-					true));
-			connectedViews = getLinksSourceByType(
-					Collections.singleton(view),
+			source.addChildren(createNavigatorItems(connectedViews, source, true));
+			connectedViews = getLinksSourceByType(Collections.singleton(view),
 					hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart.VISUAL_ID);
-			source.addChildren(createNavigatorItems(connectedViews, source,
-					true));
+			source.addChildren(createNavigatorItems(connectedViews, source, true));
 			if (!target.isEmpty()) {
 				result.add(target);
 			}
@@ -406,8 +384,7 @@ public class PtnetLoLANavigatorContentProvider implements
 		for (Iterator it = edges.iterator(); it.hasNext();) {
 			Edge nextEdge = (Edge) it.next();
 			View nextEdgeSource = nextEdge.getSource();
-			if (type.equals(nextEdgeSource.getType())
-					&& isOwnView(nextEdgeSource)) {
+			if (type.equals(nextEdgeSource.getType()) && isOwnView(nextEdgeSource)) {
 				result.add(nextEdgeSource);
 			}
 		}
@@ -424,8 +401,7 @@ public class PtnetLoLANavigatorContentProvider implements
 		for (Iterator it = edges.iterator(); it.hasNext();) {
 			Edge nextEdge = (Edge) it.next();
 			View nextEdgeTarget = nextEdge.getTarget();
-			if (type.equals(nextEdgeTarget.getType())
-					&& isOwnView(nextEdgeTarget)) {
+			if (type.equals(nextEdgeTarget.getType()) && isOwnView(nextEdgeTarget)) {
 				result.add(nextEdgeTarget);
 			}
 		}

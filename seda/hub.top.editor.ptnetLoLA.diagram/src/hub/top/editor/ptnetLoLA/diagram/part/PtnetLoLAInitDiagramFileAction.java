@@ -50,8 +50,7 @@ public class PtnetLoLAInitDiagramFileAction implements IObjectActionDelegate {
 				|| selection.isEmpty()) {
 			return;
 		}
-		IFile file = (IFile) ((IStructuredSelection) selection)
-				.getFirstElement();
+		IFile file = (IFile) ((IStructuredSelection) selection).getFirstElement();
 		domainModelURI = URI.createPlatformResourceURI(file.getFullPath()
 				.toString(), true);
 		action.setEnabled(true);
@@ -95,7 +94,7 @@ public class PtnetLoLAInitDiagramFileAction implements IObjectActionDelegate {
 						.bind(
 								hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLAInitDiagramFileAction_InitDiagramFileWizardTitle,
 								hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart.MODEL_ID));
-		hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorUtil
-				.runWizard(getShell(), wizard, "InitDiagramFile"); //$NON-NLS-1$
+		hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorUtil.runWizard(
+				getShell(), wizard, "InitDiagramFile"); //$NON-NLS-1$
 	}
 }

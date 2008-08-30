@@ -78,7 +78,7 @@ public class TransitionEditPart extends AbstractBorderedShapeEditPart {
 	/**
 	 * @generated
 	 */
-	public static final int VISUAL_ID = 1001;
+	public static final int VISUAL_ID = 2001;
 
 	/**
 	 * @generated
@@ -120,8 +120,7 @@ public class TransitionEditPart extends AbstractBorderedShapeEditPart {
 				if (child instanceof IBorderItemEditPart) {
 					return new BorderItemSelectionEditPolicy();
 				}
-				EditPolicy result = child
-						.getEditPolicy(EditPolicy.PRIMARY_DRAG_ROLE);
+				EditPolicy result = child.getEditPolicy(EditPolicy.PRIMARY_DRAG_ROLE);
 				if (result == null) {
 					result = new NonResizableEditPolicy();
 				}
@@ -235,8 +234,8 @@ public class TransitionEditPart extends AbstractBorderedShapeEditPart {
 			this.setLineWidth(2);
 			this.setForegroundColor(THIS_FORE);
 			this.setBackgroundColor(THIS_BACK);
-			this.setPreferredSize(new Dimension(getMapMode().DPtoLP(25),
-					getMapMode().DPtoLP(25)));
+			this.setPreferredSize(new Dimension(getMapMode().DPtoLP(25), getMapMode()
+					.DPtoLP(25)));
 		}
 
 		/**
@@ -327,16 +326,14 @@ public class TransitionEditPart extends AbstractBorderedShapeEditPart {
 				// tokens to be consumed
 				for (Arc arc : t.getIncoming()) {
 					Place p = (Place) arc.getSource();
-					tokenMap
-							.put(p, new Integer(p.getToken() - arc.getWeight()));
+					tokenMap.put(p, new Integer(p.getToken() - arc.getWeight()));
 				}
 				// tokens to be produced
 				for (Arc arc : t.getOutgoing()) {
 					Place p = (Place) arc.getTarget();
 					Integer pRemoved = tokenMap.get(p);
 					if (pRemoved == null)
-						tokenMap.put(p, new Integer(p.getToken()
-								+ arc.getWeight()));
+						tokenMap.put(p, new Integer(p.getToken() + arc.getWeight()));
 					else
 						tokenMap.put(p, pRemoved + arc.getWeight());
 				}
@@ -345,8 +342,7 @@ public class TransitionEditPart extends AbstractBorderedShapeEditPart {
 				for (java.util.Map.Entry<Place, Integer> e : tokenMap) {
 
 					org.eclipse.emf.edit.command.SetCommand cmd = new org.eclipse.emf.edit.command.SetCommand(
-							this.getEditingDomain(), e.getKey(), featToken, e
-									.getValue());
+							this.getEditingDomain(), e.getKey(), featToken, e.getValue());
 					cmd.setLabel("set token on " + e.getKey().getName());
 					cmdList.add(cmd);
 				}

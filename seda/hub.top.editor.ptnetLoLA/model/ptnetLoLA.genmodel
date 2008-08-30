@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <genmodel:GenModel xmi:version="2.0"
     xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
-    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" copyrightText="&#xD;&#xA;Copyright (c) 2008 Dirk Fahland. All rights reserved. EPL1.0/GPL3.0/LGPL3.0&#xD;&#xA;&#xD;&#xA;ServiceTechnolog.org - PetriNet Editor Framework&#xD;&#xA;&#xD;&#xA;This program and the accompanying materials are made available under&#xD;&#xA;the terms of the Eclipse Public License v1.0, which accompanies this&#xD;&#xA;distribution, and is available at http://www.eclipse.org/legal/epl-v10.html&#xD;&#xA;&#xD;&#xA;Software distributed under the License is distributed on an &quot;AS IS&quot; basis,&#xD;&#xA;WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License&#xD;&#xA;for the specific language governing rights and limitations under the&#xD;&#xA;License.&#xD;&#xA;&#xD;&#xA;The Original Code is this file as it was released on July 30, 2008.&#xD;&#xA;The Initial Developer of the Original Code is&#xD;&#xA;&#x9;&#x9;Dirk Fahland&#xD;&#xA;&#xD;&#xA;Portions created by the Initial Developer are Copyright (c) 2008&#xD;&#xA;the Initial Developer. All Rights Reserved.&#xD;&#xA;&#xD;&#xA;Contributor(s):&#xD;&#xA;&#xD;&#xA;Alternatively, the contents of this file may be used under the terms of&#xD;&#xA;either the GNU General Public License Version 3 or later (the &quot;GPL&quot;), or&#xD;&#xA;the GNU Lesser General Public License Version 3 or later (the &quot;LGPL&quot;),&#xD;&#xA;in which case the provisions of the GPL or the LGPL are applicable instead&#xD;&#xA;of those above. If you wish to allow use of your version of this file only&#xD;&#xA;under the terms of either the GPL or the LGPL, and not to allow others to&#xD;&#xA;use your version of this file under the terms of the EPL, indicate your&#xD;&#xA;decision by deleting the provisions above and replace them with the notice&#xD;&#xA;and other provisions required by the GPL or the LGPL. If you do not delete&#xD;&#xA;the provisions above, a recipient may use your version of this file under&#xD;&#xA;the terms of any one of the EPL, the GPL or the LGPL.&#xD;&#xA;"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" copyrightText=" Copyright (c) 2008 Dirk Fahland. All rights reserved. EPL1.0/GPL3.0/LGPL3.0&#xD;&#xA; &#xD;&#xA; ServiceTechnolog.org - PetriNet Editor Framework&#xD;&#xA; &#xD;&#xA; This program and the accompanying materials are made available under&#xD;&#xA; the terms of the Eclipse Public License v1.0, which accompanies this&#xD;&#xA; distribution, and is available at http://www.eclipse.org/legal/epl-v10.html&#xD;&#xA; &#xD;&#xA; Software distributed under the License is distributed on an &quot;AS IS&quot; basis,&#xD;&#xA; WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License&#xD;&#xA; for the specific language governing rights and limitations under the&#xD;&#xA; License.&#xD;&#xA;&#xD;&#xA; The Original Code is this file as it was released on July 30, 2008.&#xD;&#xA; The Initial Developer of the Original Code is&#xD;&#xA; &#x9;&#x9;Dirk Fahland&#xD;&#xA; &#xD;&#xA; Portions created by the Initial Developer are Copyright (c) 2008&#xD;&#xA; the Initial Developer. All Rights Reserved.&#xD;&#xA;&#xD;&#xA; Contributor(s):&#xD;&#xA;&#xD;&#xA; Alternatively, the contents of this file may be used under the terms of&#xD;&#xA; either the GNU General Public License Version 3 or later (the &quot;GPL&quot;), or&#xD;&#xA; the GNU Lesser General Public License Version 3 or later (the &quot;LGPL&quot;),&#xD;&#xA; in which case the provisions of the GPL or the LGPL are applicable instead&#xD;&#xA; of those above. If you wish to allow use of your version of this file only&#xD;&#xA; under the terms of either the GPL or the LGPL, and not to allow others to&#xD;&#xA; use your version of this file under the terms of the EPL, indicate your&#xD;&#xA; decision by deleting the provisions above and replace them with the notice&#xD;&#xA; and other provisions required by the GPL or the LGPL. If you do not delete&#xD;&#xA; the provisions above, a recipient may use your version of this file under&#xD;&#xA; the terms of any one of the EPL, the GPL or the LGPL."
     modelDirectory="/hub.top.editor.ptnetLoLA/src" modelPluginID="hub.top.editor.ptnetLoLA"
-    modelName="PtnetLoLA" importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0"
+    modelName="PtnetLoLA" importerID="org.eclipse.emf.importer.ecore" complianceLevel="5.0"
     copyrightFields="false">
   <foreignModel>ptnetLoLA.ecore</foreignModel>
   <genPackages prefix="PtnetLoLA" basePackage="hub.top.editor" disposableProviderFactory="true"
-      ecorePackage="ptnetLoLA.ecore#/">
+      contentTypeIdentifier="" ecorePackage="ptnetLoLA.ecore#/">
     <genEnums typeSafeEnumCompatible="false" ecoreEnum="ptnetLoLA.ecore#//NodeType">
       <genEnumLiterals ecoreEnumLiteral="ptnetLoLA.ecore#//NodeType/internal"/>
       <genEnumLiterals ecoreEnumLiteral="ptnetLoLA.ecore#//NodeType/input"/>
@@ -29,8 +29,8 @@
     <genClasses ecoreClass="ptnetLoLA.ecore#//Node">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//Node/name"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ptnetLoLA.ecore#//Node/annotation"/>
-      <genFeatures property="Readonly" notify="false" createChild="false" ecoreFeature="ecore:EReference ptnetLoLA.ecore#//Node/incoming"/>
-      <genFeatures property="Readonly" notify="false" createChild="false" ecoreFeature="ecore:EReference ptnetLoLA.ecore#//Node/outgoing"/>
+      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EReference ptnetLoLA.ecore#//Node/incoming"/>
+      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EReference ptnetLoLA.ecore#//Node/outgoing"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//Node/type"/>
     </genClasses>
     <genClasses ecoreClass="ptnetLoLA.ecore#//Marking">
@@ -46,8 +46,8 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//Annotation/text"/>
     </genClasses>
     <genClasses ecoreClass="ptnetLoLA.ecore#//Arc">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference ptnetLoLA.ecore#//Arc/source"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference ptnetLoLA.ecore#//Arc/target"/>
+      <genFeatures createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference ptnetLoLA.ecore#//Arc/source"/>
+      <genFeatures createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference ptnetLoLA.ecore#//Arc/target"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//Arc/weight"/>
     </genClasses>
     <genClasses ecoreClass="ptnetLoLA.ecore#//ArcToPlace"/>

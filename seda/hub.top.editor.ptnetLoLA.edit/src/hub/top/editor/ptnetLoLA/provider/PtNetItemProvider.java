@@ -7,20 +7,22 @@
 package hub.top.editor.ptnetLoLA.provider;
 
 
+import hub.top.editor.ptnetLoLA.Arc;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.editor.ptnetLoLA.PtnetLoLAFactory;
 import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.common.util.ResourceLocator;
-
 import org.eclipse.emf.ecore.EStructuralFeature;
-
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
@@ -125,7 +127,27 @@ public class PtNetItemProvider
 	public String getText(Object object) {
 		return getString("_UI_PtNet_type");
 	}
-
+	
+	/**
+	 * @param notification
+	 * @generated not
+	 */
+	private void removeArc (Notification notification) {
+		Arc arc = (Arc)notification.getNewValue();
+		if (arc == null) arc = (Arc)notification.getOldValue();
+		if (arc == null) {
+			PtnetLoLAEditPlugin.INSTANCE.log(new Exception("Notification for removing arc has no value: "+notification));
+			return;
+		}
+		
+		BasicCommandStack commandStack = new BasicCommandStack();
+		AdapterFactoryEditingDomain editingDomain = new AdapterFactoryEditingDomain(adapterFactory, commandStack, new HashMap<Resource, Boolean>());
+		
+		System.err.println("untying arc "+arc);
+		arc.setSource(null);
+		arc.setTarget(null);
+	}
+	
 	/**
 	 * This handles model notifications by calling {@link #updateChildren} to update any cached
 	 * children and by creating a viewer notification, which it passes to {@link #fireNotifyChanged}.
@@ -144,6 +166,13 @@ public class PtNetItemProvider
 			case PtnetLoLAPackage.PT_NET__ANNOTATION:
 			case PtnetLoLAPackage.PT_NET__ARCS:
 			case PtnetLoLAPackage.PT_NET__FINAL_MARKING:
+				/*
+				if (PtnetLoLAPackage.PT_NET__ARCS == notification.getFeatureID(PtNet.class) &&
+					notification.getEventType() == Notification.REMOVE)
+				{
+					removeArc(notification);
+				}
+				*/
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}

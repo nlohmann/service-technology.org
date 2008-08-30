@@ -182,7 +182,7 @@ public class PlaceImpl extends NodeImpl implements Place {
 		
 		PtNet net = (PtNet)eContainer;
 		RefMarkedPlace pMarked = null;
-		for (RefMarkedPlace p : net.getInitialMarking().getPlaces()) {
+		for (RefMarkedPlace p : net.getFinalMarking().getPlaces()) {
 			if (p.getPlace() == this) {
 				pMarked = p;
 				break;
@@ -194,7 +194,7 @@ public class PlaceImpl extends NodeImpl implements Place {
 			if (pMarked != null) {
 				pMarked.setToken(0);
 				pMarked.setPlace(null);
-				net.getInitialMarking().getPlaces().remove(pMarked);
+				net.getFinalMarking().getPlaces().remove(pMarked);
 			} else {
 				// nothing to do
 				doNotify = false;
@@ -206,7 +206,7 @@ public class PlaceImpl extends NodeImpl implements Place {
 				RefMarkedPlace p = PtnetLoLAFactory.eINSTANCE.createRefMarkedPlace();
 				p.setPlace(this);
 				p.setToken(newFinalMarking);
-				net.getInitialMarking().getPlaces().add(p);
+				net.getFinalMarking().getPlaces().add(p);
 			}
 		} 
 

@@ -342,7 +342,7 @@
          <enablement>
             <test
                property="org.eclipse.gmf.runtime.emf.core.editingDomain"
-               value="hub.top.editor.ptnetLoLA.diagram.EditingDomain"/>
+               value="hub.top.editor.ptnetLoLA.editingDomain"/>
          </enablement>
       </clientContext> 
       <binding context="PtnetLoLAClientContext">

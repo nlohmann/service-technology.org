@@ -71,7 +71,7 @@ public class PtnetLoLAResourceListener extends ResourceSetListenerImpl {
 	 * @see org.eclipse.emf.transaction.ResourceSetListenerImpl#resourceSetChanged(org.eclipse.emf.transaction.ResourceSetChangeEvent)
 	 */
 	public void resourceSetChanged(ResourceSetChangeEvent event) {
-		System.out.println("A change has been made with "+event.getNotifications().size()+" notifications produced.");
+		//System.out.println("A change has been made with "+event.getNotifications().size()+" notifications produced.");
 	}
 
 	/*

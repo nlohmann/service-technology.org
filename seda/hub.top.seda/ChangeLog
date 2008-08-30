@@ -3,6 +3,7 @@ ChangeLog for hub.top.seda
 
 Version 1.0.5
 -------------
++ added support for final markings, the editor can now create Fiona-readable .owfn files with final markings
 + created a transactional editing domain "hub.top.editor.ptnetLoLA.editingDomain" for the EMF models
 + installed a listener and an adapter for "hub.top.editor.ptnetLoLA.editingDomain" to handle the removal of arcs from the net; now all references get updated properly such that arcs can be deleted from a model and this opeation is undoable
 

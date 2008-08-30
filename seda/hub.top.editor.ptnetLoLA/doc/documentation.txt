@@ -1,3 +1,10 @@
+
+1 The model files and source code generation
+--------------------------------------------
+
+1.1 .genmodel
+-------------
+
 The .genmodel is set to generate the following packages.
 
 Model plug-in ID: hub.top.editor.ptnetLoLA
@@ -18,8 +25,23 @@ base package: hub.top.editor
 Prefix: PtnetLoLA
 
 
+1.2 .gmfgen
+-----------
 
 The .gmfgen is set to generate the following packages.
 
 Package name prefix: hub.top.editor.ptnetLoLA.diagram
 Model ID: PtnetLoLA
+
+
+2 Source code implementations of the model
+------------------------------------------
+
+2.1 PtNet
+---------
+
+Upon creation, a PtNet always gets an initial marking and a final marking.
+The final marking is optional wrt. the model. The automatic creation of the
+final marking has to be made dependent on whether the net has places which
+are considered as such.
+This functionality is implemented in the PtnetLoLAFactory.

@@ -389,7 +389,8 @@ public class PtNetImpl extends EObjectImpl implements PtNet {
 				setAnnotation((Annotation)newValue);
 				return;
 			case PtnetLoLAPackage.PT_NET__ARCS:
-				setArcs((Collection<? extends Arc>)newValue);
+				getArcs().clear();
+				getArcs().addAll((Collection<? extends Arc>)newValue);
 				return;
 			case PtnetLoLAPackage.PT_NET__FINAL_MARKING:
 				setFinalMarking((Marking)newValue);

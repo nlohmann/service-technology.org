@@ -17,4 +17,6 @@ public interface PlaceValidator {
 	boolean validate();
 
 	boolean validateToken(int value);
+
+	boolean validateFinalMarking(int value);
 }

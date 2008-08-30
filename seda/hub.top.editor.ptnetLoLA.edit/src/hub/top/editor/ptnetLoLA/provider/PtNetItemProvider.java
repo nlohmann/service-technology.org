@@ -166,13 +166,6 @@ public class PtNetItemProvider
 			case PtnetLoLAPackage.PT_NET__ANNOTATION:
 			case PtnetLoLAPackage.PT_NET__ARCS:
 			case PtnetLoLAPackage.PT_NET__FINAL_MARKING:
-				/*
-				if (PtnetLoLAPackage.PT_NET__ARCS == notification.getFeatureID(PtNet.class) &&
-					notification.getEventType() == Notification.REMOVE)
-				{
-					removeArc(notification);
-				}
-				*/
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}

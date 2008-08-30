@@ -16,6 +16,7 @@
     </genEnums>
     <genClasses ecoreClass="ptnetLoLA.ecore#//Place">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//Place/token"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//Place/finalMarking"/>
     </genClasses>
     <genClasses ecoreClass="ptnetLoLA.ecore#//PtNet">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ptnetLoLA.ecore#//PtNet/places"/>

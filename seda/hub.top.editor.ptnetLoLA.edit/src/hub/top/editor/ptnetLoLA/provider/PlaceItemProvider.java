@@ -64,6 +64,7 @@ public class PlaceItemProvider
 			super.getPropertyDescriptors(object);
 
 			addTokenPropertyDescriptor(object);
+			addFinalMarkingPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -82,6 +83,28 @@ public class PlaceItemProvider
 				 getString("_UI_Place_token_feature"),
 				 getString("_UI_PropertyDescriptor_description", "_UI_Place_token_feature", "_UI_Place_type"),
 				 PtnetLoLAPackage.Literals.PLACE__TOKEN,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Final Marking feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addFinalMarkingPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Place_finalMarking_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Place_finalMarking_feature", "_UI_Place_type"),
+				 PtnetLoLAPackage.Literals.PLACE__FINAL_MARKING,
 				 true,
 				 false,
 				 false,
@@ -128,6 +151,7 @@ public class PlaceItemProvider
 
 		switch (notification.getFeatureID(Place.class)) {
 			case PtnetLoLAPackage.PLACE__TOKEN:
+			case PtnetLoLAPackage.PLACE__FINAL_MARKING:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 		}

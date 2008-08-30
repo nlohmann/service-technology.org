@@ -157,6 +157,7 @@ public class PtnetLoLAFactoryImpl extends EFactoryImpl implements PtnetLoLAFacto
 		PtNetImpl ptNet = new PtNetImpl();
 		// each net must have an initial marking
 		ptNet.setInitialMarking(createMarking());
+		ptNet.setFinalMarking(createMarking());
 		return ptNet;
 	}
 

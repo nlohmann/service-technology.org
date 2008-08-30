@@ -219,6 +219,15 @@ public class PtnetLoLAPackageImpl extends EPackageImpl implements PtnetLoLAPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getPlace_FinalMarking() {
+		return (EAttribute)placeEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getPtNet() {
 		return ptNetEClass;
 	}
@@ -505,6 +514,7 @@ public class PtnetLoLAPackageImpl extends EPackageImpl implements PtnetLoLAPacka
 		// Create classes and their features
 		placeEClass = createEClass(PLACE);
 		createEAttribute(placeEClass, PLACE__TOKEN);
+		createEAttribute(placeEClass, PLACE__FINAL_MARKING);
 
 		ptNetEClass = createEClass(PT_NET);
 		createEReference(ptNetEClass, PT_NET__PLACES);
@@ -584,7 +594,8 @@ public class PtnetLoLAPackageImpl extends EPackageImpl implements PtnetLoLAPacka
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(placeEClass, Place.class, "Place", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getPlace_Token(), ecorePackage.getEInt(), "token", null, 1, 1, Place.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPlace_Token(), ecorePackage.getEInt(), "token", "0", 1, 1, Place.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPlace_FinalMarking(), ecorePackage.getEInt(), "finalMarking", "0", 1, 1, Place.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(ptNetEClass, PtNet.class, "PtNet", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getPtNet_Places(), this.getPlace(), null, "places", null, 0, -1, PtNet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

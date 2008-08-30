@@ -189,13 +189,22 @@ public interface PtnetLoLAPackage extends EPackage {
 	int PLACE__TOKEN = NODE_FEATURE_COUNT + 0;
 
 	/**
+	 * The feature id for the '<em><b>Final Marking</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PLACE__FINAL_MARKING = NODE_FEATURE_COUNT + 1;
+
+	/**
 	 * The number of structural features of the '<em>Place</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PLACE_FEATURE_COUNT = NODE_FEATURE_COUNT + 1;
+	int PLACE_FEATURE_COUNT = NODE_FEATURE_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link hub.top.editor.ptnetLoLA.impl.PtNetImpl <em>Pt Net</em>}' class.
@@ -627,6 +636,17 @@ public interface PtnetLoLAPackage extends EPackage {
 	EAttribute getPlace_Token();
 
 	/**
+	 * Returns the meta object for the attribute '{@link hub.top.editor.ptnetLoLA.Place#getFinalMarking <em>Final Marking</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Final Marking</em>'.
+	 * @see hub.top.editor.ptnetLoLA.Place#getFinalMarking()
+	 * @see #getPlace()
+	 * @generated
+	 */
+	EAttribute getPlace_FinalMarking();
+
+	/**
 	 * Returns the meta object for class '{@link hub.top.editor.ptnetLoLA.PtNet <em>Pt Net</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -973,6 +993,14 @@ public interface PtnetLoLAPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute PLACE__TOKEN = eINSTANCE.getPlace_Token();
+
+		/**
+		 * The meta object literal for the '<em><b>Final Marking</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PLACE__FINAL_MARKING = eINSTANCE.getPlace_FinalMarking();
 
 		/**
 		 * The meta object literal for the '{@link hub.top.editor.ptnetLoLA.impl.PtNetImpl <em>Pt Net</em>}' class.

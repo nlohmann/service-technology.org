@@ -175,9 +175,11 @@ public class PtnetLoLADocumentProvider extends AbstractDocumentProvider
 	 * @generated
 	 */
 	private TransactionalEditingDomain createEditingDomain() {
-		TransactionalEditingDomain editingDomain = DiagramEditingDomainFactory
-				.getInstance().createEditingDomain();
-		editingDomain.setID("hub.top.editor.ptnetLoLA.diagram.EditingDomain"); //$NON-NLS-1$
+		//TransactionalEditingDomain editingDomain = DiagramEditingDomainFactory
+		//		.getInstance().createEditingDomain();
+		//editingDomain.setID("hub.top.editor.ptnetLoLA.diagram.EditingDomain"); //$NON-NLS-1$
+		TransactionalEditingDomain editingDomain = createEditingDomain_fromPackage();
+		
 		final NotificationFilter diagramResourceModifiedFilter = NotificationFilter
 				.createNotifierFilter(editingDomain.getResourceSet()).and(
 						NotificationFilter.createEventTypeFilter(Notification.ADD)).and(

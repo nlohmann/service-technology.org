@@ -55,6 +55,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * The following features are implemented:
  * <ul>
  *   <li>{@link hub.top.editor.ptnetLoLA.impl.PlaceImpl#getToken <em>Token</em>}</li>
+ *   <li>{@link hub.top.editor.ptnetLoLA.impl.PlaceImpl#getFinalMarking <em>Final Marking</em>}</li>
  * </ul>
  * </p>
  *
@@ -70,6 +71,16 @@ public class PlaceImpl extends NodeImpl implements Place {
 	 * @ordered
 	 */
 	protected static final int TOKEN_EDEFAULT = 0;
+
+	/**
+	 * The default value of the '{@link #getFinalMarking() <em>Final Marking</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFinalMarking()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int FINAL_MARKING_EDEFAULT = 0;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -150,6 +161,63 @@ public class PlaceImpl extends NodeImpl implements Place {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @generated not
+	 */
+	public int getFinalMarking() {
+		PtNet net = (PtNet)eContainer;
+		for (RefMarkedPlace p : net.getFinalMarking().getPlaces()) {
+			if (p.getPlace() == this)
+				return p.getToken();
+		}
+		return 0;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated not
+	 */
+	public void setFinalMarking(int newFinalMarking) {
+		int oldFinalMarking = getFinalMarking();
+		
+		PtNet net = (PtNet)eContainer;
+		RefMarkedPlace pMarked = null;
+		for (RefMarkedPlace p : net.getInitialMarking().getPlaces()) {
+			if (p.getPlace() == this) {
+				pMarked = p;
+				break;
+			}
+		}
+
+		boolean doNotify = true;
+		if (newFinalMarking == 0) {
+			if (pMarked != null) {
+				pMarked.setToken(0);
+				pMarked.setPlace(null);
+				net.getInitialMarking().getPlaces().remove(pMarked);
+			} else {
+				// nothing to do
+				doNotify = false;
+			}
+		} else if (newFinalMarking > 0) {
+			if (pMarked != null) {
+				pMarked.setToken(newFinalMarking);
+			} else {
+				RefMarkedPlace p = PtnetLoLAFactory.eINSTANCE.createRefMarkedPlace();
+				p.setPlace(this);
+				p.setToken(newFinalMarking);
+				net.getInitialMarking().getPlaces().add(p);
+			}
+		} 
+
+		if (doNotify && eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, PtnetLoLAPackage.PLACE__FINAL_MARKING, oldFinalMarking, newFinalMarking));
+
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -157,6 +225,8 @@ public class PlaceImpl extends NodeImpl implements Place {
 		switch (featureID) {
 			case PtnetLoLAPackage.PLACE__TOKEN:
 				return new Integer(getToken());
+			case PtnetLoLAPackage.PLACE__FINAL_MARKING:
+				return new Integer(getFinalMarking());
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -171,6 +241,9 @@ public class PlaceImpl extends NodeImpl implements Place {
 		switch (featureID) {
 			case PtnetLoLAPackage.PLACE__TOKEN:
 				setToken(((Integer)newValue).intValue());
+				return;
+			case PtnetLoLAPackage.PLACE__FINAL_MARKING:
+				setFinalMarking(((Integer)newValue).intValue());
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -187,6 +260,9 @@ public class PlaceImpl extends NodeImpl implements Place {
 			case PtnetLoLAPackage.PLACE__TOKEN:
 				setToken(TOKEN_EDEFAULT);
 				return;
+			case PtnetLoLAPackage.PLACE__FINAL_MARKING:
+				setFinalMarking(FINAL_MARKING_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -201,6 +277,8 @@ public class PlaceImpl extends NodeImpl implements Place {
 		switch (featureID) {
 			case PtnetLoLAPackage.PLACE__TOKEN:
 				return getToken() != TOKEN_EDEFAULT;
+			case PtnetLoLAPackage.PLACE__FINAL_MARKING:
+				return getFinalMarking() != FINAL_MARKING_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}

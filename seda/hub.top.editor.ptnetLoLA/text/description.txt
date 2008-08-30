@@ -9,6 +9,7 @@ Package ptnetLoLA <http://www.informatik.hu-berlin.de/top/tools/editors/petrinet
 
   Class Place -> Node
     Attribute /token : EInt<<1..1>>
+    Attribute /finalMarking : EInt<<1..1>>
 
   Class PtNet
     Reference places : Place<<0..*>>

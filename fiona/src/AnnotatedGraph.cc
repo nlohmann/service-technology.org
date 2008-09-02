@@ -1803,6 +1803,9 @@ AnnotatedGraph* AnnotatedGraph::product(const AnnotatedGraph* rhs) {
         productOG->removeReachableFalseNodes();
     }
 
+    // Assign the final nodes for the product
+    productOG->assignFinalNodes();
+
     trace(TRACE_5, "AnnotatedGraph::product(const AnnotatedGraph* rhs): end\n");
 
     return productOG;

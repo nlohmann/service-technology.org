@@ -224,58 +224,91 @@ void AnnotatedGraph::removeEdgesFromNodeToAllOtherNodes(AnnotatedGraphNode* node
 bool AnnotatedGraph::isAcyclic() {
     trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): start\n");
 
-    // Define a set for every Node, that will contain all transitive parent nodes
-    map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> > parentNodes;
+    // map the number of every nodes predecessors to the node 
+    map<AnnotatedGraphNode*, unsigned int> predecessors;
 
-    // Define a queue for all nodes that still need to be tested and initialize it
-    queue<AnnotatedGraphNode*> testNodes;
-
+    // if the graph has no root it is empty and thus acyclic
     if (hasNoRoot()) {
         trace(TRACE_0, "The graph is empty and thus acyclic!\n");
         return true;
     }
 
-    testNodes.push(root);
-    AnnotatedGraphNode* testNode;
+    // A set that contains all nodes of the graph in the beginning
+    set<AnnotatedGraphNode*> allNodes;
 
-    // While there are still nodes in the queue
-    while (!testNodes.empty()) {
-
-        testNode = testNodes.front();
-        testNodes.pop();
-
-        // A node counts as a parent node to it self for the purpose of cycles
-        parentNodes[testNode].insert(testNode);
+    // First iteration:
+    // - determine the number of predecessors for every node
+    // - copy every node into the set of allNodes
+    for (vector<AnnotatedGraphNode*>::iterator currentNode = setOfNodes.begin(); currentNode != setOfNodes.end(); currentNode++) {
 
         // Iterate all transitions of that node
         AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =
-                testNode->getLeavingEdgesConstIterator();
-
+            (*currentNode)->getLeavingEdgesConstIterator();
         while (edgeIter->hasNext()) {
             AnnotatedGraphEdge* edge = edgeIter->getNext();
-            // If the Node is the source of that transition and if the Destination is a valid node
+            // If the target node of this edge is a blue node
             if (edge->getDstNode()->getColor() == BLUE) {
-
-                // Return false if an outgoing transition points at a transitive parent node,
-                // else add the destination to the queue and update its transitive parent nodes
-                if (parentNodes[testNode].find(edge->getDstNode())
-                        != parentNodes[testNode].end()) {
-                    delete edgeIter;
-                    trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): end\n");
-                    return false;
-                } else {
-                    testNodes.push(edge->getDstNode());
-                    parentNodes[edge->getDstNode()].insert(parentNodes[testNode].begin(),
-                            parentNodes[testNode].end());
-                }
+                // increase the number of predecessors of the target node
+                predecessors[edge->getDstNode()] += 1;
             }
         }
         delete edgeIter;
+
+        // copy this node into the set of all nodes
+        allNodes.insert(*currentNode);
     }
+
+    // now we define a queue that will hold all nodes that have no predecessor (left)
+    queue<AnnotatedGraphNode*> zeroNodes;
+    
+    // Initialize the queue
+    for (vector<AnnotatedGraphNode*>::iterator currentNode = setOfNodes.begin(); currentNode != setOfNodes.end(); currentNode++) {
+        if(predecessors[(*currentNode)] == 0) {
+            zeroNodes.push(*currentNode);
+        }
+    }
+
+    // while there are still nodes that have no predecessor
+    while (zeroNodes.size() != 0) {
+        // erase this node from zeroNodes as well as from the set allNodes
+        AnnotatedGraphNode* currentNode = zeroNodes.front();
+        zeroNodes.pop();
+        allNodes.erase(currentNode);
+
+        AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =
+            (currentNode)->getLeavingEdgesConstIterator();
+
+        // Iterate over all edges of this node
+        while (edgeIter->hasNext()) {
+            AnnotatedGraphEdge* edge = edgeIter->getNext();
+            // If the target node of this edge is a blue node
+            if (edge->getDstNode()->getColor() == BLUE) {
+                // Since this node was erased it decreases the number of predecessors
+                // for its follower nodes
+                predecessors[edge->getDstNode()] -= 1;
+
+                // If a follower node has no predecessors left it is taken into the queue
+                if (predecessors[edge->getDstNode()] == 0) {
+                    zeroNodes.push(edge->getDstNode());
+                }
+            }
+        }
+    }
+
     trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): end\n");
-    return true;
+
+    // If all nodes could have been erased this way, this graph is
+    // acyclic. If there are still nodes left, there must be a cycle.
+    if (allNodes.size() == 0) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
+
+/*  Old algorithm that counts all services that match the OG
+ *  and are a subgraph of the dual OG at the same time
 
 //! \brief computes the number of services determined by this OG
 //! \return number of Services
@@ -561,6 +594,189 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(
     return number;
 }
 
+    End of the old algorithm */
+
+
+//! \brief computes the number of tree-service-automata determined by this OG
+//! \return number of Strategies
+long double AnnotatedGraph::numberOfStrategies() {
+
+    trace(TRACE_5, "AnnotatedGraph::numberOfStrategies(...): start\n");
+
+    trace(TRACE_1, "Removing false nodes...\n");
+    removeReachableFalseNodes();
+
+    // if this og is empty there are no strategies for it
+    if (root == NULL) {
+        return 0;
+    }
+
+    // define variables that will be used in the recursive function
+    map<AnnotatedGraphNode*, list <list<AnnotatedGraphNode*> > > validFollowerCombinations;
+    map<AnnotatedGraphNode*, long double> eliminateRedundantCounting;
+
+    // define variables that will be used in the preprocessing before starting the recursion
+    set<string> labels;
+    list<GraphFormulaAssignment> assignmentList;
+    GraphFormulaAssignment possibleAssignment;
+    map<string, AnnotatedGraphEdge*> edges;
+
+    trace(TRACE_2, "Computing true assignments for all nodes\n");
+    // Preprocess all nodes of the OG in order to fill the variables needed in the recursion
+    for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode
+            != setOfNodes.end(); ++iNode) {
+
+        // reset the temporary variables for every node
+        labels.clear();
+        assignmentList.clear();
+        edges.clear();
+        possibleAssignment = GraphFormulaAssignment();
+
+        // the literals "true" and "final" are always set to true in
+        // every assignment
+        possibleAssignment.setToTrue("true");
+        possibleAssignment.setToTrue("final");
+
+        // get the labels of all outgoing edges,
+        // save those labels in a set and fill a mapping that allows finding the
+        // outgoing edges for a label
+        trace(TRACE_5, "Collecting labels of outgoing edges for current node\n");
+        AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =(*iNode)->getLeavingEdgesConstIterator();
+        while (edgeIter->hasNext()) {
+            AnnotatedGraphEdge* edge = edgeIter->getNext();
+            labels.insert(edge->getLabel());
+            edges[edge->getLabel()] = edge;
+        }
+
+        // get rid of the iterator
+        delete edgeIter;
+
+        // return the number of true assignments for this node's formula
+        processAssignmentsRecursively(labels,
+                possibleAssignment, (*iNode), assignmentList);
+
+        // create a temporary variable for a list of nodes
+        list<AnnotatedGraphNode*> followerNodes;
+
+        // for every true assignment a list of nodes will be created. These are the nodes which are
+        // reached by outgoing edges of which the labels were true in the assignment. This set is then saved in
+        // a map for the currently proceeded node.
+        for (list<GraphFormulaAssignment>::iterator assignment =
+                assignmentList.begin(); assignment != assignmentList.end(); assignment++) {
+
+            followerNodes = list<AnnotatedGraphNode*>();
+            for (set<string>::iterator label = labels.begin(); label
+                    != labels.end(); label++) {
+
+                if (assignment->get((*label))) {
+                    followerNodes.push_back(edges[(*label)]->getDstNode());
+                }
+            }
+            validFollowerCombinations[(*iNode)].push_back(followerNodes);
+        }
+    }
+
+    long double number = 0;
+
+    trace(TRACE_1, "Starting recursive computation of number of Strategies\n");
+
+    // process the nodes recursively
+    number = numberOfStrategiesRecursively(root,
+            validFollowerCombinations, eliminateRedundantCounting);
+
+    trace(TRACE_5, "AnnotatedGraph::numberOfStrategies(...): end\n");
+    return number;
+}
+
+
+//! \brief compute the number of tree service automata from this current node on
+//! \param activeNode a node pointing to the current node
+//! \param validFollowerCombinations a map that contains all sets of follower nodes that succeed to
+//!        fullfill the annotation of the current node with the edges leading to them
+//! \param eliminateRedundantCounting map containing all already computed number of tree service 
+//!           automata for every node. This map is filled meanwhile the recursion
+//! \return number of Strategies for the current node
+long double AnnotatedGraph::numberOfStrategiesRecursively(
+        AnnotatedGraphNode* activeNode,
+        map<AnnotatedGraphNode*, list<list<AnnotatedGraphNode*> > >& validFollowerCombinations,
+        map<AnnotatedGraphNode*, long double>& eliminateRedundantCounting) {
+
+    // if the number for the active Node has already been computed, use the saved value
+    if (eliminateRedundantCounting[activeNode] != 0) {
+        trace(TRACE_3 ,"    value for node " + activeNode->getName() + " was already calculated\n");
+        return eliminateRedundantCounting[activeNode];
+    }
+
+    trace(TRACE_2 ,"    first time entering node: " + activeNode->getName() + "\n");
+
+    // define the counting variable
+    long double number = 0;
+
+    trace(TRACE_3 ,"    this node has " +  intToString(validFollowerCombinations[activeNode].size()) + " follower Combinations\n");
+    
+    // iterate over the list of valid follower combinations
+    for (list<list<AnnotatedGraphNode*> >::iterator followerList =
+        validFollowerCombinations[activeNode].begin(); followerList != validFollowerCombinations[activeNode].end(); followerList++) {
+        trace(TRACE_4, "        current followerCombination: ");
+        // if there is no need for followers in order to fulfill
+        // the annotation, then count an additional automaton for
+        // this node
+        if ((*followerList).size() == 0) {
+            //if (validFollowerCombinations[activeNode].size() == 1) {
+                number += 1;
+            //}
+            trace(TRACE_4, "empty\n");
+            continue;
+        }
+
+        // the value of the current combination is the product of the values of
+        // all the nodes the edges of the current combination point to 
+        long double currentCombinationValue = 1;
+
+        // detailed information for high debug levels
+        if (debug_level >= TRACE_4) {
+            bool firstIteration = true;
+            for (list<AnnotatedGraphNode*>::iterator follower =
+                   followerList->begin(); follower != followerList->end(); follower++) {
+                if (!firstIteration) {
+                    trace(TRACE_4, ", ");
+                } else {
+                    firstIteration = false;
+                }
+                trace(TRACE_4, (*follower)->getName());
+            }
+        trace(TRACE_4, "\n");
+        }
+
+        // DEBUG
+        int i = 0;
+
+        // Iterate over all follower nodes from this valid follower combination
+        // and after having done the recursion for them, multiply
+        for (list<AnnotatedGraphNode*>::iterator follower =
+            followerList->begin(); follower != followerList->end(); follower++) {
+            currentCombinationValue *= numberOfStrategiesRecursively( (*follower),
+                    validFollowerCombinations, eliminateRedundantCounting);
+            trace(TRACE_3, "    backtracking to node: " + activeNode->getName() + "\n");
+            i++;
+        }
+
+        // add the value of the current combination to the active node's value
+        number += currentCombinationValue;
+    }
+
+    // use a stringstream to turn a long double into a string for debug output
+    stringstream longDoubleZahl;
+    longDoubleZahl << number;
+    trace(TRACE_2 ,"    node " + activeNode->getName() + " returned a value of " + longDoubleZahl.str() + "\n");
+
+    // eliminitae redundant counting by saving the value for this node
+    eliminateRedundantCounting[activeNode] = number;
+
+    // return the value of this active node to the caller
+    return number;
+}
+
 
 //! \brief computes the number of true assignments for the given formula of an OG node and additionally
 //!        saves them in an assignmentList for every node. The function works by recursively
@@ -578,10 +794,9 @@ unsigned int AnnotatedGraph::processAssignmentsRecursively(set<string> labels,
 
     // If there is no outgoing transition, return immediatly
     if (labels.empty()) {
-        possibleAssignment.setToTrue("true");
-        possibleAssignment.setToTrue("final");
         if (testNode->assignmentSatisfiesAnnotation(possibleAssignment)) {
             assignmentList.push_back(possibleAssignment);
+            return 1;
         }
         return 0;
     }
@@ -593,7 +808,7 @@ unsigned int AnnotatedGraph::processAssignmentsRecursively(set<string> labels,
     label = (*labels.begin());
     labels.erase(labels.begin());
 
-    // if this was the last lable ...
+    // if this was the last label ...
     if (labels.empty()) {
 
         // set it to False
@@ -615,7 +830,7 @@ unsigned int AnnotatedGraph::processAssignmentsRecursively(set<string> labels,
     } else {
         // set it to False
         possibleAssignment.setToFalse(label);
-        // count the number of all true assignments which are true following this label being set to false
+        // count the number of all assignments which are true following this label being set to false
         tempValue = processAssignmentsRecursively(labels, possibleAssignment,
                 testNode, assignmentList);
         // increase the number of true assignments accordingly
@@ -623,7 +838,7 @@ unsigned int AnnotatedGraph::processAssignmentsRecursively(set<string> labels,
 
         // set it to True
         possibleAssignment.setToTrue(label);
-        // count the number of all true assignments which are true following this label being set to true
+        // count the number of all assignments which are true following this label being set to true
         tempValue = processAssignmentsRecursively(labels, possibleAssignment,
                 testNode, assignmentList);
         // increase the number of true assignments accordingly

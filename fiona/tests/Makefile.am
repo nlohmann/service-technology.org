@@ -91,8 +91,10 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              png/big.owfn \
              countservices/acyclic.og \
              countservices/cyclic.og \
-             countservices/1.og \
              countservices/nostrat.og \
+             countservices/false_nodes.og \
+             countservices/multiple_arcs.og \
+             countservices/sequence4.owfn.og \
              falseannos/bluefalsenode.expected.og \
              falseannos/bluefalsenode.og \
              falseannos/shorten.expected.og \

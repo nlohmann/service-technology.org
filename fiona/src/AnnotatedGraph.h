@@ -147,12 +147,10 @@ class AnnotatedGraph : public Graph {
         /// transforms the public views annotated graph to a non annotated Graph
         void transformOGToService( Graph* cleanPV);
 
-        /// recursive function for computing the number of services
-        unsigned int numberOfServicesRecursively(set<AnnotatedGraphNode*> activeNodes,
-                                                 map<AnnotatedGraphNode*, unsigned int>& followers,
-                                                 map<AnnotatedGraphNode*, list <set<AnnotatedGraphNode*> > >& validFollowerCombinations,
-                                                 map<set<AnnotatedGraphNode*>, unsigned int>& eliminateRedundantCounting,
-                                                 unsigned int& instances);
+        /// recursive function for computing the number of matching tree service automata
+        long double numberOfStrategiesRecursively(AnnotatedGraphNode* activeNode,
+                                                 map<AnnotatedGraphNode*, list <list<AnnotatedGraphNode*> > >& validFollowerCombinations,
+                                                 map<AnnotatedGraphNode*, long double>& eliminateRedundantCounting);
 
         /// recursive function for computing the number of true assignments for a node
         unsigned int processAssignmentsRecursively(set<string> labels,
@@ -345,8 +343,8 @@ class AnnotatedGraph : public Graph {
         bool isEquivalent(AnnotatedGraphNode* leftNode,
                           AnnotatedGraphNode* rightNode);
 
-        /// computes the number of Services determined by this OG
-        unsigned int numberOfServices();
+        /// computes the number of matching tree service automata for this OG
+        long double numberOfStrategies();
 
         /// Minimizes the graph
         void minimizeGraph();

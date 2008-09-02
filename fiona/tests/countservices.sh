@@ -86,7 +86,7 @@ fi
 ############################################################################
 # count services                                                           #
 ############################################################################
-og="$DIR/1.og"
+og="$DIR/false_nodes.og"
 cmd="$FIONA $og -t count"
 
 if [ "$memcheck" = "yes" ]; then
@@ -96,7 +96,47 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "Computed number of strategies: 5" > /dev/null
+    echo $OUTPUT | grep "Computed number of matching tree service automata: 5" > /dev/null
+    resultCyclic=$?
+
+    if [ $resultCyclic -ne 0 ]; then
+        result=1
+        echo   ... expected number of services differs.
+    fi
+fi
+
+############################################################################
+og="$DIR/multiple_arcs.og"
+cmd="$FIONA $og -t count"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "Computed number of matching tree service automata: 9" > /dev/null
+    resultCyclic=$?
+
+    if [ $resultCyclic -ne 0 ]; then
+        result=1
+        echo   ... expected number of services differs.
+    fi
+fi
+
+############################################################################
+og="$DIR/sequence4.owfn.og"
+cmd="$FIONA $og -t count"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$og.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    echo $OUTPUT | grep "Computed number of matching tree service automata: 1.67772e+07" > /dev/null
     resultCyclic=$?
 
     if [ $resultCyclic -ne 0 ]; then
@@ -116,7 +156,7 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    echo $OUTPUT | grep "Computed number of strategies: 0" > /dev/null
+    echo $OUTPUT | grep "The computed number resulted 0, which implies that the service is not controllable." > /dev/null
     resultCyclic=$?
 
     if [ $resultCyclic -ne 0 ]; then

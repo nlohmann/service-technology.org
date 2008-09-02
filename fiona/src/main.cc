@@ -1539,8 +1539,8 @@ void normalizeOWFN(oWFN* PN) {
 }
 
 
-//! \brief compute the number of strategies that are characterized by a given OG
-//! \param OG an og to compute the number of strategies for
+//! \brief compute the number of tree service automata that match with the given OG
+//! \param OG an og to compute the number of matching tree service automata for
 //! \param graphName a string with the name of the file, the og was taken from
 void countStrategies(AnnotatedGraph* OG, string graphName) {
 
@@ -1555,15 +1555,25 @@ void countStrategies(AnnotatedGraph* OG, string graphName) {
         time_t seconds, seconds2;
 
         seconds = time (NULL);
-        trace("Started computing the number of strategies\n");
+        trace("Started computing the number of matching tree service automata\n");
         // Compute and show the number of Services
-        trace("Computed number of strategies: " + intToString(OG->numberOfServices()) + "\n");
+        long double computedNumber = OG->numberOfStrategies();
+
+        stringstream longDoubleZahl;
+        longDoubleZahl << computedNumber;
+        if (computedNumber == 0) {
+            trace("The computed number resulted 0, which implies that the service is not controllable.");
+        } else if (longDoubleZahl.str() != "inf"){
+            trace("Computed number of matching tree service automata: " + longDoubleZahl.str() + "\n");
+        } else {
+            trace("The computed number exceeds 1,1E+4932!\n");
+        }
         seconds2 = time (NULL);
 
         cout << difftime(seconds2, seconds) << " s consumed for computation" << endl << endl;
 
     } else {
-        trace("Cannot compute number of strategies, since the given OG is not acyclic\n\n");
+        trace("Cannot compute number of matching tree service automata, since the given OG is not acyclic\n\n");
     }
 }
 

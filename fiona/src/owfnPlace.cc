@@ -47,7 +47,7 @@
 //! \param _net
 owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) :
     Node(name), type(_type), capacity(0), nrbits(0),
-            max_occurence(1), cardprop(0), proposition(NULL) {
+            max_occurrence(1), cardprop(0), proposition(NULL) {
 
     references = initial_marking = hash_factor = 0;
     net = _net;
@@ -61,7 +61,7 @@ owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) :
 //! \param _net
 owfnPlace::owfnPlace(const string& name, placeType _type, oWFN * _net) :
     Node(name), type(_type), capacity(0), nrbits(0),
-            max_occurence(1), cardprop(0), proposition(NULL) {
+            max_occurrence(1), cardprop(0), proposition(NULL) {
 
     references = initial_marking = hash_factor = 0;
     net = _net;

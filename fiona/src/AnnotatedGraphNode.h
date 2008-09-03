@@ -203,13 +203,13 @@ class PriorityMap {
 
         /// Type of priority map.
         /// The first element of number represents the minimal length of a clause containing the key element.
-        /// The second element of number represents the maximal occurence of the key element throughout the annotation.
+        /// The second element of number represents the maximal occurrence of the key element throughout the annotation.
         typedef map<KeyType, pair<int, int> > MapType;
 
         /// Type of priority map for the IG.
         /// as the first element of the map we use a multiset of messages
         /// The first element of int represents the minimal length of a clause containing the key element.
-        /// The second element of int represents the maximal occurence of the key element throughout the annotation. 
+        /// The second element of int represents the maximal occurrence of the key element throughout the annotation. 
         typedef map<messageMultiSet, pair<int, int> > MapTypeIG;
         
         typedef map<int, set<std::string> > MapClauseEvents;

@@ -157,8 +157,7 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
         }
 
         // do we actually need to calculate a new node?
-        if (((options[O_MESSAGES_MAX] == false) && (options[O_EVENT_USE_MAX] == false))
-            || checkMaximalEvents(mmSet, currentNode, typeOfEdge)) {
+        if (checkMaximalEvents(mmSet, currentNode, typeOfEdge)) {
 
             if (typeOfEdge == SENDING) {
                 trace(TRACE_2, "\t\t\t\t    sending event: ");
@@ -215,7 +214,7 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
                 }
             }
         } else {
-            trace(TRACE_2, "\t\t\t            event suppressed (max_occurence reached)\n");
+            trace(TRACE_2, "\t\t\t            event suppressed (max_occurrence reached)\n");
 
             currentNode->removeLiteralFromAnnotation(PN->createLabel(mmSet));
         }
@@ -405,8 +404,8 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
     // now we check each message stored in the map, if its occurance violates our boundaries or not
     if (typeOfPlace == SENDING) {
         for (iter = numberOfInputMessages.begin(); iter != numberOfInputMessages.end(); ++iter) {
-            if (options[O_EVENT_USE_MAX] == true) { // max use of events set
-                if (currentNode->eventsUsedInput[iter->first] + iter->second > PN->getInputPlace(iter->first)->max_occurence) {
+                if ((currentNode->eventsUsedInput[iter->first] + iter->second > PN->getInputPlace(iter->first)->max_occurrence) &&
+                       (PN->getInputPlace(iter->first)->max_occurrence >= 0)) {
 
                     // this input event shall not be sent anymore, so quit here
                     trace(TRACE_3, "maximal occurrences of event ");
@@ -416,12 +415,11 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
                     trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, AnnotatedGraphNode * currentNode, bool typeOfPlace): end\n");
                     return false;
                 }
-            }
         }
     } else if (typeOfPlace == RECEIVING) {
         for (iter = numberOfOutputMessages.begin(); iter != numberOfOutputMessages.end(); ++iter) {
-            if (options[O_EVENT_USE_MAX] == true) { // max use of events set
-                if (currentNode->eventsUsedOutput[iter->first] +iter->second> PN->getOutputPlace(iter->first)->max_occurence) {
+                if ((currentNode->eventsUsedOutput[iter->first] + iter->second > PN->getOutputPlace(iter->first)->max_occurrence) &&
+                       (PN->getOutputPlace(iter->first)->max_occurrence >= 0)) {
 
                     // this output event shall not be received anymore, so quit here
                     trace(TRACE_3, "maximal occurrences of event ");
@@ -430,7 +428,6 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
                     trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, AnnotatedGraphNode * currentNode, bool typeOfPlace): end\n");
                     return false;
                 }
-            }
         }
     }
 

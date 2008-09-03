@@ -109,8 +109,8 @@ class owfnPlace : public Node {
         /// first bit representing this place in bit vector
         int startbit; 
         
-        /// max occurences of the node in its owfn
-        int max_occurence;
+        /// max occurrences of the node in its owfn
+        int max_occurrence;
         
         /// returns the type of the node
         placeType getType() const;

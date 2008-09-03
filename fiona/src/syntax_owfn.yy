@@ -398,8 +398,8 @@ place: nodeident {
 	PlaceTable->add(PS);
 	P->capacity = CurrentCapacity;
 	P->nrbits = (CurrentCapacity > 0 && logzwo(CurrentCapacity) < 32) ? logzwo(CurrentCapacity) + 1 : 32;
-	// set max_occurence to default value
-	P->max_occurence = events_manual;
+	// set max_occurrence to default value
+	P->max_occurrence = events_manual;
 	free($1);
 	if (type == INPUT || type == OUTPUT) {
 	    numberOfEvents += events_manual;
@@ -435,32 +435,32 @@ commands:
     }
 | KEY_MAX_OCCURRENCES OP_EQ NUMBER commands
     {
-        // set max_occurence to value that was given in oWFN file
+        // set max_occurrence to value that was given in oWFN file
         if (options[O_READ_EVENTS]) {
-            sscanf($3, "%u", &(PS->getPlace()->max_occurence));
+            sscanf($3, "%u", &(PS->getPlace()->max_occurrence));
             free($3);
         }
 //    	options[O_EVENT_USE_MAX] = true;
 //        if (options[O_EVENT_USE_MAX] &&
-//            PS->getPlace()->max_occurence > events_manual)
+//            PS->getPlace()->max_occurrence > events_manual)
 //        {
-//            PS->getPlace()->max_occurence = events_manual;
+//            PS->getPlace()->max_occurrence = events_manual;
 //        }
-//        numberOfEvents += PS->getPlace()->max_occurence - events_manual;
+//        numberOfEvents += PS->getPlace()->max_occurrence - events_manual;
     }
 | KEY_MAX_OCCURRENCES OP_EQ NEGATIVE_NUMBER commands
     {
-        //set max_occurence to value that was given in oWFN file
+        //set max_occurrence to value that was given in oWFN file
         if (options[O_READ_EVENTS]) {
-        	sscanf($3, "%d", &(PS->getPlace()->max_occurence));
+        	sscanf($3, "%d", &(PS->getPlace()->max_occurrence));
         	free($3);
     	}
 //        if (options[O_EVENT_USE_MAX] &&
-//            PS->getPlace()->max_occurence > events_manual)
+//            PS->getPlace()->max_occurrence > events_manual)
 //        {
-//            PS->getPlace()->max_occurence = events_manual;
+//            PS->getPlace()->max_occurrence = events_manual;
 //        }
-//        numberOfEvents += PS->getPlace()->max_occurence - events_manual;
+//        numberOfEvents += PS->getPlace()->max_occurrence - events_manual;
     }
 ;
 

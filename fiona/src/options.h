@@ -55,7 +55,7 @@ typedef enum {
     O_GRAPH_TYPE,               //!< -t, set mode of operation
     O_MESSAGES_MAX,             //!< -m, set a message maximum
     O_EVENT_USE_MAX,            //!< -e, set an events maximum
-    O_READ_EVENTS,              //!< -E, read the event occurences from the oWFN
+    O_READ_EVENTS,              //!< -E, read the event occurrences from the oWFN
     O_CALC_REDUCED_IG,          //!< -r, reduce the ig
     O_CALC_ALL_STATES,          //!< -R, calculate all states
     O_SHOW_NODES,               //!< -s, show additional information in nodes

@@ -318,6 +318,9 @@ void CommunicationGraph::printGraphToDot() {
         if (options[O_MESSAGES_MAX]) {
             dotFile << " -m" << intToString(messages_manual);
         }
+        if (options[O_READ_EVENTS]) {
+        	dotFile << " (-E)";
+        }
         if (options[O_EVENT_USE_MAX]) {
             dotFile << " -e" << intToString(events_manual);
         }

@@ -186,7 +186,7 @@ void print_help() {
 //  trace("                                 (-1 means disabling -e option, but is only\n");
 //  trace("                                 possible if -m option is set)\n");
 //  trace("                                 (only relevant for OG)\n");
-//  trace(" -E | --readevents ............. set the maximum occurences of events to\n");
+//  trace(" -E | --readevents ............. set the maximum occurrences of events to\n");
 //  trace("                                 values taken from the oWFN file. If none\n");
 //  trace("                                 are given, eventsmaximum is used. \n");
 //  trace("                                 (default is no maximum)\n");
@@ -723,14 +723,10 @@ void parse_command_line(int argc, char* argv[]) {
     	parameters[P_RESPONSIVE] = false;
     }
     
-    // Max Occurences - correcting parameters if needed
+    // Max Occurrences - correcting parameters if needed
     if (!options[O_READ_EVENTS] && !options[O_EVENT_USE_MAX]) {
         options[O_READ_EVENTS] = true;
     }
-    if (events_manual < 0) {
-        options[O_EVENT_USE_MAX] = false;
-    }
-
     
     bool firstfile = true;
     // reading all oWFNs and OGs

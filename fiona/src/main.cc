@@ -294,8 +294,8 @@ void reportOptionValues() {
         trace(TRACE_0, "    sending events:\n");
         for (unsigned int e = 0; e < PN->getInputPlaceCount(); e++) {
             trace(TRACE_0, "    !" + string(PN->getInputPlace(e)->name));
-            if (PN->getInputPlace(e)->max_occurence >= 0) {
-                trace(TRACE_0, "    (max. " + intToString(PN->getInputPlace(e)->max_occurence) + "x)\n");
+            if (PN->getInputPlace(e)->max_occurrence >= 0) {
+                trace(TRACE_0, "    (max. " + intToString(PN->getInputPlace(e)->max_occurrence) + "x)\n");
             } else {
                 trace(TRACE_0, "    (no limit)\n");
             }
@@ -303,8 +303,8 @@ void reportOptionValues() {
         trace(TRACE_0, "    receiving events:\n");
         for (unsigned int e = 0; e < PN->getOutputPlaceCount(); e++) {
             trace(TRACE_0, "    ?" + string(PN->getOutputPlace(e)->name));
-            if (PN->getOutputPlace(e)->max_occurence >= 0) {
-                trace(TRACE_0, "    (max. " + intToString(PN->getOutputPlace(e)->max_occurence) + "x)\n");
+            if (PN->getOutputPlace(e)->max_occurrence >= 0) {
+                trace(TRACE_0, "    (max. " + intToString(PN->getOutputPlace(e)->max_occurrence) + "x)\n");
             } else {
                 trace(TRACE_0, "    (no limit)\n");
             }

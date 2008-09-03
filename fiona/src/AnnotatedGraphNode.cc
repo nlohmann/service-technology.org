@@ -591,7 +591,7 @@ void AnnotatedGraphNode::getEvents(set<string>& events) {
 
 //! \brief Delivers the element from the priority map with the highest priority.
 //!        The element with the highest priority will be in a clause with minimal length
-//!        and will have the maximal count of occurences throughout the annotation
+//!        and will have the maximal count of occurrences throughout the annotation
 //!        in regards to other elements with minimal clause length. 
 //!        The element will be removed afterwards. 
 PriorityMap::KeyType PriorityMap::pop() {
@@ -607,7 +607,7 @@ PriorityMap::KeyType PriorityMap::pop() {
 
         // consider the element with a minimal depth clause (to catch the init values) 
         if (i->second.first ==  min_depth) {
-            // consider the second moment of priority (occurence count) 
+            // consider the second moment of priority (occurrence count)
             if (i->second.second >= max_occ) {
                 key = i->first;
                 min_depth = i->second.first;
@@ -677,7 +677,7 @@ void PriorityMap::adjustPM(oWFN * PN, const std::string & eventName) {
 
 //! \brief Delivers the element from the priority map with the highest priority.
 //!        The element with the highest priority will be in a clause with minimal length
-//!        and will have the maximal count of occurences throughout the annotation
+//!        and will have the maximal count of occurrences throughout the annotation
 //!        in regards to other elements with minimal clause length. 
 //!        The element will be removed afterwards. 
 messageMultiSet PriorityMap::popIG() {
@@ -693,7 +693,7 @@ messageMultiSet PriorityMap::popIG() {
     for (i = pmIG.begin(); i != pmIG.end(); i++) {
         // consider the element with a minimal depth clause (to catch the init values) 
         if (i->second.first == min_depth) {
-            // consider the second moment of priority (occurence count) 
+            // consider the second moment of priority (occurrence count)
             if (i->second.second >= max_occ) {
                 key = i->first;
                 min_depth = i->second.first;
@@ -733,7 +733,7 @@ void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
         if (key != NULL && (key->getType() == INPUT || key->getType() == OUTPUT)) {
             // initialize with a minimal priority
             pm[key].first  = INT_MAX; // minimal clause length
-            pm[key].second = 0;       // maximal occurence in the annotation
+            pm[key].second = 0;       // maximal occurrence in the annotation
 
             // iterate over the annotation (in cnf) in regards to a specific interface place
             for (GraphFormulaMultiaryAnd::iterator j = annotation->begin();
@@ -746,7 +746,7 @@ void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
                     GraphFormulaLiteral* lit = dynamic_cast<GraphFormulaLiteral*>(*k);
                     // interface place found in the clause?
                     if (lit->asString() == key->getLabelForCommGraph()) {
-                        // for every literal found, increase the count of occurence 
+                        // for every literal found, increase the count of occurrence
                         pm[key].second++;
 
                         // if this label's actual clause is shorter than the former minimum, set the new minimum
@@ -787,7 +787,7 @@ void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphForm
         if (found != eventFound.end()) {       
             // initialize with a minimal priority
             pmIG[*activatedEvent].first  = INT_MAX; // minimal clause length
-            pmIG[*activatedEvent].second = 0;       // maximal occurences in the annotation
+            pmIG[*activatedEvent].second = 0;       // maximal occurrences in the annotation
 
             // remember this that we took a look at this event
             eventFound[*activatedEvent] = true;
@@ -807,7 +807,7 @@ void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphForm
                 // activated event found in the clause?
                 if (lit->asString() == PN->createLabel(*activatedEvent)) {
 
-                    // for every literal found, increase the number of occurences 
+                    // for every literal found, increase the number of occurrences
                     pmIG[*activatedEvent].second++;
 
                     // if this label's actual clause is shorter than the former minimum, 

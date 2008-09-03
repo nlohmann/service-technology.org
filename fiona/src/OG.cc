@@ -166,11 +166,11 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
 
         trace(TRACE_2, currentEvent->getLabelForCommGraph() + "\n");
 
-        if (currentEvent->max_occurence < 0 ||
+        if (currentEvent->max_occurrence < 0 ||
             (currentEvent->getType() == INPUT &&
-             currentEvent->max_occurence > currentNode->eventsUsedInput[PN->getInputPlaceIndex(currentEvent)]) ||
+             currentEvent->max_occurrence > currentNode->eventsUsedInput[PN->getInputPlaceIndex(currentEvent)]) ||
             (currentEvent->getType() == OUTPUT &&
-             currentEvent->max_occurence > currentNode->eventsUsedOutput[PN->getOutputPlaceIndex(currentEvent)])) {
+             currentEvent->max_occurrence > currentNode->eventsUsedOutput[PN->getOutputPlaceIndex(currentEvent)])) {
 
             // we have to consider this event
             AnnotatedGraphNode* v = new AnnotatedGraphNode();    // create new AnnotatedGraphNode of the graph
@@ -248,7 +248,7 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                 }
             }
         } else {
-            trace(TRACE_2, "\t\t\t            event suppressed (max_occurence reached)\n");
+            trace(TRACE_2, "\t\t\t            event suppressed (max_occurrence reached)\n");
             currentNode->removeLiteralFromAnnotation(currentEvent->getLabelForCommGraph());
 
             if (currentEvent->getType() == INPUT) {
@@ -632,29 +632,32 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
 
     if (options[O_CALC_ALL_STATES]) {
 
-    	// if parameter "responsive" is used, we consider TSCCs only and store which 
+    	// if parameter "responsive" is used, we consider TSCCs only and store which
     	// TSCC we have seen already
     	// note: each TSCC has _at least_ one representative, it may have more than one though
     	std::map<unsigned int, bool> visitedTSCCs;
-    	
+
         // NO state reduction
         // iterate over all states of the node
         for (iter = node->reachGraphStateSet.begin();
              iter != node->reachGraphStateSet.end(); iter++) {
 
-        	// figure out, whether a clause shall be created for this state 
+        	// figure out, whether a clause shall be created for this state
         	bool useThisState = false;
-        	
+
+            // carry on a two step loop escape
+            bool continueLoop = false;
+
         	// if parameter "responsive" is not used
         	if (!parameters[P_RESPONSIVE]) {
         		useThisState = (*iter)->type == DEADLOCK ||
                     				(*iter)->type == FINALSTATE ||
-                                    (*iter)->isNotAutonomouslyTransient(); 
+                                    (*iter)->isNotAutonomouslyTransient();
         	} else { // if parameter "responsive" is used, then we consider TSCCs only
         		useThisState = ((*iter)->repTSCC && !visitedTSCCs[(*iter)->dfs]) ||
                 					(*iter)->isNotAutonomouslyTransient();
         	}
-        	
+
         	// we create a clause for the current state
             if (useThisState) {
                 // get the marking of this state
@@ -668,16 +671,16 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
                     GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
                     myclause->addSubFormula(myliteral);
                 }
-	            
+
                 // use a new reference of the currently considered state
                 State * currentState = (*iter);
-                
+
                 // if we are in responsive mode, remember which TSCC we are in
                 // (since current state is a representative of the TSCC it holds: dfs==lowlink)
                 if (parameters[P_RESPONSIVE]) {
                 	visitedTSCCs[currentState->dfs] = true;
                 }
-	            
+
 	            do {
 	            	// in case of a final state we add a special literal "final" to the clause
 	                if (currentState->type == FINALSTATE) {
@@ -685,11 +688,12 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
 	                	if ((PN->FinalCondition) && currentState->cardFireList > 0) {
 	                        cerr << "\n\t WARNING: found a finalstate which activates a transition";
 	                        cerr << "\n\t          you shouldn't do this!"<< endl;
-	
+
 	                        // transient final states are ignored in annotation, just like
 	                        // all other transient states
-	                       // delete myclause;
-	                        continue;
+	                        //delete myclause;
+	                        continueLoop = true;
+                            break;
 	                    } else {
 	                        node->hasFinalStateInStateSet = true;
 	                        GraphFormulaLiteral * myliteral = new GraphFormulaLiteralFinal();
@@ -704,11 +708,11 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
 	                        myclause->addSubFormula(myliteral);
 	                    }
 	                }
-	                
+
 	                if (parameters[P_RESPONSIVE]) {
 		                // get next state of TSCC, make sure that we stay in this TSCC by
 	                	// comparing lowlink values
-		                if (currentState->nexttar && 
+		                if (currentState->nexttar &&
 		                		(currentState->lowlink == currentState->nexttar->lowlink)) {
 		                	currentState = currentState->nexttar;
 			                if (currentState) {
@@ -720,13 +724,18 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
 		                	break;
 		                }
 	                }
-	              
+
 	                // since in responsive mode, we are in a loop, we have to check if the current
 	                // state is the one we have started with
 	                // if we are not in responsive mode, we get out of here, since the current state
 	                // stays the same
 	            } while (currentState && (currentState != (*iter)));
-	            
+
+	            // continue the loop without adding the clause if determined
+	            if (continueLoop) {
+	                continue;
+                }
+
                 node->addClause(myclause);
             }
         }

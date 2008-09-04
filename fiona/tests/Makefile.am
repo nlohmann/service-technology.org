@@ -50,6 +50,7 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              syntax/max_occurrence.owfn \
              syntax/syntax_example.owfn \
              syntax/syntax_example_new.owfn \
+             syntax/syntax_example_new_short.owfn \
              syntax/formula.owfn \
              syntax/formula.owfn.expected.og \
              extrema/all_final_marking.owfn \
@@ -71,6 +72,8 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              extrema/one_output.owfn \
              extrema/one_output_marked.owfn \
              extrema/transient_finalmarking.owfn \
+             extrema/non_empty_true_node.owfn \
+             extrema/non_empty_true_node2.owfn \
              cyclic/livelockInP.owfn \
              cyclic/zyklusP.owfn \
              cyclic/zyklusPmitCommit.owfn \
@@ -113,6 +116,10 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              sim_og/trafo_rule3_N8.owfn \
              sim_og/trafo_rule4_N9.owfn \
              sim_og/trafo_rule4_N10.owfn \
+             sim_og/trafo_wsfm_M0.owfn \
+             sim_og/trafo_wsfm_M1.owfn \
+             sim_og/trafo_wsfm_M2.owfn \
+             sim_og/trafo_wsfm_M3.owfn \
              matching/airline.og \
              matching/airline.owfn \
              matching/agency_traveler.og \

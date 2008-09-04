@@ -1,15 +1,178 @@
 PLACE
-  INTERNAL
-    ;
+INTERNAL
+  p0,  { initial }
+  pa1,
+  pa2,
+  pa3,
+  pa4,
+  pa5,
+  pb1,
+  pb2,
+  pb3,
+  pb4,
+  pb5,
+  pc1,
+  pc2,
+  pc3,
+  pc4,
+  pc5,
+  pd1,
+  pd2,
+  pd3,
+  pd4,
+  pd5;
 
-  INPUT
-    p1 {$ MAX_OCCURRENCES = 1 $};
-
-  OUTPUT
-    ;
+OUTPUT
+  a {$ MAX_OCCURRENCES = 3 $} ,
+  b {$ MAX_OCCURRENCES = 1 $} ,
+  c {$ MAX_OCCURRENCES = 4 $} ,
+  d;
 
 INITIALMARKING
-    ;
+  p0: 1;
 
-FINALMARKING
-  ;
+FINALCONDITION
+  (p0 < 1);
+
+TRANSITION ta1
+CONSUME
+  p0:  1;
+PRODUCE
+  a  : 1,
+  pa1 : 1;
+
+TRANSITION ta2
+CONSUME
+  pa1:  1;
+PRODUCE
+  a  : 1,
+  pa2 : 1;
+
+TRANSITION ta3
+CONSUME
+  pa2:  1;
+PRODUCE
+  a  : 1,
+  pa3 : 1;
+
+TRANSITION ta4
+CONSUME
+  pa3:  1;
+PRODUCE
+  a  : 1,
+  pa4: 1;
+
+TRANSITION ta5
+CONSUME
+  pa4:  1;
+PRODUCE
+  a  : 1,
+  pa5 : 1;
+
+TRANSITION tb1
+CONSUME
+  p0:  1;
+PRODUCE
+  b  : 1,
+  pb1 : 1;
+
+TRANSITION tb2
+CONSUME
+  pb1:  1;
+PRODUCE
+  b  : 1,
+  pb2 : 1;
+
+TRANSITION tb3
+CONSUME
+  pb2:  1;
+PRODUCE
+  b  : 1,
+  pb3 : 1;
+
+TRANSITION tb4
+CONSUME
+  pb3:  1;
+PRODUCE
+  b  : 1,
+  pb4: 1;
+
+TRANSITION tb5
+CONSUME
+  pb4:  1;
+PRODUCE
+  b  : 1,
+  pb5 : 1;
+
+TRANSITION tc1
+CONSUME
+  p0:  1;
+PRODUCE
+  c  : 1,
+  pc1 : 1;
+
+TRANSITION tc2
+CONSUME
+  pc1:  1;
+PRODUCE
+  c  : 1,
+  pc2 : 1;
+
+TRANSITION tc3
+CONSUME
+  pc2:  1;
+PRODUCE
+  c  : 1,
+  pc3 : 1;
+
+TRANSITION tc4
+CONSUME
+  pc3:  1;
+PRODUCE
+  c  : 1,
+  pc4: 1;
+
+TRANSITION tc5
+CONSUME
+  pc4:  1;
+PRODUCE
+  c  : 1,
+  pc5 : 1;
+
+TRANSITION td1
+CONSUME
+  p0:  1;
+PRODUCE
+  d  : 1,
+  pd1 : 1;
+
+TRANSITION td2
+CONSUME
+  pd1:  1;
+PRODUCE
+  d  : 1,
+  pd2 : 1;
+
+TRANSITION td3
+CONSUME
+  pd2:  1;
+PRODUCE
+  d  : 1,
+  pd3 : 1;
+
+TRANSITION td4
+CONSUME
+  pd3:  1;
+PRODUCE
+  d  : 1,
+  pd4: 1;
+
+TRANSITION td5
+CONSUME
+  pd4:  1;
+PRODUCE
+  d  : 1,
+  pd5 : 1;
+
+
+{ END OF FILE }

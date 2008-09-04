@@ -1566,7 +1566,7 @@ void countStrategies(AnnotatedGraph* OG, string graphName) {
         } else if (longDoubleZahl.str() != "inf"){
             trace("Computed number of matching tree service automata: " + longDoubleZahl.str() + "\n");
         } else {
-            trace("The computed number exceeds 1,1E+4932!\n");
+            trace("The computed number exceeds long double (approximately 10^4900)!\n");
         }
         seconds2 = time (NULL);
 

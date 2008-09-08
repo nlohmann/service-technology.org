@@ -1,5 +1,5 @@
 \input texinfo
-@setfilename simmatch.info
+@setfilename owfn2bpel.info
 @include version.texi
 @afourpaper
 @finalout

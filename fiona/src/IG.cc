@@ -73,6 +73,16 @@ void interactionGraph::buildGraph() {
     setOfNodes.push_back(getRoot());
 
     computeGraphStatistics();
+    
+    time_t seconds, seconds2;
+
+    trace(TRACE_2, "setting final nodes...\n");
+    seconds = time(NULL);
+    assignFinalNodes();
+    seconds2 = time(NULL);
+    trace(TRACE_2, "finished setting final nodes...\n");
+    trace(TRACE_3, "    " + intToString((int) difftime(seconds2, seconds)) + " s consumed.\n");
+    
 }
 
 

@@ -53,9 +53,22 @@
 
 //using namespace std;
 
+/// when counting nodes/edges/states and blue nodes/blue edges
+/// we need to remember that we have visited a node already and if
+/// we have counted the node as a blue node or not
+/// (we may reach a blue node from a red path and later on from a blue path!) 
+enum typeOfVisit {
+	VISITED_COUNTED_AS_BLUE,	/// node has been visited and counted as blue
+	VISITED_NOT_COUNTED			/// node has been visited but not (yet) counted
+};
 
 class AnnotatedGraph : public Graph {
 
+	// private enumeration
+	private:
+		
+		typedef typeOfVisit t_typeOfVisit;
+	
     // Public Typedefs
     public:
 
@@ -170,7 +183,7 @@ class AnnotatedGraph : public Graph {
         /// states stored in all nodes and the number of all nodes and edges in this graph.
         /// Furthermore computes the number of blue nodes and edges.
         void computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphNode* v,
-                                                 std::map<AnnotatedGraphNode*, bool>& visitedNodes, 
+                                                 std::map<AnnotatedGraphNode*, t_typeOfVisit>& visitedNodes, 
                                                  bool onABluePath);
 
         /// The total number of all states stored in all nodes in this graph.

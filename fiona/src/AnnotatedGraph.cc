@@ -2854,7 +2854,7 @@ void AnnotatedGraph::assignFinalNodes() {
 //!           to be shown or not.
 void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdges() {
     // Reset statistic variables
-    std::map<AnnotatedGraphNode*, bool> visitedNodes;
+    std::map<AnnotatedGraphNode*, t_typeOfVisit> visitedNodes;
     nStoredStates = 0;
     nEdges = 0;
     nBlueEdges = 0;
@@ -2867,31 +2867,38 @@ if (hasNoRoot()) {
 }
 
 
-//! \brief Helps computeNumberOfStatesAndEdges to computes the total number of all
+//! \brief Helps computeNumberOfStatesAndEdges to compute the total number of all
 //!        states stored in all nodes, the number of nodes and the number of all
-//!           edges in this graph. Also finds out which nodes and edges are to be
+//!        edges in this graph. Also finds out which nodes and edges are to be
 //!        counted as blue.
 //!        This is done recursively (dfs).
 //! \param v Current node in the iteration process.
-//! \param visitedNodes[] Array of bool storing the nodes that we have
-//!        already looked at.
+//! \param visitedNodes[] Array of t_typeOfVisit storing the nodes that we have
+//!        already looked at; distinguishes between "a visit only" and "counted as blue".
 //! \param onABluePath true if we are on a blue path
 void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphNode* v,
-        std::map<AnnotatedGraphNode*, bool>& visitedNodes,
+        std::map<AnnotatedGraphNode*, t_typeOfVisit>& visitedNodes,
         bool onABluePath) {
 
     assert(v != NULL);
 
-    // counting the current node
-    visitedNodes[v] = true;
+    // marking the current node as visited if it has not been visited so far,
+    // suppose it is not counted as blue
+    if (visitedNodes.find(v) == visitedNodes.end()) {
+    	visitedNodes[v] = VISITED_NOT_COUNTED;
+    }
 
     // Determine if we have a blue node and are on a blue path.
-    if (onABluePath && (v->getColor() == BLUE) && (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
+    if (onABluePath && (v->getColor() == BLUE) && 
+    		(parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
+    	
         ++nBlueNodes;
+        
+        // remember that the current node has been counted as blue
+        visitedNodes[v] = VISITED_COUNTED_AS_BLUE;
     } else {
         onABluePath = false;
     }
-
     // Add the new states
     nStoredStates += v->reachGraphStateSet.size();
 
@@ -2917,9 +2924,23 @@ void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphN
             onABluePathInLoop = false;
         }
 
-        if ((vNext != v) && !visitedNodes[vNext]) {
-            // Call recursively with the current blue path status.
-            computeNumberOfNodesAndStatesAndEdgesHelper(vNext, visitedNodes, onABluePathInLoop);
+        if (vNext != v) {
+        	// have we visited the next node before? 
+        	// 1) if not, we check the next node
+        	// 2) if we have seen the next before, we only consider it again if
+        	// 		a) we are on a blue path
+        	// 		b) the next node is blue
+        	// 		c) we have not yet counted the next (blue) node as a blue node
+        	//		(it is possible to reach a blue node via a red path before, however there
+        	//		 may be a blue path which also leads to the blue node)
+        	if ((visitedNodes.find(vNext) == visitedNodes.end()) ||
+        			(onABluePathInLoop && 
+        			vNext->getColor() == BLUE &&
+        			visitedNodes[vNext] == VISITED_NOT_COUNTED)) {
+        	
+        		// Call recursively with the current blue path status.
+        		computeNumberOfNodesAndStatesAndEdgesHelper(vNext, visitedNodes, onABluePathInLoop);
+        	}
         }
     }
     delete edgeIter;

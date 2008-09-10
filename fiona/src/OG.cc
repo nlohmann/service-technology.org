@@ -684,7 +684,6 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
 	            do {
 	            	// in case of a final state we add a special literal "final" to the clause
 	                if (currentState->type == FINALSTATE) {
-	                    cout << "it is final" << endl;
 	                	if ((PN->FinalCondition) && currentState->cardFireList > 0) {
 	                        cerr << "\n\t WARNING: found a finalstate which activates a transition";
 	                        cerr << "\n\t          you shouldn't do this!"<< endl;

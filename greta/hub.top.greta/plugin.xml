@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+ Humboldt Universität zu Berlin, Thoery of Programming
+
+ $Id$
+-->
+
+<plugin>
+
+  <extension point="org.eclipse.emf.ecore.generated_package">
+    <package 
+       uri = "adaptiveSystem" 
+       class = "hub.top.adaptiveSystem.AdaptiveSystemPackage"
+       genModel = "model/adaptiveSystem.genmodel" /> 
+  </extension>
+
+  <extension point="org.eclipse.emf.ecore.extension_parser">
+    <parser 
+       type="adaptivesystem" 
+       class="hub.top.adaptiveSystem.util.AdaptiveSystemResourceFactoryImpl" />
+  </extension>
+
+</plugin>

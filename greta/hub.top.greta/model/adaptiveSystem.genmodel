@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" copyrightText="Humboldt Universität zu Berlin, Thoery of Programming"
+    modelDirectory="/hub.top.GRETA/src" modelPluginID="hub.top.GRETA" modelName="AdaptiveSystem"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0">
+  <foreignModel>adaptiveSystem.ecore</foreignModel>
+  <genPackages prefix="AdaptiveSystem" basePackage="hub.top" resource="XMI" disposableProviderFactory="true"
+      ecorePackage="adaptiveSystem.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="adaptiveSystem.ecore#//Orientation">
+      <genEnumLiterals ecoreEnumLiteral="adaptiveSystem.ecore#//Orientation/normal"/>
+      <genEnumLiterals ecoreEnumLiteral="adaptiveSystem.ecore#//Orientation/anti"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="adaptiveSystem.ecore#//Quantor">
+      <genEnumLiterals ecoreEnumLiteral="adaptiveSystem.ecore#//Quantor/universal"/>
+      <genEnumLiterals ecoreEnumLiteral="adaptiveSystem.ecore#//Quantor/existencial"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="adaptiveSystem.ecore#//Temp">
+      <genEnumLiterals ecoreEnumLiteral="adaptiveSystem.ecore#//Temp/cold"/>
+      <genEnumLiterals ecoreEnumLiteral="adaptiveSystem.ecore#//Temp/without"/>
+      <genEnumLiterals ecoreEnumLiteral="adaptiveSystem.ecore#//Temp/hot"/>
+    </genEnums>
+    <genClasses ecoreClass="adaptiveSystem.ecore#//AdaptiveSystem">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//AdaptiveSystem/oclets"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//AdaptiveSystem/adaptiveProcess"/>
+      <genFeatures property="Readonly" createChild="false" propertyCategory="4. Intern"
+          ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//AdaptiveSystem/setWellformednessToOclets"/>
+    </genClasses>
+    <genClasses ecoreClass="adaptiveSystem.ecore#//Oclet">
+      <genFeatures createChild="false" propertyCategory="1. Editable" ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Oclet/name"/>
+      <genFeatures createChild="false" propertyCategory="1. Editable" ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Oclet/orientation"/>
+      <genFeatures createChild="false" propertyCategory="1. Editable" ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Oclet/quantor"/>
+      <genFeatures property="Readonly" children="true" createChild="true" propertyCategory="2. Structure"
+          ecoreFeature="ecore:EReference adaptiveSystem.ecore#//Oclet/preNet"/>
+      <genFeatures property="Readonly" children="true" createChild="true" propertyCategory="2. Structure"
+          ecoreFeature="ecore:EReference adaptiveSystem.ecore#//Oclet/doNet"/>
+      <genFeatures property="Readonly" createChild="false" propertyCategory="2. Structure"
+          ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Oclet/wellFormed"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="adaptiveSystem.ecore#//OccurrenceNet">
+      <genFeatures createChild="false" propertyCategory="1. Editable" ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//OccurrenceNet/name"/>
+      <genFeatures property="None" children="true" createChild="true" propertyCategory="2. Structure"
+          ecoreFeature="ecore:EReference adaptiveSystem.ecore#//OccurrenceNet/nodes"/>
+      <genFeatures property="None" children="true" createChild="true" propertyCategory="2. Structure"
+          ecoreFeature="ecore:EReference adaptiveSystem.ecore#//OccurrenceNet/arcs"/>
+    </genClasses>
+    <genClasses ecoreClass="adaptiveSystem.ecore#//DoNet"/>
+    <genClasses ecoreClass="adaptiveSystem.ecore#//PreNet">
+      <genFeatures property="Readonly" notify="false" createChild="false" propertyCategory="2. Structure"
+          propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//PreNet/markedConditions"/>
+    </genClasses>
+    <genClasses ecoreClass="adaptiveSystem.ecore#//AdaptiveProcess">
+      <genFeatures property="Readonly" notify="false" createChild="false" propertyCategory="2. Structure"
+          propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//AdaptiveProcess/markedConditions"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="adaptiveSystem.ecore#//Node">
+      <genFeatures createChild="false" propertyCategory="1. Editable" ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Node/name"/>
+      <genFeatures createChild="false" propertyCategory="1. Editable" ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Node/abstract"/>
+      <genFeatures createChild="false" propertyCategory="1. Editable" ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Node/temp"/>
+      <genFeatures property="Readonly" createChild="false" propertyCategory="4. Intern"
+          ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Node/disabledByAntiOclet"/>
+      <genFeatures property="Readonly" createChild="false" propertyCategory="4. Intern"
+          ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Node/disabledByConflict"/>
+    </genClasses>
+    <genClasses ecoreClass="adaptiveSystem.ecore#//Condition">
+      <genFeatures property="Readonly" notify="false" createChild="false" propertyCategory="2. Structure"
+          propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//Condition/preEvents"/>
+      <genFeatures property="Readonly" notify="false" createChild="false" propertyCategory="2. Structure"
+          propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//Condition/postEvents"/>
+      <genFeatures createChild="false" propertyCategory="1. Editable" ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Condition/token"/>
+      <genFeatures property="Readonly" createChild="false" propertyCategory="4. Intern"
+          ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Condition/marked"/>
+      <genFeatures property="Readonly" createChild="false" propertyCategory="4. Intern"
+          ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Condition/maximal"/>
+      <genFeatures property="Readonly" createChild="false" propertyCategory="4. Intern"
+          ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Condition/minimal"/>
+      <genFeatures property="Readonly" notify="false" createChild="false" propertyCategory="2. Structure"
+          propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//Condition/incoming"/>
+      <genFeatures property="Readonly" notify="false" createChild="false" propertyCategory="2. Structure"
+          propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//Condition/outgoing"/>
+    </genClasses>
+    <genClasses ecoreClass="adaptiveSystem.ecore#//Event">
+      <genFeatures property="Readonly" notify="false" createChild="false" propertyCategory="2. Structure"
+          propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//Event/preConditions"/>
+      <genFeatures property="Readonly" notify="false" createChild="false" propertyCategory="2. Structure"
+          propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//Event/postConditions"/>
+      <genFeatures property="Readonly" createChild="false" propertyCategory="4. Intern"
+          ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Event/saturated"/>
+      <genFeatures property="Readonly" createChild="false" propertyCategory="4. Intern"
+          ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Event/enabled"/>
+      <genFeatures property="Readonly" notify="false" createChild="false" propertyCategory="2. Structure"
+          propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//Event/incoming"/>
+      <genFeatures property="Readonly" notify="false" createChild="false" propertyCategory="2. Structure"
+          propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//Event/outgoing"/>
+    </genClasses>
+    <genClasses ecoreClass="adaptiveSystem.ecore#//Arc">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute adaptiveSystem.ecore#//Arc/weight"/>
+    </genClasses>
+    <genClasses ecoreClass="adaptiveSystem.ecore#//ArcToEvent">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//ArcToEvent/source"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//ArcToEvent/destination"/>
+    </genClasses>
+    <genClasses ecoreClass="adaptiveSystem.ecore#//ArcToCondition">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//ArcToCondition/source"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference adaptiveSystem.ecore#//ArcToCondition/destination"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

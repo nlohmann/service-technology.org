@@ -1,0 +1,7 @@
+# Tracing options for the hub.top.GRETA.diagram plug-in
+
+# Common issues
+hub.top.GRETA.diagram/debug=false
+
+# Visual IDs
+hub.top.GRETA.diagram/debug/visualID=false

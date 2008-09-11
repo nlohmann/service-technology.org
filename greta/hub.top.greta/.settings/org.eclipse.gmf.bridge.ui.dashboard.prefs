@@ -1,0 +1,8 @@
+#Tue Sep 09 14:23:50 CEST 2008
+eclipse.preferences.version=1
+gmf_dashboard/domainGenerationModel=platform\:/resource/hub.top.GRETA/model/adaptiveSystem.genmodel
+gmf_dashboard/domainModel=platform\:/resource/hub.top.GRETA/model/adaptiveSystem.ecore
+gmf_dashboard/generationModel=platform\:/resource/hub.top.GRETA/model/adaptiveSystem.gmfgen
+gmf_dashboard/graphicalDefinitionModel=platform\:/resource/hub.top.GRETA/model/adaptiveSystem.gmfgraph
+gmf_dashboard/mappingModel=platform\:/resource/hub.top.GRETA/model/adaptiveSystem.gmfmap
+gmf_dashboard/toolingDefinitionModel=platform\:/resource/hub.top.GRETA/model/adaptiveSystem.gmftool

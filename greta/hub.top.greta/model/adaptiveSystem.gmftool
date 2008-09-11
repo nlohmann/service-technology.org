@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmftool:ToolRegistry xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:gmftool="http://www.eclipse.org/gmf/2005/ToolDefinition">
+  <palette
+      title="adaptiveSystemPalette"
+      description="Adaptive System Palette">
+    <tools
+        xsi:type="gmftool:ToolGroup"
+        title="Net">
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Adaptive Process"
+          description="Create a new Adaptive Process">
+        <smallIcon
+            xsi:type="gmftool:BundleImage"
+            path="/model/custom/icons/full/MainProcess.gif"
+            bundle="hub.top.apCreate"/>
+        <largeIcon
+            xsi:type="gmftool:BundleImage"
+            path="/model/custom/icons/full/MainProcess.gif"
+            bundle="hub.top.apCreate"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Oclet"
+          description="Create a new Oclet">
+        <smallIcon
+            xsi:type="gmftool:BundleImage"
+            path="/model/custom/icons/full/Oclet.gif"
+            bundle="hub.top.apCreate"/>
+        <largeIcon
+            xsi:type="gmftool:BundleImage"
+            path="/model/custom/icons/full/Oclet.gif"
+            bundle="hub.top.apCreate"/>
+      </tools>
+    </tools>
+    <tools
+        xsi:type="gmftool:ToolGroup"
+        title="Elements">
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Condition"
+          description="Create new Condition">
+        <smallIcon
+            xsi:type="gmftool:BundleImage"
+            path="/model/custom/icons/full/Condition.gif"
+            bundle="hub.top.apCreate"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Event"
+          description="Create new Event">
+        <smallIcon
+            xsi:type="gmftool:BundleImage"
+            path="/model/custom/icons/full/Event.gif"
+            bundle="hub.top.apCreate"/>
+        <largeIcon
+            xsi:type="gmftool:BundleImage"
+            path="/model/custom/icons/full/Event.gif"
+            bundle="hub.top.apCreate"/>
+      </tools>
+    </tools>
+    <tools
+        xsi:type="gmftool:ToolGroup"
+        title="Connection">
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Arc"
+          description="Create new Arc">
+        <smallIcon
+            xsi:type="gmftool:BundleImage"
+            path="/model/custom/icons/full/Arc.gif"
+            bundle="hub.top.apCreate"/>
+        <largeIcon
+            xsi:type="gmftool:BundleImage"
+            path="/model/custom/icons/full/Arc.gif"
+            bundle="hub.top.apCreate"/>
+      </tools>
+    </tools>
+  </palette>
+</gmftool:ToolRegistry>

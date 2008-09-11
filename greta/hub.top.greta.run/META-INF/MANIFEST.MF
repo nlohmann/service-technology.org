@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Run Plug-in
+Bundle-SymbolicName: hub.top.GRETA.run;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: hub.top.greta.run.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.gmf.runtime.notation,
+ org.eclipse.emf.edit,
+ org.eclipse.core.resources,
+ org.eclipse.gmf.runtime.diagram.ui
+Eclipse-LazyStart: true
+Import-Package: hub.top.adaptiveSystem,
+ hub.top.adaptiveSystem.diagram.edit.commands,
+ hub.top.adaptiveSystem.diagram.edit.parts,
+ hub.top.adaptiveSystem.diagram.edit.policies,
+ hub.top.adaptiveSystem.diagram.part,
+ hub.top.adaptiveSystem.diagram.providers,
+ hub.top.adaptiveSystem.diagram.view.factories,
+ hub.top.adaptiveSystem.impl,
+ hub.top.adaptiveSystem.presentation,
+ hub.top.adaptiveSystem.provider,
+ hub.top.adaptiveSystem.tests,
+ hub.top.adaptiveSystem.util
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy

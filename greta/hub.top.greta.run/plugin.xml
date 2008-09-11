@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="hub.top.GRETA.run.actionSet1"
+            label="Adaptive System Actions"
+            visible="true">
+         <action
+               class="hub.top.greta.run.actions.AdaptiveProcessStep"
+               disabledIcon="icons/adaptiveProcessStepDisabled4.png"
+               icon="icons/adaptiveProcessStepEnabled4.png"
+               id=" hub.top.GRETA.run.step"
+               label="go one step in adaptive process"
+               toolbarPath="org.eclipse.debug.ui.launchActionSet"
+               tooltip="go one step in adaptive process">
+         </action>
+         <action
+               class="hub.top.greta.run.actions.CheckOclets"
+               disabledIcon="icons/wellformedOcletsOK4.png"
+               icon="icons/wellformedOcletsFrage1.png"
+               id="hub.top.GRETA.run.checkOclets"
+               label="check wellformedness of oclets"
+               toolbarPath="org.eclipse.debug.ui.launchActionSet"
+               tooltip="check wellformedness of oclets">
+         </action>
+      </actionSet>
+   </extension>
+
+</plugin>

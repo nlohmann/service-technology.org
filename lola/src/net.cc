@@ -88,7 +88,7 @@ void readnet();
 void removeisolated();
 unsigned int NonEmptyHash;
 int main(int argc, char ** argv){
-  
+
   //// 11 LINE ADDED BY NIELS (for debug purposes)
   if (argc == 2 && std::string(argv[1]) == "--bug") {
     printf("\n\n");
@@ -101,7 +101,7 @@ int main(int argc, char ** argv){
     printf("\n\n");
     return EXIT_SUCCESS;
   }
-    
+
   unsigned int i,h;
   Place * tmpPlace;
 
@@ -111,7 +111,7 @@ int main(int argc, char ** argv){
   reserve = new char[10000];
   garbagefound = 0;
   // 1. Fileoptionen holen und auswerten
-  
+
   // Options:
   // File without option: Input net (stdin if not specified)
   // -h output configuration
@@ -138,7 +138,7 @@ int main(int argc, char ** argv){
   // <base> is set to "unknown_net"
 
   hflg = Nflg = nflg = Aflg = Sflg = Yflg = Pflg = GMflg = aflg = sflg = yflg = pflg = gmflg = cflg = false;
-  lownetfile = pnmlfile = netfile = analysefile = graphfile = pathfile = statefile = symmfile = 
+  lownetfile = pnmlfile = netfile = analysefile = graphfile = pathfile = statefile = symmfile =
   netbasename = (char *) 0;
   graphformat = '\0';
   for(i = 1; i < argc; i++)
@@ -150,7 +150,7 @@ int main(int argc, char ** argv){
 		// option
 		switch(argv[i][1])
 		{
-		case 'n': if(nflg || Nflg) 
+		case 'n': if(nflg || Nflg)
 				  {
 					cerr << "multiple use of options -n/-N not allowed\n";
 					return(4);
@@ -163,7 +163,7 @@ int main(int argc, char ** argv){
 				  else
 				  {
 					if((i+1 < argc) && (argv[i+1][0] != '-'))
-					{	
+					{
 						i++;
 						file = argv[i];
 					}
@@ -188,7 +188,7 @@ int main(int argc, char ** argv){
 				  break;
 		case 'h':         hflg = true;
 				  break;
-		case 'a': if(aflg || Aflg) 
+		case 'a': if(aflg || Aflg)
 				  {
 					cerr << "multiple use of options -a/-A not allowed\n";
 					return(4);
@@ -201,7 +201,7 @@ int main(int argc, char ** argv){
 				  else
 				  {
 					if((i+1 < argc) && (argv[i+1][0] != '-'))
-					{	
+					{
 						i++;
 						file = argv[i];
 					}
@@ -219,7 +219,7 @@ int main(int argc, char ** argv){
 				  }
 				  Aflg = true;
 				  break;
-		case 's': if(sflg || Sflg) 
+		case 's': if(sflg || Sflg)
 				  {
 					cerr << "multiple use of options -s/-S not allowed\n";
 					return(4);
@@ -232,7 +232,7 @@ int main(int argc, char ** argv){
 				  else
 				  {
 					if( (i+1 < argc) && (argv[i+1][0] != '-'))
-					{	
+					{
 						i++;
 						file = argv[i];
 					}
@@ -250,7 +250,7 @@ int main(int argc, char ** argv){
 				  }
 				  Sflg = true;
 				  break;
-		case 'y': if(yflg || Yflg) 
+		case 'y': if(yflg || Yflg)
 				  {
 					cerr << "multiple use of options -y/-Y not allowed\n";
 					return(4);
@@ -263,7 +263,7 @@ int main(int argc, char ** argv){
 				  else
 				  {
 					if((i+1 < argc) && (argv[i+1][0] != '-'))
-					{	
+					{
 						i++;
 						file = argv[i];
 					}
@@ -281,7 +281,7 @@ int main(int argc, char ** argv){
 				  }
 				  Yflg = true;
 				  break;
-		case 'p': if(pflg || Pflg) 
+		case 'p': if(pflg || Pflg)
 				  {
 					cerr << "multiple use of options -p/-P not allowed\n";
 					return(4);
@@ -294,7 +294,7 @@ int main(int argc, char ** argv){
 				  else
 				  {
 					if((i+1 < argc) && (argv[i+1][0] != '-'))
-					{	
+					{
 						i++;
 						file = argv[i];
 					}
@@ -315,7 +315,7 @@ int main(int argc, char ** argv){
 		case 'f':
 		case 'm':
 		case 'g': graphformat = argv[i][1];
-				  if(gmflg || GMflg) 
+				  if(gmflg || GMflg)
 				  {
 					cerr << "multiple use of options -g/-m-f/-G/-M/-F not allowed\n";
 					return(4);
@@ -328,7 +328,7 @@ int main(int argc, char ** argv){
 				  else
 				  {
 					if((i+1 < argc) &&(argv[i+1][0] != '-'))
-					{	
+					{
 						i++;
 						file = argv[i];
 					}
@@ -368,7 +368,7 @@ int main(int argc, char ** argv){
 		for(h=strlen(netbasename);;h--)
 		{
 			if(netbasename[h] == '.')
-			{	
+			{
 				netbasename[h] = '\0';
 				break;
 			}
@@ -383,7 +383,7 @@ int main(int argc, char ** argv){
 	strcpy(netbasename,"unknown_net");
   }
   if(nflg && !lownetfile)
-  {	
+  {
 	lownetfile = new char [strlen(netbasename) + 7];
 	strcpy(lownetfile,netbasename);
 	strcpy(lownetfile+strlen(netbasename),".llnet");
@@ -392,31 +392,31 @@ int main(int argc, char ** argv){
 	strcpy(pnmlfile+strlen(pnmlfile),".pnml");
   }
   if(aflg && !analysefile)
-  {	
+  {
 	analysefile = new char [strlen(netbasename) + 7];
 	strcpy(analysefile,netbasename);
 	strcpy(analysefile+strlen(netbasename),".task");
   }
   if(sflg && !statefile)
-  {	
+  {
 	statefile = new char [strlen(netbasename) + 8];
 	strcpy(statefile,netbasename);
 	strcpy(statefile+strlen(netbasename),".state");
   }
   if(yflg && !symmfile)
-  {	
+  {
 	symmfile = new char [strlen(netbasename) + 7];
 	strcpy(symmfile,netbasename);
 	strcpy(symmfile+strlen(netbasename),".symm");
   }
   if(pflg && !pathfile)
-  {	
+  {
 	pathfile = new char [strlen(netbasename) + 7];
 	strcpy(pathfile,netbasename);
 	strcpy(pathfile+strlen(netbasename),".path");
   }
   if(gmflg && !graphfile)
-  {	
+  {
 	graphfile = new char [strlen(netbasename) + 8];
 	strcpy(graphfile,netbasename);
 	strcpy(graphfile+strlen(netbasename),".graph");
@@ -572,7 +572,7 @@ int main(int argc, char ** argv){
 	Places[0]->NrSignificant = h+1;
 	cout << "\n" << Places[0]->NrSignificant << " significant places\n";
 #endif
-	
+
   }
   catch(overflow)
   {
@@ -689,14 +689,14 @@ int main(int argc, char ** argv){
 	if(F)
 	{
 		checkstart = new unsigned int[F->card+5];
-		for(i=0;i<F->card;i++) 
+		for(i=0;i<F->card;i++)
 		{
 			checkstart[i] = 0;
 		}
 	}
 #endif
 
-		
+
 	try{
 //siphontrapproperty();
 #ifdef NONE
@@ -710,7 +710,8 @@ int main(int argc, char ** argv){
 #ifdef STUBBORN
   sortscapegoats();
 #endif
-return modelcheck();
+  int returnValue = modelcheck();
+  _exit(returnValue); // proper handover of return code only with _exit
 #endif
 #if defined(LIVEPROP) && defined(TWOPHASE)
 return liveproperty();
@@ -718,7 +719,7 @@ return liveproperty();
 #ifdef REVERSIBILITY
 return reversibility();
 #endif
-#if defined(HOME) && defined(TWOPHASE) 
+#if defined(HOME) && defined(TWOPHASE)
 return home();
 #endif
 #ifdef FINDPATH
@@ -796,7 +797,7 @@ void findcyclingtransitions()
  	// use Node::parent pointer as stack, pos[0] = current succ, pos[1] for status info
 	// 0 - never seen, 1 - on stack, 2 - explored, x+4 - already selected as cyclic
  	// x+8 - transition
-		
+
 Node * currentnode, * newnode, * maxnode, * searchnode;
 unsigned int maxfan;
 Transition * currenttransition;
@@ -815,7 +816,7 @@ bool IsTransition ;
 	{
 		// is there another successor ?
 		newnode = (Node *) 0;
-		if(currentnode->pos[1] < 8) 
+		if(currentnode->pos[1] < 8)
 		{
 			// successor of place
 			for(;currentnode->pos[0] < currentnode -> NrOfLeaving;currentnode -> pos[0]++)
@@ -858,7 +859,7 @@ bool IsTransition ;
 					}
 				}
 				if(currenttransition->pos[0] < Transitions[0]->cnt)
-				{	
+				{
 					newnode = Transitions[currenttransition->pos[0]];
 					IsTransition = true;
 				}
@@ -876,13 +877,13 @@ bool IsTransition ;
 				newnode -> parent = currentnode;
 				newnode -> pos[0] = 0;
 				currentnode = newnode; //explore newnode
-			break;	
+			break;
 			case 1: // newnode on stack
 				maxfan = 0;
 				for(searchnode = currentnode;searchnode !=newnode;searchnode = searchnode -> parent)
-				{	
+				{
 					if(searchnode -> pos[1] < 8) continue; // jump over places
-					if(searchnode -> pos[1] > 11) 
+					if(searchnode -> pos[1] > 11)
 					{
 						//already selected
 						maxnode = searchnode;
@@ -905,7 +906,7 @@ bool IsTransition ;
 				currentnode -> pos[0] ++; // check next succ
 			break;
 			}
-			
+
 		}
 		else
 		{
@@ -919,7 +920,7 @@ bool IsTransition ;
 	{
 		if(Transitions[j]-> cyclic)
 		{
-			cerr << "\n" << Transitions[j] -> name; 
+			cerr << "\n" << Transitions[j] -> name;
 		}
 	}
 }

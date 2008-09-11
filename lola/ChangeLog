@@ -1,5 +1,6 @@
 Version 1.03
 ============
++ fixed bug #12302: LoLA: Uneinheitliche bzw. falsche Rückgabewerte bei MODELCHECKING <https://gna.org/bugs/?12302>, LoLA now returns the result via the _exit command
 + added directory "patches" collecting some unpublished adjustments
 
 

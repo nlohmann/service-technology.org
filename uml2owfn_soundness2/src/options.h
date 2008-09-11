@@ -119,6 +119,7 @@ typedef enum
   A_KEEP_UNCONN_PINS,	///< keep unconnected pins
   A_DEADLOCKS,		///< check for absence of deadlocks
   A_SAFE,		      ///< check for safeness
+  A_REMOVE_PINSETS, ///< remove the output pinsets when checking soundness
   A_MAX
 } possibleAnalysis;
 

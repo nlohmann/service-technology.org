@@ -116,7 +116,7 @@ stringstream logContents;
  *****************************************************************************/
 
 string generate_task_file_contents (analysis_t analysis);
-bool write_task_to_file (analysis_t analysis);
+bool shall_write_task_to_file (analysis_t analysis);
 
 void log_print (string text);
 void log_println (string text);
@@ -128,17 +128,17 @@ void log_println (string text);
 
 /*!
  * \brief	modify the process's name deleting some symbols
- * 			such that the outputfile can be easily read by 
+ * 			such that the outputfile can be easily read by
  * 			most programs
- * 
+ *
  * \param	processName	current name of the process
- * 
+ *
  * \returns	modified name of the process
  */
 string process_name_to_file_name (string processName)
 {
 	string modifiedProcessName = "";
-	
+
 	for (string::iterator c = processName.begin(); c != processName.end(); c++) {
 		switch (*c) {
 			case '#':
@@ -149,12 +149,12 @@ string process_name_to_file_name (string processName)
 			default:
 				modifiedProcessName = modifiedProcessName + (*c);
 		}
-	}	
+	}
 	return modifiedProcessName;
 }
 
 // analyzation of the commandline
-void analyze_cl(int argc, char *argv[]) 
+void analyze_cl(int argc, char *argv[])
 {
 
   // setting globals
@@ -176,12 +176,12 @@ void analyze_cl(int argc, char *argv[])
 
 
 // opening a file
-void open_file(string file) 
+void open_file(string file)
 {
   if (inputfiles.size() >= 1)
   {
     globals::filename = file;
-    if (!(frontend_in = fopen(globals::filename.c_str(), "r"))) 
+    if (!(frontend_in = fopen(globals::filename.c_str(), "r")))
     {
       cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
       exit(2);
@@ -191,7 +191,7 @@ void open_file(string file)
 
 
 // closing a file
-void close_file(string file) 
+void close_file(string file)
 {
   if ( globals::filename != "<STDIN>" && frontend_in != NULL)
   {
@@ -208,7 +208,7 @@ void close_file(string file)
 /*!
  * \brief return string of the output file name of the current process
  * \pre globals::output_filename and globals::output_filename_suffix have been set
- */ 
+ */
 string getOutputFilename() {
   if (globals::output_filename == "")
     return "";
@@ -232,11 +232,11 @@ possibleFormats getOutputDefaultFormat_net () {
 
 /*!
  * \brief return string of the output file name of the current process
- * 
+ *
  * \param format of the output file name
- * 
+ *
  * \pre globals::output_filename and globals::output_filename_suffix have been set
- */ 
+ */
 string getOutputFilename_net (possibleFormats format) {
 	if (globals::output_filename == "")
 		return "";
@@ -262,8 +262,8 @@ void write_net_file(analysis_t analysis)
 // <Dirk.F end>
     //  PN.calculate_max_occurrences();
   cerr << PN.information() << endl;
-    
-    
+
+
   // create oWFN output ?
   if (formats[F_OWFN])
   {
@@ -292,12 +292,12 @@ void write_net_file(analysis_t analysis)
 	  trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
 	  PN.set_format(FORMAT_LOLA);
 	  (*output) << PN;
-	  
-	  if (!write_task_to_file(analysis)) {	// append verification property to net
+
+	  if (!shall_write_task_to_file(analysis)) {	// append verification property to net
 		  trace(TRACE_DEBUG, "-> Appending specification for verification ...\n");
 		  (*output) << generate_task_file_contents(analysis);
 	  }
-	  
+
 	  if (globals::output_filename != "")
 	  {
 		  closeOutput(output);
@@ -361,7 +361,7 @@ void write_net_file(analysis_t analysis)
             output = NULL;
         }
     }
-    
+
 
   // create INA output ?
   if ( formats[F_INA] )
@@ -470,14 +470,14 @@ void log_println (string text) {
 
 void write_log_file () {
 	if (!globals::parameters[P_LOG]) return;
-	
+
 	// write log file
 	if (globals::output_filename != "")
 	{
 		trace(TRACE_INFORMATION, "writing log file to uml2owfn_" + globals::output_filename + ".log ... ");
 		output = openOutput("uml2owfn_" + globals::output_filename + ".log");
 	}
-	
+
 	(*output) << logContents.str() << endl;
 
 	if (globals::output_filename != "") {
@@ -500,19 +500,19 @@ string generate_task_file_contents_safeState (analysis_t analysis);
  *           #generate_state_task_file_contents()
  *        and/or
  *           #write_task_file()
- * 
+ *
  * \param analysis the analysis setting for which the task file shall be
  *        written
- * 
+ *
  * \return string to be written to a file
- */ 
+ */
 string generate_task_file_contents (analysis_t analysis)
 {
   // append all task file contents
   string contents = "";
   contents += generate_task_file_contents_finalState(analysis)+"\n\n";
   contents += generate_task_file_contents_safeState(analysis)+"\n\n";
-  return contents; 
+  return contents;
 }
 
 /*!
@@ -526,7 +526,7 @@ string generate_task_file_contents (analysis_t analysis)
 string generate_task_file_contents_finalState (analysis_t analysis)
 {
 	stringstream taskContents;
-	
+
 	if ( formats[F_LOLA] ) {
 		if (analysis[A_SOUNDNESS]) {
 			if (!analysis[A_DEADLOCKS]) {
@@ -541,8 +541,8 @@ string generate_task_file_contents_finalState (analysis_t analysis)
 			}
 		}
 	}
-	
-	return taskContents.str(); 
+
+	return taskContents.str();
 }
 
 /*!
@@ -555,43 +555,43 @@ string generate_task_file_contents_finalState (analysis_t analysis)
 string generate_task_file_contents_safeState (analysis_t analysis)
 {
   stringstream taskContents;
-  
+
   if ( formats[F_LOLA] ) {
     if (analysis[A_SAFE]) {
       safeStateFormula->set_format(FORMAT_LOLA_STATEPREDICATE);
       taskContents << (*safeStateFormula) << endl;
     }
   }
-  
-  return taskContents.str(); 
+
+  return taskContents.str();
 }
 
 /*!
  * \brief	write additional files, e.g. task files for LoLA
- * 
+ *
  * \post	taskFileWritten is set to true iff a file was written to the disk
  */
 void write_task_file (analysis_t analysis)
 {
-	if (!write_task_to_file(analysis))
+	if (!shall_write_task_to_file(analysis))
 		return;	// skip
-	
+
 	// in this run, we did not write a task-file yet
 	for (int i=0;i<(int)A_MAX;i++)
 	  taskFileWritten[(possibleAnalysis)i] = false;
-	
+
 	if ( formats[F_LOLA] ) {
 		if (analysis[A_SOUNDNESS]) {
 			if (!analysis[A_DEADLOCKS]) {
 			  trace(TRACE_DEBUG, "-> writing soundness analysis task to file\n");
-				// currently, we distinguish stop-nodes from end-nodes 
-				// by a state-predicate, written to a .task-file 
+				// currently, we distinguish stop-nodes from end-nodes
+				// by a state-predicate, written to a .task-file
 				if (globals::output_filename != "")	{
 					output = openOutput(getOutputFilename_net(F_LOLA) + ".fin.task");
 				}
-				  
+
 			  (*output) << generate_task_file_contents_finalState(analysis) << endl << endl;
-			    
+
 				if (globals::output_filename != "") {
 					closeOutput(output);
 					output = NULL;
@@ -599,15 +599,15 @@ void write_task_file (analysis_t analysis)
 				}
 			}
 		}
-		
+
 		if (analysis[A_SAFE]) {
 		  trace(TRACE_DEBUG, "-> writing safeness analysis task to file\n");
       if (globals::output_filename != "") {
         output = openOutput(getOutputFilename_net(F_LOLA) + ".safe.task");
       }
-        
+
       (*output) << generate_task_file_contents_safeState(analysis) << endl << endl;
-        
+
       if (globals::output_filename != "") {
         closeOutput(output);
         output = NULL;
@@ -621,7 +621,7 @@ void write_task_file (analysis_t analysis)
  * \brief distinguish the cases where a task file has to be written to
  *        the disk rather than to be appended to the net file
  */
-bool write_task_to_file (analysis_t analysis) {
+bool shall_write_task_to_file (analysis_t analysis) {
 	if (formats[F_LOLA])
 	{
 	  // check cases where a task file is generated
@@ -630,8 +630,8 @@ bool write_task_to_file (analysis_t analysis) {
 	  if (analysis[A_SAFE])
 	     return globals::parameters[P_TASKFILE]; // take global setting
 	}
-	return true;	// in general yes, whether task file is written depends on
-					// write_task_file()
+	return true;	// in general yes, whether task file is really written
+                // depends on write_task_file()
 }
 
 /*!
@@ -648,10 +648,10 @@ void write_script_file () {
 			{
 				output = openOutput("check_" + globals::output_filename + ".sh");
 			}
-			
+
 			(*output) << "# script for checking the processes for soundness" << endl;
 			(*output) << scriptContents.str();
-		
+
 			if (globals::output_filename != "") {
 				closeOutput(output);
 				output = NULL;
@@ -661,48 +661,48 @@ void write_script_file () {
 }
 
 void extend_script_file_subAnalysis_lola (possibleAnalysis an) {
-  
+
   string analysis_text;
   string taskFile_suffix;
   string lolaCommand;
   bool isTaskFileAnalysis = false;
-  
+
   if (an == A_DEADLOCKS) {
     analysis_text = " for deadlocks";
     lolaCommand = "lola-dl";
     taskFile_suffix = "";
-    
+
   } else if (an == A_SAFE) {
     analysis_text = " for safeness";
-    lolaCommand = "lola-state";
+    lolaCommand = "lola-sp";
     taskFile_suffix = ".safe"; // safeness of the net
     isTaskFileAnalysis = true;
-    
+
   } else if (an == A_SOUNDNESS) {
     analysis_text = " for soundness";
     lolaCommand = "lola-mc";
     taskFile_suffix = ".fin"; // reachability of final state
     isTaskFileAnalysis = true;
-    
+
   } else {
     trace(TRACE_ERROR, " [ERROR] unknown analysis task , cannot generate script file\n");
     return;
   }
-  
+
   scriptContents << "echo ----------------------------------------------------------------" << endl;
   scriptContents << "echo  checking " << getOutputFilename() << analysis_text << endl;
   scriptContents << "echo ----------------------------------------------------------------" << endl;
-  
+
   if (isTaskFileAnalysis && taskFileWritten[an]) {
     scriptContents << "${1}" << lolaCommand << " "
-      << getOutputFilename_net(F_LOLA) 
+      << getOutputFilename_net(F_LOLA)
       << " -a " << getOutputFilename_net(F_LOLA) << taskFile_suffix << ".task"
-      << " -P" 
+      << " -P"
       << endl;
   } else {
     scriptContents << "${1}" << lolaCommand << " "
-      << getOutputFilename_net(F_LOLA)  
-      << " -P" 
+      << getOutputFilename_net(F_LOLA)
+      << " -P"
       << endl;
   }
   scriptContents << endl;
@@ -711,7 +711,7 @@ void extend_script_file_subAnalysis_lola (possibleAnalysis an) {
 /*!
  * \brief	generates and writes a script file (if applicable) for the current
  * 			call, e.g. a script file to invoke lola for soudness checking
- * 
+ *
  * \pre		write_net_file() and write_script_file() have already been called
  * 			for the current output
  */
@@ -722,7 +722,7 @@ void extend_script_file (analysis_t analysis) {
        extend_script_file_subAnalysis_lola(A_SAFE);
 
 		if ( analysis[A_SOUNDNESS] ) {
-			
+
 		  if (analysis[A_DEADLOCKS])
 		    extend_script_file_subAnalysis_lola(A_DEADLOCKS);
 		  else
@@ -748,8 +748,8 @@ typedef enum {
 translationResult_t translate_process(Block *process, analysis_t analysis, unsigned int reduction_level)
 {
 	translationResult_t res = RES_OK;
-	
-	trace(TRACE_WARNINGS, "\ngenerating Petri net for " + process->name + "\n");	    	
+
+	trace(TRACE_WARNINGS, "\ngenerating Petri net for " + process->name + "\n");
 
     // Generates a petri net from the current process
     //PetriNet* tryPN = new PetriNet();
@@ -770,10 +770,10 @@ translationResult_t translate_process(Block *process, analysis_t analysis, unsig
     	bom->removeUnconnectedPins(&PN);
     	//bom->removeEmptyOutputPinSets(&PN);
     }
-    
+
     // extend net for soundness checking
     if (analysis[A_SOUNDNESS]) {
-        
+
       // check net structure: free choice?
       trace(TRACE_DEBUG, "-> checking whether net is free-choice\n");
       set<Node *> nonFC = PN.isFreeChoice();
@@ -783,25 +783,25 @@ translationResult_t translate_process(Block *process, analysis_t analysis, unsig
       	for (set<Node*>::iterator n=nonFC.begin(); n!=nonFC.end(); n++) {
       		witnessString += " '"+(*n)->nodeFullName()+"'";
       	}
-      	trace(TRACE_WARNINGS, " [WARNING] process is not free-choice: transitions"+witnessString+" are not free-choice.\n"); 
+      	trace(TRACE_WARNINGS, " [WARNING] process is not free-choice: transitions"+witnessString+" are not free-choice.\n");
       }
-      
+
       trace(TRACE_DEBUG, "-> soundness analysis: creating alpha places\n");
     	// create proper initial marking
     	bom->soundness_initialPlaces(&PN);
-    	
+
     	if (analysis[A_DEADLOCKS]) {
         // create proper livelocks on the net to check for deadlocks
         trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for deadlock analysis\n");
-    		bom->soundness_terminalPlaces(&PN, true, analysis[A_STOP_NODES]);
+    		bom->soundness_terminalPlaces(&PN, true, analysis[A_STOP_NODES], !analysis[A_REMOVE_PINSETS]);
     	}
     	else
     	{
     		// close net without adding livelocks
         trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for general soundness analysis\n");
-    		bom->soundness_terminalPlaces(&PN, true, analysis[A_STOP_NODES]);
+    		bom->soundness_terminalPlaces(&PN, true, analysis[A_STOP_NODES], !analysis[A_REMOVE_PINSETS]);
     	}
-  	
+
     	// check net structure: alpha to omega?
       trace(TRACE_DEBUG, "-> checking whether each node is on a path from alpha to omega\n");
       Node* ll_node = NULL;
@@ -810,14 +810,14 @@ translationResult_t translate_process(Block *process, analysis_t analysis, unsig
       	res = RES_NO_WF_STRUCTURE;
       	trace(TRACE_WARNINGS, " [WARNING] process has no workflow-structure: node " + ll_node->nodeFullName() + " is not on alpha-omega path\n.");
       }
-      
+
       if (res != RES_OK) {
-      	// the net either is not a free-choice net or has no WF-structure
+      	// the net either is not a free-choice net or has no WF-structure,
       	// cannot use deadlock analysis to decide soundness
       	analysis[A_DEADLOCKS] = false;
       }
     }
-    
+
 	// jump into Thomas Heidinger's part
 	if (reduction_level > 0) {
 		// structural reduction preserves livelocks and deadlocks
@@ -826,15 +826,15 @@ translationResult_t translate_process(Block *process, analysis_t analysis, unsig
     		trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
     		PN.reduce(globals::reduction_level);
 		}
-		
-	    // check whether net reduction created an empty net 
+
+	    // check whether net reduction created an empty net
 		if (PN.getInternalPlaces().size() == 0) {
 			cerr << process->name << " retrying (reason: empty process)." << endl;
 			cerr << PN.information() << endl;
 			return RES_EMPTY_PROCESS;
 		}
 	}
-	
+
 	// finished Petri net creation and manipulation, generate analysis files and scripts
   if (analysis[A_SOUNDNESS] && !analysis[A_DEADLOCKS]) {
     // generate formula that specifies the final state
@@ -846,22 +846,23 @@ translationResult_t translate_process(Block *process, analysis_t analysis, unsig
     	finalStateFormula = bom->createOmegaPredicate(&PN, false);
     }
   }
-  
+
   if (analysis[A_SAFE]) {
-    safeStateFormula = bom->createSafeStatePredicate(&PN);
+    safeStateFormula = bom->createSafeStatePredicate(&PN, /* can be empty? */ globals::parameters[P_TASKFILE]);
     if (safeStateFormula == NULL || safeStateFormula->size() == 0)
       // no formula needed to check safeness, net is safe
+      // this field is evaluated when writing the task and script files
       analysis[A_SAFE] = false;
   }
-    
-  // fix names of places such that they can be read by 
+
+  // fix names of places such that they can be read by
   // an owfn/lola parser after output
   //PN.fixPlaceNames();
 
   cerr << process->name << "." << endl;
 
   // extend output file name suffix if necessary
-  // if we work with the unreduced net, extend the file name 
+  // if we work with the unreduced net, extend the file name
   if (reduction_level < globals::reduction_level) {
   	globals::output_filename_suffix += ".unreduced";
   }
@@ -871,7 +872,7 @@ translationResult_t translate_process(Block *process, analysis_t analysis, unsig
   write_net_file(analysis);		// write out current process and further related files
   write_task_file(analysis);		// write task file for this process (if applciable)
   extend_script_file(analysis);	// extend script file for this process (if applicable)
-  
+
   if (finalStateFormula != NULL) {
   	delete finalStateFormula;	// TODO clean up subformulas!
   	finalStateFormula = NULL;
@@ -880,7 +881,7 @@ translationResult_t translate_process(Block *process, analysis_t analysis, unsig
     delete safeStateFormula;  // TODO clean up subformulas!
     safeStateFormula = NULL;
   }
-  
+
   return res;
 }
 
@@ -933,7 +934,7 @@ int main( int argc, char *argv[])
       open_file(*file);
 
       // reset the parser
-      frontend_restart(frontend_in);      
+      frontend_restart(frontend_in);
     } else {
         return 0;
     }
@@ -942,11 +943,11 @@ int main( int argc, char *argv[])
     trace(TRACE_ALWAYS, "Parsing " + globals::filename + " ...\n");
     int parse_result = frontend_parse();
     trace(TRACE_INFORMATION, "Parsing of " + globals::filename + " complete.\n");
-    
-    
+
+
     if (file != inputfiles.end())
       close_file(*file);
-    
+
     if (frontend_nerrs == 0)
     {
     	//log_println("NET;CORRECT SYNTAX;SYNTAX ERROR");
@@ -960,25 +961,25 @@ int main( int argc, char *argv[])
     		trace(TRACE_DEBUG, "-> resolving references and names, creating nodes of the process\n");
 	    	(*process)->transferName();
     		trace(TRACE_DEBUG, "-> resolved\n");
-    		
+
     		// set suffix for this process, so we have an output file name
     	    globals::output_filename_suffix =  "." + process_name_to_file_name((*process)->name);
     	    // write output file name of this process to the log
     	    log_print(getOutputFilename_net(getOutputDefaultFormat_net()));
-    	    
+
 	    	//if the process was filtered, dont create an output at all
 	    	if ((*process)->syntaxError) {
 	    		trace(TRACE_WARNINGS, "translation error: skipping process " + (*process)->name + "\n");
 	    		log_println(";false;translation error");
 	    		continue;
 	    	}
-	    	
+
 	    	if ((*process)->isComplexEmpty()) {
 	    		trace(TRACE_WARNINGS, "[ERROR] process has no contents, skipping process " + (*process)->name + "\n");
 	    		log_println(";false;empty process");
 	    		continue;
 	    	}
-	        
+
 	    	// link the information of processes, tasks and services that are referenced
 	    	// by "callto" blocks into the callto blocks and then tests if there
 	    	// are overlapping input and/or output sets
@@ -992,44 +993,44 @@ int main( int argc, char *argv[])
 	    		log_println(";false;overlapping");
 	    		continue;
 	    	}
-	    	
+
 	    	// check whether all connections can find their starting and ending pins
     		trace(TRACE_DEBUG, "-> resolving links between nodes\n");
 	      (*process)->linkNodes();
     		trace(TRACE_DEBUG, "-> resolved\n");
-	        
+
 	    	if (globals::parameters[P_FILTER] && (*process)->filtered)
 	    	{
 	    		trace(TRACE_WARNINGS, "filtering on: skipping process " + (*process)->name + " because of wrong pin multiplicities\n");
 	    		log_println(";false;multiplicities");
 	    		continue;
 	    	}
-	
+
 	        // DECOMPOSITION
 	        // Decomposition is currently not in use, due to
 	        // a missing algorithm that would allow to turn a
 	        // structurally decomposed net into a meaningful process
-	
+
 	        // Testroles for cutting
 	        // set<string> testStrings;
-	        // testStrings.insert("Hmn32Rls##Customer");        
-	
+	        // testStrings.insert("Hmn32Rls##Customer");
+
 	        // Functions to spread roles, cut the net and
 	        // turn it into a working process (incomplete)
 	        // (*process)->adjustRoles();
 	        // (*process)->cutNet(testStrings, 2);
-	        // (*process)->disableStart();        
+	        // (*process)->disableStart();
 	        // (*process)->disableEnd();
-	    	
+
 	    	translationResult_t res;
 	    	/*
  	    	if (globals::analysis[A_DEADLOCKS] && globals::analysis[A_LIVELOCKS]) {
 	    		// cannot check for deadlock and livelocks at once,
 	    		// create two dedicated nets
  	    		globals::multi_analysis = true; // start multi analysis
- 	    		
+
 	    		analysis_t sub_analysis;
-	    		
+
 	    		sub_analysis = globals::analysis; sub_analysis[A_LIVELOCKS] = false;
 	    		res = translate_process_reconcile(*process, sub_analysis);
 
@@ -1037,13 +1038,13 @@ int main( int argc, char *argv[])
 	    			sub_analysis = globals::analysis; sub_analysis[A_DEADLOCKS] = false;
 	    			res = translate_process_reconcile(*process, sub_analysis);
 	    		}
-	    		
+
 	    		globals::multi_analysis = false; // done
-	    		
+
 	    	} else*/ {
 	    		res = translate_process_reconcile(*process, globals::analysis);
 	    	}
- 	    	
+
  	    	// evaluate translation result for this process
  	    	switch (res) {
  	    		case RES_OK:
@@ -1068,7 +1069,7 @@ int main( int argc, char *argv[])
 	    scriptContents.flush();
 	    write_log_file();			// write translation log for the entire library
 	    logContents.flush();
-    
+
 	    if (processTranslated > 1)
 	    	trace(TRACE_ALWAYS, toString(processTranslated)+" of "+toString(processNum)+" processes have been translated.\n");
 	    else
@@ -1078,10 +1079,10 @@ int main( int argc, char *argv[])
     }
 
     // clear all variables and prepare for input of the next xml file
-    globals::processes.clear();      
-    globals::tasks.clear();      
-    globals::services.clear();      
-	
+    globals::processes.clear();
+    globals::tasks.clear();
+    globals::services.clear();
+
 	file++;
   } while (file != inputfiles.end());
 

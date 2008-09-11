@@ -141,12 +141,13 @@ void print_help()
 	trace("    safe                analyze for safeness\n");
 	trace("    stop                distinguish stop nodes from end nodes\n");
 	trace("    keeppins            keep unconnected pins\n");
+	trace("    removePinsets       remove output pinsets (requires -a soundness)\n");
 	trace("\n");
 	trace("Examples:\n");
 	trace("  uml2owfn -i library.xml -f dot -o\n");
 	trace("  uml2owfn -i library.xml -f lola -p filter -a soundness -o\n");
 	trace("\n");
-	trace("Report bugs to <" + string(PACKAGE_BUGREPORT) + ">.\n");
+	//trace("Report bugs to <" + string(PACKAGE_BUGREPORT) + ">.\n");
 }
 
 
@@ -234,14 +235,14 @@ void parse_command_line(int argc, char* argv[])
 
 			options[O_OUTPUT] = true;
 
-			
-			
+
+
 			if (optarg != NULL) {
 				globals::output_filename = string(optarg);
 				trace(TRACE_INFORMATION, "output file name is: "+string(optarg)+"\n");
 			} else
 				trace(TRACE_INFORMATION, "no output file name given\n");
-			
+
 
 			break;
 		}
@@ -339,12 +340,12 @@ void parse_command_line(int argc, char* argv[])
 
 			break;
 		}
-		
+
 		case 'a':
 		{
 			options[O_ANALYSIS] = true;
 			parameter = string(optarg);
-			
+
 			if (parameter == "soundness")
 				globals::analysis[A_SOUNDNESS] = true;
 			else if (parameter == "stop")
@@ -355,12 +356,14 @@ void parse_command_line(int argc, char* argv[])
 				globals::analysis[A_DEADLOCKS] = true;
       else if (parameter == "safe")
         globals::analysis[A_SAFE] = true;
+      else if (parameter == "removePinsets")
+        globals::analysis[A_REMOVE_PINSETS] = true;
 			else {
 				trace(TRACE_ALWAYS, "Unknown analysis task \"" + parameter +"\".\n");
 				trace(TRACE_ALWAYS, "Use -h to get a list of valid analysis tasks.\n");
 				exit(1);
 			}
-			
+
 			break;
 		}
 
@@ -374,7 +377,7 @@ void parse_command_line(int argc, char* argv[])
 		}
 	}
 
-	for ( ; optind < argc; ++optind) 
+	for ( ; optind < argc; ++optind)
 	{
 		options[O_INPUT] = true;
 		globals::filename = string(argv[optind]);
@@ -445,10 +448,10 @@ void parse_command_line(int argc, char* argv[])
 		// set output file name to a standard output filename in case of no inputfiles
 		if ( not(options[O_INPUT]) )
 		{
-			globals::output_filename = "stdof"; 
+			globals::output_filename = "stdof";
 			trace(TRACE_ALWAYS, "Output filename set to standard: stdof\n");
-		} 
-		else 
+		}
+		else
 		{
 			set< string >::iterator file = inputfiles.begin();
 			unsigned int pos = file->rfind("."+suffixes[F_BOM_XML], file->length());
@@ -457,7 +460,7 @@ void parse_command_line(int argc, char* argv[])
 				globals::output_filename = file->substr(0, pos);
 				trace(TRACE_INFORMATION, "Output filename set to: "+globals::output_filename+"\n");
 			}
-			file++;      
+			file++;
 		}
 	}
 
@@ -469,9 +472,9 @@ void parse_command_line(int argc, char* argv[])
 	{
 		trace(TRACE_INFORMATION, " - output files will be named \"" + globals::output_filename + ".<ext>\"\n");
 	}
-	
+
 	if (options[O_ANALYSIS]) {
-		
+
 		if (globals::analysis[A_SOUNDNESS])
 			trace(TRACE_INFORMATION, "generating nets to analyze soundness\n");
 		if (globals::analysis[A_STOP_NODES]) {
@@ -491,8 +494,14 @@ void parse_command_line(int argc, char* argv[])
 		  options[O_PARAMETER] = true;
 		  globals::parameters[P_TASKFILE] = true;
 		}
+		if (globals::analysis[A_REMOVE_PINSETS]) {
+      trace(TRACE_INFORMATION, "removing output pinsets\n");
+      if (!globals::analysis[A_SOUNDNESS]) {
+        trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
+      }
+    }
 	}
-	
+
 	if (options[O_PARAMETER]) {
 		if (globals::parameters[P_FILTER])
 			trace(TRACE_INFORMATION, "filter processes for syntactical compliance\n");

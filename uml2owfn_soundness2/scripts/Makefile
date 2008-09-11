@@ -7,6 +7,9 @@ SED               = gsed               # GNU sed
 LOLA-SP           = lola-sp            # LoLA with STATEPREDICATE
 LOLA-MC           = lola-mc            # LoLA with MODELCHECKING
 LOLA-FULL-LIMITED = lola-full-limited  # LoLA with FULL
+
+REDUCTION-LEVEL   = 3                  # Petri net reduction level for the
+                                       # translation
 ##########################################################################
 
 
@@ -18,13 +21,14 @@ LOLAFILES = $(wildcard *.lola)
 help:
 	@echo
 	@echo "targets:"
-	@echo "* translate     translate library"
-	@echo "* soundness     soundness check (AGEF omega)"
-	@echo "* safeness      safeness check"
-	@echo "* full          full state space"
-	@echo "* table         collect results in table"
-	@echo "* clean         remove analysis files"
-	@echo "* veryclean     remove Petri nets"
+	@echo "* translate      translate library"
+	@echo "* translateweak  translate library with weaker termination semantics"
+	@echo "* soundness      soundness check (AGEF omega)"
+	@echo "* safeness       safeness check"
+	@echo "* full           full state space"
+	@echo "* table          collect results in table"
+	@echo "* clean          remove analysis files"
+	@echo "* veryclean      remove Petri nets"
 	@echo
 
 soundness: $(LOLAFILES:.lola=.lola.sound.output)
@@ -101,8 +105,10 @@ results.csv: safeness soundness
 # create files
 ##########################################################################
 translate: $(LIBRARY).xml
-	uml2owfn -i $< -f lola -a soundness -a safe -p taskfile -p filter -p log -r 1 -o 2> translation.log
-
+	uml2owfn -i $< -f lola -a soundness -a safe -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) -o 2> translation.log
+	
+translateweak: $(LIBRARY).xml
+	uml2owfn -i $< -f lola -a soundness -a safe -a removePinsets -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) -o 2> translation.log
 
 ##########################################################################
 # tidy up

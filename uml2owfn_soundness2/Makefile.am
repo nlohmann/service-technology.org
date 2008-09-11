@@ -1,41 +1,17 @@
-#############################################################################
-# GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
+###############################################################################
+# UML2oWFN -- Translating IBM Business Modeler Processes into Petri Net Models
 #
-# Copyright (C) 2006, 2007  Niels Lohmann,
-#                           Christian Gierds, and
-#                           Martin Znamirowski
-# Copyright (C) 2005        Niels Lohmann and
-#			    Christian Gierds
+# Copyright (C) 2007, 2008  Martin Znamirowski,
+#                           Dirk Fahland, and
+#                           Niels Lohmann
 #
-# GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation; either version 3 of the License, or (at your option) any
-# later version.
-#
-# GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# GNU BPEL2oWFN; if not, see http://www.gnu.org/licenses or write to the Free
-# Software Foundation,Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA 02110-1301  USA.
-#############################################################################
+###############################################################################
 
 # File last changed $Date: 2007/06/28 07:38:13 $ by $Author: nielslohmann $
 # Version $Revision: 1.64 $
 
 # Where else are Makefiles?
 SUBDIRS = src doc
-
-# Which targets have no dependencies (i.e. always succeed)?
-.PHONY: binarydistreadme update
-
-# do not publish CVS files
-dist-hook:
-	rm -rf `find $(distdir) -name CVS`
-
 
 ####################################
 # Targets to clean generated files #
@@ -44,44 +20,16 @@ dist-hook:
 # always remove vi's temporary files
 CLEANFILES = -r *~
 
-# all files that require the permission to execute
-#SHELLSCRIPTS = tests/test1 \
-#	       tests/test2 \
-#	       tests/test3 \
-#	       tests/test4 \
-#	       tests/test5 \
-#	       tests/test6
-
-# Delete all files that can be created by other files, repair file
-# permissions and set filetype to UNIX.
-hu-prepare: maintainer-clean
-	-rm -f COPYING
-	-rm -f aclocal.m4
-	-rm -f configure
-	-rm -f configure
-	-rm -f depcomp
-	-rm -f compile
-	-rm -f config.guess
-	-rm -f config.sub
-	-rm -f install-sh
-	-rm -f Makefile.in
-	-rm -f missing
-	-rm -f ylwrap
-	-rm -f -r autom4te.cache
-	-rm -f doc/mdate-sh
-	-rm -f doc/bpel2owfn
-	-rm -f doc/stamp-vti
-	-rm -f doc/version.texi
-	-rm -f doc/Makefile.in
-	-rm -f src/Makefile.in
-	-rm -f src/bpel2owfn.h.in
-	-rm -f -r src/.deps
-	-rm -f tests/Makefile.in
-	-rm -f rpm/Makefile.in	
-	find . -type d -exec chmod 755 {} \;
-	find . -type f -exec chmod 644 {} \;
-	-find . -type f -exec dos2unix {} \;
-	chmod 755 $(SHELLSCRIPTS) doc/gendocs.sh gnupload
+#############################################################################
+# remove everything that cannot be built
+#############################################################################
+cvs-clean: maintainer-clean
+	rm -fr .DS_Store INSTALL Makefile.in aclocal.m4 compile configure depcomp \
+	  install-sh missing ylwrap $(DIST_ARCHIVES).sig config.sub config.guess \
+	  config.h.in~
+	rm -fr doc/.DS_Store doc/Makefile.in doc/mdate-sh doc/manual
+	rm -fr src/.DS_Store src/Makefile.in src/config.h.in config.h.in~
+	rm -fr tests/Makefile.in tests/.DS_Store
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
 	@echo "  aclocal"
@@ -92,6 +40,11 @@ hu-prepare: maintainer-clean
 	@echo "or"
 	@echo "  autoreconf -i"
 	@echo
+	
+#	rm -fr man/Makefile.in
+#	rm -fr exp/Makefile.in exp/bpm2008
+#	rm -fr maintainer/Makefile.in
+	
 
 
 ####################################
@@ -162,37 +115,6 @@ bindist_win32:
 # target for any other operating system
 bindist:
 	$(MAKE) binarydist CXXFLAGS="-O3" CFLAGS="-O3"
-
-
-#################################################################
-# Targets for automatic upload to ftp.gnu.org and alpha.gnu.org #
-#################################################################
-
-gnupload_alpha: *.tar.gz
-	@echo "====================================="
-	@echo " FILE DISTRIBUTION TO GNU FTP SERVER "
-	@echo "====================================="
-	@ls *.tar.gz
-	@echo
-	@echo "Are you sure you want to upload these files to"
-	@echo "  ftp://alpha.gnu.org/gnu/bpel2owfn/$(PACKAGE_VERSION)?"
-	@echo "If not, please press (crtl+c) now."
-	@read answer
-	./gnupload --to alpha.gnu.org:bpel2owfn/$(PACKAGE_VERSION) $^
-	rm $(^:.tar.gz=.tar.gz.sig)
-
-gnupload_release: *.tar.gz
-	@echo "============================================="
-	@echo " RELEASE FILE DISTRIBUTION TO GNU FTP SERVER "
-	@echo "============================================="
-	@ls *.tar.gz
-	@echo
-	@echo "Are you sure you want to upload these files to"
-	@echo "  ftp://ftp.gnu.org/gnu/bpel2owfn/$(PACKAGE_VERSION)?"
-	@echo "If not, please press (crtl+c) now."
-	@read answer
-	./gnupload --to ftp.gnu.org:bpel2owfn/$(PACKAGE_VERSION) $^
-	rm $(^:.tar.gz=.tar.gz.sig)
 
 
 #####################################

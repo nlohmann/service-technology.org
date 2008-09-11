@@ -3,6 +3,10 @@ ChangeLog for UML2oWFN
 Version 1.03 (in progress)
 ============
 
++ stored reduction level in the scripts/Makefile in variable "REDUCTION-LEVEL", so the reduction level can be set at the make call
++ added new scripts/Makefile target "translateweak" that uses the "-a removePinsets" option,  
++ added new analysis switch "-a removePinsets" that relaxes the process termination semantics by requiring that only the control-flow terminates, but that data may still be pending at the process output
++ updated documentation and included .pdf creation
 + overrode the Petri net reduction method in the ExtendedWorkflowNet class, now implementing reduce_series_places (level 1) and reduce_identical_places (level 3)
 + moved re-implementation of reduce_series_places and reduce_series_transitions to ExtendedWorkflowNet and restored the original implementation
 + added routine to remove empty output pinsets which is needed for a deadlock-based soundness analysis of Petri nets, the routine is not used in this version because for BOM processes, only the modelchecking-based soundness analysis yields correct results (the inner of the process must be empty).

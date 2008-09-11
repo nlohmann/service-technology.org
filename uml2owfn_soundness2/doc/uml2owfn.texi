@@ -57,7 +57,12 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @c ----------------------------------------------------------------------------
 
 @menu
-* Overview:: Overview.
+* Overview::Overview.
+* Command Line Options::How to run UML2oWFN.
+* Translation::Translating UML2 activity diagrams/IBM Websphere Business Modeler process models to Petri nets.
+* Analysis::Analyzing Soundness with UML2oWFN.
+* ChangeLog::Version history.
+* GNU Free Documentation License::The license of this manual.
 @end menu
 
 @c ----------------------------------------------------------------------------
@@ -119,106 +124,254 @@ If you need any further information, see file @file{INSTALL} for detailed instru
 
 UML2oWFN was written by Martin Znamirowski (@email{znamirow@@informatik.hu-berlin.de}) Dirk Fahland (@email{dirk.fahland@@service-technology.org}), and Niels Lohmann (@email{niels.lohmann@@service-technology.org}).
 
+@c ----------------------------------------------------------------------------
 
-@chapter Processing
+@node Command Line Options
 
-@section Soundness analysis with UML2oWFN
+@chapter Invoking UML2oWFN
 
-@enumerate
-@item To prepare the soundness analysis you need three different binaries of the Low-Level Net Analyzer (LoLA, @url{http:// }) to be accessible from the command-line. (1) @file{lola-mc} - LoLA compiled with MODELCHECKING, (2) @file{lola-dl} - LoLA compiled with DEADLOCK, and (3) @file{lola-full} - LoLA compiled with FULL; each with CAPACITY 1 and CHECKCAPACITY. The analysis script files rely on these model checkers. 
+@section Command Line Options
 
+For an overview of the command line options, type @samp{uml2owfn -h} to see the following help screen:
 
-@item Translate the library @file{lib.xml} you want to verify with the
-following command-line arguments
+@smallexample
+@include cmdline.out
+@end smallexample
+
+@c ----------------------------------------------------------------------------
+
+@node Translation
+
+@chapter Translating UML2 activity diagrams/IBM Websphere Business Modeler process models to Petri nets
+
+@section Generating Petri nets 
+
+Invoke the following command to translate a library @file{lib.xml} to Petri nets
 
 @cartouche
-@smallexample
-uml2owfn -i lib.xml -f lola -a soundness -a deadlocks -a safe -p filter -p log -d 2 -o > translate.log 2> translate-err.log
-@end smallexample
+@example
+uml2owfn -i lib.xml -f FORMAT -o
+@end example
 @end cartouche
 
-This creates a set of @file{lib.XXX__YYY.lola} files where @samp{YYY} is the name
-of a process, and @samp{XXX} its containing catalog. Each @file{lib.XXX__YYY.lola}
-file gets additionally a
-@file{lib.XXX__YYY.lola.safe.task} file to check for safeness of the net, and
-depending on the net structure a @file{lib.XXX__YYY_fin.task} file to check for the
-reachability of a `good' final state. Additionally the file
-@file{uml2owfn_lib.log} is written which contains structural analysis results of
-the files.  The files @file{translate.log} and 
-@file{translate-err.log} contains the verbose output of uml2owfn. Further the
-script @file{check_lib.sh} is created.
+This creates a set of Petri net files, @file{lib.XXX__YYY.<ext>}, where @samp{YYY}
+is the name of a process, and @samp{XXX} its containing catalog. The format of
+the file is specified the @samp{-f FORMAT} option. If you have @samp{dot}
+installed, try @samp{-f dot} to generate a graphical representation of each
+net in @samp{.png} format.
 
-During the run, UML2oWFN makes a number of structural checks on each process
+@c ----------------------------------------------------------------------------
 
-@enumerate
-@item @samp{-p filter} causes checking whether a process has overlapping pinsets
-or multiplicities at a pin that has an incoming or outgoing edge; processes that
-have this kind of structural properties are not translated.
+@node Analysis
 
-@item By @samp{-a soundess} uml2owfn automatically checks whether resulting net
-N of the translation is a free-choice net. uml2owfn adds a unique alpha place
-and a number of omega places (one for each stop node and each end node), and
-checks whether each node of the net N is on a path from alpha to one of the
-omega places (i.e. whether N has workflow structure). In this case no
-@file{lib.XXX__YYY_fin.task} file is generated.
-@end enumerate
+@chapter Soundness analysis with UML2oWFN
 
-To check a net for safeness call
+
+@section Setup 
+
+To prepare the soundness analysis you need three different binaries of the
+Low-Level Net Analyzer (LoLA, @url{http:// }) to be accessible from the
+command-line. 
+
+@itemize
+@item @file{lola-mc} - LoLA compiled with MODELCHECKING,
+@item @file{lola-sp} - LoLA compiled with STATEPREDICATE, and
+@item @file{lola-full-limited} - LoLA compiled with FULL (and MAXIMALSTATES 100000);
+@end itemize
+
+each with CAPACITY 1 and CHECKCAPACITY. The analysis script files rely on these
+model checkers. 
+
+
+@section Use case: standard soundness analysis
+
+This section describes how to achieve standard soundness analysis. Translate
+the library @file{lib.xml} you want to verify with the following command-line
+arguments
 
 @cartouche
-@smallexample
-lola-state lib.XXX__YYY.lola -a lib.XXX__YYY_safe.task
-@end smallexample
+@example
+uml2owfn -i lib.xml -f lola -a soundness -a safe -p taskfile -o
+@end example
 @end cartouche
 
-In case a net is a free-choice workflow net, the net is livelock free; thus the
-net is sound if it is also deadlock-free and safe. The verification only has to
-check for deadlocks, call 
+This creates a set of Petri net files, @file{lib.XXX__YYY.lola}, where @samp{YYY}
+is the name of a process, and @samp{XXX} its containing catalog. Each
+@file{lib.XXX__YYY.lola} gets two process-specific analysis task files:
 
-@cartouche
-@smallexample
-lola-dl lib.XXX__YYY.lola
-@end smallexample
-@end cartouche
+@itemize
+@item The file @file{lib.XXX__YYY.lola.safe.task} contains a state predicate that
+specifies that process @samp{YYY} is not safe (has a lock of synchronization).
+@item The file @file{lib.XXX__YYY.lola.fin.task} contains a CTL formula that
+specifies that process @samp{YYY} always reaches a valid final state (has no
+local deadlocks and no livelocks).
+@end itemize
 
-to check soundness of process @samp{YYY}.
+UML2oWFN also generates a script @file{check_lib.sh} containing the appropriate
+LoLA command calls for each file.
 
-If the net is not free-choice or not a workflow-net, the verification has to
-check for deadlock-freedom, safeness, and livelock-freedom; this can only be
-done by checking the reachability of a set of final markings. In the latter
-case, the corresponding CTL model-checking property is appended to the net file;
-call
+@example
+lola-sp lib.XXX__YYY.lola -a lib.XXX__YYY.lola.safe.task -P
+lola-sp lib.XXX__YYY.lola -a lib.XXX__YYY.lola.fin.task -P
+@end example
 
-@cartouche
-@smallexample
-lola-mc lib.XXX__YYY.lola -a lib.XXX__YYY_safe_fin.task
-@end smallexample
-@end cartouche
+If the first call returns @samp{predicate is not satisfiable}, then the process
+is safe. Otherwise LoLA returns a place which can hold more than one token. If
+the second call returns @samp{result: true}, then the process is deadlock free
+and livelock free. Calling
 
-to check soundness of process @samp{YYY}. 
-
-
-@item You may run the script 
-
-@cartouche
-@smallexample
+@example
 sh ./check_lib.sh
+@end example
+
+will make these checks for each process of the library.
+
+@section Generating additional information on the processes
+
+The following options can be used to generate additional information about the
+processes.
+
+@itemize
+
+@item @samp{-p log} write a log @file{uml2owfn_lib.log} in CSV (comma separated
+file) format containing information about each process. The column format is
+@example
+file name;is structurally feasible;structural problem
+@end example
+A process is declared as structurally feasible if
+  @enumerate
+  @item it could be parsed and translated into a Petri net,
+  @item it is not empty,
+  @item it has no overlapping pinsets, and
+  @item all token consumption/production multiplicities on all edges are exactly
+  min:1 and max:1.
+  @end enumerate
+The corresponding column contains values @samp{true} or @samp{false}. If the
+value is @samp{false}, the column @samp{structural problem} provides further
+information. In case the process is structurally feasible, the generated Petri
+net is check for being a free-choice workflow-net. If one of the properties is
+violated, this is also written to @samp{structural problem}; however, the
+soundness analysis is also applicable for processes which are neither
+free-choice, nor workflow nets.
+
+@item @samp{-d 2} prints further information of the translation process to
+standard output, and statistical data on the size of each generated net to
+standard error. To store this data to a file during the translation, redirect
+the output to a file, e.g.
+@smallexample
+uml2owfn -i lib.xml [your-options-here] -d 2 > translate.log 2> translate-err.log
 @end smallexample
-@end cartouche
+This option is particularly useful for debugging.
 
-to verify the entire library with the appropriate model-checking method, but you have to interpret the analysis result by yourself.
+@end itemize
+
+@section Making the analysis more efficient
+
+@acronym{UML2oWFN} includes structural Petri net reduction techniques that can
+be applied to reduce the size of the Petri net while preserving the (un)soundness
+of the net. Use option @samp{-r LEVEL} to include net reduction in the translation.
+@acronym{UML2oWFN} applies the following reduction rules up to @samp{LEVEL}
+until no more rule can be applied:
+
+@enumerate
+@item merge series of places (in a variant that preserves the k-boundedness of
+the net)
+@item --
+@item merge parallel places
+@item --
+@item --
+@item --
+@end enumerate
+
+This may drastically reduce the size of the nets and hence improve model-checking
+efficiency in terms of memory consumption and runtime.
 
 
-@item Alternatively, you may run
+@section Use case: weaker soundness analysis with dataflow-invariant process termination
+
+The soundness analysis invoked by parameters @samp{-a soundness -a safe} is rather
+strict as it requires that all data is available at the process output upon
+process termination. While a violation of this property is still considered an
+error, it might prevent a detection of more severe control-flow errors in the
+process. To this extend, the soundness analysis can be changed to ignore the
+dataflow at the process output. Use option @samp{-a removePinsets} when translating
+the library to create slightly changed @samp{.lola} files with corresponding
+@samp{.task} files. The analysis itself is performed as descibed above.
 
 @cartouche
-@smallexample
-sh ./niels-full.sh;
-sh ./niels-analysis.sh
-@end smallexample
+@example
+uml2owfn -i lib.xml -f lola -a soundness -a safe -a removePinsets -p taskfile -o
+@end example
 @end cartouche
 
-in the directory of the generated @file{lib.XXX__YYY.lola} files. The script @file{niels-full.sh} first constructs the complete state space of each file (invoking @file{lola-full}) and writes the number of states and transitions into two different files. The script @file{niels-analysis.sh} then checks each net for soundness invoking @file{lola-dl} if the net is a free-choice workflow net, or @file{lola-dl} in the remaining cases. The results are compiled into the file @file{result.csv}. 
-@end enumerate
+
+@section Use case: automated translation, analysis and compilation of results
+
+@acronym{UML2oWFN} comes with a makefile that eases analysis and compilation of
+the analysis results for process librares. The @file{scripts/Makefile} the following
+make targets are available
+
+@itemize
+	@item @samp{translate}      translate library
+	@item @samp{translateweak}  translate library with weaker termination semantics
+	@item @samp{soundness}      soundness check (AGEF omega)
+	@item @samp{safeness}       safeness check
+	@item @samp{full}           full state space
+	@item @samp{table}          collect results in table
+	@item @samp{clean}          remove analysis files
+	@item @samp{veryclean}      remove Petri nets
+@end itemize
+
+Copy @file{scripts/Makefile} to the directory that contains your library 
+@file{lib.xml} and change the value of @samp{LIBRARY} in this @file{Makefile} to
+@samp{lib} (stripping the extension @samp{.xml}). Also make sure that @samp{SED}
+holds the file name of your sed (stream editor) binary, e.g. @file{sed} or
+@file{gsed}.
+
+The standard workflow for the first use case using the makefile would be:
+@example
+make translate
+make table
+@end example
+To run the second use case, execute @samp{make translateweak} instead of
+@samp{make translate}.
+
+In case you want to include numbers on the size of the state space of each
+process, execute
+@example
+make translate
+make full
+make table
+@end example
+
+The target @samp{table} prepares two different representation of the analysis
+results in @file{results.csv} and @file{results-comparison.csv}. The target
+depends on @samp{soundness} and @samp{safeness}, thus the table will always
+contain the analysis results of the most recent translation.
+
+You can use @samp{REDUCTION-LEVEL} to set the level Petri net reduction rules
+that are applied upon translating the library. The calls
+@example
+make translate LIBRARY=myLib REDUCTION-LEVEL=3
+make table LIBRARY=myLib SED=sed
+@end example
+will translate library @file{myLib.xml}, apply reduction level 3, and create
+the result tables using the program @samp{sed}.
+
+@c ----------------------------------------------------------------------------
+
+
+@node ChangeLog
+@chapter Version History
+
+
+@include ChangeLog.texi
+
+@sp 3
+
+
+@c ----------------------------------------------------------------------------
+
+@include fdl.texi
 
 @bye

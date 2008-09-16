@@ -121,7 +121,7 @@ rm -f $DIR/sequence3-partner.png
 ############################################################################
 # Building most permissive partner for sequence3 out of OG                 #
 ############################################################################
-input="$DIR/sequence3.owfn.og"
+input="$builddir/$SUBDIR/sequence3.owfn.og"
 inputCopy="$builddir/$SUBDIR/sequence3.owfn.og"
 output="$builddir/$SUBDIR/sequence3-partner.owfn"
 outputExpected="$testdir/$SUBDIR/sequence3-partner.expected.owfn"
@@ -132,7 +132,7 @@ if [ "$testdir" != "$builddir" ]; then
         $MKDIR_P $builddir/$SUBDIR
     fi
 
-    cp $input $inputCopy
+#    cp $input $inputCopy
 fi
 
 cmd="$FIONA $inputCopy -t mostpermissivepartner"
@@ -226,9 +226,9 @@ rm -f $DIR/coffee2-partner.png
 ############################################################################
 # Building small partner for coffee and coffee_extended out of OG          #
 ############################################################################
-input="$DIR/coffee.owfn.ig.og"
+input="$builddir/$SUBDIR/coffee.owfn.ig.og"
 inputCopy="$builddir/$SUBDIR/coffee.owfn.ig.og"
-input2="$DIR/coffee2.owfn.ig.og"
+input2="$builddir/$SUBDIR/coffee2.owfn.ig.og"
 inputCopy2="$builddir/$SUBDIR/coffee2.owfn.ig.og"
 
 output="$builddir/$SUBDIR/coffee-partner.owfn"
@@ -242,8 +242,8 @@ if [ "$testdir" != "$builddir" ]; then
         $MKDIR_P $builddir/$SUBDIR
     fi
 
-    cp $input $inputCopy
-    cp $input2 $inputCopy2
+#    cp $input $inputCopy
+#    cp $input2 $inputCopy2
 fi
 
 cmd="$FIONA $inputCopy $inputCopy2 -t smallpartner"
@@ -283,7 +283,7 @@ fi
 ############################################################################
 input="$DIR/coffee_extended.owfn"
 inputCopy="$builddir/$SUBDIR/coffee_extended.owfn"
-output="$builddir/$SUBDIR/coffee_extended-partner.expected.owfn"
+output="$builddir/$SUBDIR/coffee_extended-partner.owfn"
 outputExpected="$testdir/$SUBDIR/coffee_extended-partner.expected.owfn"
 
 
@@ -328,3 +328,4 @@ fi
 
 echo $result
 exit $result
+

@@ -30,8 +30,16 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-DIR=$testdir/oWFNreduction
+SUBDIR=oWFNreduction
+DIR=$testdir/$SUBDIR
 FIONA=fiona
+
+# for make distcheck: make copy of $owfn and work on it
+if [ "$testdir" != "$builddir" ]; then
+    if [ ! -e $builddir/$SUBDIR ]; then
+        $MKDIR_P $builddir/$SUBDIR
+    fi
+fi
 
 rm -f $DIR/*.log
 rm -f $DIR/060116-misc-coffee.reduced.owfn
@@ -48,7 +56,8 @@ nodes_soll=60
 transitions_soll=67
 
 owfn="$DIR/060116-misc-coffee"
-cmd="$FIONA $owfn.owfn -t reduce -p r4"
+output="$builddir/$SUBDIR/060116-misc-coffee"
+cmd="$FIONA $owfn.owfn -t reduce -o $output -p r4"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og.memcheck.log"
@@ -72,7 +81,7 @@ else
     result=`expr $result + $nodes + $edges`
 fi
 
-cmd="$FIONA $owfn.owfn $owfn.reduced.owfn -t equivalence"
+cmd="$FIONA $owfn.owfn $output.reduced.owfn -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -103,7 +112,8 @@ nodes_soll=18
 transitions_soll=7
 
 owfn="$DIR/phcontrol3.unf"
-cmd="$FIONA $owfn.owfn -t reduce"
+output="$builddir/$SUBDIR/phcontrol3.unf"
+cmd="$FIONA $owfn.owfn -t reduce -o $output"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og.memcheck.log"
@@ -127,7 +137,7 @@ else
     result=`expr $result + $nodes + $edges`
 fi
 
-cmd="$FIONA $owfn.owfn $owfn.reduced.owfn -t equivalence"
+cmd="$FIONA $owfn.owfn $output.reduced.owfn -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -161,7 +171,8 @@ nodes_soll=66
 transitions_soll=68
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_6"
-cmd="$FIONA $owfn.owfn -t reduce"
+output="$builddir/$SUBDIR/06-03-23_BPM06_shop_sect_6"
+cmd="$FIONA $owfn.owfn -t reduce -o $output"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$og.memcheck.log"
@@ -185,7 +196,7 @@ else
     result=`expr $result + $nodes + $edges`
 fi
 
-cmd="$FIONA $owfn.owfn $owfn.reduced.owfn -t equivalence"
+cmd="$FIONA $owfn.owfn $output.reduced.owfn -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -213,3 +224,4 @@ fi
 echo
 
 exit $result
+

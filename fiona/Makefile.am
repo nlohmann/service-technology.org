@@ -26,6 +26,8 @@ SUBDIRS = cudd src tests doc
 
 .PHONY: binarydistreadme
 
+DISTCLEANFILES = env.sh
+
 # all files that require the permission to execute
 SHELLSCRIPTS = tests/*.sh
 

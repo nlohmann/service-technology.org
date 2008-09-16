@@ -30,8 +30,19 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-DIR=$testdir/falseannos
+SUBDIR=falseannos
+DIR=$testdir/$SUBDIR
 FIONA=fiona
+
+# for make distcheck: make copy of $owfn and work on it
+if [ "$testdir" != "$builddir" ]; then
+    if [ ! -e $builddir/$SUBDIR ]; then
+        $MKDIR_P $builddir/$SUBDIR
+        cp $DIR/* $builddir/$SUBDIR
+    fi
+fi
+
+
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
 rm -f $DIR/*.log
@@ -47,7 +58,7 @@ result=0
 # -t removefalsenodes 1
 ############################################################################
 
-violating="$DIR/violating"
+violating="$builddir/$SUBDIR/violating"
 
 cleanedPerHand="$DIR/violating.expected.og"
 
@@ -98,7 +109,7 @@ fi
 # -t removefalsenodes 2
 ############################################################################
 
-violating="$DIR/bluefalsenode"
+violating="$builddir/$SUBDIR/bluefalsenode"
 
 cleanedPerHand="$DIR/bluefalsenode.expected.og"
 
@@ -149,7 +160,7 @@ fi
 # -t removefalsenodes shorten annotations
 ############################################################################
 
-violating="$DIR/shorten"
+violating="$builddir/$SUBDIR/shorten"
 
 cleanedPerHand="$DIR/shorten.expected.og"
 

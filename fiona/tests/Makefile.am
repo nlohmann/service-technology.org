@@ -280,7 +280,7 @@ covrunclean:
 
 clean-local: covrunclean cleandeps
 
-DISTCLEAN_FILES = productog/1_X_2.output.og \
+DISTCLEANFILES =  productog/1_X_2.output.og \
                   productog/1_X_2.output.out \
                   productog/1_X_2.output.png \
                   productog/1_X_2_X_3.output.og \
@@ -299,7 +299,104 @@ DISTCLEAN_FILES = productog/1_X_2.output.og \
                   partner/sequence3-partner.dot \
                   partner/sequence3-partner.png \
                   formula/*output* \
-                  petrify.log
+                  petrify.log \
+		  falseannos/bluefalsenode.blue.og \
+		  falseannos/bluefalsenode.expected.og \
+		  falseannos/bluefalsenode.og \
+		  falseannos/shorten.blue.og \
+		  falseannos/shorten.expected.og \
+		  falseannos/shorten.og \
+		  falseannos/violating.blue.og \
+		  falseannos/violating.expected.og \
+		  falseannos/violating.og \
+		  minimize/06-03-23_BPM06_shop_sect_3.owfn.og.minimal.og \
+		  minimize/06-03-23_BPM06_shop_sect_3.owfn.og.minimal.out \
+		  minimize/06-03-23_BPM06_shop_sect_3.owfn.og.minimal.png \
+		  minimize/4-loop.og.minimal.og \
+		  minimize/4-loop.og.minimal.out \
+		  minimize/4-loop.og.minimal.png \
+		  minimize/final_non-final.og.minimal.og \
+		  minimize/final_non-final.og.minimal.out \
+		  minimize/final_non-final.og.minimal.png \
+		  minimize/keesCoffee_condition.emptyNode.og.minimal.og \
+		  minimize/keesCoffee_condition.emptyNode.og.minimal.out \
+		  minimize/keesCoffee_condition.emptyNode.og.minimal.png \
+		  minimize/keesCoffee_condition.og.minimal.og \
+		  minimize/keesCoffee_condition.og.minimal.out \
+		  minimize/keesCoffee_condition.og.minimal.png \
+		  minimize/myCoffee.og.minimal.og \
+		  minimize/myCoffee.og.minimal.out \
+		  minimize/myCoffee.og.minimal.png \
+		  minimize/non-final_final.og.minimal.og \
+		  minimize/non-final_final.og.minimal.out \
+		  minimize/non-final_final.og.minimal.png \
+		  minimize/nostrat.og.minimal.og \
+		  minimize/nostrat.og.minimal.out \
+		  minimize/nostrat.og.minimal.png \
+		  minimize/sample.og.minimal.og \
+		  minimize/sample.og.minimal.out \
+		  minimize/sample.og.minimal.png \
+		  oWFNreduction/06-03-23_BPM06_shop_sect_6.reduced.owfn \
+		  oWFNreduction/060116-misc-coffee.reduced.owfn \
+		  oWFNreduction/phcontrol3.unf.reduced.owfn \
+		  partner/coffee-partner.dot \
+		  partner/coffee-partner.owfn \
+		  partner/coffee-partner.png \
+		  partner/coffee.owfn \
+		  partner/coffee.owfn.ig.og \
+		  partner/coffee.owfn.ig.out \
+		  partner/coffee.owfn.ig.pn \
+		  partner/coffee.owfn.ig.png \
+		  partner/coffee.owfn.ig.stg \
+		  partner/coffee2-partner.dot \
+		  partner/coffee2-partner.owfn \
+		  partner/coffee2-partner.png \
+		  partner/coffee2.owfn \
+		  partner/coffee2.owfn.ig.og \
+		  partner/coffee2.owfn.ig.out \
+		  partner/coffee2.owfn.ig.pn \
+		  partner/coffee2.owfn.ig.png \
+		  partner/coffee2.owfn.ig.stg \
+		  partner/coffee_extended-partner.dot \
+		  partner/coffee_extended-partner.owfn \
+		  partner/coffee_extended-partner.png \
+		  partner/coffee_extended.owfn \
+		  partner/coffee_extended.owfn.ig.og \
+		  partner/coffee_extended.owfn.ig.out \
+		  partner/coffee_extended.owfn.ig.pn \
+		  partner/coffee_extended.owfn.ig.png \
+		  partner/coffee_extended.owfn.ig.stg \
+		  partner/sequence3.owfn.og.og.pn \
+		  partner/sequence3.owfn.og.og.stg \
+		  png/big.owfn.output.dot \
+		  png/big.owfn.output.out \
+		  png/big.owfn.output.png \
+		  png/big.owfn.output.tex \
+		  productog/1x2.output.og \
+		  productog/1x2.output.out \
+		  productog/1x2.output.png \
+		  productog/1x2x3.output.og \
+		  productog/1x2x3.output.out \
+		  productog/1x2x3.output.png \
+		  productog/3x1x2.output.og \
+		  productog/3x1x2.output.out \
+		  productog/3x1x2.output.png \
+		  publicview/complexPV.pv.owfn \
+		  publicview/complexPV.pv.sa.out \
+		  publicview/complexPV.pv.sa.png \
+		  publicview/non_empty_true_node2.pv.owfn \
+		  publicview/non_empty_true_node2.pv.sa.out \
+		  publicview/non_empty_true_node2.pv.sa.png \
+		  publicview/non_empty_true_node3.pv.owfn \
+		  publicview/non_empty_true_node3.pv.sa.out \
+		  publicview/non_empty_true_node3.pv.sa.png \
+		  syntax/formula.owfn.output.og \
+		  syntax/formula.owfn.output.og.out \
+		  partner/sequence3.owfn.og.out \
+		  partner/sequence3.owfn.og.png \
+		  partner/sequence3.owfn.og.stg \
+		  partner/sequence3.owfn.og.pn
+
 
 distclean-local:
 	-test -d coverage_html/ && rm -rf coverage_html/

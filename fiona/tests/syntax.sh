@@ -29,8 +29,17 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-DIR=$testdir/syntax
+SUBDIR=syntax
+DIR=$testdir/$SUBDIR
 FIONA=fiona
+
+# for make distcheck: make copy of $owfn and work on it
+if [ "$testdir" != "$builddir" ]; then
+    if [ ! -e $builddir/$SUBDIR ]; then
+        $MKDIR_P $builddir/$SUBDIR
+    fi
+fi
+
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
 rm -f $DIR/formula.owfn.output.og
@@ -174,13 +183,6 @@ resultSingle=0
 owfn="$DIR/formula.owfn"
 outputPrefix="$builddir/syntax/formula.owfn.output"
 outputExpected="$testdir/syntax/formula.owfn.expected.og"
-
-# for make distcheck: make copy of $owfn and work on it
-if [ "$testdir" != "$builddir" ]; then
-    if [ ! -e $builddir/$SUBDIR ]; then
-        $MKDIR_P $builddir/$SUBDIR
-    fi
-fi
 
 cmd="$FIONA $owfn -t og -o $outputPrefix -p no-png"
 

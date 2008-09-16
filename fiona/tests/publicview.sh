@@ -30,8 +30,16 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-DIR=$testdir/publicview
-FIONA="fiona"
+SUBDIR=publicview
+DIR=$testdir/$SUBDIR
+FIONA=fiona
+
+# for make distcheck: make copy of $owfn and work on it
+if [ "$testdir" != "$builddir" ]; then
+    if [ ! -e $builddir/$SUBDIR ]; then
+        $MKDIR_P $builddir/$SUBDIR
+    fi
+fi
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
 rm -f $DIR/NonFinalTauNode1.pv.sa.out
@@ -72,7 +80,8 @@ result=0
 ############################################################################
 
 service="$DIR/complexPV"
-cmd="$FIONA $service.owfn -t pv -p no-png"
+output="$builddir/$SUBDIR/complexPV"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -84,7 +93,7 @@ else
     exitcode=$?
 fi
 
-cmd="$FIONA $service.pv.owfn $service.owfn -t equivalence"
+cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -112,7 +121,8 @@ fi
 ############################################################################
 
 service="$DIR/non_empty_true_node2"
-cmd="$FIONA $service.owfn -t pv -p no-png"
+output="$builddir/$SUBDIR/non_empty_true_node2"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -124,7 +134,7 @@ else
     exitcode=$?
 fi
 
-cmd="$FIONA $service.pv.owfn $service.owfn -t equivalence"
+cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -152,7 +162,8 @@ fi
 ############################################################################
 
 service="$DIR/non_empty_true_node3"
-cmd="$FIONA $service.owfn -t pv -p no-png"
+output="$builddir/$SUBDIR/non_empty_true_node3"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -164,7 +175,7 @@ else
     exitcode=$?
 fi
 
-cmd="$FIONA $service.pv.owfn $service.owfn -t equivalence"
+cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -443,3 +454,4 @@ OUTCOMMENTED
 echo
 
 exit $result
+

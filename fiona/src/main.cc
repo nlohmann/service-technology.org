@@ -1479,7 +1479,7 @@ void reduceOWFN(oWFN* PN) {
         PNapiNet->set_format(PNapi::FORMAT_OWFN, true);
 
         ofstream output;
-        const string owfnOutput = outFileName.erase((outFileName.size()-5), outFileName.size()) + ".reduced.owfn";
+        const string owfnOutput = outFileName + ".reduced.owfn";
         output.open (owfnOutput.c_str(),ios::out);
 
         (output) << (*PNapiNet);

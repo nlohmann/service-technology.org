@@ -1,0 +1,6 @@
+==============
+ Version 1.00
+==============
+
+* created Makefile.am and configure.ac for autotools usage
+* it's compilable running autoreconf, configure and make

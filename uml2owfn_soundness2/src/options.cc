@@ -142,6 +142,8 @@ void print_help()
 	trace("    stop                distinguish stop nodes from end nodes\n");
 	trace("    keeppins            keep unconnected pins\n");
 	trace("    removePinsets       remove output pinsets (requires -a soundness)\n");
+  trace("    wfNet               attempt to translate net into a workflow net,\n");
+  trace("                        (requires -a soundness)\n");
 	trace("\n");
 	trace("Examples:\n");
 	trace("  uml2owfn -i library.xml -f dot -o\n");
@@ -358,6 +360,8 @@ void parse_command_line(int argc, char* argv[])
         globals::analysis[A_SAFE] = true;
       else if (parameter == "removePinsets")
         globals::analysis[A_REMOVE_PINSETS] = true;
+      else if (parameter == "wfNet")
+        globals::analysis[A_WF_NET] = true;
 			else {
 				trace(TRACE_ALWAYS, "Unknown analysis task \"" + parameter +"\".\n");
 				trace(TRACE_ALWAYS, "Use -h to get a list of valid analysis tasks.\n");

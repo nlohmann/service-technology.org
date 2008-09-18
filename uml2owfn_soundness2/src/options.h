@@ -110,7 +110,7 @@ typedef enum
 
 
 /*!
- * \brief enumeration of the possible output file formats
+ * \brief enumeration of the possible analysis switches
  */
 typedef enum
 {
@@ -120,6 +120,7 @@ typedef enum
   A_DEADLOCKS,		///< check for absence of deadlocks
   A_SAFE,		      ///< check for safeness
   A_REMOVE_PINSETS, ///< remove the output pinsets when checking soundness
+  A_WF_NET,       /// translate into a workflow net for soundness analysis
   A_MAX
 } possibleAnalysis;
 

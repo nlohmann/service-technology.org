@@ -358,6 +358,62 @@ make table LIBRARY=myLib SED=sed
 will translate library @file{myLib.xml}, apply reduction level 3, and create
 the result tables using the program @samp{sed}.
 
+The Makefile variable @samp{OUTPUT-FORMAT} allows you to set the output format
+of the translation of @acronym{UML2oWFN}, default value is @samp{lola}. The
+targets @samp{full}, @samp{table}, @samp{safeness}, @samp{soundness}, @samp{clean},
+and @samp{veryclean} require the @samp{lola}-format.
+
+@section Use case: soundness analysis using tools for workflow-nets 
+
+Aalst et al. have established the notion of a @i{workflow net} to model workflows.
+Workflow nets are a special class of Petri nets that have a unique start place
+@samp{alpha} that is initially marked, and a uniqe end place @samp{omega} that
+is marked when the workflow has finished. Further, every place and transition
+lies on a path from @samp{alpha} to @samp{omega}. There are efficient soundness
+analysis algorithms for workflow nets.
+
+In order to analyse processes of the IBM buiness modeler with such tools, the
+generated nets have to provide a unique @samp{alpha} place, and a unique
+@samp{omega} place. An equivalent translation of an arbitrary IBM business
+modeler process into a workflow net requires knowledge about the reachable states
+of the process. However, for a specific class of processes, this transformation
+can be done on the structure of the process alone.
+
+The parameter @samp{-a wfNet} triggers the use of this structural translation,
+it must be used together with @samp{-a soundness} to become effective. Call
+
+@cartouche
+@example
+uml2owfn -i lib.xml -f tpn -a soundness -a safe -a wfNet -p taskfile -o
+@end example
+@end cartouche
+
+to translate each process of the library @file{lib.xml} into a Woflan @file{.tpn}
+file with workflow-net structure. Each file can be loaded into Woflan and
+analyzed for soundness.
+
+The workflow-net translation introduces a unique @samp{alpha} place that is
+initially marked, like in all other soundness analysis use cases. It further
+adds a unique @samp{omega} place that has no outgoing arcs. Each output pinset
+of the process produces on this omega place; the termination of the process via
+an output pinset requires that @i{all} end-nodes are marked. This effectively
+implements an AND-join at the end of the process. 
+
+Any process that does not terminate with exactly one token on each end node will
+be analyzed as unsafe, although the original process semantics tell that the
+process is sound. Conversely, every process that is found to be sound by this
+analysis, is also sound in the original semantics.
+
+You can use
+
+@example
+make translatewf
+@end example
+
+to automate the translation. The Makefile variable @samp{OUTPUT-FORMAT} allows
+you to set the output format of the translation of @acronym{UML2oWFN}, default
+value is @samp{lola}.
+
 @c ----------------------------------------------------------------------------
 
 

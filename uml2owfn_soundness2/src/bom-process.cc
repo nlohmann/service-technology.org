@@ -316,75 +316,81 @@ void BomProcess::soundness_initialPlaces(PetriNet *PN) {
  * \param	liveLocks  introduce live-locks at final state places
  * \param	stopNodes  distinguish stop nodes from end nodes
  * \param keepPinsets  ignore termination according to output pinsets
+ * \param wfNet  attempt to create a workflow net structure
  */
-void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool stopNodes, bool keepPinsets=true)
+void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool stopNodes, bool keepPinsets=true, bool wfNet=false)
 {
-    set<Place*> 		places_to_remove;
-    set<Transition*>	transitions_to_remove;
-    set<Node*> 		noMoreOutput;
-    set<Place*>		omegaPlaces;	// set of new omega places
+  set<Place*> 		 places_to_remove;
+  set<Transition*> transitions_to_remove;
+  set<Node*> 		   noMoreOutput;
+  set<Place*>		   omegaPlaces;	     // set of new omega places
 
-    // make all final places (as found in the final marking) non-final
-    set<Place *>	finalPlaces = PN->getFinalPlaces();
-    for (set<Place *>::iterator place = finalPlaces.begin(); place != finalPlaces.end(); place ++)
+  // make all final places (as found in the final marking) non-final
+  set<Place *>	finalPlaces = PN->getFinalPlaces();
+  for (set<Place *>::iterator place = finalPlaces.begin(); place != finalPlaces.end(); place ++)
+  {
+    (*place)->isFinal = false;
+      // possible extension: introduce omega-place as unqiue final place
+  }
+
+  // replace the post-set of the output pinset transition with an
+  // omega place marked final
+
+  // get all post-places of output pinset-transitions
+  for (set<Transition *>::iterator outPS = process_outputPinSets.begin(); outPS != process_outputPinSets.end(); outPS++)
+  {
+    set<Node *> outputPins = PN->postset(*outPS);	// and the output pins
+    for (set<Node *>::iterator it = outputPins.begin(); it != outputPins.end(); it++)
     {
-    	(*place)->isFinal = false;
-        // possible extension: introduce omega-place as unqiue final place
+      Place* place = static_cast<Place*>(*it);
+      places_to_remove.insert(place);
     }
+    noMoreOutput.insert((*outPS));
 
-    // replace the post-set of the output pinset transition with an
-    // omega place marked final
+    if (keepPinsets) {
+      // keep pinsets: create omega post-place of the pinset-transition,
+      // and add a live-locking loop if necessary
+      Place* outputPlace = PN->newPlace((*outPS)->nodeFullName() + "_omega");
+      PN->newArc((*outPS), outputPlace);
+      outputPlace->isFinal = true;		// make it a final place
 
-    // get all post-places of output pinset-transitions
-    for (set<Transition *>::iterator outPS = process_outputPinSets.begin(); outPS != process_outputPinSets.end(); outPS++)
-    {
-    	set<Node *> outputPins = PN->postset(*outPS);	// and the output pins
-    	for (set<Node *>::iterator it = outputPins.begin(); it != outputPins.end(); it++)
-    	{
-    		Place* place = static_cast<Place*>(*it);
-   	    places_to_remove.insert(place);
-    	}
-    	noMoreOutput.insert((*outPS));
+      omegaPlaces.insert(outputPlace);	// is one of the new final places
 
-    	if (keepPinsets) {
-    	  // keep pinsets: create omega post-place of the pinset-transition,
-    	  // and add a live-locking loop if necessary
-        Place* outputPlace = PN->newPlace((*outPS)->nodeFullName() + "_omega");
-        PN->newArc((*outPS), outputPlace);
-        outputPlace->isFinal = true;		// make it a final place
+      if (liveLocks) {	// introduce live-lock at omega-place
+        Transition* tLoop = PN->newTransition(outputPlace->nodeFullName() + ".loop");
+        PN->newArc(outputPlace, tLoop, STANDARD, 1);
+        PN->newArc(tLoop, outputPlace, STANDARD, 1);
 
-        omegaPlaces.insert(outputPlace);	// is one of the new final places
+      }
 
-        if (liveLocks) {	// introduce live-lock at omega-place
-          Transition* tLoop = PN->newTransition(outputPlace->nodeFullName() + "_omega.loop");
-          PN->newArc(outputPlace, tLoop, STANDARD, 1);
-          PN->newArc(tLoop, outputPlace, STANDARD, 1);
-        }
+    } else {
+      // do not keep pinsets: remove pinset transition
+      transitions_to_remove.insert(*outPS);
 
-    	} else {
-        // do not keep pinsets: remove pinset transition
-    	  transitions_to_remove.insert(*outPS);
-
-    	  // and add a token consuming transition to each pre-place
-        set<Node *> inputPins = PN->preset(*outPS); // and the output pins
-        for (set<Node *>::iterator it = inputPins.begin(); it != inputPins.end(); it++)
-        {
-          Place* place = static_cast<Place*>(*it);
-          Transition* tConsume = PN->newTransition(place->nodeFullName()+"_consume");
-          PN->newArc(place, tConsume);
-          // adding live-locks is not necessary
-        }
-    	}
+      // and add a token consuming transition to each pre-place
+      set<Node *> inputPins = PN->preset(*outPS); // and the output pins
+      for (set<Node *>::iterator it = inputPins.begin(); it != inputPins.end(); it++)
+      {
+        Place* place = static_cast<Place*>(*it);
+        Transition* tConsume = PN->newTransition(place->nodeFullName()+"_consume");
+        PN->newArc(place, tConsume);
+        // adding live-locks is not necessary
+      }
     }
+  }
 
+  // connect the end- and stop- nodes to the output transitions
   if (keepPinsets)
   {
+    // implement the BOM process termination semantics in petri nets:
     // when checking soundness, transition which consume from
     // end-nodes must be made looping, this is necessary to make sure
     // that the soundness-formula for correct termination on end nodes
     //   AG EF (endNode > 0 AND p1 = 0 AND ... p17 = 0)
     // remains true once an endNode carries a token
     // (consuming from endNode must not violate the formula)
+
+    // include all end nodes in the process termination semantics
     for (set<Place *>::iterator it = process_endNodes.begin(); it != process_endNodes.end(); it++) {
       Place* p = static_cast<Place*>(*it);
 
@@ -393,19 +399,35 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
       transitions_to_remove.insert(t);
       //PN->newArc(t, p, STANDARD, 1);				// add arc back to p
 
-      int outputSetNum = 1;
-      for (set<Place *>::iterator omega = omegaPlaces.begin();
-                    omega != omegaPlaces.end(); omega++)
-      {
-        Transition *tEndClean =
-          PN->newTransition( p->nodeFullName()+".clean."+toString(outputSetNum) );
-        PN->newArc(p, tEndClean);
-        // is not a live-lock, tEndClean consumes from endNode
-        PN->newArc((*omega), tEndClean);
-        PN->newArc(tEndClean, (*omega));
-        outputSetNum++;
+      if (!wfNet) {
+        // not creating a workflow net, add a transition that cleans the end node
+        // for each omega place
+        int outputSetNum = 1;
+        for (set<Place *>::iterator omega = omegaPlaces.begin();
+                      omega != omegaPlaces.end(); omega++)
+        {
+          Transition *tEndClean =
+            PN->newTransition( p->nodeFullName()+".clean."+toString(outputSetNum) );
+          PN->newArc(p, tEndClean);
+          // is not a live-lock, tEndClean consumes from endNode
+          PN->newArc((*omega), tEndClean);
+          PN->newArc(tEndClean, (*omega));
+          outputSetNum++;
+        }
+      } else {
+        // try to create a workflow net: each output pinset has its own
+        // omega transition and its own omega-place, add each end node
+        // to the preset of each output pinset-omega transition
+        for (set<Transition *>::iterator outPS = process_outputPinSets.begin();
+             outPS != process_outputPinSets.end(); outPS++)
+        {
+          PN->newArc(p, (*outPS));
+        }
       }
+
     }
+
+    // include all stop nodes in the process termination semantics
     for (set<Place *>::iterator it = process_stopNodes.begin(); it != process_stopNodes.end(); it++) {
       Place* p = static_cast<Place*>(*it);
 
@@ -419,21 +441,49 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
 
       } else {
         // treat stop nodes like end nodes
-        int outputSetNum = 1;
-        for (set<Place *>::iterator omega = omegaPlaces.begin();
-                      omega != omegaPlaces.end(); omega++)
-        {
-          Transition *tEndClean =
-            PN->newTransition( p->nodeFullName()+".clean."+toString(outputSetNum) );
-          PN->newArc(p, tEndClean);
-          // is not a live-lock, tEndClean consumes from endNode
-          PN->newArc((*omega), tEndClean);
-          PN->newArc(tEndClean, (*omega));
-          outputSetNum++;
+
+        if (!wfNet) {
+          // not creating a workflow net, add a transition that cleans the end node
+          // for each omega place
+          int outputSetNum = 1;
+          for (set<Place *>::iterator omega = omegaPlaces.begin();
+                        omega != omegaPlaces.end(); omega++)
+          {
+            Transition *tEndClean =
+              PN->newTransition( p->nodeFullName()+".clean."+toString(outputSetNum) );
+            PN->newArc(p, tEndClean);
+            // is not a live-lock, tEndClean consumes from endNode
+            PN->newArc((*omega), tEndClean);
+            PN->newArc(tEndClean, (*omega));
+            outputSetNum++;
+          }
+        } else {
+          // try to create a workflow net: each output pinset has its own
+          // omega transition and its own omega-place, add each end node
+          // to the preset of each output pinset-omega transition
+          for (set<Transition *>::iterator outPS = process_outputPinSets.begin();
+               outPS != process_outputPinSets.end(); outPS++)
+          {
+            PN->newArc(p, (*outPS));
+          }
         }
       }
     }
-  }
+
+    // a workflow net may have only one omega place
+    if (wfNet) {
+      Place* processOmega = PN->newPlace("omega");
+      for (set<Place *>::iterator omega = omegaPlaces.begin();
+                    omega != omegaPlaces.end(); omega++)
+      {
+        Transition* tOmega = PN->newTransition((*omega)->nodeFullName() + ".finish");
+        PN->newArc(*omega, tOmega);
+        PN->newArc(tOmega, processOmega);
+        (*omega)->isFinal = false;  // local omega is no longer a final place
+      }
+      processOmega->isFinal = true; // is the only final place in the process
+    }
+  } // end: connect end/stop nodes with pinsets
 
   // remove the old interface output places
   for (set<Place*>::iterator p = places_to_remove.begin(); p != places_to_remove.end(); p++) {

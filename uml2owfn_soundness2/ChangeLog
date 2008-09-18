@@ -3,6 +3,7 @@ ChangeLog for UML2oWFN
 Version 1.03 (in progress)
 ============
 
++ added parameter "-a wfNet" to translate processes into Aalst-workflow-nets, the translation assumes an AND-join on all end- and stop-nodes of the process
 + stored reduction level in the scripts/Makefile in variable "REDUCTION-LEVEL", so the reduction level can be set at the make call
 + added new scripts/Makefile target "translateweak" that uses the "-a removePinsets" option,  
 + added new analysis switch "-a removePinsets" that relaxes the process termination semantics by requiring that only the control-flow terminates, but that data may still be pending at the process output

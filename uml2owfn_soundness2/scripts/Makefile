@@ -10,6 +10,8 @@ LOLA-FULL-LIMITED = lola-full-limited  # LoLA with FULL
 
 REDUCTION-LEVEL   = 3                  # Petri net reduction level for the
                                        # translation
+OUTPUT-FORMAT     = lola               # output format to be produced by UML2oWFN
+                                       # see uml2owfn -h for feasible options
 ##########################################################################
 
 
@@ -105,10 +107,14 @@ results.csv: safeness soundness
 # create files
 ##########################################################################
 translate: $(LIBRARY).xml
-	uml2owfn -i $< -f lola -a soundness -a safe -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) -o 2> translation.log
+	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) -o 2> translation.log
 	
 translateweak: $(LIBRARY).xml
-	uml2owfn -i $< -f lola -a soundness -a safe -a removePinsets -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) -o 2> translation.log
+	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a removePinsets -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) -o 2> translation.log
+	
+translatewf: $(LIBRARY).xml
+	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a wfNet -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) -o 2> translation.log
+
 
 ##########################################################################
 # tidy up

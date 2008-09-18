@@ -790,16 +790,17 @@ translationResult_t translate_process(Block *process, analysis_t analysis, unsig
     	// create proper initial marking
     	bom->soundness_initialPlaces(&PN);
 
+    	// add livelocks only if not creating a workflow net
+    	bool liveLocks = analysis[A_WF_NET] ? false : true;
     	if (analysis[A_DEADLOCKS]) {
         // create proper livelocks on the net to check for deadlocks
         trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for deadlock analysis\n");
-    		bom->soundness_terminalPlaces(&PN, true, analysis[A_STOP_NODES], !analysis[A_REMOVE_PINSETS]);
+    		bom->soundness_terminalPlaces(&PN, liveLocks, analysis[A_STOP_NODES], !analysis[A_REMOVE_PINSETS], analysis[A_WF_NET]);
     	}
     	else
     	{
-    		// close net without adding livelocks
         trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for general soundness analysis\n");
-    		bom->soundness_terminalPlaces(&PN, true, analysis[A_STOP_NODES], !analysis[A_REMOVE_PINSETS]);
+    		bom->soundness_terminalPlaces(&PN, liveLocks, analysis[A_STOP_NODES], !analysis[A_REMOVE_PINSETS], analysis[A_WF_NET]);
     	}
 
     	// check net structure: alpha to omega?

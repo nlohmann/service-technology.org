@@ -1,6 +1,7 @@
 @heading Version 1.03 (in progress)
 
 @itemize
+@item added parameter @samp{-a wfNet} to translate processes into Aalst-workflow-nets, the translation assumes an AND-join on all end- and stop-nodes of the process
 @item stored reduction level in the @file{scripts/Makefile} in variable @samp{REDUCTION-LEVEL}, so the reduction level can be set at the make call
 @item added new @file{scripts/Makefile} target @samp{translateweak} that uses the @samp{-a removePinsets} option,
 @item added new analysis switch @samp{-a removePinsets} that relaxes the process termination semantics by requiring that only the control-flow terminates, but that data may still be pending at the process output

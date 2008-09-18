@@ -371,7 +371,7 @@ distcleancheck: distclean
 # somehow find on radon gets it wrong *shrug*
 distdir:
 	cp -pR * $(distdir)/
-	rm -rf `find $(distdir) -type d -name CVS`
+	rm -rf `find $(distdir) -type d -name .svn`
 	find $(distdir) -type f -name '*.o' -exec rm -rf '{}' ';'
 	find $(distdir) -type f -name '*.obj' -exec rm -rf '{}' ';'
 	find $(distdir) -type f -name '*.a' -exec rm -rf '{}' ';'
@@ -395,3 +395,4 @@ distdir:
 
 # just to make Fiona's maintainer-clean work
 maintainer-clean: distclean
+

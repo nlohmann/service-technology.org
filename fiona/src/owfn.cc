@@ -74,7 +74,7 @@ oWFN::oWFN() :
         binHashTable = new binDecision * [HASHSIZE];
     } catch(bad_alloc) {
         cerr << "\nhash table too large!\n";
-        _exit(2);
+        _exit(EC_MEMORY_EXHAUSTED);
     }
 
     for (i = 0; i < HASHSIZE; i++) {
@@ -3671,7 +3671,7 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
     assert(false);
     cerr << "You reached an unreachable line in function "
          << "owfnTransition ** oWFN::stubbornfirelistdeadlocks())"<< endl;
-    exit(1);
+    exit(EC_UNREACHABLE_LINE);
 }
 #endif
 

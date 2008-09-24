@@ -76,13 +76,15 @@ class AnnotatedGraph : public Graph {
         typedef std::list<AnnotatedGraph*> ogs_t;
 
         /// Type of container passed to AnnotatedGraph::getProductOGFilePrefix().
-        typedef std::list<std::string> ogfiles_t;
+        typedef std::list<string> ogfiles_t;
 
         /// Type of container of nodes stored in this graph
         typedef std::vector<AnnotatedGraphNode*> nodes_t;
 
         /// Type of the predecessor map
         typedef std::map< AnnotatedGraphNode*, AnnotatedGraphNode::LeavingEdges > predecessorMap;
+        
+        string getSuffix() const;
 
     // Protected Methods and typedefs    
     protected:
@@ -92,7 +94,7 @@ class AnnotatedGraph : public Graph {
         typedef nodes_t::iterator nodes_iterator;
 
         /// name of the file that was source of the graph
-        std::string filename;
+        string filename;
 
         /// A pointer to the root node
         AnnotatedGraphNode* root;
@@ -134,8 +136,8 @@ class AnnotatedGraph : public Graph {
         //! NOTE: graph has to be acyclic!
         GraphFormulaMultiaryAnd* createStructureFormulaRecursively(AnnotatedGraphNode*);
 
-        set<std::string> sendEvents;
-        set<std::string> recvEvents;
+        set<string> sendEvents;
+        set<string> recvEvents;
 
         /// remove a node from the annotated graph
         virtual void removeNode(AnnotatedGraphNode*);
@@ -229,6 +231,11 @@ class AnnotatedGraph : public Graph {
         void computeInterfaceRecursively(AnnotatedGraphNode* v,
                                          std::map<AnnotatedGraphNode*, bool>& visitedNodes);
 
+        /// dfs through the graph printing each node and edge to the output stream
+        void createDotFileRecursively(AnnotatedGraphNode* v,
+                                      fstream& os,
+                                      std::map<AnnotatedGraphNode*, bool>&) const;
+
 
     // Public methods
     public:
@@ -250,26 +257,26 @@ class AnnotatedGraph : public Graph {
         virtual void addNode(AnnotatedGraphNode* node);
 
         /// creates a new node in the graph
-        AnnotatedGraphNode* addNode(const std::string& nodeName,
+        AnnotatedGraphNode* addNode(const string& nodeName,
                                     GraphFormula* annotation,
                                     GraphNodeColor color = BLUE);
 
         /// creates a new edge in the graph
-        void addEdge(const std::string& srcName,
-                     const std::string& dstName,
-                     const std::string& label);
+        void addEdge(const string& srcName,
+                     const string& dstName,
+                     const string& label);
 
 
         /// creates a new edge in the graph
         void addEdge(AnnotatedGraphNode * src,
                      AnnotatedGraphNode * dst,
-                     const std::string& label);
+                     const string& label);
 
         /// Returns the number of nodes in this graph.
         virtual unsigned int getNumberOfNodes() const;
 
         /// returns true if a node with the given name was found
-        bool hasNodeWithName(const std::string& nodeName) const;
+        bool hasNodeWithName(const string& nodeName) const;
 
         /// returns a pointer to the root node
         AnnotatedGraphNode* getRoot() const;
@@ -278,10 +285,10 @@ class AnnotatedGraph : public Graph {
         void setRoot(AnnotatedGraphNode* newRoot);
 
         /// sets the root node to the one with the given name
-        void setRootToNodeWithName(const std::string& nodeName);
+        void setRootToNodeWithName(const string& nodeName);
 
         /// returns a node with the given name, or NULL else
-        AnnotatedGraphNode* getNodeWithName(const std::string& nodeName) const;
+        AnnotatedGraphNode* getNodeWithName(const string& nodeName) const;
 
         /// retruns true if the graph's root node is NULL
         bool hasNoRoot() const;
@@ -307,10 +314,10 @@ class AnnotatedGraph : public Graph {
                                                 set<AnnotatedGraphNode*>& unreachableNodes);
 
         /// returns the name of the source file for the Graph
-        std::string getFilename();
+        string getFilename();
 
         /// sets the name of the source file for the Graph
-        void setFilename(std::string filename);
+        void setFilename(string filename);
 
         /// Returns the product OG of all given OGs.
         static AnnotatedGraph* product(const ogs_t& ogs);
@@ -323,28 +330,33 @@ class AnnotatedGraph : public Graph {
                                                  const AnnotatedGraphNode* rhs) const;
 
         /// Produces the default prefix of the product OG output file.
-        static std::string getProductOGFilePrefix(const ogfiles_t& ogfiles);
+        static string getProductOGFilePrefix(const ogfiles_t& ogfiles);
 
         /// Strips the OG file suffix from filename and returns the result.
-        static std::string stripOGFileSuffix(const std::string& filename);
+        static string stripOGFileSuffix(const std::string& filename);
 
-        /// dfs through the graph printing each node and edge to the output stream
-        void printGraphToDot(AnnotatedGraphNode* v,
-                             fstream& os,
-                             std::map<AnnotatedGraphNode*, bool>&) const;
+        /// Creates a dot output (.out) of the graph, using the filename as title.
+        virtual string createDotFile(string& filenamePrefix) const;
 
-        /// creates a dot output of the graph and calls dot to create an image from it
-        void printDotFile(const std::string& filenamePrefix) const;
+        /// Creates a dot output (.out) of the graph, using a specified title.
+        virtual string createDotFile(string& filenamePrefix,
+                                     const string& dotGraphTitle) const;
+        
+        /// Creates an image output (.png) of the graph by calling dot.
+		virtual string createPNGFile(string& filenamePrefix,
+                         		     string& dotFileName) const;
 
-        /// creates a dot output of the graph and calls dot to create an image from it
-        void printDotFile(const std::string& filenamePrefix,
-                          const std::string& dotGraphTitle) const;
+        /// Creates an annotated dot output (.dot) of the graph by calling dot.
+		virtual string createAnnotatedDotFile(string& filenamePrefix,
+                         		              string& dotFileName) const;
 
-        /// Prints this OG in OG file format
-        void printOGFile(const std::string& filenamePrefix, bool hasOWFN) const;
 
-        /// Adds the suffix for OG files to the given file name prefix
-        static std::string addOGFileSuffix(const std::string& filePrefix);
+        /// Creates an og output file (.og) of the graph. 
+        string createOGFile(const string& filenamePrefix, bool hasOWFN) const;
+
+        /// Adds the suffix for OG files to the given file name prefix, 
+        /// simply adds ".og" to the given string.
+        static string addOGFileSuffix(const std::string& filePrefix);
 
         /// checks, whether this AnnotatedGraph simulates the given simulant
         bool simulates(AnnotatedGraph* smallerOG);

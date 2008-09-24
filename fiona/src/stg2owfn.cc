@@ -232,6 +232,11 @@ string STG2oWFN_main(vector<string>& edgeLabels,
     string netfile = PNFileName.substr(0, PNFileName.find(".owfn") );
     string filename = netfile + "-partner.owfn";
     ofstream *file = new ofstream(filename.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
+    
+    if (!file->good()) {
+        file->close();
+        exit(EC_FILE_ERROR);
+    }
 
     STGPN.set_format(FORMAT_OWFN);
     (*file) << STGPN;

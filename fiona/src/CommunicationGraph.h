@@ -61,18 +61,17 @@ class CommunicationGraph : public AnnotatedGraph {
         GraphNodeDiagnosisColor_enum diagnose_recursively(AnnotatedGraphNode* v,
                                                           std::map<AnnotatedGraphNode*, bool>& visitedNodes);
 
-
-        /// recursive helper function for printGraphToDot()
-        void printGraphToDotRecursively(AnnotatedGraphNode* v,
-                                        fstream& os,
-                                        std::map<AnnotatedGraphNode*, bool>&);
+        /// Recursive helper for createDotFile; runs a dfs through the graph printing each node and edge to the output stream
+        void createDotFileRecursively(AnnotatedGraphNode* v,
+                                      fstream& os,
+                                      std::map<AnnotatedGraphNode*, bool>&) const;
 
         /// recursive helper function for annotateGraphDistributedly()
         bool annotateGraphDistributedlyRecursively(AnnotatedGraphNode* v,
                                                    std::map<AnnotatedGraphNode*, bool>&);
 
         /// helper function for annotateGraphDistributedly()
-        void removeLabeledSuccessor(AnnotatedGraphNode* v, std::string label);
+        void removeLabeledSuccessor(AnnotatedGraphNode* v, string label);
 
 
     protected:
@@ -135,8 +134,17 @@ class CommunicationGraph : public AnnotatedGraph {
         /// changed significantly and depending on the debug-level set
         void printProgress();
 
-        /// brief creates a dot file of the graph
-        void printGraphToDot();
+        /// Creates a dot output (.out) of the graph, using the filename as title. 
+        virtual string createDotFile(string& filenamePrefix) const;
+
+        /// Creates an image output (.png) of the graph by calling dot.
+        virtual string createPNGFile(string& filenamePrefix,
+                                    string& dotFileName) const;
+
+        /// Creates an annotated dot output (.dot) of the graph by calling dot.
+        virtual string createAnnotatedDotFile(string& filenamePrefix,
+                                            string& dotFileName) const;
+   
 
         /// fills the given sets with the names of the inputs and outputs
         /// needed for public view generation. The interfaces of the public view

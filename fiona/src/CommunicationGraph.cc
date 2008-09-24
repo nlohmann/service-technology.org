@@ -255,11 +255,11 @@ void CommunicationGraph::printProgressFirst() {
 }
 
 
-//! \brief creates a dot file of the graph
-void CommunicationGraph::printGraphToDot() {
+//! \brief creates a dot output of the graph, uses the filename as title.
+//! \param filenamePrefix a string containing the prefix of the output file name
+string CommunicationGraph::createDotFile(string& filenamePrefix) const {
 
     unsigned int maxSizeForDotFile = 5000; // number relevant for .out file
-    unsigned int maxSizeForPNGFile = 500; // number relevant to generate png
 
     if (((parameters[P_SHOW_RED_NODES] || parameters[P_SHOW_ALL_NODES]) &&
             (getNumberOfNodes() <= maxSizeForDotFile))
@@ -270,26 +270,13 @@ void CommunicationGraph::printGraphToDot() {
         trace(TRACE_0, "creating the dot file of the graph...\n");
         AnnotatedGraphNode* rootNode = root;
 
-        string outfilePrefixWithOptions = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
-
-        if (!options[O_CALC_ALL_STATES]) {
-            outfilePrefixWithOptions += ".R";
-        }
-        if (parameters[P_RESPONSIVE]) {
-        	outfilePrefixWithOptions += ".responsive";
-        }
-        if (parameters[P_DIAGNOSIS]) {
-            outfilePrefixWithOptions += ".diag";
-        } else {
-            if (parameters[P_OG]) {
-                outfilePrefixWithOptions += ".og";
-            } else {
-                outfilePrefixWithOptions += ".ig";
-            }
-        }
-
-        string dotFileName = outfilePrefixWithOptions + ".out";
+        
+        string dotFileName = filenamePrefix + ".out";
         fstream dotFile(dotFileName.c_str(), ios_base::out | ios_base::trunc);
+        if (!dotFile.good()) {
+            dotFile.close();
+            exit(EC_FILE_ERROR);
+        }
         dotFile << "digraph g1 {\n";
         dotFile << "graph [fontname=\"Helvetica\", label=\"";
 
@@ -299,7 +286,7 @@ void CommunicationGraph::printGraphToDot() {
             parameters[P_OG] ? dotFile << "OG of " : dotFile << "IG of ";
         }
 
-        dotFile << PN->filename;
+        dotFile << filenamePrefix;
         dotFile << " (parameters:";
         if (parameters[P_IG] && options[O_CALC_REDUCED_IG]) {
             dotFile << " -r";
@@ -337,28 +324,52 @@ void CommunicationGraph::printGraphToDot() {
         std::map<AnnotatedGraphNode*, bool> visitedNodes;
 
         // filling the file with nodes and edges
-        printGraphToDotRecursively(rootNode, dotFile, visitedNodes);
+        createDotFileRecursively(rootNode, dotFile, visitedNodes);
         }
 
         dotFile << "}";
         dotFile.close();
         // ... dot file created (.out) //
 
-        if (parameters[P_TEX]) {
-            string annotatedDotFileName = outfilePrefixWithOptions + ".dot";
+		return dotFileName;
+      
+    } else {
+        trace(TRACE_0, "graph is too big to create dot file\n");
+    }
+    
+    return "";
+}
+
+//! \brief annotates a given dot output file and stores it to a .dot-File.
+//! \param filenamePrefix a string containing the prefix of the output file name
+//! \param dotFileName the base dot file
+string CommunicationGraph::createAnnotatedDotFile(string& filenamePrefix, string& dotFileName) const {
+
+// Checking the option is not needed anymore since this function has to be called knowingly. 
+            string annotatedDotFileName = filenamePrefix + ".dot";
             // annotate .dot file
             system(("dot -Tdot " + dotFileName + " -o " + annotatedDotFileName).c_str());
-        }
+            
+            return annotatedDotFileName;
+}
+
+//! \brief Calls dot to create an image (png) of an .out-file.
+//! \param filenamePrefix The prefix of the annotated dot file, suffix will be added.
+//! \param dotFileName The base .out file.
+string CommunicationGraph::createPNGFile(string& filenamePrefix, string& dotFileName) const {
+
+    unsigned int maxSizeForPNGFile = 500; // number relevant to generate png
+
 
         // prepare dot command line creating the picture
-        string imgFileName = outfilePrefixWithOptions + ".png";
+        string imgFileName = filenamePrefix + ".png";
         string dotCmd = "dot -Tpng \"" + dotFileName + "\" -o \"" + imgFileName + "\"";
 
         // print only, if number of nodes is lower than required
         // if option is set to show all nodes, then we compare the number of all nodes
         // otherwise, we compare the number of blue nodes only
         bool graphToBigForPNG = false;
-        std::string reasonForFail = "";
+        string reasonForFail = "";
 
         if (parameters[P_SHOW_RED_NODES] || parameters[P_SHOW_ALL_NODES]) {
             // we have to check number of ALL nodes
@@ -379,11 +390,12 @@ void CommunicationGraph::printGraphToDot() {
             trace(TRACE_0, "(" + reasonForFail + ")\n");
             trace(TRACE_0, dotCmd + "\n");
         } else {
-            if (!parameters[P_NOPNG]) {
-                // print commandline and execute system command
-                trace(TRACE_0, dotCmd + "\n");
-                system(dotCmd.c_str());
-            }
+          
+            // print commandline and execute system command
+            trace(TRACE_0, dotCmd + "\n");
+            system(dotCmd.c_str());
+            return imgFileName;
+            
 
 //            // on windows machines, the png file can be shown per system call
 //            if (parameters[P_OG]) {
@@ -392,20 +404,24 @@ void CommunicationGraph::printGraphToDot() {
 //                system(showCmd.c_str());
 //            }
 
+
         }
-    } else {
-        trace(TRACE_0, "graph is too big to create dot file\n");
-    }
+        
+                return "";
+
+
 }
+
 
 
 //! \brief breadthsearch through the graph printing each node and edge to the output stream
 //! \param v current node in the iteration process
 //! \param os output stream
 //! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
-void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
-                                                    fstream& os,
-                                                    std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
+void CommunicationGraph::createDotFileRecursively(AnnotatedGraphNode* v,
+                                                  fstream& os,
+                                                  std::map<AnnotatedGraphNode*, bool>& visitedNodes) const {
+
     // the given node pointer should never be NULL
     assert(v != NULL);
 
@@ -510,7 +526,7 @@ void CommunicationGraph::printGraphToDotRecursively(AnnotatedGraphNode* v,
 
         os << "];\n";
         if ((vNext != v) && !visitedNodes[vNext]) {
-            printGraphToDotRecursively(vNext, os, visitedNodes);
+            createDotFileRecursively(vNext, os, visitedNodes);
         }
     } // while
     delete edgeIter;
@@ -676,7 +692,7 @@ bool CommunicationGraph::annotateGraphDistributedlyRecursively(AnnotatedGraphNod
 //! \brief DESCRIPTION
 //! \param DESCRIPTION
 //! \param DESCRIPTION
-void CommunicationGraph::removeLabeledSuccessor(AnnotatedGraphNode* v, std::string label) {
+void CommunicationGraph::removeLabeledSuccessor(AnnotatedGraphNode* v, string label) {
 
     AnnotatedGraphNode::LeavingEdges::Iterator edgeIter = v->getLeavingEdgesIterator();
 

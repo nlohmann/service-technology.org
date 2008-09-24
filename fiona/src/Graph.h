@@ -81,30 +81,35 @@ class Graph {
                                         PNapi::Transition* incomingTransition // The transition that leads to this node
         );
 
+
+        /// Recursive helper for createDotFile; runs a dfs through the graph printing each node and edge to the output stream
+        void createDotFileRecursively(GraphNode* v,
+                                      fstream& os,
+                                      std::map<GraphNode*, bool>&) const;
     public:
 
         /// basic constructor
         Graph();
 
         /// basic deconstructor
-        ~Graph();
+        virtual ~Graph();
 
         /// adds a node to the graph
         void addNode(GraphNode* node);
 
         /// creates a new node in the graph
-        GraphNode* addNode(const std::string& nodeName, GraphNodeColor color = BLUE);
+        GraphNode* addNode(const string& nodeName, GraphNodeColor color = BLUE);
 
         /// creates a new edge in the graph
-        void addEdge(const std::string& srcName,
-                     const std::string& dstName,
-                     const std::string& label);
+        void addEdge(const string& srcName,
+                     const string& dstName,
+                     const string& label);
 
         /// returns true if a node with the given name was found
-        bool hasNodeWithName(const std::string& nodeName) const;
+        bool hasNodeWithName(const string& nodeName) const;
 
         /// retruns a node with the given name, or NULL else
-        GraphNode* getNodeWithName(const std::string& nodeName) const;
+        GraphNode* getNodeWithName(const string& nodeName) const;
 
         /// returns a pointer to the root node
         GraphNode* getRoot() const;
@@ -113,24 +118,23 @@ class Graph {
         void setRoot(GraphNode* newRoot);
 
         /// sets the root node to the one with the given name
-        void setRootToNodeWithName(const std::string& nodeName);
+        void setRootToNodeWithName(const string& nodeName);
 
         /// retruns true if the graph's root node is NULL
         bool hasNoRoot() const;
 
-        /// dfs through the graph printing each node and edge to the output stream
-        void printGraphToDot(GraphNode* v,
-                             fstream& os,
-                             std::map<GraphNode*, bool>&) const;
-
-        /// creates a dot output of the graph and calls dot to create an image from it
-        void printDotFile(const std::string& filenamePrefix) const;
-
-        /// creates a dot output of the graph and calls dot to create an image from it
-        void printDotFile(const std::string& filenamePrefix,
-                          const std::string& dotGraphTitle) const;
 
 
+        /// Creates a dot output (.out) of the graph, using the filename as title.
+        virtual string createDotFile(string& filenamePrefix) const;
+
+        /// creates a dot output (.out) of the graph, using a specified title.
+        virtual string createDotFile(string& filenamePrefix,
+                                     const string& dotGraphTitle) const;
+
+		/// calls dot to create an image file (.png) of a given dot file (.out)
+		virtual string createPNGFile(string& filenamePrefix,
+                         		     string& dotFileName) const;
 
 		/// tests if this OG is acyclic
         bool isAcyclic();

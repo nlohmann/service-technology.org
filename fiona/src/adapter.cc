@@ -301,7 +301,7 @@ void Adapter::readRules(PNapi::PetriNet * rewriter)
         adapt_rules_yyin = fopen(adapterRulesFile.c_str(), "r");
         if (!adapt_rules_yyin) {
             cerr << "cannot open rules file '" << adapterRulesFile << "' for reading'\n" << endl;
-            exit(4);
+            exit(EC_NO_RULES_FILE);
         }
         adapt_rules_yyparse();
     }

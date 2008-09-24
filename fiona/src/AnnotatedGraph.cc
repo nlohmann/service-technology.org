@@ -51,8 +51,8 @@
 
 using namespace std;
 
-//extern std::list<std::string> netfiles;
-//extern std::list<std::string> ogfiles;
+//extern std::list<string> netfiles;
+//extern std::list<string> ogfiles;
 
 
 //! \brief a basic constructor of AnnotatedGraph
@@ -75,13 +75,13 @@ AnnotatedGraph::~AnnotatedGraph() {
 
 
 //! \brief returns the name of the graph's source file
-std::string AnnotatedGraph::getFilename() {
+string AnnotatedGraph::getFilename() {
     return filename;
 }
 
 
 //! \brief returns the name of the graph's source file
-void AnnotatedGraph::setFilename(std::string filename) {
+void AnnotatedGraph::setFilename(string filename) {
     this->filename = filename;
 }
 
@@ -107,7 +107,7 @@ void AnnotatedGraph::setRoot(AnnotatedGraphNode* newRoot) {
 
 //! \brief sets the root node of the graph to one matching the given name
 //! \param nodeName a string containing the name of the node to become the new root
-void AnnotatedGraph::setRootToNodeWithName(const std::string& nodeName) {
+void AnnotatedGraph::setRootToNodeWithName(const string& nodeName) {
     setRoot(getNodeWithName(nodeName));
 }
 
@@ -124,7 +124,7 @@ void AnnotatedGraph::addNode(AnnotatedGraphNode* node) {
 //! \param GraphFormula a pointer to a GraphFormula being the annotation of the new node
 //! \param color color of the node
 //! \return returns a pointer to the created AnnotatedGraphNode
-AnnotatedGraphNode* AnnotatedGraph::addNode(const std::string& nodeName,
+AnnotatedGraphNode* AnnotatedGraph::addNode(const string& nodeName,
                                             GraphFormula* annotation,
                                             GraphNodeColor color) {
 
@@ -144,7 +144,7 @@ void AnnotatedGraph::clearNodeSet() {
 //! \brief checks if the graph has a node with the given name
 //! \param nodeName the name to be matched
 //! \return returns true if a node with the given name exists, else false
-bool AnnotatedGraph::hasNodeWithName(const std::string& nodeName) const {
+bool AnnotatedGraph::hasNodeWithName(const string& nodeName) const {
     return getNodeWithName(nodeName) != NULL;
 }
 
@@ -152,7 +152,7 @@ bool AnnotatedGraph::hasNodeWithName(const std::string& nodeName) const {
 //! \brief returns a pointer to the node that matches a given name, or NULL else
 //! \param nodeName the name to be matched
 //! \return returns a pointer to the found node or NULL
-AnnotatedGraphNode* AnnotatedGraph::getNodeWithName(const std::string& nodeName) const {
+AnnotatedGraphNode* AnnotatedGraph::getNodeWithName(const string& nodeName) const {
 
     for (nodes_const_iterator node_iter = setOfNodes.begin();
          node_iter != setOfNodes.end(); ++node_iter) {
@@ -170,9 +170,9 @@ AnnotatedGraphNode* AnnotatedGraph::getNodeWithName(const std::string& nodeName)
 //! \param srcName a string containing the name of the source node
 //! \param dstNodeName a string containing the name of the destination node
 //! \param label a string containing the label of the edge
-void AnnotatedGraph::addEdge(const std::string& srcName,
-                             const std::string& dstNodeName,
-                             const std::string& label) {
+void AnnotatedGraph::addEdge(const string& srcName,
+                             const string& dstNodeName,
+                             const string& label) {
 
     AnnotatedGraphNode* src = getNodeWithName(srcName);
     AnnotatedGraphNode* dstNode = getNodeWithName(dstNodeName);
@@ -188,7 +188,7 @@ void AnnotatedGraph::addEdge(const std::string& srcName,
 //! \param label a string containing the label of the edge
 void AnnotatedGraph::addEdge(AnnotatedGraphNode * src,
                              AnnotatedGraphNode * dst,
-                             const std::string& label) {
+                             const string& label) {
 
     AnnotatedGraphEdge* transition = new AnnotatedGraphEdge(dst, label);
     src->addLeavingEdge(transition);
@@ -1216,10 +1216,10 @@ void AnnotatedGraph::minimizeGraph() {
         trace("\n\n");
 
         // the second parameter is false, since this OG has no underlying oWFN
-        printOGFile(outfilePrefix, false);
+        createOGFile(outfilePrefix, false);
         
         if (!parameters[P_NOPNG]) {
-            printDotFile(outfilePrefix + ".og");
+            createDotFile(outfilePrefix + ".og");
         }
     }
 */
@@ -1784,7 +1784,7 @@ AnnotatedGraph* AnnotatedGraph::product(const AnnotatedGraph* rhs) {
     AnnotatedGraphNode* currentOGNode = this->getRoot();
     AnnotatedGraphNode* currentRhsNode = rhs->getRoot();
 
-    std::string currentName;
+    string currentName;
     currentName = currentOGNode->getName() + "x"+ currentRhsNode->getName();
 
     GraphFormulaCNF* currentFormula = createProductAnnotation(currentOGNode,
@@ -1849,7 +1849,7 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
     assert(productOG->getRoot() != NULL);
 
     // iterate over all outgoing edges from current node of OG
-    std::string currentLabel;
+    string currentLabel;
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =
             currentOGNode->getLeavingEdgesConstIterator();
 
@@ -1863,7 +1863,7 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
         if (currentRhsNode->hasEdgeWithLabel(currentLabel)) {
 
             // remember the name of the old node of the product OG
-            std::string currentName;
+            string currentName;
             currentName = currentOGNode->getName() + "x"
                     + currentRhsNode->getName();
             assert(productOG->hasNodeWithName(currentName));
@@ -1877,7 +1877,7 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
 
             // build the new node of the product OG
             // that has name and annotation constructed from current nodes of OG and rhs OG
-            std::string newProductName;
+            string newProductName;
             newProductName = newOGNode->getName() + "x"+ newRhsNode->getName();
             // if the node is new, add that node to the OG
             AnnotatedGraphNode* found =
@@ -1938,7 +1938,7 @@ GraphFormulaCNF* AnnotatedGraph::createProductAnnotation(
 //!        product OG output file.
 //! \param ogfiles a set of the filenames of the used OGs
 //! \return returns a string for the name of the product og
-std::string AnnotatedGraph::getProductOGFilePrefix(const ogfiles_t& ogfiles) {
+string AnnotatedGraph::getProductOGFilePrefix(const ogfiles_t& ogfiles) {
     assert(ogfiles.size() != 0);
 
     ogfiles_t::const_iterator iOgFile = ogfiles.begin();
@@ -1956,7 +1956,7 @@ std::string AnnotatedGraph::getProductOGFilePrefix(const ogfiles_t& ogfiles) {
 //! \brief strips the OG file suffix from filename and returns the result
 //! \param filename name of the og file
 //! \param returns the filename without suffix
-std::string AnnotatedGraph::stripOGFileSuffix(const std::string& filename) {
+string AnnotatedGraph::stripOGFileSuffix(const std::string& filename) {
 
     static const string ogFileSuffix = ".og";
     if (filename.substr(filename.size() - ogFileSuffix.size()) == ogFileSuffix) {
@@ -1967,18 +1967,20 @@ std::string AnnotatedGraph::stripOGFileSuffix(const std::string& filename) {
 }
 
 
-//! \brief creates a dot output of the graph and calls dot to create an image from it
+//! \brief creates a dot output of the graph
 //! \param filenamePrefix a string containing the prefix of the output file name
 //! \param dotGraphTitle a title for the graph to be shown in the image
-void AnnotatedGraph::printDotFile(const std::string& filenamePrefix,
-                                  const std::string& dotGraphTitle) const {
+string AnnotatedGraph::createDotFile(string& filenamePrefix,
+                                  const string& dotGraphTitle) const {
 
     trace(TRACE_0, "creating the dot file of the OG...\n");
 
     string dotFile = filenamePrefix + ".out";
-    string pngFile = filenamePrefix + ".png";
-
     fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
+    if (!dotFileHandle.good()) {
+        dotFileHandle.close();
+        return "";
+    }
     dotFileHandle << "digraph g1 {\n";
     dotFileHandle << "graph [fontname=\"Helvetica\", label=\"";
     dotFileHandle << dotGraphTitle;
@@ -1987,31 +1989,51 @@ void AnnotatedGraph::printDotFile(const std::string& filenamePrefix,
     dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
     std::map<AnnotatedGraphNode*, bool> visitedNodes;
-    printGraphToDot(getRoot(), dotFileHandle, visitedNodes);
+    createDotFileRecursively(getRoot(), dotFileHandle, visitedNodes);
 
     dotFileHandle << "}";
     dotFileHandle.close();
     // ... dot file created (.out) //
 
-    if (parameters[P_TEX]) {
+	return dotFile;
+}
+
+//! \brief annotates a given dot output file and stores it to a .dot-File.
+//! \param filenamePrefix a string containing the prefix of the output file name
+//! \param dotFileName the base dot file
+string AnnotatedGraph::createAnnotatedDotFile(string& filenamePrefix, std::string& dotFileName) const {
+
         string annotatedDotFileName = filenamePrefix + ".dot";
         // annotate .dot file
-        system(("dot -Tdot " + dotFile + " -o " + annotatedDotFileName).c_str());
-    }
+        system(("dot -Tdot " + dotFileName + " -o " + annotatedDotFileName).c_str());
+
+		return annotatedDotFileName;
+}
+
+//! \brief calls dot to create an image (.png) of the given dot file (.out)
+//! \param filenamePrefix a string containing the prefix of the output file name
+//! \param dotFileName the base .out file
+string AnnotatedGraph::createPNGFile(string& filenamePrefix, std::string& dotFileName) const {
+
+    string pngFile = filenamePrefix + ".png";
 
     // prepare dot command line for printing
-    string cmd = "dot -Tpng \"" + dotFile + "\" -o \""+ pngFile + "\"";
+    string cmd = "dot -Tpng \"" + dotFileName + "\" -o \""+ pngFile + "\"";
 
     // print commandline and execute system command
     trace(TRACE_0, cmd + "\n\n");
     system(cmd.c_str());
+    
+    return pngFile;
+    
 }
 
 
-//! \brief creates a dot output of the graph and calls dot to create an image from it
+
+//! \brief creates a dot output of the graph, uses the filename as title.
 //! \param filenamePrefix a string containing the prefix of the output file name
-void AnnotatedGraph::printDotFile(const std::string& filenamePrefix) const {
-    printDotFile(filenamePrefix, filenamePrefix);
+string AnnotatedGraph::createDotFile(string& filenamePrefix) const {
+    return createDotFile(filenamePrefix, filenamePrefix);
 }
 
 
@@ -2019,7 +2041,7 @@ void AnnotatedGraph::printDotFile(const std::string& filenamePrefix) const {
 //! \param v current node in the iteration process
 //! \param os output stream
 //! \param visitedNodes maps nodes to Bools remembering already visited nodes
-void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v, fstream& os,
+void AnnotatedGraph::createDotFileRecursively(AnnotatedGraphNode* v, fstream& os,
         std::map<AnnotatedGraphNode*, bool>& visitedNodes) const {
 
 
@@ -2045,7 +2067,7 @@ void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v, fstream& os,
 
         visitedNodes[v] = true;
 
-        std::string currentLabel;
+        string currentLabel;
 
 
         AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =
@@ -2064,7 +2086,7 @@ void AnnotatedGraph::printGraphToDot(AnnotatedGraphNode* v, fstream& os,
             os << "p"<< v->getName() << "->"<< "p"<< successor->getName()
                     << " [label=\""<< currentLabel
                     << "\", fontcolor=black, color= blue];\n";
-            printGraphToDot(successor, os, visitedNodes);
+            createDotFileRecursively(successor, os, visitedNodes);
         }
         delete edgeIter;
     }
@@ -2136,13 +2158,17 @@ void AnnotatedGraph::computeInterfaceRecursively(AnnotatedGraphNode* v,
 //! \param hasOWFN gives true if this Annotated Graph is also a Communication Graph
 //!                that contains it's oWFN. Important to determine whether a true
 //!                annotated node is the empty node or not.
-void AnnotatedGraph::printOGFile(const std::string& filenamePrefix, bool hasOWFN) const {
+string AnnotatedGraph::createOGFile(const string& filenamePrefix, bool hasOWFN) const {
 
-    trace(TRACE_5, "AnnotatedGraph::printOGFile(): start\n");
+    trace(TRACE_5, "AnnotatedGraph::createOGFile(): start\n");
     trace(TRACE_1, "creating .og file for " + filenamePrefix + "\n");
 
     fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(), ios_base::out | ios_base::trunc);
 
+    if (!ogFile.good()) {
+            ogFile.close();
+            exit(EC_FILE_ERROR);
+    }
     if (hasNoRoot()) {
         // print file for empty OG
         ogFile << "NODES" << endl << "  0 : " << GraphFormulaLiteral::FALSE
@@ -2151,7 +2177,7 @@ void AnnotatedGraph::printOGFile(const std::string& filenamePrefix, bool hasOWFN
                 << endl;
 
         ogFile.close();
-        return;
+        return addOGFileSuffix(filenamePrefix);
     }
 
     ogFile << "INTERFACE" << endl;
@@ -2236,14 +2262,16 @@ void AnnotatedGraph::printOGFile(const std::string& filenamePrefix, bool hasOWFN
 
     ogFile.close();
 
-    trace(TRACE_5, "AnnotatedGraph::printOGFile(): end\n");
+    trace(TRACE_5, "AnnotatedGraph::createOGFile(): end\n");
+    
+    return addOGFileSuffix(filenamePrefix);
 }
 
 
 //! \brief adds the suffix ".og" to a string
 //! \param filePrefix a string to be modified
 //! \return returns the string with the og suffix
-std::string AnnotatedGraph::addOGFileSuffix(const std::string& filePrefix) {
+string AnnotatedGraph::addOGFileSuffix(const std::string& filePrefix) {
     return filePrefix + ".og";
 }
 
@@ -2377,7 +2405,7 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
 
     // prepare deadlock creation
     AnnotatedGraphNode* deadlock = NULL;
-    map<std::string, AnnotatedGraphNode*> deadlockMap;
+    map<string, AnnotatedGraphNode*> deadlockMap;
     unsigned int currNumberOfDeadlocks = 0;
 
     // gather created nodes in order to add it to the graph
@@ -2398,11 +2426,11 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
 
         // Simplify the annotation so only literals that matter are left over
         currNode->getAnnotation()->simplify();
-        std::string currAnnotation = currNode->getAnnotation()->asString();
+        string currAnnotation = currNode->getAnnotation()->asString();
 
         // If !a is disabled in q of OG, add ?a->Deadlock in q of dual service
         // preparation: assume all receive events are disabled in current node (dual service)
-        set<std::string> disabledRecvEvents = recvEvents;
+        set<string> disabledRecvEvents = recvEvents;
 
         // preparation: we need to gather outgoing sending transitions
         // which do not appear in the current nodes annotation
@@ -2417,7 +2445,7 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
                 currNode->getLeavingEdgesIterator();
         while (edge_iter->hasNext()) {
             AnnotatedGraphEdge* currEdge = edge_iter->getNext();
-            std::string currLabel = currEdge->getLabel();
+            string currLabel = currEdge->getLabel();
 
             // act on transition type
             switch (currEdge->getType()) {
@@ -2434,7 +2462,7 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
 
                     // if the current edges label does not appear, this is a
                     // nonAnnotatedSendingEvent
-                    if (currAnnotation.find(currLabel) == std::string::npos) {
+                    if (currAnnotation.find(currLabel) == string::npos) {
                         currLabel[0] = '!';
                         sendingEventsNotInAnnotation.insert(currLabel);
                     } else {
@@ -2451,7 +2479,7 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
 
         // iterate over all disabled receive events and create an
         // arc to this node's deadlock node for every such event
-        for (set<std::string>::iterator event_iter = disabledRecvEvents.begin(); event_iter
+        for (set<string>::iterator event_iter = disabledRecvEvents.begin(); event_iter
                 != disabledRecvEvents.end(); ++event_iter) {
 
             if (options[O_PV_MULTIPLE_DEADLOCKS]) {
@@ -2554,7 +2582,7 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
     if (!options[O_PV_MULTIPLE_DEADLOCKS]) {
         this->addNode(deadlock);
     } else {
-        map<std::string, AnnotatedGraphNode*>::iterator deadlockIter;
+        map<string, AnnotatedGraphNode*>::iterator deadlockIter;
         for (deadlockIter = deadlockMap.begin(); deadlockIter
                 != deadlockMap.end(); ++deadlockIter) {
             this->addNode(deadlockIter->second);
@@ -2618,7 +2646,7 @@ void AnnotatedGraph::transformOGToService(Graph* cleanPV) {
         GraphNode* copiedNode;
 
         // gather all relevent informatiion
-        std::string stringVal;
+        string stringVal;
         stringVal.assign((*copyNode)->getName());
         GraphNodeColor colorVal = (*copyNode)->getColor();
         unsigned int numberVal = (*copyNode)->getNumber();
@@ -2692,7 +2720,7 @@ bool isDiamond(AnnotatedGraphNode * node,
     std::map< AnnotatedGraphNode*, bool> inQueue;
     std::list< AnnotatedGraphNode*> diamond;
     std::map< AnnotatedGraphNode*, bool> seen;
-    std::map< AnnotatedGraphNode*, std::multiset< std::string> > messages;
+    std::map< AnnotatedGraphNode*, std::multiset< string> > messages;
     AnnotatedGraphNode* q_end= NULL;
 
     testNodes.push(node);
@@ -2718,7 +2746,7 @@ bool isDiamond(AnnotatedGraphNode * node,
                 AnnotatedGraphEdge * edge = preNodes->getNext();
                 AnnotatedGraphNode * preNode = edge->getDstNode();
                 cerr << "    | | +- " << preNode->getNumber() << endl;
-                std::string event = edge->getLabel();
+                string event = edge->getLabel();
                 GraphFormulaCNF * preFormula = preNode->getAnnotation()->getDeepCopy();
                 GraphFormulaCNF * formula = dnode->getAnnotation()->getDeepCopy();
 
@@ -2746,7 +2774,7 @@ bool isDiamond(AnnotatedGraphNode * node,
                     messages[dnode] = messages[preNode];
                     messages[dnode].insert(edge->getLabelWithoutPrefix());
                 } else {
-                    std::multiset< std::string> secset = messages[preNode];
+                    std::multiset< string> secset = messages[preNode];
                     secset.insert(edge->getLabelWithoutPrefix());
                     if (secset != messages[dnode]) {
                         return false;
@@ -3053,6 +3081,10 @@ string AnnotatedGraph::printGraphToSTG(vector<string>& edgeLabels) {
 
     // create STG file, print header, transition information and then add buffered graph information
     fstream STGFileStream(STGFileName.c_str(), ios_base::out | ios_base::trunc | ios_base::binary);
+    if (!STGFileStream.good()) {
+            STGFileStream.close();
+            exit(EC_FILE_ERROR);
+    } 
     STGFileStream << ".model Labeled_Transition_System" << "\n";
     STGFileStream << ".dummy";
     for (int i = 0; i < (int)edgeLabels.size(); i++)
@@ -3139,6 +3171,31 @@ void AnnotatedGraph::printGraphToSTGRecursively(AnnotatedGraphNode * v,
     delete edgeIter;
 }
 
+
+string AnnotatedGraph::getSuffix() const {
+	
+	string suffix = "";
+	
+    if (!options[O_CALC_ALL_STATES]) {
+        suffix += ".R";
+    }
+    if (parameters[P_RESPONSIVE]) {
+        suffix += ".responsive";
+    }
+    if (parameters[P_DIAGNOSIS]) {
+        suffix += ".diag";
+    } else {
+        if (parameters[P_OG]) {
+            suffix += ".og";
+        } else {
+            suffix += ".ig";
+        }
+    }
+    
+    return suffix;
+
+
+}
 
 /**** TRANSFERRED FROM COMMUNICATIONGRAPH END ****/
 

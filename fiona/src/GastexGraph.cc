@@ -171,9 +171,9 @@ void GasTexGraph::makeGasTex(string texFileName) {
 
     // open the texFile for writing
     fstream texFile(texFileName.c_str(), ios_base::out | ios_base::trunc);
-    if (!texFile) {
-        cerr << "cannot write to file " << texFileName << endl;
-        exit(4);
+    if (!texFile.good()) {
+        texFile.close();
+        exit(EC_FILE_ERROR);
     }
 
     // setting standard values for layout (from dot2tex.h)

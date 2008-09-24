@@ -79,7 +79,7 @@ void Graph::addNode(GraphNode* node) {
 //! \param nodeName a string containing the name of the new node
 //! \param color color of the node
 //! \return returns a pointer to the created GraphNode
-GraphNode* Graph::addNode(const std::string& nodeName,
+GraphNode* Graph::addNode(const string& nodeName,
                           GraphNodeColor color) {
 
     GraphNode* node = new GraphNode(nodeName, color, setOfNodes.size());
@@ -92,9 +92,9 @@ GraphNode* Graph::addNode(const std::string& nodeName,
 //! \param srcName a string containing the name of the source node
 //! \param dstNodeName a string containing the name of the destination node
 //! \param label a string containing the label of the edge
-void Graph::addEdge(const std::string& srcName,
-                    const std::string& dstNodeName,
-                    const std::string& label) {
+void Graph::addEdge(const string& srcName,
+                    const string& dstNodeName,
+                    const string& label) {
 
     GraphNode* src = getNodeWithName(srcName);
     GraphNode* dstNode = getNodeWithName(dstNodeName);
@@ -107,7 +107,7 @@ void Graph::addEdge(const std::string& srcName,
 //! \brief checks if the graph has a node with the given name
 //! \param nodeName the name to be matched
 //! \return returns true if a node with the given name exists, else false
-bool Graph::hasNodeWithName(const std::string& nodeName) const {
+bool Graph::hasNodeWithName(const string& nodeName) const {
     return getNodeWithName(nodeName) != NULL;
 }
 
@@ -115,7 +115,7 @@ bool Graph::hasNodeWithName(const std::string& nodeName) const {
 //! \brief returns a pointer to the node that matches a given name, or NULL else
 //! \param nodeName the name to be matched
 //! \return returns a pointer to the found node or NULL
-GraphNode* Graph::getNodeWithName(const std::string& nodeName) const {
+GraphNode* Graph::getNodeWithName(const string& nodeName) const {
 
     for (nodes_const_iterator node_iter = setOfNodes.begin();
          node_iter != setOfNodes.end(); ++node_iter) {
@@ -145,7 +145,7 @@ void Graph::setRoot(GraphNode* newRoot) {
 
 //! \brief sets the root node of the graph to one matching the given name
 //! \param nodeName a string containing the name of the node to become the new root
-void Graph::setRootToNodeWithName(const std::string& nodeName) {
+void Graph::setRootToNodeWithName(const string& nodeName) {
     setRoot(getNodeWithName(nodeName));
 }
 
@@ -240,17 +240,20 @@ bool Graph::isAcyclic() {
 }
 
 
-//! \brief creates a dot output of the graph and calls dot to create an image from it
+//! \brief creates a dot output of the graph
 //! \param filenamePrefix a string containing the prefix of the output file name
 //! \param dotGraphTitle a title for the graph to be shown in the image
-void Graph::printDotFile(const std::string& filenamePrefix,
-                         const std::string& dotGraphTitle) const {
+string Graph::createDotFile(string& filenamePrefix,
+                         const string& dotGraphTitle) const {
 
     trace(TRACE_0, "creating the dot file of the graph...\n");
     
     string dotFile = filenamePrefix + ".out";
-    string pngFile = filenamePrefix + ".png";
     fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
+    if (!dotFileHandle.good()) {
+        dotFileHandle.close();
+        exit(EC_FILE_ERROR);
+    }
     dotFileHandle << "digraph g1 {\n";
     dotFileHandle << "graph [fontname=\"Helvetica\", label=\"";
     dotFileHandle << dotGraphTitle;
@@ -259,10 +262,32 @@ void Graph::printDotFile(const std::string& filenamePrefix,
     dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
     std::map<GraphNode*, bool> visitedNodes;
-    printGraphToDot(getRoot(), dotFileHandle, visitedNodes);
+    createDotFileRecursively(getRoot(), dotFileHandle, visitedNodes);
 
     dotFileHandle << "}";
     dotFileHandle.close();
+
+    return dotFile;
+    
+}
+
+//! \brief creates a dot output of the graph, using the filename as title.
+//! \param filenamePrefix a string containing the prefix of the output file name
+string Graph::createDotFile(string& filenamePrefix) const {
+    return createDotFile(filenamePrefix, filenamePrefix);
+}
+
+
+//! \brief calls dot to create an image (.png) of the given dot file (.out)
+//! \param filenamePrefix a string containing the prefix of the output file name
+//! \param dotFileName the base .out file
+string Graph::createPNGFile(string& filenamePrefix,
+                         	string& dotFileName) const {
+
+    trace(TRACE_0, "creating the png file of the dot file...\n");
+    
+    string dotFile = filenamePrefix + ".out";
+    string pngFile = filenamePrefix + ".png";
 
     // prepare dot command line for printing
     string cmd = "dot -Tpng \"" + dotFile + "\" -o \""+ pngFile + "\"";
@@ -270,23 +295,20 @@ void Graph::printDotFile(const std::string& filenamePrefix,
     // print commandline and execute system command
     trace(TRACE_0, cmd + "\n\n");
     system(cmd.c_str());
+    
+    return pngFile;
+    
 }
 
-
-//! \brief creates a dot output of the graph and calls dot to create an image from it
-//! \param filenamePrefix a string containing the prefix of the output file name
-void Graph::printDotFile(const std::string& filenamePrefix) const {
-    printDotFile(filenamePrefix, filenamePrefix);
-}
 
 
 //! \brief dfs through the graph printing each node and edge to the output stream
 //! \param v current node in the iteration process
 //! \param os output stream
 //! \param visitedNodes maps nodes to Bools remembering already visited nodes
-void Graph::printGraphToDot(GraphNode* v,
-                            fstream& os,
-                            std::map<GraphNode*, bool>& visitedNodes) const {
+void Graph::createDotFileRecursively(GraphNode* v,
+                                     fstream& os,
+                                     std::map<GraphNode*, bool>& visitedNodes) const {
 
     if (v == NULL) {
         // print the empty OG...
@@ -306,7 +328,7 @@ void Graph::printGraphToDot(GraphNode* v,
         os << "];\n";
         visitedNodes[v] = true;
 
-        std::string currentLabel;
+        string currentLabel;
 
         GraphNode::LeavingEdges::ConstIterator edgeIter =
             v->getLeavingEdgesConstIterator();
@@ -322,7 +344,7 @@ void Graph::printGraphToDot(GraphNode* v,
             os << "p"<< v->getName() << "->"<< "p"<< successor->getName()
                     << " [label=\""<< currentLabel
                     << "\", fontcolor=black, color= blue];\n";
-            printGraphToDot(successor, os, visitedNodes);
+            createDotFileRecursively(successor, os, visitedNodes);
         }
         delete edgeIter;
     }

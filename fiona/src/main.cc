@@ -126,8 +126,9 @@ unsigned int numberOfEvents;
 //! \brief an exit function in case the memory is exhausted
 void myown_newhandler() {
     cerr << "new failed, memory exhausted"<< endl;
-    exit(2);
+    exit(EC_MEMORY_EXHAUSTED);
 }
+
 
 
 //! \brief reads an oWFN from owfnfile
@@ -148,7 +149,7 @@ void readnet(const std::string& owfnfile) {
     else owfn_yyin = fopen(owfnfile.c_str(), "r");
     if (!owfn_yyin) {
         cerr << "cannot open owfn file " << owfnfile << "' for reading'\n" << endl;
-        exit(4);
+        exit(EC_FILE_ERROR);
     }
     // diagnosefilename = owfnfile;
 
@@ -225,7 +226,7 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     og_yyin = fopen(ogfile.c_str(), "r");
     if (!og_yyin) {
         cerr << "cannot open OG file '" << ogfile << "' for reading'\n" << endl;
-        exit(4);
+        exit(EC_FILE_ERROR);
     }
     OGToParse = new AnnotatedGraph();
     ogfileToParse = ogfile; // for debug - declaration in debug.cc
@@ -348,7 +349,7 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix) {
     dot_yyin = fopen((dotFileName).c_str(), "r");
     if (!dot_yyin) {
         cerr << "cannot open dot file '" << dotFileName << "' for reading'\n" << endl;
-        exit(4);
+        exit(EC_FILE_ERROR);
     }
 
     // clear the graph holding the parsed informations
@@ -372,102 +373,22 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix) {
 }
 
 
-//! \brief create a GasTex file of the given IG/OG
-//! \param graph the IG/OG to generate a GasTex file from
-void makeGasTex(CommunicationGraph* graph) {
-
-    trace(TRACE_1, "Internal translation of the graph into GasTex format...\n");
-
-    string outfilePrefixWithOptions = options[O_OUTFILEPREFIX] ? outfilePrefix : graph->getFilename();
-
-    if (!options[O_CALC_ALL_STATES]) {
-        outfilePrefixWithOptions += ".R";
-    }
-
-    if (parameters[P_DIAGNOSIS]) {
-        outfilePrefixWithOptions += ".diag";
-    } else {
-        if (parameters[P_OG]) {
-            outfilePrefixWithOptions += ".og";
-        } else {
-            outfilePrefixWithOptions += ".ig";
-        }
-    }
-
-    string outFileName = outfilePrefixWithOptions + ".dot";
-
-    dot_yylineno = 1;
-    dot_yydebug = 0;
-
-    // try to open the dot file for reading
-    dot_yyin = fopen((outFileName).c_str(), "r");
-    if (!dot_yyin) {
-        cerr << "cannot open graph file '" << outFileName << "' for reading'\n" << endl;
-        exit(4);
-    }
-
-    // clear the graph holding the parsed informations
-    if (gastexGraph) {
-        delete gastexGraph;
-    }
-
-    // preparing the global variable gastexGraph for parsing
-    gastexGraph = new GasTexGraph();
-
-    // parsing the dot file into variable gastexGraph
-    dot_yyparse();
-
-    fclose(dot_yyin);
-
-    string texFileName = outfilePrefixWithOptions + ".tex";
-
-    // writing gastexGraph to new tex file
-    gastexGraph->makeGasTex(texFileName);
-
-    trace(TRACE_0, texFileName + " generated\n");
+//! \brief creates all output files with respect to the parameters
+//! \param g An object of AnnotatedGraph, CommunicationGraph, IG or OG
+//! type. 
+void createOutputFiles(AnnotatedGraph* graph, string prefix) {
+  
+   string dotFileName = graph->createDotFile(prefix); // .out
+   
+   if (!parameters[P_NOPNG]  && dotFileName != "") {
+       graph->createPNGFile(prefix, dotFileName);
+   }		         
+   
+   if (parameters[P_TEX] && dotFileName != "") {
+        string annotatedDotFileName = graph->createAnnotatedDotFile(prefix, dotFileName); // .dot
+        makeGasTex(annotatedDotFileName, prefix);
+   }  
 }
-
-
-//! \brief create a GasTex file of the given IG/OG
-//! \param graph the IG/OG to generate a GasTex file from
-//! \param fileNamePrefix the filenameprefix for adding .dot and .tex, resp.
-//!        fileNamePrefix.dot is assumed to exist (as a layout annotated dot file)
-void makeGasTex(AnnotatedGraph* graph, string fileNamePrefix) {
-
-    trace(TRACE_1, "Internal translation of the graph into GasTex format...\n");
-
-    string dotFileName = fileNamePrefix + ".dot";
-    string texFileName = fileNamePrefix + ".tex";
-
-    dot_yylineno = 1;
-    dot_yydebug = 0;
-
-    // try to open the dot file for reading
-    dot_yyin = fopen((dotFileName).c_str(), "r");
-    if (!dot_yyin) {
-        cerr << "cannot open annotated dot file '" << dotFileName << "' for reading'\n" << endl;
-        exit(4);
-    }
-
-    // clear the graph holding the parsed informations
-    if (gastexGraph) {
-        delete gastexGraph;
-    }
-
-    // preparing the global variable gastexGraph for parsing
-    gastexGraph = new GasTexGraph();
-
-    // parsing the dot file into variable gastexGraph
-    dot_yyparse();
-
-    fclose(dot_yyin);
-
-    // writing gastexGraph to new tex file
-    gastexGraph->makeGasTex(texFileName);
-
-    trace(TRACE_0, texFileName + " generated\n");
-}
-
 
 //! \brief generate a public view for a given og
 //! \param OG an og to generate the public view of
@@ -497,7 +418,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
     outfilePrefix += ".pv.sa";
 
     // create an empty graph to be made the public view
-    Graph* cleanPV = new Graph();
+    AnnotatedGraph* cleanPV = new AnnotatedGraph();
 
     // give the graph to the OG to be generated from
     OG->transformToPublicView(cleanPV, fromOWFN);
@@ -510,9 +431,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
             trace(TRACE_0, "the public view service automaton is to big to generate a dot file\n\n");
         } else {
             trace(TRACE_0, "generating dot output...\n");
-
-            // .out
-            cleanPV->printDotFile(outfilePrefix, "public view of " + graphName);
+            createOutputFiles(cleanPV, outfilePrefix);
         }
 
         // create sets for transferring the interface from the original owfn
@@ -541,7 +460,10 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
         ofstream output;
         const string owfnOutput = AnnotatedGraph::stripOGFileSuffix(graphName) + ".pv.owfn";
         output.open (owfnOutput.c_str(),ios::out);
-
+        if (!output.good()) {
+            output.close();
+            exit(EC_FILE_ERROR);
+        }
         (output) << (*PVoWFN);
         output.close();
 
@@ -623,11 +545,9 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
 
         if (!parameters[P_EQ_R]) {    // don't create png if we are in eqr mode
             // generate output files
-            graph->printGraphToDot(); // .out, .png
-
-            if (parameters[P_TEX]) {
-                makeGasTex(graph);
-            }
+			string basefilename = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
+            basefilename += graph->getSuffix();
+            createOutputFiles(graph, basefilename);
         }
 
 /* create also an .og file to enable comparison of different IGs */
@@ -646,7 +566,7 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
 
         // the second parameter is true, since the oWFN this IG was generated
         // from still exists and additional information are available
-        graph->printOGFile(igFilename, true);
+        graph->createOGFile(igFilename, true);
     }
 
     return graph;
@@ -914,11 +834,9 @@ string computeOG(oWFN* PN) {
         }
 
         if (!parameters[P_EQ_R]) {    // don't create png if we are in eqr mode
-             graph->printGraphToDot(); // .out, .png
-
-            if (parameters[P_TEX]) {
-                makeGasTex(graph);
-            }
+			string basefilename = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
+            basefilename += graph->getSuffix();
+            createOutputFiles(graph, basefilename);           
         }
 
         if (options[O_OUTFILEPREFIX]) {
@@ -933,14 +851,14 @@ string computeOG(oWFN* PN) {
 
         // the second parameter is true, since the oWFN this OG was generated
         // from still exists and additional information are available
-        graph->printOGFile(ogFilename, true);
+        graph->createOGFile(ogFilename, true);
         //vector<string> edgeLabels;                        // renamend transitions
         if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
             computeMostPermissivePartner(graph);
         }
 
         if (options[O_OTF]) {
-            //graph->bdd->printGraphToDot();
+            //graph->bdd->createDotFile();
             graph->bdd->save("OTF");
         }
     }
@@ -952,7 +870,7 @@ string computeOG(oWFN* PN) {
         seconds2 = time (NULL);
         cout << difftime(seconds2, seconds) << " s consumed for building and reordering the BDDs" << endl;
 
-        //graph->bdd->printGraphToDot();
+        //graph->bdd->createDotFile();
         if (!options[O_NOOUTPUTFILES]) {
             graph->bdd->save();
         }
@@ -1013,8 +931,10 @@ void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace("\n\n");
 
         // the second parameter is false, since this OG has no underlying oWFN
-        productOG->printOGFile(outfilePrefix, false);
-        productOG->printDotFile(outfilePrefix);
+        productOG->createOGFile(outfilePrefix, false);
+        string dotFileName = productOG->createDotFile(outfilePrefix);
+        productOG->createPNGFile(outfilePrefix, dotFileName);
+
         trace("\n");
     }
 
@@ -1402,7 +1322,7 @@ void makePNG(oWFN* PN) {
         // check whether the stream was succesfully created
         if (!out->is_open()) {
             trace(TRACE_0, "File \"" + dotFileName + "\" could not be opened for writing access!\n");
-            exit(-1);
+           exit(EC_FILE_ERROR);
         }
 
         // create the dot and write it to the file
@@ -1421,7 +1341,7 @@ void makePNG(oWFN* PN) {
                 trace(TRACE_0, (outFileName + ".dot generated\n\n"));
             } else {
                 trace(TRACE_0, "error: Dot exited with non zero value! here\n\n");
-                exit(-1);
+                exit(EC_DOT_ERROR);
             }
 
             // transforming .dot file into gastex format
@@ -1481,7 +1401,10 @@ void reduceOWFN(oWFN* PN) {
         ofstream output;
         const string owfnOutput = outFileName + ".reduced.owfn";
         output.open (owfnOutput.c_str(),ios::out);
-
+        if (!output.good()) {
+            output.close();
+            exit(EC_FILE_ERROR);
+        }
         (output) << (*PNapiNet);
         output.close();
     }
@@ -1527,6 +1450,10 @@ void normalizeOWFN(oWFN* PN) {
         ofstream output;
         const string owfnOutput = outFileName.erase((outFileName.size()-5), outFileName.size()) + ".normalized.owfn";
         output.open (owfnOutput.c_str(), ios::out);
+        if (!output.good()) {
+            output.close();
+            exit(EC_FILE_ERROR);
+        }
 
         (output) << (*PNapiNet);
         output.close();
@@ -1750,13 +1677,8 @@ int main(int argc, char** argv) {
                     trace("\n\n");
 
                     // the second parameter is false, since no oWFN is given
-                    readOG->printOGFile(ogFilename, false);
-
-                    readOG->printDotFile(ogFilename); // .out, .png
-
-                    if (parameters[P_TEX]) {
-                        makeGasTex(readOG, ogFilename);
-                    }
+                    readOG->createOGFile(ogFilename, false);
+                    createOutputFiles(readOG, ogFilename);
                 }
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 delete readOG;
@@ -1840,7 +1762,7 @@ int main(int argc, char** argv) {
                     if (!options[O_NOOUTPUTFILES]) {
                     trace(TRACE_0, "\nCreating new .og-file without false nodes... \n");
                     // the second parameter is false, since the read OG has no underlying oWFN
-                    readOG->printOGFile(newFilename, false);
+                    readOG->createOGFile(newFilename, false);
                     trace(TRACE_0, "New .og-file '" + newFilename + ".og' succesfully created.\n\n");
                 }
 
@@ -1864,7 +1786,7 @@ int main(int argc, char** argv) {
                 } else {
                     newFilename = readOG->getFilename();
                 }
-                readOG->printDotFile(newFilename);
+                createOutputFiles(readOG, newFilename);
                 readOG->computeAndPrintGraphStatistics();
                 delete readOG;
             }

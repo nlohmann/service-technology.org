@@ -278,7 +278,7 @@ void printErrorInvalidNumberForOptionAndExit(const std::string& option,
          << "\tEnter \"fiona --help\" for more information.\n"
          << endl;
 
-    exit(1);
+    exit(EC_BAD_CALL);
 }
 
 
@@ -407,7 +407,7 @@ void parse_command_line(int argc, char* argv[]) {
                     cerr << "Error:\twrong debug mode" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
-                    exit(1);
+                    exit(EC_BAD_CALL);
                 }
                 break;
             case 't': {
@@ -529,7 +529,7 @@ void parse_command_line(int argc, char* argv[]) {
                     cerr << "Error:\t\"" << optarg << "\" is a wrong modus operandi (option -t)" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
-                    exit(1);
+                    exit(EC_BAD_CALL);
                 }
                 break;
             }
@@ -581,7 +581,7 @@ void parse_command_line(int argc, char* argv[]) {
                     cerr << "Error:\twrong show option" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
-                    exit(1);
+                    exit(EC_BAD_CALL);
                 }
                 break;
             case 'b':
@@ -594,7 +594,7 @@ void parse_command_line(int argc, char* argv[]) {
                     cerr << "Error:\twrong BDD reorder method" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
-                    exit(1);
+                    exit(EC_BAD_CALL);
                 }
                 break;
             case 'B':
@@ -609,7 +609,7 @@ void parse_command_line(int argc, char* argv[]) {
                     cerr << "Error:\twrong BDD reorder method" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
-                    exit(1);
+                    exit(EC_BAD_CALL);
                 }
                 break;
             case 'o':
@@ -620,7 +620,7 @@ void parse_command_line(int argc, char* argv[]) {
                     cerr << "Error:\toutput filename prefix missing" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
-                    exit(1);
+                    exit(EC_BAD_CALL);
                 }
                 break;
             case 'Q':
@@ -680,7 +680,7 @@ void parse_command_line(int argc, char* argv[]) {
                 } else {
                     cerr << "Error:\twrong parameter (option -p)" << endl
                     << "\tEnter \"fiona --help\" for more information.\n" << endl;
-                    exit(1);
+                    exit(EC_BAD_CALL);
                 }
                 break;
             }
@@ -692,14 +692,14 @@ void parse_command_line(int argc, char* argv[]) {
                     cerr << "Error:\toutput filename prefix missing" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
-                    exit(1);
+                    exit(EC_BAD_CALL);
                 }
                 break;
             case '?':
                 cerr << "Error:\toption error" << endl
                      << "\tEnter \"fiona --help\" for more information.\n"
                      << endl;
-                exit(1);
+                exit(EC_BAD_CALL);
             default:
                 cerr << "Warning:\tUnknown option ignored" << endl
                      << "\tEnter \"fiona --help\" for more information.\n"
@@ -778,21 +778,21 @@ void parse_command_line(int argc, char* argv[]) {
     if (ogfiles.size() == 0 && netfiles.size() == 0 && dotfiles.size() == 0) {
         cerr << "Error: \t No oWFNs or OGs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
     if (parameters[P_MINIMIZE_OG] && ogfiles.size() == 0) {
         cerr << "Error: \t If option '-t minimizeOG' is used, at least one OG" << endl;
         cerr << "       \t file must be given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
     if (parameters[P_GASTEX] && dotfiles.size() != 1) {
         cerr << "Error: \t If option '-t tex' is used, exactly one annotated dot " << endl;
         cerr << "       \t file must be given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
     if (parameters[P_EX] && (((netfiles.size() + ogfiles.size()) != 2)
@@ -801,63 +801,63 @@ void parse_command_line(int argc, char* argv[]) {
         cerr << "       \t given or (in case of BDD-equivalence) exactly two oWFNs have to be" << endl;
         cerr << "       \t entered and their BDDs must have been computed before." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
     if ((parameters[P_REDUCE] || parameters[P_IG] || parameters[P_OG]) &&
         !parameters[P_SYNTHESIZE_PARTNER_OWFN] && netfiles.size() == 0) {
         cerr << "Error: \t No oWFNs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
     if ( parameters[P_SYNTHESIZE_PARTNER_OWFN] && (parameters[P_IG] || parameters[P_OG]) &&
          ogfiles.size() == 0 && netfiles.size() == 0) {
         cerr << "Error: \t No oWFNs or OGs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
     if ((parameters[P_ADAPTER] || parameters[P_SMALLADAPTER]) && netfiles.size() < 2) {
         cerr << "Error: \t No oWFNs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
     if (parameters[P_PNG] && netfiles.size() == 0 && ogfiles.size() == 0) {
         cerr << "Error: \t No oWFNs or OGs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
     
     if (parameters[P_MATCH] && ogfiles.size() != 1) {
         cerr << "Error: \t Exactly one operating guideline must be given for matching!\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
     if (parameters[P_PRODUCTOG] && ogfiles.size() < 2) {
         cerr << "Error: \t Give at least two OGs to build their product!\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
     if (parameters[P_SIMULATES] && ((netfiles.size() + ogfiles.size()) != 2)) {
         cerr << "Error: \t If option -t simulation is used, exactly two OG/oWFN files must be entered\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
     if (parameters[P_READ_OG] && ogfiles.size() < 1) {
         cerr << "Error: \t If option -t readOG is used, at least one OG file must be entered\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
     if (options[O_EVENT_USE_MAX] == false && options[O_MESSAGES_MAX] == false) {
         cerr << "Error: \t if no limit for using events is given, you must specify a message bound via option -m " << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
     if (options[O_BDD] && parameters[P_OG] == false && parameters[P_EX] == false) {
@@ -868,7 +868,7 @@ void parse_command_line(int argc, char* argv[]) {
     if (ogfiles.size() == 0 && netfiles.size() == 0 && parameters[P_PV]) {
         cerr << "Error:\tNo OGs or oWFNs given. Public View Service Automaton cannot be generated." << endl
              << "\tEnter \"fiona --help\" for more information.\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
     if (!parameters[P_PV] && options[O_PV_MULTIPLE_DEADLOCKS]) {
@@ -879,7 +879,7 @@ void parse_command_line(int argc, char* argv[]) {
     if (!parameters[P_PRODUCTOG] && !parameters[P_SIMULATES] &&
         !parameters[P_EX] && options[O_OUTFILEPREFIX] && (ogfiles.size() > 1 || netfiles.size() > 1)) {
         cerr << "Error: \t The output option cannot be used if multiple output files are to be created!\n" << endl;
-        exit(1);
+        exit(EC_BAD_CALL);
     }
 
 }
@@ -894,7 +894,7 @@ FileType getFileType(const std::string& fileName) {
     if (!fileStream) {
         cerr << "Error:\tCould not open '" << fileName << "' for reading.\n"
              << endl;
-        exit(1);
+        exit(EC_FILE_ERROR);
     }
 
     string line = "";

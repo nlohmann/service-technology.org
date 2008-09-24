@@ -264,7 +264,7 @@ void owfnTransition::fire(oWFN * PN) {
                     << decrPlace.getMultiplicity() << endl;
             cerr << "number of states calculated so far: "<< State::state_count
                     << endl;
-            _exit(4);
+            _exit(EC_CAPACITY_EXCEEDED);
         } else {
             PN->CurrentMarking[PN->getPlaceIndex(decrOwfnPlace)] -= decrPlace.getMultiplicity();
         }

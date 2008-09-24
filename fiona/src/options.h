@@ -115,6 +115,18 @@ typedef enum {
     P_SINGLE                    //!< state reduction in node using single marking as representative
 } possibleParameters;
 
+// EXIT CODE CONSTANTS
+const unsigned short int EC_FILE_ERROR = 4;
+const unsigned short int EC_NO_RULES_FILE = 4;
+const unsigned short int EC_NO_CUDD_FILE = 4;
+const unsigned short int EC_CAPACITY_EXCEEDED = 4;
+const unsigned short int EC_BDD_ERROR = 1;
+const unsigned short int EC_MEMORY_EXHAUSTED = 5;
+const unsigned short int EC_UNREACHABLE_LINE = 1;
+const unsigned short int EC_DOT_ERROR = 1;
+const unsigned short int EC_BAD_CALL = 2;
+
+
 
 // some file names and pointers (in options.cc)
 // different modes controlled by command line (in options.cc)

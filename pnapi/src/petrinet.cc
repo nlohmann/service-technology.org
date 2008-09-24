@@ -1549,7 +1549,7 @@ Place *PetriNet::findPlace(string role) const
 {
   map< std::string, Node* >::const_iterator p = roleMap.find(role);
   
-  if ((p != roleMap.end()) && (p->second->nodeType == PLACE))
+  if ((p != roleMap.end()) && (p->second != NULL) && (p->second->nodeType == PLACE))
     return (static_cast<Place *>(p->second));
   else
   {

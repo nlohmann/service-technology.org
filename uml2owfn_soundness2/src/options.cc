@@ -130,6 +130,7 @@ void print_help()
 	trace("    filter              filter out infeasible processes from the library\n");
 	trace("    log                 write a log file for the translation\n");
 	trace("    taskfile            write analysis task to a separate file\n");
+	trace("    anon                anonymize the process output\n");
 	trace("\n");
 	trace("  FORMAT is one of the following (multiple formats permitted):\n");
 	trace("    lola, owfn, dot, pep, tpn, apnn, ina, spin, info, pnml, txt, info\n");
@@ -294,6 +295,8 @@ void parse_command_line(int argc, char* argv[])
 				globals::parameters[P_TASKFILE] = true;
 			else if (parameter == "log")
 				globals::parameters[P_LOG] = true;
+			else if (parameter == "anon")
+			  globals::parameters[P_ANONYMIZE] = true;
 			else {
 				trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
 				trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");
@@ -468,12 +471,14 @@ void parse_command_line(int argc, char* argv[])
 		}
 	}
 
-	if (options[O_INPUT])
-	{
+	// -------------------------------------------------------------------------
+	//  print information about the current configuration
+	// -------------------------------------------------------------------------
+
+	if (options[O_INPUT]) {
 		trace(TRACE_INFORMATION, " - input is read from \"" + globals::filename + "\"\n");
 	}
-	if (options[O_OUTPUT])
-	{
+	if (options[O_OUTPUT]) {
 		trace(TRACE_INFORMATION, " - output files will be named \"" + globals::output_filename + ".<ext>\"\n");
 	}
 
@@ -504,6 +509,12 @@ void parse_command_line(int argc, char* argv[])
         trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
       }
     }
+    if (globals::analysis[A_WF_NET]) {
+      trace(TRACE_INFORMATION, "creating a workflow net with a final AND-join\n");
+      if (!globals::analysis[A_SOUNDNESS]) {
+        trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
+      }
+    }
 	}
 
 	if (options[O_PARAMETER]) {
@@ -513,6 +524,8 @@ void parse_command_line(int argc, char* argv[])
 			trace(TRACE_INFORMATION, "write analysis task in separate files\n");
 		if (globals::parameters[P_LOG])
 			trace(TRACE_INFORMATION, "write log file\n");
+		if (globals::parameters[P_ANONYMIZE])
+		  trace(TRACE_INFORMATION, "anonymize output\n");
 	}
 }
 

@@ -253,14 +253,16 @@ string getOutputFilename_net (possibleFormats format) {
  */
 void write_net_file(analysis_t analysis)
 {
-    trace(TRACE_DEBUG, "-> writing Petri net to file\n");
-    // now the net will not change any more, thus the nodes are re-enumerated
-    // and the maximal occurrences of the nodes are calculated.
-// <Dirk.F start>
-    //DO NOT RE-ENUMERATE PLACES
-    //PN.reenumerate();
-// <Dirk.F end>
-    //  PN.calculate_max_occurrences();
+  trace(TRACE_DEBUG, "-> writing Petri net to file\n");
+
+  // now the net will not change anymore, re-enumerate nodes of the net
+  // to anonymize it
+  if (globals::parameters[P_ANONYMIZE]) {
+    PN.reenumerate();
+    PN.anonymizeNodes();
+  }
+
+  //  PN.calculate_max_occurrences();
   cerr << PN.information() << endl;
 
 
@@ -951,7 +953,7 @@ int main( int argc, char *argv[])
 
     if (frontend_nerrs == 0)
     {
-    	//log_println("NET;CORRECT SYNTAX;SYNTAX ERROR");
+    	//log_println("NET;CORRECT SYNTAX;SYNTAX ERROR;NUM NODES;NUM EDGES;AVG INDEGREE; AVG OUTDEGREE");
 	    int processTranslated = 0; int processNum = 0;
 	    for(set<Block*>::iterator process = globals::processes.begin(); process != globals::processes.end(); process++)
 	    {
@@ -971,13 +973,15 @@ int main( int argc, char *argv[])
 	    	//if the process was filtered, dont create an output at all
 	    	if ((*process)->syntaxError) {
 	    		trace(TRACE_WARNINGS, "translation error: skipping process " + (*process)->name + "\n");
-	    		log_println(";false;translation error");
+	    		log_print(";false;translation error");
+	        log_println(";NaN;NaN;NaN;NaN");
 	    		continue;
 	    	}
 
 	    	if ((*process)->isComplexEmpty()) {
 	    		trace(TRACE_WARNINGS, "[ERROR] process has no contents, skipping process " + (*process)->name + "\n");
-	    		log_println(";false;empty process");
+	    		log_print(";false;empty process");
+	    		log_println(";"+(*process)->statistics_toString());
 	    		continue;
 	    	}
 
@@ -991,7 +995,8 @@ int main( int argc, char *argv[])
 	    	//if the process was filtered, dont create an output at all
 	    	if (globals::parameters[P_FILTER] && (*process)->filtered) {
 	    		trace(TRACE_WARNINGS, "filtering on: skipping process " + (*process)->name + "\n");
-	    		log_println(";false;overlapping");
+	    		log_print(";false;overlapping");
+	    		log_println(";"+(*process)->statistics_toString());
 	    		continue;
 	    	}
 
@@ -1003,67 +1008,56 @@ int main( int argc, char *argv[])
 	    	if (globals::parameters[P_FILTER] && (*process)->filtered)
 	    	{
 	    		trace(TRACE_WARNINGS, "filtering on: skipping process " + (*process)->name + " because of wrong pin multiplicities\n");
-	    		log_println(";false;multiplicities");
+	    		log_print(";false;multiplicities");
+	    		log_println(";"+(*process)->statistics_toString());
 	    		continue;
 	    	}
 
-	        // DECOMPOSITION
-	        // Decomposition is currently not in use, due to
-	        // a missing algorithm that would allow to turn a
-	        // structurally decomposed net into a meaningful process
+#ifdef BOM_DECOMPOSION
+	      // Decomposition is currently not in use, due to
+        // a missing algorithm that would allow to turn a
+        // structurally decomposed net into a meaningful process
 
-	        // Testroles for cutting
-	        // set<string> testStrings;
-	        // testStrings.insert("Hmn32Rls##Customer");
+        // Testroles for cutting
+         set<string> testStrings;
+         testStrings.insert("Hmn32Rls##Customer");
 
-	        // Functions to spread roles, cut the net and
-	        // turn it into a working process (incomplete)
-	        // (*process)->adjustRoles();
-	        // (*process)->cutNet(testStrings, 2);
-	        // (*process)->disableStart();
-	        // (*process)->disableEnd();
+        // Functions to spread roles, cut the net and
+        // turn it into a working process (incomplete)
+        (*process)->adjustRoles();
+        (*process)->cutNet(testStrings, 2);
+        (*process)->disableStart();
+        (*process)->disableEnd();
+#endif // BOM_DECOMPOSITION
 
-	    	translationResult_t res;
-	    	/*
- 	    	if (globals::analysis[A_DEADLOCKS] && globals::analysis[A_LIVELOCKS]) {
-	    		// cannot check for deadlock and livelocks at once,
-	    		// create two dedicated nets
- 	    		globals::multi_analysis = true; // start multi analysis
-
-	    		analysis_t sub_analysis;
-
-	    		sub_analysis = globals::analysis; sub_analysis[A_LIVELOCKS] = false;
-	    		res = translate_process_reconcile(*process, sub_analysis);
-
-	    		if (res == RES_OK) {
-	    			sub_analysis = globals::analysis; sub_analysis[A_DEADLOCKS] = false;
-	    			res = translate_process_reconcile(*process, sub_analysis);
-	    		}
-
-	    		globals::multi_analysis = false; // done
-
-	    	} else*/ {
-	    		res = translate_process_reconcile(*process, globals::analysis);
-	    	}
+	    	// translate process wrt. the current analysis settings, if necessary,
+	    	// multiple translations and analyses for the same processes can be
+	    	// invoked, just add another call to translate_process_reconcile
+	    	// with different analysis settings
+        translationResult_t res;
+	    	res = translate_process_reconcile(*process, globals::analysis);
 
  	    	// evaluate translation result for this process
  	    	switch (res) {
  	    		case RES_OK:
  	 	    		processTranslated++;
- 	 	    		log_println(";true;---");
+ 	 	    		log_print(";true;---");
  	 	    		break;
  	    		case RES_EMPTY_PROCESS:
- 	    			log_println(";false;empty process");
+ 	    			log_print(";false;empty process");
  	    			break;
  	    		case RES_NOT_FREECHOICE:
  	    		  processTranslated++;
- 	    			log_println(";true;not free-choice");
+ 	    			log_print(";true;not free-choice");
  	    			break;
  	    		case RES_NO_WF_STRUCTURE:
  	    		  processTranslated++;
- 	    			log_println(";true;no workflow structure");
+ 	    			log_print(";true;no workflow structure");
  	    			break;
  	    	}
+
+ 	    	// add statistical values of the current process to the log
+ 	    	log_println(";"+(*process)->statistics_toString());
 
 	    } // for all processes
 	    write_script_file();		// write script file for the entire process library

@@ -169,6 +169,24 @@ Node* ExtendedWorkflowNet::isPathCovered() const {
 	return NULL;
 }
 
+/**
+ * \brief anonymize the roles of all nodes of the net by making the id of
+ *        each node its first role
+ */
+void ExtendedWorkflowNet::anonymizeNodes() {
+  int currentId = 1;
+
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    (*p)->history.push_front("p"+toString((*p)->id));
+  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+    (*p)->history.push_front("p"+toString((*p)->id));
+  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+    (*p)->history.push_front("p"+toString((*p)->id));
+
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+    (*t)->history.push_front("t"+toString((*t)->id));
+}
+
 /******************************************************************************
  * reduction rules on workflow nets
  *****************************************************************************/

@@ -76,7 +76,7 @@ BlockConnection::BlockConnection()
     enabled = true;
     roleCrossing = false;
     input = false;
-    
+
     tgt = NULL;
     src = NULL;
 }
@@ -182,7 +182,7 @@ void Block::filter()
 		return;
 	if (parent != NULL && parent->filtered)
 		return;
-	
+
     // check if the inputSets are overlapping
     set<string> alreadyUsedInputs;
     for (set<string>::iterator currentInputCriterion = inputCriteria.begin(); currentInputCriterion != inputCriteria.end(); currentInputCriterion++)
@@ -387,7 +387,7 @@ void Block::simpleOutput (string delay)
         }
     }
 */
-    
+
     if (children.size() != 0)
     {
         cerr << endl << delay << "  Der Prozess hat folgende Kinder!" << endl;
@@ -395,7 +395,7 @@ void Block::simpleOutput (string delay)
         {
             (*child)->simpleOutput((delay+ "    "));
         }
-        
+
         /*
         cerr << endl << delay << "  Der Prozess hat folgende Connections!" << endl;
         for (set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
@@ -404,11 +404,11 @@ void Block::simpleOutput (string delay)
             cerr << delay << "      ";
             if ((*con)->source != "")
             {
-                cerr << "sourceNode: \"" << (*con)->source << "\" " << endl << delay << "      " ; 
+                cerr << "sourceNode: \"" << (*con)->source << "\" " << endl << delay << "      " ;
             }
             if ((*con)->sourceContact != "")
             {
-                cerr << "sourceContactPoint: \"" << (*con)->sourceContact << "\" " ; 
+                cerr << "sourceContactPoint: \"" << (*con)->sourceContact << "\" " ;
             }
             cerr << endl << delay << "      ";
             if ((*con)->target != "")
@@ -417,7 +417,7 @@ void Block::simpleOutput (string delay)
             }
             if ((*con)->targetContact != "")
             {
-                cerr << "targetContactPoint: \"" << (*con)->targetContact << "\" " ; 
+                cerr << "targetContactPoint: \"" << (*con)->targetContact << "\" " ;
             }
             cerr << endl;
         }
@@ -433,19 +433,19 @@ void Block::transferName ()
 	//trace(TRACE_DEBUG, "setting name to: ");
     name=attributes["name"];
     //trace(TRACE_DEBUG, name+"\n");
-    
+
     if (complex) {
     	for (set<Block*>::iterator child = children.begin(); child != children.end(); child++) {
-    		
+
     		if (*child == this) {
     			trace(TRACE_ERROR, " [ERROR] node "+name+" has itself as child\n");
     			syntaxError = true;
     			return;
     		}
-    		
+
     		// resolve names of children
     		(*child)->transferName();
-    		
+
     		if ((*child)->syntaxError)	// inherit error value from child
     			syntaxError = true;
         }
@@ -459,7 +459,7 @@ void Block::transferName ()
  *        and callToService tasks
  */
 void Block::instantiateInterface(Block* sourceBlock) {
-	
+
 	for (set<string>::iterator input = sourceBlock->inputs.begin(); input != sourceBlock->inputs.end(); input++) {
 		//assert((*input) != st);
 		this->inputs.insert((*input));
@@ -485,15 +485,15 @@ void Block::instantiateInterface(Block* sourceBlock) {
 	this->inputCriterionSet = sourceBlock->inputCriterionSet;
 	this->outputCriterionSet = sourceBlock->outputCriterionSet;
 	this->criterionMap = sourceBlock->criterionMap;
-	
-	// the wrong multiplicities from the childs additional pins and 
+
+	// the wrong multiplicities from the childs additional pins and
 	// the tasks original pins need to be merged
 	this->wrongMultiplicity.insert(sourceBlock->wrongMultiplicity.begin(),sourceBlock->wrongMultiplicity.end());
-    
+
     for (set<string>::iterator additionalInput = this->additionalInputs.begin(); additionalInput != this->additionalInputs.end(); additionalInput++)
     {
     	//assert((*additionalInput) != NULL);
-        for (set<string>::iterator additionalInputCriterion = this->additionalInputSet[*additionalInput].begin(); additionalInputCriterion != this->additionalInputSet[*additionalInput].end(); additionalInputCriterion++) 
+        for (set<string>::iterator additionalInputCriterion = this->additionalInputSet[*additionalInput].begin(); additionalInputCriterion != this->additionalInputSet[*additionalInput].end(); additionalInputCriterion++)
         {
         	//assert((*additionalInputCriterion) != NULL);
         	this->inputCriterionSet[*additionalInputCriterion].insert(*additionalInput);
@@ -504,7 +504,7 @@ void Block::instantiateInterface(Block* sourceBlock) {
     for (set<string>::iterator additionalOutput = this->additionalOutputs.begin(); additionalOutput != this->additionalOutputs.end(); additionalOutput++)
     {
     	//assert((*additionalOutput) != NULL);
-        for (set<string>::iterator additionalOutputCriterion = this->additionalOutputSet[*additionalOutput].begin(); additionalOutputCriterion != this->additionalOutputSet[*additionalOutput].end(); additionalOutputCriterion++) 
+        for (set<string>::iterator additionalOutputCriterion = this->additionalOutputSet[*additionalOutput].begin(); additionalOutputCriterion != this->additionalOutputSet[*additionalOutput].end(); additionalOutputCriterion++)
         {
         	//assert((*additionalOutputCriterion) != NULL);
         	this->outputCriterionSet[*additionalOutputCriterion].insert(*additionalOutput);
@@ -520,7 +520,7 @@ void Block::instantiateInterface(Block* sourceBlock) {
 void Block::linkInserts()
 {
 	filter();	// check filtering criteria for this block
-	
+
     // Only do this, if this is a process
 	if (complex)
     {
@@ -528,7 +528,7 @@ void Block::linkInserts()
 		for (set<Block*>::iterator childIt = children.begin(); childIt != children.end(); childIt++) {
 			Block* child = (*childIt);
 			assert(child != NULL);
-			
+
 			// if the childblock is a call to task
 			if (child->type == CALLTOTASK)
 			{
@@ -539,7 +539,7 @@ void Block::linkInserts()
 					if ((*searchTask)->attributes["name"] == child->attributes["task"]) {
 						task = *searchTask;
 						break;
-					}                    
+					}
 				}
 				//assert(task != NULL);
 				if (task == NULL) {
@@ -573,7 +573,7 @@ void Block::linkInserts()
 			// if the childblock is a call to service
 			else if (child->type == CALLTOSERVICE)
 			{
-	
+
 				// search the referenced service in all global services
 				Block* service = NULL;
 				for ( set<Block*>::iterator searchService = globals::services.begin(); searchService != globals::services.end(); searchService++)
@@ -581,7 +581,7 @@ void Block::linkInserts()
 					if ((*searchService)->attributes["name"] == child->attributes["service"]) {
 						service = *searchService;
 						break;
-					}                    
+					}
 				}
 				//assert(service != NULL);
 				if (service == NULL) {
@@ -591,11 +591,11 @@ void Block::linkInserts()
 					child->instantiateInterface(service);
 				}
 			}
-	
+
 			// Now that all needed information are gathered, test
 		    // whether this child has overlapping input- and/or outputsets
 		    child->filter();
-	
+
 			// Copy all of the referenced tasks values to the callToTask- Block
 		    if(child->filtered == true) {
 		        filtered = true;
@@ -629,10 +629,10 @@ void Block::linkNodes()
         if((*con)->sourceContact == "")
         {
           cerr << "Ungültige Connection. Kein Ziel spezifiziert !" << endl;
-        } 
+        }
         else
         {
-          // Search the inputs of the process whether they match the sourceContact 
+          // Search the inputs of the process whether they match the sourceContact
           for (set<string>::iterator input = inputs.begin(); input != inputs.end(); input++)
           {
             // if a matching input could be found, this source is valid
@@ -642,7 +642,7 @@ void Block::linkNodes()
               (*con)->src = this;
               break;
             }
-          }                    
+          }
         }
       }
       else
@@ -663,7 +663,7 @@ void Block::linkNodes()
               break;
             }
           }
-        } 
+        }
         else
           // if a source contact is given as well
         {
@@ -725,10 +725,10 @@ void Block::linkNodes()
         if((*con)->targetContact == "")
         {
           cerr << "Ungültige Connection. Kein Ziel spezifiziert !" << endl;
-        } 
+        }
         else
         {
-          // Search the outputs of the process whether they match the targetContact 
+          // Search the outputs of the process whether they match the targetContact
           for (set<string>::iterator output = outputs.begin(); output != outputs.end(); output++)
           {
             // if a matching output could be found, this target is valid
@@ -738,7 +738,7 @@ void Block::linkNodes()
               (*con)->tgt = this;
               break;
             }
-          }                    
+          }
         }
       }
       else
@@ -756,10 +756,10 @@ void Block::linkNodes()
             {
               targetValid = true;
               (*con)->tgt = (*child);
-              break;                        
+              break;
             }
           }
-        } 
+        }
         else
           // if a source contact is given as well
         {
@@ -809,7 +809,7 @@ void Block::linkNodes()
             }
           }
         }
-      }      
+      }
 
       // if the target and the source both are valid, this connection is valid
       if (targetValid && sourceValid)
@@ -819,503 +819,26 @@ void Block::linkNodes()
       else
       {
         cerr<< "Connection konnte nicht gueltig gemacht werden." << endl;
-        cerr<< "Process:\"" << name << "\"" << endl;                
+        cerr<< "Process:\"" << name << "\"" << endl;
         cerr<< "Connectionname:\"" << (*con)->name << "\"" << endl;
         // <Dirk.F start> extended debug info
         if (!sourceValid)
           cerr << "[invalid source]" << endl;
         // <Dirk.F end>
-        cerr<< "SourceContact:\"" << (*con)->sourceContact << "\"" << endl;                
+        cerr<< "SourceContact:\"" << (*con)->sourceContact << "\"" << endl;
         cerr<< "SourceNode:\"" << (*con)->source << "\"" << endl;
 
         // <Dirk.F start> extended debug info
         if (!targetValid)
           cerr << "[invalid target]" << endl;
         // <Dirk.F end>
-        cerr<< "TargetContact:\"" << (*con)->targetContact << "\"" << endl;                
-        cerr<< "TargetNode:\"" << (*con)->target << "\"" << endl;                       
+        cerr<< "TargetContact:\"" << (*con)->targetContact << "\"" << endl;
+        cerr<< "TargetNode:\"" << (*con)->target << "\"" << endl;
       }
     }
 
   } // end if(complex)
 }
-
-/*
-//! \brief translates this block and all of its children into a petrinet
-//!        by following the pattern for each blocktype and then translating
-//!        all connections in the end
-//! \param PN petrinet to be filled with transitions, places and arcs
-//! \return returns zero in case that this block is not a process, thus cannot
-//!         be translated into a petrinet
-PetriNet* Block::returnSimpleNet(PetriNet* PN)
-{
-	// TODO re-factor this method, it is too long!
-	
-	// Only do this, if this block is a process
-    if(type == PROCESS) 
-    {
-    
-    //Create pointer to the current place and the current transition
-	Place* p;
-	Transition* t;
-	
-	// DECOMPOSITION: Important variable for decomposition
-	PN->realStartNode = NULL;
-
-	// create all input places of the process
-	for (set<string>::iterator input = inputs.begin(); input != inputs.end(); input++)
-	{
-		PN->newPlace(("process."+ name + ".input." +(*input)), IN);
-	}
-
-	// create all output places of the process
-	for (set<string>::iterator output = outputs.begin(); output != outputs.end(); output++)
-	{
-		PN->newPlace(("process."+ name + ".output." +(*output)), OUT);
-	}
-	
-	// iterate over all children of the process, translating every child
-	// by its types pattern
-	for (set<Block*>::iterator child = children.begin(); child != children.end(); child++)
-	{
-
-		// DECOMPOSITION: if not decomposed, all children are enabled
-		if(!(*child)->enabled)
-		{
-			continue;
-		}
-
-		// if the child is a startnode, use the startnode pattern
-		if ((*child)->type == STARTNODE)
-		{
-			p = PN->newPlace((name + ".startNode." + (*child)->name), INTERNAL);
-			p->mark();
-			(*child)->centralNode = p;
-			PN->realStartNode=p;
-		}
-
-		// if the child is a endnode, use the endnode pattern
-		if ((*child)->type == ENDNODE)
-		{
-			p = PN->newPlace((name + ".endNode." + (*child)->name), INTERNAL);
-// <Dirk.F start>, corrected end node semantics
-//			p->isFinal = true;
-            // a token on an end-node is consumed
-            t = PN->newTransition((name + ".t_endNode." + (*child)->name));
-            PN->newArc(p, t);
-// <Dirk.F end>             
-		}
-
-		// if the child is a stopnode, use the stopnode pattern
-		if ((*child)->type == STOPNODE)
-		{
-			p = PN->newPlace((name + ".stopNode." + (*child)->name), INTERNAL);
-// <Dirk.F start>, corrected stop node semantics
-//			p->isFinal = true;
-            // a token on a stop-node describes that the process has
-            // terminated - we need to detect this state, but it must not
-            // be a deadlock, make it a life-lock instead
-            t = PN->newTransition((name + ".t_stopNode." + (*child)->name));
-            PN->newArc(p, t);  // add a loop
-            PN->newArc(t, p);
-// <Dirk.F end>             
-		}
-
-		// now come a lot of blocktypes that are translated equally in their
-		// their patterns but need to be named correctly to their type
-		
-		// if the child is a callToProcess, use the task pattern
-		if ((*child)->type == CALLTOPROCESS)
-		{
-
-			t = PN->newTransition(("callToProcess." + (*child)->name + ".fire"));
-			for (set<string>::iterator input = (*child)->inputs.begin(); input != (*child)->inputs.end(); input++)
-			{
-				p = PN->newPlace(("callToProcess." + (*child)->name + ".input." + (*input)), INTERNAL);
-				PN->newArc(p,t);
-			}
-
-			for (set<string>::iterator output = (*child)->outputs.begin(); output != (*child)->outputs.end(); output++)
-			{
-				p = PN->newPlace(("callToProcess." + (*child)->name + ".output." + (*output)), INTERNAL);
-				PN->newArc(t,p);
-			}
-			for (set<string>::iterator additionalInput = (*child)->additionalInputs.begin(); additionalInput != (*child)->additionalInputs.end(); additionalInput++)
-			{
-				p = PN->newPlace(("callToProcess." + (*child)->name + ".additionalInput." + (*additionalInput)), INTERNAL);
-				PN->newArc(p,t);
-			}
-			for (set<string>::iterator additionalOutput = (*child)->additionalOutputs.begin(); additionalOutput != (*child)->additionalOutputs.end(); additionalOutput++)
-			{
-				p = PN->newPlace(("callToProcess." + (*child)->name + ".additionalOutput." + (*additionalOutput)), INTERNAL);
-				PN->newArc(t,p);
-			}
-		}
-
-		// if the child is a callToTask, use the task pattern
-		if ((*child)->type == CALLTOTASK)
-		{
-
-			t = PN->newTransition(("callToTask." + (*child)->name + ".fire"));
-			for (set<string>::iterator input = (*child)->inputs.begin(); input != (*child)->inputs.end(); input++)
-			{
-				p = PN->newPlace(("callToTask." + (*child)->name + ".input." + (*input)), INTERNAL);
-				PN->newArc(p,t);
-			}
-
-			for (set<string>::iterator output = (*child)->outputs.begin(); output != (*child)->outputs.end(); output++)
-			{
-				p = PN->newPlace(("callToTask." + (*child)->name + ".output." + (*output)), INTERNAL);
-				PN->newArc(t,p);
-			}
-			for (set<string>::iterator additionalInput = (*child)->additionalInputs.begin(); additionalInput != (*child)->additionalInputs.end(); additionalInput++)
-			{
-				p = PN->newPlace(("callToTask." + (*child)->name + ".additionalInput." + (*additionalInput)), INTERNAL);
-				PN->newArc(p,t);
-			}
-			for (set<string>::iterator additionalOutput = (*child)->additionalOutputs.begin(); additionalOutput != (*child)->additionalOutputs.end(); additionalOutput++)
-			{
-				p = PN->newPlace(("callToTask." + (*child)->name + ".additionalOutput." + (*additionalOutput)), INTERNAL);
-				PN->newArc(t,p);
-			}
-		}
-
-		// if the child is a callToService, use the task pattern
-		if ((*child)->type == CALLTOSERVICE)
-		{
-
-			t = PN->newTransition(("callToService." + (*child)->name + ".fire"));
-			for (set<string>::iterator input = (*child)->inputs.begin(); input != (*child)->inputs.end(); input++)
-			{
-				p = PN->newPlace(("callToService." + (*child)->name + ".input." + (*input)), INTERNAL);
-				PN->newArc(p,t);
-			}
-
-			for (set<string>::iterator output = (*child)->outputs.begin(); output != (*child)->outputs.end(); output++)
-			{
-				p = PN->newPlace(("callToService." + (*child)->name + ".output." + (*output)), INTERNAL);
-				PN->newArc(t,p);
-			}
-			for (set<string>::iterator additionalInput = (*child)->additionalInputs.begin(); additionalInput != (*child)->additionalInputs.end(); additionalInput++)
-			{
-				p = PN->newPlace(("callToService." + (*child)->name + ".additionalInput." + (*additionalInput)), INTERNAL);
-				PN->newArc(p,t);
-			}
-			for (set<string>::iterator additionalOutput = (*child)->additionalOutputs.begin(); additionalOutput != (*child)->additionalOutputs.end(); additionalOutput++)
-			{
-				p = PN->newPlace(("callToService." + (*child)->name + ".additionalOutput." + (*additionalOutput)), INTERNAL);
-				PN->newArc(t,p);
-			}
-		}
-		
-		// if the child is an observer, use the task pattern
-		if ((*child)->type == OBSERVER)
-		{
-
-			t = PN->newTransition(("observer." + (*child)->name + ".fire"));
-			for (set<string>::iterator input = (*child)->inputs.begin(); input != (*child)->inputs.end(); input++)
-			{
-				p = PN->newPlace(("observer." + (*child)->name + ".input." + (*input)), INTERNAL);
-				PN->newArc(p,t);
-			}
-
-			for (set<string>::iterator output = (*child)->outputs.begin(); output != (*child)->outputs.end(); output++)
-			{
-				p = PN->newPlace(("observer." + (*child)->name + ".output." + (*output)), INTERNAL);
-				PN->newArc(t,p);
-			}
-		}
-
-		// if the child is map, use the task pattern
-		if ((*child)->type == MAP)
-		{
-
-			t = PN->newTransition(("map." + (*child)->name + ".fire"));
-			for (set<string>::iterator input = (*child)->inputs.begin(); input != (*child)->inputs.end(); input++)
-			{
-				p = PN->newPlace(("map." + (*child)->name + ".input." + (*input)), INTERNAL);
-				PN->newArc(p,t);
-			}
-
-			for (set<string>::iterator output = (*child)->outputs.begin(); output != (*child)->outputs.end(); output++)
-			{
-				p = PN->newPlace(("map." + (*child)->name + ".output." + (*output)), INTERNAL);
-				PN->newArc(t,p);
-			}
-		}
-
-		// if the child is an timer, use the task pattern
-		if ((*child)->type == TIMER)
-		{
-
-			t = PN->newTransition(("timer." + (*child)->name + ".fire"));
-			for (set<string>::iterator input = (*child)->inputs.begin(); input != (*child)->inputs.end(); input++)
-			{
-				p = PN->newPlace(("timer." + (*child)->name + ".input." + (*input)), INTERNAL);
-				PN->newArc(p,t);
-			}
-
-			for (set<string>::iterator output = (*child)->outputs.begin(); output != (*child)->outputs.end(); output++)
-			{
-				p = PN->newPlace(("timer." + (*child)->name + ".output." + (*output)), INTERNAL);
-				PN->newArc(t,p);
-			}
-		}
-
-		// if the child is an notificationReceiver, use the task pattern
-		if ((*child)->type == NOTIFICATIONRECEIVER)
-		{
-
-			t = PN->newTransition(("notificationReceiver." + (*child)->name + ".fire"));
-			for (set<string>::iterator input = (*child)->inputs.begin(); input != (*child)->inputs.end(); input++)
-			{
-				p = PN->newPlace(("notificationReceiver." + (*child)->name + ".input." + (*input)), INTERNAL);
-				PN->newArc(p,t);
-			}
-
-			for (set<string>::iterator output = (*child)->outputs.begin(); output != (*child)->outputs.end(); output++)
-			{
-				p = PN->newPlace(("notificationReceiver." + (*child)->name + ".output." + (*output)), INTERNAL);
-				PN->newArc(t,p);
-			}
-		}
-
-		// if the child is an notificationBroadcaster, use the task pattern
-		if ((*child)->type == NOTIFICATIONBROADCASTER)
-		{
-
-			t = PN->newTransition(("notificationBroadcaster." + (*child)->name + ".fire"));
-			for (set<string>::iterator input = (*child)->inputs.begin(); input != (*child)->inputs.end(); input++)
-			{
-				p = PN->newPlace(("notificationBroadcaster." + (*child)->name + ".input." + (*input)), INTERNAL);
-				PN->newArc(p,t);
-			}
-
-			for (set<string>::iterator output = (*child)->outputs.begin(); output != (*child)->outputs.end(); output++)
-			{
-				p = PN->newPlace(("notificationBroadcaster." + (*child)->name + ".output." + (*output)), INTERNAL);
-				PN->newArc(t,p);
-			}
-		}
-
-		// if the child is a task, use the task pattern
-		if ((*child)->type == TASK)
-		{
-			t = PN->newTransition(("task." + (*child)->name + ".fire"));
-			for (set<string>::iterator input = (*child)->inputs.begin(); input != (*child)->inputs.end(); input++)
-			{
-				p = PN->newPlace(("task." + (*child)->name + ".input." + (*input)), INTERNAL);
-				PN->newArc(p,t);
-			}
-
-			for (set<string>::iterator output = (*child)->outputs.begin(); output != (*child)->outputs.end(); output++)
-			{
-				p = PN->newPlace(("task." + (*child)->name + ".output." + (*output)), INTERNAL);
-				PN->newArc(t,p);
-			}
-		}
-
-		// Now come the controlflow types, these are the most interesting
-		
-		// if the child is a decision, use the decision pattern
-		if ((*child)->type == DECISION)
-		{
-			map<string, bool> generated;
-			Place* central;
-			central = PN->newPlace(("decision." + (*child)->name + ".activated"), INTERNAL);
-			for (set<string>::iterator inputBranch = (*child)->inputBranches.begin(); inputBranch != (*child)->inputBranches.end(); inputBranch++)
-			{                   
-				t = PN->newTransition(("decision." + (*child)->name + ".activate." + (*inputBranch)));
-				for (set<string>::iterator input = (*child)->inputBranchSet[(*inputBranch)].begin(); input != (*child)->inputBranchSet[(*inputBranch)].end(); input++)
-				{
-					if (!generated[(*input)])
-					{
-						p = PN->newPlace(("decision." + (*child)->name + ".input." + (*input)), INTERNAL);
-						generated[(*input)] = true;
-					}
-					else
-					{
-						p =PN->findPlace(("decision." + (*child)->name + ".input." + (*input)));
-					}
-					PN->newArc(p,t);                        
-				}
-				PN->newArc(t,central);
-			}
-			for (set<string>::iterator outputBranch = (*child)->outputBranches.begin(); outputBranch != (*child)->outputBranches.end(); outputBranch++)
-			{                   
-				t = PN->newTransition(("decision." + (*child)->name + ".fire." + (*outputBranch)));
-				for (set<string>::iterator output = (*child)->outputBranchSet[(*outputBranch)].begin(); output != (*child)->outputBranchSet[(*outputBranch)].end(); output++)
-				{
-					if (!generated[(*output)])
-					{
-						p = PN->newPlace(("decision." + (*child)->name + ".output." + (*output)), INTERNAL);
-						generated[(*output)] = true;
-					}
-					else
-					{
-						p =PN->findPlace(("decision." + (*child)->name + ".output." + (*output)));
-					}
-					PN->newArc(t,p);                        
-				}
-				PN->newArc(central, t);
-			}
-		}
-
-		// if the child is a fork, use the fork pattern
-		if ((*child)->type == FORK)
-		{
-			map<string, bool> generated;
-			set<Place*> centrals;
-			for (set<string>::iterator outputBranch = (*child)->outputBranches.begin(); outputBranch != (*child)->outputBranches.end(); outputBranch++)
-			{
-				Place* central = PN->newPlace(("fork." + (*child)->name + ".activated." + (*outputBranch)), INTERNAL);
-				centrals.insert(central);                
-				t = PN->newTransition(("fork." + (*child)->name + ".fire." + (*outputBranch)));
-				for (set<string>::iterator output = (*child)->outputBranchSet[(*outputBranch)].begin(); output != (*child)->outputBranchSet[(*outputBranch)].end(); output++)
-				{
-					if (!generated[(*output)])
-					{
-						p = PN->newPlace(("fork." + (*child)->name + ".output." + (*output)), INTERNAL);
-						generated[(*output)] = true;
-					}
-					else
-					{
-						p =PN->findPlace(("fork." + (*child)->name + ".output." + (*output)));
-					}
-					PN->newArc(t,p);                        
-				}
-				PN->newArc(central, t);
-			}
-			for (set<string>::iterator inputBranch = (*child)->inputBranches.begin(); inputBranch != (*child)->inputBranches.end(); inputBranch++)
-			{                   
-				t = PN->newTransition(("fork." + (*child)->name + ".activate." + (*inputBranch)));
-				for (set<string>::iterator input = (*child)->inputBranchSet[(*inputBranch)].begin(); input != (*child)->inputBranchSet[(*inputBranch)].end(); input++)
-				{
-					if (!generated[(*input)])
-					{
-						p = PN->newPlace(("fork." + (*child)->name + ".input." + (*input)), INTERNAL);
-						generated[(*input)] = true;
-					}
-					else
-					{
-						p =PN->findPlace(("fork." + (*child)->name + ".input." + (*input)));
-					}
-					PN->newArc(p,t);                        
-				}
-
-				for (set<Place*>::iterator central = centrals.begin(); central != centrals.end(); central++)
-				{
-					PN->newArc(t,(*central));
-				}
-			}
-		}
-
-		// if the child is a merge, use the merge pattern
-		if ((*child)->type == MERGE)
-		{
-			map<string, bool> generated;
-			Place* central;
-			central = PN->newPlace(("merge." + (*child)->name + ".activated"), INTERNAL);
-			for (set<string>::iterator inputBranch = (*child)->inputBranches.begin(); inputBranch != (*child)->inputBranches.end(); inputBranch++)
-			{                   
-				t = PN->newTransition(("merge." + (*child)->name + ".activate." + (*inputBranch)));
-				for (set<string>::iterator input = (*child)->inputBranchSet[(*inputBranch)].begin(); input != (*child)->inputBranchSet[(*inputBranch)].end(); input++)
-				{
-					if (!generated[(*input)])
-					{
-						p = PN->newPlace(("merge." + (*child)->name + ".input." + (*input)), INTERNAL);
-						generated[(*input)] = true;
-					}
-					else
-					{
-						p =PN->findPlace(("merge." + (*child)->name + ".input." + (*input)));
-					}
-					PN->newArc(p,t);                        
-				}
-				PN->newArc(t,central);
-			}
-			for (set<string>::iterator outputBranch = (*child)->outputBranches.begin(); outputBranch != (*child)->outputBranches.end(); outputBranch++)
-			{                   
-				t = PN->newTransition(("merge." + (*child)->name + ".fire." + (*outputBranch)));
-				for (set<string>::iterator output = (*child)->outputBranchSet[(*outputBranch)].begin(); output != (*child)->outputBranchSet[(*outputBranch)].end(); output++)
-				{
-					if (!generated[(*output)])
-					{
-						p = PN->newPlace(("merge." + (*child)->name + ".output." + (*output)), INTERNAL);
-						generated[(*output)] = true;
-					}
-					else
-					{
-						p =PN->findPlace(("merge." + (*child)->name + ".output." + (*output)));
-					}
-					PN->newArc(t,p);                        
-				}
-				PN->newArc(central, t);
-			}
-		}
-
-		// if the child is a join, use the join pattern
-		if ((*child)->type == JOIN)
-		{
-			map<string, bool> generated;
-			set<Place*> centrals;
-			for (set<string>::iterator inputBranch = (*child)->inputBranches.begin(); inputBranch != (*child)->inputBranches.end(); inputBranch++)
-			{                   
-				t = PN->newTransition(("join." + (*child)->name + ".activate." + (*inputBranch)));
-				for (set<string>::iterator input = (*child)->inputBranchSet[(*inputBranch)].begin(); input != (*child)->inputBranchSet[(*inputBranch)].end(); input++)
-				{
-					if (!generated[(*input)])
-					{
-						p = PN->newPlace(("join." + (*child)->name + ".input." + (*input)), INTERNAL);
-						generated[(*input)] = true;
-					}
-					else
-					{
-						p =PN->findPlace(("join." + (*child)->name + ".input." + (*input)));
-					}
-					PN->newArc(p,t);                        
-				}
-
-				Place* central = PN->newPlace(("join." + (*child)->name + ".activated.", (*inputBranch)), INTERNAL);
-				centrals.insert(central);                
-				PN->newArc(t,(central));
-			}
-			for (set<string>::iterator outputBranch = (*child)->outputBranches.begin(); outputBranch != (*child)->outputBranches.end(); outputBranch++)
-			{
-				t = PN->newTransition(("join." + (*child)->name + ".fire." + (*outputBranch)));
-				for (set<string>::iterator output = (*child)->outputBranchSet[(*outputBranch)].begin(); output != (*child)->outputBranchSet[(*outputBranch)].end(); output++)
-				{
-					if (!generated[(*output)])
-					{
-						p = PN->newPlace(("join." + (*child)->name + ".output." + (*output)), INTERNAL);
-						generated[(*output)] = true;
-					}
-					else
-					{
-						p =PN->findPlace(("join." + (*child)->name + ".output." + (*output)));
-					}
-					PN->newArc(t,p);                        
-				}
-				for (set<Place*>::iterator central = centrals.begin(); central != centrals.end(); central++)
-				{
-					PN->newArc((*central), t);
-				}
-			}
-		}
-	}
-	
-	// now that all children of the process have been translated, they need to be
-	// connected
-	translateConnections(PN);
-	
-	// returns the ready petrinet.
-	return PN;    
-    
-    } // end if (this.type == PROCESS)
-    return NULL;
-}
-
-*/
 
 /*!
  * \brief	returns a string that can be used as a prefix for node-names
@@ -1335,20 +858,20 @@ const string Block::globalPrefixString() const {
 //!         be translated into a petrinet
 ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
 {
-    
+
     // Only do this, if this block is a process
-    if(type == PROCESS) 
+    if(type == PROCESS)
     {
-    
+
     //Create pointer to the current place and the current transition
     Place* p;
     Transition* t;
-    
+
     //bom->bom_nodes.insert(this);	// is a BOM-node of the process
 
     set<Transition*> startingTransitions;
     map<string, Node*> processCentralNodes;
-    
+
     // prefix for node names at the global level, e.g. inputCriteria etc.
     string globalPrefix = globalPrefixString();
 
@@ -1358,14 +881,14 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
         t = PN->newTransition(globalPrefix + "inputCriterion." +(*inputCriterion) + ".fire");
         startingTransitions.insert(t);
         bom->process_inputPinSets.insert(t);	// insert input pinset
-        
+
         p = PN->newPlace((globalPrefix + "inputCriterion." +(*inputCriterion) + ".used"), INTERNAL);
         processCentralNodes[*inputCriterion] = p;
         PN->newArc(t,p);
-        
+
         // is an 'input criterion used'-place
         bom->process_inputCriterion_used.insert(p);
-        
+
         for (set<string>::iterator inputOfThisCriterion = inputCriterionSet[*inputCriterion].begin(); inputOfThisCriterion != inputCriterionSet[*inputCriterion].end(); inputOfThisCriterion++)
         {
         	string placeName = globalPrefix + "input." +(*inputOfThisCriterion);
@@ -1374,20 +897,20 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
         	if (p == NULL) p = PN->newPlace(placeName, INTERNAL);
           PN->newArc(t,p);			// add arc from the inputCriterion-transition
           bom->pinPlaces.insert(p);	// process-side place is a pin to the process
-            
+
           placeName = globalPrefix + "trueInput." +(*inputOfThisCriterion);
           p = PN->findPlace(placeName);		// see if input place was already created
         	if (p == NULL) p = PN->newPlace(placeName, IN);
           PN->newArc(p,t);			// add arc to the inputCriterion-transition
         }
     }
-    
+
     // create all output places of the process
     for (set<string>::iterator outputCriterion = outputCriteria.begin(); outputCriterion != outputCriteria.end(); outputCriterion++)
     {
         t = PN->newTransition(globalPrefix + "outputCriterion." +(*outputCriterion) + ".fire");
         bom->process_outputPinSets.insert(t);	// insert output pinset
-        
+
         /*
         if (criterionMap[*outputCriterion].begin() == criterionMap[*outputCriterion].begin())
         {
@@ -1407,24 +930,25 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
         	if (p == NULL) p = PN->newPlace(placeName, INTERNAL);
           PN->newArc(p,t);
           bom->pinPlaces.insert(p);		// process-side place is a pin to the process
-          
+
           placeName = globalPrefix + "trueOutput." +(*outputOfThisCriterion);
           p = PN->findPlace(placeName);  	// see if output place was already created
           if (p == NULL) p = PN->newPlace(placeName, OUT);
           PN->newArc(t,p);
         }
     }
-    
+
     // iterate over all children of the process, translating every child
     // by its types pattern
     for (set<Block*>::iterator child = children.begin(); child != children.end(); child++)
     {
-
+#ifdef BOM_DECOMPOSTION
         // DECOMPOSITION: if not decomposed, all children are enabled
         if(!(*child)->enabled)
         {
             continue;
         }
+#endif // BOM_DECOMPOSITION
 
         // if the child is a startnode, use the startnode pattern
         if ((*child)->type == STARTNODE)
@@ -1452,7 +976,7 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
             p = PN->newPlace((globalPrefix + "stopNode." + (*child)->name), INTERNAL);
             bom->process_stopNodes.insert(p);		// is a stopNode
 // <Dirk.F start> distinguish net and verification property
-// TODO stop nodes are final if we check the net as an oWFN --> develop corresponding function 
+// TODO stop nodes are final if we check the net as an oWFN --> develop corresponding function
 // DONE stop nodes are looping if the net is used for soundness checking
 
             t = PN->newTransition((globalPrefix + "stopNode." + (*child)->name + ".eat"));
@@ -1466,7 +990,7 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
 
         // now come a lot of blocktypes that are translated equally in their
         // their patterns but need to be named correctly to their type
-        
+
         // if the child is a callToProcess, use the task pattern
         if ((*child)->type == CALLTOPROCESS ||
             (*child)->type == CALLTOTASK ||
@@ -1481,7 +1005,7 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
             map<string, Node*> inputMap;
             map<string, Node*> outputMap;
             map<string, Node*> centralMap;
-        	
+
             for (set<string>::iterator input = (*child)->inputs.begin(); input != (*child)->inputs.end(); input++)
             {
                 p = PN->newPlace(((*child)->returnType() + "." + (*child)->name + ".input." + (*input)), INTERNAL);
@@ -1497,18 +1021,18 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
                 bom->pinPlaces.insert(p);				// this place represents a pin
                 bom->process_internalPlaces.insert(p);	// is an internal place
             }
-            
+
 
             Transition* tNodeFire = PN->newTransition(((*child)->returnType() + "." + (*child)->name + ".fire"));
-            
+
             int num_inputCriteria = (*child)->inputCriteria.size();
             int num_outputCriteria = (*child)->outputCriteria.size();
-            
+
             if (num_inputCriteria > 1) {
                 Place* pNodeActive = PN->newPlace(((*child)->returnType() + "." + (*child)->name + ".activated"), INTERNAL);
                 PN->newArc(pNodeActive, tNodeFire);	// node can fire only if it is activated
                 bom->process_internalPlaces.insert(pNodeActive);	// internal place
-                
+
 	            for (set<string>::iterator inputCriterion = (*child)->inputCriteria.begin(); inputCriterion != (*child)->inputCriteria.end(); inputCriterion++)
 	            {
 	                Transition* tCriterionFire = PN->newTransition(((*child)->returnType() + "." + (*child)->name + ".inputCriterion." + (*inputCriterion) + ".fire"));
@@ -1535,12 +1059,12 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
             		PN->newArc(inputMap[*input], tNodeFire);
             	}
             }
-            
+
             if (num_outputCriteria > 1) {
                 Place* pNodeCompleted = PN->newPlace(((*child)->returnType() + "." + (*child)->name + ".completed"), INTERNAL);
                 PN->newArc(tNodeFire, pNodeCompleted);	// node completes only after it fired
                 bom->process_internalPlaces.insert(pNodeCompleted);	// internal place
-                
+
 	            for (set<string>::iterator outputCriterion = (*child)->outputCriteria.begin(); outputCriterion != (*child)->outputCriteria.end(); outputCriterion++)
 	            {
 	            	Transition* tCriterionFire = PN->newTransition(((*child)->returnType() + "." + (*child)->name + ".outputCriterion." + (*outputCriterion) + ".fire"));
@@ -1554,7 +1078,7 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
 		                    PN->newArc(centralMap[*relatedInputCriterion],tCriterionFire);
 		                }
 	            	}
-	            	
+
 	            	PN->newArc(pNodeCompleted, tCriterionFire);	// completion of task activates this criterion
 
 	            	// criterion produces on its output pins only
@@ -1571,7 +1095,7 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
         }
 
         // Now come the controlflow types, these are the most interesting
-        
+
         // if the child is a decision, use the decision pattern
         if ((*child)->type == DECISION)
         {
@@ -1579,9 +1103,9 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
             Place* central;
             central = PN->newPlace(("decision." + (*child)->name + ".activated"), INTERNAL);
             bom->process_internalPlaces.insert(central);	// is an internal place
-            
+
             for (set<string>::iterator inputBranch = (*child)->inputBranches.begin(); inputBranch != (*child)->inputBranches.end(); inputBranch++)
-            {                   
+            {
                 t = PN->newTransition(("decision." + (*child)->name + ".activate." + (*inputBranch)));
                 for (set<string>::iterator input = (*child)->inputBranchSet[(*inputBranch)].begin(); input != (*child)->inputBranchSet[(*inputBranch)].end(); input++)
                 {
@@ -1596,20 +1120,20 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
                     {
                         p = PN->findPlace(("decision." + (*child)->name + ".input." + (*input)));
                     }
-                    PN->newArc(p,t);                        
+                    PN->newArc(p,t);
                 }
                 PN->newArc(t,central);
             }
-            
+
             if ((*child)->attributes["isInclusive"] == "true")
             {
-                set<set<string> > powerSet;
-            	inclusiveDecisionPatternRecursively((*child), central, (*child)->outputBranches, "0", PN, bom, generated, powerSet);
+              set<set<string> > powerSet;
+              translateInclusiveDecisionPatternRecursively((*child), central, (*child)->outputBranches, "0", PN, bom, generated, powerSet);
             }
             else
             {
             	for (set<string>::iterator outputBranch = (*child)->outputBranches.begin(); outputBranch != (*child)->outputBranches.end(); outputBranch++)
-            	{                   
+            	{
             		t = PN->newTransition(("decision." + (*child)->name + ".fire." + (*outputBranch)));
             		for (set<string>::iterator output = (*child)->outputBranchSet[(*outputBranch)].begin(); output != (*child)->outputBranchSet[(*outputBranch)].end(); output++)
             		{
@@ -1624,7 +1148,7 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
             			{
             				p =PN->findPlace(("decision." + (*child)->name + ".output." + (*output)));
             			}
-            			PN->newArc(t,p);                        
+            			PN->newArc(t,p);
             		}
             		PN->newArc(central, t);
             	}
@@ -1639,9 +1163,9 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
             for (set<string>::iterator outputBranch = (*child)->outputBranches.begin(); outputBranch != (*child)->outputBranches.end(); outputBranch++)
             {
                 Place* central = PN->newPlace(("fork." + (*child)->name + ".activated." + (*outputBranch)), INTERNAL);
-                centrals.insert(central);    
+                centrals.insert(central);
                 bom->process_internalPlaces.insert(central);	// is an internal place
-                
+
                 t = PN->newTransition(("fork." + (*child)->name + ".fire." + (*outputBranch)));
                 for (set<string>::iterator output = (*child)->outputBranchSet[(*outputBranch)].begin(); output != (*child)->outputBranchSet[(*outputBranch)].end(); output++)
                 {
@@ -1656,12 +1180,12 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
                     {
                         p =PN->findPlace(("fork." + (*child)->name + ".output." + (*output)));
                     }
-                    PN->newArc(t,p);                        
+                    PN->newArc(t,p);
                 }
                 PN->newArc(central, t);
             }
             for (set<string>::iterator inputBranch = (*child)->inputBranches.begin(); inputBranch != (*child)->inputBranches.end(); inputBranch++)
-            {                   
+            {
                 t = PN->newTransition(("fork." + (*child)->name + ".activate." + (*inputBranch)));
                 for (set<string>::iterator input = (*child)->inputBranchSet[(*inputBranch)].begin(); input != (*child)->inputBranchSet[(*inputBranch)].end(); input++)
                 {
@@ -1676,7 +1200,7 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
                     {
                         p =PN->findPlace(("fork." + (*child)->name + ".input." + (*input)));
                     }
-                    PN->newArc(p,t);                        
+                    PN->newArc(p,t);
                 }
 
                 for (set<Place*>::iterator central = centrals.begin(); central != centrals.end(); central++)
@@ -1693,9 +1217,9 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
             Place* central;
             central = PN->newPlace(("merge." + (*child)->name + ".activated"), INTERNAL);
             bom->process_internalPlaces.insert(central);	// is an internal place
-            
+
             for (set<string>::iterator inputBranch = (*child)->inputBranches.begin(); inputBranch != (*child)->inputBranches.end(); inputBranch++)
-            {                   
+            {
                 t = PN->newTransition(("merge." + (*child)->name + ".activate." + (*inputBranch)));
                 for (set<string>::iterator input = (*child)->inputBranchSet[(*inputBranch)].begin(); input != (*child)->inputBranchSet[(*inputBranch)].end(); input++)
                 {
@@ -1710,12 +1234,12 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
                     {
                         p =PN->findPlace(("merge." + (*child)->name + ".input." + (*input)));
                     }
-                    PN->newArc(p,t);                        
+                    PN->newArc(p,t);
                 }
                 PN->newArc(t,central);
             }
             for (set<string>::iterator outputBranch = (*child)->outputBranches.begin(); outputBranch != (*child)->outputBranches.end(); outputBranch++)
-            {                   
+            {
                 t = PN->newTransition(("merge." + (*child)->name + ".fire." + (*outputBranch)));
                 for (set<string>::iterator output = (*child)->outputBranchSet[(*outputBranch)].begin(); output != (*child)->outputBranchSet[(*outputBranch)].end(); output++)
                 {
@@ -1730,7 +1254,7 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
                     {
                         p = PN->findPlace(("merge." + (*child)->name + ".output." + (*output)));
                     }
-                    PN->newArc(t,p);                        
+                    PN->newArc(t,p);
                 }
                 PN->newArc(central, t);
             }
@@ -1742,7 +1266,7 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
             map<string, bool> generated;
             set<Place*> centrals;
             for (set<string>::iterator inputBranch = (*child)->inputBranches.begin(); inputBranch != (*child)->inputBranches.end(); inputBranch++)
-            {                   
+            {
                 t = PN->newTransition(("join." + (*child)->name + ".activate." + (*inputBranch)));
                 for (set<string>::iterator input = (*child)->inputBranchSet[(*inputBranch)].begin(); input != (*child)->inputBranchSet[(*inputBranch)].end(); input++)
                 {
@@ -1757,11 +1281,11 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
                     {
                         p =PN->findPlace(("join." + (*child)->name + ".input." + (*input)));
                     }
-                    PN->newArc(p,t);                        
+                    PN->newArc(p,t);
                 }
 
                 Place* central = PN->newPlace(("join." + (*child)->name + ".activated." + (*inputBranch)), INTERNAL);
-                centrals.insert(central);                
+                centrals.insert(central);
                 PN->newArc(t,(central));
                 bom->process_internalPlaces.insert(central);	// is an internal place
             }
@@ -1781,7 +1305,7 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
                     {
                         p =PN->findPlace(("join." + (*child)->name + ".output." + (*output)));
                     }
-                    PN->newArc(t,p);                        
+                    PN->newArc(t,p);
                 }
                 for (set<Place*>::iterator central = centrals.begin(); central != centrals.end(); central++)
                 {
@@ -1790,19 +1314,19 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
             }
         }
     }
-    
+
     // now that all children of the process have been translated, they need to be
     // connected
     translateConnections(PN, bom);
-    
+
     // returns the ready petrinet.
-    return PN;    
-    
+    return PN;
+
     } // end if (this.type == PROCESS)
     return NULL;
 }
 
-void Block::inclusiveDecisionPatternRecursively(Block* decision, Place* centralNode, set<string>& currentOutputBranches, string number, PetriNet* PN, BomProcess* bom, map<string, bool>& generated, set<set<string> >& powerSet)
+void Block::translateInclusiveDecisionPatternRecursively(Block* decision, Place* centralNode, set<string>& currentOutputBranches, string number, PetriNet* PN, BomProcess* bom, map<string, bool>& generated, set<set<string> >& powerSet)
 {
 	if (!powerSet.insert(currentOutputBranches).second)
 	{
@@ -1813,7 +1337,7 @@ void Block::inclusiveDecisionPatternRecursively(Block* decision, Place* centralN
 	t = PN->newTransition(("decision." + decision->name + ".fire." + number));
 	PN->newArc(centralNode, t);
 	for (set<string>::iterator outputBranch = currentOutputBranches.begin(); outputBranch != currentOutputBranches.end(); outputBranch++)
-	{                   
+	{
 		for (set<string>::iterator output = decision->outputBranchSet[(*outputBranch)].begin(); output != decision->outputBranchSet[(*outputBranch)].end(); output++)
 		{
 			if (!generated[(*output)])
@@ -1831,17 +1355,17 @@ void Block::inclusiveDecisionPatternRecursively(Block* decision, Place* centralN
 		}
 	}
 	int i = 0;
-	
+
 	if (currentOutputBranches.size() == 1)
 	{
 		return;
 	}
-	
+
 	for (set<string>::iterator outputBranch = currentOutputBranches.begin(); outputBranch != currentOutputBranches.end(); outputBranch++)
 	{
 		set<string> newSet = set<string>(currentOutputBranches);
 		newSet.erase(*outputBranch);
-		inclusiveDecisionPatternRecursively(decision, centralNode, newSet, (number+"."+toString(i)), PN, bom, generated, powerSet);
+		translateInclusiveDecisionPatternRecursively(decision, centralNode, newSet, (number+"."+toString(i)), PN, bom, generated, powerSet);
 		i++;
 	}
 }
@@ -1870,10 +1394,11 @@ void Block::translateConnections(PetriNet* PN, BomProcess *bom)
         {
             continue;
         }
-        
-        // create at least one of the transitions and the central place of the connection
+
+      // create at least one of the transitions and the central place of the connection
     	Transition* t;
-        Place* p;
+      Place* p;
+
 
         // if the connection is not rolecrossing, create the second transition to
         // for this is a simple roleinternal connection.
@@ -1900,32 +1425,32 @@ void Block::translateConnections(PetriNet* PN, BomProcess *bom)
                 p = PN->newPlace((globalPrefix + "connection." + (*con)->name), IN);
                 (*con)->firstArcs.first = PN->newArc(p,t);
             }
-            (*con)->firstTransition = t;            
+            (*con)->firstTransition = t;
         }
-        
-        
+
+
         // From this point on the code becomes rather obfuscated, because we always
         // need to differentiate whether a block is atomic or not, if the source
         // or target are rolecrossing, if one of the common or one of the addiotional
         // inputs/outputs are used, or if some of the original (not decomposed
         // processes inputs and outputs are used. The if brackets distinguish
         // every of the above mentioned cases by their conditions.
-        
+
         if ((*con)->src->atomic == true && (!(*con)->roleCrossing || !(*con)->input))
         {
             if ((*con)->src->type == STARTNODE)
             {
                 (*con)->firstArcs.first = PN->newArc(PN->findPlace((globalPrefix + "startNode." + (*con)->src->name)),t);
             }
-        
+
             if ((*con)->src->type == ENDNODE)
             {
-                (*con)->firstArcs.first = PN->newArc(PN->findPlace((globalPrefix + "endNode." + (*con)->src->name)),t);             
+                (*con)->firstArcs.first = PN->newArc(PN->findPlace((globalPrefix + "endNode." + (*con)->src->name)),t);
             }
-        
+
             if ((*con)->src->type == STOPNODE)
             {
-                (*con)->firstArcs.first = PN->newArc(PN->findPlace((globalPrefix + "stopNode." + (*con)->src->name)),t);             
+                (*con)->firstArcs.first = PN->newArc(PN->findPlace((globalPrefix + "stopNode." + (*con)->src->name)),t);
             }
         }
         else if((*con)->src == this && (!(*con)->roleCrossing))
@@ -1935,7 +1460,7 @@ void Block::translateConnections(PetriNet* PN, BomProcess *bom)
                 if( (*input) == (*con)->sourceContact )
                 {
                     (*con)->firstArcs.first = PN->newArc(PN->findPlace(globalPrefix + "input." + (*input)),t);
-                    break;             
+                    break;
                 }
             }
             for (set<string>::iterator output = outputs.begin(); output != outputs.end(); output++)
@@ -1943,7 +1468,7 @@ void Block::translateConnections(PetriNet* PN, BomProcess *bom)
                 if( (*output) == (*con)->sourceContact )
                 {
                     (*con)->firstArcs.first = PN->newArc(PN->findPlace(globalPrefix + "output." + (*output)),t);
-                    break;             
+                    break;
                 }
             }
         }
@@ -1958,27 +1483,27 @@ void Block::translateConnections(PetriNet* PN, BomProcess *bom)
                     {
                         (*con)->firstArcs.first = PN->newArc(PN->findPlace((*con)->src->returnType() + "." + (*con)->src->name + ".output." + (*output)),t);
                         found = true;
-                        break;             
+                        break;
                     }
                 }
-                
+
              }
         }
         if ((*con)->tgt->atomic == true && (!(*con)->roleCrossing || (*con)->input))
         {
             if ((*con)->tgt->type == STARTNODE)
             {
-                (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((globalPrefix + "startNode." + (*con)->tgt->name)));             
+                (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((globalPrefix + "startNode." + (*con)->tgt->name)));
             }
-        
+
             if ((*con)->tgt->type == ENDNODE)
             {
-                (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((globalPrefix + "endNode." + (*con)->tgt->name)));             
+                (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((globalPrefix + "endNode." + (*con)->tgt->name)));
             }
-        
+
             if ((*con)->tgt->type == STOPNODE)
             {
-                (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((globalPrefix + "stopNode." + (*con)->tgt->name)));             
+                (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((globalPrefix + "stopNode." + (*con)->tgt->name)));
             }
         }
         else if((*con)->tgt == this && (!(*con)->roleCrossing))
@@ -1988,7 +1513,7 @@ void Block::translateConnections(PetriNet* PN, BomProcess *bom)
                 if( (*input) == (*con)->targetContact )
                 {
                     (*con)->firstArcs.second = PN->newArc(t,PN->findPlace(globalPrefix + "input." + (*input)));
-                    break;             
+                    break;
                 }
             }
             for (set<string>::iterator output = outputs.begin(); output != outputs.end(); output++)
@@ -1996,13 +1521,13 @@ void Block::translateConnections(PetriNet* PN, BomProcess *bom)
                 if( (*output) == (*con)->targetContact )
                 {
                     (*con)->firstArcs.second = PN->newArc(t,PN->findPlace(globalPrefix + "output." + (*output)));
-                    break;             
+                    break;
                 }
             }
         }
         else
         {
-            if(!(*con)->roleCrossing || (*con)->input)            
+            if(!(*con)->roleCrossing || (*con)->input)
             {
                 bool found = false;
                 for (set<string>::iterator input = (*con)->tgt->inputs.begin(); input != (*con)->tgt->inputs.end(); input++)
@@ -2011,7 +1536,7 @@ void Block::translateConnections(PetriNet* PN, BomProcess *bom)
                     {
                         (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((*con)->tgt->returnType() + "." + (*con)->tgt->name + ".input." + (*input)));
                         found = true;
-                        break;             
+                        break;
                     }
                 }
             }
@@ -2019,6 +1544,89 @@ void Block::translateConnections(PetriNet* PN, BomProcess *bom)
     }
 }
 
+
+// --------------------------- BOM related methods -----------------------------
+
+/*!
+ * \brief set all fields that contain statistical values of this process
+ */
+void Block::calculateStatisticalData() {
+
+  int inDegree = 0;
+  int outDegree = 0;
+
+  // count number of nodes
+  num_nodes = 0;
+  for (set<Block *>::iterator child = children.begin(); child != children.end(); child++) {
+    if ((*child)->type == STARTNODE || (*child)->type == STOPNODE || (*child)->type == ENDNODE)
+      continue;
+    else {
+      num_nodes++;
+      inDegree += (*child)->getInDegree();
+      outDegree += (*child)->getOutDegree();
+    }
+  }
+  // calculate average degree of input pins and output pins
+  avg_inDegree = (float)inDegree / (float)num_nodes;
+  avg_outDegree = (float)outDegree / (float)num_nodes;
+
+  // get number of edges
+  num_edges = connections.size();
+}
+
+/*!
+ * \brief calculate number of input pins of the block
+ */
+int Block::getInDegree () {
+  int inPins = 0;
+
+  // number of inputs of a gateway node: average number of input pins
+  if (type == JOIN || type == MERGE || type == FORK || type == DECISION) {
+    for (set<string>::iterator inputBranch = inputBranches.begin(); inputBranch != inputBranches.end(); inputBranch++)
+      inPins += inputBranchSet[(*inputBranch)].size();
+    inPins = inPins / inputBranches.size();
+  } else {
+  // number of inputs of a task node
+    inPins += inputs.size();
+    inPins += additionalInputs.size();
+  }
+  return inPins;
+}
+
+/*!
+ * \brief calculate number of output pins of the block
+ */
+int Block::getOutDegree () {
+  int outPins = 0;
+
+  // number of inputs of a gateway node: average number of input pins
+  if (type == JOIN || type == MERGE || type == FORK || type == DECISION) {
+    for (set<string>::iterator outputBranch = outputBranches.begin(); outputBranch != outputBranches.end(); outputBranch++)
+      outPins += outputBranchSet[(*outputBranch)].size();
+    outPins = outPins / outputBranches.size();
+  } else {
+  // number of inputs of a task node
+    outPins += outputs.size();
+    outPins += additionalOutputs.size();
+  }
+  return outPins;
+}
+
+/*!
+ * \brief return a CSV compatible string representation of the statistical
+ *        information of this process, the format is
+ *        number of nodes; number of edges, avg number of input pins, avg number of output pins
+ */
+string Block::statistics_toString(char separator) {
+  this->calculateStatisticalData();
+  return
+      toString(this->num_nodes) + separator +
+      toString(this->num_edges) + separator +
+      floatToString(this->avg_inDegree) + separator +
+      floatToString(this->avg_outDegree);
+}
+
+#ifdef BOM_DECOMPOSITION
 //! \brief DECOMPOSITION: This is the actual decomposition function, that is
 //!        executed before the petrinet is created. It computes for every block
 //!        and connection whether it is enabled and whether the connection is
@@ -2031,10 +1639,10 @@ void Block::cutNet(set<string> roleSet, int mode)
 	cerr << "The given roles are:\n";
     for (set<string>::iterator role = roleSet.begin(); role != roleSet.end(); role++)
     {
-        cerr << "    " + (*role) + "\n";        
+        cerr << "    " + (*role) + "\n";
     }
     cerr << "Der Modus ist: \"";
-    
+
     // print an explanation for the used mode
     switch(mode)
     {
@@ -2043,26 +1651,26 @@ void Block::cutNet(set<string> roleSet, int mode)
         case 3: cerr << "Use all blocks that have at least all of those roles\"\n"; break;
         case 4: cerr << "Use all blocks that have none of the given roles\"\n"; break;
     }
-    
+
     // This is the set where all enabled blocks will be gathered. A block is enabled
     // if it fits the roles in the given mode
     set<Block*> cutBlocks;
-    
+
     // iterate over all blocks of the process
     for (set<Block*>::iterator child = children.begin(); child != children.end(); child++)
     {
-        
+
     	// "Use all blocks that have exactly those roles" mode
     	if(mode == 1)
         {
             bool isEqual = true;
-            
+
             // if the set of roles differ this is already false
             if(roleSet.size() != (*child)->roleRequirements.size())
             {
                 continue;
             }
-            
+
             // if the number of roles match, check for every role if it is
             // contained in the role requirements
             for (set<string>::iterator role = roleSet.begin(); role != roleSet.end(); role++)
@@ -2073,7 +1681,7 @@ void Block::cutNet(set<string> roleSet, int mode)
                     break;
                 }
             }
-            
+
             // If the sets are equal add this block to the cutBlocks
             if (isEqual)
             {
@@ -2091,14 +1699,14 @@ void Block::cutNet(set<string> roleSet, int mode)
                     cutBlocks.insert((*child));
                     break;
                 }
-            }        
+            }
         }
     	// "Use all blocks that have at least all of those roles" mode
         if(mode == 3)
         {
             // assume this block fits
         	bool isEqual = true;
-            
+
             // check for every role in the set, if it is also in the blocks roles
             for (set<string>::iterator role = roleSet.begin(); role != roleSet.end(); role++)
             {
@@ -2108,7 +1716,7 @@ void Block::cutNet(set<string> roleSet, int mode)
                     break;
                 }
             }
-            
+
             // if so, add the block to the cut Blocks
             if (isEqual)
             {
@@ -2120,7 +1728,7 @@ void Block::cutNet(set<string> roleSet, int mode)
         {
             // assume this block fits
         	bool isEqual = true;
-        	
+
         	// if one of the roles if found, this block doesnt fit
             for (set<string>::iterator role = roleSet.begin(); role != roleSet.end(); role++)
             {
@@ -2129,7 +1737,7 @@ void Block::cutNet(set<string> roleSet, int mode)
                     isEqual = false;
                 }
             }
-            
+
             // none fitting role could be found, add the block to the cut blocks
             if (isEqual)
             {
@@ -2137,14 +1745,14 @@ void Block::cutNet(set<string> roleSet, int mode)
             }
         }
     }
-    
-    // print all blocks that match the roles 
+
+    // print all blocks that match the roles
     cerr << "The following blocks match the roles:\n";
     for (set<Block*>::iterator block = cutBlocks.begin(); block != cutBlocks.end(); block++)
     {
-        cerr << "    " + (*block)->name + "\n";        
+        cerr << "    " + (*block)->name + "\n";
     }
-    
+
     // Horrible complexity
     // Iterate over all blocks, if it is not part of the cut Blocks, it is disabled
     // (enabled is default)
@@ -2153,29 +1761,29 @@ void Block::cutNet(set<string> roleSet, int mode)
         if (cutBlocks.find(*child) == cutBlocks.end())
         {
             (*child)->enabled = false;
-            cerr << "    Dieser Block ist jetzt false: " + (*child)->name + "\n";        
+            cerr << "    Dieser Block ist jetzt false: " + (*child)->name + "\n";
         }
     }
-    
+
     // iterate over all connections
     for ( set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
     {
         // assume its neither enabled nor rolecrossing
     	(*con)->enabled = false;
         (*con)->roleCrossing = false;
-        
-        
+
+
         // if the source of the connection is enabled, this connection is too.
         // assume it is rolecrossing and not an input
         if (cutBlocks.find((*con)->src) != cutBlocks.end())
         {
             (*con)->enabled = true;
             (*con)->roleCrossing = true;
-            (*con)->input = false;            
+            (*con)->input = false;
         }
 
         // if the target of the connection is enabled, this connection is too.
-        // it can only be an output or neither and if it was rolecrossing 
+        // it can only be an output or neither and if it was rolecrossing
         // (because the source was also enabled) it cant be rolecrossing anymore.
         if (cutBlocks.find((*con)->tgt) != cutBlocks.end())
         {
@@ -2191,7 +1799,7 @@ void Block::cutNet(set<string> roleSet, int mode)
             }
         }
     }
-    
+
     // Check all enabled connections again:
     // if it was assumed rolecrossing, but the nonenabled source/target is the
     // process itself, it is not rolecrossing, but an original input/output
@@ -2199,7 +1807,7 @@ void Block::cutNet(set<string> roleSet, int mode)
     {
         if ((*con)->enabled)
         {
-        
+
             if((*con)->roleCrossing)
             {
                 if ((*con)->src == this)
@@ -2212,7 +1820,7 @@ void Block::cutNet(set<string> roleSet, int mode)
                 }
             }
         }
-    }    
+    }
 }
 
 //! \brief DECOMPOSTION: Determine all connections that have an input or a startnode
@@ -2222,7 +1830,7 @@ void Block::disableStart()
     // Sets to gather the connections
 	set<BlockConnection*> relevantConnections;
     Block* relevantTarget;
-    
+
     // iterate over all connections
     for ( set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
     {
@@ -2242,7 +1850,7 @@ void Block::disableStart()
             }
         }
     }
-    
+
     // disable all relevant connections and add them to the starting connections
     for ( set<BlockConnection*>::iterator con = relevantConnections.begin(); con != relevantConnections.end(); con++)
     {
@@ -2285,7 +1893,7 @@ void Block::disableEnd()
             }
         }
     }
-    
+
     // disable all relevant connections and add them to the ending connections
     for ( set<BlockConnection*>::iterator con = relevantConnections.begin(); con != relevantConnections.end(); con++)
     {
@@ -2295,14 +1903,14 @@ void Block::disableEnd()
             endingConnections.insert(*con);
         }
     }
-          
+
 }
 
 
 //! \brief DECOMPOSITION
 void Block::mergeStart(PetriNet* PN)
 {
-    
+
 	Transition* t;
     if (!startingConnections.empty())
     {
@@ -2312,7 +1920,7 @@ void Block::mergeStart(PetriNet* PN)
     {
         return;
     }
-    
+
     for ( set<BlockConnection*>::iterator con = startingConnections.begin(); con != startingConnections.end(); con++)
     {
     	if ((*con)->src == this)
@@ -2322,31 +1930,31 @@ void Block::mergeStart(PetriNet* PN)
     			if( (*input) == (*con)->sourceContact )
                 {
                     (*con)->firstArcs.second = PN->newArc(PN->findPlace("process." + name + ".input." + (*input)), t);
-                    break;             
+                    break;
                 }
             }
         }
     	else if ((*con)->src->type == STARTNODE)
         {
-            (*con)->firstArcs.second = PN->newArc(PN->findPlace((name + ".startNode." + (*con)->src->name)), t);             
+            (*con)->firstArcs.second = PN->newArc(PN->findPlace((name + ".startNode." + (*con)->src->name)), t);
         }
-        
-        
+
+
         if ((*con)->tgt->atomic == true && (!(*con)->roleCrossing || (*con)->input))
         {
             if ((*con)->tgt->type == STARTNODE)
             {
-                (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((name + ".startNode." + (*con)->tgt->name)));             
+                (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((name + ".startNode." + (*con)->tgt->name)));
             }
-        
+
             if ((*con)->tgt->type == ENDNODE)
             {
-                (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((name + ".endNode." + (*con)->tgt->name)));             
+                (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((name + ".endNode." + (*con)->tgt->name)));
             }
-        
+
             if ((*con)->tgt->type == STOPNODE)
             {
-                (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((name + ".stopNode." + (*con)->tgt->name)));             
+                (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((name + ".stopNode." + (*con)->tgt->name)));
             }
         }
         else if((*con)->tgt == this && (!(*con)->roleCrossing))
@@ -2356,7 +1964,7 @@ void Block::mergeStart(PetriNet* PN)
                 if( (*input) == (*con)->targetContact )
                 {
                     (*con)->firstArcs.second = PN->newArc(t,PN->findPlace("process." + name + ".input." + (*input)));
-                    break;             
+                    break;
                 }
             }
             for (set<string>::iterator output = outputs.begin(); output != outputs.end(); output++)
@@ -2364,13 +1972,13 @@ void Block::mergeStart(PetriNet* PN)
                 if( (*output) == (*con)->targetContact )
                 {
                     (*con)->firstArcs.second = PN->newArc(t,PN->findPlace("process." + name + ".output." + (*output)));
-                    break;             
+                    break;
                 }
             }
         }
         else
         {
-            if(!(*con)->roleCrossing || (*con)->input)            
+            if(!(*con)->roleCrossing || (*con)->input)
             {
                 bool found = false;
                 for (set<string>::iterator input = (*con)->tgt->inputs.begin(); input != (*con)->tgt->inputs.end(); input++)
@@ -2379,10 +1987,10 @@ void Block::mergeStart(PetriNet* PN)
                     {
                         (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((*con)->tgt->returnType() + "." + (*con)->tgt->name + ".input." + (*input)));
                         found = true;
-                        break;             
+                        break;
                     }
                 }
-                
+
                 if( !found && (*con)->targetAdditional)
                 {
                     for (set<string>::iterator input = (*con)->tgt->additionalInputs.begin(); input != (*con)->tgt->additionalInputs.end(); input++)
@@ -2391,9 +1999,9 @@ void Block::mergeStart(PetriNet* PN)
                         {
                             (*con)->firstArcs.second = PN->newArc(t,PN->findPlace((*con)->tgt->returnType() + "." + (*con)->tgt->name + ".additionalInput." + (*input)));
                             found = true;
-                            break;             
+                            break;
                         }
-                    }                
+                    }
                 }
             }
         }
@@ -2413,7 +2021,7 @@ void Block::mergeEnd(PetriNet* PN)
     {
         return;
     }
-    
+
     for ( set<BlockConnection*>::iterator con = endingConnections.begin(); con != endingConnections.end(); con++)
     {
         if ((*con)->tgt == this)
@@ -2423,36 +2031,36 @@ void Block::mergeEnd(PetriNet* PN)
                 if( (*output) == (*con)->targetContact )
                 {
                     (*con)->firstArcs.second = PN->newArc(t, PN->findPlace("process." + name + ".output." + (*output)));
-                    break;             
+                    break;
                 }
             }
         }
         else if ((*con)->tgt->type == ENDNODE)
         {
-            (*con)->firstArcs.second = PN->newArc(t, PN->findPlace((name + ".endNode." + (*con)->tgt->name)));             
+            (*con)->firstArcs.second = PN->newArc(t, PN->findPlace((name + ".endNode." + (*con)->tgt->name)));
         }
 // <Dirk.F start> added stop node treatment
         else if ((*con)->tgt->type == STOPNODE)
         {
-            (*con)->firstArcs.second = PN->newArc(t, PN->findPlace((name + ".stopNode." + (*con)->tgt->name)));             
+            (*con)->firstArcs.second = PN->newArc(t, PN->findPlace((name + ".stopNode." + (*con)->tgt->name)));
         }
 // <Dirk.F end>
-        
+
         if ((*con)->src->atomic == true && (!(*con)->roleCrossing || !(*con)->input))
         {
             if ((*con)->src->type == STARTNODE)
             {
                 (*con)->firstArcs.first = PN->newArc(PN->findPlace((name + ".startNode." + (*con)->src->name)),t);
             }
-        
+
             if ((*con)->src->type == ENDNODE)
             {
-                (*con)->firstArcs.first = PN->newArc(PN->findPlace((name + ".endNode." + (*con)->src->name)),t);             
+                (*con)->firstArcs.first = PN->newArc(PN->findPlace((name + ".endNode." + (*con)->src->name)),t);
             }
-        
+
             if ((*con)->src->type == STOPNODE)
             {
-                (*con)->firstArcs.first = PN->newArc(PN->findPlace((name + ".stopNode." + (*con)->src->name)),t);             
+                (*con)->firstArcs.first = PN->newArc(PN->findPlace((name + ".stopNode." + (*con)->src->name)),t);
             }
         }
         else if((*con)->src == this && (!(*con)->roleCrossing))
@@ -2462,7 +2070,7 @@ void Block::mergeEnd(PetriNet* PN)
                 if( (*input) == (*con)->sourceContact )
                 {
                     (*con)->firstArcs.first = PN->newArc(PN->findPlace("process." + name + ".input." + (*input)),t);
-                    break;             
+                    break;
                 }
             }
             for (set<string>::iterator output = outputs.begin(); output != outputs.end(); output++)
@@ -2470,7 +2078,7 @@ void Block::mergeEnd(PetriNet* PN)
                 if( (*output) == (*con)->sourceContact )
                 {
                     (*con)->firstArcs.first = PN->newArc(PN->findPlace("process." + name + ".output." + (*output)),t);
-                    break;             
+                    break;
                 }
             }
         }
@@ -2485,10 +2093,10 @@ void Block::mergeEnd(PetriNet* PN)
                     {
                         (*con)->firstArcs.first = PN->newArc(PN->findPlace((*con)->src->returnType() + "." + (*con)->src->name + ".output." + (*output)),t);
                         found = true;
-                        break;             
+                        break;
                     }
                 }
-                
+
                 if( !found && (*con)->sourceAdditional)
                 {
                     for (set<string>::iterator output = (*con)->src->additionalOutputs.begin(); output != (*con)->src->additionalOutputs.end(); output++)
@@ -2497,13 +2105,13 @@ void Block::mergeEnd(PetriNet* PN)
                         {
                             (*con)->firstArcs.first = PN->newArc(PN->findPlace((*con)->src->returnType() + "." + (*con)->src->name + ".additionalOutput." + (*output)),t);
                             found = true;
-                            break;             
+                            break;
                         }
-                    }                
+                    }
                 }
             }
         }
-    }     
+    }
 }
 
 
@@ -2524,7 +2132,7 @@ void Block::createEndState(PetriNet* PN)
             mergePlaces2.insert(p);
         }
     }
-    
+
     for ( set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
     {
         if ((*con)->enabled && (*con)->roleCrossing && (*con)->input)
@@ -2536,8 +2144,8 @@ void Block::createEndState(PetriNet* PN)
     }
 /*
     bool markAll = true;
-    
-    
+
+
     for ( set<Block*>::iterator block = children.begin(); block != children.end() ; block++)
     {
         if (((*block)->type == STARTNODE) && (*block)->enabled == true)
@@ -2545,22 +2153,23 @@ void Block::createEndState(PetriNet* PN)
             markAll = false;
         }
     }
-  */  
+  */
     //set<Place*>::iterator merge2 = mergePlaces2.begin();
     for ( set<Place*>::iterator merge1 = mergePlaces1.begin(); merge1 != mergePlaces1.end(); merge1++)
     {
-        
+
         (*merge1)->mark();
         PN->generatedInitials.insert(*merge1);
-        
+
         //histories.insert((*merge1)->nodeFullName());
         //PN->mergePlaces((*merge1)->nodeFullName(),(*merge2)->nodeFullName());
         //merge2++;
     }
-    
+
     // Code needs serious tightening here
     globals::finalCondition= "has to be determined by the output function itself";
 }
+
 void Block::adjustRoles()
 {
     if(type == PROCESS)
@@ -2576,12 +2185,12 @@ void Block::adjustRoles()
                 cerr << (*child)->returnType() << " " << (*child)->name << "!\n";
             }
         }
-        
+
         if (children.size() == noRoles.size())
         {
             return;
         }
-        
+
         unsigned int lastSize = 0;
         while (noRoles.size() != lastSize)
         {
@@ -2600,11 +2209,11 @@ void Block::adjustRoles()
                                 {
                                     noRoles.erase(*child);
                                 }
-                            } 
+                            }
                         }
                     }
                 }
-            
+
                 if ((*child)->type == ENDNODE)
                 {
                     for ( set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
@@ -2617,11 +2226,11 @@ void Block::adjustRoles()
                                 {
                                     noRoles.erase(*child);
                                 }
-                            } 
+                            }
                         }
                     }
                 }
-            
+
                 if ((*child)->type == STOPNODE)
                 {
                     for ( set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
@@ -2634,11 +2243,11 @@ void Block::adjustRoles()
                                 {
                                     noRoles.erase(*child);
                                 }
-                            } 
+                            }
                         }
                     }
                 }
-        
+
                 if ((*child)->type == DECISION)
                 {
                     for ( set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
@@ -2651,11 +2260,11 @@ void Block::adjustRoles()
                                 {
                                     noRoles.erase(*child);
                                 }
-                            } 
+                            }
                         }
                     }
                 }
-        
+
                 if ((*child)->type == FORK)
                 {
                     for ( set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
@@ -2668,11 +2277,11 @@ void Block::adjustRoles()
                                 {
                                     noRoles.erase(*child);
                                 }
-                            } 
+                            }
                         }
                     }
                 }
-        
+
                 if ((*child)->type == MERGE)
                 {
                     for ( set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
@@ -2685,11 +2294,11 @@ void Block::adjustRoles()
                                 {
                                     noRoles.erase(*child);
                                 }
-                            } 
+                            }
                         }
                     }
                 }
-        
+
                 if ((*child)->type == JOIN)
                 {
                     for ( set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
@@ -2702,7 +2311,7 @@ void Block::adjustRoles()
                                 {
                                     noRoles.erase(*child);
                                 }
-                            } 
+                            }
                         }
                     }
                 }
@@ -2710,6 +2319,7 @@ void Block::adjustRoles()
         }
     }
 }
+#endif // BOM_DECOMPOSITION
 
 Block::Block( blockType mytype, bool ifcomplex, bool ifatomic)
 {

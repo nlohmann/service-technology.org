@@ -31,11 +31,11 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
- * 
+ *
  * \since   2005/11/11
  *
  * \date    \$Date: 2007/06/28 07:38:16 $
- * 
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
@@ -80,9 +80,9 @@ using std::ofstream;
 string toString(int i)
 {
   std::ostringstream buffer;
-  
+
   buffer << i;
-  
+
   return buffer.str();
 }
 
@@ -113,7 +113,18 @@ string toString(const vector<unsigned int> &v)
 }
 
 
-
+/*!
+ * Converts a C++ float to a C++ string object.
+ *
+ * \param f standard C float
+ * \return  C++ string object representing f
+ */
+string floatToString(float f)
+{
+  std::ostringstream buffer;
+  buffer << f;
+  return buffer.str();
+}
 
 
 /*!
@@ -127,7 +138,7 @@ int toInt(string s)
   int result;
   istringstream isst;
   isst.str(s);
- 
+
   isst >> result;
 
   if (isst.fail())
@@ -152,7 +163,7 @@ unsigned int toUInt(string s)
   unsigned int result;
   istringstream isst;
   isst.str(s);
- 
+
   isst >> result;
 
   if (isst.fail())

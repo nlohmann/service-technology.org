@@ -24,6 +24,7 @@ public:
 
 	//map<Node*, Block*>	pn_to_bom;
 
+  /// Petri net nodes that implement specific parts of the process
 	set<Place*>			pinPlaces;
 
 	set<Transition *>	process_inputPinSets;
@@ -37,9 +38,9 @@ public:
 	set<Place*>     process_inputCriterion_used;
 
 	/// create the formula describing the final state
-	FormulaState* createFinalStatePredicate (PetriNet* PN);
-	FormulaState* createOmegaPredicate (PetriNet* PN, bool stopNodes);
-	FormulaState* createSafeStatePredicate (PetriNet* PN, bool mustBeNonEmpty);
+	FormulaState* createFinalStatePredicate (PetriNet* PN) const;
+	FormulaState* createOmegaPredicate (PetriNet* PN, bool stopNodes) const;
+	FormulaState* createSafeStatePredicate (PetriNet* PN, bool mustBeNonEmpty) const;
 
 	/// remove places representing unconnected pins in the given net
 	void removeUnconnectedPins (PetriNet *PN);

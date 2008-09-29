@@ -31,11 +31,11 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
- * 
+ *
  * \since   2005/11/11
  *
  * \date    \$Date: 2007/06/28 07:38:16 $
- * 
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
@@ -82,6 +82,8 @@ string toString(int i);
 ///converts a vector to a C++ string
 string toString(const vector<unsigned int> &v);
 
+/// converts float to string
+string floatToString(float f);
 
 /// converts string to int
 int toInt(string s);

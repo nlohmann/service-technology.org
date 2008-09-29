@@ -61,6 +61,8 @@ public:
 
 	unsigned int reduce(unsigned int reduction_level);
 
+	void anonymizeNodes();   ///< re-enumerate the roles of all nodes of the net
+
 private:
   void reduce_series_places();
   void reduce_series_transitions();

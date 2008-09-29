@@ -24,6 +24,8 @@ BomProcess::~BomProcess()
 {
 }
 
+// ------------------------ Petri Net related methods --------------------------
+
 /*!
  * \brief construct a formula the describes the legal final states of the
  *        process considering the different termination semantics due to stop
@@ -33,7 +35,7 @@ BomProcess::~BomProcess()
  *
  * \param PN  a net that formalizes the process of this object
  */
-FormulaState* BomProcess::createFinalStatePredicate(PetriNet* PN)
+FormulaState* BomProcess::createFinalStatePredicate(PetriNet* PN) const
 {
 	FormulaState* mainF = new FormulaState(LOG_OR);
 
@@ -85,7 +87,7 @@ FormulaState* BomProcess::createFinalStatePredicate(PetriNet* PN)
  *                   which clear the tokens on all internal places, this
  *                   functionality is currently not implemented and returns NULL
  */
-FormulaState* BomProcess::createOmegaPredicate(PetriNet* PN, bool stopNodes)
+FormulaState* BomProcess::createOmegaPredicate(PetriNet* PN, bool stopNodes) const
 {
 	FormulaState* mainF;
 
@@ -126,7 +128,8 @@ FormulaState* BomProcess::createOmegaPredicate(PetriNet* PN, bool stopNodes)
 	return mainF;
 }
 
-FormulaState* BomProcess::createSafeStatePredicate (PetriNet* PN, bool mustBeNonEmpty=false) {
+FormulaState* BomProcess::createSafeStatePredicate (PetriNet* PN, bool mustBeNonEmpty=false) const
+{
   // net is safe iff all internal places do not have more than one token
   // the analysis checks for the violation of the safe state
   FormulaState* mainF;

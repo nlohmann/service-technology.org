@@ -236,7 +236,9 @@ processes.
 @item @samp{-p log} write a log @file{uml2owfn_lib.log} in CSV (comma separated
 file) format containing information about each process. The column format is
 @example
-file name;is structurally feasible;structural problem
+file name;is structurally feasible;structural problem;
+number of nodes;number of edges;
+average number of incoming edges;average number of outgoing edges
 @end example
 A process is declared as structurally feasible if
   @enumerate
@@ -413,6 +415,15 @@ make translatewf
 to automate the translation. The Makefile variable @samp{OUTPUT-FORMAT} allows
 you to set the output format of the translation of @acronym{UML2oWFN}, default
 value is @samp{lola}.
+
+
+@section Use case: anonymize the processes
+
+In case you want to generated anonymized processes models which can not be related
+back to the originals due to self-explaining names, use the option
+@samp{-p anon}. This will enumerate the places and transitions of each process
+individually, starting with @i{p1} and @i{t1}. Any related files like the
+@file{.task} files are consistent with the anonymized output.
 
 @c ----------------------------------------------------------------------------
 

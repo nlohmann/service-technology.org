@@ -92,11 +92,13 @@ bool AnnotatedGraph::hasNoRoot() const {
     return getRoot() == NULL;
 }
 
+
 //! \brief returns a AnnotatedGraphNode pointer to the root node
 //! \return returns a pointer to the root node
 AnnotatedGraphNode* AnnotatedGraph::getRoot() const {
     return root;
 }
+
 
 //! \brief sets the root node of the graph to a given node
 //! \param newRoot a pointer to the node to become the new root
@@ -128,8 +130,10 @@ AnnotatedGraphNode* AnnotatedGraph::addNode(const string& nodeName,
                                             GraphFormula* annotation,
                                             GraphNodeColor color) {
 
-    AnnotatedGraphNode* node = new AnnotatedGraphNode(nodeName, annotation,
-                                                      color, setOfNodes.size());
+    AnnotatedGraphNode* node = new AnnotatedGraphNode(nodeName,
+                                                      annotation,
+                                                      color,
+                                                      setOfNodes.size());
     addNode(node);
     return node;
 }
@@ -597,7 +601,7 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(
     End of the old algorithm */
 
 
-//! \brief computes the number of tree-service-automata determined by this OG
+//! \brief computes the number of tree-shaped service automata matching with this OG
 //! \return number of Strategies
 long double AnnotatedGraph::numberOfStrategies() {
 
@@ -623,8 +627,8 @@ long double AnnotatedGraph::numberOfStrategies() {
 
     trace(TRACE_2, "Computing true assignments for all nodes\n");
     // Preprocess all nodes of the OG in order to fill the variables needed in the recursion
-    for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode
-            != setOfNodes.end(); ++iNode) {
+    for (nodes_t::const_iterator iNode = setOfNodes.begin();
+         iNode != setOfNodes.end(); ++iNode) {
 
         // reset the temporary variables for every node
         labels.clear();
@@ -653,7 +657,9 @@ long double AnnotatedGraph::numberOfStrategies() {
 
         // return the number of true assignments for this node's formula
         processAssignmentsRecursively(labels,
-                possibleAssignment, (*iNode), assignmentList);
+                                      possibleAssignment,
+                                      (*iNode),
+                                      assignmentList);
 
         // create a temporary variable for a list of nodes
         list<AnnotatedGraphNode*> followerNodes;
@@ -661,8 +667,8 @@ long double AnnotatedGraph::numberOfStrategies() {
         // for every true assignment a list of nodes will be created. These are the nodes which are
         // reached by outgoing edges of which the labels were true in the assignment. This set is then saved in
         // a map for the currently proceeded node.
-        for (list<GraphFormulaAssignment>::iterator assignment =
-                assignmentList.begin(); assignment != assignmentList.end(); assignment++) {
+        for (list<GraphFormulaAssignment>::iterator assignment = assignmentList.begin();
+             assignment != assignmentList.end(); assignment++) {
 
             followerNodes = list<AnnotatedGraphNode*>();
             for (set<string>::iterator label = labels.begin(); label
@@ -682,14 +688,15 @@ long double AnnotatedGraph::numberOfStrategies() {
 
     // process the nodes recursively
     number = numberOfStrategiesRecursively(root,
-            validFollowerCombinations, eliminateRedundantCounting);
+                                           validFollowerCombinations,
+                                           eliminateRedundantCounting);
 
     trace(TRACE_5, "AnnotatedGraph::numberOfStrategies(...): end\n");
     return number;
 }
 
 
-//! \brief compute the number of tree service automata from this current node on
+//! \brief compute the number of tree-shaped service automata matching from this node
 //! \param activeNode a node pointing to the current node
 //! \param validFollowerCombinations a map that contains all sets of follower nodes that succeed to
 //!        fullfill the annotation of the current node with the edges leading to them
@@ -716,7 +723,10 @@ long double AnnotatedGraph::numberOfStrategiesRecursively(
     
     // iterate over the list of valid follower combinations
     for (list<list<AnnotatedGraphNode*> >::iterator followerList =
-        validFollowerCombinations[activeNode].begin(); followerList != validFollowerCombinations[activeNode].end(); followerList++) {
+         validFollowerCombinations[activeNode].begin();
+         followerList != validFollowerCombinations[activeNode].end();
+         followerList++) {
+
         trace(TRACE_4, "        current followerCombination: ");
         // if there is no need for followers in order to fulfill
         // the annotation, then count an additional automaton for
@@ -878,6 +888,7 @@ void AnnotatedGraph::findFalseNodes(std::vector<AnnotatedGraphNode*>* falseNodes
     trace(TRACE_5, "AnnotatedGraph::findFalseNodes(): end\n");
 }
 
+
 //! \brief Removes all unneeded literals from all reachable nodes
 //!        and removes reachable nodes which do not satisfy their own annotation.
 void AnnotatedGraph::removeReachableFalseNodes() {
@@ -893,6 +904,7 @@ void AnnotatedGraph::removeReachableFalseNodes() {
 
     trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodes(): end\n");
 }
+
 
 //! \brief Helps AnnotatedGraph::removeReachableFalseNodes by recursively:
 //!        1. Constructing a parent function for all reachable nodes.
@@ -957,6 +969,7 @@ void AnnotatedGraph::removeReachableFalseNodesInit(AnnotatedGraphNode* currentNo
 
     trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesInit(): end\n");
 }
+
 
 //! \brief Proceeds a set of candidates for false nodes, removes proven false nodes
 //!        and designates their parents as candidates for the next recursive step.
@@ -1768,8 +1781,8 @@ bool AnnotatedGraph::isEquivalentRecursive(AnnotatedGraphNode* leftNode,
 //! \param rhs the OG to be used for computing the product
 //! \return returns the product OG
 AnnotatedGraph* AnnotatedGraph::product(const AnnotatedGraph* rhs) {
-    trace(TRACE_5,
-            "AnnotatedGraph::product(const AnnotatedGraph* rhs): start\n");
+
+    trace(TRACE_5, "AnnotatedGraph::product(const AnnotatedGraph* rhs): start\n");
 
     // this will be the product OG
     AnnotatedGraph* productOG= new AnnotatedGraph;
@@ -1837,11 +1850,10 @@ AnnotatedGraph* AnnotatedGraph::product(const ogs_t& ogs) {
 //! \param currentRhsNode the current node of the rhs OG
 //! \param productOG the resulting product OG
 void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
-        AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG) {
+                                    AnnotatedGraphNode* currentRhsNode,
+                                    AnnotatedGraph* productOG) {
 
-    trace(
-            TRACE_5,
-            "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): start\n");
+    trace(TRACE_5, "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): start\n");
 
     // at this time, the node constructed from currentOGNode and
     // currentRhsNode is already inserted
@@ -1886,18 +1898,15 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
             if (found != NULL) {
                 // the node was known before, so we just have to add a new edge
                 productOG->addEdge(currentName, newProductName, currentLabel);
-
-                trace(
-                        TRACE_5,
-                        "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): end\n");
             } else {
                 // we computed a new node, so we add a node and an edge
                 // trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
 
-                GraphFormulaCNF* newProductFormula = createProductAnnotation(
-                        newOGNode, newRhsNode);
+                GraphFormulaCNF* newProductFormula =
+                    createProductAnnotation(newOGNode, newRhsNode);
 
-                AnnotatedGraphNode* newProductNode= new AnnotatedGraphNode(newProductName, newProductFormula);
+                AnnotatedGraphNode* newProductNode =
+                    new AnnotatedGraphNode(newProductName, newProductFormula);
 
                 productOG->addNode(newProductNode);
 
@@ -1908,10 +1917,10 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
             }
         }
     }
+
     delete edgeIter;
-    trace(
-            TRACE_5,
-            "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): end\n");
+
+    trace(TRACE_5, "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): end\n");
 }
 
 
@@ -1920,12 +1929,12 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
 //! \param lhs the first node
 //! \param rhs the second node
 //! \return returns the Formula of the product node
-GraphFormulaCNF* AnnotatedGraph::createProductAnnotation(
-        const AnnotatedGraphNode* lhs, const AnnotatedGraphNode* rhs) const {
+GraphFormulaCNF* AnnotatedGraph::createProductAnnotation(const AnnotatedGraphNode* lhs,
+                                                         const AnnotatedGraphNode* rhs) const {
 
-    GraphFormulaMultiaryAnd* conjunction= new GraphFormulaMultiaryAnd(
-            lhs->getAnnotation()->getDeepCopy(),
-            rhs->getAnnotation()->getDeepCopy());
+    GraphFormulaMultiaryAnd* conjunction =
+        new GraphFormulaMultiaryAnd(lhs->getAnnotation()->getDeepCopy(),
+                                    rhs->getAnnotation()->getDeepCopy());
 
     GraphFormulaCNF* cnf = conjunction->getCNF();
     delete conjunction;
@@ -1945,8 +1954,7 @@ string AnnotatedGraph::getProductOGFilePrefix(const ogfiles_t& ogfiles) {
     string productFilePrefix = stripOGFileSuffix(*iOgFile);
 
     for (++iOgFile; iOgFile != ogfiles.end(); ++iOgFile) {
-        productFilePrefix += "_X_"
-                + stripOGFileSuffix(platform_basename(*iOgFile));
+        productFilePrefix += "_X_" + stripOGFileSuffix(platform_basename(*iOgFile));
     }
 
     return productFilePrefix;
@@ -1971,7 +1979,7 @@ string AnnotatedGraph::stripOGFileSuffix(const std::string& filename) {
 //! \param filenamePrefix a string containing the prefix of the output file name
 //! \param dotGraphTitle a title for the graph to be shown in the image
 string AnnotatedGraph::createDotFile(string& filenamePrefix,
-                                  const string& dotGraphTitle) const {
+                                     const string& dotGraphTitle) const {
 
     trace(TRACE_0, "creating the dot file of the OG...\n");
 
@@ -1993,10 +2001,11 @@ string AnnotatedGraph::createDotFile(string& filenamePrefix,
 
     dotFileHandle << "}";
     dotFileHandle.close();
-    // ... dot file created (.out) //
 
-	return dotFile;
+    // ... dot file created (.out) //
+    return dotFile;
 }
+
 
 //! \brief annotates a given dot output file and stores it to a .dot-File.
 //! \param filenamePrefix a string containing the prefix of the output file name
@@ -2007,8 +2016,9 @@ string AnnotatedGraph::createAnnotatedDotFile(string& filenamePrefix, std::strin
         // annotate .dot file
         system(("dot -Tdot " + dotFileName + " -o " + annotatedDotFileName).c_str());
 
-		return annotatedDotFileName;
+        return annotatedDotFileName;
 }
+
 
 //! \brief calls dot to create an image (.png) of the given dot file (.out)
 //! \param filenamePrefix a string containing the prefix of the output file name
@@ -2025,9 +2035,8 @@ string AnnotatedGraph::createPNGFile(string& filenamePrefix, std::string& dotFil
     system(cmd.c_str());
     
     return pngFile;
-    
-}
 
+}
 
 
 //! \brief creates a dot output of the graph, uses the filename as title.
@@ -2041,9 +2050,9 @@ string AnnotatedGraph::createDotFile(string& filenamePrefix) const {
 //! \param v current node in the iteration process
 //! \param os output stream
 //! \param visitedNodes maps nodes to Bools remembering already visited nodes
-void AnnotatedGraph::createDotFileRecursively(AnnotatedGraphNode* v, fstream& os,
-        std::map<AnnotatedGraphNode*, bool>& visitedNodes) const {
-
+void AnnotatedGraph::createDotFileRecursively(AnnotatedGraphNode* v,
+                                              fstream& os,
+                                              std::map<AnnotatedGraphNode*, bool>& visitedNodes) const {
 
     if (v == NULL) {
         // print the empty OG...
@@ -2053,7 +2062,6 @@ void AnnotatedGraph::createDotFileRecursively(AnnotatedGraphNode* v, fstream& os
     }
 
     if (visitedNodes[v] != true) {
-
 
         if (v->isFinal()) {
             os << "p"<< v->getName() << " [label=\"# "<< v->getName() << "\\n";
@@ -2069,23 +2077,21 @@ void AnnotatedGraph::createDotFileRecursively(AnnotatedGraphNode* v, fstream& os
 
         string currentLabel;
 
-
         AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =
-                v->getLeavingEdgesConstIterator();
+            v->getLeavingEdgesConstIterator();
 
         while (edgeIter->hasNext()) {
             AnnotatedGraphEdge* edge = edgeIter->getNext();
 
             // remember the label of the egde
             currentLabel = edge->getLabel();
-            AnnotatedGraphNode* successor =
-//                    v->followEdgeWithLabel(currentLabel);
-                      edge->getDstNode();
-                assert(successor != NULL);
+            AnnotatedGraphNode* successor = edge->getDstNode();
+            assert(successor != NULL);
 
-            os << "p"<< v->getName() << "->"<< "p"<< successor->getName()
-                    << " [label=\""<< currentLabel
-                    << "\", fontcolor=black, color= blue];\n";
+            os << "p" << v->getName() << "->" << "p" << successor->getName()
+               << " [label=\""<< currentLabel
+               << "\", fontcolor=black, color= blue];\n";
+
             createDotFileRecursively(successor, os, visitedNodes);
         }
         delete edgeIter;
@@ -2258,8 +2264,8 @@ string AnnotatedGraph::createOGFile(const string& filenamePrefix, bool hasOWFN) 
         }
         delete iEdge;
     }
-    ogFile << ';' << endl;
 
+    ogFile << ';' << endl;
     ogFile.close();
 
     trace(TRACE_5, "AnnotatedGraph::createOGFile(): end\n");
@@ -2714,8 +2720,9 @@ void AnnotatedGraph::reduceStructurally() {
 
 
 bool isDiamond(AnnotatedGraphNode * node,
-        AnnotatedGraph::predecessorMap& predecessors) {
-    // check for simple diamomd
+               AnnotatedGraph::predecessorMap& predecessors) {
+
+    // check for simple diamond
     std::queue< AnnotatedGraphNode*> testNodes;
     std::map< AnnotatedGraphNode*, bool> inQueue;
     std::list< AnnotatedGraphNode*> diamond;
@@ -2819,7 +2826,7 @@ bool isDiamond(AnnotatedGraphNode * node,
  *  NOTE: If a node B is reachable from a node B via two different edges
  *        then A is two times the predecessor of B
  *
- *  ??? Vorgï¿½nger zweimal drin, wenn ï¿½ber zwei Kanten erreichbar
+ *  ??? Vorgänger zweimal drin, wenn über zwei Kanten erreichbar
  */
 void AnnotatedGraph::getPredecessorRelation(AnnotatedGraph::predecessorMap& resultMap) {
 
@@ -2837,6 +2844,7 @@ void AnnotatedGraph::getPredecessorRelation(AnnotatedGraph::predecessorMap& resu
         }
     }
 }
+
 
 //! \brief assigns the final nodes of the OG according to Gierds 2007
 void AnnotatedGraph::assignFinalNodes() {
@@ -2881,15 +2889,18 @@ void AnnotatedGraph::assignFinalNodes() {
 //!           The function also respects the parameter if empty nodes are
 //!           to be shown or not.
 void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdges() {
+
     // Reset statistic variables
     std::map<AnnotatedGraphNode*, t_typeOfVisit> visitedNodes;
     nStoredStates = 0;
     nEdges = 0;
     nBlueEdges = 0;
     nBlueNodes = 0;
-if (hasNoRoot()) {
-    return;
-}
+
+    if (hasNoRoot()) {
+        return;
+    }
+
     // Call the recursive helper
     computeNumberOfNodesAndStatesAndEdgesHelper(root, visitedNodes, (root->getColor() == BLUE));
 }
@@ -2905,8 +2916,8 @@ if (hasNoRoot()) {
 //!        already looked at; distinguishes between "a visit only" and "counted as blue".
 //! \param onABluePath true if we are on a blue path
 void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphNode* v,
-        std::map<AnnotatedGraphNode*, t_typeOfVisit>& visitedNodes,
-        bool onABluePath) {
+                                                                 std::map<AnnotatedGraphNode*, t_typeOfVisit>& visitedNodes,
+                                                                 bool onABluePath) {
 
     assert(v != NULL);
 
@@ -2918,15 +2929,16 @@ void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphN
 
     // Determine if we have a blue node and are on a blue path.
     if (onABluePath && (v->getColor() == BLUE) && 
-    		(parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
-    	
+        (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
+
         ++nBlueNodes;
-        
+
         // remember that the current node has been counted as blue
         visitedNodes[v] = VISITED_COUNTED_AS_BLUE;
     } else {
         onABluePath = false;
     }
+
     // Add the new states
     nStoredStates += v->reachGraphStateSet.size();
 
@@ -2953,27 +2965,25 @@ void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphN
         }
 
         if (vNext != v) {
-        	// have we visited the next node before? 
-        	// 1) if not, we check the next node
-        	// 2) if we have seen the next before, we only consider it again if
-        	// 		a) we are on a blue path
-        	// 		b) the next node is blue
-        	// 		c) we have not yet counted the next (blue) node as a blue node
-        	//		(it is possible to reach a blue node via a red path before, however there
-        	//		 may be a blue path which also leads to the blue node)
-        	if ((visitedNodes.find(vNext) == visitedNodes.end()) ||
-        			(onABluePathInLoop && 
-        			vNext->getColor() == BLUE &&
-        			visitedNodes[vNext] == VISITED_NOT_COUNTED)) {
-        	
-        		// Call recursively with the current blue path status.
-        		computeNumberOfNodesAndStatesAndEdgesHelper(vNext, visitedNodes, onABluePathInLoop);
-        	}
+            // have we visited the next node before? 
+            // 1) if not, we check the next node
+            // 2) if we have seen the next before, we only consider it again if
+            // 		a) we are on a blue path
+            // 		b) the next node is blue
+            // 		c) we have not yet counted the next (blue) node as a blue node
+            //		(it is possible to reach a blue node via a red path before, however there
+            //		 may be a blue path which also leads to the blue node)
+            if ((visitedNodes.find(vNext) == visitedNodes.end()) ||
+                (onABluePathInLoop && vNext->getColor() == BLUE &&
+                 visitedNodes[vNext] == VISITED_NOT_COUNTED)) {
+
+                // Call recursively with the current blue path status.
+                computeNumberOfNodesAndStatesAndEdgesHelper(vNext, visitedNodes, onABluePathInLoop);
+            }
         }
     }
     delete edgeIter;
 }
-
 
 
 //! \brief Computes statistics about this graph. They can be printed by
@@ -2983,6 +2993,7 @@ void AnnotatedGraph::computeGraphStatistics() {
     computeNumberOfNodesAndStatesAndEdges();
     trace(TRACE_5, "AnnotatedGraph::computeGraphStatistics(): end\n");
 }
+
 
 //! \brief Prints statistics about this graph. May only be called after
 //!       computeGraphStatistics().
@@ -2998,6 +3009,7 @@ void AnnotatedGraph::printGraphStatistics() {
     trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStoredStates()) + "\n");
     trace(TRACE_5, "AnnotatedGraph::printGraphStatistics(): end\n");
 }
+
 
 //! \brief returns the number of stored states
 //!        may only be called after computeGraphStatistics()
@@ -3029,6 +3041,7 @@ unsigned int AnnotatedGraph::getNumberOfBlueNodes() const {
 unsigned int AnnotatedGraph::getNumberOfBlueEdges() const {
     return nBlueEdges;
 }
+
 
 //! \brief returns the number of nodes
 //! \return number of nodes
@@ -3137,11 +3150,11 @@ void AnnotatedGraph::printGraphToSTGRecursively(AnnotatedGraphNode * v,
             continue; // continue if node is not to show
         }
 
-		// build label vector:
-		// each label is mapped to his position in edgeLabes
-		string currentLabel = element->getLabel();
-		int foundPosition = -1;
-		for (int i = 0; i < (int)edgeLabels.size(); i++) {
+        // build label vector:
+        // each label is mapped to his position in edgeLabes
+        string currentLabel = element->getLabel();
+        int foundPosition = -1;
+        for (int i = 0; i < (int)edgeLabels.size(); i++) {
 
             if (currentLabel == edgeLabels.at(i) ) {
                 foundPosition = i;
@@ -3173,9 +3186,9 @@ void AnnotatedGraph::printGraphToSTGRecursively(AnnotatedGraphNode * v,
 
 
 string AnnotatedGraph::getSuffix() const {
-	
-	string suffix = "";
-	
+
+    string suffix = "";
+
     if (!options[O_CALC_ALL_STATES]) {
         suffix += ".R";
     }
@@ -3193,9 +3206,8 @@ string AnnotatedGraph::getSuffix() const {
     }
     
     return suffix;
-
-
 }
+
 
 /**** TRANSFERRED FROM COMMUNICATIONGRAPH END ****/
 

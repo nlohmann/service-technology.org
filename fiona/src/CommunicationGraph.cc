@@ -321,7 +321,7 @@ string CommunicationGraph::createDotFile(string& filenamePrefix) const {
             dotFile << "p0"
                     << " [label=\"#0\", fontcolor=black, color=red, style=dashed];\n";
         } else {
-        std::map<AnnotatedGraphNode*, bool> visitedNodes;
+            std::map<AnnotatedGraphNode*, bool> visitedNodes;
 
         // filling the file with nodes and edges
         createDotFileRecursively(rootNode, dotFile, visitedNodes);

@@ -48,8 +48,7 @@ rm -f $DIR/dke07_shop_sect_6.owfn.R.ig.og
 rm -f $DIR/*.log
 
 result=0
-
-exit $result
+#exit $result
 
 
 ############################################################################

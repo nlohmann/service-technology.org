@@ -33,13 +33,11 @@ SUBDIR=sequence_suite
 DIR=$testdir/$SUBDIR
 FIONA=fiona
 
-result=0
-
-
-exit $result
-
 #loeschen aller erzeugten Dateien im letzten Durchlauf
 rm -f $DIR/*.log
+
+result=0
+#exit $result
 
 ############################################################################
 

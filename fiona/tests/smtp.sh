@@ -25,21 +25,25 @@ source defaults.sh
 
 result=1
 
-DIR=$testdir/philosophers
+DIR=$testdir/smtp
 FIONA=fiona
 
+echo ---------------------------------------------------------------------
+
 for i in 3 4 5; do
-    cmd="$FIONA -a -t OG $DIR/smtp$i.owfn"
+    cmd="$FIONA -t og $DIR/smtp$i.owfn"
 
     if [ "$quiet" != "no" ]; then
         cmd="$cmd -Q"
     fi
 
     echo
-    echo ---------------------------------------------------------------------
     echo running: $cmd
+    $cmd 2>&1
     echo
     $cmd
 done
 
 exit $result
+
+echo ---------------------------------------------------------------------

@@ -29,7 +29,7 @@ DIR=$testdir/philosophers
 FIONA=fiona
 
 for i in 3 4 5 6 7 8 9 10; do
-    cmd="$FIONA -a -t OG $DIR/phcontrol$i.unf.owfn -e1 -m1"
+    cmd="$FIONA -t og $DIR/phcontrol$i.unf.owfn -e1 -m1"
     if [ "$quiet" != "no" ]; then
         cmd="$cmd -Q"
     fi
@@ -37,6 +37,7 @@ for i in 3 4 5 6 7 8 9 10; do
     echo
     echo ---------------------------------------------------------------------
     echo running: $cmd
+    $cmd 2>&1
     echo
 done
 

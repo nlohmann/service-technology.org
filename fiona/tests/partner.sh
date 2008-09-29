@@ -326,5 +326,6 @@ if [ $result -ne 0 ]; then
     fi
 fi
 
-#echo $result
+echo
+
 exit $result

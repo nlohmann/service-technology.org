@@ -142,7 +142,6 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              productog/1x2x3.expected.og \
              productog/3x1x2.expected.og \
              publicview/complexPV.owfn \
-             publicview/complexPV.owfn.og \
              publicview/non_empty_true_node2.owfn \
              publicview/non_empty_true_node3.owfn \
              publicview/NonFinalTauNode1.owfn \

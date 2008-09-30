@@ -29,8 +29,16 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-DIR=$testdir/statesReduction
+SUBDIR=statesReduction
+DIR=$testdir/$SUBDIR
 FIONA=fiona
+
+# for make distcheck: make copy of $owfn and work on it
+if [ "$testdir" != "$builddir" ]; then
+    if [ ! -e $builddir/$SUBDIR ]; then
+        $MKDIR_P $builddir/$SUBDIR
+    fi
+fi
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
 rm -f $DIR/06-03-23_BPM06_shop_sect_3.output.owfn.ig.og
@@ -54,8 +62,9 @@ result=0
 ############################################################################
 # check if graph using -R is the same as the one generated without -R
 ############################################################################
+
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
-outputPrefix="$builddir/statesReduction/06-03-23_BPM06_shop_sect_3.owfn.output"
+outputPrefix="$builddir/$SUBDIR/06-03-23_BPM06_shop_sect_3.owfn.output"
 cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 
 echo running $cmd1
@@ -76,8 +85,9 @@ result=`expr $result + $equivalent`
 # check if graph using -R is the same as the one generated without -R
 # ==> OG
 ############################################################################
+
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
-outputPrefix="$builddir/statesReduction/06-03-23_BPM06_shop_sect_3.owfn.output"
+outputPrefix="$builddir/$SUBDIR/06-03-23_BPM06_shop_sect_3.owfn.output"
 cmd1="$FIONA $owfn -t eqR -t OG -o $outputPrefix"
 
 
@@ -98,8 +108,9 @@ result=`expr $result + $equivalent`
 ############################################################################
 # check if graph using -R is the same as the one generated without -R
 ############################################################################
+
 owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
-outputPrefix="$builddir/statesReduction/06-03-23_BPM06_shop_sect_6.owfn.output"
+outputPrefix="$builddir/$SUBDIR/06-03-23_BPM06_shop_sect_6.owfn.output"
 cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 
 echo running $cmd1
@@ -119,8 +130,9 @@ result=`expr $result + $equivalent`
 ############################################################################
 # check if graph using -R is the same as the one generated without -R
 ############################################################################
+
 owfn="$DIR/myCoffee.owfn"
-outputPrefix="$builddir/statesReduction/myCoffee.owfn.output"
+outputPrefix="$builddir/$SUBDIR/myCoffee.owfn.output"
 cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 
 echo running $cmd1
@@ -140,8 +152,9 @@ result=`expr $result + $equivalent`
 ############################################################################
 # check if graph using -R is the same as the one generated without -R
 ############################################################################
+
 owfn="$DIR/dke07_shop_sect_3.owfn"
-outputPrefix="$builddir/statesReduction/dke07_shop_sect_3.owfn.output"
+outputPrefix="$builddir/$SUBDIR/dke07_shop_sect_3.owfn.output"
 cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 
 echo running $cmd1
@@ -161,8 +174,9 @@ result=`expr $result + $equivalent`
 ############################################################################
 # check if graph using -R is the same as the one generated without -R
 ############################################################################
+
 owfn="$DIR/dke07_shop_sect_6.owfn"
-outputPrefix="$builddir/statesReduction/dke07_shop_sect_6.owfn.output"
+outputPrefix="$builddir/$SUBDIR/dke07_shop_sect_6.owfn.output"
 cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 
 echo running $cmd1

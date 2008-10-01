@@ -3,6 +3,7 @@ ChangeLog for UML2oWFN
 Version 1.03 (in progress)
 ============
 
++ added parameter "-a orJoin" to translate process for soundness analysis assuming an implicit OR-join on the control-flow
 + extend log output, log now contains statistical data about the each process: number of nodes, number of edges, average number of incoming edges, average number of outgoing edges
 + added parameter "-p anon" to anonymize the process output by enumerating places (p1, p2, ...) and transitions (t1, t2, ...) before writing to disk
 + added parameter "-a wfNet" to translate processes into Aalst-workflow-nets, the translation assumes an AND-join on all end- and stop-nodes of the process

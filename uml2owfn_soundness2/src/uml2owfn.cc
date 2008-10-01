@@ -797,12 +797,12 @@ translationResult_t translate_process(Block *process, analysis_t analysis, unsig
     	if (analysis[A_DEADLOCKS]) {
         // create proper livelocks on the net to check for deadlocks
         trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for deadlock analysis\n");
-    		bom->soundness_terminalPlaces(&PN, liveLocks, analysis[A_STOP_NODES], !analysis[A_REMOVE_PINSETS], analysis[A_WF_NET]);
+    		bom->soundness_terminalPlaces(&PN, liveLocks, analysis[A_STOP_NODES], !analysis[A_REMOVE_PINSETS], analysis[A_WF_NET], analysis[A_ORJOIN]);
     	}
     	else
     	{
         trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for general soundness analysis\n");
-    		bom->soundness_terminalPlaces(&PN, liveLocks, analysis[A_STOP_NODES], !analysis[A_REMOVE_PINSETS], analysis[A_WF_NET]);
+    		bom->soundness_terminalPlaces(&PN, liveLocks, analysis[A_STOP_NODES], !analysis[A_REMOVE_PINSETS], analysis[A_WF_NET], analysis[A_ORJOIN]);
     	}
 
     	// check net structure: alpha to omega?

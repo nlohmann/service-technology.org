@@ -270,45 +270,45 @@ void BomProcess::soundness_initialPlaces(PetriNet *PN) {
 	Place* pAlpha = PN->newPlace("alpha", INTERNAL);
 	pAlpha->mark();
 
-    set<Place*> removeNodes;
-    set<Node*> noMoreInput;
-    unsigned int setNum = 1;
+  set<Place*> removeNodes;
+  set<Node*> noMoreInput;
+  unsigned int setNum = 1;
 
-    // create an activating transition for each input pinset of the process
-    for (set<Transition *>::iterator inPS = process_inputPinSets.begin(); inPS != process_inputPinSets.end(); inPS++)
+  // create an activating transition for each input pinset of the process
+  for (set<Transition *>::iterator inPS = process_inputPinSets.begin(); inPS != process_inputPinSets.end(); inPS++)
+  {
+    // the transition of the input pinset
+    Transition* pinset_transition = static_cast<Transition *>(*inPS);
+    set<Node *> inputPins = PN->preset(pinset_transition);	// and the input pins
+
+    if (inputPins.size() == 0)	// if the pinset has no transition (process without data input)
     {
-    	// the transition of the input pinset
-    	Transition* pinset_transition = static_cast<Transition *>(*inPS);
-    	set<Node *> inputPins = PN->preset(pinset_transition);	// and the input pins
-
-    	if (inputPins.size() == 0)	// if the pinset has no transition (process without data input)
-    	{
-    		PN->newArc(pAlpha, pinset_transition);	// add new arc to the pinset transition
-    		continue;
-    	}
-
-    	PN->newArc(pAlpha, pinset_transition);
-    	noMoreInput.insert(pinset_transition);
-
-    	for (set<Node *>::iterator it = inputPins.begin(); it != inputPins.end(); it++)
-    	{
-    		Place* place = static_cast<Place*>(*it);
-            // choose the 'old' input place for removal
-	        removeNodes.insert(place);
-    	}
-    	setNum++;
+      PN->newArc(pAlpha, pinset_transition);	// add new arc to the pinset transition
+      continue;
     }
 
-    // remove all chosen places
-    for (set<Place*>::iterator p = removeNodes.begin(); p != removeNodes.end(); p++) {
-    	//cerr << "removing place " << (*p)->nodeFullName() << endl;
-        PN->removePlace(*p);
+    PN->newArc(pAlpha, pinset_transition);
+    noMoreInput.insert(pinset_transition);
+
+    for (set<Node *>::iterator it = inputPins.begin(); it != inputPins.end(); it++)
+    {
+      Place* place = static_cast<Place*>(*it);
+          // choose the 'old' input place for removal
+        removeNodes.insert(place);
     }
-    // make all post-transitions that had an input-place internal transitions
-    for (set<Node*>::iterator t = noMoreInput.begin(); t != noMoreInput.end(); t++) {
-    	//cerr << "making transition " << (*t)->nodeFullName() << " internal" << endl;
-        (*t)->type = INTERNAL;
-    }
+    setNum++;
+  }
+
+  // remove all chosen places
+  for (set<Place*>::iterator p = removeNodes.begin(); p != removeNodes.end(); p++) {
+    //cerr << "removing place " << (*p)->nodeFullName() << endl;
+      PN->removePlace(*p);
+  }
+  // make all post-transitions that had an input-place internal transitions
+  for (set<Node*>::iterator t = noMoreInput.begin(); t != noMoreInput.end(); t++) {
+    //cerr << "making transition " << (*t)->nodeFullName() << " internal" << endl;
+      (*t)->type = INTERNAL;
+  }
 }
 
 /*!
@@ -320,8 +320,9 @@ void BomProcess::soundness_initialPlaces(PetriNet *PN) {
  * \param	stopNodes  distinguish stop nodes from end nodes
  * \param keepPinsets  ignore termination according to output pinsets
  * \param wfNet  attempt to create a workflow net structure
+ * \param orJoin construct valid OR-join for process termination
  */
-void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool stopNodes, bool keepPinsets=true, bool wfNet=false)
+void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool stopNodes, bool keepPinsets=true, bool wfNet=false, bool orJoin=false)
 {
   set<Place*> 		 places_to_remove;
   set<Transition*> transitions_to_remove;
@@ -334,6 +335,12 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
   {
     (*place)->isFinal = false;
       // possible extension: introduce omega-place as unqiue final place
+  }
+
+  if (orJoin) {   // in case of an OR-join: add unique omega-place
+    Place *omega = PN->newPlace("omega");
+    omega->isFinal = true,
+    omegaPlaces.insert(omega);
   }
 
   // replace the post-set of the output pinset transition with an
@@ -350,7 +357,7 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
     }
     noMoreOutput.insert((*outPS));
 
-    if (keepPinsets) {
+    if (!orJoin && keepPinsets) {
       // keep pinsets: create omega post-place of the pinset-transition,
       // and add a live-locking loop if necessary
       Place* outputPlace = PN->newPlace((*outPS)->nodeFullName() + "_omega");
@@ -363,10 +370,9 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
         Transition* tLoop = PN->newTransition(outputPlace->nodeFullName() + ".loop");
         PN->newArc(outputPlace, tLoop, STANDARD, 1);
         PN->newArc(tLoop, outputPlace, STANDARD, 1);
-
       }
 
-    } else {
+    } else if (!orJoin && !wfNet) {
       // do not keep pinsets: remove pinset transition
       transitions_to_remove.insert(*outPS);
 
@@ -379,6 +385,10 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
         PN->newArc(place, tConsume);
         // adding live-locks is not necessary
       }
+    } else if (orJoin && !wfNet) {
+      // add an arc producing a token on omega
+      Place* omega = *omegaPlaces.begin();
+      PN->newArc(*outPS, omega, STANDARD, 1);
     }
   }
 
@@ -397,12 +407,13 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
     for (set<Place *>::iterator it = process_endNodes.begin(); it != process_endNodes.end(); it++) {
       Place* p = static_cast<Place*>(*it);
 
-      // get post-transition ".eat" of place p
-      Transition* t = static_cast<Transition*>(*(PN->postset(p).begin()));
-      transitions_to_remove.insert(t);
-      //PN->newArc(t, p, STANDARD, 1);				// add arc back to p
+      if (!orJoin) {
+        // remove post-transition ".eat" of end place p
+        Transition* t = static_cast<Transition*>(*(PN->postset(p).begin()));
+        transitions_to_remove.insert(t);
+      }
 
-      if (!wfNet) {
+      if (!wfNet && !orJoin) {
         // not creating a workflow net, add a transition that cleans the end node
         // for each omega place
         int outputSetNum = 1;
@@ -417,7 +428,7 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
           PN->newArc(tEndClean, (*omega));
           outputSetNum++;
         }
-      } else {
+      } else if (wfNet && !orJoin) {
         // try to create a workflow net: each output pinset has its own
         // omega transition and its own omega-place, add each end node
         // to the preset of each output pinset-omega transition
@@ -434,10 +445,11 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
     for (set<Place *>::iterator it = process_stopNodes.begin(); it != process_stopNodes.end(); it++) {
       Place* p = static_cast<Place*>(*it);
 
-      // get post-transition ".eat" of place p
-      Transition* t = static_cast<Transition*>(*(PN->postset(p).begin()));
-      transitions_to_remove.insert(t);
-          //PN->newArc(t,p);				// add arc back to p
+      if (!orJoin) {
+        // remove post-transition ".eat" of end place p
+        Transition* t = static_cast<Transition*>(*(PN->postset(p).begin()));
+        transitions_to_remove.insert(t);
+      }
 
       if (stopNodes) {
         // distinguish stop nodes from end-nodes
@@ -445,7 +457,7 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
       } else {
         // treat stop nodes like end nodes
 
-        if (!wfNet) {
+        if (!wfNet && !orJoin) {
           // not creating a workflow net, add a transition that cleans the end node
           // for each omega place
           int outputSetNum = 1;
@@ -460,7 +472,7 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
             PN->newArc(tEndClean, (*omega));
             outputSetNum++;
           }
-        } else {
+        } else if (wfNet && !orJoin) {
           // try to create a workflow net: each output pinset has its own
           // omega transition and its own omega-place, add each end node
           // to the preset of each output pinset-omega transition
@@ -474,7 +486,7 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
     }
 
     // a workflow net may have only one omega place
-    if (wfNet) {
+    if (wfNet && !orJoin) {
       Place* processOmega = PN->newPlace("omega");
       for (set<Place *>::iterator omega = omegaPlaces.begin();
                     omega != omegaPlaces.end(); omega++)

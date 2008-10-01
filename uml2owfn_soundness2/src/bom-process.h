@@ -52,7 +52,7 @@ public:
 	void soundness_initialPlaces (PetriNet *PN);
 
 	/// make output places internal and add live-locks at all terminal places
-	void soundness_terminalPlaces (PetriNet *PN, bool liveLocks, bool stopNodes, bool keepPinsets, bool wfNet);
+	void soundness_terminalPlaces (PetriNet *PN, bool liveLocks, bool stopNodes, bool keepPinsets, bool wfNet, bool orJoin);
 
 	/// constructor
 	BomProcess();

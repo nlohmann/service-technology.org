@@ -145,7 +145,9 @@ void print_help()
 	trace("    removePinsets       remove output pinsets (requires -a soundness)\n");
   trace("    wfNet               attempt to translate net into a workflow net,\n");
   trace("                        (requires -a soundness)\n");
-	trace("\n");
+  trace("    orJoin              analyze net by assuming an implicit OR-join,\n");
+  trace("                        (requires -a soundness)\n");
+  trace("\n");
 	trace("Examples:\n");
 	trace("  uml2owfn -i library.xml -f dot -o\n");
 	trace("  uml2owfn -i library.xml -f lola -p filter -a soundness -o\n");
@@ -365,7 +367,9 @@ void parse_command_line(int argc, char* argv[])
         globals::analysis[A_REMOVE_PINSETS] = true;
       else if (parameter == "wfNet")
         globals::analysis[A_WF_NET] = true;
-			else {
+      else if (parameter == "orJoin")
+        globals::analysis[A_ORJOIN] = true;
+      else {
 				trace(TRACE_ALWAYS, "Unknown analysis task \"" + parameter +"\".\n");
 				trace(TRACE_ALWAYS, "Use -h to get a list of valid analysis tasks.\n");
 				exit(1);
@@ -511,6 +515,12 @@ void parse_command_line(int argc, char* argv[])
     }
     if (globals::analysis[A_WF_NET]) {
       trace(TRACE_INFORMATION, "creating a workflow net with a final AND-join\n");
+      if (!globals::analysis[A_SOUNDNESS]) {
+        trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
+      }
+    }
+    if (globals::analysis[A_ORJOIN]) {
+      trace(TRACE_INFORMATION, "creating a workflow net with a final implicit OR-join\n");
       if (!globals::analysis[A_SOUNDNESS]) {
         trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
       }

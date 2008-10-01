@@ -121,7 +121,8 @@ typedef enum
   A_DEADLOCKS,		///< check for absence of deadlocks
   A_SAFE,		      ///< check for safeness
   A_REMOVE_PINSETS, ///< remove the output pinsets when checking soundness
-  A_WF_NET,       /// translate into a workflow net for soundness analysis
+  A_WF_NET,       ///< translate into a workflow net for soundness analysis
+  A_ORJOIN,       ///< analyze soundness by assuming an implicit OR-join
   A_MAX
 } possibleAnalysis;
 

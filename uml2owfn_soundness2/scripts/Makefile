@@ -115,6 +115,9 @@ translateweak: $(LIBRARY).xml
 translatewf: $(LIBRARY).xml
 	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a wfNet -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) -o 2> translation.log
 
+translateor: $(LIBRARY).xml
+	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a orJoin -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) -o 2> translation.log
+
 
 ##########################################################################
 # tidy up

@@ -49,7 +49,7 @@ void parseAttrStr(string lhs, string rhs) {
         dummyNode.height = atof(rhs.substr(1, rhs.length() - 2).c_str());
     } else if (lhs == "peripheries") {
         if (rhs == "2") {
-            dummyNode.isFinal = true;
+            dummyNode.peripheries = 2;
         }
     } else if (lhs == "color") {
         dummyNode.color = rhs;
@@ -359,9 +359,11 @@ node_stmt: /* empty */
             {
                 GasTexNode* node = new GasTexNode(dummyNode);
 
-                if (firstNode) {
-                    node->isInitial = true;
-                    firstNode = false;
+                if (gastexGraph->style == GasTexGraph::STYLE_OG) {
+                    if (firstNode) {
+                        node->isInitial = true;
+                        firstNode = false;
+                    }
                 }
 
                 gastexGraph->addNode(node);
@@ -375,11 +377,27 @@ node_stmt: /* empty */
             {
                 GasTexNode* node = new GasTexNode(dummyNode);
 
-                if (firstNode) {
-                    node->isInitial = true;
-                    firstNode = false;
+                if (gastexGraph->style == GasTexGraph::STYLE_OG) {
+                    if (firstNode) {
+                        node->isInitial = true;
+                        firstNode = false;
+                    }
+
+                    if (node->peripheries == 2) {
+                        node->isFinal = true;
+                    }
+
+                } else if (gastexGraph->style == GasTexGraph::STYLE_OWFN) {
+
+                    if (node->fillcolor == "black") {
+                        node->isInitial = true;
+                   }
+
+                    if (node->fillcolor == "gray") {
+                        node->isFinal = true;
+                    }
                 }
-                
+
                 gastexGraph->addNode(node);
 
                 if (!defaultNodeStack.empty()) 

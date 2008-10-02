@@ -397,11 +397,6 @@ void AnnotatedGraphNode::removeEdgesToNode(const AnnotatedGraphNode* nodeToDelet
     while (iEdge->hasNext()) {
         AnnotatedGraphEdge* edge = iEdge->getNext();
         if (edge->getDstNode() == nodeToDelete) {
-            // -"ByHiding" does not work in the numberOfServices() function
-            // since an OG without any strategies will become a single root
-            // node with the annotation "true", when calling the 
-            // removeFalseNodes() function beforehand
-            // removeLiteralFromAnnotationByHiding(edge->getLabel());
             removeLiteralFromAnnotation(edge->getLabel());
             delete edge;
             iEdge->remove();
@@ -468,20 +463,6 @@ void AnnotatedGraphNode::removeLiteralFromAnnotation(const std::string& literal)
     annotation->removeLiteral(literal);
     
     trace(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotation(const string& literal) : end\n");
-}
-
-
-//! \brief removes the given literal from this node's annotation
-//!        by absorbing the literal; multiary formulas made empty
-//!        will be removed
-//! \param literal the literal which is to be removed
-void AnnotatedGraphNode::removeLiteralFromAnnotationByHiding(const std::string& literal) {
-    trace(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotationByHiding(const string& literal) : start\n");
-   
-    //cout << "remove literal " << literal << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
-    annotation->removeLiteralByHiding(literal);
-   
-    trace(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotationByHiding(const string& literal) : end\n");
 }
 
 

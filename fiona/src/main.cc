@@ -334,7 +334,8 @@ void reportOptionValues() {
 //! \brief create a GasTex file of annotated dot file 'myDotFile'
 //! \param myDotFile the dot file with layout annotations
 //! \param myFilePrefix the file prefix to add '.tex' to
-void makeGasTex(std::string myDotFile, std::string myFilePrefix) {
+void makeGasTex(std::string myDotFile, std::string myFilePrefix, 
+                GasTexGraph::STYLE style) {
     trace(TRACE_1, "makeGasTex called for file: ");
     trace(TRACE_1, myDotFile + "\n");
     trace(TRACE_1, "prefix of the file is: ");
@@ -360,6 +361,8 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix) {
     // preparing the global variable gastexGraph for parsing
     gastexGraph = new GasTexGraph();
 
+    // the style has to be set before parsing
+    gastexGraph->setStyle(style);
     // parsing the dot file into variable gastexGraph
     dot_yyparse();
     fclose(dot_yyin);
@@ -386,7 +389,7 @@ void createOutputFiles(AnnotatedGraph* graph, string prefix) {
    
    if (parameters[P_TEX] && dotFileName != "") {
         string annotatedDotFileName = graph->createAnnotatedDotFile(prefix, dotFileName); // .dot
-        makeGasTex(annotatedDotFileName, prefix);
+        makeGasTex(annotatedDotFileName, prefix, GasTexGraph::STYLE_OG);
    }  
 }
 
@@ -1345,7 +1348,7 @@ void makePNG(oWFN* PN) {
             }
 
             // transforming .dot file into gastex format
-            makeGasTex((outFileName + ".dot"), (outFileName));
+            makeGasTex((outFileName + ".dot"), (outFileName), GasTexGraph::STYLE_OWFN);
         }
 
         // call dot to create the png file
@@ -1554,7 +1557,9 @@ int main(int argc, char** argv) {
         if (outfilePrefix.substr(outfilePrefix.size() - dotFileSuffix.size()) == dotFileSuffix) {
             outfilePrefix=outfilePrefix.substr(0, outfilePrefix.size() - dotFileSuffix.size());
         }
-        makeGasTex(dotFileName, outfilePrefix);
+
+        // TODO: find out of which type the graph in the dot file is (og? owfn?)
+        makeGasTex(dotFileName, outfilePrefix, GasTexGraph::STYLE_OG);
     }
 
     // **********************************************************************************

@@ -142,10 +142,6 @@ class AnnotatedGraphNode : public GraphNode {
         /// removes the given literal from this node's annotation
         void removeLiteralFromAnnotation(const std::string& literal);
 
-        /// remove the given literal from this node's annotation
-        /// in that way that the literal is absorbed
-        void removeLiteralFromAnnotationByHiding(const std::string& literal);
-
         /// Removes unneeded literals from the node's annotation. Labels of
         /// edges to red nodes are unneeded.
         void removeUnneededLiteralsFromAnnotation();

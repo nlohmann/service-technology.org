@@ -64,6 +64,7 @@ public:
     int fontsize;
     string shape;
     string style;
+    unsigned int peripheries;
 
     set<GasTexEdge*> edges;
 
@@ -112,6 +113,12 @@ struct BoundingBox {
 class GasTexGraph {
 
 public:
+    typedef enum {
+        STYLE_OWFN,
+        STYLE_OG
+    } STYLE; 
+
+    STYLE style;
     string label;
     int posx, posy, width, height;
     string fontname;
@@ -126,11 +133,12 @@ public:
     GasTexGraph();
     ~GasTexGraph();
 
+    void setStyle(STYLE style);
     void addNode(GasTexNode* node);
     void addEdge(GasTexEdge* edge);
     GasTexNode* getNode(string id);
     void makeGasTex(string texFileName);
-    void makeGasTexOfPN(fstream& texFile);
+    void makeGasTexOfOWFN(fstream& texFile);
     void makeGasTexOfOG(fstream& texFile);
 };
 

@@ -86,6 +86,7 @@ void GasTexNode::setToDefault() {
     fontsize = 10;
     shape = "";
     style = "";
+    peripheries = 1;
 }
 
 
@@ -124,6 +125,8 @@ void GasTexEdge::setToDefault() {
 
 GasTexGraph::GasTexGraph() {
     root = NULL;
+
+    style = STYLE_OWFN;
 }
 
 
@@ -166,6 +169,11 @@ GasTexNode* GasTexGraph::getNode(string id) {
 }
 
 
+void GasTexGraph::setStyle(STYLE style) {
+    this->style = style;
+}
+
+
 void GasTexGraph::makeGasTex(string texFileName) {
     trace(TRACE_5, "GasTexGraph::makeGasTex(string): start\n");
 
@@ -181,12 +189,12 @@ void GasTexGraph::makeGasTex(string texFileName) {
         texFile << texHeader[i];
     }
 
-    // there are two styles available, onw for OG and one for IG 
+    // there are two styles available, one for OG/IG and one for OWFN 
     if (gastexGraph) {
-        if (parameters[P_OG] || parameters[P_IG]) {
+        if (gastexGraph->style == STYLE_OG) {
             makeGasTexOfOG(texFile);
-        } else {
-            makeGasTexOfPN(texFile);
+        } else if (gastexGraph->style == STYLE_OWFN) {
+            makeGasTexOfOWFN(texFile);
         } 
     }
 
@@ -304,6 +312,8 @@ void GasTexGraph::makeGasTexOfOG(fstream& texFile) {
         		texFile << ogNodeStmt[11] << texFormat((*iNode)->label);
         		texFile << ogNodeStmt[12];
         	}
+        } else {
+            texFile << ogNodeStmt[11] << ogNodeStmt[12];
         }
         //texFile << ogNodeStmt[12] << endl;
         texFile << endl;
@@ -343,7 +353,7 @@ void GasTexGraph::makeGasTexOfOG(fstream& texFile) {
 }
 
 
-void GasTexGraph::makeGasTexOfPN(fstream& texFile) {
+void GasTexGraph::makeGasTexOfOWFN(fstream& texFile) {
 
     // drawing bounding boxes
     for(set<BoundingBox*>::iterator iBB = gastexGraph->boundingBoxes.begin(); 

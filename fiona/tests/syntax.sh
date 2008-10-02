@@ -93,6 +93,47 @@ fi
 
 ############################################################################
 
+maxoccurrencesbluenodes_soll=21
+maxoccurrencesblueedges_soll=20
+maxoccurrencesstoredstates_soll=81
+
+owfn="$DIR/max_occurrence.owfn"
+cmd="$FIONA $owfn -t OG -m5 -e -1"
+
+if [ "$quiet" != "no" ]; then
+    cmd="$cmd -Q"
+fi
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.OG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    maxoccurrencescontrol=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $maxoccurrencesbluenodes_soll" > /dev/null
+    maxoccurrencesbluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $maxoccurrencesblueedges_soll" > /dev/null
+    maxoccurrencesblueedges=$?
+
+    echo $OUTPUT | grep "number of states stored in nodes: $maxoccurrencesstoredstates_soll" > /dev/null
+    maxoccurrencesstoredstates=$?
+
+    if [ $maxoccurrencescontrol -ne 0 -o $maxoccurrencesbluenodes -ne 0 -o $maxoccurrencesblueedges -ne 0 -o $maxoccurrencesstoredstates -ne 0 ]
+    then
+    echo   ... failed to build OG correctly
+    fi
+
+    result=`expr $result + $maxoccurrencescontrol + $maxoccurrencesbluenodes + $maxoccurrencesblueedges + $maxoccurrencesstoredstates`
+fi
+
+############################################################################
+
 owfn="$DIR/syntax_example.owfn"
 cmd="$FIONA $owfn -t IG"
 

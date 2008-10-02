@@ -279,35 +279,38 @@ covrunclean:
 
 clean-local: covrunclean cleandeps
 
-DISTCLEANFILES =  productog/1_X_2.output.og \
-                  productog/1_X_2.output.out \
-                  productog/1_X_2.output.png \
-                  productog/1_X_2_X_3.output.og \
-                  productog/1_X_2_X_3.output.out \
-                  productog/1_X_2_X_3.output.png \
-                  productog/3_X_1_X_2.output.og \
-                  productog/3_X_1_X_2.output.out \
-                  productog/3_X_1_X_2.output.png \
-                  partner/sequence3.owfn \
-                  partner/sequence3.owfn.OG.out \
-                  partner/sequence3.owfn.OG.png \
-                  partner/sequence3.owfn.og \
-                  partner/sequence3.owfn.OG.stg \
-                  partner/sequence3.owfn.OG.pn \
-                  partner/sequence3-partner.owfn \
-                  partner/sequence3-partner.dot \
-                  partner/sequence3-partner.png \
+DISTCLEANFILES =  productog/1x2.output.og \
+		  productog/1x2.output.out \
+		  productog/1x2.output.png \
+		  productog/1x2x3.output.og \
+		  productog/1x2x3.output.out \
+		  productog/1x2x3.output.png \
+		  productog/3x1x2.output.og \
+		  productog/3x1x2.output.out \
+		  productog/3x1x2.output.png \
                   formula/*output* \
                   petrify.log \
 		  falseannos/bluefalsenode.blue.og \
-		  falseannos/bluefalsenode.expected.og \
-		  falseannos/bluefalsenode.og \
 		  falseannos/shorten.blue.og \
-		  falseannos/shorten.expected.og \
-		  falseannos/shorten.og \
 		  falseannos/violating.blue.og \
-		  falseannos/violating.expected.og \
-		  falseannos/violating.og \
+                  falseannos/bluefalsenode.expected.og \
+                  falseannos/bluefalsenode.og \
+                  falseannos/shorten.expected.og \
+                  falseannos/shorten.og \
+                  falseannos/violating.expected.og \
+                  falseannos/violating.og \
+                  statesReduction/06-03-23_BPM06_shop_sect_3.owfn.output.ig.og \
+                  statesReduction/06-03-23_BPM06_shop_sect_3.owfn.output.R.ig.og \
+                  statesReduction/06-03-23_BPM06_shop_sect_3.owfn.output.og \
+                  statesReduction/06-03-23_BPM06_shop_sect_3.owfn.output.R.og \
+                  statesReduction/06-03-23_BPM06_shop_sect_6.owfn.output.ig.og \
+                  statesReduction/06-03-23_BPM06_shop_sect_6.owfn.output.R.ig.og \
+                  statesReduction/myCoffee.owfn.output.ig.og \
+                  statesReduction/myCoffee.owfn.output.R.ig.og \
+                  statesReduction/dke07_shop_sect_3.owfn.output.ig.og \
+                  statesReduction/dke07_shop_sect_3.owfn.output.R.ig.og \
+                  statesReduction/dke07_shop_sect_6.owfn.output.ig.og \
+                  statesReduction/dke07_shop_sect_6.owfn.output.R.ig.og \
 		  minimize/06-03-23_BPM06_shop_sect_3.owfn.og.minimal.og \
 		  minimize/06-03-23_BPM06_shop_sect_3.owfn.og.minimal.out \
 		  minimize/06-03-23_BPM06_shop_sect_3.owfn.og.minimal.png \
@@ -338,6 +341,17 @@ DISTCLEANFILES =  productog/1_X_2.output.og \
 		  oWFNreduction/06-03-23_BPM06_shop_sect_6.reduced.owfn \
 		  oWFNreduction/060116-misc-coffee.reduced.owfn \
 		  oWFNreduction/phcontrol3.unf.reduced.owfn \
+                  partner/sequence3.owfn \
+                  partner/sequence3.owfn.og \
+                  partner/sequence3-partner.owfn \
+                  partner/sequence3-partner.dot \
+                  partner/sequence3-partner.png \
+		  partner/sequence3.owfn.og.og.pn \
+		  partner/sequence3.owfn.og.og.stg \
+		  partner/sequence3.owfn.og.out \
+		  partner/sequence3.owfn.og.png \
+		  partner/sequence3.owfn.og.stg \
+		  partner/sequence3.owfn.og.pn \
 		  partner/coffee-partner.dot \
 		  partner/coffee-partner.owfn \
 		  partner/coffee-partner.png \
@@ -365,21 +379,15 @@ DISTCLEANFILES =  productog/1_X_2.output.og \
 		  partner/coffee_extended.owfn.ig.pn \
 		  partner/coffee_extended.owfn.ig.png \
 		  partner/coffee_extended.owfn.ig.stg \
-		  partner/sequence3.owfn.og.og.pn \
-		  partner/sequence3.owfn.og.og.stg \
 		  png/big.owfn.output.dot \
 		  png/big.owfn.output.out \
 		  png/big.owfn.output.png \
 		  png/big.owfn.output.tex \
-		  productog/1x2.output.og \
-		  productog/1x2.output.out \
-		  productog/1x2.output.png \
-		  productog/1x2x3.output.og \
-		  productog/1x2x3.output.out \
-		  productog/1x2x3.output.png \
-		  productog/3x1x2.output.og \
-		  productog/3x1x2.output.out \
-		  productog/3x1x2.output.png \
+		  png/big.owfn.output.og \
+		  png/big.owfn.output.og.dot \
+		  png/big.owfn.output.og.out \
+		  png/big.owfn.output.og.png \
+		  png/big.owfn.output.og.tex \
 		  publicview/complexPV.pv.owfn \
 		  publicview/complexPV.pv.sa.out \
 		  publicview/complexPV.pv.sa.png \
@@ -389,12 +397,20 @@ DISTCLEANFILES =  productog/1_X_2.output.og \
 		  publicview/non_empty_true_node3.pv.owfn \
 		  publicview/non_empty_true_node3.pv.sa.out \
 		  publicview/non_empty_true_node3.pv.sa.png \
+		  publicview/NonFinalTauNode1.pv.sa.out \
+		  publicview/NonFinalTauNode1.pv.owfn \
+		  publicview/NonFinalTauNode2.pv.sa.out \
+		  publicview/NonFinalTauNode2.pv.owfn \
+		  publicview/NonFinalTauNode3.pv.sa.out \
+		  publicview/NonFinalTauNode3.pv.owfn \
+		  publicview/NonFinalTauNode4.pv.sa.out \
+		  publicview/NonFinalTauNode4.pv.owfn \
+		  publicview/NonFinalTauNode1not.pv.sa.out \
+		  publicview/NonFinalTauNode1not.pv.owfn \
+		  publicview/NonFinalTauNode2not.pv.sa.out \
+		  publicview/NonFinalTauNode2not.pv.owfn \
 		  syntax/formula.owfn.output.og \
-		  syntax/formula.owfn.output.og.out \
-		  partner/sequence3.owfn.og.out \
-		  partner/sequence3.owfn.og.png \
-		  partner/sequence3.owfn.og.stg \
-		  partner/sequence3.owfn.og.pn
+		  syntax/formula.owfn.output.og.out
 
 
 distclean-local:

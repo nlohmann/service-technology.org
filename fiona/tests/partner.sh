@@ -42,19 +42,23 @@ FIONA=fiona
 result=0
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
-rm -f $DIR/sequence3.owfn.*
+rm -f $DIR/sequence3.owfn.i*
+rm -f $DIR/sequence3.owfn.o*
 rm -f $DIR/sequence3-partner.dot
 rm -f $DIR/sequence3-partner.owfn
 rm -f $DIR/sequence3-partner.png
-rm -f $DIR/coffee.owfn.*
+rm -f $DIR/coffee.owfn.i*
+rm -f $DIR/coffee.owfn.o*
 rm -f $DIR/coffee-partner.dot
 rm -f $DIR/coffee-partner.owfn
 rm -f $DIR/coffee-partner.png
-rm -f $DIR/coffee2.owfn.*
+rm -f $DIR/coffee2.owfn.i*
+rm -f $DIR/coffee2.owfn.o*
 rm -f $DIR/coffee2-partner.dot
 rm -f $DIR/coffee2-partner.owfn
 rm -f $DIR/coffee2-partner.png
-rm -f $DIR/coffee_extended.owfn.*
+rm -f $DIR/coffee_extended.owfn.i*
+rm -f $DIR/coffee_extended.owfn.o*
 rm -f $DIR/coffee_extended-partner.dot
 rm -f $DIR/coffee_extended-partner.owfn
 rm -f $DIR/coffee_extended-partner.png

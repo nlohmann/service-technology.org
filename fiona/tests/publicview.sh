@@ -200,16 +200,16 @@ fi
 
 
 ############################################################################
-# start of the outcommented detailed test                                  #
+# start of the outcommentable detailed test                                #
 ############################################################################
-<<OUTCOMMENTED
 
 ############################################################################
 # NonFinalTauNode1 equivalence
 ############################################################################
 
 service="$DIR/NonFinalTauNode1"
-cmd="$FIONA $service.owfn -t pv"
+output="$builddir/$SUBDIR/NonFinalTauNode1"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -221,7 +221,7 @@ else
     exitcode=$?
 fi
 
-cmd="$FIONA $service.pv.owfn $service.owfn -t equivalence"
+cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -249,7 +249,8 @@ fi
 ############################################################################
 
 service="$DIR/NonFinalTauNode2"
-cmd="$FIONA $service.owfn -t pv -p no-png"
+output="$builddir/$SUBDIR/NonFinalTauNode2"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -261,7 +262,7 @@ else
     exitcode=$?
 fi
 
-cmd="$FIONA $service.pv.owfn $service.owfn -t equivalence"
+cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -289,7 +290,8 @@ fi
 ############################################################################
 
 service="$DIR/NonFinalTauNode3"
-cmd="$FIONA $service.owfn -t pv -p no-png"
+output="$builddir/$SUBDIR/NonFinalTauNode3"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -301,7 +303,7 @@ else
     exitcode=$?
 fi
 
-cmd="$FIONA $service.pv.owfn $service.owfn -t equivalence"
+cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -329,7 +331,8 @@ fi
 ############################################################################
 
 service="$DIR/NonFinalTauNode4"
-cmd="$FIONA $service.owfn -t pv -p no-png"
+output="$builddir/$SUBDIR/NonFinalTauNode4"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -341,7 +344,7 @@ else
     exitcode=$?
 fi
 
-cmd="$FIONA $service.pv.owfn $service.owfn -t equivalence"
+cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -369,7 +372,8 @@ fi
 ############################################################################
 
 service="$DIR/NonFinalTauNode1not"
-cmd="$FIONA $service.owfn -t pv -p no-png"
+output="$builddir/$SUBDIR/NonFinalTauNode1not"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -381,7 +385,7 @@ else
     exitcode=$?
 fi
 
-cmd="$FIONA $service.pv.owfn $service.owfn -t equivalence"
+cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -409,7 +413,8 @@ fi
 ############################################################################
 
 service="$DIR/NonFinalTauNode2not"
-cmd="$FIONA $service.owfn -t pv -p no-png"
+output="$builddir/$SUBDIR/NonFinalTauNode2not"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -421,7 +426,7 @@ else
     exitcode=$?
 fi
 
-cmd="$FIONA $service.pv.owfn $service.owfn -t equivalence"
+cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
 
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
@@ -446,10 +451,8 @@ fi
 
 
 ############################################################################
-# end of the outcommented detailed test                                    #
+# end of the outcommentable detailed test                                  #
 ############################################################################
-OUTCOMMENTED
-
 
 echo
 

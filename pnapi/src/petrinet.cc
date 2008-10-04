@@ -831,6 +831,7 @@ void PetriNet::removePlace(Place *p)
   }
 
   delete p;
+  p = NULL;
 }
 
 
@@ -883,6 +884,7 @@ void PetriNet::removeArc(Arc *f)
   F.erase(f);
 
   delete f;
+  f = NULL;
 }
 
 
@@ -1346,12 +1348,14 @@ void PetriNet::mergePlaces(string role1, Place * & p2)
  *          places. The identifiers are used to complete the role-string and
  *          pass the search request.
  *
- * \param   id1    identifier of the activity represented by the first place
+ * \param   id1    identifier of the BPEL activity represented by the first place
  * \param   role1  string describing the role of the first place (beginning
  *                 with a period, e.g. ".initial")
- * \param   id2    identifier of the activity represented by the second place
+ * \param   id2    identifier of the BPEL activity represented by the second place
  * \param   role2  string describing the role of the second place (beginning
  *                 with a period, e.g. ".initial")
+ * 
+ * \note	This method is used by BPEL2oWFN only.
  */
 void PetriNet::mergePlaces(unsigned int id1, string role1, unsigned int id2, string role2)
 {
@@ -1574,10 +1578,11 @@ Place *PetriNet::findPlace(string role) const
  *
  *          Finds a place of the Petri net given an id and a role.
  *
- * \param   id    an identifier
+ * \param   id    an identifier (BPEL)
  * \param   role  the demanded role
  * \return  a pointer to the place or a NULL pointer if the place was not
  *          found.
+ * \note	This is used by BPEL2oWFN only.
  */
 Place *PetriNet::findPlace(unsigned int id, string role) const
 {

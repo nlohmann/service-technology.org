@@ -380,17 +380,19 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix,
 //! \param g An object of AnnotatedGraph, CommunicationGraph, IG or OG
 //! type. 
 void createOutputFiles(AnnotatedGraph* graph, string prefix) {
-  
-   string dotFileName = graph->createDotFile(prefix); // .out
-   
-   if (!parameters[P_NOPNG]  && dotFileName != "") {
-       graph->createPNGFile(prefix, dotFileName);
-   }		         
-   
-   if (parameters[P_TEX] && dotFileName != "") {
-        string annotatedDotFileName = graph->createAnnotatedDotFile(prefix, dotFileName); // .dot
-        makeGasTex(annotatedDotFileName, prefix, GasTexGraph::STYLE_OG);
-   }  
+    if (!parameters[P_NODOT]) {
+    
+        string dotFileName = graph->createDotFile(prefix); // .out
+       
+        if (!parameters[P_NOPNG]  && dotFileName != "") {
+            graph->createPNGFile(prefix, dotFileName);
+        }		         
+       
+        if (parameters[P_TEX] && dotFileName != "") {
+            string annotatedDotFileName = graph->createAnnotatedDotFile(prefix, dotFileName); // .dot
+            makeGasTex(annotatedDotFileName, prefix, GasTexGraph::STYLE_OG);
+        }  
+    }
 }
 
 //! \brief generate a public view for a given og
@@ -935,9 +937,12 @@ void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 
         // the second parameter is false, since this OG has no underlying oWFN
         productOG->createOGFile(outfilePrefix, false);
-        string dotFileName = productOG->createDotFile(outfilePrefix);
-        productOG->createPNGFile(outfilePrefix, dotFileName);
-
+        if (!parameters[P_NODOT]) {
+            string dotFileName = productOG->createDotFile(outfilePrefix);
+            if (!parameters[P_NOPNG]) {
+                productOG->createPNGFile(outfilePrefix, dotFileName);
+            }
+        }
         trace("\n");
     }
 
@@ -1784,6 +1789,8 @@ int main(int argc, char** argv) {
             }
 
             else if (parameters[P_PNG]) {
+                trace(TRACE_0, "=================================================================\n");
+                trace(TRACE_0, "Processing OG " + readOG->getFilename() + "\n");
                 readOG->computeAndPrintGraphStatistics();
                 string newFilename;
                 if (options[O_OUTFILEPREFIX]) {
@@ -1792,7 +1799,7 @@ int main(int argc, char** argv) {
                     newFilename = readOG->getFilename();
                 }
                 createOutputFiles(readOG, newFilename);
-                readOG->computeAndPrintGraphStatistics();
+                trace(TRACE_0, (newFilename + ".png generated\n\n"));
                 delete readOG;
             }
         }

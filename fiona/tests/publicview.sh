@@ -81,7 +81,7 @@ result=0
 
 service="$DIR/complexPV"
 output="$builddir/$SUBDIR/complexPV"
-cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-dot"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -122,7 +122,7 @@ fi
 
 service="$DIR/non_empty_true_node2"
 output="$builddir/$SUBDIR/non_empty_true_node2"
-cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-dot"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -163,7 +163,7 @@ fi
 
 service="$DIR/non_empty_true_node3"
 output="$builddir/$SUBDIR/non_empty_true_node3"
-cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-dot"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -209,7 +209,7 @@ fi
 
 service="$DIR/NonFinalTauNode1"
 output="$builddir/$SUBDIR/NonFinalTauNode1"
-cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-dot"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -250,7 +250,7 @@ fi
 
 service="$DIR/NonFinalTauNode2"
 output="$builddir/$SUBDIR/NonFinalTauNode2"
-cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-dot"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -291,7 +291,7 @@ fi
 
 service="$DIR/NonFinalTauNode3"
 output="$builddir/$SUBDIR/NonFinalTauNode3"
-cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-dot"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -332,7 +332,7 @@ fi
 
 service="$DIR/NonFinalTauNode4"
 output="$builddir/$SUBDIR/NonFinalTauNode4"
-cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-dot"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -373,7 +373,7 @@ fi
 
 service="$DIR/NonFinalTauNode1not"
 output="$builddir/$SUBDIR/NonFinalTauNode1not"
-cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-dot"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"
@@ -414,7 +414,7 @@ fi
 
 service="$DIR/NonFinalTauNode2not"
 output="$builddir/$SUBDIR/NonFinalTauNode2not"
-cmd="$FIONA $service.owfn -t pv -o $output -p no-png"
+cmd="$FIONA $service.owfn -t pv -o $output -p no-dot"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$service.owfn.memcheck.log"

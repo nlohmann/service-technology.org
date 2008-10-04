@@ -104,6 +104,7 @@ typedef enum {
     P_SHOW_DEADLOCKS_PER_NODE,  //!< show deadlock states only
 
     P_NOPNG,                    //!< do not create a PNG output
+    P_NODOT,                    //!< do not create any dot related output
     P_TEX,                      //!< create a gastex tex file in some other mode
     P_DIAGNOSIS,                //!< diagnosis information
     P_AUTONOMOUS,               //!< check for autonomous controllability

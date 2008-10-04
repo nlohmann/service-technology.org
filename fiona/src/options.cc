@@ -237,6 +237,7 @@ void print_help() {
   trace("                                 (only relevant for PV mode -t PV)\n");  
   trace(" -p | --parameter=<param> ...... additional parameter <param>\n");
   trace("                                   no-png     - does not create a PNG file\n");
+  trace("                                   no-dot     - does not create dot-related output\n");
   trace("                                   diagnosis  - disables optimizations\n");
   trace("                                   autonomous - autonomous controllability\n");
   trace("                                   r1 - r5    - set reduction level in mode\n");
@@ -356,6 +357,7 @@ void parse_command_line(int argc, char* argv[]) {
 
     // -p parameters
     parameters[P_NOPNG] = false;
+    parameters[P_NODOT] = false;
     parameters[P_TEX] = false;
     parameters[P_DIAGNOSIS] = false;
     parameters[P_AUTONOMOUS] = false;
@@ -634,6 +636,8 @@ void parse_command_line(int argc, char* argv[]) {
                 options[O_PARAMETER] = true;
                 if (lc_optarg == "no-png") {
                     parameters[P_NOPNG] = true;
+                } else if (lc_optarg == "no-dot") {
+                    parameters[P_NODOT] = true;
                 } else if (lc_optarg == "tex") {
                     parameters[P_TEX] = true;
                 } else if (lc_optarg == "diagnosis") {

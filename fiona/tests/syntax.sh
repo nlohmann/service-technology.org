@@ -225,7 +225,7 @@ owfn="$DIR/formula.owfn"
 outputPrefix="$builddir/syntax/formula.owfn.output"
 outputExpected="$testdir/syntax/formula.owfn.expected.og"
 
-cmd="$FIONA $owfn -t og -o $outputPrefix -p no-png"
+cmd="$FIONA $owfn -t og -o $outputPrefix -p no-dot"
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$outputPrefix.memcheck.log"

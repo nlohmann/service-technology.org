@@ -38,7 +38,7 @@
  * \date    \$Date: 2008-06-19 11:42:07 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
- *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
+ *          the project Tools4BPEL at the Humboldt-Universitï¿½t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \version \$Revision: 1.7 $
@@ -859,6 +859,7 @@ void PetriNet::removeTransition(Transition *t)
 
   T.erase(t);
   delete t;
+  t = NULL;
 }
 
 

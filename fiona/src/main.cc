@@ -385,7 +385,9 @@ void createOutputFiles(AnnotatedGraph* graph, string prefix) {
         string dotFileName = graph->createDotFile(prefix); // .out
        
         if (!parameters[P_NOPNG]  && dotFileName != "") {
-            graph->createPNGFile(prefix, dotFileName);
+            string pngres = graph->createPNGFile(prefix, dotFileName);
+            if (pngres != "") trace(TRACE_0, pngres + " generated\n");
+
         }		         
        
         if (parameters[P_TEX] && dotFileName != "") {

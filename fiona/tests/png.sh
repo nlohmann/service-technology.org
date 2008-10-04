@@ -42,6 +42,10 @@ rm -f $DIR/big.owfn.output.og.png
 rm -f $DIR/big.owfn.output.og.dot
 rm -f $DIR/big.owfn.output.og.out
 rm -f $DIR/big.owfn.output.og.tex
+rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.og.dot
+rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.og.out
+rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.og.png
+rm -f $DIR/06-03-23_BPM06_shop_sect_3.owfn.og.tex
 rm -f $DIR/*.log
 
 result=0
@@ -124,11 +128,59 @@ else
         echo "... failed: no tex file was generated."
     fi
 
+    echo $OUTPUT | grep "big.owfn.output.og.png generated" > /dev/null
+    resultSingle=$?
+
     if [ $resultSingle -ne 0 ]; then
         result=1
         echo "... failed: no png was generated."
     fi
 fi
+
+
+############################################################################
+resultSingle=0
+og="$DIR/06-03-23_BPM06_shop_sect_3.owfn.og"
+
+# for make distcheck: make copy of $owfn and work on it
+if [ "$testdir" != "$builddir" ]; then
+    if [ ! -e $builddir/$SUBDIR ]; then
+        $MKDIR_P $builddir/$SUBDIR
+    fi
+fi
+
+cmd="$FIONA $og -t png -p tex"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$outputPrefix.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    if [ $? -ne 0 ]; then
+        echo "... failed: $FIONA exited with non-zero return value."
+        result=1
+    fi
+
+    echo $OUTPUT | grep "06-03-23_BPM06_shop_sect_3.owfn.og.tex generated" > /dev/null
+    resultSingle=$?
+
+    if [ $resultSingle -ne 0 ]; then
+        result=1
+        echo "... failed: no tex file was generated."
+    fi
+
+
+    echo $OUTPUT | grep "06-03-23_BPM06_shop_sect_3.owfn.og.png generated" > /dev/null
+    resultSingle=$?
+
+    if [ $resultSingle -ne 0 ]; then
+        result=1
+        echo "... failed: no png was generated."
+    fi
+fi
+
 
 
 ###########################################################################

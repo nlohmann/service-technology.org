@@ -286,7 +286,12 @@ string CommunicationGraph::createDotFile(string& filenamePrefix) const {
             parameters[P_OG] ? dotFile << "OG of " : dotFile << "IG of ";
         }
 
-        dotFile << filenamePrefix;
+        if (PN != 0) {
+            dotFile << PN->filename;
+        } else {
+            dotFile << filenamePrefix.substr(0, filenamePrefix.rfind("."));
+        }
+        
         dotFile << " (parameters:";
         if (parameters[P_IG] && options[O_CALC_REDUCED_IG]) {
             dotFile << " -r";

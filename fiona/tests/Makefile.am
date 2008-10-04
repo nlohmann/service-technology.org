@@ -91,7 +91,8 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              messagebound/messageboundtest4.owfn \
              messagebound/messageboundtest5.owfn \
              messagebound/unlimited-communication.owfn \
-             png/big.owfn \  
+             png/big.owfn \
+             png/06-03-23_BPM06_shop_sect_3.owfn \
              countservices/acyclic.og \
              countservices/cyclic.og \
              countservices/nostrat.og \
@@ -388,6 +389,10 @@ DISTCLEANFILES =  productog/1x2.output.og \
 		  png/big.owfn.output.og.out \
 		  png/big.owfn.output.og.png \
 		  png/big.owfn.output.og.tex \
+		  png/06-03-23_BPM06_shop_sect_3.owfn.og.dot \
+		  png/06-03-23_BPM06_shop_sect_3.owfn.og.out \
+ 		  png/06-03-23_BPM06_shop_sect_3.owfn.og.png \
+		  png/06-03-23_BPM06_shop_sect_3.owfn.og.tex \
 		  publicview/complexPV.pv.owfn \
 		  publicview/complexPV.pv.sa.out \
 		  publicview/complexPV.pv.sa.png \

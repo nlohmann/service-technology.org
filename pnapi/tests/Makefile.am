@@ -1,7 +1,7 @@
-TESTS = test1
+TESTS = test
 
-bin_PROGRAMS = test1
+bin_PROGRAMS = test
 
-test1_SOURCES = me.h me.cc
+test_SOURCES = main.cc me.cc me.h su.cc su.h
 
-test1_LDADD = ../src/lib_pnapi.a
+test_LDADD = ../src/lib_pnapi.a

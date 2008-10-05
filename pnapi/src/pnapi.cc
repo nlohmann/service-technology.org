@@ -27,6 +27,6 @@ using std::string;
 namespace globals {
   string filename="";
   string output_filename="";
-  string invocation = "PN API";
+  //string invocation = "PN API";
   unsigned int reduction_level;
 }

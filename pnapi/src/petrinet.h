@@ -38,7 +38,7 @@
  * \date    \$Date: 2008-06-19 11:42:07 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
- *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
+ *          the project Tools4BPEL at the Humboldt-Universitï¿½t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \version \$Revision: 1.7 $
@@ -516,6 +516,14 @@ class PetriNet
     
     /// conjunctive set of disjunctive place sets for simple final condition
     list< set< pair<Place *, unsigned int > > > final_set_list;
+    
+    void setInvocation(string);
+    
+    string getInvocation();
+    
+    void setPackageString(string);
+    
+    string getPackageString();
 
   private:
     /// removes a place from the net
@@ -631,6 +639,12 @@ class PetriNet
     
     /// mapping of arcs to their appropriate weight
     map< pair< Node*, Node* >, int > weight;
+    
+    /// invocation string
+    string invocation_string;
+    
+    /// package string
+    string package_string;
 };
 
     // repeated declaration to avoid compilation errors using gcc 4.3

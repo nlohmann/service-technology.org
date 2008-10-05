@@ -323,7 +323,9 @@ void Arc::mirror()
  */
 PetriNet::PetriNet() :
   nextId(1),
-  format(FORMAT_OWFN)
+  format(FORMAT_OWFN),
+  invocation_string("PN API"),
+  package_string("Petri Net API")
 {
 }
 
@@ -803,6 +805,8 @@ void PetriNet::detachNode(Node *n)
  * \param   p  place to be removed
  *
  * \pre     p != NULL
+ * 
+ * \post	p == NULL
  */
 void PetriNet::removePlace(Place *p)
 {
@@ -844,6 +848,10 @@ void PetriNet::removePlace(Place *p)
  * \param   t  transition to be removed
  *
  * \pre     t != NULL
+ * 
+ * \post	t == NULL
+ * 
+ * \test	This method has been tested.
  */
 void PetriNet::removeTransition(Transition *t)
 {
@@ -873,6 +881,8 @@ void PetriNet::removeTransition(Transition *t)
  * \param   f  arc to be removed
  *
  * \pre     f != NULL
+ * 
+ * \post	f == NULL
  */
 void PetriNet::removeArc(Arc *f)
 {
@@ -914,6 +924,7 @@ void PetriNet::removeArc(Arc *f)
  * \post    Transition t12 having the incoming and outgoing arcs of t1 and t2
  *          and the union of the histories of t1 and t2.
  *
+ * \test	This method has been tested.
  */
 void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 {
@@ -1168,6 +1179,8 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
  * \post    Place p12 having the incoming and outgoing arcs of p1 and p2 and
  *          the union of the histories of t1 and t2.
  *
+ * \test	All methods mergePlaces() has been tested as they are concluding
+ * 			to this one method.
  */
 void PetriNet::mergePlaces(Place * & p1, Place * & p2)
 {
@@ -1518,7 +1531,7 @@ set<Node *> PetriNet::preset(Node *n) const
  * \pre     n != NULL
  *
  * \deprecated  This function is replaced by the Node class's attribute
- *              #preset and should -- for performance reasons -- not be used
+ *              #postset and should -- for performance reasons -- not be used
  *              any more.
  */
 set<Node *> PetriNet::postset(Node *n) const
@@ -2184,6 +2197,8 @@ void PetriNet::calculate_max_occurrences()
  * 
  *          Swaps the input and output places, i.e. swaps the sets #P_in and
  *          #P_out and the adjacent arcs.
+ * 
+ *  \test	This method has been tested.
  */
 void PetriNet::mirror()
 {
@@ -2352,6 +2367,8 @@ void PetriNet::produce(const PetriNet &net)
 
 /*!
  * \brief  adds a transition that has read arcs to all final places
+ * 
+ * \test	This method has been tested.
  */
 void PetriNet::loop_final_state()
 {
@@ -2398,6 +2415,26 @@ unsigned int PetriNet::pop_forEach_suffix()
 {
   forEach_suffix.pop_front();
   return forEach_suffix.size();
+}
+
+void PetriNet::setInvocation(std::string invokestr)
+{
+	invocation_string = invokestr;
+}
+
+std::string PetriNet::getInvocation()
+{
+	return invocation_string;
+}
+
+void PetriNet::setPackageString(std::string packagestr)
+{
+	package_string = packagestr;
+}
+
+std::string PetriNet::getPackageString()
+{
+	return package_string;
 }
 
 } /* namespace PNapi */

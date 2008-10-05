@@ -92,7 +92,7 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              messagebound/messageboundtest5.owfn \
              messagebound/unlimited-communication.owfn \
              png/big.owfn \
-             png/06-03-23_BPM06_shop_sect_3.owfn \
+             png/06-03-23_BPM06_shop_sect_3.owfn.og \
              countservices/acyclic.og \
              countservices/cyclic.og \
              countservices/nostrat.og \

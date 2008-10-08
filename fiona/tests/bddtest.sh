@@ -37,7 +37,7 @@ FIONA=fiona
 rm -f $DIR/*.log
 
 result=0
-exit $result
+#exit $result
 
 ############################################################################
 

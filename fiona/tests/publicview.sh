@@ -112,7 +112,7 @@ else
     resultSIM=$?
     if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
         let "result += 1"
-        echo ... equivalence check of the service's and its public view's OGs failed.
+        echo ... equivalence check of the OGs of the service and its public view failed.
     fi
 fi
 
@@ -153,7 +153,7 @@ else
     resultSIM=$?
     if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
         let "result += 1"
-        echo ... equivalence check of the service's and its public view's OGs failed.
+        echo ... equivalence check of the OGs of the service and its public view failed.
     fi
 fi
 
@@ -194,7 +194,7 @@ else
     resultSIM=$?
     if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
         let "result += 1"
-        echo ... equivalence check of the service's and its public view's OGs succeeded, which is not expected for this owfn.
+        echo ... equivalence check of the OGs of the service and its public view succeeded, which is not expected for this owfn.
     fi
 fi
 
@@ -202,6 +202,13 @@ fi
 ############################################################################
 # start of the outcommentable detailed test                                #
 ############################################################################
+# <<OUTCOMMENTED
+
+
+echo
+
+exit $result
+
 
 ############################################################################
 # NonFinalTauNode1 equivalence
@@ -240,7 +247,7 @@ else
     resultSIM=$?
     if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
         let "result += 1"
-        echo ... equivalence check of the service's and its public view's OGs failed.
+        echo ... equivalence check of the OGs of the service and its public view failed.
     fi
 fi
 
@@ -281,7 +288,7 @@ else
     resultSIM=$?
     if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
         let "result += 1"
-        echo ... equivalence check of the service's and its public view's OGs failed.
+        echo ... equivalence check of the OGs of the service and its public view failed.
     fi
 fi
 
@@ -322,7 +329,7 @@ else
     resultSIM=$?
     if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
         let "result += 1"
-        echo ... equivalence check of the service's and its public view's OGs failed.
+        echo ... equivalence check of the OGs of the service and its public view failed.
     fi
 fi
 
@@ -363,7 +370,7 @@ else
     resultSIM=$?
     if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
         let "result += 1"
-        echo ... equivalence check of the service's and its public view's OGs failed.
+        echo ... equivalence check of the OGs of the service and its public view failed.
     fi
 fi
 
@@ -404,7 +411,7 @@ else
     resultSIM=$?
     if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
         let "result += 1"
-        echo ... equivalence check of the service's and its public view's OGs failed.
+        echo ... equivalence check of the OGs of the service and its public view failed.
     fi
 fi
 
@@ -445,7 +452,7 @@ else
     resultSIM=$?
     if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
         let "result += 1"
-        echo ... equivalence check of the service's and its public view's OGs failed.
+        echo ... equivalence check of the OGs of the service and its public view failed.
     fi
 fi
 
@@ -453,6 +460,8 @@ fi
 ############################################################################
 # end of the outcommentable detailed test                                  #
 ############################################################################
+# OUTCOMMENTED
+
 
 echo
 

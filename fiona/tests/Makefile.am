@@ -19,12 +19,25 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
+
 include $(top_srcdir)/Makefile.covcommon
 
+
+############################################################################
+# All tests that are expected to succeed (the default case) 
+############################################################################
 TESTS = slist.sh syntax.sh extrema.sh cyclic.sh messagebound.sh png.sh \
         countservices.sh falseannos.sh oWFNreduction.sh sim_og.sh \
         matching.sh productog.sh publicview.sh samples.sh partner.sh \
-        minimize.sh statesReduction.sh bddtest.sh responsive.sh
+        minimize.sh bddtest.sh statesReduction.sh responsive.sh
+
+
+############################################################################
+# All tests that are expected to fail (must be a subset of TESTS above)
+# e.g., XFAIL_TESTS = bddtest.sh 
+############################################################################
+XFAIL_TESTS = bddtest.sh 
+
 
 check_PROGRAMS = slistcheck
 

@@ -37,19 +37,22 @@
 #include "binDecision.h"
 
 
-unsigned int bin_p;     // (=place); index in CurrentMarking
-int bin_pb;             // next bit of place to be processed;
-unsigned char bin_byte; // byte to be matched against tree vector; constructed from CurrentMarking
-int bin_t;              // index in tree vector
-unsigned char * bin_v;  // current tree vector
-int bin_s;              // nr of bits pending in byte from previous iteration
-int bin_d;              // difference position
-int bin_dir;            // did we go "old" or "new" in last decision?
-int bin_b;              // bit nr at start of byte
+unsigned int bin_p;     ///< (=place); index in CurrentMarking
+int bin_pb;             ///< next bit of place to be processed;
+unsigned char bin_byte; ///< byte to be matched against tree vector; constructed from CurrentMarking
+int bin_t;              ///< index in tree vector
+unsigned char * bin_v;  ///< current tree vector
+int bin_s;              ///< nr of bits pending in byte from previous iteration
+int bin_d;              ///< difference position (set in binSearch for later binInsert)
+int bin_dir;            ///< did we go "old" (value:0) or "new" (value:1) in last decision?
+int bin_b;              ///< bit nr at start of byte
 binDecision* fromdec = NULL;
-binDecision* todec = NULL;
-binDecision* vectordec = NULL;
+binDecision* todec = NULL;     ///< next decision in bintree (binSearch)
+binDecision* vectordec = NULL; ///< bindecision of bin_v (binSearch)
 
+// to create a new set of markings, create a new binDecision* = null
+// add new marking to the set with binSearch(); binInsert();
+// never insert without prior search!
 
 //! \brief constructor (2 parameters)
 //! \param b bitnumber
@@ -67,7 +70,7 @@ binDecision::binDecision(int b, long int BitVectorSize) :
 //! \brief destructor
 binDecision::~binDecision() {
 	delete[] vector;
-	
+
     delete state;
     delete nextold;
     delete nextnew;
@@ -129,7 +132,7 @@ int logzwo(int m) {
 //! \return DESCRIPTION
 State* binInsert(oWFN* PN) {
     trace(TRACE_5, "binInsert(oWFN* PN)\n");
-    
+
     return binInsert(PN->binHashTable + (PN->getPlaceHashValue()), PN);
 }
 
@@ -353,35 +356,50 @@ State* binSearch(binDecision* Bucket, oWFN* PN) {
         return NULL;
     }
 
-    bin_p = 0;                  // current place
+    // convert CurrentMarking (int-vector) to bit-vector and
+    // compare with bin_v (one byte at a time)
+    bin_p = 0;                  // index of current place in CurrentMarking
     bin_pb = 0;                 // current bit in current place
-    bin_s = 0;                  //
-    bin_t = 0;                  //
+    bin_s = 0;                  // start-bit of bin_byte
+    bin_t = 0;                  // index in vector bin_v
     bin_b = 0;                  //
-    bin_byte = 0;               // working byte to compare
+    bin_byte = 0;               // to become one byte in the resulting bit-vector
+
     bin_v = fromdec->vector;    // vector to compare
     todec = fromdec->nextold;   // next decision in bintree
-    vectordec = fromdec;        // bindecision of v
+    vectordec = fromdec;        // bindecision of bin_v
 
     while (true) {
-        // - fill byte starting at bit s
-        while (bin_s < 8&& bin_p < PN->getPlaceCount()) {
+        // - fill bin_byte starting at bin_s
+        while (bin_s < 8 && bin_p < PN->getPlaceCount()) {
+            // still more bits to go (space in bin_byte and place remaining)
             if (8 - bin_s < PN->getPlace(bin_p)->nrbits - bin_pb) {
+                // bin_byte has NOT enough space to store remaining bits of
+                // place bin_p
+
+                // shift what fits, cut the rest, and add to bin_byte
                 inttobits(&bin_byte, bin_s, 8 - bin_s,
                           (PN->CurrentMarking[bin_p] % (1 << (PN->getPlace(bin_p)->nrbits - bin_pb))) >> (PN->getPlace(bin_p)->nrbits + bin_s - (8 + bin_pb)));
 
+                // compute new indizes
                 bin_pb += 8 - bin_s;
                 bin_s = 8;
                 break;
             } else {
+                // bin_byte has enough space to store remaining bits of
+                // place bin_p
+
+                // shift what fits (fill up with zeros), and add to bin_byte
                 inttobits(&bin_byte, bin_s, PN->getPlace(bin_p)->nrbits - bin_pb, PN->CurrentMarking[bin_p] %(1
                         << (PN->getPlace(bin_p)->nrbits - bin_pb)));
 
+                // compute new indizes
                 bin_s += PN->getPlace(bin_p)->nrbits - bin_pb;
-                bin_p++;
-                bin_pb = 0;
+                bin_p++;      // next place
+                bin_pb = 0;   // starts at next place at bit 0
             }
-        }
+        } // while (still more bits to go)
+        // converted one byte
 
         // - compare byte with bin_v[bin_t] and find first difference
         bin_d = 8 - logzwo(bin_v[bin_t] ^ bin_byte);
@@ -404,9 +422,9 @@ checkagain:
                     return NULL;
                 } else {
                     bin_s = 0;
-                    bin_t++;
+                    bin_t++;      // next byte from CurrentMarking
                     bin_b += 8;
-                    bin_byte = 0;
+                    bin_byte = 0; // build new byte from CurrentMarking
                     continue;
                 }
             }
@@ -414,17 +432,21 @@ checkagain:
             if (bin_b + bin_d == todec->bitnr) {
                 // case 2: no difference or difference equals "to" branch =
                 // continue with nextnew
+
+                // switch comparison to the new branch
                 if (bin_d < 8) {
+                    // re-compute indizes to fit the new branch
                     bin_byte = bin_byte << (bin_d + 1);
                     bin_s = 7 - bin_d;
-                    bin_v = todec->vector;
+                    bin_v = todec->vector;      // take vector from new branch
                     bin_t = 0;
-                    bin_b = todec->bitnr + 1;
+                    bin_b = todec->bitnr + 1;   // continue comparison after branch
                     vectordec = fromdec = todec;
-                    todec = fromdec->nextnew;
-                    bin_dir = 1;
+                    todec = fromdec->nextnew;   // get next branch in new vector
+                    bin_dir = 1;    // now descending the "new" branch
                     continue;
                 } else {
+                    // no difference (bin_d == 8)
                     bin_s = 0;
                     bin_t++;
                     bin_b += 8;

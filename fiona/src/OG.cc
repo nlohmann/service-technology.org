@@ -81,10 +81,12 @@ void OG::buildGraph() {
     // creates the root node and calculates its reachability graph (set of states)
     calculateRootNode();
 
+    // [LUHME XV] Parameter OTF existiert nicht mehr (nicht vor Projekt-Ende Tools4BPEL löschen!)
     if (options[O_OTF]) {
         bdd->convertRootNode(getRoot());
     }
-
+    // [LUHME XV] Reihenfolge "push_back()" und "buildGraph()" ist umgekehrt zu IG::buildGraph()
+    // [LUHME XV] muss setOfNodes wirklich gefüllt werden? reicht nicht setOfSortedNodes?
     setOfNodes.push_back(getRoot());
 
     // start building up the rest of the graph
@@ -166,12 +168,13 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
 
         trace(TRACE_2, currentEvent->getLabelForCommGraph() + "\n");
 
-        if (currentEvent->max_occurrence < 0 ||
+        if (currentEvent->max_occurrence < 0 /* default: -1 (unbounded) */ ||
             (currentEvent->getType() == INPUT &&
              currentEvent->max_occurrence > currentNode->eventsUsedInput[PN->getInputPlaceIndex(currentEvent)]) ||
             (currentEvent->getType() == OUTPUT &&
              currentEvent->max_occurrence > currentNode->eventsUsedOutput[PN->getOutputPlaceIndex(currentEvent)])) {
 
+            // [LUHME XV] Knoten "v" umbenennen in "newNode"
             // we have to consider this event
             AnnotatedGraphNode* v = new AnnotatedGraphNode();    // create new AnnotatedGraphNode of the graph
             trace(TRACE_5, "\t\t\t\t    calculating successor states\n");
@@ -189,9 +192,11 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                 currentNode->removeLiteralFromAnnotation(currentEvent->getLabelForCommGraph());
                 addProgress(your_progress);
                 printProgress();
+                // [LUHME XV] auch solche Knoten zählen: #blue + #red <= #computed
                 numberDeletedVertices--;      // elsewise deletion of v is counted twice
-                delete v;
+                delete v;                     // because ~AnnotatedGraphNode increments numberDeletedVertices
             } else {
+                // node v is BLUE
 
                 // was the new node v computed before?
                 AnnotatedGraphNode* found = findGraphNodeInSet(v);
@@ -199,7 +204,7 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                 if (found == NULL) {
                     trace(TRACE_1, "\t computed successor node new\n");
 
-                    // node v is new, so the node as well as the edge to it is added
+                    // node v is new, add v and edge (currentNode,v) to OG
                     addGraphNode(currentNode, v);
 
                     if (currentEvent->getType() == INPUT) {
@@ -239,6 +244,7 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                         currentNode->removeLiteralFromAnnotation(currentEvent->getLabelForCommGraph());
                     }
 
+                    // [LUHME XV] nach oben (im Block)?
                     delete v;
 
                     if (currentEvent->getType() == INPUT) {
@@ -248,6 +254,7 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                 }
             }
         } else {
+            // this event is to be skipped (i.e. max occurrences exceeded)
             trace(TRACE_2, "\t\t\t            event suppressed (max_occurrence reached)\n");
             currentNode->removeLiteralFromAnnotation(currentEvent->getLabelForCommGraph());
 
@@ -269,7 +276,7 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                 return;
             }
         }
-    }
+    } // for (all events)
 
     // finished iterating over successors
     trace(TRACE_2, "\t\t  no events left...\n");
@@ -281,6 +288,7 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
     trace(TRACE_3, "\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()));
     trace(TRACE_3, " via formula " + currentNode->getAnnotation()->asString() + "\n");
 
+    // [LUHME XV] Option OTF kann gelöscht werden (nach Ende Tools4BPEL)
     if (options[O_OTF]) {
         //cout << "currentNode: " << currentNode->getName() << endl;
         bdd->addOrDeleteLeavingEdges(currentNode);
@@ -392,9 +400,9 @@ void OG::calculateSuccStatesInput(unsigned int input,
         if (options[O_CALC_ALL_STATES]) {
 #ifdef CHECKCAPACITY
             try {
-#endif                
+#endif
         	// calc the reachable states from that marking
-                PN->calculateReachableStatesFull(newNode); 
+                PN->calculateReachableStatesFull(newNode);
 #ifdef CHECKCAPACITY
             }
             catch (CapacityException& ex)
@@ -404,18 +412,18 @@ void OG::calculateSuccStatesInput(unsigned int input,
                 newNode->setColor(RED);
                 return;
             }
-#endif                
+#endif
         } else {
             if (parameters[P_SINGLE]) {
 	        // calc the reachable states from that marking using stubborn set method taking
 	        // care of deadlocks
         	// --> the current state is stored in the node, the states reachable from the current state
-        	//     are not stored in the node        	
+        	//     are not stored in the node
 #ifdef CHECKCAPACITY
                 try {
-#endif                
+#endif
         	    // calc the reachable states from that marking
-                    PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+                    PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode);
 #ifdef CHECKCAPACITY
                 }
                 catch (CapacityException& ex)
@@ -425,12 +433,12 @@ void OG::calculateSuccStatesInput(unsigned int input,
                     newNode->setColor(RED);
                     return;
                 }
-#endif                
+#endif
             } else if (parameters[P_REPRESENTATIVE]) {
                 // --> store the current state and all "minimal" states in the node
 #ifdef CHECKCAPACITY
                 try {
-#endif                
+#endif
         	    // calc the reachable states from that marking
                     PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode);
 #ifdef CHECKCAPACITY
@@ -442,7 +450,7 @@ void OG::calculateSuccStatesInput(unsigned int input,
                     newNode->setColor(RED);
                     return;
                 }
-#endif                
+#endif
             }
         }
 
@@ -465,6 +473,7 @@ void OG::calculateSuccStatesInput(unsigned int input,
 //! \param output the output messages that are taken from the marking
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
+//! \post if message-bound is violated, then newNode is set to RED
 void OG::calculateSuccStatesOutput(unsigned int output,
                                    AnnotatedGraphNode* node,
                                    AnnotatedGraphNode* newNode) {
@@ -483,24 +492,24 @@ void OG::calculateSuccStatesOutput(unsigned int output,
             }
         }
     } else {
-    	if (parameters[P_SINGLE]) 
+    	if (parameters[P_SINGLE])
         {
 	    binDecision * tempBinDecision = (binDecision *) 0;
-	    	
+
 	    setOfStatesStubbornTemp.clear();
 	    owfnPlace * outputPlace = PN->getPlace(output);
 	    StateSet stateSet;
-	
-	    for (StateSet::iterator iter = node->reachGraphStateSet.begin(); 
-                    iter != node->reachGraphStateSet.end(); iter++) 
+
+	    for (StateSet::iterator iter = node->reachGraphStateSet.begin();
+                    iter != node->reachGraphStateSet.end(); iter++)
             {
 	        (*iter)->decode(PN);
 	        // calc reachable states from that marking using stubborn set method that
-	        // calculates all those states that activate the given receiving event 
+	        // calculates all those states that activate the given receiving event
 	        // --> not necessarily the deadlock states
 #ifdef CHECKCAPACITY
                 try {
-#endif                
+#endif
         	    // calc the reachable states from that marking
 	            PN->calculateReducedSetOfReachableStates(stateSet, setOfStatesStubbornTemp, &tempBinDecision, outputPlace, newNode);
 #ifdef CHECKCAPACITY
@@ -512,7 +521,7 @@ void OG::calculateSuccStatesOutput(unsigned int output,
                     newNode->setColor(RED);
                     return;
                 }
-#endif                
+#endif
             	if (newNode->getColor() == RED) {
                 	// a message bound violation occured during computation of reachability graph
                     trace(TRACE_3, "\t\t\t\t found message bound violation during calculating OG in node\n");
@@ -520,29 +529,29 @@ void OG::calculateSuccStatesOutput(unsigned int output,
                     return;
                 }
             }
-	
-            if (tempBinDecision) 
+
+            if (tempBinDecision)
             {
         	delete tempBinDecision;
             }
-    	} 
-        else if (parameters[P_REPRESENTATIVE]) 
+    	}
+        else if (parameters[P_REPRESENTATIVE])
         {
-	    for (StateSet::iterator iter2 = node->reachGraphStateSet.begin(); 
-                    iter2 != node->reachGraphStateSet.end(); iter2++) 
+	    for (StateSet::iterator iter2 = node->reachGraphStateSet.begin();
+                    iter2 != node->reachGraphStateSet.end(); iter2++)
             {
                 (*iter2)->decode(PN); // get the marking of the state
-            
-	        if (PN->removeOutputMessage(output)) 
-                { 
+
+	        if (PN->removeOutputMessage(output))
+                {
                     // remove the output message from the current marking
 	            // calc the reachable states from that marking using stubborn set method taking
 	            // care of deadlocks
 #ifdef CHECKCAPACITY
                     try {
-#endif                
+#endif
                         // calc the reachable states from that marking
-	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+	            	PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode);
 #ifdef CHECKCAPACITY
                     }
                     catch (CapacityException& ex)
@@ -552,8 +561,8 @@ void OG::calculateSuccStatesOutput(unsigned int output,
                         newNode->setColor(RED);
                         return;
                     }
-#endif                
-                    if (newNode->getColor() == RED) 
+#endif
+                    if (newNode->getColor() == RED)
                     {
 	                // a message bound violation occured during computation of reachability graph
 	                trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
@@ -648,12 +657,13 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
             // carry on a two step loop escape
             bool continueLoop = false;
 
-        	// if parameter "responsive" is not used
         	if (!parameters[P_RESPONSIVE]) {
+        	  // if parameter "responsive" is not used
         		useThisState = (*iter)->type == DEADLOCK ||
                     				(*iter)->type == FINALSTATE ||
                                     (*iter)->isNotAutonomouslyTransient();
-        	} else { // if parameter "responsive" is used, then we consider TSCCs only
+        	} else {
+        	  // if parameter "responsive" is used, then we consider TSCCs only
         		useThisState = ((*iter)->repTSCC && !visitedTSCCs[(*iter)->dfs]) ||
                 					(*iter)->isNotAutonomouslyTransient();
         	}
@@ -661,12 +671,17 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
         	// we create a clause for the current state
             if (useThisState) {
                 // get the marking of this state
+                // [LUHME XV] "decodeShowOnly()" in "decodeMarkingOnly()" umbenennen
+                // [LUHME XV] dekodieren vor die "do {}"-Schleife verschieben?
                 (*iter)->decodeShowOnly(PN);
 
+                // [LUHME XV] ist es sinnvoller zuerst die Empfangs-Ereignisse der OG
+                // [LUHME XV] zu berechnen und danach die Sende-Ereignisse der OG?
+                // [LUHME XV] -> dann bei der PriorityMap evtl. weniger umsortieren.
                 // this clause's first literal
                 GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
 
-                // get all input events
+                // get all input places of the net = sending events of the OG
                 for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
                     GraphFormulaLiteral* myliteral = new GraphFormulaLiteral(PN->getInputPlace(i)->getLabelForCommGraph());
                     myclause->addSubFormula(myliteral);
@@ -694,13 +709,14 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
 	                        continueLoop = true;
                             break;
 	                    } else {
+                          // non-transient final state; add literal "final"
 	                        node->hasFinalStateInStateSet = true;
 	                        GraphFormulaLiteral * myliteral = new GraphFormulaLiteralFinal();
 	                        myclause->addSubFormula(myliteral);
 	                    }
 	                }
 
-	                // get all activated output events
+	                // get all activated receiving events of OG
 	                for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
 	                    if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] > 0) {
 	                        GraphFormulaLiteral * myliteral = new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
@@ -730,14 +746,15 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
 	                // stays the same
 	            } while (currentState && (currentState != (*iter)));
 
-	            // continue the loop without adding the clause if determined
+	            // continue the loop without adding the clause
+	            // in case of transient final marking
 	            if (continueLoop) {
 	                continue;
                 }
 
                 node->addClause(myclause);
-            }
-        }
+            } // if (useThisState)
+        } // for (node->reachGraphStateSet)
     } else {
 
         // WITH state reduction

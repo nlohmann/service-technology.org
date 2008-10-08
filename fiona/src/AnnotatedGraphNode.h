@@ -51,6 +51,7 @@
 #include <climits>
 
 
+// [LUHME XV] Sollte _eigentlich_ eine binDecision sein?
 typedef std::set<State*> StateSet;
 
 using namespace std;
@@ -167,16 +168,18 @@ class AnnotatedGraphNode : public GraphNode {
 #define new NEW_NEW
 };
 
-
+// [LUHME XV] Klasse virtualisieren und zwei Kinderklassen
+// [LUHME XV] PriorityMapIG und PriorityMapOG (nur noch eine Funktion pop(),
+// [LUHME XV] die überladen wird)
 class PriorityMap {
     public:
 
         typedef owfnPlace* KeyType;
 
         /// Fills the priority map according to the given annotation with interface places.
-        /// NOTE: All interface places will be considered; places not in the 
+        /// NOTE: All interface places will be considered; places not in the
         /// annotation will have a minimal priority.
-        /// \param annotation the annotation, from which the priority map will be extracted. 
+        /// \param annotation the annotation, from which the priority map will be extracted.
         void fill(oWFN * PN, GraphFormulaCNF *annotation);
         void fillForIG(setOfMessages&, oWFN*, GraphFormulaCNF*);
 
@@ -188,7 +191,7 @@ class PriorityMap {
         messageMultiSet popIG();
 
         void adjustPM(oWFN *, const std::string&);
-        
+
         /// Returns true iff the priority map is empty.
         bool empty() const;
 
@@ -205,9 +208,9 @@ class PriorityMap {
         /// Type of priority map for the IG.
         /// as the first element of the map we use a multiset of messages
         /// The first element of int represents the minimal length of a clause containing the key element.
-        /// The second element of int represents the maximal occurrence of the key element throughout the annotation. 
+        /// The second element of int represents the maximal occurrence of the key element throughout the annotation.
         typedef map<messageMultiSet, pair<int, int> > MapTypeIG;
-        
+
         typedef map<int, set<std::string> > MapClauseEvents;
 
         /// Underlying representation of association between interface places and their priority.
@@ -215,7 +218,7 @@ class PriorityMap {
 
         /// Underlying representation of association between a set of messages and their priority.
         MapTypeIG pmIG;
-        
+
         MapClauseEvents pmClauseEvents;
 };
 

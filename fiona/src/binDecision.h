@@ -44,22 +44,25 @@ class State;
  */
 class binDecision {
     public:
-        int bitnr;
-        binDecision* nextold;
-        binDecision* nextnew;
+        // [LUHME XV]
+        int bitnr;   ///< position of the first differing bit on the path from root to the current vect
+        binDecision* nextold; ///< next branch off the current vector
+        binDecision* nextnew; ///< next branch off the next branch of current vector
 
         /// actual bit vector
         unsigned char* vector;
 
+        // [LUHME XV] kann möglicherweise raus?
         /// backlink to previous decision
         binDecision* prev;
 
+        // [LUHME XV] kann möglicherweise raus?
         /// link to state record for this state
         State* state;
 
         /// constructor (2 parameters)
         binDecision(int b, long int bitVectorSize);
-        
+
         /// destructor
         ~binDecision();
 

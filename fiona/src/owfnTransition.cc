@@ -405,7 +405,10 @@ void owfnTransition::check_enabled(oWFN * PN) {
   //  cout << "BEFORE" << endl;
  //   cout << "current marking: " << PN->getCurrentMarkingAsString() << endl;
  //   cout << "transition " << name << " is quasiEnabled: " << isQuasiEnabled() << " and enabled: " << isEnabled() << endl;
-    
+    // [LUHME XV] Check auf Enabledness und Quasi-Enabledness überarbeiten: evtl. kann sich ein Check einsparen lassen.
+    // [LUHME XV] Wenn enabled, dann auch quasi-enabled.
+    // [LUHME XV] Evtl. zwei Versionen, weil OG keine Quasi-Enabledness braucht.
+
     if (enabledNr == getArrivingArcsCount()) { // there are as many pre-places appropriatly marked as there are incoming arcs
         if (!isEnabled()) { // transition was not enabled before
             // include transition into list of enabled transitions

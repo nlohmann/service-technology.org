@@ -77,41 +77,42 @@ extern unsigned int numberOfEvents;
 #include<set>
 
 
-
+// [LUHME XV] gehören Deklarationen/C-Code in die .yy-Datei oder in eine eigene Datei?
 /* list of places and multiplicities to become arcs */
 class arc_list {
  public:
 	PlSymbol * place;
 	unsigned int nu;
-    arc_list * next;
+	arc_list * next;
 
-    ~arc_list()
-    {
-        // It's our responsibility to delete 'next' so that eventually the
-        // whole linked list is deleted. We shall not delete 'place' because
-        // other classes still want to use the PlSymbol pointed to by 'place'.
-        delete next;
-    }
+	~arc_list()
+	{
+		// It's our responsibility to delete 'next' so that eventually the
+		// whole linked list is deleted. We shall not delete 'place' because
+		// other classes still want to use the PlSymbol pointed to by 'place'.
+		delete next;
+	}
 
-    // Provides user defined operator new. Needed to trace all new operations
-    // on this class.
+	// Provides user defined operator new. Needed to trace all new operations
+	// on this class.
 #undef new
-    NEW_OPERATOR(arc_list)
+	NEW_OPERATOR(arc_list)
 #define new NEW_NEW
 };   
 
-
+// [LUHME XV] Kommentare ergänzen
 int CurrentCapacity;
 owfnPlace *P;
 owfnTransition *T; /** The transition that is currently parsed. */
 Symbol * S;
 PlSymbol * PS;
-oWFN * PN;					// the petri net
+oWFN * PN;                  // the petri net
 unsigned int * finalMarking;
 string current_port = ""; ///< the currently parsed port
 
-placeType type = INTERNAL;		/* type of place */
+placeType type = INTERNAL;      /* type of place */
 
+// [LUHME XV] "ignoredPlacesDueToMatching_t" wird derzeit entfernt (Christian G.)
 /**
  * See ignoredPlacesDueToMatching.
  */
@@ -158,11 +159,11 @@ InTransitionParsePosition inTransitionParsePosition;
 // Bison generates a list of all used tokens in file "syntax.h" (for flex)
 %token_table
 
-
+// [LUHME XV] Kommentare ergänzen, welche Felder werden überhaupt verwendet?
 %union {
 	char * str;
 	int value;
-	int * exl;
+	int * exl;          ///< expression list
 	arc_list * al;
 	owfnPlace * pl;
 	owfnTransition * tr;
@@ -185,19 +186,23 @@ InTransitionParsePosition inTransitionParsePosition;
 
 /* Grammar rules */
 
-input:  net { 
-}
+input:  net
 ;
 
+/* [LUHME XV] Semantik aus dem Regel-Inneren ans Ende der Regel verlagern */
+/* [LUHME XV] evtl. durch Auftrennen der Regel */
 net:
   {
-    ignoredPlacesDueToMatching.clear();
+	ignoredPlacesDueToMatching.clear();
   }
-        interface KEY_MARKING
+		/* [LUHME XV] C-Code zwischen "interface" "KEY_MARKING" */
+		interface KEY_MARKING
 		{
+			// copy place symbol table to PN
 			PlSymbol* plSymbol = NULL;
 			PlaceTable->initGetNextSymbol();
 			while ((plSymbol = PlaceTable->getNextSymbol()) != NULL) {
+				// [LUHME XV] Matching soll nach dem Parser gelöst werden
 				// Ignore (do not add to PN) external places if oWFN should
 				// be matched with an OG. That is because we match the
 				// reachability graph of the inner of the oWFN with the OG.
@@ -210,7 +215,7 @@ net:
 
 				PN->addPlace(plSymbol->getPlace());
 			}
-			
+			// [LUHME XV] in die "oWFN::initialize()"-Methode verschieben
 			PN->CurrentMarking = new unsigned int [PlaceTable->getSize()];
 			
 		}
@@ -220,7 +225,7 @@ net:
 			// fill in arcs
 			for (unsigned int i = 0; i < PN->getTransitionCount(); i++) {
 				for (unsigned int j=0;
-				    j < PN->getTransition(i)->getLeavingArcsCount(); j++)
+					j < PN->getTransition(i)->getLeavingArcsCount(); j++)
 				{
 					owfnPlace * pl = PN->getTransition(i)->getLeavingArc(j)->pl;
 					if (parameters[P_MATCH] && pl->type != INTERNAL)
@@ -230,7 +235,7 @@ net:
 					pl->addArrivingArc(PN->getTransition(i)->getLeavingArc(j));
 				}
 				for (unsigned int j = 0;
-				     j < PN->getTransition(i)->getArrivingArcsCount(); j++)
+					 j < PN->getTransition(i)->getArrivingArcsCount(); j++)
 				{
 					owfnPlace * pl = PN->getTransition(i)->getArrivingArc(j)->pl;
 					if (parameters[P_MATCH] && pl->type != INTERNAL)
@@ -244,8 +249,8 @@ net:
 			// Delete all places that were not added while parsing this oWFN
 			// for matching.
 			for (ignoredPlacesDueToMatching_t::const_iterator iplace =
-			     ignoredPlacesDueToMatching.begin();
-			     iplace != ignoredPlacesDueToMatching.end(); ++iplace)
+				 ignoredPlacesDueToMatching.begin();
+				 iplace != ignoredPlacesDueToMatching.end(); ++iplace)
 			{
 				delete *iplace;
 			}
@@ -256,7 +261,7 @@ net:
 /********************************
  * the new interface definition *
  ********************************/
-
+/* [LUHME XV] "interface" umbenennen in "placeDeclaration" */
 interface:
   KEY_PLACE place_area port_area /* deprecated syntax */
 | KEY_INTERFACE interface_area KEY_PLACE {type = INTERNAL; } placelists SEMICOLON /* new Luhme XIV syntax */
@@ -274,7 +279,7 @@ port_list_new:
 
 port_definition_new:
   KEY_PORT nodeident
-    { current_port = std::string($2); }
+	{ current_port = std::string($2); }
   place_area_input place_area_output synchronous_area
 ;
 
@@ -291,62 +296,64 @@ labellist:
 
 
 final:
-    KEY_NOFINALMARKING
+	/* [LUHME XV] wird das wirklich gebraucht? alternativ: das Schlüsselwort: FINALMARKING weglassen*/
+	KEY_NOFINALMARKING /* the net has NO final marking (opposed to the empty final marking) */
 |
-    KEY_FINALMARKING 
-    multiplefinalmarkinglists 
-    SEMICOLON
+	KEY_FINALMARKING 
+	multiplefinalmarkinglists 
+	SEMICOLON
 | 
-    KEY_FINALCONDITION statepredicate SEMICOLON 
-    {
+	KEY_FINALCONDITION statepredicate SEMICOLON 
+	{
 	PN->FinalCondition = $2;
 
 	// merge() and posate() can only be called on FinalCondition after the PN
 	// and the FinalCondition (in this order) have been initialized with the
 	// initial marking. This is done after parsing is complete.
-    }
+	}
 | 
-    KEY_FINALCONDITION SEMICOLON 
-    {
-      PN->FinalCondition = NULL;
-    }
+	KEY_FINALCONDITION SEMICOLON 
+	{
+	  PN->FinalCondition = NULL;
+	}
 ;
 
 multiplefinalmarkinglists:
-    {
-        PN->finalMarkingString += "[";
+	{
+		/* [LUHME XV] WTF? member "finalMarkingString" durch Methode zum Erzeugen ersetzen*/
+		PN->finalMarkingString += "[";
 
-        finalMarking = new unsigned int [PlaceTable->getSize()];
-	
-        for (unsigned int i = 0; i < PlaceTable->getSize(); i++) {
-	
-            finalMarking[i] = 0;
-        }
-    }
-    finalmarkinglist 
-    {
-        PN->finalMarkingString += "]";
+		finalMarking = new unsigned int [PlaceTable->getSize()];
 
-        PN->FinalMarkingList.push_back(finalMarking);
-    }
+		// initialize finalMarking, places not occurring in the finalMarking are set to zero    
+		for (unsigned int i = 0; i < PlaceTable->getSize(); i++) {
+			finalMarking[i] = 0;
+		}
+	}
+	finalmarkinglist 
+	{
+		PN->finalMarkingString += "]";
+
+		PN->FinalMarkingList.push_back(finalMarking);
+	}
 |
-    multiplefinalmarkinglists SEMICOLON     
-    {
-        PN->finalMarkingString += ", [";
+	multiplefinalmarkinglists SEMICOLON     
+	{
+		PN->finalMarkingString += ", [";
 
-        finalMarking = new unsigned int [PlaceTable->getSize()];
-	
-        for (unsigned int i = 0; i < PlaceTable->getSize(); i++) {
-	
-            finalMarking[i] = 0;
-        }
-    }
-    finalmarkinglist
-    {
-        PN->finalMarkingString += "]";
+		finalMarking = new unsigned int [PlaceTable->getSize()];
 
-        PN->FinalMarkingList.push_back(finalMarking);
-    }
+		// initialize finalMarking, places not occurring in the finalMarking are set to zero    
+		for (unsigned int i = 0; i < PlaceTable->getSize(); i++) {
+			finalMarking[i] = 0;
+		}
+	}
+	finalmarkinglist
+	{
+		PN->finalMarkingString += "]";
+
+		PN->FinalMarkingList.push_back(finalMarking);
+	}
 ;
 
 place_area: place_area_internal place_area_input  place_area_output
@@ -402,15 +409,15 @@ place: nodeident {
 	P->max_occurrence = events_manual;
 	free($1);
 	if (type == INPUT || type == OUTPUT) {
-	    numberOfEvents += events_manual;
+		numberOfEvents += events_manual;
 	}
-    
-    /* annotate the place with the current port name if specified */
-    if (current_port != "" && type != INTERNAL)
-      PN->add_place_to_port(PS->getPlace(), current_port);
-    
-    }
-    controlcommands
+	
+	/* annotate the place with the current port name if specified */
+	if (current_port != "" && type != INTERNAL)
+	  PN->add_place_to_port(PS->getPlace(), current_port);
+	
+	}
+	controlcommands
 ;
 
 nodeident: IDENT { $$ = $1;}
@@ -425,43 +432,43 @@ controlcommands:
 commands:
   /* empty */
 | KEY_MAX_UNIQUE_EVENTS OP_EQ NUMBER commands
-    {
-    }
+	{
+	}
 | KEY_ON_LOOP OP_EQ KEY_TRUE commands
-    {
-    }
+	{
+	}
 | KEY_ON_LOOP OP_EQ KEY_FALSE commands
-    {
-    }
+	{
+	}
 | KEY_MAX_OCCURRENCES OP_EQ NUMBER commands
-    {
-        // set max_occurrence to value that was given in oWFN file
-        if (options[O_READ_EVENTS]) {
-            sscanf($3, "%u", &(PS->getPlace()->max_occurrence));
-            free($3);
-        }
-//    	options[O_EVENT_USE_MAX] = true;
+	{
+		// set max_occurrence to value that was given in oWFN file
+		if (options[O_READ_EVENTS]) {
+			sscanf($3, "%u", &(PS->getPlace()->max_occurrence));
+			free($3);
+		}
+//      options[O_EVENT_USE_MAX] = true;
 //        if (options[O_EVENT_USE_MAX] &&
 //            PS->getPlace()->max_occurrence > events_manual)
 //        {
 //            PS->getPlace()->max_occurrence = events_manual;
 //        }
 //        numberOfEvents += PS->getPlace()->max_occurrence - events_manual;
-    }
+	}
 | KEY_MAX_OCCURRENCES OP_EQ NEGATIVE_NUMBER commands
-    {
-        //set max_occurrence to value that was given in oWFN file
-        if (options[O_READ_EVENTS]) {
-        	sscanf($3, "%d", &(PS->getPlace()->max_occurrence));
-        	free($3);
-    	}
+	{
+		//set max_occurrence to value that was given in oWFN file
+		if (options[O_READ_EVENTS]) {
+			sscanf($3, "%d", &(PS->getPlace()->max_occurrence));
+			free($3);
+		}
 //        if (options[O_EVENT_USE_MAX] &&
 //            PS->getPlace()->max_occurrence > events_manual)
 //        {
 //            PS->getPlace()->max_occurrence = events_manual;
 //        }
 //        numberOfEvents += PS->getPlace()->max_occurrence - events_manual;
-    }
+	}
 ;
 
 
@@ -482,7 +489,7 @@ port_list:
 
 port_definition:
   nodeident
-    { current_port = std::string($1); }
+	{ current_port = std::string($1); }
   COLON port_participant_list SEMICOLON
 ;
 
@@ -493,20 +500,22 @@ port_participant_list:
 
 port_participant:
   nodeident
-    {
-        PS = static_cast<PlSymbol *>( PlaceTable->lookup($1) );
+	{
+		PS = static_cast<PlSymbol *>( PlaceTable->lookup($1) );
 	
-        if (PS == NULL) {
-            string error = "Place " + string($1) + " does not exist!";
-            owfn_yyerror(error.c_str());
-        } else {
-            PN->add_place_to_port(PS->getPlace(), current_port);
-        }
-    }
+		if (PS == NULL) {
+			string error = "Place " + string($1) + " does not exist!";
+			owfn_yyerror(error.c_str());
+		} else {
+			PN->add_place_to_port(PS->getPlace(), current_port);
+		}
+	}
 ;
 
 
-
+/* [LUHME XV] optional "markinglist", "markinglist" nicht leer */
+/* [LUHME XV] "markinglist" in "marked_places_list" umbenennen */
+/* [LUHME XV] Groß-Klein-"_"-Schreibung konsolidieren */
 markinglist:
   /* empty */ 
 | marking
@@ -515,7 +524,7 @@ markinglist:
 
 marking: 
   nodeident COLON NUMBER 
-      {
+	  {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
@@ -523,36 +532,35 @@ marking:
 		owfn_yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
-	*(PS->getPlace()) += i;
+	*(PS->getPlace()) += i; // add i tokens to the place
 	free($1);
 	free($3);
-      } 
-| nodeident
-      {
-	unsigned int i;
+	  } 
+| nodeident /* we assume 1 token, if no NUMBER is given*/
+	  {
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
 		string error = "Place " + string($1) + " does not exist!";
 		owfn_yyerror(error.c_str());
 	}
-	sscanf("1","%u",&i);
-	*(PS->getPlace()) += i;
+	*(PS->getPlace()) += 1; // add 1 token to the place
 	free($1);
-      }
+	  }
 ;
 
 finalmarkinglist: 
 | finalmarking
 | finalmarkinglist COMMA 
-    {
-    PN->finalMarkingString = PN->finalMarkingString + ", ";
-    }
-    finalmarking
+	{
+	PN->finalMarkingString = PN->finalMarkingString + ", ";
+	}
+	finalmarking
 ;
 
+// [LUHME XV] syntax von initial marking und final marking kann gleichartig geparst werden
 finalmarking: 
   nodeident COLON NUMBER 
-      {
+	  {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
@@ -560,38 +568,37 @@ finalmarking:
 		owfn_yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
+	// [LUHME XV] warum nicht auch hier += wie bei initial marking?
 	finalMarking[PN->getPlaceIndex(PS->getPlace())] = i;
-        if (i < 5) {
-            
-            for (unsigned int n = 0; n < i; n++) {
-                
-                if (n != 0) {
-                    
-                    PN->finalMarkingString = PN->finalMarkingString + ", ";
-                }
-                PN->finalMarkingString = PN->finalMarkingString + string($1);
-            }
-        } else {
-            
-            PN->finalMarkingString = PN->finalMarkingString + string($1) + ":" + string($3);
-        }
+		if (i < 5) {
+			
+			for (unsigned int n = 0; n < i; n++) {
+				
+				if (n != 0) {
+					
+					PN->finalMarkingString = PN->finalMarkingString + ", ";
+				}
+				PN->finalMarkingString = PN->finalMarkingString + string($1);
+			}
+		} else {
+			
+			PN->finalMarkingString = PN->finalMarkingString + string($1) + ":" + string($3);
+		}
 	
 	free($1);
 	free($3);
-      }
-| nodeident
-      {
-	unsigned int i;
+	  }
+| nodeident /* we assume 1 token, if no NUMBER is given*/
+	  {
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
 		string error = "Place " + string($1) + " does not exist!";
 		owfn_yyerror(error.c_str());
 	}
-	sscanf("1","%u",&i);
-	finalMarking[PN->getPlaceIndex(PS->getPlace())] = i;
-        PN->finalMarkingString = PN->finalMarkingString + string($1);
+	finalMarking[PN->getPlaceIndex(PS->getPlace())] = 1;
+		PN->finalMarkingString = PN->finalMarkingString + string($1);
 	free($1);
-      }
+	  }
 ;
 
 
@@ -610,10 +617,12 @@ transition: KEY_TRANSITION tname
 	}
 	KEY_CONSUME
 	{
+		// [LUHME XV] kann wahrscheinlich gelöscht werden, wird hier nicht benutzt
 		inTransitionParsePosition = IN_CONSUME;
 	}
 	arclist SEMICOLON KEY_PRODUCE
 	{
+		// [LUHME XV] kann wahrscheinlich gelöscht werden, wird hier nicht benutzt
 		inTransitionParsePosition = IN_PRODUCE;
 	}
 	arclist SEMICOLON
@@ -625,6 +634,7 @@ transition: KEY_TRANSITION tname
 	/* Anzahl der Boegen */
 	card = 0;
 	for(current = $6; current; current = current->next) {
+		// [LUHME XV] Matching aus Parser entfernen
 		// Ignore external places if oWFN should be matched with an
 		// OG. That is because we match the reachability graph of
 		// the inner of the oWFN with the OG.
@@ -635,15 +645,16 @@ transition: KEY_TRANSITION tname
 		++card;
 	}
 		
-	/* Schleife ueber alle Boegen */
+	/* Schleife ueber alle eingehenden Boegen */
 	for(current = $6; current; current = current->next) {
 		if (current->place->getPlace()->type == OUTPUT) {
-			string msg = string("Transition '") + T->name + "' reads from "
+			string msg = string("Transition '") + T->name + "' consumes from "
 				"output place '" + current->place->getPlace()->name +
 				"' which is not allowed.";
 			owfn_yyerror(msg.c_str());
 		}
-
+		
+		// [LUHME XV] Matching aus Parser entfernen
 		if (parameters[P_MATCH] && current->place->getPlace()->type != INTERNAL) {
 			if (T->hasNonTauLabelForMatching()) {
 				string msg = string("Transition '") + T->name + "' sends or "
@@ -651,7 +662,7 @@ transition: KEY_TRANSITION tname
 				owfn_yyerror(msg.c_str());
 			}
 			T->setLabelForMatching(
-			    current->place->getPlace()->getLabelForMatching());
+				current->place->getPlace()->getLabelForMatching());
 
 			continue;
 		}
@@ -664,6 +675,7 @@ transition: KEY_TRANSITION tname
 				break;
 			}
 		}
+		// variable i is still needed, don't even think about touching it
 
 		if(i >= T->getArrivingArcsCount()) {
 			T->addArrivingArc(
@@ -681,15 +693,16 @@ transition: KEY_TRANSITION tname
 		++card;
 	}
 
-	/* Schleife ueber alle Boegen */
+	/* Schleife ueber alle ausgehenden Boegen */
 	for(current = $10; current; current = current->next) {
 		if (current->place->getPlace()->type == INPUT) {
-			string msg = string("Transition '") + T->name + "' writes to an "
+			string msg = string("Transition '") + T->name + "' produces to an "
 				"input place '" + current->place->getPlace()->name +
 				"' which is not allowed.";
 			owfn_yyerror(msg.c_str());
 		}
 
+		// [LUHME XV] Matching aus Parser entfernen
 		if (parameters[P_MATCH] && current->place->getPlace()->type != INTERNAL) {
 			if (T->hasNonTauLabelForMatching()) {
 				string msg = string("Transition '") + T->name + "' sends or "
@@ -697,7 +710,7 @@ transition: KEY_TRANSITION tname
 				owfn_yyerror(msg.c_str());
 			}
 			T->setLabelForMatching(
-			    current->place->getPlace()->getLabelForMatching());
+				current->place->getPlace()->getLabelForMatching());
 
 			continue;
 		}
@@ -710,6 +723,7 @@ transition: KEY_TRANSITION tname
 				break;
 			}
 		}
+		// variable i is still needed, don't even think about touching it
 
 		if(i >= T->getLeavingArcsCount()) {
 			T->addLeavingArc(
@@ -741,7 +755,7 @@ tname:   IDENT
 ;
 
 
-arclist: { $$ = (arc_list *) 0;}
+arclist: /* empty */ { $$ = (arc_list *) 0;}
 | arc {$$ = $1;}
 | arc COMMA arclist {
 			$1-> next = $3;
@@ -751,7 +765,7 @@ arclist: { $$ = (arc_list *) 0;}
 
 arc: 
   nodeident COLON NUMBER 
-      {
+	  {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable -> lookup($1);
 	if(!PS) {
@@ -762,13 +776,12 @@ arc:
 	$$->place = PS;
 	$$->next = (arc_list *)  0;
 	sscanf($3,"%u",&i);
-	$$->nu = i;
+	$$->nu = i;     // set arc-weight
 	free($1);
 	free($3);
-      }
-| nodeident
-      {
-	unsigned int i;
+	  }
+| nodeident /* if no arc weight is given, we assume "1" */
+	  {
 	PS = (PlSymbol *) PlaceTable -> lookup($1);
 	if(!PS) {
 		string error = "Place " + string($1) + " does not exist!";
@@ -777,30 +790,33 @@ arc:
 	$$ = new arc_list;
 	$$->place = PS;
 	$$->next = (arc_list *)  0;
-	sscanf("1","%u",&i);
-	$$->nu = i;
+	$$->nu = 1;     // set arc-weight to 1
 	free($1);
-      }
+	  }
 ;
 
 statepredicate: LPAR 
-    {
-    PN->finalConditionString += "(";  
-    }
-    statepredicate RPAR 
-    {
+	{
+		// [LUHME XV] member "finalConditionString" durch Methode ersetzen
+	PN->finalConditionString += "(";  
+	}
+	statepredicate RPAR 
+	{
 	$$ = $3;
-    PN->finalConditionString += ")";
+	PN->finalConditionString += ")";
 }
 | statepredicate OP_AND 
-    {
-    PN->finalConditionString = PN->finalConditionString + " AND ";    
-    }
-    statepredicate 
-    {
+	{
+	PN->finalConditionString = PN->finalConditionString + " AND ";    
+	}
+	statepredicate 
+	{
+	// [LUHME XV] "conj" groß oder zwei Klassen "...formulaConj" und "...formulaDisj"
 	$$ = new binarybooleanformula(conj,$1,$4);
 }
 | statepredicate OP_AND KEY_ALL_OTHER_PLACES_EMPTY {
+	// [LUHME XV] Entfalten der Formel verschieben,
+	// [LUHME XV] KEY_ALL_OTHER_PLACES_EMPTY, etc. als atomare Formel repräsentieren
 	//
 	// Warning: code duplication! Keep the rules for
 	// KEY_ALL_OTHER_PLACES_EMPTY, KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY and
@@ -810,6 +826,7 @@ statepredicate: LPAR
 	set<owfnPlace*> places_in_lhs;
 	lhs->collectplaces(places_in_lhs);
 	set<owfnPlace*> all_other_places;
+	// [LUHME XV] std::set_difference() in "<algorithm>" verwenden?
 	for (size_t iplace = 0; iplace != PN->getPlaceCount(); ++iplace)
 	{
 		owfnPlace* current_place = PN->getPlace(iplace);
@@ -819,7 +836,7 @@ statepredicate: LPAR
 		}
 	}
 
-	if (all_other_places.size() == 0)
+	if (all_other_places.empty())
 	{
 		$$ = $1;
 	}
@@ -833,17 +850,19 @@ statepredicate: LPAR
 		for (set<owfnPlace*>::const_iterator itplace = all_other_places.begin();
 			 itplace != all_other_places.end(); ++itplace)
 		{
+			// [LUHME XV] Symbol "eq" in Großbuchstaben oder eigene Methode/Klasse
 			rhs->sub[iplace] = new atomicformula(eq, *itplace, 0);
-            rhs->sub[iplace]->parent = rhs;
-            rhs->sub[iplace]->parentindex = iplace;
+			rhs->sub[iplace]->parent = rhs;
+			rhs->sub[iplace]->parentindex = iplace;
 			++iplace;
 		}
 		
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
-    PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_PLACES_EMPTY";  
+	PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_PLACES_EMPTY";  
 }
 | statepredicate OP_AND KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY {
+	// [LUHME XV] Entfalten der Formel verschieben, s.o.
 	//
 	// Warning: code duplication! Keep the rules for
 	// KEY_ALL_OTHER_PLACES_EMPTY, KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY and
@@ -857,7 +876,7 @@ statepredicate: LPAR
 	{
 		owfnPlace* current_place = PN->getPlace(iplace);
 		if ((current_place->type == INTERNAL) &&
-		    (places_in_lhs.find(current_place) == places_in_lhs.end()))
+			(places_in_lhs.find(current_place) == places_in_lhs.end()))
 		{
 			all_other_internal_places.insert(current_place);
 		}
@@ -875,20 +894,21 @@ statepredicate: LPAR
 		rhs->sub = new formula*[rhs->cardsub];
 		size_t iplace = 0;
 		for (set<owfnPlace*>::const_iterator itplace =
-		     all_other_internal_places.begin();
-		     itplace != all_other_internal_places.end(); ++itplace)
+			 all_other_internal_places.begin();
+			 itplace != all_other_internal_places.end(); ++itplace)
 		{
 			rhs->sub[iplace] = new atomicformula(eq, *itplace, 0);
-            rhs->sub[iplace]->parent = rhs;
-            rhs->sub[iplace]->parentindex = iplace;
+			rhs->sub[iplace]->parent = rhs;
+			rhs->sub[iplace]->parentindex = iplace;
 			++iplace;
 		}
 		
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
-    PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_INTERNAL_PLACES_EMPTY";  
+	PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_INTERNAL_PLACES_EMPTY";  
 }
 | statepredicate OP_AND KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY {
+	// [LUHME XV] Entfalten der Formel verschieben, s.o.
 	//
 	// Warning: code duplication! Keep the rules for
 	// KEY_ALL_OTHER_PLACES_EMPTY, KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY and
@@ -899,14 +919,14 @@ statepredicate: LPAR
 	lhs->collectplaces(places_in_lhs);
 	set<owfnPlace*> all_other_external_places;
 
-    // We cannot use PN->inputPlacesArray and PN->outputPlacesArray here
-    // because they are not initialized yet. They would be initialized only
-    // after PN->initialize() were called, but we cannot wait until then.
+	// We cannot use PN->inputPlacesArray and PN->outputPlacesArray here
+	// because they are not initialized yet. They would be initialized only
+	// after PN->initialize() were called, but we cannot wait until then.
 	for (size_t iplace = 0; iplace != PN->getPlaceCount(); ++iplace)
 	{
 		owfnPlace* current_place = PN->getPlace(iplace);
 		if ((current_place->type != INTERNAL) &&
-		    (places_in_lhs.find(current_place) == places_in_lhs.end()))
+			(places_in_lhs.find(current_place) == places_in_lhs.end()))
 		{
 			all_other_external_places.insert(current_place);
 		}
@@ -924,33 +944,33 @@ statepredicate: LPAR
 		rhs->sub = new formula*[rhs->cardsub];
 		size_t iplace = 0;
 		for (set<owfnPlace*>::const_iterator itplace =
-		     all_other_external_places.begin();
-		     itplace != all_other_external_places.end(); ++itplace)
+			 all_other_external_places.begin();
+			 itplace != all_other_external_places.end(); ++itplace)
 		{
 			rhs->sub[iplace] = new atomicformula(eq, *itplace, 0);
-            rhs->sub[iplace]->parent = rhs;
-            rhs->sub[iplace]->parentindex = iplace;
+			rhs->sub[iplace]->parent = rhs;
+			rhs->sub[iplace]->parentindex = iplace;
 			++iplace;
 		}
 		
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
-    PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_EXTERNAL_PLACES_EMPTY";  
+	PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_EXTERNAL_PLACES_EMPTY";  
 }
 | statepredicate OP_OR 
-    {
-        PN->finalConditionString = PN->finalConditionString + " OR ";  
-    }
-    statepredicate 
-    {
-        $$ = new binarybooleanformula(disj,$1,$4);
+	{
+		PN->finalConditionString = PN->finalConditionString + " OR ";  
+	}
+	statepredicate 
+	{
+		$$ = new binarybooleanformula(disj,$1,$4);
 }
 | OP_NOT
-    {
-        PN->finalConditionString = PN->finalConditionString + "NOT ";      
-    } 
-    statepredicate 
-    {
+	{
+		PN->finalConditionString = PN->finalConditionString + "NOT ";      
+	} 
+	statepredicate 
+	{
 	   $$ = new unarybooleanformula(neg,$3);
 }
 | nodeident OP_EQ NUMBER {
@@ -962,7 +982,7 @@ statepredicate: LPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(eq, PS->getPlace(), i);
-    PN->finalConditionString = PN->finalConditionString + string($1) + " = " + string($3);  
+	PN->finalConditionString = PN->finalConditionString + string($1) + " = " + string($3);  
 	free($1);
 	free($3);
 }
@@ -975,7 +995,7 @@ statepredicate: LPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(neq, PS->getPlace(), i);
-    PN->finalConditionString = PN->finalConditionString + string($1) + " != " + string($3);  
+	PN->finalConditionString = PN->finalConditionString + string($1) + " != " + string($3);  
 	free($1);
 	free($3);
 }
@@ -988,7 +1008,7 @@ statepredicate: LPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(lt, PS->getPlace(), i);
-    PN->finalConditionString = PN->finalConditionString + string($1) + " < " + string($3);  
+	PN->finalConditionString = PN->finalConditionString + string($1) + " < " + string($3);  
 	free($1);
 	free($3);
 }
@@ -1001,7 +1021,7 @@ statepredicate: LPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(gt, PS->getPlace(), i);
-    PN->finalConditionString = PN->finalConditionString + string($1) + " > " + string($3);  
+	PN->finalConditionString = PN->finalConditionString + string($1) + " > " + string($3);  
 	free($1);
 	free($3);
 }
@@ -1014,7 +1034,7 @@ statepredicate: LPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(geq, PS->getPlace(), i);
-    PN->finalConditionString = PN->finalConditionString + string($1) + " >= " + string($3);  
+	PN->finalConditionString = PN->finalConditionString + string($1) + " >= " + string($3);  
 	free($1);
 	free($3);
 }
@@ -1027,7 +1047,7 @@ statepredicate: LPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(leq, PS->getPlace(), i);
-    PN->finalConditionString = PN->finalConditionString + string($1) + " <= " + string($3);  
+	PN->finalConditionString = PN->finalConditionString + string($1) + " <= " + string($3);  
 	free($1);
 	free($3);
 }

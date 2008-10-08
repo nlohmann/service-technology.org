@@ -228,7 +228,7 @@ void AnnotatedGraph::removeEdgesFromNodeToAllOtherNodes(AnnotatedGraphNode* node
 bool AnnotatedGraph::isAcyclic() {
     trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): start\n");
 
-    // map the number of every nodes predecessors to the node 
+    // map the number of every nodes predecessors to the node
     map<AnnotatedGraphNode*, unsigned int> predecessors;
 
     // if the graph has no root it is empty and thus acyclic
@@ -264,7 +264,7 @@ bool AnnotatedGraph::isAcyclic() {
 
     // now we define a queue that will hold all nodes that have no predecessor (left)
     queue<AnnotatedGraphNode*> zeroNodes;
-    
+
     // Initialize the queue
     for (vector<AnnotatedGraphNode*>::iterator currentNode = setOfNodes.begin(); currentNode != setOfNodes.end(); currentNode++) {
         if(predecessors[(*currentNode)] == 0) {
@@ -700,7 +700,7 @@ long double AnnotatedGraph::numberOfStrategies() {
 //! \param activeNode a node pointing to the current node
 //! \param validFollowerCombinations a map that contains all sets of follower nodes that succeed to
 //!        fullfill the annotation of the current node with the edges leading to them
-//! \param eliminateRedundantCounting map containing all already computed number of tree service 
+//! \param eliminateRedundantCounting map containing all already computed number of tree service
 //!           automata for every node. This map is filled meanwhile the recursion
 //! \return number of Strategies for the current node
 long double AnnotatedGraph::numberOfStrategiesRecursively(
@@ -720,7 +720,7 @@ long double AnnotatedGraph::numberOfStrategiesRecursively(
     long double number = 0;
 
     trace(TRACE_3 ,"    this node has " +  intToString(validFollowerCombinations[activeNode].size()) + " follower Combinations\n");
-    
+
     // iterate over the list of valid follower combinations
     for (list<list<AnnotatedGraphNode*> >::iterator followerList =
          validFollowerCombinations[activeNode].begin();
@@ -740,7 +740,7 @@ long double AnnotatedGraph::numberOfStrategiesRecursively(
         }
 
         // the value of the current combination is the product of the values of
-        // all the nodes the edges of the current combination point to 
+        // all the nodes the edges of the current combination point to
         long double currentCombinationValue = 1;
 
         // detailed information for high debug levels
@@ -1124,7 +1124,7 @@ void AnnotatedGraph::minimizeGraph() {
     // false nodes are removed to increase performance only;
     // should also work if nodes are unsatisfiable
     trace(TRACE_1, "removing false nodes...\n");
-    removeReachableFalseNodes(); 
+    removeReachableFalseNodes();
     removeUnreachableNodes();
 
     // we only have to minimize if at least two blue nodes are present...
@@ -1230,7 +1230,7 @@ void AnnotatedGraph::minimizeGraph() {
 
         // the second parameter is false, since this OG has no underlying oWFN
         createOGFile(outfilePrefix, false);
-        
+
         if (!parameters[P_NOPNG]) {
             createDotFile(outfilePrefix + ".og");
         }
@@ -1473,11 +1473,11 @@ bool AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG) {
         return false;
     }
 
-    // if one of the OGs is empty, both need to be empty in order to be equivalent 
+    // if one of the OGs is empty, both need to be empty in order to be equivalent
     if (root == NULL || secondOG->getRoot() == NULL) {
         return (root == NULL && secondOG->getRoot() == NULL);
-    } 
-    
+    }
+
     // We need to remember the pairs of nodes we already visited.
     set<pair<AnnotatedGraphNode*, AnnotatedGraphNode*> > visitedNodes;
 
@@ -2033,7 +2033,7 @@ string AnnotatedGraph::createPNGFile(string& filenamePrefix, std::string& dotFil
     // print commandline and execute system command
     trace(TRACE_0, cmd + "\n\n");
     system(cmd.c_str());
-    
+
     return pngFile;
 
 }
@@ -2269,7 +2269,7 @@ string AnnotatedGraph::createOGFile(const string& filenamePrefix, bool hasOWFN) 
     ogFile.close();
 
     trace(TRACE_5, "AnnotatedGraph::createOGFile(): end\n");
-    
+
     return addOGFileSuffix(filenamePrefix);
 }
 
@@ -2323,7 +2323,7 @@ void AnnotatedGraph::removeTrueNodes(bool fromOWFN) {
 
         // If this OG was read from an OG file, the states stored
         // in a node are not present and thus the empty node is not
-        // identifiable. In this case all true nodes will be 
+        // identifiable. In this case all true nodes will be
         // deleted although there exist services which do not maintain
         // their behaviour, this is a TODO
 
@@ -2541,7 +2541,7 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
                     new GraphFormulaFixed(true, ""), currNode->getColor());
             trace(TRACE_3, "            created new node " + newNode->getName()
                     + "\n");
-            
+
             // create tau transition from current to new node
             AnnotatedGraphEdge* tauTransition= new AnnotatedGraphEdge(newNode, GraphFormulaLiteral::TAU);
             currNode->addLeavingEdge(tauTransition);
@@ -2555,10 +2555,10 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
                 AnnotatedGraphEdge* currEdge = edge_iter->getNext();
 
                 // Only copy edges that represent receiving events or (in case of q not being final
-                // are sending events that appear in the annotation 
-                if (currEdge->getType() == RECEIVING || 
-                       (currEdge->getType() == SENDING && 
-                        sendingEventsNotInAnnotation.find(currEdge->getLabel()) == sendingEventsNotInAnnotation.end() && 
+                // are sending events that appear in the annotation
+                if (currEdge->getType() == RECEIVING ||
+                       (currEdge->getType() == SENDING &&
+                        sendingEventsNotInAnnotation.find(currEdge->getLabel()) == sendingEventsNotInAnnotation.end() &&
                         !hasFinalLiteral) ) {
 
                     // create new leaving edge
@@ -2571,14 +2571,14 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
                 }
             }
 
-            // In any case the current node is not final any more. 
+            // In any case the current node is not final any more.
             currNode->setFinal(false);
-            
+
             //if (hasFinalLiteral && !hasSendingEventThatOccursInAnnotation && nonAnnotatedSendingEvents.empty()) {
             if (hasFinalLiteral) {
             newNode->setFinal(true);
             }
-            
+
             // insert node into the set of created nodes
             createdNodes.insert(newNode);
         }
@@ -2608,11 +2608,11 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
 void AnnotatedGraph::transformToPublicView(Graph* cleanPV, bool fromOWFN) {
 
     // first either the empty node (if the owfn is given) or all true nodes
-    // need to be removed. 
+    // need to be removed.
     trace(TRACE_1, "    removing true nodes ...\n");
     removeTrueNodes(fromOWFN);
     trace(TRACE_2, "\n");
-    
+
     trace(TRACE_1, "    constructing dual service...\n");
     constructDualService();
     trace(TRACE_2, "\n");
@@ -2845,7 +2845,7 @@ void AnnotatedGraph::getPredecessorRelation(AnnotatedGraph::predecessorMap& resu
     }
 }
 
-
+// [LUHME XV] Methodenbeschreibung erweitern
 //! \brief assigns the final nodes of the OG according to Gierds 2007
 void AnnotatedGraph::assignFinalNodes() {
     trace(TRACE_5, "AnnotatedGraph::assignFinalNodes(): start\n");
@@ -2928,7 +2928,7 @@ void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphN
     }
 
     // Determine if we have a blue node and are on a blue path.
-    if (onABluePath && (v->getColor() == BLUE) && 
+    if (onABluePath && (v->getColor() == BLUE) &&
         (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
 
         ++nBlueNodes;
@@ -2965,7 +2965,7 @@ void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphN
         }
 
         if (vNext != v) {
-            // have we visited the next node before? 
+            // have we visited the next node before?
             // 1) if not, we check the next node
             // 2) if we have seen the next before, we only consider it again if
             // 		a) we are on a blue path
@@ -3050,7 +3050,7 @@ unsigned int AnnotatedGraph::getNumberOfNodes() const {
 }
 
 
-//! \brief creates a STG file of the graph 
+//! \brief creates a STG file of the graph
 //! \param edgeLabels a reference to a vector of strings containing the old
 //         label names from this graph
 //! \return the filename of the created STG file
@@ -3097,7 +3097,7 @@ string AnnotatedGraph::printGraphToSTG(vector<string>& edgeLabels) {
     if (!STGFileStream.good()) {
             STGFileStream.close();
             exit(EC_FILE_ERROR);
-    } 
+    }
     STGFileStream << ".model Labeled_Transition_System" << "\n";
     STGFileStream << ".dummy";
     for (int i = 0; i < (int)edgeLabels.size(); i++)
@@ -3170,7 +3170,7 @@ void AnnotatedGraph::printGraphToSTGRecursively(AnnotatedGraphNode * v,
         assert(foundPosition >= 0);
         assert(currentLabel == edgeLabels.at(foundPosition) );
 
-        // print current transition to stream 
+        // print current transition to stream
         os << "p" << v->getNumber() << " t" << foundPosition << " p" << vNext->getNumber() << endl;
 
 
@@ -3204,7 +3204,7 @@ string AnnotatedGraph::getSuffix() const {
             suffix += ".ig";
         }
     }
-    
+
     return suffix;
 }
 

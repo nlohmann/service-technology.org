@@ -178,7 +178,7 @@ void readnet(const std::string& owfnfile) {
 
     PN->initialize();
     // Initialize final condition (if present) with initial marking.
-    // Only afterwards is merging allowed, because merge requires subformulas
+    // Only afterwards merging is allowed, because merge requires subformulas
     // to have sensible values.
     if (PN->FinalCondition) {
         PN->FinalCondition->init(PN->CurrentMarking);
@@ -317,11 +317,11 @@ void reportOptionValues() {
         trace(TRACE_0, "interface message bound set to: "
                         + intToString(messages_manual) + "\n");
     }
-    
+
     if (parameters[P_RESPONSIVE]) {
     	trace(TRACE_0, "\ncalculation of responsive partner(s)\n");
     }
-    
+
     trace(TRACE_0, "\n");
 }
 
@@ -334,7 +334,7 @@ void reportOptionValues() {
 //! \brief create a GasTex file of annotated dot file 'myDotFile'
 //! \param myDotFile the dot file with layout annotations
 //! \param myFilePrefix the file prefix to add '.tex' to
-void makeGasTex(std::string myDotFile, std::string myFilePrefix, 
+void makeGasTex(std::string myDotFile, std::string myFilePrefix,
                 GasTexGraph::STYLE style) {
     trace(TRACE_1, "makeGasTex called for file: ");
     trace(TRACE_1, myDotFile + "\n");
@@ -378,28 +378,30 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix,
 
 //! \brief creates all output files with respect to the parameters
 //! \param g An object of AnnotatedGraph, CommunicationGraph, IG or OG
-//! type. 
+//! type.
 void createOutputFiles(AnnotatedGraph* graph, string prefix) {
     if (!parameters[P_NODOT]) {
-    
+
         string dotFileName = graph->createDotFile(prefix); // .out
-       
+
         if (!parameters[P_NOPNG]  && dotFileName != "") {
             string pngres = graph->createPNGFile(prefix, dotFileName);
             if (pngres != "") trace(TRACE_0, pngres + " generated\n");
 
-        }		         
-       
+        }
+
         if (parameters[P_TEX] && dotFileName != "") {
             string annotatedDotFileName = graph->createAnnotatedDotFile(prefix, dotFileName); // .dot
             makeGasTex(annotatedDotFileName, prefix, GasTexGraph::STYLE_OG);
-        }  
+        }
     }
 }
 
 //! \brief generate a public view for a given og
 //! \param OG an og to generate the public view of
 //! \param graphName a name for the graph in the output
+// [LUHME XV] R�ckgabewert in string mit Name der erzeugten Datei ver�ndern
+// [LUHME XV] Trennen von Public View und Ausgabe des Public View
 void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
 
     // if the OG is empty, there is no public view and the computation
@@ -413,9 +415,9 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
         return;
     }
 
-    trace(TRACE_0, "generating the public view for "); 
+    trace(TRACE_0, "generating the public view for ");
     trace(graphName);
-    
+
     trace("\n");
 
     // dont create the public view automaton's png if it becomes to big
@@ -485,11 +487,6 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
 //! \param igFilename reference to a string containing the filename of the created IG
 interactionGraph* computeIG(oWFN* PN, string& igFilename) {
 
-    time_t seconds, seconds2;
-    interactionGraph * graph = new interactionGraph(PN);
-    igFilename = "";
-
-
     // print information about reduction rules (if desired)
     if (options[O_CALC_REDUCED_IG] || parameters[P_USE_EAD]) {
         trace(TRACE_0, "building the reduced interaction graph by using reduction rule(s)\n");
@@ -507,9 +504,16 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
     }
     trace(TRACE_0, "\n");
 
-    
+    // [LUHME XV] Konstruktor und "buildGraph()" verheiraten?
+    // [LUHME XV] Klasse "interactionGraph" in "InteractionGraph" umbenennen
+    interactionGraph * graph = new interactionGraph(PN);
+    igFilename = "";
+
+    // [LUHME XV] "seconds" und "seconds2" durch "start" und "stop" ersetzen, ÜBERALL!
     // build interaction graph
+    time_t seconds, seconds2;
     seconds = time (NULL);
+    // [LUHME XV] "buildGraph" in "build" umbenennen
     graph->buildGraph();
     seconds2 = time (NULL);
 
@@ -518,9 +522,10 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
     } else {
         trace(TRACE_0, "\nbuilding the interaction graph finished.\n");
     }
+    // [LUHME XV] Tracen, Zeit in Millisekunden nehmen.
     cout << difftime(seconds2, seconds) << " s consumed for building graph" << endl;
 
-
+    // [LUHME XV] gehört in die Klasse "InteractionGraph" in die Dateiausgabe
     // add interface information to graph: Input -> Output and vice versa
     // input/outputPlacenames contain all possible labels for the IG
     for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
@@ -533,6 +538,7 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
 
     // print statistics
     trace(TRACE_0, "\nnet is controllable: ");
+    // [LUHME XV] Diese Abfrage in bool Graph::hasBlueRoot() auslagern; ÜBERALL
     if (graph->getRoot()->getColor() == BLUE) {
         trace(TRACE_0, "YES\n\n");
     } else {
@@ -552,13 +558,14 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
 
         if (!parameters[P_EQ_R]) {    // don't create png if we are in eqr mode
             // generate output files
-			string basefilename = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
+            string basefilename = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
             basefilename += graph->getSuffix();
             createOutputFiles(graph, basefilename);
         }
 
-/* create also an .og file to enable comparison of different IGs */
+        // create also an .og file to enable comparison of different IGs
 
+        // [LUHME XV] alles von hier an in eine "createFilename(Type)"-Funktion
         if (options[O_OUTFILEPREFIX]) {
             igFilename = outfilePrefix;
         } else {
@@ -580,13 +587,17 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
 }
 
 
+// [LUHME XV] Brauchen wir diesen Wrapper?
 string computeIG(oWFN* PN) {
 
+    // [LUHME XV] "igFilename" als Member von interactionGraph
     string igFilename = "";
+    // [LUHME XV] lieber als Konstruktoraufruf hier?
     interactionGraph* graph = computeIG(PN, igFilename);
 
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
 
+    // [LUHME XV] Soll/muss das hierher?
     graph->clearNodeSet();
     delete graph;
 
@@ -609,7 +620,7 @@ string computeSmallPartner(AnnotatedGraph* IG) {
     // 1. step: was done before (computing the IG)
     // 2. step: if the net is controllable create STG file for petrify out of computed IG
     string stgFilename = "";
-    vector<string> edgeLabels; // renamend transitions 
+    vector<string> edgeLabels; // renamend transitions
 
     if (!IG->hasNoRoot() && IG->getRoot()->getColor() == BLUE) {
         trace(TRACE_1, "    Creating STG File\n");
@@ -681,7 +692,7 @@ string computeMostPermissivePartner(AnnotatedGraph* OG) {
     // 1. step: was done before (computing the OG)
     // 2. step: if the net is controllable create STG file for petrify out of computed IG
     string stgFilename = "";
-    vector<string> edgeLabels; // renamend transitions 
+    vector<string> edgeLabels; // renamend transitions
 
     if (!OG->hasNoRoot() && OG->getRoot()->getColor() == BLUE) {
         trace(TRACE_1, "    Creating STG File\n");
@@ -722,6 +733,7 @@ string computeMostPermissivePartner(AnnotatedGraph* OG) {
 //! \param PN the given oWFN
 string computeOG(oWFN* PN) {
 
+    // [LUHME XV] konsistente Benennung der Zeit-Variablen (siehe Rest von Fiona)
     time_t  buildGraphTime1, buildGraphTime2,
             seconds, seconds2,
             graphStatsTime1, graphStatsTime2,
@@ -740,9 +752,11 @@ string computeOG(oWFN* PN) {
     // build operating guideline
     trace(TRACE_1, "Building the graph...\n");
     buildGraphTime1 = time(NULL);
+    // [LUHME XV] in "build()" umbenennen
     graph->buildGraph();
     buildGraphTime2 = time(NULL);
     trace(TRACE_1, "finished building the graph\n");
+    // [LUHME XV] Zeit in Millisekunden nehmen (�BERALL!)
     trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n\n");
 
     // add interface information to graph: Input -> Output and vice versa
@@ -803,6 +817,7 @@ string computeOG(oWFN* PN) {
 
         string publicViewName;
 
+        // [LUHME XV] Dateinamen-Manipulation in FileNameHandler auslagern
         if (options[O_OUTFILEPREFIX]) {
             publicViewName = outfilePrefix;
         } else {
@@ -841,9 +856,9 @@ string computeOG(oWFN* PN) {
         }
 
         if (!parameters[P_EQ_R]) {    // don't create png if we are in eqr mode
-			string basefilename = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
+            string basefilename = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
             basefilename += graph->getSuffix();
-            createOutputFiles(graph, basefilename);           
+            createOutputFiles(graph, basefilename);
         }
 
         if (options[O_OUTFILEPREFIX]) {
@@ -886,6 +901,7 @@ string computeOG(oWFN* PN) {
     trace(TRACE_5, "computation finished -- trying to delete graph\n");
     graph->clearNodeSet();
     delete graph;
+    graph = NULL;
     trace(TRACE_5, "graph deleted\n");
 
     // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
@@ -1542,8 +1558,11 @@ void checkAcyclicity(AnnotatedGraph* OG, string graphName) {
 
 
 int main(int argc, char** argv) {
-
+    // [LUHME XV] gehört hier nicht hin
     AnnotatedGraph* OGToMatch = NULL;
+
+    // [LUHME XV] IFDEF überprüfen
+    // [LUHME XV] Jans New-Handler
     set_new_handler(&myown_newhandler);
 
     // evaluate command line options
@@ -1554,9 +1573,12 @@ int main(int argc, char** argv) {
     // ********                start dot file dependant operations               ********
     // **********************************************************************************
 
+    // [LUHME XV] Parameter "-t tex" ist evtl. überflüssig
+    // [LUHME XV] gehört hier nicht hin
     if (parameters[P_GASTEX]) {
         // if -t tex was called, then outfileprefix still contains file suffix
 
+        // [LUHME XV] es gibt eine Funktion "basename()" um Dateinamen/Erweiterung zu managen
         // remember suffix in dotFileName
         string dotFileName = outfilePrefix;
         // try to remove .out suffix
@@ -1565,7 +1587,7 @@ int main(int argc, char** argv) {
             outfilePrefix=outfilePrefix.substr(0, outfilePrefix.size() - dotFileSuffix.size());
         }
 
-        // TODO: find out of which type the graph in the dot file is (og? owfn?)
+        //! \TODO: find out of which type the graph in the dot file is (og? owfn?)
         makeGasTex(dotFileName, outfilePrefix, GasTexGraph::STYLE_OG);
     }
 
@@ -1598,6 +1620,10 @@ int main(int argc, char** argv) {
             return 0;
         }
 */
+
+	// [LUHME XV] Soll hier tatsächlich schon aus der main() gesprungen werden?
+	// [LUHME XV] Wegen Speicher-Aufräumen??? Dateien schließen? Newlogger-Ausgaben?
+	// [LUHME XV] gleiches für P_SIMULATES und P_EX Rufe
         if (parameters[P_PRODUCTOG]) {
             // calculating the product OG
             computeProductOG(OGsFromFiles);
@@ -1631,6 +1657,8 @@ int main(int argc, char** argv) {
              (parameters[P_SYNTHESIZE_PARTNER_OWFN] && !parameters[P_ADAPTER] &&
               !parameters[P_SMALLADAPTER] && ogfiles.size() > 0) ) {
 
+        // [LUHME XV] Fehlermeldung auslagern?
+        // [LUHME XV] Generell Fehlermeldungen in eine Datei auslagern und mit Fehlercode rufen (siehe BPEL2oWFN)
         // Abort if there are no OGs at all
         if (ogfiles.begin() == ogfiles.end() && !(parameters[P_PV])) {
             trace("Error:  No OGs have been given for computation\n\n");
@@ -1640,10 +1668,12 @@ int main(int argc, char** argv) {
         // iterate all input files
         for (AnnotatedGraph::ogfiles_t::const_iterator iOgFile = ogfiles.begin(); iOgFile != ogfiles.end(); ++iOgFile) {
 
+            // [LUHME XV] Was wird hier wirklich gelesen? IGs? OGs? Annotated graphs? ???
+            // [LUHME XV] Warum ist readOG ein Pointer? Objekt reicht? Konstruktoraufruf stattdessen?
             AnnotatedGraph* readOG = readog(*iOgFile);
 
             if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
-                // computes partner out of IG or a most permissive partner from an og 
+                // computes partner out of IG or a most permissive partner from an og
 
                 // it is possible that we read an old OG file where no interface information
                 // were stored, so we have to compute them from the graph
@@ -1651,6 +1681,9 @@ int main(int argc, char** argv) {
                     readOG->computeInterfaceFromGraph();
                 }
 
+                // [LUHME XV] "smallpartner" und "mostpermissivepartner"-Optionen umbennennen
+                // [LUHME XV] "-t smallpartner" -> "-t partner"
+                // [LUHME XV] "-t mostpermissivepartner" -> "-t partner --mostpermissive"
                 if (parameters[P_IG]) {
                     computeSmallPartner(readOG);
                 } else if (parameters[P_OG]) {
@@ -1658,7 +1691,7 @@ int main(int argc, char** argv) {
                 }
                 delete readOG;
             }
-            
+
             else if (parameters[P_PV]) {
                 // computes a service automaton "public view" which has the same
                 // OG as given in readOG
@@ -1670,10 +1703,11 @@ int main(int argc, char** argv) {
             else if (parameters[P_MINIMIZE_OG]) {
                 // minimizes a given OG
 
-                string ogFilename = "";
-
                 //readOG->removeReachableFalseNodes();
                 readOG->minimizeGraph();
+
+                // [LUHME XV] WTF?
+		string ogFilename("");
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 // generate output files
@@ -1704,6 +1738,7 @@ int main(int argc, char** argv) {
                 delete readOG;
             }
 
+            // [LUHME XV] als Paramter raus??
             else if (parameters[P_CHECK_ACYCLIC]) {
                 // counts the number of deterministic strategies
                 // that are characterized by a given OG
@@ -1712,6 +1747,7 @@ int main(int argc, char** argv) {
                 delete readOG;
             }
 
+            // [LUHME XV] Raus?
             else if (parameters[P_CHECK_FALSE_NODES]) {
                 // checks if there are nodes in the og which violate the annotation
                 trace(TRACE_0, "Checking '" + readOG->getFilename() + "' ");
@@ -1746,6 +1782,7 @@ int main(int argc, char** argv) {
                 } else {
                     newFilename = AnnotatedGraph::stripOGFileSuffix(readOG->getFilename()) + ".blue";
                 }
+                // [LUHME XV] nach unten schieben
                 time_t seconds, seconds2;
 
                 if(TRACE_1 <= debug_level) {
@@ -1767,21 +1804,22 @@ int main(int argc, char** argv) {
                 trace(TRACE_0, "Removed all unreachable nodes.\n");
                 cout << "    " << difftime(seconds2, seconds) << " s consumed removing unreachable nodes" << endl << endl;
 
-                if(TRACE_1 <= debug_level) {
+                if (TRACE_1 <= debug_level) {
                     readOG->computeAndPrintGraphStatistics();
                 }
 
-                    if (!options[O_NOOUTPUTFILES]) {
+                if (!options[O_NOOUTPUTFILES]) {
                     trace(TRACE_0, "\nCreating new .og-file without false nodes... \n");
                     // the second parameter is false, since the read OG has no underlying oWFN
                     readOG->createOGFile(newFilename, false);
-                    trace(TRACE_0, "New .og-file '" + newFilename + ".og' succesfully created.\n\n");
+                    trace(TRACE_0, "New .og-file '" + newFilename + ".og' successfully created.\n\n");
                 }
 
                 delete readOG;
 
             }
 
+            // [LUHME XV] Parameter in "P_READ_OG_ONLY" umbenennen
             else if (parameters[P_READ_OG]) {
                 trace(TRACE_0, "OG was read from file '" + readOG->getFilename() + "'\n");
                 readOG->computeAndPrintGraphStatistics();
@@ -1806,36 +1844,46 @@ int main(int argc, char** argv) {
             }
         }
 
+// [LUHME XV] Wurde das oben nicht schon alles gemacht? Wurde zwischenzeitlich noch was eingelesen?
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
         // Destroy buffer of OG parser.
         // Must NOT be called before fclose(og_yyin);
         og_yylex_destroy();
 #endif
 
+// [LUHME XV] Warum an dieser Stelle?
 #ifdef LOG_NEW
         NewLogger::printall();
 #endif
 
+        // [LUHME XV] WTF?
         if (!parameters[P_PV] && !parameters[P_PNG]) {
             return 0;
         }
-    }
+    } //// END OF OG INPUT
 
     // **********************************************************************************
-    // ********                start PN file dependant operations                ********
+    // ********                start PN file dependent operations                ********
     // **********************************************************************************
 
     // netfiles only used for getting the correct name strings
     if (parameters[P_EX] && options[O_BDD]) {
         // checking exchangeability using BDDs
 
+        // [LUHME XV] Hier soll eine vernünftige Fehlermeldung hin
         assert(netfiles.size() == 2);
         // the BDD representations of the given nets are assumed to exist already
 
+        // [LUHME XV] Klasse "Exchangeability" umbennen?
+        // [LUHME XV] Code mit Christian S. Austauschbarkeit zusammenlegen
+        // [LUHME XV] hier nicht "netfiles" benutzen
         list<std::string>::iterator netiter = netfiles.begin();
         Exchangeability* og1 = new Exchangeability(*netiter);
         Exchangeability* og2 = new Exchangeability(*(++netiter));
 
+        // [LUHME XV] Ausgabe "YES"/"NO" in og->check() auslagern?
+        // [LUHME XV] "check" in "checkEquivalence" umbenennen?
+        // [LUHME XV] Variablennamen ändern; irgendwas mit "BDD-OG"
         trace(TRACE_0, "The two operating guidelines are equal: ");
         if (og1->check(og2) == true) {
             trace(TRACE_0, "YES\n\n");
@@ -1847,8 +1895,10 @@ int main(int argc, char** argv) {
     else if (parameters[P_ADAPTER] || parameters[P_SMALLADAPTER]) {
 
         Adapter adapter;
+        // [LUHME XV] "generateAdapter()" in "generate()" umbenennen
+        // [LUHME XV] Netze explizit übergeben
         adapter.generateAdapter();
-    } 
+    }
     else if (parameters[P_IG] || parameters[P_OG] || parameters[P_MATCH] ||
              parameters[P_PNG] || parameters[P_REDUCE] || parameters[P_NORMALIZE] ||
              parameters[P_PV] || parameters[P_MATCH_PARTNER]) {
@@ -1866,6 +1916,7 @@ int main(int argc, char** argv) {
         // ---------------- processing every single net -------------------
         for (list<std::string>::iterator netiter = netfiles.begin(); netiter != netfiles.end(); ++netiter) {
 
+            // [LUHME XV] Fliegt irgendwann raus.
             // calculate the graph of the same net twice --> once with -R and once with no -R
             // in case the option -t eqR is set, otherwise we go through this loop only once
             for (int i = (parameters[P_EQ_R]) ? 0 : 1; i <= 1; i++) {
@@ -1881,29 +1932,34 @@ int main(int argc, char** argv) {
                 currentowfnfile = *netiter;
                 assert(currentowfnfile != "");
 
+                // [LUHME XV] gehört in den Parser
                 // prepare getting the net
                 PlaceTable = new SymbolTab<PlSymbol>;
 
-                // get the net
-                readnet(currentowfnfile);
+                // [LUHME XV] readnet() und reportNet() als Members der Klasse "oWFN"
                 trace(TRACE_0, "=================================================================\n");
                 trace(TRACE_0, "processing net " + currentowfnfile + "\n");
+                // get the net
+                // [LUHME XV] Wo kommt "PN" her? Wird unten gebraucht aber vom Parser initialisiert... WTF
+                readnet(currentowfnfile);
                 reportNet();
                 delete PlaceTable;
 
+                // [LUHME XV] Mal in LoLA oder BPEL2oWFN gucken, wie man dort peibt
                 if (currentowfnfile == "<stdin>") {
                     currentowfnfile = "stdin";
                 }
-                
-                // start computation
+
+                // [LUHME XV] verschieben
                 fileName = "";
 
+                // start computation
                 if (parameters[P_IG]) {
                     reportOptionValues(); // adjust events_manual and print limit of considering events
                     if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
                         fileName = computeSmallPartner(PN); // compute a small partner
                     } else {
-                        fileName = computeIG(PN);           // computing IG of the current oWFN 
+                        fileName = computeIG(PN);           // computing IG of the current oWFN
                     }
                 }
 
@@ -1938,24 +1994,26 @@ int main(int argc, char** argv) {
                     // remember file name of og-file to check equivalence later on
                     ogfiles.push_back(AnnotatedGraph::addOGFileSuffix(fileName));
                 }
-                
+
                 if (parameters[P_MATCH_PARTNER]) {
-                    
+
                     parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
                     parameters[P_OG] = true;
-                    
+
+                    // [LUHME XV] Achtung! Es gibt auch "ogFilename"
                     string ogfilename = computeOG(PN);
-                    
+
                     parameters[P_SYNTHESIZE_PARTNER_OWFN] = false;
                     parameters[P_OG] = false;
-                    string PNFileName = currentowfnfile;    
+                    string PNFileName = currentowfnfile;
                     string netfile = PNFileName.substr(0, PNFileName.find(".owfn") );
                     string partnerfilename = netfile + "-partner.owfn";
 
+                    // [LUHME XV] WTF!?
                     system(("src/fiona -t match " + ogfilename + ".og " + partnerfilename).c_str());
-                    
-                }            
-                
+
+                }
+
                 //delete PN;
                 //trace(TRACE_5, "net deleted\n");
             }
@@ -1992,6 +2050,7 @@ int main(int argc, char** argv) {
 }
 
 
+// [LUHME XV] Sowas gibt es als Standardmethode "basename()"
 std::string platform_basename(const std::string& path) {
 #ifdef WIN32
     string::size_type posOfLastBackslash = path.find_last_of('\\');

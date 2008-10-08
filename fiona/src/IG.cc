@@ -62,10 +62,12 @@ interactionGraph::~interactionGraph() {
 //! \fn void interactionGraph::buildGraph()
 void interactionGraph::buildGraph() {
 
+    // [LUHME XV] Daniela, lösch das mal und überleg Dir, was Du da machen wolltest!
     setOfStatesStubbornTemp.clear();
 
     calculateRootNode(); // creates the root node and calculates its reachability graph (set of states)
 
+    // [LUHME XV] Reihenfolge "push_back()" und "buildGraph()" ist umgekehrt zu OG::buildGraph()
     // build the IG, whether the reduced or not the reduced one is built is being decided in that
     // function itself
     buildGraph(getRoot(), 1);
@@ -73,7 +75,7 @@ void interactionGraph::buildGraph() {
     setOfNodes.push_back(getRoot());
 
     computeGraphStatistics();
-    
+
     time_t seconds, seconds2;
 
     trace(TRACE_2, "setting final nodes...\n");
@@ -82,7 +84,7 @@ void interactionGraph::buildGraph() {
     seconds2 = time(NULL);
     trace(TRACE_2, "finished setting final nodes...\n");
     trace(TRACE_3, "    " + intToString((int) difftime(seconds2, seconds)) + " s consumed.\n");
-    
+
 }
 
 
@@ -91,7 +93,7 @@ void interactionGraph::buildGraph() {
 //! \fn void interactionGraph::buildGraph(AnnotatedGraphNode * node)
 void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
 
-    // at this point, the states inside the current node node are already computed!
+    // at this point, the states inside the current node are already computed!
 
     trace(TRACE_1, "\n-----------------------------------------------------------------\n");
     trace(TRACE_1, "\t current node: ");
@@ -127,6 +129,8 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
     // collection of all activated events
     setOfMessages activatedEvents;
 
+    // [LUHME XV]: müssen sendingEvents und receivingEvents getrennt sein, wenn
+    // [LUHME XV]: sie hier vereinigt werden?
     // collect the receiving events
     for (setOfMessages::iterator iter = receivingEvents.begin(); iter != receivingEvents.end(); iter++) {
            activatedEvents.insert(*iter);
@@ -177,6 +181,7 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
 
             trace(TRACE_2, PN->createLabel(mmSet) + "\n");
 
+            // [LUHME XV] Variable "v" in "newNode" umbenennen
             // create new AnnotatedGraphNode of the graph
             AnnotatedGraphNode* v = new AnnotatedGraphNode();
 
@@ -218,6 +223,7 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
                     currentNode->removeLiteralFromAnnotation(PN->createLabel(mmSet));
                 } else if (v->getColor() == BLUE) {
                     // only if "early detection" reduction is activated, we adjust the priority map
+                    // [LUHME XV] neu-justieren der Priority-Map auch in den anderen Fällen?
                     if (parameters[P_USE_EAD]) {
                         pmIG.adjustPM(PN, PN->createLabel(mmSet));
                     }
@@ -543,7 +549,7 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
         if (options[O_CALC_ALL_STATES]) {
 #ifdef CHECKCAPACITY
             try {
-#endif                
+#endif
         	// no state reduction
         	PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
 #ifdef CHECKCAPACITY
@@ -555,7 +561,7 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
                 newNode->setColor(RED);
                 return;
             }
-#endif                
+#endif
         } else {
         	if (parameters[P_SINGLE]) {
 	        	// state reduction
@@ -563,8 +569,8 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
 	        	// care of deadlocks
 #ifdef CHECKCAPACITY
             try {
-#endif                
-	            PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode); 
+#endif
+	            PN->calculateReachableStatesStubbornDeadlocks(setOfStatesStubbornTemp, newNode);
 #ifdef CHECKCAPACITY
             }
             catch (CapacityException& ex)
@@ -574,11 +580,11 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
                 newNode->setColor(RED);
                 return;
             }
-#endif                
+#endif
         	} else if (parameters[P_REPRESENTATIVE]) {
 #ifdef CHECKCAPACITY
             try {
-#endif                
+#endif
         		PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode);
 #ifdef CHECKCAPACITY
             }
@@ -589,7 +595,7 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
                 newNode->setColor(RED);
                 return;
             }
-#endif                
+#endif
         	}
         }
 
@@ -624,7 +630,7 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
         if (options[O_MESSAGES_MAX] == true) { // k-message-bounded set
             for (unsigned int i = 0; i < PN->getPlaceCount(); i++)
             {
-                if (PN->CurrentMarking[i] > messages_manual) 
+                if (PN->CurrentMarking[i] > messages_manual)
                 {
                     // adding output message to state already using full message bound
                     trace(TRACE_3, "\t\t\t\t\t adding output event would cause capacity bound violation\n");
@@ -637,7 +643,7 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
   */          if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
 #ifdef CHECKCAPACITY
             try {
-#endif                
+#endif
                 PN->calculateReachableStatesFull(newNode); // calc the reachable states from that marking
 #ifdef CHECKCAPACITY
             }
@@ -648,7 +654,7 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
                 newNode->setColor(RED);
                 return;
             }
-#endif                
+#endif
             }
         }
     } else {
@@ -664,16 +670,16 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 
 	        for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter
 	                != node->reachGraphStateSet.end(); iter++) {
-	
+
 	            (*iter)->decode(PN);
-	            
+
 #ifdef CHECKCAPACITY
             try {
-#endif                
+#endif
 	            // calc reachable states from that marking using stubborn set method that
-	            // calculates all those states that activate the given receiving event 
+	            // calculates all those states that activate the given receiving event
 	            // --> not necessarily the deadlock states
-	            PN->calculateReducedSetOfReachableStates(stateSet, setOfStatesStubbornTemp, 
+	            PN->calculateReducedSetOfReachableStates(stateSet, setOfStatesStubbornTemp,
 	            											&tempBinDecision, receivingEvent, newNode);
 #ifdef CHECKCAPACITY
             }
@@ -684,7 +690,7 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
                 newNode->setColor(RED);
                 return;
             }
-#endif                
+#endif
             	if (newNode->getColor() == RED) {
                 	// a message bound violation occured during computation of reachability graph
                     trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
@@ -700,16 +706,16 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
     	} else if (parameters[P_REPRESENTATIVE]) {
 	        for (StateSet::iterator iter2 = node->reachGraphStateSet.begin(); iter2
 	        		!= node->reachGraphStateSet.end(); iter2++) {
-	        	
+
 	        	(*iter2)->decode(PN); // get the marking of the state
 
 	        	if (PN->removeOutputMessage(receivingEvent)) { // remove the output message from the current marking
 #ifdef CHECKCAPACITY
             try {
-#endif                
+#endif
 	            	// calc the reachable states from that marking using stubborn set method taking
 	            	// care of deadlocks
-	            	PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode); 
+	            	PN->calculateReducedSetOfReachableStatesStoreInNode(setOfStatesStubbornTemp, newNode);
 #ifdef CHECKCAPACITY
             }
             catch (CapacityException& ex)
@@ -719,7 +725,7 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
                 newNode->setColor(RED);
                 return;
             }
-#endif                
+#endif
 	            	if (newNode->getColor() == RED) {
 	                	// a message bound violation occured during computation of reachability graph
 	                    trace(TRACE_3, "\t\t\t\t found message bound violation during calculating EG in node\n");
@@ -746,11 +752,11 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
     void (interactionGraph::*calcReceiving) (State *, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
     void (interactionGraph::*calcSending)     (State *, GraphFormulaMultiaryOr*, setOfMessages&);
 
-	// if we calculate a responsive partner, we consider TSCCs only and store which 
+	// if we calculate a responsive partner, we consider TSCCs only and store which
 	// TSCC we have seen already
 	// note: each TSCC has _at least_ one representative, it may have more than one though
 	std::map<unsigned int, bool> visitedTSCCs;
-    
+
     // Define the functions to be used for calculation
     if (parameters[P_USE_CRE]) { // Use "combine receiving events" to calculate receiving events.
         calcReceiving = &interactionGraph::combineReceivingEvents;
@@ -779,44 +785,44 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
 
     // Process each state in the node
     for (iter; iter != iterEnd; iter++) {
-    	
-    	// figure out, whether a clause shall be created for this state 
+
+    	// figure out, whether a clause shall be created for this state
     	bool useThisState = false;
-    	
+
     	// if a non-responsive partner shall be calculated
     	if (!parameters[P_RESPONSIVE]) {
     		useThisState = (*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE;
     	} else { // if parameter "responsive" is used, then we consider TSCCs only
     		useThisState = ((*iter)->repTSCC && !visitedTSCCs[(*iter)->dfs]);
     	}
-    	
+
     	// we do consider this state
-        if (useThisState) { 
+        if (useThisState) {
         	// first, get the state
             (*iter)->decode(PN);
 
             // initialize the clause
             GraphFormulaMultiaryOr* myclause = new GraphFormulaMultiaryOr();
-            
+
             // use a new reference of the currently considered state
             State * currentState = (*iter);
-            
+
             // if we are in responsive mode, remember which TSCC we are in
             // (since current state is a representative of the TSCC it holds: dfs==lowlink)
             if (parameters[P_RESPONSIVE]) {
             	visitedTSCCs[currentState->dfs] = true;
             }
-            
+
             do {
-            	
+
                 // delete the list of quasi enabled transitions
-            	if (currentState->quasiFirelist) { 
+            	if (currentState->quasiFirelist) {
             		delete [] currentState->quasiFirelist;
             		currentState->quasiFirelist = NULL;
             	}
 
             	// get the firelist of the quasi enabled transitions
-            	currentState->quasiFirelist = PN->quasiFirelist(); 
+            	currentState->quasiFirelist = PN->quasiFirelist();
 
             	// call the functions to calculate receiving and sending events via function pointers (see above)
             	// based on the current state
@@ -833,7 +839,7 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
             	if (parameters[P_RESPONSIVE]) {
             		// get next state of TSCC, make sure that we stay in this TSCC by
             		// comparing lowlink values
-            		if (currentState->nexttar && 
+            		if (currentState->nexttar &&
             				(currentState->lowlink == currentState->nexttar->lowlink)) {
             			currentState = currentState->nexttar;
             			if (currentState) {

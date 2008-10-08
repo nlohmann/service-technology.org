@@ -254,17 +254,17 @@ class oWFN {
         void addSuccStatesToNode(AnnotatedGraphNode*, State*);
 
         /// decodes state, checks for message bound violation and adds successors
-        void addSuccStatesToNodeStubborn(AnnotatedGraphNode*, 
-											StateSet&, 
-											unsigned int*,
-											State *);        
+        void addSuccStatesToNodeStubborn(AnnotatedGraphNode*,
+                                         StateSet&,
+                                         unsigned int*,
+                                         State*);
 
         /// helper function for addSuccStatesToNodeStubborn
-        void addSuccStatesToNodeStubborn(AnnotatedGraphNode*, 
-											StateSet&,
-											StateSet&,
-											unsigned int*,
-											State *);        
+        void addSuccStatesToNodeStubborn(AnnotatedGraphNode*,
+                                         StateSet&,
+                                         StateSet&,
+                                         unsigned int*,
+                                         State*);
 
         
         /// decodes state, figures out if state activates output event, 
@@ -279,8 +279,8 @@ class oWFN {
         /// decodes state, figures out if state activates output event, 
         ///		checks for message bound violation and adds successors recursively
         void addSuccStatesToListStubborn(StateSet&,
-        								 StateSet &,
-        								 StateSet &,
+        								 StateSet&,
+        								 StateSet&,
                                          owfnPlace*,
                                          State*,
                                          AnnotatedGraphNode*);
@@ -289,8 +289,8 @@ class oWFN {
         /// decodes state, figures out if state activates output event, 
         ///		checks for message bound violation and adds successors recursively
         void addSuccStatesToListStubborn(StateSet&,
-        								 StateSet &,
-        								 StateSet &,
+        								 StateSet&,
+        								 StateSet&,
                                          messageMultiSet,
                                          State*,
                                          AnnotatedGraphNode*);
@@ -299,7 +299,7 @@ class oWFN {
         /// decodes state, figures out if state activates output event, 
         ///		checks for message bound violation and adds successors recursively
         void addSuccStatesToListStubborn(StateSet&,
-        								 StateSet &,
+        								 StateSet&,
                                          messageMultiSet,
                                          State*,
                                          AnnotatedGraphNode*);
@@ -309,10 +309,16 @@ class oWFN {
         bool violatesMessageBound();
 
         /// adds recursively the state s and all its successor states to the given state set
-        void addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode*, StateSet&, StateSet&, State* s);
+        void addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode*,
+                                                             StateSet&,
+                                                             StateSet&,
+                                                             State* s);
+
         /// helper function to add recursively the state s and all its successor states to the given state set
-        void addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode*, StateSet&, State* s);
-        
+        void addSuccStatesToGivenSetOfStatesStubbornDeadlock(AnnotatedGraphNode*,
+                                                             StateSet&,
+                                                             State* s);
+
         /// calculates and returns the next state
         State* calculateNextSate();
 
@@ -339,13 +345,23 @@ class oWFN {
         
         /// calculates the reduced set of states reachable from the current marking and stores them 
         /// given state set
-        void calculateReducedSetOfReachableStates(StateSet&, StateSet&, binDecision**, owfnPlace*, AnnotatedGraphNode*);
-        void calculateReducedSetOfReachableStates(StateSet&, StateSet&, binDecision**, messageMultiSet, AnnotatedGraphNode*);
+        void calculateReducedSetOfReachableStates(StateSet&,
+                                                  StateSet&,
+                                                  binDecision**,
+                                                  owfnPlace*,
+                                                  AnnotatedGraphNode*);
+
+        void calculateReducedSetOfReachableStates(StateSet&,
+                                                  StateSet&,
+                                                  binDecision**,
+                                                  messageMultiSet,
+                                                  AnnotatedGraphNode*);
         
         bool currentMarkingActivatesReceivingEvent(unsigned int* );
         
         void calculateStubbornTransitions(State*);
-        void calculateReducedSetOfReachableStatesStoreInNode(StateSet&, AnnotatedGraphNode*);
+        void calculateReducedSetOfReachableStatesStoreInNode(StateSet&,
+                                                             AnnotatedGraphNode*);
 
         /// NO REDUCTION! calculate all reachable states from the current marking
         /// and store them in the node n (== AnnotatedGraphNode of CommunicationGraph)

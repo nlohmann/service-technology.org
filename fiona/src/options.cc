@@ -130,7 +130,7 @@ void print_help() {
   trace("                                   OG          - compute operating guideline\n");
   trace("                                   match       - check whether a given oWFN\n");
   trace("                                                 matches with a given OG\n");
-//  trace("                                   minimizeOG  - minimizes a given OG\n");
+  trace("                                   minimizeOG  - minimizes a given OG\n");
   trace("\n");
   trace("                                   reduce      - structurally reduce all\n");
   trace("                                                 given oWFNs\n");
@@ -160,7 +160,6 @@ void print_help() {
   trace("                                                 given set of services\n");
   trace("                                  smalladapter - calculate a small adapter for\n");
   trace("                                                 a given set of services\n");
-  trace("                                    responsive - create responsive partner(s)\n");
   trace("\n");
   trace("                                   png         - generate png files for all\n");
   trace("                                                 given oWFNs or OGs\n");
@@ -176,8 +175,6 @@ void print_help() {
   trace("                                   count       - count the number of strategies\n");
   trace("                                                 that are characterized by a\n");
   trace("                                                 given OG\n");
-  trace("                                   distributed - checks a given oWFN for\n");
-  trace("                                                 distributed controllability\n");
   trace("                                   readOG      - only reads a given OG File\n");
   trace(" -m | --messagebound=<level> ... set maximum number of same messages per\n");
   trace("                                 state to <level>  (default is 1)\n");
@@ -238,8 +235,12 @@ void print_help() {
   trace(" -p | --parameter=<param> ...... additional parameter <param>\n");
   trace("                                   no-png     - does not create a PNG file\n");
   trace("                                   no-dot     - does not create dot-related output\n");
-  trace("                                   diagnosis  - disables optimizations\n");
-  trace("                                   autonomous - autonomous controllability\n");
+  trace("                                   responsive - create responsive partner(s)\n");
+  trace("                                                (for IG/OG computation)\n");
+//  trace("                                   diagnosis  - disables optimizations\n");
+//  trace("                                  distributed - checks a given oWFN for\n");
+//  trace("                                                distributed controllability\n");
+//  trace("                                   autonomous - autonomous controllability\n");
   trace("                                   r1 - r5    - set reduction level in mode\n");
   trace("                                                \"-t reduce\" to to the \n");
   trace("                                                specified value \n");
@@ -250,8 +251,14 @@ void print_help() {
   trace(" -a | --adapterrules=<filename>  read adapter rules from <filename>\n");
   trace("\n");
   trace("\n");
+  trace("The most common calls of fiona are:\n");
+  trace("  fiona example.owfn                           (for controllability)\n");
+  trace("  fiona -t og example.owfn                     (for OG construction)\n");
+  trace("  fiona -t match client.owfn service.owfn.og   (for matching client.owfn\n");
+  trace("                                               with the OG of service.owfn)\n");
+  trace("\n");
   trace("For more information see:\n");
-  trace("  http://www.informatik.hu-berlin.de/top/tools4bpel/fiona\n");
+  trace("  http://www.service-technology.org/fiona\n");
   trace("\n");
 }
 
@@ -321,7 +328,8 @@ void parse_command_line(int argc, char* argv[]) {
 
     // initialize parameters
 
-    // -t parameters
+    // -t parameters are the "scenarios" in which Fiona runs
+    // (descriptions are found in options.h)
     parameters[P_OG] = false;
     parameters[P_IG] = true;
     parameters[P_MATCH] = false;
@@ -497,28 +505,22 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if (lc_optarg == "removefalsenodes") {
                     parameters[P_OG] = false;
                     parameters[P_IG] = false;
+                    parameters[P_REMOVE_FALSE_NODES] = true;
                     // if original OG has empty node, then empty node must be kept
                     parameters[P_SHOW_EMPTY_NODE] = true;
-                    parameters[P_REMOVE_FALSE_NODES] = true;
                 } else if (lc_optarg == "isacyclic") {
                     parameters[P_IG] = false;
                     parameters[P_CHECK_ACYCLIC] = true;
                 } else if (lc_optarg == "count") {
                     parameters[P_IG] = false;
                     parameters[P_COUNT_SERVICES] = true;
-                } else if (lc_optarg == "distributed") {
-                    parameters[P_OG] = true;
-                    parameters[P_IG] = false;
-                    options[O_SHOW_NODES] = true;
-                    parameters[P_SHOW_EMPTY_NODE] = true; // essential for theory!
-                    parameters[P_DISTRIBUTED] = true;
                 } else if (lc_optarg == "readog") {
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
                     parameters[P_READ_OG] = true;
                 } else if (lc_optarg == "reduce") {
                     if (globals::reduction_level == 0) {
-                        globals::reduction_level =5;
+                        globals::reduction_level = 5;
                     }
                     parameters[P_IG] = false;
                     parameters[P_OG] = false;
@@ -642,14 +644,18 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_TEX] = true;
                 } else if (lc_optarg == "diagnosis") {
                     parameters[P_DIAGNOSIS] = true;
-//                    parameters[P_OG] = false;
-//                    parameters[P_IG] = true; 
                     options[O_SHOW_NODES] = true;
                     parameters[P_SHOW_BLUE_NODES] = true;
                     parameters[P_SHOW_EMPTY_NODE] = true;
                     parameters[P_SHOW_RED_NODES] = true;
                     parameters[P_SHOW_ALL_NODES] = true;
                     parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
+                } else if (lc_optarg == "distributed") {
+                    parameters[P_OG] = true;
+                    parameters[P_IG] = false;
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = true; // essential for theory!
+                    parameters[P_DISTRIBUTED] = true;
                 } else if (lc_optarg == "autonomous") {
                     parameters[P_AUTONOMOUS] = true;
                 } else if (string(optarg) == "r1") {

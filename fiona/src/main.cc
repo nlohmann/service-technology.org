@@ -1703,6 +1703,11 @@ int main(int argc, char** argv) {
             else if (parameters[P_MINIMIZE_OG]) {
                 // minimizes a given OG
 
+                trace(TRACE_0, "=================================================================\n");
+                trace(TRACE_0, "processing OG " + readOG->getFilename() + "\n");
+                readOG->computeAndPrintGraphStatistics();
+                trace("\n");
+
                 //readOG->removeReachableFalseNodes();
                 readOG->minimizeGraph();
 
@@ -1727,6 +1732,8 @@ int main(int argc, char** argv) {
                     createOutputFiles(readOG, ogFilename);
                 }
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                trace(TRACE_0, "=================================================================\n");
+                trace("\n");
                 delete readOG;
             }
 

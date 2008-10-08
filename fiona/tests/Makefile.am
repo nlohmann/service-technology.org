@@ -402,10 +402,10 @@ DISTCLEANFILES =  productog/1x2.output.og \
 		  png/big.owfn.output.og.out \
 		  png/big.owfn.output.og.png \
 		  png/big.owfn.output.og.tex \
-		  png/06-03-23_BPM06_shop_sect_3.owfn.og.dot \
-		  png/06-03-23_BPM06_shop_sect_3.owfn.og.out \
- 		  png/06-03-23_BPM06_shop_sect_3.owfn.og.png \
-		  png/06-03-23_BPM06_shop_sect_3.owfn.og.tex \
+		  png/06-03-23_BPM06_shop_sect_3.owfn.og.output.dot \
+		  png/06-03-23_BPM06_shop_sect_3.owfn.og.output.out \
+ 		  png/06-03-23_BPM06_shop_sect_3.owfn.og.output.png \
+		  png/06-03-23_BPM06_shop_sect_3.owfn.og.output.tex \
 		  publicview/complexPV.pv.owfn \
 		  publicview/complexPV.pv.sa.out \
 		  publicview/complexPV.pv.sa.png \

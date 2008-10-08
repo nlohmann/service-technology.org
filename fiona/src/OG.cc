@@ -701,7 +701,7 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
 	                if (currentState->type == FINALSTATE) {
 	                	if ((PN->FinalCondition) && currentState->cardFireList > 0) {
 	                        cerr << "\n\t WARNING: found a finalstate which activates a transition";
-	                        cerr << "\n\t          you shouldn't do this!"<< endl;
+	                        cerr << " - you shouldn't do this!" << endl;
 
 	                        // transient final states are ignored in annotation, just like
 	                        // all other transient states
@@ -777,7 +777,7 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
                 if ((*iter)->type == FINALSTATE) {
                     if ((PN->FinalCondition) && (*iter)->cardFireList > 0) {
                         cerr << "\n\t WARNING: found a finalstate which activates a transition";
-                        cerr << "\n\t          you shouldn't do this!"<< endl;
+                        cerr << " - you shouldn't do this!" << endl;
 
                         // transient final states are ignored in annotation, just like
                         // all other transient states

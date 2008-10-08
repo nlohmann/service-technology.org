@@ -89,12 +89,11 @@ typedef enum {
     P_REMOVE_FALSE_NODES,        //!< remove nodes with false annotations in og
     P_CHECK_ACYCLIC,            //!< Check whether an OG is acyclic 
     P_COUNT_SERVICES,           //!< Compute the number of services characterized by an OG
-    P_DISTRIBUTED,              //!< check for distributed controllability
     P_READ_OG,                  //!< only read an OG from a file
     P_REDUCE,                   //!< reduce given oWFNs 
     P_NORMALIZE,                //!< normalize given oWFNs
     P_PARTNER_TEST,             //!< first synthesize a partner, then match it with the og. 
-    P_RESPONSIVE,				//!< generate responsive partners (IG/OG) using TSCCs
+    P_RESPONSIVE,               //!< generate responsive partners (IG/OG) using TSCCs
 
     P_SHOW_BLUE_NODES,          //!< show blue nodes only (empty node not shown though)
     P_SHOW_EMPTY_NODE,          //!< show all blue nodes (including empty node)
@@ -107,12 +106,13 @@ typedef enum {
     P_NODOT,                    //!< do not create any dot related output
     P_TEX,                      //!< create a gastex tex file in some other mode
     P_DIAGNOSIS,                //!< diagnosis information
+    P_DISTRIBUTED,              //!< check for distributed controllability
     P_AUTONOMOUS,               //!< check for autonomous controllability
     P_REDUCE_LEVEL,             //!< set reduction level of mode -t reduce
     P_USE_CRE,                  //!< Use "combine receiving events" for IG-reduction
     P_USE_RBS,                  //!< Use "receive before sending" for IG-reduction
-    P_USE_EAD,                    //!< use "early detection" rule for IG-reduction
-    P_REPRESENTATIVE,              //!< state reduction in node using representatives
+    P_USE_EAD,                  //!< use "early detection" rule for IG-reduction
+    P_REPRESENTATIVE,           //!< state reduction in node using representatives
     P_SINGLE                    //!< state reduction in node using single marking as representative
 } possibleParameters;
 

@@ -1,27 +1,3 @@
-############################################################################
-# Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
-#                      Jan Bretschneider and Christian Gierds              #
-#                                                                          #
-# This file is part of Fiona.                                              #
-#                                                                          #
-# Fiona is free software; you can redistribute it and/or modify it         #
-# under the terms of the GNU General Public License as published by the    #
-# Free Software Foundation; either version 2 of the License, or (at your   #
-# option) any later version.                                               #
-#                                                                          #
-# Fiona is distributed in the hope that it will be useful, but WITHOUT     #
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    #
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for #
-# more details.                                                            #
-#                                                                          #
-# You should have received a copy of the GNU General Public License along  #
-# with Fiona; if not, write to the Free Software Foundation, Inc., 51      #
-# Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
-############################################################################
-
-# File last changed $Date: 2008-06-03 09:20:18 $ by $Author: massuthe $.
-# Version $Revision: 1.21 $
-
 SUBDIRS = cudd src tests doc
 
 .PHONY: binarydistreadme
@@ -32,8 +8,8 @@ DISTCLEANFILES = env.sh
 SHELLSCRIPTS = tests/*.sh
 
 # delete all files that can be created by other files
-hu-prepare: maintainer-clean
-	-rm -f COPYING
+cvs-clean: maintainer-clean
+	-rm -f COPYING Doxyfile
 	-rm -f aclocal.m4
 	-rm -f configure
 	-rm -f depcomp
@@ -45,8 +21,6 @@ hu-prepare: maintainer-clean
 	-rm -f -r src/.deps
 	-rm -f src/Fiona.h.in
 	-rm -f tests/Makefile.in
-	find -type d -exec chmod 755 {} \;
-	find -type f -exec chmod 644 {} \;
 	@echo -----------------------------------------------------
 	@echo To recreate installation status enter
 	@echo   aclocal

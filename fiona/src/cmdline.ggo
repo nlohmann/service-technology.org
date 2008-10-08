@@ -3,13 +3,15 @@ version "2.0"
 
 purpose "Fiona is a tool to automatically analyze the interactional behavior of a given open workflow net (oWFN)."
 
-#description ""
+description "About Fiona"
 
 
-section "Algorithm"
+section "Scenarios"
 
 option "type" t
-  "Select the modus operandi of fiona (only one type is allowed)."
+  "Select the modus operandi of fiona (only one type is allowed).\
+IG          - compute interaction graph
+OG          - compute operating guideline"
   details="\
 IG          - compute interaction graph
 OG          - compute operating guideline

@@ -1,26 +1,3 @@
-############################################################################
-# Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert     #
-#                                                                          #
-# This file is part of BPEL2oWFN.                                          #
-#                                                                          #
-# BPEL2oWFN is free software; you can redistribute it and/or modify it     #
-# under the terms of the GNU General Public License as published by the    #
-# Free Software Foundation; either version 2 of the License, or (at your   #
-# option) any later version.                                               #
-#                                                                          #
-# BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT #
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    #
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for #
-# more details.                                                            #
-#                                                                          #
-# You should have received a copy of the GNU General Public License along  #
-# with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51  #
-# Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
-############################################################################
-
-# File last changed $Date: 2008-06-03 09:20:18 $ by $Author: massuthe $.
-# Version $Revision: 1.54 $
-
 include $(top_srcdir)/Makefile.covcommon
 
 bin_PROGRAMS = fiona
@@ -107,6 +84,16 @@ WARNINGS=-W -Wall -Wno-unused
 # Collect all compile flags
 fiona_CXXFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(OPTIMIZATION_LEVEL) $(WARNINGS)
 fiona_CFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(OPTIMIZATION_LEVEL) $(WARNINGS)
+
+
+#############################################################################
+# enable or disable assertions (toggle with --configure --enable-assert)
+#############################################################################
+if !USEASSERTIONS
+  fiona_CFLAGS += -DNDEBUG=1
+  fiona_CXXFLAGS += -DNDEBUG=1
+endif
+
 
 # the library search path.
 fiona_LDFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(all_libraries) 

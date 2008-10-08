@@ -1,17 +1,15 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-# Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT(Fiona, 2.0, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.31 $)
+AC_INIT(Fiona, 3.0-unreleased, fiona@service-technology.org, fiona)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
 
 AM_INIT_AUTOMAKE
 
-# delete file with enviroment variables for some progs
+# delete file with environnent variables for some progs
 rm env.sh >& /dev/null
 
 # Checks for programs.
@@ -24,6 +22,25 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_SED
+
+
+#############################################################################
+# check whether to use assertions using the configure script parameter
+# "--enable-assert" (standard) and "--disable-assert"
+#############################################################################
+AC_ARG_ENABLE(assert, "enable assertions",
+[case "${enableval}" in
+  yes) assertions=yes ;;
+  no)  assertions=no ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-assert) ;;
+esac],[assertions=yes])
+AC_MSG_CHECKING([whether to use assertions])
+AC_MSG_RESULT($assertions)
+if test "$assertions" = 'no'; then
+    AC_DEFINE(NDEBUG,1,[Turn off assert statements])
+fi
+AM_CONDITIONAL(USEASSERTIONS, test "$assertions" = "yes")
+
 
 if test "$RANLIB" = ":"; then
   AC_MSG_ERROR([ranlib was not found!])
@@ -107,6 +124,7 @@ AC_SUBST(CUDD_XFLAGS)
 AC_SUBST(builddir)
 
 AC_CONFIG_FILES([Makefile
+                 Doxyfile
                  src/Makefile
                  tests/Makefile
                  doc/Makefile
@@ -128,6 +146,7 @@ AC_OUTPUT
 
 echo "--------- compile settings ---------"
 echo "compile for 64bit...: $enable_64bit"
+echo "enable assertions...: $assertions"
 echo "------------------------------------"
 echo
 

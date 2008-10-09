@@ -52,7 +52,7 @@ int comparestr( const void* a, const void* b){
 //! \param filename name of the fale to check exchangebility for  
 //! \param heuristic Cudd Reorderding type
 Exchangeability::Exchangeability(string filename, Cudd_ReorderingType heuristic) {
-    trace(TRACE_5, "Exchangeability::Exchangeability(char* filename): begin\n");
+    TRACE(TRACE_5, "Exchangeability::Exchangeability(char* filename): begin\n");
     // Init cudd package when first Exchangeability object is created.
     if (nbrBdd == 0) {
         //mgrMp = Cudd_Init(0, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
@@ -83,13 +83,13 @@ Exchangeability::Exchangeability(string filename, Cudd_ReorderingType heuristic)
 //     }
 //     cout << endl;
 //
-//     trace(TRACE_5, "Exchangeability::Exchangeability(char* filename): end\n");
+//     TRACE(TRACE_5, "Exchangeability::Exchangeability(char* filename): end\n");
 }
 
 
 //! \brief destructor
 Exchangeability::~Exchangeability() {
-    trace(TRACE_5, "Exchangeability::~Exchangeability(): begin\n");
+    TRACE(TRACE_5, "Exchangeability::~Exchangeability(): begin\n");
 
     delete [] names;
 
@@ -112,14 +112,14 @@ Exchangeability::~Exchangeability() {
 
     labelList.clear();
 
-    trace(TRACE_5, "Exchangeability::~Exchangeability(): end\n");
+    TRACE(TRACE_5, "Exchangeability::~Exchangeability(): end\n");
 }
 
 
 //! \brief loads the BDD representation of the opereating guideline stored in filname
 //! \param filename name of the og file
 void Exchangeability::loadBdd(std::string filename) {
-    trace(TRACE_5, "Exchangeability::loadBdds(string filename): begin\n");
+    TRACE(TRACE_5, "Exchangeability::loadBdds(string filename): begin\n");
     cout << "loading BDD-representation of the operating guideline of "
          << filename << endl;
 
@@ -182,7 +182,7 @@ void Exchangeability::loadBdd(std::string filename) {
     bddMp = loadDiagram(fpMp, mgrMp);
     fclose(fpMp);
 
-    trace(TRACE_5, "Exchangeability::loadBdds(string filename): end\n");
+    TRACE(TRACE_5, "Exchangeability::loadBdds(string filename): end\n");
 }
 
 
@@ -196,7 +196,7 @@ void Exchangeability::loadHeader(FILE* fp,
                                  int* nVars,
                                  int** permids,
                                  int* nSuppVars) {
-    trace(TRACE_5, "Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids): begin\n");
+    TRACE(TRACE_5, "Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids): begin\n");
     Dddmp_DecompType ddType; //possible Values: DDDMP_BDD,DDDMP_ADD,DDDMP_CNF,DDDMP_NONE
     char** orderedVarNames;
     char** suppVarNames;
@@ -239,7 +239,7 @@ void Exchangeability::loadHeader(FILE* fp,
         qsort((void*)orderedVarNames, *nVars, sizeof(char*), comparestr);
         *names = orderedVarNames; //suppVarNames;
     }
-    trace(TRACE_5, "Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids): end\n");
+    TRACE(TRACE_5, "Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids): end\n");
 }
 
 
@@ -274,7 +274,7 @@ void Exchangeability::loadOptimalOrder(DdManager* mgr, int size, int* permids, i
 //! \param mgr DESCRPITION
 //! \return DESCRPITION
 DdNode* Exchangeability::loadDiagram(FILE* fp, DdManager* mgr) {
-    trace(TRACE_5, "Exchangeability::loadDiagram(FILE* fp, DdManager* mgr, int size, int* permids): begin\n");
+    TRACE(TRACE_5, "Exchangeability::loadDiagram(FILE* fp, DdManager* mgr, int size, int* permids): begin\n");
 
     DdNode* bdd = Dddmp_cuddBddLoad (mgr /* IN: DD Manager */,
                                      DDDMP_VAR_MATCHIDS /* IN: storing mode selector */,
@@ -285,7 +285,7 @@ DdNode* Exchangeability::loadDiagram(FILE* fp, DdManager* mgr) {
                                      NULL /* IN: file name */, fp /* IN: file pointer */
     );
 
-    trace(TRACE_5, "Exchangeability::loadDiagram(FILE* fp, DdManager* mgr, int size, int* permids): end\n");
+    TRACE(TRACE_5, "Exchangeability::loadDiagram(FILE* fp, DdManager* mgr, int size, int* permids): end\n");
     return (bdd);
 }
 
@@ -300,7 +300,7 @@ void Exchangeability::printDotFile(char* filename,
                                    char** varNames,
                                    DdNode* bddMp,
                                    DdNode* bddAnn) {
-    trace(TRACE_5, "Exchangeability::printDotFile(char* filename, char** varNames, DdNode* bddMp, DdNode* bddAnn): begin\n");
+    TRACE(TRACE_5, "Exchangeability::printDotFile(char* filename, char** varNames, DdNode* bddMp, DdNode* bddAnn): begin\n");
     if ((Cudd_DagSize(bddMp) < 200000) && (Cudd_DagSize(bddAnn) < 200000)) {
 
         char bufferMp[256];
@@ -331,7 +331,7 @@ void Exchangeability::printDotFile(char* filename,
             system(bufferAnn);
         }
     }
-    trace(TRACE_5, "Exchangeability::printDotFile(char* filename, char** varNames, DdNode* bddMp, DdNode* bddAnn): end\n");
+    TRACE(TRACE_5, "Exchangeability::printDotFile(char* filename, char** varNames, DdNode* bddMp, DdNode* bddAnn): end\n");
 }
 
 
@@ -347,7 +347,7 @@ void Exchangeability::print() {
 //! \brief checks the equality of two BDD representations
 //! \param bdd BDD representation to check with
 bool Exchangeability::check(Exchangeability* bdd) {
-    trace(TRACE_5, "Exchangeability::check(Exchangeability* bdd): begin\n");
+    TRACE(TRACE_5, "Exchangeability::check(Exchangeability* bdd): begin\n");
 
     if (this->labelList.size() != bdd->labelList.size()) {
         return (false);
@@ -372,7 +372,7 @@ bool Exchangeability::check(Exchangeability* bdd) {
     } else {
         return (false);
     }
-    trace(TRACE_5, "Exchangeability::check(Exchangeability* bdd): end\n");
+    TRACE(TRACE_5, "Exchangeability::check(Exchangeability* bdd): end\n");
 }
 
 

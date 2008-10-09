@@ -116,12 +116,15 @@ void print_help() {
   trace("\n");
   trace(" -h | --help ................... print this information and exit\n");
   trace(" -v | --version ................ print version information and exit\n");
+#ifndef NDEBUG
+  // show this part of the help only, if debug output is possible
   trace(" -d | --debug=<level> .......... set debug <level>:\n");
   trace("                                   1 - show nodes and dfs information\n");
   trace("                                   2 - show analyse information (i.e. colors)\n");
   trace("                                   3 - show information on events and states\n");
   trace("                                   4 - yet to be defined ;)\n");
   trace("                                   5 - show detailed information on everything\n");
+#endif
   trace("\n");
   trace(" -t | --type=<type> ............ select the modus operandi of fiona <type>:\n");
   trace("                                 (only one type is allowed; default is IG)\n");
@@ -386,7 +389,7 @@ void parse_command_line(int argc, char* argv[]) {
     globals::reduction_level = 0;
 
     // evaluate options and set parameters
-    trace(TRACE_0, "\n");
+    trace( "\n");
     int optc = 0;
     while ((optc = getopt_long (argc, argv, par_string, longopts, (int *) 0))
            != EOF) {
@@ -741,7 +744,7 @@ void parse_command_line(int argc, char* argv[]) {
     bool firstfile = true;
     // reading all oWFNs and OGs
     for ( ; optind < argc; ++optind) {
-        trace(TRACE_1, "trying to get file type of given file " + (string)(argv[optind]));
+        TRACE(TRACE_1, "trying to get file type of given file " + (string)(argv[optind]));
         switch (getFileType(argv[optind])) {
             case FILETYPE_OWFN:
                 if (firstfile) {
@@ -772,9 +775,9 @@ void parse_command_line(int argc, char* argv[]) {
                      << "\tEnter \"fiona --help\" for more information.\n"
                      << endl;
         }
-        trace(TRACE_1, " ... done\n");
+        TRACE(TRACE_1, " ... done\n");
     }
-    trace(TRACE_1, "\n");
+    TRACE(TRACE_1, "\n");
 
     // read net from stdin
     if (ogfiles.size() == 0 && netfiles.size() == 0 &&

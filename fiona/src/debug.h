@@ -34,6 +34,15 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include "fiona.h"
+
+/// In a release output is  restricted to TRACE_0, so write_trace will never be called
+#if defined(NDEBUG) 
+#define TRACE(A,B)
+#else
+#define TRACE(A,B) debug_trace(A,B)
+#endif
+
 #include "mynew.h"
 #include <string>
 #include <iostream>
@@ -44,21 +53,23 @@ extern std::string ogfileToParse;
 extern std::string owfnfileToParse;
 
 typedef enum {
-    TRACE_0, //!< no messages
-    TRACE_1, //!< keep track of nodes
-    TRACE_2, //!< edges
-    TRACE_3, //!< number of states: global, local
-    TRACE_4, //!< to be defined
-    TRACE_5 //!< all
+    TRACE_0, /*!< error messages and some important status messages
+                  like "is controllable" and size of IG/OG
+             */
+    TRACE_1, //!< notification with coarse granularity what Fiona is doing ("parsing file", "calculating IG/OG", etc.)
+    TRACE_2, //!< 
+    TRACE_3, //!< 
+    TRACE_4, //!< 
+    TRACE_5  //!< really everything
 } trace_level_fiona;
 
 extern trace_level_fiona debug_level;
 
 /// Provides output to stderr using different #trace_level_fiona 
 /// (in order to regulate amount of output)
-void trace(trace_level_fiona pTraceLevel, std::string message);
+void debug_trace(trace_level_fiona pTraceLevel, std::string message);
 
-/// Works like #trace(trace_level,std::string) with trace_level_fiona = TRACE_ALWAYS
+/// Works like #trace(trace_level,std::string) with trace_level_fiona = TRACE_0
 void trace(std::string message);
 
 /// turns an integer into its string representation

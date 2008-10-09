@@ -47,21 +47,23 @@ std::string owfnfileToParse;
 trace_level_fiona debug_level = TRACE_0;
 
 
+#ifndef NDEBUG
 //! \brief Provides output to stderr using different #trace_level_fiona
 //!        (in order to regulate amount of output)
 //! \param pTraceLevel	the used trace level
 //! \param message	the output
-void trace(trace_level_fiona pTraceLevel, std::string message) {
+void debug_trace(trace_level_fiona pTraceLevel, std::string message) {
+#warning "running debug_trace;"
     if (pTraceLevel <= debug_level) {
         (*log_output) << message << std::flush;
     }
 }
-
+#endif
 
 //! \brief Works like #trace(trace_level_fiona, std::string) with trace_level = TRACE_ALWAYS
 //! \param message the output
 void trace(std::string message) {
-    trace(TRACE_0, message);
+    (*log_output) << message << std::flush;
 }
 
 

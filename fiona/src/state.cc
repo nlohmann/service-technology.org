@@ -80,7 +80,7 @@ State::~State() {
 /// \param PN The corresponding open workflow net.
 void State::decodeShowOnly(oWFN * PN) {
 
-    trace(TRACE_5, "void State::decodeShowOnly(oWFN * PN) : start\n");
+    TRACE(TRACE_5, "void State::decodeShowOnly(oWFN * PN) : start\n");
 
     numberOfDecodes++;
 
@@ -157,7 +157,7 @@ void State::decodeShowOnly(oWFN * PN) {
         if (cfirst == pfirst) {
             if (currentplacenr == 0) {
                 // all places decoded - finishing
-                trace(TRACE_5, "void State::decodeShowOnly(oWFN * PN) : end\n");
+                TRACE(TRACE_5, "void State::decodeShowOnly(oWFN * PN) : end\n");
                 return;
             }
 
@@ -255,11 +255,11 @@ void State::decodeShowOnly(oWFN * PN) {
 //! \brief Same as decodeShowOnly(), but initializes all transition of the given 'PN'.
 //! \param PN given oWFN
 void State::decode(oWFN * PN) {
-    trace(TRACE_5, "void State::decode(int * v, oWFN * PN):start\n");
+    TRACE(TRACE_5, "void State::decode(int * v, oWFN * PN):start\n");
     decodeShowOnly(PN);
     PN->placeHashValue = placeHashValue;
     PN->checkEnablednessOfAllTransitions();
-    trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
+    TRACE(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
 }
 
 

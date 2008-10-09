@@ -200,9 +200,9 @@ unarybooleanformula::unarybooleanformula(FType t, formula* l) {
 
 //! \brief deconstructor
 unarybooleanformula::~unarybooleanformula() {
-    trace(TRACE_5, "unarybooleanformula::~unarybooleanformula() : start\n");
+    TRACE(TRACE_5, "unarybooleanformula::~unarybooleanformula() : start\n");
     delete sub;
-    trace(TRACE_5, "unarybooleanformula::~unarybooleanformula() : end\n");
+    TRACE(TRACE_5, "unarybooleanformula::~unarybooleanformula() : end\n");
 }
 
 
@@ -225,13 +225,13 @@ binarybooleanformula::~binarybooleanformula() {
 
 //! \brief deconstructor
 booleanformula::~booleanformula() {
-    trace(TRACE_5, "booleanformula::~booleanformula() : start\n");
+    TRACE(TRACE_5, "booleanformula::~booleanformula() : start\n");
     for (size_t isub = 0; isub != cardsub; ++isub) {
         delete sub[isub];
     }
 
     delete[] sub;
-    trace(TRACE_5, "booleanformula::~booleanformula() : end\n");
+    TRACE(TRACE_5, "booleanformula::~booleanformula() : end\n");
 }
 
 

@@ -175,7 +175,7 @@ void GasTexGraph::setStyle(STYLE style) {
 
 
 void GasTexGraph::makeGasTex(string texFileName) {
-    trace(TRACE_5, "GasTexGraph::makeGasTex(string): start\n");
+    TRACE(TRACE_5, "GasTexGraph::makeGasTex(string): start\n");
 
     // open the texFile for writing
     fstream texFile(texFileName.c_str(), ios_base::out | ios_base::trunc);
@@ -203,7 +203,7 @@ void GasTexGraph::makeGasTex(string texFileName) {
         texFile << texFooter[i];
     }
 
-    trace(TRACE_5, "GasTexGraph::makeGasTex(): end\n");
+    TRACE(TRACE_5, "GasTexGraph::makeGasTex(): end\n");
 }
 
 void GasTexGraph::makeGasTexOfOG(fstream& texFile) {

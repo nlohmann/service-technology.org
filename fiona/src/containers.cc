@@ -43,8 +43,8 @@
 //! \returns true left is less than right.
 //! \returns false left is greater or equal to right.
 bool CompareGraphNodes::operator()(AnnotatedGraphNode const* left, AnnotatedGraphNode const* right) {
-    trace(TRACE_5, "CompareGraphNodes::operator()() : start\n");
-    trace(TRACE_5, "CompareGraphNodes::operator()() : end\n");
+    TRACE(TRACE_5, "CompareGraphNodes::operator()() : start\n");
+    TRACE(TRACE_5, "CompareGraphNodes::operator()() : end\n");
 
     return (left->reachGraphStateSet < right->reachGraphStateSet);
 }

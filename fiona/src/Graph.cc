@@ -58,13 +58,13 @@ Graph::Graph() :
 
 //! \brief a basic destructor of AnnotadedGraph
 Graph::~Graph() {
-	trace(TRACE_5, "Graph::~Graph() : start\n");
+	TRACE(TRACE_5, "Graph::~Graph() : start\n");
     for (nodes_iterator node_iter = setOfNodes.begin();
          node_iter != setOfNodes.end(); ++node_iter) {
 
         delete *node_iter;
     }
-    trace(TRACE_5, "Graph::~Graph() : end\n");
+    TRACE(TRACE_5, "Graph::~Graph() : end\n");
 }
 
 
@@ -191,7 +191,7 @@ unsigned int Graph::numberOfNodes() {
 //! \brief checks, whether this Graph is acyclic
 //! \return true on positive check, otherwise: false
 bool Graph::isAcyclic() {
-    trace(TRACE_5, "Graph::isAcyclic(...): start\n");
+    TRACE(TRACE_5, "Graph::isAcyclic(...): start\n");
 
     // Define a set for every Node, that will contain all transitive parent nodes
     map<GraphNode*, set<GraphNode*> > parentNodes;
@@ -224,7 +224,7 @@ bool Graph::isAcyclic() {
                 if (parentNodes[testNode].find(edge->getDstNode())
                         != parentNodes[testNode].end()) {
                     delete edgeIter;
-                    trace(TRACE_5, "Graph::isAcyclic(...): end\n");
+                    TRACE(TRACE_5, "Graph::isAcyclic(...): end\n");
                     return false;
                 } else {
                     testNodes.push(edge->getDstNode());
@@ -235,7 +235,7 @@ bool Graph::isAcyclic() {
         }
         delete edgeIter;
     }
-    trace(TRACE_5, "Graph::isAcyclic(...): end\n");
+    TRACE(TRACE_5, "Graph::isAcyclic(...): end\n");
     return true;
 }
 
@@ -246,7 +246,7 @@ bool Graph::isAcyclic() {
 string Graph::createDotFile(string& filenamePrefix,
                          const string& dotGraphTitle) const {
 
-    trace(TRACE_0, "creating the dot file of the graph...\n");
+    trace( "creating the dot file of the graph...\n");
     
     string dotFile = filenamePrefix + ".out";
     fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
@@ -284,7 +284,7 @@ string Graph::createDotFile(string& filenamePrefix) const {
 string Graph::createPNGFile(string& filenamePrefix,
                          	string& dotFileName) const {
 
-    trace(TRACE_0, "creating the png file of the dot file...\n");
+    trace( "creating the png file of the dot file...\n");
     
     string dotFile = filenamePrefix + ".out";
     string pngFile = filenamePrefix + ".png";
@@ -293,7 +293,7 @@ string Graph::createPNGFile(string& filenamePrefix,
     string cmd = "dot -Tpng \"" + dotFile + "\" -o \""+ pngFile + "\"";
 
     // print commandline and execute system command
-    trace(TRACE_0, cmd + "\n\n");
+    trace( cmd + "\n\n");
     system(cmd.c_str());
     
     return pngFile;
@@ -359,7 +359,7 @@ void Graph::createDotFileRecursively(GraphNode* v,
 //!        underlying owfn
 void Graph::transformToOWFN(PNapi::PetriNet* PN, set<string> setOfInputs, set<string> setOfOutputs) {
 
-    trace(TRACE_0, "creating the oWFN from the service automaton ...\n");
+    trace( "creating the oWFN from the service automaton ...\n");
 
     GraphNode* currentNode = getRoot(); 
 
@@ -416,14 +416,14 @@ void Graph::transformToOWFNRecursively(GraphNode* currentNode,
 
     // If this node was already visited, simply connect the incoming transition
 	if(visitedNodes.find(currentNode) != visitedNodes.end()) {
-        trace(TRACE_3, "    node " + currentNode->getName() + " has already been visited\n");
+        TRACE(TRACE_3, "    node " + currentNode->getName() + " has already been visited\n");
         if (incomingTransition != NULL) {
             PN->newArc(incomingTransition, PN->findPlace(currentNode->getName()));
         } 
          return;
     }
 
-    trace(TRACE_2, "    Processing node: " + currentNode->getName() + "\n");
+    TRACE(TRACE_2, "    Processing node: " + currentNode->getName() + "\n");
 
     PNapi::Place* place;
 

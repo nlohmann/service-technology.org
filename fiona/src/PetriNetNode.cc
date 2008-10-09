@@ -135,7 +135,7 @@ Node::Arcs_t::size_type Node::getLeavingArcsCount() const {
 
 //! \brief destructor
 Node::~Node() {
-    trace(TRACE_5, "Node::~Node() : start\n");
+    TRACE(TRACE_5, "Node::~Node() : start\n");
 
     // Transitions and places share pointers to the same arcs because every
     // arriving arc of a transition is a leaving arc of a place and vice versa.
@@ -144,7 +144,7 @@ Node::~Node() {
     for (Arcs_t::size_type i = 0; i < getArrivingArcsCount(); ++i)
         delete getArrivingArc(i);
 
-    trace(TRACE_5, "Node::~Node() : end\n");
+    TRACE(TRACE_5, "Node::~Node() : end\n");
 }
 
 

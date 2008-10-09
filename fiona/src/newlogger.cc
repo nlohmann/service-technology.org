@@ -213,11 +213,11 @@ NewLogger::pointerLog_t NewLogger::pointerLog;
 
 //! \brief destructor
 NewLogger::~NewLogger() {
-    trace(TRACE_5, "NewLogger::~NewLogger() : start\n");
+    TRACE(TRACE_5, "NewLogger::~NewLogger() : start\n");
     for (log_t::const_iterator iter = log.begin(); iter != log.end(); ++iter) {
         delete iter->second;
     }
-    trace(TRACE_5, "NewLogger::~NewLogger() : end\n");
+    TRACE(TRACE_5, "NewLogger::~NewLogger() : end\n");
 }
 
 //! \brief Adds memory allocation info to log for given type at fiven filepos

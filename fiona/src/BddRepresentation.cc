@@ -51,7 +51,7 @@ extern oWFN * PN;
 //! \brief constructor
 BddRepresentation::BddRepresentation(unsigned int numberOfLabels,
                                      Cudd_ReorderingType heuristic) {
-    trace(TRACE_5, "BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic): begin\n");
+    TRACE(TRACE_5, "BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic): begin\n");
 
     nbrLabels = numberOfLabels + 1; //labels + final
     maxLabelBits = nbrBits(numberOfLabels-1);
@@ -113,13 +113,13 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels,
          }
      }
      */
-    trace(TRACE_5, "BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic): end\n");
+    TRACE(TRACE_5, "BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic): end\n");
 }
 
 
 //! \brief destructor
 BddRepresentation::~BddRepresentation() {
-    trace(TRACE_5, "BddRepresentation::~BddRepresentation(): begin\n");
+    TRACE(TRACE_5, "BddRepresentation::~BddRepresentation(): begin\n");
 
     nodeMap.clear();
 
@@ -134,18 +134,18 @@ BddRepresentation::~BddRepresentation() {
 
     delete labelTable;
 
-    trace(TRACE_5, "BddRepresentation::~BddRepresentation(): end\n");
+    TRACE(TRACE_5, "BddRepresentation::~BddRepresentation(): end\n");
 }
 
 
 void BddRepresentation::convertRootNode(AnnotatedGraphNode* root) {
-    trace(TRACE_5, "void BddRepresentation::convertRootNode(AnnotatedGraphNode* root): begin\n");
+    TRACE(TRACE_5, "void BddRepresentation::convertRootNode(AnnotatedGraphNode* root): begin\n");
 
     pair<map<unsigned int, unsigned int>::iterator, bool> success;
     success = nodeMap.insert(make_pair(root->getNumber(), 0));
     assert(success.second == true);
 
-    trace(TRACE_5, "void BddRepresentation::convertRootNode(AnnotatedGraphNode* root): end\n");
+    TRACE(TRACE_5, "void BddRepresentation::convertRootNode(AnnotatedGraphNode* root): end\n");
 }
 
 
@@ -153,7 +153,7 @@ void BddRepresentation::convertRootNode(AnnotatedGraphNode* root) {
 void BddRepresentation::generateRepresentation(AnnotatedGraphNode* v,
                                                std::map<AnnotatedGraphNode*, bool>& visitedNodes) {
 
-    trace(TRACE_5, "BddRepresentation::generateRepresentation(AnnotatedGraphNode* v, bool visitedNodes[]): start\n");
+    TRACE(TRACE_5, "BddRepresentation::generateRepresentation(AnnotatedGraphNode* v, bool visitedNodes[]): start\n");
 
     //annotation
     DdNode * annotation = annotationToBddAnn(v);
@@ -212,14 +212,14 @@ void BddRepresentation::generateRepresentation(AnnotatedGraphNode* v,
             } //end while
             delete edgeIter;
     }
-    trace(TRACE_5, "BddRepresentation::generateRepresentation(AnnotatedGraphNode* v, bool visitedNodes[]): end\n");
+    TRACE(TRACE_5, "BddRepresentation::generateRepresentation(AnnotatedGraphNode* v, bool visitedNodes[]): end\n");
 }
 
 
 //! \brief add blue edges to the BDD and delete red edges from the BDD (for the on the fly construction)
 void BddRepresentation::addOrDeleteLeavingEdges(AnnotatedGraphNode* v) {
 
-    trace(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(AnnotatedGraphNode* v): start\n");
+    TRACE(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(AnnotatedGraphNode* v): start\n");
 
     if (v->getColor() == BLUE) { //add annotation
         DdNode * annotation = annotationToBddAnn(v);
@@ -291,14 +291,14 @@ void BddRepresentation::addOrDeleteLeavingEdges(AnnotatedGraphNode* v) {
         delete edgeIter;
     }
 
-    trace(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(AnnotatedGraphNode* v): end\n");
+    TRACE(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(AnnotatedGraphNode* v): end\n");
 }
 
 
 //! \brief returns the BDD of the given label
 DdNode* BddRepresentation::labelToBddMp(const std::string& label) {
 
-    trace(TRACE_5, "BddRepresentation::labelToBddMp(const std::string& label): start\n");
+    TRACE(TRACE_5, "BddRepresentation::labelToBddMp(const std::string& label): start\n");
 
     BddLabel * s = labelTable->lookup(label.c_str());
     unsigned int number = s->nbr;
@@ -321,7 +321,7 @@ DdNode* BddRepresentation::labelToBddMp(const std::string& label) {
         f = tmp;
     }
     //cout << "label: " << label << ": "; Cudd_PrintMinterm(mgrMp,f);
-    trace(TRACE_5, "BddRepresentation::labelToBddMp(const std::string& label): end\n");
+    TRACE(TRACE_5, "BddRepresentation::labelToBddMp(const std::string& label): end\n");
     return (f);
 }
 
@@ -329,7 +329,7 @@ DdNode* BddRepresentation::labelToBddMp(const std::string& label) {
 //! \brief returns the BDD of the nodes (given as integer) of an edge
 DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2) {
 
-    trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2): start\n");
+    TRACE(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2): start\n");
 
     unsigned int bddNumber1 = getBddNumber(node1);
     unsigned int bddNumber2 = getBddNumber(node2);
@@ -381,14 +381,14 @@ DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2) 
         Cudd_RecursiveDeref(mgrMp, f);
         f = tmp;
     }
-    trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2): end\n");
+    TRACE(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2): end\n");
     return (f);
 }
 
 
 //! \brief returns the BDD of the annotation of a given node
 DdNode* BddRepresentation::annotationToBddAnn(AnnotatedGraphNode* v) {
-    trace(TRACE_5, "DdNode* BddRepresentation::annotationToBddAnn(AnnotatedGraphNode * v): start\n");
+    TRACE(TRACE_5, "DdNode* BddRepresentation::annotationToBddAnn(AnnotatedGraphNode * v): start\n");
 
     //	cout << "----------------------------------\n";
     //	cout << "node " << v->getNumber() << " ("<< getBddNumber(v->getNumber()) << ") : " << v->getAnnotation()->asString()<< endl;
@@ -450,7 +450,7 @@ DdNode* BddRepresentation::annotationToBddAnn(AnnotatedGraphNode* v) {
     Cudd_RecursiveDeref(mgrAnn, f);
     annotation = tmp;
 
-    trace(TRACE_5, "DdNode* BddRepresentation::annotationToBddAnn(AnnotatedGraphNode * v): end\n");
+    TRACE(TRACE_5, "DdNode* BddRepresentation::annotationToBddAnn(AnnotatedGraphNode * v): end\n");
     return annotation;
 }
 
@@ -489,7 +489,7 @@ DdNode* BddRepresentation::clauseToBddAnn(const GraphFormulaMultiaryOr* myclause
 //! \param node
 unsigned int BddRepresentation::getBddNumber(unsigned int node) {
 
-    trace(TRACE_5, "BddRepresentation::getBddNumber(unsigned int node): begin\n");
+    TRACE(TRACE_5, "BddRepresentation::getBddNumber(unsigned int node): begin\n");
 
     map<unsigned int, unsigned int>::const_iterator map_iter;
     map_iter = nodeMap.find(node); //search node in nodeMap
@@ -504,7 +504,7 @@ unsigned int BddRepresentation::getBddNumber(unsigned int node) {
         bddNumber = map_iter -> second;
     }
 
-    trace(TRACE_5, "BddRepresentation::getBddNumber(unsigned int node): end\n");
+    TRACE(TRACE_5, "BddRepresentation::getBddNumber(unsigned int node): end\n");
     return (bddNumber);
 }
 
@@ -562,7 +562,7 @@ void BddRepresentation::addBddVars(unsigned int max) {
 
 //! \brief returns the binary representation of a number
 BitVector BddRepresentation::numberToBin(unsigned int number, int cntBits) {
-    trace(TRACE_5, "BddRepresentation::numberToBin(unsigned int number, int cntBits): start\n");
+    TRACE(TRACE_5, "BddRepresentation::numberToBin(unsigned int number, int cntBits): start\n");
 
     BitVector assignment = BitVector(cntBits);
     int base = 2;
@@ -579,7 +579,7 @@ BitVector BddRepresentation::numberToBin(unsigned int number, int cntBits) {
     for (int i = index; i >= 0; --i) {
         assignment[i] = false;
     }
-    trace(TRACE_5, "BddRepresentation::numberToBin(unsigned int number, int cntBits): end\n");
+    TRACE(TRACE_5, "BddRepresentation::numberToBin(unsigned int number, int cntBits): end\n");
     return (assignment);
 }
 
@@ -680,7 +680,7 @@ void BddRepresentation::printDotFile(char** varNames, char* option) {
         fclose(fpAnn);
 
         if ((Cudd_DagSize(bddMp) < 900) && (Cudd_DagSize(bddAnn) < 900)) {
-            trace(TRACE_0, "\ncreating the dot file of BDD_MP and BDD_ANN...\n");
+            trace( "\ncreating the dot file of BDD_MP and BDD_ANN...\n");
             if (options[O_OUTFILEPREFIX]) {
                 const char * prefix = outfilePrefix.c_str();
                 if (options[O_CALC_ALL_STATES]) {
@@ -716,10 +716,10 @@ void BddRepresentation::printDotFile(char** varNames, char* option) {
                 }
             }
 
-            trace(TRACE_0, bufferMp);
-            trace(TRACE_0, "\n");
-            trace(TRACE_0, bufferAnn);
-            trace(TRACE_0, "\n");
+            trace( bufferMp);
+            trace( "\n");
+            trace( bufferAnn);
+            trace( "\n");
             system(bufferMp);
             system(bufferAnn);
 
@@ -771,17 +771,17 @@ void BddRepresentation::printDotFile(char** varNames, char* option) {
                     }
                 }
 
-                trace(TRACE_0, bufferMpRed);
-                trace(TRACE_0, "\n");
+                trace( bufferMpRed);
+                trace( "\n");
                 system(bufferMpRed);
             }
 
         } else {
-            trace(TRACE_0, "\nBDDs are too big to have dot create the graphics\n");
+            trace( "\nBDDs are too big to have dot create the graphics\n");
         }
 
     } else {
-        trace(TRACE_0, "\nBDDs are too big to create dot file\n");
+        trace( "\nBDDs are too big to create dot file\n");
     }
 }
 

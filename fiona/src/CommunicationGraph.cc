@@ -66,8 +66,8 @@ CommunicationGraph::CommunicationGraph(oWFN * _PN) {
 
 //! \brief destructor
 CommunicationGraph::~CommunicationGraph() {
-    trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : start\n");
-    trace(TRACE_5, "Deleting CommunicationGraph of file " + filename + "\n");
+    TRACE(TRACE_5, "CommunicationGraph::~CommunicationGraph() : start\n");
+    TRACE(TRACE_5, "Deleting CommunicationGraph of file " + filename + "\n");
 
     for (unsigned int i = 0; i < setOfNodes.size(); i++) {
         setOfSortedNodes.erase(setOfNodes[i]);
@@ -91,7 +91,7 @@ CommunicationGraph::~CommunicationGraph() {
         delete PN;
     }
 
-    trace(TRACE_5, "CommunicationGraph::~CommunicationGraph() : end\n");
+    TRACE(TRACE_5, "CommunicationGraph::~CommunicationGraph() : end\n");
 }
 
 //! \brief returns the number of nodes
@@ -105,7 +105,7 @@ unsigned int CommunicationGraph::getNumberOfNodes() const {
 //!        for IG and OG
 void CommunicationGraph::calculateRootNode() {
 
-    trace(TRACE_5, "void CommunicationGraph::calculateRootNode(): start\n");
+    TRACE(TRACE_5, "void CommunicationGraph::calculateRootNode(): start\n");
 
     assert(setOfSortedNodes.size() == 0);
 
@@ -138,14 +138,14 @@ void CommunicationGraph::calculateRootNode() {
     setOfSortedNodes.insert(root);
     // setOfNodes.push_back(root); <-- happens in the buildGraph-functions.
 
-    trace(TRACE_5, "void CommunicationGraph::calculateRootNode(): end\n");
+    TRACE(TRACE_5, "void CommunicationGraph::calculateRootNode(): end\n");
 }
 
 //! \brief remove a node from the CommunicationGraph
 //! \param node node to remove
 void CommunicationGraph::removeNode(AnnotatedGraphNode* node) {
 
-    trace(TRACE_5, "void CommunicationGraph::removeNode(): start\n");
+    TRACE(TRACE_5, "void CommunicationGraph::removeNode(): start\n");
     assert(node);
 
     setOfSortedNodes.erase(node);  // only valid if container is a std::set
@@ -157,7 +157,7 @@ void CommunicationGraph::removeNode(AnnotatedGraphNode* node) {
             break;
         }
     }
-    trace(TRACE_5, "void CommunicationGraph::removeNode(): end\n");
+    TRACE(TRACE_5, "void CommunicationGraph::removeNode(): end\n");
 
 }
 
@@ -195,25 +195,25 @@ bool CommunicationGraph::stateActivatesOutputEvents(State * s) {
 //! \param toAddValue the additional progress value
 void CommunicationGraph::addProgress(double toAddValue) {
 
-    trace(TRACE_4, "\t adding ");
+    TRACE(TRACE_4, "\t adding ");
 
     // double2int in per cent = trunc(100*value)
-    trace(TRACE_4, intToString(int(100 * toAddValue)));
-    trace(TRACE_4, ",");
+    TRACE(TRACE_4, intToString(int(100 * toAddValue)));
+    TRACE(TRACE_4, ",");
     // precision 4 digits after comma = (x * 100 * 1000) mod 1000
 
     int aftercomma = int(100 * 10000 * toAddValue) % 10000;
 
     if (aftercomma < 10)
-        trace(TRACE_4, "0");
+        TRACE(TRACE_4, "0");
     if (aftercomma < 100)
-        trace(TRACE_4, "0");
+        TRACE(TRACE_4, "0");
     if (aftercomma < 1000)
-        trace(TRACE_4, "0");
+        TRACE(TRACE_4, "0");
 
-    trace(TRACE_4, intToString(aftercomma));
+    TRACE(TRACE_4, intToString(aftercomma));
 
-    trace(TRACE_4, " to progress\n");
+    TRACE(TRACE_4, " to progress\n");
 
     global_progress += toAddValue;
 }
@@ -230,11 +230,15 @@ void CommunicationGraph::printProgress() {
 
     if (current_progress >= (show_progress + progress_step_size)) {
         // significant progress change
+#ifndef NDEBUG
         if (debug_level == TRACE_0) {
-            trace(TRACE_0, " " + intToString(current_progress) + " ");
+#endif            
+            trace( " " + intToString(current_progress) + " ");
+#ifndef NDEBUG
         } else {
-            trace(TRACE_0, "    progress: " + intToString(current_progress) + " %\n");
+            trace( "    progress: " + intToString(current_progress) + " %\n");
         }
+#endif
         // assigning next progress value to show
         show_progress = current_progress;
     }
@@ -245,13 +249,17 @@ void CommunicationGraph::printProgress() {
 //!        changed significantly and depending on the debug-level set
 void CommunicationGraph::printProgressFirst() {
 
-    trace(TRACE_0, "    ");
+    trace( "    ");
 
+#ifndef NDEBUG
     if (debug_level == TRACE_0) {
-        trace(TRACE_0, "progress (in %): 0 ");
+#endif
+        trace( "progress (in %): 0 ");
+#ifndef NDEBUG
     } else {
-        trace(TRACE_0, "progress: 0 %\n");
+        trace( "progress: 0 %\n");
     }
+#endif
 }
 
 
@@ -267,7 +275,7 @@ string CommunicationGraph::createDotFile(string& filenamePrefix) const {
          ((parameters[P_SHOW_EMPTY_NODE] || parameters[P_SHOW_BLUE_NODES]) &&
          getNumberOfBlueNodes() <= maxSizeForDotFile)) {
 
-        trace(TRACE_0, "creating the dot file of the graph...\n");
+        trace( "creating the dot file of the graph...\n");
         AnnotatedGraphNode* rootNode = root;
 
         
@@ -339,7 +347,7 @@ string CommunicationGraph::createDotFile(string& filenamePrefix) const {
 		return dotFileName;
       
     } else {
-        trace(TRACE_0, "graph is too big to create dot file\n");
+        trace( "graph is too big to create dot file\n");
     }
     
     return "";
@@ -391,20 +399,20 @@ string CommunicationGraph::createPNGFile(string& filenamePrefix, string& dotFile
         }
 
         if (graphToBigForPNG) {
-            trace(TRACE_0, "graph is too big to create the graphics :( ");
-            trace(TRACE_0, "(" + reasonForFail + ")\n");
-            trace(TRACE_0, dotCmd + "\n");
+            trace( "graph is too big to create the graphics :( ");
+            trace( "(" + reasonForFail + ")\n");
+            trace( dotCmd + "\n");
         } else {
           
             // print commandline and execute system command
-            trace(TRACE_0, dotCmd + "\n");
+            trace( dotCmd + "\n");
             system(dotCmd.c_str());
             return imgFileName;
             
 
 //            // on windows machines, the png file can be shown per system call
 //            if (parameters[P_OG]) {
-//                trace(TRACE_0, "initiating command to show the graphics...\n");
+//                trace( "initiating command to show the graphics...\n");
 //                string showCmd = "cmd /c \"start " + imgFileName + "\"";
 //                system(showCmd.c_str());
 //            }
@@ -870,9 +878,9 @@ void CommunicationGraph::deleteOWFN() {
 
 //! \brief Adds a node to the CommunicationGraph. The node is inserted in both sets.
 void CommunicationGraph::addNode(AnnotatedGraphNode* toAdd) {
-    trace(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : start\n");
+    TRACE(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : start\n");
     setOfNodes.push_back(toAdd);
     setOfSortedNodes.insert(toAdd);
-    trace(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : start\n");
+    TRACE(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : start\n");
 
 }

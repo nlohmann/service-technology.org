@@ -58,7 +58,7 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
     extern FILE *stg_yyin;
     
     // call STG parser
-    trace(TRACE_2, "        starting STG parser\n");
+    TRACE(TRACE_2, "        starting STG parser\n");
     stg_yyin = fopen(PNFileName.c_str(), "r");
     
     stg_yyparse();
@@ -71,7 +71,7 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 
 
     // create a petrinet object and create places 
-    trace(TRACE_2, "        create places\n");
+    TRACE(TRACE_2, "        create places\n");
     PetriNet STGPN = PetriNet();
     for (set<string>::iterator p = places.begin(); p != places.end(); p++) {
         STGPN.newPlace(*p);
@@ -79,7 +79,7 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
     
 
     // initially mark places
-    trace(TRACE_2, "        initially mark places\n");
+    TRACE(TRACE_2, "        initially mark places\n");
     
     for (set<string>::iterator p = initialMarked.begin(); p != initialMarked.end(); p++) {
         STGPN.findPlace(*p)->mark();
@@ -87,7 +87,7 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 
     
     // create interface places out of dummy transitions
-    trace(TRACE_2, "        create interface places\n");
+    TRACE(TRACE_2, "        create interface places\n");
 
     for (set<string>::iterator t = interface.begin(); t != interface.end(); t++) {
         string remapped = remap(*t, edgeLabels);
@@ -117,7 +117,7 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 
 
     // create transitions and arcs from/to interface places
-    trace(TRACE_2, "        create transitions\n");
+    TRACE(TRACE_2, "        create transitions\n");
     
     for (set<string>::iterator t = transitions.begin(); t != transitions.end(); t++) {
         string remapped = remap(*t, edgeLabels);
@@ -160,7 +160,7 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 
 
     // create arcs p->t
-    trace(TRACE_2, "        create arcs\n");
+    TRACE(TRACE_2, "        create arcs\n");
     
     // Create a map of string sets for final condition creation. 
     map<string, set<string> > finalCondMap; 

@@ -63,14 +63,14 @@ AnnotatedGraph::AnnotatedGraph() :
 
 //! \brief a basic destructor of AnnotatedGraph
 AnnotatedGraph::~AnnotatedGraph() {
-    trace(TRACE_5, "AnnotatedGraph::~AnnotatedGraph() : start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::~AnnotatedGraph() : start\n");
     for (unsigned int i = 0; i < setOfNodes.size(); i++) {
         delete setOfNodes[i];
     }
     setOfNodes.clear();
     inputPlacenames.clear();
     outputPlacenames.clear();
-    trace(TRACE_5, "AnnotatedGraph::~AnnotatedGraph() : end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::~AnnotatedGraph() : end\n");
 }
 
 
@@ -226,14 +226,14 @@ void AnnotatedGraph::removeEdgesFromNodeToAllOtherNodes(AnnotatedGraphNode* node
 //! \brief checks, whether this AnnotatedGraph is acyclic
 //! \return true on positive check, otherwise: false
 bool AnnotatedGraph::isAcyclic() {
-    trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::isAcyclic(...): start\n");
 
     // map the number of every nodes predecessors to the node
     map<AnnotatedGraphNode*, unsigned int> predecessors;
 
     // if the graph has no root it is empty and thus acyclic
     if (hasNoRoot()) {
-        trace(TRACE_0, "The graph is empty and thus acyclic!\n");
+        trace( "The graph is empty and thus acyclic!\n");
         return true;
     }
 
@@ -299,7 +299,7 @@ bool AnnotatedGraph::isAcyclic() {
         }
     }
 
-    trace(TRACE_5, "AnnotatedGraph::isAcyclic(...): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::isAcyclic(...): end\n");
 
     // If all nodes could have been erased this way, this graph is
     // acyclic. If there are still nodes left, there must be a cycle.
@@ -318,9 +318,9 @@ bool AnnotatedGraph::isAcyclic() {
 //! \return number of Services
 unsigned int AnnotatedGraph::numberOfServices() {
 
-    trace(TRACE_5, "AnnotatedGraph::numberOfServices(...): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::numberOfServices(...): start\n");
 
-    trace(TRACE_1, "Removing false nodes...\n");
+    TRACE(TRACE_1, "Removing false nodes...\n");
     removeReachableFalseNodes();
 
     if (root == NULL) {
@@ -340,7 +340,7 @@ unsigned int AnnotatedGraph::numberOfServices() {
     GraphFormulaAssignment possibleAssignment;
     map<string, AnnotatedGraphEdge*> edges;
 
-    trace(TRACE_2, "Computing true assignments for all nodes\n");
+    TRACE(TRACE_2, "Computing true assignments for all nodes\n");
     // Preprocess all nodes of the OG in order to fill the variables needed in the recursion
     for (nodes_t::const_iterator iNode = setOfNodes.begin(); iNode
             != setOfNodes.end(); ++iNode) {
@@ -354,7 +354,7 @@ unsigned int AnnotatedGraph::numberOfServices() {
         // get the labels of all outgoing edges, that reach a blue destination
         // save those labels in a set and fill a mapping that allows finding the
         // outgoing edges for a label. (does not work with non-determinism yet)
-        trace(TRACE_5, "Collecting labels of outgoing edges for current node\n");
+        TRACE(TRACE_5, "Collecting labels of outgoing edges for current node\n");
         AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =(*iNode)->getLeavingEdgesConstIterator();
         while (edgeIter->hasNext()) {
             AnnotatedGraphEdge* edge = edgeIter->getNext();
@@ -399,20 +399,20 @@ unsigned int AnnotatedGraph::numberOfServices() {
     unsigned int number = 0;
     unsigned int instances = 0;
 
-    trace(TRACE_1, "Starting recursive computation of number of Services\n");
+    TRACE(TRACE_1, "Starting recursive computation of number of Services\n");
     // process Instances recursively
     number = numberOfServicesRecursively(activeNodes, followers,
             validFollowerCombinations, eliminateRedundantCounting, instances);
 
     if (instances > 100000) {
-        trace(TRACE_2, "Valid Number of instances exceeded.\n");
+        TRACE(TRACE_2, "Valid Number of instances exceeded.\n");
         trace(
                 TRACE_0,
                 "The number of strategies is approx INFINITY ;), aborting further calculation.\n");
-        trace(TRACE_5, "AnnotatedGraph::numberOfServices(...): end\n");
+        TRACE(TRACE_5, "AnnotatedGraph::numberOfServices(...): end\n");
         return number;
     } else {
-        trace(TRACE_5, "AnnotatedGraph::numberOfServices(...): end\n");
+        TRACE(TRACE_5, "AnnotatedGraph::numberOfServices(...): end\n");
         return number;
     }
 }
@@ -438,7 +438,7 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(
         if (instances > 100000) {
             return 0;
         }
-        trace(TRACE_2, "Processed number of instances: "
+        TRACE(TRACE_2, "Processed number of instances: "
                 + intToString(instances) + "\n");
     }
     instances++;
@@ -592,8 +592,8 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(
     eliminateRedundantCounting[activeNodes] = number;
 
     // return the number of services for this instance
-    //trace(TRACE_5, "Number returned was: " + intToString(number) + "\n");
-    //trace(TRACE_5, "Current Instances are: " + intToString(instances) + "\n");
+    //TRACE(TRACE_5, "Number returned was: " + intToString(number) + "\n");
+    //TRACE(TRACE_5, "Current Instances are: " + intToString(instances) + "\n");
 
     return number;
 }
@@ -605,9 +605,9 @@ unsigned int AnnotatedGraph::numberOfServicesRecursively(
 //! \return number of Strategies
 long double AnnotatedGraph::numberOfStrategies() {
 
-    trace(TRACE_5, "AnnotatedGraph::numberOfStrategies(...): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::numberOfStrategies(...): start\n");
 
-    trace(TRACE_1, "Removing false nodes...\n");
+    TRACE(TRACE_1, "Removing false nodes...\n");
     removeReachableFalseNodes();
 
     // if this og is empty there are no strategies for it
@@ -625,7 +625,7 @@ long double AnnotatedGraph::numberOfStrategies() {
     GraphFormulaAssignment possibleAssignment;
     map<string, AnnotatedGraphEdge*> edges;
 
-    trace(TRACE_2, "Computing true assignments for all nodes\n");
+    TRACE(TRACE_2, "Computing true assignments for all nodes\n");
     // Preprocess all nodes of the OG in order to fill the variables needed in the recursion
     for (nodes_t::const_iterator iNode = setOfNodes.begin();
          iNode != setOfNodes.end(); ++iNode) {
@@ -644,7 +644,7 @@ long double AnnotatedGraph::numberOfStrategies() {
         // get the labels of all outgoing edges,
         // save those labels in a set and fill a mapping that allows finding the
         // outgoing edges for a label
-        trace(TRACE_5, "Collecting labels of outgoing edges for current node\n");
+        TRACE(TRACE_5, "Collecting labels of outgoing edges for current node\n");
         AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter =(*iNode)->getLeavingEdgesConstIterator();
         while (edgeIter->hasNext()) {
             AnnotatedGraphEdge* edge = edgeIter->getNext();
@@ -684,14 +684,14 @@ long double AnnotatedGraph::numberOfStrategies() {
 
     long double number = 0;
 
-    trace(TRACE_1, "Starting recursive computation of number of Strategies\n");
+    TRACE(TRACE_1, "Starting recursive computation of number of Strategies\n");
 
     // process the nodes recursively
     number = numberOfStrategiesRecursively(root,
                                            validFollowerCombinations,
                                            eliminateRedundantCounting);
 
-    trace(TRACE_5, "AnnotatedGraph::numberOfStrategies(...): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::numberOfStrategies(...): end\n");
     return number;
 }
 
@@ -710,16 +710,16 @@ long double AnnotatedGraph::numberOfStrategiesRecursively(
 
     // if the number for the active Node has already been computed, use the saved value
     if (eliminateRedundantCounting[activeNode] != 0) {
-        trace(TRACE_3 ,"    value for node " + activeNode->getName() + " was already calculated\n");
+        TRACE(TRACE_3 ,"    value for node " + activeNode->getName() + " was already calculated\n");
         return eliminateRedundantCounting[activeNode];
     }
 
-    trace(TRACE_2 ,"    first time entering node: " + activeNode->getName() + "\n");
+    TRACE(TRACE_2 ,"    first time entering node: " + activeNode->getName() + "\n");
 
     // define the counting variable
     long double number = 0;
 
-    trace(TRACE_3 ,"    this node has " +  intToString(validFollowerCombinations[activeNode].size()) + " follower Combinations\n");
+    TRACE(TRACE_3 ,"    this node has " +  intToString(validFollowerCombinations[activeNode].size()) + " follower Combinations\n");
 
     // iterate over the list of valid follower combinations
     for (list<list<AnnotatedGraphNode*> >::iterator followerList =
@@ -727,7 +727,7 @@ long double AnnotatedGraph::numberOfStrategiesRecursively(
          followerList != validFollowerCombinations[activeNode].end();
          followerList++) {
 
-        trace(TRACE_4, "        current followerCombination: ");
+        TRACE(TRACE_4, "        current followerCombination: ");
         // if there is no need for followers in order to fulfill
         // the annotation, then count an additional automaton for
         // this node
@@ -735,7 +735,7 @@ long double AnnotatedGraph::numberOfStrategiesRecursively(
             //if (validFollowerCombinations[activeNode].size() == 1) {
                 number += 1;
             //}
-            trace(TRACE_4, "empty\n");
+            TRACE(TRACE_4, "empty\n");
             continue;
         }
 
@@ -749,13 +749,13 @@ long double AnnotatedGraph::numberOfStrategiesRecursively(
             for (list<AnnotatedGraphNode*>::iterator follower =
                    followerList->begin(); follower != followerList->end(); follower++) {
                 if (!firstIteration) {
-                    trace(TRACE_4, ", ");
+                    TRACE(TRACE_4, ", ");
                 } else {
                     firstIteration = false;
                 }
-                trace(TRACE_4, (*follower)->getName());
+                TRACE(TRACE_4, (*follower)->getName());
             }
-        trace(TRACE_4, "\n");
+        TRACE(TRACE_4, "\n");
         }
 
         // DEBUG
@@ -767,7 +767,7 @@ long double AnnotatedGraph::numberOfStrategiesRecursively(
             followerList->begin(); follower != followerList->end(); follower++) {
             currentCombinationValue *= numberOfStrategiesRecursively( (*follower),
                     validFollowerCombinations, eliminateRedundantCounting);
-            trace(TRACE_3, "    backtracking to node: " + activeNode->getName() + "\n");
+            TRACE(TRACE_3, "    backtracking to node: " + activeNode->getName() + "\n");
             i++;
         }
 
@@ -778,7 +778,7 @@ long double AnnotatedGraph::numberOfStrategiesRecursively(
     // use a stringstream to turn a long double into a string for debug output
     stringstream longDoubleZahl;
     longDoubleZahl << number;
-    trace(TRACE_2 ,"    node " + activeNode->getName() + " returned a value of " + longDoubleZahl.str() + "\n");
+    TRACE(TRACE_2 ,"    node " + activeNode->getName() + " returned a value of " + longDoubleZahl.str() + "\n");
 
     // eliminitae redundant counting by saving the value for this node
     eliminateRedundantCounting[activeNode] = number;
@@ -868,7 +868,7 @@ unsigned int AnnotatedGraph::processAssignmentsRecursively(set<string> labels,
 //!        the mentioned criterion
 void AnnotatedGraph::findFalseNodes(std::vector<AnnotatedGraphNode*>* falseNodes) {
 
-    trace(TRACE_5, "AnnotatedGraph::findFalseNodes(): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::findFalseNodes(): start\n");
 
     // if the og is empty, dont search for false nodes
     if (getRoot()->getColor() == RED) {
@@ -885,7 +885,7 @@ void AnnotatedGraph::findFalseNodes(std::vector<AnnotatedGraphNode*>* falseNodes
         }
         ++iNode;
     }
-    trace(TRACE_5, "AnnotatedGraph::findFalseNodes(): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::findFalseNodes(): end\n");
 }
 
 
@@ -893,7 +893,7 @@ void AnnotatedGraph::findFalseNodes(std::vector<AnnotatedGraphNode*>* falseNodes
 //!        and removes reachable nodes which do not satisfy their own annotation.
 void AnnotatedGraph::removeReachableFalseNodes() {
 
-    trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodes(): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::removeReachableFalseNodes(): start\n");
     if (getRoot() == NULL) return;
 
     set<AnnotatedGraphNode*> visitedNodes, redNodes;
@@ -902,7 +902,7 @@ void AnnotatedGraph::removeReachableFalseNodes() {
     removeReachableFalseNodesInit(getRoot(), redNodes, parentNodes, visitedNodes);
     removeReachableFalseNodesRecursively(redNodes, parentNodes);
 
-    trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodes(): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::removeReachableFalseNodes(): end\n");
 }
 
 
@@ -920,7 +920,7 @@ void AnnotatedGraph::removeReachableFalseNodesInit(AnnotatedGraphNode* currentNo
                                                    map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >& parentNodes,
                                                    set<AnnotatedGraphNode*>& visitedNodes) {
 
-    trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesInit(): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesInit(): start\n");
 
     // This node should not be processed again.
     visitedNodes.insert(currentNode);
@@ -967,7 +967,7 @@ void AnnotatedGraph::removeReachableFalseNodesInit(AnnotatedGraphNode* currentNo
         currentNode->getAnnotation()->removeLiteral(*unneededEvent);
     }
 
-    trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesInit(): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesInit(): end\n");
 }
 
 
@@ -977,7 +977,7 @@ void AnnotatedGraph::removeReachableFalseNodesInit(AnnotatedGraphNode* currentNo
 //! \param parentNodes The parent node function as created by AnnotatedGraph::removeReachableFalseNodesInit.
 void AnnotatedGraph::removeReachableFalseNodesRecursively(set<AnnotatedGraphNode*>& candidates, map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >& parentNodes) {
 
-    trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesRecursively(): s\n");
+    TRACE(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesRecursively(): s\n");
 
     // The set to be filled with the new candidates
     set<AnnotatedGraphNode*> newCandidates;
@@ -1028,7 +1028,7 @@ void AnnotatedGraph::removeReachableFalseNodesRecursively(set<AnnotatedGraphNode
         removeReachableFalseNodesRecursively(newCandidates, parentNodes);
     }
 
-    trace(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesRecursively(): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::removeReachableFalseNodesRecursively(): end\n");
 }
 
 
@@ -1036,7 +1036,7 @@ void AnnotatedGraph::removeReachableFalseNodesRecursively(set<AnnotatedGraphNode
 //!        node due to other node removals
 void AnnotatedGraph::removeUnreachableNodes() {
 
-    trace(TRACE_5, "AnnotatedGraph::removUnreachableNodes(): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::removUnreachableNodes(): start\n");
 
     set<AnnotatedGraphNode*> unreachableNodes;
 
@@ -1058,7 +1058,7 @@ void AnnotatedGraph::removeUnreachableNodes() {
 
         AnnotatedGraphNode* currentNode = *nodeIter;
 
-        trace(TRACE_3, "\t\tremoved unreachable node: " + (*nodeIter)->getName() + "\n");
+        TRACE(TRACE_3, "\t\tremoved unreachable node: " + (*nodeIter)->getName() + "\n");
 
         AnnotatedGraphNode::LeavingEdges::Iterator edgeIter = currentNode->getLeavingEdgesIterator();
         while (edgeIter->hasNext()) {
@@ -1074,7 +1074,7 @@ void AnnotatedGraph::removeUnreachableNodes() {
         delete currentNode;
     }
 
-    trace(TRACE_5, "AnnotatedGraph::removeUnreachableNodes(): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::removeUnreachableNodes(): end\n");
 }
 
 
@@ -1084,12 +1084,12 @@ void AnnotatedGraph::removeUnreachableNodes() {
 void AnnotatedGraph::removeUnreachableNodesRecursively(AnnotatedGraphNode* currentNode,
                                                         set<AnnotatedGraphNode*>& unreachableNodes) {
 
-    trace(TRACE_5, "AnnotatedGraph::removeUnreachableNodesRecursively(AnnotatedGraphNode* currentNode, set<AnnotatedGraphNode*>& unreachableNodes): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::removeUnreachableNodesRecursively(AnnotatedGraphNode* currentNode, set<AnnotatedGraphNode*>& unreachableNodes): start\n");
 
     // remove the node from the set of unreachable nodes
     unreachableNodes.erase(currentNode);
 
-    trace(TRACE_4, "\t\tnode " + currentNode->getName() + " is reachable.\n");
+    TRACE(TRACE_4, "\t\tnode " + currentNode->getName() + " is reachable.\n");
 
     // iterate over all edges
     AnnotatedGraphNode::LeavingEdges::ConstIterator edgeIter = currentNode->getLeavingEdgesConstIterator();
@@ -1103,17 +1103,17 @@ void AnnotatedGraph::removeUnreachableNodesRecursively(AnnotatedGraphNode* curre
     }
     delete edgeIter;
 
-    trace(TRACE_5, "AnnotatedGraph::removeUnreachableNodesRecursively(AnnotatedGraphNode* currentNode, set<AnnotatedGraphNode*>& unreachableNodes): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::removeUnreachableNodesRecursively(AnnotatedGraphNode* currentNode, set<AnnotatedGraphNode*>& unreachableNodes): end\n");
 }
 
 
 //! \brief takes an AnnotatedGraph, finds equivalent nodes and minimizes
 //!        the graph such that it still characterizes the same strategies
 void AnnotatedGraph::minimizeGraph() {
-    trace(TRACE_5, "AnnotatedGraph::minimizeGraph(): start\n");
-    trace(TRACE_0, "starting minimization...\n");
+    TRACE(TRACE_5, "AnnotatedGraph::minimizeGraph(): start\n");
+    trace( "starting minimization...\n");
 
-    trace(TRACE_1, "number of nodes before minimization: " + intToString(setOfNodes.size()) + "\n");
+    TRACE(TRACE_1, "number of nodes before minimization: " + intToString(setOfNodes.size()) + "\n");
 
     time_t seconds, seconds2;
     seconds = time(NULL);
@@ -1123,7 +1123,7 @@ void AnnotatedGraph::minimizeGraph() {
 
     // false nodes are removed to increase performance only;
     // should also work if nodes are unsatisfiable
-    trace(TRACE_1, "removing false nodes...\n");
+    TRACE(TRACE_1, "removing false nodes...\n");
     removeReachableFalseNodes();
     removeUnreachableNodes();
 
@@ -1158,9 +1158,9 @@ void AnnotatedGraph::minimizeGraph() {
             for (jNode = iNode + 1; jNode != setOfNodes.end(); ++jNode) {
 
                 if (isEquivalent(*iNode, *jNode)) {
-                    trace(TRACE_2, "\tnodes:\t(" + (*iNode)->getName());
-                    trace(TRACE_2, ", " + (*jNode)->getName() + ")");
-                    trace(TRACE_2, "\t ...are equivalent :)\n");
+                    TRACE(TRACE_2, "\tnodes:\t(" + (*iNode)->getName());
+                    TRACE(TRACE_2, ", " + (*jNode)->getName() + ")");
+                    TRACE(TRACE_2, "\t ...are equivalent :)\n");
 
                     // remember that they are equivalent
                     firstEquivalentNode[*iNode] = *jNode;
@@ -1169,9 +1169,9 @@ void AnnotatedGraph::minimizeGraph() {
                     // continue outer loop
                     break;
                 } else {
-                    trace(TRACE_3, "\tnodes:\t(" + (*iNode)->getName());
-                    trace(TRACE_3, ", " + (*jNode)->getName() + ")");
-                    trace(TRACE_3, "\t ...are NOT equivalent :(\n");
+                    TRACE(TRACE_3, "\tnodes:\t(" + (*iNode)->getName());
+                    TRACE(TRACE_3, ", " + (*jNode)->getName() + ")");
+                    TRACE(TRACE_3, "\t ...are NOT equivalent :(\n");
                 }
             }
         }
@@ -1212,11 +1212,11 @@ void AnnotatedGraph::minimizeGraph() {
 
     seconds2 = time(NULL);
     cout << "    " << difftime(seconds2, seconds) << " s consumed" << endl;
-    trace(TRACE_0, "finished minimization...\n\n");
+    trace( "finished minimization...\n\n");
 
     // nicht noetig, weil final flag wird bewahrt
     // assignFinalNodes();
-    trace(TRACE_1, "number of nodes after minimization: " + intToString(setOfNodes.size()) + "\n\n");
+    TRACE(TRACE_1, "number of nodes after minimization: " + intToString(setOfNodes.size()) + "\n\n");
 
 /*
     if (!options[O_OUTFILEPREFIX]) {
@@ -1237,7 +1237,7 @@ void AnnotatedGraph::minimizeGraph() {
     }
 */
 
-    trace(TRACE_5, "AnnotatedGraph::minimizeGraph(): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::minimizeGraph(): end\n");
 }
 
 
@@ -1245,7 +1245,7 @@ void AnnotatedGraph::minimizeGraph() {
 //! \return true on positive check, otherwise: false
 //! \param smallerOG the simulant that should be simulated
 bool AnnotatedGraph::simulates(AnnotatedGraph* smallerOG) {
-    trace(TRACE_5, "AnnotatedGraph::simulates(AnnotatedGraph* smallerOG): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::simulates(AnnotatedGraph* smallerOG): start\n");
 
     // Simulation is impossible without a simulant.
     if (smallerOG == NULL) {
@@ -1267,7 +1267,7 @@ bool AnnotatedGraph::simulates(AnnotatedGraph* smallerOG) {
         result = true;
     }
 
-    trace(TRACE_5, "AnnotatedGraph::simulates(AnnotatedGraph* smallerOG): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::simulates(AnnotatedGraph* smallerOG): end\n");
     return result;
 }
 
@@ -1292,15 +1292,15 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode* myNode,
     assert(myNode);
     assert(simNode);
 
-    trace(TRACE_2, "\t checking whether node " + myNode->getName());
-    trace(TRACE_3, " of " + greaterOG->getFilename());
-    trace(TRACE_2, " simulates node " + simNode->getName());
-    trace(TRACE_3, " of " + smallerOG->getFilename());
-    trace(TRACE_2, "\n");
+    TRACE(TRACE_2, "\t checking whether node " + myNode->getName());
+    TRACE(TRACE_3, " of " + greaterOG->getFilename());
+    TRACE(TRACE_2, " simulates node " + simNode->getName());
+    TRACE(TRACE_3, " of " + smallerOG->getFilename());
+    TRACE(TRACE_2, "\n");
 
     // If we already visited this pair of nodes, then we're done.
     if (visitedNodes.find(make_pair(myNode, simNode)) != visitedNodes.end()) {
-        trace(TRACE_3, "\t already been checked\n");
+        TRACE(TRACE_3, "\t already been checked\n");
         return true;
     } else {
         visitedNodes.insert(make_pair(myNode, simNode));
@@ -1308,70 +1308,70 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode* myNode,
 
     // 1st step:
     // first we check implication of annotations: simNode -> myNode
-    trace(TRACE_3, "\t\t checking annotations (2nd node's annotation implies 1st?)...\n");
+    TRACE(TRACE_3, "\t\t checking annotations (2nd node's annotation implies 1st?)...\n");
     GraphFormulaCNF* simNodeAnnotationInCNF = simNode->getAnnotation()->getCNF();
     GraphFormulaCNF* myNodeAnnotationInCNF = myNode->getAnnotation()->getCNF();
 
     if (simNodeAnnotationInCNF->implies(myNodeAnnotationInCNF)) {
-        trace(TRACE_3, "\t\t\t annotations ok\n");
-        trace(TRACE_4, "\t\t\t   " + simNode->getAnnotation()->asString() + "\n");
-        trace(TRACE_4, "\t\t\t   ->\n");
-        trace(TRACE_4, "\t\t\t   " + myNode->getAnnotation()->asString() + "\n");
+        TRACE(TRACE_3, "\t\t\t annotations ok\n");
+        TRACE(TRACE_4, "\t\t\t   " + simNode->getAnnotation()->asString() + "\n");
+        TRACE(TRACE_4, "\t\t\t   ->\n");
+        TRACE(TRACE_4, "\t\t\t   " + myNode->getAnnotation()->asString() + "\n");
 
         delete simNodeAnnotationInCNF;
         delete myNodeAnnotationInCNF;
     } else {
-        trace(TRACE_2, "\t\t simulation failed (annotation)\n");
+        TRACE(TRACE_2, "\t\t simulation failed (annotation)\n");
 
-        trace(TRACE_4, "\t\t\t   " + simNode->getAnnotation()->asString() + "\n");
-        trace(TRACE_4, "\t\t\t   -/->\n");
-        trace(TRACE_4, "\t\t\t   " + myNode->getAnnotation()->asString() + "\n");
+        TRACE(TRACE_4, "\t\t\t   " + simNode->getAnnotation()->asString() + "\n");
+        TRACE(TRACE_4, "\t\t\t   -/->\n");
+        TRACE(TRACE_4, "\t\t\t   " + myNode->getAnnotation()->asString() + "\n");
 
         // reporting all leaving edges of both nodes for debugging
         AnnotatedGraphNode::LeavingEdges::Iterator edgeIter;
 
-        trace(TRACE_4, "\t\t\t   leaving edges of node ");
-        trace(TRACE_4, simNode->getName() + " of ");
-        trace(TRACE_4, smallerOG->getFilename());
-        trace(TRACE_4, " (" + intToString(simNode->getLeavingEdgesCount())
+        TRACE(TRACE_4, "\t\t\t   leaving edges of node ");
+        TRACE(TRACE_4, simNode->getName() + " of ");
+        TRACE(TRACE_4, smallerOG->getFilename());
+        TRACE(TRACE_4, " (" + intToString(simNode->getLeavingEdgesCount())
                 + "):\n");
 
         edgeIter = simNode->getLeavingEdgesIterator();
         while (edgeIter->hasNext()) {
             AnnotatedGraphEdge* edge = edgeIter->getNext();
-            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> "
+            TRACE(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> "
                     + edge->getDstNode()->getName() + " (");
             switch (edge->getDstNode()->getColor()) {
                 case BLUE:
-                    trace(TRACE_4, "BLUE");
+                    TRACE(TRACE_4, "BLUE");
                     break;
                 case RED:
-                    trace(TRACE_4, "RED");
+                    TRACE(TRACE_4, "RED");
                     break;
             }
-            trace(TRACE_4, ")\n");
+            TRACE(TRACE_4, ")\n");
         }
 
-        trace(TRACE_4, "\t\t\t   leaving edges of node ");
-        trace(TRACE_4, myNode->getName() + " of ");
-        trace(TRACE_4, greaterOG->getFilename());
-        trace(TRACE_4, " (" + intToString(myNode->getLeavingEdgesCount())
+        TRACE(TRACE_4, "\t\t\t   leaving edges of node ");
+        TRACE(TRACE_4, myNode->getName() + " of ");
+        TRACE(TRACE_4, greaterOG->getFilename());
+        TRACE(TRACE_4, " (" + intToString(myNode->getLeavingEdgesCount())
                 + "):\n");
 
         edgeIter = myNode->getLeavingEdgesIterator();
         while (edgeIter->hasNext()) {
             AnnotatedGraphEdge* edge = edgeIter->getNext();
-            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> "
+            TRACE(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> "
                     + edge->getDstNode()->getName() + "(");
             switch (edge->getDstNode()->getColor()) {
                 case BLUE:
-                    trace(TRACE_4, "BLUE");
+                    TRACE(TRACE_4, "BLUE");
                     break;
                 case RED:
-                    trace(TRACE_4, "RED");
+                    TRACE(TRACE_4, "RED");
                     break;
             }
-            trace(TRACE_4, ")\n");
+            TRACE(TRACE_4, ")\n");
         }
 
         delete edgeIter;
@@ -1383,62 +1383,62 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode* myNode,
 
     // 2nd step:
     // now we check whether myNode has each outgoing event of simNode
-    trace(TRACE_3, "\t\t checking edges...\n");
+    TRACE(TRACE_3, "\t\t checking edges...\n");
     AnnotatedGraphNode::LeavingEdges::ConstIterator simEdgeIter = simNode->getLeavingEdgesConstIterator();
 
     while (simEdgeIter->hasNext()) {
         AnnotatedGraphEdge* simEdge = simEdgeIter->getNext();
 
-        trace(TRACE_4, "\t\t\t checking event " + simEdge->getLabel() + "\n");
+        TRACE(TRACE_4, "\t\t\t checking event " + simEdge->getLabel() + "\n");
 
         AnnotatedGraphEdge* myEdge = myNode->getEdgeWithLabel(simEdge->getLabel());
 
         if (myEdge == NULL) {
             // simNode has edge which myNode hasn't
-            trace(TRACE_2, "\t\t simulation failed (edges)\n");
+            TRACE(TRACE_2, "\t\t simulation failed (edges)\n");
 
             // reporting all leaving edges of both nodes for debugging
             AnnotatedGraphNode::LeavingEdges::Iterator edgeIter;
 
-            trace(TRACE_4, "\t\t\t   leaving edges of node ");
-            trace(TRACE_4, simNode->getName() + " of ");
-            trace(TRACE_4, smallerOG->getFilename());
-            trace(TRACE_4, " (" + intToString(simNode->getLeavingEdgesCount()) + "):\n");
+            TRACE(TRACE_4, "\t\t\t   leaving edges of node ");
+            TRACE(TRACE_4, simNode->getName() + " of ");
+            TRACE(TRACE_4, smallerOG->getFilename());
+            TRACE(TRACE_4, " (" + intToString(simNode->getLeavingEdgesCount()) + "):\n");
 
             edgeIter = simNode->getLeavingEdgesIterator();
             while (edgeIter->hasNext()) {
                 AnnotatedGraphEdge* edge = edgeIter->getNext();
-                trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + " (");
+                TRACE(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + " (");
                 switch (edge->getDstNode()->getColor()) {
                     case BLUE:
-                        trace(TRACE_4, "BLUE");
+                        TRACE(TRACE_4, "BLUE");
                         break;
                     case RED:
-                        trace(TRACE_4, "RED");
+                        TRACE(TRACE_4, "RED");
                         break;
                 }
-                trace(TRACE_4, ")\n");
+                TRACE(TRACE_4, ")\n");
             }
 
-            trace(TRACE_4, "\t\t\t   leaving edges of node ");
-            trace(TRACE_4, myNode->getName() + " of ");
-            trace(TRACE_4, greaterOG->getFilename());
-            trace(TRACE_4, " (" + intToString(myNode->getLeavingEdgesCount()) + "):\n");
+            TRACE(TRACE_4, "\t\t\t   leaving edges of node ");
+            TRACE(TRACE_4, myNode->getName() + " of ");
+            TRACE(TRACE_4, greaterOG->getFilename());
+            TRACE(TRACE_4, " (" + intToString(myNode->getLeavingEdgesCount()) + "):\n");
 
             edgeIter = myNode->getLeavingEdgesIterator();
             while (edgeIter->hasNext()) {
                 AnnotatedGraphEdge* edge = edgeIter->getNext();
-                trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> "
+                TRACE(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> "
                         + edge->getDstNode()->getName() + "(");
                 switch (edge->getDstNode()->getColor()) {
                     case BLUE:
-                        trace(TRACE_4, "BLUE");
+                        TRACE(TRACE_4, "BLUE");
                         break;
                     case RED:
-                        trace(TRACE_4, "RED");
+                        TRACE(TRACE_4, "RED");
                         break;
                 }
-                trace(TRACE_4, ")\n");
+                TRACE(TRACE_4, ")\n");
             }
 
             delete edgeIter;
@@ -1446,7 +1446,7 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode* myNode,
 
             return false;
         } else {
-            trace(TRACE_4, "\t\t\t event present, going down\n");
+            TRACE(TRACE_4, "\t\t\t event present, going down\n");
 
             if (!simulatesRecursive(myEdge->getDstNode(),
                     simEdge->getDstNode(), visitedNodes, greaterOG, smallerOG)) {
@@ -1466,7 +1466,7 @@ bool AnnotatedGraph::simulatesRecursive(AnnotatedGraphNode* myNode,
 //! \return true on positive check, otherwise: false
 //! \param secondOG the AnnotatedGraph that is checked for equivalence
 bool AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG) {
-    trace(TRACE_5, "AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG): start\n");
 
     // Simulation is impossible without a simulant.
     if (secondOG == NULL) {
@@ -1488,7 +1488,7 @@ bool AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG) {
         result = true;
     }
 
-    trace(TRACE_5, "AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG): end\n");
     return result;
 }
 
@@ -1500,7 +1500,7 @@ bool AnnotatedGraph::isEquivalent(AnnotatedGraph* secondOG) {
 //! \param rightNode the second AnnotatedGraphNode
 bool AnnotatedGraph::isEquivalent(AnnotatedGraphNode* leftNode,
                                   AnnotatedGraphNode* rightNode) {
-    trace(TRACE_5, "AnnotatedGraph::isEquivalent(AnnotatedGraphNode* leftNode, AnnotatedGraphNode* rightNode): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::isEquivalent(AnnotatedGraphNode* leftNode, AnnotatedGraphNode* rightNode): start\n");
 
     assert(leftNode);
     assert(rightNode);
@@ -1514,7 +1514,7 @@ bool AnnotatedGraph::isEquivalent(AnnotatedGraphNode* leftNode,
         result = true;
     }
 
-    trace(TRACE_5, "AnnotatedGraph::isEquivalent(AnnotatedGraphNode* firstNode, AnnotatedGraphNode* secondNode): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::isEquivalent(AnnotatedGraphNode* firstNode, AnnotatedGraphNode* secondNode): end\n");
     return result;
 }
 
@@ -1541,15 +1541,15 @@ bool AnnotatedGraph::isEquivalentRecursive(AnnotatedGraphNode* leftNode,
     assert(leftNode);
     assert(rightNode);
 
-    trace(TRACE_2, "\t checking whether node " + leftNode->getName());
-    trace(TRACE_3, " of " + leftOG->getFilename());
-    trace(TRACE_2, " is equivalent to node " + rightNode->getName());
-    trace(TRACE_3, " of " + rightOG->getFilename());
-    trace(TRACE_2, "\n");
+    TRACE(TRACE_2, "\t checking whether node " + leftNode->getName());
+    TRACE(TRACE_3, " of " + leftOG->getFilename());
+    TRACE(TRACE_2, " is equivalent to node " + rightNode->getName());
+    TRACE(TRACE_3, " of " + rightOG->getFilename());
+    TRACE(TRACE_2, "\n");
 
     // If we already visited this pair of nodes, then we're done.
     if (visitedNodes.find(make_pair(leftNode, rightNode)) != visitedNodes.end()) {
-        trace(TRACE_3, "\t already been checked\n");
+        TRACE(TRACE_3, "\t already been checked\n");
         return true;
     } else {
         visitedNodes.insert(make_pair(leftNode, rightNode));
@@ -1563,35 +1563,35 @@ bool AnnotatedGraph::isEquivalentRecursive(AnnotatedGraphNode* leftNode,
 
     // 1st step:
     // first we check equivalence of annotations: leftNode <-> rightNode
-    trace(TRACE_3, "\t\t checking equivalence of annotations...\n");
+    TRACE(TRACE_3, "\t\t checking equivalence of annotations...\n");
     GraphFormulaCNF* leftNodeAnnotationInCNF = leftNode->getAnnotation()->getCNF();
     GraphFormulaCNF* rightNodeAnnotationInCNF = rightNode->getAnnotation()->getCNF();
 
     if (leftNodeAnnotationInCNF->implies(rightNodeAnnotationInCNF)) {
-        trace(TRACE_3, "\t\t first annotation implication is ok\n");
-        trace(TRACE_4, "\t\t\t   " + leftNode->getAnnotation()->asString() + "\n");
-        trace(TRACE_4, "\t\t\t   ->\n");
-        trace(TRACE_4, "\t\t\t   " + rightNode->getAnnotation()->asString() + "\n");
+        TRACE(TRACE_3, "\t\t first annotation implication is ok\n");
+        TRACE(TRACE_4, "\t\t\t   " + leftNode->getAnnotation()->asString() + "\n");
+        TRACE(TRACE_4, "\t\t\t   ->\n");
+        TRACE(TRACE_4, "\t\t\t   " + rightNode->getAnnotation()->asString() + "\n");
 
         if (rightNodeAnnotationInCNF->implies(leftNodeAnnotationInCNF)) {
-            trace(TRACE_3, "\t\t second annotation implication is ok\n");
-            trace(TRACE_4, "\t\t\t   " + rightNode->getAnnotation()->asString() + "\n");
-            trace(TRACE_4, "\t\t\t   ->\n");
-            trace(TRACE_4, "\t\t\t   " + leftNode->getAnnotation()->asString() + "\n");
+            TRACE(TRACE_3, "\t\t second annotation implication is ok\n");
+            TRACE(TRACE_4, "\t\t\t   " + rightNode->getAnnotation()->asString() + "\n");
+            TRACE(TRACE_4, "\t\t\t   ->\n");
+            TRACE(TRACE_4, "\t\t\t   " + leftNode->getAnnotation()->asString() + "\n");
         } else {
-            trace(TRACE_3, "\t\t\t annotation implication false\n");
-            trace(TRACE_4, "\t\t\t   " + rightNode->getAnnotation()->asString() + "\n");
-            trace(TRACE_4, "\t\t\t   -/->\n");
-            trace(TRACE_4, "\t\t\t   " + leftNode->getAnnotation()->asString() + "\n");
+            TRACE(TRACE_3, "\t\t\t annotation implication false\n");
+            TRACE(TRACE_4, "\t\t\t   " + rightNode->getAnnotation()->asString() + "\n");
+            TRACE(TRACE_4, "\t\t\t   -/->\n");
+            TRACE(TRACE_4, "\t\t\t   " + leftNode->getAnnotation()->asString() + "\n");
 
             result = false;
         }
     } else {
-        trace(TRACE_2, "\t\t equivalence failed (annotation)\n");
-        trace(TRACE_3, "\t\t\t annotation implication false\n");
-        trace(TRACE_4, "\t\t\t   " + leftNode->getAnnotation()->asString() + "\n");
-        trace(TRACE_4, "\t\t\t   -/->\n");
-        trace(TRACE_4, "\t\t\t   " + rightNode->getAnnotation()->asString() + "\n");
+        TRACE(TRACE_2, "\t\t equivalence failed (annotation)\n");
+        TRACE(TRACE_3, "\t\t\t annotation implication false\n");
+        TRACE(TRACE_4, "\t\t\t   " + leftNode->getAnnotation()->asString() + "\n");
+        TRACE(TRACE_4, "\t\t\t   -/->\n");
+        TRACE(TRACE_4, "\t\t\t   " + rightNode->getAnnotation()->asString() + "\n");
 
         result = false;
     }
@@ -1603,45 +1603,45 @@ bool AnnotatedGraph::isEquivalentRecursive(AnnotatedGraphNode* leftNode,
         // reporting all leaving edges of both nodes for debugging
         AnnotatedGraphNode::LeavingEdges::Iterator edgeIter;
 
-        trace(TRACE_4, "\t\t\t   leaving edges of node ");
-        trace(TRACE_4, rightNode->getName() + " of ");
-        trace(TRACE_4, rightOG->getFilename());
-        trace(TRACE_4, " (" + intToString(rightNode->getLeavingEdgesCount())
+        TRACE(TRACE_4, "\t\t\t   leaving edges of node ");
+        TRACE(TRACE_4, rightNode->getName() + " of ");
+        TRACE(TRACE_4, rightOG->getFilename());
+        TRACE(TRACE_4, " (" + intToString(rightNode->getLeavingEdgesCount())
                 + "):\n");
 
         edgeIter = rightNode->getLeavingEdgesIterator();
         while (edgeIter->hasNext()) {
             AnnotatedGraphEdge* edge = edgeIter->getNext();
-            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + " (");
+            TRACE(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + " (");
             switch (edge->getDstNode()->getColor()) {
                 case BLUE:
-                    trace(TRACE_4, "BLUE");
+                    TRACE(TRACE_4, "BLUE");
                     break;
                 case RED:
-                    trace(TRACE_4, "RED");
+                    TRACE(TRACE_4, "RED");
                     break;
             }
-            trace(TRACE_4, ")\n");
+            TRACE(TRACE_4, ")\n");
         }
 
-        trace(TRACE_4, "\t\t\t   leaving edges of node ");
-        trace(TRACE_4, leftNode->getName() + " of ");
-        trace(TRACE_4, leftOG->getFilename());
-        trace(TRACE_4, " (" + intToString(leftNode->getLeavingEdgesCount()) + "):\n");
+        TRACE(TRACE_4, "\t\t\t   leaving edges of node ");
+        TRACE(TRACE_4, leftNode->getName() + " of ");
+        TRACE(TRACE_4, leftOG->getFilename());
+        TRACE(TRACE_4, " (" + intToString(leftNode->getLeavingEdgesCount()) + "):\n");
 
         edgeIter = leftNode->getLeavingEdgesIterator();
         while (edgeIter->hasNext()) {
             AnnotatedGraphEdge* edge = edgeIter->getNext();
-            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + "(");
+            TRACE(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + "(");
             switch (edge->getDstNode()->getColor()) {
                 case BLUE:
-                    trace(TRACE_4, "BLUE");
+                    TRACE(TRACE_4, "BLUE");
                     break;
                 case RED:
-                    trace(TRACE_4, "RED");
+                    TRACE(TRACE_4, "RED");
                     break;
             }
-            trace(TRACE_4, ")\n");
+            TRACE(TRACE_4, ")\n");
         }
 
         delete edgeIter;
@@ -1651,98 +1651,98 @@ bool AnnotatedGraph::isEquivalentRecursive(AnnotatedGraphNode* leftNode,
 
     // 2nd step:
     // now we check whether both nodes have the same outgoing events
-    trace(TRACE_3, "\t\t checking edges...\n");
+    TRACE(TRACE_3, "\t\t checking edges...\n");
 
-    trace(TRACE_3, "\t\t\t checking whether each edge of ");
-    trace(TRACE_3, leftNode->getName());
-    trace(TRACE_3, " of " + leftOG->getFilename() + "\n");
-    trace(TRACE_3, "\t\t\t                 is present at ");
-    trace(TRACE_3, rightNode->getName());
-    trace(TRACE_3, " of " + rightOG->getFilename() + "...\n");
+    TRACE(TRACE_3, "\t\t\t checking whether each edge of ");
+    TRACE(TRACE_3, leftNode->getName());
+    TRACE(TRACE_3, " of " + leftOG->getFilename() + "\n");
+    TRACE(TRACE_3, "\t\t\t                 is present at ");
+    TRACE(TRACE_3, rightNode->getName());
+    TRACE(TRACE_3, " of " + rightOG->getFilename() + "...\n");
 
     edgeIter = leftNode->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* leftEdge = edgeIter->getNext();
-        trace(TRACE_4, "\t\t\t\t checking event " + leftEdge->getLabel() + "\n");
+        TRACE(TRACE_4, "\t\t\t\t checking event " + leftEdge->getLabel() + "\n");
 
         AnnotatedGraphEdge* rightEdge = rightNode->getEdgeWithLabel(leftEdge->getLabel());
         if (rightEdge == NULL) {
             // first node has edge which second node hasn't
-            trace(TRACE_4, "\t\t\t\t event missing\n");
+            TRACE(TRACE_4, "\t\t\t\t event missing\n");
             result = false;
             break;
         } else {
-            trace(TRACE_4, "\t\t\t\t event present\n");
+            TRACE(TRACE_4, "\t\t\t\t event present\n");
         }
     }
 
-    trace(TRACE_3, "\t\t\t checking whether each edge of ");
-    trace(TRACE_3, rightNode->getName());
-    trace(TRACE_3, " of " + rightOG->getFilename() + "\n");
-    trace(TRACE_3, "\t\t\t                 is present at ");
-    trace(TRACE_3, leftNode->getName());
-    trace(TRACE_3, " of " + leftOG->getFilename() + "...\n");
+    TRACE(TRACE_3, "\t\t\t checking whether each edge of ");
+    TRACE(TRACE_3, rightNode->getName());
+    TRACE(TRACE_3, " of " + rightOG->getFilename() + "\n");
+    TRACE(TRACE_3, "\t\t\t                 is present at ");
+    TRACE(TRACE_3, leftNode->getName());
+    TRACE(TRACE_3, " of " + leftOG->getFilename() + "...\n");
 
     edgeIter = rightNode->getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* rightEdge = edgeIter->getNext();
-        trace(TRACE_4, "\t\t\t\t checking event " + rightEdge->getLabel() + "\n");
+        TRACE(TRACE_4, "\t\t\t\t checking event " + rightEdge->getLabel() + "\n");
 
         AnnotatedGraphEdge* leftEdge = leftNode->getEdgeWithLabel(rightEdge->getLabel());
         if (leftEdge == NULL) {
             // first node has edge which second node hasn't
-            trace(TRACE_4, "\t\t\t\t event missing\n");
+            TRACE(TRACE_4, "\t\t\t\t event missing\n");
             result = false;
             break;
         } else {
-            trace(TRACE_4, "\t\t\t\t event present\n");
+            TRACE(TRACE_4, "\t\t\t\t event present\n");
         }
     }
 
     if (result == false) {
-        trace(TRACE_2, "\t\t equivalence failed (edges)\n");
+        TRACE(TRACE_2, "\t\t equivalence failed (edges)\n");
         // reporting all leaving edges of both nodes for debugging
         AnnotatedGraphNode::LeavingEdges::Iterator edgeIter;
 
-        trace(TRACE_4, "\t\t\t   leaving edges of node ");
-        trace(TRACE_4, rightNode->getName() + " of ");
-        trace(TRACE_4, rightOG->getFilename());
-        trace(TRACE_4, " (" + intToString(rightNode->getLeavingEdgesCount()) + "):\n");
+        TRACE(TRACE_4, "\t\t\t   leaving edges of node ");
+        TRACE(TRACE_4, rightNode->getName() + " of ");
+        TRACE(TRACE_4, rightOG->getFilename());
+        TRACE(TRACE_4, " (" + intToString(rightNode->getLeavingEdgesCount()) + "):\n");
 
         edgeIter = rightNode->getLeavingEdgesIterator();
         while (edgeIter->hasNext()) {
             AnnotatedGraphEdge* edge = edgeIter->getNext();
-            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> "
+            TRACE(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> "
                     + edge->getDstNode()->getName() + " (");
             switch (edge->getDstNode()->getColor()) {
                 case BLUE:
-                    trace(TRACE_4, "BLUE");
+                    TRACE(TRACE_4, "BLUE");
                     break;
                 case RED:
-                    trace(TRACE_4, "RED");
+                    TRACE(TRACE_4, "RED");
                     break;
             }
-            trace(TRACE_4, ")\n");
+            TRACE(TRACE_4, ")\n");
         }
 
-        trace(TRACE_4, "\t\t\t   leaving edges of node ");
-        trace(TRACE_4, leftNode->getName() + " of ");
-        trace(TRACE_4, leftOG->getFilename());
-        trace(TRACE_4, " (" + intToString(leftNode->getLeavingEdgesCount()) + "):\n");
+        TRACE(TRACE_4, "\t\t\t   leaving edges of node ");
+        TRACE(TRACE_4, leftNode->getName() + " of ");
+        TRACE(TRACE_4, leftOG->getFilename());
+        TRACE(TRACE_4, " (" + intToString(leftNode->getLeavingEdgesCount()) + "):\n");
 
         edgeIter = leftNode->getLeavingEdgesIterator();
         while (edgeIter->hasNext()) {
             AnnotatedGraphEdge* edge = edgeIter->getNext();
-            trace(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + "(");
+            TRACE(TRACE_4, "\t\t\t\t\t" + edge->getLabel() + " --> " + edge->getDstNode()->getName() + "(");
             switch (edge->getDstNode()->getColor()) {
                 case BLUE:
-                    trace(TRACE_4, "BLUE");
+                    TRACE(TRACE_4, "BLUE");
                     break;
                 case RED:
-                    trace(TRACE_4, "RED");
+                    TRACE(TRACE_4, "RED");
                     break;
             }
-            trace(TRACE_4, ")\n");
+            TRACE(TRACE_4, ")\n");
         }
 
         delete edgeIter;
@@ -1750,13 +1750,13 @@ bool AnnotatedGraph::isEquivalentRecursive(AnnotatedGraphNode* leftNode,
     }
 
     // we know: both nodes have the same outgoing edges
-    trace(TRACE_4, "\t\t\t all events present at both nodes, going down\n");
+    TRACE(TRACE_4, "\t\t\t all events present at both nodes, going down\n");
 
     edgeIter = leftNode->getLeavingEdgesConstIterator();
 
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* leftEdge = edgeIter->getNext();
-        trace(TRACE_4, "\t\t\t performing event " + leftEdge->getLabel() + "\n");
+        TRACE(TRACE_4, "\t\t\t performing event " + leftEdge->getLabel() + "\n");
         AnnotatedGraphEdge* rightEdge = rightNode->getEdgeWithLabel(leftEdge->getLabel());
 
         if (!isEquivalentRecursive(leftEdge->getDstNode(),
@@ -1782,7 +1782,7 @@ bool AnnotatedGraph::isEquivalentRecursive(AnnotatedGraphNode* leftNode,
 //! \return returns the product OG
 AnnotatedGraph* AnnotatedGraph::product(const AnnotatedGraph* rhs) {
 
-    trace(TRACE_5, "AnnotatedGraph::product(const AnnotatedGraph* rhs): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::product(const AnnotatedGraph* rhs): start\n");
 
     // this will be the product OG
     AnnotatedGraph* productOG= new AnnotatedGraph;
@@ -1819,7 +1819,7 @@ AnnotatedGraph* AnnotatedGraph::product(const AnnotatedGraph* rhs) {
     // Assign the final nodes for the product
     productOG->assignFinalNodes();
 
-    trace(TRACE_5, "AnnotatedGraph::product(const AnnotatedGraph* rhs): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::product(const AnnotatedGraph* rhs): end\n");
 
     return productOG;
 }
@@ -1853,7 +1853,7 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
                                     AnnotatedGraphNode* currentRhsNode,
                                     AnnotatedGraph* productOG) {
 
-    trace(TRACE_5, "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): start\n");
 
     // at this time, the node constructed from currentOGNode and
     // currentRhsNode is already inserted
@@ -1900,7 +1900,7 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
                 productOG->addEdge(currentName, newProductName, currentLabel);
             } else {
                 // we computed a new node, so we add a node and an edge
-                // trace(TRACE_0, "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
+                // trace( "adding node " + newNode->getName() + " with annotation " + newNode->getAnnotation()->asString() + "\n");
 
                 GraphFormulaCNF* newProductFormula =
                     createProductAnnotation(newOGNode, newRhsNode);
@@ -1920,7 +1920,7 @@ void AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode,
 
     delete edgeIter;
 
-    trace(TRACE_5, "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::buildProductOG(AnnotatedGraphNode* currentOGNode, AnnotatedGraphNode* currentRhsNode, AnnotatedGraph* productOG): end\n");
 }
 
 
@@ -1981,7 +1981,7 @@ string AnnotatedGraph::stripOGFileSuffix(const std::string& filename) {
 string AnnotatedGraph::createDotFile(string& filenamePrefix,
                                      const string& dotGraphTitle) const {
 
-    trace(TRACE_0, "creating the dot file of the OG...\n");
+    trace( "creating the dot file of the OG...\n");
 
     string dotFile = filenamePrefix + ".out";
     fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
@@ -2031,7 +2031,7 @@ string AnnotatedGraph::createPNGFile(string& filenamePrefix, std::string& dotFil
     string cmd = "dot -Tpng \"" + dotFileName + "\" -o \""+ pngFile + "\"";
 
     // print commandline and execute system command
-    trace(TRACE_0, cmd + "\n\n");
+    trace( cmd + "\n\n");
     system(cmd.c_str());
 
     return pngFile;
@@ -2166,8 +2166,8 @@ void AnnotatedGraph::computeInterfaceRecursively(AnnotatedGraphNode* v,
 //!                annotated node is the empty node or not.
 string AnnotatedGraph::createOGFile(const string& filenamePrefix, bool hasOWFN) const {
 
-    trace(TRACE_5, "AnnotatedGraph::createOGFile(): start\n");
-    trace(TRACE_1, "creating .og file for " + filenamePrefix + "\n");
+    TRACE(TRACE_5, "AnnotatedGraph::createOGFile(): start\n");
+    TRACE(TRACE_1, "creating .og file for " + filenamePrefix + "\n");
 
     fstream ogFile(addOGFileSuffix(filenamePrefix).c_str(), ios_base::out | ios_base::trunc);
 
@@ -2268,7 +2268,7 @@ string AnnotatedGraph::createOGFile(const string& filenamePrefix, bool hasOWFN) 
     ogFile << ';' << endl;
     ogFile.close();
 
-    trace(TRACE_5, "AnnotatedGraph::createOGFile(): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::createOGFile(): end\n");
 
     return addOGFileSuffix(filenamePrefix);
 }
@@ -2286,7 +2286,7 @@ string AnnotatedGraph::addOGFileSuffix(const std::string& filePrefix) {
 //! \param node node to remove
 void AnnotatedGraph::removeNode(AnnotatedGraphNode* node) {
 
-    trace(TRACE_5, "AnnotatedGraph::removeNode(): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::removeNode(): start\n");
     assert(node);
 
     for (vector<AnnotatedGraphNode*>::iterator testnode = setOfNodes.begin(); testnode
@@ -2296,7 +2296,7 @@ void AnnotatedGraph::removeNode(AnnotatedGraphNode* node) {
             break;
         }
     }
-    trace(TRACE_5, "AnnotatedGraph::removeNode(): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::removeNode(): end\n");
 }
 
 
@@ -2331,16 +2331,16 @@ void AnnotatedGraph::removeTrueNodes(bool fromOWFN) {
             // is an empty node and will be removed
             removeEdgesToNodeFromAllOtherNodes(currNode);
             removeNode(currNode);
-            trace(TRACE_2, "        Removing emptyNode: " + currNode->getName());
+            TRACE(TRACE_2, "        Removing emptyNode: " + currNode->getName());
             delete currNode;
             return;
         } else if (!fromOWFN && currNode->getAnnotationAsString() == GraphFormulaLiteral::TRUE) {
             // node is annotated with true
             // remove node and all its incoming/outgoing transitions
             deleteNodes.insert(currNode);
-            trace(TRACE_2, "        Removing node: " + currNode->getName());
-            trace(TRACE_3, "\n            Annotation: " + currNode->getAnnotationAsString());
-            trace(TRACE_2, "\n");
+            TRACE(TRACE_2, "        Removing node: " + currNode->getName());
+            TRACE(TRACE_3, "\n            Annotation: " + currNode->getAnnotationAsString());
+            TRACE(TRACE_2, "\n");
             delete currNode;
             continue;
         }
@@ -2391,7 +2391,7 @@ void AnnotatedGraph::constructDualService() {
                 default:
                     // should never be reached
                     assert(false);
-                    trace(TRACE_0,
+                    trace(
                             "discovered an event with unknown type (label was "
                                     +currEdge->getLabel() + ")\n");
                     // do nothing
@@ -2539,17 +2539,17 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
             // create new node
             AnnotatedGraphNode* newNode= new AnnotatedGraphNode(currNode->getName() + "_tau",
                     new GraphFormulaFixed(true, ""), currNode->getColor());
-            trace(TRACE_3, "            created new node " + newNode->getName()
+            TRACE(TRACE_3, "            created new node " + newNode->getName()
                     + "\n");
 
             // create tau transition from current to new node
             AnnotatedGraphEdge* tauTransition= new AnnotatedGraphEdge(newNode, GraphFormulaLiteral::TAU);
             currNode->addLeavingEdge(tauTransition);
-            trace(TRACE_4, "            created tau transition from "
+            TRACE(TRACE_4, "            created tau transition from "
                     + currNode->getName() +" to "+ newNode->getName() + "\n");
 
             // add current node's leaving receiving edges to new node
-            trace(TRACE_4, "            adding leaving edges to new node\n");
+            TRACE(TRACE_4, "            adding leaving edges to new node\n");
             edge_iter = currNode->getLeavingEdgesIterator();
             while (edge_iter->hasNext()) {
                 AnnotatedGraphEdge* currEdge = edge_iter->getNext();
@@ -2565,7 +2565,7 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
                     AnnotatedGraphEdge* newEdge= new AnnotatedGraphEdge((currEdge)->getDstNode(),
                             (currEdge)->getLabel());
                     newNode->addLeavingEdge(newEdge);
-                    trace(TRACE_5, "            adding edge " + newEdge->getLabel()
+                    TRACE(TRACE_5, "            adding edge " + newEdge->getLabel()
                             +" from " + newNode->getName() + " to "
                             + newEdge->getDstNode()->getName() + "\n");
                 }
@@ -2596,7 +2596,7 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
     }
 
     // add the newly created nodes to the graph
-    trace(TRACE_3,"\n        inserting all newly created nodes into the graphs nodeset...\n");
+    TRACE(TRACE_3,"\n        inserting all newly created nodes into the graphs nodeset...\n");
     for (set<AnnotatedGraphNode*>::iterator n = createdNodes.begin(); n
             != createdNodes.end(); ++n) {
         this->addNode((*n));
@@ -2609,31 +2609,31 @@ void AnnotatedGraph::transformToPublicView(Graph* cleanPV, bool fromOWFN) {
 
     // first either the empty node (if the owfn is given) or all true nodes
     // need to be removed.
-    trace(TRACE_1, "    removing true nodes ...\n");
+    TRACE(TRACE_1, "    removing true nodes ...\n");
     removeTrueNodes(fromOWFN);
-    trace(TRACE_2, "\n");
+    TRACE(TRACE_2, "\n");
 
-    trace(TRACE_1, "    constructing dual service...\n");
+    TRACE(TRACE_1, "    constructing dual service...\n");
     constructDualService();
-    trace(TRACE_2, "\n");
+    TRACE(TRACE_2, "\n");
 
-    trace(TRACE_1, "    fixing dual service...\n");
+    TRACE(TRACE_1, "    fixing dual service...\n");
     fixDualService(fromOWFN);
-    trace(TRACE_2, "\n");
+    TRACE(TRACE_2, "\n");
 
-    trace(TRACE_1, "\nStatistics of the public view service automaton: \n");
-    trace(TRACE_1, "  nodes: " + intToString(setOfNodes.size()) + "\n");
+    TRACE(TRACE_1, "\nStatistics of the public view service automaton: \n");
+    TRACE(TRACE_1, "  nodes: " + intToString(setOfNodes.size()) + "\n");
     unsigned int edges = 0;
     for (nodes_iterator nodeIter = setOfNodes.begin(); nodeIter
             != setOfNodes.end(); ++nodeIter) {
 
         edges += (*nodeIter)->getLeavingEdgesCount();
     }
-    trace(TRACE_1, "  edges: " + intToString(edges) + "\n\n");
+    TRACE(TRACE_1, "  edges: " + intToString(edges) + "\n\n");
 
-    trace(TRACE_1, "internal translation from OG class to graph class...\n");
+    TRACE(TRACE_1, "internal translation from OG class to graph class...\n");
     transformOGToService(cleanPV);
-    trace(TRACE_1, "\n");
+    TRACE(TRACE_1, "\n");
 }
 
 
@@ -2676,7 +2676,7 @@ void AnnotatedGraph::transformOGToService(Graph* cleanPV) {
         // it is final in the graph too
         copiedNode->setFinal((*copyNode)->isFinal());
 
-        trace(TRACE_4, "    copied node: " + stringVal + "\n");
+        TRACE(TRACE_4, "    copied node: " + stringVal + "\n");
     }
 
     // create all edges after all nodes have been created in the graph
@@ -2697,7 +2697,7 @@ void AnnotatedGraph::reduceStructurally() {
     bool isDiamond(AnnotatedGraphNode * node,
             AnnotatedGraph::predecessorMap& predecessors);
 
-    trace(TRACE_5, "AnnotatedGraph::reduceStructurally(): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::reduceStructurally(): start\n");
 
     std::map< AnnotatedGraphNode*, bool> processed;
     std::queue< AnnotatedGraphNode*> nodeQueue;
@@ -2715,7 +2715,7 @@ void AnnotatedGraph::reduceStructurally() {
         isDiamond(node, predecessors);
     }
 
-    trace(TRACE_5, "AnnotatedGraph::reduceStructurally(): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::reduceStructurally(): end\n");
 }
 
 
@@ -2848,13 +2848,13 @@ void AnnotatedGraph::getPredecessorRelation(AnnotatedGraph::predecessorMap& resu
 // [LUHME XV] Methodenbeschreibung erweitern
 //! \brief assigns the final nodes of the OG according to Gierds 2007
 void AnnotatedGraph::assignFinalNodes() {
-    trace(TRACE_5, "AnnotatedGraph::assignFinalNodes(): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::assignFinalNodes(): start\n");
 
     for (nodes_t::iterator node = setOfNodes.begin(); node != setOfNodes.end(); node++) {
         if (((*node)->getAnnotationAsString()).find(GraphFormulaLiteral::FINAL, 0) != string::npos) {
             // current node has literal final in annotation
 
-            trace(TRACE_2, "    found literal final in node " + (*node)->getName() + "\n");
+            TRACE(TRACE_2, "    found literal final in node " + (*node)->getName() + "\n");
             // check whether all outgoing edges are receiving ones
             bool receivesOnly = true;
             SList<AnnotatedGraphEdge*>::ConstIterator edge = (*node)->getLeavingEdgesConstIterator();
@@ -2869,13 +2869,13 @@ void AnnotatedGraph::assignFinalNodes() {
 
             // node is final iff literal final AND no non-receiving outgoing edge
             if (receivesOnly) {
-                trace(TRACE_2, "    set final flag for node " + (*node)->getName() + "\n");
+                TRACE(TRACE_2, "    set final flag for node " + (*node)->getName() + "\n");
                 (*node)->setFinal(true);
             }
         }
     }
 
-    trace(TRACE_5, "AnnotatedGraph::assignFinalNodes(): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::assignFinalNodes(): start\n");
 }
 
 
@@ -2989,25 +2989,25 @@ void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphN
 //! \brief Computes statistics about this graph. They can be printed by
 //!        printGraphStatistics().
 void AnnotatedGraph::computeGraphStatistics() {
-    trace(TRACE_5, "AnnotatedGraph::computeGraphStatistics(): start\n");
+    TRACE(TRACE_5, "AnnotatedGraph::computeGraphStatistics(): start\n");
     computeNumberOfNodesAndStatesAndEdges();
-    trace(TRACE_5, "AnnotatedGraph::computeGraphStatistics(): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::computeGraphStatistics(): end\n");
 }
 
 
 //! \brief Prints statistics about this graph. May only be called after
 //!       computeGraphStatistics().
 void AnnotatedGraph::printGraphStatistics() {
-    trace(TRACE_5, "AnnotatedGraph::printGraphStatistics(): start\n");
-    trace(TRACE_0, "    number of nodes: " + intToString(getNumberOfNodes()) + "\n");
-    trace(TRACE_0, "    number of edges: " + intToString(getNumberOfEdges()) + "\n");
-    trace(TRACE_0, "    number of deleted nodes: " + intToString(numberDeletedVertices) + "\n");
-    trace(TRACE_0, "    number of blue nodes: " + intToString(getNumberOfBlueNodes()) + "\n");
-    trace(TRACE_0, "    number of blue edges: " + intToString(getNumberOfBlueEdges()) + "\n");
-    trace(TRACE_0, "    number of states calculated: " + intToString(State::state_count) + "\n");
-    trace(TRACE_0, "    number of states stored in datastructure: " + intToString(State::state_count_stored_in_binDec) + "\n");
-    trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStoredStates()) + "\n");
-    trace(TRACE_5, "AnnotatedGraph::printGraphStatistics(): end\n");
+    TRACE(TRACE_5, "AnnotatedGraph::printGraphStatistics(): start\n");
+    trace( "    number of nodes: " + intToString(getNumberOfNodes()) + "\n");
+    trace( "    number of edges: " + intToString(getNumberOfEdges()) + "\n");
+    trace( "    number of deleted nodes: " + intToString(numberDeletedVertices) + "\n");
+    trace( "    number of blue nodes: " + intToString(getNumberOfBlueNodes()) + "\n");
+    trace( "    number of blue edges: " + intToString(getNumberOfBlueEdges()) + "\n");
+    trace( "    number of states calculated: " + intToString(State::state_count) + "\n");
+    trace( "    number of states stored in datastructure: " + intToString(State::state_count_stored_in_binDec) + "\n");
+    trace( "    number of states stored in nodes: " + intToString(getNumberOfStoredStates()) + "\n");
+    TRACE(TRACE_5, "AnnotatedGraph::printGraphStatistics(): end\n");
 }
 
 
@@ -3055,7 +3055,7 @@ unsigned int AnnotatedGraph::getNumberOfNodes() const {
 //         label names from this graph
 //! \return the filename of the created STG file
 string AnnotatedGraph::printGraphToSTG(vector<string>& edgeLabels) {
-    trace(TRACE_5, "void AnnotatedGraph::printGraphToSTG() : start\n");
+    TRACE(TRACE_5, "void AnnotatedGraph::printGraphToSTG() : start\n");
 
     // build STG file name
     string STGFileName;
@@ -3108,7 +3108,7 @@ string AnnotatedGraph::printGraphToSTG(vector<string>& edgeLabels) {
     STGFileStream << "\n" << STGGraphString << endl;
     STGFileStream.close();
 
-    trace(TRACE_5, "void AnnotatedGraph::printGraphToSTG() : end\n");
+    TRACE(TRACE_5, "void AnnotatedGraph::printGraphToSTG() : end\n");
 
     return STGFileName;
 }
@@ -3213,9 +3213,9 @@ string AnnotatedGraph::getSuffix() const {
 
 //! \brief Computes and prints the statistics of this graph (Convenience method).
 void AnnotatedGraph::computeAndPrintGraphStatistics() {
-    trace(TRACE_5, "void AnnotatedGraph::computeAndPrintGraphStatistics() : start\n");
+    TRACE(TRACE_5, "void AnnotatedGraph::computeAndPrintGraphStatistics() : start\n");
     computeGraphStatistics();
     printGraphStatistics();
-    trace(TRACE_5, "void AnnotatedGraph::computeAndPrintGraphStatistics() : end\n");
+    TRACE(TRACE_5, "void AnnotatedGraph::computeAndPrintGraphStatistics() : end\n");
 }
 

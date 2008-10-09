@@ -131,7 +131,7 @@ int logzwo(int m) {
 //! \param PN DESCRIPTION
 //! \return DESCRIPTION
 State* binInsert(oWFN* PN) {
-    trace(TRACE_5, "binInsert(oWFN* PN)\n");
+    TRACE(TRACE_5, "binInsert(oWFN* PN)\n");
 
     return binInsert(PN->binHashTable + (PN->getPlaceHashValue()), PN);
 }
@@ -143,7 +143,7 @@ State* binInsert(oWFN* PN) {
 //! \return DESCRIPTION
 State* binInsert(binDecision** Bucket, oWFN* PN) {
     // relies on a previous bin_search with all values bin_* set properly!
-    trace(TRACE_5, "binInsert(binDecision** Bucket, oWFN* PN): start\n");
+    TRACE(TRACE_5, "binInsert(binDecision** Bucket, oWFN* PN): start\n");
 
     // cout << "binInsert: inserting "
     //      << PN->getMarkingAsString(PN->CurrentMarking) << endl;
@@ -170,7 +170,7 @@ State* binInsert(binDecision** Bucket, oWFN* PN) {
         (*Bucket)->state->my_entry = *Bucket;
 
         // cout << "\t at address: " << (*Bucket)->state << endl;
-        trace(TRACE_5, "binInsert(binDecision** Bucket, oWFN* PN): end\n");
+        TRACE(TRACE_5, "binInsert(binDecision** Bucket, oWFN* PN): end\n");
         return (*Bucket)->state;
     }
 
@@ -219,7 +219,7 @@ State* binInsert(binDecision** Bucket, oWFN* PN) {
 
     // cout << "\t at address: " << newd->state << endl;
 
-    trace(TRACE_5, "binInsert(binDecision** Bucket, oWFN* PN): end\n");
+    TRACE(TRACE_5, "binInsert(binDecision** Bucket, oWFN* PN): end\n");
     return newd->state;
 }
 
@@ -335,7 +335,7 @@ void binDeleteAll(oWFN* PN, int h) {
 //! \param PN DESCRIPTION
 //! \return DESCRIPTION
 State* binSearch(oWFN* PN) {
-    trace(TRACE_5, "binSearch(oWFN* PN)\n");
+    TRACE(TRACE_5, "binSearch(oWFN* PN)\n");
     return binSearch(PN->binHashTable[PN->getPlaceHashValue()], PN);
 }
 

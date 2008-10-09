@@ -134,43 +134,37 @@ void myown_newhandler() {
 //! \brief reads an oWFN from owfnfile
 //! \param owfnfile the owfnfile to be read from
 void readnet(const std::string& owfnfile) {
+
     owfn_yylineno = 1;
     owfn_yydebug = 0;
     owfn_yy_flex_debug = 0;
     assert(owfnfile != "");
     // diagnosefilename = (char *) 0;
 
-    cerr << "Reading PN file:" << owfnfile << endl;
-    trace(TRACE_5, "reading from file " + owfnfile + "\n");
+    TRACE(TRACE_1, "reading from file " + owfnfile + "\n");
 
     if (owfnfile == "<stdin>") {
         owfn_yyin = stdin;
     }
     else owfn_yyin = fopen(owfnfile.c_str(), "r");
     if (!owfn_yyin) {
-        cerr << "cannot open owfn file " << owfnfile << "' for reading'\n" << endl;
         exit(EC_FILE_ERROR);
     }
     // diagnosefilename = owfnfile;
 
-    cerr << "Allocating memory..." << endl;
 
     PN = new oWFN();
 
-    cerr << "Assigning filename." << endl;
     if (owfnfile == "<stdin>") {
         PN->filename = "stdin";
     }
     else PN->filename = owfnfile;
 
-    cerr << "Preparing to parse" << endl;
 
     owfnfileToParse = owfnfile;
 
-    cerr << "Parse now." << endl;
     owfn_yyparse();
 
-    cerr << "Parsing complete." << endl;
     fclose(owfn_yyin);
     for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
         PN->CurrentMarking[i] = PN->getPlace(i)->initial_marking;
@@ -193,23 +187,25 @@ void readnet(const std::string& owfnfile) {
     // doesn't work with, since array for input and output places
     // depend on the order of the Places array, reordering results in
     // a heavy crash
+    
+    TRACE(TRACE_1, "reading from file " + owfnfile + " finished.\n");
 }
 
 
 //! \brief reports the net statistics
 void reportNet() {
-    trace(TRACE_0, "    places: " + intToString(PN->getPlaceCount()));
-    trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCount()));
-    trace(TRACE_0, " input places, " + intToString(PN->getOutputPlaceCount()));
-    trace(TRACE_0, " output places)\n");
-    trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCount()) + "\n");
-    trace(TRACE_0, "    ports: " + intToString(PN->getPortCount()) + "\n\n");
+    trace( "    places: " + intToString(PN->getPlaceCount()));
+    trace( " (including " + intToString(PN->getInputPlaceCount()));
+    trace( " input places, " + intToString(PN->getOutputPlaceCount()));
+    trace( " output places)\n");
+    trace( "    transitions: " + intToString(PN->getTransitionCount()) + "\n");
+    trace( "    ports: " + intToString(PN->getPortCount()) + "\n\n");
     if (PN->FinalCondition) {
-        trace(TRACE_0, "finalcondition used\n\n");
+        trace( "finalcondition used\n\n");
     } else if (PN->FinalMarkingList.size() > 0) {
-        trace(TRACE_0, "finalmarking used\n\n");
+        trace( "finalmarking used\n\n");
     } else {
-        trace(TRACE_0, "neither finalcondition nor finalmarking given\n");
+        trace( "neither finalcondition nor finalmarking given\n");
     }
 }
 
@@ -222,7 +218,7 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     og_yydebug = 0;
     og_yy_flex_debug = 0;
     assert(ogfile != "");
-    trace(TRACE_1, "reading from file " + ogfile + "\n");
+    TRACE(TRACE_1, "reading from file " + ogfile + "\n");
     og_yyin = fopen(ogfile.c_str(), "r");
     if (!og_yyin) {
         cerr << "cannot open OG file '" << ogfile << "' for reading'\n" << endl;
@@ -234,7 +230,7 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     fclose(og_yyin);
 
     OGToParse->setFilename(ogfile);
-    trace(TRACE_1, "file successfully read\n");
+    TRACE(TRACE_1, "file successfully read\n");
 
     return OGToParse;
 }
@@ -255,7 +251,7 @@ void readAllOGs(AnnotatedGraph::ogs_t& theOGs) {
 //! \brief deletes all OGs from a list
 //! \param OGsFromFiles a list of OGs
 void deleteOGs(AnnotatedGraph::ogs_t& OGsFromFiles) {
-    trace(TRACE_5, "main: deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles) : start\n");
+    TRACE(TRACE_5, "main: deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles) : start\n");
 
     for (AnnotatedGraph::ogs_t::const_iterator iOg = OGsFromFiles.begin();
          iOg != OGsFromFiles.end(); ++iOg) {
@@ -264,26 +260,26 @@ void deleteOGs(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
     OGsFromFiles.clear();
 
-    trace(TRACE_5, "main: deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles) : end\n");
+    TRACE(TRACE_5, "main: deleteOGs(const AnnotatedGraph::ogs_t& OGsFromFiles) : end\n");
 }
 
 
 //! \brief reports values for -e and -m option
 void reportOptionValues() {
-    trace(TRACE_5, "-e option found: ");
+    TRACE(TRACE_5, "-e option found: ");
     if (options[O_EVENT_USE_MAX]) {
-        trace(TRACE_5, "yes\n");
+        TRACE(TRACE_5, "yes\n");
     } else {
-        trace(TRACE_5, "no\n");
+        TRACE(TRACE_5, "no\n");
     }
 
     // max_occurrence is set for each input/output place of the net in the owfn file
     // syntax in the owfn file: 
     //      abort {$ MAX_OCCURRENCES = 2 $}
     // (use -1 for unbounded occurrence)
-    trace(TRACE_5, "-E option found: ");
+    TRACE(TRACE_5, "-E option found: ");
     if (options[O_READ_EVENTS]) {
-        trace(TRACE_5, "yes\n");
+        TRACE(TRACE_5, "yes\n");
 
         // store the max occurrence information
         string maxOccurrenceString = "";
@@ -322,27 +318,27 @@ void reportOptionValues() {
         // then show the whole maxOccurrenceString
         // otherwise discard the maxOccurrenceString
         if (showMaxOccurrences) {
-            trace(TRACE_0, maxOccurrenceString);
+            trace( maxOccurrenceString);
         }
     } else {
-        trace(TRACE_5, "no\n");
+        TRACE(TRACE_5, "no\n");
     }
 
     if (options[O_EVENT_USE_MAX]) {
-        trace(TRACE_0, "each event considered max: " + intToString(events_manual) + "\n");
+        trace( "each event considered max: " + intToString(events_manual) + "\n");
     }
 
     // report message bound
     if (options[O_MESSAGES_MAX]) {
-        trace(TRACE_0, "interface message bound set to: "
+        trace( "interface message bound set to: "
                         + intToString(messages_manual) + "\n");
     }
 
     if (parameters[P_RESPONSIVE]) {
-    	trace(TRACE_0, "\ncalculation of responsive partner(s)\n");
+    	trace( "\ncalculation of responsive partner(s)\n");
     }
 
-    trace(TRACE_0, "\n");
+    trace( "\n");
 }
 
 
@@ -356,10 +352,10 @@ void reportOptionValues() {
 //! \param myFilePrefix the file prefix to add '.tex' to
 void makeGasTex(std::string myDotFile, std::string myFilePrefix,
                 GasTexGraph::STYLE style) {
-    trace(TRACE_1, "makeGasTex called for file: ");
-    trace(TRACE_1, myDotFile + "\n");
-    trace(TRACE_1, "prefix of the file is: ");
-    trace(TRACE_1, myFilePrefix + "\n");
+    TRACE(TRACE_1, "makeGasTex called for file: ");
+    TRACE(TRACE_1, myDotFile + "\n");
+    TRACE(TRACE_1, "prefix of the file is: ");
+    TRACE(TRACE_1, myFilePrefix + "\n");
 
     string dotFileName = myDotFile;
 
@@ -392,7 +388,7 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix,
     // writing gastexGraph to new tex file
     gastexGraph->makeGasTex(texFileName);
 
-    trace(TRACE_0, texFileName + " generated\n");
+    trace( texFileName + " generated\n");
 }
 
 
@@ -405,7 +401,7 @@ void createOutputFiles(AnnotatedGraph* graph, string prefix) {
 
         if (!parameters[P_NOPNG]  && dotFileName != "") {
             string pngres = graph->createPNGFile(prefix, dotFileName);
-            if (pngres != "") trace(TRACE_0, pngres + " generated\n");
+            if (pngres != "") trace( pngres + " generated\n");
 
         }
 
@@ -428,14 +424,14 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
     // will be aborted
     if(OG->hasNoRoot() || OG->getRoot()->getColor() == RED) {
         if (fromOWFN) {
-            trace(TRACE_0,"\nThe given oWFN is not controllable. No PublicView will be generated.\n\n");
+            trace("\nThe given oWFN is not controllable. No PublicView will be generated.\n\n");
         } else {
-            trace(TRACE_0,"\nThe given OG describes no partners. No PublicView will be generated.\n\n");
+            trace("\nThe given OG describes no partners. No PublicView will be generated.\n\n");
         }
         return;
     }
 
-    trace(TRACE_0, "generating the public view for ");
+    trace( "generating the public view for ");
     trace(graphName);
 
     trace("\n");
@@ -457,9 +453,9 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
 
         // test whether this graph is too big
         if(cleanPV->numberOfNodes() > maxSizeForDot && !parameters[P_NOPNG]) {
-            trace(TRACE_0, "the public view service automaton is to big to generate a dot file\n\n");
+            trace( "the public view service automaton is to big to generate a dot file\n\n");
         } else {
-            trace(TRACE_0, "generating dot output...\n");
+            trace( "generating dot output...\n");
             createOutputFiles(cleanPV, outfilePrefix);
         }
 
@@ -481,9 +477,9 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
         cleanPV->transformToOWFN(PVoWFN, inputs, outputs);
 
         // print the information of the public view's owfn
-        trace(TRACE_1, "Public View oWFN statistics:\n");
+        TRACE(TRACE_1, "Public View oWFN statistics:\n");
         trace(PVoWFN->information());
-        trace(TRACE_1, "\n");
+        TRACE(TRACE_1, "\n");
 
         // create the stream for the owfn output
         ofstream output;
@@ -496,8 +492,8 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
         (output) << (*PVoWFN);
         output.close();
 
-        trace(TRACE_0, "=================================================================\n");
-        trace(TRACE_0, "\n");
+        trace( "=================================================================\n");
+        trace( "\n");
     }
 }
 
@@ -509,20 +505,20 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
 
     // print information about reduction rules (if desired)
     if (options[O_CALC_REDUCED_IG] || parameters[P_USE_EAD]) {
-        trace(TRACE_0, "building the reduced interaction graph by using reduction rule(s)\n");
+        trace( "building the reduced interaction graph by using reduction rule(s)\n");
         if (parameters[P_USE_CRE]) {
-            trace(TRACE_0, "     \"combine receiving events\"\n");
+            trace( "     \"combine receiving events\"\n");
         }
         if (parameters[P_USE_RBS]) {
-            trace(TRACE_0, "     \"receiving before sending\"\n");
+            trace( "     \"receiving before sending\"\n");
         }
         if (parameters[P_USE_EAD]) {
-            trace(TRACE_0, "     \"early detection\"\n");
+            trace( "     \"early detection\"\n");
         }
     } else {
-        trace(TRACE_0, "building the interaction graph...\n");
+        trace( "building the interaction graph...\n");
     }
-    trace(TRACE_0, "\n");
+    trace( "\n");
 
     // [LUHME XV] Konstruktor und "buildGraph()" verheiraten?
     // [LUHME XV] Klasse "interactionGraph" in "InteractionGraph" umbenennen
@@ -538,9 +534,9 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
     seconds2 = time (NULL);
 
     if (options[O_CALC_REDUCED_IG]) {
-        trace(TRACE_0, "building the reduced interaction graph finished.\n");
+        trace( "building the reduced interaction graph finished.\n");
     } else {
-        trace(TRACE_0, "\nbuilding the interaction graph finished.\n");
+        trace( "\nbuilding the interaction graph finished.\n");
     }
     // [LUHME XV] Tracen, Zeit in Millisekunden nehmen.
     cout << difftime(seconds2, seconds) << " s consumed for building graph" << endl;
@@ -557,17 +553,17 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
 
 
     // print statistics
-    trace(TRACE_0, "\nnet is controllable: ");
+    trace( "\nnet is controllable: ");
     // [LUHME XV] Diese Abfrage in bool Graph::hasBlueRoot() auslagern; ÜBERALL
     if (graph->getRoot()->getColor() == BLUE) {
-        trace(TRACE_0, "YES\n\n");
+        trace( "YES\n\n");
     } else {
-        trace(TRACE_0, "NO\n\n");
+        trace( "NO\n\n");
     }
 
-    trace(TRACE_0, "IG statistics:\n");
+    trace( "IG statistics:\n");
     graph->printGraphStatistics();
-    trace(TRACE_0, "\n");
+    trace( "\n");
 
 
     // create output files if needed
@@ -615,15 +611,15 @@ string computeIG(oWFN* PN) {
     // [LUHME XV] lieber als Konstruktoraufruf hier?
     interactionGraph* graph = computeIG(PN, igFilename);
 
-    trace(TRACE_5, "computation finished -- trying to delete graph\n");
+    TRACE(TRACE_5, "computation finished -- trying to delete graph\n");
 
     // [LUHME XV] Soll/muss das hierher?
     graph->clearNodeSet();
     delete graph;
 
-    trace(TRACE_5, "graph deleted\n");
-    trace(TRACE_0, "=================================================================\n");
-    trace(TRACE_0, "\n");
+    TRACE(TRACE_5, "graph deleted\n");
+    trace( "=================================================================\n");
+    trace( "\n");
 
     return igFilename;
 }
@@ -634,8 +630,8 @@ string computeIG(oWFN* PN) {
 //! \return a string containing the filename of the partner owfn
 string computeSmallPartner(AnnotatedGraph* IG) {
 
-    trace(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : start\n");
-    trace(TRACE_0, "\n\nComputing partner oWFN \n");
+    TRACE(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : start\n");
+    trace( "\n\nComputing partner oWFN \n");
 
     // 1. step: was done before (computing the IG)
     // 2. step: if the net is controllable create STG file for petrify out of computed IG
@@ -643,10 +639,10 @@ string computeSmallPartner(AnnotatedGraph* IG) {
     vector<string> edgeLabels; // renamend transitions
 
     if (!IG->hasNoRoot() && IG->getRoot()->getColor() == BLUE) {
-        trace(TRACE_1, "    Creating STG File\n");
+        TRACE(TRACE_1, "    Creating STG File\n");
         stgFilename = IG->printGraphToSTG(edgeLabels);
     } else {
-        trace(TRACE_0, "\n    Cannot synthesize a partner for a net, that is not controllable\n\n");
+        trace( "\n    Cannot synthesize a partner for a net, that is not controllable\n\n");
         return "";
     }
 
@@ -657,11 +653,11 @@ string computeSmallPartner(AnnotatedGraph* IG) {
 
     string systemcall = string(HAVE_PETRIFY) + " " + stgFilename + " -dead -ip -nolog -o " + pnFilename;
     if (HAVE_PETRIFY != "not found") {
-        trace(TRACE_1, "    Calling Petrify.\n");
-        trace(TRACE_2, "        " + systemcall + "\n");
+        TRACE(TRACE_1, "    Calling Petrify.\n");
+        TRACE(TRACE_2, "        " + systemcall + "\n");
         system(systemcall.c_str());
     } else {
-        trace(TRACE_0, "cannot execute command as Petrify was not found in path\n");
+        trace( "cannot execute command as Petrify was not found in path\n");
         return "";
     }
 
@@ -669,12 +665,12 @@ string computeSmallPartner(AnnotatedGraph* IG) {
     // 4. step: create oWFN out of the petrinet computed by petrify
     // 5. step: complete interface with the interface information stored in the
     // IG (done in STG2oWFN_main
-    trace(TRACE_1, "    Converting petrify result to petri net.\n");
+    TRACE(TRACE_1, "    Converting petrify result to petri net.\n");
     string owfnFilename = STG2oWFN_main( edgeLabels, pnFilename, IG->inputPlacenames, IG->outputPlacenames );
 
 
-    trace(TRACE_0, "Partner synthesis completed. Created file: " + owfnFilename + "\n");
-    trace(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : end\n");
+    trace( "Partner synthesis completed. Created file: " + owfnFilename + "\n");
+    TRACE(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : end\n");
 
     return owfnFilename; // return partner filename
 }
@@ -706,8 +702,8 @@ string computeSmallPartner(oWFN* givenPN) {
 //! \return a string containing the filename of the partner owfn.
 string computeMostPermissivePartner(AnnotatedGraph* OG) {
 
-    trace(TRACE_5, "string computeMostPermissivePartner(AnnotatedGraph*) : start\n");
-    trace(TRACE_0, "\n\nComputing partner oWFN \n");
+    TRACE(TRACE_5, "string computeMostPermissivePartner(AnnotatedGraph*) : start\n");
+    trace( "\n\nComputing partner oWFN \n");
 
     // 1. step: was done before (computing the OG)
     // 2. step: if the net is controllable create STG file for petrify out of computed IG
@@ -715,10 +711,10 @@ string computeMostPermissivePartner(AnnotatedGraph* OG) {
     vector<string> edgeLabels; // renamend transitions
 
     if (!OG->hasNoRoot() && OG->getRoot()->getColor() == BLUE) {
-        trace(TRACE_1, "    Creating STG File\n");
+        TRACE(TRACE_1, "    Creating STG File\n");
         stgFilename = OG->printGraphToSTG(edgeLabels);
     } else {
-        trace(TRACE_0, "\nCannot synthesize a partner for a net, that is not controllable\n\n");
+        trace( "\nCannot synthesize a partner for a net, that is not controllable\n\n");
         return "";
     }
 
@@ -729,21 +725,21 @@ string computeMostPermissivePartner(AnnotatedGraph* OG) {
 
     string systemcall = string(HAVE_PETRIFY) + " " + stgFilename + " -dead -ip -nolog -o " + pnFilename;
     if (HAVE_PETRIFY != "not found") {
-        trace(TRACE_1, "    Calling Petrify.\n");
-        trace(TRACE_2, "        " + systemcall + "\n");
+        TRACE(TRACE_1, "    Calling Petrify.\n");
+        TRACE(TRACE_2, "        " + systemcall + "\n");
         system(systemcall.c_str());
     } else {
-        trace(TRACE_0, "cannot execute command as Petrify was not found in path\n");
+        trace( "cannot execute command as Petrify was not found in path\n");
         return "";
     }
 
 
     // 4. step: create oWFN out of the petrinet computed by petrify
-    trace(TRACE_1, "    Converting petrify result to petri net.\n");
+    TRACE(TRACE_1, "    Converting petrify result to petri net.\n");
     string owfnFilename = STG2oWFN_main( edgeLabels, pnFilename, OG->inputPlacenames, OG->outputPlacenames );
 
-    trace(TRACE_0, "Partner synthesis completed. Created file: " + owfnFilename + "\n");
-    trace(TRACE_5, "string computeMostPermissivePartner(AnnotatedGraph*) : end\n");
+    trace( "Partner synthesis completed. Created file: " + owfnFilename + "\n");
+    TRACE(TRACE_5, "string computeMostPermissivePartner(AnnotatedGraph*) : end\n");
 
     return owfnFilename; // return partner filename
 }
@@ -764,20 +760,20 @@ string computeOG(oWFN* PN) {
     bool controllable = false;
     string ogFilename = "";
 
-    trace(TRACE_0, "building the operating guideline...\n");
+    trace( "building the operating guideline...\n");
     graph->printProgressFirst();
 
     seconds = time(NULL);
 
     // build operating guideline
-    trace(TRACE_1, "Building the graph...\n");
+    TRACE(TRACE_1, "Building the graph...\n");
     buildGraphTime1 = time(NULL);
     // [LUHME XV] in "build()" umbenennen
     graph->buildGraph();
     buildGraphTime2 = time(NULL);
-    trace(TRACE_1, "finished building the graph\n");
+    TRACE(TRACE_1, "finished building the graph\n");
     // [LUHME XV] Zeit in Millisekunden nehmen (�BERALL!)
-    trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n\n");
+    TRACE(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n\n");
 
     // add interface information to graph: Input -> Output and vice versa
     // input/outputPlacenames contain all possible labels for the IG
@@ -789,48 +785,48 @@ string computeOG(oWFN* PN) {
     }
 
     // print statistics
-    trace(TRACE_1, "computing graph statistics...\n");
+    TRACE(TRACE_1, "computing graph statistics...\n");
     graphStatsTime1 = time(NULL);
     graph->computeGraphStatistics();
     graphStatsTime2 = time(NULL);
-    trace(TRACE_1, "finished computing graph statistics\n");
-    trace(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n\n");
+    TRACE(TRACE_1, "finished computing graph statistics\n");
+    TRACE(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n\n");
 
 
     if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
-        trace(TRACE_1, "removing false nodes...\n");
+        TRACE(TRACE_1, "removing false nodes...\n");
         removeFalseNodesTime1 = time(NULL);
         graph->removeReachableFalseNodes();
         removeFalseNodesTime2 = time(NULL);
-        trace(TRACE_1, "finished removing false nodes\n");
-        trace(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n\n");
+        TRACE(TRACE_1, "finished removing false nodes\n");
+        TRACE(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n\n");
 
-        trace(TRACE_1, "removing unreachable nodes...\n");
+        TRACE(TRACE_1, "removing unreachable nodes...\n");
         removeUnreachableNodesTime1 = time(NULL);
         graph->removeUnreachableNodes();
         removeUnreachableNodesTime2 = time(NULL);
-        trace(TRACE_1, "finished removing unreachable nodes\n");
-        trace(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n\n");
+        TRACE(TRACE_1, "finished removing unreachable nodes\n");
+        TRACE(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n\n");
     }
 
 
     seconds2 = time(NULL);
 
-    trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
-    trace(TRACE_0, "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n\n");
+    trace( "\nbuilding the operating guideline finished.\n");
+    trace( "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n\n");
 
-    trace(TRACE_0, "\nnet is controllable: ");
+    trace( "\nnet is controllable: ");
     if (graph->hasNoRoot() || graph->getRoot()->getColor()==RED) {
-        trace(TRACE_0, "NO\n\n");
+        trace( "NO\n\n");
     } else {
-        trace(TRACE_0, "YES\n\n");
+        trace( "YES\n\n");
         controllable = true;
     }
 
     // print statistics
-    trace(TRACE_0, "OG statistics:\n");
+    trace( "OG statistics:\n");
     graph->printGraphStatistics();
-    trace(TRACE_0, "\n");
+    trace( "\n");
 
     // switch to publicview generation if the mode is PV
     if (parameters[P_PV]) {
@@ -855,7 +851,7 @@ string computeOG(oWFN* PN) {
     if (!options[O_NOOUTPUTFILES]) {
         // distributed controllability?
         if (parameters[P_DISTRIBUTED]) {
-            trace(TRACE_0, "\nannotating OG for distributed controllability\n");
+            trace( "\nannotating OG for distributed controllability\n");
 
             bool graphChanged = true;
             while (graphChanged) {
@@ -866,11 +862,11 @@ string computeOG(oWFN* PN) {
 
             parameters[P_SHOW_EMPTY_NODE] = false;
 
-            trace(TRACE_0, "\nnet is distributedly controllable: ");
+            trace( "\nnet is distributedly controllable: ");
             if (graph->getRoot()->getColor() == BLUE) {
-                trace(TRACE_0, "MAYBE\n\n");
+                trace( "MAYBE\n\n");
             } else {
-                trace(TRACE_0, "NO\n\n");
+                trace( "NO\n\n");
                 parameters[P_SHOW_ALL_NODES] = true;
             }
         }
@@ -906,7 +902,7 @@ string computeOG(oWFN* PN) {
     }
 
     if (options[O_BDD]) {
-        trace(TRACE_0, "\nbuilding the BDDs...\n");
+        trace( "\nbuilding the BDDs...\n");
         seconds = time (NULL);
         graph->convertToBdd();
         seconds2 = time (NULL);
@@ -918,15 +914,15 @@ string computeOG(oWFN* PN) {
         }
     }
 
-    trace(TRACE_5, "computation finished -- trying to delete graph\n");
+    TRACE(TRACE_5, "computation finished -- trying to delete graph\n");
     graph->clearNodeSet();
     delete graph;
     graph = NULL;
-    trace(TRACE_5, "graph deleted\n");
+    TRACE(TRACE_5, "graph deleted\n");
 
-    // trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
-    trace(TRACE_0, "=================================================================\n");
-    trace(TRACE_0, "\n");
+    // trace( "HIT A KEY TO CONTINUE"); getchar();
+    trace( "=================================================================\n");
+    trace( "\n");
 
     return ogFilename;
 }
@@ -993,14 +989,14 @@ void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 //! \param PN an oWFN to matched against an og
 void checkMatching(AnnotatedGraph* OGToMatch, oWFN* PN) {
     string reasonForFailedMatch;
-    trace(TRACE_0, ("matching " + PN->filename + " with " + (OGToMatch->getFilename())+ "...\n\n"));
+    trace( ("matching " + PN->filename + " with " + (OGToMatch->getFilename())+ "...\n\n"));
     if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
-        trace(TRACE_1, "\n");
-        trace(TRACE_0, "oWFN matches with OG: YES\n\n");
+        TRACE(TRACE_1, "\n");
+        trace( "oWFN matches with OG: YES\n\n");
     } else {
-        trace(TRACE_1, "\n");
-        trace(TRACE_0, "Match failed: " +reasonForFailedMatch + "\n\n");
-        trace(TRACE_0, "oWFN matches with OG: NO\n\n");
+        TRACE(TRACE_1, "\n");
+        trace( "Match failed: " +reasonForFailedMatch + "\n\n");
+        trace( "oWFN matches with OG: NO\n\n");
     }
 }
 
@@ -1054,60 +1050,60 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
         // get the net into variable PN
         readnet(currentowfnfile);
-        trace(TRACE_0, "=================================================================\n");
-        trace(TRACE_0, "processing net " + currentowfnfile + "\n");
+        trace( "=================================================================\n");
+        trace( "processing net " + currentowfnfile + "\n");
         reportNet();
         delete PlaceTable;
 
         // compute OG
         OG* graph = new OG(PN);
 
-        trace(TRACE_0, "building the operating guideline...\n");
+        trace( "building the operating guideline...\n");
         graph->printProgressFirst();
 
         seconds = time(NULL);
 
-        trace(TRACE_1, "Building the graph...\n");
+        TRACE(TRACE_1, "Building the graph...\n");
         buildGraphTime1 = time(NULL);
         graph->buildGraph(); // build operating guideline
         buildGraphTime2 = time(NULL);
-        trace(TRACE_1, "finished building the graph\n");
-        trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n");
+        TRACE(TRACE_1, "finished building the graph\n");
+        TRACE(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n");
 
-        trace(TRACE_1, "computing graph statistics...\n");
+        TRACE(TRACE_1, "computing graph statistics...\n");
         graphStatsTime1 = time(NULL);
         graph->computeGraphStatistics();
         graphStatsTime2 = time(NULL);
-        trace(TRACE_1, "finished computing graph statistics\n");
-        trace(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n");
+        TRACE(TRACE_1, "finished computing graph statistics\n");
+        TRACE(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n");
 
 
         if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
-            trace(TRACE_1, "removing false nodes...\n");
+            TRACE(TRACE_1, "removing false nodes...\n");
             removeFalseNodesTime1 = time(NULL);
             graph->removeReachableFalseNodes();
             removeFalseNodesTime2 = time(NULL);
-            trace(TRACE_1, "finished removing false nodes\n");
-            trace(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n");
+            TRACE(TRACE_1, "finished removing false nodes\n");
+            TRACE(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n");
 
-            trace(TRACE_1, "removing unreachable nodes...\n");
+            TRACE(TRACE_1, "removing unreachable nodes...\n");
             removeUnreachableNodesTime1 = time(NULL);
             graph->removeUnreachableNodes();
             removeUnreachableNodesTime2 = time(NULL);
-            trace(TRACE_1, "finished removing unreachable nodes\n");
-            trace(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n");
+            TRACE(TRACE_1, "finished removing unreachable nodes\n");
+            TRACE(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n");
         }
 
 
         seconds2 = time(NULL);
 
-        trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
-        trace(TRACE_0, "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n");
+        trace( "\nbuilding the operating guideline finished.\n");
+        trace( "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n");
 
         // print statistics
-        trace(TRACE_0, "OG statistics:\n");
+        trace( "OG statistics:\n");
         graph->printGraphStatistics();
-        trace(TRACE_0, "\n");
+        trace( "\n");
 
         // add new OG to the list
         if (!OGfirst && netfiles.size() == 1) {
@@ -1135,26 +1131,26 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
     seconds = time (NULL);
 
-    trace(TRACE_0, "\n=================================================================\n");
-    trace(TRACE_0, "checking whether " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + "...\n\n");
+    trace( "\n=================================================================\n");
+    trace( "checking whether " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + "...\n\n");
     if (firstOG->simulates(secondOG)) {
-        trace(TRACE_1, "result: simulation holds: YES\n\n");
-        trace(TRACE_0, "The first OG characterizes all strategies of the second one.\n\n");
+        TRACE(TRACE_1, "result: simulation holds: YES\n\n");
+        trace( "The first OG characterizes all strategies of the second one.\n\n");
     } else {
-        trace(TRACE_1, "result: simulation holds: NO\n\n");
-        trace(TRACE_0, "The second OG characterizes at least one strategy that is\n");
-        trace(TRACE_0, "not characterized by the first one.\n\n");
+        TRACE(TRACE_1, "result: simulation holds: NO\n\n");
+        trace( "The second OG characterizes at least one strategy that is\n");
+        trace( "not characterized by the first one.\n\n");
     }
 
     seconds2 = time (NULL);
     cout << "    " << difftime(seconds2, seconds) << " s consumed for checking equivalence" << endl << endl;
 
     if (!calledWithNet) {
-        trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
-        trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
+        trace( "Attention: This result is only valid if the given OGs are complete\n");
+        trace( "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
     } else if (netfiles.size() == 1) {
-        trace(TRACE_0, "Attention: This result is only valid if the given OG is complete\n");
-        trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
+        trace( "Attention: This result is only valid if the given OG is complete\n");
+        trace( "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
     }
 
     deleteOGs(OGsFromFiles);
@@ -1216,8 +1212,8 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
         // get the net into variable PN
         readnet(currentowfnfile);
-        trace(TRACE_0, "=================================================================\n");
-        trace(TRACE_0, "processing net " + currentowfnfile + "\n");
+        trace( "=================================================================\n");
+        trace( "processing net " + currentowfnfile + "\n");
         reportNet();
         delete PlaceTable;
 
@@ -1226,55 +1222,55 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         // compute OG
         OG* graph = new OG(PN);
 
-        trace(TRACE_0, "building the operating guideline...\n");
+        trace( "building the operating guideline...\n");
         graph->printProgressFirst();
 
         seconds = time(NULL);
 
-        trace(TRACE_1, "Building the graph...\n");
+        TRACE(TRACE_1, "Building the graph...\n");
         buildGraphTime1 = time(NULL);
         graph->buildGraph(); // build operating guideline
         buildGraphTime2 = time(NULL);
-        trace(TRACE_1, "finished building the graph\n");
-        trace(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n\n");
+        TRACE(TRACE_1, "finished building the graph\n");
+        TRACE(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n\n");
 
-        trace(TRACE_1, "computing graph statistics...\n");
+        TRACE(TRACE_1, "computing graph statistics...\n");
         graphStatsTime1 = time(NULL);
         graph->computeGraphStatistics();
         graphStatsTime2 = time(NULL);
-        trace(TRACE_1, "finished computing graph statistics\n");
-        trace(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n\n");
+        TRACE(TRACE_1, "finished computing graph statistics\n");
+        TRACE(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n\n");
 
 
         if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
-            trace(TRACE_1, "removing false nodes...\n");
+            TRACE(TRACE_1, "removing false nodes...\n");
             removeFalseNodesTime1 = time(NULL);
             graph->removeReachableFalseNodes();
             removeFalseNodesTime2 = time(NULL);
-            trace(TRACE_1, "finished removing false nodes\n");
-            trace(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n\n");
+            TRACE(TRACE_1, "finished removing false nodes\n");
+            TRACE(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n\n");
 
-            trace(TRACE_1, "removing unreachable nodes...\n");
+            TRACE(TRACE_1, "removing unreachable nodes...\n");
             removeUnreachableNodesTime1 = time(NULL);
             graph->removeUnreachableNodes();
             removeUnreachableNodesTime2 = time(NULL);
-            trace(TRACE_1, "finished removing unreachable nodes\n");
-            trace(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n\n");
+            TRACE(TRACE_1, "finished removing unreachable nodes\n");
+            TRACE(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n\n");
         }
 
 
         seconds2 = time(NULL);
 
-        trace(TRACE_0, "\nbuilding the operating guideline finished.\n");
-        trace(TRACE_0, "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n\n");
+        trace( "\nbuilding the operating guideline finished.\n");
+        trace( "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n\n");
 
         seconds2 = time (NULL);
         cout << "    " << difftime(seconds2, seconds) << " s consumed for building graph" << endl << endl;
 
         // print statistics
-        trace(TRACE_0, "OG statistics:\n");
+        trace( "OG statistics:\n");
         graph->printGraphStatistics();
-        trace(TRACE_0, "\n");
+        trace( "\n");
 
         // add new OG to the list
         if (!OGfirst && netfiles.size() == 1) {
@@ -1287,8 +1283,8 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         netiter++;
     }
 
-    trace(TRACE_0, "=================================================================\n");
-    trace(TRACE_0, "\n\nchecking equivalence of the OGs...\n");
+    trace( "=================================================================\n");
+    trace( "\n\nchecking equivalence of the OGs...\n");
 
     AnnotatedGraph::ogs_t::const_iterator currentOGfile = OGsFromFiles.begin();
     AnnotatedGraph *firstOG = *currentOGfile;
@@ -1299,28 +1295,28 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
 
     seconds = time (NULL);
 
-    trace(TRACE_1, "checking whether " + firstOG->getFilename() + " is equivalent to " + secondOG->getFilename() + "\n");
+    TRACE(TRACE_1, "checking whether " + firstOG->getFilename() + " is equivalent to " + secondOG->getFilename() + "\n");
 
     // Check the equivalence
     bool areEquivalent = firstOG->isEquivalent(secondOG);
 
-    trace(TRACE_0, "\nresult: " + firstOG->getFilename() + " and " + secondOG->getFilename() + " are equivalent:");
+    trace( "\nresult: " + firstOG->getFilename() + " and " + secondOG->getFilename() + " are equivalent:");
 
     if (areEquivalent) {
-        trace(TRACE_0, " YES\n\n");
+        trace( " YES\n\n");
     } else {
-        trace(TRACE_0, " NO\n\n");
+        trace( " NO\n\n");
     }
 
     seconds2 = time (NULL);
     cout << "    " << difftime(seconds2, seconds) << " s consumed for checking equivalence" << endl << endl;
 
     if (!calledWithNet && !parameters[P_EQ_R]) {
-        trace(TRACE_0, "Attention: This result is only valid if the given OGs are complete\n");
-        trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
+        trace( "Attention: This result is only valid if the given OGs are complete\n");
+        trace( "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
     } else if (netfiles.size() == 1 && !parameters[P_EQ_R]) {
-        trace(TRACE_0, "Attention: This result is only valid if the given OG is complete\n");
-        trace(TRACE_0, "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
+        trace( "Attention: This result is only valid if the given OG is complete\n");
+        trace( "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
     }
 
     deleteOGs(OGsFromFiles);
@@ -1331,7 +1327,7 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
 //! \param PN an oWFN to generate a PNG from
 void makePNG(oWFN* PN) {
 
-    trace(TRACE_1, "Internal translation of the net into PNapi format...\n");
+    TRACE(TRACE_1, "Internal translation of the net into PNapi format...\n");
 
     // translate the net into PNapi format
     PNapi::PetriNet* PNapiNet = PN->returnPNapiNet();
@@ -1367,7 +1363,7 @@ void makePNG(oWFN* PN) {
 
         // check whether the stream was succesfully created
         if (!out->is_open()) {
-            trace(TRACE_0, "File \"" + dotFileName + "\" could not be opened for writing access!\n");
+            trace( "File \"" + dotFileName + "\" could not be opened for writing access!\n");
            exit(EC_FILE_ERROR);
         }
 
@@ -1384,9 +1380,9 @@ void makePNG(oWFN* PN) {
             // annotate .dot file
             int exitvalue = system(("dot -Tdot " + dotFileName + " -o " + outFileName + ".dot").c_str());
             if (exitvalue == 0) {
-                trace(TRACE_0, (outFileName + ".dot generated\n\n"));
+                trace( (outFileName + ".dot generated\n\n"));
             } else {
-                trace(TRACE_0, "error: Dot exited with non zero value! here\n\n");
+                trace( "error: Dot exited with non zero value! here\n\n");
                 exit(EC_DOT_ERROR);
             }
 
@@ -1398,9 +1394,9 @@ void makePNG(oWFN* PN) {
         int exitvalue = system(("dot -q -Tpng -o \"" + outFileName + ".png\" " + dotFileName).c_str());
 
         if (exitvalue == 0) {
-            trace(TRACE_0, (outFileName + ".png generated\n\n"));
+            trace( (outFileName + ".png generated\n\n"));
         } else {
-            trace(TRACE_0, "error: Dot exited with non zero value! dort\n\n" + intToString(exitvalue));
+            trace( "error: Dot exited with non zero value! dort\n\n" + intToString(exitvalue));
         }
     }
 }
@@ -1410,7 +1406,7 @@ void makePNG(oWFN* PN) {
 //! \param PN an oWFN to reduce
 void reduceOWFN(oWFN* PN) {
 
-    trace(TRACE_1, "Internal translation of the net into PNapi format...\n");
+    TRACE(TRACE_1, "Internal translation of the net into PNapi format...\n");
 
     // translate the net into PNapi format
     PNapi::PetriNet* PNapiNet = PN->returnPNapiNet();
@@ -1422,15 +1418,15 @@ void reduceOWFN(oWFN* PN) {
     // set the output format to dot
     PNapiNet->set_format(PNapi::FORMAT_OWFN, true);
 
-    trace(TRACE_1, "Performing structural reduction ...\n\n");
+    TRACE(TRACE_1, "Performing structural reduction ...\n\n");
 
     // calling the reduce function of the pnapi with reduction level 5
     PNapiNet->reduce(globals::reduction_level);
 
     // Statistics of the reduced oWFN
-    trace(TRACE_0, "Reduced oWFN statistics:\n");
+    trace( "Reduced oWFN statistics:\n");
     trace(PNapiNet->information());
-    trace(TRACE_0, "\n\n");
+    trace( "\n\n");
 
     string outFileName;
 
@@ -1463,10 +1459,10 @@ void reduceOWFN(oWFN* PN) {
 //! \param PN an oWFN to normalize
 void normalizeOWFN(oWFN* PN) {
 
-    trace(TRACE_5, "void normalizeOWFN(oWFN*) : start\n");
+    TRACE(TRACE_5, "void normalizeOWFN(oWFN*) : start\n");
 
     // normalize
-    trace(TRACE_0, "Performing normalization ...\n\n");
+    trace( "Performing normalization ...\n\n");
     oWFN* normalOWFN = PN->returnNormalOWFN();
 
 
@@ -1478,9 +1474,9 @@ void normalizeOWFN(oWFN* PN) {
 
 
     // Statistics of the reduced oWFN
-    trace(TRACE_0, "Normalized oWFN statistics:\n");
+    trace( "Normalized oWFN statistics:\n");
     trace(PNapiNet->information());
-    trace(TRACE_0, "\n\n");
+    trace( "\n\n");
 
 
     // create the output
@@ -1508,7 +1504,7 @@ void normalizeOWFN(oWFN* PN) {
     delete PNapiNet;
     delete normalOWFN;
 
-    trace(TRACE_5, "void normalizeOWFN(oWFN*) : end\n");
+    TRACE(TRACE_5, "void normalizeOWFN(oWFN*) : end\n");
 }
 
 
@@ -1521,7 +1517,7 @@ void countStrategies(AnnotatedGraph* OG, string graphName) {
     trace(graphName);
     trace("\n");
 
-    trace(TRACE_1, "Checking if the OG is acyclic\n");
+    TRACE(TRACE_1, "Checking if the OG is acyclic\n");
 
     if (OG->isAcyclic()) {
 
@@ -1560,7 +1556,7 @@ void checkAcyclicity(AnnotatedGraph* OG, string graphName) {
     trace(graphName);
     trace("\n");
 
-    trace(TRACE_1, "Checking if the OG is acyclic\n");
+    TRACE(TRACE_1, "Checking if the OG is acyclic\n");
 
     if (OG->isAcyclic()) {
         trace("The given OG is acyclic\n\n");
@@ -1630,8 +1626,8 @@ int main(int argc, char** argv) {
 #endif
 
 /*        if (parameters[P_READ_OG]) {
-            trace(TRACE_0, "OG was read from file\n");
-            trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+            trace( "OG was read from file\n");
+            trace( "HIT A KEY TO CONTINUE"); getchar();
 
             // only print OG size information
 #ifdef LOG_NEW
@@ -1723,15 +1719,15 @@ int main(int argc, char** argv) {
             else if (parameters[P_MINIMIZE_OG]) {
                 // minimizes a given OG
 
-                trace(TRACE_0, "=================================================================\n");
-                trace(TRACE_0, "processing OG " + readOG->getFilename() + "\n");
+                trace( "=================================================================\n");
+                trace( "processing OG " + readOG->getFilename() + "\n");
                 readOG->computeAndPrintGraphStatistics();
                 trace("\n");
 
                 //readOG->removeReachableFalseNodes();
                 readOG->minimizeGraph();
 
-                trace(TRACE_0, "size after minimization:\n");
+                trace( "size after minimization:\n");
                 readOG->computeAndPrintGraphStatistics();
                 trace("\n");
 
@@ -1755,7 +1751,7 @@ int main(int argc, char** argv) {
                     createOutputFiles(readOG, ogFilename);
                 }
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                trace(TRACE_0, "=================================================================\n");
+                trace( "=================================================================\n");
                 trace("\n");
                 delete readOG;
             }
@@ -1780,27 +1776,27 @@ int main(int argc, char** argv) {
             // [LUHME XV] Raus?
             else if (parameters[P_CHECK_FALSE_NODES]) {
                 // checks if there are nodes in the og which violate the annotation
-                trace(TRACE_0, "Checking '" + readOG->getFilename() + "' ");
-                trace(TRACE_0, "for nodes with false annotation...");
+                trace( "Checking '" + readOG->getFilename() + "' ");
+                trace( "for nodes with false annotation...");
 
                 std::vector<AnnotatedGraphNode*> falseNodes;
                 readOG->findFalseNodes(&falseNodes);
 
                 if (falseNodes.size() == 0) {
-                    trace(TRACE_0, "\n     No nodes with false annotation found!");
+                    trace( "\n     No nodes with false annotation found!");
                 } else {
-                    trace(TRACE_0, "\n     Node(s) with false annotation found!");
+                    trace( "\n     Node(s) with false annotation found!");
                     std::vector<AnnotatedGraphNode*>::iterator it = falseNodes.begin();
 
                     while (it != falseNodes.end()) {
                         AnnotatedGraphNode* currentNode = *it;
-                        trace(TRACE_1, "\n         Node '" + currentNode->getName() + "' violates its annotation. ");
-                        trace(TRACE_2, "\n             Annotation is: " + currentNode->getAnnotationAsString());
+                        TRACE(TRACE_1, "\n         Node '" + currentNode->getName() + "' violates its annotation. ");
+                        TRACE(TRACE_2, "\n             Annotation is: " + currentNode->getAnnotationAsString());
                         ++it;
                     }
                 }
 
-                trace(TRACE_0, "\n\n");
+                trace( "\n\n");
                 delete readOG;
             }
 
@@ -1819,19 +1815,19 @@ int main(int argc, char** argv) {
                     readOG->computeAndPrintGraphStatistics();
                 }
 
-                trace(TRACE_0, "Removing nodes from '" + readOG->getFilename() + "' ");
-                trace(TRACE_0, "that violate their own annotation...\n");
+                trace( "Removing nodes from '" + readOG->getFilename() + "' ");
+                trace( "that violate their own annotation...\n");
                 seconds = time(NULL);
                 readOG->removeReachableFalseNodes();
                 seconds2 = time(NULL);
-                trace(TRACE_0, "Removed all nodes with false annotation.\n");
+                trace( "Removed all nodes with false annotation.\n");
                 cout << "    " << difftime(seconds2, seconds) << " s consumed for removing reachable false nodes" << endl << endl;
 
-                trace(TRACE_0, "Removing unreachable nodes from '" + readOG->getFilename() + "' \n");
+                trace( "Removing unreachable nodes from '" + readOG->getFilename() + "' \n");
                 seconds = time(NULL);
                 readOG->removeUnreachableNodes();
                 seconds2 = time(NULL);
-                trace(TRACE_0, "Removed all unreachable nodes.\n");
+                trace( "Removed all unreachable nodes.\n");
                 cout << "    " << difftime(seconds2, seconds) << " s consumed removing unreachable nodes" << endl << endl;
 
                 if (TRACE_1 <= debug_level) {
@@ -1839,10 +1835,10 @@ int main(int argc, char** argv) {
                 }
 
                 if (!options[O_NOOUTPUTFILES]) {
-                    trace(TRACE_0, "\nCreating new .og-file without false nodes... \n");
+                    trace( "\nCreating new .og-file without false nodes... \n");
                     // the second parameter is false, since the read OG has no underlying oWFN
                     readOG->createOGFile(newFilename, false);
-                    trace(TRACE_0, "New .og-file '" + newFilename + ".og' successfully created.\n\n");
+                    trace( "New .og-file '" + newFilename + ".og' successfully created.\n\n");
                 }
 
                 delete readOG;
@@ -1851,16 +1847,16 @@ int main(int argc, char** argv) {
 
             // [LUHME XV] Parameter in "P_READ_OG_ONLY" umbenennen
             else if (parameters[P_READ_OG]) {
-                trace(TRACE_0, "OG was read from file '" + readOG->getFilename() + "'\n");
+                trace( "OG was read from file '" + readOG->getFilename() + "'\n");
                 readOG->computeAndPrintGraphStatistics();
-                trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
-                trace(TRACE_0, "\n");
+                trace( "HIT A KEY TO CONTINUE"); getchar();
+                trace( "\n");
                 delete readOG;
             }
 
             else if (parameters[P_PNG]) {
-                trace(TRACE_0, "=================================================================\n");
-                trace(TRACE_0, "Processing OG " + readOG->getFilename() + "\n");
+                trace( "=================================================================\n");
+                trace( "Processing OG " + readOG->getFilename() + "\n");
                 readOG->computeAndPrintGraphStatistics();
                 string newFilename;
                 if (options[O_OUTFILEPREFIX]) {
@@ -1869,7 +1865,7 @@ int main(int argc, char** argv) {
                     newFilename = readOG->getFilename();
                 }
                 createOutputFiles(readOG, newFilename);
-                trace(TRACE_0, (newFilename + ".png generated\n\n"));
+                trace( (newFilename + ".png generated\n\n"));
                 delete readOG;
             }
         }
@@ -1914,11 +1910,11 @@ int main(int argc, char** argv) {
         // [LUHME XV] Ausgabe "YES"/"NO" in og->check() auslagern?
         // [LUHME XV] "check" in "checkEquivalence" umbenennen?
         // [LUHME XV] Variablennamen ändern; irgendwas mit "BDD-OG"
-        trace(TRACE_0, "The two operating guidelines are equal: ");
+        trace( "The two operating guidelines are equal: ");
         if (og1->check(og2) == true) {
-            trace(TRACE_0, "YES\n\n");
+            trace( "YES\n\n");
         } else {
-            trace(TRACE_0, "NO\n\n");
+            trace( "NO\n\n");
         }
         // return 0;
     }
@@ -1967,8 +1963,8 @@ int main(int argc, char** argv) {
                 PlaceTable = new SymbolTab<PlSymbol>;
 
                 // [LUHME XV] readnet() und reportNet() als Members der Klasse "oWFN"
-                trace(TRACE_0, "=================================================================\n");
-                trace(TRACE_0, "processing net " + currentowfnfile + "\n");
+                trace( "=================================================================\n");
+                trace( "processing net " + currentowfnfile + "\n");
                 // get the net
                 // [LUHME XV] Wo kommt "PN" her? Wird unten gebraucht aber vom Parser initialisiert... WTF
                 readnet(currentowfnfile);
@@ -2045,7 +2041,7 @@ int main(int argc, char** argv) {
                 }
 
                 //delete PN;
-                //trace(TRACE_5, "net deleted\n");
+                //TRACE(TRACE_5, "net deleted\n");
             }
 
             // in case the option -t eqR is set, check equivalence for both computed graphs

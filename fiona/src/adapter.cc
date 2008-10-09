@@ -56,22 +56,22 @@ std::map< std::string, unsigned int > rulesPerChannel;	// from parser: number of
 //! \brief a basic constructor of Adapter
 Adapter::Adapter()
 {
-    trace(TRACE_5, "Adapter::Adapter() : start\n");
+    TRACE(TRACE_5, "Adapter::Adapter() : start\n");
 	
     // initialize member variables
 	
-    trace(TRACE_5, "Adapter::Adapter() : end\n");
+    TRACE(TRACE_5, "Adapter::Adapter() : end\n");
 }
 
 
 //! \brief a basic destructor of Adapter
 Adapter::~Adapter()
 {
-    trace(TRACE_5, "Adapter::~Adapter() : start\n");
+    TRACE(TRACE_5, "Adapter::~Adapter() : start\n");
 	
     // delete member variables
 	
-    trace(TRACE_5, "Adapter::~Adapter() : end\n");
+    TRACE(TRACE_5, "Adapter::~Adapter() : end\n");
 }
 
 
@@ -84,7 +84,7 @@ ostream * Adapter::openOutput(string name)
   ofstream * file = new ofstream(name.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
 
   if (!file->is_open())
-  trace(TRACE_0, "File \"" + name + "\" could not be opened for writing access!\n");
+  trace( "File \"" + name + "\" could not be opened for writing access!\n");
 
   return file;
 }
@@ -111,7 +111,7 @@ void Adapter::outputPNasOWFN(PNapi::PetriNet * petrinet, string prefix)
 {
     ostream * output = openOutput(prefix + ".owfn");
 	
-    trace(TRACE_1, "-> Printing Petri net " + prefix + " as oWFN ...\n");
+    TRACE(TRACE_1, "-> Printing Petri net " + prefix + " as oWFN ...\n");
     petrinet->set_format(PNapi::FORMAT_OWFN);
     (*output) << *petrinet;
 
@@ -129,15 +129,15 @@ void Adapter::outputPNasPNG(PNapi::PetriNet * petrinet, string prefix)
 	{
 	    ostream * output = openOutput(prefix + ".dot");
 	    
-	    trace(TRACE_1, "-> Printing Petri net " + prefix + " as PNG ...\n");
+	    TRACE(TRACE_1, "-> Printing Petri net " + prefix + " as PNG ...\n");
 	    petrinet->set_format(PNapi::FORMAT_DOT);
 	    (*output) << *petrinet;
 	
 	    closeOutput(output);
 	    
 		string systemcall = "dot -q -Tpng -o\"" + prefix + ".png\" \"" + prefix + ".dot\"";
-		trace(TRACE_1, "Invoking dot with the following options:\n");
-		trace(TRACE_1, systemcall + "\n\n");
+		TRACE(TRACE_1, "Invoking dot with the following options:\n");
+		TRACE(TRACE_1, systemcall + "\n\n");
 		system(systemcall.c_str());
 	}
 }
@@ -170,8 +170,8 @@ PNapi::PetriNet * Adapter::readService(std::string filename, std::string & netna
     	netname = netname.substr(netname.find_last_of("\\") + 1);
     }
     assert(netname != "");
-    trace(TRACE_1, "-> reading net:\t\t" + filename + "\n");
-    trace(TRACE_1, "netname:\t\t" + netname + "\n");
+    TRACE(TRACE_1, "-> reading net:\t\t" + filename + "\n");
+    TRACE(TRACE_1, "netname:\t\t" + netname + "\n");
     
     
     // get oWFN into variable PN, convert it to petrinet and stores it in serviceList
@@ -201,8 +201,8 @@ PNapi::PetriNet * Adapter::readControl(std::string composedNetName)
     // compose control filename
     assert(composedNetName != "");
     std::string filename = composedNetName + "-partner.owfn";
-    trace(TRACE_1, "-> reading net:\t\t" + filename + "\n");
-    trace(TRACE_1, "composedNetName:\t" + composedNetName + "\n\n");
+    TRACE(TRACE_1, "-> reading net:\t\t" + filename + "\n");
+    TRACE(TRACE_1, "composedNetName:\t" + composedNetName + "\n\n");
 	
     
     // get control oWFN into variable PN and convert it to petrinet
@@ -315,12 +315,12 @@ void Adapter::readRules(PNapi::PetriNet * rewriter)
         bool conflictfree = (rule->first.size() > 0) ? true : false;
         PNapi::Transition * t = rewriter->newTransition("rule" + toString(ruleNr));
         
-        trace(TRACE_1, "handling rule:\t");
+        TRACE(TRACE_1, "handling rule:\t");
         
         // handle first channel list of current adapter rule
         for(list< string >::iterator channel = rule->first.begin(); channel != rule->first.end(); channel++)
         {
-            trace(TRACE_1, *channel + " ");
+            TRACE(TRACE_1, *channel + " ");
             if (rulesPerChannel[*channel] > 1)
             {
                 conflictfree = false;
@@ -347,10 +347,10 @@ void Adapter::readRules(PNapi::PetriNet * rewriter)
 
         
         // handle second channel list of current adapter rule
-        trace(TRACE_1, " -> ");
+        TRACE(TRACE_1, " -> ");
         for(list< string >::iterator channel = rule->second.begin(); channel != rule->second.end(); channel++)
         {
-            trace(TRACE_1, *channel + " ");
+            TRACE(TRACE_1, *channel + " ");
         	
 	    PNapi::Place * p  = rewriter->findPlace(*channel + "_internal");
                     
@@ -363,18 +363,18 @@ void Adapter::readRules(PNapi::PetriNet * rewriter)
             rewriter->newArc(t, p);
         }
         
-        trace(TRACE_1, "\n");
+        TRACE(TRACE_1, "\n");
         
         ruleNr++;
     }
-    trace(TRACE_1, "\n");
+    TRACE(TRACE_1, "\n");
 }
 
 
 //! \brief main function for generating adapter
 void Adapter::generateAdapter()
 {
-    trace(TRACE_5, "generateAdapter() : start\n");
+    TRACE(TRACE_5, "generateAdapter() : start\n");
     
     extern list<std::string> netfiles;		// list of all input (owfn) files
     
@@ -391,9 +391,9 @@ void Adapter::generateAdapter()
     secondsBefor = time(NULL);
     for(list<std::string>::iterator netiter = netfiles.begin(); netiter != netfiles.end(); netiter++)
     {
-    	trace(TRACE_1, "=================================================================\n");
-    	trace(TRACE_1, "reading service\n");
-    	trace(TRACE_1, "=================================================================\n");
+    	TRACE(TRACE_1, "=================================================================\n");
+    	TRACE(TRACE_1, "reading service\n");
+    	TRACE(TRACE_1, "=================================================================\n");
     	
     	std::string currentNetname = "";
         PNapi::PetriNet * currentPN = readService( *netiter, currentNetname );
@@ -401,7 +401,7 @@ void Adapter::generateAdapter()
         assert(currentNetname != "");
         
         combinedPrefixes += ( currentNetname + "_" );
-        trace(TRACE_1, "combinedPrefixes:\t" + combinedPrefixes + "\n\n");
+        TRACE(TRACE_1, "combinedPrefixes:\t" + combinedPrefixes + "\n\n");
         currentPN->addPrefix(currentNetname + "_", true);
         serviceList.push_back(currentPN);
 //    	outputPNasPNG( currentPN, currentNetname );				// as test
@@ -413,9 +413,9 @@ void Adapter::generateAdapter()
     
     
     // read given rules
-    trace(TRACE_1, "=================================================================\n");
-    trace(TRACE_1, "reading rules\n");
-    trace(TRACE_1, "=================================================================\n");
+    TRACE(TRACE_1, "=================================================================\n");
+    TRACE(TRACE_1, "reading rules\n");
+    TRACE(TRACE_1, "=================================================================\n");
 	
     readRules(adapterRewriter);
 //    outputPNasPNG(adapterRewriter, combinedPrefixes + "rewriter-complete");	// as test
@@ -426,9 +426,9 @@ void Adapter::generateAdapter()
     
     
     // compose adapter rules and given services for computing adapter control with fiona
-    trace(TRACE_1, "=================================================================\n");
-    trace(TRACE_1, "computing adapter\n");
-    trace(TRACE_1, "=================================================================\n");
+    TRACE(TRACE_1, "=================================================================\n");
+    TRACE(TRACE_1, "computing adapter\n");
+    TRACE(TRACE_1, "=================================================================\n");
 	
     adapterComposed = new PNapi::PetriNet(*adapterRewriter);
     adapterComposed->addPrefix("adapter_");
@@ -450,8 +450,8 @@ void Adapter::generateAdapter()
 	string systemcall = (parameters[P_SMALLADAPTER]) ?
 		"fiona -t smallpartner -r -m" + toString(messages_manual) + " " + combinedPrefixes + "composed.owfn" :
 		"fiona -t mostpermissivepartner -m" + toString(messages_manual) + " " + combinedPrefixes + "composed.owfn";
-    trace(TRACE_1, "Invoking fiona with the following options:\n");
-    trace(TRACE_1, systemcall + "\n\n");
+    TRACE(TRACE_1, "Invoking fiona with the following options:\n");
+    TRACE(TRACE_1, systemcall + "\n\n");
     system(systemcall.c_str());
     secondsAfter = time(NULL);
     cerr << endl << difftime(secondsAfter, secondsBefor) << " s consumed for building controller" << endl << endl;
@@ -479,5 +479,5 @@ void Adapter::generateAdapter()
     delete adapterComposed;
     delete adapterControl;
 
-    trace(TRACE_5, "generateAdapter() : end\n");
+    TRACE(TRACE_5, "generateAdapter() : end\n");
 }

@@ -158,7 +158,7 @@ GraphNode::GraphNode(const std::string& _name,
 //! \brief destructor
 GraphNode::~GraphNode() {
     
-    trace(TRACE_5, "GraphNode::~GraphNode() : start\n");
+    TRACE(TRACE_5, "GraphNode::~GraphNode() : start\n");
     
     LeavingEdges::ConstIterator iEdge = getLeavingEdgesConstIterator();
     while (iEdge->hasNext()) {
@@ -177,7 +177,7 @@ GraphNode::~GraphNode() {
     
     numberDeletedVertices++;
     
-    trace(TRACE_5, "GraphNode::~GraphNode() : end\n");
+    TRACE(TRACE_5, "GraphNode::~GraphNode() : end\n");
 }
 
 

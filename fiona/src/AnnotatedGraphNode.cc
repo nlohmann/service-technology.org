@@ -38,6 +38,7 @@
 #include "mynew.h"
 #include "AnnotatedGraphNode.h"
 #include "options.h"
+#include "debug.h"
 #include <cassert>
 
 using namespace std;
@@ -73,7 +74,7 @@ AnnotatedGraphNode::AnnotatedGraphNode(const std::string& _name,
 //! \brief destructor
 AnnotatedGraphNode::~AnnotatedGraphNode() {
 
-    trace(TRACE_5, "AnnotatedGraphNode::~AnnotatedGraphNode() : start\n");
+    TRACE(TRACE_5, "AnnotatedGraphNode::~AnnotatedGraphNode() : start\n");
 
     LeavingEdges::ConstIterator iEdge = getLeavingEdgesConstIterator();
     while (iEdge->hasNext()) {
@@ -84,7 +85,7 @@ AnnotatedGraphNode::~AnnotatedGraphNode() {
 
     delete annotation;
 
-    trace(TRACE_5, "AnnotatedGraphNode::~AnnotatedGraphNode() : end\n");
+    TRACE(TRACE_5, "AnnotatedGraphNode::~AnnotatedGraphNode() : end\n");
 }
 
 
@@ -409,10 +410,10 @@ void AnnotatedGraphNode::removeEdgesToNode(const AnnotatedGraphNode* nodeToDelet
 //! \brief analyses the node and sets its color
 void AnnotatedGraphNode::analyseNode(bool ignoreFinal) {
     
-    trace(TRACE_5, "AnnotatedGraphNode::analyseNodeByFormula() : start\n");
+    TRACE(TRACE_5, "AnnotatedGraphNode::analyseNodeByFormula() : start\n");
     
-    trace(TRACE_3, "\t\t\t analysing node ");
-    trace(TRACE_3, this->getName() + "...\n");
+    TRACE(TRACE_3, "\t\t\t analysing node ");
+    TRACE(TRACE_3, this->getName() + "...\n");
     assert(this->getColor() == BLUE);
     
     // computing the assignment given by outgoing edges (to blue nodes)
@@ -441,28 +442,28 @@ void AnnotatedGraphNode::analyseNode(bool ignoreFinal) {
     delete myassignment;
     
     if (result) {
-        trace(TRACE_3, "\t\t\t node analysed blue, formula "
+        TRACE(TRACE_3, "\t\t\t node analysed blue, formula "
               + this->getAnnotation()->asString() + "\n");
         this->setColor(BLUE);
     } else {
-        trace(TRACE_3, "\t\t\t node analysed red, formula "
+        TRACE(TRACE_3, "\t\t\t node analysed red, formula "
               + this->getAnnotation()->asString() + "\n");
         this->setColor(RED);
     }
     
-    trace(TRACE_5, "AnnotatedGraphNode::analyseNodeByFormula() : end\n");
+    TRACE(TRACE_5, "AnnotatedGraphNode::analyseNodeByFormula() : end\n");
 }
 
 
 //! \brief removes the given literal from this node's annotation
 //! \param literal the literal which is to be removed
 void AnnotatedGraphNode::removeLiteralFromAnnotation(const std::string& literal) {
-    trace(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotation(const string& literal) : start\n");
+    TRACE(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotation(const string& literal) : start\n");
     
     //cout << "remove literal " << literal << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
     annotation->removeLiteral(literal);
     
-    trace(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotation(const string& literal) : end\n");
+    TRACE(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotation(const string& literal) : end\n");
 }
 
 
@@ -509,9 +510,9 @@ bool AnnotatedGraphNode::isToShow(const AnnotatedGraphNode* rootOfGraph, bool ha
 //! \return true iff the assignment satisfies the annotation
 bool AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const {
     
-    trace(TRACE_5, "AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const: start\n");
+    TRACE(TRACE_5, "AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const: start\n");
     assert(annotation != NULL);
-    trace(TRACE_5, "AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const: end\n");
+    TRACE(TRACE_5, "AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const: end\n");
     return annotation->satisfies(assignment);
 }
 
@@ -521,8 +522,8 @@ bool AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignm
 //! \return the assignment described above
 GraphFormulaAssignment* AnnotatedGraphNode::getAssignment() const {
     
-    trace(TRACE_5, "AnnotatedGraphNode::getAssignment(): start\n");
-    trace(TRACE_5, "computing annotation of node " + getName() + "\n");
+    TRACE(TRACE_5, "AnnotatedGraphNode::getAssignment(): start\n");
+    TRACE(TRACE_5, "computing annotation of node " + getName() + "\n");
     
     GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
     
@@ -539,7 +540,7 @@ GraphFormulaAssignment* AnnotatedGraphNode::getAssignment() const {
     // we assume that literal final is always true
     myassignment->setToTrue(GraphFormulaLiteral::FINAL);
     
-    trace(TRACE_5, "AnnotatedGraphNode::getAssignment(): end\n");
+    TRACE(TRACE_5, "AnnotatedGraphNode::getAssignment(): end\n");
     return myassignment;
 }
 
@@ -549,8 +550,8 @@ GraphFormulaAssignment* AnnotatedGraphNode::getAssignment() const {
 //! \param events set of string to fill
 void AnnotatedGraphNode::getEvents(set<string>& events) {
     
-    trace(TRACE_5, "AnnotatedGraphNode::getEvents(): start\n");
-    trace(TRACE_5, "computing annotation of node " + getName() + "\n");
+    TRACE(TRACE_5, "AnnotatedGraphNode::getEvents(): start\n");
+    TRACE(TRACE_5, "computing annotation of node " + getName() + "\n");
     
     // Adds all event-representing literals from the formula of the node
     // to the set of events
@@ -566,7 +567,7 @@ void AnnotatedGraphNode::getEvents(set<string>& events) {
     }
     delete edgeIter;
 
-    trace(TRACE_5, "AnnotatedGraphNode::getEvents(): end\n");
+    TRACE(TRACE_5, "AnnotatedGraphNode::getEvents(): end\n");
 }
 
 
@@ -611,7 +612,7 @@ PriorityMap::KeyType PriorityMap::pop() {
 
 void PriorityMap::adjustPM(oWFN * PN, const std::string & eventName) {
     
-    trace(TRACE_5, "PriorityMap::adjustPM(oWFN * PN, const std::string & eventName): start\n");
+    TRACE(TRACE_5, "PriorityMap::adjustPM(oWFN * PN, const std::string & eventName): start\n");
     
     MapClauseEvents::iterator iterClauses;
     set<std::string>::iterator iterLiterals;
@@ -653,7 +654,7 @@ void PriorityMap::adjustPM(oWFN * PN, const std::string & eventName) {
         pmClauseEvents.erase(*iterClausesToDelete);
     }
 
-    trace(TRACE_5, "PriorityMap::adjustPM(oWFN * PN, const std::string & eventName): end\n");
+    TRACE(TRACE_5, "PriorityMap::adjustPM(oWFN * PN, const std::string & eventName): end\n");
 }
 
 //! \brief Delivers the element from the priority map with the highest priority.
@@ -701,7 +702,7 @@ messageMultiSet PriorityMap::popIG() {
 //!        annotation will have a minimal priority.
 //! \param annotation the annotation, from which the priority map will be extracted.
 void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
-    trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation): start\n");
+    TRACE(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation): start\n");
 
     oWFN::Places_t::size_type i;
     KeyType key;
@@ -740,7 +741,7 @@ void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
         }
     }
 
-    trace(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation): end\n");
+    TRACE(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation): end\n");
 }
 
 //! \brief Fills the priority map according to the given annotation with interface places 
@@ -750,7 +751,7 @@ void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
 //! \param annotation the annotation, from which the priority map will be extracted.
 void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphFormulaCNF *annotation) {
     
-    trace(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation): start\n");
+    TRACE(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation): start\n");
 
     // just to remember which event we have considered already, 
     // needed for initialising the priority map correctly
@@ -806,7 +807,7 @@ void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphForm
         }
     }
 
-    trace(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation): end\n");
+    TRACE(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation): end\n");
 }
 
 //! \brief returns whether the priority map is empty

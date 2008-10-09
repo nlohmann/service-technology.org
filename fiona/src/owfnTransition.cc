@@ -236,7 +236,7 @@ void owfnTransition::initialize() {
 //! \param PN the owfn to be fired in
 void owfnTransition::fire(oWFN * PN) {
 
-    trace(TRACE_5, "owfnTransition::fire(oWFN * PN) : start\n");
+    TRACE(TRACE_5, "owfnTransition::fire(oWFN * PN) : start\n");
  
     for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i) {
         AdjacentPlace incrPlace = IncrPlaces[i];
@@ -304,7 +304,7 @@ void owfnTransition::fire(oWFN * PN) {
     //        }
     //    }
 
-    trace(TRACE_5, "owfnTransition::fire(oWFN * PN) : end\n");
+    TRACE(TRACE_5, "owfnTransition::fire(oWFN * PN) : end\n");
 }
 
 
@@ -374,7 +374,7 @@ void owfnTransition::backfire(oWFN * PN) {
 //! \param PN owfn this transition is part of
 //! \fn void owfnTransition::check_enabled(oWFN * PN)
 void owfnTransition::check_enabled(oWFN * PN) {
-    //   	trace(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : start\n");
+    //   	TRACE(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : start\n");
 
     messageSet.clear();
 
@@ -447,7 +447,7 @@ void owfnTransition::check_enabled(oWFN * PN) {
  //  cout << "current marking: " << PN->getCurrentMarkingAsString() << endl;
  //  cout << "transition " << name << "(" << this << ")" << " is quasiEnabled: " << isQuasiEnabled() << " and enabled: " << isEnabled() << endl;
 
-    // trace(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : end\n");
+    // TRACE(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : end\n");
 }
 
 

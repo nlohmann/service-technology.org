@@ -397,8 +397,7 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix,
 
 
 //! \brief creates all output files with respect to the parameters
-//! \param g An object of AnnotatedGraph, CommunicationGraph, IG or OG
-//! type.
+//! \param graph An object of AnnotatedGraph, CommunicationGraph, IG or OG
 void createOutputFiles(AnnotatedGraph* graph, string prefix) {
     if (!parameters[P_NODOT]) {
 
@@ -416,6 +415,7 @@ void createOutputFiles(AnnotatedGraph* graph, string prefix) {
         }
     }
 }
+
 
 //! \brief generate a public view for a given og
 //! \param OG an og to generate the public view of
@@ -1731,8 +1731,11 @@ int main(int argc, char** argv) {
                 //readOG->removeReachableFalseNodes();
                 readOG->minimizeGraph();
 
-                // [LUHME XV] WTF?
-		string ogFilename("");
+                trace(TRACE_0, "size after minimization:\n");
+                readOG->computeAndPrintGraphStatistics();
+                trace("\n");
+
+                string ogFilename("");
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 // generate output files

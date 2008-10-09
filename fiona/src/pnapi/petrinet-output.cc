@@ -353,7 +353,7 @@ string Transition::output_dot() const
 #ifdef USING_BPEL2OWFN
   string label = nodeShortName();
 #else
-  string label = nodeShortName();
+  string label = nodeName();
 #endif
   
   switch(type)

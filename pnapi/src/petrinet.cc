@@ -368,6 +368,8 @@ PetriNet::PetriNet(const PetriNet & net)
 
   nextId = net.nextId;
   format = FORMAT_OWFN;
+  invocation_string = net.invocation_string;
+  package_string = net.package_string;
 
   
   // transfer the the final place set list
@@ -500,6 +502,8 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
 
   nextId = net.nextId;
   format = FORMAT_OWFN;
+  invocation_string = net.invocation_string;
+  package_string = net.package_string;
 
   // add all internal places
   for (set< Place * >::iterator place = net.P.begin(); place != net.P.end(); place ++)
@@ -2407,22 +2411,20 @@ unsigned int PetriNet::push_forEach_suffix(string suffix)
   return forEach_suffix.size();
 }
 
-
-
-
-
 unsigned int PetriNet::pop_forEach_suffix()
 {
   forEach_suffix.pop_front();
   return forEach_suffix.size();
 }
 
+
+
 void PetriNet::setInvocation(std::string invokestr)
 {
 	invocation_string = invokestr;
 }
 
-std::string PetriNet::getInvocation()
+std::string PetriNet::getInvocation() const
 {
 	return invocation_string;
 }
@@ -2432,9 +2434,25 @@ void PetriNet::setPackageString(std::string packagestr)
 	package_string = packagestr;
 }
 
-std::string PetriNet::getPackageString()
+std::string PetriNet::getPackageString() const
 {
 	return package_string;
+}
+
+
+void PetriNet::makeInnerStructure()
+{
+	// deletes all IN-places
+	for(set<Place *>::iterator place = P_in.begin(); place != P_in.end(); place = P_in.begin())
+	{
+		this->removePlace(*place);
+	}
+	
+	// deletes all OUT-places
+	for(set<Place *>::iterator place = P_out.begin(); place != P_out.end(); place = P_out.begin())
+	{
+		this->removePlace(*place);
+	}
 }
 
 } /* namespace PNapi */

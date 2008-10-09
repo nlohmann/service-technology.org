@@ -517,14 +517,21 @@ class PetriNet
     /// conjunctive set of disjunctive place sets for simple final condition
     list< set< pair<Place *, unsigned int > > > final_set_list;
     
+    /// sets the invocation string
     void setInvocation(string);
     
-    string getInvocation();
+    /// returns the invokation string
+    string getInvocation() const;
     
+    /// sets the package string
     void setPackageString(string);
     
-    string getPackageString();
+    /// returns the package string
+    string getPackageString() const;
 
+    /// deletes all interface places
+    void makeInnerStructure();
+    
   private:
     /// removes a place from the net
     void removePlace(Place *p);

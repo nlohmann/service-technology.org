@@ -277,39 +277,59 @@ void reportOptionValues() {
         trace(TRACE_5, "no\n");
     }
 
+    // max_occurrence is set for each input/output place of the net in the owfn file
+    // syntax in the owfn file: 
+    //      abort {$ MAX_OCCURRENCES = 2 $}
+    // (use -1 for unbounded occurrence)
     trace(TRACE_5, "-E option found: ");
     if (options[O_READ_EVENTS]) {
         trace(TRACE_5, "yes\n");
+
+        // store the max occurrence information
+        string maxOccurrenceString = "";
+        
+        // if the max occurrence property of at least one input/output place is set (>0)
+        // then the maxOccurenceString will be shown
+        bool showMaxOccurrences = false;
+        
+        maxOccurrenceString += "considering the following events:\n";
+        maxOccurrenceString += "    sending events:\n";
+        
+        for (unsigned int e = 0; e < PN->getInputPlaceCount(); e++) {
+            maxOccurrenceString += "        !" + string(PN->getInputPlace(e)->name);
+            if (PN->getInputPlace(e)->max_occurrence >= 0) {
+                maxOccurrenceString += " (max. " + intToString(PN->getInputPlace(e)->max_occurrence) + "x)\n";
+                showMaxOccurrences = true;
+            } else {
+                maxOccurrenceString += " (unbounded)\n";
+            }
+        }
+        
+        maxOccurrenceString += "    receiving events:\n";
+        for (unsigned int e = 0; e < PN->getOutputPlaceCount(); e++) {
+            maxOccurrenceString += "        ?" + string(PN->getOutputPlace(e)->name);
+            if (PN->getOutputPlace(e)->max_occurrence >= 0) {
+                maxOccurrenceString += " (max. " + intToString(PN->getOutputPlace(e)->max_occurrence) + "x)\n";
+                showMaxOccurrences = true;
+            } else {
+                maxOccurrenceString += " (unbounded)\n";
+            }
+        }
+        
+        maxOccurrenceString += "\n";
+        
+        // is there at least one input/output place for which the max_occurrence property is set,
+        // then show the whole maxOccurrenceString
+        // otherwise discard the maxOccurrenceString
+        if (showMaxOccurrences) {
+            trace(TRACE_0, maxOccurrenceString);
+        }
     } else {
         trace(TRACE_5, "no\n");
     }
 
-    // report events
-    if (debug_level == TRACE_0) {
-        if (options[O_EVENT_USE_MAX]) {
-            trace(TRACE_0, "each event considered max: "
-                    + intToString(events_manual) +"\n");
-        }
-    } else {
-        trace(TRACE_0, "considering the following events:\n");
-        trace(TRACE_0, "    sending events:\n");
-        for (unsigned int e = 0; e < PN->getInputPlaceCount(); e++) {
-            trace(TRACE_0, "    !" + string(PN->getInputPlace(e)->name));
-            if (PN->getInputPlace(e)->max_occurrence >= 0) {
-                trace(TRACE_0, "    (max. " + intToString(PN->getInputPlace(e)->max_occurrence) + "x)\n");
-            } else {
-                trace(TRACE_0, "    (no limit)\n");
-            }
-        }
-        trace(TRACE_0, "    receiving events:\n");
-        for (unsigned int e = 0; e < PN->getOutputPlaceCount(); e++) {
-            trace(TRACE_0, "    ?" + string(PN->getOutputPlace(e)->name));
-            if (PN->getOutputPlace(e)->max_occurrence >= 0) {
-                trace(TRACE_0, "    (max. " + intToString(PN->getOutputPlace(e)->max_occurrence) + "x)\n");
-            } else {
-                trace(TRACE_0, "    (no limit)\n");
-            }
-        }
+    if (options[O_EVENT_USE_MAX]) {
+        trace(TRACE_0, "each event considered max: " + intToString(events_manual) + "\n");
     }
 
     // report message bound

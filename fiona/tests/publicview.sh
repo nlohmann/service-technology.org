@@ -194,7 +194,7 @@ else
     resultSIM=$?
     if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
         let "result += 1"
-        echo ... equivalence check of the OGs of the service and its public view succeeded, which is not expected for this owfn.
+        echo ... equivalence check succeeded unexpectedly; this might be due to a repaired public view generation.
     fi
 fi
 
@@ -466,4 +466,3 @@ fi
 echo
 
 exit $result
-

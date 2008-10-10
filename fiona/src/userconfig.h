@@ -3,22 +3,10 @@
 // specify whether each new operation shall be logged
 //#define LOG_NEW
 
-// Specify whether for debugging purposes various assertions should be checked.
-// Helps to prevent doing unintended memory operations such as writing outside
-// of array bounds or losing memory by overwriting pointers that should not be
-// overwritten.
-#undef NDEBUG     // assertions are tested
-//#define NDEBUG 1    // assertions are ignored
-
 // enable Fiona to detect (T)SCC, when computing the reachability graph of each marking
 // the states shown in the nodes of the graphic are then annotated with information
 // about the SCC they are in and whether they are a representative of their SCC
 //#define TSCC	
-
-// Select your operating system
-#define WINDOWS
-//#define LINUX
-//#define SUNOS
 
 // CAPACITY is the largest expected number of tokens on any place.
 // Set CAPACITY to 1 for safe nets. Do not define CAPACITY if
@@ -37,17 +25,12 @@
 
 #define REPORTFREQUENCY 1000
 
-// MAXPATH is only used for the FINDPATH algorithm. There, LoLA aborts
-// a search attempt after having reached a depth of MAXPATH and
-// starts another attempt. When MAXPATH is not defined, a standard
-// value applies
-
-#define MAXPATH 3000000
 
 // HASHSIZE is the number of entries in the table that hashes the 
 // reachable states.  Larger values should speed up search but
 // consume more memory. This variable must be set to a power of 2
 
+//! \TODO: remove this definition if no hash tables are used
 #define HASHSIZE 65536
 
 // Defining COVER and/or SYMMETRY and/or STUBBORN enables the application of the
@@ -56,9 +39,8 @@
 // If a reduction technique does not fit to the analysis task, the reduction
 // technique will be switched off automatically.
 
-//#define COVER
+//! \TODO: Is this reduction really used??? It triggers code fragments, but it is not clear, whether there are ever used.
 #define STUBBORN
-//#define SYMMETRY
 
 // In connection with STATEPREDICATE (below), there exist two versions of
 // stubborn set. RELAXED selects the Kristensen/Valmari method (Petri net
@@ -70,61 +52,3 @@
 
 //#define RELAXED
 
-// When SYMMETRY is defined, the value of SYMMINTEGRATION specifies the
-// technique for using the symmetries in graph generation
-// 1 refers to the iteration of symmetries (leads to maximal reduction,
-//   fast for small symmetry groups, slow for large symmetry groups)
-// 2 refers to the iteration of states (leads to maximal reduction.
-//	 fast for large symmetry groups, slow for small symmetry griups)
-// 3 refers to the canonical representitive technique (does not lead
-//   to maximal reduction, fast for all kind of symmetry groups)
-// 4 refers to the canonical representitive technique on the fly (i.e.
-//   without pre-computed symmetries) (does not lead to maximal reduction)
-// 5 refers to the canonical representitive technique on the fly (i.e.
-//   without pre-computed symmetries) and maxiaml reduction (slower than 4)
-
-//#define SYMMINTEGRATION 3
-#define MAXATTEMPT 10
-
-// GRAPH specifies the strategy of graph exploration. It must have
-// either value depth_first or value breadth_first.
-
-
-#define DEPTH_FIRST
-//#define BREADTH_FIRST
-
-// The following list contains all available analysis tasks. Please,
-// define exactly one of the following values.
-// REACHABILITY searches for a given state
-// REVERSIBILITY verifies reversibility of the net
-// HOME checks for home states
-// BOUNDEDNET decides boundedness of the net
-// BOUNDEDPLACE decides boundedness of a given place
-// DEADTRANSITION verifies whether a given transition is dead
-// MODELCHECKING verifies a given temporal logic formula
-// FINDPATH performs a memoryless search for a state that satisfies a
-// given state predicate
-// FULL just computes a graph without verifying any property
-// DEADLOCK verifies whether a dead state is reachable
-// STATEPREDICATE searches for a state satisfying a given predicate
-// NONE does not verify anything. Use this if you only want to get the
-// generating set of the symmetries or the LL net.
-
-//#define REACHABILITY
-#define MODELCHECKING
-//#define BOUNDEDPLACE
-//#define BOUNDEDNET
-//#define DEADTRANSITION
-//#define REVERSIBILITY
-//#define HOME
-//#define FINDPATH
-//#define FULL
-//#define DEADLOCK
-//#define NONE
-//#define STATEPREDICATE
-
-// EXTENDEDCTL enables the use of transition formulae for restricting the scope of
-// path quantifiers in CTL formulae. If disabled, transition formulae may appear in
-// formulae but are ignored. Only relevant in combination with MODELCHECKING
-
-//#define EXTENDEDCTL

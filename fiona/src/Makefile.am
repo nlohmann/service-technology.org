@@ -86,15 +86,6 @@ fiona_CXXFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(OPTIMIZATION_LEVEL) $(WARNINGS)
 fiona_CFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(OPTIMIZATION_LEVEL) $(WARNINGS)
 
 
-#############################################################################
-# enable or disable assertions (toggle with --configure --enable-assert)
-#############################################################################
-if !USEASSERTIONS
-  fiona_CFLAGS += -DNDEBUG=1
-  fiona_CXXFLAGS += -DNDEBUG=1
-endif
-
-
 # the library search path.
 fiona_LDFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(all_libraries) 
 

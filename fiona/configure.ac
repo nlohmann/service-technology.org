@@ -39,7 +39,6 @@ AC_MSG_RESULT($assertions)
 if test "$assertions" = 'no'; then
     AC_DEFINE(NDEBUG,1,[Turn off assert statements])
 fi
-AM_CONDITIONAL(USEASSERTIONS, test "$assertions" = "yes")
 
 
 if test "$RANLIB" = ":"; then

@@ -1,15 +1,13 @@
 SUBDIRS = cudd src tests doc
 
-.PHONY: binarydistreadme
 
-DISTCLEANFILES = env.sh
-
-# all files that require the permission to execute
-SHELLSCRIPTS = tests/*.sh
+#############################################################################
+# organize cleaning
+#############################################################################
 
 # delete all files that can be created by other files
 cvs-clean: maintainer-clean
-	-rm -f COPYING Doxyfile
+	-rm -f COPYING Doxyfile config.guess config.sub INSTALL
 	-rm -f aclocal.m4
 	-rm -f configure
 	-rm -f depcomp
@@ -22,12 +20,33 @@ cvs-clean: maintainer-clean
 	-rm -f src/Fiona.h.in
 	-rm -f tests/Makefile.in
 	@echo -----------------------------------------------------
-	@echo To recreate installation status enter
-	@echo   aclocal
-	@echo   autoconf
-	@echo   autoheader
-	@echo   automake -a -c
+	@echo "To recreate installation status enter"
+	@echo "  aclocal ; autoconf; autoheader; automake -a -c"
+	@echo "or"
+	@echo "  autoreconf -i"
 	@echo
+
+# [NL] Is this needed?
+clean:
+	for subdir in $(SUBDIRS); do \
+		if [ "$$subdir" != "cudd" ]; then \
+			(cd "$$subdir" && $(MAKE) $(AM_MAKEFLAGS) $@); \
+		fi \
+	done
+
+veryclean: clean
+	$(MAKE) $(AM_MAKEFLAGS) veryclean --directory=src
+
+# [NL] Who needs this?
+libclean: clean
+	(cd cudd && $(MAKE) $(AM_MAKEFLAGS) clean)
+
+
+#############################################################################
+# organize binary distributions
+#############################################################################
+
+.PHONY: binarydistreadme
 
 # a README file for a binary distribution
 binarydistreadme:
@@ -93,18 +112,9 @@ create_bindist_archive:
 	zip -9 -m -r $(BINARYDISTDIR).zip $(BINARYDISTDIR)
 
 
-clean:
-	for subdir in $(SUBDIRS); do \
-		if [ "$$subdir" != "cudd" ]; then \
-			(cd "$$subdir" && $(MAKE) $(AM_MAKEFLAGS) $@); \
-		fi \
-	done
-
-veryclean: clean
-	$(MAKE) $(AM_MAKEFLAGS) veryclean --directory=src
-
-libclean: clean
-	(cd cudd && $(MAKE) $(AM_MAKEFLAGS) clean)
+#############################################################################
+# organize checking (make check)
+#############################################################################
 
 # Do single checks in tests directory.
 check-%: all
@@ -118,6 +128,11 @@ memcheck: all
 memcheck-%: all
 	(cd tests && $(MAKE) $(AM_MAKEFLAGS) $@)
 
+
+#############################################################################
+# organize checking code coverage
+#############################################################################
+
 # Do code coverage check for test suite.
 allcov:
 	(cd cudd  && $(MAKE) $(AM_MAKEFLAGS) all)
@@ -127,3 +142,24 @@ allcov:
 covcheck: allcov
 	(cd tests && $(MAKE) $(AM_MAKEFLAGS) covcheck)
 
+
+#########################################################################
+# targets to organize creating and applying patches
+#########################################################################
+patch:
+	@svn diff > $(PACKAGE)-rev-`svn info | $(GREP) "Last Changed Rev" | $(AWK) '{print $$4}'`.patch
+	@echo "created patch $(PACKAGE)-rev-`svn info | $(GREP) "Last Changed Rev" | $(AWK) '{print $$4}'`.patch"
+	@echo
+	@echo "WARNING: This patch will only work for revision `svn info | $(GREP) "Last Changed Rev" | $(AWK) '{print $$4}'`."
+	@echo "         Do not try to apply this patch to a different version"
+	@echo "         unless you know what you are doing. You have been warned."
+	@echo
+
+patched: *.patch
+	@echo
+	@echo "WARNING: You are about to apply a patch to revision `svn info | $(GREP) "Last Changed Rev" | $(AWK) '{print $$4}'`".
+	@echo "         Make sure the patch $< was made for this revision."
+	@echo "         If you want to abort, press Ctrl+C now!"
+	@echo "         Otherwise, press return to continue. You have been warned."
+	@read
+	@patch -p0 -i $< && echo "applied patch $<"

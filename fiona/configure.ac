@@ -1,6 +1,3 @@
-#                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
-
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 3.0-unreleased, fiona@service-technology.org, fiona)
 
@@ -8,9 +5,6 @@ AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
 
 AM_INIT_AUTOMAKE
-
-# delete file with environnent variables for some progs
-rm env.sh >& /dev/null
 
 # Checks for programs.
 AC_PROG_CXX
@@ -20,9 +14,7 @@ AC_PROG_CPP
 AC_PROG_EGREP
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 AC_PROG_SED
-
 
 #############################################################################
 # check whether to use assertions using the configure script parameter
@@ -36,11 +28,12 @@ AC_ARG_ENABLE(assert, "enable assertions",
 esac],[assertions=yes])
 AC_MSG_CHECKING([whether to use assertions])
 AC_MSG_RESULT($assertions)
-if test "$assertions" = 'no'; then
-    AC_DEFINE(NDEBUG,1,[Turn off assert statements])
+if test "$assertions" = "no"; then
+    AC_DEFINE(NDEBUG,1,[Turn off assertions and debug output])
 fi
 
-
+# check for the "ranlib" tool and signal an error if it is not found
+AC_PROG_RANLIB
 if test "$RANLIB" = ":"; then
   AC_MSG_ERROR([ranlib was not found!])
 fi
@@ -58,6 +51,12 @@ if test "$LEX" != "flex"; then
  AC_MSG_ERROR([flex was not found.])
 fi
 
+#AC_PROG_YACC
+AC_CHECK_PROG(YACC, bison, bison, not found)
+if test "$YACC" = "not found"; then
+ AC_MSG_ERROR([bison was not found.])
+fi
+
 AC_CHECK_PROG(DOT, dot, dot, not found)
 if test "$DOT" = "not found"; then
  AC_MSG_WARN([Graphviz dot was not found.])
@@ -70,25 +69,10 @@ fi
 AC_CHECK_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], not found)
 if test "$PETRIFY" = "not found"; then
  AC_MSG_WARN([Petrify was not found.])
- AC_DEFINE(HAVE_PETRIFY, "not found", [Petrify can not be used on this system.])
+ AC_DEFINE(HAVE_PETRIFY, "not found", [Petrify was not found on this system.])
 else
  AC_DEFINE_UNQUOTED(HAVE_PETRIFY, "${PETRIFY}", [Petrify can be used on this system.])
 fi
-
-if test -e env.sh; then
-  echo "PETRIFY=\"$PETRIFY\"" >> env.sh;
-else
-  echo "PETRIFY=\"$PETRIFY\"" > env.sh;
-fi
-
-AC_CHECK_PROG(YACC, bison, bison, not found)
-if test "$YACC" = "not found"; then
- AC_MSG_ERROR([bison was not found.])
-fi
-
-#if test "`uname -o`" != "Cygwin" ; then
-#ac_default_prefix=$HOME
-#fi
 
 # Check for --enable-64bit parameter to enable 64bit compilation
 AC_ARG_ENABLE(64bit,
@@ -153,4 +137,3 @@ echo
 echo "Run \"make\" to build fiona (cudd package is built automatically)."
 echo "Run \"make win32\" to build a fiona executable that is independent of cygwin1.dll."
 echo
-

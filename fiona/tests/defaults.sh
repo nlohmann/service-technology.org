@@ -21,8 +21,6 @@
 # Allows test scrips to be directly called from the command line. Set all unset
 # environment variables that are normally set by the Makefile.
 
-source ../env.sh
-
 if [ "$testdir" == "" ]; then
     testdir=.
 fi

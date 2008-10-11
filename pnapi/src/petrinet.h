@@ -499,6 +499,12 @@ class PetriNet
     /// calculates the postset of a node
     set<Node*> postset(Node *n) const;
     
+    /// checks if the Petri net is normal
+    bool isNormal() const;
+    
+    /// normalizes the Petri net
+    void normalize();
+    
     /// outputs the Petri net
     friend ostream& operator<< (ostream& os, const PetriNet &obj);
     

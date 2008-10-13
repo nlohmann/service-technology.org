@@ -57,6 +57,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     zyklusRcontrol=$?
@@ -73,6 +79,7 @@ else
     fi
 
     result=`expr $result + $zyklusRcontrol + $zyklusRbluenodes + $zyklusRblueedges`
+    fi
 fi
 
 #############################################################################
@@ -91,6 +98,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "net is controllable: NO" > /dev/null
     zyklusPcontrol=$?
@@ -101,6 +114,7 @@ else
     fi
 
     result=`expr $result + $zyklusPcontrol`
+    fi
 fi
 
 ############################################################################
@@ -123,6 +137,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     zyklusReturncontrol=$?
@@ -139,6 +159,7 @@ else
     fi
 
     result=`expr $result + $zyklusReturncontrol + $zyklusReturnbluenodes + $zyklusReturnblueedges`
+    fi
 fi
 
 ############################################################################
@@ -161,6 +182,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     livelockInPcontrol=$?
@@ -177,6 +204,7 @@ else
     fi
 
     result=`expr $result + $livelockInPcontrol + $livelockInPbluenodes + $livelockInPblueedges`
+    fi
 fi
 
 ############################################################################
@@ -199,6 +227,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     zyklusPcommitcontrol=$?
@@ -218,6 +252,7 @@ else
     fi
 
     result=`expr $result + $zyklusPcommitcontrol + $zyklusPcommitbluenodes + $zyklusPcommitblueedges + $zyklusPcommitblueedges`
+    fi
 fi
 
 #############################################################################

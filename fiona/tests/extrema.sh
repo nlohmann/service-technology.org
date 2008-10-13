@@ -29,6 +29,8 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
+echo hallo $testdir/$evaluate
+
 DIR=$testdir/extrema FIONA=fiona
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
@@ -102,14 +104,22 @@ for ((i=0; i<${#owfns[*]}; ++i)) do
     else
         expectation_controllable="${expectations_controllable[$i]}"
         echo running $cmd
-        $cmd 2>&1 | grep "net is controllable: $expectation_controllable" \
+        OUTPUT=`$cmd 2>&1`
+        fionaExitCode=$?
+        `$evaluate $fionaExitCode`
+        if [ $? -ne 0 ] 
+        then
+        result=1
+        else
+        echo $OUTPUT | grep "net is controllable: $expectation_controllable" \
             >/dev/null
         result1=$?
-
+   
         if [ $result1 -ne 0 ] ; then
             echo     ... FAILED
             echo
             result=1
+        fi
         fi
     fi
 done;

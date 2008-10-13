@@ -50,15 +50,18 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo ... fiona exited with nonzero return value although it should not
-        result=1
-    fi
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "oWFN matches with OG: YES" > /dev/null
     if [ $? -ne 0 ]; then
         echo ... oWFN does not match with OG although it should
         result=1
+    fi
     fi
 fi
 
@@ -73,15 +76,19 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo ... fiona exited with nonzero return value although it should not
-        result=1
-    fi
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
     if [ $? -ne 0 ]; then
         echo ... oWFN matches with OG although it should not
         result=1
+    fi
     fi
 fi
 
@@ -96,10 +103,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -eq 0 ]; then
-        echo ... fiona exited with zero return value although it should not
-        result=1
-    fi
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "ends or receives more than one message" > /dev/null
     if [ $? -ne 0 ]; then
@@ -107,6 +116,7 @@ else
             writing more than one message, but it seems there was a different \
             reason.
         result=1
+    fi
     fi
 fi
 
@@ -123,15 +133,19 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo ... fiona exited with nonzero return value although it should not
-        result=1
-    fi
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
     if [ $? -ne 0 ]; then
         echo ... oWFN matches with OG although it should not
         result=1
+    fi
     fi
 fi
 
@@ -148,15 +162,19 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo ... fiona exited with nonzero return value although it should not
-        result=1
-    fi
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
     if [ $? -ne 0 ]; then
         echo ... oWFN does not match with OG although it should
         result=1
+    fi
     fi
 fi
 
@@ -173,15 +191,19 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo ... fiona exited with nonzero return value although it should not
-        result=1
-    fi
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
     if [ $? -ne 0 ]; then
         echo ... oWFN does not match with OG although it should
         result=1
+    fi
     fi
 fi
 
@@ -198,15 +220,19 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo ... fiona exited with nonzero return value although it should not
-        result=1
-    fi
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
     if [ $? -ne 0 ]; then
         echo ... oWFN matches with OG although it should not
         result=1
+    fi
     fi
 fi
 
@@ -221,15 +247,19 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo ... fiona exited with nonzero return value although it should not
-        result=1
-    fi
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
     if [ $? -ne 0 ]; then
         echo ... oWFN matches with OG although it should not
         result=1
+    fi
     fi
 fi
 

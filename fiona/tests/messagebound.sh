@@ -53,6 +53,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "net is controllable: NO" > /dev/null
     mb14control=$?
@@ -63,6 +69,7 @@ else
     fi
 
     result=`expr $mb14control`
+    fi
 fi
 
 ############################################################################
@@ -84,6 +91,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     mb21control=$?
@@ -100,6 +113,7 @@ else
     fi
 
     result=`expr $result + $mb21control + $mb21bluenodes + $mb21blueedges`
+    fi
 fi
 
 ############################################################################
@@ -121,6 +135,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     mb22control=$?
@@ -137,6 +157,7 @@ else
     fi
 
     result=`expr $result + $mb22control + $mb22bluenodes + $mb22blueedges`
+    fi
 fi
 
 ############################################################################
@@ -158,6 +179,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     mb22control=$?
@@ -174,6 +201,7 @@ else
     fi
 
     result=`expr $result + $mb22control + $mb22bluenodes + $mb22blueedges`
+    fi
 fi
 
 ############################################################################
@@ -195,6 +223,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     mb22control=$?
@@ -211,6 +245,7 @@ else
     fi
 
     result=`expr $result + $mb22control + $mb22bluenodes + $mb22blueedges`
+    fi
 fi
 
 ############################################################################
@@ -229,6 +264,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "net is controllable: NO" > /dev/null
     mb22control=$?
@@ -239,6 +280,7 @@ else
     fi
 
     result=`expr $result + $mb22control`
+    fi
 fi
 
 ############################################################################
@@ -257,6 +299,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "net is controllable: NO" > /dev/null
     mb22control=$?
@@ -267,6 +315,7 @@ else
     fi
 
     result=`expr $result + $mb22control`
+    fi
 fi
 
 ############################################################################

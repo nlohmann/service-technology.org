@@ -55,6 +55,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 	resultOG=$?
 	echo $OUTPUT | grep "number of blue nodes: 2" > /dev/null
@@ -66,6 +72,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build OG correctly
+	fi
 	fi
 fi
 
@@ -83,6 +90,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: NO" > /dev/null
 	resultOG=$?
 	echo $OUTPUT | grep "number of blue nodes: 0" > /dev/null
@@ -94,6 +107,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build OG correctly
+	fi
 	fi
 fi
 
@@ -111,6 +125,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 	resultOG=$?
 	echo $OUTPUT | grep "number of blue nodes: 2" > /dev/null
@@ -122,6 +142,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build OG correctly
+	fi
 	fi
 fi
 
@@ -139,6 +160,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 	resultOG=$?
 	echo $OUTPUT | grep "number of blue nodes: 6" > /dev/null
@@ -150,6 +177,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build OG correctly
+	fi
 	fi
 fi
 
@@ -167,6 +195,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 	resultOG=$?
 	echo $OUTPUT | grep "number of blue nodes: 18" > /dev/null
@@ -178,6 +212,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build OG correctly
+	fi
 	fi
 fi
 
@@ -196,6 +231,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: NO" > /dev/null
 	resultOG=$?
 	echo $OUTPUT | grep "number of blue nodes: 0" > /dev/null
@@ -207,6 +248,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build OG correctly
+	fi
 	fi
 fi
 
@@ -224,6 +266,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 	resultIG=$?
 	echo $OUTPUT | grep "number of blue nodes: 2" > /dev/null
@@ -235,6 +283,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build IG correctly
+	fi
 	fi
 fi
 
@@ -252,6 +301,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: NO" > /dev/null
 	resultIG=$?
 	echo $OUTPUT | grep "number of blue nodes: 0" > /dev/null
@@ -263,6 +318,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build IG correctly
+	fi
 	fi
 fi
 
@@ -280,6 +336,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 	resultIG=$?
 	echo $OUTPUT | grep "number of blue nodes: 2" > /dev/null
@@ -291,6 +353,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build IG correctly
+	fi
 	fi
 fi
 
@@ -308,6 +371,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 	resultIG=$?
 	echo $OUTPUT | grep "number of blue nodes: 6" > /dev/null
@@ -319,6 +388,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build IG correctly
+	fi
 	fi
 fi
 
@@ -336,6 +406,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 	resultIG=$?
 	echo $OUTPUT | grep "number of blue nodes: 18" > /dev/null
@@ -347,6 +423,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build IG correctly
+	fi
 	fi
 fi
 
@@ -365,6 +442,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: NO" > /dev/null
 	resultIG=$?
 	echo $OUTPUT | grep "number of blue nodes: 0" > /dev/null
@@ -376,6 +459,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build IG correctly
+	fi
 	fi
 fi
 
@@ -393,6 +477,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 	resultIG=$?
 	echo $OUTPUT | grep "number of blue nodes: 2" > /dev/null
@@ -404,6 +494,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build reduced IG correctly
+	fi
 	fi
 fi
 
@@ -422,6 +513,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: NO" > /dev/null
 	resultIG=$?
 	echo $OUTPUT | grep "number of blue nodes: 0" > /dev/null
@@ -433,6 +530,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build reduced IG correctly
+	fi
 	fi
 fi
 
@@ -450,6 +548,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 	resultIG=$?
 	echo $OUTPUT | grep "number of blue nodes: 2" > /dev/null
@@ -461,6 +565,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build reduced IG correctly
+	fi
 	fi
 fi
 
@@ -478,6 +583,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 	resultIG=$?
 	echo $OUTPUT | grep "number of blue nodes: 4" > /dev/null
@@ -490,6 +601,7 @@ else
 	    result=1
 	    echo   ... failed to build reduced IG correctly
 	fi
+	fi
 fi
 
 owfn="$DIR/2_TSCCs_in_1_node_with_communication_2.owfn"
@@ -506,6 +618,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 	resultIG=$?
 	echo $OUTPUT | grep "number of blue nodes: 8" > /dev/null
@@ -517,6 +635,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build reduced IG correctly
+	fi
 	fi
 fi
 
@@ -534,6 +653,12 @@ if [ "$memcheck" = "yes" ]; then
 else
 	echo running $cmd
 	OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 	echo $OUTPUT | grep "net is controllable: NO" > /dev/null
 	resultIG=$?
 	echo $OUTPUT | grep "number of blue nodes: 0" > /dev/null
@@ -545,6 +670,7 @@ else
 	then
 	    result=1
 	    echo   ... failed to build reduced IG correctly
+	fi
 	fi
 fi
 

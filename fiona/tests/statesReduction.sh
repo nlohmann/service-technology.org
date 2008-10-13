@@ -69,17 +69,22 @@ cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
-echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     equivalent=$?
 
-if [ $equivalent -ne 0 ]
-then
-    echo   ... the two graphs do not characterize the same strategies
+    if [ $equivalent -ne 0 ]
+    then
+        echo   ... the two graphs do not characterize the same strategies
+    fi
+    result=`expr $result + $equivalent`
 fi
-
-
-result=`expr $result + $equivalent`
 
 ############################################################################
 # check if graph using -R is the same as the one generated without -R
@@ -93,17 +98,21 @@ cmd1="$FIONA $owfn -t eqR -t OG -o $outputPrefix"
 
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
-
-echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    equivalent=$?
-
-if [ $equivalent -ne 0 ]
+fionaExitCode=$?
+`$evaluate $fionaExitCode`
+if [ $? -ne 0 ] 
 then
-    echo   ... the two graphs do not characterize the same strategies
+    result=1
+else
+    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+        equivalent=$?
+
+    if [ $equivalent -ne 0 ]
+    then
+        echo   ... the two graphs do not characterize the same strategies
+    fi
+    result=`expr $result + $equivalent`
 fi
-
-
-result=`expr $result + $equivalent`
 
 ############################################################################
 # check if graph using -R is the same as the one generated without -R
@@ -115,6 +124,12 @@ cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
+fionaExitCode=$?
+`$evaluate $fionaExitCode`
+if [ $? -ne 0 ] 
+then
+result=1
+else
 
 echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     equivalent=$?
@@ -124,8 +139,8 @@ then
     echo   ... the two graphs do not characterize the same strategies
 fi
 
-
 result=`expr $result + $equivalent`
+fi
 
 ############################################################################
 # check if graph using -R is the same as the one generated without -R
@@ -137,6 +152,12 @@ cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
+fionaExitCode=$?
+`$evaluate $fionaExitCode`
+if [ $? -ne 0 ] 
+then
+result=1
+else
 
 echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     equivalent=$?
@@ -148,7 +169,7 @@ fi
 
 
 result=`expr $result + $equivalent`
-
+fi
 ############################################################################
 # check if graph using -R is the same as the one generated without -R
 ############################################################################
@@ -159,6 +180,12 @@ cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
+fionaExitCode=$?
+`$evaluate $fionaExitCode`
+if [ $? -ne 0 ] 
+then
+result=1
+else
 
 echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     equivalent=$?
@@ -170,6 +197,7 @@ fi
 
 
 result=`expr $result + $equivalent`
+fi
 
 ############################################################################
 # check if graph using -R is the same as the one generated without -R
@@ -181,6 +209,12 @@ cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
+fionaExitCode=$?
+`$evaluate $fionaExitCode`
+if [ $? -ne 0 ] 
+then
+result=1
+else
 
 echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     equivalent=$?
@@ -192,6 +226,7 @@ fi
 
 
 result=`expr $result + $equivalent`
+fi
 
 ############################################################################
 

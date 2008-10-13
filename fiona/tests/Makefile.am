@@ -60,6 +60,7 @@ CHECKLOUD_ENVIRONMENT = $(TESTS_ENVIRONMENT) quiet=no
 #   o More reasons at http://www.gnu.org/software/automake/manual/html_mono/automake.html#wildcards
 EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              defaults.sh \
+             evaluateExitCode.sh \
              syntax/max_occurrence.owfn \
              syntax/syntax_example.owfn \
              syntax/syntax_example_new.owfn \

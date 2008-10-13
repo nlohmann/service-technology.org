@@ -71,10 +71,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo "... failed: $FIONA exited with non-zero return value."
-        result=1
-    fi
+    
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "06-03-23_BPM06_shop_sect_3.owfn.og.output.tex generated" > /dev/null
     resultSingle=$?
@@ -91,6 +94,7 @@ else
     if [ $resultSingle -ne 0 ]; then
         result=1
         echo "... failed: no png was generated."
+    fi
     fi
 fi
 
@@ -116,10 +120,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo "... failed: $FIONA exited with non-zero return value."
-        result=1
-    fi
+    
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "big.owfn.output.tex generated" > /dev/null
     resultSingle=$?
@@ -135,6 +142,8 @@ else
     if [ $resultSingle -ne 0 ]; then
         result=1
         echo "... failed: no png was generated."
+    fi
+    
     fi
 fi
 
@@ -160,10 +169,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo "... failed: $FIONA exited with non-zero return value."
-        result=1
-    fi
+    
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "big.owfn.output.og.tex generated" > /dev/null
     resultSingle=$?
@@ -179,6 +191,8 @@ else
     if [ $resultSingle -ne 0 ]; then
         result=1
         echo "... failed: no png was generated."
+    fi
+    
     fi
 fi
 

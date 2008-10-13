@@ -56,6 +56,14 @@ i=9
     else
         echo running $cmd
         OUTPUT=`$cmd 2>&1`
+        fionaExitCode=$?
+        `$evaluate $fionaExitCode`
+        if [ $? -ne 0 ] 
+        then
+        result=1
+        else
+
+    
         echo $OUTPUT | grep "net is controllable: YES" > /dev/null
         resultIG=$?
         echo $OUTPUT | grep "number of states stored in nodes: $(((i+1)*(i+2)/2))" > /dev/null
@@ -74,6 +82,7 @@ i=9
             result=1
             echo   ... failed to build IG correctly
         fi
+        fi
     fi
     
 
@@ -90,6 +99,14 @@ i=9
     else
         echo running $cmd
         OUTPUT=`$cmd  2>&1`
+        fionaExitCode=$?
+        `$evaluate $fionaExitCode`
+        if [ $? -ne 0 ] 
+        then
+        result=1
+        else
+
+
         echo $OUTPUT | grep "net is controllable: YES" > /dev/null
         resultOG=$?
         echo $OUTPUT | grep "number of states stored in nodes: $(((2**(i+1))-1))" > /dev/null
@@ -106,6 +123,7 @@ i=9
         then
             result=1
             echo   ... failed to build OG
+        fi
         fi
     fi
 
@@ -132,6 +150,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     mycoffeecontrol=$?
@@ -151,6 +176,7 @@ else
     fi
 
     result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
+    fi
 fi
 
 
@@ -176,6 +202,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     mycoffeecontrol=$?
@@ -195,6 +228,7 @@ else
     fi
 
     result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
+    fi
 fi
 
 ############################################################################
@@ -219,6 +253,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     mycoffeecontrol=$?
@@ -238,6 +279,7 @@ else
     fi
 
     result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
+    fi
 fi
 
 
@@ -261,6 +303,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     keescoffee1control=$?
@@ -280,6 +329,7 @@ else
     fi
 
     result=`expr $result + $keescoffee1control + $keescoffee1bluenodes + $keescoffee1blueedges + $keescoffee1storedstates`
+    fi
 fi
 
 ############################################################################
@@ -302,6 +352,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     keescoffee2control=$?
@@ -321,6 +378,7 @@ else
     fi
 
     result=`expr $result + $keescoffee2control + $keescoffee2bluenodes + $keescoffee2blueedges + $keescoffee2storedstates`
+    fi
 fi
 
 ############################################################################
@@ -345,6 +403,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     shop3control=$?
@@ -364,6 +429,7 @@ else
     fi
 
     result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
+    fi
 fi
 
 
@@ -389,6 +455,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     shop3control=$?
@@ -408,6 +481,7 @@ else
     fi
 
     result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
+    fi
 fi
 
 
@@ -433,6 +507,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     shop3control=$?
@@ -452,6 +533,7 @@ else
     fi
 
     result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
+    fi
 fi
 
 
@@ -477,6 +559,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     shop6control=$?
@@ -496,6 +585,7 @@ else
     fi
 
     result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
+    fi
 fi
 
 
@@ -522,6 +612,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     shop6control=$?
@@ -542,6 +639,7 @@ else
     fi
 
     result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges  # + $shop6storedstates`
+    fi
 fi
 
 
@@ -567,6 +665,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     shop6control=$?
@@ -586,6 +691,7 @@ else
     fi
 
     result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
+    fi
 fi
 
 ############################################################################

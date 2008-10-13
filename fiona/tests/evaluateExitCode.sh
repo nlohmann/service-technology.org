@@ -1,5 +1,8 @@
+#!/bin/bash
+
 ############################################################################
-# Copyright 2007 Jan Bretschneider                                         #
+# Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
+#                      Jan Bretschneider and Christian Gierds              #
 #                                                                          #
 # This file is part of Fiona.                                              #
 #                                                                          #
@@ -18,19 +21,24 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# Allows test scrips to be directly called from the command line. Set all unset
-# environment variables that are normally set by the Makefile.
 
-if [ "$testdir" == "" ]; then
-    testdir=.
+FILE_ERROR=4
+
+source defaults.sh
+
+result=0
+
+if [ 2 -gt $1 ]
+then
+exit 0
+else 
+    
+    if [ $1 -eq $FILE_ERROR ] 
+    then
+        echo "A file error occured, result invalid."
+        exit 1
+    else 
+        echo "Some error occured, result invalid."
+    fi
+    
 fi
-
-if [ "$builddir" == "" ]; then
-    builddir=.
-fi
-
-if [ "$MKDIR_P" == "" ]; then
-    MKDIR_P="mkdir -p"
-fi
-
-evaluate="evaluateExitCode.sh"

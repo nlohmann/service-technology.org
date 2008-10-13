@@ -70,7 +70,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
+    
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     maxoccurrencescontrol=$?
 
@@ -89,6 +95,7 @@ else
     fi
 
     result=`expr $result + $maxoccurrencescontrol + $maxoccurrencesbluenodes + $maxoccurrencesblueedges + $maxoccurrencesstoredstates`
+    fi
 fi
 
 ############################################################################

@@ -85,11 +85,14 @@ else
     OUTPUT=`$cmd 2>&1`
 fi
 
-exitcode=$?
-if [ $exitcode -ne 0 ]; then
-  echo ... failed to minimize OG.
-fi
-result=$(($result | $exitcode))
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+    result=0
+    fi
 
 ############################################################################
 
@@ -124,11 +127,14 @@ else
     OUTPUT=`$cmd 2>&1`
 fi
 
-exitcode=$?
-if [ $exitcode -ne 0 ]; then
-  echo ... failed to minimize OG.
-fi
-result=$(($result | $exitcode))
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+    result=0
+    fi
 
 ############################################################################
 
@@ -162,11 +168,14 @@ else
     OUTPUT=`$cmd 2>&1`
 fi
 
-exitcode=$?
-if [ $exitcode -ne 0 ]; then
-  echo ... failed to minimize OG.
-fi
-result=$(($result | $exitcode))
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+    result=0
+    fi
 
 ############################################################################
 
@@ -218,11 +227,14 @@ else
     OUTPUT=`$cmd 2>&1`
 fi
 
-exitcode=$?
-if [ $exitcode -ne 0 ]; then
-  echo ... failed to minimize OG.
-fi
-result=$(($result | $exitcode))
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+    result=0
+    fi
 
 ############################################################################
 
@@ -256,11 +268,14 @@ else
     OUTPUT=`$cmd 2>&1`
 fi
 
-exitcode=$?
-if [ $exitcode -ne 0 ]; then
-  echo ... failed to minimize OG.
-fi
-result=$(($result | $exitcode))
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+    result=0
+    fi
 
 ############################################################################
 
@@ -294,11 +309,14 @@ else
     OUTPUT=`$cmd 2>&1`
 fi
 
-exitcode=$?
-if [ $exitcode -ne 0 ]; then
-  echo ... failed to minimize OG.
-fi
-result=$(($result | $exitcode))
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+    result=0
+    fi
 
 ############################################################################
 
@@ -332,11 +350,14 @@ else
     OUTPUT=`$cmd 2>&1`
 fi
 
-exitcode=$?
-if [ $exitcode -ne 0 ]; then
-  echo ... failed to minimize OG.
-fi
-result=$(($result | $exitcode))
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+    result=0
+    fi
 
 ############################################################################
 
@@ -370,11 +391,14 @@ else
     OUTPUT=`$cmd 2>&1`
 fi
 
-exitcode=$?
-if [ $exitcode -ne 0 ]; then
-  echo ... failed to minimize OG.
-fi
-result=$(($result | $exitcode))
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+    result=0
+    fi
 
 ############################################################################
 
@@ -408,11 +432,14 @@ else
     OUTPUT=`$cmd 2>&1`
 fi
 
-exitcode=$?
-if [ $exitcode -ne 0 ]; then
-  echo ... failed to minimize OG.
-fi
-result=$(($result | $exitcode))
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+    result=0
+    fi
 
 ############################################################################
 

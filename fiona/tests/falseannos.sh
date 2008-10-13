@@ -77,6 +77,14 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
 
+
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
     echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
     ok=$?
 
@@ -86,6 +94,7 @@ else
     fi
 
     result=`expr $result + $ok`
+    fi
 fi
 
 cmd="diff $violating.blue.og $cleanedPerHand "
@@ -98,10 +107,19 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     if [ "$OUTPUT" != "" ]; then
         let "result += 1"
         echo ... automatically cleaned OG is not equivalent to manually cleaned OG.
+    fi
     fi
 fi
 
@@ -122,11 +140,25 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    fi
+
 
     cmd="$FIONA $violating.blue.og -t checkfalsenodes"
 
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
     ok=$?
@@ -137,6 +169,7 @@ else
     fi
 
     result=`expr $result + $ok`
+    fi
 fi
 
 cmd="diff $violating.blue.og $cleanedPerHand "
@@ -150,9 +183,18 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
 
+
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
     if [ "$OUTPUT" != "" ]; then
         let "result += 1"
         echo ... automatically cleaned OG is not equivalent to manually cleaned OG.
+    fi
     fi
 fi
 
@@ -179,6 +221,13 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
 
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
     echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
     ok=$?
 
@@ -188,6 +237,7 @@ else
     fi
 
     result=`expr $result + $ok`
+    fi
 fi
 
 cmd="diff $violating.blue.og $cleanedPerHand "

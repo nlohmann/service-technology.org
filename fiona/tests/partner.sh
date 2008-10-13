@@ -92,13 +92,24 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        let "result += 1"
-        echo "... failed: $FIONA exited with non-zero return value."
-        #resultSingle=1
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
     else
+
+
         echo running $check
         OUTPUT=`$check 2>&1`
+        fionaExitCode=$?
+        `$evaluate $fionaExitCode`
+        if [ $? -ne 0 ] 
+        then
+        result=1
+        else
+
+
         echo $OUTPUT | grep "are equivalent: YES" > /dev/null
         if [ $? -ne 0 ]; then
             let "result += 1"
@@ -109,6 +120,7 @@ else
             #        "$output" "$outputExpected"
             #    resultSingle=1
             #fi
+        fi
         fi
     fi
 fi
@@ -149,16 +161,27 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        let "result += 1"
-        echo "... failed: $FIONA exited with non-zero return value."
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
     else
+
         echo running $check
         OUTPUT=`$check 2>&1`
+        fionaExitCode=$?
+        `$evaluate $fionaExitCode`
+        if [ $? -ne 0 ] 
+        then
+        result=1
+        else
+
         echo $OUTPUT | grep "are equivalent: YES" > /dev/null
         if [ $? -ne 0 ]; then
             let "result += 1"
             echo ... computed partner not equivalent to expected partner.
+        fi
         fi
     fi
 fi
@@ -197,10 +220,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        let "result += 1"
-        echo "... failed: $FIONA exited with non-zero return value."
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
     else
+
         echo running $check
         OUTPUT=`$check 2>&1`
         echo $OUTPUT | grep "are equivalent: YES" > /dev/null
@@ -210,10 +236,18 @@ else
         fi
         echo running $check2
         OUTPUT=`$check2 2>&1`
+        fionaExitCode=$?
+        `$evaluate $fionaExitCode`
+        if [ $? -ne 0 ] 
+        then
+        result=1
+        else
+
         echo $OUTPUT | grep "are equivalent: YES" > /dev/null
         if [ $? -ne 0 ]; then
             let "result += 1"
             echo ... computed partner not equivalent to expected partner.
+        fi
         fi
     fi
 fi
@@ -261,10 +295,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        let "result += 1"
-        echo "... failed: $FIONA exited with non-zero return value."
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
     else
+
         echo running $check
         OUTPUT=`$check 2>&1`
         echo $OUTPUT | grep "are equivalent: YES" > /dev/null
@@ -274,10 +311,18 @@ else
         fi
         echo running $check2
         OUTPUT=`$check2 2>&1`
+        fionaExitCode=$?
+        `$evaluate $fionaExitCode`
+        if [ $? -ne 0 ] 
+        then
+        result=1
+        else
+
         echo $OUTPUT | grep "are equivalent: YES" > /dev/null
         if [ $? -ne 0 ]; then
             let "result += 1"
             echo ... computed partner not equivalent to expected partner.
+        fi
         fi
     fi
 fi
@@ -309,16 +354,27 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        let "result += 1"
-        echo "... failed: $FIONA exited with non-zero return value."
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
     else
+
         echo running $check
         OUTPUT=`$check 2>&1`
+        fionaExitCode=$?
+        `$evaluate $fionaExitCode`
+        if [ $? -ne 0 ] 
+        then
+        result=1
+        else
+
         echo $OUTPUT | grep "are equivalent: YES" > /dev/null
         if [ $? -ne 0 ]; then
             let "result += 1"
             echo ... computed partner not equivalent to expected partner.
+        fi
         fi
     fi
 fi

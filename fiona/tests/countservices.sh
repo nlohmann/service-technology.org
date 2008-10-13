@@ -52,12 +52,22 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
+    
     echo $OUTPUT | grep "The given OG is acyclic" > /dev/null
     resultAcyclic=$?
 
     if [ $resultAcyclic -ne 0 ]; then
         result=1
         echo   ... acyclic OG is reported as cyclic.
+    fi
     fi
 fi
 
@@ -74,12 +84,21 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
     echo $OUTPUT | grep "The given OG is NOT ayclic" > /dev/null
     resultCyclic=$?
 
     if [ $resultCyclic -ne 0 ]; then
         result=1
         echo   ... cyclic OG is reported as acyclic.
+    fi
     fi
 fi
 
@@ -96,12 +115,21 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
     echo $OUTPUT | grep "Computed number of matching tree service automata: 5" > /dev/null
     resultCyclic=$?
 
     if [ $resultCyclic -ne 0 ]; then
         result=1
         echo   ... expected number of services differs.
+    fi
     fi
 fi
 
@@ -116,12 +144,22 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
     echo $OUTPUT | grep "Computed number of matching tree service automata: 9" > /dev/null
     resultCyclic=$?
 
     if [ $resultCyclic -ne 0 ]; then
         result=1
         echo   ... expected number of services differs.
+    fi
+    
     fi
 fi
 
@@ -135,13 +173,23 @@ if [ "$memcheck" = "yes" ]; then
     result=$(($result | $?))
 else
     echo running $cmd
-    OUTPUT=`$cmd 2>&1`
+    OUTPUT=`$cmd 2>&1`    
+    
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
     echo $OUTPUT | grep "Computed number of matching tree service automata: 1.67772e+07" > /dev/null
     resultCyclic=$?
 
     if [ $resultCyclic -ne 0 ]; then
         result=1
         echo   ... expected number of services differs.
+    fi
+    
     fi
 fi
 
@@ -156,12 +204,22 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
     echo $OUTPUT | grep "The computed number resulted 0, which implies that the service is not controllable." > /dev/null
     resultCyclic=$?
 
     if [ $resultCyclic -ne 0 ]; then
         result=1
         echo   ... expected number of services differs.
+    fi
+    
     fi
 fi
 

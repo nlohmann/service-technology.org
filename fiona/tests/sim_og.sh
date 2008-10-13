@@ -51,11 +51,19 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
     echo $OUTPUT | grep "The second OG characterizes at least one strategy that is" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... Simulation succeded, although it should not.
+    fi
     fi
 fi
 
@@ -73,11 +81,21 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
+
     echo $OUTPUT | grep "The first OG characterizes all strategies of the second one." > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... Simulation failed, although it should not.
+    fi
     fi
 fi
 
@@ -95,11 +113,20 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
+
     echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... OGs determined not equivalent, although they are.
+    fi
     fi
 fi
 
@@ -117,11 +144,20 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
+
     echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... OGs determined not equivalent, although they are.
+    fi
     fi
 fi
 
@@ -139,11 +175,19 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+    
     echo $OUTPUT | grep "The first OG characterizes all strategies of the second one." > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... OGs determined not equivalent, although they are.
+    fi
     fi
 fi
 
@@ -161,11 +205,20 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
+
     echo $OUTPUT | grep "The first OG characterizes all strategies of the second one." > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... OGs determined not equivalent, although they are.
+    fi
     fi
 fi
 
@@ -183,11 +236,19 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
     echo $OUTPUT | grep "The first OG characterizes all strategies of the second one." > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... OGs determined not equivalent, although they are.
+    fi
     fi
 fi
 
@@ -206,11 +267,19 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
     echo $OUTPUT | grep "The first OG characterizes all strategies of the second one." > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... Simulation failed, although it should not.
+    fi
     fi
 fi
 
@@ -228,11 +297,19 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
     echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... OGs determined not equivalent, although they are.
+    fi
     fi
 fi
 

@@ -71,10 +71,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo "... failed: $FIONA exited with non-zero return value."
-        resultSingle=1
-    fi
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     if [ $resultSingle -eq 0 ] ; then
         echo "diff $outputPrefix.og $outputExpected"
@@ -83,6 +86,7 @@ else
                  "$outputPrefix.og" "$outputExpected"
             resultSingle=1
         fi
+    fi
     fi
 fi
 
@@ -116,10 +120,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo "... failed: $FIONA exited with non-zero return value."
-        resultSingle=1
-    fi
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     if [ $resultSingle -eq 0 ] ; then
         echo "diff $outputPrefix.og $outputExpected"
@@ -128,6 +135,7 @@ else
                  "$outputPrefix.og" "$outputExpected"
             resultSingle=1
         fi
+    fi
     fi
 fi
 
@@ -161,10 +169,12 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo "... failed: $FIONA exited with non-zero return value."
-        resultSingle=1
-    fi
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
 
     if [ $resultSingle -eq 0 ] ; then
         echo "diff $outputPrefix.og $outputExpected"
@@ -173,6 +183,7 @@ else
                  "$outputPrefix.og" "$outputExpected"
             resultSingle=1
         fi
+    fi
     fi
 fi
 

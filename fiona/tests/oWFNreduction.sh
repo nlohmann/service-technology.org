@@ -66,6 +66,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "|P|=$nodes_soll" > /dev/null
     nodes=$?
@@ -79,6 +86,7 @@ else
     fi
 
     result=`expr $result + $nodes + $edges`
+    fi
 fi
 
 cmd="$FIONA $owfn.owfn $output.reduced.owfn -t equivalence"
@@ -94,12 +102,20 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... equivalence check of the owfn and it's reduced version's OGs failed.
+    fi
     fi
 fi
 
@@ -122,6 +138,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "|P|=$nodes_soll" > /dev/null
     nodes=$?
@@ -135,6 +158,7 @@ else
     fi
 
     result=`expr $result + $nodes + $edges`
+    fi
 fi
 
 cmd="$FIONA $owfn.owfn $output.reduced.owfn -t equivalence"
@@ -150,12 +174,20 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "are equivalent: NO" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... the net and the reduced net are equivalent so the PNapi was probably updated to handle finalconditions.
+    fi
     fi
 fi
 
@@ -181,6 +213,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "|P|=$nodes_soll" > /dev/null
     nodes=$?
@@ -194,6 +233,7 @@ else
     fi
 
     result=`expr $result + $nodes + $edges`
+    fi
 fi
 
 cmd="$FIONA $owfn.owfn $output.reduced.owfn -t equivalence"
@@ -209,12 +249,20 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    `$evaluate $fionaExitCode`
+    if [ $? -ne 0 ] 
+    then
+    result=1
+    else
+
 
     echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     resultSIM=$?
     if [ $resultSIM -ne 0 ]; then
         let "result += 1"
         echo ... equivalence check of the owfn and it's reduced version's OGs failed.
+    fi
     fi
 fi
 

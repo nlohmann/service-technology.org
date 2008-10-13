@@ -9,6 +9,12 @@ EXTRA_DIST = gendocs.sh gendocs_template
 MAINTAINERCLEANFILES = cmdline.out
 
 #############################################################################
+# skip texi2dvi and dvips (avoid bug under cygwin)
+#############################################################################
+TEXI2DVI = echo
+DVIPS = echo
+
+#############################################################################
 # run "uml2owfn --help" to include output in documentation
 #############################################################################
 cmdline.out: $(top_srcdir)/src/options.cc $(top_srcdir)/src/options.h $(top_srcdir)/configure.ac

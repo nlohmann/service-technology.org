@@ -24,7 +24,6 @@ CLEANFILES = *.lola \
 		uml2owfn.exe.stackdump \
 		core \
 		result.txt \
-		*.sh \
 		*.csv
 
 EXTRA_DIST = $(TESTS) compiler soundness

@@ -1,6 +1,8 @@
-@heading Version 1.03 (in progress)
+@heading Version 1.03 (unreleased)
 
 @itemize
+@item fixed a bug in handling filenames, UML2oWFN can now process files in other directories than the current working directory
+@item added tests to @file{./tests/}, run @samp{make check} to run the test suite
 @item added parameter @samp{-a orJoin} to translate process for soundness analysis assuming an implicit OR-join on the control-flow
 @item extend log output, log now contains statistical data about the each process: number of nodes, number of edges, average number of incoming edges, average number of outgoing edges
 @item added parameter @samp{-p anon} to anonymize the process output by enumerating places (p1, p2, ...) and transitions (t1, t2, ...) before writing to disk

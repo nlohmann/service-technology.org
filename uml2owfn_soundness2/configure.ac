@@ -12,7 +12,7 @@
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([UML2OWFN],[1.03],[znamirow@informatik.hu-berlin.bde],[uml2owfn])
+AC_INIT([UML2OWFN],[1.03-unreleased],[znamirow@informatik.hu-berlin.de],[uml2owfn])
 AM_INIT_AUTOMAKE
 
 
@@ -68,6 +68,7 @@ fi
 # Set files to generate.
 AC_CONFIG_FILES([src/Makefile \
                  doc/Makefile \
+                 tests/Makefile \
                  Makefile])
 
 

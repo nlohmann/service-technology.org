@@ -62,6 +62,8 @@
 #include <map>
 #include <set>
 
+#include <libgen.h>     // for ::basename
+
 #include "uml2owfn.h"   // generated configuration file
 #include "pnapi.h"      // Petri Net support
 #include "bom-process.h"	// representation of BOM processes
@@ -135,8 +137,7 @@ void log_println (string text);
  *
  * \returns	modified name of the process
  */
-string process_name_to_file_name (string processName)
-{
+string process_name_to_file_name (string processName) {
 	string modifiedProcessName = "";
 
 	for (string::iterator c = processName.begin(); c != processName.end(); c++) {
@@ -173,32 +174,37 @@ void analyze_cl(int argc, char *argv[])
 
 }
 
-
-
 // opening a file
-void open_file(string file)
-{
-  if (inputfiles.size() >= 1)
-  {
-    globals::filename = file;
-    if (!(frontend_in = fopen(globals::filename.c_str(), "r")))
-    {
-      cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
-      exit(2);
+void open_file(string file) {
+  if (inputfiles.size() >= 1) {
+
+    char* ffile = (char*)malloc(file.size() + sizeof(char));
+    strcpy(ffile, file.c_str());
+    globals::filename = string(::basename(ffile));
+    globals::workingDirectory = string(::dirname(ffile));
+    free(ffile);
+
+    if (!(frontend_in = fopen(file.c_str(), "r"))) {
+      cerr << "Could not open file for reading: " << file.c_str() << endl;
+      exit(EXIT_FAILURE);
     }
   }
 }
 
-
 // closing a file
-void close_file(string file)
-{
-  if ( globals::filename != "<STDIN>" && frontend_in != NULL)
-  {
+void close_file(string file) {
+  if ( globals::filename != "<STDIN>" && frontend_in != NULL) {
     trace(TRACE_INFORMATION," + Closing input file: " + globals::filename + "\n");
     fclose(frontend_in);
     frontend_in = NULL;
   }
+}
+
+/*!
+ * \brief remove last extension of a file name
+ */
+string stripExtension(string fileName) {
+  return fileName.substr(0, fileName.rfind('.',fileName.length()));
 }
 
 /******************************************************************************
@@ -207,13 +213,15 @@ void close_file(string file)
 
 /*!
  * \brief return string of the output file name of the current process
+ * \param prefix added in front of the file name
+ * \param use_suffix append suffix to filename
  * \pre globals::output_filename and globals::output_filename_suffix have been set
  */
-string getOutputFilename() {
+string getOutputFilename(string prefix = "", bool use_suffix=true) {
   if (globals::output_filename == "")
     return "";
   else
-    return globals::output_filename + globals::output_filename_suffix;
+    return globals::workingDirectory + GetSeparatorChar() + prefix + globals::output_filename + (use_suffix ? globals::output_filename_suffix : "");
 }
 
 /*!
@@ -477,7 +485,7 @@ void write_log_file () {
 	if (globals::output_filename != "")
 	{
 		trace(TRACE_INFORMATION, "writing log file to uml2owfn_" + globals::output_filename + ".log ... ");
-		output = openOutput("uml2owfn_" + globals::output_filename + ".log");
+		output = openOutput(getOutputFilename("uml2owfn_", false) + ".log");
 	}
 
 	(*output) << logContents.str() << endl;
@@ -648,7 +656,7 @@ void write_script_file () {
 			// write script file for soundness analysis
 			if (globals::output_filename != "")
 			{
-				output = openOutput("check_" + globals::output_filename + ".sh");
+				output = openOutput(getOutputFilename("check_", false) + ".sh");
 			}
 
 			(*output) << "# script for checking the processes for soundness" << endl;
@@ -760,9 +768,11 @@ translationResult_t translate_process(Block *process, analysis_t analysis, unsig
     process->returnNet(&PN, bom);
     trace(TRACE_DEBUG, "-> done\n");
 
+#ifdef BOM_DECOMPOSITION
     // DECOMPOSITION
     // Creating an end state for the decomposed oWFN
-    //(*process)->createEndState(tryPN);
+    process->createEndState(&PN);
+#endif
 
     // Delete places in the net that represent unused pins
     // of tasks in the business object model
@@ -932,14 +942,12 @@ int main( int argc, char *argv[])
   set< string >::iterator file = inputfiles.begin();
   do
   {
-    if (file != inputfiles.end())
-    {
-      open_file(*file);
+    open_file(*file);
+    // reset the parser
+    frontend_restart(frontend_in);
 
-      // reset the parser
-      frontend_restart(frontend_in);
-    } else {
-        return 0;
+    if (globals::getOutputFileNameFromInput) {
+      globals::output_filename = stripExtension(globals::filename);
     }
 
     // invoke BPEL Bison parser
@@ -963,6 +971,8 @@ int main( int argc, char *argv[])
 	    	// values
     		trace(TRACE_DEBUG, "-> resolving references and names, creating nodes of the process\n");
 	    	(*process)->transferName();
+	    	if (globals::parameters[P_ANONYMIZE])  // anonymize name of the process
+	    	  (*process)->name = "net"+toString(processNum);
     		trace(TRACE_DEBUG, "-> resolved\n");
 
     		// set suffix for this process, so we have an output file name
@@ -1013,21 +1023,28 @@ int main( int argc, char *argv[])
 	    		continue;
 	    	}
 
-#ifdef BOM_DECOMPOSION
+#ifdef BOM_DECOMPOSITION
 	      // Decomposition is currently not in use, due to
         // a missing algorithm that would allow to turn a
         // structurally decomposed net into a meaningful process
+	    	if (globals::parameters[P_CUT])
+	    	{
+          string roleName = (*process)->findRole();
+          if (roleName != "")
+          {
+            // Testroles for cutting
+            set<string> testStrings;
+            //testStrings.insert("Hmn32Rls##Customer");
+            testStrings.insert(roleName);
 
-        // Testroles for cutting
-         set<string> testStrings;
-         testStrings.insert("Hmn32Rls##Customer");
-
-        // Functions to spread roles, cut the net and
-        // turn it into a working process (incomplete)
-        (*process)->adjustRoles();
-        (*process)->cutNet(testStrings, 2);
-        (*process)->disableStart();
-        (*process)->disableEnd();
+            // Functions to spread roles, cut the net and
+            // turn it into a working process (incomplete)
+            (*process)->adjustRoles();
+            (*process)->cutNet(testStrings, 4);
+            (*process)->disableStart();
+            (*process)->disableEnd();
+          }
+	    	}
 #endif // BOM_DECOMPOSITION
 
 	    	// translate process wrt. the current analysis settings, if necessary,
@@ -1084,7 +1101,7 @@ int main( int argc, char *argv[])
   trace(TRACE_INFORMATION, "All files have been parsed.\n");
 
   // everything went fine
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 /*!

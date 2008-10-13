@@ -30,11 +30,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
- * 
+ *
  * \since   2007/03/05
  *
  * \date    \$Date: 2007/06/28 07:38:16 $
- * 
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
@@ -48,9 +48,6 @@
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
-
-
-
 
 
 /******************************************************************************
@@ -78,7 +75,7 @@ namespace globals
     extern set<Block*> processes;
     extern set<Block*> tasks;
     extern set<Block*> services;
-    
+
 
   extern string finalCondition;
 
@@ -87,18 +84,24 @@ namespace globals
 
   extern string invocation;
 
+  /// working directory of input file
+  extern string workingDirectory;
+
   /// filename of input file
   extern string filename;
 
   /// filename of output file
   extern string output_filename;
-  
+
   /// suffix for output file name, used if multiple files are written
   extern string output_filename_suffix;
 
+  /// flag whether output file name is generated from the given input file
+  extern bool getOutputFileNameFromInput;
+
   /// parameters (set by #parse_command_line)
   extern map<possibleParameters, bool> parameters;
-  
+
   /// analysis task flags (set by #parse_command_line)
   extern map<possibleAnalysis, bool> analysis;
 
@@ -107,9 +110,9 @@ namespace globals
 
   /// the line of the last syntax error
   extern string last_error_line;
-  
+
   extern unsigned int reduction_level;
-  
+
   /// store current process name for output
   extern string currentProcessName;
 

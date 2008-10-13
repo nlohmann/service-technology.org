@@ -377,6 +377,9 @@ class Block
     void transferName();
 
 #ifdef BOM_DECOMPOSITION
+    /// DECOMPOSITION: determine a role name from the role names used in this process
+    string findRole();
+
     /// DECOMPOSITION: Changes the roles of roleless control flow components
     ///                so that they become part of the roleview
     void adjustRoles();

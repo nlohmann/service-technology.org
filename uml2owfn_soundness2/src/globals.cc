@@ -30,11 +30,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
- * 
+ *
  * \since   2007/03/05
  *
  * \date    \$Date: 2007/06/28 07:38:16 $
- * 
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
@@ -60,18 +60,20 @@
 namespace globals {
 
   string finalCondition = "";
-  
+
     set<Block*> processes;
     set<Block*> tasks;
     set<Block*> services;
-    
+
   string program_name ="";
 
   string invocation = "";
- 
+
+  string workingDirectory = "";
   string filename = "<STDIN>";
   string output_filename = "";
   string output_filename_suffix = "";	///< suffix of the current output file (if multiple files are written)
+  bool getOutputFileNameFromInput = false;
 
   map<possibleParameters, bool> parameters;
   analysis_t analysis;
@@ -81,7 +83,7 @@ namespace globals {
   string last_error_line = "";
 
   unsigned int reduction_level = 0;
-  
+
   // store the current process name (for output)
   string currentProcessName = "";
 

@@ -131,9 +131,12 @@ void print_help()
 	trace("    log                 write a log file for the translation\n");
 	trace("    taskfile            write analysis task to a separate file\n");
 	trace("    anon                anonymize the process output\n");
+#ifdef BOM_DECOMPOSITION
+  trace("    cut                 cut each process\n");
+#endif
 	trace("\n");
 	trace("  FORMAT is one of the following (multiple formats permitted):\n");
-	trace("    lola, owfn, dot, pep, tpn, apnn, ina, spin, info, pnml, txt, info\n");
+	trace("    lola, owfn, dot, pep, tpn, apnn, ina, spin, pnml, info\n");
 	trace("\n");
 	trace("  TASK is one of the following (multiple parameters permitted):\n");
 	trace("    soundness           analyze for soundness\n");
@@ -299,6 +302,10 @@ void parse_command_line(int argc, char* argv[])
 				globals::parameters[P_LOG] = true;
 			else if (parameter == "anon")
 			  globals::parameters[P_ANONYMIZE] = true;
+#ifdef BOM_DECOMPOSITION
+			else if (parameter == "cut")
+			  globals::parameters[P_CUT] = true;
+#endif
 			else {
 				trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
 				trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");
@@ -460,11 +467,12 @@ void parse_command_line(int argc, char* argv[])
 		if ( not(options[O_INPUT]) )
 		{
 			globals::output_filename = "stdof";
-			trace(TRACE_ALWAYS, "Output filename set to standard: stdof\n");
+			trace(TRACE_ALWAYS, "Output file name set to standard: stdof\n");
 		}
 		else
 		{
 			set< string >::iterator file = inputfiles.begin();
+			/*
 			unsigned int pos = file->rfind("."+suffixes[F_BOM_XML], file->length());
 			if (pos == ( file->length() - (suffixes[F_BOM_XML].length()+1) ))
 			{
@@ -472,6 +480,9 @@ void parse_command_line(int argc, char* argv[])
 				trace(TRACE_INFORMATION, "Output filename set to: "+globals::output_filename+"\n");
 			}
 			file++;
+			*/
+			globals::getOutputFileNameFromInput = true;
+			trace(TRACE_INFORMATION, "Generating output file name from input file name\n");
 		}
 	}
 

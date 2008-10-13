@@ -942,7 +942,7 @@ ExtendedWorkflowNet* Block::returnNet(ExtendedWorkflowNet* PN, BomProcess *bom)
     // by its types pattern
     for (set<Block*>::iterator child = children.begin(); child != children.end(); child++)
     {
-#ifdef BOM_DECOMPOSTION
+#ifdef BOM_DECOMPOSITION
         // DECOMPOSITION: if not decomposed, all children are enabled
         if(!(*child)->enabled)
         {
@@ -1389,11 +1389,7 @@ void Block::translateConnections(PetriNet* PN, BomProcess *bom)
 	// iterate over all connections
     for ( set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
     {
-    	// DECOMPOSITION: If the connection is not enabled, dont do anything
-    	if((*con)->enabled == false)
-        {
-            continue;
-        }
+
 
       // create at least one of the transitions and the central place of the connection
     	Transition* t;
@@ -1404,8 +1400,12 @@ void Block::translateConnections(PetriNet* PN, BomProcess *bom)
         // for this is a simple roleinternal connection.
         if((*con)->roleCrossing == false)
         {
-            t = PN->newTransition(globalPrefix + "connection." + (*con)->name);
-            (*con)->firstTransition = t;
+          // DECOMPOSITION: If the connection is not enabled, dont do anything
+          if((*con)->enabled == false)
+            continue;
+
+          t = PN->newTransition(globalPrefix + "connection." + (*con)->name);
+          (*con)->firstTransition = t;
         }
         else
         // If the connection is rolecrossing, the central place of the connection
@@ -1428,6 +1428,9 @@ void Block::translateConnections(PetriNet* PN, BomProcess *bom)
             (*con)->firstTransition = t;
         }
 
+        // DECOMPOSITION: If the connection is not enabled, dont do anything
+        if((*con)->enabled == false)
+          continue;
 
         // From this point on the code becomes rather obfuscated, because we always
         // need to differentiate whether a block is atomic or not, if the source
@@ -1627,6 +1630,35 @@ string Block::statistics_toString(char separator) {
 }
 
 #ifdef BOM_DECOMPOSITION
+
+string Block::findRole()
+{
+  set<string> roleNames;
+  map<string, int> roleNameCount;
+
+  // iterate over all blocks of the process
+  for (set<Block*>::iterator child = children.begin(); child != children.end(); child++)
+  {
+    for (set<string>::iterator roleName = (*child)->roleRequirements.begin();
+                               roleName != (*child)->roleRequirements.end(); roleName++)
+    {
+      roleNames.insert(*roleName);
+      roleNameCount[*roleName]++;
+    }
+  }
+
+  string minName = "";
+  int minCount = 65536;
+  for (set<string>::iterator roleName = roleNames.begin(); roleName != roleNames.end(); roleName++)
+  {
+    if (roleNameCount[*roleName] < minCount) {
+      minCount = roleNameCount[*roleName];
+      minName = *roleName;
+    }
+  }
+  return minName;
+}
+
 //! \brief DECOMPOSITION: This is the actual decomposition function, that is
 //!        executed before the petrinet is created. It computes for every block
 //!        and connection whether it is enabled and whether the connection is
@@ -1765,62 +1797,48 @@ void Block::cutNet(set<string> roleSet, int mode)
         }
     }
 
-    // iterate over all connections
-    for ( set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
-    {
-        // assume its neither enabled nor rolecrossing
-    	(*con)->enabled = false;
+  // iterate over all connections
+  for (set<BlockConnection*>::iterator con = connections.begin();
+       con != connections.end(); con++) {
+    // assume its neither enabled nor rolecrossing
+    (*con)->enabled = false;
+    (*con)->roleCrossing = false;
+
+    bool srcPresent = (*con)->src->enabled;
+    bool tgtPresent = (*con)->tgt->enabled;
+
+    // if the source of the connection is enabled, this connection is too.
+    // assume it is rolecrossing and not an input
+    if (srcPresent || tgtPresent) {
+      // has source or target: link is represented somehow
+      (*con)->enabled = true;
+
+      if (!srcPresent || !tgtPresent) {
+        // source or target is missing: croses role boundary
+        (*con)->roleCrossing = true;
+        if (!tgtPresent)
+          (*con)->input = false;  // no target: link leaves the process
+        if (!srcPresent)
+          (*con)->input = true;  // no source: link enters the process
+      }
+    }
+  }
+
+  // Check all enabled connections again:
+  // if it was assumed rolecrossing, but the nonenabled source/target is the
+  // process itself, it is not rolecrossing, but an original input/output
+  for (set<BlockConnection*>::iterator con = connections.begin();
+       con != connections.end(); con++) {
+    if ((*con)->enabled && (*con)->roleCrossing) {
+      if ((*con)->src == this || (*con)->tgt == this) {
         (*con)->roleCrossing = false;
-
-
-        // if the source of the connection is enabled, this connection is too.
-        // assume it is rolecrossing and not an input
-        if (cutBlocks.find((*con)->src) != cutBlocks.end())
-        {
-            (*con)->enabled = true;
-            (*con)->roleCrossing = true;
-            (*con)->input = false;
-        }
-
-        // if the target of the connection is enabled, this connection is too.
-        // it can only be an output or neither and if it was rolecrossing
-        // (because the source was also enabled) it cant be rolecrossing anymore.
-        if (cutBlocks.find((*con)->tgt) != cutBlocks.end())
-        {
-            (*con)->enabled = true;
-            (*con)->input = true;
-            if ((*con)->roleCrossing)
-            {
-                (*con)->roleCrossing = false;
-            }
-            else
-            {
-                (*con)->roleCrossing = true;
-            }
-        }
+      }
     }
 
-    // Check all enabled connections again:
-    // if it was assumed rolecrossing, but the nonenabled source/target is the
-    // process itself, it is not rolecrossing, but an original input/output
-    for ( set<BlockConnection*>::iterator con = connections.begin(); con != connections.end(); con++)
-    {
-        if ((*con)->enabled)
-        {
-
-            if((*con)->roleCrossing)
-            {
-                if ((*con)->src == this)
-                {
-                    (*con)->roleCrossing = false;
-                }
-                if ((*con)->tgt == this)
-                {
-                    (*con)->roleCrossing = false;
-                }
-            }
-        }
+    if ((*con)->enabled) {
+      assert((*con)->src->enabled || (*con)->tgt->enabled);
     }
+  }
 }
 
 //! \brief DECOMPOSTION: Determine all connections that have an input or a startnode

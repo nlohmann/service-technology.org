@@ -1,17 +1,12 @@
 ###############################################################################
 # UML2oWFN -- Translating IBM Business Modeler Processes into Petri Net Models
-#
-# Copyright (C) 2007, 2008  Martin Znamirowski,
-#                           Dirk Fahland, and
-#                           Niels Lohmann
-#
 ###############################################################################
 
 # File last changed $Date: 2007/06/28 07:38:13 $ by $Author: nielslohmann $
 # Version $Revision: 1.64 $
 
 # Where else are Makefiles?
-SUBDIRS = src doc
+SUBDIRS = src doc tests
 
 ####################################
 # Targets to clean generated files #
@@ -21,13 +16,13 @@ SUBDIRS = src doc
 CLEANFILES = -r *~
 
 #############################################################################
-# remove everything that cannot be built
+# remove everything that can be re-built
 #############################################################################
-cvs-clean: maintainer-clean
+svn-clean: maintainer-clean
 	rm -fr .DS_Store INSTALL Makefile.in aclocal.m4 compile configure depcomp \
 	  install-sh missing ylwrap $(DIST_ARCHIVES).sig config.sub config.guess \
 	  config.h.in~
-	rm -fr doc/.DS_Store doc/Makefile.in doc/mdate-sh doc/manual
+	rm -fr doc/.DS_Store doc/ChangeLog.txt doc/Makefile.in doc/mdate-sh doc/manual
 	rm -fr src/.DS_Store src/Makefile.in src/config.h.in config.h.in~
 	rm -fr tests/Makefile.in tests/.DS_Store
 	@echo "-----------------------------------------------------"

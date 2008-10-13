@@ -321,7 +321,7 @@ void Arc::mirror()
   target = old_source;
 
   assert(target != NULL);
-  assert(source != NULL);  
+  assert(source != NULL);
   source->postset.erase(old_target);
   source->postset.insert(old_source);
   target->preset.erase(old_source);
@@ -501,7 +501,7 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
   }
 
     if (net.realStartNode!=NULL) {
-    
+
         Place * newPlace = new Place( *net.realStartNode );
         newPlace->id = (net.realStartNode)->id;
         newPlace->preset.clear();
@@ -905,17 +905,17 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 {
   if (t1 == t2)
     return;
-  
+
   assert(t1 != NULL);
   assert(t2 != NULL);
-  
+
   // variable needed for correct arc weights
   bool sametarget = false;
   // container for arcs to be deleted
   set<Arc *>::iterator delArc;
   // the merged transition
   Node *t12 = newTransition("");
-  
+
   // organize the communication type of the new transition
   if (t1->type == t2->type)
   {
@@ -938,9 +938,9 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
     t12->type = INOUT;
   }
   else assert(false); ///< this should never happer or we have missed a case
-  
+
   t12->prefix = t1->prefix;
-  
+
   // copy t1's history to t12
   for (list<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
   {
@@ -952,7 +952,7 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
       //      t12->history.push_back(t1->prefix + *role);
     }
   }
-  
+
   // copy t2's history to t12
   for (list<string>::iterator role = t2->history.begin(); role != t2->history.end(); role++)
   {
@@ -964,35 +964,35 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
       //      t12->history.push_back(t2->prefix + *role);
     }
   }
-  
+
   roleMap[t1->nodeFullName()] = t12;
   roleMap[t2->nodeFullName()] = t12;
-  
+
   // merge pre- and postsets for t12
   t12->preset=setUnion(t1->preset, t2->preset);
   t12->postset=setUnion(t1->postset, t2->postset);
-  
+
   // create the weighted arcs for t12
-  
+
   // this is the preset of t12 without the preset of t1. It is needed not generate double arcs if
   // the preset of t1 and t2 were not distinct.
   set<Node *> preset2without1 = setDifference(t12->preset,t1->preset);
-  
+
   // create new arcs from the t1 preset to t12
   for (set<Node *>::iterator n = t1->preset.begin(); n != t1->preset.end(); n++)
     newArc((*n), t12, STANDARD, arc_weight((*n),t1));
-  
+
   // create new arcs from the preset of t2 to t12 without those, that have been already covered by the preset of t1
   for (set<Node *>::iterator n = preset2without1.begin(); n != preset2without1.end(); n++)
     newArc((*n), t12, STANDARD, arc_weight((*n),t2));
-  
+
   // create new arcs from t12 to postset of t1
-  for (set<Node *>::iterator n = t1->postset.begin(); n != t1->postset.end(); n++) 
+  for (set<Node *>::iterator n = t1->postset.begin(); n != t1->postset.end(); n++)
     newArc(t12, (*n), STANDARD, arc_weight(t1,(*n)));
-  
+
   // create new arcs from t12 to postset of t2 and adjust arcweights if a node of postset of t2 is also in postset of t1
   for (set<Node *>::iterator n = t2->postset.begin(); n != t2->postset.end(); n++)
-  {    
+  {
     // Find an arc already created in because of the postset of t1
     for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     {
@@ -1002,7 +1002,7 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
         delArc=f;
       }
     }
-    
+
     // if such an arc was found, save its weight, delete it and add its weight to the arc from t12 to postset of t2
     if (sametarget)
     {
@@ -1017,13 +1017,13 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
       newArc(t12, (*n), STANDARD, arc_weight(t2,(*n)));
     }
   }
-  
-  
+
+
   // set max_occurrences
   t12->max_occurrences = (t1->max_occurrences > t2->max_occurrences) ?
     t1->max_occurrences :
     t2->max_occurrences;
-  
+
   removeTransition(t1);
   removeTransition(t2);
 }
@@ -1034,7 +1034,7 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 
 /*!
  * \brief   merges two parallel transitions
- *          
+ *
  *          Merges two parallel transitions. Given transitions t1 and t2:
  *          -# a new transition t12 with empty history is created
  *          -# this transition gets the union of the histories of transition t1
@@ -1057,30 +1057,30 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
 {
   if (t1 == t2)
     return;
-  
+
   assert(t1 != NULL);
   assert(t2 != NULL);
-  
+
   Node *t12 = newTransition("");
-  
+
   // organize the communication type of the new transition
   if (t1->type == t2->type)
     t12->type = t1->type;
-  
+
   else if ((t1->type == IN && t2->type == INTERNAL) ||
            (t1->type == INTERNAL && t2->type == IN))
     t12->type = IN;
-  
+
   else if ((t1->type == INTERNAL && t2->type == OUT) ||
            (t1->type == OUT && t2->type == INTERNAL))
     t12->type = OUT;
-  
+
   else if ((t1->type == OUT && t2->type == IN) ||
            (t1->type == IN && t2->type == OUT) ||
            (t1->type == INOUT || t2->type == INOUT))
     t12->type = INOUT;
-  
-  
+
+
   // copy t1's history to t12
   for (list<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
   {
@@ -1094,7 +1094,7 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
       t12->history.push_back(t2->prefix + *role);
     }
   }
-  
+
   // copy t2's history to t12
   for (list<string>::iterator role = t2->history.begin(); role != t2->history.end(); role++)
   {
@@ -1108,28 +1108,28 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
       t12->history.push_back(t2->prefix + *role);
     }
   }
-  
+
   // merge pre- and postsets for t12
   t12->preset=setUnion(t1->preset, t2->preset);
   t12->postset=setUnion(t1->postset, t2->postset);
-  
+
   // create the weighted arcs for t12
   set<Node *> preset2without1 = setDifference(t12->preset,t1->preset);
   set<Node *> postset2without1 = setDifference(t12->postset,t1->postset);
-  
-  
+
+
   for (set<Node *>::iterator n = t1->preset.begin(); n != t1->preset.end(); n++)
     newArc((*n), t12, STANDARD, arc_weight((*n),t1));
-  
+
   for (set<Node *>::iterator n = preset2without1.begin(); n != preset2without1.end(); n++)
     newArc((*n), t12, STANDARD, arc_weight((*n),t2));
-  
+
   for (set<Node *>::iterator n = t1->postset.begin(); n != t1->postset.end(); n++)
     newArc(t12, (*n), STANDARD, arc_weight(t1,(*n)));
-  
+
   for (set<Node *>::iterator n = postset2without1.begin(); n != postset2without1.end(); n++)
     newArc(t12, (*n), STANDARD, arc_weight(t2,(*n)));
-  
+
   removeTransition(t1);
   removeTransition(t2);
 }
@@ -1140,7 +1140,7 @@ void PetriNet::fixPlaceNames()
     for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
     {
         string placeName = (*place)->nodeShortName();
-                
+
         while ( placeName.find("#",0) != string::npos)
         {
             int deletePos;
@@ -1154,10 +1154,10 @@ void PetriNet::fixPlaceNames()
             deletePos = placeName.find_first_of(" ",0);
             placeName.erase(deletePos,1);
         }
-        
+
         (*place)->history.pop_front();
         (*place)->history.push_front(placeName);
-                        
+
     }
 
     for (set< Place * >::iterator place = P_out.begin(); place != P_out.end(); place ++)
@@ -1178,7 +1178,7 @@ void PetriNet::fixPlaceNames()
         }
 
         (*place)->history.pop_front();
-        (*place)->history.push_front(placeName);                
+        (*place)->history.push_front(placeName);
     }
 }
 
@@ -1210,28 +1210,28 @@ Place* PetriNet::mergePlaces(Place * & p1, Place * & p2)
 {
   if (p1 == p2 && p1 != NULL)
     return p1;		// return this place
-  
+
   if (p1 == NULL || p2 == NULL)
   {
     std::cerr << "[PN] At least one parameter of mergePlaces was NULL!" << std::endl;
     assert(false);
     return NULL;
   }
-  
+
   assert(p1 != NULL);
   assert(p2 != NULL);
   assert(p1->type == INTERNAL);
   assert(p2->type == INTERNAL);
-  
+
   Place *p12 = newPlace("", INTERNAL);
-  
+
   p12->tokens = max(p1->tokens, p2->tokens);
   p12->isFinal = (p1->isFinal || p2->isFinal);
   p12->wasExternal = p1->wasExternal + p2->wasExternal;
-  
+
   if (realStartNode == p1 || realStartNode == p2)
       realStartNode = p12;
-      
+
   if (generatedInitials.find(p1) != generatedInitials.end())
   {
       generatedInitials.erase(p1);
@@ -1244,7 +1244,7 @@ Place* PetriNet::mergePlaces(Place * & p1, Place * & p2)
       generatedInitials.insert(p12);
   }
 
-  
+
   for (list<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
   {
     p12->history.push_back(*role);
@@ -1257,7 +1257,7 @@ Place* PetriNet::mergePlaces(Place * & p1, Place * & p2)
       p12->history.push_back(p2->prefix + *role);
     }
   }
-  
+
   for (list<string>::iterator role = p2->history.begin(); role != p2->history.end(); role++)
   {
     p12->history.push_back(*role);
@@ -1270,37 +1270,37 @@ Place* PetriNet::mergePlaces(Place * & p1, Place * & p2)
       p12->history.push_back(p2->prefix + *role);
     }
   }
-  
+
   // merge pre- and postsets for p12
   p12->preset=setUnion(p1->preset, p2->preset);
   p12->postset=setUnion(p1->postset, p2->postset);
-  
+
   // create the weighted arcs for p12
-  
+
   set<Node *> preset2without1 = setDifference(p12->preset,p1->preset);
   set<Node *> postset2without1 = setDifference(p12->postset,p1->postset);
-  
+
   if ((p1->preset.size() + p1->postset.size()) > 1000)
     std::cerr << (p1->preset.size() + p1->postset.size()) << " arcs to add..." << std::endl;
-  
+
   for (set<Node *>::iterator n = p1->preset.begin(); n != p1->preset.end(); n++)
     newArc((*n), p12, STANDARD, arc_weight((*n),p1));
-  
+
   for (set<Node *>::iterator n = preset2without1.begin(); n != preset2without1.end(); n++)
     newArc((*n), p12, STANDARD, arc_weight((*n),p2));
-  
+
   for (set<Node *>::iterator n = p1->postset.begin(); n != p1->postset.end(); n++)
     newArc(p12, (*n), STANDARD, arc_weight(p1,(*n)));
-  
+
   for (set<Node *>::iterator n = postset2without1.begin(); n != postset2without1.end(); n++)
     newArc(p12, (*n), STANDARD, arc_weight(p2,(*n)));
-  
+
   removePlace(p1);
   removePlace(p2);
-  
+
   p1 = NULL;
   p2 = NULL;
-  
+
   return p12;
 }
 
@@ -1322,10 +1322,10 @@ Place* PetriNet::mergePlaces(string role1, string role2)
   Place * p2 = findPlace(role2);
 
   if ( p1 == NULL )
-    std::cerr << "p1 has role '" << role1 << "'" << std::endl; 
+    std::cerr << "p1 has role '" << role1 << "'" << std::endl;
 
   if ( p2 == NULL )
-    std::cerr << "p2 has role '" << role2 << "'" << std::endl; 
+    std::cerr << "p2 has role '" << role2 << "'" << std::endl;
 
   return mergePlaces( p1, p2 );
 }
@@ -1335,7 +1335,7 @@ Place* PetriNet::mergePlaces(Place * & p1, string role2)
   Place * p2 = findPlace(role2);
 
   if ( p2 == NULL )
-    std::cerr << "p2 has role '" << role2 << "'" << std::endl; 
+    std::cerr << "p2 has role '" << role2 << "'" << std::endl;
 
   return mergePlaces( p1, p2 );
 }
@@ -1345,8 +1345,8 @@ Place* PetriNet::mergePlaces(string role1, Place * & p2)
   Place * p1 = findPlace(role1);
 
   if ( p1 == NULL )
-    std::cerr << "p1 has role '" << role1 << "'" << std::endl; 
-  
+    std::cerr << "p1 has role '" << role1 << "'" << std::endl;
+
   return mergePlaces( p1, p2 );
 }
 
@@ -1482,7 +1482,7 @@ bool PetriNet::sameweights(Node *n) const
         }
       }
   }
-  
+
   return true;
 }
 
@@ -1566,7 +1566,7 @@ set<Node *> PetriNet::postset(Node *n) const
 Place *PetriNet::findPlace(string role) const
 {
   map< std::string, Node* >::const_iterator p = roleMap.find(role);
-  
+
   if ((p != roleMap.end()) && (p->second->nodeType == PLACE))
     return (static_cast<Place *>(p->second));
   else
@@ -1578,7 +1578,7 @@ Place *PetriNet::findPlace(string role) const
         return (static_cast<Place *>(p_with_suffix->second));
     }
   }
-  
+  //cerr << role << " not found " << endl;
   return NULL;
 }
 
@@ -1618,7 +1618,7 @@ Place *PetriNet::findPlace(unsigned int id, string role) const
 Transition *PetriNet::findTransition(string role) const
 {
   map< std::string, Node* >::const_iterator t = roleMap.find(role);
-  
+
   if (t != roleMap.end() && t->second != NULL )
   {
     if (t->second->nodeType == TRANSITION)
@@ -1657,7 +1657,7 @@ set< Place * > PetriNet::getFinalPlaces() const
 
 /*!
  * \brief	returns a set of all internal places
- * 
+ *
  * \return	the set of all internal places
  */
 set<Place *> PetriNet::getInternalPlaces() {
@@ -1753,7 +1753,7 @@ void PetriNet::addPrefix(string prefix)
 /*!
  * \brief   composes a second Petri net
  *
- * Given a second Petri net #net, the internal structure is added and input 
+ * Given a second Petri net #net, the internal structure is added and input
  * and output places are connected appropriatedly (if an input and an output
  * place name of the two nets match).
  *
@@ -1924,12 +1924,12 @@ void PetriNet::compose(const PetriNet &net)
   }
 }
 
-void PetriNet::fixIBMNet() 
+void PetriNet::fixIBMNet()
 {
     set<Place*> removeNodes;
 
     // collect all nodes that have to be removed
-    
+
     //  remove isolated output places
     for (set< Place * >::iterator place = P_out.begin(); place != P_out.end(); place ++)
     {
@@ -1938,7 +1938,7 @@ void PetriNet::fixIBMNet()
             removeNodes.insert(*place);
         }
     }
-    
+
     //  remove isolated input places
     for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
     {
@@ -1947,25 +1947,25 @@ void PetriNet::fixIBMNet()
             removeNodes.insert(*place);
         }
     }
-    
+
     //  remove isolated internal places
     for (set< Place * >::iterator place = P.begin(); place != P.end(); place ++)
     {
-        if ((*place)->postset.empty() && !(*place)->isFinal && (*place)->type == INTERNAL) 
+        if ((*place)->postset.empty() && !(*place)->isFinal && (*place)->type == INTERNAL)
         {
             removeNodes.insert(*place);
         }
     }
-    
+
     //  remove non-marked internal places with an empty preset
     for (set< Place * >::iterator place = P.begin(); place != P.end(); place ++)
     {
-        if ((*place)->preset.empty() && (*place)->type == INTERNAL && (*place)->tokens==0) 
+        if ((*place)->preset.empty() && (*place)->type == INTERNAL && (*place)->tokens==0)
         {
             removeNodes.insert(*place);
         }
     }
-    
+
     // finally remove all gathered nodes
     for (set< Place * >::iterator place = removeNodes.begin(); place != removeNodes.end(); place ++)
     {
@@ -1977,7 +1977,7 @@ void PetriNet::fixIBMNet()
 /*!
  * second step of the transformation of open nets to closed nets that can be
  * used for soundness checking
- * 
+ *
  * - adds a new transition that consumes from each interface output place and each
  *   final places of the net and produces on a new final place
  * - makes each interface output place internal
@@ -1985,14 +1985,14 @@ void PetriNet::fixIBMNet()
  *   not a deadlock of the net
  */
 
-void PetriNet::mergeFinalStates() 
+void PetriNet::mergeFinalStates()
 {
 	// TODO: this is a hack and should be solved at the Petri net translation step
     set<Place*> removeNodes;
     set<Node*> noMoreOutput;
 
 // <Dirk.F> removed creation of single final loop (revision 63) and
-// <Dirk.F> added a looping place at each output place. #LOOP# 
+// <Dirk.F> added a looping place at each output place. #LOOP#
 
     // make all final places (as found in the final marking) pre-places of the
     // finalizing transition, remove these places from the final marking
@@ -2003,7 +2003,7 @@ void PetriNet::mergeFinalStates()
             (*place)->isFinal = false;
 // <Dirk.F start> #LOOP#
 
-//            newArc((*place),finalTransition, STANDARD, 1);        	
+//            newArc((*place),finalTransition, STANDARD, 1);
 //        	Transition* tLoop = newTransition((*place)->nodeFullName() + "_loopFinal");
 //        	newArc((*place), tLoop, STANDARD, 1);
 //        	newArc(tLoop, (*place), STANDARD, 1);
@@ -2044,7 +2044,7 @@ void PetriNet::mergeFinalStates()
     {
         (*t)->type = INTERNAL;
     }
-    
+
 // <Dirk.F start> soundness, endNodes and stopnodes
     // when checking soundness, transition which consume from
     // end-nodes must be made looping, this is necessary to make sure
@@ -2054,14 +2054,14 @@ void PetriNet::mergeFinalStates()
     // (consuming from endNode must not violate the formula)
 	for (set<Place *>::iterator it = P.begin(); it != P.end(); it++) {
 		Place* p = static_cast<Place*>(*it);
-		
+
 		if (p->nodeFullName().find("endNode") != string::npos )
 		{
 			// extend endNode-name with .eat and add an arc fromt he corresponding transition
 			Transition* t = findTransition(p->nodeFullName() + ".eat");
 			newArc(t, p, STANDARD, 1);
 		}
-		
+
 		if (p->nodeFullName().find("stopNode") != string::npos )
 		{
 			// create a looping transition for the stopNode-place
@@ -2078,7 +2078,7 @@ void PetriNet::mergeFinalStates()
 
 /*!
  * \brief   moves channel places to the list of internal places
- * 
+ *
  *          Converts input and output places (channels) to internal places.
  *
  * \todo    What means "P_in.clear(); P_in = set< Place * >();"?
@@ -2103,7 +2103,7 @@ void PetriNet::makeChannelsInternal()
 
 /*!
  * \brief   re-enumerates the nodes
- * 
+ *
  *          Re-enumerates the nodes of the Petri net to have places numbered
  *          p1, p2, ... and transitions t1, t2, ... .
  */
@@ -2132,7 +2132,7 @@ void PetriNet::reenumerate()
 
 /*!
  * \brief   swaps input and output places
- * 
+ *
  *          Swaps the input and output places, i.e. swaps the sets #P_in and
  *          #P_out and the adjacent arcs.
  */
@@ -2199,7 +2199,7 @@ void PetriNet::produce(const PetriNet &net)
     if ( (*t)->labels.empty())
     {
       Transition *t_new = newTransition((*t)->nodeName());
-      
+
       // copy the arcs of the constraint oWFN
       for (set< Arc * >::iterator arc = net.F.begin(); arc != net.F.end(); arc ++)
       {
@@ -2230,7 +2230,7 @@ void PetriNet::produce(const PetriNet &net)
     for (set<string>::iterator label = (*t)->labels.begin(); label != (*t)->labels.end(); label++)
     {
       Transition *t_l = findTransition(*label);
-      
+
       // specified transition not found -- trying places instead
       if (t_l == NULL)
       {
@@ -2238,12 +2238,12 @@ void PetriNet::produce(const PetriNet &net)
         if (p != NULL)
         {
           set<Node *> transitions_p;
-          
+
           if (p->type == IN)
             transitions_p = p->postset;
           else
             transitions_p = p->preset;
-          
+
           for (set<Node *>::iterator pre_transition = transitions_p.begin(); pre_transition != transitions_p.end(); pre_transition++)
           {
             used_labels.insert((*pre_transition)->nodeName());
@@ -2271,7 +2271,7 @@ void PetriNet::produce(const PetriNet &net)
     // I have to comment the next line as Fiona cannot read node names with brackets
     // Transition *t_new = newTransition("(" + tp->first->nodeName() + "," + tp->second->nodeName() + ")");
     Transition *t_new = newTransition(tp->first->nodeName() + "_" + tp->second->nodeName());
-    
+
     // copy the arcs of the constraint oWFN
     for (set< Arc * >::iterator arc = net.F.begin(); arc != net.F.end(); arc ++)
     {
@@ -2280,7 +2280,7 @@ void PetriNet::produce(const PetriNet &net)
       if ( ( (*arc)->target->nodeType == PLACE) && ( (*arc)->source == static_cast<Node *>(tp->second) ) )
         newArc( t_new, findPlace( (*arc)->target->nodeName() ), STANDARD, (*arc)->weight );
     }
-    
+
     // copy the arcs of the oWFN
     for (set< Arc * >::iterator arc = F.begin(); arc != F.end(); arc ++)
     {
@@ -2291,7 +2291,7 @@ void PetriNet::produce(const PetriNet &net)
     }
   }
 
-  
+
   // remove transitions that are used as labels
   for (set<string>::iterator t = used_labels.begin(); t != used_labels.end(); t++)
     removeTransition(findTransition(*t));
@@ -2306,8 +2306,8 @@ void PetriNet::produce(const PetriNet &net)
  */
 void PetriNet::loop_final_state()
 {
-  Transition *t = newTransition("antideadlock"); 
-  
+  Transition *t = newTransition("antideadlock");
+
   for (set<Place *>::iterator place = P.begin(); place != P.end(); place++)
   {
     if ( (*place)->isFinal )
@@ -2316,10 +2316,10 @@ void PetriNet::loop_final_state()
 }
 
 /*!
- * 
+ *
  * first step in transforming the given open net into a closed net by making all
  * input interface places of the open net internal, initially marked places
- * 
+ *
  */
 unsigned int PetriNet::fix_lola_output()
 {

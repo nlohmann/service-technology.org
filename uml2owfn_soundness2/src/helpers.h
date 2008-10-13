@@ -169,8 +169,11 @@ set<T> setDifference(set<T> a, set<T> b)
   return result;
 }
 
-
-
-
+// define path separator
+#ifdef WIN32
+#define GetSeparatorChar() '\\'
+#else
+#define GetSeparatorChar() '/'
+#endif
 
 #endif

@@ -1751,6 +1751,77 @@ set< Place * > PetriNet::getInterfacePlaces() const
 
 
 
+void PetriNet::setPlaceSet(set<Place *> Pset)
+{
+  P = Pset;
+}
+
+
+
+
+set<Place *> PetriNet::getPlaceSet() const
+{
+  return P;
+}
+
+
+
+void PetriNet::setInputPlaceSet(set<Place *> Pinset)
+{
+  P_in = Pinset;
+}
+
+
+
+set<Place *> PetriNet::getInputPlaceSet() const
+{
+  return P_in;
+}
+
+
+
+void PetriNet::setOutputPlaceSet(set<Place *> Poutset)
+{
+  P_out = Poutset;
+}
+
+
+
+set<Place *> PetriNet::getOutputPlaceSet() const
+{
+  return P_out;
+}
+
+
+
+void PetriNet::setTransitionSet(set<Transition *> Tset)
+{
+  T = Tset;
+}
+
+
+
+set<Transition *> PetriNet::getTransitionSet() const
+{
+  return T;
+}
+
+
+
+void PetriNet::setArcSet(set<Arc *> Fset)
+{
+  F = Fset;
+}
+
+
+
+set<Arc *> PetriNet::getArcSet() const
+{
+  return F;
+}
+
+
+
 
 /*---------------------------------------------------------------------------*/
 
@@ -2479,35 +2550,57 @@ void PetriNet::setPlacePort(Place *place, string port)
 
 
 /*!
+ * \brief   Returns the number of interface places in t's neighborhood
+ *
+ * \return  an unsigned integer which represents the number of interface places
+ */
+#include <iostream>
+unsigned int PetriNet::neighborInterfacePlaces(Transition *t) const
+{
+  unsigned int counter = 0;
+
+  for (set<Node *>::iterator ip = t->preset.begin(); ip != t->preset.end(); ip++)
+    if ((*ip)->type != INTERNAL)
+      counter++;
+  for (set<Node *>::iterator ip = t->postset.begin(); ip != t->postset.end(); ip++)
+    if ((*ip)->type != INTERNAL)
+      counter++;
+
+  return counter;
+}
+
+
+
+/*!
  * \brief 	checks the Petri net for normal criterion
  *
  * \return	the boolean value true if the net is normal and false if the
  * 			net does not fulfill the normal criterion
- *
- * \todo    iterate on interface places instead of transitions' set
  */
 bool PetriNet::isNormal() const
 {
   bool retVal = true;
 
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  set<Place *> interface = getInterfacePlaces();
+
+  for (set<Place *>::iterator p = interface.begin(); p != interface.end(); p++)
   {
-    unsigned int c = 0;
-    set<Node *> pre = (*t)->preset;
-    set<Node *> post = (*t)->postset;
-
-    for (set<Node *>::iterator p = pre.begin(); p != pre.end(); p++)
-      if ((*p)->type != INTERNAL)
-        c++;
-    for (set<Node *>::iterator p = post.begin(); p != post.end(); p++)
-      if ((*p)->type != INTERNAL)
-        c++;
-
-    if (c > 1)
-    {
-      retVal = false;
+    set<Node *> pre = (*p)->preset;
+    set<Node *> post = (*p)->postset;
+    for (set<Node *>::iterator t = pre.begin(); t != pre.end(); t++)
+      if (neighborInterfacePlaces(static_cast<Transition *>(*t)) > 1)
+      {
+        retVal = false;
+        break;
+      }
+    if (!retVal)
       break;
-    }
+    for (set<Node *>::iterator t = post.begin(); t != post.end(); t++)
+      if (neighborInterfacePlaces(static_cast<Transition *>(*t)) > 1)
+      {
+        retVal = false;
+        break;
+      }
   }
 
   return retVal;

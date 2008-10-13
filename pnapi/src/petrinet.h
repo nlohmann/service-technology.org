@@ -535,6 +535,36 @@ class PetriNet
     /// returns the package string
     string getPackageString() const;
 
+    /// sets the set of places P
+    void setPlaceSet(set<Place *> Pset);
+
+    /// returns the place set P
+    set<Place *> getPlaceSet() const;
+
+    /// sets the set of input places P_in
+    void setInputPlaceSet(set<Place *> Pinset);
+
+    /// returns the set of input places P_in
+    set<Place *> getInputPlaceSet() const;
+
+    /// sets the set of output places P_out
+    void setOutputPlaceSet(set<Place *> Poutset);
+
+    /// returns the set of output places P_out
+    set<Place *> getOutputPlaceSet() const;
+
+    /// sets the set of arcs F
+    void setArcSet(set<Arc *> Fset);
+
+    /// returns the set of arcs F
+    set<Arc *> getArcSet() const;
+
+    /// sets the set of transitions T
+    void setTransitionSet(set<Transition *> Tset);
+
+    /// returns the transitions set T
+    set<Transition *> getTransitionSet() const;
+
     /// deletes all interface places
     void makeInnerStructure();
 
@@ -619,6 +649,9 @@ class PetriNet
 
     /// returns an id for new nodes
     unsigned int getId();
+
+    /// returns the number of interface places in t's neighborhood
+    unsigned int neighborInterfacePlaces(Transition *t) const;
 
     /// a role suffix for the forEach activity
     deque<string> forEach_suffix;

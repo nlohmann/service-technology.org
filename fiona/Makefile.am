@@ -1,4 +1,4 @@
-SUBDIRS = cudd src tests doc
+SUBDIRS = cudd src tests doc man
 
 
 #############################################################################

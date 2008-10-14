@@ -19,6 +19,7 @@ AC_PROG_EGREP
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_SED
+AM_MISSING_PROG(HELP2MAN, help2man)
 
 # flags set by the configure script
 configured_CFLAGS=""
@@ -190,7 +191,8 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  tests/Makefile
                  doc/Makefile
-                 cudd/Makefile])
+                 cudd/Makefile
+                 man/Makefile])
 AC_OUTPUT
 
 

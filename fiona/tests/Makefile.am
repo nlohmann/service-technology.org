@@ -1,25 +1,3 @@
-############################################################################
-# Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
-#                      Jan Bretschneider and Christian Gierds              #
-#                                                                          #
-# This file is part of Fiona.                                              #
-#                                                                          #
-# Fiona is free software; you can redistribute it and/or modify it         #
-# under the terms of the GNU General Public License as published by the    #
-# Free Software Foundation; either version 2 of the License, or (at your   #
-# option) any later version.                                               #
-#                                                                          #
-# Fiona is distributed in the hope that it will be useful, but WITHOUT     #
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    #
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for #
-# more details.                                                            #
-#                                                                          #
-# You should have received a copy of the GNU General Public License along  #
-# with Fiona; if not, write to the Free Software Foundation, Inc., 51      #
-# Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
-############################################################################
-
-
 include $(top_srcdir)/Makefile.covcommon
 
 
@@ -251,7 +229,7 @@ check-loud:
 
 # Generate check targets from $(TESTS). That is done by removing '.sh' from
 # every word in $(TESTS) and precede them by 'check-'. So one of many check
-# targets would be check-samples if samples.sh was in $(TESTS).
+# targets would be "check-samples" if "samples.sh" was in $(TESTS).
 SINGLE_CHECK_TARGETS = $(TESTS:%.sh=check-%)
 
 # The same for loud (unquiet, output files generating)
@@ -283,7 +261,7 @@ COV_ALLFILES=$(COV_RUNFILES) $(COV_DBFILE)
 # Coverage check
 covcheck: covrunclean
 	$(MAKE) $(AM_MAKEFLAGS) CXX="$(CXXCOV)" $(check_PROGRAMS)
-	$(MAKE) $(AM_MAKEFLAGS) cleandeps
+	-$(MAKE) $(AM_MAKEFLAGS) cleandeps
 	-$(MAKE) $(AM_MAKEFLAGS) check
 	covmerge.exe $(COV_RUNFILES) > $(COV_DBFILE)
 	gen_html $(COV_DBFILE)
@@ -292,7 +270,8 @@ covcheck: covrunclean
 covrunclean:
 	-test -z "$(COV_ALLFILES)" || rm -f $(COV_ALLFILES)
 
-clean-local: covrunclean cleandeps
+#[NL] clean-local: covrunclean cleandeps
+clean-local: covrunclean
 
 DISTCLEANFILES =  productog/1x2.output.og \
 		  productog/1x2.output.out \
@@ -435,5 +414,3 @@ DISTCLEANFILES =  productog/1x2.output.og \
 distclean-local:
 	-test -d coverage_html/ && rm -rf coverage_html/
 	rm -rf $(DISTCLEAN_FILES)    
-   
-

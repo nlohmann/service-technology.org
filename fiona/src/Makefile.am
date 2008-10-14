@@ -80,56 +80,48 @@ EXTRA_DIST = lexer_owfn.h
 #############################################################################
 
 # a target to avoid problems with Radon
-# [NL] Why is this needed? What _is_ the problem with Radon?
+# [NL] Why is this needed? What _are_ the problems with Radon?
 veryclean: clean
 	-rm -f $(BUILT_SOURCES)
 
 # [NL] Who needs this target?
-clean-local: cleandeps
+#clean-local: cleandeps
 
 
 #############################################################################
 # set compiler flags (optimization level, warnings, includes, libraries...)
 #############################################################################
-
-# Set 64bit compile and link flags if 64bit was configured
-if ENABLE_64BIT
-LINK_COMPILE_64BIT_FLAG = -m64
-else
-LINK_COMPILE_64BIT_FLAG =
-endif
-
 # [NL] Do we really want to force optimization levels?
-OPTIMIZATION_LEVEL= -O3 #-g -O2
-
 # [NL] Do we really want to force warnings?
+# [NL] What is "all_includes"?
+# [NL] What is "all_libraries"?
+
+OPTIMIZATION_LEVEL= -O3 #-g -O2
 WARNINGS=-W -Wall -Wno-unused
 
-# set the include path found by configure
-# [NL] Why is "all_includes" needed?
-fiona_CPPFLAGS = -I$(builddir)/../cudd/include $(all_includes)
+# flags for the preprocessor: set the include path found by configure
+fiona_CPPFLAGS = -I$(top_srcdir)/cudd/include $(all_includes)
 
 # flags for the C and C++ compiler
-# [NL] Wouldn't it be cleaner to use "+=" instead of just "="
-fiona_CXXFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(OPTIMIZATION_LEVEL) $(WARNINGS)
-fiona_CFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(OPTIMIZATION_LEVEL) $(WARNINGS)
+fiona_CXXFLAGS = $(OPTIMIZATION_LEVEL) $(WARNINGS) @configured_CXXFLAGS@
+fiona_CFLAGS = $(OPTIMIZATION_LEVEL) $(WARNINGS) @configured_CFLAGS@
 
 # flags for the linker
-# [NL] Why is "all_libraries" needed?
-fiona_LDFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(all_libraries) 
+fiona_LDFLAGS = $(all_libraries) @configured_LDFLAGS@
 
 # list all libraries Fiona needs
-fiona_LDADD = $(builddir)/../cudd/obj/libobj.a \
-	$(builddir)/../cudd/dddmp/libdddmp.a $(builddir)/../cudd/cudd/libcudd.a \
-	$(builddir)/../cudd/mtr/libmtr.a $(builddir)/../cudd/st/libst.a \
-	$(builddir)/../cudd/util/libutil.a $(builddir)/../cudd/epd/libepd.a \
+fiona_LDADD = $(builddir)/../cudd/libobj.a \
+	$(builddir)/../cudd/libdddmp.a $(builddir)/../cudd/libcudd.a \
+	$(builddir)/../cudd/libmtr.a $(builddir)/../cudd/libst.a \
+	$(builddir)/../cudd/libutil.a $(builddir)/../cudd/libepd.a \
         lib_pnapi.a
 
 
+#############################################################################
 # [NL] This needs to be documented
 allcov: $(BUILT_SOURCES) fiona.h
 	$(MAKE) $(AM_MAKEFLAGS) CXX="$(CXXCOV)" all
-	$(MAKE) $(AM_MAKEFLAGS) cleandeps
+	-$(MAKE) $(AM_MAKEFLAGS) cleandeps
 
 
 #############################################################################
@@ -144,3 +136,7 @@ lib_pnapi_a_SOURCES = pnapi/pnapi.cc pnapi/pnapi.h\
 		      pnapi/petrinet-reduction.cc \
 		      pnapi/petrinet.cc \
 		      pnapi/petrinet.h
+
+lib_pnapi_a_CFLAGS = @configured_CFLAGS@
+lib_pnapi_a_CXXFLAGS = @configured_CXXFLAGS@
+lib_pnapi_a_LDFLAGS = @configured_LDFLAGS@

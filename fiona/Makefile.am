@@ -15,7 +15,7 @@ cvs-clean: maintainer-clean
 	-rm -f Makefile.in
 	-rm -f missing
 	-rm -f -r autom4te.cache
-	-rm -f src/Makefile.in
+	-rm -f src/Makefile.in cudd/Makefile.in
 	-rm -f -r src/.deps
 	-rm -f src/Fiona.h.in
 	-rm -f tests/Makefile.in
@@ -26,20 +26,13 @@ cvs-clean: maintainer-clean
 	@echo "  autoreconf -i"
 	@echo
 
-# [NL] Is this needed?
-clean:
-	for subdir in $(SUBDIRS); do \
-		if [ "$$subdir" != "cudd" ]; then \
-			(cd "$$subdir" && $(MAKE) $(AM_MAKEFLAGS) $@); \
-		fi \
-	done
 
 veryclean: clean
 	$(MAKE) $(AM_MAKEFLAGS) veryclean --directory=src
 
-# [NL] Who needs this?
-libclean: clean
-	(cd cudd && $(MAKE) $(AM_MAKEFLAGS) clean)
+# [NL] We only need this, because CUDD's Makefiles are not managed by the Autotools
+#libclean: clean
+#	(cd cudd && $(MAKE) $(AM_MAKEFLAGS) clean)
 
 
 #############################################################################
@@ -72,9 +65,9 @@ binarydistreadme:
 	@echo -e Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. >> BINARYREADME
 
 # target to create an executable that is independet of Cygwin
-win32:
-	(cd cudd && $(MAKE) win32)
-	(cd src && $(MAKE) fiona_CXXFLAGS="" fiona_CFLAGS="" CXXFLAGS+="-O3 -mno-cygwin -U _WIN32 -DCOMPILE_DATE=\"\\\"`date`\\\"\"" CFLAGS+="-O3 -mno-cygwin -U _WIN32")
+win32: clean
+	$(top_srcdir)/configure --enable-win32
+	$(MAKE) $(AM_MAKEFLAGS)
 
 # name of the directory/archive for a binary distribution
 BINARYDISTDIR = $(distdir)
@@ -85,23 +78,19 @@ BINARYDISTFILES = src/$(PACKAGE)$(EXEEXT) COPYING
 BINARYFILES = src/$(PACKAGE)$(EXEEXT) COPYING
 
 bindist_generic:
-	$(MAKE) fiona_CXXFLAGS="" fiona_CFLAGS="" CXXFLAGS="-O3 -DCOMPILE_DATE=\"\\\"`date`\\\"\"" CFLAGS="-O3 -DCOMPILE_DATE=\"`date`\""
+	$(MAKE) $(AM_MAKEFLAGS) CXXFLAGS="-O3 -DCOMPILE_DATE=\"\\\"`date`\\\"\"" CFLAGS="-O3 -DCOMPILE_DATE=\"`date`\""
 
 # target to create a binary distribution
-bindist: libclean binarydistreadme bindist_generic create_bindist_archive
+bindist: clean binarydistreadme bindist_generic create_bindist_archive
 
 # target to create a binary distribution for systems having no cygwin1.dll.
-win32bindist: libclean binarydistreadme win32
-	$(MAKE) create_bindist_archive BINARYDISTDIR="$(distdir)-win32"
+bindist_win32:
+	$(top_srcdir)/configure --enable-win32 --disable-assert
+	$(MAKE) bindist
 
 bindist_universal:
-	@echo "You have to configure with:"
-	@echo "  ./configure --disable-dependency-tracking"
-	@echo "Press return to continue."
-	@read answer
-	$(MAKE) bindist OS=mac-universal CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
-	CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
-	LDFLAGS="-arch i386 -arch ppc"
+	$(top_srcdir)/configure --enable-universal --disable-assert
+	$(MAKE) bindist
 
 # Helper target for bindist and win32bindist. Creates the actual zip file to be
 # distributed.

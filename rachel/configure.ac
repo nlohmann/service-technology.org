@@ -1,10 +1,18 @@
+AC_INIT(Rachel, 1.11-unreleased, rachel@service-technology.org, rachel)
+
+#############################################################################
+# check for prerequisites, programms, headers, and libraries
+#############################################################################
+
+# prerequisites for Autoconf and Automake
 AC_PREREQ(2.61)
-AC_INIT(Rachel, 1.10, rachel@service-technology.org, rachel)
+AM_INIT_AUTOMAKE(gnits)
+
+# where to look for source code and how the config header should be called
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS(src/config.h)
 
-AM_INIT_AUTOMAKE
-
+# check for generic programs
 AC_PROG_CXX
 AM_PROG_CC_C_O
 AM_PROG_LEX
@@ -13,13 +21,7 @@ AC_PROG_SED
 AC_PROG_AWK
 AC_PROG_GREP
 
-AC_HEADER_ASSERT
-AC_CHECK_HEADERS(pthread.h)
-AC_TYPE_SIZE_T
-
-AC_CANONICAL_BUILD
-AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
-
+# check for additional programs
 AC_CHECK_PROG(GENGETOPT, gengetopt, gengetopt)
 AC_CHECK_PROG(DOT, dot, dot)
 AC_CHECK_PROG(AGPP, ag++, ag++)
@@ -27,71 +29,78 @@ AC_CHECK_PROG(ACPP, ac++, ac++)
 AC_DEFINE_UNQUOTED(HAVE_DOT, "$DOT", [whether dot was found by configure])
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# check for libraries
+AC_CHECK_HEADERS(libgen.h)
+AC_TYPE_SIZE_T
 
-# the configure script can take the parameter "--enable-aspects" which is
-# later used in src/Makefile.am
-# (http://www.gnu.org/software/libtool/manual/autoconf/Package-Options.html)
+# look up canonical build name and write it to config.h
+AC_CANONICAL_BUILD
+AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
+
+
+#############################################################################
+# In the following, command line paraemters for the configure script are
+# defined. Each parameter is also written into a Makefile conditional to
+# later set compliler flags accordingly. Finally, the result is also written
+# into the configuration header "config.h".
+#############################################################################
+
+# parameter "--enable-assert"
+AC_ARG_ENABLE(assert,
+  AS_HELP_STRING([--disable-assert],[disable assertions and verbose debug messages (enabled by default)]),
+  [enable_assert=${enableval}], [enable_assert=yes])
+AC_MSG_CHECKING([whether to use assertions])
+AC_MSG_RESULT($enable_assert)
+AC_DEFINE_UNQUOTED(CONFIG_ENABLEASSERT, "$enable_assert", [whether to use assertions])
+
+if test "$enable_assert" = "no"; then
+  AC_DEFINE(NDEBUG,1,[Turn off assertions and verbose debug messages.])
+fi
+
+# parameter "--enable-aspects"
 AC_ARG_ENABLE(aspects,
-[  --enable-aspects   turn on aspects (standard; turn them off with --disable-aspects)],
-[case "${enableval}" in
-  yes) aspects=yes ;;
-  no)  aspects=no ;;
-  *) AC_MSG_ERROR(bad value ${enableval} for --enable-aspects) ;;
-esac],[aspects=no])
-AM_CONDITIONAL(ASPECTS, test x$aspects = xyes)
+  AS_HELP_STRING([--enable-aspects],[enable AspectC++ aspects for debugging messages (disabled by default)]),
+  enable_aspects=${enableval}, enable_aspects="no")
 AC_MSG_CHECKING([whether to use aspects])
-AC_MSG_RESULT($aspects)
-AC_DEFINE_UNQUOTED(CONFIG_ASPECTS, "$aspects", [whether to use aspects])
+AC_MSG_RESULT($enable_aspects)
+AM_CONDITIONAL(ENABLE_ASPECTS, test "$enable_aspects" = "yes")
+AC_DEFINE_UNQUOTED(CONFIG_ENABLEASPECTS, "$enable_aspects", [whether to use aspects])
 
-
-# the configure script can take the parameter "--enable-universal" which is
-# later used in src/Makefile.am
-# (http://www.gnu.org/software/libtool/manual/autoconf/Package-Options.html)
+# parameter "--enable-universal"
 AC_ARG_ENABLE(universal,
-[  --enable-universal   build Mac universal binary],
-[case "${enableval}" in
-  yes) universal=yes
-       AM_INIT_AUTOMAKE(no-dependencies) ;;
-  no)  universal=no ;;
-  *) AC_MSG_ERROR(bad value ${enableval} for --enable-universal) ;;
-esac],[universal=no])
-AM_CONDITIONAL(UNIVERSAL, test x$universal = xyes)
+  AS_HELP_STRING([--enable-universal],[build a Mac Universal binary which is executable on Intel and Power PC platforms (disabled by default)]),
+  enable_universal=${enableval}, enable_universal="no")
 AC_MSG_CHECKING([whether to build Mac universal binary])
-AC_MSG_RESULT($universal)
-AC_DEFINE_UNQUOTED(CONFIG_UNIVERSAL, "$universal", [whether to build Mac universal binary])
+AC_MSG_RESULT($enable_universal)
+AM_CONDITIONAL(ENABLE_UNIVERSAL, test "$enable_universal" = "yes")
+AC_DEFINE_UNQUOTED(CONFIG_ENABLEUNIVERSAL, "$enable_universal", [whether to build a Mac universal binary])
 
+if test "$enable_universal" = "yes"; then
+  AM_INIT_AUTOMAKE(no-dependencies)
+fi
 
-# the configure script can take the parameter "--enable-win32" which is
-# later used in src/Makefile.am
-# (http://www.gnu.org/software/libtool/manual/autoconf/Package-Options.html)
+# parameter "--enable-win32"
 AC_ARG_ENABLE(win32,
-[  --enable-win32   build Windows MinGW binary],
-[case "${enableval}" in
-  yes) win32=yes ;;
-  no)  win32=no ;;
-  *) AC_MSG_ERROR(bad value ${enableval} for --enable-win32) ;;
-esac],[win32=no])
-AM_CONDITIONAL(WIN32, test x$win32 = xyes)
+  AS_HELP_STRING([--enable-win32],[build a Windows binary that is independent of a local Cygwin installation (disabled by default)]),
+  enable_win32=${enableval}, enable_win32="no")
 AC_MSG_CHECKING([whether to build Windows MinGW binary])
-AC_MSG_RESULT($win32)
-AC_DEFINE_UNQUOTED(CONFIG_WIN32, "$win32", [whether to build Windows MinGW binary])
+AC_MSG_RESULT($enable_win32)
+AM_CONDITIONAL(ENABLE_WIN32, test "$enable_win32" = "yes")
+AC_DEFINE_UNQUOTED(CONFIG_ENABLEWIN32, "$enable_win32", [whether to build a Cygwin-independent Windows binary])
+
+# parameter "--enable-64bit"
+AC_ARG_ENABLE(64bit,
+  AS_HELP_STRING([--enable-64bit],[build for a 64 bit architecture such as x86_64 or ppc64 (disabled by default)]),
+  enable_64bit=${enableval}, enable_64bit="no")
+AC_MSG_CHECKING([whether to build for a 64 bit architecture])
+AC_MSG_RESULT($enable_64bit)
+AM_CONDITIONAL(ENABLE_64BIT, test "$enable_64bit" = "yes")
+AC_DEFINE_UNQUOTED(CONFIG_ENABLE64BIT, "$enable_64bit", [whether to build a 64 Bit binary])
 
 
-# the configure script can take the parameter "--enable-use64bit" which is
-# later used in src/Makefile.am
-# (http://www.gnu.org/software/libtool/manual/autoconf/Package-Options.html)
-AC_ARG_ENABLE(use64bit,
-[  --enable-use64bit   build a 64 Bit binary],
-[case "${enableval}" in
-  yes) use64bit=yes ;;
-  no)  use64bit=no ;;
-  *) AC_MSG_ERROR(bad value ${enableval} for --enable-use64bit) ;;
-esac],[use64bit=no])
-AM_CONDITIONAL(USE64BIT, test x$use64bit = xyes)
-AC_MSG_CHECKING([whether to build a 64 Bit binary])
-AC_MSG_RESULT($use64bit)
-AC_DEFINE_UNQUOTED(CONFIG_USE64BIT, "$use64bit", [whether to build a 64 Bit binary])
-
+#############################################################################
+# create output files
+#############################################################################
 
 AC_CONFIG_FILES([Makefile src/Doxyfile src/Makefile man/Makefile doc/Makefile tests/Makefile exp/Makefile maintainer/Makefile maintainer/debian/changelog.template])
 

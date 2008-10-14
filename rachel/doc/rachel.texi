@@ -5,7 +5,7 @@
 @finalout
 @settitle Rachel User's Manual
 
-@c ----------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
 
 @copying
 
@@ -28,17 +28,18 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @end direntry
 
 
-@c ----------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
 
 @titlepage
 
 @title Rachel
 
 @subtitle @b{R}epairing @b{A}utomata for @b{Ch}oreographies by @b{E}diting @b{L}abels
+@subtitle @url{http://service-technology.org/rachel}
+@vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}
 
 @author Niels Lohmann
-
 @page
 
 
@@ -46,7 +47,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @insertcopying
 @end titlepage
 
-@c ----------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
 
 @ifnottex
 @node Top
@@ -54,7 +55,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @insertcopying
 @end ifnottex
 
-@c ----------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
 
 @menu
 * What is Rachel?::What is Rachel?
@@ -64,31 +65,33 @@ Permission is granted to copy, distribute and/or modify this document under the 
 * GNU Free Documentation License::The license of this manual.
 @end menu
 
-@c ----------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
 
 @contents
 @paragraphindent none
 
-@c ----------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
 
 @node What is Rachel?
 @chapter What is Rachel?
 
-Rachel is a software tool to repair deadlocking choreographies. For more information, see the following publications or links:
+Rachel is a tool to repair deadlocking service choreographies. Much work has been conducted to analyze service choreographies to assert manyfold correctness criteria. While errors can be detected automatically, the @i{correction} of defective services is usually done manually. Rachel implements a graph-based approach to calculate the minimal edit distance between a given defective service and synthesized correct services. This edit distance helps to automatically fix found errors while keeping the rest of the service untouched.
+
+For more information, see the following publications or links:
 
 @itemize
 @item Niels Lohmann. @b{Fixing Deadlocking Service Choreographies Using a Simulation-based Graph Edit Distance}. In Monika Solanki, Barry Norton, and Stephan Reiff-Marganiec, editors, @i{3rd Young Researchers Workshop on Service Oriented Computing, YR-SOC 2008, London, UK, 12--13 June 2008, Proceedings}, pages 13--20, June 2008.
 
 This paper briefly describes the setting in which Rachel can be used as well as first experimental results. The paper is part of the distribution of Rachel  (@file{doc/background.pdf}) and is freely available at @url{http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Lohmann_2008_yrsoc.pdf}. Furthermore, slides of the talk are available at @url{http://service-technology.org/wiki/publications/lohmann_2008_yrsoc}.
 
-@item Niels Lohmann. @b{Correcting Deadlocking Service Choreographies Using a Simulation-Based Graph Edit Distance}. In Marlon Dumas and Manfred Reichert, editors, @i{Business Process Management, 6th International Conference, BPM 2008, Milan, Italy, September 1--4, 2008, Proceedings}, Lecture Notes in Computer Science, September 2008. Springer-Verlag.
+@item Niels Lohmann. @b{Correcting Deadlocking Service Choreographies Using a Simulation-Based Graph Edit Distance}. In Marlon Dumas, Manfred Reichert, and Ming-Chien Shan, editors, @i{Business Process Management, 6th International Conference, BPM 2008, Milan, Italy, September 1--4, 2008, Proceedings}, volume 5240 of @i{Lecture Notes in Computer Science}, pages 132--147. Springer-Verlag, September 2008.
 
-This paper gives all definitions and details on the algorithms implemented in Rachel. In addition, a case study is described and runtimes of Rachel are examined. This case study is part of the distribution of Rachel (@file{exp/bpm2008.tar.gz}) and can be executed with @samp{make experiments}. Note that Rachel needs to be installed first.
+This paper (a preprint is available at @url{http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Lohmann_2008_bpm.pdf}) gives all definitions and details on the algorithms implemented in Rachel. In addition, a case study is described and runtimes of Rachel are examined. This case study is part of the distribution of Rachel (@file{exp/bpm2008.tar.gz}) and can be executed with @samp{make experiments}.
 @end itemize
 
 
 
-@c ----------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
 
 @node First Steps
 @chapter First Steps
@@ -120,9 +123,9 @@ make check
 to execute the testcases located in @file{tests}. If everything went fine, you should see something like:
 
 @smallexample
-==================
-All 4 tests passed
-==================
+======================================================
+All 16 tests behaved as expected (5 expected failures)
+======================================================
 @end smallexample
 
 If an error occurs, please send the output to @email{rachel@@service-technology.org}.
@@ -155,6 +158,9 @@ Experiments and case studies published in several papers. For each file, say @fi
 @item man
 The manpage of Rachel which can be displayed using @samp{man rachel} after having Rachel installed (see Installation description above).
 
+@item maintainer
+Some scripts for maintainers of Rachel which can be used to create and distribute releases.
+
 @item src
 The source code of Rachel.
 
@@ -165,11 +171,13 @@ Testcases for Rachel which check the generated binary. The testscripts check the
 
 
 
-@c ----------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
 
 
 @node Command Line Options
 @chapter Invoking Rachel
+
+Rachel is a command line tool and does not come with a fancy GUI. However, Rachel can be easily scripted and combined with other tools.
 
 @section Command Line Options
 
@@ -197,7 +205,7 @@ Note: If not all parameters are defined, the standard values apply. Mandatory co
 
 
 
-@c ----------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
 
 
 @node ChangeLog
@@ -213,7 +221,7 @@ The most recent change log is available at Rachel's website at @url{http://servi
 
 
 
-@c ----------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
 
 @include fdl.texi
 

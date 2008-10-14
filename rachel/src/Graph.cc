@@ -21,6 +21,7 @@
 #include <cassert>
 #include <algorithm>
 
+#include "config.h"
 #include "Graph.h"
 #include "helpers.h"
 #include "costfunction.h"

@@ -20,6 +20,7 @@
 
 #include <cassert>
 
+#include "config.h"
 #include "Formula.h"
 
 /*

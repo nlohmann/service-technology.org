@@ -23,6 +23,7 @@
 #include <sstream>
 #include <cassert>
 
+#include "config.h"
 #include "Graph.h"
 #include "helpers.h"
 

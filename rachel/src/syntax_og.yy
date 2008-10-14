@@ -1,24 +1,3 @@
-/*****************************************************************************
- * Copyright 2008       Niels Lohmann                                        *
- * Copyright 2005, 2006 Jan Bretschneider                                    *
- *                                                                           *
- * This file is part of Fiona.                                               *
- *                                                                           *
- * Fiona is free software; you can redistribute it and/or modify it          *
- * under the terms of the GNU General Public License as published by the     *
- * Free Software Foundation; either version 2 of the License, or (at your    *
- * option) any later version.                                                *
- *                                                                           *
- * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
- *                                                                           *
- * You should have received a copy of the GNU General Public License along   *
- * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
- *****************************************************************************/
-
 %{
 #include <libgen.h>
 #include "Graph.h"
@@ -47,6 +26,7 @@ extern int og_yyerror(char *msg);
 %name-prefix="og_yy"
 
 %token key_nodes key_initialnode key_finalnode key_transitions
+%token key_interface key_input key_output
 %token key_red key_blue
 %token comma colon semicolon ident arrow number
 %token key_true key_false key_final
@@ -75,13 +55,27 @@ extern int og_yyerror(char *msg);
 
 og:
    { G_parsedGraph = Graph(basename(G_filename)); }
- nodes initialnode transitions
+ interface nodes initialnode transitions
    { G_parsedGraph.reenumerate(); }
 ;
 
 
+interface:
+  /* for backwards compatibility, the interface is optional */
+| key_interface key_input places_list semicolon
+  key_output places_list semicolon
+;
+
+
+places_list:
+  /* empty */
+| places_list comma ident
+| ident
+;
+
+
 nodes:
- key_nodes nodes_list semicolon
+  key_nodes nodes_list semicolon
 ;
 
 

@@ -24,6 +24,7 @@
 #include <cstdio>
 #include <map>
 
+#include "config.h"
 #include "Matching.h"
 #include "costfunction.h"
 #include "Graph.h"

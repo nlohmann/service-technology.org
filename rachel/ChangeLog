@@ -6,6 +6,34 @@
                       http://service-technology.org/rachel
 
 
+Version 1.11-unreleased
+=======================
+
+* implemented Fiona's modified OG file format (an OG file now also consists
+  of an interface definition) and adjusted the respective test cases -- note
+  that Rachel's parser is backwards compatible and still accepts OG files
+  without interface definition
+
+* renamed configure script parameter `--enable-use64bit' to `--enable-64bit'
+  to achieve parameter compatibility with Fiona
+
+* explicitly handling the disabling of assertions (with parameter
+  `--disable-assert') similar to Fiona's configure script
+
+* canonized names of constants generated for file `src/config.h' and adjusted
+  the output of the `--bug' parameter
+
+* removed unnecessary files `src/getopt.c', `src/getopt1.c', and
+  `src/getopt.h'
+
+* used option `gnits' for Automake, see
+  `http://www.gnu.org/software/autoconf/manual/automake.html#Gnits'
+
+* moved acknowledgements from file `AUTHOR' to file `THANKS' to meet the
+  strict Gnits requirements
+
+* updated documentation
+
 Version 1.10
 ============
 

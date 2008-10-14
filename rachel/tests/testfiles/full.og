@@ -1,5 +1,9 @@
 { this is a comment }
 
+INTERFACE
+  INPUT a, b;
+  OUTPUT c;
+
 NODES
   0 : true : blue,
   1 : false : blue,

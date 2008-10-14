@@ -39,10 +39,3 @@ cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
 #############################################################################
 manual: $(info_TEXINFOS)
 	./gendocs.sh $(PACKAGE) "$(PACKAGE_NAME)"
-
-
-wiki: ChangeLog.texi
-	texi2html rachel.texi
-	$(SED) -n '/procrastination/,/The most recent change log/w ChangeLog.tmp' rachel.html
-	cat ChangeLog.tmp | $(SED) '1,2d' | $(SED) -e 's/<dt> <b>/<h3>/;' | $(SED) -e 's/<\/b><\/dt>/<\/h3>/;' | $(SED) -e 's/<p>/<li>/;' | $(SED) -e 's/<\/p>/<\/li>/;' | $(SED) -e 's/<dd>/<ul>/;' | $(SED) -e 's/<\/dd>/<\/ul>/;' | $(SED) -e 's/<blockquote>/<ul>/;' | $(SED) -e 's/<\/blockquote>/<\/ul>/;' > ChangeLog.htm
-	rm rachel.html ChangeLog.tmp

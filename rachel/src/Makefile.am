@@ -12,9 +12,6 @@ rachel_SOURCES = syntax_og.yy lexer_og.ll \
 		 cmdline.c cmdline.h \
 		 $(aspected_sources)
 
-# no needed?
-# 		 getopt.h getopt.c getopt1.c
-
 EXTRA_rachel_SOURCES = $(unaspected_sources)
 
 BUILT_SOURCES = cmdline.c syntax_og.cc
@@ -29,25 +26,22 @@ rachel_LDFLAGS  =
 rachel_CFLAGS   =
 rachel_CXXFLAGS =
 
-
 # flags to build Mac Universal binary
-if UNIVERSAL
+if ENABLE_UNIVERSAL
   rachel_LDFLAGS  += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386 -mmacosx-version-min=10.4
   rachel_CFLAGS   += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386
   rachel_CXXFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386
 endif
 
-
 # flags to build Windows MinGW binary
-if WIN32
+if ENABLE_WIN32
   rachel_LDFLAGS  += -mno-cygwin -U _WIN32
   rachel_CFLAGS   += -mno-cygwin -U _WIN32
   rachel_CXXFLAGS += -mno-cygwin -U _WIN32
 endif
 
-
 # flags to build a 64 bit binary
-if USE64BIT
+if ENABLE_64BIT
   rachel_LDFLAGS  += -m64
   rachel_CFLAGS   += -m64
   rachel_CXXFLAGS += -m64
@@ -81,7 +75,7 @@ unaspected_sources = Simulation.cc Matching.cc
 # if "./configure --disable-aspects" was used, the original sources are just copied
 # and ag++ is not invoked at all
 aspected-%.cc: %.cc $(aspects)
-if ASPECTS
+if ENABLE_ASPECTS
 	-$(AGPP) --config $(dir $<)puma.config --weave_only -o aspected-$(notdir $<) $<
 	$(SED) -i '1 i #include <new>' aspected-$(notdir $<)
 	$(SED) -i 's/new (unsigned long int/new (size_t/' aspected-$(notdir $<)

@@ -32,6 +32,8 @@
 #include <cstdio>
 #include <string>
 
+#include "config.h"
+
 /* make this class visible for flex as flex uses it in og_yylval. */
 class Formula;
 
@@ -58,6 +60,10 @@ number         [0-9]+
 NODES                                   { return key_nodes;       }
 INITIALNODE                             { return key_initialnode; }
 TRANSITIONS                             { return key_transitions; }
+
+INTERFACE                               { return key_interface;   }
+INPUT                                   { return key_input;       }
+OUTPUT                                  { return key_output;      }
 
 [Tt][Rr][Uu][Ee]                        { return key_true;        }
 [Ff][Aa][Ll][Ss][Ee]                    { return key_false;       }

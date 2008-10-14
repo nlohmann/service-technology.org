@@ -25,13 +25,3 @@ CONTACT
     Skype:  nlohmann
     WWW:    http://service-technology.org/rachel
     E-Mail: niels.lohmann@uni-rostock.de
-
-
-ACKNOWLEDGEMENTS
-  * The Flex/Bison parser for OG files was taken and adapted from Fiona,
-    originally written by Jan Bretschneider.
-
-  * The translation into an linear programming problem was derived from a
-    program provided by Oleg Sokolsky.
-
-  * The aspects are implemented with AspectC++ (http://www.aspectc.org).

@@ -6,43 +6,33 @@
                       http://service-technology.org/rachel
 
 
-Version 1.10
-============
+Version 1.11-unreleased
+=======================
 
-* Rachel does not need to be installed to execute `make experiments'
+* implemented Fiona's modified OG file format (an OG file now also consists
+  of an interface definition) and adjusted the respective test cases -- note
+  that Rachel's parser is backwards compatible and still accepts OG files
+  without interface definition
 
-* added configure script parameter `--enable-universal' to set flags to build
-  a Mac universal binary (`http://www.apple.com/universal')
+* renamed configure script parameter `--enable-use64bit' to `--enable-64bit'
+  to achieve parameter compatibility with Fiona
 
-* added configure script parameter `--enable-win32' to set flags to build a
-  Windows binary which uses the MinGW framework (`http://www.mingw.org') to
-  be independent of the `cygwin1.dll' provided by Cygwin
-  (`http://www.cygwin.com')
+* explicitly handling the disabling of assertions (with parameter
+  `--disable-assert') similar to Fiona's configure script
 
-* added configure script parameter `--enable-use64bit' to set flags to build
-  a 64 bit binary (e.g. for x86_64, ppc64, or 64-Bit SPARC)
+* canonized names of constants generated for file `src/config.h' and adjusted
+  the output of the `--bug' parameter
 
-* chosen configure script parameters are printed when using `--bug' command
-  line parameter
+* removed unnecessary files `src/getopt.c', `src/getopt1.c', and
+  `src/getopt.h'
 
-* made the configure script option `--disable-aspects' standard
+* used option `gnits' for Automake, see
+  `http://www.gnu.org/software/autoconf/manual/automake.html#Gnits'
 
-* added a command line parameter `--noop' to exit after parsing the input
-  files - mostly for debug information, e.g. if you want to count the
-  services characterized by an OG (combined with `--verbose')
+* moved acknowledgements from file `AUTHOR' to file `THANKS' to meet the
+  strict Gnits requirements
 
-* fixed a bug: the requirements to calculate matching-based edit distance
-  (final states are sink states) led to incorrect formula evaluation (see
-  `https://gna.org/bugs/?11944') when calculating the number of characterized
-  services
-
-* removed orphaned code for linear programming
-
-* added more test cases (also expected failures)
-
-* added code coverage checks using LTP LCOV
-  (`http://ltp.sourceforge.net/coverage/lcov.php'); checks can be invoked in
-  directory `tests' with `make prepare-cover cover'
+* updated documentation
 
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for

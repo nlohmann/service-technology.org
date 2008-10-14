@@ -1,27 +1,5 @@
 #!/bin/bash
 
-############################################################################
-# Copyright 2007 Peter Laufer                                              #
-# Copyright 2008 Peter Massuthe                                            #
-#                                                                          #
-#                                                                          #
-# This file is part of Fiona.                                              #
-#                                                                          #
-# Fiona is free software; you can redistribute it and/or modify it         #
-# under the terms of the GNU General Public License as published by the    #
-# Free Software Foundation; either version 2 of the License, or (at your   #
-# option) any later version.                                               #
-#                                                                          #
-# Fiona is distributed in the hope that it will be useful, but WITHOUT     #
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    #
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for #
-# more details.                                                            #
-#                                                                          #
-# You should have received a copy of the GNU General Public License along  #
-# with Fiona; if not, write to the Free Software Foundation, Inc., 51      #
-# Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
-############################################################################
-
 source defaults.sh
 source memcheck_helper.sh
 
@@ -67,25 +45,23 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-
-    echo $OUTPUT | grep "|P|=$nodes_soll" > /dev/null
-    nodes=$?
-
-    echo $OUTPUT | grep "|T|=$transitions_soll" > /dev/null
-    edges=$?
-
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
-    then
-    echo   ... failed to reduce the oWFN correctly
-    fi
-
-    result=`expr $result + $nodes + $edges`
+        echo $OUTPUT | grep "|P|=$nodes_soll" > /dev/null
+        nodes=$?
+    
+        echo $OUTPUT | grep "|T|=$transitions_soll" > /dev/null
+        edges=$?
+    
+        if [ $nodes -ne 0 -o $edges -ne 0 ]
+        then
+            echo   ... failed to reduce the oWFN correctly
+        fi
+    
+        result=`expr $result + $nodes + $edges`
     fi
 fi
 
@@ -103,19 +79,17 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the owfn and it's reduced version's OGs failed.
-    fi
+        echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+        resultSIM=$?
+        if [ $resultSIM -ne 0 ]; then
+            let "result += 1"
+            echo ... equivalence check of the owfn and it's reduced version's OGs failed.
+        fi
     fi
 fi
 
@@ -139,25 +113,23 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-
-    echo $OUTPUT | grep "|P|=$nodes_soll" > /dev/null
-    nodes=$?
-
-    echo $OUTPUT | grep "|T|=$transitions_soll" > /dev/null
-    edges=$?
-
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
-    then
-    echo   ... failed to reduce the oWFN correctly
-    fi
-
-    result=`expr $result + $nodes + $edges`
+        echo $OUTPUT | grep "|P|=$nodes_soll" > /dev/null
+        nodes=$?
+    
+        echo $OUTPUT | grep "|T|=$transitions_soll" > /dev/null
+        edges=$?
+    
+        if [ $nodes -ne 0 -o $edges -ne 0 ]
+        then
+        echo   ... failed to reduce the oWFN correctly
+        fi
+    
+        result=`expr $result + $nodes + $edges`
     fi
 fi
 
@@ -175,19 +147,17 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-
-    echo $OUTPUT | grep "are equivalent: NO" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... the net and the reduced net are equivalent so the PNapi was probably updated to handle finalconditions.
-    fi
+        echo $OUTPUT | grep "are equivalent: NO" > /dev/null
+        resultSIM=$?
+        if [ $resultSIM -ne 0 ]; then
+            let "result += 1"
+            echo ... the net and the reduced net are equivalent so the PNapi was probably updated to handle finalconditions.
+        fi
     fi
 fi
 
@@ -214,25 +184,23 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-
-    echo $OUTPUT | grep "|P|=$nodes_soll" > /dev/null
-    nodes=$?
-
-    echo $OUTPUT | grep "|T|=$transitions_soll" > /dev/null
-    edges=$?
-
-    if [ $nodes -ne 0 -o $edges -ne 0 ]
-    then
-    echo   ... failed to reduce the oWFN correctly
-    fi
-
-    result=`expr $result + $nodes + $edges`
+        echo $OUTPUT | grep "|P|=$nodes_soll" > /dev/null
+        nodes=$?
+    
+        echo $OUTPUT | grep "|T|=$transitions_soll" > /dev/null
+        edges=$?
+    
+        if [ $nodes -ne 0 -o $edges -ne 0 ]
+        then
+            echo   ... failed to reduce the oWFN correctly
+        fi
+    
+        result=`expr $result + $nodes + $edges`
     fi
 fi
 
@@ -250,19 +218,17 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the owfn and it's reduced version's OGs failed.
-    fi
+        echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+        resultSIM=$?
+        if [ $resultSIM -ne 0 ]; then
+            let "result += 1"
+            echo ... equivalence check of the owfn and it's reduced version's OGs failed.
+        fi
     fi
 fi
 

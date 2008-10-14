@@ -1,26 +1,5 @@
 #!/bin/bash
 
-############################################################################
-# Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
-#                      Jan Bretschneider and Christian Gierds              #
-#                                                                          #
-# This file is part of Fiona.                                              #
-#                                                                          #
-# Fiona is free software; you can redistribute it and/or modify it         #
-# under the terms of the GNU General Public License as published by the    #
-# Free Software Foundation; either version 2 of the License, or (at your   #
-# option) any later version.                                               #
-#                                                                          #
-# Fiona is distributed in the hope that it will be useful, but WITHOUT     #
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    #
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for #
-# more details.                                                            #
-#                                                                          #
-# You should have received a copy of the GNU General Public License along  #
-# with Fiona; if not, write to the Free Software Foundation, Inc., 51      #
-# Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
-############################################################################
-
 source defaults.sh
 source memcheck_helper.sh
 
@@ -69,16 +48,15 @@ cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
-    fionaExitCode=$?
-    `$evaluate $fionaExitCode`
-    if [ $? -ne 0 ] 
-    then
+fionaExitCode=$?
+$evaluate $fionaExitCode
+if [ $? -ne 0 ] 
+then
     result=1
-    else
-
+else
     echo $OUTPUT | grep "are equivalent: YES" > /dev/null
     equivalent=$?
-
+    
     if [ $equivalent -ne 0 ]
     then
         echo   ... the two graphs do not characterize the same strategies
@@ -99,7 +77,7 @@ cmd1="$FIONA $owfn -t eqR -t OG -o $outputPrefix"
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
 fionaExitCode=$?
-`$evaluate $fionaExitCode`
+$evaluate $fionaExitCode
 if [ $? -ne 0 ] 
 then
     result=1
@@ -125,21 +103,20 @@ cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
 fionaExitCode=$?
-`$evaluate $fionaExitCode`
+$evaluate $fionaExitCode
 if [ $? -ne 0 ] 
 then
-result=1
+    result=1
 else
-
-echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    equivalent=$?
-
-if [ $equivalent -ne 0 ]
-then
-    echo   ... the two graphs do not characterize the same strategies
-fi
-
-result=`expr $result + $equivalent`
+    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+        equivalent=$?
+    
+    if [ $equivalent -ne 0 ]
+    then
+        echo   ... the two graphs do not characterize the same strategies
+    fi
+    
+    result=`expr $result + $equivalent`
 fi
 
 ############################################################################
@@ -153,22 +130,20 @@ cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
 fionaExitCode=$?
-`$evaluate $fionaExitCode`
+$evaluate $fionaExitCode
 if [ $? -ne 0 ] 
 then
-result=1
+    result=1
 else
-
-echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    equivalent=$?
-
-if [ $equivalent -ne 0 ]
-then
-    echo   ... the two graphs do not characterize the same strategies
-fi
-
-
-result=`expr $result + $equivalent`
+    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+        equivalent=$?
+    
+    if [ $equivalent -ne 0 ]
+    then
+        echo   ... the two graphs do not characterize the same strategies
+    fi
+    
+    result=`expr $result + $equivalent`
 fi
 ############################################################################
 # check if graph using -R is the same as the one generated without -R
@@ -181,22 +156,20 @@ cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
 fionaExitCode=$?
-`$evaluate $fionaExitCode`
+$evaluate $fionaExitCode
 if [ $? -ne 0 ] 
 then
-result=1
+    result=1
 else
-
-echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    equivalent=$?
-
-if [ $equivalent -ne 0 ]
-then
-    echo   ... the two graphs do not characterize the same strategies
-fi
-
-
-result=`expr $result + $equivalent`
+    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+        equivalent=$?
+    
+    if [ $equivalent -ne 0 ]
+    then
+        echo   ... the two graphs do not characterize the same strategies
+    fi
+    
+    result=`expr $result + $equivalent`
 fi
 
 ############################################################################
@@ -210,22 +183,20 @@ cmd1="$FIONA $owfn -t eqR -t IG -o $outputPrefix"
 echo running $cmd1
 OUTPUT=`$cmd1 2>&1`
 fionaExitCode=$?
-`$evaluate $fionaExitCode`
+$evaluate $fionaExitCode
 if [ $? -ne 0 ] 
 then
-result=1
+    result=1
 else
+    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+        equivalent=$?
+    
+    if [ $equivalent -ne 0 ]
+    then
+        echo   ... the two graphs do not characterize the same strategies
+    fi
 
-echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    equivalent=$?
-
-if [ $equivalent -ne 0 ]
-then
-    echo   ... the two graphs do not characterize the same strategies
-fi
-
-
-result=`expr $result + $equivalent`
+    result=`expr $result + $equivalent`
 fi
 
 ############################################################################

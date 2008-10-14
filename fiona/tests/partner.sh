@@ -1,25 +1,5 @@
 #!/bin/bash
 
-############################################################################
-# Copyright 2007 Jan Bretschneider                                         #
-#                                                                          #
-# This file is part of Fiona.                                              #
-#                                                                          #
-# Fiona is free software; you can redistribute it and/or modify it         #
-# under the terms of the GNU General Public License as published by the    #
-# Free Software Foundation; either version 2 of the License, or (at your   #
-# option) any later version.                                               #
-#                                                                          #
-# Fiona is distributed in the hope that it will be useful, but WITHOUT     #
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    #
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for #
-# more details.                                                            #
-#                                                                          #
-# You should have received a copy of the GNU General Public License along  #
-# with Fiona; if not, write to the Free Software Foundation, Inc., 51      #
-# Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
-############################################################################
-
 source defaults.sh
 source memcheck_helper.sh
 
@@ -93,34 +73,30 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-
         echo running $check
         OUTPUT=`$check 2>&1`
         fionaExitCode=$?
-        `$evaluate $fionaExitCode`
+        $evaluate $fionaExitCode
         if [ $? -ne 0 ] 
         then
-        result=1
+            result=1
         else
-
-
-        echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-        if [ $? -ne 0 ]; then
-            let "result += 1"
-            echo ... computed partner not equivalent to expected partner.
-        #else
-            #if ! diff "$output" "$outputExpected" >/dev/null ; then
-            #    echo "... failed: Output and expected output differ. Compare " \
-            #        "$output" "$outputExpected"
-            #    resultSingle=1
-            #fi
-        fi
+            echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+            if [ $? -ne 0 ]; then
+                let "result += 1"
+                echo ... computed partner not equivalent to expected partner.
+            #else
+                #if ! diff "$output" "$outputExpected" >/dev/null ; then
+                #    echo "... failed: Output and expected output differ. Compare " \
+                #        "$output" "$outputExpected"
+                #    resultSingle=1
+                #fi
+            fi
         fi
     fi
 fi
@@ -162,26 +138,24 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
         echo running $check
         OUTPUT=`$check 2>&1`
         fionaExitCode=$?
-        `$evaluate $fionaExitCode`
+        $evaluate $fionaExitCode
         if [ $? -ne 0 ] 
         then
-        result=1
+            result=1
         else
-
-        echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-        if [ $? -ne 0 ]; then
-            let "result += 1"
-            echo ... computed partner not equivalent to expected partner.
-        fi
+            echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+            if [ $? -ne 0 ]; then
+                let "result += 1"
+                echo ... computed partner not equivalent to expected partner.
+            fi
         fi
     fi
 fi
@@ -221,34 +195,39 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
         echo running $check
         OUTPUT=`$check 2>&1`
-        echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-        if [ $? -ne 0 ]; then
-            let "result += 1"
-            echo ... computed partner not equivalent to expected partner.
-        fi
-        echo running $check2
-        OUTPUT=`$check2 2>&1`
         fionaExitCode=$?
-        `$evaluate $fionaExitCode`
+        $evaluate $fionaExitCode
         if [ $? -ne 0 ] 
         then
-        result=1
+            result=1
         else
-
-        echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-        if [ $? -ne 0 ]; then
-            let "result += 1"
-            echo ... computed partner not equivalent to expected partner.
-        fi
-        fi
+            echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+            if [ $? -ne 0 ]; then
+                let "result += 1"
+                echo ... computed partner not equivalent to expected partner.
+            fi
+            echo running $check2
+            OUTPUT=`$check2 2>&1`
+            fionaExitCode=$?
+            $evaluate $fionaExitCode
+            if [ $? -ne 0 ] 
+            then
+                result=1
+            else
+                echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+                if [ $? -ne 0 ]; then
+                    let "result += 1"
+                    echo ... computed partner not equivalent to expected partner.
+                fi
+            fi
+        fi        
     fi
 fi
 
@@ -296,33 +275,38 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
         echo running $check
         OUTPUT=`$check 2>&1`
-        echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-        if [ $? -ne 0 ]; then
-            let "result += 1"
-            echo ... computed partner not equivalent to expected partner.
-        fi
-        echo running $check2
-        OUTPUT=`$check2 2>&1`
         fionaExitCode=$?
-        `$evaluate $fionaExitCode`
+        $evaluate $fionaExitCode
         if [ $? -ne 0 ] 
         then
-        result=1
+            result=1
         else
-
-        echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-        if [ $? -ne 0 ]; then
-            let "result += 1"
-            echo ... computed partner not equivalent to expected partner.
-        fi
+            echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+            if [ $? -ne 0 ]; then
+                let "result += 1"
+                echo ... computed partner not equivalent to expected partner.
+            fi
+            echo running $check2
+            OUTPUT=`$check2 2>&1`
+            fionaExitCode=$?
+            $evaluate $fionaExitCode
+            if [ $? -ne 0 ] 
+            then
+                result=1
+            else
+                echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+                if [ $? -ne 0 ]; then
+                    let "result += 1"
+                    echo ... computed partner not equivalent to expected partner.
+                fi
+            fi
         fi
     fi
 fi
@@ -355,26 +339,24 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
         echo running $check
         OUTPUT=`$check 2>&1`
         fionaExitCode=$?
-        `$evaluate $fionaExitCode`
+        $evaluate $fionaExitCode
         if [ $? -ne 0 ] 
         then
-        result=1
+            result=1
         else
-
-        echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-        if [ $? -ne 0 ]; then
-            let "result += 1"
-            echo ... computed partner not equivalent to expected partner.
-        fi
+            echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+            if [ $? -ne 0 ]; then
+                let "result += 1"
+                echo ... computed partner not equivalent to expected partner.
+            fi
         fi
     fi
 fi

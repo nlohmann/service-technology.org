@@ -1,27 +1,5 @@
 #!/bin/bash
 
-############################################################################
-# Copyright 2007 Peter Laufer                                              #
-# Copyright 2008 Peter Massuthe                                            #
-#                                                                          #
-#                                                                          #
-# This file is part of Fiona.                                              #
-#                                                                          #
-# Fiona is free software; you can redistribute it and/or modify it         #
-# under the terms of the GNU General Public License as published by the    #
-# Free Software Foundation; either version 2 of the License, or (at your   #
-# option) any later version.                                               #
-#                                                                          #
-# Fiona is distributed in the hope that it will be useful, but WITHOUT     #
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    #
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for #
-# more details.                                                            #
-#                                                                          #
-# You should have received a copy of the GNU General Public License along  #
-# with Fiona; if not, write to the Free Software Foundation, Inc., 51      #
-# Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
-############################################################################
-
 source defaults.sh
 source memcheck_helper.sh
 
@@ -91,40 +69,38 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
-    fi
-fi
-
-cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$service.sa.owfn.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    fionaExitCode=$?
-    `$evaluate $fionaExitCode`
-    if [ $? -ne 0 ] 
-    then
-    result=1
+        result=1
     else
-
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the OGs of the service and its public view failed.
-    fi
+        cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
+        
+        if [ "$quiet" != "no" ]; then
+            cmd="$cmd -Q"
+        fi
+        
+        if [ "$memcheck" = "yes" ]; then
+            memchecklog="$service.sa.owfn.memcheck.log"
+            do_memcheck "$cmd" "$memchecklog"
+            result=$(($result | $?))
+        else
+            echo running $cmd
+            OUTPUT=`$cmd 2>&1`
+            fionaExitCode=$?
+            $evaluate $fionaExitCode
+            if [ $? -ne 0 ] 
+            then
+                result=1
+            else
+                echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+                resultSIM=$?
+                if [ $resultSIM -ne 0 ]; then
+                    let "result += 1"
+                    echo ... equivalence check of the OGs of the service and its public view failed.
+                fi
+            fi
+        fi
     fi
 fi
 
@@ -144,41 +120,39 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
-    fi
-
-fi
-
-cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$service.sa.owfn.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    fionaExitCode=$?
-    `$evaluate $fionaExitCode`
-    if [ $? -ne 0 ] 
-    then
-    result=1
+        result=1
     else
 
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the OGs of the service and its public view failed.
-    fi
+        cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
+        
+        if [ "$quiet" != "no" ]; then
+            cmd="$cmd -Q"
+        fi
+        
+        if [ "$memcheck" = "yes" ]; then
+            memchecklog="$service.sa.owfn.memcheck.log"
+            do_memcheck "$cmd" "$memchecklog"
+            result=$(($result | $?))
+        else
+            echo running $cmd
+            OUTPUT=`$cmd 2>&1`
+            fionaExitCode=$?
+            $evaluate $fionaExitCode
+            if [ $? -ne 0 ] 
+            then
+                result=1
+            else
+                echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+                resultSIM=$?
+                if [ $resultSIM -ne 0 ]; then
+                    let "result += 1"
+                    echo ... equivalence check of the OGs of the service and its public view failed.
+                fi
+            fi
+        fi
     fi
 fi
 
@@ -198,43 +172,41 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
-    fi
-fi
-
-cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$service.sa.owfn.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    fionaExitCode=$?
-    `$evaluate $fionaExitCode`
-    if [ $? -ne 0 ] 
-    then
-    result=1
+        result=1
     else
 
-
-    echo $OUTPUT | grep "are equivalent: NO" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check succeeded unexpectedly; this might be due to a repaired public view generation.
-    fi
+        cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
+        
+        if [ "$quiet" != "no" ]; then
+            cmd="$cmd -Q"
+        fi
+        
+        if [ "$memcheck" = "yes" ]; then
+            memchecklog="$service.sa.owfn.memcheck.log"
+            do_memcheck "$cmd" "$memchecklog"
+            result=$(($result | $?))
+        else
+            echo running $cmd
+            OUTPUT=`$cmd 2>&1`
+            fionaExitCode=$?
+            $evaluate $fionaExitCode
+            if [ $? -ne 0 ] 
+            then
+                result=1
+            else
+                echo $OUTPUT | grep "are equivalent: NO" > /dev/null
+                resultSIM=$?
+                if [ $resultSIM -ne 0 ]; then
+                    let "result += 1"
+                    echo ... equivalence check succeeded unexpectedly; this might be due to a repaired public view generation.
+                fi
+            fi
+        fi
     fi
 fi
-
 
 ############################################################################
 # start of the outcommentable detailed test                                #
@@ -263,40 +235,38 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
-    fi
-fi
-
-cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$service.sa.owfn.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    fionaExitCode=$?
-    `$evaluate $fionaExitCode`
-    if [ $? -ne 0 ] 
-    then
-    result=1
+        result=1
     else
-
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the OGs of the service and its public view failed.
-    fi
+        cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
+        
+        if [ "$quiet" != "no" ]; then
+            cmd="$cmd -Q"
+        fi
+        
+        if [ "$memcheck" = "yes" ]; then
+            memchecklog="$service.sa.owfn.memcheck.log"
+            do_memcheck "$cmd" "$memchecklog"
+            result=$(($result | $?))
+        else
+            echo running $cmd
+            OUTPUT=`$cmd 2>&1`
+            fionaExitCode=$?
+            $evaluate $fionaExitCode
+            if [ $? -ne 0 ] 
+            then
+                result=1
+            else
+                echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+                resultSIM=$?
+                if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
+                    let "result += 1"
+                    echo ... equivalence check of the OGs of the service and its public view failed.
+                fi
+            fi
+        fi
     fi
 fi
 
@@ -316,40 +286,39 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
-    fi
-fi
-
-cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$service.sa.owfn.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    fionaExitCode=$?
-    `$evaluate $fionaExitCode`
-    if [ $? -ne 0 ] 
-    then
-    result=1
+        result=1
     else
 
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the OGs of the service and its public view failed.
-    fi
+        cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
+        
+        if [ "$quiet" != "no" ]; then
+            cmd="$cmd -Q"
+        fi
+        
+        if [ "$memcheck" = "yes" ]; then
+            memchecklog="$service.sa.owfn.memcheck.log"
+            do_memcheck "$cmd" "$memchecklog"
+            result=$(($result | $?))
+        else
+            echo running $cmd
+            OUTPUT=`$cmd 2>&1`
+            fionaExitCode=$?
+            $evaluate $fionaExitCode
+            if [ $? -ne 0 ] 
+            then
+                result=1
+            else
+                echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+                resultSIM=$?
+                if [ $exitcode -ne 0 -o $resultSIM -ne 0 ]; then
+                    let "result += 1"
+                    echo ... equivalence check of the OGs of the service and its public view failed.
+                fi
+            fi
+        fi
     fi
 fi
 
@@ -369,41 +338,39 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
-    fi
-
-fi
-
-cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$service.sa.owfn.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    fionaExitCode=$?
-    `$evaluate $fionaExitCode`
-    if [ $? -ne 0 ] 
-    then
-    result=1
+        result=1
     else
 
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the OGs of the service and its public view failed.
-    fi
+        cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
+        
+        if [ "$quiet" != "no" ]; then
+            cmd="$cmd -Q"
+        fi
+        
+        if [ "$memcheck" = "yes" ]; then
+            memchecklog="$service.sa.owfn.memcheck.log"
+            do_memcheck "$cmd" "$memchecklog"
+            result=$(($result | $?))
+        else
+            echo running $cmd
+            OUTPUT=`$cmd 2>&1`
+            fionaExitCode=$?
+            $evaluate $fionaExitCode
+            if [ $? -ne 0 ] 
+            then
+                result=1
+            else
+                echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+                resultSIM=$?
+                if [ $resultSIM -ne 0 ]; then
+                    let "result += 1"
+                    echo ... equivalence check of the OGs of the service and its public view failed.
+                fi
+            fi
+        fi
     fi
 fi
 
@@ -423,40 +390,38 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
-    fi
-fi
-
-cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$service.sa.owfn.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    fionaExitCode=$?
-    `$evaluate $fionaExitCode`
-    if [ $? -ne 0 ] 
-    then
-    result=1
+        result=1
     else
-
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the OGs of the service and its public view failed.
-    fi
+        cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
+        
+        if [ "$quiet" != "no" ]; then
+            cmd="$cmd -Q"
+        fi
+        
+        if [ "$memcheck" = "yes" ]; then
+            memchecklog="$service.sa.owfn.memcheck.log"
+            do_memcheck "$cmd" "$memchecklog"
+            result=$(($result | $?))
+        else
+            echo running $cmd
+            OUTPUT=`$cmd 2>&1`
+            fionaExitCode=$?
+            $evaluate $fionaExitCode
+            if [ $? -ne 0 ] 
+            then
+                result=1
+            else
+                echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+                resultSIM=$?
+                if [ $resultSIM -ne 0 ]; then
+                    let "result += 1"
+                    echo ... equivalence check of the OGs of the service and its public view failed.
+                fi
+            fi
+        fi
     fi
 fi
 
@@ -476,40 +441,39 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
-    fi
-fi
-
-cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$service.sa.owfn.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    fionaExitCode=$?
-    `$evaluate $fionaExitCode`
-    if [ $? -ne 0 ] 
-    then
-    result=1
+        result=1
     else
-
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the OGs of the service and its public view failed.
-    fi
+    
+        cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
+        
+        if [ "$quiet" != "no" ]; then
+            cmd="$cmd -Q"
+        fi
+        
+        if [ "$memcheck" = "yes" ]; then
+            memchecklog="$service.sa.owfn.memcheck.log"
+            do_memcheck "$cmd" "$memchecklog"
+            result=$(($result | $?))
+        else
+            echo running $cmd
+            OUTPUT=`$cmd 2>&1`
+            fionaExitCode=$?
+            $evaluate $fionaExitCode
+            if [ $? -ne 0 ] 
+            then
+                result=1
+            else
+                echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+                resultSIM=$?
+                if [ $resultSIM -ne 0 ]; then
+                    let "result += 1"
+                    echo ... equivalence check of the OGs of the service and its public view failed.
+                fi
+            fi
+        fi
     fi
 fi
 
@@ -529,40 +493,38 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
-    fi
-fi
-
-cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
-
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
-fi
-
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$service.sa.owfn.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$(($result | $?))
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    fionaExitCode=$?
-    `$evaluate $fionaExitCode`
-    if [ $? -ne 0 ] 
-    then
-    result=1
+        result=1
     else
-
-
-    echo $OUTPUT | grep "are equivalent: YES" > /dev/null
-    resultSIM=$?
-    if [ $resultSIM -ne 0 ]; then
-        let "result += 1"
-        echo ... equivalence check of the OGs of the service and its public view failed.
-    fi
+        cmd="$FIONA $output.pv.owfn $service.owfn -t equivalence"
+        
+        if [ "$quiet" != "no" ]; then
+            cmd="$cmd -Q"
+        fi
+        
+        if [ "$memcheck" = "yes" ]; then
+            memchecklog="$service.sa.owfn.memcheck.log"
+            do_memcheck "$cmd" "$memchecklog"
+            result=$(($result | $?))
+        else
+            echo running $cmd
+            OUTPUT=`$cmd 2>&1`
+            fionaExitCode=$?
+            $evaluate $fionaExitCode
+            if [ $? -ne 0 ] 
+            then
+                result=1
+            else
+                echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+                resultSIM=$?
+                if [ $resultSIM -ne 0 ]; then
+                    let "result += 1"
+                    echo ... equivalence check of the OGs of the service and its public view failed.
+                fi
+            fi
+        fi
     fi
 fi
 

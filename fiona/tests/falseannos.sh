@@ -1,27 +1,5 @@
 #!/bin/bash
 
-############################################################################
-# Copyright 2007 Peter Laufer                                              #
-# Copyright 2008 Peter Massuthe                                            #
-#                                                                          #
-#                                                                          #
-# This file is part of Fiona.                                              #
-#                                                                          #
-# Fiona is free software; you can redistribute it and/or modify it         #
-# under the terms of the GNU General Public License as published by the    #
-# Free Software Foundation; either version 2 of the License, or (at your   #
-# option) any later version.                                               #
-#                                                                          #
-# Fiona is distributed in the hope that it will be useful, but WITHOUT     #
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    #
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for #
-# more details.                                                            #
-#                                                                          #
-# You should have received a copy of the GNU General Public License along  #
-# with Fiona; if not, write to the Free Software Foundation, Inc., 51      #
-# Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
-############################################################################
-
 source defaults.sh
 source memcheck_helper.sh
 
@@ -71,29 +49,33 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    cmd="$FIONA $violating.blue.og -t checkfalsenodes"
-
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-    echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
-    ok=$?
-
-    if [ $ok -ne 0 ]
-    then
-    echo   ... false annotated nodes found after removal.
-    fi
-
-    result=`expr $result + $ok`
+        cmd="$FIONA $violating.blue.og -t checkfalsenodes"
+        echo running $cmd
+        OUTPUT=`$cmd 2>&1`
+    
+        fionaExitCode=$?
+        $evaluate $fionaExitCode
+        if [ $? -ne 0 ] 
+        then
+            result=1
+        else
+    
+            echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
+            ok=$?
+        
+            if [ $ok -ne 0 ]
+            then
+                echo   ... false annotated nodes found after removal.
+            fi
+    
+            result=`expr $result + $ok`
+        fi
     fi
 fi
 
@@ -109,17 +91,15 @@ else
     OUTPUT=`$cmd 2>&1`
     
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-
-    if [ "$OUTPUT" != "" ]; then
-        let "result += 1"
-        echo ... automatically cleaned OG is not equivalent to manually cleaned OG.
-    fi
+        if [ "$OUTPUT" != "" ]; then
+            let "result += 1"
+            echo ... automatically cleaned OG is not equivalent to manually cleaned OG.
+        fi
     fi
 fi
 
@@ -142,33 +122,32 @@ else
     OUTPUT=`$cmd 2>&1`
     
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
-    fi
-
-
-    cmd="$FIONA $violating.blue.og -t checkfalsenodes"
-
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-    fionaExitCode=$?
-    `$evaluate $fionaExitCode`
-    if [ $? -ne 0 ] 
-    then
-    result=1
+        result=1
     else
 
-    echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
-    ok=$?
-
-    if [ $ok -ne 0 ]
-    then
-    echo   ... false annotated nodes found after removal.
-    fi
-
-    result=`expr $result + $ok`
+        cmd="$FIONA $violating.blue.og -t checkfalsenodes"
+    
+        echo running $cmd
+        OUTPUT=`$cmd 2>&1`
+        fionaExitCode=$?
+        $evaluate $fionaExitCode
+        if [ $? -ne 0 ] 
+        then
+            result=1
+        else
+            echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
+            ok=$?
+        
+            if [ $ok -ne 0 ]
+            then
+            echo   ... false annotated nodes found after removal.
+            fi
+        
+            result=`expr $result + $ok`
+            fi
     fi
 fi
 
@@ -183,18 +162,16 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
 
-
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-    if [ "$OUTPUT" != "" ]; then
-        let "result += 1"
-        echo ... automatically cleaned OG is not equivalent to manually cleaned OG.
-    fi
+        if [ "$OUTPUT" != "" ]; then
+            let "result += 1"
+            echo ... automatically cleaned OG is not equivalent to manually cleaned OG.
+        fi
     fi
 fi
 
@@ -215,33 +192,34 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    cmd="$FIONA $violating.blue.og -t checkfalsenodes"
-
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-    echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
-    ok=$?
-
-    if [ $ok -ne 0 ]
-    then
-    echo   ... false annotated nodes found after removal.
-    fi
-
-    result=`expr $result + $ok`
+        cmd="$FIONA $violating.blue.og -t checkfalsenodes"
+        echo running $cmd
+        OUTPUT=`$cmd 2>&1`
+    
+        fionaExitCode=$?
+        $evaluate $fionaExitCode
+        if [ $? -ne 0 ] 
+        then
+            result=1
+        else
+            echo $OUTPUT | grep "No nodes with false annotation found" > /dev/null
+            ok=$?
+            if [ $ok -ne 0 ]
+            then
+                echo   ... false annotated nodes found after removal.
+            fi
+            result=`expr $result + $ok`
+        fi
     fi
 fi
 
 cmd="diff $violating.blue.og $cleanedPerHand "
-
 
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$cleanedPerHand.memcheck.log"
@@ -250,10 +228,16 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-
-    if [ "$OUTPUT" != "" ]; then
-        let "result += 1"
-        echo ... automatically cleaned OG is not equivalent to manually cleaned OG.
+    fionaExitCode=$?
+    $evaluate $fionaExitCode
+    if [ $? -ne 0 ] 
+    then
+        result=1
+    else
+        if [ "$OUTPUT" != "" ]; then
+            let "result += 1"
+            echo ... automatically cleaned OG is not equivalent to manually cleaned OG.
+        fi
     fi
 fi
 

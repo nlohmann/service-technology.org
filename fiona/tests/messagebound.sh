@@ -1,26 +1,5 @@
 #!/bin/bash
 
-############################################################################
-# Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
-#                      Jan Bretschneider and Christian Gierds              #
-#                                                                          #
-# This file is part of Fiona.                                              #
-#                                                                          #
-# Fiona is free software; you can redistribute it and/or modify it         #
-# under the terms of the GNU General Public License as published by the    #
-# Free Software Foundation; either version 2 of the License, or (at your   #
-# option) any later version.                                               #
-#                                                                          #
-# Fiona is distributed in the hope that it will be useful, but WITHOUT     #
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    #
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for #
-# more details.                                                            #
-#                                                                          #
-# You should have received a copy of the GNU General Public License along  #
-# with Fiona; if not, write to the Free Software Foundation, Inc., 51      #
-# Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
-############################################################################
-
 source defaults.sh
 source memcheck_helper.sh
 
@@ -54,21 +33,20 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-    echo $OUTPUT | grep "net is controllable: NO" > /dev/null
-    mb14control=$?
-
-    if [ $mb14control -ne 0 ]
-    then
-    echo   ... failed to build OG correctly
-    fi
-
-    result=`expr $mb14control`
+        echo $OUTPUT | grep "net is controllable: NO" > /dev/null
+        mb14control=$?
+    
+        if [ $mb14control -ne 0 ]
+        then
+            echo   ... failed to build OG correctly
+        fi
+    
+        result=`expr $mb14control`
     fi
 fi
 
@@ -92,27 +70,26 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    mb21control=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $mb21bluenodes_soll" > /dev/null
-    mb21bluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $mb21blueedges_soll" > /dev/null
-    mb21blueedges=$?
-
-    if [ $mb21control -ne 0 -o $mb21bluenodes -ne 0 -o $mb21blueedges -ne 0 ]
-    then
-    echo   ... failed to build OG correctly
-    fi
-
-    result=`expr $result + $mb21control + $mb21bluenodes + $mb21blueedges`
+        echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+        mb21control=$?
+    
+        echo $OUTPUT | grep "number of blue nodes: $mb21bluenodes_soll" > /dev/null
+        mb21bluenodes=$?
+    
+        echo $OUTPUT | grep "number of blue edges: $mb21blueedges_soll" > /dev/null
+        mb21blueedges=$?
+    
+        if [ $mb21control -ne 0 -o $mb21bluenodes -ne 0 -o $mb21blueedges -ne 0 ]
+        then
+            echo   ... failed to build OG correctly
+        fi
+    
+        result=`expr $result + $mb21control + $mb21bluenodes + $mb21blueedges`
     fi
 fi
 
@@ -136,27 +113,26 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    mb22control=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $mb22bluenodes_soll" > /dev/null
-    mb22bluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $mb22blueedges_soll" > /dev/null
-    mb22blueedges=$?
-
-    if [ $mb22control -ne 0 -o $mb22bluenodes -ne 0 -o $mb22blueedges -ne 0 ]
-    then
-    echo   ... failed to build OG correctly
-    fi
-
-    result=`expr $result + $mb22control + $mb22bluenodes + $mb22blueedges`
+        echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+        mb22control=$?
+    
+        echo $OUTPUT | grep "number of blue nodes: $mb22bluenodes_soll" > /dev/null
+        mb22bluenodes=$?
+    
+        echo $OUTPUT | grep "number of blue edges: $mb22blueedges_soll" > /dev/null
+        mb22blueedges=$?
+    
+        if [ $mb22control -ne 0 -o $mb22bluenodes -ne 0 -o $mb22blueedges -ne 0 ]
+        then
+            echo   ... failed to build OG correctly
+        fi
+    
+        result=`expr $result + $mb22control + $mb22bluenodes + $mb22blueedges`
     fi
 fi
 
@@ -180,27 +156,26 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    mb22control=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $mb22bluenodes_soll" > /dev/null
-    mb22bluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $mb22blueedges_soll" > /dev/null
-    mb22blueedges=$?
-
-    if [ $mb22control -ne 0 -o $mb22bluenodes -ne 0 -o $mb22blueedges -ne 0 ]
-    then
-    echo   ... failed to build OG correctly
-    fi
-
-    result=`expr $result + $mb22control + $mb22bluenodes + $mb22blueedges`
+        echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+        mb22control=$?
+    
+        echo $OUTPUT | grep "number of blue nodes: $mb22bluenodes_soll" > /dev/null
+        mb22bluenodes=$?
+    
+        echo $OUTPUT | grep "number of blue edges: $mb22blueedges_soll" > /dev/null
+        mb22blueedges=$?
+    
+        if [ $mb22control -ne 0 -o $mb22bluenodes -ne 0 -o $mb22blueedges -ne 0 ]
+        then
+            echo   ... failed to build OG correctly
+        fi
+    
+        result=`expr $result + $mb22control + $mb22bluenodes + $mb22blueedges`
     fi
 fi
 
@@ -224,27 +199,26 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    mb22control=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $mb22bluenodes_soll" > /dev/null
-    mb22bluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $mb22blueedges_soll" > /dev/null
-    mb22blueedges=$?
-
-    if [ $mb22control -ne 0 -o $mb22bluenodes -ne 0 -o $mb22blueedges -ne 0 ]
-    then
-    echo   ... failed to build OG correctly
-    fi
-
-    result=`expr $result + $mb22control + $mb22bluenodes + $mb22blueedges`
+        echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+        mb22control=$?
+    
+        echo $OUTPUT | grep "number of blue nodes: $mb22bluenodes_soll" > /dev/null
+        mb22bluenodes=$?
+    
+        echo $OUTPUT | grep "number of blue edges: $mb22blueedges_soll" > /dev/null
+        mb22blueedges=$?
+    
+        if [ $mb22control -ne 0 -o $mb22bluenodes -ne 0 -o $mb22blueedges -ne 0 ]
+        then
+            echo   ... failed to build OG correctly
+        fi
+    
+        result=`expr $result + $mb22control + $mb22bluenodes + $mb22blueedges`
     fi
 fi
 
@@ -265,21 +239,20 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-    echo $OUTPUT | grep "net is controllable: NO" > /dev/null
-    mb22control=$?
-
-    if [ $mb22control -ne 0 ]
-    then
-    echo   ... failed to build OG correctly
-    fi
-
-    result=`expr $result + $mb22control`
+        echo $OUTPUT | grep "net is controllable: NO" > /dev/null
+        mb22control=$?
+    
+        if [ $mb22control -ne 0 ]
+        then
+            echo   ... failed to build OG correctly
+        fi
+    
+        result=`expr $result + $mb22control`
     fi
 fi
 
@@ -300,21 +273,20 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
     fionaExitCode=$?
-    `$evaluate $fionaExitCode`
+    $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
-    result=1
+        result=1
     else
-
-    echo $OUTPUT | grep "net is controllable: NO" > /dev/null
-    mb22control=$?
-
-    if [ $mb22control -ne 0 ]
-    then
-    echo   ... failed to build OG correctly
-    fi
-
-    result=`expr $result + $mb22control`
+        echo $OUTPUT | grep "net is controllable: NO" > /dev/null
+        mb22control=$?
+    
+        if [ $mb22control -ne 0 ]
+        then
+            echo   ... failed to build OG correctly
+        fi
+    
+        result=`expr $result + $mb22control`
     fi
 fi
 

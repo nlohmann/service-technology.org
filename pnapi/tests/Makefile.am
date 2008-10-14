@@ -5,7 +5,7 @@ TESTS = test_mergePlaces test_mergeTransitions test_mirror \
 		test_copyconstructor test_makeChannelsInternal \
 		test_makeInnerStructure
 
-bin_PROGRAMS =  test_mergePlaces test_mergeTransitions test_mirror \
+check_PROGRAMS =  test_mergePlaces test_mergeTransitions test_mirror \
 			test_removeTransition test_loop_final_state \
 			test_produce \
 			test_find_get_rename test_assignmentoperator \
@@ -24,15 +24,4 @@ test_copyconstructor_SOURCES = test_copyconstructor.cc
 test_makeChannelsInternal_SOURCES = test_makeChannelsInternal.cc
 test_makeInnerStructure_SOURCES = test_makeInnerStructure.cc
 
-
-test_mergePlaces_LDADD = ../src/lib_pnapi.a
-test_mergeTransitions_LDADD = ../src/lib_pnapi.a
-test_mirror_LDADD = ../src/lib_pnapi.a
-test_removeTransition_LDADD = ../src/lib_pnapi.a
-test_loop_final_state_LDADD = ../src/lib_pnapi.a
-test_produce_LDADD = ../src/lib_pnapi.a
-test_find_get_rename_LDADD = ../src/lib_pnapi.a
-test_assignmentoperator_LDADD = ../src/lib_pnapi.a
-test_copyconstructor_LDADD = ../src/lib_pnapi.a
-test_makeChannelsInternal_LDADD = ../src/lib_pnapi.a
-test_makeInnerStructure_LDADD = ../src/lib_pnapi.a
+LDADD = $(top_builddir)/src/lib_pnapi.a

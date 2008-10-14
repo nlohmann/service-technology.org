@@ -248,18 +248,11 @@ else
     then
         result=1
     else
-        if [ $? -ne 0 ]; then
-            echo "... failed: $FIONA exited with non-zero return value."
+        echo "running diff  $outputPrefix.og $outputExpected"
+        if ! diff "$outputPrefix.og" "$outputExpected" >/dev/null ; then
+            echo "... failed: Output and expected output differ. Compare " \
+                 "$outputPrefix.og" "$outputExpected"
             resultSingle=1
-        fi
-    
-        if [ $resultSingle -eq 0 ] ; then
-            echo "running diff  $outputPrefix.og $outputExpected"
-            if ! diff "$outputPrefix.og" "$outputExpected" >/dev/null ; then
-                echo "... failed: Output and expected output differ. Compare " \
-                     "$outputPrefix.og" "$outputExpected"
-                resultSingle=1
-            fi
         fi
     fi
 fi

@@ -940,7 +940,7 @@ int main( int argc, char *argv[])
 
   // parsing all inputfiles
   set< string >::iterator file = inputfiles.begin();
-  do
+  while (file != inputfiles.end())
   {
     open_file(*file);
     // reset the parser
@@ -1095,8 +1095,8 @@ int main( int argc, char *argv[])
     globals::tasks.clear();
     globals::services.clear();
 
-	file++;
-  } while (file != inputfiles.end());
+    file++;
+  }
 
   trace(TRACE_INFORMATION, "All files have been parsed.\n");
 

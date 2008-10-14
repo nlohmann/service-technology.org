@@ -12,7 +12,7 @@
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([UML2OWFN],[1.03-unreleased],[znamirow@informatik.hu-berlin.de],[uml2owfn])
+AC_INIT([UML2oWFN],[1.03-unreleased],[fahland@informatik.hu-berlin.de],[uml2owfn])
 AM_INIT_AUTOMAKE
 
 
@@ -47,15 +47,21 @@ AC_CHECK_FUNCS([pow])
 AM_PROG_CC_C_O
 
 
+############################################################################
 # Check for optional programs.
+############################################################################
+
+# GNU parser generators
 AC_PROG_YACC
 AC_PROG_LEX
 
-AC_CHECK_PROG(KC, kc++, kc++, not found)
-if test "$KC" = "not found"; then
- AC_MSG_WARN([Kimwitu++ was not found. You will not be able to complile BPEL2oWFN from scratch.])
-fi
+# Kimwitu
+#AC_CHECK_PROG(KC, kc++, kc++, not found)
+#if test "$KC" = "not found"; then
+# AC_MSG_WARN([Kimwitu++ was not found. You will not be able to complile BPEL2oWFN from scratch.])
+#fi
 
+# Dot
 AC_CHECK_PROG(DOT, dot, dot, not found)
 if test "$DOT" = "not found"; then
  AC_MSG_WARN([Graphviz dot was not found.])
@@ -65,7 +71,9 @@ else
 fi
 
 
+############################################################################
 # Set files to generate.
+############################################################################
 AC_CONFIG_FILES([src/Makefile \
                  doc/Makefile \
                  tests/Makefile \

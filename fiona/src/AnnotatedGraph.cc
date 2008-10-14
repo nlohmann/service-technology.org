@@ -2605,6 +2605,7 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
 
 
 //! \brief transforms the graph into its public view
+//! \TODO the argument cleanPV is never written!!!
 void AnnotatedGraph::transformToPublicView(Graph* cleanPV, bool fromOWFN) {
 
     // first either the empty node (if the owfn is given) or all true nodes
@@ -2632,12 +2633,14 @@ void AnnotatedGraph::transformToPublicView(Graph* cleanPV, bool fromOWFN) {
     TRACE(TRACE_1, "  edges: " + intToString(edges) + "\n\n");
 
     TRACE(TRACE_1, "internal translation from OG class to graph class...\n");
-    transformOGToService(cleanPV);
+    transformOGToService(this);
+//    transformOGToService(cleanPV);
     TRACE(TRACE_1, "\n");
 }
 
 
 //! \brief transforms the public view modified OG to a Service
+//! \TODO the argument cleanPV is ignored!!!
 void AnnotatedGraph::transformOGToService(Graph* cleanPV) {
 
     // map from every node in the annotated graph to its corresponding

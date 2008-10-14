@@ -399,9 +399,9 @@ void createOutputFiles(AnnotatedGraph* graph, string prefix) {
 
         string dotFileName = graph->createDotFile(prefix); // .out
 
-        if (!parameters[P_NOPNG]  && dotFileName != "") {
+        if (!parameters[P_NOPNG] && dotFileName != "") {
             string pngres = graph->createPNGFile(prefix, dotFileName);
-            if (pngres != "") trace( pngres + " generated\n");
+            if (pngres != "") trace(pngres + " generated\n");
 
         }
 
@@ -422,7 +422,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
 
     // if the OG is empty, there is no public view and the computation
     // will be aborted
-    if(OG->hasNoRoot() || OG->getRoot()->getColor() == RED) {
+    if (OG->hasNoRoot() || OG->getRoot()->getColor() == RED) {
         if (fromOWFN) {
             trace("\nThe given oWFN is not controllable. No PublicView will be generated.\n\n");
         } else {
@@ -431,7 +431,7 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
         return;
     }
 
-    trace( "generating the public view for ");
+    trace("generating the public view for ");
     trace(graphName);
 
     trace("\n");
@@ -452,11 +452,11 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
     if (!options[O_NOOUTPUTFILES]) {
 
         // test whether this graph is too big
-        if(cleanPV->numberOfNodes() > maxSizeForDot && !parameters[P_NOPNG]) {
-            trace( "the public view service automaton is to big to generate a dot file\n\n");
+        if (OG->numberOfNodes() > maxSizeForDot && !parameters[P_NOPNG]) {
+            trace("the public view service automaton is to big to generate a dot file\n\n");
         } else {
-            trace( "generating dot output...\n");
-            createOutputFiles(cleanPV, outfilePrefix);
+            trace("generating dot output...\n");
+            createOutputFiles(OG, outfilePrefix);
         }
 
         // create sets for transferring the interface from the original owfn
@@ -474,7 +474,8 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
         //transform to owfn
         PNapi::PetriNet* PVoWFN = new PNapi::PetriNet();
         PVoWFN->set_format(PNapi::FORMAT_OWFN, true);
-        cleanPV->transformToOWFN(PVoWFN, inputs, outputs);
+//        cleanPV->transformToOWFN(PVoWFN, inputs, outputs);
+        OG->transformToOWFN(PVoWFN, inputs, outputs);
 
         // print the information of the public view's owfn
         TRACE(TRACE_1, "Public View oWFN statistics:\n");
@@ -492,8 +493,8 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
         (output) << (*PVoWFN);
         output.close();
 
-        trace( "=================================================================\n");
-        trace( "\n");
+        trace("\n=================================================================\n");
+        trace("\n");
     }
 }
 

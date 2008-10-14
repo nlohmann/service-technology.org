@@ -244,7 +244,7 @@ bool Graph::isAcyclic() {
 //! \param filenamePrefix a string containing the prefix of the output file name
 //! \param dotGraphTitle a title for the graph to be shown in the image
 string Graph::createDotFile(string& filenamePrefix,
-                         const string& dotGraphTitle) const {
+                            const string& dotGraphTitle) const {
 
     trace( "creating the dot file of the graph...\n");
     
@@ -408,11 +408,11 @@ void Graph::transformToOWFN(PNapi::PetriNet* PN, set<string> setOfInputs, set<st
 //! \param incomingTransition needed to creat the arc from the node that called the
 //!                           current one by following its edges
 void Graph::transformToOWFNRecursively(GraphNode* currentNode,
-                                          set<GraphNode*>& visitedNodes,
-                                          set<string>& finalNodeNames,
-                                          PNapi::PetriNet* PN,
-                                          unsigned int& transitionNumber,
-                                          PNapi::Transition* incomingTransition) {
+                                       set<GraphNode*>& visitedNodes,
+                                       set<string>& finalNodeNames,
+                                       PNapi::PetriNet* PN,
+                                       unsigned int& transitionNumber,
+                                       PNapi::Transition* incomingTransition) {
 
     // If this node was already visited, simply connect the incoming transition
 	if(visitedNodes.find(currentNode) != visitedNodes.end()) {
@@ -489,6 +489,7 @@ void Graph::clearNodeSet() {
     setOfNodes.clear();
 }
 
+
 /*!
  *  \brief Calculates the predecessor relation of the graph
  *
@@ -499,8 +500,7 @@ void Graph::clearNodeSet() {
  *
  *  ??? Vorgänger zweimal drin, wenn über zwei Kanten erreichbar
  */
-void Graph::getPredecessorRelation(Graph::predecessorMap& resultMap)
-{
+void Graph::getPredecessorRelation(Graph::predecessorMap& resultMap) {
     resultMap.clear();
 
     // iterate over all nodes of the graph

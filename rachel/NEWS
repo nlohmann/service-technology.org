@@ -27,12 +27,16 @@ Version 1.11-unreleased
   `src/getopt.h'
 
 * used option `gnits' for Automake, see
-  `http://www.gnu.org/software/autoconf/manual/automake.html#Gnits'
+  `http://www.gnu.org/software/automake/manual/automake.html#Gnits'
 
 * moved acknowledgements from file `AUTHOR' to file `THANKS' to meet the
   strict Gnits requirements
 
 * updated documentation
+
+* the configure script now takes care about the compilation flags; for
+  example `./configure --enable-64bit' sets the flags necessary to build a 64
+  bit executable with `make'
 
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for

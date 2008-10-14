@@ -10,11 +10,13 @@
 
 @item removed unnecessary files @file{src/getopt.c}, @file{src/getopt1.c}, and @file{src/getopt.h}
 
-@item used option @option{gnits} for Automake, see @url{http://www.gnu.org/software/autoconf/manual/automake.html#Gnits}
+@item used option @option{gnits} for Automake, see @url{http://www.gnu.org/software/automake/manual/automake.html#Gnits}
 
 @item moved acknowledgements from file @file{AUTHOR} to file @file{THANKS} to meet the strict Gnits requirements
 
 @item updated documentation
+
+@item the configure script now takes care about the compilation flags; for example @command{./configure --enable-64bit} sets the flags necessary to build a 64 bit executable with @command{make}
 @end itemize
 
 

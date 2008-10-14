@@ -18,42 +18,19 @@ BUILT_SOURCES = cmdline.c syntax_og.cc
 
 
 ################################################################
-# organize flags
+# inherit flags set by the configure script
 ################################################################
 
-# initial setting necessary to enable "+=" statements later
-rachel_LDFLAGS  =
-rachel_CFLAGS   =
-rachel_CXXFLAGS =
-
-# flags to build Mac Universal binary
-if ENABLE_UNIVERSAL
-  rachel_LDFLAGS  += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386 -mmacosx-version-min=10.4
-  rachel_CFLAGS   += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386
-  rachel_CXXFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386
-endif
-
-# flags to build Windows MinGW binary
-if ENABLE_WIN32
-  rachel_LDFLAGS  += -mno-cygwin -U _WIN32
-  rachel_CFLAGS   += -mno-cygwin -U _WIN32
-  rachel_CXXFLAGS += -mno-cygwin -U _WIN32
-endif
-
-# flags to build a 64 bit binary
-if ENABLE_64BIT
-  rachel_LDFLAGS  += -m64
-  rachel_CFLAGS   += -m64
-  rachel_CXXFLAGS += -m64
-endif
+rachel_LDFLAGS  = @configured_LDFLAGS@
+rachel_CFLAGS   = @configured_CFLAGS@
+rachel_CXXFLAGS = @configured_CXXFLAGS@
 
 
 ################################################################
 # organize cleaning, and distribution
 ################################################################
 
-EXTRA_DIST = syntax_og.h cmdline.ggo rachel.conf Doxydetails \
-	     $(aspects)
+EXTRA_DIST = syntax_og.h cmdline.ggo rachel.conf Doxydetails $(aspects)
 
 CLEANFILES = *.gcno *.gcda
 

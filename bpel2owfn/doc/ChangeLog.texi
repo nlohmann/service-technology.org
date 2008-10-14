@@ -1,4 +1,4 @@
-@heading Version 2.04 (not yet released)
+@heading Version 2.04-unreleased
 
 @itemize
 @item fixed bug #12110 (@url{https://gna.org/bugs/?12110}): compilation errors using GCC 4.3.1
@@ -48,6 +48,12 @@
 @item cleaned Makefiles (removed explicit rules that were covered by implicit rules)
 
 @item removed maintainer scripts for Fink and RPM
+
+@item added configure scripts from Rachel and Fiona to set the necessary compilation flags to compile a Mac Universal binary (@option{--enable-universal}), a 64 bit binary (@option{--enable-64bit}), or a Windows MinGW binary (@option{--enable-win32})
+
+@item used option @option{gnits} for Automake, see @url{http://www.gnu.org/software/automake/manual/automake.html#Gnits}
+
+@item moved acknowledgements from file @file{AUTHOR} to file @file{THANKS} to meet the strict Gnits requirements
 @end itemize
 
 

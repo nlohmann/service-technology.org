@@ -6,8 +6,8 @@
  http://service-technology.org/bpel2owfn - http://gnu.org/software/bpelo2wfn
 
 
-Version 2.04 (not yet released)
-===============================
+Version 2.04-unreleased
+=======================
 
 * fixed bug #12110 (`https://gna.org/bugs/?12110'): compilation errors using
   GCC 4.3.1
@@ -72,6 +72,17 @@ Version 2.04 (not yet released)
   rules)
 
 * removed maintainer scripts for Fink and RPM
+
+* added configure scripts from Rachel and Fiona to set the necessary
+  compilation flags to compile a Mac Universal binary (`--enable-universal'),
+  a 64 bit binary (`--enable-64bit'), or a Windows MinGW binary
+  (`--enable-win32')
+
+* used option `gnits' for Automake, see
+  `http://www.gnu.org/software/automake/manual/automake.html#Gnits'
+
+* moved acknowledgements from file `AUTHOR' to file `THANKS' to meet the
+  strict Gnits requirements
 
 
 See file ChangeLog <http://service-technology.org/files/bpel2owfn/ChangeLog> for

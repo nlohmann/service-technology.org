@@ -1,0 +1,37 @@
+INTERFACE
+  INPUT
+    beverage,
+    money;
+  OUTPUT
+    coffee,
+    euro,
+    tea;
+
+NODES
+  0 : (!coffee + !euro + !tea) : blue,
+  1 : !euro : blue,
+  6 : ?money : blue,
+  7 : (?beverage * final) : blue : finalnode,
+  15 : final : blue : finalnode,
+  24 : ?money : blue,
+  32 : !euro : blue,
+  33 : ?money : blue,
+  34 : (!coffee + !tea) : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 1 : !coffee,
+  0 -> 32 : !tea,
+  0 -> 34 : !euro,
+  1 -> 6 : !euro,
+  6 -> 7 : ?money,
+  6 -> 24 : ?beverage,
+  7 -> 15 : ?beverage,
+  24 -> 15 : ?money,
+  32 -> 33 : !euro,
+  33 -> 7 : ?money,
+  33 -> 24 : ?beverage,
+  34 -> 6 : !coffee,
+  34 -> 33 : !tea;

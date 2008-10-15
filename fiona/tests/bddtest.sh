@@ -42,6 +42,8 @@ fi
 
 ############################################################################
 
+#check number of nodes in sequence3.owfn
+
 nodes_mp=28
 nodes_ann=16
 
@@ -83,6 +85,8 @@ else
 fi
 
 ############################################################################
+
+#check correctness of the BDD of sequence3.owfn
 
 owfn="$DIR/sequence3.owfn"
 owfn_reference="$testdir/bdd_ref/sequence3_reference.owfn"
@@ -132,49 +136,64 @@ if [ "$testdir" != "$builddir" ]; then
     rm -rf $builddir/$SUBDIR
 fi
 
-############################################################################
+
 ############################################################################
 
-nodes_mp=1562
-nodes_ann=361
+#check correctness of the BDD of myCoffee.owfn
+SUBDIR=$testdir/bdd_ref
+owfn="$DIR/myCoffee.owfn"
+owfn_reference="$testdir/bdd_ref/myCoffee_reference.owfn"
 
-owfn="$testdir/philosophers/phcontrol4.unf.owfn"
-cmd="$FIONA $owfn -b 4 -t OG"
-if [ "$quiet" != "no" ]; then
-    cmd="$cmd -Q"
+# for make distcheck: make copy of $owfn and work on it
+if [ "$testdir" != "$builddir" ]; then
+    if [ ! -e $builddir/$SUBDIR ]; then
+        $MKDIR_P $builddir/$SUBDIR
+    fi
+
+    cp $owfn $builddir/$SUBDIR
 fi
 
+owfn="$builddir/$SUBDIR/myCoffee.owfn"
+
+cmd="$FIONA $owfn -b 4 -t OG"
+$cmd 2>/dev/null 1>/dev/null
+
+cmd="$FIONA $owfn $owfn_reference -t equivalence -b1"
+
+
 if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.b4.IG.memcheck.log"
+    memchecklog="$owfn.n.n.x.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"
     result=$(($result | $?))
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
+    
     fionaExitCode=$?
     $evaluate $fionaExitCode
     if [ $? -ne 0 ] 
     then
         result=1
     else
-        echo $OUTPUT | grep "BDD_MP: number of nodes: $nodes_mp" > /dev/null
-        resultNodesMP=$?
-        echo $OUTPUT | grep "BDD_ANN: number of nodes: $nodes_ann" > /dev/null
-        resultNodesANN=$?
+        echo $OUTPUT | grep "The two operating guidelines are equal: YES" > /dev/null
+        resultEqual=$?
     
-        if [ $resultNodesMP -ne 0 ] ; then
-            echo ... failed to build BDD_MP correctly
-            result=1
-        fi
-    
-        if [ $resultNodesANN -ne 0 ] ; then
-            echo ... failed to build BDD_ANN correctly
+        if [ $resultEqual -ne 0 ] ; then
+            echo "... failed (the two operating guidelines are not equal although they should be)"
             result=1
         fi
     fi
 fi
 
+if [ "$testdir" != "$builddir" ]; then
+    rm -rf $builddir/$SUBDIR
+fi
+
+
+
 ############################################################################
+
+#check correctness of the BDD of phcontrol4.unf.owfn
 
 owfn="$testdir/philosophers/phcontrol4.unf.owfn"
 owfn_reference="$testdir/bdd_ref/phcontrol4.unf_reference.owfn"

@@ -34,7 +34,7 @@
 #ifndef BDDREPRESENTATION_H_
 #define BDDREPRESENTATION_H_
 
-#include "mynew.h" 
+#include "mynew.h"
 #include <vector>
 #include <map>
 #include <list>

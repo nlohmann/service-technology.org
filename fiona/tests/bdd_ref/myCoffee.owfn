@@ -1,0 +1,68 @@
+{ coffee }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,		
+  p2,
+  p3,
+  p4;
+INPUT
+  euro, 
+  tea,
+  coffee;
+OUTPUT
+  beverage,
+  money;
+
+INITIALMARKING
+  p0:	1
+ ;
+
+FINALMARKING
+  p4:	1
+ ;
+
+TRANSITION t1	 { ?euro }
+CONSUME
+  p0:	1,
+  euro: 1;	 
+PRODUCE
+  p1:	1;
+
+TRANSITION t2	 { ?coffee }
+CONSUME
+  coffee:	1,
+  p1: 1;
+PRODUCE
+  p2:	1;
+
+TRANSITION t3	 { ?tea }
+CONSUME
+  p1:	1,
+  tea : 1;
+PRODUCE
+  p2:	1;
+
+TRANSITION t4	 { !beverage }
+CONSUME
+  p2:	1;
+PRODUCE
+  beverage:1,
+  p3 : 1;
+ 
+TRANSITION t5	 { !money }
+CONSUME
+  p3:	1;
+PRODUCE
+  money:1,
+  p4 : 1;
+  
+TRANSITION t6	 { !money }
+CONSUME
+  p2:	1;
+PRODUCE
+  money:1,
+  p4 : 1;  
+
+{ END OF FILE }

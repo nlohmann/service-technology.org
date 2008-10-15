@@ -1,0 +1,27 @@
+digraph g1 {
+graph [fontname="Helvetica", label="OG of tests/bdd_ref/myCoffee_reference.owfn (parameters: -m1 -E)"];
+node [fontname="Helvetica" fontsize=10];
+edge [fontname="Helvetica" fontsize=10];
+p0 [label="# 0\n(!coffee + !euro + !tea)", fontcolor=black, color=blue];
+p0->p1 [label="!coffee", fontcolor=black, color=blue];
+p1 [label="# 1\n!euro", fontcolor=black, color=blue];
+p1->p6 [label="!euro", fontcolor=black, color=blue];
+p6 [label="# 6\n?money", fontcolor=black, color=blue];
+p6->p7 [label="?money", fontcolor=black, color=blue];
+p7 [label="# 7\n(?beverage * final)", fontcolor=black, color=blue, peripheries=2];
+p7->p15 [label="?beverage", fontcolor=black, color=blue];
+p15 [label="# 15\nfinal", fontcolor=black, color=blue, peripheries=2];
+p6->p24 [label="?beverage", fontcolor=black, color=blue];
+p24 [label="# 24\n?money", fontcolor=black, color=blue];
+p24->p15 [label="?money", fontcolor=black, color=blue];
+p0->p32 [label="!tea", fontcolor=black, color=blue];
+p32 [label="# 32\n!euro", fontcolor=black, color=blue];
+p32->p33 [label="!euro", fontcolor=black, color=blue];
+p33 [label="# 33\n?money", fontcolor=black, color=blue];
+p33->p7 [label="?money", fontcolor=black, color=blue];
+p33->p24 [label="?beverage", fontcolor=black, color=blue];
+p0->p34 [label="!euro", fontcolor=black, color=blue];
+p34 [label="# 34\n(!coffee + !tea)", fontcolor=black, color=blue];
+p34->p6 [label="!coffee", fontcolor=black, color=blue];
+p34->p33 [label="!tea", fontcolor=black, color=blue];
+}

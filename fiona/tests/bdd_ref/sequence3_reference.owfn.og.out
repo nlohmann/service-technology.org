@@ -1,0 +1,25 @@
+digraph g1 {
+graph [fontname="Helvetica", label="OG of ./sequence_suite/sequence3.owfn (parameters: -m1 -E)"];
+node [fontname="Helvetica" fontsize=10];
+edge [fontname="Helvetica" fontsize=10];
+p0 [label="# 0\n(!a + !b + !c)", fontcolor=black, color=blue];
+p0->p1 [label="!c", fontcolor=black, color=blue];
+p1 [label="# 1\n(!a + !b)", fontcolor=black, color=blue];
+p1->p2 [label="!b", fontcolor=black, color=blue];
+p2 [label="# 2\n!a", fontcolor=black, color=blue];
+p2->p3 [label="!a", fontcolor=black, color=blue];
+p3 [label="# 3\nfinal", fontcolor=black, color=blue, peripheries=2];
+p1->p4 [label="!a", fontcolor=black, color=blue];
+p4 [label="# 4\n!b", fontcolor=black, color=blue];
+p4->p3 [label="!b", fontcolor=black, color=blue];
+p0->p5 [label="!b", fontcolor=black, color=blue];
+p5 [label="# 5\n(!a + !c)", fontcolor=black, color=blue];
+p5->p2 [label="!c", fontcolor=black, color=blue];
+p5->p6 [label="!a", fontcolor=black, color=blue];
+p6 [label="# 6\n!c", fontcolor=black, color=blue];
+p6->p3 [label="!c", fontcolor=black, color=blue];
+p0->p7 [label="!a", fontcolor=black, color=blue];
+p7 [label="# 7\n(!b + !c)", fontcolor=black, color=blue];
+p7->p4 [label="!c", fontcolor=black, color=blue];
+p7->p6 [label="!b", fontcolor=black, color=blue];
+}

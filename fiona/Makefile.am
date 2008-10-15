@@ -15,7 +15,7 @@ cvs-clean: maintainer-clean
 	-rm -f Makefile.in
 	-rm -f missing
 	-rm -f -r autom4te.cache
-	-rm -f src/Makefile.in cudd/Makefile.in
+	-rm -f src/Makefile.in cudd/Makefile.in mate/Makefile.in
 	-rm -f -r src/.deps
 	-rm -f src/Fiona.h.in
 	-rm -f tests/Makefile.in

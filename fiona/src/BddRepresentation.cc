@@ -155,17 +155,22 @@ void BddRepresentation::generateRepresentation(AnnotatedGraphNode* v,
 
     TRACE(TRACE_5, "BddRepresentation::generateRepresentation(AnnotatedGraphNode* v, bool visitedNodes[]): start\n");
 
+    DdNode* tmp;
     //annotation
     DdNode * annotation = annotationToBddAnn(v);
-    //cout << "annotation of node: " << v->getNumber() << "\n";
-    DdNode* tmp = Cudd_bddOr(mgrAnn, annotation, bddAnn);
+//    cout << "annotation of node: " << v->getNumber() << " ("<< getBddNumber(v->getNumber()) << ")" << "\n";
+//    Cudd_PrintMinterm(mgrAnn, annotation);
+//    cout << "---------------------\n";
+    tmp = Cudd_bddOr(mgrAnn, annotation, bddAnn);
     assert(tmp != NULL);
     Cudd_Ref(tmp);
     Cudd_RecursiveDeref(mgrAnn, annotation);
     Cudd_RecursiveDeref(mgrAnn, bddAnn);
     bddAnn = tmp;
 
-    bddMp = nodesToBddMp(0, 1);
+    //cout << "current BDD_Ann\n"; Cudd_PrintMinterm(mgrAnn, bddAnn); cout << "=====================\n";
+
+    //bddMp = nodesToBddMp(0, 1);
 
     if (v->getColor() == BLUE && v->reachGraphStateSet.size() != 0) {
             visitedNodes[v] = true;
@@ -193,11 +198,11 @@ void BddRepresentation::generateRepresentation(AnnotatedGraphNode* v,
                     Cudd_RecursiveDeref(mgrMp, label);
                     Cudd_RecursiveDeref(mgrMp, nodes);
 
-                    /*cout << "edge: " << v->getNumber() << " [" << element->getLabel() << "> " << vNext->getNumber() << endl;
-                     cout << "edge: " << getBddNumber(v->getNumber()) << " [" << element->getLabel() << "> "
-                     << getBddNumber(vNext->getNumber()) << " -new-\n";
-                     Cudd_PrintMinterm(mgrMp, edge);
-                     cout << "\n=====================\n\n";*/
+//                    cout << "edge: " << v->getNumber() << " [" << element->getLabel() << "> " << vNext->getNumber() << endl;
+//                    cout << "edge: " << getBddNumber(v->getNumber()) << " [" << element->getLabel() << "> "
+//                    << getBddNumber(vNext->getNumber()) << " -new-\n";
+//                    Cudd_PrintMinterm(mgrMp, edge);
+//                    cout << "=====================\n";
 
                     tmp = Cudd_bddOr(mgrMp, edge, bddMp);
                     assert(tmp != NULL);
@@ -205,6 +210,9 @@ void BddRepresentation::generateRepresentation(AnnotatedGraphNode* v,
                     Cudd_RecursiveDeref(mgrMp, edge);
                     Cudd_RecursiveDeref(mgrMp, bddMp);
                     bddMp = tmp;
+//                    cout << "current BDD_MP\n";
+//                    Cudd_PrintMinterm(mgrMp, bddMp);
+//                    cout << "=====================\n";
                     if ((vNext != v) && !visitedNodes[vNext]) {
                         generateRepresentation(vNext, visitedNodes);
                     }
@@ -390,8 +398,8 @@ DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2) 
 DdNode* BddRepresentation::annotationToBddAnn(AnnotatedGraphNode* v) {
     TRACE(TRACE_5, "DdNode* BddRepresentation::annotationToBddAnn(AnnotatedGraphNode * v): start\n");
 
-    //	cout << "----------------------------------\n";
-    //	cout << "node " << v->getNumber() << " ("<< getBddNumber(v->getNumber()) << ") : " << v->getAnnotation()->asString()<< endl;
+//    cout << "----------------------------------\n";
+//    cout << "node " << v->getNumber() << " ("<< getBddNumber(v->getNumber()) << ") : " << v->getAnnotation()->asString()<< endl;
 
     DdNode* tmp;
     DdNode* CNFTemp;
@@ -416,7 +424,7 @@ DdNode* BddRepresentation::annotationToBddAnn(AnnotatedGraphNode* v) {
     }
 
     unsigned int bddNumber = getBddNumber(v->getNumber());
-    //cout << "bddNumber: " << bddNumber  << "  maxNodeNumber(old): " << maxNodeNumber << endl;
+    //cout << "bddNumber: " << bddNumber  << "  maxNodeNumber: " << maxNodeNumber << endl;
 
     if (bddNumber > maxNodeNumber) {
         addBddVars(bddNumber);

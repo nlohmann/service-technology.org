@@ -56,6 +56,7 @@ if test "$enable_64bit" = "yes"; then
   configured_CFLAGS=$configured_CFLAGS" -m64"
   configured_CXXFLAGS=$configured_CXXFLAGS" -m64"
   configured_LDFLAGS=$configured_LDFLAGS" -m64"
+  CUDD_XFLAGS="-DSIZEOF_VOID_P=8"
 fi
 
 #############################################################################
@@ -143,21 +144,21 @@ fi
 #############################################################################
 # set flags for CUDD
 #############################################################################
-case `uname -s` in
-  Linux)
-    CUDD_XFLAGS="-malign-double -DHAVE_IEEE_754 -DBSD"
-    ;;
-  SunOS)
-    CUDD_XFLAGS="-DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN"
-    ;;
-  CYGWIN*)
-    CUDD_XFLAGS="-malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864"
-    ;;
-  Darwin)
-    CUDD_XFLAGS="-DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3"
-    ;;
-  *) ;;
-esac
+#case `uname -s` in
+#  Linux)
+#    CUDD_XFLAGS="-malign-double -DHAVE_IEEE_754 -DBSD"
+#    ;;
+#  SunOS)
+#    CUDD_XFLAGS="-DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN"
+#    ;;
+#  CYGWIN*)
+#    CUDD_XFLAGS="-malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864"
+#    ;;
+#  Darwin)
+#    CUDD_XFLAGS="-DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3"
+#    ;;
+#  *) ;;
+#esac
 
 AC_SUBST(CUDD_XFLAGS)
 

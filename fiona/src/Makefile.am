@@ -91,13 +91,13 @@ veryclean: clean
 #############################################################################
 # set compiler flags (optimization level, warnings, includes, libraries...)
 #############################################################################
-# [NL] Do we really want to force optimization levels?
-# [NL] Do we really want to force warnings?
+# [NL] Do we really want to force optimization levels? No!
+# [NL] Do we really want to force warnings? No!
 # [NL] What is "all_includes"?
 # [NL] What is "all_libraries"?
 
-OPTIMIZATION_LEVEL= -O3 #-g -O2
-WARNINGS=-W -Wall -Wno-unused
+#OPTIMIZATION_LEVEL= -O3 #-g -O2
+#WARNINGS=-W -Wall -Wno-unused
 
 # flags for the preprocessor: set the include path found by configure
 fiona_CPPFLAGS = -I$(top_srcdir)/cudd/include $(all_includes)

@@ -18,10 +18,9 @@ TESTS = slist.sh syntax.sh extrema.sh cyclic.sh messagebound.sh png.sh \
 
 
 check_PROGRAMS = slistcheck
-
 slistcheck_SOURCES = slistcheck.cc
-
-slistcheck_CXXFLAGS = -I$(top_srcdir)/src
+slistcheck_CXXFLAGS = -I$(top_srcdir)/src @configured_CXXFLAGS@
+slistcheck_LDFLAGS = @configured_LDFLAGS@
 
 # Notice: If you add environment variables here, you have to provide defaults
 # defaults.sh, too.
@@ -175,6 +174,10 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              statesReduction/Reservations.owfn \
              bdd_ref/phcontrol4.unf_reference.owfn \
              bdd_ref/sequence3_reference.owfn \
+	     bdd_ref/myCoffee_reference.owfn \
+	     bdd_ref/myCoffee_reference.owfn.OG.BDD_ANN.cudd \
+	     bdd_ref/myCoffee_reference.owfn.OG.BDD_MP.cudd \
+	     bdd_ref/myCoffee_reference.owfn.og.png \
              bdd_ref/phcontrol4.unf_reference.owfn.OG.BDD_ANN.cudd \
              bdd_ref/phcontrol4.unf_reference.owfn.OG.BDD_MP.cudd \
              bdd_ref/sequence3_reference.owfn.OG.BDD_ANN.cudd \

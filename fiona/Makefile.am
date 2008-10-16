@@ -15,7 +15,7 @@ svn-clean: maintainer-clean
 	-rm -f Makefile.in
 	-rm -f missing
 	-rm -f -r autom4te.cache
-	-rm -f src/Makefile.in \
+	-rm -f src/Makefile.in
 	-rm -f libs/Makefile.in libs/cudd/Makefile.in libs/pnapi/Makefile.in
 	-rm -f man/Makefile.in
 	-rm -f -r src/.deps

@@ -3,7 +3,7 @@
 ###########################################################################
 
 # these libraries have to be built
-lib_LIBRARIES = libobj.a libdddmp.a libcudd.a libmtr.a \
+noinst_LIBRARIES = libobj.a libdddmp.a libcudd.a libmtr.a \
 	libst.a libutil.a libepd.a
 
 # sources for libobj.a -- CUDD's C++ interface
@@ -86,9 +86,9 @@ AM_LDFLAGS = @CUDD_XFLAGS@ @configured_LDFLAGS@
 # * Why do I need "nanotrav"? Does not compile anyway...
 # * Why do I need "mtr"? "mtr.h" is distributed anyway...
 # * To use "include", I have to take care of the linked files.
-AM_CPPFLAGS = -I$(top_srcdir)/cudd/include \
-	-I$(top_srcdir)/cudd/nanotrav \
-	-I$(top_srcdir)/cudd/mtr \
+AM_CPPFLAGS = -I$(top_srcdir)/libs/cudd/include \
+	-I$(top_srcdir)/libs/cudd/nanotrav \
+	-I$(top_srcdir)/libs/cudd/mtr \
 	-I$(top_srcdir)/src
 
 

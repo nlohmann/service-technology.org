@@ -46,7 +46,7 @@
 #include "main.h"
 #include "state.h"
 #include "containers.h"
-#include "pnapi/pnapi.h"
+#include "pnapi.h"
 #include "SinglyLinkedList.h"
 
 using namespace std;

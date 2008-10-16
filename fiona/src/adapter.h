@@ -37,7 +37,7 @@
 #include <list>
 #include <map>
 #include <string>
-#include "pnapi/pnapi.h"
+#include "pnapi.h"
 
 using namespace std;
 

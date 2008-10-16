@@ -96,6 +96,12 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
 	falseannos/shorten.og \
 	falseannos/violating.expected.og \
 	falseannos/violating.og \
+	falseannos/bluefalsenode.expected.og \
+	falseannos/bluefalsenode.og \
+	falseannos/shorten.expected.og \
+	falseannos/shorten.og \
+	falseannos/violating.expected.og \
+	falseannos/violating.og \
 	oWFNreduction/060116-misc-coffee.owfn \
 	oWFNreduction/phcontrol3.unf.owfn \
 	oWFNreduction/06-03-23_BPM06_shop_sect_6.owfn \
@@ -157,6 +163,10 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
 	partner/coffee2-partner.expected.owfn \
 	partner/coffee_extended.owfn \
 	partner/coffee_extended-partner.expected.owfn \
+	partner/coffee.owfn \
+	partner/coffee2.owfn \
+	partner/coffee_extended.owfn \
+	partner/sequence3.owfn \
 	minimize/nostrat.og \
 	minimize/final_non-final.og \
 	minimize/non-final_final.og \
@@ -229,6 +239,7 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
 	responsive/2_TSCCs_in_1_node_with_communication_1.owfn \
 	responsive/2_TSCCs_in_1_node_with_communication_2.owfn \
 	responsive/cgvExample.owfn
+	
 
 # Global check-loud target. Runs all tests. Output files are generated.
 check-loud:

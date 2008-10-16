@@ -48,7 +48,7 @@
 #include "options.h"
 #include "debug.h"
 #include "fiona.h"
-#include "pnapi/pnapi.cc"
+#include "pnapi.cc"
 
 using namespace std;
 

@@ -33,8 +33,8 @@
 
 #include "adapter.h"
 #include "debug.h"
-#include "pnapi/helpers.h"
-#include "pnapi/pnapi.h"
+#include "helpers.h"
+#include "pnapi.h"
 #include "options.h"
 #include "owfn.h"
 #include "state.h"

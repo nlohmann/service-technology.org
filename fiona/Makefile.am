@@ -1,4 +1,4 @@
-SUBDIRS = cudd src tests doc man
+SUBDIRS = libs src tests doc man
 
 
 #############################################################################
@@ -15,7 +15,9 @@ svn-clean: maintainer-clean
 	-rm -f Makefile.in
 	-rm -f missing
 	-rm -f -r autom4te.cache
-	-rm -f src/Makefile.in cudd/Makefile.in man/Makefile.in
+	-rm -f src/Makefile.in \
+	-rm -f libs/Makefile.in libs/cudd/Makefile.in libs/pnapi/Makefile.in
+	-rm -f man/Makefile.in
 	-rm -f -r src/.deps
 	-rm -f src/Fiona.h.in
 	-rm -f tests/Makefile.in
@@ -29,10 +31,6 @@ svn-clean: maintainer-clean
 
 veryclean: clean
 	$(MAKE) $(AM_MAKEFLAGS) veryclean --directory=src
-
-# [NL] We only need this, because CUDD's Makefiles are not managed by the Autotools
-#libclean: clean
-#	(cd cudd && $(MAKE) $(AM_MAKEFLAGS) clean)
 
 
 #############################################################################
@@ -122,7 +120,7 @@ memcheck-%: all
 # organize checking code coverage
 #############################################################################
 
-# Do code coverage check for test suite.
+# Do code coverage check for test suite. TODO: Check if it still works
 allcov:
 	(cd cudd  && $(MAKE) $(AM_MAKEFLAGS) all)
 	(cd src   && $(MAKE) $(AM_MAKEFLAGS) allcov)

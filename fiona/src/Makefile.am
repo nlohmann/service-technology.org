@@ -100,7 +100,9 @@ veryclean: clean
 #WARNINGS=-W -Wall -Wno-unused
 
 # flags for the preprocessor: set the include path found by configure
-fiona_CPPFLAGS = -I$(top_srcdir)/cudd/include $(all_includes)
+fiona_CPPFLAGS = -I$(top_srcdir)/libs/cudd/include \
+	-I$(top_srcdir)/libs/pnapi \
+	$(all_includes)
 
 # flags for the C and C++ compiler
 fiona_CXXFLAGS = $(OPTIMIZATION_LEVEL) $(WARNINGS) @configured_CXXFLAGS@
@@ -110,11 +112,14 @@ fiona_CFLAGS = $(OPTIMIZATION_LEVEL) $(WARNINGS) @configured_CFLAGS@
 fiona_LDFLAGS = $(all_libraries) @configured_LDFLAGS@
 
 # list all libraries Fiona needs
-fiona_LDADD = $(builddir)/../cudd/libobj.a \
-	$(builddir)/../cudd/libdddmp.a $(builddir)/../cudd/libcudd.a \
-	$(builddir)/../cudd/libmtr.a $(builddir)/../cudd/libst.a \
-	$(builddir)/../cudd/libutil.a $(builddir)/../cudd/libepd.a \
-        lib_pnapi.a
+fiona_LDADD = $(builddir)/../libs/cudd/libobj.a \
+	$(builddir)/../libs/cudd/libdddmp.a \
+	$(builddir)/../libs/cudd/libcudd.a \
+	$(builddir)/../libs/cudd/libmtr.a \
+	$(builddir)/../libs/cudd/libst.a \
+	$(builddir)/../libs/cudd/libutil.a \
+	$(builddir)/../libs/cudd/libepd.a \
+        $(builddir)/../libs/pnapi/lib_pnapi.a
 
 
 #############################################################################
@@ -122,20 +127,3 @@ fiona_LDADD = $(builddir)/../cudd/libobj.a \
 allcov: $(BUILT_SOURCES) fiona.h
 	$(MAKE) $(AM_MAKEFLAGS) CXX="$(CXXCOV)" all
 	-$(MAKE) $(AM_MAKEFLAGS) cleandeps
-
-
-#############################################################################
-# Petri Net API
-#############################################################################
-noinst_LIBRARIES = lib_pnapi.a
-
-lib_pnapi_a_SOURCES = pnapi/pnapi.cc pnapi/pnapi.h\
-		      pnapi/helpers.cc pnapi/helpers.h \
-		      pnapi/options.h \
-		      pnapi/petrinet-output.cc \
-		      pnapi/petrinet-reduction.cc \
-		      pnapi/petrinet.cc \
-		      pnapi/petrinet.h
-
-lib_pnapi_a_CFLAGS = @configured_CFLAGS@
-lib_pnapi_a_CXXFLAGS = @configured_CXXFLAGS@

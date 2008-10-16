@@ -7,7 +7,7 @@
 
 //#include "owfn.h"
 #include "CommunicationGraph.h"
-#include "pnapi/pnapi.h"
+#include "pnapi.h"
 
 // #defines YY_FLEX_HAS_YYLEX_DESTROY if we can call yylex_destroy()
 #include "lexer_owfn_wrap.h"

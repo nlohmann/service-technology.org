@@ -593,7 +593,7 @@ else
             echo   ... failed to build IG correctly
         fi
     
-        result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges  # + $shop6storedstates`
+        result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges` # + $shop6storedstates`
     fi
 fi
 
@@ -640,7 +640,7 @@ else
     
         if [ $shop6control -ne 0 -o $shop6bluenodes -ne 0 -o $shop6blueedges -ne 0 -o $shop6storedstates -ne 0 ]
         then
-        echo   ... failed to build reduced IG correctly
+	        echo   ... failed to build reduced IG correctly
         fi
     
         result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`

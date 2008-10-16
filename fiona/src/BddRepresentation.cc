@@ -810,6 +810,8 @@ void BddRepresentation::save(char* option) {
     int size = nbrLabels + maxNodeBits;
     char** names = new char*[size];
 
+    string modus = toLower(option)
+
     assert(PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= pow(double(2), double(sizeof(int)*8-1)) - 1);
     //PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= 2^31 -1
 
@@ -858,19 +860,19 @@ void BddRepresentation::save(char* option) {
     if (options[O_OUTFILEPREFIX]) {
         const char * prefix = outfilePrefix.c_str();
         if (options[O_CALC_ALL_STATES]) {
-            sprintf(bufferMp, "%s.%s.BDD_MP.cudd", prefix, option);
-            sprintf(bufferAnn, "%s.%s.BDD_ANN.cudd", prefix, option);
+            sprintf(bufferMp, "%s.%s.BDD_MP.cudd", prefix, modus.c_str());
+            sprintf(bufferAnn, "%s.%s.BDD_ANN.cudd", prefix, modus.c_str());
         } else {
-            sprintf(bufferMp, "%s.R.%s.BDD_MP.cudd", prefix, option);
-            sprintf(bufferAnn, "%s.R.%s.BDD_ANN.cudd", prefix, option);
+            sprintf(bufferMp, "%s.R.%s.BDD_MP.cudd", prefix, modus.c_str());
+            sprintf(bufferAnn, "%s.R.%s.BDD_ANN.cudd", prefix, modus.c_str());
         }
     } else {
         if (options[O_CALC_ALL_STATES]) {
-            sprintf(bufferMp, "%s.%s.BDD_MP.cudd", PN->filename.c_str(), option);
-            sprintf(bufferAnn, "%s.%s.BDD_ANN.cudd", PN->filename.c_str(), option);
+            sprintf(bufferMp, "%s.%s.BDD_MP.cudd", PN->filename.c_str(), modus.c_str());
+            sprintf(bufferAnn, "%s.%s.BDD_ANN.cudd", PN->filename.c_str(), modus.c_str());
         } else {
-            sprintf(bufferMp, "%s.R.%s.BDD_MP.cudd", PN->filename.c_str(), option);
-            sprintf(bufferAnn, "%s.R.%s.BDD_ANN.cudd", PN->filename.c_str(), option);
+            sprintf(bufferMp, "%s.R.%s.BDD_MP.cudd", PN->filename.c_str(), modus.c_str());
+            sprintf(bufferAnn, "%s.R.%s.BDD_ANN.cudd", PN->filename.c_str(), modus.c_str());
         }
     }
 

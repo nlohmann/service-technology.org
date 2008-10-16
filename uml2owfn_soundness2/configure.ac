@@ -12,7 +12,7 @@
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([UML2oWFN],[1.03-unreleased],[fahland@informatik.hu-berlin.de],[uml2owfn])
+AC_INIT([UML2oWFN],[1.03-unreleased],[uml2owfn@service-technology.org],[uml2owfn])
 AM_INIT_AUTOMAKE
 
 

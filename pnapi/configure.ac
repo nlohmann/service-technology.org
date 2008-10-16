@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT(Petri Net API, 1.00, stephan.mennicke@uni-rostock.de, pnapi)
+AC_INIT(Petri Net API, 1.00, pnapi@service-technology.org, pnapi)
 
 AC_CONFIG_SRCDIR(src/petrinet.cc)
 AC_CONFIG_HEADERS(src/config.h)

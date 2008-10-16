@@ -248,8 +248,8 @@ else
     then
         result=1
     else
-        echo "running diff  $outputPrefix.og $outputExpected"
-        if ! diff "$outputPrefix.og" "$outputExpected" >/dev/null ; then
+        echo "running diff -b $outputPrefix.og $outputExpected"
+        if ! diff -b "$outputPrefix.og" "$outputExpected" >/dev/null ; then
             echo "... failed: Output and expected output differ. Compare " \
                  "$outputPrefix.og" "$outputExpected"
             resultSingle=1
@@ -266,3 +266,4 @@ fi
 echo
 
 exit $result
+

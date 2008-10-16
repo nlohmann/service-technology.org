@@ -3,7 +3,7 @@ SUBDIRS = src tests
 DISTCLEANFILES = 
 
 # delete all files that can be created by other files
-cvs-clean: maintainer-clean
+svn-clean: maintainer-clean
 	-rm -f COPYING
 	-rm -f aclocal.m4
 	-rm -f configure

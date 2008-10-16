@@ -1,9 +1,9 @@
 SUBDIRS = src doc
 
-cvs-clean: maintainer-clean
+svn-clean: maintainer-clean
 	rm -fr .DS_Store INSTALL Makefile.in aclocal.m4 compile configure depcomp install-sh missing ylwrap @PACKAGE_TARNAME@-@VERSION@.zip config.guess config.sub
 	rm -fr doc/.DS_Store doc/Makefile.in doc/mdate-sh
-	rm -fr src/.DS_Store src/Makefile.in
+	rm -fr src/.DS_Store src/Makefile.in src/config.h.in
 
 win-bin: clean
 	make all CXXFLAGS="-O3 -mno-cygwin -U _WIN32" LDFLAGS="-O3 -mno-cygwin -U _WIN32"

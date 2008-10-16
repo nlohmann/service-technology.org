@@ -6,7 +6,7 @@ EXTRA_DIST = doc patches
 ##############################################################################
 # remove everything that can be rebuilt
 ##############################################################################
-cvs-clean: maintainer-clean
+svn-clean: maintainer-clean
 	-rm -f aclocal.m4 COPYING INSTALL depcomp configure Makefile.in \
 	  missing ylwrap install-sh config.guess config.sub \
 	  src/readnet-syntax.h src/Makefile.in src/config.H.in \

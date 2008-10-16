@@ -3,7 +3,7 @@ SUBDIRS = src man doc tests exp maintainer
 #############################################################################
 # remove everything that cannot be built
 #############################################################################
-cvs-clean: maintainer-clean
+svn-clean: maintainer-clean
 	rm -fr COPYING INSTALL Makefile.in aclocal.m4 compile configure \
 	depcomp install-sh missing ylwrap $(DIST_ARCHIVES).sig config.sub \
 	config.guess config.h.in~

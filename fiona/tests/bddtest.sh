@@ -140,9 +140,10 @@ fi
 ############################################################################
 
 #check correctness of the BDD of myCoffee.owfn
-SUBDIR=$testdir/bdd_ref
+SUBDIR=bdd_ref
+DIR=$testdir/$SUBDIR
 owfn="$DIR/myCoffee.owfn"
-owfn_reference="$testdir/bdd_ref/myCoffee_reference.owfn"
+owfn_reference="$DIR/myCoffee_reference.owfn"
 
 # for make distcheck: make copy of $owfn and work on it
 if [ "$testdir" != "$builddir" ]; then
@@ -156,6 +157,7 @@ fi
 owfn="$builddir/$SUBDIR/myCoffee.owfn"
 
 cmd="$FIONA $owfn -b 4 -t OG"
+echo running $cmd
 $cmd 2>/dev/null 1>/dev/null
 
 cmd="$FIONA $owfn $owfn_reference -t equivalence -b1"
@@ -210,6 +212,7 @@ fi
 
 owfn="$builddir/$SUBDIR/phcontrol4.unf.owfn"
 cmd="$FIONA $owfn -b 4 -t OG"
+echo running $cmd
 $cmd 2>/dev/null 1>/dev/null
 
 cmd="$FIONA $owfn $owfn_reference -t equivalence -b1"

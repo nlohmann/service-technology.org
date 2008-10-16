@@ -1,66 +1,56 @@
-BEGIN OF AUTHORS file for Fiona Version 1.5
+                         ______ _
+                        |  ____(_)
+                        | |__   _  ___  _ __   __ _
+                        |  __| | |/ _ \| '_ \ / _` |
+                        | |    | | (_) | | | | (_| |
+                        |_|    |_|\___/|_| |_|\__,_|
+                    http://service-technology.org/fiona
 
 
 
-Authors and Acknowledgements
-****************************
-
-Authors
-=======
-
-Fiona was written by:
-   * Peter Massuthe (Humboldt-Universita"t zu Berlin)
-
-   * Daniela Weinberg (Humboldt-Universita"t zu Berlin)
+COPYRIGHT
+    Copyright (c) 2008 Christian Gierds, Niels Lohmann, Peter Massuthe,
+    Daniela Weinberg
 
 
-Acknowledgements
-================
+AUTHORS/ MAINTAINERS
+    Fiona was written and is maintained by
+        Peter Massuthe (Humboldt-Universita"t zu Berlin)
+        Daniela Weinberg (Humboldt-Universita"t zu Berlin)
 
-We would like to thank:
-   * Karsten Wolf (Universita"t Rostock) for his support
-   * Niels Lohmann (Humboldt-Universita"t zu Berlin) for his support
 
-Fiona is part of the Tools4BPEL project funded by the German
-Bundesministerium fu"r Bildung und Forschung (BMBF).
+ACKNOWLEDGEMENTS
 
-Contact
-=======
+    We would like to thank
+        Karsten Wolf (Universita"t Rostock)
+        Niels Lohmann (Universita"t Rostock)
+        Christian Gierds (Humboldt-Universita"t zu Berlin)
+        Kathrin Kaschner (Universita"t Rostock)
+        Jan Bretschneider
 
-Peter Massuthe and Daniela Weinberg
+    and our students
+        Martin Znamirowski (Humboldt-Universita"t zu Berlin)
+        Jan Sürmeli (Humboldt-Universita"t zu Berlin)
+        Robert Danitz (Humboldt-Universita"t zu Berlin)
+        Janine Ott (Humboldt-Universita"t zu Berlin)
 
-Humboldt-Universita"t zu Berlin
-Institut fu"r Informatik
-Unter den Linden 6
-10099 Berlin, Germany
+    Fiona is part of the Tools4BPEL project funded by the German
+    Bundesministerium fu"r Bildung und Forschung (BMBF).
 
-Homepage
-     `http://www.informatik.hu-berlin.de/top/mitarbeiter/massuthe'
-     `http://www.informatik.hu-berlin.de/top/mitarbeiter/weinberg'
 
-E-mail
-     <massuthe@informatik.hu-berlin.de>
-     <weinberg@informatik.hu-berlin.de>
+CONTACT
 
-----------------------------------------------------------------------
+    Peter Massuthe and Daniela Weinberg
 
-Copyright (C) 2005, 2006 Peter Massuthe and Daniela Weinberg.
+    Humboldt-Universita"t zu Berlin
+    Institut fu"r Informatik
+    Unter den Linden 6
+    10099 Berlin, Germany
 
-This file is part of Fiona, a tool for analyzing business processes
-modelled as open workflow nets (oWFNs).
+    Homepage
+         `http://www.informatik.hu-berlin.de/top/mitarbeiter/massuthe'
+         `http://www.informatik.hu-berlin.de/top/mitarbeiter/weinberg'
 
-Fiona is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2 of the License, or (at your
-option) any later version.
-
-Fiona is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with Fiona; if not, write to the Free Software Foundation, Inc., 51
-Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
-
-END OF AUTHORS file for Fiona Version 1.5
+    E-mail
+         <massuthe@informatik.hu-berlin.de>
+         <weinberg@informatik.hu-berlin.de>

@@ -29,6 +29,7 @@ AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
 configured_CFLAGS=""
 configured_CXXFLAGS=""
 configured_LDFLAGS=""
+CUDD_XFLAGS=""
 
 
 #############################################################################
@@ -62,7 +63,7 @@ if test "$enable_64bit" = "yes"; then
   configured_CFLAGS=$configured_CFLAGS" -m64"
   configured_CXXFLAGS=$configured_CXXFLAGS" -m64"
   configured_LDFLAGS=$configured_LDFLAGS" -m64"
-  CUDD_XFLAGS="-DSIZEOF_VOID_P=8"
+  CUDD_XFLAGS=$CUDD_XFLAGS" -DSIZEOF_VOID_P=8"
 fi
 
 #############################################################################
@@ -121,18 +122,18 @@ fi
 #############################################################################
 AC_CHECK_PROG(DOT, dot, dot, not found)
 if test "$DOT" = "not found"; then
-  AC_MSG_WARN([Graphviz dot was not found.])
-  AC_DEFINE_UNQUOTED(CONFIG_DOT, "not found", [Dot can not be used on this system.])
+  AC_MSG_WARN([Graphviz dot was not found. See file README.])
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "not found", [Dot was not found.])
 else
-  AC_DEFINE_UNQUOTED(CONFIG_DOT, "${DOT}", [Dot can be used on this system.])
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "${DOT}", [Dot can be used.])
 fi
 
 AC_CHECK_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], not found)
 if test "$PETRIFY" = "not found"; then
-  AC_MSG_WARN([Petrify was not found. You will not be able to use the parameters "-t mostpermissivepartner" or "-t smallpartner"!])
-  AC_DEFINE(CONFIG_PETRIFY, "not found", [Petrify was not found on this system.])
+  AC_MSG_WARN([Petrify was not found. See file README.])
+  AC_DEFINE(CONFIG_PETRIFY, "not found", [Petrify was not found.])
 else
-  AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "${PETRIFY}", [Petrify can be used on this system.])
+  AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "${PETRIFY}", [Petrify can be used.])
 fi
 
 
@@ -154,13 +155,13 @@ fi
 #############################################################################
 case `uname -s` in
   Linux)
-    CUDD_XFLAGS=CUDD_XFLAGS" -malign-double -DHAVE_IEEE_754 -DBSD"
+    CUDD_XFLAGS=$CUDD_XFLAGS" -malign-double -DHAVE_IEEE_754 -DBSD"
     ;;
   SunOS)
-    CUDD_XFLAGS=CUDD_XFLAGS" -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN"
+    CUDD_XFLAGS=$CUDD_XFLAGS" -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN"
     ;;
   CYGWIN*)
-    CUDD_XFLAGS=CUDD_XFLAGS" -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864"
+    CUDD_XFLAGS=$CUDD_XFLAGS" -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864"
     ;;
   Darwin)
     CUDD_XFLAGS=$CUDD_XFLAGS" -DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3"

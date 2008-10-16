@@ -658,22 +658,24 @@ void BddRepresentation::printDotFile(char** varNames, char* option) {
         char bufferMp[256];
         char bufferAnn[256];
 
+        string modus = toLower(option);
+
         if (options[O_OUTFILEPREFIX]) {
             const char * prefix = outfilePrefix.c_str();
             if (options[O_CALC_ALL_STATES]) {
-                sprintf(bufferMp, "%s.%s.BDD_MP.out", prefix, option);
-                sprintf(bufferAnn, "%s.%s.BDD_ANN.out", prefix, option);
+                sprintf(bufferMp, "%s.%s.BDD_MP.out", prefix, modus.c_str());
+                sprintf(bufferAnn, "%s.%s.BDD_ANN.out", prefix, modus.c_str());
             } else {
-                sprintf(bufferMp, "%s.R.%s.BDD_MP.out", prefix, option);
-                sprintf(bufferAnn, "%s.R.%s.BDD_ANN.out", prefix, option);
+                sprintf(bufferMp, "%s.R.%s.BDD_MP.out", prefix, modus.c_str());
+                sprintf(bufferAnn, "%s.R.%s.BDD_ANN.out", prefix, modus.c_str());
             }
         } else {
             if (options[O_CALC_ALL_STATES]) {
-                sprintf(bufferMp, "%s.%s.BDD_MP.out", PN->filename.c_str(), option);
-                sprintf(bufferAnn, "%s.%s.BDD_ANN.out", PN->filename.c_str(), option);
+                sprintf(bufferMp, "%s.%s.BDD_MP.out", PN->filename.c_str(), modus.c_str());
+                sprintf(bufferAnn, "%s.%s.BDD_ANN.out", PN->filename.c_str(), modus.c_str());
             } else {
-                sprintf(bufferMp, "%s.R.%s.BDD_MP.out", PN->filename.c_str(), option);
-                sprintf(bufferAnn, "%s.R.%s.BDD_ANN.out", PN->filename.c_str(), option);
+                sprintf(bufferMp, "%s.R.%s.BDD_MP.out", PN->filename.c_str(), modus.c_str());
+                sprintf(bufferAnn, "%s.R.%s.BDD_ANN.out", PN->filename.c_str(), modus.c_str());
             }
         }
 
@@ -736,15 +738,15 @@ void BddRepresentation::printDotFile(char** varNames, char* option) {
                 if (options[O_OUTFILEPREFIX]) {
                     const char * prefix = outfilePrefix.c_str();
                     if (options[O_CALC_ALL_STATES]) {
-                        sprintf(bufferMpRed, "%s.%s.BDD_MPRED.out", prefix, option);
+                        sprintf(bufferMpRed, "%s.%s.BDD_MPRED.out", prefix, modus.c_str());
                     } else {
-                        sprintf(bufferMpRed, "%s.R.%s.BDD_MPRED.out", prefix, option);
+                        sprintf(bufferMpRed, "%s.R.%s.BDD_MPRED.out", prefix, modus.c_str());
                     }
                 } else {
                     if (options[O_CALC_ALL_STATES]) {
-                        sprintf(bufferMpRed, "%s.%s.BDD_MPRED.out", PN->filename.c_str(), option);
+                        sprintf(bufferMpRed, "%s.%s.BDD_MPRED.out", PN->filename.c_str(), modus.c_str());
                     } else {
-                        sprintf(bufferMpRed, "%s.R.%s.BDD_MPRED.out", PN->filename.c_str(), option);
+                        sprintf(bufferMpRed, "%s.R.%s.BDD_MPRED.out", PN->filename.c_str(), modus.c_str());
                     }
                 }
 

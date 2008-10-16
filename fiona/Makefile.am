@@ -6,9 +6,9 @@ SUBDIRS = cudd src tests doc man
 #############################################################################
 
 # delete all files that can be created by other files
-cvs-clean: maintainer-clean
+svn-clean: maintainer-clean
 	-rm -f COPYING Doxyfile config.guess config.sub INSTALL
-	-rm -f aclocal.m4
+	-rm -f aclocal.m4 compile ylwrap
 	-rm -f configure
 	-rm -f depcomp
 	-rm -f install-sh

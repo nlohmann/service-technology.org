@@ -48,7 +48,7 @@ nodes_mp=28
 nodes_ann=16
 
 owfn="$DIR/sequence3.owfn"
-cmd="$FIONA $owfn -b 4 -t of"
+cmd="$FIONA $owfn -b 4 -t og"
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
 fi

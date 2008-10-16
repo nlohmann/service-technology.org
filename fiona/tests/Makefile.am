@@ -96,12 +96,6 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
 	falseannos/shorten.og \
 	falseannos/violating.expected.og \
 	falseannos/violating.og \
-	falseannos/bluefalsenode.expected.og \
-	falseannos/bluefalsenode.og \
-	falseannos/shorten.expected.og \
-	falseannos/shorten.og \
-	falseannos/violating.expected.og \
-	falseannos/violating.og \
 	oWFNreduction/060116-misc-coffee.owfn \
 	oWFNreduction/phcontrol3.unf.owfn \
 	oWFNreduction/06-03-23_BPM06_shop_sect_6.owfn \
@@ -155,7 +149,6 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
 	samples/dke07_shop_sect_6.owfn \
 	samples/keesCoffee_condition.owfn \
 	samples/myCoffee.owfn \
-	partner/sequence3.owfn \
 	partner/sequence3-partner.expected.owfn \
 	partner/coffee.owfn \
 	partner/coffee-partner.expected.owfn \
@@ -163,9 +156,6 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
 	partner/coffee2-partner.expected.owfn \
 	partner/coffee_extended.owfn \
 	partner/coffee_extended-partner.expected.owfn \
-	partner/coffee.owfn \
-	partner/coffee2.owfn \
-	partner/coffee_extended.owfn \
 	partner/sequence3.owfn \
 	minimize/nostrat.og \
 	minimize/final_non-final.og \

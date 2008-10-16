@@ -83,7 +83,6 @@ static struct option longopts[] = {
 //  { "bla",           no_argument,       NULL, GETOPT_BLA },
     { "help",            no_argument,       NULL, 'h' },
     { "version",         no_argument,       NULL, 'v' },
-    { "bug",             no_argument,       NULL, 'g' },
     { "debug",           required_argument, NULL, 'd' },
     { "type",            required_argument, NULL, 't' },
     { "messagebound",    required_argument, NULL, 'm' },
@@ -102,7 +101,7 @@ static struct option longopts[] = {
     { NULL,              0,                 NULL, 0   }
 };
 
-const char* par_string = "hvgd:t:m:e:ErRs:b:B:o:QMp:a:";
+const char* par_string = "hvd:t:m:e:ErRs:b:B:o:QMp:a:";
 
 
 // --------------------- functions for command line evaluation ------------------------
@@ -281,27 +280,6 @@ void print_version() {
 }
 
 
-// prints debug information about system variables, the current compilation
-// in case of unusal behavior of Fiona, with this information it might be easier to track down
-// the bug(s)
-void print_debug_info() {
-    printf("\n\n");
-    printf("Please email the following information to %s:\n", PACKAGE_BUGREPORT);
-    printf("- tool:               %s\n", PACKAGE_NAME);
-    printf("- version:            %s\n", PACKAGE_VERSION);
-    printf("- compilation date:   %s\n", __DATE__);
-    printf("- compiler version:   %s\n", __VERSION__);
-    printf("- platform:           %s\n", BUILDSYSTEM);
-    printf("- config ASSERT:      %s\n", CONFIG_ENABLEASSERT);
-//    printf("- config ASPECTS:     %s\n", CONFIG_ENABLEASPECTS);
-    printf("- config UNIVERSAL:   %s\n", CONFIG_ENABLEUNIVERSAL);
-    printf("- config ENABLE64BIT: %s\n", CONFIG_ENABLE64BIT);
-    printf("- config WIN32:       %s\n", CONFIG_ENABLEWIN32);
-    printf("\n\n");
-    exit(EXIT_SUCCESS);
-}
-
-
 void printErrorInvalidNumberForOptionAndExit(const std::string& option,
     const std::string& givenArgument) {
     cerr << "Error:\tArgument for option " << option << " has to be a "
@@ -425,9 +403,6 @@ void parse_command_line(int argc, char* argv[]) {
             case 'v':
                 options[O_VERSION] = true;
                 print_version();
-                exit(0);
-            case 'g':
-                print_debug_info();
                 exit(0);
             case 'd':
                 options[O_DEBUG] = true;

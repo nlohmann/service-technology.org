@@ -1575,6 +1575,28 @@ void checkAcyclicity(AnnotatedGraph* OG, string graphName) {
 
 
 int main(int argc, char** argv) {
+    
+    // print debug information about system variables, the current compilation
+    // in case of unusal behavior of Fiona, with this information it might be easier to track down
+    // the bug(s)
+    if (argc == 2 && std::string(argv[1]) == "--bug") {
+        printf("\n\n");
+        printf("Please email the following information to %s:\n", PACKAGE_BUGREPORT);
+        printf("- tool:               %s\n", PACKAGE_NAME);
+        printf("- version:            %s\n", PACKAGE_VERSION);
+        printf("- compilation date:   %s\n", __DATE__);
+        printf("- compiler version:   %s\n", __VERSION__);
+        printf("- platform:           %s\n", BUILDSYSTEM);
+        printf("- config ASSERT:      %s\n", CONFIG_ENABLEASSERT);
+    //    printf("- config ASPECTS:     %s\n", CONFIG_ENABLEASPECTS);
+        printf("- config UNIVERSAL:   %s\n", CONFIG_ENABLEUNIVERSAL);
+        printf("- config ENABLE64BIT: %s\n", CONFIG_ENABLE64BIT);
+        printf("- config WIN32:       %s\n", CONFIG_ENABLEWIN32);
+        printf("\n\n");
+        exit(EXIT_SUCCESS);
+    }
+    
+    
     // [LUHME XV] gehört hier nicht hin
     AnnotatedGraph* OGToMatch = NULL;
 

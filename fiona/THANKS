@@ -1,12 +1,10 @@
-                         ______ _
-                        |  ____(_)
-                        | |__   _  ___  _ __   __ _
-                        |  __| | |/ _ \| '_ \ / _` |
-                        | |    | | (_) | | | | (_| |
-                        |_|    |_|\___/|_| |_|\__,_|
-                    http://service-technology.org/fiona
-
-
+                          _____ _                   
+                         |  ___(_) ___  _ __   __ _ 
+                         | |_  | |/ _ \| '_ \ / _` |
+                         |  _| | | (_) | | | | (_| |
+                         |_|   |_|\___/|_| |_|\__,_|
+                     http://service-technology.org/fiona
+                   
 
 ACKNOWLEDGEMENTS
 
@@ -16,12 +14,14 @@ ACKNOWLEDGEMENTS
         Christian Gierds (Humboldt-Universita"t zu Berlin)
         Kathrin Kaschner (Universita"t Rostock)
         Jan Bretschneider
+        Arjan J. Mooij (TU Eindhoven)
 
     and our students
         Martin Znamirowski
-        Jan Sürmeli
+        Jan Su"rmeli
         Robert Danitz
         Janine Ott
 
-    Fiona is part of the Tools4BPEL project funded by the German
-    Bundesministerium fu"r Bildung und Forschung (BMBF).
+    Fiona was initially developed as part of the Tools4BPEL project funded
+    by the German Bundesministerium fu"r Bildung und Forschung (BMBF),
+    see http://www.informatik.hu-berlin.de/top/tools4bpel.

@@ -1,12 +1,10 @@
-                         ______ _
-                        |  ____(_)
-                        | |__   _  ___  _ __   __ _
-                        |  __| | |/ _ \| '_ \ / _` |
-                        | |    | | (_) | | | | (_| |
-                        |_|    |_|\___/|_| |_|\__,_|
-                    http://service-technology.org/fiona
-
-
+                          _____ _                   
+                         |  ___(_) ___  _ __   __ _ 
+                         | |_  | |/ _ \| '_ \ / _` |
+                         |  _| | | (_) | | | | (_| |
+                         |_|   |_|\___/|_| |_|\__,_|
+                     http://service-technology.org/fiona
+                   
 
 COPYRIGHT
     Copyright (c) 2008 Christian Gierds, Niels Lohmann, Peter Massuthe,
@@ -34,8 +32,9 @@ ACKNOWLEDGEMENTS
         Robert Danitz (Humboldt-Universita"t zu Berlin)
         Janine Ott (Humboldt-Universita"t zu Berlin)
 
-    Fiona is part of the Tools4BPEL project funded by the German
-    Bundesministerium fu"r Bildung und Forschung (BMBF).
+    Fiona was initially developed as part of the Tools4BPEL project funded
+    by the German Bundesministerium fu"r Bildung und Forschung (BMBF),
+    see http://www.informatik.hu-berlin.de/top/tools4bpel.
 
 
 CONTACT

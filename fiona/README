@@ -1,21 +1,18 @@
-                         ______ _
-                        |  ____(_)
-                        | |__   _  ___  _ __   __ _
-                        |  __| | |/ _ \| '_ \ / _` |
-                        | |    | | (_) | | | | (_| |
-                        |_|    |_|\___/|_| |_|\__,_|
-                    http://service-technology.org/fiona
-
-                    
+                          _____ _                   
+                         |  ___(_) ___  _ __   __ _ 
+                         | |_  | |/ _ \| '_ \ / _` |
+                         |  _| | | (_) | | | | (_| |
+                         |_|   |_|\___/|_| |_|\__,_|
+                     http://service-technology.org/fiona
+                   
 
 PURPOSE
     Fiona is a tool designed to check behavioral correctness of a service
     and to analyze the interaction of services in service oriented
     architectures, for instance. It implements very efficient data
-    structures and algorithms, which have partly been adapted from
-    the Petri net model-checker LoLA. Fiona has been proven to be
-    applicable in practice by service designers, service publishers,
-    and service brokers.
+    structures and algorithms, which have partly been adapted from the
+    Petri net model-checker LoLA. Fiona has been proven to be applicable in
+    practice by service designers, service publishers, and service brokers.
 
 
 COPYRIGHT
@@ -23,7 +20,7 @@ COPYRIGHT
     Daniela Weinberg
 
 
-AUTHOR
+AUTHORS
     Fiona is written and maintained by Peter Massuthe and Daniela Weinberg.
     See file "AUTHORS" for more information.
 

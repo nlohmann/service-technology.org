@@ -810,7 +810,7 @@ void BddRepresentation::save(char* option) {
     int size = nbrLabels + maxNodeBits;
     char** names = new char*[size];
 
-    string modus = toLower(option)
+    string modus = toLower(option);
 
     assert(PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= pow(double(2), double(sizeof(int)*8-1)) - 1);
     //PN->getInputPlaceCount() + PN->getOutputPlaceCount() <= 2^31 -1

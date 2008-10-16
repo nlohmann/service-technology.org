@@ -127,7 +127,7 @@ allcov: $(BUILT_SOURCES) fiona.h
 #############################################################################
 # Petri Net API
 #############################################################################
-lib_LIBRARIES = lib_pnapi.a
+noinst_LIBRARIES = lib_pnapi.a
 
 lib_pnapi_a_SOURCES = pnapi/pnapi.cc pnapi/pnapi.h\
 		      pnapi/helpers.cc pnapi/helpers.h \
@@ -139,4 +139,3 @@ lib_pnapi_a_SOURCES = pnapi/pnapi.cc pnapi/pnapi.h\
 
 lib_pnapi_a_CFLAGS = @configured_CFLAGS@
 lib_pnapi_a_CXXFLAGS = @configured_CXXFLAGS@
-lib_pnapi_a_LDFLAGS = @configured_LDFLAGS@

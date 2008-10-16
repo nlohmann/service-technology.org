@@ -122,17 +122,17 @@ fi
 AC_CHECK_PROG(DOT, dot, dot, not found)
 if test "$DOT" = "not found"; then
   AC_MSG_WARN([Graphviz dot was not found.])
-  AC_DEFINE(HAVE_DOT, 0, [Dot can not be used on this system.])
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "not found", [Dot can not be used on this system.])
 else
-  AC_DEFINE(HAVE_DOT, 1, [Dot can be used on this system.])
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "${DOT}", [Dot can be used on this system.])
 fi
 
 AC_CHECK_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], not found)
 if test "$PETRIFY" = "not found"; then
-  AC_MSG_WARN([Petrify was not found.])
-  AC_DEFINE(HAVE_PETRIFY, "not found", [Petrify was not found on this system.])
+  AC_MSG_WARN([Petrify was not found. You will not be able to use the parameters "-t mostpermissivepartner" or "-t smallpartner"!])
+  AC_DEFINE(CONFIG_PETRIFY, "not found", [Petrify was not found on this system.])
 else
-  AC_DEFINE_UNQUOTED(HAVE_PETRIFY, "${PETRIFY}", [Petrify can be used on this system.])
+  AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "${PETRIFY}", [Petrify can be used on this system.])
 fi
 
 
@@ -150,23 +150,23 @@ fi
 
 
 #############################################################################
-# set flags for CUDD
+# set and export flags for CUDD
 #############################################################################
-#case `uname -s` in
-#  Linux)
-#    CUDD_XFLAGS="-malign-double -DHAVE_IEEE_754 -DBSD"
-#    ;;
-#  SunOS)
-#    CUDD_XFLAGS="-DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN"
-#    ;;
-#  CYGWIN*)
-#    CUDD_XFLAGS="-malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864"
-#    ;;
-#  Darwin)
-#    CUDD_XFLAGS="-DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3"
-#    ;;
-#  *) ;;
-#esac
+case `uname -s` in
+  Linux)
+    CUDD_XFLAGS=CUDD_XFLAGS" -malign-double -DHAVE_IEEE_754 -DBSD"
+    ;;
+  SunOS)
+    CUDD_XFLAGS=CUDD_XFLAGS" -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN"
+    ;;
+  CYGWIN*)
+    CUDD_XFLAGS=CUDD_XFLAGS" -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864"
+    ;;
+  Darwin)
+    CUDD_XFLAGS=$CUDD_XFLAGS" -DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3"
+    ;;
+  *) ;;
+esac
 
 AC_SUBST(CUDD_XFLAGS)
 
@@ -182,10 +182,6 @@ AC_SUBST(configured_LDFLAGS)
 #############################################################################
 # anything else
 #############################################################################
-
-# Checks for libraries.
-# FIXME: Replace `main' with a function in `-lm':
-AC_CHECK_LIB([m], [main])
 
 # Force @builddir@ substitution. Without this src/Makefile.in lacked @builddir@
 # substitution on gruenau.informatik.hu-berlin.de with automake 1.9.6.
@@ -214,6 +210,8 @@ echo "compile for 64 bit...        $enable_64bit"
 echo "compile for Win32...         $enable_win32"
 echo "compile for Mac Universal... $enable_universal"
 echo "enable assertions...         $enable_assert"
+echo "dot:                         $DOT"
+echo "petrify:                     $PETRIFY"
 echo "-----------------------------------------------"
 echo
 echo

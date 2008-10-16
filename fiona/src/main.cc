@@ -652,8 +652,8 @@ string computeSmallPartner(AnnotatedGraph* IG) {
     // prepare petrify command line and execute system command if possible
     string pnFilename = stgFilename.substr(0, stgFilename.size() - 4) + ".pn"; // change .stg to .pn
 
-    string systemcall = string(HAVE_PETRIFY) + " " + stgFilename + " -dead -ip -nolog -o " + pnFilename;
-    if (HAVE_PETRIFY != "not found") {
+    string systemcall = string(CONFIG_PETRIFY) + " " + stgFilename + " -dead -ip -nolog -o " + pnFilename;
+    if (CONFIG_PETRIFY != "not found") {
         TRACE(TRACE_1, "    Calling Petrify.\n");
         TRACE(TRACE_2, "        " + systemcall + "\n");
         system(systemcall.c_str());
@@ -724,8 +724,8 @@ string computeMostPermissivePartner(AnnotatedGraph* OG) {
     // prepare petrify command line and execute system command if possible
     string pnFilename = stgFilename.substr(0, stgFilename.size() - 4) + ".pn"; // change .stg to .pn
 
-    string systemcall = string(HAVE_PETRIFY) + " " + stgFilename + " -dead -ip -nolog -o " + pnFilename;
-    if (HAVE_PETRIFY != "not found") {
+    string systemcall = string(CONFIG_PETRIFY) + " " + stgFilename + " -dead -ip -nolog -o " + pnFilename;
+    if (CONFIG_PETRIFY != "not found") {
         TRACE(TRACE_1, "    Calling Petrify.\n");
         TRACE(TRACE_2, "        " + systemcall + "\n");
         system(systemcall.c_str());
@@ -1588,10 +1588,11 @@ int main(int argc, char** argv) {
         printf("- compiler version:   %s\n", __VERSION__);
         printf("- platform:           %s\n", BUILDSYSTEM);
         printf("- config ASSERT:      %s\n", CONFIG_ENABLEASSERT);
-    //    printf("- config ASPECTS:     %s\n", CONFIG_ENABLEASPECTS);
         printf("- config UNIVERSAL:   %s\n", CONFIG_ENABLEUNIVERSAL);
         printf("- config ENABLE64BIT: %s\n", CONFIG_ENABLE64BIT);
         printf("- config WIN32:       %s\n", CONFIG_ENABLEWIN32);
+        printf("- external dot:       %s\n", CONFIG_DOT);
+        printf("- external Petrify:   %s\n", CONFIG_PETRIFY);
         printf("\n\n");
         exit(EXIT_SUCCESS);
     }

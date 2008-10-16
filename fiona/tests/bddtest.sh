@@ -21,7 +21,7 @@ result=0
 ############################################################################
 
 owfn="$DIR/sequence5.owfn"
-cmd="$FIONA $owfn -b 4 -t OG"
+cmd="$FIONA $owfn -b 4 -t og"
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
 fi
@@ -48,7 +48,7 @@ nodes_mp=28
 nodes_ann=16
 
 owfn="$DIR/sequence3.owfn"
-cmd="$FIONA $owfn -b 4 -t OG"
+cmd="$FIONA $owfn -b 4 -t of"
 if [ "$quiet" != "no" ]; then
     cmd="$cmd -Q"
 fi
@@ -102,7 +102,7 @@ fi
 
 owfn="$builddir/$SUBDIR/sequence3.owfn"
 
-cmd="$FIONA $owfn -b 4 -t OG"
+cmd="$FIONA $owfn -b 4 -t og"
 $cmd 2>/dev/null 1>/dev/null
 
 cmd="$FIONA $owfn $owfn_reference -t equivalence -b1"
@@ -156,7 +156,7 @@ fi
 
 owfn="$builddir/$SUBDIR/myCoffee.owfn"
 
-cmd="$FIONA $owfn -b 4 -t OG"
+cmd="$FIONA $owfn -b 4 -t og"
 echo running $cmd
 $cmd 2>/dev/null 1>/dev/null
 
@@ -211,7 +211,7 @@ if [ "$testdir" != "$builddir" ]; then
 fi
 
 owfn="$builddir/$SUBDIR/phcontrol4.unf.owfn"
-cmd="$FIONA $owfn -b 4 -t OG"
+cmd="$FIONA $owfn -b 4 -t og"
 echo running $cmd
 $cmd 2>/dev/null 1>/dev/null
 

@@ -175,19 +175,19 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
              bdd_ref/phcontrol4.unf_reference.owfn \
              bdd_ref/sequence3_reference.owfn \
 	     bdd_ref/myCoffee_reference.owfn \
-	     bdd_ref/myCoffee_reference.owfn.OG.BDD_ANN.cudd \
-	     bdd_ref/myCoffee_reference.owfn.OG.BDD_MP.cudd \
+	     bdd_ref/myCoffee_reference.owfn.og.BDD_ANN.cudd \
+	     bdd_ref/myCoffee_reference.owfn.og.BDD_MP.cudd \
 	     bdd_ref/myCoffee_reference.owfn.og.png \
-             bdd_ref/phcontrol4.unf_reference.owfn.OG.BDD_ANN.cudd \
-             bdd_ref/phcontrol4.unf_reference.owfn.OG.BDD_MP.cudd \
-             bdd_ref/sequence3_reference.owfn.OG.BDD_ANN.cudd \
-             bdd_ref/sequence3_reference.owfn.OG.BDD_MP.cudd \
-             bdd_ref/phcontrol4.unf_reference.owfn.OG.png \
-             bdd_ref/sequence3_reference.owfn.OG.png \
+             bdd_ref/phcontrol4.unf_reference.owfn.og.BDD_ANN.cudd \
+             bdd_ref/phcontrol4.unf_reference.owfn.og.BDD_MP.cudd \
+             bdd_ref/sequence3_reference.owfn.og.BDD_ANN.cudd \
+             bdd_ref/sequence3_reference.owfn.og.BDD_MP.cudd \
+             bdd_ref/phcontrol4.unf_reference.owfn.og.png \
+             bdd_ref/sequence3_reference.owfn.og.png \
              bdd_ref/myCoffee.owfn \
              bdd_ref/myCoffee_reference.owfn \
-	     bdd_ref/myCoffee_reference.owfn.OG.BDD_ANN.cudd \
-	     bdd_ref/myCoffee_reference.owfn.OG.BDD_MP.cudd \
+	     bdd_ref/myCoffee_reference.owfn.og.BDD_ANN.cudd \
+	     bdd_ref/myCoffee_reference.owfn.og.BDD_MP.cudd \
 	     bdd_ref/myCoffee_reference_assignments.txt \
              sequence_suite/sequence10.owfn \
              sequence_suite/sequence11.owfn \

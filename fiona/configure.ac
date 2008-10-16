@@ -21,6 +21,10 @@ AC_PROG_MAKE_SET
 AC_PROG_SED
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# look up canonical build name and write it to the config header
+AC_CANONICAL_BUILD
+AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
+
 # flags set by the configure script
 configured_CFLAGS=""
 configured_CXXFLAGS=""
@@ -36,6 +40,7 @@ AC_ARG_ENABLE(assert,
   [enable_assert=${enableval}], [enable_assert=yes])
 AC_MSG_CHECKING([whether to use assertions])
 AC_MSG_RESULT($enable_assert)
+AC_DEFINE_UNQUOTED(CONFIG_ENABLEASSERT, "$enable_assert", [whether to use assertions])
 
 if test "$enable_assert" = "no"; then
   AC_DEFINE(NDEBUG,1,[Turn off assertions and verbose debug messages.])
@@ -51,6 +56,7 @@ AC_ARG_ENABLE(64bit,
   enable_64bit=${enableval}, enable_64bit="no")
 AC_MSG_CHECKING([whether to build for a 64 bit architecture])
 AC_MSG_RESULT($enable_64bit)
+AC_DEFINE_UNQUOTED(CONFIG_ENABLE64BIT, "$enable_64bit", [whether to build a 64 Bit binary])
 
 if test "$enable_64bit" = "yes"; then
   configured_CFLAGS=$configured_CFLAGS" -m64"
@@ -68,6 +74,7 @@ AC_ARG_ENABLE(universal,
   enable_universal=${enableval}, enable_universal="no")
 AC_MSG_CHECKING([whether to build Mac universal binary])
 AC_MSG_RESULT($enable_universal)
+AC_DEFINE_UNQUOTED(CONFIG_ENABLEUNIVERSAL, "$enable_universal", [whether to build a Mac universal binary])
 
 if test "$enable_universal" = "yes"; then
   AM_INIT_AUTOMAKE(no-dependencies)
@@ -86,6 +93,7 @@ AC_ARG_ENABLE(win32,
   enable_win32=${enableval}, enable_win32="no")
 AC_MSG_CHECKING([whether to build Windows MinGW binary])
 AC_MSG_RESULT($enable_win32)
+AC_DEFINE_UNQUOTED(CONFIG_ENABLEWIN32, "$enable_win32", [whether to build a Cygwin-independent Windows binary])
 
 if test "$enable_win32" = "yes"; then
   configured_CFLAGS=$configured_CFLAGS" -mno-cygwin -U _WIN32"

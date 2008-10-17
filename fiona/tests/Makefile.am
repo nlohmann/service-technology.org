@@ -7,7 +7,7 @@ include $(top_srcdir)/Makefile.covcommon
 TESTS = slist.sh syntax.sh extrema.sh cyclic.sh messagebound.sh png.sh \
 	countservices.sh falseannos.sh oWFNreduction.sh sim_og.sh \
 	matching.sh productog.sh publicview.sh samples.sh partner.sh \
-	minimize.sh bddtest.sh statesReduction.sh responsive.sh
+	minimize.sh bddtest.sh statesReduction.sh responsive.sh normalize.sh
 
 
 ############################################################################
@@ -127,6 +127,16 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
 	matching/interface_rcv-a_snd-by.owfn.png \
 	matching/interface_rcv-ax_snd-b.owfn \
 	matching/interface_rcv-ax_snd-b.owfn.png \
+    normalize/abnormal_input.owfn \
+    normalize/abnormal_input.normalized.expected.owfn \
+    normalize/abnormal_output.owfn \
+    normalize/abnormal_output.normalized.expected.owfn \
+    normalize/abnormal_both.owfn \
+    normalize/abnormal_both.normalized.expected.owfn \
+    normalize/abnormal_both2.owfn \
+    normalize/abnormal_both2.normalized.expected.owfn \
+    normalize/coffee.owfn \
+    normalize/coffee.normalized.expected.owfn \
 	productog/1.og \
 	productog/2.og \
 	productog/3.og \

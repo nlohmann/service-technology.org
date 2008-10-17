@@ -143,7 +143,7 @@ else
     else
         echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN does not match with OG although it should
+            echo ... oWFN matches with OG although it should not
             result=1
         fi
     fi
@@ -170,7 +170,7 @@ else
     else
         echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN does not match with OG although it should
+            echo ... oWFN matches with OG although it should not
             result=1
         fi
     fi

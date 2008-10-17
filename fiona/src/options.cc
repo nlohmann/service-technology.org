@@ -206,7 +206,7 @@ void print_help() {
   trace("                                               node\n");
   trace("                                   deadlocks - show all but transient states\n");
   trace(" -b | --BDD=<reordering> ....... enable BDD construction (only relevant for OG)\n");
-  trace("                                 <reordering> specifies reodering method:\n");
+  trace("                                 <reordering> specifies reordering method:\n");
   trace("                                    0 - CUDD_REORDER_SAME\n");
   trace("                                    1 - CUDD_REORDER_NONE\n");
   trace("                                    2 - CUDD_REORDER_RANDOM\n");

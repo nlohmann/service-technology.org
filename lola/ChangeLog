@@ -2,6 +2,9 @@ Version 1.03 (unreleased)
 =========================
 + fixed bug #12302: LoLA: Uneinheitliche bzw. falsche Rückgabewerte bei MODELCHECKING <https://gna.org/bugs/?12302>, LoLA now returns the result via the _exit command
 + added directory "patches" collecting some unpublished adjustments
++ fixed bug #12063 (https://gna.org/bugs/?12063): LIVEPROP now works without crashing
++ added a test case "umlprocess" to avoid regression of bug #12063 (https://gna.org/bugs/?12063)
++ out commented "TWOPHASE" in userconfig.H for liveprop test
 
 
 Version 1.02

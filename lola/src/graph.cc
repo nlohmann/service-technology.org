@@ -25,15 +25,15 @@ unsigned int isbounded;
 unsigned int State::card = 0;
 binDecision ** binHashTable;
 unsigned int largest_sat = 0; // largest dfs + 1 of a state satisfying given predicate
-	int bin_p; // (=place); index in MARKINGVECTOR
-	int bin_pb; // next bit of place to be processed;
+	unsigned int bin_p; // (=place); index in MARKINGVECTOR
+	unsigned int bin_pb; // next bit of place to be processed;
 	unsigned char bin_byte; // byte to be matched against tree vector; constructed from MARKINGVECTOR
-	int bin_t; // index in tree vector
+	unsigned int bin_t; // index in tree vector
 	unsigned char * bin_v; // current tree vector
-	int bin_s; // nr of bits pending in byte from previous iteration
-	int bin_d; // difference position
-	int bin_b; // bit nr at start of byte
-	int bin_dir; // bit nr at start of byte
+	unsigned int bin_s; // nr of bits pending in byte from previous iteration
+	unsigned int bin_d; // difference position
+	unsigned int bin_b; // bit nr at start of byte
+	unsigned int bin_dir; // bit nr at start of byte
 	binDecision * fromdec, * todec, *vectordec;
 #ifdef FULLTARJAN
 State * TarStack;
@@ -678,6 +678,7 @@ Persistents = 0;
     }
 #endif
 #ifdef WITHFORMULA 
+#ifndef TWOPHASE
 	int res;
 	if(!F)
 	{	
@@ -696,6 +697,7 @@ Persistents = 0;
 	}
 	cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
 	F -> parent = (formula *) 0;
+#endif
 #endif
 #ifdef DISTRIBUTE
   Reason WhyTerminated;
@@ -929,7 +931,9 @@ if(i >= Places[0]->cnt) // target_marking found!
 	if(i < Places[0]->cnt) { heureka(resultfixedR,CurrentMarking); end_communication(); return 1;}
 #endif
 #ifdef WITHFORMULA
+#ifndef TWOPHASE
 	update_formula(CurrentState -> firelist[CurrentState -> current]);
+#endif
 #endif
 #ifdef STATEPREDICATE
 	if(F -> value) { heureka(resultfixedR,CurrentMarking); end_communication(); return 1;}
@@ -1039,7 +1043,9 @@ if(!NewOmegas) smallerstate = (State *) 0;
 #endif
 	      CurrentState -> firelist[CurrentState -> current] -> backfire();
 #ifdef WITHFORMULA
+#ifndef TWOPHASE
 	update_formula(CurrentState -> firelist[CurrentState -> current]);
+#endif
 #endif
 #ifdef CYCRED
 // closing in {0,1} --> on stack ( 0 = has successor on stack and has not been extended by spp2)
@@ -1059,7 +1065,9 @@ if(!NewOmegas) smallerstate = (State *) 0;
 	  else
 	    {
 #if defined(WITHFORMULA) && ! defined(DISTRIBUTE)
+#ifndef TWOPHASE
 	update_formula(CurrentState -> firelist[CurrentState -> current]);
+#endif
 #endif
 #ifdef CYCLE
 	fl = FIRELIST();
@@ -1179,11 +1187,6 @@ if(!NewOmegas) smallerstate = (State *) 0;
 	NewState -> smaller = smallerstate;
 	NewState -> NewOmega = NewOmegas;
 #endif
-//////////////
-	if(!(NewState -> firelist) || !(NewState -> firelist[0]))
-	{
-		printstate("",CurrentMarking);
-	}
 #ifdef DEADLOCK
 	if(!(NewState -> firelist) || !(NewState -> firelist[0]))
 	{
@@ -1269,7 +1272,7 @@ if(i >= Places[0]->cnt) // target_marking found!
       else
 	{
 	  // close state and return to previous state
-	int j;
+
 
 #if defined(FAIRPROP) || defined(EVENTUALLYPROP) || defined(STABLEPROP)
 		if(CurrentState ->dfs == CurrentState -> min)
@@ -1386,7 +1389,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 	{
 	  (*graphstream) << "STATE " << CurrentState ->dfs << " Prog: " << CurrentState -> progress_value;
 	  if(CurrentState -> persistent) (*graphstream) << " persistent ";
-	  j=0;
+	  int j=0;
 	  if(graphformat == 'm')
 	  {
 		 for(i=0;i<Places[0]->cnt;i++)
@@ -1417,7 +1420,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 	if(GMflg)
 	{
 	  cout << "STATE " << CurrentState ->dfs;
-	  j=0;
+	  int j=0;
 	  if(graphformat == 'm')
 	  {
 		 for(i=0;i<Places[0]->cnt;i++)
@@ -1653,7 +1656,7 @@ afterdownsearch:
 	      if(CurrentState -> parent) CurrentState -> parent -> min = MIN(CurrentState -> min, CurrentState-> parent -> min);
 #endif
 #endif
-	  State * TmpState = CurrentState;
+
 #ifdef CYCRED
 		CurrentState -> closing = 2;
 #endif
@@ -1663,7 +1666,9 @@ afterdownsearch:
 	    {
 	      CurrentState -> firelist[CurrentState -> current] -> backfire();
 #ifdef WITHFORMULA 
+#ifndef TWOPHASE
 		  update_formula(CurrentState -> firelist[CurrentState -> current]);
+#endif
 #endif
 	      CurrentState -> current ++;
 	    }
@@ -2033,7 +2038,9 @@ endomegaproc:
 if(!NewOmegas) smallerstate = (State *) 0;
 #endif
 #ifdef WITHFORMULA
+#ifndef TWOPHASE
 			update_formula(CurrentState -> firelist[CurrentState -> current]);
+#endif
 #endif
 #ifdef DISTRIBUTE
 #if defined(SYMMETRY) && SYMMINTEGRATION == 3
@@ -2060,7 +2067,9 @@ if(!NewOmegas) smallerstate = (State *) 0;
 #endif
 	            CurrentState -> firelist[CurrentState -> current] -> backfire();
 #ifdef WITHFORMULA
+#ifndef TWOPHASE
 			update_formula(CurrentState -> firelist[CurrentState -> current]);
+#endif
 #endif
 	            CurrentState -> succ[(CurrentState -> current)++] = (State *) 0;
 	        }
@@ -2255,7 +2264,9 @@ if(i >= Places[0]->cnt) // target_marking found!
 	            CurrentState->firelist[CurrentState -> current]->backfire();
 
 #ifdef WITHFORMULA
+#ifndef TWOPHASE
 			update_formula(CurrentState -> firelist[CurrentState -> current]);
+#endif
 #endif
 		    CurrentState->current++;
 	    }
@@ -2267,7 +2278,9 @@ if(i >= Places[0]->cnt) // target_marking found!
 		{	
 			CurrentState -> firelist[CurrentState -> current]->fire();
 #ifdef WITHFORMULA
+#ifndef TWOPHASE
 			update_formula(CurrentState -> firelist[CurrentState -> current]);
+#endif
 #endif
 			CurrentState = CurrentState->succ[CurrentState->current];
 #ifdef COVER
@@ -2324,7 +2337,9 @@ if(i >= Places[0]->cnt) // target_marking found!
 #endif
 	      CurrentState -> firelist[CurrentState -> current] -> backfire();
 #ifdef WITHFORMULA
+#ifndef TWOPHASE
 			update_formula(CurrentState -> firelist[CurrentState -> current]);
+#endif
 #endif
 	      CurrentState -> current ++;
 	    }
@@ -2376,9 +2391,11 @@ if(i >= Places[0]->cnt) // target_marking found!
 		cout << "\nnet is unbounded!\n";
 	}
 #endif
+#endif
 	statistics(NrOfStates,Edges,NonEmptyHash);
 	return 0;
-#endif
+
+
 }
 	  
 void RemoveGraph()
@@ -2472,9 +2489,10 @@ NrOfStates ++ ;
 	    }
 	}
     }
+#endif
   statistics(NrOfStates,Edges,NonEmptyHash);
   return false;
-#endif
+
 }
 
 #endif
@@ -2785,14 +2803,14 @@ unsigned int i;
 }
 #else
 
-int home(){}
+int home(){return 0;}
 		
 #endif
 
 void print_binDec(binDecision * d, int indent);
 void print_binDec(int h)
 {
-	int i;
+	unsigned int i;
 	for(i=0;i< Places[0] -> NrSignificant;i++)
 	{
 		cout << Places[i] -> name << ": " << Places[i] -> nrbits;
@@ -2804,7 +2822,7 @@ void print_binDec(int h)
 	
 void print_binDec(binDecision * d, int indent)
 {
-	int i;
+	unsigned int i;
 	// print bin decision table at hash entry h
 
 	for(i=0;i<indent;i++) cout << ".";

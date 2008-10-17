@@ -1034,15 +1034,15 @@ inline binDecision::~binDecision()
 }
 
 extern binDecision ** binHashTable;
-	extern int bin_p; // (=place); index in MARKINGVECTOR
-	extern int bin_pb; // next bit of place to be processed;
+	extern unsigned int bin_p; // (=place); index in MARKINGVECTOR
+	extern unsigned int bin_pb; // next bit of place to be processed;
 	extern unsigned char bin_byte; // byte to be matched against tree vector; constructed from MARKINGVECTOR
-	extern int bin_t; // index in tree vector
+	extern unsigned int bin_t; // index in tree vector
 	extern unsigned char * bin_v; // current tree vector
-	extern int bin_s; // nr of bits pending in byte from previous iteration
-	extern int bin_d; // difference position
-	extern int bin_dir; // did we go "old" or "new" in last decision?
-	extern int bin_b; // bit nr at start of byte
+	extern unsigned int bin_s; // nr of bits pending in byte from previous iteration
+	extern unsigned int bin_d; // difference position
+	extern unsigned int bin_dir; // did we go "old" or "new" in last decision?
+	extern unsigned int bin_b; // bit nr at start of byte
 	extern binDecision * fromdec, * todec;
 #if defined(TARJAN) || defined(MODELCHECKING) || defined(COVER)
         extern binDecision * vectordec;

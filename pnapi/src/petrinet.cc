@@ -860,6 +860,15 @@ void PetriNet::removePlace(Place *p)
 
 
 
+/*!
+ * \brief   Reevaluates the type of transition t
+ *
+ *          When removing an interface place, the connected
+ *          transitions have to get new or same type because
+ *          they might be connected to another interface place
+ *          or not. In the second case the transition must be
+ *          of internal type after the deletion.
+ */
 void PetriNet::reevaluateType(Transition *t)
 {
   if (t->type != INTERNAL)
@@ -1751,6 +1760,7 @@ set< Place * > PetriNet::getInterfacePlaces() const
 
 
 
+
 void PetriNet::setPlaceSet(set<Place *> Pset)
 {
   P = Pset;
@@ -1766,10 +1776,12 @@ set<Place *> PetriNet::getPlaceSet() const
 
 
 
+
 void PetriNet::setInputPlaceSet(set<Place *> Pinset)
 {
   P_in = Pinset;
 }
+
 
 
 
@@ -1780,10 +1792,12 @@ set<Place *> PetriNet::getInputPlaceSet() const
 
 
 
+
 void PetriNet::setOutputPlaceSet(set<Place *> Poutset)
 {
   P_out = Poutset;
 }
+
 
 
 
@@ -1794,10 +1808,12 @@ set<Place *> PetriNet::getOutputPlaceSet() const
 
 
 
+
 void PetriNet::setTransitionSet(set<Transition *> Tset)
 {
   T = Tset;
 }
+
 
 
 
@@ -1808,10 +1824,12 @@ set<Transition *> PetriNet::getTransitionSet() const
 
 
 
+
 void PetriNet::setArcSet(set<Arc *> Fset)
 {
   F = Fset;
 }
+
 
 
 
@@ -2554,7 +2572,6 @@ void PetriNet::setPlacePort(Place *place, string port)
  *
  * \return  an unsigned integer which represents the number of interface places
  */
-#include <iostream>
 unsigned int PetriNet::neighborInterfacePlaces(Transition *t) const
 {
   unsigned int counter = 0;
@@ -2611,6 +2628,10 @@ bool PetriNet::isNormal() const
 /*!
  * \brief   normalizes the given Petri net
  *
+ *          A Petri net (resp. open net) is called normal if
+ *            each transition has only one interface place in its neighborhood.
+ *
+ * \todo    Write test cases.
  */
 void PetriNet::normalize()
 {
@@ -2670,8 +2691,185 @@ void PetriNet::normalize()
     temp.insert(*place);
   }
 
+  // remove the old interface places
   for (set<Place *>::iterator place = temp.begin(); place != temp.end(); place++)
     removePlace(*place);
+}
+
+
+
+
+/*!
+ * \brief   sets the invokation string
+ */
+void PetriNet::setInvocation(std::string invokestr)
+{
+  invocation_string = invokestr;
+}
+
+
+
+
+/*!
+ * \brief   returns the invocation string
+ */
+std::string PetriNet::getInvocation() const
+{
+  return invocation_string;
+}
+
+
+
+
+/*!
+ * \brief   sets the package string
+ */
+void PetriNet::setPackageString(std::string packagestr)
+{
+  package_string = packagestr;
+}
+
+
+
+
+/*!
+ * \brief   return the package string
+ */
+std::string PetriNet::getPackageString() const
+{
+  return package_string;
+}
+
+
+
+
+/*!
+ * \brief   deletes all interface places
+ */
+void PetriNet::makeInnerStructure()
+{
+    // deletes all IN-places
+    for(set<Place *>::iterator place = P_in.begin(); place != P_in.end(); place = P_in.begin())
+    {
+        removePlace(*place);
+    }
+
+    // deletes all OUT-places
+    for(set<Place *>::iterator place = P_out.begin(); place != P_out.end(); place = P_out.begin())
+    {
+        removePlace(*place);
+    }
+}
+
+
+
+
+/*!
+ * \brief   checks for open net criteria
+ *
+ *          A Petri net N is called an open net if
+ *            (1) no initial marking marks an interface place
+ *            (2) no final marking activates a transition
+ *
+ * \return  true if the criteria are fulfilled and false if not
+ *
+ * \todo    Write test cases.
+ */
+bool PetriNet::isSane() const
+{
+  bool retVal = true;
+
+  // checking condition (1)
+  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+    if ((*p)->tokens != 0)
+    {
+      std::cerr << "Warning: The input place \"" << (*p)->nodeFullName() << "\" has got an initial marking!\n";
+      retVal = false;
+    }
+  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+    if ((*p)->tokens != 0)
+    {
+      std::cerr << "Warning: The ouput place \"" << (*p)->nodeFullName() << "\" has got an initial marking!\n";
+      retVal = false;
+    }
+
+  // checking condition (2)
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    if ((*p)->isFinal && !((*p)->postset).empty())
+    {
+      std::cerr << "Warning: The place \"" << (*p)->nodeFullName() << "\" marked final activates at least one transition!\n";
+      retVal = false;
+    }
+
+  return retVal;
+}
+
+
+
+
+/*!
+ * \brief   checks whether the Petri net is a workflow net or not
+ *
+ *          A Petri net N is a workflow net iff
+ *            (1) there is exactly one place with empty preset
+ *            (2) there is exactly one place with empty postset
+ *            (3) all other nodes are situated on a path between the places described in (1) and (2)
+ *
+ * \return  true iff (1), (2) and (3) are fulfilled
+ *
+ * \deprecated  This method hasn't been completed yet. It always returns true!
+ * \todo        Complete the method.
+ * \todo        Test the method after implementing it.
+ */
+/*bool PetriNet::isWorkflowNet() const
+{
+  return true;
+}*/
+
+
+
+
+/*!
+ * \brief   checks whether the Petri net is free choice
+ *
+ *          A Petri net is free choice iff
+ *            all two transitions have either disjoint or equal presets
+ *
+ * \return  true if the criterion is fulfilled and false if not
+ *
+ * \todo    Write test cases.
+ */
+bool PetriNet::isFreeChoice() const
+{
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+    for (set<Transition *>::iterator tt = T.begin(); tt != T.end(); tt++)
+    {
+      set<Node *> t_pre  = (*t)->preset;
+      set<Node *> tt_pre = (*tt)->preset;
+      if ((t_pre != tt_pre) && !(setIntersection(t_pre, tt_pre).empty()))
+        return false;
+    }
+  return true;
+}
+
+
+
+
+
+/*!
+ * \brief   intersects two Node sets
+ */
+set<Node *> PetriNet::setIntersection(std::set<Node *> s1, std::set<Node *> s2) const
+{
+  set<Node *> result;
+  if (s1.empty() || s2.empty())
+    return result;
+
+  for (set<Node *>::iterator e = s1.begin(); e != s1.end(); e++)
+    if (s2.count(*e) > 0)
+      result.insert(*e);
+
+  return result;
 }
 
 
@@ -2691,57 +2889,6 @@ unsigned int PetriNet::pop_forEach_suffix()
 {
   forEach_suffix.pop_front();
   return forEach_suffix.size();
-}
-
-
-/*!
- * \brief   sets the invokation string
- */
-void PetriNet::setInvocation(std::string invokestr)
-{
-	invocation_string = invokestr;
-}
-
-/*!
- * \brief   returns the invocation string
- */
-std::string PetriNet::getInvocation() const
-{
-	return invocation_string;
-}
-
-/*!
- * \brief   sets the package string
- */
-void PetriNet::setPackageString(std::string packagestr)
-{
-	package_string = packagestr;
-}
-
-/*!
- * \brief   return the package string
- */
-std::string PetriNet::getPackageString() const
-{
-	return package_string;
-}
-
-/*!
- * \brief   deletes all interface places
- */
-void PetriNet::makeInnerStructure()
-{
-    // deletes all IN-places
-    for(set<Place *>::iterator place = P_in.begin(); place != P_in.end(); place = P_in.begin())
-    {
-        removePlace(*place);
-    }
-
-    // deletes all OUT-places
-    for(set<Place *>::iterator place = P_out.begin(); place != P_out.end(); place = P_out.begin())
-    {
-        removePlace(*place);
-    }
 }
 
 } /* namespace PNapi */

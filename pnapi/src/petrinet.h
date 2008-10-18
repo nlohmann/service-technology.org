@@ -568,6 +568,15 @@ class PetriNet
     /// deletes all interface places
     void makeInnerStructure();
 
+    /// checks whether the Petri net is an open net
+    bool isSane() const;
+
+    /// checks the Petri net for workflow criteria
+    //bool isWorkflowNet() const;
+
+    /// checks the Petri net for free choice criterion
+    bool isFreeChoice() const;
+
   private:
     /// removes a place from the net
     void removePlace(Place *p);
@@ -614,6 +623,9 @@ class PetriNet
     /// PNML (Petri Net Markup Language) output
     void output_pnml(ostream *output) const;
 
+    /// GasTeX output
+    void output_gastex(ostream *output) const;
+
     /// remove unused status places
     unsigned int reduce_unused_status_places();
 
@@ -652,6 +664,9 @@ class PetriNet
 
     /// returns the number of interface places in t's neighborhood
     unsigned int neighborInterfacePlaces(Transition *t) const;
+
+    /// intersects two Node sets
+    set<Node *> setIntersection(set<Node *>, set<Node *>) const;
 
     /// a role suffix for the forEach activity
     deque<string> forEach_suffix;

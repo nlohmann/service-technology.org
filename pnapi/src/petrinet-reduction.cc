@@ -399,7 +399,7 @@ void PetriNet::reduce_identical_transitions()
       Transition* t1 = findTransition(labels->first);
       Transition* t2 = findTransition(labels->second);
       
-      mergeParallelTransitions(t1, t2, false);
+      mergeParallelTransitions(t1, t2);
       result++;
     }
     //if (result!=0)

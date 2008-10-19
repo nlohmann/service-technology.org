@@ -1,49 +1,45 @@
 /*****************************************************************************\
-  GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
+  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
+  Copyright (C) 2007, 2008  Dirk Fahland <dirk.fahland@service-technolog.org>,
+                            Martin Znamirowski <znamirow@informatik.hu-berlin.de>
   Copyright (C) 2006, 2007  Niels Lohmann,
                             Christian Gierds, and
                             Martin Znamirowski
   Copyright (C) 2005        Niels Lohmann and
-			    Christian Gierds
-  GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 3 of the License, or (at your option) any
-  later version.
-  GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
-  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-  details.
-  You should have received a copy of the GNU General Public License along with
-  GNU BPEL2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
-  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
-  Floor, Boston, MA 02110-1301  USA.
+                            Christian Gierds
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
+
 %{
 /*!
- * \file    frontend-parser-wsdl.cc
+ * \file    frontend-parser.cc
  *
- * \brief   WSDL 1.1 parser
+ * \brief   IBM WebSphere Business Modeler XML export parser
  *
- *          WSDL is parsed as defined in
- *          http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd
- *
- *          Partner Link Types are parsed according to the "Schema for OASIS
- *          Business Process Execution Language (WS-BPEL) 2.0 - Schema for
- *          Partner Link Type" (http://docs.oasis-open.org/wsbpel/2.0/plnktype)
- *
- * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ * \author  Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *
  * \since   2007/04/29
  *
  * \date    \$Date: 2007/06/28 07:38:16 $
  * 
- * \note    This file is part of the tool BPEL2oWFN and was created during the
+ * \note    This file was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \note    This file was created using GNU Bison reading file
- *          frontend-parser-chor.yy.
+ *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
  * \version \$Revision: 1.10 $

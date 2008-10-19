@@ -12,7 +12,7 @@
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([UML2oWFN],[1.03-unreleased],[uml2owfn@service-technology.org],[uml2owfn])
+AC_INIT([UML2oWFN],[1.10],[uml2owfn@service-technology.org],[uml2owfn])
 AM_INIT_AUTOMAKE
 
 
@@ -30,7 +30,7 @@ AC_CONFIG_HEADERS(src/uml2owfn.h)
 AC_CANONICAL_BUILD
 
 
-# Checks for C/C++ details.
+# Check for C/C++.
 AC_PROG_CXX
 AC_PROG_CC
 
@@ -55,11 +55,10 @@ AM_PROG_CC_C_O
 AC_PROG_YACC
 AC_PROG_LEX
 
-# Kimwitu
-#AC_CHECK_PROG(KC, kc++, kc++, not found)
-#if test "$KC" = "not found"; then
-# AC_MSG_WARN([Kimwitu++ was not found. You will not be able to complile BPEL2oWFN from scratch.])
-#fi
+# *nix command-line tools for ./doc
+AC_PROG_SED
+AC_PROG_AWK
+AC_PROG_GREP
 
 # Dot
 AC_CHECK_PROG(DOT, dot, dot, not found)
@@ -77,6 +76,7 @@ fi
 AC_CONFIG_FILES([src/Makefile \
                  doc/Makefile \
                  tests/Makefile \
+                 maintainer/Makefile \
                  Makefile])
 
 

@@ -1,13 +1,19 @@
-BEGIN OF README file for UML2oWFN 1.03
+          _   _  __  __  _      ____        __        __ _____  _   _ 
+         | | | ||  \/  || |    |___ \   ___ \ \      / /|  ___|| \ | |
+         | | | || |\/| || |      __) | / _ \ \ \ /\ / / | |_   |  \| |
+         | |_| || |  | || |___  / __/ | (_) | \ V  V /  |  _|  | |\  |
+          \___/ |_|  |_||_____||_____| \___/   \_/\_/   |_|    |_| \_|
+                 http://www.service-technology.org/uml2owfn/
+
 
 About this Distribution
 ***********************
 
 This file describes this distribution of UML2oWFN, version 1.03, a
 tool translating business processes described in IBM Websphere Business
-Modeler XML to open workflow nets (oWFN), last updated 7 August 2008.
+Modeler XML to open workflow nets (oWFN), last updated 19 October 2008.
 
-UML2oWFN is licensed under the GNU General Public License.
+UML2oWFN is licensed under the GNU General Public License version 3.
 
 Copyright (C) 2007,2008 Martin Znamirowski, Dirk Fahland, and Niels Lohmann
 
@@ -57,15 +63,18 @@ Directories
 
 `doc'
      The documentation of UML2oWFN consisting of a manual and an
-     installation manual.
-     ( TODO: The documentation is in Texinfo format and
-     ( can be converted into many file formats using `make FORMAT' where
-     ( `FORMAT' is a file format out of `dvi', `html', `pdf' or `ps'.
+     installation manual. The documentation is in Texinfo format and
+     can be converted into many file formats using `make FORMAT' where
+     `FORMAT' is a file format out of `dvi', `html', `pdf' or `ps'.
 
 `tests'
-     ( TODO: Several test processes to self-test UML2oWFN. 
-
-     ( TODO: The tests can be triggered with `make check'.
+     Several test processes to self-test UML2oWFN. 
+     The tests can be triggered with `make check'.
+     
+`lola'
+     Several LoLA configuration files that can be used to create the LoLA
+     model checker variants for automated soundness analysis of translated
+     processes.
 
 Copyright
 =========

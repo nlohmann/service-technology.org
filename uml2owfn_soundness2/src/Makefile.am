@@ -1,28 +1,3 @@
-#############################################################################
-# GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
-#
-# Copyright (C) 2006-2008   Niels Lohmann,
-#                           Christian Gierds,
-#                           Martin Znamirowski, and
-#                           Dirk Fahland
-# Copyright (C) 2005        Niels Lohmann and
-#			                Christian Gierds
-#
-# GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation; either version 3 of the License, or (at your option) any
-# later version.
-#
-# GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# GNU BPEL2oWFN; if not, see http://www.gnu.org/licenses or write to the Free
-# Software Foundation,Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA 02110-1301  USA.
-#############################################################################
 
 # File last changed $Date: 2007/06/28 07:38:14 $ by $Author: nielslohmann $.
 # Version $Revision: 1.81 $

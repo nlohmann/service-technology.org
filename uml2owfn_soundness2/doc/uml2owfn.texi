@@ -11,7 +11,7 @@
 
 @b{About this document:}
 
-This manual is for UML2oWFN, version @value{VERSION}, a tool to translate models of the IBM Websphere Business Modeler to Petri nets, last updated @value{UPDATED}.
+This manual is for UML2oWFN, version @value{VERSION}, a tool to translate models of the IBM WebSphere Business Modeler to Petri nets, last updated @value{UPDATED}.
 
 Copyright @copyright{} 2008 Martin Znamirowski, Dirk Fahland, and Niels Lohmann
 
@@ -34,7 +34,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @title UML2oWFN
 
-@subtitle Translating Models of the IBM Websphere Business Modeler to Petri Nets
+@subtitle Translating Models of the IBM WebSphere Business Modeler to Petri Nets
 @subtitle Version @value{VERSION}, @value{UPDATED}
 
 @author Dirk Fahland
@@ -59,7 +59,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @menu
 * Overview::Overview.
 * Command Line Options::How to run UML2oWFN.
-* Translation::Translating UML2 activity diagrams/IBM Websphere Business Modeler process models to Petri nets.
+* Translation::Translating UML2 activity diagrams/IBM WebSphere Business Modeler process models to Petri nets.
 * Analysis::Analyzing Soundness with UML2oWFN.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
@@ -75,7 +75,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @node Overview
 @chapter Overview
 
-UML2oWFN translates the XML export of the IBM Websphere Business Modeler into standard Petri net file formats. The translation can be targeted to a specific analysis like checking soundness, or for deriving contracts from business process specifications.
+UML2oWFN translates the XML export of the IBM WebSphere Business Modeler into standard Petri net file formats. The translation can be targeted to a specific analysis like checking soundness, or for deriving contracts from business process specifications.
 
 
 @section Usage
@@ -142,7 +142,7 @@ For an overview of the command line options, type @samp{uml2owfn -h} to see the 
 
 @node Translation
 
-@chapter Translating UML2 activity diagrams/IBM Websphere Business Modeler process models to Petri nets
+@chapter Translating UML2 activity diagrams/IBM WebSphere Business Modeler process models to Petri nets
 
 @section Generating Petri nets 
 
@@ -164,14 +164,15 @@ net in @samp{.png} format.
 
 @node Analysis
 
-@chapter Soundness analysis with UML2oWFN
+@chapter Soundness Analysis with UML2oWFN
 
 
-@section Setup 
+@section Setup LoLA as Analysis Tool
 
 To prepare the soundness analysis you need three different binaries of the
-Low-Level Net Analyzer (LoLA, @url{http:// }) to be accessible from the
-command-line. 
+Low-Level Net Analyzer (LoLA, @url{http://www.service-technolorg.org/lola/},
+source-code available at @url{http://svn.gna.org/svn/service-tech/trunk/lola/})
+to be accessible from the command-line. 
 
 @itemize
 @item @file{lola-mc} - LoLA compiled with MODELCHECKING,
@@ -182,8 +183,53 @@ command-line.
 each with CAPACITY 1 and CHECKCAPACITY. The analysis script files rely on these
 model checkers. 
 
+In @file{<uml2owfn>/lola/}, we are providing the corresponding LoLA configuration
+files for these LOLA variants with this release. You can generate these LoLA
+executables as follows. 
 
-@section Use case: standard soundness analysis
+@enumerate
+@item Download LoLA and extract the source code files into its own directory, e.g.
+@file{<lola>}.
+
+@item In case you take the most recent version from our source-code repository at 
+@url{http://svn.gna.org/svn/service-tech/trunk/lola/} run
+@example
+cd <lola>
+autoreconf -i
+./configure
+@end example
+
+@item In the @file{<lola>} directory, @samp{make} should create a LoLA binary for
+your platform.
+
+@item Replace the @file{<lola>/userconfig.H} with the corresponding variant from
+@file{<uml2owfn>/lola/}, compile LoLA and rename the resulting file, e.g.
+@example
+cd <lola>
+
+cp <uml2owfn>/lola/userconfig.H.modelchecking ./userconfig.H
+make
+mv lola lola-mc
+
+cp <uml2owfn>/lola/userconfig.H.statepredicate ./userconfig.H
+make
+mv lola lola-sp
+
+cp <uml2owfn>/lola/userconfig.H.full-limited ./userconfig.H
+make
+mv lola lola-full-limited
+@end example
+
+In case you work on Windows/Cygwin, you need to provide the @file{.exe} extension
+for the @samp{mv} command.
+
+@item Make all three LoLA binaries available on your command-line, for instance
+by moving them to @file{/usr/local/bin/}.
+@end enumerate
+
+
+
+@section Use Case: Standard Soundness Analysis
 
 This section describes how to achieve standard soundness analysis. Translate
 the library @file{lib.xml} you want to verify with the following command-line
@@ -226,7 +272,8 @@ sh ./check_lib.sh
 
 will make these checks for each process of the library.
 
-@section Generating additional information on the processes
+
+@section Generating Additional Information on the Processes
 
 The following options can be used to generate additional information about the
 processes.
@@ -267,7 +314,8 @@ This option is particularly useful for debugging.
 
 @end itemize
 
-@section Making the analysis more efficient
+
+@section Making the Analysis More Efficient
 
 @acronym{UML2oWFN} includes structural Petri net reduction techniques that can
 be applied to reduce the size of the Petri net while preserving the (un)soundness
@@ -307,7 +355,7 @@ uml2owfn -i lib.xml -f lola -a soundness -a safe -a removePinsets -p taskfile -o
 @end cartouche
 
 
-@section Use case: automated translation, analysis and compilation of results
+@section Use Case: Automated Translation, Analysis and Compilation of Results
 
 @acronym{UML2oWFN} comes with a makefile that eases analysis and compilation of
 the analysis results for process librares. The @file{scripts/Makefile} the following
@@ -365,7 +413,70 @@ of the translation of @acronym{UML2oWFN}, default value is @samp{lola}. The
 targets @samp{full}, @samp{table}, @samp{safeness}, @samp{soundness}, @samp{clean},
 and @samp{veryclean} require the @samp{lola}-format.
 
-@section Use case: soundness analysis using tools for workflow-nets 
+
+@section Use Case: Choosing Termination Semantics for Your Analysis
+
+ UML2oWFN provides four kinds of termination semantics that can be implemented
+ upon translation a process library to Petri nets. You can choose the termination
+ semantics by the "right" selection of parameters. We briefly explain each
+ termination semantics and the corresponding parameter combinations:
+ 
+ @enumerate
+ @item The "standard" UML2 termination semantics synchronizes control-flow and
+ data-flow upon termination by clearing the control-flow tokens from end nodes
+ as soon as data-flow has terminated via one output pinset. This semantics
+ prioritizes data-flow over control-flow. Choose
+ @example
+ -a soundness
+ @end example
+ to use this termination semantics
+ 
+ @item The "workflow net" semantics synchronizes control-flow and data-flow in
+ order to detect propert termination locally at a unique "omega" sink place of
+ the net as in workflow Petri nets. The termination semantics assumes that
+ data-flow terminates via an XOR-join (only one output pinset gets to fire) while
+ all control-flow terminates via an AND-join. This assumption may be wrong for
+ your process as UML2 Activity Diagrams generally terminate control-flow via an
+ implicit OR-join. Interpretation of analysis results therefore must be done
+ carefully! Choose
+ @example
+ -a soundness -a wfNet
+ @end example
+ to use this termination semantics. 
+
+@item The "control-flow only" semantics ignores data-flow upon termination (by
+removing the corresponding parts from the process) and lets the control-flow
+terminate via an implicit OR-join. Choose
+ @example
+ -a soundness -a removePinsets
+ @end example
+ to use this termination semantics.
+
+@item A variant of the "standard" UML2 termination semantics which synchronizes
+control-flow over data-flow, but makes both flow independent of each other. Thus
+it is possible to analyze termination problems due to race conditions between
+control-flow and data-flow. In case these are dependent on each other, this semantics
+is equivalent to the standard termination semantics. It assumes that the
+process control-flow terminates via an implicit OR-join while the data-flow
+terminates via an XOR-join. Choose
+ @example
+ -a soundness -a orJoin
+ @end example
+ to use this termination semantics.
+ @end enumerate
+ 
+ These termination semantics should not be combined (i.e. it will produce
+ unpredictable results).
+ 
+ The analysis for the safeness of a process is independent of the chosen termination
+ semantics and can always be included by adding
+ @example
+ -a safe
+ @end example
+ to the parameters. 
+
+
+@section Use Case: Soundness Analysis Using Tools for Workflow-Nets 
 
 Aalst et al. have established the notion of a @i{workflow net} to model workflows.
 Workflow nets are a special class of Petri nets that have a unique start place
@@ -374,10 +485,10 @@ is marked when the workflow has finished. Further, every place and transition
 lies on a path from @samp{alpha} to @samp{omega}. There are efficient soundness
 analysis algorithms for workflow nets.
 
-In order to analyse processes of the IBM buiness modeler with such tools, the
-generated nets have to provide a unique @samp{alpha} place, and a unique
-@samp{omega} place. An equivalent translation of an arbitrary IBM business
-modeler process into a workflow net requires knowledge about the reachable states
+In order to analyse processes of the IBM WebSphere Business Modeler with such
+tools, the generated nets have to provide a unique @samp{alpha} place, and a unique
+@samp{omega} place. An equivalent translation of an arbitrary IBM WebSphere
+Business Modeler process into a workflow net requires knowledge about the reachable states
 of the process. However, for a specific class of processes, this transformation
 can be done on the structure of the process alone.
 
@@ -386,7 +497,7 @@ it must be used together with @samp{-a soundness} to become effective. Call
 
 @cartouche
 @example
-uml2owfn -i lib.xml -f tpn -a soundness -a safe -a wfNet -p taskfile -o
+uml2owfn -i lib.xml -f tpn -a soundness -a wfNet -o
 @end example
 @end cartouche
 
@@ -417,7 +528,7 @@ you to set the output format of the translation of @acronym{UML2oWFN}, default
 value is @samp{lola}.
 
 
-@section Use case: anonymize the processes
+@section Use Case: Anonymize the Processes
 
 In case you want to generated anonymized processes models which can not be related
 back to the originals due to self-explaining names, use the option
@@ -431,11 +542,14 @@ individually, starting with @i{p1} and @i{t1}. Any related files like the
 @node ChangeLog
 @chapter Version History
 
+The following list provides a detailed overview about the changes, features, and
+bugfixes to @acronym{UML2oWFN} as they have been included in this release.
 
 @include ChangeLog.texi
 
 @sp 3
 
+The most recent change log is available at Rachel's website at @url{http://service-technology.org/files/uml2owfn/ChangeLog}.
 
 @c ----------------------------------------------------------------------------
 

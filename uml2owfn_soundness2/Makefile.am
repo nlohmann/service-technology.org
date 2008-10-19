@@ -6,7 +6,7 @@
 # Version $Revision: 1.64 $
 
 # Where else are Makefiles?
-SUBDIRS = src doc tests
+SUBDIRS = src doc tests maintainer
 
 ####################################
 # Targets to clean generated files #

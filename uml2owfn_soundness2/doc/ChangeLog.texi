@@ -1,48 +1,39 @@
-@heading Version 1.03 (unreleased)
-
+@heading Version 1.03-unreleased
 @itemize
 @item fixed a bug in handling filenames, UML2oWFN can now process files in other directories than the current working directory
-@item added tests to @file{./tests/}, run @samp{make check} to run the test suite
 @item added parameter @samp{-a orJoin} to translate process for soundness analysis assuming an implicit OR-join on the control-flow
-@item extend log output, log now contains statistical data about the each process: number of nodes, number of edges, average number of incoming edges, average number of outgoing edges
-@item added parameter @samp{-p anon} to anonymize the process output by enumerating places (p1, p2, ...) and transitions (t1, t2, ...) before writing to disk
 @item added parameter @samp{-a wfNet} to translate processes into Aalst-workflow-nets, the translation assumes an AND-join on all end- and stop-nodes of the process
-@item stored reduction level in the @file{scripts/Makefile} in variable @samp{REDUCTION-LEVEL}, so the reduction level can be set at the make call
-@item added new @file{scripts/Makefile} target @samp{translateweak} that uses the @samp{-a removePinsets} option,
-@item added new analysis switch @samp{-a removePinsets} that relaxes the process termination semantics by requiring that only the control-flow terminates, but that data may still be pending at the process output
-@item updated documentation and included .pdf creation
-@item overrode the Petri net reduction method in the ExtendedWorkflowNet class, now implementing reduce_series_places (level 1) and reduce_identical_places (level 3)
-@item moved re-implementation of reduce_series_places and reduce_series_transitions to ExtendedWorkflowNet and restored the original implementation
-@item added routine to remove empty output pinsets which is needed for a deadlock-based soundness analysis of Petri nets, the routine is not used in this version because for BOM processes, only the modelchecking-based soundness analysis yields correct results (the inner of the process must be empty).
-@item changed task file naming scheme to 'net.lola.<tasktype>.task'
-@item added parameter "-a safe" to check for safeness of a net using LoLA with state predicates, this parameter can be used together with "-a soundness" and "-a deadlocks"
-@item worked on bug #12160: PNAPI: Petri net reduction rules do not preserve (un)-safeness, disallowing place/transition fusion if places/transitions are together in the preset/postset of another transition/place 
-@item modified analysis scripts: fixed evaluation of LoLA return results (in case of deadlock analysis, return result '0' means 'unsound'), and preserving LoLA output in 'niels-analysis_lola.log' for further investigations
-@item added documentation in ./doc/
-@item added analysis scripts (by Niels)
-@item modified soundness analysis scheme: the parameter combination "-a soundness -a deadlocks" tries to generate Petri nets for a deadlock based soundness analysis of the library. In case a net is a freechoice-workflow net, this is possible, in any other case a reachability analysis of the set of final markings must be done by CTL-model checking. For each case the corresponding net and analysis task is created.
+@item added new analysis switch @samp{-a removePinsets} that relaxes the process termination semantics by requiring that only the control-flow terminates, but that data may still be pending at the process output, and added new @file{scripts/Makefile} target @samp{translateweak} that uses the @samp{-a removePinsets} option,
+@item added parameter @samp{-a safe} to check for safeness of a net using LoLA with state predicates, this parameter can be used together with @samp{-a soundness}
+@item added parameter @samp{-p anon} to anonymize the process output by enumerating places (p1, p2, ...) and transitions (t1, t2, ...) before writing to disk
+@item added log file output for translation, with parameter "-p log" a log file
+(name "uml2owfn_<inputfile>.log") with entries of the form "process name;
+translation successful;reason-for-fail;number of nodes, number of edges, average
+number of incoming edges, average number of outgoing edges" is written
 @item added checks for free-choice nets and for workflow-nets (each node is on a path from alpha to omega); this additional Petri net functionality is implemented in the class ExtendedWorkflowNet which inherits from PetriNet
+@item added check whether generated Petri net is empty, if this is the case, then the net is translated again without reduction rules, the name is extended with a ".unreduced" (if it is still emtpy, then the net is skipped: no net file, no analysis, not in script file)
+@item changed task file naming scheme to 'net.lola.<tasktype>.task'
+@item worked on bug #12160: PNAPI: Petri net reduction rules do not preserve (un)-safeness, disallowing place/transition fusion if places/transitions are together in the preset/postset of another transition/place
+@item overrode the Petri net reduction method in the ExtendedWorkflowNet class, now implementing reduce_series_places (level 1) and reduce_identical_places (level 3)
+@item stored reduction level in the @file{scripts/Makefile} in variable @samp{REDUCTION-LEVEL}, so the reduction level can be set at the make call
 @item extended filtering criteria: empty processes are not translated
 @item fixed bug #12156: UML2oWFN: translation of overlapping pinsets fails, @url{https://gna.org/bugs/?12156}
-@item added log file output for translation, with parameter "-p log" a log file (name "uml2owfn_<inputfile>.log") with entries of the form "<process-name>;<translated>;<reason-for-fail>" is written
-@item changed lola executable file names (in the generated script) to "lola-dl" for deadlock analysis and "lola-mc" for modelchecking (soundness)
-@item added check whether generated Petri net is empty, if this is the case, then the net is translated again without reduction rules, the name is extended with a ".unreduced" (if it is still emtpy, then the net is skipped: no net file, no analysis, not in script file)
+@item added documentation in ./doc/
+@item added tests to @file{./tests/}, run @samp{make check} to run the test suite
 @end itemize
 
 @heading Version 1.02
-
 @itemize
 @item Changed output: The property for the soundness analysis is now appended to the net and written to the net file by default.
 @item Added parameter switch "-p taskfile" to re-enable the old functionality and to write a separate task file.
 @item The generated verification script considers all cases accordingly.
 @item Re-enabled the error routine of the parser. Parser errors are now printed to the console.
-@item Added null pointer checking in Block::linkInserts() and disabled filtering in the parser. Fixes Bug #12027, @url{https://gna.org/bugs/index.php?12027} 
+@item Added null pointer checking in Block::linkInserts() and disabled filtering in the parser. Fixes Bug #12027, @url{https://gna.org/bugs/index.php?12027}
 @item Added wbim:humanTask to the lexer. Is parsed and represented as normal task.
 @item Added wbim:bulkResourceRequirement to the lexer. Is parsed as role requirement. This is feasible because role requirements are (currently) ignored in the process translation, fixes Bug #12031, https://gna.org/bugs/?12031
 @item Added wbim:indidividualResourceRequirement to the lexer. Is parsed as role requirement. This is feasible because role requirements are (currently) ignored in the process translation
 @item Extended parser to read atomic "callToProcess"-tags without children
 @item changed command line help output to provide correct and meaningful examples for command line parameters
-@item This release correctly parses libraries a1-a4, b1-b4, and p1. Library m1 cannot be parsed due to an unrecoverable error in the parser implementation, see Bug #12041, https://gna.org/bugs/?12041
 @item implemented Woflan file format (.tpn), see @url{https://gna.org/task/?6011}
 @item file format can be triggered with "-f tpn"
 @item Soundness checking now distinguishes checking for reachability of end states, checking for deadlocks, and checking for non-reachability of the final state (this will deprecate...)

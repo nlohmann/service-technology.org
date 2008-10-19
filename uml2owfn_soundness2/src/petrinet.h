@@ -1,26 +1,25 @@
 /*****************************************************************************\
-  GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
-
+  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
+  Copyright (C) 2007, 2008  Dirk Fahland <dirk.fahland@service-technolog.org>,
+                            Martin Znamirowski <znamirow@informatik.hu-berlin.de>
   Copyright (C) 2006, 2007  Niels Lohmann,
                             Christian Gierds, and
                             Martin Znamirowski
   Copyright (C) 2005        Niels Lohmann and
-			    Christian Gierds
+                            Christian Gierds
 
-  GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 3 of the License, or (at your option) any
-  later version.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-  GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
-  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-  details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License along with
-  GNU BPEL2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
-  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
-  Floor, Boston, MA 02110-1301  USA.
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 /*!
@@ -37,7 +36,7 @@
  *
  * \date    \$Date: 2007/06/28 07:38:17 $
  *
- * \note    This file is part of the tool GNU BPEL2oWFN and was created during
+ * \note    This file was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
@@ -197,13 +196,13 @@ class Node
 
     /// type of node as defined in #communication_type
     communication_type type;
-    
+
     /// return a copy of the preset of the node
     set<Node*> getPreSet () const;
-    
+
     /// return  a copy of the postset of the node
     set<Node*> getPostSet () const;
-    
+
     /// destructor
     virtual ~Node();
 
@@ -436,7 +435,7 @@ class PetriNet
     /// adds an arc given source and target node, and arc type
     Arc *newArc(Node *my_source, Node *my_target, arc_type my_type = STANDARD, unsigned int my_weight = 1);
 
-    // fix names of places such that they can be read by 
+    // fix names of places such that they can be read by
     // an owfn/lola parser after output
     void fixPlaceNames();
 
@@ -484,7 +483,7 @@ class PetriNet
 
     /// removes a transition from the net
     void removeTransition(Transition *t);
-    
+
     /// removes a place from the net
     void removePlace(Place *p);
 
@@ -514,7 +513,7 @@ class PetriNet
 
     /// add a loop to the final states to check deadlock freedom with LoLA
     void loop_final_state();
-    
+
     /// statistical output
     string information() const;
 
@@ -536,7 +535,7 @@ class PetriNet
 
     /// calculates the postset of a node
     set<Node*> postset(Node *n) const;
-    
+
 // <Dirk.F start>
     /// get the set of all places
     set<Place*> getInternalPlaces ();
@@ -560,7 +559,7 @@ class PetriNet
 
 
   private:
-  
+
     set<Place*> generatedInitials;
 
     Place* realStartNode;
@@ -604,7 +603,7 @@ class PetriNet
 
     /// TPN-output
     void output_tpn(ostream *output) const;
-    
+
     /// PNML (Petri Net Markup Language) output
     void output_pnml(ostream *output) const;
 

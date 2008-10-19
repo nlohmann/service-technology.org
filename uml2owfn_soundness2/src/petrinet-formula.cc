@@ -1,9 +1,19 @@
 /*****************************************************************************\
-  Petri net formulas
-  
-  Copyright (C) 2008  Dirk Fahland
-  
-  license: to be determined 
+  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
+  Copyright (C) 2008  Dirk Fahland <dirk.fahland@service-technolog.org>,
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 /*!
@@ -27,7 +37,7 @@
 #include <cassert>
 #include <iostream>
 #include <set>
-#include <sstream> 
+#include <sstream>
 #include <utility>
 
 #include "petrinet-formula.h"
@@ -39,7 +49,7 @@ using std::cerr;
 using std::stringstream;
 using std::endl;
 
-// ------------------------- formula ------------------------- 
+// ------------------------- formula -------------------------
 
 /*!
  * \brief destructor
@@ -86,11 +96,11 @@ PetriNetLiteral::PetriNetLiteral(Place *aPlace, comparison_relation aRel, int aV
  */
 const string PetriNetLiteral::output_lola() const {
 	stringstream str;
-	
+
 	// negated formula?
 	if (negated)
 		str << "NOT ";
-	
+
 	// node name
 	str << toLoLAident(p->nodeFullName()) << " ";
 
@@ -106,7 +116,7 @@ const string PetriNetLiteral::output_lola() const {
 	default:
 		relStr = ">"; break;	// default is ">"
 	}
-	
+
 	// construct and return: [NOT] pName REL val
 	str << relStr << " " << val;
 	return str.str();
@@ -159,7 +169,7 @@ void FormulaState::set_quantifier(logical_quantifier aQuant) {
 
 /*!
  * \brief	set the the formula output format
- * 
+ *
  * \param	aFormat
  */
 void FormulaState::set_format(formula_output_format aFormat)
@@ -207,7 +217,7 @@ ostream& operator<< (ostream& os, const FormulaState &obj)
 void FormulaState::output_lola_complete(ostream *output) const
 {
 	assert(output != NULL);
-	
+
 	// print header of the output and contents
 	switch (format) {
 	  case FORMAT_LOLA_FORMULA:
@@ -236,15 +246,15 @@ const string FormulaState::output_lola() const
 			qStr = "ALLPATH ALWAYS "; quantified = true; break;
 		case LOGQ_CTL_ALLPATH_EVENTUALLY:
 			qStr = "ALLPATH EVENTUALLY "; quantified = true; break;
-		case LOGQ_CTL_EXPATH_ALWAYS: 
+		case LOGQ_CTL_EXPATH_ALWAYS:
 			qStr = "EXPATH ALWAYS "; quantified = true; break;
-		case LOGQ_CTL_EXPATH_EVENTUALLY: 
+		case LOGQ_CTL_EXPATH_EVENTUALLY:
 			qStr = "EXPATH EVENTUALLY "; quantified = true; break;
 		case LOGQ_NONE:
 		default:
 			qStr = ""; break;
 	}
-	
+
 	// generate predicate string
 	stringstream str;	// create string stream
 	bool first = true;
@@ -252,7 +262,7 @@ const string FormulaState::output_lola() const
 	{
 		string subStr;
 		Formula* f = (*it);
-		
+
 		// a non-quantified formula connects its operands with the logical connectives
 		if (!first && !quantified) {
 			string opStr = "";
@@ -265,7 +275,7 @@ const string FormulaState::output_lola() const
 			default:
 				opStr = "";			// default operator is none
 			}
-			str << "\n" << opStr << " ";	// insert operator between two operands 
+			str << "\n" << opStr << " ";	// insert operator between two operands
 		}
 
 		// append next operand
@@ -279,11 +289,11 @@ const string FormulaState::output_lola() const
 			subStr = "";
 		}
 		str << subStr;
-		
+
 		first = false; // next iteration is not the first iteration, need an operator after this
 	}
-	
-	if (!first)	// is true iff the formula has at least one operand 
+
+	if (!first)	// is true iff the formula has at least one operand
 	{
 		return qStr + "( "+str.str()+" )";	// return formula in parantheses
 	}

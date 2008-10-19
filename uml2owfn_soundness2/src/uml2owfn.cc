@@ -1,51 +1,22 @@
 /*****************************************************************************\
-  GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
+  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
+  Copyright (C) 2007, 2008  Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
+                            Dirk Fahland <dirk.fahland@service-technolog.org>,
+                            Niels Lohmann <niels.lohmann@service-technolog.org>
 
-  Copyright (C) 2006, 2007  Niels Lohmann,
-                            Christian Gierds, and
-                            Martin Znamirowski
-  Copyright (C) 2005        Niels Lohmann and
-			    Christian Gierds
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-  GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 3 of the License, or (at your option) any
-  later version.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
-  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-  details.
-
-  You should have received a copy of the GNU General Public License along with
-  GNU BPEL2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
-  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
-  Floor, Boston, MA 02110-1301  USA.
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
-
-/*!
- * \file    bpel2owfn.cc
- *
- * \brief   BPEL2oWFN's main
- *
- * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
- *
- * \since   2005/10/18
- *
- * \date    \$Date: 2007/06/28 07:38:15 $
- *
- * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
- *
- * \version \$Revision: 1.185 $
- */
-
-
-
 
 
 /******************************************************************************

@@ -1,22 +1,19 @@
 /*****************************************************************************\
-  UML2oWFN - Petri Net API workflow extension.
+  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
+  Copyright (C) 2008  Dirk Fahland <dirk.fahland@service-technolog.org>,
 
-  Copyright (C) 2008 Dirk Fahland
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-  UML2oWFN is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 3 of the License, or (at your option) any
-  later version.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  UML2oWFN is distributed in the hope that it will be useful, but WITHOUT
-  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-  details.
-
-  You should have received a copy of the GNU General Public License along with
-  GNU UML2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
-  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
-  Floor, Boston, MA 02110-1301  USA.
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 /*!
@@ -24,8 +21,7 @@
  *
  * \brief   Petri Net API: workflow extension
  *
- * \author  Dirk Fahland <fahland@informatik.hu-berlin,de>,
- *          last changes of: \$Author: nielslohmann $
+ * \author  Dirk Fahland <fahland@informatik.hu-berlin,de>
  *
  * \since   2008-06-06
  *

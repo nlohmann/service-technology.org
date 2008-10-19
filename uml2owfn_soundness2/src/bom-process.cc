@@ -1,3 +1,21 @@
+/*****************************************************************************\
+  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
+  Copyright (C) 2008  Dirk Fahland <dirk.fahland@service-technolog.org>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+\*****************************************************************************/
+
 #include "bom-process.h"
 #include "debug.h"
 #include "helpers.h"
@@ -312,8 +330,40 @@ void BomProcess::soundness_initialPlaces(PetriNet *PN) {
 }
 
 /*!
- * \brief	makes all output places internal and adds
- * 			live-locks to all terminal places of the net
+ * \brief	implement the termination semantics for the net by adding and removing
+ *        places and transitions, some places will be marked as final, together
+ *        with information from the BomProcess, this information can be used
+ *        to construct verification properties to verify the correctness of the
+ *        net
+ *
+ * we provide four kinds of termination semantics
+ * #1: the "old" UML2 termination semantics that clears all tokens from the net
+ *     as soon as data-flow has terminated ( output pinset has fired),
+ *      [parameter combination: keepPinsets && !wfNet && !orJoin] (standard)
+ *
+ *     this semantics can be suppelemented with live-locking loops on
+ *     the terminal places of the net
+ *      [parameter: livelocks]
+ *
+ * #2: the workflow net semantics, all control- and data-flow terminates
+ *     on a single "omega" places, we thereby assume that data-flow terminates
+ *     via an XOR-join while all control-flow terminates via an AND-join
+ *      [parameter combination: keepPinsets && wfNet && !orJoin]
+ *
+ *     this semantics can be suppelemented with live-locking loops on
+ *     the terminal places of the net
+ *      [parameter: livelocks]
+ *
+ * #3: the control-flow OR-join termination semantics which removes data-flow
+ *     from the termination semantics and let's all control-flow terminate via
+ *     an implicit OR-join
+ *      [parameter combination: !keepPinsets && !wfNet && !orJoin]
+ *
+ * #4: the "new" UML2 termination semantics; it is equivalent to the "old"
+ *     termation semantics (#1) but creates less places: the process control-flow
+ *     terminates via an implicit OR-join, the data-flow terminates via an
+ *     XOR-join
+ *      [parameter combination: keepPinsets && !wfNet && orJoin]
  *
  * \param	PN  the net to be modified
  * \param	liveLocks  introduce live-locks at final state places
@@ -337,32 +387,41 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
       // possible extension: introduce omega-place as unqiue final place
   }
 
+  // preparation for termination semantics #4 ("new)
   if (orJoin) {   // in case of an OR-join: add unique omega-place
     Place *omega = PN->newPlace("omega");
     omega->isFinal = true,
     omegaPlaces.insert(omega);
   }
 
-  // replace the post-set of the output pinset transition with an
-  // omega place marked final
+  // we strip the termination part of the current net removing redundant structure
+  // and extend the remaining net with places and transitions according to the
+  // chosen termination semantics
 
-  // get all post-places of output pinset-transitions
+  // first modify the post-places of each output pinset transition
   for (set<Transition *>::iterator outPS = process_outputPinSets.begin(); outPS != process_outputPinSets.end(); outPS++)
   {
+    // remove the outer data-flow output places
     set<Node *> outputPins = PN->postset(*outPS);	// and the output pins
     for (set<Node *>::iterator it = outputPins.begin(); it != outputPins.end(); it++)
     {
       Place* place = static_cast<Place*>(*it);
       places_to_remove.insert(place);
     }
+    // the output pinset transition is not an output transition anymore
     noMoreOutput.insert((*outPS));
 
+    // now extend the output pinset transition according to the termination
+    // semantics
+
     if (!orJoin && keepPinsets) {
+      // semantics #1 ("old") and #2 (workflow net)
+
       // keep pinsets: create omega post-place of the pinset-transition,
       // and add a live-locking loop if necessary
       Place* outputPlace = PN->newPlace((*outPS)->nodeFullName() + "_omega");
       PN->newArc((*outPS), outputPlace);
-      outputPlace->isFinal = true;		// make it a final place
+      outputPlace->isFinal = true;		  // make it a final place
 
       omegaPlaces.insert(outputPlace);	// is one of the new final places
 
@@ -373,9 +432,10 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
       }
 
     } else if (!orJoin && !wfNet) {
+      // semanics #3 ("no data-flow dependent termination")
+
       // do not keep pinsets: remove pinset transition
       transitions_to_remove.insert(*outPS);
-
       // and add a token consuming transition to each pre-place
       set<Node *> inputPins = PN->preset(*outPS); // and the output pins
       for (set<Node *>::iterator it = inputPins.begin(); it != inputPins.end(); it++)
@@ -385,16 +445,22 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
         PN->newArc(place, tConsume);
         // adding live-locks is not necessary
       }
+
     } else if (orJoin && !wfNet) {
+      // semantics #4 ("new")
+
       // add an arc producing a token on omega
       Place* omega = *omegaPlaces.begin();
       PN->newArc(*outPS, omega, STANDARD, 1);
     }
   }
 
-  // connect the end- and stop- nodes to the output transitions
+  // now connect the end- and stop- nodes to the output pinset transitions to
+  // synchronize control-flow with data-flow upon termination
   if (keepPinsets)
   {
+    // termination sematnics #1, #2 and #4
+
     // implement the BOM process termination semantics in petri nets:
     // when checking soundness, transition which consume from
     // end-nodes must be made looping, this is necessary to make sure
@@ -408,12 +474,16 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
       Place* p = static_cast<Place*>(*it);
 
       if (!orJoin) {
+        // termination semantics #1 ("old") and #2 ("workflow net")
+
         // remove post-transition ".eat" of end place p
         Transition* t = static_cast<Transition*>(*(PN->postset(p).begin()));
         transitions_to_remove.insert(t);
       }
 
       if (!wfNet && !orJoin) {
+        // termination semantics #1 ("old")
+
         // not creating a workflow net, add a transition that cleans the end node
         // for each omega place
         int outputSetNum = 1;
@@ -429,6 +499,8 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
           outputSetNum++;
         }
       } else if (wfNet && !orJoin) {
+        // termination semantics #2 ("workflow net")
+
         // try to create a workflow net: each output pinset has its own
         // omega transition and its own omega-place, add each end node
         // to the preset of each output pinset-omega transition
@@ -442,10 +514,13 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
     }
 
     // include all stop nodes in the process termination semantics
+    // warning code duplication in case we treat stop-nodes as end-nodes
     for (set<Place *>::iterator it = process_stopNodes.begin(); it != process_stopNodes.end(); it++) {
       Place* p = static_cast<Place*>(*it);
 
       if (!orJoin) {
+        // termination semantics #1 ("old") and #2 ("workflow net")
+
         // remove post-transition ".eat" of end place p
         Transition* t = static_cast<Transition*>(*(PN->postset(p).begin()));
         transitions_to_remove.insert(t);
@@ -458,6 +533,8 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
         // treat stop nodes like end nodes
 
         if (!wfNet && !orJoin) {
+          // termination semantics #1 ("old")
+
           // not creating a workflow net, add a transition that cleans the end node
           // for each omega place
           int outputSetNum = 1;
@@ -473,6 +550,8 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
             outputSetNum++;
           }
         } else if (wfNet && !orJoin) {
+          // termination semantics #2 ("workflow net")
+
           // try to create a workflow net: each output pinset has its own
           // omega transition and its own omega-place, add each end node
           // to the preset of each output pinset-omega transition
@@ -485,8 +564,10 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
       }
     }
 
-    // a workflow net may have only one omega place
+    // finishing touches after control- and data-flow are synchronized
+    // a workflow net may have only one omega place, create it here
     if (wfNet && !orJoin) {
+      // termination semenatics #2 ("workflow net")
       Place* processOmega = PN->newPlace("omega");
       for (set<Place *>::iterator omega = omegaPlaces.begin();
                     omega != omegaPlaces.end(); omega++)
@@ -500,6 +581,7 @@ void BomProcess::soundness_terminalPlaces(PetriNet *PN, bool liveLocks, bool sto
     }
   } // end: connect end/stop nodes with pinsets
 
+  // finally clean up the net from the nodes which we remembered for removal
   // remove the old interface output places
   for (set<Place*>::iterator p = places_to_remove.begin(); p != places_to_remove.end(); p++) {
       PN->removePlace(*p);

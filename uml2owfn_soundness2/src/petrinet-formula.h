@@ -1,9 +1,19 @@
 /*****************************************************************************\
-  Petri net formulas
-  
-  Copyright (C) 2008  Dirk Fahland
-  
-  license: to be determined 
+  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
+  Copyright (C) 2008  Dirk Fahland <dirk.fahland@service-technolog.org>,
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 /*!
@@ -47,11 +57,11 @@ using std::list;
 using std::pair;
 using std::ostream;
 
-// ------------------ operators and connectives ------------------ 
+// ------------------ operators and connectives ------------------
 
 /*!
  * \brief enum-type for comparisons
- * 
+ *
  */
 typedef enum
 {
@@ -87,7 +97,7 @@ typedef enum
 	LOGQ_CTL_EXPATH_EVENTUALLY
 } logical_quantifier;
 
-// ------------------------- formula ------------------------- 
+// ------------------------- formula -------------------------
 
 /*!
  * \brief empty base-class for all formulae, helps as basic
@@ -98,13 +108,13 @@ class Formula {
 public:
 	/// negated formula
 	bool negated;
-	
+
 	/// basic constructor
 	Formula();
-	
+
     /// destructor
     virtual ~Formula();
-    
+
 private:
 	/// create an output string in LoLA format
 	const string output_lola() const;
@@ -118,7 +128,7 @@ private:
 class PetriNetLiteral: public Formula
 {
 	friend class FormulaState;
-	
+
 public:
 	/// the place of the literal
 	 Place* p;
@@ -126,16 +136,16 @@ public:
 	comparison_relation rel;
 	/// the value to compare against
 	int val;
-	
+
 	/// create an output string
 	const string toString() const;
 
 	/// create a new Petri net place literal
 	PetriNetLiteral(Place *aPlace, comparison_relation aRel, int aVal);
-	
+
     /// destructor
     virtual ~PetriNetLiteral();
-    
+
 private:
 	/// create an output string in LoLA format
 	const string output_lola() const;
@@ -167,7 +177,7 @@ public:
 	void set_connective (logical_connective aConn);
 	/// set the quantifier of this formula
 	void set_quantifier (logical_quantifier aQuant);
-	
+
 	/// set the output format for this formula object
 	void set_format (formula_output_format aFormat);
 
@@ -176,7 +186,7 @@ public:
 
   /// outputs the formula
   friend ostream& operator<< (ostream& os, const FormulaState &obj);
-  
+
   /// constructor for formula with boolean connectives
   FormulaState(logical_connective aConn);
   /// constructor for quantified formula
@@ -184,16 +194,16 @@ public:
 
   /// destructor
   virtual ~FormulaState();
-    
+
 private:
 	/// their common logical connective
 	logical_connective op;
 	/// their common logical quantifier
 	logical_quantifier quant;
-	
+
 	/// output format for this formula
 	formula_output_format format;
-	
+
   /// output LoLA formula
   void output_lola_complete(ostream *output) const;
   /// output LoLA formula without preceding header

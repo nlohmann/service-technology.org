@@ -1003,10 +1003,13 @@ void PetriNet::removeArc(Arc *f)
  *             t1 and t2
  *          -# the presets and postsets of t1 and t2 are calculated and united
  *          -# t12 is connected with all the places in the preset and postset
+ *             if addweights is true, weights of merged arcs will be added,
+ *             otherwise the weight of the arc connected with t1 will be taken
  *          -# the transitions t1 and t2 are removed
  *
  * \param   t1  first transition
  * \param   t2  second transition
+ * \param   addWeights  determines wether weights of merged arcs should be added
  *
  * \pre     t1 != NULL
  * \pre     t2 != NULL
@@ -1014,9 +1017,12 @@ void PetriNet::removeArc(Arc *f)
  * \post    Transition t12 having the incoming and outgoing arcs of t1 and t2
  *          and the union of the histories of t1 and t2.
  *
+ * \todo    overwork the weight setting part according to the appropriate one
+ *          of PetriNet::mergePlaces()
+ * 
  * \test	This method has been tested in tests/test_mergeTransitions.cc.
  */
-void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
+void PetriNet::mergeTransitions(Transition *t1, Transition *t2, bool addWeights)
 {
   if (t1 == t2)
     return;
@@ -1121,6 +1127,9 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
     // if such an arc was found, save its weight, delete it and add its weight to the arc from t12 to postset of t2
     if (sametarget)
     {
+      if(!addWeights)
+          continue;
+      
       int weightsave = arc_weight(t12,(*n));
       removeArc(*delArc);
       newArc(t12, (*n), STANDARD, (arc_weight(t2,(*n)) + weightsave));
@@ -1257,10 +1266,13 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
  *          -# this place gets the union of the histories of place p1 and p2
  *          -# the presets and postsets of p1 and p2 are calculated and united
  *          -# p12 is connected with all the transitions in the preset and postset
+ *             if addWeights is true, weights of merged arcs will be added,
+ *             otherwise the weight of the arc connected with p1 will be chosen
  *          -# the places p1 and p2 are removed
  *
  * \param   p1  first place
  * \param   p2  second place
+ * \param   addWeights  determines wether weights of merged arcs should be added
  *
  * \pre     p1 != NULL
  * \pre     p2 != NULL
@@ -1272,7 +1284,7 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
  * \test	All methods mergePlaces() has been tested as they are concluding
  * 			to this one method. Test can be found in tests/test_mergePlaces.cc.
  */
-void PetriNet::mergePlaces(Place * & p1, Place * & p2)
+void PetriNet::mergePlaces(Place * & p1, Place * & p2, bool addWeights)
 {
   if (p1 == p2 && p1 != NULL)
     return;
@@ -1378,7 +1390,10 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
     newArc((*n), p12, STANDARD, arc_weight((*n),p2));
 
   for (set<Node *>::iterator n = preset1and2.begin(); n != preset1and2.end(); n++)
-    newArc((*n), p12, STANDARD, arc_weight((*n),p1) + arc_weight((*n),p2));
+      if(addWeights)
+          newArc((*n), p12, STANDARD, arc_weight((*n),p1) + arc_weight((*n),p2));
+      else
+          newArc((*n), p12, STANDARD, arc_weight((*n),p1));
 
   for (set<Node *>::iterator n = postset1without2.begin(); n != postset1without2.end(); n++)
     newArc(p12, (*n), STANDARD, arc_weight(p1,(*n)));
@@ -1387,7 +1402,10 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
     newArc(p12, (*n), STANDARD, arc_weight(p2,(*n)));
 
   for (set<Node *>::iterator n = postset1and2.begin(); n != postset1and2.end(); n++)
-    newArc(p12, (*n), STANDARD, arc_weight(p1,(*n)) + arc_weight(p2,(*n)));
+      if(addWeights)
+          newArc(p12, (*n), STANDARD, arc_weight(p1,(*n)) + arc_weight(p2,(*n)));
+      else
+          newArc(p12, (*n), STANDARD, arc_weight(p1,(*n)));
 
   removePlace(p1);
   removePlace(p2);
@@ -1405,8 +1423,9 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
  *
  * \param   role1  string describing the role of the first place
  * \param   role2  string describing the role of the second place
+ * \param   addWeights  determines wether weights of merged arcs shoul be added
  */
-void PetriNet::mergePlaces(string role1, string role2)
+void PetriNet::mergePlaces(string role1, string role2, bool addWeights)
 {
   Place * p1 = findPlace(role1);
   Place * p2 = findPlace(role2);
@@ -1417,27 +1436,27 @@ void PetriNet::mergePlaces(string role1, string role2)
   if ( p2 == NULL )
     std::cerr << "p2 has role '" << role2 << "'" << std::endl;
 
-  mergePlaces( p1, p2 );
+  mergePlaces( p1, p2, addWeights );
 }
 
-void PetriNet::mergePlaces(Place * & p1, string role2)
+void PetriNet::mergePlaces(Place * & p1, string role2, bool addWeights)
 {
   Place * p2 = findPlace(role2);
 
   if ( p2 == NULL )
     std::cerr << "p2 has role '" << role2 << "'" << std::endl;
 
-  mergePlaces( p1, p2 );
+  mergePlaces( p1, p2 , addWeights);
 }
 
-void PetriNet::mergePlaces(string role1, Place * & p2)
+void PetriNet::mergePlaces(string role1, Place * & p2, bool addWeights)
 {
   Place * p1 = findPlace(role1);
 
   if ( p1 == NULL )
     std::cerr << "p1 has role '" << role1 << "'" << std::endl;
 
-  mergePlaces( p1, p2 );
+  mergePlaces( p1, p2, addWeights );
 }
 
 
@@ -1457,12 +1476,13 @@ void PetriNet::mergePlaces(string role1, Place * & p2)
  * \param   id2    identifier of the BPEL activity represented by the second place
  * \param   role2  string describing the role of the second place (beginning
  *                 with a period, e.g. ".initial")
+ * \param   addWeights  determines wether weights of merged arcs should be added
  *
  * \note	This method is used by BPEL2oWFN only.
  */
-void PetriNet::mergePlaces(unsigned int id1, string role1, unsigned int id2, string role2)
+void PetriNet::mergePlaces(unsigned int id1, string role1, unsigned int id2, string role2, bool addWeights)
 {
-  mergePlaces(toString(id1) + role1, toString(id2) + role2);
+  mergePlaces(toString(id1) + role1, toString(id2) + role2, addWeights);
 }
 
 
@@ -2774,6 +2794,7 @@ void PetriNet::makeInnerStructure()
  * \return  true if the criteria are fulfilled and false if not
  *
  * \todo    Write test cases.
+ * \todo    Rewrite the method (Stephan works on it)
  */
 bool PetriNet::isSane() const
 {
@@ -2794,12 +2815,25 @@ bool PetriNet::isSane() const
     }
 
   // checking condition (2)
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    if ((*p)->isFinal && !((*p)->postset).empty())
+  set<Place *> final_places = getFinalPlaces();
+  set<Node *> finals;
+  for (set<Place *>::iterator p = final_places.begin(); p != final_places.end(); p++)
+    finals.insert(static_cast<Node *>(*p));
+  for (set<Node *>::iterator p = finals.begin(); p != finals.end(); p++)
+  {
+    for (set<Node *>::iterator t = (*p)->postset.begin(); t != (*p)->postset.end(); t++)
     {
-      std::cerr << "Warning: The place \"" << (*p)->nodeFullName() << "\" marked final activates at least one transition!\n";
-      retVal = false;
+      if (setUnion(finals, (*t)->preset) == finals)
+      {
+        for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+          if ((*f)->source == (*p) && (*f)->target == (*t) && (*f)->weight == 1)
+          {
+            // until I've found a good representation for final markings there's no output
+            retVal = false;
+          }
+      }
     }
+  }
 
   return retVal;
 }
@@ -2850,26 +2884,6 @@ bool PetriNet::isFreeChoice() const
         return false;
     }
   return true;
-}
-
-
-
-
-
-/*!
- * \brief   intersects two Node sets
- */
-set<Node *> PetriNet::setIntersection(std::set<Node *> s1, std::set<Node *> s2) const
-{
-  set<Node *> result;
-  if (s1.empty() || s2.empty())
-    return result;
-
-  for (set<Node *>::iterator e = s1.begin(); e != s1.end(); e++)
-    if (s2.count(*e) > 0)
-      result.insert(*e);
-
-  return result;
 }
 
 

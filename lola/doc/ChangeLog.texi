@@ -1,0 +1,80 @@
+@heading Version 1.03 (unreleased)
+@itemize
+
+@item fixed bug #12302 (@url{https://gna.org/bugs/?12302}): LoLA: Uneinheitliche bzw. falsche Rückgabewerte bei @code{MODELCHECKING}, LoLA now returns the result via the @samp{_exit} command
+
+@item added directory @file{patches} collecting some unpublished adjustments
+
+@item fixed bug #12063 (@url{https://gna.org/bugs/?12063}): @code{LIVEPROP} now works without crashing
+
+@item added a test case @samp{umlprocess} to avoid regression of bug #12063 (@url{https://gna.org/bugs/?12063})
+
+@item out-commented @samp{TWOPHASE} in @file{userconfig.H} for liveprop test
+
+@item fixed bug #12061 (@url{https://gna.org/bugs/?12061}): @code{BOUNDEDNET} now works without crashing
+
+@item added a test case @samp{unbounded} to avoid regression of bug #12061 (@url{https://gna.org/bugs/?12061})
+
+@item updated the documentation -- integrated first parts of @url{http://wwwteo.informatik.uni-rostock.de/ls_tpp/lola/}
+
+@item the files @file{ChangeLog} and @file{NEWS} are now generated from the file @file{doc/ChangeLog.texi} as it is done in Rachel or BPEL2oWFN
+
+@item renamed Makefile target @samp{cvs-clean} to @samp{svn-clean}
+
+@item tidied the configure script and removed unnecessary checks
+
+@item set bug reporting address to @email{lola@@service-technology.org}
+
+@item added command line parameters for the @file{configure} script:
+@itemize
+@item @samp{--disable-assert} to disable assertions (enabled by default)
+@item @samp{--enable-64bit} to build for a 64 bit architecture such as x86_64 or ppc64 (disabled by default)
+@item @samp{--enable-universal} to build a Mac Universal binary which is executable on Intel and Power PC platforms (disabled by default)
+@item @samp{--enable-win32} to build a Windows binary that is independent of a local Cygwin installation (disabled by default)
+@end itemize
+@end itemize
+
+
+@heading Version 1.02
+@itemize
+@item fixed bug #12089 @url{https://gna.org/bugs/?12089}
+
+@item added Makefile target @samp{win-bin} that produces a Cygwin independent binary when compiling under Cygwin, helps to avoid bug #12071 @url{http://gna.org/bugs/?12071}
+
+@item added a testcase @samp{choreography} from a BPEL4Chor choreography using symmetries (see file @file{tests/nets/choreography.tar.gz} on how to create this file with BPEL2oWFN)
+
+@item fixed bug #12097 @url{https://gna.org/bugs/?12097}
+
+@item fixed bug #12109 @url{https://gna.org/bugs/?12109}
+@end itemize
+
+
+@heading Version 1.01
+@itemize
+@item fixed bug #12062 @url{http://gna.org/bugs/?12062}
+
+@item added Makefile target @samp{cvs-clean} that removes all files that can be rebuilt by @samp{autoreconf -iv}
+
+@item the information gathered by the configure script is now collected in a header file @file{src/config.H}
+
+@item tidied Makefiles
+
+@item added a testsuite (invoked by Makefile target @option{check}) consisting of:
+@itemize
+  @item the Dining Philosophers
+  @item the Echo Algorithm (currently not used)
+  @item a business process translated from a UML specification
+  @item an AI planning problem
+@end itemize
+
+@item added the documentation from @url{http://www.informatik.hu-berlin.de/~kschmidt/doku.ps}
+
+@item added a (undocumented) command line parameter @option{--bug} for debug purposes
+@end itemize
+
+
+@heading Version 1.00
+@itemize
+@item code of a version of Karsten Wolf that has not been officially released; this version is not a completely tested version and is only intended for internal purposes
+@item minor adjustments (only affecting the frontend) to use the GNU Autotools
+@end itemize

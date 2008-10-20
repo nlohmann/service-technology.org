@@ -1,26 +1,6 @@
 bin_PROGRAMS = lola
 
 
-#lola_YFLAGS = --verbose
-
-
-#######################
-# issues to be solved #
-#######################
-
-# 1. The original Makefile set the following flags:
-#
-# lola_CXXFLAGS = -I bdd/bddlib -I bdd/mem -I dist -I comm -I storage $(CONFIG)
-#
-# As those directories are not present, they currently make no sense.
-#
-#
-# 2. The following source files were in the original contribution, but not
-#    listed in the Makefile:
-#    - structure.cc
-#    - test.cc
-
-
 #######################
 # the list of sources #
 #######################

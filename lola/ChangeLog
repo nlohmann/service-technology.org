@@ -1,39 +1,110 @@
+                           _          _        _    
+                          | |    ___ | |      / \   
+                          | |   / _ \| |     / _ \  
+                          | |__| (_) | |___ / ___ \ 
+                          |_____\___/|_____/_/   \_\
+                     http://service-technology.org/lola
+
+
 Version 1.03 (unreleased)
 =========================
-+ fixed bug #12302: LoLA: Uneinheitliche bzw. falsche Rückgabewerte bei MODELCHECKING <https://gna.org/bugs/?12302>, LoLA now returns the result via the _exit command
-+ added directory "patches" collecting some unpublished adjustments
-+ fixed bug #12063 (https://gna.org/bugs/?12063): LIVEPROP now works without crashing
-+ added a test case "umlprocess" to avoid regression of bug #12063 (https://gna.org/bugs/?12063)
-+ out commented "TWOPHASE" in userconfig.H for liveprop test
-+ fixed bug #12061 (https://gna.org/bugs/?12061): BOUNDEDNET now works without crashing
-+ added a test case "unbounded" to avoid regression of bug #12061 (https://gna.org/bugs/?12061)
 
+* fixed bug #12302 (`https://gna.org/bugs/?12302'): LoLA: Uneinheitliche bzw.
+  falsche RÃ¼ckgabewerte bei `MODELCHECKING', LoLA now returns the result via
+  the `_exit' command
+
+* added directory `patches' collecting some unpublished adjustments
+
+* fixed bug #12063 (`https://gna.org/bugs/?12063'): `LIVEPROP' now works
+  without crashing
+
+* added a test case `umlprocess' to avoid regression of bug #12063
+  (`https://gna.org/bugs/?12063')
+
+* out-commented `TWOPHASE' in `userconfig.H' for liveprop test
+
+* fixed bug #12061 (`https://gna.org/bugs/?12061'): `BOUNDEDNET' now works
+  without crashing
+
+* added a test case `unbounded' to avoid regression of bug #12061
+  (`https://gna.org/bugs/?12061')
+
+* updated the documentation - integrated first parts of
+  `http://wwwteo.informatik.uni-rostock.de/ls_tpp/lola/'
+
+* the files `ChangeLog' and `NEWS' are now generated from the file
+  `doc/ChangeLog.texi' as it is done in Rachel or BPEL2oWFN
+
+* renamed Makefile target `cvs-clean' to `svn-clean'
+
+* tidied the configure script and removed unnecessary checks
+
+* set bug reporting address to <lola@service-technology.org>
+
+* added command line parameters for the `configure' script:
+     * `--disable-assert' to disable assertions (enabled by default)
+
+     * `--enable-64bit' to build for a 64 bit architecture such as x86_64 or
+       ppc64 (disabled by default)
+
+     * `--enable-universal' to build a Mac Universal binary which is
+       executable on Intel and Power PC platforms (disabled by default)
+
+     * `--enable-win32' to build a Windows binary that is independent of a
+       local Cygwin installation (disabled by default)
 
 Version 1.02
 ============
-+ fixed bug #12089 <https://gna.org/bugs/?12089>
-+ added Makefile target "win-bin" that produces a Cygwin independent binary when compiling under Cygwin, helps to avoid bug #12071 <http://gna.org/bugs/?12071>
-+ added a testcase "choreography" from a BPEL4Chor choreography using symmetries (see file "tests/nets/choreography.tar.gz" on how to create this file with BPEL2oWFN)
-+ fixed bug #12097 <https://gna.org/bugs/?12097>
-+ fixed bug #12109 <https://gna.org/bugs/?12109>
 
+* fixed bug #12089 `https://gna.org/bugs/?12089'
+
+* added Makefile target `win-bin' that produces a Cygwin independent binary
+  when compiling under Cygwin, helps to avoid bug #12071
+  `http://gna.org/bugs/?12071'
+
+* added a testcase `choreography' from a BPEL4Chor choreography using
+  symmetries (see file `tests/nets/choreography.tar.gz' on how to create this
+  file with BPEL2oWFN)
+
+* fixed bug #12097 `https://gna.org/bugs/?12097'
+
+* fixed bug #12109 `https://gna.org/bugs/?12109'
 
 Version 1.01
 ============
-+ fixed bug #12062 <http://gna.org/bugs/?12062>
-+ added Makefile target "cvs-clean" that removes all files that can be rebuilt by "autoreconf -iv"
-+ the information gathered by the configure script is now collected in a header file "src/config.H"
-+ tidied Makefiles
-+ added a testsuite (invoked by Makefile target "check") consisting of
-  + the Dining Philosophers
-  + the Echo Algorithm (currently not used)
-  + a business process translated from a UML specification
-  + an AI planning problem
-+ added the documentation from <http://www.informatik.hu-berlin.de/~kschmidt/doku.ps>
-+ added a (undocumented) command line parameter "--bug" for debug purposes
 
+* fixed bug #12062 `http://gna.org/bugs/?12062'
+
+* added Makefile target `cvs-clean' that removes all files that can be
+  rebuilt by `autoreconf -iv'
+
+* the information gathered by the configure script is now collected in a
+  header file `src/config.H'
+
+* tidied Makefiles
+
+* added a testsuite (invoked by Makefile target `check') consisting of:
+     * the Dining Philosophers
+
+     * the Echo Algorithm (currently not used)
+
+     * a business process translated from a UML specification
+
+     * an AI planning problem
+
+* added the documentation from
+  `http://www.informatik.hu-berlin.de/~kschmidt/doku.ps'
+
+* added a (undocumented) command line parameter `--bug' for debug purposes
 
 Version 1.00
 ============
-+ code of a version of Karsten Wolf that has not been officially released; this version is not a completely tested version and is only intended for internal purposes
-+ minor adjustments (only affecting the frontend) to use the GNU Autotools
+
+* code of a version of Karsten Wolf that has not been officially released;
+  this version is not a completely tested version and is only intended for
+  internal purposes
+
+* minor adjustments (only affecting the frontend) to use the GNU Autotools
+
+
+

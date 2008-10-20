@@ -1,0 +1,584 @@
+\input texinfo
+@setfilename lola.info
+@include version.texi
+@afourpaper
+@finalout
+@settitle LoLA User's Manual
+
+@c --------------------------------------------------------------------------
+
+@copying
+
+@b{About this document:}
+
+This manual is for LoLA -- A Low Level Petri Net Analyser, last updated @value{UPDATED}.
+
+Copyright @copyright{} 2008 Karsten Wolf
+
+@end copying
+
+@dircategory service-technology.org
+@direntry
+* lola: (lola).       LoLA.
+@end direntry
+
+
+@c --------------------------------------------------------------------------
+
+@titlepage
+
+@title LoLA
+
+@subtitle A Low Level Petri Net Analyser
+@c @subtitle @url{http://service-technology.org/lola}
+@c @vskip 0.5em
+@c @subtitle Version @value{VERSION}, @value{UPDATED}
+
+@author Karsten Wolf
+@page
+
+
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c --------------------------------------------------------------------------
+
+@ifnottex
+@node Top
+@top LoLA
+@insertcopying
+@end ifnottex
+
+@c --------------------------------------------------------------------------
+
+@menu
+* About LoLA::About LoLA
+* Documentation:: Documentation
+* Download::  Download
+* First Steps:: First Steps
+* ChangeLog::Version history.
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@contents
+@paragraphindent none
+
+@c --------------------------------------------------------------------------
+
+@node About LoLA
+@chapter About LoLA
+
+
+@section Abstract
+
+LoLA (a Low Level Petri Net Analyzer) has been implemented for the validation of reduction techniques for place/transition net state spaces. Its particular strengths include
+
+@itemize
+@item A large number of available state space reduction techniques many of which may be applied jointly;
+@item A high degree of automation for various state space reduction techniques
+@item Availability of dedicated variations of state space reduction techniques for several frequently used properties
+@item efficient implementation exploiting the particular nature of Petri net models
+@item simple textual interaction for easy integration into other tools
+@end itemize
+
+LoLA has been tested on several UNIX platforms (Solaris, SUN-OS, LINUX) as well as under WINDOWS using the CYGWIN environment.
+
+
+@section Selected Case Studies
+
+The following list gives a short summary of some case studies involving the use of LoLA.
+
+@subsection Verification of a GALS wrapper 
+
+A GALS circuit is a complex integrated circuit where several components operate locally synchronously but exchange information asynchronously. GALS technology promises lower energy consumption and higher clock frequency. 
+
+In a joint project, researchers at Humboldt-Universität zu Berlin and the Semiconductor Research Institute in Frankfurt/Oder analysed a GALS circuit that implements a device for coding/decoding signals of wireless LAN connections according to the 802.11 protocol. They were particularly concerned with parts of the circuit they called wrapper. A wrapper is attached to each synchronous component of a GALS circuit. It is responsible for managing the asynchronously incoming data, pausing the local clock in case of no pending data, and shipping the outgoing signals to the respective next component. They modeled a wrapper as a place-transition net and analysed the occurrence of hazard situations. A hazard is a situation where, according to two incoming signals within a very short time interval, output signals may assume undefined values. In the model, a hazard situation corresponds to a particular reachable state predicate. LoLA was used with stubborn sets and the sweep-line method as reduction techniques. Analysis revealed 8 hazard situations in the model. 6 of them were ruled out by the engineers due to timing constraints which were not modeled. The remaining 2 hazards were confirmed as real problems. The circuit was redesigned and another verification confirmed the absence of hazard situations.
+
+More information: Milos Krstic, Eckhard Grass, and Christian Stahl. Request-Driven GALS Technique for Wireless Communication System. In Proceedings of the 11th International Symposium on Advanced Research in Asynchronous Circuits and Systems (ASYNC 2005), New York, NY, USA, pages 76-85, March 2005. IEEE Computer Society.
+
+
+@subsection Validation of a Petri Net Semantics for WS-BPEL
+
+The language WS-BPEL has been proposed by an industrial consortium for the specification of web services. Researchers at Humboldt-Universität zu Berlin proposed a formal semantics for WS-BPEL on the basis of high-level Petri nets (with a straightforward place-transition net abstraction that ignores data dependencies). Due to tricky concepts in the language, the translation of WS-BPEL to Petri nets required a validation. The validation was carried out through an automated translation of WS-BPEL into Petri nets and a subsequent analysis of the resulting Petri nets using LoLA. LoLA was used with stubborn sets and the sweep-line method as most frequently used reduction techniques.
+
+More information: Sebastian Hinz, Karsten Schmidt, and Christian Stahl. Transforming BPEL to Petri Nets. In Wil M. P. van der Aalst, B. Benatallah, F. Casati, and F. Curbera, editors, Proceedings of the Third International Conference on Business Process Management (BPM 2005), volume 3649 of Lecture Notes in Computer Science, Nancy, France, pages 220-235, September 2005.
+
+
+@subsection Verification of WS-BPEL choreographies 
+
+The language WS-BPEL has been proposed by an industrial consortium for the specification of web services. Researchers at Humboldt-Universität zu Berlin developed a tool for translating WS-BPEL processes and choreographies into place-transition nets. LoLA has been used for checking several properties on the choreographies. They used stubborn sets and the symmetry method. The latter method turned out to be useful in those cases where choreographies involved a large number of instances of one and the same process. This way, choreographies with more than 1000 service instances could be verified.
+
+
+@subsection Garavel's challenge in the Petri Net Mailing List 
+
+In 2003, H. Garavel posted a place/transition net to the Petri net mailing list. It consisted of 485 places and 776 transitions. He was interested in quasi-liveness, i.e. the absence of any transition that is dead in the initial marking. According to the posting, the example stems from the translation of a LOTOS specification into Petri nets. There were four responses reporting successful verification. One of them involved LoLA. With LoLA, we checked each transition separately for non-death. We succeeded for all but two transitions. For the remaining transitions, goal-oriented execution confirmed non-death. According to the other responses which involved either symbolic (BDD based) verification or the use of the covering step graph technique, the full state space consisted of almost 10^22 states.
+
+More information:    The original posting 
+   The summary of responses
+
+
+@subsection Exploration of biochemical networks 
+
+A biochemical network reflects substances and known reactions for their mutual transformation. Researchers at SRI use LoLA in the exploration of Petri net models of such networks. They use the capability of LoLA to produce witness paths which are interpreted as reaction sequences.
+
+
+@section Integration
+
+LoLA has been integrated into various other tools.
+
+   The Petri Net Kernel 
+   The Model Checking Kit 
+   CPN-AMI
+
+
+@c --------------------------------------------------------------------------
+
+@node Documentation
+@chapter Documentation
+
+@section Net File Format
+
+In LoLA, the Petri net to be analysed needs to be provided in textual representation. LoLA supports place-transition nets and high-level nets in the shape of an interpreted algebraic Petri net. A place-transition net description starts with the keyword NET, followed by the specification of
+
+@itemize
+@item places
+@item the initial marking
+@item transitions and arcs
+@end itemize
+
+A high level net description starts with the keyword SPECIFICATION, followed by the definition of
+
+@itemize
+@item sorts (data domains)
+@item operations 
+@end itemize
+
+The defined symbols can be used in the actual net description which is subsequently provided using the keyword NET, followed by the specification of
+
+@itemize
+@item places
+@item the initial marking
+@item transitions and arcs
+@end itemize
+
+
+@c --------------------------------------------------------------------------
+@subsection File Format for Place/Transition Nets: Places
+
+In LoLA, every place is represented as a unique name. The name can be an identifier according to the general rules for building    identifiers or a    number . The set of places is specified by the keyword @samp{PLACE}, followed by a list of sections. Each section starts with a capacity specification and is followed by a comma-separated list of the places names, finished by a @samp{;}. The capacity statement may by empty or consist of the keyword @samp{SAFE}, optionally followed by a number. Using @samp{SAFE} without number is equivalent to the specification @samp{SAFE 1}. If the file @file{userconfig.H} contains the directive @samp{#CAPACITY k}, an empty capacity specification is equivalent to the specification @samp{SAFE k}. Otherwise, an empty specification represents an unbounded capacity (which is internally approximated by a capacity of @math{2^{32}}). A capacity statement specifies the maximum number of tokens expected on the places which are specified subsequently. LoLA uses the capacity statement only for a compact representation of markings. The firing rule is not effected by the capacity specification. Optionally, the validity of the capacity specifications can be checked during state space generation. For this purpose, the directive @samp{CHECKCAPACITY} must be active in the file @file{userconfig.H}.
+
+@b{Example:}
+@cartouche
+@code{PLACE SAFE p1, 17, helloworld, p[]....8[[[; 
+p2 , p3 ; SAFE 7 : p4 , p5;}
+
+specifies 8 places. Places p1, 17, hellworld, p[]....8[[[ are expected to never contain more than 1 token. Places p2, p3 have either unknown bound (without @samp{#CAPACITY} in @file{userconfig.H}), or the bound specified in @file{userconfig.H}. Places p4 and p5 are expected to contain at most 7 tokens.
+@end cartouche
+
+
+@c --------------------------------------------------------------------------
+@subsection File Format for Place/Transition Nets: Initial Marking
+
+The initial marking of the net is specified in a separate section starting with the keyword @samp{MARKING} and finished by a @samp{;}. In between, there is a comma-separated list. Each list item consists of a   place name , a @samp{:}, and a   number . The number specifies the number of tokens initially being on the mentioned place. Places which are not mentioned get 0 tokens initially. For places mentioned more than once, the specified token counts are summed up. 
+
+@b{Example:}
+@cartouche
+@code{MARKING p1 : 13, p2 : 3 , p1 : 4 ;}
+
+assigns 16 tokens to place p1, 3 tokens to place p2, and 0 tokens to any other place in the net.
+@end cartouche
+
+
+@c --------------------------------------------------------------------------
+@subsection File Format for Place/Transition Nets: Transitions and Arcs
+
+In LoLA, there is, for each transition, a distinguished section for defining that transition and all connecting arcs. The section starts with the keyword "TRANSITION" followed by the name of the transition. This name may be built general rules for building    identifiers or a    number . 
+
+Then, optionally, a fairness assumption "WEAK FAIR" or "STRONG FAIR" may be specified. The assumptions are effective only for the verification of a few properties. A transition is treated weakly unfair in an infinite transition sequence iff it is, from some point in the sequence, permanently enabled but never fired. It is treated strongly unfair iff it is infinitely often enabled but only finitely often fired. 
+
+After that, the list of incoming arcs is specified. This part starts with the keyword "CONSUME" and ends with a ";" Between these symbols, there is a comma-separated list of arc specifications. Each arc specification consists of a    place name , a ":", and a   number . It represents an arc from the mentioned place to the currently spefified transition. The number represents the multiplicity of the arc. 
+
+Finally, the list of outgoing arcs is specified. This part starts with the keyword "PRODUCE" and ends with a ";" Between these symbols, there is a comma-separated list of arc specifications. Each arc specification consists of a    place name , a ":", and a   number . It represents an arc from the currently spefified transition to the mentioned place. The number represents the multiplicity of the arc. 
+
+@b{Example:}
+@cartouche
+@example
+TRANSITION t1 WEAK FAIR
+CONSUME p1 : 2 , p2 : 4 ;
+PRODUCE p1 : 2 , p3 : 2 ;
+@end example
+
+is a transition which is to be treated weakly fair for some properties. It tests p1 for the presence of 2 tokens, removes 4 tokens from p2, and puts 2 tokens onto p3.
+
+@example
+TRANSITION t2
+CONSUME p1 : 1 ;
+PRODUCE ;
+@end example
+
+may be treated unfair. It removes a token from p1 and does not put tokens anywhere.
+@end cartouche
+
+
+@c --------------------------------------------------------------------------
+@subsection File Format for High Level Nets: Sorts
+
+Sorts represents domains for tokens on places. A sort name can be buit according to the general rules for building    identifiers . The set of sorts is specified by the keyword "SORTS", followed by a list of sort definitions. Each definition consists of a sort name, a ":", and a sort description which ends with a ";". The following descriptions are available:
+
+@itemize
+@item the description "BOOLEAN" with values "TRUE" and "FALSE"; Example: s1 = BOOLEAN ;
+
+@item an interval of natural numbers, specified as a comma-separated pair of    numbers , enclosed in brackets "[" and "]". The description represents all values which are natrual numbers greater or equal to the left number, and less or equal to the right number Example: s3 = [ 3 , 7 ] ;.
+
+@item the keyword "ENUMERATE", followed by a comma-separated list of identifiers and the keyword "END". Each identifier represents a distinguished value. Example: s4 = ENUMERATE blue , white , red END ;
+
+@item the keyword "ARRAY" followed by a scalar sort decription, the keyword "OF", and another arbitrary sort description. The description represents arrays (vectors) where the first sort description represents the set of indices while the second sort description represents the values of components. Any of the sort descriptions mentioned in the first four items of this list are scalar wihle the remaining two are not. Example: s5 = ARRAY s2 OF [ 1 , 3 ].
+
+@item The keyword "RECORD" followed by a list of component definitions, finished by the keyword "END". A component definition consists of an identifier, a ":", and a sort description. A record description represents cross products of values where each component represents one dinension of the cross product. Example: s6 = RECORD r1 : BOOLEAN; r2 : ARRAY [ 1 , 3 ] OF s2 END ;
+
+@item any previously specified sort name; represents the description of the mentioned sort; Example: s2 = s1 ;
+@end itemize
+
+LoLA considers a canonical ordering on each set of values that can be described by a sort description. The ordering is defined as follows:
+@itemize
+@item for BOOLEAN: FALSE < TRUE;
+
+@item for intervals: the usual ordering on the natural numbers;
+
+@item for enumerations: ascending according to appearance in the description;
+for arrays: for the smallest index where both values differ, the corresponding component determines the order;
+
+@item for records: the values of the first differing components (in order of definition) determine the order.
+
+@item According to these rules, there are a unique least element, a unique largest element, and a canonical order of enumeration of all values of a sort description.
+@end itemize
+
+Every value of a sort description has a text representation.
+@itemize
+@item The text representations of the boolean constants are "TRUE" and "FALSE"; Example: TRUE
+
+@item The text representation of a number is the decimal ASCII representation of that number; Example: 42
+
+@item The text representation of an enumerated value is the ASCII representation of that value; Example: red
+
+@item The text representation of a value of an array is a "|"-separated list of the component values, in ascending order of their index, enclosed in brackets; Example: [1|5|7|3]
+
+@item The text representation of a value of a record is a "|"-separated list of the values of the record components (in the order of definition), enclosed in "<" and ">". Example: <1|TRUE|[1|2|5]|red>
+
+@item The text representation is used in the translation from a high-level net to a low-level net.
+@end itemize
+
+For sorts, several compatibility rules apply:
+@itemize
+@item Every sort is compatible to itself and renamings.
+
+@item All integer sorts are compatible to each other
+
+@item Two ARRAY types are compatible if their component sorts are compatible and their index sorts represent the same number of values
+
+@item Two record types are compatible if they have the same number of components, and the components have pairwise compatible sorts (in the order of specification of the components).
+@end itemize
+
+
+@c --------------------------------------------------------------------------
+@subsection File Format for High Level Nets: Operations
+
+Operations represent mappings between    sorts . The specification of an operation consists of an operation symbol which can later on be used in    terms , a typing which controls the construction of terms, and a meaning which is basically a side-effect free program. 
+
+The specification of an operation starts with the keyword "FUNCTION". It follows, enclosed in parenthesis, the specification of argument typing and, separated by a ":", the specification of a return type. The specification of argument type may be empty or a ";"-separated list. Each entry in the list is formed by a comma-separated list of    identifiers , followed by a ":" and a    sort description . The return type is a    sort description , . Each identifier represents an argument of the specified function. The order of arguments corresponds to the order of appearance of the respective identifiers. The identifiers for the arguments are used in the description of the meaning of the operation. 
+
+The specification of the meaning of an operation consists of a declaration part and a statement which is enclosed in the pair "BEGIN" and "END" of keywords. The declaration part consists of the keyword "VAR" and a ";"-separated list of declarations. Each declaration consists of a ","-separated list of    identifiers , a ":", and a sort description. Each declared variable represents a value which is, upon each execution of the subsequent statement, initialized with the least value of its    sort. 
+
+The meaning of an operation defines a mapping from the cross-product of domains which are represented by the argument sorts, to the of the data domain represented by the return type. A statement can have any of the following shapes where S1 and S2 are substatements, X is a declared variable or represents an argument, E, E1, E2, ... are   expressions, and $L$ is a    left value.
+
+@itemize
+@item EXIT - finish execution and return the multiset of values collected so far
+
+@item RETURN E - evaluate expression E and add the resulting value to the collection of values to be returned; continue execution!
+
+@item L = E - replace the value of L with the result of evaluating expression E
+
+@item S1 ; S2 - execute first statement S1 and then statement S2
+
+@item WHILE E DO S1 END - perform a loop that consists of evaluating expression E (of sort BOOLEAN) first, and then executing S1. Leave the loop as soon as E evaluates to FALSE
+
+@item REPEAT S1 UNTIL E END - perform a loop that consists of executing S1 first and then evaluating expression E (of sort BOOLEAN). Leave the loop as soon as E evaluates to TRUE
+
+@item FOR X := E1 TO E2 DO S1 END - execute S1 once for each value of scalar expression X between the value of expression E1 and the value of expression E2
+
+@item FOR ALL X DO S1 END - perform S1 for each value in the domain of the sort of X, in the canonical order of that domain
+
+@item IF E THEN S1 END - execute S1 if evaluation of E yields TRUE
+
+@item IF E THEN S1 ELSE S2 END - execute S1 if evaluation of E yields TRUE, otherwise execute S2
+
+@item SWITCH E CASE E1 : S1 CASE E2 : S2 ... ELSE S END - Evaluate expression E and execute the first statement Si where Ei has the same value as E. If no expresion matches, execute S. The part "ELSE S" is optional. If it is absent, nothing is executed in a situation where no case expression matches.
+@end itemize
+
+All used variables must be declared as arguments or in the declarations section. There are no variables or side-effects. Wherever variables, expressions, or left values occur, attached sorts must be compatible. When integer values (or arrays, records having integer components) are assigned, they are aligned to the target sort. That is, we add or subtract the size of the target interval iteratively until the resulting value fits in the target domain. 
+
+@b{Examples:}
+@cartouche
+@example
+FUNCTION allelements() : s 
+@{ returns all elements of domain s @} 
+VAR x : s ; 
+noprime : ARRAY [ 2 , 10000 ] OF BOOLEAN @{ initially all entries FALSE @} 
+BEGIN 
+  FOR ALL x DO 
+     RETURN x 
+   END 
+END
+@end example
+@end cartouche
+
+@cartouche
+@example
+FUNCTION allprimesuntil(n : [ 2 , 10000 ] ) : [2 , 10000] 
+@{ returns all prime numbers until n which is expected to be less or equal to 10000 @} 
+VAR x , y : [ 2 , 10000 ] ; 
+noprime : ARRAY [ 2 , 10000 ] OF BOOLEAN @{ initially all entries FALSE @} 
+BEGIN 
+  FOR x = 2 TO n DO 
+    IF NOT noprime[ x ] THEN 
+       RETURN x 
+       y = x 
+       WHILE x * y <= n DO 
+         y = y * x ; 
+         noprime [ y ] = TRUE 
+       END 
+     END 
+   END 
+END
+@end example
+@end cartouche
+
+@cartouche
+@example
+FUNCTION iscontained(x : s ; a : ARRAY i OF s ) : BOOLEAN 
+@{ returns TRUE iff x occurs in a @} 
+VAR y : i ; 
+BEGIN 
+  FOR ALL y DO 
+    IF a [ y ] = x THEN 
+       RETURN TRUE 
+       EXIT 
+     END 
+   END 
+   RETURN FALSE 
+END
+@end example
+@end cartouche
+
+
+@c --------------------------------------------------------------------------
+@subsection File Format for High-Level Nets: Places
+
+In LoLA, every place is represented as a unique name. The name can be an identifier according to the general rules for building    identifiers or a    number . The set of places is specified by the keyword "PLACE", followed by a list of sections. Each section starts with a capacity specification and is followed by a comma-separated list, finished by a ";". Each entra in the list consists of a place name, a ":", and a    sort name . The sort name specifies the data domain for tokens on the mentioned place. The capacity statement may by empty or consist of the keyword "SAFE", optionally followed by a number. Using "SAFE" without number is equivalent to the specification "SAFE 1". If the file userconfig.H contains the directive #CAPACITY k, an empty capacity specification is equivalent to the specification "SAFE k". Otherwise, an empty specification represents an unounded capacity (whih is internally approximated by a capacity of 2^32). A capacity statement specifies the maximum number of tokens of a particular value expected on the places which are speficied subsequently. LoLA uses the capacity statement only for a compact representation of markings. The firing rule is not effected by the capacity specification. Optionally, the validity of the capacity specifications can be checked during state space generation. For this purpose, the directive "CHECKCAPACITY" must be active in the file userconfig.H. The specification of HL-net places may be arbitrarily mixed with the specification of   place/transition net places . This option must, however, be used wit hcare as LoLA translates every HL net place into a set of place/transition net places. Every resulting place has a name that consists of the name of the HL Net place, a ".", and a    text representation of a value. LoLA does not avoid resulting name clashes with specified place/transition net nplace names. 
+
+@b{Example:}
+@cartouche
+PLACE SAFE p1 : phil, 17 : phil, helloworld, p[]....8[[[ : bla; 
+p2 : bla , p3 : bla; SAFE 7 : p4 : bla , p5; 
+
+specifies 8 high level places. Places p1, 17 contain tokens of sort (domain) phil, places helloworld and p5 are in fact low level places, i.e. they contain black tokens. The remaining places contain tokens of sort (domain) vla. Places p1, 17, hellworld, p[]....8[[[ are expected to never contain more than 1 token per value. Places p2, p3 have either unknown bound (without #CAPACITY in userconfig.H), or the bound specified in userconfig.H. Places p4 and p5 are expected to contain at most 7 tokens. 
+
+If sort bla is defined as bla = [ 1 , 3 ] ; then LoLA will internally consider places p2.1, p2.2, p2.3, p3.1 and so on.
+@end cartouche
+
+
+@c --------------------------------------------------------------------------
+@subsection File Format for High-Level Nets: Initial Marking
+
+The initial marking of the net is specified in a separate section starting with the keyword "MARKING" and finished by a ";". In between, there is a comma-separated list. Each list item consists either of a   low level place name , a ":", and a   number , or a    high level place name , a ":", and a   multiterm of the sort which is specified for the corresponding place. The number specifies the number of tokens initially being on the mentioned low level place. The multiterm represents the number of tokens of each value on a high level place. Places which are not mentioned get 0 tokens initially. For places mentioned more than once, the specified token counts are summed up. 
+
+@b{Example:}
+@cartouche
+MARKING p1 : allprimes(), p2 : 3 , p1 : succ(allprimes()) , p1.7 : 3; assigns as many tokens to place p1 as the sum of results of evaluating allprimes() and succ(allprimes()), with 3 additional tokens on the instance p1.7, and 3 tokens to place p2. All other places have no tokens in the initial marking.
+@end cartouche
+
+
+@c --------------------------------------------------------------------------
+@subsection File Format for High-Level Nets: Transitions and Arcs
+
+In LoLA, there is, for each transition, a distinguished section for defining that transition and all connecting arcs. The section starts with the keyword "TRANSITION" followed by the name of the transition. This name may be built general rules for building    identifiers or a    number . 
+
+Then, optionally, a fairness assumption "WEAK FAIR" or "STRONG FAIR" may be specified. The assumptions are effective only for the verification of a few properties. A transition is treated weakly unfair in an infinite transition sequence iff it is, from some point in the sequence, permanently enabled but never fired. It is treated strongly unfair iff it is infinitely often enabled but only finitely often fired. 
+
+The next part of a transition specification is a variable declaration in exactly the same shape as in the definition of    operations . Each assignment of values to these variables defines a firing mode of the transition. The set of firing modes can, optiionally, be further restricted through a guard. A guard is specified as a Boolean valued    expression , subsequent to the keyword "GUARD". After that, the list of incoming arcs is specified. This part starts with the keyword "CONSUME" and ends with a ";" Between these symbols, there is a comma-separated list of arc specifications. Each arc specification consists either of a    low level place name , a ":", and a   number , or a    high level place name , a ":", and a   multiterm of the same sort as the mentioned place. It represents an arc from the mentioned place to the currently spefified transition. The number represents the multiplicity of the arc. The multiterm may contain the variables which have been specified local to this transition. The multiterm represents an arc expression which maps a firing mode of the transition to a multiset of values to be consumed from the mentioned place. 
+
+Finally, the list of outgoing arcs is specified. This part starts with the keyword "PRODUCE" and ends with a ";" Between these symbols, there is a comma-separated list of arc specifications. Each arc specification consists either of a    low level place name , a ":", and a   number , or a    high level place name , a ":", and a   multiterm of the same sort as the mentioned place. It represents an arc from the currently spefified transition to the mentioned place. The number represents the multiplicity of the arc. The multiterm may contain the variables which have been specified local to this transition. The multiterm represents an arc expression which maps a firing mode of the transition to a multiset of values to be produced on the mentioned place. 
+
+Examples: TRANSITION t1 WEAK FAIR VAR x,y: bla; z : phil; GUARD x < y CONSUME p1 : allprimes():2 + succ(x):15, p2 : 4 , p3 : z; PRODUCE p1 : second(x) , p3 : y ; is a transition which is to be treated weakly fair for some properties. Fired in mode (x=2, y=3,z = hegel), it removes as many tokens from p1 as specified by allprimes():2 + succ(x), with succ(x) evaluated for x=2. It removes 4 tokens from low level place p2, and one token (of value hegel) from place p3. It produces the tokens as specified by the multiterm second(x), evaluated for x=2, on p1, and a single token of value 3 to place p3. 
+
+Internally, each high level transition is replaced by an equivalent set of low level transitions, one for each firing mode that satisfies the guard. The name of a ow level transition consists of the name of the corresponding high-level transition, a ".", and a description of the firing mode which is enclosed in brackets "[" and "]". The firing mode is described as a "|"-deparated list where an entry consists of a variable name, a "=", and a textual representation of a value, according to the rules explained    elsewhere . 
+
+Example: The low level transition of the firing mode used in the previous example could have the name t1.[y=3|x=2|z=hegel]. There are no fixed rules for the order in which the variables appear. 
+
+It is typical for high level nets that many firing modes of a high-level transition correspond to dead low level transitions. This way, the internal representation of a high level net can easily cause a memory overflow. For such a case, we recommend to rule out as many as possible dead firing modes through the use of (otherwise unneeded) transition guards. For a variable assignment that violates the guard, we do not generate a low level transition. 
+
+A high level net description may contain high level transition definitions as well as    low level transition definitions. In such a case, the user is responsible for avoiding name clashes between specified low level transitions and generated low level instances of high-level transitions.
+
+
+
+@c --------------------------------------------------------------------------
+@section Supported Properties
+
+Using LoLA, you can verify various properties, including properties of
+
+@itemize
+@item the whole net
+@item a marking
+@item a places
+@item a transitions
+@item a state predicate
+@item a CTL-formula
+@end itemize
+
+
+@section Reduction Techniques
+
+The list of reduction techniques in LoLA includes
+
+@itemize
+@item Symmetries
+@item Stubborn Sets
+@item Sweep Line Method
+@item Cycle coverage
+@item Coverability graph
+@item Attracted Execution
+@item Invariant based compression
+@end itemize
+
+Most techniques may be applied in combination. LoLA shall always use a version of a reduction technique that preserves the analysed property. In many cases, variations of a technique are used which are particularly optimised for the analysed property.
+
+
+@section Output
+
+LoLA is able to produce some valuable output.
+
+@itemize
+@item Verification result: return value
+@item Witness/counterexample path
+@item Witness/counterexample state
+@item The generated portion of the state space
+@item The low level version of a HL net
+@item The generating set of net automorphisms
+@item The generated progress measure
+@item Status information
+@end itemize
+
+
+
+@node Download
+@chapter Download
+
+The use of LoLA is free under the GNU public license which is part of the distribution below. 
+
+After downloading and unpacking LoLA, there will be a dirctory called lola containing a number of c++ source files. For running LoLA,
+
+@itemize
+@item edit the file userconfig.H. Most parts of this file concern properties to be verified or available reduction techniques. The effect of editing those parts of userconfig.H is explained in the respective section of the online documentation. The only remeining option is #HASHSIZE. Its value controls the size of the hash table for storing visited states. A larger value speeds up state space exploration a little bit at the price of requiring more memory for the table itself. For most users, the original value should be satisfactory.
+
+@item Create an executable file by calling the shell tool make. As a result, there will be an executable called lola.
+
+@item Call lola with a file containing the net description, a file containing information about the verified property (if applicable - refer to the documentation for details), and some command line options controlling the desired output information (also explained in the documentation).
+@item The configuration in which LoLA has been generated can be accessed calling lola with the command line option -h.
+@end itemize
+
+In a subdirectory of LoLA, you can find a number of example Petri net descriptions as well as examples for additional information about verification problems.
+
+
+
+
+@node First Steps
+@chapter First Steps
+
+@section Setup and Installation
+
+@enumerate
+@item Go to @url{http://service-technology.org/files/lola} and download the latest release version of LoLA, say @file{lola-@value{VERSION}.tar.gz}. To setup and compile LoLA, change into your download directory and type
+
+@cartouche
+@smallexample
+tar xfz lola-@value{VERSION}.tar.gz
+cd lola-@value{VERSION}
+./configure
+make
+@end smallexample
+@end cartouche
+
+After compilation, a binary @samp{src/lola} is generated.@footnote{On Microsoft Windows, the file will be called @file{lola.exe}.} If you experience any compiler warnings, don't panic: LoLA contains some generated or third party code that we cannot influence.
+
+@item To test whether everything went fine, type
+
+@cartouche
+@smallexample
+make check
+@end smallexample
+@end cartouche
+
+to execute the testcases located in @file{tests}. If everything went fine, you should see something like:
+
+@smallexample
+======================================================
+All 16 tests behaved as expected (5 expected failures)
+======================================================
+@end smallexample
+
+If an error occurs, please send the output to @email{lola@@service-technology.org}.
+
+@item To install the binary, the manpage, and the documentation, type
+
+@cartouche
+@smallexample
+make install
+@end smallexample
+@end cartouche
+
+You might need superuser permissions to do so.
+@end enumerate
+
+If you need any further information, see file @file{INSTALL} for detailed instructions.
+
+
+@section Contents of the Distribution
+
+The distribution contains several directories:
+
+@table @file
+@item doc
+The Texinfo documentation of LoLA and a @acronym{PDF} file @file{background.pdf} with a short description of the setting in which LoLA should be used. The documentation can be created using @samp{make pdf}. Note you need to have LoLA properly installed before (see Installation description above).
+
+@item src
+The source code of LoLA.
+
+@item tests
+Testcases for LoLA which check the generated binary.
+@end table
+
+
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node ChangeLog
+@chapter Version History
+
+LoLA is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+
+@include ChangeLog.texi
+
+@sp 3
+
+The most recent change log is available at LoLA's website at @url{http://service-technology.org/files/lola/ChangeLog}.
+
+
+
+@c --------------------------------------------------------------------------
+
+@bye

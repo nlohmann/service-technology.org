@@ -89,18 +89,22 @@ void removeisolated();
 unsigned int NonEmptyHash;
 int main(int argc, char ** argv){
 
-  //// 11 LINE ADDED BY NIELS (for debug purposes)
-  if (argc == 2 && std::string(argv[1]) == "--bug") {
-    printf("\n\n");
-    printf("Please email the following information to %s:\n", PACKAGE_BUGREPORT);
-    printf("- tool:              %s\n", PACKAGE_NAME);
-    printf("- version:           %s\n", PACKAGE_VERSION);
-    printf("- compilation date:  %s\n", __DATE__);
-    printf("- compiler version:  %s\n", __VERSION__);
-    printf("- platform:          %s\n", BUILDSYSTEM);
-    printf("\n\n");
-    return EXIT_SUCCESS;
-  }
+  //// 15 LINE ADDED BY NIELS (for debug purposes)
+    if (argc == 2 && std::string(argv[1]) == "--bug") {
+	    printf("\n\n");
+        printf("Please email the following information to %s:\n", PACKAGE_BUGREPORT);
+        printf("- tool:               %s\n", PACKAGE_NAME);
+        printf("- version:            %s\n", PACKAGE_VERSION);
+        printf("- compilation date:   %s\n", __DATE__);
+        printf("- compiler version:   %s\n", __VERSION__);
+        printf("- platform:           %s\n", BUILDSYSTEM);
+        printf("- config ASSERT:      %s\n", CONFIG_ENABLEASSERT);
+        printf("- config UNIVERSAL:   %s\n", CONFIG_ENABLEUNIVERSAL);
+        printf("- config ENABLE64BIT: %s\n", CONFIG_ENABLE64BIT);
+        printf("- config WIN32:       %s\n", CONFIG_ENABLEWIN32);
+        printf("\n\n");
+        exit(EXIT_SUCCESS);
+    }
 
   unsigned int i,h;
   Place * tmpPlace;

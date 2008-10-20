@@ -1,4 +1,9 @@
-BEGIN OF AUTHORS file for UML2oWFN Version 1.03
+          _   _  __  __  _      ____        __        __ _____  _   _ 
+         | | | ||  \/  || |    |___ \   ___ \ \      / /|  ___|| \ | |
+         | | | || |\/| || |      __) | / _ \ \ \ /\ / / | |_   |  \| |
+         | |_| || |  | || |___  / __/ | (_) | \ V  V /  |  _|  | |\  |
+          \___/ |_|  |_||_____||_____| \___/   \_/\_/   |_|    |_| \_|
+                 http://www.service-technology.org/uml2owfn/
 
 Authors and Acknowledgements
 ****************************
@@ -6,7 +11,7 @@ Authors and Acknowledgements
 Authors
 =======
 
-BPEL2oWFN was written by:
+UML2oWFN was written by:
    * Martin Znamirowski, Humboldt-Universit"at zu Berlin
    
    * Dirk Fahland, Humboldt-Universit"at zu Berlin

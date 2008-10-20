@@ -6,8 +6,14 @@
                  http://www.service-technology.org/uml2owfn/
 
 
-Version 1.03-unreleased
+Version 1.11-unreleased
 =======================
+
+* Cleaned the autotools configuration files and added options to directly
+  compile binaries for different platforms.
+
+Version 1.10
+============
 
 * fixed a bug in handling filenames, UML2oWFN can now process files in other
   directories than the current working directory

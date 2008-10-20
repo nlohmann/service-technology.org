@@ -1,40 +1,25 @@
 /* src/uml2owfn.h.in.  Generated from configure.ac by autoheader.  */
 
+/* The platform. */
+#undef BUILDSYSTEM
+
+/* whether to build a 64 Bit binary */
+#undef CONFIG_ENABLE64BIT
+
+/* whether to use assertions */
+#undef CONFIG_ENABLEASSERT
+
+/* whether to build a Mac universal binary */
+#undef CONFIG_ENABLEUNIVERSAL
+
+/* whether to build a Cygwin-independent Windows binary */
+#undef CONFIG_ENABLEWIN32
+
 /* Graphviz dot can be used on this system. */
 #undef HAVE_DOT
 
-/* Define to 1 if you have the <inttypes.h> header file. */
-#undef HAVE_INTTYPES_H
-
-/* Define to 1 if you have the <memory.h> header file. */
-#undef HAVE_MEMORY_H
-
-/* Define to 1 if you have the `pow' function. */
-#undef HAVE_POW
-
-/* Define to 1 if you have the <stdint.h> header file. */
-#undef HAVE_STDINT_H
-
-/* Define to 1 if you have the <stdlib.h> header file. */
-#undef HAVE_STDLIB_H
-
-/* Define to 1 if you have the <strings.h> header file. */
-#undef HAVE_STRINGS_H
-
-/* Define to 1 if you have the <string.h> header file. */
-#undef HAVE_STRING_H
-
-/* Define to 1 if you have the <sys/stat.h> header file. */
-#undef HAVE_SYS_STAT_H
-
-/* Define to 1 if you have the <sys/types.h> header file. */
-#undef HAVE_SYS_TYPES_H
-
-/* Define to 1 if you have the <unistd.h> header file. */
-#undef HAVE_UNISTD_H
-
-/* Define to 1 if you have the <windows.h> header file. */
-#undef HAVE_WINDOWS_H
+/* Turn off assertions and verbose debug messages. */
+#undef NDEBUG
 
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 #undef NO_MINUS_C_MINUS_O
@@ -56,9 +41,6 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
-
-/* Define to 1 if you have the ANSI C header files. */
-#undef STDC_HEADERS
 
 /* Version number of package */
 #undef VERSION

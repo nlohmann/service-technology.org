@@ -6,66 +6,10 @@
                  http://www.service-technology.org/uml2owfn/
 
 
-Version 1.03-unreleased
+Version 1.11-unreleased
 =======================
 
-* fixed a bug in handling filenames, UML2oWFN can now process files in other
-  directories than the current working directory
-
-* added parameter `-a orJoin' to translate process for soundness analysis
-  assuming an implicit OR-join on the control-flow
-
-* added parameter `-a wfNet' to translate processes into Aalst-workflow-nets,
-  the translation assumes an AND-join on all end- and stop-nodes of the
-  process
-
-* added new analysis switch `-a removePinsets' that relaxes the process
-  termination semantics by requiring that only the control-flow terminates,
-  but that data may still be pending at the process output, and added new
-  `scripts/Makefile' target `translateweak' that uses the `-a removePinsets'
-  option,
-
-* added parameter `-a safe' to check for safeness of a net using LoLA with
-  state predicates, this parameter can be used together with `-a soundness'
-
-* added parameter `-p anon' to anonymize the process output by enumerating
-  places (p1, p2, ...) and transitions (t1, t2, ...) before writing to disk
-
-* added log file output for translation, with parameter "-p log" a log file
-  (name "uml2owfn_<inputfile>.log") with entries of the form "process name;
-  translation successful;reason-for-fail;number of nodes, number of edges,
-  average number of incoming edges, average number of outgoing edges" is
-  written
-
-* added checks for free-choice nets and for workflow-nets (each node is on a
-  path from alpha to omega); this additional Petri net functionality is
-  implemented in the class ExtendedWorkflowNet which inherits from PetriNet
-
-* added check whether generated Petri net is empty, if this is the case, then
-  the net is translated again without reduction rules, the name is extended
-  with a ".unreduced" (if it is still emtpy, then the net is skipped: no net
-  file, no analysis, not in script file)
-
-* changed task file naming scheme to 'net.lola.<tasktype>.task'
-
-* worked on bug #12160: PNAPI: Petri net reduction rules do not preserve
-  (un)-safeness, disallowing place/transition fusion if places/transitions
-  are together in the preset/postset of another transition/place
-
-* overrode the Petri net reduction method in the ExtendedWorkflowNet class,
-  now implementing reduce_series_places (level 1) and reduce_identical_places
-  (level 3)
-
-* stored reduction level in the `scripts/Makefile' in variable
-  `REDUCTION-LEVEL', so the reduction level can be set at the make call
-
-* extended filtering criteria: empty processes are not translated
-
-* fixed bug #12156: UML2oWFN: translation of overlapping pinsets fails,
-  `https://gna.org/bugs/?12156'
-
-* added documentation in ./doc/
-
-* added tests to `./tests/', run `make check' to run the test suite
+* Cleaned the autotools configuration files and added options to directly
+  compile binaries for different platforms.
 
 \nSee file ChangeLog <http://service-technology.org/files/uml2owfn/ChangeLog> for\ncomplete version history.\n

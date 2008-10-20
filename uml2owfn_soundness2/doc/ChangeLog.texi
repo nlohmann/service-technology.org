@@ -1,4 +1,9 @@
-@heading Version 1.03-unreleased
+@heading Version 1.11-unreleased
+@itemize
+@item Cleaned the autotools configuration files and added options to directly compile binaries for different platforms.
+@end itemize
+
+@heading Version 1.10
 @itemize
 @item fixed a bug in handling filenames, UML2oWFN can now process files in other directories than the current working directory
 @item added parameter @samp{-a orJoin} to translate process for soundness analysis assuming an implicit OR-join on the control-flow

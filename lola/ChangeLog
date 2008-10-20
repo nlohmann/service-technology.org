@@ -5,6 +5,8 @@ Version 1.03 (unreleased)
 + fixed bug #12063 (https://gna.org/bugs/?12063): LIVEPROP now works without crashing
 + added a test case "umlprocess" to avoid regression of bug #12063 (https://gna.org/bugs/?12063)
 + out commented "TWOPHASE" in userconfig.H for liveprop test
++ fixed bug #12061 (https://gna.org/bugs/?12061): BOUNDEDNET now works without crashing
++ added a test case "unbounded" to avoid regression of bug #12061 (https://gna.org/bugs/?12061)
 
 
 Version 1.02

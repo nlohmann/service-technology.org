@@ -7,10 +7,7 @@
 #endif
 #include<fstream>
 #include<cstring>
-#include<stdio.h>
-
-using std::ofstream;
-
+#include<cstdio>
 Decision ** HashTable;
 unsigned int  * BitHashTable;
 unsigned int LastChoice;
@@ -79,7 +76,7 @@ void printstate(char *, unsigned int *);
 void printmarking()
 {
 	unsigned int i;
-	
+
 	for(i=0;i<Places[0]->cnt;i++)
 	{
 		cout << Places[i]->name << " : " << CurrentMarking[i] << endl;
@@ -260,7 +257,7 @@ void print_reg_path(State *s, State * startofrepeatingseq,ofstream * pathstream,
 			cout << "PATH EXPRESSION \n";
 		}
 	}
-	// print a regular expression for path  from initial state to 
+	// print a regular expression for path  from initial state to
 	// generalised state s in coverability graph
 	if(startofrepeatingseq)
 	{
@@ -270,7 +267,7 @@ void print_reg_path(State *s, State * startofrepeatingseq,ofstream * pathstream,
 			{
 				int i;
 				print_reg_path(s -> parent,s->smaller,pathstream,0);
-			if(s->smaller) 
+			if(s->smaller)
 			{
 				if(Pflg)
 				{
@@ -301,7 +298,7 @@ void print_reg_path(State *s, State * startofrepeatingseq,ofstream * pathstream,
 				(*pathstream) << s -> parent -> firelist[s -> parent -> current] -> name;
 				}
 			}
-			if(s->smaller) 
+			if(s->smaller)
 			{
 				if(Pflg)
 				{
@@ -336,7 +333,7 @@ void print_reg_path(State *s, State * startofrepeatingseq,ofstream * pathstream,
 				(*pathstream)  << " " << s -> parent -> firelist[s->parent->current] -> name;
 				}
 			}
-			if(s->smaller) 
+			if(s->smaller)
 			{
 				if(Pflg)
 				{
@@ -355,7 +352,7 @@ void print_reg_path(State *s, State * startofrepeatingseq,ofstream * pathstream,
 		{
 			int i;
 			print_reg_path(s -> parent,s->smaller,pathstream,0);
-			if(s->smaller) 
+			if(s->smaller)
 			{
 				if(Pflg)
 				{
@@ -385,9 +382,9 @@ void print_reg_path(State *s, State * startofrepeatingseq,ofstream * pathstream,
 			{
 			(*pathstream) << s -> parent -> firelist[s->parent->current] -> name ;
 			}
-				
+
 		}
-		if(s->smaller) 
+		if(s->smaller)
 		{
 			if(Pflg)
 			{
@@ -401,10 +398,10 @@ void print_reg_path(State *s, State * startofrepeatingseq,ofstream * pathstream,
 	}
 }
 #endif
-		
 
-#define MIN(X,Y) ( (X) < (Y) ? (X) : (Y)) 
-#define MAX(X,Y) ( (X) > (Y) ? (X) : (Y)) 
+
+#define MIN(X,Y) ( (X) < (Y) ? (X) : (Y))
+#define MAX(X,Y) ( (X) > (Y) ? (X) : (Y))
 
 State * CurrentState;
 
@@ -412,17 +409,17 @@ State * CurrentState;
 
 bool analyse_fairness(State * pool, unsigned int level)
 {
-	// 1. cut the (not necessarily connected) graph in pool into sccs. 
+	// 1. cut the (not necessarily connected) graph in pool into sccs.
 	//    All states in search space have tarlevel = level && ! expired.
 	//    Before return "false", all states in pool must be "expired".
-	
+
 	State * C,* N; // current, new state in dfs
 	State * T; // local tarjan stack;
 	State * S; // local scc
 	unsigned int card = 1;
 	State * O; // parent of root of local scc (must be set after analysis of scc)
 	unsigned int oldd, oldm, oldc;
-	
+
 	while(pool)
 	{
 		// proceed as long as there are states in pool
@@ -457,15 +454,15 @@ bool analyse_fairness(State * pool, unsigned int level)
 					{
 						pool = pool -> nexttar;
 						if(pool == N)
-						{	
-							pool = (State *) 0;	
+						{
+							pool = (State *) 0;
 						}
 					}
 					N -> nexttar -> prevtar = N -> prevtar;
 					N -> prevtar -> nexttar = N -> nexttar;
 					if(T)
 					{
-						N -> nexttar = T -> nexttar;	
+						N -> nexttar = T -> nexttar;
 						T -> nexttar = N;
 						N -> prevtar = T;
 						N -> nexttar -> prevtar = N;
@@ -489,7 +486,7 @@ bool analyse_fairness(State * pool, unsigned int level)
 					{
 						// existing state in expired scc or outside
 						// current search space
-						C -> current++;	
+						C -> current++;
 					}
 				}
 			}
@@ -536,7 +533,7 @@ bool analyse_fairness(State * pool, unsigned int level)
 						{
 							ss->firelist[i]->fairabled ++;
 							if((ss->succ[i]-> tarlevel == level + 1) && !(ss->succ[i]->expired))
-							{	
+							{
 								ss->firelist[i]->faired ++;
 							}
 						}
@@ -545,7 +542,7 @@ bool analyse_fairness(State * pool, unsigned int level)
 #endif
 						if(ss == S) break;
 					}
-					
+
 #ifdef STABLEPROP
 					if(cardphi ==  cardS)
 					{
@@ -573,7 +570,7 @@ bool analyse_fairness(State * pool, unsigned int level)
 								// 1. remove all transitions
 								// from S that enable t[i]
 								// At this point, there must
-								// be some state remaining in S, 
+								// be some state remaining in S,
 								// otherwise the weak fairness test
 								// would have failed.
 								while(Transitions[i]->fairabled)
@@ -608,8 +605,8 @@ bool analyse_fairness(State * pool, unsigned int level)
 						Transitions[i] -> faired = Transitions[i]-> fairabled = 0;
 					}
 					return true; // arrived here only if all transitions have paased fairness test.
-		
-aftercheck:  				
+
+aftercheck:
 					for(;!(S -> expired);S = S -> nexttar)
 					{
 						S -> expired = true;
@@ -618,7 +615,7 @@ aftercheck:
 					C -> ddfs = oldd;
 					C -> mmin = oldm;
 					C -> current = oldc;
-					
+
 				}
 				// end process scc
 				// C) return to previous state
@@ -644,7 +641,7 @@ Persistents = 0;
   unsigned int i;
   State * NewState;
 #ifdef CYCLE
-  bool IsCyclic; 
+  bool IsCyclic;
   unsigned int silentpath; // nr of consecutive non-stored states
   Transition ** fl;
 #endif
@@ -670,27 +667,27 @@ Persistents = 0;
 #endif
   for(i = 0; i < HASHSIZE;i++)
     {
-#ifdef BITHASH 
+#ifdef BITHASH
 	 BitHashTable[i]  = 0;
 #else
       binHashTable[i] = (binDecision *) 0;
 #endif
     }
 #endif
-#ifdef WITHFORMULA 
+#ifdef WITHFORMULA
 #ifndef TWOPHASE
 	int res;
 	if(!F)
-	{	
+	{
 		cerr << "\nspecify predicate in analysis task file!\n";
 		_exit(4);
 	}
 	F = F -> reduce(&res);
-	if(res<2) return res;	
+	if(res<2) return res;
 	F = F -> posate();
 	F -> tempcard = 0;
 	F -> setstatic();
-	if(F ->  tempcard) 
+	if(F ->  tempcard)
 	{
 		cerr << "temporal operators are not allowed in state predicates\n";
 		exit(3);
@@ -735,7 +732,7 @@ Persistents = 0;
   {
 	for(i=0,IsCyclic=false;fl[i];i++)
 	{
-		if(fl[i]->cyclic) 
+		if(fl[i]->cyclic)
 		{
 			IsCyclic = true;
 			break;
@@ -791,7 +788,7 @@ Persistents = 0;
 		_exit(4);
 	}
 #endif
-#ifdef DEADTRANSITION 
+#ifdef DEADTRANSITION
 	if(!CheckTransition)
 	{
 		cerr << "\n specify transition to be checked in analysis task file!\n";
@@ -814,7 +811,7 @@ Persistents = 0;
 #if defined ( STUBBORN ) && defined ( REACHABILITY ) && ! defined(DISTRIBUTE)
   if(!CurrentState -> firelist )
 	{
-		// early abortion  
+		// early abortion
 	      cout << "\nstate found!\n";
 		  printstate("",CurrentMarking);
 		print_path(CurrentState);
@@ -823,7 +820,7 @@ Persistents = 0;
 		return 1;
          }
 #endif
-#if defined (REACHABILITY ) && ! defined ( STUBBORN ) && ! defined(DISTRIBUTE) 
+#if defined (REACHABILITY ) && ! defined ( STUBBORN ) && ! defined(DISTRIBUTE)
 for(i=0;i<Places[0]->cnt;i++)
 {
 	 if(CurrentMarking[i] != Places[i]->target_marking)
@@ -831,13 +828,13 @@ for(i=0;i<Places[0]->cnt;i++)
 }
 if(i >= Places[0]->cnt) // target_marking found!
 {
-		// early abortion  
+		// early abortion
 	      cout << "\nstate found!\n";
 		printstate("",CurrentMarking);
 		print_path(CurrentState);
 		printincompletestates(CurrentState, graphstream,1);//1=toplevel
 		statistics(NrOfStates,Edges,NonEmptyHash);
-	 return 1; 
+	 return 1;
 }
 #endif
 #ifdef COVER
@@ -873,7 +870,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 #endif
 	}
 #endif
-#ifdef TARJAN 
+#ifdef TARJAN
   CurrentState -> succ = new State * [CardFireList+1];
   CurrentState -> dfs = CurrentState -> min = 0;
 #ifdef FULLTARJAN
@@ -882,9 +879,9 @@ if(i >= Places[0]->cnt) // target_marking found!
 	TarStack = CurrentState;
 #endif
 #endif
-  
+
   // process marking until returning from initial state
-  
+
   while(CurrentState)
     {
 #ifdef EXTENDED
@@ -896,7 +893,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 	{
 	  // there is a next state that needs to be explored
 	  Edges ++;
-	      if(!(Edges % REPORTFREQUENCY)) 
+	      if(!(Edges % REPORTFREQUENCY))
 		{
 #ifdef DISTRIBUTE
 		rapport(rapportstring);
@@ -941,7 +938,6 @@ if(i >= Places[0]->cnt) // target_marking found!
 #endif
 #ifdef COVER
 	//In coverability graphs, we need to check for new w
-
 	// 1. Search backwards until last w-Intro for smaller state
 	unsigned int NrCovered;
 	State * smallerstate;
@@ -957,11 +953,11 @@ if(i >= Places[0]->cnt) // target_marking found!
 	    smallerstate -> parent)
 	{
 
-		CurrentState -> firelist[CurrentState ->  current] -> traceback();
+		smallerstate -> firelist[CurrentState ->  current] -> traceback();
 		NrCovered = 0;
 		for(i=0;i<Places[0]->cnt;i++)
 		{
-				// case 1: smaller state[i] > current state [i] 
+				// case 1: smaller state[i] > current state [i]
 				// ---> continue with previous state
 				if(Ancestor[i] > CurrentMarking[i])
 				{
@@ -981,7 +977,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 		// current marking is not new, ancestors of smaller marking cannot
 		// be smaller than current marking, since they would be smaller than
 		// this smaller marking --> leave w-Intro procedure
-		if(!NrCovered) 
+		if(!NrCovered)
 		{
 			smallerstate = (State *) 0;
 			goto endomegaproc;
@@ -997,7 +993,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 				{
 					// Here we have a place that deserves a new Omega
 					// 1. set old value in place record
-					Places[i] -> lastfinite = 
+					Places[i] -> lastfinite =
 					 CurrentMarking[i];
 					Places[i] -> set_cmarking(VERYLARGE);
 					Places[i] -> bounded = false;
@@ -1006,13 +1002,11 @@ if(i >= Places[0]->cnt) // target_marking found!
 		}
 		NewOmegas[NrCovered] = (Place*) 0;
 		goto endomegaproc;
-
-			
-	nextstate:
 		if(smallerstate -> smaller) // smallerstate is a omega-introducing state
 		{
 			break;
 		}
+nextstate: ;
 	}
 endomegaproc:
 if(!NewOmegas) smallerstate = (State *) 0;
@@ -1199,7 +1193,7 @@ if(!NewOmegas) smallerstate = (State *) 0;
 		return 1;
 	}
 #endif
-#ifdef DEADTRANSITION 
+#ifdef DEADTRANSITION
 	if(CheckTransition -> enabled)
 	{
 		// early abortion
@@ -1212,10 +1206,10 @@ if(!NewOmegas) smallerstate = (State *) 0;
 		return 1;
 	}
 #endif
-#if ( defined ( STUBBORN ) && defined ( REACHABILITY ) ) 
+#if ( defined ( STUBBORN ) && defined ( REACHABILITY ) )
   if(!NewState -> firelist )
 	{
-		// early abortion  
+		// early abortion
 	      cout << "\nstate found!\n";
 		  printstate("",CurrentMarking);
 		print_path(NewState);
@@ -1224,7 +1218,7 @@ if(!NewOmegas) smallerstate = (State *) 0;
 		return 1;
          }
 #endif
-#if ( defined (REACHABILITY ) && ! defined ( STUBBORN ) ) 
+#if ( defined (REACHABILITY ) && ! defined ( STUBBORN ) )
 for(i=0;i<Places[0]->cnt;i++)
 {
 	 if(CurrentMarking[i] != Places[i]->target_marking)
@@ -1232,13 +1226,13 @@ for(i=0;i<Places[0]->cnt;i++)
 }
 if(i >= Places[0]->cnt) // target_marking found!
 {
-		// early abortion  
+		// early abortion
 	      cout << "\nstate found!\n";
 		  printstate("",CurrentMarking);
 		print_path(NewState);
 		printincompletestates(NewState, graphstream,1);//1=toplevel
 		statistics(NrOfStates,Edges,NonEmptyHash);
-	 return 1; 
+	 return 1;
 }
 #endif
 #endif
@@ -1344,7 +1338,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 			}
 #endif
 		}
-		
+
 #endif
 #ifdef CYCRED
 		if(CurrentState -> closing == 0)
@@ -1460,7 +1454,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 			Transition ** forgotten;
 
 			forgotten = F -> spp2(CurrentState);
-#if defined(LIVEPROP) 
+#if defined(LIVEPROP)
 			if(!forgotten)
 			{
 				// check for forgotten down transitions (SPP3 of
@@ -1530,7 +1524,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 				}
 				forgotten = (Transition **) 0;
 			}
-afterdownsearch: 
+afterdownsearch:
 
 #endif
 			if(forgotten)
@@ -1562,7 +1556,7 @@ afterdownsearch:
 				MinBookmark = NrOfStates;
 #if defined(LIVEPROP) && ! defined(TWOPHASE)
 				// check if tscc reached property
-				if(largest_sat <=CurrentState -> dfs) 
+				if(largest_sat <=CurrentState -> dfs)
 				{
 					// tscc did not reach prop -> prop not live
 					cout << "\npredicate not live: not satisfiable beyond reported state\n\n";
@@ -1622,7 +1616,7 @@ afterdownsearch:
 				//TSCC really closed: deposit state
 				StatevectorList * s;
 
-	
+
 				MinBookmark = NrOfStates;
 				s = new StatevectorList;
 				s -> sv = new Statevector(Places[0]->cnt);
@@ -1665,7 +1659,7 @@ afterdownsearch:
 	  if(CurrentState)
 	    {
 	      CurrentState -> firelist[CurrentState -> current] -> backfire();
-#ifdef WITHFORMULA 
+#ifdef WITHFORMULA
 #ifndef TWOPHASE
 		  update_formula(CurrentState -> firelist[CurrentState -> current]);
 #endif
@@ -1729,9 +1723,9 @@ unsigned int DistributeNow = 0;
 unsigned int breadth_first()
 {
 	// min true = Dieser Knoten hat noch fruchtbare Zweige
-	// succ[i] 0 = dieser Zweig ist nicht mehr fruchtbar 
+	// succ[i] 0 = dieser Zweig ist nicht mehr fruchtbar
 #ifdef BREADTH_FIRST
-  
+
   ofstream * graphstream;
   unsigned int limit;
   unsigned int d;
@@ -1748,7 +1742,7 @@ unsigned int breadth_first()
 			gmflg = false;
 		}
   }
-		
+
 
   State * CurrentState, * NewState, * initial;
   // init initial marking and hash table
@@ -1759,7 +1753,7 @@ unsigned int breadth_first()
 #ifndef DISTRIBUTE
   for(i = 0; i < HASHSIZE;i++)
     {
-#ifdef BITHASH 
+#ifdef BITHASH
 	BitHashTable[i] = 0;
 #else
       binHashTable[i] = (binDecision *) 0;
@@ -1850,7 +1844,7 @@ for(i=0;i<Transitions[0]->cnt;i++) Transitions[i]->check_enabled();
 #ifdef STUBBORN
   if(!CurrentState -> firelist )
 	{
-		// early abortion  
+		// early abortion
 #ifdef REACHABILITY
 	      cout << "\nstate found!\n";
 #endif
@@ -1880,10 +1874,10 @@ for(i=0;i<Transitions[0]->cnt;i++) Transitions[i]->check_enabled();
 		_exit(4);
 	}
 #endif
-#ifdef DEADLOCK 
+#ifdef DEADLOCK
 	if(!CurrentState -> firelist || ! (CurrentState -> firelist[0]))
 	{
-		 // early abortion 
+		 // early abortion
 		 cout << "\ndead state found!\n";
 		 printstate("",CurrentMarking);
 		 print_path(CurrentState);
@@ -1894,16 +1888,16 @@ for(i=0;i<Transitions[0]->cnt;i++) Transitions[i]->check_enabled();
 #ifdef STATEPREDICATE
 	int res;
 	if(!F)
-	{	
+	{
 		cerr << "\nspecify predicate in analysis task file!\n";
 		_exit(4);
 	}
 	F = F -> reduce(&res);
-	if(res<2) return res;	
+	if(res<2) return res;
 	F = F -> posate();
 	F -> tempcard = 0;
 	F -> setstatic();
-	if(F ->  tempcard) 
+	if(F ->  tempcard)
 	{
 		cerr << "temporal operators are not allowed in state predicates\n";
 		exit(3);
@@ -1921,7 +1915,7 @@ for(i=0;i<Transitions[0]->cnt;i++) Transitions[i]->check_enabled();
 	}
 #endif
 
-#if ( defined (REACHABILITY ) && ! defined ( STUBBORN ) ) 
+#if ( defined (REACHABILITY ) && ! defined ( STUBBORN ) )
 for(i=0;i<Places[0]->cnt;i++)
 {
 	 if(CurrentMarking[i] != Places[i]->target_marking)
@@ -1929,19 +1923,19 @@ for(i=0;i<Places[0]->cnt;i++)
 }
 if(i >= Places[0]->cnt) // target_marking found!
 {
-		// early abortion  
+		// early abortion
 	      cout << "\nstate found!\n";
 		  printstate("",CurrentMarking);
 		print_path(CurrentState);
 	statistics(NrOfStates,Edges,NonEmptyHash);
-	 return 1; 
+	 return 1;
 }
 #endif
   CurrentState -> parent = (State *) 0;
   CurrentState -> succ = new State * [CardFireList];
-  
+
   // process marking until returning from initial state
-  
+
   while(CurrentState)
     {
       if(CurrentState -> firelist[CurrentState -> current])
@@ -1950,7 +1944,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 	  {
 		// working layer
 	        Edges ++;
-	      if(!(Edges % REPORTFREQUENCY)) 
+	      if(!(Edges % REPORTFREQUENCY))
 	{
 #ifdef DISTRIBUTE
 		rapport(rapportstring);
@@ -1981,7 +1975,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 		NrCovered = 0;
 		for(i=0;i<Places[0]->cnt;i++)
 		{
-				// case 1: smaller state[i] > current state [i] 
+				// case 1: smaller state[i] > current state [i]
 				// ---> continue with previous state
 				if(Ancestor[i] > CurrentMarking[i])
 				{
@@ -2001,7 +1995,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 		// current marking is not new, ancestors of smaller marking cannot
 		// be smaller than current marking, since they would be smaller than
 		// this smaller marking --> leave w-Intro procedure
-		if(!NrCovered) 
+		if(!NrCovered)
 		{
 			smallerstate = (State *) 0;
 			goto endomegaproc;
@@ -2017,7 +2011,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 				{
 					// Here we have a place that deserves a new Omega
 					// 1. set old value in place record
-					Places[i] -> lastfinite = 
+					Places[i] -> lastfinite =
 					 CurrentMarking[i];
 					Places[i] -> set_cmarking(VERYLARGE);
 					Places[i] -> bounded = false;
@@ -2027,7 +2021,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 		NewOmegas[NrCovered] = (Place*) 0;
 		goto endomegaproc;
 
-			
+
 	nextstate:
 		if(smallerstate -> smaller) // smallerstate is a omega-introducing state
 		{
@@ -2092,7 +2086,7 @@ if(!NewOmegas) smallerstate = (State *) 0;
 	if(gmflg)
 	{
 	  (*graphstream) << "STATE " << NewState ->dfs << " FROM " <<
-	  CurrentState -> dfs << " BY " << 
+	  CurrentState -> dfs << " BY " <<
 	  CurrentState -> firelist[CurrentState -> current] -> name
 	  << "; DEPTH " << limit;
 	  j=0;
@@ -2127,7 +2121,7 @@ if(!NewOmegas) smallerstate = (State *) 0;
 	if(GMflg)
 	{
 	  cout << "STATE " << NewState ->dfs << " FROM " <<
-	  CurrentState -> dfs << " BY " << 
+	  CurrentState -> dfs << " BY " <<
 	  CurrentState -> firelist[CurrentState -> current] -> name
 	  << "; DEPTH " << limit;
 	  j=0;
@@ -2163,7 +2157,7 @@ if(!NewOmegas) smallerstate = (State *) 0;
 #ifdef STUBBORN
                     if(!NewState -> firelist )
 	            {
-		        // early abortion  
+		        // early abortion
 #ifdef REACHABILITY
 	                cout << "\nstate found!\n";
 #endif
@@ -2203,7 +2197,7 @@ if(!NewOmegas) smallerstate = (State *) 0;
 #ifdef DEADLOCK
                 if(!NewState -> firelist || !(NewState -> firelist[0]))
 	            {
-		        // early abortion  
+		        // early abortion
 	                cout << "\ndead state found!\n";
 					printstate("",CurrentMarking);
 		        print_path(NewState);
@@ -2211,7 +2205,7 @@ if(!NewOmegas) smallerstate = (State *) 0;
 		        return 1;
                     }
 #endif
-#if defined(DEADTRANSITION) 
+#if defined(DEADTRANSITION)
 	if(CheckTransition->enabled)
 	{
 	      cout << "\ntransition " << CheckTransition -> name << " is not dead!\n";
@@ -2232,7 +2226,7 @@ if(!NewOmegas) smallerstate = (State *) 0;
 		        return 1;
                     }
 #endif
-#if ( defined (REACHABILITY ) && ! defined ( STUBBORN ) ) 
+#if ( defined (REACHABILITY ) && ! defined ( STUBBORN ) )
 for(i=0;i<Places[0]->cnt;i++)
 {
 	 if(CurrentMarking[i]!= Places[i]->target_marking)
@@ -2240,12 +2234,12 @@ for(i=0;i<Places[0]->cnt;i++)
 }
 if(i >= Places[0]->cnt) // target_marking found!
 {
-		// early abortion  
+		// early abortion
 	      cout << "\nstate found!\n";
 		  printstate("",CurrentMarking);
 		print_path(NewState);
 	statistics(NrOfStates,Edges,NonEmptyHash);
-	 return 1; 
+	 return 1;
 }
 #endif
 #ifdef COVER
@@ -2275,7 +2269,7 @@ if(i >= Places[0]->cnt) // target_marking found!
         {
 		// proceed forward to working layer
 		if(CurrentState -> succ[CurrentState -> current])
-		{	
+		{
 			CurrentState -> firelist[CurrentState -> current]->fire();
 #ifdef WITHFORMULA
 #ifndef TWOPHASE
@@ -2289,8 +2283,8 @@ if(i >= Places[0]->cnt) // target_marking found!
 			{
 				for(i=0;CurrentState -> NewOmega[i];i++)
 				{
-					CurrentState -> NewOmega[i] -> lastfinite = 
-					CurrentMarking[CurrentState -> NewOmega[i] -> index]; 
+					CurrentState -> NewOmega[i] -> lastfinite =
+					CurrentMarking[CurrentState -> NewOmega[i] -> index];
 					CurrentState -> NewOmega[i] -> bounded = false;
 					CurrentState -> NewOmega[i] -> set_cmarking(VERYLARGE);
 				}
@@ -2308,7 +2302,7 @@ if(i >= Places[0]->cnt) // target_marking found!
       }
       else
 	{
-	
+
 	  // close state and return to previous state
 	  if(CurrentState -> min)
 	  {
@@ -2317,10 +2311,10 @@ if(i >= Places[0]->cnt) // target_marking found!
 	  }
 	  else
 	  {
-		  CurrentState = CurrentState -> parent;  
+		  CurrentState = CurrentState -> parent;
 	          if(CurrentState) CurrentState -> succ[CurrentState -> current] = (State *) 0;
 	  }
-	  
+
 	  d--;
 	  if(CurrentState)
 	    {
@@ -2397,7 +2391,7 @@ if(i >= Places[0]->cnt) // target_marking found!
 
 
 }
-	  
+
 void RemoveGraph()
 {
 	int i;
@@ -2435,22 +2429,22 @@ bool mutual_reach()
 
   if(!CurrentState -> firelist )
 	{
-		// early abortion  
+		// early abortion
   statistics(NrOfStates,Edges,NonEmptyHash);
 		return true;
     }
   CurrentState -> parent = (State *) 0;
   CurrentState -> succ = new State * [CardFireList];
-  
+
   // process marking until returning from initial state
-  
+
   while(CurrentState)
     {
       if(CurrentState -> firelist[CurrentState -> current])
 	{
 	  // there is a next state that needs to be explored
 	  Edges ++;
-	      if(!(Edges % REPORTFREQUENCY)) 
+	      if(!(Edges % REPORTFREQUENCY))
               cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
 	  CurrentState -> firelist[CurrentState -> current] -> fire();
 	  if(NewState = SEARCHPROC())
@@ -2471,7 +2465,7 @@ NrOfStates ++ ;
 	      CurrentState -> succ[CurrentState -> current] = NewState;
   if(!NewState -> firelist )
 	{
-		// early abortion  
+		// early abortion
   statistics(NrOfStates,Edges,NonEmptyHash);
 		return true;
     }
@@ -2535,7 +2529,7 @@ bool target_reach()
 
   if(!CurrentState -> firelist )
 	{
-		// early abortion  
+		// early abortion
   statistics(NrOfStates,Edges,NonEmptyHash);
 		return true;
     }
@@ -2543,16 +2537,16 @@ bool target_reach()
 #ifdef TARJAN
   CurrentState -> succ = new State * [CardFireList];
 #endif
-  
+
   // process marking until returning from initial state
-  
+
   while(CurrentState)
     {
       if(CurrentState -> firelist[CurrentState -> current])
 	{
 	  // there is a next state that needs to be explored
 	  Edges ++;
-	      if(!(Edges % REPORTFREQUENCY)) 
+	      if(!(Edges % REPORTFREQUENCY))
               cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
 	  CurrentState -> firelist[CurrentState -> current] -> fire();
 	  if(NewState = SEARCHPROC())
@@ -2584,7 +2578,7 @@ bool target_reach()
 		NrOfStates ++;
   if(!NewState -> firelist )
 	{
-		// early abortion  
+		// early abortion
   statistics(NrOfStates,Edges,NonEmptyHash);
 		return true;
     }
@@ -2626,7 +2620,7 @@ bool target_reach()
 				//TSCC really closed
 				MinBookmark = NrOfStates;
 				CurrentState = CurrentState -> parent;
-			}		
+			}
 #else
 	  CurrentState = CurrentState -> parent;
 #endif
@@ -2652,14 +2646,14 @@ int reversibility()
 	{
 		Places[i]->initial_marking = CurrentMarking[i];
 	}
-	// Compute representitives of all TSCC 
+	// Compute representitives of all TSCC
 	depth_first();
 	//Check whether initial marking is reachable
 	for(;TSCCRepresentitives;TSCCRepresentitives = TSCCRepresentitives->next)
 	{
 		// 1. initialize start and target markings
 		for(i=0;i < Places[0]->cnt;i++)
-		{	
+		{
 			Places[i]->target_marking = Places[i]->initial_marking;
 			Places[i]->set_cmarking((*TSCCRepresentitives->sv)[i]);
 		}
@@ -2679,23 +2673,23 @@ int reversibility()
 }
 #endif
 
-#if defined(LIVEPROP) && defined(TWOPHASE) 
+#if defined(LIVEPROP) && defined(TWOPHASE)
 int liveproperty()
 {
 	unsigned int i;
-	
+
 	int res;
 	if(!F)
-	{	
+	{
 		cerr << "\nspecify predicate in analysis task file!\n";
 		_exit(4);
 	}
 	F = F -> reduce(&res);
-	if(res<2) return res;	
+	if(res<2) return res;
 	F = F -> posate();
 	F -> tempcard = 0;
 	F -> setstatic();
-	if(F ->  tempcard) 
+	if(F ->  tempcard)
 	{
 		cerr << "temporal operators are not allowed in state predicates\n";
 		exit(3);
@@ -2707,14 +2701,14 @@ int liveproperty()
 	{
 		Places[i]->initial_marking = CurrentMarking[i];
 	}
-	// Compute representitives of all TSCC 
+	// Compute representitives of all TSCC
 	depth_first();
 	//Check whether target state is reachable
 	for(;TSCCRepresentitives;TSCCRepresentitives = TSCCRepresentitives->next)
 	{
 		// 1. initialize start and target markings
 		for(i=0;i < Places[0]->cnt;i++)
-		{	
+		{
 			Places[i]->target_marking = Places[i]->initial_marking;
 			Places[i]->set_cmarking((*(TSCCRepresentitives->sv))[i]);
 		}
@@ -2741,8 +2735,8 @@ int home()
 unsigned int i;
 	StatevectorList * New, * Old, * Candidate;
 
-	
-	// Compute representitives of all TSCC 
+
+	// Compute representitives of all TSCC
 	depth_first();
 	Candidate = TSCCRepresentitives;
 	if(!Candidate)
@@ -2758,7 +2752,7 @@ unsigned int i;
 	{
 		// 1. initialize start and target markings
 		for(i=0;i < Places[0]->cnt;i++)
-		{	
+		{
 			Places[i]->target_marking = Candidate->sv->vector[i];
 			Places[i]->set_cmarking(New->sv->vector[i]);
 		}
@@ -2778,7 +2772,7 @@ unsigned int i;
 	{
 		// 1. initialize start and target markings
 		for(i=0;i < Places[0]->cnt;i++)
-		{	
+		{
 			Places[i]->target_marking = Candidate->sv->vector[i];
 			Places[i]->set_cmarking(Old->sv->vector[i]);
 		}
@@ -2804,7 +2798,7 @@ unsigned int i;
 #else
 
 int home(){return 0;}
-		
+
 #endif
 
 void print_binDec(binDecision * d, int indent);
@@ -2818,21 +2812,21 @@ void print_binDec(int h)
 	cout << endl;
 	print_binDec(binHashTable[h],0);
 }
-	
-	
+
+
 void print_binDec(binDecision * d, int indent)
 {
 	unsigned int i;
 	// print bin decision table at hash entry h
 
 	for(i=0;i<indent;i++) cout << ".";
-	
-	if(!d) 
+
+	if(!d)
 	{
 		cout << " nil " << endl;
 		return;
 	}
-	
+
 	cout << "b " << d -> bitnr << " v ";
 	for(i=0; i< (BitVectorSize - (d -> bitnr + 1)) ; i+=8)
 	{
@@ -2847,5 +2841,5 @@ void print_binDec(binDecision * d, int indent)
 	print_binDec(d -> nextold,indent+1);
 	print_binDec(d -> nextnew,indent+1);
 }
-	
+
 #endif

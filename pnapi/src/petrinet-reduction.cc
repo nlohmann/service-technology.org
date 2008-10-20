@@ -292,7 +292,7 @@ void PetriNet::reduce_dead_nodes()
  * If there exist two distinct (precondition 1) places with identical preset
  * (precondition 2) and postset (precondition 3) and the weights of all incoming
  * and outgoing arcs have the value 1 (precondition 4), then they can be merged.
- *
+ * 
  * \todo 
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
@@ -353,7 +353,7 @@ void PetriNet::reduce_identical_places()
  * preset (precondition 2) and postset (precondition 3) and none of those two
  * is connected to any arc with a weight other than 1 (precondition 4),
  * then they can be merged.
- *
+ * 
  * \todo
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
@@ -379,8 +379,8 @@ void PetriNet::reduce_identical_transitions()
             ((*t1)->preset == (*t2)->preset) &&	// precondition 2
             ((*t1)->postset == (*t2)->postset) && // precondition 3
             (sameweights(*t2)) && // precondition 4
-            (arc_weight((*((*t1)->preset.begin())),(*t1)) == 1) && //precondition 4
-            (arc_weight((*((*t2)->preset.begin())),(*t2)) == 1)) // precondition 4
+            (arc_weight((*((*t1)->preset.begin())),(*t1)) == 1) && // precondition 4
+            (arc_weight((*((*t2)->preset.begin())),(*t2)) == 1) ) // precondition 4
         {
           string id1 = ((*t1)->nodeFullName());
           string id2 = ((*t2)->nodeFullName());
@@ -419,7 +419,7 @@ void PetriNet::reduce_identical_transitions()
  * can be merged and the transition can be removed. Furthermore, none of the
  * places may be communicating (precondition 4) and the included arcs must have
  * a weight of 1 (precondition 5).
- *
+ * 
  * \todo
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
@@ -486,13 +486,21 @@ void PetriNet::reduce_series_places()
  * (precondition 3), then the preset and the postset can be merged and the
  * place can be removed. Furthermore the in and outgoing arcs have to have
  * a weight of 1 (precondition 4).
+ * If both the pretransition and the posttransition are connected with an
+ * interface place and keepNormal is true, the reduction will be prevented (precondition 5)
  *
+ * \param   keepNormal determines wether reduction of a normalized net should
+ *          preserve normalization or not. If true, interface transitions
+ *          (i.e. transitions connected with interface places) will only be
+ *          merged with internal transitions (i.e. transitions connected
+ *          with internal places only). 
+ * 
  * \todo
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
  *       ???? What about initially marked and final places ????
  */
-void PetriNet::reduce_series_transitions() {
+void PetriNet::reduce_series_transitions(bool keepNormal) {
     // trace(TRACE_DEBUG, "[PN]\tApplying rule RA2 (fusion of series transitions)...\n");
     int result=0;
 
@@ -508,7 +516,8 @@ void PetriNet::reduce_series_transitions() {
             Transition* t2 = static_cast<Transition*>(*((*p)->postset.begin()));
 
             if (((t2)->preset.size() == 1) && // precondition 3
-                    (arc_weight(t1, *p) == 1) && (arc_weight(*p, t2) == 1)) // precondition 4
+                    (arc_weight(t1, *p) == 1) && (arc_weight(*p, t2) == 1) && // precondition 4
+                    !((t1->type != INTERNAL) && (t2->type != INTERNAL) && (keepNormal)) ) //precondition 5
             {
                 string id1 = (t1->nodeFullName(true));
                 string id2 = (t2->nodeFullName(true));
@@ -549,7 +558,7 @@ void PetriNet::reduce_series_transitions() {
  *       marking.
  *
  * \return number of removed places
- *
+ * 
  * \pre \f$ p \f$ is a place of the net: \f$ p \in P \f$
  * \pre \f$ p \f$ is initially marked: \f$ m_0(p) > 0 \f$
  * \pre \f$ p \f$ has one transition in its preset and one transition in its postset: \f$ |{}^\bullet p| = 1 \f$, \f$ |p^\bullet| = 1 \f$
@@ -599,7 +608,7 @@ unsigned int PetriNet::reduce_self_loop_places()
  *       communicating partners.
  *
  * \return number of removed transitions
- *
+ * 
  * \pre \f$ t \f$ is a transition of the net: \f$ t \in T \f$
  * \pre \f$ t \f$ has one place in its preset and one place in its postset: \f$ |{}^\bullet t| = 1 \f$, \f$ |t^\bullet| = 1 \f$
  * \pre \f$ t \f$'s preset and postset are equal: \f$ t^\bullet = {}^\bullet t \f$
@@ -909,12 +918,22 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
  *
  * \return the number of passes until a fixed point was reached
  *
+ * \param   keepNormal determines wether reduction of a normalized net should
+ *          preserve normalization or not. If true, interface transitions
+ *          (i.e. transitions connected with interface places) will only be
+ *          merged with internal transitions (i.e. transitions connected
+ *          with internal places only). 
+ * 
+ * \note    reduce_dead_nodes, reduce_unused_status_places and 
+ *          reduce_suspicious_transitions temporary won't be invoked 
+ *          since they are no murta rules.
+ * 
  * \todo
  *       - Improve performance of the rules.
  *       - Pass a parameter to this function to choose the property of the
  *         model to be preserved.
  */
-unsigned int PetriNet::reduce(unsigned int reduction_level)
+unsigned int PetriNet::reduce(unsigned int reduction_level, bool keepNormal)
 {
   // trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " + information() + "\n");
   // trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
@@ -925,6 +944,7 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
   
   while (!done)
   {
+    /* no murata rules
     if (reduction_level >= 1)
     {
       reduce_dead_nodes();
@@ -937,6 +957,7 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
       reduce_suspicious_transitions();
 #endif
     }
+    //*/
     
     if (reduction_level >= 3)
     {
@@ -947,20 +968,23 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
     if (reduction_level >= 4)
     {
       reduce_series_places();		// RA1
-      reduce_series_transitions();	// RA2
+      reduce_series_transitions(keepNormal);	// RA2
     }
     
     if (reduction_level == 5)
     {
       reduce_self_loop_places();	// RC1
       reduce_self_loop_transitions();	// RC2
-      reduce_remove_initially_marked_places_in_choreographies();
+      // no murata rule
+      // reduce_remove_initially_marked_places_in_choreographies();
     }
     
+    /* no murata rule
     if (reduction_level == 6)
     {
       reduce_equal_places();		// RD1
     }
+    //*/
     
     
     // trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + toString(passes++) + ": " + information() + "\n");

@@ -449,7 +449,7 @@ class PetriNet
     void removeTransition(Transition *t);
 
     /// applies structral reduction rules
-    unsigned int reduce(unsigned int reduction_level = 5);
+    unsigned int reduce(unsigned int reduction_level = 5, bool keepNormal = false);
 
     /// swaps input and output places
     void mirror();
@@ -645,7 +645,7 @@ class PetriNet
     void reduce_series_places();
 
     /// fusion of series transitions
-    void reduce_series_transitions();
+    void reduce_series_transitions(bool keepNormal);
 
     /// elimination of self-loop places
     unsigned int reduce_self_loop_places();

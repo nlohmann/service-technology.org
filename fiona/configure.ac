@@ -196,11 +196,9 @@ AC_CONFIG_FILES([Makefile
                  Doxyfile
                  src/Makefile
                  tests/Makefile
-                 doc/Makefile
                  libs/Makefile
                  libs/cudd/Makefile
-                 libs/pnapi/Makefile
-                 man/Makefile])
+                 libs/pnapi/Makefile])
 AC_OUTPUT
 
 

@@ -1,0 +1,45 @@
+INTERFACE
+  INPUT
+    deliver,
+    known,
+    new;
+  OUTPUT
+    login,
+    order,
+    terms;
+
+NODES
+  0 : (!login + !order) : blue,
+  17 : !login : blue,
+  18 : (?new * (?deliver + ?known)) : blue,
+  19 : !terms : blue,
+  20 : ?deliver : blue,
+  21 : final : blue : finalnode,
+  28 : ?known : blue,
+  36 : ?deliver : blue,
+  38 : ((!order + ?known) * (!order + ?new)) : blue,
+  39 : !order : blue,
+  41 : (!order + !terms) : blue,
+  42 : !order : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 17 : !order,
+  0 -> 38 : !login,
+  17 -> 18 : !login,
+  18 -> 19 : ?new,
+  18 -> 28 : ?deliver,
+  18 -> 36 : ?known,
+  19 -> 20 : !terms,
+  20 -> 21 : ?deliver,
+  28 -> 21 : ?known,
+  36 -> 21 : ?deliver,
+  38 -> 18 : !order,
+  38 -> 39 : ?known,
+  38 -> 41 : ?new,
+  39 -> 36 : !order,
+  41 -> 42 : !terms,
+  41 -> 19 : !order,
+  42 -> 20 : !order;

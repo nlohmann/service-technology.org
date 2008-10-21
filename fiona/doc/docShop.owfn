@@ -1,0 +1,87 @@
+{ "online shop" for fiona_tool_paper }
+
+PLACE
+INTERNAL
+  p1,
+  p2,
+  p3,
+  p4,
+  p5,
+  p6,
+  p7,
+  p8,
+  p9;
+
+INPUT
+  login,
+  order,
+  terms;
+
+OUTPUT
+  new,
+  known,
+  deliver;
+
+INITIALMARKING
+  p1;
+
+FINALMARKING
+  p9;
+
+TRANSITION t1  { ?login }
+CONSUME
+  p1,
+  login;
+PRODUCE
+  p2;
+
+TRANSITION t2  { !new customer }
+CONSUME
+  p2;
+PRODUCE
+  p3,
+  p4,
+  new;
+
+TRANSITION t3  { !known customer }
+CONSUME
+  p2;
+PRODUCE
+  p5,
+  known;
+
+TRANSITION t4  { ?terms }
+CONSUME
+  p3,
+  terms;
+PRODUCE
+  p6;
+
+TRANSITION t5  { ?order (new) }
+CONSUME
+  p4,
+  order;
+PRODUCE
+  p7;
+
+TRANSITION t6  { ?order (known) }
+CONSUME
+  p5,
+  order;
+PRODUCE
+  p8;
+
+TRANSITION t7  { !deliver (new) }
+CONSUME
+  p6,
+  p7;
+PRODUCE
+  p9,
+  deliver;
+
+TRANSITION t8  { !deliver (known) }
+CONSUME
+  p8;
+PRODUCE
+  p9,
+  deliver;

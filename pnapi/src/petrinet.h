@@ -407,22 +407,22 @@ class PetriNet
     Arc *newArc(Node *my_source, Node *my_target, arc_type my_type = STANDARD, unsigned int my_weight = 1);
 
     /// merges two places
-    void mergePlaces(Place * & p1, Place * & p2, bool addWeights = true);
+    void mergePlaces(Place * & p1, Place * & p2);
 
     /// merges two places
-    void mergePlaces(string role1, Place * & p2, bool addWeights = true);
+    void mergePlaces(string role1, Place * & p2);
 
     /// merges two places
-    void mergePlaces(Place * & p1, string role2, bool addWeights = true);
+    void mergePlaces(Place * & p1, string role2);
 
     /// merges two places given two roles
-    void mergePlaces(string role1, string role2, bool addWeights = true);
+    void mergePlaces(string role1, string role2);
 
     /// merges two places given two identifiers and roles
-    void mergePlaces(unsigned int id1, string role1, unsigned int id2, string role2, bool addWeights = true);
+    void mergePlaces(unsigned int id1, string role1, unsigned int id2, string role2);
 
     /// merges two transitions
-    void mergeTransitions(Transition *t1, Transition *t2, bool addWeights = true);
+    void mergeTransitions(Transition *t1, Transition *t2);
 
     /// merges two parallel transitions
     void mergeParallelTransitions(Transition *t1, Transition *t2);

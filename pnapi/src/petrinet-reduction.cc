@@ -335,7 +335,7 @@ void PetriNet::reduce_identical_places()
     {
       Place* p1 = findPlace(labels->first);
       Place* p2 = findPlace(labels->second);
-      mergePlaces(p1, p2, false);
+      mergePlaces(p1, p2);
       result++;
     }
     //if (result!=0)
@@ -466,7 +466,7 @@ void PetriNet::reduce_series_places()
   for (set<pair<string, string> >::iterator placePair = placePairs.begin();
        placePair != placePairs.end(); placePair++)
   {
-    mergePlaces(placePair->first, placePair->second, false);
+    mergePlaces(placePair->first, placePair->second);
     result++;
   }
   //if (result!=0)
@@ -540,7 +540,7 @@ void PetriNet::reduce_series_transitions(bool keepNormal) {
                     != transitionPairs.end(); transitionPair++) {
         Transition* t1 = findTransition(transitionPair->first);
         Transition* t2 = findTransition(transitionPair->second);
-        mergeTransitions(t1, t2, false);
+        mergeTransitions(t1, t2);
         result++;
     }
     //if (result!=0)
@@ -944,16 +944,16 @@ unsigned int PetriNet::reduce(unsigned int reduction_level, bool keepNormal)
   
   while (!done)
   {
-    /* no murata rules
     if (reduction_level >= 1)
     {
       reduce_dead_nodes();
     }
     
+    /* no murata rule
     if (reduction_level >= 2)
     {
-      reduce_unused_status_places();
 #ifdef USING_BPEL2OWFN
+      reduce_unused_status_places();
       reduce_suspicious_transitions();
 #endif
     }
@@ -998,6 +998,106 @@ unsigned int PetriNet::reduce(unsigned int reduction_level, bool keepNormal)
   // trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " + information() + "\n");
   
   return passes;
+}
+
+
+
+/*!
+ * \brief   merges two parallel transitions
+ *
+ *          Merges two parallel transitions. Given transitions t1 and t2:
+ *          -# a new transition t12 with empty history is created
+ *          -# this transition gets the union of the histories of transition t1
+ *             and t2
+ *          -# the presets and postsets of t1 and t2 are calculated and united
+ *          -# t12 is connected with all the places in the preset and postset
+ *          -# the transitions t1 and t2 are removed
+ *
+ * \param   t1  first transition
+ * \param   t2  second transition
+ *
+ * \pre     t1 != NULL
+ * \pre     t2 != NULL
+ * \post    Transitions t1 and t2 removed.
+ * \post    Transition t12 having the incoming and outgoing arcs of t1 and t2
+ *          and the union of the histories of t1 and t2.
+ *
+ */
+void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
+{
+  if (t1 == t2)
+    return;
+
+  assert(t1 != NULL);
+  assert(t2 != NULL);
+
+  Node *t12 = newTransition("");
+
+  // organize the communication type of the new transition
+  if (t1->type == t2->type)
+    t12->type = t1->type;
+
+  else if ((t1->type == IN && t2->type == INTERNAL) ||
+           (t1->type == INTERNAL && t2->type == IN))
+    t12->type = IN;
+
+  else if ((t1->type == INTERNAL && t2->type == OUT) ||
+           (t1->type == OUT && t2->type == INTERNAL))
+    t12->type = OUT;
+
+  else if ((t1->type == OUT && t2->type == IN) ||
+           (t1->type == IN && t2->type == OUT) ||
+           (t1->type == INOUT || t2->type == INOUT))
+    t12->type = INOUT;
+
+
+  // copy t1's history to t12
+  for (list<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
+  {
+    roleMap[*role] = t12;
+    t12->history.push_back(*role);
+    if (t1->prefix != "")
+    {
+        roleMap[t1->prefix + *role] = t12;
+        t12->history.push_back(t1->prefix + *role);
+    }
+  }
+
+  // copy t2's history to t12
+  for (list<string>::iterator role = t2->history.begin(); role != t2->history.end(); role++)
+  {
+    roleMap[*role] = t12;
+    t12->history.push_back(*role);
+    if (t1->prefix != "" || t2->prefix != "")
+    {
+        roleMap[t2->prefix + *role] = t12;
+        t12->history.push_back(t2->prefix + *role);
+    }
+  }
+
+  // merge pre- and postsets for t12
+  t12->preset=setUnion(t1->preset, t2->preset);
+  t12->postset=setUnion(t1->postset, t2->postset);
+
+  // create the weighted arcs for t12
+  set<Node *> preset2without1 = setDifference(t12->preset,t1->preset);
+  set<Node *> postset2without1 = setDifference(t12->postset,t1->postset);
+
+
+  for (set<Node *>::iterator n = t1->preset.begin(); n != t1->preset.end(); n++)
+    newArc((*n), t12, STANDARD, arc_weight((*n),t1));
+
+  for (set<Node *>::iterator n = preset2without1.begin(); n != preset2without1.end(); n++)
+    newArc((*n), t12, STANDARD, arc_weight((*n),t2));
+
+  for (set<Node *>::iterator n = t1->postset.begin(); n != t1->postset.end(); n++)
+    newArc(t12, (*n), STANDARD, arc_weight(t1,(*n)));
+
+  for (set<Node *>::iterator n = postset2without1.begin(); n != postset2without1.end(); n++)
+    newArc(t12, (*n), STANDARD, arc_weight(t2,(*n)));
+
+  removeTransition(t1);
+  removeTransition(t2);
 }
 
 /****************************************************

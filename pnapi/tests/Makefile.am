@@ -36,3 +36,51 @@ test_reduce_6_SOURCES = test_reduce_6.cc
 test_reduce_7_SOURCES = test_reduce_7.cc
 
 LDADD = $(top_builddir)/src/lib_pnapi.a
+
+
+##############################################################################
+# all you need for code coverage
+##############################################################################
+
+# the lcov scripts
+EXTRA_DIST = lcov/README lcov/gendesc lcov/genhtml \
+	lcov/geninfo lcov/genpng lcov/lcov
+
+# remove files create during code coverage test
+CLEANFILES = -fr output $(COVERINFOS) *.gcno *.gcda
+
+# path to the tools
+LCOV    = lcov/lcov
+GENHTML = lcov/genhtml
+GENDESC = lcov/gendesc
+GENPNG  = lcov/genpng
+
+# use .info as suffix for cover information
+SUFFIXES = .info
+
+# for each test, create an .info file
+COVERINFOS = $(TESTS:=.info)
+
+# wrapper for the testscripts
+%.info: %
+	@$(LCOV) --zerocounters --quiet --directory $(top_srcdir)/src
+	-@$(TESTS_ENVIRONMENT) $(top_srcdir)/tests/$<
+	@$(LCOV) --capture --directory $(top_srcdir)/src --output-file $@ --test-name $<
+
+# compile the code for code coverage
+cover-prepare:
+	$(MAKE) --directory=$(top_srcdir) clean
+	$(MAKE) --directory=$(top_srcdir)/src all \
+	  CXXFLAGS="-fprofile-arcs -ftest-coverage" \
+	  CFLAGS="-fprofile-arcs -ftest-coverage" \
+	  LDFLAGS="-lgcov"
+
+# create a HTML table from the results
+cover:
+	$(MAKE) $(COVERINFOS) \
+	  CXXFLAGS="-fprofile-arcs -ftest-coverage" \
+	  CFLAGS="-fprofile-arcs -ftest-coverage" \
+	  LDFLAGS="-lgcov"
+	$(GENHTML) $(COVERINFOS) \
+	   --output-directory output --title "$(PACKAGE_STRING)" \
+	   --show-details --legend

@@ -198,7 +198,8 @@ AC_CONFIG_FILES([Makefile
                  tests/Makefile
                  libs/Makefile
                  libs/cudd/Makefile
-                 libs/pnapi/Makefile])
+                 libs/pnapi/Makefile
+		 man/Makefile])
 AC_OUTPUT
 
 

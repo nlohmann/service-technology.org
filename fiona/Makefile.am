@@ -1,4 +1,4 @@
-SUBDIRS = libs src tests 
+SUBDIRS = libs src tests man
 EXTRA_DIST = doc/docShop.owfn doc/docShop.owfn.og doc/fionaDocumentation.pdf
 
 

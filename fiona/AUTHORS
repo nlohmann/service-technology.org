@@ -1,40 +1,48 @@
-                          _____ _                   
-                         |  ___(_) ___  _ __   __ _ 
+                          _____ _
+                         |  ___(_) ___  _ __   __ _
                          | |_  | |/ _ \| '_ \ / _` |
                          |  _| | | (_) | | | | (_| |
                          |_|   |_|\___/|_| |_|\__,_|
                      http://service-technology.org/fiona
-                   
+
 
 COPYRIGHT
-    Copyright (c) 2008 Christian Gierds, Niels Lohmann, Peter Massuthe,
+    Copyright (c) 2008  Robert Danitz, Christian Gierds, Niels Lohmann,
+                        Peter Massuthe, Richard Mu"ller, Janine Ott,
+                        Jan Su"rmeli, Daniela Weinberg, Karsten Wolf,
+                        Martin Znamirowski
+
+    Copyright (c) 2007  Jan Bretschneider, Robert Danitz, Christian Gierds,
+                        Kathrin Kaschner, Leonard Kern, Niels Lohmann,
+                        Peter Massuthe, Daniela Weinberg, Karsten Wolf
+
+    Copyright (c) 2006  Kathrin Kaschner, Peter Massuthe, Daniela Weinberg,
+                        Karsten Wolf
+
+
+AUTHORS
     Daniela Weinberg
+    Peter Massuthe
+    Karsten Wolf
+    Jan Bretschneider
+    Christian Gierds
+    Kathrin Kaschner
+    Niels Lohmann
 
 
-AUTHORS/ MAINTAINERS
-    Fiona was written and is maintained by
-        Peter Massuthe (Humboldt-Universita"t zu Berlin)
-        Daniela Weinberg (Humboldt-Universita"t zu Berlin)
+CONTRIBUTORS
+    Robert Danitz
+    Leonard Kern
+    Richard Mu"ller
+    Janine Ott
+    Jan Su"rmeli
+    Martin Znamirowski
 
 
-ACKNOWLEDGEMENTS
-
-    We would like to thank
-        Karsten Wolf (Universita"t Rostock)
-        Niels Lohmann (Universita"t Rostock)
-        Christian Gierds (Humboldt-Universita"t zu Berlin)
-        Kathrin Kaschner (Universita"t Rostock)
-        Jan Bretschneider
-
-    and our students
-        Martin Znamirowski (Humboldt-Universita"t zu Berlin)
-        Jan Sürmeli (Humboldt-Universita"t zu Berlin)
-        Robert Danitz (Humboldt-Universita"t zu Berlin)
-        Janine Ott (Humboldt-Universita"t zu Berlin)
-
-    Fiona was initially developed as part of the Tools4BPEL project funded
-    by the German Bundesministerium fu"r Bildung und Forschung (BMBF),
-    see http://www.informatik.hu-berlin.de/top/tools4bpel.
+MAINTAINERS
+    Peter Massuthe
+    Daniela Weinberg
+    Karsten Wolf (coordinator)
 
 
 CONTACT
@@ -46,10 +54,17 @@ CONTACT
     Unter den Linden 6
     10099 Berlin, Germany
 
-    Homepage
-         `http://www.informatik.hu-berlin.de/top/mitarbeiter/massuthe'
-         `http://www.informatik.hu-berlin.de/top/mitarbeiter/weinberg'
+
+    Karsten Wolf (coordinator)
+
+    Universitaet Rostock
+    Institut fuer Informatik
+    18051 Rostock, Germany
+
 
     E-mail
-         <massuthe@informatik.hu-berlin.de>
-         <weinberg@informatik.hu-berlin.de>
+         <fiona@service-technology.org>
+         Incoming mail will be forwarded to the maintainers.
+
+    Web
+         http://service-technology.org/fiona

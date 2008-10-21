@@ -4,7 +4,7 @@ AC_INIT(Fiona, 3.0-unreleased, fiona@service-technology.org, fiona)
 #############################################################################
 
 AC_PREREQ(2.59)
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE(gnits)
 
 # where to look for source code and how the config header should be called
 AC_CONFIG_SRCDIR(src/main.cc)
@@ -153,21 +153,21 @@ fi
 #############################################################################
 # set and export flags for CUDD
 #############################################################################
-case `uname -s` in
-  Linux)
-    CUDD_XFLAGS=$CUDD_XFLAGS" -malign-double -DHAVE_IEEE_754 -DBSD"
-    ;;
-  SunOS)
-    CUDD_XFLAGS=$CUDD_XFLAGS" -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN"
-    ;;
-  CYGWIN*)
-    CUDD_XFLAGS=$CUDD_XFLAGS" -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864"
-    ;;
-  Darwin)
-    CUDD_XFLAGS=$CUDD_XFLAGS" -DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN"
-    ;;
-  *) ;;
-esac
+#case `uname -s` in
+#  Linux)
+#    CUDD_XFLAGS=$CUDD_XFLAGS" -malign-double -DHAVE_IEEE_754 -DBSD"
+#    ;;
+#  SunOS)
+#    CUDD_XFLAGS=$CUDD_XFLAGS" -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN"
+#    ;;
+#  CYGWIN*)
+#    CUDD_XFLAGS=$CUDD_XFLAGS" -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864"
+#    ;;
+#  Darwin)
+#    CUDD_XFLAGS=$CUDD_XFLAGS" -DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN"
+#    ;;
+#  *) ;;
+#esac
 
 AC_SUBST(CUDD_XFLAGS)
 

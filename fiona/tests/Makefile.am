@@ -127,16 +127,16 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
 	matching/interface_rcv-a_snd-by.owfn.png \
 	matching/interface_rcv-ax_snd-b.owfn \
 	matching/interface_rcv-ax_snd-b.owfn.png \
-    normalize/abnormal_input.owfn \
-    normalize/abnormal_input.normalized.expected.owfn \
-    normalize/abnormal_output.owfn \
-    normalize/abnormal_output.normalized.expected.owfn \
-    normalize/abnormal_both.owfn \
-    normalize/abnormal_both.normalized.expected.owfn \
-    normalize/abnormal_both2.owfn \
-    normalize/abnormal_both2.normalized.expected.owfn \
-    normalize/coffee.owfn \
-    normalize/coffee.normalized.expected.owfn \
+	normalize/abnormal_input.owfn \
+	normalize/abnormal_input.normalized.expected.owfn \
+	normalize/abnormal_output.owfn \
+	normalize/abnormal_output.normalized.expected.owfn \
+	normalize/abnormal_both.owfn \
+	normalize/abnormal_both.normalized.expected.owfn \
+	normalize/abnormal_both2.owfn \
+	normalize/abnormal_both2.normalized.expected.owfn \
+	normalize/coffee.owfn \
+	normalize/coffee.normalized.expected.owfn \
 	productog/1.og \
 	productog/2.og \
 	productog/3.og \

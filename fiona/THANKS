@@ -1,26 +1,14 @@
-                          _____ _                   
-                         |  ___(_) ___  _ __   __ _ 
+                          _____ _
+                         |  ___(_) ___  _ __   __ _
                          | |_  | |/ _ \| '_ \ / _` |
                          |  _| | | (_) | | | | (_| |
                          |_|   |_|\___/|_| |_|\__,_|
                      http://service-technology.org/fiona
-                   
+
 
 ACKNOWLEDGEMENTS
-
-    We would like to thank
-        Karsten Wolf (Universita"t Rostock)
-        Niels Lohmann (Universita"t Rostock)
-        Christian Gierds (Humboldt-Universita"t zu Berlin)
-        Kathrin Kaschner (Universita"t Rostock)
-        Jan Bretschneider
-        Arjan J. Mooij (TU Eindhoven)
-
-    and our students
-        Martin Znamirowski
-        Jan Su"rmeli
-        Robert Danitz
-        Janine Ott
+    Arjan J. Mooij, Technische Universiteit Eindhoven
+    Eric Verbeek, Technische Universiteit Eindhoven
 
     Fiona was initially developed as part of the Tools4BPEL project funded
     by the German Bundesministerium fu"r Bildung und Forschung (BMBF),

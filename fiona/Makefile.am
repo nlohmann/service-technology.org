@@ -20,7 +20,7 @@ svn-clean: maintainer-clean
 	-rm -f libs/Makefile.in libs/cudd/Makefile.in libs/pnapi/Makefile.in
 	-rm -f man/Makefile.in
 	-rm -f -r src/.deps
-	-rm -f src/Fiona.h.in
+	-rm -f src/Fiona.h.in src/fiona.h.in~
 	-rm -f tests/Makefile.in
 	@echo -----------------------------------------------------
 	@echo "To recreate installation status enter"
@@ -38,30 +38,9 @@ veryclean: clean
 # organize binary distributions
 #############################################################################
 
-.PHONY: binarydistreadme
-
 # a README file for a binary distribution
-binarydistreadme:
-	@echo -e Copyright \(C\) 2005, 2006, 2007, 2008 Peter Massuthe and Daniela Weinberg > BINARYREADME
-	@echo >> BINARYREADME
-	@echo -e This is a binary distribution of Fiona, a tool translating business >> BINARYREADME
-	@echo -e processes described in BPEL to open workflow nets \(oWFN\). The sources >> BINARYREADME
-	@echo -e of Fiona can be downloaded from the website of Fiona >> BINARYREADME
-	@echo -e \(http://www.informatik.hu-berlin.de/top/tools4bpel/Fiona\). >> BINARYREADME
-	@echo >> BINARYREADME
-	@echo -e Fiona is free software\; you can redistribute it and/or modify it >> BINARYREADME
-	@echo -e under the terms of the GNU General Public License as published by the >> BINARYREADME
-	@echo -e Free Software Foundation\; either version 2 of the License, or \(at your >> BINARYREADME
-	@echo -e option\) any later version. >> BINARYREADME
-	@echo >> BINARYREADME
-	@echo -e Fiona is distributed in the hope that it will be useful, but >> BINARYREADME
-	@echo -e WITHOUT ANY WARRANTY\; without even the implied warranty of >> BINARYREADME
-	@echo -e MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU >> BINARYREADME
-	@echo -e General Public License for more details. >> BINARYREADME
-	@echo >> BINARYREADME
-	@echo -e You should have received a copy of the GNU General Public License along >> BINARYREADME
-	@echo -e with Fiona\; if not, write to the Free Software Foundation, Inc., 51 >> BINARYREADME
-	@echo -e Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. >> BINARYREADME
+binarydistreadme: README
+	cp README BINARYREADME
 
 # target to create an executable that is independet of Cygwin
 win32: clean

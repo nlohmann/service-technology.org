@@ -262,6 +262,12 @@ rm -f $DIR/abnormal_both.normalized.owfn
 rm -f $DIR/abnormal_both2.normalized.owfn
 rm -f $DIR/coffee.normalized.owfn
 
+if [ $result -eq 0 ]; then
+    if [ "$testdir" != "$builddir" ]; then
+        rm -rf $builddir/$SUBDIR
+    fi
+fi
+
 echo
 
 exit $result

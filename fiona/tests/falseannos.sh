@@ -242,6 +242,11 @@ else
 fi
 
 ############################################################################
+if [ $result -eq 0 ]; then
+    if [ "$testdir" != "$builddir" ]; then
+        rm -rf $builddir/$SUBDIR
+    fi
+fi
 
 echo
 

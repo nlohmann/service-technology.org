@@ -362,7 +362,7 @@ else
 fi
 
 ###########################################################################
-if [ $result -ne 0 ]; then
+if [ $result -eq 0 ]; then
     if [ "$testdir" != "$builddir" ]; then
         rm -rf $builddir/$SUBDIR
     fi

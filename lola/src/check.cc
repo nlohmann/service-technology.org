@@ -1,11 +1,12 @@
-#include"graph.H"
-#include"dimensions.H"
-#include"formula.H"
-#include"net.H"
-#include"stubborn.H"
-#include"check.H"
-#include<fstream>
-#include<iostream>
+#include "graph.H"
+#include "dimensions.H"
+#include "formula.H"
+#include "net.H"
+#include "stubborn.H"
+#include "check.H"
+
+#include <fstream>
+#include <iostream>
 
 using std::ofstream;
 
@@ -442,12 +443,13 @@ int modelcheck()
 	}
 	DeadStatePathRestriction = new bool [F -> tempcard];
 
-
+#ifdef WITHFORMULA
 	for(i=0;i<Places[0]->cnt;i++)
 	{
 		Places[i] -> propositions = new formula * [Places[i] -> cardprop];
 		Places[i]->cardprop = 0;
 	}
+#endif
 	int res;
 	F = F -> reduce(& res);
 	if(res < 2)
@@ -485,7 +487,6 @@ int modelcheck()
 	return  (initial -> value[F -> index] ? 0 : 1);
 }
 
-void oldsearchAF(State *,unarytemporalformula *);
 void searchAF(State *,unarytemporalformula *);
 void searchEG(State *,unarytemporalformula *);
 void searchAU(State *,untilformula *);
@@ -1775,7 +1776,7 @@ void searchEU(State * s, untilformula * f)
 }
 				
 
-void searchAU(State * s, untilformula * f)
+void futuresearchAU(State * s, untilformula * f)
 {
 	unsigned int MinBookmark;
 	State * tarjanroot;
@@ -2207,7 +2208,7 @@ void searchAU(State * s, untilformula * f)
 	}
 }
 				
-void oldsearchAU(State * s, untilformula * f)
+void searchAU(State * s, untilformula * f)
 {
 	unsigned int i;
 	State * CurrentState, * NewState;
@@ -2405,7 +2406,7 @@ void oldsearchAU(State * s, untilformula * f)
 	}
 }
 				
-void oldsearchAF(State * s, unarytemporalformula * f)
+void searchAF(State * s, unarytemporalformula * f)
 {
 	unsigned int i;
 	State * CurrentState, * NewState;
@@ -2563,7 +2564,7 @@ void oldsearchAF(State * s, unarytemporalformula * f)
 	}
 }
 				
-void oldsearchEG(State * s, unarytemporalformula * f)
+void searchEG(State * s, unarytemporalformula * f)
 {
 	unsigned int i;
 	State * CurrentState, * NewState;
@@ -2724,7 +2725,7 @@ void oldsearchEG(State * s, unarytemporalformula * f)
 				
 
 				
-void searchAF(State * s, unarytemporalformula * f)
+void futuresearchAF(State * s, unarytemporalformula * f)
 {
 	unsigned int i;
 	State * CurrentState, * NewState;
@@ -2930,7 +2931,7 @@ void searchAF(State * s, unarytemporalformula * f)
 	}
 }
 				
-void searchEG(State * s, unarytemporalformula * f)
+void futuresearchEG(State * s, unarytemporalformula * f)
 {
 	unsigned int i;
 	State * CurrentState, * NewState;

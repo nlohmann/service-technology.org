@@ -1,5 +1,5 @@
-#include<iostream>
-#include"dimensions.H"
+#include <iostream>
+#include "dimensions.H"
 
 using std::cout;
 using std::endl;
@@ -14,6 +14,10 @@ void reportconfiguration()
 	cout << "http://www.informatik.hu-berlin.de/~kschmidt/lola.html" << endl << endl;
 	cout << "This executable is compiled in the following configuration:" << endl;
 	cout << "* Verification problem: " << endl;
+#ifdef LTLPROP
+	cout << "  LTLPROP: check if the system satisfies" << endl;
+	cout << "                a LTL property (given as Buchi automaton)" << endl;
+#endif
 #ifdef REACHABILITY
 	cout << "  REACHABILITY: check if a (completely specified) marking" << endl;
 	cout << "                is reachable from the initial marking" << endl;

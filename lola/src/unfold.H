@@ -1,8 +1,8 @@
 #ifndef UNFOLD_H
 #define UNFOLD_H
 
-#include"net.H"
-#include"dimensions.H"
+#include "net.H"
+#include "dimensions.H"
 
 typedef enum
 {

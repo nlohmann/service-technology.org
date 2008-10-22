@@ -1,15 +1,17 @@
 #ifndef GRAPH_H
 #define GRAPH_H
-#include"net.H"
-#include"dimensions.H"
-#include"symm.H"
-#include"formula.H"
+
+#include "net.H"
+#include "dimensions.H"
+#include "symm.H"
+#include "formula.H"
+
 // depository and search structures for reachability graph, TARJAN
 
 //#define CYCRED
 extern State * CurrentState;
 
-extern long int BitVectorSize;
+extern unsigned int BitVectorSize;
 
 class Statevector;
 
@@ -76,7 +78,7 @@ unsigned int closing;
 
 inline State::State()
 {
-	int i;
+
         persistent = 0;
 #ifdef CYCRED
 	closing = 0;
@@ -87,7 +89,7 @@ inline State::State()
 	witnesstransition = new Transition * [F -> tempcard+5];
 	value = new bool [F -> card+5];
 	known = new bool [F -> card+5];	
-	for(i=0;i<F->card;i++)
+	for(int i=0;i<F->card;i++)
 	{
 		known[i] = false;
 	}
@@ -104,7 +106,7 @@ inline State::State()
 	checkddfs = new unsigned int [ F -> tempcard];
 	checkmmin = new unsigned int [F -> tempcard];
 	checktarlevel = new unsigned int [ F -> tempcard];
-	for(i=0;i<F->tempcard;i++)
+	for(int i=0;i<F->tempcard;i++)
 	{
 		witness[i] = (State *) 0;
 		witnesstransition[i] = (Transition *) 0;
@@ -121,7 +123,7 @@ inline State::State()
 class binDecision
 {
 public:
-	int bitnr;
+	unsigned int bitnr;
 	binDecision *  nextold;
 	binDecision *  nextnew;
 	unsigned char * vector;
@@ -674,7 +676,7 @@ inline void trace();
 
 inline void print_marking()
 {
-  int i;
+  unsigned int i;
   for(i=0;i< Places[0]->cnt;i++)
     {
       if(MARKINGVECTOR[i])
@@ -730,7 +732,7 @@ inline State * insert_marking()
   // vom fehlgeschlagenen Versuch haben.
   
   Statevector * sv;
-  State * s;
+
   unsigned int i;
   // HashTable n    
   if(LastDecision)
@@ -987,7 +989,7 @@ inline void inttobits(unsigned char * bytepos, int bitpos, int nrbits, unsigned 
 {
 	// store value as a bit sequence of a char array starting at byte bytepos, bit bitpos and consisting of nrbits bits
 
-	unsigned char comp;
+
 	if(nrbits <= 8 - bitpos)
 	{
 		// value fits completely into first byte
@@ -1015,7 +1017,7 @@ inline void inttobits(unsigned char * bytepos, int bitpos, int nrbits, unsigned 
 void print_binDec(int);
 inline binDecision::binDecision(int b)
 {
-	int i;
+	unsigned int i;
 	bitnr = b;
 	nextold = nextnew = (binDecision *) 0;
 	vector = new unsigned char [ (BitVectorSize - (bitnr + 2) ) / 8 + 2];
@@ -1070,7 +1072,7 @@ inline State * bin_symm_search_marking()
 {
   State * st;
 	unsigned char byte; 
-	int t,p,pb,d; 
+	unsigned int t,p,pb,d; 
 	unsigned char * v; 
 	int s; 
 	int dir; 
@@ -1089,7 +1091,7 @@ inline State * bin_symm_search_marking()
     {
       return (State *) 0;
     }
-  if(st = symm_first_binSearch())
+  if((st = symm_first_binSearch()))
     {
       return st;
     }
@@ -1111,7 +1113,7 @@ inline State * bin_symm_search_marking()
   
   while((bin_p = NextSymm(Scapegoat)) < Places[0]->cnt)
     {
-      if(st = symm_next_binSearch())
+      if((st = symm_next_binSearch()))
 	{
 	  return st;
 	}
@@ -1356,8 +1358,8 @@ inline void binDelete(binDecision ** Bucket)
 
 	if((*Bucket) -> nextold)
 	{
-		int vbyte, obyte;
-		int upper, lower; 
+		unsigned int vbyte, obyte;
+		unsigned int upper, lower; 
 		unsigned char * v, * o;
 		v = (*Bucket) -> vector;
 		
@@ -1491,7 +1493,7 @@ checkagain:     if(todec)
 				if(bin_d < 8)
 				{
 					// compute scapegoat;
-					int pb,s;
+					unsigned int pb,s;
 					s = bin_s;	
 					Scapegoat = bin_p;
 					pb = bin_pb;
@@ -1551,7 +1553,7 @@ checkagain:     if(todec)
 			if(bin_d < 8)
 			{
 				// compute scapegoat
-				int pb,s;
+				unsigned int pb,s;
 				s = bin_s;	
 				Scapegoat = bin_p;
 				pb = bin_pb;
@@ -1637,7 +1639,7 @@ checkagain:     if(todec)
 				if(bin_d < 8)
 				{
 					// compute scapegoat
-					int pb,s;
+					unsigned int pb,s;
 					s = bin_s;	
 					Scapegoat = bin_p;
 					pb = bin_pb;
@@ -1697,7 +1699,7 @@ checkagain:     if(todec)
 			if(bin_d < 8)
 			{
 				// compute scapegoat
-				int pb,s;
+				unsigned int pb,s;
 				s = bin_s;	
 				Scapegoat = bin_p;
 				pb = bin_pb;
@@ -1731,7 +1733,7 @@ inline State * binInsert()
 {
 	return binInsert(binHashTable + (HASHENTRY));
 
-void print_path(State *);
 }
+void print_path(State *);
 	
 #endif

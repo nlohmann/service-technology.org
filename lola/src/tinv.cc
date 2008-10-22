@@ -1,6 +1,6 @@
 #include "tinv.H"
 #ifdef DISTRIBUTE
-#include"distribute.h"
+#include "distribute.h"
 #endif
 
 int ProgressSpan;

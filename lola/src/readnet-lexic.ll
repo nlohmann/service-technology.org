@@ -1,17 +1,16 @@
 %{
-//// 5 LINE ADDED BY NIELS
 #include "unfold.H"
 #include "symboltab.H"
 class arc_list;
 class case_list;
 #include "readnet-syntax.h"
 
-//// LINE OUT-COMMENTED BY NIELS
-//int yylineno=1;
 void setlval();
 %}
 
 %%
+AUTOMATON	 { return key_automaton;}
+FINAL 		 { return key_final;}
 RECORD           { return key_record;}
 END              { return key_end;}
 SORT		 { return key_sort;}

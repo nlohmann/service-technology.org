@@ -1,13 +1,16 @@
-#include"formula.H"
-#include"graph.H"
-#include"stubborn.H"
-#include"dimensions.H"
+#include "formula.H"
+#include "graph.H"
+#include "stubborn.H"
+#include "dimensions.H"
+
 #ifdef DISTRIBUTE
-#include"distribute.h"
+#include "distribute.h"
 #endif
-#include<fstream>
-#include<cstring>
-#include<cstdio>
+
+#include <fstream>
+#include <cstring>
+#include <cstdio>
+
 Decision ** HashTable;
 unsigned int  * BitHashTable;
 unsigned int LastChoice;
@@ -1019,7 +1022,7 @@ if(!NewOmegas) smallerstate = (State *) 0;
 	  if(!search_and_insert(CurrentMarking))
 #endif
 #else
-	  if(NewState = SEARCHPROC())
+	  if((NewState = SEARCHPROC()))
 #endif
 	    {
 		  // State exists! (or, at least, I am not responsible for it (in the moment))
@@ -2816,10 +2819,9 @@ void print_binDec(int h)
 
 void print_binDec(binDecision * d, int indent)
 {
-	unsigned int i;
 	// print bin decision table at hash entry h
 
-	for(i=0;i<indent;i++) cout << ".";
+	for(int i=0;i<indent;i++) cout << ".";
 
 	if(!d)
 	{
@@ -2828,12 +2830,12 @@ void print_binDec(binDecision * d, int indent)
 	}
 
 	cout << "b " << d -> bitnr << " v ";
-	for(i=0; i< (BitVectorSize - (d -> bitnr + 1)) ; i+=8)
+	for(unsigned int i=0; i< (BitVectorSize - (d -> bitnr + 1)) ; i+=8)
 	{
 		cout << (unsigned int) (d -> vector)[i/8] << " " ;
 	}
 
-	for(i=0;i<BitVectorSize - (d -> bitnr+1);i++)
+	for(unsigned int i=0;i<BitVectorSize - (d -> bitnr+1);i++)
 	{
 		cout << (((d->vector)[i/8] >> (7-i%8))%2);
 	}

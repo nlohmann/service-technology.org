@@ -1,6 +1,5 @@
 bin_PROGRAMS = lola
 
-
 #######################
 # the list of sources #
 #######################
@@ -8,6 +7,7 @@ bin_PROGRAMS = lola
 lola_SOURCES = readnet-syntax.yy \
 	       readnet-lexic.ll \
 	       net.cc net.H \
+	       buchi.cc buchi.H \
 	       formula.cc formula.H \
 	       stubborn.cc stubborn.H \
 	       graph.cc graph.H \
@@ -23,4 +23,11 @@ lola_SOURCES = readnet-syntax.yy \
 	       structure.H \
 	       userconfig.H 
 
+lola_EXTRASOURCES = ltl.H ltl.cc
+
 EXTRA_DIST = readnet-syntax.h
+
+lola_CFLAGS = @configured_CFLAGS@
+lola_CXXFLAGS = @configured_CXXFLAGS@
+lola_LDFLAGS = @configured_LDFLAGS@
+

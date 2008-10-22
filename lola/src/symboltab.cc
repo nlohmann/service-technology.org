@@ -104,6 +104,12 @@ SoSymbol::SoSymbol(char * name, UType * ty): Symbol(name,GlobalTable)
 	type = ty;
 }
 
+StSymbol::StSymbol(char * name): Symbol(name,BuchiTable)
+{
+	kind = st;
+	state = new buchistate(name);
+}
+
 RcSymbol::RcSymbol(char * name, UType * ty): Symbol(name,GlobalTable)
 {
 	type = ty;

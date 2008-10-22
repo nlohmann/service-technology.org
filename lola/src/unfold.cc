@@ -1,9 +1,9 @@
-#include"net.H"
-#include"dimensions.H"
+#include "net.H"
+#include "dimensions.H"
 #include "unfold.H"
 #include "symboltab.H"
-#include<strings.h>
-#include<stdio.h>
+#include <strings.h>
+#include <stdio.h>
 
 extern void yyerror(char *);
 

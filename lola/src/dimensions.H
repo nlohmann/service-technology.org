@@ -60,6 +60,12 @@
 #define MC 0
 #endif
 
+#ifdef LTLPROP
+#define LT 1
+#else
+#define LT 0
+#endif
+
 #ifdef BOUNDEDPLACE
 #define BP 1
 #else
@@ -126,11 +132,11 @@
 #define NO 0
 #endif
 
-#if (ST + EV + FA + RC + BP + MC + DT + RV + HO + FP + FU + BN + DL + SP + LP + NO) > 1
+#if (LT + ST + EV + FA + RC + BP + MC + DT + RV + HO + FP + FU + BN + DL + SP + LP + NO) > 1
 #error "define only one verification task!"
 #endif
 
-#if (ST + EV + FA + RC + BP + MC + DT + RV + HO + FP + FU + BN + DL + SP + LP + NO) < 1
+#if (LT + ST + EV + FA + RC + BP + MC + DT + RV + HO + FP + FU + BN + DL + SP + LP + NO) < 1
 #error "define a verification task by uncommenting the corresponding line in file userconfig.H!"
 #endif
 
@@ -177,6 +183,13 @@
 #endif
 #endif
 
+/* TWOPHASE ergibt nur bei LIVEPROP oder HOME Sinn, sonst nicht */
+#ifdef TWOPHASE
+#if (!defined(LIVEPROP) && !defined(HOME))
+#undef TWOPHASE
+#endif
+#endif
+
 #undef RC
 #undef BP 
 #undef MC
@@ -193,6 +206,7 @@
 #undef FA
 #undef EV
 #undef ST
+#undef LT
 
 #ifdef HASHSIZE
 
@@ -549,6 +563,11 @@
 #ifdef STUBBORN
 #define EXTENDED
 #endif
+#endif
+
+#ifdef LTLPROP
+#define FIRELIST firelist
+#define WITHFORMULA
 #endif
 
 #ifdef DEADLOCK

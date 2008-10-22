@@ -1,9 +1,9 @@
-#include"net.H"
-#include"printnet.H"
+#include "net.H"
+#include "printnet.H"
 
 void printnet()
 {
-	int i,j;
+	unsigned int i,j;
 	cout << "PLACE";
 	for(i=0;i<Places[0]->cnt;i++)
 	{
@@ -47,7 +47,7 @@ void printnet()
 
 void printnettofile(ofstream & f)
 {
-	int i,j;
+	unsigned int i,j;
 	f << "PLACE";
 	for(i=0;i<Places[0]->cnt;i++)
 	{
@@ -91,7 +91,7 @@ void printnettofile(ofstream & f)
 
 void printpnml()
 {
-	int i,j,k;
+	unsigned int i,j,k;
 	cout << "<pnml xmlns=" << '"' << "http://www.informatik.hu-berlin.de/top/pnml/ptNetb" << '"' << ">" << endl;
 	cout << "\t<net id=\"" << "LoLA_Ausgabe" << '"' << " type=\"http://www.informatik.hu-berlin.de/top/pntd/ptNetb\">" << endl;
 	for(i=0;i<Places[0]->cnt;i++)
@@ -147,7 +147,7 @@ void printpnml()
 
 void printpnmltofile(ofstream & f)
 {
-	int i,j,k;
+	unsigned int i,j,k;
 	f << "<pnml xmlns=" << '"' << "http://www.informatik.hu-berlin.de/top/pnml/ptNetb" << '"' << ">" << endl;
 	f << "\t<net id=\"" << "LoLA_Ausgabe" << '"' << " type=\"http://www.informatik.hu-berlin.de/top/pntd/ptNetb\">" << endl;
 	for(i=0;i<Places[0]->cnt;i++)

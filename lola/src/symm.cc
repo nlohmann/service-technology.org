@@ -1,7 +1,8 @@
 #include "symm.H"
-#include<limits.h>
-#include"graph.H"
-#include<stdlib.h>
+#include <limits.h>
+#include "graph.H"
+#include <stdlib.h>
+
 #define NodeType int
 #define PL 0
 #define TR 1

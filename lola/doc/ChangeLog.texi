@@ -1,7 +1,19 @@
+@heading Version 1.10
+@itemize
+@item this is an official source release by Karsten Wolf -- removed warning after executing the configure script
+
+@item added a generic Doxygen (@url{http://www.doxygen.org}) configuration file @file{Doxyfile.in}
+
+@item completed task #6267 (@url{http://gna.org/task/?626}): @code{TWOPHASE} is only set when it makes sense, i.e. only in @code{LIVEPROP} and @code{HOME}
+
+@item actually using command line parameters (@samp{--enable-win32}, @samp{--enable-64bit}, and @samp{--enable-universal}) from the configure script
+@end itemize
+
+
 @heading Version 1.03
 @itemize
 
-@item fixed bug #12302 (@url{https://gna.org/bugs/?12302}): LoLA: Uneinheitliche bzw. falsche Rückgabewerte bei @code{MODELCHECKING}, LoLA now returns the result via the @samp{_exit} command
+@item fixed bug #12302 (@url{https://gna.org/bugs/?12302}): LoLA: Exit Codes in @code{MODELCHECKING}: LoLA now returns the result via the @samp{_exit} command
 
 @item added directory @file{patches} collecting some unpublished adjustments
 

@@ -6,4 +6,54 @@
                      http://service-technology.org/lola
 
 
-See <http://service-technology.org/lola> for details.
+PURPOSE
+    LoLA (a Low Level Petri Net Analyzer) has been implemented for the
+    validation of reduction techniques for place/transition net state spaces.
+    Its particular strengths include
+    
+     * A large number of available state space reduction techniques many of
+       which may be applied jointly;
+     * A high degree of automation for various state space reduction
+       techniques
+     * Availability of dedicated variations of state space reduction
+       techniques for several frequently used properties
+     * efficient implementation exploiting the particular nature of Petri net
+       models simple textual interaction for easy integration into other
+       tools
+
+    LoLA has been tested on several UNIX platforms (Solaris, SUN-OS, LINUX)
+    as well as under WINDOWS using the CYGWIN environment.
+
+
+COPYRIGHT
+    Copyright (c) 1998, 1999, 2000, 2001, 2002,
+                  2003, 2004, 2005, 2006, 2007, 2008 Karsten Wolf
+
+
+AUTHORS
+    LoLA is written and maintained by Karsten Wolf. See file "AUTHORS" for
+    more information.
+
+
+LICENSE
+    License GPLv3+: GNU GPL version 3 or later
+    <http://gnu.org/licenses/gpl.html>
+
+    LoLA is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of LoLA.
+
+
+INSTALLATION
+    LoLA can be easily compiled and installed. See file "INSTALL" for
+    instructions.
+
+    LoLA uses some generated code. If you want to make changes to the source
+    code, you might need the following tools to regenerate the code:
+     * Flex (http://flex.sourceforge.net)
+     * Bison (http://www.gnu.org/software/bison)
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of LoLA.

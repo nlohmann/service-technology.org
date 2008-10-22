@@ -1,10 +1,10 @@
-#include<stdlib.h>
-#include"dimensions.H"
-#include"net.H"
-#include"formula.H"
-#include"graph.H"
-#include"stubborn.H"
-#include"check.H"
+#include <stdlib.h>
+#include "dimensions.H"
+#include "net.H"
+#include "formula.H"
+#include "graph.H"
+#include "stubborn.H"
+#include "check.H"
 
 #ifdef FINDPATH
 //unsigned int numberenabled;

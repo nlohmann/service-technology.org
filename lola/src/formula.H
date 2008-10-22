@@ -1,11 +1,12 @@
 #ifndef FORMULA_H
 #define FORMULA_H
-#include"net.H"
-#include"unfold.H"
-#include"symboltab.H"
-#include<fstream>
 
-#include"dimensions.H"
+#include "net.H"
+#include "unfold.H"
+#include "symboltab.H"
+#include "dimensions.H"
+
+#include <fstream>
 
 typedef enum
 {
@@ -13,6 +14,8 @@ eq, neq, geq, leq, lt, gt, conj, disj, neg, ax, ex, au, eu, ag, eg, af, ef, qe, 
 } FType;
 
 class State;
+class TrSymbol;
+class PlSymbol;
 
 class formula
 {
@@ -49,20 +52,20 @@ class transitionformula : public formula
 	TrSymbol * hltransition;
 	fmode * firingmode;
 	transitionformula(Transition *);
-	formula *  posate(){}
-	formula * negate(){}
-    virtual Transition ** spp2(State *){}
+	formula *  posate(){return (formula *) 0;}
+	formula * negate(){return (formula *) 0;}
+    virtual Transition ** spp2(State *){return (Transition **)0;}
 	transitionformula(TrSymbol *, fmode *);
   void  updateatomic(){}
 	formula * copy();
-    formula * reduce(int *){}
+    formula * reduce(int *){return (formula *) 0;}
     void  setstatic(){}
     formula *  merge();
 	unsigned int counttype(FType);
     formula *  replacequantifiers();
     bool evaluatetransition(Transition *);
     virtual unsigned int  collectsubs(FType,formula **,unsigned int);
-	bool initatomic(){}
+	bool initatomic(){return (formula *) 0;}
   void evaluateatomic(State * s){}
 };
 
@@ -81,7 +84,7 @@ public:
   virtual formula * copy();
     formula *  merge();
     formula * reduce(int *);
-    bool evaluatetransition(Transition * t){}
+    bool evaluatetransition(Transition * t){return 0;}
     virtual unsigned int  collectsubs(FType,formula **,unsigned int);
   virtual formula *  replacequantifiers();
   virtual void evaluateatomic(State *);
@@ -99,7 +102,7 @@ public:
   void  updateatomic();
     formula *  merge();
 	formula * posate();
-    virtual Transition ** spp2(State *){}
+    virtual Transition ** spp2(State *){return (Transition **)0;};
 	formula * negate();
   bool initatomic();
     formula * reduce(int *);
@@ -118,10 +121,10 @@ public:
   binarybooleanformula(FType,formula *, formula *);
   void evaluateatomic(State *);
     formula *  merge();
-	formula * posate(){}
-	formula * negate(){}
+	formula * posate(){return (formula *) 0;}
+	formula * negate(){return (formula *) 0;}
     formula *  replacequantifiers();
-    virtual Transition ** spp2(State *){}
+    virtual Transition ** spp2(State *){return (Transition **)0;};
     void  setstatic();
     formula * reduce(int *);
     bool evaluatetransition(Transition *);
@@ -166,11 +169,11 @@ public:
   void  updateatomic(){}
     formula * reduce(int *);
 	formula * posate();
-    virtual Transition ** spp2(State *){}
-	formula * negate(){}
+    virtual Transition ** spp2(State *){return (Transition **)0;}
+	formula * negate(){return (formula *) 0;}
     formula *  replacequantifiers();
     void  setstatic();
-    bool evaluatetransition(Transition *){}
+    bool evaluatetransition(Transition *){return 0;}
   unarytemporalformula(FType, formula *, formula *);
   void evaluateatomic(State *);
     virtual unsigned int  collectsubs(FType,formula **,unsigned int);
@@ -188,14 +191,14 @@ public:
     formula * reduce(int *);
   void  updateatomic(){}
   formula * posate();
-  formula * negate(){}
-    virtual Transition ** spp2(State *){}
+  formula * negate(){return (formula *) 0;}
+    virtual Transition ** spp2(State *){return (Transition **)0;}
   formula * copy();
     void  setstatic();
   untilformula(FType,formula *, formula *, formula *);
   void evaluateatomic(State *);
     unsigned int  counttype(FType);
-    bool evaluatetransition(Transition *){}
+    bool evaluatetransition(Transition *){return 0;}
     virtual unsigned int  collectsubs(FType,formula **,unsigned int);
   bool initatomic();
 };
@@ -205,23 +208,23 @@ class hlatomicformula : public formula
 public:
   Place * p;
   UExpression *  k;
-    formula *  merge(){}
+    formula *  merge(){return (formula *) 0;}
   UExpression * color; // Instanzbeschreibung einer HL-Stelle
-    formula * reduce(int *){}
+    formula * reduce(int *){return (formula *) 0;}
   PlSymbol * ps; // -"-
     void  setstatic(){}
-	formula * posate(){}
-    virtual Transition ** spp2(State *){}
-	formula * negate(){}
+	formula * posate(){return (formula *) 0;}
+    virtual Transition ** spp2(State *){return (Transition **)0;}
+	formula * negate(){return (formula *) 0;}
   formula * copy();
   void  updateatomic(){}
-    bool evaluatetransition(Transition *){}
-    virtual unsigned int  collectsubs(FType,formula **,unsigned int){}
+    bool evaluatetransition(Transition *){return 0;}
+    virtual unsigned int  collectsubs(FType,formula **,unsigned int){return 0;}
   formula *  replacequantifiers();
   hlatomicformula(FType,PlSymbol *, UExpression *);
-    unsigned int  counttype(FType){}
+    unsigned int  counttype(FType){return 0;}
   void evaluateatomic(State *s){}
-  bool initatomic(){}
+  bool initatomic(){return 0;}
 };
 
 
@@ -229,23 +232,23 @@ class quantifiedformula : public formula
 {
 public:
   formula * sub; 
-    formula *  merge(){}
+    formula *  merge(){return (formula *) 0;}
   UVar * var; // quantifizierte Variable; kommt nur beim Parsen vor und wird zu
     void  setstatic(){}
 			  // Konjunktion  bzw. Disjunktion entfaltet
   void  updateatomic(){}
-    virtual Transition ** spp2(State *){}
-  formula * posate(){}
-  formula * negate(){}
-    formula * reduce(int *){}
+    virtual Transition ** spp2(State *){return (Transition **)0;}
+  formula * posate(){return (formula *) 0;}
+  formula * negate(){return (formula *) 0;}
+    formula * reduce(int *){return (formula *) 0;}
   quantifiedformula(FType, UVar *, formula *);
-    virtual unsigned int  collectsubs(FType,formula **,unsigned int){}
+    virtual unsigned int  collectsubs(FType,formula **,unsigned int){return 0;}
   formula * copy();
-    bool evaluatetransition(Transition *){}
+    bool evaluatetransition(Transition *){return 0;}
     formula *  replacequantifiers();
-    unsigned int  counttype(FType){}
+    unsigned int  counttype(FType){return 0;}
   void evaluateatomic(State * s){}
-  bool initatomic(){}
+  bool initatomic(){return 0;}
 };
 
 class UExpression;
@@ -257,18 +260,18 @@ public:
     formula *  merge();
     void  setstatic(){}
   void  updateatomic(){}
-    virtual Transition ** spp2(State *){}
-  formula * posate(){}
-  formula * negate(){}
+    virtual Transition ** spp2(State *){return (Transition **)0;}
+  formula * posate(){return (formula *) 0;}
+  formula * negate(){return (formula *) 0;}
     formula * reduce(int *);
   staticformula(UExpression *);
     virtual unsigned int  collectsubs(FType,formula **,unsigned int);
   formula * copy();
-    bool evaluatetransition(Transition *){}
+    bool evaluatetransition(Transition *){return 0;}
     formula *  replacequantifiers();
     unsigned int  counttype(FType);
   void evaluateatomic(State * s){}
-  bool initatomic(){}
+  bool initatomic(){return 0;}
 };
 
 extern formula * F;

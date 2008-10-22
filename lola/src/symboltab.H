@@ -1,9 +1,10 @@
 #ifndef SYMBOLTAB_H
 #define SYMBOLTAB_H
 
-#include"net.H"
-#include"dimensions.H"
-#include"unfold.H"
+#include "net.H"
+#include "dimensions.H"
+#include "unfold.H"
+#include "buchi.H"
 
 class Symbol;
 
@@ -21,7 +22,7 @@ class SymbolTab
 
 extern SymbolTab * PlaceTable, * TransitionTable;
 	
-typedef enum {va,en,rc,fc,so,pl,tr,fp} kinds;
+typedef enum {va,en,rc,fc,so,pl,tr,fp,st} kinds;
 class Symbol
 {
 public:
@@ -85,6 +86,13 @@ class SoSymbol: public Symbol
 public:
 	UType * type;
         SoSymbol(char *, UType *);
+};
+
+class StSymbol: public Symbol
+{
+public:
+	buchistate * state;
+        StSymbol(char *);
 };
 
 

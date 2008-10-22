@@ -6,12 +6,26 @@
                      http://service-technology.org/lola
 
 
+Version 1.10
+============
+
+* this is an official source release by Karsten Wolf - removed warning after
+  executing the configure script
+
+* added a generic Doxygen (`http://www.doxygen.org') configuration file
+  `Doxyfile.in'
+
+* completed task #6267 (`http://gna.org/task/?626'): `TWOPHASE' is only set
+  when it makes sense, i.e. only in `LIVEPROP' and `HOME'
+
+* actually using command line parameters (`--enable-win32', `--enable-64bit',
+  and `--enable-universal') from the configure script
+
 Version 1.03
 ============
 
-* fixed bug #12302 (`https://gna.org/bugs/?12302'): LoLA: Uneinheitliche bzw.
-  falsche Rückgabewerte bei `MODELCHECKING', LoLA now returns the result via
-  the `_exit' command
+* fixed bug #12302 (`https://gna.org/bugs/?12302'): LoLA: Exit Codes in
+  `MODELCHECKING': LoLA now returns the result via the `_exit' command
 
 * added directory `patches' collecting some unpublished adjustments
 

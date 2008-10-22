@@ -1,9 +1,8 @@
-#include"formula.H"
-#include"graph.H"
-#include"unfold.H"
+#include "formula.H"
+#include "graph.H"
+#include "unfold.H"
 
 formula * F;
-#ifdef WITHFORMULA
 unsigned int formula::card = 0;
 unsigned int formula::tempcard = 0;
 
@@ -13,7 +12,7 @@ unsigned int xoperators = 0;
 
 void yyerror(char *);
 
-hlatomicformula::hlatomicformula(FType t, PlSymbol * pp, UExpression * te) 
+hlatomicformula::hlatomicformula(FType t, PlSymbol * pp, UExpression * te)
 {
   type = t;
   p = (Place *) 0;
@@ -79,25 +78,25 @@ unsigned int transitionformula::collectsubs(FType ty, formula ** subs, unsigned 
 	subs[pos++] = this;
 	return pos;
 }
-	
+
 unsigned int staticformula::collectsubs(FType ty, formula ** subs, unsigned int pos)
 {
 	subs[pos++] = this;
 	return pos;
 }
-	
+
 unsigned int atomicformula::collectsubs(FType ty, formula ** subs, unsigned int pos)
 {
 	subs[pos++] = this;
 	return pos;
 }
-	
+
 unsigned int unarybooleanformula::collectsubs(FType ty, formula ** subs, unsigned int pos)
 {
 	subs[pos++] = this;
 	return pos;
 }
-	
+
 unsigned int binarybooleanformula::collectsubs(FType ty, formula ** subs, unsigned int pos)
 {
 	if(type == ty)
@@ -108,7 +107,7 @@ unsigned int binarybooleanformula::collectsubs(FType ty, formula ** subs, unsign
 	subs[pos++] = this;
 	return pos;
 }
-	
+
 unsigned int booleanformula::collectsubs(FType ty, formula ** subs, unsigned int pos)
 {
 	if(type == ty)
@@ -123,21 +122,21 @@ unsigned int booleanformula::collectsubs(FType ty, formula ** subs, unsigned int
 	subs[pos++] = this;
 	return pos;
 }
-	
+
 unsigned int unarytemporalformula::collectsubs(FType ty, formula ** subs, unsigned int pos)
 {
 	tempindex = tempcard++;
 	subs[pos++] = this;
 	return pos;
 }
-	
+
 unsigned int untilformula::collectsubs(FType ty, formula ** subs, unsigned int pos)
 {
 	tempindex = tempcard++;
 	subs[pos++] = this;
 	return pos;
 }
-	
+
 
 atomicformula::atomicformula(FType t, Place * pp, unsigned int kk)
 {
@@ -222,7 +221,7 @@ void atomicformula::evaluateatomic(State * s)
 	case eq: if(CurrentMarking[p->index] == k)
 		 {
 			s -> value[index] = true;
-			
+
                  }
 		 else
 		 {
@@ -233,7 +232,7 @@ void atomicformula::evaluateatomic(State * s)
 	case neq: if(CurrentMarking[p->index] != k)
 		 {
 			s -> value[index] = true;
-			
+
                  }
 		 else
 		 {
@@ -244,7 +243,7 @@ void atomicformula::evaluateatomic(State * s)
 	case leq: if(CurrentMarking[p->index] <= k)
 		 {
 			s -> value[index] = true;
-			
+
                  }
 		 else
 		 {
@@ -255,7 +254,7 @@ void atomicformula::evaluateatomic(State * s)
 	case geq: if(CurrentMarking[p->index] >= k)
 		 {
 			s -> value[index] = true;
-			
+
                  }
 		 else
 		 {
@@ -266,7 +265,7 @@ void atomicformula::evaluateatomic(State * s)
 	case lt: if(CurrentMarking[p->index] < k)
 		 {
 			s -> value[index] = true;
-			
+
                  }
 		 else
 		 {
@@ -277,7 +276,7 @@ void atomicformula::evaluateatomic(State * s)
 	case gt: if(CurrentMarking[p->index] > k)
 		 {
 			s -> value[index] = true;
-			
+
                  }
 		 else
 		 {
@@ -524,7 +523,7 @@ formula * transitionformula::replacequantifiers()
             {
 				UValue * pl;
                 for(fm=firingmode;fm;fm=fm ->next)
-                {  
+                {
                     if(fm -> v == v) break;
                 }
                 if(!fm) yyerror("firing mode incomplete");
@@ -561,7 +560,7 @@ formula * transitionformula::replacequantifiers()
 		   firingmode = (fmode *) 0;
 		   return this;
 }
-	
+
 formula * atomicformula::replacequantifiers()
 {
 	return this;
@@ -733,7 +732,7 @@ formula * binarybooleanformula::merge()
 	}
 	return f;
 }
-		
+
 
 formula * booleanformula::merge()
 {
@@ -759,7 +758,7 @@ formula * booleanformula::merge()
 	}
 	return f;
 }
-		
+
 bool transitionformula::evaluatetransition(Transition * t)
 {
 	if(transition == t) return true;
@@ -812,15 +811,17 @@ bool booleanformula::evaluatetransition(Transition * t)
 		return false;
 	}
 }
-			
+
 void atomicformula::setstatic()
 {
+#ifdef WITHFORMULA
 	if(!(p -> propositions))
 	{
 		p -> propositions = new formula * [p -> cardprop];
 		p -> cardprop = 0;
 	}
 	p -> propositions[p -> cardprop ++] = this;
+#endif
 	index = card ++;
 #if defined(STUBBORN) && defined(STATEPREDICATE)
 	// compute global down set for state predicate
@@ -882,6 +883,8 @@ void booleanformula::setstatic()
 
 void untilformula::setstatic()
 {
+
+#ifdef WITHFORMULA
 	hold -> setstatic();
 hold -> parent = this;
 	goal -> setstatic();
@@ -905,11 +908,13 @@ goal -> parent = this;
 		}
 		DeadStatePathRestriction[tempindex] = true;
 	}
+#endif
 }
 
 
 void unarytemporalformula::setstatic()
 {
+#ifdef WITHFORMULA
 	element -> setstatic();
 	element -> parent = this;
 	index = card++;
@@ -935,6 +940,7 @@ void unarytemporalformula::setstatic()
 	{
 		xoperators++;
 	}
+#endif
 }
 
 unsigned int subindex;
@@ -943,7 +949,7 @@ void atomicformula::updateatomic()
 {
 	bool newvalue;
 	newvalue = false;
-	
+
 	switch(type)
 	{
 		case eq: if(CurrentMarking[p -> index] == k) newvalue = true; break;
@@ -1209,12 +1215,17 @@ formula * untilformula::reduce(int * res)
 
 formula * atomicformula::posate()
 {
+#ifdef WITHFORMULA
 	p -> cardprop ++;
+#endif
 	return this;
 }
 
 formula * atomicformula::negate()
 {
+#ifdef WITHFORMULA
+	p -> cardprop ++;
+#endif
 	switch(type)
 	{
 	case gt: type = leq; break;
@@ -1288,6 +1299,7 @@ void update_formula(Transition * t)
     // update value of formula after having fired t
     unsigned int i,j;
 
+#ifdef WITHFORMULA
     for(i=0;t->DecrPlaces[i] < Places[0]->cnt;i++)
     {
         for(j=0; j < Places[t->DecrPlaces[i]] -> cardprop;j++)
@@ -1302,6 +1314,7 @@ void update_formula(Transition * t)
             Places[t->IncrPlaces[i]]->propositions[j] -> updateatomic();
         }
     }
+#endif
 }
 
 Transition ** booleanformula::spp2(State * s)
@@ -1332,7 +1345,7 @@ Transition ** atomicformula::spp2(State * s)
 #if defined(RELAXED) && ! defined(STRUCT)
 	unsigned int i;
 
-	// 1. up(f) coverd by TSCC? 
+	// 1. up(f) coverd by TSCC?
 	//      yes -> return 0
 	//      no -> goto 2.
 	switch(type)
@@ -1486,7 +1499,6 @@ staticformula::staticformula(UExpression * e)
 	atomic =true;
 }
 
-#endif
 
 
 

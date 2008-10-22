@@ -1,13 +1,11 @@
-#include"net.H"
-#include"graph.H"
-#include"formula.H"
-#include<limits.h>
+#include "net.H"
+#include "graph.H"
+#include "formula.H"
+#include <limits.h>
 #ifdef STUBBORN
 
-#ifdef WITHFORMULA
 void insert_up(State *, formula *);
 void insert_global_down(formula *);
-#endif
 
 extern unsigned int * checkstart;
 void stubbornclosure()
@@ -117,7 +115,6 @@ void stubborninsert(Transition* t)
 	}
 }
 		
-#ifdef WITHFORMULA
 
 void insert_down(State *,formula *);
 		
@@ -619,7 +616,6 @@ Transition ** stubbornfirelistctl()
 	return firelist();
 }
 	
-#endif
 	
 Transition ** stubbornfireliststatic()
 {

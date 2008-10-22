@@ -1,7 +1,7 @@
-#include"graph.H"
-#include"net.H"
-#include"graph.H"
-#include"formula.H"
+#include "graph.H"
+#include "net.H"
+#include "graph.H"
+#include "formula.H"
 
 void stubbornclosure();
 void stubborninsert(Transition *);

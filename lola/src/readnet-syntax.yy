@@ -1,12 +1,13 @@
 %{
-#include"dimensions.H"
-#include"net.H"
-#include"graph.H"
-#include"symboltab.H"
-#include"formula.H"
-#include"unfold.H"
-#include<stdio.h>
-#include<limits.h>
+#include "dimensions.H"
+#include "net.H"
+#include "graph.H"
+#include "symboltab.H"
+#include "formula.H"
+#include "buchi.H"
+#include "unfold.H"
+#include <cstdio>
+#include <limits.h>
 
 extern UBooType * TheBooType;
 extern UNumType * TheNumType;
@@ -76,7 +77,6 @@ VaSymbol * VS;
 %yacc
 
 
-
 %type <varsy> quantification
 %type <value> transitionvariables
 %type <fm> firingmode
@@ -140,7 +140,7 @@ VaSymbol * VS;
 %type <tlist> hlterm
 
 	
-%token key_safe key_next key_analyse key_place key_marking key_transition key_consume key_produce comma colon semicolon ident number eqqual tand tor exists forall globally future until tnot tgeq tgt tleq tlt tneq key_formula lpar rpar key_state key_path key_generator key_record key_end key_sort key_function key_do key_array key_enumerate key_constant key_boolean key_of key_begin key_while key_if key_then key_else key_switch key_case key_repeat key_for key_to key_all key_exit key_return key_true key_false key_mod key_var key_guard tiff timplies lbrack rbrack dot pplus mminus times divide slash key_exists key_strong key_weak key_fair
+%token key_final key_automaton key_safe key_next key_analyse key_place key_marking key_transition key_consume key_produce comma colon semicolon ident number eqqual tand tor exists forall globally future until tnot tgeq tgt tleq tlt tneq key_formula lpar rpar key_state key_path key_generator key_record key_end key_sort key_function key_do key_array key_enumerate key_constant key_boolean key_of key_begin key_while key_if key_then key_else key_switch key_case key_repeat key_for key_to key_all key_exit key_return key_true key_false key_mod key_var key_guard tiff timplies lbrack rbrack dot pplus mminus times divide slash key_exists key_strong key_weak key_fair
 %nonassoc tgeq tgt tleq tlt tneq eqqual
 %left tnot exists forall globally future key_next
 %left tand tor pplus mminus times divide key_mod
@@ -148,7 +148,8 @@ VaSymbol * VS;
 %nonassoc colon
 %{
 extern YYSTYPE yylval;
-//// LINE COMMENTED BY NIELS //// #include"lex.yy.c"
+
+//// 1 LINE REMOVED BY NIELS //// #include"lex.yy.c"
 //// 3 LINES ADDED BY NIELS
 extern int yylex();
 extern FILE *yyin;
@@ -157,16 +158,13 @@ extern int yylineno;
 
 %%
 input: declarations net            { 
-#ifdef WITHFORMULA
 F = (formula *) 0 ; 
-#endif
 }
      | declarations net formulaheader ctlformula { 
-#ifdef WITHFORMULA
 F = $4;
-#endif
 }
 	| declarations net key_analyse key_place aplace {
+	F = (formula *) 0;
 	CheckPlace = $5;
 #ifdef STUBBORN
 	Transitions[0]->StartOfStubbornList = (Transition *) 0;
@@ -181,6 +179,7 @@ int i;
 #endif
                 }
 	| declarations net key_analyse key_transition atransition {
+	F = (formula *) 0;
 	CheckTransition = $5;
 #ifdef STUBBORN
 	Transitions[0]->EndOfStubbornList = LastAttractor = Transitions[0]->StartOfStubbornList = CheckTransition;
@@ -188,9 +187,10 @@ int i;
 	CheckTransition -> instubborn = true;
 #endif
 	}
-	| declarations net key_analyse key_marking amarkinglist 
+	| declarations net key_analyse key_marking amarkinglist  { F = (formula *) 0;}
+	| declarations net key_automaton automaton  {F = (formula *) 0;}
      ; 
-formulaheader: key_formula {LocalTable = new SymbolTab(256);}
+formulaheader: key_formula {LocalTable = new SymbolTab(2);}
 			;
 atransition: nodeident {
 				TS = (TrSymbol *) TransitionTable -> lookup($1);
@@ -1003,7 +1003,7 @@ fac: ident {
 		e -> lval = a;
 		$$ =e;
 		}
-   | lpar expression rpar {$$ = $2;} //// SEMICOLON ADDED BY NIELS
+   | lpar expression rpar {$$ = $2;}
    | key_true {
 		$$ = new UTrueExpression;
 		$$ -> type = TheBooType;
@@ -1723,7 +1723,7 @@ transitionvariables: vardeclarations {$$ = 0;}
 tname:   ident {LocalTable = new SymbolTab(256);}
 		 | number {LocalTable = new SymbolTab(256);}
     ;
-guard: { $$ = (UExpression *) 0; } //// SEMICOLON ADDED BY NIELS
+guard: { $$ = (UExpression *) 0;}
 	 | key_guard expression {if($2 -> type -> tag != boo) yyerror("guard expression must be boolean"); $$ = $2;}
      ;
 arclist: { $$ = (arc_list *) 0;}
@@ -1790,139 +1790,94 @@ numex:     number {
 			}
 	 ;
 ctlformula:   cplace eqqual numex   {
-#ifdef WITHFORMULA
 					((hlatomicformula *) $1) -> k = $3;
 					$1 -> type = eq;
 					$$ = $1;
-#endif
 				    }
           |   cplace tneq numex  {
-#ifdef WITHFORMULA
 					((hlatomicformula *) $1) -> k = $3;
 					$1 -> type = neq;
 					$$ = $1;
-#endif
 				  }
           |   cplace tleq numex  {
-#ifdef WITHFORMULA		   
 					((hlatomicformula *) $1) -> k = $3;
 					$1 -> type = leq;
 					$$ = $1;
-#endif
 				  }
           |   cplace tgeq numex  {
-#ifdef WITHFORMULA
 					((hlatomicformula *) $1) -> k = $3;
 					$1 -> type= geq;
 					$$ = $1;
-#endif
 				    }
           |   cplace tlt numex  {
-#ifdef WITHFORMULA
 					((hlatomicformula *) $1) -> k = $3;
 					$1 -> type = lt;
 					$$ = $1;
-#endif
 				    }
           |   cplace tgt numex {
-#ifdef WITHFORMULA    
 					((hlatomicformula *) $1) -> k = $3;
 					$1 -> type = gt;
 					$$ = $1;
-#endif 	
 	                            }
           |   ctlformula tand ctlformula  {
-#ifdef WITHFORMULA
 					   $$ = new binarybooleanformula(conj,$1,$3);
-#endif
                                            }
           |   ctlformula tor ctlformula  {
-#ifdef WITHFORMULA
 			                   $$ = new binarybooleanformula(disj,$1,$3);
-#endif
                                           }
           |   tnot ctlformula  {
-#ifdef WITHFORMULA
                                         $$ = new unarybooleanformula(neg,$2);
-#endif
                                  }
 		  | lbrack expression rbrack {
-#ifdef WITHFORMULA
 				if($2 -> type -> tag != boo)
 				{	
 					yyerror("formula requires boolean expression");
 				}
 				$$ = new staticformula($2);
-#endif
 					   }
 	  | key_exists  quantification colon ctlformula {
-#ifdef WITHFORMULA
 		$2 -> name[0] = '\0';
 		$$ = new quantifiedformula(qe,$2->var,$4);
-#endif
 		}
 	  | key_all quantification colon ctlformula {
-#ifdef WITHFORMULA
 		$2 -> name[0] = '\0';
 		$$ = new quantifiedformula(qa,$2->var,$4);
-#endif
 		}
           |   lpar ctlformula rpar  {
-#ifdef WITHFORMULA
                                      $$ = $2;
-#endif
                                     }
           |   exists transformula lbrack ctlformula until ctlformula rbrack  {
-#ifdef WITHFORMULA
                                   $$ = new untilformula(eu,$4,$6,(transitionformula *) $2);
-#endif
                                                               }
           |   forall transformula lbrack ctlformula until ctlformula rbrack    {
-#ifdef WITHFORMULA
                              $$ = new untilformula(au,$4,$6,(transitionformula *) $2);
-#endif
                                                               }
           |   exists transformula globally ctlformula  {
-#ifdef WITHFORMULA
                            $$ = new unarytemporalformula(eg,$4,(transitionformula *) $2);
-#endif
                                            }
           |   forall transformula globally ctlformula  {
-#ifdef WITHFORMULA
                                 $$ = new unarytemporalformula(ag,$4,(transitionformula *) $2);
-#endif
                                            }
           |   exists transformula key_next ctlformula  {
-#ifdef WITHFORMULA
                                       $$ = new unarytemporalformula(ex,$4,(transitionformula *) $2);
-#endif
                                          }
           |   forall transformula key_next ctlformula  {
-#ifdef WITHFORMULA
 				$$ = new unarytemporalformula(ax,$4,(transitionformula *) $2);
-#endif
                                         }
           |   exists transformula future ctlformula  {
-#ifdef WITHFORMULA
                                       $$ = new unarytemporalformula(ef,$4,(transitionformula *) $2);
-#endif
                                          }
           |   forall transformula future ctlformula  {
-#ifdef WITHFORMULA
 				$$ = new unarytemporalformula(af,$4,(transitionformula *) $2);
-#endif
                                         }
 ;
 cplace: nodeident {
-#ifdef WITHFORMULA
 				    PS = (PlSymbol *) PlaceTable -> lookup($1);
                     if(!PS) yyerror("Place does not exist");
 					if(PS -> sort) yyerror("HL places require instance");
 					$$ = new hlatomicformula(neq,PS,(UExpression *) 0);
-#endif
 				  }
 	  | nodeident dot lpar expression rpar {
-#ifdef WITHFORMULA
 				    PS = (PlSymbol *) PlaceTable -> lookup($1);
                     if(!PS) yyerror("Place does not exist");
                     if(!(PS-> sort)) yyerror("LL places do not require instance");
@@ -1931,7 +1886,6 @@ cplace: nodeident {
 						yyerror("place color incompatible to place sort");
 					}
 					$$ = new hlatomicformula(neq,PS,$4);
-#endif
 				}
 	  ;
 quantification: nodeident colon sortdescription {
@@ -1946,50 +1900,36 @@ transformula:  { $$ = (transitionformula *) 0;}
 			| transitionformula { $$ = $1;}
 			;
 transitionformula:  key_exists quantification colon transitionformula {
-#ifdef WITHFORMULA
 					$2 -> name[0] = '\0';
 					$$ = new quantifiedformula(qe,$2 -> var,$4);
-#endif
 					}
 				| key_all quantification colon transitionformula {
-#ifdef WITHFORMULA
 					$2 -> name[0] = '\0';
 					$$ = new quantifiedformula(qa,$2 -> var,$4);
-#endif
 					}
  				| transitionformula tand transitionformula {
-#ifdef WITHFORMULA
 						$$ = new binarybooleanformula(conj, $1, $3);
-#endif
 					}
 				| transitionformula tor transitionformula {
-#ifdef WITHFORMULA
 						$$ = new binarybooleanformula(disj, $1, $3);
-#endif
 					}
 				| tnot transitionformula {
-#ifdef WITHFORMULA
 						$$ = new unarybooleanformula(neg,$2);
-#endif
 					}
 				| lpar transitionformula rpar {$$ = $2;}
 				| formulatransition {
-#ifdef WITHFORMULA
 					if($1->vars && $1 -> vars -> card)
 					{
 						yyerror("HL transition requires firing mode");
 					}
 					$$ = new transitionformula($1 -> transition);
-#endif
 				}
 				| formulatransition dot lbrack parfiringmode rbrack {
-#ifdef WITHFORMULA
 					if((! $1 -> vars) || ($1 -> vars -> card == 0))
 					{
 						yyerror("LL transition does not require firing mode");
 					}
 					$$ = new transitionformula($1,$4);
-#endif
 				}
 				;
 formulatransition: nodeident {
@@ -2017,7 +1957,131 @@ fmodeblock: nodeident eqqual expression {
 			$$ -> next = (fmode *) 0;
 		}
 		  ;
-
+automaton:	{
+#ifdef WITHFORMULA
+	BuchiTable = new SymbolTab(10);} statepart finalpart transitionpart {
+				{
+						int i,j;
+						buchitransition * bt;
+						for(i=0;i<buchistate::nr;i++)
+						{
+							buchistate * b = buchiautomaton[i];
+							b -> delta = new buchitransition * [b -> nrdelta+1];
+							for(j=0,bt = b -> transitionlist;bt;bt = bt -> next,j++)
+							{
+								b -> delta[j] = bt;
+							}
+						}
+					    }
+						// process all guard formulas
+						int i, j, res;
+						for(i=0;i<Places[0]->NrSignificant;i++)
+						{
+							Places[i]-> cardprop = 0;
+							Places[i]-> propositions = (formula **) 0;
+						}
+						for(i=0;i<buchistate::nr;i++)
+						for(j=0;j<buchiautomaton[i]->nrdelta;j++)
+						{
+							buchiautomaton[i]->delta[j]->guard =
+							buchiautomaton[i]->delta[j]->guard -> replacequantifiers();
+							buchiautomaton[i]->delta[j]->guard -> tempcard = 0;
+							buchiautomaton[i]->delta[j]->guard =
+							buchiautomaton[i]->delta[j]->guard -> merge();
+							buchiautomaton[i]->delta[j]->guard =
+							buchiautomaton[i]->delta[j]->guard -> reduce(&res);
+							if(res == 0) buchiautomaton[i]->delta[j] = (buchitransition *) 0;
+							buchiautomaton[i]->delta[j]->guard =
+							buchiautomaton[i]->delta[j]->guard -> posate();
+							buchiautomaton[i]->delta[j]->guard -> tempcard = 0;
+						}
+						for(i=0;i<buchistate::nr;i++)
+						for(j=0;j<buchiautomaton[i]->nrdelta;j++)
+						{
+							buchiautomaton[i]->delta[j]->guard -> setstatic();
+							if(buchiautomaton[i]->delta[j]->guard -> tempcard)
+							{
+								yyerror("temporal operators not allowed in buchi automaton");
+							}
+						}
+						
+#endif						
+		}
+	;
+statepart: key_state statelist semicolon {
+			int i;
+			buchistate * b;
+			buchiautomaton = new buchistate * [buchistate::nr];
+			for(b=initialbuchistate;b;b=b->next)
+			{
+				buchiautomaton[b->code] = b;
+			}
+				 }
+	;
+statelist: statelist comma ident  { StSymbol * s ; 
+					if(s = (StSymbol *) (BuchiTable -> lookup($3)))
+					{
+						yyerror("State name in Buchi automaton used twice");
+					}
+					s = new StSymbol($3);
+					if(!initialbuchistate)
+					{
+						initialbuchistate = s -> state;
+					}
+					else
+					{
+						s -> state -> next = initialbuchistate -> next;
+						initialbuchistate -> next = s -> state;
+					}  
+				  }
+	 | ident                  { StSymbol * s;
+					if(s = (StSymbol *) (BuchiTable -> lookup($1)))
+					{
+						yyerror("State name in Buchi automaton used twice");
+					}
+					s = new StSymbol($1);
+					if(!initialbuchistate)
+					{
+						initialbuchistate = s -> state;
+					}
+					else
+					{
+						s -> state -> next = initialbuchistate -> next;
+						initialbuchistate -> next = s -> state;
+					}  
+				  }
+	 ;
+finalpart: key_final finallist semicolon 
+	 ;
+finallist: finallist comma ident { StSymbol * s;
+					s = (StSymbol *) BuchiTable -> lookup($3);
+					if(!s) yyerror("state does not exist");
+					s -> state -> final = 1;
+				 }
+	 | ident 		 { StSymbol * s;
+					s = (StSymbol *) BuchiTable -> lookup($1);
+					if(!s) yyerror("state does not exist");
+					s -> state -> final = 1;
+	 }						  
+	 ;
+transitionpart:  
+              |  transitionpart btransition 
+	      ;
+btransition : key_transition ident key_to ident key_guard {LocalTable = new SymbolTab(2); } ctlformula {
+			StSymbol * from, * to;
+			buchitransition * bt;
+			from = (StSymbol *) BuchiTable -> lookup($2);
+			if(!from) yyerror("state does not exist");
+			to = (StSymbol *) BuchiTable -> lookup($4);
+			if(!to) yyerror("state does not exist");
+			bt = new buchitransition;
+			bt -> next = from -> state -> transitionlist;
+			from -> state -> transitionlist = bt;
+			(from -> state -> nrdelta )++;
+			bt -> delta = to -> state;
+			bt -> guard = $7;
+		}
+	    ;
 %%
 
 
@@ -2048,8 +2112,8 @@ void readnet()
 	 	CurrentMarking[ii] = Places[ii]->initial_marking;
 		Places[ii]->index = ii;
 	}
-
-#ifdef WITHFORMULA
+if(F) 
+{
 	  F = F -> replacequantifiers();
 	  F -> tempcard = 0;
 	  F = F -> merge();
@@ -2061,8 +2125,28 @@ void readnet()
 		Transitions[i] -> lstdisabled = new unsigned int [F -> tempcard];
 	}
 #endif
-#endif
 }
+}
+
+/*
+bool taskfile = false;
+
+int yywrap()
+{
+	yylineno = 1;
+	if(taskfile) return 1;
+	if(!analysefile) return 1;
+	taskfile = true;
+	yyin = fopen(analysefile,"r");
+	if(!yyin)
+	{
+		cerr << "cannot open analysis task file: " << analysefile << "\n";
+		exit(4);
+	}
+	diagnosefilename = analysefile;
+	return(0);
+}
+*/
 
 void yyerror(char * mess)
 {

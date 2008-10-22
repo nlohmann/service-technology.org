@@ -1,4 +1,4 @@
-#include<fstream>
+#include <fstream>
 
 using std::ofstream;
 

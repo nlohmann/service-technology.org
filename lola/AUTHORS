@@ -1,5 +1,26 @@
-Written by:
-  Karsten Wolf, Universität Rostock
+                           _          _        _    
+                          | |    ___ | |      / \   
+                          | |   / _ \| |     / _ \  
+                          | |__| (_) | |___ / ___ \ 
+                          |_____\___/|_____/_/   \_\
+                     http://service-technology.org/lola
 
-Maintained by:
-  Niels Lohmann, Universität Rostock
+
+COPYRIGHT
+    Copyright (c) 1998, 1999, 2000, 2001, 2002,
+                  2003, 2004, 2005, 2006, 2007, 2008 Karsten Wolf
+
+
+AUTHOR/MAINTAINER
+    LoLA is written and maintained by Karsten Wolf
+
+
+CONTACT
+    Karsten Wolf
+    Institut fuer Informatik
+    Lehrstuhl Theorie der Programmiersprachen und Programmierung
+    Universitaet Rostock
+    18051 Rostock, Germany
+
+    WWW:    http://service-technology.org/lola
+    E-Mail: lola@service-technology.org

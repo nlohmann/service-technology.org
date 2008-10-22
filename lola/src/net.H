@@ -1,18 +1,21 @@
-// Nodes, arcs, Petri net containers, and basic access to a net (enabling, firing,...)
+/// This file organises the internal representation of a Petri net, i.e.
+/// Nodes, arcs, Petri net containers, and basic access to a net (enabling, firing,...)
+/// as well as output of a net.
+/// This file does also contain the main routine and related topics such as
+/// command line options.
 
 #ifndef NET_H
 #define NET_H
 
-#include<streambuf>
-#include<cstring> ///// LINE ADDED BY NIELS
-#include<cstdlib> ///// LINE ADDED BY NIELS
-#include<iostream>
-#include<limits.h>
-#include<unistd.h>
+#include <iostream>
+#include <limits.h>
+#include <unistd.h>
+#include <cstring>
+#include <cstdlib>
 #include "dimensions.H"
 
 using std::ostream;
-using std::ofstream; ///// LINE ADDED BY NIELS
+using std::ofstream;
 using std::cerr;
 using std::cout;
 using std::endl;
@@ -20,138 +23,160 @@ using std::endl;
 #define true 1
 #define false 0
 
-class Arc;
-extern unsigned int * CurrentMarking;
 
-class formula;
-class overflow {};
+class Arc; ///< Petri net arcs
+extern unsigned int * CurrentMarking; //< The current marking used in state space explorations
 
-class Node 
+class formula; ///< Can hold a state predicate or a temporal logic formula
+class overflow {}; ///< a dummy class for handling overflow exceptions
+
+/// Petri net nodes, including places and transitions
+class Node
 {
  public:
   unsigned int nr;
-  char * name; 
-  unsigned short int NrOfArriving;
-  unsigned short int NrOfLeaving;
-  Arc ** ArrivingArcs;
-  Arc ** LeavingArcs;
-  Node(char *);
-  ostream& operator << (ostream &);
-  ~Node();
-  void NewArriving(Arc&);
-  void NewLeaving(Arc&);
-  unsigned int pos[2]; // index in array of all nodes, two values for appearance in two arrays
+  char * name;  ///< external (string) representation
+  unsigned short int NrOfArriving; ///< number of incoming arcs
+  unsigned short int NrOfLeaving; ///< number of outgoing arcs
+  Arc ** ArrivingArcs; ///< array with pointers to each incoming arc
+  Arc ** LeavingArcs; ///< array with pointers to each outgoing arc
+  Node(char *); ///< constructor
+  ostream& operator << (ostream &); ///< output procedure
+  ~Node(); ///< destructor
+  void NewArriving(Arc&); ///< insertion of a new incoming arc during net construction
+  void NewLeaving(Arc&); ///< insertion of a new outgoing arc during net construction
+  unsigned int pos[2]; ///< index in array of all nodes, two values for appearance in two arrays
 #ifdef CYCLE
-  Node * parent ; // fuer Tiefensuche im Netz
+  Node * parent ; ///< for organizing a list that serves as a stack in a depth-first search through the net
+                  ///< idea: cycles in the net are necessary for seeing cycles in the state space
 #endif
 };
 
+/// insert a new incoming arc
 inline void Node::NewArriving(Arc & a)
 {
-  Arc ** Old = ArrivingArcs;
-  NrOfArriving++;
-  ArrivingArcs = new Arc* [NrOfArriving];
-  for(int i = 0; i < NrOfArriving -1;i++)
+  Arc ** Old = ArrivingArcs; /// remember original array
+  NrOfArriving++; /// increment size
+  ArrivingArcs = new Arc* [NrOfArriving]; /// enlarge array
+  for(int i = 0; i < NrOfArriving -1;i++) ///copy old entries
   {
     ArrivingArcs[i] = Old[i];
   }
-  ArrivingArcs[NrOfArriving -1] = & a;
-  delete [] Old;
+  ArrivingArcs[NrOfArriving -1] = & a; /// add new arc
+  delete [] Old; /// free old array
 }
 
+/// insert a new outgoing arc
 inline void Node::NewLeaving(Arc & a)
 {
-  Arc ** Old = LeavingArcs;
-  NrOfLeaving++;
-  LeavingArcs = new Arc* [NrOfLeaving];
-  for(int i = 0; i < NrOfLeaving -1;i++)
+  Arc ** Old = LeavingArcs; /// remember old array
+  NrOfLeaving++; /// increment size
+  LeavingArcs = new Arc* [NrOfLeaving]; ///enlarge array
+  for(int i = 0; i < NrOfLeaving -1;i++) /// copy old entries
   {
     LeavingArcs[i] = Old[i];
   }
-  LeavingArcs[NrOfLeaving -1] = & a;
-  delete [] Old;
+  LeavingArcs[NrOfLeaving -1] = & a; /// add new arc
+  delete [] Old; /// free old arry
 }
 
+/// destructor
 inline Node::~Node()
 {
+	/// release nontrivial ingredients
   delete [] name;
   delete []  ArrivingArcs;
   delete [] LeavingArcs;
 }
 
+/// constructor
 inline Node::Node(char * n)
 {
+	/// copy external representation
   name = new char [strlen(n) + 1];
   strcpy(name,n);
+   /// initialize arcs
   pos[0] = pos[1] = NrOfArriving = NrOfLeaving = 0;
+   /// dummy arrays to start with
   ArrivingArcs = new Arc* [1];
   LeavingArcs = new Arc*  [1];
 }
 
+/// contains dfsnum of currently processed transition, used for
+/// stubborn.ignorance management which requires depth first search
+/// through transitions
 extern unsigned int currentdfsnum;
-// contains dfsnum of currently processed state, used for
-//  ignorance managment
+
+
+
+// TODO: shift to check.H ?
 #ifdef MODELCHECKING
-extern unsigned int formulaindex; // in modelchecking,
-//the different subformulas must be treated spearately 
+extern unsigned int formulaindex; ///< in modelchecking,
+///< the different subformulas must be treated spearately
 #endif
 
+/// output operator
 inline ostream& operator << (ostream & str,Node n)
 {
   str << n.name;
   return str;
 }
-  
+
 class Transition;
 
+/// A Petri net place
 class Place: public Node
 {
  public:
-  static unsigned int cnt; // Number of places for statistics;
-  Place(char *);
-  ~Place();
-  static unsigned int hash_value;
-  unsigned int target_marking;
-  unsigned int initial_marking;
-  unsigned int hash_factor;
-  void operator += (unsigned int);  // increment marking of place
-  void operator -= (unsigned int);  // decrement marking of place
-  bool operator >= (unsigned int);  // test enabledness with respect to place
-  void set_marking(unsigned int);   // set initial 1marking of place;
-  void set_cmarking(unsigned int);   // set current marking of place;
-  void set_hash(unsigned int);      // define a factor for hash value calculation
-  // hash(m) = sum(p in P) p.hash_factor*CurrentMarking[p]
-  unsigned int index; // index in place array, necessary for symmetries
-  unsigned int references; // we remove isolated places 
-  static unsigned int NrSignificant;
-  bool significant; // set by p-invariants; only marking of sig. places is stored
+  static unsigned int cnt; ///< overall number of places;
+  Place(char *); ///< constructor
+  ~Place(); ///< destructor
+  static unsigned int hash_value; ///< hash value of CurrentMarking
+  // TODO: conditional compilation?
+  unsigned int target_marking; ///< marking that is checked for reachability
+  unsigned int initial_marking; ///< the initial marking (as defined in input file)
+  unsigned int hash_factor; ///< weight of place in hash value calculation (= weighted sum of markings)
+  void operator += (unsigned int);  ///<increment marking of place
+  void operator -= (unsigned int);  ///< decrement marking of place
+  bool operator >= (unsigned int);  ///< test enabledness with respect to place
+  void set_marking(unsigned int);   ///< set initial marking of place;
+  void set_cmarking(unsigned int);   ///< set current marking of place;
+  void set_hash(unsigned int);      ///< define a factor for hash value calculation
+  ///< hash(m) = sum(p in P) p.hash_factor*CurrentMarking[p]
+  unsigned int index; ///< index in place array, necessary for symmetries
+  unsigned int references; ///< #objects referring to this place - if 0 => remove place as isolated
+  static unsigned int NrSignificant; ///< nr of significant places (insignificant =
+  ///< linear dependent on signifiucant places
+  bool significant; ///< set when PREDUCTION is switched on ; only marking of sig. places is stored
 #ifdef STUBBORN
-  unsigned int visible; // number of visible pre-transitions
-  Transition ** PreTransitions; // List of pre-transitions (used as "mustbeincluded")
-  Transition ** PostTransitions; // List of post-transitions (used as "mustbeincluded")
-  void initialize();
+  unsigned int visible; ///< number of visible pre-transitions; used in stubborn set algorithms
+  Transition ** PreTransitions; ///< List of pre-transitions (used as "mustbeincluded" in stubborn set algorithms)
+  Transition ** PostTransitions; ///< List of post-transitions (used as "mustbeincluded" in stubborn set algorithms)
+  void initialize(); ///< should be called upon parsing a net
 #endif
 #ifdef COVER
-	bool bounded; // true if marking in current state is not omega
-	unsigned int lastfinite; // number of tokens in the moment of omega-intro
+	bool bounded; ///< true if marking in current state is not omega (coverability feature)
+	unsigned int lastfinite; ///< number of tokens in the moment of omega-intro (coverability feature)
 #endif
 #ifdef WITHFORMULA
-	unsigned int cardprop; // number of propositions mentioning this pl.
-	formula ** propositions;
+	unsigned int cardprop; ///< number of propositions mentioning this place when a formula is involved
+	formula ** propositions; ///< arry of all propositions mentioning this place. Used whebn formula values are updated
 #endif
-  int capacity;   // maximum capacity
-  int nrbits;     // nr of bits required for storing its marking (= log capacity)
+  unsigned int capacity;   ///< maximum capacity used for determining nr of bits in Decision tree
+  unsigned int nrbits;     ///< nr of bits required for storing its marking (= log capacity)
 };
 
-extern Place ** Places;
+extern Place ** Places; ///< array containing all places of the net
+///< in this array, significant places are sorted to the beginning
 
+/// constructor
 inline Place::Place(char * name) : Node(name)
 {
   cnt += 1;
 #ifdef PREDUCTION
-  significant = false; // in this case, psolve() sets sign. places to true
+  significant = false; // in this case, psolve() sets sign. places subsequently
 #else
-  significant = true;
+  significant = true; // without PREDUCTION, all places are significant
 #endif
   if(!(cnt % REPORTFREQUENCY))
   {
@@ -169,12 +194,14 @@ inline Place::Place(char * name) : Node(name)
 #endif
 }
 
-
+///desctructor
+// TODO: free arrays that are present depending on STUBBORN, MODELCHECKING etc.?
 inline Place::~Place()
 {
   cnt -= 1;
 }
-  
+
+/// add i to initial marking of place, adjust hash value
 inline void Place::operator += (unsigned int i)
 {
   initial_marking += i;
@@ -184,6 +211,7 @@ inline void Place::operator += (unsigned int i)
 #endif
 }
 
+/// sub i from initial marking of place, adjust hash value
 inline void Place::operator -= (unsigned int i)
 {
   initial_marking -= i;
@@ -193,11 +221,14 @@ inline void Place::operator -= (unsigned int i)
 #endif
 }
 
+// TODO: Do we ever use this?
+/// compare initial marking with i
 inline bool Place::operator >= (unsigned int i)
 {
   return((initial_marking >= i) ? 1 : 0);
 }
 
+/// define a weight for a place that is used for computing a hash value
 inline void Place::set_hash(unsigned int i)
 {
   hash_value -= hash_factor * initial_marking;
@@ -205,6 +236,8 @@ inline void Place::set_hash(unsigned int i)
   hash_value += hash_factor * initial_marking;
   hash_value %= HASHSIZE;
 }
+
+/// set the initial marking  of a place to i; adjust hash values
 inline void Place::set_marking(unsigned int i)
 {
 #ifndef SWEEP
@@ -215,7 +248,9 @@ inline void Place::set_marking(unsigned int i)
  hash_value += hash_factor * initial_marking;
   hash_value %= HASHSIZE;
 #endif
-}  
+}
+
+/// set CurrentMarking of a place, adjust hash value
 inline void Place::set_cmarking(unsigned int i)
 {
 #ifndef SWEEP
@@ -226,28 +261,30 @@ inline void Place::set_cmarking(unsigned int i)
  hash_value += hash_factor *CurrentMarking[index];
   hash_value %= HASHSIZE;
 #endif
-}  
+}
 
-
+/// Petri net arc
 class Arc
 {
  public:
-	static unsigned int cnt;
-  Node * Source;
-  Node * Destination;
-  Place * pl;
-  Transition * tr;
-  unsigned int Multiplicity;
-  Arc(Transition *, Place *, bool ,unsigned int);
-  Node * Get(bool);
-  void operator += (unsigned int);
+	static unsigned int cnt; ///< number of arcs
+  Node * Source; ///< the source node of arc (can be place or transition)
+  Node * Destination; ///< the sink node of arc (can be place or transition)
+  Place * pl; ///< the place connected to this arc (can be source or sink)
+  Transition * tr; ///< the transition connected to this arc (can be source of sink)
+  unsigned int Multiplicity; ///< multiplicity attached to this arc
+  Arc(Transition *, Place *, bool ,unsigned int); ///< constructor
+  Node * Get(bool); ///< false --> get source  true --> get destination
+  void operator += (unsigned int);  ///< add i to multiplicity of arc
 };
 
 #ifdef STUBBORN
+
+/// create those arrays for the place which are required for stubborn set calculations
 inline void Place::initialize()
 {
 	int i;
-	
+
   // Create list of pre-transitions. If this place is the scapegoat for a disabled transition in
   // stubborn set then these transitions must be in the stubborn set, too.
   PreTransitions = new Transition * [NrOfArriving+1];
@@ -265,6 +302,7 @@ inline void Place::initialize()
 }
 #endif
 
+/// constructor
 inline Arc::Arc(Transition * t,Place * p, bool totrans, unsigned int mult)
 {
   tr = t;
@@ -275,97 +313,108 @@ inline Arc::Arc(Transition * t,Place * p, bool totrans, unsigned int mult)
 	cnt++;
 }
 
+/// get source (0) or destination (1) of node
 inline Node * Arc::Get(bool dest)
 {
   return dest? Destination : Source;
 }
 
+/// add i to multiplicity of node (used in parser, otherwise deprecated)
 inline void Arc::operator += (unsigned int incr)
 {
   Multiplicity += incr;
 }
 
+/// A Petri net transition
 class Transition:public Node
 {
  public:
-  static unsigned int cnt; // statistics;
-  static Transition * StartOfEnabledList;
-  Transition(char *);
-  ~Transition();
-  unsigned int fairness;
-  static unsigned int NrEnabled; // Number of enabled tr. at curr. state
-  bool enabled;
-  Transition * NextEnabled;
-  Transition * PrevEnabled; // double linking in list of enabled transitions
-  // in the sequel, lists are NIL-terminated
-  unsigned int * PrePlaces; // Places to be checked for enabledness
-  unsigned int * Pre; // Multiplicity to be checked
-  unsigned int * IncrPlaces; // Places that are incremented by transition
-  unsigned int * Incr; // Amount of increment
-  unsigned int * DecrPlaces; // Places that are decremented by transition
-  unsigned int * Decr; // amount of decrement
-  Transition ** ImproveEnabling; // list of transitions where enabledness
-  //must be checked again after firing this transition
-  Transition ** ImproveDisabling; // list of transitions where disabledness
-  // must be checked again after firing this transition
-  void initialize(); // Set above arrays, list, enabled...
-  void fire(); // replace current marking by successor marking, force
-  // enabling test where necessary
-  void backfire(); // fire transition backwards to replace original state,
-  // force enabling tests where necessary
-  inline void check_enabled(); // test if tr is enabled. If necessary, rearrange list
-	int hash_change; // change of hash value by firing t;
-	void set_hashchange();
+  static unsigned int cnt; ///< statistics; overall number of transitions
+  static Transition * StartOfEnabledList; ///< anchor to list of enabled transitions
+  Transition(char *); ///< constructor
+  ~Transition(); ///< destructor
+  unsigned int fairness; ///< fairness constraint defined for this transition: 0=no, 1=weak, 2=strong
+  static unsigned int NrEnabled; ///< Number of enabled tr. at CurrentMarking
+  bool enabled; ///< is this transition enabled in CurrentMarking?
+  Transition * NextEnabled; ///< enabled transitions are kept in double linked list --> insertion, deletion in O(1)
+  Transition * PrevEnabled; ///< enabled transitions are kept in double linked list --> insertion, deletion in O(1)
+  // in the sequel, lists are represented as 0-terminated arrays
+  unsigned int * PrePlaces; ///< Places to be checked for enabledness after this fired
+  unsigned int * Pre; ///< Multiplicity to be checked for enabledness after this fired
+  unsigned int * IncrPlaces; ///< Places that are incremented by this transition firing
+  unsigned int * Incr; ///< Amount of increment when this transition fires
+  unsigned int * DecrPlaces; ///< Places that are decremented by this transition firing
+  unsigned int * Decr; ///< amount of decrement when this transition fires
+  Transition ** ImproveEnabling; ///< list of transitions where enabledness
+  ///< must be checked again after firing this transition
+  Transition ** ImproveDisabling; ///< list of transitions where disabledness
+  ///< must be checked again after firing this transition
+  void initialize(); ///< Set arrays, list, enabled etc. for this transition
+  void fire(); ///< replace current marking by successor marking, force
+  ///< enabling test where necessary
+  void backfire(); ///< fire transition backwards to replace original state,
+  ///< force enabling tests where necessary, used in backtracking
+  inline void check_enabled(); ///< test if tr is enabled. If necessary, rearrange Enabled list
+	int hash_change; ///< Delta of hash value: must be added to current hash value when t fires;
+	void set_hashchange(); ///< set the hash value Delta for this transition
 #ifdef STUBBORN
-  static Transition * StartOfStubbornList;
-  static Transition * EndOfStubbornList;
-  static unsigned int NrStubborn; // Nr. of enabled (!) transitions in stubborn set
-  Transition * NextStubborn;
-  unsigned int instubborn;
-  Place * scapegoat; // unsufficiently marked place for disabled transition
-  Transition ** mustbeincluded; // If this transition is in a stubborn set, these ones must be, too
-  Transition ** conflicting; // Transitions that can disable this transition
-  unsigned int dfs; 
-  unsigned int min; 
-  unsigned int stamp;
-  unsigned int mbiindex; // index in must be included list;
-  Transition * nextontarjanstack; // for tscc based stubborn set method
-  Transition * nextoncallstack; // for tscc based stubborn set method
-  static Transition * TarjanStack;
-  static Transition * CallStack;
-  bool visible;
-#endif 
-#ifdef MODELCHECKING
-	unsigned int * lstdisabled;
-	unsigned int * lstfired;
-#else
-	bool down; // transition is in the down set of a state predicate
-	unsigned int lastdisabled; // dfsnum of last state where
-							  // some fired transition disables this one
-	unsigned int lastfired; // dfsnum of last state where this tr. was fired
-	Transition ** add_up; // addditional transitions to be included when
-						  // this transition is in down set
+  static Transition * StartOfStubbornList; ///< Anchor to start of stubborn set
+  static Transition * EndOfStubbornList; ///< Anchor to end of stubborn set
+  static unsigned int NrStubborn; ///< Nr. of enabled (!) transitions in stubborn set
+  Transition * NextStubborn; ///< stubborn set is organized as a single linked list
+  unsigned int instubborn; ///< This transition in stubborn set?
+  Place * scapegoat; ///< insufficiently marked place for disabled transition
+  Transition ** mustbeincluded; ///< If this transition is in a stubborn set, these ones must be, too
+  Transition ** conflicting; ///< Transitions that can disable this transition, used as mustbeincluded
+  unsigned int dfs; ///< dfs number for depth first search through mustbeincluded graph
+  unsigned int min; ///< lowlink used for finding SCC in mustbeincluded graph
+  unsigned int stamp; ///< used for determining whether dfs values of this section stem from this search
+  unsigned int mbiindex; ///< index in mustbeincluded graph: represents successor in depth first search through mustbeincluded graph;
+  Transition * nextontarjanstack; ///< represents Tarjan stack for scc detection in mustbeincluded graph
+  Transition * nextoncallstack; ///< represents call stack for scc detection in mustbeincluded graph
+  static Transition * TarjanStack; ///< Top of Tarjan stack in mustbeincluded graph search
+  static Transition * CallStack; ///< Top of call stack in mustbeincluded graph search
+  bool visible; ///< can this transition alter any atomic proposition in used formula?
 #endif
-  static Transition * StartOfIgnoredList; // which transitions could be
-  Transition * NextIgnored;               //potentially ignored
+#ifdef MODELCHECKING
+	unsigned int * lstdisabled; ///<array containing, for each recursive search, largest dfsnum where this transition has been disabled
+	 ///< used for resolving fairness and ignorance issues
+	unsigned int * lstfired; ///< array containing, for each recursive search, largest dfsnum where this transition has fired.
+	 ///< used for resolving fairness and ignorance issues ///
+#else
+	bool down; ///< transition is in the global down set of a state predicate (see Kristensen/Valmari approach)
+	unsigned int lastdisabled; ///< dfsnum of last state where
+							  ///< some fired transition disables this one
+	 ///< used for resolving fairness and ignorance issues
+	unsigned int lastfired; ///< dfsnum of last state where this tr. was fired
+	 ///< used for resolving fairness and ignorance issues
+	Transition ** add_up; ///< addditional transitions to be included when
+						  ///< this transition is in down set
+	 ///< used for resolving fairness and ignorance issues in the Kristensen/Valmari approach
+#endif
+  static Transition * StartOfIgnoredList; ///< Anchor to Ignored list
+  Transition * NextIgnored;               ///< list of potentially ignored transitions
 #ifdef WITHFORMULA
-	bool * pathrestriction;
+	bool * pathrestriction;  ///< for which subformulas, this transition is in the cope of corresponding path quantifier?
+	///< used for extended CTL treatment
 #endif
 #if defined(CYCLE) || defined(STRUCT)
-	bool cyclic ; // can firing potentially close cycle in reach-graph?
+	bool cyclic ; ///< can firing potentially close cycle in reach-graph?
 #endif
 #ifdef COVER
-	void traceback();
+	void traceback();///< fire transition backwards, but in Ancestor vector instead of CurrentMarking
+	    ///< used for walking backwards in coverability graph generation
 #endif
 #if defined(FAIRPROP) || defined(EVENTUALLYPROP) || defined(STABLEPROP) || defined(MODELCHECKING)
-	unsigned int fairabled; //(#enabled [strongfair trans], #disabled [weak])
-	unsigned int faired; // #succs in scc [strongfair trans])
+	unsigned int fairabled; ///< (#enabled [strongfair trans], #disabled [weak])
+	unsigned int faired; ///< #succs inside scc [strongfair trans])
 #endif
 #ifdef SWEEP
-	long int progress_value;
+	long int progress_value; ///< Delta of this transition to progress values of markings
 #endif
 };
 
+/// constructor
 inline Transition::Transition(char * name):Node(name)
 {
   cnt += 1;
@@ -373,12 +422,12 @@ inline Transition::Transition(char * name):Node(name)
   {
 	cerr << "\n" << cnt << "transitions parsed\n";
   }
-  enabled = false;
+  enabled = false;  // real setting in first enabledness check
 #ifdef STUBBORN
-  stamp = 0;
+  stamp = 0; // not seen in any search
   NextStubborn = (Transition *) 0;
-  instubborn = false; 
-  visible = false;
+  instubborn = false; // real set in init of stubbornm set
+  visible = false; // real set upon parsing the formula
 #endif
 #ifdef EXTENDED
 #ifndef MODELCHECKING
@@ -395,6 +444,7 @@ inline Transition::Transition(char * name):Node(name)
 #endif
 }
 
+/// calculate impact of this transition to hash value of a marking
 inline void Transition::set_hashchange()
 {
 	unsigned int i;
@@ -411,12 +461,13 @@ inline void Transition::set_hashchange()
 	hash_change %= HASHSIZE;
 }
 
-
+/// destructor
 inline Transition::~Transition()
 {
   cnt -= 1;
 }
 
+/// init transition specific arrays
 inline void Transition::initialize()
 {
   unsigned int i,j,k;
@@ -433,7 +484,7 @@ inline void Transition::initialize()
   // Create list of places where transition increments marking
   IncrPlaces = new unsigned int [NrOfLeaving + 1];
   Incr = new unsigned int [NrOfLeaving + 1];
-  
+
   k=0;
   for(i = 0; i < NrOfLeaving;i++)
     {
@@ -454,7 +505,7 @@ inline void Transition::initialize()
 	      IncrPlaces[k] = LeavingArcs[i]->pl->index;
 	      Incr[k] = LeavingArcs[i]->Multiplicity - ArrivingArcs[j]->Multiplicity;
 	      k++;
-	    } 
+	    }
 	}
       else
 	{
@@ -489,7 +540,7 @@ inline void Transition::initialize()
 	      DecrPlaces[k] = ArrivingArcs[i]->pl->index;
 	      Decr[k] = ArrivingArcs[i]->Multiplicity - LeavingArcs[j]->Multiplicity;
 	      k++;
-	    } 
+	    }
 	}
       else
 	{
@@ -588,7 +639,7 @@ inline void Transition::initialize()
   set_hashchange();
 }
 
-
+/// fire this transition on CurrentMarking, re-evaluate enabledness
 inline void Transition::fire()
 {
   unsigned int * p;
@@ -610,7 +661,7 @@ if(Places[(*p)]-> bounded)
 #endif
       CurrentMarking[* p] += * i;
 #ifdef CHECKCAPACITY
-	if(CurrentMarking[*p] > Places[*p]->capacity) 
+	if(CurrentMarking[*p] > Places[*p]->capacity)
 	{
 		cerr << "capacity of place " << Places[*p]->name << " exceeded!" << endl;
 		_exit(4);
@@ -640,7 +691,7 @@ if(Places[(*p)]-> bounded)
 #endif
     }
 
-  
+
 #ifndef COVER
 #ifndef SWEEP
   Places[0]->hash_value += hash_change;
@@ -663,6 +714,7 @@ if(Places[(*p)]-> bounded)
     }
 }
 
+/// undo effect of firing transition (used for backtracking)
 inline void Transition::backfire()
 {
   unsigned int * p;
@@ -724,6 +776,7 @@ inline void Transition::backfire()
 #ifdef COVER
 extern unsigned int * Ancestor;
 
+/// proceed to predeccessor marking in Ancestor vector
 inline void Transition::traceback()
 {
   unsigned int * p;
@@ -747,7 +800,8 @@ inline void Transition::traceback()
 }
 #endif
 
-inline void Transition::check_enabled()  
+/// check activation of this transition
+inline void Transition::check_enabled()
 {
   unsigned int * p;
   unsigned int *i;
@@ -806,29 +860,30 @@ inline void Transition::check_enabled()
     }
 }
 
-extern Place * CheckPlace;
-extern Transition * CheckTransition;
-extern Transition ** Transitions;
-extern unsigned int Edges;
-extern Transition * LastAttractor; // Last transition in list of
-// static attractor set. Attractor sets form always a prefix in the 
-// list of stubborn transitions. Static attractor transitions are never
-// removed from that list.
+extern Place * CheckPlace; ///< place that selected verification problem refers to
+extern Transition * CheckTransition; ///< transition that selected verification problem refers to
+extern Transition ** Transitions; ///< array containing all transitions in the net
+extern unsigned int Edges; ///< number of transition occurrences during state space exploration
+extern Transition * LastAttractor; ///< Last transition in list of
+///< static attractor set. Attractor sets form always a prefix in the
+///< list of stubborn transitions. Static attractor transitions are never
+///< removed from that list.
 
-// file names for input and output
+/// file names for input and output
 
-extern char * netfile;
-extern char * analysefile;
-extern char * graphfile;
-extern char * pathfile;
-extern char * statefile;
-extern char * symmfile;
-extern char * netbasename;
+extern char * netfile;  ///< name of file containing LoLA net input
+extern char * analysefile; ///< name of file containing parameters of verification problem input
+extern char * graphfile; ///< name of file for reachability graph output
+extern char * pathfile; ///< name of file for witness/counterexample path output
+extern char * statefile; ///< name of file for witness/counterexample state output
+extern char * symmfile; ///< name of file for output of generating set of all symmetries
+extern char * netbasename; ///< base of net file name (used for generic output file names)
 
-extern bool Aflg, Sflg, Yflg, Pflg,GMflg, aflg, sflg, yflg,pflg,gmflg;
-extern char graphformat;
-extern long int BitVectorSize;
+extern bool Aflg, Sflg, Yflg, Pflg,GMflg, aflg, sflg, yflg,pflg,gmflg; ///< flags for parsing command line
+extern char graphformat; ///< command line option (verbatim) for controlling reachability graph output format
+extern unsigned int BitVectorSize; ///< nr of bits for storing a single marking
 
+void readnet(); ///< parse a net(+verification task parameters)
 
 #endif
 

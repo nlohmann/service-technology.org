@@ -1,4 +1,4 @@
-AC_INIT([LoLA],[1.03],[lola@service-technology.org],[lola])
+AC_INIT([LoLA],[1.10],[lola@service-technology.org],[lola])
 
 #############################################################################
 # check for prerequisites, programms, headers, and libraries
@@ -103,11 +103,6 @@ AC_SUBST(configured_LDFLAGS)
 #############################################################################
 
 # Set files to generate.
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile tests/Makefile Doxyfile])
 
 AC_OUTPUT
-
-echo ""
-echo "WARNING! This is not an official release version of LoLA."
-echo "         For an official release, visit <http://service-technology.org/lola>."
-echo ""

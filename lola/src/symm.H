@@ -1,8 +1,8 @@
 #ifndef SYMM_H
 #define SYMM_H
 
-#include"net.H"
-#include"dimensions.H"
+#include "net.H"
+#include "dimensions.H"
 
 class SymmImage
 {

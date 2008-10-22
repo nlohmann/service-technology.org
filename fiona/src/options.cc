@@ -266,12 +266,20 @@ void print_help() {
 // Prints some version information
 void print_version() {
     trace(std::string(PACKAGE_STRING) + " -- ");
-    trace("Functional InteractiON Analysis of open workflow nets\n");
-#ifdef COMPILE_DATE
-    trace("(compiled " + std::string(COMPILE_DATE) + ")\n");
-#endif
-    trace("\n");
-    trace("Copyright (C) 2005, 2006, 2007, 2008 Peter Massuthe and Daniela Weinberg\n");
+    trace("Functional InteractiON Analysis of open workflow nets\n\n");
+
+    trace("Copyright (c) 2008  Robert Danitz, Christian Gierds, Niels Lohmann,\n");
+    trace("                    Peter Massuthe, Richard Müller, Janine Ott,\n");
+    trace("                    Jan Sürmeli, Daniela Weinberg, Karsten Wolf,\n");
+    trace("                    Martin Znamirowski\n\n");
+
+    trace("Copyright (c) 2007  Jan Bretschneider, Robert Danitz, Christian Gierds,\n");
+    trace("                    Kathrin Kaschner, Leonard Kern, Niels Lohmann,\n");
+    trace("                    Peter Massuthe, Daniela Weinberg, Karsten Wolf\n\n");
+
+    trace("Copyright (c) 2006  Kathrin Kaschner, Peter Massuthe, Daniela Weinberg,\n");
+    trace("                    Karsten Wolf\n\n");
+
     trace("This is free software; see the source for copying conditions. There is NO\n");
     trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 }

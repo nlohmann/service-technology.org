@@ -262,9 +262,32 @@ void CommunicationGraph::printProgressFirst() {
 }
 
 
-//! \brief creates a dot output of the graph, uses the filename as title.
+//! \brief creates a dot output of the graph, uses "diagnosis|OG|IG of <filename>" as title.
 //! \param filenamePrefix a string containing the prefix of the output file name
 string CommunicationGraph::createDotFile(string& filenamePrefix) const {
+    
+    string title;
+
+    if (parameters[P_DIAGNOSIS]) {
+        title = "diagnosis of ";
+    } else {
+        parameters[P_OG] ? title = "OG of " : title = "IG of ";
+    }
+
+    if (PN != 0) {
+        title = PN->filename;
+    } else {
+        title = filenamePrefix.substr(0, filenamePrefix.rfind("."));
+    }
+    
+    return createDotFile(filenamePrefix, title);
+
+}
+
+
+//! \brief creates a dot output of the graph, uses the filename as title.
+//! \param filenamePrefix a string containing the prefix of the output file name
+string CommunicationGraph::createDotFile(string& filenamePrefix, const string& dotFileTitle) const {
 
     unsigned int maxSizeForDotFile = 5000; // number relevant for .out file
 
@@ -282,22 +305,12 @@ string CommunicationGraph::createDotFile(string& filenamePrefix) const {
         fstream dotFile(dotFileName.c_str(), ios_base::out | ios_base::trunc);
         if (!dotFile.good()) {
             dotFile.close();
-            exit(EC_FILE_ERROR);
+            TRACE(TRACE_0, "Error: A file error occured. Exit.");
         }
         dotFile << "digraph g1 {\n";
         dotFile << "graph [fontname=\"Helvetica\", label=\"";
-
-        if (parameters[P_DIAGNOSIS]) {
-            dotFile << "diagnosis of ";
-        } else {
-            parameters[P_OG] ? dotFile << "OG of " : dotFile << "IG of ";
-        }
-
-        if (PN != 0) {
-            dotFile << PN->filename;
-        } else {
-            dotFile << filenamePrefix.substr(0, filenamePrefix.rfind("."));
-        }
+        
+        dotFile << dotFileTitle;
         
         dotFile << " (parameters:";
         if (parameters[P_IG] && options[O_CALC_REDUCED_IG]) {

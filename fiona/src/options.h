@@ -114,16 +114,15 @@ typedef enum {
 } possibleParameters;
 
 // EXIT CODE CONSTANTS
-const unsigned short int EC_FILE_ERROR = 4;
-const unsigned short int EC_NO_RULES_FILE = 4;
-const unsigned short int EC_NO_CUDD_FILE = 4;
-const unsigned short int EC_CAPACITY_EXCEEDED = 4;
-const unsigned short int EC_BDD_ERROR = 1;
-const unsigned short int EC_MEMORY_EXHAUSTED = 5;
-const unsigned short int EC_UNREACHABLE_LINE = 1;
-const unsigned short int EC_DOT_ERROR = 1;
-const unsigned short int EC_BAD_CALL = 2;
-
+const unsigned short int EC_FILE_ERROR = 4;                 //!< An error occured with a file stream.
+const unsigned short int EC_NO_RULES_FILE = 4;              //!< Adapter: No rules file found.
+const unsigned short int EC_NO_CUDD_FILE = 4;               //!< No cudd file found.
+const unsigned short int EC_CAPACITY_EXCEEDED = 4;          //!< oWFN: Place capacity exceeded.
+const unsigned short int EC_BDD_ERROR = 1;                  //!< BDD: An error occured.
+const unsigned short int EC_MEMORY_EXHAUSTED = 5;           //!< "new" was not possible -> memory is exhausted.
+const unsigned short int EC_UNREACHABLE_LINE = 1;           //!< An unreachable line in code was reached. 
+const unsigned short int EC_DOT_ERROR = 1;                  //!< Dot refused to work properly.
+const unsigned short int EC_BAD_CALL = 2;                   //!< Fiona was called in an inappropriate way: Wrong mode/parameters.
 
 
 // some file names and pointers (in options.cc)

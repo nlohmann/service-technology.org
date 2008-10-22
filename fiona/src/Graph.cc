@@ -245,30 +245,37 @@ bool Graph::isAcyclic() {
 //! \param dotGraphTitle a title for the graph to be shown in the image
 string Graph::createDotFile(string& filenamePrefix,
                             const string& dotGraphTitle) const {
-
-    trace( "creating the dot file of the graph...\n");
+ 
+    unsigned int maxSizeForDotFile = 5000; // number relevant for .out file
     
-    string dotFile = filenamePrefix + ".out";
-    fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
-    if (!dotFileHandle.good()) {
-        dotFileHandle.close();
-        exit(EC_FILE_ERROR);
+    if (setOfNodes.size() <= maxSizeForDotFile) {
+    
+            trace( "creating the dot file of the graph...\n");
+            
+            string dotFile = filenamePrefix + ".out";
+            fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
+            if (!dotFileHandle.good()) {
+                dotFileHandle.close();
+                exit(EC_FILE_ERROR);
+            }
+            dotFileHandle << "digraph g1 {\n";
+            dotFileHandle << "graph [fontname=\"Helvetica\", label=\"";
+            dotFileHandle << dotGraphTitle;
+            dotFileHandle << "\"];\n";
+            dotFileHandle << "node [fontname=\"Helvetica\" fontsize=10];\n";
+            dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
+        
+            std::map<GraphNode*, bool> visitedNodes;
+            createDotFileRecursively(getRoot(), dotFileHandle, visitedNodes);
+        
+            dotFileHandle << "}";
+            dotFileHandle.close();
+        
+            return dotFile;
+    } else {
+            trace( "graph is too big to create dot file\n");
     }
-    dotFileHandle << "digraph g1 {\n";
-    dotFileHandle << "graph [fontname=\"Helvetica\", label=\"";
-    dotFileHandle << dotGraphTitle;
-    dotFileHandle << "\"];\n";
-    dotFileHandle << "node [fontname=\"Helvetica\" fontsize=10];\n";
-    dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
-
-    std::map<GraphNode*, bool> visitedNodes;
-    createDotFileRecursively(getRoot(), dotFileHandle, visitedNodes);
-
-    dotFileHandle << "}";
-    dotFileHandle.close();
-
-    return dotFile;
-    
+    return "";
 }
 
 //! \brief creates a dot output of the graph, using the filename as title.
@@ -357,7 +364,7 @@ void Graph::createDotFileRecursively(GraphNode* v,
 //!        underlying owfn
 //! \param setOfOutputs outputs that are not part of the graph but appeared in the
 //!        underlying owfn
-void Graph::transformToOWFN(PNapi::PetriNet* PN, set<string> setOfInputs, set<string> setOfOutputs) {
+void Graph::transformToOWFN(PNapi::PetriNet* PN, set<string>& setOfInputs, set<string>& setOfOutputs) {
 
     trace( "creating the oWFN from the service automaton ...\n");
 

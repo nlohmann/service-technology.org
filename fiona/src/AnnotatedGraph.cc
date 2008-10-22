@@ -1981,29 +1981,42 @@ string AnnotatedGraph::stripOGFileSuffix(const std::string& filename) {
 string AnnotatedGraph::createDotFile(string& filenamePrefix,
                                      const string& dotGraphTitle) const {
 
-    trace( "creating the dot file of the OG...\n");
+    unsigned int maxSizeForDotFile = 5000; // number relevant for .out file
 
-    string dotFile = filenamePrefix + ".out";
-    fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
-    if (!dotFileHandle.good()) {
-        dotFileHandle.close();
-        return "";
+    if (((parameters[P_SHOW_RED_NODES] || parameters[P_SHOW_ALL_NODES]) &&
+            (getNumberOfNodes() <= maxSizeForDotFile))
+         ||
+         ((parameters[P_SHOW_EMPTY_NODE] || parameters[P_SHOW_BLUE_NODES]) &&
+         getNumberOfBlueNodes() <= maxSizeForDotFile)) {
+
+            trace( "creating the dot file of the OG...\n");
+        
+            string dotFile = filenamePrefix + ".out";
+            fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
+            if (!dotFileHandle.good()) {
+                dotFileHandle.close();
+                return "";
+            }
+            dotFileHandle << "digraph g1 {\n";
+            dotFileHandle << "graph [fontname=\"Helvetica\", label=\"";
+            dotFileHandle << dotGraphTitle;
+            dotFileHandle << "\"];\n";
+            dotFileHandle << "node [fontname=\"Helvetica\" fontsize=10];\n";
+            dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
+        
+            std::map<AnnotatedGraphNode*, bool> visitedNodes;
+            createDotFileRecursively(getRoot(), dotFileHandle, visitedNodes);
+        
+            dotFileHandle << "}";
+            dotFileHandle.close();
+        
+            // ... dot file created (.out) //
+            return dotFile;
+    } else {
+            trace( "graph is too big to create dot file\n");
     }
-    dotFileHandle << "digraph g1 {\n";
-    dotFileHandle << "graph [fontname=\"Helvetica\", label=\"";
-    dotFileHandle << dotGraphTitle;
-    dotFileHandle << "\"];\n";
-    dotFileHandle << "node [fontname=\"Helvetica\" fontsize=10];\n";
-    dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
-
-    std::map<AnnotatedGraphNode*, bool> visitedNodes;
-    createDotFileRecursively(getRoot(), dotFileHandle, visitedNodes);
-
-    dotFileHandle << "}";
-    dotFileHandle.close();
-
-    // ... dot file created (.out) //
-    return dotFile;
+    
+    return "";
 }
 
 
@@ -2173,7 +2186,7 @@ string AnnotatedGraph::createOGFile(const string& filenamePrefix, bool hasOWFN) 
 
     if (!ogFile.good()) {
             ogFile.close();
-            exit(EC_FILE_ERROR);
+            TRACE(TRACE_0, "Error: A file error occured. Exit.");
     }
     if (hasNoRoot()) {
         // print file for empty OG
@@ -2604,97 +2617,6 @@ void AnnotatedGraph::fixDualService(bool fromOWFN) {
 }
 
 
-//! \brief transforms the graph into its public view
-//! \TODO the argument cleanPV is never written!!!
-void AnnotatedGraph::transformToPublicView(Graph* cleanPV, bool fromOWFN) {
-
-    // first either the empty node (if the owfn is given) or all true nodes
-    // need to be removed.
-    TRACE(TRACE_1, "    removing true nodes ...\n");
-    removeTrueNodes(fromOWFN);
-    TRACE(TRACE_2, "\n");
-
-    TRACE(TRACE_1, "    constructing dual service...\n");
-    constructDualService();
-    TRACE(TRACE_2, "\n");
-
-    TRACE(TRACE_1, "    fixing dual service...\n");
-    fixDualService(fromOWFN);
-    TRACE(TRACE_2, "\n");
-
-    TRACE(TRACE_1, "\nStatistics of the public view service automaton: \n");
-    TRACE(TRACE_1, "  nodes: " + intToString(setOfNodes.size()) + "\n");
-    unsigned int edges = 0;
-    for (nodes_iterator nodeIter = setOfNodes.begin(); nodeIter
-            != setOfNodes.end(); ++nodeIter) {
-
-        edges += (*nodeIter)->getLeavingEdgesCount();
-    }
-    TRACE(TRACE_1, "  edges: " + intToString(edges) + "\n\n");
-
-    TRACE(TRACE_1, "internal translation from OG class to graph class...\n");
-    transformOGToService(this);
-//    transformOGToService(cleanPV);
-    TRACE(TRACE_1, "\n");
-}
-
-
-//! \brief transforms the public view modified OG to a Service
-//! \TODO the argument cleanPV is ignored!!!
-void AnnotatedGraph::transformOGToService(Graph* cleanPV) {
-
-    // map from every node in the annotated graph to its corresponding
-    // node in the graph
-    map<AnnotatedGraphNode*, GraphNode*> nodeMap;
-
-    // iterate over all nodes
-    for (nodes_t::iterator copyNode = setOfNodes.begin(); copyNode
-            != setOfNodes.end(); copyNode++) {
-
-        // pointer for the copied node
-        GraphNode* copiedNode;
-
-        // gather all relevent informatiion
-        string stringVal;
-        stringVal.assign((*copyNode)->getName());
-        GraphNodeColor colorVal = (*copyNode)->getColor();
-        unsigned int numberVal = (*copyNode)->getNumber();
-
-        // create the new node with the gathered information
-        copiedNode = new GraphNode(stringVal, colorVal, numberVal);
-
-        // insert the new node into the nodemap
-        nodeMap[(*copyNode)] = copiedNode;
-
-        // add the new node to the graph
-        cleanPV->addNode(copiedNode);
-
-        // if this was the root node mark it as root node in the new
-        // graph as well
-        if (root == (*copyNode)) {
-            cleanPV->setRoot(copiedNode);
-        }
-
-        // if this node was final in the annotated graph
-        // it is final in the graph too
-        copiedNode->setFinal((*copyNode)->isFinal());
-
-        TRACE(TRACE_4, "    copied node: " + stringVal + "\n");
-    }
-
-    // create all edges after all nodes have been created in the graph
-    for (nodes_t::iterator copyNode = setOfNodes.begin(); copyNode
-            != setOfNodes.end(); copyNode++) {
-
-        AnnotatedGraphNode::LeavingEdges::Iterator edge_iter = (*copyNode)->getLeavingEdgesIterator();
-        while (edge_iter->hasNext()) {
-            AnnotatedGraphEdge* edge = edge_iter->getNext();
-            nodeMap[(*copyNode)]->addLeavingEdge(new GraphEdge( nodeMap[(edge)->getDstNode()], (edge)->getLabel()));
-        }
-    }
-}
-
-
 // CODE FROM CG FOR STRUCTURAL REDUCTION
 void AnnotatedGraph::reduceStructurally() {
     bool isDiamond(AnnotatedGraphNode * node,
@@ -3099,7 +3021,7 @@ string AnnotatedGraph::printGraphToSTG(vector<string>& edgeLabels) {
     fstream STGFileStream(STGFileName.c_str(), ios_base::out | ios_base::trunc | ios_base::binary);
     if (!STGFileStream.good()) {
             STGFileStream.close();
-            exit(EC_FILE_ERROR);
+            TRACE(TRACE_0, "Error: A file error occured. Exit.");
     }
     STGFileStream << ".model Labeled_Transition_System" << "\n";
     STGFileStream << ".dummy";
@@ -3220,5 +3142,155 @@ void AnnotatedGraph::computeAndPrintGraphStatistics() {
     computeGraphStatistics();
     printGraphStatistics();
     TRACE(TRACE_5, "void AnnotatedGraph::computeAndPrintGraphStatistics() : end\n");
+}
+
+
+//! \brief Transforms this OG (represented by an AnnotatedGraph) into a Public
+//!        View. The method works on the AnnotatedGraph object itself. 
+//!        To prevent this, create a copy with toAnnotatedGraph() first.
+void AnnotatedGraph::transformToPV(bool fromOWFN) {
+// first either the empty node (if the owfn is given) or all true nodes
+    // need to be removed.
+    TRACE(TRACE_1, "    removing true nodes ...\n");
+    removeTrueNodes(fromOWFN);
+    TRACE(TRACE_2, "\n");
+
+    TRACE(TRACE_1, "    constructing dual service...\n");
+    constructDualService();
+    TRACE(TRACE_2, "\n");
+
+    TRACE(TRACE_1, "    fixing dual service...\n");
+    fixDualService(fromOWFN);
+    TRACE(TRACE_2, "\n");
+
+    TRACE(TRACE_1, "\nStatistics of the public view service automaton: \n");
+    TRACE(TRACE_1, "  nodes: " + intToString(setOfNodes.size()) + "\n");
+    unsigned int edges = 0;
+    for (nodes_iterator nodeIter = setOfNodes.begin(); nodeIter
+            != setOfNodes.end(); ++nodeIter) {
+
+        edges += (*nodeIter)->getLeavingEdgesCount();
+    }
+    TRACE(TRACE_1, "  edges: " + intToString(edges) + "\n\n");
+}
+
+/**** Copy functions ****/
+
+//! \brief Copies this AnnotatedGraph-Object into another
+//!        AnnotatedGraph-Object (destination).
+//!        A deep copy is made, all nodes, edges and annotations are copied.
+void AnnotatedGraph::toAnnotatedGraph(AnnotatedGraph* destination) {
+    
+    // Assign simple members
+    destination->filename = filename; 
+
+
+    // map from every node in the annotated graph to its corresponding
+    // node in the graph
+    map<AnnotatedGraphNode*, AnnotatedGraphNode*> nodeMap;
+
+    // iterate over all nodes
+    for (nodes_t::iterator copyNode = setOfNodes.begin(); copyNode
+            != setOfNodes.end(); copyNode++) {
+
+        // pointer for the copied node
+        AnnotatedGraphNode* copiedNode;
+
+        // gather all relevent informatiion
+        string stringVal;
+        stringVal.assign((*copyNode)->getName());
+        GraphNodeColor colorVal = (*copyNode)->getColor();
+        unsigned int numberVal = (*copyNode)->getNumber();
+        GraphFormulaCNF* anno = (*copyNode)->getAnnotation()->getDeepCopy();
+        // create the new node with the gathered information
+        copiedNode = new AnnotatedGraphNode(stringVal, anno, colorVal, numberVal);
+
+        // insert the new node into the nodemap
+        nodeMap[(*copyNode)] = copiedNode;
+
+        // add the new node to the graph
+        destination->addNode(copiedNode);
+
+        // if this was the root node mark it as root node in the new
+        // graph as well
+        if (root == (*copyNode)) {
+            destination->setRoot(copiedNode);
+        }
+
+        // if this node was final in the annotated graph
+        // it is final in the graph too
+        copiedNode->setFinal((*copyNode)->isFinal());
+
+        TRACE(TRACE_4, "    copied node: " + stringVal + "\n");
+    }
+
+    // create all edges after all nodes have been created in the graph
+    for (nodes_t::iterator copyNode = setOfNodes.begin(); copyNode
+            != setOfNodes.end(); copyNode++) {
+
+        AnnotatedGraphNode::LeavingEdges::Iterator edge_iter = (*copyNode)->getLeavingEdgesIterator();
+        while (edge_iter->hasNext()) {
+            AnnotatedGraphEdge* edge = edge_iter->getNext();
+            nodeMap[(*copyNode)]->addLeavingEdge(new AnnotatedGraphEdge( nodeMap[(edge)->getDstNode()], (edge)->getLabel()));
+        }
+    }
+
+}
+
+//! \brief Copies this AnnotatedGraph-Object into a Graph object (destination). 
+//!        A deep copy is made, all nodes and edges are copied. 
+//!        Since a Graph is not annotated, annotations are not copied.
+void AnnotatedGraph::toGraph(Graph* destination) {
+
+    // map from every node in the annotated graph to its corresponding
+    // node in the graph
+    map<AnnotatedGraphNode*, GraphNode*> nodeMap;
+
+    // iterate over all nodes
+    for (nodes_t::iterator copyNode = setOfNodes.begin(); copyNode
+            != setOfNodes.end(); copyNode++) {
+
+        // pointer for the copied node
+        GraphNode* copiedNode;
+
+        // gather all relevent informatiion
+        string stringVal;
+        stringVal.assign((*copyNode)->getName());
+        GraphNodeColor colorVal = (*copyNode)->getColor();
+        unsigned int numberVal = (*copyNode)->getNumber();
+
+        // create the new node with the gathered information
+        copiedNode = new GraphNode(stringVal, colorVal, numberVal);
+
+        // insert the new node into the nodemap
+        nodeMap[(*copyNode)] = copiedNode;
+
+        // add the new node to the graph
+        destination->addNode(copiedNode);
+
+        // if this was the root node mark it as root node in the new
+        // graph as well
+        if (root == (*copyNode)) {
+            destination->setRoot(copiedNode);
+        }
+
+        // if this node was final in the annotated graph
+        // it is final in the graph too
+        copiedNode->setFinal((*copyNode)->isFinal());
+
+        TRACE(TRACE_4, "    copied node: " + stringVal + "\n");
+    }
+
+    // create all edges after all nodes have been created in the graph
+    for (nodes_t::iterator copyNode = setOfNodes.begin(); copyNode
+            != setOfNodes.end(); copyNode++) {
+
+        AnnotatedGraphNode::LeavingEdges::Iterator edge_iter = (*copyNode)->getLeavingEdgesIterator();
+        while (edge_iter->hasNext()) {
+            AnnotatedGraphEdge* edge = edge_iter->getNext();
+            nodeMap[(*copyNode)]->addLeavingEdge(new GraphEdge( nodeMap[(edge)->getDstNode()], (edge)->getLabel()));
+        }
+    }
+
 }
 

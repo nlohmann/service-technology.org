@@ -143,7 +143,7 @@ class Graph {
         /// existed events which do not appear in the graph's transitions anymore
         /// those events need to be given in order to keep the same interface for
         /// the public view
-        void transformToOWFN(PNapi::PetriNet* PN, set<string> setOfInputs, set<string> setOfOutputs);
+        void transformToOWFN(PNapi::PetriNet* PN, set<string>& setOfInputs, set<string>& setOfOutputs);
 
         /// a function needed for successful deletion of the graph
         void clearNodeSet();

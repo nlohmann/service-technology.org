@@ -184,7 +184,7 @@ void GasTexGraph::makeGasTex(string texFileName) {
     fstream texFile(texFileName.c_str(), ios_base::out | ios_base::trunc);
     if (!texFile.good()) {
         texFile.close();
-        exit(EC_FILE_ERROR);
+        TRACE(TRACE_0, "Error: A file error occured. Exit.");
     }
 
     // setting standard values for layout (from dot2tex.h)

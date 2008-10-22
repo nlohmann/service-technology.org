@@ -134,8 +134,11 @@ class CommunicationGraph : public AnnotatedGraph {
         /// changed significantly and depending on the debug-level set
         void printProgress();
 
-        /// Creates a dot output (.out) of the graph, using the filename as title. 
+        /// Creates a dot output (.out) of the graph, using "OG|IG of <filename>" as title. 
         virtual string createDotFile(string& filenamePrefix) const;
+
+        /// Creates a dot output (.out) of the graph, using a custom title. 
+        virtual string createDotFile(string& filenamePrefix, const string& dotGraphTitle) const;
 
         /// Creates an image output (.png) of the graph by calling dot.
         virtual string createPNGFile(string& filenamePrefix,

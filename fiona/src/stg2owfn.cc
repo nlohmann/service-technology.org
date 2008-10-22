@@ -263,7 +263,7 @@ string STG2oWFN_main(vector<string>& edgeLabels,
     
     if (!file->good()) {
         file->close();
-        exit(EC_FILE_ERROR);
+        TRACE(TRACE_0, "Error: A file error occured. Exit.");
     }
 
     STGPN.set_format(FORMAT_OWFN);

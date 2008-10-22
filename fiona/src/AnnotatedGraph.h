@@ -141,7 +141,7 @@ class AnnotatedGraph : public Graph {
 
         /// remove a node from the annotated graph
         virtual void removeNode(AnnotatedGraphNode*);
-
+        
         /// Public View Generation only:
         /// constructs the dual service, by transforming all sending
         /// events into receiving events and vice versa
@@ -158,10 +158,26 @@ class AnnotatedGraph : public Graph {
         /// equivalence of the public view's and the original process' OGs
         void fixDualService(bool fromOWFN);
 
-        /// Public View Generation only:
-        /// transforms the public views annotated graph to a non annotated Graph
-        void transformOGToService( Graph* cleanPV);
 
+public:
+// CODE FROM PL
+        /// Public View Generation only:
+        /// Transforms this OG to a Public View.  
+        /// WARNING: This directly changes the object itself, no copy is made. 
+        void transformToPV(bool fromOWFN);
+// END OF CODE FROM PL
+        
+
+        /// Makes a deep copy of the object into another AnnotatedGraph object.
+        void toAnnotatedGraph(AnnotatedGraph* destination);
+
+        /// Makes a deep copy of the object into a Graph object, losing
+        /// additional information like annotations.
+        void toGraph(Graph* destination); 
+        
+        // END: NEW PUBLIC VIEW METHODS
+
+protected:
         /// recursive function for computing the number of matching tree service automata
         long double numberOfStrategiesRecursively(AnnotatedGraphNode* activeNode,
                                                  map<AnnotatedGraphNode*, list <list<AnnotatedGraphNode*> > >& validFollowerCombinations,
@@ -393,11 +409,6 @@ class AnnotatedGraph : public Graph {
 		/// creates a STG file of the graph
 		string printGraphToSTG(vector<string>& edgeLabels);
 
-
-// CODE FROM PL
-        /// transforms the graph to the public view
-        void transformToPublicView(Graph* cleanPV, bool fromOWFN);
-// END OF CODE FROM PL
 
 // CODE FROM CG FOR STRUCTURAL REDUCTION
         virtual void reduceStructurally();

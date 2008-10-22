@@ -148,7 +148,7 @@ void readnet(const std::string& owfnfile) {
     }
     else owfn_yyin = fopen(owfnfile.c_str(), "r");
     if (!owfn_yyin) {
-        exit(EC_FILE_ERROR);
+        TRACE(TRACE_0, "Error: A file error occured. Exit.");
     }
     // diagnosefilename = owfnfile;
 
@@ -222,7 +222,7 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     og_yyin = fopen(ogfile.c_str(), "r");
     if (!og_yyin) {
         cerr << "cannot open OG file '" << ogfile << "' for reading'\n" << endl;
-        exit(EC_FILE_ERROR);
+        TRACE(TRACE_0, "Error: A file error occured. Exit.");
     }
     OGToParse = new AnnotatedGraph();
     ogfileToParse = ogfile; // for debug - declaration in debug.cc
@@ -335,7 +335,7 @@ void reportOptionValues() {
     }
 
     if (parameters[P_RESPONSIVE]) {
-    	trace( "\ncalculation of responsive partner(s)\n");
+        trace( "\ncalculation of responsive partner(s)\n");
     }
 
     trace( "\n");
@@ -366,7 +366,7 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix,
     dot_yyin = fopen((dotFileName).c_str(), "r");
     if (!dot_yyin) {
         cerr << "cannot open dot file '" << dotFileName << "' for reading'\n" << endl;
-        exit(EC_FILE_ERROR);
+        TRACE(TRACE_0, "Error: A file error occured. Exit.");
     }
 
     // clear the graph holding the parsed informations
@@ -394,10 +394,11 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix,
 
 //! \brief creates all output files with respect to the parameters
 //! \param graph An object of AnnotatedGraph, CommunicationGraph, IG or OG
-void createOutputFiles(AnnotatedGraph* graph, string prefix) {
+//! \param a title for the dot file
+void createOutputFiles(AnnotatedGraph* graph, string prefix, string dotFileTitle) {
     if (!parameters[P_NODOT]) {
-
-        string dotFileName = graph->createDotFile(prefix); // .out
+        
+        string dotFileName = graph->createDotFile(prefix, dotFileTitle); // .out
 
         if (!parameters[P_NOPNG] && dotFileName != "") {
             string pngres = graph->createPNGFile(prefix, dotFileName);
@@ -413,69 +414,40 @@ void createOutputFiles(AnnotatedGraph* graph, string prefix) {
 }
 
 
-//! \brief generate a public view for a given og
-//! \param OG an og to generate the public view of
+//! \brief output a given public view into dot (.out), png and owfn.
 //! \param graphName a name for the graph in the output
-// [LUHME XV] R�ckgabewert in string mit Name der erzeugten Datei ver�ndern
-// [LUHME XV] Trennen von Public View und Ausgabe des Public View
-void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
-
-    // if the OG is empty, there is no public view and the computation
-    // will be aborted
-    if (OG->hasNoRoot() || OG->getRoot()->getColor() == RED) {
-        if (fromOWFN) {
-            trace("\nThe given oWFN is not controllable. No PublicView will be generated.\n\n");
-        } else {
-            trace("\nThe given OG describes no partners. No PublicView will be generated.\n\n");
-        }
-        return;
-    }
-
-    trace("generating the public view for ");
-    trace(graphName);
-
-    trace("\n");
+//! \param pv The public view
+//! \param fromOWFN If set to true, the method uses information of the PN
+//! \param inputs A set of input places that will be put into the resulting owfn - can be omitted.
+//! \param outputs A set of output places that will be put into the resulting owfn - can be omitted.
+void outputPublicView(string graphName, Graph* pv, bool fromOWFN, set<string> inputs = set<string>(), set<string> outputs = set<string>()) {
 
     // dont create the public view automaton's png if it becomes to big
     unsigned int maxSizeForDot = 150;
 
+    // Determine filename
     outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
     outfilePrefix += ".pv.sa";
 
-    // create an empty graph to be made the public view
-    AnnotatedGraph* cleanPV = new AnnotatedGraph();
-
-    // give the graph to the OG to be generated from
-    OG->transformToPublicView(cleanPV, fromOWFN);
-
     // generate output files
     if (!options[O_NOOUTPUTFILES]) {
+        
+        if (!parameters[P_NODOT]) {
 
-        // test whether this graph is too big
-        if (OG->numberOfNodes() > maxSizeForDot && !parameters[P_NOPNG]) {
-            trace("the public view service automaton is to big to generate a dot file\n\n");
-        } else {
-            trace("generating dot output...\n");
-            createOutputFiles(OG, outfilePrefix);
-        }
-
-        // create sets for transferring the interface from the original owfn
-        // to the newly created one. If the original owfn is not known, these
-        // sets will stay empty
-        set<string> inputs;
-        set<string> outputs;
-
-        // Only fill those sets if the original interface is known
-        if (fromOWFN) {
-            CommunicationGraph* casted = dynamic_cast<CommunicationGraph*>(OG);
-            casted->returnInterface(inputs,outputs);
+            string title = "Public view of ";
+            title += graphName;
+            string dotfile = pv->createDotFile(outfilePrefix, title);
+            if (!parameters[P_NOPNG] && dotfile != "") {
+                pv->createPNGFile(outfilePrefix, dotfile);
+            }
+        
         }
 
         //transform to owfn
         PNapi::PetriNet* PVoWFN = new PNapi::PetriNet();
         PVoWFN->set_format(PNapi::FORMAT_OWFN, true);
-//        cleanPV->transformToOWFN(PVoWFN, inputs, outputs);
-        OG->transformToOWFN(PVoWFN, inputs, outputs);
+
+        pv->transformToOWFN(PVoWFN, inputs, outputs);
 
         // print the information of the public view's owfn
         TRACE(TRACE_1, "Public View oWFN statistics:\n");
@@ -488,15 +460,76 @@ void computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN) {
         output.open (owfnOutput.c_str(),ios::out);
         if (!output.good()) {
             output.close();
-            exit(EC_FILE_ERROR);
+            TRACE(TRACE_0, "Error: A file error occured. Exit.");
         }
         (output) << (*PVoWFN);
         output.close();
 
         trace("\n=================================================================\n");
         trace("\n");
+        
     }
+
 }
+
+
+
+//! \brief generate a public view for a given og
+//! \param OG an og to generate the public view of
+//! \param graphName a name for the graph in the output
+//! \param fromOWFN If set to true, the method uses information of the PN
+//! \param keepOG if set to true, the method first creates a copy of the OG - otherwise it will be changed.
+//! \return the public view as a pointer to a Graph object on the heap.
+Graph* computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN, bool keepOG=false) {
+
+    // if the OG is empty, there is no public view and the computation
+    // will be aborted
+    if (OG->hasNoRoot() || OG->getRoot()->getColor() == RED) {
+        if (fromOWFN) {
+            trace("\nThe given oWFN is not controllable. No PublicView will be generated.\n\n");
+        } else {
+            trace("\nThe given OG describes no partners. No PublicView will be generated.\n\n");
+        }
+        return NULL;
+    }
+
+    trace("generating the public view for ");
+    trace(graphName);
+
+    trace("\n");
+
+    
+    AnnotatedGraph* annotatedPV; // This public view will be copied into a graph object later. 
+
+    // If the keepOG parameter is true, create a copy of the OG.
+    // If not, simply work on the given OG.
+    if (keepOG) {
+        annotatedPV = new AnnotatedGraph(); // Create a new object as destination for the deep copy.
+        OG->toAnnotatedGraph(annotatedPV);  // Perform deep copy.   
+    } else {
+        annotatedPV = OG;                   // Work on the given OG.
+    }
+
+    // Transformation into a Public View.
+    // The pv object will be transformed - i.e. either the given OG or
+    // a deep copy. 
+    annotatedPV->transformToPV(fromOWFN);
+
+    // Transform the AnnotatedGraph object annotatedPV into a Graph. 
+    Graph* pv = new Graph();       // Create a new object as destination for the copy.
+    annotatedPV->toGraph(pv);               // Perform copy to Graph - getting rid of annotations.
+
+    // If the given OG was duplicated, the duplicate has to be deleted.
+    // Otherwise nothing is to be done in this step.
+    if (keepOG) {
+        delete annotatedPV;
+    }
+
+    // Return the Graph pointer.
+    return pv;
+    
+}
+
 
 
 //! \brief create an IG of an oWFN
@@ -577,7 +610,7 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
             // generate output files
             string basefilename = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
             basefilename += graph->getSuffix();
-            createOutputFiles(graph, basefilename);
+            createOutputFiles(graph, basefilename, "IG of " + PN->filename);
         }
 
         // create also an .og file to enable comparison of different IGs
@@ -842,8 +875,14 @@ string computeOG(oWFN* PN) {
             publicViewName = publicViewName.substr(0, publicViewName.size()-5);
         }
 
-        computePublicView(graph, publicViewName, true);
-
+        Graph* PV = computePublicView(graph, publicViewName, true);
+        if (PV != NULL) {
+            CommunicationGraph* casted = dynamic_cast<CommunicationGraph*>(graph);
+            set<string> inputs, outputs;
+            casted->returnInterface(inputs,outputs);
+            outputPublicView(publicViewName, PV, true, inputs, outputs);
+            delete PV;
+        }
         delete graph;
         return "";
     }
@@ -875,7 +914,7 @@ string computeOG(oWFN* PN) {
         if (!parameters[P_EQ_R]) {    // don't create png if we are in eqr mode
             string basefilename = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
             basefilename += graph->getSuffix();
-            createOutputFiles(graph, basefilename);
+            createOutputFiles(graph, basefilename, "OG of " + PN->filename);
         }
 
         if (options[O_OUTFILEPREFIX]) {
@@ -954,6 +993,8 @@ void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace(*iOgFile + "\n");
     }
     trace("\n");
+    trace( "Attention: This result is only valid if the given OGs are complete\n");
+    trace( "           (i.e., \"-s empty\" option was set and \"-m\" option high enough)\n\n");
 
     AnnotatedGraph* productOG = AnnotatedGraph::product(OGsFromFiles);
 
@@ -972,12 +1013,9 @@ void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 
         // the second parameter is false, since this OG has no underlying oWFN
         productOG->createOGFile(outfilePrefix, false);
-        if (!parameters[P_NODOT]) {
-            string dotFileName = productOG->createDotFile(outfilePrefix);
-            if (!parameters[P_NOPNG]) {
-                productOG->createPNGFile(outfilePrefix, dotFileName);
-            }
-        }
+        
+        createOutputFiles(productOG, outfilePrefix, AnnotatedGraph::addOGFileSuffix(outfilePrefix));
+        
         trace("\n");
     }
 
@@ -1365,8 +1403,9 @@ void makePNG(oWFN* PN) {
         // check whether the stream was succesfully created
         if (!out->is_open()) {
             trace( "File \"" + dotFileName + "\" could not be opened for writing access!\n");
-           exit(EC_FILE_ERROR);
+           TRACE(TRACE_0, "Error: A file error occured. Exit.");
         }
+        
 
         // create the dot and write it to the file
         (*out) << (*PNapiNet);
@@ -1446,7 +1485,7 @@ void reduceOWFN(oWFN* PN) {
         output.open (owfnOutput.c_str(),ios::out);
         if (!output.good()) {
             output.close();
-            exit(EC_FILE_ERROR);
+            TRACE(TRACE_0, "Error: A file error occured. Exit.");
         }
         (output) << (*PNapiNet);
         output.close();
@@ -1495,7 +1534,7 @@ void normalizeOWFN(oWFN* PN) {
         output.open (owfnOutput.c_str(), ios::out);
         if (!output.good()) {
             output.close();
-            exit(EC_FILE_ERROR);
+            TRACE(TRACE_0, "Error: A file error occured. Exit.");
         }
 
         (output) << (*PNapiNet);
@@ -1661,9 +1700,9 @@ int main(int argc, char** argv) {
         }
 */
 
-	// [LUHME XV] Soll hier tatsächlich schon aus der main() gesprungen werden?
-	// [LUHME XV] Wegen Speicher-Aufräumen??? Dateien schließen? Newlogger-Ausgaben?
-	// [LUHME XV] gleiches für P_SIMULATES und P_EX Rufe
+    // [LUHME XV] Soll hier tatsächlich schon aus der main() gesprungen werden?
+    // [LUHME XV] Wegen Speicher-Aufräumen??? Dateien schließen? Newlogger-Ausgaben?
+    // [LUHME XV] gleiches für P_SIMULATES und P_EX Rufe
         if (parameters[P_PRODUCTOG]) {
             // calculating the product OG
             computeProductOG(OGsFromFiles);
@@ -1736,7 +1775,11 @@ int main(int argc, char** argv) {
                 // computes a service automaton "public view" which has the same
                 // OG as given in readOG
                 readOG->removeReachableFalseNodes();
-                computePublicView(readOG, (*iOgFile), false);
+                Graph* PV = computePublicView(readOG, (*iOgFile), false);
+                if (PV != NULL) {
+                    outputPublicView((*iOgFile), PV, false);
+                    delete PV;
+                }
                 delete readOG;
             }
 
@@ -1772,7 +1815,7 @@ int main(int argc, char** argv) {
 
                     // the second parameter is false, since no oWFN is given
                     readOG->createOGFile(ogFilename, false);
-                    createOutputFiles(readOG, ogFilename);
+                    createOutputFiles(readOG, ogFilename, ogFilename);
                 }
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 trace( "=================================================================\n");
@@ -1888,7 +1931,7 @@ int main(int argc, char** argv) {
                 } else {
                     newFilename = readOG->getFilename();
                 }
-                createOutputFiles(readOG, newFilename);
+                createOutputFiles(readOG, newFilename, newFilename);
                 trace( (newFilename + ".png generated\n\n"));
                 delete readOG;
             }

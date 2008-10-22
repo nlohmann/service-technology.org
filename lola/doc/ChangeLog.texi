@@ -1,4 +1,4 @@
-@heading Version 1.03 (unreleased)
+@heading Version 1.03
 @itemize
 
 @item fixed bug #12302 (@url{https://gna.org/bugs/?12302}): LoLA: Uneinheitliche bzw. falsche Rückgabewerte bei @code{MODELCHECKING}, LoLA now returns the result via the @samp{_exit} command
@@ -32,6 +32,8 @@
 @item @samp{--enable-universal} to build a Mac Universal binary which is executable on Intel and Power PC platforms (disabled by default)
 @item @samp{--enable-win32} to build a Windows binary that is independent of a local Cygwin installation (disabled by default)
 @end itemize
+
+@item updated documentation -- took text from @url{http://wwwteo.informatik.uni-rostock.de/ls_tpp/lola}
 @end itemize
 
 

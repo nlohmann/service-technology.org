@@ -13,7 +13,7 @@
 // than specified.
 
 //#define CHECKCAPACITY 
-#define CAPACITY 1
+//#define CAPACITY 1
 
 // REPORTFREQUENCY controls the output of progress messages to the
 // terminal (to be precise: to the standard error stream).
@@ -49,11 +49,11 @@
 // finally applied in the exectuable program.
 
 //#define COVER
-#define STUBBORN
+//#define STUBBORN
 //#define SYMMETRY
 //#define CYCLE
-#define PREDUCTION
-#define SMALLSTATE
+//#define PREDUCTION
+//#define SMALLSTATE
 //#define BITHASH
 //#define DISTRIBUTE
 //#define SWEEP
@@ -124,9 +124,9 @@
 //#define REVERSIBILITY
 //#define HOME
 //#define FINDPATH
-#define FULL
+//#define FULL
 //#define DEADLOCK
-//#define NONE
+#define NONE
 //#define STATEPREDICATE
 //#define LIVEPROP
 //#define FAIRPROP

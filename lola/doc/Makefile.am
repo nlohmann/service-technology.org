@@ -4,7 +4,7 @@ lola_TEXINFOS = ChangeLog.texi
 
 TEXINFO_TEX = texinfo.tex
 
-EXTRA_DIST = gendocs.sh gendocs_template
+EXTRA_DIST = gendocs.sh gendocs_template lola-old.ps
 
 all: ../ChangeLog
 

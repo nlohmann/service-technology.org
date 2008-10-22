@@ -6,8 +6,8 @@
                      http://service-technology.org/lola
 
 
-Version 1.03 (unreleased)
-=========================
+Version 1.03
+============
 
 * fixed bug #12302 (`https://gna.org/bugs/?12302'): LoLA: Uneinheitliche bzw.
   falsche Rückgabewerte bei `MODELCHECKING', LoLA now returns the result via
@@ -52,6 +52,9 @@ Version 1.03 (unreleased)
 
      * `--enable-win32' to build a Windows binary that is independent of a
        local Cygwin installation (disabled by default)
+
+* updated documentation - took text from
+  `http://wwwteo.informatik.uni-rostock.de/ls_tpp/lola'
 
 Version 1.02
 ============

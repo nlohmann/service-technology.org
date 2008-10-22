@@ -20,9 +20,3 @@ svn-clean: maintainer-clean
 	@echo "or"
 	@echo "  autoreconf -i"
 	@echo
-
-##############################################################################
-# compiler for windows
-##############################################################################
-win-bin: clean
-	make all CXXFLAGS="-O3 -mno-cygwin -U _WIN32" LDFLAGS="-O3 -mno-cygwin -U _WIN32"

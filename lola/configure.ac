@@ -1,4 +1,4 @@
-AC_INIT([LoLA],[1.03-unreleased],[lola@service-technology.org],[lola])
+AC_INIT([LoLA],[1.03],[lola@service-technology.org],[lola])
 
 #############################################################################
 # check for prerequisites, programms, headers, and libraries

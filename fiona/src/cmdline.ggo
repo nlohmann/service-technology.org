@@ -1,7 +1,7 @@
 package "fiona"
 version "2.0"
 
-purpose "Fiona is a tool to automatically analyze the interactional behavior of a given open workflow net (oWFN)."
+purpose "Fiona is a tool to automatically analyze the interactional behavior of a given open net (oWFN)."
 
 description "About Fiona"
 

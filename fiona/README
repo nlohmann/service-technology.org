@@ -47,7 +47,7 @@ INSTALLATION
     Fiona can be easily compiled and installed. See file "INSTALL" for
     instructions.
 
-    To to generate graphical output, Graphviz dot (http://www.graphviz.org/)
+    To generate graphical output, Graphviz dot (http://www.graphviz.org/)
     is needed. To synthesize open nets, the tool Petrify
     (http://www.lsi.upc.es/~jordicf/petrify/distrib/home.html) is required.
 

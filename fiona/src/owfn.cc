@@ -2880,7 +2880,7 @@ void oWFN::addPlace(owfnPlace *place) {
     Places.push_back(place);
 
     if (!(Places.size() % REPORTFREQUENCY)) {
-        cerr << "\n"<< Places.size() << "places parsed\n";
+        cerr << "\n"<< Places.size() << " places parsed\n";
     }
 }
 

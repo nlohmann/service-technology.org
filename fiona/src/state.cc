@@ -79,8 +79,8 @@ State::~State() {
 
 /// \brief Decodes State in bintree and writes the corresponding marking into
 ///        the CurrentMarking of the given 'PN'.
-/// \param PN The corresponding open workflow net.
-void State::decodeShowOnly(oWFN * PN) {
+/// \param PN The corresponding open net.
+void State::decodeShowOnly(oWFN* PN) {
 
     TRACE(TRACE_5, "void State::decodeShowOnly(oWFN * PN) : start\n");
 

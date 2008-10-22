@@ -53,12 +53,13 @@ output="$builddir/$SUBDIR/sequence3-partner.owfn"
 outputExpected="$testdir/$SUBDIR/sequence3-partner.expected.owfn"
 
 
-# for make distcheck: make copy of $input and work on it
+# for make distcheck: create directory $builddir/$SUBDIR for writing output files to
 if [ "$testdir" != "$builddir" ]; then
     if [ ! -e $builddir/$SUBDIR ]; then
         $MKDIR_P $builddir/$SUBDIR
     fi
 
+    # make copy of $input and work on it
     cp $input $inputCopy
 fi
 

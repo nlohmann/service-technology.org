@@ -35,7 +35,7 @@ og2="$DIR/2.og"
 outputPrefix="$builddir/productog/1x2.output"
 outputExpected="$testdir/productog/1x2.expected.og"
 
-# for make distcheck: make copy of $owfn and work on it
+# for make distcheck: create directory $builddir/$SUBDIR for writing output files to
 if [ "$testdir" != "$builddir" ]; then
     if [ ! -e $builddir/$SUBDIR ]; then
         $MKDIR_P $builddir/$SUBDIR
@@ -82,7 +82,7 @@ og3="$DIR/3.og"
 outputPrefix="$builddir/productog/1x2x3.output"
 outputExpected="$testdir/productog/1x2x3.expected.og"
 
-# for make distcheck: make copy of $owfn and work on it
+# for make distcheck: create directory $builddir/$SUBDIR for writing output files to
 if [ "$testdir" != "$builddir" ]; then
     if [ ! -e $builddir/$SUBDIR ]; then
         $MKDIR_P $builddir/$SUBDIR
@@ -129,7 +129,7 @@ og3="$DIR/3.og"
 outputPrefix="$builddir/productog/3x1x2.output"
 outputExpected="$testdir/productog/3x1x2.expected.og"
 
-# for make distcheck: make copy of $owfn and work on it
+# for make distcheck: create directory $builddir/$SUBDIR for writing output files to
 if [ "$testdir" != "$builddir" ]; then
     if [ ! -e $builddir/$SUBDIR ]; then
         $MKDIR_P $builddir/$SUBDIR

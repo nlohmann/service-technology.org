@@ -12,10 +12,12 @@ SUBDIR=falseannos
 DIR=$testdir/$SUBDIR
 FIONA=fiona
 
-# for make distcheck: make copy of $owfn and work on it
+# for make distcheck: create directory $builddir/$SUBDIR for writing output files to
 if [ "$testdir" != "$builddir" ]; then
     if [ ! -e $builddir/$SUBDIR ]; then
         $MKDIR_P $builddir/$SUBDIR
+        
+        # copy files to new directory
         cp $DIR/* $builddir/$SUBDIR
     fi
 fi

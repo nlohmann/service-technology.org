@@ -150,12 +150,13 @@ DIR=$testdir/$SUBDIR
 owfn="$DIR/myCoffee.owfn"
 owfn_reference="$DIR/myCoffee_reference.owfn"
 
-# for make distcheck: make copy of $owfn and work on it
+# for make distcheck: create directory $builddir/$SUBDIR for writing output files to
 if [ "$testdir" != "$builddir" ]; then
     if [ ! -e $builddir/$SUBDIR ]; then
         $MKDIR_P $builddir/$SUBDIR
     fi
 
+    # make copy of $owfn and work on it
     cp $owfn $builddir/$SUBDIR
 fi
 
@@ -205,13 +206,14 @@ fi
 owfn="$testdir/philosophers/phcontrol4.unf.owfn"
 owfn_reference="$testdir/bdd_ref/phcontrol4.unf_reference.owfn"
 
-# for make distcheck: make copy of $owfn and work on it
+# for make distcheck: create directory $builddir/$SUBDIR for writing output files to
 SUBDIR=philosophers
 if [ "$testdir" != "$builddir" ]; then
     if [ ! -e $builddir/$SUBDIR ]; then
         $MKDIR_P $builddir/$SUBDIR
     fi
-
+    
+    # make copy of $owfn and work on it
     cp $owfn $builddir/$SUBDIR
 fi
 

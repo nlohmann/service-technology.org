@@ -35,7 +35,7 @@ resultSingle=0
 og="$DIR/06-03-23_BPM06_shop_sect_3.owfn.og"
 outputPrefix="$builddir/png/06-03-23_BPM06_shop_sect_3.owfn.og.output"
 
-# for make distcheck: make copy of $owfn and work on it
+# for make distcheck: create directory $builddir/$SUBDIR for writing output files to
 if [ "$testdir" != "$builddir" ]; then
     if [ ! -e $builddir/$SUBDIR ]; then
         $MKDIR_P $builddir/$SUBDIR
@@ -83,7 +83,7 @@ resultSingle=0
 owfn="$DIR/big.owfn"
 outputPrefix="$builddir/png/big.owfn.output"
 
-# for make distcheck: make copy of $owfn and work on it
+# for make distcheck: create directory $builddir/$SUBDIR for writing output files to
 if [ "$testdir" != "$builddir" ]; then
     if [ ! -e $builddir/$SUBDIR ]; then
         $MKDIR_P $builddir/$SUBDIR
@@ -130,7 +130,7 @@ resultSingle=0
 owfn="$DIR/big.owfn"
 outputPrefix="$builddir/png/big.owfn.output"
 
-# for make distcheck: make copy of $owfn and work on it
+# for make distcheck: create directory $builddir/$SUBDIR for writing output files to
 if [ "$testdir" != "$builddir" ]; then
     if [ ! -e $builddir/$SUBDIR ]; then
         $MKDIR_P $builddir/$SUBDIR

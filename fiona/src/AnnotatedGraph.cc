@@ -2187,6 +2187,7 @@ string AnnotatedGraph::createOGFile(const string& filenamePrefix, bool hasOWFN) 
     if (!ogFile.good()) {
             ogFile.close();
             TRACE(TRACE_0, "Error: A file error occured. Exit.");
+            exit(EC_FILE_ERROR);
     }
     if (hasNoRoot()) {
         // print file for empty OG
@@ -3022,6 +3023,7 @@ string AnnotatedGraph::printGraphToSTG(vector<string>& edgeLabels) {
     if (!STGFileStream.good()) {
             STGFileStream.close();
             TRACE(TRACE_0, "Error: A file error occured. Exit.");
+            exit(EC_FILE_ERROR);
     }
     STGFileStream << ".model Labeled_Transition_System" << "\n";
     STGFileStream << ".dummy";

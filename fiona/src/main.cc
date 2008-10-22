@@ -148,7 +148,8 @@ void readnet(const std::string& owfnfile) {
     }
     else owfn_yyin = fopen(owfnfile.c_str(), "r");
     if (!owfn_yyin) {
-        TRACE(TRACE_0, "Error: A file error occured. Exit.");
+        TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+        exit(EC_FILE_ERROR);
     }
     // diagnosefilename = owfnfile;
 
@@ -222,7 +223,8 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     og_yyin = fopen(ogfile.c_str(), "r");
     if (!og_yyin) {
         cerr << "cannot open OG file '" << ogfile << "' for reading'\n" << endl;
-        TRACE(TRACE_0, "Error: A file error occured. Exit.");
+        TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+        exit(EC_FILE_ERROR);
     }
     OGToParse = new AnnotatedGraph();
     ogfileToParse = ogfile; // for debug - declaration in debug.cc
@@ -366,7 +368,8 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix,
     dot_yyin = fopen((dotFileName).c_str(), "r");
     if (!dot_yyin) {
         cerr << "cannot open dot file '" << dotFileName << "' for reading'\n" << endl;
-        TRACE(TRACE_0, "Error: A file error occured. Exit.");
+        TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+        exit(EC_FILE_ERROR);
     }
 
     // clear the graph holding the parsed informations
@@ -460,7 +463,8 @@ void outputPublicView(string graphName, Graph* pv, bool fromOWFN, set<string> in
         output.open (owfnOutput.c_str(),ios::out);
         if (!output.good()) {
             output.close();
-            TRACE(TRACE_0, "Error: A file error occured. Exit.");
+            TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+            exit(EC_FILE_ERROR);
         }
         (output) << (*PVoWFN);
         output.close();
@@ -1403,7 +1407,8 @@ void makePNG(oWFN* PN) {
         // check whether the stream was succesfully created
         if (!out->is_open()) {
             trace( "File \"" + dotFileName + "\" could not be opened for writing access!\n");
-           TRACE(TRACE_0, "Error: A file error occured. Exit.");
+           TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+           exit(EC_FILE_ERROR);
         }
         
 
@@ -1485,7 +1490,8 @@ void reduceOWFN(oWFN* PN) {
         output.open (owfnOutput.c_str(),ios::out);
         if (!output.good()) {
             output.close();
-            TRACE(TRACE_0, "Error: A file error occured. Exit.");
+            TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+            exit(EC_FILE_ERROR);
         }
         (output) << (*PNapiNet);
         output.close();
@@ -1534,7 +1540,8 @@ void normalizeOWFN(oWFN* PN) {
         output.open (owfnOutput.c_str(), ios::out);
         if (!output.good()) {
             output.close();
-            TRACE(TRACE_0, "Error: A file error occured. Exit.");
+            TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+            exit(EC_FILE_ERROR);
         }
 
         (output) << (*PNapiNet);

@@ -1219,19 +1219,31 @@ void PetriNet::output_owfn(ostream *output) const
   (*output) << "    ";
   
   unsigned int count = 1;
+  long last_capacity = 0;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); count++, p++)
   {
-    if( (*p)->capacity > 0)
+    if( (*p)->capacity != last_capacity )
     {
-      (*output) << "SAFE " << (*p)->capacity << " : ";
+      if (count > 1)
+      {
+        (*output) << "; ";   
+      }
+      if ( (*p)->capacity > 0 )
+      {
+        (*output) << "SAFE " << (*p)->capacity << " : ";
+      }
+      last_capacity = (*p)->capacity;
     }
+    else if (count > 1)
+    {
+      (*output) << ", ";   
+    }
+
 #ifdef USING_BPEL2OWFN
     (*output) << (*p)->nodeShortName();
 #else
     (*output) << (*p)->nodeName();
 #endif
-    if (count < P.size())
-      (*output) << "; ";
   }
   (*output) << ";" << endl << endl;
   

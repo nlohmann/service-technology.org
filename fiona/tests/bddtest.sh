@@ -33,8 +33,13 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     $cmd  2>/dev/null 1>/dev/null
-    result5=$?
-    if [ $result5 -ne 0 ] ; then
+    fionaExitCode=$?
+    $evaluate $fionaExitCode
+    if [ $? -ne 0 ] 
+    then
+        result=1
+    fi
+    if [ $fionaExitCode -ne 0 ] ; then
         echo ... failed to build BDD
         result=1
     fi

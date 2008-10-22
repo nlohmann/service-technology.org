@@ -85,8 +85,12 @@ else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
 fi
-
 exitcode=$?
+$evaluate $exitcode
+if [ $? -ne 0 ] 
+then
+    result=1
+fi
 if [ $exitcode -ne 0 ]; then
   echo ... minimized OG not equivalent to original OG.
 fi
@@ -129,6 +133,11 @@ else
 fi
 
 exitcode=$?
+$evaluate $exitcode
+if [ $? -ne 0 ] 
+then
+    result=1
+fi
 if [ $exitcode -ne 0 ]; then
   echo ... minimized OG not equivalent to original OG.
 fi
@@ -170,6 +179,11 @@ else
 fi
 
 exitcode=$?
+$evaluate $exitcode
+if [ $? -ne 0 ] 
+then
+    result=1
+fi
 if [ $exitcode -ne 0 ]; then
   echo ... minimized OG not equivalent to original OG.
 fi
@@ -229,6 +243,11 @@ else
 fi
 
 exitcode=$?
+$evaluate $exitcode
+if [ $? -ne 0 ] 
+then
+    result=1
+fi
 if [ $exitcode -ne 0 ]; then
   echo ... minimized OG not equivalent to original OG.
 fi
@@ -270,6 +289,11 @@ else
 fi
 
 exitcode=$?
+$evaluate $exitcode
+if [ $? -ne 0 ] 
+then
+    result=1
+fi
 if [ $exitcode -ne 0 ]; then
   echo ... minimized OG not equivalent to original OG.
 fi
@@ -311,6 +335,11 @@ else
 fi
 
 exitcode=$?
+$evaluate $exitcode
+if [ $? -ne 0 ] 
+then
+    result=1
+fi
 if [ $exitcode -ne 0 ]; then
   echo ... minimized OG not equivalent to original OG.
 fi
@@ -352,6 +381,11 @@ else
 fi
 
 exitcode=$?
+$evaluate $exitcode
+if [ $? -ne 0 ] 
+then
+    result=1
+fi
 if [ $exitcode -ne 0 ]; then
   echo ... minimized OG not equivalent to original OG.
 fi
@@ -393,6 +427,11 @@ else
 fi
 
 exitcode=$?
+$evaluate $exitcode
+if [ $? -ne 0 ] 
+then
+    result=1
+fi
 if [ $exitcode -ne 0 ]; then
   echo ... minimized OG not equivalent to original OG.
 fi
@@ -434,6 +473,11 @@ else
 fi
 
 exitcode=$?
+$evaluate $exitcode
+if [ $? -ne 0 ] 
+then
+    result=1
+fi
 if [ $exitcode -ne 0 ]; then
   echo ... minimized OG not equivalent to original OG.
 fi

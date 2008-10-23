@@ -6,9 +6,8 @@
                      http://service-technology.org/fiona
 
 
-
-Version 3.0-unreleased
-=======================
+Version 3.0
+===========
 
 * Fiona now supports more service analysis scenarios
     * given an og-file Fiona generates a public view

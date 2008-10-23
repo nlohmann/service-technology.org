@@ -1,4 +1,4 @@
-AC_INIT(Fiona, 3.0-unreleased, fiona@service-technology.org, fiona)
+AC_INIT(Fiona, 3.0, fiona@service-technology.org, fiona)
 
 # the first line should be everything you will ever need to touch
 #############################################################################

@@ -6,10 +6,12 @@ LIBRARY           = b3
 SED               = gsed               # GNU sed
 LOLA-SP           = lola-sp            # LoLA with STATEPREDICATE
 LOLA-MC           = lola-mc            # LoLA with MODELCHECKING
+LOLA-LP           = lola-lp            # LoLA with LIVEPROP
 LOLA-FULL-LIMITED = lola-full-limited  # LoLA with FULL
 
 REDUCTION-LEVEL   = 3                  # Petri net reduction level for the
                                        # translation
+UML2OWFN-PARAM   =                     # additional UML2oWFN paramters
 OUTPUT-FORMAT     = lola               # output format to be produced by UML2oWFN
                                        # see uml2owfn -h for feasible options
 ##########################################################################
@@ -25,6 +27,8 @@ help:
 	@echo "targets:"
 	@echo "* translate      translate library"
 	@echo "* translateweak  translate library with weaker termination semantics"
+	@echo "* translatewf    translate library into classical workflow nets"
+	@echo "* translateor    translate library nets with OR-join on the controlflow"
 	@echo "* soundness      soundness check (AGEF omega)"
 	@echo "* safeness       safeness check"
 	@echo "* full           full state space"
@@ -45,7 +49,7 @@ full:      $(LOLAFILES:.lola=.lola.full.output)
 	-@$(LOLA-SP) $< -a $(<:.lola=.lola.safe.task) > $@ 2> $@ ; echo SAFENESS-RESULT: $$? >> $@
 
 %.lola.sound.output: %.lola
-	-@$(LOLA-MC) $< -a $(<:.lola=.lola.fin.task) > $@ 2> $@ ; echo SOUNDNESS-RESULT: $$? >> $@
+	-@$(LOLA-LP) $< -a $(<:.lola=.lola.fin.task) > $@ 2> $@ ; echo SOUNDNESS-RESULT: $$? >> $@
 
 %.lola.full.output: %.lola
 	-@$(LOLA-FULL-LIMITED) $< > $@ 2> $@ || echo FULL-RESULT: $$? >> $@
@@ -107,16 +111,16 @@ results.csv: safeness soundness
 # create files
 ##########################################################################
 translate: $(LIBRARY).xml
-	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) -o 2> translation.log
-	
+	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
+
 translateweak: $(LIBRARY).xml
-	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a removePinsets -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) -o 2> translation.log
+	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a removePinsets -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
 	
 translatewf: $(LIBRARY).xml
-	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a wfNet -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) -o 2> translation.log
+	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a wfNet -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
 
 translateor: $(LIBRARY).xml
-	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a orJoin -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) -o 2> translation.log
+	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a orJoin -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
 
 
 ##########################################################################

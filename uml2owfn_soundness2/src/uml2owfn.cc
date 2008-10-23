@@ -513,12 +513,20 @@ string generate_task_file_contents_finalState (analysis_t analysis)
 			if (!analysis[A_DEADLOCKS]) {
 				// formula that specifies final state
 				// create an AG EF model checking formula and write the .task-file
-				FormulaState ctl_AG = FormulaState(LOGQ_CTL_ALLPATH_ALWAYS);
-				FormulaState ctl_EF = FormulaState(LOGQ_CTL_EXPATH_EVENTUALLY);
-				ctl_EF.subFormulas.insert(finalStateFormula);
-				ctl_AG.subFormulas.insert(&ctl_EF);
-			  ctl_AG.set_format(FORMAT_LOLA_FORMULA);
-			  taskContents << ctl_AG << endl;
+			  if (globals::parameters[P_CTL]) {
+			    // generate a CTL-formula
+          FormulaState ctl_AG = FormulaState(LOGQ_CTL_ALLPATH_ALWAYS);
+          FormulaState ctl_EF = FormulaState(LOGQ_CTL_EXPATH_EVENTUALLY);
+          ctl_EF.subFormulas.insert(finalStateFormula);
+          ctl_AG.subFormulas.insert(&ctl_EF);
+          ctl_AG.set_format(FORMAT_LOLA_FORMULA);
+          // and write to output stream
+          taskContents << ctl_AG << endl;
+			  } else {
+			    // generate a state predicate and write to output stream
+          finalStateFormula->set_format(FORMAT_LOLA_STATEPREDICATE);
+          taskContents << *finalStateFormula << endl;
+			  }
 			}
 		}
 	}
@@ -661,7 +669,10 @@ void extend_script_file_subAnalysis_lola (possibleAnalysis an) {
 
   } else if (an == A_SOUNDNESS) {
     analysis_text = " for soundness";
-    lolaCommand = "lola-mc";
+    if (globals::parameters[P_CTL])
+      lolaCommand = "lola-mc";
+    else
+      lolaCommand = "lola-lp";
     taskFile_suffix = ".fin"; // reachability of final state
     isTaskFileAnalysis = true;
 

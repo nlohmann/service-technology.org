@@ -175,9 +175,10 @@ source-code available at @url{http://svn.gna.org/svn/service-tech/trunk/lola/})
 to be accessible from the command-line. 
 
 @itemize
-@item @file{lola-mc} - LoLA compiled with MODELCHECKING,
-@item @file{lola-sp} - LoLA compiled with STATEPREDICATE, and
-@item @file{lola-full-limited} - LoLA compiled with FULL (and MAXIMALSTATES 100000);
+@item @file{lola-lp} - LoLA compiled with LIVEPROP,
+@item @file{lola-sp} - LoLA compiled with STATEPREDICATE,
+@item @file{lola-full-limited} - LoLA compiled with FULL (and MAXIMALSTATES 100000), and
+@item optionally @file{lola-mc} - LoLA compiled with MODELCHECKING;
 @end itemize
 
 each with CAPACITY 1 and CHECKCAPACITY. The analysis script files rely on these
@@ -207,9 +208,9 @@ your platform.
 @example
 cd <lola>
 
-cp <uml2owfn>/lola/userconfig.H.modelchecking ./userconfig.H
+cp <uml2owfn>/lola/userconfig.H.liveprop ./userconfig.H
 make
-mv lola lola-mc
+mv lola lola-lp
 
 cp <uml2owfn>/lola/userconfig.H.statepredicate ./userconfig.H
 make
@@ -218,12 +219,16 @@ mv lola lola-sp
 cp <uml2owfn>/lola/userconfig.H.full-limited ./userconfig.H
 make
 mv lola lola-full-limited
+
+cp <uml2owfn>/lola/userconfig.H.modelchecking ./userconfig.H
+make
+mv lola lola-mc
 @end example
 
 In case you work on Windows/Cygwin, you need to provide the @file{.exe} extension
 for the @samp{mv} command.
 
-@item Make all three LoLA binaries available on your command-line, for instance
+@item Make all LoLA binaries available on your command-line, for instance
 by moving them to @file{/usr/local/bin/}.
 @end enumerate
 
@@ -248,23 +253,22 @@ is the name of a process, and @samp{XXX} its containing catalog. Each
 @itemize
 @item The file @file{lib.XXX__YYY.lola.safe.task} contains a state predicate that
 specifies that process @samp{YYY} is not safe (has a lock of synchronization).
-@item The file @file{lib.XXX__YYY.lola.fin.task} contains a CTL formula that
-specifies that process @samp{YYY} always reaches a valid final state (has no
-local deadlocks and no livelocks).
+@item The file @file{lib.XXX__YYY.lola.fin.task} contains a state predicate that
+specifies the valid final states of the process.
 @end itemize
 
-UML2oWFN also generates a script @file{check_lib.sh} containing the appropriate
+@acronym{UML2oWFN} also generates a script @file{check_lib.sh} containing the appropriate
 LoLA command calls for each file.
 
 @example
 lola-sp lib.XXX__YYY.lola -a lib.XXX__YYY.lola.safe.task -P
-lola-sp lib.XXX__YYY.lola -a lib.XXX__YYY.lola.fin.task -P
+lola-lp lib.XXX__YYY.lola -a lib.XXX__YYY.lola.fin.task -P
 @end example
 
 If the first call returns @samp{predicate is not satisfiable}, then the process
 is safe. Otherwise LoLA returns a place which can hold more than one token. If
-the second call returns @samp{result: true}, then the process is deadlock free
-and livelock free. Calling
+the second call returns @samp{predicate is live!}, then the process is deadlock
+free and livelock free and always reaches a terminal state. Calling
 
 @example
 sh ./check_lib.sh
@@ -353,65 +357,6 @@ the library to create slightly changed @samp{.lola} files with corresponding
 uml2owfn -i lib.xml -f lola -a soundness -a safe -a removePinsets -p taskfile -o
 @end example
 @end cartouche
-
-
-@section Use Case: Automated Translation, Analysis and Compilation of Results
-
-@acronym{UML2oWFN} comes with a makefile that eases analysis and compilation of
-the analysis results for process librares. The @file{scripts/Makefile} the following
-make targets are available
-
-@itemize
-	@item @samp{translate}      translate library
-	@item @samp{translateweak}  translate library with weaker termination semantics
-	@item @samp{soundness}      soundness check (AGEF omega)
-	@item @samp{safeness}       safeness check
-	@item @samp{full}           full state space
-	@item @samp{table}          collect results in table
-	@item @samp{clean}          remove analysis files
-	@item @samp{veryclean}      remove Petri nets
-@end itemize
-
-Copy @file{scripts/Makefile} to the directory that contains your library 
-@file{lib.xml} and change the value of @samp{LIBRARY} in this @file{Makefile} to
-@samp{lib} (stripping the extension @samp{.xml}). Also make sure that @samp{SED}
-holds the file name of your sed (stream editor) binary, e.g. @file{sed} or
-@file{gsed}.
-
-The standard workflow for the first use case using the makefile would be:
-@example
-make translate
-make table
-@end example
-To run the second use case, execute @samp{make translateweak} instead of
-@samp{make translate}.
-
-In case you want to include numbers on the size of the state space of each
-process, execute
-@example
-make translate
-make full
-make table
-@end example
-
-The target @samp{table} prepares two different representation of the analysis
-results in @file{results.csv} and @file{results-comparison.csv}. The target
-depends on @samp{soundness} and @samp{safeness}, thus the table will always
-contain the analysis results of the most recent translation.
-
-You can use @samp{REDUCTION-LEVEL} to set the level Petri net reduction rules
-that are applied upon translating the library. The calls
-@example
-make translate LIBRARY=myLib REDUCTION-LEVEL=3
-make table LIBRARY=myLib SED=sed
-@end example
-will translate library @file{myLib.xml}, apply reduction level 3, and create
-the result tables using the program @samp{sed}.
-
-The Makefile variable @samp{OUTPUT-FORMAT} allows you to set the output format
-of the translation of @acronym{UML2oWFN}, default value is @samp{lola}. The
-targets @samp{full}, @samp{table}, @samp{safeness}, @samp{soundness}, @samp{clean},
-and @samp{veryclean} require the @samp{lola}-format.
 
 
 @section Use Case: Choosing Termination Semantics for Your Analysis
@@ -535,6 +480,97 @@ back to the originals due to self-explaining names, use the option
 @samp{-p anon}. This will enumerate the places and transitions of each process
 individually, starting with @i{p1} and @i{t1}. Any related files like the
 @file{.task} files are consistent with the anonymized output.
+
+
+@section Use Case: Automated Translation, Analysis and Compilation of Results
+
+@acronym{UML2oWFN} comes with a makefile that eases analysis and compilation of
+the analysis results for process librares. The @file{scripts/Makefile} the following
+make targets are available
+
+@itemize
+	@item @samp{translate}      translate library
+	@item @samp{translateweak}  translate library with weaker termination semantics
+	@item @samp{translatewf}    translate library into classical workflow nets
+	@item @samp{translateor}    translate library nets with OR-join on the controlflow
+	@item @samp{soundness}      soundness check (AGEF omega)
+	@item @samp{safeness}       safeness check
+	@item @samp{full}           full state space
+	@item @samp{table}          collect results in table
+	@item @samp{clean}          remove analysis files
+	@item @samp{veryclean}      remove Petri nets
+@end itemize
+
+Copy @file{scripts/Makefile} to the directory that contains your library 
+@file{lib.xml} and change the value of @samp{LIBRARY} in this @file{Makefile} to
+@samp{lib} (stripping the extension @samp{.xml}). Also make sure that @samp{SED}
+holds the file name of your sed (stream editor) binary, e.g. @file{sed} or
+@file{gsed}.
+
+The standard workflow for the first use case using the makefile would be:
+@example
+make translate
+make table
+@end example
+To run the second use case, execute @samp{make translateweak} instead of
+@samp{make translate}.
+
+In case you want to include numbers on the size of the state space of each
+process, execute
+@example
+make translate
+make full
+make table
+@end example
+
+The target @samp{table} prepares two different representation of the analysis
+results in @file{results.csv} and @file{results-comparison.csv}. The target
+depends on @samp{soundness} and @samp{safeness}, thus the table will always
+contain the analysis results of the most recent translation.
+
+You can use @samp{REDUCTION-LEVEL} to set the level Petri net reduction rules
+that are applied upon translating the library. The calls
+@example
+make translate LIBRARY=myLib REDUCTION-LEVEL=3
+make table LIBRARY=myLib SED=sed
+@end example
+will translate library @file{myLib.xml}, apply reduction level 3, and create
+the result tables using the program @samp{sed}.
+
+The Makefile variable @samp{OUTPUT-FORMAT} allows you to set the output format
+of the translation of @acronym{UML2oWFN}, default value is @samp{lola}. The
+targets @samp{full}, @samp{table}, @samp{safeness}, @samp{soundness}, @samp{clean},
+and @samp{veryclean} require the @samp{lola}-format.
+
+Use the parameter @samp{UML2OWFN-PARAM} for refining the translation with further
+command-line parameters of UML2oWFN if you need.
+
+
+@section Use Case: Verify Soundness via CTL properties
+
+The standard translation of @acronym{UML2oWFN} generates a state-predicate that
+describes all valid terminal states. LoLA provides a dedicated algorithm to check
+whether this state is always reachable. This property can equivalently be transformed
+into a CTL property. Then standard CTL-model checking techniques are applicable.
+
+To invoke the generation of CTL properties and corresponding analysis script files,
+use the parameter @samp{-p ctl}. To verify whether the generated CTL formula holds
+for a given process, use LoLA with the model checking algorithms, e.g. call
+
+@example
+lola-mc lib.XXX__YYY.lola -a lib.XXX__YYY.lola.fin.task -P
+@end example
+
+This line is automatically included in the verification script @file{check_lib.sh}.
+To use the @file{Makefile} to automate the compilation of results in this setting,
+you have to set two parameters:
+@example
+make translate UML2OWFN-PARAM="-p ctl"
+make table LOLA-LP=lola-mc
+@end example
+The first line causes the translation to generate CTL properties, the second line
+switches the model-checker for the soundness analysis to the LoLA variant with
+model checking algorithms (that has to be compiled as described above).
 
 @c ----------------------------------------------------------------------------
 

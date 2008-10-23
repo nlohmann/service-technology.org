@@ -9,6 +9,10 @@
 Version 1.11-unreleased
 =======================
 
+* Changed the standard soundness verification procedures to the more efficient
+  liveness property verification algorithm of LoLA. To use the old CTL model
+  checking procedures use parameter `-p ctl'.
+
 * Cleaned the autotools configuration files and added options to directly
   compile binaries for different platforms.
 

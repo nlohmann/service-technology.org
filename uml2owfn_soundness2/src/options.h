@@ -118,6 +118,7 @@ typedef enum
   P_FILTER,			///< apply filtering before translating the process to a net
   P_TASKFILE,		///< insist on writing task files
   P_ANONYMIZE,   ///< anonymize the process output (re-enumerate places)
+  P_CTL,        ///< generate CTL properties for analysis (if applicable)
   P_CUT         ///< cut the process along one swimlane
 } possibleParameters;
 

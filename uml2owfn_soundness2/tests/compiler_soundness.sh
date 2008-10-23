@@ -68,7 +68,28 @@ uml2owfn -i $testdir/soundness/TestSuite_soundness.xml -p filter -a soundness -a
 result5=$?
 rm -f $testdir/soundness/*.tpn
 
-if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 -a $result4 -eq 0 -a $result5 -eq 0 \)
+echo ""
+echo "[CTL model checking]"
+echo "uml2owfn -i $testdir/soundness/TestSuite_soundness.xml -p filter -a soundness -p ctl -f lola -o"
+uml2owfn -i $testdir/soundness/TestSuite_soundness.xml -p filter -a soundness -p ctl -f lola -o &> /dev/null
+result6=$?
+
+must_filecount_filter=12
+agef_count=$(ls $testdir/soundness/*.lola | xargs grep "ALLPATH ALWAYS ( EXPATH EVENTUALLY (" | wc -l)
+if [ ! $agef_count -eq $must_filecount_filter ] ; then
+  result6=1
+  echo "[fail] CTL properties not generated for all processes"
+fi
+lola_mc_count=$(grep "lola-mc" $testdir/soundness/check_TestSuite_soundness.sh | wc -l)
+if [ ! $lola_mc_count -eq $must_filecount_filter ] ; then
+  result6=1
+  echo "[fail] not calling CTL model checker for CTL analysis"
+fi
+rm -f $testdir/compiler/*.lola
+rm -f $testdir/compiler/*.task
+rm -f $testdir/compiler/*.sh
+
+if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 -a $result4 -eq 0 -a $result5 -eq 0 -a $result6 -eq 0 \)
 then
   result=0
 else

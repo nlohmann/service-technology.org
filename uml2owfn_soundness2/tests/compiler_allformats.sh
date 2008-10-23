@@ -158,7 +158,6 @@ fi
 rm -f $testdir/compiler/*.lola
 rm -f $testdir/compiler/uml2owfn_TestSuite.log
 
-
 if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 -a $result4 -eq 0 -a $result5 -eq 0 -a $result6 -eq 0 -a $result7 -eq 0 -a $result8 -eq 0 -a $result9 -eq 0 -a $result10 -eq 0 -a $result11 -eq 0 -a $result12 -eq 0 -a $result13 -eq 0 \)
 then
   result=0

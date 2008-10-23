@@ -129,7 +129,7 @@ void print_help()
 	trace("\n");
 	trace("Options:\n");
 	trace(" -p, --parameter=PARAM  modify processing with given parameter\n");
-	trace(" -i, --input=FILE       read a BPEL process from FILE\n");
+	trace(" -i, --input=FILE       read a process library from FILE\n");
 	trace(" -o, --output[=NAME]    write output to file (NAME sets filename)\n");
 	trace(" -f, --format=FORMAT    create output of the given format\n");
 	trace(" -d, --debug=NUMBER     set a debug level (NUMBER=0..4 or \"flex\" or \"bison\")\n");
@@ -146,10 +146,13 @@ void print_help()
 #ifdef BOM_DECOMPOSITION
   trace("    cut                 cut each process\n");
 #endif
+  trace("    ctl                 generate CTL model checking properties for analysis");
+  trace("                        (if applicable)");
 	trace("\n");
 	trace("  FORMAT is one of the following (multiple formats permitted):\n");
 	trace("    lola, owfn, dot, pep, tpn, apnn, ina, spin, pnml, info\n");
 	trace("\n");
+  //    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
 	trace("  TASK is one of the following (multiple parameters permitted):\n");
 	trace("    soundness           analyze for soundness\n");
 	trace("    deadlocks           check for deadlocks (except in the final state),\n");
@@ -179,7 +182,7 @@ void print_version()
 	// 80 chars
 	//    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
 	trace(string(PACKAGE_STRING) + " (compiled " + string(__DATE__) + ")\n\n");
-	trace("Copyright (C) 2007, 2008 Martin Znamirowski, Dirk Fahland\n");
+	trace("Copyright (C) 2007, 2008 Martin Znamirowski, Dirk Fahland, Niels Lohmann\n");
 }
 
 
@@ -318,6 +321,8 @@ void parse_command_line(int argc, char* argv[])
 			else if (parameter == "cut")
 			  globals::parameters[P_CUT] = true;
 #endif
+      else if (parameter == "ctl")
+        globals::parameters[P_CTL] = true;
 			else {
 				trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
 				trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");

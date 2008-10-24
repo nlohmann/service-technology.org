@@ -6,6 +6,15 @@
                      http://service-technology.org/lola
 
 
+Version 1.11-unreleased
+=======================
+
+* completed documentation
+
+* updated `-h' output
+
+* removed old manual `lola-old.ps' from documentation
+
 Version 1.10
 ============
 

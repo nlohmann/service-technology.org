@@ -1,3 +1,13 @@
+@heading Version 1.11-unreleased
+@itemize
+@item completed documentation
+
+@item updated @option{-h} output
+
+@item removed old manual @file{lola-old.ps} from documentation
+@end itemize
+
+
 @heading Version 1.10
 @itemize
 @item this is an official source release by Karsten Wolf -- removed warning after executing the configure script

@@ -5,6 +5,8 @@
 @finalout
 @settitle LoLA User's Manual
 
+
+
 @c --------------------------------------------------------------------------
 
 @copying
@@ -54,18 +56,18 @@ Copyright @copyright{} 2008 Karsten Wolf
 
 @menu
 * About LoLA::About LoLA
-* Net File Format::  Net File Format
+* Net File Format::
 * Supported Properties::
 * Reduction Techniques::
 * Output::
 * Download::  Download
 * First Steps:: First Steps
 * ChangeLog::Version history.
+* Indices:: 
 @end menu
 
 @c --------------------------------------------------------------------------
 
-@c @shortcontents
 @contents
 @paragraphindent none
 
@@ -80,7 +82,7 @@ Copyright @copyright{} 2008 Karsten Wolf
 
 
 @c --------------------------------------------------------------------------
-@section Abstract
+@subsubheading Abstract
 
 LoLA (a Low Level Petri Net Analyzer) has been implemented for the validation of reduction techniques for place/transition net state spaces. Its particular strengths include
 
@@ -112,12 +114,11 @@ The following list gives a short summary of some case studies involving the use 
 
 @subsection Verification of a GALS wrapper 
 
-A GALS circuit is a complex integrated circuit where several components operate locally synchronously but exchange information asynchronously. GALS technology promises lower energy consumption and higher clock frequency. 
+A @acronym{GALS} circuit is a complex integrated circuit where several components operate locally synchronously but exchange information asynchronously. @acronym{GALS} technology promises lower energy consumption and higher clock frequency. 
 
-In a joint project, researchers at Humboldt-Universität zu Berlin and the Semiconductor Research Institute in Frankfurt/Oder analysed a GALS circuit that implements a device for coding/decoding signals of wireless LAN connections according to the 802.11 protocol. They were particularly concerned with parts of the circuit they called wrapper. A wrapper is attached to each synchronous component of a GALS circuit. It is responsible for managing the asynchronously incoming data, pausing the local clock in case of no pending data, and shipping the outgoing signals to the respective next component. They modeled a wrapper as a place-transition net and analysed the occurrence of hazard situations. A hazard is a situation where, according to two incoming signals within a very short time interval, output signals may assume undefined values. In the model, a hazard situation corresponds to a particular reachable state predicate. LoLA was used with stubborn sets and the sweep-line method as reduction techniques. Analysis revealed 8 hazard situations in the model. 6 of them were ruled out by the engineers due to timing constraints which were not modeled. The remaining 2 hazards were confirmed as real problems. The circuit was redesigned and another verification confirmed the absence of hazard situations.
+In a joint project, researchers at Humboldt-Universit@"at zu Berlin and the Semiconductor Research Institute in Frankfurt/Oder analysed a @acronym{GALS} circuit that implements a device for coding/decoding signals of wireless @acronym{LAN} connections according to the 802.11 protocol. They were particularly concerned with parts of the circuit they called wrapper. A wrapper is attached to each synchronous component of a @acronym{GALS} circuit. It is responsible for managing the asynchronously incoming data, pausing the local clock in case of no pending data, and shipping the outgoing signals to the respective next component. They modeled a wrapper as a place-transition net and analysed the occurrence of hazard situations. A hazard is a situation where, according to two incoming signals within a very short time interval, output signals may assume undefined values. In the model, a hazard situation corresponds to a particular reachable state predicate. LoLA was used with stubborn sets and the sweep-line method as reduction techniques. Analysis revealed 8 hazard situations in the model. 6 of them were ruled out by the engineers due to timing constraints which were not modeled. The remaining 2 hazards were confirmed as real problems. The circuit was redesigned and another verification confirmed the absence of hazard situations.
 
-@subsubheading More information:
-
+@b{More information:}
 @itemize
 @item
 Milos Krstic, Eckhard Grass, and Christian Stahl. @b{Request-Driven GALS Technique for Wireless Communication System}. In @i{Proceedings of the 11th International Symposium on Advanced Research in Asynchronous Circuits and Systems (ASYNC 2005)}, New York, NY, USA, pages 76-85, March 2005. IEEE Computer Society.
@@ -126,34 +127,29 @@ Milos Krstic, Eckhard Grass, and Christian Stahl. @b{Request-Driven GALS Techniq
 
 @subsection Validation of a Petri Net Semantics for WS-BPEL
 
-The language WS-BPEL has been proposed by an industrial consortium for the specification of web services. Researchers at Humboldt-Universität zu Berlin proposed a formal semantics for WS-BPEL on the basis of high-level Petri nets (with a straightforward place-transition net abstraction that ignores data dependencies). Due to tricky concepts in the language, the translation of WS-BPEL to Petri nets required a validation. The validation was carried out through an automated translation of WS-BPEL into Petri nets and a subsequent analysis of the resulting Petri nets using LoLA. LoLA was used with stubborn sets and the sweep-line method as most frequently used reduction techniques.
+The language @acronym{WS-BPEL, Web Service Business Process Execution Language} has been proposed by an industrial consortium for the specification of web services. Researchers at Humboldt-Universit@"at zu Berlin proposed a formal semantics for @acronym{WS-BPEL} on the basis of high-level Petri nets (with a straightforward place-transition net abstraction that ignores data dependencies). Due to tricky concepts in the language, the translation of @acronym{WS-BPEL} into Petri nets required a validation. The validation was carried out through an automated translation of @acronym{WS-BPEL} into Petri nets and a subsequent analysis of the resulting Petri nets using LoLA. LoLA was used with stubborn sets and the sweep-line method as most frequently used reduction techniques.
 
-@subsubheading More information:
-
+@b{More information:}
 @itemize
-@item
-Sebastian Hinz, Karsten Schmidt, and Christian Stahl. @b{Transforming BPEL to Petri Nets}. In Wil M. P. van der Aalst, B. Benatallah, F. Casati, and F. Curbera, editors, @i{Proceedings of the Third International Conference on Business Process Management (BPM 2005)}, volume 3649 of Lecture Notes in Computer Science, Nancy, France, pages 220-235, September 2005.
+@item Sebastian Hinz, Karsten Schmidt, and Christian Stahl. @b{Transforming BPEL to Petri Nets}. In Wil M. P. van der Aalst, B. Benatallah, F. Casati, and F. Curbera, editors, @i{Proceedings of the Third International Conference on Business Process Management (BPM 2005)}, volume 3649 of Lecture Notes in Computer Science, Nancy, France, pages 220-235, September 2005.
 @end itemize
 
 
 @subsection Verification of WS-BPEL choreographies 
 
-The language WS-BPEL has been proposed by an industrial consortium for the specification of web services. Researchers at Humboldt-Universität zu Berlin developed a tool for translating WS-BPEL processes and choreographies into place-transition nets. LoLA has been used for checking several properties on the choreographies. They used stubborn sets and the symmetry method. The latter method turned out to be useful in those cases where choreographies involved a large number of instances of one and the same process. This way, choreographies with more than 1000 service instances could be verified.
+The language @acronym{WS-BPEL} has been proposed by an industrial consortium for the specification of web services. Researchers at Humboldt-Universit@"at zu Berlin developed a tool for translating @acronym{WS-BPEL} processes and choreographies into place-transition nets. LoLA has been used for checking several properties on the choreographies. They used stubborn sets and the symmetry method. The latter method turned out to be useful in those cases where choreographies involved a large number of instances of one and the same process. This way, choreographies with more than 1000 service instances could be verified.
 
-@subsubheading More information:
-
+@b{More information:}
 @itemize
-@item
-Niels Lohmann, Oliver Kopp, Frank Leymann, and Wolfgang Reisig. @b{Analyzing BPEL4Chor: Verification and Participant Synthesis}. In Marlon Dumas and Reiko Heckel, editors, @i{Web Services and Formal Methods, Forth International Workshop, WS-FM 2007}, Brisbane, Australia, September 28-29, 2007, Proceedings, volume 4937 of Lecture Notes in Computer Science, pages 46-60, 2008. Springer-Verlag.
+@item Niels Lohmann, Oliver Kopp, Frank Leymann, and Wolfgang Reisig. @b{Analyzing BPEL4Chor: Verification and Participant Synthesis}. In Marlon Dumas and Reiko Heckel, editors, @i{Web Services and Formal Methods, Forth International Workshop, WS-FM 2007}, Brisbane, Australia, September 28-29, 2007, Proceedings, volume 4937 of Lecture Notes in Computer Science, pages 46-60, 2008. Springer-Verlag.
 @end itemize
 
 
 @subsection Garavel's challenge in the Petri Net Mailing List 
 
-In 2003, H. Garavel posted a place/transition net to the Petri net mailing list. It consisted of 485 places and 776 transitions. He was interested in quasi-liveness, i.e. the absence of any transition that is dead in the initial marking. According to the posting, the example stems from the translation of a LOTOS specification into Petri nets. There were four responses reporting successful verification. One of them involved LoLA. With LoLA, we checked each transition separately for non-death. We succeeded for all but two transitions. For the remaining transitions, goal-oriented execution confirmed non-death. According to the other responses which involved either symbolic (BDD based) verification or the use of the covering step graph technique, the full state space consisted of almost @math{10^{22}} states.
+In 2003, H. Garavel posted a place/transition net to the Petri net mailing list. It consisted of 485 places and 776 transitions. He was interested in quasi-liveness, i.e. the absence of any transition that is dead in the initial marking. According to the posting, the example stems from the translation of a @acronym{LOTOS} specification into Petri nets. There were four responses reporting successful verification. One of them involved LoLA. With LoLA, we checked each transition separately for non-death. We succeeded for all but two transitions. For the remaining transitions, goal-oriented execution confirmed non-death. According to the other responses which involved either symbolic (@acronym{BDD} based) verification or the use of the covering step graph technique, the full state space consisted of almost @math{10^{22}} states.
 
-@subsubheading More information:
-
+@b{More information:}
 @itemize
 @item @url{http://www.informatik.uni-hamburg.de/cgi-bin/TGI/pnml/getpost?id=2003/07/2709, The original posting}
 @item @url{http://www.informatik.uni-hamburg.de/cgi-bin/TGI/pnml/getpost?id=2003/09/2736, The summary of responses}
@@ -184,8 +180,9 @@ LoLA has been integrated into various other tools.
 @c ==========================================================================
 @node Net File Format
 @chapter Net File Format
+@cindex @code{NET}
 
-In LoLA, the Petri net to be analysed needs to be provided in textual representation. LoLA supports place-transition nets and high-level nets in the shape of an interpreted algebraic Petri net. A place-transition net description starts with the keyword NET, followed by the specification of
+In LoLA, the Petri net to be analysed needs to be provided in textual representation. LoLA supports place-transition nets and high-level nets in the shape of an interpreted algebraic Petri net. A place-transition net description starts with the keyword @samp{NET}, followed by the specification of
 
 @itemize
 @item places
@@ -193,14 +190,14 @@ In LoLA, the Petri net to be analysed needs to be provided in textual representa
 @item transitions and arcs
 @end itemize
 
-A high level net description starts with the keyword SPECIFICATION, followed by the definition of
+A high level net description starts with the keyword @samp{SPECIFICATION}, followed by the definition of
 
 @itemize
 @item sorts (data domains)
 @item operations 
 @end itemize
 
-The defined symbols can be used in the actual net description which is subsequently provided using the keyword NET, followed by the specification of
+The defined symbols can be used in the actual net description which is subsequently provided using the keyword @samp{NET}, followed by the specification of
 
 @itemize
 @item places
@@ -211,94 +208,116 @@ The defined symbols can be used in the actual net description which is subsequen
 
 
 @c --------------------------------------------------------------------------
-@section File Format: Identifiers
+@section Basics
 
-The rules for building identifiers in LoLA are quite liberal. This way, it should be easy to translate various file formats into LoLA format. Basically, every string of printable characters that does not contain any of the following characters is an identifier: ,;:()@{@} 
+
+@subsection File Format: Identifiers
+
+The rules for building identifiers in LoLA are quite liberal. This way, it should be easy to translate various file formats into LoLA format. Basically, every string of printable characters that does not contain any of the following characters is an identifier: @code{,}, @code{;}, @code{:}, @code{(}, @code{)}, @code{@{}, @code{@}} 
 
 Exceptions from this rule are numbers and the following reserved strings:
 
 @code{RECORD}, @code{END}, @code{SORT}, @code{FUNCTION}, @code{SAFE}, @code{DO}, @code{ARRAY}, @code{STRONG}, @code{WEAK}, @code{FAIR}, @code{ENUMERATE}, @code{CONSTANT}, @code{BOOLEAN}, @code{OF}, @code{BEGIN}, @code{WHILE}, @code{IF}, @code{THEN}, @code{ELSE}, @code{SWITCH}, @code{CASE}, @code{NEXTSTEP}, @code{REPEAT}, @code{FOR}, @code{TO}, @code{ALL}, @code{EXIT}, @code{EXISTS}, @code{RETURN}, @code{TRUE}, @code{FALSE}, @code{MOD}, @code{VAR}, @code{GUARD}, @code{STATE}, @code{PATH}, @code{GENERATOR}, @code{ANALYSE}, @code{PLACE}, @code{TRANSITION}, @code{MARKING}, @code{CONSUME}, @code{PRODUCE}, @code{FORMULA}, @code{EXPATH}, @code{ALLPATH}, @code{ALWAYS}, @code{UNTIL}, @code{EVENTUALLY}, @code{AND}, @code{OR}, @code{NOT}, @code{<->}, @code{<>}, @code{->}, @code{=}, @code{[}, @code{]}, @code{.}, @code{+}, @code{-}, @code{*}, @code{/}, @code{:}, @code{;}, @code{|}, @code{(}, @code{)}, @code{,}, @code{>}, @code{<}, @code{#}, @code{>=}, @code{<=} 
 
-@b{Examples:}
 @cartouche
-@code{p1}
-
-@code{|||=}
-
-@code{helloworld}
-
-@code{[]....8[[[}
+@b{Examples:}
+@example
+p1
+|||=
+helloworld
+[]....8[[[
+@end example
 @end cartouche
 
-Identifiers must be separated from other parts of the net file specification using white space characters. White space characters include the blank, newline, and tab characters as well as comments. A comment in LoLA is any text between a pair of curling brackets @{, @} on the same line.
+Identifiers must be separated from other parts of the net file specification using white space characters. White space characters include the blank, newline, and tab characters as well as comments. A comment in LoLA is any text between a pair of curling brackets @samp{@{}, @samp{@}} on the same line.
 
-@b{Example:}
 @cartouche
-@code{@{ A @{ comment @}}. 
+@b{Example:}
+@example
+@{ A @{ comment @}
+@end example
 @end cartouche
 
 Future versions of LoLA may have additional reserved words. New reserved words shall, however, always consist of capital letters only.
 
 
+@subsection File Format: Numbers
 
-@c --------------------------------------------------------------------------
-@section File Format: Numbers
+Every sequence of digits, separated by white space (blank, tab, newline, or comment, i.e. text enclosed in curling brackets @samp{@{}, @samp{@}}), is a number. LoLA does not have a concept of signed numbers. 
 
-Every sequence of digits, separated by white space (blank, tab, newline, or comment, i.e. text enclosed in curling brackets @{,@}), is a number. LoLA does not have a concept of signed numbers. 
-
-Examples: 0, 11, 0001117. 
-
-
-
-@c --------------------------------------------------------------------------
-@section File Format for Place/Transition Nets: Places
-
-In LoLA, every place is represented as a unique name. The name can be an identifier according to the general rules for building    identifiers or a    number. The set of places is specified by the keyword @samp{PLACE}, followed by a list of sections. Each section starts with a capacity specification and is followed by a comma-separated list of the places names, finished by a @samp{;}. The capacity statement may by empty or consist of the keyword @samp{SAFE}, optionally followed by a number. Using @samp{SAFE} without number is equivalent to the specification @samp{SAFE 1}. If the file @file{userconfig.H} contains the directive @samp{#CAPACITY k}, an empty capacity specification is equivalent to the specification @samp{SAFE k}. Otherwise, an empty specification represents an unbounded capacity (which is internally approximated by a capacity of @math{2^{32}}). A capacity statement specifies the maximum number of tokens expected on the places which are specified subsequently. LoLA uses the capacity statement only for a compact representation of markings. The firing rule is not effected by the capacity specification. Optionally, the validity of the capacity specifications can be checked during state space generation. For this purpose, the directive @samp{CHECKCAPACITY} must be active in the file @file{userconfig.H}.
-
-@b{Example:}
 @cartouche
-@code{PLACE SAFE p1, 17, helloworld, p[]....8[[[; 
-p2 , p3 ; SAFE 7 : p4 , p5;}
-
-specifies 8 places. Places p1, 17, hellworld, p[]....8[[[ are expected to never contain more than 1 token. Places p2, p3 have either unknown bound (without @samp{#CAPACITY} in @file{userconfig.H}), or the bound specified in @file{userconfig.H}. Places p4 and p5 are expected to contain at most 7 tokens.
+@b{Example:}
+@example
+0
+11
+0001117
+@end example
 @end cartouche
 
 
 
 @c --------------------------------------------------------------------------
-@section File Format for Place/Transition Nets: Initial Marking
+@section File Format for Place/Transition Nets
 
-The initial marking of the net is specified in a separate section starting with the keyword @samp{MARKING} and finished by a @samp{;}. In between, there is a comma-separated list. Each list item consists of a   place name , a @samp{:}, and a   number. The number specifies the number of tokens initially being on the mentioned place. Places which are not mentioned get 0 tokens initially. For places mentioned more than once, the specified token counts are summed up. 
 
-@b{Example:}
+@subsection Places
+@cindex @code{#CAPACITY @i{k}}
+@cindex @code{#CHECKCAPACITY @i{k}}
+@cindex @code{PLACE}
+@cindex @code{SAFE}
+
+In LoLA, every place is represented as a unique name. The name can be an identifier according to the general rules for building identifiers or a  number. The set of places is specified by the keyword @samp{PLACE}, followed by a list of sections. Each section starts with a capacity specification and is followed by a comma-separated list of the places names, finished by a @samp{;}. The capacity statement may by empty or consist of the keyword @samp{SAFE}, optionally followed by a number. Using @samp{SAFE} without number is equivalent to the specification @samp{SAFE@tie{}1}. If the file @file{userconfig.H} contains the directive @samp{#CAPACITY@tie{}@i{k}}, an empty capacity specification is equivalent to the specification @samp{SAFE@tie{}@i{k}}. Otherwise, an empty specification represents an unbounded capacity (which is internally approximated by a capacity of @math{2^{32}}). A capacity statement specifies the maximum number of tokens expected on the places which are specified subsequently. LoLA uses the capacity statement only for a compact representation of markings. The firing rule is not effected by the capacity specification. Optionally, the validity of the capacity specifications can be checked during state space generation. For this purpose, the directive @samp{CHECKCAPACITY} must be active in the file @file{userconfig.H}.
+
 @cartouche
-@code{MARKING p1 : 13, p2 : 3 , p1 : 4 ;}
+@b{Example:}
+@example
+PLACE SAFE p1, 17, helloworld, p[]....8[[[;
+p2 , p3 ; SAFE 7 : p4 , p5;
+@end example
 
-assigns 16 tokens to place p1, 3 tokens to place p2, and 0 tokens to any other place in the net.
+specifies 8 places. Places @samp{p1}, @samp{17}, @samp{hellworld}, @samp{p[]....8[[[} are expected to never contain more than 1 token. Places @samp{p2}, @samp{p3} have either unknown bound (without @samp{#CAPACITY} in @file{userconfig.H}), or the bound specified in @file{userconfig.H}. Places @samp{p4} and @samp{p5} are expected to contain at most 7 tokens.
 @end cartouche
 
 
+@subsection Initial Marking
+@cindex @code{MARKING}
 
-@c --------------------------------------------------------------------------
-@section File Format for Place/Transition Nets: Transitions and Arcs
+The initial marking of the net is specified in a separate section starting with the keyword @samp{MARKING} and finished by a @samp{;}. In between, there is a comma-separated list. Each list item consists of a place name, a @samp{:}, and a number. The number specifies the number of tokens initially being on the mentioned place. Places which are not mentioned get 0 tokens initially. For places mentioned more than once, the specified token counts are summed up. 
 
-In LoLA, there is, for each transition, a distinguished section for defining that transition and all connecting arcs. The section starts with the keyword "TRANSITION" followed by the name of the transition. This name may be built general rules for building    identifiers or a    number. 
-
-Then, optionally, a fairness assumption "WEAK FAIR" or "STRONG FAIR" may be specified. The assumptions are effective only for the verification of a few properties. A transition is treated weakly unfair in an infinite transition sequence iff it is, from some point in the sequence, permanently enabled but never fired. It is treated strongly unfair iff it is infinitely often enabled but only finitely often fired. 
-
-After that, the list of incoming arcs is specified. This part starts with the keyword "CONSUME" and ends with a ";" Between these symbols, there is a comma-separated list of arc specifications. Each arc specification consists of a    place name , a ":", and a   number. It represents an arc from the mentioned place to the currently spefified transition. The number represents the multiplicity of the arc. 
-
-Finally, the list of outgoing arcs is specified. This part starts with the keyword "PRODUCE" and ends with a ";" Between these symbols, there is a comma-separated list of arc specifications. Each arc specification consists of a    place name , a ":", and a   number. It represents an arc from the currently spefified transition to the mentioned place. The number represents the multiplicity of the arc. 
-
-@b{Example:}
 @cartouche
+@b{Example:}
+@example
+MARKING p1 : 13, p2 : 3 , p1 : 4 ;
+@end example
+
+assigns 17 tokens to place @samp{p1}, 3 tokens to place @samp{p2}, and 0 tokens to any other place in the net.
+@end cartouche
+
+
+@subsection Transitions and Arcs
+@cindex @code{TRANSITION}
+@cindex @code{WEAK FAIR}
+@cindex @code{STRONG FAIR}
+@cindex @code{CONSUME}
+@cindex @code{PRODUCE}
+
+In LoLA, there is, for each transition, a distinguished section for defining that transition and all connecting arcs. The section starts with the keyword @samp{TRANSITION} followed by the name of the transition. This name may be built general rules for building identifiers or a number.
+
+Then, optionally, a fairness assumption @samp{WEAK FAIR} or @samp{STRONG FAIR} may be specified. The assumptions are effective only for the verification of a few properties. A transition is treated @dfn{weakly unfair} in an infinite transition sequence iff it is, from some point in the sequence, permanently enabled but never fired. It is treated @dfn{strongly unfair} iff it is infinitely often enabled but only finitely often fired. 
+
+After that, the list of incoming arcs is specified. This part starts with the keyword @samp{CONSUME} and ends with a @samp{;}. Between these symbols, there is a comma-separated list of arc specifications. Each arc specification consists of a place name, a @samp{:}, and a number. It represents an arc from the mentioned place to the currently specified transition. The number represents the multiplicity of the arc. 
+
+Finally, the list of outgoing arcs is specified. This part starts with the keyword @samp{PRODUCE} and ends with a @samp{;} Between these symbols, there is a comma-separated list of arc specifications. Each arc specification consists of a place name, a @samp{:}, and a number. It represents an arc from the currently specified transition to the mentioned place. The number represents the multiplicity of the arc. 
+
+@cartouche
+@b{Example:}
 @example
 TRANSITION t1 WEAK FAIR
 CONSUME p1 : 2 , p2 : 4 ;
 PRODUCE p1 : 2 , p3 : 2 ;
 @end example
 
-is a transition which is to be treated weakly fair for some properties. It tests p1 for the presence of 2 tokens, removes 4 tokens from p2, and puts 2 tokens onto p3.
+is a transition which is to be treated weakly fair for some properties. It tests @samp{p1} for the presence of 2 tokens, removes 4 tokens from @samp{p2}, and puts 2 tokens onto p3.
 
 @example
 TRANSITION t2
@@ -306,33 +325,90 @@ CONSUME p1 : 1 ;
 PRODUCE ;
 @end example
 
-may be treated unfair. It removes a token from p1 and does not put tokens anywhere.
+may be treated unfair. It removes a token from @samp{p1} and does not put tokens anywhere.
 @end cartouche
 
 
 
 @c --------------------------------------------------------------------------
-@section File Format for High Level Nets: Sorts
+@section File Format for High Level Nets
 
-Sorts represents domains for tokens on places. A sort name can be buit according to the general rules for building    identifiers. The set of sorts is specified by the keyword "SORTS", followed by a list of sort definitions. Each definition consists of a sort name, a ":", and a sort description which ends with a ";". The following descriptions are available:
+
+@subsection Sorts
+@cindex @code{SORTS}
+@cindex @code{BOOLEAN}
+@cindex @code{TRUE}
+@cindex @code{FALSE}
+@cindex @code{ENUMERATE}
+@cindex @code{ARRAY}
+@cindex @code{RECORD}
+
+Sorts represents domains for tokens on places. A sort name can be buit according to the general rules for building identifiers. The set of sorts is specified by the keyword @samp{SORTS}, followed by a list of sort definitions. Each definition consists of a sort name, a @samp{:}, and a sort description which ends with a @samp{;}. The following descriptions are available:
 
 @itemize
-@item the description "BOOLEAN" with values "TRUE" and "FALSE"; Example: s1 = BOOLEAN ;
+@item the description @samp{BOOLEAN} with values @samp{TRUE} and @samp{FALSE}; 
 
-@item an interval of natural numbers, specified as a comma-separated pair of    numbers , enclosed in brackets "[" and "]". The description represents all values which are natrual numbers greater or equal to the left number, and less or equal to the right number Example: s3 = [ 3 , 7 ] ;.
+@cartouche
+@b{Example:}
+@example
+s1 = BOOLEAN ;
+@end example
+@end cartouche
 
-@item the keyword "ENUMERATE", followed by a comma-separated list of identifiers and the keyword "END". Each identifier represents a distinguished value. Example: s4 = ENUMERATE blue , white , red END ;
+@item an interval of natural numbers, specified as a comma-separated pair of  numbers, enclosed in brackets @samp{[} and @samp{]}. The description represents all values which are natural numbers greater or equal to the left number, and less or equal to the right number.
 
-@item the keyword "ARRAY" followed by a scalar sort decription, the keyword "OF", and another arbitrary sort description. The description represents arrays (vectors) where the first sort description represents the set of indices while the second sort description represents the values of components. Any of the sort descriptions mentioned in the first four items of this list are scalar wihle the remaining two are not. Example: s5 = ARRAY s2 OF [ 1 , 3 ].
+@cartouche
+@b{Example:}
+@example
+s3 = [ 3 , 7 ] ;
+@end example
+@end cartouche
 
-@item The keyword "RECORD" followed by a list of component definitions, finished by the keyword "END". A component definition consists of an identifier, a ":", and a sort description. A record description represents cross products of values where each component represents one dinension of the cross product. Example: s6 = RECORD r1 : BOOLEAN; r2 : ARRAY [ 1 , 3 ] OF s2 END ;
+@item the keyword @samp{ENUMERATE}, followed by a comma-separated list of identifiers and the keyword @samp{END}. Each identifier represents a distinguished value.
 
-@item any previously specified sort name; represents the description of the mentioned sort; Example: s2 = s1 ;
+@cartouche
+@b{Example:}
+@example
+s4 = ENUMERATE
+       blue , white , red
+     END ;
+@end example
+@end cartouche
+
+@item the keyword @samp{ARRAY} followed by a scalar sort description, the keyword @samp{OF}, and another arbitrary sort description. The description represents arrays (vectors) where the first sort description represents the set of indices while the second sort description represents the values of components. Any of the sort descriptions mentioned in the first four items of this list are scalar while the remaining two are not.
+
+@cartouche
+@b{Example:}
+@example
+s5 = ARRAY s2 OF [ 1 , 3 ];
+@end example
+@end cartouche
+
+@item The keyword @samp{RECORD} followed by a list of component definitions, finished by the keyword @samp{END}. A component definition consists of an identifier, a @samp{:}, and a sort description. A record description represents cross products of values where each component represents one dimension of the cross product.
+
+@cartouche
+@b{Example:}
+@example
+s6 = RECORD
+       r1 : BOOLEAN;
+       r2 : ARRAY [ 1 , 3 ] OF s2
+     END ;
+@end example
+@end cartouche
+
+@item any previously specified sort name; represents the description of the mentioned sort.
+
+@cartouche
+@b{Example:}
+@example
+s2 = s1 ;
+@end example
+@end cartouche
 @end itemize
 
 LoLA considers a canonical ordering on each set of values that can be described by a sort description. The ordering is defined as follows:
 @itemize
-@item for BOOLEAN: FALSE < TRUE;
+@item for @samp{BOOLEAN}: @samp{FALSE} < @samp{TRUE};
 
 @item for intervals: the usual ordering on the natural numbers;
 
@@ -346,18 +422,54 @@ for arrays: for the smallest index where both values differ, the corresponding c
 
 Every value of a sort description has a text representation.
 @itemize
-@item The text representations of the boolean constants are "TRUE" and "FALSE"; Example: TRUE
+@item The text representations of the boolean constants are @samp{TRUE} and @samp{FALSE};
 
-@item The text representation of a number is the decimal ASCII representation of that number; Example: 42
+@cartouche
+@b{Example:}
+@example
+TRUE
+@end example
+@end cartouche
 
-@item The text representation of an enumerated value is the ASCII representation of that value; Example: red
+@item The text representation of a number is the decimal @acronym{ASCII} representation of that number;
 
-@item The text representation of a value of an array is a "|"-separated list of the component values, in ascending order of their index, enclosed in brackets; Example: [1|5|7|3]
+@cartouche
+@b{Example:}
+@example
+42
+@end example
+@end cartouche
 
-@item The text representation of a value of a record is a "|"-separated list of the values of the record components (in the order of definition), enclosed in "<" and ">". Example: <1|TRUE|[1|2|5]|red>
+@item The text representation of an enumerated value is the @acronym{ASCII} representation of that value;
 
-@item The text representation is used in the translation from a high-level net to a low-level net.
+@cartouche
+@b{Example:}
+@example
+red
+@end example
+@end cartouche
+
+@item The text representation of a value of an array is a @samp{|}-separated list of the component values, in ascending order of their index, enclosed in brackets;
+
+@cartouche
+@b{Example:}
+@example
+[1|5|7|3]
+@end example
+@end cartouche
+
+@item The text representation of a value of a record is a @samp{|}-separated list of the values of the record components (in the order of definition), enclosed in @samp{<} and @samp{>}.
+
+@cartouche
+@b{Example:}
+@example
+<1|TRUE|[1|2|5]|red>
+@end example
+@end cartouche
 @end itemize
+
+The text representation is used in the translation from a high-level net to a low-level net.
+
 
 For sorts, several compatibility rules apply:
 @itemize
@@ -365,154 +477,284 @@ For sorts, several compatibility rules apply:
 
 @item All integer sorts are compatible to each other
 
-@item Two ARRAY types are compatible if their component sorts are compatible and their index sorts represent the same number of values
+@item Two @samp{ARRAY} types are compatible if their component sorts are compatible and their index sorts represent the same number of values
 
 @item Two record types are compatible if they have the same number of components, and the components have pairwise compatible sorts (in the order of specification of the components).
 @end itemize
 
 
+@subsection Operations
+@cindex @code{EXIT} operation
+@cindex @code{RETURN} operation
+@cindex @code{WHILE} operation
+@cindex @code{REPEAT} operation
+@cindex @code{FOR} operation
+@cindex @code{SWITCH} operation
+@cindex @code{IF} operation
+@cindex @code{FUNCTION}
+@cindex @code{VAR}
 
-@c --------------------------------------------------------------------------
-@section File Format for High Level Nets: Operations
+Operations represent mappings between sorts. The specification of an operation consists of an operation symbol which can later on be used in terms, a typing which controls the construction of terms, and a meaning which is basically a side-effect free program.
 
-Operations represent mappings between    sorts. The specification of an operation consists of an operation symbol which can later on be used in    terms , a typing which controls the construction of terms, and a meaning which is basically a side-effect free program. 
+The specification of an operation starts with the keyword @samp{FUNCTION}. It follows, enclosed in parenthesis, the specification of argument typing and, separated by a @samp{:}, the specification of a return type. The specification of argument type may be empty or a @samp{;}-separated list. Each entry in the list is formed by a comma-separated list of identifiers, followed by a @samp{:} and a sort description. The return type is a sort description. Each identifier represents an argument of the specified function. The order of arguments corresponds to the order of appearance of the respective identifiers. The identifiers for the arguments are used in the description of the meaning of the operation.
 
-The specification of an operation starts with the keyword "FUNCTION". It follows, enclosed in parenthesis, the specification of argument typing and, separated by a ":", the specification of a return type. The specification of argument type may be empty or a ";"-separated list. Each entry in the list is formed by a comma-separated list of    identifiers , followed by a ":" and a    sort description. The return type is a    sort description ,. Each identifier represents an argument of the specified function. The order of arguments corresponds to the order of appearance of the respective identifiers. The identifiers for the arguments are used in the description of the meaning of the operation. 
+The specification of the meaning of an operation consists of a declaration part and a statement which is enclosed in the pair @samp{BEGIN} and @samp{END} of keywords. The declaration part consists of the keyword @samp{VAR} and a @samp{;}-separated list of declarations. Each declaration consists of a @samp{,}-separated list of identifiers, a @samp{:}, and a sort description. Each declared variable represents a value which is, upon each execution of the subsequent statement, initialized with the least value of its sort. 
 
-The specification of the meaning of an operation consists of a declaration part and a statement which is enclosed in the pair "BEGIN" and "END" of keywords. The declaration part consists of the keyword "VAR" and a ";"-separated list of declarations. Each declaration consists of a ","-separated list of    identifiers , a ":", and a sort description. Each declared variable represents a value which is, upon each execution of the subsequent statement, initialized with the least value of its    sort. 
+The meaning of an operation defines a mapping from the cross-product of domains which are represented by the argument sorts, to the of the data domain represented by the return type. A statement can have any of the following shapes where @samp{@i{S1}} and @samp{@i{S2}} are substatements, @samp{@i{X}} is a declared variable or represents an argument, @samp{@i{E}}, @samp{@i{E1}}, @samp{@i{E1}}, @dots{}, are expressions, and @samp{@i{L}} is a left value.
 
-The meaning of an operation defines a mapping from the cross-product of domains which are represented by the argument sorts, to the of the data domain represented by the return type. A statement can have any of the following shapes where S1 and S2 are substatements, X is a declared variable or represents an argument, E, E1, E2, ... are   expressions, and $L$ is a    left value.
+@table @code
+@item EXIT
 
-@itemize
-@item EXIT - finish execution and return the multiset of values collected so far
+finish execution and return the multiset of values collected so far
 
-@item RETURN E - evaluate expression E and add the resulting value to the collection of values to be returned; continue execution!
+@item RETURN @i{E}
 
-@item L = E - replace the value of L with the result of evaluating expression E
+evaluate expression @samp{@i{E}} and add the resulting value to the collection of values to be returned; continue execution!
 
-@item S1 ; S2 - execute first statement S1 and then statement S2
+@item @i{L} = @i{E}
 
-@item WHILE E DO S1 END - perform a loop that consists of evaluating expression E (of sort BOOLEAN) first, and then executing S1. Leave the loop as soon as E evaluates to FALSE
+replace the value of @samp{@i{L}} with the result of evaluating expression @samp{@i{E}}
 
-@item REPEAT S1 UNTIL E END - perform a loop that consists of executing S1 first and then evaluating expression E (of sort BOOLEAN). Leave the loop as soon as E evaluates to TRUE
+@item @i{S1} ; @i{S2}
 
-@item FOR X := E1 TO E2 DO S1 END - execute S1 once for each value of scalar expression X between the value of expression E1 and the value of expression E2
+execute first statement @samp{@i{S1}} and then statement @samp{@i{S2}}
 
-@item FOR ALL X DO S1 END - perform S1 for each value in the domain of the sort of X, in the canonical order of that domain
+@item WHILE E DO S1 END
 
-@item IF E THEN S1 END - execute S1 if evaluation of E yields TRUE
+perform a loop that consists of evaluating expression @samp{@i{E}} (of sort @samp{BOOLEAN}) first, and then executing @samp{@i{S1}}. Leave the loop as soon as @samp{@i{E}} evaluates to @samp{FALSE}
 
-@item IF E THEN S1 ELSE S2 END - execute S1 if evaluation of E yields TRUE, otherwise execute S2
+@item REPEAT @i{S1} UNTIL @i{E} END
 
-@item SWITCH E CASE E1 : S1 CASE E2 : S2 ... ELSE S END - Evaluate expression E and execute the first statement Si where Ei has the same value as E. If no expresion matches, execute S. The part "ELSE S" is optional. If it is absent, nothing is executed in a situation where no case expression matches.
-@end itemize
+perform a loop that consists of executing @samp{@i{S1}} first and then evaluating expression @samp{@i{E}} (of sort @samp{BOOLEAN}). Leave the loop as soon as @samp{@i{E}} evaluates to @samp{TRUE}
+
+@item FOR @i{X} := @i{E1} TO @i{E2} DO @i{S1} END
+
+execute @samp{@i{S1}} once for each value of scalar expression @samp{@i{X}} between the value of expression @samp{@i{E1}} and the value of expression @samp{@i{E2}}
+
+@item FOR ALL @i{X} DO @i{S1} END
+
+perform @samp{@i{S1}} for each value in the domain of the sort of @samp{@i{X}}, in the canonical order of that domain
+
+@item IF @i{E} THEN @i{S1} END
+
+execute @samp{@i{S1}} if evaluation of @samp{@i{E}} yields @samp{TRUE}
+
+@item IF @i{E} THEN @i{S1} ELSE @i{S2} END
+
+execute @samp{@i{S1}} if evaluation of @samp{@i{E}} yields @samp{TRUE}, otherwise execute @samp{@i{S2}}
+
+@item SWITCH @i{E} CASE @i{E1} : @i{S1} CASE @i{E2} : @i{S2} @dots{} ELSE @i{S} END
+
+Evaluate expression @samp{@i{E}} and execute the first statement @samp{@i{Si}} where @samp{@i{Ei}} has the same value as @samp{@i{E}}. If no expresion matches, execute @samp{@i{S}}. The part @samp{ELSE @i{S}} is optional. If it is absent, nothing is executed in a situation where no case expression matches.
+@end table
 
 All used variables must be declared as arguments or in the declarations section. There are no variables or side-effects. Wherever variables, expressions, or left values occur, attached sorts must be compatible. When integer values (or arrays, records having integer components) are assigned, they are aligned to the target sort. That is, we add or subtract the size of the target interval iteratively until the resulting value fits in the target domain. 
 
-@b{Examples:}
 @cartouche
+@b{Example:}
 @example
 FUNCTION allelements() : s 
 @{ returns all elements of domain s @} 
-VAR x : s ; 
-noprime : ARRAY [ 2 , 10000 ] OF BOOLEAN @{ initially all entries FALSE @} 
+VAR
+  x : s ; 
+  noprime : ARRAY [ 2 , 10000 ] OF BOOLEAN @{ initially all entries FALSE @} 
 BEGIN 
   FOR ALL x DO 
      RETURN x 
-   END 
+  END 
 END
 @end example
 @end cartouche
 
 @cartouche
+@b{Example:}
 @example
 FUNCTION allprimesuntil(n : [ 2 , 10000 ] ) : [2 , 10000] 
 @{ returns all prime numbers until n which is expected to be less or equal to 10000 @} 
-VAR x , y : [ 2 , 10000 ] ; 
-noprime : ARRAY [ 2 , 10000 ] OF BOOLEAN @{ initially all entries FALSE @} 
+VAR
+  x , y : [ 2 , 10000 ] ; 
+  noprime : ARRAY [ 2 , 10000 ] OF BOOLEAN @{ initially all entries FALSE @} 
 BEGIN 
   FOR x = 2 TO n DO 
     IF NOT noprime[ x ] THEN 
-       RETURN x 
-       y = x 
-       WHILE x * y <= n DO 
-         y = y * x ; 
-         noprime [ y ] = TRUE 
-       END 
-     END 
-   END 
+      RETURN x 
+      y = x 
+      WHILE x * y <= n DO 
+        y = y * x ; 
+        noprime [ y ] = TRUE 
+      END 
+    END 
+  END 
 END
 @end example
 @end cartouche
 
 @cartouche
+@b{Example:}
 @example
 FUNCTION iscontained(x : s ; a : ARRAY i OF s ) : BOOLEAN 
 @{ returns TRUE iff x occurs in a @} 
-VAR y : i ; 
+VAR
+  y : i ; 
 BEGIN 
   FOR ALL y DO 
     IF a [ y ] = x THEN 
-       RETURN TRUE 
-       EXIT 
-     END 
-   END 
-   RETURN FALSE 
+      RETURN TRUE 
+      EXIT 
+    END 
+  END 
+  RETURN FALSE 
 END
 @end example
 @end cartouche
 
 
+@subsection Expressions and Left Values
+@cindex @code{AND}
+@cindex @code{OR}
+@cindex @code{NOT}
 
-@c --------------------------------------------------------------------------
-@section File Format for High-Level Nets: Places
+Expressions can be used in the descriptions of the meaning of operations, in transition guards, and in the specification of state predicates and CTL formulas. An expression represents a single value that may depend on arguments of the operation and values of variables.
 
-In LoLA, every place is represented as a unique name. The name can be an identifier according to the general rules for building    identifiers or a    number. The set of places is specified by the keyword "PLACE", followed by a list of sections. Each section starts with a capacity specification and is followed by a comma-separated list, finished by a ";". Each entra in the list consists of a place name, a ":", and a    sort name. The sort name specifies the data domain for tokens on the mentioned place. The capacity statement may by empty or consist of the keyword "SAFE", optionally followed by a number. Using "SAFE" without number is equivalent to the specification "SAFE 1". If the file @file{userconfig.H} contains the directive @samp{#CAPACITY k}, an empty capacity specification is equivalent to the specification "SAFE k". Otherwise, an empty specification represents an unounded capacity (whih is internally approximated by a capacity of 2^32). A capacity statement specifies the maximum number of tokens of a particular value expected on the places which are speficied subsequently. LoLA uses the capacity statement only for a compact representation of markings. The firing rule is not effected by the capacity specification. Optionally, the validity of the capacity specifications can be checked during state space generation. For this purpose, the directive "CHECKCAPACITY" must be active in the file @file{userconfig.H}. The specification of HL-net places may be arbitrarily mixed with the specification of   place/transition net places. This option must, however, be used wit hcare as LoLA translates every HL net place into a set of place/transition net places. Every resulting place has a name that consists of the name of the HL Net place, a ".", and a    text representation of a value. LoLA does not avoid resulting name clashes with specified place/transition net nplace names. 
+Expressions can be built according as follows (@samp{E1} and @samp{E2} are subexpressions):
+@itemize
+@item Left values: A variable is an expression. The current value of the variable forms the value of the expression. Its sort is the sort of the variable (specified in the variable declaration. If @samp{L} is a left value of an array sort, and @samp{E} an expression of the corresponding index type, then @samp{L [ E ]} is an expression, too. Its sort is the component sort of the array sort, its value is the i-th component of the value of @samp{L} if @samp{E} evaluates to the ith element of its sort. If @samp{L} is a left value of a record type, and bla one of its components, then @samp{L . bla} is a left value. Its value is the corresponding component of the value of @samp{L}, its sort is the sort specified for component bla.
 
-@b{Example:}
+@item Numbers, symbols of an enumeration type, the keywords @samp{TRUE} and @samp{FALSE} are expressions. There value corresponds to the depicted item. The type is integral, an enumeration type (the one that mentions the item), or @samp{BOOLEAN}, resp.
+
+@item Logical connectives: If @samp{E1} and @samp{E2} are expressions of type @samp{BOOLEAN}, so are @samp{E1 <-> E2}, @samp{E1 -> E2}, @samp{E1 AND E2}, @samp{E1 OR E2}, and @samp{NOT E1}. The value is the logical ``if and only if'', ``implies'', conjunction, disjunction, or negation (resp.) of the values of the subexpressions.
+
+@item Comparisons: If @samp{E1} and @samp{E2} are expressions, then @samp{E1 < E2}, @samp{E1 > E2}, @samp{E1 <= E2}, @samp{E1 >= E2}, @samp{E1 = E2}, @samp{E1 <> E2}, and @samp{E1 # E2} are expressions of type @samp{BOOLEAN}. If the sorts of @samp{E1} and @samp{E2} are incompatible, all comparisons except @samp{<>} and @samp{#} evaluate to @samp{FALSE}. Otherwise, the comparisons represent the usual relations less than, greater than, less or equal, greater or equal, equal, inequal, and an alternative representation of inequal. For scalar sorts, the comparisons are evaluated according to the canonical order of values. For Arrays, and Records, the comparison return @samp{TRUE} iff it returns true for all pairwise comparisons of the components.
+
+@item Arithmetic operations: If @samp{E1} and @samp{E2} are expressions of an integral sort, or arrays or records thereof, then @samp{E1 + E2}, @samp{E1 - E2}, @samp{E1 * E2}, @samp{E1 / E2}, @samp{E1 MOD E2}, and @samp{- E1} are expressions of the same sort as well. Values correspond to the addition, subtraction, multiplication, division, remainder, and sign change operations, resp. For arrays or records, the operation is performed component-wise.
+
+@item Parenthesis: If @samp{E} is an expression, so is @samp{( E )}. This way, operation precedence can be controlled.
+
+@item Aggregation: If @samp{E1},@dots{}, @samp{Ek} are expressions with compatible sort, then @samp{[ E1 | E2 @dots{} | Ek ]} is an expression of sort @samp{ARRAY [1 , k ] OF} that sort. Its components get value according to the values of @samp{E1},@dots{}, @samp{Ek}.
+
+@item Function call: If @samp{bla} is an operation with k arguments and return sort @samp{s}, @samp{E1},@dots{}, @samp{Ek} expressions compatible to the corresponding argument sorts of bla, then @samp{bla(E1,@dots{},Ek)} is an expression of sort @samp{s}. Its value is the value returned by executing the meaning of @samp{bla}, with argument values set to the values of @samp{E1},@dots{}, @samp{Ek}. If @samp{bla} returns 0 or more than 1 value, LoLA terminates with a run-time error.
+@end itemize
+
 @cartouche
+@b{Examples:}
+@example
+[ TRUE | TRUE | FALSE | FALSE ] <-> [ TRUE | FALSE | TRUE | FALSE ]
+@end example
+evaluates to
+@example
+[ TRUE | FALSE | FALSE | TRUE ]
+@end example
+and
+@example
+[ 1 | 2 ] * [ 2 | 3 ]
+@end example
+evaluates to
+@example
+[ 2 | 6 ]
+@end example
+@end cartouche
+
+
+@subsection Terms and Multiterms
+
+Terms represents combinations of defined operations, that is, mappings between domains which are specified as sorts. 
+
+A Term is a variable (which must be declared in the context of the term occurrence, or an operation symbol with a comma-separated list of (sub-)terms, enclosed in parenthesis. The number of subterms must fit to the number of specified arguments for the operation. 
+
+If a term is a variable, its sort that has been attached to the variable in its declaration. If a term is an operation, its sort is the specified return domain of the operation. Each subterm must have a sort that is compatible with the sort of the corresponding argument in the top-level operation. 
+
+Given a value for each variable that occurs in a term, a term can be evaluated to a multiset of values from the domain that is represented by its sort. If subterms evaluate to multisets, the top-level term is evaluated for each combination of values of the subterms and the results are summed up (using multiset addition). 
+
+Assume that @samp{all()} evaluates to the multiset @samp{[1,2,3]}, @samp{x} has value 2, @samp{even(1)} = @samp{even(3)} = @samp{FALSE}, and @samp{even(2)} = @samp{TRUE}. Let @samp{cross(x,y)} evaluate to a @samp{RECORD} with component a taking value @samp{x} and component @samp{b} taking value @samp{y}. @samp{even(all())} evaluates to @samp{[2 FALSE, TRUE ]}, @samp{cross( all(), all())} evaluates to @samp{[<1|1>,<1|2>,<1|3>,<2,1>,<2,2>,<2,3>,<3,1>,<3,2>,<3,3>]}, and @samp{even(x)} evaluates to @samp{[TRUE]}.
+
+A multiterm can be a term, a term followed by a @samp{:} and a number k, or two multiterms with enclosed @samp{+}. A multiterm evaluates to a multiset that corresponds to the evaluation of the denoted term, the multiset where each element occurs k time as often as in the specified term, or the multiset where the occurrence of each element corresponds to the sum of its occurrences in the two involved multiterms, resp. 
+
+@cartouche
+@b{Example:}
+@example
+even(twotimesthree()):3 + even(one()) + even(two()):5
+@end example
+
+evaluates to the multiset that assigns 7 to @samp{FALSE} and 5 to @samp{TRUE}, under the assumption that @samp{even(twotimesthree())} evaluates to @samp{TRUE} occurring twice, @samp{even(one())} evaluates to a single occurrence of @samp{FALSE}, and @samp{even(two())} evaluates to a single occurrence of @samp{TRUE}.
+@end cartouche
+
+
+@subsection Places
+@cindex @code{#CAPACITY @i{k}}
+@cindex @code{#CHECKCAPACITY @i{k}}
+@cindex @code{PLACE}
+@cindex @code{SAFE}
+
+In LoLA, every place is represented as a unique name. The name can be an identifier according to the general rules for building identifiers or a  number. The set of places is specified by the keyword @samp{PLACE}, followed by a list of sections. Each section starts with a capacity specification and is followed by a comma-separated list, finished by a @samp{;}. Each entra in the list consists of a place name, a @samp{:}, and a sort name. The sort name specifies the data domain for tokens on the mentioned place. The capacity statement may by empty or consist of the keyword @samp{SAFE}, optionally followed by a number. Using @samp{SAFE} without number is equivalent to the specification @samp{SAFE@tie{}1}. If the file @file{userconfig.H} contains the directive @samp{#CAPACITY@tie{}@i{k}}, an empty capacity specification is equivalent to the specification @samp{SAFE@tie{}@i{k}}. Otherwise, an empty specification represents an unbounded capacity (which is internally approximated by a capacity of @math{2^{32}}). A capacity statement specifies the maximum number of tokens of a particular value expected on the places which are speficied subsequently. LoLA uses the capacity statement only for a compact representation of markings. The firing rule is not effected by the capacity specification. Optionally, the validity of the capacity specifications can be checked during state space generation. For this purpose, the directive @samp{CHECKCAPACITY} must be active in the file @file{userconfig.H}. The specification of HL-net places may be arbitrarily mixed with the specification of place/transition net places. This option must, however, be used with care as LoLA translates every HL net place into a set of place/transition net places. Every resulting place has a name that consists of the name of the HL Net place, a @samp{.}, and a  text representation of a value. LoLA does not avoid resulting name clashes with specified place/transition net place names. 
+
+@cartouche
+@b{Example:}
+@example
 PLACE SAFE p1 : phil, 17 : phil, helloworld, p[]....8[[[ : bla; 
-p2 : bla , p3 : bla; SAFE 7 : p4 : bla , p5; 
+p2 : bla , p3 : bla; SAFE 7 : p4 : bla , p5;
+@end example
 
-specifies 8 high level places. Places p1, 17 contain tokens of sort (domain) phil, places helloworld and p5 are in fact low level places, i.e. they contain black tokens. The remaining places contain tokens of sort (domain) vla. Places p1, 17, hellworld, p[]....8[[[ are expected to never contain more than 1 token per value. Places p2, p3 have either unknown bound (without #CAPACITY in @file{userconfig.H}), or the bound specified in @file{userconfig.H}. Places p4 and p5 are expected to contain at most 7 tokens. 
+specifies 8 high level places. Places @samp{p1}, @samp{17} contain tokens of sort (domain) @samp{phil}, places @samp{helloworld} and @samp{p5} are in fact low level places, i.e. they contain black tokens. The remaining places contain tokens of sort (domain) @samp{bla}. Places @samp{p1}, @samp{17}, @samp{hellworld}, @samp{p[]....8[[[} are expected to never contain more than 1 token per value. Places @samp{p2}, @samp{p3} have either unknown bound (without @samp{#CAPACITY} in @file{userconfig.H}), or the bound specified in @file{userconfig.H}. Places @samp{p4} and @samp{p5} are expected to contain at most 7 tokens. 
 
-If sort bla is defined as bla = [ 1 , 3 ] ; then LoLA will internally consider places p2.1, p2.2, p2.3, p3.1 and so on.
+If sort @samp{bla} is defined as @samp{bla = [ 1 , 3 ] ;} then LoLA will internally consider places @samp{p2.1}, @samp{p2.2}, @samp{p2.3}, @samp{p3.1} and so on.
 @end cartouche
 
 
+@subsection Initial Marking
+@cindex @code{MARKING}
 
-@c --------------------------------------------------------------------------
-@section File Format for High-Level Nets: Initial Marking
+The initial marking of the net is specified in a separate section starting with the keyword @samp{MARKING} and finished by a @samp{;}. In between, there is a comma-separated list. Each list item consists either of a low level place name, a @samp{:}, and a number, or a high level place name, a @samp{:}, and a multiterm of the sort which is specified for the corresponding place. The number specifies the number of tokens initially being on the mentioned low level place. The multiterm represents the number of tokens of each value on a high level place. Places which are not mentioned get 0 tokens initially. For places mentioned more than once, the specified token counts are summed up.
 
-The initial marking of the net is specified in a separate section starting with the keyword "MARKING" and finished by a ";". In between, there is a comma-separated list. Each list item consists either of a   low level place name , a ":", and a   number , or a    high level place name , a ":", and a   multiterm of the sort which is specified for the corresponding place. The number specifies the number of tokens initially being on the mentioned low level place. The multiterm represents the number of tokens of each value on a high level place. Places which are not mentioned get 0 tokens initially. For places mentioned more than once, the specified token counts are summed up. 
-
-@b{Example:}
 @cartouche
-MARKING p1 : allprimes(), p2 : 3 , p1 : succ(allprimes()) , p1.7 : 3; assigns as many tokens to place p1 as the sum of results of evaluating allprimes() and succ(allprimes()), with 3 additional tokens on the instance p1.7, and 3 tokens to place p2. All other places have no tokens in the initial marking.
+@b{Example:}
+@example
+MARKING p1 : allprimes(), p2 : 3 , p1 : succ(allprimes()) , p1.7 : 3;
+@end example
+
+assigns as many tokens to place p1 as the sum of results of evaluating @samp{allprimes()} and @samp{succ(allprimes())}, with 3 additional tokens on the instance @samp{p1.7}, and 3 tokens to place @samp{p2}. All other places have no tokens in the initial marking.
 @end cartouche
 
 
+@subsection Transitions and Arcs
+@cindex @code{TRANSITION}
+@cindex @code{WEAK FAIR}
+@cindex @code{STRONG FAIR}
+@cindex @code{CONSUME}
+@cindex @code{PRODUCE}
+@cindex @code{GUARD}
 
-@c --------------------------------------------------------------------------
-@section File Format for High-Level Nets: Transitions and Arcs
+In LoLA, there is, for each transition, a distinguished section for defining that transition and all connecting arcs. The section starts with the keyword @samp{TRANSITION} followed by the name of the transition. This name may be built general rules for building identifiers or a number. 
 
-In LoLA, there is, for each transition, a distinguished section for defining that transition and all connecting arcs. The section starts with the keyword "TRANSITION" followed by the name of the transition. This name may be built general rules for building    identifiers or a    number. 
+Then, optionally, a fairness assumption @samp{WEAK FAIR} or @samp{STRONG FAIR} may be specified. The assumptions are effective only for the verification of a few properties. A transition is treated @dfn{weakly unfair} in an infinite transition sequence iff it is, from some point in the sequence, permanently enabled but never fired. It is treated @dfn{strongly unfair} iff it is infinitely often enabled but only finitely often fired. 
 
-Then, optionally, a fairness assumption "WEAK FAIR" or "STRONG FAIR" may be specified. The assumptions are effective only for the verification of a few properties. A transition is treated weakly unfair in an infinite transition sequence iff it is, from some point in the sequence, permanently enabled but never fired. It is treated strongly unfair iff it is infinitely often enabled but only finitely often fired. 
+The next part of a transition specification is a variable declaration in exactly the same shape as in the definition of operations. Each assignment of values to these variables defines a firing mode of the transition. The set of firing modes can, optionally, be further restricted through a guard. A guard is specified as a Boolean valued expression, subsequent to the keyword @samp{GUARD}. After that, the list of incoming arcs is specified. This part starts with the keyword @samp{CONSUME} and ends with a @samp{;} Between these symbols, there is a comma-separated list of arc specifications. Each arc specification consists either of a low level place name, a @samp{:}, and a number, or a high level place name, a @samp{:}, and a multiterm of the same sort as the mentioned place. It represents an arc from the mentioned place to the currently specified transition. The number represents the multiplicity of the arc. The multiterm may contain the variables which have been specified local to this transition. The multiterm represents an arc expression which maps a firing mode of the transition to a multiset of values to be consumed from the mentioned place. 
 
-The next part of a transition specification is a variable declaration in exactly the same shape as in the definition of    operations. Each assignment of values to these variables defines a firing mode of the transition. The set of firing modes can, optiionally, be further restricted through a guard. A guard is specified as a Boolean valued    expression , subsequent to the keyword "GUARD". After that, the list of incoming arcs is specified. This part starts with the keyword "CONSUME" and ends with a ";" Between these symbols, there is a comma-separated list of arc specifications. Each arc specification consists either of a    low level place name , a ":", and a   number , or a    high level place name , a ":", and a   multiterm of the same sort as the mentioned place. It represents an arc from the mentioned place to the currently spefified transition. The number represents the multiplicity of the arc. The multiterm may contain the variables which have been specified local to this transition. The multiterm represents an arc expression which maps a firing mode of the transition to a multiset of values to be consumed from the mentioned place. 
+Finally, the list of outgoing arcs is specified. This part starts with the keyword @samp{PRODUCE} and ends with a @samp{;} Between these symbols, there is a comma-separated list of arc specifications. Each arc specification consists either of a low level place name, a @samp{:}, and a number, or a  high level place name, a @samp{:}, and a multiterm of the same sort as the mentioned place. It represents an arc from the currently specified transition to the mentioned place. The number represents the multiplicity of the arc. The multiterm may contain the variables which have been specified local to this transition. The multiterm represents an arc expression which maps a firing mode of the transition to a multiset of values to be produced on the mentioned place. 
 
-Finally, the list of outgoing arcs is specified. This part starts with the keyword "PRODUCE" and ends with a ";" Between these symbols, there is a comma-separated list of arc specifications. Each arc specification consists either of a    low level place name , a ":", and a   number , or a    high level place name , a ":", and a   multiterm of the same sort as the mentioned place. It represents an arc from the currently spefified transition to the mentioned place. The number represents the multiplicity of the arc. The multiterm may contain the variables which have been specified local to this transition. The multiterm represents an arc expression which maps a firing mode of the transition to a multiset of values to be produced on the mentioned place. 
+@cartouche
+@b{Example:}
+@example
+TRANSITION t1 WEAK FAIR
+VAR x,y: bla; z : phil;
+GUARD x < y
+CONSUME p1 : allprimes():2 + succ(x):15, p2 : 4 , p3 : z;
+PRODUCE p1 : second(x) , p3 : y; 
+@end example
 
-Examples: TRANSITION t1 WEAK FAIR VAR x,y: bla; z : phil; GUARD x < y CONSUME p1 : allprimes():2 + succ(x):15, p2 : 4 , p3 : z; PRODUCE p1 : second(x) , p3 : y ; is a transition which is to be treated weakly fair for some properties. Fired in mode (x=2, y=3,z = hegel), it removes as many tokens from p1 as specified by allprimes():2 + succ(x), with succ(x) evaluated for x=2. It removes 4 tokens from low level place p2, and one token (of value hegel) from place p3. It produces the tokens as specified by the multiterm second(x), evaluated for x=2, on p1, and a single token of value 3 to place p3. 
+is a transition which is to be treated weakly fair for some properties. Fired in mode (x=2, y=3, z=hegel), it removes as many tokens from p1 as specified by allprimes():2 + succ(x), with succ(x) evaluated for x=2. It removes 4 tokens from low level place p2, and one token (of value hegel) from place p3. It produces the tokens as specified by the multiterm second(x), evaluated for x=2, on p1, and a single token of value 3 to place p3.
+@end cartouche
 
-Internally, each high level transition is replaced by an equivalent set of low level transitions, one for each firing mode that satisfies the guard. The name of a ow level transition consists of the name of the corresponding high-level transition, a ".", and a description of the firing mode which is enclosed in brackets "[" and "]". The firing mode is described as a "|"-deparated list where an entry consists of a variable name, a "=", and a textual representation of a value, according to the rules explained    elsewhere. 
+Internally, each high level transition is replaced by an equivalent set of low level transitions, one for each firing mode that satisfies the guard. The name of a ow level transition consists of the name of the corresponding high-level transition, a @samp{.}, and a description of the firing mode which is enclosed in brackets @samp{[} and @samp{]}. The firing mode is described as a @samp{|}-separated list where an entry consists of a variable name, a @samp{=}, and a textual representation of a value, according to the rules explained elsewhere. 
 
-Example: The low level transition of the firing mode used in the previous example could have the name t1.[y=3|x=2|z=hegel]. There are no fixed rules for the order in which the variables appear. 
+@cartouche
+@b{Example:}
+
+The low level transition of the firing mode used in the previous example could have the name @samp{t1.[y=3|x=2|z=hegel]}. There are no fixed rules for the order in which the variables appear. 
+@end cartouche
 
 It is typical for high level nets that many firing modes of a high-level transition correspond to dead low level transitions. This way, the internal representation of a high level net can easily cause a memory overflow. For such a case, we recommend to rule out as many as possible dead firing modes through the use of (otherwise unneeded) transition guards. For a variable assignment that violates the guard, we do not generate a low level transition. 
 
-A high level net description may contain high level transition definitions as well as    low level transition definitions. In such a case, the user is responsible for avoiding name clashes between specified low level transitions and generated low level instances of high-level transitions.
+A high level net description may contain high level transition definitions as well as low level transition definitions. In such a case, the user is responsible for avoiding name clashes between specified low level transitions and generated low level instances of high-level transitions.
 
 
 
@@ -540,16 +782,17 @@ Using LoLA, you can verify various properties, including properties of
 
 
 @subsection Checking Reversibility
+@cindex @code{#REVERSIBILITY}
 
-A net is @i{reversible} iff the initial marking is reachable from every reachable marking. 
+A net is @dfn{reversible} iff the initial marking is reachable from every reachable marking. 
 
 Edit file @file{userconfig.H} and select the option @samp{#REVERSIBILITY} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification. 
 
-@b{Example:}
 @cartouche
-@smallexample
+@b{Example:}
+@example
 lola ph.net
-@end smallexample
+@end example
 @end cartouche
 
 The following reduction techniques may be applied:
@@ -560,19 +803,20 @@ The following reduction techniques may be applied:
 
 
 @subsection Checking Deadlock freedom
+@cindex @code{#DEADLOCK}
 
-A @i{deadlock} is a marking (reachable from the initial marking) that does not enable any transition. 
+A @dfn{deadlock} is a marking (reachable from the initial marking) that does not enable any transition. 
 
 Edit file @file{userconfig.H} and select the option @samp{#DEADLOCK} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification. 
 
-@b{Example:}
 @cartouche
-@smallexample
+@b{Example:}
+@example
 lola ph.net
-@end smallexample
+@end example
 @end cartouche
 
-In case of a reachable deadlock, LoLA may produce a   witness path and a   witness state. 
+In case of a reachable deadlock, LoLA may produce a witness path and a witness state. 
 
 The following reduction techniques may be applied:
 @itemize
@@ -588,19 +832,20 @@ Both depth first search and breadth first search are available. Breadth first se
 
 
 @subsection Checking Existence of Home Markings
+@cindex @code{#HOME}
 
-A @i{home marking} is a marking that is reachable from every reachable marking. 
+A @dfn{home marking} is a marking that is reachable from every reachable marking. 
 
 Edit file @file{userconfig.H} and select the option @samp{#HOME} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification. 
 
-@b{Example:}
 @cartouche
-@smallexample
+@b{Example:}
+@example
 lola ph.net
-@end smallexample
+@end example
 @end cartouche
 
-In case of an existing, LoLA may produce a   witness state. A witness path is not directly available but may be generated through checking   reachability of the witness marking. 
+In case of an existing, LoLA may produce a witness state. A witness path is not directly available but may be generated through checking reachability of the witness marking. 
 
 The following reduction techniques may be applied:
 @itemize
@@ -610,16 +855,17 @@ The following reduction techniques may be applied:
 
 
 @subsection Checking Boundedness
+@cindex @code{#BOUNDEDNET}
 
-A net is @i{bounded} iff it has finitely many reachable markings. 
+A net is @dfn{bounded} iff it has finitely many reachable markings. 
 
 Edit file @file{userconfig.H} and select the option @samp{#BOUNDEDNET} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification. 
 
-@b{Example:}
 @cartouche
-@smallexample
+@b{Example:}
+@example
 lola ph.net
-@end smallexample
+@end example
 @end cartouche
 
 In case of an unbounded net, LoLA may produce a witness path which demonstrates the reachability of infinitely many different markings. 
@@ -637,34 +883,35 @@ Both depth first search and breadth first search are available. Breadth first se
 
 @subsection Checking Liveness
 
-A net is @i{live} iff every transition is. 
+A net is @dfn{live} iff every transition is. 
 
-This verification problem is not directly supported in LoLA. You can, however, easily transform the problem into checking liveness for each individual   transition. This way, you generate |T| state spaces instead of one. However, the individual state spaces tend to be significantly smaller than any known reduced state space for the liveness problem for nets.
+This verification problem is not directly supported in LoLA. You can, however, easily transform the problem into checking liveness for each individual transition. This way, you generate @math{|T|} state spaces instead of one. However, the individual state spaces tend to be significantly smaller than any known reduced state space for the liveness problem for nets.
 
 
 @subsection Checking Quasi-Liveness
 
-A net is @i{quasi-live} iff no transition is dead in the initial marking
+A net is @dfn{quasi-live} iff no transition is dead in the initial marking
 
-This verification problem is not directly supported in LoLA. You can, however, easily transform the problem into checking death for each individual   transition. This way, you generate |T| state spaces instead of one. However, the individual state spaces tend to be significantly smaller than any known reduced state space for the quasi-liveness problem for nets.
+This verification problem is not directly supported in LoLA. You can, however, easily transform the problem into checking death for each individual transition. This way, you generate @math{|T|} state spaces instead of one. However, the individual state spaces tend to be significantly smaller than any known reduced state space for the quasi-liveness problem for nets.
 
 
 @subsection Checking Nothing
+@cindex @code{#FULL}
 
 LoLA has the opportunity of generating a state space without checking any property. This feature is useful for evaluating reduction techniques, or for obtaining (and post-processing) the full state space. 
 
 Edit file @file{userconfig.H} and select the option @samp{#FULL} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification. 
 
-@b{Example:}
 @cartouche
-@smallexample
+@b{Example:}
+@example
 lola ph.net
-@end smallexample
+@end example
 @end cartouche
 
 The following reduction techniques may be applied:
 @itemize
-@item Stubborn sets (in dedalock preserving version)
+@item Stubborn sets (in deadlock preserving version)
 @item Symmetries 
 @item The sweep-line method 
 @item Cycle coverage 
@@ -672,17 +919,20 @@ The following reduction techniques may be applied:
 @end itemize
 
 Both depth first search and breadth first search are available. Breadth first search is only recommended if you are interested in a shortest witness path to a deadlock. Choose the search strategy by selecting (commenting or uncommenting) the appropriate lines in the file @file{userconfig.H}.
-Not Checking
+
+
+@subsection Not Checking
+@cindex @code{#NONE}
 
 LoLA has the opportunity of being run without generating any state space. This feature is useful for getting access to generated pre-processing information such as the unfolded version of a high-level net, the automorphisms generated for the symmetry method, or the progress measure generated for the sweep-line method. 
 
 Edit file @file{userconfig.H} and select the option @samp{#NONE} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification. 
 
-@b{Example:}
 @cartouche
-@smallexample
+@b{Example:}
+@example
 lola ph.net
-@end smallexample
+@end example
 @end cartouche
 
 The following reduction techniques may be applied: 
@@ -698,23 +948,42 @@ The following reduction techniques may be applied:
 
 
 @subsection Specification
+@cindex @code{ANALYSE MARKING}
+@cindex @code{.task} files
 
-The marking to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option "-a". If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with ".task". If option "-A" is used instead of "-a", the specification is read from the standard input stream. 
+The marking to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option @option{-a}. If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with @file{.task}. If option @option{-A} is used instead of @option{-a}, the specification is read from the standard input stream. 
 
-The specification starts with "ANALYSE MARKING" followed by a description in the same syntax as for the initial marking (  low level version or   high level version ) of the net. There is, however, no final ";". Instead of a specification in a separate file, the specification can be immedietaly appended to the specification of the net. This approach is recommended if LoLA is integrated into another tool and communicates via standard input/output streams.
+The specification starts with @samp{ANALYSE MARKING} followed by a description in the same syntax as for the initial marking (  low level version or high level version ) of the net. There is, however, no final @samp{;}. Instead of a specification in a separate file, the specification can be immediately appended to the specification of the net. This approach is recommended if LoLA is integrated into another tool and communicates via standard input/output streams.
 
-Example for a low level specification: ANALYSE MARKING p1: 3 , p2 : 1 ; hello : 24
+@cartouche
+@b{Example for a low level specification:}
+@example
+ANALYSE MARKING p1: 3 , p2 : 1 ; hello : 24
+@end example
+@end cartouche
 
-Example for a high level specification: ANALYSE MARKING p1 : all(), bla: L(all())
+@cartouche
+@b{Example for a high level specification:}
+@example
+ANALYSE MARKING p1 : all(), bla: L(all())
+@end example
+@end cartouche
+
 
 
 @subsection Checking Reachability
+@cindex @code{#REACHABILITY}
 
-A marking is @i{reachable} iff there is a transition sequence that transforms the initial marking into the analysed one. 
+A marking is @dfn{reachable} iff there is a transition sequence that transforms the initial marking into the analysed one. 
 
-Edit file @file{userconfig.H} and select the option "#REACHABILITY" (by uncommenting the appropriate line and commenting all other lines in the properties section). Call "make" for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{#REACHABILITY} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
 
-Example "lola ph.net -a ph.state "
+@cartouche
+@b{Example:}
+@example
+lola ph.net -a ph.state
+@end example
+@end cartouche
 
 In case of a reachable marking, LoLA may produce a witness path.
 
@@ -733,18 +1002,49 @@ Both depth first search and breadth first search are available. Breadth first se
 
 @subsection Checking Coverability
 
-A marking is @i{coverable} iff a marking is reachable which is pointwise greater or equal than the analysed one. This verification problem is not directly supported in LoLA. You can, however, easily transform the problem into a reachability problem for a state predicate.
+A marking is @dfn{coverable} iff a marking is reachable which is pointwise greater or equal than the analysed one. This verification problem is not directly supported in LoLA. You can, however, easily transform the problem into a reachability problem for a state predicate.
 
-Example: Coverability of marking p1:1, p2:17, p3 : 5 corresponds to reachability of the predicate p1 >= 1 AND p2 >= 17 AND p3 >= 5.
+@cartouche
+@b{Example:}
+
+Coverability of marking
+
+@example
+p1:1, p2:17, p3 : 5
+@end example
+
+corresponds to reachability of the predicate
+
+@example
+p1 >= 1 AND p2 >= 17 AND p3 >= 5
+@end example
+@end cartouche
+
 
 
 @subsection Checking Home Status
 
-A marking is a @i{home marking} iff it is reachable from every reachable marking. 
+A marking is a @dfn{home marking} iff it is reachable from every reachable marking. 
 
 This verification problem is not directly supported in LoLA. You can, however, easily transform the problem into a liveness problem for a state predicate.
 
-Example: Marking p1:1, p2:17, p3 : 5 is a home marking iff the predicate p1 = 1 AND p2 = 17 AND p3 = 5 AND p4 = 0 AND ... is live. 
+@cartouche
+@b{Example:}
+
+Marking
+
+@example
+p1:1, p2:17, p3 : 5
+@end example
+
+is a home marking iff the predicate
+
+@example
+p1 = 1 AND p2 = 17 AND p3 = 5 AND p4 = 0 AND @dots{}
+@end example
+
+is live.
+@end cartouche
 
 
 
@@ -753,23 +1053,44 @@ Example: Marking p1:1, p2:17, p3 : 5 is a home marking iff the predicate p1 = 1 
 
 
 @subsection Specification
+@cindex @code{ANALYSE PLACE}
+@cindex @code{.task} files
+@cindex @code{-a} option
+@cindex @code{-A} option
+@cindex @code{-n} option
 
-The place to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option "-a". If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with ".task". If option "-A" is used instead of "-a", the specification is read from the standard input stream. 
+The place to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option @option{-a}. If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with @file{.task}. If option @option{-A} is used instead of @option{-a}, the specification is read from the standard input stream. 
 
-The specification starts with "ANALYSE PLACE" followed by the name of the place. In the case of a high-level net, a place instance name as generated by LoLA must be used. For finding out the generated names, call LoLA with option -n (generates the low level version of the net). Instead of a specification in a separate file, the specification can be immedietaly appended to the specification of the net. This approach is recommended if LoLA is integrated into another tool and communicates via standard input/output streams.
+The specification starts with @samp{ANALYSE PLACE} followed by the name of the place. In the case of a high-level net, a place instance name as generated by LoLA must be used. For finding out the generated names, call LoLA with option @option{-n} (generates the low level version of the net). Instead of a specification in a separate file, the specification can be immediately appended to the specification of the net. This approach is recommended if LoLA is integrated into another tool and communicates via standard input/output streams.
 
-Example for a low level specification: ANALYSE PLACE p1
+@cartouche
+@b{Example for a low level specification:}
+@example
+ANALYSE PLACE p1
+@end example
+@end cartouche
 
-Example for a high level specification: ANALYSE PLACE hl.1
+@cartouche
+@b{Example for a high level specification:}
+@example
+ANALYSE PLACE hl.1
+@end example
+@end cartouche
 
 
-@subsection Checking boundedness
+@subsection Checking Boundedness
+@cindex @code{#BOUNDEDPLACE}
 
-A place is @i{bounded} iff there is a fixed natural number that is greater than the number of tokens on that place, for every reachable marking. 
+A place is @dfn{bounded} iff there is a fixed natural number that is greater than the number of tokens on that place, for every reachable marking. 
 
-Edit file @file{userconfig.H} and select the option "#BOUNDEDPLACE" (by uncommenting the appropriate line and commenting all other lines in the properties section). Call "make" for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{#BOUNDEDPLACE} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
 
-Example "lola ph.net -a ph.place "
+@cartouche
+@b{Example:}
+@example
+lola ph.net -a ph.place
+@end example
+@end cartouche
 
 In case of an unbounded place, LoLA may produce a generalized witness path.
 
@@ -786,16 +1107,24 @@ Both depth first search and breadth first search are available. Breadth first se
 
 @subsection Checking Death
 
-A place is @i{dead} iff it is unmarked in any reachable marking. This verification problem is not directly supported in LoLA. You can, however, easily transform the problem into a reachability problem for a state predicate.
+A place is @dfn{dead} iff it is unmarked in any reachable marking. This verification problem is not directly supported in LoLA. You can, however, easily transform the problem into a reachability problem for a state predicate.
 
-Example: p1 is dead iff the predicate p1 > 0 is not reachable. 
+@cartouche
+@b{Example:}
+
+Place @samp{p1} is dead iff the predicate @samp{p1 > 0} is not reachable. 
+@end cartouche
 
 
 @subsection Checking Liveness
 
-A place is @i{live} iff, from every reachable marking, a marking can be reached that marks that place. This verification problem is not directly supported in LoLA. You can, however, easily transform the problem into a liveness problem for a state predicate.
+A place is @dfn{live} iff, from every reachable marking, a marking can be reached that marks that place. This verification problem is not directly supported in LoLA. You can, however, easily transform the problem into a liveness problem for a state predicate.
 
-Example: p1 is live iff the predicate p1 > 0 is live. 
+@cartouche
+@b{Example:}
+
+Place @samp{p1} is live iff the predicate @samp{p1 > 0} is live.
+@end cartouche
 
 
 
@@ -804,43 +1133,78 @@ Example: p1 is live iff the predicate p1 > 0 is live.
 
 
 @subsection Specification
+@cindex @code{ANALYSE TRANSITION}
+@cindex @code{.task} files
+@cindex @code{-a} option
+@cindex @code{-A} option
 
-The transition to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option "-a". If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with ".task". If option "-A" is used instead of "-a", the specification is read from the standard input stream. 
+The transition to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option @option{-a}. If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with @file{.task}. If option @option{-A} is used instead of @option{-a}, the specification is read from the standard input stream. 
 
-The specification starts with "ANALYSE TRANSITION" followed by the name of the transition. In the case of a high-level net, a transition instance name as generated by LoLA must be used. For finding out the generated names, call LoLA with option -n (generates the low level version of the net). Instead of a specification in a separate file, the specification can be immediately appended to the specification of the net. This approach is recommended if LoLA is integrated into another tool and communicates via standard input/output streams.
+The specification starts with @samp{ANALYSE TRANSITION} followed by the name of the transition. In the case of a high-level net, a transition instance name as generated by LoLA must be used. For finding out the generated names, call LoLA with option @option{-n} (generates the low level version of the net). Instead of a specification in a separate file, the specification can be immediately appended to the specification of the net. This approach is recommended if LoLA is integrated into another tool and communicates via standard input/output streams.
 
-Example for a low level specification: ANALYSE TRANSITION t1
+@cartouche
+@b{Example for a low level specification:}
+@example
+ANALYSE TRANSITION t1
+@end example
+@end cartouche
 
-Example for a high level specification: ANALYSE TRANSITION tr.[y=3]
+@cartouche
+@b{Example for a high level specification:}
+@example
+ANALYSE TRANSITION tr.[y=3]
+@end example
+@end cartouche
 
 
-@subsection Checking death
+@subsection Checking Death
+@cindex @code{#DEADTRANSITION}
 
-A transition is dead iff it is disabled in every marking reachable from the initial marking. 
+A transition is @dfn{dead} iff it is disabled in every marking reachable from the initial marking. 
 
-Edit file @file{userconfig.H} and select the option "#DEADTRANSITION" (by uncommenting the appropriate line and commenting all other lines in the properties section). Call "make" for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{#DEADTRANSITION} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
 
-Example "lola ph.net -a ph.transition "
+@cartouche
+@b{Example:}
+@example
+lola ph.net -a ph.transition
+@end example
+@end cartouche
 
-In case of an non-dead transition, LoLA may produce a   witness path and a   witness state . 
 
-The following reduction techniques may be applied: 
-  Coverability graph 
-  Stubborn sets (always recommended) 
-  Symmetries 
-  The sweep-line method 
-  Cycle Coverage 
-  Attracted execution 
-  Invariant based state compression (always recommended)
+In case of an non-dead transition, LoLA may produce a witness path and a witness state.
+
+The following reduction techniques may be applied:
+@itemize
+@item Coverability graph 
+@item Stubborn sets (always recommended) 
+@item Symmetries 
+@item The sweep-line method 
+@item Cycle Coverage 
+@item Attracted execution 
+@item Invariant based state compression (always recommended)
+@end itemize
 
 Both depth first search and breadth first search are available. Breadth first search is only recommended if you are interested in a shortest generalized witness path. Choose the search strategy by selecting (commenting or uncommenting) the appropriate lines in the file @file{userconfig.H}. 
 
 
 @subsection Checking Liveness
 
-A transition is live iff, from every reachable marking, a marking is reachable that enables that transition . This verification problem is not directly supported in LoLA. You can, however, easily transform the problem into a liveness problem for a   state predicate . 
+A transition is @dfn{live} iff, from every reachable marking, a marking is reachable that enables that transition. This verification problem is not directly supported in LoLA. You can, however, easily transform the problem into a liveness problem for a state predicate.
 
-Example: t1 with pre-places specified through CONSUME p1 : 2, p2 : 5; is live iff the predicate p1 >= 2 AND p2 >= 5 is live.
+@cartouche
+@b{Example:}
+
+t1 with pre-places specified through
+@example
+CONSUME p1 : 2, p2 : 5;
+@end example
+is live iff the predicate
+@example
+p1 >= 2 AND p2 >= 5
+@end example
+is live.
+@end cartouche
 
 
 
@@ -849,90 +1213,147 @@ Example: t1 with pre-places specified through CONSUME p1 : 2, p2 : 5; is live if
 
 
 @subsection Specification
+@cindex @code{FORMULA}, state predicate specification
+@cindex @code{.task} files
+@cindex @code{ALWAYS}
+@cindex @code{EVENTUALLY}
+@cindex @code{NEXTSTEP}
+@cindex @code{UNTIL}
+@cindex @code{EXPATH}
+@cindex @code{ALLPATH}
 
-The predicate to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option "-a". If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with ".task". If option "-A" is used instead of "-a", the specification is read from the standard input stream. 
+The predicate to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option @option{-a}. If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with @file{.task}. If option @option{-A} is used instead of @option{-a}, the specification is read from the standard input stream. 
 
-The specification starts with "FORMULA" followed by the description of the predicate. The syntax for a state predicate is the same as for a   CTL-formula . As the only difference, temporal operators (NEXTSTEP, ALWAYS, EVENTUALLY, UNTIL) and path quantifiers (EXPATH, ALLPATH) cannot be used in a state predicate.
+The specification starts with @samp{FORMULA} followed by the description of the predicate. The syntax for a state predicate is the same as for a CTL-formula. As the only difference, temporal operators (@samp{NEXTSTEP}, @samp{ALWAYS}, @samp{EVENTUALLY}, @samp{UNTIL}) and path quantifiers (@samp{EXPATH}, @samp{ALLPATH}) cannot be used in a state predicate.
 
-Instead of a specification in a separate file, the specification can be immedietaly appended to the specification of the net. This approach is recommended if LoLA is integrated into another tool and communicates via standard input/output streams.
+Instead of a specification in a separate file, the specification can be immediately appended to the specification of the net. This approach is recommended if LoLA is integrated into another tool and communicates via standard input/output streams.
 
-Example for a low level specification: FORMULA (p1 > 2 AND p3 = 4) OR p6 < 5
+@cartouche
+@b{Example for a low level specification:}
+@example
+FORMULA (p1 > 2 AND p3 = 4) OR p6 < 5
+@end example
+@end cartouche
 
-Example for a high level specification: FORMULA ALL x : phil : [ x = 3 ] OR hasright . ( x ) > 0
+@cartouche
+@b{Example for a high level specification:}
+@example
+FORMULA ALL x : phil : [ x = 3 ] OR hasright . ( x ) > 0
+@end example
+@end cartouche
 
 
 @subsection Checking Reachability
+@cindex @code{#STATEPREDICATE}
 
 A state predicate is reachable if there is a marking reachable from the initial marking where the given predicate is satisfied. 
 
-Edit file @file{userconfig.H} and select the option "#STATEPREDICATE" (by uncommenting the appropriate line and commenting all other lines in the properties section). Call "make" for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{#STATEPREDICATE} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
 
-Example "lola ph.net -a ph.statepredicate "
+@cartouche
+@b{Example:}
+@example
+lola ph.net -a ph.statepredicate
+@end example
+@end cartouche
 
-In case of a reachable state predicate, LoLA may produce a   witness path and a   witness state . 
+In case of a reachable state predicate, LoLA may produce a witness path and a witness state.
 
-The following reduction techniques may be applied: 
-  Stubborn sets (always recommended) 
-  The sweep-line method 
-  Cycle Coverage 
-  Attracted execution 
-  Invariant based state compression (always recommended)
+The following reduction techniques may be applied:
+@itemize
+@item Stubborn sets (always recommended) 
+@item The sweep-line method 
+@item Cycle Coverage 
+@item Attracted execution 
+@item Invariant based state compression (always recommended)
+@end itemize
 
 Both depth first search and breadth first search are available. Breadth first search is only recommended if you are interested in a shortest witness path. Choose the search strategy by selecting (commenting or uncommenting) the appropriate lines in the file @file{userconfig.H}. 
 
 
 @subsection Checking Liveness
+@cindex @code{#LIVEPRPOP}
 
-A state predicate is reachable live iff, from every reachable marking, there is a marking reachable where the given predicate is satisfied. The property corresponds to the CTL specification AG EF phi. 
+A state predicate is reachable live iff, from every reachable marking, there is a marking reachable where the given predicate is satisfied. The property corresponds to the CTL specification @b{AG}@tie{}@b{EF}@tie{}@math{\phi}. 
 
-Edit file @file{userconfig.H} and select the option "#LIVEPRPOP" (by uncommenting the appropriate line and commenting all other lines in the properties section). Call "make" for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{#LIVEPRPOP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
 
-Example "lola ph.net -a ph.statepredicate "
+@cartouche
+@b{Example:}
+@example
+lola ph.net -a ph.statepredicate
+@end example
+@end cartouche
 
-In case of a non-live state predicate, LoLA may produce a   witness state , i.e. a marking from which no marking is reachable that satisfies the predicate. 
+In case of a non-live state predicate, LoLA may produce a witness state, i.e. a marking from which no marking is reachable that satisfies the predicate. 
 
-The following reduction techniques may be applied: 
-  Stubborn sets (always recommended) 
-  Invariant based state compression (always recommended)
+The following reduction techniques may be applied:
+@itemize
+@item Stubborn sets (always recommended) 
+@item Invariant based state compression (always recommended)
+@end itemize
 
 
 @subsection Checking Fairness
+@cindex @code{#FAIRPRPOP}
 
-A state predicate is fair iff it occurs infinitely often on every path that starts with the initial marking and treats all transitions fair w.r.t. their specified fairness assumption. The property corresponds to the LTL specification GF phi. 
+A state predicate is fair iff it occurs infinitely often on every path that starts with the initial marking and treats all transitions fair w.r.t. their specified fairness assumption. The property corresponds to the LTL specification @b{GF}@tie{}@math{\phi}. 
 
-Edit file @file{userconfig.H} and select the option "#FAIRPRPOP" (by uncommenting the appropriate line and commenting all other lines in the properties section). Call "make" for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{#FAIRPRPOP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
 
-Example "lola ph.net -a ph.statepredicate "
+@cartouche
+@b{Example:}
+@example
+lola ph.net -a ph.statepredicate
+@end example
+@end cartouche
 
-The following reduction techniques may be applied: 
-  Stubborn sets (always recommended) 
-  Invariant based state compression (always recommended)
+The following reduction techniques may be applied:
+@itemize
+@item Stubborn sets (always recommended) 
+@item Invariant based state compression (always recommended)
+@end itemize
 
 
 @subsection Checking Stabilization
+@cindex @code{#STABLEPRPOP}
 
-A state predicate stabilizes iff, on every path that starts with the initial marking and treats all transitions fair w.r.t. their specified fairness assumption, the predicate is satisfied for all but finitely many states. The property corresponds to the LTL specification FG phi. 
+A state predicate stabilizes iff, on every path that starts with the initial marking and treats all transitions fair w.r.t. their specified fairness assumption, the predicate is satisfied for all but finitely many states. The property corresponds to the LTL specification @b{FG}@tie{}@math{\phi}. 
 
-Edit file @file{userconfig.H} and select the option "#STABLEPRPOP" (by uncommenting the appropriate line and commenting all other lines in the properties section). Call "make" for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{#STABLEPRPOP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
 
-Example "lola ph.net -a ph.statepredicate "
+@cartouche
+@b{Example:}
+@example
+lola ph.net -a ph.statepredicate
+@end example
+@end cartouche
 
-The following reduction techniques may be applied: 
-  Stubborn sets (always recommended) 
-  Invariant based state compression (always recommended)
-
+The following reduction techniques may be applied:
+@itemize 
+@item Stubborn sets (always recommended)
+@item Invariant based state compression (always recommended)
+@end itemize
 
 @subsection Checking Eventual Occurrence
+@cindex @code{#EVENTUALLYPRPOP}
 
-A state predicate stabilizes iff, on every path that starts with the initial marking and treats all transitions fair w.r.t. their specified fairness assumption, the predicate is satisfied for all but finitely many states. The property corresponds to the LTL specification F phi. 
+A state predicate stabilizes iff, on every path that starts with the initial marking and treats all transitions fair w.r.t. their specified fairness assumption, the predicate is satisfied for all but finitely many states. The property corresponds to the LTL specification @b{F}@tie{}@math{\phi}. 
 
-Edit file @file{userconfig.H} and select the option "#EVENTUALLYPRPOP" (by uncommenting the appropriate line and commenting all other lines in the properties section). Call "make" for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{#EVENTUALLYPRPOP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
 
-Example "lola ph.net -a ph.statepredicate "
+@cartouche
+@b{Example:}
+@example
+lola ph.net -a ph.statepredicate
+@end example
+@end cartouche
 
-The following reduction techniques may be applied: 
-  Stubborn sets (always recommended) 
-  Invariant based state compression (always recommended)
+The following reduction techniques may be applied:
+@itemize
+@item Stubborn sets (always recommended) 
+@item Invariant based state compression (always recommended)
+@end itemize
 
 
 
@@ -941,38 +1362,108 @@ The following reduction techniques may be applied:
 
 
 @subsection Specification
+@cindex @code{FORMULA}, CTL specification
+@cindex @code{.task} files
+@cindex @code{-a} option
+@cindex @code{-A} option
+@cindex @code{AND}
+@cindex @code{OR}
+@cindex @code{NOT}
+@cindex @code{ALWAYS}
+@cindex @code{EVENTUALLY}
+@cindex @code{NEXTSTEP}
+@cindex @code{UNTIL}
+@cindex @code{EXPATH}
+@cindex @code{ALLPATH}
+@cindex @code{ALL}
+@cindex @code{EXISTS}
 
-The formula to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option "-a". If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with ".task". If option "-A" is used instead of "-a", the specification is read from the standard input stream. Instead of a specification in a separate file, the specification can be immedietaly appended to the specification of the net. This approach is recommended if LoLA is integrated into another tool and communicates via standard input/output streams.
 
-The specification starts with "FORMULA" followed by the description of the predicate. For place-transition nets, a formula can be recursively constructed as follows:
+The formula to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option @option{-a}. If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with @file{.task}. If option @option{-A} is used instead of @option{-a}, the specification is read from the standard input stream. Instead of a specification in a separate file, the specification can be immediately appended to the specification of the net. This approach is recommended if LoLA is integrated into another tool and communicates via standard input/output streams.
+
+The specification starts with @samp{FORMULA} followed by the description of the predicate. For place-transition nets, a formula can be recursively constructed as follows:
+
 @itemize
-@item Every comparison is a CTL formula. A comparison consists of a place name, one of the operators < > <= >= = <> #, and a natural number. A marking satisfies a comparison if the number of tokens on the specified places is in the specified relation to the given number. Thereby, # and <> both represent inequality while all other operators have the obvious meaning. Example: p17 >= 28
-@item Boolean combinations of CTL formulas are CTL formulas. The Boolean operators AND, OR, and NOT can be used. Formulas may be enclosed in parenthesis for controlling precedence. Example: p1 > 3 AND NOT (p15 = 1 OR p17 <= 0) AND p3 # 2
-@item A CTL formula preceded by any of the following pairs of keywords is a CTL formula: ALLPATH ALWAYS, EXPATH ALWAYS; ALLPATH EVENTUALLY, EXPATH EVENTUALLY, ALLPATH NEXTSTEP, EXPATH NEXTSTEP.Thereby, ALLPATH represents the universal path quantifier (A) and requires validity of the subsequent formula on all paths, EXPATH represents the existential path quantifier (E) and requires validity of the subsequent formula on at least one path. ALWAYS represents the temporal operator "G" and requires valididy of the subsequent formula on all states on a path, EVENTUALLY represents the temporal operator "F" and requires validity of the subsequent formula on at least one state on a path, NEXTSTEP represents the tempral operator "X" and requires validity of the subsequent formula on the second state of a path. Example: ALLPATH ALWAYS EXPATH EVENTUALLY (p1 = 3 OR EXPATH NEXTSTEP p2 > 5)
-@item If phi and psi are CTL formulas, so are EXPATH [ phi UNTIL psi ] and ALLPATH [ phi UNTIL psi ]. UNTIL represents the temporal operator "U" and requires thatapsi is valid on some state on a path such that phi is valid on all preceding states. Example: EXPATH [ p1 = 3 UNTIL ALLPATH [p2 = 4 UNTIL ALLPATH EVENTUALLY p7 > 15]]
+@item Every comparison is a CTL formula. A comparison consists of a place name, one of the operators @samp{<}, @samp{>}, @samp{<=}, @samp{>=}, @samp{=}, @samp{<>}, @samp{#}, and a natural number. A marking satisfies a comparison if the number of tokens on the specified places is in the specified relation to the given number. Thereby, @samp{#} and @samp{<>} both represent inequality while all other operators have the obvious meaning.
+
+@cartouche
+@b{Example:}
+@example
+p17 >= 28
+@end example
+@end cartouche
+
+@item Boolean combinations of CTL formulas are CTL formulas. The Boolean operators @samp{AND}, @samp{OR}, and @samp{NOT} can be used. Formulas may be enclosed in parenthesis for controlling precedence.
+
+@cartouche
+@b{Example:}
+@example
+p1 > 3 AND NOT (p15 = 1 OR p17 <= 0) AND p3 # 2
+@end example
+@end cartouche
+
+@item A CTL formula preceded by any of the following pairs of keywords is a CTL formula: @samp{ALLPATH ALWAYS}, @samp{EXPATH ALWAYS}; @samp{ALLPATH EVENTUALLY}, @samp{EXPATH EVENTUALLY}, @samp{ALLPATH NEXTSTEP}, @samp{EXPATH NEXTSTEP}. Thereby, @samp{ALLPATH} represents the universal path quantifier @b{A} and requires validity of the subsequent formula on all paths, @samp{EXPATH} represents the existential path quantifier @b{E} and requires validity of the subsequent formula on at least one path. 
+
+@samp{ALWAYS} represents the temporal operator @b{G} and requires validity of the subsequent formula on all states on a path, @samp{EVENTUALLY} represents the temporal operator @b{F} and requires validity of the subsequent formula on at least one state on a path, @samp{NEXTSTEP} represents the temporal operator @b{X} and requires validity of the subsequent formula on the second state of a path. 
+
+@cartouche
+@b{Example:}
+@example
+ALLPATH ALWAYS EXPATH EVENTUALLY (p1 = 3 OR EXPATH NEXTSTEP p2 > 5)
+@end example
+@end cartouche
+
+@item If @i{phi} and @i{psi} are CTL formulas, so are @samp{EXPATH [ @i{phi} UNTIL @i{psi} ]} and @samp{ALLPATH [ @i{phi} UNTIL @i{psi} ]}. @samp{UNTIL} represents the temporal operator @b{U} and requires that @i{psi} is valid on some state on a path such that @i{phi} is valid on all preceding states.
+
+@cartouche
+@b{Example:}
+@example
+EXPATH [ p1 = 3 UNTIL ALLPATH [p2 = 4 UNTIL ALLPATH EVENTUALLY p7 > 15]]
+@end example
+@end cartouche
 @end itemize
 
 For high-level nets, there are the following additional features:
 
 @itemize
-@item A formula may be preceded by a variable quantification. A variable quantification starts with one of the keywords ALL or EXISTS, followed by an identifier, a ":", the name of a sort which is defined in the net description, and a ":". The subsequent formula comprises the scope of the quantification.
-@item A high level place name can be extended with a symbolic instance expression. The expression nust be enclosed in parenthesis and is appended to the place name with a ".". The expression must have a sort that is compatible to the sort of the involved place. It may use all constants and operations which are permitted in   specifications of operations in the net description. An expression may contain those variables that have been introduced through those quantifications which have the spefified expression in their scope.
-@item Every boolean expression (according to the syntax for   operations in the net description, enclosed in brackets, is a CTL formula.
-@item Example: EXPATH EVENTUALLY ALL x : phil : ( [x = 3 ] OR [ hasleft . ( x ) > 0 )] ) specifies that there is a reachable marking where all instances of high level place hasleft, except hasleft.3, have at least one token.
+@item A formula may be preceded by a variable quantification. A variable quantification starts with one of the keywords @samp{ALL} or @samp{EXISTS}, followed by an identifier, a @samp{:}, the name of a sort which is defined in the net description, and a @samp{:}. The subsequent formula comprises the scope of the quantification.
+
+@item A high level place name can be extended with a symbolic instance expression. The expression must be enclosed in parenthesis and is appended to the place name with a @samp{.}. The expression must have a sort that is compatible to the sort of the involved place. It may use all constants and operations which are permitted in specifications of operations in the net description. An expression may contain those variables that have been introduced through those quantifications which have the specified expression in their scope.
+
+@item Every boolean expression (according to the syntax for operations in the net description, enclosed in brackets, is a CTL formula.
+
+@cartouche
+@b{Example:}
+@example
+EXPATH EVENTUALLY ALL x : phil : ( [x = 3 ] OR [ hasleft . ( x ) > 0 )] )
+@end example
+specifies that there is a reachable marking where all instances of high level place @samp{hasleft}, except @samp{hasleft.3}, have at least one token.
+@end cartouche
+
 @end itemize
 
 
+
+
 @subsection Model Checking
+@cindex @code{#MODELCHECKING}
 
-A CTL formula is valid iff it is satisfied by the initial marking of the net. 
+A CTL formula is @dfn{valid} iff it is satisfied by the initial marking of the net. 
 
-Edit file @file{userconfig.H} and select the option "#MODELCHECKING" (by uncommenting the appropriate line and commenting all other lines in the properties section). Call "make" for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{#MODELCHECKING} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
 
-Example "lola ph.net -a ph.ctlformula "
+@cartouche
+@b{Example:}
+@example
+lola ph.net -a ph.ctlformula
+@end example
+@end cartouche
 
-In case of a satisfied existentially uqantified formula, or a violated universally quantified formula, LoLA may produce a   witness path . The path does only concern the top level temporal operator, i.e., subformulas are treated as if they were atomic. The following reduction techniques may be applied: 
-   Stubborn sets (always recommended) 
-   Invariant based state compression (always recommended)
+In case of a satisfied existentially unquantified formula, or a violated universally quantified formula, LoLA may produce a witness path. The path does only concern the top level temporal operator, i.e., subformulas are treated as if they were atomic. The following reduction techniques may be applied:
+@itemize
+@item Stubborn sets (always recommended) 
+@item Invariant based state compression (always recommended)
+@end itemize
 
 
 
@@ -999,26 +1490,29 @@ Most techniques may be applied in combination. LoLA shall always use a version o
 
 
 @c --------------------------------------------------------------------------
-@section Reduction Technique Symmetries
+@section Symmetries
 
 
-@subsection Applicability
+@subheading Applicability
 
 The symmetry method is available to all properties which concern single places, transitions, or markings. It is further applicable to the global verification problems of boundedness, reversibility, deadlock freedom. Symmetry reduction typically causes significant overhead in run-time and memory. It is recommended if the system under investigation exhibits a high degree of regularity such as a lot of identical components which interact in some systematically structured network. The reduction is typically linear in the number of graph automorphisms which in turn may be exponential in the size of the net. 
 
-Unlike many other tools, LoLA can determine symmetry in the system completely on its own. It neither needs an external specification of symmetries, nor the use of dedicated data types ("scalar sets"). Instead, it explores all graph automorphisms of the investigated Petri net which yields at least as strong reduction as alternative approaches. 
+Unlike many other tools, LoLA can determine symmetry in the system completely on its own. It neither needs an external specification of symmetries, nor the use of dedicated data types (``scalar sets''). Instead, it explores all graph automorphisms of the investigated Petri net which yields at least as strong reduction as alternative approaches. 
 
 
-@subsection Invocation
+@subheading Invocation
+@cindex @code{#SYMMETRY}
+@cindex @code{#SYMMINTEGRATION}, part of @code{#SYMMETRY}
+@cindex @code{#MAXATTEMPT}, part of @code{#SYMMETRY}
 
-The symmetry method is invoked by uncommenting the line #SYMMETRY in the file @file{userconfig.H}, prior to the generation of an executable file. The value #SYMMINTEGRATION selects a particular strategy of generating a symmetrically reduced state space. SYMMINTEGRATION can be given any value between 1 and 5. The values have the following meaning:
+The symmetry method is invoked by uncommenting the line @samp{#SYMMETRY} in the file @file{userconfig.H}, prior to the generation of an executable file. The value @samp{#SYMMINTEGRATION} selects a particular strategy of generating a symmetrically reduced state space. @samp{SYMMINTEGRATION} can be given any value between 1 and 5. The values have the following meaning:
 
 @table @asis
 @itemx 1
 Compute a generating set of the automorphisms in advance. Then, for each marking, iterate the set of all symmetries (with some reasonable shortcuts) and check the symmetric image of the marking for presence in the set of known markings. This method yields maximum reduction but may be prohibitively inefficient for massively symmetrical systems.
 
 @itemx 2
-Do not compute a generating set of the automorphisms in advance. Then, for each marking, iterate all known markings and try to compute a symetry that maps between them. This method yields maximum reduction. It is only recommendable for massively symmetrical system. Currently, the use of the method is discouraged due to an unfixed bug.
+Do not compute a generating set of the automorphisms in advance. Then, for each marking, iterate all known markings and try to compute a symmetry that maps between them. This method yields maximum reduction. It is only recommendable for massively symmetrical system. Currently, the use of the method is discouraged due to an unfixed bug.
 
 @itemx 3
 Compute a generating set of the automorphisms in advance. Use this set for transforming a newly encountered marking into an approximated canonical representative which is searched in, and inserted into, the set of known markings. Does not yield maximum reduction but has the by far best performance.
@@ -1032,223 +1526,220 @@ Do not compute a generating set of the automorphisms in advance. Compute a canon
 
 We strongly recommend the use of method 3. It is the one we most frequently applied so far. Thus, it is the most stable option. 
 
-For method 4, the option MAXATTEMPT controls a trade-off between reduction and run-time. A large value refers to slow verification but close to maximum reduction while a small value refers to fast verification but a larger state space. We do not have much experience with a good choice of that value. 
+For method 4, the option @samp{MAXATTEMPT} controls a trade-off between reduction and run-time. A large value refers to slow verification but close to maximum reduction while a small value refers to fast verification but a larger state space. We do not have much experience with a good choice of that value. 
 
-If one of the methods is used where a generating set of all graph automorphisms is generated in advance, LoLA can output this generating set using the   -y option 
+If one of the methods is used where a generating set of all graph automorphisms is generated in advance, LoLA can output this generating set using the @option{-y} option 
 
 
-@subsection Compatibility
+@subheading Compatibility
 
 The symmetry method can be applied in combination with the stubborn set method, the state compression based on invariants, the coverability graph construction, and the cycle coverage method. It is incompatible with the sweep-line method, and attracted execution. It can be applied with both depth-first and breadth-first search. 
 
 
-@subsection Further reading
+@subheading Further reading
 
-The syymetry methods implemented in LoLA correspond to the publications:
-T. Junttila:
-New canonical representative marking algorithms for place/transition nets.. 
-Proc. int. Conf. Application and Theory of Petri Nets, LNCS 3099, 2004, pp. 258-277
+The symmetry methods implemented in LoLA correspond to the publications:
 
-K. Schmidt:
-How to Calculate Symmetries of Petri nets. 
-Acta Informatica 36, 2000, pp 545-590.
+@itemize
+@item Tommi A. Junttila. @b{New canonical representative marking algorithms for place/transition-nets}. In J. Cortadella and W. Reisig, editors, @i{Application and Theory of Petri Nets 2004}, volume 3099 of Lecture Notes in Computer Science, pages 258–277. Springer, 2004.
 
-K. Schmidt:
-Integrating Low level Symmetries into Reachability Analysis. 
-In S. Graf, M. Schwartzbach (Eds.): Proceedings of the 6th International Conference Tools and Algorithms for the Construction and Analysis of Systems, Berlin, Germany (2000), pp. 315-331. LNCS 1785,  Springer.
+@item Karsten Schmidt. @b{How to Calculate Symmetries of Petri Nets}. @i{Acta Inf.}, 36(7):545-590, 2000. 
 
+@item Karsten Schmidt. @b{Integrating Low Level Symmetries into Reachability Analysis}. In Susanne Graf and Michael I. Schwartzbach, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems: 6th International Conference, TACAS 2000, Held as Part of the Joint European Conferences on Theory and Practice of Software, ETAPS 2000, Berlin, Germany, March/April 2000. Proceedings}, volume 1785 of Lecture Notes in Computer Science, pages 315-330, 2000. Springer-Verlag.
+@end itemize
 
 
 @c --------------------------------------------------------------------------
-@section Reduction Technique Stubborn Sets
+@section Stubborn Sets
 
 
-@subsection Applicability
+@subheading Applicability
 
 The stubborn set method is available for all properties supported by LoLA. Its use is always recommended as it does not produce significant overhead, neither in run time nor space. It performs best if the system under investigation exhibits a substantial amount of concurrency. Making more detailed predictions on its reduction power is rather difficult. 
 
 LoLA features a broad range of stubborn set methods. Each is optimised for the verification of a particular property. LoLA shall automatically incorporate a stubborn set method that preserves the class of properties that has been selected by the user in @file{userconfig.H}. Only for checking reachability and dead transition verification, the user may choose between a strict and a relaxed method, as explained below. 
 
 
-@subsection Invocation
+@subheading Invocation
+@cindex @code{#STUBBORN}
+@cindex @code{#RELAXED}, part of @code{#STUBBORN}
 
-The stubborn set method is invoked by uncommenting the line #STUBBORN in the file @file{userconfig.H}, prior to the generation of an executable file. The option #RELAXED toggles the choice between the strict and the relaxed version of the stubborn set method. It is only relevant for reachability and dead transition verification. We recommend to use the strict version in those cases where the investigated marking/state predicate is expected to be reachable or the investigated transition is expected not to be dead. Otherwise, we recommend to use the relaxed version. 
+The stubborn set method is invoked by uncommenting the line @samp{#STUBBORN} in the file @file{userconfig.H}, prior to the generation of an executable file. The option @samp{#RELAXED} toggles the choice between the strict and the relaxed version of the stubborn set method. It is only relevant for reachability and dead transition verification. We recommend to use the strict version in those cases where the investigated marking/state predicate is expected to be reachable or the investigated transition is expected not to be dead. Otherwise, we recommend to use the relaxed version. 
 
 
-@subsection Compatibility
+@subheading Compatibility
 
 The stubborn set method is compatible with all other reduction techniques, and both depth-first and breadth-first search. 
 
 
-@subsection Further reading
+@subheading Further reading
 
 Most stubborn set methods implemented in LoLA correspond to the publications:
-A. Valmari:
-The state explosion problem.. 
-Lectures on Petri Nets I: Basic Models, LNCS 1491, 1998, pp. 429-528
 
-R. Gerth, R. Kuiper, D. Peled, W. Penczek:
-A partial order approach to branching time logic model checking.. 
-Proc. 3rd Israel Symposium on the Theory of Computing and Systems, IEEE 1995, pp. 130-140
+@itemize
+@item Antti Valmari. @b{The State Explosion Problem}. In W. Reisig and G. Rozenberg, Eds, @i{Lectures on Petri Nets I: Basic Models, Advances in Petri Nets, the Volumes Are Based on the Advanced Course on Petri Nets}, volume 1491 of Lecture Notes in Computer Science, pages 429-528, 1998. Springer-Verlag.
 
-L. Kristensen, K. Schmidt, A. Valmari:
-Question-guided stubborn set methods for state properties. 
-Formal Methods in System Design 29 (3), 2006, pp. 215-251
+@item Rob Gerth, Ruurd Kuiper, Doron Peled, Wojciech Penczek: @b{A Partial Order Approach to Branching Time Logic Model Checking}. @i{Inf. Comput.} 150(2): 132-152 (1999)
 
-K. Schmidt:
-Stubborn Sets for Modelchecking the EF/AG Fragment of CTL. 
-Fundamenta Informaticae 43(1-4), 2000, pp 331-341.
+@item Lars Michael Kristensen, Karsten Schmidt, Antti Valmari: @b{Question-guided stubborn set methods for state properties}. @i{Formal Methods in System Design (FMSD)} 29(3):215-251 (2006)
 
-K. Schmidt:
-Stubborn Sets for Standard Properties. 
-In S. Donatelli, H.C.M. Kleijn (Eds.): Proceedings of the 20th International Conference on Application and Theory of Petri Nets, Williamsburg, VA (1999), pp. 46-65. LNCS 1639, Springer.
+@item Karsten Schmidt. @b{Stubborn Sets for Model Checking the EF/AG Fragment of CTL}. @i{Fundam. Inform.}, 43(1-4):331-341, August 2000.
+
+@item Karsten Schmidt. @b{Stubborn Sets for Standard Properties}. In @i{Applications and Theory of Petri Nets 1999: 20th International Conference, ICATPN'99, Williamsburg, Virginia, USA, June 1999. Proceedings}, volume 1639 of Lecture Notes in Computer Science, pages 46-65, 1999. Springer-Verlag.
+@end itemize
 
 
 
 @c --------------------------------------------------------------------------
-@section Reduction Technique Sweep-Line Method
+@section Sweep-Line Method
 
 
-@subsection Applicability
+@subheading Applicability
+@cindex @code{-y} option
 
 The sweep line method is available for all reachability, and dead transition problems. Use of the method is recommended for systems which exhibit substantial sequential subbehaviours in their components. 
 
-The sweep-line method is based on a so-called progress measure. LoLA generates such a progress measure automatically and is able to output it using the   -y option . 
+The sweep-line method is based on a so-called progress measure. LoLA generates such a progress measure automatically and is able to output it using the @option{-y} option.
 
 
-@subsection Invocation
+@subheading Invocation
 
-The sweep-line method is invoked by uncommenting the line #SWEEP in the file @file{userconfig.H}, prior to the generation of an executable file. 
+@cindex @code{#SWEEP}
+The sweep-line method is invoked by uncommenting the line @samp{#SWEEP} in the file @file{userconfig.H}, prior to the generation of an executable file. 
 
 
-@subsection Compatibility
+@subheading Compatibility
 
 The sweep-line method is compatible only with the stubborn set method. Use in combination with the stubborn set method is strongly recommended as otherwise only insignificant reduction can be obtained in many examples. 
 
 With the sweep-line method, it is impossible to produce a witness path for the checked property. It is also not possible to output the visited states. However, a witness state can still be generated. 
 
 
-@subsection Further reading
+@subheading Further reading
 
 The sweep-line method as implemented in LoLA corresponds to the publications:
-T. Mailund, L.M. Kristensen:
-A generalized sweep-line method for safety properties.. 
-Proc. Formal Methods Europe, LNCS 2391, 2002, pp. 549-567
 
-K. Schmidt:
-Automated Generation of a Progress Measure for the Sweep-Line Method 
-Journal Software Tools for Technology Transfer 8 (3), 2006, pp 195-203. 
-also in: Proc. of the 10th Conf. Tools and Algorithms for the Construction and Analysis of Systems  2004, LNCS 2988, pp. 192-204.
+@itemize
+@item Lars Michael Kristensen and Thomas Mailund. @b{A Generalised Sweep-Line Method for Safety Properties}. @i{Proc. Formal Methods Europe}, LNCS 2391, 2002, pp. 549-567
 
+@item Karsten Schmidt. @b{Automated Generation of a Progress Measure for the Sweep-Line Method}. @i{STTT}, 8(3):195-203, June 2006. Also in: Kurt Jensen and Andreas Podelski, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems, 10th International Conference, TACAS 2004, Held as Part of the Joint European Conferences on Theory and Practice of Software, ETAPS 2004, Barcelona, Spain, March 29-April 2, 2004, Proceedings}, volume 2988 of Lecture Notes in Computer Science, pages 192-204, 2004. Springer-Verlag
+@end itemize
 
 
 @c --------------------------------------------------------------------------
-@section Reduction Technique Cycle Coverage
+@section Cycle Coverage
 
 
-@subsection Applicability
+@subheading Applicability
 
-The cycle coverage method is available only for the verification of reachability and dead transitionproblems. Its use is subject to a space/time trade-off which may be controlled in the configuration of LoLA. 
-
-
-@subsection Invocation
-
-The cycle coverage method is invoked by uncommenting the line #CYCLE in the file @file{userconfig.H}, prior to the generation of an executable file. The method basically consists of storing only as many states as necessary to have at least one state per cycle in the state space in the set of stored states. Other states are computed and processed but not stored. By the cycle coverage property, this method terminates but may compute one and the same state several times. The option #MAXUNSAVED controls the time/space trade-off through storing additional states. A large number leads to better reduction but increase of run-time while a small number leads to fast verification but weaker reduction. Another way of controlling the trade-off is to set (uncomment) the option #NONBRANCHINGONLY in the file @file{userconfig.H}. This method has a reasonable performance but may lead to less significant reduction than a good value for #MAXUNSAVED. 
+The cycle coverage method is available only for the verification of reachability and dead transition problems. Its use is subject to a space/time trade-off which may be controlled in the configuration of LoLA. 
 
 
-@subsection Compatibility
+@subheading Invocation
+@cindex @code{#CYCLE}
+@cindex @code{#MAXUNSAVED}, part of @code{#CYCLE}
+@cindex @code{#NONBRANCHINGONLY}, part of @code{#CYCLE}
+
+The cycle coverage method is invoked by uncommenting the line @samp{#CYCLE} in the file @file{userconfig.H}, prior to the generation of an executable file. The method basically consists of storing only as many states as necessary to have at least one state per cycle in the state space in the set of stored states. Other states are computed and processed but not stored. By the cycle coverage property, this method terminates but may compute one and the same state several times. The option @samp{#MAXUNSAVED} controls the time/space trade-off through storing additional states. A large number leads to better reduction but increase of run-time while a small number leads to fast verification but weaker reduction. Another way of controlling the trade-off is to set (uncomment) the option @samp{#NONBRANCHINGONLY} in the file @file{userconfig.H}. This method has a reasonable performance but may lead to less significant reduction than a good value for @samp{#MAXUNSAVED}. 
+
+
+@subheading Compatibility
 
 The cycle coverage method is compatible only with the stubborn set and symmetry methods. Use in combination with the stubborn set method is strongly encouraged as otherwise only insignificant reduction is obtained in many examples. The method requires the use of the depth-first search strategy. 
 
 
-@subsection Further reading
+@subheading Further reading
 
 The method has been described in
-K. Schmidt:
-Using Petri net Invariants in State Space Construction. 
-Proc. of the 9th Conf. Tools and Algorithms for the Construction and Analysis of Systems 2003, pp. 473-488 LNCS 2619, Springer.
+
+@itemize
+@item Karsten Schmidt. @b{Using Petri Net Invariants in State Space Construction}. In Hubert Garavel and John Hatcliff, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems (TACAS 2003), 9th International Conference, Part of ETAPS 2003, Warsaw, Poland}, volume 2619 of Lecture Notes in Computer Science, pages 473-488, 2003. Springer-Verlag.
+@end itemize
 
 
 
 @c --------------------------------------------------------------------------
-@section Reduction Technique Coverability Graph
+@section Coverability Graph
 
 
-@subsection Applicability
+@subheading Applicability
 
 The coverability graph construction is available for the verification of boundedness (of a net or a particular place), and the dead transition problem. For the boundedness problems, its use is compulsory. 
 
 
-@subsection Invocation
+@subheading Invocation
+@cindex @code{#COVER}
 
-The coverability graph method is invoked by uncommenting the line #COVER in the file @file{userconfig.H}, prior to the generation of an executable file. 
+The coverability graph method is invoked by uncommenting the line @samp{#COVER} in the file @file{userconfig.H}, prior to the generation of an executable file. 
 
 
-@subsection Compatibility
+@subheading Compatibility
 
 The coverability graph method is only compatible with the stubborn set method and the symmetry method. It can be used for both depth-first and breadth-first search. 
 
 
-@subsection Further reading
+@subheading Further reading
 
 The coverability graph method implemented in LoLA corresponds to the publications:
-R.M. Karp, R.E. Miller:
-Parallel programm schemata.. 
-J. Computer and System Sciences 4, 1969, pp. 147-195
 
-K. Schmidt:
-Modelchecking with Coverability Graphs. 
-Formal Methods in System Design 15 (3), 1999, pp 239-254.
+@itemize
+@item R.M. Karp, R.E. Miller: Parallel program schemata. J. Computer and System Sciences 4, 1969, pp. 147-195
+
+@item Karsten Schmidt. @b{Model-Checking with Coverability Graphs}. @i{Formal Methods in System Design}, 15(3):239-254, November 1999
+@end itemize
 
 
 
 @c --------------------------------------------------------------------------
-@section Reduction Technique Attracted Execution
+@section Attracted Execution
 
 
-@subsection Applicability
+@subheading Applicability
 
 The attracted execution method is available for all reachability and dead transition properties as well as the existence of deadlocks. 
 
 It is not a complete verification technique. It rather generates random execution sequences and checks the visited markings for the property to be verified. In case of non-reachability or death of the investigated transition, LoLA runs forever. 
 
 
-@subsection Invocation
+@subheading Invocation
+@cindex @code{#FINDPATH}
 
-The attracted execution method is invoked by uncommenting the line #FINDPATH in the file @file{userconfig.H}, prior to the generation of an executable file. 
+The attracted execution method is invoked by uncommenting the line @samp{#FINDPATH} in the file @file{userconfig.H}, prior to the generation of an executable file. 
 
 
-@subsection Compatibility
+@subheading Compatibility
 
 The attracted execution method is compatible only with the stubborn set method. Application in combination with the stubborn set method is strongly encouraged as only in this combination, execution is attracted towards witness states for the investigated property.
 
 
 
 @c --------------------------------------------------------------------------
-@section Reduction Technique Invariant Based Compression
+@section Invariant Based Compression
 
 
-@subsection Applicability
+@subheading Applicability
 
-The compression of states is applicable for all properties supported by LoLA. It does not reduce the number of generated states, but the amount of memory necessary for storing an individual state. It typically inproves both run-time and memory consumption while the preprocessing is insignificant. It is thus recommended to always use this technique. 
-
-
-@subsection Invocation
-
-The state compression method is invoked by uncommenting the line #PREDUCTION in the file @file{userconfig.H}, prior to the generation of an executable file. 
+The compression of states is applicable for all properties supported by LoLA. It does not reduce the number of generated states, but the amount of memory necessary for storing an individual state. It typically improves both run-time and memory consumption while the preprocessing is insignificant. It is thus recommended to always use this technique. 
 
 
-@subsection Compatibility
+@subheading Invocation
+@cindex @code{#PREDUCTION}
+
+The state compression method is invoked by uncommenting the line @samp{#PREDUCTION} in the file @file{userconfig.H}, prior to the generation of an executable file. 
+
+
+@subheading Compatibility
 
 The state compression technique is compatible with all other reduction techniques, except for the sweep-line method. 
 
 
-@subsection Further reading
+@subheading Further reading
 
 The method corresponds to the publication:
-K. Schmidt:
-Using Petri net Invariants in State Space Construction. 
-Proc. 9th Conf. Tools and Algorithms for the Construction and Analysis of Systems 2003, pp. 473-488 LNCS 2619, Springer.
+
+@itemize
+@item Karsten Schmidt. @b{Using Petri Net Invariants in State Space Construction}. In Hubert Garavel and John Hatcliff, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems (TACAS 2003), 9th International Conference, Part of ETAPS 2003, Warsaw, Poland}, volume 2619 of Lecture Notes in Computer Science, pages 473-488, 2003. Springer-Verlag.
+@end itemize
 
 
 
@@ -1274,9 +1765,11 @@ LoLA is able to produce some valuable output.
 
 
 @c --------------------------------------------------------------------------
-@section Output: Return Value
+@c @node Output: Return Value
+@section Return Value
 
 The result of verification is written to the standard error stream. For a comfortable integration of LoLA into other tools, the result is also passed as the exit value of the program. It can thus be processed in a calling program or a wrapping shell script. The return values of the executable of LoLA has the following meaning:
+
 @table @asis
 @itemx 0
 specified state or deadlock found/net or place unbounded/home marking exists/net is reversible/predicate is live/CTL formula true/transition not dead/liveness property does not hold;
@@ -1300,77 +1793,112 @@ uncaught memory overflow, or bug
 
 
 @c --------------------------------------------------------------------------
-@section Output: Witness Path
+@section Witness Path
+@cindex @code{PATH}
+@cindex @code{.path} files
+@cindex @code{-p} option
+@cindex @code{-P} option
 
-For some problems, LoLA is able to provide a witness or counterexample path for the verification problem. This path can be accessed using the -p or -P command line option when running LoLA. When the -p option is followed by a file name, the path is written to the specified file. If -p is used without a file name, a file name is created by replacing the suffix of the net specification file with ".path". Using -P, the path is written to the standard output stream which is convenient for integrating LoLA into other tools. 
+For some problems, LoLA is able to provide a witness or counterexample path for the verification problem. This path can be accessed using the @option{-p} or @option{-P} command line option when running LoLA. When the @option{-p} option is followed by a file name, the path is written to the specified file. If @option{-p} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.path}. Using @option{-P}, the path is written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
-The path output starts with "PATH", followed by a white space separated list of    transition names. Instances of high level net transitions come in their generated low level name. 
+The path output starts with @samp{PATH}, followed by a white space separated list of transition names. Instances of high level net transitions come in their generated low level name. 
 
-If the coverability graph option is used, parts of the path may be enclosed in parenthesis "(" and ")". In that case, the enclosed parts are to be exeuted "very often" in order to show that some places may have "many" tokens.
-
-
-
-@c --------------------------------------------------------------------------
-@section Output: Witness State
-
-For some problems, LoLA is able to provide a witness state for the verification problem. This state can be accessed using the -s or -S command line option when running LoLA. When the -s option is followed by a file name, the state is written to the specified file. If -s is used without a file name, a file name is created by replacing the suffix of the net specification file with ".state". Using -S, the state is written to the standard output stream which is convenient for integrating LoLA into other tools. 
-
-The state output starts with "STATE", followed by the description of a    marking in the same format as in the place/transition net description (but without the finalizing ";").
+If the coverability graph option is used, parts of the path may be enclosed in parenthesis @samp{(} and @samp{)}. In that case, the enclosed parts are to be executed ``very often'' in order to show that some places may have ``many'' tokens.
 
 
 
 @c --------------------------------------------------------------------------
-@section Output: Computed Portion of the State Space
+@section Witness State
+@cindex @code{STATE}
+@cindex @code{.state} files
+@cindex @code{-s} option
+@cindex @code{-S} option
 
-For most verification runs, LoLA is able to report on the computed portion of the state space. Exceptions concern the use of reduction techniques (like the sweep-line method or the goal-oriented execution) and the verification of some properties where advanced state space exploration strategies (other then normal depth-first or breadth-first search) are applied. Graph output can be activated using the -g, -G, -m, or -M command line options when running LoLA. When the -g or -m option is followed by a file name, the graph is written to the specified file. If -g or -m is used without a file name, a file name is created by replacing the suffix of the net specification file with ".graph". Using -G or -M, the graph is written to the standard output stream which is convenient for integrating LoLA into other tools. The graph output consists of a list of states. If the -m or -M options are used, we write for each state, a header, the corresponding marking (in the same syntax as for the place/transition net   initial marking), and information about successors. The first and third part of the description depend on the underlying search strategy. If the -g or -G options are used, only the first and third parts of the description (i.e., the mere graph structure) are written. 
+For some problems, LoLA is able to provide a witness state for the verification problem. This state can be accessed using the @option{-s} or @option{-S} command line option when running LoLA. When the @option{-s} option is followed by a file name, the state is written to the specified file. If @option{-s} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.state}. Using @option{-S}, the state is written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
-If depth first search is used, the header consists of the text "STATE" and a number. The number is the depth-first search number which is consecutively assigned to each state upon first visit. The order of appearance in the state output file corresponds to the order of completion of the states. Between "STATE" and number, there may occur one of the characters "!" or "*". "!" identifies a state that proves the actual property (like an existing deadlock, the state satisfying the given predicate, etc.), and the states marked with "*" are those on a path from the initial state to the one marked "!". These special marks occur only if the state space has not been traversed completely. 
+The state output starts with @samp{STATE}, followed by the description of a  marking in the same format as in the place/transition net description (but without the finalizing @samp{;}).
 
-Subsequent to the (optional) marking description, a depth-first graph output lists the set transitions to be considered. For unreduced state space generation, this is the list of enabled transitions, otherwise a subset thereof. For each transition, we mention its name and, separated with "->" the number of the resulting successor state. If an incompletely traversed state space is printed, the "->" may be replaced by a "=>", and the number of the successor state may be replaced by a "?". The single transition marked "=>" is the one on the witness or counterexample path for the property to be verified. "?" replaces numbers of those states which have not been visited during verification. 
 
-If breadth first search is used, the header has the form "STATE" number1 "FROM" number2 "BY" transition-name. Number1 is the consecutively assigned number of visit of the reported state. Number2 is the unique number of the predecessor state from which this state has been visited. Transition-name is the name of the transition responsible for transforming state number1 into state number2. 
+
+@c --------------------------------------------------------------------------
+@section Computed Portion of the State Space
+@cindex @code{STATE}
+@cindex @code{.graph} files
+@cindex @code{-g} option
+@cindex @code{-G} option
+@cindex @code{-m} option
+@cindex @code{-M} option
+
+For most verification runs, LoLA is able to report on the computed portion of the state space. Exceptions concern the use of reduction techniques (like the sweep-line method or the goal-oriented execution) and the verification of some properties where advanced state space exploration strategies (other then normal depth-first or breadth-first search) are applied. Graph output can be activated using the @option{-g}, @option{-G}, @option{-m}, or @option{-M} command line options when running LoLA. When the @option{-g} or @option{-m} option is followed by a file name, the graph is written to the specified file. If @option{-g} or @option{-m} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.graph}. Using @option{-G} or @option{-M}, the graph is written to the standard output stream which is convenient for integrating LoLA into other tools. The graph output consists of a list of states. If the @option{-m} or @option{-M} options are used, we write for each state, a header, the corresponding marking (in the same syntax as for the place/transition net initial marking), and information about successors. The first and third part of the description depend on the underlying search strategy. If the @option{-g} or @option{-G} options are used, only the first and third parts of the description (i.e., the mere graph structure) are written. 
+
+If depth first search is used, the header consists of the text @samp{STATE} and a number. The number is the depth-first search number which is consecutively assigned to each state upon first visit. The order of appearance in the state output file corresponds to the order of completion of the states. Between @samp{STATE} and number, there may occur one of the characters @samp{!} or @samp{*}. @samp{!} identifies a state that proves the actual property (like an existing deadlock, the state satisfying the given predicate, etc.), and the states marked with @samp{*} are those on a path from the initial state to the one marked @samp{!}. These special marks occur only if the state space has not been traversed completely. 
+
+Subsequent to the (optional) marking description, a depth-first graph output lists the set transitions to be considered. For unreduced state space generation, this is the list of enabled transitions, otherwise a subset thereof. For each transition, we mention its name and, separated with @samp{->} the number of the resulting successor state. If an incompletely traversed state space is printed, the @samp{->} may be replaced by a @samp{=>}, and the number of the successor state may be replaced by a @samp{?}. The single transition marked @samp{=>} is the one on the witness or counterexample path for the property to be verified. @samp{?} replaces numbers of those states which have not been visited during verification. 
+
+If breadth first search is used, the header has the form @samp{STATE @i{number1} FROM @i{number2} BY @i{transition-name}}. @samp{@i{number1}} is the consecutively assigned number of visit of the reported state. @samp{@i{number2}} is the unique number of the predecessor state from which this state has been visited. @samp{@i{transition-name}} is the name of the transition responsible for transforming state @samp{@i{number1}} into state @samp{@i{number2}}. 
 
 Subsequent to the (optional) marking description, the list of considered transitions (without information on the reached state number) is listed as a white-space separated list of transition names.
 
 
 
 @c --------------------------------------------------------------------------
-@section Output: Place/Transition Net
+@section Place/Transition Net
+@cindex @code{.llnet} files
+@cindex @code{-n} option
+@cindex @code{-N} option
 
-This feature is only useful if the original net specification is a high-level net. Then, it is possible to generate a complete net description file in the place/transition net syntax, containing the semantically equivalent low level counterpart of the given high-level net. This output option is triggered by the -n or -N command line option. When the -n option is followed by a file name, the net is written to the specified file. If -n is used without a file name, a file name is created by replacing the suffix of the net specification file with ".llnet". Using -N, the net is written to the standard output stream which is convenient for integrating LoLA into other tools. 
+This feature is only useful if the original net specification is a high-level net. Then, it is possible to generate a complete net description file in the place/transition net syntax, containing the semantically equivalent low level counterpart of the given high-level net. This output option is triggered by the @option{-n} or @option{-N} command line option. When the @option{-n} option is followed by a file name, the net is written to the specified file. If @option{-n} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.llnet}. Using @option{-N}, the net is written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
 The names used in the generated description correspond to the internally used names for place and transition instances.
 
 
 
 @c --------------------------------------------------------------------------
-@section Output: Net Automorphisms
+@section Net Automorphisms
+@cindex @code{GENERATOR}
+@cindex @code{.state} files
+@cindex @code{-y} option
+@cindex @code{-Y} option
 
-In most cases where the symmetry method is applied, LoLA is able to report the computed set of net automorphisms which describe the symmetries in the net. This information can be accessed using the -y or -Y command line option when running LoLA. When the -y option is followed by a file name, the automorphisms are written to the specified file. If -y is used without a file name, a file name is created by replacing the suffix of the net specification file with ".state". Using -Y, the automorphisms are written to the standard output stream which is convenient for integrating LoLA into other tools. 
+In most cases where the symmetry method is applied, LoLA is able to report the computed set of net automorphisms which describe the symmetries in the net. This information can be accessed using the @option{-y} or @option{-Y} command line option when running LoLA. When the @option{-y} option is followed by a file name, the automorphisms are written to the specified file. If @option{-y} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.state}. Using @option{-Y}, the automorphisms are written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
-Each automorphism description starts with "GENERATOR", followed by numbers which are separated by a ".". These numbers describe the structure of the generating set. The first number is a family number, the second one a consecutive number within each family. Each automorphism can be obtained from generators by composing at most one generator per family. Thereby, the composition of 0 generators is supposed to yield the identity mapping. 
+Each automorphism description starts with @samp{GENERATOR}, followed by numbers which are separated by a @samp{.}. These numbers describe the structure of the generating set. The first number is a family number, the second one a consecutive number within each family. Each automorphism can be obtained from generators by composing at most one generator per family. Thereby, the composition of 0 generators is supposed to yield the identity mapping. 
 
-Subsequent to the discussed numbers, the actual automorphism (a bijection on the places) is reported. It is description in the so-called cycle notation. It consists of a list of cycles where is cycle is a list of place names, enclosed in parenthesis "(" and ")". The corresponding mapping is defined as follows:
+Subsequent to the discussed numbers, the actual automorphism (a bijection on the places) is reported. It is description in the so-called cycle notation. It consists of a list of cycles where is cycle is a list of place names, enclosed in parenthesis @samp{(} and @samp{)}. The corresponding mapping is defined as follows:
 If a place name does not appear in any cycle, it is mapped to itself.
 If a place name occurs as the last entry of a cycle, it is mapped to the first entry of this cycle
 Otherwise, the place is mapped to the respective next entry of its cycle
-For example, (a b c) (d f) represents the mapping a->b, b->c, c->a,d->f,e->e,f->d.
+
+@cartouche
+@b{Example:}
+@example
+(a b c) (d f)
+@end example
+represents the mapping
+@example
+a->b, b->c, c->a, d->f, e->e, f->d.
+@end example
+@end cartouche
+
+
+@c --------------------------------------------------------------------------
+@section The Generated Progress Measure
+@cindex @code{PROGRESS MEASURE}
+@cindex @code{.state} files
+@cindex @code{-y} option
+@cindex @code{-Y} option
+
+If the sweep-line method is among the reduction techniques to be used, LoLA calculates a progress measure which is an important ingredient to that technique. This measure can be accessed using the @option{-y} or @option{-Y} command line option when running LoLA. When the @option{-y} option is followed by a file name, the measure is written to the specified file. If @option{-y} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.state}. Using @option{-Y}, the progress measure is written to the standard output stream which is convenient for integrating LoLA into other tools. 
+
+The output starts with the text @samp{PROGRESS MEASURE}, followed by a white space separated list where each entry consists of a transition name (or the name of a transition instance), a @samp{:}, and a number. From this information, the used progress measure is defined as follows: The initial marking has progress value 0. If some marking m has progress value p, firing transition t in m leads to marking m', and we report value x for t, then m' has progress value p + x. The design of the measure takes care that progress values are independent of the path on which we reach them.
 
 
 
 @c --------------------------------------------------------------------------
-@section Output: Net Automorphisms
+@section Status information
+@cindex @code{#REPORTFREQUENCY}
 
-If the sweep-line method is among the reduction techniques to be used, LoLA calculates a progress measure which is an important ingredient to that technique. This measure can be accessed using the -y or -Y command line option when running LoLA. When the -y option is followed by a file name, the measure is written to the specified file. If -y is used without a file name, a file name is created by replacing the suffix of the net specification file with ".state". Using -Y, the progress measure is written to the standard output stream which is convenient for integrating LoLA into other tools. 
-
-The output starts with the text "PROGRESS MEASURE", followed by a white space separated list where each entry consists of a transition name (or the name of a transition instance), a ":", and a number. From this information, the used progress measure is defined as follows: The initial marking has progress value 0. If some marking m has progress value p, firing transition t in m leads to marking m', and we report value x for t, then m' has progress value p + x. The design of the measure takes care that progress values are independent of the path on which we reach them.
-
-
-
-@c --------------------------------------------------------------------------
-@section Output: Status information
-
-During the execution of LoLA, status information is generated and printed to the standard error output stream. During calculation of net automorphisms, LoLA reports traversal of certain levels in a search tree (which has a size that is equal to the number of places and transitions in the place-transition net). During standard state space exploration, LoLA reports the number of visited states and explored state changes. During plain execution, LoLA reports the number of fired transition. Using the sweep-line method, LoLA reports the number of fired transition, the currently processed round and progress value as well as current and peak number of stored states. The amount of produced information can be controlled through the directive #REPORTFREQUENCY in the file @file{userconfig.H}. The value refers in most cases to the number of fired transitions after which a message is produced. For the calculation of automorphisms, it refers to the depth at which a message is emitted.
+During the execution of LoLA, status information is generated and printed to the standard error output stream. During calculation of net automorphisms, LoLA reports traversal of certain levels in a search tree (which has a size that is equal to the number of places and transitions in the place-transition net). During standard state space exploration, LoLA reports the number of visited states and explored state changes. During plain execution, LoLA reports the number of fired transition. Using the sweep-line method, LoLA reports the number of fired transition, the currently processed round and progress value as well as current and peak number of stored states. The amount of produced information can be controlled through the directive @samp{#REPORTFREQUENCY} in the file @file{userconfig.H}. The value refers in most cases to the number of fired transitions after which a message is produced. For the calculation of automorphisms, it refers to the depth at which a message is emitted.
 
 
 
@@ -1380,17 +1908,20 @@ During the execution of LoLA, status information is generated and printed to the
 @node Download
 @chapter Download
 
-The use of LoLA is free under the GNU public license which is part of the distribution below. 
+The use of LoLA is free under the @acronym{GNU} General Public License which is part of the distribution.
 
 After downloading and unpacking LoLA, there will be a directory called lola containing a number of C++ source files. For running LoLA,
+
+@cindex @code{#HASHSIZE}
+@cindex @code{-h} option
 
 @itemize
 @item edit the file @file{userconfig.H}. Most parts of this file concern properties to be verified or available reduction techniques. The effect of editing those parts of @file{userconfig.H} is explained in the respective section of the online documentation. The only remaining option is @samp{#HASHSIZE}. Its value controls the size of the hash table for storing visited states. A larger value speeds up state space exploration a little bit at the price of requiring more memory for the table itself. For most users, the original value should be satisfactory.
 
-@item Create an executable file by calling the shell tool make. As a result, there will be an executable called lola.
+@item Create an executable file by calling the shell tool @samp{make}. As a result, there will be an executable called @file{lola}.
 
-@item Call lola with a file containing the net description, a file containing information about the verified property (if applicable - refer to the documentation for details), and some command line options controlling the desired output information (also explained in the documentation).
-@item The configuration in which LoLA has been generated can be accessed calling lola with the command line option -h.
+@item Call @file{lola} with a file containing the net description, a file containing information about the verified property (if applicable -- refer to the documentation for details), and some command line options controlling the desired output information (also explained in the documentation).
+@item The configuration in which LoLA has been generated can be accessed calling @file{lola} with the command line option @option{-h}.
 @end itemize
 
 In a subdirectory of LoLA, you can find a number of example Petri net descriptions as well as examples for additional information about verification problems.
@@ -1490,5 +2021,10 @@ The most recent change log is available at LoLA's website at @url{http://service
 
 
 @c --------------------------------------------------------------------------
+
+@node Indices
+@unnumbered Index
+
+@printindex cp
 
 @bye

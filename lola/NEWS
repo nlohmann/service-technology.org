@@ -6,20 +6,14 @@
                      http://service-technology.org/lola
 
 
-Version 1.10
-============
+Version 1.11-unreleased
+=======================
 
-* this is an official source release by Karsten Wolf - removed warning after
-  executing the configure script
+* completed documentation
 
-* added a generic Doxygen (`http://www.doxygen.org') configuration file
-  `Doxyfile.in'
+* updated `-h' output
 
-* completed task #6267 (`http://gna.org/task/?626'): `TWOPHASE' is only set
-  when it makes sense, i.e. only in `LIVEPROP' and `HOME'
-
-* actually using command line parameters (`--enable-win32', `--enable-64bit',
-  and `--enable-universal') from the configure script
+* removed old manual `lola-old.ps' from documentation
 
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for

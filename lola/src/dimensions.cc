@@ -9,9 +9,9 @@ void reportconfiguration()
 	cout << "LoLA - A low level Analyzer" << endl;
 	cout << "---------------------------" << endl << endl;
 	cout << "state space based verification of low level Petri nets." << endl;
-	cout << "written by Karsten Schmidt" << endl;
+	cout << "written by Karsten Wolf" << endl;
 	cout << "NO WARRANTY!" << endl;
-	cout << "http://www.informatik.hu-berlin.de/~kschmidt/lola.html" << endl << endl;
+	cout << "http://wwwteo.informatik.uni-rostock.de/ls_tpp/lola" << endl << endl;
 	cout << "This executable is compiled in the following configuration:" << endl;
 	cout << "* Verification problem: " << endl;
 #ifdef LTLPROP

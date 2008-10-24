@@ -72,7 +72,10 @@ AC_MSG_RESULT($enable_universal)
 AC_DEFINE_UNQUOTED(CONFIG_ENABLEUNIVERSAL, "$enable_universal", [whether to build a Mac universal binary])
 
 if test "$enable_universal" = "yes"; then
-  AM_INIT_AUTOMAKE(no-dependencies)
+  if test "$enable_dependency_tracking" != no ; then
+    AC_MSG_ERROR([Please re-run configure with these options:
+  `--disable-dependency-tracking --enable-universal'])
+  fi
   configured_CFLAGS=$configured_CFLAGS" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386"
   configured_CXXFLAGS=$configured_CXXFLAGS" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386"
   configured_LDFLAGS=$configured_LDFLAGS" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386 -mmacosx-version-min=10.4"

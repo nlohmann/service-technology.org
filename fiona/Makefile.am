@@ -1,5 +1,4 @@
-SUBDIRS = libs src tests man
-EXTRA_DIST = doc/docShop.owfn doc/docShop.owfn.og doc/fionaDocumentation.pdf
+SUBDIRS = libs src tests man doc
 
 
 #############################################################################
@@ -15,6 +14,7 @@ svn-clean: maintainer-clean
 	-rm -f install-sh
 	-rm -f Makefile.in
 	-rm -f missing
+	-rm -f mdate-sh
 	-rm -f -r autom4te.cache
 	-rm -f src/Makefile.in
 	-rm -f libs/Makefile.in libs/cudd/Makefile.in libs/pnapi/Makefile.in

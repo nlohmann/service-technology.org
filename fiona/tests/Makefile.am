@@ -420,6 +420,8 @@ DISTCLEANFILES =  productog/1x2.output.og \
 	syntax/formula.owfn.output.og.out \
 	philosophers/phcontrol4.unf.owfn.og.png \
 	philosophers/phcontrol4.unf.owfn.og.out \
+	philosophers/phcontrol4.unf.owfn.og.BDD_MP.cudd \
+	philosophers/phcontrol4.unf.owfn.og.BDD_ANN.cudd \
 	bdd_ref/myCoffee.owfn.og.out \
 	bdd_ref/myCoffee.owfn.og \
 	bdd_ref/myCoffee.owfn.og.BDD_ANN.cudd \

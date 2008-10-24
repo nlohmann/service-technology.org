@@ -1,4 +1,4 @@
-AC_INIT(Fiona, 3.0, fiona@service-technology.org, fiona)
+AC_INIT(Fiona, 3.1-unreleased, fiona@service-technology.org, fiona)
 
 # the first line should be everything you will ever need to touch
 #############################################################################
@@ -195,6 +195,7 @@ AC_SUBST(builddir)
 AC_CONFIG_FILES([Makefile
                  Doxyfile
                  src/Makefile
+                 doc/Makefile
                  tests/Makefile
                  libs/Makefile
                  libs/cudd/Makefile

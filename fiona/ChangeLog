@@ -6,30 +6,45 @@
                      http://service-technology.org/fiona
 
 
+Version 3.1-unreleased
+======================
+
+* ChangeLogs are now generated from Texinfo documentation
+
 Version 3.0
 ===========
 
 * Fiona now supports more service analysis scenarios
-    * given an og-file Fiona generates a public view
-    * given two or more open nets such that there composition does not
-      behave well, Fiona can generate an adapter - either a rather small
-      adapter or a most permissive adapter
-        * Fiona is able to read adapter rules from file
-    * given an open net file, Fiona can generate a partner open net for
-      the given net - either a rather small partner or a most
-      permissive one is generated
+     * given an og-file Fiona generates a public view
 
-* implemented powerful preprocessing and conversion functionalities for
-  open nets and OGs
-    * minimization of a given OG
-    * structural reduction of given open nets (reduction level can be set
-      via command line)
-    * normalization of given open nets
-    * generation of png files of given open nets, OGs and IGs
-    * given an OG, check for nodes that violate their own annotation
-    * given an OG, removal of nodes that violate their own annotation
-    * test, if given OG contains cycles
-    * counting the number of strategies characterized by a given OG
+     * given two or more open nets such that there composition does not
+       behave well, Fiona can generate an adapter - either a rather small
+       adapter or a most permissive adapter
+
+     * Fiona is able to read adapter rules from file
+
+     * given an open net file, Fiona can generate a partner open net for the
+       given net - either a rather small partner or a most permissive one is
+       generated
+
+* implemented powerful preprocessing and conversion functionalities for open
+  nets and OGs
+     * minimization of a given OG
+
+     * structural reduction of given open nets (reduction level can be set
+       via command line)
+
+     * normalization of given open nets
+
+     * generation of png files of given open nets, OGs and IGs
+
+     * given an OG, check for nodes that violate their own annotation
+
+     * given an OG, removal of nodes that violate their own annotation
+
+     * test, if given OG contains cycles
+
+     * counting the number of strategies characterized by a given OG
 
 * Fiona reads a given OG File for further processing
 
@@ -43,11 +58,15 @@ Version 3.0
 * in case of calculating an reduced IG, it is now possible to choose which
   reduction technique is used via command line
 
-* we optimized our algorithms resulting in a faster and more efficient computation
-  of IG and OG
+* we optimized our algorithms resulting in a faster and more efficient
+  computation of IG and OG
 
-* it is possible to disable assertions and to disable calls to trace functions,
-  which makes the computation a lot faster (type ./configure --disable-assert)
+* it is possible to disable assertions and to disable calls to trace
+  functions, which makes the computation a lot faster (type `./configure
+  --disable-assert')
 
-* option `--bug' prints out detailed system and compilation information to better
-  trace down bugs
+* option `--bug' prints out detailed system and compilation information to
+  better trace down bugs
+
+
+

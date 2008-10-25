@@ -68,6 +68,7 @@
 #include <map>
 #include <list>
 #include <deque>
+#include <stack>
 
 using std::string;
 using std::vector;
@@ -76,6 +77,7 @@ using std::set;
 using std::map;
 using std::list;
 using std::pair;
+using std::stack;
 using std::ostream;
 
 
@@ -176,7 +178,7 @@ typedef enum
  * \ingroup petrinet
  */
 class Place;
-typedef map<Place*,int> Marking;
+
 
 
 
@@ -572,7 +574,7 @@ class PetriNet
     bool isSane() const;
 
     /// checks the Petri net for workflow criteria
-    //bool isWorkflowNet() const;
+    bool isWorkflowNet();
 
     /// checks the Petri net for free choice criterion
     bool isFreeChoice() const;
@@ -664,6 +666,9 @@ class PetriNet
 
     /// returns the number of interface places in t's neighborhood
     unsigned int neighborInterfacePlaces(Transition *t) const;
+
+    /// DFS with Tarjan's algorithm
+    unsigned int dfsTarjan(Node *n, stack<Node *> &S, set<Node *> &stacked, unsigned int &i, map<Node *, int> &index, map<Node *, unsigned int> &lowlink) const;
 
     /// a role suffix for the forEach activity
     deque<string> forEach_suffix;

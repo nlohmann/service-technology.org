@@ -57,6 +57,7 @@
 #include <cassert>
 #include <iostream>
 #include <utility>
+#include <algorithm>
 
 #include "petrinet.h"
 #include "helpers.h"		// helper functions (setUnion, setDifference, max, toString)
@@ -65,6 +66,7 @@
 using std::pair;
 using std::cerr;
 using std::endl;
+using std::min;
 
 
 namespace PNapi
@@ -293,7 +295,7 @@ Arc::~Arc()
 /*!
  * \brief   swaps source and target node of the arc
  *
- * \todo    Check me!
+ * \test    Tested in tests/test_mirror.cc
  */
 void Arc::mirror()
 {
@@ -737,17 +739,21 @@ Arc *PetriNet::newArc(Node *my_source, Node *my_target, arc_type my_type, unsign
   // Tag the involved transition as communicating if it is.
   if (my_source->nodeType == PLACE)
     if (P_in.find(static_cast<Place*>(my_source)) != P_in.end())
+    {
       if ((static_cast<Transition*>(my_target))->type == OUT || (static_cast<Transition*>(my_target))->type == INOUT)
         (static_cast<Transition*>(my_target))->type = INOUT;
       else
         (static_cast<Transition*>(my_target))->type = IN;
+    }
 
   if (my_target->nodeType == PLACE)
     if (P_out.find(static_cast<Place*>(my_target)) != P_out.end())
+    {
       if ((static_cast<Transition*>(my_source))->type == IN || (static_cast<Transition*>(my_source))->type == INOUT)
         (static_cast<Transition*>(my_source))->type = INOUT;
       else
         (static_cast<Transition*>(my_source))->type = OUT;
+    }
 
 
   // Finally add the arc to the Petri net.
@@ -1016,7 +1022,7 @@ void PetriNet::removeArc(Arc *f)
  *
  * \todo    overwork the weight setting part according to the appropriate one
  *          of PetriNet::mergePlaces()
- * 
+ *
  * \test	This method has been tested in tests/test_mergeTransitions.cc.
  */
 void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
@@ -1123,7 +1129,7 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 
     // if such an arc was found, save its weight, delete it and add its weight to the arc from t12 to postset of t2
     if (sametarget)
-    { 
+    {
       int weightsave = arc_weight(t12,(*n));
       removeArc(*delArc);
       newArc(t12, (*n), STANDARD, (arc_weight(t2,(*n)) + weightsave));
@@ -1458,6 +1464,7 @@ bool PetriNet::sameweights(Node *n) const
   for (set<Arc*>::iterator f = F.begin(); f != F.end(); f++)
   {
     if (((*f)->source == n) || ((*f)->target == n) )
+    {
       if (first)
       {
         first=false;
@@ -1470,6 +1477,7 @@ bool PetriNet::sameweights(Node *n) const
           return false;
         }
       }
+    }
   }
 
   return true;
@@ -1496,6 +1504,7 @@ bool PetriNet::sameweights(Node *n) const
  */
 set<Node *> PetriNet::preset(Node *n) const
 {
+  std::cerr << "Warning: The method preset(Node *) has been replaced by the Node class's attribute preset!\n";
   assert(n != NULL);
 
   set<Node *> result;
@@ -1525,6 +1534,7 @@ set<Node *> PetriNet::preset(Node *n) const
  */
 set<Node *> PetriNet::postset(Node *n) const
 {
+  std::cerr << "Warning: The method postset(Node *) has been replaced by the Node class's attribute postset!\n";
   assert(n != NULL);
 
   set<Node *> result;
@@ -1763,6 +1773,8 @@ unsigned int PetriNet::getId()
  * \brief   adds a suffix to the name of all interface places of the net
  *
  * \param   suffix to add to the interface places
+ *
+ * \note    BPEL2oWFN only method!
  */
 void PetriNet::add_interface_suffix(string suffix)
 {
@@ -1782,6 +1794,8 @@ void PetriNet::add_interface_suffix(string suffix)
  * \brief   adds a prefix to the name of all nodes of the net
  *
  * \param   prefix The prefix to add.
+ *
+ * \note    BPEL2oWFN only method.
  */
 void PetriNet::addPrefix(string prefix, bool renameInterface)
 {
@@ -1844,6 +1858,9 @@ void PetriNet::addPrefix(string prefix, bool renameInterface)
  * place name of the two nets match).
  *
  * \param net the net that should be added (connected)
+ *
+ * \note    If capacity k on input places is given, method creates complementary place
+ *          with k+1 token and a deadlock transition
  */
 void PetriNet::compose(const PetriNet &net, unsigned int capacityOnInterface)
 {
@@ -2121,6 +2138,8 @@ void PetriNet::compose(const PetriNet &net, unsigned int capacityOnInterface)
  *          Converts input and output places (channels) to internal places.
  *
  * \todo    What means "P_in.clear(); P_in = set< Place * >();"?
+ *
+ * \deprecated  This method has been replaced by method compose().
  */
 void PetriNet::makeChannelsInternal()
 {
@@ -2181,6 +2200,8 @@ void PetriNet::reenumerate()
  *
  * \post    All communication places have max_occurrences values between 0
  *          (initial value) and UINT_MAX (maximal value).
+ *
+ * \note    BPEL2oWFN only method.
  */
 void PetriNet::calculate_max_occurrences()
 {
@@ -2440,6 +2461,8 @@ void PetriNet::produce(const PetriNet &net)
  * \brief  adds a transition that has read arcs to all final places
  *
  * \test	This method has been tested in tests/test_loop_final_state.cc.
+ *
+ * \note    BPEL2oWFN only method.
  */
 void PetriNet::loop_final_state()
 {
@@ -2543,7 +2566,7 @@ void PetriNet::normalize()
 
   for (set<Place *>::iterator place = interface.begin(); place != interface.end(); place++)
   {
-    // create new internal place from interfaceplace
+    // create new internal place from interface place
     Place *newP = newPlace((*place)->nodeFullName() + suffix);
     assert(newP != NULL);
 
@@ -2729,15 +2752,143 @@ bool PetriNet::isSane() const
  *            (3) all other nodes are situated on a path between the places described in (1) and (2)
  *
  * \return  true iff (1), (2) and (3) are fulfilled
+ * \return  false in any other case
  *
- * \deprecated  This method hasn't been completed yet. It always returns true!
- * \todo        Complete the method.
- * \todo        Test the method after implementing it.
+ * \test    Tested in tests/test_isWorkflowNet.cc
  */
-/*bool PetriNet::isWorkflowNet() const
+bool PetriNet::isWorkflowNet()
 {
-  return true;
-}*/
+  Place *first = NULL;
+  Place *last  = NULL;
+
+  // finding places described in condition (1) & (2)
+  for (set<Place *>::const_iterator p = P.begin(); p != P.end(); p++)
+  {
+    if ((*p)->preset.empty())
+    {
+      if (first == NULL)
+        first = *p;
+      else
+      {
+        std::cerr << "This net is no workflow net because there are more than one place with empty preset!\n";
+        return false;
+      }
+    }
+    if ((*p)->postset.empty())
+    {
+      if (last == NULL)
+        last = *p;
+      else
+      {
+        std::cerr << "This net is no workflow net because there are more than one place with empty postset!\n";
+        return false;
+      }
+    }
+  }
+  if (first == NULL || last == NULL)
+  {
+    std::cerr << "No workflow net! Either no place with empty preset or no place with empty postset found.\n";
+    return false;
+  }
+
+  // insert new transition which consumes from last and produces on first to form a cycle
+  Transition *tarjan = newTransition("tarjan");
+  newArc(last, tarjan);
+  newArc(tarjan, first);
+
+  // each 2 nodes $x,y \in P \cup T$ are in a directed cycle (strongly connected net using tarjan's algorithm)
+  unsigned int i = 0; ///< count index
+  map<Node *, int> index; ///< index property for nodes
+  map<Node *, unsigned int> lowlink; ///< lowlink property for nodes
+  set<Node *> stacked; ///< the stack indication for nodes
+  stack<Node *> S; ///< stack used by Tarjan's algorithm
+
+  // set all nodes' index values to ``undefined''
+  for (set<Place *>::const_iterator p = P.begin(); p != P.end(); p++)
+    index[*p] = (-1);
+  for (set<Transition *>::const_iterator t = T.begin(); t != T.end(); t++)
+    index[*t] = (-1);
+
+  // getting the number of strongly connected components reachable from first
+  unsigned int sscCount = dfsTarjan(first, S, stacked, i, index, lowlink);
+
+  std::cout << "\nstrongly connected components: " << sscCount << "\n\n";
+
+  removeTransition(tarjan);
+
+  // check set $P \cup T$
+  set<Node *> nodeSet;
+  for (set<Place *>::const_iterator p = P.begin(); p != P.end(); p++)
+    nodeSet.insert(*p);
+  for (set<Transition *>::const_iterator t = T.begin(); t != T.end(); t++)
+    nodeSet.insert(*t);
+
+  /* true iff only one strongly connected component found from first and all nodes
+   * of $\mathcal{N}$ are members of this component
+   */
+  if (sscCount == 1 && setDifference(nodeSet, stacked).empty())
+    return true;
+  else
+  {
+    cerr << "No workflow net! Some places are not between the the preset-less and the postset-less place.\n";
+    return false;
+  }
+}
+
+
+
+
+/*!
+ * \brief   DFS on the net using Tarjan's algorithm.
+ *
+ * \param   Node n which is to check
+ * \param   Stack S is the stack used in the Tarjan algorithm
+ * \param   Set stacked which is needed to identify a node which is already stacked
+ * \param   $i \in \mathbb{N}$ which is the equivalent to Tarjan's index variable
+ * \param   Map index which describes the index property of a node
+ * \param   Map lowlink which describes the lowlink property of a node
+ *
+ * \return  the number of strongly connected components reachable from the start node
+ *          if there are one or more components not reachable, they are counted as one.
+ *
+ * \note    Used by method isWorkflowNet() to check condition (3) - only working for this method.
+ */
+unsigned int PetriNet::dfsTarjan(Node *n, stack<Node *> &S, set<Node *> &stacked, unsigned int &i, map<Node *, int> &index, map<Node *, unsigned int> &lowlink) const
+{
+  unsigned int retVal = 0;
+
+  index[n] = i;
+  lowlink[n] = i;
+  i++;
+  S.push(n);
+  stacked.insert(n);
+  std::cout << n->nodeFullName() << " stacked, ";
+  for (set<Node *>::const_iterator nn = n->postset.begin(); nn != n->postset.end(); nn++)
+  {
+    if (index[*nn] < 0)
+    {
+      retVal += dfsTarjan(*nn, S, stacked, i, index, lowlink);
+      lowlink[n] = min(lowlink[n], lowlink[*nn]);
+    }
+    else
+    {
+      if (stacked.count(*nn) > 0)
+        lowlink[n] = min(lowlink[n], lowlink[*nn]);
+    }
+  }
+  if (static_cast<int>(lowlink[n]) == index[n])
+  {
+    retVal++;
+    std::cout << "\nSCC: ";
+    while (!S.empty() && lowlink[S.top()] == lowlink[n])
+    {
+      std::cout << S.top()->nodeFullName() << ", ";
+      S.pop();
+    };
+  }
+
+  return retVal;
+}
 
 
 
@@ -2772,12 +2923,19 @@ bool PetriNet::isFreeChoice() const
  * Functions to manage <forEach> suffix
  *****************************************************************************/
 
+/*!
+ * \note    BPEL2oWFN only method.
+ */
 unsigned int PetriNet::push_forEach_suffix(string suffix)
 {
   forEach_suffix.push_front(suffix);
   return forEach_suffix.size();
 }
 
+
+/*!
+ * \note    BPEL2oWFN only method.
+ */
 unsigned int PetriNet::pop_forEach_suffix()
 {
   forEach_suffix.pop_front();

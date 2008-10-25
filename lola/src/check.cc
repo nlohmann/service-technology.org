@@ -19,7 +19,7 @@ State * initial;
 unsigned int * checkstart;
 unsigned int formulaindex;
 
-void printstate(char * c, unsigned int * st)
+void printstate(char const* c, unsigned int * st)
 {
 	// unused: int j;
 	// int i;

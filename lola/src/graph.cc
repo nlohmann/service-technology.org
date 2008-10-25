@@ -75,7 +75,7 @@ Transition ** firelist()
   return tl;
 }
 
-void printstate(char *, unsigned int *);
+void printstate(char const*, unsigned int *);
 void printmarking()
 {
 	unsigned int i;

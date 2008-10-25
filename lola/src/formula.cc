@@ -1,6 +1,7 @@
 #include "formula.H"
 #include "graph.H"
 #include "unfold.H"
+#include <cassert>
 
 formula * F;
 unsigned int formula::card = 0;

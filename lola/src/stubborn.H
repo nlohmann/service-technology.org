@@ -16,15 +16,7 @@ Transition ** structstubbornset();
 Transition ** stubbornfirelistctl();
 Transition ** relaxedstubbornset();
 Transition ** structreachstubbornset();
+
 #if defined(MODELCHECKING) && defined(STUBBORN)
 void sortscapegoats();
 #endif
-
-
-
-
-
-
-
-
-

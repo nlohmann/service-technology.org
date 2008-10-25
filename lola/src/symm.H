@@ -51,13 +51,3 @@ extern unsigned int kanhash; // hash value of canonical representitive
 void AllSyms();
 
 #endif
-
-
-
-
-
-
-
-
-
-

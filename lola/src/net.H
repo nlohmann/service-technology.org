@@ -293,12 +293,12 @@ inline void Place::initialize()
     {
 	PreTransitions[i] = ArrivingArcs[i]-> tr;
     }
-    PreTransitions[NrOfArriving] = (Transition *) 0;
+    PreTransitions[NrOfArriving] = NULL;
   for(i=0;i < NrOfLeaving;i++)
     {
 	PostTransitions[i] = LeavingArcs[i]-> tr;
     }
-    PostTransitions[NrOfLeaving] = (Transition *) 0;
+    PostTransitions[NrOfLeaving] = NULL;
 }
 #endif
 
@@ -425,7 +425,7 @@ inline Transition::Transition(char * name):Node(name)
   enabled = false;  // real setting in first enabledness check
 #ifdef STUBBORN
   stamp = 0; // not seen in any search
-  NextStubborn = (Transition *) 0;
+  NextStubborn = NULL;
   instubborn = false; // real set in init of stubbornm set
   visible = false; // real set upon parsing the formula
 #endif
@@ -555,7 +555,7 @@ inline void Transition::initialize()
   // Create list of transitions where enabledness can change
   // if this transition fires. For collecting these transitions, we
   // abuse the Enabled linked list
-  StartOfEnabledList = (Transition *) 0;
+  StartOfEnabledList = NULL;
   NrEnabled = 0;
   for(i=0;IncrPlaces[i] < Places[0]->cnt;i++)
     {
@@ -577,11 +577,11 @@ inline void Transition::initialize()
       StartOfEnabledList->enabled = false;
       ImproveEnabling[i]=StartOfEnabledList;
     }
-  ImproveEnabling[i] = (Transition *) 0;
+  ImproveEnabling[i] = NULL;
   // Create list of transitions where enabledness can change
   // if this transition fires. For collecting these transitions, we
   // abuse the Enabled linked list
-  StartOfEnabledList = (Transition *) 0;
+  StartOfEnabledList = NULL;
   NrEnabled = 0;
   for(i=0;DecrPlaces[i] < Places[0]->cnt;i++)
     {
@@ -603,11 +603,11 @@ inline void Transition::initialize()
       StartOfEnabledList->enabled = false;
       ImproveDisabling[i]=StartOfEnabledList;
     }
-  ImproveDisabling[i] = (Transition *) 0;
+  ImproveDisabling[i] = NULL;
 #ifdef STUBBORN
   // Create list of conflicting transitions. If this  transition is enabled nd member of a
   // stubborn set then these transitions must be in the stubborn set, too.
-  StartOfEnabledList = (Transition *) 0;
+  StartOfEnabledList = NULL;
   NrEnabled = 0;
   for(i=0;PrePlaces[i] < Places[0]->cnt;i++)
     {
@@ -632,7 +632,7 @@ inline void Transition::initialize()
       StartOfEnabledList->enabled = false;
       conflicting[i]=StartOfEnabledList;
     }
-  conflicting[i] = (Transition *) 0;
+  conflicting[i] = NULL;
   mustbeincluded = conflicting;
 #endif
   NrEnabled = 0;
@@ -851,7 +851,7 @@ inline void Transition::check_enabled()
 		NextEnabled -> PrevEnabled = this;
 	}
       StartOfEnabledList = this;
-      PrevEnabled = (Transition *) 0;
+      PrevEnabled = NULL;
       enabled = true;
       NrEnabled++;
 #ifdef STUBBORN

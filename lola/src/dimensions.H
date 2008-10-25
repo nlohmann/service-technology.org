@@ -3,9 +3,9 @@
 #ifndef DIMENSIONS_H
 #define DIMENSIONS_H
 
-#include"userconfig.H"
-#include<iostream>
-#include<limits.h>
+#include "userconfig.H"
+#include <iostream>
+#include <limits.h>
 
 #undef APPROXIMATE_CANONIZATION
 // TARJAN=evaluate dfs and min for detecting terminal scc

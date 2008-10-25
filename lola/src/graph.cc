@@ -138,7 +138,7 @@ void printincompletestates(State *s,ofstream * graphstream,int level)
 {
 #ifndef CYCLE
 #ifdef TARJAN
-	int i,j;
+	int j;
 	// level = 1 --> top level, no firelist, mark '!'
 	// level = 0 --> other level, firelist,  mark '*'
 	if(!s) return;
@@ -149,7 +149,7 @@ void printincompletestates(State *s,ofstream * graphstream,int level)
 	  j=0;
 	  if(graphformat == 'm')
 	  {
-		 for(i=0;i<Places[0]->cnt;i++)
+		 for(unsigned int i=0;i<Places[0]->cnt;i++)
 		 {
 			 if(CurrentMarking[i])
 				{
@@ -168,12 +168,12 @@ void printincompletestates(State *s,ofstream * graphstream,int level)
 		 (*graphstream) << "\n\n";
 	  if(!level)
 	  {
-	  for(i=0; i < s -> current;i++)
+	  for(unsigned int i=0; i < s -> current;i++)
 	  {
 		(*graphstream) << s -> firelist[i]->name << " -> " << s -> succ[i]->dfs << "\n";
       }
 		(*graphstream) << s -> firelist[s->current]->name << " => " << s -> succ[s->current]->dfs << "\n";
-	  for(i = s -> current + 1; s ->firelist[i];i++)
+	  for(unsigned int i = s -> current + 1; s ->firelist[i];i++)
 	  {
 		(*graphstream) << s -> firelist[i]->name << " -> ?\n";
       }
@@ -186,7 +186,7 @@ void printincompletestates(State *s,ofstream * graphstream,int level)
 	  j=0;
 	  if(graphformat == 'm')
 	  {
-		 for(i=0;i<Places[0]->cnt;i++)
+		 for(unsigned int i=0;i<Places[0]->cnt;i++)
 		 {
 			 if(CurrentMarking[i])
 			 {
@@ -206,13 +206,13 @@ void printincompletestates(State *s,ofstream * graphstream,int level)
 	  cout << "\n\n";
 	  if(!level)
 	  {
-	  for(i=0; i < s -> current;i++)
+	  for(unsigned int i=0; i < s -> current;i++)
 	  {
 		cout << s -> firelist[i]->name << " -> " <<
 		s -> succ[i]->dfs << "\n";
       }
 		cout << s -> firelist[s->current]->name << " => " << s -> succ[s->current]->dfs << "\n";
-	  for(i = s -> current + 1; s ->firelist[i];i++)
+	  for(unsigned int i = s -> current + 1; s ->firelist[i];i++)
 	  {
 		cout << s -> firelist[i]->name << " -> ?\n";
       }
@@ -224,7 +224,7 @@ if(!s->parent) return;
 		  if(s -> NewOmega)
 		  {
 			  // Replace new omegas by their old values
-			  for(i=0;s ->NewOmega[i];i++)
+			  for(unsigned int i=0;s ->NewOmega[i];i++)
 			  {
 				s ->NewOmega[i]->set_cmarking(s ->NewOmega[i]->lastfinite);
 				s ->NewOmega[i]->bounded = true;

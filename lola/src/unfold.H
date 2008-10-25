@@ -18,6 +18,7 @@ class UType
         unsigned long int size;
         virtual bool iscompatible(UType *) = 0;
 	virtual UValue * make() = 0;
+	virtual ~UType() {}
 };
 
 class UNumType: public UType
@@ -133,6 +134,8 @@ class UValue
 inline ostream& operator << (ostream & os, UValue * val)
 {
 	val->print(os);
+	
+    return os;
 }
 	
 class UNumValue: public UValue
@@ -186,12 +189,12 @@ class UEnuValue: public UValue
 	virtual bool iseqqual(UValue *);
 	virtual bool isfirst();
 	virtual bool islesseqqual(UValue *);
-	UValue * addop(UValue *){}
-	UValue * subop(UValue *){}
-	UValue * mulop(UValue *){}
-	UValue * divop(UValue *){}
-	UValue * modop(UValue *){}
-	UValue * negop(){}
+    UValue * addop(UValue *){ return NULL; }
+	UValue * subop(UValue *){ return NULL; }
+	UValue * mulop(UValue *){ return NULL; }
+	UValue * divop(UValue *){ return NULL; }
+	UValue * modop(UValue *){ return NULL; }
+	UValue * negop(){ return NULL; }
 	char * text();
 };	
 
@@ -267,6 +270,7 @@ class UExpression
 	public:
 	UType * type;
 	virtual UValue * evaluate() = 0;
+	virtual ~UExpression() {}
 };
 
 //class DerefList;
@@ -276,6 +280,7 @@ class ULVal
 	public:
 	UType * type;
 	virtual UValue * dereference() = 0;
+	virtual ~ULVal() {}
 };
 
 class UVar;
@@ -317,6 +322,7 @@ class UStatement
 {
 	public:
 	virtual void execute() = 0;
+	virtual ~UStatement() {}
 };
 
 class UWhileStatement : public UStatement
@@ -642,6 +648,7 @@ class UTerm
 	public:
 	UType * type;
 	virtual UValueList * evaluate() = 0;
+	virtual ~UTerm() {}
 };
 
 class UVarTerm: public UTerm
@@ -682,4 +689,3 @@ class fmode
 };
 
 #endif
-

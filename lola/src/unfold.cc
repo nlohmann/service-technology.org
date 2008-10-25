@@ -80,7 +80,7 @@ UEnuType::UEnuType(UEnList * l)
 	UEnList * ll;
 	for(size = 0, ll = l; ll; ll = ll -> next,size++);
 	tags = new EnSymbol * [size];
-	for(int i = 0; i < size; i++)
+	for(unsigned int i = 0; i < size; i++)
 	{
 		tags[i] = l->sy;
 		l -> sy -> ord = i;
@@ -116,7 +116,7 @@ UValue * UArrType::make()
 	val -> type = this;
 	//val -> numeric = 0;
 	val -> content = new UValue * [index -> size];
-	for(int i = 0; i < index -> size; i++)
+	for(unsigned int i = 0; i < index -> size; i++)
 	{
 		val -> content[i] = component -> make();
 	}
@@ -295,7 +295,7 @@ bool UArrValue::iseqqual(UValue * val)
 
 	if(!type -> iscompatible(val-> type)) return false;
 	vv = (UArrValue *) val;
-	for(int i=0;i<((UArrType *) type) -> index -> size; i++)
+	for(unsigned i=0;i<((UArrType *) type) -> index -> size; i++)
 	{
 		if(!content[i]->iseqqual(vv -> content[i])) return false;
 	}
@@ -428,7 +428,7 @@ bool UArrValue::islesseqqual(UValue * val)
 
 	if(!type -> iscompatible(val-> type)) return false;
 	vv = (UArrValue *) val;
-	for(int i=0;i<((UArrType *) type) -> index -> size; i++)
+	for(unsigned int i=0;i<((UArrType *) type) -> index -> size; i++)
 	{
 		if(!content[i]->islesseqqual(vv -> content[i])) return false;
 	}
@@ -625,7 +625,7 @@ char * UArrValue::text()
 char * URecValue::text()
 {
 	char * c;
-	unsigned int i;
+	int i;
 	unsigned int len;
 
 	char ** cc;
@@ -793,7 +793,7 @@ UValue * UArrValue::copy()
 	//val -> numeric = numeric;
 	val -> type = type;
 	val -> content = new UValue * [((UArrType*) type)->index -> size];
-	for(int i = 0; i < ((UArrType*) type)->index -> size; i++)
+	for(unsigned int i = 0; i < ((UArrType*) type)->index -> size; i++)
 	{
 		val -> content[i] = content[i]->copy();
 	}
@@ -814,7 +814,7 @@ void UArrValue::operator ++ (int)
 void UArrValue::print(ostream & os)
 {
 	os << "[";
-	for(int i = 0; i< ((UArrType *) type)->component->size - 1;i++)
+	for(unsigned int i = 0; i< ((UArrType *) type)->component->size - 1;i++)
 	{
 		os << content[i] << "|";
 	}
@@ -1107,7 +1107,7 @@ void runtimeerror(char const * mess)
 
 UValue *  UCallExpression::evaluate()
 {
-	UValueList * tmp;
+	// unused: UValueList * tmp;
 	UValue * resu;
 	fct -> enter();
 	for(int i = 0; i < fct -> arity; i++)
@@ -1694,7 +1694,7 @@ bool UEnuValue::isfirst()
 
 bool UArrValue::isfirst()
 {
-	for(int i = 0; i < ((UArrType *) type) -> index -> size; i++)
+	for(unsigned int i = 0; i < ((UArrType *) type) -> index -> size; i++)
 	{
 		if (!(content[i]->isfirst())) return false;
 	}
@@ -1935,14 +1935,14 @@ void UVar::assign(UValue *v)
 
 void UFunction::enter()
 {
-	int i;
+	//int i;
 	UValueList * l;
 	UResultList * r;
 	UVar * va;
 	Symbol *s;
 
 
-	for(i=0;i< localsymb -> size;i++)
+	for(unsigned int i=0;i< localsymb -> size;i++)
 	{
 		for(s = localsymb -> table[i]; s ; s = s -> next)
 		{
@@ -1966,13 +1966,13 @@ void UFunction::enter()
 	
 void UFunction::leave()
 {
-	int i;
+	// int i;
 	UValueList * l;
-	UResultList * r;
+	// not used: UResultList * r;
 	UVar * va;
 	Symbol * s;
 
-	for(i=0; i < localsymb -> size; i++)
+	for(unsigned int i=0; i < localsymb -> size; i++)
 	{
 		for(s = localsymb -> table[i]; s; s = s -> next)
 		{

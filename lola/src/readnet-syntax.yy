@@ -206,7 +206,7 @@ atransition: nodeident {
 		   | hlprefix lbrack firingmode rbrack {
 		   unsigned int i, j,card;
 		   fmode * fm;
-		   VaSymbol * v;
+		   // unused: VaSymbol * v;
 		   UValue * vl;
 		   char ** cc;
 		   char ** inst;
@@ -351,7 +351,7 @@ sortdeclaration:  ident eqqual sortdescription semicolon {
 				// symbol table relates a name to a sort description (UType)
 
 				SoSymbol * s;
-				if(s = (SoSymbol *) (GlobalTable -> lookup($1)))
+				if( (s = (SoSymbol *) (GlobalTable -> lookup($1))) )
 				{
 					yyerror("sort symbol name already used");
 				}
@@ -368,7 +368,7 @@ sortdescription : key_boolean { $$ = TheBooType; }
 							$$ = s -> type;
 						}
 				| key_record recordcomponents key_end {
-						URcList * rl;
+						// unused: URcList * rl;
 						$$ = new URecType($2);
 						}
 				| key_array sortdescription key_of sortdescription {
@@ -446,7 +446,7 @@ vdeclaration: identlist colon sortdescription semicolon {
 							{	
 								VaSymbol * v;
 								UVar * vvv;
-								if(v = (VaSymbol *) (LocalTable -> lookup(il -> name)))
+								if( (v = (VaSymbol *) (LocalTable -> lookup(il -> name))) )
 								{
 									yyerror("variable name already used");
 								}
@@ -485,7 +485,7 @@ head: ident lpar fparlists rpar colon sortdescription {
 			f -> formalpar = new UVar * [f -> arity +5];
 			int i;
 			i = 0;
-			for(int j = 0; j < LocalTable -> size; j++)
+			for(unsigned int j = 0; j < LocalTable -> size; j++)
 			{
 				Symbol * s;
 				for(s = LocalTable -> table[j]; s; s = s -> next)
@@ -504,7 +504,7 @@ fparlist: identlist colon sortdescription {
 		{
 								VaSymbol * v;
 								UVar * vvv;
-								if(v = (VaSymbol *) (LocalTable -> lookup(il -> name)))
+								if( (v = (VaSymbol *) (LocalTable -> lookup(il -> name))) )
 								{
 									yyerror("variable name already used");
 								}
@@ -1294,7 +1294,7 @@ placelists: capacity placelist
 	  ;
 capacity:            { CurrentCapacity = CAPACITY;}
 	  | key_safe    colon  {CurrentCapacity = 1;}
-	  | key_safe number  colon { sscanf($2,"%u",&CurrentCapacity);}
+	  | key_safe number  colon { sscanf($2,"%d",&CurrentCapacity);}
           ;
 placelist:  placelist comma place 
            |  place 
@@ -2010,7 +2010,7 @@ automaton:	{
 		}
 	;
 statepart: key_state statelist semicolon {
-			int i;
+			// unused: int i;
 			buchistate * b;
 			buchiautomaton = new buchistate * [buchistate::nr];
 			for(b=initialbuchistate;b;b=b->next)
@@ -2020,7 +2020,7 @@ statepart: key_state statelist semicolon {
 				 }
 	;
 statelist: statelist comma ident  { StSymbol * s ; 
-					if(s = (StSymbol *) (BuchiTable -> lookup($3)))
+					if( (s = (StSymbol *) (BuchiTable -> lookup($3))) )
 					{
 						yyerror("State name in Buchi automaton used twice");
 					}
@@ -2036,7 +2036,7 @@ statelist: statelist comma ident  { StSymbol * s ;
 					}  
 				  }
 	 | ident                  { StSymbol * s;
-					if(s = (StSymbol *) (BuchiTable -> lookup($1)))
+					if( (s = (StSymbol *) (BuchiTable -> lookup($1))) )
 					{
 						yyerror("State name in Buchi automaton used twice");
 					}

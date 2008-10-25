@@ -21,11 +21,12 @@ unsigned int formulaindex;
 
 void printstate(char * c, unsigned int * st)
 {
-	int i,j;
+	// unused: int j;
+	// int i;
 	if(Sflg)
 	{
 	cout << "STATE"; cout << c ;
-	for(i=0,j=0;i<Places[0]->cnt;i++)
+	for(unsigned int i=0,j=0;i<Places[0]->cnt;i++)
 	{
 		if(st[i])
 		{
@@ -53,7 +54,7 @@ void printstate(char * c, unsigned int * st)
 		return;
 	}
 	statestream << "STATE";
-	for(i=0,j=0;i<Places[0]->cnt;i++)
+	for(unsigned int i=0,j=0;i<Places[0]->cnt;i++)
 	{
 		if(st[i])
 		{

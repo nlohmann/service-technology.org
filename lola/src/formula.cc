@@ -140,17 +140,16 @@ unsigned int untilformula::collectsubs(FType ty, formula ** subs, unsigned int p
 
 atomicformula::atomicformula(FType t, Place * pp, unsigned int kk)
 {
-  unsigned int i;
   type = t;
   p = pp;
   k = kk;
   // mark environment of p as visible
 #ifdef STUBBORN
-  for(i=0; p -> PreTransitions[i];i++)
+  for(unsigned int i=0; p -> PreTransitions[i];i++)
   {
 	p -> PreTransitions[i] -> visible = true;
   }
-  for(i=0; p -> PostTransitions[i];i++)
+  for(unsigned int i=0; p -> PostTransitions[i];i++)
   {
 	p -> PostTransitions[i] -> visible = true;
   }
@@ -334,6 +333,9 @@ bool atomicformula::initatomic()
 		case geq: if(CurrentMarking[p->index]>=k) return(value=true); return(value=false);
 		case  lt: if(CurrentMarking[p->index] <k) return(value=true); return(value=false);
 		case  gt: if(CurrentMarking[p->index] >k) return(value=true); return(value=false);
+		
+		// Karsten muss das checken!
+        default: /* this should not happen */ assert(false); return false;
 	}
 }
 
@@ -352,6 +354,9 @@ bool binarybooleanformula::initatomic()
 				   return value = false;
 		case disj: if(right -> initatomic()) return value = true;
 				   return value;
+				   
+	    // Karsten fragen
+    	default: /* this should not happen */ assert(false); return false;
 	}
 }
 
@@ -392,18 +397,25 @@ bool booleanformula::initatomic()
 			return value = true;
 		}
 		return value = false;
-	}
+		
+	// Karsten fragen
+	default: /* this should not happen */ assert(false); return false;
+	}	
 }
 
 bool unarytemporalformula::initatomic()
 {
 	element -> initatomic();
+	
+	// Karsten fragen: Rückgabe?
 }
 
 bool untilformula::initatomic()
 {
 	hold -> initatomic();
 	goal -> initatomic();
+	
+	// Karsten fragen: Rückgabe?
 }
 
 formula * hlatomicformula::copy()
@@ -958,6 +970,8 @@ void atomicformula::updateatomic()
 		case geq: if(CurrentMarking[p -> index] >= k) newvalue = true; break;
 		case gt: if(CurrentMarking[p -> index] > k) newvalue = true; break;
 		case lt: if(CurrentMarking[p -> index] < k) newvalue = true; break;
+		
+        default: break;
 	}
 	if(newvalue != value)
 	{
@@ -1052,57 +1066,64 @@ formula * atomicformula::reduce(int * res)
 	case geq: if(CurrentMarking[p -> index] >= k) * res = 1;else * res = 0; break;
 	case lt: if(CurrentMarking[p -> index] < k) * res = 1;else * res = 0; break;
 	case gt: if(CurrentMarking[p -> index] > k) * res = 1;else * res = 0; break;
+    default: break;
 	}
 	return (formula *) 0;
 }
 
 formula * unarybooleanformula::reduce(int * res)
 {
-	int subres;
-	sub = sub -> reduce(& subres);
-	if(sub) atomic = sub -> atomic;
-	switch(subres)
-	{
-	case 0: * res = 1; return (formula *) 0;
-	case 1: * res = 0; return (formula *) 0;
-	case 2: * res = 2; return this;
-	}
+    int subres;
+    sub = sub -> reduce(& subres);
+    if(sub) atomic = sub -> atomic;
+    switch(subres)
+    {
+        case 0: * res = 1; return (formula *) 0;
+        case 1: * res = 0; return (formula *) 0;
+        case 2: * res = 2; return this;
+        
+        // Karsten fragen
+        default: /* this should not happen */ assert(false); return false;
+    }
 }
 
 formula * binarybooleanformula::reduce(int * res)
 {
-	int subres1, subres2;
+    int subres1, subres2;
 
-	left = left -> reduce(& subres1);
-	right = right -> reduce(& subres2);
-	if(type == conj)
-	{
-		switch(subres1)
-		{
-		case 0: * res = 0; return (formula *) 0;
-		case 1: * res = subres2; if(right) atomic = right -> atomic; return right;
-		case 2: switch(subres2)
-				{
-				case 0: * res = 0; return (formula *) 0;
-				case 1: * res = 2; if(left) atomic = left -> atomic; return left;
-				case 2: * res = 2; if(left -> atomic && right -> atomic) atomic = true; else atomic = false; return this;
-				}
-		}
-	}
-	else
-	{
-		switch(subres1)
-		{
-		case 0: * res = subres2; if(right) atomic = right -> atomic; return right;
-		case 1: * res = 1; return (formula *) 0;
-		case 2: switch(subres2)
-				{
-				case 0: * res = 2; if(left) atomic = left -> atomic; return left;
-				case 1: * res = 1; return (formula *) 0;
-				case 2: * res = 2; if(left -> atomic && right -> atomic) atomic = true;else atomic = false; return this;
-				}
-		}
-	}
+    left = left -> reduce(& subres1);
+    right = right -> reduce(& subres2);
+    if(type == conj)
+    {
+        switch(subres1)
+        {
+            case 0: * res = 0; return (formula *) 0;
+            case 1: * res = subres2; if(right) atomic = right -> atomic; return right;
+            case 2: switch(subres2)
+            {
+                case 0: * res = 0; return (formula *) 0;
+                case 1: * res = 2; if(left) atomic = left -> atomic; return left;
+                case 2: * res = 2; if(left -> atomic && right -> atomic) atomic = true; else atomic = false; return this;
+            }
+        }
+    }
+    else
+    {
+        switch(subres1)
+        {
+            case 0: * res = subres2; if(right) atomic = right -> atomic; return right;
+            case 1: * res = 1; return (formula *) 0;
+            case 2: switch(subres2)
+            {
+                case 0: * res = 2; if(left) atomic = left -> atomic; return left;
+                case 1: * res = 1; return (formula *) 0;
+                case 2: * res = 2; if(left -> atomic && right -> atomic) atomic = true;else atomic = false; return this;
+            }
+        }
+    }
+    
+    // Karsten fragen
+    /* this should not happen */ assert(false); return false;
 }
 
 formula * booleanformula::reduce(int * res)
@@ -1192,25 +1213,31 @@ formula * unarytemporalformula::reduce(int * res)
 
 formula * untilformula::reduce(int * res)
 {
-	int subres;
-	atomic = false;
-	goal = goal -> reduce(& subres);
-	if(subres < 2)
-	{
-		* res = subres;
-		return(formula *) 0;
-	}
-	hold = hold -> reduce(& subres);
-	switch(subres)
-	{
-	case 0: * res = 2; return goal;
-	case 1: * res = 2; switch(type)
-					   {
-					   case au: return new unarytemporalformula(af,goal,tformula);
-					   case eu: return new unarytemporalformula(ef,goal,tformula);
-					   }
-	case 2: * res = 2; return this;
-	}
+    int subres;
+    atomic = false;
+    goal = goal -> reduce(& subres);
+    if(subres < 2)
+    {
+        * res = subres;
+        return(formula *) 0;
+    }
+    hold = hold -> reduce(& subres);
+    switch(subres)
+    {
+        case 0: * res = 2; return goal;
+        case 1: * res = 2; switch(type)
+        {
+            case au: return new unarytemporalformula(af,goal,tformula);
+            case eu: return new unarytemporalformula(ef,goal,tformula);
+
+                               // Karsten fragen
+            default: /* this should not happen */ assert(false); return false;
+        }
+        case 2: * res = 2; return this;
+        
+        // Karsten fragen:
+        default: /* this should not happen */ assert(false); return false;
+    }
 }
 
 formula * atomicformula::posate()
@@ -1234,6 +1261,7 @@ formula * atomicformula::negate()
 	case leq: type = gt; break;
 	case eq: type = neq; break;
 	case neq: type = eq; break;
+    default: break;
 	}
 	return this;
 }
@@ -1297,19 +1325,18 @@ formula * untilformula::posate()
 void update_formula(Transition * t)
 {
     // update value of formula after having fired t
-    unsigned int i,j;
 
 #ifdef WITHFORMULA
-    for(i=0;t->DecrPlaces[i] < Places[0]->cnt;i++)
+    for(unsigned int i=0;t->DecrPlaces[i] < Places[0]->cnt;i++)
     {
-        for(j=0; j < Places[t->DecrPlaces[i]] -> cardprop;j++)
+        for(unsigned int j=0; j < Places[t->DecrPlaces[i]] -> cardprop;j++)
         {
             Places[t->DecrPlaces[i]]->propositions[j] -> updateatomic();
         }
     }
-    for(i=0;t->IncrPlaces[i] < Places[0]->cnt;i++)
+    for(unsigned int i=0;t->IncrPlaces[i] < Places[0]->cnt;i++)
     {
-        for(j=0; j < Places[t->IncrPlaces[i]] -> cardprop;j++)
+        for(unsigned int j=0; j < Places[t->IncrPlaces[i]] -> cardprop;j++)
         {
             Places[t->IncrPlaces[i]]->propositions[j] -> updateatomic();
         }
@@ -1328,7 +1355,7 @@ Transition ** booleanformula::spp2(State * s)
 	}
 	for(i=0;i<cardsub;i++)
 	{
-		if(fl = sub[i] -> spp2(s))
+		if( (fl = sub[i] -> spp2(s)) )
 		{
 			return fl;
 		}
@@ -1342,6 +1369,8 @@ Transition ** stubbornfirelist(State *, formula *);
 
 Transition ** atomicformula::spp2(State * s)
 {
+    // Karsten fragen: Rückgabewert immer definiert?
+    
 #if defined(RELAXED) && ! defined(STRUCT)
 	unsigned int i;
 

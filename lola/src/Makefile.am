@@ -30,4 +30,3 @@ EXTRA_DIST = readnet-syntax.h
 lola_CFLAGS = @configured_CFLAGS@
 lola_CXXFLAGS = @configured_CXXFLAGS@
 lola_LDFLAGS = @configured_LDFLAGS@
-

@@ -108,8 +108,8 @@ inline State::State()
 	checktarlevel = new unsigned int [ F -> tempcard];
 	for(int i=0;i<F->tempcard;i++)
 	{
-		witness[i] = (State *) 0;
-		witnesstransition[i] = (Transition *) 0;
+		witness[i] = NULL;
+		witnesstransition[i] = NULL;
 		checkexpired[i] = false;
 		checktarlevel[i] = 0;
    	}
@@ -282,8 +282,8 @@ inline Decision::Decision(unsigned int p)
   next = new Decision * [2];
   value = new unsigned int [2];
   index = new unsigned int [2];
-  next[0] = (Decision *) 0;
-  next[1] = (Decision *) 0;
+  next[0] = NULL;
+  next[1] = NULL;
 }
 
 inline void Decision::insert(unsigned int v, Statevector * vec, unsigned int idx,Decision *nxt)
@@ -393,14 +393,14 @@ inline State * search_marking()
   Statevector * & v = LastVector;
 
   // 0. Hashabelle leer -> alles klar
-  v = (Statevector *) 0;
-  if(!(d = HashTable[HASHENTRY])) return (State *) 0;
+  v = NULL;
+  if(!(d = HashTable[HASHENTRY])) return NULL;
   i = 0;
   while(d)
     {
       // 1. Interpolationssuche in Tabelle
-      if(MARKINGVECTOR[i] < d -> value[0]) return (State *) 0;
-      if(MARKINGVECTOR[i] > d -> value[d->size - 1]) return (State *) 0; 
+      if(MARKINGVECTOR[i] < d -> value[0]) return NULL;
+      if(MARKINGVECTOR[i] > d -> value[d->size - 1]) return NULL; 
       if(MARKINGVECTOR[i] == d -> value[0])
 	{
 	  // found, no interpolation necessary
@@ -440,7 +440,7 @@ inline State * search_marking()
 		}
 	      if(l != r) // this means: not found!
 		{
-		  return (State *) 0; 
+		  return NULL; 
 		}
 	    }
 	}
@@ -449,7 +449,7 @@ inline State * search_marking()
       v = d -> vector[m];
       for(j=d->index[m]+1;i < (d->next[m] ? d -> next[m] -> PlaceNr : Places[0]-> NrSignificant); i++,j++)
 	{
-	  if((*(d -> vector[m]))[j] != MARKINGVECTOR[i]) return (State *) 0;
+	  if((*(d -> vector[m]))[j] != MARKINGVECTOR[i]) return NULL;
 	}
       d = d -> next[m];
     } // while d
@@ -469,9 +469,9 @@ inline State * bit_search()
 #else
 	canonize_on_the_fly();
 #endif
-	return ( BitHashTable[kanhash/MPERWORD] >> (kanhash % MPERWORD) & 1 ) ? CurrentState : (State *) 0;
+	return ( BitHashTable[kanhash/MPERWORD] >> (kanhash % MPERWORD) & 1 ) ? CurrentState : NULL;
 #else
-	return ( BitHashTable[Places[0]->hash_value/MPERWORD] >> (Places[0]->hash_value % MPERWORD) & 1 ) ? CurrentState : (State *) 0;
+	return ( BitHashTable[Places[0]->hash_value/MPERWORD] >> (Places[0]->hash_value % MPERWORD) & 1 ) ? CurrentState : NULL;
 #endif
 }
 
@@ -747,7 +747,7 @@ inline State * insert_marking()
 	    {
 	      sv -> set(i - Scapegoat,MARKINGVECTOR[i]);
 	    }
-	  LastDecision -> insert(MARKINGVECTOR[Scapegoat],sv,0,(Decision *) 0);
+	  LastDecision -> insert(MARKINGVECTOR[Scapegoat],sv,0, NULL);
 #if (defined(SYMMETRY) && SYMMINTEGRATION == 2)
 	  sv -> prev = LastVector;
 #endif
@@ -784,7 +784,7 @@ inline State * insert_marking()
 	  NewDecision -> value[newindex] = MARKINGVECTOR[Scapegoat];
 	  NewDecision -> vector[newindex] = sv;
 	  NewDecision -> index[newindex] = 0;
-	  NewDecision -> next[newindex] = (Decision *) 0;
+	  NewDecision -> next[newindex] = NULL;
 #if defined(COVER) || defined(TARJAN) || defined(MODELCHECKING)
 	  sv -> state = new State;
 #endif
@@ -806,7 +806,7 @@ inline State * insert_marking()
       d -> size = 1;
       d -> value[0] = MARKINGVECTOR[0];
       d -> index[0] = 0;
-      d -> next[0] = (Decision *) 0;
+      d -> next[0] = NULL;
       sv = d -> vector[0] = new Statevector(Places[0] -> NrSignificant);
       for(i=0;i< Places[0]-> NrSignificant;i++)
 	{
@@ -816,7 +816,7 @@ inline State * insert_marking()
       sv -> state = new State;
 #endif
 #if (defined(SYMMETRY) && SYMMINTEGRATION == 2)
-      sv -> prev = (Statevector *) 0;
+      sv -> prev = NULL;
 #endif
       HashTable[HASHENTRY] = d; 
 #if defined(COVER) || defined(TARJAN) || defined(MODELCHECKING)
@@ -1019,7 +1019,7 @@ inline binDecision::binDecision(int b)
 {
 	unsigned int i;
 	bitnr = b;
-	nextold = nextnew = (binDecision *) 0;
+	nextold = nextnew = NULL;
 	vector = new unsigned char [ (BitVectorSize - (bitnr + 2) ) / 8 + 2];
 	for(i=0;i<(BitVectorSize - (bitnr + 2) ) / 8 + 1;i++)
 	{
@@ -1089,7 +1089,7 @@ inline State * bin_symm_search_marking()
 	cout << endl;
   if(!binHashTable[Places[0]->hash_value])
     {
-      return (State *) 0;
+      return NULL;
     }
   if((st = symm_first_binSearch()))
     {
@@ -1133,7 +1133,7 @@ inline State * bin_symm_search_marking()
         vectordec = vector;
 #endif
 	todec = to;
-  return (State *) 0;
+  return NULL;
 }
       
 inline State * binSearch(binDecision * Bucket)
@@ -1142,7 +1142,7 @@ inline State * binSearch(binDecision * Bucket)
 	// search the state given in MARKINGVECTOR in the binHashTable
 	if(!( fromdec = Bucket)) 
 	{
-		return (State *) 0;
+		return NULL;
 	}
 	
 	bin_p = 0; bin_pb = 0; bin_s = 0; bin_t = 0; bin_b = 0;
@@ -1194,7 +1194,7 @@ checkagain:     if(todec)
 		// case 1: no difference or difference before "to" branch = state not found
 				if(bin_d < 8)
 				{
-					return (State *) 0;
+					return NULL;
 				}
 				else
 				{
@@ -1243,7 +1243,7 @@ checkagain:     if(todec)
 		// case 4: no difference or state not found
 			if(bin_d < 8)
 			{
-				return (State *) 0;
+				return NULL;
 			}
 			else
 			{
@@ -1280,7 +1280,7 @@ inline State * binInsert(binDecision ** Bucket)
 			vbi =  (vbi + Places[bin_p] -> nrbits) % 8;
 		}
 #if (defined(SYMMETRY) && SYMMINTEGRATION == 2)
-		(*Bucket)->prev = (binDecision *) 0;
+		(*Bucket)->prev = NULL;
 #endif
 
 #if defined(TARJAN) || defined(MODELCHECKING) || defined(COVER) 
@@ -1412,7 +1412,7 @@ inline void binDelete(binDecision ** Bucket)
 	{
 		// top level state is last state in list
 		delete [] (*Bucket) -> vector;
-		*Bucket = (binDecision *) 0;
+		*Bucket = NULL;
 	}
 }
 
@@ -1432,7 +1432,7 @@ inline void binDeleteAll(int h)
 	if(!binHashTable[h]) return;
 	binDeleteAll(binHashTable[h] -> nextold);
 	delete [] binHashTable[h] -> vector;
-	binHashTable[h] = (binDecision *) 0;
+	binHashTable[h] = NULL;
 }
 
 inline State * symm_first_binSearch()
@@ -1500,7 +1500,7 @@ checkagain:     if(todec)
 					while(1)
 					{	
 						s -= pb;
-						if(s <= bin_d) return (State *) 0;
+						if(s <= bin_d) return NULL;
 						Scapegoat--;
 						pb = Places[Scapegoat] -> nrbits;
 					}
@@ -1560,7 +1560,7 @@ checkagain:     if(todec)
 				while(1)
 				{	
 					s -= pb;
-					if(s <= bin_d) return (State *) 0;
+					if(s <= bin_d) return NULL;
 					Scapegoat--;
 					pb = Places[Scapegoat] -> nrbits;
 				}
@@ -1646,7 +1646,7 @@ checkagain:     if(todec)
 					while(1)
 					{	
 						s -= pb;
-						if(s <= bin_d) return (State *) 0;
+						if(s <= bin_d) return NULL;
 						Scapegoat--;
 						pb = Places[Scapegoat] -> nrbits;
 					}
@@ -1706,7 +1706,7 @@ checkagain:     if(todec)
 				while(1)
 				{	
 					s -= pb;
-					if(s <= bin_d) return (State *) 0;
+					if(s <= bin_d) return NULL;
 					Scapegoat--;
 					pb = Places[Scapegoat] -> nrbits;
 				}

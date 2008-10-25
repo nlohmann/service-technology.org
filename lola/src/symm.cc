@@ -36,7 +36,7 @@ Reaktoreintrag::Reaktoreintrag()
 {
   stamp = 0;
   count = 0;
-  Node * node;
+  Node * node; // unused?
 }
 
 Reaktoreintrag * Reaktor[2][2];
@@ -127,7 +127,7 @@ void ArcSort(Arc ** list,unsigned int from, unsigned int to)
 
 void init_syms()
 {
-  int i;
+  // int i;
   
   ToDoList[PL] = ToDoList[TR] = (ToDo *) 0;
   CardSpecification[PL] = CardSpecification[TR] = 1;
@@ -141,12 +141,12 @@ void init_syms()
   Reaktor[PL][CO] = new Reaktoreintrag [Places[0]->cnt];
   Reaktor[TR][DO] = new Reaktoreintrag [Transitions[0]->cnt];
   Reaktor[TR][CO] = new Reaktoreintrag [Transitions[0]->cnt];
-  for(i=0;i<Places[0]->cnt;i++)
+  for(unsigned i=0;i<Places[0]->cnt;i++)
     {
       if(Places[i]->NrOfLeaving)  ArcSort(Places[i]->LeavingArcs,0,Places[i]->NrOfLeaving - 1);
       if(Places[i]->NrOfArriving) ArcSort(Places[i]->ArrivingArcs,0,Places[i]->NrOfArriving - 1);
     }
-  for(i=0;i<Transitions[0]->cnt;i++)
+  for(unsigned i=0;i<Transitions[0]->cnt;i++)
     {
       if(Transitions[i]->NrOfLeaving) ArcSort(Transitions[i]->LeavingArcs,0,Transitions[i]->NrOfLeaving - 1);
       if(Transitions[i]->NrOfArriving) ArcSort(Transitions[i]->ArrivingArcs,0,Transitions[i]->NrOfArriving - 1);
@@ -336,7 +336,8 @@ void SplitTransitionsInVorReaktor(unsigned int c,unsigned int attribute(Node *))
 
 void InitialConstraint()
 {
-  unsigned int c,b,i,bmax,cmax;
+  unsigned int c,b,bmax,cmax;
+  // unused: unsigned int i;
 
   // split acc. to nr of arriving arcs
   SplitPlacesInVorReaktor(0,get_card_arcs_in);
@@ -438,7 +439,7 @@ void InitialConstraint()
 	// equivalence. Doing it here seems to be a good approximation.
 	for(c=0;c<CardSpecification[TR];c++)
 	{
-		for(i=Specification[TR][c].first;i <= Specification[TR][c].last;i++)
+		for(unsigned int i=Specification[TR][c].first;i <= Specification[TR][c].last;i++)
 		{
 			if(Transitions[i]->cyclic)
 			{
@@ -765,7 +766,7 @@ bool Refine(NodeType n, unsigned int ref)
 {
   unsigned int m1,m2,i,j,arcdir,otherarcdir,currentcardarc,dir,othern,c,cmax;
   Reaktoreintrag * r;
-  Arc * a,* aa;
+  // unused: Arc * a,* aa;
 
   othern = n ? PL : TR;
   for(arcdir = DO; arcdir < 2; arcdir++)
@@ -867,7 +868,7 @@ bool RefineUntilNothingChanges(NodeType n)
 void ReUnify(unsigned int plpegel, unsigned int trpegel)
 {
   unsigned int c;
-  NodeType n;
+  // unused: NodeType n;
   
   for(c = CardSpecification[PL]-1; c >= plpegel;c--)
     {
@@ -905,7 +906,8 @@ void ReUnify(unsigned int plpegel, unsigned int trpegel)
 
 void StoreSymmetry(unsigned int pos)
 {
-  unsigned int offset,i,c,*v;
+  unsigned int offset,c,*v;
+  // unused: unsigned int i;
   
   offset = Store[CurrentStore].arg->nr;
   v = Store[CurrentStore].image[pos].vector = new unsigned int [Places[0]->cnt - offset];
@@ -997,10 +999,11 @@ void WriteSymms()
 void DefineToOther(unsigned int imagepos)
 {
   Node ** possibleImages;
-  unsigned int cntriv,intriv,i,k,j;
-  NodeType type;
+  unsigned int cntriv,i,j;
+  // unused: unused int intriv, k;
+  // unused: NodeType type;
   Reaktoreintrag swap;
-  DomType dir;
+  // unused: DomType dir;
   unsigned int MyCardSpecification[2];
 
   for(cntriv = 0; Specification[PL][cntriv].first == Specification[PL][cntriv].last;cntriv++);
@@ -1064,10 +1067,11 @@ bool found;
 void OnlineDefineToOther()
 {
   Node ** possibleImages;
-  unsigned int cntriv,intriv,i,k,j;
-  NodeType type;
+  unsigned int cntriv,i,j;
+  // unused: unsigned int intriv, k;
+  // unused: NodeType type;
   Reaktoreintrag swap;
-  DomType dir;
+  // unused: DomType dir;
   unsigned int MyCardSpecification[2];
 
   for(cntriv = 0; Specification[PL][cntriv].first == Specification[PL][cntriv].last;cntriv++);
@@ -1131,10 +1135,11 @@ void OnlineCanonize()
 {
   unsigned int * swaprep;
   Node ** possibleImages;
-  unsigned int cn, cntriv,intriv,i,k,j;
-  NodeType type;
+  unsigned int cn, cntriv,i,j;
+  // unused: unsigned int intriv, k;
+  // unused: NodeType type;
   Reaktoreintrag swap;
-  DomType dir;
+  // unused: DomType dir;
   unsigned int MyCardSpecification[2];
   unsigned int SourceIndex;
   unsigned int maxmarking, checkmarking;
@@ -1253,12 +1258,14 @@ void OnlineCanonize()
 void DefineToId(void)
 {
       
-  unsigned int cntriv,nrmin,intriv,c,i,j,k,MyCardSpecification[2],MyStorePosition,current,composed,val,oldstorenr;
-  NodeType type;
+  unsigned int cntriv,nrmin,intriv,c,i,j,k,MyCardSpecification[2],MyStorePosition,composed,val,oldstorenr;
+  // unused: unsigned int current;
+  // unused: NodeType type;
   Reaktoreintrag swap;
   DomType dir;
-  SymmImage * sigma,* svec;
-      
+  SymmImage * sigma;
+  // unused: SymmImage * svec;     
+
   cntriv = CardSpecification[PL]-1;
   nrmin = UINT_MAX;
   for(c=0;c<CardSpecification[PL];c++)
@@ -1387,7 +1394,7 @@ void ComputeSymmetries(void)
 {
   unsigned int i,j;
   unsigned long int CardSymm;
-  unsigned int h;
+  // unused: unsigned int h;
   unsigned int plp,trp;
 
   cout << "\n computing symmetries...\n";
@@ -1504,10 +1511,10 @@ void ComputeSymmetries(void)
 void ComputePartition(void)
 {
   unsigned int i,j;
-  unsigned long int CardSymm;
-  unsigned int h;
+  // unused: unsigned long int CardSymm;
+  // unused: unsigned int h;
   unsigned int c;
-  unsigned int plp,trp;
+  // unused: unsigned int plp,trp;
 
   cout << "\n partitioning nodes wrt symmetries...\n";
   init_syms();
@@ -1609,7 +1616,7 @@ unsigned int NextSymm(unsigned int scg)
   // return value > #PL --> no more symm.
 
 
-  int i,j,l,m,r;
+  int l,m,r;
   SymmStore * sigma;
   
   // search the largest argument less or equal to scg
@@ -1654,13 +1661,13 @@ unsigned int NextSymm(unsigned int scg)
     };
   sigma = Store+m;
   sigma ->current--;
-  for(i=sigma->argnr;i< Places[0]->cnt;i++)
+  for(unsigned int i=sigma->argnr;i< Places[0]->cnt;i++)
     {
       CurrentSymm[i] = sigma->reference[sigma->image[sigma->current].vector[i-sigma->argnr]-sigma->argnr];
     }
-  for(i = m+1; i < CardStore;i++)
+  for(unsigned int i = m+1; i < CardStore;i++)
     {
-      for(j = Store[i].argnr;j < Places[0]->cnt;j++)
+      for(unsigned int j = Store[i].argnr;j < Places[0]->cnt;j++)
 	{
 	  Store[i].reference[j - Store[i].argnr] = CurrentSymm[j];
 	}
@@ -1867,7 +1874,7 @@ State * symm_search2(Decision * d)
   
 State * symm_search_marking2()
 {
-  int i;
+  // unused: int i;
   
   
   State * s;
@@ -1875,7 +1882,7 @@ State * symm_search_marking2()
   Statevector * lv;
   unsigned int lc,li;
   
-  if(s = search_marking())
+  if( (s = search_marking()) )
     {
       return s;
     }
@@ -1884,25 +1891,23 @@ State * symm_search_marking2()
   li = Scapegoat;
   lc = LastChoice;
   if(HashTable[Places[0]->hash_value])
-    {
-      int i;
-  
+  {
       NewStamp();
-      for(i=0;i<Places[0]->cnt;i++)
-	{
-	  Reaktor[PL][DO][i].count = CurrentMarking[((Place *) Reaktor[PL][DO][i].node)->index];
-	  Reaktor[PL][DO][i].stamp = Stamp;
-	}
-      for(i=0;i < CardSpecification[PL];i++)
-	{
-	  CountSort(PL,DO,Specification[PL][i].first,Specification[PL][i].last);
-	}
+      for(unsigned int i=0;i<Places[0]->cnt;i++)
+      {
+          Reaktor[PL][DO][i].count = CurrentMarking[((Place *) Reaktor[PL][DO][i].node)->index];
+          Reaktor[PL][DO][i].stamp = Stamp;
+      }
+      for(unsigned int i=0;i < CardSpecification[PL];i++)
+      {
+          CountSort(PL,DO,Specification[PL][i].first,Specification[PL][i].last);
+      }
       LastDecision = ld;
       LastVector = lv;
       Scapegoat = li;
       LastChoice = lc;
       return symm_search2(HashTable[Places[0]->hash_value]);
-    }
+  }
   LastDecision = ld;
   LastVector = lv;
   Scapegoat = li;
@@ -2073,47 +2078,45 @@ State * bin_symm_search2(binDecision * d)
   
 State * bin_symm_search_marking2()
 {
-  int i;
-  
-  
-  State * s;
+  // unused: int i;
+
+
+    State * s;
   //Decision * ld;
   //Statevector * lv;
   //unsigned int lc,li;
-  
-  if(s = binSearch())
+
+    if( (s = binSearch()) )
     {
-      return s;
+        return s;
     }
   //ld = LastDecision;
   //lv = LastVector;
   //li = Scapegoat;
   //lc = LastChoice;
-  if(binHashTable[Places[0]->hash_value])
+    if(binHashTable[Places[0]->hash_value])
     {
-      int i;
-  
-      NewStamp();
-      for(i=0;i<Places[0]->cnt;i++)
-	{
-	  Reaktor[PL][DO][i].count = CurrentMarking[((Place *) Reaktor[PL][DO][i].node)->index];
-	  Reaktor[PL][DO][i].stamp = Stamp;
-	}
-      for(i=0;i < CardSpecification[PL];i++)
-	{
-	  CountSort(PL,DO,Specification[PL][i].first,Specification[PL][i].last);
-	}
+        NewStamp();
+        for(unsigned i=0;i<Places[0]->cnt;i++)
+        {
+            Reaktor[PL][DO][i].count = CurrentMarking[((Place *) Reaktor[PL][DO][i].node)->index];
+            Reaktor[PL][DO][i].stamp = Stamp;
+        }
+        for(unsigned i=0;i < CardSpecification[PL];i++)
+        {
+            CountSort(PL,DO,Specification[PL][i].first,Specification[PL][i].last);
+        }
   //    LastDecision = ld;
    //   LastVector = lv;
     //  Scapegoat = li;
      // LastChoice = lc;
-      return bin_symm_search2(binHashTable[Places[0]->hash_value]);
+        return bin_symm_search2(binHashTable[Places[0]->hash_value]);
     }
   //LastDecision = ld;
   //LastVector = lv;
   //Scapegoat = li;
   //LastChoice = lc;
-  return (State *) 0;
+    return (State *) 0;
 }
 
 void canonize_on_the_fly()

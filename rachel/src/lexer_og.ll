@@ -40,7 +40,7 @@ class Formula;
 #include "syntax_og.h"
 
 extern char* G_filename;
-extern int og_yyerror(char *msg);
+extern int og_yyerror(char const *msg);
 %}
 
 %s COMMENT
@@ -93,7 +93,7 @@ OUTPUT                                  { return key_output;      }
 %%
 
 
-int og_yyerror(char *msg) {
+int og_yyerror(char const *msg) {
     assert(msg != NULL);
     assert(og_yytext != NULL);
     assert(G_filename != NULL);

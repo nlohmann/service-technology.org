@@ -809,7 +809,7 @@ void BddRepresentation::print() {
 
 
 //! \brief save bddMp and bddAnn in file
-void BddRepresentation::save(char* option) {
+void BddRepresentation::save(char const* option) {
     int size = nbrLabels + maxNodeBits;
     char** names = new char*[size];
 

@@ -17,6 +17,8 @@
 @item updated documentation
 
 @item the configure script now takes care about the compilation flags; for example @command{./configure --enable-64bit} sets the flags necessary to build a 64 bit executable with @command{make}
+
+@item adapted code to avoid deprecation warnings of GCC 4.2
 @end itemize
 
 

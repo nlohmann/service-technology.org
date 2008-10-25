@@ -5,7 +5,7 @@
 #include <strings.h>
 #include <stdio.h>
 
-extern void yyerror(char *);
+extern void yyerror(char const *);
 
 UBooType * TheBooType;
 UNumType * TheNumType;
@@ -1099,7 +1099,7 @@ void UFunction::addresult(UValue * va)
 	result = v;
 }
 
-void runtimeerror(char * mess)
+void runtimeerror(char const * mess)
 {
 	cerr << "Run time error: " << mess << endl;
 	exit(3);

@@ -59,7 +59,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @c --------------------------------------------------------------------------
 
 @menu
-* What is Fiona?::What is Fiona?
+* Introduction::Introduction
 * First Steps::How to set up and install Fiona.
 * Command Line Options::How to run Fiona.
 * ChangeLog::Version history.
@@ -73,8 +73,32 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @c --------------------------------------------------------------------------
 
-@node What is Fiona?
-@chapter What is Fiona?
+@node Introduction
+@chapter Introduction
+
+This documentation presents Fiona, a tool to analyze the interaction of services. Its features cover the check of controllability and the construction of an operating guideline of a service as well as other derived notions. @i{Controllability} [1,2] is a minimal correctness criterion of a service stating the existence of a behaviorally compatible partner for the service. An @i{operating guideline} (OG) [3] of a service is an operational characterization of @i{all} behaviorally compatible partners of this service. As a formal model for services Fiona uses @i{open nets} [4,3], a special class of Petri nets that extend classical Petri nets by an interface for communication with other open nets.
+
+The development of Fiona started in 2006 as a reimplementation of a tool called Wombat (available at @url{http://www.informatik.hu-berlin.de/top/wombat}). Wombat was designed to constructively decide controllability of an open net (called workflow module in Wombat). The main reasons for a reimplementation were (1) a completely new theoretical foundation for deciding controllability, (2) a desired focus on efficiency rather than mere effectiveness, (3) the newly developed concept of an operating guideline, and, thus, (4) the need for a separation of computing compatible interactions from reduction rules to ensure efficiency of the algorithms.
+
+Currently, Fiona is developed distributedly by the groups of Wolfgang Reisig (Humboldt-Universit@"at zu Berlin, Germany) and Karsten Wolf (University of Rostock, Germany). It is maintained by Daniela Weinberg, Peter Massuthe, and Karsten Wolf (coordinator).
+
+Fiona is released as free software under the terms of the GNU General Public License. It is written in C++ and its distribution is based on the GNU autotools, which provide the possibility to run Fiona on most operating systems. It compiles on Microsoft Windows (with Cygwin), UNIX (Solaris), Linux, and Mac OS X.
+
+The functionality of Fiona comprises (among others) the following main analysis scenarios:
+
+@itemize
+@item @b{Controllability.} Controllability of an open net @math{N} is decided by synthesizing a partner of @math{N} (as an automaton called @i{interaction graph} (IG) [2]). If no partner can be synthesized (i.e., the IG is empty), then @math{N} is uncontrollable.
+
+@item @b{Operating guideline.} An operating guideline (OG) [3] is a finite characterization of @i{all} behaviorally compatible partners by annotating a single partner (as automaton) with Boolean formulae in order to derive all other partners.
+
+@item @b{Matching.} Given an open net @math{M} and an operating guideline @math{OG_N} of an open net @math{N}, Fiona decides whether @math{M} is behaviorally compatible to @math{N} by matching @math{M} with @math{OG_N}. Matching is more efficient than composing the two nets and model checking the composition (as proposed by other approaches, like the @i{public view} approach).
+
+@item @b{Partner synthesis.} Given an open net @math{N}, Fiona computes a behaviorally compatible partner open net @math{M} (if possible). The synthesis can be triggered to construct a small @math{M} (with respect to communication) or a partner @math{M} which exhaustively communicates with @math{N}.
+@end itemize
+
+Fiona is a stand-alone tool, designed to be used as a background service of existing service modeling tools. Therefore, Fiona has no graphical interface -- the analysis task as well as the input file(s) are given to Fiona via command line options. Fiona then computes and reports the result and, if needed, generates the output file(s).
+
+
 
 
 

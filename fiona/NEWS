@@ -9,6 +9,8 @@
 Version 3.1-unreleased
 ======================
 
+* adapted code to avoid deprecation warnings of GCC 4.2
+
 * ChangeLogs are now generated from Texinfo documentation
 
 

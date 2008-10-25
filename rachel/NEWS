@@ -38,6 +38,8 @@ Version 1.11-unreleased
   example `./configure --enable-64bit' sets the flags necessary to build a 64
   bit executable with `make'
 
+* adapted code to avoid deprecation warnings of GCC 4.2
+
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for
 complete version history.

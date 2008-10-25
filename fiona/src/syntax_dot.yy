@@ -42,7 +42,7 @@
 #include <stack>
 #include "dot2tex.h"
 #include "GastexGraph.h"
-int dot_yyerror(char *s);
+int dot_yyerror(char const *s);
 int dot_yylex(void);
 
 using namespace std;
@@ -532,10 +532,6 @@ int dot_yyerror(string s) {
   cerr << "ERROR: " << s << " at symbol \"" << dot_yytext;
   cerr << "\" on line " << dot_yylineno << endl;
   exit(1);
-}
-
-int yyerror(char *s) {
-  return yyerror(string(s));
 }
 
 int yyerror(char const *s) {

@@ -66,7 +66,7 @@ class BddRepresentation {
         void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
         void printDotFile(char** names = NULL, char* option = "OG");
         void print();
-        void save(char* option = "OG");
+        void save(char const* option = "OG");
         void printMemoryInUse();
 
         // Provides user defined operator new. Needed to trace all new

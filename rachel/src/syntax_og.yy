@@ -19,11 +19,12 @@ extern char *G_filename;
 // from flex
 extern char* og_yytext;
 extern int og_yylex();
-extern int og_yyerror(char *msg);
+extern int og_yyerror(char const *msg);
 %}
 
 // Bison options
 %name-prefix="og_yy"
+%error-verbose
 
 %token key_nodes key_initialnode key_finalnode key_transitions
 %token key_interface key_input key_output

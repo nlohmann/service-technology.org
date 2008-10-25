@@ -2,6 +2,8 @@
 @itemize
 @item completed documentation
 
+@item adapted code to avoid deprecation warnings of GCC 4.2
+
 @item updated @option{-h} output
 
 @item removed old manual @file{lola-old.ps} from documentation

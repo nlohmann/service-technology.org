@@ -13,7 +13,7 @@ extern UBooType * TheBooType;
 extern UNumType * TheNumType;
 
 #define YYDEBUG 1
-void yyerror(char *);
+void yyerror(char const *);
 
 class arc_list
 {
@@ -71,7 +71,8 @@ VaSymbol * VS;
 }
 
 
-///// 3 LINES ADDED BY NIELS
+///// 4 LINES ADDED BY NIELS
+%error-verbose
 %token_table
 %defines
 %yacc
@@ -2148,7 +2149,7 @@ int yywrap()
 }
 */
 
-void yyerror(char * mess)
+void yyerror(char const * mess)
 {
         printf("syntaxerror at line %d of file %s:  %s\n",yylineno, diagnosefilename,mess);
 		exit(3);

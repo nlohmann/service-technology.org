@@ -37,7 +37,7 @@
 %{
 #include "dot2tex.h"
 #include "syntax_dot.h"
-int dot_yyerror(char *s);
+int dot_yyerror(char const *s);
 %}
 
 alpha       [a-zA-Z_]

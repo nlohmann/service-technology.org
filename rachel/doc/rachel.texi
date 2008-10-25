@@ -153,7 +153,7 @@ The distribution contains several directories:
 The Texinfo documentation of Rachel and a @acronym{PDF} file @file{background.pdf} with a short description of the setting in which Rachel should be used. The documentation can be created using @samp{make pdf}. Note you need to have Rachel properly installed before (see Installation description above).
 
 @item exp
-Experiments and case studies published in several papers. For each file, say @file{bpm2008.tar.gz}, a Makefile target @samp{bpm2008} exists. You can run all experiments with @samp{make experiments}. Note you need to have Rachel properly installed before (see Installation description above).
+Experiments and case studies published in several papers. For each file, say @file{bpm2008.tar.gz}, a Makefile target @samp{bpm2008} exists. You can run all experiments with @samp{make experiments}.
 
 @item man
 The manpage of Rachel which can be displayed using @samp{man rachel} after having Rachel installed (see Installation description above).

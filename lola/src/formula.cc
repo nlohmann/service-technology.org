@@ -10,7 +10,7 @@ unsigned int TemporalIndex;
 bool * DeadStatePathRestriction;
 unsigned int xoperators = 0;
 
-void yyerror(char *);
+void yyerror(char const *);
 
 hlatomicformula::hlatomicformula(FType t, PlSymbol * pp, UExpression * te)
 {

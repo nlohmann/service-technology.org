@@ -11,6 +11,8 @@ Version 1.11-unreleased
 
 * completed documentation
 
+* adapted code to avoid deprecation warnings of GCC 4.2
+
 * updated `-h' output
 
 * removed old manual `lola-old.ps' from documentation

@@ -2234,8 +2234,14 @@ string AnnotatedGraph::createOGFile(const string& filenamePrefix, bool hasOWFN) 
             ogFile << ',' << endl;
         }
 
-        ogFile << "  " << node->getName() << " : "
-                << node->getAnnotationAsString() << " : " << node->getColor().toString();
+        ogFile << "  " << node->getName() << " : ";
+        string annotation = node->getAnnotationAsString();
+        if ( annotation.find(", ") != string::npos ) {
+            ogFile << "[" << annotation << "]";
+        } else {
+            ogFile << annotation;
+        }
+        ogFile << " : " << node->getColor().toString();
 
         if (node->isFinal()) {
             ogFile << " : finalnode";
@@ -2272,7 +2278,13 @@ string AnnotatedGraph::createOGFile(const string& filenamePrefix, bool hasOWFN) 
                 ogFile << ',' << endl;
             }
 
-            ogFile << "  " << node->getName() << " -> " << edge->getDstNode()->getName() << " : " << edge->getLabel();
+            ogFile << "  " << node->getName() << " -> " << edge->getDstNode()->getName() << " : ";
+            string annotation = edge->getLabel();
+            if ( annotation.find(", ") != string::npos ) {
+                ogFile << "[" << annotation << "]";
+            } else {
+                ogFile << annotation;
+            }
 
             printedFirstEdge = true;
         }

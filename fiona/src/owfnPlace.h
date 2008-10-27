@@ -64,6 +64,9 @@ class owfnPlace : public Node {
         
         /// constructor
         owfnPlace(const std::string&, placeType, oWFN *);
+
+        /// copy constructor
+        owfnPlace(owfnPlace *, oWFN*);
         
         /// basic deconstructor
         ~owfnPlace();
@@ -134,7 +137,10 @@ class owfnPlace : public Node {
 #endif
 
         /// set the port of the place
-        void set_port(const std::string port);
+        void setPort(const std::string port);
+
+        /// get the port of the place
+        std::string getPort();
 
         /// Provides user defined operator new. Needed to trace all new
         // operations on this class.

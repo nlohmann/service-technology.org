@@ -200,7 +200,6 @@ class oWFN {
         unsigned int* CurrentMarking;
         list<unsigned int*> FinalMarkingList;
         formula* FinalCondition;
-        std::string finalConditionString;
         std::string finalMarkingString;
         State* currentState;
 
@@ -396,7 +395,8 @@ class oWFN {
         bool isMinimal();
         
         /// is the given marking == final marking of the net?
-        bool isFinal() const; // does current marking satisfy final condition/final marking of the net?
+        /// or does current marking satisfy final condition/final marking of the net
+        bool isFinal() const;
 
         /// prints the current marking
         void printCurrentMarking() const;
@@ -437,9 +437,15 @@ class oWFN {
 
         /// returns a pointer to this petrinet in the PNapi net format
         PNapi::PetriNet* returnPNapiNet();
+
+        /// returns true iff this owfn is normal
+        bool isNormal();
     
         /// returns a pointer to a normalized copy of this petrinet in the oWFN format
         oWFN* returnNormalOWFN();
+
+        /// returns the labeled core of the given oWFN which is necessary for matching
+        oWFN* returnMatchingOWFN();
 
         /// restricts the oWFN to a given port (i.e., removes all other ports)
         void restrictToPort(const std::string &portName);

@@ -66,6 +66,7 @@ extern int og_yylex();
 AnnotatedGraph* OGToParse;
 map<string, AnnotatedGraphNode*> nodes;
 bool readInputPlacenames;
+string identString;
 
 void og_yyerror_unknown_node(const std::string& nodeName)
 {
@@ -92,9 +93,10 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
 %token key_nodes key_initialnode key_transitions
 %token key_interface key_input key_output
 %token key_red key_blue
+%token lbracket rbracket // left/open and right/close squared bracket
 %token comma colon semicolon ident arrow
 %token key_true key_false key_finalnode
-%token lpar rpar
+%token lpar rpar         // left and right parenthesis
 
 %left op_or
 %left op_and
@@ -122,7 +124,11 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
 
 /* Grammar rules */
 
-og: interface nodes initialnode transitions
+og:
+    {
+        identString = ""; // initialize identString
+    }
+interface nodes initialnode transitions
     {
         nodes.clear();
     }
@@ -202,6 +208,28 @@ formula: lpar formula rpar
         $$ = new GraphFormulaLiteral($1);
         free($1);
     }
+| lbracket ident_list rbracket
+    {
+        $$ = new GraphFormulaLiteral(identString);
+        identString = "";
+    }
+;
+
+/* ident_list builds the global variable identString out of read idents */
+ident_list: ident_list comma ident
+    {
+        string temp($3);
+        identString = identString + ", " + temp;
+        temp = "";
+        free($3);
+    }
+| ident
+    {
+        string temp($1);
+        identString += temp;
+        temp = "";
+        free($1);
+    }
 ;
 
 color_optional: colon key_blue
@@ -275,5 +303,19 @@ transition: ident arrow ident colon ident
         free($3);
         free($5);
     }
-;
+| ident arrow ident colon lbracket ident_list rbracket
+    {
+        if (nodes[$1] == NULL) {
+            og_yyerror_unknown_node($1);
+        }
+    
+        if (nodes[$3] == NULL) {
+            og_yyerror_unknown_node($3);
+        }
 
+        OGToParse->addEdge(nodes[$1], nodes[$3], identString);
+        free($1);
+        free($3);
+        identString = "";
+    }
+;

@@ -87,6 +87,8 @@ OUTPUT        { return key_output;      }
 \+            { return op_or;     }
 \(            { return lpar;      }
 \)            { return rpar;      }
+\[            { return lbracket;  }
+\]            { return rbracket;  }
 
 [Rr][Ee][Dd]      { return key_red;  }
 [Bb][Ll][Uu][Ee]  { return key_blue; }
@@ -98,7 +100,7 @@ OUTPUT        { return key_output;      }
 ,             { return comma;     }
 ->            { return arrow;     }
 
-[^,;:()\t \n\r\{\}=]+  { setlval(); return ident;  }
+[^,;:()\t \n\r\{\}=\[\]]+        { setlval(); return ident;       }
 
 [\n\r]        { break; }
 [ \t]         { break; }

@@ -125,7 +125,7 @@ class owfnTransition : public Node {
 
 #ifdef STUBBORN
         ///
-        bool prePlaceIsScapegoatForDisabledness(AdjacentPlace prePlace) const;
+        bool prePlaceIsScapegoatForDisabledness(oWFN* petrinet, AdjacentPlace prePlace) const;
 
         /// an insufficiently marked pre-place, if this disabled
         owfnPlace *scapegoat;
@@ -155,6 +155,9 @@ class owfnTransition : public Node {
 
         /// Sets quasi enabledness of this owfnTransition.
         void setQuasiEnabled(bool isQuasiEnabled);
+
+        /// Returns whether this is normal (connected to max. 1 input/output place) or not
+        bool isNormal() const;
 
         std::set<unsigned int> messageSet;
 

@@ -38,6 +38,7 @@
 #define MAIN_H
 
 #include <string>
+#include "owfn.h"
 
 extern oWFN* PN;
 extern unsigned int numberOfDecodes;

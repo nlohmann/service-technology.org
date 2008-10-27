@@ -113,11 +113,39 @@ void owfnTransition::setQuasiEnabled(bool isQuasiEnabled) {
 }
 
 
+//! \brief Returns true if this transition is normal, false otherwise.
+bool owfnTransition::isNormal() const {
+
+    //trace(TRACE_5, "owfnTransition::isNormal() : start\n");
+ 
+    int countInterfacePlaces = 0;
+
+    for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size() && countInterfacePlaces < 2; i++) {
+        AdjacentPlace incrPlace = IncrPlaces[i];
+        owfnPlace* incrOwfnPlace = incrPlace.getOwfnPlace();
+
+        if ( incrOwfnPlace->getType() != INTERNAL ) countInterfacePlaces++;
+    }
+
+    for (AdjacentPlaces_t::size_type i = 0; i != DecrPlaces.size() && countInterfacePlaces < 2; i++) {
+        AdjacentPlace decrPlace = DecrPlaces[i];
+        owfnPlace* decrOwfnPlace = decrPlace.getOwfnPlace();
+
+        if ( decrOwfnPlace->getType() != INTERNAL ) countInterfacePlaces++;
+    }
+
+    //trace(TRACE_5, "owfnTransition::isNormal() : start\n");
+    return (countInterfacePlaces < 2);
+}
+
+
 #ifdef STUBBORN
 //! \brief DESCRIPTON
 //! \return DESCRIPTON
-bool owfnTransition::prePlaceIsScapegoatForDisabledness(AdjacentPlace prePlace) const {
-    return (PN->CurrentMarking[PN->getPlaceIndex(prePlace.getOwfnPlace())] <
+bool owfnTransition::prePlaceIsScapegoatForDisabledness(oWFN* petrinet, AdjacentPlace prePlace) const {
+    //cout << "owfnTransition::prePlaceIsScapegoatForDisabledness multiplicity = " + intToString(prePlace.getMultiplicity()) + "\n";
+    //cout << "owfnTransition::prePlaceIsScapegoatForDisabledness petrinet->CurrentMarking = " + intToString(petrinet->CurrentMarking[petrinet->getPlaceIndex(prePlace.getOwfnPlace())]) + "\n";
+    return (petrinet->CurrentMarking[petrinet->getPlaceIndex(prePlace.getOwfnPlace())] <
             prePlace.getMultiplicity());
 }
 #endif
@@ -139,12 +167,15 @@ void owfnTransition::set_hashchange() {
 
 //! \brief sets initializes various values of the transition
 void owfnTransition::initialize() {
+    //trace(TRACE_5, "owfnTransition::initialize() start\n");
+
     // Create list of Pre-Places for enabling test
     for (unsigned int i = 0; i < getArrivingArcsCount(); ++i) {
         PrePlaces.push_back(AdjacentPlace(getArrivingArc(i)->pl, getArrivingArc(i)->Multiplicity));
     }
 
     // Create list of places where transition increments marking
+    //cout << "    found " << getLeavingArcsCount() << " leaving arcs for transition " << getName() << "(" << this << ")" << endl;
     for (unsigned int i = 0; i < getLeavingArcsCount(); i++) {
         //Is oWFNPlace a loop place?
         unsigned int j = 0;
@@ -166,6 +197,7 @@ void owfnTransition::initialize() {
     }
 
     // Create list of places where transition decrements marking
+    //cout << "    found " << getArrivingArcsCount() << " arriving arcs for transition " << getName() << "(" << this << ")" << endl;
     for (unsigned int i = 0; i < getArrivingArcsCount(); i++) {
         //Is oWFNPlace a loop place?
         unsigned int j = 0;
@@ -188,24 +220,32 @@ void owfnTransition::initialize() {
 
     // Create list of transitions where enabledness can change
     // if this transition fires.
+    //cout << "    found " << IncrPlaces.size() << " IncrPlaces for transition " << getName() << "(" << this << ")" << endl;
     for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i) {
         owfnPlace* incrOwfnPlace = IncrPlaces[i].getOwfnPlace();
         for (unsigned int j = 0; j < incrOwfnPlace->getLeavingArcsCount(); j++) {
-            if (!incrOwfnPlace->getLeavingArc(j)->tr->isEnabled()) {
+            owfnTransition* transition = incrOwfnPlace->getLeavingArc(j)->tr;
+            //cout << "    checking transition " << transition->getName() << "(" << transition << ")" << " for transition " << getName() << "(" << this << ")" << endl;
+            if (!transition->isEnabled()) {
                 // not yet in list
-                ImproveEnabling.push_back(incrOwfnPlace->getLeavingArc(j)->tr);
+                ImproveEnabling.push_back( transition );
+                //cout << "    pushing transition " << transition->getName() << "(" << transition << ")" << " for transition " << getName() << "(" << this << ")" << endl;
             }
         }
     }
 
     // Create list of transitions where enabledness can change
     // if this transition fires.
+    //cout << "    found " << DecrPlaces.size() << " DecrPlaces for transition " << getName() << "(" << this << ")" << endl;
     for (AdjacentPlaces_t::size_type i = 0; i != DecrPlaces.size(); ++i) {
         owfnPlace* decrOwfnPlace = DecrPlaces[i].getOwfnPlace();
         for (unsigned int j = 0; j < decrOwfnPlace->getLeavingArcsCount(); j++) {
-            if (!decrOwfnPlace->getLeavingArc(j)->tr->isEnabled()) {
+            owfnTransition* transition = decrOwfnPlace->getLeavingArc(j)->tr;
+            //cout << "    checking transition " << transition->getName() << "(" << transition << ")" << " for transition " << getName() << "(" << this << ")" << endl;
+            if (!transition->isEnabled()) {
                 // not yet in list
-                ImproveDisabling.push_back(decrOwfnPlace->getLeavingArc(j)->tr);
+                ImproveDisabling.push_back( transition );
+                //cout << "    pushing transition " << transition->getName() << "(" << transition << ")" << " for transition " << getName() << "(" << this << ")" << endl;
             }
         }
     }
@@ -231,59 +271,64 @@ void owfnTransition::initialize() {
 
     mustbeincluded = conflicting;
 #endif
+
+    //trace(TRACE_5, "owfnTransition::initialize() end\n");
 }
 
 
 //! \brief fires the transition in a given owfn and changes its state and marking accordingly
-//! \param PN the owfn to be fired in
-void owfnTransition::fire(oWFN * PN) {
+//! \param petrinet the owfn to be fired in
+void owfnTransition::fire(oWFN * petrinet) {
 
-    TRACE(TRACE_5, "owfnTransition::fire(oWFN * PN) : start\n");
+    //trace(TRACE_5, "owfnTransition::fire(oWFN * petrinet) : start\n");
  
+    //cerr << "transition has " << intToString(IncrPlaces.size()) << " IncrPlaces\n" << endl;
     for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i) {
         AdjacentPlace incrPlace = IncrPlaces[i];
         owfnPlace* incrOwfnPlace = incrPlace.getOwfnPlace();
         
-        PN->CurrentMarking[PN->getPlaceIndex(incrOwfnPlace)] += incrPlace.getMultiplicity();
+        petrinet->CurrentMarking[petrinet->getPlaceIndex(incrOwfnPlace)] += incrPlace.getMultiplicity();
 #ifdef CHECKCAPACITY
-        if(PN->CurrentMarking[PN->getPlaceIndex(incrOwfnPlace)] > incrOwfnPlace->capacity) {
+        if(petrinet->CurrentMarking[petrinet->getPlaceIndex(incrOwfnPlace)] > incrOwfnPlace->capacity) {
             TRACE(TRACE_2, "capacity of place " + incrOwfnPlace->name + " exceeded!\n") ;
             throw CapacityException(incrOwfnPlace->name);
             //_exit(4);
         }
 #endif
     }
+
+    //cerr << "transition has " << intToString(DecrPlaces.size()) << " DecrPlaces\n" << endl;
     for (AdjacentPlaces_t::size_type i = 0; i != DecrPlaces.size(); ++i) {
         AdjacentPlace decrPlace = DecrPlaces[i];
         owfnPlace* decrOwfnPlace = decrPlace.getOwfnPlace();
 
-        if (PN->CurrentMarking[PN->getPlaceIndex(decrOwfnPlace)]
+        if (petrinet->CurrentMarking[petrinet->getPlaceIndex(decrOwfnPlace)]
                 < decrPlace.getMultiplicity()) {
-            PN->printCurrentMarking();
+            petrinet->printCurrentMarking();
             cerr << "marking of place "<< decrOwfnPlace->name<< " is: "
-                    << PN->CurrentMarking[PN->getPlaceIndex(decrOwfnPlace)]
+                    << petrinet->CurrentMarking[petrinet->getPlaceIndex(decrOwfnPlace)]
                     << " but transition "<< this->name<< " consumes: "
                     << decrPlace.getMultiplicity() << endl;
             cerr << "number of states calculated so far: "<< State::state_count
                     << endl;
             _exit(EC_CAPACITY_EXCEEDED);
         } else {
-            PN->CurrentMarking[PN->getPlaceIndex(decrOwfnPlace)] -= decrPlace.getMultiplicity();
+            petrinet->CurrentMarking[petrinet->getPlaceIndex(decrOwfnPlace)] -= decrPlace.getMultiplicity();
         }
     }
 
-    PN->placeHashValue += hash_change;
-    PN->placeHashValue %= HASHSIZE;
+    petrinet->placeHashValue += hash_change;
+    petrinet->placeHashValue %= HASHSIZE;
     for (ImproveDisEnabling_t::size_type i = 0; i != ImproveEnabling.size(); ++i) {
         owfnTransition* transition = ImproveEnabling[i];
         if (!(transition->isEnabled()) || !(transition->isQuasiEnabled())) {
-            transition->check_enabled(PN);
+            transition->check_enabled(petrinet);
         }
     }
     for (ImproveDisEnabling_t::size_type i = 0; i != ImproveDisabling.size(); ++i) {
         owfnTransition* transition = ImproveDisabling[i];
         if (transition->isEnabled() || transition->isQuasiEnabled()) {
-            transition->check_enabled(PN);
+            transition->check_enabled(petrinet);
         }
     }
 
@@ -292,7 +337,7 @@ void owfnTransition::fire(oWFN * PN) {
     //		unsigned int j;
     //        for(j=0; j < (* p) -> cardprop; j++) {
     //            if ((* p)->proposition != NULL) {
-    //	            (* p)->proposition[j] -> update(PN->CurrentMarking[(* p)->index]);
+    //	            (* p)->proposition[j] -> update(petrinet->CurrentMarking[(* p)->index]);
     //			}
     //        }
     //    }
@@ -301,12 +346,12 @@ void owfnTransition::fire(oWFN * PN) {
     //		unsigned int j;
     //        for(j=0; j < (* p) -> cardprop; j++) {
     //            if ((* p)->proposition != NULL) {
-    //	            (* p)->proposition[j] -> update(PN->CurrentMarking[(* p)->index]);
+    //	            (* p)->proposition[j] -> update(petrinet->CurrentMarking[(* p)->index]);
     //            }
     //        }
     //    }
 
-    TRACE(TRACE_5, "owfnTransition::fire(oWFN * PN) : end\n");
+    //trace(TRACE_5, "owfnTransition::fire(oWFN * petrinet) : end\n");
 }
 
 
@@ -376,7 +421,8 @@ void owfnTransition::backfire(oWFN * PN) {
 //! \param PN owfn this transition is part of
 //! \fn void owfnTransition::check_enabled(oWFN * PN)
 void owfnTransition::check_enabled(oWFN * PN) {
-    //   	TRACE(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : start\n");
+
+    //trace(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : start\n");
 
     messageSet.clear();
 
@@ -384,13 +430,16 @@ void owfnTransition::check_enabled(oWFN * PN) {
 #ifdef STUBBORN
     mustbeincluded = conflicting;
 #endif
+
+    //cout << "BEFORE" << endl;
+    //cout << "PrePlaces.size() = " + intToString(PrePlaces.size()) + "\n";
     for (AdjacentPlaces_t::size_type iPrePlace = 0;
          iPrePlace != PrePlaces.size(); ++iPrePlace) {
 
         AdjacentPlace prePlace = PrePlaces[iPrePlace];
         owfnPlace* preOwfnPlace = prePlace.getOwfnPlace();
 
-        if (prePlaceIsScapegoatForDisabledness(prePlace)) {
+        if (prePlaceIsScapegoatForDisabledness(PN, prePlace)) {
 #ifdef STUBBORN
             scapegoat = preOwfnPlace;
             mustbeincluded = preOwfnPlace->PreTransitions;
@@ -404,9 +453,9 @@ void owfnTransition::check_enabled(oWFN * PN) {
         }
     }
 
-  //  cout << "BEFORE" << endl;
- //   cout << "current marking: " << PN->getCurrentMarkingAsString() << endl;
- //   cout << "transition " << name << " is quasiEnabled: " << isQuasiEnabled() << " and enabled: " << isEnabled() << endl;
+    //cout << "current marking: " << PN->getCurrentMarkingAsString() << endl;
+    //cout << "transition " << name << "(" << this << ")" << " is quasiEnabled: " << isQuasiEnabled() << " and enabled: " << isEnabled() << endl;
+    //cout << "enabledNr = " + intToString(enabledNr) + " getArrivingArcsCount = " + intToString(getArrivingArcsCount()) + "\n";
     // [LUHME XV] Check auf Enabledness und Quasi-Enabledness überarbeiten: evtl. kann sich ein Check einsparen lassen.
     // [LUHME XV] Wenn enabled, dann auch quasi-enabled.
     // [LUHME XV] Evtl. zwei Versionen, weil OG keine Quasi-Enabledness braucht.
@@ -445,17 +494,18 @@ void owfnTransition::check_enabled(oWFN * PN) {
         }
     }
     
-//    cout << "AFTER" << endl;
- //  cout << "current marking: " << PN->getCurrentMarkingAsString() << endl;
- //  cout << "transition " << name << "(" << this << ")" << " is quasiEnabled: " << isQuasiEnabled() << " and enabled: " << isEnabled() << endl;
+    //cout << "AFTER" << endl;
+    //cout << "current marking: " << PN->getCurrentMarkingAsString() << endl;
+    //cout << "transition " << name << "(" << this << ")" << " is quasiEnabled: " << isQuasiEnabled() << " and enabled: " << isEnabled() << endl;
 
-    // TRACE(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : end\n");
+    //trace(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : end\n");
 }
 
 
 //! \brief sets the label for matching
 //! \param label new label
 void owfnTransition::setLabelForMatching(const std::string& label) {
+    //trace(TRACE_5, "    set LabelForMatching for transition " + getName() + " to " + label + "\n");
     labelForMatching = label;
 }
 

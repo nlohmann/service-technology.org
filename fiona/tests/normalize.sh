@@ -260,7 +260,6 @@ fi
 ############################################################################
 
 # remove all created files
-
 rm -f $DIR/abnormal_input.normalized.owfn
 rm -f $DIR/abnormal_output.normalized.owfn
 rm -f $DIR/abnormal_both.normalized.owfn

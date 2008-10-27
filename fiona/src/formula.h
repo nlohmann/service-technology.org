@@ -38,12 +38,16 @@
 #ifndef FORMULA_H
 #define FORMULA_H
 #include "mynew.h"
-#include"owfnPlace.h"
-#include"symboltab.h"
-#include<fstream>
-#include<set>
+#include "owfnPlace.h"
+#include "symboltab.h"
+#include <fstream>
+#include <set>
+#include <string>
 
 #include"dimensions.h"
+
+// forward declaration of oWFN class in order to use it as type
+class oWFN;
 
 using namespace std;
 
@@ -55,6 +59,9 @@ class formula {
         
         /// value of formula w.r.t. CurrentMarking
         bool value; 
+
+        /// returns string representation of the formula
+        virtual string getString() = 0;
         
         /// remove negation in formulae without temporal
         virtual formula * posate() = 0; 
@@ -65,8 +72,13 @@ class formula {
         /// checks whether this unary boolean formula is true with a given current marking
         virtual bool init(unsigned int *) = 0;
 
-        /// returns a deep copy of this formula
-        virtual formula * deep_copy() = 0;
+        /// returns a reduced deep copy of this formula where only references
+        /// to internal places from the given net are allowed
+        /// this is needed for the matching algorithm of fiona
+        virtual formula * reduced_copy(oWFN *) = 0;
+
+        /// returns a deep copy of this formula with references to places from given net
+        virtual formula * deep_copy(oWFN *) = 0;
 
         /// returns a flat copy of this formula
         virtual formula * flat_copy() = 0;
@@ -145,6 +157,9 @@ class atomicformula : public formula {
         /// incremental re-calculation of partial formula
         virtual void update(unsigned int);
 
+        /// returns string representation of the formula
+        virtual string getString();
+        
         /// remove negation in formulae without temporal
         virtual formula * posate();
 
@@ -154,8 +169,11 @@ class atomicformula : public formula {
         /// set links to parents and from/to mentioned places
         virtual void setstatic();
 
+        /// returns a reduced deep copy of this formula
+        virtual atomicformula * reduced_copy(oWFN *);
+
         /// returns a deep copy of this formula
-        virtual atomicformula * deep_copy();
+        virtual atomicformula * deep_copy(oWFN *);
 
         /// returns a flat copy of this formula
         virtual atomicformula * flat_copy();
@@ -201,6 +219,9 @@ class unarybooleanformula : public formula {
         /// formula.
         virtual formula * merge();
 
+        /// returns string representation of the formula
+        virtual string getString();
+        
         /// remove negation in formulae without temporal
         virtual formula * posate();
 
@@ -223,8 +244,11 @@ class unarybooleanformula : public formula {
         /// returns the longest chain of subformulas connected by a specified operator
         virtual unsigned int counttype(FType);
 
+        /// returns a reduced deep copy of this formula
+        virtual unarybooleanformula * reduced_copy(oWFN *);
+
         /// returns a deep copy of this formula
-        virtual unarybooleanformula * deep_copy();
+        virtual unarybooleanformula * deep_copy(oWFN *);
 
         /// returns a flat copy of this formula
         virtual unarybooleanformula * flat_copy();
@@ -253,6 +277,9 @@ class binarybooleanformula : public formula {
         /// formula.
         virtual formula * merge();
 
+        /// returns string representation of the formula
+        virtual string getString();
+        
         /// remove negation in formulae without temporal
         virtual formula * posate() {
             return (formula *) 0;
@@ -279,8 +306,11 @@ class binarybooleanformula : public formula {
         /// returns the longest chain of subformulas connected by a specified operator
         virtual unsigned int counttype(FType);
 
+        /// returns a reduced deep copy of this formula
+        virtual binarybooleanformula * reduced_copy(oWFN *);
+
         /// returns a deep copy of this formula
-        virtual binarybooleanformula * deep_copy();
+        virtual binarybooleanformula * deep_copy(oWFN *);
 
         /// returns a flat copy of this formula
         virtual binarybooleanformula * flat_copy();
@@ -305,6 +335,9 @@ class booleanformula : public formula {
         /// formula.
         virtual formula * merge();
 
+        /// returns string representation of the formula
+        virtual string getString();
+        
         /// remove negation in formulae without temporal
         virtual formula * posate();
 
@@ -327,8 +360,11 @@ class booleanformula : public formula {
         /// set links to parents and from/to mentioned places
         virtual void setstatic();
 
+        /// returns a reduced deep copy of this formula
+        virtual booleanformula * reduced_copy(oWFN *);
+
         /// returns a deep copy of this formula
-        virtual booleanformula * deep_copy();
+        virtual booleanformula * deep_copy(oWFN *);
 
         /// returns a flat copy of this formula
         virtual booleanformula * flat_copy();

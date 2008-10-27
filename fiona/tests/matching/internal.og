@@ -1,0 +1,18 @@
+INTERFACE
+  INPUT
+    a,
+    b;
+  OUTPUT
+    ;
+
+NODES
+  0 : (?a + ?b) : blue,
+  1 : final : blue : finalnode,
+  2 : final : blue : finalnode;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 1 : ?a,
+  0 -> 2 : ?b;

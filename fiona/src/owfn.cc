@@ -331,11 +331,13 @@ void oWFN::removeisolated() {
 //! \brief returns an array of transition pointers containing all enabled transition
 //! \return firelist
 owfnTransition ** oWFN::firelist() {
+    TRACE(TRACE_5, "oWFN::firelist(): enabledTransitions.size() = " + intToString(enabledTransitions.size()) + "\n");
     owfnTransition** tl = new owfnTransition * [enabledTransitions.size() + 1];
     int i = 0;
     EnabledTransitions::ConstIterator iTrans = enabledTransitions.getConstIterator();
     while (iTrans->hasNext()) {
-        tl[i++] = iTrans->getNext();
+        tl[i] = iTrans->getNext();
+        i++;
     }
     delete iTrans;
     tl[i] = NULL;
@@ -2169,7 +2171,7 @@ void oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, A
 //                                                           AnnotatedGraphNode* n) {
 //
 //    // calculates the EG starting at the current marking
-//    trace( "oWFN::calculateReducedSetOfReachableStatesStoreInNode(binDecision** tempBinDecision, AnnotatedGraphNode * n) : start\n");
+//    TRACE( "oWFN::calculateReducedSetOfReachableStatesStoreInNode(binDecision** tempBinDecision, AnnotatedGraphNode * n) : start\n");
 //
 //    // test current marking if message bound k reached
 //    if (violatesMessageBound()) {
@@ -2275,7 +2277,7 @@ void oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, A
 //
 //            if (NewState != NULL) {
 //                // Current marking already in bintree
-//                trace( "Current marking already in bintree \n");
+//                TRACE( "Current marking already in bintree \n");
 //
 //                if (currentMarkingActivatesReceivingEvent(tempCurrentMarking)) { // if all places are appropriatly marked, we save this state
 //                  //  stateSet.insert(CurrentState);
@@ -2317,7 +2319,7 @@ void oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, A
 //                CurrentState->succ[CurrentState->current] = NewState;
 //                (CurrentState->current)++;
 //            } else {
-//                trace( "Current marking new\n");
+//                TRACE( "Current marking new\n");
 //
 //                if (currentMarkingActivatesReceivingEvent(tempCurrentMarking)) { // if all places are appropriatly marked, we save this state
 //                    NewState = binInsert(this);
@@ -2389,7 +2391,7 @@ void oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, A
 //            // no more transition to fire
 //        } else {
 //            // close state and return to previous state
-//            trace( "close state and return to previous state\n");
+//            TRACE( "close state and return to previous state\n");
 //            CurrentState = CurrentState->parent;
 //
 //            if (CurrentState) { // there is a father to further examine
@@ -2403,7 +2405,7 @@ void oWFN::calculateReducedSetOfReachableStatesStoreInNode(StateSet& stateSet, A
 //        tempCurrentMarking = NULL;
 //    }
 //
-//    trace( "oWFN::calculateReducedSetOfReachableStatesStoreInNode(binDecision** tempBinDecision, AnnotatedGraphNode * n) : end\n");
+//    TRACE( "oWFN::calculateReducedSetOfReachableStatesStoreInNode(binDecision** tempBinDecision, AnnotatedGraphNode * n) : end\n");
 //    return;
 //}
 
@@ -2958,16 +2960,23 @@ stateType oWFN::typeOfState() {
 bool oWFN::isFinal() const {
     TRACE(TRACE_5, "bool oWFN::isFinal() : start\n");
     if (FinalCondition) {
+        //cerr << "        oWFN::isFinal we have a finalcondition" << endl;
+        //cerr << "        owfn::isFinal getPlaceCount() = " << getPlaceCount() << endl;
         for (unsigned int currentplacenr = 0; currentplacenr < getPlaceCount(); currentplacenr++) {
-            for (unsigned int j=0; j < PN->getPlace(currentplacenr)->cardprop; j++) {
-                if (PN->getPlace(currentplacenr)->proposition != NULL) {
-                    PN->getPlace(currentplacenr)->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+            //cerr << "        owfn::isFinal getPlace(" << currentplacenr << ")->cardprop = " << getPlace(currentplacenr)->cardprop << endl;
+            for (unsigned int j=0; j < getPlace(currentplacenr)->cardprop; j++) {
+                if ( getPlace(currentplacenr)->proposition != NULL) {
+                    //cerr << "        owfn::isFinal current place has non-NULL proposition" << endl;
+                    getPlace(currentplacenr)->proposition[j] -> update( CurrentMarking[currentplacenr] );
+                } else {
+                    //cerr << "        owfn::isFinal current place has NULL proposition" << endl;
                 }
             }
         }
         TRACE(TRACE_5, "bool oWFN::isFinal() : end\n");
-        return FinalCondition -> value;
+        return FinalCondition->value;
     } else {
+        //cerr << "        oWFN::isFinal we have final marking(s)" << endl;
         for (list<unsigned int *>::const_iterator FinalMarking = FinalMarkingList.begin();
              FinalMarking != FinalMarkingList.end(); FinalMarking++) {
             bool finalMarkingFits = true;
@@ -3013,19 +3022,24 @@ string oWFN::createLabel(messageMultiSet m) const {
 //! \param og Operating guideline against this oWFN should be matched.
 //! \param reasonForFailedMatch In case of a failed match, holds a text
 //!        describing why the matching failed.
-//! \return true If this oWFN matches with given OG.
-//!         retval false Otherwise.
-bool oWFN::matchesWithOG(const AnnotatedGraph* og, string& reasonForFailedMatch) {
-    // Check whether the initial marking violates the message bound and exit
-    // with an error message if it does.
-    if (violatesMessageBound()) {
+//! \return true if this oWFN matches with given OG, false otherwise
+bool oWFN::matchesWithOG(const AnnotatedGraph* OG, string& reasonForFailedMatch) {
+
+    // check whether the initial marking violates a message bound
+    if ( violatesMessageBound() ) {
         reasonForFailedMatch = "Current marking: '"
                                + getCurrentMarkingAsString()
                                + "' violated message bound.";
         return false;
     }
 
-    // Initialize the currentState with the initial marking.
+    // check whether the given OG is empty
+    if ( OG->getRoot()->isRed() ) {
+        reasonForFailedMatch = "The OG is empty (its root node is red).";
+        return false;
+    }
+
+    // initialize the currentState with the initial marking
     State* currentState = binInsert(this);
     currentState->firelist = firelist();
     currentState->cardFireList = CurrentCardFireList;
@@ -3040,18 +3054,10 @@ bool oWFN::matchesWithOG(const AnnotatedGraph* og, string& reasonForFailedMatch)
 
     // remember that we checked the currentState and the root node of the graph
     StateNodesAssoc_t stateNodesAssoc;
+    stateNodesAssoc[currentState].insert( OG->getRoot()->getNumber() );
 
-    // Initialize the currentOGNode with the root node of the OG.
-    AnnotatedGraphNode* currentOGNode = og->getRoot();
-    stateNodesAssoc[currentState].insert(currentOGNode->getNumber());
-
-    if (currentOGNode->isRed()) {
-        reasonForFailedMatch = "The OG is empty (its root node is red).";
-        return false;
-    }
-
-    // We return true if (and only if) the recusive method succeeded.
-    return matchesWithOGRecursive(currentOGNode, currentState,
+    // we return true iff the recursive method succeeded
+    return matchesWithOGRecursive(OG->getRoot(), currentState,
                                   reasonForFailedMatch, stateNodesAssoc);
 }
 
@@ -3061,18 +3067,15 @@ bool oWFN::matchesWithOG(const AnnotatedGraph* og, string& reasonForFailedMatch)
 //! \param currentState current oWFN state
 //! \param reasonForFailedMatch In case of a failed match, holds a text
 //!        describing why the matching failed.
-//! \return true If this oWFN matches with given OG.
-//!         false Otherwise.
+//! \return true if this oWFN matches with given OG, false otherwise
 bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                                   State* currentState,
                                   string& reasonForFailedMatch,
                                   StateNodesAssoc_t& stateNodesAssoc) {
 
-    // A temporary copy of the CurrentMarking. Used to revert to the
-    // CurrentMarking if firing of a transition leads to an already seen
-    // marking.
-    unsigned int* tmpCurrentMarking = NULL;
-    unsigned int tmpPlaceHashValue;
+    unsigned int* oldCurrentMarking = NULL;
+    unsigned int oldPlaceHashValue = 0;
+    AnnotatedGraphNode* oldOGNode = NULL;
 
     // If currentState becomes NULL we don't need to look any further.
     if (currentState == NULL) {
@@ -3083,24 +3086,36 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
     // Check whether there are still enabled transitions to be fired in
     // currentState (transitions that have not been processed yet while
     // building the reachability graph). currentState->current holds the
-    // index of the last fired transition in the array of to be fired
-    // transitions currentState->firelist[].
-    while (currentState->current < currentState->cardFireList) {
-        // There is a not yet fired transition in currentState.
+    // index of the current (to be fired) transition in the array of to
+    // be fired transitions currentState->firelist[] with cardinality
+    // currentState->cardFireList.
+    // If currentState->current is out of the firelist's range, we're through.
+    TRACE(TRACE_4, "\nstart cycle with currentState->current = " + intToString(currentState->current) + ", " +
+                   "currentState->cardFireList = " + intToString(currentState->cardFireList) + ",\n" +
+                   "                 current marking " + getCurrentMarkingAsString() + ", " +
+                   "current OG node " + currentOGNode->getName() + "\n");
 
-        // Retrieve the transition leaving the current state that should be
-        // fired next.
+    while (currentState->current < currentState->cardFireList) {
+
+        // Retrieve the transition leaving the current state that should be fired next.
         owfnTransition* transition = currentState->firelist[currentState->current];
+        TRACE(TRACE_4, "    transition " + transition->getName() + " should be fired next\n");
 
         // Save the current marking, so we can easily revert to it if
         // firing the transition that we will try in this if-branch leads
         // us to a state we have already seen.
-        if (tmpCurrentMarking != NULL) {
-            delete[] tmpCurrentMarking;
-            tmpCurrentMarking = NULL;
+        if (oldCurrentMarking != NULL) {
+            delete[] oldCurrentMarking;
+            oldCurrentMarking = NULL;
         }
-        tmpCurrentMarking = copyCurrentMarking();
-        tmpPlaceHashValue = placeHashValue;
+        oldCurrentMarking = copyCurrentMarking();
+        oldPlaceHashValue = placeHashValue;
+
+        // Save the currentOGNode to a temporary copy, so we can easily
+        // revert to it if the state we reached to firing the current
+        // transition lead us to an already seen state.
+        oldOGNode = currentOGNode;
+
 
         // Check whether the transition to be fired is also present in the
         // OG. If not, exit this function returning false, because the oWFN
@@ -3108,7 +3123,7 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
         if (transition->hasNonTauLabelForMatching() &&
             !currentOGNode->hasBlueEdgeWithLabel(transition->getLabelForMatching())) {
 
-            reasonForFailedMatch = "A transition labeled with \""
+            reasonForFailedMatch = "Transition " + transition->getName() + " labeled with \""
                                    + transition->getLabelForMatching()
                                    + "\" leaves the marking ["
                                    + getCurrentMarkingAsString()
@@ -3116,47 +3131,43 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                                    + " leaves the node \"" + currentOGNode->getName()
                                    + "\" in the OG.";
 
-            delete[] tmpCurrentMarking;
+            delete[] oldCurrentMarking;
             return false;
         }
 
-        // Fire the to be tried transition. The thereby reached marking is
-        // saved to CurrentMarking.
+        // Fire the to be tried transition. The thereby reached marking is saved to CurrentMarking.
         transition->fire(this);
-
-        // Save the currentOGNode to a temporary copy, so we can easily
-        // revert to it if the state we reached to firing the current
-        // transition lead us to an already seen state.
-        AnnotatedGraphNode* oldOGNode = currentOGNode;
 
         // if net makes a visible step, the OG node does so, too
         if (transition->hasNonTauLabelForMatching()) {
-            // Fire the transition in the OG that belongs to the transition we
-            // just fired in the oWFN.
+            // Fire the transition in the OG that belongs to the transition we just fired in the oWFN.
             currentOGNode = currentOGNode->followEdgeWithLabel(transition->getLabelForMatching());
+            TRACE(TRACE_4, "    transition " + transition->getName() + " is " + transition->getLabelForMatching() +
+                           " labeled, new OG node is " + currentOGNode->getName() + "\n");
         } else {
-            // if net just made a silent step, the OG node stays unchanged
-            // so do nothing.
+            // if net just made a silent step, the OG node stays unchanged, so do nothing.
+            TRACE(TRACE_4, "    transition " + transition->getName() + " is TAU labeled, OG node is " +
+                           currentOGNode->getName() + " (unchanged)\n");
         }
 
-        // Determine whether we have already seen the state we just
-        // reached.
+
+        // Determine whether we have already seen the state we just reached.
         State* newState = binSearch(this);
 
         // let's see if we have not yet checked the current state
         // and if we have not yet checked the current state and the current node already
-        if (newState != NULL &&
-                (stateNodesAssoc[newState].find(currentOGNode->getNumber()) != stateNodesAssoc[newState].end())) {
+        if ( newState != NULL && 
+            (stateNodesAssoc[newState].find(currentOGNode->getNumber()) != stateNodesAssoc[newState].end())) {
 
-            TRACE(TRACE_2, "marking [" + getCurrentMarkingAsString() + "] already seen with node ");
-            TRACE(TRACE_2, currentOGNode->getName() + "\n");
-            TRACE(TRACE_2, "  backtracking from node " + currentOGNode->getName());
-            TRACE(TRACE_2, " with annotation " + currentOGNode->getAnnotationAsString() + "\n");
-
+        	TRACE(TRACE_2, "marking [" + getCurrentMarkingAsString() + "] already seen with node ");
+        	TRACE(TRACE_2, currentOGNode->getName() + "\n");
+        	TRACE(TRACE_2, "    backtracking from node " + currentOGNode->getName());
+        	TRACE(TRACE_2, " with annotation " + currentOGNode->getAnnotationAsString() + "\n");
+            
             // We have already seen the state we just reaching by firing
             // the transition above. So we have to revert to the state that
             // the transition left from.
-            copyMarkingToCurrentMarking(tmpCurrentMarking);
+            copyMarkingToCurrentMarking(oldCurrentMarking);
 
             // owfnTransition::backfire() does not actually backfire.
             // It merely rechecks enabledness of all transitions in
@@ -3164,13 +3175,12 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
             // to restore the CurrentMarking first and then call
             // backfire() to undo the effect of a transition.
             transition->backfire(this);
-            placeHashValue = tmpPlaceHashValue;
-            delete[] tmpCurrentMarking;
-            tmpCurrentMarking = NULL;
+            placeHashValue = oldPlaceHashValue;
+            delete[] oldCurrentMarking;
+            oldCurrentMarking = NULL;
             currentState->succ[currentState->current] = newState;
 
-            // Increment current to the index of the next to be fired
-            // transition.
+            // Increment current to the index of the next to be fired transition.
             currentState->current++;
 
             if (transition->hasNonTauLabelForMatching()) {
@@ -3181,12 +3191,9 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                 // so do nothing.
             }
         } else {
+
             // The state we reached by firing the above transition is new.
             // So we have to initialize this newly seen state.
-
-            TRACE(TRACE_1, "found new marking [" + getCurrentMarkingAsString() + "] at node ");
-            TRACE(TRACE_1, currentOGNode->getName() + "\n");
-
             newState = binInsert(this);
             newState->firelist = firelist();
             newState->cardFireList = CurrentCardFireList;
@@ -3200,18 +3207,22 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
             newState->type = typeOfState();
             currentState->succ[currentState->current] = newState;
 
+        	TRACE(TRACE_1, "found new marking [" + getCurrentMarkingAsString() + "] at node ");
+        	TRACE(TRACE_1, currentOGNode->getName() + "\n");
+        	
+
             // Clean up the temporary copy of the former CurrentMarking
             // because we do not longer need to be able to revert to it as
             // we have a found a _new_ not yet seen state.
-            if (tmpCurrentMarking != NULL) {
-                delete[] tmpCurrentMarking;
-                tmpCurrentMarking = NULL;
+            if (oldCurrentMarking != NULL) {
+                delete[] oldCurrentMarking;
+                oldCurrentMarking = NULL;
             }
 
             // remember that we have checked the current state with a certain (current) node
             stateNodesAssoc[newState].insert(currentOGNode->getNumber());
 
-            // Check whether the initial marking violates the message bound
+            // Check whether the current marking violates the message bound
             // and exit with an error message if it does.
             if (violatesMessageBound()) {
                 reasonForFailedMatch = "Current marking: ["
@@ -3220,12 +3231,9 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                 return false;
             }
 
-            // Continue the matching recursively using newState and
-            // currentOGNode.
+            // Continue the matching recursively using newState and currentOGNode.
             // Upon success, don't forget to continue to work with oldOGNode.
-            if (!matchesWithOGRecursive(currentOGNode, newState,
-                                        reasonForFailedMatch,
-                                        stateNodesAssoc)) {
+            if (!matchesWithOGRecursive(currentOGNode, newState, reasonForFailedMatch, stateNodesAssoc)) {
                 return false;
             } else {
                 currentOGNode = oldOGNode;
@@ -3247,16 +3255,21 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
     //
     // If the currentState has a leaving tau transition, we can skip
     // checking the annotation because it is satisfied for sure.
-    if (!currentState->hasLeavingTauTransitionForMatching()) {
-        GraphFormulaAssignment
-                assignment = makeAssignmentForOGMatchingForState(currentState);
+    // This is because all possible markings are reached through this
+    // algorithm and no OG node formula is allowed to contain the
+    // literal TAU, therefore it doesn't matter if a formula containing
+    // TAU is checked or not.
+    TRACE(TRACE_4, "    no to be fired transition left\n");
+    if (!currentState->hasEnabledTransitionWithTauLabelForMatching()) {
+
+        TRACE(TRACE_4, "    no tau transition found, so we check annotation of current OG node\n");
+        GraphFormulaAssignment assignment = makeAssignmentForOGMatchingForState(currentState);
 
         if (!currentOGNode->assignmentSatisfiesAnnotation(assignment)) {
             // Clean up the temporary copy of the former CurrentMarking
-            // just to be sure.
-            if (tmpCurrentMarking != NULL) {
-                delete[] tmpCurrentMarking;
-                tmpCurrentMarking = NULL;
+            if (oldCurrentMarking != NULL) {
+                delete[] oldCurrentMarking;
+                oldCurrentMarking = NULL;
             }
 
             reasonForFailedMatch = "The marking ["
@@ -3269,11 +3282,17 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
 
             return false;
         } else {
-            TRACE(TRACE_4, "marking [" + getCurrentMarkingAsString() + "] satisfied\n");
-            TRACE(TRACE_4, "  annotation " + currentOGNode->getAnnotationAsString());
-            TRACE(TRACE_4, " of node " + currentOGNode->getName() + "\n");
+        	TRACE(TRACE_4, "marking [" + getCurrentMarkingAsString() + "] satisfied\n");
+        	TRACE(TRACE_4, "    annotation " + currentOGNode->getAnnotationAsString());
+        	TRACE(TRACE_4, " of node " + currentOGNode->getName() + "\n");
         }
     }
+
+    TRACE(TRACE_4, "end cycle with currentState->current = " + intToString(currentState->current) + ", " +
+                   "currentState->cardFireList = " + intToString(currentState->cardFireList) + ",\n" +
+                   "               current marking " + getCurrentMarkingAsString() + ", " +
+                   "current OG node " + currentOGNode->getName() + "\n\n");
+
 
     // Although we won't use currentState after tracking back (it will
     // be lost anyway), we set it to its parent here for convenience.
@@ -3287,9 +3306,9 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
     }
 
     // Clean up before we return from the function.
-    if (tmpCurrentMarking != NULL) {
-        delete[] tmpCurrentMarking;
-        tmpCurrentMarking = NULL;
+    if (oldCurrentMarking != NULL) {
+        delete[] oldCurrentMarking;
+        oldCurrentMarking = NULL;
     }
 
     // We found no reason for the oWFN not to match with the OG. So it matches.
@@ -3312,14 +3331,17 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
 GraphFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const State* currentState) const {
     GraphFormulaAssignment assignment;
 
-    for (unsigned int itransition = 0; itransition
-            != currentState->cardFireList; ++itransition) {
-        owfnTransition* transition = currentState->firelist[itransition];
+    for (unsigned int i = 0; i != currentState->cardFireList; ++i) {
+        owfnTransition* transition = currentState->firelist[i];
         assignment.setToTrue(transition->getLabelForMatching());
+        TRACE(TRACE_4, "    makeAssignment: set " + transition->getLabelForMatching() + " to true\n");
     }
 
     if (isFinal()) {
         assignment.setToTrue(GraphFormulaLiteral::FINAL);
+        TRACE(TRACE_4, "    makeAssignment: set FINAL to true\n");
+    } else {
+        TRACE(TRACE_4, "    makeAssignment: set FINAL to false\n");
     }
 
     return assignment;
@@ -3704,7 +3726,7 @@ void oWFN::add_place_to_port(owfnPlace *place, std::string port) {
 
     TRACE(TRACE_3, "adding place `" + place->name+ "' to port `"+ port + "'\n");
     ports[port].push_back(place);
-    place->set_port(port);
+    place->setPort(port);
 }
 
 
@@ -3834,12 +3856,24 @@ PNapi::PetriNet* oWFN::returnPNapiNet() {
 }
 
 
-//! \brief returns this net as an PNapi net
-//! \return PNapi version of the owfn
+//! \brief returns true iff this owfn is normal
+//! \return bool
+bool oWFN::isNormal() {
+    bool result = true;
+    for (Transitions_t::const_iterator transition = Transitions.begin();
+         result && transition != Transitions.end(); transition++) {
+        result = (*transition)->isNormal();
+    }
+    return result;
+}
+
+//! \brief returns this net with normalized transitions
+//! \return normalized version of the owfn
 oWFN* oWFN::returnNormalOWFN() {
 
     TRACE(TRACE_5, "oWFN* oWFN::returnNormalOWFN() : start\n");
     const std::string suffix = "_normalized";
+    const std::string suffixCap = suffix + "Cap";
 
     // create new oWFN
     oWFN* result = new oWFN();
@@ -3849,157 +3883,357 @@ oWFN* oWFN::returnNormalOWFN() {
     result->filename = filename;
 
 
-    // create all places from this oWFN as internal places in normal oWFN
+    // create all places from oWFN as places in normal oWFN
     for (Places_t::const_iterator place = Places.begin(); place != Places.end(); place++) {
-
-        // WARNING: NAME CREATION FOR PLACES - HANDLE WITH CARE
-        std::string name = (*place)->getName() + (((*place)->getType() != INTERNAL) ? suffix : "");
-
-        TRACE(TRACE_5, "handle place: " + (*place)->getName() + ", create place: " + name + "\n");
-        owfnPlace* newPlace = new owfnPlace(name, INTERNAL, result);
-        newPlace->initial_marking = (*place)->initial_marking;
+        //owfnPlace* newPlace = new owfnPlace( (*place)->getName(), (*place)->getType(), result );
+        owfnPlace* newPlace = new owfnPlace( *place, result );
+        assert(newPlace != NULL);
+        //newPlace->initial_marking = (*place)->initial_marking;
         result->addPlace(newPlace);
     }
 
 
-    // create all transitions from this oWFN as transitions in normal oWFN and create all arcs
+    // create all transitions from this oWFN as transitions in normal oWFN,
+    // create all arcs and interface places and handle abnormal transitions
     for (Transitions_t::const_iterator transition = Transitions.begin(); transition != Transitions.end(); transition++) {
         TRACE(TRACE_5, "handle and create transition: " + (*transition)->getName() + "\n");
 
+        // create new transition
         owfnTransition* newTransition = new owfnTransition( (*transition)->getName() );
         result->addTransition(newTransition);
 
-        // arriving arcs
+        // handle arriving arcs
         TRACE(TRACE_5, "    found " + intToString((*transition)->Node::getArrivingArcsCount()) + " arriving arcs\n");
         for (Node::Arcs_t::size_type i = 0; i < (*transition)->Node::getArrivingArcsCount(); i++) {
 
             TRACE(TRACE_5, "        handle arriving arc " + intToString(i) + "\n");
             Arc::Arc* arc = (*transition)->Node::getArrivingArc(i);
+            std::string name = arc->pl->getName();
 
-            owfnPlace* destination = NULL;
-            if (arc->pl->getType() == INTERNAL) {
-                destination = result->getPlace( arc->pl->getName() );
+            // treat arcs from interface places to abnormal transitions special
+            if ( !(*transition)->isNormal() && arc->pl->getType() != INTERNAL ) {
+
+                TRACE(TRACE_5, "        handle abnormal transition's inputplace: " + name + "\n"); 
+
+                // create new place for normalisation
+                owfnPlace* normalPlace = new owfnPlace(name + suffix, INTERNAL, result);
+                assert(normalPlace != NULL);
+                normalPlace->initial_marking = 0;
+                result->addPlace(normalPlace);
+
+                // create transition for normalisation
+                owfnTransition* normalTransition = new owfnTransition("t" + name + suffix);
+                assert(normalTransition != NULL);
+                result->addTransition(normalTransition);
+
+                // create arc from input place to normal transition
+                owfnPlace* source = result->getPlace( name );
+                assert(source != NULL);
+                Arc::Arc* newArc = new Arc( normalTransition, source, true, 1 );
+                assert(newArc != NULL);
+                normalTransition->addArrivingArc(newArc);
+                source->addLeavingArc(newArc);
+
+                // create arc from normal transition to normal place one
+                newArc = new Arc( normalTransition, normalPlace, false, 1 );
+                assert(newArc != NULL);
+                normalPlace->addArrivingArc(newArc);
+                normalTransition->addLeavingArc(newArc);
+
+                // create arc from normal place one to abnormal transition
+                newArc = new Arc( newTransition, normalPlace, true, arc->Multiplicity );
+                assert(newArc != NULL);
+                newTransition->addArrivingArc(newArc);
+                normalPlace->addLeavingArc(newArc);
             } else {
-                destination = result->getPlace( arc->pl->getName() + suffix );
+                owfnPlace* source = result->getPlace( name );
+                assert(source != NULL);
+
+                TRACE(TRACE_5, "        create arriving arc " + intToString(i) + "\n");
+                Arc::Arc* newArc = new Arc(newTransition, source, true, arc->Multiplicity);
+                newTransition->addArrivingArc(newArc);
+                source->addLeavingArc(newArc);
             }
-            assert(destination != NULL);
-
-            TRACE(TRACE_5, "        create arriving arc " + intToString(i) + "\n");
-            Arc::Arc* newArc = new Arc(*transition, destination, true, arc->Multiplicity);
-
-            newTransition->addArrivingArc(newArc);
         }
 
-        // leaving arcs
+        // handle leaving arcs
         TRACE(TRACE_5, "    found " + intToString((*transition)->Node::getLeavingArcsCount()) + " leaving arcs\n");
         for (Node::Arcs_t::size_type i = 0; i < (*transition)->Node::getLeavingArcsCount(); i++) {
 
             TRACE(TRACE_5, "        handle leaving arc " + intToString(i) + "\n");
             Arc::Arc* arc = (*transition)->Node::getLeavingArc(i);
+            std::string name = arc->pl->getName();
 
-            owfnPlace* destination = NULL;
-            if (arc->pl->getType() == INTERNAL) {
-                destination = result->getPlace( arc->pl->getName() );
+            // treat arcs from abnormal transitions to interface places special
+            if ( !(*transition)->isNormal() && arc->pl->getType() != INTERNAL ) {
+
+                TRACE(TRACE_5, "        handle abnormal transition's outputplace: " + name + "\n"); 
+
+                // create new places for normalisation
+                owfnPlace* normalPlace = new owfnPlace(name + suffix, INTERNAL, result);
+                assert(normalPlace != NULL);
+                normalPlace->initial_marking = 0;
+                result->addPlace(normalPlace);
+
+                // this special place is necessary for max occurrences of the output place
+                owfnPlace* capacityPlace = new owfnPlace(name + suffixCap, INTERNAL, result);
+                assert(capacityPlace != NULL);
+                // capacity for normalized output place (== initial marking of capacityPlace)
+                // is set to the highest multiplicity of all arcs arriving the original output place
+                unsigned int maxCount = 0;
+                for (Transitions_t::const_iterator tran = Transitions.begin(); tran != Transitions.end(); tran++) {
+                    for (Node::Arcs_t::size_type j = 0; j < (*tran)->Node::getLeavingArcsCount(); j++) {
+                        Arc::Arc* leavArc = (*tran)->Node::getLeavingArc(j);
+                        if ( leavArc->pl->getName() == name && leavArc->Multiplicity > maxCount ) {
+                            maxCount = leavArc->Multiplicity;
+                        }
+                    }
+                }
+                capacityPlace->initial_marking = maxCount;
+                result->addPlace(capacityPlace);
+
+                // create transition for normalisation
+                owfnTransition* normalTransition = new owfnTransition("t" + name + suffix);
+                assert(normalTransition != NULL);
+                result->addTransition(normalTransition);
+
+                // create arc from abnormal transition to normal place one
+                Arc::Arc* newArc = new Arc( newTransition, normalPlace, false, arc->Multiplicity );
+                assert(newArc != NULL);
+                normalPlace->addArrivingArc(newArc);
+                newTransition->addLeavingArc(newArc);
+
+                // create arc from normal place one to normal transition
+                newArc = new Arc( normalTransition, normalPlace, true, 1 );
+                assert(newArc != NULL);
+                normalTransition->addArrivingArc(newArc);
+                normalPlace->addLeavingArc(newArc);
+
+                // create arc from normal transition to output place
+                owfnPlace* destination = result->getPlace( name );
+                assert(destination != NULL);
+                newArc = new Arc( normalTransition, destination, false, 1 );
+                assert(newArc != NULL);
+                destination->addArrivingArc(newArc);
+                normalTransition->addLeavingArc(newArc);
+
+                // create arc from normal transition to normal place two
+                newArc = new Arc( normalTransition, capacityPlace, false, 1 );
+                assert(newArc != NULL);
+                capacityPlace->addArrivingArc(newArc);
+                normalTransition->addLeavingArc(newArc);
+
+                // create arc from normal place two to abnormal transition
+                newArc = new Arc( newTransition, capacityPlace, true, 1 );
+                assert(newArc != NULL);
+                newTransition->addArrivingArc(newArc);
+                capacityPlace->addLeavingArc(newArc);
             } else {
-                destination = result->getPlace( arc->pl->getName() + suffix );
+                owfnPlace* destination = result->getPlace( name );
+                assert(destination != NULL);
+
+                TRACE(TRACE_5, "        create leaving arc " + intToString(i) + "\n");
+                Arc::Arc* newArc = new Arc(newTransition, destination, false, arc->Multiplicity);
+                destination->addArrivingArc(newArc);
+                newTransition->addLeavingArc(newArc);
             }
-            assert(destination != NULL);
-
-            TRACE(TRACE_5, "        create leaving arc " + intToString(i) + "\n");
-            Arc::Arc* newArc = new Arc(*transition, destination, false, arc->Multiplicity);
-
-            newTransition->addLeavingArc(newArc);
         }
     }
-
-
-    // create new places, transitions and arcs for former input places
-    for (Places_t::const_iterator place = inputPlaces.begin(); place != inputPlaces.end(); place++) {
-        TRACE(TRACE_5, "create new inputplace: " + (*place)->getName() + "\n");
-
-        // create inputplace
-        owfnPlace* newPlace = new owfnPlace( (*place)->getName(), INPUT, result);
-        assert(newPlace != NULL);
-        result->addPlace(newPlace);
-
-        // create transition
-        std::string name = (*place)->getName();
-        owfnTransition* newTransition = new owfnTransition("t" + name + suffix);
-        assert(newTransition != NULL);
-        result->addTransition(newTransition);
-
-        // first arc
-        Arc::Arc* inArc = new Arc( newTransition, newPlace, true, 1 );
-        assert(inArc != NULL);
-        newTransition->addArrivingArc(inArc);
-
-        // second arc
-        owfnPlace* destination = result->getPlace( (*place)->getName() + suffix);
-        assert(destination != NULL);
-        Arc::Arc* outArc = new Arc( newTransition, destination, false, 1 );
-        assert(outArc != NULL);
-        newTransition->addLeavingArc(outArc);
-    }
-
-
-    // create new places, transitions and arcs for former output places
-    for (Places_t::const_iterator place = outputPlaces.begin(); place != outputPlaces.end(); place++) {
-        TRACE(TRACE_5, "create new outputplace: " + (*place)->getName() + "\n");
-
-        // create outputplace
-        owfnPlace* newPlace = new owfnPlace( (*place)->getName(), OUTPUT, result);
-        assert(newPlace != NULL);
-        result->addPlace(newPlace);
-
-        // create transition
-        std::string name = (*place)->getName();
-        owfnTransition* newTransition = new owfnTransition("t" + name + suffix);
-        assert(newTransition != NULL);
-        result->addTransition(newTransition);
-
-        // first arc
-        owfnPlace* destination = result->getPlace( (*place)->getName() + suffix);
-        assert(destination != NULL);
-        Arc::Arc* inArc = new Arc( newTransition, destination, true, 1 );
-        assert(inArc != NULL);
-        newTransition->addArrivingArc( inArc );
-
-        // second arc
-        Arc::Arc* outArc = new Arc( newTransition, newPlace, false, 1 );
-        assert(outArc != NULL);
-        newTransition->addLeavingArc( outArc );
-    }
-
-
-    // copy current marking
-    result->CurrentMarking = copyGivenMarking(CurrentMarking);
 
 
     // create new list of final markings
     for (list<unsigned int*>::iterator marking = FinalMarkingList.begin(); marking != FinalMarkingList.end(); marking++) {
         TRACE(TRACE_5, "create new final marking\n");
 
-
-        // create new final marking for new count of places and initialize with 0
         unsigned int * copy = new unsigned int [result->getPlaceCount()];
+
         for (unsigned int i = 0; i < result->getPlaceCount(); i++) {
-            copy[i] = 0;
-        }
+            owfnPlace* newPlace = result->getPlace(i);
+            owfnPlace* oldPlace = getPlace( newPlace->getName() );
 
-        // copy former final marking information
-        for (unsigned int i = 0; i < getPlaceCount(); i++) {
-            owfnPlace* oldPlace = getPlace(i);
-            std::string newName = oldPlace->getName() + ((oldPlace->getType() != INTERNAL) ? suffix : "");
-            owfnPlace* newPlace = result->getPlace( newName );
+            if ( oldPlace != NULL ) {
 
-            copy[ result->getPlaceIndex(newPlace) ] = (*marking)[ i ];
+                // copy old final marking
+                copy[i] = (*marking)[ getPlaceIndex(oldPlace) ];
+
+            } else if ( newPlace->getName().find(suffixCap) != string::npos ) {
+
+                // take initial marking as final marking ( for special newly
+                // created places - look for capacityPlace above )
+                copy[i] = newPlace->initial_marking;
+            } else {
+
+                // default value
+                copy[i] = 0;
+            }
         }
 
         result->FinalMarkingList.push_back( copy );
     }
+    result->finalMarkingString = string( finalMarkingString );
+
+
+    // create current marking
+    unsigned int * newMarking = new unsigned int [result->getPlaceCount()];
+    result->CurrentMarking = newMarking;
+
+
+    // initialize owfn
+    result->initialize();
 
 
     TRACE(TRACE_5, "oWFN* oWFN::returnNormalOWFN() : end\n");
+    return result;
+}
+
+
+//! \brief returns the labeled core of the given oWFN which is necessary for matching
+//! \return labeled core of the owfn
+oWFN* oWFN::returnMatchingOWFN() {
+
+    TRACE(TRACE_5, "oWFN* oWFN::returnMatchingOWFN() : start\n");
+
+
+    // create new oWFN
+    oWFN* result = new oWFN();
+
+
+    // set filename
+    result->filename = filename;
+
+
+    // create all core places from oWFN as core places in the new oWFN
+    for (Places_t::const_iterator oldPlace = Places.begin(); oldPlace != Places.end(); oldPlace++) {
+        TRACE(TRACE_5, "handle place " + (*oldPlace)->getName() + "\n");
+        if ( (*oldPlace)->getType() == INTERNAL ) {
+            owfnPlace* newPlace = new owfnPlace( *oldPlace, result );
+            assert(newPlace != NULL);
+            result->addPlace(newPlace);
+            TRACE(TRACE_5, "    created new place " + newPlace->getName() + "\n");
+        }
+    }
+
+
+    // create all transitions, create all internal arcs and label transitions
+    for (Transitions_t::const_iterator oldTransition = Transitions.begin(); oldTransition != Transitions.end(); oldTransition++) {
+        TRACE(TRACE_5, "handle transition " + (*oldTransition)->getName() + "\n");
+
+        // create new transition
+        owfnTransition* newTransition = new owfnTransition( (*oldTransition)->getName() );
+        result->addTransition(newTransition);
+        TRACE(TRACE_5, "    created new transition " + newTransition->getName() + "\n");
+
+        // handle arriving arcs
+        TRACE(TRACE_5, "    found " + intToString((*oldTransition)->Node::getArrivingArcsCount()) + " arriving arcs\n");
+        for (Node::Arcs_t::size_type i = 0; i < (*oldTransition)->Node::getArrivingArcsCount(); i++) {
+
+            TRACE(TRACE_5, "        handle arriving arc " + intToString(i) + "\n");
+            Arc::Arc* oldArc = (*oldTransition)->Node::getArrivingArc(i);
+
+            // label transition or create arc
+            if ( oldArc->pl->getType() != INTERNAL ) {
+                TRACE(TRACE_5, "        handle transition's inputplace " + oldArc->pl->getName() + "\n"); 
+
+                if ( newTransition->hasNonTauLabelForMatching() ) {
+                    string msg = string("Transition '") + newTransition->getName() + "' sends or "
+                                "receives more than one message which is not allowed.";
+                    return NULL;
+                }
+                newTransition->setLabelForMatching( oldArc->pl->getLabelForMatching());
+
+            } else {
+                owfnPlace* newPlace = result->getPlace( oldArc->pl->getName() );
+                assert(newPlace != NULL);
+
+                TRACE(TRACE_5, "        create arriving arc " + intToString(i) + "\n");
+                Arc::Arc* newArc = new Arc(newTransition, newPlace, true, oldArc->Multiplicity);
+                newTransition->addArrivingArc(newArc);
+                newPlace->addLeavingArc(newArc);
+                TRACE(TRACE_5, "        added arc from place " + newPlace->getName() + "\n");
+            }
+        }
+
+        // handle leaving arcs
+        TRACE(TRACE_5, "    found " + intToString((*oldTransition)->Node::getLeavingArcsCount()) + " leaving arcs\n");
+        for (Node::Arcs_t::size_type i = 0; i < (*oldTransition)->Node::getLeavingArcsCount(); i++) {
+
+            TRACE(TRACE_5, "        handle leaving arc " + intToString(i) + "\n");
+            Arc::Arc* oldArc = (*oldTransition)->Node::getLeavingArc(i);
+
+            // label transition or create arc
+            if ( oldArc->pl->getType() != INTERNAL ) {
+                TRACE(TRACE_5, "        handle transition's outputplace " + oldArc->pl->getName() + "\n"); 
+
+                if ( newTransition->hasNonTauLabelForMatching() ) {
+                    string msg = string("Transition '") + newTransition->getName() + "' sends or "
+                                "receives more than one message which is not allowed.";
+                    return NULL;
+                }
+                newTransition->setLabelForMatching( oldArc->pl->getLabelForMatching());
+
+            } else {
+                owfnPlace* newPlace = result->getPlace( oldArc->pl->getName() );
+                assert(newPlace != NULL);
+
+                TRACE(TRACE_5, "        create leaving arc " + intToString(i) + "\n");
+                Arc::Arc* newArc = new Arc(newTransition, newPlace, false, oldArc->Multiplicity);
+                newPlace->addArrivingArc(newArc);
+                newTransition->addLeavingArc(newArc);
+                TRACE(TRACE_5, "        added arc to place " + newPlace->getName() + "\n");
+            }
+        }
+    }
+
+
+    // create new list of final markings, if available
+    for (list<unsigned int*>::iterator marking = FinalMarkingList.begin(); marking != FinalMarkingList.end(); marking++) {
+        TRACE(TRACE_5, "create new final marking\n");
+
+        unsigned int * copy = new unsigned int [ result->getPlaceCount() ];
+
+        for (unsigned int i = 0; i < result->getPlaceCount(); i++) {
+            owfnPlace* newPlace = result->getPlace(i);
+            owfnPlace* oldPlace = getPlace( newPlace->getName() );
+            assert( oldPlace != NULL );
+
+            copy[i] = (*marking)[ getPlaceIndex(oldPlace) ];
+        }
+
+        result->FinalMarkingList.push_back( copy );
+    }
+    result->finalMarkingString = string( finalMarkingString );
+
+
+    // create current marking
+    result->CurrentMarking = new unsigned int [ result->getPlaceCount() ];
+    for (unsigned int i = 0; i < result->getPlaceCount(); i++) {
+        owfnPlace* newPlace = result->getPlace(i);
+        owfnPlace* oldPlace = getPlace( newPlace->getName() );
+        assert( oldPlace != NULL );
+
+        result->CurrentMarking[i] = CurrentMarking[ getPlaceIndex(oldPlace) ];
+    }
+
+
+    // initialize owfn
+    result->initialize();
+
+
+    // create final condition, if available
+    if ( this->FinalCondition == NULL ) {
+        // there is no final condition
+        TRACE(TRACE_5, "there is no final condition\n");
+        result->FinalCondition = NULL;
+    } else {
+        // copy existing final condition with updated place references in
+        // atomic forumlae
+        TRACE(TRACE_5, "copy existing final condition\n");
+        result->FinalCondition = FinalCondition->reduced_copy( result );
+        result->FinalCondition->setstatic();
+    }
+
+
+    TRACE(TRACE_5, "oWFN* oWFN::returnMatchingOWFN() : end\n");
     return result;
 }
 

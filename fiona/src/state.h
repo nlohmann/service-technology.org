@@ -70,15 +70,15 @@ class State {
         /// number of transitions to be fired
         unsigned int cardFireList;
 
-        /// Transitions to be fired 
+        /// transitions to be fired 
         /// note: in case of -R (state reduction in nodes) this list contains
         /// transitions, that are stubborn!!!
         owfnTransition ** firelist;
 
-        /// Transitions that are quasi enabled
+        /// transitions that are quasi enabled
         owfnTransition ** quasiFirelist;
 
-        /// Nr of last already fired element of firelist
+        /// nr of last already fired element of firelist
         unsigned int current;
 
         /// last branch in binary decision tree that represents marking
@@ -107,7 +107,7 @@ class State {
         void decodeShowOnly(oWFN* PN);
 
         /// Returns true iff this state has an enabled tau labeled transition.
-        bool hasLeavingTauTransitionForMatching() const;
+        bool hasEnabledTransitionWithTauLabelForMatching() const;
     
         /// is transient in autonomous setting
         bool isNotAutonomouslyTransient() const;

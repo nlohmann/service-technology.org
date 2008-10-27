@@ -1027,23 +1027,6 @@ void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 }
 
 
-//! \brief match a net against an og
-//! \param OGToMatch an og to be matched against
-//! \param PN an oWFN to matched against an og
-void checkMatching(AnnotatedGraph* OGToMatch, oWFN* PN) {
-    string reasonForFailedMatch;
-    trace( ("matching " + PN->filename + " with " + (OGToMatch->getFilename())+ "...\n\n"));
-    if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
-        TRACE(TRACE_1, "\n");
-        trace( "oWFN matches with OG: YES\n\n");
-    } else {
-        TRACE(TRACE_1, "\n");
-        trace( "Match failed: " +reasonForFailedMatch + "\n\n");
-        trace( "oWFN matches with OG: NO\n\n");
-    }
-}
-
-
 //! \brief check for simulation relation of two given OGs
 //! \param OGsFromFiles a list containing exactly two OGs
 void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
@@ -1060,7 +1043,7 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         // oWFN(s) was given on command line, so compute the corresponding OGs
         calledWithNet = true;
 
-        // simulation  on OGs depends heavily on empty node,
+        // simulation on OGs depends heavily on empty node,
         // so set the correct options to compute OG with empty node
         options[O_SHOW_NODES] = true;
         parameters[P_SHOW_EMPTY_NODE] = true;
@@ -1377,9 +1360,10 @@ void makePNG(oWFN* PN) {
 
     // set strings needed in PNapi output
     globals::output_filename = PN->filename;
-    if (PN->finalConditionString != "") {
+    if ( PN->FinalCondition != NULL  ) {
+        assert( PN->FinalCondition->getString() != "" );
         globals::filename = PN->filename + " \\n Final Condition: "
-                + PN->finalConditionString;
+                + PN->FinalCondition->getString();
     } else {
         globals::filename = PN->filename + " \\n Final Marking: "
                 + PN->finalMarkingString;
@@ -1503,7 +1487,7 @@ void reduceOWFN(oWFN* PN) {
 
 //! \brief normalize the given oWFN
 //! \param PN an oWFN to normalize
-void normalizeOWFN(oWFN* PN) {
+oWFN* normalizeOWFN(oWFN* PN) {
 
     TRACE(TRACE_5, "void normalizeOWFN(oWFN*) : start\n");
 
@@ -1549,9 +1533,52 @@ void normalizeOWFN(oWFN* PN) {
     }
 
     delete PNapiNet;
-    delete normalOWFN;
 
     TRACE(TRACE_5, "void normalizeOWFN(oWFN*) : end\n");
+    return normalOWFN;
+}
+
+
+//! \brief match a net against an OG
+//! \param OGToMatch an OG to be matched against an oWFN
+//! \param PN an oWFN to be matched against an OG
+void checkMatching(AnnotatedGraph* OGToMatch, oWFN* PN) {
+
+    TRACE(TRACE_5, "void checkMatching(AnnotatedGraph*, oWFN*) : start\n");
+
+    // normalize given PN if necessary
+    oWFN* normalOWFN = PN;
+    if ( !PN->isNormal() ) {
+        TRACE(TRACE_0, "normalizing current petrinet " + PN->filename + "\n");
+        // TODO: this is a dirty hack to prevent normalization from outputting
+        // some files, but it is ok because there will be a general
+        // reorganisation of output files soon
+        bool temp = options[O_NOOUTPUTFILES];
+        options[O_NOOUTPUTFILES] = true;
+        normalOWFN = normalizeOWFN(PN);
+        options[O_NOOUTPUTFILES] = temp;
+    }
+
+    // use only the labeled core
+    oWFN* coreOWFN = normalOWFN->returnMatchingOWFN();
+
+    // match coreOWFN with given OG
+    string reasonForFailedMatch;
+    TRACE(TRACE_0, ("matching " + coreOWFN->filename + " with " + (OGToMatch->getFilename())+ "...\n\n"));
+    if ( coreOWFN->matchesWithOG(OGToMatch, reasonForFailedMatch) ) {
+        TRACE(TRACE_1, "\n");
+        TRACE(TRACE_0, "oWFN matches with OG: YES\n\n");
+    } else {
+        TRACE(TRACE_1, "\n");
+        TRACE(TRACE_0, "Match failed: " +reasonForFailedMatch + "\n\n");
+        TRACE(TRACE_0, "oWFN matches with OG: NO\n\n");
+    }
+
+    // garbage collection
+    if ( normalOWFN != PN ) delete normalOWFN;
+    delete coreOWFN;
+
+    TRACE(TRACE_5, "void checkMatching(AnnotatedGraph*, oWFN*) : start\n");
 }
 
 
@@ -1644,10 +1671,7 @@ int main(int argc, char** argv) {
     }
     
     
-    // [LUHME XV] gehört hier nicht hin
-    AnnotatedGraph* OGToMatch = NULL;
-
-    // [LUHME XV] IFDEF überprüfen
+    // [LUHME XV] IFDEF ueberpruefen
     // [LUHME XV] Jans New-Handler
     set_new_handler(&myown_newhandler);
 
@@ -1939,7 +1963,7 @@ int main(int argc, char** argv) {
                     newFilename = readOG->getFilename();
                 }
                 createOutputFiles(readOG, newFilename, newFilename);
-                trace( (newFilename + ".png generated\n\n"));
+                //trace( (newFilename + ".png generated\n\n"));
                 delete readOG;
             }
         }
@@ -2003,6 +2027,7 @@ int main(int argc, char** argv) {
              parameters[P_PNG] || parameters[P_REDUCE] || parameters[P_NORMALIZE] ||
              parameters[P_PV] || parameters[P_MATCH_PARTNER]) {
 
+        AnnotatedGraph* OGToMatch = NULL;
         if (parameters[P_MATCH]) {
             assert(ogfiles.size() == 1);
             // we match multiple oWFNs with one OG,
@@ -2085,7 +2110,8 @@ int main(int argc, char** argv) {
                 }
 
                 if (parameters[P_NORMALIZE]) {
-                    normalizeOWFN(PN);    // normalize given net
+                    oWFN* normalOWFN = normalizeOWFN(PN); // normalize given net
+                    delete normalOWFN;
                 }
 
                 if (parameters[P_EQ_R]) {

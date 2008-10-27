@@ -265,13 +265,18 @@ void State::decode(oWFN * PN) {
 }
 
 
-bool State::hasLeavingTauTransitionForMatching() const {
+bool State::hasEnabledTransitionWithTauLabelForMatching() const {
+    //cerr << "    State::hasEnabledTransitionWithTauLabelForMatching() start" << endl;
     for (size_t itrans = 0; itrans != cardFireList; ++itrans) {
+        //cerr << "        check transition " << firelist[itrans]->getName() << "(" << firelist[itrans] << ")" << endl;
         if (!firelist[itrans]->hasNonTauLabelForMatching()) {
+            //cerr << "        transition " << firelist[itrans]->getName() << "(" << firelist[itrans] << ") has TAU label" << endl;
+            //cerr << "    State::hasEnabledTransitionWithTauLabelForMatching() end" << endl;
             return true;
         }
     }
 
+    //cerr << "    State::hasEnabledTransitionWithTauLabelForMatching() end" << endl;
     return false;
 }
 

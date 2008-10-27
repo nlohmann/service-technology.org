@@ -71,6 +71,27 @@ owfnPlace::owfnPlace(const string& name, placeType _type, oWFN * _net) :
 }
 
 
+//! \brief copy constructor
+//! \param original pointer to a owfnPlace which serves as original
+//! \param _net pointer to a OWFN
+owfnPlace::owfnPlace(owfnPlace * original, oWFN * _net) :
+    Node( original->getName() ),
+    type( original->type ),
+    initial_marking( original->initial_marking ),
+    hash_factor( original->hash_factor ),
+    references( original->references ),
+    capacity( original->capacity ),
+    nrbits( original->nrbits ),
+    startbit( 0 ),       // startbit is set correctly in oWFN::initialize
+    max_occurrence( original->max_occurrence ),
+    cardprop(0),         // is set by formula::setstatic()
+    proposition(NULL)    // is set by formula::setstatic()
+{
+    net = _net;
+    port = original->getPort();
+}
+
+
 //! \brief destructor
 owfnPlace::~owfnPlace() {
     TRACE(TRACE_5, "owfnPlace::~owfnPlace() : start\n");
@@ -177,6 +198,12 @@ void owfnPlace::set_hash(unsigned int i) {
 
 //! \brief set the port of the oWFN place
 //! \param my_port port to be set
-void owfnPlace::set_port(const std::string my_port) {
+void owfnPlace::setPort(const std::string my_port) {
     port = my_port;
+}
+
+//! \brief get the port of the oWFN place
+//! \return a string representing the port
+std::string owfnPlace::getPort() {
+    return port;
 }

@@ -77,6 +77,7 @@ extern unsigned int numberOfEvents;
 #include<stdio.h>
 #include<limits.h>
 #include<set>
+#include <string>
 
 
 // [LUHME XV] gehören Deklarationen/C-Code in die .yy-Datei oder in eine eigene Datei?
@@ -113,19 +114,6 @@ unsigned int * finalMarking;
 string current_port = ""; ///< the currently parsed port
 
 placeType type = INTERNAL;      /* type of place */
-
-// [LUHME XV] "ignoredPlacesDueToMatching_t" wird derzeit entfernt (Christian G.)
-/**
- * See ignoredPlacesDueToMatching.
- */
-typedef std::set<owfnPlace*> ignoredPlacesDueToMatching_t;
-
-/**
- * Set of all places that were not added to the parsed oWFN, because matching
- * should be performed on the oWFN. Those places must be deleted when parsing
- * is done, because they won't be delete by the oWFN.
- */
-ignoredPlacesDueToMatching_t ignoredPlacesDueToMatching;
 
 enum InTransitionParsePosition { IN_CONSUME, IN_PRODUCE };
 InTransitionParsePosition inTransitionParsePosition; 
@@ -194,9 +182,6 @@ input:  net
 /* [LUHME XV] Semantik aus dem Regel-Inneren ans Ende der Regel verlagern */
 /* [LUHME XV] evtl. durch Auftrennen der Regel */
 net:
-  {
-	ignoredPlacesDueToMatching.clear();
-  }
 		/* [LUHME XV] C-Code zwischen "interface" "KEY_MARKING" */
 		interface KEY_MARKING
 		{
@@ -204,17 +189,6 @@ net:
 			PlSymbol* plSymbol = NULL;
 			PlaceTable->initGetNextSymbol();
 			while ((plSymbol = PlaceTable->getNextSymbol()) != NULL) {
-				// [LUHME XV] Matching soll nach dem Parser gelöst werden
-				// Ignore (do not add to PN) external places if oWFN should
-				// be matched with an OG. That is because we match the
-				// reachability graph of the inner of the oWFN with the OG.
-				if (parameters[P_MATCH] &&
-					plSymbol->getPlace()->type != INTERNAL)
-				{
-					ignoredPlacesDueToMatching.insert(plSymbol->getPlace());
-					continue;
-				}
-
 				PN->addPlace(plSymbol->getPlace());
 			}
 			// [LUHME XV] in die "oWFN::initialize()"-Methode verschieben
@@ -230,31 +204,14 @@ net:
 					j < PN->getTransition(i)->getLeavingArcsCount(); j++)
 				{
 					owfnPlace * pl = PN->getTransition(i)->getLeavingArc(j)->pl;
-					if (parameters[P_MATCH] && pl->type != INTERNAL)
-					{
-						continue;
-					}
 					pl->addArrivingArc(PN->getTransition(i)->getLeavingArc(j));
 				}
 				for (unsigned int j = 0;
 					 j < PN->getTransition(i)->getArrivingArcsCount(); j++)
 				{
 					owfnPlace * pl = PN->getTransition(i)->getArrivingArc(j)->pl;
-					if (parameters[P_MATCH] && pl->type != INTERNAL)
-					{
-						continue;
-					}
 					pl->addLeavingArc(PN->getTransition(i)->getArrivingArc(j));
 				}
-			}
-
-			// Delete all places that were not added while parsing this oWFN
-			// for matching.
-			for (ignoredPlacesDueToMatching_t::const_iterator iplace =
-				 ignoredPlacesDueToMatching.begin();
-				 iplace != ignoredPlacesDueToMatching.end(); ++iplace)
-			{
-				delete *iplace;
 			}
 		}
 ;
@@ -629,24 +586,9 @@ transition: KEY_TRANSITION tname
 	}
 	arclist SEMICOLON
 	{
-	unsigned int card;
 	unsigned int i;
 	arc_list * current;
 
-	/* Anzahl der Boegen */
-	card = 0;
-	for(current = $6; current; current = current->next) {
-		// [LUHME XV] Matching aus Parser entfernen
-		// Ignore external places if oWFN should be matched with an
-		// OG. That is because we match the reachability graph of
-		// the inner of the oWFN with the OG.
-		if (parameters[P_MATCH] && current->place->getPlace()->type != INTERNAL) {
-			continue;
-		}
-
-		++card;
-	}
-		
 	/* Schleife ueber alle eingehenden Boegen */
 	for(current = $6; current; current = current->next) {
 		if (current->place->getPlace()->type == OUTPUT) {
@@ -656,20 +598,7 @@ transition: KEY_TRANSITION tname
 			owfn_yyerror(msg.c_str());
 		}
 		
-		// [LUHME XV] Matching aus Parser entfernen
-		if (parameters[P_MATCH] && current->place->getPlace()->type != INTERNAL) {
-			if (T->hasNonTauLabelForMatching()) {
-				string msg = string("Transition '") + T->name + "' sends or "
-					"receives more than one message which is not allowed.";
-				owfn_yyerror(msg.c_str());
-			}
-			T->setLabelForMatching(
-				current->place->getPlace()->getLabelForMatching());
-
-			continue;
-		}
-	/* gibt es Bogen schon? */
-
+        /* gibt es Bogen schon? */
 		for(i = 0; i < T->getArrivingArcsCount();i++) {
 			if(current->place->getPlace() == T->getArrivingArc(i)->pl) {
 				/* Bogen existiert, nur Vielfachheit addieren */
@@ -677,23 +606,14 @@ transition: KEY_TRANSITION tname
 				break;
 			}
 		}
-		// variable i is still needed, don't even think about touching it
 
+		// variable i is still needed, don't even think about touching it
 		if(i >= T->getArrivingArcsCount()) {
-			T->addArrivingArc(
-				new Arc(T, current->place->getPlace(), true, current->nu)
-			);
+			T->addArrivingArc( new Arc(T, current->place->getPlace(), true, current->nu) );
 			current->place->getPlace()->references ++;
 		}
 	}
 
-	/* 2. Outliste eintragen */
-
-	/* Anzahl der Boegen */
-	card = 0;
-	for(current = $10; current; current = current->next) {
-		++card;
-	}
 
 	/* Schleife ueber alle ausgehenden Boegen */
 	for(current = $10; current; current = current->next) {
@@ -704,20 +624,7 @@ transition: KEY_TRANSITION tname
 			owfn_yyerror(msg.c_str());
 		}
 
-		// [LUHME XV] Matching aus Parser entfernen
-		if (parameters[P_MATCH] && current->place->getPlace()->type != INTERNAL) {
-			if (T->hasNonTauLabelForMatching()) {
-				string msg = string("Transition '") + T->name + "' sends or "
-					"receives more than one message which is not allowed.";
-				owfn_yyerror(msg.c_str());
-			}
-			T->setLabelForMatching(
-				current->place->getPlace()->getLabelForMatching());
-
-			continue;
-		}
 		/* gibt es Bogen schon? */
-
 		for(i = 0; i < T->getLeavingArcsCount(); i++) {
 			if(current->place->getPlace() == T->getLeavingArc(i)->pl) {
 				/* Bogen existiert, nur Vielfachheit addieren */
@@ -725,12 +632,10 @@ transition: KEY_TRANSITION tname
 				break;
 			}
 		}
-		// variable i is still needed, don't even think about touching it
 
+		// variable i is still needed, don't even think about touching it
 		if(i >= T->getLeavingArcsCount()) {
-			T->addLeavingArc(
-				new Arc(T,current->place->getPlace(), false, current->nu)
-			);
+			T->addLeavingArc( new Arc(T,current->place->getPlace(), false, current->nu) );
 			current->place->getPlace()->references++;
 		}
 	}
@@ -740,7 +645,7 @@ opt_synchronize_label
 
 	free($2);
 
-	// delete arc_list because they are no longer used.
+	// delete arc_list because they are no longer used
 	delete $6;
 	delete $10;
 }
@@ -797,24 +702,22 @@ arc:
 	  }
 ;
 
-statepredicate: LPAR 
+statepredicate: LPAR statepredicate RPAR 
 	{
-		// [LUHME XV] member "finalConditionString" durch Methode ersetzen
-	PN->finalConditionString += "(";  
-	}
-	statepredicate RPAR 
-	{
-	$$ = $3;
-	PN->finalConditionString += ")";
+	$$ = $2;
 }
-| statepredicate OP_AND 
-	{
-	PN->finalConditionString = PN->finalConditionString + " AND ";    
-	}
-	statepredicate 
+| statepredicate OP_AND statepredicate 
 	{
 	// [LUHME XV] "conj" groß oder zwei Klassen "...formulaConj" und "...formulaDisj"
-	$$ = new binarybooleanformula(conj,$1,$4);
+	$$ = new binarybooleanformula(conj,$1,$3);
+}
+| statepredicate OP_OR statepredicate 
+	{
+		$$ = new binarybooleanformula(disj,$1,$3);
+}
+| OP_NOT statepredicate 
+	{
+	   $$ = new unarybooleanformula(neg,$2);
 }
 | statepredicate OP_AND KEY_ALL_OTHER_PLACES_EMPTY {
 	// [LUHME XV] Entfalten der Formel verschieben,
@@ -861,7 +764,6 @@ statepredicate: LPAR
 		
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
-	PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_PLACES_EMPTY";  
 }
 | statepredicate OP_AND KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY {
 	// [LUHME XV] Entfalten der Formel verschieben, s.o.
@@ -907,7 +809,6 @@ statepredicate: LPAR
 		
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
-	PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_INTERNAL_PLACES_EMPTY";  
 }
 | statepredicate OP_AND KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY {
 	// [LUHME XV] Entfalten der Formel verschieben, s.o.
@@ -957,23 +858,6 @@ statepredicate: LPAR
 		
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
-	PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_EXTERNAL_PLACES_EMPTY";  
-}
-| statepredicate OP_OR 
-	{
-		PN->finalConditionString = PN->finalConditionString + " OR ";  
-	}
-	statepredicate 
-	{
-		$$ = new binarybooleanformula(disj,$1,$4);
-}
-| OP_NOT
-	{
-		PN->finalConditionString = PN->finalConditionString + "NOT ";      
-	} 
-	statepredicate 
-	{
-	   $$ = new unarybooleanformula(neg,$3);
 }
 | nodeident OP_EQ NUMBER {
 	unsigned int i;
@@ -984,7 +868,6 @@ statepredicate: LPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(eq, PS->getPlace(), i);
-	PN->finalConditionString = PN->finalConditionString + string($1) + " = " + string($3);  
 	free($1);
 	free($3);
 }
@@ -997,7 +880,6 @@ statepredicate: LPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(neq, PS->getPlace(), i);
-	PN->finalConditionString = PN->finalConditionString + string($1) + " != " + string($3);  
 	free($1);
 	free($3);
 }
@@ -1010,7 +892,6 @@ statepredicate: LPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(lt, PS->getPlace(), i);
-	PN->finalConditionString = PN->finalConditionString + string($1) + " < " + string($3);  
 	free($1);
 	free($3);
 }
@@ -1023,7 +904,6 @@ statepredicate: LPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(gt, PS->getPlace(), i);
-	PN->finalConditionString = PN->finalConditionString + string($1) + " > " + string($3);  
 	free($1);
 	free($3);
 }
@@ -1036,7 +916,6 @@ statepredicate: LPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(geq, PS->getPlace(), i);
-	PN->finalConditionString = PN->finalConditionString + string($1) + " >= " + string($3);  
 	free($1);
 	free($3);
 }
@@ -1049,7 +928,6 @@ statepredicate: LPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(leq, PS->getPlace(), i);
-	PN->finalConditionString = PN->finalConditionString + string($1) + " <= " + string($3);  
 	free($1);
 	free($3);
 }

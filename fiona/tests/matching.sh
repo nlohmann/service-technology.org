@@ -16,8 +16,8 @@ rm -f $DIR/*.log
 
 result=0
 
+############################################################################
 og="$DIR/shop.og"
-
 ############################################################################
 
 owfn="$DIR/client_match_1.owfn"
@@ -70,6 +70,31 @@ fi
 
 ############################################################################
 
+owfn="$DIR/client_nomatch_2.owfn"
+cmd="$FIONA $owfn -t match $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    $evaluate $fionaExitCode
+    if [ $? -ne 0 ] 
+    then
+        result=1
+    else
+        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        if [ $? -ne 0 ]; then
+            echo ... oWFN matches with OG although it should not
+            result=1
+        fi
+    fi
+fi
+
+############################################################################
+
 owfn="$DIR/client_nosupport_1.owfn"
 cmd="$FIONA $owfn -t match $og"
 if [ "$memcheck" = "yes" ]; then
@@ -85,11 +110,16 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "ends or receives more than one message" > /dev/null
+        #echo $OUTPUT | grep "ends or receives more than one message" > /dev/null
+        #if [ $? -ne 0 ]; then
+        #    echo ... Parsing should have failed due to a transition reading or \
+        #        writing more than one message, but it seems there was a different \
+        #        reason.
+        #    result=1
+        #fi
+        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... Parsing should have failed due to a transition reading or \
-                writing more than one message, but it seems there was a different \
-                reason.
+            echo ... oWFN matches with OG although it should not
             result=1
         fi
     fi
@@ -206,6 +236,87 @@ fi
 ############################################################################
 
 owfn="$DIR/interface_rcv-ax_snd-b.owfn"
+cmd="$FIONA $owfn -t match $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    $evaluate $fionaExitCode
+    if [ $? -ne 0 ] 
+    then
+        result=1
+    else
+        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        if [ $? -ne 0 ]; then
+            echo ... oWFN matches with OG although it should not
+            result=1
+        fi
+    fi
+fi
+
+############################################################################
+og="$DIR/internal.og"
+############################################################################
+
+owfn="$DIR/internal_match.owfn"
+cmd="$FIONA $owfn -t match $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    $evaluate $fionaExitCode
+    if [ $? -ne 0 ] 
+    then
+        result=1
+    else
+        echo $OUTPUT | grep "oWFN matches with OG: YES" > /dev/null
+        if [ $? -ne 0 ]; then
+            echo ... oWFN does not match with OG although it should
+            result=1
+        fi
+    fi
+fi
+
+############################################################################
+og="$DIR/interface_match.og"
+############################################################################
+
+owfn="$DIR/interface-partner.owfn"
+cmd="$FIONA $owfn -t match $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    $evaluate $fionaExitCode
+    if [ $? -ne 0 ] 
+    then
+        result=1
+    else
+        echo $OUTPUT | grep "oWFN matches with OG: YES" > /dev/null
+        if [ $? -ne 0 ]; then
+            echo ... oWFN does not match with OG although it should
+            result=1
+        fi
+    fi
+fi
+
+############################################################################
+og="$DIR/interface_nomatch.og"
+############################################################################
+
+owfn="$DIR/interface-partner.owfn"
 cmd="$FIONA $owfn -t match $og"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.match.memcheck.log"

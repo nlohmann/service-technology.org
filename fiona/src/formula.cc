@@ -267,7 +267,7 @@ bool atomicformula::init(unsigned int* CurrentMarking) {
                 return (value=true);
             return (value=false);
         case conj: /* fall through */
-        case disj: /* fall through */
+        case disj:
         case neg:
             assert(false);
             break; // should never happen, since this is an atomic formula
@@ -302,11 +302,11 @@ bool binarybooleanformula::init(unsigned int* m) {
                 return value = true;
             return value;
         case eq: /* fall through */
-        case neq: /* fall through */
-        case geq: /* fall through */
-        case leq: /* fall through */
-        case lt: /* fall through */
-        case gt: /* fall through */
+        case neq:
+        case geq:
+        case leq:
+        case lt:
+        case gt:
         case neg:
             assert(false);
             break; // should never happen, since this is a binary boolean formula
@@ -348,11 +348,11 @@ bool booleanformula::init(unsigned int* m) {
             }
             return value = false;
         case eq: /* fall through */
-        case neq: /* fall through */
-        case geq: /* fall through */
-        case leq: /* fall through */
-        case lt: /* fall through */
-        case gt: /* fall through */
+        case neq:
+        case geq:
+        case leq:
+        case lt:
+        case gt:
         case neg:
             assert(false);
             break; // should never happen, since this is a boolean formula
@@ -361,10 +361,110 @@ bool booleanformula::init(unsigned int* m) {
 }
 
 
-//! \brief returns a deep copy of this formula (which is a flat copy for an atomic formula)
-//! \return  deep copy (flat copy)
-atomicformula* atomicformula::deep_copy() {
-    return flat_copy();
+//! \brief returns a reduced deep copy of this formula where only references
+//!        to internal places from the given net are allowed
+//!        this is needed for the matching algorithm of fiona
+//! \param net a pointer to an oWFN
+//! \return  reduced copy
+atomicformula* atomicformula::reduced_copy(oWFN * net) {
+    owfnPlace* newPlace = net->getPlace( p->getName() );
+    if ( newPlace == NULL || newPlace->type != INTERNAL ) {
+        return NULL;
+    } else {
+        atomicformula* f = new atomicformula(type, newPlace, k);
+        f->value = value;
+        f->parent = parent;
+        f->parentindex = parentindex;
+        return f;
+    }
+}
+
+
+//! \brief returns a reduced copy of this formula
+//! \return reduced copy
+unarybooleanformula* unarybooleanformula::reduced_copy(oWFN * net) {
+    formula* newSub = sub->reduced_copy(net);
+    if ( newSub == NULL ) {
+        return NULL;
+    } else {
+        unarybooleanformula* f = new unarybooleanformula(type, newSub);
+        f->value = value;
+        f->parent = parent;
+        f->parentindex = parentindex;
+        f->sub->parent = f;
+        return f;
+    }
+}
+
+
+//! \brief returns a reduced copy of this formula
+//! \return reduced copy
+binarybooleanformula* binarybooleanformula::reduced_copy(oWFN * net) {
+    formula* newLeft = left->reduced_copy(net);
+    formula* newRight = right->reduced_copy(net);
+    if ( newLeft == NULL && newRight == NULL ) {
+        return NULL;
+    } else if ( newLeft == NULL ) {
+        newRight->parent = parent;
+        newRight->parentindex = parentindex;
+        return (binarybooleanformula*)newRight;
+    } else if ( newRight == NULL ) {
+        newLeft->parent = parent;
+        newLeft->parentindex = parentindex;
+        return (binarybooleanformula*)newLeft;
+    } else {
+        binarybooleanformula* f = new binarybooleanformula(type, newLeft, newRight);
+        f->value = value;
+        f->parent = parent;
+        f->parentindex = parentindex;
+        f->left->parent = f->right->parent = f;
+        return f;
+    }
+}
+
+
+//! \brief returns a reduced copy of this formula
+//! \return reduced copy
+booleanformula* booleanformula::reduced_copy(oWFN * net) {
+
+    booleanformula* f = new booleanformula();
+
+    formula ** newSubs = new formula* [cardsub];
+    unsigned int j = 0;
+
+    for (unsigned int i = 0; i < cardsub; i++) {
+        formula* newSub = sub[i]->reduced_copy(net);
+        if ( newSub != NULL ) {
+            newSubs[j] = newSub;
+            newSubs[j]->parent = f;
+            newSubs[j]->parentindex = j;
+            j++;
+        }
+    }
+
+    f->type = type;
+    f->sub = newSubs;
+    f->cardsub = j;
+    f->firstvalid = firstvalid;
+    f->value = value;
+    f->parent = parent;
+    f->parentindex = parentindex;
+    return f;
+}
+
+
+//! \brief returns a deep copy of this formula with a reference to a place from
+//!        given net (the new place has the same name as the old place)
+//! \param net a pointer to an oWFN
+//! \return  deep copy
+atomicformula* atomicformula::deep_copy(oWFN * net) {
+    atomicformula* f;
+    owfnPlace* newPlace = net->getPlace( p->getName() );
+    f = new atomicformula(type, newPlace, k);
+    f->value = value;
+    f->parent = parent;
+    f->parentindex = parentindex;
+    return f;
 }
 
 
@@ -382,9 +482,9 @@ atomicformula* atomicformula::flat_copy() {
 
 //! \brief returns a deep copy of this formula
 //! \return deep copy
-unarybooleanformula* unarybooleanformula::deep_copy() {
+unarybooleanformula* unarybooleanformula::deep_copy(oWFN * net) {
     unarybooleanformula* f;
-    f = new unarybooleanformula(type, sub->deep_copy());
+    f = new unarybooleanformula(type, sub->deep_copy(net));
     f->value = value;
     f->parent = parent;
     f->parentindex = parentindex;
@@ -407,9 +507,9 @@ unarybooleanformula* unarybooleanformula::flat_copy() {
 
 //! \brief returns a deep copy of this formula
 //! \return deep copy
-binarybooleanformula* binarybooleanformula::deep_copy() {
+binarybooleanformula* binarybooleanformula::deep_copy(oWFN * net) {
     binarybooleanformula* f;
-    f = new binarybooleanformula(type, left->deep_copy(), right->deep_copy());
+    f = new binarybooleanformula(type, left->deep_copy(net), right->deep_copy(net));
     f->value = value;
     f->parent = parent;
     f->parentindex = parentindex;
@@ -432,7 +532,7 @@ binarybooleanformula* binarybooleanformula::flat_copy() {
 
 //! \brief returns a deep copy of this formula
 //! \return deep copy
-booleanformula* booleanformula::deep_copy() {
+booleanformula* booleanformula::deep_copy(oWFN * net) {
     unsigned int i;
     booleanformula* f;
 
@@ -441,7 +541,7 @@ booleanformula* booleanformula::deep_copy() {
     formula **newsub;
     newsub = new formula* [cardsub];
     for (i=0; i<cardsub; i++) {
-        newsub[i] = sub[i]->deep_copy();
+        newsub[i] = sub[i]->deep_copy(net);
         newsub[i]->parent = f;
         newsub[i]->parentindex = i;
     }
@@ -482,7 +582,7 @@ booleanformula* booleanformula::flat_copy() {
 //!        formula.
 //! \return compressed formula
 formula* atomicformula::merge() {
-    return deep_copy();
+    return flat_copy();
 }
 
 
@@ -552,11 +652,11 @@ formula* binarybooleanformula::merge() {
             }
             break;
         case eq: /* fall through */
-        case neq: /* fall through */
-        case geq: /* fall through */
-        case leq: /* fall through */
-        case lt: /* fall through */
-        case gt: /* fall through */
+        case neq:
+        case geq:
+        case leq:
+        case lt:
+        case gt:
         case neg:
             assert(false);
             break; // should never happen, since this is a binary boolean formula
@@ -622,11 +722,11 @@ formula* booleanformula::merge() {
             }
             break;
         case eq: /* fall through */
-        case neq: /* fall through */
-        case geq: /* fall through */
-        case leq: /* fall through */
-        case lt: /* fall through */
-        case gt: /* fall through */
+        case neq:
+        case geq:
+        case leq:
+        case lt:
+        case gt:
         case neg:
             assert(false);
             break; // should never happen, since this is a boolean formula
@@ -638,11 +738,12 @@ formula* booleanformula::merge() {
 
 //! \brief set links to parents and from/to mentioned places
 void atomicformula::setstatic() {
-    if (!(p->proposition)) {
+    if ( p->proposition == NULL ) {
         p->proposition = new formula* [p->cardprop];
         p->cardprop = 0;
     }
-    p->proposition[p->cardprop ++] = this;
+    p->proposition[p->cardprop] = this;
+    p->cardprop++;
 }
 
 
@@ -663,8 +764,7 @@ void binarybooleanformula::setstatic() {
 
 //! \brief set links to parents and from/to mentioned places
 void booleanformula::setstatic() {
-    unsigned int i;
-    for (i=0; i < cardsub; i++) {
+    for (unsigned int i=0; i < cardsub; i++) {
         sub[i]->setstatic();
         sub[i]->parent = this;
         sub[i]->parentindex = i;
@@ -706,7 +806,7 @@ void atomicformula::update(unsigned int m) {
                 newvalue = true;
             break;
         case conj: /* fall through */
-        case disj: /* fall through */
+        case disj:
         case neg:
             assert(false);
             break; // should never happen, since this is an atomic formula
@@ -807,7 +907,7 @@ formula* atomicformula::negate() {
             type = eq;
             break;
         case conj: /* fall through */
-        case disj: /* fall through */
+        case disj:
         case neg:
             assert(false);
             break; // should never happen, since this is an aomic formula
@@ -834,8 +934,7 @@ formula* unarybooleanformula::negate() {
 //! \brief remove negation in formulae without temporal
 //! \return returns the modified formula
 formula* booleanformula::posate() {
-    unsigned int i;
-    for (i=0; i<cardsub; i++) {
+    for (unsigned int i=0; i<cardsub; i++) {
         sub[i] = sub[i]->posate();
     }
     return this;
@@ -845,8 +944,7 @@ formula* booleanformula::posate() {
 //! \brief negates the formula
 //! \return returns the negated formula
 formula* booleanformula::negate() {
-    unsigned int i;
-    for (i=0; i<cardsub; i++) {
+    for (unsigned int i=0; i<cardsub; i++) {
         sub[i] = sub[i]->negate();
     }
     if (type == conj) {
@@ -855,4 +953,115 @@ formula* booleanformula::negate() {
         type = conj;
     }
     return this;
+}
+
+
+string atomicformula::getString() {
+    switch (type) {
+        case eq:
+            return p->getName() + " = " + intToString(k);
+            break;
+        case neq:
+            return p->getName() + " <> " + intToString(k);
+            break;
+        case leq:
+            return p->getName() + " <= " + intToString(k);
+            break;
+        case geq:
+            return p->getName() + " >= " + intToString(k);
+            break;
+        case lt:
+            return p->getName() + " < " + intToString(k);
+            break;
+        case gt:
+            return p->getName() + " > " + intToString(k);
+            break;
+        case neg:  /* fall through */
+        case conj:
+        case disj:
+            assert(false);
+            break; // should never happen, since this is an atomic formula
+    }
+
+   return NULL;
+}
+
+
+string unarybooleanformula::getString() {
+    switch (type) {
+        case neg:
+            return "NOT " + sub->getString();
+            break;
+        case eq: /* fall through */
+        case neq:
+        case leq:
+        case geq:
+        case lt:
+        case gt:
+        case conj:
+        case disj:
+            assert(false);
+            break; // should never happen, since this is an unary boolean formula
+    }
+
+    return NULL;
+}
+
+
+string binarybooleanformula::getString() {
+    switch (type) {
+        case conj:
+            return "(" + left->getString() + " AND " + right->getString() + ")";
+            break;
+        case disj:
+            return "(" + left->getString() + " OR " + right->getString() + ")";
+            break;
+        case eq: /* fall through */
+        case neq:
+        case leq:
+        case geq:
+        case lt:
+        case gt:
+        case neg:
+            assert(false);
+            break; // should never happen, since this is an binary boolean formula
+    }
+
+    return NULL;
+}
+
+
+string booleanformula::getString() {
+    string result;
+    switch (type) {
+        case conj:
+            result = "(";
+            for (unsigned int i = 0; i < cardsub - 1; i++) {
+                result = result + sub[i]->getString() + " AND ";
+            }
+            assert(cardsub > 0);
+            result = result + sub[cardsub - 1]->getString() + ")";
+            return result;
+            break;
+        case disj:
+            result = "(";
+            for (unsigned int i = 0; i < cardsub - 1; i++) {
+                result = result + sub[i]->getString() + " OR ";
+            }
+            assert(cardsub > 0);
+            result = result + sub[cardsub - 1]->getString() + ")";
+            return result;
+            break;
+        case eq: /* fall through */
+        case neq:
+        case leq:
+        case geq:
+        case lt:
+        case gt:
+        case neg:
+            assert(false);
+            break; // should never happen, since this is an n-ary and/or boolean formula
+    }
+
+    return NULL;
 }

@@ -1,0 +1,46 @@
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,
+  p2,
+  p3;
+
+INPUT
+  a,
+  b;
+
+OUTPUT
+  ;
+
+INITIALMARKING
+  p0:   1;
+
+FINALCONDITION
+  (p1 = 1 OR p3 = 1) AND ALL_OTHER_PLACES_EMPTY;
+
+TRANSITION t0    { ?a }
+CONSUME
+  p0:   1,
+  a:    1;
+PRODUCE
+  p1:   1;
+
+TRANSITION t1    { TAU }
+CONSUME
+  p0:   1;
+PRODUCE
+  p2:   1;
+
+TRANSITION t2    { ?a }
+CONSUME
+  p2:   1,
+  a:    1;
+PRODUCE
+  p1:   1;
+
+TRANSITION t3    { ?b }
+CONSUME
+  p2:   1,
+  b:    1;
+PRODUCE
+  p3:   1;

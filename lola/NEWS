@@ -17,6 +17,9 @@ Version 1.11-unreleased
 
 * removed old manual `lola-old.ps' from documentation
 
+* adapted documentation to fix bug #12090 (`https://gna.org/bugs/?12090'):
+  syntax description deviated from implementation
+
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for
 complete version history.

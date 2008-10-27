@@ -7,6 +7,8 @@
 @item updated @option{-h} output
 
 @item removed old manual @file{lola-old.ps} from documentation
+
+@item adapted documentation to fix bug #12090 (@url{https://gna.org/bugs/?12090}): syntax description deviated from implementation 
 @end itemize
 
 

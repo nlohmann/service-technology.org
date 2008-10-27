@@ -93,7 +93,7 @@ inline Node::~Node()
 inline Node::Node(char * n)
 {
 	/// copy external representation
-  name = new char [strlen(n) + 1];
+  name = new char [strlen(n) + 5];
   strcpy(name,n);
    /// initialize arcs
   pos[0] = pos[1] = NrOfArriving = NrOfLeaving = 0;

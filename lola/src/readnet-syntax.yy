@@ -1178,6 +1178,12 @@ net: key_place placelists semicolon key_marking {LocalTable = (SymbolTab *) 0;} 
 	}
     }
 	PlaceTable->card = i;
+#ifdef WITHFORMULA
+	for(i=0;i<PlaceTable->card;i++)
+	{
+		Places[i]->propositions = (formula **) 0;
+	}
+#endif
   // Create array of transitions 
   Transitions = new Transition * [TransitionTable -> card+10];
   i = 0;

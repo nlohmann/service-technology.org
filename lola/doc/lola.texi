@@ -211,7 +211,7 @@ The defined symbols can be used in the actual net description which is subsequen
 @section Basics
 
 
-@subsection File Format: Identifiers
+@subsection Identifiers
 
 The rules for building identifiers in LoLA are quite liberal. This way, it should be easy to translate various file formats into LoLA format. Basically, every string of printable characters that does not contain any of the following characters is an identifier: @code{,}, @code{;}, @code{:}, @code{(}, @code{)}, @code{@{}, @code{@}} 
 
@@ -241,7 +241,7 @@ Identifiers must be separated from other parts of the net file specification usi
 Future versions of LoLA may have additional reserved words. New reserved words shall, however, always consist of capital letters only.
 
 
-@subsection File Format: Numbers
+@subsection Numbers
 
 Every sequence of digits, separated by white space (blank, tab, newline, or comment, i.e. text enclosed in curling brackets @samp{@{}, @samp{@}}), is a number. LoLA does not have a concept of signed numbers. 
 
@@ -364,13 +364,13 @@ s3 = [ 3 , 7 ] ;
 @end example
 @end cartouche
 
-@item the keyword @samp{ENUMERATE}, followed by a comma-separated list of identifiers and the keyword @samp{END}. Each identifier represents a distinguished value.
+@item the keyword @samp{ENUMERATE}, followed by a white space separated list of identifiers and the keyword @samp{END}. Each identifier represents a distinguished value.
 
 @cartouche
 @b{Example:}
 @example
 s4 = ENUMERATE
-       blue , white , red
+       blue white red
      END ;
 @end example
 @end cartouche
@@ -614,7 +614,7 @@ END
 @cindex @code{OR}
 @cindex @code{NOT}
 
-Expressions can be used in the descriptions of the meaning of operations, in transition guards, and in the specification of state predicates and CTL formulas. An expression represents a single value that may depend on arguments of the operation and values of variables.
+Expressions can be used in the descriptions of the meaning of operations, in transition guards, and in the specification of state predicates and @acronym{CTL} formulas. An expression represents a single value that may depend on arguments of the operation and values of variables.
 
 Expressions can be built according as follows (@samp{E1} and @samp{E2} are subexpressions):
 @itemize
@@ -772,7 +772,7 @@ Using LoLA, you can verify various properties, including properties of
 @item a places
 @item a transitions
 @item a state predicate
-@item a CTL-formula
+@item a @acronym{CTL}-formula
 @end itemize
 
 
@@ -1224,7 +1224,7 @@ is live.
 
 The predicate to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option @option{-a}. If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with @file{.task}. If option @option{-A} is used instead of @option{-a}, the specification is read from the standard input stream. 
 
-The specification starts with @samp{FORMULA} followed by the description of the predicate. The syntax for a state predicate is the same as for a CTL-formula. As the only difference, temporal operators (@samp{NEXTSTEP}, @samp{ALWAYS}, @samp{EVENTUALLY}, @samp{UNTIL}) and path quantifiers (@samp{EXPATH}, @samp{ALLPATH}) cannot be used in a state predicate.
+The specification starts with @samp{FORMULA} followed by the description of the predicate. The syntax for a state predicate is the same as for a @acronym{CTL}-formula. As the only difference, temporal operators (@samp{NEXTSTEP}, @samp{ALWAYS}, @samp{EVENTUALLY}, @samp{UNTIL}) and path quantifiers (@samp{EXPATH}, @samp{ALLPATH}) cannot be used in a state predicate.
 
 Instead of a specification in a separate file, the specification can be immediately appended to the specification of the net. This approach is recommended if LoLA is integrated into another tool and communicates via standard input/output streams.
 
@@ -1274,7 +1274,7 @@ Both depth first search and breadth first search are available. Breadth first se
 @subsection Checking Liveness
 @cindex @code{#LIVEPRPOP}
 
-A state predicate is reachable live iff, from every reachable marking, there is a marking reachable where the given predicate is satisfied. The property corresponds to the CTL specification @b{AG}@tie{}@b{EF}@tie{}@math{\phi}. 
+A state predicate is reachable live iff, from every reachable marking, there is a marking reachable where the given predicate is satisfied. The property corresponds to the @acronym{CTL} specification @b{AG}@tie{}@b{EF}@tie{}@math{\phi}. 
 
 Edit file @file{userconfig.H} and select the option @samp{#LIVEPRPOP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
 
@@ -1358,11 +1358,11 @@ The following reduction techniques may be applied:
 
 
 @c --------------------------------------------------------------------------
-@section Properties of a CTL Formula
+@section Properties of a @acronym{CTL} Formula
 
 
 @subsection Specification
-@cindex @code{FORMULA}, CTL specification
+@cindex @code{FORMULA}, @acronym{CTL} specification
 @cindex @code{.task} files
 @cindex @code{-a} option
 @cindex @code{-A} option
@@ -1384,7 +1384,7 @@ The formula to be analysed can be specified in a separate file. The file name is
 The specification starts with @samp{FORMULA} followed by the description of the predicate. For place-transition nets, a formula can be recursively constructed as follows:
 
 @itemize
-@item Every comparison is a CTL formula. A comparison consists of a place name, one of the operators @samp{<}, @samp{>}, @samp{<=}, @samp{>=}, @samp{=}, @samp{<>}, @samp{#}, and a natural number. A marking satisfies a comparison if the number of tokens on the specified places is in the specified relation to the given number. Thereby, @samp{#} and @samp{<>} both represent inequality while all other operators have the obvious meaning.
+@item Every comparison is a @acronym{CTL} formula. A comparison consists of a place name, one of the operators @samp{<}, @samp{>}, @samp{<=}, @samp{>=}, @samp{=}, @samp{<>}, @samp{#}, and a natural number. A marking satisfies a comparison if the number of tokens on the specified places is in the specified relation to the given number. Thereby, @samp{#} and @samp{<>} both represent inequality while all other operators have the obvious meaning.
 
 @cartouche
 @b{Example:}
@@ -1393,7 +1393,7 @@ p17 >= 28
 @end example
 @end cartouche
 
-@item Boolean combinations of CTL formulas are CTL formulas. The Boolean operators @samp{AND}, @samp{OR}, and @samp{NOT} can be used. Formulas may be enclosed in parenthesis for controlling precedence.
+@item Boolean combinations of @acronym{CTL} formulas are @acronym{CTL} formulas. The Boolean operators @samp{AND}, @samp{OR}, and @samp{NOT} can be used. Formulas may be enclosed in parenthesis for controlling precedence.
 
 @cartouche
 @b{Example:}
@@ -1402,7 +1402,7 @@ p1 > 3 AND NOT (p15 = 1 OR p17 <= 0) AND p3 # 2
 @end example
 @end cartouche
 
-@item A CTL formula preceded by any of the following pairs of keywords is a CTL formula: @samp{ALLPATH ALWAYS}, @samp{EXPATH ALWAYS}; @samp{ALLPATH EVENTUALLY}, @samp{EXPATH EVENTUALLY}, @samp{ALLPATH NEXTSTEP}, @samp{EXPATH NEXTSTEP}. Thereby, @samp{ALLPATH} represents the universal path quantifier @b{A} and requires validity of the subsequent formula on all paths, @samp{EXPATH} represents the existential path quantifier @b{E} and requires validity of the subsequent formula on at least one path. 
+@item A @acronym{CTL} formula preceded by any of the following pairs of keywords is a @acronym{CTL} formula: @samp{ALLPATH ALWAYS}, @samp{EXPATH ALWAYS}; @samp{ALLPATH EVENTUALLY}, @samp{EXPATH EVENTUALLY}, @samp{ALLPATH NEXTSTEP}, @samp{EXPATH NEXTSTEP}. Thereby, @samp{ALLPATH} represents the universal path quantifier @b{A} and requires validity of the subsequent formula on all paths, @samp{EXPATH} represents the existential path quantifier @b{E} and requires validity of the subsequent formula on at least one path. 
 
 @samp{ALWAYS} represents the temporal operator @b{G} and requires validity of the subsequent formula on all states on a path, @samp{EVENTUALLY} represents the temporal operator @b{F} and requires validity of the subsequent formula on at least one state on a path, @samp{NEXTSTEP} represents the temporal operator @b{X} and requires validity of the subsequent formula on the second state of a path. 
 
@@ -1413,7 +1413,7 @@ ALLPATH ALWAYS EXPATH EVENTUALLY (p1 = 3 OR EXPATH NEXTSTEP p2 > 5)
 @end example
 @end cartouche
 
-@item If @i{phi} and @i{psi} are CTL formulas, so are @samp{EXPATH [ @i{phi} UNTIL @i{psi} ]} and @samp{ALLPATH [ @i{phi} UNTIL @i{psi} ]}. @samp{UNTIL} represents the temporal operator @b{U} and requires that @i{psi} is valid on some state on a path such that @i{phi} is valid on all preceding states.
+@item If @i{phi} and @i{psi} are @acronym{CTL} formulas, so are @samp{EXPATH [ @i{phi} UNTIL @i{psi} ]} and @samp{ALLPATH [ @i{phi} UNTIL @i{psi} ]}. @samp{UNTIL} represents the temporal operator @b{U} and requires that @i{psi} is valid on some state on a path such that @i{phi} is valid on all preceding states.
 
 @cartouche
 @b{Example:}
@@ -1430,7 +1430,7 @@ For high-level nets, there are the following additional features:
 
 @item A high level place name can be extended with a symbolic instance expression. The expression must be enclosed in parenthesis and is appended to the place name with a @samp{.}. The expression must have a sort that is compatible to the sort of the involved place. It may use all constants and operations which are permitted in specifications of operations in the net description. An expression may contain those variables that have been introduced through those quantifications which have the specified expression in their scope.
 
-@item Every boolean expression (according to the syntax for operations in the net description, enclosed in brackets, is a CTL formula.
+@item Every boolean expression (according to the syntax for operations in the net description, enclosed in brackets, is a @acronym{CTL} formula.
 
 @cartouche
 @b{Example:}
@@ -1448,7 +1448,7 @@ specifies that there is a reachable marking where all instances of high level pl
 @subsection Model Checking
 @cindex @code{#MODELCHECKING}
 
-A CTL formula is @dfn{valid} iff it is satisfied by the initial marking of the net. 
+A @acronym{CTL} formula is @dfn{valid} iff it is satisfied by the initial marking of the net. 
 
 Edit file @file{userconfig.H} and select the option @samp{#MODELCHECKING} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
 
@@ -1541,7 +1541,7 @@ The symmetry method can be applied in combination with the stubborn set method, 
 The symmetry methods implemented in LoLA correspond to the publications:
 
 @itemize
-@item Tommi A. Junttila. @b{New canonical representative marking algorithms for place/transition-nets}. In J. Cortadella and W. Reisig, editors, @i{Application and Theory of Petri Nets 2004}, volume 3099 of Lecture Notes in Computer Science, pages 258–277. Springer, 2004.
+@item Tommi A. Junttila. @b{New canonical representative marking algorithms for place/transition-nets}. In J. Cortadella and W. Reisig, editors, @i{Application and Theory of Petri Nets 2004}, volume 3099 of Lecture Notes in Computer Science, pages 258-277. Springer, 2004.
 
 @item Karsten Schmidt. @b{How to Calculate Symmetries of Petri Nets}. @i{Acta Inf.}, 36(7):545-590, 2000. 
 
@@ -1583,7 +1583,7 @@ Most stubborn set methods implemented in LoLA correspond to the publications:
 
 @item Lars Michael Kristensen, Karsten Schmidt, Antti Valmari: @b{Question-guided stubborn set methods for state properties}. @i{Formal Methods in System Design (FMSD)} 29(3):215-251 (2006)
 
-@item Karsten Schmidt. @b{Stubborn Sets for Model Checking the EF/AG Fragment of CTL}. @i{Fundam. Inform.}, 43(1-4):331-341, August 2000.
+@item Karsten Schmidt. @b{Stubborn Sets for Model Checking the EF/AG Fragment of @acronym{CTL}}. @i{Fundam. Inform.}, 43(1-4):331-341, August 2000.
 
 @item Karsten Schmidt. @b{Stubborn Sets for Standard Properties}. In @i{Applications and Theory of Petri Nets 1999: 20th International Conference, ICATPN'99, Williamsburg, Virginia, USA, June 1999. Proceedings}, volume 1639 of Lecture Notes in Computer Science, pages 46-65, 1999. Springer-Verlag.
 @end itemize
@@ -1620,7 +1620,7 @@ With the sweep-line method, it is impossible to produce a witness path for the c
 The sweep-line method as implemented in LoLA corresponds to the publications:
 
 @itemize
-@item Lars Michael Kristensen and Thomas Mailund. @b{A Generalised Sweep-Line Method for Safety Properties}. @i{Proc. Formal Methods Europe}, LNCS 2391, 2002, pp. 549-567
+@item Lars Michael Kristensen and Thomas Mailund. @b{A Generalised Sweep-Line Method for Safety Properties}. @i{Proc. Formal Methods Europe}, volume 2391 of Lecture Notes in Computer Science, 2002, pp. 549-567
 
 @item Karsten Schmidt. @b{Automated Generation of a Progress Measure for the Sweep-Line Method}. @i{STTT}, 8(3):195-203, June 2006. Also in: Kurt Jensen and Andreas Podelski, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems, 10th International Conference, TACAS 2004, Held as Part of the Joint European Conferences on Theory and Practice of Software, ETAPS 2004, Barcelona, Spain, March 29-April 2, 2004, Proceedings}, volume 2988 of Lecture Notes in Computer Science, pages 192-204, 2004. Springer-Verlag
 @end itemize
@@ -1772,7 +1772,7 @@ The result of verification is written to the standard error stream. For a comfor
 
 @table @asis
 @itemx 0
-specified state or deadlock found/net or place unbounded/home marking exists/net is reversible/predicate is live/CTL formula true/transition not dead/liveness property does not hold;
+specified state or deadlock found/net or place unbounded/home marking exists/net is reversible/predicate is live/@acronym{CTL} formula true/transition not dead/liveness property does not hold;
 
 @itemx 1
 the opposite verification result as a thumb rule, if the outcome of a verification result can be supported by a counterexample or witness path, that case corresponds to return value 0;

@@ -830,13 +830,13 @@ void atomicformula::setstatic()
 #ifdef WITHFORMULA
 	if(!(p -> propositions))
 	{
-		p -> propositions = new formula * [p -> cardprop];
+		p -> propositions = new formula * [p -> cardprop+10];
 		p -> cardprop = 0;
 	}
 	p -> propositions[p -> cardprop ++] = this;
 #endif
 	index = card ++;
-#if defined(STUBBORN) && defined(STATEPREDICATE)
+#if defined(STUBBORN) && (defined(STATEPREDICATE) || defined(LIVEPROP))
 	// compute global down set for state predicate
 	unsigned int i;
 	switch(type)
@@ -1266,6 +1266,129 @@ formula * atomicformula::negate()
 	}
 	return this;
 }
+
+void transitionformula::print()
+{
+	cout << "[tf: ";
+	if(transition) cout << transition -> name;
+	if(hltransition) cout << hltransition;
+	cout << "]";
+}
+
+void atomicformula::print()
+{
+	cout << "[at: ";
+	cout << p -> name;
+	switch(type)
+	{
+	case eq: cout << " = "; break;
+	case neq: cout << " # "; break;
+	case leq: cout << " <= "; break;
+	case geq: cout << " >= "; break;
+	case lt: cout << " < "; break;
+	case gt: cout << " > "; break;
+	default: cout << "???";
+	}
+	cout << k << "]";
+}
+
+void unarytemporalformula::print()
+{
+	cout << "[un: ";
+	if(tformula) tformula -> print();
+	switch(type)
+	{
+	case ax: cout << "AX "; break;
+	case ex: cout << "EX "; break;
+	case af: cout << "AF "; break;
+	case ag: cout << "AG "; break;
+	case ef: cout << "EF "; break;
+	case eg: cout << "EG "; break;
+	default: cout << "???";
+	}
+	element -> print();
+	cout << "]";
+}
+
+void untilformula::print()
+{
+	cout << "[ut: ";
+	if(tformula) tformula -> print();
+	switch(type)
+	{
+	case au: cout << "AU "; break;
+	case eu: cout << "EU "; break;
+	default: cout << "???";
+	}
+	hold -> print();
+	cout << ",";
+	goal -> print();
+	cout << "]";
+}
+	
+void hlatomicformula::print()
+{
+	cout << "[hl: "<< p -> name << "]" ;
+}
+
+
+void unarybooleanformula::print()
+{
+	cout << "[ub: " << "NOT ";
+	sub -> print();
+	cout << "]";
+}
+
+void binarybooleanformula::print()
+{	cout << "[bb: ";
+	switch(type)
+	{
+	case conj: cout << "AND "; break;
+	case disj: cout << "OR "; break;
+	default: cout << "???";
+	}
+	left -> print();
+	cout << ", ";
+	right -> print();
+	cout << "]";
+}
+
+
+void booleanformula::print()
+{
+	cout << "[bo: ";
+	switch(type)
+	{
+	case conj: cout << "AND "; break;
+	case disj: cout << "OR "; break;
+	default: cout << "???";
+	}
+	for(int i = 0; i < cardsub; i++)
+	{
+		sub[i]->print();
+		cout << ", ";
+	}
+	cout << "]";
+}
+
+
+void quantifiedformula::print()
+{
+	cout << "[qu: ";
+	switch(type)
+	{
+	case qe: cout << "EXISTS "; break;
+	case qa: cout << "ALL "; break;
+	default: cout << "???";
+	}
+	cout << "]";
+}
+
+void staticformula::print()
+{	
+	cout << "[st: ]";
+}
+	
 
 formula * unarybooleanformula::posate()
 {

@@ -44,6 +44,7 @@ public:
     virtual formula * reduce(int *) = 0;
     unsigned int parentindex;
     virtual ~formula() {}
+    virtual void print() = 0;
 };
 
 class transitionformula : public formula
@@ -68,6 +69,7 @@ public:
     virtual unsigned int  collectsubs(FType,formula **,unsigned int);
     bool initatomic() { return NULL; }
     void evaluateatomic(State * s) {}
+    void print();
 };
 
 class atomicformula : public formula
@@ -90,6 +92,7 @@ public:
     virtual formula * replacequantifiers();
     virtual void evaluateatomic(State *);
     unsigned int counttype(FType);
+    void print();
 };
 
 class unarybooleanformula : public formula
@@ -112,6 +115,7 @@ public:
     virtual unsigned int collectsubs(FType,formula **,unsigned int);
     unsigned int counttype(FType);
     formula * copy();
+    void print();
 };
 
 class binarybooleanformula : public formula
@@ -134,6 +138,7 @@ public:
     unsigned int counttype(FType);
     formula * copy();
     bool initatomic();
+    void print();
 };
 
 class booleanformula : public formula
@@ -158,6 +163,7 @@ public:
     unsigned int firstvalid; // Teilformeln werden manchmal nach Gueltigkeit sortiert
                            // (links die ungueltigen, rechts die gueltigen)
     booleanformula() {}
+    void print();
 };
 
 class unarytemporalformula : public formula
@@ -180,6 +186,7 @@ public:
     virtual unsigned int  collectsubs(FType,formula **,unsigned int);
     formula * copy();
     bool initatomic();
+    void print();
 };
 
 class untilformula : public formula
@@ -202,6 +209,7 @@ public:
     bool evaluatetransition(Transition *) { return 0; }
     virtual unsigned int collectsubs(FType,formula **,unsigned int);
     bool initatomic();
+    void print();
 };
 
 class hlatomicformula : public formula
@@ -226,6 +234,7 @@ public:
     unsigned int counttype(FType) { return 0; }
     void evaluateatomic(State *s) {}
     bool initatomic() { return 0; }
+    void print();
 };
 
 
@@ -250,6 +259,7 @@ public:
     unsigned int  counttype(FType) { return 0; }
     void evaluateatomic(State * s) {}
     bool initatomic() { return 0; }
+    void print();
 };
 
 class UExpression;
@@ -273,6 +283,7 @@ public:
     unsigned int  counttype(FType);
     void evaluateatomic(State * s) {}
     bool initatomic() { return 0; }
+    void print();
 };
 
 extern formula * F;

@@ -167,17 +167,18 @@ typedef enum
   FORMAT_LOLA,		///< LoLA
   FORMAT_OWFN,		///< Fiona open workflow net (oWFN)
   FORMAT_PEP,		///< Low-Level PEP Notation
-  FORMAT_PNML		///< Petri Net Markup Language (PNML)
+  FORMAT_PNML,		///< Petri Net Markup Language (PNML)
+  FORMAT_GASTEX ///< GasTeX format
 } output_format;
 
 /*!
 * \brief   Marking
  *
- *          A set of pairs, each containing a Place-Pointer and a token count.
+ *          A set of tokens in places according to the marking_id in each place.
  *
  * \ingroup petrinet
  */
-class Place;
+typedef vector<unsigned int> Marking;
 
 
 
@@ -314,12 +315,18 @@ class Place: public Node
   /// class PetriNet is allowed to access the privates of class Place
   friend class PetriNet;
 
+  /// class Arc is allowed to access the privates of class Place
+  friend class Arc;
+
   private:
     /// initial marking of the place
     unsigned int tokens;
 
     /// not empty if place was once an communication place and is now internal because of choreographie
     string wasExternal;
+
+    /// id for the marking vector
+    unsigned int marking_id;
 
     /// DOT-output of the place (used by PetriNet::dotOut())
     string output_dot() const;
@@ -345,6 +352,9 @@ class Place: public Node
 
     /// capacity, where 0 means unlimited
     unsigned int capacity;
+
+    /// returns the marking ID of the place
+    unsigned int getMarkingID();
 };
 
 /*****************************************************************************/
@@ -578,6 +588,21 @@ class PetriNet
 
     /// checks the Petri net for free choice criterion
     bool isFreeChoice() const;
+
+    /// inits all Places in the net
+    unsigned int initMarking() const;
+
+    /// calculates the current marking m
+    Marking calcCurrentMarking() const;
+
+    /// reforms the marking m to the places' token
+    void marking2Places(Marking &m);
+
+    /// calculates the successor m' from m using transition t
+    Marking calcSuccessorMarking(Marking &m, Transition *t) const;
+
+    /// looks for a living transition under m
+    Transition *findLivingTransition(Marking &m) const;
 
   private:
     /// removes a place from the net

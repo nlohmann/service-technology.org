@@ -235,6 +235,18 @@ void Place::mark(unsigned int my_tokens)
 
 
 
+/*!
+ * \brief   returns the marking ID of the place
+ *
+ * \return  unsigned int value for marking_id
+ */
+unsigned int Place::getMarkingID()
+{
+  return marking_id;
+}
+
+
+
 
 /*!
  * \brief   destructor
@@ -930,6 +942,7 @@ void PetriNet::reevaluateType(Transition *t)
           }
         break;
       }
+      default: break;
     }
   }
 }
@@ -2844,12 +2857,11 @@ bool PetriNet::isWorkflowNet()
  * \param   Node n which is to check
  * \param   Stack S is the stack used in the Tarjan algorithm
  * \param   Set stacked which is needed to identify a node which is already stacked
- * \param   $i \in \mathbb{N}$ which is the equivalent to Tarjan's index variable
+ * \param   int \f$i \in \fmathbb{N}\f$ which is the equivalent to Tarjan's index variable
  * \param   Map index which describes the index property of a node
  * \param   Map lowlink which describes the lowlink property of a node
  *
- * \return  the number of strongly connected components reachable from the start node
- *          if there are one or more components not reachable, they are counted as one.
+ * \return  the number of strongly connected components reachable from the start node.
  *
  * \note    Used by method isWorkflowNet() to check condition (3) - only working for this method.
  */
@@ -2914,6 +2926,156 @@ bool PetriNet::isFreeChoice() const
         return false;
     }
   return true;
+}
+
+
+
+
+/*!
+ * \brief   initializes all Places \f$p \in P\f$ for gathering in a Marking
+ *
+ * \return  unsigned int with the length of the marking vector
+ */
+unsigned int PetriNet::initMarking() const
+{
+  unsigned int c_id = 0;
+  for (set<Place *>::const_iterator p = P.begin(); p != P.end(); p++)
+  {
+    (*p)->marking_id = c_id++;
+  }
+  for (set<Place *>::const_iterator p_i = P_in.begin(); p_i != P_in.end(); p_i++)
+  {
+    (*p_i)->marking_id = c_id++;
+  }
+  for (set<Place *>::const_iterator p_o = P_out.begin(); p_o != P_out.end(); p_o++)
+  {
+    (*p_o)->marking_id = c_id++;
+  }
+
+  return c_id;
+}
+
+
+
+
+/*!
+ * \brief   calculates the current marking m
+ *
+ * \return  Marking m which represents the current Marking m
+ *          if the net
+ *
+ * \note    method uses the information in the property token of
+ *          each place.
+ */
+Marking PetriNet::calcCurrentMarking() const
+{
+  unsigned int placeCount = initMarking(); // initializes the places and returns the number of places
+  Marking *m = new Marking(placeCount, 0);
+
+  for (set<Place *>::const_iterator p = P.begin(); p != P.end(); p++)
+    (*m)[(*p)->marking_id] = (*p)->tokens;
+  for (set<Place *>::const_iterator p = P_in.begin(); p != P_in.end(); p++)
+    (*m)[(*p)->marking_id] = (*p)->tokens;
+  for (set<Place *>::const_iterator p = P_out.begin(); p != P_out.end(); p++)
+    (*m)[(*p)->marking_id] = (*p)->tokens;
+
+  return *m;
+}
+
+
+
+
+void PetriNet::marking2Places(Marking &m)
+{
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    (*p)->tokens = m[(*p)->marking_id];
+  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+      (*p)->tokens = m[(*p)->marking_id];
+  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+      (*p)->tokens = m[(*p)->marking_id];
+}
+
+
+
+
+/*!
+ * \brief   calculates the successor marking m' to m under Transition t
+ *
+ * \pre     Two arcs f1, f2 \in F with f1 = (p_1, t_1)  f2 = (p_2, t_2)
+ *          imply p_1 != p_2 or t_1 != t_2 or there is an arc
+ *          f* = (p_1, t_1) with arc-weight(f*) = arc_weight(f1) + arc_weight(f2)
+ *          (as usually introduced arc weights)
+ *
+ * \param   Marking &m current marking
+ * \param   Transition &t defines the scope
+ *
+ * \return  Marking &m' successor marking
+ */
+Marking PetriNet::calcSuccessorMarking(Marking &m, Transition *t) const
+{
+  Marking *mm = new Marking(m);
+  set<Arc *> activators; ///< set to gather arcs
+
+  // gather all arcs in F that connect a place p in the preset of t with t
+  for (set<Arc *>::const_iterator f = F.begin(); f != F.end(); f++)
+    if ((*f)->target == t)
+    {
+      Place *p = static_cast<Place *>((*f)->source);
+      if ((*mm)[p->marking_id] >= (*f)->weight)
+        activators.insert(*f);
+      else
+        break;
+    }
+
+  // if m does not activate t then m' = m
+  if (t->preset.size() != activators.size())
+    return *mm;
+
+  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+    if ((*f)->source == t)
+    {
+      Place *p = static_cast<Place *>((*f)->target);
+      (*mm)[p->marking_id] += (*f)->weight;
+    }
+
+  for (set<Arc *>::iterator f = activators.begin(); f != activators.end(); f++)
+  {
+    Place *p = static_cast<Place *>((*f)->source);
+    (*mm)[p->marking_id] -= (*f)->weight;
+  }
+
+  return *mm;
+}
+
+
+
+
+/*!
+ * \brief     looks for a living transition under marking m
+ *
+ * \param     Marking m
+ *
+ * \return    Transition t if t is living under m and NULL if not
+ */
+Transition *PetriNet::findLivingTransition(Marking &m) const
+{
+  Transition *result = NULL;
+
+  for (set<Arc *>::const_iterator f = F.begin(); f != F.end(); f++)
+  {
+    Node *n = (*f)->source;
+    if (n->nodeType == PLACE)
+    {
+      Place *p = static_cast<Place *>((*f)->source);
+      if (m[p->marking_id] >= (*f)->weight)
+      {
+        result = static_cast<Transition *>((*f)->target);
+        break;
+      }
+    }
+  }
+
+  return result;
 }
 
 

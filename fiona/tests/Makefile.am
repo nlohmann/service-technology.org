@@ -113,12 +113,12 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
 	sim_og/trafo_wsfm_M2.owfn \
 	sim_og/trafo_wsfm_M3.owfn \
 	matching/agency_traveler.og \
-	matching/agency_traveler.og \
 	matching/agency_traveler.owfn \
 	matching/airline.og \
 	matching/airline.owfn \
 	matching/client_match_1.owfn \
 	matching/client_nomatch_1.owfn \
+	matching/client_nomatch_2.owfn \
 	matching/client_nosupport_1.owfn \
 	matching/shop.og \
 	matching/shop_rednodes.og \

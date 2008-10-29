@@ -360,7 +360,6 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_READ_OG] = false;
     parameters[P_REDUCE] = false;
     parameters[P_NORMALIZE] = false;
-    parameters[P_MATCH_PARTNER] = false;
     parameters[P_RESPONSIVE] = false;
 
     // -s parameters
@@ -459,12 +458,6 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_IG] = false;
                     parameters[P_SHOW_EMPTY_NODE] = true;
                     parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
-                } else if (lc_optarg == "matchpartner") {
-                    parameters[P_OG] = false;
-                    parameters[P_IG] = false;
-                    parameters[P_SHOW_EMPTY_NODE] = true;
-                    parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
-                    parameters[P_MATCH_PARTNER] = true;
                 } else if (lc_optarg == "productog") {
                     parameters[P_IG] = false;
                     parameters[P_PRODUCTOG] = true;

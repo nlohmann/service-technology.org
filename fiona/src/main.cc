@@ -2025,7 +2025,7 @@ int main(int argc, char** argv) {
     }
     else if (parameters[P_IG] || parameters[P_OG] || parameters[P_MATCH] ||
              parameters[P_PNG] || parameters[P_REDUCE] || parameters[P_NORMALIZE] ||
-             parameters[P_PV] || parameters[P_MATCH_PARTNER]) {
+             parameters[P_PV]) {
 
         AnnotatedGraph* OGToMatch = NULL;
         if (parameters[P_MATCH]) {
@@ -2119,25 +2119,6 @@ int main(int argc, char** argv) {
                     options[O_CALC_ALL_STATES] = !options[O_CALC_ALL_STATES];
                     // remember file name of og-file to check equivalence later on
                     ogfiles.push_back(AnnotatedGraph::addOGFileSuffix(fileName));
-                }
-
-                if (parameters[P_MATCH_PARTNER]) {
-
-                    parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
-                    parameters[P_OG] = true;
-
-                    // [LUHME XV] Achtung! Es gibt auch "ogFilename"
-                    string ogfilename = computeOG(PN);
-
-                    parameters[P_SYNTHESIZE_PARTNER_OWFN] = false;
-                    parameters[P_OG] = false;
-                    string PNFileName = currentowfnfile;
-                    string netfile = PNFileName.substr(0, PNFileName.find(".owfn") );
-                    string partnerfilename = netfile + "-partner.owfn";
-
-                    // [LUHME XV] WTF!?
-                    system(("src/fiona -t match " + ogfilename + ".og " + partnerfilename).c_str());
-
                 }
 
                 //delete PN;

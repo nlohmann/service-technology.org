@@ -26,4 +26,7 @@ CLEANFILES = *.lola \
 		result.txt \
 		*.csv
 
-EXTRA_DIST = $(TESTS) compiler soundness
+EXTRA_DIST = $(TESTS) \
+		 	compiler/TestSuite.xml \
+		 	soundness/TestSuite_soundness.xml \
+		 	soundness/TestSuite_soundness.txt

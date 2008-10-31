@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 
 echo "TEST: test_process"
 
@@ -7,7 +7,7 @@ rm -fr lola/src/userconfig.H
 cp $testdir/nets/process.userconfig.H.modelchecking lola/src/userconfig.H
 
 echo "  [2/3] compiling LoLA..."
-make clean all --silent --directory=lola > /dev/null
+$MAKE clean all --silent --directory=lola > /dev/null
 
 echo "  [3/3] running LoLA..."
 lola/src/lola $testdir/nets/process.lola -a $testdir/nets/process.task > /dev/null

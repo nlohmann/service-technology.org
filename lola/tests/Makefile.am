@@ -10,4 +10,4 @@ TESTS = test_init \
 
 EXTRA_DIST = nets $(TESTS)
 
-TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests
+TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests MAKE=$(MAKE)

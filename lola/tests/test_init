@@ -1,9 +1,9 @@
-#! /bin/bash
+#! /bin/sh
 
 echo "TEST: test_init"
 
 echo "  [1/2] collecting test LoLA sources..."
-make dist  --silent --directory=.. distdir=lola > /dev/null
+$MAKE dist  --silent --directory=.. distdir=lola > /dev/null
 tar xfz ../lola.tar.gz
 
 echo "  [2/2] configuring LoLA..."

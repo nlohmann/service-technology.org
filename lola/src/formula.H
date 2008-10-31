@@ -67,7 +67,7 @@ public:
     formula * replacequantifiers();
     bool evaluatetransition(Transition *);
     virtual unsigned int  collectsubs(FType,formula **,unsigned int);
-    bool initatomic() { return NULL; }
+    bool initatomic() { return 0; }
     void evaluateatomic(State * s) {}
     void print();
 };

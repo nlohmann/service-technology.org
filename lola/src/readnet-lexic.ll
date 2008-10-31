@@ -1,3 +1,5 @@
+%option yylineno
+
 %{
 #include "unfold.H"
 #include "symboltab.H"

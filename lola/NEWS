@@ -20,6 +20,9 @@ Version 1.11-unreleased
 * adapted documentation to fix bug #12090 (`https://gna.org/bugs/?12090'):
   syntax description deviated from implementation
 
+* small changes to the test scripts and the lexer to make LoLA compilable on
+  FreeBSD
+
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for
 complete version history.

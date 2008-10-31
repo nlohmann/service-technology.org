@@ -8,7 +8,9 @@
 
 @item removed old manual @file{lola-old.ps} from documentation
 
-@item adapted documentation to fix bug #12090 (@url{https://gna.org/bugs/?12090}): syntax description deviated from implementation 
+@item adapted documentation to fix bug #12090 (@url{https://gna.org/bugs/?12090}): syntax description deviated from implementation
+
+@item small changes to the test scripts and the lexer to make LoLA compilable on FreeBSD
 @end itemize
 
 

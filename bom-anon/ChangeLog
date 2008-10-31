@@ -1,11 +1,18 @@
+ ____   ___  __  __     _                                      _              
+| __ ) / _ \|  \/  |   / \   _ __   ___  _ __  _   _ _ __ ___ (_)_______ _ __ 
+|  _ \| | | | |\/| |  / _ \ | '_ \ / _ \| '_ \| | | | '_ ` _ \| |_  / _ \ '__|
+| |_) | |_| | |  | | / ___ \| | | | (_) | | | | |_| | | | | | | |/ /  __/ |   
+|____/ \___/|_|  |_|/_/   \_\_| |_|\___/|_| |_|\__, |_| |_| |_|_/___\___|_|   
+    http://service-technology.org/bom-anon     |___/                          
+
+
 Version 0.4
 ===========
 
 * fixed bugs:
-  * https://gna.org/bugs/?12022
-  * https://gna.org/bugs/?12025
-  * https://gna.org/bugs/?12029
-  * https://gna.org/bugs/?12029
+  * bug #12022 (https://gna.org/bugs/?12022)
+  * bug #12025 (https://gna.org/bugs/?12025)
+  * bug #12029 (https://gna.org/bugs/?12029)
 
 * added a wrapper function that strips newlines at the beginning and ending of a string
 * added a parameter "--bug" for debugging purposes
@@ -18,9 +25,9 @@ Version 0.3
 ===========
 
 * fixed bugs:
-  * http://gna.org/bugs/?11677
-  * http://gna.org/bugs/?11678
-  * http://gna.org/bugs/?11679
+  * bug #11677 (http://gna.org/bugs/?11677)
+  * bug #11678 (http://gna.org/bugs/?11678)
+  * bug #11679 (http://gna.org/bugs/?11679)
 
 * "type" and "instanceOf" not longer whitelisted
 * real numbers in any element are replaced by 0.0

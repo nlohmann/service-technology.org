@@ -1,5 +1,5 @@
 AC_PREREQ(2.61)
-AC_INIT(BOM-Anonymizer, 0.4, niels.lohmann@service-technology.org, bom-anon)
+AC_INIT(BOM-Anonymizer, 0.5-unreleased, niels.lohmann@service-technology.org, bom-anon)
 AC_CONFIG_SRCDIR([src/bom-anon.ll])
 AC_CONFIG_HEADERS(src/config.h)
 

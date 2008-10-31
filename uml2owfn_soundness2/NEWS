@@ -16,4 +16,7 @@ Version 1.11-unreleased
 * Cleaned the autotools configuration files and added options to directly
   compile binaries for different platforms.
 
-\nSee file ChangeLog <http://service-technology.org/files/uml2owfn/ChangeLog> for\ncomplete version history.\n
+
+See file ChangeLog <http://service-technology.org/files/uml2owfn/ChangeLog> for
+complete version history.
+

@@ -215,6 +215,8 @@ string Graph::toDot() {
                 case(DELETE): result += " color=red"; break;
                 case(INSERT): result += " color=green"; break;
                 case(MODIFY): result += " color=orange"; break;
+                case(NONE):
+                case(KEEP):
                 default: break;
             }
             

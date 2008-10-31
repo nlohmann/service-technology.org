@@ -41,6 +41,8 @@ string Action::toString() const {
                 return "keep " + label_old;
             }
             
+        case(NONE):
+        case(KEEP):
         default:
             return "none";
     }

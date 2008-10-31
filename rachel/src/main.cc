@@ -162,7 +162,7 @@ void dotOutput(Graph &A, Graph &B, Graph &C) {
     
     
     // if dot found during configuration, executed it to create a PNG
-    if (HAVE_DOT != "") {
+    if (!string(HAVE_DOT).empty()) {
         string command = string(HAVE_DOT) + " " + dot_filename + " -Tpng -O";
         system(command.c_str());
     }    
@@ -284,7 +284,10 @@ int main(int argc, char** argv) {
         case(mode_arg_matching): {
             fprintf(stderr, "matching: %.2f\n", Matching::matching());
             break;
-        }        
+        }
+        
+        default:
+            break;
     }
 
     

@@ -4,7 +4,7 @@
 #define UTIL_H
 
 /* to log memory (re/de)allocation */
-#include <mynew.h>
+#include "mynew.h"
 
 #ifdef __cplusplus
 extern "C" {

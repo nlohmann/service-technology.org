@@ -4,6 +4,10 @@
 @item adapted code to avoid deprecation warnings of GCC 4.2
 
 @item ChangeLogs are now generated from Texinfo documentation
+
+@item test cases using Graphviz Dot or Petrify are now skipped if the configure script did not find these tools
+
+@item fixed bug #12530 (@url{https://gna.org/bugs/?12530}): the @acronym{CUDD} package is now entirely translated with a C++ compiler to allow linking of the @code{new} logger
 @end itemize
 
 

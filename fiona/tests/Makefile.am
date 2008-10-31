@@ -24,8 +24,8 @@ slistcheck_LDFLAGS = @configured_LDFLAGS@
 
 # Notice: If you add environment variables here, you have to provide defaults
 # defaults.sh, too.
-TESTS_ENVIRONMENT = testdir=$(srcdir) MKDIR_P="$(MKDIR_P)" \
-	builddir=$(builddir) PATH=".:../src:$(srcdir):$$PATH"
+TESTS_ENVIRONMENT = testdir=$(srcdir) MKDIR_P="$(MKDIR_P)" PETRIFY="@PETRIFY@"\
+	DOT="@DOT@" builddir=$(builddir) PATH=".:../src:$(srcdir):$$PATH"
 
 MEMCHECK_ENVIRONMENT = $(TESTS_ENVIRONMENT) memcheck=yes
 CHECKLOUD_ENVIRONMENT = $(TESTS_ENVIRONMENT) quiet=no

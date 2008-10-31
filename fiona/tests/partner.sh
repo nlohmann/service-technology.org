@@ -9,10 +9,13 @@ echo running $0
 echo
 
 if test "$PETRIFY" = "not found"; then
-  echo Note: fiona was built without Petrify support!
+  echo "Note: Fiona was built without Petrify support!"
+  echo "      See file README."
   echo
-  echo skipping $0
-  exit 0
+
+	# The exit 77 is the magic value which tells Automake's `make check'
+	# that this test was skipped.
+  exit 77
 fi
 
 SUBDIR=partner

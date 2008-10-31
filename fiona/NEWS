@@ -13,6 +13,12 @@ Version 3.1-unreleased
 
 * ChangeLogs are now generated from Texinfo documentation
 
+* test cases using Graphviz Dot or Petrify are now skipped if the configure
+  script did not find these tools
+
+* fixed bug #12530 (`https://gna.org/bugs/?12530'): the CUDD package is now
+  entirely translated with a C++ compiler to allow linking of the `new' logger
+
 
 See file ChangeLog <http://service-technology.org/files/fiona/ChangeLog> for
 complete version history.

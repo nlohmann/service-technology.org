@@ -79,18 +79,19 @@ EXTRA_DIST = include/cudd.h \
 ###########################################################################
 
 # inherit the flags set by the configures script
-AM_CFLAGS = @CUDD_XFLAGS@ @configured_CFLAGS@
+AM_CFLAGS   = @CUDD_XFLAGS@ @configured_CFLAGS@
 AM_CXXFLAGS = @CUDD_XFLAGS@ @configured_CXXFLAGS@
-AM_LDFLAGS = @CUDD_XFLAGS@ @configured_LDFLAGS@
+AM_LDFLAGS  = @CUDD_XFLAGS@ @configured_LDFLAGS@
 
 # * Why do I need "nanotrav"? Does not compile anyway...
 # * Why do I need "mtr"? "mtr.h" is distributed anyway...
 # * To use "include", I have to take care of the linked files.
-AM_CPPFLAGS = -I$(top_srcdir)/libs/cudd/include \
+AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/libs/cudd/include \
 	-I$(top_srcdir)/libs/cudd/nanotrav \
-	-I$(top_srcdir)/libs/cudd/mtr \
-	-I$(top_srcdir)/src
+	-I$(top_srcdir)/libs/cudd/mtr
 
+# use the C++ compiler for CUDD's sources
+CC = $(CXX)
 
 ###########################################################################
 # Tests
@@ -99,6 +100,6 @@ AM_CPPFLAGS = -I$(top_srcdir)/libs/cudd/include \
 # test program for the C++ object-oriented encapsulation of CUDD
 TESTS = testobj.sh
 check_PROGRAMS = testobj
-testobj_SOURCES = obj/testobj.cc include/cudd.h
+testobj_SOURCES = obj/testobj.cc include/cudd.h test-helper.cc
 testobj_LDADD = libobj.a libdddmp.a libcudd.a libmtr.a \
 	libst.a libutil.a libepd.a

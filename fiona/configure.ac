@@ -125,11 +125,12 @@ fi
 #############################################################################
 AC_CHECK_PROG(DOT, dot, dot, not found)
 if test "$DOT" = "not found"; then
-  AC_MSG_WARN([Graphviz dot was not found. See file README.])
-  AC_DEFINE_UNQUOTED(CONFIG_DOT, "not found", [Dot was not found.])
+  AC_MSG_WARN([Graphviz Dot was not found. See file README.])
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "not found", [Graphviz Dot was not found.])
 else
-  AC_DEFINE_UNQUOTED(CONFIG_DOT, "${DOT}", [Dot can be used.])
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "${DOT}", [Graphviz Dot can be used.])
 fi
+AC_SUBST(DOT)
 
 AC_CHECK_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], not found)
 if test "$PETRIFY" = "not found"; then
@@ -138,6 +139,7 @@ if test "$PETRIFY" = "not found"; then
 else
   AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "${PETRIFY}", [Petrify can be used.])
 fi
+AC_SUBST(PETRIFY)
 
 
 #############################################################################

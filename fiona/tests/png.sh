@@ -8,6 +8,16 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
+if test "$DOT" = "not found"; then
+  echo "Note: Fiona was built without Graphviz Dot support!"
+  echo "      See file README."
+  echo
+
+	# The exit 77 is the magic value which tells Automake's `make check'
+	# that this test was skipped.
+  exit 77
+fi
+
 SUBDIR=png
 DIR=$testdir/$SUBDIR
 FIONA=fiona

@@ -21,14 +21,13 @@ XFAIL_TESTS = test-cmdline \
 	test-frontend-error-lexer \
 	test-frontend-error-parser
 
-TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=.:../src:$$PATH
+TESTS_ENVIRONMENT = testdir=@srcdir@ builddir=@builddir@ PATH=.:../src:$$PATH
 
 EXTRA_DIST = $(TESTS) testfiles \
 	lcov/README lcov/gendesc lcov/genhtml \
 	lcov/geninfo lcov/genpng lcov/lcov
 
-CLEANFILES = -fr output $(COVERINFOS) \
-	traveler.sa_agency_airline.og_simulation.dot*
+CLEANFILES = -fr output $(COVERINFOS)
 
 
 ##############################################################################

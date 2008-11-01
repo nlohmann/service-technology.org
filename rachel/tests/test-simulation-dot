@@ -5,3 +5,7 @@ echo ""
 echo "test: simulation with Dot output"
 echo "      $command"
 $command &> /dev/null
+
+if [ $? -eq 0 ]
+	then rm $builddir/traveler.sa_agency_airline.og_simulation.dot $builddir/traveler.sa_agency_airline.og_simulation.dot.png
+fi

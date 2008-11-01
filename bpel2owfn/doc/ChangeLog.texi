@@ -54,6 +54,10 @@
 @item used option @option{gnits} for Automake, see @url{http://www.gnu.org/software/automake/manual/automake.html#Gnits}
 
 @item moved acknowledgements from file @file{AUTHOR} to file @file{THANKS} to meet the strict Gnits requirements
+
+@item fixed a bug: Woflan TPN files were not created because of missing invokation in @code{main()} method
+
+@item overworked test scripts: creation of output files is checked now
 @end itemize
 
 

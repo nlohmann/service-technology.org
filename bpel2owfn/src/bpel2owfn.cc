@@ -602,6 +602,24 @@ void final_output()
         output = NULL;
       }
     }
+
+
+    // create TPN output ?
+    if ( formats[F_TPN] )
+    {
+      if (globals::output_filename != "")
+      {
+        output = openOutput(globals::output_filename + "." + suffixes[F_TPN]);
+      }
+      trace(TRACE_INFORMATION, "-> Printing Petri net for TPN ...\n");
+      PN.set_format(FORMAT_TPN);
+      (*output) << PN;
+      if (globals::output_filename != "")
+      {
+        closeOutput(output);
+        output = NULL;
+      }
+    }
     
     
     // create dot output ?

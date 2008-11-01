@@ -5,3 +5,7 @@ echo ""
 echo "test: BPEL4Chor choreography with 10 instances"
 echo "      $command"
 $command &> /dev/null
+
+if [ $? -eq 0 ]
+	then rm $builddir/choreography10.owfn
+fi

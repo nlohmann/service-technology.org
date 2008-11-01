@@ -84,6 +84,11 @@ Version 2.04-unreleased
 * moved acknowledgements from file `AUTHOR' to file `THANKS' to meet the
   strict Gnits requirements
 
+* fixed a bug: Woflan TPN files were not created because of missing
+  invokation in `main()' method
+
+* overworked test scripts: creation of output files is checked now
+
 
 See file ChangeLog <http://service-technology.org/files/bpel2owfn/ChangeLog> for
 complete version history.

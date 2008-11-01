@@ -1,7 +1,11 @@
-#! /bin/bash
+#! /bin/sh
 
 command="bpel2owfn --input=$testdir/testfiles/purchaseOrderProcess.bpel --mode=petrinet --format=owfn --output=purchaseOrderProcess"
 echo ""
 echo "test: Petri net file output: oWFN format"
 echo "      $command"
 $command &> /dev/null
+
+if [ $? -eq 0 ]
+	then rm $builddir/purchaseOrderProcess.owfn
+fi

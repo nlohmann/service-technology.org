@@ -5,3 +5,7 @@ echo ""
 echo "test: user-defined choreography, customer 2"
 echo "      $command"
 $command &> /dev/null
+
+if [ $? -eq 0 ]
+	then rm $builddir/coffee_customer2.lola $builddir/coffee_customer2.task
+fi

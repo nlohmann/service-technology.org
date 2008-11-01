@@ -18,12 +18,19 @@
  Floor, Boston, MA 02110-1301  USA.
 \*****************************************************************************/
 
+/*!
+ * \file Simulation.h
+ * \brief Functions for the simulation-based graph similarity
+ */
+
 #ifndef __SIMULATION_H
 #define __SIMULATION_H
 
-#include "Action.h"
-#include "Graph.h"
 #include "EditDistance.h"
+#include "types.h"
+
+class ActionScript;
+class Graph;
 
 
 /*!

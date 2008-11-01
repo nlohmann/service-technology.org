@@ -19,15 +19,18 @@
 \*****************************************************************************/
 
 #include <cassert>
-#include <algorithm>
-
+#include <set>
 #include "config.h"
 #include "Graph.h"
+#include "Formula.h"
 #include "helpers.h"
 #include "costfunction.h"
 
+using std::vector;
 using std::map;
 using std::max;
+using std::string;
+using std::set;
 
 
 /**************************************
@@ -100,7 +103,7 @@ Edge::Edge() :
 Edges Graph::outEdges(Node q) {
     Edges result;
     
-    for (size_t i = 0; i < edges[q].size(); i++) {
+    for (size_t i = 0; i < edges[q].size(); ++i) {
         if ( !addedNodes[edges[q][i].target] )
             result.push_back(edges[q][i]);
     }
@@ -111,7 +114,7 @@ Edges Graph::outEdges(Node q) {
 
 /// returns (at most 1!) successor of a node with a given label
 Edge Graph::successor(Node q, const Label &a) {
-    for (size_t i = 0; i < edges[q].size(); i++) {
+    for (size_t i = 0; i < edges[q].size(); ++i) {
         if (edges[q][i].label == a && addedNodes[edges[q][i].source] == false)
             return edges[q][i];
     }
@@ -160,9 +163,9 @@ Assignments Graph::sat(Node q) {
     vector<Labels> satisfyingLabels = checkSat(q);
     
     // for each label, find the respective edge
-    for (size_t i = 0; i < satisfyingLabels.size(); i++) {
+    for (size_t i = 0; i < satisfyingLabels.size(); ++i) {
         Assignment temp;
-        for (size_t j = 0; j < satisfyingLabels[i].size(); j++) {
+        for (size_t j = 0; j < satisfyingLabels[i].size(); ++j) {
             temp.push_back(successor(q, satisfyingLabels[i][j]));
         }
         result.push_back(temp);
@@ -180,7 +183,7 @@ Assignments Graph::sat(Node q) {
  * \param id  identifier of the graph
  *
  */
-Graph::Graph(const string _id) :
+Graph::Graph(const std::string _id) :
   edges(), root(), max_value(0), insertionValue(), deletionValue(),
   formulas(), id(_id),  nodes(), addedNodes() {
 }
@@ -190,7 +193,7 @@ Graph::Graph(const string _id) :
 string Graph::toDot() {
     string result;
 
-    for (size_t i = 0; i != nodes.size(); i++) {
+    for (size_t i = 0; i != nodes.size(); ++i) {
         result += "  q_" + id + "_" + toString(nodes[i]) + " [label=\"q" + toString(nodes[i]);
                 
         if (formulas[nodes[i]] != NULL)
@@ -203,7 +206,7 @@ string Graph::toDot() {
         
         result += "];\n";
 
-        for (size_t j = 0; j < edges[nodes[i]].size(); j++) {
+        for (size_t j = 0; j < edges[nodes[i]].size(); ++j) {
             result += "  q_"  + id + "_" + toString(edges[nodes[i]][j].source);
             result += " -> q_" + id + "_" + toString(edges[nodes[i]][j].target);
             result += " [label=\"" + edges[nodes[i]][j].label + "\"";
@@ -239,16 +242,16 @@ vector<Labels> Graph::checkSat(Node q) {
     vector<unsigned int> bounds;
     unsigned int count = 1;
     unsigned int degree = edges[q].size();
-    for (size_t i = 0; i < degree; i++) {
+    for (size_t i = 0; i < degree; ++i) {
         index.push_back(0);
         bounds.push_back(2);
         count *= 2;
     }
     
-    for (size_t j = 0; j < count; j++) {
+    for (size_t j = 0; j < count; ++j) {
         set<string> tempSet;
         Labels tempLabels;
-        for (size_t i = 0; i < degree; i++) {
+        for (size_t i = 0; i < degree; ++i) {
             if (index[i] != 0) {
                 tempSet.insert(edges[q][i].label);
                 tempLabels.push_back(edges[q][i].label);
@@ -298,7 +301,7 @@ void Graph::setRoot(Node q) {
 /// add a node to the graph
 Node Graph::addNode(Node q) {
     // if node is present, return it
-    for (size_t i = 0; i < nodes.size(); i++) {
+    for (size_t i = 0; i < nodes.size(); ++i) {
         if (nodes[i] == q)
             return q;
     }
@@ -322,7 +325,7 @@ Node Graph::addNode(Node q) {
  */
 Node Graph::addNewNode(Node q, const Label l) {
     // if node was already added here, return it
-    for (size_t i = 0; i < edges[q].size(); i++) {
+    for (size_t i = 0; i < edges[q].size(); ++i) {
         if ( edges[q][i].label == l ) //&& addedNodes[ edges[q][i].target ] )
             return edges[q][i].target;
     }
@@ -350,7 +353,7 @@ Value Graph::preprocessDeletionRecursively(Node q) {
     Value result = 0;
 
     // iterate the successor nodes and collect their preprocess value
-    for (unsigned i  = 0; i < edges[q].size(); i++) {
+    for (unsigned i  = 0; i < edges[q].size(); ++i) {
         result += L(edges[q][i].label, "") * preprocessDeletionRecursively(edges[q][i].target);
     }
     
@@ -375,14 +378,14 @@ Value Graph::preprocessInsertionRecursively(Node q) {
     
     // get and iterate the satisfying assignments
     Assignments assignments = sat(q);
-    for (size_t k = 0; k < assignments.size(); k++) {
+    for (size_t k = 0; k < assignments.size(); ++k) {
         
         Assignment beta = assignments[k];
         
         Value newValue = 0;
         
         // iterate the successor nodes and collect their preprocess value
-        for (unsigned i  = 0; i < beta.size(); i++) {
+        for (unsigned i  = 0; i < beta.size(); ++i) {
             newValue += L("", beta[i].label) * preprocessInsertionRecursively(beta[i].target);
         }
         
@@ -447,14 +450,14 @@ long double Graph::countServicesRecursively(Node q) {
     long double result = 0;
     
     // traverse the satisfying assignments of the node's formula
-    for (size_t k = 0; k < assignments.size(); k++) {
+    for (size_t k = 0; k < assignments.size(); ++k) {
         Assignment beta = assignments[k];
 
         // the number of services represented by this assignment
         long double temp = 1;
 
         // multiply all recursively reachable services
-        for (size_t i = 0; i < beta.size(); i++) {
+        for (size_t i = 0; i < beta.size(); ++i) {
             temp *= countServicesRecursively(beta[i].target);
         }
 
@@ -496,7 +499,7 @@ bool Graph::isCyclicRecursively(Node q) {
         return true;
     
     // check if this combination is already on the call stack
-    for (size_t i = 0; i < call_stack.size(); i++) {
+    for (size_t i = 0; i < call_stack.size(); ++i) {
         if (call_stack[i] == q) {
             result = true;
             return true;
@@ -505,7 +508,7 @@ bool Graph::isCyclicRecursively(Node q) {
     
     call_stack.push_back(q);
 
-    for (size_t i = 0; i < edges[q].size(); i++) {
+    for (size_t i = 0; i < edges[q].size(); ++i) {
         result = result || isCyclicRecursively(edges[q][i].target);
     }
     
@@ -532,7 +535,7 @@ void Graph::reenumerate() {
     addedNodes.clear();
 
     // re-indexing nodes
-    for (size_t i = 0; i < nodes.size(); i++) {
+    for (size_t i = 0; i < nodes.size(); ++i) {
         translation1[i] = nodes[i];
         translation2[nodes[i]] = i;
         new_formulas[i] = formulas[nodes[i]];
@@ -541,8 +544,8 @@ void Graph::reenumerate() {
     }
     
     // using the new index for the edges
-    for (size_t i = 0; i < nodes.size(); i++) {
-        for (size_t j = 0; j < edges[nodes[i]].size(); j++) {
+    for (size_t i = 0; i < nodes.size(); ++i) {
+        for (size_t j = 0; j < edges[nodes[i]].size(); ++j) {
             Edge e;
             e.source = translation2[ edges[nodes[i]][j].source ];
             e.target = translation2[ edges[nodes[i]][j].target ];
@@ -564,7 +567,7 @@ void Graph::reenumerate() {
 double Graph::averageSatSize() {
     double result = 0;
     
-    for (size_t i = 0; i < nodes.size(); i++) {
+    for (size_t i = 0; i < nodes.size(); ++i) {
         result += sat(nodes[i]).size();
     }
     
@@ -578,7 +581,7 @@ void Graph::printStatisticsForMarkings() {
     unsigned int S_count = 0;
     unsigned int S_imp_count = 0;
     
-    for (size_t i = 0; i < nodes.size(); i++) {
+    for (size_t i = 0; i < nodes.size(); ++i) {
         bool F = false;
         bool F_imp = false;
         
@@ -594,10 +597,10 @@ void Graph::printStatisticsForMarkings() {
         
         std::vector<Labels> mySat = checkSat(nodes[i]);
         bool S = true;
-        for (size_t j = 0; j < mySat.size(); j++) {
+        for (size_t j = 0; j < mySat.size(); ++j) {
             bool S_temp = true;
             
-            for (size_t k = 0; k < mySat[j].size(); k++) {
+            for (size_t k = 0; k < mySat[j].size(); ++k) {
                 if (mySat[j][k].substr(0,1) == "?")
                     S_temp = false;
             }
@@ -609,7 +612,7 @@ void Graph::printStatisticsForMarkings() {
             S_count++;
             
             bool S_imp = true;
-            for (size_t j = 0; j < edges[nodes[i]].size(); j++) {
+            for (size_t j = 0; j < edges[nodes[i]].size(); ++j) {
                 if (edges[nodes[i]][j].label.substr(0,1) == "?")
                     S_imp = false;
             }

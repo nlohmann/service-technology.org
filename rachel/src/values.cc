@@ -18,6 +18,11 @@
  Floor, Boston, MA 02110-1301  USA.
  \*****************************************************************************/
 
+/*!
+ * \file values.cc
+ * \brief Implements functions for the node and label similarity
+ */
+ 
 #include "values.h"
 #include "cmdline.h"
 

@@ -19,6 +19,7 @@
 \*****************************************************************************/
 
 #include <cassert>
+#include <set>
 
 #include "config.h"
 #include "Formula.h"
@@ -41,7 +42,7 @@ FormulaOR::FormulaOR(Formula *_left, Formula *_right) :
     assert(_right != NULL);
 }
 
-FormulaLit::FormulaLit(const string _literal) :
+FormulaLit::FormulaLit(const Label _literal) :
     literal(_literal)
 {
 }
@@ -51,27 +52,27 @@ FormulaLit::FormulaLit(const string _literal) :
  * string output
  */
 
-string FormulaAND::toString() const {
+std::string FormulaAND::toString() const {
     return "(" + left->toString() + " AND " + right->toString() + ")";
 }
 
-string FormulaOR::toString() const {
+std::string FormulaOR::toString() const {
     return "(" + left->toString() + " OR " + right->toString() + ")";
 }
 
-string FormulaLit::toString() const {
+std::string FormulaLit::toString() const {
     return literal;
 }
 
-string FormulaTrue::toString() const {
+std::string FormulaTrue::toString() const {
     return "TRUE";
 }
 
-string FormulaFalse::toString() const {
+std::string FormulaFalse::toString() const {
     return "FALSE";
 }
 
-string FormulaFinal::toString() const {
+std::string FormulaFinal::toString() const {
     return "FINAL";
 }
 
@@ -80,23 +81,23 @@ string FormulaFinal::toString() const {
  * satisfaction test
  */
 
-bool FormulaAND::sat(const set<string> &l) const {
+bool FormulaAND::sat(const std::set<Label> &l) const {
     return (left->sat(l) && right->sat(l));
 }
 
-bool FormulaOR::sat(const set<string> &l) const {
+bool FormulaOR::sat(const std::set<Label> &l) const {
     return (left->sat(l) || right->sat(l));
 }
 
-bool FormulaLit::sat(const set<string> &l) const {
+bool FormulaLit::sat(const std::set<Label> &l) const {
     return (l.find(literal) != l.end());
 }
 
-bool FormulaTrue::sat(const set<string> &l) const {
+bool FormulaTrue::sat(const std::set<Label> &l) const {
     return true;
 }
 
-bool FormulaFalse::sat(const set<string> &l) const {
+bool FormulaFalse::sat(const std::set<Label> &l) const {
     return false;
 }
 
@@ -117,6 +118,6 @@ bool FormulaFalse::sat(const set<string> &l) const {
  *
  * This bug was found by Martin Znamirowski. See <http://gna.org/bugs/?11944>.
  */
-bool FormulaFinal::sat(const set<string> &l) const {
+bool FormulaFinal::sat(const std::set<Label> &l) const {
     return true;
 }

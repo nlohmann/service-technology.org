@@ -26,7 +26,7 @@
  **************************************/
 
 /// return a string representation of the action
-string Action::toString() const {
+std::string Action::toString() const {
     switch (type) {
         case(INSERT):
             return "insert " + label_new;
@@ -82,10 +82,10 @@ void ActionScript::add(const Action &a) {
 
 
 /// return a string representation of the script
-string ActionScript::toString() const {
-    string result;
+std::string ActionScript::toString() const {
+    std::string result;
     
-    for (size_t i = 0; i < script.size(); i++) {
+    for (size_t i = 0; i < script.size(); ++i) {
         if (i != 0)
             result += ", ";
         result += script[i].toString();

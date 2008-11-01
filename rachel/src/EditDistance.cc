@@ -19,6 +19,7 @@
 \*****************************************************************************/
 
 #include "EditDistance.h"
+#include "Graph.h"
 
 unsigned int EditDistance::cache_hit = 0;
 unsigned int EditDistance::cache_miss = 0;
@@ -34,11 +35,11 @@ Value **EditDistance::cache = NULL;
 void EditDistance::initializeCache(Graph &g1, Graph &g2) {
     cache = new Value*[g1.nodes.size()];
     
-    for (size_t i = 0; i < g1.nodes.size(); i++) {
+    for (size_t i = 0; i < g1.nodes.size(); ++i) {
         cache[i] = new Value[g2.nodes.size()];
         
         // initialize cache entries to 0
-        for (size_t j = 0; j < g2.nodes.size(); j++) {
+        for (size_t j = 0; j < g2.nodes.size(); ++j) {
             cache[i][j] = 0;
         }
     }    
@@ -52,7 +53,7 @@ void EditDistance::initializeCache(Graph &g1, Graph &g2) {
  *      after calculating the matching.
  */
 void EditDistance::emptyCache(Graph &g1, Graph &g2) {
-    for (size_t i = 0; i < g1.nodes.size(); i++) {
+    for (size_t i = 0; i < g1.nodes.size(); ++i) {
         delete [] cache[i];
     }
     

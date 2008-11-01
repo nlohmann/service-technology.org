@@ -21,34 +21,10 @@
 #ifndef __GRAPH_H
 #define __GRAPH_H
 
-
-#include <string>
 #include <map>
-#include <vector>
+#include "types.h"
 
-#include "Formula.h"
-#include "Action.h"
-
-
-/******************************
- * class forward delcarations *
- ******************************/
-
-class Edge;
-
-
-/************
- * typedefs *
- ************/
-
-typedef unsigned int Node;
-typedef std::vector<Node> Nodes;
-typedef std::string Label;
-typedef std::vector<Label> Labels;
-typedef std::vector<Edge> Assignment;
-typedef std::vector<Assignment> Assignments;
-typedef double Value;
-typedef std::vector<Edge> Edges;
+class Formula;
 
 
 /***********
@@ -187,7 +163,7 @@ class Graph {
         // a hack to get the needed numbers for Luhme
         void printStatisticsForMarkings();
     
-        Graph(string const id);
+        Graph(std::string const id);
 };
 
 #endif

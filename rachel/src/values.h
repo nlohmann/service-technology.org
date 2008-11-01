@@ -18,11 +18,17 @@
  Floor, Boston, MA 02110-1301  USA.
  \*****************************************************************************/
 
+/*!
+ * \file values.h
+ * \brief Node and label similarity (can be overridden by command line parameters)
+ */
+ 
 #ifndef __VALUES_H
 #define __VALUES_H
 
+#include "types.h"
 
-#include "main.h"
+class Graph;
 
 
 /// node similarity

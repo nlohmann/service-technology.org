@@ -23,14 +23,18 @@
 #include <cstdlib>
 #include <cstdio>
 #include <map>
+#include <set>
 
 #include "config.h"
 #include "Matching.h"
 #include "costfunction.h"
+#include "Action.h"
 #include "Graph.h"
 #include "helpers.h"
 
 using std::map;
+using std::set;
+using std::string;
 
 
 /*************
@@ -79,7 +83,7 @@ Permutation Matching::permuteEdges(Edges &e1, Edges &e2) {
 
     // create pairs without ("","")-pairs or duplicates
     Permutation result;
-    for (size_t i = 0; i < e1.size(); i++) {
+    for (size_t i = 0; i < e1.size(); ++i) {
         if (e1[i].label != "" || e2[i].label != "") {
 
             // Optimization: The variable already is set to true if the current
@@ -137,10 +141,10 @@ Permutations Matching::calcPermutations(Node q1, Node q2, Assignment &beta) {
     // add epsilon-edges to fill edge vectors to equal size
     unsigned int e1size = e1.size();
     unsigned int e2size = e2.size();
-    for (unsigned int i = 0; i < e2size; i++) {
+    for (unsigned int i = 0; i < e2size; ++i) {
         e1.push_back( Edge(q1,0,"") );
     }
-    for (unsigned int i = 0; i < e1size; i++) {
+    for (unsigned int i = 0; i < e1size; ++i) {
         e2.push_back( Edge(q2,q2,"") );
     }
 
@@ -175,7 +179,7 @@ ActionScript Matching::w(Node q1, Node q2) {
     
     // get and iterate the satisfying assignments
     Assignments assignments = B.sat(q2);
-    for (unsigned int k = 0; k < assignments.size(); k++) {
+    for (unsigned int k = 0; k < assignments.size(); ++k) {
         Permutations permutations = calcPermutations(q1,q2,assignments[k]);
 
         ActionScript assignment_script;
@@ -184,13 +188,13 @@ ActionScript Matching::w(Node q1, Node q2) {
         
         // iterate the permutations
         for (Permutations::iterator perms = permutations.begin();
-             perms != permutations.end(); perms++) {
+             perms != permutations.end(); ++perms) {
 
             ActionScript permutation_script;
             
             // iterate the current permutation
             for (Permutation::iterator perm = perms->begin();
-                 perm != perms->end(); perm++) {
+                 perm != perms->end(); ++perm) {
                 Value current_value = 0;
                 
                 Edge e1 = perm->first;

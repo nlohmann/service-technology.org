@@ -24,15 +24,15 @@
 #include <cassert>
 #include <climits>
 #include <cstdlib>
+#include <string>
 #include <libgen.h>
-
+#include "Action.h"
 #include "Graph.h"
 #include "Matching.h"
 #include "Simulation.h"
 #include "cmdline.h"
 #include "config.h"
 #include "helpers.h"
-
 
 
 using std::endl;
@@ -76,7 +76,7 @@ gengetopt_args_info args_info;
  *************/
 
 /// returns the name of a chose mode
-string mode_name(enum_mode mode) {
+std::string mode_name(enum_mode mode) {
     switch (mode) {
         case(mode_arg_simulation): return "simulation";            
         case(mode_arg_matching):   return "matching";
@@ -101,7 +101,7 @@ Graph outputEditScript(Graph &g1, Graph &g2) {
         todo.pop();
         
         // show action script and push successors
-        for (size_t i = 0; i < current.script.size(); i++) {
+        for (size_t i = 0; i < current.script.size(); ++i) {
             todo.push(NodePair(current.script[i].stateA, current.script[i].stateB));
             
             g3.addNode(index.first);
@@ -120,12 +120,12 @@ Graph outputEditScript(Graph &g1, Graph &g2) {
 
 
 void dotOutput(Graph &A, Graph &B, Graph &C) {
-    string dot_filename;
+    std::string dot_filename;
     
     // if no filename is given via command line, create it
     if (args_info.dot_arg == NULL) {
-        dot_filename = string(basename(args_info.automaton_arg)) + "_" +
-        string(basename(args_info.og_arg)) + "_" +
+        dot_filename = std::string(basename(args_info.automaton_arg)) + "_" +
+        std::string(basename(args_info.og_arg)) + "_" +
         mode_name(args_info.mode_arg) + ".dot";
     } else {
         dot_filename = args_info.dot_arg;
@@ -162,8 +162,8 @@ void dotOutput(Graph &A, Graph &B, Graph &C) {
     
     
     // if dot found during configuration, executed it to create a PNG
-    if (!string(HAVE_DOT).empty()) {
-        string command = string(HAVE_DOT) + " " + dot_filename + " -Tpng -O";
+    if (!std::string(HAVE_DOT).empty()) {
+        std::string command = std::string(HAVE_DOT) + " " + dot_filename + " -Tpng -O";
         system(command.c_str());
     }    
 }

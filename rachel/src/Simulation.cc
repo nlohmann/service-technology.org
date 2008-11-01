@@ -18,11 +18,15 @@
  Floor, Boston, MA 02110-1301  USA.
 \*****************************************************************************/
 
+/*!
+ * \file Simulation.cc
+ * \brief Implements functions for the simulation-based graph similarity
+ */
+
 #include <vector>
 #include <cstdlib>
 #include <cassert>
 #include <cstdio>
-
 #include "helpers.h"
 #include "cmdline.h"
 #include "costfunction.h"
@@ -30,7 +34,6 @@
 #include "Action.h"
 #include "Graph.h"
 
-using std::vector;
 using std::pair;
 using std::map;
 
@@ -65,7 +68,7 @@ ActionScript Simulation::w1(Node q1, Node q2) {
     Action action_insert(INSERT, 0);
     
     // traverse B's edges and find edge with highest value if A stutters
-    for (size_t i = 0; i < B.outEdges(q2).size(); i++)  {
+    for (size_t i = 0; i < B.outEdges(q2).size(); ++i)  {
         Value currentvalue = L("", B.outEdges(q2)[i].label) *
             simulation_recursively(q1, B.outEdges(q2)[i].target);
  
@@ -93,11 +96,11 @@ ActionScript Simulation::w2(Node q1, Node q2) {
     ActionScript script;
     
     // traverse A's edges
-    for (size_t i = 0; i < A.outEdges(q1).size(); i++) {
+    for (size_t i = 0; i < A.outEdges(q1).size(); ++i) {
         Action action_modify(MODIFY, 0);
         
         // traverse B's edges: find edge with highest value if no-one stutters
-        for (size_t j = 0; j < B.outEdges(q2).size(); j++) {
+        for (size_t j = 0; j < B.outEdges(q2).size(); ++j) {
             Value currentvalue = L(A.outEdges(q1)[i].label, B.outEdges(q2)[j].label) *
                 simulation_recursively(A.outEdges(q1)[i].target, B.outEdges(q2)[j].target);            
 

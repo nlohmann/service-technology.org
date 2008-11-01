@@ -21,7 +21,9 @@
 #ifndef __EDITDISTANCE_H
 #define __EDITDISTANCE_H
 
-#include "Graph.h"
+#include "types.h"
+
+class Graph;
 
 
 /*!
@@ -51,6 +53,7 @@ class EditDistance {
         /// allocate memory for cache and initialize it
         static void emptyCache(Graph &g1, Graph &g2);
     
+        /// destructor
         virtual ~EditDistance() {};
 };
 

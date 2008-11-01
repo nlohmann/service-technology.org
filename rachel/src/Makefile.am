@@ -6,7 +6,7 @@ rachel_SOURCES = syntax_og.yy lexer_og.ll \
 		 Graph.cc Graph.h \
 		 Formula.cc Formula.h \
 		 Action.cc Action.h \
-		 costfunction.h \
+		 costfunction.h types.h \
 		 Simulation.h Matching.h \
 		 EditDistance.h EditDistance.cc \
 		 cmdline.c cmdline.h \
@@ -30,7 +30,7 @@ rachel_CXXFLAGS = @configured_CXXFLAGS@
 # organize cleaning, and distribution
 ################################################################
 
-EXTRA_DIST = syntax_og.h cmdline.ggo rachel.conf Doxydetails $(aspects)
+EXTRA_DIST = syntax_og.h cmdline.ggo rachel.conf $(aspects)
 
 CLEANFILES = *.gcno *.gcda
 

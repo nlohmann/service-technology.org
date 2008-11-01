@@ -21,8 +21,7 @@
 #ifndef __VALUES_H
 #define __VALUES_H
 
-
-#include "Graph.h"
+#include "types.h"
 #include "cmdline.h"
 
 

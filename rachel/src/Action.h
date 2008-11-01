@@ -21,20 +21,7 @@
 #ifndef __ACTION_H
 #define __ACTION_H
 
-
-#include "Formula.h"
-
-
-typedef enum action_type {
-    NONE,       ///< no action determined yet (this is not "keep"!)
-    INSERT,     ///< insert edge
-    DELETE,     ///< delete egde
-    MODIFY,     ///< modify edge
-    KEEP        ///< keep edge
-};
-typedef double Value;
-typedef unsigned int Node;
-typedef string Label;
+#include "types.h"
 
 
 /// an edit action
@@ -59,7 +46,7 @@ class Action {
         Label label_new;
         
         /// return a string representation of the action
-        string toString() const;
+        std::string toString() const;
         
         // constructor
         Action(action_type myType, Value myValue,
@@ -71,7 +58,7 @@ class Action {
 class ActionScript {
     public:
         /// the vector of edit actions
-        vector<Action> script;
+        std::vector<Action> script;
         
         /// the aggregated value of the script
         Value value;
@@ -80,7 +67,7 @@ class ActionScript {
         void add(const Action &a);
         
         /// return a string representation of the script
-        string toString() const;
+        std::string toString() const;
         
         /// constructor
         ActionScript();

@@ -127,6 +127,6 @@ AC_SUBST(configured_LDFLAGS)
 # create output files
 #############################################################################
 
-AC_CONFIG_FILES([Makefile src/Doxyfile src/Makefile man/Makefile doc/Makefile tests/Makefile exp/Makefile maintainer/Makefile maintainer/debian/changelog.template])
+AC_CONFIG_FILES([Makefile Doxyfile src/Makefile man/Makefile doc/Makefile tests/Makefile exp/Makefile maintainer/Makefile maintainer/debian/changelog.template])
 
 AC_OUTPUT

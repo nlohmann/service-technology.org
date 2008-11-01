@@ -40,6 +40,10 @@ Version 1.11-unreleased
 
 * adapted code to avoid warnings of GCC 4.2 (mostly deprecation warnings)
 
+* overworked test scripts: creation of output files is checked now
+
+* simplified header inclusion: all typedefs are now made in `types.h'
+
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for
 complete version history.

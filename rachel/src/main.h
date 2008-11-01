@@ -22,18 +22,17 @@
 #define __MAIN_H
 
 #include <cassert>
-
-#include "graph.h"
+#include "types.h"
 
 
 /// calculate the faculty function
 unsigned int fac(unsigned int n);
 
 /// return maximum of two values
-Value max(Value v1, Value v2);
+Value max(Value &v1, Value &v2);
 
 /// converts unsigned int to string
-string toString(Node q);
+std::string toString(Node q);
 
 /// updates an index
 void next_index(vector<unsigned int> &current_index, const vector<unsigned int> &max_index);

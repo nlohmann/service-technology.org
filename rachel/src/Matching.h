@@ -21,14 +21,11 @@
 #ifndef __MATCHING_H
 #define __MATCHING_H
 
-#include "Action.h"
-#include "Graph.h"
 #include "EditDistance.h"
+#include "types.h"
 
-
-typedef std::pair<Edge,Edge> EdgePair;
-typedef set<EdgePair> Permutation;
-typedef set<Permutation> Permutations;
+class ActionScript;
+class Graph;
 
 
 /*!

@@ -22,7 +22,6 @@
 #include <map>
 #include <sstream>
 #include <cassert>
-
 #include "config.h"
 #include "Graph.h"
 #include "helpers.h"
@@ -47,7 +46,7 @@ void next_index(std::vector<unsigned int> &current_index,
 {
     assert(current_index.size() == max_index.size());
     
-    for (unsigned int i = 0; i < current_index.size(); i++) {
+    for (unsigned int i = 0; i < current_index.size(); ++i) {
         if (current_index[i] < max_index[i]-1) {
             current_index[i]++;
             break;

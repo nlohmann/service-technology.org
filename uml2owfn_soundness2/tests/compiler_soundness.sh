@@ -3,17 +3,17 @@
 source defaults.sh
 
 # copy files to builddir (in case it is a different directory)
-#if test \( "$testdir" = "$builddir" \)
-#then
-#  builddir_cleanup=0
-#else 
-#  $MKDIR_P $builddir/soundness
-#  cp $testdir/soundness/* $builddir/soundness
-#  builddir_cleanup=1
-#fi
+if test \( "$testdir" = "$builddir" \)
+then
+  builddir_cleanup=0
+else 
+  $MKDIR_P $builddir/soundness
+  cp $testdir/soundness/* $builddir/soundness
+  builddir_cleanup=1
+fi
 
 result=0
-DIR=$testdir/soundness
+DIR=$builddir/soundness
 
 echo ""
 echo "UML2oWFN compiler for soundness analysis tests"
@@ -133,11 +133,11 @@ echo "[CTL model checking]"
 
 
 # remove files from builddir
-#if [ $builddir_cleanup -eq 1 ] ; then
-#  rm -f $builddir/soundness/TestSuite_soundness.txt
-#  rm -f $builddir/soundness/TestSuite_soundness.xml
-#  rmdir $builddir/soundness
-#fi
+if [ $builddir_cleanup -eq 1 ] ; then
+  rm -f $builddir/soundness/TestSuite_soundness.txt
+  rm -f $builddir/soundness/TestSuite_soundness.xml
+  rmdir $builddir/soundness
+fi
 
 
 exit $result

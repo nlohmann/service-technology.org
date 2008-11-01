@@ -49,6 +49,8 @@
 #include <map>
 #include <utility>
 
+#include <libgen.h>     // for ::basename
+
 #include "uml2owfn.h"
 #include "options.h"
 #include "helpers.h"
@@ -475,32 +477,38 @@ void parse_command_line(int argc, char* argv[])
 	if ( options[O_OUTPUT] )
 	{
 		createOutputFile = true;
-	}
 
-	// set output file name if non is already chosen
-	if ((options[O_OUTPUT]) && (globals::output_filename == ""))
-	{
-		// set output file name to a standard output filename in case of no inputfiles
-		if ( not(options[O_INPUT]) )
-		{
-			globals::output_filename = "stdof";
-			trace(TRACE_ALWAYS, "Output file name set to standard: stdof\n");
-		}
-		else
-		{
-			set< string >::iterator file = inputfiles.begin();
-			/*
-			unsigned int pos = file->rfind("."+suffixes[F_BOM_XML], file->length());
-			if (pos == ( file->length() - (suffixes[F_BOM_XML].length()+1) ))
-			{
-				globals::output_filename = file->substr(0, pos);
-				trace(TRACE_INFORMATION, "Output filename set to: "+globals::output_filename+"\n");
-			}
-			file++;
-			*/
-			globals::getOutputFileNameFromInput = true;
-			trace(TRACE_INFORMATION, "Generating output file name from input file name\n");
-		}
+		if (globals::output_filename == "")
+    {
+      // set output file name to a standard output filename in case of no inputfiles
+      if ( not(options[O_INPUT]) )
+      {
+        globals::output_filename = "stdof";
+        trace(TRACE_ALWAYS, "Output file name set to standard: stdof\n");
+      }
+      else
+      {
+        set< string >::iterator file = inputfiles.begin();
+        /*
+        unsigned int pos = file->rfind("."+suffixes[F_BOM_XML], file->length());
+        if (pos == ( file->length() - (suffixes[F_BOM_XML].length()+1) ))
+        {
+          globals::output_filename = file->substr(0, pos);
+          trace(TRACE_INFORMATION, "Output filename set to: "+globals::output_filename+"\n");
+        }
+        file++;
+        */
+        globals::getOutputFileNameFromInput = true;
+        trace(TRACE_INFORMATION, "Generating output file name from input file name\n");
+      }
+    } else {
+      // separate output file name into path and file name
+      char* ffile = (char*)malloc(globals::output_filename.size() + sizeof(char));
+      strcpy(ffile, globals::output_filename.c_str());
+      globals::output_filename = string(::basename(ffile));
+      globals::output_directory = string(::dirname(ffile));
+      free(ffile);
+    }
 	}
 
 	// -------------------------------------------------------------------------
@@ -511,7 +519,7 @@ void parse_command_line(int argc, char* argv[])
 		trace(TRACE_INFORMATION, " - input is read from \"" + globals::filename + "\"\n");
 	}
 	if (options[O_OUTPUT]) {
-		trace(TRACE_INFORMATION, " - output files will be named \"" + globals::output_filename + ".<ext>\"\n");
+		trace(TRACE_INFORMATION, " - output files will be named \"" + globals::output_directory+GetSeparatorChar()+globals::output_filename + ".<ext>\"\n");
 	}
 
 	if (options[O_ANALYSIS]) {

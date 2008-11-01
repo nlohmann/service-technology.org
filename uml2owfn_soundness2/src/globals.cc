@@ -70,6 +70,7 @@ namespace globals {
 
   string workingDirectory = "";
   string filename = "<STDIN>";
+  string output_directory = ".";      // write to current directory by default
   string output_filename = "";
   string output_filename_suffix = "";	///< suffix of the current output file (if multiple files are written)
   bool getOutputFileNameFromInput = false;

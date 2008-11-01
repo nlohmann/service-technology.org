@@ -89,6 +89,9 @@ namespace globals
   /// filename of input file
   extern string filename;
 
+  /// directory of output file
+  extern string output_directory;
+
   /// filename of output file
   extern string output_filename;
 

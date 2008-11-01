@@ -13,8 +13,8 @@ XFAIL_TESTS = compiler_allformats.sh
 
 # Notice: If you add environment variables here, you have to provide defaults
 # defaults.sh, too.
-TESTS_ENVIRONMENT = testdir=$(srcdir) builddir=$(builddir)\
-		MKDIR_P="$(MKDIR_P)" PATH=.:../src:$(srcdir):$$PATH
+TESTS_ENVIRONMENT = testdir=@srcdir@ builddir=@builddir@\
+		MKDIR_P="$(MKDIR_P)" PATH=.:../src:@srcdir@:$$PATH
 
 CLEANFILES = *.lola \
 		*.task \

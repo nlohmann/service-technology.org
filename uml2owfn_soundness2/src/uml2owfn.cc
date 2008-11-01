@@ -191,8 +191,12 @@ string stripExtension(string fileName) {
 string getOutputFilename(string prefix = "", bool use_suffix=true) {
   if (globals::output_filename == "")
     return "";
-  else
-    return globals::workingDirectory + GetSeparatorChar() + prefix + globals::output_filename + (use_suffix ? globals::output_filename_suffix : "");
+
+  string dirString = (globals::getOutputFileNameFromInput
+      ? globals::workingDirectory
+      : globals::output_directory);
+
+  return dirString + GetSeparatorChar() + prefix + globals::output_filename + (use_suffix ? globals::output_filename_suffix : "");
 }
 
 /*!

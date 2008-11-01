@@ -289,13 +289,23 @@ void PetriNet::reduce_dead_nodes()
 /*!
  * \brief Elimination of identical places (RB1):
  *
- * If there exist two distinct (precondition 1) places with identical preset
- * (precondition 2) and postset (precondition 3) and the weights of all incoming
- * and outgoing arcs have the value 1 (precondition 4), then they can be merged.
+ * If there exist two distinct (precondition 1) places 
+ * with identical preset (precondition 2) 
+ * and postset (precondition 3) 
+ * and the weights of all incoming and outgoing arcs 
+ * have the value 1 (precondition 4), 
+ * and neither of them is initially marked (precondition 5), 
+ * then they can be "merged". 
+ * I.e. one of these places can be removed (including all connected arcs)
+ * and its history will be attached to the other's one.
+ * (See mergeParallelPlaces)
+ * 
+ * This reduction preserves liveness and boundedness (Pillat2008, def. 3.3). 
  * 
  * \todo 
- *       - Overwork the preconditions and postconditions.
+ *       - Overwork the preconditions and postconditions. 
  *       - Re-organize the storing and removing of nodes.
+ * 
  */
 void PetriNet::reduce_identical_places()
 {
@@ -307,9 +317,10 @@ void PetriNet::reduce_identical_places()
   // iterate the places
   for (set<Place*>::iterator p1 = P.begin(); p1 != P.end(); p1++)
   {
-    if (((*p1)->preset.empty()) || ((*p1)->postset.empty()) || !(sameweights(*p1)))
+    if (!(sameweights(*p1))) // precondition 4
       continue;
     
+    // iterate the preset
     for (set<Node*>:: iterator preTransition = (*p1)->preset.begin(); preTransition != (*p1)->preset.end(); preTransition++)
     {
       for (set<Node*>::iterator p2 = (*preTransition)->postset.begin(); p2 != (*preTransition)->postset.end(); p2++)
@@ -318,24 +329,45 @@ void PetriNet::reduce_identical_places()
             ((*p1)->postset == (*p2)->postset) && // precondition 3
             (sameweights(*p2)) && // precondition 4
             (arc_weight((*preTransition), (*p1)) == 1) && // precondition 4 
-            (arc_weight((*preTransition), (*p2)) == 1) ) // precondition 4
+            (arc_weight((*preTransition), (*p2)) == 1) && // precondition 4
+            ((*p1)->tokens == 0) && // precondition 5
+            (static_cast<Place*>(*p2)->tokens == 0) ) // precondition 5
         {
           string id1 = ((*p1)->nodeFullName());
           string id2 = ((*p2)->nodeFullName());
           placePairs.insert(pair<string, string>(id1, id2));
         }
     }
+    
+    if((*p1)->preset.empty()){
+      // iterate the postset
+      for (set<Node*>:: iterator postTransition = (*p1)->postset.begin(); postTransition != (*p1)->postset.end(); postTransition++)
+      {
+        for (set<Node*>::iterator p2 = (*postTransition)->preset.begin(); p2 != (*postTransition)->preset.end(); p2++)
+          if ((*p1 != *p2) &&     // precondition 1
+              ((*p1)->preset == (*p2)->preset) && // precondition 2
+              ((*p1)->postset == (*p2)->postset) && // precondition 3
+              (sameweights(*p2)) && // precondition 4
+              (arc_weight((*p1), (*postTransition)) == 1) && // precondition 4 
+              (arc_weight((*p2), (*postTransition)) == 1) ) // precondition 4
+          {
+            string id1 = ((*p1)->nodeFullName());
+            string id2 = ((*p2)->nodeFullName());
+            placePairs.insert(pair<string, string>(id1, id2));
+          }
+      }
+    }
   }
     
     // trace(TRACE_VERY_DEBUG, "[PN]\tFound " + toString(placePairs.size()) + " places with same preset and postset...\n");
     
-    // merge the found places
+    // "merge" the found places
     for (set<pair<string, string> >::iterator labels = placePairs.begin();
          labels != placePairs.end(); labels++)
     {
       Place* p1 = findPlace(labels->first);
       Place* p2 = findPlace(labels->second);
-      mergePlaces(p1, p2);
+      mergeParallelPlaces(p1, p2);
       result++;
     }
     //if (result!=0)
@@ -349,14 +381,21 @@ void PetriNet::reduce_identical_places()
 /*!
  * \brief Elimination of identical transitions (RB2):
  *
- * If there exist two distinct (precondition 1) transitions with identical
- * preset (precondition 2) and postset (precondition 3) and none of those two
- * is connected to any arc with a weight other than 1 (precondition 4),
- * then they can be merged.
+ * If there exist two distinct (precondition 1) transitions 
+ * with identical preset (precondition 2) 
+ * and postset (precondition 3) 
+ * and none of those two is connected to any arc with a weight 
+ * other than 1 (precondition 4),
+ * then they can be "merged".
+ * I.e. one place will be removed and its history will be attached
+ * to the other ones.
+ * 
+ * This reduction preserves liveness and boundedness (Pillat2008, def. 5.4).
  * 
  * \todo
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
+ * 
  */
 void PetriNet::reduce_identical_transitions()
 {
@@ -368,9 +407,10 @@ void PetriNet::reduce_identical_transitions()
   // iterate the transitions
   for (set<Transition*>::iterator t1 = T.begin(); t1 != T.end(); t1++)
   {
-    if (!(sameweights(*t1)))
+    if (!(sameweights(*t1))) // precondition 4
       continue;
     
+    // iterate the preset
     for (set<Node*>:: iterator prePlace = (*t1)->preset.begin(); prePlace != (*t1)->preset.end(); prePlace++)
     {
       for (set<Node*>::iterator t2 = (*prePlace)->postset.begin(); t2 != (*prePlace)->postset.end(); t2++)
@@ -379,12 +419,34 @@ void PetriNet::reduce_identical_transitions()
             ((*t1)->preset == (*t2)->preset) &&	// precondition 2
             ((*t1)->postset == (*t2)->postset) && // precondition 3
             (sameweights(*t2)) && // precondition 4
-            (arc_weight((*((*t1)->preset.begin())),(*t1)) == 1) && // precondition 4
-            (arc_weight((*((*t2)->preset.begin())),(*t2)) == 1) ) // precondition 4
+            (arc_weight((*prePlace),(*t1)) == 1) && // precondition 4
+            (arc_weight((*prePlace),(*t2)) == 1) ) // precondition 4
         {
           string id1 = ((*t1)->nodeFullName());
           string id2 = ((*t2)->nodeFullName());
           transitionPairs.insert(pair<string, string>(id1, id2));
+        }
+      }
+    }
+    
+    if ((*t1)->preset.empty())
+    {
+      // iterate the postset
+      for (set<Node*>:: iterator postPlace = (*t1)->postset.begin(); postPlace != (*t1)->postset.end(); postPlace++)
+      {
+        for (set<Node*>::iterator t2 = (*postPlace)->preset.begin(); t2 != (*postPlace)->preset.end(); t2++)
+        {
+          if ((*t1 != *t2) &&     // precondition 1
+              ((*t1)->preset == (*t2)->preset) && // precondition 2
+              ((*t1)->postset == (*t2)->postset) && // precondition 3
+              (sameweights(*t2)) && // precondition 4
+              (arc_weight((*t1),(*postPlace)) == 1) && // precondition 4
+              (arc_weight((*t2),(*postPlace)) == 1) ) // precondition 4
+          {
+            string id1 = ((*t1)->nodeFullName());
+            string id2 = ((*t2)->nodeFullName());
+            transitionPairs.insert(pair<string, string>(id1, id2));
+          }
         }
       }
     }
@@ -413,16 +475,21 @@ void PetriNet::reduce_identical_transitions()
 /*!
  * \brief Fusion of series places (RA1):
  *
- * If there exists a transition with singleton preset and postset
- * (precondition 1) that are distinct (precondition 2) and where the place in
- * the preset has no other outgoing arcs (precondition 3), then the places
- * can be merged and the transition can be removed. Furthermore, none of the
- * places may be communicating (precondition 4) and the included arcs must have
- * a weight of 1 (precondition 5).
+ * If there exists a transition with singleton preset and 
+ * postset (precondition 1) that are distinct (precondition 2),
+ * where the preset's preset is not empty (precondition 3)
+ * and the place in the preset has no other outgoing arcs (precondition 4)
+ * and alle arcs connected with this transition have a weight of 1 (precondition 5)
+ * and the postplace ist not initially marked (precondition 6),
+ * then the preset and postset can be merged an the transition can be removed.
+ * Furthermore none of these places may be communicating (precondition 7).
+ * 
+ * This reduction preserves liveness and boundedness (Pillat2008, def. 4.6).
  * 
  * \todo
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
+ * 
 */
 void PetriNet::reduce_series_places()
 {
@@ -439,12 +506,17 @@ void PetriNet::reduce_series_places()
     Place* prePlace = static_cast<Place*>(*((*t)->preset.begin()));
     Place* postPlace = static_cast<Place*>(*((*t)->postset.begin()));
     
-    if (((*t)->preset.size() == 1) && ((*t)->postset.size() == 1) && // precondition 1
+    if (((*t)->preset.size() == 1) && // precondition 1
+        ((*t)->postset.size() == 1) && // precondition 1
         (prePlace != postPlace) &&			 // precondition 2
-        ((prePlace)->postset.size() == 1) &&		 // precondition 3
-        (prePlace->type == INTERNAL) &&			 // precondition 4
-        (postPlace->type == INTERNAL) &&
-        (arc_weight(prePlace, *t) == 1 && arc_weight(*t, postPlace) == 1)) // precondition 5
+        (!(prePlace->preset.empty())) &&     // precondition 3
+        ((prePlace)->postset.size() == 1) &&		 // precondition 4
+        (arc_weight(prePlace, *t) == 1) && // precondition 5
+        (arc_weight(*t, postPlace) == 1) && // precondition 5
+        (postPlace->tokens == 0 ) && // precondition 6
+        (prePlace->type == INTERNAL) &&	// precondition 7
+        (postPlace->type == INTERNAL) ) // precondition 7
+        
     {
       string id1 = ((*((*t)->preset.begin()))->nodeFullName());
       string id2 = ((*((*t)->postset.begin()))->nodeFullName());
@@ -482,13 +554,16 @@ void PetriNet::reduce_series_places()
  *
  * If there exists a place with singleton preset and postset (precondition 1),
  * which is not final or marked (precondition 2),
- * and if the transition in its postset has no other incoming arcs
- * (precondition 3), then the preset and the postset can be merged and the
- * place can be removed. Furthermore the in and outgoing arcs have to have
- * a weight of 1 (precondition 4).
+ * and if the transition in its postset has no other incoming arcs (precondition 3),
+ * and if the preset's postset and the postset's postset are disjunct (precondition 4),
+ * then the preset and the postset can be merged and the place can be removed.
+ * 
+ * This reduction preserves liveness and boundedness (Pillat2008, def. 4.3). 
+ * 
  * If both the pretransition and the posttransition are connected with an
  * interface place and keepNormal is true, the reduction will be prevented (precondition 5)
  *
+ * 
  * \param   keepNormal determines wether reduction of a normalized net should
  *          preserve normalization or not. If true, interface transitions
  *          (i.e. transitions connected with interface places) will only be
@@ -499,6 +574,7 @@ void PetriNet::reduce_series_places()
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
  *       ???? What about initially marked and final places ????
+ *
  */
 void PetriNet::reduce_series_transitions(bool keepNormal) {
     // trace(TRACE_DEBUG, "[PN]\tApplying rule RA2 (fusion of series transitions)...\n");
@@ -509,15 +585,19 @@ void PetriNet::reduce_series_transitions(bool keepNormal) {
 
     // iterate the places
     for (set<Place*>::iterator p = P.begin(); p != P.end(); p++) {
-        if (((*p)->postset.size() == 1) && ((*p)->preset.size() == 1) //precondition 1
-                && !(*p)->isFinal && (!(*p)->tokens > 0)) // precondition 2
+        if (((*p)->postset.size() == 1) && //precondition 1
+            ((*p)->preset.size() == 1) && //precondition 1
+            (!(*p)->isFinal) && // precondition 2
+            (!(*p)->tokens > 0) ) // precondition 2
         {
             Transition* t1 = static_cast<Transition*>(*((*p)->preset.begin()));
             Transition* t2 = static_cast<Transition*>(*((*p)->postset.begin()));
 
             if (((t2)->preset.size() == 1) && // precondition 3
-                    (arc_weight(t1, *p) == 1) && (arc_weight(*p, t2) == 1) && // precondition 4
-                    !((t1->type != INTERNAL) && (t2->type != INTERNAL) && (keepNormal)) ) //precondition 5
+               (setIntersection(t1->postset,t2->postset).empty() ) && // precondition 4
+               (!((t1->type != INTERNAL) && 
+                  (t2->type != INTERNAL) && 
+                  (keepNormal))) ) //precondition 5
             {
                 string id1 = (t1->nodeFullName(true));
                 string id2 = (t2->nodeFullName(true));
@@ -895,7 +975,218 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
 }
 
 
+/*!
+ * \brief   merges two parallel transitions
+ *
+ *          Merges two parallel transitions. Given transitions t1 and t2:
+ *          -# a new transition t12 with empty history is created
+ *          -# this transition gets the union of the histories of transition t1
+ *             and t2
+ *          -# t12 is connected with all the places in the preset and postset of t1
+ *          -# the transitions t1 and t2 are removed
+ * 
+ *          This Function is needed by reduce_identical_transitions
+ *
+ * \param   t1  first transition
+ * \param   t2  second transition
+ *
+ * \pre     t1 != NULL
+ * \pre     t2 != NULL
+ * \post    Transitions t1 and t2 removed.
+ * \post    Transition t12 having the incoming and outgoing arcs of t1
+ *          and the union of the histories of t1 and t2.
+ *
+ */
+void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
+{
+  if (t1 == t2)
+    return;
 
+  assert(t1 != NULL);
+  assert(t2 != NULL);
+
+  Node *t12 = newTransition("");
+
+  // organize the communication type of the new transition
+  if (t1->type == t2->type)
+    t12->type = t1->type;
+
+  else if ((t1->type == IN && t2->type == INTERNAL) ||
+           (t1->type == INTERNAL && t2->type == IN))
+    t12->type = IN;
+
+  else if ((t1->type == INTERNAL && t2->type == OUT) ||
+           (t1->type == OUT && t2->type == INTERNAL))
+    t12->type = OUT;
+
+  else if ((t1->type == OUT && t2->type == IN) ||
+           (t1->type == IN && t2->type == OUT) ||
+           (t1->type == INOUT || t2->type == INOUT))
+    t12->type = INOUT;
+
+
+  // copy t1's history to t12
+  for (list<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
+  {
+    roleMap[*role] = t12;
+    t12->history.push_back(*role);
+    if (t1->prefix != "")
+    {
+        roleMap[t1->prefix + *role] = t12;
+        t12->history.push_back(t1->prefix + *role);
+    }
+  }
+
+  // copy t2's history to t12
+  for (list<string>::iterator role = t2->history.begin(); role != t2->history.end(); role++)
+  {
+    roleMap[*role] = t12;
+    t12->history.push_back(*role);
+    if (t1->prefix != "" || t2->prefix != "")
+    {
+        roleMap[t2->prefix + *role] = t12;
+        t12->history.push_back(t2->prefix + *role);
+    }
+  }
+
+  // merge pre- and postsets for t12
+  t12->preset=t1->preset;
+  t12->postset=t1->postset;
+
+  for (set<Node *>::iterator n = t1->preset.begin(); n != t1->preset.end(); n++)
+    newArc((*n), t12, STANDARD, arc_weight((*n),t1));
+
+  for (set<Node *>::iterator n = t1->postset.begin(); n != t1->postset.end(); n++)
+    newArc(t12, (*n), STANDARD, arc_weight(t1,(*n)));
+
+  removeTransition(t1);
+  removeTransition(t2);
+}
+
+/*!
+ * \brief   merges two parallel places
+ *
+ *          Function to merge two parallel places. Given places p1 and p2:
+ *          -# a new place p12 with empty history is created
+ *          -# this place gets the union of the histories of place p1 and p2
+ *          -# p12 is connected with the preset and postset of p1
+ *          -# the places p1 and p2 are removed
+ * 
+ *          This function is needed by reduce_identical_places.
+ *
+ * \param   p1  first place
+ * \param   p2  second place
+ *
+ * \pre     p1 != NULL
+ * \pre     p2 != NULL
+ * \pre     p1 and p2 are internal places.
+ * \post    Places p1 and p2 removed.
+ * \post    Place p12 having the incoming and outgoing arcs of p1 and
+ *          the union of the histories of p1 and p2.
+ * 
+ * \note    This function has been copied from mergePlaces
+ * \note    What if p1 or p2 is final?
+ * 
+ */
+void PetriNet::mergeParallelPlaces(Place *p1, Place *p2)
+{
+  if (p1 == p2 && p1 != NULL)
+      return;
+
+  if (p1 == NULL || p2 == NULL)
+  {
+    std::cerr << "[PN] At least one parameter of mergePlaces was NULL!" << std::endl;
+    assert(false);
+    return;
+  }
+
+  assert(p1 != NULL);
+  assert(p2 != NULL);
+  assert(p1->type == INTERNAL);
+  assert(p2->type == INTERNAL);
+
+  Place *p12 = newPlace("");
+
+  p12->history.clear();
+  p12->prefix = p1->prefix;
+
+  for (list<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
+  {
+    p12->history.push_back(*role);
+    roleMap[*role] = p12;
+    if (p1->prefix != "" || p2->prefix != "")
+    {
+      p12->prefix = p1->prefix;
+      roleMap[p1->prefix + *role] = p12;
+      p12->history.push_back(p1->prefix + *role);
+      roleMap[p2->prefix + *role] = p12;
+      p12->history.push_back(p2->prefix + *role);
+    }
+  }
+
+  for (list<string>::iterator role = p2->history.begin(); role != p2->history.end(); role++)
+  {
+    p12->history.push_back(*role);
+    roleMap[*role] = p12;
+    if (p1->prefix != "" || p2->prefix != "")
+    {
+      roleMap[p1->prefix + *role] = p12;
+      p12->history.push_back(p1->prefix + *role);
+      roleMap[p2->prefix + *role] = p12;
+      p12->history.push_back(p2->prefix + *role);
+    }
+
+  }
+
+  list<set<pair<Place *, unsigned int> > > newFinalSetList;
+  // change final places in the final sets
+  for (list<set<pair<Place *, unsigned int> > >::iterator final_set = final_set_list.begin(); final_set != final_set_list.end(); final_set++)
+  {
+    set<pair<Place *, unsigned int> > s1;
+    set<pair<Place *, unsigned int> > s2;
+    for (set<pair<Place *, unsigned int> >::iterator p = final_set->begin(); p != final_set->end(); p++)
+    {
+      if ((p->first) == p1 || (p->first) == p2)
+      {
+        p12->isFinal = true;
+        s1.insert(pair<Place *, unsigned int>(p12,p->second));
+      }
+      else
+      {
+        s2.insert(*p);
+      }
+    }
+    set<pair<Place *, unsigned int> > s1s2 = setUnion(s1,s2);
+/*
+    set<pair<Place *, unsigned int> > s1s2;
+    s1s2.insert(s1.begin(), s1.end());
+    s1s2.insert(s2.begin(), s2.end());
+*/
+    newFinalSetList.push_back(s1s2);
+  }
+  final_set_list = newFinalSetList;
+
+  // merge pre- and postsets for p12
+  p12->preset=p1->preset;
+  p12->postset=p1->postset;
+
+  // create the weighted arcs for p12
+
+  if ((p1->preset.size() + p1->postset.size()) > 1000)
+    std::cerr << (p1->preset.size() + p1->postset.size()) << " arcs to add..." << std::endl;
+
+  for (set<Node *>::iterator n = p1->preset.begin(); n != p1->preset.end(); n++)
+    newArc((*n), p12, STANDARD, arc_weight((*n),p1));
+
+  for (set<Node *>::iterator n = p1->postset.begin(); n != p1->postset.end(); n++)
+    newArc(p12, (*n), STANDARD, arc_weight(p1,(*n)));
+
+  removePlace(p1);
+  removePlace(p2);
+
+  p1 = NULL;
+  p2 = NULL;
+}
 
 
 /*!
@@ -912,6 +1203,10 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
  *  - elimination of self-loop places (RC1)
  *  - elimination of self-loop transitions (RC2)
  *  - elimination of self-loop transitions (RD1)
+ * 
+ * The implementations of RA1, RA2, RB1 and RB2 accord with Thomas Pillat's 
+ * "Gegenüberstellung struktureller Reduktionstechniken für Petrinetze",
+ * written 2008-03-31 (Pillat2008).
  *
  * The rules are applied until a fixed point (i.e. the number of places,
  * transitions and arcs does not change) is reached.
@@ -1000,105 +1295,6 @@ unsigned int PetriNet::reduce(unsigned int reduction_level, bool keepNormal)
   return passes;
 }
 
-
-
-/*!
- * \brief   merges two parallel transitions
- *
- *          Merges two parallel transitions. Given transitions t1 and t2:
- *          -# a new transition t12 with empty history is created
- *          -# this transition gets the union of the histories of transition t1
- *             and t2
- *          -# the presets and postsets of t1 and t2 are calculated and united
- *          -# t12 is connected with all the places in the preset and postset
- *          -# the transitions t1 and t2 are removed
- *
- * \param   t1  first transition
- * \param   t2  second transition
- *
- * \pre     t1 != NULL
- * \pre     t2 != NULL
- * \post    Transitions t1 and t2 removed.
- * \post    Transition t12 having the incoming and outgoing arcs of t1 and t2
- *          and the union of the histories of t1 and t2.
- *
- */
-void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
-{
-  if (t1 == t2)
-    return;
-
-  assert(t1 != NULL);
-  assert(t2 != NULL);
-
-  Node *t12 = newTransition("");
-
-  // organize the communication type of the new transition
-  if (t1->type == t2->type)
-    t12->type = t1->type;
-
-  else if ((t1->type == IN && t2->type == INTERNAL) ||
-           (t1->type == INTERNAL && t2->type == IN))
-    t12->type = IN;
-
-  else if ((t1->type == INTERNAL && t2->type == OUT) ||
-           (t1->type == OUT && t2->type == INTERNAL))
-    t12->type = OUT;
-
-  else if ((t1->type == OUT && t2->type == IN) ||
-           (t1->type == IN && t2->type == OUT) ||
-           (t1->type == INOUT || t2->type == INOUT))
-    t12->type = INOUT;
-
-
-  // copy t1's history to t12
-  for (list<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
-  {
-    roleMap[*role] = t12;
-    t12->history.push_back(*role);
-    if (t1->prefix != "")
-    {
-        roleMap[t1->prefix + *role] = t12;
-        t12->history.push_back(t1->prefix + *role);
-    }
-  }
-
-  // copy t2's history to t12
-  for (list<string>::iterator role = t2->history.begin(); role != t2->history.end(); role++)
-  {
-    roleMap[*role] = t12;
-    t12->history.push_back(*role);
-    if (t1->prefix != "" || t2->prefix != "")
-    {
-        roleMap[t2->prefix + *role] = t12;
-        t12->history.push_back(t2->prefix + *role);
-    }
-  }
-
-  // merge pre- and postsets for t12
-  t12->preset=setUnion(t1->preset, t2->preset);
-  t12->postset=setUnion(t1->postset, t2->postset);
-
-  // create the weighted arcs for t12
-  set<Node *> preset2without1 = setDifference(t12->preset,t1->preset);
-  set<Node *> postset2without1 = setDifference(t12->postset,t1->postset);
-
-
-  for (set<Node *>::iterator n = t1->preset.begin(); n != t1->preset.end(); n++)
-    newArc((*n), t12, STANDARD, arc_weight((*n),t1));
-
-  for (set<Node *>::iterator n = preset2without1.begin(); n != preset2without1.end(); n++)
-    newArc((*n), t12, STANDARD, arc_weight((*n),t2));
-
-  for (set<Node *>::iterator n = t1->postset.begin(); n != t1->postset.end(); n++)
-    newArc(t12, (*n), STANDARD, arc_weight(t1,(*n)));
-
-  for (set<Node *>::iterator n = postset2without1.begin(); n != postset2without1.end(); n++)
-    newArc(t12, (*n), STANDARD, arc_weight(t2,(*n)));
-
-  removeTransition(t1);
-  removeTransition(t2);
-}
 
 /****************************************************
  * Backup

@@ -1074,7 +1074,7 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   {
     t12->type = INOUT;
   }
-  else assert(false); ///< this should never happer or we have missed a case
+  else assert(false); ///< this should never happen or we have missed a case
 
   t12->prefix = t1->prefix;
 

@@ -436,9 +436,6 @@ class PetriNet
     /// merges two transitions
     void mergeTransitions(Transition *t1, Transition *t2);
 
-    /// merges two parallel transitions
-    void mergeParallelTransitions(Transition *t1, Transition *t2);
-
     /// finds place given a role
     Place* findPlace(string role) const;
 
@@ -579,7 +576,7 @@ class PetriNet
 
     /// deletes all interface places
     void makeInnerStructure();
-
+    
     /// checks whether the Petri net is an open net
     bool isSane() const;
 
@@ -686,6 +683,12 @@ class PetriNet
     /// remove unneeded initially marked places in choreographies
     void reduce_remove_initially_marked_places_in_choreographies();
 
+    /// merges two parallel transitions
+    void mergeParallelTransitions(Transition *t1, Transition *t2);
+    
+    /// merges two parallel places
+    void mergeParallelPlaces(Place *p1, Place *p2);
+    
     /// returns an id for new nodes
     unsigned int getId();
 

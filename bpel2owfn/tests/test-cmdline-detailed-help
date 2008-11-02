@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 command="bpel2owfn --detailed-help"
 echo ""

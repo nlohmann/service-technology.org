@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 command="bpel2owfn --input=$testdir/bpel4chor/chor_paper_traveler.bpel --input=$testdir/bpel4chor/chor_paper_airline.bpel --input=$testdir/bpel4chor/chor_paper_traveler.bpel --topology=$testdir/bpel4chor/chor_paper_topology10.xml --mode=choreography --parameter=communicationonly --output=choreography10 --format=owfn"
 echo ""

@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/usr/bin/env bash
 
 command="bpel2owfn --input=$testdir/testfiles/purchaseOrderProcess.bpel --mode=petrinet --format=apnn --output=purchaseOrderProcess"
 echo ""

@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 command="bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer1.bpel --mode=choreography --format=lola --parameter=communicationonly --parameter=reduce --output=coffee_customer3"
 echo ""

@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 command="rachel -a $testdir/testfiles/traveler.sa"
 echo ""

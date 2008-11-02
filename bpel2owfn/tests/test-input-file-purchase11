@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 command="bpel2owfn --input=$testdir/testfiles/purchase.bpel"
 echo ""

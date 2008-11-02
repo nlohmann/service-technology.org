@@ -1,4 +1,4 @@
-# /bin/bash
+#!/usr/bin/env bash
 
 command="bpel2owfn -mcfg --input=$testdir/sa_tests/sa00062.bpel"
 echo ""

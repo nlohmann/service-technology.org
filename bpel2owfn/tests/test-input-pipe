@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 command="cat $testdir/testfiles/purchaseOrderProcess.bpel | bpel2owfn"
 echo ""

@@ -76,6 +76,12 @@ option "benefit-delete" -
   default="0.2"
   optional
 
+option "threshold" t
+  "Threshold for suboptimal matching results"
+  double
+  default="1.0"
+  optional
+
 option "conf-file" c
   "Read configurations from file"
   string

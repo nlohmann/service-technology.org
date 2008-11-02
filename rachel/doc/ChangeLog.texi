@@ -1,4 +1,4 @@
-@heading Version 1.11-unreleased
+@heading Version 1.11
 @itemize
 @item implemented Fiona's modified OG file format (an OG file now also consists of an interface definition) and adjusted the respective test cases --- note that Rachel's parser is backwards compatible and still accepts OG files without interface definition
 
@@ -23,6 +23,8 @@
 @item overworked test scripts: creation of output files is checked now
 
 @item simplified header inclusion: all typedefs are now made in @file{types.h}
+
+@item added a command line parameter @option{--threshold}/@option{-t} to set a threshold to control the matching algorithm: whenever a formula's assignment reaches this value, it is immediately returned instead of the optimum; this results in faster, yet sub-optimal results 
 @end itemize
 
 

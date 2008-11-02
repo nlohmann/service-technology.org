@@ -6,8 +6,8 @@
                       http://service-technology.org/rachel
 
 
-Version 1.11-unreleased
-=======================
+Version 1.11
+============
 
 * implemented Fiona's modified OG file format (an OG file now also consists
   of an interface definition) and adjusted the respective test cases -- note
@@ -43,6 +43,11 @@ Version 1.11-unreleased
 * overworked test scripts: creation of output files is checked now
 
 * simplified header inclusion: all typedefs are now made in `types.h'
+
+* added a command line parameter `--threshold'/`-t' to set a threshold to
+  control the matching algorithm: whenever a formula's assignment reaches
+  this value, it is immediately returned instead of the optimum; this results
+  in faster, yet sub-optimal results
 
 Version 1.10
 ============

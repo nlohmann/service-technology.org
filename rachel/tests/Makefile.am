@@ -10,6 +10,7 @@ TESTS = test-cmdline \
 	test-simulation-dot \
 	test-matching \
 	test-matching-verbose \
+	test-matching-threshold \
 	test-frontend-full \
 	test-frontend-error-lexer \
 	test-frontend-error-parser \

@@ -240,12 +240,17 @@ ActionScript Matching::w(Node q1, Node q2) {
         // distcount value
         assignment_script.value *= (discount() / perm_size);
         
+        if (assignment_script.value > args_info.threshold_arg) {
+            return assignment_script;
+        }
+        
         // store value for best assignment we found
         if (assignment_script.value > result.value) {
-            result = assignment_script;
+            result = assignment_script;            
         }
     }
 
+    // fprintf(stderr, "(%d,%d) %lf %d\n", q1, q2, (1-discount()) * N(q1,q2) + result.value, result.script.size());
     return result;
 }
 

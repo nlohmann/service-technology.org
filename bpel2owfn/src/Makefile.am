@@ -93,10 +93,13 @@ KCSOURCES = ast-system-k.cc ast-system-k.h \
 
 # Dependencies of the Kimwitu++ files: the timestamp is renewed when a
 # Kimwitu++ file is touched. This triggers the creation of all source files.
+# The sed-script fixes problems occurring when BPEL2oWFN is compiled on
+# x86_64 machines.
 $(KCDUMMY): $(KCFILES_NECESSARY) $(KCFILES_TEMP)
 	touch $@
 	$(KC) $(KCFLAGS) $^
 	-rm $(KCFILES_TEMP:.k=.cc) $(KCFILES_TEMP:.k=.h)
+	$(SED) -i 's/reinterpret_cast<int>/reinterpret_cast<long>/g' ast-system-k.cc
 
 
 ################################################################

@@ -25,6 +25,9 @@ AM_MISSING_PROG(HELP2MAN, help2man)
 AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
 
+# needed to compile CUDD on x86_64 machines
+AC_CHECK_SIZEOF([void*])
+
 # flags set by the configure script
 configured_CFLAGS=""
 configured_CXXFLAGS=""
@@ -63,8 +66,16 @@ if test "$enable_64bit" = "yes"; then
   configured_CFLAGS=$configured_CFLAGS" -m64"
   configured_CXXFLAGS=$configured_CXXFLAGS" -m64"
   configured_LDFLAGS=$configured_LDFLAGS" -m64"
+fi
+
+# In case we compile for 64 bit (either explicitly with "--using-64bit" or
+# implicitly on a x86_64 system), we have to set a preprocessor definition
+# "SIZEOF_VOID_P" for CUDD.
+# (the variable "$ac_cv_sizeof_voidp" is set by "AC_CHECK_SIZEOF([void*])")
+if test "$ac_cv_sizeof_voidp" = "8" -o "$enable_64bit" = "yes"; then
   CUDD_XFLAGS=$CUDD_XFLAGS" -DSIZEOF_VOID_P=8"
 fi
+
 
 #############################################################################
 # check whether to build a Mac Universal binary using the configure
@@ -156,30 +167,9 @@ fi
 
 
 #############################################################################
-# set and export flags for CUDD
-#############################################################################
-#case `uname -s` in
-#  Linux)
-#    CUDD_XFLAGS=$CUDD_XFLAGS" -malign-double -DHAVE_IEEE_754 -DBSD"
-#    ;;
-#  SunOS)
-#    CUDD_XFLAGS=$CUDD_XFLAGS" -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN"
-#    ;;
-#  CYGWIN*)
-#    CUDD_XFLAGS=$CUDD_XFLAGS" -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864"
-#    ;;
-#  Darwin)
-#    CUDD_XFLAGS=$CUDD_XFLAGS" -DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN"
-#    ;;
-#  *) ;;
-#esac
-
-AC_SUBST(CUDD_XFLAGS)
-
-
-#############################################################################
 # export the configured flags for subsequent Makefiles
 #############################################################################
+AC_SUBST(CUDD_XFLAGS)
 AC_SUBST(configured_CFLAGS)
 AC_SUBST(configured_CXXFLAGS)
 AC_SUBST(configured_LDFLAGS)

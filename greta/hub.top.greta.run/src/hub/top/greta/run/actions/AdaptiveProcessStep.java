@@ -858,7 +858,8 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 	 */
 	private void disableEvent(Event event) {
 		
-		if(event.isSetDisabledByAntiOclet() && !event.isDisabledByAntiOclet()) {
+		if(!event.isSetDisabledByAntiOclet() || (event.isSetDisabledByAntiOclet() && !event.isDisabledByAntiOclet())) {
+			System.out.println("disable Event " + event.getName());
 			SetCommand cmd = new SetCommand(
 					adaptiveSystemDiagramEditor.getEditingDomain(), event, AdaptiveSystemPackage.eINSTANCE.getNode_DisabledByAntiOclet(), true);
 			cmd.setLabel("set attribute isDisabledByAntiOclet on event");

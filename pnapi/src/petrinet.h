@@ -69,6 +69,8 @@
 #include <list>
 #include <deque>
 #include <stack>
+#include "typedefs.h"
+#include "formula.h"
 
 using std::string;
 using std::vector;
@@ -86,102 +88,6 @@ using std::ostream;
 
 namespace PNapi
 {
-
-
-/******************************************************************************
- * Data structure
- *****************************************************************************/
-
-/*!
- * \brief   place and transition types
- *
- *          Enumeration of the possible types of a place or transition, i.e.
- *          whether a place or transition is internal, receives a message,
- *          sends a message or both.
- *
- * \ingroup petrinet
- */
-typedef enum
-{
-  INTERNAL,		///< non-communicating (standard)
-  IN,			///< input of an open workflow net (oWFN)
-  OUT,			///< output of an open workflow net (oWFN)
-  INOUT			///< input and output of an open workflow net (oWFN)
-} communication_type;
-
-
-
-
-
-/*!
- * \brief   arc types
- *
- *          Enumeration of the possible types of an arc, i.e. whether it is a
- *          standard arc or a read arc. The latter will be "unfolded" to a
- *          loop.
- *
- * \ingroup petrinet
- */
-typedef enum
-{
-  STANDARD,		///< standard arc
-  READ			///< read arc (will be unfolded to a loop)
-} arc_type;
-
-
-
-
-
-/*!
-* \brief   node types
- *
- *          Enumeration of the possible types of a node, i.e. whether it is a
- *          place or a transition.
- *
- * \ingroup petrinet
- */
-typedef enum
-{
-  PLACE,		///< a place
-  TRANSITION		///< a transition
-} node_type;
-
-
-
-
-
-/*!
-* \brief   file formats
- *
- *          Enumeration of the possible output file formats.
- *
- * \ingroup petrinet
- */
-typedef enum
-{
-  FORMAT_APNN,		///< Abstract Petri Net Notation (APNN)
-  FORMAT_DOT,		///< Graphviz dot
-  FORMAT_INA,		///< INA
-  FORMAT_SPIN,		///< INA
-  FORMAT_INFO,		///< Info File
-  FORMAT_LOLA,		///< LoLA
-  FORMAT_OWFN,		///< Fiona open workflow net (oWFN)
-  FORMAT_PEP,		///< Low-Level PEP Notation
-  FORMAT_PNML,		///< Petri Net Markup Language (PNML)
-  FORMAT_GASTEX ///< GasTeX format
-} output_format;
-
-/*!
-* \brief   Marking
- *
- *          A set of tokens in places according to the marking_id in each place.
- *
- * \ingroup petrinet
- */
-typedef vector<unsigned int> Marking;
-
-
-
 
 /******************************************************************************
  * Classes
@@ -292,6 +198,9 @@ class Transition: public Node
 
     /// add a label to the transition (used for constraint oWFN)
     void add_label(string new_label);
+
+    /// help method for normalize method
+    bool isNormal() const;
 };
 
 /*****************************************************************************/
@@ -508,9 +417,6 @@ class PetriNet
     /// calculates the postset of a node
     set<Node*> postset(Node *n) const;
 
-    /// checks if the Petri net is normal
-    bool isNormal() const;
-
     /// normalizes the Petri net
     void normalize();
 
@@ -574,11 +480,14 @@ class PetriNet
     /// returns the transitions set T
     set<Transition *> getTransitionSet() const;
 
+    /// sets the final condition
+    void setFinalCondition(Formula *f);
+
+    /// checks the finalcondition for Marking m
+    bool checkFinalCondition(Marking &m) const;
+
     /// deletes all interface places
     void makeInnerStructure();
-    
-    /// checks whether the Petri net is an open net
-    bool isSane() const;
 
     /// checks the Petri net for workflow criteria
     bool isWorkflowNet();
@@ -685,10 +594,10 @@ class PetriNet
 
     /// merges two parallel transitions
     void mergeParallelTransitions(Transition *t1, Transition *t2);
-    
+
     /// merges two parallel places
     void mergeParallelPlaces(Place *p1, Place *p2);
-    
+
     /// returns an id for new nodes
     unsigned int getId();
 
@@ -733,6 +642,9 @@ class PetriNet
 
     /// mapping of arcs to their appropriate weight
     map< pair< Node*, Node* >, int > weight;
+
+    /// the final condition describing all final markings
+    Formula *finalcondition;
 
     /// invocation string
     string invocation_string;

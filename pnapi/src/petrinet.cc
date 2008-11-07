@@ -191,6 +191,28 @@ void Transition::add_label(string new_label)
 
 
 
+/*!
+ * \brief   checks if the transition is normal
+ *
+ * \note    This is a help method for normalize method
+ *          in class PetriNet.
+ */
+bool Transition::isNormal() const
+{
+  int counter = 0;
+
+  for (set<Node *>::const_iterator p = preset.begin(); p != preset.end(); p++)
+    if ((*p)->type != INTERNAL)
+      counter++;
+  for (set<Node *>::const_iterator p = postset.begin(); p != postset.end(); p++)
+    if ((*p)->type != INTERNAL)
+      counter++;
+
+  return counter <= 1;
+}
+
+
+
 
 /*****************************************************************************/
 
@@ -2523,42 +2545,6 @@ unsigned int PetriNet::neighborInterfacePlaces(Transition *t) const
 
 
 
-/*!
- * \brief 	checks the Petri net for normal criterion
- *
- * \return	the boolean value true if the net is normal and false if the
- * 			net does not fulfill the normal criterion
- */
-bool PetriNet::isNormal() const
-{
-  bool retVal = true;
-
-  set<Place *> interface = getInterfacePlaces();
-
-  for (set<Place *>::iterator p = interface.begin(); p != interface.end(); p++)
-  {
-    set<Node *> pre = (*p)->preset;
-    set<Node *> post = (*p)->postset;
-    for (set<Node *>::iterator t = pre.begin(); t != pre.end(); t++)
-      if (neighborInterfacePlaces(static_cast<Transition *>(*t)) > 1)
-      {
-        retVal = false;
-        break;
-      }
-    if (!retVal)
-      break;
-    for (set<Node *>::iterator t = post.begin(); t != post.end(); t++)
-      if (neighborInterfacePlaces(static_cast<Transition *>(*t)) > 1)
-      {
-        retVal = false;
-        break;
-      }
-  }
-
-  return retVal;
-}
-
-
 
 /*!
  * \brief   normalizes the given Petri net
@@ -2570,65 +2556,99 @@ bool PetriNet::isNormal() const
  */
 void PetriNet::normalize()
 {
-  if (isNormal())
-    return;
-
   std::string suffix = "_normalized";
   set<Place *> temp;
   set<Place *> interface = getInterfacePlaces();
 
-  for (set<Place *>::iterator place = interface.begin(); place != interface.end(); place++)
+  for (set<Place *>::iterator place = interface.begin(); place
+      != interface.end(); place++)
   {
-    // create new internal place from interface place
-    Place *newP = newPlace((*place)->nodeFullName() + suffix);
-    assert(newP != NULL);
-
-    // create new interface place
-    Place *newPin = newPlace("i_" + (*place)->nodeFullName(), (*place)->type);
-    assert(newPin != NULL);
-
-    // create new transition
-    Transition *newT = newTransition("t_" + (*place)->nodeFullName());
-    assert(newT != NULL);
-
-    // set arcs (1, 2 & 3)
-    if ((*place)->type == IN)
+    set<Node *> neighbors = setUnion((*place)->preset, (*place)->postset);
+    for (set<Node *>::iterator transition = neighbors.begin();
+        transition != neighbors.end(); transition++)
     {
-      Arc *f1 = newArc(newPin, newT);
-      assert(f1 != NULL);
-      Arc *f2 = newArc(newT, newP);
-      assert(f2 != NULL);
-      for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+      Transition *t = static_cast<Transition *>(*transition);
+      while (!t->isNormal())
       {
-        if ((*f)->source == (*place))
+        // create new internal place from interface place
+        Place *newP = newPlace((*place)->nodeFullName() + suffix);
+        assert(newP != NULL);
+
+        // create new interface place
+        Place *newPin = newPlace("i_" + (*place)->nodeFullName(),
+            (*place)->type);
+        assert(newPin != NULL);
+
+        // create new transition
+        Transition *newT = newTransition("t_" + (*place)->nodeFullName());
+        assert(newT != NULL);
+
+        // set arcs (1, 2 & 3)
+        if ((*place)->type == IN)
         {
-          Arc *f3 = newArc(newP, (*f)->target);
-          assert(f3 != NULL);
+          Arc *f1 = newArc(newPin, newT);
+          assert(f1 != NULL);
+          Arc *f2 = newArc(newT, newP);
+          assert(f2 != NULL);
+          for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+          {
+            if ((*f)->source == (*place))
+            {
+              Arc *f3 = newArc(newP, (*f)->target);
+              assert(f3 != NULL);
+            }
+          }
         }
+        else
+        {
+          Arc *f1 = newArc(newT, newPin);
+          assert(f1 != NULL);
+          Arc *f2 = newArc(newP, newT);
+          assert(f2 != NULL);
+          for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+          {
+            if ((*f)->target == (*place))
+            {
+              Arc *f3 = newArc((*f)->source, newP);
+              assert(f3 != NULL);
+            }
+          }
+        }
+
+        temp.insert(*place);
       }
     }
-    else
-    {
-      Arc *f1 = newArc(newT, newPin);
-      assert(f1 != NULL);
-      Arc *f2 = newArc(newP, newT);
-      assert(f2 != NULL);
-      for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-      {
-        if ((*f)->target == (*place))
-        {
-          Arc *f3 = newArc((*f)->source, newP);
-          assert(f3 != NULL);
-        }
-      }
-    }
-
-    temp.insert(*place);
   }
 
   // remove the old interface places
   for (set<Place *>::iterator place = temp.begin(); place != temp.end(); place++)
     removePlace(*place);
+}
+
+
+
+
+/*!
+ * \brief   sets the final condition
+ */
+void PetriNet::setFinalCondition(Formula *f)
+{
+  finalcondition = f;
+}
+
+
+
+
+/*!
+ * \brief   checks a marking m for final condition
+ *
+ * \param   Marking m
+ *
+ * \return  TRUE iff m fulfills the final condition
+ */
+bool PetriNet::checkFinalCondition(Marking &m) const
+{
+  return finalcondition->evaluate(m);
 }
 
 
@@ -2700,63 +2720,6 @@ void PetriNet::makeInnerStructure()
 
 
 /*!
- * \brief   checks for open net criteria
- *
- *          A Petri net N is called an open net if
- *            (1) no initial marking marks an interface place
- *            (2) no final marking activates a transition
- *
- * \return  true if the criteria are fulfilled and false if not
- *
- * \todo    Write test cases.
- * \todo    Rewrite the method (Stephan works on it)
- */
-bool PetriNet::isSane() const
-{
-  bool retVal = true;
-
-  // checking condition (1)
-  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
-    if ((*p)->tokens != 0)
-    {
-      std::cerr << "Warning: The input place \"" << (*p)->nodeFullName() << "\" has got an initial marking!\n";
-      retVal = false;
-    }
-  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
-    if ((*p)->tokens != 0)
-    {
-      std::cerr << "Warning: The ouput place \"" << (*p)->nodeFullName() << "\" has got an initial marking!\n";
-      retVal = false;
-    }
-
-  // checking condition (2)
-  set<Place *> final_places = getFinalPlaces();
-  set<Node *> finals;
-  for (set<Place *>::iterator p = final_places.begin(); p != final_places.end(); p++)
-    finals.insert(static_cast<Node *>(*p));
-  for (set<Node *>::iterator p = finals.begin(); p != finals.end(); p++)
-  {
-    for (set<Node *>::iterator t = (*p)->postset.begin(); t != (*p)->postset.end(); t++)
-    {
-      if (setUnion(finals, (*t)->preset) == finals)
-      {
-        for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-          if ((*f)->source == (*p) && (*f)->target == (*t) && (*f)->weight == 1)
-          {
-            // until I've found a good representation for final markings there's no output
-            retVal = false;
-          }
-      }
-    }
-  }
-
-  return retVal;
-}
-
-
-
-
-/*!
  * \brief   checks whether the Petri net is a workflow net or not
  *
  *          A Petri net N is a workflow net iff
@@ -2809,7 +2772,8 @@ bool PetriNet::isWorkflowNet()
   newArc(last, tarjan);
   newArc(tarjan, first);
 
-  // each 2 nodes $x,y \in P \cup T$ are in a directed cycle (strongly connected net using tarjan's algorithm)
+  // each 2 nodes \f$x,y \in P \cup T\f$ are in a directed cycle
+  // (strongly connected net using tarjan's algorithm)
   unsigned int i = 0; ///< count index
   map<Node *, int> index; ///< index property for nodes
   map<Node *, unsigned int> lowlink; ///< lowlink property for nodes
@@ -2985,6 +2949,15 @@ Marking PetriNet::calcCurrentMarking() const
 
 
 
+/*!
+ * \brief   recalculates a marking m to its corresponding place tokens
+ *
+ * An initial markings was described by setting the tokens variable of each place
+ * to one specific value. Now, we can describe Markings without using those variables,
+ * so probably it is necessary to translate the new markings to the old fashion.
+ *
+ * \param   Marking m which represents the new markings
+ */
 void PetriNet::marking2Places(Marking &m)
 {
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
@@ -3000,11 +2973,6 @@ void PetriNet::marking2Places(Marking &m)
 
 /*!
  * \brief   calculates the successor marking m' to m under Transition t
- *
- * \pre     Two arcs f1, f2 \in F with f1 = (p_1, t_1)  f2 = (p_2, t_2)
- *          imply p_1 != p_2 or t_1 != t_2 or there is an arc
- *          f* = (p_1, t_1) with arc-weight(f*) = arc_weight(f1) + arc_weight(f2)
- *          (as usually introduced arc weights)
  *
  * \param   Marking &m current marking
  * \param   Transition &t defines the scope
@@ -3031,7 +2999,7 @@ Marking PetriNet::calcSuccessorMarking(Marking &m, Transition *t) const
   if (t->preset.size() != activators.size())
     return *mm;
 
-  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+  for (set<Arc *>::const_iterator f = F.begin(); f != F.end(); f++)
     if ((*f)->source == t)
     {
       Place *p = static_cast<Place *>((*f)->target);

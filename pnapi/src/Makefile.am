@@ -1,13 +1,10 @@
 # the Petri net API
-noinst_LIBRARIES = lib_pnapi.a
+lib_LIBRARIES = lib_pnapi.a
 
-lib_pnapi_a_SOURCES = pnapi.cc pnapi.h\
-		      helpers.cc helpers.h \
-		      options.h \
+lib_pnapi_a_SOURCES = pnapi.h pnapi.cc \
+          petrinet.h petrinet.cc \
+		      helpers.h helpers.cc \
+          formula.h formula.cc \
+		      options.h typedefs.h \
 		      petrinet-output.cc \
-		      petrinet-reduction.cc \
-		      petrinet.cc \
-		      petrinet.h
-
-# remove files create during code coverage test
-CLEANFILES = *.gcno *.gcda
+		      petrinet-reduction.cc

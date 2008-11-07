@@ -24,6 +24,7 @@
 //////////////////
 
 #include "petrinet.h"		// to define member functions
+#include "typedefs.h"
 
 
 
@@ -52,7 +53,7 @@ typedef enum
 {
   TRACE_ERROR,		///< only trace error messages
   TRACE_ALWAYS,		///< trace level for errors
-  TRACE_WARNINGS,       ///< trace level for warnings 
+  TRACE_WARNINGS,       ///< trace level for warnings
   TRACE_INFORMATION,	///< trace level some more (useful) information
   TRACE_DEBUG,          ///< trace level for detailed debug information
   TRACE_VERY_DEBUG	///< trace level for everything

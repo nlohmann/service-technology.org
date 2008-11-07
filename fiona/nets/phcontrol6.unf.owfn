@@ -1,215 +1,203 @@
 PLACE
 INTERNAL
-    ea.1,
-    ea.2,
-    ea.3,
-    ea.4,
-    ea.5,
-    ea.6,
-    hl.1,
-    fo.1,
-    hl.2,
-    fo.2,
-    hl.3,
-    fo.3,
-    hl.4,
-    fo.4,
-    hl.5,
-    fo.5,
-    hl.6,
-    fo.6,
-    th.1,
-    th.2,
-    th.3,
-    th.4,
-    th.5,
-    th.6,
-    ready.1,
-    ready.2,
-    ready.3,
-    ready.4,
-    ready.5,
-    ready.6,
+    ea_1,
+    ea_2,
+    ea_3,
+    ea_4,
+    ea_5,
+    ea_6,
+    hl_1,
+    fo_1,
+    hl_2,
+    fo_2,
+    hl_3,
+    fo_3,
+    hl_4,
+    fo_4,
+    hl_5,
+    fo_5,
+    hl_6,
+    fo_6,
+    th_1,
+    th_2,
+    th_3,
+    th_4,
+    th_5,
+    th_6,
+    ready_1,
+    ready_2,
+    ready_3,
+    ready_4,
+    ready_5,
+    ready_6,
     endzustand;
 
 INPUT
-    interface.in.1,
-    interface.in.2,
-    interface.in.3,
-    interface.in.4,
-    interface.in.5,
-    interface.in.6;
+    interface_in_1,
+    interface_in_2,
+    interface_in_3,
+    interface_in_4,
+    interface_in_5,
+    interface_in_6;
 
 OUTPUT
-    interface.out.1,
-    interface.out.2,
-    interface.out.3,
-    interface.out.4,
-    interface.out.5,
-    interface.out.6;
+    interface_out_1,
+    interface_out_2,
+    interface_out_3,
+    interface_out_4,
+    interface_out_5,
+    interface_out_6;
 
 INITIALMARKING
-    fo.1 : 1,
-    fo.2 : 1,
-    fo.3 : 1,
-    fo.4 : 1,
-    fo.5 : 1,
-    fo.6 : 1,
-    th.1 : 1,
-    th.2 : 1,
-    th.3 : 1,
-    th.4 : 1,
-    th.5 : 1,
-    th.6 : 1;
+    fo_1 : 1,
+    fo_2 : 1,
+    fo_3 : 1,
+    fo_4 : 1,
+    fo_5 : 1,
+    fo_6 : 1,
+    th_1 : 1,
+    th_2 : 1,
+    th_3 : 1,
+    th_4 : 1,
+    th_5 : 1,
+    th_6 : 1;
 
-FINALCONDITION
-    (endzustand = 1 AND ALL_OTHER_EXTERNAL_PLACES_EMPTY);
+FINALMARKING
+    endzustand, fo_1, fo_2, fo_3, fo_4, fo_5, fo_6;
 
-TRANSITION r.y1
+TRANSITION r_y1
     CONSUME
-        ea.1 : 1;
+        ea_1 : 1;
     PRODUCE
-        fo.2 : 1,
-        fo.1 : 1,
-        ready.1 : 1;
-TRANSITION r.y2
+        fo_2 : 1,
+        fo_1 : 1,
+        ready_1 : 1;
+TRANSITION r_y2
     CONSUME
-        ea.2 : 1;
+        ea_2 : 1;
     PRODUCE
-        fo.3 : 1,
-        fo.2 : 1,
-        ready.2 : 1;
-TRANSITION r.y3
+        fo_3 : 1,
+        fo_2 : 1,
+        ready_2 : 1;
+TRANSITION r_y3
     CONSUME
-        ea.3 : 1;
+        ea_3 : 1;
     PRODUCE
-        fo.4 : 1,
-        fo.3 : 1,
-        ready.3 : 1;
-TRANSITION r.y4
+        fo_4 : 1,
+        fo_3 : 1,
+        ready_3 : 1;
+TRANSITION r_y4
     CONSUME
-        ea.4 : 1;
+        ea_4 : 1;
     PRODUCE
-        fo.5 : 1,
-        fo.4 : 1,
-        ready.4 : 1;
-TRANSITION r.y5
+        fo_5 : 1,
+        fo_4 : 1,
+        ready_4 : 1;
+TRANSITION r_y5
     CONSUME
-        ea.5 : 1;
+        ea_5 : 1;
     PRODUCE
-        fo.6 : 1,
-        fo.5 : 1,
-        ready.5 : 1;
-TRANSITION r.y6
+        fo_6 : 1,
+        fo_5 : 1,
+        ready_5 : 1;
+TRANSITION r_y6
     CONSUME
-        ea.6 : 1;
+        ea_6 : 1;
     PRODUCE
-        fo.1 : 1,
-        fo.6 : 1,
-        ready.6 : 1;
+        fo_1 : 1,
+        fo_6 : 1,
+        ready_6 : 1;
 TRANSITION finish
     CONSUME
-        ready.1 : 1,
-        ready.2 : 1,
-        ready.3 : 1,
-        ready.4 : 1,
-        ready.5 : 1,
-        ready.6 : 1;
+        ready_1 : 1,
+        ready_2 : 1,
+        ready_3 : 1,
+        ready_4 : 1,
+        ready_5 : 1,
+        ready_6 : 1;
     PRODUCE
         endzustand : 1;
-TRANSITION tl.y1
+TRANSITION tl_y1
     CONSUME
-        fo.1 : 1,
-        interface.in.1 : 1,
-        th.1 : 1;
+        fo_1 : 1,
+        interface_in_1 : 1,
+        th_1 : 1;
     PRODUCE
-        interface.out.1 : 1,
-        hl.1 : 1;
-TRANSITION tl.y2
+        hl_1 : 1;
+TRANSITION tl_y2
     CONSUME
-        fo.2 : 1,
-        interface.in.2 : 1,
-        th.2 : 1;
+        fo_2 : 1,
+        interface_in_2 : 1,
+        th_2 : 1;
     PRODUCE
-        interface.out.2 : 1,
-        hl.2 : 1;
-TRANSITION tl.y3
+        hl_2 : 1;
+TRANSITION tl_y3
     CONSUME
-        fo.3 : 1,
-        interface.in.3 : 1,
-        th.3 : 1;
+        fo_3 : 1,
+        interface_in_3 : 1,
+        th_3 : 1;
     PRODUCE
-        interface.out.3 : 1,
-        hl.3 : 1;
-TRANSITION tl.y4
+        hl_3 : 1;
+TRANSITION tl_y4
     CONSUME
-        fo.4 : 1,
-        interface.in.4 : 1,
-        th.4 : 1;
+        fo_4 : 1,
+        interface_in_4 : 1,
+        th_4 : 1;
     PRODUCE
-        interface.out.4 : 1,
-        hl.4 : 1;
-TRANSITION tl.y5
+        hl_4 : 1;
+TRANSITION tl_y5
     CONSUME
-        fo.5 : 1,
-        interface.in.5 : 1,
-        th.5 : 1;
+        fo_5 : 1,
+        interface_in_5 : 1,
+        th_5 : 1;
     PRODUCE
-        interface.out.5 : 1,
-        hl.5 : 1;
-TRANSITION tl.y6
+        hl_5 : 1;
+TRANSITION tl_y6
     CONSUME
-        fo.6 : 1,
-        interface.in.6 : 1,
-        th.6 : 1;
+        fo_6 : 1,
+        interface_in_6 : 1,
+        th_6 : 1;
     PRODUCE
-        interface.out.6 : 1,
-        hl.6 : 1;
-TRANSITION tr.y1
+        hl_6 : 1;
+TRANSITION tr_y1
     CONSUME
-        fo.2 : 1,
-        interface.in.1 : 1,
-        hl.1 : 1;
+        fo_2 : 1,
+        hl_1 : 1;
     PRODUCE
-        interface.out.1 : 1,
-        ea.1 : 1;
-TRANSITION tr.y2
+        interface_out_1 : 1,
+        ea_1 : 1;
+TRANSITION tr_y2
     CONSUME
-        fo.3 : 1,
-        interface.in.2 : 1,
-        hl.2 : 1;
+        fo_3 : 1,
+        hl_2 : 1;
     PRODUCE
-        interface.out.2 : 1,
-        ea.2 : 1;
-TRANSITION tr.y3
+        interface_out_2 : 1,
+        ea_2 : 1;
+TRANSITION tr_y3
     CONSUME
-        fo.4 : 1,
-        interface.in.3 : 1,
-        hl.3 : 1;
+        fo_4 : 1,
+        hl_3 : 1;
     PRODUCE
-        interface.out.3 : 1,
-        ea.3 : 1;
-TRANSITION tr.y4
+        interface_out_3 : 1,
+        ea_3 : 1;
+TRANSITION tr_y4
     CONSUME
-        fo.5 : 1,
-        interface.in.4 : 1,
-        hl.4 : 1;
+        fo_5 : 1,
+        hl_4 : 1;
     PRODUCE
-        interface.out.4 : 1,
-        ea.4 : 1;
-TRANSITION tr.y5
+        interface_out_4 : 1,
+        ea_4 : 1;
+TRANSITION tr_y5
     CONSUME
-        fo.6 : 1,
-        interface.in.5 : 1,
-        hl.5 : 1;
+        fo_6 : 1,
+        hl_5 : 1;
     PRODUCE
-        interface.out.5 : 1,
-        ea.5 : 1;
-TRANSITION tr.y6
+        interface_out_5 : 1,
+        ea_5 : 1;
+TRANSITION tr_y6
     CONSUME
-        fo.1 : 1,
-        interface.in.6 : 1,
-        hl.6 : 1;
+        fo_1 : 1,
+        hl_6 : 1;
     PRODUCE
-        interface.out.6 : 1,
-        ea.6 : 1;
+        interface_out_6 : 1,
+        ea_6 : 1;

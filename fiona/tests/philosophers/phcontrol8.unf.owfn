@@ -80,10 +80,8 @@ INITIALMARKING
     th_7 : 1,
     th_8 : 1;
 
-FINALCONDITION
-    endzustand = 1
-    AND fo_1 = 1 AND fo_2 = 1 AND fo_3 = 1 AND fo_4 = 1 AND fo_5 = 1 AND fo_6 = 1 AND fo_7 = 1 AND fo_8 = 1
-    AND ALL_OTHER_PLACES_EMPTY;
+FINALMARKING
+    endzustand, fo_1, fo_2, fo_3, fo_4, fo_5, fo_6, fo_7, fo_8;
 
 TRANSITION r_y1
     CONSUME

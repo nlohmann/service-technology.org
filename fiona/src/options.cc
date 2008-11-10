@@ -130,6 +130,8 @@ void print_help() {
   trace("                                   OG          - compute operating guideline\n");
   trace("                                   match       - check whether a given oWFN\n");
   trace("                                                 matches with a given OG\n");
+  trace("                                   productog   - calculate the product OG\n");
+  trace("                                                 of all given OGs\n");
   trace("                                   minimizeOG  - minimizes a given OG\n");
   trace("\n");
   trace("                                   reduce      - structurally reduce all\n");

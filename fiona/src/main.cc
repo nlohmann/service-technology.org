@@ -327,7 +327,11 @@ void reportOptionValues() {
     }
 
     if (options[O_EVENT_USE_MAX]) {
-        trace( "each event considered max: " + intToString(events_manual) + "\n");
+        if (events_manual == -1) {
+            trace( "each event considered max: unbounded\n");
+        } else {
+            trace( "each event considered max: " + intToString(events_manual) + "\n");
+        }
     }
 
     // report message bound

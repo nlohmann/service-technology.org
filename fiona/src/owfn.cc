@@ -3055,6 +3055,14 @@ bool oWFN::matchesWithOG(const AnnotatedGraph* OG, string& reasonForFailedMatch)
     // remember that we checked the currentState and the root node of the graph
     StateNodesAssoc_t stateNodesAssoc;
     stateNodesAssoc[currentState].insert( OG->getRoot()->getNumber() );
+    //cout << "    DEBUG created state " << currentState << endl;
+    //for ( StateNodesAssoc_t::iterator it = stateNodesAssoc.begin(); it != stateNodesAssoc.end(); it++) {
+    //    cout << "    DEBUG state " << it->first << " is mapped to OG-nodes ";
+    //    for ( std::set<unsigned int>::iterator sit = (it->second).begin(); sit != (it->second).end(); sit++) {
+    //        cout << *sit << " ";
+    //    }
+    //    cout << endl;
+    //}
 
     // we return true iff the recursive method succeeded
     return matchesWithOGRecursive(OG->getRoot(), currentState,
@@ -3073,47 +3081,39 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                                   string& reasonForFailedMatch,
                                   StateNodesAssoc_t& stateNodesAssoc) {
 
-    unsigned int* oldCurrentMarking = NULL;
-    unsigned int oldPlaceHashValue = 0;
+    assert( currentOGNode != NULL ); // this should never happen
+    assert( currentState != NULL );
+
     AnnotatedGraphNode* oldOGNode = NULL;
+    unsigned int current = 0;
 
-    // If currentState becomes NULL we don't need to look any further.
-    if (currentState == NULL) {
-        reasonForFailedMatch = "";
-        return true;
-    }
-
-    // Check whether there are still enabled transitions to be fired in
-    // currentState (transitions that have not been processed yet while
-    // building the reachability graph). currentState->current holds the
-    // index of the current (to be fired) transition in the array of to
-    // be fired transitions currentState->firelist[] with cardinality
-    // currentState->cardFireList.
-    // If currentState->current is out of the firelist's range, we're through.
-    TRACE(TRACE_4, "\nstart cycle with currentState->current = " + intToString(currentState->current) + ", " +
+    TRACE(TRACE_4, "\nstart cycle with current = " + intToString(current) + ", " +
                    "currentState->cardFireList = " + intToString(currentState->cardFireList) + ",\n" +
                    "                 current marking " + getCurrentMarkingAsString() + ", " +
                    "current OG node " + currentOGNode->getName() + "\n");
 
-    while (currentState->current < currentState->cardFireList) {
+
+    // Check whether there are still enabled transitions to be fired in
+    // currentState (transitions that have not been processed yet while
+    // building the reachability graph). current holds the
+    // index of the current (to be fired) transition in the array of to
+    // be fired transitions currentState->firelist[] with cardinality
+    // currentState->cardFireList.
+    // If current is out of the firelist's range, we're through.
+    while (current < currentState->cardFireList) {
 
         // Retrieve the transition leaving the current state that should be fired next.
-        owfnTransition* transition = currentState->firelist[currentState->current];
-        TRACE(TRACE_4, "    transition " + transition->getName() + " should be fired next\n");
+        owfnTransition* transition = currentState->firelist[current];
+        TRACE(TRACE_3, "    transition " + transition->getName() + " should be fired next\n");
 
-        // Save the current marking, so we can easily revert to it if
-        // firing the transition that we will try in this if-branch leads
-        // us to a state we have already seen.
-        if (oldCurrentMarking != NULL) {
-            delete[] oldCurrentMarking;
-            oldCurrentMarking = NULL;
-        }
-        oldCurrentMarking = copyCurrentMarking();
-        oldPlaceHashValue = placeHashValue;
 
         // Save the currentOGNode to a temporary copy, so we can easily
-        // revert to it if the state we reached to firing the current
+        // revert to it if the state we reached by firing the current
         // transition lead us to an already seen state.
+        // We do not need to safe the current marking or the current
+        // placeHashValue because this is remembered by the currentState. We
+        // just have to decode it into this net to restore the initial state
+        // from the beginning of this cycle.
         oldOGNode = currentOGNode;
 
 
@@ -3131,69 +3131,106 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                                    + " leaves the node \"" + currentOGNode->getName()
                                    + "\" in the OG.";
 
-            delete[] oldCurrentMarking;
             return false;
         }
 
-        // Fire the to be tried transition. The thereby reached marking is saved to CurrentMarking.
+
+        // Fire the to be tried transition. The thereby reached marking is
+        // automatically saved to the current marking of this net.
         transition->fire(this);
 
-        // if net makes a visible step, the OG node does so, too
+
+        // If the net makes a visible step (non-tau step), the OG node does so, too.
         if (transition->hasNonTauLabelForMatching()) {
+
             // Fire the transition in the OG that belongs to the transition we just fired in the oWFN.
-            currentOGNode = currentOGNode->followEdgeWithLabel(transition->getLabelForMatching());
-            TRACE(TRACE_4, "    transition " + transition->getName() + " is " + transition->getLabelForMatching() +
+            currentOGNode = currentOGNode->followEdgeWithLabel( transition->getLabelForMatching() );
+            TRACE(TRACE_3, "    transition " + transition->getName() + " is " + transition->getLabelForMatching() +
                            " labeled, new OG node is " + currentOGNode->getName() + "\n");
         } else {
-            // if net just made a silent step, the OG node stays unchanged, so do nothing.
-            TRACE(TRACE_4, "    transition " + transition->getName() + " is TAU labeled, OG node is " +
+
+            // If net just made a silent step, the OG node stays unchanged, so do nothing.
+            TRACE(TRACE_3, "    transition " + transition->getName() + " is TAU labeled, OG node is " +
                            currentOGNode->getName() + " (unchanged)\n");
         }
 
 
         // Determine whether we have already seen the state we just reached.
         State* newState = binSearch(this);
+        //cout << "    DEBUG newState is " << newState << endl;
 
-        // let's see if we have not yet checked the current state
-        // and if we have not yet checked the current state and the current node already
-        if ( newState != NULL && 
-            (stateNodesAssoc[newState].find(currentOGNode->getNumber()) != stateNodesAssoc[newState].end())) {
+        if ( newState != NULL ) {
 
-        	TRACE(TRACE_2, "marking [" + getCurrentMarkingAsString() + "] already seen with node ");
-        	TRACE(TRACE_2, currentOGNode->getName() + "\n");
-        	TRACE(TRACE_2, "    backtracking from node " + currentOGNode->getName());
-        	TRACE(TRACE_2, " with annotation " + currentOGNode->getAnnotationAsString() + "\n");
-            
-            // We have already seen the state we just reaching by firing
-            // the transition above. So we have to revert to the state that
-            // the transition left from.
-            copyMarkingToCurrentMarking(oldCurrentMarking);
+            // If newState and NULL are unequal, then we have seen the current
+            // state already. The next thing that matters is if we have seen
+            // the current state together with the current OG node.
+            // But before this we can remember the successor.
+            currentState->succ[current] = newState;
 
-            // owfnTransition::backfire() does not actually backfire.
-            // It merely rechecks enabledness of all transitions in
-            // question with respect to CurrentMarking. Therefore you have
-            // to restore the CurrentMarking first and then call
-            // backfire() to undo the effect of a transition.
-            transition->backfire(this);
-            placeHashValue = oldPlaceHashValue;
-            delete[] oldCurrentMarking;
-            oldCurrentMarking = NULL;
-            currentState->succ[currentState->current] = newState;
 
-            // Increment current to the index of the next to be fired transition.
-            currentState->current++;
+            // Let's see if we have seen the current state together with the current node already.
+            if ( stateNodesAssoc[newState].find(currentOGNode->getNumber()) != stateNodesAssoc[newState].end() ) {
 
-            if (transition->hasNonTauLabelForMatching()) {
-                // go back to the previously considered node
-                currentOGNode = oldOGNode;
+                // We have seen the current state with current node already, so
+                // we have to abort recursion and backtrack.
+                TRACE(TRACE_3, "marking [" + getCurrentMarkingAsString() + "] already seen with node ");
+                TRACE(TRACE_3, currentOGNode->getName() + "\n");
+                TRACE(TRACE_3, "    backtracking from node " + currentOGNode->getName());
+                TRACE(TRACE_3, " with annotation " + currentOGNode->getAnnotationAsString() + "\n");
+                
+
+                // We have already seen the state we just reaching by firing
+                // the transition above. So we have to revert to the state that
+                // the transition left from.
+                currentState->decode(this);
+
+
+                // If the net does not made a silent step by firing the
+                // transition above we have to go back to the previously
+                // considered OG node.
+                if (transition->hasNonTauLabelForMatching()) {
+                    currentOGNode = oldOGNode;
+                }
+
             } else {
-                // if net makes a silent (back) step, the OG node stays unchanged
-                // so do nothing.
+
+                // We have not seen the current state with current node already, so
+                // we remember this node and continue with the recursion.
+                TRACE(TRACE_3, "marking [" + getCurrentMarkingAsString() + "] already seen, but not with node ");
+                TRACE(TRACE_3, currentOGNode->getName() + "\n");
+
+
+                // Remember that we have checked the current state with the
+                // current OG node. This is necessary to handle cyclic nets.
+                stateNodesAssoc[newState].insert( currentOGNode->getNumber() );
+                //cout << "    DEBUG added node to state " << newState << endl;
+                //for ( StateNodesAssoc_t::iterator it = stateNodesAssoc.begin(); it != stateNodesAssoc.end(); it++) {
+                //    cout << "    DEBUG state " << it->first << " is mapped to OG-nodes ";
+                //    for ( std::set<unsigned int>::iterator sit = (it->second).begin(); sit != (it->second).end(); sit++) {
+                //        cout << *sit << " ";
+                //    }
+                //    cout << endl;
+                //}
+
+
+                // Continue the matching recursively using newState and currentOGNode.
+                // Upon success, don't forget to continue to work with the old
+                // OG node and the old state.
+                if (!matchesWithOGRecursive(currentOGNode, newState, reasonForFailedMatch, stateNodesAssoc)) {
+                    return false;
+                } else {
+                    currentOGNode = oldOGNode;
+                    currentState->decode(this);
+                }
             }
         } else {
 
-            // The state we reached by firing the above transition is new.
-            // So we have to initialize this newly seen state.
+            // If newState and NULL are equal, then we have not seen the current
+            // state already, so the state we reached by firing the above
+            // transition is new. Now we have to initialize this newly seen state.
+        	TRACE(TRACE_3, "found new marking [" + getCurrentMarkingAsString() + "] at node ");
+        	TRACE(TRACE_3, currentOGNode->getName() + "\n");
+
             newState = binInsert(this);
             newState->firelist = firelist();
             newState->cardFireList = CurrentCardFireList;
@@ -3205,22 +3242,24 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
             }
             newState->placeHashValue = placeHashValue;
             newState->type = typeOfState();
-            currentState->succ[currentState->current] = newState;
 
-        	TRACE(TRACE_1, "found new marking [" + getCurrentMarkingAsString() + "] at node ");
-        	TRACE(TRACE_1, currentOGNode->getName() + "\n");
+
+            // Remember that the new state is a successor of the current state.
+            currentState->succ[current] = newState;
+
         	
+            // Remember that we have checked the current state with the
+            // current OG node. This is necessary to handle cyclic nets.
+            stateNodesAssoc[newState].insert( currentOGNode->getNumber() );
+            //cout << "    DEBUG created state " << newState << endl;
+            //for ( StateNodesAssoc_t::iterator it = stateNodesAssoc.begin(); it != stateNodesAssoc.end(); it++) {
+            //    cout << "    DEBUG state " << it->first << " is mapped to OG-nodes ";
+            //    for ( std::set<unsigned int>::iterator sit = (it->second).begin(); sit != (it->second).end(); sit++) {
+            //        cout << *sit << " ";
+            //    }
+            //    cout << endl;
+            //}
 
-            // Clean up the temporary copy of the former CurrentMarking
-            // because we do not longer need to be able to revert to it as
-            // we have a found a _new_ not yet seen state.
-            if (oldCurrentMarking != NULL) {
-                delete[] oldCurrentMarking;
-                oldCurrentMarking = NULL;
-            }
-
-            // remember that we have checked the current state with a certain (current) node
-            stateNodesAssoc[newState].insert(currentOGNode->getNumber());
 
             // Check whether the current marking violates the message bound
             // and exit with an error message if it does.
@@ -3231,15 +3270,22 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                 return false;
             }
 
+
             // Continue the matching recursively using newState and currentOGNode.
-            // Upon success, don't forget to continue to work with oldOGNode.
+            // Upon success, don't forget to continue to work with the old
+            // OG node and the old state.
             if (!matchesWithOGRecursive(currentOGNode, newState, reasonForFailedMatch, stateNodesAssoc)) {
                 return false;
             } else {
                 currentOGNode = oldOGNode;
+                currentState->decode(this);
             }
         }
+
+        // Increment current to the index of the next to be fired transition.
+        current++;
     }
+
 
     // There are no transitions left to fire. So we are about to
     // backtrack to the parent of the currentState. But before we
@@ -3259,18 +3305,13 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
     // algorithm and no OG node formula is allowed to contain the
     // literal TAU, therefore it doesn't matter if a formula containing
     // TAU is checked or not.
-    TRACE(TRACE_4, "    no to be fired transition left\n");
+    TRACE(TRACE_3, "    no to be fired transition left\n");
     if (!currentState->hasEnabledTransitionWithTauLabelForMatching()) {
 
-        TRACE(TRACE_4, "    no tau transition found, so we check annotation of current OG node\n");
+        TRACE(TRACE_3, "    no tau transition found, so we check annotation of current OG node\n");
         GraphFormulaAssignment assignment = makeAssignmentForOGMatchingForState(currentState);
 
         if (!currentOGNode->assignmentSatisfiesAnnotation(assignment)) {
-            // Clean up the temporary copy of the former CurrentMarking
-            if (oldCurrentMarking != NULL) {
-                delete[] oldCurrentMarking;
-                oldCurrentMarking = NULL;
-            }
 
             reasonForFailedMatch = "The marking ["
                                    + getCurrentMarkingAsString()
@@ -3282,34 +3323,16 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
 
             return false;
         } else {
-        	TRACE(TRACE_4, "marking [" + getCurrentMarkingAsString() + "] satisfied\n");
-        	TRACE(TRACE_4, "    annotation " + currentOGNode->getAnnotationAsString());
-        	TRACE(TRACE_4, " of node " + currentOGNode->getName() + "\n");
+        	TRACE(TRACE_3, "marking [" + getCurrentMarkingAsString() + "] satisfied\n");
+        	TRACE(TRACE_3, "    annotation " + currentOGNode->getAnnotationAsString());
+        	TRACE(TRACE_3, " of node " + currentOGNode->getName() + "\n");
         }
     }
 
-    TRACE(TRACE_4, "end cycle with currentState->current = " + intToString(currentState->current) + ", " +
+    TRACE(TRACE_4, "end cycle with current = " + intToString(current) + ", " +
                    "currentState->cardFireList = " + intToString(currentState->cardFireList) + ",\n" +
                    "               current marking " + getCurrentMarkingAsString() + ", " +
                    "current OG node " + currentOGNode->getName() + "\n\n");
-
-
-    // Although we won't use currentState after tracking back (it will
-    // be lost anyway), we set it to its parent here for convenience.
-    currentState = currentState->parent;
-    if (currentState != NULL) {
-        // Decode currentState into CurrentMarking such that
-        // currentState and CurrentMarking again denote the same
-        // state of the oWFN.
-        currentState->decode(this);
-        currentState->current++;
-    }
-
-    // Clean up before we return from the function.
-    if (oldCurrentMarking != NULL) {
-        delete[] oldCurrentMarking;
-        oldCurrentMarking = NULL;
-    }
 
     // We found no reason for the oWFN not to match with the OG. So it matches.
     reasonForFailedMatch = "";

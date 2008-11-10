@@ -1,0 +1,17 @@
+INTERFACE
+  INPUT
+;
+  OUTPUT
+;
+
+NODES
+  0x0x0 : (!A) : blue,
+  5x21x17 : (!A + ?B) : blue;
+
+INITIALNODE
+  0x0x0;
+
+TRANSITIONS
+  0x0x0 -> 5x21x17 : !A,
+  5x21x17 -> 0x0x0 : !A,
+  5x21x17 -> 0x0x0 : ?B;

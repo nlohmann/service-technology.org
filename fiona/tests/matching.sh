@@ -340,7 +340,217 @@ else
 fi
 
 ############################################################################
+owfn="$DIR/small_cycle.owfn"
+############################################################################
 
+og="$DIR/small_cycle_1a.og"
+cmd="$FIONA $owfn -t match $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    $evaluate $fionaExitCode
+    if [ $? -ne 0 ] 
+    then
+        result=1
+    else
+        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        if [ $? -ne 0 ]; then
+            echo ... oWFN matches with OG although it should not
+            result=1
+        fi
+    fi
+fi
+############################################################################
+og="$DIR/small_cycle_1b.og"
+cmd="$FIONA $owfn -t match $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    $evaluate $fionaExitCode
+    if [ $? -ne 0 ] 
+    then
+        result=1
+    else
+        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        if [ $? -ne 0 ]; then
+            echo ... oWFN matches with OG although it should not
+            result=1
+        fi
+    fi
+fi
+############################################################################
+og="$DIR/small_cycle_2a.og"
+cmd="$FIONA $owfn -t match $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    $evaluate $fionaExitCode
+    if [ $? -ne 0 ] 
+    then
+        result=1
+    else
+        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        if [ $? -ne 0 ]; then
+            echo ... oWFN matches with OG although it should not
+            result=1
+        fi
+    fi
+fi
+############################################################################
+og="$DIR/small_cycle_2b.og"
+cmd="$FIONA $owfn -t match $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    $evaluate $fionaExitCode
+    if [ $? -ne 0 ] 
+    then
+        result=1
+    else
+        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        if [ $? -ne 0 ]; then
+            echo ... oWFN matches with OG although it should not
+            result=1
+        fi
+    fi
+fi
+
+############################################################################
+## The following tests check the recursion inside the matching algorithm. ##
+############################################################################
+og="$DIR/cycle_1.og"
+############################################################################
+
+owfn="$DIR/cycle_1.owfn"
+cmd="$FIONA -t match $owfn $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd -d 4 | grep "start cycle" | wc -l 2>&1`
+    #echo start cycles: $OUTPUT
+    if [ $OUTPUT -ne 2 ] 
+    then
+        echo ... something went wrong inside the matching algorithm
+        result=1
+    fi
+fi
+
+owfn="$DIR/cycle_2.owfn"
+cmd="$FIONA -t match $owfn $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd -d 4 | grep "start cycle" | wc -l 2>&1`
+    #echo start cycles: $OUTPUT
+    if [ $OUTPUT -ne 2 ] 
+    then
+        echo ... something went wrong inside the matching algorithm
+        result=1
+    fi
+fi
+
+############################################################################
+og="$DIR/cycle_2.og"
+############################################################################
+
+owfn="$DIR/cycle_1.owfn"
+cmd="$FIONA -t match $owfn $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd -d 4 | grep "start cycle" | wc -l 2>&1`
+    #echo start cycles: $OUTPUT
+    if [ $OUTPUT -ne 4 ] 
+    then
+        echo ... something went wrong inside the matching algorithm
+        result=1
+    fi
+fi
+
+owfn="$DIR/cycle_2.owfn"
+cmd="$FIONA -t match $owfn $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd -d 4 | grep "start cycle" | wc -l 2>&1`
+    #echo start cycles: $OUTPUT
+    if [ $OUTPUT -ne 4 ] 
+    then
+        echo ... something went wrong inside the matching algorithm
+        result=1
+    fi
+fi
+
+############################################################################
+og="$DIR/cycle_3.og"
+############################################################################
+
+owfn="$DIR/cycle_1.owfn"
+cmd="$FIONA -t match $owfn $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd -d 4 | grep "start cycle" | wc -l 2>&1`
+    #echo start cycles: $OUTPUT
+    if [ $OUTPUT -ne 6 ] 
+    then
+        echo ... something went wrong inside the matching algorithm
+        result=1
+    fi
+fi
+
+owfn="$DIR/cycle_2.owfn"
+cmd="$FIONA -t match $owfn $og"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd -d 4 | grep "start cycle" | wc -l 2>&1`
+    #echo start cycles: $OUTPUT
+    if [ $OUTPUT -ne 6 ] 
+    then
+        echo ... something went wrong inside the matching algorithm
+        result=1
+    fi
+fi
+
+############################################################################
 echo
-
 exit $result

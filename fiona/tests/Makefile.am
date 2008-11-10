@@ -133,6 +133,16 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
 	matching/interface_rcv-a_snd-by.owfn.png \
 	matching/interface_rcv-ax_snd-b.owfn \
 	matching/interface_rcv-ax_snd-b.owfn.png \
+    matching/cycle_1.owfn \
+    matching/cycle_2.owfn \
+    matching/cycle_1.og \
+    matching/cycle_2.og \
+    matching/cycle_3.og \
+    matching/small_cycle.owfn \
+    matching/small_cycle_1a.og \
+    matching/small_cycle_1b.og \
+    matching/small_cycle_2a.og \
+    matching/small_cycle_2b.og \
 	normalize/abnormal_input.owfn \
 	normalize/abnormal_input.normalized.expected.owfn \
 	normalize/abnormal_output.owfn \

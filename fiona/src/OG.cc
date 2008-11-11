@@ -726,8 +726,8 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
                     if (parameters[P_RESPONSIVE]) {
                         // get next state of TSCC, make sure that we stay in this TSCC by
                         // comparing lowlink values
-                        if (currentState->nexttar && (currentState->lowlink
-                                        == currentState->nexttar->lowlink)) {
+                        if (currentState->nexttar && (currentState->tlowlink
+                                        == currentState->nexttar->tlowlink)) {
                             currentState = currentState->nexttar;
                             if (currentState) {
                                 // and decode it first

@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -231,7 +231,7 @@ void CommunicationGraph::printProgress() {
         // significant progress change
 #ifndef NDEBUG
         if (debug_level == TRACE_0) {
-#endif            
+#endif
             trace( " " + intToString(current_progress) + " ");
 #ifndef NDEBUG
         } else {
@@ -265,7 +265,7 @@ void CommunicationGraph::printProgressFirst() {
 //! \brief creates a dot output of the graph, uses "diagnosis|OG|IG of <filename>" as title.
 //! \param filenamePrefix a string containing the prefix of the output file name
 string CommunicationGraph::createDotFile(string& filenamePrefix) const {
-    
+
     string title;
 
     if (parameters[P_DIAGNOSIS]) {
@@ -279,7 +279,7 @@ string CommunicationGraph::createDotFile(string& filenamePrefix) const {
     } else {
         title = filenamePrefix.substr(0, filenamePrefix.rfind("."));
     }
-    
+
     return createDotFile(filenamePrefix, title);
 
 }
@@ -300,7 +300,7 @@ string CommunicationGraph::createDotFile(string& filenamePrefix, const string& d
         trace( "creating the dot file of the graph...\n");
         AnnotatedGraphNode* rootNode = root;
 
-        
+
         string dotFileName = filenamePrefix + ".out";
         fstream dotFile(dotFileName.c_str(), ios_base::out | ios_base::trunc);
         if (!dotFile.good()) {
@@ -310,9 +310,9 @@ string CommunicationGraph::createDotFile(string& filenamePrefix, const string& d
         }
         dotFile << "digraph g1 {\n";
         dotFile << "graph [fontname=\"Helvetica\", label=\"";
-        
+
         dotFile << dotFileTitle;
-        
+
         dotFile << " (parameters:";
         if (parameters[P_IG] && options[O_CALC_REDUCED_IG]) {
             dotFile << " -r";
@@ -358,11 +358,11 @@ string CommunicationGraph::createDotFile(string& filenamePrefix, const string& d
         // ... dot file created (.out) //
 
 		return dotFileName;
-      
+
     } else {
         trace( "graph is too big to create dot file\n");
     }
-    
+
     return "";
 }
 
@@ -371,11 +371,11 @@ string CommunicationGraph::createDotFile(string& filenamePrefix, const string& d
 //! \param dotFileName the base dot file
 string CommunicationGraph::createAnnotatedDotFile(string& filenamePrefix, string& dotFileName) const {
 
-// Checking the option is not needed anymore since this function has to be called knowingly. 
+// Checking the option is not needed anymore since this function has to be called knowingly.
             string annotatedDotFileName = filenamePrefix + ".dot";
             // annotate .dot file
             system(("dot -Tdot " + dotFileName + " -o " + annotatedDotFileName).c_str());
-            
+
             return annotatedDotFileName;
 }
 
@@ -416,12 +416,12 @@ string CommunicationGraph::createPNGFile(string& filenamePrefix, string& dotFile
             trace( "(" + reasonForFail + ")\n");
             trace( dotCmd + "\n");
         } else {
-          
+
             // print commandline and execute system command
             trace( dotCmd + "\n");
             system(dotCmd.c_str());
             return imgFileName;
-            
+
 
 //            // on windows machines, the png file can be shown per system call
 //            if (parameters[P_OG]) {
@@ -432,7 +432,7 @@ string CommunicationGraph::createPNGFile(string& filenamePrefix, string& dotFile
 
 
         }
-        
+
                 return "";
 
 
@@ -469,20 +469,20 @@ void CommunicationGraph::createDotFileRecursively(AnnotatedGraphNode* v,
         			parameters[P_SHOW_STATES_PER_NODE] ) {
         		(*iter)->decode(PN);
         		// os << "(" << *iter << ") " ;
-        		if (parameters[P_RESPONSIVE]) {                
-        			os << "[" << PN->getCurrentMarkingAsString() << "], SCC:" << (*iter)->lowlink;
+        		if (parameters[P_RESPONSIVE]) {
+        			os << "[" << PN->getCurrentMarkingAsString() << "], SCC:" << (*iter)->lowlink << ", tlowlink: " << (*iter)->tlowlink;
         			// check whether this state is representative of the SCC
-        			if ((*iter)->lowlink == (*iter)->dfs) {
+        			if ((*iter)->tlowlink == (*iter)->dfs) {
         				// yes, it is
         				os << ", rep.";
         				if ((*iter)->repTSCC) {
         					os << " (TSCC)";
         				}
-        			} 
+        			}
         		} else {
         			os << "[" << PN->getCurrentMarkingAsString() << "]";
         		}
-                
+
                 //  os << " (";
                 // print the suffix (state type)
 //                switch ((*iter)->exactType()) {
@@ -561,12 +561,12 @@ void CommunicationGraph::createDotFileRecursively(AnnotatedGraphNode* v,
 
 //! \brief fills the given sets with the names of the inputs and outputs
 //!        needed for public view generation. The interfaces of the public view
-//!        and the original netmust be the same, even if some output/inputs are 
+//!        and the original netmust be the same, even if some output/inputs are
 //!        not used
 //! \param inputs set to be filled with the names of all inputs
 //! \param outputs set to be filled with the names of all outputs
 void CommunicationGraph::returnInterface(set<string>& inputs, set<string>& outputs) {
-    
+
     // Gather all inputs
     unsigned int inputIterator = 0;
     unsigned int endOfIteration = PN->getInputPlaceCount();

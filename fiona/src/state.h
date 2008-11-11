@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -57,20 +57,20 @@ class State {
     public:
         /// constructor
         State();
-        
+
         /// destructor
         ~State();
 
         /// number of states
         static unsigned int state_count;
-        
+
         /// number of states
         static unsigned int state_count_stored_in_binDec;
 
         /// number of transitions to be fired
         unsigned int cardFireList;
 
-        /// transitions to be fired 
+        /// transitions to be fired
         /// note: in case of -R (state reduction in nodes) this list contains
         /// transitions, that are stubborn!!!
         owfnTransition ** firelist;
@@ -95,7 +95,7 @@ class State {
 
         /// type of state (Deadlock, Final, Transient)
         stateType type;
-        
+
         /// returns exact type of state (Final, iDL, eDL, TR)
         stateType exactType();
 
@@ -108,7 +108,7 @@ class State {
 
         /// Returns true iff this state has an enabled tau labeled transition.
         bool hasEnabledTransitionWithTauLabelForMatching() const;
-    
+
         /// is transient in autonomous setting
         bool isNotAutonomouslyTransient() const;
 
@@ -118,27 +118,30 @@ class State {
 
         /// depth first search number
         unsigned int dfs;
-        
+
+        /// the ID of the TSCC needed to detect TSCCs
+        unsigned int tlowlink;
+
         /// the ID of the SCC
-        unsigned int lowlink; 
+        unsigned int lowlink;
 
         /// true,  iff this state is a representative of a TERMINAL SCC
-        /// false, iff 
+        /// false, iff
         ///			(a) this state is not a representative at all, and/or
         ///		    (b) this state is a representative of an SCC
-        bool repTSCC;	
-        
+        bool repTSCC;
+
         /// previous and next state in the depth first search graph
         /// it may lead to a state outside of the current SCC!
         State * nexttar, * prevtar;
-        
+
 		unsigned int tarlevel;
-        
+
 #undef new
         /// Provides user defined operator new. Needed to trace all new operations
         /// on this class.
         NEW_OPERATOR(State)
 #define new NEW_NEW
     };
-    
+
 #endif

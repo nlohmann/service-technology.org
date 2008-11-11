@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -2498,9 +2498,9 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
             // current state is the first state on the stack
             TarStack = CurrentState;
 
-            // we start counting by 0, so the current state's depth first search number and
-            // lowlink value is just the current number of overall states - 1
-            CurrentState->dfs = CurrentState->lowlink = CurrentState->state_count - 1;
+            // we start counting by 0, so the current state's depth first search number,
+            // lowlink and min value is just the current number of overall states - 1
+            CurrentState->dfs = CurrentState->tlowlink = CurrentState->lowlink = CurrentState->state_count - 1;
 
             // current state does not have any successor or predecessor states
             CurrentState->nexttar = CurrentState->prevtar = CurrentState;
@@ -2571,10 +2571,14 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
 
                     if (parameters[P_RESPONSIVE]) {
                         // [LUHME XV]: nächste zeile raus!?
-                        CurrentState->succ[CurrentState->current] = NewState;
-                        if(!(NewState->tarlevel)) {
-                            CurrentState->lowlink = MINIMUM(CurrentState->lowlink, NewState->lowlink);
-                        }
+						CurrentState->succ[CurrentState->current] = NewState;
+						if(!(NewState->tarlevel) && (NewState->current < NewState->cardFireList)) {
+							CurrentState->lowlink = MINIMUM(CurrentState->lowlink, NewState->lowlink);
+						}
+
+						if(!(NewState->tarlevel)) {
+							CurrentState->tlowlink = MINIMUM(CurrentState->tlowlink, NewState->tlowlink);
+						}
                     }
 
                     (CurrentState->current)++;  // choose next transition to fire
@@ -2599,9 +2603,9 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                     // responsive partners are to be calculated, so we use the Tarjan algorithm
                     // to calculate (T)SCCs
                     if (parameters[P_RESPONSIVE]) {
-                        // we start counting by 0, so the current state's depth first search number and
-                        // lowlink value is just the current number of overall states - 1
-                        NewState->dfs = NewState->lowlink = CurrentState->state_count - 1;
+                        // we start counting by 0, so the current state's depth first search number,
+                        // lowlink and min value is just the current number of overall states - 1
+                        NewState->dfs = NewState->tlowlink = NewState->lowlink = CurrentState->state_count - 1;
 
                         // fit the newly calculated state into the Tarjan stack of states
                         NewState->prevtar = TarStack;
@@ -2649,7 +2653,7 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                 // to calculate (T)SCCs
                 if (parameters[P_RESPONSIVE]) {
                     // state is part of a TSCC and it is the representative of it
-                    if((CurrentState->dfs == CurrentState->lowlink)
+                    if((CurrentState->dfs == CurrentState->tlowlink)
                             && (CurrentState->dfs >= MinBookmark)) {
 
 //                      cout << "found TSCC with id: " << CurrentState->dfs << endl;
@@ -2666,8 +2670,8 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                     }
 
                     if(CurrentState->parent) {
-                        CurrentState->parent->lowlink =
-                            MINIMUM(CurrentState->lowlink, CurrentState->parent->lowlink);
+                        CurrentState->parent->tlowlink =
+                            MINIMUM(CurrentState->tlowlink, CurrentState->parent->tlowlink);
                     }
                 }
 
@@ -3247,7 +3251,6 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
             // Remember that the new state is a successor of the current state.
             currentState->succ[current] = newState;
 
-        	
             // Remember that we have checked the current state with the
             // current OG node. This is necessary to handle cyclic nets.
             stateNodesAssoc[newState].insert( currentOGNode->getNumber() );
@@ -3936,7 +3939,7 @@ oWFN* oWFN::returnNormalOWFN() {
             // treat arcs from interface places to abnormal transitions special
             if ( !(*transition)->isNormal() && arc->pl->getType() != INTERNAL ) {
 
-                TRACE(TRACE_5, "        handle abnormal transition's inputplace: " + name + "\n"); 
+                TRACE(TRACE_5, "        handle abnormal transition's inputplace: " + name + "\n");
 
                 // create new place for normalisation
                 owfnPlace* normalPlace = new owfnPlace(name + suffix, INTERNAL, result);
@@ -3990,7 +3993,7 @@ oWFN* oWFN::returnNormalOWFN() {
             // treat arcs from abnormal transitions to interface places special
             if ( !(*transition)->isNormal() && arc->pl->getType() != INTERNAL ) {
 
-                TRACE(TRACE_5, "        handle abnormal transition's outputplace: " + name + "\n"); 
+                TRACE(TRACE_5, "        handle abnormal transition's outputplace: " + name + "\n");
 
                 // create new places for normalisation
                 owfnPlace* normalPlace = new owfnPlace(name + suffix, INTERNAL, result);
@@ -4155,7 +4158,7 @@ oWFN* oWFN::returnMatchingOWFN() {
 
             // label transition or create arc
             if ( oldArc->pl->getType() != INTERNAL ) {
-                TRACE(TRACE_5, "        handle transition's inputplace " + oldArc->pl->getName() + "\n"); 
+                TRACE(TRACE_5, "        handle transition's inputplace " + oldArc->pl->getName() + "\n");
 
                 if ( newTransition->hasNonTauLabelForMatching() ) {
                     string msg = string("Transition '") + newTransition->getName() + "' sends or "
@@ -4185,7 +4188,7 @@ oWFN* oWFN::returnMatchingOWFN() {
 
             // label transition or create arc
             if ( oldArc->pl->getType() != INTERNAL ) {
-                TRACE(TRACE_5, "        handle transition's outputplace " + oldArc->pl->getName() + "\n"); 
+                TRACE(TRACE_5, "        handle transition's outputplace " + oldArc->pl->getName() + "\n");
 
                 if ( newTransition->hasNonTauLabelForMatching() ) {
                     string msg = string("Transition '") + newTransition->getName() + "' sends or "

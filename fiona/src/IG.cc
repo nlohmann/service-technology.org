@@ -837,7 +837,7 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
             		// get next state of TSCC, make sure that we stay in this TSCC by
             		// comparing lowlink values
             		if (currentState->nexttar &&
-            				(currentState->lowlink == currentState->nexttar->lowlink)) {
+            				(currentState->tlowlink == currentState->nexttar->tlowlink)) {
             			currentState = currentState->nexttar;
             			if (currentState) {
             				// and decode it first

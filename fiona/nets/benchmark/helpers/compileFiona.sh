@@ -45,12 +45,12 @@ echo "Creating backup of $FIONA_DIR/src/userconfig.h"
 cp $FIONA_DIR/src/userconfig.h $FIONA_DIR/src/userconfig.h.old
 if [ $2 == "OFF" ]
 then
-	cat $FIONA_DIR/src/userconfig.h | sed -e 's/#define LOG_NEW/\/\/ #define LOG_NEW/'  > $FIONA_DIR/src/userconfig.h.new
+	cat $FIONA_DIR/src/userconfig.h | sed -e 's/#define LOG_NEW/\/\/#define LOG_NEW/'  > $FIONA_DIR/src/userconfig.h.new
 	echo "Created new userconfig.h with newlogger OFF."
 fi
 if [ $2 == "ON" ]
 then
-	cat $FIONA_DIR/src/userconfig.h | sed -e 's/\/\/ #define LOG_NEW/#define LOG_NEW/'  > $FIONA_DIR/src/userconfig.h.new
+	cat $FIONA_DIR/src/userconfig.h | sed -e 's/\/\/#define LOG_NEW/#define LOG_NEW/'  > $FIONA_DIR/src/userconfig.h.new
 	echo "Created new userconfig.h with newlogger ON."
 fi
 

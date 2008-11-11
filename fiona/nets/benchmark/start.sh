@@ -18,8 +18,9 @@
 # The compilation of these versions can be done with the        #
 # ./prepare.sh script or by hand.                               #
 #                                                               #
-# Call: ./start.sh <logfile> [<FionaSuffix>]                    #
+# Call: ./start.sh <logfile> <comment> [<FionaSuffix>]          #
 #          <logfile> All results will be stored here            #
+#          <comment> A file containing a comment                #
 #          <FionaSuffix> The suffix that is used for            #
 #                        executables on your system (if any)    #
 #---------------------------------------------------------------#
@@ -108,15 +109,25 @@ then
 	resultFile=$1
 	echo "Results will be stored in: $resultFile"
 else
-	echo "Call: ./start.sh <logfile> [<FionaSuffix>]"
+	echo "Call: ./start.sh <logfile> <comment> [<FionaSuffix>]"
 	echo -e "\tA NAME/PATH FOR A LOGFILE IS NOT GIVEN. EXIT."
 	exit
 fi
 
-FIONA_SUFFIX=""
 if [ $2 ]
 then
-	FIONA_SUFFIX=".$2"
+	comment=`cat $2`
+else
+	echo "Call: ./start.sh <logfile> <comment> [<FionaSuffix>]"
+	echo -e "\tA FILE CONTAINING A COMMENT IS NOT GIVEN. EXIT."
+	exit
+fi
+
+
+FIONA_SUFFIX=""
+if [ $3 ]
+then
+	FIONA_SUFFIX=".$3"
 	echo "Suffix is: $FIONA_SUFFIX"
 fi
 
@@ -151,7 +162,7 @@ FIONAWN_VERSION=$(ls -l fiona_with_new_logger$FIONA_SUFFIX)
 date=$(date)
 user=$(whoami)
 
-table="===== Benchmark: $date by $user =====\n\n**FIONA BENCHMARKING RESULTS.**\n\nDate of execution: $date\n\nUser: $user\n\n\n\n''$FIONA_VERSION''\n\n''$FIONAWN_VERSION''\n\nGeneral Parameters: $generalParams\n\nIG -r Parameters: $igrParams\n\nIG Parameters: $igParams\n\nOG  Parameters: $ogParams"
+table="===== Benchmark: $date by $user =====\n\n**Comment: **$comment\n\n**FIONA BENCHMARKING RESULTS.**\n\nDate of execution: $date\n\nUser: $user\n\n\n\n''$FIONA_VERSION''\n\n''$FIONAWN_VERSION''\n\nGeneral Parameters: $generalParams\n\nIG -r Parameters: $igrParams\n\nIG Parameters: $igParams\n\nOG  Parameters: $ogParams"
 
 if [ $buffer -eq 1 ]
 then

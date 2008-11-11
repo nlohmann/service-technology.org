@@ -11,4 +11,4 @@
 #       No suffix (should work with unix and cygwin             #
 #---------------------------------------------------------------#
 
-all.sh log.txt
+all.sh log.txt nocomment

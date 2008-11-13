@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -148,8 +148,8 @@ State* binInsert(binDecision** Bucket, oWFN* PN) {
     // relies on a previous bin_search with all values bin_* set properly!
     TRACE(TRACE_5, "binInsert(binDecision** Bucket, oWFN* PN): start\n");
 
-    // cout << "binInsert: inserting "
-    //      << PN->getMarkingAsString(PN->CurrentMarking) << endl;
+  //   cout << "binInsert: inserting "
+  //        << PN->getMarkingAsString(PN->CurrentMarking) << endl;
 
     binDecision* newd;
     int vby, vbi;

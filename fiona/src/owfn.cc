@@ -2571,14 +2571,14 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
 
                     if (parameters[P_RESPONSIVE]) {
                         // [LUHME XV]: nächste zeile raus!?
-						CurrentState->succ[CurrentState->current] = NewState;
-						if(!(NewState->tarlevel) && (NewState->current < NewState->cardFireList)) {
-							CurrentState->lowlink = MINIMUM(CurrentState->lowlink, NewState->lowlink);
-						}
+                        CurrentState->succ[CurrentState->current] = NewState;
+                        if(!(NewState->tarlevel) && (NewState->current < NewState->cardFireList)) {
+                            CurrentState->lowlink = MINIMUM(CurrentState->lowlink, NewState->lowlink);
+                        }
 
-						if(!(NewState->tarlevel)) {
-							CurrentState->tlowlink = MINIMUM(CurrentState->tlowlink, NewState->tlowlink);
-						}
+                        if(!(NewState->tarlevel)) {
+                            CurrentState->tlowlink = MINIMUM(CurrentState->tlowlink, NewState->tlowlink);
+                        }
                     }
 
                     (CurrentState->current)++;  // choose next transition to fire
@@ -2672,6 +2672,8 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
                     if(CurrentState->parent) {
                         CurrentState->parent->tlowlink =
                             MINIMUM(CurrentState->tlowlink, CurrentState->parent->tlowlink);
+                        CurrentState->parent->lowlink =
+                            MINIMUM(CurrentState->lowlink, CurrentState->parent->lowlink);
                     }
                 }
 
@@ -3181,7 +3183,7 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                 TRACE(TRACE_3, currentOGNode->getName() + "\n");
                 TRACE(TRACE_3, "    backtracking from node " + currentOGNode->getName());
                 TRACE(TRACE_3, " with annotation " + currentOGNode->getAnnotationAsString() + "\n");
-                
+
 
                 // We have already seen the state we just reaching by firing
                 // the transition above. So we have to revert to the state that

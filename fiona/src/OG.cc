@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -385,6 +385,7 @@ void OG::calculateSuccStatesInput(unsigned int input,
         // then supress new sending event
         if (options[O_MESSAGES_MAX] == true) { // k-message-bounded set
             if (PN->CurrentMarking[PN->getPlaceIndex(PN->getPlace(input))] >= messages_manual) {
+
                 // adding input message to state already using full message bound
                 TRACE(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
                 TRACE(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, AnnotatedGraphNode* oldNode, AnnotatedGraphNode* newNode) : end\n");

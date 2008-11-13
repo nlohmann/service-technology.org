@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -187,7 +187,7 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
                 calculateSuccStatesSendingEvent(mmSet, currentNode, v);
 
                 if (v->getColor() == RED) {
-                    // message bound violation occured during calculateSuccStatesSendingEvent
+                    // message bound violation occurred during calculateSuccStatesSendingEvent
                     TRACE(TRACE_2, "\t\t\t\t    sending event: ");
                     TRACE(TRACE_2, PN->createLabel(mmSet));
                     TRACE(TRACE_2, " at node " + currentNode->getName() + " suppressed (message bound violated)\n");
@@ -253,7 +253,7 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
     if (currentNode->getColor() != RED) {
         currentNode->analyseNode();
     }
-    TRACE(TRACE_5, "node analysed\n");
+    TRACE(TRACE_5, "node analyzed\n");
 
     TRACE(TRACE_1, "\t\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()) + "\n");
 }

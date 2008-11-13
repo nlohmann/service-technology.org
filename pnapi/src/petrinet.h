@@ -71,6 +71,7 @@
 #include <stack>
 #include "typedefs.h"
 #include "formula.h"
+#include "options.h"
 
 using std::string;
 using std::vector;
@@ -428,6 +429,9 @@ class PetriNet
 
     /// copy constructor
     PetriNet(const PetriNet &);
+
+    /// construction from stream
+    PetriNet(FILE *, input_format = INPUT_OWFN);
 
     /// assignment operator
     PetriNet & operator=(const PetriNet &);

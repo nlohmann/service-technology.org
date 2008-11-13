@@ -93,6 +93,18 @@ typedef enum
 } output_format;
 
 /*!
+ * \brief   file formats
+ *
+ *          Enumeration of the possible input file formats.
+ *
+ * \ingroup petrinet
+ */
+typedef enum
+{
+  INPUT_OWFN      ///< Fiona open workflow net (oWFN)
+} input_format;
+
+/*!
 * \brief   Marking
  *
  *          A set of tokens in places according to the marking_id in each place.

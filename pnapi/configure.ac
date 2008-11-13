@@ -9,6 +9,8 @@ AC_CONFIG_HEADERS(src/config.h)
 AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_RANLIB
+AC_PROG_LEX
+AC_PROG_YACC
 
 AC_CHECK_PROG(DOT, dot, dot, not found)
 if test "$DOT" = "not found"; then

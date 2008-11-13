@@ -68,6 +68,11 @@ using std::cerr;
 using std::endl;
 using std::min;
 
+/* C definitions from lexer/parser */
+extern FILE * pnapi_owfn_in;
+extern int pnapi_owfn_parse();
+extern PNapi::PetriNet PN;
+
 
 namespace PNapi
 {
@@ -353,15 +358,19 @@ void Arc::mirror()
 
 /*****************************************************************************/
 
+#define PN_DEFAULT_NEXTID 1
+#define PN_DEFAULT_FORMAT FORMAT_OWFN
+#define PN_DEFAULT_INVOCATION_STRING "PN API"
+#define PN_DEFAULT_PACKAGE_STRING "Petri Net API"
 
 /*!
  * \brief   constructor
  */
 PetriNet::PetriNet() :
-  nextId(1),
-  format(FORMAT_OWFN),
-  invocation_string("PN API"),
-  package_string("Petri Net API")
+  nextId(PN_DEFAULT_NEXTID),
+  format(PN_DEFAULT_FORMAT),
+  invocation_string(PN_DEFAULT_INVOCATION_STRING),
+  package_string(PN_DEFAULT_PACKAGE_STRING)
 {
 }
 
@@ -501,7 +510,40 @@ PetriNet::PetriNet(const PetriNet & net)
 }
 
 
+/*!
+ * \brief   construction from file
+ *
+ *          Constructs a net from the file contents. At the moment only OWFN 
+ *          files are supported. 
+ *
+ * \note    This constructor should work with a stream,
+ *          but internally a FILE pointer is needed and getting the underlying
+ *          FILE pointer for a stream doesn't seem to be trivial.
+ */
+PetriNet::PetriNet(FILE * input, input_format format) :
+  nextId(PN_DEFAULT_NEXTID),
+  format(PN_DEFAULT_FORMAT),
+  invocation_string(PN_DEFAULT_INVOCATION_STRING),
+  package_string(PN_DEFAULT_PACKAGE_STRING)
+{
+  switch (format)
+  {
+    case INPUT_OWFN:
+      // set lexer input
+      pnapi_owfn_in = input;
+      // initialize global result variable (copy)
+      PN = *this;
+      // parse the input
+      if (pnapi_owfn_parse() != 0)
+	throw "owfn parser failed";
+      // copy the result back
+      *this = PN;
+      break; 
 
+    default: 
+      throw "unsupported input format";
+  }
+}
 
 
 /*!

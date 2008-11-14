@@ -157,12 +157,15 @@ fi
 
 echo "Retrieving information about fiona..." 
 FIONA_VERSION=$(ls -l fiona$FIONA_SUFFIX)
+FIONA_VERSION_NUMBER="$(fiona$FIONA_SUFFIX --version | grep Functional | sed 's/ -- Functional InteractiON Analysis of open nets//')"
 FIONAWN_VERSION=$(ls -l fiona_with_new_logger$FIONA_SUFFIX)
+
+SCRIPT_REVISION=$(svn info $0 | grep Revision)
 
 date=$(date)
 user=$(whoami)
 
-table="===== Benchmark: $date by $user =====\n\n**Comment: **$comment\n\n**FIONA BENCHMARKING RESULTS.**\n\nDate of execution: $date\n\nUser: $user\n\n\n\n''$FIONA_VERSION''\n\n''$FIONAWN_VERSION''\n\nGeneral Parameters: $generalParams\n\nIG -r Parameters: $igrParams\n\nIG Parameters: $igParams\n\nOG  Parameters: $ogParams"
+table="===== $date by $user ($FIONA_VERSION_NUMBER) =====\n\n**Comment: **$comment\n\n**Fiona Version: **$FIONA_VERSION_NUMBER\n\n**Date of execution: **$date\n\n**Benchmark script:** $0 ($SCRIPT_REVISION)\n\nUser: $user\n\n''$FIONA_VERSION''\n\n''$FIONAWN_VERSION''\n\nGeneral Parameters: $generalParams\n\nIG -r Parameters: $igrParams\n\nIG Parameters: $igParams\n\nOG  Parameters: $ogParams"
 
 if [ $buffer -eq 1 ]
 then

@@ -97,7 +97,7 @@ typedef enum
   F_OWFN,		///< Fiona open workflow net
   F_DOT,		///< Graphviz dot format
   F_PEP,		///< low-level PEP notation
-  F_TPN,        ///< Woflan TPN format
+  F_TPN,    ///< Woflan TPN format
   F_APNN,		///< Abstract Petri Net Notation
   F_INA,		///< INA Petri net
   F_SPIN,		///< SPIN Petri net

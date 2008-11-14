@@ -505,8 +505,15 @@ void parse_command_line(int argc, char* argv[])
       // separate output file name into path and file name
       char* ffile = (char*)malloc(globals::output_filename.size() + sizeof(char));
       strcpy(ffile, globals::output_filename.c_str());
-      globals::output_filename = string(::basename(ffile));
-      globals::output_directory = string(::dirname(ffile));
+
+      if (ffile[globals::output_filename.size()-1] != GetSeparatorChar()) {
+        globals::output_directory = string(::dirname(ffile));
+        globals::output_filename = string(::basename(ffile));
+      } else {
+        globals::output_directory = string(::dirname(ffile))+GetSeparatorChar()+string(::basename(ffile));
+        globals::output_filename = "";
+        globals::getOutputFileNameFromInput = true;
+      }
       free(ffile);
     }
 	}

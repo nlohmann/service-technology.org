@@ -192,7 +192,7 @@ string getOutputFilename(string prefix = "", bool use_suffix=true) {
   if (globals::output_filename == "")
     return "";
 
-  string dirString = (globals::getOutputFileNameFromInput
+  string dirString = (globals::output_directory == ""
       ? globals::workingDirectory
       : globals::output_directory);
 
@@ -962,9 +962,9 @@ int main( int argc, char *argv[])
     		trace(TRACE_DEBUG, "-> resolved\n");
 
     		// set suffix for this process, so we have an output file name
-    	    globals::output_filename_suffix =  "." + process_name_to_file_name((*process)->name);
-    	    // write output file name of this process to the log
-    	    log_print(getOutputFilename_net(getOutputDefaultFormat_net()));
+    	  globals::output_filename_suffix =  "." + process_name_to_file_name((*process)->name);
+    	  // write output file name of this process to the log
+    	  log_print(getOutputFilename_net(getOutputDefaultFormat_net()));
 
 	    	//if the process was filtered, dont create an output at all
 	    	if ((*process)->syntaxError) {

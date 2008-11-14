@@ -25,7 +25,7 @@
 /*!
  * \file    globals.cc
  *
- * \brief   global varialbes
+ * \brief   global variables
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $

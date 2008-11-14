@@ -572,6 +572,39 @@ The first line causes the translation to generate CTL properties, the second lin
 switches the model-checker for the soundness analysis to the LoLA variant with
 model checking algorithms (that has to be compiled as described above).
 
+
+@section Use Case: Translate, Analyze, and Compile Reults of Several Large Process Suites
+
+Invoking and compiling analysis results for several large process suites can be
+done automatically with the @file{./scripts/repository/Makefile} and the corresponding
+script files. To use the file, create a "process repository" as follows. Create
+a new directory, e.g. @file{<analysis>}. In @file{<analysis>} create a new
+sub-directory for each process library, e.g. @file{<analysis>/lib1},
+@file{<analysis>/lib2}, ... and place the library files in the corresponding
+directories: @file{<analysis>/lib1/myLib1.xml} etc. Then copy all files from
+@file{./scripts/repository/} to @file{<analysis>} and call
+
+@example
+make table
+@end example
+
+which will automatically translate all process libraries for all corresponding
+analysis, perform the analysis and verification, collect the result of each
+library and analysis, and compiles result tables in @file{.html} and @file{.tex}
+format in @file{<analysis>/lib1} etc. Call
+
+@example
+make help
+@end example
+
+to learn about the other functionality provided by this script. Call
+
+@example
+make cleanall
+@end example
+
+to clean all generated files, leaving only the original process libraries.
+
 @c ----------------------------------------------------------------------------
 
 

@@ -301,61 +301,7 @@ string Transition::output_dot() const
     case(INTERNAL):	result += "["; break;
   }
 
-// <Dirk.F start> ignore BPEL qualifiers
-/*
-  // add labels for transitions with singleton history
-
-  // internal activities
-  if (history.size() == 1 && history.begin()->find("internal.empty") != string::npos)
-    result += "label=\"empty\" fillcolor=gray";
-  if (history.size() == 1 && history.begin()->find("internal.assign") != string::npos)
-    result += "label=\"asgn\" fillcolor=gray";
-  if (history.size() == 1 && history.begin()->find("internal.opaqueActivity") != string::npos)
-    result += "label=\"opque\" fillcolor=gray";
-
-  // communicating activities
-  if (history.size() == 1 && history.begin()->find("internal.receive") != string::npos)
-    result += "label=\"recv\"";
-  if (history.size() == 1 && history.begin()->find("internal.reply") != string::npos)
-    result += "label=\"reply\"";
-  if (history.size() == 1 && history.begin()->find("internal.invoke") != string::npos)
-    result += "label=\"invk\"";
-  if (history.size() == 1 && history.begin()->find("internal.onMessage_") != string::npos)
-    result += "label=\"on\\nmsg\"";
-  if (history.size() == 1 && history.begin()->find(".onEvent.") != string::npos)
-    result += "label=\"on\\nevent\"";
-
-  // structured activities
-  if (history.size() == 1 && history.begin()->find("internal.case") != string::npos)
-    result += "label=\"case\" fillcolor=azure2";
-  if (history.size() == 1 && history.begin()->find("internal.onAlarm") != string::npos)
-    result += "label=\"on\\nalarm\" fillcolor=azure2";
-  if (history.size() == 1 && history.begin()->find("internal.split") != string::npos)
-    result += "label=\"flow\\nsplit\" fillcolor=azure2";
-  if (history.size() == 1 && history.begin()->find("internal.join") != string::npos)
-    result += "label=\"flow\\njoin\" fillcolor=azure2";
-  if (history.size() == 1 && history.begin()->find("internal.leave") != string::npos)
-    result += "label=\"leave\\nloop\" fillcolor=azure2";
-  if (history.size() == 1 && history.begin()->find("internal.loop") != string::npos)
-    result += "label=\"enter\\nloop\" fillcolor=azure2";
-
-  // everything about links
-  if (history.size() == 1 && history.begin()->find(".setLinks") != string::npos)
-    result += "label=\"tc\" fillcolor=darkseagreen1";
-  if (history.size() == 1 && history.begin()->find(".evaluate") != string::npos)
-    result += "label=\"jc\\neval\" fillcolor=darkseagreen1";
-  if (history.size() == 1 && history.begin()->find(".skip") != string::npos)
-    result += "label=\"skip\" fillcolor=darkseagreen1";
-  if (history.size() == 1 && history.begin()->find(".reset_false") != string::npos)
-    result += "label=\"reset\\nlink\" fillcolor=darkseagreen1";
-  if (history.size() == 1 && history.begin()->find(".reset_true") != string::npos)
-    result += "label=\"reset\\nlink\" fillcolor=darkseagreen1";
-
-
-  // stopping
-  if (history.size() == 1 && history.begin()->find(".stopped.") != string::npos)
-    result += "label=\"stop\" fillcolor=darksalmon";
-*/
+// <Dirk.F start> use coloring for places according to BOM
   // use coloring for places according to BOM
   // task transition
   if (history.size() == 1 	&& history.begin()->find(".fire") != string::npos
@@ -418,61 +364,6 @@ string Transition::output_dot() const
   result += "]\n";
 
   result += " t" + toString(id) + "_l\t[shape=none];\n";
-// <Dirk.F start> full string already written above
-/*
-  string teststring = nodeFullName();
-  if (history.size() == 1)
-  {
-    if (teststring.find(".connection.") != string::npos)
-    {
-      label = "connection";
-    }
-    if (teststring.find("task.") != string::npos)
-    {
-      label = teststring.substr(teststring.find("task.")+5, teststring.length());
-    }
-    if (teststring.find("service.") != string::npos)
-    {
-      label = teststring.substr(teststring.find("service.")+8, teststring.length());
-    }
-
-    //if (teststring.find("process.") != string::npos)
-    //{
-    //  std::cerr << "yay\n";
-    //  label = teststring.substr(teststring.find("process.")+8, teststring.length());
-    //}
-    if (teststring.find("callToTask.") != string::npos)
-    {
-      label = teststring.substr(teststring.find("callToTask.")+11, teststring.length());
-    }
-    if (teststring.find("callToService.") != string::npos)
-    {
-      label = teststring.substr(teststring.find("callToService.")+14, teststring.length());
-    }
-    if (teststring.find("callToProcess.") != string::npos)
-    {
-      label = teststring.substr(teststring.find("callToProcess.")+14, teststring.length());
-    }
-    if (teststring.find("merge.") != string::npos)
-    {
-      label = teststring.substr(teststring.find("merge.")+6, teststring.length());
-    }
-    if (teststring.find("decision.") != string::npos)
-    {
-      label = teststring.substr(teststring.find("decision.")+9, teststring.length());
-    }
-    if (teststring.find(".initialize") != string::npos)
-    {
-      label = teststring;
-    }
-    if (teststring.find(".finalize") != string::npos)
-    {
-      label = teststring;
-    }
-  }
-*/
-// <Dirk.F end>
-
   result += " t" + toString(id) + "_l -> t" + toString(id) + " [headlabel=\"" + label + "\"]\n";
 
   return result;
@@ -549,23 +440,7 @@ string Place::output_dot() const
     default:    break;
   }
 
-// <Dirk.F start> ignore BPEL specific colorings
-/*
-  if (isFinal)
-    result += "fillcolor=gray";
-  else if (firstMemberIs("!link."))
-    result += "fillcolor=red";
-  else if (firstMemberIs("link."))
-    result += "fillcolor=green";
-  else if (firstMemberIs("variable."))
-    result += "fillcolor=cyan";
-  else if (historyContains("1.internal.clock"))
-    result += "fillcolor=seagreen";
-  else if (wasExternal != "")
-    result += "fillcolor=lightgoldenrod1";
-*/
-
-  // use coloring for places according to BOM
+// <Dirk.F start> use coloring for places according to BOM
   if (isFinal)
       result += "fillcolor=gray";
   // process input places

@@ -1,5 +1,7 @@
 @heading Version 1.11-unreleased
 @itemize
+@item Added new @file{./scripts/repository/Makefile} for an automated analysis and result compilation of several large process suites. See manual on usage.
+@item Fixed handling of paths for output files, output files can now be written to their own directories
 @item Changed the standard soundness verification procedures to the more efficient
 liveness property verification algorithm of LoLA. To use the old CTL model checking
 procedures use parameter @samp{-p ctl}.

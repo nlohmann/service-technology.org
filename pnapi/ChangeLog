@@ -1,6 +1,45 @@
-==============
- Version 1.00
-==============
 
+Version 1.0.1
+===============
+
+* implemented scanner and parser for oWFN files
+
+* structural changes
+
+* added formula class
+
+* overworked reduction rules
+	* murata rules will only be applied if the weight of all involved arcs is 1
+	* some murata rules are extended by arc weights according to Thomas Pillat's proofs (see [pillat2008])
+	* remaining rules have been deactivated
+	* normalized nets can be kept normal
+
+* implemented new functions
+	* findLivingTransition
+	* calcSuccessorMarking
+	* marking2Places
+	* calcCurrentMarking
+	* initMarking
+	* isWorkflowNet
+	* isFreeChoice
+	* set and get methods for P, P_in, P_out, T and F
+	* reevaluateType
+	* isNormal
+	* normalize
+	* makeInnerStructure
+	* set and get methods for invocation_string and package_string
+
+* bugfixes
+	* added missing "=NULL" after use of delete
+	* searching for a place which has been removed or renamed won't cause a crash anymore
+
+* added files
+	* generic Doxygen configuration file
+	* testcases
+
+Version 1.0 
+===========
+
+* copied api from fiona
 * created Makefile.am and configure.ac for autotools usage
 * it's compilable running autoreconf, configure and make

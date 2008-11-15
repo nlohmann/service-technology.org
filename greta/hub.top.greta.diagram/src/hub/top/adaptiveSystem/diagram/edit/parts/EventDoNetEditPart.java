@@ -68,7 +68,6 @@ public class EventDoNetEditPart extends AbstractBorderedShapeEditPart {
 	 * @generated
 	 */
 	protected void createDefaultEditPolicies() {
-
 		super.createDefaultEditPolicies();
 		installEditPolicy(
 				EditPolicyRoles.SEMANTIC_ROLE,
@@ -401,10 +400,8 @@ public class EventDoNetEditPart extends AbstractBorderedShapeEditPart {
 			}
 
 			if (adaptiveSystem.isSetWellformednessToOclets()) {
-				SetCommand cmd = new SetCommand(
-						this.getEditingDomain(),
-						adaptiveSystem,
-						AdaptiveSystemPackage.eINSTANCE
+				SetCommand cmd = new SetCommand(this.getEditingDomain(),
+						adaptiveSystem, AdaptiveSystemPackage.eINSTANCE
 								.getAdaptiveSystem_SetWellformednessToOclets(),
 						false);
 				cmd.setLabel("set adaptive process attribute "
@@ -420,8 +417,8 @@ public class EventDoNetEditPart extends AbstractBorderedShapeEditPart {
 						AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed(),
 						false);
 				cmd.setLabel("set oclet attribute "
-						+ AdaptiveSystemPackage.eINSTANCE
-								.getOclet_WellFormed().getName());
+						+ AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed()
+								.getName());
 				cmd.canExecute();
 				((CommandStack) ((EditingDomain) this.getEditingDomain())
 						.getCommandStack()).execute(cmd);
@@ -432,7 +429,7 @@ public class EventDoNetEditPart extends AbstractBorderedShapeEditPart {
 			}
 		}
 	}
-	
+
 	/**
 	 * @generated
 	 */

@@ -73,10 +73,10 @@ public class AdaptiveSystemPaletteFactory {
 				types);
 		entry
 				.setSmallIcon(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
-						.findImageDescriptor("/hub.top.apCreate/model/custom/icons/full/MainProcess.gif")); //$NON-NLS-1$
+						.findImageDescriptor("/hub.top.GRETA/model/custom/icons/full/AdaptiveProcess.gif")); //$NON-NLS-1$
 		entry
 				.setLargeIcon(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
-						.findImageDescriptor("/hub.top.apCreate/model/custom/icons/full/MainProcess.gif")); //$NON-NLS-1$
+						.findImageDescriptor("/hub.top.GRETA/model/custom/icons/full/AdaptiveProcess.gif")); //$NON-NLS-1$
 		return entry;
 	}
 
@@ -93,10 +93,10 @@ public class AdaptiveSystemPaletteFactory {
 				types);
 		entry
 				.setSmallIcon(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
-						.findImageDescriptor("/hub.top.apCreate/model/custom/icons/full/Oclet.gif")); //$NON-NLS-1$
+						.findImageDescriptor("/hub.top.GRETA/model/custom/icons/full/Oclet.gif")); //$NON-NLS-1$
 		entry
 				.setLargeIcon(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
-						.findImageDescriptor("/hub.top.apCreate/model/custom/icons/full/Oclet.gif")); //$NON-NLS-1$
+						.findImageDescriptor("/hub.top.GRETA/model/custom/icons/full/Oclet.gif")); //$NON-NLS-1$
 		return entry;
 	}
 
@@ -117,7 +117,7 @@ public class AdaptiveSystemPaletteFactory {
 				types);
 		entry
 				.setSmallIcon(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
-						.findImageDescriptor("/hub.top.apCreate/model/custom/icons/full/Condition.gif")); //$NON-NLS-1$
+						.findImageDescriptor("/hub.top.GRETA/model/custom/icons/full/Condition.gif")); //$NON-NLS-1$
 		entry.setLargeIcon(entry.getSmallIcon());
 		return entry;
 	}
@@ -139,10 +139,10 @@ public class AdaptiveSystemPaletteFactory {
 				types);
 		entry
 				.setSmallIcon(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
-						.findImageDescriptor("/hub.top.apCreate/model/custom/icons/full/Event.gif")); //$NON-NLS-1$
+						.findImageDescriptor("/hub.top.GRETA/model/custom/icons/full/Event.gif")); //$NON-NLS-1$
 		entry
 				.setLargeIcon(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
-						.findImageDescriptor("/hub.top.apCreate/model/custom/icons/full/Event.gif")); //$NON-NLS-1$
+						.findImageDescriptor("/hub.top.GRETA/model/custom/icons/full/Event.gif")); //$NON-NLS-1$
 		return entry;
 	}
 
@@ -161,10 +161,10 @@ public class AdaptiveSystemPaletteFactory {
 				types);
 		entry
 				.setSmallIcon(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
-						.findImageDescriptor("/hub.top.apCreate/model/custom/icons/full/Arc.gif")); //$NON-NLS-1$
+						.findImageDescriptor("/hub.top.GRETA/model/custom/icons/full/Arc.gif")); //$NON-NLS-1$
 		entry
 				.setLargeIcon(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
-						.findImageDescriptor("/hub.top.apCreate/model/custom/icons/full/Arc.gif")); //$NON-NLS-1$
+						.findImageDescriptor("/hub.top.GRETA/model/custom/icons/full/Arc.gif")); //$NON-NLS-1$
 		return entry;
 	}
 

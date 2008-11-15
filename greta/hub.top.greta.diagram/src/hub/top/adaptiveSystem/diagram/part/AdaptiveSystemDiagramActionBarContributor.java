@@ -12,13 +12,13 @@ public class AdaptiveSystemDiagramActionBarContributor extends
 	 * @generated
 	 */
 	protected Class getEditorClass() {
-		return AdaptiveSystemDiagramEditor.class;
+		return hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor.class;
 	}
 
 	/**
 	 * @generated
 	 */
 	protected String getEditorId() {
-		return AdaptiveSystemDiagramEditor.ID;
+		return hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor.ID;
 	}
 }

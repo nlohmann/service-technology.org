@@ -68,10 +68,9 @@ public class AdaptiveSystemCanonicalEditPolicy extends
 		switch (visualID) {
 		case hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveProcessEditPart.VISUAL_ID:
 		case hub.top.adaptiveSystem.diagram.edit.parts.OcletEditPart.VISUAL_ID:
-			return !semanticChildren.contains(view.getElement())
-					|| visualID != hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry
-							.getNodeVisualID((View) getHost().getModel(), view
-									.getElement());
+			if (!semanticChildren.contains(view.getElement())) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -167,11 +166,18 @@ public class AdaptiveSystemCanonicalEditPolicy extends
 		for (Iterator linksIterator = existingLinks.iterator(); linksIterator
 				.hasNext();) {
 			Edge nextDiagramLink = (Edge) linksIterator.next();
+			int diagramLinkVisualID = hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry
+					.getVisualID(nextDiagramLink);
+			if (diagramLinkVisualID == -1) {
+				if (nextDiagramLink.getSource() != null
+						&& nextDiagramLink.getTarget() != null) {
+					linksIterator.remove();
+				}
+				continue;
+			}
 			EObject diagramLinkObject = nextDiagramLink.getElement();
 			EObject diagramLinkSrc = nextDiagramLink.getSource().getElement();
 			EObject diagramLinkDst = nextDiagramLink.getTarget().getElement();
-			int diagramLinkVisualID = hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry
-					.getVisualID(nextDiagramLink);
 			for (Iterator LinkDescriptorsIterator = linkDescriptors.iterator(); LinkDescriptorsIterator
 					.hasNext();) {
 				hub.top.adaptiveSystem.diagram.part.AdaptiveSystemLinkDescriptor nextLinkDescriptor = (hub.top.adaptiveSystem.diagram.part.AdaptiveSystemLinkDescriptor) LinkDescriptorsIterator
@@ -204,94 +210,159 @@ public class AdaptiveSystemCanonicalEditPolicy extends
 		switch (hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry
 				.getVisualID(view)) {
 		case hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveSystemEditPart.VISUAL_ID: {
-			domain2NotationMap.put(view.getElement(), view);
-			result
-					.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
-							.getAdaptiveSystem_79ContainedLinks(view));
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result
+						.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
+								.getAdaptiveSystem_79ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
 			break;
 		}
 		case hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveProcessEditPart.VISUAL_ID: {
-			domain2NotationMap.put(view.getElement(), view);
-			result
-					.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
-							.getAdaptiveProcess_1001ContainedLinks(view));
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result
+						.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
+								.getAdaptiveProcess_1001ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
 			break;
 		}
 		case hub.top.adaptiveSystem.diagram.edit.parts.OcletEditPart.VISUAL_ID: {
-			domain2NotationMap.put(view.getElement(), view);
-			result
-					.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
-							.getOclet_1002ContainedLinks(view));
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result
+						.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
+								.getOclet_1002ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
 			break;
 		}
 		case hub.top.adaptiveSystem.diagram.edit.parts.ConditionAPEditPart.VISUAL_ID: {
-			domain2NotationMap.put(view.getElement(), view);
-			result
-					.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
-							.getCondition_2001ContainedLinks(view));
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result
+						.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
+								.getCondition_2001ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
 			break;
 		}
 		case hub.top.adaptiveSystem.diagram.edit.parts.EventAPEditPart.VISUAL_ID: {
-			domain2NotationMap.put(view.getElement(), view);
-			result
-					.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
-							.getEvent_2002ContainedLinks(view));
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result
+						.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
+								.getEvent_2002ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
 			break;
 		}
 		case hub.top.adaptiveSystem.diagram.edit.parts.PreNetEditPart.VISUAL_ID: {
-			domain2NotationMap.put(view.getElement(), view);
-			result
-					.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
-							.getPreNet_2003ContainedLinks(view));
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result
+						.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
+								.getPreNet_2003ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
 			break;
 		}
 		case hub.top.adaptiveSystem.diagram.edit.parts.ConditionPreNetEditPart.VISUAL_ID: {
-			domain2NotationMap.put(view.getElement(), view);
-			result
-					.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
-							.getCondition_2004ContainedLinks(view));
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result
+						.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
+								.getCondition_2004ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
 			break;
 		}
 		case hub.top.adaptiveSystem.diagram.edit.parts.EventPreNetEditPart.VISUAL_ID: {
-			domain2NotationMap.put(view.getElement(), view);
-			result
-					.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
-							.getEvent_2005ContainedLinks(view));
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result
+						.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
+								.getEvent_2005ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
 			break;
 		}
 		case hub.top.adaptiveSystem.diagram.edit.parts.DoNetEditPart.VISUAL_ID: {
-			domain2NotationMap.put(view.getElement(), view);
-			result
-					.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
-							.getDoNet_2006ContainedLinks(view));
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result
+						.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
+								.getDoNet_2006ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
 			break;
 		}
 		case hub.top.adaptiveSystem.diagram.edit.parts.ConditionDoNetEditPart.VISUAL_ID: {
-			domain2NotationMap.put(view.getElement(), view);
-			result
-					.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
-							.getCondition_2007ContainedLinks(view));
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result
+						.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
+								.getCondition_2007ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
 			break;
 		}
 		case hub.top.adaptiveSystem.diagram.edit.parts.EventDoNetEditPart.VISUAL_ID: {
-			domain2NotationMap.put(view.getElement(), view);
-			result
-					.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
-							.getEvent_2008ContainedLinks(view));
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result
+						.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
+								.getEvent_2008ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
 			break;
 		}
 		case hub.top.adaptiveSystem.diagram.edit.parts.ArcToConditionEditPart.VISUAL_ID: {
-			domain2NotationMap.put(view.getElement(), view);
-			result
-					.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
-							.getArcToCondition_3001ContainedLinks(view));
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result
+						.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
+								.getArcToCondition_3001ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
 			break;
 		}
 		case hub.top.adaptiveSystem.diagram.edit.parts.ArcToEventEditPart.VISUAL_ID: {
-			domain2NotationMap.put(view.getElement(), view);
-			result
-					.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
-							.getArcToEvent_3002ContainedLinks(view));
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result
+						.addAll(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramUpdater
+								.getArcToEvent_3002ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
 			break;
 		}
 		}

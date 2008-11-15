@@ -42,12 +42,15 @@ public class OcletCreateCommand extends CreateElementCommand {
 	 * @generated
 	 */
 	protected EObject doDefaultElementCreation() {
-		hub.top.adaptiveSystem.Oclet newElement = (hub.top.adaptiveSystem.Oclet) super
-				.doDefaultElementCreation();
-		if (newElement != null) {
-			hub.top.adaptiveSystem.diagram.providers.AdaptiveSystemElementTypes.Initializers.Oclet_1002
-					.init(newElement);
-		}
+		hub.top.adaptiveSystem.Oclet newElement = hub.top.adaptiveSystem.AdaptiveSystemFactory.eINSTANCE
+				.createOclet();
+
+		hub.top.adaptiveSystem.AdaptiveSystem owner = (hub.top.adaptiveSystem.AdaptiveSystem) getElementToEdit();
+		owner.getOclets().add(newElement);
+
+		hub.top.adaptiveSystem.diagram.providers.AdaptiveSystemElementTypes
+				.init_Oclet_1002(newElement);
 		return newElement;
 	}
+
 }

@@ -64,10 +64,11 @@ public class ArcToEventCreateCommand extends CreateElementCommand {
 			return false;
 		}
 		if (source != null
-				&& !(source instanceof hub.top.adaptiveSystem.Condition)) {
+				&& false == source instanceof hub.top.adaptiveSystem.Condition) {
 			return false;
 		}
-		if (target != null && !(target instanceof hub.top.adaptiveSystem.Event)) {
+		if (target != null
+				&& false == target instanceof hub.top.adaptiveSystem.Event) {
 			return false;
 		}
 		if (getSource() == null) {
@@ -86,7 +87,6 @@ public class ArcToEventCreateCommand extends CreateElementCommand {
 	 * @generated
 	 */
 	protected EObject doDefaultElementCreation() {
-		// hub.top.adaptiveSystem.ArcToEvent newElement = (hub.top.adaptiveSystem.ArcToEvent) super.doDefaultElementCreation();
 		hub.top.adaptiveSystem.ArcToEvent newElement = hub.top.adaptiveSystem.AdaptiveSystemFactory.eINSTANCE
 				.createArcToEvent();
 		getContainer().getArcs().add(newElement);

@@ -58,7 +58,6 @@ public class AdaptiveProcessEditPart extends ShapeNodeEditPart {
 	 * @generated
 	 */
 	protected void createDefaultEditPolicies() {
-
 		super.createDefaultEditPolicies();
 		installEditPolicy(
 				EditPolicyRoles.SEMANTIC_ROLE,
@@ -265,7 +264,6 @@ public class AdaptiveProcessEditPart extends ShapeNodeEditPart {
 		 * @generated
 		 */
 		public AdaptiveProcessDescriptor() {
-
 			this.setLayoutManager(new StackLayout());
 			this.setFill(false);
 			this.setOutline(false);
@@ -291,16 +289,15 @@ public class AdaptiveProcessEditPart extends ShapeNodeEditPart {
 
 			this.add(adaptiveProcessBackground0);
 
-			RectangleFigure adaptiveProcessContent0 = new RectangleFigure();
-			adaptiveProcessContent0.setFill(false);
-			adaptiveProcessContent0.setOutline(false);
-			adaptiveProcessContent0.setPreferredSize(new Dimension(getMapMode()
-					.DPtoLP(50), getMapMode().DPtoLP(50)));
-			adaptiveProcessContent0.setMinimumSize(new Dimension(getMapMode()
-					.DPtoLP(200), getMapMode().DPtoLP(200)));
+			fFigureAdaptiveProcessContent = new RectangleFigure();
+			fFigureAdaptiveProcessContent.setFill(false);
+			fFigureAdaptiveProcessContent.setOutline(false);
+			fFigureAdaptiveProcessContent.setPreferredSize(new Dimension(
+					getMapMode().DPtoLP(50), getMapMode().DPtoLP(50)));
+			fFigureAdaptiveProcessContent.setMinimumSize(new Dimension(
+					getMapMode().DPtoLP(200), getMapMode().DPtoLP(200)));
 
-			this.add(adaptiveProcessContent0);
-			fFigureAdaptiveProcessContent = adaptiveProcessContent0;
+			this.add(fFigureAdaptiveProcessContent);
 
 		}
 

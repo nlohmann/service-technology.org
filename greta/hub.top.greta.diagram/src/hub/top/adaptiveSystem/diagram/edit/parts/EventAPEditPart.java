@@ -52,7 +52,6 @@ public class EventAPEditPart extends AbstractBorderedShapeEditPart {
 	static final Color ACTIVATED_HOT_EVENT_FOREGROUND = new Color(null, 255, 0,
 			0);
 
-	
 	/**
 	 * @generated
 	 */
@@ -79,7 +78,6 @@ public class EventAPEditPart extends AbstractBorderedShapeEditPart {
 	 * @generated
 	 */
 	protected void createDefaultEditPolicies() {
-
 		super.createDefaultEditPolicies();
 		installEditPolicy(
 				EditPolicyRoles.SEMANTIC_ROLE,
@@ -417,7 +415,6 @@ public class EventAPEditPart extends AbstractBorderedShapeEditPart {
 		super.handleNotificationEvent(notification);
 	}
 
-	
 	/**
 	 * @generated
 	 */
@@ -463,8 +460,8 @@ public class EventAPEditPart extends AbstractBorderedShapeEditPart {
 		 * 
 		 */
 		protected void recolorActivatedEvent() {
-			Event event = (Event) ((Node) (EventAPEditPart.this)
-					.getModel()).getElement();
+			Event event = (Event) ((Node) (EventAPEditPart.this).getModel())
+					.getElement();
 
 			if (event.isEnabled()) {
 				this.setPreferredSize(new Dimension(getMapMode().DPtoLP(24),
@@ -483,15 +480,13 @@ public class EventAPEditPart extends AbstractBorderedShapeEditPart {
 					this.setBackgroundColor(ACTIVATED_HOT_EVENT_BACKGROUND);
 				}
 			} else {
-				UserImplUpdateNode.updateEvent(EventAPEditPart.this,
-						this);
+				UserImplUpdateNode.updateEvent(EventAPEditPart.this, this);
 				this.setPreferredSize(new Dimension(getMapMode().DPtoLP(20),
 						getMapMode().DPtoLP(20)));
 				this.setBorder(null);
 			}
 		}
 
-		
 	}
 
 }

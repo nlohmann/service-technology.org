@@ -42,7 +42,7 @@ public class ArcToEventReorientCommand extends EditElementCommand {
 	 * @generated
 	 */
 	public boolean canExecute() {
-		if (!(getElementToEdit() instanceof hub.top.adaptiveSystem.ArcToEvent)) {
+		if (false == getElementToEdit() instanceof hub.top.adaptiveSystem.ArcToEvent) {
 			return false;
 		}
 		if (reorientDirection == ReorientRelationshipRequest.REORIENT_SOURCE) {

@@ -3,7 +3,9 @@ package hub.top.adaptiveSystem.diagram.edit.parts;
 import hub.top.adaptiveSystem.AdaptiveSystemPackage;
 import hub.top.adaptiveSystem.Oclet;
 
-import org.eclipse.draw2d.FlowLayout;
+import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.draw2d.GridData;
+import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.RectangleFigure;
@@ -24,7 +26,7 @@ import org.eclipse.gmf.runtime.diagram.ui.editpolicies.CreationEditPolicy;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.DragDropEditPolicy;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.ConstrainedToolbarLayout;
-import org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel;
+import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
 import org.eclipse.gmf.runtime.notation.Node;
@@ -67,7 +69,6 @@ public class OcletEditPart extends ShapeNodeEditPart {
 	protected void createDefaultEditPolicies() {
 		installEditPolicy(EditPolicyRoles.CREATION_ROLE,
 				new CreationEditPolicy());
-
 		super.createDefaultEditPolicies();
 		installEditPolicy(
 				EditPolicyRoles.SEMANTIC_ROLE,
@@ -264,11 +265,11 @@ public class OcletEditPart extends ShapeNodeEditPart {
 		/**
 		 * @generated
 		 */
-		private WrapLabel fFigureOcletName;
+		private WrappingLabel fFigureOcletName;
 		/**
 		 * @generated
 		 */
-		private WrapLabel fFigureOcletQuantor;
+		private WrappingLabel fFigureOcletQuantor;
 		/**
 		 * @generated
 		 */
@@ -276,7 +277,7 @@ public class OcletEditPart extends ShapeNodeEditPart {
 		/**
 		 * @generated
 		 */
-		private WrapLabel fFigureOcletOrientation;
+		private WrappingLabel fFigureOcletOrientation;
 
 		/**
 		 * @generated NOT
@@ -294,62 +295,84 @@ public class OcletEditPart extends ShapeNodeEditPart {
 		}
 
 		/**
-		 * @generated
+		 * @generated NOT
 		 */
 		private void createContents() {
 
 			RectangleFigure labelContainer0 = new RectangleFigure();
 			labelContainer0.setFill(false);
 			labelContainer0.setOutline(false);
+			labelContainer0.setForegroundColor(ColorConstants.orange);
 			labelContainer0.setPreferredSize(new Dimension(getMapMode().DPtoLP(
-					200), getMapMode().DPtoLP(15)));
+					200), getMapMode().DPtoLP(20)));
 			labelContainer0.setMaximumSize(new Dimension(getMapMode().DPtoLP(
-					1000), getMapMode().DPtoLP(15)));
+					1000), getMapMode().DPtoLP(20)));
 			labelContainer0.setMinimumSize(new Dimension(getMapMode().DPtoLP(
-					200), getMapMode().DPtoLP(15)));
+					200), getMapMode().DPtoLP(20)));
 
 			this.add(labelContainer0);
 
-			FlowLayout layoutLabelContainer0 = new FlowLayout();
-			layoutLabelContainer0.setStretchMinorAxis(false);
-			layoutLabelContainer0.setMinorAlignment(FlowLayout.ALIGN_LEFTTOP);
-
-			layoutLabelContainer0.setMajorAlignment(FlowLayout.ALIGN_CENTER);
-			layoutLabelContainer0.setMajorSpacing(0);
-			layoutLabelContainer0.setMinorSpacing(0);
-			layoutLabelContainer0.setHorizontal(true);
-
+			GridLayout layoutLabelContainer0 = new GridLayout();
+			layoutLabelContainer0.numColumns = 3;
+			layoutLabelContainer0.makeColumnsEqualWidth = false;
+			//START: Manja Wolf
+			layoutLabelContainer0.marginHeight = 2;
+			layoutLabelContainer0.marginWidth = 0;
+			layoutLabelContainer0.verticalSpacing = 0;
+			//END: Manja Wolf
 			labelContainer0.setLayoutManager(layoutLabelContainer0);
 
-			WrapLabel ocletName1 = new WrapLabel();
-			ocletName1.setText("");
+			fFigureOcletName = new WrappingLabel();
+			fFigureOcletName.setText("");
 
-			ocletName1.setFont(OCLETNAME1_FONT);
+			fFigureOcletName.setFont(FFIGUREOCLETNAME_FONT);
 
-			labelContainer0.add(ocletName1);
-			fFigureOcletName = ocletName1;
+			GridData constraintFFigureOcletName = new GridData();
+			constraintFFigureOcletName.verticalAlignment = SWT.CENTER;
+			constraintFFigureOcletName.horizontalAlignment = GridData.BEGINNING;
+			constraintFFigureOcletName.horizontalIndent = 10;
+			constraintFFigureOcletName.horizontalSpan = 1;
+			constraintFFigureOcletName.verticalSpan = 1;
+			constraintFFigureOcletName.grabExcessHorizontalSpace = false;
+			constraintFFigureOcletName.grabExcessVerticalSpace = false;
+			labelContainer0.add(fFigureOcletName, constraintFFigureOcletName);
 
-			WrapLabel ocletQuantor1 = new WrapLabel();
-			ocletQuantor1.setText("");
+			fFigureOcletQuantor = new WrappingLabel();
+			fFigureOcletQuantor.setText("");
 
-			labelContainer0.add(ocletQuantor1);
-			fFigureOcletQuantor = ocletQuantor1;
+			GridData constraintFFigureOcletQuantor = new GridData();
+			constraintFFigureOcletQuantor.verticalAlignment = SWT.CENTER;
+			constraintFFigureOcletQuantor.horizontalAlignment = GridData.BEGINNING;
+			constraintFFigureOcletQuantor.horizontalIndent = 0;
+			constraintFFigureOcletQuantor.horizontalSpan = 1;
+			constraintFFigureOcletQuantor.verticalSpan = 1;
+			constraintFFigureOcletQuantor.grabExcessHorizontalSpace = false;
+			constraintFFigureOcletQuantor.grabExcessVerticalSpace = false;
+			labelContainer0.add(fFigureOcletQuantor,
+					constraintFFigureOcletQuantor);
 
-			WrapLabel ocletOrientation1 = new WrapLabel();
-			ocletOrientation1.setText("");
+			fFigureOcletOrientation = new WrappingLabel();
+			fFigureOcletOrientation.setText("");
 
-			labelContainer0.add(ocletOrientation1);
-			fFigureOcletOrientation = ocletOrientation1;
+			GridData constraintFFigureOcletOrientation = new GridData();
+			constraintFFigureOcletOrientation.verticalAlignment = SWT.CENTER;
+			constraintFFigureOcletOrientation.horizontalAlignment = GridData.BEGINNING;
+			constraintFFigureOcletOrientation.horizontalIndent = 0;
+			constraintFFigureOcletOrientation.horizontalSpan = 1;
+			constraintFFigureOcletOrientation.verticalSpan = 1;
+			constraintFFigureOcletOrientation.grabExcessHorizontalSpace = false;
+			constraintFFigureOcletOrientation.grabExcessVerticalSpace = false;
+			labelContainer0.add(fFigureOcletOrientation,
+					constraintFFigureOcletOrientation);
 
-			RectangleFigure ocletBody0 = new RectangleFigure();
-			ocletBody0.setFill(false);
-			ocletBody0.setPreferredSize(new Dimension(getMapMode().DPtoLP(200),
-					getMapMode().DPtoLP(1)));
-			ocletBody0.setMaximumSize(new Dimension(getMapMode().DPtoLP(1000),
-					getMapMode().DPtoLP(1)));
+			fFigureOcletBody = new RectangleFigure();
+			fFigureOcletBody.setFill(false);
+			fFigureOcletBody.setPreferredSize(new Dimension(getMapMode()
+					.DPtoLP(200), getMapMode().DPtoLP(1)));
+			fFigureOcletBody.setMaximumSize(new Dimension(getMapMode().DPtoLP(
+					1000), getMapMode().DPtoLP(1)));
 
-			this.add(ocletBody0);
-			fFigureOcletBody = ocletBody0;
+			this.add(fFigureOcletBody);
 
 		}
 
@@ -375,14 +398,14 @@ public class OcletEditPart extends ShapeNodeEditPart {
 		/**
 		 * @generated
 		 */
-		public WrapLabel getFigureOcletName() {
+		public WrappingLabel getFigureOcletName() {
 			return fFigureOcletName;
 		}
 
 		/**
 		 * @generated
 		 */
-		public WrapLabel getFigureOcletQuantor() {
+		public WrappingLabel getFigureOcletQuantor() {
 			return fFigureOcletQuantor;
 		}
 
@@ -396,7 +419,7 @@ public class OcletEditPart extends ShapeNodeEditPart {
 		/**
 		 * @generated
 		 */
-		public WrapLabel getFigureOcletOrientation() {
+		public WrappingLabel getFigureOcletOrientation() {
 			return fFigureOcletOrientation;
 		}
 
@@ -420,8 +443,8 @@ public class OcletEditPart extends ShapeNodeEditPart {
 	/**
 	 * @generated
 	 */
-	static final Font OCLETNAME1_FONT = new Font(Display.getCurrent(), Display
-			.getDefault().getSystemFont().getFontData()[0].getName(), 9,
+	static final Font FFIGUREOCLETNAME_FONT = new Font(Display.getCurrent(),
+			Display.getDefault().getSystemFont().getFontData()[0].getName(), 9,
 			SWT.BOLD);
 
 }

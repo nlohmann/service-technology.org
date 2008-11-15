@@ -37,4 +37,5 @@ public class EventAPCreateCommand extends CreateElementCommand {
 		return hub.top.adaptiveSystem.AdaptiveSystemPackage.eINSTANCE
 				.getOccurrenceNet();
 	}
+
 }

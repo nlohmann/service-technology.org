@@ -42,7 +42,7 @@ public class ArcToConditionReorientCommand extends EditElementCommand {
 	 * @generated
 	 */
 	public boolean canExecute() {
-		if (!(getElementToEdit() instanceof hub.top.adaptiveSystem.ArcToCondition)) {
+		if (false == getElementToEdit() instanceof hub.top.adaptiveSystem.ArcToCondition) {
 			return false;
 		}
 		if (reorientDirection == ReorientRelationshipRequest.REORIENT_SOURCE) {

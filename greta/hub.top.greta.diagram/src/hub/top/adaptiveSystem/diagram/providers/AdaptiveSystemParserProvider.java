@@ -70,9 +70,9 @@ public class AdaptiveSystemParserProvider extends AbstractProvider implements
 						.getOclet_Orientation(), };
 		hub.top.adaptiveSystem.diagram.parsers.MessageFormatParser parser = new hub.top.adaptiveSystem.diagram.parsers.MessageFormatParser(
 				features);
-		parser.setViewPattern("  [{0} - {1}]");
-		parser.setEditorPattern("  [{0} - {1}]");
-		parser.setEditPattern("  [{0} - {1}]");
+		parser.setViewPattern("[{0} - {1}]");
+		parser.setEditorPattern("[{0} - {1}]");
+		parser.setEditPattern("[{0} - {1}]");
 		return parser;
 	}
 
@@ -469,6 +469,58 @@ public class AdaptiveSystemParserProvider extends AbstractProvider implements
 	/**
 	 * @generated
 	 */
+	private IParser arcToConditionWeight_6001Parser;
+
+	/**
+	 * @generated
+	 */
+	private IParser getArcToConditionWeight_6001Parser() {
+		if (arcToConditionWeight_6001Parser == null) {
+			arcToConditionWeight_6001Parser = createArcToConditionWeight_6001Parser();
+		}
+		return arcToConditionWeight_6001Parser;
+	}
+
+	/**
+	 * @generated
+	 */
+	protected IParser createArcToConditionWeight_6001Parser() {
+		EAttribute[] features = new EAttribute[] { hub.top.adaptiveSystem.AdaptiveSystemPackage.eINSTANCE
+				.getArc_Weight(), };
+		hub.top.adaptiveSystem.diagram.parsers.MessageFormatParser parser = new hub.top.adaptiveSystem.diagram.parsers.MessageFormatParser(
+				features);
+		return parser;
+	}
+
+	/**
+	 * @generated
+	 */
+	private IParser arcToEventWeight_6002Parser;
+
+	/**
+	 * @generated
+	 */
+	private IParser getArcToEventWeight_6002Parser() {
+		if (arcToEventWeight_6002Parser == null) {
+			arcToEventWeight_6002Parser = createArcToEventWeight_6002Parser();
+		}
+		return arcToEventWeight_6002Parser;
+	}
+
+	/**
+	 * @generated
+	 */
+	protected IParser createArcToEventWeight_6002Parser() {
+		EAttribute[] features = new EAttribute[] { hub.top.adaptiveSystem.AdaptiveSystemPackage.eINSTANCE
+				.getArc_Weight(), };
+		hub.top.adaptiveSystem.diagram.parsers.MessageFormatParser parser = new hub.top.adaptiveSystem.diagram.parsers.MessageFormatParser(
+				features);
+		return parser;
+	}
+
+	/**
+	 * @generated
+	 */
 	protected IParser getParser(int visualID) {
 		switch (visualID) {
 		case hub.top.adaptiveSystem.diagram.edit.parts.OcletNameEditPart.VISUAL_ID:
@@ -505,6 +557,10 @@ public class AdaptiveSystemParserProvider extends AbstractProvider implements
 			return getEventName_4014Parser();
 		case hub.top.adaptiveSystem.diagram.edit.parts.EventDoNetTempEditPart.VISUAL_ID:
 			return getEventTemp_4015Parser();
+		case hub.top.adaptiveSystem.diagram.edit.parts.ArcToConditionWeightEditPart.VISUAL_ID:
+			return getArcToConditionWeight_6001Parser();
+		case hub.top.adaptiveSystem.diagram.edit.parts.ArcToEventWeightEditPart.VISUAL_ID:
+			return getArcToEventWeight_6002Parser();
 		}
 		return null;
 	}

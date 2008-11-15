@@ -63,11 +63,12 @@ public class ArcToConditionCreateCommand extends CreateElementCommand {
 		if (source == null && target == null) {
 			return false;
 		}
-		if (source != null && !(source instanceof hub.top.adaptiveSystem.Event)) {
+		if (source != null
+				&& false == source instanceof hub.top.adaptiveSystem.Event) {
 			return false;
 		}
 		if (target != null
-				&& !(target instanceof hub.top.adaptiveSystem.Condition)) {
+				&& false == target instanceof hub.top.adaptiveSystem.Condition) {
 			return false;
 		}
 		if (getSource() == null) {
@@ -86,7 +87,6 @@ public class ArcToConditionCreateCommand extends CreateElementCommand {
 	 * @generated
 	 */
 	protected EObject doDefaultElementCreation() {
-		// hub.top.adaptiveSystem.ArcToCondition newElement = (hub.top.adaptiveSystem.ArcToCondition) super.doDefaultElementCreation();
 		hub.top.adaptiveSystem.ArcToCondition newElement = hub.top.adaptiveSystem.AdaptiveSystemFactory.eINSTANCE
 				.createArcToCondition();
 		getContainer().getArcs().add(newElement);

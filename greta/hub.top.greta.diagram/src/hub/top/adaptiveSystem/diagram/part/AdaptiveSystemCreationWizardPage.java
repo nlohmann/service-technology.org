@@ -63,8 +63,9 @@ public class AdaptiveSystemCreationWizardPage extends WizardNewFileCreationPage 
 	 */
 	public void createControl(Composite parent) {
 		super.createControl(parent);
-		setFileName(AdaptiveSystemDiagramEditorUtil.getUniqueFileName(
-				getContainerFullPath(), getFileName(), getExtension()));
+		setFileName(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorUtil
+				.getUniqueFileName(getContainerFullPath(), getFileName(),
+						getExtension()));
 		setPageComplete(validatePage());
 	}
 
@@ -78,8 +79,10 @@ public class AdaptiveSystemCreationWizardPage extends WizardNewFileCreationPage 
 		String extension = getExtension();
 		if (extension != null
 				&& !getFilePath().toString().endsWith("." + extension)) {
-			setErrorMessage(NLS.bind(
-					"File name should have ''{0}'' extension.", extension));
+			setErrorMessage(NLS
+					.bind(
+							hub.top.adaptiveSystem.diagram.part.Messages.AdaptiveSystemCreationWizardPageExtensionError,
+							extension));
 			return false;
 		}
 		return true;

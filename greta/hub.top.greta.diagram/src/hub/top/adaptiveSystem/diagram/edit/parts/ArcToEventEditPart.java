@@ -16,9 +16,12 @@ import org.eclipse.emf.common.command.CommandStack;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ConnectionNodeEditPart;
+import org.eclipse.gmf.runtime.diagram.ui.editparts.ITreeBranchEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.PolylineConnectionEx;
+import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.gmf.runtime.notation.Edge;
 import org.eclipse.gmf.runtime.notation.Node;
 import org.eclipse.gmf.runtime.notation.View;
@@ -27,7 +30,8 @@ import org.eclipse.swt.graphics.Color;
 /**
  * @generated
  */
-public class ArcToEventEditPart extends ConnectionNodeEditPart {
+public class ArcToEventEditPart extends ConnectionNodeEditPart implements
+		ITreeBranchEditPart {
 
 	/**
 	 * @generated
@@ -49,6 +53,23 @@ public class ArcToEventEditPart extends ConnectionNodeEditPart {
 		installEditPolicy(
 				EditPolicyRoles.SEMANTIC_ROLE,
 				new hub.top.adaptiveSystem.diagram.edit.policies.ArcToEventItemSemanticEditPolicy());
+	}
+
+	/**
+	 * @generated
+	 */
+	protected boolean addFixedChild(EditPart childEditPart) {
+		return false;
+	}
+
+	/**
+	 * @generated
+	 */
+	protected void addChildVisual(EditPart childEditPart, int index) {
+		if (addFixedChild(childEditPart)) {
+			return;
+		}
+		super.addChildVisual(childEditPart, -1);
 	}
 
 	/**
@@ -132,7 +153,6 @@ public class ArcToEventEditPart extends ConnectionNodeEditPart {
 				.getPrimaryShape().updateFace();
 	}
 
-	
 	/**
 	 * @generated
 	 */
@@ -178,7 +198,7 @@ public class ArcToEventEditPart extends ConnectionNodeEditPart {
 			}
 
 		}
-		
+
 		/**
 		 * @generated
 		 */

@@ -23,6 +23,46 @@ public class Messages extends NLS {
 	/**
 	 * @generated
 	 */
+	public static String AdaptiveSystemCreationWizardTitle;
+
+	/**
+	 * @generated
+	 */
+	public static String AdaptiveSystemCreationWizard_DiagramModelFilePageTitle;
+
+	/**
+	 * @generated
+	 */
+	public static String AdaptiveSystemCreationWizard_DiagramModelFilePageDescription;
+
+	/**
+	 * @generated
+	 */
+	public static String AdaptiveSystemCreationWizard_DomainModelFilePageTitle;
+
+	/**
+	 * @generated
+	 */
+	public static String AdaptiveSystemCreationWizard_DomainModelFilePageDescription;
+
+	/**
+	 * @generated
+	 */
+	public static String AdaptiveSystemCreationWizardOpenEditorError;
+
+	/**
+	 * @generated
+	 */
+	public static String AdaptiveSystemCreationWizardCreationError;
+
+	/**
+	 * @generated
+	 */
+	public static String AdaptiveSystemCreationWizardPageExtensionError;
+
+	/**
+	 * @generated
+	 */
 	public static String AdaptiveSystemDiagramEditorUtil_OpenModelResourceErrorDialogTitle;
 
 	/**
@@ -189,6 +229,16 @@ public class Messages extends NLS {
 	 * @generated
 	 */
 	public static String AdaptiveSystemElementChooserDialog_SelectModelElementTitle;
+
+	/**
+	 * @generated
+	 */
+	public static String ModelElementSelectionPageMessage;
+
+	/**
+	 * @generated
+	 */
+	public static String ValidateActionMessage;
 
 	/**
 	 * @generated
@@ -364,6 +414,36 @@ public class Messages extends NLS {
 	 * @generated
 	 */
 	public static String NavigatorActionProvider_OpenDiagramActionName;
+
+	/**
+	 * @generated
+	 */
+	public static String AbstractParser_UnexpectedValueTypeMessage;
+
+	/**
+	 * @generated
+	 */
+	public static String AbstractParser_WrongStringConversionMessage;
+
+	/**
+	 * @generated
+	 */
+	public static String AbstractParser_UnknownLiteralMessage;
+
+	/**
+	 * @generated
+	 */
+	public static String MessageFormatParser_InvalidInputError;
+
+	/**
+	 * @generated
+	 */
+	public static String AdaptiveSystemModelingAssistantProviderTitle;
+
+	/**
+	 * @generated
+	 */
+	public static String AdaptiveSystemModelingAssistantProviderMessage;
 
 	//TODO: put accessor fields manually	
 }

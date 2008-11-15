@@ -8,7 +8,7 @@ import hub.top.adaptiveSystem.ArcToEvent;
 import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Oclet;
 
-import org.eclipse.draw2d.BorderLayout;
+import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Ellipse;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.PositionConstants;
@@ -33,7 +33,7 @@ import org.eclipse.gmf.runtime.diagram.ui.editpolicies.BorderItemSelectionEditPo
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
 import org.eclipse.gmf.runtime.diagram.ui.figures.BorderItemLocator;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.ConstrainedToolbarLayout;
-import org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel;
+import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
 import org.eclipse.gmf.runtime.notation.Bounds;
@@ -72,7 +72,6 @@ public class ConditionDoNetEditPart extends AbstractBorderedShapeEditPart {
 	 * @generated
 	 */
 	protected void createDefaultEditPolicies() {
-
 		super.createDefaultEditPolicies();
 		installEditPolicy(
 				EditPolicyRoles.SEMANTIC_ROLE,
@@ -481,10 +480,8 @@ public class ConditionDoNetEditPart extends AbstractBorderedShapeEditPart {
 			}
 
 			if (adaptiveSystem.isSetWellformednessToOclets()) {
-				SetCommand cmd = new SetCommand(
-						this.getEditingDomain(),
-						adaptiveSystem,
-						AdaptiveSystemPackage.eINSTANCE
+				SetCommand cmd = new SetCommand(this.getEditingDomain(),
+						adaptiveSystem, AdaptiveSystemPackage.eINSTANCE
 								.getAdaptiveSystem_SetWellformednessToOclets(),
 						false);
 				cmd.setLabel("set adaptive process attribute "
@@ -500,8 +497,8 @@ public class ConditionDoNetEditPart extends AbstractBorderedShapeEditPart {
 						AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed(),
 						false);
 				cmd.setLabel("set oclet attribute "
-						+ AdaptiveSystemPackage.eINSTANCE
-								.getOclet_WellFormed().getName());
+						+ AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed()
+								.getName());
 				cmd.canExecute();
 				((CommandStack) ((EditingDomain) this.getEditingDomain())
 						.getCommandStack()).execute(cmd);
@@ -521,16 +518,13 @@ public class ConditionDoNetEditPart extends AbstractBorderedShapeEditPart {
 		/**
 		 * @generated
 		 */
-		private WrapLabel fFigureToken;
+		private WrappingLabel fFigureToken;
 
 		/**
 		 * @generated NOT
 		 */
 		public ConditionDescriptor() {
-
-			BorderLayout layoutThis = new BorderLayout();
-			this.setLayoutManager(layoutThis);
-
+			this.setForegroundColor(ColorConstants.black);
 			this.setPreferredSize(new Dimension(getMapMode().DPtoLP(20),
 					getMapMode().DPtoLP(20)));
 			this.setMaximumSize(new Dimension(getMapMode().DPtoLP(20),
@@ -541,15 +535,18 @@ public class ConditionDoNetEditPart extends AbstractBorderedShapeEditPart {
 		}
 
 		/**
-		 * @generated
+		 * @generated NOT
 		 */
 		private void createContents() {
 
-			WrapLabel token0 = new WrapLabel();
-			token0.setText("");
+			fFigureToken = new WrappingLabel();
+			fFigureToken.setText("");
+			//START: Manja Wolf
+			//centering token
+			fFigureToken.setAlignment(PositionConstants.CENTER);
+			//END: Manja Wolf
 
-			this.add(token0, BorderLayout.CENTER);
-			fFigureToken = token0;
+			this.add(fFigureToken);
 
 		}
 
@@ -575,7 +572,7 @@ public class ConditionDoNetEditPart extends AbstractBorderedShapeEditPart {
 		/**
 		 * @generated
 		 */
-		public WrapLabel getFigureToken() {
+		public WrappingLabel getFigureToken() {
 			return fFigureToken;
 		}
 

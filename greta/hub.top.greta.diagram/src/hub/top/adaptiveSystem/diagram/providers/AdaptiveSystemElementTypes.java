@@ -46,50 +46,62 @@ public class AdaptiveSystemElementTypes extends ElementInitializers {
 	 * @generated
 	 */
 	public static final IElementType AdaptiveSystem_79 = getElementType("hub.top.GRETA.diagram.AdaptiveSystem_79"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
 	public static final IElementType AdaptiveProcess_1001 = getElementType("hub.top.GRETA.diagram.AdaptiveProcess_1001"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
 	public static final IElementType Oclet_1002 = getElementType("hub.top.GRETA.diagram.Oclet_1002"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
 	public static final IElementType Condition_2001 = getElementType("hub.top.GRETA.diagram.Condition_2001"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
 	public static final IElementType Event_2002 = getElementType("hub.top.GRETA.diagram.Event_2002"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
 	public static final IElementType PreNet_2003 = getElementType("hub.top.GRETA.diagram.PreNet_2003"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
 	public static final IElementType Condition_2004 = getElementType("hub.top.GRETA.diagram.Condition_2004"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
 	public static final IElementType Event_2005 = getElementType("hub.top.GRETA.diagram.Event_2005"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
 	public static final IElementType DoNet_2006 = getElementType("hub.top.GRETA.diagram.DoNet_2006"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
 	public static final IElementType Condition_2007 = getElementType("hub.top.GRETA.diagram.Condition_2007"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
 	public static final IElementType Event_2008 = getElementType("hub.top.GRETA.diagram.Event_2008"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
 	public static final IElementType ArcToCondition_3001 = getElementType("hub.top.GRETA.diagram.ArcToCondition_3001"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */

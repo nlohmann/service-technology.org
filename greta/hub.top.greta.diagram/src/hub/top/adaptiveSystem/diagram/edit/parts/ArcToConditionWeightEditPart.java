@@ -1,17 +1,13 @@
 package hub.top.adaptiveSystem.diagram.edit.parts;
 
-import hub.top.adaptiveSystem.Condition;
-import hub.top.adaptiveSystem.Temp;
-
 import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.draw2d.ConnectionLocator;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Point;
-import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.transaction.RunnableWithResult;
@@ -25,12 +21,10 @@ import org.eclipse.gmf.runtime.common.ui.services.parser.IParserEditStatus;
 import org.eclipse.gmf.runtime.common.ui.services.parser.ParserEditStatus;
 import org.eclipse.gmf.runtime.common.ui.services.parser.ParserOptions;
 import org.eclipse.gmf.runtime.common.ui.services.parser.ParserService;
-import org.eclipse.gmf.runtime.diagram.ui.editparts.IBorderItemEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ITextAwareEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.LabelEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.LabelDirectEditPolicy;
-import org.eclipse.gmf.runtime.diagram.ui.figures.IBorderItemLocator;
 import org.eclipse.gmf.runtime.diagram.ui.l10n.DiagramColorRegistry;
 import org.eclipse.gmf.runtime.diagram.ui.requests.RequestConstants;
 import org.eclipse.gmf.runtime.diagram.ui.tools.TextDirectEditManager;
@@ -45,21 +39,19 @@ import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * @generated
  */
-public class ConditionPreNetTempEditPart extends LabelEditPart implements
-		ITextAwareEditPart, IBorderItemEditPart {
+public class ArcToConditionWeightEditPart extends LabelEditPart implements
+		ITextAwareEditPart {
 
 	/**
 	 * @generated
 	 */
-	public static final int VISUAL_ID = 4007;
+	public static final int VISUAL_ID = 6001;
 
 	/**
 	 * @generated
@@ -87,14 +79,14 @@ public class ConditionPreNetTempEditPart extends LabelEditPart implements
 	static {
 		registerSnapBackPosition(
 				hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry
-						.getType(hub.top.adaptiveSystem.diagram.edit.parts.ConditionPreNetTempEditPart.VISUAL_ID),
-				new Point(0, 0));
+						.getType(hub.top.adaptiveSystem.diagram.edit.parts.ArcToConditionWeightEditPart.VISUAL_ID),
+				new Point(0, 6));
 	}
 
 	/**
 	 * @generated
 	 */
-	public ConditionPreNetTempEditPart(View view) {
+	public ArcToConditionWeightEditPart(View view) {
 		super(view);
 	}
 
@@ -110,30 +102,8 @@ public class ConditionPreNetTempEditPart extends LabelEditPart implements
 	/**
 	 * @generated
 	 */
-	public IBorderItemLocator getBorderItemLocator() {
-		IFigure parentFigure = getFigure().getParent();
-		if (parentFigure != null && parentFigure.getLayoutManager() != null) {
-			Object constraint = parentFigure.getLayoutManager().getConstraint(
-					getFigure());
-			return (IBorderItemLocator) constraint;
-		}
-		return null;
-	}
-
-	/**
-	 * @generated
-	 */
-	public void refreshBounds() {
-		int x = ((Integer) getStructuralFeatureValue(NotationPackage.eINSTANCE
-				.getLocation_X())).intValue();
-		int y = ((Integer) getStructuralFeatureValue(NotationPackage.eINSTANCE
-				.getLocation_Y())).intValue();
-		int width = ((Integer) getStructuralFeatureValue(NotationPackage.eINSTANCE
-				.getSize_Width())).intValue();
-		int height = ((Integer) getStructuralFeatureValue(NotationPackage.eINSTANCE
-				.getSize_Height())).intValue();
-		getBorderItemLocator()
-				.setConstraint(new Rectangle(x, y, width, height));
+	public int getKeyPoint() {
+		return ConnectionLocator.MIDDLE;
 	}
 
 	/**
@@ -220,7 +190,7 @@ public class ConditionPreNetTempEditPart extends LabelEditPart implements
 	}
 
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	protected String getLabelText() {
 		String text = null;
@@ -233,6 +203,13 @@ public class ConditionPreNetTempEditPart extends LabelEditPart implements
 		if (text == null || text.length() == 0) {
 			text = defaultText;
 		}
+		//START: Manja Wolf
+		// in case of the default value "0", do not
+		// print the label
+		if (text == null || text.length() == 0 || text.equals("1")) {
+			text = "";
+		}
+		//End: Manja Wolf
 		return text;
 	}
 
@@ -325,7 +302,7 @@ public class ConditionPreNetTempEditPart extends LabelEditPart implements
 		if (parser == null) {
 			String parserHint = ((View) getModel()).getType();
 			IAdaptable hintAdapter = new hub.top.adaptiveSystem.diagram.providers.AdaptiveSystemParserProvider.HintAdapter(
-					hub.top.adaptiveSystem.diagram.providers.AdaptiveSystemElementTypes.Condition_2004,
+					hub.top.adaptiveSystem.diagram.providers.AdaptiveSystemElementTypes.ArcToCondition_3001,
 					getParserElement(), parserHint);
 			parser = ParserService.getInstance().getParser(hintAdapter);
 		}
@@ -477,31 +454,6 @@ public class ConditionPreNetTempEditPart extends LabelEditPart implements
 		}
 	}
 
-	/** 
-	 * Refresh the editpart's figure font color. 
-	 * Override the standard method to set the font color 
-	 * @generated NOT
-	 */
-	@Override
-	protected void refreshFontColor() {
-		View view = (View) this.getParent().getModel();
-		Condition condition = (Condition) view.getElement();
-		if (condition.isSetDisabledByAntiOclet()
-				&& condition.isDisabledByAntiOclet()
-				|| condition.isSetDisabledByConflict()
-				&& condition.isDisabledByConflict()) {
-			setFontColor(ColorConstants.lightGray);
-		} else {
-			if (condition.getTemp().equals(Temp.COLD))
-				setFontColor(ColorConstants.blue);
-			if (condition.getTemp().equals(Temp.HOT))
-				setFontColor(ColorConstants.red);
-			if (condition.getTemp().equals(Temp.WITHOUT))
-				setFontColor(ColorConstants.black);
-		}
-
-	}
-
 	/**
 	 * @generated
 	 */
@@ -558,11 +510,11 @@ public class ConditionPreNetTempEditPart extends LabelEditPart implements
 	 * @generated
 	 */
 	private View getFontStyleOwnerView() {
-		return (View) getModel();
+		return getPrimaryView();
 	}
 
 	/**
-	 * @generated NOT
+	 * @generated
 	 */
 	protected void handleNotificationEvent(Notification event) {
 		Object feature = event.getFeature();
@@ -601,12 +553,6 @@ public class ConditionPreNetTempEditPart extends LabelEditPart implements
 				}
 			}
 		}
-		//START: Manja Wolf
-		//set the color of the label depending on condition attributes 
-		if (event.getNotifier() instanceof Condition) {
-			refreshFontColor();
-		}
-		//END: Manja Wolf
 		super.handleNotificationEvent(event);
 	}
 
@@ -623,30 +569,7 @@ public class ConditionPreNetTempEditPart extends LabelEditPart implements
 	 * @generated
 	 */
 	protected IFigure createFigurePrim() {
-		return new ConditionTempDescriptor();
+		return new WrappingLabel();
 	}
-
-	/**
-	 * @generated
-	 */
-	public class ConditionTempDescriptor extends WrappingLabel {
-
-		/**
-		 * @generated
-		 */
-		public ConditionTempDescriptor() {
-			this.setText("");
-
-			this.setFont(THIS_FONT);
-
-		}
-
-	}
-
-	/**
-	 * @generated
-	 */
-	static final Font THIS_FONT = new Font(Display.getCurrent(), "normal13",
-			13, SWT.NORMAL);
 
 }

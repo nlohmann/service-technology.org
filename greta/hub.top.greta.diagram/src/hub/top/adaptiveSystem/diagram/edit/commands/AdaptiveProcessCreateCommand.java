@@ -33,14 +33,6 @@ public class AdaptiveProcessCreateCommand extends CreateElementCommand {
 	/**
 	 * @generated
 	 */
-	protected EClass getEClassToEdit() {
-		return hub.top.adaptiveSystem.AdaptiveSystemPackage.eINSTANCE
-				.getAdaptiveSystem();
-	}
-
-	/**
-	 * @generated
-	 */
 	public boolean canExecute() {
 		hub.top.adaptiveSystem.AdaptiveSystem container = (hub.top.adaptiveSystem.AdaptiveSystem) getElementToEdit();
 		if (container.getAdaptiveProcess() != null) {
@@ -48,4 +40,13 @@ public class AdaptiveProcessCreateCommand extends CreateElementCommand {
 		}
 		return true;
 	}
+
+	/**
+	 * @generated
+	 */
+	protected EClass getEClassToEdit() {
+		return hub.top.adaptiveSystem.AdaptiveSystemPackage.eINSTANCE
+				.getAdaptiveSystem();
+	}
+
 }

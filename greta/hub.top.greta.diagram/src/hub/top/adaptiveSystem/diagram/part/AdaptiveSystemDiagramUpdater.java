@@ -676,7 +676,7 @@ public class AdaptiveSystemDiagramUpdater {
 			hub.top.adaptiveSystem.OccurrenceNet container) {
 		Collection result = new LinkedList();
 		for (Iterator links = container.getArcs().iterator(); links.hasNext();) {
-			Object linkObject = links.next();
+			EObject linkObject = (EObject) links.next();
 			if (false == linkObject instanceof hub.top.adaptiveSystem.ArcToCondition) {
 				continue;
 			}
@@ -705,7 +705,7 @@ public class AdaptiveSystemDiagramUpdater {
 			hub.top.adaptiveSystem.OccurrenceNet container) {
 		Collection result = new LinkedList();
 		for (Iterator links = container.getArcs().iterator(); links.hasNext();) {
-			Object linkObject = links.next();
+			EObject linkObject = (EObject) links.next();
 			if (false == linkObject instanceof hub.top.adaptiveSystem.ArcToEvent) {
 				continue;
 			}
@@ -813,7 +813,7 @@ public class AdaptiveSystemDiagramUpdater {
 		}
 		Collection result = new LinkedList();
 		for (Iterator links = container.getArcs().iterator(); links.hasNext();) {
-			Object linkObject = links.next();
+			EObject linkObject = (EObject) links.next();
 			if (false == linkObject instanceof hub.top.adaptiveSystem.ArcToCondition) {
 				continue;
 			}
@@ -858,7 +858,7 @@ public class AdaptiveSystemDiagramUpdater {
 		}
 		Collection result = new LinkedList();
 		for (Iterator links = container.getArcs().iterator(); links.hasNext();) {
-			Object linkObject = links.next();
+			EObject linkObject = (EObject) links.next();
 			if (false == linkObject instanceof hub.top.adaptiveSystem.ArcToEvent) {
 				continue;
 			}

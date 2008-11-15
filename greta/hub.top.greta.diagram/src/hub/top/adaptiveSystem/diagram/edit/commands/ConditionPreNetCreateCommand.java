@@ -37,4 +37,5 @@ public class ConditionPreNetCreateCommand extends CreateElementCommand {
 		return hub.top.adaptiveSystem.AdaptiveSystemPackage.eINSTANCE
 				.getOccurrenceNet();
 	}
+
 }

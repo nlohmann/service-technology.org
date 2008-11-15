@@ -45,13 +45,11 @@ public class AdaptiveSystemEditPart extends DiagramEditPart {
 				&& notification.getOldValue() == null) {
 			//after creating a new oclet, the wellformedness should be checked
 			//System.out.println("a new oclet instanciated.");
-			AdaptiveSystem adaptiveSystem= (AdaptiveSystem) ((Diagram) this
+			AdaptiveSystem adaptiveSystem = (AdaptiveSystem) ((Diagram) this
 					.getModel()).getElement();
 			if (adaptiveSystem.isSetWellformednessToOclets()) {
-				SetCommand cmd = new SetCommand(
-						this.getEditingDomain(),
-						adaptiveSystem,
-						AdaptiveSystemPackage.eINSTANCE
+				SetCommand cmd = new SetCommand(this.getEditingDomain(),
+						adaptiveSystem, AdaptiveSystemPackage.eINSTANCE
 								.getAdaptiveSystem_SetWellformednessToOclets(),
 						false);
 				cmd.setLabel("set adaptive process attribute "
@@ -65,7 +63,7 @@ public class AdaptiveSystemEditPart extends DiagramEditPart {
 		}
 		super.handleNotificationEvent(notification);
 	}
-	
+
 	/**
 	 * @generated
 	 */

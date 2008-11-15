@@ -10,6 +10,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gmf.runtime.common.core.command.ICommand;
 import org.eclipse.gmf.runtime.common.ui.services.parser.IParserEditStatus;
 import org.eclipse.gmf.runtime.common.ui.services.parser.ParserEditStatus;
+import org.eclipse.osgi.util.NLS;
 
 /**
  * @generated
@@ -190,8 +191,11 @@ public class MessageFormatParser extends
 		if (values == null) {
 			return new ParserEditStatus(
 					hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin.ID,
-					IParserEditStatus.UNEDITABLE, "Invalid input at "
-							+ pos.getErrorIndex());
+					IParserEditStatus.UNEDITABLE,
+					NLS
+							.bind(
+									hub.top.adaptiveSystem.diagram.part.Messages.MessageFormatParser_InvalidInputError,
+									new Integer(pos.getErrorIndex())));
 		}
 		return validateNewValues(values);
 	}

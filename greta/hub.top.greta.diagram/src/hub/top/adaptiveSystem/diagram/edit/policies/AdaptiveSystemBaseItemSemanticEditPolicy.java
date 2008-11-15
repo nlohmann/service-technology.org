@@ -2,7 +2,6 @@ package hub.top.adaptiveSystem.diagram.edit.policies;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -109,23 +108,23 @@ public class AdaptiveSystemBaseItemSemanticEditPolicy extends
 			elementType = null;
 		}
 		Command semanticCommand = getSemanticCommandSwitch(completedRequest);
-		if (semanticCommand != null) {
-			ICommand command = semanticCommand instanceof ICommandProxy ? ((ICommandProxy) semanticCommand)
-					.getICommand()
-					: new CommandProxy(semanticCommand);
-			completedRequest
-					.setParameter(
-							hub.top.adaptiveSystem.diagram.edit.helpers.AdaptiveSystemBaseEditHelper.EDIT_POLICY_COMMAND,
-							command);
-		}
 		if (elementType != null) {
+			if (semanticCommand != null) {
+				ICommand command = semanticCommand instanceof ICommandProxy ? ((ICommandProxy) semanticCommand)
+						.getICommand()
+						: new CommandProxy(semanticCommand);
+				completedRequest
+						.setParameter(
+								hub.top.adaptiveSystem.diagram.edit.helpers.AdaptiveSystemBaseEditHelper.EDIT_POLICY_COMMAND,
+								command);
+			}
 			ICommand command = elementType.getEditCommand(completedRequest);
 			if (command != null) {
 				if (!(command instanceof CompositeTransactionalCommand)) {
 					TransactionalEditingDomain editingDomain = ((IGraphicalEditPart) getHost())
 							.getEditingDomain();
 					command = new CompositeTransactionalCommand(editingDomain,
-							null).compose(command);
+							command.getLabel()).compose(command);
 				}
 				semanticCommand = new ICommandProxy(command);
 			}
@@ -343,6 +342,7 @@ public class AdaptiveSystemBaseItemSemanticEditPolicy extends
 	 * @generated
 	 */
 	public static class LinkConstraints {
+
 		/**
 		 * @generated
 		 */
@@ -375,6 +375,7 @@ public class AdaptiveSystemBaseItemSemanticEditPolicy extends
 				hub.top.adaptiveSystem.OccurrenceNet container,
 				hub.top.adaptiveSystem.Event source,
 				hub.top.adaptiveSystem.Condition target) {
+
 			return true;
 		}
 
@@ -385,32 +386,9 @@ public class AdaptiveSystemBaseItemSemanticEditPolicy extends
 				hub.top.adaptiveSystem.OccurrenceNet container,
 				hub.top.adaptiveSystem.Condition source,
 				hub.top.adaptiveSystem.Event target) {
+
 			return true;
 		}
-
-		/**
-		 * @generated
-		 */
-		private static boolean evaluate(
-				hub.top.adaptiveSystem.diagram.expressions.AdaptiveSystemAbstractExpression constraint,
-				Object sourceEnd, Object oppositeEnd, boolean clearEnv) {
-			if (sourceEnd == null) {
-				return true;
-			}
-			Map evalEnv = Collections.singletonMap(OPPOSITE_END_VAR,
-					oppositeEnd);
-			try {
-				Object val = constraint.evaluate(sourceEnd, evalEnv);
-				return (val instanceof Boolean) ? ((Boolean) val)
-						.booleanValue() : false;
-			} catch (Exception e) {
-				hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
-						.getInstance().logError(
-								"Link constraint evaluation error", e); //$NON-NLS-1$
-				return false;
-			}
-		}
-
 	}
 
 }

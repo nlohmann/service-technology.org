@@ -33,14 +33,6 @@ public class PreNetCreateCommand extends CreateElementCommand {
 	/**
 	 * @generated
 	 */
-	protected EClass getEClassToEdit() {
-		return hub.top.adaptiveSystem.AdaptiveSystemPackage.eINSTANCE
-				.getOclet();
-	}
-
-	/**
-	 * @generated
-	 */
 	public boolean canExecute() {
 		hub.top.adaptiveSystem.Oclet container = (hub.top.adaptiveSystem.Oclet) getElementToEdit();
 		if (container.getPreNet() != null) {
@@ -48,4 +40,13 @@ public class PreNetCreateCommand extends CreateElementCommand {
 		}
 		return true;
 	}
+
+	/**
+	 * @generated
+	 */
+	protected EClass getEClassToEdit() {
+		return hub.top.adaptiveSystem.AdaptiveSystemPackage.eINSTANCE
+				.getOclet();
+	}
+
 }

@@ -10,15 +10,23 @@ import hub.top.adaptiveSystem.Oclet;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Connection;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.PolylineDecoration;
+import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RotatableDecoration;
+import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.emf.common.command.CommandStack;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ConnectionNodeEditPart;
+import org.eclipse.gmf.runtime.diagram.ui.editparts.IBorderItemEditPart;
+import org.eclipse.gmf.runtime.diagram.ui.editparts.ITreeBranchEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
+import org.eclipse.gmf.runtime.diagram.ui.figures.BorderItemLocator;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.PolylineConnectionEx;
+import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.gmf.runtime.notation.Edge;
 import org.eclipse.gmf.runtime.notation.Node;
 import org.eclipse.gmf.runtime.notation.View;
@@ -27,7 +35,8 @@ import org.eclipse.swt.graphics.Color;
 /**
  * @generated
  */
-public class ArcToConditionEditPart extends ConnectionNodeEditPart {
+public class ArcToConditionEditPart extends ConnectionNodeEditPart implements
+		ITreeBranchEditPart {
 
 	/**
 	 * @generated
@@ -49,6 +58,23 @@ public class ArcToConditionEditPart extends ConnectionNodeEditPart {
 		installEditPolicy(
 				EditPolicyRoles.SEMANTIC_ROLE,
 				new hub.top.adaptiveSystem.diagram.edit.policies.ArcToConditionItemSemanticEditPolicy());
+	}
+
+	/**
+	 * @generated
+	 */
+	protected boolean addFixedChild(EditPart childEditPart) {
+		return false;
+	}
+
+	/**
+	 * @generated
+	 */
+	protected void addChildVisual(EditPart childEditPart, int index) {
+		if (addFixedChild(childEditPart)) {
+			return;
+		}
+		super.addChildVisual(childEditPart, -1);
 	}
 
 	/**
@@ -132,8 +158,7 @@ public class ArcToConditionEditPart extends ConnectionNodeEditPart {
 		((OcletEditPart) this.getSource().getParent().getParent().getParent())
 				.getPrimaryShape().updateFace();
 	}
-	
-	
+
 	/**
 	 * @generated
 	 */
@@ -180,7 +205,7 @@ public class ArcToConditionEditPart extends ConnectionNodeEditPart {
 			}
 
 		}
-		
+
 		/**
 		 * @generated
 		 */

@@ -45,10 +45,9 @@ public class DoNetCompartmentCanonicalEditPolicy extends CanonicalEditPolicy {
 		switch (visualID) {
 		case hub.top.adaptiveSystem.diagram.edit.parts.ConditionDoNetEditPart.VISUAL_ID:
 		case hub.top.adaptiveSystem.diagram.edit.parts.EventDoNetEditPart.VISUAL_ID:
-			return !semanticChildren.contains(view.getElement())
-					|| visualID != hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry
-							.getNodeVisualID((View) getHost().getModel(), view
-									.getElement());
+			if (!semanticChildren.contains(view.getElement())) {
+				return true;
+			}
 		}
 		return false;
 	}

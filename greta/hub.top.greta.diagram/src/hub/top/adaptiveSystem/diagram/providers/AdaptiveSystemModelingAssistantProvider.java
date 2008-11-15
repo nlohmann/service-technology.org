@@ -550,8 +550,10 @@ public class AdaptiveSystemModelingAssistantProvider extends
 						.getInstance().getItemProvidersAdapterFactory());
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(
 				shell, labelProvider);
-		dialog.setMessage("Available domain model elements:");
-		dialog.setTitle("Select domain model element");
+		dialog
+				.setMessage(hub.top.adaptiveSystem.diagram.part.Messages.AdaptiveSystemModelingAssistantProviderMessage);
+		dialog
+				.setTitle(hub.top.adaptiveSystem.diagram.part.Messages.AdaptiveSystemModelingAssistantProviderTitle);
 		dialog.setMultipleSelection(false);
 		dialog.setElements(elements);
 		EObject selected = null;

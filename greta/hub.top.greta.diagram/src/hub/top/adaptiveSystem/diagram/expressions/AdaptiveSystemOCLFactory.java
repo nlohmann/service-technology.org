@@ -1,87 +1,79 @@
 package hub.top.adaptiveSystem.diagram.expressions;
 
 import java.lang.ref.WeakReference;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
-
 import org.eclipse.emf.ecore.EClassifier;
-import org.eclipse.emf.ecore.EEnum;
-import org.eclipse.emf.ecore.EEnumLiteral;
-import org.eclipse.emf.ecore.ETypedElement;
-
 import org.eclipse.ocl.Environment;
 import org.eclipse.ocl.EvaluationEnvironment;
 import org.eclipse.ocl.ParserException;
 import org.eclipse.ocl.Query;
-
 import org.eclipse.ocl.ecore.EcoreFactory;
-import org.eclipse.ocl.ecore.OCL;
-
 import org.eclipse.ocl.expressions.OCLExpression;
 import org.eclipse.ocl.expressions.OperationCallExp;
 import org.eclipse.ocl.expressions.Variable;
-
 import org.eclipse.ocl.helper.OCLHelper;
-
 import org.eclipse.ocl.utilities.AbstractVisitor;
 import org.eclipse.ocl.utilities.PredefinedType;
 
 /**
- * @generated 
+ * @generated
  */
 public class AdaptiveSystemOCLFactory {
 
 	/**
-	 * @generated 
+	 * @generated
 	 */
 	private AdaptiveSystemOCLFactory() {
 	}
 
 	/**
-	 * @generated 
+	 * @generated
 	 */
-	public static AdaptiveSystemAbstractExpression getExpression(String body,
-			EClassifier context, Map environment) {
+	public static hub.top.adaptiveSystem.diagram.expressions.AdaptiveSystemAbstractExpression getExpression(
+			String body, EClassifier context, Map environment) {
 		return new Expression(body, context, environment);
 	}
 
 	/**
-	 * @generated 
+	 * @generated
 	 */
-	public static AdaptiveSystemAbstractExpression getExpression(String body,
-			EClassifier context) {
+	public static hub.top.adaptiveSystem.diagram.expressions.AdaptiveSystemAbstractExpression getExpression(
+			String body, EClassifier context) {
 		return getExpression(body, context, Collections.EMPTY_MAP);
 	}
 
 	/**
-	 * @generated 
+	 * @generated
 	 */
-	private static class Expression extends AdaptiveSystemAbstractExpression {
+	private static class Expression
+			extends
+			hub.top.adaptiveSystem.diagram.expressions.AdaptiveSystemAbstractExpression {
+
 		/**
-		 * @generated 
+		 * @generated
 		 */
 		private WeakReference queryRef;
 
 		/**
-		 * @generated 
+		 * @generated
 		 */
-		private final OCL oclInstance;
+		private final org.eclipse.ocl.ecore.OCL oclInstance;
 
 		/**
-		 * @generated 
+		 * @generated
 		 */
 		public Expression(String body, EClassifier context, Map environment) {
 			super(body, context);
-			oclInstance = OCL.newInstance();
+			oclInstance = org.eclipse.ocl.ecore.OCL.newInstance();
 			initCustomEnv(oclInstance.getEnvironment(), environment);
 		}
 
 		/**
-		 * @generated 
+		 * @generated
 		 */
 		protected Query getQuery() {
 			Query oclQuery = null;
@@ -104,7 +96,7 @@ public class AdaptiveSystemOCLFactory {
 		}
 
 		/**
-		 * @generated 
+		 * @generated
 		 */
 		protected Object doEvaluate(Object context, Map env) {
 			Query oclQuery = getQuery();
@@ -118,7 +110,6 @@ public class AdaptiveSystemOCLFactory {
 				evalEnv.replace((String) nextEntry.getKey(), nextEntry
 						.getValue());
 			}
-
 			try {
 				initExtentMap(context);
 				Object result = oclQuery.evaluate(context);
@@ -134,32 +125,18 @@ public class AdaptiveSystemOCLFactory {
 		/**
 		 * @generated
 		 */
-		protected Object performCast(Object value, ETypedElement targetType) {
-			if (targetType.getEType() instanceof EEnum) {
-				if (value instanceof EEnumLiteral) {
-					EEnumLiteral literal = (EEnumLiteral) value;
-					return (literal.getInstance() != null) ? literal
-							.getInstance() : literal;
-				}
-			}
-			return super.performCast(value, targetType);
-		}
-
-		/**
-		 * @generated
-		 */
 		private void initExtentMap(Object context) {
 			if (!getStatus().isOK() || context == null) {
 				return;
 			}
 			final Query queryToInit = getQuery();
 			final Object extentContext = context;
-
 			queryToInit.getExtentMap().clear();
 			if (queryToInit.queryText() != null
 					&& queryToInit.queryText().indexOf(
 							PredefinedType.ALL_INSTANCES_NAME) >= 0) {
 				AbstractVisitor visitior = new AbstractVisitor() {
+
 					private boolean usesAllInstances = false;
 
 					public Object visitOperationCallExp(OperationCallExp oc) {
@@ -184,7 +161,7 @@ public class AdaptiveSystemOCLFactory {
 		}
 
 		/**
-		 * @generated 
+		 * @generated
 		 */
 		private static void initCustomEnv(Environment ecoreEnv, Map environment) {
 			for (Iterator it = environment.keySet().iterator(); it.hasNext();) {
@@ -196,11 +173,11 @@ public class AdaptiveSystemOCLFactory {
 		}
 
 		/**
-		 * @generated 
+		 * @generated
 		 */
 		private static Variable createVar(Environment ecoreEnv, String name,
 				EClassifier type) {
-			Variable var = EcoreFactory.eINSTANCE.createVariable(); // or ecoreEnv.getOCLFactory().createVariable()?
+			Variable var = EcoreFactory.eINSTANCE.createVariable();
 			var.setName(name);
 			var.setType(ecoreEnv.getUMLReflection().getOCLType(type));
 			return var;

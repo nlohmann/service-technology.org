@@ -259,6 +259,7 @@ public class AdaptiveSystemNavigatorLabelProvider extends LabelProvider
 							"Parser was not found for label " + 4016); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
+
 	}
 
 	/**
@@ -281,6 +282,7 @@ public class AdaptiveSystemNavigatorLabelProvider extends LabelProvider
 							"Parser was not found for label " + 4001); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
+
 	}
 
 	/**
@@ -303,6 +305,7 @@ public class AdaptiveSystemNavigatorLabelProvider extends LabelProvider
 							"Parser was not found for label " + 4004); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
+
 	}
 
 	/**
@@ -342,6 +345,7 @@ public class AdaptiveSystemNavigatorLabelProvider extends LabelProvider
 							"Parser was not found for label " + 4006); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
+
 	}
 
 	/**
@@ -364,6 +368,7 @@ public class AdaptiveSystemNavigatorLabelProvider extends LabelProvider
 							"Parser was not found for label " + 4009); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
+
 	}
 
 	/**
@@ -403,6 +408,7 @@ public class AdaptiveSystemNavigatorLabelProvider extends LabelProvider
 							"Parser was not found for label " + 4011); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
+
 	}
 
 	/**
@@ -425,40 +431,53 @@ public class AdaptiveSystemNavigatorLabelProvider extends LabelProvider
 							"Parser was not found for label " + 4014); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
+
 	}
 
 	/**
 	 * @generated
 	 */
 	private String getArcToCondition_3001Text(View view) {
-		hub.top.adaptiveSystem.ArcToCondition domainModelElement = (hub.top.adaptiveSystem.ArcToCondition) view
-				.getElement();
-		if (domainModelElement != null) {
-			return String.valueOf(domainModelElement.getWeight());
+		IAdaptable hintAdapter = new hub.top.adaptiveSystem.diagram.providers.AdaptiveSystemParserProvider.HintAdapter(
+				hub.top.adaptiveSystem.diagram.providers.AdaptiveSystemElementTypes.ArcToCondition_3001,
+				(view.getElement() != null ? view.getElement() : view),
+				hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry
+						.getType(hub.top.adaptiveSystem.diagram.edit.parts.ArcToConditionWeightEditPart.VISUAL_ID));
+		IParser parser = ParserService.getInstance().getParser(hintAdapter);
+
+		if (parser != null) {
+			return parser.getPrintString(hintAdapter, ParserOptions.NONE
+					.intValue());
 		} else {
 			hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
-					.getInstance()
-					.logError(
-							"No domain element for view with visualID = " + 3001); //$NON-NLS-1$
+					.getInstance().logError(
+							"Parser was not found for label " + 6001); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
+
 	}
 
 	/**
 	 * @generated
 	 */
 	private String getArcToEvent_3002Text(View view) {
-		hub.top.adaptiveSystem.ArcToEvent domainModelElement = (hub.top.adaptiveSystem.ArcToEvent) view
-				.getElement();
-		if (domainModelElement != null) {
-			return String.valueOf(domainModelElement.getWeight());
+		IAdaptable hintAdapter = new hub.top.adaptiveSystem.diagram.providers.AdaptiveSystemParserProvider.HintAdapter(
+				hub.top.adaptiveSystem.diagram.providers.AdaptiveSystemElementTypes.ArcToEvent_3002,
+				(view.getElement() != null ? view.getElement() : view),
+				hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry
+						.getType(hub.top.adaptiveSystem.diagram.edit.parts.ArcToEventWeightEditPart.VISUAL_ID));
+		IParser parser = ParserService.getInstance().getParser(hintAdapter);
+
+		if (parser != null) {
+			return parser.getPrintString(hintAdapter, ParserOptions.NONE
+					.intValue());
 		} else {
 			hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
-					.getInstance()
-					.logError(
-							"No domain element for view with visualID = " + 3002); //$NON-NLS-1$
+					.getInstance().logError(
+							"Parser was not found for label " + 6002); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
+
 	}
 
 	/**

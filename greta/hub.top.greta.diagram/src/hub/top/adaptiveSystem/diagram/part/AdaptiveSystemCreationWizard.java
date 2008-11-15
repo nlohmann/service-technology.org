@@ -32,12 +32,12 @@ public class AdaptiveSystemCreationWizard extends Wizard implements INewWizard {
 	/**
 	 * @generated
 	 */
-	protected AdaptiveSystemCreationWizardPage diagramModelFilePage;
+	protected hub.top.adaptiveSystem.diagram.part.AdaptiveSystemCreationWizardPage diagramModelFilePage;
 
 	/**
 	 * @generated
 	 */
-	protected AdaptiveSystemCreationWizardPage domainModelFilePage;
+	protected hub.top.adaptiveSystem.diagram.part.AdaptiveSystemCreationWizardPage domainModelFilePage;
 
 	/**
 	 * @generated
@@ -91,8 +91,8 @@ public class AdaptiveSystemCreationWizard extends Wizard implements INewWizard {
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.workbench = workbench;
 		this.selection = selection;
-		setWindowTitle("New AdaptiveSystem Diagram");
-		setDefaultPageImageDescriptor(AdaptiveSystemDiagramEditorPlugin
+		setWindowTitle(hub.top.adaptiveSystem.diagram.part.Messages.AdaptiveSystemCreationWizardTitle);
+		setDefaultPageImageDescriptor(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
 				.getBundledImageDescriptor("icons/wizban/NewAdaptiveSystemWizard.gif")); //$NON-NLS-1$
 		setNeedsProgressMonitor(true);
 	}
@@ -101,18 +101,33 @@ public class AdaptiveSystemCreationWizard extends Wizard implements INewWizard {
 	 * @generated
 	 */
 	public void addPages() {
-		diagramModelFilePage = new AdaptiveSystemCreationWizardPage(
+		diagramModelFilePage = new hub.top.adaptiveSystem.diagram.part.AdaptiveSystemCreationWizardPage(
 				"DiagramModelFile", getSelection(), "adaptivesystem_diagram"); //$NON-NLS-1$ //$NON-NLS-2$
-		diagramModelFilePage.setTitle("Create AdaptiveSystem Diagram");
 		diagramModelFilePage
-				.setDescription("Select file that will contain diagram model.");
+				.setTitle(hub.top.adaptiveSystem.diagram.part.Messages.AdaptiveSystemCreationWizard_DiagramModelFilePageTitle);
+		diagramModelFilePage
+				.setDescription(hub.top.adaptiveSystem.diagram.part.Messages.AdaptiveSystemCreationWizard_DiagramModelFilePageDescription);
 		addPage(diagramModelFilePage);
 
-		domainModelFilePage = new AdaptiveSystemCreationWizardPage(
-				"DomainModelFile", getSelection(), "adaptivesystem"); //$NON-NLS-1$ //$NON-NLS-2$
-		domainModelFilePage.setTitle("Create AdaptiveSystem Diagram");
+		domainModelFilePage = new hub.top.adaptiveSystem.diagram.part.AdaptiveSystemCreationWizardPage(
+				"DomainModelFile", getSelection(), "adaptivesystem") { //$NON-NLS-1$ //$NON-NLS-2$
+
+			public void setVisible(boolean visible) {
+				if (visible) {
+					String fileName = diagramModelFilePage.getFileName();
+					fileName = fileName.substring(0, fileName.length()
+							- ".adaptivesystem_diagram".length()); //$NON-NLS-1$
+					setFileName(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorUtil
+							.getUniqueFileName(getContainerFullPath(),
+									fileName, "adaptivesystem")); //$NON-NLS-1$
+				}
+				super.setVisible(visible);
+			}
+		};
 		domainModelFilePage
-				.setDescription("Select file that will contain domain model.");
+				.setTitle(hub.top.adaptiveSystem.diagram.part.Messages.AdaptiveSystemCreationWizard_DomainModelFilePageTitle);
+		domainModelFilePage
+				.setDescription(hub.top.adaptiveSystem.diagram.part.Messages.AdaptiveSystemCreationWizard_DomainModelFilePageDescription);
 		addPage(domainModelFilePage);
 	}
 
@@ -124,16 +139,19 @@ public class AdaptiveSystemCreationWizard extends Wizard implements INewWizard {
 
 			protected void execute(IProgressMonitor monitor)
 					throws CoreException, InterruptedException {
-				diagram = AdaptiveSystemDiagramEditorUtil.createDiagram(
-						diagramModelFilePage.getURI(), domainModelFilePage
-								.getURI(), monitor);
+				diagram = hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorUtil
+						.createDiagram(diagramModelFilePage.getURI(),
+								domainModelFilePage.getURI(), monitor);
 				if (isOpenNewlyCreatedDiagramEditor() && diagram != null) {
 					try {
-						AdaptiveSystemDiagramEditorUtil.openDiagram(diagram);
+						hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorUtil
+								.openDiagram(diagram);
 					} catch (PartInitException e) {
-						ErrorDialog.openError(getContainer().getShell(),
-								"Error opening diagram editor", null, e
-										.getStatus());
+						ErrorDialog
+								.openError(
+										getContainer().getShell(),
+										hub.top.adaptiveSystem.diagram.part.Messages.AdaptiveSystemCreationWizardOpenEditorError,
+										null, e.getStatus());
 					}
 				}
 			}
@@ -144,12 +162,17 @@ public class AdaptiveSystemCreationWizard extends Wizard implements INewWizard {
 			return false;
 		} catch (InvocationTargetException e) {
 			if (e.getTargetException() instanceof CoreException) {
-				ErrorDialog.openError(getContainer().getShell(),
-						"Creation Problems", null, ((CoreException) e
-								.getTargetException()).getStatus());
+				ErrorDialog
+						.openError(
+								getContainer().getShell(),
+								hub.top.adaptiveSystem.diagram.part.Messages.AdaptiveSystemCreationWizardCreationError,
+								null, ((CoreException) e.getTargetException())
+										.getStatus());
 			} else {
-				AdaptiveSystemDiagramEditorPlugin.getInstance().logError(
-						"Error creating diagram", e.getTargetException()); //$NON-NLS-1$
+				hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
+						.getInstance()
+						.logError(
+								"Error creating diagram", e.getTargetException()); //$NON-NLS-1$
 			}
 			return false;
 		}

@@ -73,7 +73,6 @@ public class DoNetEditPart extends ShapeNodeEditPart {
 	 * @generated
 	 */
 	protected void createDefaultEditPolicies() {
-
 		super.createDefaultEditPolicies();
 		installEditPolicy(
 				EditPolicyRoles.SEMANTIC_ROLE,
@@ -360,7 +359,6 @@ public class DoNetEditPart extends ShapeNodeEditPart {
 		this.getEditDomain().getCommandStack().execute(deleteCC);
 	}
 
-	
 	/**
 	 * @generated
 	 */
@@ -375,7 +373,6 @@ public class DoNetEditPart extends ShapeNodeEditPart {
 		 * @generated
 		 */
 		public DoNetDescriptor() {
-
 			this.setLayoutManager(new StackLayout());
 			this.setFill(false);
 			this.setOutline(false);
@@ -395,13 +392,12 @@ public class DoNetEditPart extends ShapeNodeEditPart {
 
 			this.add(doNetBackground0);
 
-			RectangleFigure doNetBody0 = new RectangleFigure();
-			doNetBody0.setFill(false);
-			doNetBody0.setPreferredSize(new Dimension(getMapMode().DPtoLP(200),
-					getMapMode().DPtoLP(90)));
+			fFigureDoNetBody = new RectangleFigure();
+			fFigureDoNetBody.setFill(false);
+			fFigureDoNetBody.setPreferredSize(new Dimension(getMapMode()
+					.DPtoLP(200), getMapMode().DPtoLP(90)));
 
-			this.add(doNetBody0);
-			fFigureDoNetBody = doNetBody0;
+			this.add(fFigureDoNetBody);
 
 		}
 

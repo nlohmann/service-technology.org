@@ -8,7 +8,7 @@ import hub.top.adaptiveSystem.Condition;
 
 import java.util.ArrayList;
 
-import org.eclipse.draw2d.BorderLayout;
+import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Ellipse;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.PositionConstants;
@@ -30,7 +30,7 @@ import org.eclipse.gmf.runtime.diagram.ui.editpolicies.BorderItemSelectionEditPo
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
 import org.eclipse.gmf.runtime.diagram.ui.figures.BorderItemLocator;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.ConstrainedToolbarLayout;
-import org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel;
+import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
 import org.eclipse.gmf.runtime.notation.Bounds;
@@ -68,7 +68,6 @@ public class ConditionAPEditPart extends AbstractBorderedShapeEditPart {
 	 * @generated
 	 */
 	protected void createDefaultEditPolicies() {
-
 		super.createDefaultEditPolicies();
 		installEditPolicy(
 				EditPolicyRoles.SEMANTIC_ROLE,
@@ -441,8 +440,6 @@ public class ConditionAPEditPart extends AbstractBorderedShapeEditPart {
 		super.handleNotificationEvent(notification);
 	}
 
-	
-	
 	/**
 	 * @generated
 	 */
@@ -451,35 +448,33 @@ public class ConditionAPEditPart extends AbstractBorderedShapeEditPart {
 		/**
 		 * @generated
 		 */
-		private WrapLabel fFigureToken;
+		private WrappingLabel fFigureToken;
 
 		/**
 		 * @generated NOT
 		 */
 		public ConditionDescriptor() {
-
-			BorderLayout layoutThis = new BorderLayout();
-			this.setLayoutManager(layoutThis);
-
+			this.setForegroundColor(ColorConstants.black);
 			this.setPreferredSize(new Dimension(getMapMode().DPtoLP(20),
 					getMapMode().DPtoLP(20)));
 			this.setMaximumSize(new Dimension(getMapMode().DPtoLP(20),
 					getMapMode().DPtoLP(20)));
-			UserImplUpdateNode.updateCondition(
-					ConditionAPEditPart.this, this);
+			UserImplUpdateNode.updateCondition(ConditionAPEditPart.this, this);
 			createContents();
 		}
 
 		/**
-		 * @generated
+		 * @generated NOT
 		 */
 		private void createContents() {
 
-			WrapLabel token0 = new WrapLabel();
-			token0.setText("");
-
-			this.add(token0, BorderLayout.CENTER);
-			fFigureToken = token0;
+			fFigureToken = new WrappingLabel();
+			fFigureToken.setText("");
+			//START: Manja Wolf
+			//centering token
+			fFigureToken.setAlignment(PositionConstants.CENTER);
+			//END: Manja Wolf
+			this.add(fFigureToken);
 
 		}
 
@@ -505,7 +500,7 @@ public class ConditionAPEditPart extends AbstractBorderedShapeEditPart {
 		/**
 		 * @generated
 		 */
-		public WrapLabel getFigureToken() {
+		public WrappingLabel getFigureToken() {
 			return fFigureToken;
 		}
 

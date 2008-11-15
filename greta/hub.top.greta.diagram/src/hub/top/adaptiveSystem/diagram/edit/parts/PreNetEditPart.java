@@ -73,7 +73,6 @@ public class PreNetEditPart extends ShapeNodeEditPart {
 	 * @generated
 	 */
 	protected void createDefaultEditPolicies() {
-
 		super.createDefaultEditPolicies();
 		installEditPolicy(
 				EditPolicyRoles.SEMANTIC_ROLE,
@@ -362,7 +361,6 @@ public class PreNetEditPart extends ShapeNodeEditPart {
 		 * @generated
 		 */
 		public PreNetDescriptor() {
-
 			this.setLayoutManager(new StackLayout());
 			this.setFill(false);
 			this.setOutline(false);
@@ -382,13 +380,12 @@ public class PreNetEditPart extends ShapeNodeEditPart {
 
 			this.add(preNetBackground0);
 
-			RectangleFigure preNetBody0 = new RectangleFigure();
-			preNetBody0.setFill(false);
-			preNetBody0.setPreferredSize(new Dimension(
-					getMapMode().DPtoLP(200), getMapMode().DPtoLP(90)));
+			fFigurePreNetBody = new RectangleFigure();
+			fFigurePreNetBody.setFill(false);
+			fFigurePreNetBody.setPreferredSize(new Dimension(getMapMode()
+					.DPtoLP(200), getMapMode().DPtoLP(90)));
 
-			this.add(preNetBody0);
-			fFigurePreNetBody = preNetBody0;
+			this.add(fFigurePreNetBody);
 
 		}
 

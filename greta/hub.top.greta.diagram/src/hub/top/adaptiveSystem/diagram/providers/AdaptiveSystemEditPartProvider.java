@@ -10,10 +10,6 @@ import org.eclipse.gmf.runtime.diagram.ui.services.editpart.AbstractEditPartProv
 import org.eclipse.gmf.runtime.diagram.ui.services.editpart.CreateGraphicEditPartOperation;
 import org.eclipse.gmf.runtime.diagram.ui.services.editpart.IEditPartOperation;
 import org.eclipse.gmf.runtime.notation.View;
-import hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveSystemEditPartFactory;
-import hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveSystemEditPart;
-
-import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry;
 
 /**
  * @generated
@@ -44,7 +40,7 @@ public class AdaptiveSystemEditPartProvider extends AbstractEditPartProvider {
 	 * @generated
 	 */
 	public AdaptiveSystemEditPartProvider() {
-		setFactory(new AdaptiveSystemEditPartFactory());
+		setFactory(new hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveSystemEditPartFactory());
 		setAllowCaching(true);
 	}
 
@@ -122,8 +118,9 @@ public class AdaptiveSystemEditPartProvider extends AbstractEditPartProvider {
 	public synchronized boolean provides(IOperation operation) {
 		if (operation instanceof CreateGraphicEditPartOperation) {
 			View view = ((IEditPartOperation) operation).getView();
-			if (!AdaptiveSystemEditPart.MODEL_ID
-					.equals(AdaptiveSystemVisualIDRegistry.getModelID(view))) {
+			if (!hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveSystemEditPart.MODEL_ID
+					.equals(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry
+							.getModelID(view))) {
 				return false;
 			}
 			if (isAllowCaching() && getCachedPart(view) != null) {

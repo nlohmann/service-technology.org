@@ -18,9 +18,7 @@ public class AdaptiveSystemVisualIDRegistry {
 	/**
 	 * @generated
 	 */
-	private static final String DEBUG_KEY = hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin
-			.getInstance().getBundle().getSymbolicName()
-			+ "/debug/visualID"; //$NON-NLS-1$
+	private static final String DEBUG_KEY = "hub.top.GRETA.diagram/debug/visualID"; //$NON-NLS-1$
 
 	/**
 	 * @generated
@@ -97,14 +95,28 @@ public class AdaptiveSystemVisualIDRegistry {
 	 * @generated
 	 */
 	public static int getNodeVisualID(View containerView, EObject domainElement) {
-		if (domainElement == null
-				|| !hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveSystemEditPart.MODEL_ID
-						.equals(hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry
-								.getModelID(containerView))) {
+		if (domainElement == null) {
 			return -1;
 		}
-		switch (hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry
-				.getVisualID(containerView)) {
+		String containerModelID = hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry
+				.getModelID(containerView);
+		if (!hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveSystemEditPart.MODEL_ID
+				.equals(containerModelID)) {
+			return -1;
+		}
+		int containerVisualID;
+		if (hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveSystemEditPart.MODEL_ID
+				.equals(containerModelID)) {
+			containerVisualID = hub.top.adaptiveSystem.diagram.part.AdaptiveSystemVisualIDRegistry
+					.getVisualID(containerView);
+		} else {
+			if (containerView instanceof Diagram) {
+				containerVisualID = hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveSystemEditPart.VISUAL_ID;
+			} else {
+				return -1;
+			}
+		}
+		switch (containerVisualID) {
 		case hub.top.adaptiveSystem.diagram.edit.parts.OcletEditPart.VISUAL_ID:
 			if (hub.top.adaptiveSystem.AdaptiveSystemPackage.eINSTANCE
 					.getPreNet().isSuperTypeOf(domainElement.eClass())) {
@@ -300,6 +312,16 @@ public class AdaptiveSystemVisualIDRegistry {
 				return true;
 			}
 			break;
+		case hub.top.adaptiveSystem.diagram.edit.parts.ArcToConditionEditPart.VISUAL_ID:
+			if (hub.top.adaptiveSystem.diagram.edit.parts.ArcToConditionWeightEditPart.VISUAL_ID == nodeVisualID) {
+				return true;
+			}
+			break;
+		case hub.top.adaptiveSystem.diagram.edit.parts.ArcToEventEditPart.VISUAL_ID:
+			if (hub.top.adaptiveSystem.diagram.edit.parts.ArcToEventWeightEditPart.VISUAL_ID == nodeVisualID) {
+				return true;
+			}
+			break;
 		}
 		return false;
 	}
@@ -331,16 +353,6 @@ public class AdaptiveSystemVisualIDRegistry {
 	private static boolean isDiagram(
 			hub.top.adaptiveSystem.AdaptiveSystem element) {
 		return true;
-	}
-
-	/**
-	 * @generated
-	 */
-	private static boolean evaluate(
-			hub.top.adaptiveSystem.diagram.expressions.AdaptiveSystemAbstractExpression expression,
-			Object element) {
-		Object result = expression.evaluate(element);
-		return result instanceof Boolean && ((Boolean) result).booleanValue();
 	}
 
 }

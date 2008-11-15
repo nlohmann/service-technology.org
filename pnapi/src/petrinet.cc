@@ -1520,7 +1520,7 @@ unsigned int PetriNet::arc_weight(Node *my_source, Node *my_target) const
 
 
 /*!
- * \brief   returns true if all arcs connecting to n have a weight of 1
+ * \brief   returns true iff all arcs connecting to n have the same weight
  *
  *          Returns true only if the given node's incoming and outgoing arcs
  *          all have the same weight.

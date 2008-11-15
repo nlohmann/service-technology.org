@@ -635,7 +635,7 @@ void PetriNet::reduce_series_transitions(bool keepNormal) {
  * \note As \f$ p \f$ has both ingoing and outgoing arcs, \f$ p \f$ is an
  *       internal place. Thus, removing this place preserves controllability
  *       and all communicating partners if \f$ p \f$ is not covered by a final
- *       marking.
+ *       marking. 
  *
  * \return number of removed places
  * 
@@ -645,6 +645,15 @@ void PetriNet::reduce_series_transitions(bool keepNormal) {
  * \pre \f$ p \f$'s preset and postset are equal: \f$ p^\bullet = {}^\bullet p \f$
  *
  * \post \f$ p \f$ is removed: \f$ P' = P \; \backslash \; \{p\} \f$
+ * 
+ * Extension by arc weights:
+ * If there exists a place p with singleton preset t (precondition 1),
+ * where the preset is identical to the postset (precondition 2),
+ * and the arc weights of (p->t) and (t->p) is equal (precondition 3),
+ * and p stores initially at least as many tokens as given by the arc weights (precondition 4),
+ * and p is not final (precondition 5),
+ * then this place can be removed.
+ * 
  */
 unsigned int PetriNet::reduce_self_loop_places()
 {
@@ -654,10 +663,11 @@ unsigned int PetriNet::reduce_self_loop_places()
   
   // find places fulfilling the preconditions
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    if ( ((*p)->tokens > 0) &&
-         ((*p)->postset.size() == 1 && (*p)->preset.size() == 1) &&
-         ((*p)->preset == (*p)->postset) &&
-         (!(*p)->isFinal) )
+    if ( ((*p)->preset.size() == 1) &&       // precondition 1
+         ((*p)->preset == (*p)->postset) &&  // precodnition 2
+         (sameweights(*p)) &&                // precondition 3
+         ((*p)->tokens >= arc_weight((*p),(*((*p)->preset.begin())))) && // precondition 4
+         (!(*p)->isFinal) ) // precondition 5
         self_loop_places.push_back(*p);
   
   // remove useless places
@@ -694,6 +704,13 @@ unsigned int PetriNet::reduce_self_loop_places()
  * \pre \f$ t \f$'s preset and postset are equal: \f$ t^\bullet = {}^\bullet t \f$
  *
  * \post \f$ t \f$ is removed: \f$ T' = T \; \backslash \; \{t\} \f$
+ * 
+ * Extension by arc weights:
+ * If there exists a transition t with singleton preset p (precondition 1),
+ * where the preset is identical to the postset (precondition 2),
+ * and the arc weights both of (p->t) and of (t->p) is equal to 1 (precondition 3),
+ * then this transition can be removed.
+ * 
  */
 unsigned int PetriNet::reduce_self_loop_transitions()
 {
@@ -703,8 +720,10 @@ unsigned int PetriNet::reduce_self_loop_transitions()
   
   // find transitions fulfilling the preconditions
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-    if ( ((*t)->postset.size() == 1 && (*t)->preset.size() == 1) &&
-         ((*t)->preset == (*t)->postset) )
+    if ( ((*t)->preset.size() == 1) &&        // precondition 1
+         ((*t)->preset == (*t)->postset) &&   // precondition 2
+         (arc_weight((*t),(*((*t)->preset.begin()))) == 1) &&  // precondition 3
+         (arc_weight((*((*t)->preset.begin())),(*t)) == 1) )  // precondition 3
         self_loop_transitions.push_back(*t);
   
   // remove useless transitions
